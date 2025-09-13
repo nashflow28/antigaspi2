@@ -35,6 +35,12 @@ const router = createRouter({
       meta: { requiresAuth: false }
     },
     {
+      path: '/products/:id/reserve',
+      name: 'product-reserve',
+      component: () => import('@/views/ProductReserveView.vue'),
+      meta: { requiresAuth: true, roles: ['consumer'] }
+    },
+    {
       path: '/dashboard',
       name: 'dashboard',
       component: () => import('@/views/DashboardView.vue'),
