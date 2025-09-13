@@ -15,7 +15,7 @@ class ReservationController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('auth:api');
+        // Middleware is handled in routes, not controller for Laravel 11
     }
 
     public function index(Request $request): JsonResponse

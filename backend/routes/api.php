@@ -60,8 +60,8 @@ Route::get('categories', [ProductController::class, 'categories']);
 // Routes de test et informations
 Route::get('health', function () {
     return response()->json([
-        'success' => true,
-        'message' => 'API Antigaspi fonctionnelle',
+        'status' => 'ok',
+        'message' => 'API is working',
         'timestamp' => now(),
         'version' => '1.0.0'
     ]);

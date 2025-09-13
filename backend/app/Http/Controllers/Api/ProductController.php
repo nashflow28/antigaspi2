@@ -14,7 +14,7 @@ class ProductController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('auth:api')->except(['index', 'show']);
+        // Middleware is handled in routes, not controller for Laravel 11
     }
 
     public function index(Request $request): JsonResponse

@@ -1,0 +1,32 @@
+{
+  "name": "antigaspi-2",
+  "version": "1.0.0",
+  "description": "> **Système de lutte contre le gaspillage alimentaire connectant commerçants et consommateurs**",
+  "main": "index.js",
+  "scripts": {
+    "test": "playwright test",
+    "test:headed": "playwright test --headed",
+    "test:ui": "playwright test --ui",
+    "test:debug": "playwright test --debug",
+    "test:report": "playwright show-report",
+    "dev": "echo \"Frontend development server will be configured in Stage 2\"",
+    "build": "echo \"Build process will be configured in Stage 2\"",
+    "lint": "echo \"Linting will be configured in Stage 2\"",
+    "format": "echo \"Formatting will be configured in Stage 2\""
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nashflow28/antigaspi2.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/nashflow28/antigaspi2/issues"
+  },
+  "homepage": "https://github.com/nashflow28/antigaspi2#readme",
+  "devDependencies": {
+    "@playwright/test": "^1.55.0"
+  }
+}
