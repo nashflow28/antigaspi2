@@ -27,9 +27,7 @@ export const useReservationsStore = defineStore('reservations', () => {
 
   const totalSavings = computed(() =>
     completedReservations.value.reduce((total, reservation) => {
-      const originalPrice = parseFloat(reservation.product.original_price)
-      const discountedPrice = parseFloat(reservation.product.discounted_price)
-      const savings = (originalPrice - discountedPrice) * reservation.quantity_reserved
+      const savings = (reservation.original_price - reservation.discounted_price) * reservation.quantity
       return total + savings
     }, 0)
   )

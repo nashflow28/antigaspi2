@@ -1,0 +1,225 @@
+<template>
+  <div class="space-y-8">
+    <!-- Header moderne -->
+    <div class="text-center animate-fade-in-up">
+      <h3 class="text-2xl font-display font-bold text-neutral-900 mb-2">
+        Content de vous revoir !
+      </h3>
+      <p class="text-neutral-600">
+        Connectez-vous pour accéder à votre compte Antigaspi
+      </p>
+    </div>
+
+    <form @submit.prevent="handleSubmit" class="space-y-6 animate-fade-in-up" style="animation-delay: 0.2s;">
+      <!-- Email Input -->
+      <div class="form-group">
+        <label for="email" class="form-label flex items-center gap-2">
+          <span>Adresse email</span>
+          <span class="text-error-500">*</span>
+        </label>
+        <div class="relative">
+          <input
+            id="email"
+            type="email"
+            v-model="form.email"
+            :class="[
+              'form-input pl-12',
+              errors.email ? 'form-input-error' : ''
+            ]"
+            placeholder="votre@email.com"
+            autocomplete="email"
+            required
+          />
+          <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+            <Mail class="w-5 h-5 text-neutral-400" />
+          </div>
+        </div>
+        <p v-if="errors.email" class="form-error animate-fade-in">
+          {{ errors.email }}
+        </p>
+      </div>
+
+      <!-- Password Input -->
+      <div class="form-group">
+        <label for="password" class="form-label flex items-center gap-2">
+          <span>Mot de passe</span>
+          <span class="text-error-500">*</span>
+        </label>
+        <div class="relative">
+          <input
+            id="password"
+            :type="showPassword ? 'text' : 'password'"
+            v-model="form.password"
+            :class="[
+              'form-input pl-12 pr-12',
+              errors.password ? 'form-input-error' : ''
+            ]"
+            placeholder="••••••••"
+            autocomplete="current-password"
+            required
+          />
+          <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+            <Lock class="w-5 h-5 text-neutral-400" />
+          </div>
+          <button
+            type="button"
+            @click="togglePasswordVisibility"
+            class="absolute inset-y-0 right-0 pr-4 flex items-center text-neutral-400 hover:text-primary-600 transition-colors duration-200"
+          >
+            <Eye v-if="!showPassword" class="w-5 h-5" />
+            <EyeOff v-else class="w-5 h-5" />
+          </button>
+        </div>
+        <p v-if="errors.password" class="form-error animate-fade-in">
+          {{ errors.password }}
+        </p>
+      </div>
+
+      <!-- Options et liens -->
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <input
+            id="remember-me"
+            v-model="form.remember"
+            type="checkbox"
+            class="form-checkbox"
+          />
+          <label for="remember-me" class="text-sm text-neutral-700 font-medium">
+            Se souvenir de moi
+          </label>
+        </div>
+
+        <div class="text-sm">
+          <a href="#" class="font-medium text-primary-600 hover:text-primary-700 transition-colors duration-200 hover:underline">
+            Mot de passe oublié ?
+          </a>
+        </div>
+      </div>
+
+      <!-- Submit Button -->
+      <button
+        type="submit"
+        :disabled="loading"
+        class="w-full btn btn-primary btn-lg glow-effect group relative overflow-hidden"
+      >
+        <span class="relative z-10 flex items-center justify-center gap-2">
+          <Loader2 v-if="loading" class="w-5 h-5 animate-spin" />
+          <span>{{ loading ? 'Connexion en cours...' : 'Se connecter' }}</span>
+        </span>
+        <div class="absolute inset-0 bg-gradient-to-r from-primary-600 to-secondary-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+      </button>
+
+      <!-- Divider -->
+      <div class="relative">
+        <div class="absolute inset-0 flex items-center">
+          <div class="w-full border-t border-neutral-200"></div>
+        </div>
+        <div class="relative flex justify-center text-sm">
+          <span class="px-4 bg-white text-neutral-500 font-medium">ou</span>
+        </div>
+      </div>
+
+      <!-- Register Link -->
+      <div class="text-center">
+        <p class="text-neutral-600">
+          Pas encore de compte ?
+          <router-link
+            to="/register"
+            class="font-medium text-primary-600 hover:text-primary-700 transition-colors duration-200 hover:underline ml-1"
+          >
+            Créer un compte
+          </router-link>
+        </p>
+      </div>
+    </form>
+
+    <!-- Footer Links -->
+    <div class="text-center text-sm text-neutral-500 animate-fade-in-up" style="animation-delay: 0.4s;">
+      <p>
+        En vous connectant, vous acceptez nos
+        <a href="#" class="text-primary-600 hover:text-primary-700 hover:underline transition-colors duration-200">
+          Conditions d'utilisation
+        </a>
+        et notre
+        <a href="#" class="text-primary-600 hover:text-primary-700 hover:underline transition-colors duration-200">
+          Politique de confidentialité
+        </a>
+      </p>
+    </div>
+  </div>
+</template>
+
+<script setup lang="ts">
+import { ref, reactive } from 'vue'
+import { useRouter } from 'vue-router'
+import { useAuthStore } from '@/stores/auth'
+import { Mail, Lock, Eye, EyeOff, Loader2 } from 'lucide-vue-next'
+import type { LoginCredentials } from '@/types'
+
+const router = useRouter()
+const authStore = useAuthStore()
+
+const loading = ref(false)
+const showPassword = ref(false)
+const errors = ref<Record<string, string>>({})
+
+const form = reactive<LoginCredentials & { remember: boolean }>({
+  email: '',
+  password: '',
+  remember: false
+})
+
+const validateForm = (): boolean => {
+  errors.value = {}
+
+  if (!form.email) {
+    errors.value.email = 'L\'adresse e-mail est requise'
+  } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) {
+    errors.value.email = 'Veuillez saisir une adresse e-mail valide'
+  }
+
+  if (!form.password) {
+    errors.value.password = 'Le mot de passe est requis'
+  } else if (form.password.length < 6) {
+    errors.value.password = 'Le mot de passe doit contenir au moins 6 caractères'
+  }
+
+  return Object.keys(errors.value).length === 0
+}
+
+const togglePasswordVisibility = () => {
+  showPassword.value = !showPassword.value
+}
+
+const handleSubmit = async () => {
+  if (!validateForm()) {
+    return
+  }
+
+  loading.value = true
+
+  try {
+    const result = await authStore.login({
+      email: form.email,
+      password: form.password
+    })
+
+    if (result.success) {
+      // Rediriger selon le rôle de l'utilisateur
+      const user = authStore.user
+      if (user?.role === 'admin') {
+        router.push('/admin/dashboard')
+      } else if (user?.role === 'merchant') {
+        router.push('/merchant/dashboard')
+      } else {
+        router.push('/dashboard')
+      }
+    }
+  } catch (error: any) {
+    // L'erreur est déjà gérée par le store et affichée via les notifications
+    console.error('Login error:', error)
+  } finally {
+    loading.value = false
+  }
+}
+</script>

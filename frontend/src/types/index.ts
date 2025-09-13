@@ -45,17 +45,33 @@ export interface Product {
 
 export interface Reservation {
   id: number
-  product_id: number
-  consumer_id: number
-  quantity_reserved: number
-  total_amount: string
-  status: 'pending' | 'confirmed' | 'completed' | 'cancelled'
-  reserved_at: string
+  product_id?: number
+  consumer_id?: number
+  quantity_reserved?: number
+  quantity: number
+  total_amount?: string
+  original_price: number
+  discounted_price: number
+  status: 'pending' | 'confirmed' | 'ready' | 'completed' | 'cancelled' | 'expired'
+  reserved_at?: string
   confirmed_at?: string
   completed_at?: string
   cancelled_at?: string
-  product: Product
-  consumer: User
+  pickup_date: Date | string
+  pickup_notes: string
+  reservation_code: string
+  created_at: Date | string
+  product: {
+    id: number
+    name: string
+    image_url?: string | null
+    merchant: {
+      name: string
+      address: string
+      phone: string
+    }
+  }
+  consumer?: User
 }
 
 export interface AuthResponse {
