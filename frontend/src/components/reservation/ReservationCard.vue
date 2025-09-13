@@ -38,7 +38,7 @@
           >
             <button
               @click="$emit('view', reservation.id); showActions = false"
-              class="w-full px-4 py-2 text-left text-sm hover:bg-neutral-50 flex items-center gap-2"
+              class="w-full px-4 py-2 text-left text-sm hover:bg-gray-50 flex items-center gap-2"
             >
               <Eye class="w-4 h-4" />
               Voir détails
@@ -46,7 +46,7 @@
             <button
               v-if="reservation.product.merchant.phone"
               @click="$emit('contact', reservation); showActions = false"
-              class="w-full px-4 py-2 text-left text-sm hover:bg-neutral-50 flex items-center gap-2"
+              class="w-full px-4 py-2 text-left text-sm hover:bg-gray-50 flex items-center gap-2"
             >
               <Phone class="w-4 h-4" />
               Contacter
@@ -54,7 +54,7 @@
             <button
               v-if="canCancel"
               @click="$emit('cancel', reservation.id); showActions = false"
-              class="w-full px-4 py-2 text-left text-sm hover:bg-neutral-50 text-error-600 flex items-center gap-2"
+              class="w-full px-4 py-2 text-left text-sm hover:bg-gray-50 text-error-600 flex items-center gap-2"
             >
               <X class="w-4 h-4" />
               Annuler
@@ -138,7 +138,7 @@
 
           <!-- Countdown ou statut -->
           <div v-if="reservation.status !== 'completed' && reservation.status !== 'cancelled' && reservation.status !== 'expired'">
-            <div class="bg-neutral-50 rounded-xl p-3">
+            <div class="bg-gray-50 rounded-xl p-3">
               <div class="flex items-center justify-between">
                 <span class="text-sm font-medium text-neutral-700">
                   {{ getStatusMessage() }}

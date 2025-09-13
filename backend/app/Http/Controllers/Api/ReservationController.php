@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\StoreReservationRequest;
+use App\Http\Resources\ReservationResource;
 use App\Models\Reservation;
 use App\Models\Product;
 use Illuminate\Http\JsonResponse;
@@ -49,48 +51,7 @@ class ReservationController extends Controller
             $perPage = min($request->get('per_page', 15), 50);
             $reservations = $query->paginate($perPage);
 
-            // Formater les données
-            $reservations->getCollection()->transform(function ($reservation) {
-                return [
-                    'id' => $reservation->id,
-                    'reservation_code' => $reservation->reservation_code,
-                    'quantity_reserved' => $reservation->quantity_reserved,
-                    'total_amount' => $reservation->total_amount,
-                    'status' => $reservation->status,
-                    'expires_at' => $reservation->expires_at,
-                    'time_until_expiration' => $reservation->time_until_expiration,
-                    'is_expired' => $reservation->isExpired(),
-                    'can_be_cancelled' => $reservation->canBeCancelled(),
-                    'notes' => $reservation->notes,
-                    'product' => [
-                        'id' => $reservation->product->id,
-                        'name' => $reservation->product->name,
-                        'discounted_price' => $reservation->product->discounted_price,
-                        'expiration_date' => $reservation->product->expiration_date,
-                        'image_url' => $reservation->product->image_url,
-                        'category' => $reservation->product->category->name,
-                    ],
-                    'merchant' => [
-                        'business_name' => $reservation->product->merchant->business_name,
-                        'city' => $reservation->product->merchant->user->city,
-                        'address' => $reservation->product->merchant->user->address,
-                        'phone' => $reservation->product->merchant->user->phone,
-                    ],
-                    'created_at' => $reservation->created_at,
-                    'confirmed_at' => $reservation->confirmed_at,
-                ];
-            });
-
-            return response()->json([
-                'success' => true,
-                'data' => $reservations->items(),
-                'pagination' => [
-                    'current_page' => $reservations->currentPage(),
-                    'last_page' => $reservations->lastPage(),
-                    'per_page' => $reservations->perPage(),
-                    'total' => $reservations->total(),
-                ]
-            ]);
+            return ReservationResource::collection($reservations);
 
         } catch (\Exception $e) {
             return response()->json([
@@ -101,104 +62,39 @@ class ReservationController extends Controller
         }
     }
 
-    public function store(Request $request): JsonResponse
+    public function store(StoreReservationRequest $request): JsonResponse
     {
         try {
             $user = JWTAuth::parseToken()->authenticate();
-
-            if (!$user->isConsumer()) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Seuls les consommateurs peuvent faire des réservations'
-                ], 403);
-            }
-
-            $validator = Validator::make($request->all(), [
-                'product_id' => 'required|exists:products,id',
-                'quantity_reserved' => 'required|integer|min:1',
-                'notes' => 'nullable|string|max:500',
-            ]);
-
-            if ($validator->fails()) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Erreurs de validation',
-                    'errors' => $validator->errors()
-                ], 422);
-            }
 
             // Transaction pour assurer la cohérence des données
             return DB::transaction(function () use ($request, $user) {
                 $product = Product::lockForUpdate()->findOrFail($request->product_id);
 
-                // Vérifications
-                if (!$product->is_active) {
-                    return response()->json([
-                        'success' => false,
-                        'message' => 'Ce produit n\'est plus disponible'
-                    ], 400);
-                }
-
-                if ($product->isExpired()) {
-                    return response()->json([
-                        'success' => false,
-                        'message' => 'Ce produit est expiré'
-                    ], 400);
-                }
-
-                if ($product->quantity_available < $request->quantity_reserved) {
-                    return response()->json([
-                        'success' => false,
-                        'message' => 'Stock insuffisant. Quantité disponible: ' . $product->quantity_available
-                    ], 400);
-                }
-
-                // Vérifier si l'utilisateur a déjà une réservation active pour ce produit
-                $existingReservation = Reservation::where('user_id', $user->id)
-                    ->where('product_id', $product->id)
-                    ->whereIn('status', ['pending', 'confirmed'])
-                    ->exists();
-
-                if ($existingReservation) {
-                    return response()->json([
-                        'success' => false,
-                        'message' => 'Vous avez déjà une réservation active pour ce produit'
-                    ], 400);
-                }
-
                 // Calculer le montant total
-                $totalAmount = $product->discounted_price * $request->quantity_reserved;
+                $totalAmount = $product->discounted_price * $request->quantity;
 
                 // Créer la réservation
                 $reservation = Reservation::create([
                     'user_id' => $user->id,
                     'product_id' => $product->id,
-                    'quantity_reserved' => $request->quantity_reserved,
+                    'quantity_reserved' => $request->quantity,
                     'total_amount' => $totalAmount,
                     'status' => 'pending',
                     'notes' => $request->notes,
-                    'expires_at' => now()->addHours(24), // 24h pour récupérer
+                    'reserved_at' => now(),
+                    'expires_at' => now()->addHours(24),
                 ]);
 
                 // Décrémenter le stock
-                $product->decrement('quantity_available', $request->quantity_reserved);
+                $product->decrement('quantity_available', $request->quantity);
 
                 $reservation->load(['product.category', 'product.merchant.user']);
 
                 return response()->json([
                     'success' => true,
                     'message' => 'Réservation créée avec succès',
-                    'data' => [
-                        'id' => $reservation->id,
-                        'reservation_code' => $reservation->reservation_code,
-                        'quantity_reserved' => $reservation->quantity_reserved,
-                        'total_amount' => $reservation->total_amount,
-                        'status' => $reservation->status,
-                        'expires_at' => $reservation->expires_at,
-                        'product_name' => $reservation->product->name,
-                        'merchant_name' => $reservation->product->merchant->business_name,
-                        'merchant_phone' => $reservation->product->merchant->user->phone,
-                    ]
+                    'data' => new ReservationResource($reservation)
                 ], 201);
             });
 
@@ -220,46 +116,9 @@ class ReservationController extends Controller
                 ->where('user_id', $user->id)
                 ->findOrFail($id);
 
-            $reservationData = [
-                'id' => $reservation->id,
-                'reservation_code' => $reservation->reservation_code,
-                'quantity_reserved' => $reservation->quantity_reserved,
-                'total_amount' => $reservation->total_amount,
-                'status' => $reservation->status,
-                'expires_at' => $reservation->expires_at,
-                'time_until_expiration' => $reservation->time_until_expiration,
-                'is_expired' => $reservation->isExpired(),
-                'can_be_cancelled' => $reservation->canBeCancelled(),
-                'notes' => $reservation->notes,
-                'product' => [
-                    'id' => $reservation->product->id,
-                    'name' => $reservation->product->name,
-                    'description' => $reservation->product->description,
-                    'original_price' => $reservation->product->original_price,
-                    'discounted_price' => $reservation->product->discounted_price,
-                    'expiration_date' => $reservation->product->expiration_date,
-                    'image_url' => $reservation->product->image_url,
-                    'category' => [
-                        'id' => $reservation->product->category->id,
-                        'name' => $reservation->product->category->name,
-                        'icon' => $reservation->product->category->icon,
-                    ],
-                ],
-                'merchant' => [
-                    'id' => $reservation->product->merchant->id,
-                    'business_name' => $reservation->product->merchant->business_name,
-                    'business_type' => $reservation->product->merchant->business_type,
-                    'city' => $reservation->product->merchant->user->city,
-                    'address' => $reservation->product->merchant->user->address,
-                    'phone' => $reservation->product->merchant->user->phone,
-                ],
-                'created_at' => $reservation->created_at,
-                'confirmed_at' => $reservation->confirmed_at,
-            ];
-
             return response()->json([
                 'success' => true,
-                'data' => $reservationData
+                'data' => new ReservationResource($reservation)
             ]);
 
         } catch (\Exception $e) {
@@ -348,42 +207,7 @@ class ReservationController extends Controller
             $perPage = min($request->get('per_page', 15), 50);
             $reservations = $query->paginate($perPage);
 
-            // Formater les données
-            $reservations->getCollection()->transform(function ($reservation) {
-                return [
-                    'id' => $reservation->id,
-                    'reservation_code' => $reservation->reservation_code,
-                    'quantity_reserved' => $reservation->quantity_reserved,
-                    'total_amount' => $reservation->total_amount,
-                    'status' => $reservation->status,
-                    'expires_at' => $reservation->expires_at,
-                    'is_expired' => $reservation->isExpired(),
-                    'notes' => $reservation->notes,
-                    'customer' => [
-                        'name' => $reservation->user->full_name,
-                        'phone' => $reservation->user->phone,
-                        'city' => $reservation->user->city,
-                    ],
-                    'product' => [
-                        'id' => $reservation->product->id,
-                        'name' => $reservation->product->name,
-                        'category' => $reservation->product->category->name,
-                    ],
-                    'created_at' => $reservation->created_at,
-                    'confirmed_at' => $reservation->confirmed_at,
-                ];
-            });
-
-            return response()->json([
-                'success' => true,
-                'data' => $reservations->items(),
-                'pagination' => [
-                    'current_page' => $reservations->currentPage(),
-                    'last_page' => $reservations->lastPage(),
-                    'per_page' => $reservations->perPage(),
-                    'total' => $reservations->total(),
-                ]
-            ]);
+            return ReservationResource::collection($reservations);
 
         } catch (\Exception $e) {
             return response()->json([
@@ -478,6 +302,110 @@ class ReservationController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur lors de la finalisation',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function markReady($id): JsonResponse
+    {
+        try {
+            $user = JWTAuth::parseToken()->authenticate();
+
+            if (!$user->isMerchant()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Seuls les commerçants peuvent marquer les réservations comme prêtes'
+                ], 403);
+            }
+
+            $reservation = Reservation::with(['product.merchant'])
+                ->findOrFail($id);
+
+            if ($reservation->product->merchant->user_id !== $user->id) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Vous ne pouvez gérer que vos propres réservations'
+                ], 403);
+            }
+
+            if ($reservation->status !== 'confirmed') {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Cette réservation n\'est pas confirmée'
+                ], 400);
+            }
+
+            $reservation->update(['status' => 'ready']);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Réservation marquée comme prête pour le retrait'
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Erreur lors de la mise à jour',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function statistics(): JsonResponse
+    {
+        try {
+            $user = JWTAuth::parseToken()->authenticate();
+
+            // Statistiques de base
+            $stats = [
+                'total_reservations' => Reservation::where('user_id', $user->id)->count(),
+                'pending_reservations' => Reservation::where('user_id', $user->id)->where('status', 'pending')->count(),
+                'confirmed_reservations' => Reservation::where('user_id', $user->id)->where('status', 'confirmed')->count(),
+                'completed_reservations' => Reservation::where('user_id', $user->id)->where('status', 'completed')->count(),
+                'cancelled_reservations' => Reservation::where('user_id', $user->id)->where('status', 'cancelled')->count(),
+            ];
+
+            // Impact environnemental (réservations terminées uniquement)
+            $completedReservations = Reservation::with('product')
+                ->where('user_id', $user->id)
+                ->where('status', 'completed')
+                ->get();
+
+            $totalSavings = 0;
+            $totalFoodSaved = 0;
+
+            foreach ($completedReservations as $reservation) {
+                $savings = ($reservation->product->original_price - $reservation->product->discounted_price) * $reservation->quantity_reserved;
+                $totalSavings += $savings;
+                $totalFoodSaved += $reservation->quantity_reserved;
+            }
+
+            $stats['environmental_impact'] = [
+                'total_money_saved' => round($totalSavings, 2),
+                'total_food_saved_kg' => $totalFoodSaved,
+                'total_co2_saved_kg' => round($totalFoodSaved * 2.5, 1), // 2.5kg CO2 par kg de nourriture
+            ];
+
+            // Statistiques mensuelles
+            $thisMonth = Reservation::where('user_id', $user->id)
+                ->whereMonth('created_at', now()->month)
+                ->whereYear('created_at', now()->year);
+
+            $stats['this_month'] = [
+                'total_reservations' => $thisMonth->count(),
+                'completed_reservations' => $thisMonth->where('status', 'completed')->count(),
+            ];
+
+            return response()->json([
+                'success' => true,
+                'data' => $stats
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Erreur lors du calcul des statistiques',
                 'error' => $e->getMessage()
             ], 500);
         }

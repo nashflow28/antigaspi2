@@ -45,12 +45,14 @@ Route::prefix('reservations')->middleware('auth:api')->group(function () {
     // Routes pour les consommateurs
     Route::get('/', [ReservationController::class, 'index']); // Mes réservations
     Route::post('/', [ReservationController::class, 'store']); // Créer une réservation
+    Route::get('/statistics', [ReservationController::class, 'statistics']); // Mes statistiques
     Route::get('/{id}', [ReservationController::class, 'show']); // Détail de ma réservation
     Route::post('/{id}/cancel', [ReservationController::class, 'cancel']); // Annuler ma réservation
 
     // Routes pour les commerçants
     Route::get('/merchant/list', [ReservationController::class, 'merchantReservations']); // Réservations reçues
     Route::post('/{id}/confirm', [ReservationController::class, 'confirm']); // Confirmer une réservation
+    Route::post('/{id}/ready', [ReservationController::class, 'markReady']); // Marquer comme prêt
     Route::post('/{id}/complete', [ReservationController::class, 'complete']); // Marquer comme terminée
 });
 
