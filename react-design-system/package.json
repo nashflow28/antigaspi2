@@ -1,0 +1,71 @@
+{
+  "name": "@antigaspi/design-system",
+  "version": "1.0.0",
+  "description": "Modern React design system for Antigaspi with dark mode and glassmorphism effects",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc && vite build",
+    "dev": "vite",
+    "test": "vitest",
+    "test:ui": "vitest --ui",
+    "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
+    "preview": "vite preview",
+    "typecheck": "tsc --noEmit"
+  },
+  "keywords": [
+    "react",
+    "design-system",
+    "components",
+    "ui",
+    "tailwindcss",
+    "framer-motion",
+    "typescript",
+    "dark-mode",
+    "glassmorphism"
+  ],
+  "author": "Claude Code",
+  "license": "MIT",
+  "peerDependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  },
+  "dependencies": {
+    "class-variance-authority": "^0.7.0",
+    "clsx": "^2.0.0",
+    "framer-motion": "^10.16.0",
+    "tailwind-merge": "^2.0.0"
+  },
+  "devDependencies": {
+    "@testing-library/jest-dom": "^6.8.0",
+    "@testing-library/react": "^14.3.1",
+    "@types/react": "^18.2.0",
+    "@types/react-dom": "^18.2.0",
+    "@typescript-eslint/eslint-plugin": "^6.0.0",
+    "@typescript-eslint/parser": "^6.0.0",
+    "@vitejs/plugin-react": "^4.0.0",
+    "@vitest/ui": "^0.34.7",
+    "autoprefixer": "^10.4.0",
+    "eslint": "^8.45.0",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "eslint-plugin-react-refresh": "^0.4.0",
+    "jsdom": "^22.1.0",
+    "postcss": "^8.4.0",
+    "tailwindcss": "^3.3.0",
+    "typescript": "^5.0.2",
+    "vite": "^4.4.0",
+    "vitest": "^0.34.0"
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/antigaspi/react-design-system.git"
+  },
+  "bugs": {
+    "url": "https://github.com/antigaspi/react-design-system/issues"
+  },
+  "homepage": "https://github.com/antigaspi/react-design-system#readme"
+}

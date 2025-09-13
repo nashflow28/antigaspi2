@@ -1,7 +1,7 @@
 <template>
   <div class="min-h-screen">
     <!-- Hero Section - Design moderne avec glassmorphism et gradients -->
-    <section class="relative bg-gradient-to-br from-primary-500 via-primary-600 to-secondary-700 text-white overflow-hidden">
+    <section class="relative bg-gradient-to-br from-primary-500 via-primary-600 to-secondary-700 text-white overflow-hidden" data-testid="hero-section">
       <!-- Background decorative elements -->
       <div class="absolute inset-0">
         <div class="absolute top-0 left-0 w-72 h-72 bg-accent-500/20 rounded-full blur-3xl animate-pulse-glow"></div>
@@ -18,7 +18,7 @@
           </div>
 
           <!-- Titre principal avec gradient text -->
-          <h1 class="text-5xl md:text-7xl lg:text-8xl font-display font-bold mb-8 animate-fade-in-up text-balance" style="animation-delay: 0.2s;">
+          <h1 class="text-5xl md:text-7xl font-display font-bold mb-8 animate-fade-in-up text-balance" style="animation-delay: 0.2s; font-size: 8rem;" data-testid="main-hero-title">
             <span class="bg-gradient-to-r from-white via-primary-100 to-accent-200 bg-clip-text text-transparent">
               Sauvons
             </span>
