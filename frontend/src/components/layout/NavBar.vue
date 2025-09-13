@@ -12,7 +12,7 @@
               <span class="text-white text-xl">🌱</span>
             </div>
             <div class="flex flex-col">
-              <span class="text-2xl font-display font-bold bg-gradient-primary bg-clip-text text-transparent">
+              <span class="text-2xl font-bold bg-gradient-primary bg-clip-text text-transparent">
                 Antigaspi
               </span>
               <span class="text-xs text-neutral-500 font-medium -mt-1">

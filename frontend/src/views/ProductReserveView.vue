@@ -11,7 +11,7 @@
             <ArrowLeft class="w-6 h-6" />
           </button>
           <div>
-            <h1 class="text-3xl lg:text-4xl font-display font-bold text-neutral-900 mb-2">
+            <h1 class="text-3xl lg:text-4xl font-bold text-neutral-900 mb-2">
               Réserver un produit 🛒
             </h1>
             <p class="text-lg text-neutral-600">

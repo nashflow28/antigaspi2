@@ -4,7 +4,7 @@
     <div class="mb-8">
       <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
         <div>
-          <h1 class="text-3xl lg:text-4xl font-display font-bold text-neutral-900 mb-2">
+          <h1 class="text-3xl lg:text-4xl font-bold text-neutral-900 mb-2">
             Tableau de bord Administrateur
           </h1>
           <p class="text-neutral-600 text-lg">

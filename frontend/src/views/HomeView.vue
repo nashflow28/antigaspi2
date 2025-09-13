@@ -18,7 +18,7 @@
           </div>
 
           <!-- Titre principal avec gradient text -->
-          <h1 class="text-5xl md:text-7xl font-display font-bold mb-8 animate-fade-in-up text-balance" style="animation-delay: 0.2s; font-size: 8rem;" data-testid="main-hero-title">
+          <h1 class="text-5xl md:text-7xl font-bold mb-8 animate-fade-in-up text-balance" style="animation-delay: 0.2s; font-size: 8rem;" data-testid="main-hero-title">
             <span class="bg-gradient-to-r from-white via-primary-100 to-accent-200 bg-clip-text text-transparent">
               Sauvons
             </span>
@@ -93,7 +93,7 @@
             <span class="w-2 h-2 bg-primary-500 rounded-full"></span>
             Processus simple en 3 étapes
           </div>
-          <h2 class="text-4xl lg:text-6xl font-display font-bold text-neutral-900 mb-6 text-balance">
+          <h2 class="text-4xl lg:text-5xl font-bold text-neutral-900 mb-6 text-balance" style="font-family: 'Cal Sans', 'Inter', ui-sans-serif, system-ui, sans-serif">
             Comment ça marche ?
           </h2>
           <p class="text-xl text-neutral-600 max-w-2xl mx-auto">

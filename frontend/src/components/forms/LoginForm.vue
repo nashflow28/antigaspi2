@@ -2,7 +2,7 @@
   <div class="space-y-8">
     <!-- Header moderne -->
     <div class="text-center animate-fade-in-up">
-      <h3 class="text-2xl font-display font-bold text-neutral-900 mb-2">
+      <h3 class="text-2xl font-bold text-neutral-900 mb-2">
         Content de vous revoir !
       </h3>
       <p class="text-neutral-600">

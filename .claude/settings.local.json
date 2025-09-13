@@ -21,7 +21,8 @@
       "Bash(npm run test:*)",
       "Bash(npm run build:*)",
       "Bash(find:*)",
-      "Bash(npm run typecheck:*)"
+      "Bash(npm run typecheck:*)",
+      "Bash(npm uninstall:*)"
     ],
     "deny": [],
     "ask": []

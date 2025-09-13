@@ -5,7 +5,7 @@
       <div class="container-fluid py-6">
         <div class="flex items-center justify-between animate-fade-in-up">
           <div>
-            <h1 class="text-3xl lg:text-4xl font-display font-bold text-neutral-900 mb-2">
+            <h1 class="text-3xl lg:text-4xl font-bold text-neutral-900 mb-2">
               Bonjour {{ authStore.user?.first_name }} ! 👋
             </h1>
             <p class="text-lg text-neutral-600">
