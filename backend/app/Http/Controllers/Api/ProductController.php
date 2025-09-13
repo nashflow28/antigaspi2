@@ -1,0 +1,374 @@
+<?php
+
+namespace App\Http\Controllers\Api;
+
+use App\Http\Controllers\Controller;
+use App\Models\Product;
+use App\Models\Category;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
+use Tymon\JWTAuth\Facades\JWTAuth;
+
+class ProductController extends Controller
+{
+    public function __construct()
+    {
+        $this->middleware('auth:api')->except(['index', 'show']);
+    }
+
+    public function index(Request $request): JsonResponse
+    {
+        try {
+            $query = Product::with(['merchant.user', 'category'])
+                ->active()
+                ->available();
+
+            // Filtres
+            if ($request->has('category_id')) {
+                $query->byCategory($request->category_id);
+            }
+
+            if ($request->has('merchant_id')) {
+                $query->byMerchant($request->merchant_id);
+            }
+
+            if ($request->has('city')) {
+                $query->whereHas('merchant.user', function ($q) use ($request) {
+                    $q->where('city', 'like', '%' . $request->city . '%');
+                });
+            }
+
+            if ($request->has('min_price') || $request->has('max_price')) {
+                $query->priceRange($request->min_price, $request->max_price);
+            }
+
+            if ($request->has('expiring_soon')) {
+                $query->expiringSoon($request->expiring_soon ?: 2);
+            }
+
+            if ($request->has('search')) {
+                $search = $request->search;
+                $query->where(function ($q) use ($search) {
+                    $q->where('name', 'like', '%' . $search . '%')
+                      ->orWhere('description', 'like', '%' . $search . '%');
+                });
+            }
+
+            // Tri
+            $sortBy = $request->get('sort_by', 'created_at');
+            $sortOrder = $request->get('sort_order', 'desc');
+
+            if ($sortBy === 'price') {
+                $query->orderBy('discounted_price', $sortOrder);
+            } elseif ($sortBy === 'expiration') {
+                $query->orderBy('expiration_date', 'asc');
+            } else {
+                $query->orderBy($sortBy, $sortOrder);
+            }
+
+            // Pagination
+            $perPage = min($request->get('per_page', 12), 50);
+            $products = $query->paginate($perPage);
+
+            // Formater les données
+            $products->getCollection()->transform(function ($product) {
+                return [
+                    'id' => $product->id,
+                    'name' => $product->name,
+                    'description' => $product->description,
+                    'original_price' => $product->original_price,
+                    'discounted_price' => $product->discounted_price,
+                    'quantity_available' => $product->quantity_available,
+                    'expiration_date' => $product->expiration_date,
+                    'image_url' => $product->image_url,
+                    'discount_percentage' => $product->discount_percentage,
+                    'savings' => $product->savings,
+                    'days_until_expiration' => $product->days_until_expiration,
+                    'category' => [
+                        'id' => $product->category->id,
+                        'name' => $product->category->name,
+                        'icon' => $product->category->icon,
+                    ],
+                    'merchant' => [
+                        'id' => $product->merchant->id,
+                        'business_name' => $product->merchant->business_name,
+                        'business_type' => $product->merchant->business_type,
+                        'city' => $product->merchant->user->city,
+                        'address' => $product->merchant->user->address,
+                        'phone' => $product->merchant->user->phone,
+                        'is_verified' => $product->merchant->is_verified,
+                    ],
+                    'created_at' => $product->created_at,
+                ];
+            });
+
+            return response()->json([
+                'success' => true,
+                'data' => $products->items(),
+                'pagination' => [
+                    'current_page' => $products->currentPage(),
+                    'last_page' => $products->lastPage(),
+                    'per_page' => $products->perPage(),
+                    'total' => $products->total(),
+                ]
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Erreur lors de la récupération des produits',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function show($id): JsonResponse
+    {
+        try {
+            $product = Product::with(['merchant.user', 'category', 'reviews.user'])
+                ->active()
+                ->findOrFail($id);
+
+            $productData = [
+                'id' => $product->id,
+                'name' => $product->name,
+                'description' => $product->description,
+                'original_price' => $product->original_price,
+                'discounted_price' => $product->discounted_price,
+                'quantity_available' => $product->quantity_available,
+                'expiration_date' => $product->expiration_date,
+                'image_url' => $product->image_url,
+                'discount_percentage' => $product->discount_percentage,
+                'savings' => $product->savings,
+                'days_until_expiration' => $product->days_until_expiration,
+                'is_expired' => $product->isExpired(),
+                'is_expiring_soon' => $product->isExpiringSoon(),
+                'category' => [
+                    'id' => $product->category->id,
+                    'name' => $product->category->name,
+                    'icon' => $product->category->icon,
+                ],
+                'merchant' => [
+                    'id' => $product->merchant->id,
+                    'business_name' => $product->merchant->business_name,
+                    'business_type' => $product->merchant->business_type,
+                    'city' => $product->merchant->user->city,
+                    'address' => $product->merchant->user->address,
+                    'phone' => $product->merchant->user->phone,
+                    'is_verified' => $product->merchant->is_verified,
+                    'average_rating' => $product->merchant->average_rating,
+                ],
+                'reviews' => $product->reviews->map(function ($review) {
+                    return [
+                        'id' => $review->id,
+                        'rating' => $review->rating,
+                        'title' => $review->title,
+                        'comment' => $review->comment,
+                        'user_name' => $review->user->first_name,
+                        'created_at' => $review->created_at,
+                    ];
+                }),
+                'created_at' => $product->created_at,
+            ];
+
+            return response()->json([
+                'success' => true,
+                'data' => $productData
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Produit non trouvé',
+                'error' => $e->getMessage()
+            ], 404);
+        }
+    }
+
+    public function store(Request $request): JsonResponse
+    {
+        try {
+            $user = JWTAuth::parseToken()->authenticate();
+
+            if (!$user->isMerchant()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Seuls les commerçants peuvent ajouter des produits'
+                ], 403);
+            }
+
+            $validator = Validator::make($request->all(), [
+                'category_id' => 'required|exists:categories,id',
+                'name' => 'required|string|max:255',
+                'description' => 'nullable|string',
+                'original_price' => 'required|numeric|min:0',
+                'discounted_price' => 'required|numeric|min:0|lt:original_price',
+                'quantity_available' => 'required|integer|min:1',
+                'expiration_date' => 'required|date|after:today',
+                'image_url' => 'nullable|url',
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Erreurs de validation',
+                    'errors' => $validator->errors()
+                ], 422);
+            }
+
+            $product = Product::create([
+                'merchant_id' => $user->merchant->id,
+                'category_id' => $request->category_id,
+                'name' => $request->name,
+                'description' => $request->description,
+                'original_price' => $request->original_price,
+                'discounted_price' => $request->discounted_price,
+                'quantity_available' => $request->quantity_available,
+                'expiration_date' => $request->expiration_date,
+                'image_url' => $request->image_url,
+                'is_active' => true,
+            ]);
+
+            $product->load(['category', 'merchant.user']);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Produit ajouté avec succès',
+                'data' => [
+                    'id' => $product->id,
+                    'name' => $product->name,
+                    'discounted_price' => $product->discounted_price,
+                    'quantity_available' => $product->quantity_available,
+                    'category' => $product->category->name,
+                ]
+            ], 201);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Erreur lors de l\'ajout du produit',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function update(Request $request, $id): JsonResponse
+    {
+        try {
+            $user = JWTAuth::parseToken()->authenticate();
+            $product = Product::findOrFail($id);
+
+            if ($product->merchant->user_id !== $user->id) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Vous ne pouvez modifier que vos propres produits'
+                ], 403);
+            }
+
+            $validator = Validator::make($request->all(), [
+                'category_id' => 'sometimes|exists:categories,id',
+                'name' => 'sometimes|string|max:255',
+                'description' => 'sometimes|string',
+                'original_price' => 'sometimes|numeric|min:0',
+                'discounted_price' => 'sometimes|numeric|min:0',
+                'quantity_available' => 'sometimes|integer|min:0',
+                'expiration_date' => 'sometimes|date|after:today',
+                'image_url' => 'sometimes|url',
+                'is_active' => 'sometimes|boolean',
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Erreurs de validation',
+                    'errors' => $validator->errors()
+                ], 422);
+            }
+
+            $product->update($request->only([
+                'category_id', 'name', 'description', 'original_price',
+                'discounted_price', 'quantity_available', 'expiration_date',
+                'image_url', 'is_active'
+            ]));
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Produit mis à jour avec succès',
+                'data' => [
+                    'id' => $product->id,
+                    'name' => $product->name,
+                    'discounted_price' => $product->discounted_price,
+                    'quantity_available' => $product->quantity_available,
+                ]
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Erreur lors de la mise à jour',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function destroy($id): JsonResponse
+    {
+        try {
+            $user = JWTAuth::parseToken()->authenticate();
+            $product = Product::findOrFail($id);
+
+            if ($product->merchant->user_id !== $user->id && !$user->isAdmin()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Vous ne pouvez supprimer que vos propres produits'
+                ], 403);
+            }
+
+            // Vérifier s'il y a des réservations actives
+            $activeReservations = $product->reservations()
+                ->whereIn('status', ['pending', 'confirmed'])
+                ->count();
+
+            if ($activeReservations > 0) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Impossible de supprimer un produit avec des réservations actives'
+                ], 400);
+            }
+
+            $product->delete();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Produit supprimé avec succès'
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Erreur lors de la suppression',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function categories(): JsonResponse
+    {
+        try {
+            $categories = Category::active()->get(['id', 'name', 'description', 'icon']);
+
+            return response()->json([
+                'success' => true,
+                'data' => $categories
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Erreur lors de la récupération des catégories',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+}

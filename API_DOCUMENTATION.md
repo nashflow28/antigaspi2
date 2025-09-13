@@ -1,0 +1,294 @@
+# 📋 API Documentation - Antigaspi
+
+## Base URL
+```
+http://localhost:8000/api
+```
+
+## 🔐 Authentication
+L'API utilise JWT (JSON Web Tokens) pour l'authentification.
+
+### Headers requis pour les routes protégées :
+```
+Authorization: Bearer {token}
+Content-Type: application/json
+```
+
+---
+
+## 🚀 Endpoints Disponibles
+
+### 1. **Authentication**
+
+#### 📝 POST `/auth/register`
+Inscription d'un nouvel utilisateur (consommateur ou commerçant)
+
+**Body (Consumer):**
+```json
+{
+  "email": "marie.kouame@email.com",
+  "password": "password123",
+  "first_name": "Marie",
+  "last_name": "Kouamé",
+  "phone": "0701234567",
+  "role": "consumer",
+  "city": "Abidjan",
+  "address": "Cocody, Angré 8ème tranche"
+}
+```
+
+**Body (Merchant):**
+```json
+{
+  "email": "boulangerie.martin@email.com",
+  "password": "password123",
+  "first_name": "Pierre",
+  "last_name": "Martin",
+  "phone": "0701234567",
+  "role": "merchant",
+  "city": "Abidjan",
+  "address": "Plateau, Avenue Chardy",
+  "business_name": "Boulangerie Martin",
+  "business_type": "Boulangerie",
+  "siret": "CI001234567"
+}
+```
+
+#### 🔑 POST `/auth/login`
+Connexion utilisateur
+
+**Body:**
+```json
+{
+  "email": "marie.kouame@email.com",
+  "password": "password123"
+}
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "message": "Connexion réussie",
+  "data": {
+    "user": {
+      "id": 1,
+      "email": "marie.kouame@email.com",
+      "first_name": "Marie",
+      "last_name": "Kouamé",
+      "role": "consumer",
+      "city": "Abidjan"
+    },
+    "token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9...",
+    "token_type": "Bearer",
+    "expires_in": 3600
+  }
+}
+```
+
+#### 👤 GET `/auth/me` *(Protected)*
+Récupérer le profil de l'utilisateur connecté
+
+#### 🚪 POST `/auth/logout` *(Protected)*
+Déconnexion (invalide le token)
+
+#### 🔄 POST `/auth/refresh` *(Protected)*
+Renouveler le token JWT
+
+---
+
+### 2. **Products**
+
+#### 📦 GET `/products`
+Liste des produits disponibles (public)
+
+**Query Parameters:**
+- `category_id` - Filtrer par catégorie
+- `merchant_id` - Filtrer par commerçant
+- `city` - Filtrer par ville
+- `min_price` / `max_price` - Fourchette de prix
+- `search` - Recherche textuelle
+- `expiring_soon` - Produits expirant bientôt (nombre de jours)
+- `sort_by` - Tri (`created_at`, `price`, `expiration`)
+- `sort_order` - Ordre (`asc`, `desc`)
+- `per_page` - Pagination (max 50)
+
+**Example:**
+```
+GET /products?city=Abidjan&category_id=2&sort_by=price&per_page=12
+```
+
+#### 🎯 GET `/products/{id}`
+Détail d'un produit (public)
+
+#### 📝 POST `/products` *(Protected - Merchant only)*
+Ajouter un nouveau produit
+
+**Body:**
+```json
+{
+  "category_id": 2,
+  "name": "Pain complet artisanal",
+  "description": "Pain complet fait maison, cuit ce matin",
+  "original_price": 500,
+  "discounted_price": 250,
+  "quantity_available": 10,
+  "expiration_date": "2024-01-16",
+  "image_url": "https://example.com/pain-complet.jpg"
+}
+```
+
+#### ✏️ PUT `/products/{id}` *(Protected - Owner only)*
+Modifier un produit
+
+#### 🗑️ DELETE `/products/{id}` *(Protected - Owner/Admin only)*
+Supprimer un produit
+
+#### 📂 GET `/categories`
+Liste des catégories disponibles
+
+---
+
+### 3. **Reservations**
+
+#### 📋 GET `/reservations` *(Protected)*
+Mes réservations (consumer)
+
+**Query Parameters:**
+- `status` - Filtrer par statut (`pending,confirmed,completed,cancelled`)
+- `from_date` / `to_date` - Période
+- `sort_by` / `sort_order` - Tri
+
+#### ➕ POST `/reservations` *(Protected - Consumer only)*
+Créer une réservation
+
+**Body:**
+```json
+{
+  "product_id": 1,
+  "quantity_reserved": 2,
+  "notes": "Je passerai vers 18h"
+}
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "message": "Réservation créée avec succès",
+  "data": {
+    "id": 10,
+    "reservation_code": "RES006",
+    "quantity_reserved": 2,
+    "total_amount": 500,
+    "status": "pending",
+    "expires_at": "2024-01-16T18:00:00.000000Z",
+    "product_name": "Pain complet artisanal",
+    "merchant_name": "Boulangerie Martin",
+    "merchant_phone": "0123456790"
+  }
+}
+```
+
+#### 🎯 GET `/reservations/{id}` *(Protected)*
+Détail d'une réservation
+
+#### ❌ POST `/reservations/{id}/cancel` *(Protected)*
+Annuler ma réservation
+
+#### 🏪 GET `/reservations/merchant/list` *(Protected - Merchant only)*
+Réservations reçues (pour les commerçants)
+
+#### ✅ POST `/reservations/{id}/confirm` *(Protected - Merchant only)*
+Confirmer une réservation
+
+#### 🏁 POST `/reservations/{id}/complete` *(Protected - Merchant only)*
+Marquer une réservation comme terminée
+
+---
+
+### 4. **Utility**
+
+#### 💊 GET `/health`
+Status de l'API
+
+**Response:**
+```json
+{
+  "success": true,
+  "message": "API Antigaspi fonctionnelle",
+  "timestamp": "2024-01-15T14:30:00.000000Z",
+  "version": "1.0.0"
+}
+```
+
+---
+
+## 📊 Statuses des Réservations
+
+| Status | Description |
+|--------|-------------|
+| `pending` | En attente de confirmation du commerçant |
+| `confirmed` | Confirmée par le commerçant |
+| `completed` | Récupérée et terminée |
+| `cancelled` | Annulée |
+
+---
+
+## 🔑 Roles Utilisateurs
+
+| Role | Permissions |
+|------|-------------|
+| `consumer` | Consulter produits, faire des réservations |
+| `merchant` | Gérer ses produits, confirmer réservations |
+| `admin` | Accès complet, gestion utilisateurs |
+
+---
+
+## 🚨 Codes d'Erreur
+
+| Code | Description |
+|------|-------------|
+| `200` | Succès |
+| `201` | Créé avec succès |
+| `400` | Erreur de validation |
+| `401` | Non authentifié |
+| `403` | Accès refusé |
+| `404` | Ressource non trouvée |
+| `422` | Erreurs de validation |
+| `500` | Erreur serveur |
+
+---
+
+## 🧪 Tests avec Postman/Insomnia
+
+### Collection de tests recommandée :
+
+1. **Register Consumer** → `POST /auth/register`
+2. **Register Merchant** → `POST /auth/register`
+3. **Login Consumer** → `POST /auth/login`
+4. **Get Products** → `GET /products`
+5. **Create Reservation** → `POST /reservations`
+6. **Login Merchant** → `POST /auth/login`
+7. **Confirm Reservation** → `POST /reservations/{id}/confirm`
+
+### Variables d'environnement :
+- `BASE_URL`: `http://localhost:8000/api`
+- `TOKEN`: `{{token}}` (auto-défini après login)
+
+---
+
+## 🛠️ Configuration Locale
+
+1. **Démarrer XAMPP** (Apache + MySQL)
+2. **Importer la base de données** :
+   ```sql
+   SOURCE C:/xampp/htdocs/antigaspi-2/database/antigaspi_schema.sql;
+   SOURCE C:/xampp/htdocs/antigaspi-2/database/sample_data.sql;
+   ```
+3. **Démarrer Laravel** :
+   ```bash
+   cd C:\xampp\htdocs\antigaspi-2\backend
+   php artisan serve
+   ```
+4. **Tester l'API** → `GET http://localhost:8000/api/health`
