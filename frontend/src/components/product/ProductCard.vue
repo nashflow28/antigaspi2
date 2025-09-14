@@ -1,75 +1,105 @@
 <template>
-  <div class="card card-interactive group cursor-pointer overflow-hidden">
-    <!-- Image du produit -->
-    <div class="relative h-48 mb-4 -m-6 mb-4 overflow-hidden">
-      <div class="absolute inset-0 bg-gradient-to-br from-primary-100 to-secondary-100 flex items-center justify-center">
-        <Package class="w-16 h-16 text-primary-400 opacity-50" />
+  <div class="card card-interactive group cursor-pointer overflow-hidden glow-effect hover:shadow-lift transition-all duration-500">
+    <!-- Image du produit avec gradients modernes -->
+    <div class="relative h-52 mb-6 -m-6 mb-4 overflow-hidden rounded-t-2xl">
+      <div class="absolute inset-0 bg-gradient-modern flex items-center justify-center">
+        <Package class="w-20 h-20 text-white/30 group-hover:scale-110 transition-transform duration-300" />
       </div>
 
-      <!-- Badge de réduction -->
-      <div class="absolute top-3 right-3 bg-success-500 text-white px-3 py-1 rounded-full text-sm font-bold shadow-soft">
-        -{{ product.discount }}%
-      </div>
+      <!-- Overlay glassmorphism -->
+      <div class="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent"></div>
 
-      <!-- Badge de disponibilité -->
-      <div class="absolute top-3 left-3 flex items-center gap-2">
-        <div class="bg-white/90 backdrop-blur-sm px-2 py-1 rounded-full text-xs font-medium">
-          <div class="flex items-center gap-1">
-            <div class="w-2 h-2 bg-success-500 rounded-full"></div>
-            <span>{{ product.available_quantity - product.reserved_quantity }} disponible{{ (product.available_quantity - product.reserved_quantity) > 1 ? 's' : '' }}</span>
-          </div>
+      <!-- Badge de réduction - Design 2025 -->
+      <div class="absolute top-4 right-4 bg-gradient-accent text-white px-4 py-2 rounded-2xl text-sm font-bold shadow-glow-accent backdrop-blur-sm border border-white/20">
+        <div class="flex items-center gap-1">
+          <span class="text-xs">💥</span>
+          <span>-{{ product.discount }}%</span>
         </div>
       </div>
 
-      <!-- Countdown timer -->
-      <div class="absolute bottom-3 left-3 bg-accent-500 text-white px-2 py-1 rounded-full text-xs font-medium">
-        ⏰ {{ formatTimeLeft(product.expires_at) }}
+      <!-- Badge de disponibilité - Design moderne -->
+      <div class="absolute top-4 left-4 glass-bg backdrop-blur-md px-3 py-2 rounded-xl glass-border">
+        <div class="flex items-center gap-2 text-xs font-medium text-white">
+          <div class="w-2 h-2 bg-success-400 rounded-full animate-pulse"></div>
+          <span>{{ product.available_quantity - product.reserved_quantity }} dispo</span>
+        </div>
+      </div>
+
+      <!-- Countdown timer - Design élégant -->
+      <div class="absolute bottom-4 left-4 glass-bg backdrop-blur-md px-3 py-2 rounded-xl glass-border">
+        <div class="flex items-center gap-2 text-xs font-medium text-white">
+          <span class="animate-pulse">⏰</span>
+          <span>{{ formatTimeLeft(product.expires_at) }}</span>
+        </div>
       </div>
     </div>
 
-    <!-- Contenu -->
-    <div class="space-y-4">
+    <!-- Contenu avec espacement moderne -->
+    <div class="space-y-5">
       <!-- Titre et description -->
       <div>
-        <h3 class="text-lg font-bold text-neutral-900 mb-2 group-hover:text-primary-600 transition-colors line-clamp-2">
+        <h3 class="text-xl font-bold text-neutral-900 mb-3 group-hover:text-primary-600 transition-colors line-clamp-2 leading-snug">
           {{ product.name }}
         </h3>
-        <p class="text-sm text-neutral-600 line-clamp-2">{{ product.description }}</p>
+        <p class="text-sm text-neutral-600 line-clamp-2 leading-relaxed">{{ product.description }}</p>
       </div>
 
-      <!-- Informations marchand -->
-      <div class="flex items-center gap-2 text-sm text-neutral-600">
-        <MapPin class="w-4 h-4" />
-        <span class="font-medium">{{ product.merchant.name }}</span>
-        <span>•</span>
-        <span>{{ product.merchant.distance }}km</span>
+      <!-- Informations marchand - Design amélioré -->
+      <div class="flex items-center gap-3 text-sm text-neutral-600 bg-neutral-50 rounded-xl p-3">
+        <div class="w-8 h-8 bg-primary-100 rounded-full flex items-center justify-center">
+          <MapPin class="w-4 h-4 text-primary-600" />
+        </div>
+        <div class="flex-1">
+          <span class="font-semibold text-neutral-900 block">{{ product.merchant.name }}</span>
+          <span class="text-xs text-neutral-500">{{ product.merchant.distance }}km de vous</span>
+        </div>
       </div>
 
-      <!-- Prix et actions -->
-      <div class="flex items-center justify-between pt-2 border-t border-neutral-100">
-        <div class="flex items-center gap-2">
-          <span class="text-2xl font-bold text-primary-600">
-            {{ formatPrice(product.discounted_price) }}
-          </span>
-          <span class="text-sm text-neutral-400 line-through">
-            {{ formatPrice(product.original_price) }}
-          </span>
+      <!-- Prix et actions - Design moderne -->
+      <div class="pt-4 border-t border-neutral-100">
+        <!-- Prix avec meilleur espacement -->
+        <div class="flex items-baseline gap-3 mb-4">
+          <div class="flex items-baseline gap-2">
+            <span class="text-3xl font-bold text-success-600">
+              {{ Math.round(product.discounted_price).toLocaleString('fr-FR') }}
+            </span>
+            <span class="text-sm font-medium text-success-600 whitespace-nowrap">
+              F CFA
+            </span>
+          </div>
+          <div class="flex items-baseline gap-1">
+            <span class="text-lg text-neutral-400 line-through">
+              {{ Math.round(product.original_price).toLocaleString('fr-FR') }}
+            </span>
+            <span class="text-xs text-neutral-400">
+              F CFA
+            </span>
+          </div>
         </div>
 
-        <div class="flex items-center gap-2">
+        <!-- Boutons d'action modernes -->
+        <div class="flex items-center gap-3">
           <button
             @click.stop="$emit('view', product)"
-            class="btn btn-ghost btn-sm"
+            class="btn btn-outline flex-1 group/btn"
           >
-            Voir
+            <span class="group-hover/btn:scale-105 transition-transform">Voir</span>
           </button>
           <button
             @click.stop="$emit('reserve', product)"
-            class="btn btn-primary btn-sm"
+            class="btn btn-primary flex-1 group/btn glow-effect"
             :disabled="product.available_quantity <= product.reserved_quantity"
           >
-            Réserver
+            <span class="group-hover/btn:scale-105 transition-transform">✨ Réserver</span>
           </button>
+        </div>
+
+        <!-- Indicateur d'économies -->
+        <div class="mt-3 text-center">
+          <span class="inline-flex items-center gap-1 text-xs font-medium text-success-700 bg-success-100 px-2 py-1 rounded-full">
+            <span>💰</span>
+            <span>Économisez {{ Math.round(product.original_price - product.discounted_price).toLocaleString('fr-FR') }} F CFA</span>
+          </span>
         </div>
       </div>
     </div>

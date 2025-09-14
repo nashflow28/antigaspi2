@@ -19,7 +19,7 @@
     </div>
 
     <!-- Product Detail -->
-    <div v-else-if="product" class="container mx-auto px-4 py-8">
+    <div v-else-if="product" class="container-fluid py-12">
       <!-- Breadcrumb -->
       <nav class="flex items-center gap-2 text-sm text-neutral-600 mb-8">
         <router-link to="/" class="hover:text-primary-600 transition-colors">Accueil</router-link>
@@ -33,31 +33,40 @@
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-12">
         <!-- Product Image -->
         <div class="space-y-6">
-          <div class="relative aspect-square bg-gradient-to-br from-primary-100 to-secondary-100 rounded-2xl overflow-hidden">
+          <div class="relative aspect-square bg-gradient-modern rounded-3xl overflow-hidden shadow-lift glow-effect">
             <!-- Main Image Placeholder -->
             <div class="absolute inset-0 flex items-center justify-center">
-              <Package class="w-32 h-32 text-primary-400 opacity-50" />
+              <Package class="w-40 h-40 text-white/20" />
             </div>
+
+            <!-- Glassmorphism overlay -->
+            <div class="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent"></div>
 
             <!-- Status Badges -->
             <div class="absolute top-6 left-6 flex flex-col gap-3">
               <!-- Availability Badge -->
-              <div class="bg-white/90 backdrop-blur-sm px-3 py-2 rounded-full text-sm font-medium">
-                <div class="flex items-center gap-2">
-                  <div class="w-2 h-2 bg-success-500 rounded-full"></div>
+              <div class="glass-bg backdrop-blur-md px-4 py-3 rounded-2xl glass-border">
+                <div class="flex items-center gap-2 text-sm font-medium text-white">
+                  <div class="w-2 h-2 bg-success-400 rounded-full animate-pulse"></div>
                   <span>{{ availableQuantity }} disponible{{ availableQuantity > 1 ? 's' : '' }}</span>
                 </div>
               </div>
             </div>
 
             <!-- Discount Badge -->
-            <div class="absolute top-6 right-6 bg-success-500 text-white px-4 py-2 rounded-full text-lg font-bold shadow-soft">
-              -{{ product.discount }}%
+            <div class="absolute top-6 right-6 bg-gradient-accent text-white px-5 py-3 rounded-2xl text-xl font-bold shadow-glow-accent backdrop-blur-sm border border-white/20">
+              <div class="flex items-center gap-2">
+                <span class="text-sm">💥</span>
+                <span>-{{ product.discount }}%</span>
+              </div>
             </div>
 
             <!-- Countdown -->
-            <div class="absolute bottom-6 left-6 bg-accent-500 text-white px-4 py-2 rounded-full text-sm font-medium">
-              ⏰ {{ formatTimeLeft(product.expires_at) }}
+            <div class="absolute bottom-6 left-6 glass-bg backdrop-blur-md px-4 py-3 rounded-2xl glass-border">
+              <div class="flex items-center gap-2 text-sm font-medium text-white">
+                <span class="animate-pulse">⏰</span>
+                <span>{{ formatTimeLeft(product.expires_at) }}</span>
+              </div>
             </div>
           </div>
         </div>

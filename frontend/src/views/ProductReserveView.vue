@@ -389,7 +389,7 @@
                 </p>
                 <div class="space-y-2">
                   <div class="text-2xl font-bold text-accent-600">
-                    {{ Math.round((product.original_price - product.discounted_price) * reservation.quantity * 100) / 100 }}€
+                    {{ Math.round((product.original_price - product.discounted_price) * reservation.quantity).toLocaleString('fr-FR') }} F CFA
                   </div>
                   <div class="text-sm text-accent-700">
                     ~{{ Math.round(reservation.quantity * 0.5 * 100) / 100 }}kg CO₂ évités
@@ -467,7 +467,7 @@ const canProceedToNextStep = computed(() => {
 
 // Fonctions
 const formatPrice = (price: number) => {
-  return `${price.toFixed(2)}€`
+  return `${Math.round(price).toLocaleString('fr-FR')} F CFA`
 }
 
 const formatTimeLeft = (expiresAt: Date) => {

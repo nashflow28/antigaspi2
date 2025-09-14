@@ -22,7 +22,11 @@
       "Bash(npm run build:*)",
       "Bash(find:*)",
       "Bash(npm run typecheck:*)",
-      "Bash(npm uninstall:*)"
+      "Bash(npm uninstall:*)",
+      "Bash(npm run type-check:*)",
+      "Bash(npm run lint)",
+      "Bash(netstat:*)",
+      "Bash(C:/xampp/mysql/bin/mysql.exe:*)"
     ],
     "deny": [],
     "ask": []

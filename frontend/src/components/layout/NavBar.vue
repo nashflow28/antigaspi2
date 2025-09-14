@@ -34,6 +34,9 @@
             <div class="absolute inset-0 bg-gradient-primary opacity-0 group-hover:opacity-10 rounded-lg transition-opacity duration-200"></div>
           </router-link>
 
+          <!-- Dark Mode Toggle -->
+          <DarkModeToggle />
+
           <template v-if="!authStore.isAuthenticated">
             <router-link
               to="/login"
@@ -264,6 +267,7 @@ import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { LogIn, UserPlus, User, Settings, LogOut, Menu, X, ChevronDown } from 'lucide-vue-next'
+import DarkModeToggle from '@/components/ui/DarkModeToggle.vue'
 
 const router = useRouter()
 const authStore = useAuthStore()

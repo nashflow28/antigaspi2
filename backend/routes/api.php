@@ -18,7 +18,7 @@ Route::prefix('auth')->group(function () {
     Route::post('login', [AuthController::class, 'login']);
 
     // Routes protégées par JWT
-    Route::middleware('auth:api')->group(function () {
+    Route::middleware(\App\Http\Middleware\ApiAuthMiddleware::class)->group(function () {
         Route::get('me', [AuthController::class, 'me']);
         Route::post('logout', [AuthController::class, 'logout']);
         Route::post('refresh', [AuthController::class, 'refresh']);
@@ -33,7 +33,7 @@ Route::prefix('products')->group(function () {
     Route::get('/categories/list', [ProductController::class, 'categories']); // Liste des catégories
 
     // Routes protégées (gestion des produits)
-    Route::middleware('auth:api')->group(function () {
+    Route::middleware(\App\Http\Middleware\ApiAuthMiddleware::class)->group(function () {
         Route::post('/', [ProductController::class, 'store']); // Ajouter un produit (commerçant)
         Route::put('/{id}', [ProductController::class, 'update']); // Modifier un produit
         Route::delete('/{id}', [ProductController::class, 'destroy']); // Supprimer un produit
@@ -41,7 +41,7 @@ Route::prefix('products')->group(function () {
 });
 
 // Routes des réservations (toutes protégées)
-Route::prefix('reservations')->middleware('auth:api')->group(function () {
+Route::prefix('reservations')->middleware(\App\Http\Middleware\ApiAuthMiddleware::class)->group(function () {
     // Routes pour les consommateurs
     Route::get('/', [ReservationController::class, 'index']); // Mes réservations
     Route::post('/', [ReservationController::class, 'store']); // Créer une réservation

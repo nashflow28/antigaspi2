@@ -38,7 +38,7 @@
               </div>
             </div>
             <div class="w-16 h-16 bg-gradient-to-br from-success-100 to-success-200 rounded-2xl flex items-center justify-center">
-              <Euro class="w-8 h-8 text-success-600" />
+              <DollarSign class="w-8 h-8 text-success-600" />
             </div>
           </div>
         </div>
@@ -284,7 +284,7 @@ import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import {
-  TrendingUp, Euro, Package, ShoppingBag, Leaf, TreePine,
+  TrendingUp, DollarSign, Package, ShoppingBag, Leaf, TreePine,
   Clock, Calendar, ArrowRight, Search, User, Lightbulb
 } from 'lucide-vue-next'
 
@@ -293,8 +293,8 @@ const authStore = useAuthStore()
 
 // État des données utilisateur
 const userStats = ref({
-  totalSavings: 127.50,
-  monthSavings: 23.80,
+  totalSavings: 83670, // 127.50€ × 656
+  monthSavings: 15609, // 23.80€ × 656
   productsSaved: 42,
   monthProducts: 8,
   co2Saved: 12.4,
@@ -306,7 +306,7 @@ const recentReservations = ref([
     id: 1,
     product: { name: 'Pain artisanal du jour' },
     merchant: { name: 'Boulangerie Martin' },
-    price: 2.50,
+    price: 1640, // 2.50€ × 656
     pickup_date: new Date(),
     status: 'confirmed'
   },
@@ -314,7 +314,7 @@ const recentReservations = ref([
     id: 2,
     product: { name: 'Légumes de saison' },
     merchant: { name: 'Primeur Bio' },
-    price: 8.90,
+    price: 5838, // 8.90€ × 656
     pickup_date: new Date(Date.now() - 86400000),
     status: 'completed'
   }
@@ -325,16 +325,16 @@ const recommendedProducts = ref([
     id: 1,
     name: 'Pâtisseries du jour',
     merchant: { name: 'Pâtisserie Delacroix' },
-    original_price: 15.00,
-    discounted_price: 7.50,
+    original_price: 9840, // 15.00€ × 656
+    discounted_price: 4920, // 7.50€ × 656
     discount: 50
   },
   {
     id: 2,
     name: 'Sandwich club',
     merchant: { name: 'Café Central' },
-    original_price: 8.50,
-    discounted_price: 4.25,
+    original_price: 5576, // 8.50€ × 656
+    discounted_price: 2788, // 4.25€ × 656
     discount: 50
   }
 ])
@@ -351,7 +351,7 @@ const currentTip = computed(() => ecoTips.value[currentTipIndex.value])
 
 // Fonctions utilitaires
 const formatPrice = (price: number) => {
-  return `${price.toFixed(2)}€`
+  return `${Math.round(price).toLocaleString('fr-FR')} F CFA`
 }
 
 const formatDate = (date: Date) => {

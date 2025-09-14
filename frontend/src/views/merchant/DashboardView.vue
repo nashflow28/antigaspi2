@@ -49,10 +49,10 @@
         <div class="bg-white rounded-2xl shadow-lg p-6 border border-gray-100">
           <div class="flex items-center space-x-4">
             <div class="w-12 h-12 bg-yellow-100 rounded-xl flex items-center justify-center">
-              <CurrencyEuroIcon class="w-6 h-6 text-yellow-600" />
+              <BanknotesIcon class="w-6 h-6 text-yellow-600" />
             </div>
             <div>
-              <p class="text-2xl font-bold text-gray-900">{{ stats.total_revenue }}€</p>
+              <p class="text-2xl font-bold text-gray-900">{{ Math.round(stats.total_revenue).toLocaleString('fr-FR') }} F CFA</p>
               <p class="text-gray-600 text-sm">Revenus ce mois</p>
             </div>
           </div>
@@ -117,7 +117,7 @@
                   >
                     {{ getStatusText(reservation.status) }}
                   </span>
-                  <span class="font-semibold text-gray-900">{{ reservation.total_amount }}€</span>
+                  <span class="font-semibold text-gray-900">{{ Math.round(reservation.total_amount).toLocaleString('fr-FR') }} F CFA</span>
                 </div>
               </div>
             </div>
@@ -258,8 +258,8 @@
               <p class="text-sm text-gray-600 mb-2">{{ product.category }}</p>
               <div class="flex items-center justify-between">
                 <div class="flex items-center space-x-2">
-                  <span class="text-lg font-semibold text-green-600">{{ product.discounted_price }}€</span>
-                  <span class="text-sm text-gray-500 line-through">{{ product.original_price }}€</span>
+                  <span class="text-lg font-semibold text-green-600">{{ Math.round(product.discounted_price).toLocaleString('fr-FR') }} F CFA</span>
+                  <span class="text-sm text-gray-500 line-through">{{ Math.round(product.original_price).toLocaleString('fr-FR') }} F CFA</span>
                 </div>
                 <span class="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded-full">
                   {{ product.quantity_available }} dispo
@@ -279,7 +279,7 @@ import {
   PlusIcon,
   ShoppingBagIcon,
   ClockIcon,
-  CurrencyEuroIcon,
+  BanknotesIcon,
   CheckCircleIcon,
   ArrowRightIcon,
   UserIcon,
@@ -354,7 +354,7 @@ const loadDashboardData = async () => {
     // Mock data for now
     stats.total_products = 8
     stats.pending_reservations = 3
-    stats.total_revenue = 245.50
+    stats.total_revenue = 160928 // 245.50€ × 656
     stats.completed_reservations = 15
     stats.conversion_rate = 67
     stats.average_rating = 4.5
@@ -366,7 +366,7 @@ const loadDashboardData = async () => {
         id: 1,
         customer_name: 'Marie Dubois',
         product_name: 'Pain de mie complet',
-        total_amount: 2.50,
+        total_amount: 1640, // 2.50€ × 656
         status: 'pending',
         created_at: new Date().toISOString()
       },
@@ -374,7 +374,7 @@ const loadDashboardData = async () => {
         id: 2,
         customer_name: 'Pierre Martin',
         product_name: 'Salade de fruits',
-        total_amount: 4.20,
+        total_amount: 2755, // 4.20€ × 656
         status: 'confirmed',
         created_at: new Date(Date.now() - 3600000).toISOString()
       }
@@ -385,8 +385,8 @@ const loadDashboardData = async () => {
         id: 1,
         name: 'Pain de mie complet',
         category: 'Boulangerie',
-        discounted_price: 2.50,
-        original_price: 4.00,
+        discounted_price: 1640, // 2.50€ × 656
+        original_price: 2624, // 4.00€ × 656
         quantity_available: 5,
         image_url: null
       },
@@ -394,8 +394,8 @@ const loadDashboardData = async () => {
         id: 2,
         name: 'Salade de fruits',
         category: 'Fruits & Légumes',
-        discounted_price: 4.20,
-        original_price: 6.50,
+        discounted_price: 2755, // 4.20€ × 656
+        original_price: 4264, // 6.50€ × 656
         quantity_available: 3,
         image_url: null
       }

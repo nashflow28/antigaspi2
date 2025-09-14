@@ -168,10 +168,10 @@
           <div class="flex items-center justify-between mb-3">
             <div class="flex items-center gap-2">
               <span class="text-2xl font-bold text-primary-600">
-                {{ formatPrice(product.discounted_price) }}€
+                {{ Math.round(product.discounted_price).toLocaleString('fr-FR') }} F CFA
               </span>
               <span class="text-neutral-400 line-through text-sm">
-                {{ formatPrice(product.original_price) }}€
+                {{ Math.round(product.original_price).toLocaleString('fr-FR') }} F CFA
               </span>
             </div>
 
@@ -292,7 +292,7 @@
 
           <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div>
-              <label class="label">Prix original (€) *</label>
+              <label class="label">Prix original (F CFA) *</label>
               <input
                 v-model.number="productForm.original_price"
                 type="number"
@@ -315,7 +315,7 @@
             </div>
 
             <div>
-              <label class="label">Prix final (€)</label>
+              <label class="label">Prix final (F CFA)</label>
               <input
                 :value="calculatedDiscountedPrice"
                 type="text"
@@ -385,6 +385,7 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
+import { useAuthStore } from '@/stores/auth'
 import {
   PlusIcon,
   MagnifyingGlassIcon,
@@ -564,36 +565,94 @@ const handleImageUpload = (event: Event) => {
 const saveProduct = async () => {
   isSubmitting.value = true
   try {
-    // Mock save functionality
-    console.log('Saving product:', productForm.value)
+    const authStore = useAuthStore()
 
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1000))
+    // Vérifier que l'utilisateur est connecté
+    if (!authStore.token) {
+      alert('Vous devez être connecté pour ajouter un produit.')
+      return
+    }
+
+    console.log('Token present:', !!authStore.token)
 
     if (showAddProductModal.value) {
-      // Add new product
-      const newProduct = {
-        ...productForm.value,
-        id: Date.now(),
+      // Créer un nouveau produit via l'API
+      const productData = {
+        name: productForm.value.name,
+        description: productForm.value.description,
+        category_id: productForm.value.category_id,
+        original_price: productForm.value.original_price,
         discounted_price: parseFloat(calculatedDiscountedPrice.value),
-        created_at: new Date().toISOString(),
-        image_url: productForm.value.image ? URL.createObjectURL(productForm.value.image) : null
+        quantity_available: productForm.value.quantity_available,
+        expiration_date: productForm.value.expiration_date
       }
-      products.value.push(newProduct)
+
+      console.log('Creating product:', productData)
+
+      const response = await fetch('http://localhost:8000/api/products', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${authStore.token}`,
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify(productData)
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json()
+        console.error('API Error:', errorData)
+        throw new Error(`HTTP error! status: ${response.status}`)
+      }
+
+      const result = await response.json()
+      console.log('Product created:', result)
+
+      // Recharger la liste des produits
+      await loadProducts()
+
     } else {
-      // Update existing product
-      const index = products.value.findIndex(p => p.id === productForm.value.id)
-      if (index !== -1) {
-        products.value[index] = {
-          ...productForm.value,
-          discounted_price: parseFloat(calculatedDiscountedPrice.value)
-        }
+      // Mise à jour de produit existant
+      const productData = {
+        name: productForm.value.name,
+        description: productForm.value.description,
+        category_id: productForm.value.category_id,
+        original_price: productForm.value.original_price,
+        discounted_price: parseFloat(calculatedDiscountedPrice.value),
+        quantity_available: productForm.value.quantity_available,
+        expiration_date: productForm.value.expiration_date,
+        is_active: productForm.value.is_active
       }
+
+      console.log('Updating product:', productForm.value.id, productData)
+
+      const response = await fetch(`http://localhost:8000/api/products/${productForm.value.id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${authStore.token}`,
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify(productData)
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json()
+        console.error('API Error:', errorData)
+        throw new Error(`HTTP error! status: ${response.status}`)
+      }
+
+      const result = await response.json()
+      console.log('Product updated:', result)
+
+      await loadProducts()
     }
 
     closeModals()
+
   } catch (error) {
     console.error('Error saving product:', error)
+    alert('Erreur lors de l\'enregistrement du produit. Vérifiez la console pour plus de détails.')
   } finally {
     isSubmitting.value = false
   }
@@ -624,64 +683,60 @@ const deleteProduct = async (product: any) => {
 
 const loadProducts = async () => {
   try {
-    // Mock data for development
-    products.value = [
-      {
-        id: 1,
-        name: 'Pain de campagne bio',
-        description: 'Délicieux pain artisanal fait avec des ingrédients biologiques locaux',
-        original_price: 4.50,
-        discount_percentage: 40,
-        discounted_price: 2.70,
-        quantity_available: 8,
-        expiration_date: '2024-01-20',
-        is_active: true,
-        image_url: '/images/bread.jpg',
-        created_at: '2024-01-15T10:00:00Z'
-      },
-      {
-        id: 2,
-        name: 'Fromage de chèvre',
-        description: 'Fromage artisanal crémeux de la ferme locale',
-        original_price: 8.00,
-        discount_percentage: 50,
-        discounted_price: 4.00,
-        quantity_available: 3,
-        expiration_date: '2024-01-18',
-        is_active: true,
-        image_url: '/images/cheese.jpg',
-        created_at: '2024-01-14T15:30:00Z'
-      },
-      {
-        id: 3,
-        name: 'Légumes de saison',
-        description: 'Assortiment de légumes frais de saison cultivés localement',
-        original_price: 12.00,
-        discount_percentage: 30,
-        discounted_price: 8.40,
-        quantity_available: 15,
-        expiration_date: '2024-01-22',
-        is_active: false,
-        image_url: '/images/vegetables.jpg',
-        created_at: '2024-01-13T08:45:00Z'
+    const authStore = useAuthStore()
+
+    const response = await fetch('http://localhost:8000/api/products', {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${authStore.token}`,
+        'Accept': 'application/json'
       }
-    ]
+    })
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`)
+    }
+
+    const result = await response.json()
+    console.log('Products loaded:', result)
+
+    // L'API retourne les produits dans result.data
+    products.value = result.data || result || []
+
   } catch (error) {
     console.error('Error loading products:', error)
+    // En cas d'erreur, utiliser des données vides
+    products.value = []
   }
 }
 
 const loadCategories = async () => {
   try {
-    categories.value = [
-      { id: 1, name: 'Boulangerie' },
-      { id: 2, name: 'Fromages' },
-      { id: 3, name: 'Fruits & Légumes' },
-      { id: 4, name: 'Viandes' },
-      { id: 5, name: 'Plats préparés' }
-    ]
+    const response = await fetch('http://localhost:8000/api/categories', {
+      method: 'GET',
+      headers: {
+        'Accept': 'application/json'
+      }
+    })
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`)
+    }
+
+    const result = await response.json()
+    console.log('Categories loaded:', result)
+    categories.value = result.data || result || []
   } catch (error) {
     console.error('Error loading categories:', error)
+    // Fallback to hardcoded categories
+    categories.value = [
+      { id: 1, name: 'Fruits et Légumes' },
+      { id: 2, name: 'Boulangerie' },
+      { id: 3, name: 'Produits laitiers' },
+      { id: 4, name: 'Viandes et poissons' },
+      { id: 5, name: 'Plats préparés' }
+    ]
   }
 }
 
