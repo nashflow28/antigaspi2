@@ -356,6 +356,14 @@
               accept="image/*"
               class="input w-full"
             />
+            <div v-if="productForm.image_url" class="mt-3">
+              <p class="text-sm text-neutral-600 mb-2">Aperçu :</p>
+              <img
+                :src="productForm.image_url"
+                alt="Aperçu du produit"
+                class="w-32 h-32 object-cover rounded-lg border"
+              />
+            </div>
           </div>
 
           <div class="flex items-center gap-3">
@@ -386,6 +394,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import { useAuthStore } from '@/stores/auth'
+import { useRoute } from 'vue-router'
 import {
   PlusIcon,
   MagnifyingGlassIcon,
@@ -421,7 +430,8 @@ const productForm = ref({
   expiration_date: '',
   category_id: '',
   is_active: true,
-  image: null as File | null
+  image: null as File | null,
+  image_url: ''
 })
 
 // Filters
@@ -530,7 +540,19 @@ const getStatusText = (product: any): string => {
 }
 
 const editProduct = (product: any) => {
-  productForm.value = { ...product }
+  productForm.value = {
+    id: product.id,
+    name: product.name,
+    description: product.description,
+    original_price: parseFloat(product.original_price),
+    discount_percentage: Math.round((1 - parseFloat(product.discounted_price) / parseFloat(product.original_price)) * 100),
+    quantity_available: product.quantity_available,
+    expiration_date: product.expiration_date.split('T')[0], // Format pour input date
+    category_id: product.category.id, // Récupérer l'id de la catégorie
+    is_active: product.is_active !== undefined ? product.is_active : true,
+    image: null,
+    image_url: product.image_url || ''
+  }
   showEditProductModal.value = true
 }
 
@@ -551,14 +573,57 @@ const resetForm = () => {
     expiration_date: '',
     category_id: '',
     is_active: true,
-    image: null
+    image: null,
+    image_url: ''
   }
 }
 
 const handleImageUpload = (event: Event) => {
   const target = event.target as HTMLInputElement
   if (target.files && target.files[0]) {
-    productForm.value.image = target.files[0]
+    const file = target.files[0]
+
+    // Vérifier la taille du fichier (max 2MB)
+    if (file.size > 2 * 1024 * 1024) {
+      alert('L\'image est trop volumineuse. Veuillez choisir une image de moins de 2MB.')
+      return
+    }
+
+    productForm.value.image = file
+
+    // Créer une version redimensionnée de l'image
+    const canvas = document.createElement('canvas')
+    const ctx = canvas.getContext('2d')
+    const img = new Image()
+
+    img.onload = () => {
+      // Calculer les nouvelles dimensions (max 400x300 pour réduire la taille)
+      let { width, height } = img
+      const maxWidth = 400
+      const maxHeight = 300
+
+      if (width > maxWidth) {
+        height = (height * maxWidth) / width
+        width = maxWidth
+      }
+      if (height > maxHeight) {
+        width = (width * maxHeight) / height
+        height = maxHeight
+      }
+
+      // Redimensionner
+      canvas.width = width
+      canvas.height = height
+      ctx?.drawImage(img, 0, 0, width, height)
+
+      // Convertir en base64 avec compression plus élevée
+      const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.5)
+      productForm.value.image_url = compressedDataUrl
+
+      console.log('Image compressed from', file.size, 'to', compressedDataUrl.length, 'characters')
+    }
+
+    img.src = URL.createObjectURL(file)
   }
 }
 
@@ -584,7 +649,8 @@ const saveProduct = async () => {
         original_price: productForm.value.original_price,
         discounted_price: parseFloat(calculatedDiscountedPrice.value),
         quantity_available: productForm.value.quantity_available,
-        expiration_date: productForm.value.expiration_date
+        expiration_date: productForm.value.expiration_date,
+        image_url: productForm.value.image_url || null
       }
 
       console.log('Creating product:', productData)
@@ -621,10 +687,22 @@ const saveProduct = async () => {
         discounted_price: parseFloat(calculatedDiscountedPrice.value),
         quantity_available: productForm.value.quantity_available,
         expiration_date: productForm.value.expiration_date,
-        is_active: productForm.value.is_active
+        is_active: productForm.value.is_active,
+        image_url: productForm.value.image_url || null
       }
 
       console.log('Updating product:', productForm.value.id, productData)
+      if (productData.image_url) {
+        console.log('Image size:', productData.image_url.length, 'characters')
+        console.log('Image preview:', productData.image_url.substring(0, 100) + '...')
+      }
+
+      console.log('Sending PUT request to:', `http://localhost:8000/api/products/${productForm.value.id}`)
+      console.log('Headers:', {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${authStore.token?.substring(0, 20)}...`,
+        'Accept': 'application/json'
+      })
 
       const response = await fetch(`http://localhost:8000/api/products/${productForm.value.id}`, {
         method: 'PUT',
@@ -636,9 +714,18 @@ const saveProduct = async () => {
         body: JSON.stringify(productData)
       })
 
+      console.log('Response received:', response.status, response.statusText)
+
       if (!response.ok) {
-        const errorData = await response.json()
-        console.error('API Error:', errorData)
+        const errorText = await response.text()
+        console.error('API Error Response:', errorText)
+        console.error('HTTP status:', response.status)
+        try {
+          const errorData = JSON.parse(errorText)
+          console.error('Parsed error:', errorData)
+        } catch (e) {
+          console.error('Could not parse error response as JSON')
+        }
         throw new Error(`HTTP error! status: ${response.status}`)
       }
 
@@ -652,7 +739,17 @@ const saveProduct = async () => {
 
   } catch (error) {
     console.error('Error saving product:', error)
-    alert('Erreur lors de l\'enregistrement du produit. Vérifiez la console pour plus de détails.')
+    console.error('Error type:', typeof error)
+    console.error('Error name:', error?.name)
+    console.error('Error message:', error?.message)
+
+    if (error?.message?.includes('NetworkError') || error?.message?.includes('Failed to fetch')) {
+      alert('Erreur de connexion au serveur. Vérifiez que le serveur backend fonctionne.')
+    } else if (error?.message?.includes('401')) {
+      alert('Session expirée. Veuillez vous reconnecter.')
+    } else {
+      alert('Erreur lors de l\'enregistrement du produit. Détails dans la console.')
+    }
   } finally {
     isSubmitting.value = false
   }
@@ -742,7 +839,13 @@ const loadCategories = async () => {
 
 // Lifecycle
 onMounted(() => {
+  const route = useRoute()
   loadProducts()
   loadCategories()
+
+  // Ouvrir la modale si on vient de /merchant/products/create
+  if (route.query.action === 'create') {
+    showAddProductModal.value = true
+  }
 })
 </script>

@@ -118,7 +118,7 @@
                   <!-- Menu Items -->
                   <div class="py-2">
                     <router-link
-                      to="/dashboard"
+                      :to="authStore.user?.role === 'merchant' ? '/merchant/dashboard' : '/dashboard'"
                       class="flex items-center px-4 py-3 text-sm text-neutral-700 hover:bg-gradient-primary hover:text-white transition-all duration-200 group"
                       @click="showUserMenu = false"
                     >
@@ -242,7 +242,7 @@
                 Connecté en tant que {{ authStore.user?.first_name }}
               </div>
               <router-link
-                to="/dashboard"
+                :to="authStore.user?.role === 'merchant' ? '/merchant/dashboard' : '/dashboard'"
                 class="block text-neutral-600 hover:text-primary-600 py-2"
                 @click="showMobileMenu = false"
               >

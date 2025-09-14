@@ -10,7 +10,7 @@
           </div>
           <div class="flex items-center space-x-4">
             <router-link
-              to="/merchant/products/create"
+              to="/merchant/products?action=create"
               class="bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-6 py-3 rounded-xl font-medium hover:from-blue-700 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 flex items-center space-x-2"
             >
               <PlusIcon class="w-5 h-5" />

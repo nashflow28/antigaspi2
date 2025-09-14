@@ -26,7 +26,10 @@
       "Bash(npm run type-check:*)",
       "Bash(npm run lint)",
       "Bash(netstat:*)",
-      "Bash(C:/xampp/mysql/bin/mysql.exe:*)"
+      "Bash(C:/xampp/mysql/bin/mysql.exe:*)",
+      "Bash(mysql:*)",
+      "Bash(php:*)",
+      "Bash(\"C:/xampp/mysql/bin/mysql.exe\":*)"
     ],
     "deny": [],
     "ask": []
