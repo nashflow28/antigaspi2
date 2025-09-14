@@ -3,6 +3,12 @@
         Options -MultiViews -Indexes
     </IfModule>
 
+    # Increase upload limits for image handling
+    php_value post_max_size 16M
+    php_value upload_max_filesize 16M
+    php_value max_execution_time 300
+    php_value max_input_time 300
+
     RewriteEngine On
 
     # Handle Authorization Header

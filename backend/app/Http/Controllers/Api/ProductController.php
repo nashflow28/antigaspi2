@@ -206,7 +206,7 @@ class ProductController extends Controller
                 'discounted_price' => 'required|numeric|min:0|lt:original_price',
                 'quantity_available' => 'required|integer|min:1',
                 'expiration_date' => 'required|date|after:today',
-                'image_url' => 'nullable|url',
+                'image_url' => 'nullable|string',
             ]);
 
             if ($validator->fails()) {
@@ -259,7 +259,21 @@ class ProductController extends Controller
             $user = JWTAuth::parseToken()->authenticate();
             $product = Product::findOrFail($id);
 
+            // Debug logging
+            \Log::info('UPDATE PRODUCT DEBUG', [
+                'product_id' => $id,
+                'authenticated_user_id' => $user->id,
+                'authenticated_user_email' => $user->email,
+                'product_merchant_id' => $product->merchant->id,
+                'product_merchant_user_id' => $product->merchant->user_id,
+                'user_merchant_id' => $user->merchant ? $user->merchant->id : 'null'
+            ]);
+
             if ($product->merchant->user_id !== $user->id) {
+                \Log::warning('UNAUTHORIZED UPDATE ATTEMPT', [
+                    'product_merchant_user_id' => $product->merchant->user_id,
+                    'authenticated_user_id' => $user->id
+                ]);
                 return response()->json([
                     'success' => false,
                     'message' => 'Vous ne pouvez modifier que vos propres produits'
@@ -274,11 +288,19 @@ class ProductController extends Controller
                 'discounted_price' => 'sometimes|numeric|min:0',
                 'quantity_available' => 'sometimes|integer|min:0',
                 'expiration_date' => 'sometimes|date|after:today',
-                'image_url' => 'sometimes|url',
+                'image_url' => 'sometimes|string',
                 'is_active' => 'sometimes|boolean',
             ]);
 
+            \Log::info('VALIDATION ATTEMPT', [
+                'request_data' => $request->all(),
+                'validation_passed' => !$validator->fails()
+            ]);
+
             if ($validator->fails()) {
+                \Log::error('VALIDATION FAILED', [
+                    'errors' => $validator->errors()->toArray()
+                ]);
                 return response()->json([
                     'success' => false,
                     'message' => 'Erreurs de validation',
@@ -286,11 +308,22 @@ class ProductController extends Controller
                 ], 422);
             }
 
+            \Log::info('ATTEMPTING PRODUCT UPDATE', [
+                'product_id' => $id,
+                'update_data' => $request->only([
+                    'category_id', 'name', 'description', 'original_price',
+                    'discounted_price', 'quantity_available', 'expiration_date',
+                    'image_url', 'is_active'
+                ])
+            ]);
+
             $product->update($request->only([
                 'category_id', 'name', 'description', 'original_price',
                 'discounted_price', 'quantity_available', 'expiration_date',
                 'image_url', 'is_active'
             ]));
+
+            \Log::info('PRODUCT UPDATED SUCCESSFULLY', ['product_id' => $id]);
 
             return response()->json([
                 'success' => true,
@@ -304,6 +337,11 @@ class ProductController extends Controller
             ]);
 
         } catch (\Exception $e) {
+            \Log::error('PRODUCT UPDATE ERROR', [
+                'product_id' => $id,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur lors de la mise à jour',
