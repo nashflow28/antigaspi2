@@ -19,3 +19,7 @@ export type { NavigationProps, NavigationItem } from './Navigation';
 
 export { DashboardLayout } from './DashboardLayout';
 export type { DashboardLayoutProps } from './DashboardLayout';
+
+export { ThemeToggle } from './ThemeToggle';
+export { Footer } from './Footer';
+export { Stats } from './Stats';

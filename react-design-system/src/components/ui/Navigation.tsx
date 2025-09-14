@@ -42,16 +42,16 @@ const Navigation: React.FC<NavigationProps> = ({
 
   const navVariants = {
     default: cn(
-      "bg-gray-900/80 border-gray-700/50",
-      scrolled && "bg-gray-900/95 shadow-2xl backdrop-blur-xl"
+      "bg-cream/80 border-gray-200/80 dark:bg-gray-900/80 dark:border-gray-700/50",
+      scrolled && "shadow-lg backdrop-blur-md"
     ),
     glass: cn(
-      "bg-white/5 border-white/10 backdrop-blur-xl",
-      scrolled && "bg-white/10 shadow-2xl"
+      "bg-white/30 border-white/40 dark:bg-gray-900/30 dark:border-gray-700/40 backdrop-blur-xl",
+      scrolled && "shadow-lg"
     ),
     solid: cn(
-      "bg-gray-900 border-gray-800",
-      scrolled && "shadow-2xl"
+      "bg-cream border-gray-200 dark:bg-gray-900 dark:border-gray-800",
+      scrolled && "shadow-lg"
     )
   };
 
@@ -92,10 +92,10 @@ const Navigation: React.FC<NavigationProps> = ({
                 href={item.href}
                 className={cn(
                   "relative px-4 py-2 rounded-xl text-sm font-medium transition-all duration-300",
-                  "hover:bg-white/5 hover:text-white",
+                  "hover:bg-primary-50 hover:text-primary-700 dark:hover:bg-white/5 dark:hover:text-white",
                   item.active
-                    ? "text-white bg-brand-500/20"
-                    : "text-gray-300"
+                    ? "text-primary-700 bg-primary-100 dark:text-white dark:bg-brand-500/20"
+                    : "text-gray-600 dark:text-gray-300"
                 )}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
@@ -126,7 +126,7 @@ const Navigation: React.FC<NavigationProps> = ({
 
           {/* Mobile menu button */}
           <motion.button
-            className="lg:hidden p-2 rounded-xl text-gray-300 hover:text-white hover:bg-white/5 transition-colors"
+            className="lg:hidden p-2 rounded-xl text-gray-700 hover:text-primary-700 hover:bg-primary-50 dark:text-gray-300 dark:hover:text-white dark:hover:bg-white/5 transition-colors"
             onClick={() => setIsOpen(!isOpen)}
             whileTap={{ scale: 0.95 }}
           >
@@ -145,7 +145,7 @@ const Navigation: React.FC<NavigationProps> = ({
       <AnimatePresence>
         {isOpen && (
           <motion.div
-            className="lg:hidden border-t border-gray-700/50 bg-gray-900/95 backdrop-blur-xl"
+            className="lg:hidden border-t border-gray-200 bg-cream/95 dark:border-gray-700 dark:bg-gray-900/95 backdrop-blur-xl"
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: "auto", opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
@@ -158,10 +158,10 @@ const Navigation: React.FC<NavigationProps> = ({
                   href={item.href}
                   className={cn(
                     "flex items-center space-x-3 px-4 py-3 rounded-xl text-base font-medium transition-all duration-200",
-                    "hover:bg-white/5 hover:text-white",
+                    "hover:bg-primary-50 hover:text-primary-700 dark:hover:bg-white/5 dark:hover:text-white",
                     item.active
-                      ? "text-white bg-brand-500/20"
-                      : "text-gray-300"
+                      ? "text-primary-700 bg-primary-100 dark:text-white dark:bg-brand-500/20"
+                      : "text-gray-700 dark:text-gray-300"
                   )}
                   onClick={() => setIsOpen(false)}
                   initial={{ opacity: 0, x: -20 }}
@@ -176,7 +176,7 @@ const Navigation: React.FC<NavigationProps> = ({
 
               {actions && (
                 <motion.div
-                  className="pt-4 border-t border-gray-700/50 space-y-2"
+                  className="pt-4 border-t border-gray-200 dark:border-gray-700 space-y-2"
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ duration: 0.3, delay: 0.4 }}

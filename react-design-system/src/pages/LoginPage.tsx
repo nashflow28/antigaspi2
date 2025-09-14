@@ -39,7 +39,7 @@ const LoginPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-950 flex items-center justify-center p-4 relative overflow-hidden">
+    <div className="min-h-screen bg-cream dark:bg-gray-950 flex items-center justify-center p-4 relative overflow-hidden">
       {/* Background Effects */}
       <div className="absolute inset-0">
         <div className="absolute top-20 left-20 w-72 h-72 bg-brand-500/20 rounded-full filter blur-3xl animate-pulse" />
@@ -110,8 +110,8 @@ const LoginPage: React.FC = () => {
 
               <div className="flex items-center justify-between">
                 <label className="flex items-center space-x-2 cursor-pointer">
-                  <input type="checkbox" className="w-4 h-4 rounded border-gray-700 bg-transparent text-brand-500 focus:ring-brand-500/20 focus:ring-2 focus:ring-offset-0" />
-                  <span className="text-sm text-gray-300">Se souvenir de moi</span>
+                  <input type="checkbox" className="w-4 h-4 rounded border-gray-300 bg-white text-brand-600 focus:ring-brand-500/20 focus:ring-2 focus:ring-offset-0 dark:border-gray-700 dark:bg-transparent" />
+                  <span className="text-sm text-gray-600 dark:text-gray-300">Se souvenir de moi</span>
                 </label>
 
                 <motion.a
@@ -126,7 +126,7 @@ const LoginPage: React.FC = () => {
 
               <Button
                 type="submit"
-                variant="primary"
+                variant="secondary"
                 size="lg"
                 className="w-full"
                 loading={isLoading}
