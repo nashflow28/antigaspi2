@@ -14,40 +14,40 @@ const buttonVariants = cva(
   ],
   {
     variants: {
-      variant: {
-        primary: [
-          "bg-gradient-to-r from-brand-500 to-brand-600",
-          "text-white shadow-lg shadow-brand-500/25",
-          "hover:from-brand-600 hover:to-brand-700",
-          "hover:shadow-xl hover:shadow-brand-500/40",
-          "focus:ring-brand-500/50",
-          "before:absolute before:inset-0 before:bg-gradient-to-r before:from-white/0 before:via-white/20 before:to-white/0",
-          "before:translate-x-[-100%] hover:before:translate-x-[100%] before:transition-transform before:duration-700"
-        ],
-        secondary: [
-          "bg-gradient-to-r from-accent-500 to-accent-600",
-          "text-white shadow-lg shadow-accent-500/25",
-          "hover:from-accent-600 hover:to-accent-700",
-          "hover:shadow-xl hover:shadow-accent-500/40",
-          "focus:ring-accent-500/50"
-        ],
-        outline: [
-          "border-2 border-brand-500/30 bg-transparent",
-          "text-brand-400 backdrop-blur-sm",
-          "hover:border-brand-500 hover:bg-brand-500/10",
-          "hover:text-brand-300 hover:shadow-lg hover:shadow-brand-500/20",
-          "focus:ring-brand-500/30"
-        ],
-        ghost: [
-          "bg-transparent text-gray-300",
-          "hover:bg-white/5 hover:text-white",
-          "focus:ring-white/20"
-        ],
-        destructive: [
-          "bg-gradient-to-r from-red-500 to-red-600",
-          "text-white shadow-lg shadow-red-500/25",
-          "hover:from-red-600 hover:to-red-700",
-          "hover:shadow-xl hover:shadow-red-500/40",
+        variant: {
+          primary: [
+            "bg-gradient-to-r from-brand-500 to-accent-500",
+            "text-white shadow-lg shadow-brand-500/25",
+            "hover:from-brand-600 hover:to-accent-600",
+            "hover:shadow-xl hover:shadow-brand-500/40",
+            "focus:ring-brand-500/50",
+            "before:absolute before:inset-0 before:bg-gradient-to-r before:from-white/0 before:via-white/20 before:to-white/0",
+            "before:translate-x-[-100%] hover:before:translate-x-[100%] before:transition-transform before:duration-700"
+          ],
+          secondary: [
+            "bg-gradient-to-r from-warning-500 to-warning-600",
+            "text-white shadow-lg shadow-warning-500/25",
+            "hover:from-warning-600 hover:to-warning-700",
+            "hover:shadow-xl hover:shadow-warning-500/40",
+            "focus:ring-warning-500/50"
+          ],
+          outline: [
+            "border-2 border-brand-500/30 bg-transparent",
+            "text-brand-600 backdrop-blur-sm",
+            "hover:border-brand-500 hover:bg-brand-50",
+            "hover:text-brand-700 hover:shadow-lg hover:shadow-brand-500/20",
+            "focus:ring-brand-500/30"
+          ],
+          ghost: [
+            "bg-transparent text-gray-600 dark:text-gray-300",
+            "hover:bg-gray-100 hover:text-gray-900 dark:hover:bg-white/5 dark:hover:text-white",
+            "focus:ring-gray-200 dark:focus:ring-white/20"
+          ],
+          destructive: [
+            "bg-gradient-to-r from-red-500 to-red-600",
+            "text-white shadow-lg shadow-red-500/25",
+            "hover:from-red-600 hover:to-red-700",
+            "hover:shadow-xl hover:shadow-red-500/40",
           "focus:ring-red-500/50"
         ]
       },

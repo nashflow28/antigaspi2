@@ -8,39 +8,37 @@ export default {
   theme: {
     extend: {
       // 🎨 ANTIGASPI DESIGN SYSTEM 2025
-      // Palette moderne avec mode sombre par défaut
+      // Nouvelle palette éco-responsable
       colors: {
-        // Brand Colors - Violet foncé comme couleur principale
+        // Brand Colors - Vert naturel comme couleur principale
         brand: {
-          50: '#faf5ff',
-          100: '#f3e8ff',
-          200: '#e9d5ff',
-          300: '#d8b4fe',
-          400: '#c084fc',
-          500: '#a855f7', // Violet principal
-          600: '#9333ea',
-          700: '#7c3aed',
-          800: '#6b21a8', // Violet foncé accent (#6B21A8)
-          900: '#581c87',
-          950: '#3b0764'
+          50: '#e8f5e9',
+          100: '#c8e6c9',
+          200: '#a5d6a7',
+          300: '#81c784',
+          400: '#66bb6a',
+          500: '#2E7D32', // Vert principal
+          600: '#1b5e20',
+          700: '#104911',
+          800: '#0b3310',
+          900: '#062009',
         },
 
-        // Accent - Bleu clair (#3B82F6)
+        // Accent - Turquoise doux
         accent: {
-          50: '#eff6ff',
-          100: '#dbeafe',
-          200: '#bfdbfe',
-          300: '#93c5fd',
-          400: '#60a5fa',
-          500: '#3b82f6', // Bleu clair accent (#3B82F6)
-          600: '#2563eb',
-          700: '#1d4ed8',
-          800: '#1e40af',
-          900: '#1e3a8a',
-          950: '#172554'
+          50: '#e0f7ff',
+          100: '#b3ecff',
+          200: '#80e1ff',
+          300: '#4dd6ff',
+          400: '#26ccff',
+          500: '#40C4FF', // Turquoise accent
+          600: '#00a5e3',
+          700: '#0087c0',
+          800: '#00699e',
+          900: '#004d7d',
         },
 
-        // Success/Green (gardé pour cohérence avec l'anti-gaspillage)
+        // Success/Green (pour validations)
         success: {
           50: '#f0fdf4',
           100: '#dcfce7',
@@ -55,19 +53,18 @@ export default {
           950: '#052e16'
         },
 
-        // Warning/Orange
+        // CTA Orange
         warning: {
-          50: '#fff7ed',
-          100: '#ffedd5',
-          200: '#fed7aa',
-          300: '#fdba74',
-          400: '#fb923c',
-          500: '#f97316',
-          600: '#ea580c',
-          700: '#c2410c',
-          800: '#9a3412',
-          900: '#7c2d12',
-          950: '#431407'
+          50: '#fff3e0',
+          100: '#ffe0b2',
+          200: '#ffcc80',
+          300: '#ffb74d',
+          400: '#ffa726',
+          500: '#FF9800',
+          600: '#fb8c00',
+          700: '#f57c00',
+          800: '#ef6c00',
+          900: '#e65100',
         },
 
         // Error/Red
@@ -85,7 +82,7 @@ export default {
           950: '#450a0a'
         },
 
-        // Gray system optimisé pour le mode sombre
+        // Gray system
         gray: {
           50: '#fafafa',
           100: '#f4f4f5',
@@ -95,18 +92,22 @@ export default {
           500: '#71717a',
           600: '#52525b',
           700: '#3f3f46',
-          800: '#27272a', // Backgrounds sombres
-          850: '#1f1f23', // Couleur custom pour variations
-          900: '#18181b', // Background principal sombre
-          925: '#0f0f12', // Plus sombre pour contraste
-          950: '#09090b'  // Le plus sombre
-        }
+          800: '#27272a',
+          850: '#1f1f23',
+          900: '#18181b',
+          925: '#0f0f12',
+          950: '#09090b'
+        },
+
+        // Background tones
+        cream: '#FAF9F6',
+        beige: '#F5F5DC'
       },
 
-      // 📝 Typography - Inter comme police principale
+      // 📝 Typography - Inter/Poppins
       fontFamily: {
-        sans: ['Inter', 'system-ui', 'sans-serif'],
-        display: ['Inter', 'system-ui', 'sans-serif'], // Pour les titres
+        sans: ['Inter', 'Poppins', 'system-ui', 'sans-serif'],
+        display: ['Poppins', 'Inter', 'system-ui', 'sans-serif'], // Pour les titres
         mono: ['JetBrains Mono', 'Monaco', 'monospace']
       },
 

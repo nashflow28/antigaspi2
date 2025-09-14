@@ -5,29 +5,29 @@ import { cn } from '../../utils/cn';
 
 const inputVariants = cva(
   [
-    "flex w-full rounded-xl border bg-transparent px-4 py-3",
-    "text-sm text-white placeholder:text-gray-500",
+    "flex w-full rounded-xl border bg-white px-4 py-3 dark:bg-transparent",
+    "text-sm text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500",
     "transition-all duration-300 ease-out",
-    "focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-900",
+    "focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-cream dark:focus:ring-offset-gray-900",
     "disabled:cursor-not-allowed disabled:opacity-50"
   ],
   {
     variants: {
       variant: {
         default: [
-          "border-gray-700/50 bg-gray-900/50 backdrop-blur-sm",
-          "hover:border-gray-600/60 hover:bg-gray-900/70",
-          "focus:border-brand-500/50 focus:ring-brand-500/20 focus:bg-gray-900/80"
+          "border-gray-300 bg-white",
+          "hover:border-gray-400",
+          "focus:border-brand-500/50 focus:ring-brand-500/20 focus:bg-white dark:focus:bg-gray-900/80"
         ],
         glass: [
-          "border-white/10 bg-white/5 backdrop-blur-xl",
-          "hover:border-white/20 hover:bg-white/10",
-          "focus:border-brand-400/50 focus:ring-brand-400/20 focus:bg-white/10"
+          "border-white/40 bg-white/30 backdrop-blur-xl dark:border-gray-600 dark:bg-gray-800/30",
+          "hover:border-white/50 hover:bg-white/40 dark:hover:border-gray-500 dark:hover:bg-gray-800/40",
+          "focus:border-brand-400/50 focus:ring-brand-400/20"
         ],
         filled: [
-          "border-gray-800 bg-gray-800/80",
-          "hover:border-gray-700 hover:bg-gray-700/80",
-          "focus:border-brand-500 focus:ring-brand-500/30 focus:bg-gray-800"
+          "border-gray-200 bg-gray-100 dark:border-gray-800 dark:bg-gray-800/80",
+          "hover:border-gray-300 hover:bg-gray-50 dark:hover:border-gray-700 dark:hover:bg-gray-700/80",
+          "focus:border-brand-500 focus:ring-brand-500/30"
         ]
       },
       size: {
