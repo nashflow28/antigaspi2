@@ -119,6 +119,179 @@
               </div>
             </div>
 
+            <!-- History Tab -->
+            <div v-else-if="activeTab === 'history'" class="space-y-8">
+              <!-- Filters and Search -->
+              <div class="bg-white border border-gray-200 rounded-xl p-6">
+                <div class="flex flex-col md:flex-row gap-4 items-start md:items-center justify-between mb-6">
+                  <h3 class="text-lg font-semibold text-gray-900 flex items-center space-x-2">
+                    <ClockIcon class="w-5 h-5" />
+                    <span>Historique des réservations</span>
+                  </h3>
+
+                  <!-- Search and Filters -->
+                  <div class="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
+                    <div class="relative">
+                      <MagnifyingGlassIcon class="w-5 h-5 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                      <input
+                        v-model="historyFilters.search"
+                        type="text"
+                        placeholder="Rechercher un produit..."
+                        class="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent text-sm"
+                      />
+                    </div>
+
+                    <select
+                      v-model="historyFilters.status"
+                      class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent text-sm"
+                    >
+                      <option value="">Tous les statuts</option>
+                      <option value="pending">En attente</option>
+                      <option value="confirmed">Confirmé</option>
+                      <option value="ready">Prêt</option>
+                      <option value="completed">Terminé</option>
+                      <option value="cancelled">Annulé</option>
+                    </select>
+
+                    <select
+                      v-model="historyFilters.period"
+                      class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent text-sm"
+                    >
+                      <option value="">Toute la période</option>
+                      <option value="week">Cette semaine</option>
+                      <option value="month">Ce mois</option>
+                      <option value="quarter">Ce trimestre</option>
+                      <option value="year">Cette année</option>
+                    </select>
+                  </div>
+                </div>
+
+                <!-- Reservations List -->
+                <div class="space-y-4">
+                  <div
+                    v-for="reservation in filteredReservations"
+                    :key="reservation.id"
+                    class="border border-gray-200 rounded-xl p-6 hover:shadow-md transition-shadow"
+                  >
+                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                      <!-- Reservation Info -->
+                      <div class="flex-grow">
+                        <div class="flex items-start gap-4">
+                          <!-- Product Image -->
+                          <div class="w-16 h-16 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0">
+                            <img
+                              v-if="reservation.product?.image_url"
+                              :src="reservation.product.image_url"
+                              :alt="reservation.product.name"
+                              class="w-full h-full object-cover"
+                            />
+                            <div v-else class="w-full h-full bg-gradient-to-br from-green-100 to-green-200 flex items-center justify-center">
+                              <ShoppingBagIcon class="w-8 h-8 text-green-600" />
+                            </div>
+                          </div>
+
+                          <!-- Details -->
+                          <div class="flex-grow min-w-0">
+                            <h4 class="font-semibold text-gray-900 mb-1">{{ reservation.product?.name }}</h4>
+                            <p class="text-sm text-gray-600 mb-2">{{ reservation.merchant?.business_name }}</p>
+
+                            <div class="flex flex-wrap gap-4 text-sm text-gray-600">
+                              <span class="flex items-center gap-1">
+                                <CalendarIcon class="w-4 h-4" />
+                                {{ formatDate(reservation.created_at) }}
+                              </span>
+                              <span class="flex items-center gap-1">
+                                <TagIcon class="w-4 h-4" />
+                                Quantité: {{ reservation.quantity_reserved }}
+                              </span>
+                              <span class="font-medium text-gray-900">
+                                {{ formatPrice(reservation.total_amount) }}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      <!-- Status and Actions -->
+                      <div class="flex flex-col sm:flex-row items-start sm:items-center gap-3">
+                        <span
+                          :class="getReservationStatusClass(reservation.status)"
+                          class="px-3 py-1 rounded-full text-sm font-medium"
+                        >
+                          {{ getReservationStatusLabel(reservation.status) }}
+                        </span>
+
+                        <!-- Action buttons for pending/confirmed reservations -->
+                        <button
+                          v-if="reservation.status === 'pending' || reservation.status === 'confirmed'"
+                          @click="cancelReservation(reservation.id)"
+                          class="px-3 py-1 text-red-600 hover:text-red-700 text-sm font-medium transition-colors"
+                        >
+                          Annuler
+                        </button>
+                      </div>
+                    </div>
+
+                    <!-- Pickup Info for ready/completed reservations -->
+                    <div
+                      v-if="reservation.status === 'ready' || reservation.status === 'completed'"
+                      class="mt-4 pt-4 border-t border-gray-100"
+                    >
+                      <div class="text-sm text-gray-600">
+                        <span class="font-medium">Récupération:</span>
+                        {{ reservation.pickup_date ? formatDate(reservation.pickup_date) : 'À confirmer' }}
+                        <span v-if="reservation.pickup_time" class="ml-2">
+                          à {{ reservation.pickup_time }}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Empty State -->
+                  <div
+                    v-if="filteredReservations.length === 0"
+                    class="text-center py-12"
+                  >
+                    <ClockIcon class="w-16 h-16 text-gray-300 mx-auto mb-4" />
+                    <h3 class="text-lg font-medium text-gray-900 mb-2">Aucune réservation trouvée</h3>
+                    <p class="text-gray-600">
+                      {{ historyFilters.search || historyFilters.status || historyFilters.period
+                         ? 'Essayez de modifier vos filtres de recherche.'
+                         : 'Vous n\'avez pas encore effectué de réservations.' }}
+                    </p>
+                  </div>
+                </div>
+
+                <!-- Pagination -->
+                <div
+                  v-if="reservationHistory.length > historyPageSize"
+                  class="flex justify-between items-center mt-6 pt-6 border-t border-gray-200"
+                >
+                  <div class="text-sm text-gray-600">
+                    Affichage {{ (historyCurrentPage - 1) * historyPageSize + 1 }}-{{ Math.min(historyCurrentPage * historyPageSize, filteredReservations.length) }}
+                    sur {{ filteredReservations.length }} réservations
+                  </div>
+
+                  <div class="flex gap-2">
+                    <button
+                      @click="historyCurrentPage--"
+                      :disabled="historyCurrentPage === 1"
+                      class="px-3 py-1 text-sm border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      Précédent
+                    </button>
+                    <button
+                      @click="historyCurrentPage++"
+                      :disabled="historyCurrentPage * historyPageSize >= filteredReservations.length"
+                      class="px-3 py-1 text-sm border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      Suivant
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
             <!-- Security Tab -->
             <div v-else-if="activeTab === 'security'" class="space-y-8">
               <div class="bg-amber-50 border border-amber-200 rounded-xl p-6">
@@ -176,14 +349,14 @@
 
             <!-- Preferences Tab -->
             <div v-else-if="activeTab === 'preferences'" class="space-y-8">
-              <div class="grid grid-cols-1 gap-8">
+              <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
                 <!-- Notification Settings -->
-                <div class="bg-gray-50 rounded-xl p-6">
-                  <h3 class="font-semibold text-gray-900 mb-4 flex items-center space-x-2">
-                    <BellIcon class="w-5 h-5" />
+                <div class="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-6 border border-blue-200">
+                  <h3 class="font-semibold text-gray-900 mb-6 flex items-center space-x-2">
+                    <BellIcon class="w-5 h-5 text-blue-600" />
                     <span>Notifications</span>
                   </h3>
-                  <div class="space-y-4">
+                  <div class="space-y-6">
                     <div class="flex items-center justify-between">
                       <div>
                         <p class="font-medium text-gray-900">Notifications par email</p>
@@ -195,13 +368,13 @@
                           type="checkbox"
                           class="sr-only peer"
                         />
-                        <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-green-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-600"></div>
+                        <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
                       </label>
                     </div>
                     <div class="flex items-center justify-between">
                       <div>
-                        <p class="font-medium text-gray-900">Notifications de nouvelles offres</p>
-                        <p class="text-sm text-gray-600">Recevoir des alertes pour les nouveaux produits</p>
+                        <p class="font-medium text-gray-900">Nouvelles offres</p>
+                        <p class="text-sm text-gray-600">Alertes pour les nouveaux produits</p>
                       </div>
                       <label class="relative inline-flex items-center cursor-pointer">
                         <input
@@ -209,32 +382,237 @@
                           type="checkbox"
                           class="sr-only peer"
                         />
-                        <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-green-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-600"></div>
+                        <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                      </label>
+                    </div>
+                    <div class="flex items-center justify-between">
+                      <div>
+                        <p class="font-medium text-gray-900">Réservations confirmées</p>
+                        <p class="text-sm text-gray-600">Notifications de confirmation</p>
+                      </div>
+                      <label class="relative inline-flex items-center cursor-pointer">
+                        <input
+                          v-model="preferences.booking_notifications"
+                          type="checkbox"
+                          class="sr-only peer"
+                        />
+                        <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                      </label>
+                    </div>
+                    <div class="flex items-center justify-between">
+                      <div>
+                        <p class="font-medium text-gray-900">Rappels de récupération</p>
+                        <p class="text-sm text-gray-600">Rappels avant expiration</p>
+                      </div>
+                      <label class="relative inline-flex items-center cursor-pointer">
+                        <input
+                          v-model="preferences.reminder_notifications"
+                          type="checkbox"
+                          class="sr-only peer"
+                        />
+                        <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
                       </label>
                     </div>
                   </div>
                 </div>
 
-                <!-- Distance Preferences -->
-                <div class="bg-gray-50 rounded-xl p-6">
-                  <h3 class="font-semibold text-gray-900 mb-4 flex items-center space-x-2">
-                    <MapPinIcon class="w-5 h-5" />
-                    <span>Préférences de distance</span>
+                <!-- Search & Discovery Preferences -->
+                <div class="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-6 border border-green-200">
+                  <h3 class="font-semibold text-gray-900 mb-6 flex items-center space-x-2">
+                    <MapPinIcon class="w-5 h-5 text-green-600" />
+                    <span>Recherche & Découverte</span>
                   </h3>
+                  <div class="space-y-6">
+                    <div>
+                      <label class="block text-sm font-medium text-gray-700 mb-2">
+                        Rayon de recherche maximum
+                      </label>
+                      <select
+                        v-model="preferences.max_distance"
+                        class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                      >
+                        <option value="5">5 km</option>
+                        <option value="10">10 km</option>
+                        <option value="15">15 km</option>
+                        <option value="25">25 km</option>
+                        <option value="50">50 km</option>
+                        <option value="100">100 km</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label class="block text-sm font-medium text-gray-700 mb-2">
+                        Catégories préférées
+                      </label>
+                      <div class="grid grid-cols-2 gap-2">
+                        <label v-for="category in availableCategories" :key="category.id"
+                               class="flex items-center space-x-2 p-2 rounded-lg hover:bg-green-100 cursor-pointer">
+                          <input
+                            v-model="preferences.preferred_categories"
+                            type="checkbox"
+                            :value="category.id"
+                            class="text-green-600 rounded focus:ring-green-500"
+                          />
+                          <span class="text-sm text-gray-700">{{ category.name }}</span>
+                        </label>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <!-- Shopping Preferences -->
+                <div class="bg-gradient-to-br from-purple-50 to-pink-50 rounded-xl p-6 border border-purple-200">
+                  <h3 class="font-semibold text-gray-900 mb-6 flex items-center space-x-2">
+                    <ShoppingBagIcon class="w-5 h-5 text-purple-600" />
+                    <span>Préférences d'achat</span>
+                  </h3>
+                  <div class="space-y-6">
+                    <div>
+                      <label class="block text-sm font-medium text-gray-700 mb-2">
+                        Budget maximum par achat
+                      </label>
+                      <select
+                        v-model="preferences.max_budget"
+                        class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                      >
+                        <option value="1000">1,000 F CFA</option>
+                        <option value="2500">2,500 F CFA</option>
+                        <option value="5000">5,000 F CFA</option>
+                        <option value="10000">10,000 F CFA</option>
+                        <option value="25000">25,000 F CFA</option>
+                        <option value="">Pas de limite</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label class="block text-sm font-medium text-gray-700 mb-2">
+                        Mode d'affichage des prix
+                      </label>
+                      <select
+                        v-model="preferences.price_display"
+                        class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                      >
+                        <option value="discount_first">Remise en premier</option>
+                        <option value="final_price">Prix final en premier</option>
+                        <option value="both">Afficher les deux</option>
+                      </select>
+                    </div>
+                    <div class="flex items-center justify-between">
+                      <div>
+                        <p class="font-medium text-gray-900">Réservation automatique</p>
+                        <p class="text-sm text-gray-600">Réserver automatiquement les favoris</p>
+                      </div>
+                      <label class="relative inline-flex items-center cursor-pointer">
+                        <input
+                          v-model="preferences.auto_reserve_favorites"
+                          type="checkbox"
+                          class="sr-only peer"
+                        />
+                        <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-purple-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-purple-600"></div>
+                      </label>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Environmental & Privacy Settings -->
+                <div class="bg-gradient-to-br from-emerald-50 to-teal-50 rounded-xl p-6 border border-emerald-200">
+                  <h3 class="font-semibold text-gray-900 mb-6 flex items-center space-x-2">
+                    <GlobeAltIcon class="w-5 h-5 text-emerald-600" />
+                    <span>Impact & Confidentialité</span>
+                  </h3>
+                  <div class="space-y-6">
+                    <div class="flex items-center justify-between">
+                      <div>
+                        <p class="font-medium text-gray-900">Statistiques publiques</p>
+                        <p class="text-sm text-gray-600">Partager votre impact environnemental</p>
+                      </div>
+                      <label class="relative inline-flex items-center cursor-pointer">
+                        <input
+                          v-model="preferences.public_impact_stats"
+                          type="checkbox"
+                          class="sr-only peer"
+                        />
+                        <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-emerald-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-600"></div>
+                      </label>
+                    </div>
+                    <div class="flex items-center justify-between">
+                      <div>
+                        <p class="font-medium text-gray-900">Recommandations personnalisées</p>
+                        <p class="text-sm text-gray-600">Améliorer les suggestions basées sur vos habitudes</p>
+                      </div>
+                      <label class="relative inline-flex items-center cursor-pointer">
+                        <input
+                          v-model="preferences.personalized_recommendations"
+                          type="checkbox"
+                          class="sr-only peer"
+                        />
+                        <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-emerald-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-600"></div>
+                      </label>
+                    </div>
+                    <div>
+                      <label class="block text-sm font-medium text-gray-700 mb-2">
+                        Fréquence des rapports d'impact
+                      </label>
+                      <select
+                        v-model="preferences.impact_report_frequency"
+                        class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                      >
+                        <option value="weekly">Hebdomadaire</option>
+                        <option value="monthly">Mensuel</option>
+                        <option value="quarterly">Trimestriel</option>
+                        <option value="never">Jamais</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Language & Accessibility -->
+              <div class="bg-gradient-to-br from-orange-50 to-red-50 rounded-xl p-6 border border-orange-200">
+                <h3 class="font-semibold text-gray-900 mb-6 flex items-center space-x-2">
+                  <GlobeAltIcon class="w-5 h-5 text-orange-600" />
+                  <span>Langue & Accessibilité</span>
+                </h3>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                   <div>
                     <label class="block text-sm font-medium text-gray-700 mb-2">
-                      Rayon de recherche maximum (km)
+                      Langue préférée
                     </label>
                     <select
-                      v-model="preferences.max_distance"
-                      class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                      v-model="preferences.language"
+                      class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent"
                     >
-                      <option value="5">5 km</option>
-                      <option value="10">10 km</option>
-                      <option value="15">15 km</option>
-                      <option value="25">25 km</option>
-                      <option value="50">50 km</option>
+                      <option value="fr">Français</option>
+                      <option value="en">English</option>
+                      <option value="ar">العربية</option>
                     </select>
+                  </div>
+                  <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                      Taille de police
+                    </label>
+                    <select
+                      v-model="preferences.font_size"
+                      class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                    >
+                      <option value="small">Petite</option>
+                      <option value="medium">Normale</option>
+                      <option value="large">Grande</option>
+                      <option value="xlarge">Très grande</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                      Contraste élevé
+                    </label>
+                    <label class="relative inline-flex items-center cursor-pointer mt-3">
+                      <input
+                        v-model="preferences.high_contrast"
+                        type="checkbox"
+                        class="sr-only peer"
+                      />
+                      <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-orange-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-orange-600"></div>
+                    </label>
                   </div>
                 </div>
               </div>
@@ -243,17 +621,18 @@
                 <button
                   @click="updatePreferences"
                   :disabled="updatingPreferences"
-                  class="px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl font-medium hover:from-blue-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2"
+                  class="px-8 py-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl font-medium hover:from-blue-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2 shadow-lg"
                 >
                   <CogIcon v-if="!updatingPreferences" class="w-5 h-5" />
                   <ArrowPathIcon v-else class="w-5 h-5 animate-spin" />
-                  <span>{{ updatingPreferences ? 'Sauvegarde...' : 'Sauvegarder' }}</span>
+                  <span>{{ updatingPreferences ? 'Sauvegarde en cours...' : 'Sauvegarder les préférences' }}</span>
                 </button>
               </div>
             </div>
 
             <!-- Statistics Tab -->
             <div v-else-if="activeTab === 'statistics'" class="space-y-8">
+              <!-- Key Metrics Cards -->
               <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div class="bg-gradient-to-br from-green-50 to-green-100 rounded-xl p-6 border border-green-200">
                   <div class="flex items-center space-x-4">
@@ -270,10 +649,10 @@
                 <div class="bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl p-6 border border-blue-200">
                   <div class="flex items-center space-x-4">
                     <div class="w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center">
-                      <CurrencyEuroIcon class="w-6 h-6 text-white" />
+                      <BanknotesIcon class="w-6 h-6 text-white" />
                     </div>
                     <div>
-                      <p class="text-2xl font-bold text-blue-900">{{ userStats.total_savings }}€</p>
+                      <p class="text-2xl font-bold text-blue-900">{{ formatPrice(userStats.total_savings) }}</p>
                       <p class="text-blue-700 text-sm">Économies totales</p>
                     </div>
                   </div>
@@ -292,20 +671,144 @@
                 </div>
               </div>
 
-              <div class="bg-gray-50 rounded-xl p-6">
-                <h3 class="font-semibold text-gray-900 mb-4">Impact environnemental</h3>
-                <div class="space-y-4">
-                  <div class="flex justify-between items-center py-3 border-b border-gray-200">
-                    <span class="text-gray-700">Nourriture sauvée</span>
-                    <span class="font-semibold text-green-600">{{ userStats.food_saved }}kg</span>
+              <!-- Charts Section -->
+              <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <!-- Monthly Activity Chart -->
+                <div class="bg-white rounded-xl border border-gray-200 p-6">
+                  <div class="flex items-center justify-between mb-6">
+                    <h3 class="font-semibold text-gray-900">Activité mensuelle</h3>
+                    <select
+                      v-model="chartPeriod"
+                      @change="updateCharts"
+                      class="text-sm border border-gray-300 rounded-lg px-3 py-1"
+                    >
+                      <option value="6">6 derniers mois</option>
+                      <option value="12">12 derniers mois</option>
+                    </select>
                   </div>
-                  <div class="flex justify-between items-center py-3 border-b border-gray-200">
-                    <span class="text-gray-700">Réservations terminées</span>
-                    <span class="font-semibold text-blue-600">{{ userStats.completed_reservations }}</span>
+                  <div class="h-64">
+                    <!-- Chart placeholder - Chart.js integration à finaliser -->
+                    <div v-if="monthlyData.labels.length > 0"
+                         class="w-full h-full bg-gradient-to-br from-green-100 to-blue-100 rounded-lg flex items-center justify-center">
+                      <div class="text-center">
+                        <ChartBarIcon class="w-16 h-16 mx-auto mb-2 text-green-600" />
+                        <p class="text-green-700 font-medium">Graphique d'activité mensuelle</p>
+                      </div>
+                    </div>
+                    <div v-else class="flex items-center justify-center h-full text-gray-500">
+                      <div class="text-center">
+                        <ChartBarIcon class="w-12 h-12 mx-auto mb-2 opacity-50" />
+                        <p>Données en cours de chargement...</p>
+                      </div>
+                    </div>
                   </div>
-                  <div class="flex justify-between items-center py-3">
-                    <span class="text-gray-700">Ce mois-ci</span>
-                    <span class="font-semibold text-purple-600">{{ userStats.this_month }} réservations</span>
+                </div>
+
+                <!-- Environmental Impact Chart -->
+                <div class="bg-white rounded-xl border border-gray-200 p-6">
+                  <h3 class="font-semibold text-gray-900 mb-6">Impact environnemental</h3>
+                  <div class="h-64">
+                    <!-- Environmental chart placeholder - Chart.js integration à finaliser -->
+                    <div v-if="environmentData.labels.length > 0"
+                         class="w-full h-full bg-gradient-to-br from-emerald-100 to-teal-100 rounded-lg flex items-center justify-center">
+                      <div class="text-center">
+                        <GlobeAltIcon class="w-16 h-16 mx-auto mb-2 text-emerald-600" />
+                        <p class="text-emerald-700 font-medium">Graphique d'impact environnemental</p>
+                      </div>
+                    </div>
+                    <div v-else class="flex items-center justify-center h-full text-gray-500">
+                      <div class="text-center">
+                        <GlobeAltIcon class="w-12 h-12 mx-auto mb-2 opacity-50" />
+                        <p>Calcul de l'impact...</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Progress Tracking -->
+              <div class="bg-gradient-to-br from-purple-50 to-pink-50 rounded-xl p-6 border border-purple-200">
+                <h3 class="font-semibold text-gray-900 mb-6">Progression & Objectifs</h3>
+                <div class="space-y-6">
+                  <!-- Monthly Goal Progress -->
+                  <div>
+                    <div class="flex justify-between items-center mb-2">
+                      <span class="text-sm font-medium text-gray-700">Objectif mensuel</span>
+                      <span class="text-sm text-purple-600">{{ userStats.this_month }}/10 réservations</span>
+                    </div>
+                    <div class="w-full bg-gray-200 rounded-full h-3">
+                      <div
+                        class="bg-gradient-to-r from-purple-500 to-pink-500 h-3 rounded-full transition-all duration-500"
+                        :style="{ width: Math.min((userStats.this_month / 10) * 100, 100) + '%' }"
+                      ></div>
+                    </div>
+                  </div>
+
+                  <!-- Savings Goal Progress -->
+                  <div>
+                    <div class="flex justify-between items-center mb-2">
+                      <span class="text-sm font-medium text-gray-700">Économies annuelles</span>
+                      <span class="text-sm text-blue-600">{{ formatPrice(userStats.total_savings) }}/50,000 F CFA</span>
+                    </div>
+                    <div class="w-full bg-gray-200 rounded-full h-3">
+                      <div
+                        class="bg-gradient-to-r from-blue-500 to-cyan-500 h-3 rounded-full transition-all duration-500"
+                        :style="{ width: Math.min((userStats.total_savings / 50000) * 100, 100) + '%' }"
+                      ></div>
+                    </div>
+                  </div>
+
+                  <!-- Environmental Goal Progress -->
+                  <div>
+                    <div class="flex justify-between items-center mb-2">
+                      <span class="text-sm font-medium text-gray-700">Impact CO2</span>
+                      <span class="text-sm text-green-600">{{ userStats.co2_saved }}/100 kg économisés</span>
+                    </div>
+                    <div class="w-full bg-gray-200 rounded-full h-3">
+                      <div
+                        class="bg-gradient-to-r from-green-500 to-emerald-500 h-3 rounded-full transition-all duration-500"
+                        :style="{ width: Math.min((userStats.co2_saved / 100) * 100, 100) + '%' }"
+                      ></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Detailed Statistics Table -->
+              <div class="bg-white rounded-xl border border-gray-200 p-6">
+                <h3 class="font-semibold text-gray-900 mb-6">Statistiques détaillées</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div class="space-y-4">
+                    <div class="flex justify-between items-center py-3 border-b border-gray-200">
+                      <span class="text-gray-700">Nourriture sauvée</span>
+                      <span class="font-semibold text-green-600">{{ userStats.food_saved }}kg</span>
+                    </div>
+                    <div class="flex justify-between items-center py-3 border-b border-gray-200">
+                      <span class="text-gray-700">Réservations terminées</span>
+                      <span class="font-semibold text-blue-600">{{ userStats.completed_reservations }}</span>
+                    </div>
+                    <div class="flex justify-between items-center py-3 border-b border-gray-200">
+                      <span class="text-gray-700">Taux de complétion</span>
+                      <span class="font-semibold text-purple-600">
+                        {{ userStats.total_reservations > 0 ? Math.round((userStats.completed_reservations / userStats.total_reservations) * 100) : 0 }}%
+                      </span>
+                    </div>
+                  </div>
+                  <div class="space-y-4">
+                    <div class="flex justify-between items-center py-3 border-b border-gray-200">
+                      <span class="text-gray-700">Ce mois-ci</span>
+                      <span class="font-semibold text-indigo-600">{{ userStats.this_month }} réservations</span>
+                    </div>
+                    <div class="flex justify-between items-center py-3 border-b border-gray-200">
+                      <span class="text-gray-700">Économie moyenne</span>
+                      <span class="font-semibold text-orange-600">
+                        {{ userStats.total_reservations > 0 ? formatPrice(Math.round(userStats.total_savings / userStats.total_reservations)) : formatPrice(0) }}
+                      </span>
+                    </div>
+                    <div class="flex justify-between items-center py-3 border-b border-gray-200">
+                      <span class="text-gray-700">Membre depuis</span>
+                      <span class="font-semibold text-gray-600">{{ memberSince }}</span>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -385,13 +888,40 @@ import {
   BellIcon,
   MapPinIcon,
   ShoppingBagIcon,
-  CurrencyEuroIcon,
+  BanknotesIcon,
   GlobeAltIcon,
   ClockIcon,
   ArrowPathIcon,
   CheckCircleIcon,
-  ExclamationCircleIcon
+  ExclamationCircleIcon,
+  MagnifyingGlassIcon,
+  CalendarIcon,
+  TagIcon
 } from '@heroicons/vue/24/outline'
+import { formatPrice } from '@/utils/currency'
+// import { Line, Doughnut } from 'vue-chart-3'
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend,
+  ArcElement
+} from 'chart.js'
+
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend,
+  ArcElement
+)
 
 const authStore = useAuthStore()
 const user = computed(() => authStore.user)
@@ -420,10 +950,43 @@ const passwordForm = reactive({
 })
 
 const preferences = reactive({
+  // Notifications
   email_notifications: true,
   product_notifications: true,
-  max_distance: '15'
+  booking_notifications: true,
+  reminder_notifications: true,
+
+  // Search & Discovery
+  max_distance: '15',
+  preferred_categories: [] as number[],
+
+  // Shopping
+  max_budget: '',
+  price_display: 'both',
+  auto_reserve_favorites: false,
+
+  // Privacy & Impact
+  public_impact_stats: false,
+  personalized_recommendations: true,
+  impact_report_frequency: 'monthly',
+
+  // Language & Accessibility
+  language: 'fr',
+  font_size: 'medium',
+  high_contrast: false
 })
+
+// Available categories for preferences
+const availableCategories = ref([
+  { id: 1, name: 'Boulangerie' },
+  { id: 2, name: 'Fruits & Légumes' },
+  { id: 3, name: 'Viandes & Poissons' },
+  { id: 4, name: 'Épicerie' },
+  { id: 5, name: 'Produits Laitiers' },
+  { id: 6, name: 'Plats Préparés' },
+  { id: 7, name: 'Boissons' },
+  { id: 8, name: 'Confiserie' }
+])
 
 const userStats = reactive({
   total_reservations: 0,
@@ -432,6 +995,150 @@ const userStats = reactive({
   food_saved: 0,
   co2_saved: 0,
   this_month: 0
+})
+
+// History tab data
+const reservationHistory = ref<any[]>([])
+const historyFilters = reactive({
+  search: '',
+  status: '',
+  period: ''
+})
+const historyCurrentPage = ref(1)
+const historyPageSize = ref(5)
+
+// Charts data
+const chartPeriod = ref('6')
+const monthlyData = reactive({
+  labels: [] as string[],
+  datasets: [
+    {
+      label: 'Réservations',
+      data: [] as number[],
+      borderColor: '#10B981',
+      backgroundColor: 'rgba(16, 185, 129, 0.1)',
+      tension: 0.4,
+      fill: true
+    },
+    {
+      label: 'Économies (F CFA)',
+      data: [] as number[],
+      borderColor: '#3B82F6',
+      backgroundColor: 'rgba(59, 130, 246, 0.1)',
+      tension: 0.4,
+      fill: true,
+      yAxisID: 'y1'
+    }
+  ]
+})
+
+const environmentData = reactive({
+  labels: ['CO2 économisé', 'Nourriture sauvée', 'Réservations complétées'],
+  datasets: [
+    {
+      data: [] as number[],
+      backgroundColor: [
+        '#10B981',
+        '#F59E0B',
+        '#3B82F6'
+      ],
+      borderWidth: 0
+    }
+  ]
+})
+
+// Chart configuration (à activer quand Chart.js sera intégré)
+/*
+const lineChartOptions = computed(() => ({
+  responsive: true,
+  maintainAspectRatio: false,
+  interaction: {
+    intersect: false,
+    mode: 'index' as const
+  },
+  scales: {
+    y: {
+      type: 'linear' as const,
+      display: true,
+      position: 'left' as const,
+      title: {
+        display: true,
+        text: 'Réservations'
+      }
+    },
+    y1: {
+      type: 'linear' as const,
+      display: true,
+      position: 'right' as const,
+      title: {
+        display: true,
+        text: 'Économies (F CFA)'
+      },
+      grid: {
+        drawOnChartArea: false
+      }
+    }
+  },
+  plugins: {
+    legend: {
+      display: true,
+      position: 'top' as const
+    },
+    tooltip: {
+      callbacks: {
+        label: function(context: any) {
+          let label = context.dataset.label || '';
+          if (label) {
+            label += ': ';
+          }
+          if (context.datasetIndex === 1) {
+            label += formatPrice(context.parsed.y);
+          } else {
+            label += context.parsed.y;
+          }
+          return label;
+        }
+      }
+    }
+  }
+}))
+
+const doughnutChartOptions = computed(() => ({
+  responsive: true,
+  maintainAspectRatio: false,
+  plugins: {
+    legend: {
+      display: true,
+      position: 'bottom' as const
+    },
+    tooltip: {
+      callbacks: {
+        label: function(context: any) {
+          const label = context.label || '';
+          const value = context.parsed;
+          let suffix = '';
+
+          if (label.includes('CO2')) suffix = ' kg';
+          else if (label.includes('Nourriture')) suffix = ' kg';
+          else if (label.includes('Réservations')) suffix = ' réservations';
+
+          return `${label}: ${value}${suffix}`;
+        }
+      }
+    }
+  }
+}))
+*/
+
+const memberSince = computed(() => {
+  if (user.value?.created_at) {
+    const date = new Date(user.value.created_at)
+    return date.toLocaleDateString('fr-FR', {
+      year: 'numeric',
+      month: 'long'
+    })
+  }
+  return 'Non disponible'
 })
 
 // Computed properties
@@ -452,9 +1159,59 @@ const isPasswordFormValid = computed(() => {
          passwordForm.new_password.length >= 6
 })
 
+// History computed properties
+const filteredReservations = computed(() => {
+  let filtered = [...reservationHistory.value]
+
+  // Filter by search
+  if (historyFilters.search) {
+    const search = historyFilters.search.toLowerCase()
+    filtered = filtered.filter(reservation =>
+      reservation.product?.name?.toLowerCase().includes(search) ||
+      reservation.merchant?.business_name?.toLowerCase().includes(search)
+    )
+  }
+
+  // Filter by status
+  if (historyFilters.status) {
+    filtered = filtered.filter(reservation => reservation.status === historyFilters.status)
+  }
+
+  // Filter by period
+  if (historyFilters.period) {
+    const now = new Date()
+    const filterDate = new Date()
+
+    switch (historyFilters.period) {
+      case 'week':
+        filterDate.setDate(now.getDate() - 7)
+        break
+      case 'month':
+        filterDate.setMonth(now.getMonth() - 1)
+        break
+      case 'quarter':
+        filterDate.setMonth(now.getMonth() - 3)
+        break
+      case 'year':
+        filterDate.setFullYear(now.getFullYear() - 1)
+        break
+    }
+
+    filtered = filtered.filter(reservation =>
+      new Date(reservation.created_at) >= filterDate
+    )
+  }
+
+  // Pagination
+  const start = (historyCurrentPage.value - 1) * historyPageSize.value
+  const end = start + historyPageSize.value
+  return filtered.slice(start, end)
+})
+
 // Tabs configuration
 const tabs = [
   { id: 'personal', name: 'Informations personnelles', icon: UserIcon },
+  { id: 'history', name: 'Historique', icon: ClockIcon },
   { id: 'security', name: 'Sécurité', icon: ShieldCheckIcon },
   { id: 'preferences', name: 'Préférences', icon: CogIcon },
   { id: 'statistics', name: 'Statistiques', icon: ChartBarIcon }
@@ -534,6 +1291,166 @@ const loadUserStats = async () => {
   }
 }
 
+// History methods
+const loadReservationHistory = async () => {
+  try {
+    const response = await fetch('http://localhost:8000/api/reservations', {
+      headers: {
+        'Authorization': `Bearer ${authStore.token}`,
+        'Accept': 'application/json'
+      }
+    })
+
+    if (response.ok) {
+      const data = await response.json()
+      reservationHistory.value = data.data || []
+    }
+  } catch (error) {
+    console.error('Error loading reservation history:', error)
+  }
+}
+
+const getReservationStatusClass = (status: string) => {
+  switch (status) {
+    case 'pending':
+      return 'bg-yellow-100 text-yellow-800'
+    case 'confirmed':
+      return 'bg-blue-100 text-blue-800'
+    case 'ready':
+      return 'bg-purple-100 text-purple-800'
+    case 'completed':
+      return 'bg-green-100 text-green-800'
+    case 'cancelled':
+      return 'bg-red-100 text-red-800'
+    default:
+      return 'bg-gray-100 text-gray-800'
+  }
+}
+
+const getReservationStatusLabel = (status: string) => {
+  switch (status) {
+    case 'pending': return 'En attente'
+    case 'confirmed': return 'Confirmé'
+    case 'ready': return 'Prêt'
+    case 'completed': return 'Terminé'
+    case 'cancelled': return 'Annulé'
+    default: return status
+  }
+}
+
+const cancelReservation = async (reservationId: number) => {
+  try {
+    const response = await fetch(`http://localhost:8000/api/reservations/${reservationId}/cancel`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${authStore.token}`,
+        'Accept': 'application/json'
+      }
+    })
+
+    if (response.ok) {
+      showMessage('Réservation annulée avec succès', 'success')
+      await loadReservationHistory() // Reload the history
+    } else {
+      showMessage('Erreur lors de l\'annulation de la réservation', 'error')
+    }
+  } catch (error) {
+    showMessage('Erreur lors de l\'annulation de la réservation', 'error')
+  }
+}
+
+// Charts functions
+const updateCharts = async () => {
+  await loadMonthlyData()
+  await loadEnvironmentData()
+}
+
+const loadMonthlyData = async () => {
+  try {
+    const months = parseInt(chartPeriod.value)
+    const response = await fetch(`http://localhost:8000/api/user/statistics/monthly?months=${months}`, {
+      headers: {
+        'Authorization': `Bearer ${authStore.token}`,
+        'Accept': 'application/json'
+      }
+    })
+
+    if (response.ok) {
+      const data = await response.json()
+
+      // Generate last N months
+      const monthNames = [
+        'Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Jun',
+        'Jul', 'Aoû', 'Sep', 'Oct', 'Nov', 'Déc'
+      ]
+
+      const labels = []
+      const reservationsData = []
+      const savingsData = []
+
+      for (let i = months - 1; i >= 0; i--) {
+        const date = new Date()
+        date.setMonth(date.getMonth() - i)
+        const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`
+        const monthLabel = `${monthNames[date.getMonth()]} ${date.getFullYear()}`
+
+        labels.push(monthLabel)
+
+        const monthData = data.data?.find((item: any) => item.month === monthKey)
+        reservationsData.push(monthData?.reservations || 0)
+        savingsData.push(monthData?.savings || 0)
+      }
+
+      monthlyData.labels.splice(0, monthlyData.labels.length, ...labels)
+      monthlyData.datasets[0].data.splice(0, monthlyData.datasets[0].data.length, ...reservationsData)
+      monthlyData.datasets[1].data.splice(0, monthlyData.datasets[1].data.length, ...savingsData)
+    }
+  } catch (error) {
+    console.error('Erreur lors du chargement des données mensuelles:', error)
+    // Generate mock data for demo
+    generateMockMonthlyData()
+  }
+}
+
+const loadEnvironmentData = async () => {
+  try {
+    // For now, use the current user stats for environmental impact
+    environmentData.datasets[0].data.splice(0, environmentData.datasets[0].data.length,
+      userStats.co2_saved,
+      userStats.food_saved,
+      userStats.completed_reservations
+    )
+  } catch (error) {
+    console.error('Erreur lors du chargement des données environnementales:', error)
+  }
+}
+
+const generateMockMonthlyData = () => {
+  const months = parseInt(chartPeriod.value)
+  const monthNames = [
+    'Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Jun',
+    'Jul', 'Aoû', 'Sep', 'Oct', 'Nov', 'Déc'
+  ]
+
+  const labels = []
+  const reservationsData = []
+  const savingsData = []
+
+  for (let i = months - 1; i >= 0; i--) {
+    const date = new Date()
+    date.setMonth(date.getMonth() - i)
+    const monthLabel = `${monthNames[date.getMonth()]} ${date.getFullYear()}`
+
+    labels.push(monthLabel)
+    reservationsData.push(Math.floor(Math.random() * 10) + 1)
+    savingsData.push(Math.floor(Math.random() * 5000) + 500)
+  }
+
+  monthlyData.labels.splice(0, monthlyData.labels.length, ...labels)
+  monthlyData.datasets[0].data.splice(0, monthlyData.datasets[0].data.length, ...reservationsData)
+  monthlyData.datasets[1].data.splice(0, monthlyData.datasets[1].data.length, ...savingsData)
+}
+
 // Initialize form data
 onMounted(() => {
   if (user.value) {
@@ -544,5 +1461,7 @@ onMounted(() => {
     profileForm.city = user.value.city
   }
   loadUserStats()
+  loadReservationHistory()
+  updateCharts()
 })
 </script>
