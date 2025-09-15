@@ -121,7 +121,18 @@
             </div>
 
             <div class="space-y-4">
-              <div v-if="recentReservations.length === 0" class="text-center py-12">
+              <!-- Loading state -->
+              <div v-if="loading" class="space-y-4">
+                <div v-for="i in 3" :key="i" class="flex items-center gap-4 p-4 rounded-xl border border-neutral-200 animate-pulse">
+                  <div class="w-16 h-16 bg-neutral-200 rounded-xl"></div>
+                  <div class="flex-1 space-y-2">
+                    <div class="h-4 bg-neutral-200 rounded w-3/4"></div>
+                    <div class="h-3 bg-neutral-200 rounded w-1/2"></div>
+                  </div>
+                </div>
+              </div>
+
+              <div v-else-if="recentReservations.length === 0" class="text-center py-12">
                 <div class="w-16 h-16 bg-neutral-100 rounded-full flex items-center justify-center mx-auto mb-4">
                   <ShoppingBag class="w-8 h-8 text-neutral-400" />
                 </div>
@@ -132,6 +143,7 @@
               </div>
 
               <div
+                v-else
                 v-for="reservation in recentReservations"
                 :key="reservation.id"
                 class="flex items-center gap-4 p-4 rounded-xl border border-neutral-200 hover:border-primary-300 hover:shadow-medium transition-all duration-200"
@@ -283,6 +295,7 @@
 import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
+import { formatPrice } from '@/utils/currency'
 import {
   TrendingUp, DollarSign, Package, ShoppingBag, Leaf, TreePine,
   Clock, Calendar, ArrowRight, Search, User, Lightbulb
@@ -301,24 +314,8 @@ const userStats = ref({
   activeReservations: 3
 })
 
-const recentReservations = ref([
-  {
-    id: 1,
-    product: { name: 'Pain artisanal du jour' },
-    merchant: { name: 'Boulangerie Martin' },
-    price: 1640, // 2.50€ × 656
-    pickup_date: new Date(),
-    status: 'confirmed'
-  },
-  {
-    id: 2,
-    product: { name: 'Légumes de saison' },
-    merchant: { name: 'Primeur Bio' },
-    price: 5838, // 8.90€ × 656
-    pickup_date: new Date(Date.now() - 86400000),
-    status: 'completed'
-  }
-])
+const recentReservations = ref([])
+const loading = ref(true)
 
 const recommendedProducts = ref([
   {
@@ -349,10 +346,47 @@ const ecoTips = ref([
 const currentTipIndex = ref(0)
 const currentTip = computed(() => ecoTips.value[currentTipIndex.value])
 
-// Fonctions utilitaires
-const formatPrice = (price: number) => {
-  return `${Math.round(price).toLocaleString('fr-FR')} F CFA`
+// Load recent reservations
+const loadRecentReservations = async () => {
+  try {
+    const response = await fetch('http://localhost:8000/api/reservations?per_page=3', {
+      method: 'GET',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${authStore.token}`
+      }
+    })
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`)
+    }
+
+    const data = await response.json()
+    if (data.success && data.data) {
+      // Transform API data to match dashboard interface
+      recentReservations.value = data.data.map((res: any) => ({
+        id: res.id,
+        product: {
+          name: res.product?.name || 'Produit inconnu'
+        },
+        merchant: {
+          name: res.product?.merchant?.name || res.product?.merchant?.business_name || 'Commerçant inconnu'
+        },
+        price: parseFloat(res.total_amount || 0),
+        pickup_date: res.pickup_date ? new Date(res.pickup_date) : new Date(res.created_at),
+        status: res.status
+      }))
+    }
+  } catch (error) {
+    console.error('Erreur lors du chargement des réservations récentes:', error)
+    recentReservations.value = []
+  } finally {
+    loading.value = false
+  }
 }
+
+// Fonctions utilitaires
 
 const formatDate = (date: Date) => {
   return new Intl.DateTimeFormat('fr-FR', {
@@ -393,6 +427,8 @@ const nextTip = () => {
 onMounted(() => {
   if (!authStore.isAuthenticated) {
     router.push('/login')
+  } else {
+    loadRecentReservations()
   }
 })
 </script>

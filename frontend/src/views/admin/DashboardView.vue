@@ -88,7 +88,7 @@
               </p>
             </div>
             <div class="p-3 bg-white/20 rounded-xl">
-              <CurrencyEuroIcon class="w-8 h-8" />
+              <div class="text-2xl font-bold">₣</div>
             </div>
           </div>
         </div>
@@ -145,7 +145,10 @@
       <div class="xl:col-span-2 card">
         <div class="flex items-center justify-between mb-6">
           <h3 class="text-xl font-semibold text-neutral-900">Activité récente</h3>
-          <button class="text-primary-600 text-sm hover:text-primary-700">
+          <button
+            @click="viewAllActivities"
+            class="text-primary-600 text-sm hover:text-primary-700 transition-colors"
+          >
             Voir tout
           </button>
         </div>
@@ -379,12 +382,13 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
+import { useAuthStore } from '@/stores/auth'
+import { formatPrice } from '@/utils/currency'
 import {
   ArrowPathIcon,
   UsersIcon,
   BuildingStorefrontIcon,
   ShoppingBagIcon,
-  CurrencyEuroIcon,
   ChartBarIcon,
   ChartPieIcon,
   CheckCircleIcon,
@@ -404,106 +408,33 @@ const selectedPeriod = ref('month')
 const revenueChartPeriod = ref('30d')
 const isLoading = ref(false)
 
-// Mock data
+// Store and utilities
+const authStore = useAuthStore()
 const stats = ref({
-  totalUsers: 12547,
-  newUsersThisMonth: 1247,
-  activeMerchants: 523,
-  merchantGrowthRate: 15.3,
-  productsSaved: 25847,
-  kgFoodSaved: 18500,
-  totalRevenue: 156780,
-  revenueGrowth: 23.5
+  totalUsers: 0,
+  newUsersThisMonth: 0,
+  activeMerchants: 0,
+  merchantGrowthRate: 0,
+  productsSaved: 0,
+  kgFoodSaved: 0,
+  totalRevenue: 0,
+  revenueGrowth: 0
 })
 
-const recentActivities = ref([
-  {
-    id: 1,
-    type: 'user_registered',
-    title: 'Nouvel utilisateur inscrit',
-    description: 'Marie Dupont s\'est inscrite comme consommatrice',
-    timestamp: '2024-01-15T14:30:00Z',
-    status: 'success'
-  },
-  {
-    id: 2,
-    type: 'merchant_joined',
-    title: 'Nouveau commerçant',
-    description: 'Boulangerie Martin a rejoint la plateforme',
-    timestamp: '2024-01-15T12:15:00Z',
-    status: 'success'
-  },
-  {
-    id: 3,
-    type: 'product_sold',
-    title: 'Produit vendu',
-    description: 'Pain de campagne bio vendu par Artisan Baker',
-    timestamp: '2024-01-15T11:45:00Z',
-    status: 'completed'
-  },
-  {
-    id: 4,
-    type: 'alert',
-    title: 'Alerte système',
-    description: 'Pic d\'utilisation détecté sur le serveur web',
-    timestamp: '2024-01-15T10:20:00Z',
-    status: 'warning'
-  }
-])
+const recentActivities = ref<any[]>([])
 
-const systemHealth = ref([
-  {
-    name: 'API Backend',
-    description: 'Services Laravel',
-    status: 'healthy',
-    uptime: '99.9%',
-    responseTime: '45ms'
-  },
-  {
-    name: 'Base de données',
-    description: 'MySQL Principal',
-    status: 'healthy',
-    uptime: '99.8%',
-    responseTime: '12ms'
-  },
-  {
-    name: 'Frontend',
-    description: 'Application Vue.js',
-    status: 'healthy',
-    uptime: '100%',
-    responseTime: '120ms'
-  },
-  {
-    name: 'CDN Images',
-    description: 'Stockage média',
-    status: 'warning',
-    uptime: '98.5%',
-    responseTime: '250ms'
-  }
-])
+const systemHealth = ref<any[]>([])
 
 const environmentalImpact = ref({
-  co2Saved: 15420,
-  waterSaved: 125000,
-  wasteSaved: 18500,
-  treesEquivalent: 342
+  co2Saved: 0,
+  waterSaved: 0,
+  wasteSaved: 0,
+  treesEquivalent: 0
 })
 
-const topMerchants = ref([
-  { id: 1, name: 'Boulangerie Artisanale', productsSold: 145, revenue: 2340.50 },
-  { id: 2, name: 'Ferme Bio Martin', productsSold: 98, revenue: 1876.20 },
-  { id: 3, name: 'Épicerie du Coin', productsSold: 76, revenue: 1234.80 },
-  { id: 4, name: 'Fromagerie Tradition', productsSold: 54, revenue: 987.30 },
-  { id: 5, name: 'Maraîcher Local', productsSold: 43, revenue: 756.90 }
-])
+const topMerchants = ref<any[]>([])
 
-const popularCategories = ref([
-  { id: 1, name: 'Boulangerie', icon: '🥖', productCount: 1247, percentage: 35 },
-  { id: 2, name: 'Fruits & Légumes', icon: '🥬', productCount: 987, percentage: 28 },
-  { id: 3, name: 'Fromages', icon: '🧀', productCount: 543, percentage: 15 },
-  { id: 4, name: 'Plats préparés', icon: '🍲', productCount: 432, percentage: 12 },
-  { id: 5, name: 'Viandes', icon: '🥩', productCount: 321, percentage: 10 }
-])
+const popularCategories = ref<any[]>([])
 
 const alerts = ref([
   {
@@ -528,10 +459,7 @@ const formatNumber = (num: number): string => {
 }
 
 const formatCurrency = (amount: number): string => {
-  return new Intl.NumberFormat('fr-FR', {
-    style: 'currency',
-    currency: 'EUR'
-  }).format(amount)
+  return formatPrice(amount)
 }
 
 const formatTimeAgo = (timestamp: string): string => {
@@ -606,11 +534,89 @@ const getAlertIconClass = (type: string): string => {
   return classes[type] || 'text-neutral-600'
 }
 
+const loadDashboardData = async () => {
+  try {
+    const response = await fetch('http://localhost:8000/api/admin/dashboard', {
+      method: 'GET',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${authStore.token}`
+      }
+    })
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`)
+    }
+
+    const data = await response.json()
+    if (data.success) {
+      // Update stats
+      stats.value = data.data.stats
+
+      // Update other data
+      topMerchants.value = data.data.topMerchants
+      popularCategories.value = data.data.popularCategories
+      recentActivities.value = data.data.recentActivities
+      environmentalImpact.value = data.data.environmentalImpact
+    }
+  } catch (error) {
+    console.error('Error loading dashboard data:', error)
+  }
+}
+
+const loadSystemHealth = async () => {
+  try {
+    const response = await fetch('http://localhost:8000/api/admin/system-health', {
+      method: 'GET',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${authStore.token}`
+      }
+    })
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`)
+    }
+
+    const data = await response.json()
+    if (data.success) {
+      systemHealth.value = data.data
+    }
+  } catch (error) {
+    console.error('Error loading system health:', error)
+    // Fallback to mock data for system health
+    systemHealth.value = [
+      {
+        name: 'API Backend',
+        description: 'Services Laravel',
+        status: 'healthy',
+        uptime: '99.9%',
+        responseTime: '45ms'
+      },
+      {
+        name: 'Base de données',
+        description: 'MySQL Principal',
+        status: 'healthy',
+        uptime: '99.8%',
+        responseTime: '12ms'
+      },
+      {
+        name: 'Frontend',
+        description: 'Application Vue.js',
+        status: 'healthy',
+        uptime: '100%',
+        responseTime: '120ms'
+      }
+    ]
+  }
+}
+
 const refreshData = async () => {
   isLoading.value = true
   try {
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1000))
+    await Promise.all([loadDashboardData(), loadSystemHealth()])
     console.log('Data refreshed')
   } catch (error) {
     console.error('Error refreshing data:', error)
@@ -626,15 +632,37 @@ const dismissAlert = (alertId: number) => {
   }
 }
 
+// Navigation and actions
+const viewAllActivities = () => {
+  // For now, show a modal or expand the activities list
+  // In the future, this could navigate to a dedicated activities page
+  alert('Fonctionnalité "Voir toutes les activités" à implémenter - Navigation vers /admin/activities')
+}
+
 // Quick actions
-const viewLogs = () => console.log('View logs')
-const viewMetrics = () => console.log('View metrics')
-const manageUsers = () => console.log('Manage users')
-const systemSettings = () => console.log('System settings')
+const viewLogs = () => {
+  // Navigate to a logs page or show logs in modal
+  alert('Fonctionnalité "Logs système" à implémenter - Navigation vers /admin/logs')
+}
+
+const viewMetrics = () => {
+  // Navigate to detailed metrics page
+  alert('Fonctionnalité "Métriques détaillées" à implémenter - Navigation vers /admin/metrics')
+}
+
+const manageUsers = () => {
+  // Navigate to user management page
+  alert('Fonctionnalité "Gestion utilisateurs" à implémenter - Navigation vers /admin/users')
+}
+
+const systemSettings = () => {
+  // Navigate to system settings page
+  alert('Fonctionnalité "Paramètres système" à implémenter - Navigation vers /admin/settings')
+}
 
 // Lifecycle
-onMounted(() => {
-  // Load initial data
+onMounted(async () => {
+  await refreshData()
   console.log('Admin dashboard loaded')
 })
 </script>

@@ -24,6 +24,29 @@
 
     <div class="container-fluid py-8">
       <div class="max-w-4xl mx-auto">
+
+        <!-- Loading State -->
+        <div v-if="loadingProduct" class="flex justify-center items-center min-h-64">
+          <div class="flex items-center gap-3">
+            <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600"></div>
+            <span class="text-neutral-600">Chargement du produit...</span>
+          </div>
+        </div>
+
+        <!-- Error State -->
+        <div v-else-if="productError" class="text-center py-16">
+          <Package class="w-24 h-24 text-neutral-300 mx-auto mb-4" />
+          <h3 class="text-xl font-bold text-neutral-700 mb-2">Produit introuvable</h3>
+          <p class="text-neutral-500 mb-6">
+            Le produit que vous souhaitez réserver n'existe pas ou n'est plus disponible.
+          </p>
+          <router-link to="/products" class="btn btn-primary">
+            Retour au catalogue
+          </router-link>
+        </div>
+
+        <!-- Main Content -->
+        <div v-else>
         <!-- Étapes de réservation -->
         <div class="card mb-8 animate-fade-in-up">
           <div class="flex items-center justify-between mb-6">
@@ -79,8 +102,14 @@
               <h3 class="text-xl font-bold text-neutral-900 mb-6">Détails du produit</h3>
 
               <div class="flex gap-6 mb-6">
-                <div class="w-32 h-32 bg-gradient-to-br from-primary-100 to-secondary-100 rounded-2xl flex items-center justify-center flex-shrink-0">
-                  <Package class="w-16 h-16 text-primary-400" />
+                <div class="w-32 h-32 bg-gradient-to-br from-primary-100 to-secondary-100 rounded-2xl flex items-center justify-center flex-shrink-0 overflow-hidden">
+                  <img
+                    v-if="product.image_url"
+                    :src="product.image_url"
+                    :alt="product.name"
+                    class="w-full h-full object-cover"
+                  />
+                  <Package v-else class="w-16 h-16 text-primary-400" />
                 </div>
                 <div class="flex-1">
                   <h4 class="text-2xl font-bold text-neutral-900 mb-2">{{ product.name }}</h4>
@@ -399,6 +428,8 @@
             </div>
           </div>
         </div>
+
+        </div><!-- End Main Content -->
       </div>
     </div>
   </div>
@@ -430,23 +461,27 @@ const reservation = ref({
   pickup_instructions: ''
 })
 
-// Données de test du produit - en réalité, cela viendrait de l'API
+// Product data from API
 const product = ref({
-  id: 1,
-  name: 'Pain artisanal du jour',
-  description: 'Pain complet bio avec graines de tournesol et sésame',
-  original_price: 4.50,
-  discounted_price: 2.25,
-  discount: 50,
+  id: 0,
+  name: '',
+  description: '',
+  original_price: 0,
+  discounted_price: 0,
+  discount: 0,
   merchant: {
-    name: 'Boulangerie Martin',
-    address: '15 rue des Martyrs, 75009 Paris',
-    distance: 0.3
+    name: '',
+    address: '',
+    distance: 0
   },
-  expires_at: new Date(Date.now() + 3600000 * 6), // 6h
-  available_quantity: 5,
-  reserved_quantity: 2
+  expires_at: new Date(),
+  available_quantity: 0,
+  reserved_quantity: 0,
+  image_url: ''
 })
+
+const loadingProduct = ref(true)
+const productError = ref(false)
 
 // Computed properties
 const canProceedToNextStep = computed(() => {
@@ -551,33 +586,134 @@ const confirmReservation = async () => {
   loading.value = true
 
   try {
-    // Ici on appellerait l'API pour créer la réservation
-    await new Promise(resolve => setTimeout(resolve, 2000)) // Simulation
+    const reservationData = {
+      product_id: product.value.id,
+      quantity: reservation.value.quantity,
+      notes: reservation.value.notes || null,
+      pickup_date: reservation.value.pickup_date || null,
+      pickup_time: reservation.value.pickup_time || null
+    }
 
-    // Redirection vers la page de confirmation
-    router.push({
-      name: 'reservation-confirmed',
-      params: {
-        reservationId: 'temp-' + Date.now()
-      }
+    console.log('Creating reservation:', reservationData)
+
+    const response = await fetch('http://localhost:8000/api/reservations', {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${authStore.token}`
+      },
+      body: JSON.stringify(reservationData)
     })
+
+    console.log('Response status:', response.status)
+
+    if (!response.ok) {
+      const errorData = await response.json()
+      console.error('API Error Response:', errorData)
+
+      if (response.status === 422) {
+        // Validation errors
+        const errors = errorData.errors || {}
+        const errorMessages = Object.values(errors).flat()
+        alert('Erreurs de validation:\n' + errorMessages.join('\n'))
+      } else if (response.status === 401) {
+        alert('Session expirée. Veuillez vous reconnecter.')
+        router.push('/login')
+      } else {
+        alert(errorData.message || 'Erreur lors de la réservation. Veuillez réessayer.')
+      }
+      return
+    }
+
+    const data = await response.json()
+    console.log('Reservation created:', data)
+
+    if (data.success) {
+      // Redirection vers la page de confirmation avec l'ID réel de la réservation
+      alert(`Réservation confirmée ! ID: ${data.data.id}`)
+      router.push('/products') // For now, redirect to products page
+    } else {
+      alert(data.message || 'Erreur lors de la réservation. Veuillez réessayer.')
+    }
+
   } catch (error) {
-    console.error('Erreur lors de la réservation:', error)
-    alert('Erreur lors de la réservation. Veuillez réessayer.')
+    console.error('Network error:', error)
+    if (error.message.includes('NetworkError') || error.message.includes('Failed to fetch')) {
+      alert('Erreur de connexion au serveur. Vérifiez que le serveur backend fonctionne.')
+    } else {
+      alert('Erreur lors de la réservation. Veuillez réessayer.')
+    }
   } finally {
     loading.value = false
   }
 }
 
-onMounted(() => {
+// Load product from API
+const fetchProduct = async () => {
+  try {
+    loadingProduct.value = true
+    productError.value = false
+
+    const productId = parseInt(route.params.id as string)
+
+    const response = await fetch(`http://localhost:8000/api/products/${productId}`, {
+      method: 'GET',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      }
+    })
+
+    if (!response.ok) {
+      if (response.status === 404) {
+        productError.value = true
+        return
+      }
+      throw new Error(`HTTP error! status: ${response.status}`)
+    }
+
+    const data = await response.json()
+
+    if (data.success && data.data) {
+      // Transform API data to match component interface
+      const apiProduct = data.data
+      product.value = {
+        id: apiProduct.id,
+        name: apiProduct.name,
+        description: apiProduct.description,
+        original_price: parseFloat(apiProduct.original_price),
+        discounted_price: parseFloat(apiProduct.discounted_price),
+        discount: apiProduct.discount_percentage,
+        merchant: {
+          name: apiProduct.merchant?.business_name || 'Commerçant inconnu',
+          address: apiProduct.merchant?.address || apiProduct.merchant?.city || 'Adresse non renseignée',
+          distance: Math.random() * 5 // Simulated distance for now
+        },
+        expires_at: new Date(apiProduct.expiration_date),
+        available_quantity: apiProduct.quantity_available,
+        reserved_quantity: 0, // Not available in current API
+        image_url: apiProduct.image_url || ''
+      }
+    } else {
+      productError.value = true
+    }
+  } catch (err) {
+    console.error('Erreur lors du chargement du produit:', err)
+    productError.value = true
+  } finally {
+    loadingProduct.value = false
+  }
+}
+
+onMounted(async () => {
   // Vérifier l'authentification
   if (!authStore.isAuthenticated) {
     router.push('/login')
     return
   }
 
-  // En réalité, charger les données du produit depuis l'API
-  const productId = route.params.productId
-  console.log('Loading product:', productId)
+  // Charger les données du produit depuis l'API
+  await fetchProduct()
 })
 </script>

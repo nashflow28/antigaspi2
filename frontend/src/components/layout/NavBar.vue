@@ -118,7 +118,7 @@
                   <!-- Menu Items -->
                   <div class="py-2">
                     <router-link
-                      :to="authStore.user?.role === 'merchant' ? '/merchant/dashboard' : '/dashboard'"
+                      :to="getDashboardRoute()"
                       class="flex items-center px-4 py-3 text-sm text-neutral-700 hover:bg-gradient-primary hover:text-white transition-all duration-200 group"
                       @click="showUserMenu = false"
                     >
@@ -288,6 +288,20 @@ const handleLogout = async () => {
   showMobileMenu.value = false
   await authStore.logout()
   router.push('/')
+}
+
+const getDashboardRoute = () => {
+  if (!authStore.user) return '/dashboard'
+
+  switch (authStore.user.role) {
+    case 'admin':
+      return '/admin/dashboard'
+    case 'merchant':
+      return '/merchant/dashboard'
+    case 'consumer':
+    default:
+      return '/dashboard'
+  }
 }
 
 // Close menus when clicking outside

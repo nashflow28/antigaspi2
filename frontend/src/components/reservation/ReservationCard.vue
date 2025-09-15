@@ -213,6 +213,7 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { formatPrice } from '@/utils/currency'
 import {
   Clock, Eye, Leaf, MapPin, MessageCircle, MoreVertical,
   Package, Phone, ShoppingBag, X
@@ -301,9 +302,6 @@ onUnmounted(() => {
 })
 
 // Méthodes de formatage
-const formatPrice = (price: number) => {
-  return `${price.toFixed(2)}€`
-}
 
 const formatDate = (date: Date | string) => {
   const d = new Date(date)

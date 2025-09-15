@@ -116,6 +116,11 @@ class Reservation extends Model
         return $this->status === 'confirmed';
     }
 
+    public function isReady(): bool
+    {
+        return $this->status === 'ready';
+    }
+
     public function isCompleted(): bool
     {
         return $this->status === 'completed';
@@ -150,7 +155,7 @@ class Reservation extends Model
 
     public function complete(): bool
     {
-        if ($this->isConfirmed()) {
+        if ($this->isConfirmed() || $this->isReady()) {
             $this->update(['status' => 'completed']);
             return true;
         }

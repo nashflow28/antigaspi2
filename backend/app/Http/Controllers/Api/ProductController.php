@@ -391,6 +391,85 @@ class ProductController extends Controller
         }
     }
 
+    public function merchantProducts(Request $request): JsonResponse
+    {
+        try {
+            $user = JWTAuth::parseToken()->authenticate();
+
+            if (!$user->isMerchant()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Seuls les commerçants peuvent accéder à cette ressource'
+                ], 403);
+            }
+
+            $query = Product::with(['category'])
+                ->where('merchant_id', $user->merchant->id);
+
+            // Filtres
+            if ($request->has('is_active')) {
+                $query->where('is_active', $request->boolean('is_active'));
+            }
+
+            if ($request->has('search')) {
+                $search = $request->search;
+                $query->where(function ($q) use ($search) {
+                    $q->where('name', 'like', '%' . $search . '%')
+                      ->orWhere('description', 'like', '%' . $search . '%');
+                });
+            }
+
+            // Tri
+            $sortBy = $request->get('sort_by', 'created_at');
+            $sortOrder = $request->get('sort_order', 'desc');
+            $query->orderBy($sortBy, $sortOrder);
+
+            // Pagination
+            $perPage = min($request->get('per_page', 12), 50);
+            $products = $query->paginate($perPage);
+
+            // Formater les données
+            $products->getCollection()->transform(function ($product) {
+                return [
+                    'id' => $product->id,
+                    'name' => $product->name,
+                    'description' => $product->description,
+                    'original_price' => $product->original_price,
+                    'discounted_price' => $product->discounted_price,
+                    'quantity_available' => $product->quantity_available,
+                    'expiration_date' => $product->expiration_date,
+                    'image_url' => $product->image_url,
+                    'discount_percentage' => $product->discount_percentage,
+                    'is_active' => $product->is_active,
+                    'category' => [
+                        'id' => $product->category->id,
+                        'name' => $product->category->name,
+                        'icon' => $product->category->icon,
+                    ],
+                    'created_at' => $product->created_at,
+                ];
+            });
+
+            return response()->json([
+                'success' => true,
+                'data' => $products->items(),
+                'pagination' => [
+                    'current_page' => $products->currentPage(),
+                    'last_page' => $products->lastPage(),
+                    'per_page' => $products->perPage(),
+                    'total' => $products->total(),
+                ]
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Erreur lors de la récupération des produits',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
     public function categories(): JsonResponse
     {
         try {

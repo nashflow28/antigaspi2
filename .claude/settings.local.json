@@ -29,7 +29,8 @@
       "Bash(C:/xampp/mysql/bin/mysql.exe:*)",
       "Bash(mysql:*)",
       "Bash(php:*)",
-      "Bash(\"C:/xampp/mysql/bin/mysql.exe\":*)"
+      "Bash(\"C:/xampp/mysql/bin/mysql.exe\":*)",
+      "Bash(python:*)"
     ],
     "deny": [],
     "ask": []

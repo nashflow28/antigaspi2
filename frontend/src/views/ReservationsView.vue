@@ -249,6 +249,8 @@
 <script setup lang="ts">
 import { ref, reactive, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
+import { useAuthStore } from '@/stores/auth'
+import { formatPrice } from '@/utils/currency'
 import {
   Calendar, CheckCheck, ChevronLeft, ChevronRight, Download,
   Grid3X3, Leaf, List
@@ -374,76 +376,60 @@ const hasFilters = computed(() =>
 const loadReservations = async () => {
   loading.value = true
   try {
-    // Simulation de données de réservations
-    await new Promise(resolve => setTimeout(resolve, 1000))
-
-    reservations.value = [
-      {
-        id: 1,
-        product: {
-          id: 1,
-          name: 'Pain de campagne bio',
-          image_url: null,
-          merchant: {
-            name: 'Boulangerie Martin',
-            address: '15 rue de la République',
-            phone: '01 23 45 67 89'
-          }
-        },
-        quantity: 2,
-        original_price: 4.50,
-        discounted_price: 2.25,
-        pickup_date: new Date('2024-01-15T18:00:00'),
-        pickup_notes: 'Demander à Marie au comptoir',
-        status: 'confirmed',
-        created_at: new Date('2024-01-14T10:30:00'),
-        reservation_code: 'ANT-001'
-      },
-      {
-        id: 2,
-        product: {
-          id: 2,
-          name: 'Salade fraîche du jour',
-          image_url: null,
-          merchant: {
-            name: 'Épicerie Bio Plus',
-            address: '8 avenue des Champs',
-            phone: '01 98 76 54 32'
-          }
-        },
-        quantity: 1,
-        original_price: 6.00,
-        discounted_price: 3.00,
-        pickup_date: new Date('2024-01-16T12:00:00'),
-        pickup_notes: '',
-        status: 'ready',
-        created_at: new Date('2024-01-15T14:20:00'),
-        reservation_code: 'ANT-002'
-      },
-      {
-        id: 3,
-        product: {
-          id: 3,
-          name: 'Fruits et légumes de saison',
-          image_url: null,
-          merchant: {
-            name: 'Primeur du Marché',
-            address: '22 place du Marché',
-            phone: '01 11 22 33 44'
-          }
-        },
-        quantity: 3,
-        original_price: 12.00,
-        discounted_price: 6.00,
-        pickup_date: new Date('2024-01-12T17:30:00'),
-        pickup_notes: 'Mélange de fruits et légumes bio',
-        status: 'completed',
-        created_at: new Date('2024-01-11T09:15:00'),
-        reservation_code: 'ANT-003'
+    const response = await fetch('http://localhost:8000/api/reservations', {
+      method: 'GET',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${useAuthStore().token}`
       }
-    ]
+    })
+
+    if (!response.ok) {
+      if (response.status === 401) {
+        router.push('/login')
+        return
+      }
+      throw new Error(`HTTP error! status: ${response.status}`)
+    }
+
+    const data = await response.json()
+    console.log('Reservations API response:', data)
+
+    if (data.success || data.data) {
+      // Handle paginated response
+      const reservationsData = data.data || []
+
+      // Transform API data to match component interface
+      reservations.value = reservationsData.map((res: any) => ({
+        id: res.id,
+        product: {
+          id: res.product?.id,
+          name: res.product?.name || 'Produit inconnu',
+          image_url: res.product?.image_url || null,
+          merchant: {
+            name: res.product?.merchant?.name || res.product?.merchant?.business_name || 'Commerçant inconnu',
+            address: res.product?.merchant?.address || res.product?.merchant?.city || 'Adresse non renseignée',
+            phone: res.product?.merchant?.phone || 'N/A'
+          }
+        },
+        quantity: res.quantity || res.quantity_reserved || 0,
+        original_price: parseFloat(res.product?.original_price || 0),
+        discounted_price: parseFloat(res.product?.discounted_price || 0),
+        total_amount: parseFloat(res.total_amount || 0),
+        pickup_date: res.pickup_date ? new Date(res.pickup_date) : null,
+        pickup_notes: res.notes || '',
+        status: res.status,
+        created_at: new Date(res.created_at),
+        reservation_code: res.reservation_code || `ANT-${res.id.toString().padStart(3, '0')}`
+      }))
+    } else {
+      console.error('API returned unexpected format:', data)
+      reservations.value = []
+    }
   } catch (error) {
     console.error('Erreur lors du chargement des réservations:', error)
+    reservations.value = []
   } finally {
     loading.value = false
   }
@@ -490,10 +476,6 @@ const exportReservations = () => {
 const markAllAsRead = () => {
   // Logique pour marquer toutes les notifications comme lues
   console.log('Marquer tout comme lu...')
-}
-
-const formatPrice = (price: number) => {
-  return `${price.toFixed(2)}€`
 }
 
 onMounted(() => {

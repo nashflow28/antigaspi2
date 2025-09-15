@@ -184,7 +184,7 @@
                   </div>
                   <div>
                     <p class="text-neutral-500">Montant</p>
-                    <p class="font-medium">{{ formatPrice(reservation.total_amount) }}€</p>
+                    <p class="font-medium">{{ formatPrice(reservation.total_amount) }}</p>
                   </div>
                   <div>
                     <p class="text-neutral-500">Récupération</p>
@@ -347,7 +347,7 @@
                 <div class="mt-2 grid grid-cols-2 gap-4 text-sm">
                   <div>
                     <span class="text-neutral-500">Prix unitaire:</span>
-                    <span class="font-medium ml-1">{{ formatPrice(selectedReservation.discounted_price) }}€</span>
+                    <span class="font-medium ml-1">{{ formatPrice(selectedReservation.discounted_price) }}</span>
                   </div>
                   <div>
                     <span class="text-neutral-500">Quantité:</span>
@@ -401,6 +401,8 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
+import { useAuthStore } from '@/stores/auth'
+import { formatPrice } from '@/utils/currency'
 import {
   MagnifyingGlassIcon,
   BookmarkIcon,
@@ -415,6 +417,9 @@ import {
   EyeIcon
 } from '@heroicons/vue/24/outline'
 
+// Auth store
+const authStore = useAuthStore()
+
 // Reactive data
 const reservations = ref<any[]>([])
 const searchQuery = ref('')
@@ -423,6 +428,7 @@ const activeFilter = ref('all')
 const sortBy = ref('created_at')
 const showDetailsModal = ref(false)
 const selectedReservation = ref<any>(null)
+const loading = ref(false)
 
 // Filters
 const filters = computed(() => [
@@ -519,10 +525,7 @@ const filteredReservations = computed(() => {
   return filtered
 })
 
-// Methods
-const formatPrice = (price: number): string => {
-  return price?.toFixed(2) || '0.00'
-}
+// Methods (formatPrice is now imported from @/utils/currency)
 
 const formatDateTime = (dateString: string): string => {
   const date = new Date(dateString)
@@ -576,25 +579,77 @@ const isUrgent = (reservation: any): boolean => {
 
 const updateReservationStatus = async (reservation: any, newStatus: string) => {
   try {
-    reservation.status = newStatus
+    let endpoint = ''
 
-    if (newStatus === 'confirmed') {
-      reservation.confirmed_at = new Date().toISOString()
-    } else if (newStatus === 'completed') {
-      reservation.pickup_date = new Date().toISOString()
+    switch (newStatus) {
+      case 'confirmed':
+        endpoint = `http://localhost:8000/api/reservations/${reservation.id}/confirm`
+        break
+      case 'completed':
+        endpoint = `http://localhost:8000/api/reservations/${reservation.id}/complete`
+        break
+      case 'cancelled':
+        endpoint = `http://localhost:8000/api/reservations/${reservation.id}/cancel`
+        break
+      default:
+        console.error('Unknown status:', newStatus)
+        return
     }
 
-    console.log(`Updated reservation ${reservation.id} to status: ${newStatus}`)
+    const response = await fetch(endpoint, {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${authStore.token}`
+      }
+    })
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`)
+    }
+
+    const data = await response.json()
+    console.log(`Updated reservation ${reservation.id} to status: ${newStatus}`, data)
+
+    // Reload reservations to get updated data
+    await loadReservations()
   } catch (error) {
     console.error('Error updating reservation status:', error)
   }
 }
 
 const markAsReady = async (reservation: any) => {
+  console.log('markAsReady called with reservation:', reservation)
+  console.log('Reservation ID:', reservation.id)
+  console.log('Auth token:', authStore.token)
   try {
-    reservation.status = 'ready'
-    console.log(`Marked reservation ${reservation.id} as ready`)
-    // TODO: Send notification to customer
+    console.log('Making API call to mark reservation as ready...')
+    const url = `http://localhost:8000/api/reservations/${reservation.id}/ready`
+    console.log('API URL:', url)
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${authStore.token}`
+      }
+    })
+
+    console.log('Response status:', response.status)
+    console.log('Response ok:', response.ok)
+
+    if (!response.ok) {
+      const errorText = await response.text()
+      console.error('Error response:', errorText)
+      throw new Error(`HTTP error! status: ${response.status}, body: ${errorText}`)
+    }
+
+    const data = await response.json()
+    console.log(`Marked reservation ${reservation.id} as ready`, data)
+
+    // Reload reservations to get updated data
+    await loadReservations()
   } catch (error) {
     console.error('Error marking reservation as ready:', error)
   }
@@ -614,80 +669,56 @@ const viewReservationDetails = (reservation: any) => {
 
 const loadReservations = async () => {
   try {
-    // Mock data for development
-    reservations.value = [
-      {
-        id: 1,
-        reservation_code: 'AGP-2024-001',
-        status: 'pending',
-        quantity: 2,
-        total_amount: 5.40,
-        notes: 'Merci de garder au frais',
-        created_at: '2024-01-15T10:00:00Z',
-        confirmed_at: null,
-        expires_at: '2024-01-16T18:00:00Z',
-        pickup_date: '2024-01-16T16:00:00Z',
-        discounted_price: 2.70,
-        product: {
-          id: 1,
-          name: 'Pain de campagne bio',
-          description: 'Délicieux pain artisanal fait avec des ingrédients biologiques locaux',
-          image_url: '/images/bread.jpg'
-        },
-        consumer: {
-          name: 'Marie Dupont',
-          phone: '+33 6 12 34 56 78'
-        }
-      },
-      {
-        id: 2,
-        reservation_code: 'AGP-2024-002',
-        status: 'confirmed',
-        quantity: 1,
-        total_amount: 4.00,
-        notes: null,
-        created_at: '2024-01-14T15:30:00Z',
-        confirmed_at: '2024-01-14T16:00:00Z',
-        expires_at: '2024-01-17T20:00:00Z',
-        pickup_date: '2024-01-17T18:00:00Z',
-        discounted_price: 4.00,
-        product: {
-          id: 2,
-          name: 'Fromage de chèvre',
-          description: 'Fromage artisanal crémeux de la ferme locale',
-          image_url: '/images/cheese.jpg'
-        },
-        consumer: {
-          name: 'Pierre Martin',
-          phone: '+33 6 98 76 54 32'
-        }
-      },
-      {
-        id: 3,
-        reservation_code: 'AGP-2024-003',
-        status: 'completed',
-        quantity: 3,
-        total_amount: 25.20,
-        notes: 'Livraison à domicile possible ?',
-        created_at: '2024-01-13T08:45:00Z',
-        confirmed_at: '2024-01-13T09:15:00Z',
-        expires_at: '2024-01-14T19:00:00Z',
-        pickup_date: '2024-01-14T17:30:00Z',
-        discounted_price: 8.40,
-        product: {
-          id: 3,
-          name: 'Légumes de saison',
-          description: 'Assortiment de légumes frais de saison cultivés localement',
-          image_url: '/images/vegetables.jpg'
-        },
-        consumer: {
-          name: 'Sophie Blanc',
-          phone: '+33 6 11 22 33 44'
-        }
+    loading.value = true
+    const response = await fetch('http://localhost:8000/api/reservations/merchant/list', {
+      method: 'GET',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${authStore.token}`
       }
-    ]
+    })
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`)
+    }
+
+    const data = await response.json()
+    console.log('Loaded merchant reservations:', data)
+
+    if (data.success && data.data) {
+      // Transform API data to match component interface
+      reservations.value = data.data.map((res: any) => ({
+        id: res.id,
+        reservation_code: res.reservation_code,
+        status: res.status,
+        quantity: parseInt(res.quantity || 1),
+        total_amount: parseFloat(res.total_amount || 0),
+        notes: res.pickup_notes || null,
+        created_at: res.created_at,
+        confirmed_at: res.confirmed_at || null,
+        expires_at: res.expires_at,
+        pickup_date: res.pickup_date,
+        discounted_price: parseFloat(res.discounted_price || 0),
+        product: {
+          id: res.product?.id || 0,
+          name: res.product?.name || 'Produit inconnu',
+          description: res.product?.description || '',
+          image_url: res.product?.image_url || '/images/placeholder.jpg'
+        },
+        consumer: {
+          name: `${res.user?.first_name || ''} ${res.user?.last_name || ''}`.trim() || 'Client',
+          phone: res.user?.phone || 'N/A'
+        }
+      }))
+    } else {
+      reservations.value = []
+    }
   } catch (error) {
     console.error('Error loading reservations:', error)
+    reservations.value = []
+  } finally {
+    loading.value = false
   }
 }
 

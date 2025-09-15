@@ -51,7 +51,16 @@ class ReservationController extends Controller
             $perPage = min($request->get('per_page', 15), 50);
             $reservations = $query->paginate($perPage);
 
-            return ReservationResource::collection($reservations);
+            return response()->json([
+                'success' => true,
+                'data' => ReservationResource::collection($reservations->items()),
+                'meta' => [
+                    'current_page' => $reservations->currentPage(),
+                    'last_page' => $reservations->lastPage(),
+                    'per_page' => $reservations->perPage(),
+                    'total' => $reservations->total()
+                ]
+            ]);
 
         } catch (\Exception $e) {
             return response()->json([
@@ -207,7 +216,16 @@ class ReservationController extends Controller
             $perPage = min($request->get('per_page', 15), 50);
             $reservations = $query->paginate($perPage);
 
-            return ReservationResource::collection($reservations);
+            return response()->json([
+                'success' => true,
+                'data' => ReservationResource::collection($reservations->items()),
+                'meta' => [
+                    'current_page' => $reservations->currentPage(),
+                    'last_page' => $reservations->lastPage(),
+                    'per_page' => $reservations->perPage(),
+                    'total' => $reservations->total()
+                ]
+            ]);
 
         } catch (\Exception $e) {
             return response()->json([

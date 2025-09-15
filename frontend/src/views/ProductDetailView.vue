@@ -34,8 +34,15 @@
         <!-- Product Image -->
         <div class="space-y-6">
           <div class="relative aspect-square bg-gradient-modern rounded-3xl overflow-hidden shadow-lift glow-effect">
-            <!-- Main Image Placeholder -->
-            <div class="absolute inset-0 flex items-center justify-center">
+            <!-- Product Image or Placeholder -->
+            <div v-if="product.image_url" class="absolute inset-0">
+              <img
+                :src="product.image_url"
+                :alt="product.name"
+                class="w-full h-full object-cover"
+              />
+            </div>
+            <div v-else class="absolute inset-0 flex items-center justify-center">
               <Package class="w-40 h-40 text-white/20" />
             </div>
 
@@ -283,6 +290,7 @@ interface Product {
   available_quantity: number
   reserved_quantity: number
   category?: string
+  image_url?: string
 }
 
 const route = useRoute()
@@ -303,7 +311,7 @@ const availableQuantity = computed(() => {
 
 // Methods
 const formatPrice = (price: number) => {
-  return `${price.toFixed(2)}€`
+  return `${price.toFixed(0)} F CFA`
 }
 
 const formatDate = (date: Date) => {
@@ -350,61 +358,67 @@ const fetchProduct = async () => {
 
     const productId = parseInt(route.params.id as string)
 
-    // Mock data for now - replace with actual API call
-    await new Promise(resolve => setTimeout(resolve, 1000))
-
-    // Mock product data based on ID
-    const mockProducts: Product[] = [
-      {
-        id: 1,
-        name: "Pain de campagne artisanal",
-        description: "Pain traditionnel fait maison, cuit au four à bois dans notre boulangerie familiale depuis 1952. Préparé avec des farines biologiques locales et un levain naturel de 20 ans d'âge. Croûte croustillante et mie moelleuse, parfait pour accompagner tous vos repas de famille.",
-        original_price: 4.50,
-        discounted_price: 2.25,
-        discount: 50,
-        category: "bakery",
-        merchant: {
-          name: "Boulangerie Martin",
-          address: "12 Rue de la Paix, 75001 Paris",
-          distance: 0.8
-        },
-        expires_at: new Date(Date.now() + 4 * 60 * 60 * 1000),
-        available_quantity: 5,
-        reserved_quantity: 2
-      },
-      {
-        id: 2,
-        name: "Plateau de fromages",
-        description: "Assortiment de fromages français sélectionnés par notre maître fromager : camembert de Normandie AOP, roquefort Papillon, chèvre cendré de Touraine, comté 18 mois d'affinage. Idéal pour un apéritif raffiné ou un plateau de fin de repas. Accompagné de conseils de dégustation.",
-        original_price: 15.90,
-        discounted_price: 7.95,
-        discount: 50,
-        category: "dairy",
-        merchant: {
-          name: "Fromagerie Dubois",
-          address: "45 Avenue Victor Hugo, 75016 Paris",
-          distance: 1.2
-        },
-        expires_at: new Date(Date.now() + 2 * 60 * 60 * 1000),
-        available_quantity: 3,
-        reserved_quantity: 0
+    const response = await fetch(`http://localhost:8000/api/products/${productId}`, {
+      method: 'GET',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
       }
-    ]
+    })
 
-    const foundProduct = mockProducts.find(p => p.id === productId)
-
-    if (!foundProduct) {
-      error.value = true
-      return
+    if (!response.ok) {
+      if (response.status === 404) {
+        error.value = true
+        return
+      }
+      throw new Error(`HTTP error! status: ${response.status}`)
     }
 
-    product.value = foundProduct
+    const data = await response.json()
+
+    if (data.success && data.data) {
+      // Transform API data to match component interface
+      const apiProduct = data.data
+      product.value = {
+        id: apiProduct.id,
+        name: apiProduct.name,
+        description: apiProduct.description,
+        original_price: parseFloat(apiProduct.original_price),
+        discounted_price: parseFloat(apiProduct.discounted_price),
+        discount: apiProduct.discount_percentage,
+        category: getCategoryKey(apiProduct.category?.name),
+        merchant: {
+          name: apiProduct.merchant?.business_name || 'Commerçant inconnu',
+          address: apiProduct.merchant?.address || apiProduct.merchant?.city || 'Adresse non renseignée',
+          distance: Math.random() * 5 // Simulated distance for now
+        },
+        expires_at: new Date(apiProduct.expiration_date),
+        available_quantity: apiProduct.quantity_available,
+        reserved_quantity: 0, // Not available in current API
+        image_url: apiProduct.image_url
+      }
+    } else {
+      error.value = true
+    }
   } catch (err) {
     console.error('Erreur lors du chargement du produit:', err)
     error.value = true
   } finally {
     loading.value = false
   }
+}
+
+// Helper function to map category names to keys
+const getCategoryKey = (categoryName: string) => {
+  const categoryMap: { [key: string]: string } = {
+    'Fruits et Légumes': 'produce',
+    'Boulangerie': 'bakery',
+    'Plats préparés': 'prepared',
+    'Épicerie': 'dairy',
+    'Produits laitiers': 'dairy',
+    'Viandes': 'meat'
+  }
+  return categoryMap[categoryName] || 'other'
 }
 
 const reserveProduct = async () => {

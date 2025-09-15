@@ -2,7 +2,15 @@
   <div class="card card-interactive group cursor-pointer overflow-hidden glow-effect hover:shadow-lift transition-all duration-500">
     <!-- Image du produit avec gradients modernes -->
     <div class="relative h-52 mb-6 -m-6 mb-4 overflow-hidden rounded-t-2xl">
-      <div class="absolute inset-0 bg-gradient-modern flex items-center justify-center">
+      <!-- Image réelle si disponible -->
+      <img
+        v-if="product.image_url"
+        :src="product.image_url"
+        :alt="product.name"
+        class="absolute inset-0 w-full h-full object-cover"
+      />
+      <!-- Placeholder si pas d'image -->
+      <div v-else class="absolute inset-0 bg-gradient-modern flex items-center justify-center">
         <Package class="w-20 h-20 text-white/30 group-hover:scale-110 transition-transform duration-300" />
       </div>
 
@@ -124,6 +132,7 @@ interface Product {
   expires_at: Date
   available_quantity: number
   reserved_quantity: number
+  image_url?: string
 }
 
 interface Props {

@@ -72,10 +72,10 @@
             <label class="block text-sm font-medium text-neutral-700 mb-2">Prix maximum</label>
             <select v-model="filters.maxPrice" class="select w-full">
               <option value="">Tous les prix</option>
-              <option value="5">Moins de 5€</option>
-              <option value="10">Moins de 10€</option>
-              <option value="20">Moins de 20€</option>
-              <option value="50">Moins de 50€</option>
+              <option value="500">Moins de 500 F CFA</option>
+              <option value="1000">Moins de 1000 F CFA</option>
+              <option value="2000">Moins de 2000 F CFA</option>
+              <option value="5000">Moins de 5000 F CFA</option>
             </select>
           </div>
 
@@ -176,6 +176,7 @@ interface Product {
   available_quantity: number
   reserved_quantity: number
   category?: string
+  image_url?: string
 }
 
 const router = useRouter()
@@ -242,118 +243,61 @@ const fetchProducts = async () => {
   try {
     loading.value = true
 
-    // Mock data for now - replace with actual API call
-    await new Promise(resolve => setTimeout(resolve, 1000))
-
-    products.value = [
-      {
-        id: 1,
-        name: "Pain de campagne artisanal",
-        description: "Pain traditionnel fait maison, cuit au four à bois. Parfait pour vos repas de famille.",
-        original_price: 4.50,
-        discounted_price: 2.25,
-        discount: 50,
-        category: "bakery",
-        merchant: {
-          name: "Boulangerie Martin",
-          address: "12 Rue de la Paix, Paris",
-          distance: 0.8
-        },
-        expires_at: new Date(Date.now() + 4 * 60 * 60 * 1000),
-        available_quantity: 5,
-        reserved_quantity: 2
-      },
-      {
-        id: 2,
-        name: "Plateau de fromages",
-        description: "Assortiment de fromages français: camembert, roquefort, chèvre cendré. Idéal pour l'apéritif.",
-        original_price: 15.90,
-        discounted_price: 7.95,
-        discount: 50,
-        category: "dairy",
-        merchant: {
-          name: "Fromagerie Dubois",
-          address: "45 Avenue Victor Hugo, Paris",
-          distance: 1.2
-        },
-        expires_at: new Date(Date.now() + 2 * 60 * 60 * 1000),
-        available_quantity: 3,
-        reserved_quantity: 0
-      },
-      {
-        id: 3,
-        name: "Salade César préparée",
-        description: "Salade fraîche avec poulet grillé, parmesan, croûtons et sauce César maison.",
-        original_price: 8.90,
-        discounted_price: 4.45,
-        discount: 50,
-        category: "prepared",
-        merchant: {
-          name: "Fresh & Co",
-          address: "23 Boulevard Saint-Germain, Paris",
-          distance: 2.1
-        },
-        expires_at: new Date(Date.now() + 6 * 60 * 60 * 1000),
-        available_quantity: 8,
-        reserved_quantity: 3
-      },
-      {
-        id: 4,
-        name: "Panier de fruits de saison",
-        description: "Pommes, poires, oranges et kiwis. Fruits mûrs parfaits pour jus ou consommation immédiate.",
-        original_price: 12.00,
-        discounted_price: 6.00,
-        discount: 50,
-        category: "produce",
-        merchant: {
-          name: "Primeur Bio Plus",
-          address: "8 Rue Montorgueil, Paris",
-          distance: 1.5
-        },
-        expires_at: new Date(Date.now() + 12 * 60 * 60 * 1000),
-        available_quantity: 4,
-        reserved_quantity: 1
-      },
-      {
-        id: 5,
-        name: "Escalopes de porc marinées",
-        description: "Escalopes fraîches marinées aux herbes de Provence. Prêtes à cuire.",
-        original_price: 18.50,
-        discounted_price: 9.25,
-        discount: 50,
-        category: "meat",
-        merchant: {
-          name: "Boucherie Moderne",
-          address: "67 Rue de Rivoli, Paris",
-          distance: 0.9
-        },
-        expires_at: new Date(Date.now() + 8 * 60 * 60 * 1000),
-        available_quantity: 6,
-        reserved_quantity: 2
-      },
-      {
-        id: 6,
-        name: "Pâtisseries du jour",
-        description: "Assortiment de pâtisseries fraîches: éclairs, millefeuilles, tartelettes aux fruits.",
-        original_price: 24.00,
-        discounted_price: 12.00,
-        discount: 50,
-        category: "bakery",
-        merchant: {
-          name: "Pâtisserie Delacroix",
-          address: "34 Place Vendôme, Paris",
-          distance: 2.3
-        },
-        expires_at: new Date(Date.now() + 3 * 60 * 60 * 1000),
-        available_quantity: 2,
-        reserved_quantity: 0
+    const response = await fetch('http://localhost:8000/api/products', {
+      method: 'GET',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
       }
-    ]
+    })
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`)
+    }
+
+    const data = await response.json()
+
+    if (data.success) {
+      // Transform API data to match component interface
+      products.value = data.data.map((product: any) => ({
+        id: product.id,
+        name: product.name,
+        description: product.description,
+        original_price: parseFloat(product.original_price),
+        discounted_price: parseFloat(product.discounted_price),
+        discount: product.discount_percentage,
+        category: getCategoryKey(product.category?.name),
+        merchant: {
+          name: product.merchant?.business_name || 'Commerçant inconnu',
+          address: product.merchant?.address || product.merchant?.city || 'Adresse non renseignée',
+          distance: Math.random() * 5 // Simulated distance for now
+        },
+        expires_at: new Date(product.expiration_date),
+        available_quantity: product.quantity_available,
+        reserved_quantity: 0, // Not available in current API
+        image_url: product.image_url
+      }))
+    } else {
+      console.error('API returned error:', data.message)
+    }
   } catch (error) {
     console.error('Erreur lors du chargement des produits:', error)
   } finally {
     loading.value = false
   }
+}
+
+// Helper function to map category names to keys
+const getCategoryKey = (categoryName: string) => {
+  const categoryMap: { [key: string]: string } = {
+    'Fruits et Légumes': 'produce',
+    'Boulangerie': 'bakery',
+    'Plats préparés': 'prepared',
+    'Épicerie': 'dairy',
+    'Produits laitiers': 'dairy',
+    'Viandes': 'meat'
+  }
+  return categoryMap[categoryName] || 'other'
 }
 
 const clearFilters = () => {

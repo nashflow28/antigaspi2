@@ -275,6 +275,8 @@
 
 <script setup lang="ts">
 import { ref, onMounted, reactive } from 'vue'
+import { useAuthStore } from '@/stores/auth'
+import { formatPrice } from '@/utils/currency'
 import {
   PlusIcon,
   ShoppingBagIcon,
@@ -287,6 +289,8 @@ import {
   StarIcon,
   BellIcon
 } from '@heroicons/vue/24/outline'
+
+const authStore = useAuthStore()
 
 // Reactive data
 const stats = reactive({
@@ -361,45 +365,11 @@ const loadDashboardData = async () => {
     stats.products_sold = 23
     stats.co2_saved = 48.5
 
-    recentReservations.value = [
-      {
-        id: 1,
-        customer_name: 'Marie Dubois',
-        product_name: 'Pain de mie complet',
-        total_amount: 1640, // 2.50€ × 656
-        status: 'pending',
-        created_at: new Date().toISOString()
-      },
-      {
-        id: 2,
-        customer_name: 'Pierre Martin',
-        product_name: 'Salade de fruits',
-        total_amount: 2755, // 4.20€ × 656
-        status: 'confirmed',
-        created_at: new Date(Date.now() - 3600000).toISOString()
-      }
-    ]
+    // Load real reservations data
+    await loadRecentReservations()
 
-    recentProducts.value = [
-      {
-        id: 1,
-        name: 'Pain de mie complet',
-        category: 'Boulangerie',
-        discounted_price: 1640, // 2.50€ × 656
-        original_price: 2624, // 4.00€ × 656
-        quantity_available: 5,
-        image_url: null
-      },
-      {
-        id: 2,
-        name: 'Salade de fruits',
-        category: 'Fruits & Légumes',
-        discounted_price: 2755, // 4.20€ × 656
-        original_price: 4264, // 6.50€ × 656
-        quantity_available: 3,
-        image_url: null
-      }
-    ]
+    // Load real products data
+    await loadRecentProducts()
 
     notifications.value = [
       {
@@ -411,6 +381,73 @@ const loadDashboardData = async () => {
     ]
   } catch (error) {
     console.error('Error loading dashboard data:', error)
+  }
+}
+
+const loadRecentReservations = async () => {
+  try {
+    const response = await fetch('http://localhost:8000/api/reservations/merchant/list?per_page=5', {
+      method: 'GET',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${authStore.token}`
+      }
+    })
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`)
+    }
+
+    const data = await response.json()
+    if (data.success && data.data) {
+      // Transform API data to match dashboard interface
+      recentReservations.value = data.data.map((res: any) => ({
+        id: res.id,
+        customer_name: `${res.consumer?.first_name || ''} ${res.consumer?.last_name || ''}`.trim() || 'Client',
+        product_name: res.product?.name || 'Produit inconnu',
+        total_amount: parseFloat(res.total_amount || 0),
+        status: res.status,
+        created_at: res.created_at
+      }))
+    }
+  } catch (error) {
+    console.error('Erreur lors du chargement des réservations récentes:', error)
+    recentReservations.value = []
+  }
+}
+
+const loadRecentProducts = async () => {
+  try {
+    const response = await fetch('http://localhost:8000/api/products/merchant?per_page=5', {
+      method: 'GET',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${authStore.token}`
+      }
+    })
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`)
+    }
+
+    const data = await response.json()
+    if (data.success && data.data) {
+      // Transform API data to match dashboard interface
+      recentProducts.value = data.data.map((product: any) => ({
+        id: product.id,
+        name: product.name,
+        category: product.category?.name || 'Catégorie',
+        discounted_price: parseFloat(product.discounted_price || 0),
+        original_price: parseFloat(product.original_price || 0),
+        quantity_available: product.quantity_available || 0,
+        image_url: product.image_url || null
+      }))
+    }
+  } catch (error) {
+    console.error('Erreur lors du chargement des produits récents:', error)
+    recentProducts.value = []
   }
 }
 

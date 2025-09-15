@@ -140,7 +140,22 @@ router.beforeEach(async (to, _from, next) => {
 
   // Hide auth pages for authenticated users
   if (to.meta.hideForAuth && authStore.isAuthenticated) {
-    next('/dashboard')
+    // Redirect to appropriate dashboard based on role
+    if (authStore.user) {
+      switch (authStore.user.role) {
+        case 'admin':
+          next('/admin/dashboard')
+          break
+        case 'merchant':
+          next('/merchant/dashboard')
+          break
+        case 'consumer':
+        default:
+          next('/dashboard')
+      }
+    } else {
+      next('/dashboard')
+    }
     return
   }
 

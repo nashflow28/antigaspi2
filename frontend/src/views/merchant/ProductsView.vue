@@ -782,7 +782,7 @@ const loadProducts = async () => {
   try {
     const authStore = useAuthStore()
 
-    const response = await fetch('http://localhost:8000/api/products', {
+    const response = await fetch('http://localhost:8000/api/products/merchant', {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -796,13 +796,13 @@ const loadProducts = async () => {
     }
 
     const result = await response.json()
-    console.log('Products loaded:', result)
+    console.log('Merchant products loaded:', result)
 
     // L'API retourne les produits dans result.data
     products.value = result.data || result || []
 
   } catch (error) {
-    console.error('Error loading products:', error)
+    console.error('Error loading merchant products:', error)
     // En cas d'erreur, utiliser des données vides
     products.value = []
   }
