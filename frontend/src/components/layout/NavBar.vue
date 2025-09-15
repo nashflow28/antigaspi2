@@ -176,6 +176,13 @@
                   >
                     Commerçants
                   </router-link>
+                  <router-link
+                    to="/admin/categories"
+                    class="block px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100"
+                    @click="showUserMenu = false"
+                  >
+                    Catégories
+                  </router-link>
                 </template>
 
                   </div>

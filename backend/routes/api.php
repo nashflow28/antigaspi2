@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\ProductController;
 use App\Http\Controllers\Api\ReservationController;
 use App\Http\Controllers\Api\AdminController;
+use App\Http\Controllers\CategoryController;
 
 /*
 |--------------------------------------------------------------------------
@@ -67,6 +68,17 @@ Route::get('categories', [ProductController::class, 'categories']);
 Route::prefix('admin')->middleware(\App\Http\Middleware\ApiAuthMiddleware::class)->group(function () {
     Route::get('/dashboard', [AdminController::class, 'dashboard']); // Dashboard admin
     Route::get('/system-health', [AdminController::class, 'systemHealth']); // Santé du système
+
+    // Gestion des catégories (admin uniquement)
+    Route::prefix('categories')->group(function () {
+        Route::get('/', [CategoryController::class, 'index']); // Liste des catégories
+        Route::get('/stats', [CategoryController::class, 'stats']); // Statistiques catégories
+        Route::post('/', [CategoryController::class, 'store']); // Créer catégorie
+        Route::get('/{category}', [CategoryController::class, 'show']); // Détail catégorie
+        Route::put('/{category}', [CategoryController::class, 'update']); // Modifier catégorie
+        Route::delete('/{category}', [CategoryController::class, 'destroy']); // Supprimer catégorie
+        Route::patch('/{category}/toggle', [CategoryController::class, 'toggleStatus']); // Activer/désactiver
+    });
 });
 
 // Routes temporaires pour les tests (à sécuriser plus tard)
