@@ -3,7 +3,7 @@ const { test, expect } = require('@playwright/test');
 test.describe('Stage 3 - Frontend Authentication', () => {
   test.beforeEach(async ({ page }) => {
     // Start with fresh state
-    await page.goto('http://localhost:3005');
+    await page.goto('http://localhost:3000');
   });
 
   test('Homepage should load and show authentication options', async ({ page }) => {
@@ -15,7 +15,7 @@ test.describe('Stage 3 - Frontend Authentication', () => {
   });
 
   test('Login page should be accessible and have form elements', async ({ page }) => {
-    await page.goto('http://localhost:3005/login');
+    await page.goto('http://localhost:3000/login');
 
     // Check page title and form elements
     await expect(page.locator('h2')).toContainText('Connexion');
@@ -29,7 +29,7 @@ test.describe('Stage 3 - Frontend Authentication', () => {
   });
 
   test('Register page should be accessible and have form elements', async ({ page }) => {
-    await page.goto('http://localhost:3005/register');
+    await page.goto('http://localhost:3000/register');
 
     // Check page title and form elements
     await expect(page.locator('h2')).toContainText('Inscription');
@@ -45,7 +45,7 @@ test.describe('Stage 3 - Frontend Authentication', () => {
   });
 
   test('Login form validation should work', async ({ page }) => {
-    await page.goto('http://localhost:3005/login');
+    await page.goto('http://localhost:3000/login');
 
     // Try to submit empty form
     await page.click('button[type="submit"]');
@@ -55,7 +55,7 @@ test.describe('Stage 3 - Frontend Authentication', () => {
   });
 
   test('Register form validation should work', async ({ page }) => {
-    await page.goto('http://localhost:3005/register');
+    await page.goto('http://localhost:3000/register');
 
     // Try to submit empty form
     await page.click('button[type="submit"]');
@@ -65,7 +65,7 @@ test.describe('Stage 3 - Frontend Authentication', () => {
   });
 
   test('Register form should show business fields for merchant', async ({ page }) => {
-    await page.goto('http://localhost:3005/register');
+    await page.goto('http://localhost:3000/register');
 
     // Select merchant role
     await page.click('input[value="merchant"]');
@@ -76,7 +76,7 @@ test.describe('Stage 3 - Frontend Authentication', () => {
   });
 
   test('Login with valid test credentials should work', async ({ page }) => {
-    await page.goto('http://localhost:3005/login');
+    await page.goto('http://localhost:3000/login');
 
     // Fill login form with test credentials
     await page.fill('#email', 'jean.dupont@email.com');
@@ -98,7 +98,7 @@ test.describe('Stage 3 - Frontend Authentication', () => {
   });
 
   test('Login with invalid credentials should show error', async ({ page }) => {
-    await page.goto('http://localhost:3005/login');
+    await page.goto('http://localhost:3000/login');
 
     // Fill login form with invalid credentials
     await page.fill('#email', 'invalid@example.com');
@@ -115,7 +115,7 @@ test.describe('Stage 3 - Frontend Authentication', () => {
     const timestamp = Date.now();
     const testEmail = `test-consumer-${timestamp}@example.com`;
 
-    await page.goto('http://localhost:3005/register');
+    await page.goto('http://localhost:3000/register');
 
     // Select consumer role (default)
     await expect(page.locator('input[value="consumer"]')).toBeChecked();
@@ -146,7 +146,7 @@ test.describe('Stage 3 - Frontend Authentication', () => {
   });
 
   test('Password visibility toggle should work', async ({ page }) => {
-    await page.goto('http://localhost:3005/login');
+    await page.goto('http://localhost:3000/login');
 
     const passwordInput = page.locator('#password');
     const toggleButton = page.locator('button').filter({ hasText: /eye|show|hide/i }).or(
@@ -169,7 +169,7 @@ test.describe('Stage 3 - Frontend Authentication', () => {
 
   test('Navigation should work correctly for authenticated users', async ({ page }) => {
     // First login with test credentials
-    await page.goto('http://localhost:3005/login');
+    await page.goto('http://localhost:3000/login');
     await page.fill('#email', 'jean.dupont@email.com');
     await page.fill('#password', 'password');
     await page.click('button[type="submit"]');
@@ -178,10 +178,10 @@ test.describe('Stage 3 - Frontend Authentication', () => {
     await page.waitForTimeout(3000);
 
     // If authenticated, should not be able to access login page
-    await page.goto('http://localhost:3005/login');
+    await page.goto('http://localhost:3000/login');
 
     // Should redirect to dashboard or stay on current page
     const currentUrl = page.url();
-    expect(currentUrl).not.toBe('http://localhost:3005/login');
+    expect(currentUrl).not.toBe('http://localhost:3000/login');
   });
 });
