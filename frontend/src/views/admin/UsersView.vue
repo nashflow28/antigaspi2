@@ -741,7 +741,7 @@ const suspendUser = async (user: User) => {
         }
       } catch (error) {
         console.error('Erreur lors de la suspension:', error)
-        showNotification('error', 'Erreur de suspension', `Impossible de suspendre ${user.name}. ${error.message}`)
+        showNotification('error', 'Erreur de suspension', `Impossible de suspendre ${user.name}. ${error instanceof Error ? error.message : 'Erreur inconnue'}`)
       }
     },
     'Suspendre',
@@ -771,7 +771,7 @@ const unsuspendUser = async (user: User) => {
         }
       } catch (error) {
         console.error('Erreur lors de la réactivation:', error)
-        showNotification('error', 'Erreur de réactivation', `Impossible de réactiver ${user.name}. ${error.message}`)
+        showNotification('error', 'Erreur de réactivation', `Impossible de réactiver ${user.name}. ${error instanceof Error ? error.message : 'Erreur inconnue'}`)
       }
     },
     'Réactiver',

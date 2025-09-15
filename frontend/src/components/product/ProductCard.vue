@@ -145,9 +145,6 @@ defineEmits<{
   view: [product: Product]
 }>()
 
-const formatPrice = (price: number) => {
-  return `${price.toFixed(2)}€`
-}
 
 const formatTimeLeft = (expiresAt: Date) => {
   const now = new Date()

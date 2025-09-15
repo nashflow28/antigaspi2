@@ -517,9 +517,6 @@ const isExpiringSoon = (product: any): boolean => {
   return diffDays <= 3 && diffDays >= 0
 }
 
-const formatPrice = (price: number): string => {
-  return price?.toFixed(2) || '0.00'
-}
 
 const formatDate = (date: string): string => {
   return new Date(date).toLocaleDateString('fr-FR')
@@ -740,12 +737,13 @@ const saveProduct = async () => {
   } catch (error) {
     console.error('Error saving product:', error)
     console.error('Error type:', typeof error)
-    console.error('Error name:', error?.name)
-    console.error('Error message:', error?.message)
+    const errorMessage = error instanceof Error ? error.message : String(error)
+    console.error('Error name:', error instanceof Error ? error.name : 'Unknown')
+    console.error('Error message:', errorMessage)
 
-    if (error?.message?.includes('NetworkError') || error?.message?.includes('Failed to fetch')) {
+    if (errorMessage.includes('NetworkError') || errorMessage.includes('Failed to fetch')) {
       alert('Erreur de connexion au serveur. Vérifiez que le serveur backend fonctionne.')
-    } else if (error?.message?.includes('401')) {
+    } else if (errorMessage.includes('401')) {
       alert('Session expirée. Veuillez vous reconnecter.')
     } else {
       alert('Erreur lors de l\'enregistrement du produit. Détails dans la console.')

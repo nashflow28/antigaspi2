@@ -314,7 +314,16 @@ const userStats = ref({
   activeReservations: 3
 })
 
-const recentReservations = ref([])
+interface ReservationItem {
+  id: number
+  merchant: { name: string }
+  product: { name: string }
+  price: number
+  pickup_date: string
+  status: string
+}
+
+const recentReservations = ref<ReservationItem[]>([])
 const loading = ref(true)
 
 const recommendedProducts = ref([
@@ -388,11 +397,12 @@ const loadRecentReservations = async () => {
 
 // Fonctions utilitaires
 
-const formatDate = (date: Date) => {
+const formatDate = (date: string | Date) => {
+  const dateObj = date instanceof Date ? date : new Date(date)
   return new Intl.DateTimeFormat('fr-FR', {
     day: '2-digit',
     month: 'short'
-  }).format(date)
+  }).format(dateObj)
 }
 
 const getStatusClass = (status: string) => {

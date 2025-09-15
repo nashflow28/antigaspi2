@@ -624,7 +624,7 @@ const approveMerchant = async (merchant: PendingMerchant) => {
         }
       } catch (error) {
         console.error('Erreur:', error)
-        showNotification('error', 'Erreur d\'approbation', `Impossible d'approuver ${merchant.business_name}. ${error.message}`)
+        showNotification('error', 'Erreur d\'approbation', `Impossible d'approuver ${merchant.business_name}. ${error instanceof Error ? error.message : 'Erreur inconnue'}`)
       }
     },
     'Approuver',
@@ -655,7 +655,7 @@ const rejectMerchant = async (merchant: PendingMerchant) => {
         }
       } catch (error) {
         console.error('Erreur:', error)
-        showNotification('error', 'Erreur de rejet', `Impossible de rejeter ${merchant.business_name}. ${error.message}`)
+        showNotification('error', 'Erreur de rejet', `Impossible de rejeter ${merchant.business_name}. ${error instanceof Error ? error.message : 'Erreur inconnue'}`)
       }
     },
     'Rejeter',
@@ -704,7 +704,7 @@ const approveProduct = async (product: ProductToModerate) => {
         }
       } catch (error) {
         console.error('Erreur:', error)
-        showNotification('error', 'Erreur d\'approbation', `Impossible d'approuver "${product.name}". ${error.message}`)
+        showNotification('error', 'Erreur d\'approbation', `Impossible d'approuver "${product.name}". ${error instanceof Error ? error.message : 'Erreur inconnue'}`)
       }
     },
     'Approuver',
@@ -734,7 +734,7 @@ const rejectProduct = async (product: ProductToModerate) => {
         }
       } catch (error) {
         console.error('Erreur:', error)
-        showNotification('error', 'Erreur de rejet', `Impossible de rejeter "${product.name}". ${error.message}`)
+        showNotification('error', 'Erreur de rejet', `Impossible de rejeter "${product.name}". ${error instanceof Error ? error.message : 'Erreur inconnue'}`)
       }
     },
     'Rejeter',
@@ -764,7 +764,7 @@ const resolveReservation = async (reservation: FlaggedReservation) => {
         }
       } catch (error) {
         console.error('Erreur:', error)
-        showNotification('error', 'Erreur de résolution', `Impossible de résoudre le signalement. ${error.message}`)
+        showNotification('error', 'Erreur de résolution', `Impossible de résoudre le signalement. ${error instanceof Error ? error.message : 'Erreur inconnue'}`)
       }
     },
     'Résoudre',

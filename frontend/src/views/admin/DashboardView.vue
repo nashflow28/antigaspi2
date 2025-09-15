@@ -369,6 +369,18 @@
         </div>
       </div>
     </div>
+
+    <!-- Modal for detailed info -->
+    <AdminModal
+      :show="modal.show"
+      :title="modal.title"
+      :content="modal.content"
+      :icon="modal.icon"
+      :type="modal.type"
+      :action-button="modal.actionButton"
+      @close="closeModal"
+      @action="handleModalAction"
+    />
   </div>
 </template>
 
@@ -376,6 +388,7 @@
 import { ref, onMounted, nextTick, watch } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 import { formatPrice } from '@/utils/currency'
+import AdminModal from '@/components/ui/AdminModal.vue'
 import {
   ArrowPathIcon,
   UsersIcon,
@@ -391,7 +404,8 @@ import {
   UserPlusIcon,
   ShoppingCartIcon,
   BellIcon,
-  ShieldExclamationIcon
+  ShieldExclamationIcon,
+  InformationCircleIcon
 } from '@heroicons/vue/24/outline'
 import {
   Chart as ChartJS,
@@ -477,6 +491,17 @@ const alerts = ref([
     timestamp: '2024-01-14T16:20:00Z'
   }
 ])
+
+// Modal state
+const modal = ref({
+  show: false,
+  title: '',
+  content: '',
+  icon: InformationCircleIcon,
+  type: 'info' as 'info' | 'success' | 'warning' | 'error',
+  actionButton: '',
+  action: null as (() => void) | null
+})
 
 // Methods
 const formatNumber = (num: number): string => {
@@ -754,65 +779,92 @@ const dismissAlert = (alertId: number) => {
   }
 }
 
+// Modal functions
+const showModal = (title: string, content: string, type: 'info' | 'success' | 'warning' | 'error' = 'info', icon?: any, actionButton?: string, action?: () => void) => {
+  modal.value.title = title
+  modal.value.content = content
+  modal.value.type = type
+  modal.value.icon = icon || InformationCircleIcon
+  modal.value.actionButton = actionButton || ''
+  modal.value.action = action || null
+  modal.value.show = true
+}
+
+const closeModal = () => {
+  modal.value.show = false
+  modal.value.action = null
+}
+
+const handleModalAction = () => {
+  if (modal.value.action) {
+    modal.value.action()
+  }
+  closeModal()
+}
+
 // Navigation and actions
 const viewAllActivities = () => {
-  // For now, show a modal with more activities
-  alert('🔍 Voir toutes les activités\n\nActivités récentes détaillées:\n\n' +
-    recentActivities.value.map(activity =>
-      `• ${activity.description}: ${activity.user}\n  ${formatTimeAgo(activity.timestamp)}`
-    ).join('\n\n'))
+  const content = `Activités récentes détaillées:\n\n${recentActivities.value.map(activity =>
+    `• ${activity.description}: ${activity.user}\n  ${formatTimeAgo(activity.timestamp)}`
+  ).join('\n\n')}`
+
+  showModal('🔍 Voir toutes les activités', content, 'info', DocumentTextIcon, 'Gérer les activités')
 }
 
 // Quick actions
 const viewLogs = () => {
-  // Show system logs summary
-  alert('📋 Logs système\n\n' +
-    '✅ API Backend: 1,247 requêtes (99.9% succès)\n' +
-    '✅ Base de données: 3,421 requêtes (98.7% < 50ms)\n' +
-    '⚠️ Frontend: 2 erreurs JavaScript détectées\n' +
-    'ℹ️ Cache Redis: 15,672 hits (94.3% ratio)\n\n' +
-    'Dernière vérification: ' + new Date().toLocaleTimeString('fr-FR'))
+  const content = `📋 Logs système\n\n` +
+    `✅ API Backend: 1,247 requêtes (99.9% succès)\n` +
+    `✅ Base de données: 3,421 requêtes (98.7% < 50ms)\n` +
+    `⚠️ Frontend: 2 erreurs JavaScript détectées\n` +
+    `ℹ️ Cache Redis: 15,672 hits (94.3% ratio)\n\n` +
+    `Dernière vérification: ${new Date().toLocaleTimeString('fr-FR')}`
+
+  showModal('📋 Logs système', content, 'info', DocumentTextIcon, 'Voir tous les logs')
 }
 
 const viewMetrics = () => {
-  // Show detailed metrics
-  alert('📊 Métriques détaillées\n\n' +
-    '👥 Utilisateurs actifs: 247 (dernières 24h)\n' +
-    '🏪 Nouveaux commerçants: 12 (cette semaine)\n' +
-    '📦 Produits ajoutés: 156 (aujourd\'hui)\n' +
-    '💰 CA moyen/commande: ' + formatCurrency(stats.value.totalRevenue / stats.value.productsSaved) + '\n' +
-    '🌍 Impact CO2: ' + environmentalImpact.value.co2Saved + 'kg économisés\n\n' +
-    'Période: ' + selectedPeriod.value)
+  const content = `📊 Métriques détaillées\n\n` +
+    `👥 Utilisateurs actifs: 247 (dernières 24h)\n` +
+    `🏪 Nouveaux commerçants: 12 (cette semaine)\n` +
+    `📦 Produits ajoutés: 156 (aujourd'hui)\n` +
+    `💰 CA moyen/commande: ${formatCurrency(stats.value.totalRevenue / stats.value.productsSaved)}\n` +
+    `🌍 Impact CO2: ${environmentalImpact.value.co2Saved}kg économisés\n\n` +
+    `Période: ${selectedPeriod.value}`
+
+  showModal('📊 Métriques détaillées', content, 'info', ChartBarIcon, 'Voir analytics')
 }
 
 const manageUsers = () => {
-  // Show user management preview
-  alert('👥 Gestion utilisateurs\n\n' +
-    '📊 Statistiques:\n' +
-    '• Total: ' + formatNumber(stats.value.totalUsers) + ' utilisateurs\n' +
-    '• Consommateurs: ' + formatNumber(stats.value.totalUsers - stats.value.activeMerchants) + '\n' +
-    '• Commerçants: ' + formatNumber(stats.value.activeMerchants) + '\n' +
-    '• Nouveaux ce mois: ' + stats.value.newUsersThisMonth + '\n\n' +
-    '🚀 Accès rapide:\n' +
-    '• Utilisateurs en attente de validation\n' +
-    '• Comptes signalés\n' +
-    '• Statistiques d\'engagement')
+  const content = `👥 Gestion utilisateurs\n\n` +
+    `📊 Statistiques:\n` +
+    `• Total: ${formatNumber(stats.value.totalUsers)} utilisateurs\n` +
+    `• Consommateurs: ${formatNumber(stats.value.totalUsers - stats.value.activeMerchants)}\n` +
+    `• Commerçants: ${formatNumber(stats.value.activeMerchants)}\n` +
+    `• Nouveaux ce mois: ${stats.value.newUsersThisMonth}\n\n` +
+    `🚀 Accès rapide:\n` +
+    `• Utilisateurs en attente de validation\n` +
+    `• Comptes signalés\n` +
+    `• Statistiques d'engagement`
+
+  showModal('👥 Gestion utilisateurs', content, 'info', UsersIcon, 'Accéder à la gestion')
 }
 
 const systemSettings = () => {
-  // Show system settings preview
-  alert('⚙️ Paramètres système\n\n' +
-    '🔧 Configuration actuelle:\n' +
-    '• Mode: Production\n' +
-    '• Version API: v1.2.3\n' +
-    '• Base de données: MySQL 8.0\n' +
-    '• Cache: Redis activé\n' +
-    '• Notifications: Email + SMS\n\n' +
-    '⚡ Actions disponibles:\n' +
-    '• Maintenance programmée\n' +
-    '• Sauvegarde manuelle\n' +
-    '• Nettoyage cache\n' +
-    '• Mise à jour sécurité')
+  const content = `⚙️ Paramètres système\n\n` +
+    `🔧 Configuration actuelle:\n` +
+    `• Mode: Production\n` +
+    `• Version API: v1.2.3\n` +
+    `• Base de données: MySQL 8.0\n` +
+    `• Cache: Redis activé\n` +
+    `• Notifications: Email + SMS\n\n` +
+    `⚡ Actions disponibles:\n` +
+    `• Maintenance programmée\n` +
+    `• Sauvegarde manuelle\n` +
+    `• Nettoyage cache\n` +
+    `• Mise à jour sécurité`
+
+  showModal('⚙️ Paramètres système', content, 'warning', CogIcon, 'Accéder aux paramètres')
 }
 
 // Lifecycle

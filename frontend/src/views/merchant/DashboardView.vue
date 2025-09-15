@@ -276,7 +276,6 @@
 <script setup lang="ts">
 import { ref, onMounted, reactive } from 'vue'
 import { useAuthStore } from '@/stores/auth'
-import { formatPrice } from '@/utils/currency'
 import {
   PlusIcon,
   ShoppingBagIcon,

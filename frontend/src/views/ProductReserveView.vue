@@ -639,7 +639,8 @@ const confirmReservation = async () => {
 
   } catch (error) {
     console.error('Network error:', error)
-    if (error.message.includes('NetworkError') || error.message.includes('Failed to fetch')) {
+    const errorMessage = error instanceof Error ? error.message : String(error)
+    if (errorMessage.includes('NetworkError') || errorMessage.includes('Failed to fetch')) {
       alert('Erreur de connexion au serveur. Vérifiez que le serveur backend fonctionne.')
     } else {
       alert('Erreur lors de la réservation. Veuillez réessayer.')
