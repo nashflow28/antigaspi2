@@ -69,6 +69,21 @@ Route::prefix('admin')->middleware(\App\Http\Middleware\ApiAuthMiddleware::class
     Route::get('/system-health', [AdminController::class, 'systemHealth']); // Santé du système
 });
 
+// Routes temporaires pour les tests (à sécuriser plus tard)
+Route::prefix('admin')->group(function () {
+    Route::get('/users', [\App\Http\Controllers\Admin\AdminUserController::class, 'index']);
+    Route::patch('/users/{id}/suspend', [\App\Http\Controllers\Admin\AdminUserController::class, 'suspend']);
+    Route::patch('/users/{id}/unsuspend', [\App\Http\Controllers\Admin\AdminUserController::class, 'unsuspend']);
+
+    // Merchant moderation routes
+    Route::get('/moderation', [\App\Http\Controllers\Admin\AdminMerchantController::class, 'moderation']);
+    Route::post('/merchants/{id}/approve', [\App\Http\Controllers\Admin\AdminMerchantController::class, 'approve']);
+    Route::post('/merchants/{id}/reject', [\App\Http\Controllers\Admin\AdminMerchantController::class, 'reject']);
+    Route::post('/products/{id}/approve', [\App\Http\Controllers\Admin\AdminMerchantController::class, 'approveProduct']);
+    Route::post('/products/{id}/reject', [\App\Http\Controllers\Admin\AdminMerchantController::class, 'rejectProduct']);
+    Route::post('/reservations/{id}/resolve', [\App\Http\Controllers\Admin\AdminMerchantController::class, 'resolveReservation']);
+});
+
 // Routes de test et informations
 Route::get('health', function () {
     return response()->json([
