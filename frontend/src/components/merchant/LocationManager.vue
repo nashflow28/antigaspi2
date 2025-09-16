@@ -74,7 +74,7 @@
       <!-- Modal -->
       <div class="flex min-h-full items-center justify-center p-4">
         <div
-          class="relative w-full max-w-md bg-white rounded-2xl shadow-xl transform transition-all"
+          class="relative w-full max-w-4xl bg-white rounded-2xl shadow-xl transform transition-all"
           @click.stop
         >
           <!-- Header -->
@@ -92,43 +92,108 @@
 
           <!-- Form -->
           <form @submit.prevent="saveLocation" class="px-6 py-6 space-y-4">
-            <div>
-              <label for="latitude" class="block text-sm font-medium text-gray-700 mb-2">
-                Latitude *
-              </label>
-              <input
-                id="latitude"
-                v-model.number="form.latitude"
-                type="number"
-                step="0.000001"
-                min="-90"
-                max="90"
-                required
-                class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                placeholder="Ex: 5.3474"
-              />
+            <!-- Map Selection Mode Toggle -->
+            <div class="flex items-center justify-center space-x-4 mb-4">
+              <button
+                type="button"
+                @click="mapSelectionMode = false"
+                :class="!mapSelectionMode ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700'"
+                class="px-4 py-2 rounded-lg font-medium transition-colors"
+              >
+                Coordonnées manuelles
+              </button>
+              <button
+                type="button"
+                @click="toggleMapSelection"
+                :class="mapSelectionMode ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700'"
+                class="px-4 py-2 rounded-lg font-medium transition-colors"
+              >
+                Sélection sur carte
+              </button>
             </div>
 
-            <div>
-              <label for="longitude" class="block text-sm font-medium text-gray-700 mb-2">
-                Longitude *
-              </label>
-              <input
-                id="longitude"
-                v-model.number="form.longitude"
-                type="number"
-                step="0.000001"
-                min="-180"
-                max="180"
-                required
-                class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                placeholder="Ex: -3.9857"
-              />
+            <!-- Map Selection -->
+            <div v-if="mapSelectionMode" class="mb-4">
+              <div class="mb-2 flex items-center justify-between">
+                <label class="block text-sm font-medium text-gray-700">
+                  Cliquez sur la carte pour choisir votre position
+                </label>
+                <button
+                  type="button"
+                  @click="centerOnCurrentPosition"
+                  class="text-blue-600 hover:text-blue-700 text-sm flex items-center space-x-1"
+                >
+                  <MapPin class="w-4 h-4" />
+                  <span>Ma position</span>
+                </button>
+              </div>
+              <div
+                ref="mapContainer"
+                class="w-full h-64 rounded-lg border border-gray-300 bg-gray-100"
+                style="min-height: 300px;"
+              >
+                <!-- Map will be loaded here -->
+              </div>
+            </div>
+
+            <!-- Manual Coordinates (only show when not in map mode) -->
+            <div v-else class="space-y-4">
+              <div>
+                <label for="latitude" class="block text-sm font-medium text-gray-700 mb-2">
+                  Latitude *
+                </label>
+                <input
+                  id="latitude"
+                  v-model.number="form.latitude"
+                  type="number"
+                  step="0.000001"
+                  min="-90"
+                  max="90"
+                  required
+                  class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  placeholder="Ex: 5.3474"
+                />
+              </div>
+
+              <div>
+                <label for="longitude" class="block text-sm font-medium text-gray-700 mb-2">
+                  Longitude *
+                </label>
+                <input
+                  id="longitude"
+                  v-model.number="form.longitude"
+                  type="number"
+                  step="0.000001"
+                  min="-180"
+                  max="180"
+                  required
+                  class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  placeholder="Ex: -3.9857"
+                />
+              </div>
+            </div>
+
+            <!-- Current Selection Display -->
+            <div v-if="form.latitude && form.longitude" class="bg-green-50 rounded-lg p-3 border border-green-200">
+              <div class="flex items-center space-x-2 mb-2">
+                <CheckCircle class="w-5 h-5 text-green-600" />
+                <span class="font-medium text-green-800">Position sélectionnée</span>
+              </div>
+              <div class="text-sm text-green-700 grid grid-cols-2 gap-2">
+                <div>
+                  <strong>Latitude:</strong> {{ form.latitude.toFixed(6) }}
+                </div>
+                <div>
+                  <strong>Longitude:</strong> {{ form.longitude.toFixed(6) }}
+                </div>
+              </div>
             </div>
 
             <div class="bg-blue-50 rounded-lg p-3">
               <p class="text-sm text-blue-700">
-                <strong>Astuce :</strong> Utilisez le bouton "Me localiser" pour obtenir automatiquement vos coordonnées GPS.
+                <strong>Deux options :</strong><br>
+                • <strong>Coordonnées manuelles :</strong> Saisissez directement lat/long<br>
+                • <strong>Sélection sur carte :</strong> Cliquez sur votre emplacement exact
               </p>
             </div>
 
@@ -197,9 +262,10 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, nextTick } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 import { MapPin, RefreshCw, X, CheckCircle, XCircle, Info } from 'lucide-vue-next'
+import 'leaflet/dist/leaflet.css'
 
 const authStore = useAuthStore()
 
@@ -208,6 +274,10 @@ const loading = ref(false)
 const saving = ref(false)
 const showLocationModal = ref(false)
 const hasLocation = ref(false)
+const mapSelectionMode = ref(false)
+const mapContainer = ref<HTMLElement | null>(null)
+let map: any = null
+let marker: any = null
 
 const location = ref({
   latitude: null as number | null,
@@ -353,14 +423,149 @@ const saveLocation = async () => {
 
 const closeModal = () => {
   showLocationModal.value = false
+  mapSelectionMode.value = false
   form.value.latitude = location.value.latitude
   form.value.longitude = location.value.longitude
+
+  // Clean up map
+  if (map) {
+    map.remove()
+    map = null
+    marker = null
+  }
 }
 
 const openModal = () => {
   form.value.latitude = location.value.latitude
   form.value.longitude = location.value.longitude
   showLocationModal.value = true
+}
+
+// Map methods
+const toggleMapSelection = async () => {
+  mapSelectionMode.value = true
+
+  await nextTick()
+
+  if (mapContainer.value && !map) {
+    initializeMap()
+  }
+}
+
+const initializeMap = async () => {
+  if (!mapContainer.value) return
+
+  // Dynamically import Leaflet
+  const L = await import('leaflet')
+
+  // Default to Abidjan, Côte d'Ivoire if no location
+  const defaultLat = form.value.latitude || 5.3474
+  const defaultLng = form.value.longitude || -3.9857
+
+  // Initialize map
+  map = L.map(mapContainer.value).setView([defaultLat, defaultLng], 13)
+
+  // Add tile layer (OpenStreetMap)
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '© OpenStreetMap contributors'
+  }).addTo(map)
+
+  // Add marker if coordinates exist
+  if (form.value.latitude && form.value.longitude) {
+    marker = L.marker([form.value.latitude, form.value.longitude], {
+      draggable: true
+    }).addTo(map)
+
+    // Handle marker drag
+    marker.on('dragend', (e: any) => {
+      const position = e.target.getLatLng()
+      updateFormCoordinates(position.lat, position.lng)
+    })
+  }
+
+  // Handle map click
+  map.on('click', (e: any) => {
+    const { lat, lng } = e.latlng
+    updateFormCoordinates(lat, lng)
+
+    // Remove existing marker
+    if (marker) {
+      map.removeLayer(marker)
+    }
+
+    // Add new marker
+    marker = L.marker([lat, lng], {
+      draggable: true
+    }).addTo(map)
+
+    // Handle new marker drag
+    marker.on('dragend', (e: any) => {
+      const position = e.target.getLatLng()
+      updateFormCoordinates(position.lat, position.lng)
+    })
+  })
+}
+
+const updateFormCoordinates = (lat: number, lng: number) => {
+  form.value.latitude = parseFloat(lat.toFixed(6))
+  form.value.longitude = parseFloat(lng.toFixed(6))
+}
+
+const centerOnCurrentPosition = async () => {
+  if (!navigator.geolocation) {
+    showNotification('error', 'Géolocalisation non supportée', 'Votre navigateur ne supporte pas la géolocalisation')
+    return
+  }
+
+  navigator.geolocation.getCurrentPosition(
+    async (position) => {
+      const lat = position.coords.latitude
+      const lng = position.coords.longitude
+
+      if (map) {
+        map.setView([lat, lng], 15)
+        updateFormCoordinates(lat, lng)
+
+        // Remove existing marker and add new one
+        if (marker) {
+          map.removeLayer(marker)
+        }
+
+        // Dynamically import Leaflet again
+        const L = await import('leaflet')
+        if (L) {
+          marker = L.marker([lat, lng], {
+            draggable: true
+          }).addTo(map)
+
+          marker.on('dragend', (e: any) => {
+            const position = e.target.getLatLng()
+            updateFormCoordinates(position.lat, position.lng)
+          })
+        }
+      }
+    },
+    (error) => {
+      let message = 'Impossible d\'obtenir votre position'
+      switch (error.code) {
+        case error.PERMISSION_DENIED:
+          message = 'Autorisation de géolocalisation refusée'
+          break
+        case error.POSITION_UNAVAILABLE:
+          message = 'Position non disponible'
+          break
+        case error.TIMEOUT:
+          message = 'Délai de géolocalisation dépassé'
+          break
+      }
+      showNotification('error', 'Erreur de géolocalisation', message)
+    },
+    {
+      enableHighAccuracy: true,
+      timeout: 10000,
+      maximumAge: 0
+    }
+  )
 }
 
 // Lifecycle
