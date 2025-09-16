@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\ProductController;
 use App\Http\Controllers\Api\ReservationController;
 use App\Http\Controllers\Api\AdminController;
 use App\Http\Controllers\Api\MerchantController;
+use App\Http\Controllers\Api\ReviewController;
 use App\Http\Controllers\CategoryController;
 
 /*
@@ -75,6 +76,21 @@ Route::prefix('merchants')->middleware(\App\Http\Middleware\ApiAuthMiddleware::c
 // Routes publiques des commerçants
 Route::prefix('merchants')->group(function () {
     Route::get('/nearby', [MerchantController::class, 'nearby']); // Commerçants à proximité
+});
+
+// Routes des avis
+Route::prefix('reviews')->group(function () {
+    // Routes publiques
+    Route::get('/', [ReviewController::class, 'index']); // Liste des avis (avec filtres)
+    Route::get('/stats', [ReviewController::class, 'stats']); // Statistiques d'avis pour un commerçant
+
+    // Routes protégées (création/modification/suppression)
+    Route::middleware(\App\Http\Middleware\ApiAuthMiddleware::class)->group(function () {
+        Route::post('/', [ReviewController::class, 'store']); // Créer un avis
+        Route::get('/{review}', [ReviewController::class, 'show']); // Voir les détails de son avis
+        Route::put('/{review}', [ReviewController::class, 'update']); // Modifier son avis
+        Route::delete('/{review}', [ReviewController::class, 'destroy']); // Supprimer son avis
+    });
 });
 
 // Routes administrateur (protégées)

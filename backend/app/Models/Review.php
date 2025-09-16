@@ -18,6 +18,8 @@ class Review extends Model
         'title',
         'comment',
         'is_verified_purchase',
+        'is_approved',
+        'approved_at',
     ];
 
     protected function casts(): array
@@ -25,6 +27,8 @@ class Review extends Model
         return [
             'rating' => 'integer',
             'is_verified_purchase' => 'boolean',
+            'is_approved' => 'boolean',
+            'approved_at' => 'datetime',
         ];
     }
 
@@ -58,5 +62,31 @@ class Review extends Model
     public function scopeByMerchant($query, $merchantId)
     {
         return $query->where('merchant_id', $merchantId);
+    }
+
+    public function scopeApproved($query)
+    {
+        return $query->where('is_approved', true);
+    }
+
+    public function scopePending($query)
+    {
+        return $query->where('is_approved', false);
+    }
+
+    public function scopeRecent($query)
+    {
+        return $query->orderBy('created_at', 'desc');
+    }
+
+    // Accessors
+    public function getStarsAttribute()
+    {
+        return str_repeat('★', $this->rating) . str_repeat('☆', 5 - $this->rating);
+    }
+
+    public function getTimeAgoAttribute()
+    {
+        return $this->created_at->diffForHumans();
     }
 }

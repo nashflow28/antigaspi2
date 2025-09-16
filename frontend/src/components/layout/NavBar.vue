@@ -43,6 +43,15 @@
             <div class="absolute inset-0 bg-gradient-primary opacity-0 group-hover:opacity-10 rounded-lg transition-opacity duration-200"></div>
           </router-link>
 
+          <router-link
+            to="/reviews"
+            class="nav-link relative group"
+            active-class="nav-link-active"
+          >
+            <span class="relative z-10">Avis</span>
+            <div class="absolute inset-0 bg-gradient-primary opacity-0 group-hover:opacity-10 rounded-lg transition-opacity duration-200"></div>
+          </router-link>
+
           <!-- Dark Mode Toggle -->
           <DarkModeToggle />
 

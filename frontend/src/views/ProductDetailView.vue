@@ -218,17 +218,19 @@
             <h3 class="text-lg font-semibold text-yellow-900">Évaluation</h3>
           </div>
           <div class="space-y-2">
-            <div class="flex items-center gap-2">
+            <div v-if="merchantStats" class="flex items-center gap-2">
               <div class="flex">
-                <Star class="w-4 h-4 text-yellow-500 fill-current" />
-                <Star class="w-4 h-4 text-yellow-500 fill-current" />
-                <Star class="w-4 h-4 text-yellow-500 fill-current" />
-                <Star class="w-4 h-4 text-yellow-500 fill-current" />
-                <Star class="w-4 h-4 text-yellow-300" />
+                <Star
+                  v-for="star in 5"
+                  :key="star"
+                  class="w-4 h-4"
+                  :class="star <= Math.round(merchantStats.average_rating) ? 'text-yellow-500 fill-current' : 'text-yellow-300'"
+                />
               </div>
-              <span class="text-sm text-yellow-800 font-medium">4.2/5</span>
+              <span class="text-sm text-yellow-800 font-medium">{{ merchantStats.average_rating }}/5</span>
             </div>
-            <p class="text-sm text-yellow-800">Basé sur 127 avis</p>
+            <p v-if="merchantStats" class="text-sm text-yellow-800">Basé sur {{ merchantStats.total_reviews }} avis</p>
+            <p v-else class="text-sm text-yellow-800">Aucun avis pour le moment</p>
           </div>
         </div>
 
@@ -250,6 +252,67 @@
           </div>
         </div>
       </div>
+
+      <!-- Reviews Section -->
+      <div class="mt-16 space-y-8">
+        <div class="text-center">
+          <h2 class="text-3xl font-bold text-neutral-900 mb-4">Avis clients</h2>
+          <p class="text-neutral-600 max-w-2xl mx-auto">
+            Découvrez les avis des consommateurs qui ont acheté ce produit ou visité ce commerçant.
+          </p>
+        </div>
+
+        <!-- Review Form for Authenticated Consumers -->
+        <div v-if="authStore.isAuthenticated && authStore.isConsumer && product">
+          <div class="max-w-4xl mx-auto">
+            <ReviewForm
+              :merchant-id="product.merchant.id"
+              :product-id="product.id"
+              :available-products="[{ id: product.id, name: product.name }]"
+              @success="onReviewSuccess"
+            />
+          </div>
+        </div>
+
+        <!-- Login prompt for unauthenticated users -->
+        <div v-else-if="!authStore.isAuthenticated" class="max-w-4xl mx-auto">
+          <div class="bg-yellow-50 border border-yellow-200 rounded-2xl p-6">
+            <div class="flex items-center space-x-3">
+              <Info class="w-6 h-6 text-yellow-600" />
+              <div>
+                <h3 class="text-lg font-medium text-yellow-800">Connexion requise</h3>
+                <p class="text-yellow-700">
+                  Connectez-vous pour laisser un avis sur ce produit ou ce commerçant.
+                </p>
+                <div class="mt-3 space-x-3">
+                  <router-link
+                    to="/login"
+                    class="inline-flex items-center px-4 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 transition-colors"
+                  >
+                    Se connecter
+                  </router-link>
+                  <router-link
+                    to="/register"
+                    class="inline-flex items-center px-4 py-2 border border-yellow-600 text-yellow-700 rounded-lg hover:bg-yellow-50 transition-colors"
+                  >
+                    S'inscrire
+                  </router-link>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Reviews List -->
+        <div v-if="product" class="max-w-4xl mx-auto">
+          <ReviewsList
+            :merchant-id="product.merchant.id"
+            :product-id="product.id"
+            :key="`${product.merchant.id}-${product.id}`"
+            @stats-updated="updateMerchantStats"
+          />
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -257,6 +320,9 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { useAuthStore } from '@/stores/auth'
+import ReviewForm from '@/components/reviews/ReviewForm.vue'
+import ReviewsList from '@/components/reviews/ReviewsList.vue'
 import {
   Package,
   MapPin,
@@ -282,6 +348,7 @@ interface Product {
   discounted_price: number
   discount: number
   merchant: {
+    id: number
     name: string
     address: string
     distance: number
@@ -293,8 +360,20 @@ interface Product {
   image_url?: string
 }
 
+interface MerchantStats {
+  total_reviews: number
+  average_rating: number
+  verified_reviews: number
+  rating_distribution: Array<{
+    rating: number
+    count: number
+    percentage: number
+  }>
+}
+
 const route = useRoute()
 const router = useRouter()
+const authStore = useAuthStore()
 
 // State
 const product = ref<Product | null>(null)
@@ -302,6 +381,7 @@ const loading = ref(true)
 const error = ref(false)
 const selectedQuantity = ref(1)
 const reserving = ref(false)
+const merchantStats = ref<MerchantStats | null>(null)
 
 // Computed
 const availableQuantity = computed(() => {
@@ -388,6 +468,7 @@ const fetchProduct = async () => {
         discount: apiProduct.discount_percentage,
         category: getCategoryKey(apiProduct.category?.name),
         merchant: {
+          id: apiProduct.merchant?.id || 0,
           name: apiProduct.merchant?.business_name || 'Commerçant inconnu',
           address: apiProduct.merchant?.address || apiProduct.merchant?.city || 'Adresse non renseignée',
           distance: Math.random() * 5 // Simulated distance for now
@@ -438,6 +519,15 @@ const reserveProduct = async () => {
   } finally {
     reserving.value = false
   }
+}
+
+const updateMerchantStats = (stats: MerchantStats) => {
+  merchantStats.value = stats
+}
+
+const onReviewSuccess = (review: any) => {
+  // The ReviewsList component will automatically refresh
+  console.log('Review submitted successfully:', review)
 }
 
 // Lifecycle
