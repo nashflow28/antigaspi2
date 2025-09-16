@@ -34,6 +34,15 @@
             <div class="absolute inset-0 bg-gradient-primary opacity-0 group-hover:opacity-10 rounded-lg transition-opacity duration-200"></div>
           </router-link>
 
+          <router-link
+            to="/merchants/map"
+            class="nav-link relative group"
+            active-class="nav-link-active"
+          >
+            <span class="relative z-10">Carte</span>
+            <div class="absolute inset-0 bg-gradient-primary opacity-0 group-hover:opacity-10 rounded-lg transition-opacity duration-200"></div>
+          </router-link>
+
           <!-- Dark Mode Toggle -->
           <DarkModeToggle />
 
@@ -224,6 +233,14 @@
             @click="showMobileMenu = false"
           >
             Produits
+          </router-link>
+
+          <router-link
+            to="/merchants/map"
+            class="block text-neutral-600 hover:text-primary-600 font-medium py-2"
+            @click="showMobileMenu = false"
+          >
+            Carte
           </router-link>
 
           <template v-if="!authStore.isAuthenticated">

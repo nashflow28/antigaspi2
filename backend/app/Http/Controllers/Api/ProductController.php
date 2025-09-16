@@ -47,6 +47,27 @@ class ProductController extends Controller
                 $query->expiringSoon($request->expiring_soon ?: 2);
             }
 
+            // Filtre géographique "Près de moi"
+            if ($request->has('latitude') && $request->has('longitude')) {
+                $latitude = $request->latitude;
+                $longitude = $request->longitude;
+                $radiusKm = $request->get('radius', 10); // Rayon par défaut : 10km
+
+                $query->whereHas('merchant', function ($q) use ($latitude, $longitude, $radiusKm) {
+                    $q->whereNotNull('latitude')
+                      ->whereNotNull('longitude')
+                      ->selectRaw("
+                          merchants.*,
+                          (6371 * acos(cos(radians(?))
+                              * cos(radians(latitude))
+                              * cos(radians(longitude) - radians(?))
+                              + sin(radians(?))
+                              * sin(radians(latitude)))) AS distance
+                      ", [$latitude, $longitude, $latitude])
+                      ->having('distance', '<', $radiusKm);
+                });
+            }
+
             if ($request->has('search')) {
                 $search = $request->search;
                 $query->where(function ($q) use ($search) {
@@ -72,7 +93,41 @@ class ProductController extends Controller
             $products = $query->paginate($perPage);
 
             // Formater les données
-            $products->getCollection()->transform(function ($product) {
+            $products->getCollection()->transform(function ($product) use ($request) {
+                $merchantData = [
+                    'id' => $product->merchant->id,
+                    'business_name' => $product->merchant->business_name,
+                    'business_type' => $product->merchant->business_type,
+                    'city' => $product->merchant->user->city,
+                    'address' => $product->merchant->user->address,
+                    'phone' => $product->merchant->user->phone,
+                    'is_verified' => $product->merchant->is_verified,
+                    'latitude' => $product->merchant->latitude,
+                    'longitude' => $product->merchant->longitude,
+                ];
+
+                // Ajouter la distance si géolocalisation demandée
+                if ($request->has('latitude') && $request->has('longitude') &&
+                    $product->merchant->latitude && $product->merchant->longitude) {
+
+                    $userLat = $request->latitude;
+                    $userLng = $request->longitude;
+                    $merchantLat = $product->merchant->latitude;
+                    $merchantLng = $product->merchant->longitude;
+
+                    // Calcul distance avec formule haversine
+                    $earthRadius = 6371; // Rayon de la Terre en km
+                    $dLat = deg2rad($merchantLat - $userLat);
+                    $dLng = deg2rad($merchantLng - $userLng);
+                    $a = sin($dLat/2) * sin($dLat/2) +
+                         cos(deg2rad($userLat)) * cos(deg2rad($merchantLat)) *
+                         sin($dLng/2) * sin($dLng/2);
+                    $c = 2 * atan2(sqrt($a), sqrt(1-$a));
+                    $distance = $earthRadius * $c;
+
+                    $merchantData['distance_km'] = round($distance, 2);
+                }
+
                 return [
                     'id' => $product->id,
                     'name' => $product->name,
@@ -90,15 +145,7 @@ class ProductController extends Controller
                         'name' => $product->category->name,
                         'icon' => $product->category->icon,
                     ],
-                    'merchant' => [
-                        'id' => $product->merchant->id,
-                        'business_name' => $product->merchant->business_name,
-                        'business_type' => $product->merchant->business_type,
-                        'city' => $product->merchant->user->city,
-                        'address' => $product->merchant->user->address,
-                        'phone' => $product->merchant->user->phone,
-                        'is_verified' => $product->merchant->is_verified,
-                    ],
+                    'merchant' => $merchantData,
                     'created_at' => $product->created_at,
                 ];
             });

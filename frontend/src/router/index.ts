@@ -41,6 +41,12 @@ const router = createRouter({
       meta: { requiresAuth: true, roles: ['consumer'] }
     },
     {
+      path: '/merchants/map',
+      name: 'merchants-map',
+      component: () => import('@/views/MerchantsMapView.vue'),
+      meta: { requiresAuth: false }
+    },
+    {
       path: '/dashboard',
       name: 'dashboard',
       component: () => import('@/views/DashboardView.vue'),

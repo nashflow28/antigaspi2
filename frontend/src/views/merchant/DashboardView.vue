@@ -161,6 +161,9 @@
             </div>
           </div>
 
+          <!-- Location Manager -->
+          <LocationManager />
+
           <!-- Performance Card -->
           <div class="bg-white rounded-2xl shadow-lg border border-gray-100 p-6">
             <h2 class="text-xl font-semibold text-gray-900 mb-4">Performance</h2>
@@ -276,6 +279,7 @@
 <script setup lang="ts">
 import { ref, onMounted, reactive } from 'vue'
 import { useAuthStore } from '@/stores/auth'
+import LocationManager from '@/components/merchant/LocationManager.vue'
 import {
   PlusIcon,
   ShoppingBagIcon,

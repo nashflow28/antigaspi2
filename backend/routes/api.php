@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\ProductController;
 use App\Http\Controllers\Api\ReservationController;
 use App\Http\Controllers\Api\AdminController;
+use App\Http\Controllers\Api\MerchantController;
 use App\Http\Controllers\CategoryController;
 
 /*
@@ -63,6 +64,18 @@ Route::prefix('reservations')->middleware(\App\Http\Middleware\ApiAuthMiddleware
 
 // Routes des catégories (alternative)
 Route::get('categories', [ProductController::class, 'categories']);
+
+// Routes des commerçants (protégées)
+Route::prefix('merchants')->middleware(\App\Http\Middleware\ApiAuthMiddleware::class)->group(function () {
+    // Gestion de la géolocalisation
+    Route::get('/location', [MerchantController::class, 'getLocation']); // Obtenir coordonnées GPS
+    Route::put('/location', [MerchantController::class, 'updateLocation']); // Mettre à jour coordonnées GPS
+});
+
+// Routes publiques des commerçants
+Route::prefix('merchants')->group(function () {
+    Route::get('/nearby', [MerchantController::class, 'nearby']); // Commerçants à proximité
+});
 
 // Routes administrateur (protégées)
 Route::prefix('admin')->middleware(\App\Http\Middleware\ApiAuthMiddleware::class)->group(function () {

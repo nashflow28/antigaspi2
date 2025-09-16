@@ -57,14 +57,25 @@
 
           <!-- Distance Filter -->
           <div>
-            <label class="block text-sm font-medium text-neutral-700 mb-2">Distance max (km)</label>
-            <select v-model="filters.maxDistance" class="select w-full">
-              <option value="">Toutes distances</option>
-              <option value="1">1 km</option>
-              <option value="2">2 km</option>
-              <option value="5">5 km</option>
-              <option value="10">10 km</option>
-            </select>
+            <label class="block text-sm font-medium text-neutral-700 mb-2">Distance</label>
+            <div class="space-y-2">
+              <button
+                @click="enableLocationFilter"
+                :disabled="locationLoading"
+                class="w-full flex items-center justify-center gap-2 py-2 px-3 text-sm border border-primary-300 text-primary-700 bg-primary-50 hover:bg-primary-100 rounded-lg transition-colors disabled:opacity-50"
+              >
+                <MapPin class="w-4 h-4" :class="{ 'animate-pulse': locationLoading }" />
+                {{ locationLoading ? 'Localisation...' : (userLocation ? 'Position activée' : 'Près de moi') }}
+              </button>
+              <select v-model="filters.maxDistance" class="select w-full" :disabled="!userLocation">
+                <option value="">{{ userLocation ? 'Toutes distances' : 'Activez votre position' }}</option>
+                <option value="1">1 km</option>
+                <option value="2">2 km</option>
+                <option value="5">5 km</option>
+                <option value="10">10 km</option>
+                <option value="20">20 km</option>
+              </select>
+            </div>
           </div>
 
           <!-- Price Range -->
@@ -158,7 +169,7 @@
 import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import ProductCard from '@/components/product/ProductCard.vue'
-import { Search, Filter, Package } from 'lucide-vue-next'
+import { Search, Filter, Package, MapPin } from 'lucide-vue-next'
 
 interface Product {
   id: number
@@ -193,6 +204,10 @@ const filters = ref({
   maxPrice: '',
   minDiscount: ''
 })
+
+// Geolocation state
+const userLocation = ref<{ latitude: number; longitude: number } | null>(null)
+const locationLoading = ref(false)
 
 // Computed
 const activeFiltersCount = computed(() => {
@@ -243,7 +258,20 @@ const fetchProducts = async () => {
   try {
     loading.value = true
 
-    const response = await fetch('http://localhost:8000/api/products', {
+    // Build URL with location parameters if available
+    let url = 'http://localhost:8000/api/products'
+    const params = new URLSearchParams()
+
+    if (userLocation.value) {
+      params.append('latitude', userLocation.value.latitude.toString())
+      params.append('longitude', userLocation.value.longitude.toString())
+    }
+
+    if (params.toString()) {
+      url += '?' + params.toString()
+    }
+
+    const response = await fetch(url, {
       method: 'GET',
       headers: {
         'Accept': 'application/json',
@@ -270,7 +298,7 @@ const fetchProducts = async () => {
         merchant: {
           name: product.merchant?.business_name || 'Commerçant inconnu',
           address: product.merchant?.address || product.merchant?.city || 'Adresse non renseignée',
-          distance: Math.random() * 5 // Simulated distance for now
+          distance: product.merchant?.distance_km || null
         },
         expires_at: new Date(product.expiration_date),
         available_quantity: product.quantity_available,
@@ -316,6 +344,51 @@ const viewProduct = (product: Product) => {
 
 const reserveProduct = (product: Product) => {
   router.push(`/products/${product.id}/reserve`)
+}
+
+const enableLocationFilter = () => {
+  if (!navigator.geolocation) {
+    alert('La géolocalisation n\'est pas supportée par votre navigateur')
+    return
+  }
+
+  locationLoading.value = true
+
+  navigator.geolocation.getCurrentPosition(
+    (position) => {
+      userLocation.value = {
+        latitude: position.coords.latitude,
+        longitude: position.coords.longitude
+      }
+      locationLoading.value = false
+
+      // Reload products with location for distance calculation
+      fetchProducts()
+    },
+    (error) => {
+      locationLoading.value = false
+      let message = 'Impossible d\'obtenir votre position'
+
+      switch (error.code) {
+        case error.PERMISSION_DENIED:
+          message = 'Autorisation de géolocalisation refusée'
+          break
+        case error.POSITION_UNAVAILABLE:
+          message = 'Position non disponible'
+          break
+        case error.TIMEOUT:
+          message = 'Délai de géolocalisation dépassé'
+          break
+      }
+
+      alert(message)
+    },
+    {
+      enableHighAccuracy: true,
+      timeout: 10000,
+      maximumAge: 300000 // 5 minutes
+    }
+  )
 }
 
 // Lifecycle
