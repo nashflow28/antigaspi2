@@ -334,7 +334,7 @@ class ProductController extends Controller
                 'original_price' => 'sometimes|numeric|min:0',
                 'discounted_price' => 'sometimes|numeric|min:0',
                 'quantity_available' => 'sometimes|integer|min:0',
-                'expiration_date' => 'sometimes|date|after:today',
+                'expiration_date' => 'sometimes|date',
                 'image_url' => 'sometimes|string',
                 'is_active' => 'sometimes|boolean',
             ]);

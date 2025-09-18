@@ -165,41 +165,62 @@
                 <template v-if="authStore.isMerchant">
                   <router-link
                     to="/merchant/products"
-                    class="block px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100"
+                    class="flex items-center px-4 py-3 text-sm text-neutral-700 hover:bg-gradient-primary hover:text-white transition-all duration-200 group"
                     @click="showUserMenu = false"
                   >
-                    Mes produits
+                    <Package class="w-4 h-4 mr-3 group-hover:text-white" />
+                    <span>Mes produits</span>
                   </router-link>
                   <router-link
                     to="/merchant/reservations"
-                    class="block px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100"
+                    class="flex items-center px-4 py-3 text-sm text-neutral-700 hover:bg-gradient-primary hover:text-white transition-all duration-200 group"
                     @click="showUserMenu = false"
                   >
-                    Réservations reçues
+                    <ShoppingBag class="w-4 h-4 mr-3 group-hover:text-white" />
+                    <span>Réservations reçues</span>
+                  </router-link>
+                  <router-link
+                    to="/merchant/reviews/dashboard"
+                    class="flex items-center px-4 py-3 text-sm text-neutral-700 hover:bg-gradient-primary hover:text-white transition-all duration-200 group"
+                    @click="showUserMenu = false"
+                  >
+                    <MessageSquare class="w-4 h-4 mr-3 group-hover:text-white" />
+                    <span>Mes avis</span>
                   </router-link>
                 </template>
 
                 <template v-if="authStore.isAdmin">
                   <router-link
                     to="/admin/users"
-                    class="block px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100"
+                    class="flex items-center px-4 py-3 text-sm text-neutral-700 hover:bg-gradient-primary hover:text-white transition-all duration-200 group"
                     @click="showUserMenu = false"
                   >
-                    Utilisateurs
+                    <User class="w-4 h-4 mr-3 group-hover:text-white" />
+                    <span>Utilisateurs</span>
                   </router-link>
                   <router-link
                     to="/admin/merchants"
-                    class="block px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100"
+                    class="flex items-center px-4 py-3 text-sm text-neutral-700 hover:bg-gradient-primary hover:text-white transition-all duration-200 group"
                     @click="showUserMenu = false"
                   >
-                    Commerçants
+                    <ShoppingBag class="w-4 h-4 mr-3 group-hover:text-white" />
+                    <span>Commerçants</span>
                   </router-link>
                   <router-link
                     to="/admin/categories"
-                    class="block px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100"
+                    class="flex items-center px-4 py-3 text-sm text-neutral-700 hover:bg-gradient-primary hover:text-white transition-all duration-200 group"
                     @click="showUserMenu = false"
                   >
-                    Catégories
+                    <Package class="w-4 h-4 mr-3 group-hover:text-white" />
+                    <span>Catégories</span>
+                  </router-link>
+                  <router-link
+                    to="/admin/reviews"
+                    class="flex items-center px-4 py-3 text-sm text-neutral-700 hover:bg-gradient-primary hover:text-white transition-all duration-200 group"
+                    @click="showUserMenu = false"
+                  >
+                    <MessageSquare class="w-4 h-4 mr-3 group-hover:text-white" />
+                    <span>Modération avis</span>
                   </router-link>
                 </template>
 
@@ -221,74 +242,9 @@
           </template>
         </div>
 
-        <!-- Mobile menu button - Design moderne -->
+        <!-- Mobile Navigation -->
         <div class="md:hidden flex items-center">
-          <button
-            @click="showMobileMenu = !showMobileMenu"
-            class="p-2 rounded-xl text-neutral-600 hover:text-primary-600 hover:bg-primary-50 transition-all duration-200 focus-visible:ring-2 focus-visible:ring-primary-500"
-          >
-            <Menu v-if="!showMobileMenu" class="w-6 h-6" />
-            <X v-else class="w-6 h-6" />
-          </button>
-        </div>
-      </div>
-
-      <!-- Mobile Navigation -->
-      <div v-show="showMobileMenu" class="md:hidden py-4 border-t border-neutral-200">
-        <div class="space-y-2">
-          <router-link
-            to="/products"
-            class="block text-neutral-600 hover:text-primary-600 font-medium py-2"
-            @click="showMobileMenu = false"
-          >
-            Produits
-          </router-link>
-
-          <router-link
-            to="/merchants/map"
-            class="block text-neutral-600 hover:text-primary-600 font-medium py-2"
-            @click="showMobileMenu = false"
-          >
-            Carte
-          </router-link>
-
-          <template v-if="!authStore.isAuthenticated">
-            <router-link
-              to="/login"
-              class="block text-neutral-600 hover:text-primary-600 font-medium py-2"
-              @click="showMobileMenu = false"
-            >
-              Connexion
-            </router-link>
-            <router-link
-              to="/register"
-              class="block text-primary-600 font-medium py-2"
-              @click="showMobileMenu = false"
-            >
-              S'inscrire
-            </router-link>
-          </template>
-
-          <template v-else>
-            <div class="pt-2 border-t border-neutral-200">
-              <div class="text-sm text-neutral-500 mb-2">
-                Connecté en tant que {{ authStore.user?.first_name }}
-              </div>
-              <router-link
-                :to="authStore.user?.role === 'merchant' ? '/merchant/dashboard' : '/dashboard'"
-                class="block text-neutral-600 hover:text-primary-600 py-2"
-                @click="showMobileMenu = false"
-              >
-                Tableau de bord
-              </router-link>
-              <button
-                @click="handleLogout"
-                class="block w-full text-left text-red-600 hover:text-red-700 py-2"
-              >
-                Se déconnecter
-              </button>
-            </div>
-          </template>
+          <MobileNav />
         </div>
       </div>
     </div>
@@ -299,14 +255,14 @@
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
-import { LogIn, UserPlus, User, Settings, LogOut, Menu, X, ChevronDown } from 'lucide-vue-next'
+import { LogIn, UserPlus, User, Settings, LogOut, ChevronDown, Package, ShoppingBag, MessageSquare } from 'lucide-vue-next'
 import DarkModeToggle from '@/components/ui/DarkModeToggle.vue'
+import MobileNav from '@/components/layout/MobileNav.vue'
 
 const router = useRouter()
 const authStore = useAuthStore()
 
 const showUserMenu = ref(false)
-const showMobileMenu = ref(false)
 const userMenuRef = ref<HTMLElement>()
 
 const userInitials = computed(() => {
@@ -318,7 +274,6 @@ const userInitials = computed(() => {
 
 const handleLogout = async () => {
   showUserMenu.value = false
-  showMobileMenu.value = false
   await authStore.logout()
   router.push('/')
 }

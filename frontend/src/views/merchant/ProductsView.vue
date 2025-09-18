@@ -388,6 +388,55 @@
         </form>
       </div>
     </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div
+      v-if="showDeleteConfirmModal"
+      class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
+      @click="cancelDelete"
+    >
+      <div
+        class="bg-white rounded-2xl p-6 max-w-md w-full shadow-2xl transform transition-all scale-100 hover:scale-105"
+        @click.stop
+      >
+        <div class="text-center">
+          <!-- Icon -->
+          <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100 mb-4">
+            <svg class="h-6 w-6 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
+            </svg>
+          </div>
+
+          <!-- Title -->
+          <h3 class="text-lg font-semibold text-gray-900 mb-2">
+            Supprimer le produit
+          </h3>
+
+          <!-- Message -->
+          <p class="text-gray-600 mb-6">
+            Êtes-vous sûr de vouloir supprimer
+            <span class="font-semibold text-gray-900">"{{ productToDelete?.name }}"</span> ?
+            Cette action est irréversible.
+          </p>
+
+          <!-- Buttons -->
+          <div class="flex space-x-3">
+            <button
+              @click="cancelDelete"
+              class="flex-1 px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors duration-200"
+            >
+              Annuler
+            </button>
+            <button
+              @click="confirmDelete"
+              class="flex-1 px-4 py-2 text-sm font-medium text-white bg-red-600 hover:bg-red-700 rounded-lg transition-colors duration-200 focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+            >
+              Supprimer
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -395,6 +444,7 @@
 import { ref, computed, onMounted } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 import { useRoute } from 'vue-router'
+import { notify } from '@/composables/useNotifications'
 import {
   PlusIcon,
   MagnifyingGlassIcon,
@@ -417,6 +467,8 @@ const activeFilter = ref('all')
 const sortBy = ref('created_at')
 const showAddProductModal = ref(false)
 const showEditProductModal = ref(false)
+const showDeleteConfirmModal = ref(false)
+const productToDelete = ref<any>(null)
 const isSubmitting = ref(false)
 
 // Product form
@@ -582,7 +634,7 @@ const handleImageUpload = (event: Event) => {
 
     // Vérifier la taille du fichier (max 2MB)
     if (file.size > 2 * 1024 * 1024) {
-      alert('L\'image est trop volumineuse. Veuillez choisir une image de moins de 2MB.')
+      notify.warning('L\'image est trop volumineuse. Veuillez choisir une image de moins de 2MB.')
       return
     }
 
@@ -631,11 +683,10 @@ const saveProduct = async () => {
 
     // Vérifier que l'utilisateur est connecté
     if (!authStore.token) {
-      alert('Vous devez être connecté pour ajouter un produit.')
+      notify.error('Vous devez être connecté pour ajouter un produit.', 'Authentification requise')
       return
     }
 
-    console.log('Token present:', !!authStore.token)
 
     if (showAddProductModal.value) {
       // Créer un nouveau produit via l'API
@@ -650,7 +701,6 @@ const saveProduct = async () => {
         image_url: productForm.value.image_url || null
       }
 
-      console.log('Creating product:', productData)
 
       const response = await fetch('http://localhost:8000/api/products', {
         method: 'POST',
@@ -664,12 +714,10 @@ const saveProduct = async () => {
 
       if (!response.ok) {
         const errorData = await response.json()
-        console.error('API Error:', errorData)
         throw new Error(`HTTP error! status: ${response.status}`)
       }
 
       const result = await response.json()
-      console.log('Product created:', result)
 
       // Recharger la liste des produits
       await loadProducts()
@@ -727,7 +775,6 @@ const saveProduct = async () => {
       }
 
       const result = await response.json()
-      console.log('Product updated:', result)
 
       await loadProducts()
     }
@@ -735,18 +782,14 @@ const saveProduct = async () => {
     closeModals()
 
   } catch (error) {
-    console.error('Error saving product:', error)
-    console.error('Error type:', typeof error)
     const errorMessage = error instanceof Error ? error.message : String(error)
-    console.error('Error name:', error instanceof Error ? error.name : 'Unknown')
-    console.error('Error message:', errorMessage)
 
     if (errorMessage.includes('NetworkError') || errorMessage.includes('Failed to fetch')) {
-      alert('Erreur de connexion au serveur. Vérifiez que le serveur backend fonctionne.')
+      notify.error('Erreur de connexion au serveur. Vérifiez que le serveur backend fonctionne.', 'Erreur réseau')
     } else if (errorMessage.includes('401')) {
-      alert('Session expirée. Veuillez vous reconnecter.')
+      notify.error('Session expirée. Veuillez vous reconnecter.', 'Authentification requise')
     } else {
-      alert('Erreur lors de l\'enregistrement du produit. Détails dans la console.')
+      notify.error('Erreur lors de l\'enregistrement du produit.')
     }
   } finally {
     isSubmitting.value = false
@@ -763,17 +806,29 @@ const toggleProductStatus = async (product: any) => {
 }
 
 const deleteProduct = async (product: any) => {
-  if (confirm(`Êtes-vous sûr de vouloir supprimer "${product.name}" ?`)) {
+  productToDelete.value = product
+  showDeleteConfirmModal.value = true
+}
+
+const confirmDelete = async () => {
+  if (productToDelete.value) {
     try {
-      const index = products.value.findIndex(p => p.id === product.id)
+      const index = products.value.findIndex(p => p.id === productToDelete.value.id)
       if (index !== -1) {
         products.value.splice(index, 1)
       }
-      console.log('Deleted product:', product.id)
+      console.log('Deleted product:', productToDelete.value.id)
     } catch (error) {
       console.error('Error deleting product:', error)
     }
   }
+  showDeleteConfirmModal.value = false
+  productToDelete.value = null
+}
+
+const cancelDelete = () => {
+  showDeleteConfirmModal.value = false
+  productToDelete.value = null
 }
 
 const loadProducts = async () => {

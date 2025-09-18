@@ -10,6 +10,7 @@
 
     <!-- Global Notifications -->
     <NotificationContainer />
+    <NotificationSystem />
 
     <!-- Background Pattern -->
     <div class="fixed inset-0 -z-10 opacity-20 dark:opacity-10">
@@ -26,6 +27,7 @@ import { onMounted } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 import NavBar from '@/components/layout/NavBar.vue'
 import NotificationContainer from '@/components/ui/NotificationContainer.vue'
+import NotificationSystem from '@/components/ui/NotificationSystem.vue'
 
 const authStore = useAuthStore()
 

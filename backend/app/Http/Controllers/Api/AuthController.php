@@ -5,14 +5,26 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Models\Merchant;
+use App\Models\RefreshToken;
+use App\Services\JwtSecurityService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\RateLimiter;
 use Tymon\JWTAuth\Facades\JWTAuth;
 
 class AuthController extends Controller
 {
+    private JwtSecurityService $jwtService;
+
+    public function __construct(JwtSecurityService $jwtService)
+    {
+        $this->jwtService = $jwtService;
+    }
+
     public function register(Request $request): JsonResponse
     {
         $validator = Validator::make($request->all(), [
@@ -252,6 +264,269 @@ class AuthController extends Controller
                 'message' => 'Erreur lors du rafraîchissement du token',
                 'error' => $e->getMessage()
             ], 401);
+        }
+    }
+
+    /**
+     * Connexion sécurisée avec rate limiting et détection d'anomalies
+     */
+    public function secureLogin(Request $request): JsonResponse
+    {
+        // Rate limiting par IP
+        $key = 'login_attempts:' . $request->ip();
+        if (RateLimiter::tooManyAttempts($key, 5)) {
+            $remainingTime = RateLimiter::availableIn($key);
+
+            Log::warning('Too many login attempts', [
+                'ip' => $request->ip(),
+                'remaining_time' => $remainingTime,
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => "Trop de tentatives. Réessayez dans {$remainingTime} secondes.",
+                'retry_after' => $remainingTime
+            ], 429);
+        }
+
+        $validator = Validator::make($request->all(), [
+            'email' => 'required|email',
+            'password' => 'required|min:6',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Données invalides',
+                'errors' => $validator->errors()
+            ], 422);
+        }
+
+        try {
+            $user = User::where('email', $request->email)->first();
+
+            if (!$user || !Hash::check($request->password, $user->password)) {
+                RateLimiter::hit($key, 300); // 5 minutes
+
+                Log::warning('Failed login attempt', [
+                    'email' => $request->email,
+                    'ip' => $request->ip(),
+                    'user_agent' => $request->userAgent(),
+                ]);
+
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Identifiants incorrects'
+                ], 401);
+            }
+
+            // Vérifier le statut du compte
+            if ($user->status !== 'active') {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Compte suspendu ou inactif'
+                ], 403);
+            }
+
+            // Générer les tokens sécurisés
+            $tokenData = $this->jwtService->generateTokenPair($user, $request);
+
+            // Effacer les tentatives de connexion après succès
+            RateLimiter::clear($key);
+
+            // Log connexion réussie
+            Log::info('Successful login', [
+                'user_id' => $user->id,
+                'email' => $user->email,
+                'ip' => $request->ip(),
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Connexion réussie',
+                'data' => $tokenData
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('Login error', [
+                'error' => $e->getMessage(),
+                'email' => $request->email,
+                'ip' => $request->ip(),
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Erreur lors de la connexion',
+            ], 500);
+        }
+    }
+
+    /**
+     * Rafraîchissement sécurisé du token
+     */
+    public function secureRefresh(Request $request): JsonResponse
+    {
+        $validator = Validator::make($request->all(), [
+            'refresh_token' => 'required|string',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Refresh token requis',
+                'errors' => $validator->errors()
+            ], 422);
+        }
+
+        try {
+            $tokenData = $this->jwtService->refreshToken(
+                $request->refresh_token,
+                $request
+            );
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Token rafraîchi avec succès',
+                'data' => $tokenData
+            ]);
+
+        } catch (\Exception $e) {
+            Log::warning('Failed token refresh', [
+                'error' => $e->getMessage(),
+                'ip' => $request->ip(),
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage()
+            ], 401);
+        }
+    }
+
+    /**
+     * Déconnexion sécurisée avec révocation du token
+     */
+    public function secureLogout(Request $request): JsonResponse
+    {
+        try {
+            $authHeader = $request->header('Authorization');
+            if ($authHeader && str_starts_with($authHeader, 'Bearer ')) {
+                $token = substr($authHeader, 7);
+                $payload = JWTAuth::setToken($token)->getPayload();
+                $jti = $payload->get('jti');
+
+                // Révoquer le token
+                $this->jwtService->revokeToken($jti);
+            }
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Déconnexion réussie'
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Erreur lors de la déconnexion'
+            ], 500);
+        }
+    }
+
+    /**
+     * Obtenir les sessions actives de l'utilisateur
+     */
+    public function getActiveSessions(Request $request): JsonResponse
+    {
+        try {
+            $user = $request->get('auth_user');
+            $sessions = $this->jwtService->getActiveSessions($user->id);
+
+            // Marquer la session actuelle
+            $currentPayload = $request->get('auth_payload');
+            $currentJti = $currentPayload['jti'] ?? null;
+
+            foreach ($sessions as &$session) {
+                if ($session['jti'] === $currentJti) {
+                    $session['is_current'] = true;
+                }
+            }
+
+            return response()->json([
+                'success' => true,
+                'data' => $sessions
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Erreur lors de la récupération des sessions'
+            ], 500);
+        }
+    }
+
+    /**
+     * Révoquer une session spécifique
+     */
+    public function revokeSession(Request $request): JsonResponse
+    {
+        $validator = Validator::make($request->all(), [
+            'session_id' => 'required|integer',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'errors' => $validator->errors()
+            ], 422);
+        }
+
+        try {
+            $user = $request->get('auth_user');
+            $success = $this->jwtService->revokeSession($user->id, $request->session_id);
+
+            if ($success) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Session révoquée avec succès'
+                ]);
+            } else {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Session non trouvée'
+                ], 404);
+            }
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Erreur lors de la révocation de la session'
+            ], 500);
+        }
+    }
+
+    /**
+     * Révoquer toutes les sessions sauf la session actuelle
+     */
+    public function revokeAllOtherSessions(Request $request): JsonResponse
+    {
+        try {
+            $user = $request->get('auth_user');
+            $currentPayload = $request->get('auth_payload');
+            $currentJti = $currentPayload['jti'];
+
+            // Révoquer toutes les autres sessions
+            RefreshToken::revokeUserTokensExcept($user->id, $currentJti);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Toutes les autres sessions ont été révoquées'
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Erreur lors de la révocation des sessions'
+            ], 500);
         }
     }
 }

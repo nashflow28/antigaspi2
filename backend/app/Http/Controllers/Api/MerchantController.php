@@ -187,4 +187,51 @@ class MerchantController extends Controller
             ], 500);
         }
     }
+
+    /**
+     * Récupère tous les commerçants avec leurs coordonnées
+     */
+    public function getAllWithLocation(): JsonResponse
+    {
+        try {
+            $merchants = Merchant::with(['user', 'products' => function ($query) {
+                    $query->active()->available();
+                }])
+                ->verified()
+                ->whereNotNull('latitude')
+                ->whereNotNull('longitude')
+                ->limit(100)
+                ->get();
+
+            $merchants->transform(function ($merchant) {
+                return [
+                    'id' => $merchant->id,
+                    'business_name' => $merchant->business_name,
+                    'business_type' => $merchant->business_type,
+                    'latitude' => floatval($merchant->latitude),
+                    'longitude' => floatval($merchant->longitude),
+                    'products_count' => $merchant->products->count(),
+                    'is_verified' => $merchant->is_verified,
+                    'user' => [
+                        'city' => $merchant->user->city,
+                        'address' => $merchant->user->address,
+                        'phone' => $merchant->user->phone,
+                    ]
+                ];
+            });
+
+            return response()->json([
+                'success' => true,
+                'data' => $merchants,
+                'total' => $merchants->count()
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Erreur lors de la récupération des commerçants',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
 }

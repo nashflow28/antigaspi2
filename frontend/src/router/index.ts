@@ -106,6 +106,18 @@ const router = createRouter({
       meta: { requiresAuth: true, roles: ['merchant'] }
     },
     {
+      path: '/merchant/reviews/dashboard',
+      name: 'merchant-reviews-dashboard',
+      component: () => import('@/views/merchant/ReviewsDashboard.vue'),
+      meta: { requiresAuth: true, roles: ['merchant'] }
+    },
+    {
+      path: '/merchant/reviews',
+      name: 'merchant-reviews',
+      component: () => import('@/views/merchant/ReviewsList.vue'),
+      meta: { requiresAuth: true, roles: ['merchant'] }
+    },
+    {
       path: '/admin',
       name: 'admin',
       redirect: '/admin/dashboard'
@@ -132,6 +144,12 @@ const router = createRouter({
       path: '/admin/categories',
       name: 'admin-categories',
       component: () => import('@/views/admin/CategoriesView.vue'),
+      meta: { requiresAuth: true, roles: ['admin'] }
+    },
+    {
+      path: '/admin/reviews',
+      name: 'admin-reviews',
+      component: () => import('@/views/admin/ReviewModeration.vue'),
       meta: { requiresAuth: true, roles: ['admin'] }
     },
     {

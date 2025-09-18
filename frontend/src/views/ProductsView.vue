@@ -170,6 +170,7 @@ import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import ProductCard from '@/components/product/ProductCard.vue'
 import { Search, Filter, Package, MapPin } from 'lucide-vue-next'
+import { notify } from '@/composables/useNotifications'
 
 interface Product {
   id: number
@@ -348,7 +349,7 @@ const reserveProduct = (product: Product) => {
 
 const enableLocationFilter = () => {
   if (!navigator.geolocation) {
-    alert('La géolocalisation n\'est pas supportée par votre navigateur')
+    notify.warning('La géolocalisation n\'est pas supportée par votre navigateur')
     return
   }
 
@@ -381,7 +382,7 @@ const enableLocationFilter = () => {
           break
       }
 
-      alert(message)
+      notify.error(message, 'Erreur de géolocalisation')
     },
     {
       enableHighAccuracy: true,

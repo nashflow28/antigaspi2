@@ -17,6 +17,9 @@ class Review extends Model
         'rating',
         'title',
         'comment',
+        'merchant_response',
+        'merchant_response_at',
+        'merchant_response_updated_at',
         'is_verified_purchase',
         'is_approved',
         'approved_at',
@@ -29,6 +32,8 @@ class Review extends Model
             'is_verified_purchase' => 'boolean',
             'is_approved' => 'boolean',
             'approved_at' => 'datetime',
+            'merchant_response_at' => 'datetime',
+            'merchant_response_updated_at' => 'datetime',
         ];
     }
 

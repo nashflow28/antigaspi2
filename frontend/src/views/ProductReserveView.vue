@@ -443,6 +443,7 @@ import {
   ArrowLeft, ArrowRight, Package, Clock, Minus, Plus, MapPin, Calendar,
   Phone, Store, HelpCircle, Mail, Loader2
 } from 'lucide-vue-next'
+import { notify } from '@/composables/useNotifications'
 
 const route = useRoute()
 const router = useRouter()
@@ -594,8 +595,6 @@ const confirmReservation = async () => {
       pickup_time: reservation.value.pickup_time || null
     }
 
-    console.log('Creating reservation:', reservationData)
-
     const response = await fetch('http://localhost:8000/api/reservations', {
       method: 'POST',
       headers: {
@@ -606,44 +605,37 @@ const confirmReservation = async () => {
       body: JSON.stringify(reservationData)
     })
 
-    console.log('Response status:', response.status)
-
     if (!response.ok) {
       const errorData = await response.json()
-      console.error('API Error Response:', errorData)
 
       if (response.status === 422) {
-        // Validation errors
         const errors = errorData.errors || {}
         const errorMessages = Object.values(errors).flat()
-        alert('Erreurs de validation:\n' + errorMessages.join('\n'))
+        notify.error(errorMessages.join('\n'), 'Erreurs de validation')
       } else if (response.status === 401) {
-        alert('Session expirée. Veuillez vous reconnecter.')
+        notify.error('Session expirée. Veuillez vous reconnecter.', 'Authentification requise')
         router.push('/login')
       } else {
-        alert(errorData.message || 'Erreur lors de la réservation. Veuillez réessayer.')
+        notify.error(errorData.message || 'Erreur lors de la réservation. Veuillez réessayer.')
       }
       return
     }
 
     const data = await response.json()
-    console.log('Reservation created:', data)
 
     if (data.success) {
-      // Redirection vers la page de confirmation avec l'ID réel de la réservation
-      alert(`Réservation confirmée ! ID: ${data.data.id}`)
-      router.push('/products') // For now, redirect to products page
+      notify.success(`Réservation confirmée ! ID: ${data.data.id}`, 'Succès')
+      router.push('/products')
     } else {
-      alert(data.message || 'Erreur lors de la réservation. Veuillez réessayer.')
+      notify.error(data.message || 'Erreur lors de la réservation. Veuillez réessayer.')
     }
 
   } catch (error) {
-    console.error('Network error:', error)
     const errorMessage = error instanceof Error ? error.message : String(error)
     if (errorMessage.includes('NetworkError') || errorMessage.includes('Failed to fetch')) {
-      alert('Erreur de connexion au serveur. Vérifiez que le serveur backend fonctionne.')
+      notify.error('Erreur de connexion au serveur. Vérifiez que le serveur backend fonctionne.', 'Erreur réseau')
     } else {
-      alert('Erreur lors de la réservation. Veuillez réessayer.')
+      notify.error('Erreur lors de la réservation. Veuillez réessayer.')
     }
   } finally {
     loading.value = false
@@ -700,7 +692,6 @@ const fetchProduct = async () => {
       productError.value = true
     }
   } catch (err) {
-    console.error('Erreur lors du chargement du produit:', err)
     productError.value = true
   } finally {
     loadingProduct.value = false

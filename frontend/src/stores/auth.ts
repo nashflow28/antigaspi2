@@ -78,10 +78,13 @@ export const useAuthStore = defineStore('auth', () => {
       loading.value = true
 
       if (token.value) {
-        await apiService.logout()
+        try {
+          await apiService.logout()
+        } catch (err: any) {
+          // Ignore logout API errors - token will be cleared locally anyway
+          // This can happen if token is already expired or invalid
+        }
       }
-    } catch (err: any) {
-      console.warn('Logout API call failed:', err.message)
     } finally {
       clearAuth()
       loading.value = false

@@ -85,7 +85,7 @@
                 @click="closeModal"
                 class="p-2 hover:bg-gray-100 rounded-lg transition-colors"
               >
-                <XMarkIcon class="w-5 h-5 text-gray-400" />
+                <X class="w-5 h-5 text-gray-400" />
               </button>
             </div>
           </div>

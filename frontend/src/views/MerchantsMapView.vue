@@ -7,7 +7,7 @@
           <div>
             <h1 class="text-3xl font-bold text-neutral-900">Carte des commerçants</h1>
             <p class="text-neutral-600 mt-1">
-              {{ merchants.length }} commerçant{{ merchants.length > 1 ? 's' : '' }} trouvé{{ merchants.length > 1 ? 's' : '' }}
+              {{ loading ? 'Chargement...' : `${merchants.length} commerçant${merchants.length > 1 ? 's' : ''} référencé${merchants.length > 1 ? 's' : ''}` }}
             </p>
           </div>
 
@@ -16,18 +16,18 @@
             <button
               @click="getCurrentLocation"
               :disabled="locationLoading"
-              class="btn btn-ghost flex items-center gap-2"
+              class="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
             >
-              <MapPin class="w-5 h-5" :class="{ 'animate-pulse': locationLoading }" />
+              <MapPin class="w-4 h-4 mr-2" :class="{ 'animate-pulse': locationLoading }" />
               {{ locationLoading ? 'Localisation...' : (userLocation ? 'Position activée' : 'Me localiser') }}
             </button>
             <button
-              @click="searchNearbyMerchants"
-              :disabled="!userLocation || loading"
-              class="btn btn-primary flex items-center gap-2"
+              @click="refreshMerchants"
+              :disabled="loading"
+              class="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50"
             >
-              <Search class="w-5 h-5" />
-              Chercher près de moi
+              <RefreshCw class="w-4 h-4 mr-2" :class="{ 'animate-spin': loading }" />
+              Actualiser
             </button>
           </div>
         </div>
@@ -37,18 +37,21 @@
     <!-- Map Container -->
     <div class="container mx-auto px-4 py-8">
       <div class="bg-white rounded-2xl shadow-lg p-6">
-        <GoogleMap
-          :api-key="googleMapsApiKey"
-          :center="mapCenter"
-          :zoom="mapZoom"
-          :markers="mapMarkers"
-          :show-user-location="!!userLocation"
-          :user-location="userLocation"
-          height="600px"
-          height-class="h-[600px]"
-          @map-ready="onMapReady"
-          @marker-click="onMarkerClick"
-        />
+        <div
+          ref="mapContainer"
+          class="w-full rounded-lg border border-gray-300"
+          style="height: 600px;"
+        >
+          <!-- Map will be loaded here -->
+        </div>
+
+        <!-- Loading overlay -->
+        <div v-if="loading" class="absolute inset-6 bg-white/80 rounded-lg flex items-center justify-center">
+          <div class="text-center">
+            <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+            <p class="text-gray-600">Chargement des commerçants...</p>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -128,10 +131,11 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, nextTick } from 'vue'
 import { useRouter } from 'vue-router'
-import GoogleMap from '@/components/maps/GoogleMap.vue'
-import { MapPin, Search, X, Building, Navigation, Phone, Package } from 'lucide-vue-next'
+import { MapPin, RefreshCw, X, Building, Navigation, Phone, Package } from 'lucide-vue-next'
+import { notify } from '@/composables/useNotifications'
+import 'leaflet/dist/leaflet.css'
 
 interface Merchant {
   id: number
@@ -151,58 +155,166 @@ interface Merchant {
 
 const router = useRouter()
 
-// Environment configuration
-const googleMapsApiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY || ''
-
 // State
 const merchants = ref<Merchant[]>([])
 const loading = ref(false)
 const locationLoading = ref(false)
 const selectedMerchant = ref<Merchant | null>(null)
-
 const userLocation = ref<{ latitude: number; longitude: number } | null>(null)
 
-// Map configuration
-const mapCenter = computed(() => {
-  if (userLocation.value) {
-    return {
-      lat: userLocation.value.latitude,
-      lng: userLocation.value.longitude
-    }
-  }
-  return { lat: 5.3474, lng: -3.9857 } // Abidjan default
-})
-
-const mapZoom = computed(() => userLocation.value ? 14 : 12)
-
-const mapMarkers = computed(() => {
-  return merchants.value.map(merchant => ({
-    id: merchant.id,
-    position: { lat: merchant.latitude, lng: merchant.longitude },
-    title: merchant.business_name,
-    info: `${merchant.business_type} - ${merchant.products_count} produit(s)`,
-    onClick: () => {
-      selectedMerchant.value = merchant
-    }
-  }))
-})
+// Map references
+const mapContainer = ref<HTMLElement | null>(null)
+let map: any = null
+let userMarker: any = null
+const merchantMarkers: any[] = []
 
 // Methods
+const initializeMap = async () => {
+  if (!mapContainer.value) return
+
+  try {
+    // Import Leaflet
+    const L = await import('leaflet')
+
+    // Initialize map centered on Abidjan, Côte d'Ivoire
+    const defaultCenter = [5.3474, -3.9857]
+    map = L.map(mapContainer.value).setView(defaultCenter, 12)
+
+    // Add tile layer
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '© OpenStreetMap contributors'
+    }).addTo(map)
+
+  } catch (error) {
+    notify.error('Erreur lors de l\'initialisation de la carte')
+  }
+}
+
+const addMerchantMarkers = async () => {
+  if (!map || merchants.value.length === 0) return
+
+  try {
+    const L = await import('leaflet')
+
+    // Clear existing markers
+    clearMerchantMarkers()
+
+    // Create custom icon for merchants
+    const merchantIcon = L.divIcon({
+      html: '<div class="bg-blue-600 text-white rounded-full w-8 h-8 flex items-center justify-center text-sm font-bold shadow-lg">🏪</div>',
+      className: 'custom-div-icon',
+      iconSize: [32, 32],
+      iconAnchor: [16, 32]
+    })
+
+    // Add markers for each merchant
+    merchants.value.forEach(merchant => {
+      const marker = L.marker([merchant.latitude, merchant.longitude], {
+        icon: merchantIcon
+      }).addTo(map)
+
+      // Add popup with merchant info
+      const popup = L.popup().setContent(`
+        <div class="p-3">
+          <h4 class="font-bold text-gray-900 mb-2">${merchant.business_name}</h4>
+          <p class="text-sm text-gray-600 mb-1">${merchant.business_type}</p>
+          <p class="text-sm text-gray-600 mb-2">${merchant.products_count} produit(s) disponible(s)</p>
+          <div class="mt-3 text-center">
+            <button id="details-btn-${merchant.id}" class="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-blue-700 transition-colors">
+              Voir les détails
+            </button>
+          </div>
+        </div>
+      `)
+
+      marker.bindPopup(popup)
+
+      // Handle popup open event to attach button listener
+      marker.on('popupopen', () => {
+        setTimeout(() => {
+          const button = document.getElementById(`details-btn-${merchant.id}`)
+          if (button) {
+            button.addEventListener('click', (e) => {
+              e.preventDefault()
+              e.stopPropagation()
+              selectedMerchant.value = merchant
+              marker.closePopup() // Close the popup when opening modal
+            })
+          }
+        }, 50)
+      })
+
+      merchantMarkers.push(marker)
+    })
+
+    // Adjust map view to show all merchants
+    if (merchants.value.length > 0) {
+      const group = L.featureGroup(merchantMarkers)
+      map.fitBounds(group.getBounds().pad(0.1))
+    }
+  } catch (error) {
+    notify.error('Erreur lors de l\'affichage des commerçants sur la carte')
+  }
+}
+
+const clearMerchantMarkers = () => {
+  merchantMarkers.forEach(marker => {
+    map.removeLayer(marker)
+  })
+  merchantMarkers.length = 0
+}
+
+const addUserLocationMarker = async () => {
+  if (!map || !userLocation.value) return
+
+  try {
+    const L = await import('leaflet')
+
+    // Remove existing user marker
+    if (userMarker) {
+      map.removeLayer(userMarker)
+    }
+
+    // Create user location icon
+    const userIcon = L.divIcon({
+      html: '<div class="bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center shadow-lg animate-pulse">📍</div>',
+      className: 'custom-div-icon',
+      iconSize: [24, 24],
+      iconAnchor: [12, 24]
+    })
+
+    // Add user location marker
+    userMarker = L.marker([userLocation.value.latitude, userLocation.value.longitude], {
+      icon: userIcon
+    }).addTo(map)
+
+    userMarker.bindPopup('<div class="p-2"><strong>Votre position</strong></div>')
+
+    // Center map on user location
+    map.setView([userLocation.value.latitude, userLocation.value.longitude], 14)
+  } catch (error) {
+    notify.error('Impossible d\'afficher votre position sur la carte')
+  }
+}
+
 const getCurrentLocation = () => {
   if (!navigator.geolocation) {
-    alert('La géolocalisation n\'est pas supportée par votre navigateur')
+    notify.warning('La géolocalisation n\'est pas supportée par votre navigateur')
     return
   }
 
   locationLoading.value = true
 
   navigator.geolocation.getCurrentPosition(
-    (position) => {
+    async (position) => {
       userLocation.value = {
         latitude: position.coords.latitude,
         longitude: position.coords.longitude
       }
       locationLoading.value = false
+
+      // Add user marker to map
+      await addUserLocationMarker()
     },
     (error) => {
       locationLoading.value = false
@@ -220,7 +332,7 @@ const getCurrentLocation = () => {
           break
       }
 
-      alert(message)
+      notify.error(message, 'Erreur de géolocalisation')
     },
     {
       enableHighAccuracy: true,
@@ -230,22 +342,11 @@ const getCurrentLocation = () => {
   )
 }
 
-const searchNearbyMerchants = async () => {
-  if (!userLocation.value) {
-    alert('Veuillez d\'abord activer votre géolocalisation')
-    return
-  }
-
+const fetchAllMerchants = async () => {
   loading.value = true
 
   try {
-    const params = new URLSearchParams({
-      latitude: userLocation.value.latitude.toString(),
-      longitude: userLocation.value.longitude.toString(),
-      radius: '20' // 20km radius
-    })
-
-    const response = await fetch(`http://localhost:8000/api/merchants/nearby?${params}`, {
+    const response = await fetch('http://localhost:8000/api/merchants/all-with-location', {
       headers: {
         'Accept': 'application/json',
         'Content-Type': 'application/json'
@@ -270,27 +371,23 @@ const searchNearbyMerchants = async () => {
         is_verified: merchant.is_verified,
         user: merchant.user
       }))
+
+      // Add markers to map after loading merchants
+      await addMerchantMarkers()
     } else {
-      console.error('API returned error:', data.message)
-      alert('Erreur lors de la recherche des commerçants')
+      // Log error for debugging
+      notify.error('Erreur lors de la récupération des commerçants')
     }
   } catch (error) {
-    console.error('Error fetching nearby merchants:', error)
-    alert('Erreur lors de la recherche des commerçants')
+    // Log error for debugging
+    notify.error('Erreur lors de la récupération des commerçants')
   } finally {
     loading.value = false
   }
 }
 
-const onMapReady = (map: google.maps.Map) => {
-  console.log('Google Map is ready:', map)
-}
-
-const onMarkerClick = (marker: any) => {
-  const merchant = merchants.value.find(m => m.id === marker.id)
-  if (merchant) {
-    selectedMerchant.value = merchant
-  }
+const refreshMerchants = async () => {
+  await fetchAllMerchants()
 }
 
 const viewMerchantProducts = () => {
@@ -302,9 +399,12 @@ const viewMerchantProducts = () => {
   }
 }
 
-// Load default merchants on mount
+
+
+// Initialize everything on mount
 onMounted(async () => {
-  // Try to get user location automatically
-  getCurrentLocation()
+  await nextTick()
+  await initializeMap()
+  await fetchAllMerchants()
 })
 </script>
