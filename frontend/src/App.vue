@@ -4,8 +4,10 @@
     <NavBar />
 
     <!-- Main Content with modern spacing -->
-    <main class="flex-1 relative">
-      <router-view />
+    <main id="main-content" class="flex-1 relative" role="main" aria-label="Contenu principal">
+      <PageTransition>
+        <router-view />
+      </PageTransition>
     </main>
 
     <!-- Global Notifications -->
@@ -14,6 +16,9 @@
 
     <!-- Network Status -->
     <NetworkStatus />
+
+    <!-- PWA Prompts -->
+    <PWAPrompt />
 
     <!-- Background Pattern -->
     <div class="fixed inset-0 -z-10 opacity-20 dark:opacity-10">
@@ -32,6 +37,8 @@ import NavBar from '@/components/layout/NavBar.vue'
 import NotificationContainer from '@/components/ui/NotificationContainer.vue'
 import NotificationSystem from '@/components/ui/NotificationSystem.vue'
 import NetworkStatus from '@/components/ui/NetworkStatus.vue'
+import PageTransition from '@/components/ui/PageTransition.vue'
+import PWAPrompt from '@/components/ui/PWAPrompt.vue'
 
 const authStore = useAuthStore()
 

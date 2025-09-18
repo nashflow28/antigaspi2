@@ -66,6 +66,126 @@
   *:focus-visible {
     @apply outline-none ring-2 ring-primary-500 ring-offset-2 ring-offset-white;
   }
+
+  /* Accessibilité - Classes utilitaires */
+  .sr-only {
+    position: absolute !important;
+    width: 1px !important;
+    height: 1px !important;
+    padding: 0 !important;
+    margin: -1px !important;
+    overflow: hidden !important;
+    clip: rect(0, 0, 0, 0) !important;
+    white-space: nowrap !important;
+    border: 0 !important;
+  }
+
+  .not-sr-only {
+    position: static !important;
+    width: auto !important;
+    height: auto !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    overflow: visible !important;
+    clip: auto !important;
+    white-space: normal !important;
+  }
+
+  .focus-within\:not-sr-only:focus-within {
+    position: static !important;
+    width: auto !important;
+    height: auto !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    overflow: visible !important;
+    clip: auto !important;
+    white-space: normal !important;
+  }
+
+  /* Skip links */
+  .skip-link {
+    position: absolute;
+    top: -40px;
+    left: 6px;
+    background: theme(colors.primary.600);
+    color: white;
+    padding: 8px 16px;
+    text-decoration: none;
+    border-radius: 4px;
+    z-index: 100;
+    font-weight: 500;
+    transition: all 0.2s ease;
+  }
+
+  .skip-link:focus {
+    top: 6px;
+    outline: 2px solid theme(colors.primary.500);
+    outline-offset: 2px;
+  }
+
+  /* Amélioration des contrastes pour l'accessibilité */
+  .text-accessible {
+    color: theme(colors.gray.900);
+  }
+
+  .text-accessible-muted {
+    color: theme(colors.gray.700);
+  }
+
+  /* États de focus améliorés */
+  .focus-ring {
+    @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2;
+  }
+
+  .focus-ring-inset {
+    @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary-500;
+  }
+
+  /* Navigation clavier visible */
+  .keyboard-nav *:focus-visible {
+    @apply ring-2 ring-primary-500 ring-offset-2;
+  }
+
+  /* Réduction du mouvement pour l'accessibilité */
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+
+    .animate-bounce,
+    .animate-spin,
+    .animate-ping,
+    .animate-pulse {
+      animation: none !important;
+    }
+  }
+
+  /* Mode haut contraste */
+  @media (prefers-contrast: high) {
+    :root {
+      --tw-bg-opacity: 1;
+      --tw-text-opacity: 1;
+    }
+
+    .text-gray-500 {
+      @apply text-gray-900;
+    }
+
+    .text-gray-400 {
+      @apply text-gray-800;
+    }
+
+    .border-gray-200 {
+      @apply border-gray-900;
+    }
+
+    .bg-gray-50 {
+      @apply bg-white;
+    }
+  }
 }
 
 /* 🎯 Components Layer - Design System Components */

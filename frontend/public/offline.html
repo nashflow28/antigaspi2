@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hors ligne - Antigaspi</title>
+    <style>
+        :root {
+            --primary-600: #059669;
+            --primary-500: #10B981;
+            --gray-900: #111827;
+            --gray-600: #4B5563;
+            --gray-100: #F3F4F6;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            color: var(--gray-900);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .offline-container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 500px;
+            width: 100%;
+            text-align: center;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .icon {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 30px;
+            background: linear-gradient(135deg, var(--primary-500), var(--primary-600));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+        }
+
+        h1 {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 16px;
+            color: var(--gray-900);
+            letter-spacing: -0.025em;
+        }
+
+        p {
+            font-size: 16px;
+            color: var(--gray-600);
+            line-height: 1.6;
+            margin-bottom: 30px;
+        }
+
+        .features {
+            text-align: left;
+            margin: 30px 0;
+            padding: 20px;
+            background: var(--gray-100);
+            border-radius: 12px;
+        }
+
+        .features h3 {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: var(--gray-900);
+        }
+
+        .features ul {
+            list-style: none;
+        }
+
+        .features li {
+            padding: 8px 0;
+            color: var(--gray-600);
+            position: relative;
+            padding-left: 24px;
+        }
+
+        .features li::before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: var(--primary-500);
+            font-weight: bold;
+        }
+
+        .retry-button {
+            background: linear-gradient(135deg, var(--primary-500), var(--primary-600));
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .retry-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px -5px rgba(16, 185, 129, 0.4);
+        }
+
+        .retry-button:active {
+            transform: translateY(0);
+        }
+
+        .offline-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            color: var(--gray-600);
+            margin-top: 20px;
+            padding: 8px 16px;
+            background: #fef2f2;
+            border-radius: 8px;
+            border: 1px solid #fecaca;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #ef4444;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .online .offline-status {
+            background: #f0fdf4;
+            border-color: #bbf7d0;
+            color: var(--primary-600);
+        }
+
+        .online .status-dot {
+            background: var(--primary-500);
+        }
+
+        @media (max-width: 640px) {
+            .offline-container {
+                padding: 30px 20px;
+                margin: 20px;
+            }
+
+            h1 {
+                font-size: 24px;
+            }
+
+            .icon {
+                width: 60px;
+                height: 60px;
+                font-size: 30px;
+            }
+        }
+
+        /* Animation d'entrée */
+        .offline-container {
+            animation: fadeInUp 0.6s ease-out;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="offline-container">
+        <div class="icon">
+            🌱
+        </div>
+
+        <h1>Mode hors ligne</h1>
+        <p>Vous n'êtes pas connecté à Internet, mais vous pouvez toujours utiliser certaines fonctionnalités d'Antigaspi.</p>
+
+        <div class="features">
+            <h3>Fonctionnalités disponibles hors ligne :</h3>
+            <ul>
+                <li>Consulter les produits mis en cache</li>
+                <li>Voir vos réservations précédentes</li>
+                <li>Accéder à votre profil</li>
+                <li>Parcourir l'historique des recherches</li>
+            </ul>
+        </div>
+
+        <button class="retry-button" onclick="retryConnection()">
+            <span>🔄</span>
+            Réessayer la connexion
+        </button>
+
+        <div class="offline-status">
+            <div class="status-dot"></div>
+            <span id="status-text">Connexion indisponible</span>
+        </div>
+    </div>
+
+    <script>
+        // Vérifier la connectivité
+        function checkConnection() {
+            const statusText = document.getElementById('status-text');
+            const container = document.querySelector('.offline-container');
+
+            if (navigator.onLine) {
+                statusText.textContent = 'Connexion rétablie';
+                container.classList.add('online');
+
+                // Rediriger vers la page d'accueil après 2 secondes
+                setTimeout(() => {
+                    window.location.href = '/';
+                }, 2000);
+            } else {
+                statusText.textContent = 'Connexion indisponible';
+                container.classList.remove('online');
+            }
+        }
+
+        // Fonction de retry
+        function retryConnection() {
+            checkConnection();
+
+            if (navigator.onLine) {
+                // Tenter de recharger la page précédente ou aller à l'accueil
+                if (document.referrer && document.referrer !== window.location.href) {
+                    window.location.href = document.referrer;
+                } else {
+                    window.location.href = '/';
+                }
+            }
+        }
+
+        // Écouter les changements de connectivité
+        window.addEventListener('online', () => {
+            checkConnection();
+        });
+
+        window.addEventListener('offline', () => {
+            checkConnection();
+        });
+
+        // Vérifier la connexion au chargement
+        document.addEventListener('DOMContentLoaded', () => {
+            checkConnection();
+        });
+
+        // Vérifier périodiquement la connexion
+        setInterval(checkConnection, 5000);
+
+        // Gestion du service worker
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.addEventListener('controllerchange', () => {
+                // Le service worker a été mis à jour
+                if (navigator.onLine) {
+                    window.location.reload();
+                }
+            });
+        }
+
+        // Message du service worker
+        if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
+            navigator.serviceWorker.addEventListener('message', (event) => {
+                if (event.data && event.data.type === 'CACHE_UPDATED') {
+                    // Le cache a été mis à jour
+                    if (navigator.onLine) {
+                        retryConnection();
+                    }
+                }
+            });
+        }
+    </script>
+</body>
+</html>
