@@ -71,6 +71,12 @@ const router = createRouter({
       meta: { requiresAuth: true, roles: ['consumer'] }
     },
     {
+      path: '/loyalty',
+      name: 'consumer-loyalty',
+      component: () => import('@/views/consumer/LoyaltyDashboard.vue'),
+      meta: { requiresAuth: true, roles: ['consumer'] }
+    },
+    {
       path: '/merchant',
       name: 'merchant',
       redirect: '/merchant/dashboard'
@@ -115,6 +121,12 @@ const router = createRouter({
       path: '/merchant/reviews',
       name: 'merchant-reviews',
       component: () => import('@/views/merchant/ReviewsList.vue'),
+      meta: { requiresAuth: true, roles: ['merchant'] }
+    },
+    {
+      path: '/merchant/loyalty',
+      name: 'merchant-loyalty',
+      component: () => import('@/views/merchant/LoyaltyManagement.vue'),
       meta: { requiresAuth: true, roles: ['merchant'] }
     },
     {

@@ -224,6 +224,18 @@ Route::prefix('admin')->middleware('jwt.auth')->group(function () {
         Route::get('/reported', [\App\Http\Controllers\Api\AdminReviewController::class, 'reported']); // Avis signalés
         Route::post('/reports/{report}/resolve', [\App\Http\Controllers\Api\AdminReviewController::class, 'resolveReport']); // Résoudre signalement
     });
+
+    // Gestion des points de fidélité (admin uniquement)
+    Route::prefix('loyalty')->group(function () {
+        Route::get('/users', [\App\Http\Controllers\Api\LoyaltyPointController::class, 'getAllUsersPoints']); // Tous les utilisateurs avec points
+        Route::post('/award', [\App\Http\Controllers\Api\LoyaltyPointController::class, 'awardPoints']); // Attribuer des points
+    });
+});
+
+// Routes des points de fidélité (protégées)
+Route::prefix('loyalty')->middleware('jwt.auth')->group(function () {
+    Route::get('/my-points', [\App\Http\Controllers\Api\LoyaltyPointController::class, 'getUserPoints']); // Mes points
+    Route::post('/redeem', [\App\Http\Controllers\Api\LoyaltyPointController::class, 'redeemPoints']); // Échanger des points
 });
 
 // Routes temporaires pour les tests (à sécuriser plus tard)

@@ -17,7 +17,7 @@
 
   <nav
     id="main-nav"
-    class="glass-bg glass-border sticky top-0 z-50 backdrop-blur-lg animate-fade-in-down"
+    class="glass-bg glass-border sticky top-0 z-[100] backdrop-blur-lg animate-fade-in-down"
     role="navigation"
     aria-label="Navigation principale"
   >
@@ -175,7 +175,7 @@
                   <div
                     v-show="showUserMenu"
                     ref="dropdownMenuRef"
-                    class="absolute right-0 mt-3 w-64 glass-bg glass-border rounded-2xl shadow-hard py-2 z-50 animate-fade-in-down"
+                    class="absolute right-0 mt-3 w-64 glass-bg glass-border rounded-2xl shadow-hard py-2 z-[200] animate-fade-in-down"
                     role="menu"
                     :aria-labelledby="userMenuButtonId"
                     @keydown="handleDropdownKeydown"
@@ -218,10 +218,19 @@
                 <template v-if="authStore.isConsumer">
                   <router-link
                     to="/reservations"
-                    class="block px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100"
+                    class="flex items-center px-4 py-3 text-sm text-neutral-700 hover:bg-gradient-primary hover:text-white transition-all duration-200 group"
                     @click="showUserMenu = false"
                   >
-                    Mes réservations
+                    <ShoppingBag class="w-4 h-4 mr-3 group-hover:text-white" />
+                    <span>Mes réservations</span>
+                  </router-link>
+                  <router-link
+                    to="/loyalty"
+                    class="flex items-center px-4 py-3 text-sm text-neutral-700 hover:bg-gradient-primary hover:text-white transition-all duration-200 group"
+                    @click="showUserMenu = false"
+                  >
+                    <Star class="w-4 h-4 mr-3 group-hover:text-white" />
+                    <span>Points de fidélité</span>
                   </router-link>
                 </template>
 
@@ -249,6 +258,14 @@
                   >
                     <MessageSquare class="w-4 h-4 mr-3 group-hover:text-white" />
                     <span>Mes avis</span>
+                  </router-link>
+                  <router-link
+                    to="/merchant/loyalty"
+                    class="flex items-center px-4 py-3 text-sm text-neutral-700 hover:bg-gradient-primary hover:text-white transition-all duration-200 group"
+                    @click="showUserMenu = false"
+                  >
+                    <Star class="w-4 h-4 mr-3 group-hover:text-white" />
+                    <span>Points de fidélité</span>
                   </router-link>
                 </template>
 
@@ -320,7 +337,7 @@
 import { ref, computed, onMounted, onUnmounted, nextTick } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
-import { LogIn, UserPlus, User, Settings, LogOut, ChevronDown, Package, ShoppingBag, MessageSquare } from 'lucide-vue-next'
+import { LogIn, UserPlus, User, Settings, LogOut, ChevronDown, Package, ShoppingBag, MessageSquare, Star } from 'lucide-vue-next'
 import DarkModeToggle from '@/components/ui/DarkModeToggle.vue'
 import MobileNav from '@/components/layout/MobileNav.vue'
 import { useAccessibility } from '@/composables/useAccessibility'

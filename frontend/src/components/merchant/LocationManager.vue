@@ -64,7 +64,7 @@
     </div>
 
     <!-- Location Modal -->
-    <div v-if="showLocationModal" class="fixed inset-0 z-50 overflow-y-auto">
+    <div v-if="showLocationModal" class="fixed inset-0 z-[9999] overflow-y-auto">
       <!-- Backdrop -->
       <div
         class="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm transition-opacity"
@@ -219,7 +219,7 @@
     </div>
 
     <!-- Notification -->
-    <div v-if="notification.show" class="fixed bottom-4 right-4 z-50">
+    <div v-if="notification.show" class="fixed bottom-4 right-4 z-[300]">
       <div
         class="bg-white rounded-lg shadow-lg border-l-4 p-4 max-w-sm"
         :class="{

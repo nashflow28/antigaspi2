@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Debug Markers Test</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <style>
+        #map { height: 500px; width: 100%; }
+        .simple-merchant-marker {
+            background: #2563eb;
+            color: white;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            border: 2px solid white;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        }
+    </style>
+</head>
+<body>
+    <h1>Debug Markers Test</h1>
+    <div id="map"></div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+        // Initialize map
+        const map = L.map('map').setView([5.3474, -3.9857], 12);
+
+        // Add tile layer
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap contributors'
+        }).addTo(map);
+
+        console.log('Map initialized:', map);
+
+        // Test data from API
+        const merchants = [
+            {"id":1,"business_name":"Boulangerie Martin","business_type":"Boulangerie","latitude":6.145132,"longitude":1.208224},
+            {"id":2,"business_name":"Superette Bella","business_type":"Épicerie","latitude":5.2842,"longitude":-4.0159},
+            {"id":3,"business_name":"Supermarché Champion","business_type":"Supermarché","latitude":6.139648,"longitude":1.223777}
+        ];
+
+        // Create custom icon
+        const merchantIcon = L.divIcon({
+            html: '🏪',
+            className: 'simple-merchant-marker',
+            iconSize: [30, 30],
+            iconAnchor: [15, 15]
+        });
+
+        // Add test marker first
+        console.log('Adding test marker...');
+        const testMarker = L.marker([5.3474, -3.9857]).addTo(map);
+        testMarker.bindPopup('<div>🧪 Test Marker - Abidjan Center</div>');
+        console.log('Test marker added:', testMarker);
+
+        // Add merchant markers
+        merchants.forEach((merchant, index) => {
+            console.log(`Adding marker ${index + 1}:`, merchant.business_name, 'at', merchant.latitude, merchant.longitude);
+
+            const marker = L.marker([merchant.latitude, merchant.longitude], {
+                icon: merchantIcon
+            }).addTo(map);
+
+            marker.bindPopup(`<div><strong>${merchant.business_name}</strong><br>${merchant.business_type}</div>`);
+
+            console.log(`Marker ${index + 1} added:`, marker);
+        });
+
+        console.log('All markers added. Checking map bounds...');
+
+        // Get all markers and fit bounds
+        const allMarkers = [testMarker];
+        merchants.forEach((merchant, index) => {
+            // Re-get markers to check they exist
+            const markers = document.querySelectorAll('.leaflet-marker-icon');
+            console.log(`Found ${markers.length} marker DOM elements`);
+        });
+    </script>
+</body>
+</html>
