@@ -1,0 +1,139 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e3]:
+  - navigation [ref=e4]:
+    - generic [ref=e6]:
+      - link "🌱 Antigaspi Sauvons ensemble" [ref=e8] [cursor=pointer]:
+        - /url: /
+        - generic [ref=e10] [cursor=pointer]: 🌱
+        - generic [ref=e11] [cursor=pointer]:
+          - generic [ref=e12] [cursor=pointer]: Antigaspi
+          - generic [ref=e13] [cursor=pointer]: Sauvons ensemble
+      - button "Ouvrir le menu" [ref=e15] [cursor=pointer]:
+        - generic [ref=e16] [cursor=pointer]: Ouvrir le menu
+  - main [ref=e21]:
+    - generic [ref=e22]:
+      - generic [ref=e26]:
+        - heading "Bonjour Jean ! 👋" [level=1] [ref=e27]
+        - paragraph [ref=e28]: Découvrez vos économies et votre impact environnemental
+      - generic [ref=e29]:
+        - generic [ref=e30]:
+          - generic [ref=e32] [cursor=pointer]:
+            - generic [ref=e33] [cursor=pointer]:
+              - generic [ref=e34] [cursor=pointer]: 83 670 F CFA
+              - paragraph [ref=e35] [cursor=pointer]: Économies totales
+              - generic [ref=e36] [cursor=pointer]:
+                - img [ref=e37] [cursor=pointer]
+                - generic [ref=e40] [cursor=pointer]: +15 609 F CFA ce mois
+            - img [ref=e42] [cursor=pointer]
+          - generic [ref=e46] [cursor=pointer]:
+            - generic [ref=e47] [cursor=pointer]:
+              - generic [ref=e48] [cursor=pointer]: "42"
+              - paragraph [ref=e49] [cursor=pointer]: Produits sauvés
+              - generic [ref=e50] [cursor=pointer]:
+                - img [ref=e51] [cursor=pointer]
+                - generic [ref=e56] [cursor=pointer]: 8 ce mois
+            - img [ref=e58] [cursor=pointer]
+          - generic [ref=e63] [cursor=pointer]:
+            - generic [ref=e64] [cursor=pointer]:
+              - generic [ref=e65] [cursor=pointer]: 12.4kg
+              - paragraph [ref=e66] [cursor=pointer]: CO₂ évité
+              - generic [ref=e67] [cursor=pointer]:
+                - img [ref=e68] [cursor=pointer]
+                - generic [ref=e71] [cursor=pointer]: ≈ 5 km en voiture
+            - img [ref=e73] [cursor=pointer]
+          - generic [ref=e77] [cursor=pointer]:
+            - generic [ref=e78] [cursor=pointer]:
+              - generic [ref=e79] [cursor=pointer]: "3"
+              - paragraph [ref=e80] [cursor=pointer]: Réservations actives
+              - generic [ref=e81] [cursor=pointer]:
+                - img [ref=e82] [cursor=pointer]
+                - generic [ref=e85] [cursor=pointer]: À récupérer aujourd'hui
+            - img [ref=e87] [cursor=pointer]
+        - generic [ref=e92]:
+          - generic [ref=e93]:
+            - generic [ref=e94]:
+              - generic [ref=e95]:
+                - generic [ref=e96]:
+                  - heading "Mes réservations récentes" [level=3] [ref=e97]
+                  - paragraph [ref=e98]: Vos dernières réservations de produits
+                - link "Voir tout" [ref=e99] [cursor=pointer]:
+                  - /url: /reservations
+                  - generic [ref=e100] [cursor=pointer]: Voir tout
+                  - img [ref=e101] [cursor=pointer]
+              - generic [ref=e105]:
+                - generic [ref=e107]: B
+                - generic [ref=e108]:
+                  - heading "Pain complet artisanal" [level=4] [ref=e109]
+                  - paragraph [ref=e110]: Boulangerie Martin
+                  - generic [ref=e111]:
+                    - generic [ref=e112]: 500 F CFA
+                    - generic [ref=e113]: 13 sept.
+                - generic [ref=e115]: Confirmée
+            - generic [ref=e116]:
+              - generic [ref=e117]:
+                - generic [ref=e118]:
+                  - heading "Recommandés pour vous" [level=3] [ref=e119]
+                  - paragraph [ref=e120]: Basé sur vos préférences et votre localisation
+                - link "Voir le catalogue" [ref=e121] [cursor=pointer]:
+                  - /url: /products
+                  - generic [ref=e122] [cursor=pointer]: Voir le catalogue
+                  - img [ref=e123] [cursor=pointer]
+              - generic [ref=e126]:
+                - generic [ref=e127] [cursor=pointer]:
+                  - generic [ref=e128] [cursor=pointer]:
+                    - img [ref=e130] [cursor=pointer]
+                    - generic [ref=e135] [cursor=pointer]:
+                      - heading "Pâtisseries du jour" [level=4] [ref=e136] [cursor=pointer]
+                      - paragraph [ref=e137] [cursor=pointer]: Pâtisserie Delacroix
+                  - generic [ref=e138] [cursor=pointer]:
+                    - generic [ref=e139] [cursor=pointer]:
+                      - generic [ref=e140] [cursor=pointer]: 4 920 F CFA
+                      - generic [ref=e141] [cursor=pointer]: 9 840 F CFA
+                    - generic [ref=e142] [cursor=pointer]: "-50%"
+                - generic [ref=e143] [cursor=pointer]:
+                  - generic [ref=e144] [cursor=pointer]:
+                    - img [ref=e146] [cursor=pointer]
+                    - generic [ref=e151] [cursor=pointer]:
+                      - heading "Sandwich club" [level=4] [ref=e152] [cursor=pointer]
+                      - paragraph [ref=e153] [cursor=pointer]: Café Central
+                  - generic [ref=e154] [cursor=pointer]:
+                    - generic [ref=e155] [cursor=pointer]:
+                      - generic [ref=e156] [cursor=pointer]: 2 788 F CFA
+                      - generic [ref=e157] [cursor=pointer]: 5 576 F CFA
+                    - generic [ref=e158] [cursor=pointer]: "-50%"
+          - generic [ref=e159]:
+            - generic [ref=e160]:
+              - generic [ref=e161]: 🌍
+              - heading "Éco-Héros" [level=3] [ref=e162]
+              - paragraph [ref=e163]: Vous avez évité le gaspillage de 42 produits !
+              - paragraph [ref=e166]: Plus que 58 produits pour le niveau suivant
+            - generic [ref=e167]:
+              - heading "Actions rapides" [level=3] [ref=e168]
+              - generic [ref=e169]:
+                - link "Chercher des produits Découvrez les offres près de chez vous" [ref=e170] [cursor=pointer]:
+                  - /url: /products
+                  - img [ref=e172] [cursor=pointer]
+                  - generic [ref=e175] [cursor=pointer]:
+                    - paragraph [ref=e176] [cursor=pointer]: Chercher des produits
+                    - paragraph [ref=e177] [cursor=pointer]: Découvrez les offres près de chez vous
+                - link "Mes réservations Gérer mes commandes en cours" [ref=e178] [cursor=pointer]:
+                  - /url: /reservations
+                  - img [ref=e180] [cursor=pointer]
+                  - generic [ref=e185] [cursor=pointer]:
+                    - paragraph [ref=e186] [cursor=pointer]: Mes réservations
+                    - paragraph [ref=e187] [cursor=pointer]: Gérer mes commandes en cours
+                - link "Mon profil Paramètres et préférences" [ref=e188] [cursor=pointer]:
+                  - /url: /profile
+                  - img [ref=e190] [cursor=pointer]
+                  - generic [ref=e193] [cursor=pointer]:
+                    - paragraph [ref=e194] [cursor=pointer]: Mon profil
+                    - paragraph [ref=e195] [cursor=pointer]: Paramètres et préférences
+            - generic [ref=e196]:
+              - generic [ref=e197]:
+                - img [ref=e199]
+                - heading "Astuce du jour" [level=3] [ref=e203]
+              - paragraph [ref=e204]: Privilégiez les commerces de proximité pour réduire votre empreinte carbone.
+              - button "Astuce suivante" [ref=e205] [cursor=pointer]
+```

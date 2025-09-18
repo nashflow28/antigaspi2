@@ -1,0 +1,52 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e3]:
+  - navigation [ref=e4]:
+    - generic [ref=e6]:
+      - link "🌱 Antigaspi Sauvons ensemble" [ref=e8] [cursor=pointer]:
+        - /url: /
+        - generic [ref=e10] [cursor=pointer]: 🌱
+        - generic [ref=e11] [cursor=pointer]:
+          - generic [ref=e12] [cursor=pointer]: Antigaspi
+          - generic [ref=e13] [cursor=pointer]: Sauvons ensemble
+      - generic [ref=e14]:
+        - link "Produits" [ref=e15] [cursor=pointer]:
+          - /url: /products
+          - generic [ref=e16] [cursor=pointer]: Produits
+        - link "Carte" [ref=e18] [cursor=pointer]:
+          - /url: /merchants/map
+          - generic [ref=e19] [cursor=pointer]: Carte
+        - link "Avis" [ref=e21] [cursor=pointer]:
+          - /url: /reviews
+          - generic [ref=e22] [cursor=pointer]: Avis
+        - button "Activer le mode sombre" [ref=e24] [cursor=pointer]:
+          - img [ref=e25] [cursor=pointer]
+        - link "Connexion" [ref=e31] [cursor=pointer]:
+          - /url: /login
+          - generic [ref=e32] [cursor=pointer]:
+            - img [ref=e33] [cursor=pointer]
+            - text: Connexion
+        - link "S'inscrire" [ref=e37] [cursor=pointer]:
+          - /url: /register
+          - img [ref=e38] [cursor=pointer]
+          - text: S'inscrire
+  - main [ref=e41]:
+    - generic [ref=e42]:
+      - generic [ref=e45]:
+        - generic [ref=e46]:
+          - heading "Catalogue des produits" [level=1] [ref=e47]
+          - paragraph [ref=e48]: 0 produit disponible
+        - generic [ref=e49]:
+          - generic [ref=e50]:
+            - img [ref=e51]
+            - textbox "Rechercher des produits..." [ref=e54]
+          - button "Filtres 0" [ref=e55] [cursor=pointer]:
+            - img [ref=e56] [cursor=pointer]
+            - text: Filtres
+            - generic [ref=e58] [cursor=pointer]: "0"
+      - generic [ref=e60]:
+        - img [ref=e61]
+        - heading "Aucun produit trouvé" [level=3] [ref=e65]
+        - paragraph [ref=e66]: Essayez de modifier vos critères de recherche ou vos filtres.
+```

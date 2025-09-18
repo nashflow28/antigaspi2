@@ -12,6 +12,9 @@
     <NotificationContainer />
     <NotificationSystem />
 
+    <!-- Network Status -->
+    <NetworkStatus />
+
     <!-- Background Pattern -->
     <div class="fixed inset-0 -z-10 opacity-20 dark:opacity-10">
       <div class="absolute inset-0 bg-gradient-to-r from-primary-500/10 via-secondary-500/5 to-accent-500/10"></div>
@@ -28,6 +31,7 @@ import { useAuthStore } from '@/stores/auth'
 import NavBar from '@/components/layout/NavBar.vue'
 import NotificationContainer from '@/components/ui/NotificationContainer.vue'
 import NotificationSystem from '@/components/ui/NotificationSystem.vue'
+import NetworkStatus from '@/components/ui/NetworkStatus.vue'
 
 const authStore = useAuthStore()
 

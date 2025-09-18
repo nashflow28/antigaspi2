@@ -1,0 +1,138 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - generic [ref=e3]:
+    - navigation [ref=e4]:
+      - generic [ref=e6]:
+        - link "🌱 Antigaspi Sauvons ensemble" [ref=e8]:
+          - /url: /
+          - generic [ref=e10]: 🌱
+          - generic [ref=e11]:
+            - generic [ref=e12]: Antigaspi
+            - generic [ref=e13]: Sauvons ensemble
+        - button "Ouvrir le menu" [ref=e15] [cursor=pointer]:
+          - generic [ref=e16] [cursor=pointer]: Ouvrir le menu
+    - main [ref=e21]:
+      - generic [ref=e22]:
+        - generic [ref=e23]:
+          - generic [ref=e29]:
+            - generic [ref=e32]: Ensemble contre le gaspillage alimentaire
+            - heading "Sauvons notre planète" [level=1] [ref=e33]:
+              - generic [ref=e34]: Sauvons
+              - generic [ref=e35]: notre planète
+            - paragraph [ref=e36]:
+              - text: Transformons les invendus en opportunités.
+              - generic [ref=e37]: Économisez jusqu'à 70%
+              - text: tout en protégeant l'environnement.
+            - generic [ref=e38]:
+              - link "🌟 Découvrir les offres" [ref=e39]:
+                - /url: /products
+                - generic [ref=e40]: 🌟 Découvrir les offres
+              - link "✨ Rejoindre maintenant" [ref=e42]:
+                - /url: /register
+                - generic [ref=e43]: ✨ Rejoindre maintenant
+            - generic [ref=e44]:
+              - generic [ref=e45]:
+                - generic [ref=e46]: 1,2M+
+                - generic [ref=e47]: Produits sauvés
+              - generic [ref=e48]:
+                - generic [ref=e49]: 50K+
+                - generic [ref=e50]: Utilisateurs actifs
+              - generic [ref=e51]:
+                - generic [ref=e52]: 2,5K+
+                - generic [ref=e53]: Commerçants partenaires
+          - img [ref=e55]
+        - generic [ref=e58]:
+          - generic [ref=e59]:
+            - generic [ref=e60]: Processus simple en 3 étapes
+            - heading "Comment ça marche ?" [level=2] [ref=e62]
+            - paragraph [ref=e63]: Rejoignez la révolution anti-gaspillage en quelques clics
+          - generic [ref=e64]:
+            - generic [ref=e65] [cursor=pointer]:
+              - generic [ref=e66] [cursor=pointer]:
+                - generic [ref=e68] [cursor=pointer]: 🔍
+                - generic [ref=e69] [cursor=pointer]: "1"
+              - generic [ref=e70] [cursor=pointer]:
+                - heading "Découvrez" [level=3] [ref=e71] [cursor=pointer]
+                - paragraph [ref=e72] [cursor=pointer]: Explorez les offres exclusives des commerçants locaux et trouvez des produits de qualité à prix réduits.
+                - generic [ref=e73] [cursor=pointer]:
+                  - generic [ref=e76] [cursor=pointer]: Géolocalisation intelligente
+                  - generic [ref=e79] [cursor=pointer]: Filtres avancés
+            - generic [ref=e80] [cursor=pointer]:
+              - generic [ref=e81] [cursor=pointer]:
+                - generic [ref=e83] [cursor=pointer]: ⚡
+                - generic [ref=e84] [cursor=pointer]: "2"
+              - generic [ref=e85] [cursor=pointer]:
+                - heading "Réservez" [level=3] [ref=e86] [cursor=pointer]
+                - paragraph [ref=e87] [cursor=pointer]: Réservez instantanément vos produits favoris avec paiement sécurisé et confirmation immédiate.
+                - generic [ref=e88] [cursor=pointer]:
+                  - generic [ref=e91] [cursor=pointer]: Réservation instantanée
+                  - generic [ref=e94] [cursor=pointer]: Paiement sécurisé
+            - generic [ref=e95] [cursor=pointer]:
+              - generic [ref=e96] [cursor=pointer]:
+                - generic [ref=e98] [cursor=pointer]: 🌱
+                - generic [ref=e99] [cursor=pointer]: "3"
+              - generic [ref=e100] [cursor=pointer]:
+                - heading "Sauvez" [level=3] [ref=e101] [cursor=pointer]
+                - paragraph [ref=e102] [cursor=pointer]: Récupérez vos achats et contribuez activement à la réduction du gaspillage alimentaire.
+                - generic [ref=e103] [cursor=pointer]:
+                  - generic [ref=e106] [cursor=pointer]: Impact environnemental
+                  - generic [ref=e109] [cursor=pointer]: Économies réalisées
+          - link "Commencer maintenant →" [ref=e111]:
+            - /url: /register
+            - generic [ref=e112]: Commencer maintenant
+            - generic [ref=e113]: →
+        - generic [ref=e115]:
+          - heading "Notre impact" [level=2] [ref=e117]
+          - generic [ref=e118]:
+            - generic [ref=e119]:
+              - generic [ref=e120]: 1,234
+              - paragraph [ref=e121]: Produits sauvés
+            - generic [ref=e122]:
+              - generic [ref=e123]: "567"
+              - paragraph [ref=e124]: Utilisateurs actifs
+            - generic [ref=e125]:
+              - generic [ref=e126]: "89"
+              - paragraph [ref=e127]: Commerçants partenaires
+        - generic [ref=e129]:
+          - heading "Prêt à faire la différence ?" [level=2] [ref=e130]
+          - paragraph [ref=e131]: Rejoignez notre communauté et commencez à économiser tout en protégeant l'environnement
+          - generic [ref=e132]:
+            - link "Consommateur" [ref=e133]:
+              - /url: /register
+            - link "Commerçant" [ref=e134]:
+              - /url: /register
+  - generic [ref=e141]:
+    - generic [ref=e142]:
+      - generic [ref=e143]:
+        - generic [ref=e145]: 🌱
+        - generic [ref=e146]: Antigaspi
+      - button [ref=e147] [cursor=pointer]:
+        - img [ref=e148] [cursor=pointer]
+    - navigation [ref=e151]:
+      - link "Produits" [ref=e152]:
+        - /url: /products
+        - img [ref=e153]
+        - generic [ref=e157]: Produits
+      - link "Carte des Commerçants" [ref=e158]:
+        - /url: /merchants/map
+        - img [ref=e159]
+        - generic [ref=e162]: Carte des Commerçants
+      - link "Avis" [ref=e163]:
+        - /url: /reviews
+        - img [ref=e164]
+        - generic [ref=e166]: Avis
+      - generic [ref=e167]:
+        - link "Se Connecter" [ref=e168]:
+          - /url: /auth/login
+          - img [ref=e169]
+          - generic [ref=e172]: Se Connecter
+        - link "S'Inscrire" [ref=e173]:
+          - /url: /auth/register
+          - img [ref=e174]
+          - generic [ref=e177]: S'Inscrire
+    - paragraph [ref=e179]:
+      - text: Antigaspi © 2025
+      - text: Lutter contre le gaspillage alimentaire
+```

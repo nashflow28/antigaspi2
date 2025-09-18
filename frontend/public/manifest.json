@@ -1,0 +1,135 @@
+{
+  "name": "Antigaspi - Lutte contre le gaspillage alimentaire",
+  "short_name": "Antigaspi",
+  "description": "Découvrez des produits frais à prix réduits près de chez vous. Faites des économies tout en luttant contre le gaspillage alimentaire en Côte d'Ivoire.",
+  "version": "1.0.0",
+  "manifest_version": 2,
+  "default_locale": "fr",
+  "scope": "/",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "theme_color": "#10B981",
+  "background_color": "#ffffff",
+  "lang": "fr",
+  "dir": "ltr",
+  "categories": ["food", "shopping", "environmental"],
+  "icons": [
+    {
+      "src": "/images/icon-72x72.png",
+      "sizes": "72x72",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/images/icon-96x96.png",
+      "sizes": "96x96",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/images/icon-128x128.png",
+      "sizes": "128x128",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/images/icon-144x144.png",
+      "sizes": "144x144",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/images/icon-152x152.png",
+      "sizes": "152x152",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/images/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/images/icon-384x384.png",
+      "sizes": "384x384",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/images/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/images/screenshot-mobile-1.png",
+      "sizes": "390x844",
+      "type": "image/png",
+      "form_factor": "narrow"
+    },
+    {
+      "src": "/images/screenshot-mobile-2.png",
+      "sizes": "390x844",
+      "type": "image/png",
+      "form_factor": "narrow"
+    },
+    {
+      "src": "/images/screenshot-desktop-1.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "form_factor": "wide"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Voir les produits",
+      "short_name": "Produits",
+      "description": "Découvrir les produits anti-gaspillage",
+      "url": "/products",
+      "icons": [
+        {
+          "src": "/images/shortcut-products.png",
+          "sizes": "96x96"
+        }
+      ]
+    },
+    {
+      "name": "Carte des commerçants",
+      "short_name": "Carte",
+      "description": "Trouver les commerçants près de chez vous",
+      "url": "/merchants/map",
+      "icons": [
+        {
+          "src": "/images/shortcut-map.png",
+          "sizes": "96x96"
+        }
+      ]
+    },
+    {
+      "name": "Mes réservations",
+      "short_name": "Réservations",
+      "description": "Voir mes réservations",
+      "url": "/reservations",
+      "icons": [
+        {
+          "src": "/images/shortcut-reservations.png",
+          "sizes": "96x96"
+        }
+      ]
+    }
+  ],
+  "related_applications": [
+    {
+      "platform": "webapp",
+      "url": "https://antigaspi.ci/manifest.json"
+    }
+  ],
+  "prefer_related_applications": false,
+  "edge_side_panel": {
+    "preferred_width": 320
+  }
+}

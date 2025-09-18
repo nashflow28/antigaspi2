@@ -1,0 +1,88 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e3]:
+  - navigation [ref=e4]:
+    - generic [ref=e6]:
+      - link "🌱 Antigaspi Sauvons ensemble" [ref=e8] [cursor=pointer]:
+        - /url: /
+        - generic [ref=e10] [cursor=pointer]: 🌱
+        - generic [ref=e11] [cursor=pointer]:
+          - generic [ref=e12] [cursor=pointer]: Antigaspi
+          - generic [ref=e13] [cursor=pointer]: Sauvons ensemble
+      - generic [ref=e14]:
+        - link "Produits" [ref=e15] [cursor=pointer]:
+          - /url: /products
+          - generic [ref=e16] [cursor=pointer]: Produits
+        - link "Carte" [ref=e18] [cursor=pointer]:
+          - /url: /merchants/map
+          - generic [ref=e19] [cursor=pointer]: Carte
+        - link "Avis" [ref=e21] [cursor=pointer]:
+          - /url: /reviews
+          - generic [ref=e22] [cursor=pointer]: Avis
+        - button "Activer le mode sombre" [ref=e24] [cursor=pointer]:
+          - img [ref=e25] [cursor=pointer]
+        - link "Connexion" [ref=e35] [cursor=pointer]:
+          - /url: /login
+          - generic [ref=e36] [cursor=pointer]:
+            - img [ref=e37] [cursor=pointer]
+            - text: Connexion
+        - link "S'inscrire" [ref=e42] [cursor=pointer]:
+          - /url: /register
+          - img [ref=e43] [cursor=pointer]
+          - text: S'inscrire
+  - main [ref=e48]:
+    - generic [ref=e50]:
+      - generic [ref=e51]:
+        - link "🥬 Antigaspi" [ref=e52] [cursor=pointer]:
+          - /url: /
+          - generic [ref=e53] [cursor=pointer]: 🥬
+          - generic [ref=e54] [cursor=pointer]: Antigaspi
+        - heading "Connexion" [level=2] [ref=e55]
+        - paragraph [ref=e56]: Connectez-vous à votre compte pour continuer
+      - generic [ref=e58]:
+        - generic [ref=e59]:
+          - heading "Content de vous revoir !" [level=3] [ref=e60]
+          - paragraph [ref=e61]: Connectez-vous pour accéder à votre compte Antigaspi
+        - generic [ref=e62]:
+          - generic [ref=e63]:
+            - generic [ref=e64]:
+              - generic [ref=e65]: Adresse email
+              - generic [ref=e66]: "*"
+            - generic [ref=e67]:
+              - textbox "Adresse email *" [active] [ref=e68]
+              - generic:
+                - img
+          - generic [ref=e69]:
+            - generic [ref=e70]:
+              - generic [ref=e71]: Mot de passe
+              - generic [ref=e72]: "*"
+            - generic [ref=e73]:
+              - textbox "Mot de passe *" [ref=e74]
+              - generic:
+                - img
+              - button [ref=e75] [cursor=pointer]:
+                - img [ref=e76] [cursor=pointer]
+          - generic [ref=e79]:
+            - generic [ref=e80]:
+              - checkbox "Se souvenir de moi" [ref=e81]
+              - generic [ref=e82]: Se souvenir de moi
+            - link "Mot de passe oublié ?" [ref=e84] [cursor=pointer]:
+              - /url: "#"
+          - button "Se connecter" [ref=e85] [cursor=pointer]:
+            - generic [ref=e87] [cursor=pointer]: Se connecter
+          - generic [ref=e93]: ou
+          - paragraph [ref=e95]:
+            - text: Pas encore de compte ?
+            - link "Créer un compte" [ref=e96] [cursor=pointer]:
+              - /url: /register
+        - paragraph [ref=e98]:
+          - text: En vous connectant, vous acceptez nos
+          - link "Conditions d'utilisation" [ref=e99] [cursor=pointer]:
+            - /url: "#"
+          - text: et notre
+          - link "Politique de confidentialité" [ref=e100] [cursor=pointer]:
+            - /url: "#"
+      - link "← Retour à l'accueil" [ref=e102] [cursor=pointer]:
+        - /url: /
+```
