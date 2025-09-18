@@ -85,7 +85,13 @@ class ReviewController extends Controller
      */
     public function store(Request $request): JsonResponse
     {
-        $validator = Validator::make($request->all(), [
+        // Handle JSON input properly
+        $data = $request->all();
+        if (empty($data) && $request->getContent()) {
+            $data = json_decode($request->getContent(), true) ?: [];
+        }
+
+        $validator = Validator::make($data, [
             'merchant_id' => 'required|exists:merchants,id',
             'product_id' => 'nullable|exists:products,id',
             'rating' => 'required|integer|between:1,5',
@@ -105,9 +111,9 @@ class ReviewController extends Controller
 
         // Check if user already reviewed this merchant/product combination
         $existingReview = Review::where('user_id', $user->id)
-                               ->where('merchant_id', $request->merchant_id)
-                               ->when($request->product_id, function ($query) use ($request) {
-                                   return $query->where('product_id', $request->product_id);
+                               ->where('merchant_id', $data['merchant_id'])
+                               ->when($data['product_id'] ?? null, function ($query) use ($data) {
+                                   return $query->where('product_id', $data['product_id']);
                                })
                                ->first();
 
@@ -120,22 +126,22 @@ class ReviewController extends Controller
 
         // Check if it's a verified purchase (user has a completed reservation)
         $isVerified = $user->reservations()
-                          ->whereHas('product', function ($query) use ($request) {
-                              $query->where('merchant_id', $request->merchant_id);
+                          ->whereHas('product', function ($query) use ($data) {
+                              $query->where('merchant_id', $data['merchant_id']);
                           })
-                          ->when($request->product_id, function ($query) use ($request) {
-                              return $query->where('product_id', $request->product_id);
+                          ->when($data['product_id'] ?? null, function ($query) use ($data) {
+                              return $query->where('product_id', $data['product_id']);
                           })
                           ->where('status', 'completed')
                           ->exists();
 
         $review = Review::create([
             'user_id' => $user->id,
-            'merchant_id' => $request->merchant_id,
-            'product_id' => $request->product_id,
-            'rating' => $request->rating,
-            'title' => $request->title,
-            'comment' => $request->comment,
+            'merchant_id' => $data['merchant_id'],
+            'product_id' => $data['product_id'] ?? null,
+            'rating' => $data['rating'],
+            'title' => $data['title'] ?? null,
+            'comment' => $data['comment'] ?? null,
             'is_verified_purchase' => $isVerified,
             'is_approved' => true, // Auto-approve for now
             'approved_at' => now(),
