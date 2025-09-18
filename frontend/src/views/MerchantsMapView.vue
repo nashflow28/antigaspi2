@@ -15,11 +15,11 @@
           <div class="flex flex-col sm:flex-row gap-3">
             <button
               @click="getCurrentLocation"
-              :disabled="locationLoading"
+              :disabled="geoLoading"
               class="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
             >
-              <MapPin class="w-4 h-4 mr-2" :class="{ 'animate-pulse': locationLoading }" />
-              {{ locationLoading ? 'Localisation...' : (userLocation ? 'Position activée' : 'Me localiser') }}
+              <MapPin class="w-4 h-4 mr-2" :class="{ 'animate-pulse': geoLoading }" />
+              {{ geoLoading ? 'Localisation...' : (position ? 'Position activée' : 'Me localiser') }}
             </button>
             <button
               @click="refreshMerchants"
@@ -39,7 +39,7 @@
       <div class="bg-white rounded-2xl shadow-lg p-6">
         <div
           ref="mapContainer"
-          class="w-full rounded-lg border border-gray-300"
+          class="w-full rounded-lg border border-gray-300 map-container"
           style="height: 600px;"
         >
           <!-- Map will be loaded here -->
@@ -56,7 +56,7 @@
     </div>
 
     <!-- Merchant Details Modal -->
-    <div v-if="selectedMerchant" class="fixed inset-0 z-50 overflow-y-auto">
+    <div v-if="selectedMerchant" class="fixed inset-0 z-[9999] overflow-y-auto">
       <!-- Backdrop -->
       <div
         class="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm transition-opacity"
@@ -131,10 +131,12 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, nextTick } from 'vue'
+import { ref, computed, onMounted, nextTick, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { MapPin, RefreshCw, X, Building, Navigation, Phone, Package } from 'lucide-vue-next'
 import { notify } from '@/composables/useNotifications'
+import useGeolocation from '@/composables/useGeolocation'
+import { useLazyLoading } from '@/composables/useLazyLoading'
 import 'leaflet/dist/leaflet.css'
 
 interface Merchant {
@@ -155,18 +157,25 @@ interface Merchant {
 
 const router = useRouter()
 
+// Composables
+const { position, getCurrentPosition, isLoading: geoLoading } = useGeolocation()
+
 // State
 const merchants = ref<Merchant[]>([])
 const loading = ref(false)
-const locationLoading = ref(false)
 const selectedMerchant = ref<Merchant | null>(null)
-const userLocation = ref<{ latitude: number; longitude: number } | null>(null)
+const merchantsCache = ref<Map<string, Merchant[]>>(new Map())
+const cacheExpiry = ref<Map<string, number>>(new Map())
 
 // Map references
 const mapContainer = ref<HTMLElement | null>(null)
 let map: any = null
 let userMarker: any = null
 const merchantMarkers: any[] = []
+let mapInitialized = ref(false)
+
+// Cache settings (5 minutes)
+const CACHE_DURATION = 5 * 60 * 1000
 
 // Methods
 const initializeMap = async () => {
@@ -199,12 +208,12 @@ const addMerchantMarkers = async () => {
     // Clear existing markers
     clearMerchantMarkers()
 
-    // Create custom icon for merchants
+    // Create custom merchant icon
     const merchantIcon = L.divIcon({
-      html: '<div class="bg-blue-600 text-white rounded-full w-8 h-8 flex items-center justify-center text-sm font-bold shadow-lg">🏪</div>',
-      className: 'custom-div-icon',
-      iconSize: [32, 32],
-      iconAnchor: [16, 32]
+      html: '🏪',
+      className: 'merchant-icon',
+      iconSize: [30, 30],
+      iconAnchor: [15, 15]
     })
 
     // Add markers for each merchant
@@ -248,9 +257,26 @@ const addMerchantMarkers = async () => {
     })
 
     // Adjust map view to show all merchants
-    if (merchants.value.length > 0) {
-      const group = L.featureGroup(merchantMarkers)
-      map.fitBounds(group.getBounds().pad(0.1))
+    if (merchantMarkers.length > 0) {
+      setTimeout(() => {
+        try {
+          const group = L.featureGroup(merchantMarkers)
+          const bounds = group.getBounds()
+          map.fitBounds(bounds.pad(0.1))
+
+          // Fallback: set a reasonable zoom level if bounds are too wide
+          setTimeout(() => {
+            const currentZoom = map.getZoom()
+            if (currentZoom < 6) {
+              const centerLat = (bounds.getNorth() + bounds.getSouth()) / 2
+              const centerLng = (bounds.getEast() + bounds.getWest()) / 2
+              map.setView([centerLat, centerLng], 6)
+            }
+          }, 300)
+        } catch (error) {
+          notify.error('Erreur lors de l\'ajustement de la vue de la carte')
+        }
+      }, 100)
     }
   } catch (error) {
     notify.error('Erreur lors de l\'affichage des commerçants sur la carte')
@@ -265,7 +291,7 @@ const clearMerchantMarkers = () => {
 }
 
 const addUserLocationMarker = async () => {
-  if (!map || !userLocation.value) return
+  if (!map || !position.value) return
 
   try {
     const L = await import('leaflet')
@@ -284,65 +310,45 @@ const addUserLocationMarker = async () => {
     })
 
     // Add user location marker
-    userMarker = L.marker([userLocation.value.latitude, userLocation.value.longitude], {
+    userMarker = L.marker([position.value.latitude, position.value.longitude], {
       icon: userIcon
     }).addTo(map)
 
     userMarker.bindPopup('<div class="p-2"><strong>Votre position</strong></div>')
 
     // Center map on user location
-    map.setView([userLocation.value.latitude, userLocation.value.longitude], 14)
+    map.setView([position.value.latitude, position.value.longitude], 14)
   } catch (error) {
     notify.error('Impossible d\'afficher votre position sur la carte')
   }
 }
 
-const getCurrentLocation = () => {
-  if (!navigator.geolocation) {
-    notify.warning('La géolocalisation n\'est pas supportée par votre navigateur')
-    return
-  }
-
-  locationLoading.value = true
-
-  navigator.geolocation.getCurrentPosition(
-    async (position) => {
-      userLocation.value = {
-        latitude: position.coords.latitude,
-        longitude: position.coords.longitude
-      }
-      locationLoading.value = false
-
+const getCurrentLocation = async () => {
+  try {
+    const coords = await getCurrentPosition()
+    if (coords) {
       // Add user marker to map
       await addUserLocationMarker()
-    },
-    (error) => {
-      locationLoading.value = false
-      let message = 'Impossible d\'obtenir votre position'
-
-      switch (error.code) {
-        case error.PERMISSION_DENIED:
-          message = 'Autorisation de géolocalisation refusée'
-          break
-        case error.POSITION_UNAVAILABLE:
-          message = 'Position non disponible'
-          break
-        case error.TIMEOUT:
-          message = 'Délai de géolocalisation dépassé'
-          break
-      }
-
-      notify.error(message, 'Erreur de géolocalisation')
-    },
-    {
-      enableHighAccuracy: true,
-      timeout: 10000,
-      maximumAge: 300000 // 5 minutes
     }
-  )
+  } catch (error) {
+    notify.error(error.message, 'Erreur de géolocalisation')
+  }
 }
 
-const fetchAllMerchants = async () => {
+const fetchAllMerchants = async (forceRefresh = false) => {
+  const cacheKey = 'all-merchants'
+  const now = Date.now()
+
+  // Check cache first (unless forced refresh)
+  if (!forceRefresh && merchantsCache.value.has(cacheKey)) {
+    const cacheTime = cacheExpiry.value.get(cacheKey) || 0
+    if (now - cacheTime < CACHE_DURATION) {
+      merchants.value = merchantsCache.value.get(cacheKey) || []
+      await addMerchantMarkers()
+      return
+    }
+  }
+
   loading.value = true
 
   try {
@@ -360,7 +366,7 @@ const fetchAllMerchants = async () => {
     const data = await response.json()
 
     if (data.success) {
-      merchants.value = data.data.map((merchant: any) => ({
+      const merchantsData = data.data.map((merchant: any) => ({
         id: merchant.id,
         business_name: merchant.business_name,
         business_type: merchant.business_type,
@@ -372,14 +378,18 @@ const fetchAllMerchants = async () => {
         user: merchant.user
       }))
 
+      merchants.value = merchantsData
+
+      // Cache the results
+      merchantsCache.value.set(cacheKey, merchantsData)
+      cacheExpiry.value.set(cacheKey, now)
+
       // Add markers to map after loading merchants
       await addMerchantMarkers()
     } else {
-      // Log error for debugging
       notify.error('Erreur lors de la récupération des commerçants')
     }
   } catch (error) {
-    // Log error for debugging
     notify.error('Erreur lors de la récupération des commerçants')
   } finally {
     loading.value = false
@@ -387,7 +397,7 @@ const fetchAllMerchants = async () => {
 }
 
 const refreshMerchants = async () => {
-  await fetchAllMerchants()
+  await fetchAllMerchants(true) // Force refresh
 }
 
 const viewMerchantProducts = () => {
@@ -401,10 +411,104 @@ const viewMerchantProducts = () => {
 
 
 
-// Initialize everything on mount
+// Cleanup on unmount
+onUnmounted(() => {
+  if (map) {
+    map.remove()
+    map = null
+  }
+  userMarker = null
+  merchantMarkers.length = 0
+})
+
+// Initialize everything on mount with lazy loading
 onMounted(async () => {
   await nextTick()
-  await initializeMap()
+
+  // Initialize map with a small delay for better UX
+  setTimeout(async () => {
+    await initializeMap()
+    mapInitialized.value = true
+  }, 100)
+
+  // Fetch merchants data
   await fetchAllMerchants()
 })
 </script>
+
+<style scoped>
+/* Temporarily removed all z-index overrides to debug marker visibility */
+/* Navigation et modales doivent être au-dessus */
+.navbar,
+.nav-menu {
+  z-index: 100 !important;
+}
+
+/* Dropdowns et menus déroulants */
+:deep(.dropdown-menu),
+:deep(.menu-dropdown),
+:deep(select),
+:deep(.select-dropdown) {
+  z-index: 200 !important;
+}
+
+/* Modales et overlays critiques */
+.modal,
+.overlay,
+.notification {
+  z-index: 9999 !important;
+}
+
+/* Merchant icon styling - Simple and clean */
+:deep(.merchant-icon) {
+  background: #2563eb;
+  color: white;
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  border: 2px solid white;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+}
+
+/* Leaflet popup z-index fixes - Force visibility */
+:deep(.leaflet-popup-pane) {
+  z-index: 1000 !important;
+  position: relative !important;
+}
+
+:deep(.leaflet-popup) {
+  z-index: 1001 !important;
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+
+:deep(.leaflet-popup-content-wrapper) {
+  z-index: 1002 !important;
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  background: white !important;
+  border: 1px solid #ccc !important;
+  border-radius: 8px !important;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3) !important;
+  max-width: 300px !important;
+}
+
+:deep(.leaflet-popup-content) {
+  margin: 0 !important;
+  padding: 0 !important;
+  display: block !important;
+  visibility: visible !important;
+}
+
+:deep(.leaflet-popup-tip) {
+  z-index: 1003 !important;
+  display: block !important;
+  visibility: visible !important;
+}
+</style>
