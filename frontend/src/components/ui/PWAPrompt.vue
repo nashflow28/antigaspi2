@@ -154,7 +154,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch, onMounted } from 'vue'
+import { ref, watch, onMounted } from 'vue'
 import { Download, X, RefreshCw } from 'lucide-vue-next'
 import { usePWA } from '@/composables/usePWA'
 import { useAccessibility } from '@/composables/useAccessibility'
@@ -249,7 +249,7 @@ const showConnectionStatusBriefly = (duration = 3000) => {
     clearTimeout(connectionStatusTimeout.value)
   }
 
-  connectionStatusTimeout.value = setTimeout(() => {
+  connectionStatusTimeout.value = window.setTimeout(() => {
     showConnectionStatus.value = false
     connectionStatusTimeout.value = null
   }, duration)

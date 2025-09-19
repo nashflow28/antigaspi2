@@ -108,7 +108,6 @@ const authStore = useAuthStore()
 const merchants = ref<Merchant[]>([])
 const selectedMerchantId = ref<number | null>(null)
 const availableProducts = ref<Product[]>([])
-const loading = ref(false)
 
 const fetchMerchants = async () => {
   try {

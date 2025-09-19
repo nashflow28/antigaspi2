@@ -9,7 +9,6 @@ export interface AccessibilityOptions {
 
 export const useAccessibility = (options: AccessibilityOptions = {}) => {
   const {
-    trapFocus = false,
     autoFocus = false,
     restoreFocus = false,
     announceChanges = true
@@ -67,7 +66,7 @@ export const useAccessibility = (options: AccessibilityOptions = {}) => {
         return htmlElement.offsetWidth > 0 &&
                htmlElement.offsetHeight > 0 &&
                !htmlElement.hasAttribute('disabled')
-      })
+      }) as HTMLElement[]
   }
 
   // Piéger le focus dans un conteneur

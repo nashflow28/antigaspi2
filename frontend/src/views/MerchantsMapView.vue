@@ -131,12 +131,11 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, nextTick, onUnmounted } from 'vue'
+import { ref, onMounted, nextTick, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { MapPin, RefreshCw, X, Building, Navigation, Phone, Package } from 'lucide-vue-next'
 import { notify } from '@/composables/useNotifications'
 import useGeolocation from '@/composables/useGeolocation'
-import { useLazyLoading } from '@/composables/useLazyLoading'
 import 'leaflet/dist/leaflet.css'
 
 interface Merchant {
@@ -185,8 +184,8 @@ const initializeMap = async () => {
     // Import Leaflet
     const L = await import('leaflet')
 
-    // Initialize map centered on Abidjan, Côte d'Ivoire
-    const defaultCenter = [5.3474, -3.9857]
+    // Initialize map centered on Lomé, Togo
+    const defaultCenter = [6.1319, 1.2228]
     map = L.map(mapContainer.value).setView(defaultCenter, 12)
 
     // Add tile layer

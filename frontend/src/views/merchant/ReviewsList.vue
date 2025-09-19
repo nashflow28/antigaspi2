@@ -34,7 +34,7 @@
             <label class="block text-sm font-medium text-gray-700 mb-2">Note</label>
             <select
               v-model="filters.rating"
-              @change="loadReviews"
+              @change="() => loadReviews()"
               class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
             >
               <option value="">Toutes les notes</option>
@@ -51,7 +51,7 @@
             <label class="block text-sm font-medium text-gray-700 mb-2">Produit</label>
             <select
               v-model="filters.product_id"
-              @change="loadReviews"
+              @change="() => loadReviews()"
               class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
             >
               <option value="">Tous les produits</option>
@@ -70,7 +70,7 @@
             <label class="block text-sm font-medium text-gray-700 mb-2">Type</label>
             <select
               v-model="filters.verified_only"
-              @change="loadReviews"
+              @change="() => loadReviews()"
               class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
             >
               <option value="">Tous les avis</option>
@@ -83,7 +83,7 @@
             <label class="block text-sm font-medium text-gray-700 mb-2">Tri</label>
             <select
               v-model="filters.sort"
-              @change="loadReviews"
+              @change="() => loadReviews()"
               class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
             >
               <option value="recent">Plus récents</option>
@@ -106,7 +106,7 @@
               </span>
             </h3>
             <button
-              @click="loadReviews"
+              @click="() => loadReviews()"
               class="inline-flex items-center px-3 py-1 text-sm text-primary-600 hover:text-primary-700 transition-colors"
               :disabled="loading"
             >

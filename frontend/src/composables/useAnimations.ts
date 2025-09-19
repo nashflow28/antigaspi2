@@ -1,4 +1,4 @@
-import { ref, nextTick, onMounted } from 'vue'
+import { ref, onMounted } from 'vue'
 
 interface AnimationOptions {
   duration?: number
@@ -26,7 +26,7 @@ export const useAnimations = () => {
   })
 
   const animate = (
-    element: Element,
+    element: HTMLElement,
     keyframes: Keyframe[] | PropertyIndexedKeyframes,
     options: AnimationOptions = {}
   ): Animation | null => {
@@ -53,63 +53,63 @@ export const useAnimations = () => {
   }
 
   // Animations pré-définies
-  const fadeIn = (element: Element, options?: AnimationOptions) => {
+  const fadeIn = (element: HTMLElement, options?: AnimationOptions) => {
     return animate(element, [
       { opacity: 0 },
       { opacity: 1 }
     ], options)
   }
 
-  const fadeOut = (element: Element, options?: AnimationOptions) => {
+  const fadeOut = (element: HTMLElement, options?: AnimationOptions) => {
     return animate(element, [
       { opacity: 1 },
       { opacity: 0 }
     ], options)
   }
 
-  const slideInFromLeft = (element: Element, distance: number = 50, options?: AnimationOptions) => {
+  const slideInFromLeft = (element: HTMLElement, distance: number = 50, options?: AnimationOptions) => {
     return animate(element, [
       { transform: `translateX(-${distance}px)`, opacity: 0 },
       { transform: 'translateX(0)', opacity: 1 }
     ], options)
   }
 
-  const slideInFromRight = (element: Element, distance: number = 50, options?: AnimationOptions) => {
+  const slideInFromRight = (element: HTMLElement, distance: number = 50, options?: AnimationOptions) => {
     return animate(element, [
       { transform: `translateX(${distance}px)`, opacity: 0 },
       { transform: 'translateX(0)', opacity: 1 }
     ], options)
   }
 
-  const slideInFromTop = (element: Element, distance: number = 30, options?: AnimationOptions) => {
+  const slideInFromTop = (element: HTMLElement, distance: number = 30, options?: AnimationOptions) => {
     return animate(element, [
       { transform: `translateY(-${distance}px)`, opacity: 0 },
       { transform: 'translateY(0)', opacity: 1 }
     ], options)
   }
 
-  const slideInFromBottom = (element: Element, distance: number = 30, options?: AnimationOptions) => {
+  const slideInFromBottom = (element: HTMLElement, distance: number = 30, options?: AnimationOptions) => {
     return animate(element, [
       { transform: `translateY(${distance}px)`, opacity: 0 },
       { transform: 'translateY(0)', opacity: 1 }
     ], options)
   }
 
-  const scaleIn = (element: Element, options?: AnimationOptions) => {
+  const scaleIn = (element: HTMLElement, options?: AnimationOptions) => {
     return animate(element, [
       { transform: 'scale(0.8)', opacity: 0 },
       { transform: 'scale(1)', opacity: 1 }
     ], options)
   }
 
-  const scaleOut = (element: Element, options?: AnimationOptions) => {
+  const scaleOut = (element: HTMLElement, options?: AnimationOptions) => {
     return animate(element, [
       { transform: 'scale(1)', opacity: 1 },
       { transform: 'scale(0.8)', opacity: 0 }
     ], options)
   }
 
-  const bounce = (element: Element, options?: AnimationOptions) => {
+  const bounce = (element: HTMLElement, options?: AnimationOptions) => {
     return animate(element, [
       { transform: 'translateY(0)' },
       { transform: 'translateY(-10px)' },
@@ -117,7 +117,7 @@ export const useAnimations = () => {
     ], { duration: 600, easing: 'cubic-bezier(0.68, -0.55, 0.265, 1.55)', ...options })
   }
 
-  const shake = (element: Element, options?: AnimationOptions) => {
+  const shake = (element: HTMLElement, options?: AnimationOptions) => {
     return animate(element, [
       { transform: 'translateX(0)' },
       { transform: 'translateX(-10px)' },
@@ -128,7 +128,7 @@ export const useAnimations = () => {
     ], { duration: 500, ...options })
   }
 
-  const pulse = (element: Element, options?: AnimationOptions) => {
+  const pulse = (element: HTMLElement, options?: AnimationOptions) => {
     return animate(element, [
       { transform: 'scale(1)' },
       { transform: 'scale(1.05)' },
@@ -136,7 +136,7 @@ export const useAnimations = () => {
     ], { duration: 1000, ...options })
   }
 
-  const glow = (element: Element, color: string = '#10B981', options?: AnimationOptions) => {
+  const glow = (element: HTMLElement, color: string = '#10B981', options?: AnimationOptions) => {
     return animate(element, [
       { boxShadow: 'none' },
       { boxShadow: `0 0 20px ${color}50` },
@@ -145,7 +145,7 @@ export const useAnimations = () => {
   }
 
   // Animation de typing pour le texte
-  const typeWriter = async (element: Element, text: string, speed: number = 50) => {
+  const typeWriter = async (element: HTMLElement, text: string, speed: number = 50) => {
     if (prefersReducedMotion.value) {
       element.textContent = text
       return
@@ -159,7 +159,7 @@ export const useAnimations = () => {
   }
 
   // Animation en cascade pour une liste d'éléments
-  const cascadeIn = (elements: Element[], options?: AnimationOptions & { stagger?: number }) => {
+  const cascadeIn = (elements: HTMLElement[], options?: AnimationOptions & { stagger?: number }) => {
     const stagger = options?.stagger || 100
     const animations: Animation[] = []
 
@@ -176,7 +176,7 @@ export const useAnimations = () => {
 
   // Animation de compteur pour les nombres
   const countUp = async (
-    element: Element,
+    element: HTMLElement,
     from: number = 0,
     to: number,
     duration: number = 2000,
@@ -225,15 +225,15 @@ export const useAnimations = () => {
 
 // Hook pour animer automatiquement les éléments au scroll
 export const useScrollAnimation = () => {
-  const elementsToAnimate = ref<Map<Element, () => void>>(new Map())
+  const elementsToAnimate = ref<Map<HTMLElement, () => void>>(new Map())
   let observer: IntersectionObserver | null = null
 
-  const addElement = (element: Element, animation: () => void) => {
+  const addHTMLElement = (element: HTMLElement, animation: () => void) => {
     elementsToAnimate.value.set(element, animation)
     observer?.observe(element)
   }
 
-  const removeElement = (element: Element) => {
+  const removeHTMLElement = (element: HTMLElement) => {
     elementsToAnimate.value.delete(element)
     observer?.unobserve(element)
   }
@@ -264,8 +264,8 @@ export const useScrollAnimation = () => {
   })
 
   return {
-    addElement,
-    removeElement
+    addHTMLElement,
+    removeHTMLElement
   }
 }
 

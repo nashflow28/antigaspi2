@@ -70,7 +70,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, nextTick, onUnmounted } from 'vue'
+import { ref, computed, onUnmounted } from 'vue'
 import { Loader2, Check } from 'lucide-vue-next'
 import { useAnimations } from '@/composables/useAnimations'
 
@@ -109,7 +109,7 @@ const emit = defineEmits<{
   blur: [event: FocusEvent]
 }>()
 
-const { prefersReducedMotion, bounce, glow } = useAnimations()
+const { prefersReducedMotion, bounce } = useAnimations()
 
 const buttonRef = ref<HTMLButtonElement>()
 const ripples = ref<Array<{ class: string; style: string; id: number }>>([])

@@ -435,11 +435,6 @@ const closeModal = () => {
   }
 }
 
-const openModal = () => {
-  form.value.latitude = location.value.latitude
-  form.value.longitude = location.value.longitude
-  showLocationModal.value = true
-}
 
 // Map methods
 const toggleMapSelection = async () => {

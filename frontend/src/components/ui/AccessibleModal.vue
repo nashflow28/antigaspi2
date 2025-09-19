@@ -142,7 +142,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch, nextTick, onMounted, onUnmounted } from 'vue'
+import { ref, computed, watch, nextTick, onUnmounted } from 'vue'
 import { X } from 'lucide-vue-next'
 import { useAccessibility } from '@/composables/useAccessibility'
 import InteractiveButton from './InteractiveButton.vue'

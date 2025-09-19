@@ -11,7 +11,7 @@
 Développer une plateforme web complète permettant aux commerçants de vendre leurs invendus à prix réduit et aux consommateurs de faire des économies tout en luttant contre le gaspillage alimentaire.
 
 ### **Cible Géographique**
-Afrique de l'Ouest (Côte d'Ivoire en priorité)
+Afrique de l'Ouest (Togo en priorité)
 
 ### **Repository GitHub**
 https://github.com/nashflow28/antigaspi2
