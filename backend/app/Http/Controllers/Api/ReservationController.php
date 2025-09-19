@@ -381,20 +381,29 @@ class ReservationController extends Controller
                 $totalFoodSaved += $reservation->quantity_reserved;
             }
 
+            $totalCo2Saved = round($totalFoodSaved * 2.5, 1);
+
+            $stats['total_savings'] = round($totalSavings, 2);
+            $stats['food_saved'] = $totalFoodSaved;
+            $stats['co2_saved'] = $totalCo2Saved;
+
             $stats['environmental_impact'] = [
-                'total_money_saved' => round($totalSavings, 2),
-                'total_food_saved_kg' => $totalFoodSaved,
-                'total_co2_saved_kg' => round($totalFoodSaved * 2.5, 1), // 2.5kg CO2 par kg de nourriture
+                'total_money_saved' => $stats['total_savings'],
+                'total_food_saved_kg' => $stats['food_saved'],
+                'total_co2_saved_kg' => $stats['co2_saved'],
             ];
 
             // Statistiques mensuelles
-            $thisMonth = Reservation::where('user_id', $user->id)
+            $thisMonthQuery = Reservation::where('user_id', $user->id)
                 ->whereMonth('created_at', now()->month)
                 ->whereYear('created_at', now()->year);
 
+            $totalThisMonth = (clone $thisMonthQuery)->count();
+            $completedThisMonth = (clone $thisMonthQuery)->where('status', 'completed')->count();
+
             $stats['this_month'] = [
-                'total_reservations' => $thisMonth->count(),
-                'completed_reservations' => $thisMonth->where('status', 'completed')->count(),
+                'total_reservations' => $totalThisMonth,
+                'completed_reservations' => $completedThisMonth,
             ];
 
             return response()->json([

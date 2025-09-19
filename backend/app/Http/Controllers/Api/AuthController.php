@@ -53,6 +53,9 @@ class AuthController extends Controller
                 'is_active' => true,
             ]);
 
+            $user->preferences = $this->defaultPreferences();
+            $user->save();
+
             // Si c'est un commerçant, créer le profil merchant
             if ($request->role === 'merchant') {
                 Merchant::create([
@@ -71,14 +74,7 @@ class AuthController extends Controller
                 'success' => true,
                 'message' => 'Inscription réussie',
                 'data' => [
-                    'user' => [
-                        'id' => $user->id,
-                        'email' => $user->email,
-                        'first_name' => $user->first_name,
-                        'last_name' => $user->last_name,
-                        'role' => $user->role,
-                        'city' => $user->city,
-                    ],
+                    'user' => $this->formatUserResponse($user),
                     'token' => $token,
                     'token_type' => 'Bearer',
                     'expires_in' => JWTAuth::factory()->getTTL() * 60
@@ -141,14 +137,7 @@ class AuthController extends Controller
                 'success' => true,
                 'message' => 'Connexion réussie',
                 'data' => [
-                    'user' => [
-                        'id' => $user->id,
-                        'email' => $user->email,
-                        'first_name' => $user->first_name,
-                        'last_name' => $user->last_name,
-                        'role' => $user->role,
-                        'city' => $user->city,
-                    ],
+                    'user' => $this->formatUserResponse($user),
                     'token' => $token,
                     'token_type' => 'Bearer',
                     'expires_in' => JWTAuth::factory()->getTTL() * 60
@@ -176,18 +165,7 @@ class AuthController extends Controller
                 ], 404);
             }
 
-            $userData = [
-                'id' => $user->id,
-                'email' => $user->email,
-                'first_name' => $user->first_name,
-                'last_name' => $user->last_name,
-                'phone' => $user->phone,
-                'role' => $user->role,
-                'city' => $user->city,
-                'address' => $user->address,
-                'is_active' => $user->is_active,
-                'created_at' => $user->created_at,
-            ];
+            $userData = $this->formatUserResponse($user);
 
             // Ajouter les infos commerçant si applicable
             if ($user->role === 'merchant' && $user->merchant) {
@@ -253,5 +231,34 @@ class AuthController extends Controller
                 'error' => $e->getMessage()
             ], 401);
         }
+    }
+
+    private function defaultPreferences(): array
+    {
+        return [
+            'email_notifications' => true,
+            'product_notifications' => true,
+            'max_distance' => 15,
+        ];
+    }
+
+    private function formatUserResponse(User $user): array
+    {
+        $preferences = $user->preferences ?? $this->defaultPreferences();
+
+        return [
+            'id' => $user->id,
+            'email' => $user->email,
+            'first_name' => $user->first_name,
+            'last_name' => $user->last_name,
+            'phone' => $user->phone,
+            'role' => $user->role,
+            'city' => $user->city,
+            'address' => $user->address,
+            'is_active' => $user->is_active,
+            'created_at' => $user->created_at,
+            'updated_at' => $user->updated_at,
+            'preferences' => $preferences,
+        ];
     }
 }

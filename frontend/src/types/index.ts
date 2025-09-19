@@ -6,8 +6,33 @@ export interface User {
   role: 'consumer' | 'merchant' | 'admin'
   city: string
   phone?: string
+  address?: string
+  preferences?: UserPreferences
   created_at: string
   updated_at: string
+}
+
+export interface UserPreferences {
+  email_notifications: boolean
+  product_notifications: boolean
+  max_distance: number
+}
+
+export interface UserMonthlyStats {
+  total_reservations: number
+  completed_reservations: number
+}
+
+export interface UserStats {
+  total_reservations: number
+  pending_reservations: number
+  confirmed_reservations: number
+  completed_reservations: number
+  cancelled_reservations: number
+  total_savings: number
+  food_saved: number
+  co2_saved: number
+  this_month: UserMonthlyStats
 }
 
 export interface Merchant {

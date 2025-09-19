@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\ProductController;
 use App\Http\Controllers\Api\ReservationController;
+use App\Http\Controllers\Api\ProfileController;
 use App\Http\Controllers\Api\ReviewController;
 use App\Http\Controllers\Api\LoyaltyPointController;
 
@@ -41,6 +42,15 @@ Route::prefix('products')->group(function () {
         Route::delete('/{id}', [ProductController::class, 'destroy']); // Supprimer un produit
     });
 });
+
+// Routes du profil utilisateur
+Route::middleware(\App\Http\Middleware\ApiAuthMiddleware::class)
+    ->prefix('profile')
+    ->group(function () {
+        Route::put('/', [ProfileController::class, 'update']);
+        Route::put('/password', [ProfileController::class, 'updatePassword']);
+        Route::put('/preferences', [ProfileController::class, 'updatePreferences']);
+    });
 
 // Routes des réservations (toutes protégées)
 Route::prefix('reservations')->middleware(\App\Http\Middleware\ApiAuthMiddleware::class)->group(function () {

@@ -7,7 +7,9 @@ import type {
   Product,
   ProductFilters,
   Reservation,
-  Category
+  Category,
+  UserPreferences,
+  UserStats
 } from '@/types'
 
 const API_BASE_URL = '/api'
@@ -108,6 +110,35 @@ class ApiService {
     return this.authenticatedRequest<ApiResponse<null>>('/auth/logout', {
       method: 'POST'
     })
+  }
+
+  async updateProfile(data: Partial<User>): Promise<ApiResponse<User>> {
+    return this.authenticatedRequest<ApiResponse<User>>('/profile', {
+      method: 'PUT',
+      body: JSON.stringify(data)
+    })
+  }
+
+  async updatePassword(payload: {
+    current_password: string
+    new_password: string
+    new_password_confirmation: string
+  }): Promise<ApiResponse<null>> {
+    return this.authenticatedRequest<ApiResponse<null>>('/profile/password', {
+      method: 'PUT',
+      body: JSON.stringify(payload)
+    })
+  }
+
+  async updatePreferences(preferences: UserPreferences): Promise<ApiResponse<UserPreferences>> {
+    return this.authenticatedRequest<ApiResponse<UserPreferences>>('/profile/preferences', {
+      method: 'PUT',
+      body: JSON.stringify(preferences)
+    })
+  }
+
+  async getUserStats(): Promise<ApiResponse<UserStats>> {
+    return this.authenticatedRequest<ApiResponse<UserStats>>('/reservations/statistics')
   }
 
   // Products
