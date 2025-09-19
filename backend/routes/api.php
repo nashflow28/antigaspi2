@@ -5,6 +5,8 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\ProductController;
 use App\Http\Controllers\Api\ReservationController;
+use App\Http\Controllers\Api\ReviewController;
+use App\Http\Controllers\Api\LoyaltyPointController;
 
 /*
 |--------------------------------------------------------------------------
@@ -58,6 +60,18 @@ Route::prefix('reservations')->middleware(\App\Http\Middleware\ApiAuthMiddleware
 
 // Routes des catégories (alternative)
 Route::get('categories', [ProductController::class, 'categories']);
+
+// Routes d'avis et points de fidélité (protégées)
+Route::middleware(\App\Http\Middleware\ApiAuthMiddleware::class)->group(function () {
+    Route::apiResource('reviews', ReviewController::class);
+
+    Route::prefix('loyalty-points')->group(function () {
+        Route::get('/', [LoyaltyPointController::class, 'index']);
+        Route::post('/', [LoyaltyPointController::class, 'store']);
+        Route::post('/redeem', [LoyaltyPointController::class, 'redeem']);
+        Route::get('/balance', [LoyaltyPointController::class, 'balance']);
+    });
+});
 
 // Routes de test et informations
 Route::get('health', function () {
