@@ -229,11 +229,11 @@
                       v-model="preferences.max_distance"
                       class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent"
                     >
-                      <option value="5">5 km</option>
-                      <option value="10">10 km</option>
-                      <option value="15">15 km</option>
-                      <option value="25">25 km</option>
-                      <option value="50">50 km</option>
+                      <option :value="5">5 km</option>
+                      <option :value="10">10 km</option>
+                      <option :value="15">15 km</option>
+                      <option :value="25">25 km</option>
+                      <option :value="50">50 km</option>
                     </select>
                   </div>
                 </div>
@@ -305,7 +305,7 @@
                   </div>
                   <div class="flex justify-between items-center py-3">
                     <span class="text-gray-700">Ce mois-ci</span>
-                    <span class="font-semibold text-purple-600">{{ userStats.this_month }} réservations</span>
+                    <span class="font-semibold text-purple-600">{{ userStats.this_month.total_reservations }} réservations</span>
                   </div>
                 </div>
               </div>
@@ -372,8 +372,10 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, reactive } from 'vue'
+import { ref, computed, onMounted, reactive, watch } from 'vue'
 import { useAuthStore } from '@/stores/auth'
+import { apiService } from '@/services/api'
+import type { User, UserPreferences, UserStats } from '@/types'
 import {
   UserIcon,
   HomeIcon,
@@ -419,19 +421,27 @@ const passwordForm = reactive({
   confirm_password: ''
 })
 
-const preferences = reactive({
+const defaultPreferences: UserPreferences = {
   email_notifications: true,
   product_notifications: true,
-  max_distance: '15'
-})
+  max_distance: 15
+}
 
-const userStats = reactive({
+const preferences = reactive<UserPreferences>({ ...defaultPreferences })
+
+const userStats = reactive<UserStats>({
   total_reservations: 0,
+  pending_reservations: 0,
+  confirmed_reservations: 0,
   completed_reservations: 0,
+  cancelled_reservations: 0,
   total_savings: 0,
   food_saved: 0,
   co2_saved: 0,
-  this_month: 0
+  this_month: {
+    total_reservations: 0,
+    completed_reservations: 0
+  }
 })
 
 // Computed properties
@@ -469,6 +479,31 @@ const formatDate = (dateString?: string) => {
   })
 }
 
+const applyUserData = (userData?: User | null) => {
+  if (!userData) {
+    preferences.email_notifications = defaultPreferences.email_notifications
+    preferences.product_notifications = defaultPreferences.product_notifications
+    preferences.max_distance = defaultPreferences.max_distance
+    return
+  }
+
+  profileForm.first_name = userData.first_name
+  profileForm.last_name = userData.last_name
+  profileForm.email = userData.email
+  profileForm.phone = userData.phone || ''
+  profileForm.city = userData.city
+
+  if (userData.preferences) {
+    preferences.email_notifications = userData.preferences.email_notifications
+    preferences.product_notifications = userData.preferences.product_notifications
+    preferences.max_distance = userData.preferences.max_distance
+  } else {
+    preferences.email_notifications = defaultPreferences.email_notifications
+    preferences.product_notifications = defaultPreferences.product_notifications
+    preferences.max_distance = defaultPreferences.max_distance
+  }
+}
+
 const showMessage = (msg: string, type: 'success' | 'error' = 'success') => {
   message.value = msg
   messageType.value = type
@@ -480,11 +515,24 @@ const showMessage = (msg: string, type: 'success' | 'error' = 'success') => {
 const updateProfile = async () => {
   try {
     updating.value = true
-    // TODO: Implement API call to update profile
-    await new Promise(resolve => setTimeout(resolve, 1000)) // Simulate API call
-    showMessage('Profil mis à jour avec succès!', 'success')
-  } catch (error) {
-    showMessage('Erreur lors de la mise à jour du profil', 'error')
+    const payload = {
+      first_name: profileForm.first_name,
+      last_name: profileForm.last_name,
+      email: profileForm.email,
+      phone: profileForm.phone,
+      city: profileForm.city
+    }
+
+    const response = await apiService.updateProfile(payload)
+    if (response.data) {
+      authStore.user = response.data
+      applyUserData(response.data)
+    }
+
+    showMessage(response.message || 'Profil mis à jour avec succès!', 'success')
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : 'Erreur lors de la mise à jour du profil'
+    showMessage(message, 'error')
   } finally {
     updating.value = false
   }
@@ -493,14 +541,18 @@ const updateProfile = async () => {
 const updatePassword = async () => {
   try {
     updatingPassword.value = true
-    // TODO: Implement API call to update password
-    await new Promise(resolve => setTimeout(resolve, 1000)) // Simulate API call
+    await apiService.updatePassword({
+      current_password: passwordForm.current_password,
+      new_password: passwordForm.new_password,
+      new_password_confirmation: passwordForm.confirm_password
+    })
     passwordForm.current_password = ''
     passwordForm.new_password = ''
     passwordForm.confirm_password = ''
     showMessage('Mot de passe modifié avec succès!', 'success')
-  } catch (error) {
-    showMessage('Erreur lors de la modification du mot de passe', 'error')
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : 'Erreur lors de la modification du mot de passe'
+    showMessage(message, 'error')
   } finally {
     updatingPassword.value = false
   }
@@ -509,11 +561,27 @@ const updatePassword = async () => {
 const updatePreferences = async () => {
   try {
     updatingPreferences.value = true
-    // TODO: Implement API call to update preferences
-    await new Promise(resolve => setTimeout(resolve, 1000)) // Simulate API call
+    const response = await apiService.updatePreferences({
+      email_notifications: preferences.email_notifications,
+      product_notifications: preferences.product_notifications,
+      max_distance: preferences.max_distance
+    })
+
+    preferences.email_notifications = response.data.email_notifications
+    preferences.product_notifications = response.data.product_notifications
+    preferences.max_distance = response.data.max_distance
+
+    if (authStore.user) {
+      authStore.user = {
+        ...authStore.user,
+        preferences: response.data
+      }
+    }
+
     showMessage('Préférences sauvegardées avec succès!', 'success')
-  } catch (error) {
-    showMessage('Erreur lors de la sauvegarde des préférences', 'error')
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : 'Erreur lors de la sauvegarde des préférences'
+    showMessage(message, 'error')
   } finally {
     updatingPreferences.value = false
   }
@@ -521,28 +589,32 @@ const updatePreferences = async () => {
 
 const loadUserStats = async () => {
   try {
-    // TODO: Implement API call to load user statistics
-    // For now, using mock data
-    userStats.total_reservations = 12
-    userStats.completed_reservations = 8
-    userStats.total_savings = 156.50
-    userStats.food_saved = 15.2
-    userStats.co2_saved = 38.0
-    userStats.this_month = 3
+    const response = await apiService.getUserStats()
+    const data = response.data
+
+    userStats.total_reservations = data.total_reservations || 0
+    userStats.pending_reservations = data.pending_reservations || 0
+    userStats.confirmed_reservations = data.confirmed_reservations || 0
+    userStats.completed_reservations = data.completed_reservations || 0
+    userStats.cancelled_reservations = data.cancelled_reservations || 0
+    userStats.total_savings = data.total_savings || 0
+    userStats.food_saved = data.food_saved || 0
+    userStats.co2_saved = data.co2_saved || 0
+    userStats.this_month.total_reservations = data.this_month?.total_reservations || 0
+    userStats.this_month.completed_reservations = data.this_month?.completed_reservations || 0
   } catch (error) {
     console.error('Error loading user stats:', error)
+    showMessage('Impossible de charger les statistiques utilisateur', 'error')
   }
 }
 
 // Initialize form data
 onMounted(() => {
-  if (user.value) {
-    profileForm.first_name = user.value.first_name
-    profileForm.last_name = user.value.last_name
-    profileForm.email = user.value.email
-    profileForm.phone = user.value.phone || ''
-    profileForm.city = user.value.city
-  }
+  applyUserData(user.value)
   loadUserStats()
+})
+
+watch(user, (newUser) => {
+  applyUserData(newUser)
 })
 </script>
