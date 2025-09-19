@@ -68,7 +68,7 @@ describe('apiService merchant product management', () => {
       2,
       `${API_BASE_URL}/products/1`,
       expect.objectContaining({
-        method: 'PATCH',
+        method: 'PUT',
         body: JSON.stringify({ is_active: false })
       })
     )
