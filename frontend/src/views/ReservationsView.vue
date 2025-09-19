@@ -413,7 +413,8 @@ const loadReservations = async () => {
             phone: res.product?.merchant?.phone || 'N/A'
           }
         },
-        quantity: res.quantity || res.quantity_reserved || 0,
+        quantity: res.quantity ?? res.quantity_reserved ?? 0,
+        quantity_reserved: res.quantity_reserved ?? res.quantity ?? 0,
         original_price: parseFloat(res.product?.original_price || 0),
         discounted_price: parseFloat(res.product?.discounted_price || 0),
         total_amount: parseFloat(res.total_amount || 0),

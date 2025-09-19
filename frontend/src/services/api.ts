@@ -179,7 +179,7 @@ class ApiService {
       method: 'POST',
       body: JSON.stringify({
         product_id: productId,
-        quantity_reserved: quantity
+        quantity
       })
     }, true)
   }
