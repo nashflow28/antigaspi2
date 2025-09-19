@@ -445,6 +445,7 @@ import { ref, computed, onMounted } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 import { useRoute } from 'vue-router'
 import { notify } from '@/composables/useNotifications'
+import { apiService } from '@/services/api'
 import {
   PlusIcon,
   MagnifyingGlassIcon,
@@ -669,7 +670,6 @@ const handleImageUpload = (event: Event) => {
       const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.5)
       productForm.value.image_url = compressedDataUrl
 
-      console.log('Image compressed from', file.size, 'to', compressedDataUrl.length, 'characters')
     }
 
     img.src = URL.createObjectURL(file)
@@ -687,107 +687,37 @@ const saveProduct = async () => {
       return
     }
 
-
-    if (showAddProductModal.value) {
-      // Créer un nouveau produit via l'API
-      const productData = {
-        name: productForm.value.name,
-        description: productForm.value.description,
-        category_id: productForm.value.category_id,
-        original_price: productForm.value.original_price,
-        discounted_price: parseFloat(calculatedDiscountedPrice.value),
-        quantity_available: productForm.value.quantity_available,
-        expiration_date: productForm.value.expiration_date,
-        image_url: productForm.value.image_url || null
-      }
-
-
-      const response = await fetch('http://localhost:8000/api/products', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${authStore.token}`,
-          'Accept': 'application/json'
-        },
-        body: JSON.stringify(productData)
-      })
-
-      if (!response.ok) {
-        const errorData = await response.json()
-        throw new Error(`HTTP error! status: ${response.status}`)
-      }
-
-      const result = await response.json()
-
-      // Recharger la liste des produits
-      await loadProducts()
-
-    } else {
-      // Mise à jour de produit existant
-      const productData = {
-        name: productForm.value.name,
-        description: productForm.value.description,
-        category_id: productForm.value.category_id,
-        original_price: productForm.value.original_price,
-        discounted_price: parseFloat(calculatedDiscountedPrice.value),
-        quantity_available: productForm.value.quantity_available,
-        expiration_date: productForm.value.expiration_date,
-        is_active: productForm.value.is_active,
-        image_url: productForm.value.image_url || null
-      }
-
-      console.log('Updating product:', productForm.value.id, productData)
-      if (productData.image_url) {
-        console.log('Image size:', productData.image_url.length, 'characters')
-        console.log('Image preview:', productData.image_url.substring(0, 100) + '...')
-      }
-
-      console.log('Sending PUT request to:', `http://localhost:8000/api/products/${productForm.value.id}`)
-      console.log('Headers:', {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${authStore.token?.substring(0, 20)}...`,
-        'Accept': 'application/json'
-      })
-
-      const response = await fetch(`http://localhost:8000/api/products/${productForm.value.id}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${authStore.token}`,
-          'Accept': 'application/json'
-        },
-        body: JSON.stringify(productData)
-      })
-
-      console.log('Response received:', response.status, response.statusText)
-
-      if (!response.ok) {
-        const errorText = await response.text()
-        console.error('API Error Response:', errorText)
-        console.error('HTTP status:', response.status)
-        try {
-          const errorData = JSON.parse(errorText)
-          console.error('Parsed error:', errorData)
-        } catch (e) {
-          console.error('Could not parse error response as JSON')
-        }
-        throw new Error(`HTTP error! status: ${response.status}`)
-      }
-
-      const result = await response.json()
-
-      await loadProducts()
+    const productPayload = {
+      name: productForm.value.name,
+      description: productForm.value.description,
+      category_id: productForm.value.category_id,
+      original_price: productForm.value.original_price,
+      discounted_price: parseFloat(calculatedDiscountedPrice.value),
+      quantity_available: productForm.value.quantity_available,
+      expiration_date: productForm.value.expiration_date,
+      image_url: productForm.value.image_url || null
     }
 
-    closeModals()
+    if (showAddProductModal.value) {
+      await apiService.createProduct(productPayload)
+      notify.success('Produit ajouté avec succès.', 'Succès')
+    } else if (productForm.value.id) {
+      await apiService.updateProduct(productForm.value.id, {
+        ...productPayload,
+        is_active: productForm.value.is_active
+      })
+      notify.success('Produit mis à jour avec succès.', 'Succès')
+    }
 
+    await loadProducts()
+    closeModals()
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error)
 
-    if (errorMessage.includes('NetworkError') || errorMessage.includes('Failed to fetch')) {
-      notify.error('Erreur de connexion au serveur. Vérifiez que le serveur backend fonctionne.', 'Erreur réseau')
-    } else if (errorMessage.includes('401')) {
+    if (errorMessage.includes('Authentication')) {
       notify.error('Session expirée. Veuillez vous reconnecter.', 'Authentification requise')
+    } else if (errorMessage.includes('Failed to fetch') || errorMessage.includes('NetworkError')) {
+      notify.error('Erreur de connexion au serveur. Vérifiez que le serveur backend fonctionne.', 'Erreur réseau')
     } else {
       notify.error('Erreur lors de l\'enregistrement du produit.')
     }
@@ -797,11 +727,22 @@ const saveProduct = async () => {
 }
 
 const toggleProductStatus = async (product: any) => {
+  const newStatus = !product.is_active
   try {
-    product.is_active = !product.is_active
-    console.log('Toggling product status:', product.id, product.is_active)
+    await apiService.updateProductStatus(product.id, newStatus)
+    notify.success(
+      newStatus ? 'Produit activé avec succès.' : 'Produit désactivé avec succès.',
+      'Succès'
+    )
+    await loadProducts()
   } catch (error) {
-    console.error('Error toggling product status:', error)
+    const errorMessage = error instanceof Error ? error.message : String(error)
+    if (errorMessage.includes('Authentication')) {
+      notify.error('Session expirée. Veuillez vous reconnecter.', 'Authentification requise')
+    } else {
+      notify.error('Impossible de mettre à jour le statut du produit.')
+    }
+    await loadProducts()
   }
 }
 
@@ -811,19 +752,25 @@ const deleteProduct = async (product: any) => {
 }
 
 const confirmDelete = async () => {
-  if (productToDelete.value) {
-    try {
-      const index = products.value.findIndex(p => p.id === productToDelete.value.id)
-      if (index !== -1) {
-        products.value.splice(index, 1)
-      }
-      console.log('Deleted product:', productToDelete.value.id)
-    } catch (error) {
-      console.error('Error deleting product:', error)
-    }
+  if (!productToDelete.value) {
+    return
   }
-  showDeleteConfirmModal.value = false
-  productToDelete.value = null
+
+  try {
+    await apiService.deleteProduct(productToDelete.value.id)
+    notify.success('Produit supprimé avec succès.', 'Succès')
+    await loadProducts()
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : String(error)
+    if (errorMessage.includes('Authentication')) {
+      notify.error('Session expirée. Veuillez vous reconnecter.', 'Authentification requise')
+    } else {
+      notify.error('Erreur lors de la suppression du produit.')
+    }
+  } finally {
+    showDeleteConfirmModal.value = false
+    productToDelete.value = null
+  }
 }
 
 const cancelDelete = () => {
@@ -833,52 +780,25 @@ const cancelDelete = () => {
 
 const loadProducts = async () => {
   try {
-    const authStore = useAuthStore()
-
-    const response = await fetch('http://localhost:8000/api/products/merchant', {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${authStore.token}`,
-        'Accept': 'application/json'
-      }
-    })
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`)
-    }
-
-    const result = await response.json()
-    console.log('Merchant products loaded:', result)
-
-    // L'API retourne les produits dans result.data
-    products.value = result.data || result || []
-
+    const response = await apiService.getMerchantProducts()
+    products.value = response.data || []
   } catch (error) {
-    console.error('Error loading merchant products:', error)
-    // En cas d'erreur, utiliser des données vides
+    const errorMessage = error instanceof Error ? error.message : String(error)
+    if (errorMessage.includes('Authentication')) {
+      notify.error('Session expirée. Veuillez vous reconnecter.', 'Authentification requise')
+    } else {
+      notify.error('Erreur lors du chargement des produits du commerçant.')
+    }
     products.value = []
   }
 }
 
 const loadCategories = async () => {
   try {
-    const response = await fetch('http://localhost:8000/api/categories', {
-      method: 'GET',
-      headers: {
-        'Accept': 'application/json'
-      }
-    })
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`)
-    }
-
-    const result = await response.json()
-    console.log('Categories loaded:', result)
-    categories.value = result.data || result || []
+    const response = await apiService.getCategories()
+    categories.value = response.data || []
   } catch (error) {
-    console.error('Error loading categories:', error)
+    notify.error('Erreur lors du chargement des catégories.')
     // Fallback to hardcoded categories
     categories.value = [
       { id: 1, name: 'Fruits et Légumes' },

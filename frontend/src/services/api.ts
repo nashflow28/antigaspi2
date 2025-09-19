@@ -6,10 +6,12 @@ import type {
   User,
   Product,
   ProductFilters,
-  Reservation
+  Reservation,
+  Category
 } from '@/types'
 
-const API_BASE_URL = '/api'
+const DEFAULT_API_BASE_URL = '/api'
+const API_BASE_URL = (import.meta?.env?.VITE_API_BASE_URL as string | undefined) || DEFAULT_API_BASE_URL
 
 class ApiService {
   private getHeaders(withAuth = false): HeadersInit {
@@ -28,52 +30,51 @@ class ApiService {
     return headers
   }
 
-  private async request<T>(
-    endpoint: string,
-    options: RequestInit = {}
-  ): Promise<T> {
-    const url = `${API_BASE_URL}${endpoint}`
-
-    const response = await fetch(url, {
-      ...options,
-      headers: {
-        ...this.getHeaders(false),
-        ...options.headers
-      }
-    })
-
-    const data = await response.json()
-
-    if (!response.ok) {
-      throw new Error(data.message || `HTTP error! status: ${response.status}`)
+  private async parseResponse<T>(response: Response): Promise<T> {
+    if (response.status === 204) {
+      return null as T
     }
 
-    return data
+    const contentType = response.headers.get('content-type')
+
+    if (contentType && contentType.includes('application/json')) {
+      return response.json() as Promise<T>
+    }
+
+    const text = await response.text()
+    try {
+      return JSON.parse(text) as T
+    } catch (error) {
+      return text as unknown as T
+    }
   }
 
-  private async authenticatedRequest<T>(
+  private async request<T>(
     endpoint: string,
-    options: RequestInit = {}
+    options: RequestInit = {},
+    withAuth = false
   ): Promise<T> {
     const url = `${API_BASE_URL}${endpoint}`
 
     const response = await fetch(url, {
       ...options,
       headers: {
-        ...this.getHeaders(true),
+        ...this.getHeaders(withAuth),
         ...options.headers
       }
     })
 
-    const data = await response.json()
+    const data = await this.parseResponse<T>(response)
 
     if (!response.ok) {
-      if (response.status === 401) {
+      if (withAuth && response.status === 401) {
         localStorage.removeItem('auth_token')
         window.location.href = '/login'
         return Promise.reject(new Error('Authentication failed'))
       }
-      throw new Error(data.message || `HTTP error! status: ${response.status}`)
+
+      const message = (data as ApiResponse<unknown>)?.message || `HTTP error! status: ${response.status}`
+      throw new Error(message)
     }
 
     return data
@@ -100,13 +101,13 @@ class ApiService {
   }
 
   async getCurrentUser(): Promise<ApiResponse<User>> {
-    return this.authenticatedRequest<ApiResponse<User>>('/auth/me')
+    return this.request<ApiResponse<User>>('/auth/me', {}, true)
   }
 
   async logout(): Promise<ApiResponse<null>> {
-    return this.authenticatedRequest<ApiResponse<null>>('/auth/logout', {
+    return this.request<ApiResponse<null>>('/auth/logout', {
       method: 'POST'
-    })
+    }, true)
   }
 
   // Products
@@ -127,59 +128,76 @@ class ApiService {
     return this.request<ApiResponse<Product[]>>(endpoint)
   }
 
+  async getMerchantProducts(): Promise<ApiResponse<Product[]>> {
+    return this.request<ApiResponse<Product[]>>('/products/merchant', {}, true)
+  }
+
   async getProduct(id: number): Promise<ApiResponse<Product>> {
     return this.request<ApiResponse<Product>>(`/products/${id}`)
   }
 
   async createProduct(product: Partial<Product>): Promise<ApiResponse<Product>> {
-    return this.authenticatedRequest<ApiResponse<Product>>('/products', {
+    return this.request<ApiResponse<Product>>('/products', {
       method: 'POST',
       body: JSON.stringify(product)
-    })
+    }, true)
   }
 
   async updateProduct(id: number, product: Partial<Product>): Promise<ApiResponse<Product>> {
-    return this.authenticatedRequest<ApiResponse<Product>>(`/products/${id}`, {
+    return this.request<ApiResponse<Product>>(`/products/${id}`, {
       method: 'PUT',
       body: JSON.stringify(product)
-    })
+    }, true)
+  }
+
+  async updateProductStatus(id: number, isActive: boolean): Promise<ApiResponse<Product>> {
+    return this.request<ApiResponse<Product>>(`/products/${id}`, {
+      method: 'PATCH',
+      body: JSON.stringify({
+        is_active: isActive
+      })
+    }, true)
   }
 
   async deleteProduct(id: number): Promise<ApiResponse<null>> {
-    return this.authenticatedRequest<ApiResponse<null>>(`/products/${id}`, {
+    return this.request<ApiResponse<null>>(`/products/${id}`, {
       method: 'DELETE'
-    })
+    }, true)
+  }
+
+  async getCategories(): Promise<ApiResponse<Category[]>> {
+    return this.request<ApiResponse<Category[]>>('/categories')
   }
 
   // Reservations
   async getReservations(): Promise<ApiResponse<Reservation[]>> {
-    return this.authenticatedRequest<ApiResponse<Reservation[]>>('/reservations')
+    return this.request<ApiResponse<Reservation[]>>('/reservations', {}, true)
   }
 
   async createReservation(productId: number, quantity: number): Promise<ApiResponse<Reservation>> {
-    return this.authenticatedRequest<ApiResponse<Reservation>>('/reservations', {
+    return this.request<ApiResponse<Reservation>>('/reservations', {
       method: 'POST',
       body: JSON.stringify({
         product_id: productId,
         quantity_reserved: quantity
       })
-    })
+    }, true)
   }
 
   async cancelReservation(id: number): Promise<ApiResponse<null>> {
-    return this.authenticatedRequest<ApiResponse<null>>(`/reservations/${id}/cancel`, {
+    return this.request<ApiResponse<null>>(`/reservations/${id}/cancel`, {
       method: 'POST'
-    })
+    }, true)
   }
 
   async getMerchantReservations(): Promise<ApiResponse<Reservation[]>> {
-    return this.authenticatedRequest<ApiResponse<Reservation[]>>('/reservations/merchant/list')
+    return this.request<ApiResponse<Reservation[]>>('/reservations/merchant/list', {}, true)
   }
 
   async confirmReservation(id: number): Promise<ApiResponse<Reservation>> {
-    return this.authenticatedRequest<ApiResponse<Reservation>>(`/reservations/${id}/confirm`, {
+    return this.request<ApiResponse<Reservation>>(`/reservations/${id}/confirm`, {
       method: 'POST'
-    })
+    }, true)
   }
 }
 
