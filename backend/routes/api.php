@@ -200,7 +200,7 @@ Route::prefix('reviews')->group(function () {
 });
 
 // Routes administrateur (protégées)
-Route::prefix('admin')->middleware('jwt.auth')->group(function () {
+Route::prefix('admin')->middleware(['jwt.auth', 'can:admin'])->group(function () {
     Route::get('/dashboard', [AdminController::class, 'dashboard']); // Dashboard admin
     Route::get('/system-health', [AdminController::class, 'systemHealth']); // Santé du système
 
@@ -230,27 +230,25 @@ Route::prefix('admin')->middleware('jwt.auth')->group(function () {
         Route::get('/users', [\App\Http\Controllers\Api\LoyaltyPointController::class, 'getAllUsersPoints']); // Tous les utilisateurs avec points
         Route::post('/award', [\App\Http\Controllers\Api\LoyaltyPointController::class, 'awardPoints']); // Attribuer des points
     });
-});
 
-// Routes des points de fidélité (protégées)
-Route::prefix('loyalty')->middleware('jwt.auth')->group(function () {
-    Route::get('/my-points', [\App\Http\Controllers\Api\LoyaltyPointController::class, 'getUserPoints']); // Mes points
-    Route::post('/redeem', [\App\Http\Controllers\Api\LoyaltyPointController::class, 'redeemPoints']); // Échanger des points
-});
-
-// Routes temporaires pour les tests (à sécuriser plus tard)
-Route::prefix('admin')->group(function () {
+    // Gestion des utilisateurs (admin uniquement)
     Route::get('/users', [\App\Http\Controllers\Admin\AdminUserController::class, 'index']);
     Route::patch('/users/{id}/suspend', [\App\Http\Controllers\Admin\AdminUserController::class, 'suspend']);
     Route::patch('/users/{id}/unsuspend', [\App\Http\Controllers\Admin\AdminUserController::class, 'unsuspend']);
 
-    // Merchant moderation routes
+    // Modération des commerçants et réservations (admin uniquement)
     Route::get('/moderation', [\App\Http\Controllers\Admin\AdminMerchantController::class, 'moderation']);
     Route::post('/merchants/{id}/approve', [\App\Http\Controllers\Admin\AdminMerchantController::class, 'approve']);
     Route::post('/merchants/{id}/reject', [\App\Http\Controllers\Admin\AdminMerchantController::class, 'reject']);
     Route::post('/products/{id}/approve', [\App\Http\Controllers\Admin\AdminMerchantController::class, 'approveProduct']);
     Route::post('/products/{id}/reject', [\App\Http\Controllers\Admin\AdminMerchantController::class, 'rejectProduct']);
     Route::post('/reservations/{id}/resolve', [\App\Http\Controllers\Admin\AdminMerchantController::class, 'resolveReservation']);
+});
+
+// Routes des points de fidélité (protégées)
+Route::prefix('loyalty')->middleware('jwt.auth')->group(function () {
+    Route::get('/my-points', [\App\Http\Controllers\Api\LoyaltyPointController::class, 'getUserPoints']); // Mes points
+    Route::post('/redeem', [\App\Http\Controllers\Api\LoyaltyPointController::class, 'redeemPoints']); // Échanger des points
 });
 
 // Routes de test et informations
