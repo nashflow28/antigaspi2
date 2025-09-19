@@ -152,7 +152,7 @@ class ApiService {
 
   async updateProductStatus(id: number, isActive: boolean): Promise<ApiResponse<Product>> {
     return this.request<ApiResponse<Product>>(`/products/${id}`, {
-      method: 'PATCH',
+      method: 'PUT',
       body: JSON.stringify({
         is_active: isActive
       })
