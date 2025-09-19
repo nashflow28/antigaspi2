@@ -20,14 +20,12 @@ return new class extends Migration
             $table->string('title')->nullable();
             $table->text('comment')->nullable();
             $table->boolean('is_verified_purchase')->default(false);
-            $table->boolean('is_approved')->default(true);
-            $table->timestamp('approved_at')->nullable();
             $table->timestamps();
 
             // Indexes for performance
-            $table->index(['merchant_id', 'is_approved']);
-            $table->index(['product_id', 'is_approved']);
-            $table->index(['user_id']);
+            $table->index('merchant_id');
+            $table->index('product_id');
+            $table->index('user_id');
             $table->index('rating');
         });
     }
