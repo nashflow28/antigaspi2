@@ -72,13 +72,13 @@ class ReservationController extends Controller
                 $product = Product::lockForUpdate()->findOrFail($request->product_id);
 
                 // Calculer le montant total
-                $totalAmount = $product->discounted_price * $request->quantity;
+                $totalAmount = $product->discounted_price * $request->quantity_reserved;
 
                 // Créer la réservation
                 $reservation = Reservation::create([
                     'user_id' => $user->id,
                     'product_id' => $product->id,
-                    'quantity_reserved' => $request->quantity,
+                    'quantity_reserved' => $request->quantity_reserved,
                     'total_amount' => $totalAmount,
                     'status' => 'pending',
                     'notes' => $request->notes,
@@ -87,7 +87,7 @@ class ReservationController extends Controller
                 ]);
 
                 // Décrémenter le stock
-                $product->decrement('quantity_available', $request->quantity);
+                $product->decrement('quantity_available', $request->quantity_reserved);
 
                 $reservation->load(['product.category', 'product.merchant.user']);
 
