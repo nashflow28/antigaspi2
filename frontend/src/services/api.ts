@@ -6,7 +6,8 @@ import type {
   User,
   Product,
   ProductFilters,
-  Reservation
+  Reservation,
+  Category
 } from '@/types'
 
 const API_BASE_URL = '/api'
@@ -149,6 +150,10 @@ class ApiService {
     return this.authenticatedRequest<ApiResponse<null>>(`/products/${id}`, {
       method: 'DELETE'
     })
+  }
+
+  async getCategories(): Promise<ApiResponse<Category[]>> {
+    return this.request<ApiResponse<Category[]>>('/categories')
   }
 
   // Reservations
