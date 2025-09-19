@@ -19,7 +19,7 @@ class AdminMerchantController extends Controller
     {
         try {
             // Get all merchants with their user relationship
-            $merchants = Merchant::with(['user', 'products'])->get();
+            $merchants = Merchant::with(['user', 'products.category'])->get();
 
             // Get merchants by verification status
             $verifiedMerchants = $merchants->where('is_verified', true);
@@ -50,10 +50,10 @@ class AdminMerchantController extends Controller
                     'description' => 'Commerçant en attente de vérification',
                     'created_at' => $merchant->created_at ? $merchant->created_at->toISOString() : now()->toISOString()
                 ];
-            });
+            })->values();
 
             // Get recent products (as products to moderate)
-            $recentProducts = Product::with(['merchant.user'])
+            $recentProducts = Product::with(['merchant.user', 'category'])
                 ->orderBy('created_at', 'desc')
                 ->take(6)
                 ->get();
@@ -63,15 +63,17 @@ class AdminMerchantController extends Controller
                     'id' => $product->id,
                     'name' => $product->name,
                     'merchant_name' => $product->merchant->business_name,
-                    'price' => $product->price,
+                    'original_price' => (float) $product->original_price,
+                    'discounted_price' => (float) $product->discounted_price,
+                    'quantity_available' => (int) $product->quantity_available,
                     'image_url' => $product->image_url ?: 'https://images.unsplash.com/photo-1546549032-9571cd6b27df?w=400',
                     'description' => $product->description ?? '',
-                    'category' => $product->category ?? 'Non catégorisé'
+                    'category' => $product->category?->name ?? 'Non catégorisé'
                 ];
-            });
+            })->values();
 
             // Get flagged reservations (using completed reservations as examples)
-            $flaggedReservations = Reservation::with(['user', 'product.merchant'])
+            $flaggedReservations = Reservation::with(['user', 'product.merchant', 'product.category'])
                 ->where('status', 'completed')
                 ->take(3)
                 ->get()
@@ -81,11 +83,12 @@ class AdminMerchantController extends Controller
                         'product_name' => $reservation->product->name,
                         'customer_name' => trim($reservation->user->first_name . ' ' . $reservation->user->last_name),
                         'merchant_name' => $reservation->product->merchant->business_name,
-                        'total_price' => $reservation->total_price,
+                        'total_amount' => (float) $reservation->total_amount,
+                        'quantity_reserved' => (int) $reservation->quantity_reserved,
                         'flag_reason' => 'Contrôle qualité',
                         'created_at' => $reservation->created_at ? $reservation->created_at->toISOString() : now()->toISOString()
                     ];
-                });
+                })->values();
 
             return response()->json([
                 'success' => true,
@@ -182,7 +185,7 @@ class AdminMerchantController extends Controller
         try {
             $product = Product::findOrFail($id);
             // For demo purposes, we'll just mark it as out of stock
-            $product->quantity = 0;
+            $product->quantity_available = 0;
             $product->save();
 
             return response()->json([
