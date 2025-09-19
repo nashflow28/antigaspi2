@@ -9,6 +9,17 @@ export const useReservationsStore = defineStore('reservations', () => {
   const loading = ref(false)
   const error = ref<string | null>(null)
 
+  const normalizeReservation = (reservation: Reservation): Reservation => {
+    const normalizedQuantity = reservation.quantity ?? reservation.quantity_reserved ?? 0
+    const normalizedQuantityReserved = reservation.quantity_reserved ?? normalizedQuantity
+
+    return {
+      ...reservation,
+      quantity: normalizedQuantity,
+      quantity_reserved: normalizedQuantityReserved
+    }
+  }
+
   const pendingReservations = computed(() =>
     reservations.value.filter(r => r.status === 'pending')
   )
@@ -57,7 +68,7 @@ export const useReservationsStore = defineStore('reservations', () => {
       clearError()
 
       const response = await apiService.getReservations()
-      reservations.value = response.data
+      reservations.value = response.data.map(normalizeReservation)
 
       return { success: true }
     } catch (err: any) {
@@ -76,9 +87,10 @@ export const useReservationsStore = defineStore('reservations', () => {
       const response = await apiService.createReservation(productId, quantity)
 
       // Add new reservation to the list
-      reservations.value.unshift(response.data)
+      const normalizedReservation = normalizeReservation(response.data)
+      reservations.value.unshift(normalizedReservation)
 
-      return { success: true, data: response.data }
+      return { success: true, data: normalizedReservation }
     } catch (err: any) {
       setError(err.message || 'Erreur lors de la réservation')
       return { success: false, error: err.message }
@@ -116,7 +128,7 @@ export const useReservationsStore = defineStore('reservations', () => {
       clearError()
 
       const response = await apiService.getMerchantReservations()
-      merchantReservations.value = response.data
+      merchantReservations.value = response.data.map(normalizeReservation)
 
       return { success: true }
     } catch (err: any) {
@@ -133,14 +145,15 @@ export const useReservationsStore = defineStore('reservations', () => {
       clearError()
 
       const response = await apiService.confirmReservation(id)
+      const normalizedReservation = normalizeReservation(response.data)
 
       // Update reservation in the list
       const index = merchantReservations.value.findIndex(r => r.id === id)
       if (index !== -1) {
-        merchantReservations.value[index] = response.data
+        merchantReservations.value[index] = normalizedReservation
       }
 
-      return { success: true, data: response.data }
+      return { success: true, data: normalizedReservation }
     } catch (err: any) {
       setError(err.message || 'Erreur lors de la confirmation')
       return { success: false, error: err.message }

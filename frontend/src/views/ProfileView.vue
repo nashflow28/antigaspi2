@@ -202,7 +202,7 @@
                               </span>
                               <span class="flex items-center gap-1">
                                 <TagIcon class="w-4 h-4" />
-                                Quantité: {{ reservation.quantity_reserved }}
+                                Quantité: {{ reservation.quantity ?? reservation.quantity_reserved }}
                               </span>
                               <span class="font-medium text-gray-900">
                                 {{ formatPrice(reservation.total_amount) }}
