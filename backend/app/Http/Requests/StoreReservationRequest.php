@@ -47,7 +47,7 @@ class StoreReservationRequest extends FormRequest
                     }
                 }
             ],
-            'quantity' => [
+            'quantity_reserved' => [
                 'required',
                 'integer',
                 'min:1',
@@ -85,9 +85,9 @@ class StoreReservationRequest extends FormRequest
         return [
             'product_id.required' => 'Veuillez sélectionner un produit.',
             'product_id.exists' => 'Le produit sélectionné n\'existe pas.',
-            'quantity.required' => 'Veuillez indiquer la quantité.',
-            'quantity.integer' => 'La quantité doit être un nombre entier.',
-            'quantity.min' => 'La quantité minimum est 1.',
+            'quantity_reserved.required' => 'Veuillez indiquer la quantité.',
+            'quantity_reserved.integer' => 'La quantité doit être un nombre entier.',
+            'quantity_reserved.min' => 'La quantité minimum est 1.',
             'notes.max' => 'Les notes ne peuvent pas dépasser 500 caractères.',
             'pickup_date.after' => 'La date de récupération doit être dans le futur.',
             'pickup_date.before' => 'La date de récupération ne peut pas dépasser 7 jours.',
@@ -103,7 +103,7 @@ class StoreReservationRequest extends FormRequest
     {
         return [
             'product_id' => 'produit',
-            'quantity' => 'quantité',
+            'quantity_reserved' => 'quantité',
             'notes' => 'notes',
             'pickup_date' => 'date de récupération',
             'pickup_time' => 'heure de récupération',
