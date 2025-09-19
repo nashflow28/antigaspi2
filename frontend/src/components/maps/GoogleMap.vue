@@ -42,6 +42,7 @@
 </template>
 
 <script setup lang="ts">
+/// <reference types="@types/google.maps" />
 import { ref, onMounted, watch, nextTick } from 'vue'
 import { Loader } from '@googlemaps/js-api-loader'
 

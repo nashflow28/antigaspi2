@@ -17,81 +17,9 @@ use App\Http\Controllers\CategoryController;
 |--------------------------------------------------------------------------
 */
 
-// Routes de test temporaires sans middleware
-Route::get('/test-reviews-dashboard', function (Request $request) {
-    try {
-        $token = $request->bearerToken();
-        if (!$token) {
-            return response()->json(['error' => 'No token'], 401);
-        }
 
-        $user = \Tymon\JWTAuth\Facades\JWTAuth::setToken($token)->authenticate();
-        if (!$user || $user->role !== 'merchant') {
-            return response()->json(['error' => 'Invalid user or not merchant', 'user' => $user], 403);
-        }
-
-        return response()->json([
-            'success' => true,
-            'message' => 'JWT works!',
-            'user' => [
-                'id' => $user->id,
-                'name' => $user->name,
-                'email' => $user->email,
-                'role' => $user->role
-            ]
-        ]);
-    } catch (\Exception $e) {
-        return response()->json(['error' => $e->getMessage()], 500);
-    }
-});
-
-// Route de test pour récupération des produits du commerçant
-Route::get('/test-products-merchant', function (Request $request) {
-    try {
-        $token = $request->bearerToken();
-        if (!$token) {
-            return response()->json(['error' => 'No token'], 401);
-        }
-
-        $user = \Tymon\JWTAuth\Facades\JWTAuth::setToken($token)->authenticate();
-        if (!$user || $user->role !== 'merchant') {
-            return response()->json(['error' => 'Invalid user or not merchant', 'user' => $user], 403);
-        }
-
-        // Appeler le contrôleur directement
-        $controller = new \App\Http\Controllers\Api\ProductController();
-        return $controller->merchantProducts($request);
-
-    } catch (\Exception $e) {
-        return response()->json(['error' => $e->getMessage()], 500);
-    }
-});
-
-
-// Route de test pour création de produits
-Route::post('/test-products', function (Request $request) {
-    try {
-        $token = $request->bearerToken();
-        if (!$token) {
-            return response()->json(['error' => 'No token'], 401);
-        }
-
-        $user = \Tymon\JWTAuth\Facades\JWTAuth::setToken($token)->authenticate();
-        if (!$user || $user->role !== 'merchant') {
-            return response()->json(['error' => 'Invalid user or not merchant', 'user' => $user], 403);
-        }
-
-        // Appeler le contrôleur directement
-        $controller = new \App\Http\Controllers\Api\ProductController();
-        return $controller->store($request);
-
-    } catch (\Exception $e) {
-        return response()->json(['error' => $e->getMessage()], 500);
-    }
-});
-
-// Routes d'authentification (publiques)
-Route::prefix('auth')->group(function () {
+// Routes d'authentification (publiques) - Rate limiting strict
+Route::prefix('auth')->middleware('throttle:auth')->group(function () {
     Route::post('register', [AuthController::class, 'register']);
     Route::post('login', [AuthController::class, 'login']); // Legacy
 
@@ -113,8 +41,8 @@ Route::prefix('auth')->group(function () {
     });
 });
 
-// Routes des produits
-Route::prefix('products')->group(function () {
+// Routes des produits - Rate limiting pour la recherche
+Route::prefix('products')->middleware('throttle:search')->group(function () {
     // Routes publiques (consultation)
     Route::get('/', [ProductController::class, 'index']); // Liste des produits
     Route::get('/categories/list', [ProductController::class, 'categories']); // Liste des catégories
@@ -122,9 +50,13 @@ Route::prefix('products')->group(function () {
     // Routes protégées (gestion des produits)
     Route::middleware('jwt.auth')->group(function () {
         Route::get('/merchant', [ProductController::class, 'merchantProducts']); // Produits du commerçant connecté
-        Route::post('/', [ProductController::class, 'store']); // Ajouter un produit (commerçant)
-        Route::put('/{id}', [ProductController::class, 'update']); // Modifier un produit
-        Route::delete('/{id}', [ProductController::class, 'destroy']); // Supprimer un produit
+
+        // Routes d'écriture avec rate limiting strict
+        Route::middleware('throttle:write')->group(function () {
+            Route::post('/', [ProductController::class, 'store']); // Ajouter un produit (commerçant)
+            Route::put('/{id}', [ProductController::class, 'update']); // Modifier un produit
+            Route::delete('/{id}', [ProductController::class, 'destroy']); // Supprimer un produit
+        });
     });
 
     // Route avec paramètre ID doit être en dernier
@@ -133,18 +65,20 @@ Route::prefix('products')->group(function () {
 
 // Routes des réservations (toutes protégées)
 Route::prefix('reservations')->middleware('jwt.auth')->group(function () {
-    // Routes pour les consommateurs
+    // Routes de consultation (rate limiting normal)
     Route::get('/', [ReservationController::class, 'index']); // Mes réservations
-    Route::post('/', [ReservationController::class, 'store']); // Créer une réservation
     Route::get('/statistics', [ReservationController::class, 'statistics']); // Mes statistiques
     Route::get('/{id}', [ReservationController::class, 'show']); // Détail de ma réservation
-    Route::post('/{id}/cancel', [ReservationController::class, 'cancel']); // Annuler ma réservation
-
-    // Routes pour les commerçants
     Route::get('/merchant/list', [ReservationController::class, 'merchantReservations']); // Réservations reçues
-    Route::post('/{id}/confirm', [ReservationController::class, 'confirm']); // Confirmer une réservation
-    Route::post('/{id}/ready', [ReservationController::class, 'markReady']); // Marquer comme prêt
-    Route::post('/{id}/complete', [ReservationController::class, 'complete']); // Marquer comme terminée
+
+    // Routes d'écriture avec rate limiting strict
+    Route::middleware('throttle:write')->group(function () {
+        Route::post('/', [ReservationController::class, 'store']); // Créer une réservation
+        Route::post('/{id}/cancel', [ReservationController::class, 'cancel']); // Annuler ma réservation
+        Route::post('/{id}/confirm', [ReservationController::class, 'confirm']); // Confirmer une réservation
+        Route::post('/{id}/ready', [ReservationController::class, 'markReady']); // Marquer comme prêt
+        Route::post('/{id}/complete', [ReservationController::class, 'complete']); // Marquer comme terminée
+    });
 });
 
 // Routes des catégories (alternative)
@@ -200,7 +134,7 @@ Route::prefix('reviews')->group(function () {
 });
 
 // Routes administrateur (protégées)
-Route::prefix('admin')->middleware(['jwt.auth', 'can:admin'])->group(function () {
+Route::prefix('admin')->middleware(['jwt.auth', 'can:admin', 'throttle:admin'])->group(function () {
     Route::get('/dashboard', [AdminController::class, 'dashboard']); // Dashboard admin
     Route::get('/system-health', [AdminController::class, 'systemHealth']); // Santé du système
 

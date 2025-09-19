@@ -9,7 +9,7 @@
           </span>
         </h3>
         <button
-          @click="loadReviews"
+          @click="() => loadReviews()"
           class="inline-flex items-center px-3 py-1 text-sm text-primary-600 hover:text-primary-700 transition-colors"
           :disabled="loading"
         >

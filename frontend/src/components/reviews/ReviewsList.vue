@@ -25,7 +25,7 @@
         <div class="relative">
           <select
             v-model="currentFilter"
-            @change="fetchReviews"
+            @change="() => fetchReviews()"
             class="text-sm border border-gray-300 rounded-lg px-3 py-1 focus:ring-2 focus:ring-yellow-500 focus:border-transparent"
           >
             <option value="">Tous les avis</option>
@@ -181,7 +181,7 @@
 <script setup lang="ts">
 import { ref, onMounted, watch } from 'vue'
 import { useAuthStore } from '@/stores/auth'
-import { MessageSquare, Star, ShieldCheck, Package, Edit, Trash2 } from 'lucide-vue-next'
+import { MessageSquare, Star, ShieldCheck, Package, Edit } from 'lucide-vue-next'
 import EditReviewForm from './EditReviewForm.vue'
 
 interface Review {

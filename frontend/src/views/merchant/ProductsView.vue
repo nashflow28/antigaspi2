@@ -691,8 +691,8 @@ const saveProduct = async () => {
       name: productForm.value.name,
       description: productForm.value.description,
       category_id: productForm.value.category_id,
-      original_price: productForm.value.original_price,
-      discounted_price: parseFloat(calculatedDiscountedPrice.value),
+      original_price: productForm.value.original_price.toString(),
+      discounted_price: parseFloat(calculatedDiscountedPrice.value).toString(),
       quantity_available: productForm.value.quantity_available,
       expiration_date: productForm.value.expiration_date,
       image_url: productForm.value.image_url || null

@@ -125,7 +125,7 @@
 
           <!-- Empty State -->
           <div v-else-if="reviews.length === 0" class="px-6 py-8 text-center">
-            <MessageSquareIcon class="w-12 h-12 text-gray-400 mx-auto mb-4" />
+            <ChatBubbleLeftRightIcon class="w-12 h-12 text-gray-400 mx-auto mb-4" />
             <h4 class="text-lg font-medium text-gray-900 mb-2">Aucun avis</h4>
             <p class="text-gray-600">
               {{ hasActiveFilters ? 'Aucun avis ne correspond à vos critères' : 'Vous n\'avez pas encore reçu d\'avis clients' }}
@@ -178,7 +178,7 @@
                 </div>
 
                 <div v-if="review.product" class="inline-flex items-center text-xs text-blue-600 bg-blue-50 rounded-full px-3 py-1 mb-4">
-                  <PackageIcon class="w-3 h-3 mr-1" />
+                  <ArchiveBoxIcon class="w-3 h-3 mr-1" />
                   {{ review.product.name }}
                 </div>
 
@@ -229,10 +229,10 @@ import { ref, onMounted, computed } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 import MerchantResponse from '@/components/reviews/MerchantResponse.vue'
 import {
-  MessageSquareIcon,
+  ChatBubbleLeftRightIcon,
   StarIcon,
   ShieldCheckIcon,
-  PackageIcon,
+  ArchiveBoxIcon,
   ChartBarIcon,
   ArrowPathIcon
 } from '@heroicons/vue/24/outline'

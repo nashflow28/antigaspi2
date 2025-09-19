@@ -31,7 +31,10 @@
       "Bash(php:*)",
       "Bash(\"C:/xampp/mysql/bin/mysql.exe\":*)",
       "Bash(python:*)",
-      "Bash(cat:*)"
+      "Bash(cat:*)",
+      "Bash(awk:*)",
+      "Bash(git pull:*)",
+      "Bash(npx vue-tsc:*)"
     ],
     "deny": [],
     "ask": []

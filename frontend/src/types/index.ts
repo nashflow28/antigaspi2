@@ -41,6 +41,7 @@ export interface Product {
   category: Category
   merchant: Merchant
   created_at: string
+  is_active?: boolean
 }
 
 export interface Reservation {

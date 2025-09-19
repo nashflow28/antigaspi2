@@ -8,7 +8,7 @@
           <label class="block text-sm font-medium text-gray-700 mb-2">Statut</label>
           <select
             v-model="filters.status"
-            @change="loadReports"
+            @change="() => loadReports()"
             class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
           >
             <option value="">Tous les statuts</option>
@@ -23,7 +23,7 @@
           <label class="block text-sm font-medium text-gray-700 mb-2">Raison</label>
           <select
             v-model="filters.reason"
-            @change="loadReports"
+            @change="() => loadReports()"
             class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
           >
             <option value="">Toutes les raisons</option>
@@ -59,7 +59,7 @@
             </span>
           </h3>
           <button
-            @click="loadReports"
+            @click="() => loadReports()"
             class="inline-flex items-center px-3 py-1 text-sm text-primary-600 hover:text-primary-700 transition-colors"
             :disabled="loading"
           >

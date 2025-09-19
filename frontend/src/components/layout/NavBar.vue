@@ -348,7 +348,6 @@ const authStore = useAuthStore()
 const {
   createAriaId,
   handleArrowNavigation,
-  handleActivationKeys,
   getFocusableElements,
   announce
 } = useAccessibility()
@@ -422,15 +421,6 @@ const handleMenuItemKeydown = (event: KeyboardEvent) => {
 }
 
 // Ouvrir/fermer le menu avec annonce
-const toggleUserMenu = () => {
-  showUserMenu.value = !showUserMenu.value
-
-  if (showUserMenu.value) {
-    announce('Menu utilisateur ouvert. Utilisez les flèches pour naviguer.')
-  } else {
-    announce('Menu utilisateur fermé')
-  }
-}
 
 const getDashboardRoute = () => {
   if (!authStore.user) return '/dashboard'

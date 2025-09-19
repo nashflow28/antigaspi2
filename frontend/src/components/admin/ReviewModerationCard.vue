@@ -68,7 +68,7 @@
         <div class="flex items-center space-x-3 mt-4">
           <button
             @click="approveReview"
-            :disabled="processing"
+            :disabled="!!processing"
             class="inline-flex items-center px-4 py-2 text-sm bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
             <Check class="w-4 h-4 mr-2" />
@@ -77,7 +77,7 @@
 
           <button
             @click="rejectReview"
-            :disabled="processing"
+            :disabled="!!processing"
             class="inline-flex items-center px-4 py-2 text-sm bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
             <X class="w-4 h-4 mr-2" />
