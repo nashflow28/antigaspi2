@@ -89,6 +89,8 @@ class AdminMerchantControllerTest extends TestCase
             $table->integer('quantity_reserved');
             $table->decimal('total_amount', 10, 2);
             $table->string('status');
+            $table->string('payment_status')->default('pending');
+            $table->unsignedBigInteger('latest_payment_id')->nullable();
             $table->string('reservation_code')->unique();
             $table->timestamp('reserved_at')->nullable();
             $table->timestamp('confirmed_at')->nullable();

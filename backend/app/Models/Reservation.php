@@ -2,11 +2,11 @@
 
 namespace App\Models;
 
+use App\Enums\PaymentStatus;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Support\Str;
 
 class Reservation extends Model
 {
@@ -18,6 +18,8 @@ class Reservation extends Model
         'quantity_reserved',
         'total_amount',
         'status',
+        'payment_status',
+        'latest_payment_id',
         'reservation_code',
         'reserved_at',
         'confirmed_at',
@@ -30,6 +32,8 @@ class Reservation extends Model
         return [
             'quantity_reserved' => 'integer',
             'total_amount' => 'decimal:2',
+            'payment_status' => PaymentStatus::class,
+            'latest_payment_id' => 'integer',
             'reserved_at' => 'datetime',
             'confirmed_at' => 'datetime',
             'expires_at' => 'datetime',
@@ -47,10 +51,12 @@ class Reservation extends Model
             if (empty($reservation->expires_at)) {
                 $reservation->expires_at = now()->addHours(24);
             }
+            if (empty($reservation->payment_status)) {
+                $reservation->payment_status = PaymentStatus::PENDING;
+            }
         });
     }
 
-    // Relationships
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
@@ -66,7 +72,11 @@ class Reservation extends Model
         return $this->hasMany(Payment::class);
     }
 
-    // Scopes
+    public function latestPayment(): BelongsTo
+    {
+        return $this->belongsTo(Payment::class, 'latest_payment_id');
+    }
+
     public function scopePending($query)
     {
         return $query->where('status', 'pending');
@@ -105,7 +115,6 @@ class Reservation extends Model
         });
     }
 
-    // Helper methods
     public function isPending(): bool
     {
         return $this->status === 'pending';
@@ -147,6 +156,7 @@ class Reservation extends Model
             $this->update([
                 'status' => 'confirmed',
                 'confirmed_at' => now(),
+                'payment_status' => $this->payment_status ?? PaymentStatus::SUCCESS,
             ]);
             return true;
         }
@@ -165,11 +175,30 @@ class Reservation extends Model
     public function cancel(): bool
     {
         if ($this->canBeCancelled()) {
-            $this->update(['status' => 'cancelled']);
+            $this->update([
+                'status' => 'cancelled',
+                'payment_status' => PaymentStatus::FAILED,
+            ]);
             $this->product->increment('quantity_available', $this->quantity_reserved);
             return true;
         }
         return false;
+    }
+
+    public function markPaymentStatus(PaymentStatus $status): void
+    {
+        $attributes = ['payment_status' => $status];
+
+        if ($status === PaymentStatus::SUCCESS && $this->isPending()) {
+            $attributes['status'] = 'confirmed';
+            $attributes['confirmed_at'] = now();
+        }
+
+        if ($status === PaymentStatus::FAILED && $this->canBeCancelled()) {
+            $attributes['status'] = 'cancelled';
+        }
+
+        $this->fill($attributes)->save();
     }
 
     public function getTimeUntilExpirationAttribute(): string

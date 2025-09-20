@@ -2,25 +2,20 @@
 
 namespace App\Http\Requests;
 
+use App\Enums\PaymentMethod;
 use App\Models\Product;
 use App\Models\Reservation;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\Rule;
 
 class StoreReservationRequest extends FormRequest
 {
-    /**
-     * Determine if the user is authorized to make this request.
-     */
     public function authorize(): bool
     {
-        // Only consumers can create reservations
         return Auth::check() && Auth::user()->role === 'consumer';
     }
 
-    /**
-     * Get the validation rules that apply to the request.
-     */
     public function rules(): array
     {
         return [
@@ -62,12 +57,23 @@ class StoreReservationRequest extends FormRequest
                     }
                 }
             ],
+            'payment_method' => ['required', Rule::enum(PaymentMethod::class)],
+            'customer_phone' => [
+                'nullable',
+                'string',
+                'regex:/^\+?[0-9]{8,15}$/',
+                Rule::requiredIf(function () {
+                    $method = $this->input('payment_method');
+                    return in_array($method, [PaymentMethod::FLOOZ->value, PaymentMethod::TMONEY->value], true);
+                }),
+            ],
+            'customer_email' => ['nullable', 'email'],
             'notes' => 'nullable|string|max:500',
             'pickup_date' => [
                 'nullable',
                 'date',
                 'after:now',
-                'before:' . now()->addDays(7)->toDateString() // Max 7 days ahead
+                'before:' . now()->addDays(7)->toDateString()
             ],
             'pickup_time' => [
                 'nullable',
@@ -77,9 +83,6 @@ class StoreReservationRequest extends FormRequest
         ];
     }
 
-    /**
-     * Get custom validation messages.
-     */
     public function messages(): array
     {
         return [
@@ -88,6 +91,11 @@ class StoreReservationRequest extends FormRequest
             'quantity.required' => 'Veuillez indiquer la quantité.',
             'quantity.integer' => 'La quantité doit être un nombre entier.',
             'quantity.min' => 'La quantité minimum est 1.',
+            'payment_method.required' => 'Veuillez sélectionner un moyen de paiement.',
+            'payment_method.enum' => 'Le moyen de paiement choisi est invalide.',
+            'customer_phone.required' => 'Le numéro de téléphone est requis pour Flooz ou Tmoney.',
+            'customer_phone.regex' => 'Le numéro de téléphone doit contenir entre 8 et 15 chiffres et peut commencer par +.',
+            'customer_email.email' => 'L\'adresse email du client est invalide.',
             'notes.max' => 'Les notes ne peuvent pas dépasser 500 caractères.',
             'pickup_date.after' => 'La date de récupération doit être dans le futur.',
             'pickup_date.before' => 'La date de récupération ne peut pas dépasser 7 jours.',
@@ -96,27 +104,23 @@ class StoreReservationRequest extends FormRequest
         ];
     }
 
-    /**
-     * Get custom attributes for validator errors.
-     */
     public function attributes(): array
     {
         return [
             'product_id' => 'produit',
             'quantity' => 'quantité',
+            'payment_method' => 'moyen de paiement',
+            'customer_phone' => 'numéro de téléphone',
+            'customer_email' => 'email client',
             'notes' => 'notes',
             'pickup_date' => 'date de récupération',
             'pickup_time' => 'heure de récupération',
         ];
     }
 
-    /**
-     * Configure the validator instance.
-     */
     public function withValidator($validator): void
     {
         $validator->after(function ($validator) {
-            // Check if user already has an active reservation for this product
             if ($this->input('product_id')) {
                 $existingReservation = Reservation::where('user_id', Auth::id())
                     ->where('product_id', $this->input('product_id'))

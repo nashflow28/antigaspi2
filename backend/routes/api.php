@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\ProductController;
 use App\Http\Controllers\Api\ReservationController;
+use App\Http\Controllers\Api\PaymentController;
 use App\Http\Controllers\Api\AdminController;
 use App\Http\Controllers\Api\MerchantController;
 use App\Http\Controllers\Api\ReviewController;
@@ -102,6 +103,18 @@ Route::prefix('reservations')->middleware('jwt.auth')->group(function () {
         Route::post('/{id}/ready', [ReservationController::class, 'markReady']); // Marquer comme prêt
         Route::post('/{id}/complete', [ReservationController::class, 'complete']); // Marquer comme terminée
     });
+});
+
+// Routes de paiement
+Route::prefix('payments')->group(function () {
+    Route::middleware('jwt.auth')->group(function () {
+        Route::post('/', [PaymentController::class, 'initiate']);
+        Route::get('/{payment}', [PaymentController::class, 'status'])->whereNumber('payment');
+        Route::post('/{payment}/cancel', [PaymentController::class, 'cancel'])->whereNumber('payment');
+    });
+
+    Route::post('/webhook/paygate', [PaymentController::class, 'paygateCallback']);
+    Route::post('/webhook/paystack', [PaymentController::class, 'paystackCallback']);
 });
 
 // Routes des notifications

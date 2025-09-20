@@ -5,11 +5,9 @@ namespace App\Http\Resources;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
+/** @mixin \App\Models\Reservation */
 class ReservationResource extends JsonResource
 {
-    /**
-     * Transform the resource into an array.
-     */
     public function toArray(Request $request): array
     {
         return [
@@ -20,9 +18,9 @@ class ReservationResource extends JsonResource
             'discounted_price' => (float) $this->product->discounted_price,
             'total_amount' => (float) $this->total_amount,
             'status' => $this->status,
+            'payment_status' => $this->payment_status?->value ?? $this->payment_status,
             'notes' => $this->notes,
 
-            // Dates and times
             'created_at' => $this->created_at,
             'reserved_at' => $this->reserved_at,
             'confirmed_at' => $this->confirmed_at,
@@ -30,7 +28,6 @@ class ReservationResource extends JsonResource
             'pickup_date' => $this->pickup_date ?? $this->expires_at,
             'pickup_notes' => $this->pickup_notes ?? $this->notes,
 
-            // Status helpers
             'is_pending' => $this->isPending(),
             'is_confirmed' => $this->isConfirmed(),
             'is_completed' => $this->isCompleted(),
@@ -38,8 +35,8 @@ class ReservationResource extends JsonResource
             'is_expired' => $this->isExpired(),
             'can_be_cancelled' => $this->canBeCancelled(),
             'time_until_expiration' => $this->time_until_expiration,
+            'latest_payment' => $this->whenLoaded('latestPayment', fn () => new PaymentResource($this->latestPayment)),
 
-            // Product information
             'product' => [
                 'id' => $this->product->id,
                 'name' => $this->product->name,
@@ -68,7 +65,6 @@ class ReservationResource extends JsonResource
                 ],
             ],
 
-            // Consumer information (for merchants)
             'consumer' => $this->when(
                 $this->relationLoaded('user'),
                 [
@@ -81,12 +77,11 @@ class ReservationResource extends JsonResource
                 ]
             ),
 
-            // Environmental impact (for completed reservations)
             'environmental_impact' => $this->when(
                 $this->isCompleted(),
                 [
                     'food_saved_kg' => $this->quantity_reserved,
-                    'co2_saved_kg' => round($this->quantity_reserved * 2.5, 1), // 2.5kg CO2 per kg food
+                    'co2_saved_kg' => round($this->quantity_reserved * 2.5, 1),
                     'money_saved' => round(
                         ($this->product->original_price - $this->product->discounted_price) * $this->quantity_reserved,
                         2
@@ -96,9 +91,6 @@ class ReservationResource extends JsonResource
         ];
     }
 
-    /**
-     * Customize the response for collection.
-     */
     public function with(Request $request): array
     {
         return [

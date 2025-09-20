@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Enums\PaymentStatus;
 use App\Models\Product;
 use App\Models\Reservation;
 use App\Models\User;
@@ -25,6 +26,8 @@ class ReservationFactory extends Factory
             'quantity_reserved' => $quantity,
             'total_amount' => $this->faker->randomFloat(2, 5, 60),
             'status' => $this->faker->randomElement(['pending', 'confirmed', 'ready', 'completed']),
+            'payment_status' => PaymentStatus::PENDING,
+            'latest_payment_id' => null,
             'reservation_code' => 'RES' . strtoupper(Str::random(8)),
             'reserved_at' => now()->subHours($this->faker->numberBetween(1, 48)),
             'confirmed_at' => now()->subHours($this->faker->numberBetween(0, 24)),

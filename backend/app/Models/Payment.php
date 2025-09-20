@@ -2,6 +2,9 @@
 
 namespace App\Models;
 
+use App\Enums\PaymentMethod;
+use App\Enums\PaymentStatus;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -17,54 +20,76 @@ class Payment extends Model
         'payment_method',
         'transaction_id',
         'status',
-        'provider_response',
+        'provider',
+        'checkout_url',
+        'customer_phone',
+        'reference',
+        'payload',
         'paid_at',
     ];
 
-    protected function casts(): array
-    {
-        return [
-            'amount' => 'decimal:2',
-            'provider_response' => 'array',
-            'paid_at' => 'datetime',
-        ];
-    }
+    protected $casts = [
+        'amount' => 'decimal:2',
+        'payment_method' => PaymentMethod::class,
+        'status' => PaymentStatus::class,
+        'payload' => 'array',
+        'paid_at' => 'datetime',
+    ];
 
-    // Relationships
     public function reservation(): BelongsTo
     {
         return $this->belongsTo(Reservation::class);
     }
 
-    // Scopes
     public function scopePending($query)
     {
-        return $query->where('status', 'pending');
+        return $query->where('status', PaymentStatus::PENDING->value);
     }
 
-    public function scopeCompleted($query)
+    public function scopeSuccessful($query)
     {
-        return $query->where('status', 'completed');
+        return $query->where('status', PaymentStatus::SUCCESS->value);
     }
 
     public function scopeFailed($query)
     {
-        return $query->where('status', 'failed');
+        return $query->where('status', PaymentStatus::FAILED->value);
     }
 
-    // Helper methods
     public function isPending(): bool
     {
-        return $this->status === 'pending';
+        return $this->status === PaymentStatus::PENDING;
+    }
+
+    public function isSuccessful(): bool
+    {
+        return $this->status === PaymentStatus::SUCCESS;
     }
 
     public function isCompleted(): bool
     {
-        return $this->status === 'completed';
+        return $this->isSuccessful();
     }
 
     public function isFailed(): bool
     {
-        return $this->status === 'failed';
+        return $this->status === PaymentStatus::FAILED;
+    }
+
+    public function isOnSite(): bool
+    {
+        return $this->status === PaymentStatus::ON_SITE;
+    }
+
+    public function isRefunded(): bool
+    {
+        return $this->status === PaymentStatus::REFUNDED;
+    }
+
+    protected function provider(): Attribute
+    {
+        return Attribute::make(
+            get: fn ($value) => $value ?? $this->payment_method?->provider(),
+        );
     }
 }
