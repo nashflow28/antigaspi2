@@ -105,6 +105,15 @@
           </router-link>
 
           <router-link
+            to="/surprise-baskets"
+            @click="closeMobileMenu"
+            class="mobile-nav-link"
+          >
+            <Gift class="w-5 h-5" />
+            <span>Paniers surprise</span>
+          </router-link>
+
+          <router-link
             to="/merchants/map"
             @click="closeMobileMenu"
             class="mobile-nav-link"
@@ -132,6 +141,16 @@
               >
                 <BarChart3 class="w-5 h-5" />
                 <span>Dashboard</span>
+              </router-link>
+
+              <router-link
+                v-if="authStore.isConsumer"
+                to="/surprise-baskets"
+                @click="closeMobileMenu"
+                class="mobile-nav-link"
+              >
+                <Gift class="w-5 h-5" />
+                <span>Paniers surprise</span>
               </router-link>
 
               <router-link
@@ -272,7 +291,7 @@ import { useAuthStore } from '@/stores/auth'
 import {
   X, Package, MapPin, MessageSquare, BarChart3, Calendar, User,
   Briefcase, ShoppingCart, Star, Settings, Users, Grid, LogOut,
-  LogIn, UserPlus
+  LogIn, UserPlus, Gift
 } from 'lucide-vue-next'
 
 const router = useRouter()

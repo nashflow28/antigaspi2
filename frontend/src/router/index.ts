@@ -29,6 +29,16 @@ const router = createRouter({
       meta: { requiresAuth: false }
     },
     {
+      path: '/surprise-baskets',
+      name: 'surprise-baskets',
+      component: () => import('@/views/consumer/SurpriseBasketsView.vue'),
+      meta: {
+        requiresAuth: false,
+        title: 'Paniers surprise',
+        breadcrumb: ['Accueil', 'Paniers surprise']
+      }
+    },
+    {
       path: '/products/:id',
       name: 'product-detail',
       component: () => import('@/views/ProductDetailView.vue'),
@@ -39,6 +49,17 @@ const router = createRouter({
       name: 'product-reserve',
       component: () => import('@/views/ProductReserveView.vue'),
       meta: { requiresAuth: true, roles: ['consumer'] }
+    },
+    {
+      path: '/surprise-baskets/:id/reserve',
+      name: 'surprise-basket-reserve',
+      component: () => import('@/views/consumer/SurpriseBasketDetailView.vue'),
+      meta: {
+        requiresAuth: true,
+        roles: ['consumer'],
+        title: 'Réserver un panier surprise',
+        breadcrumb: ['Paniers surprise', 'Réservation']
+      }
     },
     {
       path: '/merchants/map',
