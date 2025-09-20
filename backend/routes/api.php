@@ -10,6 +10,7 @@ use App\Http\Controllers\Api\AdminController;
 use App\Http\Controllers\Api\MerchantController;
 use App\Http\Controllers\Api\ReviewController;
 use App\Http\Controllers\Api\SurpriseBasketController;
+use App\Http\Controllers\Api\NotificationController;
 use App\Http\Controllers\CategoryController;
 
 /*
@@ -101,6 +102,16 @@ Route::prefix('reservations')->middleware('jwt.auth')->group(function () {
         Route::post('/{id}/ready', [ReservationController::class, 'markReady']); // Marquer comme prêt
         Route::post('/{id}/complete', [ReservationController::class, 'complete']); // Marquer comme terminée
     });
+});
+
+// Routes des notifications
+Route::prefix('notifications')->middleware('jwt.auth')->group(function () {
+    Route::get('/', [NotificationController::class, 'index']);
+    Route::post('/{notification}/read', [NotificationController::class, 'markAsRead'])->whereNumber('notification');
+    Route::post('/read-all', [NotificationController::class, 'markAllAsRead']);
+    Route::post('/subscriptions', [NotificationController::class, 'subscribe']);
+    Route::delete('/subscriptions', [NotificationController::class, 'unsubscribe']);
+    Route::patch('/preferences', [NotificationController::class, 'updatePreferences']);
 });
 
 // Routes des catégories (alternative)

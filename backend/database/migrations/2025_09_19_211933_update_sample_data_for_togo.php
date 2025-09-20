@@ -12,6 +12,10 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (DB::connection()->getDriverName() === 'sqlite') {
+            return;
+        }
+
         // Mettre à jour les données de test pour le Togo
 
         // Mise à jour des utilisateurs avec des villes du Togo
@@ -97,6 +101,10 @@ return new class extends Migration
      */
     public function down(): void
     {
+        if (DB::connection()->getDriverName() === 'sqlite') {
+            return;
+        }
+
         // Revenir aux données Côte d'Ivoire
         DB::table('users')->where('city', 'Lomé')->update(['city' => 'Abidjan']);
 

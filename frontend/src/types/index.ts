@@ -8,6 +8,9 @@ export interface User {
   phone?: string
   created_at: string
   updated_at: string
+  prefers_email_notifications?: boolean
+  prefers_sms_notifications?: boolean
+  prefers_push_notifications?: boolean
 }
 
 export interface Merchant {

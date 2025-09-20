@@ -42,6 +42,9 @@ class UserFactory extends Factory
             'address' => $this->faker->streetAddress(),
             'is_active' => true,
             'status' => 'active',
+            'prefers_email_notifications' => true,
+            'prefers_sms_notifications' => false,
+            'prefers_push_notifications' => false,
             'remember_token' => Str::random(10),
         ];
     }

@@ -1,0 +1,129 @@
+<?php
+
+namespace App\Http\Controllers\Api;
+
+use App\Http\Controllers\Controller;
+use App\Models\Notification;
+use App\Services\PushSubscriptionService;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
+
+class NotificationController extends Controller
+{
+    public function __construct(private readonly PushSubscriptionService $pushService)
+    {
+    }
+
+    public function index(Request $request): JsonResponse
+    {
+        $user = $request->user();
+
+        $query = Notification::where('user_id', $user->id)
+            ->orderByDesc('created_at');
+
+        if ($request->boolean('unread')) {
+            $query->where('is_read', false);
+        }
+
+        $notifications = $query->paginate(min($request->integer('per_page', 20) ?: 20, 100));
+
+        return response()->json([
+            'success' => true,
+            'data' => $notifications->items(),
+            'meta' => [
+                'current_page' => $notifications->currentPage(),
+                'last_page' => $notifications->lastPage(),
+                'per_page' => $notifications->perPage(),
+                'total' => $notifications->total(),
+            ],
+        ]);
+    }
+
+    public function markAsRead(Request $request, Notification $notification): JsonResponse
+    {
+        Gate::authorize('update', $notification);
+
+        $notification->update([
+            'is_read' => true,
+            'updated_at' => now(),
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'data' => $notification,
+        ]);
+    }
+
+    public function markAllAsRead(Request $request): JsonResponse
+    {
+        $user = $request->user();
+
+        Notification::where('user_id', $user->id)
+            ->where('is_read', false)
+            ->update([
+                'is_read' => true,
+                'updated_at' => now(),
+            ]);
+
+        return response()->json([
+            'success' => true,
+        ]);
+    }
+
+    public function subscribe(Request $request): JsonResponse
+    {
+        $data = $request->validate([
+            'endpoint' => 'required|url',
+            'public_key' => 'required|string',
+            'auth_token' => 'required|string',
+            'content_encoding' => 'nullable|string',
+        ]);
+
+        $subscription = $this->pushService->subscribe($request->user(), $data);
+
+        return response()->json([
+            'success' => true,
+            'data' => $subscription,
+        ], 201);
+    }
+
+    public function unsubscribe(Request $request): JsonResponse
+    {
+        $data = $request->validate([
+            'endpoint' => 'required|url',
+        ]);
+
+        $removed = $this->pushService->unsubscribe($request->user(), $data['endpoint']);
+
+        return response()->json([
+            'success' => $removed,
+        ]);
+    }
+
+    public function updatePreferences(Request $request): JsonResponse
+    {
+        $data = $request->validate([
+            'email' => 'required|boolean',
+            'sms' => 'required|boolean',
+            'push' => 'required|boolean',
+        ]);
+
+        $user = $request->user();
+        $user->fill([
+            'prefers_email_notifications' => $data['email'],
+            'prefers_sms_notifications' => $data['sms'],
+            'prefers_push_notifications' => $data['push'],
+        ]);
+        $user->save();
+
+        return response()->json([
+            'success' => true,
+            'data' => $user->only([
+                'prefers_email_notifications',
+                'prefers_sms_notifications',
+                'prefers_push_notifications',
+            ]),
+        ]);
+    }
+}

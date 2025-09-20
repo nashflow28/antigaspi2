@@ -392,4 +392,54 @@ async function doBackgroundSync() {
   }
 }
 
+// Notifications push
+self.addEventListener('push', (event) => {
+  if (!event.data) {
+    return
+  }
+
+  let payload
+
+  try {
+    payload = event.data.json()
+  } catch (error) {
+    console.warn('[SW] Failed to parse push payload as JSON', error)
+    payload = { title: 'Antigaspi', body: event.data.text() }
+  }
+
+  const title = payload.title || 'Antigaspi'
+  const options = {
+    body: payload.body || 'Nouvelle notification',
+    data: payload.data || {},
+    icon: payload.icon || '/icons/icon-192.png',
+    badge: payload.badge || '/icons/icon-192.png',
+    vibrate: [100, 50, 100],
+    actions: payload.actions || []
+  }
+
+  event.waitUntil(self.registration.showNotification(title, options))
+})
+
+self.addEventListener('notificationclick', (event) => {
+  event.notification.close()
+
+  const targetUrl = event.notification.data?.url || '/'
+
+  event.waitUntil(
+    clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clientList) => {
+      for (const client of clientList) {
+        if ('focus' in client) {
+          client.focus()
+          client.postMessage({ type: 'PUSH_NOTIFICATION_CLICKED', data: event.notification.data })
+          return
+        }
+      }
+
+      if (clients.openWindow) {
+        return clients.openWindow(targetUrl)
+      }
+    })
+  )
+})
+
 console.log('[SW] Service Worker loaded successfully', CACHE_VERSION)

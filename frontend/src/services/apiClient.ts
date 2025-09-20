@@ -202,6 +202,13 @@ export const apiEndpoints = {
   adminCategories: '/admin/categories',
   adminReviews: '/admin/reviews',
 
+  // Notifications
+  notifications: '/notifications',
+  notificationRead: (id: number) => `/notifications/${id}/read`,
+  notificationsReadAll: '/notifications/read-all',
+  notificationSubscriptions: '/notifications/subscriptions',
+  notificationPreferences: '/notifications/preferences',
+
   // Health
   health: '/health'
 }

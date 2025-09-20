@@ -10,12 +10,20 @@ use App\Models\User;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 use Tests\TestCase;
+use Tymon\JWTAuth\Facades\JWTAuth;
 
 class AdminMerchantControllerTest extends TestCase
 {
     protected function setUp(): void
     {
         parent::setUp();
+
+        $secret = str_repeat('a', 64);
+
+        config([
+            'jwt.secret' => $secret,
+            'jwt.keys.secret' => $secret,
+        ]);
 
         Schema::disableForeignKeyConstraints();
         Schema::dropIfExists('reservations');
@@ -101,6 +109,20 @@ class AdminMerchantControllerTest extends TestCase
         Schema::enableForeignKeyConstraints();
 
         parent::tearDown();
+    }
+
+    protected function authenticateAdmin(): void
+    {
+        $admin = User::create([
+            'email' => 'admin@example.com',
+            'password' => 'password',
+            'role' => 'admin',
+            'is_active' => true,
+        ]);
+
+        $token = JWTAuth::fromUser($admin);
+
+        $this->withHeader('Authorization', 'Bearer ' . $token);
     }
 
     public function test_moderation_returns_expected_payload(): void
@@ -189,6 +211,8 @@ class AdminMerchantControllerTest extends TestCase
             'notes' => 'Livraison sans contact',
         ]);
 
+        $this->authenticateAdmin();
+
         $response = $this->getJson('/api/admin/moderation');
 
         $response->assertOk()
@@ -245,6 +269,8 @@ class AdminMerchantControllerTest extends TestCase
             'image_url' => null,
             'is_active' => true,
         ]);
+
+        $this->authenticateAdmin();
 
         $response = $this->postJson("/api/admin/products/{$product->id}/reject");
 

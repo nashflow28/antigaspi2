@@ -26,6 +26,9 @@ class User extends Authenticatable implements JWTSubject
         'is_active',
         'status',
         'last_login_at',
+        'prefers_email_notifications',
+        'prefers_sms_notifications',
+        'prefers_push_notifications',
     ];
 
     protected $hidden = [
@@ -40,6 +43,9 @@ class User extends Authenticatable implements JWTSubject
             'password' => 'hashed',
             'is_active' => 'boolean',
             'last_login_at' => 'datetime',
+            'prefers_email_notifications' => 'boolean',
+            'prefers_sms_notifications' => 'boolean',
+            'prefers_push_notifications' => 'boolean',
         ];
     }
 
@@ -84,6 +90,11 @@ class User extends Authenticatable implements JWTSubject
         return $this->hasMany(Notification::class);
     }
 
+    public function pushSubscriptions(): HasMany
+    {
+        return $this->hasMany(PushSubscription::class);
+    }
+
     // Scopes
     public function scopeConsumers($query)
     {
@@ -124,5 +135,20 @@ class User extends Authenticatable implements JWTSubject
     public function getFullNameAttribute(): string
     {
         return "{$this->first_name} {$this->last_name}";
+    }
+
+    public function prefersEmailNotifications(): bool
+    {
+        return (bool) $this->prefers_email_notifications;
+    }
+
+    public function prefersSmsNotifications(): bool
+    {
+        return (bool) $this->prefers_sms_notifications;
+    }
+
+    public function prefersPushNotifications(): bool
+    {
+        return (bool) $this->prefers_push_notifications;
     }
 }
