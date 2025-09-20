@@ -80,6 +80,29 @@ class ApiService {
     return data
   }
 
+  // Generic HTTP methods
+  async get<T>(url: string, withAuth = true): Promise<T> {
+    return this.request<T>(url, { method: 'GET' }, withAuth)
+  }
+
+  async post<T>(url: string, data?: any, withAuth = true): Promise<T> {
+    return this.request<T>(url, {
+      method: 'POST',
+      body: data ? JSON.stringify(data) : undefined
+    }, withAuth)
+  }
+
+  async put<T>(url: string, data?: any, withAuth = true): Promise<T> {
+    return this.request<T>(url, {
+      method: 'PUT',
+      body: data ? JSON.stringify(data) : undefined
+    }, withAuth)
+  }
+
+  async delete<T>(url: string, withAuth = true): Promise<T> {
+    return this.request<T>(url, { method: 'DELETE' }, withAuth)
+  }
+
   // Health check
   async healthCheck(): Promise<any> {
     return this.request('/health')

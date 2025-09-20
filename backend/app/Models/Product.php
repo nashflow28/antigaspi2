@@ -22,6 +22,11 @@ class Product extends Model
         'expiration_date',
         'image_url',
         'is_active',
+        'is_surprise_basket',
+        'min_items',
+        'max_items',
+        'total_original_value',
+        'surprise_description',
     ];
 
     protected function casts(): array
@@ -32,6 +37,10 @@ class Product extends Model
             'quantity_available' => 'integer',
             'expiration_date' => 'date',
             'is_active' => 'boolean',
+            'is_surprise_basket' => 'boolean',
+            'min_items' => 'integer',
+            'max_items' => 'integer',
+            'total_original_value' => 'decimal:2',
         ];
     }
 
@@ -54,6 +63,16 @@ class Product extends Model
     public function reviews(): HasMany
     {
         return $this->hasMany(Review::class);
+    }
+
+    public function surpriseBasketItems(): HasMany
+    {
+        return $this->hasMany(SurpriseBasketItem::class, 'surprise_basket_id');
+    }
+
+    public function basketItems(): HasMany
+    {
+        return $this->hasMany(SurpriseBasketItem::class, 'product_id');
     }
 
     // Scopes
@@ -95,6 +114,16 @@ class Product extends Model
         return $query;
     }
 
+    public function scopeSurpriseBaskets($query)
+    {
+        return $query->where('is_surprise_basket', true);
+    }
+
+    public function scopeRegularProducts($query)
+    {
+        return $query->where('is_surprise_basket', false);
+    }
+
     // Helper methods
     public function getDiscountPercentageAttribute(): int
     {
@@ -132,5 +161,74 @@ class Product extends Model
             return true;
         }
         return false;
+    }
+
+    // Surprise Basket helper methods
+    public function getBasketItemsCountAttribute(): int
+    {
+        return $this->surpriseBasketItems()->count();
+    }
+
+    public function getBasketTotalValueAttribute(): float
+    {
+        return $this->surpriseBasketItems()->sum('unit_price');
+    }
+
+    public function getBasketSavingsAttribute(): float
+    {
+        return $this->total_original_value - $this->discounted_price;
+    }
+
+    public function getBasketDiscountPercentageAttribute(): int
+    {
+        if ($this->total_original_value <= 0) {
+            return 0;
+        }
+        return round((($this->total_original_value - $this->discounted_price) / $this->total_original_value) * 100);
+    }
+
+    public function addItemToBasket(Product $product, int $quantity = 1): bool
+    {
+        if (!$this->is_surprise_basket) {
+            return false;
+        }
+
+        $basketItem = $this->surpriseBasketItems()->where('product_id', $product->id)->first();
+
+        if ($basketItem) {
+            $basketItem->increment('quantity', $quantity);
+        } else {
+            $this->surpriseBasketItems()->create([
+                'product_id' => $product->id,
+                'quantity' => $quantity,
+                'unit_price' => $product->discounted_price,
+            ]);
+        }
+
+        $this->updateBasketTotalValue();
+        return true;
+    }
+
+    public function removeItemFromBasket(Product $product): bool
+    {
+        if (!$this->is_surprise_basket) {
+            return false;
+        }
+
+        $this->surpriseBasketItems()->where('product_id', $product->id)->delete();
+        $this->updateBasketTotalValue();
+        return true;
+    }
+
+    private function updateBasketTotalValue(): void
+    {
+        $totalValue = $this->surpriseBasketItems()
+            ->with('product')
+            ->get()
+            ->sum(function ($item) {
+                return $item->quantity * $item->product->original_price;
+            });
+
+        $this->update(['total_original_value' => $totalValue]);
     }
 }

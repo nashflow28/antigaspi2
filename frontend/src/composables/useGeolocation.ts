@@ -1,4 +1,4 @@
-import { ref, readonly } from 'vue'
+import { ref } from 'vue'
 
 export interface GeolocationCoords {
   latitude: number
@@ -259,10 +259,10 @@ export const useGeolocation = () => {
   }
 
   return {
-    // State (readonly)
-    position: readonly(position),
-    error: readonly(error),
-    isLoading: readonly(isLoading),
+    // State
+    position,
+    error,
+    isLoading,
     isSupported,
 
     // Methods

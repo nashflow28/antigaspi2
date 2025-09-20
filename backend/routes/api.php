@@ -9,6 +9,7 @@ use App\Http\Controllers\Api\ReservationController;
 use App\Http\Controllers\Api\AdminController;
 use App\Http\Controllers\Api\MerchantController;
 use App\Http\Controllers\Api\ReviewController;
+use App\Http\Controllers\Api\SurpriseBasketController;
 use App\Http\Controllers\CategoryController;
 
 /*
@@ -61,6 +62,27 @@ Route::prefix('products')->middleware('throttle:search')->group(function () {
 
     // Route avec paramètre ID doit être en dernier
     Route::get('/{id}', [ProductController::class, 'show']); // Détail d'un produit
+});
+
+// Routes des paniers surprise
+Route::prefix('surprise-baskets')->middleware('throttle:search')->group(function () {
+    // Routes publiques (consultation)
+    Route::get('/', [SurpriseBasketController::class, 'index']); // Liste des paniers surprise
+    Route::get('/{id}', [SurpriseBasketController::class, 'show']); // Détail d'un panier surprise
+
+    // Routes protégées (gestion des paniers surprise)
+    Route::middleware('jwt.auth')->group(function () {
+        Route::get('/merchant/list', [SurpriseBasketController::class, 'merchantBaskets']); // Paniers du commerçant connecté
+
+        // Routes d'écriture avec rate limiting strict
+        Route::middleware('throttle:write')->group(function () {
+            Route::post('/', [SurpriseBasketController::class, 'store']); // Créer un panier surprise
+            Route::put('/{id}', [SurpriseBasketController::class, 'update']); // Modifier un panier surprise
+            Route::delete('/{id}', [SurpriseBasketController::class, 'destroy']); // Supprimer un panier surprise
+            Route::post('/{basketId}/products', [SurpriseBasketController::class, 'addProduct']); // Ajouter un produit
+            Route::delete('/{basketId}/products/{productId}', [SurpriseBasketController::class, 'removeProduct']); // Retirer un produit
+        });
+    });
 });
 
 // Routes des réservations (toutes protégées)
