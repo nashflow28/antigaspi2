@@ -65,6 +65,20 @@
 
           <li role="none">
             <router-link
+              to="/surprise-baskets"
+              class="nav-link relative group"
+              active-class="nav-link-active"
+              role="menuitem"
+              :aria-current="$route.path.startsWith('/surprise-baskets') ? 'page' : undefined"
+              aria-label="Explorer les paniers surprise disponibles"
+            >
+              <span class="relative z-10">Paniers surprise</span>
+              <div class="absolute inset-0 bg-gradient-primary opacity-0 group-hover:opacity-10 rounded-lg transition-opacity duration-200"></div>
+            </router-link>
+          </li>
+
+          <li role="none">
+            <router-link
               to="/merchants/map"
               class="nav-link relative group"
               active-class="nav-link-active"
@@ -217,6 +231,14 @@
 
                 <template v-if="authStore.isConsumer">
                   <router-link
+                    to="/surprise-baskets"
+                    class="flex items-center px-4 py-3 text-sm text-neutral-700 hover:bg-gradient-primary hover:text-white transition-all duration-200 group"
+                    @click="showUserMenu = false"
+                  >
+                    <Gift class="w-4 h-4 mr-3 group-hover:text-white" />
+                    <span>Paniers surprise</span>
+                  </router-link>
+                  <router-link
                     to="/reservations"
                     class="flex items-center px-4 py-3 text-sm text-neutral-700 hover:bg-gradient-primary hover:text-white transition-all duration-200 group"
                     @click="showUserMenu = false"
@@ -337,7 +359,7 @@
 import { ref, computed, onMounted, onUnmounted, nextTick } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
-import { LogIn, UserPlus, User, Settings, LogOut, ChevronDown, Package, ShoppingBag, MessageSquare, Star } from 'lucide-vue-next'
+import { LogIn, UserPlus, User, Settings, LogOut, ChevronDown, Package, ShoppingBag, MessageSquare, Star, Gift } from 'lucide-vue-next'
 import DarkModeToggle from '@/components/ui/DarkModeToggle.vue'
 import MobileNav from '@/components/layout/MobileNav.vue'
 import { useAccessibility } from '@/composables/useAccessibility'
