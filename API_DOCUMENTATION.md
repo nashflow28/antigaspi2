@@ -166,7 +166,9 @@ Créer une réservation
 ```json
 {
   "product_id": 1,
-  "quantity_reserved": 2,
+  "quantity": 2,
+  "payment_method": "flooz",
+  "customer_phone": "+22891000000",
   "notes": "Je passerai vers 18h"
 }
 ```
@@ -182,10 +184,24 @@ Créer une réservation
     "quantity_reserved": 2,
     "total_amount": 500,
     "status": "pending",
+    "payment_status": "pending",
     "expires_at": "2024-01-16T18:00:00.000000Z",
     "product_name": "Pain complet artisanal",
     "merchant_name": "Boulangerie Martin",
     "merchant_phone": "0123456790"
+  },
+  "payment": {
+    "id": 35,
+    "reservation_id": 10,
+    "amount": 500,
+    "currency": "XOF",
+    "payment_method": "flooz",
+    "status": "pending",
+    "provider": "paygate",
+    "checkout_url": "https://paygate.test/checkout/PG-123456",
+    "customer_phone": "+22891000000",
+    "reference": "PG-123456",
+    "created_at": "2024-01-15T17:05:00.000000Z"
   }
 }
 ```
@@ -198,6 +214,53 @@ Annuler ma réservation
 
 #### 🏪 GET `/reservations/merchant/list` *(Protected - Merchant only)*
 Réservations reçues (pour les commerçants)
+
+---
+
+### 4. **Payments**
+
+#### 💳 POST `/payments` *(Protected - Consumer only)*
+Initialise un nouveau paiement pour une réservation existante.
+
+**Body:**
+```json
+{
+  "reservation_id": 10,
+  "payment_method": "paystack",
+  "customer_email": "marie.kouame@email.com"
+}
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "message": "Paiement initialisé avec succès.",
+  "data": {
+    "id": 42,
+    "reservation_id": 10,
+    "amount": 500,
+    "currency": "XOF",
+    "payment_method": "paystack",
+    "status": "pending",
+    "provider": "paystack",
+    "checkout_url": "https://checkout.paystack.test/abc123",
+    "reference": "PS-ABCD123"
+  }
+}
+```
+
+#### 🔍 GET `/payments/{id}` *(Protected)*
+Rafraîchit le statut d'un paiement (appelle l'API du fournisseur si nécessaire).
+
+#### 🛑 POST `/payments/{id}/cancel` *(Protected)*
+Annule un paiement en attente. Pour les paiements Flooz/Tmoney, l'annulation est propagée à PayGate et la réservation repasse en statut `cancelled`.
+
+#### 🔔 POST `/payments/webhook/paygate`
+Point d'entrée pour les callbacks PayGate (Flooz / Tmoney).
+
+#### 🔔 POST `/payments/webhook/paystack`
+Point d'entrée pour les webhooks Paystack.
 
 #### ✅ POST `/reservations/{id}/confirm` *(Protected - Merchant only)*
 Confirmer une réservation
