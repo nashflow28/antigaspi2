@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Antigaspi - Paniers surprise hors connexion</title>
+    <style>
+      body {
+        font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        background: #f9fafb;
+        color: #111827;
+        margin: 0;
+        padding: 0;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .offline-card {
+        max-width: 480px;
+        width: 100%;
+        background: white;
+        border-radius: 1.5rem;
+        padding: 2.5rem;
+        box-shadow: 0 25px 50px -12px rgba(30, 64, 175, 0.25);
+        text-align: center;
+      }
+      .offline-card h1 {
+        font-size: 1.75rem;
+        margin-bottom: 0.75rem;
+      }
+      .offline-card p {
+        margin: 0.5rem 0;
+        color: #4b5563;
+      }
+      .tips {
+        margin-top: 1.5rem;
+        padding: 1rem;
+        border-radius: 1rem;
+        background: #f3f4f6;
+        text-align: left;
+      }
+      .btn-primary {
+        display: inline-block;
+        margin-top: 1.75rem;
+        background: #1f2937;
+        color: white;
+        padding: 0.75rem 1.5rem;
+        border-radius: 9999px;
+        text-decoration: none;
+        font-weight: 600;
+      }
+    </style>
+  </head>
+  <body>
+    <main class="offline-card" role="alert" aria-live="polite">
+      <h1>Vous êtes hors connexion</h1>
+      <p>Impossible de charger les paniers surprise sans connexion Internet.</p>
+      <p>Reconnectez-vous pour découvrir les paniers disponibles près de chez vous.</p>
+      <section class="tips">
+        <h2 style="font-size: 1rem; margin-top: 0;">Conseils</h2>
+        <ul style="padding-left: 1.25rem; margin: 0; color: #374151;">
+          <li>Vérifiez que le mode avion est désactivé.</li>
+          <li>Revenez sur cette page après avoir retrouvé du réseau.</li>
+          <li>Les paniers consultés récemment restent accessibles si vous les avez ouverts en ligne.</li>
+        </ul>
+      </section>
+      <a class="btn-primary" href="/">Retour à l'accueil</a>
+    </main>
+  </body>
+</html>

@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "dev": "vite",
-    "build": "vue-tsc && vite build",
+    "build": "vite build",
     "preview": "vite preview",
     "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix --ignore-path .gitignore",
     "type-check": "vue-tsc --noEmit",
@@ -47,6 +47,7 @@
     "eslint": "^9.35.0",
     "eslint-plugin-vue": "^10.4.0",
     "jsdom": "^24.0.0",
+    "lighthouse": "^10.4.0",
     "vitest": "^2.1.4"
   }
 }

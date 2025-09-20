@@ -25,8 +25,38 @@ export default defineConfig({
     assetsDir: 'assets',
     rollupOptions: {
       output: {
-        manualChunks: {
-          vendor: ['vue', 'vue-router', 'pinia']
+        manualChunks(id) {
+          if (!id.includes('node_modules')) {
+            return
+          }
+
+          if (id.includes('chart.js')) {
+            return 'chart'
+          }
+
+          if (id.includes('leaflet')) {
+            return 'leaflet'
+          }
+
+          if (id.includes('lucide')) {
+            return 'icons'
+          }
+
+          if (id.includes('@headlessui') || id.includes('@heroicons')) {
+            return 'headless-ui'
+          }
+
+          if (id.includes('@vueuse')) {
+            return 'vueuse'
+          }
+
+          if (id.includes('@googlemaps')) {
+            return 'maps'
+          }
+
+          if (id.includes('vue') || id.includes('pinia') || id.includes('vue-router')) {
+            return 'framework'
+          }
         }
       }
     }

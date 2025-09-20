@@ -1,6 +1,6 @@
 // Service Worker pour Antigaspi PWA
 // Version du cache - incrémenter pour forcer la mise à jour
-const CACHE_VERSION = 'v1.0.0'
+const CACHE_VERSION = 'v1.1.0'
 const STATIC_CACHE = `antigaspi-static-${CACHE_VERSION}`
 const DYNAMIC_CACHE = `antigaspi-dynamic-${CACHE_VERSION}`
 const API_CACHE = `antigaspi-api-${CACHE_VERSION}`
@@ -18,6 +18,8 @@ const STATIC_ASSETS = [
   '/products',
   '/merchants/map',
   '/reviews',
+  '/surprise-baskets',
+  '/offline-surprise-basket.html',
   '/login',
   '/register',
   // Icons
@@ -30,7 +32,8 @@ const STATIC_ASSETS = [
 const API_ROUTES = [
   '/api/products',
   '/api/categories',
-  '/api/merchants'
+  '/api/merchants',
+  '/api/surprise-baskets'
 ]
 
 // Stratégies de cache
@@ -51,11 +54,13 @@ const ROUTE_CONFIG = {
 
   // Pages HTML - Network First avec fallback cache
   '/': CACHE_STRATEGIES.NETWORK_FIRST,
+  '/surprise-baskets': CACHE_STRATEGIES.NETWORK_FIRST,
 
   // API - Stale While Revalidate pour les données
   '/api/products': CACHE_STRATEGIES.STALE_WHILE_REVALIDATE,
   '/api/categories': CACHE_STRATEGIES.STALE_WHILE_REVALIDATE,
   '/api/merchants': CACHE_STRATEGIES.STALE_WHILE_REVALIDATE,
+  '/api/surprise-baskets': CACHE_STRATEGIES.STALE_WHILE_REVALIDATE,
 
   // API critiques - Network First
   '/api/auth': CACHE_STRATEGIES.NETWORK_FIRST,
@@ -254,6 +259,13 @@ async function getOfflineFallback(request) {
 
   // Pour les pages HTML, retourner la page offline
   if (request.headers.get('accept')?.includes('text/html')) {
+    if (url.pathname.startsWith('/surprise-baskets')) {
+      const surpriseOffline = await caches.match('/offline-surprise-basket.html')
+      if (surpriseOffline) {
+        return surpriseOffline
+      }
+    }
+
     const offlinePage = await caches.match('/offline.html')
     return offlinePage || new Response('Offline', { status: 503 })
   }
