@@ -67,6 +67,10 @@ return new class extends Migration
      */
     private function addIndexIfNotExists($table, $columns, $indexName = null)
     {
+        if (DB::connection()->getDriverName() === 'sqlite') {
+            return;
+        }
+
         $columns = is_array($columns) ? $columns : [$columns];
         $indexName = $indexName ?: $table . '_' . implode('_', $columns) . '_index';
 

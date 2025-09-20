@@ -90,6 +90,9 @@ class AuthController extends Controller
                         'last_name' => $user->last_name,
                         'role' => $user->role,
                         'city' => $user->city,
+                        'prefers_email_notifications' => $user->prefers_email_notifications,
+                        'prefers_sms_notifications' => $user->prefers_sms_notifications,
+                        'prefers_push_notifications' => $user->prefers_push_notifications,
                     ],
                     'token' => $token,
                     'token_type' => 'Bearer',
@@ -160,6 +163,9 @@ class AuthController extends Controller
                         'last_name' => $user->last_name,
                         'role' => $user->role,
                         'city' => $user->city,
+                        'prefers_email_notifications' => $user->prefers_email_notifications,
+                        'prefers_sms_notifications' => $user->prefers_sms_notifications,
+                        'prefers_push_notifications' => $user->prefers_push_notifications,
                     ],
                     'token' => $token,
                     'token_type' => 'Bearer',
@@ -199,6 +205,9 @@ class AuthController extends Controller
                 'address' => $user->address,
                 'is_active' => $user->is_active,
                 'created_at' => $user->created_at,
+                'prefers_email_notifications' => $user->prefers_email_notifications,
+                'prefers_sms_notifications' => $user->prefers_sms_notifications,
+                'prefers_push_notifications' => $user->prefers_push_notifications,
             ];
 
             // Ajouter les infos commerçant si applicable

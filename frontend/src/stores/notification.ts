@@ -1,7 +1,16 @@
 import { defineStore } from 'pinia'
-import { ref } from 'vue'
+import { computed, reactive, ref } from 'vue'
+import { useAuthStore } from '@/stores/auth'
+import {
+  fetchNotifications,
+  markNotificationAsRead,
+  markAllNotificationsAsRead,
+  subscribeToPush,
+  updateNotificationPreferences,
+  type ServerNotification
+} from '@/services/notificationService'
 
-export interface Notification {
+export interface ToastNotification {
   id: string
   type: 'success' | 'error' | 'warning' | 'info'
   title: string
@@ -10,17 +19,47 @@ export interface Notification {
   show?: boolean
 }
 
-export const useNotificationStore = defineStore('notification', () => {
-  const notifications = ref<Notification[]>([])
+interface PaginationState {
+  currentPage: number
+  lastPage: number
+  perPage: number
+  total: number
+}
 
-  const show = (
-    type: 'success' | 'error' | 'warning' | 'info',
+interface ChannelPreferences {
+  email: boolean
+  sms: boolean
+  push: boolean
+}
+
+export const useNotificationStore = defineStore('notification', () => {
+  const toasts = ref<ToastNotification[]>([])
+  const serverNotifications = ref<ServerNotification[]>([])
+  const pagination = reactive<PaginationState>({
+    currentPage: 1,
+    lastPage: 1,
+    perPage: 20,
+    total: 0
+  })
+  const loading = ref(false)
+  const preferences = reactive<ChannelPreferences>({
+    email: true,
+    sms: false,
+    push: false
+  })
+
+  const unreadCount = computed(() => serverNotifications.value.filter(n => !n.is_read).length)
+
+  const authStore = useAuthStore()
+
+  const setToast = (
+    type: ToastNotification['type'],
     title: string,
     message: string,
-    duration: number = 5000
+    duration = 5000
   ) => {
     const id = Date.now().toString()
-    const notification: Notification = {
+    const notification: ToastNotification = {
       id,
       type,
       title,
@@ -29,32 +68,124 @@ export const useNotificationStore = defineStore('notification', () => {
       show: true
     }
 
-    notifications.value.push(notification)
+    toasts.value.push(notification)
 
     if (duration > 0) {
-      setTimeout(() => {
-        remove(id)
-      }, duration)
+      setTimeout(() => removeToast(id), duration)
     }
 
     return id
   }
 
-  const remove = (id: string) => {
-    const index = notifications.value.findIndex(n => n.id === id)
+  const removeToast = (id: string) => {
+    const index = toasts.value.findIndex(n => n.id === id)
     if (index > -1) {
-      notifications.value.splice(index, 1)
+      toasts.value.splice(index, 1)
     }
   }
 
-  const clear = () => {
-    notifications.value = []
+  const clearToasts = () => {
+    toasts.value = []
+  }
+
+  const hydratePreferencesFromUser = () => {
+    if (!authStore.user) return
+
+    preferences.email = !!authStore.user.prefers_email_notifications
+    preferences.sms = !!authStore.user.prefers_sms_notifications
+    preferences.push = !!authStore.user.prefers_push_notifications
+  }
+
+  const loadNotifications = async (options: { unread?: boolean; page?: number } = {}) => {
+    loading.value = true
+    try {
+      const response = await fetchNotifications({
+        unread: options.unread,
+        page: options.page,
+        perPage: pagination.perPage
+      })
+
+      serverNotifications.value = response.data
+      pagination.currentPage = response.meta.current_page
+      pagination.lastPage = response.meta.last_page
+      pagination.perPage = response.meta.per_page
+      pagination.total = response.meta.total
+    } finally {
+      loading.value = false
+    }
+  }
+
+  const markAsRead = async (id: number) => {
+    const notification = serverNotifications.value.find(item => item.id === id)
+    if (!notification || notification.is_read) return
+
+    await markNotificationAsRead(id)
+    notification.is_read = true
+  }
+
+  const markAllAsRead = async () => {
+    if (!unreadCount.value) return
+    await markAllNotificationsAsRead()
+    serverNotifications.value = serverNotifications.value.map(notification => ({
+      ...notification,
+      is_read: true
+    }))
+  }
+
+  const savePreferences = async (updated: ChannelPreferences) => {
+    const response = await updateNotificationPreferences({
+      email: updated.email,
+      sms: updated.sms,
+      push: updated.push
+    })
+
+    preferences.email = response.data.prefers_email_notifications
+    preferences.sms = response.data.prefers_sms_notifications
+    preferences.push = response.data.prefers_push_notifications
+
+    if (authStore.user) {
+      authStore.user.prefers_email_notifications = preferences.email
+      authStore.user.prefers_sms_notifications = preferences.sms
+      authStore.user.prefers_push_notifications = preferences.push
+      localStorage.setItem('user', JSON.stringify(authStore.user))
+    }
+
+    return { ...preferences }
+  }
+
+  const ensurePushSubscription = async () => {
+    if (!preferences.push) {
+      return null
+    }
+
+    try {
+      return await subscribeToPush()
+    } catch (error) {
+      console.warn('Failed to subscribe to push notifications', error)
+      return null
+    }
   }
 
   return {
-    notifications,
-    show,
-    remove,
-    clear
+    // state
+    toasts,
+    serverNotifications,
+    pagination,
+    loading,
+    preferences,
+    unreadCount,
+
+    // toast helpers
+    show: setToast,
+    remove: removeToast,
+    clear: clearToasts,
+
+    // server helpers
+    hydratePreferencesFromUser,
+    loadNotifications,
+    markAsRead,
+    markAllAsRead,
+    savePreferences,
+    ensurePushSubscription
   }
 })

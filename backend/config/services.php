@@ -35,4 +35,17 @@ return [
         ],
     ],
 
+    'vonage' => [
+        'key' => env('VONAGE_KEY'),
+        'secret' => env('VONAGE_SECRET'),
+        'sms_from' => env('VONAGE_SMS_FROM', 'Antigaspi'),
+    ],
+
+    'webpush' => [
+        'public_key' => env('WEB_PUSH_PUBLIC_KEY'),
+        'private_key' => env('WEB_PUSH_PRIVATE_KEY'),
+        'subject' => env('WEB_PUSH_SUBJECT', 'mailto:support@example.com'),
+        'ttl' => env('WEB_PUSH_TTL', 900),
+    ],
+
 ];

@@ -357,61 +357,64 @@
                     <span>Notifications</span>
                   </h3>
                   <div class="space-y-6">
-                    <div class="flex items-center justify-between">
+                    <div class="flex items-start justify-between gap-6">
                       <div>
                         <p class="font-medium text-gray-900">Notifications par email</p>
-                        <p class="text-sm text-gray-600">Recevoir des notifications par email</p>
+                        <p class="text-sm text-gray-600">Recevoir les confirmations de réservation et résumés par email.</p>
                       </div>
                       <label class="relative inline-flex items-center cursor-pointer">
                         <input
-                          v-model="preferences.email_notifications"
+                          v-model="notificationSettings.email"
                           type="checkbox"
                           class="sr-only peer"
                         />
                         <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
                       </label>
                     </div>
-                    <div class="flex items-center justify-between">
+
+                    <div class="flex items-start justify-between gap-6">
                       <div>
-                        <p class="font-medium text-gray-900">Nouvelles offres</p>
-                        <p class="text-sm text-gray-600">Alertes pour les nouveaux produits</p>
+                        <p class="font-medium text-gray-900">Alertes SMS</p>
+                        <p class="text-sm text-gray-600">Recevoir un SMS pour les mises à jour urgentes de réservation.</p>
                       </div>
                       <label class="relative inline-flex items-center cursor-pointer">
                         <input
-                          v-model="preferences.product_notifications"
+                          v-model="notificationSettings.sms"
                           type="checkbox"
                           class="sr-only peer"
                         />
                         <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
                       </label>
                     </div>
-                    <div class="flex items-center justify-between">
+
+                    <div class="flex items-start justify-between gap-6">
                       <div>
-                        <p class="font-medium text-gray-900">Réservations confirmées</p>
-                        <p class="text-sm text-gray-600">Notifications de confirmation</p>
+                        <p class="font-medium text-gray-900">Notifications push</p>
+                        <p class="text-sm text-gray-600">
+                          Recevoir des alertes instantanées dans votre navigateur dès qu'un panier est disponible.
+                          <span v-if="!isPushSupported" class="text-red-500 block">Votre navigateur ne supporte pas les notifications push.</span>
+                        </p>
                       </div>
-                      <label class="relative inline-flex items-center cursor-pointer">
+                      <label class="relative inline-flex items-center cursor-pointer" :class="{ 'opacity-50': !isPushSupported }">
                         <input
-                          v-model="preferences.booking_notifications"
+                          v-model="notificationSettings.push"
                           type="checkbox"
                           class="sr-only peer"
+                          :disabled="!isPushSupported"
                         />
                         <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
                       </label>
                     </div>
-                    <div class="flex items-center justify-between">
-                      <div>
-                        <p class="font-medium text-gray-900">Rappels de récupération</p>
-                        <p class="text-sm text-gray-600">Rappels avant expiration</p>
-                      </div>
-                      <label class="relative inline-flex items-center cursor-pointer">
-                        <input
-                          v-model="preferences.reminder_notifications"
-                          type="checkbox"
-                          class="sr-only peer"
-                        />
-                        <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
-                      </label>
+
+                    <div class="flex justify-end">
+                      <button
+                        @click="persistNotificationPreferences"
+                        :disabled="savingNotifications"
+                        class="px-4 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        <span v-if="!savingNotifications">Enregistrer mes préférences</span>
+                        <span v-else>Enregistrement...</span>
+                      </button>
                     </div>
                   </div>
                 </div>
@@ -875,8 +878,9 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, reactive } from 'vue'
+import { ref, computed, onMounted, reactive, watch } from 'vue'
 import { useAuthStore } from '@/stores/auth'
+import { useNotificationStore } from '@/stores/notification'
 import {
   UserIcon,
   HomeIcon,
@@ -926,6 +930,21 @@ ChartJS.register(
 const authStore = useAuthStore()
 const user = computed(() => authStore.user)
 
+const notificationStore = useNotificationStore()
+const notificationSettings = reactive({
+  email: true,
+  sms: false,
+  push: false
+})
+const savingNotifications = ref(false)
+const isPushSupported = typeof window !== 'undefined' && 'Notification' in window && 'serviceWorker' in navigator
+
+const syncNotificationSettings = () => {
+  notificationSettings.email = notificationStore.preferences.email
+  notificationSettings.sms = notificationStore.preferences.sms
+  notificationSettings.push = notificationStore.preferences.push
+}
+
 // Reactive data
 const activeTab = ref('personal')
 const updating = ref(false)
@@ -950,12 +969,6 @@ const passwordForm = reactive({
 })
 
 const preferences = reactive({
-  // Notifications
-  email_notifications: true,
-  product_notifications: true,
-  booking_notifications: true,
-  reminder_notifications: true,
-
   // Search & Discovery
   max_distance: '15',
   preferred_categories: [] as number[],
@@ -1141,6 +1154,15 @@ const memberSince = computed(() => {
   return 'Non disponible'
 })
 
+watch(
+  () => authStore.user,
+  () => {
+    notificationStore.hydratePreferencesFromUser()
+    syncNotificationSettings()
+  },
+  { immediate: true }
+)
+
 // Computed properties
 const roleLabel = computed(() => {
   switch (user.value?.role) {
@@ -1273,6 +1295,34 @@ const updatePreferences = async () => {
     showMessage('Erreur lors de la sauvegarde des préférences', 'error')
   } finally {
     updatingPreferences.value = false
+  }
+}
+
+const persistNotificationPreferences = async () => {
+  const previousPush = notificationStore.preferences.push
+
+  try {
+    savingNotifications.value = true
+    const saved = await notificationStore.savePreferences({
+      email: notificationSettings.email,
+      sms: notificationSettings.sms,
+      push: notificationSettings.push
+    })
+
+    notificationSettings.email = saved.email
+    notificationSettings.sms = saved.sms
+    notificationSettings.push = saved.push
+
+    if (saved.push && !previousPush) {
+      await notificationStore.ensurePushSubscription()
+    }
+
+    notificationStore.show('success', 'Notifications', 'Préférences de notification mises à jour')
+  } catch (error: any) {
+    const message = error?.message || 'Impossible de mettre à jour vos notifications pour le moment.'
+    notificationStore.show('error', 'Notifications', message)
+  } finally {
+    savingNotifications.value = false
   }
 }
 

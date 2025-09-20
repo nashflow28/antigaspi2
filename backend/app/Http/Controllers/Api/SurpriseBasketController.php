@@ -5,10 +5,13 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Product;
 use App\Models\SurpriseBasketItem;
+use App\Models\User;
+use App\Notifications\NewSurpriseBasketNotification;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Notification;
 
 class SurpriseBasketController extends Controller
 {
@@ -160,6 +163,19 @@ class SurpriseBasketController extends Controller
 
         // Load relationships for response
         $surpriseBasket->load(['merchant', 'category', 'surpriseBasketItems.product']);
+
+        $interestedUsers = User::consumers()
+            ->where('id', '!=', $user->id)
+            ->where(function ($query) {
+                $query->where('prefers_email_notifications', true)
+                    ->orWhere('prefers_push_notifications', true)
+                    ->orWhere('prefers_sms_notifications', true);
+            })
+            ->get();
+
+        if ($interestedUsers->isNotEmpty()) {
+            Notification::send($interestedUsers, new NewSurpriseBasketNotification($surpriseBasket));
+        }
 
         return response()->json([
             'success' => true,

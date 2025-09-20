@@ -11,6 +11,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
+use App\Notifications\ReservationStatusNotification;
 use Tymon\JWTAuth\Facades\JWTAuth;
 
 class ReservationController extends Controller
@@ -99,6 +100,9 @@ class ReservationController extends Controller
                 $product->decrement('quantity_available', $request->quantity);
 
                 $reservation->load(['product.category', 'product.merchant.user']);
+                $reservation->setRelation('user', $user);
+
+                $user->notify(new ReservationStatusNotification($reservation));
 
                 return response()->json([
                     'success' => true,
@@ -157,6 +161,9 @@ class ReservationController extends Controller
                 }
 
                 if ($reservation->cancel()) {
+                    $reservation->refresh()->load('user');
+                    $reservation->user->notify(new ReservationStatusNotification($reservation));
+
                     return response()->json([
                         'success' => true,
                         'message' => 'Réservation annulée avec succès'
@@ -259,6 +266,9 @@ class ReservationController extends Controller
             }
 
             if ($reservation->confirm()) {
+                $reservation->refresh()->load('user');
+                $reservation->user->notify(new ReservationStatusNotification($reservation));
+
                 return response()->json([
                     'success' => true,
                     'message' => 'Réservation confirmée avec succès'
@@ -304,6 +314,9 @@ class ReservationController extends Controller
             if ($reservation->complete()) {
                 // Mettre à jour les ventes du commerçant
                 $reservation->product->merchant->increment('total_sales', $reservation->total_amount);
+
+                $reservation->refresh()->load('user');
+                $reservation->user->notify(new ReservationStatusNotification($reservation));
 
                 return response()->json([
                     'success' => true,
@@ -355,6 +368,9 @@ class ReservationController extends Controller
             }
 
             $reservation->update(['status' => 'ready']);
+
+            $reservation->refresh()->load('user');
+            $reservation->user->notify(new ReservationStatusNotification($reservation));
 
             return response()->json([
                 'success' => true,
