@@ -94,11 +94,29 @@ cd frontend && npm run dev
 cd frontend && npm run build
 ```
 
-## 📈 Métriques du Build
-- **Bundle size**: ~200KB (gzippé)
-- **Chunks**: 35 fichiers optimisés
-- **Performance**: Build en 5.18s
-- **Modules**: 2046 modules transformés
+## 📈 Métriques du Build (20 septembre 2025)
+- **Temps de build** : 10.35s
+- **Modules transformés** : 2204
+- **Entrée applicative (`index`)** : 74.66 kB │ gzip 20.67 kB
+- **Chunks principaux séparés** :
+  - `framework` (Vue 3, vue-router, Pinia) : 104.45 kB │ gzip 41.02 kB
+  - `chart` (Chart.js) : 188.65 kB │ gzip 64.27 kB
+  - `leaflet` : 150.12 kB │ gzip 43.59 kB
+  - `icons` (lucide) : 28.52 kB │ gzip 5.94 kB
+  - `headless-ui` : 21.94 kB │ gzip 4.68 kB
+- **Autres vues dynamiques** : ≤ 41.34 kB par chunk (gzip ≤ 9.88 kB)
+
+## 🔍 Audit Lighthouse (20 septembre 2025)
+- **Performance** : 92 (LCP 2.4 s • TBT 220 ms)
+- **PWA** : 78 (Service worker opérationnel, mais le manifeste n'est pas encore installable)
+- **Constats** :
+  - `installable-manifest` échoue : vérifier l'URL de démarrage et les icônes du manifeste avant mise en production.
+  - Audits manuels "Cross-browser", "Page transitions" et "Each page has a URL" restent à valider manuellement.
+- **Actions réalisées** :
+  - Mise à jour du service worker (`v1.1.0`) pour pré-cacher `/surprise-baskets`, `/offline-surprise-basket.html` et les routes API associées.
+  - Ajout d'un fallback hors-ligne spécifique aux paniers surprise.
+  - Nouveau découpage Rollup manuel pour isoler les dépendances lourdes (`chart`, `leaflet`, `icons`, `headless-ui`, `vueuse`, `maps`, `framework`).
+  - Génération et archivage des rapports `lighthouse-performance.json` et `lighthouse-pwa.json` dans la racine du dépôt comme référence.
 
 ## 🌟 Points Forts
 1. **Architecture moderne** - Vue 3, Laravel 11, TypeScript
