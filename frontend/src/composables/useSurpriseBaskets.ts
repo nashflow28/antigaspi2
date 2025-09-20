@@ -33,20 +33,21 @@ export const useSurpriseBaskets = () => {
     try {
       const response = await surpriseBasketService.getAll(filters)
 
-      if (response.data.success) {
-        surpriseBaskets.value = response.data.data.data
+      if (response.success) {
+        surpriseBaskets.value = response.data.data
         pagination.value = {
-          currentPage: response.data.data.current_page,
-          lastPage: response.data.data.last_page,
-          perPage: response.data.data.per_page,
-          total: response.data.data.total
+          currentPage: response.data.current_page,
+          lastPage: response.data.last_page,
+          perPage: response.data.per_page,
+          total: response.data.total
         }
       } else {
-        notify.error('Erreur lors du chargement des paniers surprise')
+        notify.error(response.message || 'Erreur lors du chargement des paniers surprise')
       }
     } catch (error) {
       console.error('Error loading surprise baskets:', error)
-      notify.error('Erreur lors du chargement des paniers surprise')
+      const message = error instanceof Error ? error.message : 'Erreur lors du chargement des paniers surprise'
+      notify.error(message || 'Erreur lors du chargement des paniers surprise')
     } finally {
       loading.value = false
     }
@@ -60,14 +61,15 @@ export const useSurpriseBaskets = () => {
     try {
       const response = await surpriseBasketService.getMerchantBaskets()
 
-      if (response.data.success) {
-        merchantBaskets.value = response.data.data.data
+      if (response.success) {
+        merchantBaskets.value = response.data.data
       } else {
-        notify.error('Erreur lors du chargement de vos paniers surprise')
+        notify.error(response.message || 'Erreur lors du chargement de vos paniers surprise')
       }
     } catch (error) {
       console.error('Error loading merchant baskets:', error)
-      notify.error('Erreur lors du chargement de vos paniers surprise')
+      const message = error instanceof Error ? error.message : 'Erreur lors du chargement de vos paniers surprise'
+      notify.error(message || 'Erreur lors du chargement de vos paniers surprise')
     } finally {
       loading.value = false
     }
@@ -81,16 +83,17 @@ export const useSurpriseBaskets = () => {
     try {
       const response = await surpriseBasketService.getById(id)
 
-      if (response.data.success) {
-        currentBasket.value = response.data.data
-        return response.data.data
+      if (response.success) {
+        currentBasket.value = response.data
+        return response.data
       } else {
-        notify.error('Panier surprise non trouvé')
+        notify.error(response.message || 'Panier surprise non trouvé')
         return null
       }
     } catch (error) {
       console.error('Error loading surprise basket:', error)
-      notify.error('Erreur lors du chargement du panier surprise')
+      const message = error instanceof Error ? error.message : 'Erreur lors du chargement du panier surprise'
+      notify.error(message || 'Erreur lors du chargement du panier surprise')
       return null
     } finally {
       loading.value = false
@@ -105,28 +108,23 @@ export const useSurpriseBaskets = () => {
     try {
       const response = await surpriseBasketService.create(data)
 
-      if (response.data.success) {
-        notify.success('Panier surprise créé avec succès')
+      if (response.success) {
+        notify.success(response.message || 'Panier surprise créé avec succès')
 
         // Add to merchant baskets if we're viewing them
         if (merchantBaskets.value.length > 0) {
-          merchantBaskets.value.unshift(response.data.data)
+          merchantBaskets.value.unshift(response.data)
         }
 
-        return response.data.data
+        return response.data
       } else {
-        notify.error('Erreur lors de la création du panier surprise')
+        notify.error(response.message || 'Erreur lors de la création du panier surprise')
         return null
       }
-    } catch (error: any) {
+    } catch (error) {
       console.error('Error creating surprise basket:', error)
-
-      if (error.response?.data?.errors) {
-        const errors = Object.values(error.response.data.errors).flat()
-        notify.error(errors[0] as string)
-      } else {
-        notify.error('Erreur lors de la création du panier surprise')
-      }
+      const message = error instanceof Error ? error.message : 'Erreur lors de la création du panier surprise'
+      notify.error(message || 'Erreur lors de la création du panier surprise')
 
       return null
     } finally {
@@ -142,40 +140,35 @@ export const useSurpriseBaskets = () => {
     try {
       const response = await surpriseBasketService.update(id, data)
 
-      if (response.data.success) {
-        notify.success('Panier surprise mis à jour avec succès')
+      if (response.success) {
+        notify.success(response.message || 'Panier surprise mis à jour avec succès')
 
         // Update in current basket
         if (currentBasket.value && currentBasket.value.id === id) {
-          currentBasket.value = response.data.data
+          currentBasket.value = response.data
         }
 
         // Update in merchant baskets
         const index = merchantBaskets.value.findIndex(basket => basket.id === id)
         if (index !== -1) {
-          merchantBaskets.value[index] = response.data.data
+          merchantBaskets.value[index] = response.data
         }
 
         // Update in surprise baskets
         const publicIndex = surpriseBaskets.value.findIndex(basket => basket.id === id)
         if (publicIndex !== -1) {
-          surpriseBaskets.value[publicIndex] = response.data.data
+          surpriseBaskets.value[publicIndex] = response.data
         }
 
-        return response.data.data
+        return response.data
       } else {
-        notify.error('Erreur lors de la mise à jour du panier surprise')
+        notify.error(response.message || 'Erreur lors de la mise à jour du panier surprise')
         return null
       }
-    } catch (error: any) {
+    } catch (error) {
       console.error('Error updating surprise basket:', error)
-
-      if (error.response?.data?.errors) {
-        const errors = Object.values(error.response.data.errors).flat()
-        notify.error(errors[0] as string)
-      } else {
-        notify.error('Erreur lors de la mise à jour du panier surprise')
-      }
+      const message = error instanceof Error ? error.message : 'Erreur lors de la mise à jour du panier surprise'
+      notify.error(message || 'Erreur lors de la mise à jour du panier surprise')
 
       return null
     } finally {
@@ -191,8 +184,8 @@ export const useSurpriseBaskets = () => {
     try {
       const response = await surpriseBasketService.delete(id)
 
-      if (response.data.success) {
-        notify.success('Panier surprise supprimé avec succès')
+      if (response.success) {
+        notify.success(response.message || 'Panier surprise supprimé avec succès')
 
         // Remove from merchant baskets
         merchantBaskets.value = merchantBaskets.value.filter(basket => basket.id !== id)
@@ -207,12 +200,13 @@ export const useSurpriseBaskets = () => {
 
         return true
       } else {
-        notify.error('Erreur lors de la suppression du panier surprise')
+        notify.error(response.message || 'Erreur lors de la suppression du panier surprise')
         return false
       }
     } catch (error) {
       console.error('Error deleting surprise basket:', error)
-      notify.error('Erreur lors de la suppression du panier surprise')
+      const message = error instanceof Error ? error.message : 'Erreur lors de la suppression du panier surprise'
+      notify.error(message || 'Erreur lors de la suppression du panier surprise')
       return false
     } finally {
       deleting.value = false
@@ -226,28 +220,29 @@ export const useSurpriseBaskets = () => {
     try {
       const response = await surpriseBasketService.addProduct(basketId, productId, quantity)
 
-      if (response.data.success) {
-        notify.success('Produit ajouté au panier surprise')
+      if (response.success) {
+        notify.success(response.message || 'Produit ajouté au panier surprise')
 
         // Update current basket
         if (currentBasket.value && currentBasket.value.id === basketId) {
-          currentBasket.value = response.data.data
+          currentBasket.value = response.data
         }
 
         // Update in merchant baskets
         const index = merchantBaskets.value.findIndex(basket => basket.id === basketId)
         if (index !== -1) {
-          merchantBaskets.value[index] = response.data.data
+          merchantBaskets.value[index] = response.data
         }
 
         return true
       } else {
-        notify.error('Erreur lors de l\'ajout du produit')
+        notify.error(response.message || 'Erreur lors de l\'ajout du produit')
         return false
       }
     } catch (error) {
       console.error('Error adding product to basket:', error)
-      notify.error('Erreur lors de l\'ajout du produit')
+      const message = error instanceof Error ? error.message : 'Erreur lors de l\'ajout du produit'
+      notify.error(message || 'Erreur lors de l\'ajout du produit')
       return false
     }
   }
@@ -259,28 +254,29 @@ export const useSurpriseBaskets = () => {
     try {
       const response = await surpriseBasketService.removeProduct(basketId, productId)
 
-      if (response.data.success) {
-        notify.success('Produit retiré du panier surprise')
+      if (response.success) {
+        notify.success(response.message || 'Produit retiré du panier surprise')
 
         // Update current basket
         if (currentBasket.value && currentBasket.value.id === basketId) {
-          currentBasket.value = response.data.data
+          currentBasket.value = response.data
         }
 
         // Update in merchant baskets
         const index = merchantBaskets.value.findIndex(basket => basket.id === basketId)
         if (index !== -1) {
-          merchantBaskets.value[index] = response.data.data
+          merchantBaskets.value[index] = response.data
         }
 
         return true
       } else {
-        notify.error('Erreur lors de la suppression du produit')
+        notify.error(response.message || 'Erreur lors de la suppression du produit')
         return false
       }
     } catch (error) {
       console.error('Error removing product from basket:', error)
-      notify.error('Erreur lors de la suppression du produit')
+      const message = error instanceof Error ? error.message : 'Erreur lors de la suppression du produit'
+      notify.error(message || 'Erreur lors de la suppression du produit')
       return false
     }
   }
