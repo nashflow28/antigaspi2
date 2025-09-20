@@ -80,7 +80,11 @@
         </div>
 
         <!-- Reviews List -->
-        <ReviewsList :merchant-id="selectedMerchantId" :key="selectedMerchantId" />
+        <ReviewsList
+          ref="reviewsListRef"
+          :merchant-id="selectedMerchantId"
+          :key="selectedMerchantId"
+        />
       </div>
     </div>
   </div>
@@ -108,6 +112,7 @@ const authStore = useAuthStore()
 const merchants = ref<Merchant[]>([])
 const selectedMerchantId = ref<number | null>(null)
 const availableProducts = ref<Product[]>([])
+const reviewsListRef = ref()
 
 const fetchMerchants = async () => {
   try {
@@ -148,8 +153,11 @@ const onMerchantChange = async () => {
 }
 
 const onReviewSuccess = (review: any) => {
-  // Reviews list will automatically refresh
   console.log('Review submitted successfully:', review)
+  // Automatically refresh the reviews list
+  if (reviewsListRef.value) {
+    reviewsListRef.value.refreshReviews()
+  }
 }
 
 onMounted(() => {

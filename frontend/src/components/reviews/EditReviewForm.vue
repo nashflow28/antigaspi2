@@ -115,7 +115,7 @@
     </div>
 
     <!-- Delete Confirmation Modal -->
-    <div v-if="showDeleteConfirm" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div v-if="showDeleteConfirm" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[120]">
       <div class="bg-white rounded-lg p-6 max-w-md w-mx-4">
         <h3 class="text-lg font-semibold text-gray-900 mb-4">Supprimer l'avis</h3>
         <p class="text-gray-600 mb-6">

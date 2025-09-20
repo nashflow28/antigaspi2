@@ -29,6 +29,15 @@
             <option value="month">Ce mois</option>
             <option value="all">Toutes les dates</option>
           </select>
+
+          <button
+            @click="exportReservations"
+            class="btn btn-outline flex items-center gap-2"
+            :disabled="filteredReservations.length === 0"
+          >
+            <ArrowDownTrayIcon class="w-4 h-4" />
+            Exporter
+          </button>
         </div>
       </div>
 
@@ -206,67 +215,111 @@
               </div>
 
               <!-- Actions -->
-              <div class="flex flex-col gap-2 min-w-[200px]">
+              <div class="flex items-center gap-2 min-w-[200px]">
+                <!-- Primary action based on status -->
                 <template v-if="reservation.status === 'pending'">
                   <button
                     @click="updateReservationStatus(reservation, 'confirmed')"
-                    class="btn btn-success btn-sm"
+                    class="btn btn-success btn-sm flex-1"
                   >
                     <CheckIcon class="w-4 h-4 mr-1" />
                     Confirmer
-                  </button>
-                  <button
-                    @click="updateReservationStatus(reservation, 'cancelled')"
-                    class="btn btn-error btn-sm"
-                  >
-                    <XMarkIcon class="w-4 h-4 mr-1" />
-                    Annuler
                   </button>
                 </template>
 
                 <template v-else-if="reservation.status === 'confirmed'">
                   <button
                     @click="markAsReady(reservation)"
-                    class="btn btn-primary btn-sm"
+                    class="btn btn-primary btn-sm flex-1"
                   >
                     <BellIcon class="w-4 h-4 mr-1" />
                     Marquer prêt
-                  </button>
-                  <button
-                    @click="updateReservationStatus(reservation, 'completed')"
-                    class="btn btn-success btn-sm"
-                  >
-                    <CheckCircleIcon class="w-4 h-4 mr-1" />
-                    Récupérée
                   </button>
                 </template>
 
                 <template v-else-if="reservation.status === 'ready'">
                   <button
                     @click="updateReservationStatus(reservation, 'completed')"
-                    class="btn btn-success btn-sm"
+                    class="btn btn-success btn-sm flex-1"
                   >
                     <CheckCircleIcon class="w-4 h-4 mr-1" />
                     Marquer récupérée
                   </button>
                 </template>
 
-                <!-- Always show contact and details buttons -->
-                <button
-                  @click="contactCustomer(reservation)"
-                  class="btn btn-outline btn-sm"
-                >
-                  <PhoneIcon class="w-4 h-4 mr-1" />
-                  Contacter
-                </button>
+                <template v-else>
+                  <button
+                    @click="contactCustomer(reservation)"
+                    class="btn btn-outline btn-sm flex-1"
+                  >
+                    <PhoneIcon class="w-4 h-4 mr-1" />
+                    Contacter
+                  </button>
+                </template>
 
-                <button
-                  @click="viewReservationDetails(reservation)"
-                  class="btn btn-outline btn-sm"
-                >
-                  <EyeIcon class="w-4 h-4 mr-1" />
-                  Détails
-                </button>
+                <!-- Three dots menu -->
+                <div class="relative">
+                  <button
+                    @click="toggleDropdown(reservation.id)"
+                    class="btn btn-ghost btn-sm p-2"
+                    :class="{ 'bg-neutral-100': openDropdown === reservation.id }"
+                  >
+                    <EllipsisVerticalIcon class="w-4 h-4" />
+                  </button>
+
+                  <!-- Dropdown menu -->
+                  <div
+                    v-if="openDropdown === reservation.id"
+                    class="absolute right-0 top-full mt-1 bg-white border border-neutral-200 rounded-lg shadow-lg py-1 z-10 min-w-[160px]"
+                  >
+                    <button
+                      @click="viewReservationDetails(reservation); closeDropdown()"
+                      class="w-full px-3 py-2 text-left text-sm hover:bg-neutral-50 flex items-center gap-2"
+                    >
+                      <EyeIcon class="w-4 h-4" />
+                      Voir détails
+                    </button>
+
+                    <button
+                      @click="contactCustomer(reservation); closeDropdown()"
+                      class="w-full px-3 py-2 text-left text-sm hover:bg-neutral-50 flex items-center gap-2"
+                    >
+                      <PhoneIcon class="w-4 h-4" />
+                      Contacter client
+                    </button>
+
+                    <template v-if="reservation.status === 'pending'">
+                      <hr class="my-1 border-neutral-200">
+                      <button
+                        @click="updateReservationStatus(reservation, 'cancelled'); closeDropdown()"
+                        class="w-full px-3 py-2 text-left text-sm hover:bg-red-50 text-red-600 flex items-center gap-2"
+                      >
+                        <XMarkIcon class="w-4 h-4" />
+                        Annuler
+                      </button>
+                    </template>
+
+                    <template v-if="reservation.status === 'confirmed'">
+                      <hr class="my-1 border-neutral-200">
+                      <button
+                        @click="updateReservationStatus(reservation, 'completed'); closeDropdown()"
+                        class="w-full px-3 py-2 text-left text-sm hover:bg-green-50 text-green-600 flex items-center gap-2"
+                      >
+                        <CheckCircleIcon class="w-4 h-4" />
+                        Marquer récupérée
+                      </button>
+                    </template>
+
+                    <hr class="my-1 border-neutral-200">
+                    <button
+                      @click="exportSingleReservation(reservation); closeDropdown()"
+                      class="w-full px-3 py-2 text-left text-sm hover:bg-neutral-50 flex items-center gap-2"
+                    >
+                      <ArrowDownTrayIcon class="w-4 h-4" />
+                      Exporter
+                    </button>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -286,7 +339,7 @@
     <!-- Reservation Details Modal -->
     <div
       v-if="showDetailsModal"
-      class="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50"
+      class="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-[120]"
       @click.self="showDetailsModal = false"
     >
       <div class="card max-w-2xl w-full max-h-[90vh] overflow-y-auto">
@@ -400,7 +453,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 import { formatPrice } from '@/utils/currency'
 import {
@@ -414,7 +467,9 @@ import {
   XMarkIcon,
   BellIcon,
   PhoneIcon,
-  EyeIcon
+  EyeIcon,
+  EllipsisVerticalIcon,
+  ArrowDownTrayIcon
 } from '@heroicons/vue/24/outline'
 
 // Auth store
@@ -429,6 +484,7 @@ const sortBy = ref('created_at')
 const showDetailsModal = ref(false)
 const selectedReservation = ref<any>(null)
 const loading = ref(false)
+const openDropdown = ref<number | null>(null)
 
 // Filters
 const filters = computed(() => [
@@ -667,6 +723,80 @@ const viewReservationDetails = (reservation: any) => {
   showDetailsModal.value = true
 }
 
+// Dropdown menu functions
+const toggleDropdown = (reservationId: number) => {
+  openDropdown.value = openDropdown.value === reservationId ? null : reservationId
+}
+
+const closeDropdown = () => {
+  openDropdown.value = null
+}
+
+// Export functions
+const exportReservations = () => {
+  const dataToExport = filteredReservations.value.map(reservation => ({
+    code: reservation.reservation_code,
+    client: reservation.consumer.name,
+    telephone: reservation.consumer.phone,
+    produit: reservation.product.name,
+    quantite: reservation.quantity_reserved,
+    montant: reservation.total_amount,
+    statut: getStatusLabel(reservation.status),
+    date_reservation: formatDateTime(reservation.created_at),
+    date_retrait: reservation.pickup_date ? formatDateTime(reservation.pickup_date) : 'N/A',
+    notes: reservation.notes || 'Aucune'
+  }))
+
+  const csvContent = [
+    // Header
+    ['Code', 'Client', 'Téléphone', 'Produit', 'Quantité', 'Montant', 'Statut', 'Date réservation', 'Date retrait', 'Notes'].join(','),
+    // Data rows
+    ...dataToExport.map(row => Object.values(row).map(value => `"${value}"`).join(','))
+  ].join('\n')
+
+  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
+  const link = document.createElement('a')
+  const url = URL.createObjectURL(blob)
+  link.setAttribute('href', url)
+  link.setAttribute('download', `reservations_${new Date().toISOString().split('T')[0]}.csv`)
+  link.style.visibility = 'hidden'
+  document.body.appendChild(link)
+  link.click()
+  document.body.removeChild(link)
+}
+
+const exportSingleReservation = (reservation: any) => {
+  const dataToExport = [{
+    code: reservation.reservation_code,
+    client: reservation.consumer.name,
+    telephone: reservation.consumer.phone,
+    produit: reservation.product.name,
+    quantite: reservation.quantity_reserved,
+    montant: reservation.total_amount,
+    statut: getStatusLabel(reservation.status),
+    date_reservation: formatDateTime(reservation.created_at),
+    date_retrait: reservation.pickup_date ? formatDateTime(reservation.pickup_date) : 'N/A',
+    notes: reservation.notes || 'Aucune'
+  }]
+
+  const csvContent = [
+    // Header
+    ['Code', 'Client', 'Téléphone', 'Produit', 'Quantité', 'Montant', 'Statut', 'Date réservation', 'Date retrait', 'Notes'].join(','),
+    // Data row
+    Object.values(dataToExport[0]).map(value => `"${value}"`).join(',')
+  ].join('\n')
+
+  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
+  const link = document.createElement('a')
+  const url = URL.createObjectURL(blob)
+  link.setAttribute('href', url)
+  link.setAttribute('download', `reservation_${reservation.reservation_code}.csv`)
+  link.style.visibility = 'hidden'
+  document.body.appendChild(link)
+  link.click()
+  document.body.removeChild(link)
+}
+
 const loadReservations = async () => {
   try {
     loading.value = true
@@ -723,7 +853,20 @@ const loadReservations = async () => {
 }
 
 // Lifecycle
+// Close dropdown when clicking outside
+const handleClickOutside = (event: Event) => {
+  const target = event.target as Element
+  if (!target.closest('.relative')) {
+    closeDropdown()
+  }
+}
+
 onMounted(() => {
   loadReservations()
+  document.addEventListener('click', handleClickOutside)
+})
+
+onUnmounted(() => {
+  document.removeEventListener('click', handleClickOutside)
 })
 </script>

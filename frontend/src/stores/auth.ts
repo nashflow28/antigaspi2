@@ -9,6 +9,22 @@ export const useAuthStore = defineStore('auth', () => {
   const loading = ref(false)
   const error = ref<string | null>(null)
 
+  // Initialize user from localStorage if available
+  const initUser = () => {
+    const savedUser = localStorage.getItem('user')
+    if (savedUser && token.value) {
+      try {
+        user.value = JSON.parse(savedUser)
+      } catch (err) {
+        console.error('Error parsing saved user data:', err)
+        localStorage.removeItem('user')
+      }
+    }
+  }
+
+  // Initialize on store creation
+  initUser()
+
   const isAuthenticated = computed(() => !!token.value && !!user.value)
   const isConsumer = computed(() => user.value?.role === 'consumer')
   const isMerchant = computed(() => user.value?.role === 'merchant')
@@ -29,12 +45,14 @@ export const useAuthStore = defineStore('auth', () => {
     token.value = authToken
     user.value = userData
     localStorage.setItem('auth_token', authToken)
+    localStorage.setItem('user', JSON.stringify(userData))
   }
 
   const clearAuth = () => {
     token.value = null
     user.value = null
     localStorage.removeItem('auth_token')
+    localStorage.removeItem('user')
   }
 
   const login = async (credentials: LoginCredentials) => {

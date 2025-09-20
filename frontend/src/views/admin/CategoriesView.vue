@@ -211,7 +211,7 @@
     </div>
 
     <!-- Create/Edit Modal Form -->
-    <div v-if="modal.show && modal.type === 'form'" class="fixed inset-0 z-50 overflow-y-auto">
+    <div v-if="modal.show && modal.type === 'form'" class="fixed inset-0 z-[120] overflow-y-auto">
       <!-- Backdrop -->
       <div
         class="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm transition-opacity"
@@ -336,7 +336,7 @@
     />
 
     <!-- Notification Container -->
-    <div class="fixed top-4 right-4 z-50 space-y-2">
+    <div class="fixed top-4 right-4 z-[110] space-y-2">
       <div
         v-for="notification in notificationStore.notifications"
         :key="notification.id"

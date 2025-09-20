@@ -861,7 +861,7 @@
     <div
       v-if="message"
       :class="[
-        'fixed top-4 right-4 px-6 py-4 rounded-xl shadow-lg z-50',
+        'fixed top-4 right-4 px-6 py-4 rounded-xl shadow-lg z-[110]',
         messageType === 'success' ? 'bg-green-500 text-white' : 'bg-red-500 text-white'
       ]"
     >

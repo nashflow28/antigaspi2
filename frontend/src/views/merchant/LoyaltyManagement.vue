@@ -20,7 +20,7 @@
               Actualiser
             </button>
             <button
-              @click="openAwardModal"
+              @click="openAwardModal()"
               class="btn btn-primary btn-sm"
             >
               <Plus class="w-4 h-4 mr-2" />
@@ -194,6 +194,9 @@
             <!-- Customer Selection -->
             <div v-if="!selectedCustomer">
               <label class="form-label">Sélectionner un client</label>
+              <div class="text-xs text-gray-500 mb-2">
+                Debug: {{ allUsersPoints.length }} clients chargés
+              </div>
               <select
                 v-model="awardForm.user_id"
                 required

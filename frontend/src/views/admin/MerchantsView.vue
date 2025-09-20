@@ -289,7 +289,7 @@
     />
 
     <!-- Notifications toast -->
-    <div class="fixed top-4 right-4 z-50 space-y-4">
+    <div class="fixed top-4 right-4 z-[110] space-y-4">
       <NotificationToast
         v-for="notification in notifications"
         :key="notification.id"
@@ -414,7 +414,12 @@ const loadModerationData = async () => {
   loading.value = true
   try {
     console.log('📡 Appel API vers http://localhost:8000/api/admin/moderation')
-    const response = await fetch('http://localhost:8000/api/admin/moderation')
+    const response = await fetch('http://localhost:8000/api/admin/moderation', {
+      headers: {
+        'Accept': 'application/json',
+        'Authorization': `Bearer ${localStorage.getItem('auth_token')}`
+      }
+    })
     const data = await response.json()
     console.log('📥 Réponse API:', data)
 
@@ -610,8 +615,17 @@ const approveMerchant = async (merchant: PendingMerchant) => {
       try {
         const response = await fetch(`http://localhost:8000/api/admin/merchants/${merchant.id}/approve`, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' }
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'Authorization': `Bearer ${localStorage.getItem('auth_token')}`
+          }
         })
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`)
+        }
+
         const data = await response.json()
 
         if (data.success) {
@@ -641,9 +655,18 @@ const rejectMerchant = async (merchant: PendingMerchant) => {
       try {
         const response = await fetch(`http://localhost:8000/api/admin/merchants/${merchant.id}/reject`, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'Authorization': `Bearer ${localStorage.getItem('auth_token')}`
+          },
           body: JSON.stringify({ reason: 'Rejeté par l\'administrateur' })
         })
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`)
+        }
+
         const data = await response.json()
 
         if (data.success) {
@@ -692,8 +715,17 @@ const approveProduct = async (product: ProductToModerate) => {
       try {
         const response = await fetch(`http://localhost:8000/api/admin/products/${product.id}/approve`, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' }
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'Authorization': `Bearer ${localStorage.getItem('auth_token')}`
+          }
         })
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`)
+        }
+
         const data = await response.json()
 
         if (data.success) {
@@ -721,9 +753,18 @@ const rejectProduct = async (product: ProductToModerate) => {
       try {
         const response = await fetch(`http://localhost:8000/api/admin/products/${product.id}/reject`, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'Authorization': `Bearer ${localStorage.getItem('auth_token')}`
+          },
           body: JSON.stringify({ reason: 'Rejeté par l\'administrateur' })
         })
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`)
+        }
+
         const data = await response.json()
 
         if (data.success) {
@@ -752,8 +793,17 @@ const resolveReservation = async (reservation: FlaggedReservation) => {
       try {
         const response = await fetch(`http://localhost:8000/api/admin/reservations/${reservation.id}/resolve`, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' }
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'Authorization': `Bearer ${localStorage.getItem('auth_token')}`
+          }
         })
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`)
+        }
+
         const data = await response.json()
 
         if (data.success) {

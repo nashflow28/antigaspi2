@@ -58,7 +58,7 @@ export const useLoyaltyPoints = () => {
         throw new Error('Token d\'authentification manquant')
       }
 
-      const response = await axios.get('/api/loyalty/my-points', {
+      const response = await axios.get('http://localhost:8000/api/loyalty/my-points', {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -95,7 +95,10 @@ export const useLoyaltyPoints = () => {
         throw new Error('Token d\'authentification manquant')
       }
 
-      const response = await axios.post('/api/admin/loyalty/award', data, {
+      // Always use merchant endpoint for now, as this composable is used in merchant context
+      const endpoint = 'http://localhost:8000/api/merchants/loyalty/award'
+
+      const response = await axios.post(endpoint, data, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -130,7 +133,7 @@ export const useLoyaltyPoints = () => {
         throw new Error('Token d\'authentification manquant')
       }
 
-      const response = await axios.post('/api/loyalty/redeem', data, {
+      const response = await axios.post('http://localhost:8000/api/loyalty/redeem', data, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -147,7 +150,7 @@ export const useLoyaltyPoints = () => {
       }
     } catch (err: any) {
       error.value = err.response?.data?.message || err.message
-      notify.error(error.value)
+      notify.error('Impossible d\'échanger vos points. Vérifiez que vous avez suffisamment de points.', 'Erreur d\'échange')
       return false
     } finally {
       loading.value = false
@@ -164,7 +167,10 @@ export const useLoyaltyPoints = () => {
         throw new Error('Token d\'authentification manquant')
       }
 
-      const response = await axios.get('/api/admin/loyalty/users', {
+      // Always use merchant endpoint for now, as this composable is used in merchant context
+      const endpoint = 'http://localhost:8000/api/merchants/loyalty/customers'
+
+      const response = await axios.get(endpoint, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -178,7 +184,7 @@ export const useLoyaltyPoints = () => {
       }
     } catch (err: any) {
       error.value = err.response?.data?.message || err.message
-      notify.error('Erreur lors de la récupération des points')
+      notify.error('Erreur lors de la récupération des points: ' + (err.response?.data?.message || err.message))
     } finally {
       loading.value = false
     }

@@ -1,5 +1,5 @@
 <template>
-  <div class="fixed top-4 right-4 z-50 space-y-4">
+  <div class="fixed top-4 right-4 z-[110] space-y-4">
     <!-- Auth errors -->
     <div
       v-if="authStore.error"

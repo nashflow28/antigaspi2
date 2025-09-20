@@ -1,12 +1,12 @@
 <template>
   <Teleport to="body">
-    <div class="fixed top-4 right-4 z-50 space-y-2">
+    <div class="fixed top-4 right-4 z-[110] space-y-2">
       <TransitionGroup name="notification" tag="div">
         <div
           v-for="notification in notifications"
           :key="notification.id"
           :class="getNotificationClasses(notification.type)"
-          class="max-w-sm bg-white rounded-lg shadow-lg border border-gray-200 overflow-hidden"
+          class="max-w-sm bg-white rounded-lg shadow-lg border border-gray-200 overflow-hidden relative"
         >
           <div class="p-4">
             <div class="flex items-start">
@@ -24,7 +24,9 @@
               <div class="ml-4 flex-shrink-0 flex">
                 <button
                   @click="removeNotification(notification.id)"
-                  class="inline-flex text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
+                  :class="notification.type === 'error' ? 'bg-red-100 hover:bg-red-200 text-red-600 rounded-full p-1' : 'text-gray-400 hover:text-gray-500'"
+                  class="inline-flex focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-colors"
+                  :title="notification.type === 'error' ? 'Cliquez pour fermer cette erreur' : 'Fermer'"
                 >
                   <X class="h-5 w-5" />
                 </button>

@@ -206,6 +206,52 @@ class LoyaltyPointController extends Controller
     }
 
     /**
+     * Get merchant's customers with their loyalty points (Merchant only)
+     */
+    public function getMerchantCustomers(Request $request): JsonResponse
+    {
+        try {
+            $merchant = $request->user();
+
+            // Get all customers who have made reservations with this merchant
+            $customers = User::with(['loyaltyPoints' => function($query) {
+                $query->active();
+            }])
+            ->where('role', 'consumer')
+            ->whereHas('reservations', function($query) use ($merchant) {
+                $query->whereHas('product', function($productQuery) use ($merchant) {
+                    $productQuery->where('merchant_id', $merchant->id);
+                });
+            })
+            ->get()
+            ->map(function ($user) {
+                $totalPoints = $user->loyaltyPoints->sum('points');
+                $name = $user->name ?: trim($user->first_name . ' ' . $user->last_name);
+                return [
+                    'id' => $user->id,
+                    'name' => $name ?: 'Utilisateur #' . $user->id,
+                    'email' => $user->email,
+                    'total_points' => $totalPoints,
+                    'last_activity' => $user->loyaltyPoints->max('created_at')
+                ];
+            })
+            ->sortByDesc('total_points')
+            ->values();
+
+            return response()->json([
+                'success' => true,
+                'data' => $customers
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Erreur lors de la récupération des clients'
+            ], 500);
+        }
+    }
+
+    /**
      * Auto-award points for purchase (Internal method)
      */
     public function awardPurchasePoints($userId, $reservationId, $amount): void

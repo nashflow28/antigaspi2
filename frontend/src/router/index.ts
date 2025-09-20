@@ -71,6 +71,12 @@ const router = createRouter({
       meta: { requiresAuth: true, roles: ['consumer'] }
     },
     {
+      path: '/reservations/:id',
+      name: 'reservation-detail',
+      component: () => import('@/views/ReservationDetailView.vue'),
+      meta: { requiresAuth: true, roles: ['consumer'] }
+    },
+    {
       path: '/loyalty',
       name: 'consumer-loyalty',
       component: () => import('@/views/consumer/LoyaltyDashboard.vue'),

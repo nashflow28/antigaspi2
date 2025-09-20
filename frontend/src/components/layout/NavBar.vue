@@ -189,7 +189,7 @@
                       <div>
                         <p class="font-semibold text-neutral-900">{{ authStore.user?.first_name }} {{ authStore.user?.last_name }}</p>
                         <p class="text-sm text-neutral-500">{{ authStore.user?.email }}</p>
-                        <span class="badge badge-primary mt-1">{{ authStore.user?.role }}</span>
+                        <span class="badge badge-primary mt-1">{{ getRoleLabel(authStore.user?.role) }}</span>
                       </div>
                     </div>
                   </div>
@@ -434,6 +434,16 @@ const getDashboardRoute = () => {
     default:
       return '/dashboard'
   }
+}
+
+const getRoleLabel = (role?: string): string => {
+  if (!role) return ''
+  const labels: Record<string, string> = {
+    consumer: 'Consommateur',
+    merchant: 'Commerçant',
+    admin: 'Administrateur'
+  }
+  return labels[role] || role
 }
 
 // Close menus when clicking outside

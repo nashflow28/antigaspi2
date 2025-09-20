@@ -109,6 +109,12 @@ Route::prefix('merchants')->middleware('jwt.auth')->group(function () {
         Route::put('/{review}/response', [\App\Http\Controllers\Api\MerchantReviewController::class, 'updateResponse']); // Modifier réponse
         Route::delete('/{review}/response', [\App\Http\Controllers\Api\MerchantReviewController::class, 'deleteResponse']); // Supprimer réponse
     });
+
+    // Gestion des points de fidélité pour commerçants
+    Route::prefix('loyalty')->group(function () {
+        Route::get('/customers', [\App\Http\Controllers\Api\LoyaltyPointController::class, 'getMerchantCustomers']); // Clients du commerçant
+        Route::post('/award', [\App\Http\Controllers\Api\LoyaltyPointController::class, 'awardPoints']); // Attribuer des points
+    });
 });
 
 // Routes publiques des commerçants

@@ -1,5 +1,5 @@
 <template>
-  <div v-if="show" class="fixed inset-0 z-50 overflow-y-auto">
+  <div v-if="show" class="fixed inset-0 z-[120] overflow-y-auto">
     <!-- Backdrop -->
     <div
       class="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm transition-opacity"

@@ -1,7 +1,7 @@
 <template>
   <div
     v-if="isVisible"
-    class="fixed top-4 right-4 z-50 max-w-sm w-full bg-white shadow-lg rounded-lg pointer-events-auto ring-1 ring-black ring-opacity-5 overflow-hidden transform transition-all duration-300 ease-in-out"
+    class="fixed top-4 right-4 z-[110] max-w-sm w-full bg-white shadow-lg rounded-lg pointer-events-auto ring-1 ring-black ring-opacity-5 overflow-hidden transform transition-all duration-300 ease-in-out"
     :class="{
       'translate-x-0': isVisible,
       'translate-x-full': !isVisible

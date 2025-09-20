@@ -126,14 +126,36 @@
               {{ review.product.name }}
             </div>
 
-            <!-- Edit/Delete buttons for user's own reviews -->
-            <div v-if="authStore.isAuthenticated && authStore.user?.id === review.user.id" class="flex space-x-2 mt-3">
+            <!-- Action buttons -->
+            <div v-if="authStore.isAuthenticated" class="flex space-x-2 mt-3">
+              <!-- Edit button for user's own reviews -->
               <button
+                v-if="authStore.user?.id === review.user.id"
                 @click="editingReviewId = review.id"
                 class="inline-flex items-center px-3 py-1 text-xs text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-full transition-colors"
               >
                 <Edit class="w-3 h-3 mr-1" />
                 Modifier
+              </button>
+
+              <!-- Report button for other users' reviews (consumers only) -->
+              <button
+                v-if="authStore.user?.id !== review.user.id && authStore.isConsumer"
+                @click="reportingReviewId = review.id"
+                class="inline-flex items-center px-3 py-1 text-xs text-red-600 bg-red-50 hover:bg-red-100 rounded-full transition-colors"
+              >
+                <Flag class="w-3 h-3 mr-1" />
+                Signaler
+              </button>
+
+              <!-- Reply button for merchants -->
+              <button
+                v-if="authStore.isMerchant"
+                @click="replyingToReviewId = review.id"
+                class="inline-flex items-center px-3 py-1 text-xs text-green-600 bg-green-50 hover:bg-green-100 rounded-full transition-colors"
+              >
+                <Reply class="w-3 h-3 mr-1" />
+                Répondre
               </button>
             </div>
           </div>
@@ -147,6 +169,83 @@
             @deleted="onReviewDeleted"
             @cancel="editingReviewId = null"
           />
+        </div>
+
+        <!-- Report Review Modal -->
+        <div v-if="reportingReviewId === review.id" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[120]">
+          <div class="bg-white rounded-lg p-6 max-w-md w-full mx-4">
+            <h3 class="text-lg font-semibold text-gray-900 mb-4">Signaler cet avis</h3>
+            <p class="text-gray-600 mb-4">
+              Pourquoi souhaitez-vous signaler cet avis ?
+            </p>
+            <div class="space-y-2 mb-6">
+              <label class="flex items-center">
+                <input type="radio" v-model="reportReason" value="inappropriate" class="mr-2" />
+                Contenu inapproprié
+              </label>
+              <label class="flex items-center">
+                <input type="radio" v-model="reportReason" value="spam" class="mr-2" />
+                Spam ou contenu commercial
+              </label>
+              <label class="flex items-center">
+                <input type="radio" v-model="reportReason" value="fake" class="mr-2" />
+                Avis faux ou trompeur
+              </label>
+              <label class="flex items-center">
+                <input type="radio" v-model="reportReason" value="offensive" class="mr-2" />
+                Langage offensant
+              </label>
+            </div>
+            <div class="flex justify-end space-x-3">
+              <button
+                @click="reportingReviewId = null; reportReason = ''"
+                class="px-4 py-2 text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
+              >
+                Annuler
+              </button>
+              <button
+                @click="submitReport(review.id)"
+                class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+              >
+                Signaler
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Reply to Review Modal -->
+        <div v-if="replyingToReviewId === review.id" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[120]">
+          <div class="bg-white rounded-lg p-6 max-w-md w-full mx-4">
+            <h3 class="text-lg font-semibold text-gray-900 mb-4">Répondre à cet avis</h3>
+            <p class="text-sm text-gray-600 mb-4">
+              Répondez de manière professionnelle et constructive à l'avis de {{ review.user.name }}.
+            </p>
+            <textarea
+              v-model="replyText"
+              placeholder="Écrivez votre réponse..."
+              class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+              rows="4"
+              maxlength="500"
+            ></textarea>
+            <div class="text-xs text-gray-500 mt-1">
+              {{ replyText?.length || 0 }}/500 caractères
+            </div>
+            <div class="flex justify-end space-x-3 mt-4">
+              <button
+                @click="replyingToReviewId = null; replyText = ''"
+                class="px-4 py-2 text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
+              >
+                Annuler
+              </button>
+              <button
+                @click="submitReply(review.id)"
+                :disabled="!replyText?.trim()"
+                class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Répondre
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -181,7 +280,7 @@
 <script setup lang="ts">
 import { ref, onMounted, watch } from 'vue'
 import { useAuthStore } from '@/stores/auth'
-import { MessageSquare, Star, ShieldCheck, Package, Edit } from 'lucide-vue-next'
+import { MessageSquare, Star, ShieldCheck, Package, Edit, Flag, Reply } from 'lucide-vue-next'
 import EditReviewForm from './EditReviewForm.vue'
 
 interface Review {
@@ -230,6 +329,10 @@ const pagination = ref<any>(null)
 const loading = ref(false)
 const currentFilter = ref('')
 const editingReviewId = ref<number | null>(null)
+const reportingReviewId = ref<number | null>(null)
+const replyingToReviewId = ref<number | null>(null)
+const replyText = ref('')
+const reportReason = ref('')
 
 const getInitials = (name: string) => {
   return name.split(' ').map(part => part[0]).join('').toUpperCase().slice(0, 2)
@@ -307,6 +410,97 @@ const onReviewDeleted = () => {
   fetchReviews()
   fetchStats()
 }
+
+const submitReport = async (reviewId: number) => {
+  try {
+    const token = localStorage.getItem('auth_token')
+    if (!token) {
+      throw new Error('Token d\'authentification manquant')
+    }
+
+    if (!reportReason.value) {
+      alert('Veuillez sélectionner une raison')
+      return
+    }
+
+    const response = await fetch('http://localhost:8000/api/reviews/report', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        review_id: reviewId,
+        reason: reportReason.value
+      })
+    })
+
+    const data = await response.json()
+
+    if (data.success) {
+      alert('Avis signalé avec succès. Notre équipe va examiner votre signalement.')
+      reportingReviewId.value = null
+      reportReason.value = ''
+    } else {
+      throw new Error(data.message || 'Erreur lors du signalement')
+    }
+  } catch (error) {
+    console.error('Error reporting review:', error)
+    alert('Erreur lors du signalement. Veuillez réessayer.')
+  }
+}
+
+const submitReply = async (reviewId: number) => {
+  try {
+    const token = localStorage.getItem('auth_token')
+    if (!token) {
+      throw new Error('Token d\'authentification manquant')
+    }
+
+    if (!replyText.value.trim()) {
+      alert('Veuillez écrire une réponse')
+      return
+    }
+
+    const response = await fetch('http://localhost:8000/api/reviews/reply', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        review_id: reviewId,
+        reply: replyText.value.trim()
+      })
+    })
+
+    const data = await response.json()
+
+    if (data.success) {
+      alert('Réponse publiée avec succès!')
+      replyingToReviewId.value = null
+      replyText.value = ''
+      // Refresh reviews to show the new reply
+      fetchReviews()
+    } else {
+      throw new Error(data.message || 'Erreur lors de la publication')
+    }
+  } catch (error) {
+    console.error('Error submitting reply:', error)
+    alert('Erreur lors de la publication. Veuillez réessayer.')
+  }
+}
+
+// Expose refresh method to parent
+const refreshReviews = () => {
+  fetchStats()
+  fetchReviews()
+}
+
+// Expose methods to parent component
+defineExpose({
+  refreshReviews
+})
 
 watch(() => props.merchantId, () => {
   fetchStats()
