@@ -46,11 +46,14 @@ class ReservationResource extends JsonResource
                 'discounted_price' => (float) $this->product->discounted_price,
                 'discount_percentage' => $this->product->discount_percentage,
                 'expiration_date' => $this->product->expiration_date,
-                'category' => $this->whenLoaded('product.category', [
-                    'id' => $this->product->category->id,
-                    'name' => $this->product->category->name,
-                    'icon' => $this->product->category->icon,
-                ]),
+                'category' => $this->whenLoaded(
+                    'product.category',
+                    fn () => optional($this->product->category, fn ($category) => [
+                        'id' => $category->id,
+                        'name' => $category->name,
+                        'icon' => $category->icon,
+                    ])
+                ),
                 'merchant' => [
                     'id' => $this->product->merchant->id,
                     'name' => $this->product->merchant->business_name,
