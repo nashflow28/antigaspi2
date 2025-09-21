@@ -13,7 +13,7 @@ class WalletController extends Controller
     public function __construct(
         private WalletService $walletService
     ) {
-        $this->middleware('auth:api');
+        // Middleware is handled in routes
     }
 
     public function getWallet(): JsonResponse

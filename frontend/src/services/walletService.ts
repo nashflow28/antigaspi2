@@ -16,7 +16,7 @@ import type {
 } from '@/types/wallet'
 
 class WalletService {
-  private readonly baseUrl = '/api/wallet'
+  private readonly baseUrl = '/wallet'
 
   /**
    * Get wallet information
@@ -24,7 +24,7 @@ class WalletService {
   async getWallet(): Promise<ApiResponse<{ wallet: Wallet }>> {
     try {
       const response = await apiService.get(this.baseUrl)
-      return response.data
+      return response
     } catch (error: any) {
       return this.handleError(error)
     }
