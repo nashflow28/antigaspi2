@@ -7,7 +7,11 @@ import type {
   Product,
   ProductFilters,
   Reservation,
-  Category
+  Category,
+  PaymentMethod,
+  ReservationCreationPayload,
+  ReservationCreationResponse,
+  PaymentApiResponse
 } from '@/types'
 
 const DEFAULT_API_BASE_URL = '/api'
@@ -197,13 +201,21 @@ class ApiService {
     return this.request<ApiResponse<Reservation[]>>('/reservations', {}, true)
   }
 
-  async createReservation(productId: number, quantity: number): Promise<ApiResponse<Reservation>> {
-    return this.request<ApiResponse<Reservation>>('/reservations', {
+  async createReservation(payload: ReservationCreationPayload): Promise<ReservationCreationResponse> {
+    const body = {
+      product_id: payload.productId,
+      quantity: payload.quantity,
+      payment_method: payload.paymentMethod,
+      customer_phone: payload.customerPhone ?? undefined,
+      customer_email: payload.customerEmail ?? undefined,
+      notes: payload.notes ?? undefined,
+      pickup_date: payload.pickupDate ?? undefined,
+      pickup_time: payload.pickupTime ?? undefined
+    }
+
+    return this.request<ReservationCreationResponse>('/reservations', {
       method: 'POST',
-      body: JSON.stringify({
-        product_id: productId,
-        quantity
-      })
+      body: JSON.stringify(body)
     }, true)
   }
 
@@ -220,6 +232,41 @@ class ApiService {
   async confirmReservation(id: number): Promise<ApiResponse<Reservation>> {
     return this.request<ApiResponse<Reservation>>(`/reservations/${id}/confirm`, {
       method: 'POST'
+    }, true)
+  }
+
+  // Payments
+  async getPayment(paymentId: number): Promise<PaymentApiResponse> {
+    return this.request<PaymentApiResponse>(`/payments/${paymentId}`, { method: 'GET' }, true)
+  }
+
+  async cancelPayment(paymentId: number, reason?: string): Promise<PaymentApiResponse> {
+    return this.request<PaymentApiResponse>(`/payments/${paymentId}/cancel`, {
+      method: 'POST',
+      body: JSON.stringify({ reason })
+    }, true)
+  }
+
+  async initiatePayment(payload: {
+    reservationId: number
+    paymentMethod: PaymentMethod
+    customerPhone?: string
+    customerEmail?: string
+    notes?: string
+    currency?: string
+  }): Promise<PaymentApiResponse> {
+    const body = {
+      reservation_id: payload.reservationId,
+      payment_method: payload.paymentMethod,
+      customer_phone: payload.customerPhone ?? undefined,
+      customer_email: payload.customerEmail ?? undefined,
+      notes: payload.notes ?? undefined,
+      currency: payload.currency ?? undefined
+    }
+
+    return this.request<PaymentApiResponse>('/payments', {
+      method: 'POST',
+      body: JSON.stringify(body)
     }, true)
   }
 }

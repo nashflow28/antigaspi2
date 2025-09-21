@@ -279,7 +279,11 @@ const reserveBasket = async () => {
 
   submitting.value = true
   try {
-    const response = await reservationsStore.createReservation(basket.value.id, quantity.value)
+    const response = await reservationsStore.createReservation({
+      productId: basket.value.id,
+      quantity: quantity.value,
+      paymentMethod: 'on_site'
+    })
     if (response.success) {
       notify.success('Réservation effectuée avec succès !')
       router.push({ name: 'reservations' })

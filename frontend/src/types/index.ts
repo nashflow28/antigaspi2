@@ -47,35 +47,70 @@ export interface Product {
   is_active?: boolean
 }
 
+export type PaymentMethod = 'flooz' | 'tmoney' | 'paystack' | 'on_site'
+
+export type PaymentStatus = 'pending' | 'success' | 'failed' | 'on_site' | 'refunded'
+
+export interface Payment {
+  id: number
+  reservation_id: number
+  amount: number
+  currency: string
+  payment_method: PaymentMethod
+  status: PaymentStatus
+  provider: string | null
+  checkout_url: string | null
+  customer_phone: string | null
+  reference: string | null
+  transaction_id?: string | null
+  payload?: Record<string, unknown> | null
+  paid_at?: string | null
+  created_at: string
+  updated_at: string
+}
+
 export interface Reservation {
   id: number
-  product_id?: number
-  consumer_id?: number
-  quantity_reserved?: number
+  reservation_code: string
   quantity: number
-  total_amount?: string
+  quantity_reserved?: number
   original_price: number
   discounted_price: number
+  total_amount?: number
   status: 'pending' | 'confirmed' | 'ready' | 'completed' | 'cancelled' | 'expired'
+  payment_status?: PaymentStatus | null
+  notes?: string | null
   reserved_at?: string
   confirmed_at?: string
   completed_at?: string
   cancelled_at?: string
-  pickup_date: Date | string
-  pickup_notes: string
-  reservation_code: string
-  created_at: Date | string
+  expires_at?: string
+  pickup_date?: string
+  pickup_time?: string
+  pickup_notes?: string | null
+  created_at?: string
   product: {
     id: number
     name: string
+    description?: string
     image_url?: string | null
+    original_price?: number
+    discounted_price?: number
+    discount_percentage?: number
+    expiration_date?: string
     merchant: {
+      id?: number
       name: string
-      address: string
-      phone: string
+      business_type?: string
+      address?: string
+      city?: string
+      phone?: string
+      distance?: number
     }
+    category?: Category | null
   }
   consumer?: User
+  latest_payment?: Payment | null
 }
 
 export interface AuthResponse {
@@ -99,6 +134,30 @@ export interface ApiResponse<T> {
     per_page: number
     total: number
   }
+}
+
+export interface ReservationCreationPayload {
+  productId: number
+  quantity: number
+  paymentMethod: PaymentMethod
+  customerPhone?: string
+  customerEmail?: string
+  notes?: string | null
+  pickupDate?: string | null
+  pickupTime?: string | null
+}
+
+export interface ReservationCreationResponse {
+  success: boolean
+  message?: string
+  data: Reservation
+  payment: Payment | null
+}
+
+export interface PaymentApiResponse {
+  success: boolean
+  message?: string
+  data: Payment
 }
 
 export interface LoginCredentials {
