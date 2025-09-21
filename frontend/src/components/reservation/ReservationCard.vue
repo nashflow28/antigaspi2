@@ -318,7 +318,8 @@ const paymentMethodLabels = {
   flooz: 'Flooz (Moov Togo)',
   tmoney: 'Mixx by Yas',
   paystack: 'Paystack',
-  on_site: 'Paiement sur place'
+  on_site: 'Paiement sur place',
+  wallet: 'Portefeuille électronique'
 } as const
 
 // Calculs

@@ -277,6 +277,11 @@ class WalletService {
         name: 'Carte bancaire',
         description: 'Visa, Mastercard via Paystack',
         requiresPhone: false
+      },
+      wallet: {
+        name: 'Portefeuille électronique',
+        description: 'Paiement via votre solde Antigaspi',
+        requiresPhone: false
       }
     }
 

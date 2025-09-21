@@ -552,7 +552,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, type Component } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { useReservationsStore } from '@/stores/reservations'
@@ -585,6 +585,15 @@ interface ReserveProduct {
   image_url?: string | null
 }
 
+type PaymentOption = {
+  value: PaymentMethod
+  label: string
+  description: string
+  requiresPhone: boolean
+  icon: Component
+  instructions: string
+}
+
 const route = useRoute()
 const router = useRouter()
 const authStore = useAuthStore()
@@ -612,10 +621,10 @@ const product = ref<ReserveProduct | null>(null)
 const loadingProduct = ref(true)
 const productError = ref(false)
 
-const paymentOptions = computed(() => {
-  const options = [
+const paymentOptions = computed<PaymentOption[]>(() => {
+  const options: PaymentOption[] = [
     {
-      value: 'flooz' as PaymentMethod,
+      value: 'flooz',
       label: 'Flooz (Moov Togo)',
       description: 'PayGate - Mobile Money',
       requiresPhone: true,
@@ -623,7 +632,7 @@ const paymentOptions = computed(() => {
       instructions: 'Assurez-vous que votre numéro Flooz est actif et dispose des fonds nécessaires.'
     },
     {
-      value: 'tmoney' as PaymentMethod,
+      value: 'tmoney',
       label: 'Mixx by Yas (Tmoney)',
       description: 'PayGate - Mobile Money',
       requiresPhone: true,
@@ -631,7 +640,7 @@ const paymentOptions = computed(() => {
       instructions: 'Le numéro Mixx by Yas doit être au format international (+228...).'
     },
     {
-      value: 'paystack' as PaymentMethod,
+      value: 'paystack',
       label: 'Paystack',
       description: 'Cartes bancaires & Mobile Money',
       requiresPhone: false,
@@ -639,7 +648,7 @@ const paymentOptions = computed(() => {
       instructions: 'Vous serez redirigé vers Paystack pour finaliser le paiement de façon sécurisée.'
     },
     {
-      value: 'on_site' as PaymentMethod,
+      value: 'on_site',
       label: 'Paiement sur place',
       description: 'Régler lors du retrait',
       requiresPhone: false,
@@ -651,7 +660,7 @@ const paymentOptions = computed(() => {
   // Add wallet option if user has wallet and sufficient balance
   if (walletStore.hasWallet && walletStore.isActive && walletStore.hasPin) {
     options.unshift({
-      value: 'wallet' as PaymentMethod,
+      value: 'wallet',
       label: 'Portefeuille électronique',
       description: `Solde: ${walletStore.formattedBalance}`,
       requiresPhone: false,
