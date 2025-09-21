@@ -6,11 +6,13 @@ use App\Enums\PaymentMethod;
 use App\Services\Payments\Gateways\OnSiteGateway;
 use App\Services\Payments\Gateways\PayGateGateway;
 use App\Services\Payments\Gateways\PaystackGateway;
+use App\Services\Payments\Gateways\WalletGateway;
+use App\Services\WalletService;
 use InvalidArgumentException;
 
 class PaymentGatewayManager
 {
-    public function __construct(protected array $config)
+    public function __construct(protected array $config, private ?WalletService $wallets = null)
     {
     }
 
@@ -20,6 +22,7 @@ class PaymentGatewayManager
             PaymentMethod::FLOOZ, PaymentMethod::TMONEY => new PayGateGateway($this->config['paygate'] ?? []),
             PaymentMethod::PAYSTACK => new PaystackGateway($this->config['paystack'] ?? []),
             PaymentMethod::ON_SITE => new OnSiteGateway(),
+            PaymentMethod::WALLET => $this->walletGateway(),
         };
     }
 
@@ -29,7 +32,13 @@ class PaymentGatewayManager
             'paygate' => new PayGateGateway($this->config['paygate'] ?? []),
             'paystack' => new PaystackGateway($this->config['paystack'] ?? []),
             'manual' => new OnSiteGateway(),
+            'wallet' => $this->walletGateway(),
             default => throw new InvalidArgumentException("Unsupported payment provider [{$provider}]."),
         };
+    }
+
+    private function walletGateway(): WalletGateway
+    {
+        return new WalletGateway($this->wallets ?? app(WalletService::class));
     }
 }
