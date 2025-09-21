@@ -52,14 +52,14 @@
           <div class="flex items-center justify-between mb-6">
             <h2 class="text-xl font-bold text-neutral-900">Étapes de réservation</h2>
             <div class="text-sm text-neutral-600">
-              Étape {{ currentStep }} sur 3
+              Étape {{ currentStep }} sur 4
             </div>
           </div>
 
           <!-- Indicateur de progression -->
           <div class="flex items-center gap-4 mb-8">
             <div
-              v-for="step in 3"
+              v-for="step in 4"
               :key="step"
               class="flex-1 relative"
             >
@@ -81,7 +81,7 @@
           </div>
 
           <!-- Libellés des étapes -->
-          <div class="grid grid-cols-3 gap-4 text-center text-sm">
+          <div class="grid grid-cols-4 gap-4 text-center text-sm">
             <div :class="currentStep >= 1 ? 'text-primary-600 font-medium' : 'text-neutral-500'">
               Détails produit
             </div>
@@ -89,6 +89,9 @@
               Informations récupération
             </div>
             <div :class="currentStep >= 3 ? 'text-primary-600 font-medium' : 'text-neutral-500'">
+              Paiement
+            </div>
+            <div :class="currentStep >= 4 ? 'text-primary-600 font-medium' : 'text-neutral-500'">
               Confirmation
             </div>
           </div>
@@ -262,8 +265,77 @@
               </div>
             </div>
 
-            <!-- Étape 3: Confirmation -->
+            <!-- Étape 3: Paiement -->
             <div v-if="currentStep === 3" class="card animate-fade-in-up">
+              <h3 class="text-xl font-bold text-neutral-900 mb-6">Choisissez votre moyen de paiement</h3>
+
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                <button
+                  v-for="option in paymentOptions"
+                  :key="option.value"
+                  type="button"
+                  class="p-4 border rounded-xl transition-all duration-300 text-left flex gap-3 items-start"
+                  :class="[
+                    paymentMethod === option.value
+                      ? 'border-primary-500 bg-primary-50 shadow-sm'
+                      : 'border-neutral-200 hover:border-primary-200 hover:bg-primary-50/40'
+                  ]"
+                  @click="paymentMethod = option.value"
+                >
+                  <div class="w-10 h-10 rounded-full flex items-center justify-center"
+                       :class="paymentMethod === option.value ? 'bg-primary-500 text-white' : 'bg-neutral-100 text-neutral-600'">
+                    <component :is="option.icon" class="w-5 h-5" />
+                  </div>
+                  <div class="flex-1">
+                    <div class="flex items-center justify-between">
+                      <p class="font-semibold text-neutral-900">{{ option.label }}</p>
+                      <span
+                        class="text-xs px-2 py-0.5 rounded-full"
+                        :class="paymentMethod === option.value ? 'bg-primary-100 text-primary-700' : 'bg-neutral-100 text-neutral-600'"
+                      >
+                        {{ option.description }}
+                      </span>
+                    </div>
+                    <p class="text-sm text-neutral-600 mt-1">{{ option.instructions }}</p>
+                  </div>
+                </button>
+              </div>
+
+              <div v-if="methodRequiresPhone" class="space-y-2">
+                <label for="mobile-money-phone" class="form-label">Numéro Mobile Money</label>
+                <input
+                  id="mobile-money-phone"
+                  v-model="mobileMoneyPhone"
+                  type="tel"
+                  placeholder="+228 90 00 00 00"
+                  class="form-input"
+                  :class="{
+                    'border-error-400 focus:ring-error-100 focus:border-error-400': mobileMoneyPhone && !/^\+?[0-9]{8,15}$/.test(mobileMoneyPhone)
+                  }"
+                  required
+                />
+                <p class="text-xs text-neutral-500">
+                  Utilisez un numéro enregistré sur le portefeuille sélectionné.
+                </p>
+              </div>
+
+              <div class="mt-6 p-4 bg-primary-50 border border-primary-200 rounded-xl text-sm text-primary-700">
+                <p class="font-semibold mb-1">Montant à payer</p>
+                <p class="text-lg font-bold text-primary-800">{{ formatPrice(totalAmount) }}</p>
+                <p v-if="methodRequiresPhone" class="mt-2 text-xs">
+                  Un SMS de confirmation vous sera envoyé dès validation par l'opérateur.
+                </p>
+                <p v-else-if="paymentMethod === 'paystack'" class="mt-2 text-xs">
+                  Vous serez redirigé vers la page Paystack après la création de la réservation.
+                </p>
+                <p v-else-if="paymentMethod === 'on_site'" class="mt-2 text-xs">
+                  Réglez ce montant directement auprès du commerçant lors du retrait.
+                </p>
+              </div>
+            </div>
+
+            <!-- Étape 4: Confirmation -->
+            <div v-if="currentStep === 4" class="card animate-fade-in-up">
               <h3 class="text-xl font-bold text-neutral-900 mb-6">Confirmation de réservation</h3>
 
               <div class="space-y-6">
@@ -277,11 +349,11 @@
                   <div class="flex justify-between items-center mb-2">
                     <span>Quantité: {{ reservation.quantity }}</span>
                     <span class="font-bold text-primary-600">
-                      {{ formatPrice(product.discounted_price * reservation.quantity) }}
+                      {{ formatPrice(totalAmount) }}
                     </span>
                   </div>
                   <div class="text-sm text-primary-700 pt-2 border-t border-primary-200">
-                    Économie: {{ formatPrice((product.original_price - product.discounted_price) * reservation.quantity) }}
+                    Économie: {{ formatPrice(savingsAmount) }}
                   </div>
                 </div>
 
@@ -302,6 +374,25 @@
                       <span>{{ reservation.contact_phone }}</span>
                     </div>
                   </div>
+                </div>
+
+                <!-- Récapitulatif paiement -->
+                <div class="p-4 bg-neutral-50 rounded-xl border border-neutral-200">
+                  <h4 class="font-bold text-neutral-800 mb-3">Paiement</h4>
+                  <div class="flex items-center justify-between mb-2">
+                    <span class="text-neutral-600">Méthode sélectionnée</span>
+                    <span class="font-semibold text-neutral-900">{{ selectedPaymentOption?.label }}</span>
+                  </div>
+                  <div class="flex items-center justify-between mb-2">
+                    <span class="text-neutral-600">Montant</span>
+                    <span class="font-semibold text-neutral-900">{{ formatPrice(totalAmount) }}</span>
+                  </div>
+                  <div v-if="methodRequiresPhone" class="text-sm text-neutral-600">
+                    Téléphone Mobile Money : <span class="font-medium">{{ mobileMoneyPhone }}</span>
+                  </div>
+                  <p class="text-xs text-neutral-500 mt-3">
+                    {{ selectedPaymentOption?.instructions }}
+                  </p>
                 </div>
 
                 <!-- Conditions -->
@@ -342,7 +433,7 @@
               <div v-else></div>
 
               <button
-                v-if="currentStep < 3"
+                v-if="currentStep < 4"
                 @click="nextStep"
                 :disabled="!canProceedToNextStep"
                 class="btn btn-primary"
@@ -439,15 +530,40 @@
 import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
+import { useReservationsStore } from '@/stores/reservations'
+import { usePaymentsStore, isFinalStatus } from '@/stores/payments'
+import { apiService } from '@/services/api'
+import { notify } from '@/composables/useNotifications'
+import type { PaymentMethod } from '@/types'
 import {
   ArrowLeft, ArrowRight, Package, Clock, Minus, Plus, MapPin, Calendar,
-  Phone, Store, HelpCircle, Mail, Loader2
+  Phone, Store, HelpCircle, Mail, Loader2, CreditCard, Smartphone, Wallet
 } from 'lucide-vue-next'
-import { notify } from '@/composables/useNotifications'
+
+interface ReserveProduct {
+  id: number
+  name: string
+  description: string
+  original_price: number
+  discounted_price: number
+  discount: number
+  merchant: {
+    name: string
+    address: string
+    distance?: number
+    phone?: string
+  }
+  expires_at: Date
+  available_quantity: number
+  reserved_quantity: number
+  image_url?: string | null
+}
 
 const route = useRoute()
 const router = useRouter()
 const authStore = useAuthStore()
+const reservationsStore = useReservationsStore()
+const paymentsStore = usePaymentsStore()
 
 const currentStep = ref(1)
 const loading = ref(false)
@@ -462,46 +578,87 @@ const reservation = ref({
   pickup_instructions: ''
 })
 
-// Product data from API
-const product = ref({
-  id: 0,
-  name: '',
-  description: '',
-  original_price: 0,
-  discounted_price: 0,
-  discount: 0,
-  merchant: {
-    name: '',
-    address: '',
-    distance: 0
-  },
-  expires_at: new Date(),
-  available_quantity: 0,
-  reserved_quantity: 0,
-  image_url: ''
-})
+const paymentMethod = ref<PaymentMethod>('on_site')
+const mobileMoneyPhone = ref(authStore.user?.phone || '')
 
+const product = ref<ReserveProduct | null>(null)
 const loadingProduct = ref(true)
 const productError = ref(false)
 
-// Computed properties
+const paymentOptions = [
+  {
+    value: 'flooz' as PaymentMethod,
+    label: 'Flooz (Moov Togo)',
+    description: 'PayGate - Mobile Money',
+    requiresPhone: true,
+    icon: Smartphone,
+    instructions: 'Assurez-vous que votre numéro Flooz est actif et dispose des fonds nécessaires.'
+  },
+  {
+    value: 'tmoney' as PaymentMethod,
+    label: 'Mixx by Yas (Tmoney)',
+    description: 'PayGate - Mobile Money',
+    requiresPhone: true,
+    icon: Smartphone,
+    instructions: 'Le numéro Mixx by Yas doit être au format international (+228...).'
+  },
+  {
+    value: 'paystack' as PaymentMethod,
+    label: 'Paystack',
+    description: 'Cartes bancaires & Mobile Money',
+    requiresPhone: false,
+    icon: CreditCard,
+    instructions: 'Vous serez redirigé vers Paystack pour finaliser le paiement de façon sécurisée.'
+  },
+  {
+    value: 'on_site' as PaymentMethod,
+    label: 'Paiement sur place',
+    description: 'Régler lors du retrait',
+    requiresPhone: false,
+    icon: Wallet,
+    instructions: 'Préparez le montant exact et réglez directement auprès du commerçant.'
+  }
+]
+
+const selectedPaymentOption = computed(() => paymentOptions.find(option => option.value === paymentMethod.value))
+const methodRequiresPhone = computed(() => selectedPaymentOption.value?.requiresPhone ?? false)
+
+const availableQuantity = computed(() => {
+  if (!product.value) return 0
+  return product.value.available_quantity - product.value.reserved_quantity
+})
+
+const totalAmount = computed(() => {
+  if (!product.value) return 0
+  return product.value.discounted_price * reservation.value.quantity
+})
+
+const savingsAmount = computed(() => {
+  if (!product.value) return 0
+  return (product.value.original_price - product.value.discounted_price) * reservation.value.quantity
+})
+
 const canProceedToNextStep = computed(() => {
   switch (currentStep.value) {
     case 1:
-      return reservation.value.quantity > 0 &&
-             reservation.value.quantity <= (product.value.available_quantity - product.value.reserved_quantity)
+      return reservation.value.quantity > 0 && reservation.value.quantity <= availableQuantity.value
     case 2:
-      return reservation.value.pickup_date &&
-             reservation.value.pickup_time &&
-             reservation.value.contact_phone
+      return Boolean(reservation.value.pickup_date && reservation.value.pickup_time && reservation.value.contact_phone)
     case 3:
+      if (!paymentMethod.value) {
+        return false
+      }
+      if (methodRequiresPhone.value) {
+        return Boolean(mobileMoneyPhone.value && /^\+?[0-9]{8,15}$/.test(mobileMoneyPhone.value))
+      }
+      return true
+    case 4:
       return acceptConditions.value
     default:
       return false
   }
 })
 
-// Fonctions
 const formatPrice = (price: number) => {
   return `${Math.round(price).toLocaleString('fr-FR')} F CFA`
 }
@@ -510,7 +667,7 @@ const formatTimeLeft = (expiresAt: Date) => {
   const now = new Date()
   const diff = expiresAt.getTime() - now.getTime()
 
-  if (diff < 0) return 'Expiré'
+  if (diff <= 0) return 'Expiré'
 
   const hours = Math.floor(diff / (1000 * 60 * 60))
   const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60))
@@ -518,23 +675,20 @@ const formatTimeLeft = (expiresAt: Date) => {
   if (hours > 0) {
     return `${hours}h${minutes > 0 ? ` ${minutes}m` : ''}`
   }
+
   return `${minutes}m`
 }
 
 const formatPickupDateTime = () => {
-  if (!reservation.value.pickup_date || !reservation.value.pickup_time) return ''
-
-  const date = new Date(reservation.value.pickup_date)
-  const timeRange = reservation.value.pickup_time === '09:00' ? '09:00 - 10:00' :
-                   reservation.value.pickup_time === '10:00' ? '10:00 - 11:00' :
-                   reservation.value.pickup_time === '11:00' ? '11:00 - 12:00' :
-                   reservation.value.pickup_time === '14:00' ? '14:00 - 15:00' :
-                   reservation.value.pickup_time === '15:00' ? '15:00 - 16:00' :
-                   reservation.value.pickup_time === '16:00' ? '16:00 - 17:00' :
-                   reservation.value.pickup_time === '17:00' ? '17:00 - 18:00' :
-                   reservation.value.pickup_time === '18:00' ? '18:00 - 19:00' : reservation.value.pickup_time
-
-  return `${date.toLocaleDateString('fr-FR')} de ${timeRange}`
+  if (!reservation.value.pickup_date || !reservation.value.pickup_time) return 'À définir'
+  const date = new Date(`${reservation.value.pickup_date}T${reservation.value.pickup_time}`)
+  return date.toLocaleString('fr-FR', {
+    weekday: 'long',
+    day: 'numeric',
+    month: 'long',
+    hour: '2-digit',
+    minute: '2-digit'
+  })
 }
 
 const getTodayDate = () => {
@@ -542,13 +696,15 @@ const getTodayDate = () => {
 }
 
 const getMaxPickupDate = () => {
+  if (!product.value) return getTodayDate()
   const maxDate = new Date(product.value.expires_at)
-  maxDate.setDate(maxDate.getDate() + 1) // Un jour après expiration
+  maxDate.setDate(maxDate.getDate() + 1)
   return maxDate.toISOString().split('T')[0]
 }
 
 const increaseQuantity = () => {
-  const maxQuantity = product.value.available_quantity - product.value.reserved_quantity
+  if (!product.value) return
+  const maxQuantity = availableQuantity.value
   if (reservation.value.quantity < maxQuantity) {
     reservation.value.quantity++
   }
@@ -561,7 +717,8 @@ const decreaseQuantity = () => {
 }
 
 const validateQuantity = () => {
-  const maxQuantity = product.value.available_quantity - product.value.reserved_quantity
+  if (!product.value) return
+  const maxQuantity = availableQuantity.value
   if (reservation.value.quantity < 1) {
     reservation.value.quantity = 1
   } else if (reservation.value.quantity > maxQuantity) {
@@ -570,7 +727,7 @@ const validateQuantity = () => {
 }
 
 const nextStep = () => {
-  if (canProceedToNextStep.value && currentStep.value < 3) {
+  if (canProceedToNextStep.value && currentStep.value < 4) {
     currentStep.value++
   }
 }
@@ -582,116 +739,80 @@ const previousStep = () => {
 }
 
 const confirmReservation = async () => {
-  if (!acceptConditions.value) return
+  if (!product.value || !acceptConditions.value) return
 
   loading.value = true
 
   try {
-    const reservationData = {
-      product_id: product.value.id,
+    const response = await reservationsStore.createReservation({
+      productId: product.value.id,
       quantity: reservation.value.quantity,
-      notes: reservation.value.notes || null,
-      pickup_date: reservation.value.pickup_date || null,
-      pickup_time: reservation.value.pickup_time || null
-    }
-
-    const response = await fetch('http://localhost:8000/api/reservations', {
-      method: 'POST',
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${authStore.token}`
-      },
-      body: JSON.stringify(reservationData)
+      paymentMethod: paymentMethod.value,
+      customerPhone: methodRequiresPhone.value ? mobileMoneyPhone.value : reservation.value.contact_phone || undefined,
+      customerEmail: authStore.user?.email,
+      notes: reservation.value.pickup_instructions || reservation.value.notes || undefined,
+      pickupDate: reservation.value.pickup_date || undefined,
+      pickupTime: reservation.value.pickup_time || undefined
     })
 
-    if (!response.ok) {
-      const errorData = await response.json()
-
-      if (response.status === 422) {
-        const errors = errorData.errors || {}
-        const errorMessages = Object.values(errors).flat()
-        notify.error(errorMessages.join('\n'), 'Erreurs de validation')
-      } else if (response.status === 401) {
-        notify.error('Session expirée. Veuillez vous reconnecter.', 'Authentification requise')
-        router.push('/login')
+    if (response.success) {
+      if (response.payment) {
+        paymentsStore.recordPayment(response.payment)
+        if (!isFinalStatus(response.payment.status)) {
+          paymentsStore.startPolling(response.payment.id)
+          notify.info('Paiement en attente de confirmation.', 'Vous recevrez une notification dès validation du prestataire.')
+        } else if (response.payment.status === 'success' || response.payment.status === 'on_site') {
+          notify.success('Paiement confirmé !', 'Votre réservation est validée.')
+        }
       } else {
-        notify.error(errorData.message || 'Erreur lors de la réservation. Veuillez réessayer.')
+        notify.success('Réservation enregistrée.', 'Vous pouvez suivre son statut dans vos réservations.')
       }
-      return
-    }
 
-    const data = await response.json()
-
-    if (data.success) {
-      notify.success(`Réservation confirmée ! ID: ${data.data.id}`, 'Succès')
-      router.push('/products')
+      router.push({ name: 'reservations' })
     } else {
-      notify.error(data.message || 'Erreur lors de la réservation. Veuillez réessayer.')
+      notify.error(response.error || 'Impossible de créer la réservation pour le moment.')
     }
-
   } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : String(error)
-    if (errorMessage.includes('NetworkError') || errorMessage.includes('Failed to fetch')) {
-      notify.error('Erreur de connexion au serveur. Vérifiez que le serveur backend fonctionne.', 'Erreur réseau')
-    } else {
-      notify.error('Erreur lors de la réservation. Veuillez réessayer.')
-    }
+    const message = error instanceof Error ? error.message : 'Erreur inattendue lors de la réservation.'
+    notify.error(message)
   } finally {
     loading.value = false
   }
 }
 
-// Load product from API
 const fetchProduct = async () => {
   try {
     loadingProduct.value = true
     productError.value = false
 
-    const productId = parseInt(route.params.id as string)
-
-    const response = await fetch(`http://localhost:8000/api/products/${productId}`, {
-      method: 'GET',
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json'
-      }
-    })
-
-    if (!response.ok) {
-      if (response.status === 404) {
-        productError.value = true
-        return
-      }
-      throw new Error(`HTTP error! status: ${response.status}`)
-    }
-
-    const data = await response.json()
-
-    if (data.success && data.data) {
-      // Transform API data to match component interface
-      const apiProduct = data.data
-      product.value = {
-        id: apiProduct.id,
-        name: apiProduct.name,
-        description: apiProduct.description,
-        original_price: parseFloat(apiProduct.original_price),
-        discounted_price: parseFloat(apiProduct.discounted_price),
-        discount: apiProduct.discount_percentage,
-        merchant: {
-          name: apiProduct.merchant?.business_name || 'Commerçant inconnu',
-          address: apiProduct.merchant?.address || apiProduct.merchant?.city || 'Adresse non renseignée',
-          distance: Math.random() * 5 // Simulated distance for now
-        },
-        expires_at: new Date(apiProduct.expiration_date),
-        available_quantity: apiProduct.quantity_available,
-        reserved_quantity: 0, // Not available in current API
-        image_url: apiProduct.image_url || ''
-      }
-    } else {
+    const productId = Number(route.params.id)
+    if (Number.isNaN(productId)) {
       productError.value = true
+      return
     }
-  } catch (err) {
+
+    const response = await apiService.getProduct(productId)
+    const apiProduct = response.data
+
+    product.value = {
+      id: apiProduct.id,
+      name: apiProduct.name,
+      description: apiProduct.description,
+      original_price: Number(apiProduct.original_price),
+      discounted_price: Number(apiProduct.discounted_price),
+      discount: apiProduct.discount_percentage,
+      merchant: {
+        name: apiProduct.merchant?.business_name || apiProduct.merchant?.name || 'Commerçant',
+        address: apiProduct.merchant?.address || apiProduct.merchant?.city || 'Adresse non renseignée',
+        distance: apiProduct.merchant?.distance,
+        phone: apiProduct.merchant?.phone
+      },
+      expires_at: new Date(apiProduct.expiration_date),
+      available_quantity: apiProduct.quantity_available,
+      reserved_quantity: (apiProduct as any).reserved_quantity ?? 0,
+      image_url: apiProduct.image_url
+    }
+  } catch (error) {
     productError.value = true
   } finally {
     loadingProduct.value = false
@@ -699,13 +820,18 @@ const fetchProduct = async () => {
 }
 
 onMounted(async () => {
-  // Vérifier l'authentification
   if (!authStore.isAuthenticated) {
     router.push('/login')
     return
   }
 
-  // Charger les données du produit depuis l'API
+  if (!authStore.isConsumer) {
+    notify.error('Seuls les consommateurs peuvent réserver des produits.')
+    router.push('/')
+    return
+  }
+
+  paymentsStore.clearPayment()
   await fetchProduct()
 })
 </script>

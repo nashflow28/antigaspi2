@@ -21,6 +21,13 @@
         >
           {{ statusLabels[reservation.status] }}
         </span>
+        <span
+          v-if="paymentStatus"
+          class="badge text-xs font-medium px-2 py-1 rounded-full"
+          :class="paymentStatusClasses[paymentStatus]"
+        >
+          Paiement : {{ paymentStatusLabels[paymentStatus] }}
+        </span>
 
         <!-- Menu d'actions -->
         <div class="relative" v-if="!isExpiredOrCancelled">
@@ -111,6 +118,37 @@
       <!-- Informations de retrait -->
       <div>
         <div class="space-y-4">
+          <!-- Informations paiement -->
+          <div v-if="paymentStatus" class="bg-primary-50 rounded-xl p-3 border border-primary-100">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-sm font-medium text-primary-700">Paiement</span>
+              <span class="text-sm font-semibold text-primary-800">
+                {{ paymentStatusLabels[paymentStatus] }}
+              </span>
+            </div>
+            <div v-if="latestPayment" class="space-y-1 text-xs text-primary-700">
+              <div class="flex items-center justify-between">
+                <span>Méthode</span>
+                <span class="font-medium">{{ paymentMethodLabels[latestPayment.payment_method] }}</span>
+              </div>
+              <div class="flex items-center justify-between">
+                <span>Montant</span>
+                <span class="font-semibold">{{ formatPrice(latestPayment.amount || reservation.discounted_price * reservation.quantity) }}</span>
+              </div>
+              <div v-if="latestPayment.customer_phone" class="flex items-center justify-between">
+                <span>Téléphone</span>
+                <span class="font-medium">{{ latestPayment.customer_phone }}</span>
+              </div>
+              <div v-if="latestPayment.reference" class="flex items-center justify-between">
+                <span>Référence</span>
+                <span class="font-medium">{{ latestPayment.reference }}</span>
+              </div>
+            </div>
+            <div v-else class="text-xs text-primary-700">
+              Paiement en cours de synchronisation…
+            </div>
+          </div>
+
           <!-- Date et heure de retrait -->
           <div class="flex items-center gap-3">
             <div class="w-8 h-8 bg-secondary-100 rounded-lg flex items-center justify-center">
@@ -260,6 +298,29 @@ const statusLabels = {
   expired: 'Expirée'
 }
 
+const paymentStatusClasses = {
+  pending: 'bg-warning-100 text-warning-800',
+  success: 'bg-success-100 text-success-800',
+  failed: 'bg-error-100 text-error-800',
+  on_site: 'bg-secondary-100 text-secondary-800',
+  refunded: 'bg-neutral-100 text-neutral-700'
+} as const
+
+const paymentStatusLabels = {
+  pending: 'En attente',
+  success: 'Payé',
+  failed: 'Échec',
+  on_site: 'Sur place',
+  refunded: 'Remboursé'
+} as const
+
+const paymentMethodLabels = {
+  flooz: 'Flooz (Moov Togo)',
+  tmoney: 'Mixx by Yas',
+  paystack: 'Paystack',
+  on_site: 'Paiement sur place'
+} as const
+
 // Calculs
 
 const isExpiredOrCancelled = computed(() =>
@@ -269,6 +330,9 @@ const isExpiredOrCancelled = computed(() =>
 const canCancel = computed(() =>
   ['pending', 'confirmed'].includes(props.reservation.status)
 )
+
+const latestPayment = computed(() => props.reservation.latest_payment ?? null)
+const paymentStatus = computed(() => props.reservation.payment_status ?? latestPayment.value?.status ?? null)
 
 // Calcul du temps restant
 const updateTimeLeft = () => {

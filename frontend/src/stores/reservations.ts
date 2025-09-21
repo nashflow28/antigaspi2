@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
-import type { Reservation } from '@/types'
+import type { Reservation, ReservationCreationPayload, Payment } from '@/types'
 import { apiService } from '@/services/api'
 
 export const useReservationsStore = defineStore('reservations', () => {
@@ -16,7 +16,8 @@ export const useReservationsStore = defineStore('reservations', () => {
     return {
       ...reservation,
       quantity: normalizedQuantity,
-      quantity_reserved: normalizedQuantityReserved
+      quantity_reserved: normalizedQuantityReserved,
+      latest_payment: reservation.latest_payment ?? null
     }
   }
 
@@ -79,18 +80,20 @@ export const useReservationsStore = defineStore('reservations', () => {
     }
   }
 
-  const createReservation = async (productId: number, quantity: number) => {
+  const createReservation = async (payload: ReservationCreationPayload) => {
     try {
       loading.value = true
       clearError()
 
-      const response = await apiService.createReservation(productId, quantity)
+      const response = await apiService.createReservation(payload)
 
       // Add new reservation to the list
       const normalizedReservation = normalizeReservation(response.data)
       reservations.value.unshift(normalizedReservation)
 
-      return { success: true, data: normalizedReservation }
+      const payment: Payment | null = response.payment ?? null
+
+      return { success: true, data: normalizedReservation, payment }
     } catch (err: any) {
       setError(err.message || 'Erreur lors de la réservation')
       return { success: false, error: err.message }

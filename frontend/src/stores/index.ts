@@ -6,3 +6,4 @@ export const pinia = createPinia()
 export { useAuthStore } from './auth'
 export { useProductsStore } from './products'
 export { useReservationsStore } from './reservations'
+export { usePaymentsStore } from './payments'

@@ -133,6 +133,72 @@
             <p v-if="quantity > 1" class="mt-1 text-xs text-primary-600">Soit {{ formattedDiscountedPrice }} par panier</p>
           </div>
 
+          <div class="space-y-4">
+            <h3 class="text-sm font-semibold text-neutral-700">Moyen de paiement</h3>
+            <div class="space-y-3">
+              <button
+                v-for="option in paymentOptions"
+                :key="option.value"
+                type="button"
+                class="flex w-full items-start gap-3 rounded-xl border p-3 text-left transition-colors"
+                :class="[
+                  paymentMethod === option.value
+                    ? 'border-primary-500 bg-primary-50 shadow-sm'
+                    : 'border-neutral-200 hover:border-primary-200 hover:bg-primary-50/40'
+                ]"
+                @click="paymentMethod = option.value"
+              >
+                <div
+                  class="flex h-10 w-10 items-center justify-center rounded-full"
+                  :class="paymentMethod === option.value ? 'bg-primary-500 text-white' : 'bg-neutral-100 text-neutral-600'"
+                >
+                  <component :is="option.icon" class="h-5 w-5" />
+                </div>
+                <div class="flex-1 space-y-1">
+                  <div class="flex items-center justify-between">
+                    <p class="font-semibold text-neutral-900">{{ option.label }}</p>
+                    <span
+                      class="rounded-full px-2 py-0.5 text-[11px] font-medium"
+                      :class="paymentMethod === option.value ? 'bg-primary-100 text-primary-700' : 'bg-neutral-100 text-neutral-600'"
+                    >
+                      {{ option.description }}
+                    </span>
+                  </div>
+                  <p class="text-xs text-neutral-600">{{ option.instructions }}</p>
+                </div>
+              </button>
+            </div>
+
+            <div v-if="methodRequiresPhone" class="space-y-2">
+              <label for="mobile-money-phone" class="form-label">Numéro Mobile Money</label>
+              <input
+                id="mobile-money-phone"
+                v-model="mobileMoneyPhone"
+                type="tel"
+                placeholder="+228 90 00 00 00"
+                class="form-input"
+                :class="{
+                  'border-error-400 focus:border-error-400 focus:ring-error-100': mobileMoneyPhone && !isPhoneValid
+                }"
+                required
+              />
+              <p class="text-xs text-neutral-500">Utilisez un numéro actif enregistré sur le portefeuille choisi.</p>
+            </div>
+
+            <div class="rounded-xl border border-primary-200 bg-primary-50 p-3 text-xs text-primary-700">
+              <p class="font-semibold">Montant à régler : {{ totalReservationPrice }}</p>
+              <p v-if="methodRequiresPhone" class="mt-1">
+                Vous recevrez une demande de validation sur votre téléphone après la réservation.
+              </p>
+              <p v-else-if="paymentMethod === 'paystack'" class="mt-1">
+                Une page Paystack s'ouvrira pour finaliser votre paiement en toute sécurité.
+              </p>
+              <p v-else-if="paymentMethod === 'on_site'" class="mt-1">
+                Réglez le montant directement auprès du commerçant lors du retrait.
+              </p>
+            </div>
+          </div>
+
           <div class="space-y-2">
             <button
               type="button"
@@ -162,13 +228,15 @@
 <script setup lang="ts">
 import { computed, onMounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { ArrowLeft, Clock, Loader2, Package, ShieldCheck, Store, Tag } from 'lucide-vue-next'
+import { ArrowLeft, Clock, Loader2, Package, ShieldCheck, Store, Tag, CreditCard, Smartphone, Wallet } from 'lucide-vue-next'
 import { useSurpriseBaskets } from '@/composables/useSurpriseBaskets'
 import { useReservationsStore } from '@/stores/reservations'
+import { usePaymentsStore, isFinalStatus } from '@/stores/payments'
 import { useAuthStore } from '@/stores/auth'
 import { notify } from '@/composables/useNotifications'
 import { formatPrice, formatSavings } from '@/utils/currency'
 import type { SurpriseBasket } from '@/services/surpriseBasketService'
+import type { PaymentMethod } from '@/types'
 
 const route = useRoute()
 const router = useRouter()
@@ -176,11 +244,14 @@ const router = useRouter()
 const { getBasketById, loadBasket } = useSurpriseBaskets()
 const reservationsStore = useReservationsStore()
 const authStore = useAuthStore()
+const paymentsStore = usePaymentsStore()
 
 const basket = ref<SurpriseBasket | null>(null)
 const isLoading = ref(true)
 const quantity = ref(1)
 const submitting = ref(false)
+const paymentMethod = ref<PaymentMethod>('on_site')
+const mobileMoneyPhone = ref(authStore.user?.phone || '')
 
 const maxQuantity = computed(() => basket.value?.quantity_available ?? 0)
 
@@ -204,6 +275,48 @@ const totalReservationPrice = computed(() => {
   return formatPrice(basket.value.discounted_price * quantity.value)
 })
 
+const paymentOptions = [
+  {
+    value: 'flooz' as PaymentMethod,
+    label: 'Flooz (Moov Togo)',
+    description: 'Mobile Money',
+    requiresPhone: true,
+    icon: Smartphone,
+    instructions: 'Confirmez l\'opération sur votre téléphone après réception de la demande.'
+  },
+  {
+    value: 'tmoney' as PaymentMethod,
+    label: 'Mixx by Yas (Tmoney)',
+    description: 'Mobile Money',
+    requiresPhone: true,
+    icon: Smartphone,
+    instructions: 'Saisissez un numéro Mixx by Yas valide au format international (+228 ...).'
+  },
+  {
+    value: 'paystack' as PaymentMethod,
+    label: 'Paystack',
+    description: 'Cartes & Wallets',
+    requiresPhone: false,
+    icon: CreditCard,
+    instructions: 'Vous serez redirigé vers Paystack pour finaliser votre paiement.'
+  },
+  {
+    value: 'on_site' as PaymentMethod,
+    label: 'Paiement sur place',
+    description: 'Paiement différé',
+    requiresPhone: false,
+    icon: Wallet,
+    instructions: 'Réglez le montant directement auprès du commerçant lors du retrait.'
+  }
+]
+
+const selectedPaymentOption = computed(() => paymentOptions.find(option => option.value === paymentMethod.value))
+const methodRequiresPhone = computed(() => selectedPaymentOption.value?.requiresPhone ?? false)
+const isPhoneValid = computed(() => {
+  if (!methodRequiresPhone.value) return true
+  return /^\+?[0-9]{8,15}$/.test(mobileMoneyPhone.value)
+})
+
 const timeLeft = computed(() => {
   if (!basket.value?.expiration_date) return 'Durée limitée'
   const expiresAt = new Date(basket.value.expiration_date)
@@ -220,12 +333,15 @@ const timeLeft = computed(() => {
   return `${minutes}m`
 })
 
-const canReserve = computed(() => authStore.isAuthenticated && authStore.isConsumer && maxQuantity.value > 0)
+const canReserve = computed(() => authStore.isAuthenticated && authStore.isConsumer && maxQuantity.value > 0 && isPhoneValid.value)
 
 const reserveButtonLabel = computed(() => {
   if (!authStore.isAuthenticated) return 'Se connecter pour réserver'
   if (!authStore.isConsumer) return 'Réservé aux consommateurs'
   if (maxQuantity.value === 0) return 'Indisponible'
+  if (paymentMethod.value === 'paystack') return 'Payer avec Paystack'
+  if (paymentMethod.value === 'flooz') return 'Confirmer avec Flooz'
+  if (paymentMethod.value === 'tmoney') return 'Confirmer avec Mixx by Yas'
   return 'Réserver maintenant'
 })
 
@@ -276,12 +392,42 @@ const reserveBasket = async () => {
     notify.error('Ce panier n\'est plus disponible.')
     return
   }
+  if (!paymentMethod.value) {
+    notify.error('Veuillez sélectionner un moyen de paiement.')
+    return
+  }
+  if (!isPhoneValid.value) {
+    notify.error('Numéro Mobile Money invalide.')
+    return
+  }
 
   submitting.value = true
   try {
-    const response = await reservationsStore.createReservation(basket.value.id, quantity.value)
+    const response = await reservationsStore.createReservation({
+      productId: basket.value.id,
+      quantity: quantity.value,
+      paymentMethod: paymentMethod.value,
+      customerPhone: methodRequiresPhone.value ? mobileMoneyPhone.value : authStore.user?.phone,
+      customerEmail: authStore.user?.email
+    })
     if (response.success) {
-      notify.success('Réservation effectuée avec succès !')
+      if (response.payment) {
+        paymentsStore.recordPayment(response.payment)
+
+        if (paymentMethod.value === 'paystack' && response.payment.checkout_url) {
+          window.open(response.payment.checkout_url, '_blank', 'noopener')
+        }
+
+        if (!isFinalStatus(response.payment.status)) {
+          paymentsStore.startPolling(response.payment.id)
+          notify.info('Paiement en attente de confirmation.', 'Nous vous informerons dès validation du prestataire.')
+        } else if (response.payment.status === 'success' || response.payment.status === 'on_site') {
+          notify.success('Réservation confirmée !', 'Le paiement est validé.')
+        }
+      } else {
+        notify.success('Réservation effectuée avec succès !')
+      }
+
       router.push({ name: 'reservations' })
     } else {
       notify.error(response.error || 'Impossible de créer la réservation pour le moment.')
@@ -297,6 +443,7 @@ const reserveBasket = async () => {
 watch(() => route.params.id, fetchBasket)
 
 onMounted(() => {
+  paymentsStore.clearPayment()
   fetchBasket()
 })
 </script>
