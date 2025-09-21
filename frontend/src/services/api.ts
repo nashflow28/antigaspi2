@@ -210,7 +210,8 @@ class ApiService {
       customer_email: payload.customerEmail ?? undefined,
       notes: payload.notes ?? undefined,
       pickup_date: payload.pickupDate ?? undefined,
-      pickup_time: payload.pickupTime ?? undefined
+      pickup_time: payload.pickupTime ?? undefined,
+      wallet_pin: payload.walletPin ?? undefined
     }
 
     return this.request<ReservationCreationResponse>('/reservations', {

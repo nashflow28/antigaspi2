@@ -47,7 +47,7 @@ export interface Product {
   is_active?: boolean
 }
 
-export type PaymentMethod = 'flooz' | 'tmoney' | 'paystack' | 'on_site'
+export type PaymentMethod = 'flooz' | 'tmoney' | 'paystack' | 'on_site' | 'wallet'
 
 export type PaymentStatus = 'pending' | 'success' | 'failed' | 'on_site' | 'refunded'
 
@@ -145,6 +145,7 @@ export interface ReservationCreationPayload {
   notes?: string | null
   pickupDate?: string | null
   pickupTime?: string | null
+  walletPin?: string
 }
 
 export interface ReservationCreationResponse {

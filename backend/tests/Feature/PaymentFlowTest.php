@@ -8,6 +8,7 @@ use App\Models\Payment;
 use App\Models\Product;
 use App\Models\Reservation;
 use App\Models\User;
+use App\Services\WalletService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Notification;
@@ -160,5 +161,76 @@ class PaymentFlowTest extends TestCase
         $this->assertEquals(PaymentStatus::SUCCESS, $payment->status);
         $this->assertEquals('confirmed', $reservation->status);
         $this->assertEquals(PaymentStatus::SUCCESS, $reservation->payment_status);
+    }
+
+    public function test_wallet_reservation_requires_pin(): void
+    {
+        Notification::fake();
+
+        $user = User::factory()->create(['role' => 'consumer', 'email' => 'user@example.com']);
+        $product = Product::factory()->create([
+            'discounted_price' => 25.00,
+            'is_active' => true,
+            'quantity_available' => 3,
+        ]);
+
+        $wallets = app(WalletService::class);
+        $wallet = $wallets->createWallet($user);
+        $user->setRelation('wallet', $wallet);
+        $wallets->setWalletPin($user, '1234');
+        $wallets->rechargeWallet($user, 100.00, 'Recharge test');
+
+        $headers = $this->actingAsJwt($user);
+
+        $response = $this->postJson('/api/reservations', [
+            'product_id' => $product->id,
+            'quantity' => 1,
+            'payment_method' => PaymentMethod::WALLET->value,
+        ], $headers);
+
+        $response->assertStatus(422)->assertJsonValidationErrors(['wallet_pin']);
+    }
+
+    public function test_wallet_reservation_succeeds_with_valid_pin(): void
+    {
+        Notification::fake();
+
+        $user = User::factory()->create(['role' => 'consumer', 'email' => 'user@example.com']);
+        $product = Product::factory()->create([
+            'discounted_price' => 30.00,
+            'is_active' => true,
+            'quantity_available' => 4,
+        ]);
+
+        $wallets = app(WalletService::class);
+        $wallet = $wallets->createWallet($user);
+        $user->setRelation('wallet', $wallet);
+        $wallets->setWalletPin($user, '5678');
+        $wallets->rechargeWallet($user, 200.00, 'Recharge test');
+
+        $headers = $this->actingAsJwt($user);
+
+        $response = $this->postJson('/api/reservations', [
+            'product_id' => $product->id,
+            'quantity' => 2,
+            'payment_method' => PaymentMethod::WALLET->value,
+            'wallet_pin' => '5678',
+        ], $headers);
+
+        $response->assertCreated()
+            ->assertJsonPath('payment.payment_method', PaymentMethod::WALLET->value);
+
+        $this->assertDatabaseHas('payments', [
+            'payment_method' => PaymentMethod::WALLET->value,
+            'status' => PaymentStatus::SUCCESS->value,
+        ]);
+
+        $reservation = Reservation::first();
+        $this->assertEquals('confirmed', $reservation->status);
+        $this->assertEquals(PaymentStatus::SUCCESS, $reservation->payment_status);
+
+        $wallet = $user->wallet()->first();
+        $expectedBalance = 200.00 - ($product->discounted_price * 2);
+        $this->assertEqualsWithDelta($expectedBalance, (float) $wallet?->fresh()->balance, 0.01);
     }
 }

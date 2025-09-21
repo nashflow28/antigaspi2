@@ -80,6 +80,15 @@ class StoreReservationRequest extends FormRequest
                 'date_format:H:i',
                 'required_with:pickup_date'
             ],
+            'wallet_pin' => [
+                'nullable',
+                'string',
+                'digits_between:4,6',
+                Rule::requiredIf(function () {
+                    $method = $this->input('payment_method');
+                    return $method === PaymentMethod::WALLET->value;
+                }),
+            ],
         ];
     }
 
@@ -101,6 +110,8 @@ class StoreReservationRequest extends FormRequest
             'pickup_date.before' => 'La date de récupération ne peut pas dépasser 7 jours.',
             'pickup_time.date_format' => 'Le format de l\'heure doit être HH:MM.',
             'pickup_time.required_with' => 'L\'heure de récupération est requise avec la date.',
+            'wallet_pin.required_if' => 'Le code PIN du portefeuille est requis pour un paiement wallet.',
+            'wallet_pin.digits_between' => 'Le code PIN du portefeuille doit contenir entre 4 et 6 chiffres.',
         ];
     }
 
@@ -115,6 +126,7 @@ class StoreReservationRequest extends FormRequest
             'notes' => 'notes',
             'pickup_date' => 'date de récupération',
             'pickup_time' => 'heure de récupération',
+            'wallet_pin' => 'code PIN du portefeuille',
         ];
     }
 
