@@ -243,6 +243,18 @@
         </div>
       </div>
     </div>
+
+    <!-- Modal de confirmation d'annulation -->
+    <ConfirmModal
+      :is-open="showCancelModal"
+      type="danger"
+      title="Annuler la réservation"
+      message="Êtes-vous sûr de vouloir annuler cette réservation ? Cette action est irréversible."
+      confirm-text="Oui, annuler"
+      cancel-text="Non, garder"
+      @confirm="confirmCancelReservation"
+      @cancel="closeCancelModal"
+    />
   </div>
 </template>
 
@@ -251,11 +263,13 @@ import { ref, reactive, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { formatPrice } from '@/utils/currency'
+import { apiService } from '@/services/api'
 import {
   Calendar, CheckCheck, ChevronLeft, ChevronRight, Download,
   Grid3X3, Leaf, List
 } from 'lucide-vue-next'
 import ReservationCard from '@/components/reservation/ReservationCard.vue'
+import ConfirmModal from '@/components/ui/ConfirmModal.vue'
 import type { Reservation } from '@/types'
 
 const router = useRouter()
@@ -265,6 +279,10 @@ const loading = ref(true)
 const viewMode = ref<'list' | 'grid'>('list')
 const currentPage = ref(1)
 const itemsPerPage = 12
+
+// Modal d'annulation
+const showCancelModal = ref(false)
+const reservationToCancel = ref<number | null>(null)
 
 // Filtres
 const filters = reactive({
@@ -436,20 +454,41 @@ const loadReservations = async () => {
   }
 }
 
-const cancelReservation = async (reservationId: number) => {
-  if (!confirm('Êtes-vous sûr de vouloir annuler cette réservation ?')) {
-    return
-  }
+const cancelReservation = (reservationId: number) => {
+  reservationToCancel.value = reservationId
+  showCancelModal.value = true
+}
+
+const confirmCancelReservation = async () => {
+  if (!reservationToCancel.value) return
 
   try {
-    // API call to cancel reservation
-    const reservation = reservations.value.find(r => r.id === reservationId)
-    if (reservation) {
-      reservation.status = 'cancelled'
+    // Appel API pour annuler la réservation
+    const response = await apiService.cancelReservation(reservationToCancel.value)
+
+    if (response.success) {
+      // Mise à jour locale après succès de l'API
+      const reservation = reservations.value.find(r => r.id === reservationToCancel.value)
+      if (reservation) {
+        reservation.status = 'cancelled'
+      }
+      console.log('✅ Réservation annulée avec succès')
+    } else {
+      throw new Error(response.message || 'Erreur lors de l\'annulation')
     }
-  } catch (error) {
-    console.error('Erreur lors de l\'annulation:', error)
+  } catch (error: any) {
+    console.error('❌ Erreur lors de l\'annulation:', error.message || error)
+    // Optionnel: afficher une notification d'erreur à l'utilisateur
+    alert('Erreur lors de l\'annulation de la réservation. Veuillez réessayer.')
+  } finally {
+    showCancelModal.value = false
+    reservationToCancel.value = null
   }
+}
+
+const closeCancelModal = () => {
+  showCancelModal.value = false
+  reservationToCancel.value = null
 }
 
 const viewReservation = (reservationId: number) => {

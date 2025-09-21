@@ -23,7 +23,7 @@
 
     <div class="container-fluid py-8">
       <!-- Quick Stats Cards -->
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6 mb-8">
         <!-- Économies réalisées -->
         <div class="card card-interactive glow-effect animate-fade-in-up" style="animation-delay: 0.1s;">
           <div class="flex items-center justify-between">
@@ -96,6 +96,26 @@
             </div>
             <div class="w-16 h-16 bg-gradient-to-br from-accent-100 to-accent-200 rounded-2xl flex items-center justify-center">
               <Calendar class="w-8 h-8 text-accent-600" />
+            </div>
+          </div>
+        </div>
+
+        <!-- Portefeuille électronique -->
+        <div class="card card-interactive glow-effect animate-fade-in-up cursor-pointer" style="animation-delay: 0.5s;" @click="router.push('/wallet')">
+          <div class="flex items-center justify-between">
+            <div>
+              <div class="text-2xl lg:text-3xl font-bold text-indigo-600 mb-2">
+                {{ walletStore.formattedBalance || '0 XOF' }}
+              </div>
+              <p class="text-sm text-neutral-600 font-medium">Mon portefeuille</p>
+              <div class="flex items-center mt-2 text-xs text-indigo-600">
+                <Wallet class="w-4 h-4 mr-1" />
+                <span v-if="walletStore.isActive">Actif</span>
+                <span v-else>Inactif</span>
+              </div>
+            </div>
+            <div class="w-16 h-16 bg-gradient-to-br from-indigo-100 to-indigo-200 rounded-2xl flex items-center justify-center">
+              <Wallet class="w-8 h-8 text-indigo-600" />
             </div>
           </div>
         </div>
@@ -295,14 +315,16 @@
 import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
+import { useWalletStore } from '@/stores/wallet'
 import { formatPrice } from '@/utils/currency'
 import {
   TrendingUp, DollarSign, Package, ShoppingBag, Leaf, TreePine,
-  Clock, Calendar, ArrowRight, Search, User, Lightbulb
+  Clock, Calendar, ArrowRight, Search, User, Lightbulb, Wallet
 } from 'lucide-vue-next'
 
 const router = useRouter()
 const authStore = useAuthStore()
+const walletStore = useWalletStore()
 
 // État des données utilisateur
 const userStats = ref({
@@ -439,6 +461,7 @@ onMounted(() => {
     router.push('/login')
   } else {
     loadRecentReservations()
+    walletStore.fetchWallet()
   }
 })
 </script>

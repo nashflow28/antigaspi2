@@ -247,6 +247,14 @@
                     <span>Mes réservations</span>
                   </router-link>
                   <router-link
+                    to="/wallet"
+                    class="flex items-center px-4 py-3 text-sm text-neutral-700 hover:bg-gradient-secondary hover:text-white transition-all duration-200 group"
+                    @click="showUserMenu = false"
+                  >
+                    <Wallet class="w-4 h-4 mr-3 group-hover:text-white" />
+                    <span>Mon portefeuille</span>
+                  </router-link>
+                  <router-link
                     to="/loyalty"
                     class="flex items-center px-4 py-3 text-sm text-neutral-700 hover:bg-gradient-primary hover:text-white transition-all duration-200 group"
                     @click="showUserMenu = false"
@@ -359,7 +367,7 @@
 import { ref, computed, onMounted, onUnmounted, nextTick } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
-import { LogIn, UserPlus, User, Settings, LogOut, ChevronDown, Package, ShoppingBag, MessageSquare, Star, Gift } from 'lucide-vue-next'
+import { LogIn, UserPlus, User, Settings, LogOut, ChevronDown, Package, ShoppingBag, MessageSquare, Star, Gift, Wallet } from 'lucide-vue-next'
 import DarkModeToggle from '@/components/ui/DarkModeToggle.vue'
 import MobileNav from '@/components/layout/MobileNav.vue'
 import { useAccessibility } from '@/composables/useAccessibility'
