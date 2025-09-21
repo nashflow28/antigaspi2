@@ -99,6 +99,7 @@ class ReservationController extends Controller
                     'customer_email' => $request->input('customer_email'),
                     'currency' => $request->input('currency', config('payments.currency', 'XOF')),
                     'notes' => $request->input('notes'),
+                    'wallet_pin' => $request->input('wallet_pin'),
                 ]);
 
                 $reservation->load(['product.category', 'product.merchant.user', 'latestPayment']);

@@ -17,6 +17,11 @@ class PaymentService
 
     public function initializePayment(Reservation $reservation, PaymentMethod $method, array $attributes = []): Payment
     {
+        if (array_key_exists('wallet_pin', $attributes)) {
+            $attributes['pin'] = $attributes['wallet_pin'];
+            unset($attributes['wallet_pin']);
+        }
+
         $payment = new Payment([
             'amount' => $reservation->total_amount,
             'currency' => $attributes['currency'] ?? config('payments.currency', 'XOF'),
@@ -26,7 +31,7 @@ class PaymentService
             'customer_phone' => $attributes['customer_phone'] ?? null,
             'reference' => $attributes['reference'] ?? Str::upper(Str::random(12)),
             'payload' => [
-                'context' => Arr::except($attributes, ['customer_phone', 'reference']),
+                'context' => Arr::except($attributes, ['customer_phone', 'reference', 'pin']),
             ],
         ]);
 

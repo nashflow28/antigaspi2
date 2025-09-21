@@ -798,6 +798,7 @@ const confirmReservation = async () => {
   if (!product.value || !acceptConditions.value) return
 
   loading.value = true
+  const isWalletPayment = paymentMethod.value === 'wallet'
 
   try {
     const response = await reservationsStore.createReservation({
@@ -808,7 +809,8 @@ const confirmReservation = async () => {
       customerEmail: authStore.user?.email,
       notes: reservation.value.pickup_instructions || reservation.value.notes || undefined,
       pickupDate: reservation.value.pickup_date || undefined,
-      pickupTime: reservation.value.pickup_time || undefined
+      pickupTime: reservation.value.pickup_time || undefined,
+      walletPin: isWalletPayment ? walletPin.value : undefined
     })
 
     if (response.success) {
@@ -833,6 +835,9 @@ const confirmReservation = async () => {
     notify.error(message)
   } finally {
     loading.value = false
+    if (isWalletPayment) {
+      walletPin.value = ''
+    }
   }
 }
 

@@ -52,6 +52,15 @@ vi.mock('@/composables/useNotifications', () => ({
   }
 }))
 
+vi.mock('@/stores/payments', () => ({
+  usePaymentsStore: () => ({
+    recordPayment: vi.fn(),
+    startPolling: vi.fn(),
+    clearPayment: vi.fn()
+  }),
+  isFinalStatus: () => false
+}))
+
 const createBasket = (overrides: Partial<SurpriseBasket> = {}): SurpriseBasket => ({
   id: 1,
   merchant_id: 5,
@@ -128,6 +137,6 @@ describe('routing paniers surprise', () => {
 
     expect(router.currentRoute.value.name).toBe('surprise-basket-reserve')
     expect(wrapper.html()).toContain('Panier Soleil')
-    expect(wrapper.html()).toContain('Réserver maintenant')
+    expect(wrapper.html()).toContain('Réserver (paiement sur place)')
   })
 })
