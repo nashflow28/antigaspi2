@@ -8,6 +8,7 @@ enum PaymentMethod: string
     case TMONEY = 'tmoney';
     case PAYSTACK = 'paystack';
     case ON_SITE = 'on_site';
+    case WALLET = 'wallet';
 
     public function provider(): string
     {
@@ -15,6 +16,7 @@ enum PaymentMethod: string
             self::FLOOZ, self::TMONEY => 'paygate',
             self::PAYSTACK => 'paystack',
             self::ON_SITE => 'manual',
+            self::WALLET => 'wallet',
         };
     }
 
@@ -23,8 +25,28 @@ enum PaymentMethod: string
         return in_array($this, [self::FLOOZ, self::TMONEY], true);
     }
 
+    public function isWallet(): bool
+    {
+        return $this === self::WALLET;
+    }
+
+    public function isInstantPayment(): bool
+    {
+        return in_array($this, [self::WALLET, self::ON_SITE], true);
+    }
+
+    public function requiresExternalProvider(): bool
+    {
+        return in_array($this, [self::FLOOZ, self::TMONEY, self::PAYSTACK], true);
+    }
+
     public static function values(): array
     {
         return array_column(self::cases(), 'value');
+    }
+
+    public static function getRechargeableMethods(): array
+    {
+        return [self::FLOOZ, self::TMONEY, self::PAYSTACK];
     }
 }

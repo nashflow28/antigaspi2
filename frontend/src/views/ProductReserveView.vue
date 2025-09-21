@@ -319,6 +319,25 @@
                 </p>
               </div>
 
+              <!-- Wallet payment PIN input -->
+              <div v-if="paymentMethod === 'wallet'" class="space-y-2">
+                <label for="wallet-pin" class="form-label">Code PIN du portefeuille</label>
+                <input
+                  id="wallet-pin"
+                  v-model="walletPin"
+                  type="password"
+                  maxlength="6"
+                  placeholder="••••••"
+                  class="form-input text-center text-lg tracking-widest"
+                  @input="(e) => e.target.value = e.target.value.replace(/\D/g, '')"
+                  required
+                />
+                <div class="flex items-center justify-between text-xs text-neutral-500">
+                  <span>Solde disponible: {{ walletStore.formattedBalance }}</span>
+                  <span v-if="!canPayWithWallet" class="text-red-600">Solde insuffisant</span>
+                </div>
+              </div>
+
               <div class="mt-6 p-4 bg-primary-50 border border-primary-200 rounded-xl text-sm text-primary-700">
                 <p class="font-semibold mb-1">Montant à payer</p>
                 <p class="text-lg font-bold text-primary-800">{{ formatPrice(totalAmount) }}</p>
@@ -330,6 +349,9 @@
                 </p>
                 <p v-else-if="paymentMethod === 'on_site'" class="mt-2 text-xs">
                   Réglez ce montant directement auprès du commerçant lors du retrait.
+                </p>
+                <p v-else-if="paymentMethod === 'wallet'" class="mt-2 text-xs">
+                  Le montant sera débité instantanément de votre portefeuille après saisie du PIN.
                 </p>
               </div>
             </div>
@@ -389,6 +411,9 @@
                   </div>
                   <div v-if="methodRequiresPhone" class="text-sm text-neutral-600">
                     Téléphone Mobile Money : <span class="font-medium">{{ mobileMoneyPhone }}</span>
+                  </div>
+                  <div v-if="paymentMethod === 'wallet'" class="text-sm text-neutral-600">
+                    Solde disponible : <span class="font-medium text-green-600">{{ walletStore.formattedBalance }}</span>
                   </div>
                   <p class="text-xs text-neutral-500 mt-3">
                     {{ selectedPaymentOption?.instructions }}
@@ -532,6 +557,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { useReservationsStore } from '@/stores/reservations'
 import { usePaymentsStore, isFinalStatus } from '@/stores/payments'
+import { useWalletStore } from '@/stores/wallet'
 import { apiService } from '@/services/api'
 import { notify } from '@/composables/useNotifications'
 import type { PaymentMethod } from '@/types'
@@ -564,6 +590,7 @@ const router = useRouter()
 const authStore = useAuthStore()
 const reservationsStore = useReservationsStore()
 const paymentsStore = usePaymentsStore()
+const walletStore = useWalletStore()
 
 const currentStep = ref(1)
 const loading = ref(false)
@@ -585,43 +612,69 @@ const product = ref<ReserveProduct | null>(null)
 const loadingProduct = ref(true)
 const productError = ref(false)
 
-const paymentOptions = [
-  {
-    value: 'flooz' as PaymentMethod,
-    label: 'Flooz (Moov Togo)',
-    description: 'PayGate - Mobile Money',
-    requiresPhone: true,
-    icon: Smartphone,
-    instructions: 'Assurez-vous que votre numéro Flooz est actif et dispose des fonds nécessaires.'
-  },
-  {
-    value: 'tmoney' as PaymentMethod,
-    label: 'Mixx by Yas (Tmoney)',
-    description: 'PayGate - Mobile Money',
-    requiresPhone: true,
-    icon: Smartphone,
-    instructions: 'Le numéro Mixx by Yas doit être au format international (+228...).'
-  },
-  {
-    value: 'paystack' as PaymentMethod,
-    label: 'Paystack',
-    description: 'Cartes bancaires & Mobile Money',
-    requiresPhone: false,
-    icon: CreditCard,
-    instructions: 'Vous serez redirigé vers Paystack pour finaliser le paiement de façon sécurisée.'
-  },
-  {
-    value: 'on_site' as PaymentMethod,
-    label: 'Paiement sur place',
-    description: 'Régler lors du retrait',
-    requiresPhone: false,
-    icon: Wallet,
-    instructions: 'Préparez le montant exact et réglez directement auprès du commerçant.'
-  }
-]
+const paymentOptions = computed(() => {
+  const options = [
+    {
+      value: 'flooz' as PaymentMethod,
+      label: 'Flooz (Moov Togo)',
+      description: 'PayGate - Mobile Money',
+      requiresPhone: true,
+      icon: Smartphone,
+      instructions: 'Assurez-vous que votre numéro Flooz est actif et dispose des fonds nécessaires.'
+    },
+    {
+      value: 'tmoney' as PaymentMethod,
+      label: 'Mixx by Yas (Tmoney)',
+      description: 'PayGate - Mobile Money',
+      requiresPhone: true,
+      icon: Smartphone,
+      instructions: 'Le numéro Mixx by Yas doit être au format international (+228...).'
+    },
+    {
+      value: 'paystack' as PaymentMethod,
+      label: 'Paystack',
+      description: 'Cartes bancaires & Mobile Money',
+      requiresPhone: false,
+      icon: CreditCard,
+      instructions: 'Vous serez redirigé vers Paystack pour finaliser le paiement de façon sécurisée.'
+    },
+    {
+      value: 'on_site' as PaymentMethod,
+      label: 'Paiement sur place',
+      description: 'Régler lors du retrait',
+      requiresPhone: false,
+      icon: Wallet,
+      instructions: 'Préparez le montant exact et réglez directement auprès du commerçant.'
+    }
+  ]
 
-const selectedPaymentOption = computed(() => paymentOptions.find(option => option.value === paymentMethod.value))
+  // Add wallet option if user has wallet and sufficient balance
+  if (walletStore.hasWallet && walletStore.isActive && walletStore.hasPin) {
+    options.unshift({
+      value: 'wallet' as PaymentMethod,
+      label: 'Portefeuille électronique',
+      description: `Solde: ${walletStore.formattedBalance}`,
+      requiresPhone: false,
+      icon: Wallet,
+      instructions: 'Paiement instantané depuis votre portefeuille. Saisissez votre code PIN pour confirmer.'
+    })
+  }
+
+  return options
+})
+
+const selectedPaymentOption = computed(() => paymentOptions.value.find(option => option.value === paymentMethod.value))
 const methodRequiresPhone = computed(() => selectedPaymentOption.value?.requiresPhone ?? false)
+
+// Wallet-specific refs
+const showWalletPayment = ref(false)
+const walletPin = ref('')
+
+// Check if wallet can pay for the current amount
+const canPayWithWallet = computed(() => {
+  if (!walletStore.hasWallet || !walletStore.isActive || !walletStore.hasPin) return false
+  return walletStore.canPay(totalAmount.value)
+})
 
 const availableQuantity = computed(() => {
   if (!product.value) return 0
@@ -650,6 +703,9 @@ const canProceedToNextStep = computed(() => {
       }
       if (methodRequiresPhone.value) {
         return Boolean(mobileMoneyPhone.value && /^\+?[0-9]{8,15}$/.test(mobileMoneyPhone.value))
+      }
+      if (paymentMethod.value === 'wallet') {
+        return Boolean(walletPin.value && walletPin.value.length >= 4 && canPayWithWallet.value)
       }
       return true
     case 4:
@@ -833,5 +889,10 @@ onMounted(async () => {
 
   paymentsStore.clearPayment()
   await fetchProduct()
+
+  // Load wallet information for authenticated users
+  if (authStore.isAuthenticated) {
+    await walletStore.fetchWallet()
+  }
 })
 </script>

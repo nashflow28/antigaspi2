@@ -95,6 +95,11 @@ class User extends Authenticatable implements JWTSubject
         return $this->hasMany(PushSubscription::class);
     }
 
+    public function wallet(): HasOne
+    {
+        return $this->hasOne(Wallet::class);
+    }
+
     // Scopes
     public function scopeConsumers($query)
     {
@@ -150,5 +155,24 @@ class User extends Authenticatable implements JWTSubject
     public function prefersPushNotifications(): bool
     {
         return (bool) $this->prefers_push_notifications;
+    }
+
+    // Wallet helper methods
+    public function getOrCreateWallet(): Wallet
+    {
+        return $this->wallet ?: $this->wallet()->create([
+            'currency' => 'XOF',
+            'daily_limit' => 50000.00,
+        ]);
+    }
+
+    public function hasWallet(): bool
+    {
+        return !is_null($this->wallet);
+    }
+
+    public function getWalletBalance(): float
+    {
+        return $this->wallet?->balance ?? 0.00;
     }
 }

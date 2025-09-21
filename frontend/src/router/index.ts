@@ -104,6 +104,17 @@ const router = createRouter({
       meta: { requiresAuth: true, roles: ['consumer'] }
     },
     {
+      path: '/wallet',
+      name: 'wallet',
+      component: () => import('@/views/WalletDashboard.vue'),
+      meta: {
+        requiresAuth: true,
+        roles: ['consumer'],
+        title: 'Portefeuille électronique',
+        breadcrumb: ['Accueil', 'Portefeuille']
+      }
+    },
+    {
       path: '/merchant',
       name: 'merchant',
       redirect: '/merchant/dashboard'

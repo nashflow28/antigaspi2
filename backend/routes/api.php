@@ -13,6 +13,7 @@ use App\Http\Controllers\Api\ReviewController;
 use App\Http\Controllers\Api\SurpriseBasketController;
 use App\Http\Controllers\Api\NotificationController;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\WalletController;
 
 /*
 |--------------------------------------------------------------------------
@@ -115,6 +116,31 @@ Route::prefix('payments')->group(function () {
 
     Route::post('/webhook/paygate', [PaymentController::class, 'paygateCallback']);
     Route::post('/webhook/paystack', [PaymentController::class, 'paystackCallback']);
+});
+
+// Routes des portefeuilles électroniques
+Route::prefix('wallet')->middleware('jwt.auth')->group(function () {
+    // Consultation du portefeuille
+    Route::get('/', [WalletController::class, 'getWallet']); // Informations portefeuille
+    Route::get('/transactions', [WalletController::class, 'getTransactions']); // Historique transactions
+    Route::get('/stats', [WalletController::class, 'getStats']); // Statistiques portefeuille
+
+    // Gestion du code PIN avec rate limiting strict
+    Route::middleware('throttle:write')->group(function () {
+        Route::post('/pin', [WalletController::class, 'setPin']); // Configurer PIN
+        Route::put('/pin', [WalletController::class, 'changePin']); // Modifier PIN
+    });
+
+    // Configuration du portefeuille
+    Route::put('/status', [WalletController::class, 'toggleStatus']); // Activer/désactiver
+    Route::put('/daily-limit', [WalletController::class, 'updateDailyLimit']); // Modifier limite quotidienne
+
+    // Opérations de paiement avec rate limiting strict
+    Route::middleware('throttle:write')->group(function () {
+        Route::post('/payment', [WalletController::class, 'processPayment']); // Effectuer paiement
+        Route::post('/transfer', [WalletController::class, 'transfer']); // Transfert entre portefeuilles
+        Route::post('/recharge', [WalletController::class, 'recharge']); // Recharger portefeuille
+    });
 });
 
 // Routes des notifications
