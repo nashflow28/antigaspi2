@@ -355,3 +355,99 @@ Status de l'API
    php artisan serve
    ```
 4. **Tester l'API** → `GET http://localhost:8000/api/health`
+### **Analytics**
+
+#### 📊 POST `/analytics/events` *(Protégé)*
+Envoie un lot d'événements analytiques collectés côté mobile.
+
+**Headers requis :**
+```
+Authorization: Bearer {token}
+Content-Type: application/json
+```
+
+**Body :**
+```json
+{
+  "events": [
+    {
+      "name": "Reservation Created",
+      "category": "Commerce",
+      "timestamp": 1736880000000,
+      "sessionId": "1736880000000-abcd123",
+      "properties": {
+        "merchantId": 12,
+        "quantity": 2,
+        "totalAmount": 7500,
+        "paymentMethod": "wallet"
+      }
+    }
+  ]
+}
+```
+
+**Réponse :**
+```json
+{
+  "success": true,
+  "stored": 1
+}
+```
+
+#### 📈 GET `/analytics/stats` *(Protégé)*
+Retourne les statistiques agrégées (réservations, revenus, nouveaux utilisateurs, événements) sur la période demandée.
+
+**Query Parameters :**
+- `start_date` *(optionnel, ISO 8601)* — Date de début (par défaut: 7 derniers jours)
+- `end_date` *(optionnel, ISO 8601)* — Date de fin (inclus)
+- `merchant_id` *(optionnel)* — Filtre sur un commerçant spécifique
+
+**Réponse :**
+```json
+{
+  "success": true,
+  "filters": {
+    "start_date": "2025-01-10",
+    "end_date": "2025-01-17",
+    "merchant_id": null
+  },
+  "summary": {
+    "total_reservations": 42,
+    "total_revenue": 128500,
+    "products_saved_from_waste": 96,
+    "new_users": 5,
+    "event_count": 238
+  },
+  "daily_breakdown": [
+    {
+      "date": "2025-01-16",
+      "merchant_id": null,
+      "total_reservations": 8,
+      "total_revenue": 28500,
+      "products_saved_from_waste": 14,
+      "new_users": 1
+    }
+  ],
+  "top_events": [
+    { "name": "Reservation Created", "count": 42 },
+    { "name": "Purchase", "count": 38 }
+  ],
+  "events_by_category": [
+    { "category": "Commerce", "count": 80 },
+    { "category": "Revenue", "count": 38 }
+  ],
+  "recent_events": [
+    {
+      "id": 153,
+      "name": "Purchase",
+      "category": "Revenue",
+      "properties": {
+        "amount": 7500,
+        "currency": "XOF",
+        "paymentMethod": "wallet"
+      },
+      "occurred_at": "2025-01-17T14:22:08+00:00"
+    }
+  ]
+}
+```

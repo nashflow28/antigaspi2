@@ -33,6 +33,7 @@ import {
 } from '../../types'
 import paymentService from '../../services/paymentService'
 import offlineService from '../../services/offlineService'
+import analyticsService from '../../services/analyticsService'
 
 interface Props {
   route: any
@@ -104,6 +105,24 @@ const ProductDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
     if (method !== 'wallet') {
       setWalletPin('')
     }
+
+    void analyticsService.track('Payment Method Selected', 'Payment', {
+      method,
+      productId: product?.id,
+      merchantId: product?.merchant.id,
+      screen: 'ProductDetails',
+    })
+  }
+
+  const openReservationModal = () => {
+    setShowReservationModal(true)
+    if (product) {
+      void analyticsService.track('Reservation Modal Opened', 'Reservation', {
+        productId: product.id,
+        merchantId: product.merchant.id,
+        paymentMethod: selectedPaymentMethod,
+      })
+    }
   }
 
   const loadProduct = async () => {
@@ -121,6 +140,13 @@ const ProductDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
         }
       } catch (error) {
         Alert.alert('Erreur', 'Impossible de charger le produit')
+        if (error instanceof Error) {
+          void analyticsService.trackError(error, 'loadProduct')
+        } else {
+          void analyticsService.track('Product Load Failed', 'System', {
+            productId,
+          })
+        }
         navigation.goBack()
       }
     }
@@ -135,7 +161,13 @@ const ProductDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
         calculateDistance(location.coords)
       }
     } catch (error) {
-      console.log('Erreur géolocalisation:', error)
+      if (error instanceof Error) {
+        void analyticsService.trackError(error, 'getUserLocation')
+      } else {
+        void analyticsService.track('Location Access Failed', 'System', {
+          details: String(error),
+        })
+      }
     }
   }
 
@@ -161,6 +193,13 @@ const ProductDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
       const reference = payment?.reference || fallbackReference
       const amount = payment?.amount ?? amountBase * quantity
       const ussd = paymentService.generateUSSDString(method, reference, amount)
+
+      void analyticsService.trackPurchase(amount, 'XOF', method, product.id.toString(), {
+        status,
+        reference,
+        reservationCode: response.data?.reservation_code,
+        merchantId: product.merchant.id,
+      })
 
       let message = ''
       switch (status) {
@@ -195,6 +234,11 @@ const ProductDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
     }
 
     if (method === 'wallet') {
+      void analyticsService.trackPurchase(totalAmount, 'XOF', method, product.id.toString(), {
+        status: payment?.status ?? 'pending',
+        reservationCode: response.data?.reservation_code,
+        merchantId: product.merchant.id,
+      })
       Alert.alert(
         payment?.status === 'success' ? 'Paiement wallet validé' : 'Réservation enregistrée',
         payment?.status === 'success'
@@ -223,6 +267,11 @@ const ProductDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
         { text: 'OK' }
       ]
     )
+    void analyticsService.track('On-Site Payment Selected', 'Payment', {
+      reservationCode: response.data?.reservation_code,
+      productId: product.id,
+      merchantId: product.merchant.id,
+    })
   }
 
   const calculateDistance = (coords: any) => {
@@ -233,6 +282,13 @@ const ProductDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
 
   const handleReservation = async () => {
     if (!product || !user) return
+
+    void analyticsService.track('Reservation Attempt', 'Reservation', {
+      productId: product.id,
+      quantity,
+      paymentMethod: selectedPaymentMethod,
+      merchantId: product.merchant.id,
+    })
 
     if (quantity > product.quantity_available) {
       Alert.alert('Erreur', 'Quantité demandée supérieure au stock disponible')
@@ -310,12 +366,21 @@ const ProductDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
         setSelectedPaymentMethod('on_site')
         setCustomerPhone(user?.phone ?? '')
 
+        void analyticsService.trackReservation(String(product.id), quantity, totalAmount, {
+          paymentMethod: selectedPaymentMethod,
+          offline: true,
+          merchantId: product.merchant.id,
+        })
+
         Alert.alert(
           'Réservation enregistrée hors ligne',
           'Nous enverrons votre demande dès que la connexion sera rétablie.'
         )
       } catch (error) {
         Alert.alert('Erreur', 'Impossible de préparer la synchronisation hors ligne.')
+        if (error instanceof Error) {
+          void analyticsService.trackError(error, 'queueReservation')
+        }
       }
       return
     }
@@ -330,12 +395,20 @@ const ProductDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
         setWalletPin('')
         setSelectedPaymentMethod('on_site')
         setCustomerPhone(user?.phone ?? '')
+        await analyticsService.trackReservation(String(product.id), quantity, totalAmount, {
+          paymentMethod: selectedPaymentMethod,
+          reservationCode: response.data.reservation_code,
+          merchantId: product.merchant.id,
+        })
         await handlePaymentFeedback(response.payment, selectedPaymentMethod, response)
       } else {
         Alert.alert('Erreur', result.payload as string)
       }
     } catch (error) {
       Alert.alert('Erreur', 'Impossible de créer la réservation')
+      if (error instanceof Error) {
+        void analyticsService.trackError(error, 'createReservation')
+      }
     }
   }
 
@@ -490,7 +563,7 @@ const ProductDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
             styles.reserveButton,
             product.quantity_available === 0 && styles.disabledButton
           ]}
-          onPress={() => setShowReservationModal(true)}
+          onPress={openReservationModal}
           disabled={product.quantity_available === 0}
         >
           <Text style={styles.reserveButtonText}>

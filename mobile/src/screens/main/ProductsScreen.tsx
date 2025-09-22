@@ -18,6 +18,7 @@ import { fetchProducts, fetchCategories, setFilters } from '../../store/slices/p
 import { Ionicons } from '@expo/vector-icons'
 import { Image } from 'expo-image'
 import { Product, ProductFilters } from '../../types'
+import analyticsService from '../../services/analyticsService'
 
 interface Props {
   navigation: any
@@ -65,7 +66,14 @@ const ProductsScreen: React.FC<Props> = ({ navigation, route }) => {
     try {
       await dispatch(fetchCategories())
     } catch (error) {
-      console.log('Erreur chargement catégories:', error)
+      Alert.alert('Erreur', 'Impossible de charger les catégories')
+      if (error instanceof Error) {
+        void analyticsService.trackError(error, 'loadCategories')
+      } else {
+        void analyticsService.track('Categories Load Failed', 'System', {
+          details: String(error),
+        })
+      }
     }
   }
 
