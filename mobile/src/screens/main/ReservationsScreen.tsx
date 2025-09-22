@@ -14,11 +14,16 @@ import {
 } from 'react-native'
 import { useDispatch, useSelector } from 'react-redux'
 import { AppDispatch, RootState } from '../../store'
-import { fetchMyReservations, cancelReservation } from '../../store/slices/reservationsSlice'
+import {
+  fetchMyReservations,
+  cancelReservation,
+  markReservationSyncPending,
+} from '../../store/slices/reservationsSlice'
 import { Ionicons } from '@expo/vector-icons'
 import { Image } from 'expo-image'
 import QRCode from 'react-native-qrcode-svg'
 import { Reservation } from '../../types'
+import offlineService from '../../services/offlineService'
 
 interface Props {
   navigation: any
@@ -30,6 +35,7 @@ const ReservationsScreen: React.FC<Props> = ({ navigation }) => {
   const dispatch = useDispatch<AppDispatch>()
   const { reservations, loading } = useSelector((state: RootState) => state.reservations)
   const { user } = useSelector((state: RootState) => state.auth)
+  const { isOnline } = useSelector((state: RootState) => state.connectivity)
 
   const [refreshing, setRefreshing] = useState(false)
   const [selectedReservation, setSelectedReservation] = useState<Reservation | null>(null)
@@ -64,6 +70,28 @@ const ReservationsScreen: React.FC<Props> = ({ navigation }) => {
           text: 'Oui, annuler',
           style: 'destructive',
           onPress: async () => {
+            if (!isOnline) {
+              try {
+                await offlineService.queueSyncAction('update', '/reservations/cancel', {
+                  action: 'cancelReservation',
+                  reservationId: reservation.id,
+                })
+                dispatch(
+                  markReservationSyncPending({
+                    id: reservation.id,
+                    pendingAction: 'delete',
+                  })
+                )
+                Alert.alert(
+                  'Annulation hors ligne',
+                  'La demande sera synchronisée dès que la connexion sera de retour.'
+                )
+              } catch (error) {
+                Alert.alert('Erreur', 'Impossible de mettre en attente cette annulation.')
+              }
+              return
+            }
+
             try {
               await dispatch(cancelReservation(reservation.id))
               Alert.alert('Succès', 'Réservation annulée avec succès')
@@ -82,8 +110,12 @@ const ReservationsScreen: React.FC<Props> = ({ navigation }) => {
     setShowQRModal(true)
   }
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
+  const getStatusColor = (reservation: Reservation) => {
+    if (reservation.pendingSync) {
+      return reservation.pendingAction === 'delete' ? '#F59E0B' : '#0EA5E9'
+    }
+
+    switch (reservation.status) {
       case 'pending': return '#F59E0B'
       case 'confirmed': return '#3B82F6'
       case 'ready': return '#10B981'
@@ -94,15 +126,22 @@ const ReservationsScreen: React.FC<Props> = ({ navigation }) => {
     }
   }
 
-  const getStatusText = (status: string) => {
-    switch (status) {
+  const getStatusText = (reservation: Reservation) => {
+    if (reservation.pendingSync) {
+      if (reservation.pendingAction === 'delete') {
+        return 'Annulation en attente'
+      }
+      return 'Synchronisation en attente'
+    }
+
+    switch (reservation.status) {
       case 'pending': return 'En attente'
       case 'confirmed': return 'Confirmée'
       case 'ready': return 'Prête'
       case 'completed': return 'Terminée'
       case 'cancelled': return 'Annulée'
       case 'expired': return 'Expirée'
-      default: return status
+      default: return reservation.status
     }
   }
 
@@ -153,6 +192,9 @@ const ReservationsScreen: React.FC<Props> = ({ navigation }) => {
   }
 
   const canCancel = (reservation: Reservation) => {
+    if (reservation.pendingSync) {
+      return false
+    }
     return ['pending', 'confirmed'].includes(reservation.status)
   }
 
@@ -171,16 +213,29 @@ const ReservationsScreen: React.FC<Props> = ({ navigation }) => {
           </Text>
         </View>
         <View style={styles.statusContainer}>
-          <View style={[styles.statusBadge, { backgroundColor: getStatusColor(item.status) }]}>
-            <Text style={styles.statusText}>{getStatusText(item.status)}</Text>
+          <View style={[styles.statusBadge, { backgroundColor: getStatusColor(item) }]}>
+            <Text style={styles.statusText}>{getStatusText(item)}</Text>
           </View>
-          {item.payment_status && (
+          {item.payment_status && !item.pendingSync && (
             <View style={[styles.paymentBadge, { backgroundColor: getPaymentStatusColor(item.payment_status) }]}>
               <Text style={styles.paymentText}>{getPaymentStatusText(item.payment_status)}</Text>
             </View>
           )}
         </View>
       </View>
+
+      {item.pendingSync && (
+        <Text
+          style={[
+            styles.syncInfo,
+            item.pendingAction === 'delete' && { color: '#F59E0B' },
+          ]}
+        >
+          {item.pendingAction === 'delete'
+            ? 'Annulation en attente de synchronisation'
+            : 'Créée hors ligne - envoi automatique dès connexion'}
+        </Text>
+      )}
 
       {/* Produit */}
       <View style={styles.productSection}>
@@ -468,6 +523,12 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'flex-start',
     marginBottom: 12,
+  },
+  syncInfo: {
+    fontSize: 12,
+    color: '#0EA5E9',
+    fontWeight: '500',
+    marginBottom: 8,
   },
   reservationCode: {
     fontSize: 16,

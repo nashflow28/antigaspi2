@@ -142,6 +142,8 @@ export interface Reservation {
   }
   consumer?: User
   latest_payment?: Payment | null
+  pendingSync?: boolean
+  pendingAction?: 'create' | 'update' | 'delete'
 }
 
 export interface AuthResponse {

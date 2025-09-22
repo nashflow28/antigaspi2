@@ -4,7 +4,7 @@
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import NetInfo from '@react-native-community/netinfo';
-import { Product, Reservation, User } from '../types';
+import apiService from './api';
 
 export interface CacheConfig {
   key: string;
@@ -57,6 +57,7 @@ class OfflineService {
 
     // Charger la queue de synchronisation
     await this.loadSyncQueue();
+    this.emit('sync-queue-updated', this.syncQueue.length);
 
     // Nettoyer le cache expiré au démarrage
     await this.cleanExpiredCache();
@@ -238,11 +239,11 @@ class OfflineService {
   /**
    * Ajouter une action à la queue de synchronisation
    */
-  async addToSyncQueue(
+  async queueSyncAction(
     type: 'create' | 'update' | 'delete',
     endpoint: string,
     data: any
-  ): Promise<void> {
+  ): Promise<SyncQueue> {
     const queueItem: SyncQueue = {
       id: `sync_${Date.now()}_${Math.random()}`,
       type,
@@ -254,17 +255,20 @@ class OfflineService {
 
     this.syncQueue.push(queueItem);
     await this.saveSyncQueue();
+    this.emit('sync-queue-updated', this.syncQueue.length);
 
     // Si on est en ligne, traiter immédiatement
     if (this.isOnline && !this.syncInProgress) {
       this.processSyncQueue();
     }
+
+    return queueItem;
   }
 
   /**
    * Traiter la queue de synchronisation
    */
-  private async processSyncQueue(): Promise<void> {
+  async processSyncQueue(): Promise<void> {
     if (this.syncInProgress || this.syncQueue.length === 0) {
       return;
     }
@@ -301,16 +305,26 @@ class OfflineService {
       success: failedItems.length === 0,
       remaining: failedItems.length,
     });
+    this.emit('sync-queue-updated', this.syncQueue.length);
   }
 
   /**
    * Traiter un élément de synchronisation
    */
   private async processSyncItem(item: SyncQueue): Promise<void> {
-    // TODO: Implémenter l'appel API selon le type
-    console.log('Synchronisation:', item);
-    // Simuler un délai
-    await new Promise(resolve => setTimeout(resolve, 500));
+    const action = item.data?.action;
+
+    switch (action) {
+      case 'createReservation':
+        await apiService.createReservation(item.data.payload);
+        break;
+      case 'cancelReservation':
+        await apiService.cancelReservation(item.data.reservationId);
+        break;
+      default:
+        console.warn('Action de synchronisation inconnue:', action);
+        break;
+    }
   }
 
   /**
@@ -324,6 +338,13 @@ class OfflineService {
       console.error('Erreur lors du chargement de la queue:', error);
       this.syncQueue = [];
     }
+  }
+
+  /**
+   * Obtenir la taille actuelle de la file de synchronisation
+   */
+  getSyncQueueLength(): number {
+    return this.syncQueue.length;
   }
 
   /**
