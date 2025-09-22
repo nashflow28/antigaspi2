@@ -23,7 +23,9 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'jwt.auth' => \Tymon\JWTAuth\Http\Middleware\Authenticate::class,
             'jwt.refresh' => \Tymon\JWTAuth\Http\Middleware\RefreshToken::class,
+            'auth.cookie' => \App\Http\Middleware\AuthenticateWithCookie::class,
             'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
+            'throttle.api' => \App\Http\Middleware\ThrottleApiRequests::class,
         ]);
 
         // Configuration du rate limiting pour l'API

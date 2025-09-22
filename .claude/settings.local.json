@@ -35,7 +35,11 @@
       "Bash(curl:*)",
       "Bash(php artisan serve:*)",
       "Bash(git checkout:*)",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "Bash(git push:*)",
+      "Bash(cat:*)",
+      "Bash(find:*)",
+      "Bash(php artisan jwt:secret:*)"
     ],
     "deny": [],
     "ask": []
