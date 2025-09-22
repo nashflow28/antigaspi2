@@ -100,6 +100,26 @@ Real-time sync: Auto-refresh data
 Error handling: Global interceptors
 ```
 
+### 🔔 Configuration des notifications push Expo
+
+1. **Créer et configurer le projet Expo**
+   - Connectez-vous avec `npx expo login` puis exécutez `npx eas init` pour lier l'application à votre compte Expo.
+   - Récupérez l'identifiant du projet (`projectId`) via `npx expo config --json | jq -r '.extra.eas.projectId'` et ajoutez-le dans `app.json` si nécessaire.
+
+2. **Générer un token d'accès Expo**
+   - Depuis [expo.dev](https://expo.dev/), créez un **Access Token** (Permissions : `push_notification:server`) et enregistrez-le dans `backend/.env` sous `EXPO_ACCESS_TOKEN=`.
+   - Ajoutez également `EXPO_PROJECT_ID` dans `mobile/.env` ou `app.json` afin que l'app mobile puisse récupérer correctement le token push.
+
+3. **Mettre à jour l'API Laravel**
+   - Exécutez `php artisan migrate` dans le dossier `backend/` pour créer/mettre à jour la table `push_subscriptions`.
+   - Vérifiez que les variables `WEB_PUSH_*` et `EXPO_ACCESS_TOKEN` sont bien renseignées dans l'environnement cible.
+
+4. **Validation sur appareil physique**
+   - Installez l'application via `npx expo run:android --device` ou `npx expo run:ios --device` (ou utilisez Expo Go avec `npx expo start --tunnel`).
+   - Connectez-vous avec un compte de test, acceptez les permissions de notifications puis surveillez la console backend pour confirmer l'enregistrement du token Expo.
+   - Depuis le backend, envoyez une notification de test (ex. `php artisan tinker` puis `app(\App\Services\PushSubscriptionService::class)->send(App\Models\User::find(1), ['title' => 'Test Expo', 'body' => 'Notification de bout en bout'])`).
+   - Vérifiez la réception sur l'appareil physique et ajustez les canaux Android si nécessaire.
+
 ### 🎯 Fonctionnalités Testées
 
 ✅ **Authentification complète** - Login/logout/register

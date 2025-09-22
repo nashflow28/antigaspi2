@@ -48,4 +48,8 @@ return [
         'ttl' => env('WEB_PUSH_TTL', 900),
     ],
 
+    'expo' => [
+        'access_token' => env('EXPO_ACCESS_TOKEN'),
+    ],
+
 ];

@@ -7,7 +7,7 @@ import * as Device from 'expo-device';
 import Constants from 'expo-constants';
 import { Platform } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import axios from 'axios';
+import axios, { AxiosInstance } from 'axios';
 
 // Configuration des notifications
 Notifications.setNotificationHandler({
@@ -40,48 +40,91 @@ export interface NotificationPreferences {
 }
 
 class NotificationService {
+  private http: AxiosInstance;
   private baseURL: string;
   private pushToken: string | null = null;
+  private initialized = false;
+  private initializationPromise: Promise<void> | null = null;
+  private listenersRegistered = false;
 
   constructor() {
     this.baseURL = 'http://localhost:8000/api';
+    this.http = axios.create({
+      baseURL: this.baseURL,
+      timeout: 10000,
+      headers: {
+        'Content-Type': 'application/json',
+        Accept: 'application/json',
+      },
+    });
+
+    this.http.interceptors.request.use(
+      async (config) => {
+        const token = await AsyncStorage.getItem('auth_token');
+
+        if (token) {
+          if (!config.headers) {
+            config.headers = {};
+          }
+
+          (config.headers as Record<string, string>).Authorization = `Bearer ${token}`;
+        }
+
+        return config;
+      },
+      (error) => Promise.reject(error)
+    );
   }
 
   /**
    * Initialiser le service de notifications
    */
   async initialize(): Promise<void> {
-    try {
-      // Vérifier si c'est un appareil physique
-      if (!Device.isDevice) {
-        console.log('Les notifications push ne fonctionnent que sur un appareil physique');
-        return;
-      }
-
-      // Demander les permissions
-      const permission = await this.requestPermissions();
-      if (!permission) {
-        console.log('Permissions de notification refusées');
-        return;
-      }
-
-      // Obtenir le token Expo Push
-      const token = await this.getExpoPushToken();
-      if (token) {
-        this.pushToken = token;
-        await this.registerTokenWithBackend(token);
-      }
-
-      // Configurer les listeners
-      this.setupNotificationListeners();
-
-      // Charger les préférences
-      await this.loadPreferences();
-
-      console.log('Service de notifications initialisé avec succès');
-    } catch (error) {
-      console.error('Erreur lors de l\'initialisation des notifications:', error);
+    if (this.initialized) {
+      return;
     }
+
+    if (this.initializationPromise) {
+      return this.initializationPromise;
+    }
+
+    this.initializationPromise = (async () => {
+      try {
+        if (!Device.isDevice) {
+          console.log('Les notifications push ne fonctionnent que sur un appareil physique');
+          this.initialized = true;
+          return;
+        }
+
+        const permissionGranted = await this.requestPermissions();
+
+        if (!permissionGranted) {
+          console.log('Permissions de notification refusées');
+          this.initialized = true;
+          return;
+        }
+
+        const token = await this.getExpoPushToken();
+
+        if (token) {
+          this.pushToken = token;
+          await this.registerTokenIfNeeded(token);
+        }
+
+        this.setupNotificationListeners();
+        await this.loadPreferences();
+
+        this.initialized = true;
+        console.log('Service de notifications initialisé avec succès');
+      } catch (error) {
+        console.error('Erreur lors de l\'initialisation des notifications:', error);
+        throw error;
+      } finally {
+        this.initializationPromise = null;
+      }
+    })();
+
+    return this.initializationPromise;
   }
 
   /**
@@ -175,22 +218,57 @@ class NotificationService {
     }
   }
 
+  private async registerTokenIfNeeded(token: string): Promise<void> {
+    const [storedToken, storedOwner, userDataRaw] = await Promise.all([
+      AsyncStorage.getItem('push_token'),
+      AsyncStorage.getItem('push_token_user'),
+      AsyncStorage.getItem('user_data'),
+    ]);
+
+    let currentUserId: string | undefined;
+
+    if (userDataRaw) {
+      try {
+        const parsed = JSON.parse(userDataRaw);
+
+        if (parsed?.id !== undefined && parsed?.id !== null) {
+          currentUserId = String(parsed.id);
+        }
+      } catch (error) {
+        console.error('Impossible de lire les données utilisateur pour les notifications push:', error);
+      }
+    }
+
+    if (storedToken === token && storedOwner && currentUserId && storedOwner === currentUserId) {
+      return;
+    }
+
+    await this.registerTokenWithBackend(token, currentUserId);
+  }
+
   /**
    * Enregistrer le token avec le backend
    */
-  private async registerTokenWithBackend(token: string): Promise<void> {
+  private async registerTokenWithBackend(token: string, userId?: string): Promise<void> {
     try {
-      await axios.post(`${this.baseURL}/notifications/register`, {
+      await this.http.post('/notifications/register', {
         token: token,
         platform: Platform.OS,
         device_model: Device.modelName,
         app_version: Constants.expoConfig?.version,
+        project_id: Constants.expoConfig?.extra?.eas?.projectId || Constants.easConfig?.projectId,
       });
 
-      // Sauvegarder localement
       await AsyncStorage.setItem('push_token', token);
+
+      if (userId) {
+        await AsyncStorage.setItem('push_token_user', userId);
+      } else {
+        await AsyncStorage.removeItem('push_token_user');
+      }
     } catch (error) {
       console.error('Erreur lors de l\'enregistrement du token:', error);
+      throw error;
     }
   }
 
@@ -198,6 +276,12 @@ class NotificationService {
    * Configurer les listeners de notifications
    */
   private setupNotificationListeners(): void {
+    if (this.listenersRegistered) {
+      return;
+    }
+
+    this.listenersRegistered = true;
+
     // Listener pour les notifications reçues quand l'app est ouverte
     Notifications.addNotificationReceivedListener(notification => {
       console.log('Notification reçue:', notification);
@@ -308,7 +392,7 @@ class NotificationService {
     } else {
       // Obtenir le nombre depuis le backend
       try {
-        const response = await axios.get(`${this.baseURL}/notifications/badge`);
+        const response = await this.http.get('/notifications/badge');
         await Notifications.setBadgeCountAsync(response.data.count || 0);
       } catch (error) {
         console.error('Erreur lors de la mise à jour du badge:', error);
@@ -342,7 +426,7 @@ class NotificationService {
     try {
       await AsyncStorage.setItem('notification_preferences', JSON.stringify(preferences));
       // Synchroniser avec le backend
-      await axios.post(`${this.baseURL}/notifications/preferences`, preferences);
+      await this.http.post('/notifications/preferences', preferences);
     } catch (error) {
       console.error('Erreur lors de la sauvegarde des préférences:', error);
     }
