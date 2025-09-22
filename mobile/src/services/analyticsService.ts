@@ -6,7 +6,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import Constants from 'expo-constants';
 import * as Device from 'expo-device';
 import { Platform } from 'react-native';
-import axios from 'axios';
+import axios, { AxiosInstance } from 'axios';
 
 export interface AnalyticsEvent {
   name: string;
@@ -47,11 +47,13 @@ class AnalyticsService {
   private baseURL: string;
   private sessionId: string;
   private userId: string | null = null;
+  private authToken: string | null = null;
   private eventQueue: AnalyticsEvent[] = [];
   private screenStartTime: number = Date.now();
   private currentScreen: string = 'App';
   private isInitialized: boolean = false;
   private batchTimer: NodeJS.Timeout | null = null;
+  private http: AxiosInstance;
 
   // Configuration
   private readonly BATCH_SIZE = 20;
@@ -61,34 +63,34 @@ class AnalyticsService {
   constructor() {
     this.baseURL = 'http://localhost:8000/api';
     this.sessionId = this.generateSessionId();
+    this.http = axios.create({ baseURL: this.baseURL });
   }
 
   /**
    * Initialiser le service analytics
    */
-  async initialize(userId?: string): Promise<void> {
+  async initialize(userId?: string, token?: string): Promise<void> {
+    if (token) {
+      this.authToken = token;
+      this.http.defaults.headers.common.Authorization = `Bearer ${token}`;
+    }
+
+    if (userId) {
+      this.userId = userId;
+    }
+
     if (this.isInitialized) return;
 
     try {
-      // Définir l'utilisateur
-      if (userId) {
-        this.userId = userId;
-      }
-
-      // Charger les événements en attente
       await this.loadQueuedEvents();
 
-      // Démarrer le batch processing
       this.startBatchProcessing();
 
-      // Enregistrer la session
       await this.trackSessionStart();
 
-      // Collecter les informations de l'appareil
       await this.collectDeviceInfo();
 
       this.isInitialized = true;
-      console.log('Service Analytics initialisé');
     } catch (error) {
       console.error('Erreur lors de l\'initialisation d\'Analytics:', error);
     }
@@ -364,7 +366,7 @@ class AnalyticsService {
     this.eventQueue = [];
 
     try {
-      await axios.post(`${this.baseURL}/analytics/events`, {
+      await this.http.post('/analytics/events', {
         events: eventsToSend,
         sessionId: this.sessionId,
         userId: this.userId,
@@ -417,7 +419,7 @@ class AnalyticsService {
    */
   async getUsageStats(): Promise<Record<string, any>> {
     try {
-      const response = await axios.get(`${this.baseURL}/analytics/stats`, {
+      const response = await this.http.get('/analytics/stats', {
         params: { userId: this.userId },
       });
       return response.data;
@@ -434,8 +436,14 @@ class AnalyticsService {
     this.userId = null;
     this.eventQueue = [];
     this.sessionId = this.generateSessionId();
+    this.isInitialized = false;
+    this.stopBatchProcessing();
     await AsyncStorage.removeItem('analytics_queue');
     await AsyncStorage.removeItem('analytics_user');
+    if (this.authToken) {
+      delete this.http.defaults.headers.common.Authorization;
+      this.authToken = null;
+    }
   }
 }
 

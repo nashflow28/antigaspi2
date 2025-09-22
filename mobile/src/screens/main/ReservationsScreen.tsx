@@ -24,6 +24,7 @@ import { Image } from 'expo-image'
 import QRCode from 'react-native-qrcode-svg'
 import { Reservation } from '../../types'
 import offlineService from '../../services/offlineService'
+import analyticsService from '../../services/analyticsService'
 
 interface Props {
   navigation: any
@@ -43,21 +44,40 @@ const ReservationsScreen: React.FC<Props> = ({ navigation }) => {
   const [activeTab, setActiveTab] = useState<'active' | 'completed' | 'cancelled'>('active')
 
   useEffect(() => {
-    loadReservations()
+    void loadReservations('initial')
   }, [])
 
-  const loadReservations = async () => {
-    try {
-      await dispatch(fetchMyReservations())
-    } catch (error) {
+  const loadReservations = async (
+    source: 'initial' | 'refresh' | 'reload' = 'initial'
+  ) => {
+    const result = await dispatch(fetchMyReservations())
+
+    if (fetchMyReservations.fulfilled.match(result)) {
+      void analyticsService.track('Reservations Loaded', 'Reservation', {
+        total: result.payload.length,
+        source,
+      })
+    } else if (fetchMyReservations.rejected.match(result)) {
       Alert.alert('Erreur', 'Impossible de charger les réservations')
+      void analyticsService.track('Reservations Load Failed', 'Reservation', {
+        source,
+        reason: result.payload ?? result.error?.message ?? 'unknown',
+      })
     }
   }
 
   const onRefresh = async () => {
     setRefreshing(true)
-    await loadReservations()
+    await loadReservations('refresh')
+    void analyticsService.track('Reservations Refreshed', 'Reservation')
     setRefreshing(false)
+  }
+
+  const handleTabChange = (tab: 'active' | 'completed' | 'cancelled') => {
+    setActiveTab(tab)
+    void analyticsService.track('Reservations Tab Changed', 'Reservation', {
+      tab,
+    })
   }
 
   const handleCancelReservation = (reservation: Reservation) => {
@@ -86,8 +106,15 @@ const ReservationsScreen: React.FC<Props> = ({ navigation }) => {
                   'Annulation hors ligne',
                   'La demande sera synchronisée dès que la connexion sera de retour.'
                 )
+                void analyticsService.track('Reservation Cancel Queued', 'Reservation', {
+                  reservationCode: reservation.reservation_code,
+                  offline: true,
+                })
               } catch (error) {
                 Alert.alert('Erreur', 'Impossible de mettre en attente cette annulation.')
+                if (error instanceof Error) {
+                  void analyticsService.trackError(error, 'cancelReservationOffline')
+                }
               }
               return
             }
@@ -95,9 +122,16 @@ const ReservationsScreen: React.FC<Props> = ({ navigation }) => {
             try {
               await dispatch(cancelReservation(reservation.id))
               Alert.alert('Succès', 'Réservation annulée avec succès')
-              loadReservations()
+              void analyticsService.track('Reservation Cancelled', 'Reservation', {
+                reservationCode: reservation.reservation_code,
+                status: 'success',
+              })
+              await loadReservations('reload')
             } catch (error) {
               Alert.alert('Erreur', 'Impossible d\'annuler la réservation')
+              if (error instanceof Error) {
+                void analyticsService.trackError(error, 'cancelReservation')
+              }
             }
           }
         }
@@ -108,6 +142,10 @@ const ReservationsScreen: React.FC<Props> = ({ navigation }) => {
   const showQRCode = (reservation: Reservation) => {
     setSelectedReservation(reservation)
     setShowQRModal(true)
+    void analyticsService.track('Reservation QR Viewed', 'Reservation', {
+      reservationCode: reservation.reservation_code,
+      status: reservation.status,
+    })
   }
 
   const getStatusColor = (reservation: Reservation) => {
@@ -350,7 +388,7 @@ const ReservationsScreen: React.FC<Props> = ({ navigation }) => {
           <TouchableOpacity
             key={tab.key}
             style={[styles.tab, activeTab === tab.key && styles.activeTab]}
-            onPress={() => setActiveTab(tab.key as any)}
+            onPress={() => handleTabChange(tab.key as any)}
           >
             <Text style={[styles.tabText, activeTab === tab.key && styles.activeTabText]}>
               {tab.label}

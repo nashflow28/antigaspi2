@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\ProductController;
 use App\Http\Controllers\Api\ReservationController;
 use App\Http\Controllers\Api\PaymentController;
+use App\Http\Controllers\Api\AnalyticsController;
 use App\Http\Controllers\Api\AdminController;
 use App\Http\Controllers\Api\MerchantController;
 use App\Http\Controllers\Api\ReviewController;
@@ -43,6 +44,12 @@ Route::prefix('auth')->middleware('throttle:auth')->group(function () {
         Route::delete('sessions/{session_id}', [AuthController::class, 'revokeSession']);
         Route::post('revoke-all-sessions', [AuthController::class, 'revokeAllOtherSessions']);
     });
+});
+
+// Routes analytics
+Route::prefix('analytics')->middleware('jwt.auth')->group(function () {
+    Route::post('/events', [AnalyticsController::class, 'storeEvents']);
+    Route::get('/stats', [AnalyticsController::class, 'stats']);
 });
 
 // Routes des produits - Rate limiting pour la recherche
