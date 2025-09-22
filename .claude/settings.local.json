@@ -27,7 +27,15 @@
       "Bash(\"C:\\xampp\\mysql\\bin\\mysql.exe\" -u root -e \"SELECT id, name, quantity_available, is_active, expiration_date FROM products WHERE id = 3;\" antigaspi_db)",
       "Bash(\"C:\\xampp\\mysql\\bin\\mysql.exe\" -u root -e \"CREATE TABLE reviews (\n  id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,\n  user_id BIGINT UNSIGNED NOT NULL,\n  product_id BIGINT UNSIGNED NOT NULL,\n  reservation_id BIGINT UNSIGNED,\n  rating TINYINT UNSIGNED NOT NULL,\n  comment TEXT,\n  is_anonymous BOOLEAN DEFAULT FALSE,\n  is_verified BOOLEAN DEFAULT FALSE,\n  helpful_count INT DEFAULT 0,\n  created_at TIMESTAMP NULL DEFAULT NULL,\n  updated_at TIMESTAMP NULL DEFAULT NULL,\n  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,\n  FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE,\n  FOREIGN KEY (reservation_id) REFERENCES reservations(id) ON DELETE SET NULL\n);\" antigaspi_db)",
       "Bash(\"C:\\xampp\\mysql\\bin\\mysql.exe\":*)",
-      "Bash(timeout:*)"
+      "Bash(timeout:*)",
+      "Bash(npx create-expo-app:*)",
+      "Bash(npm install:*)",
+      "Bash(npx expo install:*)",
+      "Bash(npm run web:*)",
+      "Bash(curl:*)",
+      "Bash(php artisan serve:*)",
+      "Bash(git checkout:*)",
+      "Bash(git add:*)"
     ],
     "deny": [],
     "ask": []

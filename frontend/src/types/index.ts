@@ -26,7 +26,7 @@ export interface Merchant {
 export interface Category {
   id: number
   name: string
-  icon: string
+  description?: string
 }
 
 export interface Product {
@@ -187,4 +187,81 @@ export interface ProductFilters {
   max_expiry_days?: number
   page?: number
   per_page?: number
+}
+
+export interface PaginatedResponse<T> {
+  data: T[]
+  current_page: number
+  last_page: number
+  per_page: number
+  total: number
+  from: number
+  to: number
+}
+
+// Merchant-specific types
+export interface MerchantStats {
+  total_products: number
+  active_products: number
+  pending_reservations: number
+  completed_reservations: number
+  total_revenue: number
+  monthly_revenue: number
+  average_rating: number
+  total_reviews: number
+}
+
+export interface ProductCreateData {
+  name: string
+  description: string
+  original_price: number
+  discounted_price: number
+  quantity_available: number
+  expiration_date: string
+  category_id: number
+  image?: File
+  is_active?: boolean
+}
+
+export interface ProductUpdateData {
+  name?: string
+  description?: string
+  original_price?: number
+  discounted_price?: number
+  quantity_available?: number
+  expiration_date?: string
+  category_id?: number
+  image?: File
+  is_active?: boolean
+}
+
+export interface SurpriseBasket {
+  id: number
+  name: string
+  description: string
+  original_price: number
+  discounted_price: number
+  quantity_available: number
+  is_active: boolean
+  products: Product[]
+  created_at: string
+  updated_at: string
+}
+
+export interface SurpriseBasketCreateData {
+  name: string
+  description: string
+  original_price: number
+  discounted_price: number
+  quantity_available: number
+  product_ids: number[]
+  is_active?: boolean
+}
+
+export interface ReservationFilters {
+  status?: string
+  payment_status?: string
+  from_date?: string
+  to_date?: string
+  product_id?: number
 }

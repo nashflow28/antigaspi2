@@ -103,8 +103,47 @@ class ApiService {
     }, withAuth)
   }
 
+  async patch<T>(url: string, data?: any, withAuth = true): Promise<T> {
+    return this.request<T>(url, {
+      method: 'PATCH',
+      body: data ? JSON.stringify(data) : undefined
+    }, withAuth)
+  }
+
   async delete<T>(url: string, withAuth = true): Promise<T> {
     return this.request<T>(url, { method: 'DELETE' }, withAuth)
+  }
+
+  async postFormData<T>(url: string, formData: FormData, withAuth = true): Promise<T> {
+    const headers: HeadersInit = {
+      'Accept': 'application/json'
+    }
+
+    if (withAuth) {
+      const token = localStorage.getItem('auth_token')
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`
+      }
+    }
+
+    const response = await fetch(`${API_BASE_URL}${url}`, {
+      method: 'POST',
+      headers,
+      body: formData
+    })
+
+    if (!response.ok) {
+      const errorText = await response.text()
+      let errorData
+      try {
+        errorData = JSON.parse(errorText)
+      } catch {
+        errorData = { message: `HTTP ${response.status}: ${response.statusText}` }
+      }
+      throw { response: { data: errorData } }
+    }
+
+    return this.parseResponse<T>(response)
   }
 
   // Health check

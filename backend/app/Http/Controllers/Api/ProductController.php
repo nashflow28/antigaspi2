@@ -520,7 +520,7 @@ class ProductController extends Controller
     public function categories(): JsonResponse
     {
         try {
-            $categories = Category::active()->get(['id', 'name', 'description', 'icon']);
+            $categories = Category::active()->get(['id', 'name', 'description']);
 
             return response()->json([
                 'success' => true,

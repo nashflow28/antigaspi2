@@ -162,6 +162,12 @@ const router = createRouter({
       meta: { requiresAuth: true, roles: ['merchant'] }
     },
     {
+      path: '/merchant/surprise-baskets',
+      name: 'merchant-surprise-baskets',
+      component: () => import('@/views/merchant/SurpriseBasketsView.vue'),
+      meta: { requiresAuth: true, roles: ['merchant'] }
+    },
+    {
       path: '/merchant/loyalty',
       name: 'merchant-loyalty',
       component: () => import('@/views/merchant/LoyaltyManagement.vue'),
