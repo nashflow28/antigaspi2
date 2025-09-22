@@ -8,6 +8,7 @@ use App\Services\PushSubscriptionService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Validation\Rule;
 
 class NotificationController extends Controller
 {
@@ -81,6 +82,24 @@ class NotificationController extends Controller
         ]);
 
         $subscription = $this->pushService->subscribe($request->user(), $data);
+
+        return response()->json([
+            'success' => true,
+            'data' => $subscription,
+        ], 201);
+    }
+
+    public function register(Request $request): JsonResponse
+    {
+        $data = $request->validate([
+            'token' => ['required', 'string', 'max:255'],
+            'platform' => ['nullable', 'string', Rule::in(['android', 'ios', 'web', 'unknown'])],
+            'device_model' => ['nullable', 'string', 'max:255'],
+            'app_version' => ['nullable', 'string', 'max:50'],
+            'project_id' => ['nullable', 'string', 'max:255'],
+        ]);
+
+        $subscription = $this->pushService->registerExpoToken($request->user(), $data);
 
         return response()->json([
             'success' => true,

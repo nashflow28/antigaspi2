@@ -116,6 +116,28 @@ EXPO_PROJECT_ID=your_expo_project_id
 APPLE_TEAM_ID=your_apple_team_id
 ```
 
+## 🔔 Notifications Push Expo
+
+### Obtenir les clés nécessaires
+1. **Associer le projet Expo** : `npx expo login` puis `npx eas init` dans le dossier `mobile/` pour créer le projet côté Expo.
+2. **Identifier le projectId** : `npx expo config --json | jq -r '.extra.eas.projectId'` puis reporter l'identifiant dans `app.json` ou `eas.json` si besoin.
+3. **Créer un access token serveur** : sur [expo.dev/settings/access-tokens](https://expo.dev/accounts), générez un token avec la permission `push_notification:server` et ajoutez-le dans `backend/.env` (`EXPO_ACCESS_TOKEN=...`).
+4. **Synchroniser le backend** : `php artisan migrate` pour mettre à jour `push_subscriptions`, puis redémarrez la queue/worker afin de prendre en compte la nouvelle configuration.
+
+### Vérification sur appareil physique
+1. Lancez le backend (`php artisan serve`) ainsi que les workers (`php artisan queue:listen`).
+2. Sur l'appareil, installez Expo Go ou un build de développement (`npx expo run:android --device`).
+3. Connectez-vous dans l'application, acceptez les permissions et vérifiez dans les logs backend que le token Expo est bien enregistré.
+4. Dans un shell `php artisan tinker`, exécutez :
+   ```php
+   app(\App\Services\PushSubscriptionService::class)
+       ->send(App\Models\User::first(), [
+           'title' => 'Test production',
+           'body' => 'Notification Expo envoyée depuis le backend',
+       ]);
+   ```
+5. Vérifiez la réception de la notification et ajustez les canaux (Android) ou les réglages de badges si nécessaire.
+
 ## 📤 Publication sur les Stores
 
 ### App Store Connect (iOS)

@@ -149,6 +149,7 @@ Route::prefix('notifications')->middleware('jwt.auth')->group(function () {
     Route::get('/', [NotificationController::class, 'index']);
     Route::post('/{notification}/read', [NotificationController::class, 'markAsRead'])->whereNumber('notification');
     Route::post('/read-all', [NotificationController::class, 'markAllAsRead']);
+    Route::post('/register', [NotificationController::class, 'register']);
     Route::post('/subscriptions', [NotificationController::class, 'subscribe']);
     Route::delete('/subscriptions', [NotificationController::class, 'unsubscribe']);
     Route::patch('/preferences', [NotificationController::class, 'updatePreferences']);
