@@ -176,6 +176,23 @@ mobile/src/
     └── index.ts                  # Types TypeScript
 ```
 
+### 📴 Mode hors ligne & synchronisation
+
+- ✅ Surveillance globale de la connectivité via `NetInfo` et diffusion Redux (`connectivitySlice`).
+- ✅ Mise en cache des listes (produits, catégories, réservations) via `offlineService.getCache` avant chaque appel réseau.
+- ✅ Persistance automatique des réponses API réussies dans `AsyncStorage` (`setCache`).
+- ✅ File d'attente locale pour les créations/annulations de réservations (`offlineService.queueSyncAction`).
+- ✅ Traitement automatique de la file quand la connexion revient (`processSyncQueue`) + rafraîchissement des réservations.
+- ✅ Bannière d'état en haut de l'écran : mode hors ligne, progression de synchronisation, erreurs éventuelles.
+
+#### Limitations connues (développeurs/testeurs)
+
+- La synchronisation différée couvre uniquement les créations et annulations de réservations pour l'instant.
+- Les actions en file d'attente sont rejouées en appelant l'API HTTP correspondante ; l'API doit rester accessible via `apiService`.
+- Tant qu'une réservation est marquée *« synchronisation en attente »*, elle apparaît en haut de la liste (badge bleu/orange).
+- Aucune résolution de conflit n'est effectuée : en cas d'erreur serveur pendant la resynchronisation, un message persiste dans la bannière.
+- Pour forcer un rafraîchissement après un test, repasser en ligne puis ouvrir l'écran « Mes réservations » ou laisser l'application traiter la file (bannière = vert/bleu).
+
 ### 📈 Métriques Phase 2
 
 - **Temps de développement**: 2 heures (Phase 1 + Phase 2)

@@ -15,7 +15,10 @@ import {
 import { useDispatch, useSelector } from 'react-redux'
 import { AppDispatch, RootState } from '../../store'
 import { fetchProduct } from '../../store/slices/productsSlice'
-import { createReservation } from '../../store/slices/reservationsSlice'
+import {
+  addOfflineReservation,
+  createReservation,
+} from '../../store/slices/reservationsSlice'
 import { Ionicons } from '@expo/vector-icons'
 import { Image } from 'expo-image'
 import * as Location from 'expo-location'
@@ -25,9 +28,11 @@ import {
   PaymentMethod,
   MobileMoneyProvider,
   ReservationCreationResponse,
-  Payment
+  Payment,
+  Reservation,
 } from '../../types'
 import paymentService from '../../services/paymentService'
+import offlineService from '../../services/offlineService'
 
 interface Props {
   route: any
@@ -42,6 +47,7 @@ const ProductDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
   const { products, loading } = useSelector((state: RootState) => state.products)
   const { user } = useSelector((state: RootState) => state.auth)
   const { loading: reservationLoading } = useSelector((state: RootState) => state.reservations)
+  const { isOnline } = useSelector((state: RootState) => state.connectivity)
 
   const [product, setProduct] = useState<Product | null>(null)
   const [showReservationModal, setShowReservationModal] = useState(false)
@@ -253,6 +259,65 @@ const ProductDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
       customerPhone: isMobileMoneyMethod(selectedPaymentMethod) ? customerPhone : user.phone,
       customerEmail: user.email,
       walletPin: selectedPaymentMethod === 'wallet' ? walletPin : undefined,
+    }
+
+    if (!isOnline) {
+      try {
+        await offlineService.queueSyncAction('create', '/reservations', {
+          action: 'createReservation',
+          payload: reservationData,
+        })
+
+        const now = Date.now()
+        const tempReservation: Reservation = {
+          id: -now,
+          reservation_code: `TMP-${now}`,
+          quantity,
+          original_price: parseFloat(product.original_price),
+          discounted_price: parseFloat(product.discounted_price),
+          total_amount: totalAmount,
+          status: 'pending',
+          payment_status: 'pending',
+          notes,
+          pickup_date: reservationData.pickupDate || undefined,
+          pickup_time: reservationData.pickupTime || undefined,
+          created_at: new Date().toISOString(),
+          product: {
+            id: product.id,
+            name: product.name,
+            description: product.description,
+            image_url: product.image_url,
+            merchant: {
+              id: product.merchant.id,
+              name: product.merchant.business_name,
+              business_type: product.merchant.business_type,
+              address: product.merchant.address,
+              city: product.merchant.city,
+              phone: product.merchant.phone,
+            },
+            category: product.category,
+          },
+          consumer: user || undefined,
+          pendingSync: true,
+          pendingAction: 'create',
+        }
+
+        dispatch(addOfflineReservation(tempReservation))
+        setShowReservationModal(false)
+        setQuantity(1)
+        setNotes('')
+        setWalletPin('')
+        setSelectedPaymentMethod('on_site')
+        setCustomerPhone(user?.phone ?? '')
+
+        Alert.alert(
+          'Réservation enregistrée hors ligne',
+          'Nous enverrons votre demande dès que la connexion sera rétablie.'
+        )
+      } catch (error) {
+        Alert.alert('Erreur', 'Impossible de préparer la synchronisation hors ligne.')
+      }
+      return
     }
 
     try {

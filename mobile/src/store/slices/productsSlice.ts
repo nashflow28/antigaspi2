@@ -1,6 +1,7 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit'
-import { ProductsState, Product, Category, ProductFilters, ApiResponse } from '../../types'
+import { ProductsState, Product, Category, ProductFilters } from '../../types'
 import apiService from '../../services/api'
+import offlineService from '../../services/offlineService'
 
 const initialState: ProductsState = {
   products: [],
@@ -14,10 +15,23 @@ const initialState: ProductsState = {
 export const fetchProducts = createAsyncThunk(
   'products/fetchProducts',
   async (filters?: ProductFilters, { rejectWithValue }) => {
+    const hasFilters = filters && Object.keys(filters).length > 0
+    const cacheKey = hasFilters ? `products_${JSON.stringify(filters)}` : 'products'
+    const cachedProducts = await offlineService.getCache<Product[]>(cacheKey)
+    const isOnline = offlineService.getConnectivityStatus()
+
+    if (!isOnline && cachedProducts) {
+      return cachedProducts
+    }
+
     try {
       const response = await apiService.getProducts(filters)
+      await offlineService.setCache(cacheKey, response.data)
       return response.data
     } catch (error: any) {
+      if (cachedProducts) {
+        return cachedProducts
+      }
       return rejectWithValue(error.message)
     }
   }
@@ -26,10 +40,22 @@ export const fetchProducts = createAsyncThunk(
 export const fetchProduct = createAsyncThunk(
   'products/fetchProduct',
   async (id: number, { rejectWithValue }) => {
+    const cacheKey = `product_${id}`
+    const cachedProduct = await offlineService.getCache<Product>(cacheKey)
+    const isOnline = offlineService.getConnectivityStatus()
+
+    if (!isOnline && cachedProduct) {
+      return cachedProduct
+    }
+
     try {
       const response = await apiService.getProduct(id)
+      await offlineService.setCache(cacheKey, response.data)
       return response.data
     } catch (error: any) {
+      if (cachedProduct) {
+        return cachedProduct
+      }
       return rejectWithValue(error.message)
     }
   }
@@ -38,10 +64,22 @@ export const fetchProduct = createAsyncThunk(
 export const fetchCategories = createAsyncThunk(
   'products/fetchCategories',
   async (_, { rejectWithValue }) => {
+    const cacheKey = 'categories'
+    const cachedCategories = await offlineService.getCache<Category[]>(cacheKey)
+    const isOnline = offlineService.getConnectivityStatus()
+
+    if (!isOnline && cachedCategories) {
+      return cachedCategories
+    }
+
     try {
       const response = await apiService.getCategories()
+      await offlineService.setCache(cacheKey, response.data)
       return response.data
     } catch (error: any) {
+      if (cachedCategories) {
+        return cachedCategories
+      }
       return rejectWithValue(error.message)
     }
   }
