@@ -394,15 +394,15 @@ class WalletController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'amount' => 'required|numeric|min:100|max:1000000',
-            'payment_method' => 'required|in:flooz,tmoney,paystack',
-            'phone' => 'required_if:payment_method,flooz,tmoney|string',
+            'payment_method' => 'required|in:flooz,tmoney,orange_money,mtn_momo,paystack',
+            'phone' => 'required_if:payment_method,flooz,tmoney,orange_money,mtn_momo|string',
         ], [
             'amount.required' => 'Le montant est requis',
             'amount.min' => 'Le montant minimum de recharge est de 100 XOF',
             'amount.max' => 'Le montant maximum de recharge est de 1 000 000 XOF',
             'payment_method.required' => 'La méthode de paiement est requise',
             'payment_method.in' => 'Méthode de paiement non supportée',
-            'phone.required_if' => 'Le numéro de téléphone est requis pour Flooz et T-Money',
+            'phone.required_if' => 'Le numéro de téléphone est requis pour les recharges Mobile Money',
         ]);
 
         if ($validator->fails()) {

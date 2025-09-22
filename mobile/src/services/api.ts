@@ -11,7 +11,10 @@ import {
   Reservation,
   ReservationCreationPayload,
   ReservationCreationResponse,
-  User
+  User,
+  Payment,
+  PaymentInitiationResponse,
+  MobileMoneyPaymentPayload
 } from '../types'
 
 class ApiService {
@@ -150,6 +153,22 @@ class ApiService {
 
   async createReservation(payload: ReservationCreationPayload): Promise<ReservationCreationResponse> {
     return this.request<ReservationCreationResponse>('POST', '/reservations', payload)
+  }
+
+  async initiateMobileMoneyPayment(payload: MobileMoneyPaymentPayload): Promise<PaymentInitiationResponse> {
+    return this.request<PaymentInitiationResponse>('POST', '/payments/mobile-money', {
+      reservation_id: payload.reservationId,
+      provider: payload.provider,
+      customer_phone: payload.customerPhone,
+      customer_email: payload.customerEmail,
+      currency: payload.currency,
+      notes: payload.notes,
+      reference: payload.reference,
+    })
+  }
+
+  async getPayment(paymentId: number): Promise<ApiResponse<Payment>> {
+    return this.request<ApiResponse<Payment>>('GET', `/payments/${paymentId}`)
   }
 
   async getMyReservations(): Promise<ApiResponse<Reservation[]>> {

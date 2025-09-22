@@ -49,7 +49,13 @@ export interface Product {
   is_active?: boolean
 }
 
-export type PaymentMethod = 'flooz' | 'tmoney' | 'paystack' | 'on_site' | 'wallet'
+export type MobileMoneyProvider = 'flooz' | 'tmoney' | 'orange_money' | 'mtn_momo'
+
+export type PaymentMethod =
+  | MobileMoneyProvider
+  | 'paystack'
+  | 'on_site'
+  | 'wallet'
 
 export type PaymentStatus = 'pending' | 'success' | 'failed' | 'on_site' | 'refunded'
 
@@ -69,6 +75,29 @@ export interface Payment {
   paid_at?: string | null
   created_at: string
   updated_at: string
+}
+
+export interface ReservationCreationResponse {
+  success: boolean
+  message?: string
+  data: Reservation
+  payment?: Payment | null
+}
+
+export interface MobileMoneyPaymentPayload {
+  reservationId: number
+  provider: MobileMoneyProvider
+  customerPhone: string
+  customerEmail?: string
+  currency?: string
+  notes?: string | null
+  reference?: string | null
+}
+
+export interface PaymentInitiationResponse {
+  success: boolean
+  message?: string
+  data?: Payment | null
 }
 
 export interface Reservation {

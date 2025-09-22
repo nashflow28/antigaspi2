@@ -11,6 +11,8 @@ return [
         'services' => [
             'flooz' => env('PAYGATE_SERVICE_FLOOZ', 'FLOOZ'),
             'tmoney' => env('PAYGATE_SERVICE_TMONEY', 'TMONEY'),
+            'orange_money' => env('PAYGATE_SERVICE_ORANGE_MONEY', 'ORANGE_MONEY'),
+            'mtn_momo' => env('PAYGATE_SERVICE_MTN_MOMO', 'MTN_MOMO'),
         ],
     ],
 

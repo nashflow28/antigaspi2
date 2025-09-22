@@ -52,6 +52,39 @@ class PaymentController extends Controller
         ], 201);
     }
 
+    public function initiateMobileMoney(Request $request): JsonResponse
+    {
+        $user = JWTAuth::parseToken()->authenticate();
+
+        $validated = $request->validate([
+            'reservation_id' => ['required', 'integer', 'exists:reservations,id'],
+            'provider' => ['required', 'string', Rule::in(['flooz', 'tmoney', 'orange_money', 'mtn_momo'])],
+            'customer_phone' => ['required', 'string', 'regex:/^\+?[0-9]{8,15}$/'],
+            'customer_email' => ['nullable', 'email'],
+            'currency' => ['nullable', 'string', 'size:3'],
+            'notes' => ['nullable', 'string', 'max:500'],
+            'reference' => ['nullable', 'string', 'max:100'],
+        ]);
+
+        $reservation = Reservation::where('user_id', $user->id)->findOrFail($validated['reservation_id']);
+
+        $method = $this->resolveMobileMoneyMethod($validated['provider']);
+
+        $payment = $this->payments->initializePayment($reservation, $method, [
+            'customer_phone' => $validated['customer_phone'],
+            'customer_email' => $validated['customer_email'] ?? null,
+            'currency' => $validated['currency'] ?? config('payments.currency', 'XOF'),
+            'notes' => $validated['notes'] ?? null,
+            'reference' => $validated['reference'] ?? null,
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Paiement Mobile Money initialisé avec succès.',
+            'data' => new PaymentResource($payment),
+        ], 201);
+    }
+
     public function status(Payment $payment): JsonResponse
     {
         $user = JWTAuth::parseToken()->authenticate();
@@ -105,5 +138,16 @@ class PaymentController extends Controller
             'success' => (bool) $payment,
             'data' => $payment ? new PaymentResource($payment) : null,
         ]);
+    }
+
+    private function resolveMobileMoneyMethod(string $provider): PaymentMethod
+    {
+        return match ($provider) {
+            'flooz' => PaymentMethod::FLOOZ,
+            'tmoney' => PaymentMethod::TMONEY,
+            'orange_money' => PaymentMethod::ORANGE_MONEY,
+            'mtn_momo' => PaymentMethod::MTN_MOMO,
+            default => throw new \InvalidArgumentException("Unsupported mobile money provider [{$provider}]."),
+        };
     }
 }

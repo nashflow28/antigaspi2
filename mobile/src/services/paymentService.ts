@@ -3,8 +3,14 @@
  * Supporte Flooz (Moov) et T-Money (Togocom)
  */
 
-import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { apiService } from './api';
+import {
+  MobileMoneyProvider,
+  MobileMoneyPaymentPayload,
+  PaymentInitiationResponse,
+  Payment
+} from '../types';
 
 export interface PaymentProvider {
   id: string;
@@ -18,21 +24,12 @@ export interface PaymentProvider {
   supportedCountries: string[];
 }
 
-export interface PaymentRequest {
+export interface MobileMoneyInitiationRequest extends MobileMoneyPaymentPayload {
   amount: number;
-  currency: string;
-  phone: string;
-  provider: 'flooz' | 'tmoney' | 'orange_money' | 'mtn_momo';
-  reference: string;
   description?: string;
 }
 
-export interface PaymentResponse {
-  success: boolean;
-  transactionId?: string;
-  reference?: string;
-  status: 'pending' | 'processing' | 'success' | 'failed';
-  message?: string;
+export interface MobileMoneyInitiationResult extends PaymentInitiationResponse {
   ussdString?: string;
 }
 
@@ -48,7 +45,6 @@ export interface TransactionHistory {
 }
 
 class PaymentService {
-  private baseURL: string;
   private providers: PaymentProvider[] = [
     {
       id: 'flooz',
@@ -96,10 +92,6 @@ class PaymentService {
     }
   ];
 
-  constructor() {
-    this.baseURL = 'http://localhost:8000/api';
-  }
-
   /**
    * Obtenir les providers disponibles
    */
@@ -112,13 +104,16 @@ class PaymentService {
     return this.providers;
   }
 
+  getProviderById(providerId: MobileMoneyProvider): PaymentProvider | undefined {
+    return this.providers.find(provider => provider.id === providerId);
+  }
+
   /**
    * Initier un paiement Mobile Money
    */
-  async initiatePayment(request: PaymentRequest): Promise<PaymentResponse> {
+  async initiateMobileMoneyPayment(request: MobileMoneyInitiationRequest): Promise<MobileMoneyInitiationResult> {
     try {
-      // Validation locale
-      if (!this.validatePhoneNumber(request.phone, request.provider)) {
+      if (!this.validatePhoneNumber(request.customerPhone, request.provider)) {
         throw new Error('Numéro de téléphone invalide pour ce provider');
       }
 
@@ -126,45 +121,46 @@ class PaymentService {
         throw new Error('Le montant minimum est de 100 XOF');
       }
 
-      // Appel API backend
-      const response = await axios.post(`${this.baseURL}/payments/mobile-money`, {
-        amount: request.amount,
-        currency: request.currency || 'XOF',
-        phone: request.phone,
+      const response = await apiService.initiateMobileMoneyPayment({
+        reservationId: request.reservationId,
         provider: request.provider,
-        reference: request.reference,
-        description: request.description
+        customerPhone: request.customerPhone,
+        customerEmail: request.customerEmail,
+        currency: request.currency,
+        notes: request.notes,
+        reference: request.reference
       });
 
-      // Sauvegarder dans l'historique local
-      await this.saveToHistory({
-        id: response.data.transactionId,
-        amount: request.amount,
-        currency: request.currency || 'XOF',
-        provider: request.provider,
-        status: response.data.status,
-        date: new Date(),
-        reference: request.reference,
-        description: request.description
-      });
+      const payment = response.data;
+      const reference = payment?.reference || request.reference || '';
 
-      // Générer le string USSD si nécessaire
-      const ussdString = this.generateUSSDString(request);
+      if (payment) {
+        await this.saveToHistory({
+          id: payment.id.toString(),
+          amount: payment.amount,
+          currency: payment.currency,
+          provider: request.provider,
+          status: payment.status,
+          date: new Date(),
+          reference,
+          description: request.description
+        });
+      }
+
+      const ussdString = payment
+        ? this.generateUSSDString(request.provider, reference, payment.amount)
+        : undefined;
 
       return {
-        success: true,
-        transactionId: response.data.transactionId,
-        reference: response.data.reference,
-        status: response.data.status,
-        message: response.data.message,
+        ...response,
         ussdString
       };
     } catch (error: any) {
       console.error('Payment initiation error:', error);
       return {
         success: false,
-        status: 'failed',
-        message: error.response?.data?.message || error.message || 'Erreur lors du paiement'
+        message: error?.message || 'Erreur lors du paiement',
+        data: null,
       };
     }
   }
@@ -172,22 +168,18 @@ class PaymentService {
   /**
    * Vérifier le statut d'un paiement
    */
-  async checkPaymentStatus(transactionId: string): Promise<PaymentResponse> {
+  async checkPaymentStatus(paymentId: number): Promise<{ success: boolean; payment?: Payment; message?: string }> {
     try {
-      const response = await axios.get(`${this.baseURL}/payments/status/${transactionId}`);
-
+      const response = await apiService.getPayment(paymentId);
       return {
-        success: response.data.success,
-        transactionId: response.data.transactionId,
-        reference: response.data.reference,
-        status: response.data.status,
-        message: response.data.message
+        success: response.success,
+        payment: response.data,
+        message: response.message
       };
     } catch (error: any) {
       return {
         success: false,
-        status: 'failed',
-        message: error.response?.data?.message || 'Erreur lors de la vérification'
+        message: error?.message || 'Erreur lors de la vérification'
       };
     }
   }
@@ -195,7 +187,7 @@ class PaymentService {
   /**
    * Simuler un paiement (pour les tests)
    */
-  async simulatePayment(request: PaymentRequest): Promise<PaymentResponse> {
+  async simulatePayment(request: MobileMoneyInitiationRequest): Promise<MobileMoneyInitiationResult> {
     return new Promise((resolve) => {
       // Simuler un délai de traitement
       setTimeout(() => {
@@ -203,13 +195,31 @@ class PaymentService {
 
         resolve({
           success,
-          transactionId: `SIM-${Date.now()}`,
-          reference: request.reference,
-          status: success ? 'success' : 'failed',
           message: success
             ? 'Paiement simulé avec succès'
             : 'Échec du paiement simulé',
-          ussdString: this.generateUSSDString(request)
+          data: {
+            id: Date.now(),
+            reservation_id: request.reservationId,
+            amount: request.amount,
+            currency: request.currency || 'XOF',
+            payment_method: request.provider,
+            status: success ? 'success' : 'failed',
+            provider: request.provider,
+            checkout_url: null,
+            customer_phone: request.customerPhone,
+            reference: request.reference,
+            transaction_id: `SIM-${Date.now()}`,
+            payload: null,
+            paid_at: success ? new Date().toISOString() : null,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+          } as Payment,
+          ussdString: this.generateUSSDString(
+            request.provider,
+            request.reference || '',
+            request.amount
+          ),
         });
       }, 2000);
     });
@@ -218,8 +228,8 @@ class PaymentService {
   /**
    * Valider un numéro de téléphone selon le provider
    */
-  private validatePhoneNumber(phone: string, provider: string): boolean {
-    const patterns: Record<string, RegExp> = {
+  validatePhoneNumber(phone: string, provider: MobileMoneyProvider): boolean {
+    const patterns: Record<MobileMoneyProvider, RegExp> = {
       flooz: /^(228)?[79]\d{7}$/,     // Togo: 7XXXXXXX ou 9XXXXXXX
       tmoney: /^(228)?[79]\d{7}$/,    // Togo: 7XXXXXXX ou 9XXXXXXX
       orange_money: /^(225|221|223|226|224)?[0-9]{8,10}$/,
@@ -233,20 +243,20 @@ class PaymentService {
   /**
    * Générer le string USSD pour paiement manuel
    */
-  private generateUSSDString(request: PaymentRequest): string {
-    const provider = this.providers.find(p => p.id === request.provider);
+  generateUSSDString(providerId: MobileMoneyProvider, reference: string, amount: number): string {
+    const provider = this.providers.find(p => p.id === providerId);
     if (!provider) return '';
 
     // Format spécifique selon le provider
-    switch (request.provider) {
+    switch (providerId) {
       case 'flooz':
-        return `${provider.ussdCode} > Payer > Marchand > ${request.reference} > ${request.amount}`;
+        return `${provider.ussdCode} > Payer > Marchand > ${reference} > ${amount}`;
       case 'tmoney':
-        return `${provider.ussdCode} > Transfert > ${request.reference} > ${request.amount}`;
+        return `${provider.ussdCode} > Transfert > ${reference} > ${amount}`;
       case 'orange_money':
-        return `${provider.ussdCode} > Transfert d'argent > ${request.reference} > ${request.amount}`;
+        return `${provider.ussdCode} > Transfert d'argent > ${reference} > ${amount}`;
       case 'mtn_momo':
-        return `${provider.ussdCode} > Send Money > ${request.reference} > ${request.amount}`;
+        return `${provider.ussdCode} > Send Money > ${reference} > ${amount}`;
       default:
         return provider.ussdCode;
     }
@@ -262,6 +272,23 @@ class PaymentService {
     } catch (error) {
       console.error('Error getting transaction history:', error);
       return [];
+    }
+  }
+
+  async recordPayment(payment: Payment, provider: MobileMoneyProvider, description?: string): Promise<void> {
+    try {
+      await this.saveToHistory({
+        id: payment.id.toString(),
+        amount: payment.amount,
+        currency: payment.currency,
+        provider,
+        status: payment.status,
+        date: payment.created_at ? new Date(payment.created_at) : new Date(),
+        reference: payment.reference || '',
+        description,
+      });
+    } catch (error) {
+      console.error('Error recording payment history:', error);
     }
   }
 
@@ -294,8 +321,8 @@ class PaymentService {
   /**
    * Obtenir les frais de transaction
    */
-  calculateFees(amount: number, provider: string): number {
-    const feeRates: Record<string, number> = {
+  calculateFees(amount: number, provider: MobileMoneyProvider): number {
+    const feeRates: Record<MobileMoneyProvider, number> = {
       flooz: 0.015,      // 1.5%
       tmoney: 0.015,     // 1.5%
       orange_money: 0.02, // 2%

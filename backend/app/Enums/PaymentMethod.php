@@ -7,13 +7,15 @@ enum PaymentMethod: string
     case FLOOZ = 'flooz';
     case TMONEY = 'tmoney';
     case PAYSTACK = 'paystack';
+    case ORANGE_MONEY = 'orange_money';
+    case MTN_MOMO = 'mtn_momo';
     case ON_SITE = 'on_site';
     case WALLET = 'wallet';
 
     public function provider(): string
     {
         return match ($this) {
-            self::FLOOZ, self::TMONEY => 'paygate',
+            self::FLOOZ, self::TMONEY, self::ORANGE_MONEY, self::MTN_MOMO => 'paygate',
             self::PAYSTACK => 'paystack',
             self::ON_SITE => 'manual',
             self::WALLET => 'wallet',
@@ -22,7 +24,7 @@ enum PaymentMethod: string
 
     public function requiresPhone(): bool
     {
-        return in_array($this, [self::FLOOZ, self::TMONEY], true);
+        return in_array($this, [self::FLOOZ, self::TMONEY, self::ORANGE_MONEY, self::MTN_MOMO], true);
     }
 
     public function isWallet(): bool
@@ -37,7 +39,7 @@ enum PaymentMethod: string
 
     public function requiresExternalProvider(): bool
     {
-        return in_array($this, [self::FLOOZ, self::TMONEY, self::PAYSTACK], true);
+        return in_array($this, [self::FLOOZ, self::TMONEY, self::ORANGE_MONEY, self::MTN_MOMO, self::PAYSTACK], true);
     }
 
     public static function values(): array
@@ -47,6 +49,6 @@ enum PaymentMethod: string
 
     public static function getRechargeableMethods(): array
     {
-        return [self::FLOOZ, self::TMONEY, self::PAYSTACK];
+        return [self::FLOOZ, self::TMONEY, self::ORANGE_MONEY, self::MTN_MOMO, self::PAYSTACK];
     }
 }

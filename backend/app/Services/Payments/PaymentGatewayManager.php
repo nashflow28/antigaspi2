@@ -19,7 +19,10 @@ class PaymentGatewayManager
     public function forMethod(PaymentMethod $method): PaymentGateway
     {
         return match ($method) {
-            PaymentMethod::FLOOZ, PaymentMethod::TMONEY => new PayGateGateway($this->config['paygate'] ?? []),
+            PaymentMethod::FLOOZ,
+            PaymentMethod::TMONEY,
+            PaymentMethod::ORANGE_MONEY,
+            PaymentMethod::MTN_MOMO => new PayGateGateway($this->config['paygate'] ?? []),
             PaymentMethod::PAYSTACK => new PaystackGateway($this->config['paystack'] ?? []),
             PaymentMethod::ON_SITE => new OnSiteGateway(),
             PaymentMethod::WALLET => $this->walletGateway(),
