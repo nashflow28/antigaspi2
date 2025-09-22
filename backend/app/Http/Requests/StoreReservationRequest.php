@@ -64,7 +64,12 @@ class StoreReservationRequest extends FormRequest
                 'regex:/^\+?[0-9]{8,15}$/',
                 Rule::requiredIf(function () {
                     $method = $this->input('payment_method');
-                    return in_array($method, [PaymentMethod::FLOOZ->value, PaymentMethod::TMONEY->value], true);
+                    return in_array($method, [
+                        PaymentMethod::FLOOZ->value,
+                        PaymentMethod::TMONEY->value,
+                        PaymentMethod::ORANGE_MONEY->value,
+                        PaymentMethod::MTN_MOMO->value,
+                    ], true);
                 }),
             ],
             'customer_email' => ['nullable', 'email'],
@@ -102,7 +107,7 @@ class StoreReservationRequest extends FormRequest
             'quantity.min' => 'La quantité minimum est 1.',
             'payment_method.required' => 'Veuillez sélectionner un moyen de paiement.',
             'payment_method.enum' => 'Le moyen de paiement choisi est invalide.',
-            'customer_phone.required' => 'Le numéro de téléphone est requis pour Flooz ou Tmoney.',
+            'customer_phone.required' => 'Le numéro de téléphone est requis pour les paiements Mobile Money.',
             'customer_phone.regex' => 'Le numéro de téléphone doit contenir entre 8 et 15 chiffres et peut commencer par +.',
             'customer_email.email' => 'L\'adresse email du client est invalide.',
             'notes.max' => 'Les notes ne peuvent pas dépasser 500 caractères.',

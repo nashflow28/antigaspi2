@@ -161,6 +161,8 @@ class PayGateGateway implements PaymentGateway
         return match ($method) {
             PaymentMethod::FLOOZ => $this->config['services']['flooz'] ?? 'FLOOZ',
             PaymentMethod::TMONEY => $this->config['services']['tmoney'] ?? 'TMONEY',
+            PaymentMethod::ORANGE_MONEY => $this->config['services']['orange_money'] ?? 'ORANGE_MONEY',
+            PaymentMethod::MTN_MOMO => $this->config['services']['mtn_momo'] ?? 'MTN_MOMO',
             default => 'MOBILE',
         };
     }

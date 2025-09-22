@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import {
   View,
   Text,
@@ -19,7 +19,15 @@ import { createReservation } from '../../store/slices/reservationsSlice'
 import { Ionicons } from '@expo/vector-icons'
 import { Image } from 'expo-image'
 import * as Location from 'expo-location'
-import { Product, ReservationCreationPayload } from '../../types'
+import {
+  Product,
+  ReservationCreationPayload,
+  PaymentMethod,
+  MobileMoneyProvider,
+  ReservationCreationResponse,
+  Payment
+} from '../../types'
+import paymentService from '../../services/paymentService'
 
 interface Props {
   route: any
@@ -39,13 +47,58 @@ const ProductDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
   const [showReservationModal, setShowReservationModal] = useState(false)
   const [quantity, setQuantity] = useState(1)
   const [notes, setNotes] = useState('')
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<PaymentMethod>('on_site')
+  const [customerPhone, setCustomerPhone] = useState(user?.phone ?? '')
+  const [walletPin, setWalletPin] = useState('')
   const [userLocation, setUserLocation] = useState<any>(null)
   const [distance, setDistance] = useState<number | null>(null)
+
+  const mobileProviders = useMemo(() => paymentService.getAvailableProviders(), [])
+
+  const paymentOptions = useMemo(
+    () => [
+      {
+        id: 'on_site' as PaymentMethod,
+        label: 'Paiement sur place',
+        icon: <Ionicons name="storefront" size={18} color="#10B981" />,
+      },
+      {
+        id: 'wallet' as PaymentMethod,
+        label: 'Mon portefeuille',
+        icon: <Ionicons name="wallet" size={18} color="#10B981" />,
+      },
+      ...mobileProviders.map(provider => ({
+        id: provider.id as PaymentMethod,
+        label: provider.name,
+        icon: <Text style={styles.paymentEmoji}>{provider.logo}</Text>,
+      })),
+    ],
+    [mobileProviders]
+  )
+
+  const isMobileMoneyMethod = (method: PaymentMethod): method is MobileMoneyProvider =>
+    ['flooz', 'tmoney', 'orange_money', 'mtn_momo'].includes(method)
+
+  const selectedMobileProvider = isMobileMoneyMethod(selectedPaymentMethod)
+    ? paymentService.getProviderById(selectedPaymentMethod)
+    : undefined
 
   useEffect(() => {
     loadProduct()
     getUserLocation()
   }, [productId])
+
+  const handleSelectPaymentMethod = (method: PaymentMethod) => {
+    setSelectedPaymentMethod(method)
+
+    if (!isMobileMoneyMethod(method)) {
+      setCustomerPhone(user?.phone ?? '')
+    }
+
+    if (method !== 'wallet') {
+      setWalletPin('')
+    }
+  }
 
   const loadProduct = async () => {
     // Chercher d'abord dans le store
@@ -80,6 +133,92 @@ const ProductDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
     }
   }
 
+  const handlePaymentFeedback = async (
+    payment: Payment | null | undefined,
+    method: PaymentMethod,
+    response: ReservationCreationResponse
+  ) => {
+    if (!product) {
+      return
+    }
+
+    const amountBase = discountedUnitPrice
+    const fallbackReference = response.data?.reservation_code || ''
+
+    if (isMobileMoneyMethod(method)) {
+      const provider = paymentService.getProviderById(method)
+      if (payment) {
+        await paymentService.recordPayment(payment, method, `Réservation ${response.data.reservation_code}`)
+      }
+
+      const status = payment?.status ?? 'pending'
+      const reference = payment?.reference || fallbackReference
+      const amount = payment?.amount ?? amountBase * quantity
+      const ussd = paymentService.generateUSSDString(method, reference, amount)
+
+      let message = ''
+      switch (status) {
+        case 'success':
+          message = 'Votre paiement a été confirmé. Merci pour votre réservation !'
+          break
+        case 'failed':
+          message = 'Le paiement a été refusé. Vous pouvez réessayer depuis vos réservations.'
+          break
+        default:
+          message = 'Votre paiement est en cours de traitement. Vous recevrez une confirmation dès validation.'
+          break
+      }
+
+      const instructions = status === 'pending' && ussd
+        ? `\n\nVous pouvez composer ${ussd} pour finaliser l\'opération.`
+        : ''
+
+      Alert.alert(
+        provider?.name ?? 'Paiement Mobile Money',
+        `${message}${instructions}`,
+        [
+          {
+            text: 'Voir mes réservations',
+            onPress: () => navigation.navigate('Reservations')
+          },
+          { text: 'OK' }
+        ]
+      )
+
+      return
+    }
+
+    if (method === 'wallet') {
+      Alert.alert(
+        payment?.status === 'success' ? 'Paiement wallet validé' : 'Réservation enregistrée',
+        payment?.status === 'success'
+          ? 'Le montant a été débité de votre portefeuille.'
+          : 'Votre réservation est enregistrée. Le paiement sera finalisé depuis votre portefeuille.',
+        [
+          {
+            text: 'Voir mes réservations',
+            onPress: () => navigation.navigate('Reservations')
+          },
+          { text: 'OK' }
+        ]
+      )
+
+      return
+    }
+
+    Alert.alert(
+      'Réservation créée !',
+      `Votre réservation ${response.data.reservation_code} a été créée avec succès.`,
+      [
+        {
+          text: 'Voir mes réservations',
+          onPress: () => navigation.navigate('Reservations')
+        },
+        { text: 'OK' }
+      ]
+    )
+  }
+
   const calculateDistance = (coords: any) => {
     // Simulation d'une distance - en production, utilisez les coordonnées réelles du marchand
     const simulatedDistance = Math.random() * 5 + 0.5 // Entre 0.5 et 5.5 km
@@ -94,30 +233,39 @@ const ProductDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
       return
     }
 
+    if (isMobileMoneyMethod(selectedPaymentMethod)) {
+      if (!paymentService.validatePhoneNumber(customerPhone, selectedPaymentMethod)) {
+        Alert.alert('Numéro invalide', 'Veuillez saisir un numéro Mobile Money valide.')
+        return
+      }
+    }
+
+    if (selectedPaymentMethod === 'wallet' && walletPin.trim().length < 4) {
+      Alert.alert('Code PIN requis', 'Veuillez renseigner votre code PIN portefeuille (4 à 6 chiffres).')
+      return
+    }
+
     const reservationData: ReservationCreationPayload = {
       productId: product.id,
       quantity,
-      paymentMethod: 'on_site', // Paiement sur place par défaut
+      paymentMethod: selectedPaymentMethod,
       notes,
-      customerPhone: user.phone,
+      customerPhone: isMobileMoneyMethod(selectedPaymentMethod) ? customerPhone : user.phone,
       customerEmail: user.email,
+      walletPin: selectedPaymentMethod === 'wallet' ? walletPin : undefined,
     }
 
     try {
       const result = await dispatch(createReservation(reservationData))
       if (createReservation.fulfilled.match(result)) {
+        const response = result.payload as ReservationCreationResponse
         setShowReservationModal(false)
-        Alert.alert(
-          'Réservation créée !',
-          `Votre réservation ${result.payload.data.reservation_code} a été créée avec succès.`,
-          [
-            {
-              text: 'Voir mes réservations',
-              onPress: () => navigation.navigate('Reservations')
-            },
-            { text: 'OK' }
-          ]
-        )
+        setQuantity(1)
+        setNotes('')
+        setWalletPin('')
+        setSelectedPaymentMethod('on_site')
+        setCustomerPhone(user?.phone ?? '')
+        await handlePaymentFeedback(response.payment, selectedPaymentMethod, response)
       } else {
         Alert.alert('Erreur', result.payload as string)
       }
@@ -154,6 +302,10 @@ const ProductDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
       </View>
     )
   }
+
+  const discountedUnitPrice = Math.round(parseFloat(product.discounted_price))
+  const originalUnitPrice = Math.round(parseFloat(product.original_price))
+  const totalAmount = discountedUnitPrice * quantity
 
   return (
     <View style={styles.container}>
@@ -195,10 +347,10 @@ const ProductDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
             <Text style={styles.productName}>{product.name}</Text>
             <View style={styles.priceContainer}>
               <Text style={styles.discountedPrice}>
-                {Math.round(parseFloat(product.discounted_price)).toLocaleString()} F CFA
+                {discountedUnitPrice.toLocaleString()} F CFA
               </Text>
               <Text style={styles.originalPrice}>
-                {Math.round(parseFloat(product.original_price)).toLocaleString()} F CFA
+                {originalUnitPrice.toLocaleString()} F CFA
               </Text>
             </View>
             <Text style={styles.savings}>
@@ -330,10 +482,64 @@ const ProductDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
                 />
               </View>
 
+              <View style={styles.paymentSection}>
+                <Text style={styles.inputLabel}>Moyen de paiement</Text>
+                <View style={styles.paymentOptionsContainer}>
+                  {paymentOptions.map(option => (
+                    <TouchableOpacity
+                      key={option.id}
+                      style={[
+                        styles.paymentOption,
+                        selectedPaymentMethod === option.id && styles.paymentOptionSelected
+                      ]}
+                      onPress={() => handleSelectPaymentMethod(option.id)}
+                    >
+                      <View style={styles.paymentOptionIcon}>{option.icon}</View>
+                      <Text style={styles.paymentOptionLabel}>{option.label}</Text>
+                    </TouchableOpacity>
+                  ))}
+                </View>
+
+                {isMobileMoneyMethod(selectedPaymentMethod) && (
+                  <View style={styles.mobileMoneySection}>
+                    <Text style={styles.helperText}>
+                      {selectedMobileProvider?.name ?? 'Mobile Money'} nécessite un numéro Mobile Money actif.
+                    </Text>
+                    <TextInput
+                      style={styles.phoneInput}
+                      placeholder="Numéro Mobile Money"
+                      value={customerPhone}
+                      onChangeText={setCustomerPhone}
+                      keyboardType="phone-pad"
+                    />
+                    <Text style={styles.feeText}>
+                      Frais estimés : {paymentService.formatCurrency(paymentService.calculateFees(totalAmount, selectedPaymentMethod))}
+                    </Text>
+                    {selectedMobileProvider && (
+                      <Text style={styles.helperText}>Code USSD : {selectedMobileProvider.ussdCode}</Text>
+                    )}
+                  </View>
+                )}
+
+                {selectedPaymentMethod === 'wallet' && (
+                  <View style={styles.mobileMoneySection}>
+                    <Text style={styles.helperText}>Entrez le code PIN de votre portefeuille.</Text>
+                    <TextInput
+                      style={styles.walletPinInput}
+                      placeholder="Code PIN"
+                      value={walletPin}
+                      onChangeText={setWalletPin}
+                      secureTextEntry
+                      keyboardType="number-pad"
+                    />
+                  </View>
+                )}
+              </View>
+
               <View style={styles.totalSection}>
                 <Text style={styles.totalLabel}>Total</Text>
                 <Text style={styles.totalAmount}>
-                  {(Math.round(parseFloat(product.discounted_price)) * quantity).toLocaleString()} F CFA
+                  {totalAmount.toLocaleString()} F CFA
                 </Text>
               </View>
             </View>
@@ -653,6 +859,68 @@ const styles = StyleSheet.create({
     padding: 12,
     fontSize: 16,
     textAlignVertical: 'top',
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+  },
+  paymentSection: {
+    marginBottom: 20,
+  },
+  paymentOptionsContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 12,
+  },
+  paymentOption: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 10,
+    paddingHorizontal: 14,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+    backgroundColor: '#ffffff',
+  },
+  paymentOptionSelected: {
+    borderColor: '#10B981',
+    backgroundColor: '#ECFDF5',
+  },
+  paymentOptionIcon: {
+    marginRight: 8,
+  },
+  paymentOptionLabel: {
+    fontSize: 15,
+    color: '#1F2937',
+    fontWeight: '500',
+  },
+  paymentEmoji: {
+    fontSize: 18,
+  },
+  mobileMoneySection: {
+    marginTop: 16,
+    gap: 8,
+  },
+  helperText: {
+    fontSize: 13,
+    color: '#6B7280',
+  },
+  phoneInput: {
+    backgroundColor: '#F9FAFB',
+    borderRadius: 8,
+    padding: 12,
+    fontSize: 16,
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+  },
+  feeText: {
+    fontSize: 14,
+    color: '#059669',
+    fontWeight: '500',
+  },
+  walletPinInput: {
+    backgroundColor: '#F9FAFB',
+    borderRadius: 8,
+    padding: 12,
+    fontSize: 16,
     borderWidth: 1,
     borderColor: '#E5E7EB',
   },

@@ -110,6 +110,7 @@ Route::prefix('reservations')->middleware('jwt.auth')->group(function () {
 Route::prefix('payments')->group(function () {
     Route::middleware('jwt.auth')->group(function () {
         Route::post('/', [PaymentController::class, 'initiate']);
+        Route::post('/mobile-money', [PaymentController::class, 'initiateMobileMoney']);
         Route::get('/{payment}', [PaymentController::class, 'status'])->whereNumber('payment');
         Route::post('/{payment}/cancel', [PaymentController::class, 'cancel'])->whereNumber('payment');
     });
