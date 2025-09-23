@@ -1,4 +1,4 @@
-import React, { forwardRef, useState } from 'react';
+import React, { forwardRef, useId, useState } from 'react';
 import { motion } from 'framer-motion';
 import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '../../utils/cn';
@@ -49,7 +49,8 @@ interface InputProps
 
 const Input = forwardRef<HTMLInputElement, InputProps>(({ className, variant, size, label, error, leftIcon, rightIcon, helperText, id, ...props }, ref) => {
   const [isFocused, setIsFocused] = useState(false);
-  const inputId = id || `input-${Math.random().toString(36).slice(2, 9)}`;
+  const generatedId = useId();
+  const inputId = id ?? `input-${generatedId}`;
 
   return (
     <div className="space-y-2">
