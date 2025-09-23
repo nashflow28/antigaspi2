@@ -38,7 +38,7 @@ const Navigation: React.FC<NavigationProps> = ({ brand, items, actions, classNam
     <motion.nav
       className={cn(
         'fixed inset-x-0 top-0 z-40 border-b border-primary-500/15 backdrop-blur-xl transition-all duration-300 ease-spring-out',
-        'bg-nav-gradient/95 supports-[backdrop-filter]:bg-nav-gradient/90 text-white',
+        'relative overflow-hidden bg-nav-gradient text-white',
         scrolled && 'shadow-glow',
         className,
       )}
@@ -46,7 +46,8 @@ const Navigation: React.FC<NavigationProps> = ({ brand, items, actions, classNam
       animate={{ y: 0, opacity: 1 }}
       transition={{ duration: 0.6, ease: 'easeOut' }}
     >
-      <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:h-20 sm:px-6 lg:px-8">
+      <div className="pointer-events-none absolute inset-0 bg-neutral-950/10" aria-hidden />
+      <div className="relative z-10 mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:h-20 sm:px-6 lg:px-8">
         <a href="#" className="flex items-center gap-3 rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neutral-50/80">
           {brand.logo && (
             <span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-white/10 text-white">
@@ -112,7 +113,7 @@ const Navigation: React.FC<NavigationProps> = ({ brand, items, actions, classNam
       <AnimatePresence>
         {isOpen && (
           <motion.div
-            className="border-t border-white/10 bg-neutral-900 text-neutral-50 lg:hidden"
+            className="relative z-10 border-t border-white/10 bg-neutral-900 text-neutral-50 lg:hidden"
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: 'auto', opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
