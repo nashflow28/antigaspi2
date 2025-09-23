@@ -1,13 +1,25 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
+import { useOnboardingStore } from '@/stores/onboarding'
 
 const router = createRouter({
   history: createWebHistory(),
   routes: [
+    // Onboarding routes
+    {
+      path: '/onboarding',
+      name: 'onboarding',
+      component: () => import('@/views/onboarding/OnboardingFlow.vue'),
+      meta: {
+        requiresAuth: false,
+        hideForAuth: false,
+        showOnboarding: false // Ne pas montrer l'onboarding dans l'onboarding
+      }
+    },
     {
       path: '/',
       name: 'home',
-      component: () => import('@/views/HomeView.vue'),
+      component: () => import('@/views/MainHomeView.vue'),
       meta: { requiresAuth: false }
     },
     {
@@ -29,6 +41,16 @@ const router = createRouter({
       meta: { requiresAuth: false }
     },
     {
+      path: '/discover',
+      name: 'discover',
+      component: () => import('@/views/DiscoverView.vue'),
+      meta: {
+        requiresAuth: false,
+        title: 'Découvrir les commerçants',
+        breadcrumb: ['Accueil', 'Découvrir']
+      }
+    },
+    {
       path: '/surprise-baskets',
       name: 'surprise-baskets',
       component: () => import('@/views/consumer/SurpriseBasketsView.vue'),
@@ -43,6 +65,27 @@ const router = createRouter({
       name: 'product-detail',
       component: () => import('@/views/ProductDetailView.vue'),
       meta: { requiresAuth: false }
+    },
+    {
+      path: '/cart',
+      name: 'cart',
+      component: () => import('@/views/CartPage.vue'),
+      meta: {
+        requiresAuth: false,
+        title: 'Mon Panier',
+        breadcrumb: ['Accueil', 'Panier']
+      }
+    },
+    {
+      path: '/checkout',
+      name: 'checkout',
+      component: () => import('@/views/CheckoutView.vue'),
+      meta: {
+        requiresAuth: true,
+        roles: ['consumer'],
+        title: 'Finaliser la commande',
+        breadcrumb: ['Panier', 'Commande']
+      }
     },
     {
       path: '/products/:id/reserve',
@@ -68,10 +111,36 @@ const router = createRouter({
       meta: { requiresAuth: false }
     },
     {
+      path: '/merchants/:id',
+      name: 'merchant-detail',
+      component: () => import('@/views/MerchantDetailView.vue'),
+      meta: { requiresAuth: false }
+    },
+    {
       path: '/reviews',
       name: 'reviews',
       component: () => import('@/views/ReviewsView.vue'),
       meta: { requiresAuth: false }
+    },
+    {
+      path: '/reviews/public',
+      name: 'public-reviews',
+      component: () => import('@/views/PublicReviewsView.vue'),
+      meta: {
+        requiresAuth: false,
+        title: 'Avis de la communauté',
+        breadcrumb: ['Accueil', 'Avis']
+      }
+    },
+    {
+      path: '/favorites',
+      name: 'favorites',
+      component: () => import('@/views/FavoritesView.vue'),
+      meta: {
+        requiresAuth: true,
+        title: 'Mes Favoris',
+        breadcrumb: ['Accueil', 'Favoris']
+      }
     },
     {
       path: '/dashboard',
@@ -209,6 +278,18 @@ const router = createRouter({
       meta: { requiresAuth: true, roles: ['admin'] }
     },
     {
+      path: '/gaspiz-demo',
+      name: 'gaspiz-demo',
+      component: () => import('@/views/GaspizInspiredHome.vue'),
+      meta: { requiresAuth: false }
+    },
+    {
+      path: '/topbar-test',
+      name: 'topbar-test',
+      component: () => import('@/views/TopBarTestView.vue'),
+      meta: { requiresAuth: false }
+    },
+    {
       path: '/:pathMatch(.*)*',
       name: 'not-found',
       component: () => import('@/views/NotFoundView.vue')
@@ -218,10 +299,35 @@ const router = createRouter({
 
 router.beforeEach(async (to, _from, next) => {
   const authStore = useAuthStore()
+  const onboardingStore = useOnboardingStore()
 
-  // Initialize auth if not already done
+  // Initialize stores if not already done
   if (authStore.token && !authStore.user) {
     await authStore.initAuth()
+  }
+
+  // Initialize onboarding store
+  onboardingStore.init()
+
+  // Check if user should see onboarding
+  const shouldShowOnboarding = onboardingStore.shouldShowOnboarding()
+  const isOnboardingRoute = to.name === 'onboarding'
+  const skipOnboardingForRoute = to.meta.showOnboarding === false
+
+  // TEMPORARILY DISABLED - Redirect to onboarding if needed (except for certain routes)
+  // if (shouldShowOnboarding && !isOnboardingRoute && !skipOnboardingForRoute) {
+  //   // Store the intended destination for after onboarding
+  //   if (to.path !== '/') {
+  //     sessionStorage.setItem('onboarding-redirect', to.fullPath)
+  //   }
+  //   next('/onboarding')
+  //   return
+  // }
+
+  // If trying to access onboarding but already completed, redirect to home
+  if (isOnboardingRoute && !shouldShowOnboarding) {
+    next('/')
+    return
   }
 
   // Check if route requires authentication

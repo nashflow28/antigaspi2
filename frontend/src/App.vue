@@ -1,49 +1,123 @@
 <template>
-  <div id="app" class="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100 dark:from-dark-900 dark:via-dark-800 dark:to-dark-900 transition-colors duration-500">
-    <!-- Navigation -->
-    <NavBar />
+  <div id="app">
+    <!-- TEMPORAIREMENT SIMPLE - POUR IDENTIFIER LE PROBLÈME -->
+    <PageTransition>
+      <router-view />
+    </PageTransition>
 
-    <!-- Main Content with modern spacing -->
-    <main id="main-content" class="flex-1 relative" role="main" aria-label="Contenu principal">
-      <PageTransition>
-        <router-view />
-      </PageTransition>
-    </main>
+    <!-- TEMPORARILY DISABLED - Global Notifications -->
+    <!-- <NotificationContainer />
+    <NotificationSystem /> -->
 
-    <!-- Global Notifications -->
-    <NotificationContainer />
-    <NotificationSystem />
+    <!-- TEMPORARILY DISABLED - Network Status -->
+    <!-- <NetworkStatus /> -->
 
-    <!-- Network Status -->
-    <NetworkStatus />
+    <!-- TEMPORARILY DISABLED - PWA Prompts -->
+    <!-- <PWAPrompt /> -->
 
-    <!-- PWA Prompts -->
-    <PWAPrompt />
-
-    <!-- Background Pattern -->
-    <div class="fixed inset-0 -z-10 opacity-20 dark:opacity-10">
-      <div class="absolute inset-0 bg-gradient-to-r from-primary-500/10 via-secondary-500/5 to-accent-500/10"></div>
-      <div class="absolute top-0 -left-4 w-72 h-72 bg-primary-400 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob"></div>
-      <div class="absolute top-0 -right-4 w-72 h-72 bg-secondary-400 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob animation-delay-2000"></div>
-      <div class="absolute -bottom-8 left-20 w-72 h-72 bg-accent-400 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob animation-delay-4000"></div>
-    </div>
+    <!-- TEMPORARILY DISABLED - Dev Tools -->
+    <!-- <OnboardingReset /> -->
   </div>
 </template>
 
 <script setup lang="ts">
-import { onMounted } from 'vue'
+import { onMounted, computed } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
-import NavBar from '@/components/layout/NavBar.vue'
+import { useProductsStore } from '@/stores/products'
+import { useMerchantsStore } from '@/stores/merchants'
+import { useCartStore } from '@/stores/cart'
+import { useNotificationStore } from '@/stores/notification'
+import MobileLayout from '@/components/layout/MobileLayout.vue'
 import NotificationContainer from '@/components/ui/NotificationContainer.vue'
 import NotificationSystem from '@/components/ui/NotificationSystem.vue'
 import NetworkStatus from '@/components/ui/NetworkStatus.vue'
 import PageTransition from '@/components/ui/PageTransition.vue'
 import PWAPrompt from '@/components/ui/PWAPrompt.vue'
+import OnboardingReset from '@/components/ui/OnboardingReset.vue'
 
+// Initialize stores
 const authStore = useAuthStore()
+const productsStore = useProductsStore()
+const merchantsStore = useMerchantsStore()
+const cartStore = useCartStore()
+const notificationStore = useNotificationStore()
+
+// Router
+const route = useRoute()
+const router = useRouter()
+
+// Computed properties for MobileLayout
+const currentPageTitle = computed(() => {
+  const routeMetaTitle = route.meta?.title as string
+  if (routeMetaTitle) return routeMetaTitle
+
+  switch (route.name) {
+    case 'home': return 'Antigaspi'
+    case 'discover': return 'Découvrir'
+    case 'cart': return 'Mon panier'
+    case 'favorites': return 'Mes favoris'
+    case 'profile': return 'Mon profil'
+    default: return 'Antigaspi'
+  }
+})
+
+const currentPageSubtitle = computed(() => {
+  const routeMetaSubtitle = route.meta?.subtitle as string
+  if (routeMetaSubtitle) return routeMetaSubtitle
+
+  switch (route.name) {
+    case 'home': return 'Produits anti-gaspillage'
+    case 'discover': return 'Commerçants près de vous'
+    case 'cart': return `${cartItemsCount.value} article${cartItemsCount.value > 1 ? 's' : ''}`
+    default: return undefined
+  }
+})
+
+const currentPageShowSearch = computed(() => {
+  return ['home', 'discover', 'products'].includes(route.name as string)
+})
+
+const cartItemsCount = computed(() => cartStore.itemsCount)
+const notificationsCount = computed(() => notificationStore.unreadCount)
+const isAuthenticated = computed(() => authStore.isAuthenticated)
+const userName = computed(() => authStore.user?.first_name)
+const userEmail = computed(() => authStore.user?.email)
+const userAvatar = computed(() => authStore.user?.avatar_url)
+
+// Event handlers
+const handleSearchClick = () => {
+  // Implémenter la recherche
+  console.log('Search clicked')
+}
+
+const handleNotificationsClick = () => {
+  router.push('/notifications')
+}
+
+const handleCartClick = () => {
+  router.push('/cart')
+}
+
+const handleLogout = async () => {
+  await authStore.logout()
+  router.push('/login')
+}
 
 onMounted(async () => {
-  // Initialize authentication state
-  await authStore.initAuth()
+  try {
+    // Initialize authentication state first
+    await authStore.initAuth()
+
+    // Initialize data stores in parallel for better performance
+    await Promise.allSettled([
+      productsStore.fetchProducts(),
+      merchantsStore.fetchMerchants()
+    ])
+
+    console.log('✅ Stores initialized successfully')
+  } catch (error) {
+    console.error('❌ Error initializing stores:', error)
+  }
 })
 </script>
