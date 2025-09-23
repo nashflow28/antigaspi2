@@ -30,12 +30,7 @@ interface DashboardLayoutProps {
   className?: string;
 }
 
-const DashboardLayout: React.FC<DashboardLayoutProps> = ({
-  children,
-  sidebar,
-  header,
-  className
-}) => {
+const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, sidebar, header, className }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
 
@@ -53,66 +48,53 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({
   }, []);
 
   return (
-    <div className={cn("min-h-screen bg-gray-950", className)}>
-      {/* Mobile Overlay */}
+    <div className={cn('min-h-screen bg-neutral-50 text-neutral-800 dark:bg-neutral-900 dark:text-neutral-50', className)}>
       <AnimatePresence>
         {sidebarOpen && isMobile && (
           <motion.div
-            className="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm lg:hidden"
+            className="fixed inset-0 z-40 bg-overlay backdrop-blur-sm lg:hidden"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.3 }}
             onClick={() => setSidebarOpen(false)}
           />
         )}
       </AnimatePresence>
 
-      {/* Sidebar */}
       <motion.aside
         className={cn(
-          "fixed inset-y-0 left-0 z-50 w-72 transform bg-gray-900/95 backdrop-blur-xl border-r border-gray-800/50",
-          "transition-transform duration-300 ease-in-out lg:translate-x-0",
-          sidebarOpen ? "translate-x-0" : "-translate-x-full"
+          'fixed inset-y-0 left-0 z-50 w-72 transform border-r border-primary-500/10 bg-white/95 shadow-card dark:border-neutral-800 dark:bg-neutral-900/95',
+          'transition-transform duration-300 ease-spring-out lg:translate-x-0',
+          sidebarOpen ? 'translate-x-0' : '-translate-x-full',
         )}
         initial={false}
       >
         <div className="flex h-full flex-col">
-          {/* Sidebar Header */}
-          <div className="flex items-center gap-3 px-6 py-6 border-b border-gray-800/50">
-            {sidebar.brand.logo && (
-              <div className="flex-shrink-0 w-8 h-8">
-                {sidebar.brand.logo}
-              </div>
-            )}
-            <h1 className="text-xl font-bold bg-gradient-to-r from-brand-400 to-accent-400 bg-clip-text text-transparent">
-              {sidebar.brand.name}
-            </h1>
+          <div className="flex items-center gap-3 px-6 py-6 border-b border-neutral-200/70 dark:border-neutral-800/80">
+            {sidebar.brand.logo && <div className="h-10 w-10 rounded-2xl bg-primary-500/15 text-primary-700 dark:text-primary-200 flex items-center justify-center">{sidebar.brand.logo}</div>}
+            <h1 className="text-h3 font-semibold text-primary-800 dark:text-primary-200">{sidebar.brand.name}</h1>
           </div>
 
-          {/* Navigation */}
-          <nav className="flex-1 px-4 py-6 space-y-2 overflow-y-auto">
+          <nav className="flex-1 space-y-1 px-4 py-6">
             {sidebar.navigation.map((item, index) => (
               <motion.a
                 key={item.label}
                 href={item.href}
                 className={cn(
-                  "flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200",
-                  "hover:bg-white/5 hover:text-white",
+                  'group flex items-center gap-3 rounded-2xl px-4 py-3 text-small font-medium transition-all duration-200',
                   item.active
-                    ? "bg-brand-500/20 text-white border border-brand-500/30"
-                    : "text-gray-300 hover:bg-gray-800/50"
+                    ? 'bg-primary-500/10 text-primary-700 shadow-inner dark:text-primary-100'
+                    : 'text-neutral-500 hover:bg-primary-200/20 hover:text-primary-700 dark:text-neutral-300 dark:hover:text-primary-100',
                 )}
-                initial={{ opacity: 0, x: -20 }}
+                initial={{ opacity: 0, x: -24 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.3, delay: index * 0.05 }}
-                whileHover={{ scale: 1.02, x: 4 }}
-                whileTap={{ scale: 0.98 }}
+                whileHover={{ x: 4 }}
               >
-                <span className="flex-shrink-0 w-5 h-5">{item.icon}</span>
+                <span className="flex h-5 w-5 items-center justify-center text-current">{item.icon}</span>
                 <span className="flex-1 truncate">{item.label}</span>
                 {item.badge && (
-                  <span className="px-2 py-1 text-xs font-semibold bg-brand-500/20 text-brand-300 rounded-full">
+                  <span className="rounded-full bg-primary-500/20 px-2 py-1 text-caption font-semibold text-primary-700 dark:text-primary-100">
                     {item.badge}
                   </span>
                 )}
@@ -120,84 +102,55 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({
             ))}
           </nav>
 
-          {/* Sidebar Footer */}
-          {sidebar.footer && (
-            <div className="p-4 border-t border-gray-800/50">
-              {sidebar.footer}
-            </div>
-          )}
+          {sidebar.footer && <div className="border-t border-neutral-200/70 p-4 dark:border-neutral-800">{sidebar.footer}</div>}
         </div>
       </motion.aside>
 
-      {/* Main Content */}
       <div className="lg:ml-72">
-        {/* Header */}
         <motion.header
-          className="sticky top-0 z-30 bg-gray-900/80 backdrop-blur-xl border-b border-gray-800/50"
+          className="sticky top-0 z-30 border-b border-neutral-200/70 bg-white/80 backdrop-blur-lg dark:border-neutral-800 dark:bg-neutral-900/80"
           initial={{ y: -20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ duration: 0.4 }}
         >
           <div className="px-4 sm:px-6 lg:px-8">
-            <div className="flex items-center justify-between h-16">
-              {/* Mobile Menu Button */}
+            <div className="flex h-16 items-center justify-between gap-4">
               <button
                 onClick={() => setSidebarOpen(true)}
-                className="p-2 text-gray-400 hover:text-white hover:bg-white/5 rounded-xl transition-colors lg:hidden"
+                className="rounded-2xl p-2 text-primary-700 transition-colors hover:bg-primary-200/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-400 lg:hidden"
+                aria-label="Ouvrir le menu"
               >
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
                 </svg>
               </button>
 
-              {/* Header Actions */}
-              <div className="flex items-center gap-4 ml-auto">
-                {/* Notifications */}
-                {header.notifications && (
-                  <div className="hidden sm:block">
-                    {header.notifications}
-                  </div>
-                )}
-
-                {/* Custom Actions */}
-                {header.actions && (
-                  <div className="hidden sm:flex items-center gap-2">
-                    {header.actions}
-                  </div>
-                )}
-
-                {/* User Profile */}
-                <div className="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-white/5 transition-colors cursor-pointer">
+              <div className="flex flex-1 items-center justify-end gap-3">
+                {header.notifications && <div className="hidden sm:block">{header.notifications}</div>}
+                {header.actions && <div className="hidden items-center gap-2 sm:flex">{header.actions}</div>}
+                <div className="flex items-center gap-3 rounded-2xl bg-primary-500/10 px-3 py-2 text-left text-primary-800 transition-colors hover:bg-primary-500/15 dark:bg-primary-500/10 dark:text-primary-100">
                   {header.user.avatar ? (
-                    <img
-                      src={header.user.avatar}
-                      alt={header.user.name}
-                      className="w-8 h-8 rounded-full object-cover"
-                    />
+                    <img src={header.user.avatar} alt={header.user.name} className="h-9 w-9 rounded-full object-cover" />
                   ) : (
-                    <div className="w-8 h-8 rounded-full bg-gradient-to-r from-brand-500 to-accent-500 flex items-center justify-center text-white text-sm font-semibold">
+                    <span className="flex h-9 w-9 items-center justify-center rounded-full bg-primary-500 text-white">
                       {header.user.name.charAt(0).toUpperCase()}
-                    </div>
+                    </span>
                   )}
-                  <div className="hidden sm:block text-left">
-                    <p className="text-sm font-medium text-white">{header.user.name}</p>
-                    <p className="text-xs text-gray-400 truncate max-w-32">{header.user.email}</p>
+                  <div className="hidden sm:block">
+                    <p className="text-small font-semibold">{header.user.name}</p>
+                    <p className="text-caption text-primary-700/80 dark:text-primary-100/70">{header.user.email}</p>
                   </div>
-                  <svg className="hidden sm:block w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                  </svg>
                 </div>
               </div>
             </div>
           </div>
         </motion.header>
 
-        {/* Page Content */}
         <motion.main
-          className="flex-1 p-4 sm:p-6 lg:p-8"
-          initial={{ opacity: 0, y: 20 }}
+          className="flex-1 px-4 py-6 sm:px-6 lg:px-8"
+          initial={{ opacity: 0, y: 24 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.2 }}
+          transition={{ duration: 0.5, delay: 0.1 }}
         >
           {children}
         </motion.main>

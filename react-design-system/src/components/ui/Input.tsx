@@ -5,142 +5,136 @@ import { cn } from '../../utils/cn';
 
 const inputVariants = cva(
   [
-    "flex w-full rounded-xl border bg-white px-4 py-3 dark:bg-transparent",
-    "text-sm text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500",
-    "transition-all duration-300 ease-out",
-    "focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-cream dark:focus:ring-offset-gray-900",
-    "disabled:cursor-not-allowed disabled:opacity-50"
+    'flex w-full rounded-2xl border bg-white/95 px-4 py-3 text-body text-neutral-700',
+    'placeholder:text-neutral-400 transition-all duration-200 ease-spring-out',
+    'focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-300 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-50',
+    'disabled:cursor-not-allowed disabled:opacity-60',
+    'dark:bg-neutral-900 dark:text-neutral-50 dark:placeholder:text-neutral-400 dark:focus-visible:ring-offset-neutral-900',
   ],
   {
     variants: {
       variant: {
-        default: [
-          "border-gray-300 bg-white",
-          "hover:border-gray-400",
-          "focus:border-brand-500/50 focus:ring-brand-500/20 focus:bg-white dark:focus:bg-gray-900/80"
-        ],
-        glass: [
-          "border-white/40 bg-white/30 backdrop-blur-xl dark:border-gray-600 dark:bg-gray-800/30",
-          "hover:border-white/50 hover:bg-white/40 dark:hover:border-gray-500 dark:hover:bg-gray-800/40",
-          "focus:border-brand-400/50 focus:ring-brand-400/20"
+        subtle: [
+          'border-neutral-200 hover:border-primary-300 focus:border-primary-400 focus:bg-white dark:border-neutral-700 dark:focus:border-primary-500',
         ],
         filled: [
-          "border-gray-200 bg-gray-100 dark:border-gray-800 dark:bg-gray-800/80",
-          "hover:border-gray-300 hover:bg-gray-50 dark:hover:border-gray-700 dark:hover:bg-gray-700/80",
-          "focus:border-brand-500 focus:ring-brand-500/30"
-        ]
+          'border-transparent bg-neutral-100 hover:bg-neutral-100 focus:bg-white dark:bg-neutral-800/70 dark:hover:bg-neutral-800',
+        ],
+        transparent: [
+          'border-primary-500/20 bg-primary-500/5 hover:border-primary-500/40 focus:bg-white dark:bg-primary-900/30 dark:border-primary-700/40',
+        ],
       },
       size: {
-        sm: "h-10 px-3 py-2 text-sm",
-        default: "h-12 px-4 py-3 text-sm",
-        lg: "h-14 px-6 py-4 text-base"
-      }
+        sm: 'h-11 text-small',
+        md: 'h-12',
+        lg: 'h-14 text-h4',
+      },
     },
     defaultVariants: {
-      variant: "default",
-      size: "default"
-    }
-  }
+      variant: 'subtle',
+      size: 'md',
+    },
+  },
 );
 
 interface InputProps
-  extends Omit<React.InputHTMLAttributes<HTMLInputElement>, "size">,
+  extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'size'>,
     VariantProps<typeof inputVariants> {
   label?: string;
   error?: string;
   leftIcon?: React.ReactNode;
   rightIcon?: React.ReactNode;
+  helperText?: string;
 }
 
-const Input = forwardRef<HTMLInputElement, InputProps>(
-  ({ className, variant, size, label, error, leftIcon, rightIcon, id, ...props }, ref) => {
-    const [isFocused, setIsFocused] = useState(false);
-    const inputId = id || `input-${Math.random().toString(36).substr(2, 9)}`;
+const Input = forwardRef<HTMLInputElement, InputProps>(({ className, variant, size, label, error, leftIcon, rightIcon, helperText, id, ...props }, ref) => {
+  const [isFocused, setIsFocused] = useState(false);
+  const inputId = id || `input-${Math.random().toString(36).slice(2, 9)}`;
 
-    return (
-      <div className="space-y-2">
-        {label && (
-          <motion.label
-            htmlFor={inputId}
-            className={cn(
-              "block text-sm font-medium transition-colors duration-200",
-              error ? "text-red-400" : "text-gray-300",
-              isFocused && !error && "text-brand-400"
-            )}
-            animate={{ color: isFocused && !error ? "#a855f7" : error ? "#f87171" : "#d1d5db" }}
-            transition={{ duration: 0.2 }}
-          >
-            {label}
-          </motion.label>
+  return (
+    <div className="space-y-2">
+      {label && (
+        <label
+          className={cn(
+            'flex items-center justify-between text-small font-medium text-neutral-600 transition-colors dark:text-neutral-200',
+            isFocused && !error && 'text-primary-600',
+            error && 'text-accent-red',
+          )}
+          htmlFor={inputId}
+        >
+          <span>{label}</span>
+          {helperText && !error && <span className="text-caption text-neutral-400">{helperText}</span>}
+        </label>
+      )}
+
+      <div className="relative">
+        {leftIcon && (
+          <span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-neutral-400">{leftIcon}</span>
         )}
 
-        <div className="relative">
-          {leftIcon && (
-            <div className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500 pointer-events-none">
-              {leftIcon}
-            </div>
+        <motion.input
+          id={inputId}
+          ref={ref}
+          className={cn(
+            inputVariants({ variant, size }),
+            leftIcon && 'pl-12',
+            rightIcon && 'pr-12',
+            error && 'border-accent-red focus-visible:ring-accent-red/60',
+            className,
           )}
+          aria-invalid={Boolean(error)}
+          aria-describedby={error ? `${inputId}-error` : helperText ? `${inputId}-helper` : undefined}
+          onFocus={(event) => {
+            setIsFocused(true);
+            props.onFocus?.(event);
+          }}
+          onBlur={(event) => {
+            setIsFocused(false);
+            props.onBlur?.(event);
+          }}
+          whileFocus={{ scale: 1.01 }}
+          transition={{ duration: 0.2 }}
+          {...props}
+        />
 
-          <motion.input
-            id={inputId}
-            className={cn(
-              inputVariants({ variant, size }),
-              leftIcon && "pl-12",
-              rightIcon && "pr-12",
-              error && "border-red-500/50 focus:border-red-500 focus:ring-red-500/20",
-              className
-            )}
-            ref={ref}
-            onFocus={(e) => {
-              setIsFocused(true);
-              props.onFocus?.(e);
-            }}
-            onBlur={(e) => {
-              setIsFocused(false);
-              props.onBlur?.(e);
-            }}
-            whileFocus={{ scale: 1.01 }}
-            transition={{ duration: 0.2, ease: "easeOut" }}
-            {...(props as any)}
-          />
-
-          {rightIcon && (
-            <div className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-500 pointer-events-none">
-              {rightIcon}
-            </div>
-          )}
-
-          {/* Focus indicator */}
-          <motion.div
-            className="absolute inset-x-0 bottom-0 h-0.5 bg-gradient-to-r from-brand-500 to-accent-500 rounded-full"
-            initial={{ scaleX: 0, opacity: 0 }}
-            animate={{
-              scaleX: isFocused ? 1 : 0,
-              opacity: isFocused ? 1 : 0
-            }}
-            transition={{ duration: 0.3, ease: "easeOut" }}
-          />
-        </div>
-
-        {error && (
-          <motion.p
-            className="text-sm text-red-400 flex items-center gap-2"
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.3 }}
-          >
-            <svg className="w-4 h-4 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-              <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-            </svg>
-            {error}
-          </motion.p>
+        {rightIcon && (
+          <span className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-neutral-400">{rightIcon}</span>
         )}
+
+        <motion.span
+          className="pointer-events-none absolute inset-x-3 bottom-1 h-0.5 rounded-full bg-primary-500"
+          initial={{ scaleX: 0, opacity: 0 }}
+          animate={{ scaleX: isFocused ? 1 : 0, opacity: isFocused ? 1 : 0 }}
+          transition={{ duration: 0.25 }}
+        />
       </div>
-    );
-  }
-);
 
-Input.displayName = "Input";
+      {error ? (
+        <motion.p
+          id={`${inputId}-error`}
+          className="flex items-center gap-2 text-small text-accent-red"
+          initial={{ opacity: 0, y: -4 }}
+          animate={{ opacity: 1, y: 0 }}
+        >
+          <svg className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+            <path
+              fillRule="evenodd"
+              d="M10 18a8 8 0 100-16 8 8 0 000 16zm0-4a1 1 0 100 2 1 1 0 000-2zm-.75-7.75a.75.75 0 00-1.5 0v4.5a.75.75 0 001.5 0v-4.5z"
+              clipRule="evenodd"
+            />
+          </svg>
+          {error}
+        </motion.p>
+      ) : helperText ? (
+        <p id={`${inputId}-helper`} className="text-caption text-neutral-500">
+          {helperText}
+        </p>
+      ) : null}
+    </div>
+  );
+});
+
+Input.displayName = 'Input';
 
 export { Input, inputVariants };
 export type { InputProps };

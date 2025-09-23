@@ -5,6 +5,7 @@ interface Stat {
   icon: React.ReactNode;
   value: number;
   label: string;
+  suffix?: string;
 }
 
 interface StatsProps {
@@ -25,20 +26,28 @@ const Counter: React.FC<{ value: number }> = ({ value }) => {
 
 const Stats: React.FC<StatsProps> = ({ stats }) => {
   return (
-    <section className="grid gap-6 sm:grid-cols-2 md:grid-cols-4">
+    <section className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
       {stats.map((stat, index) => (
         <motion.div
-          key={index}
-          className="p-6 rounded-2xl bg-white/60 dark:bg-gray-800/60 backdrop-blur-md shadow-lg flex flex-col items-center"
-          initial={{ opacity: 0, y: 20 }}
+          key={stat.label}
+          className="rounded-3xl border border-primary-500/15 bg-white/90 p-6 shadow-card backdrop-blur-md transition-all dark:bg-neutral-900/80"
+          initial={{ opacity: 0, y: 16 }}
           whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: index * 0.1 }}
+          viewport={{ once: true, amount: 0.4 }}
+          transition={{ duration: 0.4, delay: index * 0.08 }}
         >
-          <div className="text-primary-600 mb-2">{stat.icon}</div>
-          <div className="text-3xl font-bold text-primary-700 dark:text-primary-400">
-            <Counter value={stat.value} />
+          <div className="flex items-center justify-between">
+            <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary-500/15 text-primary-700 dark:text-primary-200">
+              {stat.icon}
+            </span>
+            <span className="text-caption uppercase tracking-[0.18em] text-primary-500">Impact</span>
           </div>
-          <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">{stat.label}</p>
+
+          <div className="mt-4 flex items-baseline gap-2 text-h1 text-primary-700 dark:text-primary-100">
+            <Counter value={stat.value} />
+            {stat.suffix && <span className="text-small font-medium text-primary-500/80">{stat.suffix}</span>}
+          </div>
+          <p className="mt-2 text-small text-neutral-500 dark:text-neutral-300">{stat.label}</p>
         </motion.div>
       ))}
     </section>

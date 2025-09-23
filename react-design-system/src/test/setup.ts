@@ -6,6 +6,7 @@ vi.mock('framer-motion', () => ({
   motion: {
     div: 'div',
     button: 'button',
+    span: 'span',
     input: 'input',
     textarea: 'textarea',
     a: 'a',
