@@ -1,4 +1,4 @@
-import React, { forwardRef, useState } from 'react';
+import React, { forwardRef, useId, useState } from 'react';
 import { motion } from 'framer-motion';
 import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '../../utils/cn';
@@ -39,7 +39,8 @@ interface TextareaProps
 
 const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(({ className, variant, size, label, error, helperText, id, ...props }, ref) => {
   const [isFocused, setIsFocused] = useState(false);
-  const textareaId = id || `textarea-${Math.random().toString(36).slice(2, 9)}`;
+  const generatedId = useId();
+  const textareaId = id ?? `textarea-${generatedId}`;
 
   return (
     <div className="space-y-2">
