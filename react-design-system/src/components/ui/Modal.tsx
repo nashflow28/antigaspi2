@@ -10,7 +10,7 @@ interface ModalProps {
   description?: string;
   children: React.ReactNode;
   size?: 'sm' | 'default' | 'lg' | 'xl' | 'full';
-  variant?: 'default' | 'glass' | 'dark';
+  variant?: 'surface' | 'glass' | 'dark';
   showCloseButton?: boolean;
   closeOnOverlayClick?: boolean;
   closeOnEscape?: boolean;
@@ -18,40 +18,40 @@ interface ModalProps {
 }
 
 const sizeVariants = {
-  sm: "max-w-md",
-  default: "max-w-lg",
-  lg: "max-w-2xl",
-  xl: "max-w-4xl",
-  full: "max-w-7xl mx-4"
+  sm: 'max-w-md',
+  default: 'max-w-lg',
+  lg: 'max-w-2xl',
+  xl: 'max-w-4xl',
+  full: 'max-w-6xl mx-4',
 };
 
 const variantStyles = {
-  default: "bg-gray-900/95 border-gray-700/50",
-  glass: "bg-white/5 backdrop-blur-2xl border-white/10",
-  dark: "bg-black/90 border-gray-800/50"
+  surface: 'bg-white text-neutral-800 border border-neutral-200 shadow-card dark:bg-neutral-900 dark:text-neutral-50 dark:border-neutral-800',
+  glass: 'bg-white/90 text-neutral-800 border border-primary-500/15 shadow-glow backdrop-blur-xl dark:bg-neutral-900/80 dark:text-neutral-50',
+  dark: 'bg-neutral-900 text-neutral-50 border border-neutral-700 shadow-glow',
 };
 
 const overlayVariants = {
   hidden: { opacity: 0 },
-  visible: { opacity: 1 }
+  visible: { opacity: 1 },
 };
 
 const modalVariants = {
   hidden: {
     opacity: 0,
-    scale: 0.75,
-    y: 20
+    scale: 0.96,
+    y: 24,
   },
   visible: {
     opacity: 1,
     scale: 1,
-    y: 0
+    y: 0,
   },
   exit: {
     opacity: 0,
-    scale: 0.75,
-    y: 20
-  }
+    scale: 0.94,
+    y: 16,
+  },
 };
 
 const Modal: React.FC<ModalProps> = ({
@@ -65,11 +65,11 @@ const Modal: React.FC<ModalProps> = ({
   showCloseButton = true,
   closeOnOverlayClick = true,
   closeOnEscape = true,
-  className
+  className,
 }) => {
   useEffect(() => {
-    const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && closeOnEscape) {
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape' && closeOnEscape) {
         onClose();
       }
     };
@@ -85,8 +85,8 @@ const Modal: React.FC<ModalProps> = ({
     };
   }, [isOpen, onClose, closeOnEscape]);
 
-  const handleOverlayClick = (e: React.MouseEvent) => {
-    if (e.target === e.currentTarget && closeOnOverlayClick) {
+  const handleOverlayClick = (event: React.MouseEvent) => {
+    if (event.target === event.currentTarget && closeOnOverlayClick) {
       onClose();
     }
   };
@@ -95,88 +95,44 @@ const Modal: React.FC<ModalProps> = ({
     <AnimatePresence>
       {isOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          {/* Backdrop */}
           <motion.div
-            className="absolute inset-0 bg-black/80 backdrop-blur-sm"
+            className="absolute inset-0 bg-overlay"
             variants={overlayVariants}
             initial="hidden"
             animate="visible"
             exit="hidden"
-            transition={{ duration: 0.3, ease: "easeOut" }}
+            transition={{ duration: 0.3, ease: 'easeOut' }}
             onClick={handleOverlayClick}
           />
 
-          {/* Modal */}
           <motion.div
-            className={cn(
-              "relative w-full rounded-2xl border shadow-2xl",
-              sizeVariants[size],
-              variantStyles[variant],
-              className
-            )}
+            role="dialog"
+            aria-modal="true"
+            className={cn('relative w-full rounded-3xl', sizeVariants[size], variantStyles[variant], className)}
             variants={modalVariants}
             initial="hidden"
             animate="visible"
             exit="exit"
-            transition={{
-              duration: 0.4,
-              ease: [0.23, 1, 0.32, 1]
-            }}
+            transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
           >
-            {/* Header */}
             {(title || showCloseButton) && (
-              <div className="flex items-center justify-between p-6 pb-4">
-                <div className="flex-1">
-                  {title && (
-                    <motion.h2
-                      className="text-xl font-semibold text-white mb-2"
-                      initial={{ opacity: 0, y: -10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ duration: 0.3, delay: 0.1 }}
-                    >
-                      {title}
-                    </motion.h2>
-                  )}
-                  {description && (
-                    <motion.p
-                      className="text-gray-400 text-sm"
-                      initial={{ opacity: 0, y: -10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ duration: 0.3, delay: 0.15 }}
-                    >
-                      {description}
-                    </motion.p>
-                  )}
+              <div className="flex items-start justify-between gap-4 px-6 py-5">
+                <div className="space-y-1">
+                  {title && <h2 className="text-h2 font-semibold text-primary-700 dark:text-primary-200">{title}</h2>}
+                  {description && <p className="text-small text-neutral-500 dark:text-neutral-300">{description}</p>}
                 </div>
 
                 {showCloseButton && (
-                  <motion.button
-                    onClick={onClose}
-                    className="p-2 rounded-xl text-gray-400 hover:text-white hover:bg-white/5 transition-all duration-200"
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    initial={{ opacity: 0, scale: 0.8 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ duration: 0.3, delay: 0.2 }}
-                  >
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <Button variant="ghost" size="icon" aria-label="Fermer la fenêtre" onClick={onClose}>
+                    <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                     </svg>
-                  </motion.button>
+                  </Button>
                 )}
               </div>
             )}
 
-            {/* Content */}
-            <motion.div
-              className={cn(
-                "px-6",
-                (title || showCloseButton) ? "pb-6" : "py-6"
-              )}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.4, delay: 0.2 }}
-            >
+            <motion.div className="px-6 pb-6" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.35 }}>
               {children}
             </motion.div>
           </motion.div>
@@ -186,17 +142,12 @@ const Modal: React.FC<ModalProps> = ({
   );
 };
 
-// Modal Footer component
-const ModalFooter: React.FC<{
-  children: React.ReactNode;
-  className?: string;
-}> = ({ children, className }) => (
-  <div className={cn("flex items-center justify-end gap-3 pt-6 border-t border-gray-700/30", className)}>
+const ModalFooter: React.FC<{ children: React.ReactNode; className?: string }> = ({ children, className }) => (
+  <div className={cn('mt-6 flex flex-col gap-3 border-t border-neutral-200/60 pt-4 sm:flex-row sm:items-center sm:justify-end dark:border-neutral-700/60', className)}>
     {children}
   </div>
 );
 
-// Confirmation Modal component
 interface ConfirmationModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -205,7 +156,7 @@ interface ConfirmationModalProps {
   message: string;
   confirmText?: string;
   cancelText?: string;
-  variant?: 'danger' | 'warning' | 'info';
+  variant?: 'danger' | 'primary';
 }
 
 const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
@@ -216,43 +167,25 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
   message,
   confirmText = 'Confirmer',
   cancelText = 'Annuler',
-  variant = 'danger'
+  variant = 'primary',
 }) => {
   const handleConfirm = () => {
     onConfirm();
     onClose();
   };
 
-  const confirmButtonVariant = variant === 'danger' ? 'destructive' : 'primary';
-
   return (
-    <Modal
-      isOpen={isOpen}
-      onClose={onClose}
-      title={title}
-      size="sm"
-      variant="glass"
-    >
-      <div className="space-y-6">
-        <p className="text-gray-300 leading-relaxed">
-          {message}
-        </p>
+    <Modal isOpen={isOpen} onClose={onClose} title={title} size="sm" variant="surface">
+      <p className="text-body text-neutral-600 dark:text-neutral-200">{message}</p>
 
-        <ModalFooter>
-          <Button
-            variant="ghost"
-            onClick={onClose}
-          >
-            {cancelText}
-          </Button>
-          <Button
-            variant={confirmButtonVariant}
-            onClick={handleConfirm}
-          >
-            {confirmText}
-          </Button>
-        </ModalFooter>
-      </div>
+      <ModalFooter>
+        <Button variant="ghost" onClick={onClose}>
+          {cancelText}
+        </Button>
+        <Button variant={variant === 'danger' ? 'destructive' : 'primary'} onClick={handleConfirm}>
+          {confirmText}
+        </Button>
+      </ModalFooter>
     </Modal>
   );
 };

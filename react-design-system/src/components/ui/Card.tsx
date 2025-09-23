@@ -5,130 +5,127 @@ import { cn } from '../../utils/cn';
 
 const cardVariants = cva(
   [
-    "relative overflow-hidden rounded-2xl border transition-all duration-300",
-    "backdrop-blur-sm bg-gradient-to-br"
+    'relative flex flex-col rounded-3xl border shadow-card transition-all duration-300 ease-spring-out',
+    'bg-surface-light/95 dark:bg-neutral-900/80 border-neutral-200/70 dark:border-neutral-800/80',
+    'backdrop-blur-xl overflow-hidden',
   ],
   {
     variants: {
       variant: {
-          default: [
-            "from-white/70 via-white/60 to-white/70 dark:from-gray-800/40 dark:via-gray-800/30 dark:to-gray-800/40",
-            "border-gray-200 hover:border-gray-300 dark:border-gray-700 dark:hover:border-gray-600",
-            "shadow-lg shadow-gray-200/60 hover:shadow-xl hover:shadow-gray-300/60 dark:shadow-black/20 dark:hover:shadow-black/30"
-          ],
-          glass: [
-            "from-white/20 via-white/30 to-white/20 dark:from-gray-700/20 dark:via-gray-700/30 dark:to-gray-700/20",
-            "border-white/40 dark:border-gray-600",
-            "shadow-2xl shadow-gray-200/40 hover:shadow-gray-300/50 dark:shadow-black/40 dark:hover:shadow-black/50",
-            "before:absolute before:inset-0 before:bg-gradient-to-br before:from-white/10 before:to-transparent before:pointer-events-none"
-          ],
-          primary: [
-            "from-brand-50 to-accent-50",
-            "border-brand-200 hover:border-brand-300",
-            "shadow-lg shadow-brand-200/50 hover:shadow-brand-300/60"
-          ],
-          accent: [
-            "from-accent-50 to-accent-100",
-            "border-accent-200 hover:border-accent-300",
-            "shadow-lg shadow-accent-200/50 hover:shadow-accent-300/60"
-          ]
-      },
-      size: {
-        sm: "p-4",
-        default: "p-6",
-        lg: "p-8",
-        xl: "p-10"
+        default: [
+          'bg-surface-light/95 dark:bg-neutral-900/80',
+        ],
+        glass: [
+          'bg-primary-200/15 dark:bg-neutral-900/60 border-primary-400/20',
+          'before:absolute before:inset-0 before:bg-emerald-glass before:opacity-90 before:-z-10',
+        ],
+        highlight: [
+          'bg-primary-500/10 border-primary-400/30',
+          'dark:bg-primary-800/20 dark:border-primary-600/40',
+        ],
+        muted: [
+          'bg-neutral-50 border-neutral-200',
+          'dark:bg-neutral-900 dark:border-neutral-800',
+        ],
       },
       hover: {
-        none: "",
-        lift: "hover:-translate-y-1 hover:scale-[1.02]",
-        glow: "hover:shadow-glow transition-shadow duration-500"
-      }
+        none: '',
+        lift: 'hover:-translate-y-1 hover:shadow-glow',
+        glow: 'hover:shadow-glow hover:border-primary-500/40',
+        subtle: 'hover:-translate-y-0.5 hover:bg-primary-100/20',
+      },
+      padding: {
+        none: 'p-0',
+        sm: 'p-4',
+        md: 'p-6',
+        lg: 'p-8',
+      },
     },
     defaultVariants: {
-      variant: "default",
-      size: "default",
-      hover: "lift"
-    }
-  }
+      variant: 'default',
+      hover: 'lift',
+      padding: 'md',
+    },
+  },
 );
 
 interface CardProps
-  extends Omit<HTMLMotionProps<"div">, "size">,
+  extends Omit<HTMLMotionProps<'div'>, 'size'>,
     VariantProps<typeof cardVariants> {
   children: React.ReactNode;
 }
 
-const Card = forwardRef<HTMLDivElement, CardProps>(
-  ({ className, variant, size, hover, children, ...props }, ref) => {
-    return (
-      <motion.div
-        className={cn(cardVariants({ variant, size, hover, className }))}
-        ref={ref}
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4, ease: "easeOut" }}
-        whileHover={hover === "lift" ? { y: -4, scale: 1.02 } : undefined}
-        {...props}
-      >
-        {children}
-      </motion.div>
-    );
-  }
-);
+const Card = forwardRef<HTMLDivElement, CardProps>(({
+  className,
+  variant,
+  hover,
+  padding,
+  children,
+  ...props
+}, ref) => {
+  return (
+    <motion.div
+      ref={ref}
+      className={cn(cardVariants({ variant, hover, padding, className }))}
+      initial={{ opacity: 0, y: 18 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4, ease: 'easeOut' }}
+      whileHover={hover !== 'none' ? { scale: 1.02 } : undefined}
+      {...props}
+    >
+      {children}
+    </motion.div>
+  );
+});
 
 const CardHeader = forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
   ({ className, ...props }, ref) => (
-    <div
-      ref={ref}
-        className={cn("flex flex-col space-y-1.5 pb-4", className)}
-      {...props}
-    />
-  )
+    <div ref={ref} className={cn('flex flex-col gap-1.5 pb-4', className)} {...props} />
+  ),
 );
 
-const CardTitle = forwardRef<HTMLParagraphElement, React.HTMLAttributes<HTMLHeadingElement>>(
+const CardTitle = forwardRef<HTMLHeadingElement, React.HTMLAttributes<HTMLHeadingElement>>(
   ({ className, ...props }, ref) => (
-      <h3
-        ref={ref}
-        className={cn("text-lg font-semibold leading-none tracking-tight text-gray-900 dark:text-white", className)}
-        {...props}
-      />
-  )
+    <h3
+      ref={ref}
+      className={cn('text-h3 font-semibold text-neutral-800 dark:text-neutral-50', className)}
+      {...props}
+    />
+  ),
 );
 
 const CardDescription = forwardRef<HTMLParagraphElement, React.HTMLAttributes<HTMLParagraphElement>>(
   ({ className, ...props }, ref) => (
-      <p
-        ref={ref}
-        className={cn("text-sm text-gray-600 dark:text-gray-400 leading-relaxed", className)}
-        {...props}
-      />
-  )
+    <p
+      ref={ref}
+      className={cn('text-body text-neutral-500 dark:text-neutral-300/80', className)}
+      {...props}
+    />
+  ),
 );
 
 const CardContent = forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
   ({ className, ...props }, ref) => (
-    <div ref={ref} className={cn("pt-0", className)} {...props} />
-  )
+    <div ref={ref} className={cn('flex-1', className)} {...props} />
+  ),
 );
 
 const CardFooter = forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
   ({ className, ...props }, ref) => (
     <div
       ref={ref}
-      className={cn("flex items-center pt-4 border-t border-gray-200 dark:border-gray-700", className)}
+      className={cn('mt-4 border-t border-neutral-200/70 pt-4 dark:border-neutral-700/70', className)}
       {...props}
     />
-  )
+  ),
 );
 
-Card.displayName = "Card";
-CardHeader.displayName = "CardHeader";
-CardFooter.displayName = "CardFooter";
-CardTitle.displayName = "CardTitle";
-CardDescription.displayName = "CardDescription";
-CardContent.displayName = "CardContent";
+Card.displayName = 'Card';
+CardHeader.displayName = 'CardHeader';
+CardFooter.displayName = 'CardFooter';
+CardTitle.displayName = 'CardTitle';
+CardDescription.displayName = 'CardDescription';
+CardContent.displayName = 'CardContent';
 
 export { Card, CardHeader, CardFooter, CardTitle, CardDescription, CardContent };
 export type { CardProps };

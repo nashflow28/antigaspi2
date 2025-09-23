@@ -11,13 +11,13 @@ describe('Button Component', () => {
   it('applies primary variant styles by default', () => {
     render(<Button>Primary Button</Button>);
     const button = screen.getByRole('button');
-    expect(button).toHaveClass('bg-gradient-to-r');
+    expect(button).toHaveClass('bg-nav-gradient');
   });
 
   it('applies different variants correctly', () => {
     const { rerender } = render(<Button variant="outline">Outline Button</Button>);
     let button = screen.getByRole('button');
-    expect(button).toHaveClass('border-2');
+    expect(button).toHaveClass('border-primary-400');
 
     rerender(<Button variant="ghost">Ghost Button</Button>);
     button = screen.getByRole('button');
@@ -48,7 +48,7 @@ describe('Button Component', () => {
   it('applies different sizes correctly', () => {
     const { rerender } = render(<Button size="sm">Small</Button>);
     let button = screen.getByRole('button');
-    expect(button).toHaveClass('px-3', 'py-2');
+    expect(button).toHaveClass('px-4', 'py-2');
 
     rerender(<Button size="lg">Large</Button>);
     button = screen.getByRole('button');
@@ -59,6 +59,6 @@ describe('Button Component', () => {
     render(<Button disabled>Disabled Button</Button>);
     const button = screen.getByRole('button');
     expect(button).toBeDisabled();
-    expect(button).toHaveClass('disabled:opacity-50');
+    expect(button).toHaveClass('disabled:opacity-60');
   });
 });

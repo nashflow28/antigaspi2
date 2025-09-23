@@ -3,36 +3,34 @@ import { motion } from 'framer-motion';
 
 const Footer: React.FC = () => {
   return (
-    <footer className="bg-cream dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800 mt-16">
-      <div className="max-w-7xl mx-auto px-4 py-8 flex flex-col md:flex-row items-center justify-between gap-4">
-        <motion.p
-          className="text-sm text-gray-600 dark:text-gray-400"
-          initial={{ opacity: 0, y: 10 }}
+    <footer className="mt-24 bg-primary-700 text-neutral-50">
+      <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-6 px-4 py-10 text-center sm:flex-row sm:text-left sm:px-6 lg:px-8">
+        <motion.div
+          initial={{ opacity: 0, y: 12 }}
           whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
+          transition={{ duration: 0.5 }}
+          className="space-y-1"
         >
-          © {new Date().getFullYear()} Antigaspi
-        </motion.p>
+          <p className="text-h3 font-semibold tracking-tight">Antigaspi</p>
+          <p className="text-small text-neutral-100/80">© {new Date().getFullYear()} — Ensemble, réduisons le gaspillage alimentaire.</p>
+        </motion.div>
 
-        <div className="flex space-x-4 text-gray-600 dark:text-gray-400">
-          <motion.a
-            href="#"
-            whileHover={{ scale: 1.1 }}
-            className="hover:text-primary-600 dark:hover:text-primary-400 transition-colors"
-          >
-            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M22.46 6c-.77.35-1.6.58-2.46.69a4.3 4.3 0 001.88-2.37 8.59 8.59 0 01-2.72 1.04 4.28 4.28 0 00-7.3 3.9A12.14 12.14 0 013 4.8a4.28 4.28 0 001.32 5.71 4.23 4.23 0 01-1.94-.54v.05a4.28 4.28 0 003.44 4.2 4.3 4.3 0 01-1.93.07 4.28 4.28 0 004 2.98A8.6 8.6 0 012 19.54a12.14 12.14 0 006.56 1.92c7.88 0 12.2-6.53 12.2-12.2 0-.19 0-.39-.01-.58A8.73 8.73 0 0024 5.1a8.55 8.55 0 01-2.54.7z" />
-            </svg>
-          </motion.a>
-          <motion.a
-            href="#"
-            whileHover={{ scale: 1.1 }}
-            className="hover:text-primary-600 dark:hover:text-primary-400 transition-colors"
-          >
-            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-              <path fillRule="evenodd" d="M12 2C6.48 2 2 6.48 2 12c0 4.42 2.87 8.17 6.84 9.5.5.09.68-.22.68-.48 0-.24-.01-.87-.01-1.71-2.78.6-3.37-1.34-3.37-1.34-.45-1.14-1.1-1.44-1.1-1.44-.9-.62.07-.61.07-.61 1 .07 1.52 1.03 1.52 1.03.89 1.52 2.34 1.08 2.91.83.09-.65.35-1.08.64-1.33-2.22-.25-4.56-1.11-4.56-4.95 0-1.09.39-1.98 1.03-2.68-.1-.25-.45-1.27.1-2.65 0 0 .84-.27 2.75 1.02a9.53 9.53 0 015 0c1.9-1.29 2.74-1.02 2.74-1.02.55 1.38.21 2.4.1 2.65.64.7 1.03 1.59 1.03 2.68 0 3.85-2.34 4.7-4.57 4.95.36.31.69.92.69 1.86 0 1.34-.01 2.42-.01 2.75 0 .27.18.58.69.48A10.01 10.01 0 0022 12c0-5.52-4.48-10-10-10z" clipRule="evenodd" />
-            </svg>
-          </motion.a>
+        <div className="flex items-center gap-4 text-neutral-100/80">
+          {['twitter', 'github', 'linkedin'].map((network) => (
+            <motion.a
+              key={network}
+              href="#"
+              className="flex h-10 w-10 items-center justify-center rounded-2xl bg-white/10 transition hover:bg-white/20"
+              whileHover={{ scale: 1.08 }}
+              whileTap={{ scale: 0.95 }}
+              aria-label={`Ouvrir ${network}`}
+            >
+              <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M0 0h24v24H0z" fill="none" />
+                <path d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996A4.107 4.107 0 0016.616 4c-2.266 0-4.103 1.835-4.103 4.102 0 .322.036.636.106.937-3.41-.171-6.437-1.804-8.463-4.287a4.07 4.07 0 00-.556 2.064 4.102 4.102 0 001.826 3.417 4.072 4.072 0 01-1.859-.513v.052c0 2.044 1.454 3.748 3.387 4.137a4.11 4.11 0 01-1.852.07c.522 1.63 2.038 2.818 3.833 2.853A8.233 8.233 0 012 18.408a11.616 11.616 0 006.29 1.84" />
+              </svg>
+            </motion.a>
+          ))}
         </div>
       </div>
     </footer>
