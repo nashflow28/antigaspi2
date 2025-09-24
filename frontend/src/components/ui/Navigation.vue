@@ -1,6 +1,8 @@
 <template>
   <Motion
     tag="nav"
+    role="navigation"
+    :aria-label="ariaLabel"
     :initial="{ y: -40, opacity: 0 }"
     :enter="{ y: 0, opacity: 1, transition: { duration: 0.6, ease: 'easeOut' } }"
     :class="navClasses"
@@ -22,16 +24,18 @@
         </slot>
       </a>
 
-      <div class="hidden items-center gap-1 lg:flex">
+      <div class="hidden items-center gap-1 lg:flex" role="menubar">
         <template v-for="item in items" :key="item.label">
           <Motion
             tag="a"
             :href="item.href"
+            role="menuitem"
             :initial="{ opacity: 0, y: -12 }"
             :enter="{ opacity: 1, y: 0, transition: { duration: 0.25 } }"
             :hovered="{ scale: 1.05 }"
             :tapped="{ scale: 0.96 }"
             :class="navigationItemClasses(item)"
+            :aria-current="item.active ? 'page' : undefined"
             @click.prevent="emit('item-click', item)"
           >
             <component v-if="item.icon" :is="item.icon" class="h-4 w-4" />
@@ -59,8 +63,11 @@
           variant="ghost"
           size="icon"
           :aria-expanded="isOpen"
+          :aria-controls="menuId"
           aria-label="Ouvrir la navigation"
+          aria-haspopup="true"
           data-testid="mobile-menu-button"
+          type="button"
           @click="toggleMenu"
         >
           <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -85,8 +92,10 @@
 
     <Motion
       v-if="isOpen"
+      :id="menuId"
       tag="div"
-      class="relative z-10 border-t border-white/10 bg-neutral-900 text-neutral-50 lg:hidden"
+      role="menu"
+      class="relative z-10 border-t border-white/10 bg-neutral-900 text-neutral-50 dark:border-neutral-700/60 dark:bg-neutral-900 lg:hidden"
       :initial="{ opacity: 0, y: -12 }"
       :enter="{ opacity: 1, y: 0, transition: { duration: 0.3, ease: 'easeInOut' } }"
       :leave="{ opacity: 0, y: -12, transition: { duration: 0.2, ease: 'easeInOut' } }"
@@ -97,8 +106,10 @@
           <Motion
             tag="a"
             :href="item.href"
+            role="menuitem"
             :tapped="{ scale: 0.97 }"
             :class="mobileItemClasses(item)"
+            :aria-current="item.active ? 'page' : undefined"
             @click.prevent="handleMobileItemClick(item)"
           >
             <component v-if="item.icon" :is="item.icon" class="h-5 w-5" />
@@ -118,7 +129,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, useSlots } from 'vue'
+import { computed, ref, useId, useSlots } from 'vue'
 import type { Component } from 'vue'
 import { MotionComponent as Motion } from '@vueuse/motion'
 import { useWindowScroll } from '@vueuse/core'
@@ -144,6 +155,7 @@ const props = withDefaults(
     items?: NavigationItem[]
     actions?: Component | null
     showThemeToggle?: boolean
+    ariaLabel?: string
     class?: string
   }>(),
   {
@@ -151,6 +163,7 @@ const props = withDefaults(
     items: () => [],
     actions: null,
     showThemeToggle: true,
+    ariaLabel: 'Navigation principale',
     class: '',
   },
 )
@@ -168,7 +181,7 @@ const scrolled = computed(() => y.value > 12)
 const navClasses = computed(() => {
   const classes = [
     'fixed inset-x-0 top-0 z-40 border-b border-primary-500/15 backdrop-blur-xl transition-all duration-300 ease-out',
-    'relative overflow-hidden bg-nav-gradient text-white',
+    'relative overflow-hidden bg-nav-gradient text-white dark:bg-neutral-950',
     scrolled.value ? 'shadow-glow' : '',
     props.class,
   ]
@@ -197,6 +210,8 @@ const brand = computed(() => props.brand)
 const brandHref = computed(() => brand.value?.href ?? '#')
 
 const slots = useSlots()
+const menuId = useId()
+const ariaLabel = computed(() => props.ariaLabel)
 
 const hasMobileActions = computed(
   () => !!(slots['mobile-actions'] || slots.actions || props.actions),
