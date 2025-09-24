@@ -109,6 +109,9 @@ onMounted(async () => {
     // Initialize authentication state first
     await authStore.initAuth()
 
+    // Restore persisted cart before loading data
+    cartStore.hydrateFromStorage()
+
     // Initialize data stores in parallel for better performance
     await Promise.allSettled([
       productsStore.fetchProducts(),

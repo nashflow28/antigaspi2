@@ -20,17 +20,20 @@
               id="merchant-select"
               v-model="selectedMerchantId"
               @change="onMerchantChange"
+              :disabled="merchantsLoading"
               class="border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-yellow-500 focus:border-transparent"
             >
               <option value="">Sélectionner un commerçant</option>
               <option
-                v-for="merchant in merchants"
+                v-for="merchant in merchantOptions"
                 :key="merchant.id"
                 :value="merchant.id"
               >
                 {{ merchant.business_name }}
               </option>
             </select>
+            <p v-if="merchantsLoading" class="text-xs text-gray-500 mt-1">Chargement des commerçants...</p>
+            <p v-else-if="merchantsError" class="text-xs text-red-500 mt-1">{{ merchantsError }}</p>
           </div>
         </div>
       </div>
@@ -91,16 +94,14 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { computed, ref, onMounted } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 import ReviewForm from '@/components/reviews/ReviewForm.vue'
 import ReviewsList from '@/components/reviews/ReviewsList.vue'
 import { Star, Info } from 'lucide-vue-next'
-
-interface Merchant {
-  id: number
-  business_name: string
-}
+import { storeToRefs } from 'pinia'
+import { useMerchantsStore } from '@/stores/merchants'
+import { notify } from '@/composables/useNotifications'
 
 interface Product {
   id: number
@@ -108,23 +109,24 @@ interface Product {
 }
 
 const authStore = useAuthStore()
+const merchantsStore = useMerchantsStore()
+const { merchants, loading: merchantsLoading, error: merchantsError } = storeToRefs(merchantsStore)
 
-const merchants = ref<Merchant[]>([])
 const selectedMerchantId = ref<number | null>(null)
 const availableProducts = ref<Product[]>([])
 const reviewsListRef = ref()
 
+const merchantOptions = computed(() => {
+  return merchants.value.map(merchant => ({
+    id: merchant.id,
+    business_name: merchant.business_name,
+  }))
+})
+
 const fetchMerchants = async () => {
-  try {
-    // For now, we'll use a simple list. In a real app, you'd fetch this from an API
-    // This would be something like: const response = await fetch('/api/merchants')
-    merchants.value = [
-      { id: 1, business_name: 'Boulangerie Martin' },
-      { id: 2, business_name: 'Superette Bella' },
-      { id: 3, business_name: 'Supermarché Champion' },
-    ]
-  } catch (error) {
-    console.error('Error fetching merchants:', error)
+  const result = await merchantsStore.fetchMerchants()
+  if (!result.success && result.error) {
+    notify.error(result.error, 'Avis commerçants')
   }
 }
 
@@ -145,9 +147,12 @@ const onMerchantChange = async () => {
         id: product.id,
         name: product.name
       }))
+    } else {
+      availableProducts.value = []
+      notify.error(data.message || 'Impossible de charger les produits du commerçant')
     }
   } catch (error) {
-    console.error('Error fetching products:', error)
+    notify.error('Erreur lors du chargement des produits du commerçant')
     availableProducts.value = []
   }
 }
