@@ -1,5 +1,10 @@
 <template>
-  <div class="min-h-screen bg-gradient-to-br from-purple-50 to-indigo-50 p-6">
+  <DashboardLayout
+    :sidebar="sidebar"
+    :header="header"
+    class="bg-gradient-to-br from-purple-50 to-indigo-50"
+  >
+    <div class="p-6">
     <!-- Header -->
     <div class="mb-8">
       <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
@@ -381,7 +386,8 @@
       @close="closeModal"
       @action="handleModalAction"
     />
-  </div>
+    </div>
+  </DashboardLayout>
 </template>
 
 <script setup lang="ts">
@@ -389,6 +395,8 @@ import { ref, onMounted, nextTick, watch } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 import { formatPrice } from '@/utils/currency'
 import AdminModal from '@/components/ui/AdminModal.vue'
+import DashboardLayout from '@/components/ui/DashboardLayout.vue'
+import { useDashboardLayout } from '@/composables/useDashboardLayout'
 import {
   ArrowPathIcon,
   UsersIcon,
@@ -449,6 +457,7 @@ let userGrowthChart: any = null
 
 // Store and utilities
 const authStore = useAuthStore()
+const { sidebar, header } = useDashboardLayout('admin')
 const stats = ref({
   totalUsers: 0,
   newUsersThisMonth: 0,

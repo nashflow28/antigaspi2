@@ -1,5 +1,9 @@
 <template>
-  <div class="min-h-screen bg-gradient-to-br from-neutral-50 to-neutral-100">
+  <DashboardLayout
+    :sidebar="sidebar"
+    :header="header"
+    class="bg-gradient-to-br from-neutral-50 to-neutral-100"
+  >
     <!-- Header -->
     <div class="bg-white/80 backdrop-blur-sm border-b border-neutral-200 sticky top-0 z-10">
       <div class="container mx-auto px-4 py-6">
@@ -221,7 +225,7 @@
         </div>
       </div>
     </div>
-  </div>
+  </DashboardLayout>
 </template>
 
 <script setup lang="ts">
@@ -270,6 +274,7 @@ interface Pagination {
 }
 
 const authStore = useAuthStore()
+const { sidebar, header } = useDashboardLayout('merchant')
 const reviews = ref<Review[]>([])
 const products = ref<Product[]>([])
 const pagination = ref<Pagination | null>(null)

@@ -1,5 +1,10 @@
 <template>
-  <div class="min-h-screen bg-gradient-to-br from-purple-50 to-indigo-50 p-6">
+  <DashboardLayout
+    :sidebar="sidebar"
+    :header="header"
+    class="bg-gradient-to-br from-purple-50 to-indigo-50"
+  >
+    <div class="p-6">
     <!-- Header -->
     <div class="mb-8">
       <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
@@ -137,7 +142,7 @@
         @report-resolved="onReportResolved"
       />
     </div>
-  </div>
+  </DashboardLayout>
 </template>
 
 <script setup lang="ts">
@@ -145,6 +150,8 @@ import { ref, onMounted } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 import PendingReviewsList from '@/components/admin/PendingReviewsList.vue'
 import ReportedReviewsList from '@/components/admin/ReportedReviewsList.vue'
+import DashboardLayout from '@/components/ui/DashboardLayout.vue'
+import { useDashboardLayout } from '@/composables/useDashboardLayout'
 import {
   RefreshCw,
   Clock,
@@ -164,6 +171,7 @@ interface ModerationStats {
 }
 
 const authStore = useAuthStore()
+const { sidebar, header } = useDashboardLayout('admin')
 const stats = ref<ModerationStats | null>(null)
 const loading = ref(false)
 const error = ref<string | null>(null)

@@ -1,5 +1,10 @@
 <template>
-  <div class="min-h-screen bg-gradient-to-br from-green-50 to-blue-50 p-6">
+  <DashboardLayout
+    :sidebar="sidebar"
+    :header="header"
+    class="bg-gradient-to-br from-green-50 to-blue-50"
+  >
+    <div class="p-6">
     <!-- Header -->
     <div class="mb-8">
       <div class="flex items-center gap-4 mb-4">
@@ -375,7 +380,8 @@
       @confirm="confirmDelete"
       @cancel="showDeleteModal = false"
     />
-  </div>
+    </div>
+  </DashboardLayout>
 </template>
 
 <script setup lang="ts">
@@ -383,6 +389,8 @@ import { ref, reactive, computed, onMounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { merchantService } from '@/services/merchantService'
 import type { Product, Category, ProductUpdateData } from '@/types'
+import DashboardLayout from '@/components/ui/DashboardLayout.vue'
+import { useDashboardLayout } from '@/composables/useDashboardLayout'
 import {
   ArrowLeftIcon,
   CheckIcon,
@@ -398,6 +406,7 @@ import ConfirmModal from '@/components/ui/ConfirmModal.vue'
 
 const route = useRoute()
 const router = useRouter()
+const { sidebar, header } = useDashboardLayout('merchant')
 
 // État
 const product = ref<Product | null>(null)

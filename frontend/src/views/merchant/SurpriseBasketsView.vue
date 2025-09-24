@@ -1,5 +1,10 @@
 <template>
-  <div class="min-h-screen bg-gradient-to-br from-purple-50 to-pink-50 p-6">
+  <DashboardLayout
+    :sidebar="sidebar"
+    :header="header"
+    class="bg-gradient-to-br from-purple-50 to-pink-50"
+  >
+    <div class="p-6">
     <!-- Header -->
     <div class="mb-8" v-if="currentView === 'list'">
       <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
@@ -251,7 +256,7 @@
         @close="currentView = 'list'"
       />
     </div>
-  </div>
+  </DashboardLayout>
 </template>
 
 <script setup lang="ts">
@@ -259,6 +264,8 @@ import { ref, computed, onMounted } from 'vue'
 import { merchantService } from '@/services/merchantService'
 import { formatPrice } from '@/utils/currency'
 import type { SurpriseBasket } from '@/types'
+import DashboardLayout from '@/components/ui/DashboardLayout.vue'
+import { useDashboardLayout } from '@/composables/useDashboardLayout'
 import {
   ArrowLeftIcon,
   PlusIcon,
@@ -285,6 +292,7 @@ const editingBasket = ref<SurpriseBasket | null>(null)
 const selectedBasket = ref<SurpriseBasket | null>(null)
 const loading = ref(false)
 const error = ref('')
+const { sidebar, header } = useDashboardLayout('merchant')
 
 // Calculés
 const activeBaskets = computed(() => baskets.value.filter(basket => basket.is_active))
