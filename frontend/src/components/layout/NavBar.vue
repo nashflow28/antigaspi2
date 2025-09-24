@@ -35,10 +35,10 @@
               <span class="text-white text-xl">🌱</span>
             </div>
             <div class="flex flex-col">
-              <span class="text-2xl font-bold bg-nav-gradient bg-clip-text text-transparent">
+              <span class="text-2xl font-bold bg-nav-gradient bg-clip-text text-transparent font-display">
                 Antigaspi
               </span>
-              <span class="text-xs text-neutral-500 font-medium -mt-1">
+              <span class="text-xs text-neutral-500 font-medium -mt-1 font-heading">
                 Sauvons ensemble
               </span>
             </div>
