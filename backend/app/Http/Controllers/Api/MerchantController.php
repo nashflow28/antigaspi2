@@ -12,6 +12,93 @@ use Tymon\JWTAuth\Facades\JWTAuth;
 class MerchantController extends Controller
 {
     /**
+     * Liste publique des commerçants disponibles pour la vitrine
+     */
+    public function index(Request $request): JsonResponse
+    {
+        try {
+            $query = Merchant::with(['user'])
+                ->withCount(['products as products_count' => function ($productQuery) {
+                    $productQuery->active()->available();
+                }])
+                ->verified();
+
+            if ($request->filled('search')) {
+                $search = $request->input('search');
+                $query->where(function ($q) use ($search) {
+                    $q->where('business_name', 'like', "%{$search}%")
+                        ->orWhere('business_type', 'like', "%{$search}%");
+                });
+            }
+
+            if ($request->filled('city')) {
+                $city = $request->input('city');
+                $query->whereHas('user', function ($q) use ($city) {
+                    $q->where('city', 'like', "%{$city}%");
+                });
+            }
+
+            if ($request->filled('business_type')) {
+                $query->where('business_type', $request->input('business_type'));
+            }
+
+            if ($request->boolean('has_products')) {
+                $query->having('products_count', '>', 0);
+            }
+
+            $sortBy = $request->get('sort_by', 'recent');
+            switch ($sortBy) {
+                case 'products':
+                    $query->orderByDesc('products_count');
+                    break;
+                case 'name':
+                    $query->orderBy('business_name');
+                    break;
+                default:
+                    $query->orderByDesc('created_at');
+                    break;
+            }
+
+            $perPage = min(max((int) $request->get('per_page', 12), 1), 50);
+            $merchants = $query->paginate($perPage);
+
+            $data = $merchants->getCollection()->transform(function ($merchant) {
+                return [
+                    'id' => $merchant->id,
+                    'business_name' => $merchant->business_name,
+                    'business_type' => $merchant->business_type,
+                    'is_verified' => (bool) $merchant->is_verified,
+                    'latitude' => $merchant->latitude ? (float) $merchant->latitude : null,
+                    'longitude' => $merchant->longitude ? (float) $merchant->longitude : null,
+                    'products_count' => (int) ($merchant->products_count ?? 0),
+                    'user' => [
+                        'city' => optional($merchant->user)->city,
+                        'address' => optional($merchant->user)->address,
+                        'phone' => optional($merchant->user)->phone,
+                    ],
+                ];
+            });
+
+            return response()->json([
+                'success' => true,
+                'data' => $data,
+                'pagination' => [
+                    'current_page' => $merchants->currentPage(),
+                    'last_page' => $merchants->lastPage(),
+                    'per_page' => $merchants->perPage(),
+                    'total' => $merchants->total(),
+                ],
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Erreur lors de la récupération des commerçants',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    /**
      * Met à jour les coordonnées GPS du commerçant
      */
     public function updateLocation(Request $request): JsonResponse
