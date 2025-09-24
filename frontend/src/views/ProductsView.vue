@@ -156,9 +156,19 @@
         <ProductCard
           v-for="product in filteredProducts"
           :key="product.id"
-          :product="product"
-          @view="viewProduct"
-          @reserve="reserveProduct"
+          :image="product.image_url || defaultProductImage"
+          :name="product.name"
+          :merchant="formatMerchant(product)"
+          :price="formatPrice(product.discounted_price)"
+          :original-price="formatPrice(product.original_price)"
+          :discount="formatDiscount(product.discount)"
+          :quantity="formatQuantity(product)"
+          :tags="getProductTags(product)"
+          :reserve-loading="quickReserveLoadingId === product.id"
+          :reserve-disabled="isProductSoldOut(product) || quickReserveLoadingId === product.id"
+          :on-reserve="() => onReserve(product)"
+          class="cursor-pointer"
+          @click="() => viewProduct(product)"
         />
       </div>
     </div>
@@ -168,9 +178,12 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import ProductCard from '@/components/product/ProductCard.vue'
+import ProductCard from '@/components/ui/ProductCard.vue'
 import { Search, Filter, Package, MapPin } from 'lucide-vue-next'
 import { notify } from '@/composables/useNotifications'
+import { useAuthStore } from '@/stores/auth'
+import { useReservationsStore } from '@/stores/reservations'
+import { usePaymentsStore } from '@/stores/payments'
 
 interface Product {
   id: number
@@ -182,7 +195,7 @@ interface Product {
   merchant: {
     name: string
     address: string
-    distance: number
+    distance: number | null
   }
   expires_at: Date
   available_quantity: number
@@ -192,12 +205,28 @@ interface Product {
 }
 
 const router = useRouter()
+const authStore = useAuthStore()
+const reservationsStore = useReservationsStore()
+const paymentsStore = usePaymentsStore()
 
 // State
 const products = ref<Product[]>([])
 const loading = ref(true)
 const searchQuery = ref('')
 const showFilters = ref(false)
+const quickReserveLoadingId = ref<number | null>(null)
+
+const defaultProductImage =
+  'https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=600&q=80'
+
+const CATEGORY_LABELS: Record<string, string> = {
+  bakery: 'Boulangerie',
+  dairy: 'Produits laitiers',
+  meat: 'Viandes',
+  produce: 'Fruits & Légumes',
+  prepared: 'Plats préparés',
+  other: 'Autres'
+}
 
 const filters = ref({
   category: '',
@@ -236,7 +265,13 @@ const filteredProducts = computed(() => {
   // Distance filter
   if (filters.value.maxDistance) {
     const maxDist = parseFloat(filters.value.maxDistance)
-    result = result.filter(product => product.merchant.distance <= maxDist)
+    result = result.filter(product => {
+      const distance = product.merchant.distance
+      if (distance === null || Number.isNaN(distance)) {
+        return true
+      }
+      return distance <= maxDist
+    })
   }
 
   // Price filter
@@ -299,7 +334,7 @@ const fetchProducts = async () => {
         merchant: {
           name: product.merchant?.business_name || 'Commerçant inconnu',
           address: product.merchant?.address || product.merchant?.city || 'Adresse non renseignée',
-          distance: product.merchant?.distance_km || null
+          distance: product.merchant?.distance_km ?? null
         },
         expires_at: new Date(product.expiration_date),
         available_quantity: product.quantity_available,
@@ -329,6 +364,52 @@ const getCategoryKey = (categoryName: string) => {
   return categoryMap[categoryName] || 'other'
 }
 
+const getAvailableQuantity = (product: Product) => {
+  return Math.max(product.available_quantity - product.reserved_quantity, 0)
+}
+
+const isProductSoldOut = (product: Product) => {
+  return getAvailableQuantity(product) <= 0
+}
+
+const formatPrice = (price: number) => {
+  return `${Math.round(price).toLocaleString('fr-FR')} F CFA`
+}
+
+const formatDiscount = (discount: number) => {
+  if (!discount) return undefined
+  return `-${Math.round(discount)}%`
+}
+
+const formatQuantity = (product: Product) => {
+  const available = getAvailableQuantity(product)
+  if (available === 0) return 'Complet'
+  if (available === 1) return '1 restant'
+  return `${available} restants`
+}
+
+const formatMerchant = (product: Product) => {
+  const distance = product.merchant.distance
+  const distanceLabel =
+    typeof distance === 'number' && !Number.isNaN(distance) ? ` • ${distance.toFixed(1)} km` : ''
+  return `${product.merchant.name}${distanceLabel}`
+}
+
+const getProductTags = (product: Product) => {
+  const tags: string[] = []
+
+  if (product.category) {
+    const label = CATEGORY_LABELS[product.category] ?? product.category
+    tags.push(label)
+  }
+
+  if (product.discount >= 40) {
+    tags.push('Économies garanties')
+  }
+
+  return tags
+}
+
 const clearFilters = () => {
   filters.value = {
     category: '',
@@ -343,8 +424,64 @@ const viewProduct = (product: Product) => {
   router.push(`/products/${product.id}`)
 }
 
-const reserveProduct = (product: Product) => {
-  router.push(`/products/${product.id}/reserve`)
+const onReserve = async (product: Product) => {
+  if (isProductSoldOut(product)) {
+    notify.info('Ce produit est complet pour le moment.', 'Réservation rapide')
+    return
+  }
+
+  if (!authStore.isAuthenticated) {
+    notify.info('Connectez-vous pour réserver ce produit instantanément.', 'Connexion requise')
+    router.push({ name: 'login', query: { redirect: `/products/${product.id}` } })
+    return
+  }
+
+  if (quickReserveLoadingId.value === product.id) {
+    return
+  }
+
+  try {
+    quickReserveLoadingId.value = product.id
+
+    const result = await reservationsStore.createReservation({
+      productId: product.id,
+      quantity: 1,
+      paymentMethod: 'paystack',
+      customerPhone: authStore.user?.phone || undefined,
+      customerEmail: authStore.user?.email || undefined
+    })
+
+    if (!result.success || !result.data) {
+      throw new Error(result.error || 'Réservation rapide impossible')
+    }
+
+    if (result.payment) {
+      paymentsStore.recordPayment(result.payment)
+
+      if (result.payment.checkout_url) {
+        window.open(result.payment.checkout_url, '_blank', 'noopener')
+      }
+    }
+
+    const reservedProduct = products.value.find(item => item.id === product.id)
+    if (reservedProduct) {
+      reservedProduct.reserved_quantity = Math.min(
+        reservedProduct.available_quantity,
+        reservedProduct.reserved_quantity + 1
+      )
+    }
+
+    notify.success(
+      'Réservation rapide initiée ! Consultez vos paiements pour finaliser.',
+      'Paiement rapide'
+    )
+  } catch (error: any) {
+    console.error('Erreur lors de la réservation rapide:', error)
+    const message = error?.message || 'Impossible d’initier la réservation rapide.'
+    notify.error(message, 'Réservation rapide')
+  } finally {
+    quickReserveLoadingId.value = null
+  }
 }
 
 const enableLocationFilter = () => {
