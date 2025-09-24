@@ -56,7 +56,13 @@
           </p>
         </div>
 
-        <Button variant="primary" :aria-label="`Réserver ${name}`" @click="handleReserve">
+        <Button
+          variant="primary"
+          :aria-label="`Réserver ${name}`"
+          :loading="reserveLoading"
+          :disabled="reserveDisabled"
+          @click="handleReserve"
+        >
           Réserver
         </Button>
       </div>
@@ -81,9 +87,13 @@ const props = withDefaults(
     quantity?: string;
     tags?: string[];
     onReserve?: () => void;
+    reserveLoading?: boolean;
+    reserveDisabled?: boolean;
   }>(),
   {
     tags: () => [],
+    reserveLoading: false,
+    reserveDisabled: false,
   },
 );
 
@@ -110,7 +120,9 @@ const { image, name, merchant, price, originalPrice, discount, quantity, tags } 
 
 const hasTags = computed(() => (tags.value?.length ?? 0) > 0);
 
-const handleReserve = () => {
+const handleReserve = (event: MouseEvent) => {
+  event?.stopPropagation?.();
+  event?.preventDefault?.();
   props.onReserve?.();
   emit('reserve');
   emit('onReserve');
