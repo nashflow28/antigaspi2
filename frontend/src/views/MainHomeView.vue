@@ -199,16 +199,20 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { computed, ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
+import { storeToRefs } from 'pinia'
+import { useCartStore } from '@/stores/cart'
 
 const router = useRouter()
+const cartStore = useCartStore()
+const { itemsCount } = storeToRefs(cartStore)
 
 // Reactive state
 const loading = ref(false)
 const notificationsCount = ref(3)
-const cartItems = ref(2)
 const totalProducts = ref(156)
+const cartItems = computed(() => itemsCount.value)
 
 // Categories
 const categories = ref([
@@ -309,6 +313,7 @@ const goToFavorites = () => router.push('/favorites')
 const goToProfile = () => router.push('/profile')
 
 onMounted(() => {
+  cartStore.hydrateFromStorage()
   console.log('🏠 MainHomeView loaded')
 })
 </script>

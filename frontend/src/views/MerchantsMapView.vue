@@ -7,7 +7,7 @@
           <div>
             <h1 class="text-3xl font-bold text-neutral-900">Carte des commerçants</h1>
             <p class="text-neutral-600 mt-1">
-              {{ loading ? 'Chargement...' : `${merchants.length} commerçant${merchants.length > 1 ? 's' : ''} référencé${merchants.length > 1 ? 's' : ''}` }}
+              {{ merchantsLoading ? 'Chargement...' : `${merchantsWithLocation.length} commerçant${merchantsWithLocation.length > 1 ? 's' : ''} référencé${merchantsWithLocation.length > 1 ? 's' : ''}` }}
             </p>
           </div>
 
@@ -23,10 +23,10 @@
             </button>
             <button
               @click="refreshMerchants"
-              :disabled="loading"
+              :disabled="merchantsLoading"
               class="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50"
             >
-              <RefreshCw class="w-4 h-4 mr-2" :class="{ 'animate-spin': loading }" />
+              <RefreshCw class="w-4 h-4 mr-2" :class="{ 'animate-spin': merchantsLoading }" />
               Actualiser
             </button>
           </div>
@@ -46,7 +46,7 @@
         </div>
 
         <!-- Loading overlay -->
-        <div v-if="loading" class="absolute inset-6 bg-white/80 rounded-lg flex items-center justify-center">
+        <div v-if="merchantsLoading" class="absolute inset-6 bg-white/80 rounded-lg flex items-center justify-center">
           <div class="text-center">
             <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
             <p class="text-gray-600">Chargement des commerçants...</p>
@@ -91,7 +91,7 @@
 
             <div class="flex items-center space-x-3 text-gray-600">
               <MapPin class="w-5 h-5" />
-              <span>{{ selectedMerchant.user.address || selectedMerchant.user.city }}</span>
+              <span>{{ selectedMerchant.user?.address || selectedMerchant.user?.city || selectedMerchant.city }}</span>
             </div>
 
             <div v-if="selectedMerchant.distance_km" class="flex items-center space-x-3 text-gray-600">
@@ -101,13 +101,13 @@
 
             <div class="flex items-center space-x-3 text-gray-600">
               <Phone class="w-5 h-5" />
-              <span>{{ selectedMerchant.user.phone || 'Non renseigné' }}</span>
+              <span>{{ selectedMerchant.user?.phone || 'Non renseigné' }}</span>
             </div>
 
             <div class="bg-green-50 rounded-lg p-4">
               <div class="flex items-center space-x-2 text-green-700 mb-2">
                 <Package class="w-5 h-5" />
-                <span class="font-medium">{{ selectedMerchant.products_count }} produit(s) disponible(s)</span>
+              <span class="font-medium">{{ selectedMerchant.products_count ?? 0 }} produit(s) disponible(s)</span>
               </div>
               <p class="text-green-600 text-sm">
                 Commerçant vérifié ✓
@@ -131,50 +131,32 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, nextTick, onUnmounted } from 'vue'
+import { computed, ref, onMounted, nextTick, onUnmounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { MapPin, RefreshCw, X, Building, Navigation, Phone, Package } from 'lucide-vue-next'
 import { notify } from '@/composables/useNotifications'
 import useGeolocation from '@/composables/useGeolocation'
+import { storeToRefs } from 'pinia'
+import { useMerchantsStore, type MerchantWithLocation } from '@/stores/merchants'
 import 'leaflet/dist/leaflet.css'
-
-interface Merchant {
-  id: number
-  business_name: string
-  business_type: string
-  latitude: number
-  longitude: number
-  distance_km?: number
-  products_count: number
-  is_verified: boolean
-  user: {
-    city: string
-    address: string
-    phone: string
-  }
-}
 
 const router = useRouter()
 
 // Composables
 const { position, getCurrentPosition, isLoading: geoLoading } = useGeolocation()
+const merchantsStore = useMerchantsStore()
+const { merchants, loading: merchantsLoading } = storeToRefs(merchantsStore)
 
 // State
-const merchants = ref<Merchant[]>([])
-const loading = ref(false)
-const selectedMerchant = ref<Merchant | null>(null)
-const merchantsCache = ref<Map<string, Merchant[]>>(new Map())
-const cacheExpiry = ref<Map<string, number>>(new Map())
+const merchantsWithLocation = computed(() => merchants.value.filter(merchant => merchant.latitude !== null && merchant.longitude !== null))
+const selectedMerchant = ref<MerchantWithLocation | null>(null)
 
 // Map references
 const mapContainer = ref<HTMLElement | null>(null)
 let map: any = null
 let userMarker: any = null
 const merchantMarkers: any[] = []
-let mapInitialized = ref(false)
-
-// Cache settings (5 minutes)
-const CACHE_DURATION = 5 * 60 * 1000
+const mapInitialized = ref(false)
 
 // Methods
 const initializeMap = async () => {
@@ -199,7 +181,7 @@ const initializeMap = async () => {
 }
 
 const addMerchantMarkers = async () => {
-  if (!map || merchants.value.length === 0) return
+  if (!map || merchantsWithLocation.value.length === 0) return
 
   try {
     const L = await import('leaflet')
@@ -216,7 +198,7 @@ const addMerchantMarkers = async () => {
     })
 
     // Add markers for each merchant
-    merchants.value.forEach(merchant => {
+    merchantsWithLocation.value.forEach(merchant => {
       const marker = L.marker([merchant.latitude, merchant.longitude], {
         icon: merchantIcon
       }).addTo(map)
@@ -334,69 +316,11 @@ const getCurrentLocation = async () => {
   }
 }
 
-const fetchAllMerchants = async (forceRefresh = false) => {
-  const cacheKey = 'all-merchants'
-  const now = Date.now()
-
-  // Check cache first (unless forced refresh)
-  if (!forceRefresh && merchantsCache.value.has(cacheKey)) {
-    const cacheTime = cacheExpiry.value.get(cacheKey) || 0
-    if (now - cacheTime < CACHE_DURATION) {
-      merchants.value = merchantsCache.value.get(cacheKey) || []
-      await addMerchantMarkers()
-      return
-    }
-  }
-
-  loading.value = true
-
-  try {
-    const response = await fetch('http://localhost:8000/api/merchants/all-with-location', {
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json'
-      }
-    })
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`)
-    }
-
-    const data = await response.json()
-
-    if (data.success) {
-      const merchantsData = data.data.map((merchant: any) => ({
-        id: merchant.id,
-        business_name: merchant.business_name,
-        business_type: merchant.business_type,
-        latitude: merchant.latitude,
-        longitude: merchant.longitude,
-        distance_km: merchant.distance_km,
-        products_count: merchant.products_count,
-        is_verified: merchant.is_verified,
-        user: merchant.user
-      }))
-
-      merchants.value = merchantsData
-
-      // Cache the results
-      merchantsCache.value.set(cacheKey, merchantsData)
-      cacheExpiry.value.set(cacheKey, now)
-
-      // Add markers to map after loading merchants
-      await addMerchantMarkers()
-    } else {
-      notify.error('Erreur lors de la récupération des commerçants')
-    }
-  } catch (error) {
-    notify.error('Erreur lors de la récupération des commerçants')
-  } finally {
-    loading.value = false
-  }
-}
-
 const refreshMerchants = async () => {
-  await fetchAllMerchants(true) // Force refresh
+  const result = await merchantsStore.fetchMerchants({ withLocation: true, force: true })
+  if (result.success) {
+    await addMerchantMarkers()
+  }
 }
 
 const viewMerchantProducts = () => {
@@ -409,6 +333,13 @@ const viewMerchantProducts = () => {
 }
 
 
+
+watch(merchantsWithLocation, async () => {
+  if (!mapInitialized.value) {
+    return
+  }
+  await addMerchantMarkers()
+})
 
 // Cleanup on unmount
 onUnmounted(() => {
@@ -428,10 +359,16 @@ onMounted(async () => {
   setTimeout(async () => {
     await initializeMap()
     mapInitialized.value = true
+    if (merchantsWithLocation.value.length) {
+      await addMerchantMarkers()
+    }
   }, 100)
 
   // Fetch merchants data
-  await fetchAllMerchants()
+  const result = await merchantsStore.fetchMerchants({ withLocation: true })
+  if (result.success) {
+    await addMerchantMarkers()
+  }
 })
 </script>
 

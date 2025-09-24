@@ -4,7 +4,8 @@ import type {
   Reservation,
   ApiResponse,
   PaginatedResponse,
-  Category
+  Category,
+  Merchant
 } from '@/types'
 
 // Types spécifiques au merchant
@@ -17,6 +18,34 @@ export interface MerchantStats {
   monthly_revenue: number
   average_rating: number
   total_reviews: number
+}
+
+export interface MerchantUserProfile {
+  id?: number
+  first_name?: string | null
+  last_name?: string | null
+  email?: string | null
+  phone?: string | null
+  city?: string | null
+  address?: string | null
+}
+
+export interface MerchantWithLocation extends Merchant {
+  latitude: number | null
+  longitude: number | null
+  distance_km?: number | null
+  products_count?: number
+  user?: MerchantUserProfile
+}
+
+export interface MerchantDetail extends MerchantWithLocation {
+  description?: string | null
+  opening_hours?: Record<string, string> | string | null
+  rating?: number | null
+  total_reviews?: number | null
+  surprise_baskets?: unknown[] | null
+  social_links?: Record<string, string> | null
+  [key: string]: unknown
 }
 
 export interface ProductCreateData {
@@ -76,6 +105,73 @@ export interface ReservationFilters {
 
 class MerchantService {
   private readonly baseUrl = '/api'
+
+  private buildQueryString(params?: Record<string, unknown>): string {
+    if (!params) {
+      return ''
+    }
+
+    const searchParams = new URLSearchParams()
+
+    Object.entries(params).forEach(([key, value]) => {
+      if (value === undefined || value === null || value === '') {
+        return
+      }
+
+      if (Array.isArray(value)) {
+        value.forEach(item => {
+          searchParams.append(`${key}[]`, String(item))
+        })
+      } else {
+        searchParams.append(key, String(value))
+      }
+    })
+
+    return searchParams.toString()
+  }
+
+  /**
+   * Récupérer la liste publique des commerçants
+   */
+  async getMerchants(params?: Record<string, unknown>): Promise<ApiResponse<Merchant[] | { merchants: Merchant[] }>> {
+    try {
+      const queryString = this.buildQueryString(params)
+      const endpoint = queryString ? `/merchants?${queryString}` : '/merchants'
+      const response = await apiService.get<ApiResponse<Merchant[] | { merchants: Merchant[] }>>(endpoint, false)
+      return response
+    } catch (error: any) {
+      return this.handleError(error)
+    }
+  }
+
+  /**
+   * Récupérer la liste des commerçants avec leurs coordonnées
+   */
+  async getMerchantsWithLocation(params?: Record<string, unknown>): Promise<ApiResponse<MerchantWithLocation[] | { merchants: MerchantWithLocation[] }>> {
+    try {
+      const queryString = this.buildQueryString(params)
+      const endpoint = queryString
+        ? `/merchants/all-with-location?${queryString}`
+        : '/merchants/all-with-location'
+
+      const response = await apiService.get<ApiResponse<MerchantWithLocation[] | { merchants: MerchantWithLocation[] }>>(endpoint, false)
+      return response
+    } catch (error: any) {
+      return this.handleError(error)
+    }
+  }
+
+  /**
+   * Récupérer le détail d'un commerçant
+   */
+  async getMerchantDetail(id: number): Promise<ApiResponse<MerchantDetail | { merchant: MerchantDetail }>> {
+    try {
+      const response = await apiService.get<ApiResponse<MerchantDetail | { merchant: MerchantDetail }>>(`/merchants/${id}`, false)
+      return response
+    } catch (error: any) {
+      return this.handleError(error)
+    }
+  }
 
   /**
    * Statistiques du tableau de bord merchant
