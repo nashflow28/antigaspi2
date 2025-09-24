@@ -48,3 +48,15 @@
 | ThemeToggle | Switch thème.【F:react-design-system/src/components/ui/ThemeToggle.tsx†L5-L45】 | DarkModeToggle.【F:frontend/src/components/ui/DarkModeToggle.vue†L1-L118】 | OK | Fonctionnalité équivalente (persistante + animation). |
 | Toast | Notification flottante.【F:react-design-system/src/components/ui/Toast.tsx†L6-L100】 | NotificationToast / NotificationSystem.【F:frontend/src/components/ui/NotificationToast.vue†L1-L90】【F:frontend/src/components/ui/NotificationSystem.vue†L1-L125】 | Partiel | Vue possède un toast unitaire et un système multi-toasts ; aligner design (bordure, actions ghost) et API. |
 
+## Lots navigation grand public (vue côté client)
+
+| Vue | Primitives DS utilisées | Statut |
+| --- | --- | --- |
+| `DiscoverView` | `Card`, `Button`, `Skeleton`, toasts globaux | ✅ Intégrée (liste des commerçants + favoris) |
+| `CartPage` | `Card`, `Button`, `formatPrice`, toasts du store panier | ✅ Intégrée (résumé commande) |
+| `CheckoutView` | `Card`, `Button`, `Skeleton`, notifications | ✅ Intégrée (formulaire paiement) |
+| `FavoritesView` | `Card`, `Button`, `useFavoritesStore` + toasts | ✅ Intégrée (gestion favoris) |
+| `MerchantDetailView` | `Card`, `Button`, `Skeleton`, `useMerchantsStore` | ✅ Intégrée (fiche détaillée) |
+| `PublicReviewsView` | `Card`, `Button`, `Skeleton`, `useMerchantsStore` | ✅ Intégrée (retours communauté) |
+| `OnboardingFlow` | `Card`, `Button`, `useOnboardingStore` | ✅ Intégrée (guide onboarding) |
+
