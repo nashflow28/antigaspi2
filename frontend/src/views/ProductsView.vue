@@ -1,73 +1,88 @@
 <template>
-  <div class="min-h-screen bg-gradient-to-br from-neutral-50 to-neutral-100">
-    <!-- Header -->
-    <div class="bg-white/80 backdrop-blur-sm border-b border-neutral-200 sticky top-0 z-10">
-      <div class="container mx-auto px-4 py-6">
-        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-          <div>
-            <h1 class="text-3xl font-bold text-neutral-900">Catalogue des produits</h1>
-            <p class="text-neutral-600 mt-1">
-              {{ filteredProducts.length }} produit{{ filteredProducts.length > 1 ? 's' : '' }} disponible{{ filteredProducts.length > 1 ? 's' : '' }}
-            </p>
-          </div>
-
-          <!-- Search -->
-          <div class="flex flex-col sm:flex-row gap-3 lg:min-w-96">
+  <div class="min-h-screen bg-neutral-50">
+    <header class="sticky top-0 z-30 border-b border-neutral-200/70 bg-surface-light/80 backdrop-blur-xl">
+      <div class="mx-auto flex max-w-6xl flex-col gap-6 px-6 py-6 lg:flex-row lg:items-center lg:justify-between">
+        <div class="space-y-2">
+          <p class="text-small uppercase tracking-wide text-neutral-500">Catalogue</p>
+          <h1 class="text-display-sm font-semibold text-neutral-900">Produits disponibles</h1>
+          <p class="text-neutral-600">
+            {{ filteredProducts.length }} produit{{ filteredProducts.length > 1 ? 's' : '' }} disponible{{ filteredProducts.length > 1 ? 's' : '' }}
+          </p>
+        </div>
+        <Card padding="lg" class="w-full max-w-xl shadow-card">
+          <div class="flex flex-col gap-3 sm:flex-row sm:items-center">
             <div class="relative flex-1">
-              <Search class="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-neutral-400" />
+              <Search class="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-neutral-400" />
               <input
                 v-model="searchQuery"
                 type="text"
+                class="w-full rounded-2xl border border-neutral-200 bg-surface-light py-3 pl-12 pr-4 text-body text-neutral-700 shadow-card focus:border-primary-400 focus:outline-none focus:ring-2 focus:ring-primary-200"
                 placeholder="Rechercher des produits..."
-                class="input pl-10 w-full"
               />
             </div>
-            <button
+            <Button
+              variant="secondary"
+              size="sm"
+              :left-icon="Filter"
+              class="justify-between text-primary-700"
               @click="showFilters = !showFilters"
-              class="btn btn-ghost flex items-center gap-2"
             >
-              <Filter class="w-5 h-5" />
               Filtres
-              <span class="bg-primary-500 text-white text-xs px-2 py-1 rounded-full">{{ activeFiltersCount }}</span>
-            </button>
+              <span class="ml-3 rounded-full bg-primary-100 px-2 py-0.5 text-caption font-semibold text-primary-700">{{ activeFiltersCount }}</span>
+            </Button>
           </div>
-        </div>
+        </Card>
       </div>
-    </div>
+    </header>
 
-    <!-- Filters Panel -->
-    <div
-      v-if="showFilters"
-      class="bg-white border-b border-neutral-200 shadow-sm"
-    >
-      <div class="container mx-auto px-4 py-6">
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          <!-- Category Filter -->
-          <div>
-            <label class="block text-sm font-medium text-neutral-700 mb-2">Catégorie</label>
-            <select v-model="filters.category" class="select w-full">
-              <option value="">Toutes les catégories</option>
-              <option value="bakery">Boulangerie</option>
-              <option value="dairy">Produits laitiers</option>
-              <option value="meat">Viandes</option>
-              <option value="produce">Fruits & Légumes</option>
-              <option value="prepared">Plats préparés</option>
-            </select>
-          </div>
+    <main class="mx-auto max-w-6xl space-y-spacing-22 px-6 py-spacing-22">
+      <Transition name="fade">
+        <Card
+          v-if="showFilters"
+          padding="lg"
+          class="shadow-card"
+        >
+          <template #header>
+            <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+              <h2 class="text-h3 font-semibold text-neutral-900">Affiner votre recherche</h2>
+              <Button variant="ghost" size="sm" class="text-primary-600" @click="showFilters = false">Fermer</Button>
+            </div>
+          </template>
 
-          <!-- Distance Filter -->
-          <div>
-            <label class="block text-sm font-medium text-neutral-700 mb-2">Distance</label>
-            <div class="space-y-2">
-              <button
-                @click="enableLocationFilter"
-                :disabled="locationLoading"
-                class="w-full flex items-center justify-center gap-2 py-2 px-3 text-sm border border-primary-300 text-primary-700 bg-primary-50 hover:bg-primary-100 rounded-lg transition-colors disabled:opacity-50"
+          <div class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
+            <label class="flex flex-col gap-2">
+              <span class="text-small font-medium text-neutral-600">Catégorie</span>
+              <select
+                v-model="filters.category"
+                class="w-full rounded-2xl border border-neutral-200 bg-surface-light px-4 py-3 text-body text-neutral-600 focus:border-primary-400 focus:outline-none focus:ring-2 focus:ring-primary-200"
               >
-                <MapPin class="w-4 h-4" :class="{ 'animate-pulse': locationLoading }" />
+                <option value="">Toutes les catégories</option>
+                <option value="bakery">Boulangerie</option>
+                <option value="dairy">Produits laitiers</option>
+                <option value="meat">Viandes</option>
+                <option value="produce">Fruits &amp; Légumes</option>
+                <option value="prepared">Plats préparés</option>
+              </select>
+            </label>
+
+            <div class="flex flex-col gap-2">
+              <span class="text-small font-medium text-neutral-600">Distance</span>
+              <Button
+                variant="secondary"
+                size="sm"
+                :left-icon="MapPin"
+                :loading="locationLoading"
+                :disabled="locationLoading"
+                class="justify-center"
+                @click="enableLocationFilter"
+              >
                 {{ locationLoading ? 'Localisation...' : (userLocation ? 'Position activée' : 'Près de moi') }}
-              </button>
-              <select v-model="filters.maxDistance" class="select w-full" :disabled="!userLocation">
+              </Button>
+              <select
+                v-model="filters.maxDistance"
+                class="w-full rounded-2xl border border-neutral-200 bg-surface-light px-4 py-3 text-body text-neutral-600 focus:border-primary-400 focus:outline-none focus:ring-2 focus:ring-primary-200"
+                :disabled="!userLocation"
+              >
                 <option value="">{{ userLocation ? 'Toutes distances' : 'Activez votre position' }}</option>
                 <option value="1">1 km</option>
                 <option value="2">2 km</option>
@@ -76,110 +91,114 @@
                 <option value="20">20 km</option>
               </select>
             </div>
+
+            <label class="flex flex-col gap-2">
+              <span class="text-small font-medium text-neutral-600">Prix maximum</span>
+              <select
+                v-model="filters.maxPrice"
+                class="w-full rounded-2xl border border-neutral-200 bg-surface-light px-4 py-3 text-body text-neutral-600 focus:border-primary-400 focus:outline-none focus:ring-2 focus:ring-primary-200"
+              >
+                <option value="">Tous les prix</option>
+                <option value="500">Moins de 500 F CFA</option>
+                <option value="1000">Moins de 1000 F CFA</option>
+                <option value="2000">Moins de 2000 F CFA</option>
+                <option value="5000">Moins de 5000 F CFA</option>
+              </select>
+            </label>
+
+            <label class="flex flex-col gap-2">
+              <span class="text-small font-medium text-neutral-600">Réduction minimum</span>
+              <select
+                v-model="filters.minDiscount"
+                class="w-full rounded-2xl border border-neutral-200 bg-surface-light px-4 py-3 text-body text-neutral-600 focus:border-primary-400 focus:outline-none focus:ring-2 focus:ring-primary-200"
+              >
+                <option value="">Toutes réductions</option>
+                <option value="20">20% et plus</option>
+                <option value="30">30% et plus</option>
+                <option value="50">50% et plus</option>
+                <option value="70">70% et plus</option>
+              </select>
+            </label>
           </div>
 
-          <!-- Price Range -->
-          <div>
-            <label class="block text-sm font-medium text-neutral-700 mb-2">Prix maximum</label>
-            <select v-model="filters.maxPrice" class="select w-full">
-              <option value="">Tous les prix</option>
-              <option value="500">Moins de 500 F CFA</option>
-              <option value="1000">Moins de 1000 F CFA</option>
-              <option value="2000">Moins de 2000 F CFA</option>
-              <option value="5000">Moins de 5000 F CFA</option>
-            </select>
+          <div class="mt-8 flex flex-col gap-3 border-t border-neutral-200/70 pt-6 sm:flex-row sm:justify-between">
+            <Button variant="ghost" size="sm" class="text-neutral-600 hover:text-primary-700" :disabled="activeFiltersCount === 0" @click="clearFilters">
+              Réinitialiser
+            </Button>
+            <Button variant="primary" size="sm" class="sm:w-auto" @click="applyFilters">
+              Appliquer les filtres
+            </Button>
           </div>
+        </Card>
+      </Transition>
 
-          <!-- Discount Filter -->
-          <div>
-            <label class="block text-sm font-medium text-neutral-700 mb-2">Réduction min</label>
-            <select v-model="filters.minDiscount" class="select w-full">
-              <option value="">Toutes réductions</option>
-              <option value="20">20% et plus</option>
-              <option value="30">30% et plus</option>
-              <option value="50">50% et plus</option>
-              <option value="70">70% et plus</option>
-            </select>
-          </div>
+      <section>
+        <div v-if="loading" class="grid grid-cols-1 gap-6 md:grid-cols-3 xl:grid-cols-4">
+          <Card v-for="index in 8" :key="index" padding="sm" class="space-y-4">
+            <Skeleton class="aspect-square w-full" />
+            <div class="space-y-2">
+              <Skeleton class="h-4 w-2/3" />
+              <Skeleton class="h-3 w-1/2" />
+              <Skeleton class="h-5 w-full" />
+            </div>
+          </Card>
         </div>
 
-        <!-- Filter Actions -->
-        <div class="flex justify-between items-center mt-4 pt-4 border-t border-neutral-200">
-          <button
-            @click="clearFilters"
-            class="btn btn-ghost"
-            :disabled="activeFiltersCount === 0"
-          >
-            Effacer les filtres
-          </button>
-          <button
-            @click="showFilters = false"
-            class="btn btn-primary"
-          >
-            Appliquer les filtres
-          </button>
-        </div>
-      </div>
-    </div>
-
-    <!-- Products Grid -->
-    <div class="container mx-auto px-4 py-8">
-      <!-- Loading State -->
-      <div v-if="loading" class="flex justify-center items-center min-h-64">
-        <div class="flex items-center gap-3">
-          <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600"></div>
-          <span class="text-neutral-600">Chargement des produits...</span>
-        </div>
-      </div>
-
-      <!-- Empty State -->
-      <div v-else-if="filteredProducts.length === 0" class="text-center py-16">
-        <Package class="w-24 h-24 text-neutral-300 mx-auto mb-4" />
-        <h3 class="text-xl font-bold text-neutral-700 mb-2">Aucun produit trouvé</h3>
-        <p class="text-neutral-500 mb-6">
-          Essayez de modifier vos critères de recherche ou vos filtres.
-        </p>
-        <button
-          @click="clearFilters"
-          class="btn btn-primary"
-          v-if="activeFiltersCount > 0"
-        >
-          Effacer les filtres
-        </button>
-      </div>
-
-      <!-- Products Grid -->
-      <div
-        v-else
-        class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
-      >
-        <ProductCard
-          v-for="product in filteredProducts"
-          :key="product.id"
-          :image="product.image_url || defaultProductImage"
-          :name="product.name"
-          :merchant="formatMerchant(product)"
-          :price="formatPrice(product.discounted_price)"
-          :original-price="formatPrice(product.original_price)"
-          :discount="formatDiscount(product.discount)"
-          :quantity="formatQuantity(product)"
-          :tags="getProductTags(product)"
-          :reserve-loading="quickReserveLoadingId === product.id"
-          :reserve-disabled="isProductSoldOut(product) || quickReserveLoadingId === product.id"
-          :on-reserve="() => onReserve(product)"
-          class="cursor-pointer"
-          @click="() => viewProduct(product)"
+        <EmptyState
+          v-else-if="filteredProducts.length === 0"
+          title="Aucun produit trouvé"
+          description="Essayez de modifier votre recherche ou supprimez certains filtres pour découvrir d'autres paniers disponibles."
+          action-label="Réinitialiser les filtres"
+          icon="📦"
+          @action="clearFilters"
         />
-      </div>
-    </div>
+
+        <div
+          v-else
+          data-test="products-grid"
+          class="grid grid-cols-1 gap-6 md:grid-cols-3 xl:grid-cols-4"
+        >
+          <ProductCard
+            v-for="product in filteredProducts"
+            :key="product.id"
+            :image="product.image_url || defaultProductImage"
+            :name="product.name"
+            :merchant="formatMerchant(product)"
+            :price="formatPrice(product.discounted_price)"
+            :original-price="formatPrice(product.original_price)"
+            :discount="formatDiscount(product.discount)"
+            :quantity="formatQuantity(product)"
+            :tags="getProductTags(product)"
+            :reserve-loading="quickReserveLoadingId === product.id"
+            :reserve-disabled="isProductSoldOut(product) || quickReserveLoadingId === product.id"
+            :on-reserve="() => onReserve(product)"
+            class="h-full cursor-pointer"
+            @click="() => viewProduct(product)"
+          />
+        </div>
+      </section>
+    </main>
+
+    <Toast
+      :is-open="toast.open"
+      :tone="toast.tone"
+      :title="toast.title"
+      :description="toast.description"
+      :on-close="closeToast"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { computed, onMounted, reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { Search, Filter, MapPin } from 'lucide-vue-next'
+import Button from '@/components/ui/Button.vue'
+import Card from '@/components/ui/Card.vue'
+import EmptyState from '@/components/ui/EmptyState.vue'
+import Skeleton from '@/components/ui/Skeleton.vue'
+import Toast from '@/components/ui/Toast.vue'
 import ProductCard from '@/components/ui/ProductCard.vue'
-import { Search, Filter, Package, MapPin } from 'lucide-vue-next'
 import { notify } from '@/composables/useNotifications'
 import { useAuthStore } from '@/stores/auth'
 import { useReservationsStore } from '@/stores/reservations'
@@ -209,7 +228,6 @@ const authStore = useAuthStore()
 const reservationsStore = useReservationsStore()
 const paymentsStore = usePaymentsStore()
 
-// State
 const products = ref<Product[]>([])
 const loading = ref(true)
 const searchQuery = ref('')
@@ -235,11 +253,17 @@ const filters = ref({
   minDiscount: ''
 })
 
-// Geolocation state
 const userLocation = ref<{ latitude: number; longitude: number } | null>(null)
 const locationLoading = ref(false)
 
-// Computed
+const toast = reactive({
+  open: false,
+  tone: 'success' as const,
+  title: '',
+  description: ''
+})
+let toastTimer: number | undefined
+
 const activeFiltersCount = computed(() => {
   return Object.values(filters.value).filter(value => value !== '').length
 })
@@ -247,7 +271,6 @@ const activeFiltersCount = computed(() => {
 const filteredProducts = computed(() => {
   let result = products.value
 
-  // Search filter
   if (searchQuery.value) {
     const query = searchQuery.value.toLowerCase()
     result = result.filter(product =>
@@ -257,12 +280,10 @@ const filteredProducts = computed(() => {
     )
   }
 
-  // Category filter
   if (filters.value.category) {
     result = result.filter(product => product.category === filters.value.category)
   }
 
-  // Distance filter
   if (filters.value.maxDistance) {
     const maxDist = parseFloat(filters.value.maxDistance)
     result = result.filter(product => {
@@ -274,13 +295,11 @@ const filteredProducts = computed(() => {
     })
   }
 
-  // Price filter
   if (filters.value.maxPrice) {
     const maxPrice = parseFloat(filters.value.maxPrice)
     result = result.filter(product => product.discounted_price <= maxPrice)
   }
 
-  // Discount filter
   if (filters.value.minDiscount) {
     const minDiscount = parseFloat(filters.value.minDiscount)
     result = result.filter(product => product.discount >= minDiscount)
@@ -289,12 +308,31 @@ const filteredProducts = computed(() => {
   return result
 })
 
-// Methods
+const openToast = (tone: 'success' | 'info' | 'warning', title: string, description: string) => {
+  toast.open = true
+  toast.tone = tone
+  toast.title = title
+  toast.description = description
+  if (toastTimer) {
+    window.clearTimeout(toastTimer)
+  }
+  toastTimer = window.setTimeout(() => {
+    toast.open = false
+  }, 2600)
+}
+
+const closeToast = () => {
+  toast.open = false
+  if (toastTimer) {
+    window.clearTimeout(toastTimer)
+    toastTimer = undefined
+  }
+}
+
 const fetchProducts = async () => {
   try {
     loading.value = true
 
-    // Build URL with location parameters if available
     let url = 'http://localhost:8000/api/products'
     const params = new URLSearchParams()
 
@@ -310,7 +348,7 @@ const fetchProducts = async () => {
     const response = await fetch(url, {
       method: 'GET',
       headers: {
-        'Accept': 'application/json',
+        Accept: 'application/json',
         'Content-Type': 'application/json'
       }
     })
@@ -322,7 +360,6 @@ const fetchProducts = async () => {
     const data = await response.json()
 
     if (data.success) {
-      // Transform API data to match component interface
       products.value = data.data.map((product: any) => ({
         id: product.id,
         name: product.name,
@@ -338,22 +375,22 @@ const fetchProducts = async () => {
         },
         expires_at: new Date(product.expiration_date),
         available_quantity: product.quantity_available,
-        reserved_quantity: 0, // Not available in current API
+        reserved_quantity: 0,
         image_url: product.image_url
       }))
     } else {
-      console.error('API returned error:', data.message)
+      throw new Error(data.message || 'Réponse inattendue de l’API')
     }
-  } catch (error) {
+  } catch (error: any) {
     console.error('Erreur lors du chargement des produits:', error)
+    openToast('warning', 'Chargement incomplet', 'Nous rencontrons un souci pour récupérer certains produits. Réessayez plus tard.')
   } finally {
     loading.value = false
   }
 }
 
-// Helper function to map category names to keys
 const getCategoryKey = (categoryName: string) => {
-  const categoryMap: { [key: string]: string } = {
+  const categoryMap: Record<string, string> = {
     'Fruits et Légumes': 'produce',
     'Boulangerie': 'bakery',
     'Plats préparés': 'prepared',
@@ -418,6 +455,12 @@ const clearFilters = () => {
     minDiscount: ''
   }
   searchQuery.value = ''
+  openToast('info', 'Filtres réinitialisés', 'Tous les filtres ont été supprimés.')
+}
+
+const applyFilters = () => {
+  showFilters.value = false
+  openToast('success', 'Filtres appliqués', 'Affichage mis à jour selon vos préférences.')
 }
 
 const viewProduct = (product: Product) => {
@@ -499,8 +542,7 @@ const enableLocationFilter = () => {
         longitude: position.coords.longitude
       }
       locationLoading.value = false
-
-      // Reload products with location for distance calculation
+      openToast('success', 'Position activée', 'Nous affinons les paniers en fonction de votre position.')
       fetchProducts()
     },
     (error) => {
@@ -524,13 +566,24 @@ const enableLocationFilter = () => {
     {
       enableHighAccuracy: true,
       timeout: 10000,
-      maximumAge: 300000 // 5 minutes
+      maximumAge: 300000
     }
   )
 }
 
-// Lifecycle
 onMounted(() => {
   fetchProducts()
 })
 </script>
+
+<style scoped>
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.3s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+</style>
