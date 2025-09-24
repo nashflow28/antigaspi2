@@ -261,9 +261,10 @@
 <script setup lang="ts">
 import { ref, reactive, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import { useAuthStore } from '@/stores/auth'
+import { storeToRefs } from 'pinia'
 import { formatPrice } from '@/utils/currency'
-import { apiService } from '@/services/api'
+import { notify } from '@/composables/useNotifications'
+import { useReservationsStore } from '@/stores/reservations'
 import {
   Calendar, CheckCheck, ChevronLeft, ChevronRight, Download,
   Grid3X3, Leaf, List
@@ -273,9 +274,10 @@ import ConfirmModal from '@/components/ui/ConfirmModal.vue'
 import type { Reservation } from '@/types'
 
 const router = useRouter()
+const reservationsStore = useReservationsStore()
+const { reservations, loading } = storeToRefs(reservationsStore)
 
 // État de l'interface
-const loading = ref(true)
 const viewMode = ref<'list' | 'grid'>('list')
 const currentPage = ref(1)
 const itemsPerPage = 12
@@ -291,9 +293,6 @@ const filters = reactive({
 })
 
 const sortBy = ref('created_at_desc')
-
-// Données des réservations (simulées)
-const reservations = ref<Reservation[]>([])
 
 // Statistiques
 const stats = computed(() => ({
@@ -392,65 +391,9 @@ const hasFilters = computed(() =>
 
 // Méthodes
 const loadReservations = async () => {
-  loading.value = true
-  try {
-    const response = await fetch('http://localhost:8000/api/reservations', {
-      method: 'GET',
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${useAuthStore().token}`
-      }
-    })
-
-    if (!response.ok) {
-      if (response.status === 401) {
-        router.push('/login')
-        return
-      }
-      throw new Error(`HTTP error! status: ${response.status}`)
-    }
-
-    const data = await response.json()
-    console.log('Reservations API response:', data)
-
-    if (data.success || data.data) {
-      // Handle paginated response
-      const reservationsData = data.data || []
-
-      // Transform API data to match component interface
-      reservations.value = reservationsData.map((res: any) => ({
-        id: res.id,
-        product: {
-          id: res.product?.id,
-          name: res.product?.name || 'Produit inconnu',
-          image_url: res.product?.image_url || null,
-          merchant: {
-            name: res.product?.merchant?.name || res.product?.merchant?.business_name || 'Commerçant inconnu',
-            address: res.product?.merchant?.address || res.product?.merchant?.city || 'Adresse non renseignée',
-            phone: res.product?.merchant?.phone || 'N/A'
-          }
-        },
-        quantity: res.quantity ?? res.quantity_reserved ?? 0,
-        quantity_reserved: res.quantity_reserved ?? res.quantity ?? 0,
-        original_price: parseFloat(res.product?.original_price || 0),
-        discounted_price: parseFloat(res.product?.discounted_price || 0),
-        total_amount: parseFloat(res.total_amount || 0),
-        pickup_date: res.pickup_date ? new Date(res.pickup_date) : null,
-        pickup_notes: res.notes || '',
-        status: res.status,
-        created_at: new Date(res.created_at),
-        reservation_code: res.reservation_code || `ANT-${res.id.toString().padStart(3, '0')}`
-      }))
-    } else {
-      console.error('API returned unexpected format:', data)
-      reservations.value = []
-    }
-  } catch (error) {
-    console.error('Erreur lors du chargement des réservations:', error)
-    reservations.value = []
-  } finally {
-    loading.value = false
+  const result = await reservationsStore.fetchReservations()
+  if (!result.success) {
+    notify.error(result.error || 'Impossible de charger vos réservations pour le moment.')
   }
 }
 
@@ -463,27 +406,20 @@ const confirmCancelReservation = async () => {
   if (!reservationToCancel.value) return
 
   try {
-    // Appel API pour annuler la réservation
-    const response = await apiService.cancelReservation(reservationToCancel.value)
+    const response = await reservationsStore.cancelReservation(reservationToCancel.value)
 
     if (response.success) {
-      // Mise à jour locale après succès de l'API
-      const reservation = reservations.value.find(r => r.id === reservationToCancel.value)
-      if (reservation) {
-        reservation.status = 'cancelled'
-      }
-      console.log('✅ Réservation annulée avec succès')
+      notify.success('Réservation annulée avec succès.')
     } else {
-      throw new Error(response.message || 'Erreur lors de l\'annulation')
+      notify.error(response.error || 'Erreur lors de l\'annulation de la réservation.')
     }
   } catch (error: any) {
-    console.error('❌ Erreur lors de l\'annulation:', error.message || error)
-    // Optionnel: afficher une notification d'erreur à l'utilisateur
-    alert('Erreur lors de l\'annulation de la réservation. Veuillez réessayer.')
-  } finally {
-    showCancelModal.value = false
-    reservationToCancel.value = null
+    const message = error?.message || 'Erreur lors de l\'annulation de la réservation.'
+    notify.error(message)
   }
+
+  showCancelModal.value = false
+  reservationToCancel.value = null
 }
 
 const closeCancelModal = () => {
