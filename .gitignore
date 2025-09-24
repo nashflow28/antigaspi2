@@ -67,3 +67,5 @@ Thumbs.db
 # Local configuration
 local_config.php
 config.local.php
+*storybook.log
+storybook-static

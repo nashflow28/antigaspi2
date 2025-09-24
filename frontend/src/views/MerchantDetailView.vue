@@ -273,7 +273,7 @@ const fetchMerchant = async () => {
       },
       surprise_baskets: [],
       featured_products: [
-        { id: 1, name: 'Panier légumes du jour', description: 'Assortiment d'une dizaine de légumes', discounted_price: 3200 },
+        { id: 1, name: 'Panier légumes du jour', description: "Assortiment d'une dizaine de légumes", discounted_price: 3200 },
         { id: 2, name: 'Panier brunch', description: 'Viennoiseries, fruits, boissons locales', discounted_price: 4500 },
       ],
       user: { city: 'Lomé', address: 'Quartier Tokoin', phone: '+228 90 00 00 00' },
