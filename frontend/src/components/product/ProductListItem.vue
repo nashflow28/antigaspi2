@@ -1,14 +1,14 @@
 <template>
-  <div class="card group cursor-pointer p-6 hover:shadow-hard transition-all duration-300">
+  <div class="card group cursor-pointer p-6 hover:shadow-toast transition-all duration-300">
     <div class="flex items-center gap-6">
       <!-- Image du produit -->
       <div class="relative w-24 h-24 flex-shrink-0 overflow-hidden rounded-2xl">
-        <div class="absolute inset-0 bg-gradient-to-br from-primary-100 to-secondary-100 flex items-center justify-center">
+        <div class="absolute inset-0 bg-gradient-to-br from-primary-100 to-accent-blue/10 flex items-center justify-center">
           <Package class="w-8 h-8 text-primary-400 opacity-50" />
         </div>
 
         <!-- Badge de réduction -->
-        <div class="absolute -top-2 -right-2 bg-success-500 text-white px-2 py-1 rounded-full text-xs font-bold shadow-soft">
+        <div class="absolute -top-2 -right-2 bg-primary-500 text-white px-2 py-1 rounded-full text-xs font-bold shadow-card">
           -{{ product.discount }}%
         </div>
       </div>
@@ -34,13 +34,13 @@
             <span>{{ product.merchant.distance }}km</span>
           </div>
 
-          <div class="flex items-center gap-1 text-accent-600">
+          <div class="flex items-center gap-1 text-accent-orange">
             <Clock class="w-4 h-4" />
             <span class="font-medium">{{ formatTimeLeft(product.expires_at) }}</span>
           </div>
 
           <div class="flex items-center gap-1">
-            <div class="w-2 h-2 bg-success-500 rounded-full"></div>
+            <div class="w-2 h-2 bg-primary-500 rounded-full"></div>
             <span class="text-sm text-neutral-600">
               {{ product.available_quantity - product.reserved_quantity }} disponible{{ (product.available_quantity - product.reserved_quantity) > 1 ? 's' : '' }}
             </span>

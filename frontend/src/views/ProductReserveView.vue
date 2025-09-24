@@ -105,7 +105,7 @@
               <h3 class="text-xl font-bold text-neutral-900 mb-6">Détails du produit</h3>
 
               <div class="flex gap-6 mb-6">
-                <div class="w-32 h-32 bg-gradient-to-br from-primary-100 to-secondary-100 rounded-2xl flex items-center justify-center flex-shrink-0 overflow-hidden">
+                <div class="w-32 h-32 bg-gradient-to-br from-primary-100 to-accent-blue/10 rounded-2xl flex items-center justify-center flex-shrink-0 overflow-hidden">
                   <img
                     v-if="product.image_url"
                     :src="product.image_url"
@@ -310,7 +310,7 @@
                   placeholder="+228 90 00 00 00"
                   class="form-input"
                   :class="{
-                    'border-error-400 focus:ring-error-100 focus:border-error-400': mobileMoneyPhone && !/^\+?[0-9]{8,15}$/.test(mobileMoneyPhone)
+                    'border-accent-red/50 focus:ring-accent-red/20 focus:border-accent-red/50': mobileMoneyPhone && !/^\+?[0-9]{8,15}$/.test(mobileMoneyPhone)
                   }"
                   required
                 />
@@ -380,19 +380,19 @@
                 </div>
 
                 <!-- Récapitulatif récupération -->
-                <div class="p-4 bg-secondary-50 rounded-xl border border-secondary-200">
-                  <h4 class="font-bold text-secondary-800 mb-3">Récupération</h4>
+                <div class="p-4 bg-accent-blue/5 rounded-xl border border-accent-blue/30">
+                  <h4 class="font-bold text-accent-blue/95 mb-3">Récupération</h4>
                   <div class="space-y-2 text-sm">
                     <div class="flex items-center gap-2">
-                      <MapPin class="w-4 h-4 text-secondary-600" />
+                      <MapPin class="w-4 h-4 text-accent-blue" />
                       <span>{{ product.merchant.name }}</span>
                     </div>
                     <div class="flex items-center gap-2">
-                      <Calendar class="w-4 h-4 text-secondary-600" />
+                      <Calendar class="w-4 h-4 text-accent-blue" />
                       <span>{{ formatPickupDateTime() }}</span>
                     </div>
                     <div class="flex items-center gap-2">
-                      <Phone class="w-4 h-4 text-secondary-600" />
+                      <Phone class="w-4 h-4 text-accent-blue" />
                       <span>{{ reservation.contact_phone }}</span>
                     </div>
                   </div>
@@ -421,9 +421,9 @@
                 </div>
 
                 <!-- Conditions -->
-                <div class="p-4 bg-warning-50 rounded-xl border border-warning-200">
-                  <h4 class="font-bold text-warning-800 mb-3">⚠️ Conditions importantes</h4>
-                  <ul class="text-sm text-warning-700 space-y-1">
+                <div class="p-4 bg-accent-orange/10 rounded-xl border border-accent-orange/30">
+                  <h4 class="font-bold text-accent-orange/95 mb-3">⚠️ Conditions importantes</h4>
+                  <ul class="text-sm text-accent-orange/90 space-y-1">
                     <li>• La réservation doit être récupérée dans les 24h après expiration</li>
                     <li>• En cas d'absence, le produit sera remis en vente</li>
                     <li>• Apportez une pièce d'identité pour la récupération</li>
@@ -486,7 +486,7 @@
               <h3 class="text-lg font-bold text-neutral-900 mb-4">Marchand</h3>
               <div class="space-y-3">
                 <div class="flex items-center gap-3">
-                  <div class="w-12 h-12 bg-gradient-primary rounded-xl flex items-center justify-center">
+                  <div class="w-12 h-12 bg-nav-gradient rounded-xl flex items-center justify-center">
                     <Store class="w-6 h-6 text-white" />
                   </div>
                   <div>
@@ -502,17 +502,17 @@
             </div>
 
             <!-- Aide -->
-            <div class="card bg-gradient-to-br from-success-50 to-primary-50 border-success-200 animate-fade-in-up" style="animation-delay: 0.4s;">
+            <div class="card bg-gradient-to-br from-primary-50 to-primary-100 border-primary-200 animate-fade-in-up" style="animation-delay: 0.4s;">
               <div class="flex items-center gap-3 mb-4">
-                <div class="w-8 h-8 bg-success-500 rounded-full flex items-center justify-center">
+                <div class="w-8 h-8 bg-primary-500 rounded-full flex items-center justify-center">
                   <HelpCircle class="w-4 h-4 text-white" />
                 </div>
-                <h3 class="text-lg font-bold text-success-800">Besoin d'aide ?</h3>
+                <h3 class="text-lg font-bold text-primary-800">Besoin d'aide ?</h3>
               </div>
-              <p class="text-sm text-success-700 mb-4">
+              <p class="text-sm text-primary-700 mb-4">
                 Une question sur votre réservation ?
               </p>
-              <div class="space-y-2 text-sm text-success-700">
+              <div class="space-y-2 text-sm text-primary-700">
                 <div class="flex items-center gap-2">
                   <Phone class="w-4 h-4" />
                   <span>01 23 45 67 89</span>
@@ -525,18 +525,18 @@
             </div>
 
             <!-- Impact environnemental -->
-            <div class="card bg-gradient-to-br from-accent-50 to-secondary-50 border-accent-200 animate-fade-in-up" style="animation-delay: 0.6s;">
+            <div class="card bg-gradient-to-br from-accent-orange/10 to-accent-blue/5 border-accent-orange/30 animate-fade-in-up" style="animation-delay: 0.6s;">
               <div class="text-center">
                 <div class="text-4xl mb-3">🌱</div>
-                <h3 class="text-lg font-bold text-accent-800 mb-2">Votre impact</h3>
-                <p class="text-sm text-accent-700 mb-3">
+                <h3 class="text-lg font-bold text-accent-orange/95 mb-2">Votre impact</h3>
+                <p class="text-sm text-accent-orange/90 mb-3">
                   En réservant ce produit, vous évitez le gaspillage et économisez environ :
                 </p>
                 <div class="space-y-2">
-                  <div class="text-2xl font-bold text-accent-600">
+                  <div class="text-2xl font-bold text-accent-orange">
                     {{ Math.round((product.original_price - product.discounted_price) * reservation.quantity).toLocaleString('fr-FR') }} F CFA
                   </div>
-                  <div class="text-sm text-accent-700">
+                  <div class="text-sm text-accent-orange/90">
                     ~{{ Math.round(reservation.quantity * 0.5 * 100) / 100 }}kg CO₂ évités
                   </div>
                 </div>

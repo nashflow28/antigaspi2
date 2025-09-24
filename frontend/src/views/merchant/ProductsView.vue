@@ -47,10 +47,10 @@
           </div>
         </div>
 
-        <div class="card bg-gradient-to-r from-success-500 to-success-600 text-white">
+        <div class="card bg-gradient-to-r from-primary-500 to-primary-600 text-white">
           <div class="flex items-center justify-between">
             <div>
-              <p class="text-success-100 text-sm font-medium">Produits Actifs</p>
+              <p class="text-primary-100 text-sm font-medium">Produits Actifs</p>
               <p class="text-3xl font-bold">{{ activeProducts.length }}</p>
             </div>
             <div class="p-3 bg-white/20 rounded-xl">
@@ -59,10 +59,10 @@
           </div>
         </div>
 
-        <div class="card bg-gradient-to-r from-warning-500 to-warning-600 text-white">
+        <div class="card bg-gradient-to-r from-accent-orange to-accent-orange/90 text-white">
           <div class="flex items-center justify-between">
             <div>
-              <p class="text-warning-100 text-sm font-medium">Stock Faible</p>
+              <p class="text-accent-orange/70 text-sm font-medium">Stock Faible</p>
               <p class="text-3xl font-bold">{{ lowStockProducts.length }}</p>
             </div>
             <div class="p-3 bg-white/20 rounded-xl">
@@ -71,10 +71,10 @@
           </div>
         </div>
 
-        <div class="card bg-gradient-to-r from-error-500 to-error-600 text-white">
+        <div class="card bg-gradient-to-r from-accent-red to-accent-red/90 text-white">
           <div class="flex items-center justify-between">
             <div>
-              <p class="text-red-100 text-sm font-medium">Expire Bientôt</p>
+              <p class="text-accent-red/60 text-sm font-medium">Expire Bientôt</p>
               <p class="text-3xl font-bold">{{ expiringSoonProducts.length }}</p>
             </div>
             <div class="p-3 bg-white/20 rounded-xl">
@@ -141,13 +141,13 @@
             </span>
             <span
               v-if="product.quantity_available <= 5"
-              class="px-2 py-1 bg-warning-500 text-white text-xs rounded-full"
+              class="px-2 py-1 bg-accent-orange text-white text-xs rounded-full"
             >
               Stock faible
             </span>
             <span
               v-if="isExpiringSoon(product)"
-              class="px-2 py-1 bg-error-500 text-white text-xs rounded-full"
+              class="px-2 py-1 bg-accent-red/100 text-white text-xs rounded-full"
             >
               Expire bientôt
             </span>
@@ -577,9 +577,9 @@ const formatDate = (date: string): string => {
 
 const getStatusColor = (product: any): string => {
   if (!product.is_active) return 'text-neutral-500'
-  if (isExpiringSoon(product)) return 'text-error-600'
-  if (product.quantity_available <= 5) return 'text-warning-600'
-  return 'text-success-600'
+  if (isExpiringSoon(product)) return 'text-accent-red'
+  if (product.quantity_available <= 5) return 'text-accent-orange'
+  return 'text-primary-600'
 }
 
 const getStatusText = (product: any): string => {

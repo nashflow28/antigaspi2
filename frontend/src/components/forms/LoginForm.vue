@@ -15,7 +15,7 @@
       <div class="form-group">
         <label for="email" class="form-label flex items-center gap-2">
           <span>Adresse email</span>
-          <span class="text-error-500">*</span>
+          <span class="text-accent-red">*</span>
         </label>
         <div class="relative">
           <input
@@ -43,7 +43,7 @@
       <div class="form-group">
         <label for="password" class="form-label flex items-center gap-2">
           <span>Mot de passe</span>
-          <span class="text-error-500">*</span>
+          <span class="text-accent-red">*</span>
         </label>
         <div class="relative">
           <input
@@ -106,7 +106,7 @@
           <Loader2 v-if="loading" class="w-5 h-5 animate-spin" />
           <span>{{ loading ? 'Connexion en cours...' : 'Se connecter' }}</span>
         </span>
-        <div class="absolute inset-0 bg-gradient-to-r from-primary-600 to-secondary-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+        <div class="absolute inset-0 bg-gradient-to-r from-primary-600 to-accent-blue/90 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
       </button>
 
       <!-- Divider -->

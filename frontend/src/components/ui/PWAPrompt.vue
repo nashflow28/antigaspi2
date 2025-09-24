@@ -10,7 +10,7 @@
           <div class="flex items-start gap-4">
             <!-- Icon -->
             <div class="shrink-0">
-              <div class="w-12 h-12 bg-gradient-primary rounded-xl flex items-center justify-center">
+              <div class="w-12 h-12 bg-nav-gradient rounded-xl flex items-center justify-center">
                 <span class="text-white text-xl">🌱</span>
               </div>
             </div>

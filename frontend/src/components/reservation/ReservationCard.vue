@@ -1,5 +1,5 @@
 <template>
-  <div class="card hover:shadow-medium transition-all duration-300">
+  <div class="card hover:shadow-card transition-all duration-300">
     <!-- En-tête avec statut -->
     <div class="flex items-center justify-between mb-4">
       <div class="flex items-center gap-3">
@@ -41,7 +41,7 @@
           <div
             v-if="showActions"
             v-click-outside="() => showActions = false"
-            class="absolute right-0 top-10 bg-white border border-neutral-200 rounded-xl shadow-medium z-10 py-2 min-w-[150px]"
+            class="absolute right-0 top-10 bg-white border border-neutral-200 rounded-xl shadow-card z-10 py-2 min-w-[150px]"
           >
             <button
               @click="$emit('view', reservation.id); showActions = false"
@@ -61,7 +61,7 @@
             <button
               v-if="canCancel"
               @click="$emit('cancel', reservation.id); showActions = false"
-              class="w-full px-4 py-2 text-left text-sm hover:bg-gray-50 text-error-600 flex items-center gap-2"
+              class="w-full px-4 py-2 text-left text-sm hover:bg-gray-50 text-accent-red flex items-center gap-2"
             >
               <X class="w-4 h-4" />
               Annuler
@@ -77,7 +77,7 @@
       <div>
         <div class="flex items-start gap-4">
           <!-- Image du produit -->
-          <div class="w-16 h-16 bg-gradient-to-br from-primary-100 to-secondary-100 rounded-xl flex items-center justify-center flex-shrink-0">
+          <div class="w-16 h-16 bg-gradient-to-br from-primary-100 to-accent-blue/10 rounded-xl flex items-center justify-center flex-shrink-0">
             <Package class="w-8 h-8 text-primary-400" />
           </div>
 
@@ -151,8 +151,8 @@
 
           <!-- Date et heure de retrait -->
           <div class="flex items-center gap-3">
-            <div class="w-8 h-8 bg-secondary-100 rounded-lg flex items-center justify-center">
-              <Clock class="w-4 h-4 text-secondary-600" />
+            <div class="w-8 h-8 bg-accent-blue/10 rounded-lg flex items-center justify-center">
+              <Clock class="w-4 h-4 text-accent-blue" />
             </div>
             <div>
               <div class="font-medium text-neutral-900">
@@ -166,8 +166,8 @@
 
           <!-- Notes de retrait -->
           <div v-if="reservation.pickup_notes" class="flex items-start gap-3">
-            <div class="w-8 h-8 bg-accent-100 rounded-lg flex items-center justify-center flex-shrink-0">
-              <MessageCircle class="w-4 h-4 text-accent-600" />
+            <div class="w-8 h-8 bg-accent-orange/10 rounded-lg flex items-center justify-center flex-shrink-0">
+              <MessageCircle class="w-4 h-4 text-accent-orange" />
             </div>
             <div class="text-sm text-neutral-600">
               {{ reservation.pickup_notes }}
@@ -181,7 +181,7 @@
                 <span class="text-sm font-medium text-neutral-700">
                   {{ getStatusMessage() }}
                 </span>
-                <span v-if="timeLeft && timeLeft.total > 0" class="text-sm font-bold text-accent-600">
+                <span v-if="timeLeft && timeLeft.total > 0" class="text-sm font-bold text-accent-orange">
                   {{ formatTimeLeft() }}
                 </span>
               </div>
@@ -189,7 +189,7 @@
               <!-- Barre de progression pour le temps restant -->
               <div v-if="timeLeft && timeLeft.total > 0" class="mt-2 w-full bg-neutral-200 rounded-full h-1">
                 <div
-                  class="bg-accent-500 h-1 rounded-full transition-all duration-300"
+                  class="bg-accent-orange h-1 rounded-full transition-all duration-300"
                   :style="{ width: `${Math.max(0, Math.min(100, (timeLeft.total / (24 * 60 * 60 * 1000)) * 100))}%` }"
                 ></div>
               </div>
@@ -197,17 +197,17 @@
           </div>
 
           <!-- Impact environnemental -->
-          <div v-if="reservation.status === 'completed'" class="bg-success-50 rounded-xl p-3">
+          <div v-if="reservation.status === 'completed'" class="bg-primary-50 rounded-xl p-3">
             <div class="flex items-center gap-2 mb-2">
-              <Leaf class="w-4 h-4 text-success-600" />
-              <span class="text-sm font-medium text-success-800">Impact positif</span>
+              <Leaf class="w-4 h-4 text-primary-600" />
+              <span class="text-sm font-medium text-primary-800">Impact positif</span>
             </div>
             <div class="grid grid-cols-2 gap-4 text-xs">
-              <div class="text-success-700">
+              <div class="text-primary-700">
                 <div class="font-semibold">{{ reservation.quantity }}kg</div>
                 <div>Nourriture sauvée</div>
               </div>
-              <div class="text-success-700">
+              <div class="text-primary-700">
                 <div class="font-semibold">{{ (reservation.quantity * 2.5).toFixed(1) }}kg</div>
                 <div>CO₂ évité</div>
               </div>
@@ -240,7 +240,7 @@
       <button
         v-if="canCancel"
         @click="$emit('cancel', reservation.id)"
-        class="btn btn-ghost btn-sm text-error-600 hover:bg-error-50"
+        class="btn btn-ghost btn-sm text-accent-red hover:bg-accent-red/10"
       >
         <X class="w-4 h-4" />
         Annuler
@@ -281,12 +281,12 @@ const timeLeft = ref<{
 
 // Classes de statut
 const statusClasses = {
-  pending: 'bg-warning-100 text-warning-800',
-  confirmed: 'bg-secondary-100 text-secondary-800',
-  ready: 'bg-success-100 text-success-800',
+  pending: 'bg-accent-orange/15 text-accent-orange/95',
+  confirmed: 'bg-accent-blue/10 text-accent-blue/95',
+  ready: 'bg-primary-100 text-primary-800',
   completed: 'bg-primary-100 text-primary-800',
   cancelled: 'bg-neutral-100 text-neutral-600',
-  expired: 'bg-error-100 text-error-800'
+  expired: 'bg-accent-red/15 text-accent-red/95'
 }
 
 const statusLabels = {
@@ -299,10 +299,10 @@ const statusLabels = {
 }
 
 const paymentStatusClasses = {
-  pending: 'bg-warning-100 text-warning-800',
-  success: 'bg-success-100 text-success-800',
-  failed: 'bg-error-100 text-error-800',
-  on_site: 'bg-secondary-100 text-secondary-800',
+  pending: 'bg-accent-orange/15 text-accent-orange/95',
+  success: 'bg-primary-100 text-primary-800',
+  failed: 'bg-accent-red/15 text-accent-red/95',
+  on_site: 'bg-accent-blue/10 text-accent-blue/95',
   refunded: 'bg-neutral-100 text-neutral-700'
 } as const
 

@@ -5,12 +5,12 @@
       <div class="mb-8">
         <div class="relative">
           <!-- Background circle -->
-          <div class="w-64 h-64 mx-auto bg-gradient-to-br from-primary-100 to-secondary-100 rounded-full flex items-center justify-center relative overflow-hidden">
+        <div class="w-64 h-64 mx-auto bg-gradient-to-br from-primary-100 to-accent-blue/10 rounded-full flex items-center justify-center relative overflow-hidden">
             <!-- Animated background pattern -->
             <div class="absolute inset-0 opacity-10">
               <div class="absolute top-4 left-8 w-8 h-8 bg-primary-300 rounded-full animate-pulse"></div>
-              <div class="absolute bottom-8 right-12 w-6 h-6 bg-secondary-300 rounded-full animate-pulse" style="animation-delay: 0.5s"></div>
-              <div class="absolute top-16 right-6 w-4 h-4 bg-accent-300 rounded-full animate-pulse" style="animation-delay: 1s"></div>
+              <div class="absolute bottom-8 right-12 w-6 h-6 bg-accent-blue/20 rounded-full animate-pulse" style="animation-delay: 0.5s"></div>
+              <div class="absolute top-16 right-6 w-4 h-4 bg-accent-orange/30 rounded-full animate-pulse" style="animation-delay: 1s"></div>
               <div class="absolute bottom-16 left-16 w-5 h-5 bg-primary-300 rounded-full animate-pulse" style="animation-delay: 1.5s"></div>
             </div>
 

@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen bg-gradient-subtle">
+  <div class="min-h-screen bg-gradient-to-br from-neutral-50 to-primary-50">
     <!-- Loading state -->
     <div v-if="loading" class="container-fluid py-8">
       <div class="card animate-pulse">
@@ -132,7 +132,7 @@
               <div>
                 <label class="text-sm font-medium text-neutral-700">Prix unitaire</label>
                 <div class="flex items-center gap-2">
-                  <span class="text-lg font-semibold text-success-600">
+                  <span class="text-lg font-semibold text-primary-600">
                     {{ formatPrice(reservation.discounted_price) }}
                   </span>
                   <span class="text-sm text-neutral-500 line-through">
@@ -142,7 +142,7 @@
               </div>
               <div>
                 <label class="text-sm font-medium text-neutral-700">Montant total</label>
-                <p class="text-xl font-bold text-success-600">
+                <p class="text-xl font-bold text-primary-600">
                   {{ formatPrice(reservation.total_amount) }}
                 </p>
               </div>
@@ -209,7 +209,7 @@
               >
                 <div
                   class="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0"
-                  :class="step.completed ? 'bg-success-500 text-white' : 'bg-neutral-200 text-neutral-500'"
+                  :class="step.completed ? 'bg-primary-500 text-white' : 'bg-neutral-200 text-neutral-500'"
                 >
                   <component :is="step.icon" class="w-4 h-4" />
                 </div>
@@ -227,7 +227,7 @@
           </div>
 
           <!-- Savings summary -->
-          <div class="card bg-gradient-accent text-white">
+          <div class="card bg-gradient-to-r from-accent-orange to-accent-orange/90 text-white">
             <div class="flex items-center gap-3 mb-4">
               <div class="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
                 <DollarSign class="w-6 h-6" />
@@ -401,7 +401,7 @@ const getStatusClass = (status: string) => {
     pending: 'bg-yellow-100 text-yellow-800',
     confirmed: 'bg-blue-100 text-blue-800',
     ready: 'bg-green-100 text-green-800',
-    completed: 'bg-success-100 text-success-800',
+    completed: 'bg-primary-100 text-primary-800',
     cancelled: 'bg-red-100 text-red-800',
     expired: 'bg-neutral-100 text-neutral-800'
   }

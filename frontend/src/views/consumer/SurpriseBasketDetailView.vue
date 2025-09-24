@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen bg-gradient-subtle pb-16">
+  <div class="min-h-screen bg-gradient-to-br from-neutral-50 to-primary-50 pb-16">
     <div class="container mx-auto px-4 pt-10">
       <button
         type="button"
@@ -37,13 +37,13 @@
             />
             <div
               v-else
-              class="flex h-full w-full items-center justify-center bg-gradient-to-br from-primary-50 to-secondary-50"
+              class="flex h-full w-full items-center justify-center bg-gradient-to-br from-primary-50 to-accent-blue/5"
             >
               <Package class="h-12 w-12 text-primary-400" />
             </div>
             <div class="absolute left-6 top-6 flex items-center gap-3">
               <span class="badge badge-success font-semibold">-{{ basket.basket_discount_percentage }}%</span>
-              <span class="rounded-full bg-white/90 px-3 py-1 text-xs font-medium text-neutral-700 shadow-soft">
+              <span class="rounded-full bg-white/90 px-3 py-1 text-xs font-medium text-neutral-700 shadow-card">
                 <Clock class="mr-1 inline-block h-4 w-4 text-primary-500" />
                 {{ timeLeft }}
               </span>
@@ -59,7 +59,7 @@
                   <Store class="h-4 w-4" />
                   {{ basket.merchant.business_name }}
                 </span>
-                <span v-if="basket.category?.name" class="inline-flex items-center gap-2 rounded-full bg-secondary-50 px-3 py-1 text-secondary-700">
+                <span v-if="basket.category?.name" class="inline-flex items-center gap-2 rounded-full bg-accent-blue/5 px-3 py-1 text-accent-blue/90">
                   <Tag class="h-4 w-4" />
                   {{ basket.category.name }}
                 </span>
@@ -107,7 +107,7 @@
               <span>Valeur d'origine</span>
               <span class="line-through">{{ formattedOriginalPrice }}</span>
             </div>
-            <div class="flex items-center justify-between text-sm font-semibold text-success-600">
+            <div class="flex items-center justify-between text-sm font-semibold text-primary-600">
               <span>Économies</span>
               <span>{{ formattedSavings }}</span>
             </div>
@@ -175,12 +175,12 @@
                 placeholder="+228 90 00 00 00"
                 class="form-input"
                 :class="{
-                  'border-error-400 focus:border-error-400 focus:ring-error-100': mobileMoneyPhone && !isPhoneValid
+                  'border-accent-red/50 focus:border-accent-red/50 focus:ring-accent-red/20': mobileMoneyPhone && !isPhoneValid
                 }"
                 :disabled="submitting"
               />
               <p class="text-xs text-neutral-500">Utilisez un numéro enregistré sur le portefeuille sélectionné.</p>
-              <p v-if="phoneError" class="text-xs font-medium text-error-600">{{ phoneError }}</p>
+              <p v-if="phoneError" class="text-xs font-medium text-accent-red">{{ phoneError }}</p>
             </div>
 
             <p

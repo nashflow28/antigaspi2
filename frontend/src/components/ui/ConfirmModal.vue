@@ -83,22 +83,22 @@ const iconComponent = computed(() => {
 const iconBgClass = computed(() => {
   switch (props.type) {
     case 'danger':
-      return 'bg-error-100'
+      return 'bg-accent-red/15'
     case 'success':
-      return 'bg-success-100'
+      return 'bg-primary-100'
     default:
-      return 'bg-warning-100'
+      return 'bg-accent-orange/15'
   }
 })
 
 const iconClass = computed(() => {
   switch (props.type) {
     case 'danger':
-      return 'text-error-600'
+      return 'text-accent-red'
     case 'success':
-      return 'text-success-600'
+      return 'text-primary-600'
     default:
-      return 'text-warning-600'
+      return 'text-accent-orange'
   }
 })
 

@@ -56,7 +56,7 @@
         <!-- Mobile menu header -->
         <div class="flex items-center justify-between p-4 border-b border-gray-200">
           <div class="flex items-center space-x-3">
-            <div class="w-8 h-8 bg-gradient-to-r from-primary-500 to-secondary-500 rounded-lg flex items-center justify-center">
+            <div class="w-8 h-8 bg-gradient-to-r from-primary-500 to-accent-blue/50 rounded-lg flex items-center justify-center">
               <span class="text-white text-lg">🌱</span>
             </div>
             <span class="text-lg font-semibold text-gray-900">Antigaspi</span>
@@ -72,7 +72,7 @@
         <!-- User Profile Section (if authenticated) -->
         <div v-if="authStore.isAuthenticated" class="p-4 bg-gray-50 border-b border-gray-200">
           <div class="flex items-center space-x-3">
-            <div class="w-12 h-12 bg-gradient-to-r from-primary-500 to-secondary-500 rounded-full flex items-center justify-center">
+            <div class="w-12 h-12 bg-gradient-to-r from-primary-500 to-accent-blue/50 rounded-full flex items-center justify-center">
               <span class="text-white font-medium text-lg">
                 {{ authStore.user?.first_name?.charAt(0) }}{{ authStore.user?.last_name?.charAt(0) }}
               </span>

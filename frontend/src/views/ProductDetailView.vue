@@ -33,7 +33,7 @@
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-12">
         <!-- Product Image -->
         <div class="space-y-6">
-          <div class="relative aspect-square bg-gradient-modern rounded-3xl overflow-hidden shadow-lift glow-effect">
+          <div class="relative aspect-square bg-gradient-to-br from-primary-500 via-accent-blue to-accent-blue/90 rounded-3xl overflow-hidden shadow-glow glow-effect">
             <!-- Product Image or Placeholder -->
             <div v-if="product.image_url" class="absolute inset-0">
               <img
@@ -54,14 +54,14 @@
               <!-- Availability Badge -->
               <div class="glass-bg backdrop-blur-md px-4 py-3 rounded-2xl glass-border">
                 <div class="flex items-center gap-2 text-sm font-medium text-white">
-                  <div class="w-2 h-2 bg-success-400 rounded-full animate-pulse"></div>
+                  <div class="w-2 h-2 bg-primary-400 rounded-full animate-pulse"></div>
                   <span>{{ availableQuantity }} disponible{{ availableQuantity > 1 ? 's' : '' }}</span>
                 </div>
               </div>
             </div>
 
             <!-- Discount Badge -->
-            <div class="absolute top-6 right-6 bg-gradient-accent text-white px-5 py-3 rounded-2xl text-xl font-bold shadow-glow-accent backdrop-blur-sm border border-white/20">
+            <div class="absolute top-6 right-6 bg-gradient-to-r from-accent-orange to-accent-orange/90 text-white px-5 py-3 rounded-2xl text-xl font-bold shadow-glow backdrop-blur-sm border border-white/20">
               <div class="flex items-center gap-2">
                 <span class="text-sm">💥</span>
                 <span>-{{ product.discount }}%</span>
@@ -99,7 +99,7 @@
               <span class="text-xl text-neutral-400 line-through">
                 {{ formatPrice(product.original_price) }}
               </span>
-              <span class="bg-success-100 text-success-700 px-3 py-1 rounded-full text-sm font-medium">
+              <span class="bg-primary-100 text-primary-700 px-3 py-1 rounded-full text-sm font-medium">
                 Économisez {{ formatPrice(product.original_price - product.discounted_price) }}
               </span>
             </div>

@@ -107,14 +107,14 @@ const emit = defineEmits<{
 // Variant classes
 const variantClasses = computed(() => {
   const variants = {
-    primary: 'btn-primary-2025 text-white shadow-glow-soft hover:shadow-lift',
-    secondary: 'bg-gradient-secondary text-white shadow-glow-blue hover:shadow-lift hover:from-secondary-600 hover:to-secondary-800',
-    ghost: 'btn-ghost-2025 hover-lift-2025',
-    outline: 'border-2 border-primary-500 text-primary-600 bg-transparent hover:bg-primary-50 hover:shadow-glow-soft dark:border-primary-400 dark:text-primary-400 dark:hover:bg-primary-900/20',
-    gradient: 'bg-gradient-modern-2025 text-white shadow-glow hover:shadow-lift hover:scale-105',
-    success: 'bg-success-500 hover:bg-success-600 text-white shadow-glow hover:shadow-lift',
-    warning: 'bg-warning-500 hover:bg-warning-600 text-white shadow-glow hover:shadow-lift',
-    danger: 'bg-red-500 hover:bg-red-600 text-white shadow-glow hover:shadow-lift'
+    primary: 'btn-2025 bg-primary-600 text-white shadow-card hover:bg-primary-700 hover:shadow-glow focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-400 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-50 disabled:opacity-60 disabled:cursor-not-allowed',
+    secondary: 'btn-2025 bg-gradient-to-r from-accent-blue to-accent-blue/90 text-white shadow-glow hover:from-accent-blue/95 hover:to-accent-blue/80 hover:shadow-glow focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-blue/60 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-50 disabled:opacity-60 disabled:cursor-not-allowed',
+    ghost: 'btn-2025 bg-transparent text-primary-600 hover:bg-primary-50 hover:text-primary-700 border border-primary-200 hover:shadow-card focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-300 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-50',
+    outline: 'btn-2025 border-2 border-primary-500 text-primary-600 bg-transparent hover:bg-primary-50 hover:shadow-card dark:border-primary-400 dark:text-primary-400 dark:hover:bg-primary-900/20',
+    gradient: 'btn-2025 bg-gradient-to-br from-primary-500 via-accent-blue to-accent-blue/90 text-white shadow-glow hover:shadow-glow hover:scale-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-400 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-50',
+    success: 'btn-2025 bg-primary-500 hover:bg-primary-600 text-white shadow-glow hover:shadow-glow focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-400 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-50',
+    warning: 'btn-2025 bg-accent-orange hover:bg-accent-orange/90 text-white shadow-glow hover:shadow-glow focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-orange/60 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-50',
+    danger: 'btn-2025 bg-accent-red hover:bg-accent-red/90 text-white shadow-glow hover:shadow-glow focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-red/60 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-50'
   }
   return variants[props.variant]
 })
@@ -156,12 +156,12 @@ const sizeSpinnerClasses = computed(() => {
 const glowClasses = computed(() => {
   const glows = {
     primary: 'bg-primary-500',
-    secondary: 'bg-secondary-500',
+    secondary: 'bg-accent-blue/50',
     ghost: 'bg-neutral-300',
     outline: 'bg-primary-500',
-    gradient: 'bg-gradient-modern-2025',
-    success: 'bg-success-500',
-    warning: 'bg-warning-500',
+    gradient: 'bg-gradient-to-br from-primary-500 via-accent-blue to-accent-blue/90',
+    success: 'bg-primary-500',
+    warning: 'bg-accent-orange',
     danger: 'bg-red-500'
   }
   return glows[props.variant]
