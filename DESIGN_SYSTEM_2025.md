@@ -54,6 +54,18 @@ h3: text-2xl lg:text-3xl (24px → 30px)
 - **Line height** : `1.2` pour les titres, `1.6` pour le contenu
 - **Font features** : `cv11`, `ss01` activées
 
+## 🎛️ Design Tokens (Tailwind)
+
+Les primitives Vue/React reposent sur une couche commune de tokens déclarés dans `frontend/tailwind.config.js` et `react-design-system/tailwind.config.js`. Utilisez systématiquement ces classes utilitaires plutôt que des valeurs ad hoc :
+
+- **Couleurs** : `primary.50-900`, `neutral.50-900`, `accent.blue|orange|red`, `surface.light|muted|dark|darker`, `overlay` pour les arrières-plans modals/toasts.【F:frontend/tailwind.config.js†L8-L37】
+- **Typographie** : familles `font-sans`, `font-display`, `font-heading`, `font-mono` et échelles `caption` → `h1` + `display-sm` → `display-xl` pour les héros marketing.【F:frontend/tailwind.config.js†L39-L67】
+- **Espacement & rayons** : nouveaux espacements `spacing[18|22|26|30]` et arrondis `rounded-4xl`, `rounded-5xl` pour les cartes hero/modales pleine largeur.【F:frontend/tailwind.config.js†L118-L134】
+- **Effets** : `shadow-card`, `shadow-glow`, `shadow-toast`, gradients `bg-emerald-glass`, `bg-nav-gradient`, `backdrop-blur-xs` → `3xl` pour le glassmorphism.【F:frontend/tailwind.config.js†L69-L117】
+- **Animations** : keyframes utilitaires (`fade-in-*`, `slide-in-*`, `scale-in`, `pulse-glow`, `float`, `wiggle`, `pulse-soft`, `shimmer`, `slide-up`) couplés à `transition-all duration-300 ease-spring-out`.
+
+> 🔁 Les tokens sont synchronisés entre React et Vue : toute évolution Tailwind doit être reportée dans les deux projets pour garantir la parité visuelle.
+
 ## 🎯 Composants
 
 ### Button
