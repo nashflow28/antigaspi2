@@ -56,6 +56,37 @@ test.describe('Tests Critiques - Nouvelles Fonctionnalités', () => {
         await expect(page.locator('text=Jean')).toBeVisible({ timeout: 5000 });
       }
     });
+
+    test('Mobile drawer toggles and theme persists', async ({ page }) => {
+      await page.addInitScript(() => {
+        window.localStorage.setItem('theme', 'light');
+      });
+
+      await page.setViewportSize({ width: 390, height: 844 });
+      await page.goto('/');
+
+      const mobileMenuButton = page.locator('[data-testid="mobile-menu-button"]');
+      await expect(mobileMenuButton).toBeVisible();
+
+      await mobileMenuButton.click();
+      await expect(page.locator('[data-testid="mobile-menu"]')).toBeVisible();
+
+      await mobileMenuButton.click();
+      await expect(page.locator('[data-testid="mobile-menu"]')).toHaveCount(0);
+
+      const themeToggleButton = page.locator('button[aria-label*="thème" i]').first();
+      await expect(themeToggleButton).toBeVisible();
+
+      await themeToggleButton.click();
+      await expect.poll(async () => page.evaluate(() => localStorage.getItem('theme'))).toBe('dark');
+
+      await page.reload();
+      await page.waitForLoadState('domcontentloaded');
+
+      await expect.poll(async () =>
+        page.evaluate(() => document.documentElement.classList.contains('dark'))
+      ).toBe(true);
+    });
   });
 
   test.describe('Gestion d\'Erreurs Améliorée', () => {

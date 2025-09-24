@@ -1,5 +1,9 @@
 <template>
-  <div class="min-h-screen bg-gradient-to-br from-neutral-50 to-primary-50">
+  <DashboardLayout
+    :sidebar="sidebar"
+    :header="header"
+    class="bg-gradient-to-br from-neutral-50 to-primary-50"
+  >
     <!-- Page Header -->
     <div class="glass-bg glass-border border-b backdrop-blur-lg sticky top-20 z-40">
       <div class="container-fluid py-6">
@@ -308,7 +312,7 @@
         </div>
       </div>
     </div>
-  </div>
+  </DashboardLayout>
 </template>
 
 <script setup lang="ts">
@@ -321,10 +325,13 @@ import {
   TrendingUp, DollarSign, Package, ShoppingBag, Leaf, TreePine,
   Clock, Calendar, ArrowRight, Search, User, Lightbulb, Wallet
 } from 'lucide-vue-next'
+import DashboardLayout from '@/components/ui/DashboardLayout.vue'
+import { useDashboardLayout } from '@/composables/useDashboardLayout'
 
 const router = useRouter()
 const authStore = useAuthStore()
 const walletStore = useWalletStore()
+const { sidebar, header } = useDashboardLayout('consumer')
 
 // État des données utilisateur
 const userStats = ref({

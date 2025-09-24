@@ -32,7 +32,7 @@
             :hovered="{ scale: 1.05 }"
             :tapped="{ scale: 0.96 }"
             :class="navigationItemClasses(item)"
-            @click="() => emit('item-click', item)"
+            @click.prevent="emit('item-click', item)"
           >
             <component v-if="item.icon" :is="item.icon" class="h-4 w-4" />
             <span>{{ item.label }}</span>
@@ -60,6 +60,7 @@
           size="icon"
           :aria-expanded="isOpen"
           aria-label="Ouvrir la navigation"
+          data-testid="mobile-menu-button"
           @click="toggleMenu"
         >
           <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -89,6 +90,7 @@
       :initial="{ opacity: 0, y: -12 }"
       :enter="{ opacity: 1, y: 0, transition: { duration: 0.3, ease: 'easeInOut' } }"
       :leave="{ opacity: 0, y: -12, transition: { duration: 0.2, ease: 'easeInOut' } }"
+      data-testid="mobile-menu"
     >
       <div class="space-y-2 px-4 py-4">
         <template v-for="item in items" :key="`mobile-${item.label}`">
@@ -97,7 +99,7 @@
             :href="item.href"
             :tapped="{ scale: 0.97 }"
             :class="mobileItemClasses(item)"
-            @click="handleMobileItemClick(item)"
+            @click.prevent="handleMobileItemClick(item)"
           >
             <component v-if="item.icon" :is="item.icon" class="h-5 w-5" />
             <span>{{ item.label }}</span>

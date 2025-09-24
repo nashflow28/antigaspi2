@@ -1,5 +1,9 @@
 <template>
-  <div class="min-h-screen bg-gray-50">
+  <DashboardLayout
+    :sidebar="sidebar"
+    :header="header"
+    class="bg-gray-50"
+  >
     <!-- Header -->
     <div class="bg-white shadow-sm">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -374,7 +378,7 @@
         </div>
       </div>
     </div>
-  </div>
+  </DashboardLayout>
 </template>
 
 <script setup lang="ts">
@@ -382,6 +386,8 @@ import { ref, computed, onMounted } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 import { useNotificationStore } from '@/stores/notification'
 import AdminModal from '@/components/ui/AdminModal.vue'
+import DashboardLayout from '@/components/ui/DashboardLayout.vue'
+import { useDashboardLayout } from '@/composables/useDashboardLayout'
 import {
   PlusIcon,
   TagIcon,
@@ -421,6 +427,7 @@ interface CategoryStats {
 
 const authStore = useAuthStore()
 const notificationStore = useNotificationStore()
+const { sidebar, header } = useDashboardLayout('admin')
 
 // State
 const loading = ref(true)

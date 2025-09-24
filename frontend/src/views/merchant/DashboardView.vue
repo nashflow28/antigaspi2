@@ -1,6 +1,10 @@
 <template>
-  <div class="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 p-6">
-    <div class="max-w-7xl mx-auto">
+  <DashboardLayout
+    :sidebar="sidebar"
+    :header="header"
+    class="bg-gradient-to-br from-blue-50 to-indigo-50"
+  >
+    <div class="max-w-7xl mx-auto p-6">
       <!-- Header -->
       <div class="mb-8">
         <div class="flex items-center justify-between">
@@ -273,13 +277,15 @@
         </div>
       </div>
     </div>
-  </div>
+  </DashboardLayout>
 </template>
 
 <script setup lang="ts">
 import { ref, onMounted, reactive } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 import LocationManager from '@/components/merchant/LocationManager.vue'
+import DashboardLayout from '@/components/ui/DashboardLayout.vue'
+import { useDashboardLayout } from '@/composables/useDashboardLayout'
 import {
   PlusIcon,
   ShoppingBagIcon,
@@ -294,6 +300,7 @@ import {
 } from '@heroicons/vue/24/outline'
 
 const authStore = useAuthStore()
+const { sidebar, header } = useDashboardLayout('merchant')
 
 // Reactive data
 const stats = reactive({

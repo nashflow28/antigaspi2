@@ -1,5 +1,9 @@
 <template>
-  <div class="min-h-screen bg-gradient-to-br from-neutral-50 to-neutral-100">
+  <DashboardLayout
+    :sidebar="sidebar"
+    :header="header"
+    class="bg-gradient-to-br from-neutral-50 to-neutral-100"
+  >
     <!-- Header -->
     <div class="bg-white/80 backdrop-blur-sm border-b border-neutral-200 sticky top-0 z-10">
       <div class="container mx-auto px-4 py-6">
@@ -297,7 +301,7 @@
         </div>
       </div>
     </div>
-  </div>
+  </DashboardLayout>
 </template>
 
 <script setup lang="ts">
@@ -306,6 +310,8 @@ import {
   Plus, RefreshCw, X, Loader2, Search, Users, TrendingUp, Star, Award
 } from 'lucide-vue-next'
 import { useLoyaltyPoints } from '@/composables/useLoyaltyPoints'
+import DashboardLayout from '@/components/ui/DashboardLayout.vue'
+import { useDashboardLayout } from '@/composables/useDashboardLayout'
 
 // Composables
 const {
@@ -330,6 +336,8 @@ const awardForm = ref({
   description: '',
   expires_at: ''
 })
+
+const { sidebar, header } = useDashboardLayout('merchant')
 
 // Computed
 const filteredCustomers = computed(() => {

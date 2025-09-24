@@ -1,5 +1,10 @@
 <template>
-  <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+  <DashboardLayout
+    :sidebar="sidebar"
+    :header="header"
+    class="bg-neutral-50"
+  >
+    <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
     <!-- En-tête -->
     <div class="bg-white shadow rounded-lg p-6 mb-6">
       <div class="flex items-center justify-between">
@@ -319,13 +324,16 @@
         @close="removeNotification(notification.id)"
       />
     </div>
-  </div>
+    </div>
+  </DashboardLayout>
 </template>
 
 <script setup lang="ts">
 import { ref, reactive, computed, onMounted } from 'vue'
 import ConfirmModal from '@/components/ui/ConfirmModal.vue'
 import NotificationToast from '@/components/ui/NotificationToast.vue'
+import DashboardLayout from '@/components/ui/DashboardLayout.vue'
+import { useDashboardLayout } from '@/composables/useDashboardLayout'
 
 interface User {
   id: number
@@ -392,6 +400,8 @@ const filters = reactive({
   role: '',
   status: ''
 })
+
+const { sidebar, header } = useDashboardLayout('admin')
 
 const currentPage = ref(1)
 const itemsPerPage = 10

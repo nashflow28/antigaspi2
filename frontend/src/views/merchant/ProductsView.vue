@@ -1,5 +1,10 @@
 <template>
-  <div class="min-h-screen bg-gradient-to-br from-green-50 to-blue-50 p-6">
+  <DashboardLayout
+    :sidebar="sidebar"
+    :header="header"
+    class="bg-gradient-to-br from-green-50 to-blue-50"
+  >
+    <div class="p-6">
     <!-- Header -->
     <div class="mb-8">
       <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
@@ -437,7 +442,7 @@
         </div>
       </div>
     </div>
-  </div>
+  </DashboardLayout>
 </template>
 
 <script setup lang="ts">
@@ -446,6 +451,8 @@ import { useAuthStore } from '@/stores/auth'
 import { useRoute } from 'vue-router'
 import { notify } from '@/composables/useNotifications'
 import { apiService } from '@/services/api'
+import DashboardLayout from '@/components/ui/DashboardLayout.vue'
+import { useDashboardLayout } from '@/composables/useDashboardLayout'
 import {
   PlusIcon,
   MagnifyingGlassIcon,
@@ -471,6 +478,8 @@ const showEditProductModal = ref(false)
 const showDeleteConfirmModal = ref(false)
 const productToDelete = ref<any>(null)
 const isSubmitting = ref(false)
+
+const { sidebar, header } = useDashboardLayout('merchant')
 
 // Product form
 const productForm = ref({

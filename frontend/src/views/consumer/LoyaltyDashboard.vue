@@ -1,5 +1,9 @@
 <template>
-  <div class="min-h-screen bg-gradient-to-br from-neutral-50 to-neutral-100">
+  <DashboardLayout
+    :sidebar="sidebar"
+    :header="header"
+    class="bg-gradient-to-br from-neutral-50 to-neutral-100"
+  >
     <!-- Header -->
     <div class="bg-white/80 backdrop-blur-sm border-b border-neutral-200 sticky top-0 z-10">
       <div class="container mx-auto px-4 py-6">
@@ -252,7 +256,7 @@
         </div>
       </div>
     </div>
-  </div>
+  </DashboardLayout>
 </template>
 
 <script setup lang="ts">
@@ -262,6 +266,8 @@ import {
   ShoppingBag, MessageSquare, Users, Award, Minus
 } from 'lucide-vue-next'
 import { useLoyaltyPoints } from '@/composables/useLoyaltyPoints'
+import DashboardLayout from '@/components/ui/DashboardLayout.vue'
+import { useDashboardLayout } from '@/composables/useDashboardLayout'
 
 // Composables
 const {
@@ -282,6 +288,8 @@ const {
 const selectedReward = ref(null)
 const redeeming = ref(false)
 const rewardsSection = ref(null)
+
+const { sidebar, header } = useDashboardLayout('consumer')
 
 // Mock rewards data (this would come from an API in real app)
 const availableRewards = ref([

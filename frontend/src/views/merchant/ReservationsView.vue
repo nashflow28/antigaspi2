@@ -1,5 +1,10 @@
 <template>
-  <div class="min-h-screen bg-gradient-to-br from-green-50 to-blue-50 p-6">
+  <DashboardLayout
+    :sidebar="sidebar"
+    :header="header"
+    class="bg-gradient-to-br from-green-50 to-blue-50"
+  >
+    <div class="p-6">
     <!-- Header -->
     <div class="mb-8">
       <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
@@ -449,7 +454,7 @@
         </div>
       </div>
     </div>
-  </div>
+  </DashboardLayout>
 </template>
 
 <script setup lang="ts">
@@ -471,6 +476,8 @@ import {
   EllipsisVerticalIcon,
   ArrowDownTrayIcon
 } from '@heroicons/vue/24/outline'
+import DashboardLayout from '@/components/ui/DashboardLayout.vue'
+import { useDashboardLayout } from '@/composables/useDashboardLayout'
 
 // Auth store
 const authStore = useAuthStore()
@@ -485,6 +492,7 @@ const showDetailsModal = ref(false)
 const selectedReservation = ref<any>(null)
 const loading = ref(false)
 const openDropdown = ref<number | null>(null)
+const { sidebar, header } = useDashboardLayout('merchant')
 
 // Filters
 const filters = computed(() => [
