@@ -264,9 +264,11 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
-import { useAuthStore } from '@/stores/auth'
+import { useRoute } from 'vue-router'
 import { formatPrice } from '@/utils/currency'
+import { notify } from '@/composables/useNotifications'
+import { apiService } from '@/services/api'
+import { useReservationsStore } from '@/stores/reservations'
 import {
   AlertCircle, ArrowLeft, Calendar, Check, Clock, DollarSign,
   Download, MapPin, Package, Phone, Store, Truck, X
@@ -274,8 +276,7 @@ import {
 import type { Reservation } from '@/types'
 
 const route = useRoute()
-const router = useRouter()
-const authStore = useAuthStore()
+const reservationsStore = useReservationsStore()
 
 // State
 const loading = ref(true)
@@ -337,60 +338,55 @@ const loadReservation = async () => {
   loading.value = true
   error.value = null
 
+  const reservationId = Number(route.params.id)
+  if (Number.isNaN(reservationId)) {
+    error.value = 'Identifiant de réservation invalide'
+    loading.value = false
+    return
+  }
+
   try {
-    const id = route.params.id
-    const response = await fetch(`http://localhost:8000/api/reservations/${id}`, {
-      headers: {
-        'Accept': 'application/json',
-        'Authorization': `Bearer ${authStore.token}`
-      }
-    })
+    const response = await apiService.getReservation(reservationId)
 
-    if (!response.ok) {
-      if (response.status === 401) {
-        router.push('/login')
-        return
-      }
-      if (response.status === 404) {
-        error.value = 'Réservation non trouvée'
-        return
-      }
-      throw new Error(`HTTP error! status: ${response.status}`)
+    if (!response.success || !response.data) {
+      throw new Error(response.message || 'Réservation introuvable')
     }
 
-    const data = await response.json()
+    const res = response.data
+    const quantity = res.quantity ?? res.quantity_reserved ?? 0
+    const originalPrice = Number(res.product?.original_price ?? res.original_price ?? 0)
+    const discountedPrice = Number(res.product?.discounted_price ?? res.discounted_price ?? 0)
+    const totalAmount = Number(res.total_amount ?? quantity * discountedPrice)
 
-    if (data.success && data.data) {
-      const res = data.data
-      reservation.value = {
-        id: res.id,
-        product: {
-          id: res.product?.id,
-          name: res.product?.name || 'Produit inconnu',
-          image_url: res.product?.image_url || null,
-          merchant: {
-            name: res.product?.merchant?.name || res.product?.merchant?.business_name || 'Commerçant inconnu',
-            address: res.product?.merchant?.address || res.product?.merchant?.city || 'Adresse non renseignée',
-            phone: res.product?.merchant?.phone || 'N/A'
-          }
-        },
-        quantity: res.quantity ?? res.quantity_reserved ?? 0,
-        quantity_reserved: res.quantity_reserved ?? res.quantity ?? 0,
-        original_price: parseFloat(res.product?.original_price || 0),
-        discounted_price: parseFloat(res.product?.discounted_price || 0),
-        total_amount: parseFloat(res.total_amount || 0),
-        pickup_date: res.pickup_date ? new Date(res.pickup_date) : null,
-        pickup_notes: res.notes || '',
-        status: res.status,
-        created_at: new Date(res.created_at),
-        reservation_code: res.reservation_code || `ANT-${res.id.toString().padStart(3, '0')}`
-      }
-    } else {
-      error.value = 'Format de réponse inattendu'
+    reservation.value = {
+      ...res,
+      product: {
+        id: res.product?.id ?? 0,
+        name: res.product?.name || 'Produit inconnu',
+        description: res.product?.description,
+        image_url: res.product?.image_url || null,
+        original_price: originalPrice,
+        discounted_price: discountedPrice,
+        merchant: {
+          id: res.product?.merchant?.id,
+          name: res.product?.merchant?.name || res.product?.merchant?.business_name || 'Commerçant inconnu',
+          address: res.product?.merchant?.address || res.product?.merchant?.city || 'Adresse non renseignée',
+          phone: res.product?.merchant?.phone || 'N/A'
+        }
+      },
+      quantity,
+      quantity_reserved: res.quantity_reserved ?? quantity,
+      original_price: originalPrice,
+      discounted_price: discountedPrice,
+      total_amount: totalAmount,
+      pickup_date: res.pickup_date ?? null,
+      pickup_notes: res.pickup_notes ?? res.notes ?? '',
+      reservation_code: res.reservation_code || `ANT-${res.id.toString().padStart(3, '0')}`
     }
-  } catch (err) {
-    console.error('Erreur lors du chargement de la réservation:', err)
-    error.value = 'Erreur lors du chargement de la réservation'
+  } catch (err: any) {
+    const message = err?.message || 'Erreur lors du chargement de la réservation'
+    error.value = message
+    notify.error(message)
   } finally {
     loading.value = false
   }
@@ -420,36 +416,42 @@ const getStatusText = (status: string) => {
   return texts[status as keyof typeof texts] || status
 }
 
-const formatDate = (date: Date | null) => {
+const formatDate = (date: string | Date | null | undefined) => {
   if (!date) return 'Non définie'
+
+  const parsedDate = typeof date === 'string' ? new Date(date) : date
+  if (Number.isNaN(parsedDate?.getTime?.())) {
+    return 'Non définie'
+  }
+
   return new Intl.DateTimeFormat('fr-FR', {
     dateStyle: 'full',
     timeStyle: 'short'
-  }).format(date)
+  }).format(parsedDate)
 }
 
 const cancelReservation = async () => {
-  if (!reservation.value || !confirm('Êtes-vous sûr de vouloir annuler cette réservation ?')) {
+  if (!reservation.value) {
+    return
+  }
+
+  if (!confirm('Êtes-vous sûr de vouloir annuler cette réservation ?')) {
     return
   }
 
   try {
-    const response = await fetch(`http://localhost:8000/api/reservations/${reservation.value.id}/cancel`, {
-      method: 'POST',
-      headers: {
-        'Accept': 'application/json',
-        'Authorization': `Bearer ${authStore.token}`
-      }
-    })
+    const response = await reservationsStore.cancelReservation(reservation.value.id)
 
-    if (response.ok) {
+    if (response.success) {
       reservation.value.status = 'cancelled'
+      reservation.value.cancelled_at = new Date().toISOString()
+      notify.success('Réservation annulée avec succès.')
     } else {
-      throw new Error('Erreur lors de l\'annulation')
+      notify.error(response.error || 'Erreur lors de l\'annulation de la réservation.')
     }
-  } catch (err) {
-    console.error('Erreur:', err)
-    alert('Erreur lors de l\'annulation de la réservation')
+  } catch (err: any) {
+    const message = err?.message || 'Erreur lors de l\'annulation de la réservation.'
+    notify.error(message)
   }
 }
 

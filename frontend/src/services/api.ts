@@ -240,6 +240,10 @@ class ApiService {
     return this.request<ApiResponse<Reservation[]>>('/reservations', {}, true)
   }
 
+  async getReservation(id: number): Promise<ApiResponse<Reservation>> {
+    return this.request<ApiResponse<Reservation>>(`/reservations/${id}`, {}, true)
+  }
+
   async createReservation(payload: ReservationCreationPayload): Promise<ReservationCreationResponse> {
     const body = {
       product_id: payload.productId,
