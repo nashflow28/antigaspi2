@@ -15,6 +15,7 @@
 
     /* Easing functions */
     --ease-out-cubic: cubic-bezier(0.33, 1, 0.68, 1);
+    --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
     --ease-in-out-cubic: cubic-bezier(0.65, 0, 0.35, 1);
     --ease-spring: cubic-bezier(0.68, -0.55, 0.265, 1.55);
   }
@@ -139,6 +140,11 @@
 
   .focus-ring-inset {
     @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary-500;
+  }
+
+  .focus-2025 {
+    @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500/50 focus-visible:ring-offset-2 focus-visible:ring-offset-white;
+    transition: all var(--duration-normal) var(--ease-out-expo);
   }
 
   /* Navigation clavier visible */
