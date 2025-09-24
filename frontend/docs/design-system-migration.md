@@ -17,9 +17,8 @@
 - **Toast** : notification flottante avec tonalités (success/info/warning/error), action secondaire et fermeture.【F:react-design-system/src/components/ui/Toast.tsx†L1-L106】
 
 ## Composants Vue actuels sur le même périmètre UI
-- **ModernButton** : bouton composable (variantes, tailles, effets shimmer/glow, icônes, navigation).【F:frontend/src/components/ui/ModernButton.vue†L1-L176】
-- **InteractiveButton** : bouton interactif (ripple, succès, états de chargement, variants).【F:frontend/src/components/ui/InteractiveButton.vue†L1-L200】
-- **ModernCard** : carte polyvalente avec variantes (glass, gradient), header/footer slots et états interactifs.【F:frontend/src/components/ui/ModernCard.vue†L1-L172】
+- **Button** : bouton composable (variantes, tailles, icônes, états de chargement).【F:frontend/src/components/ui/Button.vue†L1-L158】
+- **Card** : carte polyvalente avec slots header/footer et variantes hover/padding.【F:frontend/src/components/ui/Card.vue†L1-L78】
 - **AccessibleModal** : modale accessible (focus trap, slots header/body/footer, actions confirm/cancel).【F:frontend/src/components/ui/AccessibleModal.vue†L1-L200】
 - **AdminModal** : modale de contenu riche avec header iconique et actions personnalisées.【F:frontend/src/components/ui/AdminModal.vue†L1-L136】
 - **ConfirmModal** : modale de confirmation légère avec variantes danger/success/warning.【F:frontend/src/components/ui/ConfirmModal.vue†L1-L123】
@@ -29,21 +28,21 @@
 - **NotificationToast** : toast individuel (types, auto-dismiss, fermeture).【F:frontend/src/components/ui/NotificationToast.vue†L1-L90】
 - **NotificationSystem** : pile de notifications avec icônes, barre de progression et gestion store/composable.【F:frontend/src/components/ui/NotificationSystem.vue†L1-L125】
 - **NotificationContainer** : conteneur d’alertes store (auth/produits/réservations).【F:frontend/src/components/ui/NotificationContainer.vue†L1-L78】
-- **LoadingSkeleton** : squelette configurable (variants, animations, couleurs).【F:frontend/src/components/ui/LoadingSkeleton.vue†L1-L200】
+- **Skeleton** : placeholder shimmer avec arrondis configurables.【F:frontend/src/components/ui/Skeleton.vue†L1-L24】
 
 ## Table de correspondance et état de migration
 | Composant React | Rôle principal | Cible Vue actuelle | Statut de migration | Notes |
 | --- | --- | --- | --- | --- |
-| Button | Bouton d’action multi-variantes.【F:react-design-system/src/components/ui/Button.tsx†L6-L112】 | ModernButton / InteractiveButton.【F:frontend/src/components/ui/ModernButton.vue†L1-L176】【F:frontend/src/components/ui/InteractiveButton.vue†L1-L200】 | Partiel | Deux implémentations Vue couvrent la plupart des variantes/états ; harmonisation & API unifiée à prévoir. |
-| Card | Conteneur carte avec sous-composants.【F:react-design-system/src/components/ui/Card.tsx†L6-L131】 | ModernCard.【F:frontend/src/components/ui/ModernCard.vue†L1-L172】 | Partiel | Vue propose slots équivalents mais sans sous-composants typés (`CardHeader` etc.) ; adapter les API et variantes manquantes. |
+| Button | Bouton d’action multi-variantes.【F:react-design-system/src/components/ui/Button.tsx†L6-L112】 | Button.【F:frontend/src/components/ui/Button.vue†L1-L158】 | OK | Prise en charge des variantes 2025, icônes et états de chargement natifs. |
+| Card | Conteneur carte avec sous-composants.【F:react-design-system/src/components/ui/Card.tsx†L6-L131】 | Card.【F:frontend/src/components/ui/Card.vue†L1-L78】 | OK | Slots header/footer et options de padding/hover alignées sur le DS. |
 | DashboardLayout | Layout dashboard sidebar + header.【F:react-design-system/src/components/ui/DashboardLayout.tsx†L5-L159】 | (à créer) – SimpleTopBar ne couvre qu’une barre supérieure.【F:frontend/src/components/ui/SimpleTopBar.vue†L1-L167】 | À faire | Construire un layout Vue complet (sidebar responsive, header actions) pour remplacer `DashboardLayout`. |
 | EmptyState | État vide avec CTA.【F:react-design-system/src/components/ui/EmptyState.tsx†L5-L31】 | Aucun équivalent direct | À faire | Créer un composant Vue réutilisable d’état vide (icône, titre, description, action). |
 | Footer | Pied de page marketing.【F:react-design-system/src/components/ui/Footer.tsx†L4-L37】 | Aucun équivalent direct | À faire | Implémenter un footer Vue stylé cohérent DS. |
 | Input | Champ texte riche.【F:react-design-system/src/components/ui/Input.tsx†L6-L133】 | Aucun équivalent direct | À faire | Besoin d’un composant Input Vue avec variantes, icônes et messages. |
 | Modal / ConfirmationModal | Modale générique + confirmation.【F:react-design-system/src/components/ui/Modal.tsx†L6-L190】 | AccessibleModal / AdminModal / ConfirmModal.【F:frontend/src/components/ui/AccessibleModal.vue†L1-L200】【F:frontend/src/components/ui/AdminModal.vue†L1-L136】【F:frontend/src/components/ui/ConfirmModal.vue†L1-L123】 | Partiel | Fonctionnalités présentes mais multiples implémentations ; converger vers une base unique alignée sur le DS React. |
 | Navigation | Barre nav responsive + thème.【F:react-design-system/src/components/ui/Navigation.tsx†L24-L146】 | SimpleTopBar + DarkModeToggle.【F:frontend/src/components/ui/SimpleTopBar.vue†L1-L167】【F:frontend/src/components/ui/DarkModeToggle.vue†L1-L118】 | À compléter | Vue couvre topbar et toggle mais pas menu desktop/mobile unifié ; créer une `Navigation` Vue complète. |
-| ProductCard | Carte produit CTA.【F:react-design-system/src/components/ui/ProductCard.tsx†L6-L78】 | Aucun équivalent direct | À faire | À implémenter en Vue (peut réutiliser ModernCard + CTA). |
-| Skeleton | Placeholder animé.【F:react-design-system/src/components/ui/Skeleton.tsx†L4-L21】 | LoadingSkeleton.【F:frontend/src/components/ui/LoadingSkeleton.vue†L1-L200】 | Partiel | Vue offre plus d’options ; aligner tokens/variants du DS React. |
+| ProductCard | Carte produit CTA.【F:react-design-system/src/components/ui/ProductCard.tsx†L6-L78】 | Aucun équivalent direct | À faire | À implémenter en Vue (peut réutiliser Card + CTA). |
+| Skeleton | Placeholder animé.【F:react-design-system/src/components/ui/Skeleton.tsx†L4-L21】 | Skeleton.【F:frontend/src/components/ui/Skeleton.vue†L1-L24】 | OK | Placeholder shimmer léger, arrondis configurables comme sur React. |
 | Stats | Grille de KPI animés.【F:react-design-system/src/components/ui/Stats.tsx†L4-L54】 | Aucun équivalent direct | À faire | Créer composant `Stats` Vue avec compteur animé/variants. |
 | Textarea | Zone de texte riche.【F:react-design-system/src/components/ui/Textarea.tsx†L6-L112】 | Aucun équivalent direct | À faire | Développer Textarea Vue calquée sur Input. |
 | ThemeToggle | Switch thème.【F:react-design-system/src/components/ui/ThemeToggle.tsx†L5-L45】 | DarkModeToggle.【F:frontend/src/components/ui/DarkModeToggle.vue†L1-L118】 | OK | Fonctionnalité équivalente (persistante + animation). |

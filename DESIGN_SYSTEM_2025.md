@@ -56,46 +56,62 @@ h3: text-2xl lg:text-3xl (24px → 30px)
 
 ## 🎯 Composants
 
-### ModernButton
+### Button
 ```vue
-<ModernButton
-  variant="primary|secondary|ghost|outline|gradient"
-  size="sm|md|lg|xl"
+<Button
+  variant="primary|secondary|ghost|outline|promo|destructive"
+  size="sm|default|lg|xl|icon"
   :loading="false"
-  :shimmer="true"
-  :glow="true"
+  :disabled="false"
+  :left-icon="IconeGauche"
+  :right-icon="IconeDroite"
 >
   Texte du bouton
-</ModernButton>
+</Button>
 ```
 
 **Variantes** :
-- `primary` : Gradient vert → bleu avec glow
-- `secondary` : Gradient bleu avec glow bleu
-- `ghost` : Glassmorphism transparent
-- `outline` : Bordure avec hover fill
-- `gradient` : Gradient 3 couleurs moderne
+- `primary` : Dégradé nav-bar lumineux avec halo.
+- `secondary` : Fond clair avec bordure accentuée.
+- `ghost` : Transparent avec hover glassmorphism.
+- `outline` : Bordure primaire + hover teinté.
+- `promo` : Accent orange pour CTA marketing.
+- `destructive` : Rouge soutenu pour actions critiques.
 
-### ModernCard
+### Card
 ```vue
-<ModernCard
-  variant="default|glass|elevated|bordered|gradient"
-  :interactive="true"
-  :hover-lift="true"
-  :glow="true"
-  title="Titre de la carte"
-  subtitle="Sous-titre"
+<Card
+  variant="default|glass|highlight|muted"
+  hover="none|lift|glow|subtle"
+  padding="none|sm|md|lg"
 >
-  Contenu de la carte
-</ModernCard>
+  <template #header>
+    <!-- header -->
+  </template>
+
+  Contenu principal
+
+  <template #footer>
+    <!-- footer -->
+  </template>
+</Card>
 ```
 
 **Variantes** :
-- `default` : Background semi-transparent
-- `glass` : Glassmorphism complet
-- `elevated` : Shadow forte sans transparence
-- `bordered` : Bordure colorée
-- `gradient` : Background gradient subtil
+- `default` : Fond translucide avec border douce.
+- `glass` : Effet glassmorphism 2025.
+- `highlight` : Accentuation colorée pour focus.
+- `muted` : Fond neutre pour blocs secondaires.
+
+### Skeleton
+```vue
+<Skeleton
+  class="h-8 w-full"
+  rounded="sm|md|lg|full"
+/>
+```
+
+Placeholders shimmer pour chargements avec arrondis configurables.
 
 ### DarkModeToggle
 ```vue
@@ -228,8 +244,9 @@ Toggle automatique avec :
 ```vue
 <!-- Dans votre composant Vue -->
 <script setup>
-import ModernButton from '@/components/ui/ModernButton.vue'
-import ModernCard from '@/components/ui/ModernCard.vue'
+import Button from '@/components/ui/Button.vue'
+import Card from '@/components/ui/Card.vue'
+import Skeleton from '@/components/ui/Skeleton.vue'
 import DarkModeToggle from '@/components/ui/DarkModeToggle.vue'
 </script>
 ```
