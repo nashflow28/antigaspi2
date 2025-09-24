@@ -59,7 +59,7 @@
             <div class="w-8 h-8 bg-gradient-to-r from-primary-500 to-accent-blue/50 rounded-lg flex items-center justify-center">
               <span class="text-white text-lg">🌱</span>
             </div>
-            <span class="text-lg font-semibold text-gray-900">Antigaspi</span>
+            <span class="text-lg font-semibold text-gray-900 font-display">Antigaspi</span>
           </div>
           <button
             @click="closeMobileMenu"
@@ -78,7 +78,7 @@
               </span>
             </div>
             <div>
-              <p class="font-medium text-gray-900">
+              <p class="font-medium text-gray-900 font-heading">
                 {{ authStore.user?.first_name }} {{ authStore.user?.last_name }}
               </p>
               <p class="text-sm text-gray-500">{{ authStore.user?.email }}</p>

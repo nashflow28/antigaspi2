@@ -18,7 +18,11 @@
           </div>
 
           <!-- Titre principal avec gradient text -->
-          <h1 class="text-5xl md:text-7xl font-bold mb-8 animate-fade-in-up text-balance" style="animation-delay: 0.2s; font-size: 8rem;" data-testid="main-hero-title">
+          <h1
+            class="text-5xl md:text-7xl font-bold mb-8 animate-fade-in-up text-balance font-display"
+            style="animation-delay: 0.2s; font-size: 8rem;"
+            data-testid="main-hero-title"
+          >
             <span class="bg-gradient-to-r from-white via-primary-100 to-accent-orange/70 bg-clip-text text-transparent">
               Sauvons
             </span>
@@ -93,7 +97,7 @@
             <span class="w-2 h-2 bg-primary-500 rounded-full"></span>
             Processus simple en 3 étapes
           </div>
-          <h2 class="text-4xl lg:text-5xl font-bold text-neutral-900 mb-6 text-balance" style="font-family: 'Cal Sans', 'Inter', ui-sans-serif, system-ui, sans-serif">
+          <h2 class="text-4xl lg:text-5xl font-semibold text-neutral-900 mb-6 text-balance font-display">
             Comment ça marche ?
           </h2>
           <p class="text-xl text-neutral-600 max-w-2xl mx-auto">
@@ -118,7 +122,7 @@
             </div>
 
             <div class="text-center">
-              <h3 class="text-2xl font-bold text-neutral-900 mb-4 group-hover:text-primary-600 transition-colors">
+              <h3 class="text-2xl font-semibold text-neutral-900 mb-4 group-hover:text-primary-600 transition-colors font-heading">
                 Découvrez
               </h3>
               <p class="text-neutral-600 leading-relaxed mb-6">
@@ -152,7 +156,7 @@
             </div>
 
             <div class="text-center">
-              <h3 class="text-2xl font-bold text-neutral-900 mb-4 group-hover:text-accent-blue transition-colors">
+              <h3 class="text-2xl font-semibold text-neutral-900 mb-4 group-hover:text-accent-blue transition-colors font-heading">
                 Réservez
               </h3>
               <p class="text-neutral-600 leading-relaxed mb-6">
@@ -185,7 +189,7 @@
             </div>
 
             <div class="text-center">
-              <h3 class="text-2xl font-bold text-neutral-900 mb-4 group-hover:text-accent-orange transition-colors">
+              <h3 class="text-2xl font-semibold text-neutral-900 mb-4 group-hover:text-accent-orange transition-colors font-heading">
                 Sauvez
               </h3>
               <p class="text-neutral-600 leading-relaxed mb-6">
