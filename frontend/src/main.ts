@@ -1,4 +1,5 @@
 import { createApp } from 'vue'
+import { MotionPlugin } from '@vueuse/motion'
 import { pinia } from '@/stores'
 import router from '@/router'
 import App from './App-progressive.vue'
@@ -22,6 +23,7 @@ app.config.warnHandler = (msg: string, instance, trace: string) => {
 
 // IMPORTANT: Pinia DOIT être ajouté AVANT le router
 app.use(pinia)
+app.use(MotionPlugin)
 app.use(router)
 
 app.mount('#app')
