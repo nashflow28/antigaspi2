@@ -179,25 +179,17 @@
       </section>
     </main>
 
-    <Toast
-      :is-open="toast.open"
-      :tone="toast.tone"
-      :title="toast.title"
-      :description="toast.description"
-      :on-close="closeToast"
-    />
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, reactive, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { Search, Filter, MapPin } from 'lucide-vue-next'
 import Button from '@/components/ui/Button.vue'
 import Card from '@/components/ui/Card.vue'
 import EmptyState from '@/components/ui/EmptyState.vue'
 import Skeleton from '@/components/ui/Skeleton.vue'
-import Toast from '@/components/ui/Toast.vue'
 import ProductCard from '@/components/ui/ProductCard.vue'
 import { notify } from '@/composables/useNotifications'
 import { useAuthStore } from '@/stores/auth'
@@ -256,14 +248,6 @@ const filters = ref({
 const userLocation = ref<{ latitude: number; longitude: number } | null>(null)
 const locationLoading = ref(false)
 
-const toast = reactive({
-  open: false,
-  tone: 'success' as const,
-  title: '',
-  description: ''
-})
-let toastTimer: number | undefined
-
 const activeFiltersCount = computed(() => {
   return Object.values(filters.value).filter(value => value !== '').length
 })
@@ -307,27 +291,6 @@ const filteredProducts = computed(() => {
 
   return result
 })
-
-const openToast = (tone: 'success' | 'info' | 'warning', title: string, description: string) => {
-  toast.open = true
-  toast.tone = tone
-  toast.title = title
-  toast.description = description
-  if (toastTimer) {
-    window.clearTimeout(toastTimer)
-  }
-  toastTimer = window.setTimeout(() => {
-    toast.open = false
-  }, 2600)
-}
-
-const closeToast = () => {
-  toast.open = false
-  if (toastTimer) {
-    window.clearTimeout(toastTimer)
-    toastTimer = undefined
-  }
-}
 
 const fetchProducts = async () => {
   try {
@@ -383,7 +346,7 @@ const fetchProducts = async () => {
     }
   } catch (error: any) {
     console.error('Erreur lors du chargement des produits:', error)
-    openToast('warning', 'Chargement incomplet', 'Nous rencontrons un souci pour récupérer certains produits. Réessayez plus tard.')
+    notify.warning('Nous rencontrons un souci pour récupérer certains produits. Réessayez plus tard.', 'Chargement incomplet')
   } finally {
     loading.value = false
   }
@@ -455,12 +418,12 @@ const clearFilters = () => {
     minDiscount: ''
   }
   searchQuery.value = ''
-  openToast('info', 'Filtres réinitialisés', 'Tous les filtres ont été supprimés.')
+  notify.info('Tous les filtres ont été supprimés.', 'Filtres réinitialisés')
 }
 
 const applyFilters = () => {
   showFilters.value = false
-  openToast('success', 'Filtres appliqués', 'Affichage mis à jour selon vos préférences.')
+  notify.success('Affichage mis à jour selon vos préférences.', 'Filtres appliqués')
 }
 
 const viewProduct = (product: Product) => {
@@ -542,7 +505,7 @@ const enableLocationFilter = () => {
         longitude: position.coords.longitude
       }
       locationLoading.value = false
-      openToast('success', 'Position activée', 'Nous affinons les paniers en fonction de votre position.')
+      notify.success('Nous affinons les paniers en fonction de votre position.', 'Position activée')
       fetchProducts()
     },
     (error) => {
