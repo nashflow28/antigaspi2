@@ -56,17 +56,18 @@
                 </h2>
 
                 <!-- Close Button -->
-                <InteractiveButton
+                <Button
                   v-if="closable"
                   id="modal-close"
                   variant="ghost"
-                  size="sm"
+                  size="icon"
                   :aria-label="closeAriaLabel"
-                  class="shrink-0 ml-4 -mr-2"
+                  class="ml-4 -mr-2 shrink-0"
+                  :left-icon="X"
                   @click="close"
                 >
-                  <X class="w-5 h-5" />
-                </InteractiveButton>
+                  <span class="sr-only">{{ closeAriaLabel }}</span>
+                </Button>
               </div>
 
               <!-- Description -->
@@ -97,24 +98,24 @@
             >
               <slot name="footer">
                 <div class="flex gap-3 justify-end">
-                  <InteractiveButton
+                  <Button
                     v-if="showCancel"
                     variant="outline"
                     @click="cancel"
                     :aria-describedby="`${titleId}-cancel-help`"
                   >
                     {{ cancelText }}
-                  </InteractiveButton>
+                  </Button>
 
-                  <InteractiveButton
+                  <Button
                     v-if="showConfirm"
-                    :variant="confirmVariant"
+                    :variant="confirmButtonVariant"
                     :loading="loading"
                     @click="confirm"
                     :aria-describedby="`${titleId}-confirm-help`"
                   >
                     {{ confirmText }}
-                  </InteractiveButton>
+                  </Button>
                 </div>
 
                 <!-- Hidden help text for buttons -->
@@ -145,7 +146,7 @@
 import { ref, computed, watch, nextTick, onUnmounted } from 'vue'
 import { X } from 'lucide-vue-next'
 import { useAccessibility } from '@/composables/useAccessibility'
-import InteractiveButton from './InteractiveButton.vue'
+import Button from './Button.vue'
 
 interface Props {
   modelValue: boolean
@@ -221,6 +222,21 @@ const hasFooter = computed(() =>
 const closeAriaLabel = computed(() =>
   $t?.('accessibility.closeModal') || 'Close dialog'
 )
+
+const confirmButtonVariant = computed(() => {
+  const mapping: Record<
+    NonNullable<Props['confirmVariant']>,
+    'primary' | 'secondary' | 'ghost' | 'outline' | 'promo' | 'destructive'
+  > = {
+    primary: 'primary',
+    secondary: 'secondary',
+    success: 'primary',
+    danger: 'destructive',
+    warning: 'promo'
+  }
+
+  return mapping[props.confirmVariant]
+})
 
 const backdropClasses = computed(() => [
   'bg-black/20',

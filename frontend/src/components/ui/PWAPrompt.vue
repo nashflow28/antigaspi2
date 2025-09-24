@@ -26,36 +26,39 @@
 
               <!-- Buttons -->
               <div class="flex gap-2">
-                <InteractiveButton
+                <Button
                   size="sm"
                   variant="primary"
+                  :left-icon="Download"
                   @click="handleInstall"
                   :loading="installing"
                   aria-label="Installer l'application Antigaspi"
                 >
-                  <Download class="w-4 h-4" aria-hidden="true" />
                   Installer
-                </InteractiveButton>
+                </Button>
 
-                <InteractiveButton
+                <Button
                   size="sm"
                   variant="ghost"
                   @click="dismissInstallPrompt"
                   aria-label="Ignorer l'installation"
                 >
                   Plus tard
-                </InteractiveButton>
+                </Button>
               </div>
             </div>
 
             <!-- Close -->
-            <button
-              @click="dismissInstallPrompt"
-              class="shrink-0 p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+            <Button
+              variant="ghost"
+              size="icon"
+              :left-icon="X"
+              class="shrink-0 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
               aria-label="Fermer"
+              @click="dismissInstallPrompt"
             >
-              <X class="w-4 h-4" />
-            </button>
+              <span class="sr-only">Fermer</span>
+            </Button>
           </div>
         </div>
       </div>
@@ -89,36 +92,39 @@
 
               <!-- Buttons -->
               <div class="flex gap-2">
-                <InteractiveButton
+                <Button
                   size="sm"
                   variant="primary"
+                  :left-icon="RefreshCw"
                   @click="handleUpdate"
                   :loading="updating"
                   aria-label="Mettre à jour l'application"
                 >
-                  <RefreshCw class="w-4 h-4" aria-hidden="true" />
                   Mettre à jour
-                </InteractiveButton>
+                </Button>
 
-                <InteractiveButton
+                <Button
                   size="sm"
                   variant="ghost"
                   @click="dismissUpdatePrompt"
                   aria-label="Ignorer la mise à jour"
                 >
                   Plus tard
-                </InteractiveButton>
+                </Button>
               </div>
             </div>
 
             <!-- Close -->
-            <button
-              @click="dismissUpdatePrompt"
-              class="shrink-0 p-1 text-blue-400 hover:text-blue-600 dark:hover:text-blue-300 transition-colors"
+            <Button
+              variant="ghost"
+              size="icon"
+              :left-icon="X"
+              class="shrink-0 text-blue-400 hover:text-blue-600 dark:hover:text-blue-300 transition-colors"
               aria-label="Fermer"
+              @click="dismissUpdatePrompt"
             >
-              <X class="w-4 h-4" />
-            </button>
+              <span class="sr-only">Fermer</span>
+            </Button>
           </div>
         </div>
       </div>
@@ -158,7 +164,7 @@ import { ref, watch, onMounted } from 'vue'
 import { Download, X, RefreshCw } from 'lucide-vue-next'
 import { usePWA } from '@/composables/usePWA'
 import { useAccessibility } from '@/composables/useAccessibility'
-import InteractiveButton from './InteractiveButton.vue'
+import Button from './Button.vue'
 
 const {
   isOnline,
