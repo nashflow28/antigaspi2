@@ -28,17 +28,17 @@
         <div class="card card-interactive glow-effect animate-fade-in-up" style="animation-delay: 0.1s;">
           <div class="flex items-center justify-between">
             <div>
-              <div class="text-2xl lg:text-3xl font-bold text-success-600 mb-2">
+              <div class="text-2xl lg:text-3xl font-bold text-primary-600 mb-2">
                 {{ formatPrice(userStats.totalSavings) }}
               </div>
               <p class="text-sm text-neutral-600 font-medium">Économies totales</p>
-              <div class="flex items-center mt-2 text-xs text-success-600">
+              <div class="flex items-center mt-2 text-xs text-primary-600">
                 <TrendingUp class="w-4 h-4 mr-1" />
                 <span>+{{ formatPrice(userStats.monthSavings) }} ce mois</span>
               </div>
             </div>
-            <div class="w-16 h-16 bg-gradient-to-br from-success-100 to-success-200 rounded-2xl flex items-center justify-center">
-              <DollarSign class="w-8 h-8 text-success-600" />
+            <div class="w-16 h-16 bg-gradient-to-br from-primary-100 to-primary-200 rounded-2xl flex items-center justify-center">
+              <DollarSign class="w-8 h-8 text-primary-600" />
             </div>
           </div>
         </div>
@@ -66,17 +66,17 @@
         <div class="card card-interactive glow-effect animate-fade-in-up" style="animation-delay: 0.3s;">
           <div class="flex items-center justify-between">
             <div>
-              <div class="text-2xl lg:text-3xl font-bold text-secondary-600 mb-2">
+              <div class="text-2xl lg:text-3xl font-bold text-accent-blue mb-2">
                 {{ userStats.co2Saved }}kg
               </div>
               <p class="text-sm text-neutral-600 font-medium">CO₂ évité</p>
-              <div class="flex items-center mt-2 text-xs text-secondary-600">
+              <div class="flex items-center mt-2 text-xs text-accent-blue">
                 <Leaf class="w-4 h-4 mr-1" />
                 <span>≈ {{ Math.round(userStats.co2Saved / 2.3) }} km en voiture</span>
               </div>
             </div>
-            <div class="w-16 h-16 bg-gradient-to-br from-secondary-100 to-secondary-200 rounded-2xl flex items-center justify-center">
-              <TreePine class="w-8 h-8 text-secondary-600" />
+            <div class="w-16 h-16 bg-gradient-to-br from-accent-blue/10 to-accent-blue/20 rounded-2xl flex items-center justify-center">
+              <TreePine class="w-8 h-8 text-accent-blue" />
             </div>
           </div>
         </div>
@@ -85,17 +85,17 @@
         <div class="card card-interactive glow-effect animate-fade-in-up" style="animation-delay: 0.4s;">
           <div class="flex items-center justify-between">
             <div>
-              <div class="text-2xl lg:text-3xl font-bold text-accent-600 mb-2">
+              <div class="text-2xl lg:text-3xl font-bold text-accent-orange mb-2">
                 {{ userStats.activeReservations }}
               </div>
               <p class="text-sm text-neutral-600 font-medium">Réservations actives</p>
-              <div class="flex items-center mt-2 text-xs text-accent-600">
+              <div class="flex items-center mt-2 text-xs text-accent-orange">
                 <Clock class="w-4 h-4 mr-1" />
                 <span>À récupérer aujourd'hui</span>
               </div>
             </div>
-            <div class="w-16 h-16 bg-gradient-to-br from-accent-100 to-accent-200 rounded-2xl flex items-center justify-center">
-              <Calendar class="w-8 h-8 text-accent-600" />
+            <div class="w-16 h-16 bg-gradient-to-br from-accent-orange/10 to-accent-orange/20 rounded-2xl flex items-center justify-center">
+              <Calendar class="w-8 h-8 text-accent-orange" />
             </div>
           </div>
         </div>
@@ -166,9 +166,9 @@
                 v-else
                 v-for="reservation in recentReservations"
                 :key="reservation.id"
-                class="flex items-center gap-4 p-4 rounded-xl border border-neutral-200 hover:border-primary-300 hover:shadow-medium transition-all duration-200"
+                class="flex items-center gap-4 p-4 rounded-xl border border-neutral-200 hover:border-primary-300 hover:shadow-card transition-all duration-200"
               >
-                <div class="w-16 h-16 bg-gradient-primary rounded-xl flex items-center justify-center">
+                <div class="w-16 h-16 bg-nav-gradient rounded-xl flex items-center justify-center">
                   <span class="text-white font-bold">{{ reservation.merchant.name[0] }}</span>
                 </div>
                 <div class="flex-1 min-w-0">
@@ -208,11 +208,11 @@
               <div
                 v-for="product in recommendedProducts"
                 :key="product.id"
-                class="p-4 rounded-xl border border-neutral-200 hover:border-primary-300 hover:shadow-medium transition-all duration-200 cursor-pointer group"
+                class="p-4 rounded-xl border border-neutral-200 hover:border-primary-300 hover:shadow-card transition-all duration-200 cursor-pointer group"
                 @click="viewProduct(product)"
               >
                 <div class="flex items-center gap-3 mb-3">
-                  <div class="w-12 h-12 bg-gradient-secondary rounded-xl flex items-center justify-center">
+                  <div class="w-12 h-12 bg-gradient-to-r from-accent-blue to-accent-blue/90 rounded-xl flex items-center justify-center">
                     <Package class="w-6 h-6 text-white" />
                   </div>
                   <div class="flex-1 min-w-0">
@@ -245,7 +245,7 @@
             </p>
             <div class="w-full bg-neutral-200 rounded-full h-2 mb-4">
               <div
-                class="bg-gradient-primary h-2 rounded-full transition-all duration-500"
+                class="bg-nav-gradient h-2 rounded-full transition-all duration-500"
                 :style="{ width: Math.min(100, (userStats.productsSaved / 100) * 100) + '%' }"
               ></div>
             </div>
@@ -268,9 +268,9 @@
                 </div>
               </router-link>
 
-              <router-link to="/reservations" class="flex items-center gap-3 p-3 rounded-xl hover:bg-secondary-50 transition-colors group">
-                <div class="w-10 h-10 bg-secondary-100 rounded-xl flex items-center justify-center group-hover:bg-secondary-200 transition-colors">
-                  <Calendar class="w-5 h-5 text-secondary-600" />
+              <router-link to="/reservations" class="flex items-center gap-3 p-3 rounded-xl hover:bg-accent-blue/5 transition-colors group">
+                <div class="w-10 h-10 bg-accent-blue/10 rounded-xl flex items-center justify-center group-hover:bg-accent-blue/15 transition-colors">
+                  <Calendar class="w-5 h-5 text-accent-blue" />
                 </div>
                 <div>
                   <p class="font-medium text-neutral-900">Mes réservations</p>
@@ -278,9 +278,9 @@
                 </div>
               </router-link>
 
-              <router-link to="/profile" class="flex items-center gap-3 p-3 rounded-xl hover:bg-accent-50 transition-colors group">
-                <div class="w-10 h-10 bg-accent-100 rounded-xl flex items-center justify-center group-hover:bg-accent-200 transition-colors">
-                  <User class="w-5 h-5 text-accent-600" />
+              <router-link to="/profile" class="flex items-center gap-3 p-3 rounded-xl hover:bg-accent-orange/10 transition-colors group">
+                <div class="w-10 h-10 bg-accent-orange/10 rounded-xl flex items-center justify-center group-hover:bg-accent-orange/20 transition-colors">
+                  <User class="w-5 h-5 text-accent-orange" />
                 </div>
                 <div>
                   <p class="font-medium text-neutral-900">Mon profil</p>
@@ -291,17 +291,17 @@
           </div>
 
           <!-- Tips écologiques -->
-          <div class="card bg-gradient-to-br from-success-50 to-primary-50 border-success-200 animate-fade-in-up" style="animation-delay: 0.9s;">
+          <div class="card bg-gradient-to-br from-primary-50 to-primary-100 border-primary-200 animate-fade-in-up" style="animation-delay: 0.9s;">
             <div class="flex items-center gap-3 mb-4">
-              <div class="w-8 h-8 bg-success-500 rounded-full flex items-center justify-center">
+              <div class="w-8 h-8 bg-primary-500 rounded-full flex items-center justify-center">
                 <Lightbulb class="w-4 h-4 text-white" />
               </div>
-              <h3 class="text-lg font-bold text-success-800">Astuce du jour</h3>
+              <h3 class="text-lg font-bold text-primary-800">Astuce du jour</h3>
             </div>
-            <p class="text-sm text-success-700 mb-4">
+            <p class="text-sm text-primary-700 mb-4">
               {{ currentTip.text }}
             </p>
-            <button @click="nextTip" class="btn btn-sm bg-success-500 text-white hover:bg-success-600 w-full">
+            <button @click="nextTip" class="btn btn-sm bg-primary-500 text-white hover:bg-primary-600 w-full">
               Astuce suivante
             </button>
           </div>

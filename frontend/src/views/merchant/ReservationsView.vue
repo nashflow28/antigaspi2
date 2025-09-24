@@ -55,10 +55,10 @@
           </div>
         </div>
 
-        <div class="card bg-gradient-to-r from-warning-500 to-warning-600 text-white">
+        <div class="card bg-gradient-to-r from-accent-orange to-accent-orange/90 text-white">
           <div class="flex items-center justify-between">
             <div>
-              <p class="text-warning-100 text-sm font-medium">En Attente</p>
+              <p class="text-accent-orange/70 text-sm font-medium">En Attente</p>
               <p class="text-3xl font-bold">{{ pendingReservations.length }}</p>
             </div>
             <div class="p-3 bg-white/20 rounded-xl">
@@ -67,10 +67,10 @@
           </div>
         </div>
 
-        <div class="card bg-gradient-to-r from-success-500 to-success-600 text-white">
+        <div class="card bg-gradient-to-r from-primary-500 to-primary-600 text-white">
           <div class="flex items-center justify-between">
             <div>
-              <p class="text-success-100 text-sm font-medium">Confirmées</p>
+              <p class="text-primary-100 text-sm font-medium">Confirmées</p>
               <p class="text-3xl font-bold">{{ confirmedReservations.length }}</p>
             </div>
             <div class="p-3 bg-white/20 rounded-xl">
@@ -168,7 +168,7 @@
 
                     <span
                       v-if="isUrgent(reservation)"
-                      class="px-2 py-1 bg-error-100 text-error-700 rounded-full text-xs font-medium"
+                      class="px-2 py-1 bg-accent-red/15 text-accent-red/90 rounded-full text-xs font-medium"
                     >
                       Urgent
                     </span>
@@ -201,7 +201,7 @@
                   </div>
                   <div>
                     <p class="text-neutral-500">Expire</p>
-                    <p :class="isExpired(reservation) ? 'text-error-600 font-medium' : 'font-medium'">
+                    <p :class="isExpired(reservation) ? 'text-accent-red font-medium' : 'font-medium'">
                       {{ formatDateTime(reservation.expires_at) }}
                     </p>
                   </div>
@@ -424,7 +424,7 @@
               </div>
 
               <div v-if="selectedReservation.confirmed_at" class="flex items-center gap-3">
-                <div class="w-3 h-3 bg-success-500 rounded-full"></div>
+                <div class="w-3 h-3 bg-primary-500 rounded-full"></div>
                 <div>
                   <p class="text-sm font-medium">Confirmée</p>
                   <p class="text-xs text-neutral-500">{{ formatDateTime(selectedReservation.confirmed_at) }}</p>
@@ -595,11 +595,11 @@ const formatDateTime = (dateString: string): string => {
 
 const getStatusBadgeClass = (status: string): string => {
   const classes: Record<string, string> = {
-    pending: 'bg-warning-100 text-warning-700',
-    confirmed: 'bg-success-100 text-success-700',
+    pending: 'bg-accent-orange/15 text-accent-orange/90',
+    confirmed: 'bg-primary-100 text-primary-700',
     ready: 'bg-blue-100 text-blue-700',
     completed: 'bg-primary-100 text-primary-700',
-    cancelled: 'bg-error-100 text-error-700',
+    cancelled: 'bg-accent-red/15 text-accent-red/90',
     expired: 'bg-neutral-100 text-neutral-700'
   }
   return classes[status] || classes.pending

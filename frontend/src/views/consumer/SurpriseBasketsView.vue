@@ -29,7 +29,7 @@
               Filtres
               <span v-if="activeFiltersCount" class="badge badge-soft">{{ activeFiltersCount }}</span>
             </button>
-            <div class="flex items-center gap-3 rounded-xl bg-white px-4 py-3 shadow-soft">
+            <div class="flex items-center gap-3 rounded-xl bg-white px-4 py-3 shadow-card">
               <Package class="h-6 w-6 text-primary-500" />
               <div>
                 <p class="text-xs uppercase tracking-wide text-neutral-500">Impact</p>

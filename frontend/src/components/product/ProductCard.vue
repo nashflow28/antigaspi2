@@ -1,5 +1,5 @@
 <template>
-  <div class="card card-interactive group cursor-pointer overflow-hidden glow-effect hover:shadow-lift transition-all duration-500">
+  <div class="card card-interactive group cursor-pointer overflow-hidden glow-effect hover:shadow-glow transition-all duration-500">
     <!-- Image du produit avec gradients modernes -->
     <div class="relative h-52 mb-6 -m-6 mb-4 overflow-hidden rounded-t-2xl">
       <!-- Image réelle si disponible -->
@@ -10,7 +10,7 @@
         class="absolute inset-0 w-full h-full object-cover"
       />
       <!-- Placeholder si pas d'image -->
-      <div v-else class="absolute inset-0 bg-gradient-modern flex items-center justify-center">
+      <div v-else class="absolute inset-0 bg-gradient-to-br from-primary-500 via-accent-blue to-accent-blue/90 flex items-center justify-center">
         <Package class="w-20 h-20 text-white/30 group-hover:scale-110 transition-transform duration-300" />
       </div>
 
@@ -18,7 +18,7 @@
       <div class="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent"></div>
 
       <!-- Badge de réduction - Design 2025 -->
-      <div class="absolute top-4 right-4 bg-gradient-accent text-white px-4 py-2 rounded-2xl text-sm font-bold shadow-glow-accent backdrop-blur-sm border border-white/20">
+      <div class="absolute top-4 right-4 bg-gradient-to-r from-accent-orange to-accent-orange/90 text-white px-4 py-2 rounded-2xl text-sm font-bold shadow-glow backdrop-blur-sm border border-white/20">
         <div class="flex items-center gap-1">
           <span class="text-xs">💥</span>
           <span>-{{ product.discount }}%</span>
@@ -28,7 +28,7 @@
       <!-- Badge de disponibilité - Design moderne -->
       <div class="absolute top-4 left-4 glass-bg backdrop-blur-md px-3 py-2 rounded-xl glass-border">
         <div class="flex items-center gap-2 text-xs font-medium text-white">
-          <div class="w-2 h-2 bg-success-400 rounded-full animate-pulse"></div>
+          <div class="w-2 h-2 bg-primary-400 rounded-full animate-pulse"></div>
           <span>{{ product.available_quantity - product.reserved_quantity }} dispo</span>
         </div>
       </div>
@@ -68,10 +68,10 @@
         <!-- Prix avec meilleur espacement -->
         <div class="flex items-baseline gap-3 mb-4">
           <div class="flex items-baseline gap-2">
-            <span class="text-3xl font-bold text-success-600">
+            <span class="text-3xl font-bold text-primary-600">
               {{ Math.round(product.discounted_price).toLocaleString('fr-FR') }}
             </span>
-            <span class="text-sm font-medium text-success-600 whitespace-nowrap">
+            <span class="text-sm font-medium text-primary-600 whitespace-nowrap">
               F CFA
             </span>
           </div>
@@ -104,7 +104,7 @@
 
         <!-- Indicateur d'économies -->
         <div class="mt-3 text-center">
-          <span class="inline-flex items-center gap-1 text-xs font-medium text-success-700 bg-success-100 px-2 py-1 rounded-full">
+          <span class="inline-flex items-center gap-1 text-xs font-medium text-primary-700 bg-primary-100 px-2 py-1 rounded-full">
             <span>💰</span>
             <span>Économisez {{ Math.round(product.original_price - product.discounted_price).toLocaleString('fr-FR') }} F CFA</span>
           </span>

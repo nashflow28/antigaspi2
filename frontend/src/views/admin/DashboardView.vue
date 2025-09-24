@@ -48,12 +48,12 @@
           </div>
         </div>
 
-        <div class="card bg-gradient-to-r from-success-500 to-success-600 text-white">
+        <div class="card bg-gradient-to-r from-primary-500 to-primary-600 text-white">
           <div class="flex items-center justify-between">
             <div>
-              <p class="text-success-100 text-sm font-medium">Commerçants Actifs</p>
+              <p class="text-primary-100 text-sm font-medium">Commerçants Actifs</p>
               <p class="text-3xl font-bold">{{ formatNumber(stats.activeMerchants) }}</p>
-              <p class="text-success-200 text-sm mt-1">
+              <p class="text-primary-200 text-sm mt-1">
                 {{ stats.merchantGrowthRate }}% de croissance
               </p>
             </div>
@@ -120,7 +120,7 @@
             <span class="px-3 py-1 bg-primary-100 text-primary-700 rounded-full text-sm">
               Consommateurs
             </span>
-            <span class="px-3 py-1 bg-success-100 text-success-700 rounded-full text-sm">
+            <span class="px-3 py-1 bg-primary-100 text-primary-700 rounded-full text-sm">
               Commerçants
             </span>
           </div>
@@ -190,12 +190,12 @@
           >
             <div class="flex items-center gap-3">
               <div
-                :class="service.status === 'healthy' ? 'bg-success-100' : 'bg-error-100'"
+                :class="service.status === 'healthy' ? 'bg-primary-100' : 'bg-accent-red/15'"
                 class="w-8 h-8 rounded-full flex items-center justify-center"
               >
                 <component
                   :is="service.status === 'healthy' ? CheckCircleIcon : ExclamationTriangleIcon"
-                  :class="service.status === 'healthy' ? 'text-success-600' : 'text-error-600'"
+                  :class="service.status === 'healthy' ? 'text-primary-600' : 'text-accent-red'"
                   class="w-4 h-4"
                 />
               </div>
@@ -556,10 +556,10 @@ const getActivityStatusClass = (status: string): string => {
 
 const getAlertClass = (type: string): string => {
   const classes: Record<string, string> = {
-    warning: 'bg-warning-50 border-warning-200 text-warning-800',
-    error: 'bg-error-50 border-error-200 text-error-800',
+    warning: 'bg-accent-orange/10 border-accent-orange/30 text-accent-orange/95',
+    error: 'bg-accent-red/10 border-accent-red/30 text-accent-red/95',
     info: 'bg-blue-50 border-blue-200 text-blue-800',
-    success: 'bg-success-50 border-success-200 text-success-800'
+    success: 'bg-primary-50 border-primary-200 text-primary-800'
   }
   return classes[type] || 'bg-neutral-50 border-neutral-200 text-neutral-800'
 }
@@ -576,10 +576,10 @@ const getAlertIcon = (type: string) => {
 
 const getAlertIconClass = (type: string): string => {
   const classes: Record<string, string> = {
-    warning: 'text-warning-600',
-    error: 'text-error-600',
+    warning: 'text-accent-orange',
+    error: 'text-accent-red',
     info: 'text-blue-600',
-    success: 'text-success-600'
+    success: 'text-primary-600'
   }
   return classes[type] || 'text-neutral-600'
 }

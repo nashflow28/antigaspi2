@@ -9,7 +9,7 @@
       />
       <div
         v-else
-        class="flex h-full w-full items-center justify-center bg-gradient-to-br from-primary-50 to-secondary-50"
+        class="flex h-full w-full items-center justify-center bg-gradient-to-br from-primary-50 to-accent-blue/5"
       >
         <Package class="h-12 w-12 text-primary-400" />
       </div>
@@ -23,7 +23,7 @@
 
       <span
         v-if="timeLeft"
-        class="absolute bottom-4 left-4 inline-flex items-center gap-1 rounded-full bg-white/90 px-3 py-1 text-xs font-medium text-neutral-700 shadow-soft"
+        class="absolute bottom-4 left-4 inline-flex items-center gap-1 rounded-full bg-white/90 px-3 py-1 text-xs font-medium text-neutral-700 shadow-card"
       >
         <Clock class="h-4 w-4 text-primary-500" />
         {{ timeLeft }}
@@ -45,7 +45,7 @@
           <Store class="h-4 w-4" />
           {{ basket.merchant.business_name }}
         </span>
-        <span v-if="basket.category?.name" class="inline-flex items-center gap-1 rounded-full bg-secondary-50 px-3 py-1 text-secondary-700">
+        <span v-if="basket.category?.name" class="inline-flex items-center gap-1 rounded-full bg-accent-blue/5 px-3 py-1 text-accent-blue/90">
           <Tag class="h-4 w-4" />
           {{ basket.category.name }}
         </span>
@@ -57,7 +57,7 @@
           <div class="text-sm text-neutral-400 line-through" v-if="formattedOriginalPrice">
             {{ formattedOriginalPrice }}
           </div>
-          <div class="text-xs text-success-600 font-medium" v-if="formattedSavings">
+          <div class="text-xs text-primary-600 font-medium" v-if="formattedSavings">
             Économisez {{ formattedSavings }}
           </div>
         </div>

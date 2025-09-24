@@ -8,10 +8,10 @@
       variantClasses,
       {
         'cursor-pointer': interactive,
-        'card-interactive-2025': interactive && glow,
-        'hover-lift-2025': hoverLift,
-        'animate-fade-in-2025': fadeIn,
-        'animate-scale-in-2025': scaleIn
+        'transition-transform duration-300': interactive || hoverLift,
+        'hover:-translate-y-1': hoverLift,
+        'animate-fade-in': fadeIn,
+        'animate-scale-in': scaleIn
       },
       $attrs.class
     ]"
@@ -60,7 +60,7 @@
     <!-- Badge/Tag -->
     <div
       v-if="badge"
-      class="absolute top-4 right-4 badge-2025"
+      class="absolute top-4 right-4 inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs font-semibold shadow-card"
       :class="badgeVariantClasses"
     >
       {{ badge }}
@@ -134,10 +134,10 @@ const emit = defineEmits<{
 const variantClasses = computed(() => {
   const variants = {
     default: 'bg-white/90 dark:bg-dark-800/90 border border-neutral-200/50 dark:border-dark-600/50',
-    glass: 'glass-2025',
-    elevated: 'bg-white dark:bg-dark-800 shadow-lift border-0',
+    glass: 'bg-white/70 dark:bg-neutral-900/80 backdrop-blur-lg border border-white/20 dark:border-neutral-800/60',
+    elevated: 'bg-white dark:bg-dark-800 shadow-glow border-0',
     bordered: 'bg-white/95 dark:bg-dark-800/95 border-2 border-primary-200 dark:border-primary-700',
-    gradient: 'bg-gradient-card-2025 border border-white/30 dark:border-dark-600/30'
+    gradient: 'bg-emerald-glass border border-white/30 dark:border-neutral-800/60'
   }
   return variants[props.variant]
 })
@@ -145,22 +145,22 @@ const variantClasses = computed(() => {
 // Badge variant classes
 const badgeVariantClasses = computed(() => {
   const variants = {
-    success: 'badge-success-2025',
-    warning: 'bg-warning-100 text-warning-700 border-warning-200 dark:bg-warning-900/30 dark:text-warning-300 dark:border-warning-700/30',
-    error: 'bg-red-100 text-red-700 border-red-200 dark:bg-red-900/30 dark:text-red-300 dark:border-red-700/30',
-    info: 'bg-blue-100 text-blue-700 border-blue-200 dark:bg-blue-900/30 dark:text-blue-300 dark:border-blue-700/30'
+    success: 'bg-primary-500/10 text-primary-700 border border-primary-500/20 dark:bg-primary-900/30 dark:text-primary-200 dark:border-primary-700/40',
+    warning: 'bg-accent-orange/15 text-accent-orange/90 border border-accent-orange/30 dark:bg-accent-orange/20 dark:text-accent-orange/80 dark:border-accent-orange/30',
+    error: 'bg-accent-red/10 text-accent-red/90 border border-accent-red/30 dark:bg-accent-red/20 dark:text-accent-red/80 dark:border-accent-red/30',
+    info: 'bg-accent-blue/10 text-accent-blue/90 border border-accent-blue/30 dark:bg-accent-blue/20 dark:text-accent-blue/80 dark:border-accent-blue/30'
   }
   return variants[props.badgeVariant]
 })
 
 // Gradient classes
 const gradientClasses = computed(() => {
-  return 'bg-gradient-modern-2025'
+  return 'bg-gradient-to-br from-primary-500 via-accent-blue to-accent-blue/90'
 })
 
 // Glow effect classes
 const glowClasses = computed(() => {
-  return 'bg-gradient-modern-2025'
+  return 'bg-gradient-to-br from-primary-500 via-accent-blue to-accent-blue/90'
 })
 
 // Handle click

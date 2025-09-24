@@ -53,10 +53,10 @@
       </span>
 
       <!-- Success checkmark -->
-      <Transition name="success-pop">
+      <Transition name="primary-pop">
         <Check
           v-if="showSuccess"
-          class="w-4 h-4 text-green-500"
+          class="w-4 h-4 text-primary-500"
         />
       </Transition>
     </span>
@@ -160,26 +160,26 @@ const buttonClasses = computed(() => {
       'disabled:shadow-none'
     ],
     secondary: [
-      'bg-secondary-600',
+      'bg-accent-blue/90',
       'text-white',
       'shadow-sm',
-      'hover:bg-secondary-700',
+      'hover:bg-accent-blue/95',
       'hover:shadow-md',
       'hover:-translate-y-0.5',
-      'active:bg-secondary-800',
-      'focus:ring-secondary-500',
-      'disabled:bg-secondary-300'
+      'active:bg-accent-blue/95',
+      'focus:ring-accent-blue',
+      'disabled:bg-accent-blue/20'
     ],
     success: [
-      'bg-green-600',
+      'bg-primary-600',
       'text-white',
       'shadow-sm',
-      'hover:bg-green-700',
+      'hover:bg-primary-700',
       'hover:shadow-md',
       'hover:-translate-y-0.5',
-      'active:bg-green-800',
-      'focus:ring-green-500',
-      'disabled:bg-green-300'
+      'active:bg-primary-800',
+      'focus:ring-primary-500',
+      'disabled:bg-primary-300'
     ],
     danger: [
       'bg-red-600',
@@ -367,20 +367,20 @@ defineExpose({
   opacity: 0;
 }
 
-.success-pop-enter-active {
+.primary-pop-enter-active {
   transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
 }
 
-.success-pop-enter-from {
+.primary-pop-enter-from {
   opacity: 0;
   transform: scale(0);
 }
 
-.success-pop-leave-active {
+.primary-pop-leave-active {
   transition: all 0.2s ease;
 }
 
-.success-pop-leave-to {
+.primary-pop-leave-to {
   opacity: 0;
   transform: scale(0);
 }

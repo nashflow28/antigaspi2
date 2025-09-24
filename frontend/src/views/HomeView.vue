@@ -1,11 +1,11 @@
 <template>
   <div class="min-h-screen">
     <!-- Hero Section - Design moderne avec glassmorphism et gradients -->
-    <section class="relative bg-gradient-to-br from-primary-500 via-primary-600 to-secondary-700 text-white overflow-hidden" data-testid="hero-section">
+    <section class="relative bg-gradient-to-br from-primary-500 via-primary-600 to-accent-blue/90 text-white overflow-hidden" data-testid="hero-section">
       <!-- Background decorative elements -->
       <div class="absolute inset-0">
-        <div class="absolute top-0 left-0 w-72 h-72 bg-accent-500/20 rounded-full blur-3xl animate-pulse-glow"></div>
-        <div class="absolute bottom-0 right-0 w-96 h-96 bg-secondary-500/20 rounded-full blur-3xl animate-pulse-glow" style="animation-delay: 1s;"></div>
+        <div class="absolute top-0 left-0 w-72 h-72 bg-accent-orange/20 rounded-full blur-3xl animate-pulse-glow"></div>
+        <div class="absolute bottom-0 right-0 w-96 h-96 bg-accent-blue/20 rounded-full blur-3xl animate-pulse-glow" style="animation-delay: 1s;"></div>
         <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-white/10 rounded-full blur-2xl"></div>
       </div>
 
@@ -13,13 +13,13 @@
         <div class="text-center max-w-5xl mx-auto">
           <!-- Badge avec animation -->
           <div class="inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-sm rounded-full text-sm font-medium mb-8 animate-fade-in-up">
-            <span class="w-2 h-2 bg-success-400 rounded-full animate-pulse"></span>
+            <span class="w-2 h-2 bg-primary-400 rounded-full animate-pulse"></span>
             <span>Ensemble contre le gaspillage alimentaire</span>
           </div>
 
           <!-- Titre principal avec gradient text -->
           <h1 class="text-5xl md:text-7xl font-bold mb-8 animate-fade-in-up text-balance" style="animation-delay: 0.2s; font-size: 8rem;" data-testid="main-hero-title">
-            <span class="bg-gradient-to-r from-white via-primary-100 to-accent-200 bg-clip-text text-transparent">
+            <span class="bg-gradient-to-r from-white via-primary-100 to-accent-orange/70 bg-clip-text text-transparent">
               Sauvons
             </span>
             <br>
@@ -31,7 +31,7 @@
           <!-- Sous-titre élégant -->
           <p class="text-xl md:text-2xl lg:text-3xl mb-12 text-white/90 max-w-4xl mx-auto leading-relaxed animate-fade-in-up font-light" style="animation-delay: 0.4s;">
             Transformons les invendus en opportunités.
-            <span class="text-accent-200 font-medium">Économisez jusqu'à 70%</span>
+            <span class="text-accent-orange/70 font-medium">Économisez jusqu'à 70%</span>
             tout en protégeant l'environnement.
           </p>
 
@@ -39,12 +39,12 @@
           <div class="flex flex-col sm:flex-row gap-6 justify-center items-center animate-fade-in-up" style="animation-delay: 0.6s;">
             <router-link
               to="/products"
-              class="btn btn-lg bg-white text-primary-600 hover:bg-white hover:text-primary-700 hover:scale-105 shadow-hard hover:shadow-glow group relative overflow-hidden"
+              class="btn btn-lg bg-white text-primary-600 hover:bg-white hover:text-primary-700 hover:scale-105 shadow-toast hover:shadow-glow group relative overflow-hidden"
             >
               <span class="relative z-10 flex items-center gap-3">
                 🌟 Découvrir les offres
               </span>
-              <div class="absolute inset-0 bg-gradient-primary opacity-0 group-hover:opacity-10 transition-opacity duration-300"></div>
+              <div class="absolute inset-0 bg-nav-gradient opacity-0 group-hover:opacity-10 transition-opacity duration-300"></div>
             </router-link>
 
             <router-link
@@ -61,15 +61,15 @@
           <!-- Stats avec glassmorphism -->
           <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-16 animate-fade-in-up" style="animation-delay: 0.8s;">
             <div class="glass-bg glass-border rounded-2xl p-6 text-center backdrop-blur-md">
-              <div class="text-3xl font-bold text-accent-200 mb-2">1,2M+</div>
+              <div class="text-3xl font-bold text-accent-orange/70 mb-2">1,2M+</div>
               <div class="text-sm text-white/80">Produits sauvés</div>
             </div>
             <div class="glass-bg glass-border rounded-2xl p-6 text-center backdrop-blur-md">
-              <div class="text-3xl font-bold text-success-300 mb-2">50K+</div>
+              <div class="text-3xl font-bold text-primary-300 mb-2">50K+</div>
               <div class="text-sm text-white/80">Utilisateurs actifs</div>
             </div>
             <div class="glass-bg glass-border rounded-2xl p-6 text-center backdrop-blur-md">
-              <div class="text-3xl font-bold text-secondary-300 mb-2">2,5K+</div>
+              <div class="text-3xl font-bold text-accent-blue/70 mb-2">2,5K+</div>
               <div class="text-sm text-white/80">Commerçants partenaires</div>
             </div>
           </div>
@@ -107,12 +107,12 @@
           <div class="group card card-interactive glow-effect animate-fade-in-up" style="animation-delay: 0.2s;">
             <div class="relative">
               <!-- Icon avec gradient et animation -->
-              <div class="w-20 h-20 bg-gradient-primary rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-soft group-hover:shadow-glow group-hover:scale-110 transition-all duration-300">
+              <div class="w-20 h-20 bg-nav-gradient rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-card group-hover:shadow-glow group-hover:scale-110 transition-all duration-300">
                 <span class="text-3xl">🔍</span>
               </div>
 
               <!-- Step number -->
-              <div class="absolute -top-4 -right-4 w-8 h-8 bg-accent-500 text-white rounded-full flex items-center justify-center text-sm font-bold shadow-soft">
+              <div class="absolute -top-4 -right-4 w-8 h-8 bg-accent-orange text-white rounded-full flex items-center justify-center text-sm font-bold shadow-card">
                 1
               </div>
             </div>
@@ -142,17 +142,17 @@
           <!-- Feature 2 -->
           <div class="group card card-interactive glow-effect animate-fade-in-up" style="animation-delay: 0.4s;">
             <div class="relative">
-              <div class="w-20 h-20 bg-gradient-secondary rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-soft group-hover:shadow-glow group-hover:scale-110 transition-all duration-300">
+              <div class="w-20 h-20 bg-gradient-to-r from-accent-blue to-accent-blue/90 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-card group-hover:shadow-glow group-hover:scale-110 transition-all duration-300">
                 <span class="text-3xl">⚡</span>
               </div>
 
-              <div class="absolute -top-4 -right-4 w-8 h-8 bg-accent-500 text-white rounded-full flex items-center justify-center text-sm font-bold shadow-soft">
+              <div class="absolute -top-4 -right-4 w-8 h-8 bg-accent-orange text-white rounded-full flex items-center justify-center text-sm font-bold shadow-card">
                 2
               </div>
             </div>
 
             <div class="text-center">
-              <h3 class="text-2xl font-bold text-neutral-900 mb-4 group-hover:text-secondary-600 transition-colors">
+              <h3 class="text-2xl font-bold text-neutral-900 mb-4 group-hover:text-accent-blue transition-colors">
                 Réservez
               </h3>
               <p class="text-neutral-600 leading-relaxed mb-6">
@@ -161,11 +161,11 @@
 
               <div class="space-y-2 text-sm text-neutral-500">
                 <div class="flex items-center gap-2">
-                  <span class="w-1.5 h-1.5 bg-secondary-500 rounded-full"></span>
+                  <span class="w-1.5 h-1.5 bg-accent-blue/50 rounded-full"></span>
                   <span>Réservation instantanée</span>
                 </div>
                 <div class="flex items-center gap-2">
-                  <span class="w-1.5 h-1.5 bg-secondary-500 rounded-full"></span>
+                  <span class="w-1.5 h-1.5 bg-accent-blue/50 rounded-full"></span>
                   <span>Paiement sécurisé</span>
                 </div>
               </div>
@@ -175,17 +175,17 @@
           <!-- Feature 3 -->
           <div class="group card card-interactive glow-effect animate-fade-in-up" style="animation-delay: 0.6s;">
             <div class="relative">
-              <div class="w-20 h-20 bg-gradient-accent rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-soft group-hover:shadow-glow-accent group-hover:scale-110 transition-all duration-300">
+              <div class="w-20 h-20 bg-gradient-to-r from-accent-orange to-accent-orange/90 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-card group-hover:shadow-glow group-hover:scale-110 transition-all duration-300">
                 <span class="text-3xl">🌱</span>
               </div>
 
-              <div class="absolute -top-4 -right-4 w-8 h-8 bg-accent-500 text-white rounded-full flex items-center justify-center text-sm font-bold shadow-soft">
+              <div class="absolute -top-4 -right-4 w-8 h-8 bg-accent-orange text-white rounded-full flex items-center justify-center text-sm font-bold shadow-card">
                 3
               </div>
             </div>
 
             <div class="text-center">
-              <h3 class="text-2xl font-bold text-neutral-900 mb-4 group-hover:text-accent-600 transition-colors">
+              <h3 class="text-2xl font-bold text-neutral-900 mb-4 group-hover:text-accent-orange transition-colors">
                 Sauvez
               </h3>
               <p class="text-neutral-600 leading-relaxed mb-6">
@@ -194,11 +194,11 @@
 
               <div class="space-y-2 text-sm text-neutral-500">
                 <div class="flex items-center gap-2">
-                  <span class="w-1.5 h-1.5 bg-accent-500 rounded-full"></span>
+                  <span class="w-1.5 h-1.5 bg-accent-orange rounded-full"></span>
                   <span>Impact environnemental</span>
                 </div>
                 <div class="flex items-center gap-2">
-                  <span class="w-1.5 h-1.5 bg-accent-500 rounded-full"></span>
+                  <span class="w-1.5 h-1.5 bg-accent-orange rounded-full"></span>
                   <span>Économies réalisées</span>
                 </div>
               </div>
@@ -237,14 +237,14 @@
           </div>
 
           <div>
-            <div class="text-4xl md:text-5xl font-bold text-success-600 mb-2">
+            <div class="text-4xl md:text-5xl font-bold text-primary-600 mb-2">
               567
             </div>
             <p class="text-xl text-neutral-600">Utilisateurs actifs</p>
           </div>
 
           <div>
-            <div class="text-4xl md:text-5xl font-bold text-warning-600 mb-2">
+            <div class="text-4xl md:text-5xl font-bold text-accent-orange mb-2">
               89
             </div>
             <p class="text-xl text-neutral-600">Commerçants partenaires</p>

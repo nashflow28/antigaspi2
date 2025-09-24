@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen bg-gradient-subtle">
+  <div class="min-h-screen bg-gradient-to-br from-neutral-50 to-primary-50">
     <!-- Header avec statistiques -->
     <div class="glass-bg glass-border border-b">
       <div class="container-fluid py-8">
@@ -20,15 +20,15 @@
               <div class="text-xs text-neutral-500">Total</div>
             </div>
             <div class="card-glass text-center">
-              <div class="text-2xl font-bold text-secondary-600">{{ stats.active }}</div>
+              <div class="text-2xl font-bold text-accent-blue">{{ stats.active }}</div>
               <div class="text-xs text-neutral-500">En cours</div>
             </div>
             <div class="card-glass text-center">
-              <div class="text-2xl font-bold text-success-600">{{ stats.completed }}</div>
+              <div class="text-2xl font-bold text-primary-600">{{ stats.completed }}</div>
               <div class="text-xs text-neutral-500">Récupérées</div>
             </div>
             <div class="card-glass text-center">
-              <div class="text-2xl font-bold text-accent-600">{{ stats.saved }}kg</div>
+              <div class="text-2xl font-bold text-accent-orange">{{ stats.saved }}kg</div>
               <div class="text-xs text-neutral-500">Sauvées</div>
             </div>
           </div>
@@ -92,7 +92,7 @@
           </div>
 
           <!-- Impact environnemental -->
-          <div class="card mt-6 bg-gradient-accent text-white">
+          <div class="card mt-6 bg-gradient-to-r from-accent-orange to-accent-orange/90 text-white">
             <div class="flex items-center gap-3 mb-4">
               <div class="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
                 <Leaf class="w-6 h-6" />

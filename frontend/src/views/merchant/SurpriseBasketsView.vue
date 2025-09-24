@@ -67,12 +67,12 @@
     </div>
 
     <!-- Error State -->
-    <div v-if="error" class="card bg-error-50 border-error-200 mb-6">
+    <div v-if="error" class="card bg-accent-red/10 border-accent-red/30 mb-6">
       <div class="flex items-center justify-center py-8">
-        <ExclamationTriangleIcon class="w-8 h-8 text-error-500 mr-3" />
+        <ExclamationTriangleIcon class="w-8 h-8 text-accent-red mr-3" />
         <div>
-          <p class="text-error-700 font-medium">Erreur lors du chargement</p>
-          <p class="text-error-600 text-sm">{{ error }}</p>
+          <p class="text-accent-red/90 font-medium">Erreur lors du chargement</p>
+          <p class="text-accent-red text-sm">{{ error }}</p>
         </div>
       </div>
     </div>
@@ -93,10 +93,10 @@
           </div>
         </div>
 
-        <div class="card bg-gradient-to-r from-success-500 to-success-600 text-white">
+        <div class="card bg-gradient-to-r from-primary-500 to-primary-600 text-white">
           <div class="flex items-center justify-between">
             <div>
-              <p class="text-success-100 text-sm font-medium">Actifs</p>
+              <p class="text-primary-100 text-sm font-medium">Actifs</p>
               <p class="text-3xl font-bold">{{ activeBaskets.length }}</p>
             </div>
             <div class="p-3 bg-white/20 rounded-xl">
@@ -105,10 +105,10 @@
           </div>
         </div>
 
-        <div class="card bg-gradient-to-r from-warning-500 to-warning-600 text-white">
+        <div class="card bg-gradient-to-r from-accent-orange to-accent-orange/90 text-white">
           <div class="flex items-center justify-between">
             <div>
-              <p class="text-warning-100 text-sm font-medium">Stock Total</p>
+              <p class="text-accent-orange/70 text-sm font-medium">Stock Total</p>
               <p class="text-3xl font-bold">{{ totalStock }}</p>
             </div>
             <div class="p-3 bg-white/20 rounded-xl">
@@ -117,10 +117,10 @@
           </div>
         </div>
 
-        <div class="card bg-gradient-to-r from-secondary-500 to-secondary-600 text-white">
+        <div class="card bg-gradient-to-r from-accent-blue/50 to-accent-blue/90 text-white">
           <div class="flex items-center justify-between">
             <div>
-              <p class="text-secondary-100 text-sm font-medium">Revenus Potentiels</p>
+              <p class="text-accent-blue/60 text-sm font-medium">Revenus Potentiels</p>
               <p class="text-3xl font-bold">{{ formatPrice(totalRevenue) }}</p>
             </div>
             <div class="p-3 bg-white/20 rounded-xl">
@@ -163,7 +163,7 @@
             <div class="absolute top-4 right-4">
               <span
                 class="px-2 py-1 text-xs font-medium rounded-full"
-                :class="basket.is_active ? 'bg-success-100 text-success-700' : 'bg-neutral-100 text-neutral-600'"
+                :class="basket.is_active ? 'bg-primary-100 text-primary-700' : 'bg-neutral-100 text-neutral-600'"
               >
                 {{ basket.is_active ? 'Actif' : 'Inactif' }}
               </span>
@@ -171,7 +171,7 @@
 
             <!-- Discount Badge -->
             <div class="absolute bottom-4 left-4">
-              <span class="px-2 py-1 text-xs font-bold bg-error-500 text-white rounded-full">
+              <span class="px-2 py-1 text-xs font-bold bg-accent-red/100 text-white rounded-full">
                 -{{ Math.round(((basket.original_price - basket.discounted_price) / basket.original_price) * 100) }}%
               </span>
             </div>

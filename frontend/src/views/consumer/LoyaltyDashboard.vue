@@ -51,29 +51,29 @@
               <div class="flex items-center justify-between">
                 <div>
                   <p class="text-sm font-medium text-neutral-600">Points Expirent</p>
-                  <p class="text-2xl font-bold text-warning-600 mt-1">
+                  <p class="text-2xl font-bold text-accent-orange mt-1">
                     {{ formatPoints(expiringPoints) }}
                   </p>
                   <p class="text-xs text-neutral-500">Dans 30 jours</p>
                 </div>
-                <div class="p-3 bg-warning-100 rounded-xl">
-                  <Clock class="w-8 h-8 text-warning-600" />
+                <div class="p-3 bg-accent-orange/15 rounded-xl">
+                  <Clock class="w-8 h-8 text-accent-orange" />
                 </div>
               </div>
             </div>
 
             <!-- Available Rewards -->
-            <div class="card cursor-pointer hover:shadow-medium transition-all duration-200" @click="scrollToRewards">
+            <div class="card cursor-pointer hover:shadow-card transition-all duration-200" @click="scrollToRewards">
               <div class="flex items-center justify-between">
                 <div>
                   <p class="text-sm font-medium text-neutral-600">Récompenses</p>
-                  <p class="text-2xl font-bold text-secondary-600 mt-1">
+                  <p class="text-2xl font-bold text-accent-blue mt-1">
                     {{ availableRewards.length }}
                   </p>
                   <p class="text-xs text-neutral-500">Disponibles</p>
                 </div>
-                <div class="p-3 bg-secondary-100 rounded-xl">
-                  <Gift class="w-8 h-8 text-secondary-600" />
+                <div class="p-3 bg-accent-blue/10 rounded-xl">
+                  <Gift class="w-8 h-8 text-accent-blue" />
                 </div>
               </div>
             </div>
@@ -169,11 +169,11 @@
               <div
                 v-for="reward in availableRewards"
                 :key="reward.id"
-                class="border border-neutral-200 rounded-xl p-6 hover:shadow-medium transition-all duration-200"
+                class="border border-neutral-200 rounded-xl p-6 hover:shadow-card transition-all duration-200"
                 :class="canRedeem(reward.cost) ? 'bg-white hover:border-primary-300' : 'bg-neutral-50'"
               >
                 <div class="flex items-center gap-3 mb-4">
-                  <div class="p-3 bg-gradient-primary rounded-xl">
+                  <div class="p-3 bg-nav-gradient rounded-xl">
                     <component :is="reward.icon" class="w-6 h-6 text-white" />
                   </div>
                   <div>
@@ -217,7 +217,7 @@
 
           <div class="px-6 py-6">
             <div class="text-center mb-6">
-              <div class="p-4 bg-gradient-primary rounded-xl inline-block mb-4">
+              <div class="p-4 bg-nav-gradient rounded-xl inline-block mb-4">
                 <component :is="selectedReward.icon" class="w-8 h-8 text-white" />
               </div>
               <h4 class="text-xl font-semibold text-neutral-900 mb-2">{{ selectedReward.title }}</h4>

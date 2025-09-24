@@ -197,19 +197,19 @@
   }
 
   .btn-primary {
-    @apply bg-gradient-primary text-white shadow-soft hover:shadow-medium hover:shadow-glow hover:-translate-y-0.5 focus-visible:ring-primary-500 active:translate-y-0;
+    @apply bg-nav-gradient text-white shadow-card hover:shadow-card hover:shadow-glow hover:-translate-y-0.5 focus-visible:ring-primary-500 active:translate-y-0;
   }
 
   .btn-secondary {
-    @apply bg-gradient-secondary text-white shadow-soft hover:shadow-medium hover:shadow-primary-500/20 hover:-translate-y-0.5 focus-visible:ring-secondary-500 active:translate-y-0;
+    @apply bg-gradient-to-r from-accent-blue to-accent-blue/90 text-white shadow-card hover:shadow-glow hover:-translate-y-0.5 focus-visible:ring-accent-blue active:translate-y-0;
   }
 
   .btn-accent {
-    @apply bg-gradient-accent text-white shadow-soft hover:shadow-medium hover:shadow-glow-accent hover:-translate-y-0.5 focus-visible:ring-accent-500 active:translate-y-0;
+    @apply bg-gradient-to-r from-accent-orange to-accent-orange/90 text-white shadow-card hover:shadow-card hover:shadow-glow hover:-translate-y-0.5 focus-visible:ring-accent-orange active:translate-y-0;
   }
 
   .btn-outline {
-    @apply bg-white text-neutral-700 border-2 border-neutral-200 shadow-soft hover:border-primary-300 hover:text-primary-600 hover:shadow-medium hover:-translate-y-0.5 focus-visible:ring-primary-500 active:translate-y-0;
+    @apply bg-white text-neutral-700 border-2 border-neutral-200 shadow-card hover:border-primary-300 hover:text-primary-600 hover:shadow-card hover:-translate-y-0.5 focus-visible:ring-primary-500 active:translate-y-0;
   }
 
   .btn-ghost {
@@ -226,19 +226,19 @@
 
   /* 🃏 Cards - Design élégant avec glassmorphism subtil */
   .card {
-    @apply bg-white/80 backdrop-blur-sm border border-white/20 rounded-2xl p-6 shadow-soft hover:shadow-medium transition-all duration-300 ease-out;
+    @apply bg-white/80 backdrop-blur-sm border border-white/20 rounded-2xl p-6 shadow-card hover:shadow-card transition-all duration-300 ease-out;
   }
 
   .card-glass {
-    @apply bg-white/60 backdrop-blur-md border border-white/30 rounded-2xl p-6 shadow-glass;
+    @apply bg-white/60 backdrop-blur-md border border-white/30 rounded-2xl p-6 shadow-card;
   }
 
   .card-gradient {
-    @apply bg-gradient-glass border border-white/20 rounded-2xl p-6 shadow-soft;
+    @apply bg-emerald-glass border border-white/20 rounded-2xl p-6 shadow-card;
   }
 
   .card-interactive {
-    @apply cursor-pointer hover:shadow-hard hover:-translate-y-1 hover:scale-[1.02] transition-all duration-300 ease-out;
+    @apply cursor-pointer hover:shadow-toast hover:-translate-y-1 hover:scale-[1.02] transition-all duration-300 ease-out;
   }
 
   /* 📝 Form Elements - Design moderne et accessible */
@@ -251,13 +251,13 @@
   }
 
   .form-input {
-    @apply block w-full px-4 py-3 text-neutral-900 bg-white border border-neutral-200 rounded-xl shadow-soft placeholder:text-neutral-400 transition-all duration-200 ease-out;
-    @apply focus:ring-2 focus:ring-primary-500 focus:border-primary-500 focus:shadow-medium;
-    @apply hover:border-neutral-300 hover:shadow-medium;
+    @apply block w-full px-4 py-3 text-neutral-900 bg-white border border-neutral-200 rounded-xl shadow-card placeholder:text-neutral-400 transition-all duration-200 ease-out;
+    @apply focus:ring-2 focus:ring-primary-500 focus:border-primary-500 focus:shadow-card;
+    @apply hover:border-neutral-300 hover:shadow-card;
   }
 
   .form-input-error {
-    @apply border-error-500 bg-error-50 focus:ring-error-500 focus:border-error-500;
+    @apply border-accent-red bg-accent-red/10 focus:ring-accent-red focus:border-accent-red;
   }
 
   .form-textarea {
@@ -278,7 +278,7 @@
   }
 
   .form-error {
-    @apply text-sm text-error-600 mt-1;
+    @apply text-sm text-accent-red mt-1;
   }
 
   .form-help {
@@ -295,19 +295,19 @@
   }
 
   .badge-secondary {
-    @apply bg-secondary-100 text-secondary-800;
+    @apply bg-accent-blue/10 text-accent-blue/95;
   }
 
   .badge-success {
-    @apply bg-success-100 text-success-800;
+    @apply bg-primary-100 text-primary-800;
   }
 
   .badge-warning {
-    @apply bg-warning-100 text-warning-800;
+    @apply bg-accent-orange/15 text-accent-orange/95;
   }
 
   .badge-error {
-    @apply bg-error-100 text-error-800;
+    @apply bg-accent-red/15 text-accent-red/95;
   }
 
   /* 🎭 Loading et States */
@@ -334,19 +334,19 @@
   }
 
   .alert-success {
-    @apply bg-success-50 border-success-200 text-success-800;
+    @apply bg-primary-50 border-primary-200 text-primary-800;
   }
 
   .alert-warning {
-    @apply bg-warning-50 border-warning-200 text-warning-800;
+    @apply bg-accent-orange/10 border-accent-orange/30 text-accent-orange/95;
   }
 
   .alert-error {
-    @apply bg-error-50 border-error-200 text-error-800;
+    @apply bg-accent-red/10 border-accent-red/30 text-accent-red/95;
   }
 
   .alert-info {
-    @apply bg-secondary-50 border-secondary-200 text-secondary-800;
+    @apply bg-accent-blue/5 border-accent-blue/30 text-accent-blue/95;
   }
 
   /* 🌟 Special Effects */
@@ -356,7 +356,7 @@
 
   .glow-effect::before {
     content: '';
-    @apply absolute inset-0 rounded-2xl bg-gradient-primary opacity-20 blur-xl -z-10 transition-opacity duration-500;
+    @apply absolute inset-0 rounded-2xl bg-nav-gradient opacity-20 blur-xl -z-10 transition-opacity duration-500;
   }
 
   .glow-effect:hover::before {
@@ -381,11 +381,11 @@
   }
 
   .stat-increase {
-    @apply text-success-600;
+    @apply text-primary-600;
   }
 
   .stat-decrease {
-    @apply text-error-600;
+    @apply text-accent-red;
   }
 }
 

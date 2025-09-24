@@ -122,7 +122,7 @@
       <button
         v-if="showFab && fabAction"
         @click="$emit('fabClick')"
-        class="fab fixed bottom-28 right-4 z-30 w-14 h-14 bg-gradient-to-r from-primary to-primary/90 text-white rounded-full shadow-lg hover:shadow-xl transition-all duration-200 flex items-center justify-center active:scale-95"
+        class="fab fixed bottom-28 right-4 z-30 w-14 h-14 bg-gradient-to-r from-primary-500 to-primary-600 text-white rounded-full shadow-lg hover:shadow-xl transition-all duration-200 flex items-center justify-center active:scale-95"
         :aria-label="fabLabel"
       >
         <component

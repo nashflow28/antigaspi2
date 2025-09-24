@@ -44,12 +44,12 @@
     </div>
 
     <!-- Error State -->
-    <div v-if="error" class="card bg-error-50 border-error-200">
+    <div v-if="error" class="card bg-accent-red/10 border-accent-red/30">
       <div class="flex items-center justify-center py-12">
-        <ExclamationTriangleIcon class="w-8 h-8 text-error-500 mr-3" />
+        <ExclamationTriangleIcon class="w-8 h-8 text-accent-red mr-3" />
         <div>
-          <p class="text-error-700 font-medium">Erreur lors du chargement</p>
-          <p class="text-error-600 text-sm">{{ error }}</p>
+          <p class="text-accent-red/90 font-medium">Erreur lors du chargement</p>
+          <p class="text-accent-red text-sm">{{ error }}</p>
         </div>
       </div>
     </div>
@@ -193,10 +193,10 @@
               </div>
 
               <!-- Réduction calculée -->
-              <div v-if="discountPercentage > 0" class="mt-4 p-4 bg-success-50 border border-success-200 rounded-lg">
+              <div v-if="discountPercentage > 0" class="mt-4 p-4 bg-primary-50 border border-primary-200 rounded-lg">
                 <div class="flex items-center">
-                  <TagIcon class="w-5 h-5 text-success-500 mr-2" />
-                  <span class="font-medium text-success-700">
+                  <TagIcon class="w-5 h-5 text-primary-500 mr-2" />
+                  <span class="font-medium text-primary-700">
                     Réduction de {{ discountPercentage }}% ({{ savings }} XOF d'économie)
                   </span>
                 </div>
@@ -318,7 +318,7 @@
             </div>
             <div class="flex justify-between">
               <span class="text-neutral-600">Statut:</span>
-              <span :class="product.is_active ? 'text-success-600' : 'text-error-600'" class="font-medium">
+              <span :class="product.is_active ? 'text-primary-600' : 'text-accent-red'" class="font-medium">
                 {{ product.is_active ? 'Actif' : 'Inactif' }}
               </span>
             </div>
