@@ -2,6 +2,7 @@ import { createApp } from 'vue'
 import { MotionPlugin } from '@vueuse/motion'
 import { pinia } from '@/stores'
 import router from '@/router'
+import { useThemeStore } from '@/stores/theme'
 import App from './App-progressive.vue'
 
 // Import CSS
@@ -25,6 +26,11 @@ app.config.warnHandler = (msg: string, instance, trace: string) => {
 app.use(pinia)
 app.use(MotionPlugin)
 app.use(router)
+
+// Hydrate theme as soon as Pinia is ready so the `dark` class is applied
+// before the first paint even if the toggle component is not yet mounted.
+const themeStore = useThemeStore(pinia)
+themeStore.hydrate()
 
 app.mount('#app')
 

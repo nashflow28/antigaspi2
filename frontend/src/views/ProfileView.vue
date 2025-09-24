@@ -1,30 +1,30 @@
 <template>
-  <div class="min-h-screen bg-gradient-to-br from-green-50 to-blue-50 p-6">
+  <div class="min-h-screen bg-gradient-to-br from-neutral-50 via-white to-primary-50 p-6 dark:from-neutral-950 dark:via-neutral-950 dark:to-neutral-900">
     <div class="max-w-4xl mx-auto">
       <!-- Header -->
       <div class="mb-8 text-center">
-        <h1 class="text-3xl font-bold text-gray-900 mb-2">Mon Profil</h1>
-        <p class="text-gray-600">Gérez vos informations personnelles et préférences</p>
+        <h1 class="mb-2 text-3xl font-bold text-neutral-900 dark:text-neutral-50">Mon Profil</h1>
+        <p class="text-neutral-600 dark:text-neutral-300">Gérez vos informations personnelles et préférences</p>
       </div>
 
       <!-- Profile Card -->
-      <div class="bg-white rounded-2xl shadow-xl overflow-hidden mb-8">
+      <div class="mb-8 overflow-hidden rounded-2xl bg-white/95 shadow-xl dark:bg-neutral-900/90">
         <!-- Profile Header -->
-        <div class="bg-gradient-to-r from-green-600 to-blue-600 px-8 py-6 text-white">
+        <div class="bg-gradient-to-r from-primary-600 to-primary-700 px-8 py-6 text-white dark:from-primary-700 dark:to-primary-900">
           <div class="flex items-center space-x-6">
-            <div class="w-20 h-20 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
-              <UserIcon class="w-10 h-10 text-white" />
+            <div class="flex h-20 w-20 items-center justify-center rounded-full bg-white/20">
+              <UserIcon class="h-10 w-10 text-white" />
             </div>
             <div>
               <h2 class="text-2xl font-bold">
                 {{ user?.first_name }} {{ user?.last_name }}
               </h2>
-              <p class="text-green-100">{{ user?.email }}</p>
-              <div class="flex items-center mt-2 space-x-2">
-                <span class="px-3 py-1 bg-white bg-opacity-20 rounded-full text-sm">
+              <p class="text-primary-100/90">{{ user?.email }}</p>
+              <div class="mt-2 flex items-center space-x-2">
+                <span class="rounded-full bg-white/20 px-3 py-1 text-sm">
                   {{ roleLabel }}
                 </span>
-                <span class="text-sm text-green-100">
+                <span class="text-sm text-primary-100">
                   Membre depuis {{ formatDate(user?.created_at) }}
                 </span>
               </div>
@@ -35,20 +35,25 @@
         <!-- Profile Content -->
         <div class="p-8">
           <!-- Tabs -->
-          <div class="border-b border-gray-200 mb-8">
-            <nav class="-mb-px flex space-x-8">
+          <div class="mb-8 border-b border-neutral-200 dark:border-neutral-800">
+            <nav class="-mb-px flex space-x-8" role="tablist" aria-label="Sections profil">
               <button
                 v-for="tab in tabs"
                 :key="tab.id"
+                type="button"
                 @click="activeTab = tab.id"
+                role="tab"
+                :id="`profile-tab-${tab.id}`"
+                :aria-controls="`profile-panel-${tab.id}`"
+                :aria-selected="activeTab === tab.id"
                 :class="[
                   activeTab === tab.id
-                    ? 'border-green-500 text-green-600'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300',
-                  'whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm flex items-center space-x-2'
+                    ? 'border-primary-500 text-primary-600 dark:text-primary-300'
+                    : 'border-transparent text-neutral-500 hover:border-neutral-300 hover:text-neutral-700 dark:text-neutral-400 dark:hover:text-neutral-200',
+                  'flex items-center space-x-2 whitespace-nowrap border-b-2 px-1 py-2 text-sm font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-400 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:focus-visible:ring-offset-neutral-900'
                 ]"
               >
-                <component :is="tab.icon" class="w-5 h-5" />
+                <component :is="tab.icon" class="h-5 w-5" aria-hidden="true" />
                 <span>{{ tab.name }}</span>
               </button>
             </nav>
@@ -57,50 +62,56 @@
           <!-- Tab Content -->
           <div class="tab-content">
             <!-- Personal Information Tab -->
-            <div v-if="activeTab === 'personal'" class="space-y-8">
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div
+              v-if="activeTab === 'personal'"
+              :aria-labelledby="'profile-tab-personal'"
+              :id="'profile-panel-personal'"
+              class="space-y-8"
+              role="tabpanel"
+            >
+              <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
                 <div>
-                  <label class="block text-sm font-medium text-gray-700 mb-2">Prénom</label>
+                  <label class="mb-2 block text-sm font-medium text-neutral-700 dark:text-neutral-200">Prénom</label>
                   <input
                     v-model="profileForm.first_name"
                     type="text"
-                    class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                    class="w-full rounded-xl border border-neutral-300 bg-white/80 px-4 py-3 text-neutral-900 shadow-inner transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-400 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:border-neutral-700 dark:bg-neutral-900/80 dark:text-neutral-50 dark:focus-visible:ring-offset-neutral-950"
                     placeholder="Votre prénom"
                   />
                 </div>
                 <div>
-                  <label class="block text-sm font-medium text-gray-700 mb-2">Nom</label>
+                  <label class="mb-2 block text-sm font-medium text-neutral-700 dark:text-neutral-200">Nom</label>
                   <input
                     v-model="profileForm.last_name"
                     type="text"
-                    class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                    class="w-full rounded-xl border border-neutral-300 bg-white/80 px-4 py-3 text-neutral-900 shadow-inner transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-400 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:border-neutral-700 dark:bg-neutral-900/80 dark:text-neutral-50 dark:focus-visible:ring-offset-neutral-950"
                     placeholder="Votre nom"
                   />
                 </div>
                 <div>
-                  <label class="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                  <label class="mb-2 block text-sm font-medium text-neutral-700 dark:text-neutral-200">Email</label>
                   <input
                     v-model="profileForm.email"
                     type="email"
-                    class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                    class="w-full rounded-xl border border-neutral-300 bg-white/80 px-4 py-3 text-neutral-900 shadow-inner transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-400 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:border-neutral-700 dark:bg-neutral-900/80 dark:text-neutral-50 dark:focus-visible:ring-offset-neutral-950"
                     placeholder="votre@email.com"
                   />
                 </div>
                 <div>
-                  <label class="block text-sm font-medium text-gray-700 mb-2">Téléphone</label>
+                  <label class="mb-2 block text-sm font-medium text-neutral-700 dark:text-neutral-200">Téléphone</label>
                   <input
                     v-model="profileForm.phone"
                     type="tel"
-                    class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                    class="w-full rounded-xl border border-neutral-300 bg-white/80 px-4 py-3 text-neutral-900 shadow-inner transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-400 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:border-neutral-700 dark:bg-neutral-900/80 dark:text-neutral-50 dark:focus-visible:ring-offset-neutral-950"
                     placeholder="+33 6 12 34 56 78"
                   />
                 </div>
                 <div class="md:col-span-2">
-                  <label class="block text-sm font-medium text-gray-700 mb-2">Ville</label>
+                  <label class="mb-2 block text-sm font-medium text-neutral-700 dark:text-neutral-200">Ville</label>
                   <input
                     v-model="profileForm.city"
                     type="text"
-                    class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                    class="w-full rounded-xl border border-neutral-300 bg-white/80 px-4 py-3 text-neutral-900 shadow-inner transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-400 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:border-neutral-700 dark:bg-neutral-900/80 dark:text-neutral-50 dark:focus-visible:ring-offset-neutral-950"
                     placeholder="Votre ville"
                   />
                 </div>
@@ -110,7 +121,7 @@
                 <button
                   @click="updateProfile"
                   :disabled="updating"
-                  class="px-6 py-3 bg-gradient-to-r from-green-600 to-blue-600 text-white rounded-xl font-medium hover:from-green-700 hover:to-blue-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2"
+                  class="flex items-center space-x-2 rounded-xl bg-gradient-to-r from-primary-600 to-primary-700 px-6 py-3 font-medium text-white transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-400 focus-visible:ring-offset-2 focus-visible:ring-offset-white hover:from-primary-700 hover:to-primary-800 disabled:cursor-not-allowed disabled:opacity-50 dark:focus-visible:ring-offset-neutral-950"
                 >
                   <CheckIcon v-if="!updating" class="w-5 h-5" />
                   <ArrowPathIcon v-else class="w-5 h-5 animate-spin" />
@@ -120,30 +131,36 @@
             </div>
 
             <!-- History Tab -->
-            <div v-else-if="activeTab === 'history'" class="space-y-8">
+            <div
+              v-else-if="activeTab === 'history'"
+              :aria-labelledby="'profile-tab-history'"
+              :id="'profile-panel-history'"
+              class="space-y-8"
+              role="tabpanel"
+            >
               <!-- Filters and Search -->
-              <div class="bg-white border border-gray-200 rounded-xl p-6">
-                <div class="flex flex-col md:flex-row gap-4 items-start md:items-center justify-between mb-6">
-                  <h3 class="text-lg font-semibold text-gray-900 flex items-center space-x-2">
-                    <ClockIcon class="w-5 h-5" />
+              <div class="rounded-xl border border-neutral-200 bg-white/95 p-6 dark:border-neutral-800 dark:bg-neutral-900/80">
+                <div class="mb-6 flex flex-col items-start justify-between gap-4 md:flex-row md:items-center">
+                  <h3 class="flex items-center space-x-2 text-lg font-semibold text-neutral-900 dark:text-neutral-100">
+                    <ClockIcon class="h-5 w-5" />
                     <span>Historique des réservations</span>
                   </h3>
 
                   <!-- Search and Filters -->
-                  <div class="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
+                  <div class="flex w-full flex-col gap-3 sm:flex-row md:w-auto">
                     <div class="relative">
-                      <MagnifyingGlassIcon class="w-5 h-5 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                      <MagnifyingGlassIcon class="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 transform text-neutral-400 dark:text-neutral-500" />
                       <input
                         v-model="historyFilters.search"
                         type="text"
                         placeholder="Rechercher un produit..."
-                        class="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent text-sm"
+                        class="w-full rounded-lg border border-neutral-300 bg-white/80 py-2 pl-10 pr-4 text-sm text-neutral-900 shadow-inner transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-400 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:border-neutral-700 dark:bg-neutral-900/70 dark:text-neutral-50 dark:focus-visible:ring-offset-neutral-950"
                       />
                     </div>
 
                     <select
                       v-model="historyFilters.status"
-                      class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent text-sm"
+                      class="rounded-lg border border-neutral-300 bg-white/80 px-3 py-2 text-sm text-neutral-900 shadow-inner transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-400 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:border-neutral-700 dark:bg-neutral-900/70 dark:text-neutral-50 dark:focus-visible:ring-offset-neutral-950"
                     >
                       <option value="">Tous les statuts</option>
                       <option value="pending">En attente</option>
@@ -155,7 +172,7 @@
 
                     <select
                       v-model="historyFilters.period"
-                      class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent text-sm"
+                      class="rounded-lg border border-neutral-300 bg-white/80 px-3 py-2 text-sm text-neutral-900 shadow-inner transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-400 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:border-neutral-700 dark:bg-neutral-900/70 dark:text-neutral-50 dark:focus-visible:ring-offset-neutral-950"
                     >
                       <option value="">Toute la période</option>
                       <option value="week">Cette semaine</option>
@@ -171,7 +188,7 @@
                   <div
                     v-for="reservation in filteredReservations"
                     :key="reservation.id"
-                    class="border border-gray-200 rounded-xl p-6 hover:shadow-md transition-shadow"
+                    class="rounded-xl border border-neutral-200 p-6 transition-shadow hover:shadow-glow dark:border-neutral-800 dark:bg-neutral-900/70"
                   >
                     <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                       <!-- Reservation Info -->
@@ -293,7 +310,13 @@
             </div>
 
             <!-- Security Tab -->
-            <div v-else-if="activeTab === 'security'" class="space-y-8">
+            <div
+              v-else-if="activeTab === 'security'"
+              :aria-labelledby="'profile-tab-security'"
+              :id="'profile-panel-security'"
+              class="space-y-8"
+              role="tabpanel"
+            >
               <div class="bg-amber-50 border border-amber-200 rounded-xl p-6">
                 <div class="flex items-center space-x-3">
                   <ShieldCheckIcon class="w-6 h-6 text-amber-600" />
@@ -348,7 +371,13 @@
             </div>
 
             <!-- Preferences Tab -->
-            <div v-else-if="activeTab === 'preferences'" class="space-y-8">
+            <div
+              v-else-if="activeTab === 'preferences'"
+              :aria-labelledby="'profile-tab-preferences'"
+              :id="'profile-panel-preferences'"
+              class="space-y-8"
+              role="tabpanel"
+            >
               <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
                 <!-- Notification Settings -->
                 <div class="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-6 border border-blue-200">

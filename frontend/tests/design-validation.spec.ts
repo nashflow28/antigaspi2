@@ -115,4 +115,36 @@ test.describe('Design Validation Tests', () => {
       expect(boxShadow).not.toBe('none');
     }
   });
+
+  test('Theme toggle enables persistent dark mode', async ({ page }) => {
+    await page.goto('http://localhost:3008');
+
+    const themeToggle = page.getByRole('button', { name: /thème sombre/i }).first();
+    await expect(themeToggle).toBeVisible();
+
+    await themeToggle.click();
+    const hasDarkClass = await page.evaluate(() => document.documentElement.classList.contains('dark'));
+    expect(hasDarkClass).toBeTruthy();
+
+    await page.reload();
+    const persisted = await page.evaluate(() => document.documentElement.classList.contains('dark'));
+    expect(persisted).toBeTruthy();
+  });
+
+  test('Mobile navigation toggle exposes accessible attributes', async ({ page }) => {
+    await page.setViewportSize({ width: 360, height: 780 });
+    await page.goto('http://localhost:3008');
+
+    const menuToggle = page.getByTestId('mobile-menu-button');
+    await expect(menuToggle).toHaveAttribute('aria-haspopup', 'true');
+
+    const menuId = await menuToggle.getAttribute('aria-controls');
+    expect(menuId).toBeTruthy();
+
+    await menuToggle.press('Enter');
+    await expect(page.locator(`#${menuId}`)).toBeVisible();
+
+    await menuToggle.press('Enter');
+    await expect(page.locator(`#${menuId}`)).toBeHidden();
+  });
 });
