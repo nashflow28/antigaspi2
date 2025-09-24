@@ -1,103 +1,105 @@
-<template>
-  <Teleport to="body">
-    <div
-      v-if="activeErrors.length > 0"
-      class="pointer-events-none fixed inset-0 z-[120] flex items-start justify-end px-4 py-6 sm:inset-auto sm:right-6 sm:py-6"
-    >
-      <TransitionGroup
-        name="toast-stack"
-        tag="div"
-        class="flex w-full max-w-sm flex-col gap-3 sm:max-w-md"
-      >
-        <div
-          v-for="error in activeErrors"
-          :key="error.id"
-          class="pointer-events-auto"
-        >
-          <Toast
-            :is-open="true"
-            tone="error"
-            position="stacked"
-            :title="error.title"
-            :description="error.message"
-            :action-label="error.actionLabel"
-            :on-action="error.onAction"
-            :on-close="error.onClose"
-          />
-        </div>
-      </TransitionGroup>
-    </div>
-  </Teleport>
-</template>
+<template></template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
-import Toast from '@/components/ui/Toast.vue'
+import { reactive, watch } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 import { useProductsStore } from '@/stores/products'
 import { useReservationsStore } from '@/stores/reservations'
-
-interface ErrorToast {
-  id: string
-  title: string
-  message: string
-  actionLabel?: string
-  onAction?: () => void
-  onClose: () => void
-}
+import { notify } from '@/composables/useNotifications'
 
 const authStore = useAuthStore()
 const productsStore = useProductsStore()
 const reservationsStore = useReservationsStore()
 
-const activeErrors = computed<ErrorToast[]>(() => {
-  const errors: ErrorToast[] = []
+type ErrorSource = 'auth' | 'products' | 'reservations'
 
-  if (authStore.error) {
-    errors.push({
-      id: 'auth-error',
-      title: "Erreur d'authentification",
-      message: authStore.error,
-      onClose: authStore.clearError
-    })
-  }
-
-  if (productsStore.error) {
-    errors.push({
-      id: 'products-error',
-      title: 'Chargement des produits',
-      message: productsStore.error,
-      actionLabel: 'Réessayer',
-      onAction: () => {
-        productsStore.clearError()
-        productsStore.fetchProducts()
-      },
-      onClose: productsStore.clearError
-    })
-  }
-
-  if (reservationsStore.error) {
-    errors.push({
-      id: 'reservations-error',
-      title: 'Réservations',
-      message: reservationsStore.error,
-      onClose: reservationsStore.clearError
-    })
-  }
-
-  return errors
+const notificationIds = reactive<Record<ErrorSource, string | null>>({
+  auth: null,
+  products: null,
+  reservations: null
 })
+
+const clearNotification = (source: ErrorSource) => {
+  const id = notificationIds[source]
+  if (!id) return
+
+  notify.removeNotification(id)
+  if (notificationIds[source] === id) {
+    notificationIds[source] = null
+  }
+}
+
+watch(
+  () => authStore.error,
+  message => {
+    if (message) {
+      clearNotification('auth')
+      const id = notify.error(message, "Erreur d'authentification", {
+        onClose: () => {
+          if (notificationIds.auth === id) {
+            notificationIds.auth = null
+          }
+          if (authStore.error === message) {
+            authStore.clearError()
+          }
+        }
+      })
+      notificationIds.auth = id
+    } else {
+      clearNotification('auth')
+    }
+  },
+  { immediate: true }
+)
+
+watch(
+  () => productsStore.error,
+  message => {
+    if (message) {
+      clearNotification('products')
+      const id = notify.error(message, 'Chargement des produits', {
+        actionLabel: 'Réessayer',
+        onAction: () => {
+          productsStore.clearError()
+          productsStore.fetchProducts()
+        },
+        onClose: () => {
+          if (notificationIds.products === id) {
+            notificationIds.products = null
+          }
+          if (productsStore.error === message) {
+            productsStore.clearError()
+          }
+        }
+      })
+      notificationIds.products = id
+    } else {
+      clearNotification('products')
+    }
+  },
+  { immediate: true }
+)
+
+watch(
+  () => reservationsStore.error,
+  message => {
+    if (message) {
+      clearNotification('reservations')
+      const id = notify.error(message, 'Réservations', {
+        onClose: () => {
+          if (notificationIds.reservations === id) {
+            notificationIds.reservations = null
+          }
+          if (reservationsStore.error === message) {
+            reservationsStore.clearError()
+          }
+        }
+      })
+      notificationIds.reservations = id
+    } else {
+      clearNotification('reservations')
+    }
+  },
+  { immediate: true }
+)
 </script>
-
-<style scoped>
-.toast-stack-enter-active,
-.toast-stack-leave-active {
-  transition: all 0.24s ease;
-}
-
-.toast-stack-enter-from,
-.toast-stack-leave-to {
-  opacity: 0;
-  transform: translateY(-8px);
-}
-</style>
