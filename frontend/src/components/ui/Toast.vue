@@ -1,11 +1,6 @@
 <template>
   <Transition name="toast-slide">
-    <div
-      v-if="isOpen"
-      class="pointer-events-auto fixed inset-x-4 bottom-6 z-50 flex justify-center sm:inset-x-auto sm:right-6 sm:w-[360px]"
-      role="status"
-      aria-live="assertive"
-    >
+    <div v-if="isOpen" :class="rootClasses" role="status" aria-live="assertive">
       <div :class="toastClasses">
         <span aria-hidden="true" class="mt-1">
           <svg
@@ -91,6 +86,7 @@ import { computed, toRefs } from 'vue';
 import Button from './Button.vue';
 
 type ToastTone = 'success' | 'info' | 'warning' | 'error';
+type ToastPosition = 'global' | 'stacked';
 
 const props = withDefaults(
   defineProps<{
@@ -101,9 +97,11 @@ const props = withDefaults(
     actionLabel?: string;
     onAction?: () => void;
     onClose?: () => void;
+    position?: ToastPosition;
   }>(),
   {
     tone: 'success',
+    position: 'global',
   },
 );
 
@@ -119,12 +117,19 @@ const toneClasses: Record<ToastTone, string> = {
   error: 'border-accent-red',
 };
 
-const { isOpen, tone, title, description, actionLabel } = toRefs(props);
+const { isOpen, tone, title, description, actionLabel, position } = toRefs(props);
 
 const toastClasses = computed(() => [
   'flex w-full items-start gap-3 rounded-3xl border-l-4 bg-white p-4 shadow-toast dark:bg-neutral-900',
   toneClasses[tone.value],
 ]);
+
+const positionClasses: Record<ToastPosition, string> = {
+  global: 'pointer-events-auto fixed inset-x-4 bottom-6 z-50 flex justify-center sm:inset-x-auto sm:right-6 sm:w-[360px]',
+  stacked: 'pointer-events-auto z-50 w-full',
+};
+
+const rootClasses = computed(() => positionClasses[position.value]);
 
 const handleClose = () => {
   props.onClose?.();

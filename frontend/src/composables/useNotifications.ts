@@ -9,13 +9,16 @@ export interface Notification {
   duration?: number
   progress?: number
   timer?: NodeJS.Timeout
+  actionLabel?: string
+  onAction?: () => void
+  onClose?: () => void
 }
 
 const notifications = ref<Notification[]>([])
 const notificationIdCounter = ref(0)
 
 export const useNotifications = () => {
-  const addNotification = (notification: Omit<Notification, 'id' | 'progress'>) => {
+  const addNotification = (notification: Omit<Notification, 'id' | 'progress' | 'timer'>) => {
     const id = `notification-${++notificationIdCounter.value}`
     const autoClose = notification.autoClose !== false
     const duration = notification.duration || 5000
@@ -61,8 +64,17 @@ export const useNotifications = () => {
       if (notification.timer) {
         clearInterval(notification.timer)
       }
+      notification.onClose?.()
       notifications.value.splice(index, 1)
     }
+  }
+
+  const handleAction = (id: string) => {
+    const notification = notifications.value.find(n => n.id === id)
+    if (!notification) return
+
+    notification.onAction?.()
+    removeNotification(id)
   }
 
   const clearAll = () => {
@@ -70,6 +82,7 @@ export const useNotifications = () => {
       if (notification.timer) {
         clearInterval(notification.timer)
       }
+      notification.onClose?.()
     })
     notifications.value = []
   }
@@ -101,6 +114,7 @@ export const useNotifications = () => {
     notifications: computed(() => notifications.value),
     addNotification,
     removeNotification,
+    handleAction,
     clearAll,
     success,
     error,
