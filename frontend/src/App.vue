@@ -5,9 +5,8 @@
       <router-view />
     </PageTransition>
 
-    <!-- TEMPORARILY DISABLED - Global Notifications -->
-    <!-- <NotificationContainer />
-    <NotificationSystem /> -->
+    <NotificationContainer />
+    <NotificationSystem />
 
     <!-- TEMPORARILY DISABLED - Network Status -->
     <!-- <NetworkStatus /> -->
