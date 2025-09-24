@@ -310,7 +310,7 @@ router.beforeEach(async (to, _from, next) => {
   onboardingStore.init()
 
   // Check if user should see onboarding
-  const shouldShowOnboarding = onboardingStore.shouldShowOnboarding()
+  const shouldShowOnboarding = onboardingStore.shouldShowOnboarding.value
   const isOnboardingRoute = to.name === 'onboarding'
   const skipOnboardingForRoute = to.meta.showOnboarding === false
 

@@ -165,6 +165,9 @@ Route::prefix('notifications')->middleware('jwt.auth')->group(function () {
 // Routes des catégories (alternative)
 Route::get('categories', [ProductController::class, 'categories']);
 
+// Route publique principale des commerçants
+Route::get('merchants', [MerchantController::class, 'index']);
+
 // Routes des commerçants (protégées)
 Route::prefix('merchants')->middleware('jwt.auth')->group(function () {
     // Gestion de la géolocalisation
