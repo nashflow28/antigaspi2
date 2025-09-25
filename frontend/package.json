@@ -11,7 +11,11 @@
     "type-check": "vue-tsc --noEmit",
     "test:unit": "vitest run",
     "storybook": "storybook dev -p 6006",
-    "build-storybook": "storybook build"
+    "build-storybook": "storybook build",
+    "audit:legacy-classes": "node scripts/audit-legacy-classes.js",
+    "migrate:component": "node scripts/migrate-ui-component.js",
+    "capture:baseline": "node scripts/capture-baseline-screenshots.js",
+    "validate:phase3": "node scripts/validate-phase3.js"
   },
   "keywords": [],
   "author": "",
@@ -28,6 +32,7 @@
     "autoprefixer": "^10.4.21",
     "axios": "^1.12.2",
     "chart.js": "^3.9.1",
+    "glob": "^11.0.3",
     "leaflet": "^1.9.4",
     "lucide-vue-next": "^0.544.0",
     "pinia": "^3.0.3",

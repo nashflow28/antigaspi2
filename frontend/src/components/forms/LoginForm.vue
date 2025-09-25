@@ -1,5 +1,7 @@
 <template>
-  <div class="space-y-8">
+  <!-- Migration Progressive Pattern -->
+  <LoginForm2025 v-if="useDesignSystem2025().isEnabled" />
+  <div v-else class="space-y-8">
     <!-- Header moderne -->
     <div class="text-center animate-fade-in-up">
       <h3 class="text-2xl font-bold text-neutral-900 mb-2">
@@ -155,6 +157,8 @@ import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { Mail, Lock, Eye, EyeOff, Loader2 } from 'lucide-vue-next'
 import type { LoginCredentials } from '@/types'
+import { useDesignSystem2025 } from '@/composables/useDesignSystem2025'
+import LoginForm2025 from './LoginForm2025.vue'
 
 const router = useRouter()
 const authStore = useAuthStore()

@@ -1,0 +1,133 @@
+{
+  "timestamp": "2025-09-25T20:56:34.534Z",
+  "scores": {
+    "overall": 20,
+    "breakdown": {
+      "legacyClasses": 0,
+      "componentCoverage": 100,
+      "testsCoverage": 0,
+      "performance": 0,
+      "accessibility": 0
+    }
+  },
+  "checks": {
+    "legacyClasses": {
+      "status": "FAIL",
+      "message": "851 legacy class usages in 57 files",
+      "score": 0,
+      "details": {
+        "highPriorityFiles": [
+          "src\\views\\ReservationDetailView.vue",
+          "src\\views\\ProductReserveView.vue",
+          "src\\views\\ProductDetailView.vue",
+          "src\\views\\HomeView.vue",
+          "src\\views\\DashboardView.vue",
+          "src\\views\\merchant\\SurpriseBasketsView.vue",
+          "src\\views\\merchant\\ReservationsView.vue",
+          "src\\views\\merchant\\ProductsView.vue",
+          "src\\views\\merchant\\ProductEditView.vue",
+          "src\\views\\merchant\\LoyaltyManagement.vue",
+          "src\\views\\admin\\DashboardView.vue",
+          "src\\views\\admin\\CategoriesView.vue",
+          "src\\views\\consumer\\SurpriseBasketsView.vue",
+          "src\\views\\consumer\\SurpriseBasketDetailView.vue",
+          "src\\views\\consumer\\LoyaltyDashboard.vue",
+          "src\\components\\ui\\ErrorDashboard.vue",
+          "src\\components\\ui\\ErrorBoundary.vue",
+          "src\\components\\ui\\ButtonWrapper.vue",
+          "src\\components\\product\\SurpriseBasketCard.vue",
+          "src\\components\\product\\ProductListItem.vue",
+          "src\\components\\reservation\\ReservationCard.vue",
+          "src\\components\\layout\\NavBar.vue",
+          "src\\components\\forms\\RegisterForm.vue",
+          "src\\components\\forms\\LoginForm.vue",
+          "src\\components\\debug\\SequentialThinking.vue",
+          "src\\components\\ui\\2025\\Card.vue",
+          "src\\composables\\useDesignSystem2025.ts"
+        ],
+        "quickWins": [
+          "form-textarea",
+          "form-checkbox",
+          "card-gradient",
+          "badge-primary",
+          "badge-secondary",
+          "badge-warning",
+          "badge-error",
+          "btn-secondary",
+          "form-help",
+          "btn-accent",
+          "form-group",
+          "card-glass"
+        ],
+        "complexMigrations": [
+          "card",
+          "btn",
+          "btn-primary",
+          "btn-outline",
+          "btn-ghost",
+          "btn-sm",
+          "badge",
+          "shadow-glow",
+          "form-label",
+          "form-input"
+        ]
+      }
+    },
+    "componentCoverage": {
+      "status": "PASS",
+      "message": "5/5 required components found",
+      "score": 100,
+      "details": [
+        {
+          "component": "Button.vue",
+          "exists": true
+        },
+        {
+          "component": "Card.vue",
+          "exists": true
+        },
+        {
+          "component": "Input.vue",
+          "exists": true
+        },
+        {
+          "component": "Modal.vue",
+          "exists": true
+        },
+        {
+          "component": "Toast.vue",
+          "exists": true
+        }
+      ]
+    },
+    "testsCoverage": {
+      "status": "ERROR",
+      "message": "Failed to run test coverage",
+      "score": 0
+    },
+    "performance": {
+      "status": "ERROR",
+      "message": "Failed to measure performance",
+      "score": 0
+    },
+    "accessibility": {
+      "status": "ERROR",
+      "message": "Failed to run accessibility tests",
+      "score": 0
+    }
+  },
+  "errors": [
+    "Too many legacy classes remaining: 851 usages"
+  ],
+  "warnings": [
+    "Could not determine test coverage",
+    "Could not measure bundle performance",
+    "Could not validate accessibility"
+  ],
+  "recommendations": [
+    "Overall migration score is below target (90%). Review failed checks.",
+    "Complete legacy classes removal before proceeding to next phase.",
+    "Improve test coverage for migrated components.",
+    "Optimize bundle size and performance metrics."
+  ]
+}

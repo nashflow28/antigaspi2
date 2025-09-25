@@ -1,5 +1,7 @@
 <template>
-  <div class="min-h-screen bg-gradient-to-br from-neutral-50 to-neutral-100">
+  <!-- Progressive Migration Pattern -->
+  <ProductDetailView2025 v-if="useDesignSystem2025().isEnabled" />
+  <div v-else class="min-h-screen bg-gradient-to-br from-neutral-50 to-neutral-100">
     <!-- Loading State -->
     <div v-if="loading" class="flex justify-center items-center min-h-screen">
       <div class="flex items-center gap-3">
@@ -318,6 +320,8 @@
 </template>
 
 <script setup lang="ts">
+import { useDesignSystem2025 } from '@/composables/useDesignSystem2025'
+import ProductDetailView2025 from './ProductDetailView2025.vue'
 import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
