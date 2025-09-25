@@ -106,9 +106,11 @@
     </Navigation>
 
     <main class="pt-20 sm:pt-24">
-      <PageTransition>
-        <router-view />
-      </PageTransition>
+      <router-view v-slot="{ Component }">
+        <PageTransition>
+          <component :is="Component" />
+        </PageTransition>
+      </router-view>
     </main>
 
     <Footer class="border-t border-primary-500/10 bg-primary-800 text-neutral-50" />

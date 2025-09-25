@@ -52,8 +52,8 @@ Route::prefix('analytics')->middleware('jwt.auth')->group(function () {
     Route::get('/stats', [AnalyticsController::class, 'stats']);
 });
 
-// Routes des produits - Rate limiting pour la recherche
-Route::prefix('products')->middleware('throttle:search')->group(function () {
+// Routes des produits - Rate limiting temporairement désactivé
+Route::prefix('products')->group(function () {
     // Routes publiques (consultation)
     Route::get('/', [ProductController::class, 'index']); // Liste des produits
     Route::get('/categories/list', [ProductController::class, 'categories']); // Liste des catégories

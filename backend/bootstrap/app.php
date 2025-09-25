@@ -7,6 +7,11 @@ use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\RateLimiter;
 
+// Supprimer les warnings PHP qui corrompent les réponses JSON
+error_reporting(E_ERROR | E_PARSE);
+ini_set('display_errors', '0');
+ini_set('display_startup_errors', '0');
+
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
         web: __DIR__.'/../routes/web.php',
@@ -28,8 +33,8 @@ return Application::configure(basePath: dirname(__DIR__))
             'throttle.api' => \App\Http\Middleware\ThrottleApiRequests::class,
         ]);
 
-        // Configuration du rate limiting pour l'API
-        $middleware->throttleApi();
+        // Configuration du rate limiting pour l'API - TEMPORAIREMENT DÉSACTIVÉ
+        // $middleware->throttleApi();
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //
