@@ -5,8 +5,8 @@
     class="bg-gradient-to-br from-neutral-50 to-primary-50"
   >
     <!-- Page Header -->
-    <div class="glass-bg glass-border border-b backdrop-blur-lg sticky top-20 z-40">
-      <div class="container-fluid py-6">
+    <div class="sticky top-20 z-40 border-b border-neutral-200/70 bg-surface-light/80 backdrop-blur-lg">
+      <div class="container-2025 py-6">
         <div class="flex items-center justify-between animate-fade-in-up">
           <div>
             <h1 class="text-3xl lg:text-4xl font-bold text-neutral-900 mb-2">
@@ -17,19 +17,24 @@
             </p>
           </div>
           <div class="hidden md:flex items-center gap-4">
-            <div class="badge badge-success text-sm px-4 py-2">
+            <Badge variant="success" size="lg">
               🌱 {{ userStats.co2Saved }}kg CO₂ économisés
-            </div>
+            </Badge>
           </div>
         </div>
       </div>
     </div>
 
-    <div class="container-fluid py-8">
+    <div class="container-2025 py-8">
       <!-- Quick Stats Cards -->
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6 mb-8">
         <!-- Économies réalisées -->
-        <div class="card card-interactive glow-effect animate-fade-in-up" style="animation-delay: 0.1s;">
+        <Card
+          variant="glass"
+          interactive
+          class="glow-effect animate-fade-in-up"
+          style="animation-delay: 0.1s;"
+        >
           <div class="flex items-center justify-between">
             <div>
               <div class="text-2xl lg:text-3xl font-bold text-primary-600 mb-2">
@@ -45,10 +50,15 @@
               <DollarSign class="w-8 h-8 text-primary-600" />
             </div>
           </div>
-        </div>
+        </Card>
 
         <!-- Produits sauvés -->
-        <div class="card card-interactive glow-effect animate-fade-in-up" style="animation-delay: 0.2s;">
+        <Card
+          variant="glass"
+          interactive
+          class="glow-effect animate-fade-in-up"
+          style="animation-delay: 0.2s;"
+        >
           <div class="flex items-center justify-between">
             <div>
               <div class="text-2xl lg:text-3xl font-bold text-primary-600 mb-2">
@@ -64,10 +74,15 @@
               <ShoppingBag class="w-8 h-8 text-primary-600" />
             </div>
           </div>
-        </div>
+        </Card>
 
         <!-- Impact CO₂ -->
-        <div class="card card-interactive glow-effect animate-fade-in-up" style="animation-delay: 0.3s;">
+        <Card
+          variant="glass"
+          interactive
+          class="glow-effect animate-fade-in-up"
+          style="animation-delay: 0.3s;"
+        >
           <div class="flex items-center justify-between">
             <div>
               <div class="text-2xl lg:text-3xl font-bold text-accent-blue mb-2">
@@ -83,10 +98,15 @@
               <TreePine class="w-8 h-8 text-accent-blue" />
             </div>
           </div>
-        </div>
+        </Card>
 
         <!-- Réservations actives -->
-        <div class="card card-interactive glow-effect animate-fade-in-up" style="animation-delay: 0.4s;">
+        <Card
+          variant="glass"
+          interactive
+          class="glow-effect animate-fade-in-up"
+          style="animation-delay: 0.4s;"
+        >
           <div class="flex items-center justify-between">
             <div>
               <div class="text-2xl lg:text-3xl font-bold text-accent-orange mb-2">
@@ -102,10 +122,16 @@
               <Calendar class="w-8 h-8 text-accent-orange" />
             </div>
           </div>
-        </div>
+        </Card>
 
         <!-- Portefeuille électronique -->
-        <div class="card card-interactive glow-effect animate-fade-in-up cursor-pointer" style="animation-delay: 0.5s;" @click="router.push('/wallet')">
+        <Card
+          variant="glass"
+          interactive
+          class="glow-effect animate-fade-in-up cursor-pointer"
+          style="animation-delay: 0.5s;"
+          @click="router.push('/wallet')"
+        >
           <div class="flex items-center justify-between">
             <div>
               <div class="text-2xl lg:text-3xl font-bold text-indigo-600 mb-2">
@@ -122,26 +148,28 @@
               <Wallet class="w-8 h-8 text-indigo-600" />
             </div>
           </div>
-        </div>
+        </Card>
       </div>
 
       <div class="grid lg:grid-cols-3 gap-8">
         <!-- Section principale gauche -->
         <div class="lg:col-span-2 space-y-8">
           <!-- Réservations récentes -->
-          <div class="card animate-fade-in-up" style="animation-delay: 0.5s;">
+          <Card class="animate-fade-in-up" style="animation-delay: 0.5s;">
             <div class="flex items-center justify-between mb-6">
               <div>
                 <h3 class="text-xl font-bold text-neutral-900 mb-1">Mes réservations récentes</h3>
                 <p class="text-sm text-neutral-600">Vos dernières réservations de produits</p>
               </div>
-              <router-link
-                to="/reservations"
-                class="btn btn-ghost btn-sm text-primary-600 hover:text-primary-700"
+              <Button
+                variant="ghost"
+                size="sm"
+                :right-icon="ArrowRight"
+                class="text-primary-600 hover:text-primary-700"
+                @click="router.push('/reservations')"
               >
-                <span>Voir tout</span>
-                <ArrowRight class="w-4 h-4" />
-              </router-link>
+                Voir tout
+              </Button>
             </div>
 
             <div class="space-y-4">
@@ -161,9 +189,9 @@
                   <ShoppingBag class="w-8 h-8 text-neutral-400" />
                 </div>
                 <p class="text-neutral-600 mb-4">Aucune réservation récente</p>
-                <router-link to="/products" class="btn btn-primary btn-sm">
+                <Button variant="primary" size="sm" @click="router.push('/products')">
                   Découvrir les produits
-                </router-link>
+                </Button>
               </div>
 
               <div
@@ -179,33 +207,35 @@
                   <h4 class="font-semibold text-neutral-900 mb-1">{{ reservation.product.name }}</h4>
                   <p class="text-sm text-neutral-600 mb-1">{{ reservation.merchant.name }}</p>
                   <div class="flex items-center gap-4 text-xs">
-                    <span class="badge badge-primary">{{ formatPrice(reservation.price) }}</span>
+                    <Badge variant="primary">{{ formatPrice(reservation.price) }}</Badge>
                     <span class="text-neutral-500">{{ formatDate(reservation.pickup_date) }}</span>
                   </div>
                 </div>
                 <div class="text-right">
-                  <span :class="getStatusClass(reservation.status)" class="badge">
+                  <Badge :variant="getStatusVariant(reservation.status)">
                     {{ getStatusLabel(reservation.status) }}
-                  </span>
+                  </Badge>
                 </div>
               </div>
             </div>
-          </div>
+          </Card>
 
           <!-- Produits recommandés -->
-          <div class="card animate-fade-in-up" style="animation-delay: 0.6s;">
+          <Card class="animate-fade-in-up" style="animation-delay: 0.6s;">
             <div class="flex items-center justify-between mb-6">
               <div>
                 <h3 class="text-xl font-bold text-neutral-900 mb-1">Recommandés pour vous</h3>
                 <p class="text-sm text-neutral-600">Basé sur vos préférences et votre localisation</p>
               </div>
-              <router-link
-                to="/products"
-                class="btn btn-ghost btn-sm text-primary-600 hover:text-primary-700"
+              <Button
+                variant="ghost"
+                size="sm"
+                :right-icon="ArrowRight"
+                class="text-primary-600 hover:text-primary-700"
+                @click="router.push('/products')"
               >
-                <span>Voir le catalogue</span>
-                <ArrowRight class="w-4 h-4" />
-              </router-link>
+                Voir le catalogue
+              </Button>
             </div>
 
             <div class="grid md:grid-cols-2 gap-4">
@@ -231,17 +261,17 @@
                     <span class="text-lg font-bold text-primary-600">{{ formatPrice(product.discounted_price) }}</span>
                     <span class="text-sm text-neutral-400 line-through">{{ formatPrice(product.original_price) }}</span>
                   </div>
-                  <span class="badge badge-success">-{{ product.discount }}%</span>
+                  <Badge variant="success">-{{ product.discount }}%</Badge>
                 </div>
               </div>
             </div>
-          </div>
+          </Card>
         </div>
 
         <!-- Sidebar droite -->
         <div class="space-y-6">
           <!-- Badge d'impact -->
-          <div class="card card-gradient text-center animate-fade-in-up" style="animation-delay: 0.7s;">
+          <Card variant="gradient" class="text-center animate-fade-in-up" style="animation-delay: 0.7s;">
             <div class="text-6xl mb-4">🌍</div>
             <h3 class="text-xl font-bold text-neutral-900 mb-2">Éco-Héros</h3>
             <p class="text-sm text-neutral-600 mb-4">
@@ -256,10 +286,10 @@
             <p class="text-xs text-neutral-500">
               Plus que {{ Math.max(0, 100 - userStats.productsSaved) }} produits pour le niveau suivant
             </p>
-          </div>
+          </Card>
 
           <!-- Actions rapides -->
-          <div class="card animate-fade-in-up" style="animation-delay: 0.8s;">
+          <Card class="animate-fade-in-up" style="animation-delay: 0.8s;">
             <h3 class="text-lg font-bold text-neutral-900 mb-4">Actions rapides</h3>
             <div class="space-y-3">
               <router-link to="/products" class="flex items-center gap-3 p-3 rounded-xl hover:bg-primary-50 transition-colors group">
@@ -292,10 +322,10 @@
                 </div>
               </router-link>
             </div>
-          </div>
+          </Card>
 
           <!-- Tips écologiques -->
-          <div class="card bg-gradient-to-br from-primary-50 to-primary-100 border-primary-200 animate-fade-in-up" style="animation-delay: 0.9s;">
+          <Card class="bg-gradient-to-br from-primary-50 to-primary-100 border border-primary-200 animate-fade-in-up" style="animation-delay: 0.9s;">
             <div class="flex items-center gap-3 mb-4">
               <div class="w-8 h-8 bg-primary-500 rounded-full flex items-center justify-center">
                 <Lightbulb class="w-4 h-4 text-white" />
@@ -305,10 +335,10 @@
             <p class="text-sm text-primary-700 mb-4">
               {{ currentTip.text }}
             </p>
-            <button @click="nextTip" class="btn btn-sm bg-primary-500 text-white hover:bg-primary-600 w-full">
+            <Button size="sm" variant="primary" class="w-full" @click="nextTip">
               Astuce suivante
-            </button>
-          </div>
+            </Button>
+          </Card>
         </div>
       </div>
     </div>
@@ -327,6 +357,9 @@ import {
 } from 'lucide-vue-next'
 import DashboardLayout from '@/components/ui/DashboardLayout.vue'
 import { useDashboardLayout } from '@/composables/useDashboardLayout'
+import Card from '@/components/ui/2025/Card.vue'
+import Button from '@/components/ui/2025/Button.vue'
+import Badge from '@/components/ui/2025/Badge.vue'
 
 const router = useRouter()
 const authStore = useAuthStore()
@@ -434,14 +467,14 @@ const formatDate = (date: string | Date) => {
   }).format(dateObj)
 }
 
-const getStatusClass = (status: string) => {
-  const classes = {
-    'confirmed': 'badge-warning',
-    'completed': 'badge-success',
-    'cancelled': 'badge-error',
-    'pending': 'badge-secondary'
+const getStatusVariant = (status: string) => {
+  const variants = {
+    confirmed: 'warning',
+    completed: 'success',
+    cancelled: 'error',
+    pending: 'secondary'
   }
-  return classes[status as keyof typeof classes] || 'badge-secondary'
+  return variants[status as keyof typeof variants] || 'secondary'
 }
 
 const getStatusLabel = (status: string) => {
