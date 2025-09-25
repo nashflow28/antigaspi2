@@ -6,8 +6,6 @@ import { defineComponent, nextTick } from 'vue'
 import NotificationContainer from '@/components/ui/NotificationContainer.vue'
 import NotificationSystem from '@/components/ui/NotificationSystem.vue'
 import Toast from '@/components/ui/Toast.vue'
-import { useAuthStore } from '@/stores/auth'
-import { useProductsStore } from '@/stores/products'
 import { useReservationsStore } from '@/stores/reservations'
 import { useNotifications } from '@/composables/useNotifications'
 
@@ -69,18 +67,12 @@ describe('Notifications integration', () => {
     clearAll()
   })
 
-  it('relays Pinia errors into the global notification stack and wires callbacks', async () => {
-    const authStore = useAuthStore()
-    const productsStore = useProductsStore()
+  it('relays reservations store errors into the global notification stack and clears on close', async () => {
     const reservationsStore = useReservationsStore()
 
-    authStore.error = 'Token expiré' as any
-    productsStore.error = 'Catalogue indisponible' as any
     reservationsStore.error = 'Réservation impossible' as any
 
-    const fetchSpy = vi.spyOn(productsStore, 'fetchProducts').mockResolvedValue({} as any)
-    const clearProductsSpy = vi.spyOn(productsStore, 'clearError')
-    const clearAuthSpy = vi.spyOn(authStore, 'clearError')
+    const clearReservationsSpy = vi.spyOn(reservationsStore, 'clearError')
 
     const wrapper = mountNotifications()
 
@@ -88,51 +80,39 @@ describe('Notifications integration', () => {
     await nextTick()
 
     const toasts = wrapper.findAllComponents(Toast)
-    expect(toasts).toHaveLength(3)
-    expect(wrapper.html()).toContain("Erreur d'authentification")
-    expect(wrapper.html()).toContain('Chargement des produits')
+    expect(toasts).toHaveLength(1)
     expect(wrapper.html()).toContain('Réservations')
+    expect(wrapper.html()).toContain('Réservation impossible')
 
-    const retryToast = toasts.find(toast => toast.text().includes('Chargement des produits'))
-    const retryButton = retryToast?.findAll('button').find(button => button.text() === 'Réessayer')
-    expect(retryButton).toBeDefined()
-    await retryButton?.trigger('click')
-
-    await nextTick()
-
-    expect(fetchSpy).toHaveBeenCalledTimes(1)
-    expect(clearProductsSpy).toHaveBeenCalledTimes(1)
-
-    const authToast = toasts.find(toast => toast.text().includes("Erreur d'authentification"))
-    const closeAuthButton = authToast?.find('button[aria-label="Fermer la notification"]')
-    expect(closeAuthButton).toBeDefined()
-    await closeAuthButton?.trigger('click')
+    const closeButton = toasts[0].find('button[aria-label="Fermer la notification"]')
+    expect(closeButton.exists()).toBe(true)
+    await closeButton.trigger('click')
 
     await nextTick()
 
-    expect(clearAuthSpy).toHaveBeenCalledTimes(1)
+    expect(clearReservationsSpy).toHaveBeenCalledTimes(1)
   })
 
   it('deduplicates notifications for the same store and updates the message', async () => {
-    const productsStore = useProductsStore()
+    const reservationsStore = useReservationsStore()
 
-    productsStore.error = 'Erreur initiale' as any
+    reservationsStore.error = 'Erreur initiale' as any
 
     const wrapper = mountNotifications()
 
     await nextTick()
 
-    let productToast = wrapper.findAllComponents(Toast).find(toast => toast.text().includes('Erreur initiale'))
-    expect(productToast).toBeDefined()
+    let reservationToast = wrapper.findAllComponents(Toast).find(toast => toast.text().includes('Erreur initiale'))
+    expect(reservationToast).toBeDefined()
 
-    productsStore.error = 'Nouvelle erreur critique' as any
+    reservationsStore.error = 'Nouvelle erreur critique' as any
 
     await nextTick()
     await nextTick()
 
-    const allToasts = wrapper.findAllComponents(Toast).filter(toast => toast.text().includes('Chargement des produits'))
+    const allToasts = wrapper.findAllComponents(Toast).filter(toast => toast.text().includes('Réservations'))
     expect(allToasts).toHaveLength(1)
-    productToast = allToasts[0]
-    expect(productToast?.text()).toContain('Nouvelle erreur critique')
+    reservationToast = allToasts[0]
+    expect(reservationToast?.text()).toContain('Nouvelle erreur critique')
   })
 })

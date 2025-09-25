@@ -61,7 +61,7 @@ export const useAuthStore = defineStore('auth', () => {
       return { success: true }
     } catch (err: any) {
       notify.error(err.message || 'Erreur de connexion', 'Authentification', {
-        onAction: {
+        action: {
           label: 'Réessayer',
           callback: () => login(credentials)
         }
@@ -84,7 +84,7 @@ export const useAuthStore = defineStore('auth', () => {
       return { success: true }
     } catch (err: any) {
       notify.error(err.message || 'Erreur d\'inscription', 'Inscription', {
-        onAction: {
+        action: {
           label: 'Réessayer',
           callback: () => register(data)
         }

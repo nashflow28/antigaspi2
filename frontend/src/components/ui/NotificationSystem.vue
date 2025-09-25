@@ -9,9 +9,9 @@
             :tone="notification.type"
             :title="notification.title"
             :description="notification.message"
-            :action-label="notification.actionLabel"
+            :action-label="notification.action?.label"
             :on-close="() => closeNotification(notification.id)"
-            :on-action="notification.onAction ? () => triggerAction(notification.id) : undefined"
+            :on-action="notification.action ? () => triggerAction(notification.id) : undefined"
           />
         </div>
       </TransitionGroup>
@@ -29,9 +29,7 @@ const closeNotification = (id: string) => {
   removeNotification(id)
 }
 
-const triggerAction = (id: string) => {
-  handleAction(id)
-}
+const triggerAction = (id: string) => handleAction(id)
 </script>
 
 <style scoped>

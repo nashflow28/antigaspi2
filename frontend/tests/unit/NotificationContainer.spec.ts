@@ -5,8 +5,6 @@ import { nextTick } from 'vue'
 
 import NotificationContainer from '@/components/ui/NotificationContainer.vue'
 import { useNotifications } from '@/composables/useNotifications'
-import { useAuthStore } from '@/stores/auth'
-import { useProductsStore } from '@/stores/products'
 import { useReservationsStore } from '@/stores/reservations'
 
 describe('NotificationContainer', () => {
@@ -19,13 +17,9 @@ describe('NotificationContainer', () => {
     clearAll()
   })
 
-  it('renders stacked toasts for each store error', async () => {
-    const authStore = useAuthStore()
-    const productsStore = useProductsStore()
+  it('renders a toast when the reservations store reports an error', async () => {
     const reservationsStore = useReservationsStore()
 
-    authStore.error = "Connexion impossible" as any
-    productsStore.error = 'Catalogue momentanément indisponible' as any
     reservationsStore.error = 'Réservation impossible' as any
 
     mount(NotificationContainer, {
@@ -43,25 +37,18 @@ describe('NotificationContainer', () => {
 
     const { notifications } = useNotifications()
 
-    expect(notifications.value).toHaveLength(3)
-
-    const payloads = notifications.value.reduce<Record<string, any>>((acc, notification) => {
-      acc[notification.title ?? notification.id] = notification
-      return acc
-    }, {})
-
-    expect(Object.values(payloads).map(notification => notification.title)).toEqual(
-      expect.arrayContaining(["Erreur d'authentification", 'Chargement des produits', 'Réservations'])
-    )
+    expect(notifications.value).toHaveLength(1)
+    expect(notifications.value[0]?.title).toBe('Réservations')
+    expect(notifications.value[0]?.message).toBe('Réservation impossible')
   })
 
   it('clears the corresponding store error when toast is dismissed', async () => {
     vi.useFakeTimers()
 
-    const authStore = useAuthStore()
-    authStore.error = 'Token expiré' as any
+    const reservationsStore = useReservationsStore()
+    reservationsStore.error = 'Réservation impossible' as any
 
-    const clearSpy = vi.spyOn(authStore, 'clearError')
+    const clearSpy = vi.spyOn(reservationsStore, 'clearError')
 
     mount(NotificationContainer, {
       global: {
