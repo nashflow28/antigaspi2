@@ -1,19 +1,19 @@
 <template>
   <div class="min-h-screen bg-gradient-to-br from-neutral-50 to-primary-50">
     <!-- Loading state -->
-    <div v-if="loading" class="container-fluid py-8">
-      <div class="card animate-pulse">
+    <div v-if="loading" class="container-2025 py-8">
+      <Card class="animate-pulse">
         <div class="space-y-4">
           <div class="h-8 bg-neutral-200 rounded w-1/3"></div>
           <div class="h-4 bg-neutral-200 rounded w-3/4"></div>
           <div class="h-4 bg-neutral-200 rounded w-1/2"></div>
         </div>
-      </div>
+      </Card>
     </div>
 
     <!-- Error state -->
-    <div v-else-if="error" class="container-fluid py-8">
-      <div class="card text-center py-12">
+    <div v-else-if="error" class="container-2025 py-8">
+      <Card class="text-center py-12">
         <div class="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
           <AlertCircle class="w-10 h-10 text-red-500" />
         </div>
@@ -22,31 +22,32 @@
         </h3>
         <p class="text-neutral-600 mb-4">{{ error }}</p>
         <div class="flex gap-3 justify-center">
-          <button @click="loadReservation" class="btn btn-primary">
+          <Button variant="primary" @click="loadReservation">
             Réessayer
-          </button>
-          <router-link to="/reservations" class="btn btn-outline">
+          </Button>
+          <Button variant="outline" @click="$router.push('/reservations')">
             Retour aux réservations
-          </router-link>
+          </Button>
         </div>
-      </div>
+      </Card>
     </div>
 
     <!-- Main content -->
-    <div v-else-if="reservation" class="container-fluid py-8">
+    <div v-else-if="reservation" class="container-2025 py-8">
       <!-- Header -->
-      <div class="glass-bg glass-border border-b mb-8">
-        <div class="container-fluid py-6">
+      <div class="bg-white/60 backdrop-blur-md border-b mb-8">
+        <div class="container-2025 py-6">
           <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
             <div>
               <div class="flex items-center gap-3 mb-2">
-                <router-link
-                  to="/reservations"
-                  class="btn btn-ghost btn-sm"
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  @click="$router.push('/reservations')"
                 >
                   <ArrowLeft class="w-4 h-4" />
                   Retour
-                </router-link>
+                </Button>
                 <div class="h-6 w-px bg-neutral-300"></div>
                 <span class="text-sm text-neutral-500">Réservation</span>
               </div>
@@ -60,12 +61,13 @@
 
             <!-- Status badge -->
             <div class="flex items-center gap-3">
-              <span
-                class="px-3 py-1 rounded-full text-sm font-medium"
-                :class="getStatusClass(reservation.status)"
+              <Badge
+                :variant="getStatusVariant(reservation.status)"
+                size="lg"
+                class="px-3 py-1"
               >
                 {{ getStatusText(reservation.status) }}
-              </span>
+              </Badge>
             </div>
           </div>
         </div>
@@ -75,7 +77,7 @@
         <!-- Main information -->
         <div class="lg:col-span-2 space-y-6">
           <!-- Product details -->
-          <div class="card">
+          <Card>
             <h3 class="text-lg font-semibold text-neutral-900 mb-4">
               Détails du produit
             </h3>
@@ -117,10 +119,10 @@
                 </div>
               </div>
             </div>
-          </div>
+          </Card>
 
           <!-- Reservation details -->
-          <div class="card">
+          <Card>
             <h3 class="text-lg font-semibold text-neutral-900 mb-4">
               Détails de la réservation
             </h3>
@@ -158,46 +160,46 @@
               <label class="text-sm font-medium text-neutral-700">Notes de retrait</label>
               <p class="text-neutral-600 mt-1">{{ reservation.pickup_notes }}</p>
             </div>
-          </div>
+          </Card>
 
           <!-- Actions -->
-          <div class="card" v-if="canPerformActions">
+          <Card v-if="canPerformActions">
             <h3 class="text-lg font-semibold text-neutral-900 mb-4">
               Actions disponibles
             </h3>
             <div class="flex flex-wrap gap-3">
-              <button
+              <Button
                 v-if="reservation.status === 'pending'"
+                variant="destructive"
                 @click="cancelReservation"
-                class="btn btn-outline btn-danger"
               >
                 <X class="w-4 h-4" />
                 Annuler la réservation
-              </button>
+              </Button>
 
-              <button
+              <Button
+                variant="outline"
                 @click="contactMerchant"
-                class="btn btn-outline"
               >
                 <Phone class="w-4 h-4" />
                 Contacter le commerçant
-              </button>
+              </Button>
 
-              <button
+              <Button
+                variant="outline"
                 @click="downloadReceipt"
-                class="btn btn-outline"
               >
                 <Download class="w-4 h-4" />
                 Télécharger le reçu
-              </button>
+              </Button>
             </div>
-          </div>
+          </Card>
         </div>
 
         <!-- Sidebar -->
         <div class="space-y-6">
           <!-- Status timeline -->
-          <div class="card">
+          <Card>
             <h3 class="text-lg font-semibold text-neutral-900 mb-4">
               Suivi de la réservation
             </h3>
@@ -224,10 +226,10 @@
                 </div>
               </div>
             </div>
-          </div>
+          </Card>
 
           <!-- Savings summary -->
-          <div class="card bg-gradient-to-r from-accent-orange to-accent-orange/90 text-white">
+          <Card class="bg-gradient-to-r from-accent-orange to-accent-orange/90 text-white">
             <div class="flex items-center gap-3 mb-4">
               <div class="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
                 <DollarSign class="w-6 h-6" />
@@ -255,7 +257,7 @@
                 </div>
               </div>
             </div>
-          </div>
+          </Card>
         </div>
       </div>
     </div>
@@ -274,6 +276,11 @@ import {
   Download, MapPin, Package, Phone, Store, Truck, X
 } from 'lucide-vue-next'
 import type { Reservation } from '@/types'
+
+// Import 2025 Design System components
+import Card from '@/components/ui/2025/Card.vue'
+import Button from '@/components/ui/2025/Button.vue'
+import Badge from '@/components/ui/2025/Badge.vue'
 
 const route = useRoute()
 const reservationsStore = useReservationsStore()
@@ -392,16 +399,17 @@ const loadReservation = async () => {
   }
 }
 
-const getStatusClass = (status: string) => {
-  const classes = {
-    pending: 'bg-yellow-100 text-yellow-800',
-    confirmed: 'bg-blue-100 text-blue-800',
-    ready: 'bg-green-100 text-green-800',
-    completed: 'bg-primary-100 text-primary-800',
-    cancelled: 'bg-red-100 text-red-800',
-    expired: 'bg-neutral-100 text-neutral-800'
+// Convert status to 2025 Badge variant
+const getStatusVariant = (status: string) => {
+  const variants = {
+    pending: 'warning' as const,
+    confirmed: 'info' as const,
+    ready: 'success' as const,
+    completed: 'primary' as const,
+    cancelled: 'error' as const,
+    expired: 'secondary' as const
   }
-  return classes[status as keyof typeof classes] || 'bg-neutral-100 text-neutral-800'
+  return variants[status as keyof typeof variants] || 'secondary' as const
 }
 
 const getStatusText = (status: string) => {
