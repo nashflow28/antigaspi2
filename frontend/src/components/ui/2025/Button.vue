@@ -8,7 +8,7 @@
     :class="computedClasses"
     @click="handleClick"
   >
-    <LoadingSpinner v-if="loading" :size="iconSize" />
+    <Loader2 v-if="loading" :size="iconSize" class="animate-spin" />
     <component
       v-else-if="leftIcon"
       :is="leftIcon"
@@ -29,7 +29,7 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
-import LoadingSpinner from '@/components/ui/LoadingSpinner.vue'
+import { Loader2 } from 'lucide-vue-next'
 
 // Types
 export type ButtonVariant =

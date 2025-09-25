@@ -145,7 +145,7 @@ const router = createRouter({
     {
       path: '/dashboard',
       name: 'dashboard',
-      component: () => import('@/views/DashboardView.vue'),
+      component: () => import('@/components/ui/DashboardViewWrapper.vue'),
       meta: { requiresAuth: true }
     },
     {
@@ -163,7 +163,7 @@ const router = createRouter({
     {
       path: '/reservations/:id',
       name: 'reservation-detail',
-      component: () => import('@/views/ReservationDetailView.vue'),
+      component: () => import('@/components/ui/ReservationDetailViewWrapper.vue'),
       meta: { requiresAuth: true, roles: ['consumer'] }
     },
     {
@@ -292,7 +292,7 @@ const router = createRouter({
     {
       path: '/:pathMatch(.*)*',
       name: 'not-found',
-      component: () => import('@/views/NotFoundView.vue')
+      component: () => import('@/components/ui/NotFoundViewWrapper.vue')
     }
   ]
 })

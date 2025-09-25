@@ -194,6 +194,7 @@
 @layer components {
 
   /* ✨ Buttons - Design moderne avec micro-interactions */
+  /* Legacy button styles - Used by fallback components when 2025 design system is disabled */
   .btn {
     @apply inline-flex items-center justify-center gap-2 px-6 py-3 text-sm font-medium rounded-xl transition-all duration-200 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:opacity-60 disabled:pointer-events-none relative overflow-hidden;
   }
@@ -227,6 +228,7 @@
   }
 
   /* 🃏 Cards - Design élégant avec glassmorphism subtil */
+  /* Legacy card styles - Used by fallback components when 2025 design system is disabled */
   .card {
     @apply bg-white/80 backdrop-blur-sm border border-white/20 rounded-2xl p-6 shadow-card hover:shadow-card transition-all duration-300 ease-out;
   }
@@ -245,6 +247,12 @@
 
   /* 📝 Form Elements - Design moderne et accessible */
   .form-group {
+    @apply space-y-2;
+  }
+
+  /* 🚀 2025 Design System Extensions */
+  /* Form group for 2025 components - used alongside legacy forms during progressive migration */
+  .form-group-2025 {
     @apply space-y-2;
   }
 
@@ -440,6 +448,11 @@
 
   /* Container utilities */
   .container-fluid {
+    @apply w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+  }
+
+  /* Container for 2025 components - maintains consistency with legacy during progressive migration */
+  .container-2025 {
     @apply w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
   }
 

@@ -14,55 +14,48 @@
 
     <form @submit.prevent="handleSubmit" class="space-y-6 animate-fade-in-up" style="animation-delay: 0.2s;">
       <!-- Email Input -->
-      <div class="form-group">
-        <label for="email" class="form-label flex items-center gap-2">
+      <div class="form-group-2025">
+        <label for="email" class="block text-sm font-medium text-neutral-700 mb-2 flex items-center gap-2">
           <span>Adresse email</span>
           <span class="text-accent-red">*</span>
         </label>
-        <div class="relative">
-          <input
-            id="email"
-            type="email"
-            v-model="form.email"
-            :class="[
-              'form-input pl-12',
-              errors.email ? 'form-input-error' : ''
-            ]"
-            placeholder="votre@email.com"
-            autocomplete="email"
-            required
-          />
-          <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+        <Input
+          id="email"
+          type="email"
+          v-model="form.email"
+          placeholder="votre@email.com"
+          :error="errors.email"
+          autocomplete="email"
+          required
+          class="pl-12"
+        >
+          <template #icon>
             <Mail class="w-5 h-5 text-neutral-400" />
-          </div>
-        </div>
-        <p v-if="errors.email" class="form-error animate-fade-in">
-          {{ errors.email }}
-        </p>
+          </template>
+        </Input>
       </div>
 
       <!-- Password Input -->
-      <div class="form-group">
-        <label for="password" class="form-label flex items-center gap-2">
+      <div class="form-group-2025">
+        <label for="password" class="block text-sm font-medium text-neutral-700 mb-2 flex items-center gap-2">
           <span>Mot de passe</span>
           <span class="text-accent-red">*</span>
         </label>
         <div class="relative">
-          <input
+          <Input
             id="password"
             :type="showPassword ? 'text' : 'password'"
             v-model="form.password"
-            :class="[
-              'form-input pl-12 pr-12',
-              errors.password ? 'form-input-error' : ''
-            ]"
             placeholder="••••••••"
+            :error="errors.password"
             autocomplete="current-password"
             required
-          />
-          <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-            <Lock class="w-5 h-5 text-neutral-400" />
-          </div>
+            class="pl-12 pr-12"
+          >
+            <template #icon>
+              <Lock class="w-5 h-5 text-neutral-400" />
+            </template>
+          </Input>
           <button
             type="button"
             @click="togglePasswordVisibility"
@@ -72,9 +65,6 @@
             <EyeOff v-else class="w-5 h-5" />
           </button>
         </div>
-        <p v-if="errors.password" class="form-error animate-fade-in">
-          {{ errors.password }}
-        </p>
       </div>
 
       <!-- Options et liens -->
@@ -84,7 +74,7 @@
             id="remember-me"
             v-model="form.remember"
             type="checkbox"
-            class="form-checkbox"
+            class="w-4 h-4 text-primary-600 bg-white border-2 border-neutral-300 rounded focus:ring-primary-500 focus:ring-2"
           />
           <label for="remember-me" class="text-sm text-neutral-700 font-medium">
             Se souvenir de moi
@@ -99,17 +89,19 @@
       </div>
 
       <!-- Submit Button -->
-      <button
+      <Button
         type="submit"
+        variant="primary"
+        size="lg"
         :disabled="loading"
-        class="w-full btn btn-primary btn-lg glow-effect group relative overflow-hidden"
+        class="w-full glow-effect group relative overflow-hidden"
       >
         <span class="relative z-10 flex items-center justify-center gap-2">
           <Loader2 v-if="loading" class="w-5 h-5 animate-spin" />
           <span>{{ loading ? 'Connexion en cours...' : 'Se connecter' }}</span>
         </span>
         <div class="absolute inset-0 bg-gradient-to-r from-primary-600 to-accent-blue/90 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-      </button>
+      </Button>
 
       <!-- Divider -->
       <div class="relative">
@@ -159,6 +151,10 @@ import { Mail, Lock, Eye, EyeOff, Loader2 } from 'lucide-vue-next'
 import type { LoginCredentials } from '@/types'
 import { useDesignSystem2025 } from '@/composables/useDesignSystem2025'
 import LoginForm2025 from './LoginForm2025.vue'
+
+// Import 2025 Design System components for fallback
+import Input from '@/components/ui/2025/Input.vue'
+import Button from '@/components/ui/2025/Button.vue'
 
 const router = useRouter()
 const authStore = useAuthStore()
