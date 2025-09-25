@@ -61,3 +61,4 @@ Les tokens sont définis dans `tailwind.config.js` et doivent être consommés v
 - [Design System 2025](../DESIGN_SYSTEM_2025.md)
 - [Guide de migration des primitives](docs/design-system-migration.md)
 - [Changelog UI](docs/design-system-changelog.md)
+- [Phase 1 Notifications](docs/notifications/README.md)

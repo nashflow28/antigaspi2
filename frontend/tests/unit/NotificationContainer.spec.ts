@@ -4,7 +4,7 @@ import { createPinia, setActivePinia, type Pinia } from 'pinia'
 import { nextTick } from 'vue'
 
 import NotificationContainer from '@/components/ui/NotificationContainer.vue'
-import Toast from '@/components/ui/Toast.vue'
+import { useNotifications } from '@/composables/useNotifications'
 import { useAuthStore } from '@/stores/auth'
 import { useProductsStore } from '@/stores/products'
 import { useReservationsStore } from '@/stores/reservations'
@@ -15,6 +15,8 @@ describe('NotificationContainer', () => {
   beforeEach(() => {
     pinia = createPinia()
     setActivePinia(pinia)
+    const { clearAll } = useNotifications()
+    clearAll()
   })
 
   it('renders stacked toasts for each store error', async () => {
@@ -26,7 +28,7 @@ describe('NotificationContainer', () => {
     productsStore.error = 'Catalogue momentanément indisponible' as any
     reservationsStore.error = 'Réservation impossible' as any
 
-    const wrapper = mount(NotificationContainer, {
+    mount(NotificationContainer, {
       global: {
         plugins: [pinia],
         stubs: {
@@ -39,11 +41,18 @@ describe('NotificationContainer', () => {
 
     await nextTick()
 
-    const toasts = wrapper.findAllComponents(Toast)
-    expect(toasts).toHaveLength(3)
-    expect(wrapper.html()).toContain("Erreur d'authentification")
-    expect(wrapper.html()).toContain('Chargement des produits')
-    expect(wrapper.html()).toContain('Réservations')
+    const { notifications } = useNotifications()
+
+    expect(notifications.value).toHaveLength(3)
+
+    const payloads = notifications.value.reduce<Record<string, any>>((acc, notification) => {
+      acc[notification.title ?? notification.id] = notification
+      return acc
+    }, {})
+
+    expect(Object.values(payloads).map(notification => notification.title)).toEqual(
+      expect.arrayContaining(["Erreur d'authentification", 'Chargement des produits', 'Réservations'])
+    )
   })
 
   it('clears the corresponding store error when toast is dismissed', async () => {
@@ -54,7 +63,7 @@ describe('NotificationContainer', () => {
 
     const clearSpy = vi.spyOn(authStore, 'clearError')
 
-    const wrapper = mount(NotificationContainer, {
+    mount(NotificationContainer, {
       global: {
         plugins: [pinia],
         stubs: {
@@ -67,16 +76,16 @@ describe('NotificationContainer', () => {
 
     await nextTick()
 
-    const toast = wrapper.findComponent(Toast)
-    expect(toast.exists()).toBe(true)
+    const { notifications, removeNotification } = useNotifications()
+    expect(notifications.value).toHaveLength(1)
 
-    const closeButton = toast.find('button[aria-label="Fermer la notification"]')
-    await closeButton.trigger('click')
+    const [notification] = notifications.value
+    removeNotification(notification.id)
 
     await nextTick()
 
     expect(clearSpy).toHaveBeenCalledTimes(1)
-    expect(wrapper.findComponent(Toast).exists()).toBe(false)
+    expect(notifications.value).toHaveLength(0)
 
     vi.runOnlyPendingTimers()
     vi.useRealTimers()
