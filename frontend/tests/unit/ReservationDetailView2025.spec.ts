@@ -92,6 +92,7 @@ describe('ReservationDetailView (Design System 2025)', () => {
     expect(wrapper.find('.btn').exists()).toBe(false)
     expect(wrapper.html()).not.toContain('glass-bg')
     expect(wrapper.html()).not.toContain('glass-border')
+    expect(wrapper.findAll('.shadow-card').length).toBeGreaterThan(0)
 
     expect(getReservationMock).toHaveBeenCalledWith(42)
     expect(wrapper.text()).toContain('Panier surprise bio')

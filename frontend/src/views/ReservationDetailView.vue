@@ -33,24 +33,28 @@
     </div>
 
     <!-- Main content -->
-    <div v-else-if="reservation" class="container-2025 py-8">
+    <div v-else-if="reservation" class="container-2025 py-8 space-y-8">
       <!-- Header -->
-      <div class="bg-white/60 backdrop-blur-md border-b mb-8">
-        <div class="container-2025 py-6">
-          <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+      <Card
+        variant="glass"
+        shadow="lg"
+        class="border border-white/30 bg-surface-light/80 backdrop-blur-xl"
+      >
+        <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+          <div class="space-y-2">
+            <div class="flex items-center gap-3 text-sm text-neutral-500">
+              <Button
+                variant="ghost"
+                size="sm"
+                @click="$router.push('/reservations')"
+              >
+                <ArrowLeft class="w-4 h-4" />
+                Retour
+              </Button>
+              <span class="h-6 w-px bg-neutral-300/60" aria-hidden="true"></span>
+              <span>Réservation</span>
+            </div>
             <div>
-              <div class="flex items-center gap-3 mb-2">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  @click="$router.push('/reservations')"
-                >
-                  <ArrowLeft class="w-4 h-4" />
-                  Retour
-                </Button>
-                <div class="h-6 w-px bg-neutral-300"></div>
-                <span class="text-sm text-neutral-500">Réservation</span>
-              </div>
               <h1 class="text-2xl font-bold text-neutral-900">
                 {{ reservation.product.name }}
               </h1>
@@ -58,26 +62,26 @@
                 Code: {{ reservation.reservation_code }}
               </p>
             </div>
+          </div>
 
-            <!-- Status badge -->
-            <div class="flex items-center gap-3">
-              <Badge
-                :variant="getStatusVariant(reservation.status)"
-                size="lg"
-                class="px-3 py-1"
-              >
-                {{ getStatusText(reservation.status) }}
-              </Badge>
-            </div>
+          <!-- Status badge -->
+          <div class="flex items-center gap-3">
+            <Badge
+              :variant="getStatusVariant(reservation.status)"
+              size="lg"
+              class="px-3 py-1"
+            >
+              {{ getStatusText(reservation.status) }}
+            </Badge>
           </div>
         </div>
-      </div>
+      </Card>
 
-      <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div class="grid grid-cols-1 gap-8 lg:grid-cols-3">
         <!-- Main information -->
         <div class="lg:col-span-2 space-y-6">
           <!-- Product details -->
-          <Card>
+          <Card class="shadow-card">
             <h3 class="text-lg font-semibold text-neutral-900 mb-4">
               Détails du produit
             </h3>
@@ -122,7 +126,7 @@
           </Card>
 
           <!-- Reservation details -->
-          <Card>
+          <Card class="shadow-card">
             <h3 class="text-lg font-semibold text-neutral-900 mb-4">
               Détails de la réservation
             </h3>
@@ -163,7 +167,7 @@
           </Card>
 
           <!-- Actions -->
-          <Card v-if="canPerformActions">
+          <Card v-if="canPerformActions" variant="glass" shadow="md" class="shadow-card">
             <h3 class="text-lg font-semibold text-neutral-900 mb-4">
               Actions disponibles
             </h3>
@@ -199,7 +203,7 @@
         <!-- Sidebar -->
         <div class="space-y-6">
           <!-- Status timeline -->
-          <Card>
+          <Card variant="glass" shadow="md" class="shadow-card">
             <h3 class="text-lg font-semibold text-neutral-900 mb-4">
               Suivi de la réservation
             </h3>
@@ -229,7 +233,11 @@
           </Card>
 
           <!-- Savings summary -->
-          <Card class="bg-gradient-to-r from-accent-orange to-accent-orange/90 text-white">
+          <Card
+            variant="gradient"
+            shadow="lg"
+            class="border-0 bg-gradient-to-r from-accent-orange to-accent-orange/90 text-white shadow-card"
+          >
             <div class="flex items-center gap-3 mb-4">
               <div class="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
                 <DollarSign class="w-6 h-6" />
