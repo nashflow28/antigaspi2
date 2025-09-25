@@ -2,12 +2,13 @@ import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import type { Product, ProductFilters } from '@/types'
 import { apiService } from '@/services/api'
+import { notify } from '@/composables/useNotifications'
 
 export const useProductsStore = defineStore('products', () => {
   const products = ref<Product[]>([])
   const currentProduct = ref<Product | null>(null)
   const loading = ref(false)
-  const error = ref<string | null>(null)
+  // error ref removed - using useNotifications composable
   const filters = ref<ProductFilters>({
     search: '',
     category: '',
@@ -66,16 +67,9 @@ export const useProductsStore = defineStore('products', () => {
     return Array.from(uniqueMerchants.values())
   })
 
-  const setError = (message: string) => {
-    error.value = message
-    setTimeout(() => {
-      error.value = null
-    }, 5000)
-  }
+  // setError removed - using useNotifications composable
 
-  const clearError = () => {
-    error.value = null
-  }
+  // clearError removed - using useNotifications composable
 
   const setFilters = (newFilters: Partial<ProductFilters>) => {
     filters.value = { ...filters.value, ...newFilters }
@@ -96,7 +90,6 @@ export const useProductsStore = defineStore('products', () => {
   const fetchProducts = async (customFilters?: ProductFilters) => {
     try {
       loading.value = true
-      clearError()
 
       const filtersToUse = customFilters || filters.value
       const response = await apiService.getProducts(filtersToUse)
@@ -108,7 +101,12 @@ export const useProductsStore = defineStore('products', () => {
 
       return { success: true }
     } catch (err: any) {
-      setError(err.message || 'Erreur lors du chargement des produits')
+      notify.error(err.message || 'Erreur lors du chargement des produits', 'Catalogue', {
+        action: {
+          label: 'Réessayer',
+          callback: () => fetchProducts(customFilters)
+        }
+      })
       return { success: false, error: err.message }
     } finally {
       loading.value = false
@@ -118,14 +116,18 @@ export const useProductsStore = defineStore('products', () => {
   const fetchProduct = async (id: number) => {
     try {
       loading.value = true
-      clearError()
 
       const response = await apiService.getProduct(id)
       currentProduct.value = response.data
 
       return { success: true }
     } catch (err: any) {
-      setError(err.message || 'Erreur lors du chargement du produit')
+      notify.error(err.message || 'Erreur lors du chargement du produit', 'Produit', {
+        action: {
+          label: 'Réessayer',
+          callback: () => fetchProduct(id)
+        }
+      })
       return { success: false, error: err.message }
     } finally {
       loading.value = false
@@ -135,16 +137,21 @@ export const useProductsStore = defineStore('products', () => {
   const createProduct = async (productData: Partial<Product>) => {
     try {
       loading.value = true
-      clearError()
 
       const response = await apiService.createProduct(productData)
 
       // Add new product to the list
       products.value.unshift(response.data)
+      notify.success('Produit créé avec succès', 'Catalogue', { duration: 3000 })
 
       return { success: true, data: response.data }
     } catch (err: any) {
-      setError(err.message || 'Erreur lors de la création du produit')
+      notify.error(err.message || 'Erreur lors de la création du produit', 'Catalogue', {
+        action: {
+          label: 'Réessayer',
+          callback: () => createProduct(productData)
+        }
+      })
       return { success: false, error: err.message }
     } finally {
       loading.value = false
@@ -154,7 +161,6 @@ export const useProductsStore = defineStore('products', () => {
   const updateProduct = async (id: number, productData: Partial<Product>) => {
     try {
       loading.value = true
-      clearError()
 
       const response = await apiService.updateProduct(id, productData)
 
@@ -168,9 +174,15 @@ export const useProductsStore = defineStore('products', () => {
         currentProduct.value = response.data
       }
 
+      notify.success('Produit mis à jour avec succès', 'Catalogue', { duration: 3000 })
       return { success: true, data: response.data }
     } catch (err: any) {
-      setError(err.message || 'Erreur lors de la mise à jour du produit')
+      notify.error(err.message || 'Erreur lors de la mise à jour du produit', 'Catalogue', {
+        action: {
+          label: 'Réessayer',
+          callback: () => updateProduct(id, productData)
+        }
+      })
       return { success: false, error: err.message }
     } finally {
       loading.value = false
@@ -180,7 +192,6 @@ export const useProductsStore = defineStore('products', () => {
   const deleteProduct = async (id: number) => {
     try {
       loading.value = true
-      clearError()
 
       await apiService.deleteProduct(id)
 
@@ -191,9 +202,15 @@ export const useProductsStore = defineStore('products', () => {
         currentProduct.value = null
       }
 
+      notify.success('Produit supprimé avec succès', 'Catalogue', { duration: 3000 })
       return { success: true }
     } catch (err: any) {
-      setError(err.message || 'Erreur lors de la suppression du produit')
+      notify.error(err.message || 'Erreur lors de la suppression du produit', 'Catalogue', {
+        action: {
+          label: 'Réessayer',
+          callback: () => deleteProduct(id)
+        }
+      })
       return { success: false, error: err.message }
     } finally {
       loading.value = false
@@ -205,7 +222,6 @@ export const useProductsStore = defineStore('products', () => {
     products,
     currentProduct,
     loading,
-    error,
     filters,
     pagination,
 
@@ -221,8 +237,6 @@ export const useProductsStore = defineStore('products', () => {
     updateProduct,
     deleteProduct,
     setFilters,
-    clearFilters,
-    setError,
-    clearError
+    clearFilters
   }
 })

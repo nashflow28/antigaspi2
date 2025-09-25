@@ -909,7 +909,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, reactive, watch } from 'vue'
 import { useAuthStore } from '@/stores/auth'
-import { useNotificationStore } from '@/stores/notification'
+import { notify } from '@/composables/useNotifications'
 import {
   UserIcon,
   HomeIcon,
@@ -959,7 +959,7 @@ ChartJS.register(
 const authStore = useAuthStore()
 const user = computed(() => authStore.user)
 
-const notificationStore = useNotificationStore()
+// Notification store removed - using useNotifications composable
 const notificationSettings = reactive({
   email: true,
   sms: false,
@@ -1346,10 +1346,10 @@ const persistNotificationPreferences = async () => {
       await notificationStore.ensurePushSubscription()
     }
 
-    notificationStore.show('success', 'Notifications', 'Préférences de notification mises à jour')
+    notify.success('Préférences de notification mises à jour', 'Notifications')
   } catch (error: any) {
     const message = error?.message || 'Impossible de mettre à jour vos notifications pour le moment.'
-    notificationStore.show('error', 'Notifications', message)
+    notify.error(message, 'Notifications')
   } finally {
     savingNotifications.value = false
   }

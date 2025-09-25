@@ -2,12 +2,13 @@ import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import type { User, LoginCredentials, RegisterData } from '@/types'
 import { apiService } from '@/services/api'
+import { notify } from '@/composables/useNotifications'
 
 export const useAuthStore = defineStore('auth', () => {
   const user = ref<User | null>(null)
   const token = ref<string | null>(localStorage.getItem('auth_token'))
   const loading = ref(false)
-  const error = ref<string | null>(null)
+  // error ref removed - using useNotifications composable
 
   // Initialize user from localStorage if available
   const initUser = () => {
@@ -30,16 +31,9 @@ export const useAuthStore = defineStore('auth', () => {
   const isMerchant = computed(() => user.value?.role === 'merchant')
   const isAdmin = computed(() => user.value?.role === 'admin')
 
-  const setError = (message: string) => {
-    error.value = message
-    setTimeout(() => {
-      error.value = null
-    }, 5000)
-  }
+  // setError removed - using useNotifications composable
 
-  const clearError = () => {
-    error.value = null
-  }
+  // clearError removed - using useNotifications composable
 
   const setAuth = (authToken: string, userData: User) => {
     token.value = authToken
@@ -58,15 +52,20 @@ export const useAuthStore = defineStore('auth', () => {
   const login = async (credentials: LoginCredentials) => {
     try {
       loading.value = true
-      clearError()
 
       const response = await apiService.login(credentials)
 
       setAuth(response.data.token, response.data.user)
+      notify.success('Connexion réussie', 'Authentification')
 
       return { success: true }
     } catch (err: any) {
-      setError(err.message || 'Erreur de connexion')
+      notify.error(err.message || 'Erreur de connexion', 'Authentification', {
+        onAction: {
+          label: 'Réessayer',
+          callback: () => login(credentials)
+        }
+      })
       return { success: false, error: err.message }
     } finally {
       loading.value = false
@@ -76,15 +75,20 @@ export const useAuthStore = defineStore('auth', () => {
   const register = async (data: RegisterData) => {
     try {
       loading.value = true
-      clearError()
 
       const response = await apiService.register(data)
 
       setAuth(response.data.token, response.data.user)
+      notify.success('Inscription réussie', 'Bienvenue !')
 
       return { success: true }
     } catch (err: any) {
-      setError(err.message || 'Erreur d\'inscription')
+      notify.error(err.message || 'Erreur d\'inscription', 'Inscription', {
+        onAction: {
+          label: 'Réessayer',
+          callback: () => register(data)
+        }
+      })
       return { success: false, error: err.message }
     } finally {
       loading.value = false
@@ -105,6 +109,7 @@ export const useAuthStore = defineStore('auth', () => {
       }
     } finally {
       clearAuth()
+      notify.info('Vous avez \u00e9t\u00e9 d\u00e9connect\u00e9', 'Au revoir !')
       loading.value = false
     }
   }
@@ -118,6 +123,7 @@ export const useAuthStore = defineStore('auth', () => {
       user.value = response.data
     } catch (err: any) {
       console.error('Failed to get current user:', err.message)
+      notify.error('Session expir\u00e9e, veuillez vous reconnecter', 'Authentification')
       clearAuth()
     } finally {
       loading.value = false
@@ -135,7 +141,6 @@ export const useAuthStore = defineStore('auth', () => {
     user,
     token,
     loading,
-    error,
 
     // Getters
     isAuthenticated,
@@ -148,8 +153,6 @@ export const useAuthStore = defineStore('auth', () => {
     register,
     logout,
     getCurrentUser,
-    initAuth,
-    setError,
-    clearError
+    initAuth
   }
 })

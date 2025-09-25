@@ -368,7 +368,7 @@
             <div class="ml-4 flex-shrink-0 flex">
               <button
                 class="bg-white rounded-md inline-flex text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                @click="notificationStore.remove(notification.id)"
+                @click="notify.removeNotification(notification.id)"
               >
                 <span class="sr-only">Fermer</span>
                 <XMarkIcon class="h-5 w-5" />
@@ -384,7 +384,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import { useAuthStore } from '@/stores/auth'
-import { useNotificationStore } from '@/stores/notification'
+import { notify } from '@/composables/useNotifications'
 import AdminModal from '@/components/ui/AdminModal.vue'
 import DashboardLayout from '@/components/ui/DashboardLayout.vue'
 import { useDashboardLayout } from '@/composables/useDashboardLayout'
@@ -426,7 +426,7 @@ interface CategoryStats {
 }
 
 const authStore = useAuthStore()
-const notificationStore = useNotificationStore()
+// Notification store removed - using useNotifications composable
 const { sidebar, header } = useDashboardLayout('admin')
 
 // State
@@ -509,7 +509,7 @@ const loadCategories = async () => {
     }
   } catch (error) {
     console.error('Error loading categories:', error)
-    notificationStore.show('error', 'Erreur', 'Impossible de charger les catégories')
+    notify.error('Impossible de charger les catégories', 'Erreur')
   } finally {
     loading.value = false
   }
@@ -598,7 +598,7 @@ const saveCategory = async () => {
     const data = await response.json()
 
     if (data.success) {
-      notificationStore.show('success', 'Succès', data.message)
+      notify.success(data.message, 'Succès')
       closeModal()
       await loadCategories()
       await loadStats()
@@ -607,7 +607,7 @@ const saveCategory = async () => {
     }
   } catch (error) {
     console.error('Error saving category:', error)
-    notificationStore.show('error', 'Erreur', error instanceof Error ? error.message : 'Erreur inconnue')
+    notify.error(error instanceof Error ? error.message : 'Erreur inconnue', 'Erreur')
   } finally {
     saving.value = false
   }
@@ -615,7 +615,7 @@ const saveCategory = async () => {
 
 const deleteCategory = async (category: Category) => {
   if ((category.products_count ?? 0) > 0) {
-    notificationStore.show('warning', 'Attention', 'Impossible de supprimer une catégorie qui contient des produits')
+    notify.warning('Impossible de supprimer une catégorie qui contient des produits', 'Attention')
     return
   }
 
@@ -644,7 +644,7 @@ const deleteCategory = async (category: Category) => {
       const data = await response.json()
 
       if (data.success) {
-        notificationStore.show('success', 'Succès', data.message)
+        notify.success(data.message, 'Succès')
         await loadCategories()
         await loadStats()
       } else {
@@ -652,7 +652,7 @@ const deleteCategory = async (category: Category) => {
       }
     } catch (error) {
       console.error('Error deleting category:', error)
-      notificationStore.show('error', 'Erreur', error instanceof Error ? error.message : 'Erreur inconnue')
+      notify.error(error instanceof Error ? error.message : 'Erreur inconnue', 'Erreur')
     }
   }
 }
@@ -672,7 +672,7 @@ const toggleCategoryStatus = async (category: Category) => {
     const data = await response.json()
 
     if (data.success) {
-      notificationStore.show('success', 'Succès', data.message)
+      notify.success(data.message, 'Succès')
       category.is_active = !category.is_active
       await loadStats()
     } else {
@@ -680,7 +680,7 @@ const toggleCategoryStatus = async (category: Category) => {
     }
   } catch (error) {
     console.error('Error toggling status:', error)
-    notificationStore.show('error', 'Erreur', error instanceof Error ? error.message : 'Erreur inconnue')
+    notify.error(error instanceof Error ? error.message : 'Erreur inconnue', 'Erreur')
   }
 }
 

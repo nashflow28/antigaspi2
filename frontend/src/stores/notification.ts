@@ -10,14 +10,7 @@ import {
   type ServerNotification
 } from '@/services/notificationService'
 
-export interface ToastNotification {
-  id: string
-  type: 'success' | 'error' | 'warning' | 'info'
-  title: string
-  message: string
-  duration?: number
-  show?: boolean
-}
+// ToastNotification interface removed - using useNotifications composable
 
 interface PaginationState {
   currentPage: number
@@ -33,7 +26,7 @@ interface ChannelPreferences {
 }
 
 export const useNotificationStore = defineStore('notification', () => {
-  const toasts = ref<ToastNotification[]>([])
+  // toasts removed - using useNotifications composable
   const serverNotifications = ref<ServerNotification[]>([])
   const pagination = reactive<PaginationState>({
     currentPage: 1,
@@ -52,41 +45,11 @@ export const useNotificationStore = defineStore('notification', () => {
 
   const authStore = useAuthStore()
 
-  const setToast = (
-    type: ToastNotification['type'],
-    title: string,
-    message: string,
-    duration = 5000
-  ) => {
-    const id = Date.now().toString()
-    const notification: ToastNotification = {
-      id,
-      type,
-      title,
-      message,
-      duration,
-      show: true
-    }
+  // setToast removed - using useNotifications composable
 
-    toasts.value.push(notification)
+  // removeToast removed - using useNotifications composable
 
-    if (duration > 0) {
-      setTimeout(() => removeToast(id), duration)
-    }
-
-    return id
-  }
-
-  const removeToast = (id: string) => {
-    const index = toasts.value.findIndex(n => n.id === id)
-    if (index > -1) {
-      toasts.value.splice(index, 1)
-    }
-  }
-
-  const clearToasts = () => {
-    toasts.value = []
-  }
+  // clearToasts removed - using useNotifications composable
 
   const hydratePreferencesFromUser = () => {
     if (!authStore.user) return
@@ -168,17 +131,11 @@ export const useNotificationStore = defineStore('notification', () => {
 
   return {
     // state
-    toasts,
     serverNotifications,
     pagination,
     loading,
     preferences,
     unreadCount,
-
-    // toast helpers
-    show: setToast,
-    remove: removeToast,
-    clear: clearToasts,
 
     // server helpers
     hydratePreferencesFromUser,
