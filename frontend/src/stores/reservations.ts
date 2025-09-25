@@ -2,12 +2,12 @@ import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import type { Reservation, ReservationCreationPayload, Payment } from '@/types'
 import { apiService } from '@/services/api'
+import { notify } from '@/composables/useNotifications'
 
 export const useReservationsStore = defineStore('reservations', () => {
   const reservations = ref<Reservation[]>([])
   const merchantReservations = ref<Reservation[]>([])
   const loading = ref(false)
-  const error = ref<string | null>(null)
 
   const normalizeReservation = (reservation: Reservation): Reservation => {
     const normalizedQuantity = reservation.quantity ?? reservation.quantity_reserved ?? 0
@@ -52,28 +52,45 @@ export const useReservationsStore = defineStore('reservations', () => {
     merchantReservations.value.filter(r => r.status === 'confirmed')
   )
 
-  const setError = (message: string) => {
-    error.value = message
-    setTimeout(() => {
-      error.value = null
-    }, 5000)
-  }
+  const createRetryableNotification = (
+    message: string,
+    retryOperation: () => Promise<unknown>
+  ) => {
+    let hasClosed = false
 
-  const clearError = () => {
-    error.value = null
+    notify.error(message, 'Réservations', {
+      action: {
+        label: 'Réessayer',
+        callback: async () => {
+          if (loading.value) return
+
+          try {
+            await retryOperation()
+          } catch (retryError) {
+            console.error('Reservation retry failed:', retryError)
+          }
+        }
+      },
+      onClose: () => {
+        if (hasClosed) return
+        hasClosed = true
+      }
+    })
   }
 
   const fetchReservations = async () => {
     try {
       loading.value = true
-      clearError()
 
       const response = await apiService.getReservations()
       reservations.value = response.data.map(normalizeReservation)
 
       return { success: true }
     } catch (err: any) {
-      setError(err.message || 'Erreur lors du chargement des réservations')
+      createRetryableNotification(
+        err.message || 'Erreur lors du chargement des réservations',
+        () => fetchReservations()
+      )
       return { success: false, error: err.message }
     } finally {
       loading.value = false
@@ -83,7 +100,6 @@ export const useReservationsStore = defineStore('reservations', () => {
   const createReservation = async (payload: ReservationCreationPayload) => {
     try {
       loading.value = true
-      clearError()
 
       const response = await apiService.createReservation(payload)
 
@@ -93,9 +109,14 @@ export const useReservationsStore = defineStore('reservations', () => {
 
       const payment: Payment | null = response.payment ?? null
 
+      notify.success('Réservation créée avec succès', 'Réservations', { duration: 3000 })
+
       return { success: true, data: normalizedReservation, payment }
     } catch (err: any) {
-      setError(err.message || 'Erreur lors de la réservation')
+      createRetryableNotification(
+        err.message || 'Erreur lors de la réservation',
+        () => createReservation(payload)
+      )
       return { success: false, error: err.message }
     } finally {
       loading.value = false
@@ -105,7 +126,6 @@ export const useReservationsStore = defineStore('reservations', () => {
   const cancelReservation = async (id: number) => {
     try {
       loading.value = true
-      clearError()
 
       await apiService.cancelReservation(id)
 
@@ -116,9 +136,14 @@ export const useReservationsStore = defineStore('reservations', () => {
         reservation.cancelled_at = new Date().toISOString()
       }
 
+      notify.success('Réservation annulée', 'Réservations', { duration: 3000 })
+
       return { success: true }
     } catch (err: any) {
-      setError(err.message || 'Erreur lors de l\'annulation')
+      createRetryableNotification(
+        err.message || 'Erreur lors de l\'annulation',
+        () => cancelReservation(id)
+      )
       return { success: false, error: err.message }
     } finally {
       loading.value = false
@@ -128,14 +153,16 @@ export const useReservationsStore = defineStore('reservations', () => {
   const fetchMerchantReservations = async () => {
     try {
       loading.value = true
-      clearError()
 
       const response = await apiService.getMerchantReservations()
       merchantReservations.value = response.data.map(normalizeReservation)
 
       return { success: true }
     } catch (err: any) {
-      setError(err.message || 'Erreur lors du chargement des réservations')
+      createRetryableNotification(
+        err.message || 'Erreur lors du chargement des réservations',
+        () => fetchMerchantReservations()
+      )
       return { success: false, error: err.message }
     } finally {
       loading.value = false
@@ -145,7 +172,6 @@ export const useReservationsStore = defineStore('reservations', () => {
   const confirmReservation = async (id: number) => {
     try {
       loading.value = true
-      clearError()
 
       const response = await apiService.confirmReservation(id)
       const normalizedReservation = normalizeReservation(response.data)
@@ -156,9 +182,14 @@ export const useReservationsStore = defineStore('reservations', () => {
         merchantReservations.value[index] = normalizedReservation
       }
 
+      notify.success('Réservation confirmée', 'Réservations', { duration: 3000 })
+
       return { success: true, data: normalizedReservation }
     } catch (err: any) {
-      setError(err.message || 'Erreur lors de la confirmation')
+      createRetryableNotification(
+        err.message || 'Erreur lors de la confirmation',
+        () => confirmReservation(id)
+      )
       return { success: false, error: err.message }
     } finally {
       loading.value = false
@@ -180,7 +211,6 @@ export const useReservationsStore = defineStore('reservations', () => {
     reservations,
     merchantReservations,
     loading,
-    error,
 
     // Getters
     pendingReservations,
@@ -198,8 +228,6 @@ export const useReservationsStore = defineStore('reservations', () => {
     fetchMerchantReservations,
     confirmReservation,
     getReservationById,
-    clearReservations,
-    setError,
-    clearError
+    clearReservations
   }
 })
