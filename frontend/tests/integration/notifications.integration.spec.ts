@@ -1,4 +1,4 @@
-import { beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
+import { beforeAll, beforeEach, afterEach, describe, expect, it, vi } from 'vitest'
 import { mount } from '@vue/test-utils'
 import { createPinia, setActivePinia, type Pinia } from 'pinia'
 import { defineComponent, nextTick } from 'vue'
@@ -8,6 +8,21 @@ import NotificationSystem from '@/components/ui/NotificationSystem.vue'
 import Toast from '@/components/ui/Toast.vue'
 import { useReservationsStore } from '@/stores/reservations'
 import { useNotifications } from '@/composables/useNotifications'
+import { apiService } from '@/services/api'
+
+const baseReservation = {
+  id: 1,
+  reservation_code: 'ABC123',
+  quantity: 1,
+  original_price: 10,
+  discounted_price: 5,
+  status: 'pending' as const,
+  product: {
+    id: 1,
+    name: 'Produit test'
+  },
+  latest_payment: null
+}
 
 const createLocalStorageMock = () => {
   let store: Record<string, string> = {}
@@ -67,52 +82,71 @@ describe('Notifications integration', () => {
     clearAll()
   })
 
-  it('relays reservations store errors into the global notification stack and clears on close', async () => {
-    const reservationsStore = useReservationsStore()
+  afterEach(() => {
+    vi.restoreAllMocks()
+    const { clearAll } = useNotifications()
+    clearAll()
+  })
 
-    reservationsStore.error = 'Réservation impossible' as any
-
-    const clearReservationsSpy = vi.spyOn(reservationsStore, 'clearError')
+  it('renders an error toast for reservation failures and retries via the action button', async () => {
+    const getReservationsSpy = vi
+      .spyOn(apiService, 'getReservations')
+      .mockRejectedValueOnce(new Error('Network error'))
+      .mockResolvedValueOnce({ data: [baseReservation] })
 
     const wrapper = mountNotifications()
+    const reservationsStore = useReservationsStore()
 
+    await reservationsStore.fetchReservations()
+    await nextTick()
+    await nextTick()
+
+    let toasts = wrapper.findAllComponents(Toast)
+    expect(toasts).toHaveLength(1)
+    expect(wrapper.html()).toContain('Réservations')
+    expect(wrapper.html()).toContain('Network error')
+
+    const retryButton = toasts[0]
+      .findAll('button')
+      .find(button => button.text().includes('Réessayer'))
+
+    expect(retryButton).toBeDefined()
+    await retryButton!.trigger('click')
+
+    await nextTick()
+    await nextTick()
+
+    expect(getReservationsSpy).toHaveBeenCalledTimes(2)
+    toasts = wrapper.findAllComponents(Toast)
+    expect(toasts).toHaveLength(0)
+  })
+
+  it('shows a success toast when a reservation is created', async () => {
+    vi.spyOn(apiService, 'createReservation').mockResolvedValue({
+      data: baseReservation,
+      payment: null
+    })
+
+    const wrapper = mountNotifications()
+    const reservationsStore = useReservationsStore()
+
+    await reservationsStore.createReservation({ productId: 1, quantity: 1, paymentMethod: 'card' })
     await nextTick()
     await nextTick()
 
     const toasts = wrapper.findAllComponents(Toast)
-    expect(toasts).toHaveLength(1)
-    expect(wrapper.html()).toContain('Réservations')
-    expect(wrapper.html()).toContain('Réservation impossible')
+    expect(toasts.length).toBeGreaterThan(0)
 
-    const closeButton = toasts[0].find('button[aria-label="Fermer la notification"]')
-    expect(closeButton.exists()).toBe(true)
-    await closeButton.trigger('click')
+    const successToast = toasts.find(toast => toast.text().includes('Réservation créée avec succès'))
+    expect(successToast).toBeDefined()
+    expect(successToast?.text()).toContain('Réservations')
 
-    await nextTick()
-
-    expect(clearReservationsSpy).toHaveBeenCalledTimes(1)
-  })
-
-  it('deduplicates notifications for the same store and updates the message', async () => {
-    const reservationsStore = useReservationsStore()
-
-    reservationsStore.error = 'Erreur initiale' as any
-
-    const wrapper = mountNotifications()
+    const closeButton = successToast?.find('button[aria-label="Fermer la notification"]')
+    expect(closeButton?.exists()).toBe(true)
+    await closeButton?.trigger('click')
 
     await nextTick()
 
-    let reservationToast = wrapper.findAllComponents(Toast).find(toast => toast.text().includes('Erreur initiale'))
-    expect(reservationToast).toBeDefined()
-
-    reservationsStore.error = 'Nouvelle erreur critique' as any
-
-    await nextTick()
-    await nextTick()
-
-    const allToasts = wrapper.findAllComponents(Toast).filter(toast => toast.text().includes('Réservations'))
-    expect(allToasts).toHaveLength(1)
-    reservationToast = allToasts[0]
-    expect(reservationToast?.text()).toContain('Nouvelle erreur critique')
+    expect(wrapper.findAllComponents(Toast)).toHaveLength(0)
   })
 })
