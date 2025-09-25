@@ -23,8 +23,10 @@ describe('NotificationSystem', () => {
       title: 'Réservation confirmée',
       message: 'Votre panier est prêt.',
       autoClose: false,
-      actionLabel: 'Voir',
-      onAction,
+      action: {
+        label: 'Voir',
+        callback: onAction
+      },
       onClose
     })
 

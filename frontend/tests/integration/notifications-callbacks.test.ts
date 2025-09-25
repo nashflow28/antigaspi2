@@ -18,7 +18,7 @@ describe('Notifications Callbacks - Integration Tests', () => {
   })
 
   describe('Callback Execution', () => {
-    it('should execute onAction callback when action is triggered', async () => {
+    it('should execute action callback when action is triggered', async () => {
       const mockCallback = vi.fn()
 
       const id = notifications.error('Test error', 'Test Title', {
@@ -29,7 +29,7 @@ describe('Notifications Callbacks - Integration Tests', () => {
       })
 
       // Trigger the action
-      notifications.handleAction(id)
+      await notifications.handleAction(id)
 
       expect(mockCallback).toHaveBeenCalledOnce()
     })
@@ -95,7 +95,7 @@ describe('Notifications Callbacks - Integration Tests', () => {
       })
 
       // Trigger action (which should also close the notification)
-      notifications.handleAction(id)
+      await notifications.handleAction(id)
 
       expect(mockAction).toHaveBeenCalledOnce()
       expect(mockOnClose).toHaveBeenCalledOnce()
@@ -142,7 +142,7 @@ describe('Notifications Callbacks - Integration Tests', () => {
       })
 
       // Should not throw
-      expect(() => notifications.handleAction(id)).not.toThrow()
+      await expect(notifications.handleAction(id)).resolves.toBeUndefined()
 
       expect(faultyCallback).toHaveBeenCalledOnce()
       consoleSpy.mockRestore()

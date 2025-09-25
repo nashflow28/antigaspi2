@@ -9,8 +9,10 @@ export interface Notification {
   duration?: number
   progress?: number
   timer?: NodeJS.Timeout
-  actionLabel?: string
-  onAction?: () => void
+  action?: {
+    label: string
+    callback: () => void | Promise<void>
+  }
   onClose?: () => void
 }
 
@@ -69,11 +71,23 @@ export const useNotifications = () => {
     }
   }
 
-  const handleAction = (id: string) => {
+  const executeActionCallback = async (
+    callback?: () => void | Promise<void>
+  ) => {
+    if (!callback) return
+
+    try {
+      await callback()
+    } catch (error) {
+      console.error('Error executing notification action callback:', error)
+    }
+  }
+
+  const handleAction = async (id: string) => {
     const notification = notifications.value.find(n => n.id === id)
     if (!notification) return
 
-    notification.onAction?.()
+    await executeActionCallback(notification.action?.callback)
     removeNotification(id)
   }
 

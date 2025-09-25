@@ -9,7 +9,7 @@ describe('useNotifications', () => {
     vi.clearAllMocks()
   })
 
-  it('adds a notification and removes it via handleAction', () => {
+  it('adds a notification and removes it via handleAction', async () => {
     const { addNotification, notifications, handleAction } = useNotifications()
 
     const onAction = vi.fn()
@@ -20,14 +20,16 @@ describe('useNotifications', () => {
       title: 'Succès',
       message: 'Action effectuée',
       autoClose: false,
-      actionLabel: 'Annuler',
-      onAction,
+      action: {
+        label: 'Annuler',
+        callback: onAction
+      },
       onClose
     })
 
     expect(notifications.value).toHaveLength(1)
 
-    handleAction(id)
+    await handleAction(id)
 
     expect(onAction).toHaveBeenCalledTimes(1)
     expect(onClose).toHaveBeenCalledTimes(1)
