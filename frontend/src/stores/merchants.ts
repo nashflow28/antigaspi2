@@ -2,7 +2,7 @@ import { defineStore } from 'pinia'
 import { computed, reactive, ref } from 'vue'
 import type { Merchant } from '@/types'
 import { merchantService, type MerchantDetail, type MerchantWithLocation } from '@/services/merchantService'
-import { notify } from '@/composables/useNotifications'
+import { notify, type Notification } from '@/composables/useNotifications'
 
 interface MerchantFetchOptions {
   withLocation?: boolean
@@ -14,9 +14,16 @@ interface MerchantFetchOptions {
 interface MerchantState {
   list: MerchantWithLocation[]
   loading: boolean
-  error: string | null
   lastFetchedAt: number | null
   lastFetchWithLocation: boolean
+}
+
+interface MerchantNotificationPayload {
+  title?: string
+  message: string
+  action?: Notification['action']
+  onClose?: Notification['onClose']
+  operation?: string
 }
 
 const CACHE_DURATION = 5 * 60 * 1000 // 5 minutes
@@ -85,7 +92,6 @@ export const useMerchantsStore = defineStore('merchants', () => {
   const state = reactive<MerchantState>({
     list: [],
     loading: false,
-    error: null,
     lastFetchedAt: null,
     lastFetchWithLocation: false,
   })
@@ -93,7 +99,7 @@ export const useMerchantsStore = defineStore('merchants', () => {
   const detailsCache = ref<Map<number, MerchantDetail>>(new Map())
   const currentMerchantId = ref<number | null>(null)
   const detailLoading = ref(false)
-  const detailError = ref<string | null>(null)
+  const pendingOperation = ref<string | null>(null)
 
   const merchants = computed(() => state.list)
   const hasMerchants = computed(() => state.list.length > 0)
@@ -109,16 +115,55 @@ export const useMerchantsStore = defineStore('merchants', () => {
     return Date.now() - state.lastFetchedAt > CACHE_DURATION
   }
 
-  const setError = (message: string, silent?: boolean) => {
-    state.error = message
-    if (!silent) {
-      notify.error(message, 'Commerçants')
+  const emitMerchantNotification = (
+    type: 'error' | 'info' | 'success',
+    payload: MerchantNotificationPayload
+  ) => {
+    const { title = 'Commerçants', message, action, onClose, operation } = payload
+
+    if (type === 'error' && operation) {
+      pendingOperation.value = operation
+    } else if (type !== 'error') {
+      pendingOperation.value = null
     }
+
+    const wrappedAction = action
+      ? {
+          label: action.label,
+          callback: async () => {
+            await action.callback()
+            if (operation && pendingOperation.value === operation) {
+              pendingOperation.value = null
+            }
+          },
+        }
+      : undefined
+
+    const wrappedOnClose = () => {
+      if (operation && pendingOperation.value === operation) {
+        pendingOperation.value = null
+      }
+      onClose?.()
+    }
+
+    const options: Partial<Notification> = {
+      action: wrappedAction,
+      onClose: wrappedOnClose,
+    }
+
+    if (type === 'error') {
+      return notify.error(message, title, options)
+    }
+
+    if (type === 'info') {
+      return notify.info(message, title, options)
+    }
+
+    return notify.success(message, title, options)
   }
 
-  const clearError = () => {
-    state.error = null
-  }
+  const emitMerchantError = (payload: MerchantNotificationPayload) =>
+    emitMerchantNotification('error', payload)
 
   const fetchMerchants = async (options: MerchantFetchOptions = {}) => {
     const { withLocation = false, force = false, params, silent } = options
@@ -128,7 +173,6 @@ export const useMerchantsStore = defineStore('merchants', () => {
     }
 
     state.loading = true
-    clearError()
 
     try {
       const response = withLocation
@@ -144,10 +188,28 @@ export const useMerchantsStore = defineStore('merchants', () => {
       state.lastFetchedAt = Date.now()
       state.lastFetchWithLocation = withLocation
 
+      if (pendingOperation.value === 'fetch-merchants') {
+        pendingOperation.value = null
+      }
+
       return { success: true, data: state.list }
     } catch (error: any) {
       const message = error?.message || 'Erreur lors du chargement des commerçants'
-      setError(message, silent)
+      emitMerchantError({
+        message,
+        operation: 'fetch-merchants',
+        action: {
+          label: 'Réessayer',
+          callback: async () => {
+            await fetchMerchants({ ...options, force: true })
+          },
+        },
+        onClose: () => {
+          if (!silent) {
+            pendingOperation.value = null
+          }
+        },
+      })
       return { success: false, error: message }
     } finally {
       state.loading = false
@@ -164,7 +226,6 @@ export const useMerchantsStore = defineStore('merchants', () => {
     }
 
     detailLoading.value = true
-    detailError.value = null
 
     try {
       const response = await merchantService.getMerchantDetail(id)
@@ -186,13 +247,23 @@ export const useMerchantsStore = defineStore('merchants', () => {
       detailsCache.value.set(id, merchant)
       currentMerchantId.value = id
 
+      if (pendingOperation.value === 'fetch-merchant-detail') {
+        pendingOperation.value = null
+      }
+
       return { success: true, data: merchant }
     } catch (error: any) {
       const message = error?.message || 'Erreur lors du chargement du commerçant'
-      detailError.value = message
-      if (!silent) {
-        notify.error(message, 'Commerçants')
-      }
+      emitMerchantError({
+        message,
+        operation: 'fetch-merchant-detail',
+        action: {
+          label: 'Réessayer',
+          callback: async () => {
+            await fetchMerchantDetail(id, { force: true, silent })
+          },
+        },
+      })
       return { success: false, error: message }
     } finally {
       detailLoading.value = false
@@ -213,17 +284,15 @@ export const useMerchantsStore = defineStore('merchants', () => {
     state.lastFetchWithLocation = false
     detailsCache.value.clear()
     currentMerchantId.value = null
-    state.error = null
-    detailError.value = null
+    pendingOperation.value = null
   }
 
   return {
     // State
     merchants,
     loading: computed(() => state.loading),
-    error: computed(() => state.error),
     detailLoading: computed(() => detailLoading.value),
-    detailError: computed(() => detailError.value),
+    pendingOperation,
     currentMerchant,
 
     // Getters

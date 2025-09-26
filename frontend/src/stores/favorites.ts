@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 import { ref, computed, watch } from 'vue'
 import type { Product, Merchant } from '@/types'
-import { notify } from '@/composables/useNotifications'
+import { notify, type Notification } from '@/composables/useNotifications'
 
 export type FavoriteType = 'product' | 'merchant'
 
@@ -15,6 +15,14 @@ export interface FavoriteItem {
   product?: Product | null
   tags?: string[]
   addedAt: string
+}
+
+interface FavoritesNotificationPayload {
+  title?: string
+  message: string
+  action?: Notification['action']
+  onClose?: Notification['onClose']
+  operation?: string
 }
 
 const STORAGE_KEY = 'antigaspi_favorites'
@@ -44,7 +52,7 @@ export const useFavoritesStore = defineStore('favorites', () => {
   const items = ref<FavoriteItem[]>([])
   const isHydrated = ref(false)
   const loading = ref(false)
-  const error = ref<string | null>(null)
+  const pendingOperation = ref<string | null>(null)
 
   const favoritesCount = computed(() => items.value.length)
   const hasFavorites = computed(() => items.value.length > 0)
@@ -58,6 +66,60 @@ export const useFavoritesStore = defineStore('favorites', () => {
     isHydrated.value = true
   }
 
+  const emitFavoritesNotification = (
+    type: 'error' | 'info' | 'success',
+    payload: FavoritesNotificationPayload
+  ) => {
+    const { title = 'Favoris', message, action, onClose, operation } = payload
+
+    if (type === 'error' && operation) {
+      pendingOperation.value = operation
+    } else if (type !== 'error') {
+      pendingOperation.value = null
+    }
+
+    const wrappedAction = action
+      ? {
+          label: action.label,
+          callback: async () => {
+            await action.callback()
+            if (operation && pendingOperation.value === operation) {
+              pendingOperation.value = null
+            }
+          },
+        }
+      : undefined
+
+    const wrappedOnClose = () => {
+      if (operation && pendingOperation.value === operation) {
+        pendingOperation.value = null
+      }
+      onClose?.()
+    }
+
+    const options: Partial<Notification> = {
+      action: wrappedAction,
+      onClose: wrappedOnClose,
+    }
+
+    if (type === 'error') {
+      return notify.error(message, title, options)
+    }
+
+    if (type === 'info') {
+      return notify.info(message, title, options)
+    }
+
+    return notify.success(message, title, options)
+  }
+
+  const emitFavoritesError = (payload: FavoritesNotificationPayload) =>
+    emitFavoritesNotification('error', payload)
+  const emitFavoritesInfo = (payload: FavoritesNotificationPayload) =>
+    emitFavoritesNotification('info', payload)
+  const emitFavoritesSuccess = (payload: FavoritesNotificationPayload) =>
+    emitFavoritesNotification('success', payload)
+
   const persist = () => {
     if (!isHydrated.value || typeof window === 'undefined') {
       return
@@ -65,9 +127,18 @@ export const useFavoritesStore = defineStore('favorites', () => {
 
     try {
       window.localStorage.setItem(STORAGE_KEY, JSON.stringify(items.value))
+      if (pendingOperation.value === 'persist') {
+        pendingOperation.value = null
+      }
     } catch (storageError) {
-      error.value = 'Impossible de sauvegarder vos favoris'
-      notify.error(error.value, 'Favoris')
+      emitFavoritesError({
+        message: 'Impossible de sauvegarder vos favoris',
+        operation: 'persist',
+        action: {
+          label: 'Réessayer',
+          callback: () => persist(),
+        },
+      })
     }
   }
 
@@ -82,7 +153,9 @@ export const useFavoritesStore = defineStore('favorites', () => {
 
     const existingIndex = findIndex(payload.id, payload.type)
     if (existingIndex !== -1) {
-      notify.info('Cet élément est déjà dans vos favoris', 'Favoris')
+      emitFavoritesInfo({
+        message: 'Cet élément est déjà dans vos favoris',
+      })
       return { success: false as const, reason: 'already_exists' as const }
     }
 
@@ -92,7 +165,9 @@ export const useFavoritesStore = defineStore('favorites', () => {
     }
 
     items.value = [favorite, ...items.value]
-    notify.success('Ajouté à vos favoris', 'Favoris')
+    emitFavoritesSuccess({
+      message: 'Ajouté à vos favoris',
+    })
     return { success: true as const, data: favorite }
   }
 
@@ -101,12 +176,26 @@ export const useFavoritesStore = defineStore('favorites', () => {
 
     const index = findIndex(id, type)
     if (index === -1) {
-      notify.error('Élément introuvable dans vos favoris', 'Favoris')
+      emitFavoritesError({
+        message: 'Élément introuvable dans vos favoris',
+        operation: 'remove',
+        action: {
+          label: 'Réessayer',
+          callback: async () => {
+            removeFavorite(id, type)
+          },
+        },
+      })
       return { success: false as const, reason: 'not_found' as const }
     }
 
     const [removed] = items.value.splice(index, 1)
-    notify.info(`${removed.name} retiré de vos favoris`, 'Favoris')
+    if (pendingOperation.value === 'remove') {
+      pendingOperation.value = null
+    }
+    emitFavoritesInfo({
+      message: `${removed.name} retiré de vos favoris`,
+    })
     return { success: true as const }
   }
 
@@ -117,7 +206,9 @@ export const useFavoritesStore = defineStore('favorites', () => {
     }
 
     items.value.splice(index, 1)
-    notify.info('Retiré de vos favoris', 'Favoris')
+    emitFavoritesInfo({
+      message: 'Retiré de vos favoris',
+    })
     return { success: true as const, toggledOff: true as const }
   }
 
@@ -127,7 +218,9 @@ export const useFavoritesStore = defineStore('favorites', () => {
 
   const clearFavorites = () => {
     items.value = []
-    notify.info('Tous vos favoris ont été effacés', 'Favoris')
+    emitFavoritesInfo({
+      message: 'Tous vos favoris ont été effacés',
+    })
   }
 
   const groupedFavorites = computed(() => {
@@ -143,7 +236,7 @@ export const useFavoritesStore = defineStore('favorites', () => {
   return {
     items,
     loading,
-    error,
+    pendingOperation,
     favoritesCount,
     hasFavorites,
     groupedFavorites,
