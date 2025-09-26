@@ -194,7 +194,7 @@
                   ></textarea>
                 </div>
               </div>
-            </div>
+            </Card>
 
             <!-- Étape 2: Informations récupération -->
             <Card v-if="currentStep === 2" class="animate-fade-in-up">
