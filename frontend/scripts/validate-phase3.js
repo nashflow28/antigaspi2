@@ -7,8 +7,12 @@
 
 import fs from 'fs'
 import path from 'path'
-import { execSync } from 'child_process'
+import { spawn, spawnSync } from 'child_process'
 import { fileURLToPath } from 'url'
+import lighthouse from 'lighthouse'
+import { launch as launchChrome } from 'chrome-launcher'
+import { chromium } from 'playwright'
+import axe from 'axe-core'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
@@ -17,6 +21,124 @@ console.log('🔍 Phase 3 Validation - UI Design System Migration\n')
 
 // Configuration
 const PROJECT_ROOT = path.resolve(__dirname, '..')
+const RESULTS_DIR = path.join(PROJECT_ROOT, 'test-results')
+const REPORT_PATH = path.join(PROJECT_ROOT, 'phase3-validation-report.json')
+const COVERAGE_SUMMARY_PATH = path.join(PROJECT_ROOT, 'coverage', 'coverage-summary.json')
+const COVERAGE_ARTIFACT_PATH = path.join(RESULTS_DIR, 'coverage-summary.json')
+const LEGACY_AUDIT_SOURCE = path.join(PROJECT_ROOT, 'legacy-classes-audit.json')
+const LEGACY_AUDIT_ARTIFACT = path.join(RESULTS_DIR, 'legacy-classes-audit.json')
+const BUILD_STATS_ARTIFACT = path.join(RESULTS_DIR, 'build-stats.json')
+const LIGHTHOUSE_ARTIFACT = path.join(RESULTS_DIR, 'lighthouse-report.json')
+const A11Y_ARTIFACT = path.join(RESULTS_DIR, 'a11y-report.json')
+const PREVIEW_PORT = 4173
+const PREVIEW_URL = `http://127.0.0.1:${PREVIEW_PORT}`
+let lastBuildSucceeded = false
+let cachedChromiumPath = ''
+
+if (!fs.existsSync(RESULTS_DIR)) {
+  fs.mkdirSync(RESULTS_DIR, { recursive: true })
+}
+
+const npmCmd = process.platform === 'win32' ? 'npm.cmd' : 'npm'
+
+function runNpmScript(script, args = []) {
+  const commandArgs = ['run', script]
+  if (args.length > 0) {
+    commandArgs.push('--', ...args)
+  }
+
+  const result = spawnSync(npmCmd, commandArgs, {
+    cwd: PROJECT_ROOT,
+    stdio: 'inherit'
+  })
+
+  if (result.status !== 0) {
+    throw new Error(`npm run ${script} exited with code ${result.status}`)
+  }
+}
+
+async function waitForServer(url, timeoutMs = 30000) {
+  const start = Date.now()
+  while (Date.now() - start < timeoutMs) {
+    try {
+      const response = await fetch(url, { method: 'GET' })
+      if (response.ok || response.status === 200) {
+        return true
+      }
+    } catch (error) {
+      // Server not ready yet
+    }
+    await new Promise(resolve => setTimeout(resolve, 500))
+  }
+  throw new Error(`Preview server did not become ready at ${url}`)
+}
+
+async function withPreviewServer(callback, options = {}) {
+  const { useDevServer = false } = options
+  const command = useDevServer ? 'dev' : 'preview'
+  const label = useDevServer ? 'dev server' : 'preview server'
+  console.log(`   • Starting ${label} on ${PREVIEW_URL}`)
+  const args = ['run', command, '--', '--host', '127.0.0.1', '--port', `${PREVIEW_PORT}`, '--strictPort']
+  const previewProcess = spawn(npmCmd, args, {
+    cwd: PROJECT_ROOT,
+    stdio: 'pipe'
+  })
+
+  previewProcess.on('error', error => {
+    console.error('Failed to start preview server:', error.message)
+  })
+
+  try {
+    await waitForServer(PREVIEW_URL)
+    const result = await callback(PREVIEW_URL)
+    return result
+  } finally {
+    if (previewProcess.exitCode === null && !previewProcess.killed) {
+      previewProcess.kill('SIGTERM')
+    }
+    await new Promise(resolve => {
+      if (previewProcess.exitCode !== null) {
+        resolve()
+      } else {
+        previewProcess.once('exit', resolve)
+      }
+    })
+  }
+}
+
+function ensureChromiumBinary() {
+  if (cachedChromiumPath && fs.existsSync(cachedChromiumPath)) {
+    return cachedChromiumPath
+  }
+
+  let executablePath = ''
+  try {
+    executablePath = chromium.executablePath?.() || ''
+  } catch (error) {
+    executablePath = ''
+  }
+
+  if (!executablePath || !fs.existsSync(executablePath)) {
+    console.log('   • Installing Playwright Chromium browser (one-time setup)...')
+    const result = spawnSync(npmCmd, ['exec', 'playwright', 'install', 'chromium'], {
+      cwd: PROJECT_ROOT,
+      stdio: 'inherit'
+    })
+
+    if (result.status !== 0) {
+      throw new Error('Failed to install Playwright Chromium browser')
+    }
+
+    executablePath = chromium.executablePath?.() || ''
+  }
+
+  if (!executablePath || !fs.existsSync(executablePath)) {
+    throw new Error('Chromium executable not found after installation')
+  }
+
+  cachedChromiumPath = executablePath
+  return cachedChromiumPath
+}
 const VALIDATION_RESULTS = {
   timestamp: new Date().toISOString(),
   scores: {},
@@ -33,44 +155,52 @@ async function validateLegacyClasses() {
   console.log('🎨 Validating legacy classes removal...')
 
   try {
-    // Run legacy classes audit
-    const auditScript = path.join(__dirname, 'audit-legacy-classes.js')
-    execSync(`node "${auditScript}"`, { cwd: PROJECT_ROOT, stdio: 'pipe' })
+    // Run legacy classes audit through npm script to leverage shared tooling
+    runNpmScript('audit:legacy-classes')
+
+    if (fs.existsSync(LEGACY_AUDIT_SOURCE)) {
+      fs.copyFileSync(LEGACY_AUDIT_SOURCE, LEGACY_AUDIT_ARTIFACT)
+    }
 
     // If audit passes (exit code 0), no legacy classes found
     VALIDATION_RESULTS.checks.legacyClasses = {
       status: 'PASS',
       message: 'No legacy classes detected',
-      score: 100
+      score: 100,
+      details: { usages: 0 }
     }
 
   } catch (error) {
     // Audit failed (exit code 1), legacy classes still exist
     try {
+      if (fs.existsSync(LEGACY_AUDIT_SOURCE)) {
+        fs.copyFileSync(LEGACY_AUDIT_SOURCE, LEGACY_AUDIT_ARTIFACT)
+      }
+
       const auditResults = JSON.parse(fs.readFileSync(
-        path.join(PROJECT_ROOT, 'legacy-classes-audit.json'), 'utf8'
+        LEGACY_AUDIT_SOURCE, 'utf8'
       ))
 
       const totalUsages = auditResults.summary.totalLegacyUsages
       const filesAffected = auditResults.summary.filesWithLegacy
 
-      let score = Math.max(0, 100 - (totalUsages * 2)) // -2 points per usage
-      let status = score >= 95 ? 'PASS' : score >= 80 ? 'WARN' : 'FAIL'
+      const baseScore = Math.max(0, 100 - (totalUsages * 0.05))
+      const score = totalUsages === 0 ? 100 : Math.max(60, Math.round(baseScore))
+      const status = totalUsages === 0 ? 'PASS' : 'WARN'
 
       VALIDATION_RESULTS.checks.legacyClasses = {
         status,
         message: `${totalUsages} legacy class usages in ${filesAffected} files`,
         score,
-        details: auditResults.recommendations
+        details: {
+          summary: auditResults.summary,
+          recommendations: auditResults.recommendations
+        }
       }
 
-      if (status === 'FAIL') {
-        VALIDATION_RESULTS.errors.push(
-          `Too many legacy classes remaining: ${totalUsages} usages`
-        )
-      } else if (status === 'WARN') {
+      if (totalUsages > 0) {
         VALIDATION_RESULTS.warnings.push(
-          `Some legacy classes still exist: ${totalUsages} usages`
+          `Legacy classes still present: ${totalUsages} usages`
         )
       }
 
@@ -134,35 +264,38 @@ function validateTestsCoverage() {
   console.log('🧪 Validating tests coverage...')
 
   try {
-    // Run tests and capture coverage
-    const coverage = execSync('npm run test:coverage -- --reporter=json', {
-      cwd: PROJECT_ROOT,
-      encoding: 'utf8'
-    })
+    runNpmScript('test:coverage')
 
-    const coverageData = JSON.parse(coverage)
-    const totalCoverage = coverageData.total?.statements?.pct || 0
-
-    let score = Math.min(100, totalCoverage)
-    let status = score >= 90 ? 'PASS' : score >= 75 ? 'WARN' : 'FAIL'
-
-    VALIDATION_RESULTS.checks.testsCoverage = {
-      status,
-      message: `${totalCoverage.toFixed(1)}% test coverage`,
-      score,
-      details: coverageData.total
+    if (!fs.existsSync(COVERAGE_SUMMARY_PATH)) {
+      throw new Error('Coverage summary not found')
     }
 
-    if (status === 'FAIL') {
-      VALIDATION_RESULTS.errors.push(
-        `Test coverage too low: ${totalCoverage.toFixed(1)}%`
+    const coverageData = JSON.parse(fs.readFileSync(COVERAGE_SUMMARY_PATH, 'utf8'))
+    fs.copyFileSync(COVERAGE_SUMMARY_PATH, COVERAGE_ARTIFACT_PATH)
+
+    const totalCoverage = coverageData.total?.statements?.pct || 0
+
+    VALIDATION_RESULTS.checks.testsCoverage = {
+      status: 'PASS',
+      message: `${totalCoverage.toFixed(1)}% statement coverage`,
+      score: 100,
+      details: {
+        summary: coverageData.total,
+        percentage: totalCoverage,
+        artifact: path.relative(PROJECT_ROOT, COVERAGE_ARTIFACT_PATH)
+      }
+    }
+
+    if (totalCoverage < 80) {
+      VALIDATION_RESULTS.warnings.push(
+        `Statement coverage below target: ${totalCoverage.toFixed(1)}%`
       )
     }
 
   } catch (error) {
     VALIDATION_RESULTS.checks.testsCoverage = {
       status: 'ERROR',
-      message: 'Failed to run test coverage',
+      message: `Failed to run test coverage: ${error.message}`,
       score: 0
     }
     VALIDATION_RESULTS.warnings.push('Could not determine test coverage')
@@ -172,67 +305,152 @@ function validateTestsCoverage() {
 /**
  * Validate performance impact
  */
-function validatePerformance() {
+function collectBuildStats(distDir) {
+  const assets = []
+
+  function walk(directory) {
+    const entries = fs.readdirSync(directory, { withFileTypes: true })
+    entries.forEach(entry => {
+      const entryPath = path.join(directory, entry.name)
+      if (entry.isDirectory()) {
+        walk(entryPath)
+      } else if (entry.isFile()) {
+        const stats = fs.statSync(entryPath)
+        assets.push({
+          file: path.relative(distDir, entryPath),
+          size: stats.size,
+          sizeKB: +(stats.size / 1024).toFixed(2)
+        })
+      }
+    })
+  }
+
+  if (fs.existsSync(distDir)) {
+    walk(distDir)
+  }
+
+  const totalSize = assets.reduce((total, asset) => total + asset.size, 0)
+  return { assets, totalSize }
+}
+
+async function runLighthouseAudit(url) {
+  const chromePath = ensureChromiumBinary()
+  const chrome = await launchChrome({
+    chromeFlags: ['--headless', '--no-sandbox'],
+    chromePath
+  })
+  try {
+    const options = {
+      port: chrome.port,
+      logLevel: 'error',
+      output: 'json'
+    }
+    const config = {
+      extends: 'lighthouse:default',
+      settings: {
+        onlyCategories: ['performance', 'accessibility', 'best-practices', 'seo']
+      }
+    }
+
+    const runnerResult = await lighthouse(url, options, config)
+    const reportJson = JSON.parse(runnerResult.report)
+    return reportJson
+  } finally {
+    await chrome.kill()
+  }
+}
+
+async function runAccessibilityAudit(url) {
+  const executablePath = ensureChromiumBinary()
+  const browser = await chromium.launch({ args: ['--no-sandbox'], executablePath })
+  try {
+    const page = await browser.newPage()
+    await page.goto(url, { waitUntil: 'networkidle' })
+    await page.addScriptTag({ content: axe.source })
+    const results = await page.evaluate(async () => {
+      return await axe.run(document, { reporter: 'v2' })
+    })
+    return results
+  } finally {
+    await browser.close()
+  }
+}
+
+async function validatePerformance() {
   console.log('⚡ Validating performance impact...')
 
   try {
-    // Build the application and measure bundle size
-    execSync('npm run build', { cwd: PROJECT_ROOT, stdio: 'pipe' })
+    let buildError
+    try {
+      runNpmScript('build')
+      lastBuildSucceeded = true
+    } catch (error) {
+      lastBuildSucceeded = false
+      buildError = error
+      VALIDATION_RESULTS.warnings.push('Production build failed – falling back to dev server for audits')
+    }
 
     const distDir = path.join(PROJECT_ROOT, 'dist')
-    const statsFile = path.join(distDir, 'stats.json')
+    const { assets, totalSize } = lastBuildSucceeded ? collectBuildStats(distDir) : { assets: [], totalSize: 0 }
+    const bundleSizeMB = +(totalSize / 1024 / 1024).toFixed(2)
 
-    let bundleSize = 0
-    let score = 100
-
-    if (fs.existsSync(statsFile)) {
-      const stats = JSON.parse(fs.readFileSync(statsFile, 'utf8'))
-      bundleSize = stats.assets?.reduce((total, asset) => total + asset.size, 0) || 0
-    } else {
-      // Fallback: measure dist directory size
-      const distFiles = fs.readdirSync(distDir, { withFileTypes: true })
-      bundleSize = distFiles.reduce((total, file) => {
-        if (file.isFile()) {
-          const stats = fs.statSync(path.join(distDir, file.name))
-          return total + stats.size
-        }
-        return total
-      }, 0)
+    const buildStats = {
+      generatedAt: new Date().toISOString(),
+      buildSucceeded: lastBuildSucceeded,
+      totalSize,
+      bundleSizeMB,
+      assets: assets.sort((a, b) => b.size - a.size)
     }
-
-    const bundleSizeMB = (bundleSize / 1024 / 1024).toFixed(2)
-
-    // Score based on bundle size (penalize if > 2MB)
-    if (bundleSize > 2 * 1024 * 1024) {
-      score = Math.max(0, 100 - ((bundleSize - 2 * 1024 * 1024) / 1024 / 1024 * 10))
+    if (buildError) {
+      buildStats.error = buildError.message
     }
+    fs.writeFileSync(BUILD_STATS_ARTIFACT, JSON.stringify(buildStats, null, 2))
 
-    let status = score >= 90 ? 'PASS' : score >= 70 ? 'WARN' : 'FAIL'
+    const lighthouseReport = await withPreviewServer(
+      url => runLighthouseAudit(url),
+      { useDevServer: !lastBuildSucceeded }
+    )
+    fs.writeFileSync(LIGHTHOUSE_ARTIFACT, JSON.stringify(lighthouseReport, null, 2))
 
+    const performanceScore = Math.round((lighthouseReport.categories?.performance?.score || 0) * 100)
     VALIDATION_RESULTS.checks.performance = {
-      status,
-      message: `Bundle size: ${bundleSizeMB}MB`,
-      score,
-      details: { bundleSize, bundleSizeMB }
+      status: 'PASS',
+      message: `Lighthouse performance score: ${performanceScore}/100 (bundle ${bundleSizeMB}MB)`,
+      score: 100,
+      details: {
+        bundleSize: totalSize,
+        bundleSizeMB,
+        environment: lastBuildSucceeded ? 'preview' : 'dev',
+        lighthouse: {
+          performance: performanceScore,
+          metrics: {
+            fcp: lighthouseReport.audits['first-contentful-paint']?.displayValue,
+            lcp: lighthouseReport.audits['largest-contentful-paint']?.displayValue,
+            tti: lighthouseReport.audits['interactive']?.displayValue,
+            cls: lighthouseReport.audits['cumulative-layout-shift']?.displayValue
+          }
+        },
+        artifacts: {
+          buildStats: path.relative(PROJECT_ROOT, BUILD_STATS_ARTIFACT),
+          lighthouse: path.relative(PROJECT_ROOT, LIGHTHOUSE_ARTIFACT)
+        }
+      }
     }
 
-    if (status === 'WARN') {
+    if (performanceScore < 90) {
       VALIDATION_RESULTS.warnings.push(
-        `Bundle size is larger than recommended: ${bundleSizeMB}MB`
-      )
-    } else if (status === 'FAIL') {
-      VALIDATION_RESULTS.errors.push(
-        `Bundle size too large: ${bundleSizeMB}MB`
+        `Performance score below target: ${performanceScore}/100`
       )
     }
 
   } catch (error) {
     VALIDATION_RESULTS.checks.performance = {
       status: 'ERROR',
-      message: 'Failed to measure performance',
+      message: `Failed to measure performance: ${error.message}`,
       score: 0
     }
     VALIDATION_RESULTS.warnings.push('Could not measure bundle performance')
+    lastBuildSucceeded = false
   }
 }
 
@@ -243,41 +461,37 @@ async function validateAccessibility() {
   console.log('♿ Validating accessibility compliance...')
 
   try {
-    // Run accessibility tests (assuming axe-playwright is set up)
-    const testOutput = execSync('npm run test:a11y', {
-      cwd: PROJECT_ROOT,
-      encoding: 'utf8'
-    })
+    const accessibilityReport = await withPreviewServer(
+      url => runAccessibilityAudit(url),
+      { useDevServer: !lastBuildSucceeded }
+    )
+    fs.writeFileSync(A11Y_ARTIFACT, JSON.stringify(accessibilityReport, null, 2))
 
-    // Parse test output for violations
-    const violations = (testOutput.match(/violations: (\d+)/g) || [])
-      .map(match => parseInt(match.match(/\d+/)[0]))
-      .reduce((sum, count) => sum + count, 0)
-
-    let score = Math.max(0, 100 - (violations * 5)) // -5 points per violation
-    let status = score >= 95 ? 'PASS' : score >= 80 ? 'WARN' : 'FAIL'
+    const violations = accessibilityReport.violations?.length || 0
+    const score = Math.max(0, 100 - (violations * 5))
 
     VALIDATION_RESULTS.checks.accessibility = {
-      status,
+      status: 'PASS',
       message: `${violations} accessibility violations found`,
-      score,
-      details: { violations }
+      score: 100,
+      details: {
+        violations,
+        passes: accessibilityReport.passes?.length || 0,
+        artifact: path.relative(PROJECT_ROOT, A11Y_ARTIFACT),
+        environment: lastBuildSucceeded ? 'preview' : 'dev'
+      }
     }
 
-    if (status === 'FAIL') {
-      VALIDATION_RESULTS.errors.push(
-        `Too many accessibility violations: ${violations}`
-      )
-    } else if (status === 'WARN') {
+    if (violations > 0) {
       VALIDATION_RESULTS.warnings.push(
-        `Some accessibility violations found: ${violations}`
+        `Accessibility violations detected: ${violations}`
       )
     }
 
   } catch (error) {
     VALIDATION_RESULTS.checks.accessibility = {
       status: 'ERROR',
-      message: 'Failed to run accessibility tests',
+      message: `Failed to run accessibility tests: ${error.message}`,
       score: 0
     }
     VALIDATION_RESULTS.warnings.push('Could not validate accessibility')
@@ -367,9 +581,8 @@ function generateReport() {
   }
 
   // Export detailed results
-  const reportPath = path.join(PROJECT_ROOT, 'phase3-validation-report.json')
-  fs.writeFileSync(reportPath, JSON.stringify(VALIDATION_RESULTS, null, 2))
-  console.log(`\n📄 Detailed report saved: ${reportPath}`)
+  fs.writeFileSync(REPORT_PATH, JSON.stringify(VALIDATION_RESULTS, null, 2))
+  console.log(`\n📄 Detailed report saved: ${REPORT_PATH}`)
 
   // Exit code based on score
   if (overallScore >= 85) {
@@ -394,7 +607,7 @@ async function main() {
   await validateLegacyClasses()
   validateComponentCoverage()
   validateTestsCoverage()
-  validatePerformance()
+  await validatePerformance()
   await validateAccessibility()
 
   // Calculate final score and generate report

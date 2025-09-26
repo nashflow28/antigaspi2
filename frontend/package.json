@@ -10,12 +10,14 @@
     "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix",
     "type-check": "vue-tsc --noEmit",
     "test:unit": "vitest run",
+    "test:coverage": "vitest run --coverage.enabled true --coverage.reporter=json-summary --coverage.reporter=text-summary",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
     "audit:legacy-classes": "node scripts/audit-legacy-classes.js",
     "migrate:component": "node scripts/migrate-ui-component.js",
     "capture:baseline": "node scripts/capture-baseline-screenshots.js",
-    "validate:phase3": "node scripts/validate-phase3.js"
+    "validate:phase3": "node scripts/validate-phase3.js",
+    "test:a11y": "node scripts/run-a11y-audit.js"
   },
   "keywords": [],
   "author": "",
@@ -51,11 +53,13 @@
     "@storybook/addon-docs": "^9.1.8",
     "@storybook/addon-onboarding": "^9.1.8",
     "@storybook/vue3-vite": "^9.1.8",
+    "axe-core": "^4.10.0",
     "@types/google.maps": "^3.58.1",
     "@types/node": "^24.3.3",
     "@typescript-eslint/eslint-plugin": "^8.43.0",
     "@typescript-eslint/parser": "^8.43.0",
     "@vue/test-utils": "^2.4.6",
+    "@vitest/coverage-v8": "^2.1.4",
     "eslint": "^9.35.0",
     "eslint-plugin-storybook": "^9.1.8",
     "eslint-plugin-vue": "^10.4.0",
@@ -63,6 +67,8 @@
     "lighthouse": "^10.4.0",
     "storybook": "^9.1.8",
     "storybook-addon-pseudo-states": "^1.15.5",
+    "chrome-launcher": "^0.15.2",
+    "playwright": "^1.48.0",
     "vitest": "^2.1.4"
   },
   "eslintConfig": {
