@@ -1,8 +1,8 @@
 <template>
   <div class="min-h-screen bg-gradient-to-br from-neutral-50 to-primary-50">
     <!-- Page Header -->
-    <div class="glass-bg glass-border border-b backdrop-blur-lg sticky top-20 z-40">
-      <div class="container-fluid py-6">
+    <div class="sticky top-20 z-40 border-b bg-white/80 backdrop-blur-lg">
+      <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         <div class="flex items-center gap-4 animate-fade-in-up">
           <Button
             @click="$router.go(-1)"
@@ -24,7 +24,7 @@
       </div>
     </div>
 
-    <div class="container-fluid py-8">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div class="max-w-4xl mx-auto">
 
         <!-- Loading State -->
