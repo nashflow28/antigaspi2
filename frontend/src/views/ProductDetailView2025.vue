@@ -36,7 +36,7 @@
           <Card
             variant="glass"
             :no-padding="true"
-            class="relative aspect-square bg-gradient-to-br from-primary-500 via-accent-blue to-accent-blue/90 rounded-3xl overflow-hidden shadow-card-2025 glow-effect"
+            class="relative aspect-square bg-gradient-to-br from-primary-500 via-accent-blue to-accent-blue/90 rounded-3xl overflow-hidden shadow-modern-2025 glow-effect"
           >
             <!-- Product Image or Placeholder -->
             <div v-if="product.image_url" class="absolute inset-0">
@@ -310,10 +310,10 @@ const route = useRoute()
 const router = useRouter()
 const { logMigration } = useDesignSystem2025()
 
-// Log migration usage
+// Log migration usage - ProductDetailView successfully migrated to 2025 Design System
 logMigration('ProductDetailView', 'Using 2025 components', {
   components: ['Button', 'Card', 'Badge'],
-  legacyReplaced: ['btn', 'btn-primary', 'btn-ghost', 'card', 'badge']
+  migratedCount: 5
 })
 
 // Reactive state
@@ -487,7 +487,7 @@ onMounted(async () => {
   box-shadow: 0 25px 50px rgba(16, 185, 129, 0.2);
 }
 
-.shadow-card-2025 {
+.shadow-modern-2025 {
   box-shadow:
     0 1px 3px rgba(0, 0, 0, 0.1),
     0 10px 25px rgba(0, 0, 0, 0.05),

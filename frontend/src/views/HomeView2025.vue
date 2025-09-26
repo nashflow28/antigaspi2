@@ -51,7 +51,7 @@
             <Button
               @click="$router.push('/products')"
               size="lg"
-              class="bg-white text-primary-600 hover:bg-white hover:text-primary-700 hover:scale-105 shadow-toast hover:shadow-glow group relative overflow-hidden"
+              class="bg-white text-primary-600 hover:bg-white hover:text-primary-700 hover:scale-105 shadow-toast hover:shadow-modern-2025 group relative overflow-hidden"
             >
               <span class="relative z-10 flex items-center gap-3">
                 🌟 Découvrir les offres
@@ -140,12 +140,12 @@
           <Card variant="elevated" interactive class="group glow-effect animate-fade-in-up" style="animation-delay: 0.2s;">
             <div class="relative">
               <!-- Icon avec gradient et animation -->
-              <div class="w-20 h-20 bg-nav-gradient rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-card group-hover:shadow-glow group-hover:scale-110 transition-all duration-300">
+              <div class="w-20 h-20 bg-nav-gradient rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-modern-2025 group-hover:shadow-modern-2025 group-hover:scale-110 transition-all duration-300">
                 <span class="text-3xl">🔍</span>
               </div>
 
               <!-- Step number -->
-              <div class="absolute -top-4 -right-4 w-8 h-8 bg-accent-orange text-white rounded-full flex items-center justify-center text-sm font-bold shadow-card">
+              <div class="absolute -top-4 -right-4 w-8 h-8 bg-accent-orange text-white rounded-full flex items-center justify-center text-sm font-bold shadow-modern-2025">
                 1
               </div>
             </div>
@@ -175,11 +175,11 @@
           <!-- Feature 2 -->
           <Card variant="elevated" interactive class="group glow-effect animate-fade-in-up" style="animation-delay: 0.4s;">
             <div class="relative">
-              <div class="w-20 h-20 bg-gradient-to-r from-accent-blue to-accent-blue/90 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-card group-hover:shadow-glow group-hover:scale-110 transition-all duration-300">
+              <div class="w-20 h-20 bg-gradient-to-r from-accent-blue to-accent-blue/90 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-modern-2025 group-hover:shadow-modern-2025 group-hover:scale-110 transition-all duration-300">
                 <span class="text-3xl">⚡</span>
               </div>
 
-              <div class="absolute -top-4 -right-4 w-8 h-8 bg-accent-orange text-white rounded-full flex items-center justify-center text-sm font-bold shadow-card">
+              <div class="absolute -top-4 -right-4 w-8 h-8 bg-accent-orange text-white rounded-full flex items-center justify-center text-sm font-bold shadow-modern-2025">
                 2
               </div>
             </div>
@@ -208,11 +208,11 @@
           <!-- Feature 3 -->
           <Card variant="elevated" interactive class="group glow-effect animate-fade-in-up" style="animation-delay: 0.6s;">
             <div class="relative">
-              <div class="w-20 h-20 bg-gradient-to-r from-accent-orange to-accent-orange/90 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-card group-hover:shadow-glow group-hover:scale-110 transition-all duration-300">
+              <div class="w-20 h-20 bg-gradient-to-r from-accent-orange to-accent-orange/90 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-modern-2025 group-hover:shadow-modern-2025 group-hover:scale-110 transition-all duration-300">
                 <span class="text-3xl">🌱</span>
               </div>
 
-              <div class="absolute -top-4 -right-4 w-8 h-8 bg-accent-orange text-white rounded-full flex items-center justify-center text-sm font-bold shadow-card">
+              <div class="absolute -top-4 -right-4 w-8 h-8 bg-accent-orange text-white rounded-full flex items-center justify-center text-sm font-bold shadow-modern-2025">
                 3
               </div>
             </div>

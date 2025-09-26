@@ -15,21 +15,24 @@
             </p>
           </div>
           <div class="flex items-center gap-3">
-            <button
+            <Button
               @click="refreshData"
               :disabled="loading"
-              class="btn btn-outline btn-sm"
+              variant="outline"
+              size="sm"
+              :left-icon="RefreshCw"
+              :icon-class="{ 'animate-spin': loading }"
             >
-              <RefreshCw class="w-4 h-4" :class="{ 'animate-spin': loading }" />
               Actualiser
-            </button>
-            <button
+            </Button>
+            <Button
               @click="openAwardModal()"
-              class="btn btn-primary btn-sm"
+              variant="primary"
+              size="sm"
+              :left-icon="Plus"
             >
-              <Plus class="w-4 h-4 mr-2" />
               Attribuer Points
-            </button>
+            </Button>
           </div>
         </div>
       </div>
@@ -39,7 +42,7 @@
 
       <!-- Quick Stats -->
       <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-        <div class="card">
+        <Card>
           <div class="flex items-center justify-between">
             <div>
               <p class="text-sm font-medium text-neutral-600">Total Clients</p>
@@ -49,9 +52,9 @@
               <Users class="w-6 h-6 text-primary-600" />
             </div>
           </div>
-        </div>
+        </Card>
 
-        <div class="card">
+        <Card>
           <div class="flex items-center justify-between">
             <div>
               <p class="text-sm font-medium text-neutral-600">Points Distribués</p>
@@ -61,9 +64,9 @@
               <TrendingUp class="w-6 h-6 text-green-600" />
             </div>
           </div>
-        </div>
+        </Card>
 
-        <div class="card">
+        <Card>
           <div class="flex items-center justify-between">
             <div>
               <p class="text-sm font-medium text-neutral-600">Clients Actifs</p>
@@ -73,9 +76,9 @@
               <Star class="w-6 h-6 text-blue-600" />
             </div>
           </div>
-        </div>
+        </Card>
 
-        <div class="card">
+        <Card>
           <div class="flex items-center justify-between">
             <div>
               <p class="text-sm font-medium text-neutral-600">Moyenne Points</p>
@@ -85,11 +88,11 @@
               <Award class="w-6 h-6 text-purple-600" />
             </div>
           </div>
-        </div>
+        </Card>
       </div>
 
       <!-- Customers List -->
-      <div class="card">
+      <Card>
         <div class="flex items-center justify-between mb-6">
           <h3 class="text-xl font-semibold text-neutral-900">Clients avec Points de Fidélité</h3>
           <div class="flex items-center gap-3">
@@ -155,13 +158,14 @@
                   {{ customer.last_activity ? formatDate(customer.last_activity) : 'Aucune' }}
                 </td>
                 <td class="py-4 px-4">
-                  <button
+                  <Button
                     @click="openAwardModal(customer)"
-                    class="btn btn-sm btn-primary"
+                    variant="primary"
+                    size="sm"
+                    :left-icon="Plus"
                   >
-                    <Plus class="w-3 h-3 mr-1" />
                     Attribuer
-                  </button>
+                  </Button>
                 </td>
               </tr>
             </tbody>
@@ -175,7 +179,7 @@
             </p>
           </div>
         </div>
-      </div>
+      </Card>
 
     </div>
 
@@ -197,14 +201,13 @@
           <form @submit.prevent="submitAward" class="px-6 py-6 space-y-4">
             <!-- Customer Selection -->
             <div v-if="!selectedCustomer">
-              <label class="form-label">Sélectionner un client</label>
+              <Label>Sélectionner un client</Label>
               <div class="text-xs text-gray-500 mb-2">
                 Debug: {{ allUsersPoints.length }} clients chargés
               </div>
-              <select
+              <Select
                 v-model="awardForm.user_id"
                 required
-                class="form-select"
               >
                 <option value="">Choisir un client...</option>
                 <option
@@ -214,7 +217,7 @@
                 >
                   {{ customer.name }} ({{ customer.email }})
                 </option>
-              </select>
+              </Select>
             </div>
 
             <div v-else class="bg-neutral-50 rounded-lg p-3">
@@ -225,53 +228,50 @@
 
             <!-- Points Amount -->
             <div>
-              <label class="form-label">Nombre de points</label>
-              <input
+              <Label>Nombre de points</Label>
+              <Input
                 v-model.number="awardForm.points"
                 type="number"
                 min="1"
                 max="1000"
                 required
-                class="form-input"
                 placeholder="Ex: 50"
               />
             </div>
 
             <!-- Reason -->
             <div>
-              <label class="form-label">Motif</label>
-              <select
+              <Label>Motif</Label>
+              <Select
                 v-model="awardForm.earned_from"
                 required
-                class="form-select"
               >
                 <option value="">Choisir un motif...</option>
                 <option value="purchase">Achat</option>
                 <option value="review">Avis laissé</option>
                 <option value="referral">Parrainage</option>
                 <option value="bonus">Bonus spécial</option>
-              </select>
+              </Select>
             </div>
 
             <!-- Description -->
             <div>
-              <label class="form-label">Description</label>
+              <Label>Description</Label>
               <textarea
                 v-model="awardForm.description"
                 required
                 rows="3"
-                class="form-textarea"
+                class="w-full px-3 py-2 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                 placeholder="Décrivez pourquoi vous attribuez ces points..."
               ></textarea>
             </div>
 
             <!-- Expiration (optional) -->
             <div>
-              <label class="form-label">Expiration (optionnel)</label>
-              <input
+              <Label>Expiration (optionnel)</Label>
+              <Input
                 v-model="awardForm.expires_at"
                 type="date"
-                class="form-input"
                 :min="tomorrow"
               />
               <p class="text-xs text-neutral-500 mt-1">
@@ -281,21 +281,24 @@
 
             <!-- Actions -->
             <div class="flex gap-3 pt-4">
-              <button
+              <Button
                 type="button"
                 @click="closeAwardModal"
-                class="flex-1 btn btn-outline"
+                class="flex-1"
+                variant="outline"
               >
                 Annuler
-              </button>
-              <button
+              </Button>
+              <Button
                 type="submit"
                 :disabled="awarding"
-                class="flex-1 btn btn-primary"
+                class="flex-1"
+                variant="primary"
+                :left-icon="awarding ? Loader2 : undefined"
+                :icon-class="awarding ? 'animate-spin' : undefined"
               >
-                <Loader2 v-if="awarding" class="w-4 h-4 mr-2 animate-spin" />
                 {{ awarding ? 'Attribution...' : 'Attribuer' }}
-              </button>
+              </Button>
             </div>
           </form>
         </div>
@@ -312,6 +315,11 @@ import {
 import { useLoyaltyPoints } from '@/composables/useLoyaltyPoints'
 import DashboardLayout from '@/components/ui/DashboardLayout.vue'
 import { useDashboardLayout } from '@/composables/useDashboardLayout'
+import Button from '@/components/ui/2025/Button.vue'
+import Card from '@/components/ui/2025/Card.vue'
+import Label from '@/components/ui/2025/Label.vue'
+import Input from '@/components/ui/2025/Input.vue'
+import Select from '@/components/ui/2025/Select.vue'
 
 // Composables
 const {

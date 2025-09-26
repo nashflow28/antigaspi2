@@ -1,5 +1,5 @@
 <template>
-  <div class="card hover:shadow-card transition-all duration-300">
+  <Card class="hover:shadow-card transition-all duration-300">
     <!-- En-tête avec statut -->
     <div class="flex items-center justify-between mb-4">
       <div class="flex items-center gap-3">
@@ -15,28 +15,29 @@
       </div>
 
       <div class="flex items-center gap-2">
-        <span
-          class="badge text-xs font-medium px-2 py-1 rounded-full"
+        <Badge
+          size="xs"
           :class="statusClasses[reservation.status]"
         >
           {{ statusLabels[reservation.status] }}
-        </span>
-        <span
+        </Badge>
+        <Badge
           v-if="paymentStatus"
-          class="badge text-xs font-medium px-2 py-1 rounded-full"
+          size="xs"
           :class="paymentStatusClasses[paymentStatus]"
         >
           Paiement : {{ paymentStatusLabels[paymentStatus] }}
-        </span>
+        </Badge>
 
         <!-- Menu d'actions -->
         <div class="relative" v-if="!isExpiredOrCancelled">
-          <button
+          <Button
             @click="showActions = !showActions"
-            class="btn btn-ghost btn-sm p-2"
-          >
-            <MoreVertical class="w-4 h-4" />
-          </button>
+            variant="ghost"
+            size="sm"
+            class="p-2"
+            :left-icon="MoreVertical"
+          />
 
           <div
             v-if="showActions"
@@ -220,33 +221,37 @@
     <!-- Actions en bas -->
     <div v-if="!isExpiredOrCancelled" class="flex items-center justify-between mt-6 pt-4 border-t border-neutral-100">
       <div class="flex items-center gap-2">
-        <button
+        <Button
           v-if="reservation.product.merchant.phone"
           @click="$emit('contact', reservation)"
-          class="btn btn-ghost btn-sm"
+          variant="ghost"
+          size="sm"
+          :left-icon="Phone"
         >
-          <Phone class="w-4 h-4" />
           Contacter
-        </button>
-        <button
+        </Button>
+        <Button
           @click="$emit('view', reservation.id)"
-          class="btn btn-outline btn-sm"
+          variant="outline"
+          size="sm"
+          :left-icon="Eye"
         >
-          <Eye class="w-4 h-4" />
           Détails
-        </button>
+        </Button>
       </div>
 
-      <button
+      <Button
         v-if="canCancel"
         @click="$emit('cancel', reservation.id)"
-        class="btn btn-ghost btn-sm text-accent-red hover:bg-accent-red/10"
+        variant="ghost"
+        size="sm"
+        class="text-accent-red hover:bg-accent-red/10"
+        :left-icon="X"
       >
-        <X class="w-4 h-4" />
         Annuler
-      </button>
+      </Button>
     </div>
-  </div>
+  </Card>
 </template>
 
 <script setup lang="ts">
@@ -257,6 +262,9 @@ import {
   Package, Phone, ShoppingBag, X
 } from 'lucide-vue-next'
 import type { Reservation } from '@/types'
+import Card from '@/components/ui/2025/Card.vue'
+import Button from '@/components/ui/2025/Button.vue'
+import Badge from '@/components/ui/2025/Badge.vue'
 
 interface Props {
   reservation: Reservation

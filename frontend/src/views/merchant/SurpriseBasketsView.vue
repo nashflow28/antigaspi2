@@ -18,21 +18,22 @@
         </div>
 
         <div class="flex gap-4">
-          <button
+          <Button
             @click="refreshData"
-            class="btn btn-ghost"
+            variant="ghost"
             :disabled="loading"
+            :left-icon="RefreshCwIcon"
           >
-            <RefreshCwIcon class="w-5 h-5 mr-2" />
             Actualiser
-          </button>
-          <button
+          </Button>
+          <Button
             @click="currentView = 'create'"
-            class="btn btn-primary glow-effect"
+            variant="primary"
+            class="glow-effect"
+            :left-icon="PlusIcon"
           >
-            <PlusIcon class="w-5 h-5 mr-2" />
             Nouveau panier
-          </button>
+          </Button>
         </div>
       </div>
     </div>
@@ -64,29 +65,29 @@
     </div>
 
     <!-- Loading State -->
-    <div v-if="loading && currentView === 'list'" class="card">
+    <Card v-if="loading && currentView === 'list'">
       <div class="flex items-center justify-center py-12">
         <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600"></div>
         <span class="ml-3 text-neutral-600">Chargement des paniers surprise...</span>
       </div>
-    </div>
+    </Card>
 
     <!-- Error State -->
-    <div v-if="error" class="card bg-accent-red/10 border-accent-red/30 mb-6">
+    <Card v-if="error" class="bg-accent-red/10 border-accent-red/30 mb-6">
       <div class="flex items-center justify-center py-8">
-        <ExclamationTriangleIcon class="w-8 h-8 text-accent-red mr-3" />
+        <AlertTriangleIcon class="w-8 h-8 text-accent-red mr-3" />
         <div>
           <p class="text-accent-red/90 font-medium">Erreur lors du chargement</p>
           <p class="text-accent-red text-sm">{{ error }}</p>
         </div>
       </div>
-    </div>
+    </Card>
 
     <!-- List View -->
     <div v-if="currentView === 'list' && !loading">
       <!-- Quick Stats -->
       <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-        <div class="card bg-gradient-to-r from-purple-500 to-purple-600 text-white">
+        <Card class="bg-gradient-to-r from-purple-500 to-purple-600 text-white">
           <div class="flex items-center justify-between">
             <div>
               <p class="text-purple-100 text-sm font-medium">Total Paniers</p>
@@ -96,9 +97,9 @@
               <GiftIcon class="w-6 h-6" />
             </div>
           </div>
-        </div>
+        </Card>
 
-        <div class="card bg-gradient-to-r from-primary-500 to-primary-600 text-white">
+        <Card class="bg-gradient-to-r from-primary-500 to-primary-600 text-white">
           <div class="flex items-center justify-between">
             <div>
               <p class="text-primary-100 text-sm font-medium">Actifs</p>
@@ -108,9 +109,9 @@
               <CheckCircleIcon class="w-6 h-6" />
             </div>
           </div>
-        </div>
+        </Card>
 
-        <div class="card bg-gradient-to-r from-accent-orange to-accent-orange/90 text-white">
+        <Card class="bg-gradient-to-r from-accent-orange to-accent-orange/90 text-white">
           <div class="flex items-center justify-between">
             <div>
               <p class="text-accent-orange/70 text-sm font-medium">Stock Total</p>
@@ -120,9 +121,9 @@
               <PackageIcon class="w-6 h-6" />
             </div>
           </div>
-        </div>
+        </Card>
 
-        <div class="card bg-gradient-to-r from-accent-blue/50 to-accent-blue/90 text-white">
+        <Card class="bg-gradient-to-r from-accent-blue/50 to-accent-blue/90 text-white">
           <div class="flex items-center justify-between">
             <div>
               <p class="text-accent-blue/60 text-sm font-medium">Revenus Potentiels</p>
@@ -132,11 +133,11 @@
               <DollarSignIcon class="w-6 h-6" />
             </div>
           </div>
-        </div>
+        </Card>
       </div>
 
       <!-- Empty State -->
-      <div v-if="baskets.length === 0" class="card text-center py-12">
+      <Card v-if="baskets.length === 0" class="text-center py-12">
         <div class="w-20 h-20 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-6">
           <GiftIcon class="w-10 h-10 text-purple-500" />
         </div>
@@ -144,21 +145,22 @@
         <p class="text-neutral-600 mb-6 max-w-md mx-auto">
           Créez votre premier panier surprise pour valoriser vos invendus et offrir des surprises à vos clients
         </p>
-        <button
+        <Button
           @click="currentView = 'create'"
-          class="btn btn-primary"
+          variant="primary"
+          :left-icon="PlusIcon"
         >
-          <PlusIcon class="w-5 h-5 mr-2" />
           Créer mon premier panier
-        </button>
-      </div>
+        </Button>
+      </Card>
 
       <!-- Baskets Grid -->
       <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        <div
+        <Card
           v-for="basket in baskets"
           :key="basket.id"
-          class="card card-interactive glow-effect animate-fade-in-up overflow-hidden"
+          interactive
+          class="glow-effect animate-fade-in-up overflow-hidden"
         >
           <!-- Image/Icon -->
           <div class="relative h-48 bg-gradient-to-br from-purple-100 to-pink-100 flex items-center justify-center">
@@ -211,23 +213,27 @@
 
             <!-- Actions -->
             <div class="flex gap-2">
-              <button
+              <Button
                 @click="handleView(basket)"
-                class="btn btn-ghost btn-sm flex-1"
+                variant="ghost"
+                size="sm"
+                class="flex-1"
+                :left-icon="EyeIcon"
               >
-                <EyeIcon class="w-4 h-4 mr-1" />
                 Voir
-              </button>
-              <button
+              </Button>
+              <Button
                 @click="handleEdit(basket)"
-                class="btn btn-secondary btn-sm flex-1"
+                variant="secondary"
+                size="sm"
+                class="flex-1"
+                :left-icon="PencilIcon"
               >
-                <PencilIcon class="w-4 h-4 mr-1" />
                 Modifier
-              </button>
+              </Button>
             </div>
           </div>
-        </div>
+        </Card>
       </div>
     </div>
 
@@ -256,6 +262,7 @@
         @close="currentView = 'list'"
       />
     </div>
+    </div>
   </DashboardLayout>
 </template>
 
@@ -266,6 +273,8 @@ import { formatPrice } from '@/utils/currency'
 import type { SurpriseBasket } from '@/types'
 import DashboardLayout from '@/components/ui/DashboardLayout.vue'
 import { useDashboardLayout } from '@/composables/useDashboardLayout'
+import Button from '@/components/ui/2025/Button.vue'
+import Card from '@/components/ui/2025/Card.vue'
 import {
   ArrowLeftIcon,
   PlusIcon,
@@ -277,7 +286,7 @@ import {
   LayersIcon,
   EyeIcon,
   PencilIcon,
-  ExclamationTriangleIcon
+  AlertTriangleIcon
 } from 'lucide-vue-next'
 import CreateSurpriseBasket from '@/components/merchant/CreateSurpriseBasket.vue'
 import EditSurpriseBasket from '@/components/merchant/EditSurpriseBasket.vue'

@@ -142,6 +142,7 @@
         @report-resolved="onReportResolved"
       />
     </div>
+    </div>
   </DashboardLayout>
 </template>
 

@@ -1,8 +1,8 @@
 <template>
   <div class="min-h-screen bg-gradient-to-br from-neutral-50 to-primary-50">
     <!-- Page Header -->
-    <div class="glass-bg glass-border border-b backdrop-blur-lg sticky top-20 z-40">
-      <div class="container-fluid py-6">
+    <div class="bg-white/60 backdrop-blur-md glass-border border-b backdrop-blur-lg sticky top-20 z-40">
+      <div class="container-2025 py-6">
         <div class="flex items-center gap-4 animate-fade-in-up">
           <Button
             variant="ghost"
@@ -24,7 +24,7 @@
       </div>
     </div>
 
-    <div class="container-fluid py-8">
+    <div class="container-2025 py-8">
       <div class="max-w-4xl mx-auto">
 
         <!-- Loading State -->
@@ -148,7 +148,7 @@
               <!-- Quantité -->
               <div class="space-y-4">
                 <div>
-                  <label class="form-label">Quantité souhaitée</label>
+                  <Label>Quantité souhaitée</Label>
                   <div class="flex items-center gap-4">
                     <Button
                       @click="decreaseQuantity"
@@ -184,7 +184,7 @@
 
                 <!-- Notes spéciales -->
                 <div>
-                  <label for="notes" class="form-label">Notes spéciales (optionnel)</label>
+                  <Label for="notes">Notes spéciales (optionnel)</Label>
                   <textarea
                     id="notes"
                     v-model="reservation.notes"
@@ -205,7 +205,7 @@
               <div class="space-y-6">
                 <!-- Horaires de récupération -->
                 <div>
-                  <label class="form-label">Quand souhaitez-vous récupérer ?</label>
+                  <Label>Quand souhaitez-vous récupérer ?</Label>
                   <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                       <label for="pickup-date" class="text-sm font-medium text-neutral-700 mb-2 block">
@@ -246,7 +246,7 @@
 
                 <!-- Contact -->
                 <div>
-                  <label for="contact-phone" class="form-label">Téléphone de contact</label>
+                  <Label for="contact-phone">Téléphone de contact</Label>
                   <Input
                     id="contact-phone"
                     v-model="reservation.contact_phone"
@@ -261,7 +261,7 @@
 
                 <!-- Instructions spéciales -->
                 <div>
-                  <label for="pickup-instructions" class="form-label">Instructions particulières (optionnel)</label>
+                  <Label for="pickup-instructions">Instructions particulières (optionnel)</Label>
                   <textarea
                     id="pickup-instructions"
                     v-model="reservation.pickup_instructions"
@@ -314,7 +314,7 @@
               </div>
 
               <div v-if="methodRequiresPhone" class="space-y-2">
-                <label for="mobile-money-phone" class="form-label">Numéro Mobile Money</label>
+                <Label for="mobile-money-phone">Numéro Mobile Money</Label>
                 <Input
                   id="mobile-money-phone"
                   v-model="mobileMoneyPhone"
@@ -330,7 +330,7 @@
 
               <!-- Wallet payment PIN input -->
               <div v-if="paymentMethod === 'wallet'" class="space-y-2">
-                <label for="wallet-pin" class="form-label">Code PIN du portefeuille</label>
+                <Label for="wallet-pin">Code PIN du portefeuille</Label>
                 <Input
                   id="wallet-pin"
                   v-model="walletPin"
@@ -447,7 +447,7 @@
                     id="accept-conditions"
                     v-model="acceptConditions"
                     type="checkbox"
-                    class="form-checkbox"
+                    class="w-5 h-5 rounded border-neutral-300 text-primary-600 focus:ring-primary-500 focus:ring-2"
                   />
                   <label for="accept-conditions" class="text-sm text-neutral-700">
                     J'accepte les conditions de réservation et je m'engage à récupérer le produit aux horaires convenus
@@ -584,6 +584,7 @@ import Card from '@/components/ui/2025/Card.vue'
 import Button from '@/components/ui/2025/Button.vue'
 import Badge from '@/components/ui/2025/Badge.vue'
 import Input from '@/components/ui/2025/Input.vue'
+import Label from '@/components/ui/2025/Label.vue'
 
 interface ReserveProduct {
   id: number

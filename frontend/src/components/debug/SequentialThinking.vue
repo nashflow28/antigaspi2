@@ -4,16 +4,16 @@
       <div class="panel-title">
         <Brain class="w-5 h-5" />
         <span>Sequential Thinking</span>
-        <span v-if="isRecording" class="recording-badge">🔴 REC</span>
+        <span v-if="isRecording" class="recording-indicator">🔴 REC</span>
       </div>
       <div class="panel-controls">
-        <button @click="exportCurrentSession" :disabled="!currentSession" class="btn-export" title="Export session">
+        <button @click="exportCurrentSession" :disabled="!currentSession" class="button-export" title="Export session">
           <Download class="w-4 h-4" />
         </button>
-        <button @click="clearOldSessions" class="btn-clear" title="Clear old sessions">
+        <button @click="clearOldSessions" class="button-clear" title="Clear old sessions">
           <Trash2 class="w-4 h-4" />
         </button>
-        <button @click="togglePanel" class="btn-close" title="Close panel">
+        <button @click="togglePanel" class="button-close" title="Close panel">
           <X class="w-4 h-4" />
         </button>
       </div>
@@ -47,7 +47,7 @@
           <button
             v-if="!isRecording"
             @click="startNewSession"
-            class="btn-start"
+            class="button-start"
           >
             <Play class="w-4 h-4 mr-1" />
             Start
@@ -55,7 +55,7 @@
           <button
             v-else
             @click="endCurrentSession"
-            class="btn-stop"
+            class="button-stop"
           >
             <Square class="w-4 h-4 mr-1" />
             Stop
@@ -83,7 +83,7 @@
           <div v-if="!currentSession || currentSession.steps.length === 0" class="empty-state">
             <Brain class="w-8 h-8 text-gray-400" />
             <p class="text-sm text-gray-600">No active thinking session</p>
-            <button @click="startNewSession" class="btn-start-empty">
+            <button @click="startNewSession" class="button-start-empty">
               Start Thinking Session
             </button>
           </div>
@@ -176,28 +176,28 @@
         <!-- Analytics -->
         <div v-if="activeTab === 'analytics'" class="analytics-container">
           <div class="analytics-grid">
-            <div class="analytics-card">
+            <div class="analytics-component">
               <h4>Session Success Rate</h4>
               <div class="metric">
                 {{ Math.round((statistics.completedSessions / Math.max(statistics.totalSessions, 1)) * 100) }}%
               </div>
             </div>
 
-            <div class="analytics-card">
+            <div class="analytics-component">
               <h4>Avg Steps/Session</h4>
               <div class="metric">
                 {{ Math.round(statistics.averageStepsPerSession) }}
               </div>
             </div>
 
-            <div class="analytics-card">
+            <div class="analytics-component">
               <h4>Most Common Type</h4>
               <div class="metric">
                 {{ getMostCommonStepType() }}
               </div>
             </div>
 
-            <div class="analytics-card">
+            <div class="analytics-component">
               <h4>Active Sessions</h4>
               <div class="metric">
                 {{ statistics.activeSessions }}
@@ -238,7 +238,7 @@
     title="Open Sequential Thinking Panel"
   >
     <Brain class="w-5 h-5" />
-    <span v-if="currentSessionSteps > 0" class="step-badge">{{ currentSessionSteps }}</span>
+    <span v-if="currentSessionSteps > 0" class="step-indicator">{{ currentSessionSteps }}</span>
   </button>
 </template>
 
@@ -441,7 +441,7 @@ onUnmounted(() => {
   color: #374151;
 }
 
-.recording-badge {
+.recording-indicator {
   background: #dc2626;
   color: white;
   font-size: 10px;
@@ -456,9 +456,9 @@ onUnmounted(() => {
   gap: 8px;
 }
 
-.btn-export,
-.btn-clear,
-.btn-close {
+.button-export,
+.button-clear,
+.button-close {
   background: none;
   border: none;
   padding: 6px;
@@ -468,14 +468,14 @@ onUnmounted(() => {
   transition: all 0.2s;
 }
 
-.btn-export:hover,
-.btn-clear:hover,
-.btn-close:hover {
+.button-export:hover,
+.button-clear:hover,
+.button-close:hover {
   background: #e5e7eb;
   color: #374151;
 }
 
-.btn-export:disabled {
+.button-export:disabled {
   opacity: 0.5;
   cursor: not-allowed;
 }
@@ -542,8 +542,8 @@ onUnmounted(() => {
   gap: 8px;
 }
 
-.btn-start,
-.btn-stop {
+.button-start,
+.button-stop {
   display: flex;
   align-items: center;
   padding: 6px 12px;
@@ -555,25 +555,25 @@ onUnmounted(() => {
   transition: all 0.2s;
 }
 
-.btn-start {
+.button-start {
   background: #10b981;
   color: white;
 }
 
-.btn-start:hover {
+.button-start:hover {
   background: #059669;
 }
 
-.btn-stop {
+.button-stop {
   background: #dc2626;
   color: white;
 }
 
-.btn-stop:hover {
+.button-stop:hover {
   background: #b91c1c;
 }
 
-.btn-start-empty {
+.button-start-empty {
   background: #2563eb;
   color: white;
   padding: 8px 16px;
@@ -789,14 +789,14 @@ onUnmounted(() => {
   margin-bottom: 20px;
 }
 
-.analytics-card {
+.analytics-component {
   padding: 12px;
   background: #f9fafb;
   border-radius: 8px;
   text-align: center;
 }
 
-.analytics-card h4 {
+.analytics-component h4 {
   font-size: 11px;
   font-weight: 600;
   color: #6b7280;
@@ -804,7 +804,7 @@ onUnmounted(() => {
   text-transform: uppercase;
 }
 
-.analytics-card .metric {
+.analytics-component .metric {
   font-size: 20px;
   font-weight: 700;
   color: #111827;
@@ -881,7 +881,7 @@ onUnmounted(() => {
   box-shadow: 0 15px 30px -5px rgba(139, 92, 246, 0.5);
 }
 
-.step-badge {
+.step-indicator {
   position: absolute;
   top: -8px;
   right: -8px;

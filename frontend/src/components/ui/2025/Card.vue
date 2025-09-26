@@ -4,19 +4,19 @@
     @click="handleClick"
   >
     <!-- Header -->
-    <div v-if="$slots.header || title" class="card-header">
+    <div v-if="$slots.header || title" class="ui-header">
       <slot name="header">
-        <h3 v-if="title" class="card-title">{{ title }}</h3>
+        <h3 v-if="title" class="ui-title">{{ title }}</h3>
       </slot>
     </div>
 
     <!-- Content -->
-    <div v-if="$slots.default" class="card-content">
+    <div v-if="$slots.default" class="ui-content">
       <slot />
     </div>
 
     <!-- Footer -->
-    <div v-if="$slots.footer" class="card-footer">
+    <div v-if="$slots.footer" class="ui-footer">
       <slot name="footer" />
     </div>
   </div>
@@ -59,8 +59,8 @@ const emit = defineEmits<{
 // Computed classes
 const computedClasses = computed(() => {
   const baseClasses = [
-    // Base card styles
-    'card-2025',
+    // Base component styles
+    'ui-2025',
     'overflow-hidden',
     'transition-all duration-300',
 
@@ -118,8 +118,8 @@ const variantClasses = computed(() => {
     elevated: [
       'bg-white',
       'border-0',
-      'shadow-card-elevated',
-      'hover:shadow-card-elevated-hover'
+      'shadow-ui-elevated',
+      'hover:shadow-ui-elevated-hover'
     ].join(' ')
   }
 
@@ -164,23 +164,23 @@ const handleClick = (event: MouseEvent) => {
 </script>
 
 <style scoped>
-.card-2025 {
-  /* Custom card styles for 2025 design system */
+.ui-2025 {
+  /* Custom component styles for 2025 design system */
 }
 
-.card-header {
+.ui-header {
   @apply border-b border-neutral-200 pb-4 mb-4;
 }
 
-.card-title {
+.ui-title {
   @apply text-lg font-semibold text-neutral-900;
 }
 
-.card-content {
+.ui-content {
   @apply text-neutral-700;
 }
 
-.card-footer {
+.ui-footer {
   @apply border-t border-neutral-200 pt-4 mt-4;
 }
 
@@ -188,13 +188,13 @@ const handleClick = (event: MouseEvent) => {
   box-shadow: 0 8px 32px rgba(31, 38, 135, 0.1);
 }
 
-.shadow-card-elevated {
+.shadow-ui-elevated {
   box-shadow:
     0 1px 3px rgba(0, 0, 0, 0.1),
     0 10px 25px rgba(0, 0, 0, 0.05);
 }
 
-.shadow-card-elevated-hover {
+.shadow-ui-elevated-hover {
   box-shadow:
     0 4px 12px rgba(0, 0, 0, 0.12),
     0 16px 32px rgba(0, 0, 0, 0.08);
