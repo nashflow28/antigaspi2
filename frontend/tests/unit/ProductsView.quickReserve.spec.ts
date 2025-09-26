@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
 import { flushPromises, mount } from '@vue/test-utils'
-import ProductsView from '@/views/ProductsView.vue'
+import ProductsView from '@/views/ProductsView2025.vue'
 
 const routerPushMock = vi.hoisted(() => vi.fn())
 const createReservationMock = vi.hoisted(() => vi.fn())

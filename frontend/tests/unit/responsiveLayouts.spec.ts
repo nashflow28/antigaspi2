@@ -1,7 +1,7 @@
 import { mount } from '@vue/test-utils'
 import { nextTick, ref } from 'vue'
 import MainHomeView from '@/views/MainHomeView.vue'
-import ProductsView from '@/views/ProductsView.vue'
+import ProductsView from '@/views/ProductsView2025.vue'
 import ReservationsView from '@/views/ReservationsView.vue'
 
 vi.mock('vue-router', () => ({
