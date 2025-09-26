@@ -19,7 +19,7 @@ const router = createRouter({
     {
       path: '/',
       name: 'home',
-      component: () => import('@/components/ui/HomeViewWrapper.vue'),
+      component: () => import('@/views/HomeView2025.vue'),
       meta: { requiresAuth: false }
     },
     {
@@ -63,7 +63,7 @@ const router = createRouter({
     {
       path: '/products/:id',
       name: 'product-detail',
-      component: () => import('@/views/ProductDetailView.vue'),
+      component: () => import('@/views/ProductDetailView2025.vue'),
       meta: { requiresAuth: false }
     },
     {
@@ -90,7 +90,7 @@ const router = createRouter({
     {
       path: '/products/:id/reserve',
       name: 'product-reserve',
-      component: () => import('@/components/ui/ProductReserveViewWrapper.vue'),
+      component: () => import('@/views/ProductReserveView2025.vue'),
       meta: { requiresAuth: true, roles: ['consumer'] }
     },
     {
@@ -145,7 +145,7 @@ const router = createRouter({
     {
       path: '/dashboard',
       name: 'dashboard',
-      component: () => import('@/components/ui/DashboardViewWrapper.vue'),
+      component: () => import('@/views/DashboardView2025.vue'),
       meta: { requiresAuth: true }
     },
     {
@@ -163,7 +163,7 @@ const router = createRouter({
     {
       path: '/reservations/:id',
       name: 'reservation-detail',
-      component: () => import('@/components/ui/ReservationDetailViewWrapper.vue'),
+      component: () => import('@/views/ReservationDetailView2025.vue'),
       meta: { requiresAuth: true, roles: ['consumer'] }
     },
     {
@@ -209,7 +209,7 @@ const router = createRouter({
     {
       path: '/merchant/products/:id/edit',
       name: 'merchant-product-edit',
-      component: () => import('@/components/ui/ProductEditViewWrapper.vue'),
+      component: () => import('@/views/merchant/ProductEditView2025.vue'),
       meta: { requiresAuth: true, roles: ['merchant'] }
     },
     {
@@ -250,7 +250,7 @@ const router = createRouter({
     {
       path: '/admin/dashboard',
       name: 'admin-dashboard',
-      component: () => import('@/components/ui/AdminDashboardViewWrapper.vue'),
+      component: () => import('@/views/admin/DashboardView2025.vue'),
       meta: { requiresAuth: true, roles: ['admin'] }
     },
     {
@@ -292,7 +292,7 @@ const router = createRouter({
     {
       path: '/:pathMatch(.*)*',
       name: 'not-found',
-      component: () => import('@/components/ui/NotFoundViewWrapper.vue')
+      component: () => import('@/views/NotFoundView2025.vue')
     }
   ]
 })

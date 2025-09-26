@@ -25,20 +25,21 @@
             <option value="year">Cette année</option>
           </select>
 
-          <button
+          <Button
             @click="refreshData"
-            class="btn btn-primary glow-effect"
+            variant="primary"
+            class="glow-effect"
             :disabled="isLoading"
+            :left-icon="ArrowPathIcon"
           >
-            <ArrowPathIcon class="w-5 h-5 mr-2" :class="{ 'animate-spin': isLoading }" />
             Actualiser
-          </button>
+          </Button>
         </div>
       </div>
 
       <!-- Key Metrics -->
       <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 mt-8">
-        <div class="card bg-gradient-to-r from-primary-500 to-primary-600 text-white">
+        <Card class="bg-gradient-to-r from-primary-500 to-primary-600 text-white">
           <div class="flex items-center justify-between">
             <div>
               <p class="text-primary-100 text-sm font-medium">Utilisateurs Totaux</p>
@@ -51,9 +52,9 @@
               <UsersIcon class="w-8 h-8" />
             </div>
           </div>
-        </div>
+        </Card>
 
-        <div class="card bg-gradient-to-r from-primary-500 to-primary-600 text-white">
+        <Card class="bg-gradient-to-r from-primary-500 to-primary-600 text-white">
           <div class="flex items-center justify-between">
             <div>
               <p class="text-primary-100 text-sm font-medium">Commerçants Actifs</p>
@@ -66,9 +67,9 @@
               <BuildingStorefrontIcon class="w-8 h-8" />
             </div>
           </div>
-        </div>
+        </Card>
 
-        <div class="card bg-gradient-to-r from-blue-500 to-blue-600 text-white">
+        <Card class="bg-gradient-to-r from-blue-500 to-blue-600 text-white">
           <div class="flex items-center justify-between">
             <div>
               <p class="text-blue-100 text-sm font-medium">Produits Sauvés</p>
@@ -81,9 +82,9 @@
               <ShoppingBagIcon class="w-8 h-8" />
             </div>
           </div>
-        </div>
+        </Card>
 
-        <div class="card bg-gradient-to-r from-orange-500 to-orange-600 text-white">
+        <Card class="bg-gradient-to-r from-orange-500 to-orange-600 text-white">
           <div class="flex items-center justify-between">
             <div>
               <p class="text-orange-100 text-sm font-medium">Chiffre d'affaires</p>
@@ -96,14 +97,14 @@
               <div class="text-lg font-bold">F CFA</div>
             </div>
           </div>
-        </div>
+        </Card>
       </div>
     </div>
 
     <!-- Charts and Analytics -->
     <div class="grid grid-cols-1 xl:grid-cols-2 gap-6 mb-8">
       <!-- Revenue Chart -->
-      <div class="card">
+      <Card>
         <div class="flex items-center justify-between mb-6">
           <h3 class="text-xl font-semibold text-neutral-900">Évolution du chiffre d'affaires</h3>
           <select v-model="revenueChartPeriod" class="input text-sm">
@@ -115,10 +116,10 @@
         <div class="h-64">
           <canvas ref="revenueChartCanvas" class="w-full h-full"></canvas>
         </div>
-      </div>
+      </Card>
 
       <!-- User Growth Chart -->
-      <div class="card">
+      <Card>
         <div class="flex items-center justify-between mb-6">
           <h3 class="text-xl font-semibold text-neutral-900">Croissance des utilisateurs</h3>
           <div class="flex gap-2">
@@ -133,13 +134,13 @@
         <div class="h-64">
           <canvas ref="userGrowthChartCanvas" class="w-full h-full"></canvas>
         </div>
-      </div>
+      </Card>
     </div>
 
     <!-- Platform Activity -->
     <div class="grid grid-cols-1 xl:grid-cols-3 gap-6 mb-8">
       <!-- Recent Activity -->
-      <div class="xl:col-span-2 card">
+      <Card class="xl:col-span-2">
         <div class="flex items-center justify-between mb-6">
           <h3 class="text-xl font-semibold text-neutral-900">Activité récente</h3>
           <button
@@ -181,10 +182,10 @@
             </div>
           </div>
         </div>
-      </div>
+      </Card>
 
       <!-- System Health -->
-      <div class="card">
+      <Card>
         <h3 class="text-xl font-semibold text-neutral-900 mb-6">État du système</h3>
 
         <div class="space-y-4">
@@ -221,43 +222,51 @@
         <div class="mt-6 pt-6 border-t border-neutral-200">
           <h4 class="font-semibold text-neutral-900 mb-3">Actions rapides</h4>
           <div class="grid grid-cols-2 gap-2">
-            <button
+            <Button
               @click="viewLogs"
-              class="btn btn-outline btn-sm text-xs"
+              variant="outline"
+              size="sm"
+              class="text-xs"
+              :left-icon="DocumentTextIcon"
             >
-              <DocumentTextIcon class="w-4 h-4 mr-1" />
               Logs
-            </button>
-            <button
+            </Button>
+            <Button
               @click="viewMetrics"
-              class="btn btn-outline btn-sm text-xs"
+              variant="outline"
+              size="sm"
+              class="text-xs"
+              :left-icon="ChartBarIcon"
             >
-              <ChartBarIcon class="w-4 h-4 mr-1" />
               Métriques
-            </button>
-            <button
+            </Button>
+            <Button
               @click="manageUsers"
-              class="btn btn-outline btn-sm text-xs"
+              variant="outline"
+              size="sm"
+              class="text-xs"
+              :left-icon="UsersIcon"
             >
-              <UsersIcon class="w-4 h-4 mr-1" />
               Utilisateurs
-            </button>
-            <button
+            </Button>
+            <Button
               @click="systemSettings"
-              class="btn btn-outline btn-sm text-xs"
+              variant="outline"
+              size="sm"
+              class="text-xs"
+              :left-icon="CogIcon"
             >
-              <CogIcon class="w-4 h-4 mr-1" />
               Paramètres
-            </button>
+            </Button>
           </div>
         </div>
-      </div>
+      </Card>
     </div>
 
     <!-- Performance Metrics -->
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
       <!-- Environmental Impact -->
-      <div class="card">
+      <Card>
         <div class="flex items-center gap-3 mb-4">
           <div class="p-2 bg-green-100 rounded-lg">
             <GlobeEuropeAfricaIcon class="w-6 h-6 text-green-600" />
@@ -285,10 +294,10 @@
             🌱 Équivalent à {{ environmentalImpact.treesEquivalent }} arbres plantés
           </p>
         </div>
-      </div>
+      </Card>
 
       <!-- Top Merchants -->
-      <div class="card">
+      <Card>
         <h3 class="text-lg font-semibold text-neutral-900 mb-4">Top Commerçants</h3>
 
         <div class="space-y-3">
@@ -311,10 +320,10 @@
             </div>
           </div>
         </div>
-      </div>
+      </Card>
 
       <!-- Popular Categories -->
-      <div class="card">
+      <Card>
         <h3 class="text-lg font-semibold text-neutral-900 mb-4">Catégories Populaires</h3>
 
         <div class="space-y-3">
@@ -341,11 +350,11 @@
             </div>
           </div>
         </div>
-      </div>
+      </Card>
     </div>
 
     <!-- Alerts and Notifications -->
-    <div v-if="alerts.length > 0" class="card mb-8">
+    <Card v-if="alerts.length > 0" class="mb-8">
       <h3 class="text-lg font-semibold text-neutral-900 mb-4">Alertes et notifications</h3>
 
       <div class="space-y-3">
@@ -373,7 +382,7 @@
           </button>
         </div>
       </div>
-    </div>
+    </Card>
 
     <!-- Modal for detailed info -->
     <AdminModal
@@ -397,6 +406,8 @@ import { formatPrice } from '@/utils/currency'
 import AdminModal from '@/components/ui/AdminModal.vue'
 import DashboardLayout from '@/components/ui/DashboardLayout.vue'
 import { useDashboardLayout } from '@/composables/useDashboardLayout'
+import Button from '@/components/ui/2025/Button.vue'
+import Card from '@/components/ui/2025/Card.vue'
 import {
   ArrowPathIcon,
   UsersIcon,

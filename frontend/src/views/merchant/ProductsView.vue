@@ -831,3 +831,6 @@ onMounted(() => {
   }
 })
 </script>
+    </div>
+  </DashboardLayout>
+</template>

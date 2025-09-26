@@ -10,7 +10,10 @@
       "Bash(git add:*)",
       "Bash(git push:*)",
       "Bash(node:*)",
-      "Bash(pkill:*)"
+      "Bash(pkill:*)",
+      "Bash(git checkout:*)",
+      "Bash(npm run lint)",
+      "Bash(timeout 30s npm run build)"
     ],
     "deny": [],
     "ask": []

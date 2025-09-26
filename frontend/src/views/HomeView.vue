@@ -9,7 +9,7 @@
         <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-white/10 rounded-full blur-2xl"></div>
       </div>
 
-      <div class="relative container-fluid py-32 lg:py-40">
+      <div class="relative container-2025 py-32 lg:py-40">
         <div class="text-center max-w-5xl mx-auto">
           <!-- Badge avec animation -->
           <div class="inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-sm rounded-full text-sm font-medium mb-8 animate-fade-in-up">
@@ -41,38 +41,44 @@
 
           <!-- CTA Buttons avec animations -->
           <div class="flex flex-col sm:flex-row gap-6 justify-center items-center animate-fade-in-up" style="animation-delay: 0.6s;">
-            <router-link
+            <Button
+              as="router-link"
               to="/products"
-              class="btn btn-lg bg-white text-primary-600 hover:bg-white hover:text-primary-700 hover:scale-105 shadow-toast hover:shadow-glow group relative overflow-hidden"
+              size="lg"
+              variant="primary"
+              class="bg-white text-primary-600 hover:bg-white hover:text-primary-700 hover:scale-105 shadow-toast hover:shadow-card-2025 group relative overflow-hidden"
             >
               <span class="relative z-10 flex items-center gap-3">
                 🌟 Découvrir les offres
               </span>
               <div class="absolute inset-0 bg-nav-gradient opacity-0 group-hover:opacity-10 transition-opacity duration-300"></div>
-            </router-link>
+            </Button>
 
-            <router-link
+            <Button
               v-if="!authStore.isAuthenticated"
+              as="router-link"
               to="/register"
-              class="btn btn-lg btn-outline border-white/30 text-white hover:bg-white hover:text-primary-600 hover:scale-105"
+              size="lg"
+              variant="outline"
+              class="border-white/30 text-white hover:bg-white hover:text-primary-600 hover:scale-105"
             >
               <span class="flex items-center gap-2">
                 ✨ Rejoindre maintenant
               </span>
-            </router-link>
+            </Button>
           </div>
 
           <!-- Stats avec glassmorphism -->
           <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-16 animate-fade-in-up" style="animation-delay: 0.8s;">
-            <div class="glass-bg glass-border rounded-2xl p-6 text-center backdrop-blur-md">
+            <div class="bg-white/60 backdrop-blur-md glass-border rounded-2xl p-6 text-center">
               <div class="text-3xl font-bold text-accent-orange/70 mb-2">1,2M+</div>
               <div class="text-sm text-white/80">Produits sauvés</div>
             </div>
-            <div class="glass-bg glass-border rounded-2xl p-6 text-center backdrop-blur-md">
+            <div class="bg-white/60 backdrop-blur-md glass-border rounded-2xl p-6 text-center">
               <div class="text-3xl font-bold text-primary-300 mb-2">50K+</div>
               <div class="text-sm text-white/80">Utilisateurs actifs</div>
             </div>
-            <div class="glass-bg glass-border rounded-2xl p-6 text-center backdrop-blur-md">
+            <div class="bg-white/60 backdrop-blur-md glass-border rounded-2xl p-6 text-center">
               <div class="text-3xl font-bold text-accent-blue/70 mb-2">2,5K+</div>
               <div class="text-sm text-white/80">Commerçants partenaires</div>
             </div>
@@ -90,7 +96,7 @@
 
     <!-- Features Section - Design moderne avec cards interactives -->
     <section class="py-32 bg-gradient-to-b from-neutral-50 to-white relative">
-      <div class="container-fluid">
+      <div class="container-2025">
         <!-- Section Header -->
         <div class="text-center mb-20 animate-fade-in-up">
           <div class="inline-flex items-center gap-2 px-4 py-2 bg-primary-50 rounded-full text-sm font-medium text-primary-600 mb-6">
@@ -108,10 +114,10 @@
         <!-- Features Grid avec animations décalées -->
         <div class="grid lg:grid-cols-3 gap-8 lg:gap-12">
           <!-- Feature 1 -->
-          <div class="group card card-interactive glow-effect animate-fade-in-up" style="animation-delay: 0.2s;">
+          <Card :interactive="true" class="group glow-effect animate-fade-in-up" style="animation-delay: 0.2s;">
             <div class="relative">
               <!-- Icon avec gradient et animation -->
-              <div class="w-20 h-20 bg-nav-gradient rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-card group-hover:shadow-glow group-hover:scale-110 transition-all duration-300">
+              <div class="w-20 h-20 bg-nav-gradient rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-card group-hover:shadow-card-2025 group-hover:scale-110 transition-all duration-300">
                 <span class="text-3xl">🔍</span>
               </div>
 
@@ -141,12 +147,12 @@
                 </div>
               </div>
             </div>
-          </div>
+          </Card>
 
           <!-- Feature 2 -->
-          <div class="group card card-interactive glow-effect animate-fade-in-up" style="animation-delay: 0.4s;">
+          <Card :interactive="true" class="group glow-effect animate-fade-in-up" style="animation-delay: 0.4s;">
             <div class="relative">
-              <div class="w-20 h-20 bg-gradient-to-r from-accent-blue to-accent-blue/90 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-card group-hover:shadow-glow group-hover:scale-110 transition-all duration-300">
+              <div class="w-20 h-20 bg-gradient-to-r from-accent-blue to-accent-blue/90 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-card group-hover:shadow-card-2025 group-hover:scale-110 transition-all duration-300">
                 <span class="text-3xl">⚡</span>
               </div>
 
@@ -174,12 +180,12 @@
                 </div>
               </div>
             </div>
-          </div>
+          </Card>
 
           <!-- Feature 3 -->
-          <div class="group card card-interactive glow-effect animate-fade-in-up" style="animation-delay: 0.6s;">
+          <Card :interactive="true" class="group glow-effect animate-fade-in-up" style="animation-delay: 0.6s;">
             <div class="relative">
-              <div class="w-20 h-20 bg-gradient-to-r from-accent-orange to-accent-orange/90 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-card group-hover:shadow-glow group-hover:scale-110 transition-all duration-300">
+              <div class="w-20 h-20 bg-gradient-to-r from-accent-orange to-accent-orange/90 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-card group-hover:shadow-card-2025 group-hover:scale-110 transition-all duration-300">
                 <span class="text-3xl">🌱</span>
               </div>
 
@@ -207,18 +213,21 @@
                 </div>
               </div>
             </div>
-          </div>
+          </Card>
         </div>
 
         <!-- Bottom CTA -->
         <div class="text-center mt-16 animate-fade-in-up" style="animation-delay: 0.8s;">
-          <router-link
+          <Button
+            as="router-link"
             to="/register"
-            class="btn btn-primary btn-lg glow-effect"
+            variant="primary"
+            size="lg"
+            class="glow-effect"
           >
             <span>Commencer maintenant</span>
             <span class="ml-2">→</span>
-          </router-link>
+          </Button>
         </div>
       </div>
     </section>
@@ -269,28 +278,31 @@
 
         <template v-if="!authStore.isAuthenticated">
           <div class="space-x-4">
-            <router-link
+            <Button
+              as="router-link"
               to="/register"
-              class="btn bg-white text-primary-600 hover:bg-neutral-100 text-lg px-8 py-3"
+              class="bg-white text-primary-600 hover:bg-neutral-100 text-lg px-8 py-3"
             >
               Consommateur
-            </router-link>
-            <router-link
+            </Button>
+            <Button
+              as="router-link"
               to="/register"
-              class="btn bg-primary-500 hover:bg-primary-400 text-lg px-8 py-3"
+              class="bg-primary-500 hover:bg-primary-400 text-lg px-8 py-3"
             >
               Commerçant
-            </router-link>
+            </Button>
           </div>
         </template>
 
         <template v-else>
-          <router-link
+          <Button
+            as="router-link"
             to="/dashboard"
-            class="btn bg-white text-primary-600 hover:bg-gray-100 text-lg px-8 py-3"
+            class="bg-white text-primary-600 hover:bg-gray-100 text-lg px-8 py-3"
           >
             Accéder à mon tableau de bord
-          </router-link>
+          </Button>
         </template>
       </div>
     </section>
@@ -299,6 +311,8 @@
 
 <script setup lang="ts">
 import { useAuthStore } from '@/stores/auth'
+import Button from '@/components/ui/2025/Button.vue'
+import Card from '@/components/ui/2025/Card.vue'
 
 const authStore = useAuthStore()
 </script>
