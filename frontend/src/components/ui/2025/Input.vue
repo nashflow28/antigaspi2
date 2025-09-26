@@ -1,5 +1,5 @@
 <template>
-  <div class="input-wrapper">
+  <div :class="wrapperClasses">
     <!-- Label -->
     <label
       v-if="label"
@@ -31,6 +31,7 @@
         :required="required"
         :autocomplete="autocomplete"
         :class="inputClasses"
+        v-bind="inputAttrs"
         @focus="handleFocus"
         @blur="handleBlur"
         @input="handleInput"
@@ -69,6 +70,8 @@
 </template>
 
 <script setup lang="ts">
+defineOptions({ inheritAttrs: false })
+
 import { computed, ref, useAttrs } from 'vue'
 import { X } from 'lucide-vue-next'
 
@@ -93,6 +96,7 @@ interface Props {
   leftIcon?: any
   rightIcon?: any
   autocomplete?: string
+  inputClass?: string
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -102,7 +106,8 @@ const props = withDefaults(defineProps<Props>(), {
   disabled: false,
   readonly: false,
   required: false,
-  clearable: false
+  clearable: false,
+  inputClass: ''
 })
 
 // Emits
@@ -120,9 +125,42 @@ const inputRef = ref<HTMLInputElement>()
 const isFocused = ref(false)
 
 // Computed
+const attrs = useAttrs()
+
+const inputAttrs = computed(() => {
+  const { class: _class, id: _id, ...rest } = attrs
+  return rest
+})
+
+const wrapperClasses = computed(() => {
+  const attrClass = attrs.class
+
+  if (!attrClass) {
+    return 'input-wrapper'
+  }
+
+  if (typeof attrClass === 'string') {
+    return ['input-wrapper', attrClass].join(' ')
+  }
+
+  if (Array.isArray(attrClass)) {
+    return ['input-wrapper', ...attrClass].filter(Boolean).join(' ')
+  }
+
+  if (typeof attrClass === 'object') {
+    return [
+      'input-wrapper',
+      ...Object.entries(attrClass)
+        .filter(([, value]) => Boolean(value))
+        .map(([key]) => key)
+    ].join(' ')
+  }
+
+  return 'input-wrapper'
+})
+
 const inputId = computed(() => {
-  const attrs = useAttrs()
-  return attrs.id || `input-${Math.random().toString(36).substr(2, 9)}`
+  return (attrs.id as string | undefined) || `input-${Math.random().toString(36).substr(2, 9)}`
 })
 
 const model = computed({
@@ -165,7 +203,8 @@ const inputClasses = computed(() => {
 
     // Padding adjustments for icons
     props.leftIcon && 'pl-0',
-    (props.rightIcon || props.clearable) && 'pr-0'
+    (props.rightIcon || props.clearable) && 'pr-0',
+    props.inputClass
   ].filter(Boolean)
 
   return baseClasses.join(' ')
