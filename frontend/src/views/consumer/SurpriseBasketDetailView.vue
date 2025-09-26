@@ -10,24 +10,24 @@
         Retour
       </button>
 
-      <div v-if="isLoading" class="card flex min-h-[240px] items-center justify-center text-neutral-500">
+      <Card v-if="isLoading" class="flex min-h-[240px] items-center justify-center text-neutral-500">
         <span class="inline-flex h-6 w-6 animate-spin rounded-full border-2 border-neutral-200 border-t-primary-500"></span>
         <span class="ml-3">Chargement du panier surprise...</span>
-      </div>
+      </Card>
 
-      <div v-else-if="!basket" class="card text-center py-16">
+      <Card v-else-if="!basket" class="text-center py-16">
         <div class="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-neutral-100">
           <Package class="h-8 w-8 text-neutral-400" />
         </div>
         <h2 class="text-xl font-semibold text-neutral-800">Panier introuvable</h2>
         <p class="mt-2 text-neutral-500">Ce panier surprise n'est plus disponible ou n'existe pas.</p>
-        <button type="button" class="btn btn-primary mt-6" @click="router.push({ name: 'surprise-baskets' })">
+        <Button variant="primary" class="mt-6" @click="router.push({ name: 'surprise-baskets' })">
           Voir les autres paniers
-        </button>
-      </div>
+        </Button>
+      </Card>
 
       <div v-else class="grid gap-8 lg:grid-cols-[2fr_1fr]">
-        <article class="card overflow-hidden">
+        <Card class="overflow-hidden">
           <div class="relative h-64 w-full">
             <img
               v-if="basket.image_url"
@@ -42,8 +42,8 @@
               <Package class="h-12 w-12 text-primary-400" />
             </div>
             <div class="absolute left-6 top-6 flex items-center gap-3">
-              <span class="badge badge-success font-semibold">-{{ basket.basket_discount_percentage }}%</span>
-              <span class="rounded-full bg-white/90 px-3 py-1 text-xs font-medium text-neutral-700 shadow-card">
+              <Badge variant="success" class="font-semibold">-{{ basket.basket_discount_percentage }}%</Badge>
+              <span class="rounded-full bg-white/90 px-3 py-1 text-xs font-medium text-neutral-700 shadow-modern-2025">
                 <Clock class="mr-1 inline-block h-4 w-4 text-primary-500" />
                 {{ timeLeft }}
               </span>
@@ -90,9 +90,9 @@
               </p>
             </section>
           </div>
-        </article>
+        </Card>
 
-        <aside class="card space-y-6 p-6">
+        <Card class="space-y-6 p-6">
           <div>
             <h2 class="text-lg font-semibold text-neutral-900">Votre réservation</h2>
             <p class="text-sm text-neutral-500">Réservez dès maintenant et récupérez votre panier avant l'expiration.</p>
@@ -114,13 +114,13 @@
           </div>
 
           <div class="space-y-3">
-            <label class="form-label" for="quantity">Quantité</label>
+            <Label for="quantity">Quantité</Label>
             <input
               id="quantity"
               type="number"
               min="1"
               :max="Math.max(1, maxQuantity)"
-              class="form-input"
+              class="input-field-2025"
               :disabled="maxQuantity === 0"
               v-model.number="quantity"
             />
@@ -167,13 +167,13 @@
             </div>
 
             <div v-if="methodRequiresPhone" class="space-y-2">
-              <label for="mobile-money-phone" class="form-label">Numéro Mobile Money</label>
+              <Label for="mobile-money-phone">Numéro Mobile Money</Label>
               <input
                 id="mobile-money-phone"
                 v-model.trim="mobileMoneyPhone"
                 type="tel"
                 placeholder="+228 90 00 00 00"
-                class="form-input"
+                class="input-field-2025"
                 :class="{
                   'border-accent-red/50 focus:border-accent-red/50 focus:ring-accent-red/20': mobileMoneyPhone && !isPhoneValid
                 }"
@@ -209,7 +209,7 @@
           <div class="space-y-2">
             <button
               type="button"
-              class="btn btn-primary w-full"
+              class="button-primary-2025 w-full"
               :disabled="!canReserve || submitting"
               @click="reserveBasket"
             >
@@ -226,7 +226,7 @@
               Seuls les consommateurs peuvent réserver des paniers.
             </p>
           </div>
-        </aside>
+        </Card>
       </div>
     </div>
   </div>
@@ -245,6 +245,11 @@ import { notify } from '@/composables/useNotifications'
 import { formatPrice, formatSavings } from '@/utils/currency'
 import type { SurpriseBasket } from '@/services/surpriseBasketService'
 import type { PaymentMethod } from '@/types'
+import Badge from '@/components/ui/2025/Badge.vue'
+import Button from '@/components/ui/2025/Button.vue'
+import Card from '@/components/ui/2025/Card.vue'
+import Input from '@/components/ui/2025/Input.vue'
+import Label from '@/components/ui/2025/Label.vue'
 
 const route = useRoute()
 const router = useRouter()

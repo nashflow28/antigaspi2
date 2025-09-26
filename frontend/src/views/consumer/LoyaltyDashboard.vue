@@ -18,7 +18,7 @@
             <button
               @click="refreshPoints"
               :disabled="loading"
-              class="btn btn-outline btn-sm"
+              class="button-outline-2025 text-sm"
             >
               <RefreshCw class="w-4 h-4" :class="{ 'animate-spin': loading }" />
               Actualiser
@@ -36,7 +36,7 @@
           <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
 
             <!-- Total Points -->
-            <div class="card glow-effect">
+            <Card class="glow-effect">
               <div class="flex items-center justify-between">
                 <div>
                   <p class="text-sm font-medium text-neutral-600">Points Totaux</p>
@@ -48,10 +48,10 @@
                   <Star class="w-8 h-8 text-primary-600" />
                 </div>
               </div>
-            </div>
+            </Card>
 
             <!-- Expiring Points -->
-            <div class="card">
+            <Card class="">
               <div class="flex items-center justify-between">
                 <div>
                   <p class="text-sm font-medium text-neutral-600">Points Expirent</p>
@@ -64,10 +64,10 @@
                   <Clock class="w-8 h-8 text-accent-orange" />
                 </div>
               </div>
-            </div>
+            </Card>
 
             <!-- Available Rewards -->
-            <div class="card cursor-pointer hover:shadow-card transition-all duration-200" @click="scrollToRewards">
+            <Card class="cursor-pointer hover:shadow-modern-2025 transition-all duration-200" @click="scrollToRewards">
               <div class="flex items-center justify-between">
                 <div>
                   <p class="text-sm font-medium text-neutral-600">Récompenses</p>
@@ -80,14 +80,14 @@
                   <Gift class="w-8 h-8 text-accent-blue" />
                 </div>
               </div>
-            </div>
+            </Card>
 
           </div>
         </div>
 
         <!-- Points Breakdown -->
         <div class="lg:col-span-2">
-          <div class="card">
+          <Card class="">
             <div class="flex items-center justify-between mb-6">
               <h3 class="text-xl font-semibold text-neutral-900">Répartition des Points</h3>
               <div class="flex items-center gap-2 text-sm text-neutral-600">
@@ -122,12 +122,12 @@
               <p class="text-neutral-600">Aucun point gagné pour le moment</p>
               <p class="text-sm text-neutral-500">Commencez par faire un achat ou laisser un avis !</p>
             </div>
-          </div>
+          </Card>
         </div>
 
         <!-- Recent Activity -->
         <div class="lg:col-span-1">
-          <div class="card">
+          <Card class="">
             <h3 class="text-xl font-semibold text-neutral-900 mb-6">Activité Récente</h3>
 
             <div v-if="recentHistory.length > 0" class="space-y-3">
@@ -155,12 +155,12 @@
               <Clock class="w-12 h-12 text-neutral-300 mx-auto mb-3" />
               <p class="text-neutral-600 text-sm">Aucune activité récente</p>
             </div>
-          </div>
+          </Card>
         </div>
 
         <!-- Rewards Section -->
         <div ref="rewardsSection" class="lg:col-span-3">
-          <div class="card">
+          <Card class="">
             <div class="flex items-center justify-between mb-6">
               <h3 class="text-xl font-semibold text-neutral-900">Récompenses Disponibles</h3>
               <div class="flex items-center gap-2 text-sm text-neutral-600">
@@ -173,7 +173,7 @@
               <div
                 v-for="reward in availableRewards"
                 :key="reward.id"
-                class="border border-neutral-200 rounded-xl p-6 hover:shadow-card transition-all duration-200"
+                class="border border-neutral-200 rounded-xl p-6 hover:shadow-modern-2025 transition-all duration-200"
                 :class="canRedeem(reward.cost) ? 'bg-white hover:border-primary-300' : 'bg-neutral-50'"
               >
                 <div class="flex items-center gap-3 mb-4">
@@ -191,14 +191,14 @@
                 <button
                   @click="openRedeemModal(reward)"
                   :disabled="!canRedeem(reward.cost)"
-                  class="w-full btn"
-                  :class="canRedeem(reward.cost) ? 'btn-primary' : 'btn-outline opacity-50 cursor-not-allowed'"
+                  class="w-full button-primary-2025"
+                  :class="canRedeem(reward.cost) ? 'button-primary-2025' : 'button-outline-2025 opacity-50 cursor-not-allowed'"
                 >
                   {{ canRedeem(reward.cost) ? 'Échanger' : 'Points insuffisants' }}
                 </button>
               </div>
             </div>
-          </div>
+          </Card>
         </div>
 
       </div>
@@ -240,13 +240,13 @@
             </div>
 
             <div class="flex gap-3">
-              <button @click="closeRedeemModal" class="flex-1 btn btn-outline">
+              <button @click="closeRedeemModal" class="flex-1 button-outline-2025">
                 Annuler
               </button>
               <button
                 @click="confirmRedeem"
                 :disabled="redeeming"
-                class="flex-1 btn btn-primary"
+                class="flex-1 button-primary-2025"
               >
                 <Loader2 v-if="redeeming" class="w-4 h-4 mr-2 animate-spin" />
                 {{ redeeming ? 'Échange...' : 'Confirmer' }}
@@ -267,6 +267,8 @@ import {
 } from 'lucide-vue-next'
 import { useLoyaltyPoints } from '@/composables/useLoyaltyPoints'
 import DashboardLayout from '@/components/ui/DashboardLayout.vue'
+import Button from '@/components/ui/2025/Button.vue'
+import Card from '@/components/ui/2025/Card.vue'
 import { useDashboardLayout } from '@/composables/useDashboardLayout'
 
 // Composables

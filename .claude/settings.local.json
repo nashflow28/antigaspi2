@@ -13,7 +13,22 @@
       "Bash(pkill:*)",
       "Bash(git checkout:*)",
       "Bash(npm run lint)",
-      "Bash(timeout 30s npm run build)"
+      "Bash(timeout 30s npm run build)",
+      "Bash(git pull:*)",
+      "Bash(php artisan:*)",
+      "Bash(find:*)",
+      "Bash(npm run:*)",
+      "Bash(npm test)",
+      "Bash(timeout 45s npm run build)",
+      "Bash(cat:*)",
+      "Bash(awk:*)",
+      "Bash(npm install:*)",
+      "Bash(dir:*)",
+      "Bash(grep:*)",
+      "Bash(sort:*)",
+      "Read(//c/**)",
+      "Bash(npx playwright test:*)",
+      "Bash(curl:*)"
     ],
     "deny": [],
     "ask": []

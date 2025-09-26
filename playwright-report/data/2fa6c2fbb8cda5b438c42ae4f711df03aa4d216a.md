@@ -1,0 +1,95 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e3]:
+  - navigation "Navigation principale" [ref=e4]:
+    - generic [ref=e5]:
+      - link "Antigaspi" [ref=e6] [cursor=pointer]:
+        - /url: /
+        - generic [ref=e7] [cursor=pointer]: Antigaspi
+      - menubar [ref=e8]:
+        - menuitem "Accueil" [ref=e9]:
+          - img [ref=e10]
+          - generic [ref=e12]: Accueil
+        - menuitem "Découvrir" [ref=e13]:
+          - img [ref=e14]
+          - generic [ref=e16]: Découvrir
+        - menuitem "Produits" [ref=e17]:
+          - img [ref=e18]
+          - generic [ref=e20]: Produits
+        - menuitem "Avis" [ref=e21]:
+          - img [ref=e22]
+          - generic [ref=e24]: Avis
+      - generic [ref=e25]:
+        - button "Activer le thème sombre" [ref=e26] [cursor=pointer]
+        - generic [ref=e29]:
+          - button "Mon panier" [ref=e30] [cursor=pointer]:
+            - generic [ref=e32] [cursor=pointer]: Mon panier
+          - button "Se connecter" [ref=e33] [cursor=pointer]:
+            - generic [ref=e34] [cursor=pointer]: Se connecter
+          - button "Créer un compte" [ref=e35] [cursor=pointer]:
+            - generic [ref=e36] [cursor=pointer]: Créer un compte
+  - main [ref=e37]:
+    - generic [ref=e39]:
+      - generic [ref=e40]:
+        - link "🥬 Antigaspi" [ref=e41] [cursor=pointer]:
+          - /url: /
+          - generic [ref=e42] [cursor=pointer]: 🥬
+          - generic [ref=e43] [cursor=pointer]: Antigaspi
+        - heading "Connexion" [level=2] [ref=e44]
+        - paragraph [ref=e45]: Connectez-vous à votre compte pour continuer
+      - generic [ref=e47]:
+        - generic [ref=e48]:
+          - heading "Content de vous revoir !" [level=3] [ref=e49]
+          - paragraph [ref=e50]: Connectez-vous pour accéder à votre compte Antigaspi
+        - generic [ref=e51]:
+          - generic [ref=e53]:
+            - generic [ref=e54]:
+              - text: Adresse email
+              - generic [ref=e55]: "*"
+            - generic [ref=e56]:
+              - img [ref=e57]
+              - textbox "Adresse email *" [ref=e60]
+          - generic [ref=e62]:
+            - generic [ref=e63]:
+              - text: Mot de passe
+              - generic [ref=e64]: "*"
+            - generic [ref=e65]:
+              - img [ref=e66]
+              - textbox "Mot de passe *" [ref=e69]
+              - img [ref=e71]
+          - generic [ref=e74]:
+            - generic [ref=e75]:
+              - checkbox "Se souvenir de moi" [ref=e76]
+              - generic [ref=e77]: Se souvenir de moi
+            - link "Mot de passe oublié ?" [ref=e78] [cursor=pointer]:
+              - /url: /forgot-password
+          - button "Se connecter" [disabled] [ref=e79]:
+            - generic [ref=e82]: Se connecter
+        - generic [ref=e84]:
+          - generic [ref=e89]: Ou continuez avec
+          - generic [ref=e90]:
+            - button "Google" [ref=e91] [cursor=pointer]:
+              - generic [ref=e92] [cursor=pointer]:
+                - img [ref=e93] [cursor=pointer]
+                - text: Google
+            - button "Facebook" [ref=e98] [cursor=pointer]:
+              - generic [ref=e99] [cursor=pointer]:
+                - img [ref=e100] [cursor=pointer]
+                - text: Facebook
+        - generic [ref=e102]:
+          - text: Vous n'avez pas encore de compte ?
+          - link "Créez votre compte" [ref=e103] [cursor=pointer]:
+            - /url: /register
+      - link "← Retour à l'accueil" [ref=e105] [cursor=pointer]:
+        - /url: /
+  - contentinfo [ref=e106]:
+    - generic [ref=e107]:
+      - generic [ref=e108]:
+        - paragraph [ref=e109]: Antigaspi
+        - paragraph [ref=e110]: © 2025 — Ensemble, réduisons le gaspillage alimentaire.
+      - generic [ref=e111]:
+        - img [ref=e113]
+        - img [ref=e117]
+        - img [ref=e121]
+```

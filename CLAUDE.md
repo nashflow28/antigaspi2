@@ -10,7 +10,18 @@
 5. **TOUJOURS relire tous les fichiers modifiés** pour s'assurer qu'aucune mise à jour n'a été omise et qu'aucun code mort ne subsiste.
 6. **TOUJOURS exécuter la suite complète de tests (backend & frontend)** après les modifications et corriger immédiatement toute erreur ou tout test en échec.
 7. **Vérifier le lint et le build** du projet (TypeScript, ESLint, compilation frontend, etc.) afin de détecter toute régression ou erreur de syntaxe.
-8. **Ne déclarer la tâche "terminée" qu'après validation** par l’agent de revue (Phase 2) **ET** par un agent de validation finale (Phase 3), avec confirmation explicite de chacun.
+8. **Ne déclarer la tâche "terminée" qu'après validation** par l'agent de revue (Phase 2) **ET** par un agent de validation finale (Phase 3) **ET** Phase 4 (reality-checker) avec confirmation explicite de chacun.
+
+## 🚨 AGENT REALITY-CHECKER OBLIGATOIRE
+**Activation automatique pour toute déclaration de "succès", "terminé", ou score >80/100**
+
+L'agent **reality-checker** doit SYSTÉMATIQUEMENT être invoqué avant toute conclusion positive :
+- Vérifie INDÉPENDAMMENT tous les métriques annoncés
+- Challenge IMPITOYABLEMENT toute affirmation optimiste
+- Exécute ses propres audits et tests de validation
+- BLOQUE toute déclaration de réussite non prouvée empiriquement
+
+**Règle absolue :** Aucune tâche ne peut être déclarée "terminée" sans rapport de validation explicite du reality-checker.
 
 ## Phase 1: Implémentation
 [Agent principal fait le travail]
@@ -20,19 +31,34 @@
 - Focus sur la complétude des tâches TODO
 - Validation technique par domaine d'expertise
 
-## Phase 3: Validation indépendante  
+## Phase 3: Validation indépendante
 - Effectuée par un agent différent de celui d'implémentation (ex: agent **test-guardian** spécialisé en tests).
 - Comparer le résultat au plan original et s'assurer que toutes les tâches prévues ont été traitées.
 - Exécuter **tous les tests automatisés** (tests unitaires PHP + tests E2E Playwright) et vérifier qu'ils passent à 100%.
-- S'assurer que la couverture de code est satisfaisante et qu'aucune régression fonctionnelle n’est présente.
+- S'assurer que la couverture de code est satisfaisante et qu'aucune régression fonctionnelle n'est présente.
+
+## Phase 4: Contrôle empirique reality-checker 🚨
+- **OBLIGATOIRE** pour toute déclaration de succès ou score >80/100
+- Effectuée par l'agent **reality-checker** avec validation ULTRA-STRICTE
+- Audit INDÉPENDANT de tous les fichiers et métriques annoncés
+- Vérification EMPIRIQUE : lit les vrais fichiers, exécute les vrais tests
+- Challenge SYSTÉMATIQUE de tout optimisme et biais de confirmation
+- **VERDICT FINAL :** REJECT/BLOCK/FAIL si moindre discordance détectée
+
+**Triggers automatiques :**
+- Claims de "migration réussie" ou "terminé"
+- Scores annoncés >80/100
+- Déclarations "prêt pour production"
+- Métriques de performance ou couverture de test
 
 ## Règles de vérification
-- Aucune tâche n'est "terminée" sans passage par les 3 phases
+- Aucune tâche n'est "terminée" sans passage par les 4 phases
 - Chaque agent doit confirmer explicitement la complétude
 - En cas de problème détecté, retour en Phase 1
+- **Le reality-checker a un droit de veto ABSOLU sur toute conclusion**
 
 ## Commandes de test disponibles
-⚠️ **Rappel important : Ces commandes doivent être utilisées automatiquement dans les phases 2 et 3, pas seulement listées.**
+⚠️ **Rappel important : Ces commandes doivent être utilisées automatiquement dans les phases 2, 3 ET 4 (reality-checker), pas seulement listées.**
 
 - **Relecture de tous les fichiers modifiés**  
   ```bash
@@ -69,11 +95,35 @@
   npm run build
   ```
 
-- **Couverture des tests**  
+- **Couverture des tests**
   ```bash
   php artisan test --coverage
   npm run test:coverage
   ```
+
+- **Audit legacy exact (Phase 3 scoring)**
+  ```bash
+  node audit-legacy-exact.js
+  ```
+
+## 🚨 COMMANDES REALITY-CHECKER SPÉCIFIQUES
+
+- **Validation empirique des métriques**
+  ```bash
+  # Vérification indépendante du score Phase 3
+  node audit-legacy-exact.js
+
+  # Vérification build réel
+  npm run build
+
+  # Tests complets indépendants
+  npm test && php artisan test
+  ```
+
+- **Lecture directe des fichiers critiques**
+  - Toujours lire les fichiers mentionnés dans les claims de "migration"
+  - Compter manuellement les usages legacy avec grep/rg
+  - Vérifier les artefacts de build réels dans le système
 
 
 > **Documentation technique et contexte pour le développement avec Claude Code**

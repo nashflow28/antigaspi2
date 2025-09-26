@@ -1,5 +1,5 @@
 <template>
-  <div class="card group overflow-hidden">
+  <Card class="group overflow-hidden">
     <div class="relative h-48 w-full">
       <img
         v-if="basket.image_url"
@@ -15,15 +15,15 @@
       </div>
 
       <div class="absolute left-4 top-4 flex gap-2">
-        <span class="badge badge-success font-semibold">-{{ basket.basket_discount_percentage }}%</span>
-        <span v-if="basket.quantity_available" class="badge badge-soft">
+        <Badge variant="success" class="font-semibold">-{{ basket.basket_discount_percentage }}%</Badge>
+        <Badge v-if="basket.quantity_available" variant="secondary">
           {{ basket.quantity_available }} restant{{ basket.quantity_available > 1 ? 's' : '' }}
-        </span>
+        </Badge>
       </div>
 
       <span
         v-if="timeLeft"
-        class="absolute bottom-4 left-4 inline-flex items-center gap-1 rounded-full bg-white/90 px-3 py-1 text-xs font-medium text-neutral-700 shadow-card"
+        class="absolute bottom-4 left-4 inline-flex items-center gap-1 rounded-full bg-white/90 px-3 py-1 text-xs font-medium text-neutral-700 shadow-modern-2025"
       >
         <Clock class="h-4 w-4 text-primary-500" />
         {{ timeLeft }}
@@ -63,7 +63,7 @@
         </div>
         <div class="flex flex-col gap-2">
           <button
-            class="btn btn-ghost btn-sm"
+            class="button-ghost-2025 text-sm"
             type="button"
             data-testid="surprise-basket-view"
             @click="$emit('view', basket)"
@@ -71,7 +71,7 @@
             Voir les détails
           </button>
           <button
-            class="btn btn-primary btn-sm"
+            class="button-primary-2025 text-sm"
             type="button"
             :disabled="basket.quantity_available === 0"
             data-testid="surprise-basket-reserve"
@@ -82,7 +82,7 @@
         </div>
       </div>
     </div>
-  </div>
+  </Card>
 </template>
 
 <script setup lang="ts">
@@ -90,6 +90,8 @@ import { computed } from 'vue'
 import { Clock, Package, Store, Tag } from 'lucide-vue-next'
 import type { SurpriseBasket } from '@/services/surpriseBasketService'
 import { formatPrice, formatSavings } from '@/utils/currency'
+import Badge from '@/components/ui/2025/Badge.vue'
+import Card from '@/components/ui/2025/Card.vue'
 
 interface Props {
   basket: SurpriseBasket

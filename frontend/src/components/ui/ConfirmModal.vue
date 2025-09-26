@@ -24,21 +24,22 @@
         </div>
 
         <div class="flex items-center gap-3 mt-6">
-          <button
+          <Button
             type="button"
-            class="flex-1 btn btn-ghost"
+            variant="ghost"
+            class="flex-1"
             @click="onCancel"
           >
             {{ cancelText }}
-          </button>
-          <button
+          </Button>
+          <Button
             type="button"
-            class="flex-1 btn"
-            :class="confirmButtonClass"
+            :variant="confirmButtonVariant"
+            class="flex-1"
             @click="onConfirm"
           >
             {{ confirmText }}
-          </button>
+          </Button>
         </div>
       </div>
     </div>
@@ -48,6 +49,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { AlertTriangle, CheckCircle, HelpCircle } from 'lucide-vue-next'
+import Button from '@/components/ui/2025/Button.vue'
 
 interface Props {
   isOpen: boolean
@@ -102,14 +104,14 @@ const iconClass = computed(() => {
   }
 })
 
-const confirmButtonClass = computed(() => {
+const confirmButtonVariant = computed(() => {
   switch (props.type) {
     case 'danger':
-      return 'btn-error'
+      return 'error'
     case 'success':
-      return 'btn-success'
+      return 'success'
     default:
-      return 'btn-warning'
+      return 'warning'
   }
 })
 

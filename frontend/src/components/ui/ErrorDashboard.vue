@@ -7,49 +7,59 @@
         <span class="error-count" v-if="errorQueue.length > 0">{{ errorQueue.length }}</span>
       </div>
       <div class="dashboard-controls">
-        <button @click="clearAllErrors" class="btn-clear-all" title="Clear all errors">
+        <Button
+          @click="clearAllErrors"
+          variant="ghost"
+          size="sm"
+          title="Clear all errors"
+        >
           <Trash2 class="w-4 h-4" />
-        </button>
-        <button @click="showDashboard = false" class="btn-close" title="Close dashboard">
+        </Button>
+        <Button
+          @click="showDashboard = false"
+          variant="ghost"
+          size="sm"
+          title="Close dashboard"
+        >
           <X class="w-4 h-4" />
-        </button>
+        </Button>
       </div>
     </div>
 
     <div class="dashboard-content">
       <!-- Stats -->
       <div class="stats-grid">
-        <div class="stat-card">
+        <Card class="stat-item">
           <AlertTriangle class="w-5 h-5 text-red-500" />
           <div>
             <div class="stat-value">{{ errorQueue.length }}</div>
             <div class="stat-label">Erreurs en attente</div>
           </div>
-        </div>
+        </Card>
 
-        <div class="stat-card">
+        <Card class="stat-item">
           <Activity class="w-5 h-5 text-blue-500" />
           <div>
             <div class="stat-value">{{ breadcrumbs.length }}</div>
             <div class="stat-label">Breadcrumbs</div>
           </div>
-        </div>
+        </Card>
 
-        <div class="stat-card">
+        <Card class="stat-item">
           <MousePointer class="w-5 h-5 text-green-500" />
           <div>
             <div class="stat-value">{{ userActions.length }}</div>
             <div class="stat-label">Actions utilisateur</div>
           </div>
-        </div>
+        </Card>
 
-        <div class="stat-card">
+        <Card class="stat-item">
           <Wifi class="w-5 h-5" :class="isOnline ? 'text-green-500' : 'text-red-500'" />
           <div>
             <div class="stat-value">{{ isOnline ? 'En ligne' : 'Hors ligne' }}</div>
             <div class="stat-label">Statut réseau</div>
           </div>
-        </div>
+        </Card>
       </div>
 
       <!-- Tabs -->
@@ -174,7 +184,7 @@
     title="Open Error Dashboard"
   >
     <Bug class="w-5 h-5" />
-    <span v-if="errorQueue.length > 0" class="toggle-badge">{{ errorQueue.length }}</span>
+    <Badge v-if="errorQueue.length > 0" variant="warning" class="toggle-indicator">{{ errorQueue.length }}</Badge>
   </button>
 </template>
 
@@ -192,6 +202,9 @@ import {
   Navigation
 } from 'lucide-vue-next'
 import { useErrorReporting } from '@/composables/useErrorReporting'
+import Button from '@/components/ui/2025/Button.vue'
+import Card from '@/components/ui/2025/Card.vue'
+import Badge from '@/components/ui/2025/Badge.vue'
 
 const { errorQueue, breadcrumbs, userActions } = useErrorReporting()
 
@@ -284,22 +297,6 @@ if (typeof window !== 'undefined') {
   gap: 8px;
 }
 
-.btn-clear-all,
-.btn-close {
-  background: none;
-  border: none;
-  padding: 6px;
-  border-radius: 6px;
-  cursor: pointer;
-  color: #6b7280;
-  transition: all 0.2s;
-}
-
-.btn-clear-all:hover,
-.btn-close:hover {
-  background: #e5e7eb;
-  color: #374151;
-}
 
 .dashboard-content {
   flex: 1;
@@ -316,7 +313,7 @@ if (typeof window !== 'undefined') {
   border-bottom: 1px solid #e5e7eb;
 }
 
-.stat-card {
+.stat-item {
   display: flex;
   align-items: center;
   gap: 8px;
@@ -551,16 +548,11 @@ if (typeof window !== 'undefined') {
   box-shadow: 0 15px 30px -5px rgba(220, 38, 38, 0.5);
 }
 
-.toggle-badge {
+.toggle-indicator {
   position: absolute;
   top: -8px;
   right: -8px;
-  background: #fbbf24;
-  color: #1f2937;
   font-size: 12px;
-  font-weight: 600;
-  padding: 2px 6px;
-  border-radius: 9999px;
   min-width: 20px;
   text-align: center;
 }

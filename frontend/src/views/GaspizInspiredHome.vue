@@ -41,15 +41,15 @@
             <ul class="mt-6 space-y-4 text-sm text-slate-600">
               <li class="flex items-center justify-between rounded-xl bg-slate-50 p-3">
                 <span>Boulangerie artisanale</span>
-                <span class="font-semibold text-emerald-600">4,90 €</span>
+                <span class="font-semibold text-emerald-600">3213 XOF</span>
               </li>
               <li class="flex items-center justify-between rounded-xl bg-slate-50 p-3">
                 <span>Supérette bio locale</span>
-                <span class="font-semibold text-emerald-600">5,50 €</span>
+                <span class="font-semibold text-emerald-600">3606 XOF</span>
               </li>
               <li class="flex items-center justify-between rounded-xl bg-slate-50 p-3">
                 <span>Restaurant végétarien</span>
-                <span class="font-semibold text-emerald-600">6,20 €</span>
+                <span class="font-semibold text-emerald-600">4065 XOF</span>
               </li>
             </ul>
             <button class="mt-6 w-full rounded-xl bg-emerald-500 py-3 text-sm font-semibold text-white transition hover:bg-emerald-600">

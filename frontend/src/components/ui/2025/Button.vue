@@ -39,6 +39,9 @@ export type ButtonVariant =
   | 'outline'
   | 'promo'
   | 'destructive'
+  | 'error'
+  | 'success'
+  | 'warning'
 
 export type ButtonSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl'
 
@@ -163,6 +166,36 @@ const variantClasses = computed(() => {
       'active:bg-red-800',
       'shadow-lg shadow-red-500/25',
       'hover:shadow-xl hover:shadow-red-500/30'
+    ].join(' '),
+
+    error: [
+      'bg-red-600 text-white',
+      'border border-red-600',
+      'hover:bg-red-700 hover:border-red-700',
+      'focus:ring-red-500',
+      'active:bg-red-800',
+      'shadow-lg shadow-red-500/25',
+      'hover:shadow-xl hover:shadow-red-500/30'
+    ].join(' '),
+
+    success: [
+      'bg-green-600 text-white',
+      'border border-green-600',
+      'hover:bg-green-700 hover:border-green-700',
+      'focus:ring-green-500',
+      'active:bg-green-800',
+      'shadow-lg shadow-green-500/25',
+      'hover:shadow-xl hover:shadow-green-500/30'
+    ].join(' '),
+
+    warning: [
+      'bg-accent-orange text-white',
+      'border border-accent-orange',
+      'hover:bg-accent-orange/90 hover:border-accent-orange/90',
+      'focus:ring-accent-orange',
+      'active:bg-accent-orange/80',
+      'shadow-lg shadow-accent-orange/25',
+      'hover:shadow-xl hover:shadow-accent-orange/30'
     ].join(' ')
   }
 

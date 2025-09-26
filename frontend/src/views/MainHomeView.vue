@@ -175,8 +175,8 @@
               <p class="text-small text-neutral-500">{{ product.merchant }}</p>
               <div class="flex items-center justify-between">
                 <div class="flex items-center gap-2 text-primary-600">
-                  <span class="text-h4 font-semibold">{{ product.price }}€</span>
-                  <span v-if="product.originalPrice" class="text-caption text-neutral-500 line-through">{{ product.originalPrice }}€</span>
+                  <span class="text-h4 font-semibold">{{ product.price }} XOF</span>
+                  <span v-if="product.originalPrice" class="text-caption text-neutral-500 line-through">{{ product.originalPrice }} XOF</span>
                 </div>
                 <span class="rounded-full bg-primary-100 px-3 py-1 text-caption font-medium text-primary-700">-{{ product.discount }}%</span>
               </div>

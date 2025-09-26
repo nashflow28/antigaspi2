@@ -1,0 +1,110 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e3]:
+  - navigation "Navigation principale" [ref=e4]:
+    - generic [ref=e5]:
+      - link "Antigaspi" [ref=e6] [cursor=pointer]:
+        - /url: /
+        - generic [ref=e7] [cursor=pointer]: Antigaspi
+      - menubar [ref=e8]:
+        - menuitem "Accueil" [ref=e9]:
+          - img [ref=e10]
+          - generic [ref=e12]: Accueil
+        - menuitem "Découvrir" [ref=e13]:
+          - img [ref=e14]
+          - generic [ref=e16]: Découvrir
+        - menuitem "Produits" [ref=e17]:
+          - img [ref=e18]
+          - generic [ref=e20]: Produits
+        - menuitem "Avis" [ref=e21]:
+          - img [ref=e22]
+          - generic [ref=e24]: Avis
+      - generic [ref=e25]:
+        - button "Activer le thème sombre" [ref=e26] [cursor=pointer]
+        - generic [ref=e29]:
+          - button "Mon panier" [ref=e30] [cursor=pointer]:
+            - generic [ref=e32] [cursor=pointer]: Mon panier
+          - button "Se connecter" [ref=e33] [cursor=pointer]:
+            - generic [ref=e34] [cursor=pointer]: Se connecter
+          - button "Créer un compte" [ref=e35] [cursor=pointer]:
+            - generic [ref=e36] [cursor=pointer]: Créer un compte
+  - main [ref=e37]:
+    - generic [ref=e39]:
+      - generic [ref=e40]:
+        - link "🥬 Antigaspi" [ref=e41] [cursor=pointer]:
+          - /url: /
+          - generic [ref=e42] [cursor=pointer]: 🥬
+          - generic [ref=e43] [cursor=pointer]: Antigaspi
+        - heading "Inscription" [level=2] [ref=e44]
+        - paragraph [ref=e45]: Rejoignez la communauté Antigaspi et contribuez à réduire le gaspillage alimentaire
+      - generic [ref=e47]:
+        - generic [ref=e48]:
+          - generic [ref=e49]: "Je souhaite m'inscrire en tant que :"
+          - generic [ref=e50]:
+            - generic [ref=e51] [cursor=pointer]:
+              - radio "🛒 Consommateur Découvrir et réserver des produits" [checked] [ref=e52]
+              - generic [ref=e53] [cursor=pointer]:
+                - generic [ref=e54] [cursor=pointer]:
+                  - generic [ref=e55] [cursor=pointer]: 🛒
+                  - generic [ref=e56] [cursor=pointer]: Consommateur
+                - generic [ref=e57] [cursor=pointer]: Découvrir et réserver des produits
+            - generic [ref=e58] [cursor=pointer]:
+              - radio "🏪 Commerçant Vendre mes invendus" [ref=e59]
+              - generic [ref=e60] [cursor=pointer]:
+                - generic [ref=e61] [cursor=pointer]:
+                  - generic [ref=e62] [cursor=pointer]: 🏪
+                  - generic [ref=e63] [cursor=pointer]: Commerçant
+                - generic [ref=e64] [cursor=pointer]: Vendre mes invendus
+        - generic [ref=e65]:
+          - generic [ref=e66]:
+            - generic [ref=e67]: Prénom
+            - textbox "Prénom" [ref=e68]
+          - generic [ref=e69]:
+            - generic [ref=e70]: Nom
+            - textbox "Nom" [ref=e71]
+        - generic [ref=e72]:
+          - generic [ref=e73]: Adresse e-mail
+          - textbox "Adresse e-mail" [ref=e74]
+        - generic [ref=e75]:
+          - generic [ref=e76]:
+            - generic [ref=e77]: Téléphone
+            - textbox "Téléphone" [ref=e78]
+          - generic [ref=e79]:
+            - generic [ref=e80]: Ville
+            - textbox "Ville" [ref=e81]
+        - generic [ref=e82]:
+          - generic [ref=e83]: Mot de passe
+          - generic [ref=e84]:
+            - textbox "Mot de passe" [ref=e85]
+            - button [ref=e86] [cursor=pointer]:
+              - img [ref=e87] [cursor=pointer]
+        - generic [ref=e90]:
+          - generic [ref=e91]: Confirmer le mot de passe
+          - textbox "Confirmer le mot de passe" [ref=e92]
+        - generic [ref=e93]:
+          - checkbox "J'accepte les conditions d'utilisation et la politique de confidentialité" [ref=e94]
+          - generic [ref=e95]:
+            - text: J'accepte les
+            - link "conditions d'utilisation" [ref=e96] [cursor=pointer]:
+              - /url: "#"
+            - text: et la
+            - link "politique de confidentialité" [ref=e97] [cursor=pointer]:
+              - /url: "#"
+        - button "Créer mon compte" [ref=e99] [cursor=pointer]
+        - paragraph [ref=e101]:
+          - text: Déjà un compte ?
+          - link "Se connecter" [ref=e102] [cursor=pointer]:
+            - /url: /login
+      - link "← Retour à l'accueil" [ref=e104] [cursor=pointer]:
+        - /url: /
+  - contentinfo [ref=e105]:
+    - generic [ref=e106]:
+      - generic [ref=e107]:
+        - paragraph [ref=e108]: Antigaspi
+        - paragraph [ref=e109]: © 2025 — Ensemble, réduisons le gaspillage alimentaire.
+      - generic [ref=e110]:
+        - img [ref=e112]
+        - img [ref=e116]
+        - img [ref=e120]
+```

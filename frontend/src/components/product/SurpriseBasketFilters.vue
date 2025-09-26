@@ -1,5 +1,5 @@
 <template>
-  <div class="card space-y-6">
+  <Card class="space-y-6">
     <div class="flex items-center justify-between">
       <h2 class="text-lg font-semibold text-neutral-900">Filtres</h2>
       <button
@@ -14,9 +14,9 @@
 
     <div class="grid grid-cols-1 gap-5">
       <div>
-        <label class="form-label">Catégorie</label>
+        <label class="label-2025">Catégorie</label>
         <select
-          class="form-select"
+          class="select-2025"
           :value="modelValue.categoryId ?? ''"
           @change="onCategoryChange($event.target as HTMLSelectElement)"
         >
@@ -33,9 +33,9 @@
 
       <div class="grid grid-cols-1 gap-5 sm:grid-cols-2">
         <div>
-          <label class="form-label">Prix min</label>
+          <label class="label-2025">Prix min</label>
           <select
-            class="form-select"
+            class="select-2025"
             :value="modelValue.minPrice ?? ''"
             @change="onMinPriceChange($event.target as HTMLSelectElement)"
           >
@@ -46,9 +46,9 @@
           </select>
         </div>
         <div>
-          <label class="form-label">Prix max</label>
+          <label class="label-2025">Prix max</label>
           <select
-            class="form-select"
+            class="select-2025"
             :value="modelValue.maxPrice ?? ''"
             @change="onMaxPriceChange($event.target as HTMLSelectElement)"
           >
@@ -60,12 +60,13 @@
         </div>
       </div>
     </div>
-  </div>
+  </Card>
 </template>
 
 <script setup lang="ts">
 import { computed } from 'vue'
 import { formatPrice } from '@/utils/currency'
+import Card from '@/components/ui/2025/Card.vue'
 
 export interface SurpriseBasketFilterModel {
   categoryId?: number | null

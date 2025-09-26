@@ -14,13 +14,14 @@
               Gérer les catégories de produits de la plateforme
             </p>
           </div>
-          <button
+          <Button
             @click="openCreateModal"
-            class="btn btn-primary flex items-center gap-2"
+            variant="primary"
+            class="flex items-center gap-2"
           >
             <PlusIcon class="w-5 h-5" />
             Nouvelle Catégorie
-          </button>
+          </Button>
         </div>
       </div>
     </div>
@@ -28,7 +29,7 @@
     <!-- Stats Cards -->
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
       <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-        <div class="card">
+        <Card>
           <div class="flex items-center">
             <div class="p-3 rounded-lg bg-blue-100">
               <TagIcon class="w-6 h-6 text-blue-600" />
@@ -38,9 +39,9 @@
               <p class="text-2xl font-bold text-gray-900">{{ stats.total_categories || 0 }}</p>
             </div>
           </div>
-        </div>
+        </Card>
 
-        <div class="card">
+        <Card>
           <div class="flex items-center">
             <div class="p-3 rounded-lg bg-green-100">
               <CheckCircleIcon class="w-6 h-6 text-green-600" />
@@ -50,9 +51,9 @@
               <p class="text-2xl font-bold text-gray-900">{{ stats.active_categories || 0 }}</p>
             </div>
           </div>
-        </div>
+        </Card>
 
-        <div class="card">
+        <Card>
           <div class="flex items-center">
             <div class="p-3 rounded-lg bg-purple-100">
               <CubeIcon class="w-6 h-6 text-purple-600" />
@@ -62,9 +63,9 @@
               <p class="text-2xl font-bold text-gray-900">{{ stats.categories_with_products || 0 }}</p>
             </div>
           </div>
-        </div>
+        </Card>
 
-        <div class="card">
+        <Card>
           <div class="flex items-center">
             <div class="p-3 rounded-lg bg-orange-100">
               <ChartBarIcon class="w-6 h-6 text-orange-600" />
@@ -76,11 +77,11 @@
               </p>
             </div>
           </div>
-        </div>
+        </Card>
       </div>
 
       <!-- Categories Table -->
-      <div class="card">
+      <Card>
         <div class="px-6 py-4 border-b border-gray-200">
           <div class="flex justify-between items-center">
             <h3 class="text-lg font-medium text-gray-900">Liste des Catégories</h3>
@@ -203,15 +204,15 @@
           <p class="text-gray-500 mb-6">
             {{ searchQuery ? 'Aucune catégorie ne correspond à votre recherche.' : 'Commencez par créer votre première catégorie.' }}
           </p>
-          <button
+          <Button
             v-if="!searchQuery"
             @click="openCreateModal"
-            class="btn btn-primary"
+            variant="primary"
           >
             Créer une catégorie
-          </button>
+          </Button>
         </div>
-      </div>
+      </Card>
     </div>
 
     <!-- Create/Edit Modal Form -->
@@ -339,45 +340,7 @@
       @action="handleModalAction"
     />
 
-    <!-- Notification Container -->
-    <div class="fixed top-4 right-4 z-[110] space-y-2">
-      <div
-        v-for="notification in notificationStore.notifications"
-        :key="notification.id"
-        class="max-w-sm w-full bg-white shadow-lg rounded-lg pointer-events-auto ring-1 ring-black ring-opacity-5 overflow-hidden transform transition-all duration-300 ease-in-out"
-      >
-        <div class="p-4">
-          <div class="flex items-start">
-            <div class="flex-shrink-0">
-              <svg class="h-6 w-6" :class="{
-                'text-green-600': notification.type === 'success',
-                'text-red-600': notification.type === 'error',
-                'text-yellow-600': notification.type === 'warning',
-                'text-blue-600': notification.type === 'info'
-              }" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path v-if="notification.type === 'success'" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                <path v-else-if="notification.type === 'error'" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                <path v-else-if="notification.type === 'warning'" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.732-.833-2.464 0L4.35 16.5c-.77.833.192 2.5 1.732 2.5z" />
-                <path v-else stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-            </div>
-            <div class="ml-3 w-0 flex-1 pt-0.5">
-              <p class="text-sm font-medium text-gray-900">{{ notification.title }}</p>
-              <p class="mt-1 text-sm text-gray-500">{{ notification.message }}</p>
-            </div>
-            <div class="ml-4 flex-shrink-0 flex">
-              <button
-                class="bg-white rounded-md inline-flex text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                @click="notify.removeNotification(notification.id)"
-              >
-                <span class="sr-only">Fermer</span>
-                <XMarkIcon class="h-5 w-5" />
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
+    <!-- Notifications are handled by the NotificationToast component -->
   </DashboardLayout>
 </template>
 
@@ -387,6 +350,8 @@ import { useAuthStore } from '@/stores/auth'
 import { notify } from '@/composables/useNotifications'
 import AdminModal from '@/components/ui/AdminModal.vue'
 import DashboardLayout from '@/components/ui/DashboardLayout.vue'
+import Button from '@/components/ui/2025/Button.vue'
+import Card from '@/components/ui/2025/Card.vue'
 import { useDashboardLayout } from '@/composables/useDashboardLayout'
 import {
   PlusIcon,

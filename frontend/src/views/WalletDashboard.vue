@@ -5,8 +5,8 @@
     class="bg-gradient-to-br from-neutral-50 to-primary-50"
   >
     <!-- Page Header -->
-    <div class="glass-bg glass-border border-b backdrop-blur-lg sticky top-20 z-40">
-      <div class="container-fluid py-6">
+    <div class="bg-white/60 backdrop-blur-md glass-border border-b backdrop-blur-lg sticky top-20 z-40">
+      <div class="container-2025 py-6">
         <div class="flex items-center justify-between animate-fade-in-up">
           <div class="flex items-center gap-4">
             <button
@@ -28,7 +28,7 @@
       </div>
     </div>
 
-    <div class="container-fluid py-8">
+    <div class="container-2025 py-8">
       <div class="max-w-6xl mx-auto space-y-8">
 
         <!-- Wallet Card -->
@@ -103,7 +103,7 @@
           <!-- Sidebar -->
           <div class="space-y-6">
             <!-- Stats Overview -->
-            <div class="card animate-fade-in-up" style="animation-delay: 0.3s;">
+            <Card class="animate-fade-in-up" style="animation-delay: 0.3s;">
               <h3 class="text-lg font-bold text-neutral-900 mb-4">Aperçu mensuel</h3>
               <div v-if="walletStore.stats" class="space-y-4">
                 <div class="flex items-center justify-between p-3 bg-green-50 rounded-lg">
@@ -140,10 +140,10 @@
                   <div class="h-4 bg-gray-200 rounded w-1/2 mx-auto"></div>
                 </div>
               </div>
-            </div>
+            </Card>
 
             <!-- Daily Limit -->
-            <div class="card animate-fade-in-up" style="animation-delay: 0.4s;">
+            <Card class="animate-fade-in-up" style="animation-delay: 0.4s;">
               <h3 class="text-lg font-bold text-neutral-900 mb-4">Limite quotidienne</h3>
               <div v-if="walletStore.wallet" class="space-y-3">
                 <div class="flex justify-between text-sm">
@@ -161,10 +161,10 @@
                   <span class="font-medium">{{ formatAmount(walletStore.dailyLimit) }} XOF</span>
                 </div>
               </div>
-            </div>
+            </Card>
 
             <!-- Security -->
-            <div class="card bg-gradient-to-br from-blue-50 to-indigo-50 border-blue-200 animate-fade-in-up" style="animation-delay: 0.5s;">
+            <Card class="bg-gradient-to-br from-blue-50 to-indigo-50 border-blue-200 animate-fade-in-up" style="animation-delay: 0.5s;">
               <div class="flex items-center gap-3 mb-4">
                 <div class="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
                   <Shield class="w-4 h-4 text-white" />
@@ -192,7 +192,7 @@
               >
                 Configurer un PIN
               </button>
-            </div>
+            </Card>
           </div>
         </div>
       </div>
@@ -324,6 +324,7 @@ import {
   Activity, Shield, X, Key, ChevronRight
 } from 'lucide-vue-next'
 import DashboardLayout from '@/components/ui/DashboardLayout.vue'
+import Card from '@/components/ui/2025/Card.vue'
 import { useDashboardLayout } from '@/composables/useDashboardLayout'
 
 const walletStore = useWalletStore()
@@ -335,8 +336,8 @@ const showSettingsModal = ref(false)
 const showStatsModal = ref(false)
 const showPinSetupModal = ref(false)
 
-const transactions = ref([])
-const transactionsPagination = ref(null)
+const transactions = ref<any[]>([])
+const transactionsPagination = ref<Pagination | undefined>(undefined)
 const transactionsComponent = ref(null)
 
 const formatAmount = (amount: number): string => {

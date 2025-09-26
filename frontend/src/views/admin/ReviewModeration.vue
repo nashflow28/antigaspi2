@@ -18,21 +18,21 @@
         </div>
 
         <div class="flex flex-col sm:flex-row gap-4">
-          <button
+          <Button
             @click="refreshData"
-            class="btn btn-outline"
+            variant="outline"
             :disabled="loading"
           >
             <RefreshCw class="w-5 h-5 mr-2" :class="{ 'animate-spin': loading }" />
             Actualiser
-          </button>
+          </Button>
         </div>
       </div>
     </div>
 
     <!-- Statistics Cards -->
     <div v-if="stats" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 mb-8">
-      <div class="card bg-gradient-to-r from-orange-500 to-orange-600 text-white">
+      <Card class="bg-gradient-to-r from-orange-500 to-orange-600 text-white">
         <div class="flex items-center justify-between">
           <div>
             <p class="text-orange-100 text-sm font-medium">Avis en attente</p>
@@ -45,9 +45,9 @@
             <Clock class="w-8 h-8" />
           </div>
         </div>
-      </div>
+      </Card>
 
-      <div class="card bg-gradient-to-r from-red-500 to-red-600 text-white">
+      <Card class="bg-gradient-to-r from-red-500 to-red-600 text-white">
         <div class="flex items-center justify-between">
           <div>
             <p class="text-red-100 text-sm font-medium">Signalements</p>
@@ -60,9 +60,9 @@
             <AlertTriangle class="w-8 h-8" />
           </div>
         </div>
-      </div>
+      </Card>
 
-      <div class="card bg-gradient-to-r from-blue-500 to-blue-600 text-white">
+      <Card class="bg-gradient-to-r from-blue-500 to-blue-600 text-white">
         <div class="flex items-center justify-between">
           <div>
             <p class="text-blue-100 text-sm font-medium">Avis aujourd'hui</p>
@@ -75,9 +75,9 @@
             <MessageSquare class="w-8 h-8" />
           </div>
         </div>
-      </div>
+      </Card>
 
-      <div class="card bg-gradient-to-r from-green-500 to-green-600 text-white">
+      <Card class="bg-gradient-to-r from-green-500 to-green-600 text-white">
         <div class="flex items-center justify-between">
           <div>
             <p class="text-green-100 text-sm font-medium">Traités</p>
@@ -90,7 +90,7 @@
             <CheckCircle class="w-8 h-8" />
           </div>
         </div>
-      </div>
+      </Card>
     </div>
 
     <!-- Tabs Navigation -->
@@ -152,6 +152,8 @@ import { useAuthStore } from '@/stores/auth'
 import PendingReviewsList from '@/components/admin/PendingReviewsList.vue'
 import ReportedReviewsList from '@/components/admin/ReportedReviewsList.vue'
 import DashboardLayout from '@/components/ui/DashboardLayout.vue'
+import Button from '@/components/ui/2025/Button.vue'
+import Card from '@/components/ui/2025/Card.vue'
 import { useDashboardLayout } from '@/composables/useDashboardLayout'
 import {
   RefreshCw,

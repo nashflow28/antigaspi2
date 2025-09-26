@@ -969,9 +969,10 @@ const savingNotifications = ref(false)
 const isPushSupported = typeof window !== 'undefined' && 'Notification' in window && 'serviceWorker' in navigator
 
 const syncNotificationSettings = () => {
-  notificationSettings.email = notificationStore.preferences.email
-  notificationSettings.sms = notificationStore.preferences.sms
-  notificationSettings.push = notificationStore.preferences.push
+  // TODO: Implement notification store integration
+  // notificationSettings.email = notificationStore.preferences.email
+  // notificationSettings.sms = notificationStore.preferences.sms
+  // notificationSettings.push = notificationStore.preferences.push
 }
 
 // Reactive data
@@ -1186,7 +1187,8 @@ const memberSince = computed(() => {
 watch(
   () => authStore.user,
   () => {
-    notificationStore.hydratePreferencesFromUser()
+    // TODO: Implement notification store integration
+    // notificationStore.hydratePreferencesFromUser()
     syncNotificationSettings()
   },
   { immediate: true }
@@ -1328,23 +1330,25 @@ const updatePreferences = async () => {
 }
 
 const persistNotificationPreferences = async () => {
-  const previousPush = notificationStore.preferences.push
+  // TODO: Implement notification store integration
+  // const previousPush = notificationStore.preferences.push
 
   try {
     savingNotifications.value = true
-    const saved = await notificationStore.savePreferences({
-      email: notificationSettings.email,
-      sms: notificationSettings.sms,
-      push: notificationSettings.push
-    })
+    // TODO: Implement notification preferences save
+    // const saved = await notificationStore.savePreferences({
+    //   email: notificationSettings.email,
+    //   sms: notificationSettings.sms,
+    //   push: notificationSettings.push
+    // })
 
-    notificationSettings.email = saved.email
-    notificationSettings.sms = saved.sms
-    notificationSettings.push = saved.push
+    // notificationSettings.email = saved.email
+    // notificationSettings.sms = saved.sms
+    // notificationSettings.push = saved.push
 
-    if (saved.push && !previousPush) {
-      await notificationStore.ensurePushSubscription()
-    }
+    // if (saved.push && !previousPush) {
+    //   await notificationStore.ensurePushSubscription()
+    // }
 
     notify.success('Préférences de notification mises à jour', 'Notifications')
   } catch (error: any) {

@@ -1,202 +1,26 @@
 {
-  "timestamp": "2025-09-26T20:39:35.326Z",
+  "timestamp": "2025-09-26T21:56:46.843Z",
   "summary": {
     "totalFiles": 167,
-    "filesWithLegacy": 43,
-    "totalLegacyUsages": 222,
+    "filesWithLegacy": 40,
+    "totalLegacyUsages": 169,
     "legacyClassCounts": {
-      "card": 84,
-      "badge": 16,
+      "card": 69,
+      "badge": 14,
       "shadow-glow": 15,
-      "btn": 60,
-      "btn-primary": 10,
-      "form-label": 6,
-      "form-input": 12,
-      "btn-outline": 4,
-      "btn-sm": 5,
-      "btn-ghost": 3,
+      "btn": 40,
+      "btn-outline": 1,
+      "btn-primary": 5,
+      "btn-ghost": 2,
+      "form-label": 4,
       "form-select": 3,
+      "btn-sm": 2,
+      "form-input": 10,
       "btn-lg": 1,
       "form-group": 3
     }
   },
   "migrationPlan": [
-    {
-      "path": "src\\views\\consumer\\LoyaltyDashboard.vue",
-      "legacyUsages": [
-        {
-          "class": "btn",
-          "count": 10,
-          "replacement": "Button component with variant prop",
-          "lines": [
-            21,
-            194,
-            195,
-            243,
-            249
-          ]
-        },
-        {
-          "class": "card",
-          "count": 8,
-          "replacement": "Card component",
-          "lines": [
-            39,
-            54,
-            70,
-            90,
-            130,
-            163,
-            176
-          ]
-        },
-        {
-          "class": "btn-outline",
-          "count": 3,
-          "replacement": "Button variant=\"outline\"",
-          "lines": [
-            21,
-            195,
-            243
-          ]
-        },
-        {
-          "class": "btn-primary",
-          "count": 2,
-          "replacement": "Button variant=\"primary\"",
-          "lines": [
-            195,
-            249
-          ]
-        },
-        {
-          "class": "btn-sm",
-          "count": 1,
-          "replacement": "Button size=\"sm\"",
-          "lines": [
-            21
-          ]
-        }
-      ],
-      "totalUsages": 24,
-      "priority": "Critical",
-      "score": 124
-    },
-    {
-      "path": "src\\views\\consumer\\SurpriseBasketDetailView.vue",
-      "legacyUsages": [
-        {
-          "class": "card",
-          "count": 5,
-          "replacement": "Card component",
-          "lines": [
-            13,
-            18,
-            30,
-            46,
-            95
-          ]
-        },
-        {
-          "class": "btn",
-          "count": 4,
-          "replacement": "Button component with variant prop",
-          "lines": [
-            24,
-            212
-          ]
-        },
-        {
-          "class": "btn-primary",
-          "count": 2,
-          "replacement": "Button variant=\"primary\"",
-          "lines": [
-            24,
-            212
-          ]
-        },
-        {
-          "class": "form-label",
-          "count": 2,
-          "replacement": "Label component",
-          "lines": [
-            117,
-            170
-          ]
-        },
-        {
-          "class": "form-input",
-          "count": 2,
-          "replacement": "Input component",
-          "lines": [
-            123,
-            176
-          ]
-        }
-      ],
-      "totalUsages": 15,
-      "priority": "Critical",
-      "score": 115
-    },
-    {
-      "path": "src\\components\\product\\SurpriseBasketCard.vue",
-      "legacyUsages": [
-        {
-          "class": "btn",
-          "count": 6,
-          "replacement": "Button component with variant prop",
-          "lines": [
-            66,
-            74
-          ]
-        },
-        {
-          "class": "btn-sm",
-          "count": 2,
-          "replacement": "Button size=\"sm\"",
-          "lines": [
-            66,
-            74
-          ]
-        },
-        {
-          "class": "card",
-          "count": 2,
-          "replacement": "Card component",
-          "lines": [
-            2,
-            26
-          ]
-        },
-        {
-          "class": "badge",
-          "count": 2,
-          "replacement": "Badge component",
-          "lines": [
-            19
-          ]
-        },
-        {
-          "class": "btn-primary",
-          "count": 1,
-          "replacement": "Button variant=\"primary\"",
-          "lines": [
-            74
-          ]
-        },
-        {
-          "class": "btn-ghost",
-          "count": 1,
-          "replacement": "Button variant=\"ghost\"",
-          "lines": [
-            66
-          ]
-        }
-      ],
-      "totalUsages": 14,
-      "priority": "Critical",
-      "score": 114
-    },
     {
       "path": "src\\components\\ui\\ErrorDashboard.vue",
       "legacyUsages": [
@@ -426,36 +250,6 @@
       "score": 10
     },
     {
-      "path": "src\\components\\layout\\NavBar.vue",
-      "legacyUsages": [
-        {
-          "class": "card",
-          "count": 4,
-          "replacement": "Card component",
-          "lines": [
-            34,
-            163,
-            168,
-            208
-          ]
-        },
-        {
-          "class": "shadow-glow",
-          "count": 4,
-          "replacement": "shadow-card-2025",
-          "lines": [
-            30,
-            34,
-            156,
-            163
-          ]
-        }
-      ],
-      "totalUsages": 8,
-      "priority": "Low",
-      "score": 8
-    },
-    {
       "path": "src\\components\\forms\\LoginForm2025.vue",
       "legacyUsages": [
         {
@@ -504,6 +298,36 @@
           "replacement": "Input component",
           "lines": [
             166
+          ]
+        }
+      ],
+      "totalUsages": 8,
+      "priority": "Low",
+      "score": 8
+    },
+    {
+      "path": "src\\components\\layout\\NavBar.vue",
+      "legacyUsages": [
+        {
+          "class": "card",
+          "count": 4,
+          "replacement": "Card component",
+          "lines": [
+            34,
+            163,
+            168,
+            208
+          ]
+        },
+        {
+          "class": "shadow-glow",
+          "count": 4,
+          "replacement": "shadow-card-2025",
+          "lines": [
+            30,
+            34,
+            156,
+            163
           ]
         }
       ],
@@ -1160,18 +984,17 @@
   ],
   "recommendations": {
     "highPriorityFiles": [
-      "src\\views\\consumer\\SurpriseBasketDetailView.vue",
-      "src\\views\\consumer\\LoyaltyDashboard.vue",
       "src\\views\\admin\\CategoriesView.vue",
       "src\\components\\ui\\ErrorDashboard.vue",
-      "src\\components\\product\\SurpriseBasketCard.vue",
       "src\\components\\product\\ProductListItem.vue",
       "src\\components\\forms\\RegisterForm.vue"
     ],
     "quickWins": [
       "btn-outline",
       "btn-ghost",
+      "form-label",
       "form-select",
+      "btn-sm",
       "btn-lg",
       "form-group"
     ],

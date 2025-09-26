@@ -9,13 +9,13 @@
         <p>Accédez plus rapidement à l'application depuis votre écran d'accueil</p>
       </div>
       <div class="pwa-actions">
-        <button @click="installApp" class="btn-install">
+        <Button @click="installApp" variant="secondary" size="sm" class="install-btn">
           <Download class="w-4 h-4 mr-2" />
           Installer
-        </button>
-        <button @click="dismissPrompt" class="btn-dismiss">
+        </Button>
+        <Button @click="dismissPrompt" variant="ghost" size="sm" class="dismiss-btn">
           <X class="w-4 h-4" />
-        </button>
+        </Button>
       </div>
     </div>
   </div>
@@ -39,6 +39,7 @@
 import { ref, onMounted, onUnmounted } from 'vue'
 import { Download, X } from 'lucide-vue-next'
 import { installPWA } from '@/main'
+import Button from '@/components/ui/2025/Button.vue'
 
 const showInstallPrompt = ref(false)
 const showFloatingButton = ref(false)
@@ -166,41 +167,26 @@ const isRecentlyDismissed = (): boolean => {
   gap: 8px;
 }
 
-.btn-install {
-  background: rgba(255, 255, 255, 0.2);
-  color: white;
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  padding: 8px 16px;
-  border-radius: 8px;
-  font-size: 14px;
-  font-weight: 500;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  transition: all 0.2s;
+.install-btn {
+  background: rgba(255, 255, 255, 0.2) !important;
+  color: white !important;
+  border: 1px solid rgba(255, 255, 255, 0.3) !important;
 }
 
-.btn-install:hover {
-  background: rgba(255, 255, 255, 0.3);
+.install-btn:hover {
+  background: rgba(255, 255, 255, 0.3) !important;
   transform: translateY(-1px);
 }
 
-.btn-dismiss {
-  background: transparent;
-  color: white;
-  border: none;
-  padding: 8px;
-  border-radius: 6px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s;
+.dismiss-btn {
+  background: transparent !important;
+  color: white !important;
+  border: none !important;
   opacity: 0.8;
 }
 
-.btn-dismiss:hover {
-  background: rgba(255, 255, 255, 0.1);
+.dismiss-btn:hover {
+  background: rgba(255, 255, 255, 0.1) !important;
   opacity: 1;
 }
 
@@ -271,9 +257,9 @@ const isRecentlyDismissed = (): boolean => {
     font-size: 12px;
   }
 
-  .btn-install {
-    padding: 6px 12px;
-    font-size: 12px;
+  .install-btn {
+    padding: 6px 12px !important;
+    font-size: 12px !important;
   }
 
   .pwa-floating-install {

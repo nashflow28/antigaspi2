@@ -1,5 +1,5 @@
 <template>
-  <div class="card group cursor-pointer p-6 hover:shadow-toast transition-all duration-300">
+  <Card class="group cursor-pointer p-6 hover:shadow-toast transition-all duration-300">
     <div class="flex items-center gap-6">
       <!-- Image du produit -->
       <div class="relative w-24 h-24 flex-shrink-0 overflow-hidden rounded-2xl">
@@ -62,27 +62,33 @@
 
         <!-- Boutons d'action -->
         <div class="flex flex-col gap-2">
-          <button
+          <Button
             @click.stop="$emit('view', product)"
-            class="btn btn-ghost btn-sm min-w-[100px]"
+            variant="ghost"
+            size="sm"
+            class="min-w-[100px]"
           >
             Voir détails
-          </button>
-          <button
+          </Button>
+          <Button
             @click.stop="$emit('reserve', product)"
-            class="btn btn-primary btn-sm min-w-[100px]"
+            variant="primary"
+            size="sm"
+            class="min-w-[100px]"
             :disabled="product.available_quantity <= product.reserved_quantity"
           >
             {{ product.available_quantity <= product.reserved_quantity ? 'Épuisé' : 'Réserver' }}
-          </button>
+          </Button>
         </div>
       </div>
     </div>
-  </div>
+  </Card>
 </template>
 
 <script setup lang="ts">
 import { MapPin, Package, Clock } from 'lucide-vue-next'
+import Button from '@/components/ui/2025/Button.vue'
+import Card from '@/components/ui/2025/Card.vue'
 
 interface Product {
   id: number
@@ -112,7 +118,7 @@ defineEmits<{
 }>()
 
 const formatPrice = (price: number) => {
-  return `${price.toFixed(2)}€`
+  return `${price.toFixed(0)} XOF`
 }
 
 const formatTimeLeft = (expiresAt: Date) => {

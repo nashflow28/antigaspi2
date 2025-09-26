@@ -67,7 +67,7 @@
           type="text"
           required
           autocomplete="given-name"
-          class="form-input"
+          class="input-2025"
           :class="{ 'border-red-500': errors.first_name }"
           placeholder="Votre prénom"
         />
@@ -84,7 +84,7 @@
           type="text"
           required
           autocomplete="family-name"
-          class="form-input"
+          class="input-2025"
           :class="{ 'border-red-500': errors.last_name }"
           placeholder="Votre nom"
         />
@@ -103,7 +103,7 @@
         type="email"
         required
         autocomplete="email"
-        class="form-input"
+        class="input-2025"
         :class="{ 'border-red-500': errors.email }"
         placeholder="votre@email.com"
       />
@@ -120,7 +120,7 @@
           v-model="form.phone"
           type="tel"
           autocomplete="tel"
-          class="form-input"
+          class="input-2025"
           :class="{ 'border-red-500': errors.phone }"
           placeholder="+225 XX XX XX XX XX"
         />
@@ -136,7 +136,7 @@
           v-model="form.city"
           type="text"
           required
-          class="form-input"
+          class="input-2025"
           :class="{ 'border-red-500': errors.city }"
           placeholder="Abidjan, Bouaké, Yamoussoukro..."
         />
@@ -158,7 +158,7 @@
             v-model="form.business_name"
             type="text"
             :required="form.role === 'merchant'"
-            class="form-input"
+            class="input-2025"
             :class="{ 'border-red-500': errors.business_name }"
             placeholder="Nom de votre commerce"
           />
@@ -173,7 +173,7 @@
             id="business_type"
             v-model="form.business_type"
             :required="form.role === 'merchant'"
-            class="form-input"
+            class="input-2025"
             :class="{ 'border-red-500': errors.business_type }"
           >
             <option value="">Sélectionner un type</option>
@@ -205,7 +205,7 @@
           :type="showPassword ? 'text' : 'password'"
           required
           autocomplete="new-password"
-          class="form-input pr-10"
+          class="input-2025 pr-10"
           :class="{ 'border-red-500': errors.password }"
           placeholder="Au moins 6 caractères"
         />
@@ -236,7 +236,7 @@
         :type="showPassword ? 'text' : 'password'"
         required
         autocomplete="new-password"
-        class="form-input"
+        class="input-2025"
         :class="{ 'border-red-500': errors.password_confirmation }"
         placeholder="Retapez votre mot de passe"
       />
@@ -263,10 +263,12 @@
 
     <!-- Submit Button -->
     <div>
-      <button
+      <Button
         type="submit"
         :disabled="loading"
-        class="w-full btn btn-primary"
+        variant="primary"
+        size="lg"
+        class="w-full"
         :class="{ 'opacity-50 cursor-not-allowed': loading }"
       >
         <svg v-if="loading" class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
@@ -274,7 +276,7 @@
           <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
         </svg>
         {{ loading ? 'Inscription...' : 'Créer mon compte' }}
-      </button>
+      </Button>
     </div>
 
     <div class="text-center">
@@ -293,6 +295,7 @@ import { ref, reactive } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import type { RegisterData } from '@/types'
+import Button from '@/components/ui/2025/Button.vue'
 
 const router = useRouter()
 const authStore = useAuthStore()
