@@ -28,36 +28,36 @@
         </div>
 
         <div class="flex gap-4" v-if="product">
-          <button
+          <Button
             @click="deleteProduct"
-            class="btn btn-error"
+            variant="destructive"
             :disabled="loading"
           >
             <TrashIcon class="w-5 h-5 mr-2" />
             Supprimer
-          </button>
+          </Button>
         </div>
       </div>
     </div>
 
     <!-- Loading State -->
-    <div v-if="!product && !error" class="card">
+    <Card v-if="!product && !error">
       <div class="flex items-center justify-center py-12">
         <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600"></div>
         <span class="ml-3 text-neutral-600">Chargement du produit...</span>
       </div>
-    </div>
+    </Card>
 
     <!-- Error State -->
-    <div v-if="error" class="card bg-accent-red/10 border-accent-red/30">
+    <Card v-if="error" variant="bordered" class="bg-red-50 border-red-200">
       <div class="flex items-center justify-center py-12">
-        <ExclamationTriangleIcon class="w-8 h-8 text-accent-red mr-3" />
+        <ExclamationTriangleIcon class="w-8 h-8 text-red-500 mr-3" />
         <div>
-          <p class="text-accent-red/90 font-medium">Erreur lors du chargement</p>
-          <p class="text-accent-red text-sm">{{ error }}</p>
+          <p class="text-red-800 font-medium">Erreur lors du chargement</p>
+          <p class="text-red-600 text-sm">{{ error }}</p>
         </div>
       </div>
-    </div>
+    </Card>
 
     <!-- Edit Form -->
     <div v-if="product" class="grid lg:grid-cols-3 gap-8">
@@ -65,49 +65,52 @@
       <div class="lg:col-span-2 space-y-6">
         <form @submit.prevent="saveProduct">
           <!-- Informations générales -->
-          <div class="card">
-            <div class="card-header">
+          <Card>
+            <template #header>
               <h3 class="text-xl font-bold text-neutral-900">Informations générales</h3>
-            </div>
-            <div class="card-body space-y-6">
+            </template>
+            <div class="space-y-6">
               <!-- Nom du produit -->
               <div>
-                <label for="name" class="form-label required">Nom du produit</label>
-                <input
+                <label for="name" class="block text-sm font-medium text-neutral-700 mb-2">
+                  Nom du produit <span class="text-red-500">*</span>
+                </label>
+                <Input
                   id="name"
                   v-model="form.name"
-                  type="text"
-                  class="input"
-                  :class="{ 'input-error': errors.name }"
                   placeholder="Ex: Pain artisanal"
+                  :error="errors.name"
                   required
                 />
-                <p v-if="errors.name" class="form-error">{{ errors.name }}</p>
               </div>
 
               <!-- Description -->
               <div>
-                <label for="description" class="form-label required">Description</label>
+                <label for="description" class="block text-sm font-medium text-neutral-700 mb-2">
+                  Description <span class="text-red-500">*</span>
+                </label>
                 <textarea
                   id="description"
                   v-model="form.description"
                   rows="4"
-                  class="input"
-                  :class="{ 'input-error': errors.description }"
+                  class="w-full px-4 py-3 text-neutral-900 bg-white border border-neutral-200 rounded-xl shadow-sm placeholder:text-neutral-400 transition-all duration-200 focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                  :class="{ 'border-red-300 bg-red-50 focus:ring-red-500 focus:border-red-500': errors.description }"
                   placeholder="Décrivez votre produit..."
                   required
                 ></textarea>
-                <p v-if="errors.description" class="form-error">{{ errors.description }}</p>
+                <p v-if="errors.description" class="mt-2 text-sm text-red-600">{{ errors.description }}</p>
               </div>
 
               <!-- Catégorie -->
               <div>
-                <label for="category" class="form-label required">Catégorie</label>
+                <label for="category" class="block text-sm font-medium text-neutral-700 mb-2">
+                  Catégorie <span class="text-red-500">*</span>
+                </label>
                 <select
                   id="category"
                   v-model="form.category_id"
-                  class="input"
-                  :class="{ 'input-error': errors.category_id }"
+                  class="w-full px-4 py-3 text-neutral-900 bg-white border border-neutral-200 rounded-xl shadow-sm transition-all duration-200 focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                  :class="{ 'border-red-300 bg-red-50 focus:ring-red-500 focus:border-red-500': errors.category_id }"
                   required
                 >
                   <option value="">Sélectionner une catégorie</option>
@@ -119,105 +122,103 @@
                     {{ category.name }}
                   </option>
                 </select>
-                <p v-if="errors.category_id" class="form-error">{{ errors.category_id }}</p>
+                <p v-if="errors.category_id" class="mt-2 text-sm text-red-600">{{ errors.category_id }}</p>
               </div>
             </div>
-          </div>
+          </Card>
 
           <!-- Prix et stock -->
-          <div class="card">
-            <div class="card-header">
+          <Card>
+            <template #header>
               <h3 class="text-xl font-bold text-neutral-900">Prix et stock</h3>
-            </div>
-            <div class="card-body">
-              <div class="grid md:grid-cols-2 gap-6">
-                <!-- Prix original -->
-                <div>
-                  <label for="original_price" class="form-label required">Prix original (XOF)</label>
-                  <input
-                    id="original_price"
-                    v-model.number="form.original_price"
-                    type="number"
-                    min="0"
-                    step="0.01"
-                    class="input"
-                    :class="{ 'input-error': errors.original_price }"
-                    placeholder="1000"
-                    required
-                  />
-                  <p v-if="errors.original_price" class="form-error">{{ errors.original_price }}</p>
-                </div>
-
-                <!-- Prix réduit -->
-                <div>
-                  <label for="discounted_price" class="form-label required">Prix réduit (XOF)</label>
-                  <input
-                    id="discounted_price"
-                    v-model.number="form.discounted_price"
-                    type="number"
-                    min="0"
-                    step="0.01"
-                    class="input"
-                    :class="{ 'input-error': errors.discounted_price }"
-                    placeholder="750"
-                    required
-                  />
-                  <p v-if="errors.discounted_price" class="form-error">{{ errors.discounted_price }}</p>
-                </div>
-
-                <!-- Quantité -->
-                <div>
-                  <label for="quantity" class="form-label required">Quantité disponible</label>
-                  <input
-                    id="quantity"
-                    v-model.number="form.quantity_available"
-                    type="number"
-                    min="1"
-                    class="input"
-                    :class="{ 'input-error': errors.quantity_available }"
-                    placeholder="10"
-                    required
-                  />
-                  <p v-if="errors.quantity_available" class="form-error">{{ errors.quantity_available }}</p>
-                </div>
-
-                <!-- Date d'expiration -->
-                <div>
-                  <label for="expiration_date" class="form-label required">Date d'expiration</label>
-                  <input
-                    id="expiration_date"
-                    v-model="form.expiration_date"
-                    type="date"
-                    class="input"
-                    :class="{ 'input-error': errors.expiration_date }"
-                    :min="today"
-                    required
-                  />
-                  <p v-if="errors.expiration_date" class="form-error">{{ errors.expiration_date }}</p>
-                </div>
+            </template>
+            <div class="grid md:grid-cols-2 gap-6">
+              <!-- Prix original -->
+              <div>
+                <label for="original_price" class="block text-sm font-medium text-neutral-700 mb-2">
+                  Prix original (XOF) <span class="text-red-500">*</span>
+                </label>
+                <Input
+                  id="original_price"
+                  v-model.number="form.original_price"
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  placeholder="1000"
+                  :error="errors.original_price"
+                  required
+                />
               </div>
 
-              <!-- Réduction calculée -->
-              <div v-if="discountPercentage > 0" class="mt-4 p-4 bg-primary-50 border border-primary-200 rounded-lg">
-                <div class="flex items-center">
-                  <TagIcon class="w-5 h-5 text-primary-500 mr-2" />
-                  <span class="font-medium text-primary-700">
-                    Réduction de {{ discountPercentage }}% ({{ savings }} XOF d'économie)
-                  </span>
-                </div>
+              <!-- Prix réduit -->
+              <div>
+                <label for="discounted_price" class="block text-sm font-medium text-neutral-700 mb-2">
+                  Prix réduit (XOF) <span class="text-red-500">*</span>
+                </label>
+                <Input
+                  id="discounted_price"
+                  v-model.number="form.discounted_price"
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  placeholder="750"
+                  :error="errors.discounted_price"
+                  required
+                />
+              </div>
+
+              <!-- Quantité -->
+              <div>
+                <label for="quantity" class="block text-sm font-medium text-neutral-700 mb-2">
+                  Quantité disponible <span class="text-red-500">*</span>
+                </label>
+                <Input
+                  id="quantity"
+                  v-model.number="form.quantity_available"
+                  type="number"
+                  min="1"
+                  placeholder="10"
+                  :error="errors.quantity_available"
+                  required
+                />
+              </div>
+
+              <!-- Date d'expiration -->
+              <div>
+                <label for="expiration_date" class="block text-sm font-medium text-neutral-700 mb-2">
+                  Date d'expiration <span class="text-red-500">*</span>
+                </label>
+                <Input
+                  id="expiration_date"
+                  v-model="form.expiration_date"
+                  type="date"
+                  :min="today"
+                  :error="errors.expiration_date"
+                  required
+                />
               </div>
             </div>
-          </div>
+
+            <!-- Réduction calculée -->
+            <div v-if="discountPercentage > 0" class="mt-4 p-4 bg-primary-50 border border-primary-200 rounded-lg">
+              <div class="flex items-center">
+                <TagIcon class="w-5 h-5 text-primary-500 mr-2" />
+                <span class="font-medium text-primary-700">
+                  Réduction de {{ discountPercentage }}% ({{ savings }} XOF d'économie)
+                </span>
+              </div>
+            </div>
+          </Card>
 
           <!-- Image du produit -->
-          <div class="card">
-            <div class="card-header">
+          <Card>
+            <template #header>
               <h3 class="text-xl font-bold text-neutral-900">Image du produit</h3>
-            </div>
-            <div class="card-body">
+            </template>
+            <div class="space-y-4">
               <!-- Image actuelle -->
-              <div v-if="product.image_url" class="mb-4">
-                <p class="form-label">Image actuelle</p>
+              <div v-if="product.image_url">
+                <p class="block text-sm font-medium text-neutral-700 mb-2">Image actuelle</p>
                 <div class="relative inline-block">
                   <img
                     :src="product.image_url"
@@ -229,7 +230,7 @@
 
               <!-- Upload nouvelle image -->
               <div>
-                <label for="image" class="form-label">Nouvelle image (optionnel)</label>
+                <label for="image" class="block text-sm font-medium text-neutral-700 mb-2">Nouvelle image (optionnel)</label>
                 <div class="flex items-center gap-4">
                   <input
                     id="image"
@@ -239,24 +240,24 @@
                     @change="handleImageChange"
                     class="hidden"
                   />
-                  <button
+                  <Button
                     type="button"
                     @click="$refs.imageInput.click()"
-                    class="btn btn-secondary"
+                    variant="outline"
                   >
                     <PhotoIcon class="w-5 h-5 mr-2" />
                     Choisir une image
-                  </button>
+                  </Button>
                   <span v-if="form.image" class="text-sm text-neutral-600">
                     {{ form.image.name }}
                   </span>
                 </div>
-                <p class="form-help">Format JPG, PNG ou WebP. Taille max: 5 MB</p>
+                <p class="text-sm text-neutral-500 mt-1">Format JPG, PNG ou WebP. Taille max: 5 MB</p>
               </div>
 
               <!-- Prévisualisation nouvelle image -->
-              <div v-if="imagePreview" class="mt-4">
-                <p class="form-label">Aperçu</p>
+              <div v-if="imagePreview">
+                <p class="block text-sm font-medium text-neutral-700 mb-2">Aperçu</p>
                 <img
                   :src="imagePreview"
                   alt="Aperçu"
@@ -264,47 +265,40 @@
                 />
               </div>
             </div>
-          </div>
+          </Card>
 
           <!-- Statut -->
-          <div class="card">
-            <div class="card-header">
+          <Card>
+            <template #header>
               <h3 class="text-xl font-bold text-neutral-900">Statut</h3>
+            </template>
+            <div class="flex items-center gap-3">
+              <input
+                id="is_active"
+                v-model="form.is_active"
+                type="checkbox"
+                class="w-4 h-4 text-primary-600 border-neutral-300 rounded focus:ring-primary-500"
+              />
+              <label for="is_active" class="text-neutral-700">
+                Produit actif (visible par les clients)
+              </label>
             </div>
-            <div class="card-body">
-              <div class="flex items-center gap-3">
-                <input
-                  id="is_active"
-                  v-model="form.is_active"
-                  type="checkbox"
-                  class="w-4 h-4 text-primary-600 border-neutral-300 rounded focus:ring-primary-500"
-                />
-                <label for="is_active" class="text-neutral-700">
-                  Produit actif (visible par les clients)
-                </label>
-              </div>
-            </div>
-          </div>
+          </Card>
 
           <!-- Actions -->
           <div class="flex justify-end gap-4">
-            <router-link to="/merchant/products" class="btn btn-ghost">
+            <Button variant="ghost" @click="$router.push('/merchant/products')">
               Annuler
-            </router-link>
-            <button
+            </Button>
+            <Button
               type="submit"
-              class="btn btn-primary"
+              variant="primary"
               :disabled="loading"
+              :loading="loading"
             >
-              <template v-if="loading">
-                <div class="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                Sauvegarde...
-              </template>
-              <template v-else>
-                <CheckIcon class="w-5 h-5 mr-2" />
-                Sauvegarder
-              </template>
-            </button>
+              <CheckIcon class="w-5 h-5 mr-2" />
+              Sauvegarder
+            </Button>
           </div>
         </form>
       </div>
@@ -312,38 +306,38 @@
       <!-- Sidebar info -->
       <div class="space-y-6">
         <!-- Statistiques du produit -->
-        <div class="card">
-          <div class="card-header">
+        <Card>
+          <template #header>
             <h3 class="text-lg font-bold text-neutral-900">Statistiques</h3>
-          </div>
-          <div class="card-body space-y-4">
+          </template>
+          <div class="space-y-4">
             <div class="flex justify-between">
               <span class="text-neutral-600">Créé le:</span>
               <span class="font-medium">{{ formatDate(product.created_at) }}</span>
             </div>
             <div class="flex justify-between">
               <span class="text-neutral-600">Statut:</span>
-              <span :class="product.is_active ? 'text-primary-600' : 'text-accent-red'" class="font-medium">
+              <Badge :variant="product.is_active ? 'success' : 'destructive'">
                 {{ product.is_active ? 'Actif' : 'Inactif' }}
-              </span>
+              </Badge>
             </div>
             <div class="flex justify-between">
               <span class="text-neutral-600">Stock restant:</span>
               <span class="font-medium">{{ product.quantity_available }}</span>
             </div>
           </div>
-        </div>
+        </Card>
 
         <!-- Actions rapides -->
-        <div class="card">
-          <div class="card-header">
+        <Card>
+          <template #header>
             <h3 class="text-lg font-bold text-neutral-900">Actions rapides</h3>
-          </div>
-          <div class="card-body space-y-3">
-            <button
+          </template>
+          <div class="space-y-3">
+            <Button
               @click="toggleStatus"
-              class="btn w-full"
-              :class="product.is_active ? 'btn-warning' : 'btn-success'"
+              class="w-full"
+              :variant="product.is_active ? 'warning' : 'success'"
               :disabled="loading"
             >
               <template v-if="product.is_active">
@@ -354,18 +348,19 @@
                 <EyeIcon class="w-4 h-4 mr-2" />
                 Activer
               </template>
-            </button>
+            </Button>
 
-            <button
+            <Button
               @click="duplicateProduct"
-              class="btn btn-ghost w-full"
+              variant="ghost"
+              class="w-full"
               :disabled="loading"
             >
               <DocumentDuplicateIcon class="w-4 h-4 mr-2" />
               Dupliquer
-            </button>
+            </Button>
           </div>
-        </div>
+        </Card>
       </div>
     </div>
 
@@ -403,6 +398,12 @@ import {
   DocumentDuplicateIcon
 } from 'lucide-vue-next'
 import ConfirmModal from '@/components/ui/ConfirmModal.vue'
+
+// Import 2025 Design System components
+import Card from '@/components/ui/2025/Card.vue'
+import Button from '@/components/ui/2025/Button.vue'
+import Badge from '@/components/ui/2025/Badge.vue'
+import Input from '@/components/ui/2025/Input.vue'
 
 const route = useRoute()
 const router = useRouter()

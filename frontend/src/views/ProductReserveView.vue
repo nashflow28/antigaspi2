@@ -4,12 +4,14 @@
     <div class="glass-bg glass-border border-b backdrop-blur-lg sticky top-20 z-40">
       <div class="container-fluid py-6">
         <div class="flex items-center gap-4 animate-fade-in-up">
-          <button
+          <Button
             @click="$router.go(-1)"
+            variant="ghost"
+            size="sm"
             class="p-2 rounded-xl text-neutral-600 hover:text-primary-600 hover:bg-primary-50 transition-all duration-200"
           >
             <ArrowLeft class="w-6 h-6" />
-          </button>
+          </Button>
           <div>
             <h1 class="text-3xl lg:text-4xl font-bold text-neutral-900 mb-2">
               Réserver un produit 🛒
@@ -40,15 +42,18 @@
           <p class="text-neutral-500 mb-6">
             Le produit que vous souhaitez réserver n'existe pas ou n'est plus disponible.
           </p>
-          <router-link to="/products" class="btn btn-primary">
+          <Button
+            @click="() => $router.push('/products')"
+            variant="primary"
+          >
             Retour au catalogue
-          </router-link>
+          </Button>
         </div>
 
         <!-- Main Content -->
         <div v-else>
         <!-- Étapes de réservation -->
-        <div class="card mb-8 animate-fade-in-up">
+        <Card class="mb-8 animate-fade-in-up">
           <div class="flex items-center justify-between mb-6">
             <h2 class="text-xl font-bold text-neutral-900">Étapes de réservation</h2>
             <div class="text-sm text-neutral-600">
@@ -95,13 +100,13 @@
               Confirmation
             </div>
           </div>
-        </div>
+        </Card>
 
         <div class="grid lg:grid-cols-3 gap-8">
           <!-- Formulaire principal -->
           <div class="lg:col-span-2 space-y-6">
             <!-- Étape 1: Détails du produit -->
-            <div v-if="currentStep === 1" class="card animate-fade-in-up">
+            <Card v-if="currentStep === 1" class="animate-fade-in-up">
               <h3 class="text-xl font-bold text-neutral-900 mb-6">Détails du produit</h3>
 
               <div class="flex gap-6 mb-6">
@@ -126,7 +131,7 @@
                         {{ formatPrice(product.original_price) }}
                       </span>
                     </div>
-                    <span class="badge badge-success">-{{ product.discount }}%</span>
+                    <Badge variant="success">-{{ product.discount }}%</Badge>
                   </div>
                   <div class="flex items-center gap-4 text-sm text-neutral-600">
                     <div class="flex items-center gap-1">
@@ -144,21 +149,23 @@
               <!-- Quantité -->
               <div class="space-y-4">
                 <div>
-                  <label class="form-label">Quantité souhaitée</label>
+                  <label class="block text-sm font-medium text-neutral-700 mb-2">Quantité souhaitée</label>
                   <div class="flex items-center gap-4">
-                    <button
+                    <Button
                       @click="decreaseQuantity"
                       :disabled="reservation.quantity <= 1"
+                      variant="outline"
+                      size="sm"
                       class="p-3 rounded-xl border border-neutral-200 text-neutral-600 hover:bg-primary-50 hover:text-primary-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
                     >
                       <Minus class="w-5 h-5" />
-                    </button>
+                    </Button>
                     <input
                       v-model.number="reservation.quantity"
                       type="number"
                       :min="1"
                       :max="product.available_quantity - product.reserved_quantity"
-                      class="w-20 text-center form-input"
+                      class="w-20 text-center"
                       @input="validateQuantity"
                     />
                     <button
@@ -176,12 +183,12 @@
 
                 <!-- Notes spéciales -->
                 <div>
-                  <label for="notes" class="form-label">Notes spéciales (optionnel)</label>
+                  <label for="notes" class="block text-sm font-medium text-neutral-700 mb-2">Notes spéciales (optionnel)</label>
                   <textarea
                     id="notes"
                     v-model="reservation.notes"
                     placeholder="Allergies, préférences particulières..."
-                    class="form-textarea"
+                    class="w-full px-4 py-3 border border-neutral-200 rounded-xl focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all resize-none"
                     rows="3"
                   ></textarea>
                 </div>
@@ -189,13 +196,13 @@
             </div>
 
             <!-- Étape 2: Informations récupération -->
-            <div v-if="currentStep === 2" class="card animate-fade-in-up">
+            <Card v-if="currentStep === 2" class="animate-fade-in-up">
               <h3 class="text-xl font-bold text-neutral-900 mb-6">Informations de récupération</h3>
 
               <div class="space-y-6">
                 <!-- Horaires de récupération -->
                 <div>
-                  <label class="form-label">Quand souhaitez-vous récupérer ?</label>
+                  <label class="block text-sm font-medium text-neutral-700 mb-2">Quand souhaitez-vous récupérer ?</label>
                   <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                       <label for="pickup-date" class="text-sm font-medium text-neutral-700 mb-2 block">
@@ -207,7 +214,7 @@
                         type="date"
                         :min="getTodayDate()"
                         :max="getMaxPickupDate()"
-                        class="form-input"
+                        class="w-full px-4 py-3 border border-neutral-200 rounded-xl focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all"
                         required
                       />
                     </div>
@@ -218,7 +225,7 @@
                       <select
                         id="pickup-time"
                         v-model="reservation.pickup_time"
-                        class="form-select"
+                        class="w-full px-4 py-3 border border-neutral-200 rounded-xl focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all bg-white"
                         required
                       >
                         <option value="">Choisir un créneau</option>
@@ -237,13 +244,13 @@
 
                 <!-- Contact -->
                 <div>
-                  <label for="contact-phone" class="form-label">Téléphone de contact</label>
+                  <label for="contact-phone" class="block text-sm font-medium text-neutral-700 mb-2">Téléphone de contact</label>
                   <input
                     id="contact-phone"
                     v-model="reservation.contact_phone"
                     type="tel"
                     placeholder="+33 1 23 45 67 89"
-                    class="form-input"
+                    class="w-full px-4 py-3 border border-neutral-200 rounded-xl focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all"
                     required
                   />
                   <p class="text-sm text-neutral-500 mt-1">
@@ -253,20 +260,20 @@
 
                 <!-- Instructions spéciales -->
                 <div>
-                  <label for="pickup-instructions" class="form-label">Instructions particulières (optionnel)</label>
+                  <label for="pickup-instructions" class="block text-sm font-medium text-neutral-700 mb-2">Instructions particulières (optionnel)</label>
                   <textarea
                     id="pickup-instructions"
                     v-model="reservation.pickup_instructions"
                     placeholder="Comment vous trouver, indications spéciales..."
-                    class="form-textarea"
+                    class="w-full px-4 py-3 border border-neutral-200 rounded-xl focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all resize-none"
                     rows="3"
                   ></textarea>
                 </div>
               </div>
-            </div>
+            </Card>
 
             <!-- Étape 3: Paiement -->
-            <div v-if="currentStep === 3" class="card animate-fade-in-up">
+            <Card v-if="currentStep === 3" class="animate-fade-in-up">
               <h3 class="text-xl font-bold text-neutral-900 mb-6">Choisissez votre moyen de paiement</h3>
 
               <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
@@ -302,13 +309,13 @@
               </div>
 
               <div v-if="methodRequiresPhone" class="space-y-2">
-                <label for="mobile-money-phone" class="form-label">Numéro Mobile Money</label>
+                <label for="mobile-money-phone" class="block text-sm font-medium text-neutral-700 mb-2">Numéro Mobile Money</label>
                 <input
                   id="mobile-money-phone"
                   v-model="mobileMoneyPhone"
                   type="tel"
                   placeholder="+228 90 00 00 00"
-                  class="form-input"
+                  class="w-full px-4 py-3 border border-neutral-200 rounded-xl focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all"
                   :class="{
                     'border-accent-red/50 focus:ring-accent-red/20 focus:border-accent-red/50': mobileMoneyPhone && !/^\+?[0-9]{8,15}$/.test(mobileMoneyPhone)
                   }"
@@ -321,14 +328,14 @@
 
               <!-- Wallet payment PIN input -->
               <div v-if="paymentMethod === 'wallet'" class="space-y-2">
-                <label for="wallet-pin" class="form-label">Code PIN du portefeuille</label>
+                <label for="wallet-pin" class="block text-sm font-medium text-neutral-700 mb-2">Code PIN du portefeuille</label>
                 <input
                   id="wallet-pin"
                   v-model="walletPin"
                   type="password"
                   maxlength="6"
                   placeholder="••••••"
-                  class="form-input text-center text-lg tracking-widest"
+                  class="w-full px-4 py-3 border border-neutral-200 rounded-xl focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all text-center text-lg tracking-widest"
                   @input="(e) => e.target.value = e.target.value.replace(/\D/g, '')"
                   required
                 />
@@ -354,10 +361,10 @@
                   Le montant sera débité instantanément de votre portefeuille après saisie du PIN.
                 </p>
               </div>
-            </div>
+            </Card>
 
             <!-- Étape 4: Confirmation -->
-            <div v-if="currentStep === 4" class="card animate-fade-in-up">
+            <Card v-if="currentStep === 4" class="animate-fade-in-up">
               <h3 class="text-xl font-bold text-neutral-900 mb-6">Confirmation de réservation</h3>
 
               <div class="space-y-6">
@@ -436,53 +443,53 @@
                     id="accept-conditions"
                     v-model="acceptConditions"
                     type="checkbox"
-                    class="form-checkbox"
+                    class="h-4 w-4 text-primary-600 focus:ring-primary-500 border-neutral-300 rounded"
                   />
                   <label for="accept-conditions" class="text-sm text-neutral-700">
                     J'accepte les conditions de réservation et je m'engage à récupérer le produit aux horaires convenus
                   </label>
                 </div>
               </div>
-            </div>
+            </Card>
 
             <!-- Boutons navigation -->
             <div class="flex justify-between">
-              <button
+              <Button
                 v-if="currentStep > 1"
                 @click="previousStep"
-                class="btn btn-outline"
+                variant="outline"
               >
                 <ArrowLeft class="w-4 h-4 mr-2" />
                 Étape précédente
-              </button>
+              </Button>
               <div v-else></div>
 
-              <button
+              <Button
                 v-if="currentStep < 4"
                 @click="nextStep"
                 :disabled="!canProceedToNextStep"
-                class="btn btn-primary"
+                variant="primary"
               >
                 Étape suivante
                 <ArrowRight class="w-4 h-4 ml-2" />
-              </button>
+              </Button>
 
-              <button
+              <Button
                 v-else
                 @click="confirmReservation"
                 :disabled="!acceptConditions || loading"
-                class="btn btn-primary"
+                variant="primary"
               >
                 <Loader2 v-if="loading" class="w-4 h-4 mr-2 animate-spin" />
                 Confirmer la réservation
-              </button>
+              </Button>
             </div>
           </div>
 
           <!-- Sidebar informations -->
           <div class="space-y-6">
             <!-- Informations marchand -->
-            <div class="card animate-fade-in-up" style="animation-delay: 0.2s;">
+            <Card class="animate-fade-in-up" style="animation-delay: 0.2s;">
               <h3 class="text-lg font-bold text-neutral-900 mb-4">Marchand</h3>
               <div class="space-y-3">
                 <div class="flex items-center gap-3">
@@ -499,10 +506,10 @@
                   <span>À {{ product.merchant.distance }}km de vous</span>
                 </div>
               </div>
-            </div>
+            </Card>
 
             <!-- Aide -->
-            <div class="card bg-gradient-to-br from-primary-50 to-primary-100 border-primary-200 animate-fade-in-up" style="animation-delay: 0.4s;">
+            <Card class="bg-gradient-to-br from-primary-50 to-primary-100 border-primary-200 animate-fade-in-up" style="animation-delay: 0.4s;">
               <div class="flex items-center gap-3 mb-4">
                 <div class="w-8 h-8 bg-primary-500 rounded-full flex items-center justify-center">
                   <HelpCircle class="w-4 h-4 text-white" />
@@ -522,10 +529,10 @@
                   <span>support@antigaspi.com</span>
                 </div>
               </div>
-            </div>
+            </Card>
 
             <!-- Impact environnemental -->
-            <div class="card bg-gradient-to-br from-accent-orange/10 to-accent-blue/5 border-accent-orange/30 animate-fade-in-up" style="animation-delay: 0.6s;">
+            <Card class="bg-gradient-to-br from-accent-orange/10 to-accent-blue/5 border-accent-orange/30 animate-fade-in-up" style="animation-delay: 0.6s;">
               <div class="text-center">
                 <div class="text-4xl mb-3">🌱</div>
                 <h3 class="text-lg font-bold text-accent-orange/95 mb-2">Votre impact</h3>
@@ -541,7 +548,7 @@
                   </div>
                 </div>
               </div>
-            </div>
+            </Card>
           </div>
         </div>
 
@@ -565,6 +572,12 @@ import {
   ArrowLeft, ArrowRight, Package, Clock, Minus, Plus, MapPin, Calendar,
   Phone, Store, HelpCircle, Mail, Loader2, CreditCard, Smartphone, Wallet
 } from 'lucide-vue-next'
+
+// Import 2025 Design System Components
+import Card from '@/components/ui/2025/Card.vue'
+import Button from '@/components/ui/2025/Button.vue'
+import Badge from '@/components/ui/2025/Badge.vue'
+import Input from '@/components/ui/2025/Input.vue'
 
 interface ReserveProduct {
   id: number
