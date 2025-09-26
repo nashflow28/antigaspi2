@@ -1,5 +1,5 @@
 {
-  "timestamp": "2025-09-25T20:56:34.534Z",
+  "timestamp": "2025-09-26T06:37:39.384Z",
   "scores": {
     "overall": 20,
     "breakdown": {
@@ -13,15 +13,18 @@
   "checks": {
     "legacyClasses": {
       "status": "FAIL",
-      "message": "851 legacy class usages in 57 files",
+      "message": "730 legacy class usages in 61 files",
       "score": 0,
       "details": {
         "highPriorityFiles": [
-          "src\\views\\ReservationDetailView.vue",
+          "src\\views\\ProductReserveView2025.vue",
           "src\\views\\ProductReserveView.vue",
           "src\\views\\ProductDetailView.vue",
+          "src\\views\\HomeView2025.vue",
           "src\\views\\HomeView.vue",
-          "src\\views\\DashboardView.vue",
+          "src\\views\\consumer\\SurpriseBasketsView.vue",
+          "src\\views\\consumer\\SurpriseBasketDetailView.vue",
+          "src\\views\\consumer\\LoyaltyDashboard.vue",
           "src\\views\\merchant\\SurpriseBasketsView.vue",
           "src\\views\\merchant\\ReservationsView.vue",
           "src\\views\\merchant\\ProductsView.vue",
@@ -29,47 +32,35 @@
           "src\\views\\merchant\\LoyaltyManagement.vue",
           "src\\views\\admin\\DashboardView.vue",
           "src\\views\\admin\\CategoriesView.vue",
-          "src\\views\\consumer\\SurpriseBasketsView.vue",
-          "src\\views\\consumer\\SurpriseBasketDetailView.vue",
-          "src\\views\\consumer\\LoyaltyDashboard.vue",
+          "src\\components\\reservation\\ReservationCard.vue",
           "src\\components\\ui\\ErrorDashboard.vue",
           "src\\components\\ui\\ErrorBoundary.vue",
           "src\\components\\ui\\ButtonWrapper.vue",
           "src\\components\\product\\SurpriseBasketCard.vue",
           "src\\components\\product\\ProductListItem.vue",
-          "src\\components\\reservation\\ReservationCard.vue",
           "src\\components\\layout\\NavBar.vue",
           "src\\components\\forms\\RegisterForm.vue",
-          "src\\components\\forms\\LoginForm.vue",
           "src\\components\\debug\\SequentialThinking.vue",
-          "src\\components\\ui\\2025\\Card.vue",
-          "src\\composables\\useDesignSystem2025.ts"
+          "src\\components\\ui\\2025\\Card.vue"
         ],
         "quickWins": [
-          "form-textarea",
           "form-checkbox",
-          "card-gradient",
-          "badge-primary",
-          "badge-secondary",
-          "badge-warning",
-          "badge-error",
+          "form-textarea",
+          "badge-success",
           "btn-secondary",
           "form-help",
           "btn-accent",
-          "form-group",
-          "card-glass"
+          "badge-primary",
+          "form-group"
         ],
         "complexMigrations": [
           "card",
-          "btn",
-          "btn-primary",
-          "btn-outline",
-          "btn-ghost",
-          "btn-sm",
           "badge",
           "shadow-glow",
           "form-label",
-          "form-input"
+          "btn",
+          "btn-primary",
+          "btn-sm"
         ]
       }
     },
@@ -117,7 +108,7 @@
     }
   },
   "errors": [
-    "Too many legacy classes remaining: 851 usages"
+    "Too many legacy classes remaining: 730 usages"
   ],
   "warnings": [
     "Could not determine test coverage",

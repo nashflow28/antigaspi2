@@ -19,7 +19,7 @@ const router = createRouter({
     {
       path: '/',
       name: 'home',
-      component: () => import('@/views/MainHomeView.vue'),
+      component: () => import('@/components/ui/HomeViewWrapper.vue'),
       meta: { requiresAuth: false }
     },
     {
@@ -90,7 +90,7 @@ const router = createRouter({
     {
       path: '/products/:id/reserve',
       name: 'product-reserve',
-      component: () => import('@/views/ProductReserveView.vue'),
+      component: () => import('@/components/ui/ProductReserveViewWrapper.vue'),
       meta: { requiresAuth: true, roles: ['consumer'] }
     },
     {
@@ -209,7 +209,7 @@ const router = createRouter({
     {
       path: '/merchant/products/:id/edit',
       name: 'merchant-product-edit',
-      component: () => import('@/views/merchant/ProductEditView.vue'),
+      component: () => import('@/components/ui/ProductEditViewWrapper.vue'),
       meta: { requiresAuth: true, roles: ['merchant'] }
     },
     {
@@ -250,7 +250,7 @@ const router = createRouter({
     {
       path: '/admin/dashboard',
       name: 'admin-dashboard',
-      component: () => import('@/views/admin/DashboardView.vue'),
+      component: () => import('@/components/ui/AdminDashboardViewWrapper.vue'),
       meta: { requiresAuth: true, roles: ['admin'] }
     },
     {
