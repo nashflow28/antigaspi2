@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/vue3';
-import Card from '@/components/ui/Card.vue';
-import Button from '@/components/ui/Button.vue';
+import Card from '@/components/ui/2025/Card.vue';
+import Button from '@/components/ui/2025/Button.vue';
 
 type CardComponent = typeof Card;
 
@@ -22,8 +22,10 @@ const meta: Meta<CardComponent & StoryProps> = {
   },
   args: {
     variant: 'default',
-    hover: 'lift',
-    padding: 'md',
+    interactive: false,
+    shadow: 'md',
+    rounded: 'lg',
+    noPadding: false,
     title: 'Carte de suivi',
     subtitle: 'Statistiques mises à jour',
     body: 'Affichez un aperçu des performances de vos paniers et suivez les KPIs clés de votre activité.',
@@ -34,15 +36,21 @@ const meta: Meta<CardComponent & StoryProps> = {
   argTypes: {
     variant: {
       control: { type: 'select' },
-      options: ['default', 'glass', 'highlight', 'muted'],
+      options: ['default', 'glass', 'gradient', 'bordered', 'elevated'],
     },
-    hover: {
+    interactive: {
+      control: { type: 'boolean' },
+    },
+    noPadding: {
+      control: { type: 'boolean' },
+    },
+    shadow: {
       control: { type: 'select' },
-      options: ['none', 'lift', 'glow', 'subtle'],
+      options: ['none', 'sm', 'md', 'lg', 'xl'],
     },
-    padding: {
-      control: { type: 'inline-radio' },
-      options: ['none', 'sm', 'md', 'lg'],
+    rounded: {
+      control: { type: 'select' },
+      options: ['none', 'sm', 'md', 'lg', 'xl', 'full'],
     },
     showHeader: {
       control: { type: 'boolean' },
@@ -69,7 +77,14 @@ const meta: Meta<CardComponent & StoryProps> = {
       return { args };
     },
     template: `
-      <Card :variant="args.variant" :hover="args.hover" :padding="args.padding" class="max-w-md">
+      <Card
+        :variant="args.variant"
+        :interactive="args.interactive"
+        :no-padding="args.noPadding"
+        :shadow="args.shadow"
+        :rounded="args.rounded"
+        class="max-w-xl"
+      >
         <template v-if="args.showHeader" #header>
           <div class="flex flex-col gap-1">
             <h3 class="text-h3 font-semibold text-neutral-900 dark:text-neutral-50">{{ args.title }}</h3>
@@ -101,7 +116,8 @@ export const Playground: Story = {};
 export const GlassHighlight: Story = {
   args: {
     variant: 'glass',
-    hover: 'glow',
+    interactive: true,
+    shadow: 'lg',
     title: 'Visibilité renforcée',
     subtitle: 'Mise en avant marketing',
     body: 'Utilisez cette variante pour les éléments clés de la page qui nécessitent une attention accrue et un effet premium.',
@@ -113,9 +129,10 @@ export const GlassHighlight: Story = {
 
 export const Minimal: Story = {
   args: {
-    variant: 'muted',
-    hover: 'none',
-    padding: 'sm',
+    variant: 'bordered',
+    shadow: 'sm',
+    rounded: 'md',
+    noPadding: true,
     showFooter: false,
     subtitle: '',
     body: "Idéal pour des blocs secondaires ou des cartes d'information discrètes.",
@@ -124,9 +141,10 @@ export const Minimal: Story = {
 
 export const DarkMode: Story = {
   args: {
-    variant: 'highlight',
-    hover: 'lift',
-    body: 'La variante highlight ressort particulièrement bien sur les fonds sombres.',
+    variant: 'elevated',
+    interactive: true,
+    shadow: 'xl',
+    body: 'La variante elevated combine ombres profondes et surfaces contrastées pour le mode sombre.',
     footerLabel: 'Action requise',
   },
   parameters: {
@@ -152,8 +170,8 @@ export const ResponsiveGrid: Story = {
       template: `
         <div class="mx-auto grid w-full max-w-5xl gap-6 px-6 py-10 sm:grid-cols-2 lg:grid-cols-3">
           <Story :args="{ ...args, title: 'Suivi des ventes', body: 'Mesurez vos performances quotidiennes.' }" />
-          <Story :args="{ ...args, variant: 'glass', hover: 'glow', title: 'Conversion', body: 'Optimisez votre tunnel de commande.' }" />
-          <Story :args="{ ...args, variant: 'muted', title: 'Satisfaction client', body: 'Surveillez vos avis et retours.' }" />
+          <Story :args="{ ...args, variant: 'glass', interactive: true, shadow: 'lg', title: 'Conversion', body: 'Optimisez votre tunnel de commande.' }" />
+          <Story :args="{ ...args, variant: 'gradient', rounded: 'xl', title: 'Satisfaction client', body: 'Surveillez vos avis et retours.' }" />
         </div>
       `,
     }),

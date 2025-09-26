@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
 import { mount, flushPromises } from '@vue/test-utils'
-import ReservationDetailView from '@/views/ReservationDetailView.vue'
+import ReservationDetailView from '@/views/ReservationDetailView2025.vue'
 import Card from '@/components/ui/2025/Card.vue'
 import Button from '@/components/ui/2025/Button.vue'
 import Badge from '@/components/ui/2025/Badge.vue'
@@ -34,7 +34,7 @@ vi.mock('@/services/api', () => ({
   }
 }))
 
-describe('ReservationDetailView (Design System 2025)', () => {
+describe('ReservationDetailView2025 (Design System 2025)', () => {
   beforeEach(() => {
     const now = new Date().toISOString()
 
@@ -92,7 +92,7 @@ describe('ReservationDetailView (Design System 2025)', () => {
     expect(wrapper.find('.btn').exists()).toBe(false)
     expect(wrapper.html()).not.toContain('glass-bg')
     expect(wrapper.html()).not.toContain('glass-border')
-    expect(wrapper.findAll('.shadow-card').length).toBeGreaterThan(0)
+    expect(wrapper.findAll('.card-2025').length).toBeGreaterThan(0)
 
     expect(getReservationMock).toHaveBeenCalledWith(42)
     expect(wrapper.text()).toContain('Panier surprise bio')

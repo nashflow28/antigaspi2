@@ -1,6 +1,6 @@
 import { computed } from 'vue';
 import type { Meta, StoryObj } from '@storybook/vue3';
-import Button from '@/components/ui/Button.vue';
+import Button from '@/components/ui/2025/Button.vue';
 import { ArrowRight, Check, Loader2, ShoppingBag, Star } from 'lucide-vue-next';
 
 type ButtonComponent = typeof Button;
@@ -59,7 +59,7 @@ const meta: Meta<ButtonComponent & { label: string; leftIcon: IconOption; rightI
     },
     size: {
       control: { type: 'inline-radio' },
-      options: ['sm', 'default', 'lg', 'xl', 'icon'],
+      options: ['xs', 'sm', 'md', 'lg', 'xl'],
     },
     disabled: {
       control: { type: 'boolean' },
@@ -82,7 +82,7 @@ const meta: Meta<ButtonComponent & { label: string; leftIcon: IconOption; rightI
   args: {
     label: 'Valider la commande',
     variant: 'primary',
-    size: 'default',
+    size: 'md',
     disabled: false,
     loading: false,
     leftIcon: 'ShoppingBag',
