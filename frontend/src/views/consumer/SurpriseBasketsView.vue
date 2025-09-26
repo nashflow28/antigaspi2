@@ -20,22 +20,35 @@
           </div>
 
           <div class="flex flex-wrap items-center gap-3">
-            <button
+            <Button
               type="button"
-              class="btn btn-ghost flex items-center gap-2"
+              variant="ghost"
+              size="md"
+              :left-icon="Filter"
               @click="showFilters = !showFilters"
             >
-              <Filter class="h-5 w-5" />
               Filtres
-              <span v-if="activeFiltersCount" class="badge badge-soft">{{ activeFiltersCount }}</span>
-            </button>
-            <div class="flex items-center gap-3 rounded-xl bg-white px-4 py-3 shadow-card">
+              <Badge
+                v-if="activeFiltersCount"
+                variant="outline"
+                size="xs"
+                rounded
+                class="ml-2"
+              >
+                {{ activeFiltersCount }}
+              </Badge>
+            </Button>
+            <Card
+              variant="elevated"
+              :no-padding="true"
+              class="flex items-center gap-3 rounded-xl px-4 py-3 shadow-primary-500/10"
+            >
               <Package class="h-6 w-6 text-primary-500" />
               <div>
                 <p class="text-xs uppercase tracking-wide text-neutral-500">Impact</p>
                 <p class="text-sm font-semibold text-neutral-900">{{ totalResults }} commerçant{{ totalResults > 1 ? 's' : '' }}</p>
               </div>
-            </div>
+            </Card>
           </div>
         </div>
       </div>
@@ -57,23 +70,27 @@
           </div>
         </div>
 
-        <div v-else-if="surpriseBaskets.length === 0" class="card text-center py-16">
-          <div class="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-neutral-100">
+        <Card
+          v-else-if="surpriseBaskets.length === 0"
+          :no-padding="true"
+          class="flex flex-col items-center gap-3 px-8 py-16 text-center"
+        >
+          <div class="flex h-16 w-16 items-center justify-center rounded-full bg-neutral-100">
             <Package class="h-8 w-8 text-neutral-400" />
           </div>
           <h2 class="text-xl font-semibold text-neutral-800">Aucun panier ne correspond à vos filtres</h2>
           <p class="mt-2 text-neutral-500">
             Ajustez vos critères pour découvrir d'autres paniers surprise disponibles.
           </p>
-          <button
+          <Button
             v-if="activeFiltersCount"
             type="button"
-            class="btn btn-primary mt-6"
+            class="mt-6"
             @click="resetFilters"
           >
             Réinitialiser les filtres
-          </button>
-        </div>
+          </Button>
+        </Card>
 
         <div
           v-else
@@ -88,27 +105,33 @@
           />
         </div>
 
-        <div v-if="pagination.lastPage > 1" class="flex items-center justify-between rounded-2xl border border-neutral-200 bg-white px-4 py-3 text-sm text-neutral-600">
-          <button
+        <Card
+          v-if="pagination.lastPage > 1"
+          :no-padding="true"
+          class="flex items-center justify-between gap-4 rounded-2xl border border-neutral-200 bg-white px-4 py-3 text-sm text-neutral-600"
+        >
+          <Button
             type="button"
-            class="btn btn-ghost btn-sm"
+            variant="ghost"
+            size="sm"
+            :left-icon="ChevronLeft"
             :disabled="currentPage === 1"
             @click="currentPage = Math.max(1, currentPage - 1)"
           >
-            <ChevronLeft class="h-4 w-4" />
             Précédent
-          </button>
+          </Button>
           <p>Page {{ currentPage }} sur {{ pagination.lastPage }}</p>
-          <button
+          <Button
             type="button"
-            class="btn btn-ghost btn-sm"
+            variant="ghost"
+            size="sm"
+            :right-icon="ChevronRight"
             :disabled="currentPage >= pagination.lastPage"
             @click="currentPage = Math.min(pagination.lastPage, currentPage + 1)"
           >
             Suivant
-            <ChevronRight class="h-4 w-4" />
-          </button>
-        </div>
+          </Button>
+        </Card>
       </section>
     </main>
   </div>
@@ -122,6 +145,9 @@ import SurpriseBasketCard from '@/components/product/SurpriseBasketCard.vue'
 import SurpriseBasketFilters, { type SurpriseBasketFilterModel } from '@/components/product/SurpriseBasketFilters.vue'
 import { useSurpriseBaskets } from '@/composables/useSurpriseBaskets'
 import type { SurpriseBasket } from '@/services/surpriseBasketService'
+import Button from '@/components/ui/2025/Button.vue'
+import Badge from '@/components/ui/2025/Badge.vue'
+import Card from '@/components/ui/2025/Card.vue'
 
 const router = useRouter()
 const { surpriseBaskets, pagination, loading, loadSurpriseBaskets } = useSurpriseBaskets()
