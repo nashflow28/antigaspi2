@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 import { computed, ref, watch } from 'vue'
 import type { Product } from '@/types'
-import { notify } from '@/composables/useNotifications'
+import { notify, type Notification } from '@/composables/useNotifications'
 
 export interface CartItem {
   id: number
@@ -26,6 +26,14 @@ interface AddItemPayload {
   silent?: boolean
 }
 
+interface CartNotificationPayload {
+  title?: string
+  message: string
+  action?: Notification['action']
+  onClose?: Notification['onClose']
+  operation?: string
+}
+
 const STORAGE_KEY = 'antigaspi_cart_items'
 
 const resolvePrice = (value: number | string | undefined | null): number => {
@@ -43,11 +51,59 @@ const resolvePrice = (value: number | string | undefined | null): number => {
 
 export const useCartStore = defineStore('cart', () => {
   const items = ref<CartItem[]>([])
-  const error = ref<string | null>(null)
   const isHydrated = ref(false)
+  const pendingOperation = ref<string | null>(null)
 
   const itemsCount = computed(() => items.value.reduce((total, item) => total + item.quantity, 0))
   const totalAmount = computed(() => items.value.reduce((total, item) => total + item.price * item.quantity, 0))
+
+  const emitCartNotification = (type: 'error' | 'info' | 'success', payload: CartNotificationPayload) => {
+    const { title = 'Panier', message, action, onClose, operation } = payload
+
+    if (type === 'error' && operation) {
+      pendingOperation.value = operation
+    } else if (type !== 'error') {
+      pendingOperation.value = null
+    }
+
+    const wrappedAction = action
+      ? {
+          label: action.label,
+          callback: async () => {
+            await action.callback()
+            if (operation && pendingOperation.value === operation) {
+              pendingOperation.value = null
+            }
+          },
+        }
+      : undefined
+
+    const wrappedOnClose = () => {
+      if (operation && pendingOperation.value === operation) {
+        pendingOperation.value = null
+      }
+      onClose?.()
+    }
+
+    const options: Partial<Notification> = {
+      action: wrappedAction,
+      onClose: wrappedOnClose,
+    }
+
+    if (type === 'error') {
+      return notify.error(message, title, options)
+    }
+
+    if (type === 'info') {
+      return notify.info(message, title, options)
+    }
+
+    return notify.success(message, title, options)
+  }
+
+  const emitCartError = (payload: CartNotificationPayload) => emitCartNotification('error', payload)
+  const emitCartInfo = (payload: CartNotificationPayload) => emitCartNotification('info', payload)
+  const emitCartSuccess = (payload: CartNotificationPayload) => emitCartNotification('success', payload)
 
   const persist = () => {
     if (typeof window === 'undefined') {
@@ -56,9 +112,18 @@ export const useCartStore = defineStore('cart', () => {
 
     try {
       window.localStorage.setItem(STORAGE_KEY, JSON.stringify(items.value))
+      if (pendingOperation.value === 'persist') {
+        pendingOperation.value = null
+      }
     } catch (storageError) {
-      error.value = 'Impossible d\'enregistrer le panier localement'
-      notify.error(error.value, 'Panier')
+      emitCartError({
+        message: "Impossible d'enregistrer le panier localement",
+        operation: 'persist',
+        action: {
+          label: 'Réessayer',
+          callback: () => persist(),
+        },
+      })
     }
   }
 
@@ -80,9 +145,21 @@ export const useCartStore = defineStore('cart', () => {
           }))
         }
       }
+      if (pendingOperation.value === 'hydrate') {
+        pendingOperation.value = null
+      }
     } catch (storageError) {
-      error.value = 'Impossible de charger le panier sauvegardé'
-      notify.error(error.value, 'Panier')
+      emitCartError({
+        message: 'Impossible de charger le panier sauvegardé',
+        operation: 'hydrate',
+        action: {
+          label: 'Réessayer',
+          callback: () => hydrateFromStorage(),
+        },
+        onClose: () => {
+          items.value = []
+        },
+      })
       items.value = []
     } finally {
       isHydrated.value = true
@@ -95,23 +172,28 @@ export const useCartStore = defineStore('cart', () => {
     }
   }, { deep: true })
 
-  const clearError = () => {
-    error.value = null
-  }
-
   const upsertItem = (payload: AddItemPayload) => {
     const quantity = payload.quantity && payload.quantity > 0 ? Math.floor(payload.quantity) : 1
 
     if (!payload.id || !payload.name) {
       const message = 'Article invalide'
-      error.value = message
       if (!payload.silent) {
-        notify.error(message, 'Panier')
+        emitCartError({
+          message,
+          operation: 'upsert',
+          action: {
+            label: 'Réessayer',
+            callback: async () => {
+              upsertItem({
+                ...payload,
+                silent: false,
+              })
+            },
+          },
+        })
       }
       return { success: false, error: message }
     }
-
-    clearError()
 
     const existing = items.value.find(item => item.id === payload.id)
     if (existing) {
@@ -134,8 +216,14 @@ export const useCartStore = defineStore('cart', () => {
       })
     }
 
+    if (pendingOperation.value === 'upsert') {
+      pendingOperation.value = null
+    }
+
     if (!payload.silent) {
-      notify.success('Produit ajouté au panier', 'Panier')
+      emitCartSuccess({
+        message: 'Produit ajouté au panier',
+      })
     }
 
     return { success: true }
@@ -163,13 +251,23 @@ export const useCartStore = defineStore('cart', () => {
     const item = items.value.find(entry => entry.id === id)
     if (!item) {
       const message = 'Article introuvable dans le panier'
-      error.value = message
-      notify.error(message, 'Panier')
+      emitCartError({
+        message,
+        operation: 'update-quantity',
+        action: {
+          label: 'Réessayer',
+          callback: async () => {
+            updateQuantity(id, quantity)
+          },
+        },
+      })
       return { success: false, error: message }
     }
 
     item.quantity = Math.floor(quantity)
-    clearError()
+    if (pendingOperation.value === 'update-quantity') {
+      pendingOperation.value = null
+    }
     return { success: true, data: item }
   }
 
@@ -179,21 +277,31 @@ export const useCartStore = defineStore('cart', () => {
 
     if (items.value.length === initialLength) {
       const message = 'Article introuvable dans le panier'
-      error.value = message
-      notify.error(message, 'Panier')
+      emitCartError({
+        message,
+        operation: 'remove-item',
+        action: {
+          label: 'Réessayer',
+          callback: async () => {
+            removeItem(id)
+          },
+        },
+      })
       return { success: false, error: message }
     }
 
-    notify.info('Article retiré du panier', 'Panier')
-    clearError()
+    emitCartInfo({
+      message: 'Article retiré du panier',
+    })
     return { success: true }
   }
 
   const clearCart = (options: { silent?: boolean } = {}) => {
     items.value = []
-    clearError()
     if (!options.silent) {
-      notify.info('Panier vidé', 'Panier')
+      emitCartInfo({
+        message: 'Panier vidé',
+      })
     }
     return { success: true }
   }
@@ -203,8 +311,8 @@ export const useCartStore = defineStore('cart', () => {
     items,
     itemsCount,
     totalAmount,
-    error,
     isHydrated,
+    pendingOperation,
 
     // Actions
     hydrateFromStorage,
