@@ -501,6 +501,7 @@
         </div>
       </Card>
     </div>
+  </div>
   </DashboardLayout>
 </template>
 
