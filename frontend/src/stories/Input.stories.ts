@@ -1,6 +1,6 @@
 import { computed, ref, watch } from 'vue';
 import type { Meta, StoryObj } from '@storybook/vue3';
-import Input from '@/components/ui/Input.vue';
+import Input from '@/components/ui/2025/Input.vue';
 import { Calendar, Lock, Mail, Search, User } from 'lucide-vue-next';
 
 type InputComponent = typeof Input;
@@ -18,7 +18,7 @@ type IconOption = keyof typeof iconOptions;
 
 type StoryProps = {
   label: string;
-  helperText: string;
+  helpText: string;
   error: string;
   leftIcon: IconOption;
   rightIcon: IconOption;
@@ -33,10 +33,10 @@ const meta: Meta<InputComponent & StoryProps> = {
     layout: 'centered',
   },
   args: {
-    variant: 'subtle',
+    variant: 'default',
     size: 'md',
     label: 'Email professionnel',
-    helperText: 'Nous l’utiliserons pour les confirmations de réservation.',
+    helpText: 'Nous l’utiliserons pour les confirmations de réservation.',
     error: '',
     disabled: false,
     modelValue: 'contact@antigaspi.fr',
@@ -46,7 +46,7 @@ const meta: Meta<InputComponent & StoryProps> = {
   argTypes: {
     variant: {
       control: { type: 'select' },
-      options: ['subtle', 'filled', 'transparent'],
+      options: ['default', 'outline', 'filled'],
     },
     size: {
       control: { type: 'inline-radio' },
@@ -55,7 +55,7 @@ const meta: Meta<InputComponent & StoryProps> = {
     label: {
       control: { type: 'text' },
     },
-    helperText: {
+    helpText: {
       control: { type: 'text' },
     },
     error: {
@@ -106,7 +106,7 @@ const meta: Meta<InputComponent & StoryProps> = {
           :variant="args.variant"
           :size="args.size"
           :label="args.label"
-          :helper-text="args.helperText || undefined"
+          :help-text="args.helpText || undefined"
           :error="args.error || undefined"
           :disabled="args.disabled"
           :left-icon="resolvedLeft"
@@ -127,7 +127,7 @@ export const Playground: Story = {};
 export const WithIcons: Story = {
   args: {
     label: 'Recherche de panier',
-    helperText: 'Tapez le nom d’un commerçant ou d’un produit.',
+    helpText: 'Tapez le nom d’un commerçant ou d’un produit.',
     leftIcon: 'Search',
     rightIcon: 'Calendar',
     modelValue: '',
@@ -139,7 +139,7 @@ export const WithIcons: Story = {
 
 export const FocusState: Story = {
   args: {
-    helperText: 'Saisie en cours…',
+    helpText: 'Saisie en cours…',
   },
   parameters: {
     pseudo: { focus: ['input'] },
@@ -163,8 +163,8 @@ export const Disabled: Story = {
 
 export const DarkMode: Story = {
   args: {
-    variant: 'transparent',
-    helperText: 'Compatible mode sombre avec contraste renforcé.',
+    variant: 'outline',
+    helpText: 'Compatible mode sombre avec contraste renforcé.',
   },
   parameters: {
     backgrounds: { default: 'Surface Dark' },
@@ -175,7 +175,7 @@ export const DarkMode: Story = {
 export const MobileFullWidth: Story = {
   args: {
     label: 'Téléphone portable',
-    helperText: 'Affichage optimisé pour mobile.',
+    helpText: 'Affichage optimisé pour mobile.',
     leftIcon: 'User',
     modelValue: '',
   },

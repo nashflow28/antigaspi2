@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, afterAll, vi } from 'vitest'
 import { flushPromises, mount } from '@vue/test-utils'
-import ProductReserveView from '@/views/ProductReserveView.vue'
+import ProductReserveView from '@/views/ProductReserveView2025.vue'
 
 const createReservationMock = vi.hoisted(() => vi.fn())
 const routerPushMock = vi.hoisted(() => vi.fn())
@@ -88,7 +88,7 @@ const resolveProduct = () => ({
   }
 })
 
-describe('ProductReserveView - wallet reservations', () => {
+describe('ProductReserveView2025 - wallet reservations', () => {
   const mountView = async () => {
     const wrapper = mount(ProductReserveView, {
       global: {
