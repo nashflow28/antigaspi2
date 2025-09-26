@@ -17,111 +17,92 @@
           </p>
         </div>
 
-        <div class="flex flex-col sm:flex-row gap-4">
-          <div class="relative">
-            <MagnifyingGlassIcon class="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-neutral-400" />
-            <input
-              v-model="searchQuery"
-              type="text"
-              placeholder="Rechercher par code ou nom..."
-              class="input pl-10 w-full sm:w-80"
-            />
-          </div>
+        <div class="flex flex-col gap-4 sm:flex-row">
+          <Input
+            v-model="searchQuery"
+            :left-icon="MagnifyingGlassIcon"
+            placeholder="Rechercher par code ou nom..."
+            class="w-full sm:w-80"
+            variant="outline"
+          />
 
-          <select v-model="selectedDateRange" class="input">
+          <select
+            v-model="selectedDateRange"
+            class="w-full rounded-lg border border-neutral-300 bg-white px-4 py-2.5 text-sm text-neutral-700 shadow-sm transition focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500"
+          >
             <option value="today">Aujourd'hui</option>
             <option value="week">Cette semaine</option>
             <option value="month">Ce mois</option>
             <option value="all">Toutes les dates</option>
           </select>
 
-          <button
-            @click="exportReservations"
-            class="btn btn-outline flex items-center gap-2"
+          <Button
+            variant="outline"
+            class="flex items-center gap-2"
             :disabled="filteredReservations.length === 0"
+            @click="exportReservations"
           >
-            <ArrowDownTrayIcon class="w-4 h-4" />
+            <ArrowDownTrayIcon class="h-4 w-4" />
             Exporter
-          </button>
+          </Button>
         </div>
       </div>
 
       <!-- Quick stats -->
-      <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mt-6">
-        <div class="card bg-gradient-to-r from-primary-500 to-primary-600 text-white">
+      <div class="grid grid-cols-1 gap-4 md:grid-cols-4 mt-6">
+        <Card
+          v-for="stat in stats"
+          :key="stat.label"
+          no-padding
+          rounded="xl"
+          class="p-6 text-white shadow-lg"
+          :class="stat.background"
+        >
           <div class="flex items-center justify-between">
             <div>
-              <p class="text-primary-100 text-sm font-medium">Total Réservations</p>
-              <p class="text-3xl font-bold">{{ reservations.length }}</p>
+              <p :class="stat.subtitleClass">{{ stat.label }}</p>
+              <p class="text-3xl font-bold">{{ stat.value }}</p>
             </div>
-            <div class="p-3 bg-white/20 rounded-xl">
-              <BookmarkIcon class="w-6 h-6" />
-            </div>
-          </div>
-        </div>
-
-        <div class="card bg-gradient-to-r from-accent-orange to-accent-orange/90 text-white">
-          <div class="flex items-center justify-between">
-            <div>
-              <p class="text-accent-orange/70 text-sm font-medium">En Attente</p>
-              <p class="text-3xl font-bold">{{ pendingReservations.length }}</p>
-            </div>
-            <div class="p-3 bg-white/20 rounded-xl">
-              <ClockIcon class="w-6 h-6" />
+            <div class="rounded-xl bg-white/20 p-3">
+              <component :is="stat.icon" class="h-6 w-6" />
             </div>
           </div>
-        </div>
-
-        <div class="card bg-gradient-to-r from-primary-500 to-primary-600 text-white">
-          <div class="flex items-center justify-between">
-            <div>
-              <p class="text-primary-100 text-sm font-medium">Confirmées</p>
-              <p class="text-3xl font-bold">{{ confirmedReservations.length }}</p>
-            </div>
-            <div class="p-3 bg-white/20 rounded-xl">
-              <CheckCircleIcon class="w-6 h-6" />
-            </div>
-          </div>
-        </div>
-
-        <div class="card bg-gradient-to-r from-blue-500 to-blue-600 text-white">
-          <div class="flex items-center justify-between">
-            <div>
-              <p class="text-blue-100 text-sm font-medium">Récupérées</p>
-              <p class="text-3xl font-bold">{{ completedReservations.length }}</p>
-            </div>
-            <div class="p-3 bg-white/20 rounded-xl">
-              <ShoppingBagIcon class="w-6 h-6" />
-            </div>
-          </div>
-        </div>
+        </Card>
       </div>
     </div>
 
     <!-- Filters -->
-    <div class="card mb-6">
+    <Card class="mb-6">
       <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
         <div class="flex flex-wrap gap-2">
-          <button
+          <Button
             v-for="filter in filters"
             :key="filter.key"
+            size="sm"
+            rounded
+            :variant="activeFilter === filter.key ? 'primary' : 'secondary'"
+            class="font-medium"
             @click="activeFilter = filter.key"
-            :class="[
-              'px-4 py-2 rounded-lg font-medium transition-colors',
-              activeFilter === filter.key
-                ? 'bg-primary-100 text-primary-700 border-2 border-primary-200'
-                : 'bg-neutral-100 text-neutral-600 hover:bg-neutral-200'
-            ]"
           >
-            {{ filter.label }}
-            <span v-if="filter.count !== null" class="ml-2 text-sm">
-              ({{ filter.count }})
+            <span class="flex items-center gap-2">
+              {{ filter.label }}
+              <Badge
+                v-if="filter.count !== null"
+                size="xs"
+                variant="outline"
+                class="bg-white/40 text-neutral-600"
+              >
+                {{ filter.count }}
+              </Badge>
             </span>
-          </button>
+          </Button>
         </div>
 
         <div class="flex items-center gap-4">
-          <select v-model="sortBy" class="input">
+          <select
+            v-model="sortBy"
+            class="w-full rounded-lg border border-neutral-300 bg-white px-4 py-2.5 text-sm text-neutral-700 shadow-sm transition focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500"
+          >
             <option value="created_at">Plus récent</option>
             <option value="pickup_date">Date de récupération</option>
             <option value="expires_at">Date d'expiration</option>
@@ -129,14 +110,14 @@
           </select>
         </div>
       </div>
-    </div>
+    </Card>
 
     <!-- Reservations List -->
     <div v-if="filteredReservations.length > 0" class="space-y-4">
-      <div
+      <Card
         v-for="reservation in filteredReservations"
         :key="reservation.id"
-        class="card hover:shadow-lg transition-shadow"
+        class="transition-shadow hover:shadow-lg"
       >
         <div class="flex flex-col lg:flex-row gap-6">
           <!-- Product Image -->
@@ -164,19 +145,23 @@
                   </div>
 
                   <div class="flex items-center gap-2">
-                    <span
-                      :class="getStatusBadgeClass(reservation.status)"
-                      class="px-3 py-1 rounded-full text-sm font-medium"
+                    <Badge
+                      :variant="getStatusBadgeVariant(reservation.status)"
+                      size="sm"
+                      rounded
                     >
                       {{ getStatusLabel(reservation.status) }}
-                    </span>
+                    </Badge>
 
-                    <span
+                    <Badge
                       v-if="isUrgent(reservation)"
-                      class="px-2 py-1 bg-accent-red/15 text-accent-red/90 rounded-full text-xs font-medium"
+                      variant="error"
+                      size="xs"
+                      rounded
+                      pulse
                     >
                       Urgent
-                    </span>
+                    </Badge>
                   </div>
                 </div>
 
@@ -223,54 +208,64 @@
               <div class="flex items-center gap-2 min-w-[200px]">
                 <!-- Primary action based on status -->
                 <template v-if="reservation.status === 'pending'">
-                  <button
+                  <Button
+                    size="sm"
+                    variant="secondary"
+                    class="flex-1 gap-2 border-emerald-500 bg-emerald-500 text-white hover:border-emerald-600 hover:bg-emerald-600"
                     @click="updateReservationStatus(reservation, 'confirmed')"
-                    class="btn btn-success btn-sm flex-1"
                   >
-                    <CheckIcon class="w-4 h-4 mr-1" />
+                    <CheckIcon class="h-4 w-4" />
                     Confirmer
-                  </button>
+                  </Button>
                 </template>
 
                 <template v-else-if="reservation.status === 'confirmed'">
-                  <button
+                  <Button
+                    size="sm"
+                    variant="secondary"
+                    class="flex-1 gap-2 border-accent-blue bg-accent-blue text-white hover:border-accent-blue/90 hover:bg-accent-blue/90"
                     @click="markAsReady(reservation)"
-                    class="btn btn-primary btn-sm flex-1"
                   >
-                    <BellIcon class="w-4 h-4 mr-1" />
+                    <BellIcon class="h-4 w-4" />
                     Marquer prêt
-                  </button>
+                  </Button>
                 </template>
 
                 <template v-else-if="reservation.status === 'ready'">
-                  <button
+                  <Button
+                    size="sm"
+                    variant="secondary"
+                    class="flex-1 gap-2 border-emerald-500 bg-emerald-500 text-white hover:border-emerald-600 hover:bg-emerald-600"
                     @click="updateReservationStatus(reservation, 'completed')"
-                    class="btn btn-success btn-sm flex-1"
                   >
-                    <CheckCircleIcon class="w-4 h-4 mr-1" />
+                    <CheckCircleIcon class="h-4 w-4" />
                     Marquer récupérée
-                  </button>
+                  </Button>
                 </template>
 
                 <template v-else>
-                  <button
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    class="flex-1 gap-2"
                     @click="contactCustomer(reservation)"
-                    class="btn btn-outline btn-sm flex-1"
                   >
-                    <PhoneIcon class="w-4 h-4 mr-1" />
+                    <PhoneIcon class="h-4 w-4" />
                     Contacter
-                  </button>
+                  </Button>
                 </template>
 
                 <!-- Three dots menu -->
                 <div class="relative">
-                  <button
-                    @click="toggleDropdown(reservation.id)"
-                    class="btn btn-ghost btn-sm p-2"
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    class="p-2"
                     :class="{ 'bg-neutral-100': openDropdown === reservation.id }"
+                    @click="toggleDropdown(reservation.id)"
                   >
-                    <EllipsisVerticalIcon class="w-4 h-4" />
-                  </button>
+                    <EllipsisVerticalIcon class="h-4 w-4" />
+                  </Button>
 
                   <!-- Dropdown menu -->
                   <div
@@ -329,7 +324,7 @@
             </div>
           </div>
         </div>
-      </div>
+      </Card>
     </div>
 
     <!-- Empty State -->
@@ -347,31 +342,32 @@
       class="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-[120]"
       @click.self="showDetailsModal = false"
     >
-      <div class="card max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-        <div class="flex items-center justify-between mb-6">
+      <Card class="w-full max-h-[90vh] max-w-2xl overflow-y-auto" rounded="xl">
+        <div class="mb-6 flex items-center justify-between">
           <h2 class="text-2xl font-bold text-neutral-900">
             Détails de la réservation
           </h2>
-          <button @click="showDetailsModal = false" class="text-neutral-400 hover:text-neutral-600">
-            <XMarkIcon class="w-6 h-6" />
-          </button>
+          <Button variant="ghost" size="sm" class="text-neutral-400 hover:text-neutral-600" @click="showDetailsModal = false">
+            <XMarkIcon class="h-5 w-5" />
+          </Button>
         </div>
 
         <div v-if="selectedReservation" class="space-y-6">
           <!-- Reservation Info -->
           <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <label class="label">Code de réservation</label>
+              <p class="text-xs font-semibold uppercase tracking-wide text-neutral-500">Code de réservation</p>
               <p class="font-mono text-lg">{{ selectedReservation.reservation_code }}</p>
             </div>
             <div>
-              <label class="label">Statut</label>
-              <span
-                :class="getStatusBadgeClass(selectedReservation.status)"
-                class="px-3 py-1 rounded-full text-sm font-medium"
+              <p class="text-xs font-semibold uppercase tracking-wide text-neutral-500">Statut</p>
+              <Badge
+                :variant="getStatusBadgeVariant(selectedReservation.status)"
+                size="sm"
+                rounded
               >
                 {{ getStatusLabel(selectedReservation.status) }}
-              </span>
+              </Badge>
             </div>
           </div>
 
@@ -380,11 +376,11 @@
             <h3 class="text-lg font-semibold mb-4">Informations client</h3>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label class="label">Nom</label>
+                <p class="text-xs font-semibold uppercase tracking-wide text-neutral-500">Nom</p>
                 <p>{{ selectedReservation.consumer.name }}</p>
               </div>
               <div>
-                <label class="label">Téléphone</label>
+                <p class="text-xs font-semibold uppercase tracking-wide text-neutral-500">Téléphone</p>
                 <p>{{ selectedReservation.consumer.phone }}</p>
               </div>
             </div>
@@ -405,11 +401,11 @@
                 <div class="mt-2 grid grid-cols-2 gap-4 text-sm">
                   <div>
                     <span class="text-neutral-500">Prix unitaire:</span>
-                    <span class="font-medium ml-1">{{ formatPrice(selectedReservation.discounted_price) }}</span>
+                    <span class="ml-1 font-medium">{{ formatPrice(selectedReservation.discounted_price) }}</span>
                   </div>
                   <div>
                     <span class="text-neutral-500">Quantité:</span>
-                    <span class="font-medium ml-1">{{ selectedReservation.quantity }}</span>
+                    <span class="ml-1 font-medium">{{ selectedReservation.quantity }}</span>
                   </div>
                 </div>
               </div>
@@ -452,7 +448,7 @@
             <p class="text-neutral-700">{{ selectedReservation.notes }}</p>
           </div>
         </div>
-      </div>
+      </Card>
     </div>
     </div>
   </DashboardLayout>
@@ -479,6 +475,10 @@ import {
 } from '@heroicons/vue/24/outline'
 import DashboardLayout from '@/components/ui/DashboardLayout.vue'
 import { useDashboardLayout } from '@/composables/useDashboardLayout'
+import Card from '@/components/ui/2025/Card.vue'
+import Button from '@/components/ui/2025/Button.vue'
+import Badge from '@/components/ui/2025/Badge.vue'
+import Input from '@/components/ui/2025/Input.vue'
 
 // Auth store
 const authStore = useAuthStore()
@@ -503,6 +503,37 @@ const filters = computed(() => [
   { key: 'ready', label: 'Prêtes', count: readyReservations.value.length },
   { key: 'completed', label: 'Récupérées', count: completedReservations.value.length },
   { key: 'expired', label: 'Expirées', count: expiredReservations.value.length }
+])
+
+const stats = computed(() => [
+  {
+    label: 'Total Réservations',
+    value: reservations.value.length,
+    background: 'bg-gradient-to-r from-primary-500 to-primary-600',
+    subtitleClass: 'text-primary-100 text-sm font-medium',
+    icon: BookmarkIcon
+  },
+  {
+    label: 'En Attente',
+    value: pendingReservations.value.length,
+    background: 'bg-gradient-to-r from-accent-orange to-accent-orange/90',
+    subtitleClass: 'text-accent-orange/70 text-sm font-medium',
+    icon: ClockIcon
+  },
+  {
+    label: 'Confirmées',
+    value: confirmedReservations.value.length,
+    background: 'bg-gradient-to-r from-primary-500 to-primary-600',
+    subtitleClass: 'text-primary-100 text-sm font-medium',
+    icon: CheckCircleIcon
+  },
+  {
+    label: 'Récupérées',
+    value: completedReservations.value.length,
+    background: 'bg-gradient-to-r from-blue-500 to-blue-600',
+    subtitleClass: 'text-blue-100 text-sm font-medium',
+    icon: ShoppingBagIcon
+  }
 ])
 
 // Computed properties
@@ -602,16 +633,17 @@ const formatDateTime = (dateString: string): string => {
   })
 }
 
-const getStatusBadgeClass = (status: string): string => {
-  const classes: Record<string, string> = {
-    pending: 'bg-accent-orange/15 text-accent-orange/90',
-    confirmed: 'bg-primary-100 text-primary-700',
-    ready: 'bg-blue-100 text-blue-700',
-    completed: 'bg-primary-100 text-primary-700',
-    cancelled: 'bg-accent-red/15 text-accent-red/90',
-    expired: 'bg-neutral-100 text-neutral-700'
-  }
-  return classes[status] || classes.pending
+const getStatusBadgeVariant = (status: string) => {
+  const variants = {
+    pending: 'warning',
+    confirmed: 'primary',
+    ready: 'info',
+    completed: 'success',
+    cancelled: 'error',
+    expired: 'secondary'
+  } as const
+
+  return variants[status as keyof typeof variants] ?? 'secondary'
 }
 
 const getStatusLabel = (status: string): string => {

@@ -9,13 +9,20 @@
         <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-white/10 rounded-full blur-2xl"></div>
       </div>
 
-      <div class="relative container-fluid py-32 lg:py-40">
+      <div :class="[layoutContainerClass, 'relative py-32 lg:py-40']">
         <div class="text-center max-w-5xl mx-auto">
           <!-- Badge avec animation -->
-          <div class="inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-sm rounded-full text-sm font-medium mb-8 animate-fade-in-up">
-            <span class="w-2 h-2 bg-primary-400 rounded-full animate-pulse"></span>
-            <span>Ensemble contre le gaspillage alimentaire</span>
-          </div>
+          <Badge
+            variant="outline"
+            size="md"
+            rounded
+            class="bg-white/10 text-white/90 border-white/30 backdrop-blur-sm mb-8 animate-fade-in-up"
+          >
+            <span class="flex items-center gap-2">
+              <span class="h-2 w-2 rounded-full bg-primary-300 animate-pulse" />
+              Ensemble contre le gaspillage alimentaire
+            </span>
+          </Badge>
 
           <!-- Titre principal avec gradient text -->
           <h1
@@ -66,19 +73,31 @@
           </div>
 
           <!-- Stats avec glassmorphism -->
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-16 animate-fade-in-up" style="animation-delay: 0.8s;">
-            <div class="glass-bg glass-border rounded-2xl p-6 text-center backdrop-blur-md">
+          <div class="grid grid-cols-1 gap-6 md:grid-cols-3 mt-16 animate-fade-in-up" style="animation-delay: 0.8s;">
+            <Card
+              variant="glass"
+              rounded="xl"
+              class="text-center backdrop-blur-md"
+            >
               <div class="text-3xl font-bold text-accent-orange/70 mb-2">1,2M+</div>
               <div class="text-sm text-white/80">Produits sauvés</div>
-            </div>
-            <div class="glass-bg glass-border rounded-2xl p-6 text-center backdrop-blur-md">
+            </Card>
+            <Card
+              variant="glass"
+              rounded="xl"
+              class="text-center backdrop-blur-md"
+            >
               <div class="text-3xl font-bold text-primary-300 mb-2">50K+</div>
               <div class="text-sm text-white/80">Utilisateurs actifs</div>
-            </div>
-            <div class="glass-bg glass-border rounded-2xl p-6 text-center backdrop-blur-md">
+            </Card>
+            <Card
+              variant="glass"
+              rounded="xl"
+              class="text-center backdrop-blur-md"
+            >
               <div class="text-3xl font-bold text-accent-blue/70 mb-2">2,5K+</div>
               <div class="text-sm text-white/80">Commerçants partenaires</div>
-            </div>
+            </Card>
           </div>
         </div>
       </div>
@@ -93,13 +112,20 @@
 
     <!-- Features Section - Design moderne avec cards interactives -->
     <section class="py-32 bg-gradient-to-b from-neutral-50 to-white relative">
-      <div class="container-fluid">
+      <div :class="layoutContainerClass">
         <!-- Section Header -->
         <div class="text-center mb-20 animate-fade-in-up">
-          <div class="inline-flex items-center gap-2 px-4 py-2 bg-primary-50 rounded-full text-sm font-medium text-primary-600 mb-6">
-            <span class="w-2 h-2 bg-primary-500 rounded-full"></span>
-            Processus simple en 3 étapes
-          </div>
+          <Badge
+            variant="primary"
+            size="md"
+            rounded
+            class="bg-primary-50 text-primary-600 mb-6"
+          >
+            <span class="flex items-center gap-2">
+              <span class="h-2 w-2 rounded-full bg-primary-500"></span>
+              Processus simple en 3 étapes
+            </span>
+          </Badge>
           <h2 class="text-4xl lg:text-5xl font-semibold text-neutral-900 mb-6 text-balance font-display">
             Comment ça marche ?
           </h2>
@@ -308,6 +334,9 @@ import { useAuthStore } from '@/stores/auth'
 // Import 2025 Design System components
 import Card from '@/components/ui/2025/Card.vue'
 import Button from '@/components/ui/2025/Button.vue'
+import Badge from '@/components/ui/2025/Badge.vue'
 
 const authStore = useAuthStore()
+
+const layoutContainerClass = 'mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8'
 </script>

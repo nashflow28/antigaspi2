@@ -17,12 +17,12 @@
 
   <nav
     id="main-nav"
-    class="glass-bg glass-border sticky top-0 z-[100] backdrop-blur-lg animate-fade-in-down"
+    :class="navWrapperClasses"
     role="navigation"
     aria-label="Navigation principale"
   >
-    <div class="container-fluid">
-      <div class="flex justify-between h-20">
+    <div :class="navContainerClasses">
+      <div class="flex h-20 w-full items-center justify-between">
         <!-- Logo and brand - Modernisé avec gradient et animation -->
         <div class="flex items-center animate-fade-in-right">
           <router-link
@@ -128,17 +128,22 @@
               </router-link>
             </li>
             <li role="none">
-              <router-link
-                to="/register"
+              <Button
+                tag="router-link"
+                :to="'/register'"
                 data-testid="nav-register"
-                class="btn btn-primary btn-sm animate-pulse-glow"
+                size="sm"
+                variant="primary"
+                class="animate-pulse-glow"
                 role="menuitem"
                 :aria-current="$route.path === '/register' ? 'page' : undefined"
                 aria-label="Créer un nouveau compte"
               >
-                <UserPlus class="w-4 h-4" aria-hidden="true" />
-                S'inscrire
-              </router-link>
+                <span class="flex items-center gap-2">
+                  <UserPlus class="w-4 h-4" aria-hidden="true" />
+                  S'inscrire
+                </span>
+              </Button>
             </li>
           </template>
 
@@ -186,10 +191,13 @@
                   leave-from-class="transform scale-100 opacity-100"
                   leave-to-class="transform scale-95 opacity-0"
                 >
-                  <div
+                  <Card
                     v-show="showUserMenu"
                     ref="dropdownMenuRef"
-                    class="absolute right-0 mt-3 w-64 glass-bg glass-border rounded-2xl shadow-toast py-2 z-[200] animate-fade-in-down"
+                    variant="glass"
+                    rounded="xl"
+                    no-padding
+                    class="absolute right-0 z-[200] mt-3 w-64 border border-white/30 py-2 shadow-xl shadow-primary-500/10 animate-fade-in-down"
                     role="menu"
                     :aria-labelledby="userMenuButtonId"
                     @keydown="handleDropdownKeydown"
@@ -203,7 +211,7 @@
                       <div>
                         <p class="font-semibold text-neutral-900">{{ authStore.user?.first_name }} {{ authStore.user?.last_name }}</p>
                         <p class="text-sm text-neutral-500">{{ authStore.user?.email }}</p>
-                        <span class="badge badge-primary mt-1">{{ getRoleLabel(authStore.user?.role) }}</span>
+                        <Badge variant="primary" size="sm" class="mt-1">{{ getRoleLabel(authStore.user?.role) }}</Badge>
                       </div>
                     </div>
                   </div>
@@ -338,15 +346,16 @@
 
                   <!-- Logout Section -->
                   <div class="border-t border-white/10 pt-2 mt-2">
-                    <button
+                    <Button
+                      variant="ghost"
+                      class="mx-2 flex w-[calc(100%-1rem)] items-center justify-start gap-3 px-4 py-3 text-sm text-accent-red transition-all duration-200 hover:bg-accent-red/10 hover:text-accent-red/90"
                       @click="handleLogout"
-                      class="flex items-center w-full px-4 py-3 text-sm text-accent-red hover:bg-accent-red/10 hover:text-accent-red/90 transition-all duration-200 group rounded-lg mx-2"
                     >
-                      <LogOut class="w-4 h-4 mr-3 group-hover:text-accent-red/90" />
+                      <LogOut class="w-4 h-4" />
                       <span>Se déconnecter</span>
-                    </button>
+                    </Button>
                   </div>
-                  </div>
+                  </Card>
                 </transition>
               </div>
             </li>
@@ -371,9 +380,23 @@ import { LogIn, UserPlus, User, Settings, LogOut, ChevronDown, Package, Shopping
 import DarkModeToggle from '@/components/ui/DarkModeToggle.vue'
 import MobileNav from '@/components/layout/MobileNav.vue'
 import { useAccessibility } from '@/composables/useAccessibility'
+import Button from '@/components/ui/2025/Button.vue'
+import Badge from '@/components/ui/2025/Badge.vue'
+import Card from '@/components/ui/2025/Card.vue'
 
 const router = useRouter()
 const authStore = useAuthStore()
+
+const navWrapperClasses = computed(() =>
+  [
+    'sticky top-0 z-[100] w-full',
+    'backdrop-blur-xl supports-[backdrop-filter]:bg-white/70 bg-white/90',
+    'border-b border-white/30 shadow-[0_10px_30px_-15px_rgba(15,23,42,0.45)]',
+    'animate-fade-in-down transition-colors duration-300'
+  ].join(' ')
+)
+
+const navContainerClasses = 'mx-auto flex w-full max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8'
 
 const {
   createAriaId,
