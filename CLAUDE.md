@@ -1,5 +1,81 @@
 # 🤖 CLAUDE.md - Contexte Projet Antigaspi
 
+# Guide pour Claude Code
+
+## Workflow obligatoire
+1. TOUJOURS utiliser le Plan Mode pour les tâches complexes
+2. Vérifier la liste TODO avant de dire "terminé"
+3. Tester chaque fonctionnalité implémentée
+4. Ne jamais prétendre avoir terminé sans vérification complète
+5. **TOUJOURS relire tous les fichiers modifiés** pour s'assurer qu'aucune mise à jour n'a été omise et qu'aucun code mort ne subsiste.
+6. **TOUJOURS exécuter la suite complète de tests (backend & frontend)** après les modifications et corriger immédiatement toute erreur ou tout test en échec.
+7. **Vérifier le lint et le build** du projet (TypeScript, ESLint, compilation frontend, etc.) afin de détecter toute régression ou erreur de syntaxe.
+8. **Ne déclarer la tâche "terminée" qu'après validation** par l’agent de revue (Phase 2) **ET** par un agent de validation finale (Phase 3), avec confirmation explicite de chacun.
+
+## Phase 1: Implémentation
+[Agent principal fait le travail]
+
+## Phase 2: Vérification spécialisée
+- Délègue automatiquement à code-reviewer
+- Focus sur la complétude des tâches TODO
+- Validation technique par domaine d'expertise
+
+## Phase 3: Validation indépendante  
+- Effectuée par un agent différent de celui d'implémentation (ex: agent **test-guardian** spécialisé en tests).
+- Comparer le résultat au plan original et s'assurer que toutes les tâches prévues ont été traitées.
+- Exécuter **tous les tests automatisés** (tests unitaires PHP + tests E2E Playwright) et vérifier qu'ils passent à 100%.
+- S'assurer que la couverture de code est satisfaisante et qu'aucune régression fonctionnelle n’est présente.
+
+## Règles de vérification
+- Aucune tâche n'est "terminée" sans passage par les 3 phases
+- Chaque agent doit confirmer explicitement la complétude
+- En cas de problème détecté, retour en Phase 1
+
+## Commandes de test disponibles
+⚠️ **Rappel important : Ces commandes doivent être utilisées automatiquement dans les phases 2 et 3, pas seulement listées.**
+
+- **Relecture de tous les fichiers modifiés**  
+  ```bash
+  git diff --name-only HEAD
+  ```
+
+- **Détection de code mort**  
+  ```bash
+  grep -R "TODO\|FIXME" .
+  ```
+
+- **Tests backend (Laravel PHPUnit)**  
+  ```bash
+  php artisan test
+  ```
+
+- **Tests frontend (E2E Playwright)**  
+  ```bash
+  npm run test:e2e
+  ```
+
+- **Lint frontend (ESLint + TypeScript)**  
+  ```bash
+  npm run lint
+  ```
+
+- **Lint backend (Laravel Pint)**  
+  ```bash
+  ./vendor/bin/pint
+  ```
+
+- **Build frontend de production**  
+  ```bash
+  npm run build
+  ```
+
+- **Couverture des tests**  
+  ```bash
+  php artisan test --coverage
+  npm run test:coverage
+  ```
+
+
 > **Documentation technique et contexte pour le développement avec Claude Code**
 
 ## 📋 **Informations Générales**
