@@ -1,51 +1,97 @@
 <template>
-  <div class="min-h-screen bg-neutral-50">
-    <header class="sticky top-0 z-30 border-b border-neutral-200/70 bg-surface-light/80 backdrop-blur-xl">
-      <div class="mx-auto flex max-w-6xl flex-col gap-6 px-6 py-6 lg:flex-row lg:items-center lg:justify-between">
-        <div class="space-y-2">
-          <p class="text-small uppercase tracking-wide text-neutral-500">Catalogue</p>
-          <h1 class="text-display-sm font-semibold text-neutral-900">Produits disponibles</h1>
-          <p class="text-neutral-600">
-            {{ filteredProducts.length }} produit{{ filteredProducts.length > 1 ? 's' : '' }} disponible{{ filteredProducts.length > 1 ? 's' : '' }}
-          </p>
-        </div>
-        <Card padding="lg" class="w-full max-w-xl shadow-card">
-          <div class="flex flex-col gap-3 sm:flex-row sm:items-center">
-            <div class="relative flex-1">
-              <Search class="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-neutral-400" />
-              <input
-                v-model="searchQuery"
-                type="text"
-                class="w-full rounded-2xl border border-neutral-200 bg-surface-light py-3 pl-12 pr-4 text-body text-neutral-700 shadow-card focus:border-primary-400 focus:outline-none focus:ring-2 focus:ring-primary-200"
-                placeholder="Rechercher des produits..."
-              />
+  <div class="min-h-screen bg-gradient-to-br from-neutral-50 via-surface-light to-primary-50/15">
+    <header
+      class="sticky top-0 z-40 border-b border-white/50 bg-white/80 backdrop-blur-2xl shadow-[0_18px_40px_-24px_rgba(4,120,87,0.35)]"
+    >
+      <div class="container-2025 py-10">
+        <div class="flex flex-col gap-8 lg:flex-row lg:items-center lg:justify-between">
+          <div class="space-y-5 max-w-2xl">
+            <Badge variant="primary" size="sm" rounded class="w-max px-4 py-1 shadow-sm shadow-primary-200/40">
+              Catalogue 2025
+            </Badge>
+            <div class="space-y-3">
+              <h1 class="font-display text-4xl lg:text-5xl font-semibold text-neutral-900 leading-tight">
+                Produits responsables à portée de main
+              </h1>
+              <p class="text-body text-neutral-600">
+                {{ filteredProducts.length }} produit{{ filteredProducts.length > 1 ? 's' : '' }} disponible{{
+                  filteredProducts.length > 1 ? 's' : ''
+                }}
+              </p>
             </div>
-            <Button
-              variant="secondary"
-              size="sm"
-              :left-icon="Filter"
-              class="justify-between text-primary-700"
-              @click="showFilters = !showFilters"
-            >
-              Filtres
-              <span class="ml-3 rounded-full bg-primary-100 px-2 py-0.5 text-caption font-semibold text-primary-700">{{ activeFiltersCount }}</span>
-            </Button>
+            <p class="text-sm text-neutral-500">
+              Explorez nos paniers anti-gaspi triés par impact, localisation et économies garanties.
+            </p>
           </div>
-        </Card>
+          <Card variant="glass" class="w-full max-w-xl shadow-card animate-fade-in-up">
+            <div class="flex flex-col gap-4 sm:flex-row sm:items-center">
+              <Input
+                v-model="searchQuery"
+                :left-icon="Search"
+                size="lg"
+                variant="filled"
+                clearable
+                placeholder="Rechercher des produits responsables..."
+                class="flex-1"
+                @clear="searchQuery = ''"
+              />
+              <Button
+                variant="secondary"
+                size="md"
+                :left-icon="Filter"
+                class="w-full justify-between text-primary-700 sm:w-auto"
+                @click="showFilters = !showFilters"
+              >
+                <span class="flex items-center gap-2">
+                  <span>Filtres</span>
+                  <Badge
+                    variant="primary"
+                    size="sm"
+                    rounded
+                    class="border border-primary-200/70 bg-primary-50/80 text-primary-700"
+                  >
+                    {{ activeFiltersCount }}
+                  </Badge>
+                </span>
+              </Button>
+            </div>
+            <div v-if="activeFilterLabels.length" class="mt-4 flex flex-wrap gap-2">
+              <Badge
+                v-for="label in activeFilterLabels"
+                :key="label"
+                variant="outline"
+                size="sm"
+                rounded
+                class="border-primary-200/70 bg-primary-50/60 text-primary-700"
+              >
+                {{ label }}
+              </Badge>
+            </div>
+          </Card>
+        </div>
       </div>
     </header>
 
-    <main class="mx-auto max-w-6xl space-y-spacing-22 px-6 py-spacing-22">
+    <main class="container-2025 space-y-spacing-22 py-spacing-22">
       <Transition name="fade">
         <Card
           v-if="showFilters"
-          padding="lg"
-          class="shadow-card"
+          variant="glass"
+          class="animate-fade-in-up shadow-card"
         >
           <template #header>
-            <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-              <h2 class="text-h3 font-semibold text-neutral-900">Affiner votre recherche</h2>
-              <Button variant="ghost" size="sm" class="text-primary-600" @click="showFilters = false">Fermer</Button>
+            <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+              <div class="space-y-1">
+                <h2 class="text-2xl font-heading font-semibold text-neutral-900 leading-tight">
+                  Affiner votre recherche
+                </h2>
+                <p class="text-sm text-neutral-500">
+                  Combinez nos filtres intelligents pour trouver le panier idéal.
+                </p>
+              </div>
+              <Button variant="ghost" size="sm" class="text-primary-600 hover:text-primary-700" @click="showFilters = false">
+                Fermer
+              </Button>
             </div>
           </template>
 
@@ -54,7 +100,7 @@
               <span class="text-small font-medium text-neutral-600">Catégorie</span>
               <select
                 v-model="filters.category"
-                class="w-full rounded-2xl border border-neutral-200 bg-surface-light px-4 py-3 text-body text-neutral-600 focus:border-primary-400 focus:outline-none focus:ring-2 focus:ring-primary-200"
+                class="w-full rounded-2xl border border-neutral-200/80 bg-white/80 px-4 py-3 text-body text-neutral-600 shadow-sm transition focus:border-primary-400 focus:outline-none focus:ring-2 focus:ring-primary-200"
               >
                 <option value="">Toutes les catégories</option>
                 <option value="bakery">Boulangerie</option>
@@ -76,11 +122,11 @@
                 class="justify-center"
                 @click="enableLocationFilter"
               >
-                {{ locationLoading ? 'Localisation...' : (userLocation ? 'Position activée' : 'Près de moi') }}
+                {{ locationLoading ? 'Localisation...' : userLocation ? 'Position activée' : 'Près de moi' }}
               </Button>
               <select
                 v-model="filters.maxDistance"
-                class="w-full rounded-2xl border border-neutral-200 bg-surface-light px-4 py-3 text-body text-neutral-600 focus:border-primary-400 focus:outline-none focus:ring-2 focus:ring-primary-200"
+                class="w-full rounded-2xl border border-neutral-200/80 bg-white/80 px-4 py-3 text-body text-neutral-600 shadow-sm transition focus:border-primary-400 focus:outline-none focus:ring-2 focus:ring-primary-200 disabled:cursor-not-allowed disabled:opacity-60"
                 :disabled="!userLocation"
               >
                 <option value="">{{ userLocation ? 'Toutes distances' : 'Activez votre position' }}</option>
@@ -96,7 +142,7 @@
               <span class="text-small font-medium text-neutral-600">Prix maximum</span>
               <select
                 v-model="filters.maxPrice"
-                class="w-full rounded-2xl border border-neutral-200 bg-surface-light px-4 py-3 text-body text-neutral-600 focus:border-primary-400 focus:outline-none focus:ring-2 focus:ring-primary-200"
+                class="w-full rounded-2xl border border-neutral-200/80 bg-white/80 px-4 py-3 text-body text-neutral-600 shadow-sm transition focus:border-primary-400 focus:outline-none focus:ring-2 focus:ring-primary-200"
               >
                 <option value="">Tous les prix</option>
                 <option value="500">Moins de 500 F CFA</option>
@@ -110,7 +156,7 @@
               <span class="text-small font-medium text-neutral-600">Réduction minimum</span>
               <select
                 v-model="filters.minDiscount"
-                class="w-full rounded-2xl border border-neutral-200 bg-surface-light px-4 py-3 text-body text-neutral-600 focus:border-primary-400 focus:outline-none focus:ring-2 focus:ring-primary-200"
+                class="w-full rounded-2xl border border-neutral-200/80 bg-white/80 px-4 py-3 text-body text-neutral-600 shadow-sm transition focus:border-primary-400 focus:outline-none focus:ring-2 focus:ring-primary-200"
               >
                 <option value="">Toutes réductions</option>
                 <option value="20">20% et plus</option>
@@ -121,8 +167,14 @@
             </label>
           </div>
 
-          <div class="mt-8 flex flex-col gap-3 border-t border-neutral-200/70 pt-6 sm:flex-row sm:justify-between">
-            <Button variant="ghost" size="sm" class="text-neutral-600 hover:text-primary-700" :disabled="activeFiltersCount === 0" @click="clearFilters">
+          <div class="mt-8 flex flex-col gap-3 border-t border-neutral-200/70 pt-6 sm:flex-row sm:items-center sm:justify-between">
+            <Button
+              variant="ghost"
+              size="sm"
+              class="text-neutral-600 hover:text-primary-700"
+              :disabled="activeFiltersCount === 0 && !searchQuery"
+              @click="clearFilters"
+            >
               Réinitialiser
             </Button>
             <Button variant="primary" size="sm" class="sm:w-auto" @click="applyFilters">
@@ -134,12 +186,18 @@
 
       <section>
         <div v-if="loading" class="grid grid-cols-1 gap-6 md:grid-cols-3 xl:grid-cols-4">
-          <Card v-for="index in 8" :key="index" padding="sm" class="space-y-4">
-            <Skeleton class="aspect-square w-full" />
+          <Card
+            v-for="index in 8"
+            :key="index"
+            variant="glass"
+            :no-padding="true"
+            class="space-y-4 p-4"
+          >
+            <Skeleton class="aspect-square w-full rounded-2xl" />
             <div class="space-y-2">
-              <Skeleton class="h-4 w-2/3" />
-              <Skeleton class="h-3 w-1/2" />
-              <Skeleton class="h-5 w-full" />
+              <Skeleton class="h-4 w-2/3 rounded-full" />
+              <Skeleton class="h-3 w-1/2 rounded-full" />
+              <Skeleton class="h-5 w-full rounded-xl" />
             </div>
           </Card>
         </div>
@@ -172,13 +230,12 @@
             :reserve-loading="quickReserveLoadingId === product.id"
             :reserve-disabled="isProductSoldOut(product) || quickReserveLoadingId === product.id"
             :on-reserve="() => onReserve(product)"
-            class="h-full cursor-pointer"
+            class="h-full cursor-pointer transition-transform duration-300 hover:scale-[1.01]"
             @click="() => viewProduct(product)"
           />
         </div>
       </section>
     </main>
-
   </div>
 </template>
 
@@ -186,8 +243,10 @@
 import { computed, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { Search, Filter, MapPin } from 'lucide-vue-next'
-import Button from '@/components/ui/Button.vue'
-import Card from '@/components/ui/Card.vue'
+import Button from '@/components/ui/2025/Button.vue'
+import Card from '@/components/ui/2025/Card.vue'
+import Input from '@/components/ui/2025/Input.vue'
+import Badge from '@/components/ui/2025/Badge.vue'
 import EmptyState from '@/components/ui/EmptyState.vue'
 import Skeleton from '@/components/ui/Skeleton.vue'
 import ProductCard from '@/components/ui/ProductCard.vue'
@@ -250,6 +309,29 @@ const locationLoading = ref(false)
 
 const activeFiltersCount = computed(() => {
   return Object.values(filters.value).filter(value => value !== '').length
+})
+
+const activeFilterLabels = computed(() => {
+  const labels: string[] = []
+
+  if (filters.value.category) {
+    labels.push(CATEGORY_LABELS[filters.value.category] ?? filters.value.category)
+  }
+
+  if (filters.value.maxDistance) {
+    labels.push(`≤ ${filters.value.maxDistance} km`)
+  }
+
+  if (filters.value.maxPrice) {
+    const formattedPrice = Number(filters.value.maxPrice)
+    labels.push(`≤ ${Number.isNaN(formattedPrice) ? filters.value.maxPrice : formattedPrice.toLocaleString('fr-FR')} F CFA`)
+  }
+
+  if (filters.value.minDiscount) {
+    labels.push(`${filters.value.minDiscount}% minimum`)
+  }
+
+  return labels
 })
 
 const filteredProducts = computed(() => {
