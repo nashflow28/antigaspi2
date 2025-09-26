@@ -82,6 +82,7 @@ export type InputVariant = 'default' | 'outline' | 'filled'
 // Props
 interface Props {
   modelValue?: string | number
+  modelModifiers?: Record<string, boolean>
   type?: string
   label?: string
   placeholder?: string
@@ -107,7 +108,8 @@ const props = withDefaults(defineProps<Props>(), {
   readonly: false,
   required: false,
   clearable: false,
-  inputClass: ''
+  inputClass: '',
+  modelModifiers: () => ({})
 })
 
 // Emits
@@ -165,7 +167,20 @@ const inputId = computed(() => {
 
 const model = computed({
   get: () => props.modelValue ?? '',
-  set: (value) => emit('update:modelValue', value)
+  set: (value) => {
+    let nextValue: string | number = value
+
+    if (props.modelModifiers?.number) {
+      if (nextValue === '') {
+        nextValue = ''
+      } else {
+        const parsedValue = typeof nextValue === 'number' ? nextValue : Number(nextValue)
+        nextValue = Number.isNaN(parsedValue) ? (value as string | number) : parsedValue
+      }
+    }
+
+    emit('update:modelValue', nextValue)
+  }
 })
 
 const containerClasses = computed(() => {
