@@ -160,13 +160,14 @@
                     >
                       <Minus class="w-5 h-5" />
                     </Button>
-                    <input
+                    <Input
                       v-model.number="reservation.quantity"
                       type="number"
-                      :min="1"
-                      :max="product.available_quantity - product.reserved_quantity"
-                      class="w-20 text-center"
-                      @input="validateQuantity"
+                      :max="availableQuantity"
+                      min="1"
+                      class="w-20"
+                      input-class="text-center font-semibold"
+                      size="lg"
                     />
                     <button
                       @click="increaseQuantity"
@@ -205,16 +206,15 @@
                   <label class="block text-sm font-medium text-neutral-700 mb-2">Quand souhaitez-vous récupérer ?</label>
                   <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <label for="pickup-date" class="text-sm font-medium text-neutral-700 mb-2 block">
-                        Date de récupération
-                      </label>
-                      <input
+                      <Input
                         id="pickup-date"
                         v-model="reservation.pickup_date"
                         type="date"
+                        label="Date de récupération"
                         :min="getTodayDate()"
                         :max="getMaxPickupDate()"
-                        class="w-full px-4 py-3 border border-neutral-200 rounded-xl focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all"
+                        class="w-full"
+                        size="lg"
                         required
                       />
                     </div>
@@ -244,18 +244,19 @@
 
                 <!-- Contact -->
                 <div>
-                  <label for="contact-phone" class="block text-sm font-medium text-neutral-700 mb-2">Téléphone de contact</label>
-                  <input
+                  <Input
                     id="contact-phone"
                     v-model="reservation.contact_phone"
                     type="tel"
+                    label="Téléphone de contact"
                     placeholder="+33 1 23 45 67 89"
-                    class="w-full px-4 py-3 border border-neutral-200 rounded-xl focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all"
+                    class="w-full"
+                    size="lg"
+                    autocomplete="tel"
                     required
+                    :error="contactPhoneError"
+                    help-text="Pour vous contacter en cas de problème"
                   />
-                  <p class="text-sm text-neutral-500 mt-1">
-                    Pour vous contacter en cas de problème
-                  </p>
                 </div>
 
                 <!-- Instructions spéciales -->
@@ -309,35 +310,34 @@
               </div>
 
               <div v-if="methodRequiresPhone" class="space-y-2">
-                <label for="mobile-money-phone" class="block text-sm font-medium text-neutral-700 mb-2">Numéro Mobile Money</label>
-                <input
+                <Input
                   id="mobile-money-phone"
                   v-model="mobileMoneyPhone"
                   type="tel"
+                  label="Numéro Mobile Money"
                   placeholder="+228 90 00 00 00"
-                  class="w-full px-4 py-3 border border-neutral-200 rounded-xl focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all"
-                  :class="{
-                    'border-accent-red/50 focus:ring-accent-red/20 focus:border-accent-red/50': mobileMoneyPhone && !/^\+?[0-9]{8,15}$/.test(mobileMoneyPhone)
-                  }"
+                  class="w-full"
+                  size="lg"
+                  autocomplete="tel"
                   required
+                  :error="mobileMoneyPhoneError"
+                  help-text="Utilisez un numéro enregistré sur le portefeuille sélectionné."
                 />
-                <p class="text-xs text-neutral-500">
-                  Utilisez un numéro enregistré sur le portefeuille sélectionné.
-                </p>
               </div>
 
               <!-- Wallet payment PIN input -->
               <div v-if="paymentMethod === 'wallet'" class="space-y-2">
-                <label for="wallet-pin" class="block text-sm font-medium text-neutral-700 mb-2">Code PIN du portefeuille</label>
-                <input
+                <Input
                   id="wallet-pin"
                   v-model="walletPin"
                   type="password"
                   maxlength="6"
                   placeholder="••••••"
-                  class="w-full px-4 py-3 border border-neutral-200 rounded-xl focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all text-center text-lg tracking-widest"
-                  @input="(e) => e.target.value = e.target.value.replace(/\D/g, '')"
+                  class="w-full"
+                  size="lg"
                   required
+                  input-class="text-center text-lg tracking-widest"
+                  :error="walletPinError"
                 />
                 <div class="flex items-center justify-between text-xs text-neutral-500">
                   <span>Solde disponible: {{ walletStore.formattedBalance }}</span>
@@ -559,7 +559,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, type Component } from 'vue'
+import { ref, computed, onMounted, watch, type Component } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { useReservationsStore } from '@/stores/reservations'
@@ -689,13 +689,48 @@ const selectedPaymentOption = computed(() => paymentOptions.value.find(option =>
 const methodRequiresPhone = computed(() => selectedPaymentOption.value?.requiresPhone ?? false)
 
 // Wallet-specific refs
-const showWalletPayment = ref(false)
 const walletPin = ref('')
 
 // Check if wallet can pay for the current amount
 const canPayWithWallet = computed(() => {
   if (!walletStore.hasWallet || !walletStore.isActive || !walletStore.hasPin) return false
   return walletStore.canPay(totalAmount.value)
+})
+
+const digitsOnly = (value: string) => value.replace(/\D/g, '')
+
+const isContactPhoneValid = computed(() => {
+  const phone = reservation.value.contact_phone.trim()
+  if (!phone) return false
+  const digits = digitsOnly(phone)
+  return digits.length >= 8 && digits.length <= 15
+})
+
+const contactPhoneError = computed(() => {
+  const phone = reservation.value.contact_phone.trim()
+  if (!phone) return ''
+  return isContactPhoneValid.value ? '' : 'Veuillez saisir un numéro valide (8 à 15 chiffres).'
+})
+
+const isMobileMoneyPhoneValid = computed(() => {
+  if (!methodRequiresPhone.value) return true
+  const phone = mobileMoneyPhone.value.trim()
+  if (!phone) return false
+  const digits = digitsOnly(phone)
+  return digits.length >= 8 && digits.length <= 15
+})
+
+const mobileMoneyPhoneError = computed(() => {
+  if (!methodRequiresPhone.value) return ''
+  const phone = mobileMoneyPhone.value.trim()
+  if (!phone) return ''
+  return isMobileMoneyPhoneValid.value ? '' : 'Format du numéro invalide (+228 90 00 00 00).'
+})
+
+const walletPinError = computed(() => {
+  if (paymentMethod.value !== 'wallet') return ''
+  if (!walletPin.value) return ''
+  return /^\d{4,6}$/.test(walletPin.value) ? '' : 'Le PIN doit contenir entre 4 et 6 chiffres.'
 })
 
 const availableQuantity = computed(() => {
@@ -718,22 +753,63 @@ const canProceedToNextStep = computed(() => {
     case 1:
       return reservation.value.quantity > 0 && reservation.value.quantity <= availableQuantity.value
     case 2:
-      return Boolean(reservation.value.pickup_date && reservation.value.pickup_time && reservation.value.contact_phone)
+      return Boolean(
+        reservation.value.pickup_date &&
+        reservation.value.pickup_time &&
+        isContactPhoneValid.value
+      )
     case 3:
       if (!paymentMethod.value) {
         return false
       }
       if (methodRequiresPhone.value) {
-        return Boolean(mobileMoneyPhone.value && /^\+?[0-9]{8,15}$/.test(mobileMoneyPhone.value))
+        return isMobileMoneyPhoneValid.value
       }
       if (paymentMethod.value === 'wallet') {
-        return Boolean(walletPin.value && walletPin.value.length >= 4 && canPayWithWallet.value)
+        return Boolean(walletPin.value && !walletPinError.value && canPayWithWallet.value)
       }
       return true
     case 4:
       return acceptConditions.value
     default:
       return false
+  }
+})
+
+watch(
+  () => reservation.value.quantity,
+  (value) => {
+    if (!product.value) return
+    if (!Number.isFinite(value) || value < 1) {
+      reservation.value.quantity = 1
+      return
+    }
+
+    const maxQuantity = availableQuantity.value
+    if (value > maxQuantity) {
+      reservation.value.quantity = maxQuantity
+    }
+  }
+)
+
+watch(walletPin, (value) => {
+  if (!value) return
+  const sanitized = value.replace(/\D/g, '').slice(0, 6)
+  if (sanitized !== value) {
+    walletPin.value = sanitized
+  }
+})
+
+watch(mobileMoneyPhone, (value) => {
+  if (!value) return
+  const normalized = value.replace(/[^0-9+]/g, '')
+  const hasLeadingPlus = normalized.startsWith('+')
+  const digitSequence = hasLeadingPlus
+    ? digitsOnly(normalized.slice(1)).slice(0, 15)
+    : digitsOnly(normalized).slice(0, 15)
+  const cleaned = hasLeadingPlus ? `+${digitSequence}` : digitSequence
+  if (cleaned !== value) {
+    mobileMoneyPhone.value = cleaned
   }
 })
 
@@ -791,16 +867,6 @@ const increaseQuantity = () => {
 const decreaseQuantity = () => {
   if (reservation.value.quantity > 1) {
     reservation.value.quantity--
-  }
-}
-
-const validateQuantity = () => {
-  if (!product.value) return
-  const maxQuantity = availableQuantity.value
-  if (reservation.value.quantity < 1) {
-    reservation.value.quantity = 1
-  } else if (reservation.value.quantity > maxQuantity) {
-    reservation.value.quantity = maxQuantity
   }
 }
 
