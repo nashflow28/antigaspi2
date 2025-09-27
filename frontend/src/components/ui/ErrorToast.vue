@@ -26,10 +26,10 @@
               </div>
 
               <div class="ml-3 w-0 flex-1 pt-0.5">
-                <p class="text-sm font-medium text-gray-900">
+                <p class="text-sm font-medium text-neutral-900">
                   {{ getErrorTitle(error.severity) }}
                 </p>
-                <p class="mt-1 text-sm text-gray-500">
+                <p class="mt-1 text-sm text-neutral-500">
                   {{ error.userMessage }}
                 </p>
 
@@ -51,7 +51,7 @@
               <div class="ml-4 flex flex-shrink-0">
                 <button
                   type="button"
-                  class="inline-flex rounded-md bg-white text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                  class="inline-flex rounded-md bg-white text-neutral-400 hover:text-neutral-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
                   @click="dismissError(error.id)"
                 >
                   <span class="sr-only">Fermer</span>
@@ -64,7 +64,7 @@
           <!-- Auto-dismiss progress bar -->
           <div
             v-if="error.severity !== 'critical' && getTimeRemaining(error) > 0"
-            class="h-1 bg-gray-200"
+            class="h-1 bg-neutral-200"
           >
             <div
               class="h-full transition-all duration-100 ease-linear"

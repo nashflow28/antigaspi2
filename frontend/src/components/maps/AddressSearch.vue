@@ -9,7 +9,7 @@
           type="text"
           :placeholder="placeholder"
           :disabled="loading"
-          class="w-full pl-12 pr-12 py-3 bg-white border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200 shadow-sm"
+          class="w-full pl-12 pr-12 py-3 bg-white border border-neutral-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200 shadow-sm"
           @input="handleInput"
           @focus="showResults = true"
           @blur="handleBlur"
@@ -21,18 +21,18 @@
 
         <!-- Search Icon -->
         <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-          <Search class="w-5 h-5 text-gray-400" />
+          <Search class="w-5 h-5 text-neutral-400" />
         </div>
 
         <!-- Loading/Clear Button -->
         <div class="absolute inset-y-0 right-0 pr-4 flex items-center">
           <button
             v-if="searchQuery && !loading"
-            class="p-1 hover:bg-gray-100 rounded-full transition-colors"
+            class="p-1 hover:bg-neutral-100 rounded-full transition-colors"
             type="button"
             @click="clearSearch"
           >
-            <X class="w-4 h-4 text-gray-400" />
+            <X class="w-4 h-4 text-neutral-400" />
           </button>
           <div v-else-if="loading" class="p-1">
             <div class="animate-spin w-4 h-4 border-2 border-primary-500 border-t-transparent rounded-full" />
@@ -44,10 +44,10 @@
       <Transition name="dropdown">
         <div
           v-if="showResults && (results.length > 0 || loading || error)"
-          class="absolute top-full left-0 right-0 mt-2 bg-white border border-gray-200 rounded-xl shadow-lg z-50 max-h-60 overflow-y-auto"
+          class="absolute top-full left-0 right-0 mt-2 bg-white border border-neutral-200 rounded-xl shadow-lg z-50 max-h-60 overflow-y-auto"
         >
           <!-- Loading State -->
-          <div v-if="loading" class="p-4 text-center text-gray-500">
+          <div v-if="loading" class="p-4 text-center text-neutral-500">
             <div class="flex items-center justify-center space-x-2">
               <div class="animate-spin w-4 h-4 border-2 border-primary-500 border-t-transparent rounded-full" />
               <span class="text-sm">Recherche en cours...</span>
@@ -68,23 +68,23 @@
               v-for="(result, index) in results"
               :key="`${result.place_id || result.lat}-${index}`"
               :class="[
-                'w-full text-left px-4 py-3 hover:bg-gray-50 transition-colors border-b border-gray-100 last:border-b-0',
+                'w-full text-left px-4 py-3 hover:bg-neutral-50 transition-colors border-b border-neutral-100 last:border-b-0',
                 { 'bg-primary-50': index === selectedIndex }
               ]"
               type="button"
               @click="selectResult(result)"
             >
               <div class="flex items-start space-x-3">
-                <MapPin class="w-4 h-4 text-gray-400 mt-1 flex-shrink-0" />
+                <MapPin class="w-4 h-4 text-neutral-400 mt-1 flex-shrink-0" />
                 <div class="flex-1 min-w-0">
-                  <div class="font-medium text-gray-900 truncate">
+                  <div class="font-medium text-neutral-900 truncate">
                     {{ result.display_name || result.formatted_address }}
                   </div>
-                  <div v-if="result.address" class="text-sm text-gray-500 truncate">
+                  <div v-if="result.address" class="text-sm text-neutral-500 truncate">
                     {{ formatAddress(result.address) }}
                   </div>
                   <div class="flex items-center space-x-2 mt-1">
-                    <span class="text-xs text-gray-400">
+                    <span class="text-xs text-neutral-400">
                       {{ result.type || 'Adresse' }}
                     </span>
                     <span v-if="result.distance" class="text-xs text-primary-600">
@@ -97,7 +97,7 @@
           </div>
 
           <!-- No Results -->
-          <div v-else class="p-4 text-center text-gray-500">
+          <div v-else class="p-4 text-center text-neutral-500">
             <div class="flex items-center justify-center space-x-2">
               <MapPin class="w-4 h-4" />
               <span class="text-sm">Aucun résultat trouvé</span>

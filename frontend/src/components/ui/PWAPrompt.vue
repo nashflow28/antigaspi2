@@ -6,7 +6,7 @@
         v-if="showInstallPrompt"
         class="fixed bottom-4 left-4 right-4 md:left-auto md:right-4 md:max-w-sm z-50"
       >
-        <div class="bg-white dark:bg-dark-800 rounded-2xl shadow-2xl border border-gray-200 dark:border-dark-700 p-6">
+        <div class="bg-white dark:bg-dark-800 rounded-2xl shadow-2xl border border-neutral-200 dark:border-dark-700 p-6">
           <div class="flex items-start gap-4">
             <!-- Icon -->
             <div class="shrink-0">
@@ -17,10 +17,10 @@
 
             <!-- Content -->
             <div class="flex-1">
-              <h3 class="font-semibold text-gray-900 dark:text-white text-sm mb-1">
+              <h3 class="font-semibold text-neutral-900 dark:text-white text-sm mb-1">
                 Installer Antigaspi
               </h3>
-              <p class="text-gray-600 dark:text-gray-300 text-xs leading-relaxed mb-4">
+              <p class="text-neutral-600 dark:text-neutral-300 text-xs leading-relaxed mb-4">
                 Ajoutez Antigaspi à votre écran d'accueil pour un accès rapide et une expérience native.
               </p>
 
@@ -53,7 +53,7 @@
               variant="ghost"
               size="icon"
               :left-icon="X"
-              class="shrink-0 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+              class="shrink-0 text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-300 transition-colors"
               aria-label="Fermer"
               @click="dismissInstallPrompt"
             >

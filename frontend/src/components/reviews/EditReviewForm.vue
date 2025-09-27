@@ -1,17 +1,17 @@
 <template>
-  <div class="bg-white rounded-2xl shadow-lg p-6 border border-gray-100">
+  <div class="bg-white rounded-2xl shadow-lg p-6 border border-neutral-100">
     <div class="flex items-center justify-between mb-6">
       <div class="flex items-center space-x-3">
         <div class="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
           <Edit class="w-6 h-6 text-blue-600" />
         </div>
         <div>
-          <h3 class="text-lg font-semibold text-gray-900">Modifier votre avis</h3>
-          <p class="text-gray-600 text-sm">Mettez à jour votre expérience</p>
+          <h3 class="text-lg font-semibold text-neutral-900">Modifier votre avis</h3>
+          <p class="text-neutral-600 text-sm">Mettez à jour votre expérience</p>
         </div>
       </div>
       <button
-        class="text-gray-400 hover:text-gray-600 transition-colors"
+        class="text-neutral-400 hover:text-neutral-600 transition-colors"
         @click="$emit('cancel')"
       >
         <X class="w-6 h-6" />
@@ -21,7 +21,7 @@
     <form class="space-y-6" @submit.prevent="submitUpdate">
       <!-- Rating -->
       <div>
-        <label class="block text-sm font-medium text-gray-700 mb-3">
+        <label class="block text-sm font-medium text-neutral-700 mb-3">
           Note générale *
         </label>
         <StarRating
@@ -34,7 +34,7 @@
 
       <!-- Title -->
       <div>
-        <label for="edit-title" class="block text-sm font-medium text-gray-700 mb-2">
+        <label for="edit-title" class="block text-sm font-medium text-neutral-700 mb-2">
           Titre de votre avis
         </label>
         <input
@@ -42,7 +42,7 @@
           v-model="form.title"
           type="text"
           maxlength="255"
-          class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          class="w-full border border-neutral-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           placeholder="Ex: Service rapide et produits frais"
         >
         <p v-if="errors.title" class="mt-1 text-sm text-red-600">{{ errors.title }}</p>
@@ -50,7 +50,7 @@
 
       <!-- Comment -->
       <div>
-        <label for="edit-comment" class="block text-sm font-medium text-gray-700 mb-2">
+        <label for="edit-comment" class="block text-sm font-medium text-neutral-700 mb-2">
           Votre commentaire
         </label>
         <textarea
@@ -58,12 +58,12 @@
           v-model="form.comment"
           rows="4"
           maxlength="1000"
-          class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+          class="w-full border border-neutral-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
           placeholder="Décrivez votre expérience mise à jour..."
         />
         <div class="flex justify-between mt-1">
           <p v-if="errors.comment" class="text-sm text-red-600">{{ errors.comment }}</p>
-          <p class="text-xs text-gray-500">{{ (form.comment?.length || 0) }}/1000 caractères</p>
+          <p class="text-xs text-neutral-500">{{ (form.comment?.length || 0) }}/1000 caractères</p>
         </div>
       </div>
 
@@ -71,7 +71,7 @@
       <div class="flex justify-end space-x-3 pt-4">
         <button
           type="button"
-          class="px-6 py-2 text-gray-600 hover:text-gray-800 font-medium transition-colors"
+          class="px-6 py-2 text-neutral-600 hover:text-neutral-800 font-medium transition-colors"
           @click="$emit('cancel')"
         >
           Annuler
@@ -123,13 +123,13 @@
     <!-- Delete Confirmation Modal -->
     <div v-if="showDeleteConfirm" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[120]">
       <div class="bg-white rounded-lg p-6 max-w-md w-mx-4">
-        <h3 class="text-lg font-semibold text-gray-900 mb-4">Supprimer l'avis</h3>
-        <p class="text-gray-600 mb-6">
+        <h3 class="text-lg font-semibold text-neutral-900 mb-4">Supprimer l'avis</h3>
+        <p class="text-neutral-600 mb-6">
           Êtes-vous sûr de vouloir supprimer définitivement cet avis ? Cette action ne peut pas être annulée.
         </p>
         <div class="flex justify-end space-x-3">
           <button
-            class="px-4 py-2 text-gray-600 hover:text-gray-800 transition-colors"
+            class="px-4 py-2 text-neutral-600 hover:text-neutral-800 transition-colors"
             @click="showDeleteConfirm = false"
           >
             Annuler

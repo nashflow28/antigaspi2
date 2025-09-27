@@ -2,9 +2,9 @@
   <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
     <div class="bg-white rounded-xl p-6 w-full max-w-md">
       <div class="flex items-center justify-between mb-6">
-        <h3 class="text-xl font-semibold text-gray-900">Paiement Portefeuille</h3>
+        <h3 class="text-xl font-semibold text-neutral-900">Paiement Portefeuille</h3>
         <button
-          class="text-gray-400 hover:text-gray-600"
+          class="text-neutral-400 hover:text-neutral-600"
           @click="$emit('close')"
         >
           <svg
@@ -24,17 +24,17 @@
       </div>
 
       <!-- Résumé du paiement -->
-      <div class="bg-gray-50 rounded-lg p-4 mb-6">
+      <div class="bg-neutral-50 rounded-lg p-4 mb-6">
         <div class="flex items-center justify-between mb-2">
-          <span class="text-sm text-gray-600">Montant à payer</span>
-          <span class="text-lg font-semibold text-gray-900">{{ formatAmount(amount) }} XOF</span>
+          <span class="text-sm text-neutral-600">Montant à payer</span>
+          <span class="text-lg font-semibold text-neutral-900">{{ formatAmount(amount) }} XOF</span>
         </div>
         <div class="flex items-center justify-between mb-2">
-          <span class="text-sm text-gray-600">Solde actuel</span>
+          <span class="text-sm text-neutral-600">Solde actuel</span>
           <span class="text-sm font-medium text-green-600">{{ formatAmount(walletBalance) }} XOF</span>
         </div>
         <div class="flex items-center justify-between">
-          <span class="text-sm text-gray-600">Solde après paiement</span>
+          <span class="text-sm text-neutral-600">Solde après paiement</span>
           <span class="text-sm font-medium" :class="remainingBalance >= 0 ? 'text-green-600' : 'text-red-600'">
             {{ formatAmount(remainingBalance) }} XOF
           </span>
@@ -64,7 +64,7 @@
       <form v-else @submit.prevent="handlePayment">
         <div class="space-y-4">
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">
+            <label class="block text-sm font-medium text-neutral-700 mb-2">
               Code PIN du portefeuille
             </label>
             <input
@@ -72,7 +72,7 @@
               type="password"
               maxlength="6"
               placeholder="••••••"
-              class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent text-center text-lg tracking-widest"
+              class="w-full px-4 py-3 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent text-center text-lg tracking-widest"
               :class="{'border-red-300': error}"
               required
               autocomplete="off"
@@ -97,7 +97,7 @@
         <div class="flex space-x-3 mt-6">
           <button
             type="button"
-            class="flex-1 px-4 py-3 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
+            class="flex-1 px-4 py-3 border border-neutral-300 rounded-lg text-neutral-700 hover:bg-neutral-50 transition-colors"
             @click="$emit('close')"
           >
             Annuler

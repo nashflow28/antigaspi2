@@ -2,28 +2,28 @@
   <div class="fixed inset-0 bg-black bg-opacity-50 z-[120] flex items-center justify-center p-4">
     <div class="bg-white rounded-xl shadow-xl max-w-4xl w-full max-h-[80vh] overflow-hidden">
       <!-- Header -->
-      <div class="flex items-center justify-between p-6 border-b border-gray-200">
-        <h3 class="text-xl font-semibold text-gray-900">Sélectionner des produits</h3>
+      <div class="flex items-center justify-between p-6 border-b border-neutral-200">
+        <h3 class="text-xl font-semibold text-neutral-900">Sélectionner des produits</h3>
         <button
-          class="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+          class="p-2 hover:bg-neutral-100 rounded-lg transition-colors"
           @click="$emit('close')"
         >
-          <X class="w-5 h-5 text-gray-500" />
+          <X class="w-5 h-5 text-neutral-500" />
         </button>
       </div>
 
       <!-- Search and Filters -->
-      <div class="p-6 border-b border-gray-200 bg-gray-50">
+      <div class="p-6 border-b border-neutral-200 bg-neutral-50">
         <div class="flex flex-col sm:flex-row gap-4">
           <!-- Search -->
           <div class="flex-1">
             <div class="relative">
-              <Search class="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+              <Search class="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-neutral-400" />
               <input
                 v-model="searchQuery"
                 type="text"
                 placeholder="Rechercher un produit..."
-                class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                class="w-full pl-10 pr-4 py-2 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
               >
             </div>
           </div>
@@ -32,7 +32,7 @@
           <div class="sm:w-48">
             <select
               v-model="selectedCategory"
-              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+              class="w-full px-3 py-2 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
             >
               <option value="">Toutes les catégories</option>
               <option v-for="category in categories" :key="category.id" :value="category.id">
@@ -47,11 +47,11 @@
       <div class="flex-1 overflow-y-auto max-h-96">
         <div v-if="loading" class="p-8 text-center">
           <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600 mx-auto mb-2" />
-          <p class="text-gray-600">Chargement des produits...</p>
+          <p class="text-neutral-600">Chargement des produits...</p>
         </div>
 
-        <div v-else-if="filteredProducts.length === 0" class="p-8 text-center text-gray-500">
-          <Package class="w-12 h-12 mx-auto mb-3 text-gray-300" />
+        <div v-else-if="filteredProducts.length === 0" class="p-8 text-center text-neutral-500">
+          <Package class="w-12 h-12 mx-auto mb-3 text-neutral-300" />
           <p>Aucun produit trouvé</p>
           <p class="text-sm">Essayez de modifier vos critères de recherche</p>
         </div>
@@ -61,7 +61,7 @@
             <div
               v-for="product in filteredProducts"
               :key="product.id"
-              class="border border-gray-200 rounded-lg p-4 hover:bg-gray-50 transition-colors"
+              class="border border-neutral-200 rounded-lg p-4 hover:bg-neutral-50 transition-colors"
               :class="{ 'bg-primary-50 border-primary-200': isSelected(product.id) }"
             >
               <div class="flex items-start space-x-3">
@@ -74,26 +74,26 @@
                 >
                 <div
                   v-else
-                  class="w-16 h-16 bg-gray-200 rounded-lg flex items-center justify-center flex-shrink-0"
+                  class="w-16 h-16 bg-neutral-200 rounded-lg flex items-center justify-center flex-shrink-0"
                 >
-                  <Package class="w-8 h-8 text-gray-400" />
+                  <Package class="w-8 h-8 text-neutral-400" />
                 </div>
 
                 <!-- Product Info -->
                 <div class="flex-1 min-w-0">
-                  <h4 class="font-medium text-gray-900 truncate">{{ product.name }}</h4>
-                  <p class="text-sm text-gray-500 line-clamp-2">{{ product.description }}</p>
+                  <h4 class="font-medium text-neutral-900 truncate">{{ product.name }}</h4>
+                  <p class="text-sm text-neutral-500 line-clamp-2">{{ product.description }}</p>
 
                   <div class="mt-2 flex items-center justify-between">
                     <div class="flex items-center space-x-2">
                       <span class="text-sm font-medium text-green-600">
                         {{ product.discounted_price }} XOF
                       </span>
-                      <span class="text-sm text-gray-400 line-through">
+                      <span class="text-sm text-neutral-400 line-through">
                         {{ product.original_price }} XOF
                       </span>
                     </div>
-                    <span class="text-xs text-gray-500">
+                    <span class="text-xs text-neutral-500">
                       Stock: {{ product.quantity_available }}
                     </span>
                   </div>
@@ -101,12 +101,12 @@
                   <!-- Quantity Selector -->
                   <div class="mt-3 flex items-center justify-between">
                     <div class="flex items-center space-x-2">
-                      <label class="text-sm text-gray-700">Quantité:</label>
+                      <label class="text-sm text-neutral-700">Quantité:</label>
                       <div class="flex items-center space-x-1">
                         <button
                           type="button"
                           :disabled="getQuantity(product.id) <= 0"
-                          class="w-7 h-7 rounded-full border border-gray-300 flex items-center justify-center hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed text-sm"
+                          class="w-7 h-7 rounded-full border border-neutral-300 flex items-center justify-center hover:bg-neutral-100 disabled:opacity-50 disabled:cursor-not-allowed text-sm"
                           @click="updateQuantity(product.id, getQuantity(product.id) - 1)"
                         >
                           <Minus class="w-3 h-3" />
@@ -116,13 +116,13 @@
                           type="number"
                           min="0"
                           :max="product.quantity_available"
-                          class="w-12 text-center text-sm border border-gray-300 rounded py-1"
+                          class="w-12 text-center text-sm border border-neutral-300 rounded py-1"
                           @input="updateQuantity(product.id, parseInt(($event.target as HTMLInputElement).value) || 0)"
                         >
                         <button
                           type="button"
                           :disabled="getQuantity(product.id) >= product.quantity_available"
-                          class="w-7 h-7 rounded-full border border-gray-300 flex items-center justify-center hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed text-sm"
+                          class="w-7 h-7 rounded-full border border-neutral-300 flex items-center justify-center hover:bg-neutral-100 disabled:opacity-50 disabled:cursor-not-allowed text-sm"
                           @click="updateQuantity(product.id, getQuantity(product.id) + 1)"
                         >
                           <Plus class="w-3 h-3" />
@@ -150,14 +150,14 @@
       </div>
 
       <!-- Footer -->
-      <div class="p-6 border-t border-gray-200 bg-gray-50">
+      <div class="p-6 border-t border-neutral-200 bg-neutral-50">
         <div class="flex items-center justify-between">
-          <div class="text-sm text-gray-600">
+          <div class="text-sm text-neutral-600">
             {{ selectedProductsList.length }} produit(s) sélectionné(s)
           </div>
           <div class="flex items-center space-x-3">
             <button
-              class="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+              class="px-4 py-2 border border-neutral-300 text-neutral-700 rounded-lg hover:bg-neutral-50 transition-colors"
               @click="$emit('close')"
             >
               Annuler

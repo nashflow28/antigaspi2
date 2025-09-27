@@ -74,7 +74,7 @@
               <p
                 v-if="description || slots.description"
                 :id="descriptionId"
-                class="text-sm text-gray-600 dark:text-gray-400 mt-2"
+                class="text-sm text-neutral-600 dark:text-neutral-400 mt-2"
               >
                 <slot name="description">{{ description }}</slot>
               </p>

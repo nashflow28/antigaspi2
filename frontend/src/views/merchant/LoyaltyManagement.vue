@@ -187,11 +187,11 @@
 
       <div class="flex min-h-full items-center justify-center p-4">
         <div class="relative w-full max-w-md bg-white rounded-2xl shadow-xl transform transition-all" @click.stop>
-          <div class="px-6 py-4 border-b border-gray-200">
+          <div class="px-6 py-4 border-b border-neutral-200">
             <div class="flex items-center justify-between">
-              <h3 class="text-lg font-semibold text-gray-900">Attribuer des Points</h3>
-              <button class="p-2 hover:bg-gray-100 rounded-lg transition-colors" @click="closeAwardModal">
-                <X class="w-5 h-5 text-gray-400" />
+              <h3 class="text-lg font-semibold text-neutral-900">Attribuer des Points</h3>
+              <button class="p-2 hover:bg-neutral-100 rounded-lg transition-colors" @click="closeAwardModal">
+                <X class="w-5 h-5 text-neutral-400" />
               </button>
             </div>
           </div>
@@ -200,7 +200,7 @@
             <!-- Customer Selection -->
             <div v-if="!selectedCustomer">
               <Label>Sélectionner un client</Label>
-              <div class="text-xs text-gray-500 mb-2">
+              <div class="text-xs text-neutral-500 mb-2">
                 Debug: {{ allUsersPoints.length }} clients chargés
               </div>
               <Select

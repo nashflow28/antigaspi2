@@ -13,7 +13,7 @@
     >
       <div class="flex items-center space-x-3">
         <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600" />
-        <span class="text-gray-600">Chargement de la carte...</span>
+        <span class="text-neutral-600">Chargement de la carte...</span>
       </div>
     </div>
 
@@ -210,8 +210,8 @@ const updateMarkers = () => {
     if (markerData.info) {
       const infoWindow = new google.maps.InfoWindow({
         content: `<div class="p-3">
-          <h3 class="font-semibold text-gray-900">${markerData.title}</h3>
-          <p class="text-gray-600 text-sm mt-1">${markerData.info}</p>
+          <h3 class="font-semibold text-neutral-900">${markerData.title}</h3>
+          <p class="text-neutral-600 text-sm mt-1">${markerData.info}</p>
         </div>`
       })
 

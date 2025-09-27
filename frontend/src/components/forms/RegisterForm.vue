@@ -2,7 +2,7 @@
   <form class="space-y-6" @submit.prevent="handleSubmit">
     <!-- Role Selection -->
     <div>
-      <label class="block text-sm font-medium text-gray-700 mb-3">
+      <label class="block text-sm font-medium text-neutral-700 mb-3">
         Je souhaite m'inscrire en tant que :
       </label>
       <div class="grid grid-cols-2 gap-4">
@@ -10,7 +10,7 @@
           class="relative flex cursor-pointer rounded-lg border p-4 focus:outline-none"
           :class="form.role === 'consumer'
             ? 'border-primary-600 bg-primary-50 text-primary-900'
-            : 'border-gray-300 bg-white text-gray-900 hover:bg-gray-50'"
+            : 'border-neutral-300 bg-white text-neutral-900 hover:bg-neutral-50'"
         >
           <input
             v-model="form.role"
@@ -23,7 +23,7 @@
               <span class="text-2xl mr-2">🛒</span>
               <span class="block text-sm font-medium">Consommateur</span>
             </div>
-            <span class="mt-1 block text-xs text-gray-500">
+            <span class="mt-1 block text-xs text-neutral-500">
               Découvrir et réserver des produits
             </span>
           </div>
@@ -33,7 +33,7 @@
           class="relative flex cursor-pointer rounded-lg border p-4 focus:outline-none"
           :class="form.role === 'merchant'
             ? 'border-primary-600 bg-primary-50 text-primary-900'
-            : 'border-gray-300 bg-white text-gray-900 hover:bg-gray-50'"
+            : 'border-neutral-300 bg-white text-neutral-900 hover:bg-neutral-50'"
         >
           <input
             v-model="form.role"
@@ -46,7 +46,7 @@
               <span class="text-2xl mr-2">🏪</span>
               <span class="block text-sm font-medium">Commerçant</span>
             </div>
-            <span class="mt-1 block text-xs text-gray-500">
+            <span class="mt-1 block text-xs text-neutral-500">
               Vendre mes invendus
             </span>
           </div>
@@ -58,7 +58,7 @@
     <!-- Personal Information -->
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
       <div>
-        <label for="first_name" class="block text-sm font-medium text-gray-700 mb-2">
+        <label for="first_name" class="block text-sm font-medium text-neutral-700 mb-2">
           Prénom
         </label>
         <input
@@ -75,7 +75,7 @@
       </div>
 
       <div>
-        <label for="last_name" class="block text-sm font-medium text-gray-700 mb-2">
+        <label for="last_name" class="block text-sm font-medium text-neutral-700 mb-2">
           Nom
         </label>
         <input
@@ -94,7 +94,7 @@
 
     <!-- Contact Information -->
     <div>
-      <label for="email" class="block text-sm font-medium text-gray-700 mb-2">
+      <label for="email" class="block text-sm font-medium text-neutral-700 mb-2">
         Adresse e-mail
       </label>
       <input
@@ -112,7 +112,7 @@
 
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
       <div>
-        <label for="phone" class="block text-sm font-medium text-gray-700 mb-2">
+        <label for="phone" class="block text-sm font-medium text-neutral-700 mb-2">
           Téléphone
         </label>
         <input
@@ -128,7 +128,7 @@
       </div>
 
       <div>
-        <label for="city" class="block text-sm font-medium text-gray-700 mb-2">
+        <label for="city" class="block text-sm font-medium text-neutral-700 mb-2">
           Ville
         </label>
         <input
@@ -147,10 +147,10 @@
     <!-- Business Information (for merchants) -->
     <template v-if="form.role === 'merchant'">
       <div class="border-t border-neutral-200 pt-6">
-        <h3 class="text-lg font-medium text-gray-900 mb-4">Informations commerciales</h3>
+        <h3 class="text-lg font-medium text-neutral-900 mb-4">Informations commerciales</h3>
 
         <div>
-          <label for="business_name" class="block text-sm font-medium text-gray-700 mb-2">
+          <label for="business_name" class="block text-sm font-medium text-neutral-700 mb-2">
             Nom de l'entreprise
           </label>
           <input
@@ -166,7 +166,7 @@
         </div>
 
         <div class="mt-4">
-          <label for="business_type" class="block text-sm font-medium text-gray-700 mb-2">
+          <label for="business_type" class="block text-sm font-medium text-neutral-700 mb-2">
             Type de commerce
           </label>
           <select
@@ -195,7 +195,7 @@
 
     <!-- Password -->
     <div>
-      <label for="password" class="block text-sm font-medium text-gray-700 mb-2">
+      <label for="password" class="block text-sm font-medium text-neutral-700 mb-2">
         Mot de passe
       </label>
       <div class="relative">
@@ -211,7 +211,7 @@
         >
         <button
           type="button"
-          class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600"
+          class="absolute inset-y-0 right-0 pr-3 flex items-center text-neutral-400 hover:text-neutral-600"
           @click="togglePasswordVisibility"
         >
           <svg
@@ -254,7 +254,7 @@
     </div>
 
     <div>
-      <label for="password_confirmation" class="block text-sm font-medium text-gray-700 mb-2">
+      <label for="password_confirmation" class="block text-sm font-medium text-neutral-700 mb-2">
         Confirmer le mot de passe
       </label>
       <input
@@ -277,9 +277,9 @@
         v-model="form.acceptTerms"
         type="checkbox"
         required
-        class="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded mt-1"
+        class="h-4 w-4 text-primary-600 focus:ring-primary-500 border-neutral-300 rounded mt-1"
       >
-      <label for="terms" class="ml-2 block text-sm text-gray-900">
+      <label for="terms" class="ml-2 block text-sm text-neutral-900">
         J'accepte les
         <a href="#" class="text-primary-600 hover:text-primary-500">conditions d'utilisation</a>
         et la
@@ -320,7 +320,7 @@
     </div>
 
     <div class="text-center">
-      <p class="text-sm text-gray-600">
+      <p class="text-sm text-neutral-600">
         Déjà un compte ?
         <router-link to="/login" class="font-medium text-primary-600 hover:text-primary-500">
           Se connecter

@@ -5,24 +5,24 @@
     <!-- Performance Metrics -->
     <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
       <div class="bg-white rounded-lg p-4 shadow-sm border">
-        <h3 class="font-semibold text-gray-700 mb-2">Performance Score</h3>
+        <h3 class="font-semibold text-neutral-700 mb-2">Performance Score</h3>
         <div class="text-3xl font-bold text-green-600">
           95/100
         </div>
       </div>
 
       <div class="bg-white rounded-lg p-4 shadow-sm border">
-        <h3 class="font-semibold text-gray-700 mb-2">Memory Usage</h3>
+        <h3 class="font-semibold text-neutral-700 mb-2">Memory Usage</h3>
         <div class="text-lg">
           45MB / 128MB
         </div>
-        <div class="w-full bg-gray-200 rounded-full h-2 mt-2">
+        <div class="w-full bg-neutral-200 rounded-full h-2 mt-2">
           <div class="bg-blue-600 h-2 rounded-full w-1/3" />
         </div>
       </div>
 
       <div class="bg-white rounded-lg p-4 shadow-sm border">
-        <h3 class="font-semibold text-gray-700 mb-2">Bundle Size</h3>
+        <h3 class="font-semibold text-neutral-700 mb-2">Bundle Size</h3>
         <div class="text-lg">
           1.2MB gzipped
         </div>

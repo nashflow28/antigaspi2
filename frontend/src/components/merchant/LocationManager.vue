@@ -1,13 +1,13 @@
 <template>
-  <div class="bg-white rounded-2xl shadow-lg p-6 border border-gray-100">
+  <div class="bg-white rounded-2xl shadow-lg p-6 border border-neutral-100">
     <div class="flex items-center justify-between mb-6">
       <div class="flex items-center space-x-3">
         <div class="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
           <MapPin class="w-6 h-6 text-blue-600" />
         </div>
         <div>
-          <h3 class="text-lg font-semibold text-gray-900">Géolocalisation</h3>
-          <p class="text-gray-600 text-sm">Position de votre commerce</p>
+          <h3 class="text-lg font-semibold text-neutral-900">Géolocalisation</h3>
+          <p class="text-neutral-600 text-sm">Position de votre commerce</p>
         </div>
       </div>
       <button
@@ -20,10 +20,10 @@
       </button>
     </div>
 
-    <div v-if="!hasLocation" class="text-center py-8 border-2 border-dashed border-gray-300 rounded-xl">
-      <MapPin class="w-12 h-12 text-gray-400 mx-auto mb-4" />
-      <h4 class="text-lg font-medium text-gray-900 mb-2">Aucune position définie</h4>
-      <p class="text-gray-600 mb-4">
+    <div v-if="!hasLocation" class="text-center py-8 border-2 border-dashed border-neutral-300 rounded-xl">
+      <MapPin class="w-12 h-12 text-neutral-400 mx-auto mb-4" />
+      <h4 class="text-lg font-medium text-neutral-900 mb-2">Aucune position définie</h4>
+      <p class="text-neutral-600 mb-4">
         Ajoutez la position de votre commerce pour que les clients puissent vous trouver facilement
       </p>
       <button
@@ -36,19 +36,19 @@
 
     <div v-else class="space-y-4">
       <div class="grid grid-cols-2 gap-4">
-        <div class="bg-gray-50 rounded-lg p-4">
-          <label class="text-sm font-medium text-gray-700">Latitude</label>
-          <p class="text-lg text-gray-900">{{ location.latitude?.toFixed(6) }}</p>
+        <div class="bg-neutral-50 rounded-lg p-4">
+          <label class="text-sm font-medium text-neutral-700">Latitude</label>
+          <p class="text-lg text-neutral-900">{{ location.latitude?.toFixed(6) }}</p>
         </div>
-        <div class="bg-gray-50 rounded-lg p-4">
-          <label class="text-sm font-medium text-gray-700">Longitude</label>
-          <p class="text-lg text-gray-900">{{ location.longitude?.toFixed(6) }}</p>
+        <div class="bg-neutral-50 rounded-lg p-4">
+          <label class="text-sm font-medium text-neutral-700">Longitude</label>
+          <p class="text-lg text-neutral-900">{{ location.longitude?.toFixed(6) }}</p>
         </div>
       </div>
 
       <div class="flex space-x-3">
         <button
-          class="flex-1 bg-gray-100 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-200 transition-colors"
+          class="flex-1 bg-neutral-100 text-neutral-700 py-2 px-4 rounded-lg hover:bg-neutral-200 transition-colors"
           @click="showLocationModal = true"
         >
           Modifier
@@ -78,14 +78,14 @@
           @click.stop
         >
           <!-- Header -->
-          <div class="px-6 py-4 border-b border-gray-200">
+          <div class="px-6 py-4 border-b border-neutral-200">
             <div class="flex items-center justify-between">
-              <h3 class="text-lg font-semibold text-gray-900">Définir votre position</h3>
+              <h3 class="text-lg font-semibold text-neutral-900">Définir votre position</h3>
               <button
-                class="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                class="p-2 hover:bg-neutral-100 rounded-lg transition-colors"
                 @click="closeModal"
               >
-                <X class="w-5 h-5 text-gray-400" />
+                <X class="w-5 h-5 text-neutral-400" />
               </button>
             </div>
           </div>
@@ -96,7 +96,7 @@
             <div class="flex items-center justify-center space-x-4 mb-4">
               <button
                 type="button"
-                :class="!mapSelectionMode ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700'"
+                :class="!mapSelectionMode ? 'bg-blue-600 text-white' : 'bg-neutral-200 text-neutral-700'"
                 class="px-4 py-2 rounded-lg font-medium transition-colors"
                 @click="mapSelectionMode = false"
               >
@@ -104,7 +104,7 @@
               </button>
               <button
                 type="button"
-                :class="mapSelectionMode ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700'"
+                :class="mapSelectionMode ? 'bg-blue-600 text-white' : 'bg-neutral-200 text-neutral-700'"
                 class="px-4 py-2 rounded-lg font-medium transition-colors"
                 @click="toggleMapSelection"
               >
@@ -115,7 +115,7 @@
             <!-- Map Selection -->
             <div v-if="mapSelectionMode" class="mb-4">
               <div class="mb-2 flex items-center justify-between">
-                <label class="block text-sm font-medium text-gray-700">
+                <label class="block text-sm font-medium text-neutral-700">
                   Cliquez sur la carte pour choisir votre position
                 </label>
                 <button
@@ -129,7 +129,7 @@
               </div>
               <div
                 ref="mapContainer"
-                class="w-full h-64 rounded-lg border border-gray-300 bg-gray-100"
+                class="w-full h-64 rounded-lg border border-neutral-300 bg-neutral-100"
                 style="min-height: 300px;"
               >
                 <!-- Map will be loaded here -->
@@ -139,7 +139,7 @@
             <!-- Manual Coordinates (only show when not in map mode) -->
             <div v-else class="space-y-4">
               <div>
-                <label for="latitude" class="block text-sm font-medium text-gray-700 mb-2">
+                <label for="latitude" class="block text-sm font-medium text-neutral-700 mb-2">
                   Latitude *
                 </label>
                 <input
@@ -150,13 +150,13 @@
                   min="-90"
                   max="90"
                   required
-                  class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  class="w-full border border-neutral-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   placeholder="Ex: 5.3474"
                 >
               </div>
 
               <div>
-                <label for="longitude" class="block text-sm font-medium text-gray-700 mb-2">
+                <label for="longitude" class="block text-sm font-medium text-neutral-700 mb-2">
                   Longitude *
                 </label>
                 <input
@@ -167,7 +167,7 @@
                   min="-180"
                   max="180"
                   required
-                  class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  class="w-full border border-neutral-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   placeholder="Ex: -3.9857"
                 >
               </div>
@@ -200,7 +200,7 @@
             <div class="flex justify-end space-x-3 pt-4">
               <button
                 type="button"
-                class="px-4 py-2 text-gray-600 hover:text-gray-800 font-medium transition-colors"
+                class="px-4 py-2 text-neutral-600 hover:text-neutral-800 font-medium transition-colors"
                 @click="closeModal"
               >
                 Annuler
@@ -244,12 +244,12 @@
             />
           </div>
           <div class="ml-3 w-0 flex-1">
-            <p class="text-sm font-medium text-gray-900">{{ notification.title }}</p>
-            <p class="mt-1 text-sm text-gray-500">{{ notification.message }}</p>
+            <p class="text-sm font-medium text-neutral-900">{{ notification.title }}</p>
+            <p class="mt-1 text-sm text-neutral-500">{{ notification.message }}</p>
           </div>
           <div class="ml-4 flex-shrink-0 flex">
             <button
-              class="text-gray-400 hover:text-gray-600 transition-colors"
+              class="text-neutral-400 hover:text-neutral-600 transition-colors"
               @click="notification.show = false"
             >
               <X class="w-4 h-4" />

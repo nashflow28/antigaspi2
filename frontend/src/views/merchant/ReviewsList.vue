@@ -30,15 +30,15 @@
 
     <div class="container mx-auto px-4 py-8">
       <!-- Filters -->
-      <div class="bg-white rounded-2xl shadow-lg border border-gray-100 p-6 mb-8">
+      <div class="bg-white rounded-2xl shadow-lg border border-neutral-100 p-6 mb-8">
         <h3 class="text-lg font-semibold text-neutral-900 mb-4">Filtres</h3>
         <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
           <!-- Rating Filter -->
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">Note</label>
+            <label class="block text-sm font-medium text-neutral-700 mb-2">Note</label>
             <select
               v-model="filters.rating"
-              class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+              class="w-full border border-neutral-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
               @change="() => loadReviews()"
             >
               <option value="">Toutes les notes</option>
@@ -52,10 +52,10 @@
 
           <!-- Product Filter -->
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">Produit</label>
+            <label class="block text-sm font-medium text-neutral-700 mb-2">Produit</label>
             <select
               v-model="filters.product_id"
-              class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+              class="w-full border border-neutral-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
               @change="() => loadReviews()"
             >
               <option value="">Tous les produits</option>
@@ -71,10 +71,10 @@
 
           <!-- Verified Filter -->
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">Type</label>
+            <label class="block text-sm font-medium text-neutral-700 mb-2">Type</label>
             <select
               v-model="filters.verified_only"
-              class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+              class="w-full border border-neutral-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
               @change="() => loadReviews()"
             >
               <option value="">Tous les avis</option>
@@ -84,10 +84,10 @@
 
           <!-- Sort Filter -->
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">Tri</label>
+            <label class="block text-sm font-medium text-neutral-700 mb-2">Tri</label>
             <select
               v-model="filters.sort"
-              class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+              class="w-full border border-neutral-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
               @change="() => loadReviews()"
             >
               <option value="recent">Plus récents</option>
@@ -100,8 +100,8 @@
       </div>
 
       <!-- Reviews List -->
-      <div class="bg-white rounded-2xl shadow-lg border border-gray-100">
-        <div class="px-6 py-4 border-b border-gray-200">
+      <div class="bg-white rounded-2xl shadow-lg border border-neutral-100">
+        <div class="px-6 py-4 border-b border-neutral-200">
           <div class="flex items-center justify-between">
             <h3 class="text-xl font-semibold text-neutral-900">
               Avis clients
@@ -120,18 +120,18 @@
           </div>
         </div>
 
-        <div class="divide-y divide-gray-200">
+        <div class="divide-y divide-neutral-200">
           <!-- Loading State -->
           <div v-if="loading" class="px-6 py-8 text-center">
             <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600 mx-auto" />
-            <p class="text-gray-500 mt-2">Chargement des avis...</p>
+            <p class="text-neutral-500 mt-2">Chargement des avis...</p>
           </div>
 
           <!-- Empty State -->
           <div v-else-if="reviews.length === 0" class="px-6 py-8 text-center">
-            <ChatBubbleLeftRightIcon class="w-12 h-12 text-gray-400 mx-auto mb-4" />
-            <h4 class="text-lg font-medium text-gray-900 mb-2">Aucun avis</h4>
-            <p class="text-gray-600">
+            <ChatBubbleLeftRightIcon class="w-12 h-12 text-neutral-400 mx-auto mb-4" />
+            <h4 class="text-lg font-medium text-neutral-900 mb-2">Aucun avis</h4>
+            <p class="text-neutral-600">
               {{ hasActiveFilters ? 'Aucun avis ne correspond à vos critères' : 'Vous n\'avez pas encore reçu d\'avis clients' }}
             </p>
           </div>
@@ -141,7 +141,7 @@
             v-for="review in reviews"
             v-else
             :key="review.id"
-            class="px-6 py-6 hover:bg-gray-50 transition-colors"
+            class="px-6 py-6 hover:bg-neutral-50 transition-colors"
           >
             <div class="flex space-x-4">
               <!-- User Avatar -->
@@ -156,13 +156,13 @@
               <div class="flex-1 min-w-0">
                 <div class="flex items-center justify-between mb-3">
                   <div class="flex items-center space-x-3">
-                    <span class="font-medium text-gray-900">{{ review.user.name }}</span>
+                    <span class="font-medium text-neutral-900">{{ review.user.name }}</span>
                     <div class="flex items-center">
                       <StarIcon
                         v-for="star in 5"
                         :key="star"
                         class="w-4 h-4"
-                        :class="star <= review.rating ? 'text-yellow-400 fill-yellow-400' : 'text-gray-300'"
+                        :class="star <= review.rating ? 'text-yellow-400 fill-yellow-400' : 'text-neutral-300'"
                       />
                     </div>
                     <span v-if="review.is_verified_purchase" class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800">
@@ -170,14 +170,14 @@
                       Achat vérifié
                     </span>
                   </div>
-                  <span class="text-sm text-gray-500">{{ review.time_ago }}</span>
+                  <span class="text-sm text-neutral-500">{{ review.time_ago }}</span>
                 </div>
 
                 <div v-if="review.title" class="mb-3">
-                  <h4 class="font-medium text-gray-900">{{ review.title }}</h4>
+                  <h4 class="font-medium text-neutral-900">{{ review.title }}</h4>
                 </div>
 
-                <div v-if="review.comment" class="text-gray-700 text-sm leading-relaxed mb-3">
+                <div v-if="review.comment" class="text-neutral-700 text-sm leading-relaxed mb-3">
                   {{ review.comment }}
                 </div>
 
@@ -199,23 +199,23 @@
         </div>
 
         <!-- Pagination -->
-        <div v-if="pagination && pagination.last_page > 1" class="px-6 py-4 border-t border-gray-200">
+        <div v-if="pagination && pagination.last_page > 1" class="px-6 py-4 border-t border-neutral-200">
           <div class="flex items-center justify-between">
-            <div class="text-sm text-gray-500">
+            <div class="text-sm text-neutral-500">
               Page {{ pagination.current_page }} sur {{ pagination.last_page }}
               ({{ pagination.total }} avis au total)
             </div>
             <div class="flex space-x-2">
               <button
                 :disabled="pagination.current_page <= 1"
-                class="px-3 py-1 text-sm border border-gray-300 rounded disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
+                class="px-3 py-1 text-sm border border-neutral-300 rounded disabled:opacity-50 disabled:cursor-not-allowed hover:bg-neutral-50"
                 @click="loadPage(pagination.current_page - 1)"
               >
                 Précédent
               </button>
               <button
                 :disabled="pagination.current_page >= pagination.last_page"
-                class="px-3 py-1 text-sm border border-gray-300 rounded disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
+                class="px-3 py-1 text-sm border border-neutral-300 rounded disabled:opacity-50 disabled:cursor-not-allowed hover:bg-neutral-50"
                 @click="loadPage(pagination.current_page + 1)"
               >
                 Suivant

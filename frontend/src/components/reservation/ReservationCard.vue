@@ -45,7 +45,7 @@
             class="absolute right-0 top-10 bg-white border border-neutral-200 rounded-xl shadow-card z-10 py-2 min-w-[150px]"
           >
             <button
-              class="w-full px-4 py-2 text-left text-sm hover:bg-gray-50 flex items-center gap-2"
+              class="w-full px-4 py-2 text-left text-sm hover:bg-neutral-50 flex items-center gap-2"
               @click="$emit('view', reservation.id); showActions = false"
             >
               <Eye class="w-4 h-4" />
@@ -53,7 +53,7 @@
             </button>
             <button
               v-if="reservation.product.merchant.phone"
-              class="w-full px-4 py-2 text-left text-sm hover:bg-gray-50 flex items-center gap-2"
+              class="w-full px-4 py-2 text-left text-sm hover:bg-neutral-50 flex items-center gap-2"
               @click="$emit('contact', reservation); showActions = false"
             >
               <Phone class="w-4 h-4" />
@@ -61,7 +61,7 @@
             </button>
             <button
               v-if="canCancel"
-              class="w-full px-4 py-2 text-left text-sm hover:bg-gray-50 text-accent-red flex items-center gap-2"
+              class="w-full px-4 py-2 text-left text-sm hover:bg-neutral-50 text-accent-red flex items-center gap-2"
               @click="$emit('cancel', reservation.id); showActions = false"
             >
               <X class="w-4 h-4" />
@@ -177,7 +177,7 @@
 
           <!-- Countdown ou statut -->
           <div v-if="reservation.status !== 'completed' && reservation.status !== 'cancelled' && reservation.status !== 'expired'">
-            <div class="bg-gray-50 rounded-xl p-3">
+            <div class="bg-neutral-50 rounded-xl p-3">
               <div class="flex items-center justify-between">
                 <span class="text-sm font-medium text-neutral-700">
                   {{ getStatusMessage() }}

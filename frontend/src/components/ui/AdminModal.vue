@@ -13,7 +13,7 @@
         @click.stop
       >
         <!-- Header -->
-        <div class="px-6 py-4 border-b border-gray-200">
+        <div class="px-6 py-4 border-b border-neutral-200">
           <div class="flex items-center justify-between">
             <div class="flex items-center gap-3">
               <div
@@ -26,13 +26,13 @@
                   :class="iconClass"
                 />
               </div>
-              <h3 class="text-xl font-semibold text-gray-900">{{ title }}</h3>
+              <h3 class="text-xl font-semibold text-neutral-900">{{ title }}</h3>
             </div>
             <button
-              class="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+              class="p-2 hover:bg-neutral-100 rounded-lg transition-colors"
               @click="closeModal"
             >
-              <XMarkIcon class="w-5 h-5 text-gray-400" />
+              <XMarkIcon class="w-5 h-5 text-neutral-400" />
             </button>
           </div>
         </div>
@@ -47,7 +47,7 @@
             >
               <h4
                 v-if="section.title"
-                class="font-semibold text-gray-900 text-lg"
+                class="font-semibold text-neutral-900 text-lg"
               >
                 {{ section.title }}
               </h4>
@@ -56,7 +56,7 @@
                 <div
                   v-for="(item, itemIndex) in section.items"
                   :key="itemIndex"
-                  class="text-gray-600 flex items-start gap-2"
+                  class="text-neutral-600 flex items-start gap-2"
                 >
                   <!-- Safe rendering of sanitized content -->
                   <span v-if="item.type === 'bullet'" class="inline-block w-2 h-2 bg-primary-600 rounded-full mr-2 mt-1.5 flex-shrink-0" />
@@ -72,10 +72,10 @@
         </div>
 
         <!-- Footer -->
-        <div class="px-6 py-4 bg-gray-50 rounded-b-2xl">
+        <div class="px-6 py-4 bg-neutral-50 rounded-b-2xl">
           <div class="flex justify-end gap-3">
             <button
-              class="px-4 py-2 text-gray-600 hover:text-gray-800 font-medium transition-colors"
+              class="px-4 py-2 text-neutral-600 hover:text-neutral-800 font-medium transition-colors"
               @click="closeModal"
             >
               Fermer

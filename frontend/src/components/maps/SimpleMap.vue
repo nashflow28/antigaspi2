@@ -1,12 +1,12 @@
 <template>
   <div class="relative">
-    <div class="w-full bg-gray-100 rounded-lg border-2 border-dashed border-gray-300" :style="{ minHeight: height || '400px' }">
+    <div class="w-full bg-neutral-100 rounded-lg border-2 border-dashed border-neutral-300" :style="{ minHeight: height || '400px' }">
       <div class="h-full flex flex-col items-center justify-center p-8 text-center">
         <div class="mb-4">
-          <MapPin class="w-16 h-16 text-gray-400 mx-auto" />
+          <MapPin class="w-16 h-16 text-neutral-400 mx-auto" />
         </div>
-        <h3 class="text-lg font-semibold text-gray-700 mb-2">Carte des commerçants</h3>
-        <p class="text-gray-500 mb-6 max-w-md">
+        <h3 class="text-lg font-semibold text-neutral-700 mb-2">Carte des commerçants</h3>
+        <p class="text-neutral-500 mb-6 max-w-md">
           Configuration Google Maps en cours. En attendant, voici la liste des commerçants à proximité.
         </p>
 
@@ -15,13 +15,13 @@
           <div
             v-for="marker in markers"
             :key="marker.id"
-            class="bg-white rounded-lg border border-gray-200 p-4 hover:shadow-md transition-shadow cursor-pointer"
+            class="bg-white rounded-lg border border-neutral-200 p-4 hover:shadow-md transition-shadow cursor-pointer"
             @click="$emit('markerClick', marker)"
           >
             <div class="flex items-center justify-between">
               <div>
-                <h4 class="font-semibold text-gray-900">{{ marker.title }}</h4>
-                <p class="text-sm text-gray-600">{{ marker.info }}</p>
+                <h4 class="font-semibold text-neutral-900">{{ marker.title }}</h4>
+                <p class="text-sm text-neutral-600">{{ marker.info }}</p>
                 <div class="flex items-center mt-2 text-sm text-blue-600">
                   <Navigation class="w-4 h-4 mr-1" />
                   <span>{{ marker.position.lat.toFixed(4) }}, {{ marker.position.lng.toFixed(4) }}</span>
@@ -29,7 +29,7 @@
               </div>
               <div class="flex flex-col items-center">
                 <div class="w-3 h-3 bg-green-500 rounded-full mb-1" />
-                <span class="text-xs text-gray-500">Actif</span>
+                <span class="text-xs text-neutral-500">Actif</span>
               </div>
             </div>
           </div>

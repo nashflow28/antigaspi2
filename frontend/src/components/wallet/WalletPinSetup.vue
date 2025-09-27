@@ -2,11 +2,11 @@
   <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
     <div class="bg-white rounded-xl p-6 w-full max-w-md">
       <div class="flex items-center justify-between mb-6">
-        <h3 class="text-xl font-semibold text-gray-900">
+        <h3 class="text-xl font-semibold text-neutral-900">
           {{ hasPin ? 'Modifier le code PIN' : 'Configurer le code PIN' }}
         </h3>
         <button
-          class="text-gray-400 hover:text-gray-600"
+          class="text-neutral-400 hover:text-neutral-600"
           @click="$emit('close')"
         >
           <svg
@@ -28,7 +28,7 @@
       <form @submit.prevent="handleSubmit">
         <div class="space-y-4">
           <div v-if="hasPin">
-            <label class="block text-sm font-medium text-gray-700 mb-2">
+            <label class="block text-sm font-medium text-neutral-700 mb-2">
               Code PIN actuel
             </label>
             <input
@@ -36,7 +36,7 @@
               type="password"
               maxlength="6"
               placeholder="••••••"
-              class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent text-center text-lg tracking-widest"
+              class="w-full px-4 py-3 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent text-center text-lg tracking-widest"
               :class="{'border-red-300': errors.currentPin}"
               required
               @input="formatPinInput"
@@ -45,7 +45,7 @@
           </div>
 
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">
+            <label class="block text-sm font-medium text-neutral-700 mb-2">
               {{ hasPin ? 'Nouveau code PIN' : 'Code PIN' }}
             </label>
             <input
@@ -53,7 +53,7 @@
               type="password"
               maxlength="6"
               placeholder="••••••"
-              class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent text-center text-lg tracking-widest"
+              class="w-full px-4 py-3 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent text-center text-lg tracking-widest"
               :class="{'border-red-300': errors.newPin}"
               required
               @input="formatPinInput"
@@ -62,7 +62,7 @@
           </div>
 
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">
+            <label class="block text-sm font-medium text-neutral-700 mb-2">
               Confirmer le {{ hasPin ? 'nouveau ' : '' }}code PIN
             </label>
             <input
@@ -70,7 +70,7 @@
               type="password"
               maxlength="6"
               placeholder="••••••"
-              class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent text-center text-lg tracking-widest"
+              class="w-full px-4 py-3 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent text-center text-lg tracking-widest"
               :class="{'border-red-300': errors.confirmPin}"
               required
               @input="formatPinInput"
@@ -98,10 +98,10 @@
           <!-- PIN Strength Indicator -->
           <div v-if="form.newPin" class="space-y-2">
             <div class="flex justify-between text-sm">
-              <span class="text-gray-600">Force du PIN</span>
+              <span class="text-neutral-600">Force du PIN</span>
               <span :class="pinStrengthClass">{{ pinStrengthText }}</span>
             </div>
-            <div class="w-full bg-gray-200 rounded-full h-2">
+            <div class="w-full bg-neutral-200 rounded-full h-2">
               <div
                 class="h-2 rounded-full transition-all duration-300"
                 :class="pinStrengthColor"
@@ -114,7 +114,7 @@
         <div class="flex space-x-3 mt-6">
           <button
             type="button"
-            class="flex-1 px-4 py-3 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
+            class="flex-1 px-4 py-3 border border-neutral-300 rounded-lg text-neutral-700 hover:bg-neutral-50 transition-colors"
             @click="$emit('close')"
           >
             Annuler

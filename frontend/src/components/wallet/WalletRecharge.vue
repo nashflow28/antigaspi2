@@ -2,7 +2,7 @@
   <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
     <Card class="w-full max-w-md">
       <div class="flex items-center justify-between mb-6">
-        <h3 class="text-xl font-semibold text-gray-900">Recharger le portefeuille</h3>
+        <h3 class="text-xl font-semibold text-neutral-900">Recharger le portefeuille</h3>
         <Button
           variant="ghost"
           size="sm"
@@ -43,10 +43,10 @@
                 :error="errors.amount"
                 required
               />
-              <span class="absolute right-3 top-3 text-gray-500 text-sm">XOF</span>
+              <span class="absolute right-3 top-3 text-neutral-500 text-sm">XOF</span>
             </div>
             <p v-if="errors.amount" class="mt-1 text-sm text-red-600">{{ errors.amount }}</p>
-            <p class="mt-1 text-xs text-gray-500">Montant minimum: 100 XOF, maximum: 1 000 000 XOF</p>
+            <p class="mt-1 text-xs text-neutral-500">Montant minimum: 100 XOF, maximum: 1 000 000 XOF</p>
           </div>
 
           <div>
@@ -57,7 +57,7 @@
               <label
                 v-for="method in paymentMethods"
                 :key="method.value"
-                class="flex items-center p-3 border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50"
+                class="flex items-center p-3 border border-neutral-200 rounded-lg cursor-pointer hover:bg-neutral-50"
                 :class="{'border-green-500 bg-green-50': form.payment_method === method.value}"
               >
                 <input
@@ -67,17 +67,17 @@
                   class="sr-only"
                 >
                 <div class="flex items-center space-x-3 flex-1">
-                  <div class="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center">
-                    <component :is="method.icon" class="w-6 h-6 text-gray-600" />
+                  <div class="w-10 h-10 bg-neutral-100 rounded-lg flex items-center justify-center">
+                    <component :is="method.icon" class="w-6 h-6 text-neutral-600" />
                   </div>
                   <div>
-                    <div class="font-medium text-gray-900">{{ method.name }}</div>
-                    <div class="text-sm text-gray-500">{{ method.description }}</div>
+                    <div class="font-medium text-neutral-900">{{ method.name }}</div>
+                    <div class="text-sm text-neutral-500">{{ method.description }}</div>
                   </div>
                 </div>
                 <div
                   class="w-4 h-4 border-2 rounded-full"
-                  :class="form.payment_method === method.value ? 'border-green-500 bg-green-500' : 'border-gray-300'"
+                  :class="form.payment_method === method.value ? 'border-green-500 bg-green-500' : 'border-neutral-300'"
                 >
                   <div v-if="form.payment_method === method.value" class="w-full h-full bg-white rounded-full scale-50" />
                 </div>

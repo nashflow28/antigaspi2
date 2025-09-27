@@ -15,11 +15,11 @@
     <!-- Loading overlay -->
     <div
       v-if="isLoading"
-      class="absolute inset-0 flex items-center justify-center bg-gray-100/80 backdrop-blur-sm"
+      class="absolute inset-0 flex items-center justify-center bg-neutral-100/80 backdrop-blur-sm"
     >
       <div class="flex items-center space-x-2">
         <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-primary-600" />
-        <span class="text-sm text-gray-600">{{ loadingText }}</span>
+        <span class="text-sm text-neutral-600">{{ loadingText }}</span>
       </div>
     </div>
 

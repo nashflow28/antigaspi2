@@ -13,14 +13,14 @@
 
           <!-- Merchant Selector -->
           <div class="flex items-center space-x-3">
-            <label for="merchant-select" class="text-sm font-medium text-gray-700">
+            <label for="merchant-select" class="text-sm font-medium text-neutral-700">
               Commerçant :
             </label>
             <select
               id="merchant-select"
               v-model="selectedMerchantId"
               :disabled="merchantsLoading"
-              class="border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-yellow-500 focus:border-transparent"
+              class="border border-neutral-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-yellow-500 focus:border-transparent"
               @change="onMerchantChange"
             >
               <option value="">Sélectionner un commerçant</option>
@@ -32,7 +32,7 @@
                 {{ merchant.business_name }}
               </option>
             </select>
-            <p v-if="merchantsLoading" class="text-xs text-gray-500 mt-1">Chargement des commerçants...</p>
+            <p v-if="merchantsLoading" class="text-xs text-neutral-500 mt-1">Chargement des commerçants...</p>
             <p v-else-if="merchantsError" class="text-xs text-red-500 mt-1">{{ merchantsError }}</p>
           </div>
         </div>
@@ -41,9 +41,9 @@
 
     <div class="container mx-auto px-4 py-8">
       <div v-if="!selectedMerchantId" class="text-center py-16">
-        <Star class="w-16 h-16 text-gray-400 mx-auto mb-4" />
-        <h2 class="text-xl font-semibold text-gray-900 mb-2">Sélectionnez un commerçant</h2>
-        <p class="text-gray-600">Choisissez un commerçant pour voir ses avis et en laisser un.</p>
+        <Star class="w-16 h-16 text-neutral-400 mx-auto mb-4" />
+        <h2 class="text-xl font-semibold text-neutral-900 mb-2">Sélectionnez un commerçant</h2>
+        <p class="text-neutral-600">Choisissez un commerçant pour voir ses avis et en laisser un.</p>
       </div>
 
       <div v-else class="space-y-8">

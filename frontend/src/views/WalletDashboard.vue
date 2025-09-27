@@ -129,20 +129,20 @@
                     {{ formatAmount(walletStore.stats.period_stats.total_debits) }} XOF
                   </span>
                 </div>
-                <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                <div class="flex items-center justify-between p-3 bg-neutral-50 rounded-lg">
                   <div class="flex items-center gap-2">
-                    <Activity class="w-4 h-4 text-gray-600" />
-                    <span class="text-sm font-medium text-gray-800">Transactions</span>
+                    <Activity class="w-4 h-4 text-neutral-600" />
+                    <span class="text-sm font-medium text-neutral-800">Transactions</span>
                   </div>
-                  <span class="font-bold text-gray-600">
+                  <span class="font-bold text-neutral-600">
                     {{ walletStore.stats.period_stats.transaction_count }}
                   </span>
                 </div>
               </div>
               <div v-else class="text-center py-4">
                 <div class="animate-pulse">
-                  <div class="h-4 bg-gray-200 rounded w-3/4 mx-auto mb-2" />
-                  <div class="h-4 bg-gray-200 rounded w-1/2 mx-auto" />
+                  <div class="h-4 bg-neutral-200 rounded w-3/4 mx-auto mb-2" />
+                  <div class="h-4 bg-neutral-200 rounded w-1/2 mx-auto" />
                 </div>
               </div>
             </Card>
@@ -155,7 +155,7 @@
                   <span class="text-neutral-600">Utilisée aujourd'hui</span>
                   <span class="font-medium">{{ formatAmount(walletStore.dailySpent) }} XOF</span>
                 </div>
-                <div class="w-full bg-gray-200 rounded-full h-3">
+                <div class="w-full bg-neutral-200 rounded-full h-3">
                   <div
                     class="bg-gradient-to-r from-primary-500 to-primary-600 h-3 rounded-full transition-all duration-300"
                     :style="{ width: Math.min(walletStore.dailyLimitUsagePercentage, 100) + '%' }"
@@ -223,15 +223,15 @@
     <div v-if="showTransferModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
       <div class="bg-white rounded-xl p-6 w-full max-w-md">
         <div class="flex items-center justify-between mb-6">
-          <h3 class="text-xl font-semibold text-gray-900">Transfert (Bientôt disponible)</h3>
+          <h3 class="text-xl font-semibold text-neutral-900">Transfert (Bientôt disponible)</h3>
           <button
-            class="text-gray-400 hover:text-gray-600"
+            class="text-neutral-400 hover:text-neutral-600"
             @click="showTransferModal = false"
           >
             <X class="w-6 h-6" />
           </Button>
         </div>
-        <p class="text-gray-600 mb-4">
+        <p class="text-neutral-600 mb-4">
           La fonctionnalité de transfert entre utilisateurs sera disponible dans une prochaine mise à jour.
         </p>
         <button
@@ -247,9 +247,9 @@
     <div v-if="showSettingsModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
       <div class="bg-white rounded-xl p-6 w-full max-w-md">
         <div class="flex items-center justify-between mb-6">
-          <h3 class="text-xl font-semibold text-gray-900">Paramètres du portefeuille</h3>
+          <h3 class="text-xl font-semibold text-neutral-900">Paramètres du portefeuille</h3>
           <button
-            class="text-gray-400 hover:text-gray-600"
+            class="text-neutral-400 hover:text-neutral-600"
             @click="showSettingsModal = false"
           >
             <X class="w-6 h-6" />
@@ -257,23 +257,23 @@
         </div>
         <div class="space-y-4">
           <button
-            class="w-full flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+            class="w-full flex items-center justify-between p-4 border border-neutral-200 rounded-lg hover:bg-neutral-50 transition-colors"
             @click="() => { showSettingsModal = false; showPinSetupModal = true }"
           >
             <div class="flex items-center gap-3">
-              <Key class="w-5 h-5 text-gray-600" />
+              <Key class="w-5 h-5 text-neutral-600" />
               <span class="font-medium">{{ walletStore.hasPin ? 'Modifier le PIN' : 'Configurer un PIN' }}</span>
             </div>
-            <ChevronRight class="w-5 h-5 text-gray-400" />
+            <ChevronRight class="w-5 h-5 text-neutral-400" />
           </Button>
 
-          <div class="p-4 border border-gray-200 rounded-lg">
+          <div class="p-4 border border-neutral-200 rounded-lg">
             <div class="flex items-center justify-between mb-2">
               <span class="font-medium">Activer/Désactiver le portefeuille</span>
               <button
                 :disabled="walletStore.loading"
                 class="relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
-                :class="walletStore.isActive ? 'bg-primary-600' : 'bg-gray-200'"
+                :class="walletStore.isActive ? 'bg-primary-600' : 'bg-neutral-200'"
                 @click="toggleWalletStatus"
               >
                 <span
@@ -282,7 +282,7 @@
                 />
               </Button>
             </div>
-            <p class="text-sm text-gray-500">
+            <p class="text-sm text-neutral-500">
               {{ walletStore.isActive ? 'Portefeuille activé' : 'Portefeuille désactivé' }}
             </p>
           </div>
@@ -294,15 +294,15 @@
     <div v-if="showStatsModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
       <div class="bg-white rounded-xl p-6 w-full max-w-md">
         <div class="flex items-center justify-between mb-6">
-          <h3 class="text-xl font-semibold text-gray-900">Statistiques détaillées</h3>
+          <h3 class="text-xl font-semibold text-neutral-900">Statistiques détaillées</h3>
           <button
-            class="text-gray-400 hover:text-gray-600"
+            class="text-neutral-400 hover:text-neutral-600"
             @click="showStatsModal = false"
           >
             <X class="w-6 h-6" />
           </Button>
         </div>
-        <p class="text-gray-600 mb-4">
+        <p class="text-neutral-600 mb-4">
           Les statistiques détaillées avec graphiques seront disponibles dans une prochaine version.
         </p>
         <button

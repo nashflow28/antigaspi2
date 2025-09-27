@@ -95,14 +95,14 @@
 
       <!-- Tabs Navigation -->
       <div class="mb-8">
-        <div class="border-b border-gray-200">
+        <div class="border-b border-neutral-200">
           <nav class="-mb-px flex space-x-8">
             <button
               :class="[
                 'py-2 px-1 border-b-2 font-medium text-sm',
                 activeTab === 'pending'
                   ? 'border-primary-500 text-primary-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                  : 'border-transparent text-neutral-500 hover:text-neutral-700 hover:border-neutral-300'
               ]"
               @click="activeTab = 'pending'"
             >
@@ -116,7 +116,7 @@
                 'py-2 px-1 border-b-2 font-medium text-sm',
                 activeTab === 'reported'
                   ? 'border-primary-500 text-primary-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                  : 'border-transparent text-neutral-500 hover:text-neutral-700 hover:border-neutral-300'
               ]"
               @click="activeTab = 'reported'"
             >

@@ -1,6 +1,6 @@
 <template>
-  <div class="min-h-screen bg-gray-50 p-4">
-    <h1 class="text-2xl font-bold text-gray-900 mb-4">
+  <div class="min-h-screen bg-neutral-50 p-4">
+    <h1 class="text-2xl font-bold text-neutral-900 mb-4">
       🌱 Antigaspi - Simple Test View
     </h1>
 

@@ -14,14 +14,14 @@
         <!-- Review Header -->
         <div class="flex items-center justify-between mb-3">
           <div class="flex items-center space-x-3">
-            <span class="font-medium text-gray-900">{{ review.user.name }}</span>
-            <span class="text-sm text-gray-500">{{ review.user.email }}</span>
+            <span class="font-medium text-neutral-900">{{ review.user.name }}</span>
+            <span class="text-sm text-neutral-500">{{ review.user.email }}</span>
             <div class="flex items-center">
               <Star
                 v-for="star in 5"
                 :key="star"
                 class="w-4 h-4"
-                :class="star <= review.rating ? 'text-yellow-400 fill-yellow-400' : 'text-gray-300'"
+                :class="star <= review.rating ? 'text-yellow-400 fill-yellow-400' : 'text-neutral-300'"
               />
             </div>
             <span v-if="review.is_verified_purchase" class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800">
@@ -29,15 +29,15 @@
               Achat vérifié
             </span>
           </div>
-          <span class="text-sm text-gray-500">{{ review.time_ago }}</span>
+          <span class="text-sm text-neutral-500">{{ review.time_ago }}</span>
         </div>
 
         <!-- Review Content -->
         <div v-if="review.title" class="mb-3">
-          <h4 class="font-medium text-gray-900">{{ review.title }}</h4>
+          <h4 class="font-medium text-neutral-900">{{ review.title }}</h4>
         </div>
 
-        <div v-if="review.comment" class="text-gray-700 text-sm leading-relaxed mb-3">
+        <div v-if="review.comment" class="text-neutral-700 text-sm leading-relaxed mb-3">
           {{ review.comment }}
         </div>
 
@@ -85,7 +85,7 @@
           </button>
 
           <button
-            class="inline-flex items-center px-3 py-2 text-sm text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+            class="inline-flex items-center px-3 py-2 text-sm text-neutral-600 border border-neutral-300 rounded-lg hover:bg-neutral-50 transition-colors"
             @click="showDetails = !showDetails"
           >
             <Eye class="w-4 h-4 mr-2" />
@@ -94,25 +94,25 @@
         </div>
 
         <!-- Detailed Information -->
-        <div v-if="showDetails" class="mt-4 p-4 bg-gray-50 rounded-lg">
+        <div v-if="showDetails" class="mt-4 p-4 bg-neutral-50 rounded-lg">
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
             <div>
-              <p class="font-medium text-gray-900">Informations utilisateur</p>
-              <p class="text-gray-600">Email: {{ review.user.email }}</p>
-              <p class="text-gray-600">ID: {{ review.user.id }}</p>
+              <p class="font-medium text-neutral-900">Informations utilisateur</p>
+              <p class="text-neutral-600">Email: {{ review.user.email }}</p>
+              <p class="text-neutral-600">ID: {{ review.user.id }}</p>
             </div>
             <div>
-              <p class="font-medium text-gray-900">Informations commerçant</p>
-              <p class="text-gray-600">Propriétaire: {{ review.merchant.owner_name }}</p>
-              <p class="text-gray-600">ID: {{ review.merchant.id }}</p>
+              <p class="font-medium text-neutral-900">Informations commerçant</p>
+              <p class="text-neutral-600">Propriétaire: {{ review.merchant.owner_name }}</p>
+              <p class="text-neutral-600">ID: {{ review.merchant.id }}</p>
             </div>
             <div>
-              <p class="font-medium text-gray-900">Date de création</p>
-              <p class="text-gray-600">{{ formatDate(review.created_at) }}</p>
+              <p class="font-medium text-neutral-900">Date de création</p>
+              <p class="text-neutral-600">{{ formatDate(review.created_at) }}</p>
             </div>
             <div v-if="review.product">
-              <p class="font-medium text-gray-900">Produit</p>
-              <p class="text-gray-600">{{ review.product.name }} (ID: {{ review.product.id }})</p>
+              <p class="font-medium text-neutral-900">Produit</p>
+              <p class="text-neutral-600">{{ review.product.name }} (ID: {{ review.product.id }})</p>
             </div>
           </div>
         </div>

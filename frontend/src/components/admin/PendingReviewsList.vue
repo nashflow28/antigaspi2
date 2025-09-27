@@ -1,6 +1,6 @@
 <template>
-  <div class="bg-white rounded-2xl shadow-lg border border-gray-100">
-    <div class="px-6 py-4 border-b border-gray-200">
+  <div class="bg-white rounded-2xl shadow-lg border border-neutral-100">
+    <div class="px-6 py-4 border-b border-neutral-200">
       <div class="flex items-center justify-between">
         <h3 class="text-xl font-semibold text-neutral-900">
           Avis en attente de modération
@@ -19,18 +19,18 @@
       </div>
     </div>
 
-    <div class="divide-y divide-gray-200">
+    <div class="divide-y divide-neutral-200">
       <!-- Loading State -->
       <div v-if="loading" class="px-6 py-8 text-center">
         <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600 mx-auto" />
-        <p class="text-gray-500 mt-2">Chargement des avis...</p>
+        <p class="text-neutral-500 mt-2">Chargement des avis...</p>
       </div>
 
       <!-- Empty State -->
       <div v-else-if="reviews.length === 0" class="px-6 py-8 text-center">
         <CheckCircle class="w-12 h-12 text-green-400 mx-auto mb-4" />
-        <h4 class="text-lg font-medium text-gray-900 mb-2">Aucun avis en attente</h4>
-        <p class="text-gray-600">Tous les avis ont été modérés !</p>
+        <h4 class="text-lg font-medium text-neutral-900 mb-2">Aucun avis en attente</h4>
+        <p class="text-neutral-600">Tous les avis ont été modérés !</p>
       </div>
 
       <!-- Reviews List -->
@@ -38,7 +38,7 @@
         v-for="review in reviews"
         v-else
         :key="review.id"
-        class="px-6 py-6 hover:bg-gray-50 transition-colors"
+        class="px-6 py-6 hover:bg-neutral-50 transition-colors"
       >
         <ReviewModerationCard
           :review="review"
@@ -49,23 +49,23 @@
     </div>
 
     <!-- Pagination -->
-    <div v-if="pagination && pagination.last_page > 1" class="px-6 py-4 border-t border-gray-200">
+    <div v-if="pagination && pagination.last_page > 1" class="px-6 py-4 border-t border-neutral-200">
       <div class="flex items-center justify-between">
-        <div class="text-sm text-gray-500">
+        <div class="text-sm text-neutral-500">
           Page {{ pagination.current_page }} sur {{ pagination.last_page }}
           ({{ pagination.total }} avis au total)
         </div>
         <div class="flex space-x-2">
           <button
             :disabled="pagination.current_page <= 1"
-            class="px-3 py-1 text-sm border border-gray-300 rounded disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
+            class="px-3 py-1 text-sm border border-neutral-300 rounded disabled:opacity-50 disabled:cursor-not-allowed hover:bg-neutral-50"
             @click="loadPage(pagination.current_page - 1)"
           >
             Précédent
           </button>
           <button
             :disabled="pagination.current_page >= pagination.last_page"
-            class="px-3 py-1 text-sm border border-gray-300 rounded disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
+            class="px-3 py-1 text-sm border border-neutral-300 rounded disabled:opacity-50 disabled:cursor-not-allowed hover:bg-neutral-50"
             @click="loadPage(pagination.current_page + 1)"
           >
             Suivant

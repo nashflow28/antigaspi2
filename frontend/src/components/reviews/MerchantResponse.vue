@@ -1,5 +1,5 @@
 <template>
-  <div class="border-t border-gray-200 pt-4 mt-4">
+  <div class="border-t border-neutral-200 pt-4 mt-4">
     <!-- Existing Response -->
     <div v-if="review.merchant_response && !isEditing" class="mb-4">
       <div class="flex items-start space-x-3">
@@ -10,10 +10,10 @@
         </div>
         <div class="flex-1 min-w-0">
           <div class="flex items-center space-x-2 mb-2">
-            <span class="text-sm font-medium text-gray-900">Réponse du commerçant</span>
-            <span class="text-xs text-gray-500">{{ formatDate(review.merchant_response_at) }}</span>
+            <span class="text-sm font-medium text-neutral-900">Réponse du commerçant</span>
+            <span class="text-xs text-neutral-500">{{ formatDate(review.merchant_response_at) }}</span>
           </div>
-          <div class="text-sm text-gray-700 leading-relaxed bg-green-50 rounded-lg p-3">
+          <div class="text-sm text-neutral-700 leading-relaxed bg-green-50 rounded-lg p-3">
             {{ review.merchant_response }}
           </div>
           <div class="flex items-center space-x-2 mt-2">
@@ -41,7 +41,7 @@
     <div v-else-if="!review.merchant_response || isEditing" class="space-y-3">
       <div class="flex items-center space-x-2">
         <BuildingStorefrontIcon class="w-5 h-5 text-green-600" />
-        <span class="text-sm font-medium text-gray-900">
+        <span class="text-sm font-medium text-neutral-900">
           {{ isEditing ? 'Modifier votre réponse' : 'Répondre à cet avis' }}
         </span>
       </div>
@@ -51,18 +51,18 @@
           v-model="responseText"
           :placeholder="isEditing ? 'Modifiez votre réponse...' : 'Écrivez votre réponse à ce client...'"
           rows="3"
-          class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-green-500 focus:border-transparent resize-none"
+          class="w-full border border-neutral-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-green-500 focus:border-transparent resize-none"
           :disabled="submitting"
         />
 
         <div class="flex items-center justify-between">
-          <span class="text-xs text-gray-500">
+          <span class="text-xs text-neutral-500">
             {{ responseText.length }}/1000 caractères
           </span>
           <div class="flex items-center space-x-2">
             <button
               v-if="isEditing"
-              class="px-3 py-1 text-sm text-gray-600 hover:text-gray-800 transition-colors"
+              class="px-3 py-1 text-sm text-neutral-600 hover:text-neutral-800 transition-colors"
               :disabled="submitting"
               @click="cancelEditing"
             >

@@ -9,8 +9,8 @@
       <div class="bg-white shadow rounded-lg p-6 mb-6">
         <div class="flex items-center justify-between">
           <div>
-            <h1 class="text-2xl font-bold text-gray-900">Gestion des Utilisateurs</h1>
-            <p class="mt-1 text-sm text-gray-500">Gérez les consommateurs et commerçants de la plateforme</p>
+            <h1 class="text-2xl font-bold text-neutral-900">Gestion des Utilisateurs</h1>
+            <p class="mt-1 text-sm text-neutral-500">Gérez les consommateurs et commerçants de la plateforme</p>
           </div>
           <div class="flex items-center space-x-3">
             <button
@@ -58,8 +58,8 @@
               </div>
               <div class="ml-5 w-0 flex-1">
                 <dl>
-                  <dt class="text-sm font-medium text-gray-500 truncate">Total Utilisateurs</dt>
-                  <dd class="text-lg font-medium text-gray-900">{{ stats.totalUsers }}</dd>
+                  <dt class="text-sm font-medium text-neutral-500 truncate">Total Utilisateurs</dt>
+                  <dd class="text-lg font-medium text-neutral-900">{{ stats.totalUsers }}</dd>
                 </dl>
               </div>
             </div>
@@ -86,8 +86,8 @@
               </div>
               <div class="ml-5 w-0 flex-1">
                 <dl>
-                  <dt class="text-sm font-medium text-gray-500 truncate">Consommateurs</dt>
-                  <dd class="text-lg font-medium text-gray-900">{{ stats.consumers }}</dd>
+                  <dt class="text-sm font-medium text-neutral-500 truncate">Consommateurs</dt>
+                  <dd class="text-lg font-medium text-neutral-900">{{ stats.consumers }}</dd>
                 </dl>
               </div>
             </div>
@@ -114,8 +114,8 @@
               </div>
               <div class="ml-5 w-0 flex-1">
                 <dl>
-                  <dt class="text-sm font-medium text-gray-500 truncate">Commerçants</dt>
-                  <dd class="text-lg font-medium text-gray-900">{{ stats.merchants }}</dd>
+                  <dt class="text-sm font-medium text-neutral-500 truncate">Commerçants</dt>
+                  <dd class="text-lg font-medium text-neutral-900">{{ stats.merchants }}</dd>
                 </dl>
               </div>
             </div>
@@ -142,8 +142,8 @@
               </div>
               <div class="ml-5 w-0 flex-1">
                 <dl>
-                  <dt class="text-sm font-medium text-gray-500 truncate">Comptes Suspendus</dt>
-                  <dd class="text-lg font-medium text-gray-900">{{ stats.suspended }}</dd>
+                  <dt class="text-sm font-medium text-neutral-500 truncate">Comptes Suspendus</dt>
+                  <dd class="text-lg font-medium text-neutral-900">{{ stats.suspended }}</dd>
                 </dl>
               </div>
             </div>
@@ -155,19 +155,19 @@
       <div class="bg-white shadow rounded-lg p-6 mb-6">
         <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">Recherche</label>
+            <label class="block text-sm font-medium text-neutral-700 mb-2">Recherche</label>
             <input
               v-model="filters.search"
               type="text"
               placeholder="Nom, email, téléphone..."
-              class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-green-500 focus:border-green-500"
+              class="w-full border border-neutral-300 rounded-lg px-3 py-2 focus:ring-green-500 focus:border-green-500"
             >
           </div>
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">Rôle</label>
+            <label class="block text-sm font-medium text-neutral-700 mb-2">Rôle</label>
             <select
               v-model="filters.role"
-              class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-green-500 focus:border-green-500"
+              class="w-full border border-neutral-300 rounded-lg px-3 py-2 focus:ring-green-500 focus:border-green-500"
             >
               <option value="">Tous les rôles</option>
               <option value="consumer">Consommateur</option>
@@ -176,10 +176,10 @@
             </select>
           </div>
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">Statut</label>
+            <label class="block text-sm font-medium text-neutral-700 mb-2">Statut</label>
             <select
               v-model="filters.status"
-              class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-green-500 focus:border-green-500"
+              class="w-full border border-neutral-300 rounded-lg px-3 py-2 focus:ring-green-500 focus:border-green-500"
             >
               <option value="">Tous les statuts</option>
               <option value="active">Actif</option>
@@ -200,35 +200,35 @@
 
       <!-- Liste des utilisateurs -->
       <div class="bg-white shadow overflow-hidden rounded-lg">
-        <div class="px-6 py-4 border-b border-gray-200">
-          <h3 class="text-lg font-medium text-gray-900">Liste des Utilisateurs</h3>
+        <div class="px-6 py-4 border-b border-neutral-200">
+          <h3 class="text-lg font-medium text-neutral-900">Liste des Utilisateurs</h3>
         </div>
 
         <div class="overflow-x-auto">
-          <table class="min-w-full divide-y divide-gray-200">
-            <thead class="bg-gray-50">
+          <table class="min-w-full divide-y divide-neutral-200">
+            <thead class="bg-neutral-50">
               <tr>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th class="px-6 py-3 text-left text-xs font-medium text-neutral-500 uppercase tracking-wider">
                   Utilisateur
                 </th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th class="px-6 py-3 text-left text-xs font-medium text-neutral-500 uppercase tracking-wider">
                   Rôle
                 </th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th class="px-6 py-3 text-left text-xs font-medium text-neutral-500 uppercase tracking-wider">
                   Statut
                 </th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th class="px-6 py-3 text-left text-xs font-medium text-neutral-500 uppercase tracking-wider">
                   Inscription
                 </th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th class="px-6 py-3 text-left text-xs font-medium text-neutral-500 uppercase tracking-wider">
                   Dernière Activité
                 </th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th class="px-6 py-3 text-left text-xs font-medium text-neutral-500 uppercase tracking-wider">
                   Actions
                 </th>
               </tr>
             </thead>
-            <tbody class="bg-white divide-y divide-gray-200">
+            <tbody class="bg-white divide-y divide-neutral-200">
               <tr v-for="user in paginatedUsers" :key="user.id">
                 <td class="px-6 py-4 whitespace-nowrap">
                   <div class="flex items-center">
@@ -236,9 +236,9 @@
                       <img class="h-10 w-10 rounded-full" :src="user.avatar" :alt="user.name">
                     </div>
                     <div class="ml-4">
-                      <div class="text-sm font-medium text-gray-900">{{ user.name }}</div>
-                      <div class="text-sm text-gray-500">{{ user.email }}</div>
-                      <div class="text-sm text-gray-400">{{ user.phone }}</div>
+                      <div class="text-sm font-medium text-neutral-900">{{ user.name }}</div>
+                      <div class="text-sm text-neutral-500">{{ user.email }}</div>
+                      <div class="text-sm text-neutral-400">{{ user.phone }}</div>
                     </div>
                   </div>
                 </td>
@@ -266,10 +266,10 @@
                     {{ getStatusLabel(user.status) }}
                   </span>
                 </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-neutral-500">
                   {{ formatDate(user.created_at) }}
                 </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-neutral-500">
                   {{ formatDate(user.last_activity) }}
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
@@ -300,18 +300,18 @@
         </div>
 
         <!-- Pagination -->
-        <div class="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6">
+        <div class="bg-white px-4 py-3 flex items-center justify-between border-t border-neutral-200 sm:px-6">
           <div class="flex-1 flex justify-between sm:hidden">
             <button
               :disabled="currentPage === 1"
-              class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
+              class="relative inline-flex items-center px-4 py-2 border border-neutral-300 text-sm font-medium rounded-md text-neutral-700 bg-white hover:bg-neutral-50 disabled:opacity-50"
               @click="previousPage"
             >
               Précédent
             </button>
             <button
               :disabled="currentPage === totalPages"
-              class="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
+              class="ml-3 relative inline-flex items-center px-4 py-2 border border-neutral-300 text-sm font-medium rounded-md text-neutral-700 bg-white hover:bg-neutral-50 disabled:opacity-50"
               @click="nextPage"
             >
               Suivant
@@ -319,7 +319,7 @@
           </div>
           <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
             <div>
-              <p class="text-sm text-gray-700">
+              <p class="text-sm text-neutral-700">
                 Affichage de <span class="font-medium">{{ startItem }}</span> à <span class="font-medium">{{ endItem }}</span> sur <span class="font-medium">{{ totalUsers }}</span> utilisateurs
               </p>
             </div>
@@ -327,7 +327,7 @@
               <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px">
                 <button
                   :disabled="currentPage === 1"
-                  class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50"
+                  class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-neutral-300 bg-white text-sm font-medium text-neutral-500 hover:bg-neutral-50 disabled:opacity-50"
                   @click="previousPage"
                 >
                   Précédent
@@ -337,7 +337,7 @@
                   :key="page"
                   :class="{
                     'bg-green-50 border-green-500 text-green-600': page === currentPage,
-                    'bg-white border-gray-300 text-gray-500 hover:bg-gray-50': page !== currentPage
+                    'bg-white border-neutral-300 text-neutral-500 hover:bg-neutral-50': page !== currentPage
                   }"
                   class="relative inline-flex items-center px-4 py-2 border text-sm font-medium"
                   @click="goToPage(page)"
@@ -346,7 +346,7 @@
                 </button>
                 <button
                   :disabled="currentPage === totalPages"
-                  class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50"
+                  class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-neutral-300 bg-white text-sm font-medium text-neutral-500 hover:bg-neutral-50 disabled:opacity-50"
                   @click="nextPage"
                 >
                   Suivant

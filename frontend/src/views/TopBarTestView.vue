@@ -1,7 +1,7 @@
 <template>
-  <div class="min-h-screen bg-gray-50">
+  <div class="min-h-screen bg-neutral-50">
     <!-- TopBar intégrée directement -->
-    <header class="fixed top-0 left-0 right-0 bg-white border-b border-gray-200 z-40" role="banner">
+    <header class="fixed top-0 left-0 right-0 bg-white border-b border-neutral-200 z-40" role="banner">
       <div class="max-w-md mx-auto px-4">
         <div class="flex items-center justify-between h-16">
           <!-- Logo et titre -->
@@ -10,10 +10,10 @@
               <span class="text-white text-lg font-bold">🌱</span>
             </div>
             <div class="flex flex-col">
-              <h1 class="text-lg font-bold text-gray-900">
+              <h1 class="text-lg font-bold text-neutral-900">
                 Antigaspi
               </h1>
-              <p class="text-xs text-gray-500">
+              <p class="text-xs text-neutral-500">
                 TopBar Test
               </p>
             </div>
@@ -23,7 +23,7 @@
           <div class="flex items-center gap-2">
             <!-- Bouton de recherche -->
             <button
-              class="p-2 rounded-xl text-gray-600 hover:text-blue-600 hover:bg-blue-50 transition-colors"
+              class="p-2 rounded-xl text-neutral-600 hover:text-blue-600 hover:bg-blue-50 transition-colors"
               aria-label="Rechercher"
               @click="handleSearch"
             >
@@ -32,7 +32,7 @@
 
             <!-- Bouton notifications -->
             <button
-              class="relative p-2 rounded-xl text-gray-600 hover:text-blue-600 hover:bg-blue-50 transition-colors"
+              class="relative p-2 rounded-xl text-neutral-600 hover:text-blue-600 hover:bg-blue-50 transition-colors"
               aria-label="Notifications"
               @click="handleNotifications"
             >
@@ -44,7 +44,7 @@
 
             <!-- Bouton panier -->
             <button
-              class="relative p-2 rounded-xl text-gray-600 hover:text-blue-600 hover:bg-blue-50 transition-colors"
+              class="relative p-2 rounded-xl text-neutral-600 hover:text-blue-600 hover:bg-blue-50 transition-colors"
               aria-label="Panier"
               @click="handleCart"
             >
@@ -71,7 +71,7 @@
     <!-- Main content avec padding pour la TopBar -->
     <main class="pt-16 p-4">
       <div class="bg-white rounded-lg shadow p-6 mb-4">
-        <h2 class="text-xl font-bold text-gray-900 mb-4">
+        <h2 class="text-xl font-bold text-neutral-900 mb-4">
           🎯 TopBar Test Standalone
         </h2>
 

@@ -18,7 +18,7 @@
       <div
         ref="mapContainer"
         :class="[
-          'w-full border border-gray-300 rounded-xl overflow-hidden',
+          'w-full border border-neutral-300 rounded-xl overflow-hidden',
           heightClass
         ]"
         :style="{ height: mapHeight }"
@@ -33,7 +33,7 @@
       >
         <div class="text-center">
           <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600 mx-auto mb-2" />
-          <p class="text-sm text-gray-600">Chargement de la carte...</p>
+          <p class="text-sm text-neutral-600">Chargement de la carte...</p>
         </div>
       </div>
 
@@ -43,52 +43,52 @@
         <button
           v-if="enableUserLocation"
           :disabled="geoLoading"
-          class="bg-white hover:bg-gray-50 border border-gray-300 rounded-lg p-2 shadow-sm transition-colors"
+          class="bg-white hover:bg-neutral-50 border border-neutral-300 rounded-lg p-2 shadow-sm transition-colors"
           title="Me localiser"
           @click="getCurrentLocation"
         >
-          <MapPin class="w-5 h-5 text-gray-700" :class="{ 'animate-pulse': geoLoading }" />
+          <MapPin class="w-5 h-5 text-neutral-700" :class="{ 'animate-pulse': geoLoading }" />
         </button>
 
         <!-- Reset View Button -->
         <button
           v-if="selectedLocation"
-          class="bg-white hover:bg-gray-50 border border-gray-300 rounded-lg p-2 shadow-sm transition-colors"
+          class="bg-white hover:bg-neutral-50 border border-neutral-300 rounded-lg p-2 shadow-sm transition-colors"
           title="Réinitialiser la vue"
           @click="resetMapView"
         >
-          <RotateCcw class="w-5 h-5 text-gray-700" />
+          <RotateCcw class="w-5 h-5 text-neutral-700" />
         </button>
 
         <!-- Fullscreen Toggle -->
         <button
-          class="bg-white hover:bg-gray-50 border border-gray-300 rounded-lg p-2 shadow-sm transition-colors"
+          class="bg-white hover:bg-neutral-50 border border-neutral-300 rounded-lg p-2 shadow-sm transition-colors"
           :title="isFullscreen ? 'Quitter le plein écran' : 'Plein écran'"
           @click="toggleFullscreen"
         >
-          <Minimize v-if="isFullscreen" class="w-5 h-5 text-gray-700" />
-          <Maximize v-else class="w-5 h-5 text-gray-700" />
+          <Minimize v-if="isFullscreen" class="w-5 h-5 text-neutral-700" />
+          <Maximize v-else class="w-5 h-5 text-neutral-700" />
         </button>
       </div>
 
       <!-- Map Instructions -->
       <div
         v-if="!selectedLocation && showInstructions"
-        class="absolute bottom-4 left-4 right-4 bg-white bg-opacity-95 backdrop-blur-sm border border-gray-200 rounded-lg p-3 shadow-sm"
+        class="absolute bottom-4 left-4 right-4 bg-white bg-opacity-95 backdrop-blur-sm border border-neutral-200 rounded-lg p-3 shadow-sm"
       >
         <div class="flex items-start space-x-2">
           <Info class="w-4 h-4 text-blue-500 mt-0.5 flex-shrink-0" />
-          <div class="text-sm text-gray-700">
+          <div class="text-sm text-neutral-700">
             <p class="font-medium mb-1">Sélectionner un emplacement</p>
-            <p class="text-xs text-gray-600">
+            <p class="text-xs text-neutral-600">
               Cliquez sur la carte ou utilisez la recherche pour choisir votre adresse
             </p>
           </div>
           <button
-            class="ml-auto p-1 hover:bg-gray-100 rounded transition-colors"
+            class="ml-auto p-1 hover:bg-neutral-100 rounded transition-colors"
             @click="showInstructions = false"
           >
-            <X class="w-3 h-3 text-gray-400" />
+            <X class="w-3 h-3 text-neutral-400" />
           </button>
         </div>
       </div>
@@ -128,7 +128,7 @@
     <div v-if="showActions" class="mt-4 flex justify-end space-x-3">
       <button
         v-if="allowClear"
-        class="px-4 py-2 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
+        class="px-4 py-2 text-neutral-700 bg-neutral-100 hover:bg-neutral-200 rounded-lg transition-colors"
         @click="clearSelection"
       >
         Effacer

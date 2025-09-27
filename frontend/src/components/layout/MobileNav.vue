@@ -1,7 +1,7 @@
 <template>
   <!-- Mobile Menu Button -->
   <button
-    class="md:hidden relative p-2 rounded-lg text-gray-600 hover:text-gray-900 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-primary-500 transition-colors"
+    class="md:hidden relative p-2 rounded-lg text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-primary-500 transition-colors"
     :class="{ 'text-primary-600': mobileMenuOpen }"
     @click="toggleMobileMenu"
   >
@@ -54,15 +54,15 @@
         class="fixed right-0 top-0 h-full w-80 bg-white shadow-2xl z-50 md:hidden overflow-y-auto"
       >
         <!-- Mobile menu header -->
-        <div class="flex items-center justify-between p-4 border-b border-gray-200">
+        <div class="flex items-center justify-between p-4 border-b border-neutral-200">
           <div class="flex items-center space-x-3">
             <div class="w-8 h-8 bg-gradient-to-r from-primary-500 to-accent-blue/50 rounded-lg flex items-center justify-center">
               <span class="text-white text-lg">🌱</span>
             </div>
-            <span class="text-lg font-semibold text-gray-900 font-display">Antigaspi</span>
+            <span class="text-lg font-semibold text-neutral-900 font-display">Antigaspi</span>
           </div>
           <button
-            class="p-2 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors"
+            class="p-2 rounded-lg text-neutral-400 hover:text-neutral-600 hover:bg-neutral-100 transition-colors"
             @click="closeMobileMenu"
           >
             <X class="w-5 h-5" />
@@ -70,7 +70,7 @@
         </div>
 
         <!-- User Profile Section (if authenticated) -->
-        <div v-if="authStore.isAuthenticated" class="p-4 bg-gray-50 border-b border-gray-200">
+        <div v-if="authStore.isAuthenticated" class="p-4 bg-neutral-50 border-b border-neutral-200">
           <div class="flex items-center space-x-3">
             <div class="w-12 h-12 bg-gradient-to-r from-primary-500 to-accent-blue/50 rounded-full flex items-center justify-center">
               <span class="text-white font-medium text-lg">
@@ -78,10 +78,10 @@
               </span>
             </div>
             <div>
-              <p class="font-medium text-gray-900 font-heading">
+              <p class="font-medium text-neutral-900 font-heading">
                 {{ authStore.user?.first_name }} {{ authStore.user?.last_name }}
               </p>
-              <p class="text-sm text-gray-500">{{ authStore.user?.email }}</p>
+              <p class="text-sm text-neutral-500">{{ authStore.user?.email }}</p>
               <span
                 class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium"
                 :class="getRoleBadgeClasses(authStore.user?.role)"
@@ -133,7 +133,7 @@
 
           <!-- Authenticated User Links -->
           <template v-if="authStore.isAuthenticated">
-            <div class="border-t border-gray-200 pt-4 mt-4">
+            <div class="border-t border-neutral-200 pt-4 mt-4">
               <router-link
                 to="/dashboard"
                 class="mobile-nav-link"
@@ -173,8 +173,8 @@
 
               <!-- Role-specific links -->
               <template v-if="authStore.user?.role === 'merchant'">
-                <div class="border-t border-gray-200 pt-4 mt-4">
-                  <p class="text-sm font-medium text-gray-500 uppercase tracking-wider mb-2">
+                <div class="border-t border-neutral-200 pt-4 mt-4">
+                  <p class="text-sm font-medium text-neutral-500 uppercase tracking-wider mb-2">
                     Espace Commerçant
                   </p>
                   <router-link
@@ -205,8 +205,8 @@
               </template>
 
               <template v-if="authStore.user?.role === 'admin'">
-                <div class="border-t border-gray-200 pt-4 mt-4">
-                  <p class="text-sm font-medium text-gray-500 uppercase tracking-wider mb-2">
+                <div class="border-t border-neutral-200 pt-4 mt-4">
+                  <p class="text-sm font-medium text-neutral-500 uppercase tracking-wider mb-2">
                     Administration
                   </p>
                   <router-link
@@ -238,7 +238,7 @@
             </div>
 
             <!-- Logout Button -->
-            <div class="border-t border-gray-200 pt-4 mt-4">
+            <div class="border-t border-neutral-200 pt-4 mt-4">
               <button
                 class="mobile-nav-link text-red-600 hover:bg-red-50"
                 @click="handleLogout"
@@ -251,7 +251,7 @@
 
           <!-- Guest Links -->
           <template v-else>
-            <div class="border-t border-gray-200 pt-4 mt-4">
+            <div class="border-t border-neutral-200 pt-4 mt-4">
               <router-link
                 to="/auth/login"
                 class="mobile-nav-link"
@@ -273,8 +273,8 @@
         </nav>
 
         <!-- App Info -->
-        <div class="absolute bottom-0 left-0 right-0 p-4 bg-gray-50 border-t border-gray-200">
-          <p class="text-xs text-gray-500 text-center">
+        <div class="absolute bottom-0 left-0 right-0 p-4 bg-neutral-50 border-t border-neutral-200">
+          <p class="text-xs text-neutral-500 text-center">
             Antigaspi © 2025<br>
             Lutter contre le gaspillage alimentaire
           </p>

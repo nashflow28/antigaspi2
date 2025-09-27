@@ -39,7 +39,7 @@
       <div v-else-if="dashboardData" class="space-y-8">
         <!-- Key Statistics -->
         <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
-          <div class="bg-white rounded-2xl shadow-lg border border-gray-100 p-6">
+          <div class="bg-white rounded-2xl shadow-lg border border-neutral-100 p-6">
             <div class="flex items-center justify-between">
               <div>
                 <p class="text-neutral-600 text-sm font-medium">Total des avis</p>
@@ -54,7 +54,7 @@
             </div>
           </div>
 
-          <div class="bg-white rounded-2xl shadow-lg border border-gray-100 p-6">
+          <div class="bg-white rounded-2xl shadow-lg border border-neutral-100 p-6">
             <div class="flex items-center justify-between">
               <div>
                 <p class="text-neutral-600 text-sm font-medium">Note moyenne</p>
@@ -67,7 +67,7 @@
                     v-for="star in 5"
                     :key="star"
                     class="w-4 h-4"
-                    :class="star <= Math.round(dashboardData.stats.average_rating) ? 'text-yellow-400 fill-yellow-400' : 'text-gray-300'"
+                    :class="star <= Math.round(dashboardData.stats.average_rating) ? 'text-yellow-400 fill-yellow-400' : 'text-neutral-300'"
                   />
                 </div>
               </div>
@@ -77,7 +77,7 @@
             </div>
           </div>
 
-          <div class="bg-white rounded-2xl shadow-lg border border-gray-100 p-6">
+          <div class="bg-white rounded-2xl shadow-lg border border-neutral-100 p-6">
             <div class="flex items-center justify-between">
               <div>
                 <p class="text-neutral-600 text-sm font-medium">Cette semaine</p>
@@ -92,7 +92,7 @@
             </div>
           </div>
 
-          <div class="bg-white rounded-2xl shadow-lg border border-gray-100 p-6">
+          <div class="bg-white rounded-2xl shadow-lg border border-neutral-100 p-6">
             <div class="flex items-center justify-between">
               <div>
                 <p class="text-neutral-600 text-sm font-medium">Ce mois</p>
@@ -111,7 +111,7 @@
         <!-- Charts Section -->
         <div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
           <!-- Rating Distribution -->
-          <div class="bg-white rounded-2xl shadow-lg border border-gray-100 p-6">
+          <div class="bg-white rounded-2xl shadow-lg border border-neutral-100 p-6">
             <h3 class="text-xl font-semibold text-neutral-900 mb-6">Répartition des notes</h3>
             <div class="space-y-4">
               <div
@@ -123,22 +123,22 @@
                   <span class="text-sm font-medium">{{ rating.rating }}</span>
                   <Star class="w-4 h-4 text-yellow-400 fill-yellow-400" />
                 </div>
-                <div class="flex-1 bg-gray-200 rounded-full h-3">
+                <div class="flex-1 bg-neutral-200 rounded-full h-3">
                   <div
                     class="bg-gradient-to-r from-yellow-400 to-yellow-500 h-3 rounded-full transition-all duration-500"
                     :style="{ width: rating.percentage + '%' }"
                   />
                 </div>
                 <div class="flex items-center space-x-2 w-20">
-                  <span class="text-sm text-gray-600">{{ rating.count }}</span>
-                  <span class="text-xs text-gray-500">({{ rating.percentage }}%)</span>
+                  <span class="text-sm text-neutral-600">{{ rating.count }}</span>
+                  <span class="text-xs text-neutral-500">({{ rating.percentage }}%)</span>
                 </div>
               </div>
             </div>
           </div>
 
           <!-- Monthly Trend -->
-          <div class="bg-white rounded-2xl shadow-lg border border-gray-100 p-6">
+          <div class="bg-white rounded-2xl shadow-lg border border-neutral-100 p-6">
             <h3 class="text-xl font-semibold text-neutral-900 mb-6">Évolution mensuelle</h3>
             <div v-if="dashboardData.monthly_trend.length > 0" class="space-y-3">
               <div
@@ -159,15 +159,15 @@
               </div>
             </div>
             <div v-else class="text-center py-8">
-              <BarChart3 class="w-12 h-12 text-gray-400 mx-auto mb-4" />
-              <p class="text-gray-600">Pas assez de données pour le graphique</p>
+              <BarChart3 class="w-12 h-12 text-neutral-400 mx-auto mb-4" />
+              <p class="text-neutral-600">Pas assez de données pour le graphique</p>
             </div>
           </div>
         </div>
 
         <!-- Product Performance -->
-        <div class="bg-white rounded-2xl shadow-lg border border-gray-100">
-          <div class="px-6 py-4 border-b border-gray-200">
+        <div class="bg-white rounded-2xl shadow-lg border border-neutral-100">
+          <div class="px-6 py-4 border-b border-neutral-200">
             <h3 class="text-xl font-semibold text-neutral-900">Performance par produit</h3>
             <p class="text-neutral-600 text-sm">Vos produits les mieux notés</p>
           </div>
@@ -191,15 +191,15 @@
               </div>
             </div>
             <div v-else class="text-center py-8">
-              <Package class="w-12 h-12 text-gray-400 mx-auto mb-4" />
-              <p class="text-gray-600">Aucun produit avec des avis pour le moment</p>
+              <Package class="w-12 h-12 text-neutral-400 mx-auto mb-4" />
+              <p class="text-neutral-600">Aucun produit avec des avis pour le moment</p>
             </div>
           </div>
         </div>
 
         <!-- Recent Reviews -->
-        <div class="bg-white rounded-2xl shadow-lg border border-gray-100">
-          <div class="px-6 py-4 border-b border-gray-200">
+        <div class="bg-white rounded-2xl shadow-lg border border-neutral-100">
+          <div class="px-6 py-4 border-b border-neutral-200">
             <div class="flex items-center justify-between">
               <div>
                 <h3 class="text-xl font-semibold text-neutral-900">Avis récents</h3>
@@ -213,12 +213,12 @@
               </router-link>
             </div>
           </div>
-          <div class="divide-y divide-gray-200">
+          <div class="divide-y divide-neutral-200">
             <div v-if="dashboardData.recent_reviews.length > 0">
               <div
                 v-for="review in dashboardData.recent_reviews"
                 :key="review.id"
-                class="px-6 py-4 hover:bg-gray-50 transition-colors"
+                class="px-6 py-4 hover:bg-neutral-50 transition-colors"
               >
                 <div class="flex space-x-4">
                   <!-- User Avatar -->
@@ -233,13 +233,13 @@
                   <div class="flex-1 min-w-0">
                     <div class="flex items-center justify-between mb-2">
                       <div class="flex items-center space-x-2">
-                        <span class="font-medium text-gray-900">{{ review.user.name }}</span>
+                        <span class="font-medium text-neutral-900">{{ review.user.name }}</span>
                         <div class="flex items-center">
                           <Star
                             v-for="star in 5"
                             :key="star"
                             class="w-4 h-4"
-                            :class="star <= review.rating ? 'text-yellow-400 fill-yellow-400' : 'text-gray-300'"
+                            :class="star <= review.rating ? 'text-yellow-400 fill-yellow-400' : 'text-neutral-300'"
                           />
                         </div>
                         <span v-if="review.is_verified_purchase" class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800">
@@ -247,14 +247,14 @@
                           Achat vérifié
                         </span>
                       </div>
-                      <span class="text-sm text-gray-500">{{ review.time_ago }}</span>
+                      <span class="text-sm text-neutral-500">{{ review.time_ago }}</span>
                     </div>
 
                     <div v-if="review.title" class="mb-2">
-                      <h4 class="font-medium text-gray-900">{{ review.title }}</h4>
+                      <h4 class="font-medium text-neutral-900">{{ review.title }}</h4>
                     </div>
 
-                    <div v-if="review.comment" class="text-gray-700 text-sm leading-relaxed mb-2">
+                    <div v-if="review.comment" class="text-neutral-700 text-sm leading-relaxed mb-2">
                       {{ review.comment }}
                     </div>
 
@@ -267,9 +267,9 @@
               </div>
             </div>
             <div v-else class="px-6 py-8 text-center">
-              <MessageSquare class="w-12 h-12 text-gray-400 mx-auto mb-4" />
-              <h4 class="text-lg font-medium text-gray-900 mb-2">Aucun avis</h4>
-              <p class="text-gray-600">Vous n'avez pas encore reçu d'avis clients.</p>
+              <MessageSquare class="w-12 h-12 text-neutral-400 mx-auto mb-4" />
+              <h4 class="text-lg font-medium text-neutral-900 mb-2">Aucun avis</h4>
+              <p class="text-neutral-600">Vous n'avez pas encore reçu d'avis clients.</p>
             </div>
           </div>
         </div>
@@ -278,8 +278,8 @@
       <!-- Error State -->
       <div v-else-if="error" class="text-center py-16">
         <AlertTriangle class="w-16 h-16 text-red-500 mx-auto mb-4" />
-        <h2 class="text-xl font-semibold text-gray-900 mb-2">Erreur de chargement</h2>
-        <p class="text-gray-600 mb-4">{{ error }}</p>
+        <h2 class="text-xl font-semibold text-neutral-900 mb-2">Erreur de chargement</h2>
+        <p class="text-neutral-600 mb-4">{{ error }}</p>
         <button
           class="inline-flex items-center px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
           @click="refreshData"

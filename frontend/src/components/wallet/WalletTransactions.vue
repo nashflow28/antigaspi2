@@ -1,11 +1,11 @@
 <template>
   <div class="bg-white rounded-lg shadow">
-    <div class="p-6 border-b border-gray-200">
+    <div class="p-6 border-b border-neutral-200">
       <div class="flex items-center justify-between">
-        <h3 class="text-lg font-semibold text-gray-900">Historique des transactions</h3>
+        <h3 class="text-lg font-semibold text-neutral-900">Historique des transactions</h3>
         <button
           :disabled="loading"
-          class="p-2 text-gray-400 hover:text-gray-600 disabled:opacity-50"
+          class="p-2 text-neutral-400 hover:text-neutral-600 disabled:opacity-50"
           @click="refreshTransactions"
         >
           <svg
@@ -29,7 +29,7 @@
       <div class="mt-4 flex flex-wrap gap-4">
         <select
           v-model="filters.type"
-          class="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-green-500 focus:border-transparent"
+          class="px-3 py-2 border border-neutral-300 rounded-lg text-sm focus:ring-2 focus:ring-green-500 focus:border-transparent"
           @change="applyFilters"
         >
           <option value="">Tous les types</option>
@@ -40,19 +40,19 @@
         <input
           v-model="filters.date_from"
           type="date"
-          class="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-green-500 focus:border-transparent"
+          class="px-3 py-2 border border-neutral-300 rounded-lg text-sm focus:ring-2 focus:ring-green-500 focus:border-transparent"
           @change="applyFilters"
         >
 
         <input
           v-model="filters.date_to"
           type="date"
-          class="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-green-500 focus:border-transparent"
+          class="px-3 py-2 border border-neutral-300 rounded-lg text-sm focus:ring-2 focus:ring-green-500 focus:border-transparent"
           @change="applyFilters"
         >
 
         <button
-          class="px-3 py-2 text-sm text-gray-600 hover:text-gray-800"
+          class="px-3 py-2 text-sm text-neutral-600 hover:text-neutral-800"
           @click="clearFilters"
         >
           Effacer filtres
@@ -60,24 +60,24 @@
       </div>
     </div>
 
-    <div class="divide-y divide-gray-200">
+    <div class="divide-y divide-neutral-200">
       <div v-if="loading && !transactions.length" class="p-6">
         <div class="animate-pulse space-y-4">
           <div v-for="i in 3" :key="i" class="flex items-center space-x-4">
-            <div class="w-10 h-10 bg-gray-200 rounded-full" />
+            <div class="w-10 h-10 bg-neutral-200 rounded-full" />
             <div class="flex-1 space-y-2">
-              <div class="h-4 bg-gray-200 rounded w-3/4" />
-              <div class="h-3 bg-gray-200 rounded w-1/2" />
+              <div class="h-4 bg-neutral-200 rounded w-3/4" />
+              <div class="h-3 bg-neutral-200 rounded w-1/2" />
             </div>
-            <div class="h-4 bg-gray-200 rounded w-20" />
+            <div class="h-4 bg-neutral-200 rounded w-20" />
           </div>
         </div>
       </div>
 
       <div v-else-if="!transactions.length" class="p-6 text-center">
-        <div class="text-gray-500">
+        <div class="text-neutral-500">
           <svg
-            class="w-12 h-12 mx-auto mb-4 text-gray-300"
+            class="w-12 h-12 mx-auto mb-4 text-neutral-300"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -96,7 +96,7 @@
       <div
         v-for="transaction in transactions"
         :key="transaction.id"
-        class="p-4 hover:bg-gray-50 transition-colors"
+        class="p-4 hover:bg-neutral-50 transition-colors"
       >
         <div class="flex items-center space-x-4">
           <div
@@ -121,7 +121,7 @@
 
           <div class="flex-1 min-w-0">
             <div class="flex items-center justify-between">
-              <p class="text-sm font-medium text-gray-900 truncate">
+              <p class="text-sm font-medium text-neutral-900 truncate">
                 {{ transaction.description }}
               </p>
               <div class="text-right">
@@ -134,10 +134,10 @@
               </div>
             </div>
             <div class="flex items-center justify-between mt-1">
-              <p class="text-xs text-gray-500">
+              <p class="text-xs text-neutral-500">
                 {{ formatDate(transaction.created_at) }}
               </p>
-              <p class="text-xs text-gray-400">
+              <p class="text-xs text-neutral-400">
                 #{{ transaction.reference }}
               </p>
             </div>
@@ -146,22 +146,22 @@
       </div>
 
       <!-- Pagination -->
-      <div v-if="pagination && pagination.last_page > 1" class="p-4 border-t border-gray-200">
+      <div v-if="pagination && pagination.last_page > 1" class="p-4 border-t border-neutral-200">
         <div class="flex items-center justify-between">
-          <div class="text-sm text-gray-700">
+          <div class="text-sm text-neutral-700">
             Affichage de {{ pagination.from }} à {{ pagination.to }} sur {{ pagination.total }} transactions
           </div>
           <div class="flex space-x-2">
             <button
               :disabled="pagination.current_page === 1"
-              class="px-3 py-1 text-sm border border-gray-300 rounded disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
+              class="px-3 py-1 text-sm border border-neutral-300 rounded disabled:opacity-50 disabled:cursor-not-allowed hover:bg-neutral-50"
               @click="changePage(pagination.current_page - 1)"
             >
               Précédent
             </button>
             <button
               :disabled="pagination.current_page === pagination.last_page"
-              class="px-3 py-1 text-sm border border-gray-300 rounded disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
+              class="px-3 py-1 text-sm border border-neutral-300 rounded disabled:opacity-50 disabled:cursor-not-allowed hover:bg-neutral-50"
               @click="changePage(pagination.current_page + 1)"
             >
               Suivant

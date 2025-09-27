@@ -1,13 +1,13 @@
 <template>
-  <div class="bg-white rounded-2xl shadow-lg p-6 border border-gray-100">
+  <div class="bg-white rounded-2xl shadow-lg p-6 border border-neutral-100">
     <div class="flex items-center justify-between mb-6">
       <div class="flex items-center space-x-3">
         <div class="w-12 h-12 bg-yellow-100 rounded-xl flex items-center justify-center">
           <Star class="w-6 h-6 text-yellow-600" />
         </div>
         <div>
-          <h3 class="text-lg font-semibold text-gray-900">Donner votre avis</h3>
-          <p class="text-gray-600 text-sm">Partagez votre expérience avec ce commerçant</p>
+          <h3 class="text-lg font-semibold text-neutral-900">Donner votre avis</h3>
+          <p class="text-neutral-600 text-sm">Partagez votre expérience avec ce commerçant</p>
         </div>
       </div>
     </div>
@@ -15,7 +15,7 @@
     <form class="space-y-6" @submit.prevent="submitReview">
       <!-- Rating -->
       <div>
-        <label class="block text-sm font-medium text-gray-700 mb-3">
+        <label class="block text-sm font-medium text-neutral-700 mb-3">
           Note générale *
         </label>
         <StarRating
@@ -28,7 +28,7 @@
 
       <!-- Title -->
       <div>
-        <label for="title" class="block text-sm font-medium text-gray-700 mb-2">
+        <label for="title" class="block text-sm font-medium text-neutral-700 mb-2">
           Titre de votre avis
         </label>
         <input
@@ -36,7 +36,7 @@
           v-model="form.title"
           type="text"
           maxlength="255"
-          class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-yellow-500 focus:border-transparent"
+          class="w-full border border-neutral-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-yellow-500 focus:border-transparent"
           placeholder="Ex: Service rapide et produits frais"
         >
         <p v-if="errors.title" class="mt-1 text-sm text-red-600">{{ errors.title }}</p>
@@ -44,7 +44,7 @@
 
       <!-- Comment -->
       <div>
-        <label for="comment" class="block text-sm font-medium text-gray-700 mb-2">
+        <label for="comment" class="block text-sm font-medium text-neutral-700 mb-2">
           Votre commentaire
         </label>
         <textarea
@@ -52,24 +52,24 @@
           v-model="form.comment"
           rows="4"
           maxlength="1000"
-          class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-yellow-500 focus:border-transparent resize-none"
+          class="w-full border border-neutral-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-yellow-500 focus:border-transparent resize-none"
           placeholder="Décrivez votre expérience avec ce commerçant..."
         />
         <div class="flex justify-between mt-1">
           <p v-if="errors.comment" class="text-sm text-red-600">{{ errors.comment }}</p>
-          <p class="text-xs text-gray-500">{{ (form.comment?.length || 0) }}/1000 caractères</p>
+          <p class="text-xs text-neutral-500">{{ (form.comment?.length || 0) }}/1000 caractères</p>
         </div>
       </div>
 
       <!-- Product Selection (if applicable) -->
       <div v-if="availableProducts.length > 0">
-        <label for="product" class="block text-sm font-medium text-gray-700 mb-2">
+        <label for="product" class="block text-sm font-medium text-neutral-700 mb-2">
           Produit concerné (optionnel)
         </label>
         <select
           id="product"
           v-model="form.product_id"
-          class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-yellow-500 focus:border-transparent"
+          class="w-full border border-neutral-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-yellow-500 focus:border-transparent"
         >
           <option value="">Avis général sur le commerçant</option>
           <option
@@ -87,7 +87,7 @@
         <button
           v-if="showCancel"
           type="button"
-          class="px-6 py-2 text-gray-600 hover:text-gray-800 font-medium transition-colors"
+          class="px-6 py-2 text-neutral-600 hover:text-neutral-800 font-medium transition-colors"
           @click="$emit('cancel')"
         >
           Annuler

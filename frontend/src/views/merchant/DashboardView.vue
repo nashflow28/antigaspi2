@@ -9,8 +9,8 @@
       <div class="mb-8">
         <div class="flex items-center justify-between">
           <div>
-            <h1 class="text-3xl font-bold text-gray-900">Tableau de bord Commerçant</h1>
-            <p class="text-gray-600 mt-1">Gérez vos produits et réservations</p>
+            <h1 class="text-3xl font-bold text-neutral-900">Tableau de bord Commerçant</h1>
+            <p class="text-neutral-600 mt-1">Gérez vos produits et réservations</p>
           </div>
           <div class="flex items-center space-x-4">
             <router-link
@@ -26,50 +26,50 @@
 
       <!-- Statistics Cards -->
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        <div class="bg-white rounded-2xl shadow-lg p-6 border border-gray-100">
+        <div class="bg-white rounded-2xl shadow-lg p-6 border border-neutral-100">
           <div class="flex items-center space-x-4">
             <div class="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
               <ShoppingBagIcon class="w-6 h-6 text-blue-600" />
             </div>
             <div>
-              <p class="text-2xl font-bold text-gray-900">{{ stats.total_products }}</p>
-              <p class="text-gray-600 text-sm">Produits actifs</p>
+              <p class="text-2xl font-bold text-neutral-900">{{ stats.total_products }}</p>
+              <p class="text-neutral-600 text-sm">Produits actifs</p>
             </div>
           </div>
         </div>
 
-        <div class="bg-white rounded-2xl shadow-lg p-6 border border-gray-100">
+        <div class="bg-white rounded-2xl shadow-lg p-6 border border-neutral-100">
           <div class="flex items-center space-x-4">
             <div class="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center">
               <ClockIcon class="w-6 h-6 text-green-600" />
             </div>
             <div>
-              <p class="text-2xl font-bold text-gray-900">{{ stats.pending_reservations }}</p>
-              <p class="text-gray-600 text-sm">En attente</p>
+              <p class="text-2xl font-bold text-neutral-900">{{ stats.pending_reservations }}</p>
+              <p class="text-neutral-600 text-sm">En attente</p>
             </div>
           </div>
         </div>
 
-        <div class="bg-white rounded-2xl shadow-lg p-6 border border-gray-100">
+        <div class="bg-white rounded-2xl shadow-lg p-6 border border-neutral-100">
           <div class="flex items-center space-x-4">
             <div class="w-12 h-12 bg-yellow-100 rounded-xl flex items-center justify-center">
               <BanknotesIcon class="w-6 h-6 text-yellow-600" />
             </div>
             <div>
-              <p class="text-2xl font-bold text-gray-900">{{ Math.round(stats.total_revenue).toLocaleString('fr-FR') }} F CFA</p>
-              <p class="text-gray-600 text-sm">Revenus ce mois</p>
+              <p class="text-2xl font-bold text-neutral-900">{{ Math.round(stats.total_revenue).toLocaleString('fr-FR') }} F CFA</p>
+              <p class="text-neutral-600 text-sm">Revenus ce mois</p>
             </div>
           </div>
         </div>
 
-        <div class="bg-white rounded-2xl shadow-lg p-6 border border-gray-100">
+        <div class="bg-white rounded-2xl shadow-lg p-6 border border-neutral-100">
           <div class="flex items-center space-x-4">
             <div class="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center">
               <CheckCircleIcon class="w-6 h-6 text-purple-600" />
             </div>
             <div>
-              <p class="text-2xl font-bold text-gray-900">{{ stats.completed_reservations }}</p>
-              <p class="text-gray-600 text-sm">Terminées</p>
+              <p class="text-2xl font-bold text-neutral-900">{{ stats.completed_reservations }}</p>
+              <p class="text-neutral-600 text-sm">Terminées</p>
             </div>
           </div>
         </div>
@@ -78,10 +78,10 @@
       <!-- Main Content Grid -->
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <!-- Recent Reservations -->
-        <div class="lg:col-span-2 bg-white rounded-2xl shadow-lg border border-gray-100">
-          <div class="p-6 border-b border-gray-200">
+        <div class="lg:col-span-2 bg-white rounded-2xl shadow-lg border border-neutral-100">
+          <div class="p-6 border-b border-neutral-200">
             <div class="flex items-center justify-between">
-              <h2 class="text-xl font-semibold text-gray-900">Réservations récentes</h2>
+              <h2 class="text-xl font-semibold text-neutral-900">Réservations récentes</h2>
               <router-link
                 to="/merchant/reservations"
                 class="text-blue-600 hover:text-blue-700 text-sm font-medium flex items-center space-x-1"
@@ -93,23 +93,23 @@
           </div>
           <div class="p-6">
             <div v-if="recentReservations.length === 0" class="text-center py-12">
-              <ClockIcon class="w-12 h-12 text-gray-400 mx-auto mb-4" />
-              <p class="text-gray-500">Aucune réservation récente</p>
+              <ClockIcon class="w-12 h-12 text-neutral-400 mx-auto mb-4" />
+              <p class="text-neutral-500">Aucune réservation récente</p>
             </div>
             <div v-else class="space-y-4">
               <div
                 v-for="reservation in recentReservations"
                 :key="reservation.id"
-                class="flex items-center justify-between p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors"
+                class="flex items-center justify-between p-4 bg-neutral-50 rounded-xl hover:bg-neutral-100 transition-colors"
               >
                 <div class="flex items-center space-x-4">
                   <div class="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
                     <UserIcon class="w-6 h-6 text-blue-600" />
                   </div>
                   <div>
-                    <p class="font-medium text-gray-900">{{ reservation.customer_name }}</p>
-                    <p class="text-sm text-gray-600">{{ reservation.product_name }}</p>
-                    <p class="text-xs text-gray-500">{{ formatDate(reservation.created_at) }}</p>
+                    <p class="font-medium text-neutral-900">{{ reservation.customer_name }}</p>
+                    <p class="text-sm text-neutral-600">{{ reservation.product_name }}</p>
+                    <p class="text-xs text-neutral-500">{{ formatDate(reservation.created_at) }}</p>
                   </div>
                 </div>
                 <div class="flex items-center space-x-3">
@@ -121,7 +121,7 @@
                   >
                     {{ getStatusText(reservation.status) }}
                   </span>
-                  <span class="font-semibold text-gray-900">{{ Math.round(reservation.total_amount).toLocaleString('fr-FR') }} F CFA</span>
+                  <span class="font-semibold text-neutral-900">{{ Math.round(reservation.total_amount).toLocaleString('fr-FR') }} F CFA</span>
                 </div>
               </div>
             </div>
@@ -131,8 +131,8 @@
         <!-- Quick Actions -->
         <div class="space-y-6">
           <!-- Quick Actions Card -->
-          <div class="bg-white rounded-2xl shadow-lg border border-gray-100 p-6">
-            <h2 class="text-xl font-semibold text-gray-900 mb-4">Actions rapides</h2>
+          <div class="bg-white rounded-2xl shadow-lg border border-neutral-100 p-6">
+            <h2 class="text-xl font-semibold text-neutral-900 mb-4">Actions rapides</h2>
             <div class="space-y-3">
               <router-link
                 to="/merchant/products/create"
@@ -157,10 +157,10 @@
               </router-link>
               <router-link
                 to="/profile"
-                class="flex items-center space-x-3 p-3 bg-gray-50 hover:bg-gray-100 rounded-xl transition-colors"
+                class="flex items-center space-x-3 p-3 bg-neutral-50 hover:bg-neutral-100 rounded-xl transition-colors"
               >
-                <CogIcon class="w-5 h-5 text-gray-600" />
-                <span class="font-medium text-gray-700">Paramètres</span>
+                <CogIcon class="w-5 h-5 text-neutral-600" />
+                <span class="font-medium text-neutral-700">Paramètres</span>
               </router-link>
             </div>
           </div>
@@ -169,50 +169,50 @@
           <LocationManager />
 
           <!-- Performance Card -->
-          <div class="bg-white rounded-2xl shadow-lg border border-gray-100 p-6">
-            <h2 class="text-xl font-semibold text-gray-900 mb-4">Performance</h2>
+          <div class="bg-white rounded-2xl shadow-lg border border-neutral-100 p-6">
+            <h2 class="text-xl font-semibold text-neutral-900 mb-4">Performance</h2>
             <div class="space-y-4">
               <div class="flex justify-between items-center">
-                <span class="text-gray-600">Taux de conversion</span>
+                <span class="text-neutral-600">Taux de conversion</span>
                 <span class="font-semibold text-green-600">{{ stats.conversion_rate }}%</span>
               </div>
               <div class="flex justify-between items-center">
-                <span class="text-gray-600">Évaluation moyenne</span>
+                <span class="text-neutral-600">Évaluation moyenne</span>
                 <div class="flex items-center space-x-1">
                   <StarIcon class="w-4 h-4 text-yellow-400" />
                   <span class="font-semibold">{{ stats.average_rating }}</span>
                 </div>
               </div>
               <div class="flex justify-between items-center">
-                <span class="text-gray-600">Produits vendus</span>
+                <span class="text-neutral-600">Produits vendus</span>
                 <span class="font-semibold text-blue-600">{{ stats.products_sold }}</span>
               </div>
               <div class="flex justify-between items-center">
-                <span class="text-gray-600">Impact CO2</span>
+                <span class="text-neutral-600">Impact CO2</span>
                 <span class="font-semibold text-emerald-600">-{{ stats.co2_saved }}kg</span>
               </div>
             </div>
           </div>
 
           <!-- Notifications Card -->
-          <div class="bg-white rounded-2xl shadow-lg border border-gray-100 p-6">
-            <h2 class="text-xl font-semibold text-gray-900 mb-4">Notifications</h2>
+          <div class="bg-white rounded-2xl shadow-lg border border-neutral-100 p-6">
+            <h2 class="text-xl font-semibold text-neutral-900 mb-4">Notifications</h2>
             <div class="space-y-3">
               <div v-if="notifications.length === 0" class="text-center py-6">
-                <BellIcon class="w-8 h-8 text-gray-400 mx-auto mb-2" />
-                <p class="text-gray-500 text-sm">Aucune notification</p>
+                <BellIcon class="w-8 h-8 text-neutral-400 mx-auto mb-2" />
+                <p class="text-neutral-500 text-sm">Aucune notification</p>
               </div>
               <div
                 v-for="notification in notifications"
                 v-else
                 :key="notification.id"
-                class="flex items-start space-x-3 p-3 bg-gray-50 rounded-xl"
+                class="flex items-start space-x-3 p-3 bg-neutral-50 rounded-xl"
               >
                 <div class="w-2 h-2 bg-blue-500 rounded-full mt-2 flex-shrink-0" />
                 <div>
-                  <p class="text-sm font-medium text-gray-900">{{ notification.title }}</p>
-                  <p class="text-xs text-gray-600">{{ notification.message }}</p>
-                  <p class="text-xs text-gray-500 mt-1">{{ formatDate(notification.created_at) }}</p>
+                  <p class="text-sm font-medium text-neutral-900">{{ notification.title }}</p>
+                  <p class="text-xs text-neutral-600">{{ notification.message }}</p>
+                  <p class="text-xs text-neutral-500 mt-1">{{ formatDate(notification.created_at) }}</p>
                 </div>
               </div>
             </div>
@@ -221,10 +221,10 @@
       </div>
 
       <!-- Recent Products -->
-      <div class="mt-8 bg-white rounded-2xl shadow-lg border border-gray-100">
-        <div class="p-6 border-b border-gray-200">
+      <div class="mt-8 bg-white rounded-2xl shadow-lg border border-neutral-100">
+        <div class="p-6 border-b border-neutral-200">
           <div class="flex items-center justify-between">
-            <h2 class="text-xl font-semibold text-gray-900">Mes produits récents</h2>
+            <h2 class="text-xl font-semibold text-neutral-900">Mes produits récents</h2>
             <router-link
               to="/merchant/products"
               class="text-blue-600 hover:text-blue-700 text-sm font-medium flex items-center space-x-1"
@@ -236,8 +236,8 @@
         </div>
         <div class="p-6">
           <div v-if="recentProducts.length === 0" class="text-center py-12">
-            <ShoppingBagIcon class="w-12 h-12 text-gray-400 mx-auto mb-4" />
-            <p class="text-gray-500">Aucun produit ajouté</p>
+            <ShoppingBagIcon class="w-12 h-12 text-neutral-400 mx-auto mb-4" />
+            <p class="text-neutral-500">Aucun produit ajouté</p>
             <router-link
               to="/merchant/products/create"
               class="inline-flex items-center mt-4 text-blue-600 hover:text-blue-700 font-medium"
@@ -250,23 +250,23 @@
             <div
               v-for="product in recentProducts"
               :key="product.id"
-              class="bg-gray-50 rounded-xl p-4 hover:bg-gray-100 transition-colors"
+              class="bg-neutral-50 rounded-xl p-4 hover:bg-neutral-100 transition-colors"
             >
-              <div class="aspect-square bg-gray-200 rounded-lg mb-4 flex items-center justify-center">
+              <div class="aspect-square bg-neutral-200 rounded-lg mb-4 flex items-center justify-center">
                 <img
                   v-if="product.image_url"
                   :src="product.image_url"
                   :alt="product.name"
                   class="w-full h-full object-cover rounded-lg"
                 >
-                <ShoppingBagIcon v-else class="w-8 h-8 text-gray-400" />
+                <ShoppingBagIcon v-else class="w-8 h-8 text-neutral-400" />
               </div>
-              <h3 class="font-medium text-gray-900 mb-1">{{ product.name }}</h3>
-              <p class="text-sm text-gray-600 mb-2">{{ product.category }}</p>
+              <h3 class="font-medium text-neutral-900 mb-1">{{ product.name }}</h3>
+              <p class="text-sm text-neutral-600 mb-2">{{ product.category }}</p>
               <div class="flex items-center justify-between">
                 <div class="flex items-center space-x-2">
                   <span class="text-lg font-semibold text-green-600">{{ Math.round(product.discounted_price).toLocaleString('fr-FR') }} F CFA</span>
-                  <span class="text-sm text-gray-500 line-through">{{ Math.round(product.original_price).toLocaleString('fr-FR') }} F CFA</span>
+                  <span class="text-sm text-neutral-500 line-through">{{ Math.round(product.original_price).toLocaleString('fr-FR') }} F CFA</span>
                 </div>
                 <span class="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded-full">
                   {{ product.quantity_available }} dispo
