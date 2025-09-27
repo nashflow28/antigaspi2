@@ -8,8 +8,8 @@
           <label class="block text-sm font-medium text-gray-700 mb-2">Statut</label>
           <select
             v-model="filters.status"
-            @change="() => loadReports()"
             class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+            @change="() => loadReports()"
           >
             <option value="">Tous les statuts</option>
             <option value="pending">En attente</option>
@@ -23,8 +23,8 @@
           <label class="block text-sm font-medium text-gray-700 mb-2">Raison</label>
           <select
             v-model="filters.reason"
-            @change="() => loadReports()"
             class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+            @change="() => loadReports()"
           >
             <option value="">Toutes les raisons</option>
             <option value="inappropriate_content">Contenu inapproprié</option>
@@ -39,8 +39,8 @@
 
         <div class="flex items-end">
           <button
-            @click="resetFilters"
             class="w-full px-4 py-2 text-sm text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+            @click="resetFilters"
           >
             Réinitialiser
           </button>
@@ -59,9 +59,9 @@
             </span>
           </h3>
           <button
-            @click="() => loadReports()"
             class="inline-flex items-center px-3 py-1 text-sm text-primary-600 hover:text-primary-700 transition-colors"
             :disabled="loading"
+            @click="() => loadReports()"
           >
             <RefreshCw class="w-4 h-4 mr-1" :class="{ 'animate-spin': loading }" />
             Actualiser
@@ -72,7 +72,7 @@
       <div class="divide-y divide-gray-200">
         <!-- Loading State -->
         <div v-if="loading" class="px-6 py-8 text-center">
-          <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600 mx-auto"></div>
+          <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600 mx-auto" />
           <p class="text-gray-500 mt-2">Chargement des signalements...</p>
         </div>
 
@@ -87,8 +87,8 @@
 
         <!-- Reports -->
         <div
-          v-else
           v-for="report in reports"
+          v-else
           :key="report.id"
           class="px-6 py-6 hover:bg-gray-50 transition-colors"
         >
@@ -101,12 +101,16 @@
                 </div>
                 <div>
                   <div class="flex items-center space-x-2">
-                    <span class="inline-flex items-center px-2 py-1 rounded text-xs font-medium"
-                          :class="getReasonClass(report.reason)">
+                    <span
+                      class="inline-flex items-center px-2 py-1 rounded text-xs font-medium"
+                      :class="getReasonClass(report.reason)"
+                    >
                       {{ report.reason_label }}
                     </span>
-                    <span class="inline-flex items-center px-2 py-1 rounded text-xs font-medium"
-                          :class="getStatusClass(report.status)">
+                    <span
+                      class="inline-flex items-center px-2 py-1 rounded text-xs font-medium"
+                      :class="getStatusClass(report.status)"
+                    >
                       {{ report.status_label }}
                     </span>
                   </div>
@@ -184,27 +188,27 @@
             <!-- Admin Actions -->
             <div v-if="report.status === 'pending'" class="flex items-center space-x-3">
               <button
-                @click="resolveReport(report.id, 'dismiss')"
                 :disabled="processing === report.id"
                 class="inline-flex items-center px-3 py-2 text-sm bg-gray-600 text-white rounded-lg hover:bg-gray-700 disabled:opacity-50 transition-colors"
+                @click="resolveReport(report.id, 'dismiss')"
               >
                 <X class="w-4 h-4 mr-2" />
                 Rejeter
               </button>
 
               <button
-                @click="resolveReport(report.id, 'remove_review')"
                 :disabled="processing === report.id"
                 class="inline-flex items-center px-3 py-2 text-sm bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50 transition-colors"
+                @click="resolveReport(report.id, 'remove_review')"
               >
                 <Trash2 class="w-4 h-4 mr-2" />
                 Supprimer l'avis
               </button>
 
               <button
-                @click="resolveReport(report.id, 'warn_user')"
                 :disabled="processing === report.id"
                 class="inline-flex items-center px-3 py-2 text-sm bg-orange-600 text-white rounded-lg hover:bg-orange-700 disabled:opacity-50 transition-colors"
+                @click="resolveReport(report.id, 'warn_user')"
               >
                 <AlertTriangle class="w-4 h-4 mr-2" />
                 Avertir
@@ -223,16 +227,16 @@
           </div>
           <div class="flex space-x-2">
             <button
-              @click="loadPage(pagination.current_page - 1)"
               :disabled="pagination.current_page <= 1"
               class="px-3 py-1 text-sm border border-gray-300 rounded disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
+              @click="loadPage(pagination.current_page - 1)"
             >
               Précédent
             </button>
             <button
-              @click="loadPage(pagination.current_page + 1)"
               :disabled="pagination.current_page >= pagination.last_page"
               class="px-3 py-1 text-sm border border-gray-300 rounded disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
+              @click="loadPage(pagination.current_page + 1)"
             >
               Suivant
             </button>

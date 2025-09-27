@@ -11,11 +11,11 @@ vi.mock('@/composables/useNotifications', () => {
 const merchantServiceMocks = vi.hoisted(() => ({
   getMerchants: vi.fn(),
   getMerchantsWithLocation: vi.fn(),
-  getMerchantDetail: vi.fn(),
+  getMerchantDetail: vi.fn()
 }))
 
 vi.mock('@/services/merchantService', () => ({
-  merchantService: merchantServiceMocks,
+  merchantService: merchantServiceMocks
 }))
 
 import { notify } from '@/composables/useNotifications'
@@ -41,9 +41,9 @@ describe('merchants store notifications', () => {
       expect.objectContaining({
         action: expect.objectContaining({
           label: 'Réessayer',
-          callback: expect.any(Function),
+          callback: expect.any(Function)
         }),
-        onClose: expect.any(Function),
+        onClose: expect.any(Function)
       })
     )
     expect(store.pendingOperation).toBe('fetch-merchants')

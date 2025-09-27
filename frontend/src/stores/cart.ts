@@ -68,14 +68,14 @@ export const useCartStore = defineStore('cart', () => {
 
     const wrappedAction = action
       ? {
-          label: action.label,
-          callback: async () => {
-            await action.callback()
-            if (operation && pendingOperation.value === operation) {
-              pendingOperation.value = null
-            }
-          },
+        label: action.label,
+        callback: async () => {
+          await action.callback()
+          if (operation && pendingOperation.value === operation) {
+            pendingOperation.value = null
+          }
         }
+      }
       : undefined
 
     const wrappedOnClose = () => {
@@ -87,7 +87,7 @@ export const useCartStore = defineStore('cart', () => {
 
     const options: Partial<Notification> = {
       action: wrappedAction,
-      onClose: wrappedOnClose,
+      onClose: wrappedOnClose
     }
 
     if (type === 'error') {
@@ -121,8 +121,8 @@ export const useCartStore = defineStore('cart', () => {
         operation: 'persist',
         action: {
           label: 'Réessayer',
-          callback: () => persist(),
-        },
+          callback: () => persist()
+        }
       })
     }
   }
@@ -141,7 +141,7 @@ export const useCartStore = defineStore('cart', () => {
             ...item,
             price: resolvePrice(item.price),
             originalPrice: item.originalPrice ? resolvePrice(item.originalPrice) : null,
-            quantity: Number.isFinite(item.quantity) && item.quantity > 0 ? item.quantity : 1,
+            quantity: Number.isFinite(item.quantity) && item.quantity > 0 ? item.quantity : 1
           }))
         }
       }
@@ -154,11 +154,11 @@ export const useCartStore = defineStore('cart', () => {
         operation: 'hydrate',
         action: {
           label: 'Réessayer',
-          callback: () => hydrateFromStorage(),
+          callback: () => hydrateFromStorage()
         },
         onClose: () => {
           items.value = []
-        },
+        }
       })
       items.value = []
     } finally {
@@ -186,10 +186,10 @@ export const useCartStore = defineStore('cart', () => {
             callback: async () => {
               upsertItem({
                 ...payload,
-                silent: false,
+                silent: false
               })
-            },
-          },
+            }
+          }
         })
       }
       return { success: false, error: message }
@@ -212,7 +212,7 @@ export const useCartStore = defineStore('cart', () => {
         quantity,
         imageUrl: payload.imageUrl ?? null,
         merchantId: payload.merchantId ?? null,
-        merchantName: payload.merchantName ?? null,
+        merchantName: payload.merchantName ?? null
       })
     }
 
@@ -222,7 +222,7 @@ export const useCartStore = defineStore('cart', () => {
 
     if (!payload.silent) {
       emitCartSuccess({
-        message: 'Produit ajouté au panier',
+        message: 'Produit ajouté au panier'
       })
     }
 
@@ -239,7 +239,7 @@ export const useCartStore = defineStore('cart', () => {
       imageUrl: product.image_url ?? null,
       merchantId: product.merchant?.id ?? null,
       merchantName: product.merchant?.business_name ?? null,
-      silent: options.silent,
+      silent: options.silent
     })
   }
 
@@ -258,8 +258,8 @@ export const useCartStore = defineStore('cart', () => {
           label: 'Réessayer',
           callback: async () => {
             updateQuantity(id, quantity)
-          },
-        },
+          }
+        }
       })
       return { success: false, error: message }
     }
@@ -284,14 +284,14 @@ export const useCartStore = defineStore('cart', () => {
           label: 'Réessayer',
           callback: async () => {
             removeItem(id)
-          },
-        },
+          }
+        }
       })
       return { success: false, error: message }
     }
 
     emitCartInfo({
-      message: 'Article retiré du panier',
+      message: 'Article retiré du panier'
     })
     return { success: true }
   }
@@ -300,7 +300,7 @@ export const useCartStore = defineStore('cart', () => {
     items.value = []
     if (!options.silent) {
       emitCartInfo({
-        message: 'Panier vidé',
+        message: 'Panier vidé'
       })
     }
     return { success: true }
@@ -320,8 +320,7 @@ export const useCartStore = defineStore('cart', () => {
     addProduct,
     updateQuantity,
     removeItem,
-    clearCart,
+    clearCart
   }
 })
 
-export type { CartItem }

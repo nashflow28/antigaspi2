@@ -61,8 +61,8 @@
     <div class="mt-6 bg-purple-50 rounded-lg border border-purple-200 p-4">
       <h3 class="text-purple-800 font-medium mb-2">🧪 Interactive Test</h3>
       <button
-        @click="counter++"
         class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-md transition-colors"
+        @click="counter++"
       >
         Clicked {{ counter }} times
       </button>

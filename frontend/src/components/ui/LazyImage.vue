@@ -10,7 +10,7 @@
       :sizes="sizes"
       class="lazy-image transition-opacity duration-300"
       loading="lazy"
-    />
+    >
 
     <!-- Loading overlay -->
     <div
@@ -18,7 +18,7 @@
       class="absolute inset-0 flex items-center justify-center bg-gray-100/80 backdrop-blur-sm"
     >
       <div class="flex items-center space-x-2">
-        <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-primary-600"></div>
+        <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-primary-600" />
         <span class="text-sm text-gray-600">{{ loadingText }}</span>
       </div>
     </div>

@@ -19,9 +19,9 @@
             <select
               id="merchant-select"
               v-model="selectedMerchantId"
-              @change="onMerchantChange"
               :disabled="merchantsLoading"
               class="border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-yellow-500 focus:border-transparent"
+              @change="onMerchantChange"
             >
               <option value="">Sélectionner un commerçant</option>
               <option
@@ -85,8 +85,8 @@
         <!-- Reviews List -->
         <ReviewsList
           ref="reviewsListRef"
-          :merchant-id="selectedMerchantId"
           :key="selectedMerchantId"
+          :merchant-id="selectedMerchantId"
         />
       </div>
     </div>
@@ -119,7 +119,7 @@ const reviewsListRef = ref()
 const merchantOptions = computed(() => {
   return merchants.value.map(merchant => ({
     id: merchant.id,
-    business_name: merchant.business_name,
+    business_name: merchant.business_name
   }))
 })
 

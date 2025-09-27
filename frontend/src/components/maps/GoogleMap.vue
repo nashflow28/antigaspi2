@@ -4,7 +4,7 @@
       ref="mapElement"
       :class="['w-full rounded-lg', heightClass]"
       :style="{ minHeight: height || '400px' }"
-    ></div>
+    />
 
     <!-- Loading overlay -->
     <div
@@ -12,7 +12,7 @@
       class="absolute inset-0 bg-white bg-opacity-75 flex items-center justify-center rounded-lg"
     >
       <div class="flex items-center space-x-3">
-        <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600"></div>
+        <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600" />
         <span class="text-gray-600">Chargement de la carte...</span>
       </div>
     </div>
@@ -24,15 +24,25 @@
     >
       <div class="text-center p-6">
         <div class="text-red-600 mb-2">
-          <svg class="w-12 h-12 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.962-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+          <svg
+            class="w-12 h-12 mx-auto"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.962-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z"
+            />
           </svg>
         </div>
         <h3 class="text-lg font-medium text-red-900 mb-1">Erreur de chargement</h3>
         <p class="text-red-600 text-sm">{{ error }}</p>
         <button
-          @click="initializeMap"
           class="mt-3 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+          @click="initializeMap"
         >
           Réessayer
         </button>

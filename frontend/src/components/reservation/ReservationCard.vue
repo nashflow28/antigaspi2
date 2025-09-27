@@ -30,13 +30,13 @@
         </Badge>
 
         <!-- Menu d'actions -->
-        <div class="relative" v-if="!isExpiredOrCancelled">
+        <div v-if="!isExpiredOrCancelled" class="relative">
           <Button
-            @click="showActions = !showActions"
             variant="ghost"
             size="sm"
             class="p-2"
             :left-icon="MoreVertical"
+            @click="showActions = !showActions"
           />
 
           <div
@@ -45,24 +45,24 @@
             class="absolute right-0 top-10 bg-white border border-neutral-200 rounded-xl shadow-card z-10 py-2 min-w-[150px]"
           >
             <button
-              @click="$emit('view', reservation.id); showActions = false"
               class="w-full px-4 py-2 text-left text-sm hover:bg-gray-50 flex items-center gap-2"
+              @click="$emit('view', reservation.id); showActions = false"
             >
               <Eye class="w-4 h-4" />
               Voir détails
             </button>
             <button
               v-if="reservation.product.merchant.phone"
-              @click="$emit('contact', reservation); showActions = false"
               class="w-full px-4 py-2 text-left text-sm hover:bg-gray-50 flex items-center gap-2"
+              @click="$emit('contact', reservation); showActions = false"
             >
               <Phone class="w-4 h-4" />
               Contacter
             </button>
             <button
               v-if="canCancel"
-              @click="$emit('cancel', reservation.id); showActions = false"
               class="w-full px-4 py-2 text-left text-sm hover:bg-gray-50 text-accent-red flex items-center gap-2"
+              @click="$emit('cancel', reservation.id); showActions = false"
             >
               <X class="w-4 h-4" />
               Annuler
@@ -192,7 +192,7 @@
                 <div
                   class="bg-accent-orange h-1 rounded-full transition-all duration-300"
                   :style="{ width: `${Math.max(0, Math.min(100, (timeLeft.total / (24 * 60 * 60 * 1000)) * 100))}%` }"
-                ></div>
+                />
               </div>
             </div>
           </div>
@@ -223,18 +223,18 @@
       <div class="flex items-center gap-2">
         <Button
           v-if="reservation.product.merchant.phone"
-          @click="$emit('contact', reservation)"
           variant="ghost"
           size="sm"
           :left-icon="Phone"
+          @click="$emit('contact', reservation)"
         >
           Contacter
         </Button>
         <Button
-          @click="$emit('view', reservation.id)"
           variant="outline"
           size="sm"
           :left-icon="Eye"
+          @click="$emit('view', reservation.id)"
         >
           Détails
         </Button>
@@ -242,11 +242,11 @@
 
       <Button
         v-if="canCancel"
-        @click="$emit('cancel', reservation.id)"
         variant="ghost"
         size="sm"
         class="text-accent-red hover:bg-accent-red/10"
         :left-icon="X"
+        @click="$emit('cancel', reservation.id)"
       >
         Annuler
       </Button>
@@ -345,6 +345,10 @@ const paymentStatus = computed(() => props.reservation.payment_status ?? latestP
 
 // Calcul du temps restant
 const updateTimeLeft = () => {
+  if (!props.reservation.pickup_date) {
+    timeLeft.value = null
+    return
+  }
   const now = new Date()
   const pickup = new Date(props.reservation.pickup_date)
   const diff = pickup.getTime() - now.getTime()
@@ -376,7 +380,8 @@ onUnmounted(() => {
 
 // Méthodes de formatage
 
-const formatDate = (date: Date | string) => {
+const formatDate = (date: Date | string | undefined) => {
+  if (!date) return 'Non définie'
   const d = new Date(date)
   return d.toLocaleDateString('fr-FR', {
     day: 'numeric',
@@ -385,7 +390,8 @@ const formatDate = (date: Date | string) => {
   })
 }
 
-const formatPickupDate = (date: Date | string) => {
+const formatPickupDate = (date: Date | string | undefined) => {
+  if (!date) return 'Non définie'
   const d = new Date(date)
   const today = new Date()
   const tomorrow = new Date(today)
@@ -404,8 +410,8 @@ const formatPickupDate = (date: Date | string) => {
   }
 }
 
-const formatPickupTime = (date: Date | string) => {
-  return new Date(date).toLocaleTimeString('fr-FR', {
+const formatPickupTime = (date: Date | string | undefined) => {
+  if (!date) return 'Non définie'; return new Date(date).toLocaleTimeString('fr-FR', {
     hour: '2-digit',
     minute: '2-digit'
   })

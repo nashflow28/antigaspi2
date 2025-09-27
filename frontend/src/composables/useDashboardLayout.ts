@@ -12,7 +12,7 @@ import {
   UsersIcon,
   GiftIcon,
   ShieldCheckIcon,
-  ClipboardDocumentCheckIcon,
+  ClipboardDocumentCheckIcon
 } from '@heroicons/vue/24/outline'
 import { useAuthStore } from '@/stores/auth'
 import type { User } from '@/types'
@@ -38,112 +38,112 @@ const navigationByRole: Record<Role, NavigationConfig[]> = {
       label: 'Tableau de bord',
       href: '/dashboard',
       icon: ChartBarIcon,
-      routes: ['dashboard'],
+      routes: ['dashboard']
     },
     {
       label: 'Mes réservations',
       href: '/reservations',
       icon: CalendarDaysIcon,
-      routes: ['reservations', 'reservation-detail'],
+      routes: ['reservations', 'reservation-detail']
     },
     {
       label: 'Mon portefeuille',
       href: '/wallet',
       icon: BanknotesIcon,
-      routes: ['wallet'],
+      routes: ['wallet']
     },
     {
       label: 'Programme fidélité',
       href: '/loyalty',
       icon: SparklesIcon,
-      routes: ['consumer-loyalty'],
-    },
+      routes: ['consumer-loyalty']
+    }
   ],
   merchant: [
     {
       label: 'Vue d’ensemble',
       href: '/merchant/dashboard',
       icon: ChartBarIcon,
-      routes: ['merchant-dashboard'],
+      routes: ['merchant-dashboard']
     },
     {
       label: 'Produits',
       href: '/merchant/products',
       icon: Squares2X2Icon,
-      routes: ['merchant-products', 'merchant-product-create', 'merchant-product-edit'],
+      routes: ['merchant-products', 'merchant-product-create', 'merchant-product-edit']
     },
     {
       label: 'Réservations',
       href: '/merchant/reservations',
       icon: ClipboardDocumentCheckIcon,
-      routes: ['merchant-reservations'],
+      routes: ['merchant-reservations']
     },
     {
       label: 'Avis clients',
       href: '/merchant/reviews/dashboard',
       icon: ChatBubbleLeftRightIcon,
-      routes: ['merchant-reviews-dashboard', 'merchant-reviews'],
+      routes: ['merchant-reviews-dashboard', 'merchant-reviews']
     },
     {
       label: 'Paniers surprise',
       href: '/merchant/surprise-baskets',
       icon: GiftIcon,
-      routes: ['merchant-surprise-baskets'],
+      routes: ['merchant-surprise-baskets']
     },
     {
       label: 'Fidélité',
       href: '/merchant/loyalty',
       icon: SparklesIcon,
-      routes: ['merchant-loyalty'],
-    },
+      routes: ['merchant-loyalty']
+    }
   ],
   admin: [
     {
       label: 'Vue d’ensemble',
       href: '/admin/dashboard',
       icon: ChartBarIcon,
-      routes: ['admin-dashboard'],
+      routes: ['admin-dashboard']
     },
     {
       label: 'Utilisateurs',
       href: '/admin/users',
       icon: UsersIcon,
-      routes: ['admin-users'],
+      routes: ['admin-users']
     },
     {
       label: 'Commerçants',
       href: '/admin/merchants',
       icon: BuildingStorefrontIcon,
-      routes: ['admin-merchants'],
+      routes: ['admin-merchants']
     },
     {
       label: 'Catégories',
       href: '/admin/categories',
       icon: Squares2X2Icon,
-      routes: ['admin-categories'],
+      routes: ['admin-categories']
     },
     {
       label: 'Avis',
       href: '/admin/reviews',
       icon: ChatBubbleLeftRightIcon,
-      routes: ['admin-reviews'],
-    },
-  ],
+      routes: ['admin-reviews']
+    }
+  ]
 }
 
 const brandByRole: Record<Role, BrandConfig> = {
   consumer: {
     name: 'Espace Client',
-    logo: ChartBarIcon,
+    logo: ChartBarIcon
   },
   merchant: {
     name: 'Espace Commerçant',
-    logo: BuildingStorefrontIcon,
+    logo: BuildingStorefrontIcon
   },
   admin: {
     name: 'Console Admin',
-    logo: ShieldCheckIcon,
-  },
+    logo: ShieldCheckIcon
+  }
 }
 
 const formatUserName = (user: User | null) => {
@@ -168,9 +168,9 @@ export const useDashboardLayout = (role: Role) => {
         href: entry.href,
         icon: entry.icon,
         badge: entry.badge,
-        active: entry.routes.includes(currentRouteName),
+        active: entry.routes.includes(currentRouteName)
       })),
-      footer: null,
+      footer: null
     }
   })
 
@@ -181,13 +181,13 @@ export const useDashboardLayout = (role: Role) => {
     return {
       user: {
         name,
-        email: user?.email ?? 'contact@antigaspi.com',
-      },
+        email: user?.email ?? 'contact@antigaspi.com'
+      }
     }
   })
 
   return {
     sidebar,
-    header,
+    header
   }
 }

@@ -5,8 +5,8 @@
       <button
         type="button"
         class="text-sm text-primary-600 hover:text-primary-700"
-        @click="handleReset"
         :disabled="!hasActiveFilters"
+        @click="handleReset"
       >
         Réinitialiser
       </button>

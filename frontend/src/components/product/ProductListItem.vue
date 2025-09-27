@@ -40,7 +40,7 @@
           </div>
 
           <div class="flex items-center gap-1">
-            <div class="w-2 h-2 bg-primary-500 rounded-full"></div>
+            <div class="w-2 h-2 bg-primary-500 rounded-full" />
             <span class="text-sm text-neutral-600">
               {{ product.available_quantity - product.reserved_quantity }} disponible{{ (product.available_quantity - product.reserved_quantity) > 1 ? 's' : '' }}
             </span>
@@ -63,19 +63,19 @@
         <!-- Boutons d'action -->
         <div class="flex flex-col gap-2">
           <Button
-            @click.stop="$emit('view', product)"
             variant="ghost"
             size="sm"
             class="min-w-[100px]"
+            @click.stop="$emit('view', product)"
           >
             Voir détails
           </Button>
           <Button
-            @click.stop="$emit('reserve', product)"
             variant="primary"
             size="sm"
             class="min-w-[100px]"
             :disabled="product.available_quantity <= product.reserved_quantity"
+            @click.stop="$emit('reserve', product)"
           >
             {{ product.available_quantity <= product.reserved_quantity ? 'Épuisé' : 'Réserver' }}
           </Button>

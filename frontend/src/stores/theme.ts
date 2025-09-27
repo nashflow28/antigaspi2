@@ -81,7 +81,7 @@ export const useThemeStore = defineStore('theme', () => {
         setFromSystem(value)
       }
     },
-    { immediate: false },
+    { immediate: false }
   )
 
   const isDark = computed(() => isDarkInternal.value)
@@ -92,6 +92,6 @@ export const useThemeStore = defineStore('theme', () => {
     setTheme,
     hydrate,
     clearPreference,
-    hasHydrated,
+    hasHydrated
   }
 })

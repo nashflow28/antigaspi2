@@ -17,9 +17,9 @@
 
           <div class="flex items-center space-x-3">
             <button
-              @click="refreshData"
               class="inline-flex items-center px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
               :disabled="loading"
+              @click="refreshData"
             >
               <RefreshCw class="w-5 h-5 mr-2" :class="{ 'animate-spin': loading }" />
               Actualiser
@@ -32,7 +32,7 @@
     <div class="container mx-auto px-4 py-8">
       <!-- Loading State -->
       <div v-if="loading && !dashboardData" class="text-center py-16">
-        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mx-auto"></div>
+        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mx-auto" />
         <p class="text-neutral-600 mt-4">Chargement du dashboard...</p>
       </div>
 
@@ -127,7 +127,7 @@
                   <div
                     class="bg-gradient-to-r from-yellow-400 to-yellow-500 h-3 rounded-full transition-all duration-500"
                     :style="{ width: rating.percentage + '%' }"
-                  ></div>
+                  />
                 </div>
                 <div class="flex items-center space-x-2 w-20">
                   <span class="text-sm text-gray-600">{{ rating.count }}</span>
@@ -281,8 +281,8 @@
         <h2 class="text-xl font-semibold text-gray-900 mb-2">Erreur de chargement</h2>
         <p class="text-gray-600 mb-4">{{ error }}</p>
         <button
-          @click="refreshData"
           class="inline-flex items-center px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
+          @click="refreshData"
         >
           <RefreshCw class="w-5 h-5 mr-2" />
           Réessayer

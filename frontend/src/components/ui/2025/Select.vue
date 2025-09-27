@@ -1,12 +1,12 @@
 <template>
   <select
     :id="id"
+    v-model="modelValue"
     :name="name"
     :disabled="disabled"
     :required="required"
     :class="computedClasses"
     @change="handleChange"
-    v-model="modelValue"
   >
     <slot />
   </select>

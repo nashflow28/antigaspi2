@@ -243,11 +243,11 @@ export const useScrollAnimation = () => {
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
-            const animation = elementsToAnimate.value.get(entry.target)
+            const animation = elementsToAnimate.value.get(entry.target as HTMLElement)
             if (animation) {
               animation()
-              observer?.unobserve(entry.target)
-              elementsToAnimate.value.delete(entry.target)
+              observer?.unobserve(entry.target as HTMLElement)
+              elementsToAnimate.value.delete(entry.target as HTMLElement)
             }
           }
         })

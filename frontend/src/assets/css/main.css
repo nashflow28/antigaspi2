@@ -314,6 +314,15 @@
     background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
   }
 
+  .card-2025 {
+    @apply bg-white border border-neutral-200 rounded-xl shadow-card transition-all duration-300 ease-out overflow-hidden;
+    @apply hover:border-neutral-300 hover:shadow-card;
+  }
+
+  .shadow-card-2025 {
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08), 0 1px 4px rgba(0, 0, 0, 0.04);
+  }
+
   /* 🏷️ Badges et Tags */
   .badge {
     @apply inline-flex items-center px-3 py-1 text-xs font-medium rounded-full;

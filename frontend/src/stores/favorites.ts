@@ -80,14 +80,14 @@ export const useFavoritesStore = defineStore('favorites', () => {
 
     const wrappedAction = action
       ? {
-          label: action.label,
-          callback: async () => {
-            await action.callback()
-            if (operation && pendingOperation.value === operation) {
-              pendingOperation.value = null
-            }
-          },
+        label: action.label,
+        callback: async () => {
+          await action.callback()
+          if (operation && pendingOperation.value === operation) {
+            pendingOperation.value = null
+          }
         }
+      }
       : undefined
 
     const wrappedOnClose = () => {
@@ -99,7 +99,7 @@ export const useFavoritesStore = defineStore('favorites', () => {
 
     const options: Partial<Notification> = {
       action: wrappedAction,
-      onClose: wrappedOnClose,
+      onClose: wrappedOnClose
     }
 
     if (type === 'error') {
@@ -136,8 +136,8 @@ export const useFavoritesStore = defineStore('favorites', () => {
         operation: 'persist',
         action: {
           label: 'Réessayer',
-          callback: () => persist(),
-        },
+          callback: () => persist()
+        }
       })
     }
   }
@@ -154,19 +154,19 @@ export const useFavoritesStore = defineStore('favorites', () => {
     const existingIndex = findIndex(payload.id, payload.type)
     if (existingIndex !== -1) {
       emitFavoritesInfo({
-        message: 'Cet élément est déjà dans vos favoris',
+        message: 'Cet élément est déjà dans vos favoris'
       })
       return { success: false as const, reason: 'already_exists' as const }
     }
 
     const favorite: FavoriteItem = {
       ...payload,
-      addedAt: new Date().toISOString(),
+      addedAt: new Date().toISOString()
     }
 
     items.value = [favorite, ...items.value]
     emitFavoritesSuccess({
-      message: 'Ajouté à vos favoris',
+      message: 'Ajouté à vos favoris'
     })
     return { success: true as const, data: favorite }
   }
@@ -183,8 +183,8 @@ export const useFavoritesStore = defineStore('favorites', () => {
           label: 'Réessayer',
           callback: async () => {
             removeFavorite(id, type)
-          },
-        },
+          }
+        }
       })
       return { success: false as const, reason: 'not_found' as const }
     }
@@ -194,7 +194,7 @@ export const useFavoritesStore = defineStore('favorites', () => {
       pendingOperation.value = null
     }
     emitFavoritesInfo({
-      message: `${removed.name} retiré de vos favoris`,
+      message: `${removed.name} retiré de vos favoris`
     })
     return { success: true as const }
   }
@@ -207,7 +207,7 @@ export const useFavoritesStore = defineStore('favorites', () => {
 
     items.value.splice(index, 1)
     emitFavoritesInfo({
-      message: 'Retiré de vos favoris',
+      message: 'Retiré de vos favoris'
     })
     return { success: true as const, toggledOff: true as const }
   }
@@ -219,7 +219,7 @@ export const useFavoritesStore = defineStore('favorites', () => {
   const clearFavorites = () => {
     items.value = []
     emitFavoritesInfo({
-      message: 'Tous vos favoris ont été effacés',
+      message: 'Tous vos favoris ont été effacés'
     })
   }
 
@@ -245,6 +245,6 @@ export const useFavoritesStore = defineStore('favorites', () => {
     removeFavorite,
     toggleFavorite,
     isFavorite,
-    clearFavorites,
+    clearFavorites
   }
 })

@@ -1,0 +1,109 @@
+import { createApp } from 'vue'
+import { MotionPlugin } from '@vueuse/motion'
+import { pinia } from '@/stores'
+import router from '@/router'
+import { useThemeStore } from '@/stores/theme'
+import App from './App-progressive.vue'
+
+// Import CSS
+import '@/assets/css/main.css'
+import '@/assets/animations.css'
+
+// SECURITY: Import security utilities for XSS protection
+import { applySecurityMetaTags, validateCSPCompliance } from '@/utils/securityHeaders'
+
+const app = createApp(App)
+
+// Configuration globale de gestion d'erreurs
+app.config.errorHandler = (error: unknown, _instance, info: string) => {
+  console.error('Vue Error Handler:', error, info)
+}
+
+app.config.warnHandler = (msg: string, _instance, trace: string) => {
+  if (import.meta.env.DEV) {
+    console.warn('Vue Warning:', msg, trace)
+  }
+}
+
+// IMPORTANT: Pinia DOIT être ajouté AVANT le router
+app.use(pinia)
+app.use(MotionPlugin)
+app.use(router)
+
+// Hydrate theme as soon as Pinia is ready so the `dark` class is applied
+// before the first paint even if the toggle component is not yet mounted.
+const themeStore = useThemeStore(pinia)
+themeStore.hydrate()
+
+// SECURITY: Apply security headers and CSP protection
+applySecurityMetaTags()
+validateCSPCompliance()
+
+app.mount('#app')
+
+
+// Register Service Worker for PWA functionality
+if ('serviceWorker' in navigator && import.meta.env.PROD) {
+  window.addEventListener('load', async () => {
+    try {
+      const registration = await navigator.serviceWorker.register('/sw.js', {
+        scope: '/'
+      })
+
+      console.log('✅ Service Worker registered successfully:', registration.scope)
+
+      // Listen for updates
+      registration.addEventListener('updatefound', () => {
+        const newWorker = registration.installing
+        if (newWorker) {
+          newWorker.addEventListener('statechange', () => {
+            if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+              // New service worker available, show update notification
+              console.log('🔄 New app version available!')
+
+              // Option to show update banner to user
+              if (confirm('Une nouvelle version est disponible. Voulez-vous actualiser maintenant ?')) {
+                newWorker.postMessage({ type: 'SKIP_WAITING' })
+                window.location.reload()
+              }
+            }
+          })
+        }
+      })
+
+      // Listen for service worker messages
+      navigator.serviceWorker.addEventListener('message', (event) => {
+        if (event.data && event.data.type === 'CACHE_UPDATED') {
+          console.log('📦 Cache updated successfully')
+        }
+      })
+
+    } catch (error) {
+      console.error('❌ Service Worker registration failed:', error)
+    }
+  })
+}
+
+// PWA Install prompt
+let deferredPrompt: any
+window.addEventListener('beforeinstallprompt', (e) => {
+  // Prevent Chrome 67 and earlier from automatically showing the prompt
+  e.preventDefault()
+  // Stash the event so it can be triggered later
+  deferredPrompt = e
+
+  // Show install button or notification
+  console.log('💡 PWA install prompt available')
+})
+
+// Export install function for components to use
+export const installPWA = async (): Promise<boolean> => {
+  if (deferredPrompt) {
+    deferredPrompt.prompt()
+    const { outcome } = await deferredPrompt.userChoice
+    console.log(`User response to install prompt: ${outcome}`)
+    deferredPrompt = null
+    return outcome === 'accepted'
+  }
+  return false
+}

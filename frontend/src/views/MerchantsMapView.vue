@@ -14,17 +14,17 @@
           <!-- Location Controls -->
           <div class="flex flex-col sm:flex-row gap-3">
             <button
-              @click="getCurrentLocation"
               :disabled="geoLoading"
               class="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+              @click="getCurrentLocation"
             >
               <MapPin class="w-4 h-4 mr-2" :class="{ 'animate-pulse': geoLoading }" />
               {{ geoLoading ? 'Localisation...' : (position ? 'Position activée' : 'Me localiser') }}
             </button>
             <button
-              @click="refreshMerchants"
               :disabled="merchantsLoading"
               class="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50"
+              @click="refreshMerchants"
             >
               <RefreshCw class="w-4 h-4 mr-2" :class="{ 'animate-spin': merchantsLoading }" />
               Actualiser
@@ -48,7 +48,7 @@
         <!-- Loading overlay -->
         <div v-if="merchantsLoading" class="absolute inset-6 bg-white/80 rounded-lg flex items-center justify-center">
           <div class="text-center">
-            <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+            <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4" />
             <p class="text-gray-600">Chargement des commerçants...</p>
           </div>
         </div>
@@ -61,7 +61,7 @@
       <div
         class="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm transition-opacity"
         @click="selectedMerchant = null"
-      ></div>
+      />
 
       <!-- Modal -->
       <div class="flex min-h-full items-center justify-center p-4">
@@ -74,8 +74,8 @@
             <div class="flex items-center justify-between">
               <h3 class="text-lg font-semibold text-gray-900">{{ selectedMerchant.business_name }}</h3>
               <button
-                @click="selectedMerchant = null"
                 class="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                @click="selectedMerchant = null"
               >
                 <X class="w-5 h-5 text-gray-400" />
               </button>
@@ -107,7 +107,7 @@
             <div class="bg-green-50 rounded-lg p-4">
               <div class="flex items-center space-x-2 text-green-700 mb-2">
                 <Package class="w-5 h-5" />
-              <span class="font-medium">{{ selectedMerchant.products_count ?? 0 }} produit(s) disponible(s)</span>
+                <span class="font-medium">{{ selectedMerchant.products_count ?? 0 }} produit(s) disponible(s)</span>
               </div>
               <p class="text-green-600 text-sm">
                 Commerçant vérifié ✓
@@ -118,8 +118,8 @@
           <!-- Actions -->
           <div class="px-6 py-4 border-t border-gray-200 flex justify-end space-x-3">
             <button
-              @click="viewMerchantProducts"
               class="px-6 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 font-medium transition-colors"
+              @click="viewMerchantProducts"
             >
               Voir les produits
             </button>
@@ -331,7 +331,6 @@ const viewMerchantProducts = () => {
     selectedMerchant.value = null
   }
 }
-
 
 
 watch(merchantsWithLocation, async () => {

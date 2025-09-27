@@ -6,7 +6,12 @@
       <div class="container-2025 py-10">
         <div class="flex flex-col gap-8 lg:flex-row lg:items-center lg:justify-between">
           <div class="space-y-5 max-w-2xl">
-            <Badge variant="primary" size="sm" rounded class="w-max px-4 py-1 shadow-sm shadow-primary-200/40">
+            <Badge
+              variant="primary"
+              size="sm"
+              rounded
+              class="w-max px-4 py-1 shadow-sm shadow-primary-200/40"
+            >
               Catalogue 2025
             </Badge>
             <div class="space-y-3">
@@ -89,7 +94,12 @@
                   Combinez nos filtres intelligents pour trouver le panier idéal.
                 </p>
               </div>
-              <Button variant="ghost" size="sm" class="text-primary-600 hover:text-primary-700" @click="showFilters = false">
+              <Button
+                variant="ghost"
+                size="sm"
+                class="text-primary-600 hover:text-primary-700"
+                @click="showFilters = false"
+              >
                 Fermer
               </Button>
             </div>
@@ -177,7 +187,12 @@
             >
               Réinitialiser
             </Button>
-            <Button variant="primary" size="sm" class="sm:w-auto" @click="applyFilters">
+            <Button
+              variant="primary"
+              size="sm"
+              class="sm:w-auto"
+              @click="applyFilters"
+            >
               Appliquer les filtres
             </Button>
           </div>

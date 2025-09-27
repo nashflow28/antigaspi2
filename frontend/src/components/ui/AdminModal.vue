@@ -4,7 +4,7 @@
     <div
       class="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm transition-opacity"
       @click="closeModal"
-    ></div>
+    />
 
     <!-- Modal -->
     <div class="flex min-h-full items-center justify-center p-4">
@@ -29,8 +29,8 @@
               <h3 class="text-xl font-semibold text-gray-900">{{ title }}</h3>
             </div>
             <button
-              @click="closeModal"
               class="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+              @click="closeModal"
             >
               <XMarkIcon class="w-5 h-5 text-gray-400" />
             </button>
@@ -52,12 +52,20 @@
                 {{ section.title }}
               </h4>
               <div class="space-y-1">
-                <p
+                <!-- SECURITY FIX: Replace unsafe v-html with secure rendering -->
+                <div
                   v-for="(item, itemIndex) in section.items"
                   :key="itemIndex"
                   class="text-gray-600 flex items-start gap-2"
-                  v-html="item"
-                ></p>
+                >
+                  <!-- Safe rendering of sanitized content -->
+                  <span v-if="item.type === 'bullet'" class="inline-block w-2 h-2 bg-primary-600 rounded-full mr-2 mt-1.5 flex-shrink-0" />
+                  <span v-else-if="item.type === 'success'" class="text-green-600 mr-2">✅</span>
+                  <span v-else-if="item.type === 'warning'" class="text-yellow-600 mr-2">⚠️</span>
+                  <span v-else-if="item.type === 'info'" class="text-blue-600 mr-2">ℹ️</span>
+                  <span v-else-if="item.type === 'error'" class="text-red-600 mr-2">❌</span>
+                  <span>{{ item.text }}</span>
+                </div>
               </div>
             </div>
           </div>
@@ -67,15 +75,15 @@
         <div class="px-6 py-4 bg-gray-50 rounded-b-2xl">
           <div class="flex justify-end gap-3">
             <button
-              @click="closeModal"
               class="px-4 py-2 text-gray-600 hover:text-gray-800 font-medium transition-colors"
+              @click="closeModal"
             >
               Fermer
             </button>
             <button
               v-if="actionButton"
-              @click="handleAction"
               class="px-6 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 font-medium transition-colors"
+              @click="handleAction"
             >
               {{ actionButton }}
             </button>
@@ -89,10 +97,16 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { XMarkIcon } from '@heroicons/vue/24/outline'
+import { sanitizeText, logXssAttempt } from '@/utils/sanitization'
+
+interface ContentItem {
+  type: 'bullet' | 'success' | 'warning' | 'info' | 'error' | 'plain'
+  text: string
+}
 
 interface ContentSection {
   title?: string
-  items: string[]
+  items: ContentItem[]
 }
 
 interface Props {
@@ -136,6 +150,9 @@ const iconClass = computed(() => {
 const contentSections = computed(() => {
   const sections: ContentSection[] = []
 
+  // Security: Log potential XSS attempts in content
+  logXssAttempt(props.content, 'AdminModal content')
+
   // Parse content by double line breaks (sections)
   const sectionParts = props.content.split('\n\n')
 
@@ -149,10 +166,11 @@ const contentSections = computed(() => {
     const firstLine = lines[0]
     if (firstLine.includes('📊') || firstLine.includes('🔧') || firstLine.includes('🚀') ||
         firstLine.includes('Statistiques:') || firstLine.includes('Configuration:')) {
-      section.title = firstLine.replace(/[📊🔧🚀]/g, '').trim().replace(':', '')
-      section.items = lines.slice(1).map(formatLine)
+      // Sanitize title and remove emojis
+      section.title = sanitizeText(firstLine.replace(/[📊🔧🚀]/g, '').trim().replace(':', ''))
+      section.items = lines.slice(1).map(formatLineSecure)
     } else {
-      section.items = lines.map(formatLine)
+      section.items = lines.map(formatLineSecure)
     }
 
     sections.push(section)
@@ -161,14 +179,49 @@ const contentSections = computed(() => {
   return sections
 })
 
-const formatLine = (line: string): string => {
-  // Convert bullet points and format
-  return line
-    .replace(/^• /, '<span class="inline-block w-2 h-2 bg-primary-600 rounded-full mr-2 mt-1.5 flex-shrink-0"></span>')
-    .replace(/^✅ /, '<span class="text-green-600 mr-2">✅</span>')
-    .replace(/^⚠️ /, '<span class="text-yellow-600 mr-2">⚠️</span>')
-    .replace(/^ℹ️ /, '<span class="text-blue-600 mr-2">ℹ️</span>')
-    .replace(/^❌ /, '<span class="text-red-600 mr-2">❌</span>')
+/**
+ * SECURITY FIX: Safe line formatting without HTML injection
+ * Replaces the unsafe formatLine function that used HTML strings
+ */
+const formatLineSecure = (line: string): ContentItem => {
+  // Security: Sanitize input first
+  const sanitizedLine = sanitizeText(line)
+
+  // Log potential XSS attempts in individual lines
+  logXssAttempt(line, 'AdminModal line content')
+
+  // Determine type and extract text safely
+  if (sanitizedLine.startsWith('• ')) {
+    return {
+      type: 'bullet',
+      text: sanitizedLine.substring(2).trim()
+    }
+  } else if (sanitizedLine.startsWith('✅ ')) {
+    return {
+      type: 'success',
+      text: sanitizedLine.substring(3).trim()
+    }
+  } else if (sanitizedLine.startsWith('⚠️ ')) {
+    return {
+      type: 'warning',
+      text: sanitizedLine.substring(3).trim()
+    }
+  } else if (sanitizedLine.startsWith('ℹ️ ')) {
+    return {
+      type: 'info',
+      text: sanitizedLine.substring(3).trim()
+    }
+  } else if (sanitizedLine.startsWith('❌ ')) {
+    return {
+      type: 'error',
+      text: sanitizedLine.substring(3).trim()
+    }
+  } else {
+    return {
+      type: 'plain',
+      text: sanitizedLine
+    }
+  }
 }
 
 const closeModal = () => {

@@ -5,8 +5,8 @@
       <div class="flex items-center justify-between p-6 border-b border-gray-200">
         <h3 class="text-xl font-semibold text-gray-900">Sélectionner des produits</h3>
         <button
-          @click="$emit('close')"
           class="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+          @click="$emit('close')"
         >
           <X class="w-5 h-5 text-gray-500" />
         </button>
@@ -24,7 +24,7 @@
                 type="text"
                 placeholder="Rechercher un produit..."
                 class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
-              />
+              >
             </div>
           </div>
 
@@ -46,7 +46,7 @@
       <!-- Products List -->
       <div class="flex-1 overflow-y-auto max-h-96">
         <div v-if="loading" class="p-8 text-center">
-          <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600 mx-auto mb-2"></div>
+          <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600 mx-auto mb-2" />
           <p class="text-gray-600">Chargement des produits...</p>
         </div>
 
@@ -71,7 +71,7 @@
                   :src="product.image_url"
                   :alt="product.name"
                   class="w-16 h-16 object-cover rounded-lg flex-shrink-0"
-                />
+                >
                 <div
                   v-else
                   class="w-16 h-16 bg-gray-200 rounded-lg flex items-center justify-center flex-shrink-0"
@@ -105,25 +105,25 @@
                       <div class="flex items-center space-x-1">
                         <button
                           type="button"
-                          @click="updateQuantity(product.id, getQuantity(product.id) - 1)"
                           :disabled="getQuantity(product.id) <= 0"
                           class="w-7 h-7 rounded-full border border-gray-300 flex items-center justify-center hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed text-sm"
+                          @click="updateQuantity(product.id, getQuantity(product.id) - 1)"
                         >
                           <Minus class="w-3 h-3" />
                         </button>
                         <input
                           :value="getQuantity(product.id)"
-                          @input="updateQuantity(product.id, parseInt(($event.target as HTMLInputElement).value) || 0)"
                           type="number"
                           min="0"
                           :max="product.quantity_available"
                           class="w-12 text-center text-sm border border-gray-300 rounded py-1"
-                        />
+                          @input="updateQuantity(product.id, parseInt(($event.target as HTMLInputElement).value) || 0)"
+                        >
                         <button
                           type="button"
-                          @click="updateQuantity(product.id, getQuantity(product.id) + 1)"
                           :disabled="getQuantity(product.id) >= product.quantity_available"
                           class="w-7 h-7 rounded-full border border-gray-300 flex items-center justify-center hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed text-sm"
+                          @click="updateQuantity(product.id, getQuantity(product.id) + 1)"
                         >
                           <Plus class="w-3 h-3" />
                         </button>
@@ -133,11 +133,11 @@
                     <!-- Toggle Button -->
                     <button
                       type="button"
-                      @click="toggleProduct(product)"
                       class="px-3 py-1 text-sm rounded-lg transition-colors"
                       :class="isSelected(product.id)
                         ? 'bg-red-100 text-red-700 hover:bg-red-200'
                         : 'bg-primary-100 text-primary-700 hover:bg-primary-200'"
+                      @click="toggleProduct(product)"
                     >
                       {{ isSelected(product.id) ? 'Retirer' : 'Ajouter' }}
                     </button>
@@ -157,15 +157,15 @@
           </div>
           <div class="flex items-center space-x-3">
             <button
-              @click="$emit('close')"
               class="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+              @click="$emit('close')"
             >
               Annuler
             </button>
             <button
-              @click="confirmSelection"
               :disabled="selectedProductsList.length === 0"
               class="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              @click="confirmSelection"
             >
               Confirmer la sélection
             </button>

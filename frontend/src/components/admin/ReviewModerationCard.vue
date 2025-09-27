@@ -67,26 +67,26 @@
         <!-- Admin Actions -->
         <div class="flex items-center space-x-3 mt-4">
           <button
-            @click="approveReview"
             :disabled="!!processing"
             class="inline-flex items-center px-4 py-2 text-sm bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            @click="approveReview"
           >
             <Check class="w-4 h-4 mr-2" />
             {{ processing === 'approve' ? 'Approbation...' : 'Approuver' }}
           </button>
 
           <button
-            @click="rejectReview"
             :disabled="!!processing"
             class="inline-flex items-center px-4 py-2 text-sm bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            @click="rejectReview"
           >
             <X class="w-4 h-4 mr-2" />
             {{ processing === 'reject' ? 'Rejet...' : 'Rejeter' }}
           </button>
 
           <button
-            @click="showDetails = !showDetails"
             class="inline-flex items-center px-3 py-2 text-sm text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+            @click="showDetails = !showDetails"
           >
             <Eye class="w-4 h-4 mr-2" />
             {{ showDetails ? 'Masquer' : 'Détails' }}

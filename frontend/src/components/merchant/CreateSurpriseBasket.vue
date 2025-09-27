@@ -11,7 +11,7 @@
     </div>
 
     <!-- Form -->
-    <form @submit.prevent="handleSubmit" class="space-y-6">
+    <form class="space-y-6" @submit.prevent="handleSubmit">
       <!-- Basic Information -->
       <div class="bg-white rounded-xl border border-gray-200 p-6">
         <h3 class="text-lg font-semibold text-gray-900 mb-4">Informations générales</h3>
@@ -29,7 +29,7 @@
               required
               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
               placeholder="Ex: Panier Boulangerie du jour"
-            />
+            >
           </div>
 
           <!-- Category -->
@@ -63,7 +63,7 @@
               required
               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
               placeholder="2000"
-            />
+            >
           </div>
 
           <!-- Quantity -->
@@ -79,7 +79,7 @@
               required
               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
               placeholder="5"
-            />
+            >
           </div>
         </div>
 
@@ -94,7 +94,7 @@
             rows="3"
             class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
             placeholder="Décrivez brièvement ce panier surprise..."
-          ></textarea>
+          />
         </div>
 
         <!-- Surprise Description -->
@@ -108,7 +108,7 @@
             rows="2"
             class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
             placeholder="Ex: Un assortiment de viennoiseries fraîches du jour..."
-          ></textarea>
+          />
           <p class="text-sm text-gray-500 mt-1">
             Cette description sera visible par les clients sans révéler le contenu exact
           </p>
@@ -121,8 +121,8 @@
           <h3 class="text-lg font-semibold text-gray-900">Produits inclus</h3>
           <button
             type="button"
-            @click="showProductSelector = true"
             class="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
+            @click="showProductSelector = true"
           >
             <Plus class="w-4 h-4 inline mr-2" />
             Ajouter des produits
@@ -148,7 +148,7 @@
                 :src="item.product.image_url"
                 :alt="item.product.name"
                 class="w-12 h-12 object-cover rounded-lg"
-              />
+              >
               <div
                 v-else
                 class="w-12 h-12 bg-gray-200 rounded-lg flex items-center justify-center"
@@ -164,25 +164,25 @@
               <div class="flex items-center space-x-2">
                 <button
                   type="button"
-                  @click="updateProductQuantity(item.product.id, item.quantity - 1)"
                   :disabled="item.quantity <= 1"
                   class="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
+                  @click="updateProductQuantity(item.product.id, item.quantity - 1)"
                 >
                   <Minus class="w-4 h-4" />
                 </button>
                 <span class="font-medium text-gray-900 w-8 text-center">{{ item.quantity }}</span>
                 <button
                   type="button"
-                  @click="updateProductQuantity(item.product.id, item.quantity + 1)"
                   class="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center hover:bg-gray-100"
+                  @click="updateProductQuantity(item.product.id, item.quantity + 1)"
                 >
                   <Plus class="w-4 h-4" />
                 </button>
               </div>
               <button
                 type="button"
-                @click="removeProduct(item.product.id)"
                 class="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+                @click="removeProduct(item.product.id)"
               >
                 <Trash2 class="w-4 h-4" />
               </button>
@@ -224,7 +224,7 @@
               min="1"
               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
               placeholder="3"
-            />
+            >
           </div>
 
           <!-- Max Items -->
@@ -239,7 +239,7 @@
               min="1"
               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
               placeholder="8"
-            />
+            >
           </div>
 
           <!-- Expiration Date -->
@@ -253,7 +253,7 @@
               type="date"
               :min="tomorrow"
               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
-            />
+            >
           </div>
 
           <!-- Image URL -->
@@ -267,7 +267,7 @@
               type="url"
               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
               placeholder="https://example.com/image.jpg"
-            />
+            >
           </div>
         </div>
       </div>
@@ -276,8 +276,8 @@
       <div class="flex items-center justify-end space-x-4 pt-6">
         <button
           type="button"
-          @click="$emit('cancel')"
           class="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+          @click="$emit('cancel')"
         >
           Annuler
         </button>
@@ -287,7 +287,7 @@
           class="px-6 py-3 bg-primary-600 text-white rounded-lg hover:bg-primary-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
         >
           <div v-if="creating" class="flex items-center">
-            <div class="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+            <div class="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2" />
             Création...
           </div>
           <span v-else>Créer le panier surprise</span>
@@ -359,7 +359,7 @@ const tomorrow = computed(() => {
 
 const totalOriginalValue = computed(() => {
   return selectedProducts.value.reduce((total, item) => {
-    return total + (item.product.original_price * item.quantity)
+    return total + (Number(item.product.original_price) * item.quantity)
   }, 0)
 })
 

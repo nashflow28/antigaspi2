@@ -12,7 +12,7 @@
       </p>
     </div>
 
-    <form @submit.prevent="handleSubmit" class="space-y-6 animate-fade-in-up" style="animation-delay: 0.2s;">
+    <form class="space-y-6 animate-fade-in-up" style="animation-delay: 0.2s;" @submit.prevent="handleSubmit">
       <!-- Email Input -->
       <div class="form-group-2025">
         <label for="email" class="block text-sm font-medium text-neutral-700 mb-2 flex items-center gap-2">
@@ -21,8 +21,8 @@
         </label>
         <Input
           id="email"
-          type="email"
           v-model="form.email"
+          type="email"
           placeholder="votre@email.com"
           :error="errors.email"
           autocomplete="email"
@@ -44,8 +44,8 @@
         <div class="relative">
           <Input
             id="password"
-            :type="showPassword ? 'text' : 'password'"
             v-model="form.password"
+            :type="showPassword ? 'text' : 'password'"
             placeholder="••••••••"
             :error="errors.password"
             autocomplete="current-password"
@@ -58,8 +58,8 @@
           </Input>
           <button
             type="button"
-            @click="togglePasswordVisibility"
             class="absolute inset-y-0 right-0 pr-4 flex items-center text-neutral-400 hover:text-primary-600 transition-colors duration-200"
+            @click="togglePasswordVisibility"
           >
             <Eye v-if="!showPassword" class="w-5 h-5" />
             <EyeOff v-else class="w-5 h-5" />
@@ -75,7 +75,7 @@
             v-model="form.remember"
             type="checkbox"
             class="w-4 h-4 text-primary-600 bg-white border-2 border-neutral-300 rounded focus:ring-primary-500 focus:ring-2"
-          />
+          >
           <label for="remember-me" class="text-sm text-neutral-700 font-medium">
             Se souvenir de moi
           </label>
@@ -100,13 +100,13 @@
           <Loader2 v-if="loading" class="w-5 h-5 animate-spin" />
           <span>{{ loading ? 'Connexion en cours...' : 'Se connecter' }}</span>
         </span>
-        <div class="absolute inset-0 bg-gradient-to-r from-primary-600 to-accent-blue/90 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+        <div class="absolute inset-0 bg-gradient-to-r from-primary-600 to-accent-blue/90 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
       </Button>
 
       <!-- Divider -->
       <div class="relative">
         <div class="absolute inset-0 flex items-center">
-          <div class="w-full border-t border-neutral-200"></div>
+          <div class="w-full border-t border-neutral-200" />
         </div>
         <div class="relative flex justify-center text-sm">
           <span class="px-4 bg-white text-neutral-500 font-medium">ou</span>

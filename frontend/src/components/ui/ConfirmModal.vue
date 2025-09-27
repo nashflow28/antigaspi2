@@ -5,7 +5,7 @@
       <div
         class="fixed inset-0 bg-neutral-900/75 backdrop-blur-sm transition-opacity animate-fade-in"
         @click="onCancel"
-      ></div>
+      />
 
       <!-- Modal -->
       <div class="relative bg-white rounded-2xl p-6 text-left overflow-hidden shadow-2xl transform transition-all max-w-md w-full animate-fade-in-up border border-neutral-200">

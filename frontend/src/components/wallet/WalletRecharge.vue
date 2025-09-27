@@ -1,46 +1,58 @@
 <template>
   <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-    <div class="bg-white rounded-xl p-6 w-full max-w-md">
+    <Card class="w-full max-w-md">
       <div class="flex items-center justify-between mb-6">
         <h3 class="text-xl font-semibold text-gray-900">Recharger le portefeuille</h3>
-        <button
+        <Button
+          variant="ghost"
+          size="sm"
+          class="p-1"
           @click="$emit('close')"
-          class="text-gray-400 hover:text-gray-600"
         >
-          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+          <svg
+            class="w-6 h-6"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M6 18L18 6M6 6l12 12"
+            />
           </svg>
-        </button>
+        </Button>
       </div>
 
       <form @submit.prevent="handleRecharge">
         <div class="space-y-4">
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">
+            <Label for="amount">
               Montant à recharger
-            </label>
+            </Label>
             <div class="relative">
-              <input
+              <Input
+                id="amount"
                 v-model="form.amount"
                 type="number"
                 min="100"
                 max="1000000"
                 step="50"
                 placeholder="Montant en XOF"
-                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                :class="{'border-red-300': errors.amount}"
+                :error="errors.amount"
                 required
-              >
+              />
               <span class="absolute right-3 top-3 text-gray-500 text-sm">XOF</span>
             </div>
-            <p v-if="errors.amount" class="mt-1 text-sm text-red-600">{{errors.amount}}</p>
+            <p v-if="errors.amount" class="mt-1 text-sm text-red-600">{{ errors.amount }}</p>
             <p class="mt-1 text-xs text-gray-500">Montant minimum: 100 XOF, maximum: 1 000 000 XOF</p>
           </div>
 
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">
+            <Label>
               Méthode de paiement
-            </label>
+            </Label>
             <div class="space-y-2">
               <label
                 v-for="method in paymentMethods"
@@ -59,39 +71,39 @@
                     <component :is="method.icon" class="w-6 h-6 text-gray-600" />
                   </div>
                   <div>
-                    <div class="font-medium text-gray-900">{{method.name}}</div>
-                    <div class="text-sm text-gray-500">{{method.description}}</div>
+                    <div class="font-medium text-gray-900">{{ method.name }}</div>
+                    <div class="text-sm text-gray-500">{{ method.description }}</div>
                   </div>
                 </div>
                 <div
                   class="w-4 h-4 border-2 rounded-full"
                   :class="form.payment_method === method.value ? 'border-green-500 bg-green-500' : 'border-gray-300'"
                 >
-                  <div v-if="form.payment_method === method.value" class="w-full h-full bg-white rounded-full scale-50"></div>
+                  <div v-if="form.payment_method === method.value" class="w-full h-full bg-white rounded-full scale-50" />
                 </div>
               </label>
             </div>
-            <p v-if="errors.payment_method" class="mt-1 text-sm text-red-600">{{errors.payment_method}}</p>
+            <p v-if="errors.payment_method" class="mt-1 text-sm text-red-600">{{ errors.payment_method }}</p>
           </div>
 
           <div v-if="requiresPhone" class="space-y-2">
-            <label class="block text-sm font-medium text-gray-700">
+            <Label for="phone">
               Numéro de téléphone
-            </label>
-            <input
+            </Label>
+            <Input
+              id="phone"
               v-model="form.phone"
               type="tel"
               placeholder="+228 XX XX XX XX"
-              class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
-              :class="{'border-red-300': errors.phone}"
-            >
-            <p v-if="errors.phone" class="text-sm text-red-600">{{errors.phone}}</p>
+              :error="errors.phone"
+            />
+            <p v-if="errors.phone" class="text-sm text-red-600">{{ errors.phone }}</p>
           </div>
 
           <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
             <div class="flex items-start space-x-2">
               <svg class="w-5 h-5 text-blue-500 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
               </svg>
               <div class="text-sm text-blue-700">
                 <p class="font-medium">Information importante</p>
@@ -102,45 +114,58 @@
         </div>
 
         <div class="flex space-x-3 mt-6">
-          <button
+          <Button
             type="button"
+            variant="outline"
+            class="flex-1"
             @click="$emit('close')"
-            class="flex-1 px-4 py-3 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
           >
             Annuler
-          </button>
-          <button
+          </Button>
+          <Button
             type="submit"
-            :disabled="loading || !isValid"
-            class="flex-1 px-4 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            :disabled="!isValid"
+            variant="success"
+            class="flex-1"
           >
-            <span v-if="loading" class="flex items-center justify-center">
+            <span v-if="false" class="flex items-center justify-center">
               <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
-                <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" class="opacity-25"></circle>
-                <path fill="currentColor" class="opacity-75" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                <circle
+                  cx="12"
+                  cy="12"
+                  r="10"
+                  stroke="currentColor"
+                  stroke-width="4"
+                  class="opacity-25"
+                />
+                <path fill="currentColor" class="opacity-75" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
               </svg>
               Traitement...
             </span>
             <span v-else>
-              Recharger {{formatAmount(form.amount)}} XOF
+              Recharger {{ formatAmount(form.amount) }} XOF
             </span>
-          </button>
+          </Button>
         </div>
       </form>
-    </div>
+    </Card>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, computed, defineComponent } from 'vue'
+import Button from '@/components/ui/2025/Button.vue'
+import Input from '@/components/ui/2025/Input.vue'
+import Label from '@/components/ui/2025/Label.vue'
+import Card from '@/components/ui/2025/Card.vue'
 
 // Icons as components
 const PhoneIcon = defineComponent({
-  template: `<svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path></svg>`
+  template: '<svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path></svg>'
 })
 
 const CreditCardIcon = defineComponent({
-  template: `<svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path></svg>`
+  template: '<svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path></svg>'
 })
 
 interface RechargeForm {
@@ -154,9 +179,6 @@ const emit = defineEmits<{
   recharge: [data: RechargeForm]
 }>()
 
-const props = defineProps<{
-  loading?: boolean
-}>()
 
 const form = ref<RechargeForm>({
   amount: '',

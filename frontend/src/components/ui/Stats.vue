@@ -10,7 +10,7 @@
         <slot name="stat" :stat="stat" :index="index">
           <div class="flex items-center justify-between">
             <span class="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary-500/15 text-primary-700 dark:text-primary-200">
-              <component v-if="stat.icon" :is="stat.icon" />
+              <component :is="stat.icon" v-if="stat.icon" />
             </span>
             <span class="text-caption uppercase tracking-[0.18em] text-primary-500">Impact</span>
           </div>
@@ -48,14 +48,14 @@ const AnimatedCounter = defineComponent({
   props: {
     value: {
       type: Number,
-      required: true,
-    },
+      required: true
+    }
   },
   setup(counterProps) {
     const target = ref(0)
     const animated = useTransition(target, {
       duration: 1200,
-      transition: (n: number) => 1 - (1 - n) * (1 - n),
+      transition: (n: number) => 1 - (1 - n) * (1 - n)
     })
 
     const displayValue = computed(() => Math.floor(animated.value))
@@ -69,11 +69,11 @@ const AnimatedCounter = defineComponent({
       () => counterProps.value,
       (value) => {
         target.value = value
-      },
+      }
     )
 
     return () => formatted.value
-  },
+  }
 })
 
 const stats = computed(() => props.stats)

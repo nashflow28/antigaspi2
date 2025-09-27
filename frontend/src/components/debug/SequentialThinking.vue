@@ -7,13 +7,18 @@
         <span v-if="isRecording" class="recording-indicator">🔴 REC</span>
       </div>
       <div class="panel-controls">
-        <button @click="exportCurrentSession" :disabled="!currentSession" class="button-export" title="Export session">
+        <button
+          :disabled="!currentSession"
+          class="button-export"
+          title="Export session"
+          @click="exportCurrentSession"
+        >
           <Download class="w-4 h-4" />
         </button>
-        <button @click="clearOldSessions" class="button-clear" title="Clear old sessions">
+        <button class="button-clear" title="Clear old sessions" @click="clearOldSessions">
           <Trash2 class="w-4 h-4" />
         </button>
-        <button @click="togglePanel" class="button-close" title="Close panel">
+        <button class="button-close" title="Close panel" @click="togglePanel">
           <X class="w-4 h-4" />
         </button>
       </div>
@@ -38,7 +43,7 @@
 
       <!-- Session Controls -->
       <div class="session-controls">
-        <div class="session-info" v-if="currentSession">
+        <div v-if="currentSession" class="session-info">
           <span class="session-name">{{ currentSession.name }}</span>
           <span class="session-duration">{{ formatDuration(sessionDuration) }}</span>
         </div>
@@ -46,16 +51,16 @@
         <div class="session-buttons">
           <button
             v-if="!isRecording"
-            @click="startNewSession"
             class="button-start"
+            @click="startNewSession"
           >
             <Play class="w-4 h-4 mr-1" />
             Start
           </button>
           <button
             v-else
-            @click="endCurrentSession"
             class="button-stop"
+            @click="endCurrentSession"
           >
             <Square class="w-4 h-4 mr-1" />
             Stop
@@ -68,8 +73,8 @@
         <button
           v-for="tab in tabs"
           :key="tab.id"
-          @click="activeTab = tab.id"
           :class="['tab', { 'tab-active': activeTab === tab.id }]"
+          @click="activeTab = tab.id"
         >
           <component :is="tab.icon" class="w-4 h-4" />
           {{ tab.label }}
@@ -83,7 +88,7 @@
           <div v-if="!currentSession || currentSession.steps.length === 0" class="empty-state">
             <Brain class="w-8 h-8 text-gray-400" />
             <p class="text-sm text-gray-600">No active thinking session</p>
-            <button @click="startNewSession" class="button-start-empty">
+            <button class="button-start-empty" @click="startNewSession">
               Start Thinking Session
             </button>
           </div>
@@ -219,7 +224,7 @@
                   <div
                     class="type-fill"
                     :style="{ width: `${(count / maxStepTypeCount) * 100}%` }"
-                  ></div>
+                  />
                 </div>
                 <span class="type-count">{{ count }}</span>
               </div>
@@ -233,9 +238,9 @@
   <!-- Floating Button -->
   <button
     v-if="isDev && !showPanel"
-    @click="showPanel = true"
     class="thinking-toggle"
     title="Open Sequential Thinking Panel"
+    @click="showPanel = true"
   >
     <Brain class="w-5 h-5" />
     <span v-if="currentSessionSteps > 0" class="step-indicator">{{ currentSessionSteps }}</span>

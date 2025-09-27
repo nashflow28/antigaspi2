@@ -15,7 +15,7 @@
     >
       <div class="flex items-center space-x-2">
         <div class="flex items-center space-x-1">
-          <div :class="indicatorClasses" class="w-2 h-2 rounded-full"></div>
+          <div :class="indicatorClasses" class="w-2 h-2 rounded-full" />
           <span class="text-sm font-medium">{{ statusMessage }}</span>
         </div>
 

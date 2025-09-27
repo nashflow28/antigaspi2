@@ -43,15 +43,15 @@
 
         <div class="flex items-center space-x-3 ml-6">
           <button
-            @click="$emit('edit', basket)"
             class="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
+            @click="$emit('edit', basket)"
           >
             <Edit class="w-4 h-4 inline mr-2" />
             Modifier
           </button>
           <button
-            @click="$emit('close')"
             class="p-2 text-gray-500 hover:text-gray-700 transition-colors"
+            @click="$emit('close')"
           >
             <X class="w-5 h-5" />
           </button>
@@ -79,7 +79,7 @@
                 :src="item.product.image_url"
                 :alt="item.product.name"
                 class="w-16 h-16 object-cover rounded-lg flex-shrink-0"
-              />
+              >
               <div
                 v-else
                 class="w-16 h-16 bg-gray-200 rounded-lg flex items-center justify-center flex-shrink-0"
@@ -146,8 +146,8 @@
               Ce panier surprise ne contient aucun produit pour le moment
             </p>
             <button
-              @click="$emit('edit', basket)"
               class="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
+              @click="$emit('edit', basket)"
             >
               Ajouter des produits
             </button>
@@ -217,7 +217,7 @@
             :src="basket.image_url"
             :alt="basket.name"
             class="w-full h-48 object-cover rounded-lg"
-          />
+          >
         </div>
 
         <!-- Quick Actions -->
@@ -226,26 +226,26 @@
 
           <div class="space-y-3">
             <button
-              @click="$emit('edit', basket)"
               class="w-full px-4 py-3 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors flex items-center justify-center"
+              @click="$emit('edit', basket)"
             >
               <Edit class="w-4 h-4 mr-2" />
               Modifier le panier
             </button>
 
             <button
-              @click="toggleStatus"
               :disabled="updating"
               class="w-full px-4 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors flex items-center justify-center disabled:opacity-50"
+              @click="toggleStatus"
             >
               <component :is="basket.is_active ? EyeOff : Eye" class="w-4 h-4 mr-2" />
               {{ basket.is_active ? 'Désactiver' : 'Activer' }}
             </button>
 
             <button
-              @click="confirmDelete"
               :disabled="deleting"
               class="w-full px-4 py-3 border border-red-300 text-red-600 rounded-lg hover:bg-red-50 transition-colors flex items-center justify-center disabled:opacity-50"
+              @click="confirmDelete"
             >
               <Trash2 class="w-4 h-4 mr-2" />
               Supprimer

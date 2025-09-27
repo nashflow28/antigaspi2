@@ -4,9 +4,9 @@
     <section class="relative bg-gradient-to-br from-primary-500 via-primary-600 to-accent-blue/90 text-white overflow-hidden" data-testid="hero-section">
       <!-- Background decorative elements -->
       <div class="absolute inset-0">
-        <div class="absolute top-0 left-0 w-72 h-72 bg-accent-orange/20 rounded-full blur-3xl animate-pulse-glow"></div>
-        <div class="absolute bottom-0 right-0 w-96 h-96 bg-accent-blue/20 rounded-full blur-3xl animate-pulse-glow" style="animation-delay: 1s;"></div>
-        <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-white/10 rounded-full blur-2xl"></div>
+        <div class="absolute top-0 left-0 w-72 h-72 bg-accent-orange/20 rounded-full blur-3xl animate-pulse-glow" />
+        <div class="absolute bottom-0 right-0 w-96 h-96 bg-accent-blue/20 rounded-full blur-3xl animate-pulse-glow" style="animation-delay: 1s;" />
+        <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-white/10 rounded-full blur-2xl" />
       </div>
 
       <div :class="[layoutContainerClass, 'relative py-32 lg:py-40']">
@@ -49,22 +49,22 @@
           <!-- CTA Buttons avec animations -->
           <div class="flex flex-col sm:flex-row gap-6 justify-center items-center animate-fade-in-up" style="animation-delay: 0.6s;">
             <Button
-              @click="$router.push('/products')"
               size="lg"
               class="bg-white text-primary-600 hover:bg-white hover:text-primary-700 hover:scale-105 shadow-toast hover:shadow-modern-2025 group relative overflow-hidden"
+              @click="$router.push('/products')"
             >
               <span class="relative z-10 flex items-center gap-3">
                 🌟 Découvrir les offres
               </span>
-              <div class="absolute inset-0 bg-nav-gradient opacity-0 group-hover:opacity-10 transition-opacity duration-300"></div>
+              <div class="absolute inset-0 bg-nav-gradient opacity-0 group-hover:opacity-10 transition-opacity duration-300" />
             </Button>
 
             <Button
               v-if="!authStore.isAuthenticated"
-              @click="$router.push('/register')"
               variant="outline"
               size="lg"
               class="border-white/30 text-white hover:bg-white hover:text-primary-600 hover:scale-105"
+              @click="$router.push('/register')"
             >
               <span class="flex items-center gap-2">
                 ✨ Rejoindre maintenant
@@ -104,8 +104,13 @@
 
       <!-- Wave divider -->
       <div class="absolute bottom-0 left-0 right-0">
-        <svg class="w-full h-20 text-neutral-50" fill="currentColor" viewBox="0 0 1200 120" preserveAspectRatio="none">
-          <path d="M1200 120L0 16.48V120H1200Z"></path>
+        <svg
+          class="w-full h-20 text-neutral-50"
+          fill="currentColor"
+          viewBox="0 0 1200 120"
+          preserveAspectRatio="none"
+        >
+          <path d="M1200 120L0 16.48V120H1200Z" />
         </svg>
       </div>
     </section>
@@ -122,7 +127,7 @@
             class="bg-primary-50 text-primary-600 mb-6"
           >
             <span class="flex items-center gap-2">
-              <span class="h-2 w-2 rounded-full bg-primary-500"></span>
+              <span class="h-2 w-2 rounded-full bg-primary-500" />
               Processus simple en 3 étapes
             </span>
           </Badge>
@@ -137,7 +142,12 @@
         <!-- Features Grid avec animations décalées -->
         <div class="grid lg:grid-cols-3 gap-8 lg:gap-12">
           <!-- Feature 1 -->
-          <Card variant="elevated" interactive class="group glow-effect animate-fade-in-up" style="animation-delay: 0.2s;">
+          <Card
+            variant="elevated"
+            interactive
+            class="group glow-effect animate-fade-in-up"
+            style="animation-delay: 0.2s;"
+          >
             <div class="relative">
               <!-- Icon avec gradient et animation -->
               <div class="w-20 h-20 bg-nav-gradient rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-modern-2025 group-hover:shadow-modern-2025 group-hover:scale-110 transition-all duration-300">
@@ -161,11 +171,11 @@
               <!-- Mini feature list -->
               <div class="space-y-2 text-sm text-neutral-500">
                 <div class="flex items-center gap-2">
-                  <span class="w-1.5 h-1.5 bg-primary-500 rounded-full"></span>
+                  <span class="w-1.5 h-1.5 bg-primary-500 rounded-full" />
                   <span>Géolocalisation intelligente</span>
                 </div>
                 <div class="flex items-center gap-2">
-                  <span class="w-1.5 h-1.5 bg-primary-500 rounded-full"></span>
+                  <span class="w-1.5 h-1.5 bg-primary-500 rounded-full" />
                   <span>Filtres avancés</span>
                 </div>
               </div>
@@ -173,7 +183,12 @@
           </Card>
 
           <!-- Feature 2 -->
-          <Card variant="elevated" interactive class="group glow-effect animate-fade-in-up" style="animation-delay: 0.4s;">
+          <Card
+            variant="elevated"
+            interactive
+            class="group glow-effect animate-fade-in-up"
+            style="animation-delay: 0.4s;"
+          >
             <div class="relative">
               <div class="w-20 h-20 bg-gradient-to-r from-accent-blue to-accent-blue/90 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-modern-2025 group-hover:shadow-modern-2025 group-hover:scale-110 transition-all duration-300">
                 <span class="text-3xl">⚡</span>
@@ -194,11 +209,11 @@
 
               <div class="space-y-2 text-sm text-neutral-500">
                 <div class="flex items-center gap-2">
-                  <span class="w-1.5 h-1.5 bg-accent-blue/50 rounded-full"></span>
+                  <span class="w-1.5 h-1.5 bg-accent-blue/50 rounded-full" />
                   <span>Réservation instantanée</span>
                 </div>
                 <div class="flex items-center gap-2">
-                  <span class="w-1.5 h-1.5 bg-accent-blue/50 rounded-full"></span>
+                  <span class="w-1.5 h-1.5 bg-accent-blue/50 rounded-full" />
                   <span>Paiement sécurisé</span>
                 </div>
               </div>
@@ -206,7 +221,12 @@
           </Card>
 
           <!-- Feature 3 -->
-          <Card variant="elevated" interactive class="group glow-effect animate-fade-in-up" style="animation-delay: 0.6s;">
+          <Card
+            variant="elevated"
+            interactive
+            class="group glow-effect animate-fade-in-up"
+            style="animation-delay: 0.6s;"
+          >
             <div class="relative">
               <div class="w-20 h-20 bg-gradient-to-r from-accent-orange to-accent-orange/90 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-modern-2025 group-hover:shadow-modern-2025 group-hover:scale-110 transition-all duration-300">
                 <span class="text-3xl">🌱</span>
@@ -227,11 +247,11 @@
 
               <div class="space-y-2 text-sm text-neutral-500">
                 <div class="flex items-center gap-2">
-                  <span class="w-1.5 h-1.5 bg-accent-orange rounded-full"></span>
+                  <span class="w-1.5 h-1.5 bg-accent-orange rounded-full" />
                   <span>Impact environnemental</span>
                 </div>
                 <div class="flex items-center gap-2">
-                  <span class="w-1.5 h-1.5 bg-accent-orange rounded-full"></span>
+                  <span class="w-1.5 h-1.5 bg-accent-orange rounded-full" />
                   <span>Économies réalisées</span>
                 </div>
               </div>
@@ -242,10 +262,10 @@
         <!-- Bottom CTA -->
         <div class="text-center mt-16 animate-fade-in-up" style="animation-delay: 0.8s;">
           <Button
-            @click="$router.push('/register')"
             variant="primary"
             size="lg"
             class="glow-effect"
+            @click="$router.push('/register')"
           >
             <span>Commencer maintenant</span>
             <span class="ml-2">→</span>
@@ -301,14 +321,14 @@
         <template v-if="!authStore.isAuthenticated">
           <div class="space-x-4">
             <Button
-              @click="$router.push('/register')"
               class="bg-white text-primary-600 hover:bg-neutral-100 text-lg px-8 py-3"
+              @click="$router.push('/register')"
             >
               Consommateur
             </Button>
             <Button
-              @click="$router.push('/register')"
               class="bg-primary-500 hover:bg-primary-400 text-lg px-8 py-3"
+              @click="$router.push('/register')"
             >
               Commerçant
             </Button>
@@ -317,8 +337,8 @@
 
         <template v-else>
           <Button
-            @click="$router.push('/dashboard')"
             class="bg-white text-primary-600 hover:bg-gray-100 text-lg px-8 py-3"
+            @click="$router.push('/dashboard')"
           >
             Accéder à mon tableau de bord
           </Button>

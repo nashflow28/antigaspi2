@@ -59,7 +59,7 @@
               class="flex flex-col gap-4 py-6 md:flex-row md:items-center md:justify-between"
             >
               <div class="flex flex-1 items-start gap-4">
-                <div class="h-20 w-20 flex-shrink-0 rounded-2xl bg-neutral-100" aria-hidden="true"></div>
+                <div class="h-20 w-20 flex-shrink-0 rounded-2xl bg-neutral-100" aria-hidden="true" />
                 <div>
                   <p class="text-lg font-semibold text-neutral-900">{{ item.name }}</p>
                   <p v-if="item.merchantName" class="text-sm text-neutral-500">{{ item.merchantName }}</p>
@@ -75,8 +75,8 @@
                   <button
                     type="button"
                     class="text-neutral-500 hover:text-neutral-800"
-                    @click="decreaseQuantity(item)"
                     aria-label="Diminuer la quantité"
+                    @click="decreaseQuantity(item)"
                   >
                     <Minus class="h-4 w-4" />
                   </button>
@@ -84,8 +84,8 @@
                   <button
                     type="button"
                     class="text-neutral-500 hover:text-neutral-800"
-                    @click="increaseQuantity(item)"
                     aria-label="Augmenter la quantité"
+                    @click="increaseQuantity(item)"
                   >
                     <Plus class="h-4 w-4" />
                   </button>

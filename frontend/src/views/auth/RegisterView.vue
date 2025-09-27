@@ -16,9 +16,9 @@
       </div>
 
       <!-- Register Form -->
-      <div class="card">
+      <Card>
         <RegisterForm />
-      </div>
+      </Card>
 
       <!-- Additional Links -->
       <div class="text-center">
@@ -35,4 +35,5 @@
 
 <script setup lang="ts">
 import RegisterForm from '@/components/forms/RegisterForm.vue'
+import Card from '@/components/ui/2025/Card.vue'
 </script>

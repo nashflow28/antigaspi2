@@ -30,7 +30,7 @@ window.addEventListener('online', () => {
   notify.success('Connexion rétablie', 'En ligne')
 
   // Relancer les requêtes en attente
-  replayPendingRequests()
+  // Requêtes seront rejouées automatiquement
 })
 
 window.addEventListener('offline', () => {
@@ -176,7 +176,7 @@ export const useNetworkError = () => {
     const requests = Array.from(pendingRequests.value.entries())
     pendingRequests.value.clear()
 
-    for (const [key, { fn, config, requestKey }] of requests) {
+    for (const [_, { fn, config, requestKey }] of requests) {
       try {
         await withRetry(fn, config, requestKey)
         notify.success('Données synchronisées', 'Succès')

@@ -33,7 +33,7 @@ const normalizeMerchant = (merchant: Partial<MerchantWithLocation | MerchantDeta
   const user = baseMerchant.user ?? {
     city: (merchant as Merchant)?.city ?? null,
     address: (merchant as Merchant)?.address ?? null,
-    phone: (merchant as Merchant)?.phone ?? null,
+    phone: (merchant as Merchant)?.phone ?? null
   }
 
   return {
@@ -47,8 +47,8 @@ const normalizeMerchant = (merchant: Partial<MerchantWithLocation | MerchantDeta
     latitude: baseMerchant.latitude ?? null,
     longitude: baseMerchant.longitude ?? null,
     distance_km: baseMerchant.distance_km ?? null,
-    products_count: baseMerchant.products_count ?? null,
-    user,
+    products_count: baseMerchant.products_count ?? undefined,
+    user
   }
 }
 
@@ -59,11 +59,11 @@ const extractMerchantList = (
     return payload
   }
 
-  if (payload.merchants && Array.isArray(payload.merchants)) {
+  if ('merchants' in payload && payload.merchants && Array.isArray(payload.merchants)) {
     return payload.merchants
   }
 
-  if (payload.data && Array.isArray(payload.data)) {
+  if ('data' in payload && payload.data && Array.isArray(payload.data)) {
     return payload.data
   }
 
@@ -93,7 +93,7 @@ export const useMerchantsStore = defineStore('merchants', () => {
     list: [],
     loading: false,
     lastFetchedAt: null,
-    lastFetchWithLocation: false,
+    lastFetchWithLocation: false
   })
 
   const detailsCache = ref<Map<number, MerchantDetail>>(new Map())
@@ -129,14 +129,14 @@ export const useMerchantsStore = defineStore('merchants', () => {
 
     const wrappedAction = action
       ? {
-          label: action.label,
-          callback: async () => {
-            await action.callback()
-            if (operation && pendingOperation.value === operation) {
-              pendingOperation.value = null
-            }
-          },
+        label: action.label,
+        callback: async () => {
+          await action.callback()
+          if (operation && pendingOperation.value === operation) {
+            pendingOperation.value = null
+          }
         }
+      }
       : undefined
 
     const wrappedOnClose = () => {
@@ -148,7 +148,7 @@ export const useMerchantsStore = defineStore('merchants', () => {
 
     const options: Partial<Notification> = {
       action: wrappedAction,
-      onClose: wrappedOnClose,
+      onClose: wrappedOnClose
     }
 
     if (type === 'error') {
@@ -202,13 +202,13 @@ export const useMerchantsStore = defineStore('merchants', () => {
           label: 'Réessayer',
           callback: async () => {
             await fetchMerchants({ ...options, force: true })
-          },
+          }
         },
         onClose: () => {
           if (!silent) {
             pendingOperation.value = null
           }
-        },
+        }
       })
       return { success: false, error: message }
     } finally {
@@ -241,7 +241,7 @@ export const useMerchantsStore = defineStore('merchants', () => {
 
       const merchant = {
         ...normalizeMerchant(payload),
-        ...payload,
+        ...payload
       }
 
       detailsCache.value.set(id, merchant)
@@ -261,8 +261,8 @@ export const useMerchantsStore = defineStore('merchants', () => {
           label: 'Réessayer',
           callback: async () => {
             await fetchMerchantDetail(id, { force: true, silent })
-          },
-        },
+          }
+        }
       })
       return { success: false, error: message }
     } finally {
@@ -301,7 +301,7 @@ export const useMerchantsStore = defineStore('merchants', () => {
     // Actions
     fetchMerchants,
     fetchMerchantDetail,
-    reset,
+    reset
   }
 })
 

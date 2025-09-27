@@ -38,7 +38,7 @@
             :aria-current="item.active ? 'page' : undefined"
             @click.prevent="emit('item-click', item)"
           >
-            <component v-if="item.icon" :is="item.icon" class="h-4 w-4" />
+            <component :is="item.icon" v-if="item.icon" class="h-4 w-4" />
             <span>{{ item.label }}</span>
             <Transition name="indicator">
               <span
@@ -53,7 +53,7 @@
       <div class="hidden items-center gap-3 lg:flex">
         <ThemeToggle v-if="showThemeToggle" />
         <slot name="actions">
-          <component v-if="actions" :is="actions" />
+          <component :is="actions" v-if="actions" />
         </slot>
       </div>
 
@@ -70,7 +70,12 @@
           type="button"
           @click="toggleMenu"
         >
-          <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg
+            class="h-6 w-6"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
             <path
               v-if="isOpen"
               stroke-linecap="round"
@@ -112,7 +117,7 @@
             :aria-current="item.active ? 'page' : undefined"
             @click.prevent="handleMobileItemClick(item)"
           >
-            <component v-if="item.icon" :is="item.icon" class="h-5 w-5" />
+            <component :is="item.icon" v-if="item.icon" class="h-5 w-5" />
             <span>{{ item.label }}</span>
           </Motion>
         </template>
@@ -120,7 +125,7 @@
         <div v-if="hasMobileActions" class="space-y-3 border-t border-white/10 pt-3">
           <slot name="mobile-actions">
             <slot name="actions" />
-            <component v-if="!slots['mobile-actions'] && actions" :is="actions" />
+            <component :is="actions" v-if="!slots['mobile-actions'] && actions" />
           </slot>
         </div>
       </div>
@@ -164,8 +169,8 @@ const props = withDefaults(
     actions: null,
     showThemeToggle: true,
     ariaLabel: 'Navigation principale',
-    class: '',
-  },
+    class: ''
+  }
 )
 
 const emit = defineEmits<{
@@ -183,7 +188,7 @@ const navClasses = computed(() => {
     'fixed inset-x-0 top-0 z-40 border-b border-primary-500/15 backdrop-blur-xl transition-all duration-300 ease-out',
     'relative overflow-hidden bg-nav-gradient text-white dark:bg-neutral-950',
     scrolled.value ? 'shadow-glow' : '',
-    props.class,
+    props.class
   ]
 
   return classes.filter(Boolean).join(' ')
@@ -193,7 +198,7 @@ const navigationItemClasses = (item: NavigationItem) =>
   [
     'relative flex items-center gap-2 rounded-full px-4 py-2 text-small font-medium transition-all duration-200',
     'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70 focus-visible:ring-offset-2 focus-visible:ring-offset-transparent',
-    item.active ? 'bg-white/15 text-white shadow-card' : 'text-white/80 hover:text-white hover:bg-white/10',
+    item.active ? 'bg-white/15 text-white shadow-card' : 'text-white/80 hover:text-white hover:bg-white/10'
   ]
     .filter(Boolean)
     .join(' ')
@@ -201,7 +206,7 @@ const navigationItemClasses = (item: NavigationItem) =>
 const mobileItemClasses = (item: NavigationItem) =>
   [
     'flex items-center gap-3 rounded-2xl px-4 py-3 text-body font-medium transition-colors',
-    item.active ? 'bg-primary-500/20 text-primary-50' : 'text-neutral-100 hover:bg-primary-500/15',
+    item.active ? 'bg-primary-500/20 text-primary-50' : 'text-neutral-100 hover:bg-primary-500/15'
   ]
     .filter(Boolean)
     .join(' ')
@@ -214,7 +219,7 @@ const menuId = useId()
 const ariaLabel = computed(() => props.ariaLabel)
 
 const hasMobileActions = computed(
-  () => !!(slots['mobile-actions'] || slots.actions || props.actions),
+  () => !!(slots['mobile-actions'] || slots.actions || props.actions)
 )
 
 const toggleMenu = () => {

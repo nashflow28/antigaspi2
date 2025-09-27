@@ -8,8 +8,8 @@ import { chromium } from 'playwright'
 import axe from 'axe-core'
 
 const __filename = fileURLToPath(import.meta.url)
-const __dirname = path.dirname(__filename)
-const PROJECT_ROOT = path.resolve(__dirname, '..')
+const _unused_dirname = path.dirname(__filename)
+const PROJECT_ROOT = path.resolve(_unused_dirname, '..')
 const RESULTS_DIR = path.join(PROJECT_ROOT, 'test-results')
 const A11Y_REPORT_PATH = path.join(RESULTS_DIR, 'a11y-report.json')
 const PREVIEW_PORT = process.env.A11Y_PREVIEW_PORT || 4173

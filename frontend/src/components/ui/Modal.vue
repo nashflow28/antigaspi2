@@ -10,7 +10,7 @@
           class="modal-overlay absolute inset-0 bg-overlay"
           aria-hidden="true"
           @click="onOverlayClick"
-        ></div>
+        />
 
         <div
           role="dialog"
@@ -41,8 +41,18 @@
               aria-label="Fermer la fenêtre"
               @click="emitClose"
             >
-              <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+              <svg
+                class="h-5 w-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M6 18L18 6M6 6l12 12"
+                />
               </svg>
             </Button>
           </header>
@@ -64,9 +74,9 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onBeforeUnmount, useAttrs, useId, watch } from 'vue';
+import { computed, onBeforeUnmount, useAttrs, useId, watch } from 'vue'
 
-import Button from './Button.vue';
+import Button from './Button.vue'
 
 type ModalSize = 'sm' | 'default' | 'lg' | 'xl' | 'full';
 type ModalVariant = 'surface' | 'glass' | 'dark';
@@ -87,84 +97,84 @@ const props = withDefaults(
     variant: 'glass',
     showCloseButton: true,
     closeOnOverlayClick: true,
-    closeOnEscape: true,
-  },
-);
+    closeOnEscape: true
+  }
+)
 
 const emit = defineEmits<{
   (event: 'close'): void;
-}>();
+}>()
 
-const attrs = useAttrs();
-const generatedId = useId();
-const modalTitleId = `modal-title-${generatedId}`;
-const modalDescriptionId = `modal-description-${generatedId}`;
+const attrs = useAttrs()
+const generatedId = useId()
+const modalTitleId = `modal-title-${generatedId}`
+const modalDescriptionId = `modal-description-${generatedId}`
 
 const sizeClasses: Record<ModalSize, string> = {
   sm: 'max-w-md',
   default: 'max-w-lg',
   lg: 'max-w-2xl',
   xl: 'max-w-4xl',
-  full: 'max-w-6xl mx-4',
-};
+  full: 'max-w-6xl mx-4'
+}
 
 const variantClasses: Record<ModalVariant, string> = {
   surface:
     'bg-white text-neutral-800 border border-neutral-200 shadow-card dark:bg-neutral-900 dark:text-neutral-50 dark:border-neutral-800',
   glass:
     'bg-white/90 text-neutral-800 border border-primary-500/15 shadow-glow backdrop-blur-xl dark:bg-neutral-900/80 dark:text-neutral-50',
-  dark: 'bg-neutral-900 text-neutral-50 border border-neutral-700 shadow-glow',
-};
+  dark: 'bg-neutral-900 text-neutral-50 border border-neutral-700 shadow-glow'
+}
 
-const externalClass = computed(() => (attrs.class as string | undefined) ?? '');
+const externalClass = computed(() => (attrs.class as string | undefined) ?? '')
 const otherAttrs = computed(() => {
-  const { class: _class, ...rest } = attrs;
-  return rest;
-});
+  const { class: _class, ...rest } = attrs
+  return rest
+})
 
 const modalClass = computed(() => [
   'relative w-full rounded-3xl transition-all duration-300 ease-[0.22,1,0.36,1] transform-gpu',
   sizeClasses[props.size],
   variantClasses[props.variant],
-  externalClass.value,
-]);
+  externalClass.value
+])
 
 const emitClose = () => {
-  emit('close');
-};
+  emit('close')
+}
 
 const onOverlayClick = () => {
   if (props.closeOnOverlayClick) {
-    emitClose();
+    emitClose()
   }
-};
+}
 
 const handleEscape = (event: KeyboardEvent) => {
   if (event.key === 'Escape' && props.isOpen && props.closeOnEscape) {
-    emitClose();
+    emitClose()
   }
-};
+}
 
 watch(
   () => props.isOpen,
   (open) => {
     if (open) {
       if (props.closeOnEscape) {
-        window.addEventListener('keydown', handleEscape);
+        window.addEventListener('keydown', handleEscape)
       }
-      document.body.style.overflow = 'hidden';
+      document.body.style.overflow = 'hidden'
     } else {
-      window.removeEventListener('keydown', handleEscape);
-      document.body.style.overflow = '';
+      window.removeEventListener('keydown', handleEscape)
+      document.body.style.overflow = ''
     }
   },
-  { immediate: true },
-);
+  { immediate: true }
+)
 
 onBeforeUnmount(() => {
-  window.removeEventListener('keydown', handleEscape);
-  document.body.style.overflow = '';
-});
+  window.removeEventListener('keydown', handleEscape)
+  document.body.style.overflow = ''
+})
 </script>
 
 <style scoped>

@@ -23,18 +23,18 @@
           <div class="flex items-center gap-2">
             <!-- Bouton de recherche -->
             <button
-              @click="handleSearch"
               class="p-2 rounded-xl text-gray-600 hover:text-blue-600 hover:bg-blue-50 transition-colors"
               aria-label="Rechercher"
+              @click="handleSearch"
             >
               🔍
             </button>
 
             <!-- Bouton notifications -->
             <button
-              @click="handleNotifications"
               class="relative p-2 rounded-xl text-gray-600 hover:text-blue-600 hover:bg-blue-50 transition-colors"
               aria-label="Notifications"
+              @click="handleNotifications"
             >
               🔔
               <div class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full min-w-[18px] h-[18px] flex items-center justify-center px-1">
@@ -44,9 +44,9 @@
 
             <!-- Bouton panier -->
             <button
-              @click="handleCart"
               class="relative p-2 rounded-xl text-gray-600 hover:text-blue-600 hover:bg-blue-50 transition-colors"
               aria-label="Panier"
+              @click="handleCart"
             >
               🛒
               <div class="absolute -top-1 -right-1 bg-blue-500 text-white text-xs rounded-full min-w-[18px] h-[18px] flex items-center justify-center px-1">
@@ -56,8 +56,8 @@
 
             <!-- Bouton utilisateur -->
             <button
-              @click="handleUser"
               class="p-1 rounded-xl hover:bg-blue-50 transition-colors"
+              @click="handleUser"
             >
               <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
                 <span class="text-white text-sm font-medium">U</span>
@@ -124,8 +124,8 @@
       <div class="bg-purple-50 rounded-lg p-4">
         <h3 class="font-medium text-purple-900 mb-2">Test d'interactivité</h3>
         <button
-          @click="counter++"
           class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-md transition-colors"
+          @click="counter++"
         >
           Compteur: {{ counter }}
         </button>

@@ -4,7 +4,12 @@
     <NavBar />
 
     <!-- Main Content with modern spacing -->
-    <main id="main-content" class="flex-1 relative" role="main" aria-label="Contenu principal">
+    <main
+      id="main-content"
+      class="flex-1 relative"
+      role="main"
+      aria-label="Contenu principal"
+    >
       <PageTransition>
         <router-view />
       </PageTransition>
@@ -28,10 +33,10 @@
 
     <!-- Background Pattern -->
     <div class="fixed inset-0 -z-10 opacity-20 dark:opacity-10">
-      <div class="absolute inset-0 bg-gradient-to-r from-primary-500/10 via-accent-blue/5 to-accent-blue/15"></div>
-      <div class="absolute top-0 -left-4 w-72 h-72 bg-primary-400 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob"></div>
-      <div class="absolute top-0 -right-4 w-72 h-72 bg-accent-blue/30 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob animation-delay-2000"></div>
-      <div class="absolute -bottom-8 left-20 w-72 h-72 bg-accent-orange/40 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob animation-delay-4000"></div>
+      <div class="absolute inset-0 bg-gradient-to-r from-primary-500/10 via-accent-blue/5 to-accent-blue/15" />
+      <div class="absolute top-0 -left-4 w-72 h-72 bg-primary-400 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob" />
+      <div class="absolute top-0 -right-4 w-72 h-72 bg-accent-blue/30 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob animation-delay-2000" />
+      <div class="absolute -bottom-8 left-20 w-72 h-72 bg-accent-orange/40 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob animation-delay-4000" />
     </div>
   </div>
 </template>

@@ -14,8 +14,8 @@ console.log('🔍 Phase 3 - Legacy Classes Audit Tool\n')
 // Configuration
 import { fileURLToPath } from 'url'
 const __filename = fileURLToPath(import.meta.url)
-const __dirname = path.dirname(__filename)
-const PROJECT_ROOT = path.resolve(__dirname, '..')
+const _unused_dirname = path.dirname(__filename)
+const PROJECT_ROOT = path.resolve(_unused_dirname, '..')
 const SCAN_PATTERNS = [
   'src/**/*.vue',
   'src/**/*.ts',
@@ -274,7 +274,7 @@ async function main() {
   // Exit code based on results
   if (results.summary.totalLegacyUsages > 0) {
     console.log(`\n⚠️  Found ${results.summary.totalLegacyUsages} legacy class usages that need migration.`)
-    console.log(`📋 Check legacy-classes-audit.json for detailed migration plan.`)
+    console.log('📋 Check legacy-classes-audit.json for detailed migration plan.')
     process.exit(1)
   } else {
     console.log('\n✅ No legacy classes found! Migration completed.')

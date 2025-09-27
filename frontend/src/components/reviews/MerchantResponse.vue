@@ -18,16 +18,16 @@
           </div>
           <div class="flex items-center space-x-2 mt-2">
             <button
-              @click="startEditing"
               class="inline-flex items-center px-2 py-1 text-xs text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-full transition-colors"
+              @click="startEditing"
             >
               <PencilIcon class="w-3 h-3 mr-1" />
               Modifier
             </button>
             <button
-              @click="deleteResponse"
               class="inline-flex items-center px-2 py-1 text-xs text-red-600 bg-red-50 hover:bg-red-100 rounded-full transition-colors"
               :disabled="deleting"
+              @click="deleteResponse"
             >
               <TrashIcon class="w-3 h-3 mr-1" />
               Supprimer
@@ -53,7 +53,7 @@
           rows="3"
           class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-green-500 focus:border-transparent resize-none"
           :disabled="submitting"
-        ></textarea>
+        />
 
         <div class="flex items-center justify-between">
           <span class="text-xs text-gray-500">
@@ -62,21 +62,33 @@
           <div class="flex items-center space-x-2">
             <button
               v-if="isEditing"
-              @click="cancelEditing"
               class="px-3 py-1 text-sm text-gray-600 hover:text-gray-800 transition-colors"
               :disabled="submitting"
+              @click="cancelEditing"
             >
               Annuler
             </button>
             <button
-              @click="submitResponse"
               :disabled="!responseText.trim() || submitting || responseText.length > 1000"
               class="inline-flex items-center px-4 py-2 text-sm bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              @click="submitResponse"
             >
               <span v-if="submitting" class="inline-flex items-center">
-                <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                <svg
+                  class="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <circle
+                    class="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    stroke-width="4"
+                  />
+                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
                 </svg>
                 {{ isEditing ? 'Modification...' : 'Envoi...' }}
               </span>

@@ -1,24 +1,25 @@
 const { test, expect } = require('@playwright/test');
+const { AuthHelper } = require('./helpers/auth-helper.js');
 
 test.describe('Stage 1 - JWT Authentication', () => {
-  test('User can login with valid credentials', async ({ request }) => {
-    const response = await request.post('http://localhost:8000/api/auth/login', {
-      data: {
-        email: 'jean.dupont@email.com',
-        password: 'password'
-      }
-    });
+  test.describe.configure({ mode: 'serial' }); // Run auth tests in sequence to avoid rate limiting
 
-    expect(response.status()).toBe(200);
+  let authHelper;
 
-    const data = await response.json();
-    expect(data).toHaveProperty('success', true);
-    expect(data.data).toHaveProperty('token');
-    expect(data.data).toHaveProperty('token_type', 'Bearer');
-    expect(data.data).toHaveProperty('expires_in');
-    expect(data.data).toHaveProperty('user');
-    expect(data.data.user).toHaveProperty('email', 'jean.dupont@email.com');
-    expect(data.data.user).toHaveProperty('role', 'consumer');
+  test.beforeEach(async ({ request }) => {
+    authHelper = new AuthHelper(request);
+    // Small delay to avoid rate limiting
+    await authHelper.waitForRateLimit(0.5);
+  });
+
+  test('User can login with valid credentials', async () => {
+    const authData = await authHelper.login();
+    
+    expect(authData.token).toBeTruthy();
+    expect(authData.tokenType).toBe('Bearer');
+    expect(authData.expiresIn).toBe(3600);
+    expect(authData.user.email).toBe('jean.dupont@email.com');
+    expect(authData.user.role).toBe('consumer');
   });
 
   test('User cannot login with invalid credentials', async ({ request }) => {
@@ -26,7 +27,8 @@ test.describe('Stage 1 - JWT Authentication', () => {
       data: {
         email: 'jean.dupont@email.com',
         password: 'wrongpassword'
-      }
+      },
+      headers: authHelper.defaultHeaders
     });
 
     expect(response.status()).toBe(401);
@@ -36,63 +38,34 @@ test.describe('Stage 1 - JWT Authentication', () => {
     expect(data).toHaveProperty('message', 'Email ou mot de passe incorrect');
   });
 
-  test('Protected routes require authentication', async ({ request }) => {
-    const response = await request.get('http://localhost:8000/api/auth/me');
-    expect(response.status()).toBe(401);
-
-    const data = await response.json();
-    expect(data).toHaveProperty('message', 'Unauthenticated.');
+  test('Protected routes require authentication', async () => {
+    const result = await authHelper.testProtectedRoute('/auth/me');
+    
+    expect(result.status).toBe(401);
+    expect(result.data).toHaveProperty('message', 'Token not provided');
   });
 
-  test('Authenticated user can access protected routes', async ({ request }) => {
-    // First login to get token
-    const loginResponse = await request.post('http://localhost:8000/api/auth/login', {
-      data: {
-        email: 'jean.dupont@email.com',
-        password: 'password'
-      }
-    });
+  test('Authenticated user can access protected routes', async () => {
+    const authData = await authHelper.login();
+    const response = await authHelper.getProfile(authData.token);
 
-    const loginData = await loginResponse.json();
-    const token = loginData.data.token;
+    expect(response.status()).toBe(200);
 
-    // Use token to access protected route
-    const meResponse = await request.get('http://localhost:8000/api/auth/me', {
-      headers: {
-        'Authorization': `Bearer ${token}`
-      }
-    });
-
-    expect(meResponse.status()).toBe(200);
-
-    const userData = await meResponse.json();
+    const userData = await response.json();
     expect(userData).toHaveProperty('success', true);
-    expect(userData.user).toHaveProperty('email', 'jean.dupont@email.com');
+    // Fix: API returns user data under 'data', not 'user'
+    expect(userData.data).toHaveProperty('email', 'jean.dupont@email.com');
+    expect(userData.data).toHaveProperty('role', 'consumer');
   });
 
-  test('User can logout successfully', async ({ request }) => {
-    // First login
-    const loginResponse = await request.post('http://localhost:8000/api/auth/login', {
-      data: {
-        email: 'jean.dupont@email.com',
-        password: 'password'
-      }
-    });
+  test('User can logout successfully', async () => {
+    const authData = await authHelper.login();
+    const response = await authHelper.logout(authData.token);
 
-    const loginData = await loginResponse.json();
-    const token = loginData.data.token;
+    expect(response.status()).toBe(200);
 
-    // Logout
-    const logoutResponse = await request.post('http://localhost:8000/api/auth/logout', {
-      headers: {
-        'Authorization': `Bearer ${token}`
-      }
-    });
-
-    expect(logoutResponse.status()).toBe(200);
-
-    const logoutData = await logoutResponse.json();
+    const logoutData = await response.json();
     expect(logoutData).toHaveProperty('success', true);
-    expect(logoutData).toHaveProperty('message', 'Successfully logged out');
+    expect(logoutData).toHaveProperty('message', 'Déconnexion réussie');
   });
 });

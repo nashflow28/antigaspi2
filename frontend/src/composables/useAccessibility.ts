@@ -267,6 +267,6 @@ export const useAccessibility = (options: AccessibilityOptions = {}) => {
 
     // Computed
     hasFocusableElements: computed(() => focusableElements.value.length > 0),
-    currentFocusedElement: computed(() => focusableElements.value[currentFocusIndex.value]),
+    currentFocusedElement: computed(() => focusableElements.value[currentFocusIndex.value])
   }
 }

@@ -1,6 +1,11 @@
 <template>
   <Transition name="toast-slide">
-    <div v-if="isOpen" :class="rootClasses" role="status" aria-live="assertive">
+    <div
+      v-if="isOpen"
+      :class="rootClasses"
+      role="status"
+      aria-live="assertive"
+    >
       <div :class="toastClasses">
         <span aria-hidden="true" class="mt-1">
           <svg
@@ -22,7 +27,12 @@
             stroke="currentColor"
             viewBox="0 0 24 24"
           >
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M12 6a9 9 0 110 18 9 9 0 010-18z" />
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M13 16h-1v-4h-1m1-4h.01M12 6a9 9 0 110 18 9 9 0 010-18z"
+            />
           </svg>
           <svg
             v-else-if="tone === 'warning'"
@@ -72,8 +82,18 @@
           aria-label="Fermer la notification"
           @click="handleClose"
         >
-          <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          <svg
+            class="h-4 w-4"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M6 18L18 6M6 6l12 12"
+            />
           </svg>
         </button>
       </div>
@@ -82,8 +102,8 @@
 </template>
 
 <script setup lang="ts">
-import { computed, toRefs } from 'vue';
-import Button from './Button.vue';
+import { computed, toRefs } from 'vue'
+import Button from './Button.vue'
 
 type ToastTone = 'success' | 'info' | 'warning' | 'error';
 type ToastPosition = 'global' | 'stacked';
@@ -101,45 +121,45 @@ const props = withDefaults(
   }>(),
   {
     tone: 'success',
-    position: 'global',
-  },
-);
+    position: 'global'
+  }
+)
 
 const emit = defineEmits<{
   (event: 'close'): void;
   (event: 'action'): void;
-}>();
+}>()
 
 const toneClasses: Record<ToastTone, string> = {
   success: 'border-primary-500',
   info: 'border-accent-blue',
   warning: 'border-accent-orange',
-  error: 'border-accent-red',
-};
+  error: 'border-accent-red'
+}
 
-const { isOpen, tone, title, description, actionLabel, position } = toRefs(props);
+const { isOpen, tone, title, description, actionLabel, position } = toRefs(props)
 
 const toastClasses = computed(() => [
   'flex w-full items-start gap-3 rounded-3xl border-l-4 bg-white p-4 shadow-toast dark:bg-neutral-900',
-  toneClasses[tone.value],
-]);
+  toneClasses[tone.value]
+])
 
 const positionClasses: Record<ToastPosition, string> = {
   global: 'pointer-events-auto fixed inset-x-4 bottom-6 z-50 flex justify-center sm:inset-x-auto sm:right-6 sm:w-[360px]',
-  stacked: 'pointer-events-auto z-50 w-full',
-};
+  stacked: 'pointer-events-auto z-50 w-full'
+}
 
-const rootClasses = computed(() => positionClasses[position.value]);
+const rootClasses = computed(() => positionClasses[position.value])
 
 const handleClose = () => {
-  props.onClose?.();
-  emit('close');
-};
+  props.onClose?.()
+  emit('close')
+}
 
 const handleAction = () => {
-  props.onAction?.();
-  emit('action');
-};
+  props.onAction?.()
+  emit('action')
+}
 
 </script>
 

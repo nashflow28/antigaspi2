@@ -92,6 +92,6 @@ export const useOnboardingStore = defineStore('onboarding', () => {
     previousStep,
     completeOnboarding,
     reset,
-    skipOnboarding,
+    skipOnboarding
   }
 })

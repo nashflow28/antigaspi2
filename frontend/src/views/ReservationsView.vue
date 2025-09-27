@@ -8,7 +8,13 @@
           <p class="max-w-2xl text-body text-white/80">Visualisez l'ensemble de vos réservations, suivez leur statut et mesurez votre impact positif.</p>
         </div>
         <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          <Card v-for="item in statCards" :key="item.title" variant="glass" padding="lg" class="shadow-card">
+          <Card
+            v-for="item in statCards"
+            :key="item.title"
+            variant="glass"
+            padding="lg"
+            class="shadow-card"
+          >
             <div class="space-y-2">
               <p class="text-caption uppercase tracking-wide text-white/80">{{ item.title }}</p>
               <p class="text-display-sm font-semibold">{{ item.value }}</p>
@@ -70,10 +76,22 @@
               >
                 Réinitialiser les filtres
               </Button>
-              <Button variant="outline" size="sm" class="w-full justify-center" :left-icon="Download" @click="exportReservations">
+              <Button
+                variant="outline"
+                size="sm"
+                class="w-full justify-center"
+                :left-icon="Download"
+                @click="exportReservations"
+              >
                 Exporter la liste
               </Button>
-              <Button variant="ghost" size="sm" class="w-full justify-center text-primary-600" :left-icon="CheckCheck" @click="markAllAsRead">
+              <Button
+                variant="ghost"
+                size="sm"
+                class="w-full justify-center text-primary-600"
+                :left-icon="CheckCheck"
+                @click="markAllAsRead"
+              >
                 Tout marquer comme lu
               </Button>
             </div>
@@ -144,7 +162,12 @@
             </template>
 
             <div v-if="loading" class="grid grid-cols-1 gap-6 md:grid-cols-3 xl:grid-cols-4">
-              <Card v-for="index in 6" :key="index" padding="sm" class="space-y-4">
+              <Card
+                v-for="index in 6"
+                :key="index"
+                padding="sm"
+                class="space-y-4"
+              >
                 <Skeleton class="h-24 w-full" />
                 <Skeleton class="h-4 w-3/4" />
                 <Skeleton class="h-3 w-1/2" />
@@ -192,7 +215,13 @@
 
             <div v-if="filteredReservations.length > 0 && totalPages > 1" class="border-t border-neutral-200/70 pt-6">
               <div class="flex items-center justify-center gap-3">
-                <Button variant="outline" size="icon" :disabled="currentPage <= 1" :left-icon="ChevronLeft" @click="currentPage--" />
+                <Button
+                  variant="outline"
+                  size="icon"
+                  :disabled="currentPage <= 1"
+                  :left-icon="ChevronLeft"
+                  @click="currentPage--"
+                />
                 <div class="flex items-center gap-2">
                   <Button
                     v-for="page in visiblePages"
@@ -205,7 +234,13 @@
                     {{ page }}
                   </Button>
                 </div>
-                <Button variant="outline" size="icon" :disabled="currentPage >= totalPages" :left-icon="ChevronRight" @click="currentPage++" />
+                <Button
+                  variant="outline"
+                  size="icon"
+                  :disabled="currentPage >= totalPages"
+                  :left-icon="ChevronRight"
+                  @click="currentPage++"
+                />
               </div>
             </div>
           </Card>

@@ -1,24 +1,24 @@
 <template>
   <span :class="computedClasses">
     <component
-      v-if="leftIcon"
       :is="leftIcon"
+      v-if="leftIcon"
       :size="iconSize"
     />
 
     <slot />
 
     <component
-      v-if="rightIcon"
       :is="rightIcon"
+      v-if="rightIcon"
       :size="iconSize"
     />
 
     <button
       v-if="removable"
-      @click="handleRemove"
       class="badge-remove-btn"
       type="button"
+      @click="handleRemove"
     >
       <X :size="iconSize" />
     </button>

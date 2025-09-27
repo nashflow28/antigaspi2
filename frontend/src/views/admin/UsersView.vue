@@ -5,325 +5,381 @@
     class="bg-neutral-50"
   >
     <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-    <!-- En-tête -->
-    <div class="bg-white shadow rounded-lg p-6 mb-6">
-      <div class="flex items-center justify-between">
-        <div>
-          <h1 class="text-2xl font-bold text-gray-900">Gestion des Utilisateurs</h1>
-          <p class="mt-1 text-sm text-gray-500">Gérez les consommateurs et commerçants de la plateforme</p>
-        </div>
-        <div class="flex items-center space-x-3">
-          <button
-            @click="refreshData"
-            class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg flex items-center"
-          >
-            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
-            </svg>
-            Actualiser
-          </button>
-        </div>
-      </div>
-    </div>
-
-    <!-- Statistiques utilisateurs -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
-      <div class="bg-white overflow-hidden shadow rounded-lg">
-        <div class="p-5">
-          <div class="flex items-center">
-            <div class="flex-shrink-0">
-              <svg class="h-6 w-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"></path>
-              </svg>
-            </div>
-            <div class="ml-5 w-0 flex-1">
-              <dl>
-                <dt class="text-sm font-medium text-gray-500 truncate">Total Utilisateurs</dt>
-                <dd class="text-lg font-medium text-gray-900">{{ stats.totalUsers }}</dd>
-              </dl>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="bg-white overflow-hidden shadow rounded-lg">
-        <div class="p-5">
-          <div class="flex items-center">
-            <div class="flex-shrink-0">
-              <svg class="h-6 w-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
-              </svg>
-            </div>
-            <div class="ml-5 w-0 flex-1">
-              <dl>
-                <dt class="text-sm font-medium text-gray-500 truncate">Consommateurs</dt>
-                <dd class="text-lg font-medium text-gray-900">{{ stats.consumers }}</dd>
-              </dl>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="bg-white overflow-hidden shadow rounded-lg">
-        <div class="p-5">
-          <div class="flex items-center">
-            <div class="flex-shrink-0">
-              <svg class="h-6 w-6 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
-              </svg>
-            </div>
-            <div class="ml-5 w-0 flex-1">
-              <dl>
-                <dt class="text-sm font-medium text-gray-500 truncate">Commerçants</dt>
-                <dd class="text-lg font-medium text-gray-900">{{ stats.merchants }}</dd>
-              </dl>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="bg-white overflow-hidden shadow rounded-lg">
-        <div class="p-5">
-          <div class="flex items-center">
-            <div class="flex-shrink-0">
-              <svg class="h-6 w-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728L5.636 5.636m12.728 12.728L5.636 5.636"></path>
-              </svg>
-            </div>
-            <div class="ml-5 w-0 flex-1">
-              <dl>
-                <dt class="text-sm font-medium text-gray-500 truncate">Comptes Suspendus</dt>
-                <dd class="text-lg font-medium text-gray-900">{{ stats.suspended }}</dd>
-              </dl>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Filtres et recherche -->
-    <div class="bg-white shadow rounded-lg p-6 mb-6">
-      <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-2">Recherche</label>
-          <input
-            v-model="filters.search"
-            type="text"
-            placeholder="Nom, email, téléphone..."
-            class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-green-500 focus:border-green-500"
-          />
-        </div>
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-2">Rôle</label>
-          <select
-            v-model="filters.role"
-            class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-green-500 focus:border-green-500"
-          >
-            <option value="">Tous les rôles</option>
-            <option value="consumer">Consommateur</option>
-            <option value="merchant">Commerçant</option>
-            <option value="admin">Administrateur</option>
-          </select>
-        </div>
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-2">Statut</label>
-          <select
-            v-model="filters.status"
-            class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-green-500 focus:border-green-500"
-          >
-            <option value="">Tous les statuts</option>
-            <option value="active">Actif</option>
-            <option value="suspended">Suspendu</option>
-            <option value="pending">En attente</option>
-          </select>
-        </div>
-        <div class="flex items-end">
-          <button
-            @click="applyFilters"
-            class="w-full bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg"
-          >
-            Filtrer
-          </button>
-        </div>
-      </div>
-    </div>
-
-    <!-- Liste des utilisateurs -->
-    <div class="bg-white shadow overflow-hidden rounded-lg">
-      <div class="px-6 py-4 border-b border-gray-200">
-        <h3 class="text-lg font-medium text-gray-900">Liste des Utilisateurs</h3>
-      </div>
-
-      <div class="overflow-x-auto">
-        <table class="min-w-full divide-y divide-gray-200">
-          <thead class="bg-gray-50">
-            <tr>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Utilisateur
-              </th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Rôle
-              </th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Statut
-              </th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Inscription
-              </th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Dernière Activité
-              </th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Actions
-              </th>
-            </tr>
-          </thead>
-          <tbody class="bg-white divide-y divide-gray-200">
-            <tr v-for="user in paginatedUsers" :key="user.id">
-              <td class="px-6 py-4 whitespace-nowrap">
-                <div class="flex items-center">
-                  <div class="h-10 w-10 flex-shrink-0">
-                    <img class="h-10 w-10 rounded-full" :src="user.avatar" :alt="user.name" />
-                  </div>
-                  <div class="ml-4">
-                    <div class="text-sm font-medium text-gray-900">{{ user.name }}</div>
-                    <div class="text-sm text-gray-500">{{ user.email }}</div>
-                    <div class="text-sm text-gray-400">{{ user.phone }}</div>
-                  </div>
-                </div>
-              </td>
-              <td class="px-6 py-4 whitespace-nowrap">
-                <span :class="{
-                  'bg-green-100 text-green-800': user.role === 'consumer',
-                  'bg-orange-100 text-orange-800': user.role === 'merchant',
-                  'bg-purple-100 text-purple-800': user.role === 'admin'
-                }" class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full">
-                  {{ getRoleLabel(user.role) }}
-                </span>
-              </td>
-              <td class="px-6 py-4 whitespace-nowrap">
-                <span :class="{
-                  'bg-green-100 text-green-800': user.status === 'active',
-                  'bg-red-100 text-red-800': user.status === 'suspended',
-                  'bg-yellow-100 text-yellow-800': user.status === 'pending'
-                }" class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full">
-                  {{ getStatusLabel(user.status) }}
-                </span>
-              </td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                {{ formatDate(user.created_at) }}
-              </td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                {{ formatDate(user.last_activity) }}
-              </td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
-                <button
-                  @click="viewUser(user)"
-                  class="text-green-600 hover:text-green-900"
-                >
-                  Voir
-                </button>
-                <button
-                  v-if="user.status !== 'suspended'"
-                  @click="suspendUser(user)"
-                  class="text-red-600 hover:text-red-900"
-                >
-                  Suspendre
-                </button>
-                <button
-                  v-else
-                  @click="unsuspendUser(user)"
-                  class="text-green-600 hover:text-green-900"
-                >
-                  Réactiver
-                </button>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-
-      <!-- Pagination -->
-      <div class="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6">
-        <div class="flex-1 flex justify-between sm:hidden">
-          <button
-            @click="previousPage"
-            :disabled="currentPage === 1"
-            class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
-          >
-            Précédent
-          </button>
-          <button
-            @click="nextPage"
-            :disabled="currentPage === totalPages"
-            class="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
-          >
-            Suivant
-          </button>
-        </div>
-        <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+      <!-- En-tête -->
+      <div class="bg-white shadow rounded-lg p-6 mb-6">
+        <div class="flex items-center justify-between">
           <div>
-            <p class="text-sm text-gray-700">
-              Affichage de <span class="font-medium">{{ startItem }}</span> à <span class="font-medium">{{ endItem }}</span> sur <span class="font-medium">{{ totalUsers }}</span> utilisateurs
-            </p>
+            <h1 class="text-2xl font-bold text-gray-900">Gestion des Utilisateurs</h1>
+            <p class="mt-1 text-sm text-gray-500">Gérez les consommateurs et commerçants de la plateforme</p>
+          </div>
+          <div class="flex items-center space-x-3">
+            <button
+              class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg flex items-center"
+              @click="refreshData"
+            >
+              <svg
+                class="w-4 h-4 mr-2"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                />
+              </svg>
+              Actualiser
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Statistiques utilisateurs -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+        <div class="bg-white overflow-hidden shadow rounded-lg">
+          <div class="p-5">
+            <div class="flex items-center">
+              <div class="flex-shrink-0">
+                <svg
+                  class="h-6 w-6 text-green-600"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"
+                  />
+                </svg>
+              </div>
+              <div class="ml-5 w-0 flex-1">
+                <dl>
+                  <dt class="text-sm font-medium text-gray-500 truncate">Total Utilisateurs</dt>
+                  <dd class="text-lg font-medium text-gray-900">{{ stats.totalUsers }}</dd>
+                </dl>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-white overflow-hidden shadow rounded-lg">
+          <div class="p-5">
+            <div class="flex items-center">
+              <div class="flex-shrink-0">
+                <svg
+                  class="h-6 w-6 text-blue-600"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                  />
+                </svg>
+              </div>
+              <div class="ml-5 w-0 flex-1">
+                <dl>
+                  <dt class="text-sm font-medium text-gray-500 truncate">Consommateurs</dt>
+                  <dd class="text-lg font-medium text-gray-900">{{ stats.consumers }}</dd>
+                </dl>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-white overflow-hidden shadow rounded-lg">
+          <div class="p-5">
+            <div class="flex items-center">
+              <div class="flex-shrink-0">
+                <svg
+                  class="h-6 w-6 text-orange-600"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
+                  />
+                </svg>
+              </div>
+              <div class="ml-5 w-0 flex-1">
+                <dl>
+                  <dt class="text-sm font-medium text-gray-500 truncate">Commerçants</dt>
+                  <dd class="text-lg font-medium text-gray-900">{{ stats.merchants }}</dd>
+                </dl>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-white overflow-hidden shadow rounded-lg">
+          <div class="p-5">
+            <div class="flex items-center">
+              <div class="flex-shrink-0">
+                <svg
+                  class="h-6 w-6 text-red-600"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728L5.636 5.636m12.728 12.728L5.636 5.636"
+                  />
+                </svg>
+              </div>
+              <div class="ml-5 w-0 flex-1">
+                <dl>
+                  <dt class="text-sm font-medium text-gray-500 truncate">Comptes Suspendus</dt>
+                  <dd class="text-lg font-medium text-gray-900">{{ stats.suspended }}</dd>
+                </dl>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Filtres et recherche -->
+      <div class="bg-white shadow rounded-lg p-6 mb-6">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Recherche</label>
+            <input
+              v-model="filters.search"
+              type="text"
+              placeholder="Nom, email, téléphone..."
+              class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-green-500 focus:border-green-500"
+            >
           </div>
           <div>
-            <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px">
-              <button
-                @click="previousPage"
-                :disabled="currentPage === 1"
-                class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50"
-              >
-                Précédent
-              </button>
-              <button
-                v-for="page in displayPages"
-                :key="page"
-                @click="goToPage(page)"
-                :class="{
-                  'bg-green-50 border-green-500 text-green-600': page === currentPage,
-                  'bg-white border-gray-300 text-gray-500 hover:bg-gray-50': page !== currentPage
-                }"
-                class="relative inline-flex items-center px-4 py-2 border text-sm font-medium"
-              >
-                {{ page }}
-              </button>
-              <button
-                @click="nextPage"
-                :disabled="currentPage === totalPages"
-                class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50"
-              >
-                Suivant
-              </button>
-            </nav>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Rôle</label>
+            <select
+              v-model="filters.role"
+              class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-green-500 focus:border-green-500"
+            >
+              <option value="">Tous les rôles</option>
+              <option value="consumer">Consommateur</option>
+              <option value="merchant">Commerçant</option>
+              <option value="admin">Administrateur</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Statut</label>
+            <select
+              v-model="filters.status"
+              class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-green-500 focus:border-green-500"
+            >
+              <option value="">Tous les statuts</option>
+              <option value="active">Actif</option>
+              <option value="suspended">Suspendu</option>
+              <option value="pending">En attente</option>
+            </select>
+          </div>
+          <div class="flex items-end">
+            <button
+              class="w-full bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg"
+              @click="applyFilters"
+            >
+              Filtrer
+            </button>
           </div>
         </div>
       </div>
-    </div>
 
-    <!-- Modal de confirmation -->
-    <ConfirmModal
-      :is-open="confirmModal.isOpen"
-      :type="confirmModal.type"
-      :title="confirmModal.title"
-      :message="confirmModal.message"
-      :confirm-text="confirmModal.confirmText"
-      :cancel-text="confirmModal.cancelText"
-      @confirm="confirmModal.onConfirm"
-      @cancel="closeConfirmModal"
-    />
+      <!-- Liste des utilisateurs -->
+      <div class="bg-white shadow overflow-hidden rounded-lg">
+        <div class="px-6 py-4 border-b border-gray-200">
+          <h3 class="text-lg font-medium text-gray-900">Liste des Utilisateurs</h3>
+        </div>
 
-    <!-- Notifications toast -->
-    <div class="fixed top-4 right-4 z-[110] space-y-4">
-      <NotificationToast
-        v-for="notification in notifications"
-        :key="notification.id"
-        :type="notification.type"
-        :title="notification.title"
-        :message="notification.message"
-        @close="removeNotification(notification.id)"
+        <div class="overflow-x-auto">
+          <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-50">
+              <tr>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Utilisateur
+                </th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Rôle
+                </th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Statut
+                </th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Inscription
+                </th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Dernière Activité
+                </th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Actions
+                </th>
+              </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200">
+              <tr v-for="user in paginatedUsers" :key="user.id">
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <div class="flex items-center">
+                    <div class="h-10 w-10 flex-shrink-0">
+                      <img class="h-10 w-10 rounded-full" :src="user.avatar" :alt="user.name">
+                    </div>
+                    <div class="ml-4">
+                      <div class="text-sm font-medium text-gray-900">{{ user.name }}</div>
+                      <div class="text-sm text-gray-500">{{ user.email }}</div>
+                      <div class="text-sm text-gray-400">{{ user.phone }}</div>
+                    </div>
+                  </div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <span
+                    :class="{
+                      'bg-green-100 text-green-800': user.role === 'consumer',
+                      'bg-orange-100 text-orange-800': user.role === 'merchant',
+                      'bg-purple-100 text-purple-800': user.role === 'admin'
+                    }"
+                    class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full"
+                  >
+                    {{ getRoleLabel(user.role) }}
+                  </span>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <span
+                    :class="{
+                      'bg-green-100 text-green-800': user.status === 'active',
+                      'bg-red-100 text-red-800': user.status === 'suspended',
+                      'bg-yellow-100 text-yellow-800': user.status === 'pending'
+                    }"
+                    class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full"
+                  >
+                    {{ getStatusLabel(user.status) }}
+                  </span>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                  {{ formatDate(user.created_at) }}
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                  {{ formatDate(user.last_activity) }}
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
+                  <button
+                    class="text-green-600 hover:text-green-900"
+                    @click="viewUser(user)"
+                  >
+                    Voir
+                  </button>
+                  <button
+                    v-if="user.status !== 'suspended'"
+                    class="text-red-600 hover:text-red-900"
+                    @click="suspendUser(user)"
+                  >
+                    Suspendre
+                  </button>
+                  <button
+                    v-else
+                    class="text-green-600 hover:text-green-900"
+                    @click="unsuspendUser(user)"
+                  >
+                    Réactiver
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Pagination -->
+        <div class="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6">
+          <div class="flex-1 flex justify-between sm:hidden">
+            <button
+              :disabled="currentPage === 1"
+              class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
+              @click="previousPage"
+            >
+              Précédent
+            </button>
+            <button
+              :disabled="currentPage === totalPages"
+              class="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
+              @click="nextPage"
+            >
+              Suivant
+            </button>
+          </div>
+          <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+            <div>
+              <p class="text-sm text-gray-700">
+                Affichage de <span class="font-medium">{{ startItem }}</span> à <span class="font-medium">{{ endItem }}</span> sur <span class="font-medium">{{ totalUsers }}</span> utilisateurs
+              </p>
+            </div>
+            <div>
+              <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px">
+                <button
+                  :disabled="currentPage === 1"
+                  class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50"
+                  @click="previousPage"
+                >
+                  Précédent
+                </button>
+                <button
+                  v-for="page in displayPages"
+                  :key="page"
+                  :class="{
+                    'bg-green-50 border-green-500 text-green-600': page === currentPage,
+                    'bg-white border-gray-300 text-gray-500 hover:bg-gray-50': page !== currentPage
+                  }"
+                  class="relative inline-flex items-center px-4 py-2 border text-sm font-medium"
+                  @click="goToPage(page)"
+                >
+                  {{ page }}
+                </button>
+                <button
+                  :disabled="currentPage === totalPages"
+                  class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50"
+                  @click="nextPage"
+                >
+                  Suivant
+                </button>
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Modal de confirmation -->
+      <ConfirmModal
+        :is-open="confirmModal.isOpen"
+        :type="confirmModal.type"
+        :title="confirmModal.title"
+        :message="confirmModal.message"
+        :confirm-text="confirmModal.confirmText"
+        :cancel-text="confirmModal.cancelText"
+        @confirm="confirmModal.onConfirm"
+        @cancel="closeConfirmModal"
       />
-    </div>
+
+      <!-- Notifications toast -->
+      <div class="fixed top-4 right-4 z-[110] space-y-4">
+        <NotificationToast
+          v-for="notification in notifications"
+          :key="notification.id"
+          :type="notification.type"
+          :title="notification.title"
+          :message="notification.message"
+          @close="removeNotification(notification.id)"
+        />
+      </div>
     </div>
   </DashboardLayout>
 </template>

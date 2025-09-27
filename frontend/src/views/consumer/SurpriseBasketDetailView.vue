@@ -11,7 +11,7 @@
       </button>
 
       <Card v-if="isLoading" class="flex min-h-[240px] items-center justify-center text-neutral-500">
-        <span class="inline-flex h-6 w-6 animate-spin rounded-full border-2 border-neutral-200 border-t-primary-500"></span>
+        <span class="inline-flex h-6 w-6 animate-spin rounded-full border-2 border-neutral-200 border-t-primary-500" />
         <span class="ml-3">Chargement du panier surprise...</span>
       </Card>
 
@@ -34,7 +34,7 @@
               :src="basket.image_url"
               :alt="basket.name"
               class="h-full w-full object-cover"
-            />
+            >
             <div
               v-else
               class="flex h-full w-full items-center justify-center bg-gradient-to-br from-primary-50 to-accent-blue/5"
@@ -117,13 +117,13 @@
             <Label for="quantity">Quantité</Label>
             <input
               id="quantity"
+              v-model.number="quantity"
               type="number"
               min="1"
               :max="Math.max(1, maxQuantity)"
               class="input-field-2025"
               :disabled="maxQuantity === 0"
-              v-model.number="quantity"
-            />
+            >
             <p class="text-xs text-neutral-500">{{ maxQuantity }} panier{{ maxQuantity > 1 ? 's' : '' }} restant{{ maxQuantity > 1 ? 's' : '' }}</p>
           </div>
 
@@ -178,7 +178,7 @@
                   'border-accent-red/50 focus:border-accent-red/50 focus:ring-accent-red/20': mobileMoneyPhone && !isPhoneValid
                 }"
                 :disabled="submitting"
-              />
+              >
               <p class="text-xs text-neutral-500">Utilisez un numéro enregistré sur le portefeuille sélectionné.</p>
               <p v-if="phoneError" class="text-xs font-medium text-accent-red">{{ phoneError }}</p>
             </div>

@@ -5,320 +5,320 @@
     class="bg-gradient-to-br from-green-50 to-blue-50"
   >
     <div class="container-2025 py-6">
-    <!-- Header -->
-    <div class="mb-8">
-      <div class="flex items-center gap-4 mb-4">
-        <router-link
-          to="/merchant/products"
-          class="flex items-center text-neutral-600 hover:text-neutral-900 transition-colors"
-        >
-          <ArrowLeftIcon class="w-5 h-5 mr-2" />
-          Retour aux produits
-        </router-link>
-      </div>
-
-      <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
-        <div>
-          <h1 class="text-3xl lg:text-4xl font-bold text-neutral-900 mb-2">
-            {{ product ? 'Modifier le produit' : 'Chargement...' }}
-          </h1>
-          <p class="text-neutral-600 text-lg">
-            {{ product ? product.name : 'Veuillez patienter...' }}
-          </p>
-        </div>
-
-        <div class="flex gap-4" v-if="product">
-          <Button
-            variant="destructive"
-            @click="deleteProduct"
-            :disabled="loading"
+      <!-- Header -->
+      <div class="mb-8">
+        <div class="flex items-center gap-4 mb-4">
+          <router-link
+            to="/merchant/products"
+            class="flex items-center text-neutral-600 hover:text-neutral-900 transition-colors"
           >
-            <TrashIcon class="w-5 h-5 mr-2" />
-            Supprimer
-          </Button>
+            <ArrowLeftIcon class="w-5 h-5 mr-2" />
+            Retour aux produits
+          </router-link>
+        </div>
+
+        <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
+          <div>
+            <h1 class="text-3xl lg:text-4xl font-bold text-neutral-900 mb-2">
+              {{ product ? 'Modifier le produit' : 'Chargement...' }}
+            </h1>
+            <p class="text-neutral-600 text-lg">
+              {{ product ? product.name : 'Veuillez patienter...' }}
+            </p>
+          </div>
+
+          <div v-if="product" class="flex gap-4">
+            <Button
+              variant="destructive"
+              :disabled="loading"
+              @click="deleteProduct"
+            >
+              <TrashIcon class="w-5 h-5 mr-2" />
+              Supprimer
+            </Button>
+          </div>
         </div>
       </div>
-    </div>
 
-    <!-- Loading State -->
-    <Card v-if="!product && !error">
-      <div class="flex items-center justify-center py-12">
-        <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600"></div>
-        <span class="ml-3 text-neutral-600">Chargement du produit...</span>
-      </div>
-    </Card>
-
-    <!-- Error State -->
-    <Card v-if="error" variant="bordered" class="bg-red-50 border-red-200">
-      <div class="flex items-center justify-center py-8">
-        <AlertCircleIcon class="w-8 h-8 text-red-500 mr-3" />
-        <div>
-          <h3 class="text-lg font-semibold text-red-800 mb-1">Erreur de chargement</h3>
-          <p class="text-red-600">{{ error }}</p>
+      <!-- Loading State -->
+      <Card v-if="!product && !error">
+        <div class="flex items-center justify-center py-12">
+          <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600" />
+          <span class="ml-3 text-neutral-600">Chargement du produit...</span>
         </div>
-      </div>
-    </Card>
+      </Card>
 
-    <!-- Main Form -->
-    <form @submit.prevent="saveProduct" v-if="product && !error">
-      <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <!-- Main Form -->
-        <div class="lg:col-span-2 space-y-6">
-          <Card>
-            <template #header>
-              <h3 class="text-xl font-semibold text-neutral-900">Informations générales</h3>
-            </template>
+      <!-- Error State -->
+      <Card v-if="error" variant="bordered" class="bg-red-50 border-red-200">
+        <div class="flex items-center justify-center py-8">
+          <AlertCircleIcon class="w-8 h-8 text-red-500 mr-3" />
+          <div>
+            <h3 class="text-lg font-semibold text-red-800 mb-1">Erreur de chargement</h3>
+            <p class="text-red-600">{{ error }}</p>
+          </div>
+        </div>
+      </Card>
 
-            <div class="space-y-6">
-              <!-- Product Name -->
-              <div>
-                <label for="name" class="block text-sm font-medium text-neutral-700 mb-2">
-                  Nom du produit <span class="text-red-500">*</span>
-                </label>
-                <Input
-                  id="name"
-                  v-model="product.name"
-                  :error="errors.name"
-                  placeholder="Ex: Pain complet artisanal"
-                  required
-                />
-              </div>
+      <!-- Main Form -->
+      <form v-if="product && !error" @submit.prevent="saveProduct">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <!-- Main Form -->
+          <div class="lg:col-span-2 space-y-6">
+            <Card>
+              <template #header>
+                <h3 class="text-xl font-semibold text-neutral-900">Informations générales</h3>
+              </template>
 
-              <!-- Description -->
-              <div>
-                <label for="description" class="block text-sm font-medium text-neutral-700 mb-2">
-                  Description
-                </label>
-                <textarea
-                  id="description"
-                  v-model="product.description"
-                  rows="4"
-                  class="w-full px-4 py-3 text-neutral-900 bg-white border border-neutral-200 rounded-xl shadow-sm placeholder:text-neutral-400 transition-all duration-200 focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
-                  :class="{ 'border-red-300 bg-red-50 focus:ring-red-500 focus:border-red-500': errors.description }"
-                  placeholder="Décrivez votre produit..."
-                ></textarea>
-                <p v-if="errors.description" class="mt-2 text-sm text-red-600">{{ errors.description }}</p>
-              </div>
-
-              <!-- Category -->
-              <div>
-                <label for="category" class="block text-sm font-medium text-neutral-700 mb-2">
-                  Catégorie <span class="text-red-500">*</span>
-                </label>
-                <select
-                  id="category"
-                  v-model="product.category_id"
-                  class="w-full px-4 py-3 text-neutral-900 bg-white border border-neutral-200 rounded-xl shadow-sm transition-all duration-200 focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
-                  :class="{ 'border-red-300 bg-red-50 focus:ring-red-500 focus:border-red-500': errors.category_id }"
-                  required
-                >
-                  <option value="">Sélectionner une catégorie</option>
-                  <option v-for="category in categories" :key="category.id" :value="category.id">
-                    {{ category.name }}
-                  </option>
-                </select>
-                <p v-if="errors.category_id" class="mt-2 text-sm text-red-600">{{ errors.category_id }}</p>
-              </div>
-            </div>
-          </Card>
-
-          <Card>
-            <template #header>
-              <h3 class="text-xl font-semibold text-neutral-900">Prix et disponibilité</h3>
-            </template>
-
-            <div class="space-y-6">
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <!-- Original Price -->
+              <div class="space-y-6">
+                <!-- Product Name -->
                 <div>
-                  <label for="original_price" class="block text-sm font-medium text-neutral-700 mb-2">
-                    Prix original (XOF) <span class="text-red-500">*</span>
+                  <label for="name" class="block text-sm font-medium text-neutral-700 mb-2">
+                    Nom du produit <span class="text-red-500">*</span>
                   </label>
                   <Input
-                    id="original_price"
-                    type="number"
-                    v-model="product.original_price"
-                    :error="errors.original_price"
-                    placeholder="0"
-                    min="0"
-                    step="0.01"
+                    id="name"
+                    v-model="product.name"
+                    :error="errors.name"
+                    placeholder="Ex: Pain complet artisanal"
                     required
                   />
                 </div>
 
-                <!-- Discounted Price -->
+                <!-- Description -->
                 <div>
-                  <label for="discounted_price" class="block text-sm font-medium text-neutral-700 mb-2">
-                    Prix réduit (XOF) <span class="text-red-500">*</span>
+                  <label for="description" class="block text-sm font-medium text-neutral-700 mb-2">
+                    Description
+                  </label>
+                  <textarea
+                    id="description"
+                    v-model="product.description"
+                    rows="4"
+                    class="w-full px-4 py-3 text-neutral-900 bg-white border border-neutral-200 rounded-xl shadow-sm placeholder:text-neutral-400 transition-all duration-200 focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                    :class="{ 'border-red-300 bg-red-50 focus:ring-red-500 focus:border-red-500': errors.description }"
+                    placeholder="Décrivez votre produit..."
+                  />
+                  <p v-if="errors.description" class="mt-2 text-sm text-red-600">{{ errors.description }}</p>
+                </div>
+
+                <!-- Category -->
+                <div>
+                  <label for="category" class="block text-sm font-medium text-neutral-700 mb-2">
+                    Catégorie <span class="text-red-500">*</span>
+                  </label>
+                  <select
+                    id="category"
+                    v-model="product.category_id"
+                    class="w-full px-4 py-3 text-neutral-900 bg-white border border-neutral-200 rounded-xl shadow-sm transition-all duration-200 focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                    :class="{ 'border-red-300 bg-red-50 focus:ring-red-500 focus:border-red-500': errors.category_id }"
+                    required
+                  >
+                    <option value="">Sélectionner une catégorie</option>
+                    <option v-for="category in categories" :key="category.id" :value="category.id">
+                      {{ category.name }}
+                    </option>
+                  </select>
+                  <p v-if="errors.category_id" class="mt-2 text-sm text-red-600">{{ errors.category_id }}</p>
+                </div>
+              </div>
+            </Card>
+
+            <Card>
+              <template #header>
+                <h3 class="text-xl font-semibold text-neutral-900">Prix et disponibilité</h3>
+              </template>
+
+              <div class="space-y-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <!-- Original Price -->
+                  <div>
+                    <label for="original_price" class="block text-sm font-medium text-neutral-700 mb-2">
+                      Prix original (XOF) <span class="text-red-500">*</span>
+                    </label>
+                    <Input
+                      id="original_price"
+                      v-model="product.original_price"
+                      type="number"
+                      :error="errors.original_price"
+                      placeholder="0"
+                      min="0"
+                      step="0.01"
+                      required
+                    />
+                  </div>
+
+                  <!-- Discounted Price -->
+                  <div>
+                    <label for="discounted_price" class="block text-sm font-medium text-neutral-700 mb-2">
+                      Prix réduit (XOF) <span class="text-red-500">*</span>
+                    </label>
+                    <Input
+                      id="discounted_price"
+                      v-model="product.discounted_price"
+                      type="number"
+                      :error="errors.discounted_price"
+                      placeholder="0"
+                      min="0"
+                      step="0.01"
+                      required
+                    />
+                  </div>
+                </div>
+
+                <!-- Quantity -->
+                <div>
+                  <label for="quantity_available" class="block text-sm font-medium text-neutral-700 mb-2">
+                    Quantité disponible <span class="text-red-500">*</span>
                   </label>
                   <Input
-                    id="discounted_price"
+                    id="quantity_available"
+                    v-model="product.quantity_available"
                     type="number"
-                    v-model="product.discounted_price"
-                    :error="errors.discounted_price"
+                    :error="errors.quantity_available"
                     placeholder="0"
                     min="0"
-                    step="0.01"
                     required
                   />
                 </div>
+
+                <!-- Expiry Date -->
+                <div>
+                  <label for="expires_at" class="block text-sm font-medium text-neutral-700 mb-2">
+                    Date d'expiration
+                  </label>
+                  <Input
+                    id="expires_at"
+                    v-model="product.expires_at"
+                    type="datetime-local"
+                    :error="errors.expires_at"
+                  />
+                </div>
               </div>
+            </Card>
 
-              <!-- Quantity -->
-              <div>
-                <label for="quantity_available" class="block text-sm font-medium text-neutral-700 mb-2">
-                  Quantité disponible <span class="text-red-500">*</span>
-                </label>
-                <Input
-                  id="quantity_available"
-                  type="number"
-                  v-model="product.quantity_available"
-                  :error="errors.quantity_available"
-                  placeholder="0"
-                  min="0"
-                  required
-                />
+            <Card>
+              <template #header>
+                <h3 class="text-xl font-semibold text-neutral-900">Image du produit</h3>
+              </template>
+
+              <div class="space-y-4">
+                <!-- Image Preview -->
+                <div v-if="product.image_url" class="flex items-center gap-4">
+                  <img :src="product.image_url" :alt="product.name" class="w-24 h-24 object-cover rounded-xl">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    @click="removeImage"
+                  >
+                    <TrashIcon class="w-4 h-4 mr-2" />
+                    Supprimer l'image
+                  </Button>
+                </div>
+
+                <!-- Image Upload -->
+                <div class="border-2 border-dashed border-neutral-300 rounded-xl p-6 text-center hover:border-primary-400 transition-colors">
+                  <input
+                    ref="imageInput"
+                    type="file"
+                    accept="image/*"
+                    class="hidden"
+                    @change="handleImageUpload"
+                  >
+                  <Button
+                    variant="ghost"
+                    class="w-full"
+                    @click="$refs.imageInput.click()"
+                  >
+                    <CloudUploadIcon class="w-5 h-5 mr-2" />
+                    {{ product.image_url ? 'Changer l\'image' : 'Ajouter une image' }}
+                  </Button>
+                  <p class="text-sm text-neutral-500 mt-2">PNG, JPG jusqu'à 2MB</p>
+                </div>
               </div>
+            </Card>
 
-              <!-- Expiry Date -->
-              <div>
-                <label for="expires_at" class="block text-sm font-medium text-neutral-700 mb-2">
-                  Date d'expiration
-                </label>
-                <Input
-                  id="expires_at"
-                  type="datetime-local"
-                  v-model="product.expires_at"
-                  :error="errors.expires_at"
-                />
-              </div>
-            </div>
-          </Card>
-
-          <Card>
-            <template #header>
-              <h3 class="text-xl font-semibold text-neutral-900">Image du produit</h3>
-            </template>
-
-            <div class="space-y-4">
-              <!-- Image Preview -->
-              <div v-if="product.image_url" class="flex items-center gap-4">
-                <img :src="product.image_url" :alt="product.name" class="w-24 h-24 object-cover rounded-xl" />
-                <Button
-                  variant="outline"
-                  size="sm"
-                  @click="removeImage"
-                >
-                  <TrashIcon class="w-4 h-4 mr-2" />
-                  Supprimer l'image
-                </Button>
-              </div>
-
-              <!-- Image Upload -->
-              <div class="border-2 border-dashed border-neutral-300 rounded-xl p-6 text-center hover:border-primary-400 transition-colors">
-                <input
-                  type="file"
-                  ref="imageInput"
-                  @change="handleImageUpload"
-                  accept="image/*"
-                  class="hidden"
-                />
+            <!-- Actions -->
+            <Card>
+              <div class="flex flex-col sm:flex-row gap-4 justify-end">
                 <Button
                   variant="ghost"
-                  @click="$refs.imageInput.click()"
-                  class="w-full"
+                  :disabled="saving"
+                  @click="$router.push('/merchant/products')"
                 >
-                  <CloudUploadIcon class="w-5 h-5 mr-2" />
-                  {{ product.image_url ? 'Changer l\'image' : 'Ajouter une image' }}
+                  Annuler
                 </Button>
-                <p class="text-sm text-neutral-500 mt-2">PNG, JPG jusqu'à 2MB</p>
+                <Button
+                  variant="primary"
+                  type="submit"
+                  :disabled="saving"
+                  :loading="saving"
+                >
+                  {{ saving ? 'Enregistrement...' : 'Enregistrer les modifications' }}
+                </Button>
               </div>
-            </div>
-          </Card>
+            </Card>
+          </div>
 
-          <!-- Actions -->
-          <Card>
-            <div class="flex flex-col sm:flex-row gap-4 justify-end">
-              <Button
-                variant="ghost"
-                @click="$router.push('/merchant/products')"
-                :disabled="saving"
-              >
-                Annuler
-              </Button>
-              <Button
-                variant="primary"
-                type="submit"
-                :disabled="saving"
-                :loading="saving"
-              >
-                {{ saving ? 'Enregistrement...' : 'Enregistrer les modifications' }}
-              </Button>
-            </div>
-          </Card>
+          <!-- Sidebar -->
+          <div class="space-y-6">
+            <Card>
+              <template #header>
+                <h3 class="text-lg font-semibold text-neutral-900">Status</h3>
+              </template>
+
+              <div class="space-y-4">
+                <div class="flex items-center justify-between">
+                  <span class="text-sm font-medium text-neutral-700">Statut</span>
+                  <Badge :variant="product.status === 'active' ? 'success' : 'secondary'">
+                    {{ product.status === 'active' ? 'Actif' : 'Inactif' }}
+                  </Badge>
+                </div>
+
+                <div class="flex items-center justify-between">
+                  <span class="text-sm font-medium text-neutral-700">Réduction</span>
+                  <Badge variant="warning">
+                    -{{ Math.round(((product.original_price - product.discounted_price) / product.original_price) * 100) }}%
+                  </Badge>
+                </div>
+
+                <div class="flex items-center justify-between">
+                  <span class="text-sm font-medium text-neutral-700">Créé le</span>
+                  <span class="text-sm text-neutral-500">{{ formatDate(product.created_at) }}</span>
+                </div>
+
+                <div class="flex items-center justify-between">
+                  <span class="text-sm font-medium text-neutral-700">Modifié le</span>
+                  <span class="text-sm text-neutral-500">{{ formatDate(product.updated_at) }}</span>
+                </div>
+              </div>
+            </Card>
+
+            <Card>
+              <template #header>
+                <h3 class="text-lg font-semibold text-neutral-900">Statistiques</h3>
+              </template>
+
+              <div class="space-y-4">
+                <div class="flex items-center justify-between">
+                  <span class="text-sm font-medium text-neutral-700">Vues</span>
+                  <span class="text-sm font-semibold text-neutral-900">{{ product.views || 0 }}</span>
+                </div>
+
+                <div class="flex items-center justify-between">
+                  <span class="text-sm font-medium text-neutral-700">Réservations</span>
+                  <span class="text-sm font-semibold text-neutral-900">{{ product.reservations_count || 0 }}</span>
+                </div>
+
+                <div class="flex items-center justify-between">
+                  <span class="text-sm font-medium text-neutral-700">Revenus</span>
+                  <span class="text-sm font-semibold text-primary-600">
+                    {{ formatPrice((product.reservations_count || 0) * product.discounted_price) }}
+                  </span>
+                </div>
+              </div>
+            </Card>
+          </div>
         </div>
-
-        <!-- Sidebar -->
-        <div class="space-y-6">
-          <Card>
-            <template #header>
-              <h3 class="text-lg font-semibold text-neutral-900">Status</h3>
-            </template>
-
-            <div class="space-y-4">
-              <div class="flex items-center justify-between">
-                <span class="text-sm font-medium text-neutral-700">Statut</span>
-                <Badge :variant="product.status === 'active' ? 'success' : 'secondary'">
-                  {{ product.status === 'active' ? 'Actif' : 'Inactif' }}
-                </Badge>
-              </div>
-
-              <div class="flex items-center justify-between">
-                <span class="text-sm font-medium text-neutral-700">Réduction</span>
-                <Badge variant="warning">
-                  -{{ Math.round(((product.original_price - product.discounted_price) / product.original_price) * 100) }}%
-                </Badge>
-              </div>
-
-              <div class="flex items-center justify-between">
-                <span class="text-sm font-medium text-neutral-700">Créé le</span>
-                <span class="text-sm text-neutral-500">{{ formatDate(product.created_at) }}</span>
-              </div>
-
-              <div class="flex items-center justify-between">
-                <span class="text-sm font-medium text-neutral-700">Modifié le</span>
-                <span class="text-sm text-neutral-500">{{ formatDate(product.updated_at) }}</span>
-              </div>
-            </div>
-          </Card>
-
-          <Card>
-            <template #header>
-              <h3 class="text-lg font-semibold text-neutral-900">Statistiques</h3>
-            </template>
-
-            <div class="space-y-4">
-              <div class="flex items-center justify-between">
-                <span class="text-sm font-medium text-neutral-700">Vues</span>
-                <span class="text-sm font-semibold text-neutral-900">{{ product.views || 0 }}</span>
-              </div>
-
-              <div class="flex items-center justify-between">
-                <span class="text-sm font-medium text-neutral-700">Réservations</span>
-                <span class="text-sm font-semibold text-neutral-900">{{ product.reservations_count || 0 }}</span>
-              </div>
-
-              <div class="flex items-center justify-between">
-                <span class="text-sm font-medium text-neutral-700">Revenus</span>
-                <span class="text-sm font-semibold text-primary-600">
-                  {{ formatPrice((product.reservations_count || 0) * product.discounted_price) }}
-                </span>
-              </div>
-            </div>
-          </Card>
-        </div>
-      </div>
-    </form>
+      </form>
     </div>
   </DashboardLayout>
 </template>

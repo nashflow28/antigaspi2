@@ -17,7 +17,7 @@
           @keydown.arrow-down.prevent="navigateResults(1)"
           @keydown.arrow-up.prevent="navigateResults(-1)"
           @keydown.escape="clearResults"
-        />
+        >
 
         <!-- Search Icon -->
         <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
@@ -28,14 +28,14 @@
         <div class="absolute inset-y-0 right-0 pr-4 flex items-center">
           <button
             v-if="searchQuery && !loading"
-            @click="clearSearch"
             class="p-1 hover:bg-gray-100 rounded-full transition-colors"
             type="button"
+            @click="clearSearch"
           >
             <X class="w-4 h-4 text-gray-400" />
           </button>
           <div v-else-if="loading" class="p-1">
-            <div class="animate-spin w-4 h-4 border-2 border-primary-500 border-t-transparent rounded-full"></div>
+            <div class="animate-spin w-4 h-4 border-2 border-primary-500 border-t-transparent rounded-full" />
           </div>
         </div>
       </div>
@@ -49,7 +49,7 @@
           <!-- Loading State -->
           <div v-if="loading" class="p-4 text-center text-gray-500">
             <div class="flex items-center justify-center space-x-2">
-              <div class="animate-spin w-4 h-4 border-2 border-primary-500 border-t-transparent rounded-full"></div>
+              <div class="animate-spin w-4 h-4 border-2 border-primary-500 border-t-transparent rounded-full" />
               <span class="text-sm">Recherche en cours...</span>
             </div>
           </div>
@@ -67,12 +67,12 @@
             <button
               v-for="(result, index) in results"
               :key="`${result.place_id || result.lat}-${index}`"
-              @click="selectResult(result)"
               :class="[
                 'w-full text-left px-4 py-3 hover:bg-gray-50 transition-colors border-b border-gray-100 last:border-b-0',
                 { 'bg-primary-50': index === selectedIndex }
               ]"
               type="button"
+              @click="selectResult(result)"
             >
               <div class="flex items-start space-x-3">
                 <MapPin class="w-4 h-4 text-gray-400 mt-1 flex-shrink-0" />
@@ -122,9 +122,9 @@
           </div>
         </div>
         <button
-          @click="clearSelection"
           class="p-1 hover:bg-primary-100 rounded-full transition-colors"
           type="button"
+          @click="clearSelection"
         >
           <X class="w-3 h-3 text-primary-500" />
         </button>
@@ -134,7 +134,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, nextTick, onMounted, onUnmounted } from 'vue'
+import { ref, onMounted, onUnmounted } from 'vue'
 import { Search, X, MapPin, AlertCircle } from 'lucide-vue-next'
 import { useGeolocation } from '@/composables/useGeolocation'
 import { debounce } from 'lodash-es'

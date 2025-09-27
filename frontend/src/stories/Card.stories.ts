@@ -1,6 +1,6 @@
-import type { Meta, StoryObj } from '@storybook/vue3';
-import Card from '@/components/ui/2025/Card.vue';
-import Button from '@/components/ui/2025/Button.vue';
+import type { Meta, StoryObj } from '@storybook/vue3'
+import Card from '@/components/ui/2025/Card.vue'
+import Button from '@/components/ui/2025/Button.vue'
 
 type CardComponent = typeof Card;
 
@@ -18,7 +18,7 @@ const meta: Meta<CardComponent & StoryProps> = {
   component: Card,
   tags: ['autodocs'],
   parameters: {
-    layout: 'centered',
+    layout: 'centered'
   },
   args: {
     variant: 'default',
@@ -31,50 +31,50 @@ const meta: Meta<CardComponent & StoryProps> = {
     body: 'Affichez un aperçu des performances de vos paniers et suivez les KPIs clés de votre activité.',
     footerLabel: 'Dernière mise à jour il y a 5 min',
     showHeader: true,
-    showFooter: true,
+    showFooter: true
   },
   argTypes: {
     variant: {
       control: { type: 'select' },
-      options: ['default', 'glass', 'gradient', 'bordered', 'elevated'],
+      options: ['default', 'glass', 'gradient', 'bordered', 'elevated']
     },
     interactive: {
-      control: { type: 'boolean' },
+      control: { type: 'boolean' }
     },
     noPadding: {
-      control: { type: 'boolean' },
+      control: { type: 'boolean' }
     },
     shadow: {
       control: { type: 'select' },
-      options: ['none', 'sm', 'md', 'lg', 'xl'],
+      options: ['none', 'sm', 'md', 'lg', 'xl']
     },
     rounded: {
       control: { type: 'select' },
-      options: ['none', 'sm', 'md', 'lg', 'xl', 'full'],
+      options: ['none', 'sm', 'md', 'lg', 'xl', 'full']
     },
     showHeader: {
-      control: { type: 'boolean' },
+      control: { type: 'boolean' }
     },
     showFooter: {
-      control: { type: 'boolean' },
+      control: { type: 'boolean' }
     },
     title: {
-      control: { type: 'text' },
+      control: { type: 'text' }
     },
     subtitle: {
-      control: { type: 'text' },
+      control: { type: 'text' }
     },
     body: {
-      control: { type: 'text' },
+      control: { type: 'text' }
     },
     footerLabel: {
-      control: { type: 'text' },
-    },
+      control: { type: 'text' }
+    }
   },
   render: (args) => ({
     components: { Card, Button },
     setup() {
-      return { args };
+      return { args }
     },
     template: `
       <Card
@@ -103,15 +103,15 @@ const meta: Meta<CardComponent & StoryProps> = {
           </div>
         </template>
       </Card>
-    `,
-  }),
-};
+    `
+  })
+}
 
-export default meta;
+export default meta
 
 type Story = StoryObj<typeof meta>;
 
-export const Playground: Story = {};
+export const Playground: Story = {}
 
 export const GlassHighlight: Story = {
   args: {
@@ -120,12 +120,12 @@ export const GlassHighlight: Story = {
     shadow: 'lg',
     title: 'Visibilité renforcée',
     subtitle: 'Mise en avant marketing',
-    body: 'Utilisez cette variante pour les éléments clés de la page qui nécessitent une attention accrue et un effet premium.',
+    body: 'Utilisez cette variante pour les éléments clés de la page qui nécessitent une attention accrue et un effet premium.'
   },
   parameters: {
-    pseudo: { hover: ['article'] },
-  },
-};
+    pseudo: { hover: ['article'] }
+  }
+}
 
 export const Minimal: Story = {
   args: {
@@ -135,9 +135,9 @@ export const Minimal: Story = {
     noPadding: true,
     showFooter: false,
     subtitle: '',
-    body: "Idéal pour des blocs secondaires ou des cartes d'information discrètes.",
-  },
-};
+    body: "Idéal pour des blocs secondaires ou des cartes d'information discrètes."
+  }
+}
 
 export const DarkMode: Story = {
   args: {
@@ -145,27 +145,27 @@ export const DarkMode: Story = {
     interactive: true,
     shadow: 'xl',
     body: 'La variante elevated combine ombres profondes et surfaces contrastées pour le mode sombre.',
-    footerLabel: 'Action requise',
+    footerLabel: 'Action requise'
   },
   parameters: {
     backgrounds: { default: 'Surface Dark' },
-    globals: { theme: 'dark' },
-  },
-};
+    globals: { theme: 'dark' }
+  }
+}
 
 export const ResponsiveGrid: Story = {
   args: {
-    showFooter: false,
+    showFooter: false
   },
   parameters: {
     layout: 'fullscreen',
-    viewport: { defaultViewport: 'tablet' },
+    viewport: { defaultViewport: 'tablet' }
   },
   decorators: [
     (story, context) => ({
       components: { Story: story() },
       setup() {
-        return { args: context.args };
+        return { args: context.args }
       },
       template: `
         <div class="mx-auto grid w-full max-w-5xl gap-6 px-6 py-10 sm:grid-cols-2 lg:grid-cols-3">
@@ -173,7 +173,7 @@ export const ResponsiveGrid: Story = {
           <Story :args="{ ...args, variant: 'glass', interactive: true, shadow: 'lg', title: 'Conversion', body: 'Optimisez votre tunnel de commande.' }" />
           <Story :args="{ ...args, variant: 'gradient', rounded: 'xl', title: 'Satisfaction client', body: 'Surveillez vos avis et retours.' }" />
         </div>
-      `,
-    }),
-  ],
-};
+      `
+    })
+  ]
+}

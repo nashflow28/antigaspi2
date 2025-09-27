@@ -1,13 +1,23 @@
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import { resolve } from 'path'
+import { visualizer } from 'rollup-plugin-visualizer'
 
 export default defineConfig({
-  plugins: [vue()],
+  plugins: [
+    vue(),
+    // Bundle analyzer plugin
+    visualizer({
+      filename: 'dist/bundle-analysis.html',
+      open: false,
+      gzipSize: true,
+      brotliSize: true
+    })
+  ],
   resolve: {
     alias: {
-      '@': resolve(__dirname, 'src'),
-    },
+      '@': resolve(__dirname, 'src')
+    }
   },
   server: {
     port: 3000,
@@ -23,44 +33,114 @@ export default defineConfig({
     target: 'esnext',
     outDir: 'dist',
     assetsDir: 'assets',
+    sourcemap: false,
+    minify: 'terser',
+
+    // Performance optimizations
+    terserOptions: {
+      compress: {
+        drop_console: true,
+        drop_debugger: true,
+        pure_funcs: ['console.log', 'console.info', 'console.debug', 'console.warn'],
+        passes: 2
+      },
+      mangle: {
+        safari10: true
+      },
+      format: {
+        comments: false
+      }
+    },
+
+    // Bundle size optimization
+    chunkSizeWarningLimit: 500,
+
     rollupOptions: {
       output: {
-        manualChunks(id) {
-          if (!id.includes('node_modules')) {
-            return
+        // Advanced code splitting strategy
+        manualChunks: {
+          // Framework chunk (frequently used)
+          'vendor-vue': ['vue', 'vue-router', 'pinia'],
+
+          // UI library chunk (design system)
+          'vendor-ui': ['@headlessui/vue', '@heroicons/vue'],
+
+          // Heavy libraries - separate chunks
+          'vendor-charts': ['chart.js', 'vue-chart-3'],
+          'vendor-maps': ['@googlemaps/js-api-loader', 'leaflet'],
+          'vendor-utils': ['@vueuse/core', '@vueuse/motion'],
+
+          // Icon libraries
+          'vendor-icons': ['lucide-vue-next'],
+
+          // Network and utilities
+          'vendor-network': ['axios'],
+          'vendor-misc': ['dompurify']
+        },
+
+        // Optimize asset naming
+        assetFileNames: (assetInfo) => {
+          const info = assetInfo.name.split('.')
+          let extType = info[info.length - 1]
+
+          if (/png|jpe?g|svg|gif|tiff|bmp|ico/i.test(extType)) {
+            extType = 'img'
+          } else if (/woff2?|eot|ttf|otf/i.test(extType)) {
+            extType = 'fonts'
           }
 
-          if (id.includes('chart.js')) {
-            return 'chart'
-          }
+          return `assets/${extType}/[name]-[hash][extname]`
+        },
 
-          if (id.includes('leaflet')) {
-            return 'leaflet'
-          }
+        chunkFileNames: 'assets/js/[name]-[hash].js',
+        entryFileNames: 'assets/js/[name]-[hash].js'
+      },
 
-          if (id.includes('lucide')) {
-            return 'icons'
-          }
-
-          if (id.includes('@headlessui') || id.includes('@heroicons')) {
-            return 'headless-ui'
-          }
-
-          if (id.includes('@vueuse')) {
-            return 'vueuse'
-          }
-
-          if (id.includes('@googlemaps')) {
-            return 'maps'
-          }
-
-          if (id.includes('vue') || id.includes('pinia') || id.includes('vue-router')) {
-            return 'framework'
-          }
-        }
+      // Tree shaking optimization
+      treeshake: {
+        moduleSideEffects: false,
+        propertyReadSideEffects: false,
+        tryCatchDeoptimization: false
       }
-    }
+    },
+
+    // Enable asset optimization
+    assetsInlineLimit: 4096, // 4kb
+
+    // CSS optimization
+    cssCodeSplit: true,
+    cssMinify: true
   },
+
+  // Development optimizations
+  optimizeDeps: {
+    include: [
+      'vue',
+      'vue-router',
+      'pinia',
+      '@vueuse/core',
+      'axios'
+    ],
+    exclude: [
+      'chart.js',
+      'leaflet',
+      '@googlemaps/js-api-loader'
+    ]
+  },
+
+  // Performance settings
+  define: {
+    __VUE_OPTIONS_API__: false,
+    __VUE_PROD_DEVTOOLS__: false
+  },
+
+  // Additional performance configurations
+  esbuild: {
+    // Remove console logs in production
+    drop: ['console', 'debugger'],
+    legalComments: 'none'
+  },
+
   test: {
     globals: true,
     environment: 'jsdom',

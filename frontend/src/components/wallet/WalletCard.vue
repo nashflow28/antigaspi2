@@ -4,16 +4,16 @@
       <div class="flex items-center space-x-3">
         <div class="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center">
           <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
-            <path fill-rule="evenodd" d="M4 4a2 2 0 00-2 2v4a2 2 0 002 2V6h10a2 2 0 00-2-2H4zm2 6a2 2 0 012-2h8a2 2 0 012 2v4a2 2 0 01-2 2H8a2 2 0 01-2-2v-4zm6 4a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"></path>
+            <path fill-rule="evenodd" d="M4 4a2 2 0 00-2 2v4a2 2 0 002 2V6h10a2 2 0 00-2-2H4zm2 6a2 2 0 012-2h8a2 2 0 012 2v4a2 2 0 01-2 2H8a2 2 0 01-2-2v-4zm6 4a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd" />
           </svg>
         </div>
         <div>
           <h3 class="text-lg font-semibold">Portefeuille</h3>
-          <p class="text-green-100 text-sm">{{wallet?.currency || 'XOF'}}</p>
+          <p class="text-green-100 text-sm">{{ wallet?.currency || 'XOF' }}</p>
         </div>
       </div>
       <div class="text-right">
-        <div class="text-2xl font-bold">{{formattedBalance}}</div>
+        <div class="text-2xl font-bold">{{ formattedBalance }}</div>
         <div class="text-green-100 text-sm">Solde disponible</div>
       </div>
     </div>
@@ -21,23 +21,23 @@
     <div class="flex items-center justify-between text-sm">
       <div class="flex items-center space-x-4">
         <div class="flex items-center space-x-1">
-          <div class="w-2 h-2 rounded-full" :class="wallet?.is_active ? 'bg-green-300' : 'bg-red-300'"></div>
-          <span class="text-green-100">{{wallet?.is_active ? 'Actif' : 'Inactif'}}</span>
+          <div class="w-2 h-2 rounded-full" :class="wallet?.is_active ? 'bg-green-300' : 'bg-red-300'" />
+          <span class="text-green-100">{{ wallet?.is_active ? 'Actif' : 'Inactif' }}</span>
         </div>
         <div class="text-green-100">
-          Limite: {{formatAmount(wallet?.daily_limit || 0)}}
+          Limite: {{ formatAmount(wallet?.daily_limit || 0) }}
         </div>
       </div>
       <div class="flex space-x-2">
         <button
-          @click="$emit('recharge')"
           class="px-3 py-1 bg-white/20 rounded-lg hover:bg-white/30 transition-colors"
+          @click="$emit('recharge')"
         >
           Recharger
         </button>
         <button
-          @click="$emit('settings')"
           class="px-3 py-1 bg-white/20 rounded-lg hover:bg-white/30 transition-colors"
+          @click="$emit('settings')"
         >
           Paramètres
         </button>
@@ -47,13 +47,13 @@
     <div v-if="wallet?.remaining_daily_limit !== undefined" class="mt-4">
       <div class="flex justify-between text-sm text-green-100 mb-1">
         <span>Limite quotidienne restante</span>
-        <span>{{formatAmount(wallet.remaining_daily_limit)}}</span>
+        <span>{{ formatAmount(wallet.remaining_daily_limit) }}</span>
       </div>
       <div class="w-full bg-white/20 rounded-full h-2">
         <div
           class="bg-white rounded-full h-2 transition-all duration-300"
           :style="{width: dailyLimitPercentage + '%'}"
-        ></div>
+        />
       </div>
     </div>
   </div>
@@ -83,10 +83,6 @@ const props = withDefaults(defineProps<Props>(), {
   loading: false
 })
 
-const emit = defineEmits<{
-  recharge: []
-  settings: []
-}>()
 
 const formattedBalance = computed(() => {
   if (!props.wallet) return '0 XOF'

@@ -42,7 +42,7 @@
             >
               <slot name="sidebar-item" :item="item" :index="index">
                 <span class="flex h-5 w-5 items-center justify-center text-current">
-                  <component v-if="item.icon" :is="item.icon" />
+                  <component :is="item.icon" v-if="item.icon" />
                 </span>
                 <span class="flex-1 truncate">{{ item.label }}</span>
                 <span
@@ -58,7 +58,7 @@
 
         <div v-if="hasSidebarFooter" class="border-t border-neutral-200/70 p-4 dark:border-neutral-800">
           <slot name="sidebar-footer">
-            <component v-if="sidebar.footer" :is="sidebar.footer" />
+            <component :is="sidebar.footer" v-if="sidebar.footer" />
           </slot>
         </div>
       </div>
@@ -79,17 +79,27 @@
               aria-label="Ouvrir le menu"
               @click="openSidebar"
             >
-              <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+              <svg
+                class="h-6 w-6"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M4 6h16M4 12h16M4 18h16"
+                />
               </svg>
             </button>
 
             <div class="flex flex-1 items-center justify-end gap-3">
               <slot name="header-notifications">
-                <component v-if="header.notifications" :is="header.notifications" class="hidden sm:block" />
+                <component :is="header.notifications" v-if="header.notifications" class="hidden sm:block" />
               </slot>
               <slot name="header-actions">
-                <component v-if="header.actions" :is="header.actions" class="hidden items-center gap-2 sm:flex" />
+                <component :is="header.actions" v-if="header.actions" class="hidden items-center gap-2 sm:flex" />
               </slot>
               <slot name="header-user" :user="header.user">
                 <div class="flex items-center gap-3 rounded-2xl bg-primary-500/10 px-3 py-2 text-left text-primary-800 transition-colors hover:bg-primary-500/15 dark:bg-primary-500/10 dark:text-primary-100">
@@ -98,7 +108,7 @@
                     :src="header.user.avatar"
                     :alt="header.user.name"
                     class="h-9 w-9 rounded-full object-cover"
-                  />
+                  >
                   <span v-else class="flex h-9 w-9 items-center justify-center rounded-full bg-primary-500 text-white">
                     {{ header.user.name.charAt(0).toUpperCase() }}
                   </span>
@@ -176,23 +186,23 @@ watch(
       sidebarOpen.value = false
     }
   },
-  { immediate: true },
+  { immediate: true }
 )
 
 const wrapperClasses = computed(() =>
   [
     'min-h-screen bg-neutral-50 text-neutral-800 dark:bg-neutral-900 dark:text-neutral-50',
-    props.class ?? '',
+    props.class ?? ''
   ]
     .filter(Boolean)
-    .join(' '),
+    .join(' ')
 )
 
 const asideClasses = computed(() =>
   [
     'fixed inset-y-0 left-0 z-50 w-72 transform border-r border-primary-500/10 bg-white/95 shadow-card dark:border-neutral-800 dark:bg-neutral-900/95',
-    'transition-transform duration-300 ease-in-out lg:translate-x-0',
-  ].join(' '),
+    'transition-transform duration-300 ease-in-out lg:translate-x-0'
+  ].join(' ')
 )
 
 const sidebarMotion = computed(() => {
@@ -210,7 +220,7 @@ const navigationItemClasses = (item: NavigationEntry) =>
     'group flex items-center gap-3 rounded-2xl px-4 py-3 text-small font-medium transition-all duration-200',
     item.active
       ? 'bg-primary-500/10 text-primary-700 shadow-inner dark:text-primary-100'
-      : 'text-neutral-500 hover:bg-primary-200/20 hover:text-primary-700 dark:text-neutral-300 dark:hover:text-primary-100',
+      : 'text-neutral-500 hover:bg-primary-200/20 hover:text-primary-700 dark:text-neutral-300 dark:hover:text-primary-100'
   ]
     .filter(Boolean)
     .join(' ')
@@ -226,6 +236,6 @@ const closeSidebar = () => {
 const slots = useSlots()
 
 const hasSidebarFooter = computed(
-  () => !!(slots['sidebar-footer'] || props.sidebar.footer),
+  () => !!(slots['sidebar-footer'] || props.sidebar.footer)
 )
 </script>

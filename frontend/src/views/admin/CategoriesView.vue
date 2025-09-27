@@ -15,9 +15,9 @@
             </p>
           </div>
           <Button
-            @click="openCreateModal"
             variant="primary"
             class="flex items-center gap-2"
+            @click="openCreateModal"
           >
             <PlusIcon class="w-5 h-5" />
             Nouvelle Catégorie
@@ -94,7 +94,7 @@
                   type="text"
                   placeholder="Rechercher..."
                   class="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                />
+                >
               </div>
               <!-- Filter -->
               <select
@@ -111,7 +111,7 @@
 
         <!-- Loading State -->
         <div v-if="loading" class="px-6 py-12 text-center">
-          <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600 mx-auto mb-4"></div>
+          <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600 mx-auto mb-4" />
           <p class="text-gray-500">Chargement des catégories...</p>
         </div>
 
@@ -156,11 +156,11 @@
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap">
                   <button
-                    @click="toggleCategoryStatus(category)"
                     class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
                     :class="category.is_active
                       ? 'bg-green-100 text-green-800 hover:bg-green-200'
                       : 'bg-red-100 text-red-800 hover:bg-red-200'"
+                    @click="toggleCategoryStatus(category)"
                   >
                     {{ category.is_active ? 'Active' : 'Inactive' }}
                   </button>
@@ -168,25 +168,25 @@
                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                   <div class="flex items-center gap-2">
                     <button
-                      @click="viewCategory(category)"
                       class="text-blue-600 hover:text-blue-900"
                       title="Voir détails"
+                      @click="viewCategory(category)"
                     >
                       <EyeIcon class="w-4 h-4" />
                     </button>
                     <button
-                      @click="editCategory(category)"
                       class="text-indigo-600 hover:text-indigo-900"
                       title="Modifier"
+                      @click="editCategory(category)"
                     >
                       <PencilIcon class="w-4 h-4" />
                     </button>
                     <button
-                      @click="deleteCategory(category)"
                       class="text-red-600 hover:text-red-900"
                       title="Supprimer"
                       :disabled="(category.products_count ?? 0) > 0"
                       :class="{ 'opacity-50 cursor-not-allowed': (category.products_count ?? 0) > 0 }"
+                      @click="deleteCategory(category)"
                     >
                       <TrashIcon class="w-4 h-4" />
                     </button>
@@ -206,8 +206,8 @@
           </p>
           <Button
             v-if="!searchQuery"
-            @click="openCreateModal"
             variant="primary"
+            @click="openCreateModal"
           >
             Créer une catégorie
           </Button>
@@ -221,7 +221,7 @@
       <div
         class="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm transition-opacity"
         @click="closeModal"
-      ></div>
+      />
 
       <!-- Modal -->
       <div class="flex min-h-full items-center justify-center p-4">
@@ -239,8 +239,8 @@
                 <h3 class="text-xl font-semibold text-gray-900">{{ modal.title }}</h3>
               </div>
               <button
-                @click="closeModal"
                 class="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                @click="closeModal"
               >
                 <XMarkIcon class="w-5 h-5 text-gray-400" />
               </button>
@@ -249,79 +249,79 @@
 
           <!-- Form Content -->
           <div class="px-6 py-6">
-        <form @submit.prevent="saveCategory" class="space-y-6">
-          <div>
-            <label for="name" class="block text-sm font-medium text-gray-700 mb-2">
-              Nom de la catégorie *
-            </label>
-            <input
-              id="name"
-              v-model="form.name"
-              type="text"
-              required
-              maxlength="100"
-              class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-              placeholder="Ex: Fruits et Légumes"
-            />
-          </div>
+            <form class="space-y-6" @submit.prevent="saveCategory">
+              <div>
+                <label for="name" class="block text-sm font-medium text-gray-700 mb-2">
+                  Nom de la catégorie *
+                </label>
+                <input
+                  id="name"
+                  v-model="form.name"
+                  type="text"
+                  required
+                  maxlength="100"
+                  class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  placeholder="Ex: Fruits et Légumes"
+                >
+              </div>
 
-          <div>
-            <label for="description" class="block text-sm font-medium text-gray-700 mb-2">
-              Description *
-            </label>
-            <textarea
-              id="description"
-              v-model="form.description"
-              required
-              maxlength="500"
-              rows="3"
-              class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-              placeholder="Description de la catégorie..."
-            ></textarea>
-          </div>
+              <div>
+                <label for="description" class="block text-sm font-medium text-gray-700 mb-2">
+                  Description *
+                </label>
+                <textarea
+                  id="description"
+                  v-model="form.description"
+                  required
+                  maxlength="500"
+                  rows="3"
+                  class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  placeholder="Description de la catégorie..."
+                />
+              </div>
 
-          <div>
-            <label for="icon" class="block text-sm font-medium text-gray-700 mb-2">
-              Icône (emoji)
-            </label>
-            <input
-              id="icon"
-              v-model="form.icon"
-              type="text"
-              maxlength="10"
-              class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-              placeholder="🥬"
-            />
-          </div>
+              <div>
+                <label for="icon" class="block text-sm font-medium text-gray-700 mb-2">
+                  Icône (emoji)
+                </label>
+                <input
+                  id="icon"
+                  v-model="form.icon"
+                  type="text"
+                  maxlength="10"
+                  class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  placeholder="🥬"
+                >
+              </div>
 
-          <div v-if="editingCategory">
-            <label class="flex items-center">
-              <input
-                v-model="form.is_active"
-                type="checkbox"
-                class="rounded border-gray-300 text-primary-600 focus:ring-primary-500"
-              />
-              <span class="ml-2 text-sm text-gray-700">Catégorie active</span>
-            </label>
-          </div>
+              <div v-if="editingCategory">
+                <label class="flex items-center">
+                  <input
+                    v-model="form.is_active"
+                    type="checkbox"
+                    class="rounded border-gray-300 text-primary-600 focus:ring-primary-500"
+                  >
+                  <span class="ml-2 text-sm text-gray-700">Catégorie active</span>
+                </label>
+              </div>
 
-          <div class="flex justify-end gap-3 pt-4">
-            <button
-              type="button"
-              @click="closeModal"
-              class="px-4 py-2 text-gray-600 hover:text-gray-800 font-medium transition-colors"
-            >
-              Annuler
-            </button>
-            <button
-              type="submit"
-              :disabled="saving"
-              class="px-6 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 font-medium transition-colors disabled:opacity-50"
-            >
-              {{ saving ? 'Enregistrement...' : (editingCategory ? 'Modifier' : 'Créer') }}
-            </button>
-          </div>
-        </form>
+              <div class="flex justify-end gap-3 pt-4">
+                <button
+                  type="button"
+                  class="px-4 py-2 text-gray-600 hover:text-gray-800 font-medium transition-colors"
+                  @click="closeModal"
+                >
+                  Annuler
+                </button>
+                <button
+                  type="submit"
+                  :disabled="saving"
+                  class="px-6 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 font-medium transition-colors disabled:opacity-50"
+                >
+                  {{ saving ? 'Enregistrement...' : (editingCategory ? 'Modifier' : 'Créer') }}
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       </div>
@@ -653,7 +653,7 @@ const viewCategory = (category: Category) => {
   modal.value = {
     show: true,
     title: `Détails - ${category.name}`,
-    content: `📊 Informations de la catégorie\n\n` +
+    content: '📊 Informations de la catégorie\n\n' +
       `• Nom: ${category.name}\n` +
       `• Description: ${category.description}\n` +
       `• Icône: ${category.icon || 'Aucune'}\n` +

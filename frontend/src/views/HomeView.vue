@@ -4,16 +4,16 @@
     <section class="relative bg-gradient-to-br from-primary-500 via-primary-600 to-accent-blue/90 text-white overflow-hidden" data-testid="hero-section">
       <!-- Background decorative elements -->
       <div class="absolute inset-0">
-        <div class="absolute top-0 left-0 w-72 h-72 bg-accent-orange/20 rounded-full blur-3xl animate-pulse-glow"></div>
-        <div class="absolute bottom-0 right-0 w-96 h-96 bg-accent-blue/20 rounded-full blur-3xl animate-pulse-glow" style="animation-delay: 1s;"></div>
-        <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-white/10 rounded-full blur-2xl"></div>
+        <div class="absolute top-0 left-0 w-72 h-72 bg-accent-orange/20 rounded-full blur-3xl animate-pulse-glow" />
+        <div class="absolute bottom-0 right-0 w-96 h-96 bg-accent-blue/20 rounded-full blur-3xl animate-pulse-glow" style="animation-delay: 1s;" />
+        <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-white/10 rounded-full blur-2xl" />
       </div>
 
       <div class="relative container-2025 py-32 lg:py-40">
         <div class="text-center max-w-5xl mx-auto">
           <!-- Badge avec animation -->
           <div class="inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-sm rounded-full text-sm font-medium mb-8 animate-fade-in-up">
-            <span class="w-2 h-2 bg-primary-400 rounded-full animate-pulse"></span>
+            <span class="w-2 h-2 bg-primary-400 rounded-full animate-pulse" />
             <span>Ensemble contre le gaspillage alimentaire</span>
           </div>
 
@@ -51,7 +51,7 @@
               <span class="relative z-10 flex items-center gap-3">
                 🌟 Découvrir les offres
               </span>
-              <div class="absolute inset-0 bg-nav-gradient opacity-0 group-hover:opacity-10 transition-opacity duration-300"></div>
+              <div class="absolute inset-0 bg-nav-gradient opacity-0 group-hover:opacity-10 transition-opacity duration-300" />
             </Button>
 
             <Button
@@ -88,8 +88,13 @@
 
       <!-- Wave divider -->
       <div class="absolute bottom-0 left-0 right-0">
-        <svg class="w-full h-20 text-neutral-50" fill="currentColor" viewBox="0 0 1200 120" preserveAspectRatio="none">
-          <path d="M1200 120L0 16.48V120H1200Z"></path>
+        <svg
+          class="w-full h-20 text-neutral-50"
+          fill="currentColor"
+          viewBox="0 0 1200 120"
+          preserveAspectRatio="none"
+        >
+          <path d="M1200 120L0 16.48V120H1200Z" />
         </svg>
       </div>
     </section>
@@ -100,7 +105,7 @@
         <!-- Section Header -->
         <div class="text-center mb-20 animate-fade-in-up">
           <div class="inline-flex items-center gap-2 px-4 py-2 bg-primary-50 rounded-full text-sm font-medium text-primary-600 mb-6">
-            <span class="w-2 h-2 bg-primary-500 rounded-full"></span>
+            <span class="w-2 h-2 bg-primary-500 rounded-full" />
             Processus simple en 3 étapes
           </div>
           <h2 class="text-4xl lg:text-5xl font-semibold text-neutral-900 mb-6 text-balance font-display">
@@ -138,11 +143,11 @@
               <!-- Mini feature list -->
               <div class="space-y-2 text-sm text-neutral-500">
                 <div class="flex items-center gap-2">
-                  <span class="w-1.5 h-1.5 bg-primary-500 rounded-full"></span>
+                  <span class="w-1.5 h-1.5 bg-primary-500 rounded-full" />
                   <span>Géolocalisation intelligente</span>
                 </div>
                 <div class="flex items-center gap-2">
-                  <span class="w-1.5 h-1.5 bg-primary-500 rounded-full"></span>
+                  <span class="w-1.5 h-1.5 bg-primary-500 rounded-full" />
                   <span>Filtres avancés</span>
                 </div>
               </div>
@@ -171,11 +176,11 @@
 
               <div class="space-y-2 text-sm text-neutral-500">
                 <div class="flex items-center gap-2">
-                  <span class="w-1.5 h-1.5 bg-accent-blue/50 rounded-full"></span>
+                  <span class="w-1.5 h-1.5 bg-accent-blue/50 rounded-full" />
                   <span>Réservation instantanée</span>
                 </div>
                 <div class="flex items-center gap-2">
-                  <span class="w-1.5 h-1.5 bg-accent-blue/50 rounded-full"></span>
+                  <span class="w-1.5 h-1.5 bg-accent-blue/50 rounded-full" />
                   <span>Paiement sécurisé</span>
                 </div>
               </div>
@@ -204,11 +209,11 @@
 
               <div class="space-y-2 text-sm text-neutral-500">
                 <div class="flex items-center gap-2">
-                  <span class="w-1.5 h-1.5 bg-accent-orange rounded-full"></span>
+                  <span class="w-1.5 h-1.5 bg-accent-orange rounded-full" />
                   <span>Impact environnemental</span>
                 </div>
                 <div class="flex items-center gap-2">
-                  <span class="w-1.5 h-1.5 bg-accent-orange rounded-full"></span>
+                  <span class="w-1.5 h-1.5 bg-accent-orange rounded-full" />
                   <span>Économies réalisées</span>
                 </div>
               </div>

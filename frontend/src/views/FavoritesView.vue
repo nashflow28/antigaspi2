@@ -67,8 +67,8 @@
                 <button
                   type="button"
                   class="rounded-full bg-primary-50 p-2 text-primary-600 transition hover:bg-primary-100"
-                  @click="removeFavorite(favorite)"
                   aria-label="Retirer des favoris"
+                  @click="removeFavorite(favorite)"
                 >
                   <HeartOff class="h-4 w-4" />
                 </button>
@@ -166,7 +166,7 @@ const { items, hasFavorites } = storeToRefs(favoritesStore)
 const filters = [
   { value: 'all', label: 'Tous' },
   { value: 'merchant', label: 'Commerçants' },
-  { value: 'product', label: 'Paniers' },
+  { value: 'product', label: 'Paniers' }
 ]
 const filter = ref<'all' | 'merchant' | 'product'>('all')
 

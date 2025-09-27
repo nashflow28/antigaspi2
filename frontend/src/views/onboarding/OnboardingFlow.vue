@@ -24,7 +24,7 @@
             <div
               class="h-2.5 rounded-full bg-gradient-to-r from-primary-500 via-cyan-500 to-blue-500 transition-all duration-500"
               :style="{ width: `${progress}%` }"
-            ></div>
+            />
           </div>
           <ul class="mt-4 space-y-2 text-sm text-neutral-500">
             <li
@@ -179,14 +179,14 @@ const steps: StepDefinition[] = [
       {
         title: 'Choisissez vos catégories favorites',
         content: 'Boulangerie, fruits & légumes, traiteur… sélectionnez ce qui vous fait envie pour des recommandations plus pertinentes.',
-        icon: Heart,
+        icon: Heart
       },
       {
         title: 'Activez les alertes locales',
         content: 'En autorisant la localisation, nous pouvons vous prévenir lorsqu’un panier intéressant est disponible près de vous.',
-        icon: MapPin,
-      },
-    ],
+        icon: MapPin
+      }
+    ]
   },
   {
     title: 'Réservez un panier en quelques clics',
@@ -197,14 +197,14 @@ const steps: StepDefinition[] = [
       {
         title: 'Consultez la fiche détaillée',
         content: 'Accédez aux informations essentielles : contenu estimé, heure de récupération, avis des clients.',
-        icon: ShieldCheck,
+        icon: ShieldCheck
       },
       {
         title: 'Réglez et suivez votre commande',
         content: 'Paiement par portefeuille AntiGaspi, mobile money ou sur place. Recevez un récapitulatif dans votre profil.',
-        icon: Wallet,
-      },
-    ],
+        icon: Wallet
+      }
+    ]
   },
   {
     title: 'Restez informé en temps réel',
@@ -215,15 +215,15 @@ const steps: StepDefinition[] = [
       {
         title: 'Suivez vos commerçants favoris',
         content: 'Ajoutez-les à vos favoris pour recevoir leurs actualités en priorité.',
-        icon: Heart,
+        icon: Heart
       },
       {
         title: 'Recevez des rappels automatiques',
         content: 'Nous vous avertissons avant la fin de vos créneaux de retrait afin d’éviter toute perte.',
-        icon: BellRing,
-      },
-    ],
-  },
+        icon: BellRing
+      }
+    ]
+  }
 ]
 
 const insights = [
@@ -231,14 +231,14 @@ const insights = [
     title: 'Portefeuille AntiGaspi',
     description: 'Centralisez vos remboursements et cagnotte fidélité pour payer plus rapidement vos prochains paniers.',
     category: 'Astuce',
-    icon: Wallet,
+    icon: Wallet
   },
   {
     title: 'Astuces anti-gaspillage',
     description: 'Chaque panier réservé débloque des conseils pour conserver vos produits plus longtemps.',
     category: 'Conseils',
-    icon: ShieldCheck,
-  },
+    icon: ShieldCheck
+  }
 ]
 
 const activeStep = computed(() => steps[currentStep.value] ?? steps[0])

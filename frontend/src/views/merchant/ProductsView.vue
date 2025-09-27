@@ -5,503 +5,513 @@
     class="bg-gradient-to-br from-green-50 to-blue-50"
   >
     <div class="p-6">
-    <!-- Header -->
-    <div class="mb-8">
-      <div class="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
-        <div>
-          <h1 class="mb-2 text-3xl font-bold text-neutral-900 lg:text-4xl">
-            Mes Produits
-          </h1>
-          <p class="text-lg text-neutral-600">
-            Gérez vos produits et réduisez le gaspillage
-          </p>
-        </div>
-
-        <div class="flex flex-col gap-4 sm:flex-row">
-          <Button
-            variant="primary"
-            size="lg"
-            :left-icon="PlusIcon"
-            class="shadow-lg shadow-primary-500/25"
-            @click="showAddProductModal = true"
-          >
-            Ajouter un produit
-          </Button>
-
-          <Input
-            v-model="searchQuery"
-            :left-icon="MagnifyingGlassIcon"
-            placeholder="Rechercher des produits..."
-            variant="outline"
-            class="w-full sm:w-80"
-          />
-        </div>
-      </div>
-
-      <!-- Quick stats -->
-      <div class="mt-6 grid grid-cols-1 gap-4 md:grid-cols-4">
-        <Card
-          variant="elevated"
-          class="bg-gradient-to-r from-primary-500 to-primary-600 text-white shadow-lg shadow-primary-500/20"
-        >
-          <div class="flex items-center justify-between">
-            <div>
-              <p class="text-sm font-medium text-primary-100">Total Produits</p>
-              <p class="text-3xl font-bold">{{ products.length }}</p>
-            </div>
-            <div class="rounded-xl bg-white/20 p-3">
-              <ShoppingBagIcon class="h-6 w-6" />
-            </div>
-          </div>
-        </Card>
-
-        <Card
-          variant="elevated"
-          class="bg-gradient-to-r from-primary-500 to-primary-600 text-white shadow-lg shadow-primary-500/20"
-        >
-          <div class="flex items-center justify-between">
-            <div>
-              <p class="text-sm font-medium text-primary-100">Produits Actifs</p>
-              <p class="text-3xl font-bold">{{ activeProducts.length }}</p>
-            </div>
-            <div class="rounded-xl bg-white/20 p-3">
-              <CheckCircleIcon class="h-6 w-6" />
-            </div>
-          </div>
-        </Card>
-
-        <Card
-          variant="elevated"
-          class="bg-gradient-to-r from-accent-orange to-accent-orange/90 text-white shadow-lg shadow-accent-orange/20"
-        >
-          <div class="flex items-center justify-between">
-            <div>
-              <p class="text-sm font-medium text-accent-orange/80">Stock Faible</p>
-              <p class="text-3xl font-bold">{{ lowStockProducts.length }}</p>
-            </div>
-            <div class="rounded-xl bg-white/20 p-3">
-              <ExclamationTriangleIcon class="h-6 w-6" />
-            </div>
-          </div>
-        </Card>
-
-        <Card
-          variant="elevated"
-          class="bg-gradient-to-r from-accent-red to-accent-red/90 text-white shadow-lg shadow-accent-red/20"
-        >
-          <div class="flex items-center justify-between">
-            <div>
-              <p class="text-sm font-medium text-accent-red/70">Expire Bientôt</p>
-              <p class="text-3xl font-bold">{{ expiringSoonProducts.length }}</p>
-            </div>
-            <div class="rounded-xl bg-white/20 p-3">
-              <ClockIcon class="h-6 w-6" />
-            </div>
-          </div>
-        </Card>
-      </div>
-    </div>
-
-    <!-- Filters and Controls -->
-    <Card class="mb-6">
-      <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-        <div class="flex flex-wrap gap-2">
-          <Button
-            v-for="filter in filters"
-            :key="filter.key"
-            size="sm"
-            :variant="activeFilter === filter.key ? 'secondary' : 'ghost'"
-            :class="[
-              'rounded-lg',
-              activeFilter === filter.key
-                ? 'border border-primary-200 bg-primary-50 text-primary-700 hover:bg-primary-100 hover:border-primary-300'
-                : 'text-neutral-600'
-            ]"
-            @click="activeFilter = filter.key"
-          >
-            {{ filter.label }}
-            <Badge
-              v-if="filter.count !== null"
-              variant="outline"
-              size="xs"
-              rounded
-              class="ml-2"
-            >
-              {{ filter.count }}
-            </Badge>
-          </Button>
-        </div>
-
-        <div class="flex items-center gap-3">
-          <label for="sort-by" class="text-sm font-medium text-neutral-600">Trier par</label>
-          <select
-            id="sort-by"
-            v-model="sortBy"
-            class="rounded-lg border border-neutral-300 bg-white px-4 py-2 text-sm font-medium text-neutral-700 shadow-sm transition-colors focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/30"
-          >
-            <option value="created_at">Plus récent</option>
-            <option value="name">Nom A-Z</option>
-            <option value="expiration_date">Date d'expiration</option>
-            <option value="discount_percentage">Remise %</option>
-          </select>
-        </div>
-      </div>
-    </Card>
-
-    <!-- Products Grid -->
-    <div v-if="filteredProducts.length > 0" class="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
-      <Card
-        v-for="product in filteredProducts"
-        :key="product.id"
-        variant="elevated"
-        interactive
-        class="space-y-6"
-      >
-        <!-- Product Image -->
-        <div class="relative">
-          <img
-            :src="product.image_url || '/images/placeholder.jpg'"
-            :alt="product.name"
-            class="h-48 w-full rounded-xl object-cover"
-          />
-          <div class="absolute left-3 top-3 flex flex-wrap gap-2">
-            <Badge
-              v-if="!product.is_active"
-              variant="secondary"
-              size="xs"
-              rounded
-              class="bg-neutral-500 text-white hover:bg-neutral-500/90"
-            >
-              Inactif
-            </Badge>
-            <Badge
-              v-if="product.quantity_available <= 5"
-              variant="warning"
-              size="xs"
-              rounded
-            >
-              Stock faible
-            </Badge>
-            <Badge
-              v-if="isExpiringSoon(product)"
-              variant="error"
-              size="xs"
-              rounded
-            >
-              Expire bientôt
-            </Badge>
+      <!-- Header -->
+      <div class="mb-8">
+        <div class="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
+          <div>
+            <h1 class="mb-2 text-3xl font-bold text-neutral-900 lg:text-4xl">
+              Mes Produits
+            </h1>
+            <p class="text-lg text-neutral-600">
+              Gérez vos produits et réduisez le gaspillage
+            </p>
           </div>
 
-          <div class="absolute right-3 top-3">
-            <Badge
+          <div class="flex flex-col gap-4 sm:flex-row">
+            <Button
               variant="primary"
-              size="sm"
-              rounded
-              class="font-semibold"
+              size="lg"
+              :left-icon="PlusIcon"
+              class="shadow-lg shadow-primary-500/25"
+              @click="showAddProductModal = true"
             >
-              -{{ product.discount_percentage }}%
-            </Badge>
-          </div>
-        </div>
+              Ajouter un produit
+            </Button>
 
-        <!-- Product Info -->
-        <div class="space-y-4">
-          <div>
-            <h3 class="text-lg font-semibold text-neutral-900">{{ product.name }}</h3>
-            <p class="mt-2 line-clamp-2 text-sm text-neutral-600">{{ product.description }}</p>
-          </div>
-
-          <div class="flex items-center justify-between">
-            <div class="flex items-center gap-2">
-              <span class="text-2xl font-bold text-primary-600">
-                {{ Math.round(product.discounted_price).toLocaleString('fr-FR') }} F CFA
-              </span>
-              <span class="text-sm text-neutral-400 line-through">
-                {{ Math.round(product.original_price).toLocaleString('fr-FR') }} F CFA
-              </span>
-            </div>
-
-            <div class="text-right">
-              <p class="text-sm text-neutral-600">Stock: {{ product.quantity_available }}</p>
-            </div>
-          </div>
-
-          <div class="flex items-center justify-between text-sm text-neutral-600">
-            <span>Expire: {{ formatDate(product.expiration_date) }}</span>
-            <span :class="getStatusColor(product)">{{ getStatusText(product) }}</span>
-          </div>
-        </div>
-
-        <!-- Actions -->
-        <div class="flex flex-wrap gap-2">
-          <Button
-            size="sm"
-            variant="outline"
-            class="flex-1"
-            :left-icon="PencilIcon"
-            @click="editProduct(product)"
-          >
-            Modifier
-          </Button>
-
-          <Button
-            size="sm"
-            variant="secondary"
-            class="flex-1"
-            :left-icon="product.is_active ? EyeSlashIcon : EyeIcon"
-            :class="product.is_active
-              ? 'border-amber-300 text-amber-600 hover:bg-amber-50'
-              : 'border-emerald-300 text-emerald-600 hover:bg-emerald-50'"
-            @click="toggleProductStatus(product)"
-          >
-            {{ product.is_active ? 'Désactiver' : 'Activer' }}
-          </Button>
-
-          <Button
-            size="sm"
-            variant="destructive"
-            class="px-3"
-            :left-icon="TrashIcon"
-            @click="deleteProduct(product)"
-          >
-            Supprimer
-          </Button>
-        </div>
-      </Card>
-    </div>
-
-    <!-- Empty State -->
-    <div v-else class="py-12 text-center">
-      <ShoppingBagIcon class="w-16 h-16 text-neutral-300 mx-auto mb-4" />
-      <h3 class="text-xl font-semibold text-neutral-900 mb-2">Aucun produit trouvé</h3>
-      <p class="text-neutral-600 mb-6">
-        {{ searchQuery ? 'Aucun produit ne correspond à votre recherche.' : 'Commencez par ajouter votre premier produit.' }}
-      </p>
-      <Button
-        size="lg"
-        :left-icon="PlusIcon"
-        @click="showAddProductModal = true"
-      >
-        Ajouter un produit
-      </Button>
-    </div>
-
-    <!-- Add/Edit Product Modal -->
-    <div
-      v-if="showAddProductModal || showEditProductModal"
-      class="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-[120]"
-      @click.self="closeModals"
-    >
-      <Card
-        variant="elevated"
-        class="w-full max-h-[90vh] max-w-2xl overflow-y-auto"
-      >
-        <div class="mb-6 flex items-center justify-between">
-          <h2 class="text-2xl font-bold text-neutral-900">
-            {{ showAddProductModal ? 'Ajouter un produit' : 'Modifier le produit' }}
-          </h2>
-          <Button
-            variant="ghost"
-            size="sm"
-            :left-icon="XMarkIcon"
-            class="text-neutral-400 hover:text-neutral-600"
-            @click="closeModals"
-          />
-        </div>
-
-        <form @submit.prevent="saveProduct" class="space-y-6">
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <label class="label">Nom du produit *</label>
-              <input
-                v-model="productForm.name"
-                type="text"
-                class="input w-full"
-                required
-              />
-            </div>
-
-            <div>
-              <label class="label">Catégorie</label>
-              <select v-model="productForm.category_id" class="input w-full">
-                <option value="">Sélectionner une catégorie</option>
-                <option v-for="category in categories" :key="category.id" :value="category.id">
-                  {{ category.name }}
-                </option>
-              </select>
-            </div>
-          </div>
-
-          <div>
-            <label class="label">Description</label>
-            <textarea
-              v-model="productForm.description"
-              class="input w-full"
-              rows="3"
-              placeholder="Décrivez votre produit..."
-            ></textarea>
-          </div>
-
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div>
-              <label class="label">Prix original (F CFA) *</label>
-              <input
-                v-model.number="productForm.original_price"
-                type="number"
-                step="0.01"
-                class="input w-full"
-                required
-              />
-            </div>
-
-            <div>
-              <label class="label">Remise (%) *</label>
-              <input
-                v-model.number="productForm.discount_percentage"
-                type="number"
-                min="1"
-                max="90"
-                class="input w-full"
-                required
-              />
-            </div>
-
-            <div>
-              <label class="label">Prix final (F CFA)</label>
-              <input
-                :value="calculatedDiscountedPrice"
-                type="text"
-                class="input w-full bg-neutral-100"
-                disabled
-              />
-            </div>
-          </div>
-
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <label class="label">Quantité disponible *</label>
-              <input
-                v-model.number="productForm.quantity_available"
-                type="number"
-                min="1"
-                class="input w-full"
-                required
-              />
-            </div>
-
-            <div>
-              <label class="label">Date d'expiration *</label>
-              <input
-                v-model="productForm.expiration_date"
-                type="date"
-                class="input w-full"
-                required
-              />
-            </div>
-          </div>
-
-          <div>
-            <label class="label">Image du produit</label>
-            <input
-              type="file"
-              @change="handleImageUpload"
-              accept="image/*"
-              class="input w-full"
+            <Input
+              v-model="searchQuery"
+              :left-icon="MagnifyingGlassIcon"
+              placeholder="Rechercher des produits..."
+              variant="outline"
+              class="w-full sm:w-80"
             />
-            <div v-if="productForm.image_url" class="mt-3">
-              <p class="text-sm text-neutral-600 mb-2">Aperçu :</p>
-              <img
-                :src="productForm.image_url"
-                alt="Aperçu du produit"
-                class="w-32 h-32 object-cover rounded-lg border"
-              />
+          </div>
+        </div>
+
+        <!-- Quick stats -->
+        <div class="mt-6 grid grid-cols-1 gap-4 md:grid-cols-4">
+          <Card
+            variant="elevated"
+            class="bg-gradient-to-r from-primary-500 to-primary-600 text-white shadow-lg shadow-primary-500/20"
+          >
+            <div class="flex items-center justify-between">
+              <div>
+                <p class="text-sm font-medium text-primary-100">Total Produits</p>
+                <p class="text-3xl font-bold">{{ products.length }}</p>
+              </div>
+              <div class="rounded-xl bg-white/20 p-3">
+                <ShoppingBagIcon class="h-6 w-6" />
+              </div>
             </div>
+          </Card>
+
+          <Card
+            variant="elevated"
+            class="bg-gradient-to-r from-primary-500 to-primary-600 text-white shadow-lg shadow-primary-500/20"
+          >
+            <div class="flex items-center justify-between">
+              <div>
+                <p class="text-sm font-medium text-primary-100">Produits Actifs</p>
+                <p class="text-3xl font-bold">{{ activeProducts.length }}</p>
+              </div>
+              <div class="rounded-xl bg-white/20 p-3">
+                <CheckCircleIcon class="h-6 w-6" />
+              </div>
+            </div>
+          </Card>
+
+          <Card
+            variant="elevated"
+            class="bg-gradient-to-r from-accent-orange to-accent-orange/90 text-white shadow-lg shadow-accent-orange/20"
+          >
+            <div class="flex items-center justify-between">
+              <div>
+                <p class="text-sm font-medium text-accent-orange/80">Stock Faible</p>
+                <p class="text-3xl font-bold">{{ lowStockProducts.length }}</p>
+              </div>
+              <div class="rounded-xl bg-white/20 p-3">
+                <ExclamationTriangleIcon class="h-6 w-6" />
+              </div>
+            </div>
+          </Card>
+
+          <Card
+            variant="elevated"
+            class="bg-gradient-to-r from-accent-red to-accent-red/90 text-white shadow-lg shadow-accent-red/20"
+          >
+            <div class="flex items-center justify-between">
+              <div>
+                <p class="text-sm font-medium text-accent-red/70">Expire Bientôt</p>
+                <p class="text-3xl font-bold">{{ expiringSoonProducts.length }}</p>
+              </div>
+              <div class="rounded-xl bg-white/20 p-3">
+                <ClockIcon class="h-6 w-6" />
+              </div>
+            </div>
+          </Card>
+        </div>
+      </div>
+
+      <!-- Filters and Controls -->
+      <Card class="mb-6">
+        <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+          <div class="flex flex-wrap gap-2">
+            <Button
+              v-for="filter in filters"
+              :key="filter.key"
+              size="sm"
+              :variant="activeFilter === filter.key ? 'secondary' : 'ghost'"
+              :class="[
+                'rounded-lg',
+                activeFilter === filter.key
+                  ? 'border border-primary-200 bg-primary-50 text-primary-700 hover:bg-primary-100 hover:border-primary-300'
+                  : 'text-neutral-600'
+              ]"
+              @click="activeFilter = filter.key"
+            >
+              {{ filter.label }}
+              <Badge
+                v-if="filter.count !== null"
+                variant="outline"
+                size="xs"
+                rounded
+                class="ml-2"
+              >
+                {{ filter.count }}
+              </Badge>
+            </Button>
           </div>
 
           <div class="flex items-center gap-3">
-            <input
-              v-model="productForm.is_active"
-              id="is_active"
-              type="checkbox"
-              class="w-5 h-5"
-            />
-            <label for="is_active" class="label mb-0">Produit actif</label>
-          </div>
-
-          <div class="flex gap-4 pt-4">
-            <Button
-              type="button"
-              variant="secondary"
-              class="flex-1"
-              @click="closeModals"
+            <label for="sort-by" class="text-sm font-medium text-neutral-600">Trier par</label>
+            <select
+              id="sort-by"
+              v-model="sortBy"
+              class="rounded-lg border border-neutral-300 bg-white px-4 py-2 text-sm font-medium text-neutral-700 shadow-sm transition-colors focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/30"
             >
-              Annuler
-            </Button>
-            <Button
-              type="submit"
-              class="flex-1"
-              :disabled="isSubmitting"
-            >
-              <span v-if="isSubmitting">Enregistrement...</span>
-              <span v-else>{{ showAddProductModal ? 'Ajouter' : 'Mettre à jour' }}</span>
-            </Button>
+              <option value="created_at">Plus récent</option>
+              <option value="name">Nom A-Z</option>
+              <option value="expiration_date">Date d'expiration</option>
+              <option value="discount_percentage">Remise %</option>
+            </select>
           </div>
-        </form>
+        </div>
       </Card>
-    </div>
 
-    <!-- Delete Confirmation Modal -->
-    <div
-      v-if="showDeleteConfirmModal"
-      class="fixed inset-0 bg-black/50 flex items-center justify-center z-[120] p-4"
-      @click="cancelDelete"
-    >
-      <Card
-        variant="elevated"
-        class="w-full max-w-md transform shadow-2xl transition-all hover:scale-[1.02]"
-        @click.stop
-      >
-        <div class="text-center">
-          <!-- Icon -->
-          <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100 mb-4">
-            <svg class="h-6 w-6 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
-            </svg>
+      <!-- Products Grid -->
+      <div v-if="filteredProducts.length > 0" class="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
+        <Card
+          v-for="product in filteredProducts"
+          :key="product.id"
+          variant="elevated"
+          interactive
+          class="space-y-6"
+        >
+          <!-- Product Image -->
+          <div class="relative">
+            <img
+              :src="product.image_url || '/images/placeholder.jpg'"
+              :alt="product.name"
+              class="h-48 w-full rounded-xl object-cover"
+            >
+            <div class="absolute left-3 top-3 flex flex-wrap gap-2">
+              <Badge
+                v-if="!product.is_active"
+                variant="secondary"
+                size="xs"
+                rounded
+                class="bg-neutral-500 text-white hover:bg-neutral-500/90"
+              >
+                Inactif
+              </Badge>
+              <Badge
+                v-if="product.quantity_available <= 5"
+                variant="warning"
+                size="xs"
+                rounded
+              >
+                Stock faible
+              </Badge>
+              <Badge
+                v-if="isExpiringSoon(product)"
+                variant="error"
+                size="xs"
+                rounded
+              >
+                Expire bientôt
+              </Badge>
+            </div>
+
+            <div class="absolute right-3 top-3">
+              <Badge
+                variant="primary"
+                size="sm"
+                rounded
+                class="font-semibold"
+              >
+                -{{ product.discount_percentage }}%
+              </Badge>
+            </div>
           </div>
 
-          <!-- Title -->
-          <h3 class="mb-2 text-lg font-semibold text-neutral-900">
-            Supprimer le produit
-          </h3>
+          <!-- Product Info -->
+          <div class="space-y-4">
+            <div>
+              <h3 class="text-lg font-semibold text-neutral-900">{{ product.name }}</h3>
+              <p class="mt-2 line-clamp-2 text-sm text-neutral-600">{{ product.description }}</p>
+            </div>
 
-          <!-- Message -->
-          <p class="mb-6 text-neutral-600">
-            Êtes-vous sûr de vouloir supprimer
-            <span class="font-semibold text-neutral-900">"{{ productToDelete?.name }}"</span> ?
-            Cette action est irréversible.
-          </p>
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <span class="text-2xl font-bold text-primary-600">
+                  {{ Math.round(product.discounted_price).toLocaleString('fr-FR') }} F CFA
+                </span>
+                <span class="text-sm text-neutral-400 line-through">
+                  {{ Math.round(product.original_price).toLocaleString('fr-FR') }} F CFA
+                </span>
+              </div>
 
-          <!-- Buttons -->
-          <div class="flex gap-3">
+              <div class="text-right">
+                <p class="text-sm text-neutral-600">Stock: {{ product.quantity_available }}</p>
+              </div>
+            </div>
+
+            <div class="flex items-center justify-between text-sm text-neutral-600">
+              <span>Expire: {{ formatDate(product.expiration_date) }}</span>
+              <span :class="getStatusColor(product)">{{ getStatusText(product) }}</span>
+            </div>
+          </div>
+
+          <!-- Actions -->
+          <div class="flex flex-wrap gap-2">
             <Button
+              size="sm"
+              variant="outline"
+              class="flex-1"
+              :left-icon="PencilIcon"
+              @click="editProduct(product)"
+            >
+              Modifier
+            </Button>
+
+            <Button
+              size="sm"
               variant="secondary"
               class="flex-1"
-              @click="cancelDelete"
+              :left-icon="product.is_active ? EyeSlashIcon : EyeIcon"
+              :class="product.is_active
+                ? 'border-amber-300 text-amber-600 hover:bg-amber-50'
+                : 'border-emerald-300 text-emerald-600 hover:bg-emerald-50'"
+              @click="toggleProductStatus(product)"
             >
-              Annuler
+              {{ product.is_active ? 'Désactiver' : 'Activer' }}
             </Button>
+
             <Button
+              size="sm"
               variant="destructive"
-              class="flex-1"
-              @click="confirmDelete"
+              class="px-3"
+              :left-icon="TrashIcon"
+              @click="deleteProduct(product)"
             >
               Supprimer
             </Button>
           </div>
-        </div>
-      </Card>
+        </Card>
+      </div>
+
+      <!-- Empty State -->
+      <div v-else class="py-12 text-center">
+        <ShoppingBagIcon class="w-16 h-16 text-neutral-300 mx-auto mb-4" />
+        <h3 class="text-xl font-semibold text-neutral-900 mb-2">Aucun produit trouvé</h3>
+        <p class="text-neutral-600 mb-6">
+          {{ searchQuery ? 'Aucun produit ne correspond à votre recherche.' : 'Commencez par ajouter votre premier produit.' }}
+        </p>
+        <Button
+          size="lg"
+          :left-icon="PlusIcon"
+          @click="showAddProductModal = true"
+        >
+          Ajouter un produit
+        </Button>
+      </div>
+
+      <!-- Add/Edit Product Modal -->
+      <div
+        v-if="showAddProductModal || showEditProductModal"
+        class="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-[120]"
+        @click.self="closeModals"
+      >
+        <Card
+          variant="elevated"
+          class="w-full max-h-[90vh] max-w-2xl overflow-y-auto"
+        >
+          <div class="mb-6 flex items-center justify-between">
+            <h2 class="text-2xl font-bold text-neutral-900">
+              {{ showAddProductModal ? 'Ajouter un produit' : 'Modifier le produit' }}
+            </h2>
+            <Button
+              variant="ghost"
+              size="sm"
+              :left-icon="XMarkIcon"
+              class="text-neutral-400 hover:text-neutral-600"
+              @click="closeModals"
+            />
+          </div>
+
+          <form class="space-y-6" @submit.prevent="saveProduct">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label class="label">Nom du produit *</label>
+                <input
+                  v-model="productForm.name"
+                  type="text"
+                  class="input w-full"
+                  required
+                >
+              </div>
+
+              <div>
+                <label class="label">Catégorie</label>
+                <select v-model="productForm.category_id" class="input w-full">
+                  <option value="">Sélectionner une catégorie</option>
+                  <option v-for="category in categories" :key="category.id" :value="category.id">
+                    {{ category.name }}
+                  </option>
+                </select>
+              </div>
+            </div>
+
+            <div>
+              <label class="label">Description</label>
+              <textarea
+                v-model="productForm.description"
+                class="input w-full"
+                rows="3"
+                placeholder="Décrivez votre produit..."
+              />
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div>
+                <label class="label">Prix original (F CFA) *</label>
+                <input
+                  v-model.number="productForm.original_price"
+                  type="number"
+                  step="0.01"
+                  class="input w-full"
+                  required
+                >
+              </div>
+
+              <div>
+                <label class="label">Remise (%) *</label>
+                <input
+                  v-model.number="productForm.discount_percentage"
+                  type="number"
+                  min="1"
+                  max="90"
+                  class="input w-full"
+                  required
+                >
+              </div>
+
+              <div>
+                <label class="label">Prix final (F CFA)</label>
+                <input
+                  :value="calculatedDiscountedPrice"
+                  type="text"
+                  class="input w-full bg-neutral-100"
+                  disabled
+                >
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label class="label">Quantité disponible *</label>
+                <input
+                  v-model.number="productForm.quantity_available"
+                  type="number"
+                  min="1"
+                  class="input w-full"
+                  required
+                >
+              </div>
+
+              <div>
+                <label class="label">Date d'expiration *</label>
+                <input
+                  v-model="productForm.expiration_date"
+                  type="date"
+                  class="input w-full"
+                  required
+                >
+              </div>
+            </div>
+
+            <div>
+              <label class="label">Image du produit</label>
+              <input
+                type="file"
+                accept="image/*"
+                class="input w-full"
+                @change="handleImageUpload"
+              >
+              <div v-if="productForm.image_url" class="mt-3">
+                <p class="text-sm text-neutral-600 mb-2">Aperçu :</p>
+                <img
+                  :src="productForm.image_url"
+                  alt="Aperçu du produit"
+                  class="w-32 h-32 object-cover rounded-lg border"
+                >
+              </div>
+            </div>
+
+            <div class="flex items-center gap-3">
+              <input
+                id="is_active"
+                v-model="productForm.is_active"
+                type="checkbox"
+                class="w-5 h-5"
+              >
+              <label for="is_active" class="label mb-0">Produit actif</label>
+            </div>
+
+            <div class="flex gap-4 pt-4">
+              <Button
+                type="button"
+                variant="secondary"
+                class="flex-1"
+                @click="closeModals"
+              >
+                Annuler
+              </Button>
+              <Button
+                type="submit"
+                class="flex-1"
+                :disabled="isSubmitting"
+              >
+                <span v-if="isSubmitting">Enregistrement...</span>
+                <span v-else>{{ showAddProductModal ? 'Ajouter' : 'Mettre à jour' }}</span>
+              </Button>
+            </div>
+          </form>
+        </Card>
+      </div>
+
+      <!-- Delete Confirmation Modal -->
+      <div
+        v-if="showDeleteConfirmModal"
+        class="fixed inset-0 bg-black/50 flex items-center justify-center z-[120] p-4"
+        @click="cancelDelete"
+      >
+        <Card
+          variant="elevated"
+          class="w-full max-w-md transform shadow-2xl transition-all hover:scale-[1.02]"
+          @click.stop
+        >
+          <div class="text-center">
+            <!-- Icon -->
+            <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100 mb-4">
+              <svg
+                class="h-6 w-6 text-red-600"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z"
+                />
+              </svg>
+            </div>
+
+            <!-- Title -->
+            <h3 class="mb-2 text-lg font-semibold text-neutral-900">
+              Supprimer le produit
+            </h3>
+
+            <!-- Message -->
+            <p class="mb-6 text-neutral-600">
+              Êtes-vous sûr de vouloir supprimer
+              <span class="font-semibold text-neutral-900">"{{ productToDelete?.name }}"</span> ?
+              Cette action est irréversible.
+            </p>
+
+            <!-- Buttons -->
+            <div class="flex gap-3">
+              <Button
+                variant="secondary"
+                class="flex-1"
+                @click="cancelDelete"
+              >
+                Annuler
+              </Button>
+              <Button
+                variant="destructive"
+                class="flex-1"
+                @click="confirmDelete"
+              >
+                Supprimer
+              </Button>
+            </div>
+          </div>
+        </Card>
+      </div>
     </div>
-  </div>
   </DashboardLayout>
 </template>
 

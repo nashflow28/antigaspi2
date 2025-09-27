@@ -7,8 +7,8 @@
         <p class="text-gray-600 mt-1">Gérez vos paniers surprise et maximisez vos ventes</p>
       </div>
       <button
-        @click="$emit('create')"
         class="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
+        @click="$emit('create')"
       >
         <Plus class="w-4 h-4 inline mr-2" />
         Nouveau panier
@@ -68,7 +68,7 @@
 
     <!-- Loading State -->
     <div v-if="loading" class="bg-white rounded-xl border border-gray-200 p-8 text-center">
-      <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600 mx-auto mb-4"></div>
+      <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600 mx-auto mb-4" />
       <p class="text-gray-600">Chargement de vos paniers surprise...</p>
     </div>
 
@@ -80,8 +80,8 @@
         Créez votre premier panier surprise pour valoriser vos invendus et attirer de nouveaux clients
       </p>
       <button
-        @click="$emit('create')"
         class="px-6 py-3 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
+        @click="$emit('create')"
       >
         <Plus class="w-4 h-4 inline mr-2" />
         Créer mon premier panier
@@ -102,7 +102,7 @@
             :src="basket.image_url"
             :alt="basket.name"
             class="w-full h-full object-cover"
-          />
+          >
           <div v-else class="w-full h-full flex items-center justify-center">
             <Package class="w-12 h-12 text-gray-400" />
           </div>
@@ -133,8 +133,8 @@
             <h3 class="text-lg font-semibold text-gray-900 line-clamp-1">{{ basket.name }}</h3>
             <div class="relative">
               <button
-                @click="toggleDropdown(basket.id)"
                 class="p-1 hover:bg-gray-100 rounded-lg transition-colors"
+                @click="toggleDropdown(basket.id)"
               >
                 <MoreVertical class="w-4 h-4 text-gray-500" />
               </button>
@@ -145,30 +145,30 @@
                 class="absolute right-0 top-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-10 py-1 w-48"
               >
                 <button
-                  @click="editBasket(basket)"
                   class="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center"
+                  @click="editBasket(basket)"
                 >
                   <Edit class="w-4 h-4 mr-2" />
                   Modifier
                 </button>
                 <button
-                  @click="toggleBasketStatus(basket)"
                   class="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center"
+                  @click="toggleBasketStatus(basket)"
                 >
                   <component :is="basket.is_active ? EyeOff : Eye" class="w-4 h-4 mr-2" />
                   {{ basket.is_active ? 'Désactiver' : 'Activer' }}
                 </button>
                 <button
-                  @click="viewBasket(basket)"
                   class="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center"
+                  @click="viewBasket(basket)"
                 >
                   <Eye class="w-4 h-4 mr-2" />
                   Voir les détails
                 </button>
-                <hr class="my-1" />
+                <hr class="my-1">
                 <button
-                  @click="confirmDelete(basket)"
                   class="w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-red-50 flex items-center"
+                  @click="confirmDelete(basket)"
                 >
                   <Trash2 class="w-4 h-4 mr-2" />
                   Supprimer
@@ -212,14 +212,14 @@
           <!-- Actions -->
           <div class="flex items-center space-x-2">
             <button
-              @click="editBasket(basket)"
               class="flex-1 px-3 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
+              @click="editBasket(basket)"
             >
               Modifier
             </button>
             <button
-              @click="viewBasket(basket)"
               class="flex-1 px-3 py-2 text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 rounded-lg transition-colors"
+              @click="viewBasket(basket)"
             >
               Détails
             </button>
@@ -232,9 +232,9 @@
   <!-- Click outside to close dropdown -->
   <div
     v-if="openDropdown"
-    @click="openDropdown = null"
     class="fixed inset-0 z-5"
-  ></div>
+    @click="openDropdown = null"
+  />
 </template>
 
 <script setup lang="ts">

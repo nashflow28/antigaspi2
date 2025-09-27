@@ -15,8 +15,8 @@
           <div
             v-for="marker in markers"
             :key="marker.id"
-            @click="$emit('markerClick', marker)"
             class="bg-white rounded-lg border border-gray-200 p-4 hover:shadow-md transition-shadow cursor-pointer"
+            @click="$emit('markerClick', marker)"
           >
             <div class="flex items-center justify-between">
               <div>
@@ -28,7 +28,7 @@
                 </div>
               </div>
               <div class="flex flex-col items-center">
-                <div class="w-3 h-3 bg-green-500 rounded-full mb-1"></div>
+                <div class="w-3 h-3 bg-green-500 rounded-full mb-1" />
                 <span class="text-xs text-gray-500">Actif</span>
               </div>
             </div>

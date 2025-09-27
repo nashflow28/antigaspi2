@@ -41,7 +41,7 @@
                 type="text"
                 class="rounded-2xl border border-neutral-200 bg-white/80 px-4 py-3 text-neutral-900 shadow-inner transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-300 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:border-neutral-700 dark:bg-neutral-900/80 dark:text-neutral-50 dark:focus-visible:ring-offset-neutral-950"
                 placeholder="Ex : Kossi Awesso"
-              />
+              >
             </label>
             <label class="flex flex-col gap-2 text-sm text-neutral-600 dark:text-neutral-200">
               Numéro de téléphone
@@ -50,7 +50,7 @@
                 type="tel"
                 class="rounded-2xl border border-neutral-200 bg-white/80 px-4 py-3 text-neutral-900 shadow-inner transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-300 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:border-neutral-700 dark:bg-neutral-900/80 dark:text-neutral-50 dark:focus-visible:ring-offset-neutral-950"
                 placeholder="Ex : +228 90 00 00 00"
-              />
+              >
             </label>
             <label class="flex flex-col gap-2 text-sm text-neutral-600 dark:text-neutral-200">
               Créneau de retrait
@@ -117,11 +117,11 @@
           </template>
           <div class="space-y-3 text-sm text-neutral-600 dark:text-neutral-300" role="group" aria-labelledby="checkout-terms">
             <label class="flex items-start gap-3">
-              <input type="checkbox" v-model="termsAccepted" class="mt-1 h-5 w-5 rounded border-neutral-300 text-primary-600 focus-visible:ring-primary-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:border-neutral-700 dark:bg-neutral-900 dark:text-primary-400 dark:focus-visible:ring-offset-neutral-950" />
+              <input v-model="termsAccepted" type="checkbox" class="mt-1 h-5 w-5 rounded border-neutral-300 text-primary-600 focus-visible:ring-primary-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:border-neutral-700 dark:bg-neutral-900 dark:text-primary-400 dark:focus-visible:ring-offset-neutral-950">
               <span>J'accepte les conditions d'annulation AntiGaspi et m'engage à récupérer mon panier dans le créneau choisi.</span>
             </label>
             <label class="flex items-start gap-3">
-              <input type="checkbox" v-model="subscribeNotifications" class="mt-1 h-5 w-5 rounded border-neutral-300 text-primary-600 focus-visible:ring-primary-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:border-neutral-700 dark:bg-neutral-900 dark:text-primary-400 dark:focus-visible:ring-offset-neutral-950" />
+              <input v-model="subscribeNotifications" type="checkbox" class="mt-1 h-5 w-5 rounded border-neutral-300 text-primary-600 focus-visible:ring-primary-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:border-neutral-700 dark:bg-neutral-900 dark:text-primary-400 dark:focus-visible:ring-offset-neutral-950">
               <span>Recevoir des alertes lorsqu'un panier similaire est publié par mes commerçants favoris.</span>
             </label>
           </div>

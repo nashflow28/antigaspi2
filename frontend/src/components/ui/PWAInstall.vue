@@ -9,11 +9,21 @@
         <p>Accédez plus rapidement à l'application depuis votre écran d'accueil</p>
       </div>
       <div class="pwa-actions">
-        <Button @click="installApp" variant="secondary" size="sm" class="install-btn">
+        <Button
+          variant="secondary"
+          size="sm"
+          class="install-btn"
+          @click="installApp"
+        >
           <Download class="w-4 h-4 mr-2" />
           Installer
         </Button>
-        <Button @click="dismissPrompt" variant="ghost" size="sm" class="dismiss-btn">
+        <Button
+          variant="ghost"
+          size="sm"
+          class="dismiss-btn"
+          @click="dismissPrompt"
+        >
           <X class="w-4 h-4" />
         </Button>
       </div>
@@ -38,7 +48,6 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from 'vue'
 import { Download, X } from 'lucide-vue-next'
-import { installPWA } from '@/main'
 import Button from '@/components/ui/2025/Button.vue'
 
 const showInstallPrompt = ref(false)

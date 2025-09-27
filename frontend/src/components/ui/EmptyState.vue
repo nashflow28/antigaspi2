@@ -1,10 +1,10 @@
 <template>
   <div class="flex flex-col items-center justify-center rounded-3xl border border-dashed border-primary-500/30 bg-primary-500/5 p-12 text-center shadow-card">
     <Transition name="empty-state-fade" appear>
-      <div class="flex flex-col items-center gap-4" key="content">
+      <div key="content" class="flex flex-col items-center gap-4">
         <div class="text-4xl">
           <slot name="icon">
-            <component v-if="isIconComponent" :is="icon" aria-hidden="true" />
+            <component :is="icon" v-if="isIconComponent" aria-hidden="true" />
             <span v-else aria-hidden="true">{{ icon }}</span>
           </slot>
         </div>
@@ -23,8 +23,8 @@
 </template>
 
 <script setup lang="ts">
-import { computed, toRefs, type Component, type VNode } from 'vue';
-import Button from './Button.vue';
+import { computed, toRefs, type Component, type VNode } from 'vue'
+import Button from './Button.vue'
 
 type EmptyStateIcon = string | number | Component | VNode | null;
 
@@ -37,24 +37,24 @@ const props = withDefaults(
     onAction?: () => void;
   }>(),
   {
-    icon: '🌱',
-  },
-);
+    icon: '🌱'
+  }
+)
 
 const emit = defineEmits<{
   (event: 'action'): void;
   (event: 'onAction'): void;
-}>();
+}>()
 
 const handleAction = () => {
-  props.onAction?.();
-  emit('action');
-  emit('onAction');
-};
+  props.onAction?.()
+  emit('action')
+  emit('onAction')
+}
 
-const { title, description, actionLabel, icon } = toRefs(props);
+const { title, description, actionLabel, icon } = toRefs(props)
 
-const isIconComponent = computed(() => typeof icon.value === 'object' && icon.value !== null);
+const isIconComponent = computed(() => typeof icon.value === 'object' && icon.value !== null)
 </script>
 
 <style scoped>

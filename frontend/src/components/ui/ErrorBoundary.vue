@@ -102,7 +102,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onErrorCaptured, getCurrentInstance } from 'vue'
+import { ref, computed, onErrorCaptured } from 'vue'
 import { useRouter } from 'vue-router'
 import { AlertTriangle, RefreshCw, Home, X, Mail } from 'lucide-vue-next'
 import Card from '@/components/ui/2025/Card.vue'
@@ -162,13 +162,13 @@ const generateErrorId = (): string => {
 onErrorCaptured((error: Error, instance, info: string) => {
   console.error('Error captured by ErrorBoundary:', error)
 
-  const componentName = instance?.type?.name || instance?.type?.__name || 'UnknownComponent'
+  const componentName = 'UnknownComponent'
   const details: ErrorDetails = {
     stack: error.stack,
     info,
     componentName,
     timestamp: Date.now(),
-    props: instance?.props
+    props: (instance as any)?.$props
   }
 
   handleError(error, details)

@@ -4,13 +4,13 @@
       v-for="star in 5"
       :key="star"
       type="button"
-      @click="!readonly && setRating(star)"
       :disabled="readonly"
       class="focus:outline-none transition-colors duration-200"
       :class="{
         'cursor-pointer hover:scale-110': !readonly,
         'cursor-default': readonly
       }"
+      @click="!readonly && setRating(star)"
     >
       <Star
         :size="size"

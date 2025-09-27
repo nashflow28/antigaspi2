@@ -28,7 +28,7 @@
                   type="text"
                   placeholder="Ex : Boulangerie, Lomé, petit-déjeuner"
                   class="w-full rounded-2xl border border-neutral-200 bg-white px-11 py-3 text-sm shadow-inner focus:border-primary-400 focus:outline-none focus:ring-2 focus:ring-primary-200"
-                />
+                >
               </div>
               <div class="grid gap-3 md:grid-cols-2">
                 <select
@@ -244,7 +244,7 @@ const fallbackMerchants = ref<MerchantWithLocation[]>([
     longitude: null,
     distance_km: 1.2,
     products_count: 4,
-    user: { city: 'Lomé', address: 'Avenue de la Paix', phone: '+228 90 00 00 00' },
+    user: { city: 'Lomé', address: 'Avenue de la Paix', phone: '+228 90 00 00 00' }
   },
   {
     id: 2,
@@ -258,7 +258,7 @@ const fallbackMerchants = ref<MerchantWithLocation[]>([
     longitude: null,
     distance_km: 2.8,
     products_count: 6,
-    user: { city: 'Lomé', address: 'Boulevard du Mono', phone: '+228 90 10 10 10' },
+    user: { city: 'Lomé', address: 'Boulevard du Mono', phone: '+228 90 10 10 10' }
   },
   {
     id: 3,
@@ -272,8 +272,8 @@ const fallbackMerchants = ref<MerchantWithLocation[]>([
     longitude: null,
     distance_km: 5.1,
     products_count: 2,
-    user: { city: 'Kpalimé', address: 'Rue des Arts', phone: '+228 90 11 22 33' },
-  },
+    user: { city: 'Kpalimé', address: 'Rue des Arts', phone: '+228 90 11 22 33' }
+  }
 ])
 
 const fallbackProducts = ref<Product[]>([
@@ -297,10 +297,10 @@ const fallbackProducts = ref<Product[]>([
       city: 'Lomé',
       address: 'Avenue de la Paix',
       phone: '+228 90 00 00 00',
-      is_verified: true,
+      is_verified: true
     },
     created_at: new Date().toISOString(),
-    is_active: true,
+    is_active: true
   },
   {
     id: 102,
@@ -322,11 +322,11 @@ const fallbackProducts = ref<Product[]>([
       city: 'Lomé',
       address: 'Boulevard du Mono',
       phone: '+228 90 10 10 10',
-      is_verified: true,
+      is_verified: true
     },
     created_at: new Date().toISOString(),
-    is_active: true,
-  },
+    is_active: true
+  }
 ])
 
 const baseMerchants = computed(() => (merchants.value.length ? merchants.value : fallbackMerchants.value))
@@ -383,7 +383,7 @@ const toggleFavoriteMerchant = (merchant: MerchantWithLocation) => {
     type: 'merchant',
     name: merchant.business_name,
     description: merchant.business_type,
-    merchant,
+    merchant
   })
 }
 
@@ -392,11 +392,11 @@ const isMerchantFavorite = (id: number) => favoritesStore.isFavorite(id, 'mercha
 const fetchData = async () => {
   const [merchantResult, productResult] = await Promise.all([
     merchantsStore.fetchMerchants({ withLocation: true }).catch(() => ({ success: false })),
-    productsStore.fetchProducts().catch(() => ({ success: false })),
+    productsStore.fetchProducts().catch(() => ({ success: false }))
   ])
 
   if (!merchantResult?.success) {
-    notify.info("Affichage des commerçants de démonstration", 'Exploration')
+    notify.info('Affichage des commerçants de démonstration', 'Exploration')
   }
 
   if (!productResult?.success) {

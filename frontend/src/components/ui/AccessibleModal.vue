@@ -17,7 +17,7 @@
         <div
           class="absolute inset-0 bg-black/50 backdrop-blur-sm"
           :aria-hidden="true"
-        ></div>
+        />
 
         <!-- Modal Container -->
         <Transition name="modal-content" appear>
@@ -38,7 +38,7 @@
               href="#modal-close"
               class="skip-link sr-only focus:not-sr-only focus:absolute focus:top-2 focus:right-2 bg-primary-600 text-white px-2 py-1 rounded text-sm z-10"
             >
-              {{ $t?.('accessibility.skipToClose') || 'Skip to close button' }}
+              Skip to close button
             </a>
 
             <!-- Header -->
@@ -72,7 +72,7 @@
 
               <!-- Description -->
               <p
-                v-if="description || $slots.description"
+                v-if="description || slots.description"
                 :id="descriptionId"
                 class="text-sm text-gray-600 dark:text-gray-400 mt-2"
               >
@@ -85,7 +85,7 @@
               :class="bodyClasses"
               role="main"
               :tabindex="scrollable ? 0 : undefined"
-              :aria-label="scrollable ? ($t?.('accessibility.scrollableContent') || 'Scrollable content') : undefined"
+              :aria-label="scrollable ? 'Scrollable content' : undefined"
             >
               <slot />
             </div>
@@ -101,8 +101,8 @@
                   <Button
                     v-if="showCancel"
                     variant="outline"
-                    @click="cancel"
                     :aria-describedby="`${titleId}-cancel-help`"
+                    @click="cancel"
                   >
                     {{ cancelText }}
                   </Button>
@@ -111,8 +111,8 @@
                     v-if="showConfirm"
                     :variant="confirmButtonVariant"
                     :loading="loading"
-                    @click="confirm"
                     :aria-describedby="`${titleId}-confirm-help`"
+                    @click="confirm"
                   >
                     {{ confirmText }}
                   </Button>
@@ -124,13 +124,13 @@
                     v-if="showCancel"
                     :id="`${titleId}-cancel-help`"
                   >
-                    {{ $t?.('accessibility.cancelHelp') || 'Close this dialog without saving changes' }}
+                    Close this dialog without saving changes
                   </div>
                   <div
                     v-if="showConfirm"
                     :id="`${titleId}-confirm-help`"
                   >
-                    {{ $t?.('accessibility.confirmHelp') || 'Confirm and apply changes' }}
+                    Confirm and apply changes
                   </div>
                 </div>
               </slot>
@@ -143,7 +143,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch, nextTick, onUnmounted } from 'vue'
+import { ref, computed, watch, nextTick, onUnmounted, useSlots } from 'vue'
 import { X } from 'lucide-vue-next'
 import { useAccessibility } from '@/composables/useAccessibility'
 import Button from './Button.vue'
@@ -191,6 +191,7 @@ const emit = defineEmits<{
   closed: []
 }>()
 
+const slots = useSlots()
 const {
   trapFocusInContainer,
   createAriaId,
@@ -212,15 +213,15 @@ const descriptionId = createAriaId('modal-description')
 
 // Computed properties
 const hasHeader = computed(() =>
-  props.title || props.description || $slots.title || $slots.description || props.closable
+  props.title || props.description || slots.title || slots.description || props.closable
 )
 
 const hasFooter = computed(() =>
-  $slots.footer || props.showCancel || props.showConfirm
+  slots.footer || props.showCancel || props.showConfirm
 )
 
 const closeAriaLabel = computed(() =>
-  $t?.('accessibility.closeModal') || 'Close dialog'
+  'Close dialog'
 )
 
 const confirmButtonVariant = computed(() => {
@@ -355,7 +356,7 @@ const onAfterEnter = async () => {
 
   if (modalRef.value) {
     // Configurer le piège de focus
-    cleanupFocusTrap.value = trapFocusInContainer(modalRef.value)
+    cleanupFocusTrap.value = trapFocusInContainer(modalRef.value) || null
 
     // Annoncer l'ouverture
     const modalTitle = props.title || props.ariaLabel || 'Dialog opened'

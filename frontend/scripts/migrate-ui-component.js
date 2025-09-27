@@ -11,7 +11,7 @@ import readline from 'readline'
 import { fileURLToPath } from 'url'
 
 const __filename = fileURLToPath(import.meta.url)
-const __dirname = path.dirname(__filename)
+const _unused_dirname = path.dirname(__filename)
 
 console.log('🚀 UI Component Migration Assistant - Phase 3\n')
 
@@ -36,7 +36,7 @@ const COMPONENT_MIGRATIONS = {
 
       let variant = 'primary'
       let size = 'default'
-      let extraClasses = []
+      const extraClasses = []
 
       classes.forEach(cls => {
         if (variants[cls]) variant = variants[cls]
@@ -64,7 +64,7 @@ const COMPONENT_MIGRATIONS = {
 
       let variant = 'default'
       let interactive = false
-      let extraClasses = []
+      const extraClasses = []
 
       classes.forEach(cls => {
         if (variants[cls]) variant = variants[cls]
@@ -85,8 +85,8 @@ const COMPONENT_MIGRATIONS = {
     component: 'Input',
     import: "import Input from '@/components/ui/Input.vue'",
     template: (classes, attrs) => {
-      let hasError = classes.includes('form-input-error')
-      let extraClasses = classes.filter(cls =>
+      const hasError = classes.includes('form-input-error')
+      const extraClasses = classes.filter(cls =>
         !['form-input', 'form-input-error'].includes(cls)
       )
 
@@ -234,9 +234,9 @@ async function applyMigration(filePath) {
     console.log('\n🧩 Component migrations:')
 
     for (const suggestion of componentSuggestions) {
-      console.log(`\n❌ Original:`)
+      console.log('\n❌ Original:')
       console.log(`   ${suggestion.original}`)
-      console.log(`\n✅ Suggested:`)
+      console.log('\n✅ Suggested:')
       console.log(`   ${suggestion.suggested}`)
 
       const answer = await askQuestion('\nApply this migration? (y/n/a=all): ')

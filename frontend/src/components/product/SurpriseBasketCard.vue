@@ -6,7 +6,7 @@
         :src="basket.image_url"
         :alt="basket.name"
         class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-      />
+      >
       <div
         v-else
         class="flex h-full w-full items-center justify-center bg-gradient-to-br from-primary-50 to-accent-blue/5"
@@ -54,10 +54,10 @@
       <div class="flex items-end justify-between">
         <div>
           <div class="text-2xl font-bold text-primary-600">{{ formattedDiscountedPrice }}</div>
-          <div class="text-sm text-neutral-400 line-through" v-if="formattedOriginalPrice">
+          <div v-if="formattedOriginalPrice" class="text-sm text-neutral-400 line-through">
             {{ formattedOriginalPrice }}
           </div>
-          <div class="text-xs text-primary-600 font-medium" v-if="formattedSavings">
+          <div v-if="formattedSavings" class="text-xs text-primary-600 font-medium">
             Économisez {{ formattedSavings }}
           </div>
         </div>

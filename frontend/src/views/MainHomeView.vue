@@ -82,7 +82,12 @@
               <span class="rounded-full border border-white/30 bg-white/10 px-4 py-2 text-small font-medium shadow-card">
                 {{ totalProducts }} produits disponibles
               </span>
-              <Button variant="secondary" size="sm" class="bg-white/90 text-primary-700 hover:bg-white" @click="refreshProducts">
+              <Button
+                variant="secondary"
+                size="sm"
+                class="bg-white/90 text-primary-700 hover:bg-white"
+                @click="refreshProducts"
+              >
                 Explorer les nouveautés
               </Button>
             </div>
@@ -105,7 +110,12 @@
           <template #header>
             <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
               <h3 class="text-h3 font-semibold text-neutral-900">Catégories populaires</h3>
-              <Button variant="ghost" size="sm" class="text-primary-600" @click="viewAllCategories">
+              <Button
+                variant="ghost"
+                size="sm"
+                class="text-primary-600"
+                @click="viewAllCategories"
+              >
                 Voir toutes les catégories
               </Button>
             </div>
@@ -130,11 +140,23 @@
       <section class="mx-auto max-w-5xl px-6">
         <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <h3 class="text-h3 font-semibold text-neutral-900">Produits disponibles</h3>
-          <Button variant="ghost" size="sm" class="text-primary-600" @click="refreshProducts">Actualiser</Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            class="text-primary-600"
+            @click="refreshProducts"
+          >
+            Actualiser
+          </Button>
         </div>
 
         <div v-if="loading" class="mt-8 grid grid-cols-1 gap-6 md:grid-cols-3 xl:grid-cols-4">
-          <Card v-for="index in 6" :key="index" padding="sm" class="space-y-4">
+          <Card
+            v-for="index in 6"
+            :key="index"
+            padding="sm"
+            class="space-y-4"
+          >
             <Skeleton class="aspect-square w-full" />
             <div class="space-y-2">
               <Skeleton class="h-4 w-3/4" />
@@ -185,7 +207,12 @@
         </div>
 
         <div v-if="hasProducts" class="mt-10 flex justify-center">
-          <Button variant="primary" size="lg" class="px-10" @click="loadMore">
+          <Button
+            variant="primary"
+            size="lg"
+            class="px-10"
+            @click="loadMore"
+          >
             Voir plus de produits
           </Button>
         </div>

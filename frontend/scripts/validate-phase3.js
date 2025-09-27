@@ -15,12 +15,12 @@ import { chromium } from 'playwright'
 import axe from 'axe-core'
 
 const __filename = fileURLToPath(import.meta.url)
-const __dirname = path.dirname(__filename)
+const _unused_dirname = path.dirname(__filename)
 
 console.log('🔍 Phase 3 Validation - UI Design System Migration\n')
 
 // Configuration
-const PROJECT_ROOT = path.resolve(__dirname, '..')
+const PROJECT_ROOT = path.resolve(_unused_dirname, '..')
 const RESULTS_DIR = path.join(PROJECT_ROOT, 'test-results')
 const REPORT_PATH = path.join(PROJECT_ROOT, 'phase3-validation-report.json')
 const COVERAGE_SUMMARY_PATH = path.join(PROJECT_ROOT, 'coverage', 'coverage-summary.json')
@@ -557,8 +557,8 @@ function generateReport() {
   console.log('📋 Validation Results:\n')
   Object.entries(VALIDATION_RESULTS.checks).forEach(([key, check]) => {
     const statusEmoji = check.status === 'PASS' ? '✅' :
-                       check.status === 'WARN' ? '⚠️' :
-                       check.status === 'ERROR' ? '🔧' : '❌'
+      check.status === 'WARN' ? '⚠️' :
+        check.status === 'ERROR' ? '🔧' : '❌'
 
     console.log(`${statusEmoji} ${key}: ${check.message} (${check.score}/100)`)
   })

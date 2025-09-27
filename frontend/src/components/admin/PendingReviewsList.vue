@@ -9,9 +9,9 @@
           </span>
         </h3>
         <button
-          @click="() => loadReviews()"
           class="inline-flex items-center px-3 py-1 text-sm text-primary-600 hover:text-primary-700 transition-colors"
           :disabled="loading"
+          @click="() => loadReviews()"
         >
           <RefreshCw class="w-4 h-4 mr-1" :class="{ 'animate-spin': loading }" />
           Actualiser
@@ -22,7 +22,7 @@
     <div class="divide-y divide-gray-200">
       <!-- Loading State -->
       <div v-if="loading" class="px-6 py-8 text-center">
-        <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600 mx-auto"></div>
+        <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600 mx-auto" />
         <p class="text-gray-500 mt-2">Chargement des avis...</p>
       </div>
 
@@ -35,8 +35,8 @@
 
       <!-- Reviews List -->
       <div
-        v-else
         v-for="review in reviews"
+        v-else
         :key="review.id"
         class="px-6 py-6 hover:bg-gray-50 transition-colors"
       >
@@ -57,16 +57,16 @@
         </div>
         <div class="flex space-x-2">
           <button
-            @click="loadPage(pagination.current_page - 1)"
             :disabled="pagination.current_page <= 1"
             class="px-3 py-1 text-sm border border-gray-300 rounded disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
+            @click="loadPage(pagination.current_page - 1)"
           >
             Précédent
           </button>
           <button
-            @click="loadPage(pagination.current_page + 1)"
             :disabled="pagination.current_page >= pagination.last_page"
             class="px-3 py-1 text-sm border border-gray-300 rounded disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
+            @click="loadPage(pagination.current_page + 1)"
           >
             Suivant
           </button>

@@ -1,7 +1,7 @@
 <template>
   <div class="min-h-screen bg-gradient-to-b from-emerald-50 to-white text-slate-900">
     <header class="relative overflow-hidden bg-white">
-      <div class="absolute inset-0 bg-emerald-500/10"></div>
+      <div class="absolute inset-0 bg-emerald-500/10" />
       <div class="relative mx-auto flex max-w-6xl flex-col gap-12 px-6 py-16 md:flex-row md:items-center md:py-20">
         <div class="md:w-1/2">
           <span class="inline-flex items-center rounded-full bg-emerald-100 px-3 py-1 text-sm font-medium text-emerald-700">
@@ -31,7 +31,7 @@
         <div class="md:w-1/2">
           <div class="relative mx-auto max-w-md rounded-3xl bg-white p-6 shadow-2xl">
             <div class="flex items-center gap-3">
-              <div class="h-12 w-12 rounded-full bg-emerald-100"></div>
+              <div class="h-12 w-12 rounded-full bg-emerald-100" />
               <div>
                 <p class="text-sm font-semibold text-slate-700">Boulangerie du Marché</p>
                 <p class="text-xs text-slate-500">Panier surprise du soir</p>

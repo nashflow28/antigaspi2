@@ -3,14 +3,24 @@
     <div class="bg-white rounded-xl p-6 w-full max-w-md">
       <div class="flex items-center justify-between mb-6">
         <h3 class="text-xl font-semibold text-gray-900">
-          {{hasPin ? 'Modifier le code PIN' : 'Configurer le code PIN'}}
+          {{ hasPin ? 'Modifier le code PIN' : 'Configurer le code PIN' }}
         </h3>
         <button
-          @click="$emit('close')"
           class="text-gray-400 hover:text-gray-600"
+          @click="$emit('close')"
         >
-          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+          <svg
+            class="w-6 h-6"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M6 18L18 6M6 6l12 12"
+            />
           </svg>
         </button>
       </div>
@@ -28,15 +38,15 @@
               placeholder="••••••"
               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent text-center text-lg tracking-widest"
               :class="{'border-red-300': errors.currentPin}"
-              @input="formatPinInput"
               required
+              @input="formatPinInput"
             >
-            <p v-if="errors.currentPin" class="mt-1 text-sm text-red-600">{{errors.currentPin}}</p>
+            <p v-if="errors.currentPin" class="mt-1 text-sm text-red-600">{{ errors.currentPin }}</p>
           </div>
 
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-2">
-              {{hasPin ? 'Nouveau code PIN' : 'Code PIN'}}
+              {{ hasPin ? 'Nouveau code PIN' : 'Code PIN' }}
             </label>
             <input
               v-model="form.newPin"
@@ -45,15 +55,15 @@
               placeholder="••••••"
               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent text-center text-lg tracking-widest"
               :class="{'border-red-300': errors.newPin}"
-              @input="formatPinInput"
               required
+              @input="formatPinInput"
             >
-            <p v-if="errors.newPin" class="mt-1 text-sm text-red-600">{{errors.newPin}}</p>
+            <p v-if="errors.newPin" class="mt-1 text-sm text-red-600">{{ errors.newPin }}</p>
           </div>
 
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-2">
-              Confirmer le {{hasPin ? 'nouveau ' : ''}}code PIN
+              Confirmer le {{ hasPin ? 'nouveau ' : '' }}code PIN
             </label>
             <input
               v-model="form.confirmPin"
@@ -62,16 +72,16 @@
               placeholder="••••••"
               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent text-center text-lg tracking-widest"
               :class="{'border-red-300': errors.confirmPin}"
-              @input="formatPinInput"
               required
+              @input="formatPinInput"
             >
-            <p v-if="errors.confirmPin" class="mt-1 text-sm text-red-600">{{errors.confirmPin}}</p>
+            <p v-if="errors.confirmPin" class="mt-1 text-sm text-red-600">{{ errors.confirmPin }}</p>
           </div>
 
           <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
             <div class="flex items-start space-x-2">
               <svg class="w-5 h-5 text-yellow-500 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-                <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+                <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
               </svg>
               <div class="text-sm text-yellow-700">
                 <p class="font-medium">Sécurité importante</p>
@@ -89,14 +99,14 @@
           <div v-if="form.newPin" class="space-y-2">
             <div class="flex justify-between text-sm">
               <span class="text-gray-600">Force du PIN</span>
-              <span :class="pinStrengthClass">{{pinStrengthText}}</span>
+              <span :class="pinStrengthClass">{{ pinStrengthText }}</span>
             </div>
             <div class="w-full bg-gray-200 rounded-full h-2">
               <div
                 class="h-2 rounded-full transition-all duration-300"
                 :class="pinStrengthColor"
                 :style="{width: pinStrengthPercentage + '%'}"
-              ></div>
+              />
             </div>
           </div>
         </div>
@@ -104,8 +114,8 @@
         <div class="flex space-x-3 mt-6">
           <button
             type="button"
-            @click="$emit('close')"
             class="flex-1 px-4 py-3 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
+            @click="$emit('close')"
           >
             Annuler
           </button>
@@ -116,13 +126,20 @@
           >
             <span v-if="loading" class="flex items-center justify-center">
               <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
-                <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" class="opacity-25"></circle>
-                <path fill="currentColor" class="opacity-75" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                <circle
+                  cx="12"
+                  cy="12"
+                  r="10"
+                  stroke="currentColor"
+                  stroke-width="4"
+                  class="opacity-25"
+                />
+                <path fill="currentColor" class="opacity-75" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
               </svg>
               Enregistrement...
             </span>
             <span v-else>
-              {{hasPin ? 'Modifier' : 'Configurer'}} le PIN
+              {{ hasPin ? 'Modifier' : 'Configurer' }} le PIN
             </span>
           </button>
         </div>

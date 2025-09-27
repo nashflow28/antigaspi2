@@ -35,9 +35,11 @@ class RateLimitServiceProvider extends ServiceProvider
             return Limit::perMinute(60)->by($request->user()?->id ?: $request->ip());
         });
 
-        // Rate limiting strict pour l'authentification (5 tentatives par minute)
+        // Rate limiting pour l'authentification - Plus permissif en testing
         RateLimiter::for('auth', function (Request $request) {
-            return Limit::perMinute(5)->by($request->ip());
+            // En mode test ou développement, permettre plus de requêtes
+            $limit = app()->environment(['testing', 'local']) ? 100 : 5;
+            return Limit::perMinute($limit)->by($request->ip());
         });
 
         // Rate limiting pour les endpoints sensibles admin (30 requêtes par minute)
@@ -57,8 +59,9 @@ class RateLimitServiceProvider extends ServiceProvider
 
         // Rate limiting global de sécurité (1000 requêtes par heure par IP)
         RateLimiter::for('global', function (Request $request) {
+            $perMinute = app()->environment(['testing', 'local']) ? 500 : 200;
             return [
-                Limit::perMinute(200)->by($request->ip()),
+                Limit::perMinute($perMinute)->by($request->ip()),
                 Limit::perHour(1000)->by($request->ip()),
             ];
         });

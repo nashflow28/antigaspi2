@@ -36,7 +36,12 @@
                 {{ rating }} étoiles et plus
               </option>
             </select>
-            <Button variant="ghost" size="sm" class="text-neutral-500" @click="resetFilters">
+            <Button
+              variant="ghost"
+              size="sm"
+              class="text-neutral-500"
+              @click="resetFilters"
+            >
               Réinitialiser
             </Button>
           </div>
@@ -195,7 +200,7 @@ const reviews = ref<PublicReview[]>([
     productName: 'Panier petit-déjeuner',
     timeAgo: 'Il y a 2 heures',
     impact: 3,
-    isVerified: true,
+    isVerified: true
   },
   {
     id: 2,
@@ -207,7 +212,7 @@ const reviews = ref<PublicReview[]>([
     productName: 'Panier vitaminé',
     timeAgo: 'Il y a 1 jour',
     impact: 5,
-    isVerified: true,
+    isVerified: true
   },
   {
     id: 3,
@@ -219,7 +224,7 @@ const reviews = ref<PublicReview[]>([
     productName: 'Panier brunch',
     timeAgo: 'Il y a 3 jours',
     impact: 2,
-    isVerified: false,
+    isVerified: false
   },
   {
     id: 4,
@@ -231,8 +236,8 @@ const reviews = ref<PublicReview[]>([
     productName: 'Panier maraîcher',
     timeAgo: 'Il y a 5 jours',
     impact: 4,
-    isVerified: true,
-  },
+    isVerified: true
+  }
 ])
 
 const merchantOptions = computed(() => {
@@ -240,7 +245,7 @@ const merchantOptions = computed(() => {
     return [
       { id: 1, name: 'Boulangerie du Soleil' },
       { id: 2, name: 'Marché des Saveurs' },
-      { id: 3, name: 'Café Green Spirit' },
+      { id: 3, name: 'Café Green Spirit' }
     ]
   }
 
@@ -286,7 +291,7 @@ const fetchMerchants = async () => {
   reviewsLoading.value = true
   const result = await merchantsStore.fetchMerchants().catch(() => ({ success: false }))
   if (!result?.success) {
-    notify.info("Affichage des avis de démonstration.", 'Avis publics')
+    notify.info('Affichage des avis de démonstration.', 'Avis publics')
   }
   reviewsLoading.value = false
 }

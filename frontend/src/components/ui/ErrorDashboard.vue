@@ -4,22 +4,22 @@
       <div class="dashboard-title">
         <Bug class="w-5 h-5" />
         <span>Error Dashboard</span>
-        <span class="error-count" v-if="errorQueue.length > 0">{{ errorQueue.length }}</span>
+        <span v-if="errorQueue.length > 0" class="error-count">{{ errorQueue.length }}</span>
       </div>
       <div class="dashboard-controls">
         <Button
-          @click="clearAllErrors"
           variant="ghost"
           size="sm"
           title="Clear all errors"
+          @click="clearAllErrors"
         >
           <Trash2 class="w-4 h-4" />
         </Button>
         <Button
-          @click="showDashboard = false"
           variant="ghost"
           size="sm"
           title="Close dashboard"
+          @click="showDashboard = false"
         >
           <X class="w-4 h-4" />
         </Button>
@@ -67,11 +67,11 @@
         <button
           v-for="tab in tabs"
           :key="tab.id"
-          @click="activeTab = tab.id"
           :class="[
             'tab-button',
             { 'tab-active': activeTab === tab.id }
           ]"
+          @click="activeTab = tab.id"
         >
           <component :is="tab.icon" class="w-4 h-4" />
           {{ tab.label }}
@@ -113,7 +113,7 @@
                 </div>
               </div>
               <div class="error-message">{{ report.error.message }}</div>
-              <div class="error-component" v-if="report.context.component">
+              <div v-if="report.context.component" class="error-component">
                 Component: {{ report.context.component }}
               </div>
               <details class="error-details">
@@ -179,9 +179,9 @@
   <!-- Dashboard Toggle Button -->
   <button
     v-if="isDev && !showDashboard"
-    @click="showDashboard = true"
     class="dashboard-toggle"
     title="Open Error Dashboard"
+    @click="showDashboard = true"
   >
     <Bug class="w-5 h-5" />
     <Badge v-if="errorQueue.length > 0" variant="warning" class="toggle-indicator">{{ errorQueue.length }}</Badge>

@@ -1,82 +1,59 @@
 {
-  "timestamp": "2025-09-26T17:48:11.668Z",
+  "timestamp": "2025-09-27T08:38:10.871Z",
   "scores": {
-    "overall": 95,
+    "overall": 38,
     "breakdown": {
-      "legacyClasses": 77,
+      "legacyClasses": 92,
       "componentCoverage": 100,
-      "testsCoverage": 100,
-      "performance": 100,
-      "accessibility": 100
+      "testsCoverage": 0,
+      "performance": 0,
+      "accessibility": 0
     }
   },
   "checks": {
     "legacyClasses": {
       "status": "WARN",
-      "message": "460 legacy class usages in 52 files",
-      "score": 77,
+      "message": "169 legacy class usages in 40 files",
+      "score": 92,
       "details": {
         "summary": {
-          "totalFiles": 165,
-          "filesWithLegacy": 52,
-          "totalLegacyUsages": 460,
+          "totalFiles": 167,
+          "filesWithLegacy": 40,
+          "totalLegacyUsages": 169,
           "legacyClassCounts": {
-            "card": 138,
-            "glass-bg": 7,
-            "container-fluid": 7,
-            "badge": 29,
-            "shadow-glow": 19,
-            "form-label": 18,
-            "form-checkbox": 1,
-            "btn": 155,
-            "btn-primary": 18,
-            "btn-ghost": 10,
-            "btn-secondary": 1,
-            "btn-sm": 20,
-            "card-interactive": 1,
-            "btn-outline": 9,
-            "form-input": 14,
-            "form-textarea": 1,
-            "form-select": 5,
-            "badge-success": 2,
-            "badge-primary": 1,
+            "card": 69,
+            "badge": 14,
+            "shadow-glow": 15,
+            "btn": 40,
+            "btn-outline": 1,
+            "btn-primary": 5,
+            "btn-ghost": 2,
+            "form-label": 4,
+            "form-select": 3,
+            "btn-sm": 2,
+            "form-input": 10,
             "btn-lg": 1,
             "form-group": 3
           }
         },
         "recommendations": {
           "highPriorityFiles": [
-            "src/views/ProductReserveView2025.vue",
-            "src/views/HomeView2025.vue",
-            "src/views/merchant/SurpriseBasketsView.vue",
-            "src/views/merchant/ReservationsView.vue",
-            "src/views/merchant/LoyaltyManagement.vue",
-            "src/views/consumer/SurpriseBasketDetailView.vue",
-            "src/views/consumer/LoyaltyDashboard.vue",
-            "src/views/admin/CategoriesView.vue",
-            "src/components/ui/ErrorDashboard.vue",
-            "src/components/ui/ErrorBoundary.vue",
-            "src/components/reservation/ReservationCard.vue",
-            "src/components/product/SurpriseBasketCard.vue",
-            "src/components/product/ProductListItem.vue",
-            "src/components/layout/NavBar.vue",
-            "src/components/forms/RegisterForm.vue",
-            "src/components/debug/SequentialThinking.vue",
-            "src/components/ui/2025/Card.vue"
+            "src\\views\\admin\\CategoriesView.vue",
+            "src\\components\\ui\\ErrorDashboard.vue",
+            "src\\components\\product\\ProductListItem.vue",
+            "src\\components\\forms\\RegisterForm.vue"
           ],
           "quickWins": [
-            "form-checkbox",
-            "btn-secondary",
-            "card-interactive",
-            "form-textarea",
-            "badge-success",
-            "badge-primary",
+            "btn-outline",
+            "btn-ghost",
+            "form-label",
+            "form-select",
+            "btn-sm",
             "btn-lg",
             "form-group"
           ],
           "complexMigrations": [
             "card",
-            "badge",
             "btn"
           ]
         }
@@ -110,90 +87,33 @@
       ]
     },
     "testsCoverage": {
-      "status": "PASS",
-      "message": "13.6% statement coverage",
-      "score": 100,
-      "details": {
-        "summary": {
-          "lines": {
-            "total": 38872,
-            "covered": 5273,
-            "skipped": 0,
-            "pct": 13.56
-          },
-          "statements": {
-            "total": 38872,
-            "covered": 5273,
-            "skipped": 0,
-            "pct": 13.56
-          },
-          "functions": {
-            "total": 414,
-            "covered": 123,
-            "skipped": 0,
-            "pct": 29.71
-          },
-          "branches": {
-            "total": 918,
-            "covered": 467,
-            "skipped": 0,
-            "pct": 50.87
-          },
-          "branchesTrue": {
-            "total": 0,
-            "covered": 0,
-            "skipped": 0,
-            "pct": 100
-          }
-        },
-        "percentage": 13.56,
-        "artifact": "test-results/coverage-summary.json"
-      }
+      "status": "ERROR",
+      "message": "Failed to run test coverage: npm run test:coverage exited with code null",
+      "score": 0
     },
     "performance": {
-      "status": "PASS",
-      "message": "Lighthouse performance score: 35/100 (bundle 0MB)",
-      "score": 100,
-      "details": {
-        "bundleSize": 0,
-        "bundleSizeMB": 0,
-        "environment": "dev",
-        "lighthouse": {
-          "performance": 35,
-          "metrics": {
-            "fcp": "9.5 s",
-            "lcp": "16.2 s",
-            "tti": "19.0 s",
-            "cls": "0.261"
-          }
-        },
-        "artifacts": {
-          "buildStats": "test-results/build-stats.json",
-          "lighthouse": "test-results/lighthouse-report.json"
-        }
-      }
+      "status": "ERROR",
+      "message": "Failed to measure performance: spawn EINVAL",
+      "score": 0
     },
     "accessibility": {
-      "status": "PASS",
-      "message": "2 accessibility violations found",
-      "score": 100,
-      "details": {
-        "violations": 2,
-        "passes": 35,
-        "artifact": "test-results/a11y-report.json",
-        "environment": "dev"
-      }
+      "status": "ERROR",
+      "message": "Failed to run accessibility tests: spawn EINVAL",
+      "score": 0
     }
   },
   "errors": [],
   "warnings": [
-    "Legacy classes still present: 460 usages",
-    "Statement coverage below target: 13.6%",
+    "Legacy classes still present: 169 usages",
+    "Could not determine test coverage",
     "Production build failed – falling back to dev server for audits",
-    "Performance score below target: 35/100",
-    "Accessibility violations detected: 2"
+    "Could not measure bundle performance",
+    "Could not validate accessibility"
   ],
   "recommendations": [
-    "Complete legacy classes removal before proceeding to next phase."
+    "Overall migration score is below target (90%). Review failed checks.",
+    "Complete legacy classes removal before proceeding to next phase.",
+    "Improve test coverage for migrated components.",
+    "Optimize bundle size and performance metrics."
   ]
 }

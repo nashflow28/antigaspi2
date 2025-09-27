@@ -5,396 +5,396 @@
     class="bg-gradient-to-br from-purple-50 to-indigo-50"
   >
     <div class="p-6">
-    <!-- Header -->
-    <div class="mb-8">
-      <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
-        <div>
-          <h1 class="text-3xl lg:text-4xl font-bold text-neutral-900 mb-2">
-            Tableau de bord Administrateur
-          </h1>
-          <p class="text-neutral-600 text-lg">
-            Supervision globale de la plateforme Antigaspi
-          </p>
-        </div>
-
-        <div class="flex flex-col sm:flex-row gap-4">
-          <select v-model="selectedPeriod" class="input">
-            <option value="today">Aujourd'hui</option>
-            <option value="week">Cette semaine</option>
-            <option value="month">Ce mois</option>
-            <option value="year">Cette année</option>
-          </select>
-
-          <Button
-            @click="refreshData"
-            variant="primary"
-            class="glow-effect"
-            :disabled="isLoading"
-            :left-icon="ArrowPathIcon"
-          >
-            Actualiser
-          </Button>
-        </div>
-      </div>
-
-      <!-- Key Metrics -->
-      <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 mt-8">
-        <Card class="bg-gradient-to-r from-primary-500 to-primary-600 text-white">
-          <div class="flex items-center justify-between">
-            <div>
-              <p class="text-primary-100 text-sm font-medium">Utilisateurs Totaux</p>
-              <p class="text-3xl font-bold">{{ formatNumber(stats.totalUsers) }}</p>
-              <p class="text-primary-200 text-sm mt-1">
-                +{{ stats.newUsersThisMonth }} ce mois
-              </p>
-            </div>
-            <div class="p-3 bg-white/20 rounded-xl">
-              <UsersIcon class="w-8 h-8" />
-            </div>
+      <!-- Header -->
+      <div class="mb-8">
+        <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
+          <div>
+            <h1 class="text-3xl lg:text-4xl font-bold text-neutral-900 mb-2">
+              Tableau de bord Administrateur
+            </h1>
+            <p class="text-neutral-600 text-lg">
+              Supervision globale de la plateforme Antigaspi
+            </p>
           </div>
-        </Card>
 
-        <Card class="bg-gradient-to-r from-primary-500 to-primary-600 text-white">
-          <div class="flex items-center justify-between">
-            <div>
-              <p class="text-primary-100 text-sm font-medium">Commerçants Actifs</p>
-              <p class="text-3xl font-bold">{{ formatNumber(stats.activeMerchants) }}</p>
-              <p class="text-primary-200 text-sm mt-1">
-                {{ stats.merchantGrowthRate }}% de croissance
-              </p>
-            </div>
-            <div class="p-3 bg-white/20 rounded-xl">
-              <BuildingStorefrontIcon class="w-8 h-8" />
-            </div>
-          </div>
-        </Card>
+          <div class="flex flex-col sm:flex-row gap-4">
+            <select v-model="selectedPeriod" class="input">
+              <option value="today">Aujourd'hui</option>
+              <option value="week">Cette semaine</option>
+              <option value="month">Ce mois</option>
+              <option value="year">Cette année</option>
+            </select>
 
-        <Card class="bg-gradient-to-r from-blue-500 to-blue-600 text-white">
-          <div class="flex items-center justify-between">
-            <div>
-              <p class="text-blue-100 text-sm font-medium">Produits Sauvés</p>
-              <p class="text-3xl font-bold">{{ formatNumber(stats.productsSaved) }}</p>
-              <p class="text-blue-200 text-sm mt-1">
-                {{ formatNumber(stats.kgFoodSaved) }} kg sauvés
-              </p>
-            </div>
-            <div class="p-3 bg-white/20 rounded-xl">
-              <ShoppingBagIcon class="w-8 h-8" />
-            </div>
-          </div>
-        </Card>
-
-        <Card class="bg-gradient-to-r from-orange-500 to-orange-600 text-white">
-          <div class="flex items-center justify-between">
-            <div>
-              <p class="text-orange-100 text-sm font-medium">Chiffre d'affaires</p>
-              <p class="text-3xl font-bold">{{ formatCurrency(stats.totalRevenue) }}</p>
-              <p class="text-orange-200 text-sm mt-1">
-                +{{ stats.revenueGrowth }}% vs mois dernier
-              </p>
-            </div>
-            <div class="p-3 bg-white/20 rounded-xl">
-              <div class="text-lg font-bold">F CFA</div>
-            </div>
-          </div>
-        </Card>
-      </div>
-    </div>
-
-    <!-- Charts and Analytics -->
-    <div class="grid grid-cols-1 xl:grid-cols-2 gap-6 mb-8">
-      <!-- Revenue Chart -->
-      <Card>
-        <div class="flex items-center justify-between mb-6">
-          <h3 class="text-xl font-semibold text-neutral-900">Évolution du chiffre d'affaires</h3>
-          <select v-model="revenueChartPeriod" class="input text-sm">
-            <option value="7d">7 derniers jours</option>
-            <option value="30d">30 derniers jours</option>
-            <option value="90d">90 derniers jours</option>
-          </select>
-        </div>
-        <div class="h-64">
-          <canvas ref="revenueChartCanvas" class="w-full h-full"></canvas>
-        </div>
-      </Card>
-
-      <!-- User Growth Chart -->
-      <Card>
-        <div class="flex items-center justify-between mb-6">
-          <h3 class="text-xl font-semibold text-neutral-900">Croissance des utilisateurs</h3>
-          <div class="flex gap-2">
-            <span class="px-3 py-1 bg-primary-100 text-primary-700 rounded-full text-sm">
-              Consommateurs
-            </span>
-            <span class="px-3 py-1 bg-primary-100 text-primary-700 rounded-full text-sm">
-              Commerçants
-            </span>
+            <Button
+              variant="primary"
+              class="glow-effect"
+              :disabled="isLoading"
+              :left-icon="ArrowPathIcon"
+              @click="refreshData"
+            >
+              Actualiser
+            </Button>
           </div>
         </div>
-        <div class="h-64">
-          <canvas ref="userGrowthChartCanvas" class="w-full h-full"></canvas>
-        </div>
-      </Card>
-    </div>
 
-    <!-- Platform Activity -->
-    <div class="grid grid-cols-1 xl:grid-cols-3 gap-6 mb-8">
-      <!-- Recent Activity -->
-      <Card class="xl:col-span-2">
-        <div class="flex items-center justify-between mb-6">
-          <h3 class="text-xl font-semibold text-neutral-900">Activité récente</h3>
-          <button
-            @click="viewAllActivities"
-            class="text-primary-600 text-sm hover:text-primary-700 transition-colors"
-          >
-            Voir tout
-          </button>
-        </div>
-
-        <div class="space-y-4">
-          <div
-            v-for="activity in recentActivities"
-            :key="activity.id"
-            class="flex items-center gap-4 p-4 bg-neutral-50 rounded-lg hover:bg-neutral-100 transition-colors"
-          >
-            <div class="flex-shrink-0">
-              <div
-                :class="getActivityIconClass(activity.type)"
-                class="w-10 h-10 rounded-full flex items-center justify-center"
-              >
-                <component :is="getActivityIcon(activity.type)" class="w-5 h-5" />
+        <!-- Key Metrics -->
+        <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 mt-8">
+          <Card class="bg-gradient-to-r from-primary-500 to-primary-600 text-white">
+            <div class="flex items-center justify-between">
+              <div>
+                <p class="text-primary-100 text-sm font-medium">Utilisateurs Totaux</p>
+                <p class="text-3xl font-bold">{{ formatNumber(stats.totalUsers) }}</p>
+                <p class="text-primary-200 text-sm mt-1">
+                  +{{ stats.newUsersThisMonth }} ce mois
+                </p>
+              </div>
+              <div class="p-3 bg-white/20 rounded-xl">
+                <UsersIcon class="w-8 h-8" />
               </div>
             </div>
+          </Card>
 
-            <div class="flex-grow min-w-0">
-              <p class="text-neutral-900 font-medium">{{ activity.title }}</p>
-              <p class="text-neutral-600 text-sm">{{ activity.description }}</p>
-              <p class="text-neutral-400 text-xs mt-1">{{ formatTimeAgo(activity.timestamp) }}</p>
+          <Card class="bg-gradient-to-r from-primary-500 to-primary-600 text-white">
+            <div class="flex items-center justify-between">
+              <div>
+                <p class="text-primary-100 text-sm font-medium">Commerçants Actifs</p>
+                <p class="text-3xl font-bold">{{ formatNumber(stats.activeMerchants) }}</p>
+                <p class="text-primary-200 text-sm mt-1">
+                  {{ stats.merchantGrowthRate }}% de croissance
+                </p>
+              </div>
+              <div class="p-3 bg-white/20 rounded-xl">
+                <BuildingStorefrontIcon class="w-8 h-8" />
+              </div>
             </div>
+          </Card>
 
-            <div class="flex-shrink-0">
-              <span
-                :class="getActivityStatusClass(activity.status)"
-                class="px-2 py-1 rounded-full text-xs font-medium"
-              >
-                {{ activity.status }}
+          <Card class="bg-gradient-to-r from-blue-500 to-blue-600 text-white">
+            <div class="flex items-center justify-between">
+              <div>
+                <p class="text-blue-100 text-sm font-medium">Produits Sauvés</p>
+                <p class="text-3xl font-bold">{{ formatNumber(stats.productsSaved) }}</p>
+                <p class="text-blue-200 text-sm mt-1">
+                  {{ formatNumber(stats.kgFoodSaved) }} kg sauvés
+                </p>
+              </div>
+              <div class="p-3 bg-white/20 rounded-xl">
+                <ShoppingBagIcon class="w-8 h-8" />
+              </div>
+            </div>
+          </Card>
+
+          <Card class="bg-gradient-to-r from-orange-500 to-orange-600 text-white">
+            <div class="flex items-center justify-between">
+              <div>
+                <p class="text-orange-100 text-sm font-medium">Chiffre d'affaires</p>
+                <p class="text-3xl font-bold">{{ formatCurrency(stats.totalRevenue) }}</p>
+                <p class="text-orange-200 text-sm mt-1">
+                  +{{ stats.revenueGrowth }}% vs mois dernier
+                </p>
+              </div>
+              <div class="p-3 bg-white/20 rounded-xl">
+                <div class="text-lg font-bold">F CFA</div>
+              </div>
+            </div>
+          </Card>
+        </div>
+      </div>
+
+      <!-- Charts and Analytics -->
+      <div class="grid grid-cols-1 xl:grid-cols-2 gap-6 mb-8">
+        <!-- Revenue Chart -->
+        <Card>
+          <div class="flex items-center justify-between mb-6">
+            <h3 class="text-xl font-semibold text-neutral-900">Évolution du chiffre d'affaires</h3>
+            <select v-model="revenueChartPeriod" class="input text-sm">
+              <option value="7d">7 derniers jours</option>
+              <option value="30d">30 derniers jours</option>
+              <option value="90d">90 derniers jours</option>
+            </select>
+          </div>
+          <div class="h-64">
+            <canvas ref="revenueChartCanvas" class="w-full h-full" />
+          </div>
+        </Card>
+
+        <!-- User Growth Chart -->
+        <Card>
+          <div class="flex items-center justify-between mb-6">
+            <h3 class="text-xl font-semibold text-neutral-900">Croissance des utilisateurs</h3>
+            <div class="flex gap-2">
+              <span class="px-3 py-1 bg-primary-100 text-primary-700 rounded-full text-sm">
+                Consommateurs
+              </span>
+              <span class="px-3 py-1 bg-primary-100 text-primary-700 rounded-full text-sm">
+                Commerçants
               </span>
             </div>
           </div>
-        </div>
-      </Card>
-
-      <!-- System Health -->
-      <Card>
-        <h3 class="text-xl font-semibold text-neutral-900 mb-6">État du système</h3>
-
-        <div class="space-y-4">
-          <div
-            v-for="service in systemHealth"
-            :key="service.name"
-            class="flex items-center justify-between p-3 bg-neutral-50 rounded-lg"
-          >
-            <div class="flex items-center gap-3">
-              <div
-                :class="service.status === 'healthy' ? 'bg-primary-100' : 'bg-accent-red/15'"
-                class="w-8 h-8 rounded-full flex items-center justify-center"
-              >
-                <component
-                  :is="service.status === 'healthy' ? CheckCircleIcon : ExclamationTriangleIcon"
-                  :class="service.status === 'healthy' ? 'text-primary-600' : 'text-accent-red'"
-                  class="w-4 h-4"
-                />
-              </div>
-              <div>
-                <p class="font-medium text-sm">{{ service.name }}</p>
-                <p class="text-xs text-neutral-500">{{ service.description }}</p>
-              </div>
-            </div>
-
-            <div class="text-right">
-              <p class="text-sm font-medium">{{ service.uptime }}</p>
-              <p class="text-xs text-neutral-500">{{ service.responseTime }}</p>
-            </div>
+          <div class="h-64">
+            <canvas ref="userGrowthChartCanvas" class="w-full h-full" />
           </div>
-        </div>
-
-        <!-- Quick Actions -->
-        <div class="mt-6 pt-6 border-t border-neutral-200">
-          <h4 class="font-semibold text-neutral-900 mb-3">Actions rapides</h4>
-          <div class="grid grid-cols-2 gap-2">
-            <Button
-              @click="viewLogs"
-              variant="outline"
-              size="sm"
-              class="text-xs"
-              :left-icon="DocumentTextIcon"
-            >
-              Logs
-            </Button>
-            <Button
-              @click="viewMetrics"
-              variant="outline"
-              size="sm"
-              class="text-xs"
-              :left-icon="ChartBarIcon"
-            >
-              Métriques
-            </Button>
-            <Button
-              @click="manageUsers"
-              variant="outline"
-              size="sm"
-              class="text-xs"
-              :left-icon="UsersIcon"
-            >
-              Utilisateurs
-            </Button>
-            <Button
-              @click="systemSettings"
-              variant="outline"
-              size="sm"
-              class="text-xs"
-              :left-icon="CogIcon"
-            >
-              Paramètres
-            </Button>
-          </div>
-        </div>
-      </Card>
-    </div>
-
-    <!-- Performance Metrics -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-      <!-- Environmental Impact -->
-      <Card>
-        <div class="flex items-center gap-3 mb-4">
-          <div class="p-2 bg-green-100 rounded-lg">
-            <GlobeEuropeAfricaIcon class="w-6 h-6 text-green-600" />
-          </div>
-          <h3 class="text-lg font-semibold text-neutral-900">Impact Environnemental</h3>
-        </div>
-
-        <div class="space-y-4">
-          <div class="flex items-center justify-between">
-            <span class="text-neutral-600">CO₂ économisé</span>
-            <span class="font-bold text-green-600">{{ formatNumber(environmentalImpact.co2Saved) }} kg</span>
-          </div>
-          <div class="flex items-center justify-between">
-            <span class="text-neutral-600">Eau économisée</span>
-            <span class="font-bold text-blue-600">{{ formatNumber(environmentalImpact.waterSaved) }} L</span>
-          </div>
-          <div class="flex items-center justify-between">
-            <span class="text-neutral-600">Déchets évités</span>
-            <span class="font-bold text-orange-600">{{ formatNumber(environmentalImpact.wasteSaved) }} kg</span>
-          </div>
-        </div>
-
-        <div class="mt-4 p-3 bg-green-50 rounded-lg">
-          <p class="text-green-700 text-sm font-medium">
-            🌱 Équivalent à {{ environmentalImpact.treesEquivalent }} arbres plantés
-          </p>
-        </div>
-      </Card>
-
-      <!-- Top Merchants -->
-      <Card>
-        <h3 class="text-lg font-semibold text-neutral-900 mb-4">Top Commerçants</h3>
-
-        <div class="space-y-3">
-          <div
-            v-for="(merchant, index) in topMerchants"
-            :key="merchant.id"
-            class="flex items-center gap-3 p-3 bg-neutral-50 rounded-lg"
-          >
-            <div class="flex-shrink-0">
-              <div class="w-8 h-8 bg-primary-100 text-primary-600 rounded-full flex items-center justify-center font-bold text-sm">
-                {{ index + 1 }}
-              </div>
-            </div>
-            <div class="flex-grow min-w-0">
-              <p class="font-medium text-sm truncate">{{ merchant.name }}</p>
-              <p class="text-xs text-neutral-500">{{ merchant.productsSold }} produits vendus</p>
-            </div>
-            <div class="text-right">
-              <p class="font-medium text-sm">{{ formatCurrency(merchant.revenue) }}</p>
-            </div>
-          </div>
-        </div>
-      </Card>
-
-      <!-- Popular Categories -->
-      <Card>
-        <h3 class="text-lg font-semibold text-neutral-900 mb-4">Catégories Populaires</h3>
-
-        <div class="space-y-3">
-          <div
-            v-for="category in popularCategories"
-            :key="category.id"
-            class="flex items-center justify-between"
-          >
-            <div class="flex items-center gap-3">
-              <span class="text-2xl">{{ category.icon }}</span>
-              <div>
-                <p class="font-medium text-sm">{{ category.name }}</p>
-                <p class="text-xs text-neutral-500">{{ category.productCount }} produits</p>
-              </div>
-            </div>
-            <div class="text-right">
-              <div class="w-16 bg-neutral-200 rounded-full h-2">
-                <div
-                  class="bg-primary-500 h-2 rounded-full"
-                  :style="{ width: `${category.percentage}%` }"
-                ></div>
-              </div>
-              <p class="text-xs text-neutral-500 mt-1">{{ category.percentage }}%</p>
-            </div>
-          </div>
-        </div>
-      </Card>
-    </div>
-
-    <!-- Alerts and Notifications -->
-    <Card v-if="alerts.length > 0" class="mb-8">
-      <h3 class="text-lg font-semibold text-neutral-900 mb-4">Alertes et notifications</h3>
-
-      <div class="space-y-3">
-        <div
-          v-for="alert in alerts"
-          :key="alert.id"
-          :class="getAlertClass(alert.type)"
-          class="flex items-start gap-3 p-4 rounded-lg border"
-        >
-          <component
-            :is="getAlertIcon(alert.type)"
-            :class="getAlertIconClass(alert.type)"
-            class="w-5 h-5 flex-shrink-0 mt-0.5"
-          />
-          <div class="flex-grow">
-            <p class="font-medium">{{ alert.title }}</p>
-            <p class="text-sm opacity-80 mt-1">{{ alert.message }}</p>
-            <p class="text-xs opacity-60 mt-2">{{ formatTimeAgo(alert.timestamp) }}</p>
-          </div>
-          <button
-            @click="dismissAlert(alert.id)"
-            class="text-current opacity-60 hover:opacity-100 flex-shrink-0"
-          >
-            <XMarkIcon class="w-4 h-4" />
-          </button>
-        </div>
+        </Card>
       </div>
-    </Card>
 
-    <!-- Modal for detailed info -->
-    <AdminModal
-      :show="modal.show"
-      :title="modal.title"
-      :content="modal.content"
-      :icon="modal.icon"
-      :type="modal.type"
-      :action-button="modal.actionButton"
-      @close="closeModal"
-      @action="handleModalAction"
-    />
+      <!-- Platform Activity -->
+      <div class="grid grid-cols-1 xl:grid-cols-3 gap-6 mb-8">
+        <!-- Recent Activity -->
+        <Card class="xl:col-span-2">
+          <div class="flex items-center justify-between mb-6">
+            <h3 class="text-xl font-semibold text-neutral-900">Activité récente</h3>
+            <button
+              class="text-primary-600 text-sm hover:text-primary-700 transition-colors"
+              @click="viewAllActivities"
+            >
+              Voir tout
+            </button>
+          </div>
+
+          <div class="space-y-4">
+            <div
+              v-for="activity in recentActivities"
+              :key="activity.id"
+              class="flex items-center gap-4 p-4 bg-neutral-50 rounded-lg hover:bg-neutral-100 transition-colors"
+            >
+              <div class="flex-shrink-0">
+                <div
+                  :class="getActivityIconClass(activity.type)"
+                  class="w-10 h-10 rounded-full flex items-center justify-center"
+                >
+                  <component :is="getActivityIcon(activity.type)" class="w-5 h-5" />
+                </div>
+              </div>
+
+              <div class="flex-grow min-w-0">
+                <p class="text-neutral-900 font-medium">{{ activity.title }}</p>
+                <p class="text-neutral-600 text-sm">{{ activity.description }}</p>
+                <p class="text-neutral-400 text-xs mt-1">{{ formatTimeAgo(activity.timestamp) }}</p>
+              </div>
+
+              <div class="flex-shrink-0">
+                <span
+                  :class="getActivityStatusClass(activity.status)"
+                  class="px-2 py-1 rounded-full text-xs font-medium"
+                >
+                  {{ activity.status }}
+                </span>
+              </div>
+            </div>
+          </div>
+        </Card>
+
+        <!-- System Health -->
+        <Card>
+          <h3 class="text-xl font-semibold text-neutral-900 mb-6">État du système</h3>
+
+          <div class="space-y-4">
+            <div
+              v-for="service in systemHealth"
+              :key="service.name"
+              class="flex items-center justify-between p-3 bg-neutral-50 rounded-lg"
+            >
+              <div class="flex items-center gap-3">
+                <div
+                  :class="service.status === 'healthy' ? 'bg-primary-100' : 'bg-accent-red/15'"
+                  class="w-8 h-8 rounded-full flex items-center justify-center"
+                >
+                  <component
+                    :is="service.status === 'healthy' ? CheckCircleIcon : ExclamationTriangleIcon"
+                    :class="service.status === 'healthy' ? 'text-primary-600' : 'text-accent-red'"
+                    class="w-4 h-4"
+                  />
+                </div>
+                <div>
+                  <p class="font-medium text-sm">{{ service.name }}</p>
+                  <p class="text-xs text-neutral-500">{{ service.description }}</p>
+                </div>
+              </div>
+
+              <div class="text-right">
+                <p class="text-sm font-medium">{{ service.uptime }}</p>
+                <p class="text-xs text-neutral-500">{{ service.responseTime }}</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Quick Actions -->
+          <div class="mt-6 pt-6 border-t border-neutral-200">
+            <h4 class="font-semibold text-neutral-900 mb-3">Actions rapides</h4>
+            <div class="grid grid-cols-2 gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                class="text-xs"
+                :left-icon="DocumentTextIcon"
+                @click="viewLogs"
+              >
+                Logs
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                class="text-xs"
+                :left-icon="ChartBarIcon"
+                @click="viewMetrics"
+              >
+                Métriques
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                class="text-xs"
+                :left-icon="UsersIcon"
+                @click="manageUsers"
+              >
+                Utilisateurs
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                class="text-xs"
+                :left-icon="CogIcon"
+                @click="systemSettings"
+              >
+                Paramètres
+              </Button>
+            </div>
+          </div>
+        </Card>
+      </div>
+
+      <!-- Performance Metrics -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <!-- Environmental Impact -->
+        <Card>
+          <div class="flex items-center gap-3 mb-4">
+            <div class="p-2 bg-green-100 rounded-lg">
+              <GlobeEuropeAfricaIcon class="w-6 h-6 text-green-600" />
+            </div>
+            <h3 class="text-lg font-semibold text-neutral-900">Impact Environnemental</h3>
+          </div>
+
+          <div class="space-y-4">
+            <div class="flex items-center justify-between">
+              <span class="text-neutral-600">CO₂ économisé</span>
+              <span class="font-bold text-green-600">{{ formatNumber(environmentalImpact.co2Saved) }} kg</span>
+            </div>
+            <div class="flex items-center justify-between">
+              <span class="text-neutral-600">Eau économisée</span>
+              <span class="font-bold text-blue-600">{{ formatNumber(environmentalImpact.waterSaved) }} L</span>
+            </div>
+            <div class="flex items-center justify-between">
+              <span class="text-neutral-600">Déchets évités</span>
+              <span class="font-bold text-orange-600">{{ formatNumber(environmentalImpact.wasteSaved) }} kg</span>
+            </div>
+          </div>
+
+          <div class="mt-4 p-3 bg-green-50 rounded-lg">
+            <p class="text-green-700 text-sm font-medium">
+              🌱 Équivalent à {{ environmentalImpact.treesEquivalent }} arbres plantés
+            </p>
+          </div>
+        </Card>
+
+        <!-- Top Merchants -->
+        <Card>
+          <h3 class="text-lg font-semibold text-neutral-900 mb-4">Top Commerçants</h3>
+
+          <div class="space-y-3">
+            <div
+              v-for="(merchant, index) in topMerchants"
+              :key="merchant.id"
+              class="flex items-center gap-3 p-3 bg-neutral-50 rounded-lg"
+            >
+              <div class="flex-shrink-0">
+                <div class="w-8 h-8 bg-primary-100 text-primary-600 rounded-full flex items-center justify-center font-bold text-sm">
+                  {{ index + 1 }}
+                </div>
+              </div>
+              <div class="flex-grow min-w-0">
+                <p class="font-medium text-sm truncate">{{ merchant.name }}</p>
+                <p class="text-xs text-neutral-500">{{ merchant.productsSold }} produits vendus</p>
+              </div>
+              <div class="text-right">
+                <p class="font-medium text-sm">{{ formatCurrency(merchant.revenue) }}</p>
+              </div>
+            </div>
+          </div>
+        </Card>
+
+        <!-- Popular Categories -->
+        <Card>
+          <h3 class="text-lg font-semibold text-neutral-900 mb-4">Catégories Populaires</h3>
+
+          <div class="space-y-3">
+            <div
+              v-for="category in popularCategories"
+              :key="category.id"
+              class="flex items-center justify-between"
+            >
+              <div class="flex items-center gap-3">
+                <span class="text-2xl">{{ category.icon }}</span>
+                <div>
+                  <p class="font-medium text-sm">{{ category.name }}</p>
+                  <p class="text-xs text-neutral-500">{{ category.productCount }} produits</p>
+                </div>
+              </div>
+              <div class="text-right">
+                <div class="w-16 bg-neutral-200 rounded-full h-2">
+                  <div
+                    class="bg-primary-500 h-2 rounded-full"
+                    :style="{ width: `${category.percentage}%` }"
+                  />
+                </div>
+                <p class="text-xs text-neutral-500 mt-1">{{ category.percentage }}%</p>
+              </div>
+            </div>
+          </div>
+        </Card>
+      </div>
+
+      <!-- Alerts and Notifications -->
+      <Card v-if="alerts.length > 0" class="mb-8">
+        <h3 class="text-lg font-semibold text-neutral-900 mb-4">Alertes et notifications</h3>
+
+        <div class="space-y-3">
+          <div
+            v-for="alert in alerts"
+            :key="alert.id"
+            :class="getAlertClass(alert.type)"
+            class="flex items-start gap-3 p-4 rounded-lg border"
+          >
+            <component
+              :is="getAlertIcon(alert.type)"
+              :class="getAlertIconClass(alert.type)"
+              class="w-5 h-5 flex-shrink-0 mt-0.5"
+            />
+            <div class="flex-grow">
+              <p class="font-medium">{{ alert.title }}</p>
+              <p class="text-sm opacity-80 mt-1">{{ alert.message }}</p>
+              <p class="text-xs opacity-60 mt-2">{{ formatTimeAgo(alert.timestamp) }}</p>
+            </div>
+            <button
+              class="text-current opacity-60 hover:opacity-100 flex-shrink-0"
+              @click="dismissAlert(alert.id)"
+            >
+              <XMarkIcon class="w-4 h-4" />
+            </button>
+          </div>
+        </div>
+      </Card>
+
+      <!-- Modal for detailed info -->
+      <AdminModal
+        :show="modal.show"
+        :title="modal.title"
+        :content="modal.content"
+        :icon="modal.icon"
+        :type="modal.type"
+        :action-button="modal.actionButton"
+        @close="closeModal"
+        @action="handleModalAction"
+      />
     </div>
   </DashboardLayout>
 </template>
@@ -833,21 +833,21 @@ const viewAllActivities = () => {
 
 // Quick actions
 const viewLogs = () => {
-  const content = `📋 Logs système\n\n` +
-    `✅ API Backend: 1,247 requêtes (99.9% succès)\n` +
-    `✅ Base de données: 3,421 requêtes (98.7% < 50ms)\n` +
-    `⚠️ Frontend: 2 erreurs JavaScript détectées\n` +
-    `ℹ️ Cache Redis: 15,672 hits (94.3% ratio)\n\n` +
+  const content = '📋 Logs système\n\n' +
+    '✅ API Backend: 1,247 requêtes (99.9% succès)\n' +
+    '✅ Base de données: 3,421 requêtes (98.7% < 50ms)\n' +
+    '⚠️ Frontend: 2 erreurs JavaScript détectées\n' +
+    'ℹ️ Cache Redis: 15,672 hits (94.3% ratio)\n\n' +
     `Dernière vérification: ${new Date().toLocaleTimeString('fr-FR')}`
 
   showModal('📋 Logs système', content, 'info', DocumentTextIcon, 'Voir tous les logs')
 }
 
 const viewMetrics = () => {
-  const content = `📊 Métriques détaillées\n\n` +
-    `👥 Utilisateurs actifs: 247 (dernières 24h)\n` +
-    `🏪 Nouveaux commerçants: 12 (cette semaine)\n` +
-    `📦 Produits ajoutés: 156 (aujourd'hui)\n` +
+  const content = '📊 Métriques détaillées\n\n' +
+    '👥 Utilisateurs actifs: 247 (dernières 24h)\n' +
+    '🏪 Nouveaux commerçants: 12 (cette semaine)\n' +
+    '📦 Produits ajoutés: 156 (aujourd\'hui)\n' +
     `💰 CA moyen/commande: ${formatCurrency(stats.value.totalRevenue / stats.value.productsSaved)}\n` +
     `🌍 Impact CO2: ${environmentalImpact.value.co2Saved}kg économisés\n\n` +
     `Période: ${selectedPeriod.value}`
@@ -856,33 +856,33 @@ const viewMetrics = () => {
 }
 
 const manageUsers = () => {
-  const content = `👥 Gestion utilisateurs\n\n` +
-    `📊 Statistiques:\n` +
+  const content = '👥 Gestion utilisateurs\n\n' +
+    '📊 Statistiques:\n' +
     `• Total: ${formatNumber(stats.value.totalUsers)} utilisateurs\n` +
     `• Consommateurs: ${formatNumber(stats.value.totalUsers - stats.value.activeMerchants)}\n` +
     `• Commerçants: ${formatNumber(stats.value.activeMerchants)}\n` +
     `• Nouveaux ce mois: ${stats.value.newUsersThisMonth}\n\n` +
-    `🚀 Accès rapide:\n` +
-    `• Utilisateurs en attente de validation\n` +
-    `• Comptes signalés\n` +
-    `• Statistiques d'engagement`
+    '🚀 Accès rapide:\n' +
+    '• Utilisateurs en attente de validation\n' +
+    '• Comptes signalés\n' +
+    '• Statistiques d\'engagement'
 
   showModal('👥 Gestion utilisateurs', content, 'info', UsersIcon, 'Accéder à la gestion')
 }
 
 const systemSettings = () => {
-  const content = `⚙️ Paramètres système\n\n` +
-    `🔧 Configuration actuelle:\n` +
-    `• Mode: Production\n` +
-    `• Version API: v1.2.3\n` +
-    `• Base de données: MySQL 8.0\n` +
-    `• Cache: Redis activé\n` +
-    `• Notifications: Email + SMS\n\n` +
-    `⚡ Actions disponibles:\n` +
-    `• Maintenance programmée\n` +
-    `• Sauvegarde manuelle\n` +
-    `• Nettoyage cache\n` +
-    `• Mise à jour sécurité`
+  const content = '⚙️ Paramètres système\n\n' +
+    '🔧 Configuration actuelle:\n' +
+    '• Mode: Production\n' +
+    '• Version API: v1.2.3\n' +
+    '• Base de données: MySQL 8.0\n' +
+    '• Cache: Redis activé\n' +
+    '• Notifications: Email + SMS\n\n' +
+    '⚡ Actions disponibles:\n' +
+    '• Maintenance programmée\n' +
+    '• Sauvegarde manuelle\n' +
+    '• Nettoyage cache\n' +
+    '• Mise à jour sécurité'
 
   showModal('⚙️ Paramètres système', content, 'warning', CogIcon, 'Accéder aux paramètres')
 }
@@ -920,29 +920,29 @@ const createRevenueChart = () => {
       revenueChart.destroy()
     }
 
-  // Generate demo data based on selected period
-  const generateRevenueData = () => {
-    const days = revenueChartPeriod.value === '7d' ? 7 : revenueChartPeriod.value === '30d' ? 30 : 90
-    const labels = []
-    const data = []
+    // Generate demo data based on selected period
+    const generateRevenueData = () => {
+      const days = revenueChartPeriod.value === '7d' ? 7 : revenueChartPeriod.value === '30d' ? 30 : 90
+      const labels = []
+      const data = []
 
-    for (let i = days - 1; i >= 0; i--) {
-      const date = new Date()
-      date.setDate(date.getDate() - i)
-      labels.push(date.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit' }))
+      for (let i = days - 1; i >= 0; i--) {
+        const date = new Date()
+        date.setDate(date.getDate() - i)
+        labels.push(date.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit' }))
 
-      // Generate realistic revenue data with some randomness
-      const baseRevenue = 45000 + Math.random() * 30000
-      data.push(Math.round(baseRevenue))
+        // Generate realistic revenue data with some randomness
+        const baseRevenue = 45000 + Math.random() * 30000
+        data.push(Math.round(baseRevenue))
+      }
+
+      return { labels, data }
     }
 
-    return { labels, data }
-  }
+    const { labels, data } = generateRevenueData()
+    console.log('📈 Données du graphique:', { labels, data })
 
-  const { labels, data } = generateRevenueData()
-  console.log('📈 Données du graphique:', { labels, data })
-
-  console.log('📈 Tentative de création du graphique Chart.js...')
+    console.log('📈 Tentative de création du graphique Chart.js...')
 
     revenueChart = new ChartJS(ctx, {
       type: 'line',
@@ -1058,7 +1058,7 @@ const createUserGrowthChart = () => {
           '#F59E0B', // Orange for merchants
           '#8B5CF6'  // Purple for admins
         ],
-        borderWidth: 0,
+        borderWidth: 0
       }]
     }
 

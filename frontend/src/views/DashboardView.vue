@@ -176,10 +176,10 @@
               <!-- Loading state -->
               <div v-if="loading" class="space-y-4">
                 <div v-for="i in 3" :key="i" class="flex items-center gap-4 p-4 rounded-xl border border-neutral-200 animate-pulse">
-                  <div class="w-16 h-16 bg-neutral-200 rounded-xl"></div>
+                  <div class="w-16 h-16 bg-neutral-200 rounded-xl" />
                   <div class="flex-1 space-y-2">
-                    <div class="h-4 bg-neutral-200 rounded w-3/4"></div>
-                    <div class="h-3 bg-neutral-200 rounded w-1/2"></div>
+                    <div class="h-4 bg-neutral-200 rounded w-3/4" />
+                    <div class="h-3 bg-neutral-200 rounded w-1/2" />
                   </div>
                 </div>
               </div>
@@ -195,8 +195,8 @@
               </div>
 
               <div
-                v-else
                 v-for="reservation in recentReservations"
+                v-else
                 :key="reservation.id"
                 class="flex items-center gap-4 p-4 rounded-xl border border-neutral-200 hover:border-primary-300 hover:shadow-card transition-all duration-200"
               >
@@ -281,7 +281,7 @@
               <div
                 class="bg-nav-gradient h-2 rounded-full transition-all duration-500"
                 :style="{ width: Math.min(100, (userStats.productsSaved / 100) * 100) + '%' }"
-              ></div>
+              />
             </div>
             <p class="text-xs text-neutral-500">
               Plus que {{ Math.max(0, 100 - userStats.productsSaved) }} produits pour le niveau suivant
@@ -335,7 +335,12 @@
             <p class="text-sm text-primary-700 mb-4">
               {{ currentTip.text }}
             </p>
-            <Button size="sm" variant="primary" class="w-full" @click="nextTip">
+            <Button
+              size="sm"
+              variant="primary"
+              class="w-full"
+              @click="nextTip"
+            >
               Astuce suivante
             </Button>
           </Card>
@@ -408,9 +413,9 @@ const recommendedProducts = ref([
 ])
 
 const ecoTips = ref([
-  { text: "Privilégiez les commerces de proximité pour réduire votre empreinte carbone." },
-  { text: "Réservez vos produits en fin de journée pour les meilleures offres." },
-  { text: "Apportez vos sacs réutilisables lors de vos retraits." },
+  { text: 'Privilégiez les commerces de proximité pour réduire votre empreinte carbone.' },
+  { text: 'Réservez vos produits en fin de journée pour les meilleures offres.' },
+  { text: 'Apportez vos sacs réutilisables lors de vos retraits.' },
   { text: "Partagez l'application avec vos proches pour multiplier l'impact." }
 ])
 

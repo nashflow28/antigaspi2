@@ -10,8 +10,8 @@
   >
     <Loader2 v-if="loading" :size="iconSize" class="animate-spin" />
     <component
-      v-else-if="leftIcon"
       :is="leftIcon"
+      v-else-if="leftIcon"
       :size="iconSize"
     />
 
@@ -20,8 +20,8 @@
     </span>
 
     <component
-      v-if="rightIcon && !loading"
       :is="rightIcon"
+      v-if="rightIcon && !loading"
       :size="iconSize"
     />
   </component>

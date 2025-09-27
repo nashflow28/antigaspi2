@@ -16,9 +16,9 @@
       </div>
 
       <!-- Login Form -->
-      <div class="card">
+      <Card>
         <LoginForm />
-      </div>
+      </Card>
 
       <!-- Additional Links -->
       <div class="text-center">
@@ -35,4 +35,5 @@
 
 <script setup lang="ts">
 import LoginForm from '@/components/forms/LoginForm.vue'
+import Card from '@/components/ui/2025/Card.vue'
 </script>

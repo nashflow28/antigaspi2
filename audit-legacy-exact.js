@@ -12,13 +12,13 @@ let totalLegacyUsages = 0;
 let fileCount = 0;
 let legacyFiles = [];
 
-// Méthode 1: Compter class="..."
-console.log('📊 MÉTHODE 1: Comptage des usages class="..."');
+// Méthode 1: Comptage initial approximatif
+console.log('📊 MÉTHODE 1: Comptage des usages class="..." (approximatif)');
+let method1Count = 0;
 try {
   const result = execSync('cd /c/xampp/htdocs/antigaspi2/frontend && find src -name "*.vue" -exec grep -o "class=\\"[^"]*\\"" {} \\; | wc -l', { encoding: 'utf8' });
-  const classUsages = parseInt(result.trim());
-  console.log(`   Usages class="...": ${classUsages}`);
-  totalLegacyUsages += classUsages;
+  method1Count = parseInt(result.trim());
+  console.log(`   Usages class="...": ${method1Count}`);
 } catch (e) {
   console.log('   ❌ Erreur comptage class');
 }
@@ -48,10 +48,11 @@ function analyzeFile(filePath) {
   const usages = classMatches.length;
 
   fileCount++;
+  totalLegacyUsages += usages; // FIX: Ajouter à totalLegacyUsages
 
   if (usages > 0) {
     legacyFiles.push({
-      file: filePath.replace('/c/xampp/htdocs/antigaspi2/frontend/src/', ''),
+      file: filePath.replace('C:\\xampp\\htdocs\\antigaspi2\\frontend\\src\\', '').replace(/\\/g, '/'),
       usages: usages
     });
   }
@@ -64,7 +65,8 @@ const score = Math.max(0, 100 - (totalLegacyUsages * 0.05));
 
 console.log('\n🎯 RÉSULTATS AUDIT EXACT');
 console.log('========================');
-console.log(`   Total usages legacy: ${totalLegacyUsages}`);
+console.log(`   Méthode 1 (approximatif): ${method1Count} usages`);
+console.log(`   Méthode 2 (exact): ${totalLegacyUsages} usages legacy`);
 console.log(`   Fichiers analysés: ${fileCount}`);
 console.log(`   Fichiers avec legacy: ${legacyFiles.length}`);
 console.log(`   Score Phase 3: ${score.toFixed(1)}/100`);

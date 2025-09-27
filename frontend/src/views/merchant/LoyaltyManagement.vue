@@ -16,20 +16,20 @@
           </div>
           <div class="flex items-center gap-3">
             <Button
-              @click="refreshData"
               :disabled="loading"
               variant="outline"
               size="sm"
               :left-icon="RefreshCw"
               :icon-class="{ 'animate-spin': loading }"
+              @click="refreshData"
             >
               Actualiser
             </Button>
             <Button
-              @click="openAwardModal()"
               variant="primary"
               size="sm"
               :left-icon="Plus"
+              @click="openAwardModal()"
             >
               Attribuer Points
             </Button>
@@ -39,7 +39,6 @@
     </div>
 
     <div class="container mx-auto px-4 py-8">
-
       <!-- Quick Stats -->
       <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
         <Card>
@@ -104,7 +103,7 @@
                 type="text"
                 placeholder="Rechercher un client..."
                 class="pl-9 pr-4 py-2 border border-neutral-200 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
-              />
+              >
             </div>
             <!-- Sort -->
             <select
@@ -159,10 +158,10 @@
                 </td>
                 <td class="py-4 px-4">
                   <Button
-                    @click="openAwardModal(customer)"
                     variant="primary"
                     size="sm"
                     :left-icon="Plus"
+                    @click="openAwardModal(customer)"
                   >
                     Attribuer
                   </Button>
@@ -180,25 +179,24 @@
           </div>
         </div>
       </Card>
-
     </div>
 
     <!-- Award Points Modal -->
     <div v-if="showAwardModal" class="fixed inset-0 z-[9999] overflow-y-auto">
-      <div class="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm transition-opacity" @click="closeAwardModal"></div>
+      <div class="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm transition-opacity" @click="closeAwardModal" />
 
       <div class="flex min-h-full items-center justify-center p-4">
         <div class="relative w-full max-w-md bg-white rounded-2xl shadow-xl transform transition-all" @click.stop>
           <div class="px-6 py-4 border-b border-gray-200">
             <div class="flex items-center justify-between">
               <h3 class="text-lg font-semibold text-gray-900">Attribuer des Points</h3>
-              <button @click="closeAwardModal" class="p-2 hover:bg-gray-100 rounded-lg transition-colors">
+              <button class="p-2 hover:bg-gray-100 rounded-lg transition-colors" @click="closeAwardModal">
                 <X class="w-5 h-5 text-gray-400" />
               </button>
             </div>
           </div>
 
-          <form @submit.prevent="submitAward" class="px-6 py-6 space-y-4">
+          <form class="px-6 py-6 space-y-4" @submit.prevent="submitAward">
             <!-- Customer Selection -->
             <div v-if="!selectedCustomer">
               <Label>Sélectionner un client</Label>
@@ -263,7 +261,7 @@
                 rows="3"
                 class="w-full px-3 py-2 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                 placeholder="Décrivez pourquoi vous attribuez ces points..."
-              ></textarea>
+              />
             </div>
 
             <!-- Expiration (optional) -->
@@ -283,9 +281,9 @@
             <div class="flex gap-3 pt-4">
               <Button
                 type="button"
-                @click="closeAwardModal"
                 class="flex-1"
                 variant="outline"
+                @click="closeAwardModal"
               >
                 Annuler
               </Button>

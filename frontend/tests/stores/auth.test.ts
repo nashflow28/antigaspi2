@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach, type MockedFunction } from 'vitest'
+import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { setActivePinia, createPinia } from 'pinia'
 import { useAuthStore } from '@/stores/auth'
 import { apiService } from '@/services/api'

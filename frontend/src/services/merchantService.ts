@@ -138,9 +138,9 @@ class MerchantService {
       const queryString = this.buildQueryString(params)
       const endpoint = queryString ? `/merchants?${queryString}` : '/merchants'
       const response = await apiService.get<ApiResponse<Merchant[] | { merchants: Merchant[] }>>(endpoint, false)
-      return response
+      return response as any
     } catch (error: any) {
-      return this.handleError(error)
+      return this.handleError(error) as any
     }
   }
 
@@ -155,9 +155,9 @@ class MerchantService {
         : '/merchants/all-with-location'
 
       const response = await apiService.get<ApiResponse<MerchantWithLocation[] | { merchants: MerchantWithLocation[] }>>(endpoint, false)
-      return response
+      return response as any
     } catch (error: any) {
-      return this.handleError(error)
+      return this.handleError(error) as any
     }
   }
 
@@ -167,9 +167,9 @@ class MerchantService {
   async getMerchantDetail(id: number): Promise<ApiResponse<MerchantDetail | { merchant: MerchantDetail }>> {
     try {
       const response = await apiService.get<ApiResponse<MerchantDetail | { merchant: MerchantDetail }>>(`/merchants/${id}`, false)
-      return response
+      return response as any
     } catch (error: any) {
-      return this.handleError(error)
+      return this.handleError(error) as any
     }
   }
 
@@ -179,9 +179,9 @@ class MerchantService {
   async getStats(): Promise<ApiResponse<MerchantStats>> {
     try {
       const response = await apiService.get(`${this.baseUrl}/merchant/stats`)
-      return response
+      return response as any
     } catch (error: any) {
-      return this.handleError(error)
+      return this.handleError(error) as any
     }
   }
 
@@ -193,9 +193,9 @@ class MerchantService {
   async getProducts(): Promise<ApiResponse<{ products: Product[] }>> {
     try {
       const response = await apiService.get(`${this.baseUrl}/products/merchant`)
-      return response
+      return response as any
     } catch (error: any) {
-      return this.handleError(error)
+      return this.handleError(error) as any
     }
   }
 
@@ -224,9 +224,9 @@ class MerchantService {
       }
 
       const response = await apiService.postFormData(`${this.baseUrl}/products`, formData)
-      return response
+      return response as any
     } catch (error: any) {
-      return this.handleError(error)
+      return this.handleError(error) as any
     }
   }
 
@@ -255,21 +255,21 @@ class MerchantService {
       }
 
       const response = await apiService.postFormData(`${this.baseUrl}/products/${id}`, formData)
-      return response
+      return response as any
     } catch (error: any) {
-      return this.handleError(error)
+      return this.handleError(error) as any
     }
   }
 
   /**
    * Supprimer un produit
    */
-  async deleteProduct(id: number): Promise<ApiResponse> {
+  async deleteProduct(id: number): Promise<ApiResponse<any>> {
     try {
       const response = await apiService.delete(`${this.baseUrl}/products/${id}`)
-      return response
+      return response as any
     } catch (error: any) {
-      return this.handleError(error)
+      return this.handleError(error) as any
     }
   }
 
@@ -281,9 +281,9 @@ class MerchantService {
       const response = await apiService.patch(`${this.baseUrl}/products/${id}/status`, {
         is_active: isActive
       })
-      return response
+      return response as any
     } catch (error: any) {
-      return this.handleError(error)
+      return this.handleError(error) as any
     }
   }
 
@@ -310,9 +310,9 @@ class MerchantService {
       const url = queryString ? `${this.baseUrl}/reservations/merchant/list?${queryString}` : `${this.baseUrl}/reservations/merchant/list`
 
       const response = await apiService.get(url)
-      return response
+      return response as any
     } catch (error: any) {
-      return this.handleError(error)
+      return this.handleError(error) as any
     }
   }
 
@@ -325,9 +325,9 @@ class MerchantService {
         status,
         notes
       })
-      return response
+      return response as any
     } catch (error: any) {
-      return this.handleError(error)
+      return this.handleError(error) as any
     }
   }
 
@@ -339,9 +339,9 @@ class MerchantService {
   async getSurpriseBaskets(): Promise<ApiResponse<{ baskets: SurpriseBasket[] }>> {
     try {
       const response = await apiService.get(`${this.baseUrl}/surprise-baskets/merchant/list`)
-      return response
+      return response as any
     } catch (error: any) {
-      return this.handleError(error)
+      return this.handleError(error) as any
     }
   }
 
@@ -351,9 +351,9 @@ class MerchantService {
   async createSurpriseBasket(data: SurpriseBasketCreateData): Promise<ApiResponse<{ basket: SurpriseBasket }>> {
     try {
       const response = await apiService.post(`${this.baseUrl}/surprise-baskets`, data)
-      return response
+      return response as any
     } catch (error: any) {
-      return this.handleError(error)
+      return this.handleError(error) as any
     }
   }
 
@@ -363,21 +363,21 @@ class MerchantService {
   async updateSurpriseBasket(id: number, data: Partial<SurpriseBasketCreateData>): Promise<ApiResponse<{ basket: SurpriseBasket }>> {
     try {
       const response = await apiService.put(`${this.baseUrl}/surprise-baskets/${id}`, data)
-      return response
+      return response as any
     } catch (error: any) {
-      return this.handleError(error)
+      return this.handleError(error) as any
     }
   }
 
   /**
    * Supprimer un panier surprise
    */
-  async deleteSurpriseBasket(id: number): Promise<ApiResponse> {
+  async deleteSurpriseBasket(id: number): Promise<ApiResponse<any>> {
     try {
       const response = await apiService.delete(`${this.baseUrl}/surprise-baskets/${id}`)
-      return response
+      return response as any
     } catch (error: any) {
-      return this.handleError(error)
+      return this.handleError(error) as any
     }
   }
 
@@ -389,23 +389,23 @@ class MerchantService {
   async getReviews(page: number = 1): Promise<ApiResponse<PaginatedResponse<any>>> {
     try {
       const response = await apiService.get(`${this.baseUrl}/reviews/merchant?page=${page}`)
-      return response
+      return response as any
     } catch (error: any) {
-      return this.handleError(error)
+      return this.handleError(error) as any
     }
   }
 
   /**
    * Répondre à un avis
    */
-  async respondToReview(reviewId: number, response: string): Promise<ApiResponse> {
+  async respondToReview(reviewId: number, response: string): Promise<ApiResponse<any>> {
     try {
       const apiResponse = await apiService.post(`${this.baseUrl}/reviews/${reviewId}/respond`, {
         response
       })
-      return apiResponse
+      return apiResponse as any
     } catch (error: any) {
-      return this.handleError(error)
+      return this.handleError(error) as any
     }
   }
 
@@ -417,9 +417,9 @@ class MerchantService {
   async getCategories(): Promise<ApiResponse<{ categories: Category[] }>> {
     try {
       const response = await apiService.get(`${this.baseUrl}/categories`)
-      return response
+      return response as any
     } catch (error: any) {
-      return this.handleError(error)
+      return this.handleError(error) as any
     }
   }
 
@@ -432,9 +432,9 @@ class MerchantService {
       formData.append('image', file)
 
       const response = await apiService.postFormData(`${this.baseUrl}/products/upload-image`, formData)
-      return response
+      return response as any
     } catch (error: any) {
-      return this.handleError(error)
+      return this.handleError(error) as any
     }
   }
 
@@ -451,16 +451,16 @@ class MerchantService {
   }): Promise<ApiResponse<{ merchant: any }>> {
     try {
       const response = await apiService.put(`${this.baseUrl}/merchants/profile`, data)
-      return response
+      return response as any
     } catch (error: any) {
-      return this.handleError(error)
+      return this.handleError(error) as any
     }
   }
 
   /**
    * Gestion des erreurs
    */
-  private handleError(error: any): ApiResponse {
+  private handleError(error: any): ApiResponse<any> {
     if (error.response?.data) {
       return error.response.data
     }
@@ -468,7 +468,7 @@ class MerchantService {
     return {
       success: false,
       message: error.message || 'Une erreur inattendue s\'est produite',
-      errors: {}
+      data: null
     }
   }
 

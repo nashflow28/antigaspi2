@@ -9,12 +9,14 @@
       <div class="container-2025 py-6">
         <div class="flex items-center justify-between animate-fade-in-up">
           <div class="flex items-center gap-4">
-            <button
+            <Button
+              variant="ghost"
+              size="sm"
+              class="p-2"
               @click="$router.go(-1)"
-              class="p-2 rounded-xl text-neutral-600 hover:text-primary-600 hover:bg-primary-50 transition-all duration-200"
             >
               <ArrowLeft class="w-6 h-6" />
-            </button>
+            </Button>
             <div>
               <h1 class="text-3xl lg:text-4xl font-bold text-neutral-900 mb-2">
                 Portefeuille électronique 💳
@@ -30,7 +32,6 @@
 
     <div class="container-2025 py-8">
       <div class="max-w-6xl mx-auto space-y-8">
-
         <!-- Wallet Card -->
         <div class="animate-fade-in-up">
           <WalletCard
@@ -43,49 +44,53 @@
 
         <!-- Quick Actions -->
         <div class="grid grid-cols-2 md:grid-cols-4 gap-4 animate-fade-in-up" style="animation-delay: 0.1s;">
-          <button
+          <Button
+            variant="outline"
+            class="p-4 h-auto flex-col justify-start"
             @click="showRechargeModal = true"
-            class="p-4 bg-white rounded-xl border border-neutral-200 hover:border-primary-300 hover:bg-primary-50 transition-all duration-200 text-center group"
           >
             <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3 group-hover:bg-green-200 transition-colors">
               <Plus class="w-6 h-6 text-green-600" />
             </div>
             <div class="font-medium text-neutral-900">Recharger</div>
             <div class="text-sm text-neutral-500">Ajouter des fonds</div>
-          </button>
+          </Button>
 
-          <button
+          <Button
+            variant="outline"
+            class="p-4 h-auto flex-col justify-start"
             @click="showTransferModal = true"
-            class="p-4 bg-white rounded-xl border border-neutral-200 hover:border-primary-300 hover:bg-primary-50 transition-all duration-200 text-center group"
           >
             <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-3 group-hover:bg-blue-200 transition-colors">
               <ArrowUpRight class="w-6 h-6 text-blue-600" />
             </div>
             <div class="font-medium text-neutral-900">Transférer</div>
             <div class="text-sm text-neutral-500">Vers un autre utilisateur</div>
-          </button>
+          </Button>
 
-          <button
+          <Button
+            variant="outline"
+            class="p-4 h-auto flex-col justify-start"
             @click="showSettingsModal = true"
-            class="p-4 bg-white rounded-xl border border-neutral-200 hover:border-primary-300 hover:bg-primary-50 transition-all duration-200 text-center group"
           >
             <div class="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-3 group-hover:bg-purple-200 transition-colors">
               <Settings class="w-6 h-6 text-purple-600" />
             </div>
             <div class="font-medium text-neutral-900">Paramètres</div>
             <div class="text-sm text-neutral-500">PIN et limites</div>
-          </button>
+          </Button>
 
-          <button
+          <Button
+            variant="outline"
+            class="p-4 h-auto flex-col justify-start"
             @click="showStatsModal = true"
-            class="p-4 bg-white rounded-xl border border-neutral-200 hover:border-primary-300 hover:bg-primary-50 transition-all duration-200 text-center group"
           >
             <div class="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-3 group-hover:bg-orange-200 transition-colors">
               <BarChart3 class="w-6 h-6 text-orange-600" />
             </div>
             <div class="font-medium text-neutral-900">Statistiques</div>
             <div class="text-sm text-neutral-500">Analyse des dépenses</div>
-          </button>
+          </Button>
         </div>
 
         <!-- Main Content Grid -->
@@ -136,8 +141,8 @@
               </div>
               <div v-else class="text-center py-4">
                 <div class="animate-pulse">
-                  <div class="h-4 bg-gray-200 rounded w-3/4 mx-auto mb-2"></div>
-                  <div class="h-4 bg-gray-200 rounded w-1/2 mx-auto"></div>
+                  <div class="h-4 bg-gray-200 rounded w-3/4 mx-auto mb-2" />
+                  <div class="h-4 bg-gray-200 rounded w-1/2 mx-auto" />
                 </div>
               </div>
             </Card>
@@ -154,7 +159,7 @@
                   <div
                     class="bg-gradient-to-r from-primary-500 to-primary-600 h-3 rounded-full transition-all duration-300"
                     :style="{ width: Math.min(walletStore.dailyLimitUsagePercentage, 100) + '%' }"
-                  ></div>
+                  />
                 </div>
                 <div class="flex justify-between text-sm">
                   <span class="text-neutral-600">Limite</span>
@@ -187,11 +192,11 @@
               </div>
               <button
                 v-if="!walletStore.hasPin"
-                @click="showPinSetupModal = true"
                 class="w-full mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
+                @click="showPinSetupModal = true"
               >
                 Configurer un PIN
-              </button>
+              </Button>
             </Card>
           </div>
         </div>
@@ -220,18 +225,18 @@
         <div class="flex items-center justify-between mb-6">
           <h3 class="text-xl font-semibold text-gray-900">Transfert (Bientôt disponible)</h3>
           <button
-            @click="showTransferModal = false"
             class="text-gray-400 hover:text-gray-600"
+            @click="showTransferModal = false"
           >
             <X class="w-6 h-6" />
-          </button>
+          </Button>
         </div>
         <p class="text-gray-600 mb-4">
           La fonctionnalité de transfert entre utilisateurs sera disponible dans une prochaine mise à jour.
         </p>
         <button
-          @click="showTransferModal = false"
           class="w-full px-4 py-3 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
+          @click="showTransferModal = false"
         >
           Compris
         </button>
@@ -244,38 +249,38 @@
         <div class="flex items-center justify-between mb-6">
           <h3 class="text-xl font-semibold text-gray-900">Paramètres du portefeuille</h3>
           <button
-            @click="showSettingsModal = false"
             class="text-gray-400 hover:text-gray-600"
+            @click="showSettingsModal = false"
           >
             <X class="w-6 h-6" />
-          </button>
+          </Button>
         </div>
         <div class="space-y-4">
           <button
-            @click="() => { showSettingsModal = false; showPinSetupModal = true }"
             class="w-full flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+            @click="() => { showSettingsModal = false; showPinSetupModal = true }"
           >
             <div class="flex items-center gap-3">
               <Key class="w-5 h-5 text-gray-600" />
               <span class="font-medium">{{ walletStore.hasPin ? 'Modifier le PIN' : 'Configurer un PIN' }}</span>
             </div>
             <ChevronRight class="w-5 h-5 text-gray-400" />
-          </button>
+          </Button>
 
           <div class="p-4 border border-gray-200 rounded-lg">
             <div class="flex items-center justify-between mb-2">
               <span class="font-medium">Activer/Désactiver le portefeuille</span>
               <button
-                @click="toggleWalletStatus"
                 :disabled="walletStore.loading"
                 class="relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
                 :class="walletStore.isActive ? 'bg-primary-600' : 'bg-gray-200'"
+                @click="toggleWalletStatus"
               >
                 <span
                   class="inline-block h-4 w-4 transform rounded-full bg-white transition-transform"
                   :class="walletStore.isActive ? 'translate-x-6' : 'translate-x-1'"
                 />
-              </button>
+              </Button>
             </div>
             <p class="text-sm text-gray-500">
               {{ walletStore.isActive ? 'Portefeuille activé' : 'Portefeuille désactivé' }}
@@ -291,18 +296,18 @@
         <div class="flex items-center justify-between mb-6">
           <h3 class="text-xl font-semibold text-gray-900">Statistiques détaillées</h3>
           <button
-            @click="showStatsModal = false"
             class="text-gray-400 hover:text-gray-600"
+            @click="showStatsModal = false"
           >
             <X class="w-6 h-6" />
-          </button>
+          </Button>
         </div>
         <p class="text-gray-600 mb-4">
           Les statistiques détaillées avec graphiques seront disponibles dans une prochaine version.
         </p>
         <button
-          @click="showStatsModal = false"
           class="w-full px-4 py-3 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
+          @click="showStatsModal = false"
         >
           Fermer
         </button>
@@ -325,6 +330,7 @@ import {
 } from 'lucide-vue-next'
 import DashboardLayout from '@/components/ui/DashboardLayout.vue'
 import Card from '@/components/ui/2025/Card.vue'
+import Button from '@/components/ui/2025/Button.vue'
 import { useDashboardLayout } from '@/composables/useDashboardLayout'
 
 const walletStore = useWalletStore()

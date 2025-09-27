@@ -14,8 +14,8 @@
     <div :class="containerClasses">
       <!-- Left Icon -->
       <component
-        v-if="leftIcon"
         :is="leftIcon"
+        v-if="leftIcon"
         :class="iconClasses"
       />
 
@@ -36,22 +36,22 @@
         @blur="handleBlur"
         @input="handleInput"
         @keydown="handleKeydown"
-      />
+      >
 
       <!-- Right Icon / Clear Button -->
       <div v-if="rightIcon || (clearable && model)" class="flex items-center">
         <button
           v-if="clearable && model"
-          @click="clearInput"
           type="button"
           :class="clearButtonClasses"
+          @click="clearInput"
         >
           <X :size="16" />
         </button>
 
         <component
-          v-if="rightIcon"
           :is="rightIcon"
+          v-if="rightIcon"
           :class="iconClasses"
         />
       </div>

@@ -1,6 +1,5 @@
 <template>
   <button
-    @click="toggleDarkMode"
     class="relative inline-flex items-center justify-center p-2 rounded-xl transition-all duration-300 ease-out-expo group focus-2025"
     :class="[
       isDark
@@ -8,6 +7,7 @@
         : 'bg-white/80 text-neutral-700 border border-neutral-200 hover:bg-neutral-50'
     ]"
     :aria-label="isDark ? 'Activer le mode clair' : 'Activer le mode sombre'"
+    @click="toggleDarkMode"
   >
     <!-- Sun Icon -->
     <Transition
@@ -40,13 +40,14 @@
     </Transition>
 
     <!-- Hover glow effect -->
-    <div class="absolute inset-0 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"
-         :class="[
-           isDark
-             ? 'bg-gradient-to-r from-indigo-500/20 to-purple-500/20'
-             : 'bg-gradient-to-r from-amber-400/20 to-orange-400/20'
-         ]">
-    </div>
+    <div
+      class="absolute inset-0 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"
+      :class="[
+        isDark
+          ? 'bg-gradient-to-r from-indigo-500/20 to-purple-500/20'
+          : 'bg-gradient-to-r from-amber-400/20 to-orange-400/20'
+      ]"
+    />
   </button>
 </template>
 

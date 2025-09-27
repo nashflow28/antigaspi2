@@ -16,9 +16,9 @@
           </div>
           <div class="flex items-center gap-3">
             <button
-              @click="refreshPoints"
               :disabled="loading"
               class="button-outline-2025 text-sm"
+              @click="refreshPoints"
             >
               <RefreshCw class="w-4 h-4" :class="{ 'animate-spin': loading }" />
               Actualiser
@@ -30,11 +30,9 @@
 
     <div class="container mx-auto px-4 py-8">
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-
         <!-- Points Summary Cards -->
         <div class="lg:col-span-3">
           <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-
             <!-- Total Points -->
             <Card class="glow-effect">
               <div class="flex items-center justify-between">
@@ -81,7 +79,6 @@
                 </div>
               </div>
             </Card>
-
           </div>
         </div>
 
@@ -189,10 +186,10 @@
                 <p class="text-sm text-neutral-600 mb-4">{{ reward.description }}</p>
 
                 <button
-                  @click="openRedeemModal(reward)"
                   :disabled="!canRedeem(reward.cost)"
                   class="w-full button-primary-2025"
                   :class="canRedeem(reward.cost) ? 'button-primary-2025' : 'button-outline-2025 opacity-50 cursor-not-allowed'"
+                  @click="openRedeemModal(reward)"
                 >
                   {{ canRedeem(reward.cost) ? 'Échanger' : 'Points insuffisants' }}
                 </button>
@@ -200,20 +197,19 @@
             </div>
           </Card>
         </div>
-
       </div>
     </div>
 
     <!-- Redeem Modal -->
     <div v-if="selectedReward" class="fixed inset-0 z-[9999] overflow-y-auto">
-      <div class="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm transition-opacity" @click="closeRedeemModal"></div>
+      <div class="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm transition-opacity" @click="closeRedeemModal" />
 
       <div class="flex min-h-full items-center justify-center p-4">
         <div class="relative w-full max-w-md bg-white rounded-2xl shadow-xl transform transition-all" @click.stop>
           <div class="px-6 py-4 border-b border-gray-200">
             <div class="flex items-center justify-between">
               <h3 class="text-lg font-semibold text-gray-900">Confirmer l'échange</h3>
-              <button @click="closeRedeemModal" class="p-2 hover:bg-gray-100 rounded-lg transition-colors">
+              <button class="p-2 hover:bg-gray-100 rounded-lg transition-colors" @click="closeRedeemModal">
                 <X class="w-5 h-5 text-gray-400" />
               </button>
             </div>
@@ -240,13 +236,13 @@
             </div>
 
             <div class="flex gap-3">
-              <button @click="closeRedeemModal" class="flex-1 button-outline-2025">
+              <button class="flex-1 button-outline-2025" @click="closeRedeemModal">
                 Annuler
               </button>
               <button
-                @click="confirmRedeem"
                 :disabled="redeeming"
                 class="flex-1 button-primary-2025"
+                @click="confirmRedeem"
               >
                 <Loader2 v-if="redeeming" class="w-4 h-4 mr-2 animate-spin" />
                 {{ redeeming ? 'Échange...' : 'Confirmer' }}

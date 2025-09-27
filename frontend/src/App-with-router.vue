@@ -5,7 +5,7 @@
       <router-link to="/">Accueil</router-link> |
       <router-link to="/products">Produits</router-link>
     </nav>
-    <hr />
+    <hr>
     <router-view />
   </div>
 </template>

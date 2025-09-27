@@ -14,7 +14,7 @@ import { useFavoritesStore } from '@/stores/favorites'
 const baseFavorite = {
   id: 42,
   type: 'product' as const,
-  name: 'Produit star',
+  name: 'Produit star'
 }
 
 describe('favorites store notifications', () => {
@@ -35,9 +35,9 @@ describe('favorites store notifications', () => {
       expect.objectContaining({
         action: expect.objectContaining({
           label: 'Réessayer',
-          callback: expect.any(Function),
+          callback: expect.any(Function)
         }),
-        onClose: expect.any(Function),
+        onClose: expect.any(Function)
       })
     )
     expect(store.pendingOperation).toBe('remove')

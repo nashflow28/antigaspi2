@@ -11,12 +11,12 @@ import path from 'path'
 import { fileURLToPath } from 'url'
 
 const __filename = fileURLToPath(import.meta.url)
-const __dirname = path.dirname(__filename)
+const _unused_dirname = path.dirname(__filename)
 
 console.log('📸 Visual Regression Baseline Capture - Phase 3\n')
 
 // Configuration
-const PROJECT_ROOT = path.resolve(__dirname, '..')
+const PROJECT_ROOT = path.resolve(_unused_dirname, '..')
 const SCREENSHOTS_DIR = path.join(PROJECT_ROOT, 'test-screenshots/baseline')
 const BASE_URL = process.env.BASE_URL || 'http://localhost:3000'
 
@@ -37,7 +37,7 @@ const ROUTES_TO_CAPTURE = [
   { path: '/admin/dashboard', name: 'admin-dashboard', requiresAuth: 'admin' },
 
   // Error states
-  { path: '/404', name: 'not-found-page', waitFor: 'h1' },
+  { path: '/404', name: 'not-found-page', waitFor: 'h1' }
 
   // Components showcase (if Storybook available)
   // { path: '/storybook/button', name: 'button-component' }
@@ -128,7 +128,7 @@ async function captureScreenshot(page, route, viewport, theme) {
     if (route.waitFor) {
       try {
         await page.waitForSelector(route.waitFor, { timeout: 10000 })
-      } catch (error) {
+      } catch (_error) {
         console.warn(`Warning: Selector ${route.waitFor} not found for ${route.path}`)
       }
     }
@@ -150,8 +150,8 @@ async function captureScreenshot(page, route, viewport, theme) {
     console.log(`  ✅ Saved: ${filename}`)
     return true
 
-  } catch (error) {
-    console.error(`  ❌ Failed to capture ${route.name}:`, error.message)
+  } catch (_error) {
+    console.error(`  ❌ Failed to capture ${route.name}:`, _error.message)
     return false
   }
 }
@@ -187,7 +187,7 @@ async function checkApplicationRunning() {
   try {
     const response = await fetch(BASE_URL)
     return response.ok
-  } catch (error) {
+  } catch (_error) {
     return false
   }
 }
@@ -269,8 +269,8 @@ async function main() {
       }
     }
 
-  } catch (error) {
-    console.error('❌ Screenshot capture failed:', error)
+  } catch (_error) {
+    console.error('❌ Screenshot capture failed:', _error)
   } finally {
     await browser.close()
   }

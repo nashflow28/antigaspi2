@@ -4,9 +4,9 @@
     <div v-if="loading" class="container-2025 py-8">
       <Card class="animate-pulse">
         <div class="space-y-4">
-          <div class="h-8 bg-neutral-200 rounded w-1/3"></div>
-          <div class="h-4 bg-neutral-200 rounded w-3/4"></div>
-          <div class="h-4 bg-neutral-200 rounded w-1/2"></div>
+          <div class="h-8 bg-neutral-200 rounded w-1/3" />
+          <div class="h-4 bg-neutral-200 rounded w-3/4" />
+          <div class="h-4 bg-neutral-200 rounded w-1/2" />
         </div>
       </Card>
     </div>
@@ -48,7 +48,7 @@
                   <ArrowLeft class="w-4 h-4" />
                   Retour
                 </Button>
-                <div class="h-6 w-px bg-neutral-300"></div>
+                <div class="h-6 w-px bg-neutral-300" />
                 <span class="text-sm text-neutral-500">Réservation</span>
               </div>
               <h1 class="text-2xl font-bold text-neutral-900">
@@ -90,7 +90,7 @@
                   :src="reservation.product.image_url"
                   :alt="reservation.product.name"
                   class="w-full h-full object-cover"
-                />
+                >
               </div>
               <div
                 v-else

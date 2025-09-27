@@ -38,8 +38,8 @@
             <label class="block text-sm font-medium text-gray-700 mb-2">Note</label>
             <select
               v-model="filters.rating"
-              @change="() => loadReviews()"
               class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+              @change="() => loadReviews()"
             >
               <option value="">Toutes les notes</option>
               <option value="5">5 étoiles</option>
@@ -55,8 +55,8 @@
             <label class="block text-sm font-medium text-gray-700 mb-2">Produit</label>
             <select
               v-model="filters.product_id"
-              @change="() => loadReviews()"
               class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+              @change="() => loadReviews()"
             >
               <option value="">Tous les produits</option>
               <option
@@ -74,8 +74,8 @@
             <label class="block text-sm font-medium text-gray-700 mb-2">Type</label>
             <select
               v-model="filters.verified_only"
-              @change="() => loadReviews()"
               class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+              @change="() => loadReviews()"
             >
               <option value="">Tous les avis</option>
               <option value="true">Achats vérifiés uniquement</option>
@@ -87,8 +87,8 @@
             <label class="block text-sm font-medium text-gray-700 mb-2">Tri</label>
             <select
               v-model="filters.sort"
-              @change="() => loadReviews()"
               class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+              @change="() => loadReviews()"
             >
               <option value="recent">Plus récents</option>
               <option value="oldest">Plus anciens</option>
@@ -110,9 +110,9 @@
               </span>
             </h3>
             <button
-              @click="() => loadReviews()"
               class="inline-flex items-center px-3 py-1 text-sm text-primary-600 hover:text-primary-700 transition-colors"
               :disabled="loading"
+              @click="() => loadReviews()"
             >
               <ArrowPathIcon class="w-4 h-4 mr-1" :class="{ 'animate-spin': loading }" />
               Actualiser
@@ -123,7 +123,7 @@
         <div class="divide-y divide-gray-200">
           <!-- Loading State -->
           <div v-if="loading" class="px-6 py-8 text-center">
-            <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600 mx-auto"></div>
+            <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600 mx-auto" />
             <p class="text-gray-500 mt-2">Chargement des avis...</p>
           </div>
 
@@ -138,8 +138,8 @@
 
           <!-- Reviews -->
           <div
-            v-else
             v-for="review in reviews"
+            v-else
             :key="review.id"
             class="px-6 py-6 hover:bg-gray-50 transition-colors"
           >
@@ -207,16 +207,16 @@
             </div>
             <div class="flex space-x-2">
               <button
-                @click="loadPage(pagination.current_page - 1)"
                 :disabled="pagination.current_page <= 1"
                 class="px-3 py-1 text-sm border border-gray-300 rounded disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
+                @click="loadPage(pagination.current_page - 1)"
               >
                 Précédent
               </button>
               <button
-                @click="loadPage(pagination.current_page + 1)"
                 :disabled="pagination.current_page >= pagination.last_page"
                 class="px-3 py-1 text-sm border border-gray-300 rounded disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
+                @click="loadPage(pagination.current_page + 1)"
               >
                 Suivant
               </button>
@@ -231,6 +231,7 @@
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue'
 import { useAuthStore } from '@/stores/auth'
+import { useDashboardLayout } from '@/composables/useDashboardLayout'
 import MerchantResponse from '@/components/reviews/MerchantResponse.vue'
 import {
   ChatBubbleLeftRightIcon,

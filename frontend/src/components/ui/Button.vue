@@ -50,10 +50,10 @@
 </template>
 
 <script setup lang="ts">
-import { computed, markRaw, toRaw, useAttrs } from 'vue';
-import type { Component, VNode } from 'vue';
+import { computed, markRaw, toRaw, useAttrs } from 'vue'
+import type { Component, VNode } from 'vue'
 
-defineOptions({ inheritAttrs: false });
+defineOptions({ inheritAttrs: false })
 
 type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'outline' | 'promo' | 'destructive';
 type ButtonSize = 'sm' | 'default' | 'lg' | 'xl' | 'icon';
@@ -76,20 +76,20 @@ const props = withDefaults(
     disabled: false,
     leftIcon: null,
     rightIcon: null,
-    type: 'button',
-  },
-);
+    type: 'button'
+  }
+)
 
 const emit = defineEmits<{
   (event: 'click', value: MouseEvent): void;
   (event: 'focus', value: FocusEvent): void;
   (event: 'blur', value: FocusEvent): void;
-}>();
+}>()
 
-const attrs = useAttrs();
+const attrs = useAttrs()
 
 const baseClasses =
-  'group inline-flex items-center justify-center gap-2 rounded-2xl font-medium tracking-tight transition-all duration-300 ease-spring-out focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-400 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-50 disabled:opacity-60 disabled:cursor-not-allowed disabled:shadow-none relative overflow-hidden isolate select-none will-change-transform';
+  'group inline-flex items-center justify-center gap-2 rounded-2xl font-medium tracking-tight transition-all duration-300 ease-spring-out focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-400 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-50 disabled:opacity-60 disabled:cursor-not-allowed disabled:shadow-none relative overflow-hidden isolate select-none will-change-transform'
 
 const variantClasses: Record<ButtonVariant, string> = {
   primary:
@@ -103,63 +103,63 @@ const variantClasses: Record<ButtonVariant, string> = {
   promo:
     'bg-accent-orange text-neutral-900 shadow-card hover:shadow-glow hover:brightness-[1.03]',
   destructive:
-    'bg-accent-red text-white shadow-card hover:bg-accent-red/90 focus-visible:ring-accent-red/40',
-};
+    'bg-accent-red text-white shadow-card hover:bg-accent-red/90 focus-visible:ring-accent-red/40'
+}
 
 const sizeClasses: Record<ButtonSize, string> = {
   sm: 'px-4 py-2 text-small rounded-xl',
   default: 'px-5 py-2.5 text-body',
   lg: 'px-6 py-3 text-h4',
   xl: 'px-7 py-3.5 text-h3',
-  icon: 'p-2.5 rounded-xl',
-};
+  icon: 'p-2.5 rounded-xl'
+}
 
-const externalClass = computed(() => (attrs.class as string | undefined) ?? '');
+const externalClass = computed(() => (attrs.class as string | undefined) ?? '')
 const otherAttrs = computed(() => {
-  const { class: _class, ...rest } = attrs;
-  return rest;
-});
+  const { class: _class, ...rest } = attrs
+  return rest
+})
 
-const isDisabled = computed(() => props.disabled || props.loading);
+const isDisabled = computed(() => props.disabled || props.loading)
 
 const buttonClass = computed(() => [
   baseClasses,
   variantClasses[props.variant],
   sizeClasses[props.size],
   props.loading ? 'cursor-wait' : '',
-  externalClass.value,
-]);
+  externalClass.value
+])
 
 const normalizeIcon = (icon: IconProp) => {
   if (!icon) {
-    return null;
+    return null
   }
 
   if (typeof icon === 'object') {
-    return markRaw(toRaw(icon));
+    return markRaw(toRaw(icon))
   }
 
-  return icon;
-};
+  return icon
+}
 
-const normalizedLeftIcon = computed(() => normalizeIcon(props.leftIcon));
-const normalizedRightIcon = computed(() => normalizeIcon(props.rightIcon));
+const normalizedLeftIcon = computed(() => normalizeIcon(props.leftIcon))
+const normalizedRightIcon = computed(() => normalizeIcon(props.rightIcon))
 
 const onClick = (event: MouseEvent) => {
   if (isDisabled.value) {
-    event.preventDefault();
-    event.stopImmediatePropagation?.();
-    return;
+    event.preventDefault()
+    event.stopImmediatePropagation?.()
+    return
   }
-  emit('click', event);
-};
+  emit('click', event)
+}
 
 const onFocus = (event: FocusEvent) => {
-  emit('focus', event);
-};
+  emit('focus', event)
+}
 
 const onBlur = (event: FocusEvent) => {
-  emit('blur', event);
-};
+  emit('blur', event)
+}
 
 </script>

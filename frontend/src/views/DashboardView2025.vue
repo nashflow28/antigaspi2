@@ -29,7 +29,12 @@
       <!-- Quick Stats Cards -->
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6 mb-8">
         <!-- Économies réalisées -->
-        <Card variant="glass" interactive class="glow-effect animate-fade-in-up" style="animation-delay: 0.1s;">
+        <Card
+          variant="glass"
+          interactive
+          class="glow-effect animate-fade-in-up"
+          style="animation-delay: 0.1s;"
+        >
           <div class="flex items-center justify-between">
             <div>
               <div class="text-2xl lg:text-3xl font-bold text-primary-600 mb-2">
@@ -48,7 +53,12 @@
         </Card>
 
         <!-- Produits sauvés -->
-        <Card variant="glass" interactive class="glow-effect animate-fade-in-up" style="animation-delay: 0.2s;">
+        <Card
+          variant="glass"
+          interactive
+          class="glow-effect animate-fade-in-up"
+          style="animation-delay: 0.2s;"
+        >
           <div class="flex items-center justify-between">
             <div>
               <div class="text-2xl lg:text-3xl font-bold text-primary-600 mb-2">
@@ -67,7 +77,12 @@
         </Card>
 
         <!-- Impact CO₂ -->
-        <Card variant="glass" interactive class="glow-effect animate-fade-in-up" style="animation-delay: 0.3s;">
+        <Card
+          variant="glass"
+          interactive
+          class="glow-effect animate-fade-in-up"
+          style="animation-delay: 0.3s;"
+        >
           <div class="flex items-center justify-between">
             <div>
               <div class="text-2xl lg:text-3xl font-bold text-accent-blue mb-2">
@@ -86,7 +101,12 @@
         </Card>
 
         <!-- Réservations actives -->
-        <Card variant="glass" interactive class="glow-effect animate-fade-in-up" style="animation-delay: 0.4s;">
+        <Card
+          variant="glass"
+          interactive
+          class="glow-effect animate-fade-in-up"
+          style="animation-delay: 0.4s;"
+        >
           <div class="flex items-center justify-between">
             <div>
               <div class="text-2xl lg:text-3xl font-bold text-accent-orange mb-2">
@@ -105,7 +125,13 @@
         </Card>
 
         <!-- Portefeuille électronique -->
-        <Card variant="glass" interactive class="glow-effect animate-fade-in-up cursor-pointer" style="animation-delay: 0.5s;" @click="router.push('/wallet')">
+        <Card
+          variant="glass"
+          interactive
+          class="glow-effect animate-fade-in-up cursor-pointer"
+          style="animation-delay: 0.5s;"
+          @click="router.push('/wallet')"
+        >
           <div class="flex items-center justify-between">
             <div>
               <div class="text-2xl lg:text-3xl font-bold text-indigo-600 mb-2">
@@ -138,8 +164,8 @@
               <Button
                 variant="ghost"
                 size="sm"
-                @click="router.push('/reservations')"
                 class="text-primary-600 hover:text-primary-700"
+                @click="router.push('/reservations')"
               >
                 <span>Voir tout</span>
                 <ArrowRight class="w-4 h-4" />
@@ -150,10 +176,10 @@
               <!-- Loading state -->
               <div v-if="loading" class="space-y-4">
                 <div v-for="i in 3" :key="i" class="flex items-center gap-4 p-4 rounded-xl border border-neutral-200 animate-pulse">
-                  <div class="w-16 h-16 bg-neutral-200 rounded-xl"></div>
+                  <div class="w-16 h-16 bg-neutral-200 rounded-xl" />
                   <div class="flex-1 space-y-2">
-                    <div class="h-4 bg-neutral-200 rounded w-3/4"></div>
-                    <div class="h-3 bg-neutral-200 rounded w-1/2"></div>
+                    <div class="h-4 bg-neutral-200 rounded w-3/4" />
+                    <div class="h-3 bg-neutral-200 rounded w-1/2" />
                   </div>
                 </div>
               </div>
@@ -169,8 +195,8 @@
               </div>
 
               <div
-                v-else
                 v-for="reservation in recentReservations"
+                v-else
                 :key="reservation.id"
                 class="flex items-center gap-4 p-4 rounded-xl border border-neutral-200 hover:border-primary-300 hover:shadow-card transition-all duration-200"
               >
@@ -204,8 +230,8 @@
               <Button
                 variant="ghost"
                 size="sm"
-                @click="router.push('/products')"
                 class="text-primary-600 hover:text-primary-700"
+                @click="router.push('/products')"
               >
                 <span>Voir le catalogue</span>
                 <ArrowRight class="w-4 h-4" />
@@ -255,7 +281,7 @@
               <div
                 class="bg-nav-gradient h-2 rounded-full transition-all duration-500"
                 :style="{ width: Math.min(100, (userStats.productsSaved / 100) * 100) + '%' }"
-              ></div>
+              />
             </div>
             <p class="text-xs text-neutral-500">
               Plus que {{ Math.max(0, 100 - userStats.productsSaved) }} produits pour le niveau suivant
@@ -384,9 +410,9 @@ const recommendedProducts = ref([
 ])
 
 const ecoTips = ref([
-  { text: "Privilégiez les commerces de proximité pour réduire votre empreinte carbone." },
-  { text: "Réservez vos produits en fin de journée pour les meilleures offres." },
-  { text: "Apportez vos sacs réutilisables lors de vos retraits." },
+  { text: 'Privilégiez les commerces de proximité pour réduire votre empreinte carbone.' },
+  { text: 'Réservez vos produits en fin de journée pour les meilleures offres.' },
+  { text: 'Apportez vos sacs réutilisables lors de vos retraits.' },
   { text: "Partagez l'application avec vos proches pour multiplier l'impact." }
 ])
 

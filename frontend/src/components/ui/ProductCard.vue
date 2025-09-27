@@ -9,7 +9,7 @@
         :src="image"
         :alt="name"
         class="h-full w-full object-cover transition duration-500 group-hover:scale-105"
-      />
+      >
       <span
         v-if="discount"
         class="absolute left-4 top-4 rounded-full bg-primary-700 px-3 py-1 text-caption font-semibold text-neutral-50 shadow-card"
@@ -71,10 +71,10 @@
 </template>
 
 <script setup lang="ts">
-import { computed, toRefs, useAttrs } from 'vue';
-import Button from './Button.vue';
+import { computed, toRefs, useAttrs } from 'vue'
+import Button from './Button.vue'
 
-defineOptions({ inheritAttrs: false });
+defineOptions({ inheritAttrs: false })
 
 const props = withDefaults(
   defineProps<{
@@ -93,38 +93,38 @@ const props = withDefaults(
   {
     tags: () => [],
     reserveLoading: false,
-    reserveDisabled: false,
-  },
-);
+    reserveDisabled: false
+  }
+)
 
 const emit = defineEmits<{
   (event: 'reserve'): void;
   (event: 'onReserve'): void;
-}>();
+}>()
 
-const attrs = useAttrs();
+const attrs = useAttrs()
 
 const baseClasses =
-  'group relative flex flex-col overflow-hidden rounded-3xl border border-primary-500/15 bg-white shadow-card transition-all duration-300 hover:-translate-y-1 hover:scale-[1.02] hover:shadow-glow dark:bg-neutral-900';
+  'group relative flex flex-col overflow-hidden rounded-3xl border border-primary-500/15 bg-white shadow-card transition-all duration-300 hover:-translate-y-1 hover:scale-[1.02] hover:shadow-glow dark:bg-neutral-900'
 
-const externalClass = computed(() => (attrs.class as string | undefined) ?? '');
+const externalClass = computed(() => (attrs.class as string | undefined) ?? '')
 
-const articleClasses = computed(() => [baseClasses, externalClass.value]);
+const articleClasses = computed(() => [baseClasses, externalClass.value])
 
 const otherAttrs = computed(() => {
-  const { class: _class, ...rest } = attrs;
-  return rest;
-});
+  const { class: _class, ...rest } = attrs
+  return rest
+})
 
-const { image, name, merchant, price, originalPrice, discount, quantity, tags } = toRefs(props);
+const { image, name, merchant, price, originalPrice, discount, quantity, tags } = toRefs(props)
 
-const hasTags = computed(() => (tags.value?.length ?? 0) > 0);
+const hasTags = computed(() => (tags.value?.length ?? 0) > 0)
 
 const handleReserve = (event: MouseEvent) => {
-  event?.stopPropagation?.();
-  event?.preventDefault?.();
-  props.onReserve?.();
-  emit('reserve');
-  emit('onReserve');
-};
+  event?.stopPropagation?.()
+  event?.preventDefault?.()
+  props.onReserve?.()
+  emit('reserve')
+  emit('onReserve')
+}
 </script>

@@ -94,7 +94,7 @@ export class ApiClient {
       clearTimeout(timeoutId)
 
       // Gestion spéciale pour AbortError (timeout)
-      if (error.name === 'AbortError') {
+      if ((error as any)?.name === 'AbortError') {
         const timeoutError = new Error('Délai de connexion dépassé')
         ;(timeoutError as any).code = 'TIMEOUT'
         throw timeoutError

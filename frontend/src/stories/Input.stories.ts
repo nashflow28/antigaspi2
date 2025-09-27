@@ -1,7 +1,7 @@
-import { computed, ref, watch } from 'vue';
-import type { Meta, StoryObj } from '@storybook/vue3';
-import Input from '@/components/ui/2025/Input.vue';
-import { Calendar, Lock, Mail, Search, User } from 'lucide-vue-next';
+import { computed, ref, watch } from 'vue'
+import type { Meta, StoryObj } from '@storybook/vue3'
+import Input from '@/components/ui/2025/Input.vue'
+import { Calendar, Lock, Mail, Search, User } from 'lucide-vue-next'
 
 type InputComponent = typeof Input;
 
@@ -11,8 +11,8 @@ const iconOptions = {
   Mail,
   User,
   Calendar,
-  Lock,
-};
+  Lock
+}
 
 type IconOption = keyof typeof iconOptions;
 
@@ -30,7 +30,7 @@ const meta: Meta<InputComponent & StoryProps> = {
   component: Input,
   tags: ['autodocs'],
   parameters: {
-    layout: 'centered',
+    layout: 'centered'
   },
   args: {
     variant: 'default',
@@ -41,63 +41,63 @@ const meta: Meta<InputComponent & StoryProps> = {
     disabled: false,
     modelValue: 'contact@antigaspi.fr',
     leftIcon: 'Mail',
-    rightIcon: 'none',
+    rightIcon: 'none'
   },
   argTypes: {
     variant: {
       control: { type: 'select' },
-      options: ['default', 'outline', 'filled'],
+      options: ['default', 'outline', 'filled']
     },
     size: {
       control: { type: 'inline-radio' },
-      options: ['sm', 'md', 'lg'],
+      options: ['sm', 'md', 'lg']
     },
     label: {
-      control: { type: 'text' },
+      control: { type: 'text' }
     },
     helpText: {
-      control: { type: 'text' },
+      control: { type: 'text' }
     },
     error: {
-      control: { type: 'text' },
+      control: { type: 'text' }
     },
     disabled: {
-      control: { type: 'boolean' },
+      control: { type: 'boolean' }
     },
     leftIcon: {
       control: { type: 'select' },
-      options: Object.keys(iconOptions),
+      options: Object.keys(iconOptions)
     },
     rightIcon: {
       control: { type: 'select' },
-      options: Object.keys(iconOptions),
+      options: Object.keys(iconOptions)
     },
     modelValue: {
-      control: { type: 'text' },
-    },
+      control: { type: 'text' }
+    }
   },
   render: (args) => ({
     components: { Input },
     setup() {
-      const value = ref(args.modelValue ?? '');
+      const value = ref(args.modelValue ?? '')
       watch(
         () => args.modelValue,
         (next) => {
           if (typeof next === 'string' && next !== value.value) {
-            value.value = next;
+            value.value = next
           }
-        },
-      );
+        }
+      )
 
       const updateValue = (next: string) => {
-        value.value = next;
-        args.modelValue = next;
-      };
+        value.value = next
+        args.modelValue = next
+      }
 
-      const resolvedLeft = computed(() => iconOptions[(args.leftIcon ?? 'none') as IconOption] ?? null);
-      const resolvedRight = computed(() => iconOptions[(args.rightIcon ?? 'none') as IconOption] ?? null);
+      const resolvedLeft = computed(() => iconOptions[(args.leftIcon ?? 'none') as IconOption] ?? null)
+      const resolvedRight = computed(() => iconOptions[(args.rightIcon ?? 'none') as IconOption] ?? null)
 
-      return { args, value, updateValue, resolvedLeft, resolvedRight };
+      return { args, value, updateValue, resolvedLeft, resolvedRight }
     },
     template: `
       <div class="w-full max-w-md space-y-2">
@@ -114,15 +114,15 @@ const meta: Meta<InputComponent & StoryProps> = {
           @update:model-value="updateValue"
         />
       </div>
-    `,
-  }),
-};
+    `
+  })
+}
 
-export default meta;
+export default meta
 
 type Story = StoryObj<typeof meta>;
 
-export const Playground: Story = {};
+export const Playground: Story = {}
 
 export const WithIcons: Story = {
   args: {
@@ -130,58 +130,58 @@ export const WithIcons: Story = {
     helpText: 'Tapez le nom d’un commerçant ou d’un produit.',
     leftIcon: 'Search',
     rightIcon: 'Calendar',
-    modelValue: '',
+    modelValue: ''
   },
   parameters: {
-    pseudo: { hover: ['input'] },
-  },
-};
+    pseudo: { hover: ['input'] }
+  }
+}
 
 export const FocusState: Story = {
   args: {
-    helpText: 'Saisie en cours…',
+    helpText: 'Saisie en cours…'
   },
   parameters: {
-    pseudo: { focus: ['input'] },
-  },
-};
+    pseudo: { focus: ['input'] }
+  }
+}
 
 export const ErrorState: Story = {
   args: {
     error: 'Adresse email invalide',
-    rightIcon: 'none',
-  },
-};
+    rightIcon: 'none'
+  }
+}
 
 export const Disabled: Story = {
   args: {
     disabled: true,
     modelValue: 'Bouton désactivé',
-    leftIcon: 'Lock',
-  },
-};
+    leftIcon: 'Lock'
+  }
+}
 
 export const DarkMode: Story = {
   args: {
     variant: 'outline',
-    helpText: 'Compatible mode sombre avec contraste renforcé.',
+    helpText: 'Compatible mode sombre avec contraste renforcé.'
   },
   parameters: {
     backgrounds: { default: 'Surface Dark' },
-    globals: { theme: 'dark' },
-  },
-};
+    globals: { theme: 'dark' }
+  }
+}
 
 export const MobileFullWidth: Story = {
   args: {
     label: 'Téléphone portable',
     helpText: 'Affichage optimisé pour mobile.',
     leftIcon: 'User',
-    modelValue: '',
+    modelValue: ''
   },
   parameters: {
     layout: 'fullscreen',
-    viewport: { defaultViewport: 'mobile' },
+    viewport: { defaultViewport: 'mobile' }
   },
   decorators: [
     (story) => ({
@@ -190,7 +190,7 @@ export const MobileFullWidth: Story = {
         <div class="mx-auto w-full max-w-sm px-4 py-8">
           <Story />
         </div>
-      `,
-    }),
-  ],
-};
+      `
+    })
+  ]
+}

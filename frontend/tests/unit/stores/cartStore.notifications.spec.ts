@@ -29,9 +29,9 @@ describe('cart store notifications', () => {
       expect.objectContaining({
         action: expect.objectContaining({
           label: 'Réessayer',
-          callback: expect.any(Function),
+          callback: expect.any(Function)
         }),
-        onClose: expect.any(Function),
+        onClose: expect.any(Function)
       })
     )
     expect(store.pendingOperation).toBe('update-quantity')

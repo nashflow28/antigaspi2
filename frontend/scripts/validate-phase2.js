@@ -11,7 +11,7 @@ const path = require('path')
 console.log('🔍 Phase 2 Validation - Notification System Centralization\n')
 
 // Configuration
-const PROJECT_ROOT = path.resolve(__dirname, '..')
+const PROJECT_ROOT = path.resolve(_unused_dirname, '..')
 const STORES_DIR = path.join(PROJECT_ROOT, 'src/stores')
 const TESTS_DIR = path.join(PROJECT_ROOT, 'tests')
 

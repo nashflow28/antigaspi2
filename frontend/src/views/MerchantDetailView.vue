@@ -160,6 +160,7 @@ import { useFavoritesStore } from '@/stores/favorites'
 import { notify } from '@/composables/useNotifications'
 import { formatPrice } from '@/utils/currency'
 import { Store, Heart, BadgeInfo, MapPin, Phone, Navigation, Package, Star, Leaf } from 'lucide-vue-next'
+import { sanitizeRouteId, logXssAttempt } from '@/utils/sanitization'
 import type { MerchantDetail } from '@/services/merchantService'
 
 const route = useRoute()
@@ -170,7 +171,13 @@ const { currentMerchant, detailLoading } = storeToRefs(merchantsStore)
 
 const fallbackMerchant = ref<MerchantDetail | null>(null)
 
-const merchantId = computed(() => Number(route.params.id))
+// SECURITY FIX: Sanitize route parameters to prevent XSS
+const merchantId = computed(() => {
+  const rawId = route.params.id as string
+  logXssAttempt(rawId || '', 'MerchantDetailView route param')
+  const sanitizedId = sanitizeRouteId(rawId)
+  return sanitizedId || 0
+})
 const activeMerchant = computed<MerchantDetail | null>(() => currentMerchant.value ?? fallbackMerchant.value)
 
 const merchantName = computed(() => activeMerchant.value?.business_name ?? 'Commerçant AntiGaspi')
@@ -216,7 +223,7 @@ const productsPreview = computed(() => {
       id: product.id ?? index,
       name: product.name ?? 'Panier surprise',
       description: product.description ?? 'Composition variable selon arrivage.',
-      discounted_price: Number(product.discounted_price ?? 3500),
+      discounted_price: Number(product.discounted_price ?? 3500)
     }))
   }
 
@@ -236,7 +243,7 @@ const toggleFavorite = () => {
     type: 'merchant',
     name: activeMerchant.value.business_name,
     description: activeMerchant.value.business_type,
-    merchant: activeMerchant.value,
+    merchant: activeMerchant.value
   })
 }
 
@@ -269,14 +276,14 @@ const fetchMerchant = async () => {
         Mardi: '08h00 - 18h00',
         Mercredi: '08h00 - 18h00',
         Jeudi: '08h00 - 18h00',
-        Vendredi: '08h00 - 19h00',
+        Vendredi: '08h00 - 19h00'
       },
       surprise_baskets: [],
       featured_products: [
         { id: 1, name: 'Panier légumes du jour', description: "Assortiment d'une dizaine de légumes", discounted_price: 3200 },
-        { id: 2, name: 'Panier brunch', description: 'Viennoiseries, fruits, boissons locales', discounted_price: 4500 },
+        { id: 2, name: 'Panier brunch', description: 'Viennoiseries, fruits, boissons locales', discounted_price: 4500 }
       ],
-      user: { city: 'Lomé', address: 'Quartier Tokoin', phone: '+228 90 00 00 00' },
+      user: { city: 'Lomé', address: 'Quartier Tokoin', phone: '+228 90 00 00 00' }
     } as MerchantDetail
 
     notify.info("Affichage d'une fiche commerçant de démonstration.", 'Commerçants')

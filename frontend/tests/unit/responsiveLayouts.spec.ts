@@ -33,7 +33,7 @@ vi.mock('@/stores/reservations', () => ({
     loading: loadingMock,
     fetchReservations: vi.fn(async () => ({ success: true })),
     cancelReservation: vi.fn(async () => ({ success: true })),
-    createReservation: vi.fn(async () => ({ success: true, data: null })),
+    createReservation: vi.fn(async () => ({ success: true, data: null }))
   })
 }))
 

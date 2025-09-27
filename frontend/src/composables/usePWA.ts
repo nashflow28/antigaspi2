@@ -199,7 +199,7 @@ export const usePWA = () => {
         resolve(event.data)
       }
 
-      navigator.serviceWorker.controller.postMessage(
+      navigator.serviceWorker.controller?.postMessage(
         { type: 'GET_CACHE_STATUS' },
         [messageChannel.port2]
       )
@@ -235,8 +235,8 @@ export const usePWA = () => {
       }
     } else {
       // Fallback pour les navigateurs qui ne supportent pas Web Share API
-      if (shareData.url) {
-        await navigator.clipboard.writeText(shareData.url)
+      if (shareData.url && 'clipboard' in navigator) {
+        await (navigator as any).clipboard.writeText(shareData.url)
         return true
       }
       return false

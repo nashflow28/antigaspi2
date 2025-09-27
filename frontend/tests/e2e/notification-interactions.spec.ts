@@ -89,8 +89,9 @@ test.describe('Notification Callbacks - E2E Tests', () => {
       await clickNotificationAction(page, 'Réessayer')
 
       // Should see success notification
-      const successNotification = await waitForNotification(page, 'success')
-      await expect(successNotification).toContainText('Connexion réussie')
+      await waitForNotification(page, 'success')
+      const notification = page.locator('[data-testid="notification-success"]')
+      await expect(notification).toContainText('Connexion réussie')
 
       // Should redirect to dashboard
       await expect(page).toHaveURL(/.*dashboard.*/)
@@ -117,9 +118,10 @@ test.describe('Notification Callbacks - E2E Tests', () => {
       await page.click('[data-testid="login-btn"]')
 
       // Should show success notification
-      const successNotification = await waitForNotification(page, 'success')
-      await expect(successNotification).toContainText('Connexion réussie')
-      await expect(successNotification).toContainText('Authentification')
+      await waitForNotification(page, 'success')
+      const notification = page.locator('[data-testid="notification-success"]')
+      await expect(notification).toContainText('Connexion réussie')
+      await expect(notification).toContainText('Authentification')
     })
   })
 
@@ -211,8 +213,10 @@ test.describe('Notification Callbacks - E2E Tests', () => {
       await clickNotificationAction(page, 'Réessayer')
 
       // Should show success notification
-      const successNotification = await waitForNotification(page, 'success')
-      await expect(successNotification).toContainText('Produit créé avec succès')
+      await waitForNotification(page, 'success')
+      const notification = page.locator('[data-testid="notification-success"]')
+      await expect(notification).toContainText('Connexion réussie')
+      await expect(notification).toContainText('Produit créé avec succès')
     })
 
     test('should show success notification on product creation success', async ({ page }) => {
@@ -238,9 +242,11 @@ test.describe('Notification Callbacks - E2E Tests', () => {
       await page.fill('[data-testid="product-price"]', '15')
       await page.click('[data-testid="save-product-btn"]')
 
-      const successNotification = await waitForNotification(page, 'success')
-      await expect(successNotification).toContainText('Produit créé avec succès')
-      await expect(successNotification).toContainText('Catalogue')
+      await waitForNotification(page, 'success')
+      const notification = page.locator('[data-testid="notification-success"]')
+      await expect(notification).toContainText('Connexion réussie')
+      await expect(notification).toContainText('Produit créé avec succès')
+      await expect(notification).toContainText('Catalogue')
     })
   })
 
@@ -262,14 +268,16 @@ test.describe('Notification Callbacks - E2E Tests', () => {
       await page.click('[data-testid="login-btn"]')
 
       // Success notification should appear
-      const successNotification = await waitForNotification(page, 'success')
-      await expect(successNotification).toBeVisible()
+      await waitForNotification(page, 'success')
+      const notification = page.locator('[data-testid="notification-success"]')
+      await expect(notification).toContainText('Connexion réussie')
+      await expect(notification).toBeVisible()
 
       // Wait for auto-close (should be ~3 seconds for success)
       await page.waitForTimeout(4000)
 
       // Notification should be gone
-      await expect(successNotification).not.toBeVisible()
+      await expect(notification).not.toBeVisible()
     })
 
     test('should not auto-close error notifications', async ({ page }) => {
@@ -342,7 +350,9 @@ test.describe('Notification Callbacks - E2E Tests', () => {
       await page.fill('[data-testid="password"]', 'password')
       await page.click('[data-testid="login-btn"]')
 
-      const successNotification = await waitForNotification(page, 'success')
+      await waitForNotification(page, 'success')
+      const notification = page.locator('[data-testid="notification-success"]')
+      await expect(notification).toContainText('Connexion réussie')
 
       // Check progress bar is present
       const progressBar = page.locator('[data-testid="notification-progress"]')

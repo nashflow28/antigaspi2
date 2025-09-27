@@ -5,451 +5,456 @@
     class="bg-gradient-to-br from-green-50 to-blue-50"
   >
     <div class="p-6">
-    <!-- Header -->
-    <div class="mb-8">
-      <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
-        <div>
-          <h1 class="text-3xl lg:text-4xl font-bold text-neutral-900 mb-2">
-            Réservations
-          </h1>
-          <p class="text-neutral-600 text-lg">
-            Gérez les réservations de vos clients
-          </p>
+      <!-- Header -->
+      <div class="mb-8">
+        <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
+          <div>
+            <h1 class="text-3xl lg:text-4xl font-bold text-neutral-900 mb-2">
+              Réservations
+            </h1>
+            <p class="text-neutral-600 text-lg">
+              Gérez les réservations de vos clients
+            </p>
+          </div>
+
+          <div class="flex flex-col gap-4 sm:flex-row">
+            <Input
+              v-model="searchQuery"
+              :left-icon="MagnifyingGlassIcon"
+              placeholder="Rechercher par code ou nom..."
+              class="w-full sm:w-80"
+              variant="outline"
+            />
+
+            <select
+              v-model="selectedDateRange"
+              class="w-full rounded-lg border border-neutral-300 bg-white px-4 py-2.5 text-sm text-neutral-700 shadow-sm transition focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500"
+            >
+              <option value="today">Aujourd'hui</option>
+              <option value="week">Cette semaine</option>
+              <option value="month">Ce mois</option>
+              <option value="all">Toutes les dates</option>
+            </select>
+
+            <Button
+              variant="outline"
+              class="flex items-center gap-2"
+              :disabled="filteredReservations.length === 0"
+              @click="exportReservations"
+            >
+              <ArrowDownTrayIcon class="h-4 w-4" />
+              Exporter
+            </Button>
+          </div>
         </div>
 
-        <div class="flex flex-col gap-4 sm:flex-row">
-          <Input
-            v-model="searchQuery"
-            :left-icon="MagnifyingGlassIcon"
-            placeholder="Rechercher par code ou nom..."
-            class="w-full sm:w-80"
-            variant="outline"
-          />
-
-          <select
-            v-model="selectedDateRange"
-            class="w-full rounded-lg border border-neutral-300 bg-white px-4 py-2.5 text-sm text-neutral-700 shadow-sm transition focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500"
+        <!-- Quick stats -->
+        <div class="grid grid-cols-1 gap-4 md:grid-cols-4 mt-6">
+          <Card
+            v-for="stat in stats"
+            :key="stat.label"
+            no-padding
+            rounded="xl"
+            class="p-6 text-white shadow-lg"
+            :class="stat.background"
           >
-            <option value="today">Aujourd'hui</option>
-            <option value="week">Cette semaine</option>
-            <option value="month">Ce mois</option>
-            <option value="all">Toutes les dates</option>
-          </select>
-
-          <Button
-            variant="outline"
-            class="flex items-center gap-2"
-            :disabled="filteredReservations.length === 0"
-            @click="exportReservations"
-          >
-            <ArrowDownTrayIcon class="h-4 w-4" />
-            Exporter
-          </Button>
+            <div class="flex items-center justify-between">
+              <div>
+                <p :class="stat.subtitleClass">{{ stat.label }}</p>
+                <p class="text-3xl font-bold">{{ stat.value }}</p>
+              </div>
+              <div class="rounded-xl bg-white/20 p-3">
+                <component :is="stat.icon" class="h-6 w-6" />
+              </div>
+            </div>
+          </Card>
         </div>
       </div>
 
-      <!-- Quick stats -->
-      <div class="grid grid-cols-1 gap-4 md:grid-cols-4 mt-6">
+      <!-- Filters -->
+      <Card class="mb-6">
+        <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+          <div class="flex flex-wrap gap-2">
+            <Button
+              v-for="filter in filters"
+              :key="filter.key"
+              size="sm"
+              rounded
+              :variant="activeFilter === filter.key ? 'primary' : 'secondary'"
+              class="font-medium"
+              @click="activeFilter = filter.key"
+            >
+              <span class="flex items-center gap-2">
+                {{ filter.label }}
+                <Badge
+                  v-if="filter.count !== null"
+                  size="xs"
+                  variant="outline"
+                  class="bg-white/40 text-neutral-600"
+                >
+                  {{ filter.count }}
+                </Badge>
+              </span>
+            </Button>
+          </div>
+
+          <div class="flex items-center gap-4">
+            <select
+              v-model="sortBy"
+              class="w-full rounded-lg border border-neutral-300 bg-white px-4 py-2.5 text-sm text-neutral-700 shadow-sm transition focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500"
+            >
+              <option value="created_at">Plus récent</option>
+              <option value="pickup_date">Date de récupération</option>
+              <option value="expires_at">Date d'expiration</option>
+              <option value="total_amount">Montant</option>
+            </select>
+          </div>
+        </div>
+      </Card>
+
+      <!-- Reservations List -->
+      <div v-if="filteredReservations.length > 0" class="space-y-4">
         <Card
-          v-for="stat in stats"
-          :key="stat.label"
-          no-padding
-          rounded="xl"
-          class="p-6 text-white shadow-lg"
-          :class="stat.background"
+          v-for="reservation in filteredReservations"
+          :key="reservation.id"
+          class="transition-shadow hover:shadow-lg"
         >
-          <div class="flex items-center justify-between">
-            <div>
-              <p :class="stat.subtitleClass">{{ stat.label }}</p>
-              <p class="text-3xl font-bold">{{ stat.value }}</p>
+          <div class="flex flex-col lg:flex-row gap-6">
+            <!-- Product Image -->
+            <div class="flex-shrink-0">
+              <img
+                :src="reservation.product.image_url || '/images/placeholder.jpg'"
+                :alt="reservation.product.name"
+                class="w-24 h-24 lg:w-32 lg:h-32 object-cover rounded-lg"
+              >
             </div>
-            <div class="rounded-xl bg-white/20 p-3">
-              <component :is="stat.icon" class="h-6 w-6" />
+
+            <!-- Reservation Details -->
+            <div class="flex-grow">
+              <div class="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4">
+                <div class="flex-grow">
+                  <!-- Header with status -->
+                  <div class="flex items-start justify-between mb-2">
+                    <div>
+                      <h3 class="font-semibold text-lg text-neutral-900 mb-1">
+                        {{ reservation.product.name }}
+                      </h3>
+                      <p class="text-sm text-neutral-600">
+                        Code: <span class="font-mono font-medium">{{ reservation.reservation_code }}</span>
+                      </p>
+                    </div>
+
+                    <div class="flex items-center gap-2">
+                      <Badge
+                        :variant="getStatusBadgeVariant(reservation.status)"
+                        size="sm"
+                        rounded
+                      >
+                        {{ getStatusLabel(reservation.status) }}
+                      </Badge>
+
+                      <Badge
+                        v-if="isUrgent(reservation)"
+                        variant="error"
+                        size="xs"
+                        rounded
+                        pulse
+                      >
+                        Urgent
+                      </Badge>
+                    </div>
+                  </div>
+
+                  <!-- Customer Info -->
+                  <div class="mb-3">
+                    <div class="flex items-center gap-2 text-neutral-600 text-sm">
+                      <UserIcon class="w-4 h-4" />
+                      <span class="font-medium">{{ reservation.consumer.name }}</span>
+                      <span>•</span>
+                      <span>{{ reservation.consumer.phone }}</span>
+                    </div>
+                  </div>
+
+                  <!-- Reservation Details Grid -->
+                  <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 text-sm">
+                    <div>
+                      <p class="text-neutral-500">Quantité</p>
+                      <p class="font-medium">{{ reservation.quantity }}</p>
+                    </div>
+                    <div>
+                      <p class="text-neutral-500">Montant</p>
+                      <p class="font-medium">{{ formatPrice(reservation.total_amount) }}</p>
+                    </div>
+                    <div>
+                      <p class="text-neutral-500">Récupération</p>
+                      <p class="font-medium">{{ formatDateTime(reservation.pickup_date) }}</p>
+                    </div>
+                    <div>
+                      <p class="text-neutral-500">Expire</p>
+                      <p :class="isExpired(reservation) ? 'text-accent-red font-medium' : 'font-medium'">
+                        {{ formatDateTime(reservation.expires_at) }}
+                      </p>
+                    </div>
+                  </div>
+
+                  <!-- Notes -->
+                  <div v-if="reservation.notes" class="mt-3">
+                    <p class="text-neutral-500 text-sm">Notes:</p>
+                    <p class="text-neutral-700 text-sm">{{ reservation.notes }}</p>
+                  </div>
+                </div>
+
+                <!-- Actions -->
+                <div class="flex items-center gap-2 min-w-[200px]">
+                  <!-- Primary action based on status -->
+                  <template v-if="reservation.status === 'pending'">
+                    <Button
+                      size="sm"
+                      variant="secondary"
+                      class="flex-1 gap-2 border-emerald-500 bg-emerald-500 text-white hover:border-emerald-600 hover:bg-emerald-600"
+                      @click="updateReservationStatus(reservation, 'confirmed')"
+                    >
+                      <CheckIcon class="h-4 w-4" />
+                      Confirmer
+                    </Button>
+                  </template>
+
+                  <template v-else-if="reservation.status === 'confirmed'">
+                    <Button
+                      size="sm"
+                      variant="secondary"
+                      class="flex-1 gap-2 border-accent-blue bg-accent-blue text-white hover:border-accent-blue/90 hover:bg-accent-blue/90"
+                      @click="markAsReady(reservation)"
+                    >
+                      <BellIcon class="h-4 w-4" />
+                      Marquer prêt
+                    </Button>
+                  </template>
+
+                  <template v-else-if="reservation.status === 'ready'">
+                    <Button
+                      size="sm"
+                      variant="secondary"
+                      class="flex-1 gap-2 border-emerald-500 bg-emerald-500 text-white hover:border-emerald-600 hover:bg-emerald-600"
+                      @click="updateReservationStatus(reservation, 'completed')"
+                    >
+                      <CheckCircleIcon class="h-4 w-4" />
+                      Marquer récupérée
+                    </Button>
+                  </template>
+
+                  <template v-else>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      class="flex-1 gap-2"
+                      @click="contactCustomer(reservation)"
+                    >
+                      <PhoneIcon class="h-4 w-4" />
+                      Contacter
+                    </Button>
+                  </template>
+
+                  <!-- Three dots menu -->
+                  <div class="relative">
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      class="p-2"
+                      :class="{ 'bg-neutral-100': openDropdown === reservation.id }"
+                      @click="toggleDropdown(reservation.id)"
+                    >
+                      <EllipsisVerticalIcon class="h-4 w-4" />
+                    </Button>
+
+                    <!-- Dropdown menu -->
+                    <div
+                      v-if="openDropdown === reservation.id"
+                      class="absolute right-0 top-full mt-1 bg-white border border-neutral-200 rounded-lg shadow-lg py-1 z-10 min-w-[160px]"
+                    >
+                      <button
+                        class="w-full px-3 py-2 text-left text-sm hover:bg-neutral-50 flex items-center gap-2"
+                        @click="viewReservationDetails(reservation); closeDropdown()"
+                      >
+                        <EyeIcon class="w-4 h-4" />
+                        Voir détails
+                      </button>
+
+                      <button
+                        class="w-full px-3 py-2 text-left text-sm hover:bg-neutral-50 flex items-center gap-2"
+                        @click="contactCustomer(reservation); closeDropdown()"
+                      >
+                        <PhoneIcon class="w-4 h-4" />
+                        Contacter client
+                      </button>
+
+                      <template v-if="reservation.status === 'pending'">
+                        <hr class="my-1 border-neutral-200">
+                        <button
+                          class="w-full px-3 py-2 text-left text-sm hover:bg-red-50 text-red-600 flex items-center gap-2"
+                          @click="updateReservationStatus(reservation, 'cancelled'); closeDropdown()"
+                        >
+                          <XMarkIcon class="w-4 h-4" />
+                          Annuler
+                        </button>
+                      </template>
+
+                      <template v-if="reservation.status === 'confirmed'">
+                        <hr class="my-1 border-neutral-200">
+                        <button
+                          class="w-full px-3 py-2 text-left text-sm hover:bg-green-50 text-green-600 flex items-center gap-2"
+                          @click="updateReservationStatus(reservation, 'completed'); closeDropdown()"
+                        >
+                          <CheckCircleIcon class="w-4 h-4" />
+                          Marquer récupérée
+                        </button>
+                      </template>
+
+                      <hr class="my-1 border-neutral-200">
+                      <button
+                        class="w-full px-3 py-2 text-left text-sm hover:bg-neutral-50 flex items-center gap-2"
+                        @click="exportSingleReservation(reservation); closeDropdown()"
+                      >
+                        <ArrowDownTrayIcon class="w-4 h-4" />
+                        Exporter
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </Card>
       </div>
-    </div>
 
-    <!-- Filters -->
-    <Card class="mb-6">
-      <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-        <div class="flex flex-wrap gap-2">
-          <Button
-            v-for="filter in filters"
-            :key="filter.key"
-            size="sm"
-            rounded
-            :variant="activeFilter === filter.key ? 'primary' : 'secondary'"
-            class="font-medium"
-            @click="activeFilter = filter.key"
-          >
-            <span class="flex items-center gap-2">
-              {{ filter.label }}
-              <Badge
-                v-if="filter.count !== null"
-                size="xs"
-                variant="outline"
-                class="bg-white/40 text-neutral-600"
-              >
-                {{ filter.count }}
-              </Badge>
-            </span>
-          </Button>
-        </div>
-
-        <div class="flex items-center gap-4">
-          <select
-            v-model="sortBy"
-            class="w-full rounded-lg border border-neutral-300 bg-white px-4 py-2.5 text-sm text-neutral-700 shadow-sm transition focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500"
-          >
-            <option value="created_at">Plus récent</option>
-            <option value="pickup_date">Date de récupération</option>
-            <option value="expires_at">Date d'expiration</option>
-            <option value="total_amount">Montant</option>
-          </select>
-        </div>
+      <!-- Empty State -->
+      <div v-else class="text-center py-12">
+        <BookmarkIcon class="w-16 h-16 text-neutral-300 mx-auto mb-4" />
+        <h3 class="text-xl font-semibold text-neutral-900 mb-2">Aucune réservation trouvée</h3>
+        <p class="text-neutral-600">
+          {{ searchQuery ? 'Aucune réservation ne correspond à votre recherche.' : 'Les nouvelles réservations apparaîtront ici.' }}
+        </p>
       </div>
-    </Card>
 
-    <!-- Reservations List -->
-    <div v-if="filteredReservations.length > 0" class="space-y-4">
-      <Card
-        v-for="reservation in filteredReservations"
-        :key="reservation.id"
-        class="transition-shadow hover:shadow-lg"
+      <!-- Reservation Details Modal -->
+      <div
+        v-if="showDetailsModal"
+        class="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-[120]"
+        @click.self="showDetailsModal = false"
       >
-        <div class="flex flex-col lg:flex-row gap-6">
-          <!-- Product Image -->
-          <div class="flex-shrink-0">
-            <img
-              :src="reservation.product.image_url || '/images/placeholder.jpg'"
-              :alt="reservation.product.name"
-              class="w-24 h-24 lg:w-32 lg:h-32 object-cover rounded-lg"
-            />
+        <Card class="w-full max-h-[90vh] max-w-2xl overflow-y-auto" rounded="xl">
+          <div class="mb-6 flex items-center justify-between">
+            <h2 class="text-2xl font-bold text-neutral-900">
+              Détails de la réservation
+            </h2>
+            <Button
+              variant="ghost"
+              size="sm"
+              class="text-neutral-400 hover:text-neutral-600"
+              @click="showDetailsModal = false"
+            >
+              <XMarkIcon class="h-5 w-5" />
+            </Button>
           </div>
 
-          <!-- Reservation Details -->
-          <div class="flex-grow">
-            <div class="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4">
-              <div class="flex-grow">
-                <!-- Header with status -->
-                <div class="flex items-start justify-between mb-2">
-                  <div>
-                    <h3 class="font-semibold text-lg text-neutral-900 mb-1">
-                      {{ reservation.product.name }}
-                    </h3>
-                    <p class="text-sm text-neutral-600">
-                      Code: <span class="font-mono font-medium">{{ reservation.reservation_code }}</span>
-                    </p>
-                  </div>
-
-                  <div class="flex items-center gap-2">
-                    <Badge
-                      :variant="getStatusBadgeVariant(reservation.status)"
-                      size="sm"
-                      rounded
-                    >
-                      {{ getStatusLabel(reservation.status) }}
-                    </Badge>
-
-                    <Badge
-                      v-if="isUrgent(reservation)"
-                      variant="error"
-                      size="xs"
-                      rounded
-                      pulse
-                    >
-                      Urgent
-                    </Badge>
-                  </div>
-                </div>
-
-                <!-- Customer Info -->
-                <div class="mb-3">
-                  <div class="flex items-center gap-2 text-neutral-600 text-sm">
-                    <UserIcon class="w-4 h-4" />
-                    <span class="font-medium">{{ reservation.consumer.name }}</span>
-                    <span>•</span>
-                    <span>{{ reservation.consumer.phone }}</span>
-                  </div>
-                </div>
-
-                <!-- Reservation Details Grid -->
-                <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 text-sm">
-                  <div>
-                    <p class="text-neutral-500">Quantité</p>
-                    <p class="font-medium">{{ reservation.quantity }}</p>
-                  </div>
-                  <div>
-                    <p class="text-neutral-500">Montant</p>
-                    <p class="font-medium">{{ formatPrice(reservation.total_amount) }}</p>
-                  </div>
-                  <div>
-                    <p class="text-neutral-500">Récupération</p>
-                    <p class="font-medium">{{ formatDateTime(reservation.pickup_date) }}</p>
-                  </div>
-                  <div>
-                    <p class="text-neutral-500">Expire</p>
-                    <p :class="isExpired(reservation) ? 'text-accent-red font-medium' : 'font-medium'">
-                      {{ formatDateTime(reservation.expires_at) }}
-                    </p>
-                  </div>
-                </div>
-
-                <!-- Notes -->
-                <div v-if="reservation.notes" class="mt-3">
-                  <p class="text-neutral-500 text-sm">Notes:</p>
-                  <p class="text-neutral-700 text-sm">{{ reservation.notes }}</p>
-                </div>
-              </div>
-
-              <!-- Actions -->
-              <div class="flex items-center gap-2 min-w-[200px]">
-                <!-- Primary action based on status -->
-                <template v-if="reservation.status === 'pending'">
-                  <Button
-                    size="sm"
-                    variant="secondary"
-                    class="flex-1 gap-2 border-emerald-500 bg-emerald-500 text-white hover:border-emerald-600 hover:bg-emerald-600"
-                    @click="updateReservationStatus(reservation, 'confirmed')"
-                  >
-                    <CheckIcon class="h-4 w-4" />
-                    Confirmer
-                  </Button>
-                </template>
-
-                <template v-else-if="reservation.status === 'confirmed'">
-                  <Button
-                    size="sm"
-                    variant="secondary"
-                    class="flex-1 gap-2 border-accent-blue bg-accent-blue text-white hover:border-accent-blue/90 hover:bg-accent-blue/90"
-                    @click="markAsReady(reservation)"
-                  >
-                    <BellIcon class="h-4 w-4" />
-                    Marquer prêt
-                  </Button>
-                </template>
-
-                <template v-else-if="reservation.status === 'ready'">
-                  <Button
-                    size="sm"
-                    variant="secondary"
-                    class="flex-1 gap-2 border-emerald-500 bg-emerald-500 text-white hover:border-emerald-600 hover:bg-emerald-600"
-                    @click="updateReservationStatus(reservation, 'completed')"
-                  >
-                    <CheckCircleIcon class="h-4 w-4" />
-                    Marquer récupérée
-                  </Button>
-                </template>
-
-                <template v-else>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    class="flex-1 gap-2"
-                    @click="contactCustomer(reservation)"
-                  >
-                    <PhoneIcon class="h-4 w-4" />
-                    Contacter
-                  </Button>
-                </template>
-
-                <!-- Three dots menu -->
-                <div class="relative">
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    class="p-2"
-                    :class="{ 'bg-neutral-100': openDropdown === reservation.id }"
-                    @click="toggleDropdown(reservation.id)"
-                  >
-                    <EllipsisVerticalIcon class="h-4 w-4" />
-                  </Button>
-
-                  <!-- Dropdown menu -->
-                  <div
-                    v-if="openDropdown === reservation.id"
-                    class="absolute right-0 top-full mt-1 bg-white border border-neutral-200 rounded-lg shadow-lg py-1 z-10 min-w-[160px]"
-                  >
-                    <button
-                      @click="viewReservationDetails(reservation); closeDropdown()"
-                      class="w-full px-3 py-2 text-left text-sm hover:bg-neutral-50 flex items-center gap-2"
-                    >
-                      <EyeIcon class="w-4 h-4" />
-                      Voir détails
-                    </button>
-
-                    <button
-                      @click="contactCustomer(reservation); closeDropdown()"
-                      class="w-full px-3 py-2 text-left text-sm hover:bg-neutral-50 flex items-center gap-2"
-                    >
-                      <PhoneIcon class="w-4 h-4" />
-                      Contacter client
-                    </button>
-
-                    <template v-if="reservation.status === 'pending'">
-                      <hr class="my-1 border-neutral-200">
-                      <button
-                        @click="updateReservationStatus(reservation, 'cancelled'); closeDropdown()"
-                        class="w-full px-3 py-2 text-left text-sm hover:bg-red-50 text-red-600 flex items-center gap-2"
-                      >
-                        <XMarkIcon class="w-4 h-4" />
-                        Annuler
-                      </button>
-                    </template>
-
-                    <template v-if="reservation.status === 'confirmed'">
-                      <hr class="my-1 border-neutral-200">
-                      <button
-                        @click="updateReservationStatus(reservation, 'completed'); closeDropdown()"
-                        class="w-full px-3 py-2 text-left text-sm hover:bg-green-50 text-green-600 flex items-center gap-2"
-                      >
-                        <CheckCircleIcon class="w-4 h-4" />
-                        Marquer récupérée
-                      </button>
-                    </template>
-
-                    <hr class="my-1 border-neutral-200">
-                    <button
-                      @click="exportSingleReservation(reservation); closeDropdown()"
-                      class="w-full px-3 py-2 text-left text-sm hover:bg-neutral-50 flex items-center gap-2"
-                    >
-                      <ArrowDownTrayIcon class="w-4 h-4" />
-                      Exporter
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </Card>
-    </div>
-
-    <!-- Empty State -->
-    <div v-else class="text-center py-12">
-      <BookmarkIcon class="w-16 h-16 text-neutral-300 mx-auto mb-4" />
-      <h3 class="text-xl font-semibold text-neutral-900 mb-2">Aucune réservation trouvée</h3>
-      <p class="text-neutral-600">
-        {{ searchQuery ? 'Aucune réservation ne correspond à votre recherche.' : 'Les nouvelles réservations apparaîtront ici.' }}
-      </p>
-    </div>
-
-    <!-- Reservation Details Modal -->
-    <div
-      v-if="showDetailsModal"
-      class="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-[120]"
-      @click.self="showDetailsModal = false"
-    >
-      <Card class="w-full max-h-[90vh] max-w-2xl overflow-y-auto" rounded="xl">
-        <div class="mb-6 flex items-center justify-between">
-          <h2 class="text-2xl font-bold text-neutral-900">
-            Détails de la réservation
-          </h2>
-          <Button variant="ghost" size="sm" class="text-neutral-400 hover:text-neutral-600" @click="showDetailsModal = false">
-            <XMarkIcon class="h-5 w-5" />
-          </Button>
-        </div>
-
-        <div v-if="selectedReservation" class="space-y-6">
-          <!-- Reservation Info -->
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <p class="text-xs font-semibold uppercase tracking-wide text-neutral-500">Code de réservation</p>
-              <p class="font-mono text-lg">{{ selectedReservation.reservation_code }}</p>
-            </div>
-            <div>
-              <p class="text-xs font-semibold uppercase tracking-wide text-neutral-500">Statut</p>
-              <Badge
-                :variant="getStatusBadgeVariant(selectedReservation.status)"
-                size="sm"
-                rounded
-              >
-                {{ getStatusLabel(selectedReservation.status) }}
-              </Badge>
-            </div>
-          </div>
-
-          <!-- Customer Details -->
-          <div>
-            <h3 class="text-lg font-semibold mb-4">Informations client</h3>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div v-if="selectedReservation" class="space-y-6">
+            <!-- Reservation Info -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <p class="text-xs font-semibold uppercase tracking-wide text-neutral-500">Nom</p>
-                <p>{{ selectedReservation.consumer.name }}</p>
+                <p class="text-xs font-semibold uppercase tracking-wide text-neutral-500">Code de réservation</p>
+                <p class="font-mono text-lg">{{ selectedReservation.reservation_code }}</p>
               </div>
               <div>
-                <p class="text-xs font-semibold uppercase tracking-wide text-neutral-500">Téléphone</p>
-                <p>{{ selectedReservation.consumer.phone }}</p>
+                <p class="text-xs font-semibold uppercase tracking-wide text-neutral-500">Statut</p>
+                <Badge
+                  :variant="getStatusBadgeVariant(selectedReservation.status)"
+                  size="sm"
+                  rounded
+                >
+                  {{ getStatusLabel(selectedReservation.status) }}
+                </Badge>
               </div>
             </div>
-          </div>
 
-          <!-- Product Details -->
-          <div>
-            <h3 class="text-lg font-semibold mb-4">Détails du produit</h3>
-            <div class="flex gap-4">
-              <img
-                :src="selectedReservation.product.image_url || '/images/placeholder.jpg'"
-                :alt="selectedReservation.product.name"
-                class="w-20 h-20 object-cover rounded-lg"
-              />
-              <div class="flex-grow">
-                <h4 class="font-semibold">{{ selectedReservation.product.name }}</h4>
-                <p class="text-neutral-600 text-sm">{{ selectedReservation.product.description }}</p>
-                <div class="mt-2 grid grid-cols-2 gap-4 text-sm">
-                  <div>
-                    <span class="text-neutral-500">Prix unitaire:</span>
-                    <span class="ml-1 font-medium">{{ formatPrice(selectedReservation.discounted_price) }}</span>
+            <!-- Customer Details -->
+            <div>
+              <h3 class="text-lg font-semibold mb-4">Informations client</h3>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <p class="text-xs font-semibold uppercase tracking-wide text-neutral-500">Nom</p>
+                  <p>{{ selectedReservation.consumer.name }}</p>
+                </div>
+                <div>
+                  <p class="text-xs font-semibold uppercase tracking-wide text-neutral-500">Téléphone</p>
+                  <p>{{ selectedReservation.consumer.phone }}</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Product Details -->
+            <div>
+              <h3 class="text-lg font-semibold mb-4">Détails du produit</h3>
+              <div class="flex gap-4">
+                <img
+                  :src="selectedReservation.product.image_url || '/images/placeholder.jpg'"
+                  :alt="selectedReservation.product.name"
+                  class="w-20 h-20 object-cover rounded-lg"
+                >
+                <div class="flex-grow">
+                  <h4 class="font-semibold">{{ selectedReservation.product.name }}</h4>
+                  <p class="text-neutral-600 text-sm">{{ selectedReservation.product.description }}</p>
+                  <div class="mt-2 grid grid-cols-2 gap-4 text-sm">
+                    <div>
+                      <span class="text-neutral-500">Prix unitaire:</span>
+                      <span class="ml-1 font-medium">{{ formatPrice(selectedReservation.discounted_price) }}</span>
+                    </div>
+                    <div>
+                      <span class="text-neutral-500">Quantité:</span>
+                      <span class="ml-1 font-medium">{{ selectedReservation.quantity }}</span>
+                    </div>
                   </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Timeline -->
+            <div>
+              <h3 class="text-lg font-semibold mb-4">Chronologie</h3>
+              <div class="space-y-3">
+                <div class="flex items-center gap-3">
+                  <div class="w-3 h-3 bg-primary-500 rounded-full" />
                   <div>
-                    <span class="text-neutral-500">Quantité:</span>
-                    <span class="ml-1 font-medium">{{ selectedReservation.quantity }}</span>
+                    <p class="text-sm font-medium">Réservation créée</p>
+                    <p class="text-xs text-neutral-500">{{ formatDateTime(selectedReservation.created_at) }}</p>
+                  </div>
+                </div>
+
+                <div v-if="selectedReservation.confirmed_at" class="flex items-center gap-3">
+                  <div class="w-3 h-3 bg-primary-500 rounded-full" />
+                  <div>
+                    <p class="text-sm font-medium">Confirmée</p>
+                    <p class="text-xs text-neutral-500">{{ formatDateTime(selectedReservation.confirmed_at) }}</p>
+                  </div>
+                </div>
+
+                <div v-if="selectedReservation.status === 'completed'" class="flex items-center gap-3">
+                  <div class="w-3 h-3 bg-blue-500 rounded-full" />
+                  <div>
+                    <p class="text-sm font-medium">Récupérée</p>
+                    <p class="text-xs text-neutral-500">{{ formatDateTime(selectedReservation.pickup_date) }}</p>
                   </div>
                 </div>
               </div>
             </div>
-          </div>
 
-          <!-- Timeline -->
-          <div>
-            <h3 class="text-lg font-semibold mb-4">Chronologie</h3>
-            <div class="space-y-3">
-              <div class="flex items-center gap-3">
-                <div class="w-3 h-3 bg-primary-500 rounded-full"></div>
-                <div>
-                  <p class="text-sm font-medium">Réservation créée</p>
-                  <p class="text-xs text-neutral-500">{{ formatDateTime(selectedReservation.created_at) }}</p>
-                </div>
-              </div>
-
-              <div v-if="selectedReservation.confirmed_at" class="flex items-center gap-3">
-                <div class="w-3 h-3 bg-primary-500 rounded-full"></div>
-                <div>
-                  <p class="text-sm font-medium">Confirmée</p>
-                  <p class="text-xs text-neutral-500">{{ formatDateTime(selectedReservation.confirmed_at) }}</p>
-                </div>
-              </div>
-
-              <div v-if="selectedReservation.status === 'completed'" class="flex items-center gap-3">
-                <div class="w-3 h-3 bg-blue-500 rounded-full"></div>
-                <div>
-                  <p class="text-sm font-medium">Récupérée</p>
-                  <p class="text-xs text-neutral-500">{{ formatDateTime(selectedReservation.pickup_date) }}</p>
-                </div>
-              </div>
+            <!-- Notes -->
+            <div v-if="selectedReservation.notes">
+              <h3 class="text-lg font-semibold mb-4">Notes</h3>
+              <p class="text-neutral-700">{{ selectedReservation.notes }}</p>
             </div>
           </div>
-
-          <!-- Notes -->
-          <div v-if="selectedReservation.notes">
-            <h3 class="text-lg font-semibold mb-4">Notes</h3>
-            <p class="text-neutral-700">{{ selectedReservation.notes }}</p>
-          </div>
-        </div>
-      </Card>
-    </div>
+        </Card>
+      </div>
     </div>
   </DashboardLayout>
 </template>
@@ -590,14 +595,16 @@ const filteredReservations = computed(() => {
       switch (selectedDateRange.value) {
         case 'today':
           return reservationDate >= today
-        case 'week':
+        case 'week': {
           const weekAgo = new Date(today)
           weekAgo.setDate(weekAgo.getDate() - 7)
           return reservationDate >= weekAgo
-        case 'month':
+        }
+        case 'month': {
           const monthAgo = new Date(today)
           monthAgo.setMonth(monthAgo.getMonth() - 1)
           return reservationDate >= monthAgo
+        }
         default:
           return true
       }

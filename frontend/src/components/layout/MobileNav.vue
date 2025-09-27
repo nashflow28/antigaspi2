@@ -1,9 +1,9 @@
 <template>
   <!-- Mobile Menu Button -->
   <button
-    @click="toggleMobileMenu"
     class="md:hidden relative p-2 rounded-lg text-gray-600 hover:text-gray-900 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-primary-500 transition-colors"
     :class="{ 'text-primary-600': mobileMenuOpen }"
+    @click="toggleMobileMenu"
   >
     <span class="sr-only">Ouvrir le menu</span>
     <div class="w-6 h-6 relative">
@@ -11,15 +11,15 @@
       <span
         class="absolute block h-0.5 w-6 bg-current transform transition duration-300 ease-in-out"
         :class="mobileMenuOpen ? 'rotate-45 translate-y-2.5' : 'translate-y-0'"
-      ></span>
+      />
       <span
         class="absolute block h-0.5 w-6 bg-current transform transition duration-300 ease-in-out translate-y-2.5"
         :class="mobileMenuOpen ? 'opacity-0' : 'opacity-100'"
-      ></span>
+      />
       <span
         class="absolute block h-0.5 w-6 bg-current transform transition duration-300 ease-in-out translate-y-5"
         :class="mobileMenuOpen ? '-rotate-45 -translate-y-2.5' : 'translate-y-0'"
-      ></span>
+      />
     </div>
   </button>
 
@@ -35,9 +35,9 @@
     >
       <div
         v-if="mobileMenuOpen"
-        @click="closeMobileMenu"
         class="fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden"
-      ></div>
+        @click="closeMobileMenu"
+      />
     </Transition>
 
     <!-- Mobile Menu Panel -->
@@ -62,8 +62,8 @@
             <span class="text-lg font-semibold text-gray-900 font-display">Antigaspi</span>
           </div>
           <button
-            @click="closeMobileMenu"
             class="p-2 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors"
+            @click="closeMobileMenu"
           >
             <X class="w-5 h-5" />
           </button>
@@ -97,8 +97,8 @@
           <!-- Public Links -->
           <router-link
             to="/products"
-            @click="closeMobileMenu"
             class="mobile-nav-link"
+            @click="closeMobileMenu"
           >
             <Package class="w-5 h-5" />
             <span>Produits</span>
@@ -106,8 +106,8 @@
 
           <router-link
             to="/surprise-baskets"
-            @click="closeMobileMenu"
             class="mobile-nav-link"
+            @click="closeMobileMenu"
           >
             <Gift class="w-5 h-5" />
             <span>Paniers surprise</span>
@@ -115,8 +115,8 @@
 
           <router-link
             to="/merchants/map"
-            @click="closeMobileMenu"
             class="mobile-nav-link"
+            @click="closeMobileMenu"
           >
             <MapPin class="w-5 h-5" />
             <span>Carte des Commerçants</span>
@@ -124,8 +124,8 @@
 
           <router-link
             to="/reviews"
-            @click="closeMobileMenu"
             class="mobile-nav-link"
+            @click="closeMobileMenu"
           >
             <MessageSquare class="w-5 h-5" />
             <span>Avis</span>
@@ -136,8 +136,8 @@
             <div class="border-t border-gray-200 pt-4 mt-4">
               <router-link
                 to="/dashboard"
-                @click="closeMobileMenu"
                 class="mobile-nav-link"
+                @click="closeMobileMenu"
               >
                 <BarChart3 class="w-5 h-5" />
                 <span>Dashboard</span>
@@ -146,8 +146,8 @@
               <router-link
                 v-if="authStore.isConsumer"
                 to="/surprise-baskets"
-                @click="closeMobileMenu"
                 class="mobile-nav-link"
+                @click="closeMobileMenu"
               >
                 <Gift class="w-5 h-5" />
                 <span>Paniers surprise</span>
@@ -155,8 +155,8 @@
 
               <router-link
                 to="/reservations"
-                @click="closeMobileMenu"
                 class="mobile-nav-link"
+                @click="closeMobileMenu"
               >
                 <Calendar class="w-5 h-5" />
                 <span>Mes Réservations</span>
@@ -164,8 +164,8 @@
 
               <router-link
                 to="/profile"
-                @click="closeMobileMenu"
                 class="mobile-nav-link"
+                @click="closeMobileMenu"
               >
                 <User class="w-5 h-5" />
                 <span>Mon Profil</span>
@@ -179,24 +179,24 @@
                   </p>
                   <router-link
                     to="/merchant/products"
-                    @click="closeMobileMenu"
                     class="mobile-nav-link"
+                    @click="closeMobileMenu"
                   >
                     <Briefcase class="w-5 h-5" />
                     <span>Mes Produits</span>
                   </router-link>
                   <router-link
                     to="/merchant/reservations"
-                    @click="closeMobileMenu"
                     class="mobile-nav-link"
+                    @click="closeMobileMenu"
                   >
                     <ShoppingCart class="w-5 h-5" />
                     <span>Réservations Reçues</span>
                   </router-link>
                   <router-link
                     to="/merchant/reviews"
-                    @click="closeMobileMenu"
                     class="mobile-nav-link"
+                    @click="closeMobileMenu"
                   >
                     <Star class="w-5 h-5" />
                     <span>Avis Clients</span>
@@ -211,24 +211,24 @@
                   </p>
                   <router-link
                     to="/admin/dashboard"
-                    @click="closeMobileMenu"
                     class="mobile-nav-link"
+                    @click="closeMobileMenu"
                   >
                     <Settings class="w-5 h-5" />
                     <span>Admin Dashboard</span>
                   </router-link>
                   <router-link
                     to="/admin/users"
-                    @click="closeMobileMenu"
                     class="mobile-nav-link"
+                    @click="closeMobileMenu"
                   >
                     <Users class="w-5 h-5" />
                     <span>Gestion Utilisateurs</span>
                   </router-link>
                   <router-link
                     to="/admin/categories"
-                    @click="closeMobileMenu"
                     class="mobile-nav-link"
+                    @click="closeMobileMenu"
                   >
                     <Grid class="w-5 h-5" />
                     <span>Catégories</span>
@@ -240,8 +240,8 @@
             <!-- Logout Button -->
             <div class="border-t border-gray-200 pt-4 mt-4">
               <button
-                @click="handleLogout"
                 class="mobile-nav-link text-red-600 hover:bg-red-50"
+                @click="handleLogout"
               >
                 <LogOut class="w-5 h-5" />
                 <span>Se Déconnecter</span>
@@ -254,16 +254,16 @@
             <div class="border-t border-gray-200 pt-4 mt-4">
               <router-link
                 to="/auth/login"
-                @click="closeMobileMenu"
                 class="mobile-nav-link"
+                @click="closeMobileMenu"
               >
                 <LogIn class="w-5 h-5" />
                 <span>Se Connecter</span>
               </router-link>
               <router-link
                 to="/auth/register"
-                @click="closeMobileMenu"
                 class="mobile-nav-link bg-primary-50 text-primary-700 border border-primary-200"
+                @click="closeMobileMenu"
               >
                 <UserPlus class="w-5 h-5" />
                 <span>S'Inscrire</span>

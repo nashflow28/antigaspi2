@@ -5,9 +5,9 @@
 </template>
 
 <script setup lang="ts">
-import { computed, useAttrs } from 'vue';
+import { computed, useAttrs } from 'vue'
 
-defineOptions({ inheritAttrs: false });
+defineOptions({ inheritAttrs: false })
 
 type SkeletonRadius = 'sm' | 'md' | 'lg' | 'full';
 
@@ -16,27 +16,27 @@ const props = withDefaults(
     rounded?: SkeletonRadius;
   }>(),
   {
-    rounded: 'md',
-  },
-);
+    rounded: 'md'
+  }
+)
 
-const attrs = useAttrs();
+const attrs = useAttrs()
 
 const rounding: Record<SkeletonRadius, string> = {
   sm: 'rounded-lg',
   md: 'rounded-2xl',
   lg: 'rounded-3xl',
-  full: 'rounded-full',
-};
+  full: 'rounded-full'
+}
 
 const wrapperClasses = computed(() => [
   'relative overflow-hidden bg-neutral-200/70 dark:bg-neutral-800/60',
   rounding[props.rounded],
-  (attrs.class as string | undefined) ?? '',
-]);
+  (attrs.class as string | undefined) ?? ''
+])
 
 const otherAttrs = computed(() => {
-  const { class: _class, ...rest } = attrs;
-  return rest;
-});
+  const { class: _class, ...rest } = attrs
+  return rest
+})
 </script>

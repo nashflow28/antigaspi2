@@ -11,9 +11,9 @@
         </div>
       </div>
       <button
-        @click="getCurrentLocation"
         :disabled="loading"
         class="text-blue-600 hover:text-blue-700 font-medium text-sm flex items-center space-x-1"
+        @click="getCurrentLocation"
       >
         <RefreshCw class="w-4 h-4" :class="{ 'animate-spin': loading }" />
         <span>{{ loading ? 'Localisation...' : 'Me localiser' }}</span>
@@ -27,8 +27,8 @@
         Ajoutez la position de votre commerce pour que les clients puissent vous trouver facilement
       </p>
       <button
-        @click="showLocationModal = true"
         class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+        @click="showLocationModal = true"
       >
         Définir ma position
       </button>
@@ -48,15 +48,15 @@
 
       <div class="flex space-x-3">
         <button
-          @click="showLocationModal = true"
           class="flex-1 bg-gray-100 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-200 transition-colors"
+          @click="showLocationModal = true"
         >
           Modifier
         </button>
         <button
-          @click="getCurrentLocation"
           :disabled="loading"
           class="flex-1 bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50"
+          @click="getCurrentLocation"
         >
           {{ loading ? 'Localisation...' : 'Relocaliser' }}
         </button>
@@ -69,7 +69,7 @@
       <div
         class="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm transition-opacity"
         @click="closeModal"
-      ></div>
+      />
 
       <!-- Modal -->
       <div class="flex min-h-full items-center justify-center p-4">
@@ -82,8 +82,8 @@
             <div class="flex items-center justify-between">
               <h3 class="text-lg font-semibold text-gray-900">Définir votre position</h3>
               <button
-                @click="closeModal"
                 class="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                @click="closeModal"
               >
                 <X class="w-5 h-5 text-gray-400" />
               </button>
@@ -91,22 +91,22 @@
           </div>
 
           <!-- Form -->
-          <form @submit.prevent="saveLocation" class="px-6 py-6 space-y-4">
+          <form class="px-6 py-6 space-y-4" @submit.prevent="saveLocation">
             <!-- Map Selection Mode Toggle -->
             <div class="flex items-center justify-center space-x-4 mb-4">
               <button
                 type="button"
-                @click="mapSelectionMode = false"
                 :class="!mapSelectionMode ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700'"
                 class="px-4 py-2 rounded-lg font-medium transition-colors"
+                @click="mapSelectionMode = false"
               >
                 Coordonnées manuelles
               </button>
               <button
                 type="button"
-                @click="toggleMapSelection"
                 :class="mapSelectionMode ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700'"
                 class="px-4 py-2 rounded-lg font-medium transition-colors"
+                @click="toggleMapSelection"
               >
                 Sélection sur carte
               </button>
@@ -120,8 +120,8 @@
                 </label>
                 <button
                   type="button"
-                  @click="centerOnCurrentPosition"
                   class="text-blue-600 hover:text-blue-700 text-sm flex items-center space-x-1"
+                  @click="centerOnCurrentPosition"
                 >
                   <MapPin class="w-4 h-4" />
                   <span>Ma position</span>
@@ -152,7 +152,7 @@
                   required
                   class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   placeholder="Ex: 5.3474"
-                />
+                >
               </div>
 
               <div>
@@ -169,7 +169,7 @@
                   required
                   class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   placeholder="Ex: -3.9857"
-                />
+                >
               </div>
             </div>
 
@@ -200,8 +200,8 @@
             <div class="flex justify-end space-x-3 pt-4">
               <button
                 type="button"
-                @click="closeModal"
                 class="px-4 py-2 text-gray-600 hover:text-gray-800 font-medium transition-colors"
+                @click="closeModal"
               >
                 Annuler
               </button>
@@ -249,8 +249,8 @@
           </div>
           <div class="ml-4 flex-shrink-0 flex">
             <button
-              @click="notification.show = false"
               class="text-gray-400 hover:text-gray-600 transition-colors"
+              @click="notification.show = false"
             >
               <X class="w-4 h-4" />
             </button>

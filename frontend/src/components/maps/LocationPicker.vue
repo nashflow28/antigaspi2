@@ -32,7 +32,7 @@
         class="absolute inset-0 bg-white bg-opacity-80 flex items-center justify-center rounded-xl"
       >
         <div class="text-center">
-          <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600 mx-auto mb-2"></div>
+          <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600 mx-auto mb-2" />
           <p class="text-sm text-gray-600">Chargement de la carte...</p>
         </div>
       </div>
@@ -42,10 +42,10 @@
         <!-- User Location Button -->
         <button
           v-if="enableUserLocation"
-          @click="getCurrentLocation"
           :disabled="geoLoading"
           class="bg-white hover:bg-gray-50 border border-gray-300 rounded-lg p-2 shadow-sm transition-colors"
           title="Me localiser"
+          @click="getCurrentLocation"
         >
           <MapPin class="w-5 h-5 text-gray-700" :class="{ 'animate-pulse': geoLoading }" />
         </button>
@@ -53,18 +53,18 @@
         <!-- Reset View Button -->
         <button
           v-if="selectedLocation"
-          @click="resetMapView"
           class="bg-white hover:bg-gray-50 border border-gray-300 rounded-lg p-2 shadow-sm transition-colors"
           title="Réinitialiser la vue"
+          @click="resetMapView"
         >
           <RotateCcw class="w-5 h-5 text-gray-700" />
         </button>
 
         <!-- Fullscreen Toggle -->
         <button
-          @click="toggleFullscreen"
           class="bg-white hover:bg-gray-50 border border-gray-300 rounded-lg p-2 shadow-sm transition-colors"
           :title="isFullscreen ? 'Quitter le plein écran' : 'Plein écran'"
+          @click="toggleFullscreen"
         >
           <Minimize v-if="isFullscreen" class="w-5 h-5 text-gray-700" />
           <Maximize v-else class="w-5 h-5 text-gray-700" />
@@ -85,8 +85,8 @@
             </p>
           </div>
           <button
-            @click="showInstructions = false"
             class="ml-auto p-1 hover:bg-gray-100 rounded transition-colors"
+            @click="showInstructions = false"
           >
             <X class="w-3 h-3 text-gray-400" />
           </button>
@@ -115,9 +115,9 @@
           </div>
         </div>
         <button
-          @click="clearSelection"
           class="p-1 hover:bg-green-100 rounded transition-colors"
           title="Effacer la sélection"
+          @click="clearSelection"
         >
           <X class="w-4 h-4 text-green-500" />
         </button>
@@ -128,15 +128,15 @@
     <div v-if="showActions" class="mt-4 flex justify-end space-x-3">
       <button
         v-if="allowClear"
-        @click="clearSelection"
         class="px-4 py-2 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
+        @click="clearSelection"
       >
         Effacer
       </button>
       <button
         :disabled="!selectedLocation"
-        @click="confirmSelection"
         class="px-6 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+        @click="confirmSelection"
       >
         {{ confirmText }}
       </button>

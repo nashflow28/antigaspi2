@@ -4,12 +4,23 @@
       <div class="flex items-center justify-between">
         <h3 class="text-lg font-semibold text-gray-900">Historique des transactions</h3>
         <button
-          @click="refreshTransactions"
           :disabled="loading"
           class="p-2 text-gray-400 hover:text-gray-600 disabled:opacity-50"
+          @click="refreshTransactions"
         >
-          <svg class="w-5 h-5" :class="{'animate-spin': loading}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+          <svg
+            class="w-5 h-5"
+            :class="{'animate-spin': loading}"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+            />
           </svg>
         </button>
       </div>
@@ -18,8 +29,8 @@
       <div class="mt-4 flex flex-wrap gap-4">
         <select
           v-model="filters.type"
-          @change="applyFilters"
           class="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-green-500 focus:border-transparent"
+          @change="applyFilters"
         >
           <option value="">Tous les types</option>
           <option value="credit">Crédits</option>
@@ -28,21 +39,21 @@
 
         <input
           v-model="filters.date_from"
-          @change="applyFilters"
           type="date"
           class="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-green-500 focus:border-transparent"
+          @change="applyFilters"
         >
 
         <input
           v-model="filters.date_to"
-          @change="applyFilters"
           type="date"
           class="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-green-500 focus:border-transparent"
+          @change="applyFilters"
         >
 
         <button
-          @click="clearFilters"
           class="px-3 py-2 text-sm text-gray-600 hover:text-gray-800"
+          @click="clearFilters"
         >
           Effacer filtres
         </button>
@@ -53,20 +64,30 @@
       <div v-if="loading && !transactions.length" class="p-6">
         <div class="animate-pulse space-y-4">
           <div v-for="i in 3" :key="i" class="flex items-center space-x-4">
-            <div class="w-10 h-10 bg-gray-200 rounded-full"></div>
+            <div class="w-10 h-10 bg-gray-200 rounded-full" />
             <div class="flex-1 space-y-2">
-              <div class="h-4 bg-gray-200 rounded w-3/4"></div>
-              <div class="h-3 bg-gray-200 rounded w-1/2"></div>
+              <div class="h-4 bg-gray-200 rounded w-3/4" />
+              <div class="h-3 bg-gray-200 rounded w-1/2" />
             </div>
-            <div class="h-4 bg-gray-200 rounded w-20"></div>
+            <div class="h-4 bg-gray-200 rounded w-20" />
           </div>
         </div>
       </div>
 
       <div v-else-if="!transactions.length" class="p-6 text-center">
         <div class="text-gray-500">
-          <svg class="w-12 h-12 mx-auto mb-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+          <svg
+            class="w-12 h-12 mx-auto mb-4 text-gray-300"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
+            />
           </svg>
           <p class="text-sm">Aucune transaction trouvée</p>
         </div>
@@ -101,23 +122,23 @@
           <div class="flex-1 min-w-0">
             <div class="flex items-center justify-between">
               <p class="text-sm font-medium text-gray-900 truncate">
-                {{transaction.description}}
+                {{ transaction.description }}
               </p>
               <div class="text-right">
                 <p
                   class="text-sm font-semibold"
                   :class="getAmountClass(transaction.type)"
                 >
-                  {{transaction.formatted_amount}}
+                  {{ transaction.formatted_amount }}
                 </p>
               </div>
             </div>
             <div class="flex items-center justify-between mt-1">
               <p class="text-xs text-gray-500">
-                {{formatDate(transaction.created_at)}}
+                {{ formatDate(transaction.created_at) }}
               </p>
               <p class="text-xs text-gray-400">
-                #{{transaction.reference}}
+                #{{ transaction.reference }}
               </p>
             </div>
           </div>
@@ -128,20 +149,20 @@
       <div v-if="pagination && pagination.last_page > 1" class="p-4 border-t border-gray-200">
         <div class="flex items-center justify-between">
           <div class="text-sm text-gray-700">
-            Affichage de {{pagination.from}} à {{pagination.to}} sur {{pagination.total}} transactions
+            Affichage de {{ pagination.from }} à {{ pagination.to }} sur {{ pagination.total }} transactions
           </div>
           <div class="flex space-x-2">
             <button
-              @click="changePage(pagination.current_page - 1)"
               :disabled="pagination.current_page === 1"
               class="px-3 py-1 text-sm border border-gray-300 rounded disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
+              @click="changePage(pagination.current_page - 1)"
             >
               Précédent
             </button>
             <button
-              @click="changePage(pagination.current_page + 1)"
               :disabled="pagination.current_page === pagination.last_page"
               class="px-3 py-1 text-sm border border-gray-300 rounded disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
+              @click="changePage(pagination.current_page + 1)"
             >
               Suivant
             </button>

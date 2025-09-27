@@ -11,14 +11,14 @@
         </div>
       </div>
       <button
-        @click="$emit('cancel')"
         class="text-gray-400 hover:text-gray-600 transition-colors"
+        @click="$emit('cancel')"
       >
         <X class="w-6 h-6" />
       </button>
     </div>
 
-    <form @submit.prevent="submitUpdate" class="space-y-6">
+    <form class="space-y-6" @submit.prevent="submitUpdate">
       <!-- Rating -->
       <div>
         <label class="block text-sm font-medium text-gray-700 mb-3">
@@ -44,7 +44,7 @@
           maxlength="255"
           class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           placeholder="Ex: Service rapide et produits frais"
-        />
+        >
         <p v-if="errors.title" class="mt-1 text-sm text-red-600">{{ errors.title }}</p>
       </div>
 
@@ -60,7 +60,7 @@
           maxlength="1000"
           class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
           placeholder="Décrivez votre expérience mise à jour..."
-        ></textarea>
+        />
         <div class="flex justify-between mt-1">
           <p v-if="errors.comment" class="text-sm text-red-600">{{ errors.comment }}</p>
           <p class="text-xs text-gray-500">{{ (form.comment?.length || 0) }}/1000 caractères</p>
@@ -71,16 +71,16 @@
       <div class="flex justify-end space-x-3 pt-4">
         <button
           type="button"
-          @click="$emit('cancel')"
           class="px-6 py-2 text-gray-600 hover:text-gray-800 font-medium transition-colors"
+          @click="$emit('cancel')"
         >
           Annuler
         </button>
         <button
           type="button"
-          @click="confirmDelete"
           class="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 font-medium transition-colors flex items-center space-x-2"
           :disabled="submitting"
+          @click="confirmDelete"
         >
           <Trash2 class="w-4 h-4" />
           <span>Supprimer</span>
@@ -92,23 +92,29 @@
         >
           <span>{{ submitting ? 'Mise à jour...' : 'Mettre à jour' }}</span>
           <Save v-if="!submitting" class="w-4 h-4" />
-          <div v-else class="w-4 h-4 animate-spin rounded-full border-2 border-white border-t-transparent"></div>
+          <div v-else class="w-4 h-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
         </button>
       </div>
     </form>
 
     <!-- Success/Error Messages -->
-    <div v-if="message.show" class="mt-4 p-4 rounded-lg" :class="{
-      'bg-green-50 border border-green-200': message.type === 'success',
-      'bg-red-50 border border-red-200': message.type === 'error'
-    }">
+    <div
+      v-if="message.show"
+      class="mt-4 p-4 rounded-lg"
+      :class="{
+        'bg-green-50 border border-green-200': message.type === 'success',
+        'bg-red-50 border border-red-200': message.type === 'error'
+      }"
+    >
       <div class="flex items-center">
         <CheckCircle v-if="message.type === 'success'" class="w-5 h-5 text-green-500 mr-2" />
         <XCircle v-if="message.type === 'error'" class="w-5 h-5 text-red-500 mr-2" />
-        <p :class="{
-          'text-green-700': message.type === 'success',
-          'text-red-700': message.type === 'error'
-        }">
+        <p
+          :class="{
+            'text-green-700': message.type === 'success',
+            'text-red-700': message.type === 'error'
+          }"
+        >
           {{ message.text }}
         </p>
       </div>
@@ -123,15 +129,15 @@
         </p>
         <div class="flex justify-end space-x-3">
           <button
-            @click="showDeleteConfirm = false"
             class="px-4 py-2 text-gray-600 hover:text-gray-800 transition-colors"
+            @click="showDeleteConfirm = false"
           >
             Annuler
           </button>
           <button
-            @click="deleteReview"
             class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
             :disabled="deleting"
+            @click="deleteReview"
           >
             {{ deleting ? 'Suppression...' : 'Supprimer' }}
           </button>

@@ -203,12 +203,12 @@
                 <p class="text-gray-500 text-sm">Aucune notification</p>
               </div>
               <div
-                v-else
                 v-for="notification in notifications"
+                v-else
                 :key="notification.id"
                 class="flex items-start space-x-3 p-3 bg-gray-50 rounded-xl"
               >
-                <div class="w-2 h-2 bg-blue-500 rounded-full mt-2 flex-shrink-0"></div>
+                <div class="w-2 h-2 bg-blue-500 rounded-full mt-2 flex-shrink-0" />
                 <div>
                   <p class="text-sm font-medium text-gray-900">{{ notification.title }}</p>
                   <p class="text-xs text-gray-600">{{ notification.message }}</p>
@@ -258,7 +258,7 @@
                   :src="product.image_url"
                   :alt="product.name"
                   class="w-full h-full object-cover rounded-lg"
-                />
+                >
                 <ShoppingBagIcon v-else class="w-8 h-8 text-gray-400" />
               </div>
               <h3 class="font-medium text-gray-900 mb-1">{{ product.name }}</h3>

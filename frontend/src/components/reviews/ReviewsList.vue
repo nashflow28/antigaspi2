@@ -25,8 +25,8 @@
         <div class="relative">
           <select
             v-model="currentFilter"
-            @change="() => fetchReviews()"
             class="text-sm border border-gray-300 rounded-lg px-3 py-1 focus:ring-2 focus:ring-yellow-500 focus:border-transparent"
+            @change="() => fetchReviews()"
           >
             <option value="">Tous les avis</option>
             <option value="5">5 étoiles</option>
@@ -55,7 +55,7 @@
             <div
               class="bg-yellow-400 h-2 rounded-full transition-all duration-300"
               :style="{ width: rating.percentage + '%' }"
-            ></div>
+            />
           </div>
           <span class="text-xs text-gray-500 w-8">{{ rating.count }}</span>
         </div>
@@ -65,7 +65,7 @@
     <!-- Reviews List -->
     <div class="divide-y divide-gray-200">
       <div v-if="loading" class="px-6 py-8 text-center">
-        <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-yellow-600 mx-auto"></div>
+        <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-yellow-600 mx-auto" />
         <p class="text-gray-500 mt-2">Chargement des avis...</p>
       </div>
 
@@ -78,8 +78,8 @@
       </div>
 
       <div
-        v-else
         v-for="review in reviews"
+        v-else
         :key="review.id"
         class="px-6 py-4 hover:bg-gray-50 transition-colors"
       >
@@ -131,8 +131,8 @@
               <!-- Edit button for user's own reviews -->
               <button
                 v-if="authStore.user?.id === review.user.id"
-                @click="editingReviewId = review.id"
                 class="inline-flex items-center px-3 py-1 text-xs text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-full transition-colors"
+                @click="editingReviewId = review.id"
               >
                 <Edit class="w-3 h-3 mr-1" />
                 Modifier
@@ -141,8 +141,8 @@
               <!-- Report button for other users' reviews (consumers only) -->
               <button
                 v-if="authStore.user?.id !== review.user.id && authStore.isConsumer"
-                @click="reportingReviewId = review.id"
                 class="inline-flex items-center px-3 py-1 text-xs text-red-600 bg-red-50 hover:bg-red-100 rounded-full transition-colors"
+                @click="reportingReviewId = review.id"
               >
                 <Flag class="w-3 h-3 mr-1" />
                 Signaler
@@ -151,8 +151,8 @@
               <!-- Reply button for merchants -->
               <button
                 v-if="authStore.isMerchant"
-                @click="replyingToReviewId = review.id"
                 class="inline-flex items-center px-3 py-1 text-xs text-green-600 bg-green-50 hover:bg-green-100 rounded-full transition-colors"
+                @click="replyingToReviewId = review.id"
               >
                 <Reply class="w-3 h-3 mr-1" />
                 Répondre
@@ -180,32 +180,52 @@
             </p>
             <div class="space-y-2 mb-6">
               <label class="flex items-center">
-                <input type="radio" v-model="reportReason" value="inappropriate" class="mr-2" />
+                <input
+                  v-model="reportReason"
+                  type="radio"
+                  value="inappropriate"
+                  class="mr-2"
+                >
                 Contenu inapproprié
               </label>
               <label class="flex items-center">
-                <input type="radio" v-model="reportReason" value="spam" class="mr-2" />
+                <input
+                  v-model="reportReason"
+                  type="radio"
+                  value="spam"
+                  class="mr-2"
+                >
                 Spam ou contenu commercial
               </label>
               <label class="flex items-center">
-                <input type="radio" v-model="reportReason" value="fake" class="mr-2" />
+                <input
+                  v-model="reportReason"
+                  type="radio"
+                  value="fake"
+                  class="mr-2"
+                >
                 Avis faux ou trompeur
               </label>
               <label class="flex items-center">
-                <input type="radio" v-model="reportReason" value="offensive" class="mr-2" />
+                <input
+                  v-model="reportReason"
+                  type="radio"
+                  value="offensive"
+                  class="mr-2"
+                >
                 Langage offensant
               </label>
             </div>
             <div class="flex justify-end space-x-3">
               <button
-                @click="reportingReviewId = null; reportReason = ''"
                 class="px-4 py-2 text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
+                @click="reportingReviewId = null; reportReason = ''"
               >
                 Annuler
               </button>
               <button
-                @click="submitReport(review.id)"
                 class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+                @click="submitReport(review.id)"
               >
                 Signaler
               </button>
@@ -226,21 +246,21 @@
               class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
               rows="4"
               maxlength="500"
-            ></textarea>
+            />
             <div class="text-xs text-gray-500 mt-1">
               {{ replyText?.length || 0 }}/500 caractères
             </div>
             <div class="flex justify-end space-x-3 mt-4">
               <button
-                @click="replyingToReviewId = null; replyText = ''"
                 class="px-4 py-2 text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
+                @click="replyingToReviewId = null; replyText = ''"
               >
                 Annuler
               </button>
               <button
-                @click="submitReply(review.id)"
                 :disabled="!replyText?.trim()"
                 class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                @click="submitReply(review.id)"
               >
                 Répondre
               </button>
@@ -258,16 +278,16 @@
         </div>
         <div class="flex space-x-2">
           <button
-            @click="loadPage(pagination.current_page - 1)"
             :disabled="pagination.current_page <= 1"
             class="px-3 py-1 text-sm border border-gray-300 rounded disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
+            @click="loadPage(pagination.current_page - 1)"
           >
             Précédent
           </button>
           <button
-            @click="loadPage(pagination.current_page + 1)"
             :disabled="pagination.current_page >= pagination.last_page"
             class="px-3 py-1 text-sm border border-gray-300 rounded disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
+            @click="loadPage(pagination.current_page + 1)"
           >
             Suivant
           </button>

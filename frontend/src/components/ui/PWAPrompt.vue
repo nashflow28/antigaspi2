@@ -30,9 +30,9 @@
                   size="sm"
                   variant="primary"
                   :left-icon="Download"
-                  @click="handleInstall"
                   :loading="installing"
                   aria-label="Installer l'application Antigaspi"
+                  @click="handleInstall"
                 >
                   Installer
                 </Button>
@@ -40,8 +40,8 @@
                 <Button
                   size="sm"
                   variant="ghost"
-                  @click="dismissInstallPrompt"
                   aria-label="Ignorer l'installation"
+                  @click="dismissInstallPrompt"
                 >
                   Plus tard
                 </Button>
@@ -96,9 +96,9 @@
                   size="sm"
                   variant="primary"
                   :left-icon="RefreshCw"
-                  @click="handleUpdate"
                   :loading="updating"
                   aria-label="Mettre à jour l'application"
+                  @click="handleUpdate"
                 >
                   Mettre à jour
                 </Button>
@@ -106,8 +106,8 @@
                 <Button
                   size="sm"
                   variant="ghost"
-                  @click="dismissUpdatePrompt"
                   aria-label="Ignorer la mise à jour"
+                  @click="dismissUpdatePrompt"
                 >
                   Plus tard
                 </Button>
@@ -151,7 +151,7 @@
               'w-2 h-2 rounded-full',
               isOnline ? 'bg-white' : 'bg-white animate-pulse'
             ]"
-          ></div>
+          />
           {{ isOnline ? 'Connexion rétablie' : 'Hors ligne' }}
         </div>
       </div>

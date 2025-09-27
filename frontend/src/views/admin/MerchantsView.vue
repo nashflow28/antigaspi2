@@ -5,305 +5,370 @@
     class="bg-neutral-50"
   >
     <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-    <!-- En-tête -->
-    <div class="bg-white shadow rounded-lg p-6 mb-6">
-      <div class="flex items-center justify-between">
-        <div>
-          <h1 class="text-2xl font-bold text-gray-900">Modération des Commerçants</h1>
-          <p class="mt-1 text-sm text-gray-500">Gérez les demandes d'inscription et surveiller l'activité des commerçants</p>
-        </div>
-        <div class="flex items-center space-x-3">
-          <button
-            @click="refreshData"
-            class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg flex items-center"
-          >
-            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
-            </svg>
-            Actualiser
-          </button>
-        </div>
-      </div>
-    </div>
-
-    <!-- Statistiques modération -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
-      <div class="bg-white overflow-hidden shadow rounded-lg">
-        <div class="p-5">
-          <div class="flex items-center">
-            <div class="flex-shrink-0">
-              <svg class="h-6 w-6 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
-              </svg>
-            </div>
-            <div class="ml-5 w-0 flex-1">
-              <dl>
-                <dt class="text-sm font-medium text-gray-500 truncate">Commerçants Actifs</dt>
-                <dd class="text-lg font-medium text-gray-900">{{ stats.activeMerchants }}</dd>
-              </dl>
-            </div>
+      <!-- En-tête -->
+      <div class="bg-white shadow rounded-lg p-6 mb-6">
+        <div class="flex items-center justify-between">
+          <div>
+            <h1 class="text-2xl font-bold text-gray-900">Modération des Commerçants</h1>
+            <p class="mt-1 text-sm text-gray-500">Gérez les demandes d'inscription et surveiller l'activité des commerçants</p>
           </div>
-        </div>
-      </div>
-
-      <div class="bg-white overflow-hidden shadow rounded-lg">
-        <div class="p-5">
-          <div class="flex items-center">
-            <div class="flex-shrink-0">
-              <svg class="h-6 w-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-              </svg>
-            </div>
-            <div class="ml-5 w-0 flex-1">
-              <dl>
-                <dt class="text-sm font-medium text-gray-500 truncate">En Attente</dt>
-                <dd class="text-lg font-medium text-gray-900">{{ stats.pendingMerchants }}</dd>
-              </dl>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="bg-white overflow-hidden shadow rounded-lg">
-        <div class="p-5">
-          <div class="flex items-center">
-            <div class="flex-shrink-0">
-              <svg class="h-6 w-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
-              </svg>
-            </div>
-            <div class="ml-5 w-0 flex-1">
-              <dl>
-                <dt class="text-sm font-medium text-gray-500 truncate">Produits Publiés</dt>
-                <dd class="text-lg font-medium text-gray-900">{{ stats.totalProducts }}</dd>
-              </dl>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="bg-white overflow-hidden shadow rounded-lg">
-        <div class="p-5">
-          <div class="flex items-center">
-            <div class="flex-shrink-0">
-              <svg class="h-6 w-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
-              </svg>
-            </div>
-            <div class="ml-5 w-0 flex-1">
-              <dl>
-                <dt class="text-sm font-medium text-gray-500 truncate">Réservations</dt>
-                <dd class="text-lg font-medium text-gray-900">{{ stats.totalReservations }}</dd>
-              </dl>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Onglets de modération -->
-    <div class="bg-white shadow rounded-lg mb-6">
-      <div class="border-b border-gray-200">
-        <nav class="-mb-px flex space-x-8 px-6">
-          <button
-            v-for="tab in tabs"
-            :key="tab.key"
-            @click="activeTab = tab.key"
-            :class="{
-              'border-green-500 text-green-600': activeTab === tab.key,
-              'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300': activeTab !== tab.key
-            }"
-            class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm"
-          >
-            {{ tab.label }}
-            <span
-              v-if="tab.count > 0"
-              :class="{
-                'bg-green-100 text-green-600': activeTab === tab.key,
-                'bg-gray-100 text-gray-600': activeTab !== tab.key
-              }"
-              class="ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
+          <div class="flex items-center space-x-3">
+            <button
+              class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg flex items-center"
+              @click="refreshData"
             >
-              {{ tab.count }}
-            </span>
-          </button>
-        </nav>
+              <svg
+                class="w-4 h-4 mr-2"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                />
+              </svg>
+              Actualiser
+            </button>
+          </div>
+        </div>
       </div>
 
-      <div class="p-6">
-        <!-- Demandes d'inscription en attente -->
-        <div v-if="activeTab === 'pending'" class="space-y-6">
-          <h3 class="text-lg font-medium text-gray-900">Demandes d'inscription en attente</h3>
-          <div v-if="pendingMerchants.length === 0" class="text-center py-8">
-            <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path>
-            </svg>
-            <p class="mt-2 text-sm text-gray-500">Aucune demande en attente</p>
+      <!-- Statistiques modération -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+        <div class="bg-white overflow-hidden shadow rounded-lg">
+          <div class="p-5">
+            <div class="flex items-center">
+              <div class="flex-shrink-0">
+                <svg
+                  class="h-6 w-6 text-orange-600"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
+                  />
+                </svg>
+              </div>
+              <div class="ml-5 w-0 flex-1">
+                <dl>
+                  <dt class="text-sm font-medium text-gray-500 truncate">Commerçants Actifs</dt>
+                  <dd class="text-lg font-medium text-gray-900">{{ stats.activeMerchants }}</dd>
+                </dl>
+              </div>
+            </div>
           </div>
-          <div v-else class="space-y-4">
-            <div v-for="merchant in pendingMerchants" :key="merchant.id" class="border border-gray-200 rounded-lg p-6">
-              <div class="flex items-start justify-between">
-                <div class="flex-1">
-                  <h4 class="text-lg font-medium text-gray-900">{{ merchant.business_name }}</h4>
-                  <p class="text-sm text-gray-500 mt-1">{{ merchant.owner_name }}</p>
-                  <div class="mt-2 grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <p class="text-sm text-gray-600"><strong>Email:</strong> {{ merchant.email }}</p>
-                      <p class="text-sm text-gray-600"><strong>Téléphone:</strong> {{ merchant.phone }}</p>
-                      <p class="text-sm text-gray-600"><strong>Adresse:</strong> {{ merchant.address }}</p>
-                    </div>
-                    <div>
-                      <p class="text-sm text-gray-600"><strong>Type de commerce:</strong> {{ merchant.business_type }}</p>
-                      <p class="text-sm text-gray-600"><strong>Description:</strong> {{ merchant.description }}</p>
-                      <p class="text-sm text-gray-600"><strong>Demande:</strong> {{ formatDate(merchant.created_at) }}</p>
+        </div>
+
+        <div class="bg-white overflow-hidden shadow rounded-lg">
+          <div class="p-5">
+            <div class="flex items-center">
+              <div class="flex-shrink-0">
+                <svg
+                  class="h-6 w-6 text-yellow-600"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                  />
+                </svg>
+              </div>
+              <div class="ml-5 w-0 flex-1">
+                <dl>
+                  <dt class="text-sm font-medium text-gray-500 truncate">En Attente</dt>
+                  <dd class="text-lg font-medium text-gray-900">{{ stats.pendingMerchants }}</dd>
+                </dl>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-white overflow-hidden shadow rounded-lg">
+          <div class="p-5">
+            <div class="flex items-center">
+              <div class="flex-shrink-0">
+                <svg
+                  class="h-6 w-6 text-green-600"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"
+                  />
+                </svg>
+              </div>
+              <div class="ml-5 w-0 flex-1">
+                <dl>
+                  <dt class="text-sm font-medium text-gray-500 truncate">Produits Publiés</dt>
+                  <dd class="text-lg font-medium text-gray-900">{{ stats.totalProducts }}</dd>
+                </dl>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-white overflow-hidden shadow rounded-lg">
+          <div class="p-5">
+            <div class="flex items-center">
+              <div class="flex-shrink-0">
+                <svg
+                  class="h-6 w-6 text-blue-600"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
+                  />
+                </svg>
+              </div>
+              <div class="ml-5 w-0 flex-1">
+                <dl>
+                  <dt class="text-sm font-medium text-gray-500 truncate">Réservations</dt>
+                  <dd class="text-lg font-medium text-gray-900">{{ stats.totalReservations }}</dd>
+                </dl>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Onglets de modération -->
+      <div class="bg-white shadow rounded-lg mb-6">
+        <div class="border-b border-gray-200">
+          <nav class="-mb-px flex space-x-8 px-6">
+            <button
+              v-for="tab in tabs"
+              :key="tab.key"
+              :class="{
+                'border-green-500 text-green-600': activeTab === tab.key,
+                'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300': activeTab !== tab.key
+              }"
+              class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm"
+              @click="activeTab = tab.key"
+            >
+              {{ tab.label }}
+              <span
+                v-if="tab.count > 0"
+                :class="{
+                  'bg-green-100 text-green-600': activeTab === tab.key,
+                  'bg-gray-100 text-gray-600': activeTab !== tab.key
+                }"
+                class="ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
+              >
+                {{ tab.count }}
+              </span>
+            </button>
+          </nav>
+        </div>
+
+        <div class="p-6">
+          <!-- Demandes d'inscription en attente -->
+          <div v-if="activeTab === 'pending'" class="space-y-6">
+            <h3 class="text-lg font-medium text-gray-900">Demandes d'inscription en attente</h3>
+            <div v-if="pendingMerchants.length === 0" class="text-center py-8">
+              <svg
+                class="mx-auto h-12 w-12 text-gray-400"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"
+                />
+              </svg>
+              <p class="mt-2 text-sm text-gray-500">Aucune demande en attente</p>
+            </div>
+            <div v-else class="space-y-4">
+              <div v-for="merchant in pendingMerchants" :key="merchant.id" class="border border-gray-200 rounded-lg p-6">
+                <div class="flex items-start justify-between">
+                  <div class="flex-1">
+                    <h4 class="text-lg font-medium text-gray-900">{{ merchant.business_name }}</h4>
+                    <p class="text-sm text-gray-500 mt-1">{{ merchant.owner_name }}</p>
+                    <div class="mt-2 grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <p class="text-sm text-gray-600"><strong>Email:</strong> {{ merchant.email }}</p>
+                        <p class="text-sm text-gray-600"><strong>Téléphone:</strong> {{ merchant.phone }}</p>
+                        <p class="text-sm text-gray-600"><strong>Adresse:</strong> {{ merchant.address }}</p>
+                      </div>
+                      <div>
+                        <p class="text-sm text-gray-600"><strong>Type de commerce:</strong> {{ merchant.business_type }}</p>
+                        <p class="text-sm text-gray-600"><strong>Description:</strong> {{ merchant.description }}</p>
+                        <p class="text-sm text-gray-600"><strong>Demande:</strong> {{ formatDate(merchant.created_at) }}</p>
+                      </div>
                     </div>
                   </div>
-                </div>
-                <div class="ml-6 flex flex-col space-y-2">
-                  <button
-                    @click="approveMerchant(merchant)"
-                    class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm"
-                  >
-                    Approuver
-                  </button>
-                  <button
-                    @click="rejectMerchant(merchant)"
-                    class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg text-sm"
-                  >
-                    Rejeter
-                  </button>
-                  <button
-                    @click="viewMerchantDetails(merchant)"
-                    class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg text-sm"
-                  >
-                    Détails
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Produits à modérer -->
-        <div v-if="activeTab === 'products'" class="space-y-6">
-          <h3 class="text-lg font-medium text-gray-900">Produits à modérer</h3>
-          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <div v-for="product in productsToModerate" :key="product.id" class="border border-gray-200 rounded-lg overflow-hidden">
-              <div class="aspect-w-16 aspect-h-9 bg-gray-200">
-                <img v-if="product.image_url" :src="product.image_url" :alt="product.name" class="w-full h-48 object-cover">
-                <div v-else class="w-full h-48 bg-gray-300 flex items-center justify-center">
-                  <span class="text-gray-500">Pas d'image</span>
-                </div>
-              </div>
-              <div class="p-4">
-                <h4 class="font-medium text-gray-900 truncate">{{ product.name || 'N/A' }}</h4>
-                <p class="text-sm text-gray-500 mt-1">{{ product.merchant_name || 'N/A' }}</p>
-                <p class="text-lg font-bold text-green-600 mt-2">{{ product.price ? formatPrice(product.price) : '0' }} F CFA</p>
-                <div class="mt-4 flex space-x-2">
-                  <button
-                    @click="approveProduct(product)"
-                    class="flex-1 bg-green-600 hover:bg-green-700 text-white px-3 py-2 rounded text-sm"
-                  >
-                    Approuver
-                  </button>
-                  <button
-                    @click="rejectProduct(product)"
-                    class="flex-1 bg-red-600 hover:bg-red-700 text-white px-3 py-2 rounded text-sm"
-                  >
-                    Rejeter
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Réservations signalées -->
-        <div v-if="activeTab === 'reservations'" class="space-y-6">
-          <h3 class="text-lg font-medium text-gray-900">Réservations signalées</h3>
-          <div class="overflow-x-auto">
-            <table class="min-w-full divide-y divide-gray-200">
-              <thead class="bg-gray-50">
-                <tr>
-                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Réservation
-                  </th>
-                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Client
-                  </th>
-                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Commerçant
-                  </th>
-                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Signalement
-                  </th>
-                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Actions
-                  </th>
-                </tr>
-              </thead>
-              <tbody class="bg-white divide-y divide-gray-200">
-                <tr v-for="reservation in flaggedReservations" :key="reservation.id">
-                  <td class="px-6 py-4 whitespace-nowrap">
-                    <div class="text-sm font-medium text-gray-900">{{ reservation.product_name || 'N/A' }}</div>
-                    <div class="text-sm text-gray-500">{{ reservation.total_price ? formatPrice(reservation.total_price) : '0' }} F CFA</div>
-                  </td>
-                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {{ reservation.customer_name || 'N/A' }}
-                  </td>
-                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {{ reservation.merchant_name || 'N/A' }}
-                  </td>
-                  <td class="px-6 py-4 whitespace-nowrap">
-                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
-                      {{ reservation.flag_reason || 'Non spécifié' }}
-                    </span>
-                  </td>
-                  <td class="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
+                  <div class="ml-6 flex flex-col space-y-2">
                     <button
-                      @click="resolveReservation(reservation)"
-                      class="text-green-600 hover:text-green-900"
+                      class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm"
+                      @click="approveMerchant(merchant)"
                     >
-                      Résoudre
+                      Approuver
                     </button>
                     <button
-                      @click="viewReservationDetails(reservation)"
-                      class="text-blue-600 hover:text-blue-900"
+                      class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg text-sm"
+                      @click="rejectMerchant(merchant)"
+                    >
+                      Rejeter
+                    </button>
+                    <button
+                      class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg text-sm"
+                      @click="viewMerchantDetails(merchant)"
                     >
                       Détails
                     </button>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Produits à modérer -->
+          <div v-if="activeTab === 'products'" class="space-y-6">
+            <h3 class="text-lg font-medium text-gray-900">Produits à modérer</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div v-for="product in productsToModerate" :key="product.id" class="border border-gray-200 rounded-lg overflow-hidden">
+                <div class="aspect-w-16 aspect-h-9 bg-gray-200">
+                  <img
+                    v-if="product.image_url"
+                    :src="product.image_url"
+                    :alt="product.name"
+                    class="w-full h-48 object-cover"
+                  >
+                  <div v-else class="w-full h-48 bg-gray-300 flex items-center justify-center">
+                    <span class="text-gray-500">Pas d'image</span>
+                  </div>
+                </div>
+                <div class="p-4">
+                  <h4 class="font-medium text-gray-900 truncate">{{ product.name || 'N/A' }}</h4>
+                  <p class="text-sm text-gray-500 mt-1">{{ product.merchant_name || 'N/A' }}</p>
+                  <p class="text-lg font-bold text-green-600 mt-2">{{ product.price ? formatPrice(product.price) : '0' }} F CFA</p>
+                  <div class="mt-4 flex space-x-2">
+                    <button
+                      class="flex-1 bg-green-600 hover:bg-green-700 text-white px-3 py-2 rounded text-sm"
+                      @click="approveProduct(product)"
+                    >
+                      Approuver
+                    </button>
+                    <button
+                      class="flex-1 bg-red-600 hover:bg-red-700 text-white px-3 py-2 rounded text-sm"
+                      @click="rejectProduct(product)"
+                    >
+                      Rejeter
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Réservations signalées -->
+          <div v-if="activeTab === 'reservations'" class="space-y-6">
+            <h3 class="text-lg font-medium text-gray-900">Réservations signalées</h3>
+            <div class="overflow-x-auto">
+              <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                  <tr>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Réservation
+                    </th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Client
+                    </th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Commerçant
+                    </th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Signalement
+                    </th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Actions
+                    </th>
+                  </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                  <tr v-for="reservation in flaggedReservations" :key="reservation.id">
+                    <td class="px-6 py-4 whitespace-nowrap">
+                      <div class="text-sm font-medium text-gray-900">{{ reservation.product_name || 'N/A' }}</div>
+                      <div class="text-sm text-gray-500">{{ reservation.total_price ? formatPrice(reservation.total_price) : '0' }} F CFA</div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      {{ reservation.customer_name || 'N/A' }}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      {{ reservation.merchant_name || 'N/A' }}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                      <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
+                        {{ reservation.flag_reason || 'Non spécifié' }}
+                      </span>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
+                      <button
+                        class="text-green-600 hover:text-green-900"
+                        @click="resolveReservation(reservation)"
+                      >
+                        Résoudre
+                      </button>
+                      <button
+                        class="text-blue-600 hover:text-blue-900"
+                        @click="viewReservationDetails(reservation)"
+                      >
+                        Détails
+                      </button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
       </div>
-    </div>
 
-    <!-- Modal de confirmation -->
-    <ConfirmModal
-      :is-open="confirmModal.isOpen"
-      :type="confirmModal.type"
-      :title="confirmModal.title"
-      :message="confirmModal.message"
-      :confirm-text="confirmModal.confirmText"
-      :cancel-text="confirmModal.cancelText"
-      @confirm="confirmModal.onConfirm"
-      @cancel="closeConfirmModal"
-    />
-
-    <!-- Notifications toast -->
-    <div class="fixed top-4 right-4 z-[110] space-y-4">
-      <NotificationToast
-        v-for="notification in notifications"
-        :key="notification.id"
-        :type="notification.type"
-        :title="notification.title"
-        :message="notification.message"
-        @close="removeNotification(notification.id)"
+      <!-- Modal de confirmation -->
+      <ConfirmModal
+        :is-open="confirmModal.isOpen"
+        :type="confirmModal.type"
+        :title="confirmModal.title"
+        :message="confirmModal.message"
+        :confirm-text="confirmModal.confirmText"
+        :cancel-text="confirmModal.cancelText"
+        @confirm="confirmModal.onConfirm"
+        @cancel="closeConfirmModal"
       />
-    </div>
+
+      <!-- Notifications toast -->
+      <div class="fixed top-4 right-4 z-[110] space-y-4">
+        <NotificationToast
+          v-for="notification in notifications"
+          :key="notification.id"
+          :type="notification.type"
+          :title="notification.title"
+          :message="notification.message"
+          @close="removeNotification(notification.id)"
+        />
+      </div>
     </div>
   </DashboardLayout>
 </template>

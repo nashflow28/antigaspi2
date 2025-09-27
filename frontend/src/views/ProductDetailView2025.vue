@@ -3,7 +3,7 @@
     <!-- Loading State -->
     <div v-if="loading" class="flex justify-center items-center min-h-screen">
       <div class="flex items-center gap-3">
-        <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600"></div>
+        <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600" />
         <span class="text-neutral-600">Chargement du produit...</span>
       </div>
     </div>
@@ -44,14 +44,14 @@
                 :src="product.image_url"
                 :alt="product.name"
                 class="w-full h-full object-cover"
-              />
+              >
             </div>
             <div v-else class="absolute inset-0 flex items-center justify-center">
               <Package class="w-40 h-40 text-white/20" />
             </div>
 
             <!-- Glassmorphism overlay -->
-            <div class="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent"></div>
+            <div class="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent" />
 
             <!-- Stock Badge -->
             <div class="absolute top-4 left-4">
@@ -163,8 +163,8 @@
                     <Button
                       variant="ghost"
                       size="sm"
-                      @click="decreaseQuantity"
                       :disabled="reservationQuantity <= 1"
+                      @click="decreaseQuantity"
                     >
                       <Minus class="w-4 h-4" />
                     </Button>
@@ -174,12 +174,12 @@
                       min="1"
                       :max="product.quantity"
                       class="w-16 text-center border-0 focus:ring-0 py-2"
-                    />
+                    >
                     <Button
                       variant="ghost"
                       size="sm"
-                      @click="increaseQuantity"
                       :disabled="reservationQuantity >= product.quantity"
+                      @click="increaseQuantity"
                     >
                       <Plus class="w-4 h-4" />
                     </Button>
@@ -211,8 +211,8 @@
                     variant="outline"
                     size="lg"
                     full-width
-                    @click="addToWishlist"
                     :disabled="loading"
+                    @click="addToWishlist"
                   >
                     <Heart :class="['w-5 h-5 mr-2', isInWishlist && 'fill-current text-red-500']" />
                     {{ isInWishlist ? 'Retiré des favoris' : 'Ajouter aux favoris' }}
@@ -257,8 +257,8 @@
             :key="relatedProduct.id"
             interactive
             variant="bordered"
-            @click="navigateToProduct(relatedProduct.id)"
             class="group cursor-pointer"
+            @click="navigateToProduct(relatedProduct.id)"
           >
             <div class="aspect-square bg-gradient-to-br from-neutral-200 to-neutral-300 rounded-lg overflow-hidden mb-4">
               <img
@@ -266,7 +266,7 @@
                 :src="relatedProduct.image_url"
                 :alt="relatedProduct.name"
                 class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-              />
+              >
               <div v-else class="flex items-center justify-center h-full">
                 <Package class="w-12 h-12 text-neutral-400" />
               </div>
@@ -467,7 +467,7 @@ onMounted(async () => {
         quantity: 5,
         merchant: { business_name: 'Boulangerie Martin' },
         image_url: '/images/croissants.jpg'
-      },
+      }
       // ... more related products
     ]
   } catch (err) {

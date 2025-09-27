@@ -27,7 +27,7 @@ export const formatPrice = (price: number, locale: string = 'fr-FR'): string => 
   // Formatage avec séparateur de milliers
   const formattedNumber = new Intl.NumberFormat(locale, {
     minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
+    maximumFractionDigits: 0
   }).format(Math.round(price))
 
   return `${formattedNumber} F CFA`
