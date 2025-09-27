@@ -6,18 +6,18 @@
         class="mb-6 inline-flex items-center gap-2 text-responsive-sm font-medium text-neutral-600 hover:text-neutral-900"
         @click="router.back()"
       >
-        <ArrowLeft class="h-4 w-4" />
+        <ArrowLeft class="h-5 w-5" />
         Retour
       </button>
 
       <Card v-if="isLoading" class="flex min-h-[240px] items-center justify-center text-neutral-500">
-        <span class="inline-flex h-6 w-6 animate-spin rounded-full border-2 border-neutral-200 border-t-primary-500" />
+        <span class="inline-flex h-10 w-10 animate-spin rounded-full border-2 border-neutral-200 border-t-primary-500" />
         <span class="ml-3">Chargement du panier surprise...</span>
       </Card>
 
       <Card v-else-if="!basket" class="text-center py-16">
         <div class="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-neutral-100">
-          <Package class="h-8 w-8 text-neutral-400" />
+          <Package class="h-10 w-10 text-neutral-400" />
         </div>
         <h2 class="text-responsive-xl font-semibold text-neutral-800">Panier introuvable</h2>
         <p class="mt-2 text-neutral-500">Ce panier surprise n'est plus disponible ou n'existe pas.</p>
@@ -43,8 +43,8 @@
             </div>
             <div class="absolute left-6 top-6 flex items-center gap-3">
               <Badge variant="success" class="font-semibold">-{{ basket.basket_discount_percentage }}%</Badge>
-              <span class="rounded-full bg-white/90 px-3 py-1 text-responsive-xs font-medium text-neutral-700 shadow-modern-2025">
-                <Clock class="mr-1 inline-block h-4 w-4 text-primary-500" />
+              <span class="rounded-full bg-white/90 px-4 py-3 text-responsive-xs font-medium text-neutral-700 shadow-modern-2025">
+                <Clock class="mr-1 inline-block h-5 w-5 text-primary-500" />
                 {{ timeLeft }}
               </span>
             </div>
@@ -55,16 +55,16 @@
               <h1 class="text-responsive-xl font-semibold text-neutral-900">{{ basket.name }}</h1>
               <p v-if="basket.surprise_description" class="text-neutral-600">{{ basket.surprise_description }}</p>
               <div class="flex flex-wrap items-center gap-3 text-responsive-sm text-neutral-500">
-                <span class="inline-flex items-center gap-2 rounded-full bg-primary-50 px-3 py-1 text-primary-700">
-                  <Store class="h-4 w-4" />
+                <span class="inline-flex items-center gap-2 rounded-full bg-primary-50 px-4 py-3 text-primary-700">
+                  <Store class="h-5 w-5" />
                   {{ basket.merchant.business_name }}
                 </span>
-                <span v-if="basket.category?.name" class="inline-flex items-center gap-2 rounded-full bg-accent-blue/5 px-3 py-1 text-accent-blue/90">
-                  <Tag class="h-4 w-4" />
+                <span v-if="basket.category?.name" class="inline-flex items-center gap-2 rounded-full bg-accent-blue/5 px-4 py-3 text-accent-blue/90">
+                  <Tag class="h-5 w-5" />
                   {{ basket.category.name }}
                 </span>
-                <span class="inline-flex items-center gap-2 rounded-full bg-neutral-100 px-3 py-1 text-neutral-600">
-                  <ShieldCheck class="h-4 w-4" />
+                <span class="inline-flex items-center gap-2 rounded-full bg-neutral-100 px-4 py-3 text-neutral-600">
+                  <ShieldCheck class="h-5 w-5" />
                   Retrait garanti avant expiration
                 </span>
               </div>
@@ -214,7 +214,7 @@
               @click="reserveBasket"
             >
               <span v-if="submitting" class="inline-flex items-center gap-2">
-                <Loader2 class="h-4 w-4 animate-spin" />
+                <Loader2 class="h-5 w-5 animate-spin" />
                 Réservation en cours...
               </span>
               <span v-else>{{ reserveButtonLabel }}</span>

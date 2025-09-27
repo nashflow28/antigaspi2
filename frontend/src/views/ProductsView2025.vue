@@ -10,7 +10,7 @@
               variant="primary"
               size="sm"
               rounded
-              class="w-max px-4 py-1 shadow-sm shadow-primary-200/40"
+              class="w-max px-4 py-3 shadow-sm shadow-primary-200/40"
             >
               Catalogue 2025
             </Badge>
@@ -86,7 +86,7 @@
         >
           <template #header>
             <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-              <div class="space-y-1">
+              <div class="space-y-2">
                 <h2 class="text-responsive-xl font-heading font-semibold text-neutral-900 leading-relaxed">
                   Affiner votre recherche
                 </h2>
@@ -210,7 +210,7 @@
           >
             <Skeleton class="aspect-square w-full rounded-2xl" />
             <div class="space-y-2">
-              <Skeleton class="h-4 w-2/3 rounded-full" />
+              <Skeleton class="h-5 w-2/3 rounded-full" />
               <Skeleton class="h-3 w-1/2 rounded-full" />
               <Skeleton class="h-5 w-full rounded-xl" />
             </div>

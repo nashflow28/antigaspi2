@@ -4,8 +4,8 @@
       <div class="container mx-auto px-6 py-10">
         <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           <div>
-            <p class="inline-flex items-center gap-2 rounded-full bg-primary-100/70 px-4 py-1 text-responsive-sm font-medium text-primary-700">
-              <Star class="h-4 w-4" />
+            <p class="inline-flex items-center gap-2 rounded-full bg-primary-100/70 px-4 py-3 text-responsive-sm font-medium text-primary-700">
+              <Star class="h-5 w-5" />
               Avis vérifiés de la communauté
             </p>
             <h1 class="mt-3 text-display-sm font-semibold tracking-tight text-neutral-900">L'expérience AntiGaspi partagée</h1>
@@ -58,8 +58,8 @@
                 <h2 class="text-responsive-xl font-semibold text-neutral-900">Derniers avis publiés</h2>
                 <p class="text-responsive-sm text-neutral-500">{{ filteredReviews.length }} avis affichés</p>
               </div>
-              <div class="flex items-center gap-1 text-responsive-sm text-amber-500">
-                <Star class="h-4 w-4 fill-amber-400" />
+              <div class="flex items-center gap-2 text-responsive-sm text-amber-500">
+                <Star class="h-5 w-5 fill-amber-400" />
                 <span>{{ averageRating.toFixed(1) }} / 5</span>
               </div>
             </div>
@@ -68,8 +68,8 @@
           <div v-if="reviewsLoading" class="space-y-4">
             <Card v-for="n in 3" :key="n" class="bg-white/80">
               <Skeleton class="h-5 w-1/4" />
-              <Skeleton class="h-4 w-full" />
-              <Skeleton class="h-4 w-3/4" />
+              <Skeleton class="h-5 w-full" />
+              <Skeleton class="h-5 w-3/4" />
             </Card>
           </div>
 
@@ -92,11 +92,11 @@
                   <p class="text-responsive-sm text-neutral-500">{{ review.productName }}</p>
                 </div>
                 <div class="flex items-center gap-2">
-                  <div class="flex items-center gap-1">
+                  <div class="flex items-center gap-2">
                     <Star
                       v-for="star in 5"
                       :key="star"
-                      class="h-4 w-4"
+                      class="h-5 w-5"
                       :class="star <= review.rating ? 'text-amber-400 fill-amber-400' : 'text-neutral-300'"
                     />
                   </div>
@@ -105,10 +105,10 @@
               </div>
               <p class="mt-4 text-responsive-sm text-neutral-700">{{ review.comment }}</p>
               <div class="mt-4 flex flex-wrap items-center gap-3 text-responsive-xs text-neutral-500">
-                <span class="inline-flex items-center gap-1 rounded-full bg-primary-50 px-3 py-1 text-primary-600">
+                <span class="inline-flex items-center gap-2 rounded-full bg-primary-50 px-4 py-3 text-primary-600">
                   <Leaf class="h-3 w-3" /> {{ review.impact }} kg sauvés
                 </span>
-                <span v-if="review.isVerified" class="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-3 py-1 text-emerald-600">
+                <span v-if="review.isVerified" class="inline-flex items-center gap-2 rounded-full bg-emerald-50 px-4 py-3 text-emerald-600">
                   <ShieldCheck class="h-3 w-3" /> Achat vérifié
                 </span>
               </div>
@@ -132,7 +132,7 @@
                 <p class="font-semibold text-neutral-800">{{ entry.name }}</p>
                 <p class="text-responsive-xs text-neutral-500">{{ entry.reviews }} avis</p>
               </div>
-              <span class="rounded-full bg-primary-50 px-3 py-1 text-responsive-xs font-semibold text-primary-600">{{ entry.rating.toFixed(1) }}/5</span>
+              <span class="rounded-full bg-primary-50 px-4 py-3 text-responsive-xs font-semibold text-primary-600">{{ entry.rating.toFixed(1) }}/5</span>
             </li>
           </ul>
         </Card>

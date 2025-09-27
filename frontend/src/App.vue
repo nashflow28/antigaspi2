@@ -67,7 +67,7 @@
             <span>Mon panier</span>
             <span
               v-if="cartItemsCount > 0"
-              class="flex h-6 min-w-[1.5rem] items-center justify-center rounded-full bg-primary-500 px-2 text-caption font-semibold text-white"
+              class="flex h-10 min-w-[1.5rem] items-center justify-center rounded-full bg-primary-500 px-4 text-caption font-semibold text-white"
             >
               {{ cartItemsCount > 99 ? '99+' : cartItemsCount }}
             </span>

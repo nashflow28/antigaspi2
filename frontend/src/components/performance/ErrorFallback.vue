@@ -1,7 +1,7 @@
 <template>
   <div class="flex flex-col items-center justify-center p-8 text-center">
     <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mb-4">
-      <ExclamationTriangleIcon class="w-8 h-8 text-red-600" />
+      <ExclamationTriangleIcon class="w-10 h-10 text-red-600" />
     </div>
     <h3 class="text-responsive-lg font-semibold text-neutral-900 mb-2">
       Erreur de chargement
@@ -10,7 +10,7 @@
       Une erreur s'est produite lors du chargement de ce composant.
     </p>
     <button
-      class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+      class="px-4 py-3 bg-blue-600 text-white rounded-lg hover:transition-colors"
       @click="retry"
     >
       Réessayer

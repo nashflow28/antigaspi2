@@ -6,7 +6,7 @@
         <div class="flex items-center justify-between h-16">
           <!-- Logo et titre -->
           <div class="flex items-center gap-3">
-            <div class="w-8 h-8 bg-blue-600 rounded-xl flex items-center justify-center">
+            <div class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center">
               <span class="text-white text-responsive-lg font-semibold">🌱</span>
             </div>
             <div class="flex flex-col">
@@ -23,7 +23,7 @@
           <div class="flex items-center gap-2">
             <!-- Bouton de recherche -->
             <button
-              class="p-2 rounded-xl text-neutral-600 hover:text-blue-600 hover:bg-blue-50 transition-colors"
+              class="p-2 rounded-xl text-neutral-600 hover:text-blue-600 hover:transition-colors"
               aria-label="Rechercher"
               @click="handleSearch"
             >
@@ -32,7 +32,7 @@
 
             <!-- Bouton notifications -->
             <button
-              class="relative p-2 rounded-xl text-neutral-600 hover:text-blue-600 hover:bg-blue-50 transition-colors"
+              class="relative p-2 rounded-xl text-neutral-600 hover:text-blue-600 hover:transition-colors"
               aria-label="Notifications"
               @click="handleNotifications"
             >
@@ -44,7 +44,7 @@
 
             <!-- Bouton panier -->
             <button
-              class="relative p-2 rounded-xl text-neutral-600 hover:text-blue-600 hover:bg-blue-50 transition-colors"
+              class="relative p-2 rounded-xl text-neutral-600 hover:text-blue-600 hover:transition-colors"
               aria-label="Panier"
               @click="handleCart"
             >
@@ -56,10 +56,10 @@
 
             <!-- Bouton utilisateur -->
             <button
-              class="p-1 rounded-xl hover:bg-blue-50 transition-colors"
+              class="p-1 rounded-xl hover:transition-colors"
               @click="handleUser"
             >
-              <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
+              <div class="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center">
                 <span class="text-white text-responsive-sm font-medium">U</span>
               </div>
             </button>
@@ -124,7 +124,7 @@
       <div class="bg-purple-50 rounded-lg p-4">
         <h3 class="font-medium text-purple-900 mb-2">Test d'interactivité</h3>
         <button
-          class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-md transition-colors"
+          class="bg-purple-600 hover:transition-colors"
           @click="counter++"
         >
           Compteur: {{ counter }}

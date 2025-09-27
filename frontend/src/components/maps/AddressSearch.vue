@@ -28,14 +28,14 @@
         <div class="absolute inset-y-0 right-0 pr-4 flex items-center">
           <button
             v-if="searchQuery && !loading"
-            class="p-1 hover:bg-neutral-100 rounded-full transition-colors"
+            class="p-1 hover:transition-colors"
             type="button"
             @click="clearSearch"
           >
-            <X class="w-4 h-4 text-neutral-400" />
+            <X class="w-5 h-5 text-neutral-400" />
           </button>
           <div v-else-if="loading" class="p-1">
-            <div class="animate-spin w-4 h-4 border-2 border-primary-500 border-t-transparent rounded-full" />
+            <div class="animate-spin w-5 h-5 border-2 border-primary-500 border-t-transparent rounded-full" />
           </div>
         </div>
       </div>
@@ -49,7 +49,7 @@
           <!-- Loading State -->
           <div v-if="loading" class="p-4 text-center text-neutral-500">
             <div class="flex items-center justify-center space-x-2">
-              <div class="animate-spin w-4 h-4 border-2 border-primary-500 border-t-transparent rounded-full" />
+              <div class="animate-spin w-5 h-5 border-2 border-primary-500 border-t-transparent rounded-full" />
               <span class="text-responsive-sm">Recherche en cours...</span>
             </div>
           </div>
@@ -57,7 +57,7 @@
           <!-- Error State -->
           <div v-else-if="error" class="p-4 text-center text-red-500">
             <div class="flex items-center justify-center space-x-2">
-              <AlertCircle class="w-4 h-4" />
+              <AlertCircle class="w-5 h-5" />
               <span class="text-responsive-sm">{{ error }}</span>
             </div>
           </div>
@@ -68,14 +68,14 @@
               v-for="(result, index) in results"
               :key="`${result.place_id || result.lat}-${index}`"
               :class="[
-                'w-full text-left px-4 py-3 hover:bg-neutral-50 transition-colors border-b border-neutral-100 last:border-b-0',
+                'w-full text-left px-4 py-3 hover:transition-colors border-b border-neutral-100 last:border-b-0',
                 { 'bg-primary-50': index === selectedIndex }
               ]"
               type="button"
               @click="selectResult(result)"
             >
               <div class="flex items-start space-x-3">
-                <MapPin class="w-4 h-4 text-neutral-400 mt-1 flex-shrink-0" />
+                <MapPin class="w-5 h-5 text-neutral-400 mt-1 flex-shrink-0" />
                 <div class="flex-1 min-w-0">
                   <div class="font-medium text-neutral-900 truncate">
                     {{ result.display_name || result.formatted_address }}
@@ -99,7 +99,7 @@
           <!-- No Results -->
           <div v-else class="p-4 text-center text-neutral-500">
             <div class="flex items-center justify-center space-x-2">
-              <MapPin class="w-4 h-4" />
+              <MapPin class="w-5 h-5" />
               <span class="text-responsive-sm">Aucun résultat trouvé</span>
             </div>
           </div>
@@ -111,7 +111,7 @@
     <div v-if="selectedLocation" class="mt-3 p-3 bg-primary-50 border border-primary-200 rounded-lg">
       <div class="flex items-start justify-between">
         <div class="flex items-start space-x-2">
-          <MapPin class="w-4 h-4 text-primary-600 mt-0.5" />
+          <MapPin class="w-5 h-5 text-primary-600 mt-0.5" />
           <div>
             <div class="font-medium text-primary-900 text-responsive-sm">
               {{ selectedLocation.display_name || selectedLocation.formatted_address }}
@@ -122,7 +122,7 @@
           </div>
         </div>
         <button
-          class="p-1 hover:bg-primary-100 rounded-full transition-colors"
+          class="p-1 hover:transition-colors"
           type="button"
           @click="clearSelection"
         >

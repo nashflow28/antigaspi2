@@ -15,13 +15,13 @@
             >
               <!-- Animated background pattern -->
               <div class="absolute inset-0 opacity-10">
-                <div class="absolute top-4 left-8 h-8 w-8 animate-pulse rounded-full bg-primary-300" />
+                <div class="absolute top-4 left-8 h-10 w-10 animate-pulse rounded-full bg-primary-300" />
                 <div
-                  class="absolute bottom-8 right-12 h-6 w-6 animate-pulse rounded-full bg-accent-blue/20"
+                  class="absolute bottom-8 right-12 h-10 w-10 animate-pulse rounded-full bg-accent-blue/20"
                   style="animation-delay: 0.5s"
                 />
                 <div
-                  class="absolute top-16 right-6 h-4 w-4 animate-pulse rounded-full bg-accent-orange/30"
+                  class="absolute top-16 right-6 h-5 w-5 animate-pulse rounded-full bg-accent-orange/30"
                   style="animation-delay: 1s"
                 />
                 <div

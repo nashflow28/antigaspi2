@@ -4,9 +4,9 @@
     <div v-if="loading" class="container-2025 py-8">
       <Card class="animate-pulse">
         <div class="space-y-4">
-          <div class="h-8 bg-neutral-200 rounded w-1/3" />
-          <div class="h-4 bg-neutral-200 rounded w-3/4" />
-          <div class="h-4 bg-neutral-200 rounded w-1/2" />
+          <div class="h-10 bg-neutral-200 rounded w-1/3" />
+          <div class="h-5 bg-neutral-200 rounded w-3/4" />
+          <div class="h-5 bg-neutral-200 rounded w-1/2" />
         </div>
       </Card>
     </div>
@@ -45,10 +45,10 @@
                   size="sm"
                   @click="$router.push('/reservations')"
                 >
-                  <ArrowLeft class="w-4 h-4" />
+                  <ArrowLeft class="w-5 h-5" />
                   Retour
                 </Button>
-                <div class="h-6 w-px bg-neutral-300" />
+                <div class="h-10 w-px bg-neutral-300" />
                 <span class="text-responsive-sm text-neutral-500">Réservation</span>
               </div>
               <h1 class="text-responsive-xl font-semibold text-neutral-900">
@@ -64,7 +64,7 @@
               <Badge
                 :variant="getStatusVariant(reservation.status)"
                 size="lg"
-                class="px-3 py-1"
+                class="px-4 py-3"
               >
                 {{ getStatusText(reservation.status) }}
               </Badge>
@@ -96,24 +96,24 @@
                 v-else
                 class="w-24 h-24 bg-neutral-100 rounded-xl flex items-center justify-center flex-shrink-0"
               >
-                <Package class="w-8 h-8 text-neutral-400" />
+                <Package class="w-10 h-10 text-neutral-400" />
               </div>
 
               <div class="flex-1">
                 <h4 class="font-semibold text-neutral-900 mb-2">
                   {{ reservation.product.name }}
                 </h4>
-                <div class="space-y-1 text-responsive-sm text-neutral-600">
+                <div class="space-y-2 text-responsive-sm text-neutral-600">
                   <div class="flex items-center gap-2">
-                    <Store class="w-4 h-4" />
+                    <Store class="w-5 h-5" />
                     <span>{{ reservation.product.merchant.name }}</span>
                   </div>
                   <div class="flex items-center gap-2">
-                    <MapPin class="w-4 h-4" />
+                    <MapPin class="w-5 h-5" />
                     <span>{{ reservation.product.merchant.address }}</span>
                   </div>
                   <div class="flex items-center gap-2">
-                    <Phone class="w-4 h-4" />
+                    <Phone class="w-5 h-5" />
                     <span>{{ reservation.product.merchant.phone }}</span>
                   </div>
                 </div>
@@ -173,7 +173,7 @@
                 variant="destructive"
                 @click="cancelReservation"
               >
-                <X class="w-4 h-4" />
+                <X class="w-5 h-5" />
                 Annuler la réservation
               </Button>
 
@@ -181,7 +181,7 @@
                 variant="outline"
                 @click="contactMerchant"
               >
-                <Phone class="w-4 h-4" />
+                <Phone class="w-5 h-5" />
                 Contacter le commerçant
               </Button>
 
@@ -189,7 +189,7 @@
                 variant="outline"
                 @click="downloadReceipt"
               >
-                <Download class="w-4 h-4" />
+                <Download class="w-5 h-5" />
                 Télécharger le reçu
               </Button>
             </div>
@@ -210,10 +210,10 @@
                 class="flex items-center gap-3"
               >
                 <div
-                  class="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0"
+                  class="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0"
                   :class="step.completed ? 'bg-primary-500 text-white' : 'bg-neutral-200 text-neutral-500'"
                 >
-                  <component :is="step.icon" class="w-4 h-4" />
+                  <component :is="step.icon" class="w-5 h-5" />
                 </div>
                 <div class="flex-1">
                   <p
@@ -232,7 +232,7 @@
           <Card class="bg-gradient-to-r from-accent-orange to-accent-orange/90 text-white">
             <div class="flex items-center gap-3 mb-4">
               <div class="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
-                <DollarSign class="w-6 h-6" />
+                <DollarSign class="w-10 h-10" />
               </div>
               <div>
                 <h3 class="font-semibold">Vos économies</h3>

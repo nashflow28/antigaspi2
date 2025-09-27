@@ -9,11 +9,11 @@
           </span>
         </h3>
         <button
-          class="inline-flex items-center px-3 py-1 text-responsive-sm text-primary-600 hover:text-primary-700 transition-colors"
+          class="inline-flex items-center px-4 py-3 text-responsive-sm text-primary-600 hover:transition-colors"
           :disabled="loading"
           @click="() => loadReviews()"
         >
-          <RefreshCw class="w-4 h-4 mr-1" :class="{ 'animate-spin': loading }" />
+          <RefreshCw class="w-5 h-5 mr-1" :class="{ 'animate-spin': loading }" />
           Actualiser
         </button>
       </div>
@@ -22,7 +22,7 @@
     <div class="divide-y divide-neutral-200">
       <!-- Loading State -->
       <div v-if="loading" class="px-6 py-8 text-center">
-        <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600 mx-auto" />
+        <div class="animate-spin rounded-full h-10 w-10 border-b-2 border-primary-600 mx-auto" />
         <p class="text-neutral-500 mt-2">Chargement des avis...</p>
       </div>
 
@@ -38,7 +38,7 @@
         v-for="review in reviews"
         v-else
         :key="review.id"
-        class="px-6 py-6 hover:bg-neutral-50 transition-colors"
+        class="px-6 py-6 hover:transition-colors"
       >
         <ReviewModerationCard
           :review="review"
@@ -58,14 +58,14 @@
         <div class="flex space-x-2">
           <button
             :disabled="pagination.current_page <= 1"
-            class="px-3 py-1 text-responsive-sm border border-neutral-300 rounded disabled:opacity-50 disabled:cursor-not-allowed hover:bg-neutral-50"
+            class="px-4 py-3 text-responsive-sm border border-neutral-300 rounded disabled:opacity-50 disabled:cursor-not-allowed hover:bg-neutral-50"
             @click="loadPage(pagination.current_page - 1)"
           >
             Précédent
           </button>
           <button
             :disabled="pagination.current_page >= pagination.last_page"
-            class="px-3 py-1 text-responsive-sm border border-neutral-300 rounded disabled:opacity-50 disabled:cursor-not-allowed hover:bg-neutral-50"
+            class="px-4 py-3 text-responsive-sm border border-neutral-300 rounded disabled:opacity-50 disabled:cursor-not-allowed hover:bg-neutral-50"
             @click="loadPage(pagination.current_page + 1)"
           >
             Suivant

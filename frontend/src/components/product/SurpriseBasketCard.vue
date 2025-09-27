@@ -23,16 +23,16 @@
 
       <span
         v-if="timeLeft"
-        class="absolute bottom-4 left-4 inline-flex items-center gap-1 rounded-full bg-white/90 px-3 py-1 text-responsive-xs font-medium text-neutral-700 shadow-modern-2025"
+        class="absolute bottom-4 left-4 inline-flex items-center gap-2 rounded-full bg-white/90 px-4 py-3 text-responsive-xs font-medium text-neutral-700 shadow-modern-2025"
       >
-        <Clock class="h-4 w-4 text-primary-500" />
+        <Clock class="h-5 w-5 text-primary-500" />
         {{ timeLeft }}
       </span>
     </div>
 
     <div class="space-y-4 p-6">
-      <div class="space-y-1">
-        <h3 class="text-responsive-lg font-semibold text-neutral-900 group-hover:text-primary-600 transition-colors">
+      <div class="space-y-2">
+        <h3 class="text-responsive-lg font-semibold text-neutral-900 group-hover:transition-colors">
           {{ basket.name }}
         </h3>
         <p v-if="basket.surprise_description" class="line-clamp-2 text-responsive-sm text-neutral-600">
@@ -41,12 +41,12 @@
       </div>
 
       <div class="flex flex-wrap items-center gap-3 text-responsive-sm text-neutral-500">
-        <span class="inline-flex items-center gap-1 rounded-full bg-primary-50 px-3 py-1 text-primary-700">
-          <Store class="h-4 w-4" />
+        <span class="inline-flex items-center gap-2 rounded-full bg-primary-50 px-4 py-3 text-primary-700">
+          <Store class="h-5 w-5" />
           {{ basket.merchant.business_name }}
         </span>
-        <span v-if="basket.category?.name" class="inline-flex items-center gap-1 rounded-full bg-accent-blue/5 px-3 py-1 text-accent-blue/90">
-          <Tag class="h-4 w-4" />
+        <span v-if="basket.category?.name" class="inline-flex items-center gap-2 rounded-full bg-accent-blue/5 px-4 py-3 text-accent-blue/90">
+          <Tag class="h-5 w-5" />
           {{ basket.category.name }}
         </span>
       </div>

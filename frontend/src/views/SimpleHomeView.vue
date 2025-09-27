@@ -38,7 +38,7 @@
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
       <div class="bg-green-50 rounded-lg border border-green-200 p-4">
         <h3 class="text-green-800 font-medium mb-2">✅ Success</h3>
-        <ul class="text-green-700 text-responsive-sm space-y-1">
+        <ul class="text-green-700 text-responsive-sm space-y-2">
           <li>• Vue 3 initialized</li>
           <li>• Tailwind CSS working</li>
           <li>• Router navigation active</li>
@@ -48,7 +48,7 @@
 
       <div class="bg-orange-50 rounded-lg border border-orange-200 p-4">
         <h3 class="text-orange-800 font-medium mb-2">🔧 Next Steps</h3>
-        <ul class="text-orange-700 text-responsive-sm space-y-1">
+        <ul class="text-orange-700 text-responsive-sm space-y-2">
           <li>• Test complex components</li>
           <li>• Enable MobileLayout</li>
           <li>• Connect to API</li>
@@ -61,7 +61,7 @@
     <div class="mt-6 bg-purple-50 rounded-lg border border-purple-200 p-4">
       <h3 class="text-purple-800 font-medium mb-2">🧪 Interactive Test</h3>
       <button
-        class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-md transition-colors"
+        class="bg-purple-600 hover:transition-colors"
         @click="counter++"
       >
         Clicked {{ counter }} times

@@ -13,8 +13,8 @@
         </nav>
         <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           <div>
-            <p class="inline-flex items-center gap-2 rounded-full bg-primary-100/70 px-4 py-1 text-responsive-sm font-medium text-primary-700">
-              <Store class="h-4 w-4" />
+            <p class="inline-flex items-center gap-2 rounded-full bg-primary-100/70 px-4 py-3 text-responsive-sm font-medium text-primary-700">
+              <Store class="h-5 w-5" />
               Profil commerçant
             </p>
             <h1 class="mt-3 text-display-sm font-semibold tracking-tight text-neutral-900">{{ merchantName }}</h1>
@@ -25,7 +25,7 @@
             class="w-full max-w-xs"
             @click="toggleFavorite"
           >
-            <Heart :class="isFavorite ? 'fill-primary-500 text-primary-500' : 'text-primary-600'" class="h-4 w-4" />
+            <Heart :class="isFavorite ? 'fill-primary-500 text-primary-500' : 'text-primary-600'" class="h-5 w-5" />
             <span class="ml-2">{{ isFavorite ? 'Retirer des favoris' : 'Ajouter aux favoris' }}</span>
           </Button>
         </div>
@@ -40,9 +40,9 @@
           </template>
 
           <div v-if="loading" class="space-y-4">
-            <Skeleton class="h-6 w-2/3" />
-            <Skeleton class="h-4 w-1/2" />
-            <Skeleton class="h-4 w-1/3" />
+            <Skeleton class="h-10 w-2/3" />
+            <Skeleton class="h-5 w-1/2" />
+            <Skeleton class="h-5 w-1/3" />
           </div>
 
           <div v-else class="space-y-4 text-responsive-sm text-neutral-600">
@@ -111,11 +111,11 @@
           </template>
           <div class="space-y-3 text-responsive-sm text-neutral-600">
             <p v-if="merchantRating" class="flex items-center gap-2">
-              <Star class="h-4 w-4 text-amber-400" />
+              <Star class="h-5 w-5 text-amber-400" />
               {{ merchantRating }} / 5 — {{ merchantReviews }} avis
             </p>
             <p class="flex items-center gap-2">
-              <Leaf class="h-4 w-4 text-primary-500" />
+              <Leaf class="h-5 w-5 text-primary-500" />
               {{ merchantImpact }} kg sauvés cette année
             </p>
             <Button

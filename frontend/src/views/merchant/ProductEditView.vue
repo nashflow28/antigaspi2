@@ -10,7 +10,7 @@
         <div class="flex items-center gap-4 mb-4">
           <router-link
             to="/merchant/products"
-            class="flex items-center text-neutral-600 hover:text-neutral-900 transition-colors"
+            class="flex items-center text-neutral-600 hover:transition-colors"
           >
             <ArrowLeftIcon class="w-5 h-5 mr-2" />
             Retour aux produits
@@ -43,7 +43,7 @@
       <!-- Loading State -->
       <Card v-if="!product && !error">
         <div class="flex items-center justify-center py-12">
-          <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600" />
+          <div class="animate-spin rounded-full h-10 w-10 border-b-2 border-primary-600" />
           <span class="ml-3 text-neutral-600">Chargement du produit...</span>
         </div>
       </Card>
@@ -51,7 +51,7 @@
       <!-- Error State -->
       <Card v-if="error" variant="bordered" class="bg-red-50 border-red-200">
         <div class="flex items-center justify-center py-12">
-          <ExclamationTriangleIcon class="w-8 h-8 text-red-500 mr-3" />
+          <ExclamationTriangleIcon class="w-10 h-10 text-red-500 mr-3" />
           <div>
             <p class="text-red-800 font-medium">Erreur lors du chargement</p>
             <p class="text-red-600 text-responsive-sm">{{ error }}</p>
@@ -277,7 +277,7 @@
                   id="is_active"
                   v-model="form.is_active"
                   type="checkbox"
-                  class="w-4 h-4 text-primary-600 border-neutral-300 rounded focus:ring-primary-500"
+                  class="w-5 h-5 text-primary-600 border-neutral-300 rounded focus:ring-primary-500"
                 >
                 <label for="is_active" class="text-neutral-700">
                   Produit actif (visible par les clients)
@@ -341,11 +341,11 @@
                 @click="toggleStatus"
               >
                 <template v-if="product.is_active">
-                  <EyeSlashIcon class="w-4 h-4 mr-2" />
+                  <EyeSlashIcon class="w-5 h-5 mr-2" />
                   Désactiver
                 </template>
                 <template v-else>
-                  <EyeIcon class="w-4 h-4 mr-2" />
+                  <EyeIcon class="w-5 h-5 mr-2" />
                   Activer
                 </template>
               </Button>
@@ -356,7 +356,7 @@
                 :disabled="loading"
                 @click="duplicateProduct"
               >
-                <DocumentDuplicateIcon class="w-4 h-4 mr-2" />
+                <DocumentDuplicateIcon class="w-5 h-5 mr-2" />
                 Dupliquer
               </Button>
             </div>

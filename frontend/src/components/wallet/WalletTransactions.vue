@@ -29,7 +29,7 @@
       <div class="mt-4 flex flex-wrap gap-4">
         <select
           v-model="filters.type"
-          class="px-3 py-2 border border-neutral-300 rounded-lg text-responsive-sm focus:ring-2 focus:ring-green-500 focus:border-transparent"
+          class="px-4 py-3 border border-neutral-300 rounded-lg text-responsive-sm focus:ring-2 focus:ring-green-500 focus:border-transparent"
           @change="applyFilters"
         >
           <option value="">Tous les types</option>
@@ -40,19 +40,19 @@
         <input
           v-model="filters.date_from"
           type="date"
-          class="px-3 py-2 border border-neutral-300 rounded-lg text-responsive-sm focus:ring-2 focus:ring-green-500 focus:border-transparent"
+          class="px-4 py-3 border border-neutral-300 rounded-lg text-responsive-sm focus:ring-2 focus:ring-green-500 focus:border-transparent"
           @change="applyFilters"
         >
 
         <input
           v-model="filters.date_to"
           type="date"
-          class="px-3 py-2 border border-neutral-300 rounded-lg text-responsive-sm focus:ring-2 focus:ring-green-500 focus:border-transparent"
+          class="px-4 py-3 border border-neutral-300 rounded-lg text-responsive-sm focus:ring-2 focus:ring-green-500 focus:border-transparent"
           @change="applyFilters"
         >
 
         <button
-          class="px-3 py-2 text-responsive-sm text-neutral-600 hover:text-neutral-800"
+          class="px-4 py-3 text-responsive-sm text-neutral-600 hover:text-neutral-800"
           @click="clearFilters"
         >
           Effacer filtres
@@ -66,10 +66,10 @@
           <div v-for="i in 3" :key="i" class="flex items-center space-x-4">
             <div class="w-10 h-10 bg-neutral-200 rounded-full" />
             <div class="flex-1 space-y-2">
-              <div class="h-4 bg-neutral-200 rounded w-3/4" />
+              <div class="h-5 bg-neutral-200 rounded w-3/4" />
               <div class="h-3 bg-neutral-200 rounded w-1/2" />
             </div>
-            <div class="h-4 bg-neutral-200 rounded w-20" />
+            <div class="h-5 bg-neutral-200 rounded w-20" />
           </div>
         </div>
       </div>
@@ -96,7 +96,7 @@
       <div
         v-for="transaction in transactions"
         :key="transaction.id"
-        class="p-4 hover:bg-neutral-50 transition-colors"
+        class="p-4 hover:transition-colors"
       >
         <div class="flex items-center space-x-4">
           <div
@@ -154,14 +154,14 @@
           <div class="flex space-x-2">
             <button
               :disabled="pagination.current_page === 1"
-              class="px-3 py-1 text-responsive-sm border border-neutral-300 rounded disabled:opacity-50 disabled:cursor-not-allowed hover:bg-neutral-50"
+              class="px-4 py-3 text-responsive-sm border border-neutral-300 rounded disabled:opacity-50 disabled:cursor-not-allowed hover:bg-neutral-50"
               @click="changePage(pagination.current_page - 1)"
             >
               Précédent
             </button>
             <button
               :disabled="pagination.current_page === pagination.last_page"
-              class="px-3 py-1 text-responsive-sm border border-neutral-300 rounded disabled:opacity-50 disabled:cursor-not-allowed hover:bg-neutral-50"
+              class="px-4 py-3 text-responsive-sm border border-neutral-300 rounded disabled:opacity-50 disabled:cursor-not-allowed hover:bg-neutral-50"
               @click="changePage(pagination.current_page + 1)"
             >
               Suivant

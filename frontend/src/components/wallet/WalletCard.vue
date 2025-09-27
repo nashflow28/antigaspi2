@@ -3,7 +3,7 @@
     <div class="flex items-center justify-between mb-4">
       <div class="flex items-center space-x-3">
         <div class="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center">
-          <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+          <svg class="w-10 h-10" fill="currentColor" viewBox="0 0 20 20">
             <path fill-rule="evenodd" d="M4 4a2 2 0 00-2 2v4a2 2 0 002 2V6h10a2 2 0 00-2-2H4zm2 6a2 2 0 012-2h8a2 2 0 012 2v4a2 2 0 01-2 2H8a2 2 0 01-2-2v-4zm6 4a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd" />
           </svg>
         </div>
@@ -20,7 +20,7 @@
 
     <div class="flex items-center justify-between text-responsive-sm">
       <div class="flex items-center space-x-4">
-        <div class="flex items-center space-x-1">
+        <div class="flex items-center space-x-2">
           <div class="w-2 h-2 rounded-full" :class="wallet?.is_active ? 'bg-green-300' : 'bg-red-300'" />
           <span class="text-green-100">{{ wallet?.is_active ? 'Actif' : 'Inactif' }}</span>
         </div>
@@ -30,13 +30,13 @@
       </div>
       <div class="flex space-x-2">
         <button
-          class="px-3 py-1 bg-white/20 rounded-lg hover:bg-white/30 transition-colors"
+          class="px-4 py-3 bg-white/20 rounded-lg hover:transition-colors"
           @click="$emit('recharge')"
         >
           Recharger
         </button>
         <button
-          class="px-3 py-1 bg-white/20 rounded-lg hover:bg-white/30 transition-colors"
+          class="px-4 py-3 bg-white/20 rounded-lg hover:transition-colors"
           @click="$emit('settings')"
         >
           Paramètres

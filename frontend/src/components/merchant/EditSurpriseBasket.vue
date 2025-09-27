@@ -124,7 +124,7 @@
             id="is-active"
             v-model="form.is_active"
             type="checkbox"
-            class="h-4 w-4 text-primary-600 focus:ring-primary-500 border-neutral-300 rounded"
+            class="h-5 w-5 text-primary-600 focus:ring-primary-500 border-neutral-300 rounded"
           >
           <label for="is-active" class="ml-2 block text-responsive-sm text-neutral-900">
             Panier actif et visible par les clients
@@ -225,7 +225,7 @@
                 v-else
                 class="w-12 h-12 bg-neutral-200 rounded-lg flex items-center justify-center"
               >
-                <Package class="w-6 h-6 text-neutral-400" />
+                <Package class="w-10 h-10 text-neutral-400" />
               </div>
               <div>
                 <h4 class="font-medium text-neutral-900">{{ item.product.name }}</h4>
@@ -237,10 +237,10 @@
             <button
               type="button"
               :disabled="removing"
-              class="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors disabled:opacity-50"
+              class="p-2 text-red-500 hover:transition-colors disabled:opacity-50"
               @click="removeProductFromBasket(item.product.id)"
             >
-              <Trash2 class="w-4 h-4" />
+              <Trash2 class="w-5 h-5" />
             </button>
           </div>
         </div>
@@ -254,10 +254,10 @@
         <div class="mt-4 pt-4 border-t border-neutral-200">
           <button
             type="button"
-            class="w-full px-4 py-3 border-2 border-dashed border-neutral-300 text-neutral-600 rounded-lg hover:border-primary-400 hover:text-primary-600 transition-colors"
+            class="w-full px-4 py-3 border-2 border-dashed border-neutral-300 text-neutral-600 rounded-lg hover:border-primary-400 hover:transition-colors"
             @click="showProductSelector = true"
           >
-            <Plus class="w-4 h-4 inline mr-2" />
+            <Plus class="w-5 h-5 inline mr-2" />
             Ajouter des produits
           </button>
         </div>
@@ -267,7 +267,7 @@
       <div class="flex items-center justify-end space-x-4 pt-6">
         <button
           type="button"
-          class="px-6 py-3 border border-neutral-300 text-neutral-700 rounded-lg hover:bg-neutral-50 transition-colors"
+          class="px-6 py-3 border border-neutral-300 text-neutral-700 rounded-lg hover:transition-colors"
           @click="$emit('cancel')"
         >
           Annuler
@@ -275,10 +275,10 @@
         <button
           type="submit"
           :disabled="!canSubmit || updating"
-          class="px-6 py-3 bg-primary-600 text-white rounded-lg hover:bg-primary-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          class="px-6 py-3 bg-primary-600 text-white rounded-lg hover:transition-colors"
         >
           <div v-if="updating" class="flex items-center">
-            <div class="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2" />
+            <div class="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2" />
             Mise à jour...
           </div>
           <span v-else>Mettre à jour le panier</span>

@@ -58,7 +58,7 @@
           </Input>
           <button
             type="button"
-            class="absolute inset-y-0 right-0 pr-4 flex items-center text-neutral-400 hover:text-primary-600 transition-colors duration-200"
+            class="absolute inset-y-0 right-0 pr-4 flex items-center text-neutral-400 hover:transition-colors duration-200"
             @click="togglePasswordVisibility"
           >
             <Eye v-if="!showPassword" class="w-5 h-5" />
@@ -74,7 +74,7 @@
             id="remember-me"
             v-model="form.remember"
             type="checkbox"
-            class="w-4 h-4 text-primary-600 bg-white border-2 border-neutral-300 rounded focus:ring-primary-500 focus:ring-2"
+            class="w-5 h-5 text-primary-600 bg-white border-2 border-neutral-300 rounded focus:ring-primary-500 focus:ring-2"
           >
           <label for="remember-me" class="text-responsive-sm text-neutral-700 font-medium">
             Se souvenir de moi
@@ -82,7 +82,7 @@
         </div>
 
         <div class="text-responsive-sm">
-          <a href="#" class="font-medium text-primary-600 hover:text-primary-700 transition-colors duration-200 hover:underline">
+          <a href="#" class="font-medium text-primary-600 hover:transition-colors duration-200 hover:underline">
             Mot de passe oublié ?
           </a>
         </div>
@@ -100,7 +100,7 @@
           <Loader2 v-if="loading" class="w-5 h-5 animate-spin" />
           <span>{{ loading ? 'Connexion en cours...' : 'Se connecter' }}</span>
         </span>
-        <div class="absolute inset-0 bg-gradient-to-r from-primary-600 to-accent-blue/90 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+        <div class="absolute inset-0 bg-gradient-to-r from-primary-600 to-accent-blue/90 opacity-0 group-hover:transition-opacity duration-300" />
       </Button>
 
       <!-- Divider -->
@@ -119,7 +119,7 @@
           Pas encore de compte ?
           <router-link
             to="/register"
-            class="font-medium text-primary-600 hover:text-primary-700 transition-colors duration-200 hover:underline ml-1"
+            class="font-medium text-primary-600 hover:transition-colors duration-200 hover:underline ml-1"
           >
             Créer un compte
           </router-link>
@@ -131,11 +131,11 @@
     <div class="text-center text-responsive-sm text-neutral-500 animate-fade-in-up" style="animation-delay: 0.4s;">
       <p>
         En vous connectant, vous acceptez nos
-        <a href="#" class="text-primary-600 hover:text-primary-700 hover:underline transition-colors duration-200">
+        <a href="#" class="text-primary-600 hover:text-primary-700 hover:transition-colors duration-200">
           Conditions d'utilisation
         </a>
         et notre
-        <a href="#" class="text-primary-600 hover:text-primary-700 hover:underline transition-colors duration-200">
+        <a href="#" class="text-primary-600 hover:text-primary-700 hover:transition-colors duration-200">
           Politique de confidentialité
         </a>
       </p>

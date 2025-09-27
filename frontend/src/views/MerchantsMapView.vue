@@ -15,18 +15,18 @@
           <div class="flex flex-col sm:flex-row gap-3">
             <button
               :disabled="geoLoading"
-              class="inline-flex items-center px-4 py-2 text-responsive-sm font-medium text-neutral-700 bg-white border border-neutral-300 rounded-lg hover:bg-neutral-50 transition-colors"
+              class="inline-flex items-center px-4 py-3 text-responsive-sm font-medium text-neutral-700 bg-white border border-neutral-300 rounded-lg hover:transition-colors"
               @click="getCurrentLocation"
             >
-              <MapPin class="w-4 h-4 mr-2" :class="{ 'animate-pulse': geoLoading }" />
+              <MapPin class="w-5 h-5 mr-2" :class="{ 'animate-pulse': geoLoading }" />
               {{ geoLoading ? 'Localisation...' : (position ? 'Position activée' : 'Me localiser') }}
             </button>
             <button
               :disabled="merchantsLoading"
-              class="inline-flex items-center px-4 py-2 text-responsive-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50"
+              class="inline-flex items-center px-4 py-3 text-responsive-sm font-medium text-white bg-blue-600 rounded-lg hover:transition-colors disabled:opacity-50"
               @click="refreshMerchants"
             >
-              <RefreshCw class="w-4 h-4 mr-2" :class="{ 'animate-spin': merchantsLoading }" />
+              <RefreshCw class="w-5 h-5 mr-2" :class="{ 'animate-spin': merchantsLoading }" />
               Actualiser
             </button>
           </div>
@@ -74,7 +74,7 @@
             <div class="flex items-center justify-between">
               <h3 class="text-responsive-lg font-semibold text-neutral-900">{{ selectedMerchant.business_name }}</h3>
               <button
-                class="p-2 hover:bg-neutral-100 rounded-lg transition-colors"
+                class="p-2 hover:transition-colors"
                 @click="selectedMerchant = null"
               >
                 <X class="w-5 h-5 text-neutral-400" />
@@ -118,7 +118,7 @@
           <!-- Actions -->
           <div class="px-6 py-4 border-t border-neutral-200 flex justify-end space-x-3">
             <button
-              class="px-6 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 font-medium transition-colors"
+              class="px-6 py-3 bg-primary-600 text-white rounded-lg hover:transition-colors"
               @click="viewMerchantProducts"
             >
               Voir les produits
@@ -210,7 +210,7 @@ const addMerchantMarkers = async () => {
           <p class="text-responsive-sm text-neutral-600 mb-1">${merchant.business_type}</p>
           <p class="text-responsive-sm text-neutral-600 mb-2">${merchant.products_count} produit(s) disponible(s)</p>
           <div class="mt-3 text-center">
-            <button id="details-btn-${merchant.id}" class="bg-blue-600 text-white px-4 py-2 rounded-lg text-responsive-sm hover:bg-blue-700 transition-colors">
+            <button id="details-btn-${merchant.id}" class="bg-blue-600 text-white px-4 py-3 rounded-lg text-responsive-sm hover:transition-colors">
               Voir les détails
             </button>
           </div>
@@ -284,7 +284,7 @@ const addUserLocationMarker = async () => {
 
     // Create user location icon
     const userIcon = L.divIcon({
-      html: '<div class="bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center shadow-lg animate-pulse">📍</div>',
+      html: '<div class="bg-red-500 text-white rounded-full w-10 h-10 flex items-center justify-center shadow-lg animate-pulse">📍</div>',
       className: 'custom-div-icon',
       iconSize: [24, 24],
       iconAnchor: [12, 24]

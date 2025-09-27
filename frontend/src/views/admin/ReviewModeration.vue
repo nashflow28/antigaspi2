@@ -42,7 +42,7 @@
               </p>
             </div>
             <div class="p-3 bg-white/20 rounded-xl">
-              <Clock class="w-8 h-8" />
+              <Clock class="w-10 h-10" />
             </div>
           </div>
         </Card>
@@ -57,7 +57,7 @@
               </p>
             </div>
             <div class="p-3 bg-white/20 rounded-xl">
-              <AlertTriangle class="w-8 h-8" />
+              <AlertTriangle class="w-10 h-10" />
             </div>
           </div>
         </Card>
@@ -72,7 +72,7 @@
               </p>
             </div>
             <div class="p-3 bg-white/20 rounded-xl">
-              <MessageSquare class="w-8 h-8" />
+              <MessageSquare class="w-10 h-10" />
             </div>
           </div>
         </Card>
@@ -87,7 +87,7 @@
               </p>
             </div>
             <div class="p-3 bg-white/20 rounded-xl">
-              <CheckCircle class="w-8 h-8" />
+              <CheckCircle class="w-10 h-10" />
             </div>
           </div>
         </Card>
@@ -99,7 +99,7 @@
           <nav class="-mb-px flex space-x-8">
             <button
               :class="[
-                'py-2 px-1 border-b-2 font-medium text-responsive-sm',
+                'py-3 px-1 border-b-2 font-medium text-responsive-sm',
                 activeTab === 'pending'
                   ? 'border-primary-500 text-primary-600'
                   : 'border-transparent text-neutral-500 hover:text-neutral-700 hover:border-neutral-300'
@@ -107,13 +107,13 @@
               @click="activeTab = 'pending'"
             >
               Avis en attente
-              <span v-if="stats?.pending_reviews" class="ml-2 px-2 py-1 text-responsive-xs bg-orange-100 text-orange-800 rounded-full">
+              <span v-if="stats?.pending_reviews" class="ml-2 px-4 py-3 text-responsive-xs bg-orange-100 text-orange-800 rounded-full">
                 {{ stats.pending_reviews }}
               </span>
             </button>
             <button
               :class="[
-                'py-2 px-1 border-b-2 font-medium text-responsive-sm',
+                'py-3 px-1 border-b-2 font-medium text-responsive-sm',
                 activeTab === 'reported'
                   ? 'border-primary-500 text-primary-600'
                   : 'border-transparent text-neutral-500 hover:text-neutral-700 hover:border-neutral-300'
@@ -121,7 +121,7 @@
               @click="activeTab = 'reported'"
             >
               Avis signalés
-              <span v-if="stats?.pending_reports" class="ml-2 px-2 py-1 text-responsive-xs bg-red-100 text-red-800 rounded-full">
+              <span v-if="stats?.pending_reports" class="ml-2 px-4 py-3 text-responsive-xs bg-red-100 text-red-800 rounded-full">
                 {{ stats.pending_reports }}
               </span>
             </button>

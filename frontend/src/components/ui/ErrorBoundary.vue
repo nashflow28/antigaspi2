@@ -10,7 +10,7 @@
     >
       <div class="flex flex-col items-center gap-4">
         <div class="flex h-16 w-16 items-center justify-center rounded-full bg-red-100 text-red-600 shadow-inner">
-          <AlertTriangle class="h-8 w-8" />
+          <AlertTriangle class="h-10 w-10" />
         </div>
 
         <div class="space-y-2">
@@ -53,7 +53,7 @@
           class="gap-2"
           @click="retry"
         >
-          <RefreshCw class="h-4 w-4" />
+          <RefreshCw class="h-5 w-5" />
           Réessayer
         </Button>
         <Button
@@ -62,7 +62,7 @@
           class="gap-2"
           @click="goHome"
         >
-          <Home class="h-4 w-4" />
+          <Home class="h-5 w-5" />
           Retour à l'accueil
         </Button>
         <Button
@@ -71,7 +71,7 @@
           class="gap-2"
           @click="clearError"
         >
-          <X class="h-4 w-4" />
+          <X class="h-5 w-5" />
           Effacer l'erreur
         </Button>
       </div>
@@ -85,11 +85,11 @@
             href="mailto:support@antigaspi.ci"
             class="flex items-center gap-2 text-primary-600 transition hover:text-primary-700"
           >
-            <Mail class="h-4 w-4" />
+            <Mail class="h-5 w-5" />
             support@antigaspi.ci
           </a>
           <span class="text-neutral-400">•</span>
-          <span class="rounded-full bg-white px-3 py-1 text-responsive-xs font-semibold uppercase tracking-wide text-neutral-500">
+          <span class="rounded-full bg-white px-4 py-3 text-responsive-xs font-semibold uppercase tracking-wide text-neutral-500">
             ID: {{ errorId }}
           </span>
         </div>

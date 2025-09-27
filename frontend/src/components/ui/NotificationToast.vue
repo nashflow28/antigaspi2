@@ -11,7 +11,7 @@
       <div class="flex items-start">
         <div class="flex-shrink-0">
           <svg
-            class="h-6 w-6"
+            class="h-10 w-10"
             :class="iconClass"
             fill="none"
             viewBox="0 0 24 24"

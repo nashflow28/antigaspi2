@@ -32,7 +32,7 @@
         class="absolute inset-0 bg-white bg-opacity-80 flex items-center justify-center rounded-xl"
       >
         <div class="text-center">
-          <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600 mx-auto mb-2" />
+          <div class="animate-spin rounded-full h-10 w-10 border-b-2 border-primary-600 mx-auto mb-2" />
           <p class="text-responsive-sm text-neutral-600">Chargement de la carte...</p>
         </div>
       </div>
@@ -43,7 +43,7 @@
         <button
           v-if="enableUserLocation"
           :disabled="geoLoading"
-          class="bg-white hover:bg-neutral-50 border border-neutral-300 rounded-lg p-2 shadow-sm transition-colors"
+          class="bg-white hover:transition-colors"
           title="Me localiser"
           @click="getCurrentLocation"
         >
@@ -53,7 +53,7 @@
         <!-- Reset View Button -->
         <button
           v-if="selectedLocation"
-          class="bg-white hover:bg-neutral-50 border border-neutral-300 rounded-lg p-2 shadow-sm transition-colors"
+          class="bg-white hover:transition-colors"
           title="Réinitialiser la vue"
           @click="resetMapView"
         >
@@ -62,7 +62,7 @@
 
         <!-- Fullscreen Toggle -->
         <button
-          class="bg-white hover:bg-neutral-50 border border-neutral-300 rounded-lg p-2 shadow-sm transition-colors"
+          class="bg-white hover:transition-colors"
           :title="isFullscreen ? 'Quitter le plein écran' : 'Plein écran'"
           @click="toggleFullscreen"
         >
@@ -77,7 +77,7 @@
         class="absolute bottom-4 left-4 right-4 bg-white bg-opacity-95 backdrop-blur-sm border border-neutral-200 rounded-lg p-3 shadow-sm"
       >
         <div class="flex items-start space-x-2">
-          <Info class="w-4 h-4 text-blue-500 mt-0.5 flex-shrink-0" />
+          <Info class="w-5 h-5 text-blue-500 mt-0.5 flex-shrink-0" />
           <div class="text-responsive-sm text-neutral-700">
             <p class="font-medium mb-1">Sélectionner un emplacement</p>
             <p class="text-responsive-xs text-neutral-600">
@@ -85,7 +85,7 @@
             </p>
           </div>
           <button
-            class="ml-auto p-1 hover:bg-neutral-100 rounded transition-colors"
+            class="ml-auto p-1 hover:transition-colors"
             @click="showInstructions = false"
           >
             <X class="w-3 h-3 text-neutral-400" />
@@ -115,11 +115,11 @@
           </div>
         </div>
         <button
-          class="p-1 hover:bg-green-100 rounded transition-colors"
+          class="p-1 hover:transition-colors"
           title="Effacer la sélection"
           @click="clearSelection"
         >
-          <X class="w-4 h-4 text-green-500" />
+          <X class="w-5 h-5 text-green-500" />
         </button>
       </div>
     </div>
@@ -128,14 +128,14 @@
     <div v-if="showActions" class="mt-4 flex justify-end space-x-3">
       <button
         v-if="allowClear"
-        class="px-4 py-2 text-neutral-700 bg-neutral-100 hover:bg-neutral-200 rounded-lg transition-colors"
+        class="px-4 py-3 text-neutral-700 bg-neutral-100 hover:transition-colors"
         @click="clearSelection"
       >
         Effacer
       </button>
       <button
         :disabled="!selectedLocation"
-        class="px-6 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+        class="px-6 py-3 bg-primary-600 text-white rounded-lg hover:transition-colors"
         @click="confirmSelection"
       >
         {{ confirmText }}
@@ -292,7 +292,7 @@ const addSelectedMarker = async (location: SearchResult) => {
     // Create custom marker icon
     const markerIcon = L.divIcon({
       html: `
-        <div class="bg-red-500 border-2 border-white rounded-full w-6 h-6 flex items-center justify-center shadow-lg">
+        <div class="bg-red-500 border-2 border-white rounded-full w-10 h-10 flex items-center justify-center shadow-lg">
           <div class="w-2 h-2 bg-white rounded-full"></div>
         </div>
       `,
@@ -328,7 +328,7 @@ const addUserLocationMarker = async () => {
 
     const userIcon = L.divIcon({
       html: `
-        <div class="bg-blue-500 border-2 border-white rounded-full w-4 h-4 animate-pulse shadow-lg"></div>
+        <div class="bg-blue-500 border-2 border-white rounded-full w-5 h-5 animate-pulse shadow-lg"></div>
       `,
       className: 'user-location-marker',
       iconSize: [16, 16],

@@ -15,7 +15,7 @@
           <div
             v-for="marker in markers"
             :key="marker.id"
-            class="bg-white rounded-lg border border-neutral-200 p-4 hover:shadow-md transition-shadow cursor-pointer"
+            class="bg-white rounded-lg border border-neutral-200 p-4 hover:transition-shadow cursor-pointer"
             @click="$emit('markerClick', marker)"
           >
             <div class="flex items-center justify-between">
@@ -23,7 +23,7 @@
                 <h4 class="font-semibold text-neutral-900">{{ marker.title }}</h4>
                 <p class="text-responsive-sm text-neutral-600">{{ marker.info }}</p>
                 <div class="flex items-center mt-2 text-responsive-sm text-blue-600">
-                  <Navigation class="w-4 h-4 mr-1" />
+                  <Navigation class="w-5 h-5 mr-1" />
                   <span>{{ marker.position.lat.toFixed(4) }}, {{ marker.position.lng.toFixed(4) }}</span>
                 </div>
               </div>

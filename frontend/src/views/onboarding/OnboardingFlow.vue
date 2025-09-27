@@ -3,8 +3,8 @@
     <div class="container mx-auto max-w-5xl px-6 py-12">
       <div class="mb-10 flex flex-col items-start justify-between gap-6 lg:flex-row lg:items-center">
         <div>
-          <p class="mb-2 inline-flex items-center gap-2 rounded-full bg-primary-100/60 px-4 py-1 text-responsive-sm font-semibold text-primary-700">
-            <Sparkles class="h-4 w-4" />
+          <p class="mb-2 inline-flex items-center gap-2 rounded-full bg-primary-100/60 px-4 py-3 text-responsive-sm font-semibold text-primary-700">
+            <Sparkles class="h-5 w-5" />
             Guide de démarrage AntiGaspi
           </p>
           <h1 class="text-display-sm font-semibold tracking-tight text-neutral-900">
@@ -33,7 +33,7 @@
               class="flex items-center gap-2"
             >
               <span
-                class="flex h-6 w-6 items-center justify-center rounded-full border"
+                class="flex h-10 w-10 items-center justify-center rounded-full border"
                 :class="index <= currentStep ? 'border-primary-500 bg-primary-500 text-white' : 'border-neutral-300 text-neutral-400'"
               >
                 {{ index + 1 }}
@@ -69,8 +69,8 @@
                 :key="item.title"
                 class="flex items-start gap-3 rounded-2xl border border-neutral-200/70 bg-white/80 p-4 shadow-sm"
               >
-                <div class="mt-1 flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-xl bg-primary-100 text-primary-600">
-                  <component :is="item.icon" class="h-4 w-4" />
+                <div class="mt-1 flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-primary-100 text-primary-600">
+                  <component :is="item.icon" class="h-5 w-5" />
                 </div>
                 <div>
                   <p class="font-semibold text-neutral-800">{{ item.title }}</p>

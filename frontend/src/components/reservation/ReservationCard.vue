@@ -1,5 +1,5 @@
 <template>
-  <Card class="hover:shadow-card transition-all duration-300">
+  <Card class="hover:transition-all duration-300">
     <!-- En-tête avec statut -->
     <div class="flex items-center justify-between mb-4">
       <div class="flex items-center gap-3">
@@ -42,29 +42,29 @@
           <div
             v-if="showActions"
             v-click-outside="() => showActions = false"
-            class="absolute right-0 top-10 bg-white border border-neutral-200 rounded-xl shadow-card z-10 py-2 min-w-[150px]"
+            class="absolute right-0 top-10 bg-white border border-neutral-200 rounded-xl shadow-card z-10 py-3 min-w-[150px]"
           >
             <button
-              class="w-full px-4 py-2 text-left text-responsive-sm hover:bg-neutral-50 flex items-center gap-2"
+              class="w-full px-4 py-3 text-left text-responsive-sm hover:bg-neutral-50 flex items-center gap-2"
               @click="$emit('view', reservation.id); showActions = false"
             >
-              <Eye class="w-4 h-4" />
+              <Eye class="w-5 h-5" />
               Voir détails
             </button>
             <button
               v-if="reservation.product.merchant.phone"
-              class="w-full px-4 py-2 text-left text-responsive-sm hover:bg-neutral-50 flex items-center gap-2"
+              class="w-full px-4 py-3 text-left text-responsive-sm hover:bg-neutral-50 flex items-center gap-2"
               @click="$emit('contact', reservation); showActions = false"
             >
-              <Phone class="w-4 h-4" />
+              <Phone class="w-5 h-5" />
               Contacter
             </button>
             <button
               v-if="canCancel"
-              class="w-full px-4 py-2 text-left text-responsive-sm hover:bg-neutral-50 text-accent-red flex items-center gap-2"
+              class="w-full px-4 py-3 text-left text-responsive-sm hover:bg-neutral-50 text-accent-red flex items-center gap-2"
               @click="$emit('cancel', reservation.id); showActions = false"
             >
-              <X class="w-4 h-4" />
+              <X class="w-5 h-5" />
               Annuler
             </button>
           </div>
@@ -79,7 +79,7 @@
         <div class="flex items-start gap-4">
           <!-- Image du produit -->
           <div class="w-16 h-16 bg-gradient-to-br from-primary-100 to-accent-blue/10 rounded-xl flex items-center justify-center flex-shrink-0">
-            <Package class="w-8 h-8 text-primary-400" />
+            <Package class="w-10 h-10 text-primary-400" />
           </div>
 
           <!-- Détails produit -->
@@ -88,7 +88,7 @@
               {{ reservation.product.name }}
             </h4>
             <div class="flex items-center gap-2 text-responsive-sm text-neutral-600 mb-2">
-              <MapPin class="w-4 h-4 flex-shrink-0" />
+              <MapPin class="w-5 h-5 flex-shrink-0" />
               <span class="truncate">{{ reservation.product.merchant.name }}</span>
             </div>
             <div class="text-responsive-sm text-neutral-500">
@@ -127,7 +127,7 @@
                 {{ paymentStatusLabels[paymentStatus] }}
               </span>
             </div>
-            <div v-if="latestPayment" class="space-y-1 text-responsive-xs text-primary-700">
+            <div v-if="latestPayment" class="space-y-2 text-responsive-xs text-primary-700">
               <div class="flex items-center justify-between">
                 <span>Méthode</span>
                 <span class="font-medium">{{ paymentMethodLabels[latestPayment.payment_method] }}</span>
@@ -152,8 +152,8 @@
 
           <!-- Date et heure de retrait -->
           <div class="flex items-center gap-3">
-            <div class="w-8 h-8 bg-accent-blue/10 rounded-lg flex items-center justify-center">
-              <Clock class="w-4 h-4 text-accent-blue" />
+            <div class="w-10 h-10 bg-accent-blue/10 rounded-lg flex items-center justify-center">
+              <Clock class="w-5 h-5 text-accent-blue" />
             </div>
             <div>
               <div class="font-medium text-neutral-900">
@@ -167,8 +167,8 @@
 
           <!-- Notes de retrait -->
           <div v-if="reservation.pickup_notes" class="flex items-start gap-3">
-            <div class="w-8 h-8 bg-accent-orange/10 rounded-lg flex items-center justify-center flex-shrink-0">
-              <MessageCircle class="w-4 h-4 text-accent-orange" />
+            <div class="w-10 h-10 bg-accent-orange/10 rounded-lg flex items-center justify-center flex-shrink-0">
+              <MessageCircle class="w-5 h-5 text-accent-orange" />
             </div>
             <div class="text-responsive-sm text-neutral-600">
               {{ reservation.pickup_notes }}
@@ -200,7 +200,7 @@
           <!-- Impact environnemental -->
           <div v-if="reservation.status === 'completed'" class="bg-primary-50 rounded-xl p-3">
             <div class="flex items-center gap-2 mb-2">
-              <Leaf class="w-4 h-4 text-primary-600" />
+              <Leaf class="w-5 h-5 text-primary-600" />
               <span class="text-responsive-sm font-medium text-primary-800">Impact positif</span>
             </div>
             <div class="grid grid-cols-2 gap-4 text-responsive-xs">

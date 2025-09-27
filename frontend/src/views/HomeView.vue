@@ -12,7 +12,7 @@
       <div class="relative container-2025 py-32 lg:py-40">
         <div class="text-center max-w-5xl mx-auto">
           <!-- Badge avec animation -->
-          <div class="inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-sm rounded-full text-responsive-sm font-medium mb-8 animate-fade-in-up">
+          <div class="inline-flex items-center gap-2 px-4 py-3 bg-white/10 backdrop-blur-sm rounded-full text-responsive-sm font-medium mb-8 animate-fade-in-up">
             <span class="w-2 h-2 bg-primary-400 rounded-full animate-pulse" />
             <span>Ensemble contre le gaspillage alimentaire</span>
           </div>
@@ -51,7 +51,7 @@
               <span class="relative z-10 flex items-center gap-3">
                 🌟 Découvrir les offres
               </span>
-              <div class="absolute inset-0 bg-nav-gradient opacity-0 group-hover:opacity-10 transition-opacity duration-300" />
+              <div class="absolute inset-0 bg-nav-gradient opacity-0 group-hover:transition-opacity duration-300" />
             </Button>
 
             <Button
@@ -104,7 +104,7 @@
       <div class="container-2025">
         <!-- Section Header -->
         <div class="text-center mb-20 animate-fade-in-up">
-          <div class="inline-flex items-center gap-2 px-4 py-2 bg-primary-50 rounded-full text-responsive-sm font-medium text-primary-600 mb-6">
+          <div class="inline-flex items-center gap-2 px-4 py-3 bg-primary-50 rounded-full text-responsive-sm font-medium text-primary-600 mb-6">
             <span class="w-2 h-2 bg-primary-500 rounded-full" />
             Processus simple en 3 étapes
           </div>
@@ -122,18 +122,18 @@
           <Card :interactive="true" class="group glow-effect animate-fade-in-up" style="animation-delay: 0.2s;">
             <div class="relative">
               <!-- Icon avec gradient et animation -->
-              <div class="w-20 h-20 bg-nav-gradient rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-card group-hover:shadow-card-2025 group-hover:scale-110 transition-all duration-300">
+              <div class="w-20 h-20 bg-nav-gradient rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-card group-hover:shadow-card-2025 group-hover:transition-all duration-300">
                 <span class="text-responsive-xl">🔍</span>
               </div>
 
               <!-- Step number -->
-              <div class="absolute -top-4 -right-4 w-8 h-8 bg-accent-orange text-white rounded-full flex items-center justify-center text-responsive-sm font-semibold shadow-card">
+              <div class="absolute -top-4 -right-4 w-10 h-10 bg-accent-orange text-white rounded-full flex items-center justify-center text-responsive-sm font-semibold shadow-card">
                 1
               </div>
             </div>
 
             <div class="text-center">
-              <h3 class="text-responsive-xl font-semibold text-neutral-900 mb-4 group-hover:text-primary-600 transition-colors font-heading">
+              <h3 class="text-responsive-xl font-semibold text-neutral-900 mb-4 group-hover:transition-colors font-heading">
                 Découvrez
               </h3>
               <p class="text-neutral-600 leading-relaxed mb-6">
@@ -157,17 +157,17 @@
           <!-- Feature 2 -->
           <Card :interactive="true" class="group glow-effect animate-fade-in-up" style="animation-delay: 0.4s;">
             <div class="relative">
-              <div class="w-20 h-20 bg-gradient-to-r from-accent-blue to-accent-blue/90 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-card group-hover:shadow-card-2025 group-hover:scale-110 transition-all duration-300">
+              <div class="w-20 h-20 bg-gradient-to-r from-accent-blue to-accent-blue/90 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-card group-hover:shadow-card-2025 group-hover:transition-all duration-300">
                 <span class="text-responsive-xl">⚡</span>
               </div>
 
-              <div class="absolute -top-4 -right-4 w-8 h-8 bg-accent-orange text-white rounded-full flex items-center justify-center text-responsive-sm font-semibold shadow-card">
+              <div class="absolute -top-4 -right-4 w-10 h-10 bg-accent-orange text-white rounded-full flex items-center justify-center text-responsive-sm font-semibold shadow-card">
                 2
               </div>
             </div>
 
             <div class="text-center">
-              <h3 class="text-responsive-xl font-semibold text-neutral-900 mb-4 group-hover:text-accent-blue transition-colors font-heading">
+              <h3 class="text-responsive-xl font-semibold text-neutral-900 mb-4 group-hover:transition-colors font-heading">
                 Réservez
               </h3>
               <p class="text-neutral-600 leading-relaxed mb-6">
@@ -190,17 +190,17 @@
           <!-- Feature 3 -->
           <Card :interactive="true" class="group glow-effect animate-fade-in-up" style="animation-delay: 0.6s;">
             <div class="relative">
-              <div class="w-20 h-20 bg-gradient-to-r from-accent-orange to-accent-orange/90 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-card group-hover:shadow-card-2025 group-hover:scale-110 transition-all duration-300">
+              <div class="w-20 h-20 bg-gradient-to-r from-accent-orange to-accent-orange/90 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-card group-hover:shadow-card-2025 group-hover:transition-all duration-300">
                 <span class="text-responsive-xl">🌱</span>
               </div>
 
-              <div class="absolute -top-4 -right-4 w-8 h-8 bg-accent-orange text-white rounded-full flex items-center justify-center text-responsive-sm font-semibold shadow-card">
+              <div class="absolute -top-4 -right-4 w-10 h-10 bg-accent-orange text-white rounded-full flex items-center justify-center text-responsive-sm font-semibold shadow-card">
                 3
               </div>
             </div>
 
             <div class="text-center">
-              <h3 class="text-responsive-xl font-semibold text-neutral-900 mb-4 group-hover:text-accent-orange transition-colors font-heading">
+              <h3 class="text-responsive-xl font-semibold text-neutral-900 mb-4 group-hover:transition-colors font-heading">
                 Sauvez
               </h3>
               <p class="text-neutral-600 leading-relaxed mb-6">

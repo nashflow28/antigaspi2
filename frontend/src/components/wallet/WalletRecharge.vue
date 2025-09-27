@@ -10,7 +10,7 @@
           @click="$emit('close')"
         >
           <svg
-            class="w-6 h-6"
+            class="w-10 h-10"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -68,7 +68,7 @@
                 >
                 <div class="flex items-center space-x-3 flex-1">
                   <div class="w-10 h-10 bg-neutral-100 rounded-lg flex items-center justify-center">
-                    <component :is="method.icon" class="w-6 h-6 text-neutral-600" />
+                    <component :is="method.icon" class="w-10 h-10 text-neutral-600" />
                   </div>
                   <div>
                     <div class="font-medium text-neutral-900">{{ method.name }}</div>
@@ -76,7 +76,7 @@
                   </div>
                 </div>
                 <div
-                  class="w-4 h-4 border-2 rounded-full"
+                  class="w-5 h-5 border-2 rounded-full"
                   :class="form.payment_method === method.value ? 'border-green-500 bg-green-500' : 'border-neutral-300'"
                 >
                   <div v-if="form.payment_method === method.value" class="w-full h-full bg-white rounded-full scale-50" />
@@ -129,7 +129,7 @@
             class="flex-1"
           >
             <span v-if="false" class="flex items-center justify-center">
-              <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
+              <svg class="animate-spin -ml-1 mr-2 h-5 w-5 text-white" fill="none" viewBox="0 0 24 24">
                 <circle
                   cx="12"
                   cy="12"

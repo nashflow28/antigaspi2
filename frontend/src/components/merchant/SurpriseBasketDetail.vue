@@ -7,7 +7,7 @@
           <div class="flex items-center space-x-3 mb-3">
             <h1 class="text-responsive-xl font-semibold text-neutral-900">{{ basket.name }}</h1>
             <span
-              class="px-3 py-1 text-responsive-sm font-medium rounded-full"
+              class="px-4 py-3 text-responsive-sm font-medium rounded-full"
               :class="basket.is_active
                 ? 'bg-green-100 text-green-800'
                 : 'bg-red-100 text-red-800'"
@@ -43,14 +43,14 @@
 
         <div class="flex items-center space-x-3 ml-6">
           <button
-            class="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
+            class="px-4 py-3 bg-primary-600 text-white rounded-lg hover:transition-colors"
             @click="$emit('edit', basket)"
           >
-            <Edit class="w-4 h-4 inline mr-2" />
+            <Edit class="w-5 h-5 inline mr-2" />
             Modifier
           </button>
           <button
-            class="p-2 text-neutral-500 hover:text-neutral-700 transition-colors"
+            class="p-2 text-neutral-500 hover:transition-colors"
             @click="$emit('close')"
           >
             <X class="w-5 h-5" />
@@ -84,7 +84,7 @@
                 v-else
                 class="w-16 h-16 bg-neutral-200 rounded-lg flex items-center justify-center flex-shrink-0"
               >
-                <Package class="w-8 h-8 text-neutral-400" />
+                <Package class="w-10 h-10 text-neutral-400" />
               </div>
 
               <!-- Product Info -->
@@ -110,7 +110,7 @@
 
                 <!-- Category Badge -->
                 <div v-if="item.product.category" class="mt-2">
-                  <span class="inline-flex items-center px-2 py-1 text-responsive-xs font-medium bg-neutral-100 text-neutral-800 rounded-full">
+                  <span class="inline-flex items-center px-4 py-3 text-responsive-xs font-medium bg-neutral-100 text-neutral-800 rounded-full">
                     {{ item.product.category.name }}
                   </span>
                 </div>
@@ -146,7 +146,7 @@
               Ce panier surprise ne contient aucun produit pour le moment
             </p>
             <button
-              class="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
+              class="px-4 py-3 bg-primary-600 text-white rounded-lg hover:transition-colors"
               @click="$emit('edit', basket)"
             >
               Ajouter des produits
@@ -226,28 +226,28 @@
 
           <div class="space-y-3">
             <button
-              class="w-full px-4 py-3 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors flex items-center justify-center"
+              class="w-full px-4 py-3 bg-primary-600 text-white rounded-lg hover:transition-colors flex items-center justify-center"
               @click="$emit('edit', basket)"
             >
-              <Edit class="w-4 h-4 mr-2" />
+              <Edit class="w-5 h-5 mr-2" />
               Modifier le panier
             </button>
 
             <button
               :disabled="updating"
-              class="w-full px-4 py-3 border border-neutral-300 text-neutral-700 rounded-lg hover:bg-neutral-50 transition-colors flex items-center justify-center disabled:opacity-50"
+              class="w-full px-4 py-3 border border-neutral-300 text-neutral-700 rounded-lg hover:transition-colors flex items-center justify-center disabled:opacity-50"
               @click="toggleStatus"
             >
-              <component :is="basket.is_active ? EyeOff : Eye" class="w-4 h-4 mr-2" />
+              <component :is="basket.is_active ? EyeOff : Eye" class="w-5 h-5 mr-2" />
               {{ basket.is_active ? 'Désactiver' : 'Activer' }}
             </button>
 
             <button
               :disabled="deleting"
-              class="w-full px-4 py-3 border border-red-300 text-red-600 rounded-lg hover:bg-red-50 transition-colors flex items-center justify-center disabled:opacity-50"
+              class="w-full px-4 py-3 border border-red-300 text-red-600 rounded-lg hover:transition-colors flex items-center justify-center disabled:opacity-50"
               @click="confirmDelete"
             >
-              <Trash2 class="w-4 h-4 mr-2" />
+              <Trash2 class="w-5 h-5 mr-2" />
               Supprimer
             </button>
           </div>

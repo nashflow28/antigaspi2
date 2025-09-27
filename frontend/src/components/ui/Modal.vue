@@ -21,7 +21,7 @@
           v-bind="otherAttrs"
         >
           <header v-if="title || showCloseButton" class="flex items-start justify-between gap-4 px-6 py-5">
-            <div class="space-y-1">
+            <div class="space-y-2">
               <h2 v-if="title" :id="modalTitleId" class="text-h2 font-semibold text-primary-700 dark:text-primary-200">
                 {{ title }}
               </h2>

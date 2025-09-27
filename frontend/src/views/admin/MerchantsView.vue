@@ -14,11 +14,11 @@
           </div>
           <div class="flex items-center space-x-3">
             <button
-              class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg flex items-center"
+              class="bg-green-600 hover:bg-green-700 text-white px-4 py-3 rounded-lg flex items-center"
               @click="refreshData"
             >
               <svg
-                class="w-4 h-4 mr-2"
+                class="w-5 h-5 mr-2"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -43,7 +43,7 @@
             <div class="flex items-center">
               <div class="flex-shrink-0">
                 <svg
-                  class="h-6 w-6 text-orange-600"
+                  class="h-10 w-10 text-orange-600"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -71,7 +71,7 @@
             <div class="flex items-center">
               <div class="flex-shrink-0">
                 <svg
-                  class="h-6 w-6 text-yellow-600"
+                  class="h-10 w-10 text-yellow-600"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -99,7 +99,7 @@
             <div class="flex items-center">
               <div class="flex-shrink-0">
                 <svg
-                  class="h-6 w-6 text-green-600"
+                  class="h-10 w-10 text-green-600"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -127,7 +127,7 @@
             <div class="flex items-center">
               <div class="flex-shrink-0">
                 <svg
-                  class="h-6 w-6 text-blue-600"
+                  class="h-10 w-10 text-blue-600"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -172,7 +172,7 @@
                   'bg-green-100 text-green-600': activeTab === tab.key,
                   'bg-neutral-100 text-neutral-600': activeTab !== tab.key
                 }"
-                class="ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-responsive-xs font-medium"
+                class="ml-2 inline-flex items-center px-4.5 py-0.5 rounded-full text-responsive-xs font-medium"
               >
                 {{ tab.count }}
               </span>
@@ -221,19 +221,19 @@
                   </div>
                   <div class="ml-6 flex flex-col space-y-2">
                     <button
-                      class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-responsive-sm"
+                      class="bg-green-600 hover:bg-green-700 text-white px-4 py-3 rounded-lg text-responsive-sm"
                       @click="approveMerchant(merchant)"
                     >
                       Approuver
                     </button>
                     <button
-                      class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg text-responsive-sm"
+                      class="bg-red-600 hover:bg-red-700 text-white px-4 py-3 rounded-lg text-responsive-sm"
                       @click="rejectMerchant(merchant)"
                     >
                       Rejeter
                     </button>
                     <button
-                      class="bg-neutral-600 hover:bg-neutral-700 text-white px-4 py-2 rounded-lg text-responsive-sm"
+                      class="bg-neutral-600 hover:bg-neutral-700 text-white px-4 py-3 rounded-lg text-responsive-sm"
                       @click="viewMerchantDetails(merchant)"
                     >
                       Détails
@@ -266,13 +266,13 @@
                   <p class="text-responsive-lg font-semibold text-green-600 mt-2">{{ product.price ? formatPrice(product.price) : '0' }} F CFA</p>
                   <div class="mt-4 flex space-x-2">
                     <button
-                      class="flex-1 bg-green-600 hover:bg-green-700 text-white px-3 py-2 rounded text-responsive-sm"
+                      class="flex-1 bg-green-600 hover:bg-green-700 text-white px-4 py-3 rounded text-responsive-sm"
                       @click="approveProduct(product)"
                     >
                       Approuver
                     </button>
                     <button
-                      class="flex-1 bg-red-600 hover:bg-red-700 text-white px-3 py-2 rounded text-responsive-sm"
+                      class="flex-1 bg-red-600 hover:bg-red-700 text-white px-4 py-3 rounded text-responsive-sm"
                       @click="rejectProduct(product)"
                     >
                       Rejeter
@@ -320,7 +320,7 @@
                       {{ reservation.merchant_name || 'N/A' }}
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap">
-                      <span class="px-2 inline-flex text-responsive-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
+                      <span class="px-4 inline-flex text-responsive-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
                         {{ reservation.flag_reason || 'Non spécifié' }}
                       </span>
                     </td>

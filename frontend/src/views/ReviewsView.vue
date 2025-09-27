@@ -20,7 +20,7 @@
               id="merchant-select"
               v-model="selectedMerchantId"
               :disabled="merchantsLoading"
-              class="border border-neutral-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-yellow-500 focus:border-transparent"
+              class="border border-neutral-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-yellow-500 focus:border-transparent"
               @change="onMerchantChange"
             >
               <option value="">Sélectionner un commerçant</option>
@@ -58,7 +58,7 @@
 
         <div v-else-if="!authStore.isAuthenticated" class="bg-yellow-50 border border-yellow-200 rounded-2xl p-6">
           <div class="flex items-center space-x-3">
-            <Info class="w-6 h-6 text-yellow-600" />
+            <Info class="w-10 h-10 text-yellow-600" />
             <div>
               <h3 class="text-responsive-lg font-medium text-yellow-800">Connexion requise</h3>
               <p class="text-yellow-700">
@@ -67,13 +67,13 @@
               <div class="mt-3 space-x-3">
                 <router-link
                   to="/login"
-                  class="inline-flex items-center px-4 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 transition-colors"
+                  class="inline-flex items-center px-4 py-3 bg-yellow-600 text-white rounded-lg hover:transition-colors"
                 >
                   Se connecter
                 </router-link>
                 <router-link
                   to="/register"
-                  class="inline-flex items-center px-4 py-2 border border-yellow-600 text-yellow-700 rounded-lg hover:bg-yellow-50 transition-colors"
+                  class="inline-flex items-center px-4 py-3 border border-yellow-600 text-yellow-700 rounded-lg hover:transition-colors"
                 >
                   S'inscrire
                 </router-link>

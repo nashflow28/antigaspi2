@@ -5,7 +5,7 @@
       <div class="flex items-center justify-between p-6 border-b border-neutral-200">
         <h3 class="text-responsive-xl font-semibold text-neutral-900">Sélectionner des produits</h3>
         <button
-          class="p-2 hover:bg-neutral-100 rounded-lg transition-colors"
+          class="p-2 hover:transition-colors"
           @click="$emit('close')"
         >
           <X class="w-5 h-5 text-neutral-500" />
@@ -18,12 +18,12 @@
           <!-- Search -->
           <div class="flex-1">
             <div class="relative">
-              <Search class="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-neutral-400" />
+              <Search class="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-neutral-400" />
               <input
                 v-model="searchQuery"
                 type="text"
                 placeholder="Rechercher un produit..."
-                class="w-full pl-10 pr-4 py-2 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                class="w-full pl-10 pr-4 py-3 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
               >
             </div>
           </div>
@@ -32,7 +32,7 @@
           <div class="sm:w-48">
             <select
               v-model="selectedCategory"
-              class="w-full px-3 py-2 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+              class="w-full px-4 py-3 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
             >
               <option value="">Toutes les catégories</option>
               <option v-for="category in categories" :key="category.id" :value="category.id">
@@ -46,7 +46,7 @@
       <!-- Products List -->
       <div class="flex-1 overflow-y-auto max-h-96">
         <div v-if="loading" class="p-8 text-center">
-          <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600 mx-auto mb-2" />
+          <div class="animate-spin rounded-full h-10 w-10 border-b-2 border-primary-600 mx-auto mb-2" />
           <p class="text-neutral-600">Chargement des produits...</p>
         </div>
 
@@ -61,7 +61,7 @@
             <div
               v-for="product in filteredProducts"
               :key="product.id"
-              class="border border-neutral-200 rounded-lg p-4 hover:bg-neutral-50 transition-colors"
+              class="border border-neutral-200 rounded-lg p-4 hover:transition-colors"
               :class="{ 'bg-primary-50 border-primary-200': isSelected(product.id) }"
             >
               <div class="flex items-start space-x-3">
@@ -76,7 +76,7 @@
                   v-else
                   class="w-16 h-16 bg-neutral-200 rounded-lg flex items-center justify-center flex-shrink-0"
                 >
-                  <Package class="w-8 h-8 text-neutral-400" />
+                  <Package class="w-10 h-10 text-neutral-400" />
                 </div>
 
                 <!-- Product Info -->
@@ -102,7 +102,7 @@
                   <div class="mt-3 flex items-center justify-between">
                     <div class="flex items-center space-x-2">
                       <label class="text-responsive-sm text-neutral-700">Quantité:</label>
-                      <div class="flex items-center space-x-1">
+                      <div class="flex items-center space-x-2">
                         <button
                           type="button"
                           :disabled="getQuantity(product.id) <= 0"
@@ -116,7 +116,7 @@
                           type="number"
                           min="0"
                           :max="product.quantity_available"
-                          class="w-12 text-center text-responsive-sm border border-neutral-300 rounded py-1"
+                          class="w-12 text-center text-responsive-sm border border-neutral-300 rounded py-3"
                           @input="updateQuantity(product.id, parseInt(($event.target as HTMLInputElement).value) || 0)"
                         >
                         <button
@@ -133,7 +133,7 @@
                     <!-- Toggle Button -->
                     <button
                       type="button"
-                      class="px-3 py-1 text-responsive-sm rounded-lg transition-colors"
+                      class="px-4 py-3 text-responsive-sm rounded-lg transition-colors"
                       :class="isSelected(product.id)
                         ? 'bg-red-100 text-red-700 hover:bg-red-200'
                         : 'bg-primary-100 text-primary-700 hover:bg-primary-200'"
@@ -157,14 +157,14 @@
           </div>
           <div class="flex items-center space-x-3">
             <button
-              class="px-4 py-2 border border-neutral-300 text-neutral-700 rounded-lg hover:bg-neutral-50 transition-colors"
+              class="px-4 py-3 border border-neutral-300 text-neutral-700 rounded-lg hover:transition-colors"
               @click="$emit('close')"
             >
               Annuler
             </button>
             <button
               :disabled="selectedProductsList.length === 0"
-              class="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              class="px-4 py-3 bg-primary-600 text-white rounded-lg hover:transition-colors"
               @click="confirmSelection"
             >
               Confirmer la sélection

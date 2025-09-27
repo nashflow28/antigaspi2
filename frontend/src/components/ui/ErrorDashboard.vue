@@ -13,7 +13,7 @@
           title="Clear all errors"
           @click="clearAllErrors"
         >
-          <Trash2 class="w-4 h-4" />
+          <Trash2 class="w-5 h-5" />
         </Button>
         <Button
           variant="ghost"
@@ -21,7 +21,7 @@
           title="Close dashboard"
           @click="showDashboard = false"
         >
-          <X class="w-4 h-4" />
+          <X class="w-5 h-5" />
         </Button>
       </div>
     </div>
@@ -73,7 +73,7 @@
           ]"
           @click="activeTab = tab.id"
         >
-          <component :is="tab.icon" class="w-4 h-4" />
+          <component :is="tab.icon" class="w-5 h-5" />
           {{ tab.label }}
         </button>
       </div>
@@ -83,7 +83,7 @@
         <!-- Errors Tab -->
         <div v-if="activeTab === 'errors'" class="errors-list">
           <div v-if="errorQueue.length === 0" class="empty-state">
-            <CheckCircle class="w-8 h-8 text-green-500" />
+            <CheckCircle class="w-10 h-10 text-green-500" />
             <p>Aucune erreur en attente</p>
           </div>
           <div v-else>
@@ -127,7 +127,7 @@
         <!-- Breadcrumbs Tab -->
         <div v-if="activeTab === 'breadcrumbs'" class="breadcrumbs-list">
           <div v-if="breadcrumbs.length === 0" class="empty-state">
-            <Navigation class="w-8 h-8 text-neutral-400" />
+            <Navigation class="w-10 h-10 text-neutral-400" />
             <p>Aucun breadcrumb enregistré</p>
           </div>
           <div v-else>
@@ -152,7 +152,7 @@
         <!-- User Actions Tab -->
         <div v-if="activeTab === 'actions'" class="actions-list">
           <div v-if="userActions.length === 0" class="empty-state">
-            <MousePointer class="w-8 h-8 text-neutral-400" />
+            <MousePointer class="w-10 h-10 text-neutral-400" />
             <p>Aucune action utilisateur enregistrée</p>
           </div>
           <div v-else>

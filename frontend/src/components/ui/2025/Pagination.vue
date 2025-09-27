@@ -21,7 +21,7 @@
       </Button>
 
       <!-- Page Numbers -->
-      <div v-if="!compact" class="flex items-center space-x-1">
+      <div v-if="!compact" class="flex items-center space-x-2">
         <!-- First Page -->
         <Button
           v-if="showFirstLast && currentPage > 3"
@@ -33,7 +33,7 @@
         </Button>
 
         <!-- First Ellipsis -->
-        <span v-if="showFirstLast && currentPage > 4" class="px-2 text-neutral-500">
+        <span v-if="showFirstLast && currentPage > 4" class="px-4 text-neutral-500">
           ...
         </span>
 
@@ -49,7 +49,7 @@
         </Button>
 
         <!-- Last Ellipsis -->
-        <span v-if="showFirstLast && currentPage < totalPages - 3" class="px-2 text-neutral-500">
+        <span v-if="showFirstLast && currentPage < totalPages - 3" class="px-4 text-neutral-500">
           ...
         </span>
 

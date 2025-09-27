@@ -18,7 +18,7 @@
           <div class="flex items-center space-x-3">
             <router-link
               to="/merchant/reviews/dashboard"
-              class="inline-flex items-center px-4 py-2 border border-primary-600 text-primary-600 rounded-lg hover:bg-primary-50 transition-colors"
+              class="inline-flex items-center px-4 py-3 border border-primary-600 text-primary-600 rounded-lg hover:transition-colors"
             >
               <ChartBarIcon class="w-5 h-5 mr-2" />
               Dashboard
@@ -38,7 +38,7 @@
             <label class="block text-responsive-sm font-medium text-neutral-700 mb-2">Note</label>
             <select
               v-model="filters.rating"
-              class="w-full border border-neutral-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+              class="w-full border border-neutral-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
               @change="() => loadReviews()"
             >
               <option value="">Toutes les notes</option>
@@ -55,7 +55,7 @@
             <label class="block text-responsive-sm font-medium text-neutral-700 mb-2">Produit</label>
             <select
               v-model="filters.product_id"
-              class="w-full border border-neutral-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+              class="w-full border border-neutral-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
               @change="() => loadReviews()"
             >
               <option value="">Tous les produits</option>
@@ -74,7 +74,7 @@
             <label class="block text-responsive-sm font-medium text-neutral-700 mb-2">Type</label>
             <select
               v-model="filters.verified_only"
-              class="w-full border border-neutral-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+              class="w-full border border-neutral-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
               @change="() => loadReviews()"
             >
               <option value="">Tous les avis</option>
@@ -87,7 +87,7 @@
             <label class="block text-responsive-sm font-medium text-neutral-700 mb-2">Tri</label>
             <select
               v-model="filters.sort"
-              class="w-full border border-neutral-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+              class="w-full border border-neutral-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
               @change="() => loadReviews()"
             >
               <option value="recent">Plus récents</option>
@@ -110,11 +110,11 @@
               </span>
             </h3>
             <button
-              class="inline-flex items-center px-3 py-1 text-responsive-sm text-primary-600 hover:text-primary-700 transition-colors"
+              class="inline-flex items-center px-4 py-3 text-responsive-sm text-primary-600 hover:transition-colors"
               :disabled="loading"
               @click="() => loadReviews()"
             >
-              <ArrowPathIcon class="w-4 h-4 mr-1" :class="{ 'animate-spin': loading }" />
+              <ArrowPathIcon class="w-5 h-5 mr-1" :class="{ 'animate-spin': loading }" />
               Actualiser
             </button>
           </div>
@@ -123,7 +123,7 @@
         <div class="divide-y divide-neutral-200">
           <!-- Loading State -->
           <div v-if="loading" class="px-6 py-8 text-center">
-            <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600 mx-auto" />
+            <div class="animate-spin rounded-full h-10 w-10 border-b-2 border-primary-600 mx-auto" />
             <p class="text-neutral-500 mt-2">Chargement des avis...</p>
           </div>
 
@@ -141,7 +141,7 @@
             v-for="review in reviews"
             v-else
             :key="review.id"
-            class="px-6 py-6 hover:bg-neutral-50 transition-colors"
+            class="px-6 py-6 hover:transition-colors"
           >
             <div class="flex space-x-4">
               <!-- User Avatar -->
@@ -161,11 +161,11 @@
                       <StarIcon
                         v-for="star in 5"
                         :key="star"
-                        class="w-4 h-4"
+                        class="w-5 h-5"
                         :class="star <= review.rating ? 'text-yellow-400 fill-yellow-400' : 'text-neutral-300'"
                       />
                     </div>
-                    <span v-if="review.is_verified_purchase" class="inline-flex items-center px-2 py-0.5 rounded text-responsive-xs font-medium bg-green-100 text-green-800">
+                    <span v-if="review.is_verified_purchase" class="inline-flex items-center px-4 py-0.5 rounded text-responsive-xs font-medium bg-green-100 text-green-800">
                       <ShieldCheckIcon class="w-3 h-3 mr-1" />
                       Achat vérifié
                     </span>
@@ -181,7 +181,7 @@
                   {{ review.comment }}
                 </div>
 
-                <div v-if="review.product" class="inline-flex items-center text-responsive-xs text-blue-600 bg-blue-50 rounded-full px-3 py-1 mb-4">
+                <div v-if="review.product" class="inline-flex items-center text-responsive-xs text-blue-600 bg-blue-50 rounded-full px-4 py-3 mb-4">
                   <ArchiveBoxIcon class="w-3 h-3 mr-1" />
                   {{ review.product.name }}
                 </div>
@@ -208,14 +208,14 @@
             <div class="flex space-x-2">
               <button
                 :disabled="pagination.current_page <= 1"
-                class="px-3 py-1 text-responsive-sm border border-neutral-300 rounded disabled:opacity-50 disabled:cursor-not-allowed hover:bg-neutral-50"
+                class="px-4 py-3 text-responsive-sm border border-neutral-300 rounded disabled:opacity-50 disabled:cursor-not-allowed hover:bg-neutral-50"
                 @click="loadPage(pagination.current_page - 1)"
               >
                 Précédent
               </button>
               <button
                 :disabled="pagination.current_page >= pagination.last_page"
-                class="px-3 py-1 text-responsive-sm border border-neutral-300 rounded disabled:opacity-50 disabled:cursor-not-allowed hover:bg-neutral-50"
+                class="px-4 py-3 text-responsive-sm border border-neutral-300 rounded disabled:opacity-50 disabled:cursor-not-allowed hover:bg-neutral-50"
                 @click="loadPage(pagination.current_page + 1)"
               >
                 Suivant

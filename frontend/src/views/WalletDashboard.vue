@@ -15,7 +15,7 @@
               class="p-2"
               @click="$router.go(-1)"
             >
-              <ArrowLeft class="w-6 h-6" />
+              <ArrowLeft class="w-10 h-10" />
             </Button>
             <div>
               <h1 class="text-responsive-xl lg:text-display-sm font-semibold text-neutral-900 mb-2">
@@ -49,8 +49,8 @@
             class="p-4 h-auto flex-col justify-start"
             @click="showRechargeModal = true"
           >
-            <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3 group-hover:bg-green-200 transition-colors">
-              <Plus class="w-6 h-6 text-green-600" />
+            <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3 group-hover:transition-colors">
+              <Plus class="w-10 h-10 text-green-600" />
             </div>
             <div class="font-medium text-neutral-900">Recharger</div>
             <div class="text-responsive-sm text-neutral-500">Ajouter des fonds</div>
@@ -61,8 +61,8 @@
             class="p-4 h-auto flex-col justify-start"
             @click="showTransferModal = true"
           >
-            <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-3 group-hover:bg-blue-200 transition-colors">
-              <ArrowUpRight class="w-6 h-6 text-blue-600" />
+            <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-3 group-hover:transition-colors">
+              <ArrowUpRight class="w-10 h-10 text-blue-600" />
             </div>
             <div class="font-medium text-neutral-900">Transférer</div>
             <div class="text-responsive-sm text-neutral-500">Vers un autre utilisateur</div>
@@ -73,8 +73,8 @@
             class="p-4 h-auto flex-col justify-start"
             @click="showSettingsModal = true"
           >
-            <div class="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-3 group-hover:bg-purple-200 transition-colors">
-              <Settings class="w-6 h-6 text-purple-600" />
+            <div class="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-3 group-hover:transition-colors">
+              <Settings class="w-10 h-10 text-purple-600" />
             </div>
             <div class="font-medium text-neutral-900">Paramètres</div>
             <div class="text-responsive-sm text-neutral-500">PIN et limites</div>
@@ -85,8 +85,8 @@
             class="p-4 h-auto flex-col justify-start"
             @click="showStatsModal = true"
           >
-            <div class="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-3 group-hover:bg-orange-200 transition-colors">
-              <BarChart3 class="w-6 h-6 text-orange-600" />
+            <div class="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-3 group-hover:transition-colors">
+              <BarChart3 class="w-10 h-10 text-orange-600" />
             </div>
             <div class="font-medium text-neutral-900">Statistiques</div>
             <div class="text-responsive-sm text-neutral-500">Analyse des dépenses</div>
@@ -113,7 +113,7 @@
               <div v-if="walletStore.stats" class="space-y-4">
                 <div class="flex items-center justify-between p-3 bg-green-50 rounded-lg">
                   <div class="flex items-center gap-2">
-                    <ArrowUp class="w-4 h-4 text-green-600" />
+                    <ArrowUp class="w-5 h-5 text-green-600" />
                     <span class="text-responsive-sm font-medium text-green-800">Crédits</span>
                   </div>
                   <span class="font-semibold text-green-600">
@@ -122,7 +122,7 @@
                 </div>
                 <div class="flex items-center justify-between p-3 bg-red-50 rounded-lg">
                   <div class="flex items-center gap-2">
-                    <ArrowDown class="w-4 h-4 text-red-600" />
+                    <ArrowDown class="w-5 h-5 text-red-600" />
                     <span class="text-responsive-sm font-medium text-red-800">Débits</span>
                   </div>
                   <span class="font-semibold text-red-600">
@@ -131,7 +131,7 @@
                 </div>
                 <div class="flex items-center justify-between p-3 bg-neutral-50 rounded-lg">
                   <div class="flex items-center gap-2">
-                    <Activity class="w-4 h-4 text-neutral-600" />
+                    <Activity class="w-5 h-5 text-neutral-600" />
                     <span class="text-responsive-sm font-medium text-neutral-800">Transactions</span>
                   </div>
                   <span class="font-semibold text-neutral-600">
@@ -141,8 +141,8 @@
               </div>
               <div v-else class="text-center py-4">
                 <div class="animate-pulse">
-                  <div class="h-4 bg-neutral-200 rounded w-3/4 mx-auto mb-2" />
-                  <div class="h-4 bg-neutral-200 rounded w-1/2 mx-auto" />
+                  <div class="h-5 bg-neutral-200 rounded w-3/4 mx-auto mb-2" />
+                  <div class="h-5 bg-neutral-200 rounded w-1/2 mx-auto" />
                 </div>
               </div>
             </Card>
@@ -171,8 +171,8 @@
             <!-- Security -->
             <Card class="bg-gradient-to-br from-blue-50 to-indigo-50 border-blue-200 animate-fade-in-up" style="animation-delay: 0.5s;">
               <div class="flex items-center gap-3 mb-4">
-                <div class="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
-                  <Shield class="w-4 h-4 text-white" />
+                <div class="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center">
+                  <Shield class="w-5 h-5 text-white" />
                 </div>
                 <h3 class="text-responsive-lg font-semibold text-blue-800">Sécurité</h3>
               </div>
@@ -192,7 +192,7 @@
               </div>
               <button
                 v-if="!walletStore.hasPin"
-                class="w-full mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-responsive-sm font-medium"
+                class="w-full mt-4 px-4 py-3 bg-blue-600 text-white rounded-lg hover:transition-colors text-responsive-sm font-medium"
                 @click="showPinSetupModal = true"
               >
                 Configurer un PIN
@@ -228,14 +228,14 @@
             class="text-neutral-400 hover:text-neutral-600"
             @click="showTransferModal = false"
           >
-            <X class="w-6 h-6" />
+            <X class="w-10 h-10" />
           </Button>
         </div>
         <p class="text-neutral-600 mb-4">
           La fonctionnalité de transfert entre utilisateurs sera disponible dans une prochaine mise à jour.
         </p>
         <button
-          class="w-full px-4 py-3 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
+          class="w-full px-4 py-3 bg-primary-600 text-white rounded-lg hover:transition-colors"
           @click="showTransferModal = false"
         >
           Compris
@@ -252,12 +252,12 @@
             class="text-neutral-400 hover:text-neutral-600"
             @click="showSettingsModal = false"
           >
-            <X class="w-6 h-6" />
+            <X class="w-10 h-10" />
           </Button>
         </div>
         <div class="space-y-4">
           <button
-            class="w-full flex items-center justify-between p-4 border border-neutral-200 rounded-lg hover:bg-neutral-50 transition-colors"
+            class="w-full flex items-center justify-between p-4 border border-neutral-200 rounded-lg hover:transition-colors"
             @click="() => { showSettingsModal = false; showPinSetupModal = true }"
           >
             <div class="flex items-center gap-3">
@@ -272,12 +272,12 @@
               <span class="font-medium">Activer/Désactiver le portefeuille</span>
               <button
                 :disabled="walletStore.loading"
-                class="relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
+                class="relative inline-flex h-10 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
                 :class="walletStore.isActive ? 'bg-primary-600' : 'bg-neutral-200'"
                 @click="toggleWalletStatus"
               >
                 <span
-                  class="inline-block h-4 w-4 transform rounded-full bg-white transition-transform"
+                  class="inline-block h-5 w-5 transform rounded-full bg-white transition-transform"
                   :class="walletStore.isActive ? 'translate-x-6' : 'translate-x-1'"
                 />
               </Button>
@@ -299,14 +299,14 @@
             class="text-neutral-400 hover:text-neutral-600"
             @click="showStatsModal = false"
           >
-            <X class="w-6 h-6" />
+            <X class="w-10 h-10" />
           </Button>
         </div>
         <p class="text-neutral-600 mb-4">
           Les statistiques détaillées avec graphiques seront disponibles dans une prochaine version.
         </p>
         <button
-          class="w-full px-4 py-3 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
+          class="w-full px-4 py-3 bg-primary-600 text-white rounded-lg hover:transition-colors"
           @click="showStatsModal = false"
         >
           Fermer

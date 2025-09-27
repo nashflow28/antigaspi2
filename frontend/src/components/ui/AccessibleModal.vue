@@ -36,7 +36,7 @@
             <!-- Skip Link -->
             <a
               href="#modal-close"
-              class="skip-link sr-only focus:not-sr-only focus:absolute focus:top-2 focus:right-2 bg-primary-600 text-white px-2 py-1 rounded text-responsive-sm z-10"
+              class="skip-link sr-only focus:not-sr-only focus:absolute focus:top-2 focus:right-2 bg-primary-600 text-white px-4 py-3 rounded text-responsive-sm z-10"
             >
               Skip to close button
             </a>

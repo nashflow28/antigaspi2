@@ -4,8 +4,8 @@
       <div class="container mx-auto px-6 py-10">
         <div class="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
           <div class="max-w-2xl">
-            <p class="inline-flex items-center gap-2 rounded-full bg-primary-100/70 px-4 py-1 text-responsive-sm font-medium text-primary-700">
-              <Compass class="h-4 w-4" />
+            <p class="inline-flex items-center gap-2 rounded-full bg-primary-100/70 px-4 py-3 text-responsive-sm font-medium text-primary-700">
+              <Compass class="h-5 w-5" />
               Explorer les commerçants solidaires
             </p>
             <h1 class="mt-3 text-display-sm font-semibold tracking-tight text-neutral-900">
@@ -91,7 +91,7 @@
             <Card v-for="n in 6" :key="n" class="bg-white/80">
               <Skeleton class="h-48 w-full rounded-2xl" />
               <div class="mt-4 space-y-2">
-                <Skeleton class="h-4 w-3/4" />
+                <Skeleton class="h-5 w-3/4" />
                 <Skeleton class="h-3 w-1/2" />
                 <Skeleton class="h-3 w-1/3" />
               </div>
@@ -116,7 +116,7 @@
                     <h3 class="text-responsive-lg font-semibold text-neutral-900">{{ merchant.business_name }}</h3>
                     <p class="text-responsive-sm text-neutral-500">{{ merchant.business_type }}</p>
                   </div>
-                  <span v-if="merchant.distance_km" class="rounded-full bg-primary-100/70 px-3 py-1 text-responsive-xs font-semibold text-primary-700">
+                  <span v-if="merchant.distance_km" class="rounded-full bg-primary-100/70 px-4 py-3 text-responsive-xs font-semibold text-primary-700">
                     {{ merchant.distance_km.toFixed(1) }} km
                   </span>
                 </div>
@@ -124,11 +124,11 @@
 
               <ul class="space-y-2 text-responsive-sm text-neutral-600">
                 <li class="flex items-center gap-2">
-                  <MapPin class="h-4 w-4 text-primary-500" />
+                  <MapPin class="h-5 w-5 text-primary-500" />
                   <span>{{ merchant.address || merchant.city }}</span>
                 </li>
                 <li v-if="merchant.products_count" class="flex items-center gap-2">
-                  <Package class="h-4 w-4 text-primary-500" />
+                  <Package class="h-5 w-5 text-primary-500" />
                   <span>{{ merchant.products_count }} panier{{ merchant.products_count > 1 ? 's' : '' }} disponibles</span>
                 </li>
               </ul>
@@ -142,7 +142,7 @@
                     @click="toggleFavoriteMerchant(merchant)"
                   >
                     <Heart
-                      class="h-4 w-4"
+                      class="h-5 w-5"
                       :class="isMerchantFavorite(merchant.id) ? 'fill-primary-500 text-primary-500' : 'text-neutral-400'"
                     />
                     <span class="ml-1">{{ isMerchantFavorite(merchant.id) ? 'Retirer' : 'Ajouter' }}</span>

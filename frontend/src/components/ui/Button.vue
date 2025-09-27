@@ -14,7 +14,7 @@
       aria-hidden="true"
     >
       <svg
-        class="h-4 w-4 animate-spin"
+        class="h-5 w-5 animate-spin"
         fill="none"
         viewBox="0 0 24 24"
         role="presentation"

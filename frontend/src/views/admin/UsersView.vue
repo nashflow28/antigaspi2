@@ -14,11 +14,11 @@
           </div>
           <div class="flex items-center space-x-3">
             <button
-              class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg flex items-center"
+              class="bg-green-600 hover:bg-green-700 text-white px-4 py-3 rounded-lg flex items-center"
               @click="refreshData"
             >
               <svg
-                class="w-4 h-4 mr-2"
+                class="w-5 h-5 mr-2"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -43,7 +43,7 @@
             <div class="flex items-center">
               <div class="flex-shrink-0">
                 <svg
-                  class="h-6 w-6 text-green-600"
+                  class="h-10 w-10 text-green-600"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -71,7 +71,7 @@
             <div class="flex items-center">
               <div class="flex-shrink-0">
                 <svg
-                  class="h-6 w-6 text-blue-600"
+                  class="h-10 w-10 text-blue-600"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -99,7 +99,7 @@
             <div class="flex items-center">
               <div class="flex-shrink-0">
                 <svg
-                  class="h-6 w-6 text-orange-600"
+                  class="h-10 w-10 text-orange-600"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -127,7 +127,7 @@
             <div class="flex items-center">
               <div class="flex-shrink-0">
                 <svg
-                  class="h-6 w-6 text-red-600"
+                  class="h-10 w-10 text-red-600"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -160,14 +160,14 @@
               v-model="filters.search"
               type="text"
               placeholder="Nom, email, téléphone..."
-              class="w-full border border-neutral-300 rounded-lg px-3 py-2 focus:ring-green-500 focus:border-green-500"
+              class="w-full border border-neutral-300 rounded-lg px-4 py-3 focus:ring-green-500 focus:border-green-500"
             >
           </div>
           <div>
             <label class="block text-responsive-sm font-medium text-neutral-700 mb-2">Rôle</label>
             <select
               v-model="filters.role"
-              class="w-full border border-neutral-300 rounded-lg px-3 py-2 focus:ring-green-500 focus:border-green-500"
+              class="w-full border border-neutral-300 rounded-lg px-4 py-3 focus:ring-green-500 focus:border-green-500"
             >
               <option value="">Tous les rôles</option>
               <option value="consumer">Consommateur</option>
@@ -179,7 +179,7 @@
             <label class="block text-responsive-sm font-medium text-neutral-700 mb-2">Statut</label>
             <select
               v-model="filters.status"
-              class="w-full border border-neutral-300 rounded-lg px-3 py-2 focus:ring-green-500 focus:border-green-500"
+              class="w-full border border-neutral-300 rounded-lg px-4 py-3 focus:ring-green-500 focus:border-green-500"
             >
               <option value="">Tous les statuts</option>
               <option value="active">Actif</option>
@@ -189,7 +189,7 @@
           </div>
           <div class="flex items-end">
             <button
-              class="w-full bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg"
+              class="w-full bg-green-600 hover:bg-green-700 text-white px-4 py-3 rounded-lg"
               @click="applyFilters"
             >
               Filtrer
@@ -249,7 +249,7 @@
                       'bg-orange-100 text-orange-800': user.role === 'merchant',
                       'bg-purple-100 text-purple-800': user.role === 'admin'
                     }"
-                    class="px-2 inline-flex text-responsive-xs leading-5 font-semibold rounded-full"
+                    class="px-4 inline-flex text-responsive-xs leading-5 font-semibold rounded-full"
                   >
                     {{ getRoleLabel(user.role) }}
                   </span>
@@ -261,7 +261,7 @@
                       'bg-red-100 text-red-800': user.status === 'suspended',
                       'bg-yellow-100 text-yellow-800': user.status === 'pending'
                     }"
-                    class="px-2 inline-flex text-responsive-xs leading-5 font-semibold rounded-full"
+                    class="px-4 inline-flex text-responsive-xs leading-5 font-semibold rounded-full"
                   >
                     {{ getStatusLabel(user.status) }}
                   </span>
@@ -304,14 +304,14 @@
           <div class="flex-1 flex justify-between sm:hidden">
             <button
               :disabled="currentPage === 1"
-              class="relative inline-flex items-center px-4 py-2 border border-neutral-300 text-responsive-sm font-medium rounded-md text-neutral-700 bg-white hover:bg-neutral-50 disabled:opacity-50"
+              class="relative inline-flex items-center px-4 py-3 border border-neutral-300 text-responsive-sm font-medium rounded-md text-neutral-700 bg-white hover:bg-neutral-50 disabled:opacity-50"
               @click="previousPage"
             >
               Précédent
             </button>
             <button
               :disabled="currentPage === totalPages"
-              class="ml-3 relative inline-flex items-center px-4 py-2 border border-neutral-300 text-responsive-sm font-medium rounded-md text-neutral-700 bg-white hover:bg-neutral-50 disabled:opacity-50"
+              class="ml-3 relative inline-flex items-center px-4 py-3 border border-neutral-300 text-responsive-sm font-medium rounded-md text-neutral-700 bg-white hover:bg-neutral-50 disabled:opacity-50"
               @click="nextPage"
             >
               Suivant
@@ -327,7 +327,7 @@
               <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px">
                 <button
                   :disabled="currentPage === 1"
-                  class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-neutral-300 bg-white text-responsive-sm font-medium text-neutral-500 hover:bg-neutral-50 disabled:opacity-50"
+                  class="relative inline-flex items-center px-4 py-3 rounded-l-md border border-neutral-300 bg-white text-responsive-sm font-medium text-neutral-500 hover:bg-neutral-50 disabled:opacity-50"
                   @click="previousPage"
                 >
                   Précédent
@@ -339,14 +339,14 @@
                     'bg-green-50 border-green-500 text-green-600': page === currentPage,
                     'bg-white border-neutral-300 text-neutral-500 hover:bg-neutral-50': page !== currentPage
                   }"
-                  class="relative inline-flex items-center px-4 py-2 border text-responsive-sm font-medium"
+                  class="relative inline-flex items-center px-4 py-3 border text-responsive-sm font-medium"
                   @click="goToPage(page)"
                 >
                   {{ page }}
                 </button>
                 <button
                   :disabled="currentPage === totalPages"
-                  class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-neutral-300 bg-white text-responsive-sm font-medium text-neutral-500 hover:bg-neutral-50 disabled:opacity-50"
+                  class="relative inline-flex items-center px-4 py-3 rounded-r-md border border-neutral-300 bg-white text-responsive-sm font-medium text-neutral-500 hover:bg-neutral-50 disabled:opacity-50"
                   @click="nextPage"
                 >
                   Suivant

@@ -11,7 +11,7 @@
       <div class="relative bg-white rounded-2xl p-6 text-left overflow-hidden shadow-2xl transform transition-all max-w-md w-full animate-fade-in-up border border-neutral-200">
         <div class="flex items-start gap-4">
           <div class="flex-shrink-0 flex items-center justify-center w-12 h-12 rounded-2xl" :class="iconBgClass">
-            <component :is="iconComponent" class="w-6 h-6" :class="iconClass" />
+            <component :is="iconComponent" class="w-10 h-10" :class="iconClass" />
           </div>
           <div class="flex-1 min-w-0">
             <h3 class="text-responsive-lg font-semibold text-neutral-900 mb-2">

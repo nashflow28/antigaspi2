@@ -10,7 +10,7 @@
         <div class="flex items-center gap-4 mb-4">
           <router-link
             to="/merchant/products"
-            class="flex items-center text-neutral-600 hover:text-neutral-900 transition-colors"
+            class="flex items-center text-neutral-600 hover:transition-colors"
           >
             <ArrowLeftIcon class="w-5 h-5 mr-2" />
             Retour aux produits
@@ -43,7 +43,7 @@
       <!-- Loading State -->
       <Card v-if="!product && !error">
         <div class="flex items-center justify-center py-12">
-          <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600" />
+          <div class="animate-spin rounded-full h-10 w-10 border-b-2 border-primary-600" />
           <span class="ml-3 text-neutral-600">Chargement du produit...</span>
         </div>
       </Card>
@@ -51,7 +51,7 @@
       <!-- Error State -->
       <Card v-if="error" variant="bordered" class="bg-red-50 border-red-200">
         <div class="flex items-center justify-center py-8">
-          <AlertCircleIcon class="w-8 h-8 text-red-500 mr-3" />
+          <AlertCircleIcon class="w-10 h-10 text-red-500 mr-3" />
           <div>
             <h3 class="text-responsive-lg font-semibold text-red-800 mb-1">Erreur de chargement</h3>
             <p class="text-red-600">{{ error }}</p>
@@ -209,13 +209,13 @@
                     size="sm"
                     @click="removeImage"
                   >
-                    <TrashIcon class="w-4 h-4 mr-2" />
+                    <TrashIcon class="w-5 h-5 mr-2" />
                     Supprimer l'image
                   </Button>
                 </div>
 
                 <!-- Image Upload -->
-                <div class="border-2 border-dashed border-neutral-300 rounded-xl p-6 text-center hover:border-primary-400 transition-colors">
+                <div class="border-2 border-dashed border-neutral-300 rounded-xl p-6 text-center hover:transition-colors">
                   <input
                     ref="imageInput"
                     type="file"

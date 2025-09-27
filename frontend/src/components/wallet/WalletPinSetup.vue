@@ -10,7 +10,7 @@
           @click="$emit('close')"
         >
           <svg
-            class="w-6 h-6"
+            class="w-10 h-10"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -85,7 +85,7 @@
               </svg>
               <div class="text-responsive-sm text-yellow-700">
                 <p class="font-medium">Sécurité importante</p>
-                <ul class="mt-1 space-y-1 text-responsive-xs">
+                <ul class="mt-1 space-y-2 text-responsive-xs">
                   <li>• Le code PIN doit contenir 4 à 6 chiffres</li>
                   <li>• Évitez les codes évidents (1234, 0000, etc.)</li>
                   <li>• Ne partagez jamais votre code PIN</li>
@@ -114,7 +114,7 @@
         <div class="flex space-x-3 mt-6">
           <button
             type="button"
-            class="flex-1 px-4 py-3 border border-neutral-300 rounded-lg text-neutral-700 hover:bg-neutral-50 transition-colors"
+            class="flex-1 px-4 py-3 border border-neutral-300 rounded-lg text-neutral-700 hover:transition-colors"
             @click="$emit('close')"
           >
             Annuler
@@ -122,10 +122,10 @@
           <button
             type="submit"
             :disabled="loading || !isValid"
-            class="flex-1 px-4 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            class="flex-1 px-4 py-3 bg-green-600 text-white rounded-lg hover:transition-colors"
           >
             <span v-if="loading" class="flex items-center justify-center">
-              <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
+              <svg class="animate-spin -ml-1 mr-2 h-5 w-5 text-white" fill="none" viewBox="0 0 24 24">
                 <circle
                   cx="12"
                   cy="12"

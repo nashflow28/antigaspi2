@@ -48,7 +48,7 @@
               <p class="text-responsive-xl font-semibold text-primary-600 mt-1">{{ allUsersPoints.length }}</p>
             </div>
             <div class="p-3 bg-primary-100 rounded-xl">
-              <Users class="w-6 h-6 text-primary-600" />
+              <Users class="w-10 h-10 text-primary-600" />
             </div>
           </div>
         </Card>
@@ -60,7 +60,7 @@
               <p class="text-responsive-xl font-semibold text-green-600 mt-1">{{ totalPointsDistributed }}</p>
             </div>
             <div class="p-3 bg-green-100 rounded-xl">
-              <TrendingUp class="w-6 h-6 text-green-600" />
+              <TrendingUp class="w-10 h-10 text-green-600" />
             </div>
           </div>
         </Card>
@@ -72,7 +72,7 @@
               <p class="text-responsive-xl font-semibold text-blue-600 mt-1">{{ activeCustomers }}</p>
             </div>
             <div class="p-3 bg-blue-100 rounded-xl">
-              <Star class="w-6 h-6 text-blue-600" />
+              <Star class="w-10 h-10 text-blue-600" />
             </div>
           </div>
         </Card>
@@ -84,7 +84,7 @@
               <p class="text-responsive-xl font-semibold text-purple-600 mt-1">{{ averagePoints }}</p>
             </div>
             <div class="p-3 bg-purple-100 rounded-xl">
-              <Award class="w-6 h-6 text-purple-600" />
+              <Award class="w-10 h-10 text-purple-600" />
             </div>
           </div>
         </Card>
@@ -97,18 +97,18 @@
           <div class="flex items-center gap-3">
             <!-- Search -->
             <div class="relative">
-              <Search class="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-neutral-400" />
+              <Search class="w-5 h-5 absolute left-3 top-1/2 transform -translate-y-1/2 text-neutral-400" />
               <input
                 v-model="searchQuery"
                 type="text"
                 placeholder="Rechercher un client..."
-                class="pl-9 pr-4 py-2 border border-neutral-200 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                class="pl-9 pr-4 py-3 border border-neutral-200 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
               >
             </div>
             <!-- Sort -->
             <select
               v-model="sortBy"
-              class="px-3 py-2 border border-neutral-200 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+              class="px-4 py-3 border border-neutral-200 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
             >
               <option value="total_points">Trier par points</option>
               <option value="name">Trier par nom</option>
@@ -133,7 +133,7 @@
               <tr
                 v-for="customer in filteredCustomers"
                 :key="customer.id"
-                class="border-b border-neutral-100 hover:bg-neutral-50 transition-colors"
+                class="border-b border-neutral-100 hover:transition-colors"
               >
                 <td class="py-4 px-4">
                   <div class="flex items-center gap-3">
@@ -149,7 +149,7 @@
                 <td class="py-4 px-4 text-neutral-600">{{ customer.email }}</td>
                 <td class="py-4 px-4">
                   <div class="flex items-center gap-2">
-                    <Star class="w-4 h-4 text-yellow-500" />
+                    <Star class="w-5 h-5 text-yellow-500" />
                     <span class="font-semibold text-neutral-900">{{ formatPoints(customer.total_points) }}</span>
                   </div>
                 </td>
@@ -190,7 +190,7 @@
           <div class="px-6 py-4 border-b border-neutral-200">
             <div class="flex items-center justify-between">
               <h3 class="text-responsive-lg font-semibold text-neutral-900">Attribuer des Points</h3>
-              <button class="p-2 hover:bg-neutral-100 rounded-lg transition-colors" @click="closeAwardModal">
+              <button class="p-2 hover:transition-colors" @click="closeAwardModal">
                 <X class="w-5 h-5 text-neutral-400" />
               </button>
             </div>
@@ -259,7 +259,7 @@
                 v-model="awardForm.description"
                 required
                 rows="3"
-                class="w-full px-3 py-2 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                class="w-full px-4 py-3 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                 placeholder="Décrivez pourquoi vous attribuez ces points..."
               />
             </div>

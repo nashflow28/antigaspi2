@@ -59,7 +59,7 @@
             />
           </svg>
         </span>
-        <div class="flex-1 space-y-1">
+        <div class="flex-1 space-y-2">
           <p v-if="title" class="text-small font-semibold text-neutral-800 dark:text-neutral-100">
             {{ title }}
           </p>
@@ -83,7 +83,7 @@
           @click="handleClose"
         >
           <svg
-            class="h-4 w-4"
+            class="h-5 w-5"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"

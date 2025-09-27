@@ -77,16 +77,16 @@
     <div class="bg-white rounded-lg p-6 shadow-sm border">
       <h3 class="text-responsive-lg font-semibold mb-4">🔧 Performance Tools</h3>
       <div class="flex flex-wrap gap-3">
-        <button class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors">
+        <button class="px-4 py-3 bg-blue-600 text-white rounded hover:transition-colors">
           Analyze Bundle
         </button>
-        <button class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition-colors">
+        <button class="px-4 py-3 bg-green-600 text-white rounded hover:transition-colors">
           Run Lighthouse
         </button>
-        <button class="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700 transition-colors">
+        <button class="px-4 py-3 bg-purple-600 text-white rounded hover:transition-colors">
           Monitor Vitals
         </button>
-        <button class="px-4 py-2 bg-orange-600 text-white rounded hover:bg-orange-700 transition-colors">
+        <button class="px-4 py-3 bg-orange-600 text-white rounded hover:transition-colors">
           Clear Cache
         </button>
       </div>

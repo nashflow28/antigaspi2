@@ -4,8 +4,8 @@
       <div class="container mx-auto px-6 py-10">
         <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           <div>
-            <p class="inline-flex items-center gap-2 rounded-full bg-primary-100/70 px-4 py-1 text-responsive-sm font-medium text-primary-700 dark:bg-primary-500/20 dark:text-primary-100">
-              <CreditCard class="h-4 w-4" />
+            <p class="inline-flex items-center gap-2 rounded-full bg-primary-100/70 px-4 py-3 text-responsive-sm font-medium text-primary-700 dark:bg-primary-500/20 dark:text-primary-100">
+              <CreditCard class="h-5 w-5" />
               Finaliser ma réservation
             </p>
             <h1 class="mt-3 text-display-sm font-semibold tracking-tight text-neutral-900 dark:text-neutral-50">Paiement sécurisé AntiGaspi</h1>
@@ -14,13 +14,13 @@
             </p>
           </div>
           <div class="flex items-center gap-2 text-responsive-sm text-neutral-500 dark:text-neutral-400" aria-hidden="true">
-            <span class="flex h-8 w-8 items-center justify-center rounded-full bg-primary-500 text-responsive-sm font-semibold text-white">1</span>
+            <span class="flex h-10 w-10 items-center justify-center rounded-full bg-primary-500 text-responsive-sm font-semibold text-white">1</span>
             <span>Résumé</span>
             <span class="text-neutral-400 dark:text-neutral-600">—</span>
-            <span class="flex h-8 w-8 items-center justify-center rounded-full bg-primary-500 text-responsive-sm font-semibold text-white">2</span>
+            <span class="flex h-10 w-10 items-center justify-center rounded-full bg-primary-500 text-responsive-sm font-semibold text-white">2</span>
             <span>Paiement</span>
             <span class="text-neutral-400 dark:text-neutral-600">—</span>
-            <span class="flex h-8 w-8 items-center justify-center rounded-full bg-primary-500 text-responsive-sm font-semibold text-white">3</span>
+            <span class="flex h-10 w-10 items-center justify-center rounded-full bg-primary-500 text-responsive-sm font-semibold text-white">3</span>
             <span>Confirmation</span>
           </div>
         </div>
@@ -106,7 +106,7 @@
           </div>
 
           <div class="mt-4 flex items-center gap-2 rounded-2xl bg-primary-50 px-4 py-3 text-responsive-sm text-primary-700 dark:bg-primary-500/15 dark:text-primary-100">
-            <ShieldCheck class="h-4 w-4" />
+            <ShieldCheck class="h-5 w-5" />
             Transactions chiffrées et conformes aux standards mobile money locaux.
           </div>
         </Card>

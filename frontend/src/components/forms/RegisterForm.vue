@@ -277,7 +277,7 @@
         v-model="form.acceptTerms"
         type="checkbox"
         required
-        class="h-4 w-4 text-primary-600 focus:ring-primary-500 border-neutral-300 rounded mt-1"
+        class="h-5 w-5 text-primary-600 focus:ring-primary-500 border-neutral-300 rounded mt-1"
       >
       <label for="terms" class="ml-2 block text-responsive-sm text-neutral-900">
         J'accepte les

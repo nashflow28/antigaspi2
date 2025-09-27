@@ -43,7 +43,7 @@
               :no-padding="true"
               class="flex items-center gap-3 rounded-xl px-4 py-3 shadow-primary-500/10"
             >
-              <Package class="h-6 w-6 text-primary-500" />
+              <Package class="h-10 w-10 text-primary-500" />
               <div>
                 <p class="text-responsive-xs uppercase tracking-wide text-neutral-500">Impact</p>
                 <p class="text-responsive-sm font-semibold text-neutral-900">{{ totalResults }} commerçant{{ totalResults > 1 ? 's' : '' }}</p>
@@ -65,7 +65,7 @@
           class="flex min-h-[200px] items-center justify-center rounded-2xl border border-dashed border-neutral-200 bg-white"
         >
           <div class="flex items-center gap-3 text-neutral-600">
-            <span class="inline-flex h-6 w-6 animate-spin rounded-full border-2 border-neutral-200 border-t-primary-500" />
+            <span class="inline-flex h-10 w-10 animate-spin rounded-full border-2 border-neutral-200 border-t-primary-500" />
             Chargement des paniers surprise...
           </div>
         </div>
@@ -76,7 +76,7 @@
           class="flex flex-col items-center gap-3 px-8 py-16 text-center"
         >
           <div class="flex h-16 w-16 items-center justify-center rounded-full bg-neutral-100">
-            <Package class="h-8 w-8 text-neutral-400" />
+            <Package class="h-10 w-10 text-neutral-400" />
           </div>
           <h2 class="text-responsive-xl font-semibold text-neutral-800">Aucun panier ne correspond à vos filtres</h2>
           <p class="mt-2 text-neutral-500">

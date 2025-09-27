@@ -3,7 +3,7 @@
     <div class="flex items-center justify-between mb-6">
       <div class="flex items-center space-x-3">
         <div class="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
-          <Edit class="w-6 h-6 text-blue-600" />
+          <Edit class="w-10 h-10 text-blue-600" />
         </div>
         <div>
           <h3 class="text-responsive-lg font-semibold text-neutral-900">Modifier votre avis</h3>
@@ -11,10 +11,10 @@
         </div>
       </div>
       <button
-        class="text-neutral-400 hover:text-neutral-600 transition-colors"
+        class="text-neutral-400 hover:transition-colors"
         @click="$emit('cancel')"
       >
-        <X class="w-6 h-6" />
+        <X class="w-10 h-10" />
       </button>
     </div>
 
@@ -42,7 +42,7 @@
           v-model="form.title"
           type="text"
           maxlength="255"
-          class="w-full border border-neutral-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          class="w-full border border-neutral-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           placeholder="Ex: Service rapide et produits frais"
         >
         <p v-if="errors.title" class="mt-1 text-responsive-sm text-red-600">{{ errors.title }}</p>
@@ -58,7 +58,7 @@
           v-model="form.comment"
           rows="4"
           maxlength="1000"
-          class="w-full border border-neutral-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+          class="w-full border border-neutral-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
           placeholder="Décrivez votre expérience mise à jour..."
         />
         <div class="flex justify-between mt-1">
@@ -71,28 +71,28 @@
       <div class="flex justify-end space-x-3 pt-4">
         <button
           type="button"
-          class="px-6 py-2 text-neutral-600 hover:text-neutral-800 font-medium transition-colors"
+          class="px-6 py-3 text-neutral-600 hover:transition-colors"
           @click="$emit('cancel')"
         >
           Annuler
         </button>
         <button
           type="button"
-          class="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 font-medium transition-colors flex items-center space-x-2"
+          class="px-6 py-3 bg-red-600 text-white rounded-lg hover:transition-colors flex items-center space-x-2"
           :disabled="submitting"
           @click="confirmDelete"
         >
-          <Trash2 class="w-4 h-4" />
+          <Trash2 class="w-5 h-5" />
           <span>Supprimer</span>
         </button>
         <button
           type="submit"
           :disabled="!form.rating || submitting"
-          class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2"
+          class="px-6 py-3 bg-blue-600 text-white rounded-lg hover:transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2"
         >
           <span>{{ submitting ? 'Mise à jour...' : 'Mettre à jour' }}</span>
-          <Save v-if="!submitting" class="w-4 h-4" />
-          <div v-else class="w-4 h-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+          <Save v-if="!submitting" class="w-5 h-5" />
+          <div v-else class="w-5 h-5 animate-spin rounded-full border-2 border-white border-t-transparent" />
         </button>
       </div>
     </form>
@@ -129,13 +129,13 @@
         </p>
         <div class="flex justify-end space-x-3">
           <button
-            class="px-4 py-2 text-neutral-600 hover:text-neutral-800 transition-colors"
+            class="px-4 py-3 text-neutral-600 hover:transition-colors"
             @click="showDeleteConfirm = false"
           >
             Annuler
           </button>
           <button
-            class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+            class="px-4 py-3 bg-red-600 text-white rounded-lg hover:transition-colors"
             :disabled="deleting"
             @click="deleteReview"
           >

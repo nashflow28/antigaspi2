@@ -20,11 +20,11 @@
               <Star
                 v-for="star in 5"
                 :key="star"
-                class="w-4 h-4"
+                class="w-5 h-5"
                 :class="star <= review.rating ? 'text-yellow-400 fill-yellow-400' : 'text-neutral-300'"
               />
             </div>
-            <span v-if="review.is_verified_purchase" class="inline-flex items-center px-2 py-0.5 rounded text-responsive-xs font-medium bg-green-100 text-green-800">
+            <span v-if="review.is_verified_purchase" class="inline-flex items-center px-4 py-0.5 rounded text-responsive-xs font-medium bg-green-100 text-green-800">
               <ShieldCheck class="w-3 h-3 mr-1" />
               Achat vérifié
             </span>
@@ -43,11 +43,11 @@
 
         <!-- Merchant and Product Info -->
         <div class="flex items-center space-x-4 mb-4">
-          <div class="inline-flex items-center text-responsive-xs text-purple-600 bg-purple-50 rounded-full px-3 py-1">
+          <div class="inline-flex items-center text-responsive-xs text-purple-600 bg-purple-50 rounded-full px-4 py-3">
             <Building class="w-3 h-3 mr-1" />
             {{ review.merchant.business_name }}
           </div>
-          <div v-if="review.product" class="inline-flex items-center text-responsive-xs text-blue-600 bg-blue-50 rounded-full px-3 py-1">
+          <div v-if="review.product" class="inline-flex items-center text-responsive-xs text-blue-600 bg-blue-50 rounded-full px-4 py-3">
             <Package class="w-3 h-3 mr-1" />
             {{ review.product.name }}
           </div>
@@ -56,7 +56,7 @@
         <!-- Merchant Response if exists -->
         <div v-if="review.merchant_response" class="mt-4 p-3 bg-green-50 border border-green-200 rounded-lg">
           <div class="flex items-start space-x-2">
-            <Building class="w-4 h-4 text-green-600 mt-0.5" />
+            <Building class="w-5 h-5 text-green-600 mt-0.5" />
             <div>
               <p class="text-responsive-sm font-medium text-green-800">Réponse du commerçant :</p>
               <p class="text-responsive-sm text-green-700 mt-1">{{ review.merchant_response }}</p>
@@ -68,27 +68,27 @@
         <div class="flex items-center space-x-3 mt-4">
           <button
             :disabled="!!processing"
-            class="inline-flex items-center px-4 py-2 text-responsive-sm bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            class="inline-flex items-center px-4 py-3 text-responsive-sm bg-green-600 text-white rounded-lg hover:transition-colors"
             @click="approveReview"
           >
-            <Check class="w-4 h-4 mr-2" />
+            <Check class="w-5 h-5 mr-2" />
             {{ processing === 'approve' ? 'Approbation...' : 'Approuver' }}
           </button>
 
           <button
             :disabled="!!processing"
-            class="inline-flex items-center px-4 py-2 text-responsive-sm bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            class="inline-flex items-center px-4 py-3 text-responsive-sm bg-red-600 text-white rounded-lg hover:transition-colors"
             @click="rejectReview"
           >
-            <X class="w-4 h-4 mr-2" />
+            <X class="w-5 h-5 mr-2" />
             {{ processing === 'reject' ? 'Rejet...' : 'Rejeter' }}
           </button>
 
           <button
-            class="inline-flex items-center px-3 py-2 text-responsive-sm text-neutral-600 border border-neutral-300 rounded-lg hover:bg-neutral-50 transition-colors"
+            class="inline-flex items-center px-4 py-3 text-responsive-sm text-neutral-600 border border-neutral-300 rounded-lg hover:transition-colors"
             @click="showDetails = !showDetails"
           >
-            <Eye class="w-4 h-4 mr-2" />
+            <Eye class="w-5 h-5 mr-2" />
             {{ showDetails ? 'Masquer' : 'Détails' }}
           </button>
         </div>

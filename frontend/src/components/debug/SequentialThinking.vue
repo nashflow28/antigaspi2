@@ -13,13 +13,13 @@
           title="Export session"
           @click="exportCurrentSession"
         >
-          <Download class="w-4 h-4" />
+          <Download class="w-5 h-5" />
         </button>
         <button class="button-clear" title="Clear old sessions" @click="clearOldSessions">
-          <Trash2 class="w-4 h-4" />
+          <Trash2 class="w-5 h-5" />
         </button>
         <button class="button-close" title="Close panel" @click="togglePanel">
-          <X class="w-4 h-4" />
+          <X class="w-5 h-5" />
         </button>
       </div>
     </div>
@@ -54,7 +54,7 @@
             class="button-start"
             @click="startNewSession"
           >
-            <Play class="w-4 h-4 mr-1" />
+            <Play class="w-5 h-5 mr-1" />
             Start
           </button>
           <button
@@ -62,7 +62,7 @@
             class="button-stop"
             @click="endCurrentSession"
           >
-            <Square class="w-4 h-4 mr-1" />
+            <Square class="w-5 h-5 mr-1" />
             Stop
           </button>
         </div>
@@ -76,7 +76,7 @@
           :class="['tab', { 'tab-active': activeTab === tab.id }]"
           @click="activeTab = tab.id"
         >
-          <component :is="tab.icon" class="w-4 h-4" />
+          <component :is="tab.icon" class="w-5 h-5" />
           {{ tab.label }}
         </button>
       </div>
@@ -86,7 +86,7 @@
         <!-- Current Session Steps -->
         <div v-if="activeTab === 'current'" class="steps-container">
           <div v-if="!currentSession || currentSession.steps.length === 0" class="empty-state">
-            <Brain class="w-8 h-8 text-neutral-400" />
+            <Brain class="w-10 h-10 text-neutral-400" />
             <p class="text-responsive-sm text-neutral-600">No active thinking session</p>
             <button class="button-start-empty" @click="startNewSession">
               Start Thinking Session
@@ -150,7 +150,7 @@
         <!-- Sessions History -->
         <div v-if="activeTab === 'history'" class="history-container">
           <div v-if="sessions.length === 0" class="empty-state">
-            <History class="w-8 h-8 text-neutral-400" />
+            <History class="w-10 h-10 text-neutral-400" />
             <p class="text-responsive-sm text-neutral-600">No completed sessions</p>
           </div>
           <div v-else class="sessions-list">

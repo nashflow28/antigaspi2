@@ -53,7 +53,7 @@
               variant="ghost"
               size="icon"
               :left-icon="X"
-              class="shrink-0 text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-300 transition-colors"
+              class="shrink-0 text-neutral-400 hover:text-neutral-600 dark:hover:transition-colors"
               aria-label="Fermer"
               @click="dismissInstallPrompt"
             >
@@ -119,7 +119,7 @@
               variant="ghost"
               size="icon"
               :left-icon="X"
-              class="shrink-0 text-blue-400 hover:text-blue-600 dark:hover:text-blue-300 transition-colors"
+              class="shrink-0 text-blue-400 hover:text-blue-600 dark:hover:transition-colors"
               aria-label="Fermer"
               @click="dismissUpdatePrompt"
             >
@@ -140,7 +140,7 @@
       >
         <div
           :class="[
-            'px-4 py-2 rounded-full shadow-lg text-responsive-sm font-medium flex items-center gap-2',
+            'px-4 py-3 rounded-full shadow-lg text-responsive-sm font-medium flex items-center gap-2',
             isOnline
               ? 'bg-green-500 text-white'
               : 'bg-red-500 text-white'

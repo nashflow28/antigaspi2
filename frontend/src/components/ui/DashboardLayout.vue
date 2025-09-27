@@ -30,7 +30,7 @@
           </slot>
         </div>
 
-        <nav class="flex-1 space-y-1 px-4 py-6">
+        <nav class="flex-1 space-y-2 px-4 py-6">
           <template v-for="(item, index) in sidebar.navigation" :key="item.label">
             <Motion
               tag="a"
@@ -47,7 +47,7 @@
                 <span class="flex-1 truncate">{{ item.label }}</span>
                 <span
                   v-if="item.badge"
-                  class="rounded-full bg-primary-500/20 px-2 py-1 text-caption font-semibold text-primary-700 dark:text-primary-100"
+                  class="rounded-full bg-primary-500/20 px-4 py-3 text-caption font-semibold text-primary-700 dark:text-primary-100"
                 >
                   {{ item.badge }}
                 </span>
@@ -80,7 +80,7 @@
               @click="openSidebar"
             >
               <svg
-                class="h-6 w-6"
+                class="h-10 w-10"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -102,7 +102,7 @@
                 <component :is="header.actions" v-if="header.actions" class="hidden items-center gap-2 sm:flex" />
               </slot>
               <slot name="header-user" :user="header.user">
-                <div class="flex items-center gap-3 rounded-2xl bg-primary-500/10 px-3 py-2 text-left text-primary-800 transition-colors hover:bg-primary-500/15 dark:bg-primary-500/10 dark:text-primary-100">
+                <div class="flex items-center gap-3 rounded-2xl bg-primary-500/10 px-4 py-3 text-left text-primary-800 transition-colors hover:bg-primary-500/15 dark:bg-primary-500/10 dark:text-primary-100">
                   <img
                     v-if="header.user.avatar"
                     :src="header.user.avatar"

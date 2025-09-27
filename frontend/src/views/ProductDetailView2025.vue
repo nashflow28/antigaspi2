@@ -3,7 +3,7 @@
     <!-- Loading State -->
     <div v-if="loading" class="flex justify-center items-center min-h-screen">
       <div class="flex items-center gap-3">
-        <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600" />
+        <div class="animate-spin rounded-full h-10 w-10 border-b-2 border-primary-600" />
         <span class="text-neutral-600">Chargement du produit...</span>
       </div>
     </div>
@@ -22,10 +22,10 @@
     <div v-else-if="product" class="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
       <!-- Breadcrumb -->
       <nav class="flex items-center gap-2 text-responsive-sm text-neutral-600 mb-8">
-        <router-link to="/" class="hover:text-primary-600 transition-colors">Accueil</router-link>
-        <ChevronRight class="w-4 h-4" />
-        <router-link to="/products" class="hover:text-primary-600 transition-colors">Catalogue</router-link>
-        <ChevronRight class="w-4 h-4" />
+        <router-link to="/" class="hover:transition-colors">Accueil</router-link>
+        <ChevronRight class="w-5 h-5" />
+        <router-link to="/products" class="hover:transition-colors">Catalogue</router-link>
+        <ChevronRight class="w-5 h-5" />
         <span class="text-neutral-900 font-medium">{{ product.name }}</span>
       </nav>
 
@@ -166,14 +166,14 @@
                       :disabled="reservationQuantity <= 1"
                       @click="decreaseQuantity"
                     >
-                      <Minus class="w-4 h-4" />
+                      <Minus class="w-5 h-5" />
                     </Button>
                     <input
                       v-model.number="reservationQuantity"
                       type="number"
                       min="1"
                       :max="product.quantity"
-                      class="w-16 text-center border-0 focus:ring-0 py-2"
+                      class="w-16 text-center border-0 focus:ring-0 py-3"
                     >
                     <Button
                       variant="ghost"
@@ -181,7 +181,7 @@
                       :disabled="reservationQuantity >= product.quantity"
                       @click="increaseQuantity"
                     >
-                      <Plus class="w-4 h-4" />
+                      <Plus class="w-5 h-5" />
                     </Button>
                   </div>
                 </div>
@@ -228,16 +228,16 @@
               <h3 class="text-responsive-lg font-semibold text-neutral-900">Partager</h3>
               <div class="flex gap-2">
                 <Button variant="ghost" size="sm" @click="shareProduct('facebook')">
-                  <Facebook class="w-4 h-4" />
+                  <Facebook class="w-5 h-5" />
                 </Button>
                 <Button variant="ghost" size="sm" @click="shareProduct('twitter')">
-                  <Twitter class="w-4 h-4" />
+                  <Twitter class="w-5 h-5" />
                 </Button>
                 <Button variant="ghost" size="sm" @click="shareProduct('whatsapp')">
-                  <MessageCircle class="w-4 h-4" />
+                  <MessageCircle class="w-5 h-5" />
                 </Button>
                 <Button variant="ghost" size="sm" @click="copyLink">
-                  <Copy class="w-4 h-4" />
+                  <Copy class="w-5 h-5" />
                 </Button>
               </div>
             </div>
@@ -265,7 +265,7 @@
                 v-if="relatedProduct.image_url"
                 :src="relatedProduct.image_url"
                 :alt="relatedProduct.name"
-                class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                class="w-full h-full object-cover group-hover:transition-transform duration-300"
               >
               <div v-else class="flex items-center justify-center h-full">
                 <Package class="w-12 h-12 text-neutral-400" />

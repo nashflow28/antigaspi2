@@ -4,8 +4,8 @@
       <div class="container mx-auto px-6 py-10">
         <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           <div>
-            <p class="inline-flex items-center gap-2 rounded-full bg-primary-100/70 px-4 py-1 text-responsive-sm font-medium text-primary-700">
-              <ShoppingCart class="h-4 w-4" />
+            <p class="inline-flex items-center gap-2 rounded-full bg-primary-100/70 px-4 py-3 text-responsive-sm font-medium text-primary-700">
+              <ShoppingCart class="h-5 w-5" />
               Mon panier AntiGaspi
             </p>
             <h1 class="mt-3 text-display-sm font-semibold tracking-tight text-neutral-900">{{ headline }}</h1>
@@ -36,7 +36,7 @@
 
           <div v-if="!hasItems" class="py-12 text-center">
             <div class="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-neutral-100 text-neutral-400">
-              <ShoppingCart class="h-8 w-8" />
+              <ShoppingCart class="h-10 w-10" />
             </div>
             <h3 class="mt-4 text-responsive-xl font-semibold text-neutral-800">Votre panier est vide</h3>
             <p class="mt-2 text-neutral-500">
@@ -71,32 +71,32 @@
               </div>
 
               <div class="flex items-center justify-between gap-4 md:justify-end">
-                <div class="flex items-center gap-2 rounded-full border border-neutral-200 bg-white px-4 py-2 shadow-sm">
+                <div class="flex items-center gap-2 rounded-full border border-neutral-200 bg-white px-4 py-3 shadow-sm">
                   <button
                     type="button"
                     class="text-neutral-500 hover:text-neutral-800"
                     aria-label="Diminuer la quantité"
                     @click="decreaseQuantity(item)"
                   >
-                    <Minus class="h-4 w-4" />
+                    <Minus class="h-5 w-5" />
                   </button>
-                  <span class="w-8 text-center text-responsive-sm font-medium text-neutral-800">{{ item.quantity }}</span>
+                  <span class="w-10 text-center text-responsive-sm font-medium text-neutral-800">{{ item.quantity }}</span>
                   <button
                     type="button"
                     class="text-neutral-500 hover:text-neutral-800"
                     aria-label="Augmenter la quantité"
                     @click="increaseQuantity(item)"
                   >
-                    <Plus class="h-4 w-4" />
+                    <Plus class="h-5 w-5" />
                   </button>
                 </div>
 
                 <button
                   type="button"
-                  class="flex items-center gap-2 rounded-full bg-neutral-100 px-4 py-2 text-responsive-sm text-neutral-500 transition hover:bg-neutral-200"
+                  class="flex items-center gap-2 rounded-full bg-neutral-100 px-4 py-3 text-responsive-sm text-neutral-500 transition hover:bg-neutral-200"
                   @click="removeItem(item.id)"
                 >
-                  <Trash2 class="h-4 w-4" />
+                  <Trash2 class="h-5 w-5" />
                   Retirer
                 </button>
               </div>

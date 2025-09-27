@@ -42,7 +42,7 @@
       <div v-else class="mb-8">
         <div class="flex items-center gap-4 mb-4">
           <button
-            class="flex items-center text-neutral-600 hover:text-neutral-900 transition-colors"
+            class="flex items-center text-neutral-600 hover:transition-colors"
             @click="currentView = 'list'"
           >
             <ArrowLeftIcon class="w-5 h-5 mr-2" />
@@ -67,7 +67,7 @@
       <!-- Loading State -->
       <Card v-if="loading && currentView === 'list'">
         <div class="flex items-center justify-center py-12">
-          <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600" />
+          <div class="animate-spin rounded-full h-10 w-10 border-b-2 border-primary-600" />
           <span class="ml-3 text-neutral-600">Chargement des paniers surprise...</span>
         </div>
       </Card>
@@ -75,7 +75,7 @@
       <!-- Error State -->
       <Card v-if="error" class="bg-accent-red/10 border-accent-red/30 mb-6">
         <div class="flex items-center justify-center py-8">
-          <AlertTriangleIcon class="w-8 h-8 text-accent-red mr-3" />
+          <AlertTriangleIcon class="w-10 h-10 text-accent-red mr-3" />
           <div>
             <p class="text-accent-red/90 font-medium">Erreur lors du chargement</p>
             <p class="text-accent-red text-responsive-sm">{{ error }}</p>
@@ -94,7 +94,7 @@
                 <p class="text-responsive-xl font-semibold">{{ baskets.length }}</p>
               </div>
               <div class="p-3 bg-white/20 rounded-xl">
-                <GiftIcon class="w-6 h-6" />
+                <GiftIcon class="w-10 h-10" />
               </div>
             </div>
           </Card>
@@ -106,7 +106,7 @@
                 <p class="text-responsive-xl font-semibold">{{ activeBaskets.length }}</p>
               </div>
               <div class="p-3 bg-white/20 rounded-xl">
-                <CheckCircleIcon class="w-6 h-6" />
+                <CheckCircleIcon class="w-10 h-10" />
               </div>
             </div>
           </Card>
@@ -118,7 +118,7 @@
                 <p class="text-responsive-xl font-semibold">{{ totalStock }}</p>
               </div>
               <div class="p-3 bg-white/20 rounded-xl">
-                <PackageIcon class="w-6 h-6" />
+                <PackageIcon class="w-10 h-10" />
               </div>
             </div>
           </Card>
@@ -130,7 +130,7 @@
                 <p class="text-responsive-xl font-semibold">{{ formatPrice(totalRevenue) }}</p>
               </div>
               <div class="p-3 bg-white/20 rounded-xl">
-                <DollarSignIcon class="w-6 h-6" />
+                <DollarSignIcon class="w-10 h-10" />
               </div>
             </div>
           </Card>
@@ -169,7 +169,7 @@
               <!-- Status Badge -->
               <div class="absolute top-4 right-4">
                 <span
-                  class="px-2 py-1 text-responsive-xs font-medium rounded-full"
+                  class="px-4 py-3 text-responsive-xs font-medium rounded-full"
                   :class="basket.is_active ? 'bg-primary-100 text-primary-700' : 'bg-neutral-100 text-neutral-600'"
                 >
                   {{ basket.is_active ? 'Actif' : 'Inactif' }}
@@ -178,7 +178,7 @@
 
               <!-- Discount Badge -->
               <div class="absolute bottom-4 left-4">
-                <span class="px-2 py-1 text-responsive-xs font-semibold bg-accent-red/100 text-white rounded-full">
+                <span class="px-4 py-3 text-responsive-xs font-semibold bg-accent-red/100 text-white rounded-full">
                   -{{ Math.round(((basket.original_price - basket.discounted_price) / basket.original_price) * 100) }}%
                 </span>
               </div>
@@ -201,13 +201,13 @@
 
               <!-- Stock -->
               <div class="flex items-center gap-2 mb-4 text-responsive-sm text-neutral-600">
-                <PackageIcon class="w-4 h-4" />
+                <PackageIcon class="w-5 h-5" />
                 <span>{{ basket.quantity_available }} disponible{{ basket.quantity_available > 1 ? 's' : '' }}</span>
               </div>
 
               <!-- Products Count -->
               <div class="flex items-center gap-2 mb-6 text-responsive-sm text-neutral-600">
-                <LayersIcon class="w-4 h-4" />
+                <LayersIcon class="w-5 h-5" />
                 <span>{{ basket.products?.length || 0 }} produit{{ (basket.products?.length || 0) > 1 ? 's' : '' }}</span>
               </div>
 

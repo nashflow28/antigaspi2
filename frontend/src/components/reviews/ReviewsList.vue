@@ -13,7 +13,7 @@
             </h3>
             <div v-if="stats && stats.total_reviews > 0" class="flex items-center space-x-2">
               <div class="flex items-center">
-                <Star class="w-4 h-4 text-yellow-400 fill-yellow-400" />
+                <Star class="w-5 h-5 text-yellow-400 fill-yellow-400" />
                 <span class="ml-1 text-responsive-sm font-medium text-neutral-900">{{ stats.average_rating }}</span>
               </div>
               <span class="text-responsive-xs text-neutral-500">sur {{ stats.total_reviews }} avis</span>
@@ -25,7 +25,7 @@
         <div class="relative">
           <select
             v-model="currentFilter"
-            class="text-responsive-sm border border-neutral-300 rounded-lg px-3 py-1 focus:ring-2 focus:ring-yellow-500 focus:border-transparent"
+            class="text-responsive-sm border border-neutral-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-yellow-500 focus:border-transparent"
             @change="() => fetchReviews()"
           >
             <option value="">Tous les avis</option>
@@ -47,7 +47,7 @@
           :key="rating.rating"
           class="flex items-center space-x-2"
         >
-          <div class="flex items-center space-x-1 text-responsive-xs text-neutral-600 w-16">
+          <div class="flex items-center space-x-2 text-responsive-xs text-neutral-600 w-16">
             <span>{{ rating.rating }}</span>
             <Star class="w-3 h-3 text-yellow-400 fill-yellow-400" />
           </div>
@@ -57,7 +57,7 @@
               :style="{ width: rating.percentage + '%' }"
             />
           </div>
-          <span class="text-responsive-xs text-neutral-500 w-8">{{ rating.count }}</span>
+          <span class="text-responsive-xs text-neutral-500 w-10">{{ rating.count }}</span>
         </div>
       </div>
     </div>
@@ -65,7 +65,7 @@
     <!-- Reviews List -->
     <div class="divide-y divide-neutral-200">
       <div v-if="loading" class="px-6 py-8 text-center">
-        <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-yellow-600 mx-auto" />
+        <div class="animate-spin rounded-full h-10 w-10 border-b-2 border-yellow-600 mx-auto" />
         <p class="text-neutral-500 mt-2">Chargement des avis...</p>
       </div>
 
@@ -81,7 +81,7 @@
         v-for="review in reviews"
         v-else
         :key="review.id"
-        class="px-6 py-4 hover:bg-neutral-50 transition-colors"
+        class="px-6 py-4 hover:transition-colors"
       >
         <div class="flex space-x-4">
           <!-- User Avatar -->
@@ -101,11 +101,11 @@
                   <Star
                     v-for="star in 5"
                     :key="star"
-                    class="w-4 h-4"
+                    class="w-5 h-5"
                     :class="star <= review.rating ? 'text-yellow-400 fill-yellow-400' : 'text-neutral-300'"
                   />
                 </div>
-                <span v-if="review.is_verified_purchase" class="inline-flex items-center px-2 py-0.5 rounded text-responsive-xs font-medium bg-green-100 text-green-800">
+                <span v-if="review.is_verified_purchase" class="inline-flex items-center px-4 py-0.5 rounded text-responsive-xs font-medium bg-green-100 text-green-800">
                   <ShieldCheck class="w-3 h-3 mr-1" />
                   Achat vérifié
                 </span>
@@ -121,7 +121,7 @@
               {{ review.comment }}
             </div>
 
-            <div v-if="review.product" class="inline-flex items-center text-responsive-xs text-blue-600 bg-blue-50 rounded-full px-2 py-1">
+            <div v-if="review.product" class="inline-flex items-center text-responsive-xs text-blue-600 bg-blue-50 rounded-full px-4 py-3">
               <Package class="w-3 h-3 mr-1" />
               {{ review.product.name }}
             </div>
@@ -131,7 +131,7 @@
               <!-- Edit button for user's own reviews -->
               <button
                 v-if="authStore.user?.id === review.user.id"
-                class="inline-flex items-center px-3 py-1 text-responsive-xs text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-full transition-colors"
+                class="inline-flex items-center px-4 py-3 text-responsive-xs text-blue-600 bg-blue-50 hover:transition-colors"
                 @click="editingReviewId = review.id"
               >
                 <Edit class="w-3 h-3 mr-1" />
@@ -141,7 +141,7 @@
               <!-- Report button for other users' reviews (consumers only) -->
               <button
                 v-if="authStore.user?.id !== review.user.id && authStore.isConsumer"
-                class="inline-flex items-center px-3 py-1 text-responsive-xs text-red-600 bg-red-50 hover:bg-red-100 rounded-full transition-colors"
+                class="inline-flex items-center px-4 py-3 text-responsive-xs text-red-600 bg-red-50 hover:transition-colors"
                 @click="reportingReviewId = review.id"
               >
                 <Flag class="w-3 h-3 mr-1" />
@@ -151,7 +151,7 @@
               <!-- Reply button for merchants -->
               <button
                 v-if="authStore.isMerchant"
-                class="inline-flex items-center px-3 py-1 text-responsive-xs text-green-600 bg-green-50 hover:bg-green-100 rounded-full transition-colors"
+                class="inline-flex items-center px-4 py-3 text-responsive-xs text-green-600 bg-green-50 hover:transition-colors"
                 @click="replyingToReviewId = review.id"
               >
                 <Reply class="w-3 h-3 mr-1" />
@@ -218,13 +218,13 @@
             </div>
             <div class="flex justify-end space-x-3">
               <button
-                class="px-4 py-2 text-neutral-600 bg-neutral-100 rounded-lg hover:bg-neutral-200 transition-colors"
+                class="px-4 py-3 text-neutral-600 bg-neutral-100 rounded-lg hover:transition-colors"
                 @click="reportingReviewId = null; reportReason = ''"
               >
                 Annuler
               </button>
               <button
-                class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+                class="px-4 py-3 bg-red-600 text-white rounded-lg hover:transition-colors"
                 @click="submitReport(review.id)"
               >
                 Signaler
@@ -252,14 +252,14 @@
             </div>
             <div class="flex justify-end space-x-3 mt-4">
               <button
-                class="px-4 py-2 text-neutral-600 bg-neutral-100 rounded-lg hover:bg-neutral-200 transition-colors"
+                class="px-4 py-3 text-neutral-600 bg-neutral-100 rounded-lg hover:transition-colors"
                 @click="replyingToReviewId = null; replyText = ''"
               >
                 Annuler
               </button>
               <button
                 :disabled="!replyText?.trim()"
-                class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                class="px-4 py-3 bg-green-600 text-white rounded-lg hover:transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 @click="submitReply(review.id)"
               >
                 Répondre
@@ -279,14 +279,14 @@
         <div class="flex space-x-2">
           <button
             :disabled="pagination.current_page <= 1"
-            class="px-3 py-1 text-responsive-sm border border-neutral-300 rounded disabled:opacity-50 disabled:cursor-not-allowed hover:bg-neutral-50"
+            class="px-4 py-3 text-responsive-sm border border-neutral-300 rounded disabled:opacity-50 disabled:cursor-not-allowed hover:bg-neutral-50"
             @click="loadPage(pagination.current_page - 1)"
           >
             Précédent
           </button>
           <button
             :disabled="pagination.current_page >= pagination.last_page"
-            class="px-3 py-1 text-responsive-sm border border-neutral-300 rounded disabled:opacity-50 disabled:cursor-not-allowed hover:bg-neutral-50"
+            class="px-4 py-3 text-responsive-sm border border-neutral-300 rounded disabled:opacity-50 disabled:cursor-not-allowed hover:bg-neutral-50"
             @click="loadPage(pagination.current_page + 1)"
           >
             Suivant

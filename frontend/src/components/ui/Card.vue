@@ -1,6 +1,6 @@
 <template>
   <article :class="cardClass" v-bind="otherAttrs">
-    <div v-if="$slots.header" class="flex flex-col gap-1.5 pb-4">
+    <div v-if="$slots.header" class="flex flex-col gap-2.5 pb-4">
       <slot name="header" />
     </div>
 

@@ -56,7 +56,7 @@
       class="flex items-center gap-2 text-small text-accent-red"
     >
       <svg
-        class="h-4 w-4"
+        class="h-5 w-5"
         viewBox="0 0 20 20"
         fill="currentColor"
         aria-hidden="true"

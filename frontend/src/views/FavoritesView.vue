@@ -4,8 +4,8 @@
       <div class="container mx-auto px-6 py-10">
         <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           <div>
-            <p class="inline-flex items-center gap-2 rounded-full bg-primary-100/70 px-4 py-1 text-responsive-sm font-medium text-primary-700">
-              <Heart class="h-4 w-4" />
+            <p class="inline-flex items-center gap-2 rounded-full bg-primary-100/70 px-4 py-3 text-responsive-sm font-medium text-primary-700">
+              <Heart class="h-5 w-5" />
               Mes coups de cœur AntiGaspi
             </p>
             <h1 class="mt-3 text-display-sm font-semibold tracking-tight text-neutral-900">Vos commerçants & paniers favoris</h1>
@@ -70,14 +70,14 @@
                   aria-label="Retirer des favoris"
                   @click="removeFavorite(favorite)"
                 >
-                  <HeartOff class="h-4 w-4" />
+                  <HeartOff class="h-5 w-5" />
                 </button>
               </div>
             </template>
 
             <div class="space-y-3 text-responsive-sm text-neutral-600">
               <p v-if="favorite.type === 'merchant' && favorite.merchant?.city" class="flex items-center gap-2">
-                <MapPin class="h-4 w-4 text-primary-500" />
+                <MapPin class="h-5 w-5 text-primary-500" />
                 {{ favorite.merchant.city }}
               </p>
               <p class="text-responsive-xs text-neutral-400">Ajouté le {{ formatDate(favorite.addedAt) }}</p>

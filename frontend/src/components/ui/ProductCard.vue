@@ -12,14 +12,14 @@
       >
       <span
         v-if="discount"
-        class="absolute left-4 top-4 rounded-full bg-primary-700 px-3 py-1 text-caption font-semibold text-neutral-50 shadow-card"
+        class="absolute left-4 top-4 rounded-full bg-primary-700 px-4 py-3 text-caption font-semibold text-neutral-50 shadow-card"
       >
         {{ discount }}
       </span>
     </div>
 
     <div class="flex flex-1 flex-col gap-4 p-6">
-      <div class="space-y-1">
+      <div class="space-y-2">
         <h3 class="text-h3 font-semibold text-neutral-900 dark:text-neutral-50">
           {{ name }}
         </h3>
@@ -32,7 +32,7 @@
         <span
           v-for="tag in tags"
           :key="tag"
-          class="rounded-full bg-primary-500/10 px-3 py-1 text-caption text-primary-700 dark:text-primary-200"
+          class="rounded-full bg-primary-500/10 px-4 py-3 text-caption text-primary-700 dark:text-primary-200"
         >
           {{ tag }}
         </span>

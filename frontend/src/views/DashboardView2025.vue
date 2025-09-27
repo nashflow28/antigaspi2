@@ -17,7 +17,7 @@
             </p>
           </div>
           <div class="hidden md:flex items-center gap-4">
-            <Badge variant="success" size="lg" class="text-responsive-sm px-4 py-2">
+            <Badge variant="success" size="lg" class="text-responsive-sm px-4 py-3">
               🌱 {{ userStats.co2Saved }}kg CO₂ économisés
             </Badge>
           </div>
@@ -42,12 +42,12 @@
               </div>
               <p class="text-responsive-sm text-neutral-600 font-medium">Économies totales</p>
               <div class="flex items-center mt-2 text-responsive-xs text-primary-600">
-                <TrendingUp class="w-4 h-4 mr-1" />
+                <TrendingUp class="w-5 h-5 mr-1" />
                 <span>+{{ formatPrice(userStats.monthSavings) }} ce mois</span>
               </div>
             </div>
             <div class="w-16 h-16 bg-gradient-to-br from-primary-100 to-primary-200 rounded-2xl flex items-center justify-center">
-              <DollarSign class="w-8 h-8 text-primary-600" />
+              <DollarSign class="w-10 h-10 text-primary-600" />
             </div>
           </div>
         </Card>
@@ -66,12 +66,12 @@
               </div>
               <p class="text-responsive-sm text-neutral-600 font-medium">Produits sauvés</p>
               <div class="flex items-center mt-2 text-responsive-xs text-primary-600">
-                <Package class="w-4 h-4 mr-1" />
+                <Package class="w-5 h-5 mr-1" />
                 <span>{{ userStats.monthProducts }} ce mois</span>
               </div>
             </div>
             <div class="w-16 h-16 bg-gradient-to-br from-primary-100 to-primary-200 rounded-2xl flex items-center justify-center">
-              <ShoppingBag class="w-8 h-8 text-primary-600" />
+              <ShoppingBag class="w-10 h-10 text-primary-600" />
             </div>
           </div>
         </Card>
@@ -90,12 +90,12 @@
               </div>
               <p class="text-responsive-sm text-neutral-600 font-medium">CO₂ évité</p>
               <div class="flex items-center mt-2 text-responsive-xs text-accent-blue">
-                <Leaf class="w-4 h-4 mr-1" />
+                <Leaf class="w-5 h-5 mr-1" />
                 <span>≈ {{ Math.round(userStats.co2Saved / 2.3) }} km en voiture</span>
               </div>
             </div>
             <div class="w-16 h-16 bg-gradient-to-br from-accent-blue/10 to-accent-blue/20 rounded-2xl flex items-center justify-center">
-              <TreePine class="w-8 h-8 text-accent-blue" />
+              <TreePine class="w-10 h-10 text-accent-blue" />
             </div>
           </div>
         </Card>
@@ -114,12 +114,12 @@
               </div>
               <p class="text-responsive-sm text-neutral-600 font-medium">Réservations actives</p>
               <div class="flex items-center mt-2 text-responsive-xs text-accent-orange">
-                <Clock class="w-4 h-4 mr-1" />
+                <Clock class="w-5 h-5 mr-1" />
                 <span>À récupérer aujourd'hui</span>
               </div>
             </div>
             <div class="w-16 h-16 bg-gradient-to-br from-accent-orange/10 to-accent-orange/20 rounded-2xl flex items-center justify-center">
-              <Calendar class="w-8 h-8 text-accent-orange" />
+              <Calendar class="w-10 h-10 text-accent-orange" />
             </div>
           </div>
         </Card>
@@ -139,13 +139,13 @@
               </div>
               <p class="text-responsive-sm text-neutral-600 font-medium">Mon portefeuille</p>
               <div class="flex items-center mt-2 text-responsive-xs text-indigo-600">
-                <Wallet class="w-4 h-4 mr-1" />
+                <Wallet class="w-5 h-5 mr-1" />
                 <span v-if="walletStore.isActive">Actif</span>
                 <span v-else>Inactif</span>
               </div>
             </div>
             <div class="w-16 h-16 bg-gradient-to-br from-indigo-100 to-indigo-200 rounded-2xl flex items-center justify-center">
-              <Wallet class="w-8 h-8 text-indigo-600" />
+              <Wallet class="w-10 h-10 text-indigo-600" />
             </div>
           </div>
         </Card>
@@ -168,7 +168,7 @@
                 @click="router.push('/reservations')"
               >
                 <span>Voir tout</span>
-                <ArrowRight class="w-4 h-4" />
+                <ArrowRight class="w-5 h-5" />
               </Button>
             </div>
 
@@ -178,7 +178,7 @@
                 <div v-for="i in 3" :key="i" class="flex items-center gap-4 p-4 rounded-xl border border-neutral-200 animate-pulse">
                   <div class="w-16 h-16 bg-neutral-200 rounded-xl" />
                   <div class="flex-1 space-y-2">
-                    <div class="h-4 bg-neutral-200 rounded w-3/4" />
+                    <div class="h-5 bg-neutral-200 rounded w-3/4" />
                     <div class="h-3 bg-neutral-200 rounded w-1/2" />
                   </div>
                 </div>
@@ -186,7 +186,7 @@
 
               <div v-else-if="recentReservations.length === 0" class="text-center py-12">
                 <div class="w-16 h-16 bg-neutral-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <ShoppingBag class="w-8 h-8 text-neutral-400" />
+                  <ShoppingBag class="w-10 h-10 text-neutral-400" />
                 </div>
                 <p class="text-neutral-600 mb-4">Aucune réservation récente</p>
                 <Button variant="primary" size="sm" @click="router.push('/products')">
@@ -198,7 +198,7 @@
                 v-for="reservation in recentReservations"
                 v-else
                 :key="reservation.id"
-                class="flex items-center gap-4 p-4 rounded-xl border border-neutral-200 hover:border-primary-300 hover:shadow-card transition-all duration-200"
+                class="flex items-center gap-4 p-4 rounded-xl border border-neutral-200 hover:border-primary-300 hover:transition-all duration-200"
               >
                 <div class="w-16 h-16 bg-nav-gradient rounded-xl flex items-center justify-center">
                   <span class="text-white font-semibold">{{ reservation.merchant.name[0] }}</span>
@@ -234,7 +234,7 @@
                 @click="router.push('/products')"
               >
                 <span>Voir le catalogue</span>
-                <ArrowRight class="w-4 h-4" />
+                <ArrowRight class="w-5 h-5" />
               </Button>
             </div>
 
@@ -242,15 +242,15 @@
               <div
                 v-for="product in recommendedProducts"
                 :key="product.id"
-                class="p-4 rounded-xl border border-neutral-200 hover:border-primary-300 hover:shadow-card transition-all duration-200 cursor-pointer group"
+                class="p-4 rounded-xl border border-neutral-200 hover:border-primary-300 hover:transition-all duration-200 cursor-pointer active:scale-95 touch-manipulation group"
                 @click="viewProduct(product)"
               >
                 <div class="flex items-center gap-3 mb-3">
                   <div class="w-12 h-12 bg-gradient-to-r from-accent-blue to-accent-blue/90 rounded-xl flex items-center justify-center">
-                    <Package class="w-6 h-6 text-white" />
+                    <Package class="w-10 h-10 text-white" />
                   </div>
                   <div class="flex-1 min-w-0">
-                    <h4 class="font-semibold text-neutral-900 mb-1 group-hover:text-primary-600 transition-colors">
+                    <h4 class="font-semibold text-neutral-900 mb-1 group-hover:transition-colors">
                       {{ product.name }}
                     </h4>
                     <p class="text-responsive-sm text-neutral-600">{{ product.merchant.name }}</p>
@@ -292,8 +292,8 @@
           <Card class="animate-fade-in-up" style="animation-delay: 0.8s;">
             <h3 class="text-responsive-lg font-semibold text-neutral-900 mb-4">Actions rapides</h3>
             <div class="space-y-3">
-              <router-link to="/products" class="flex items-center gap-3 p-3 rounded-xl hover:bg-primary-50 transition-colors group">
-                <div class="w-10 h-10 bg-primary-100 rounded-xl flex items-center justify-center group-hover:bg-primary-200 transition-colors">
+              <router-link to="/products" class="flex items-center gap-3 p-3 rounded-xl hover:transition-colors group">
+                <div class="w-10 h-10 bg-primary-100 rounded-xl flex items-center justify-center group-hover:transition-colors">
                   <Search class="w-5 h-5 text-primary-600" />
                 </div>
                 <div>
@@ -302,8 +302,8 @@
                 </div>
               </router-link>
 
-              <router-link to="/reservations" class="flex items-center gap-3 p-3 rounded-xl hover:bg-accent-blue/5 transition-colors group">
-                <div class="w-10 h-10 bg-accent-blue/10 rounded-xl flex items-center justify-center group-hover:bg-accent-blue/15 transition-colors">
+              <router-link to="/reservations" class="flex items-center gap-3 p-3 rounded-xl hover:transition-colors group">
+                <div class="w-10 h-10 bg-accent-blue/10 rounded-xl flex items-center justify-center group-hover:transition-colors">
                   <Calendar class="w-5 h-5 text-accent-blue" />
                 </div>
                 <div>
@@ -312,8 +312,8 @@
                 </div>
               </router-link>
 
-              <router-link to="/profile" class="flex items-center gap-3 p-3 rounded-xl hover:bg-accent-orange/10 transition-colors group">
-                <div class="w-10 h-10 bg-accent-orange/10 rounded-xl flex items-center justify-center group-hover:bg-accent-orange/20 transition-colors">
+              <router-link to="/profile" class="flex items-center gap-3 p-3 rounded-xl hover:transition-colors group">
+                <div class="w-10 h-10 bg-accent-orange/10 rounded-xl flex items-center justify-center group-hover:transition-colors">
                   <User class="w-5 h-5 text-accent-orange" />
                 </div>
                 <div>
@@ -327,8 +327,8 @@
           <!-- Tips écologiques -->
           <Card class="bg-gradient-to-br from-primary-50 to-primary-100 border-primary-200 animate-fade-in-up" style="animation-delay: 0.9s;">
             <div class="flex items-center gap-3 mb-4">
-              <div class="w-8 h-8 bg-primary-500 rounded-full flex items-center justify-center">
-                <Lightbulb class="w-4 h-4 text-white" />
+              <div class="w-10 h-10 bg-primary-500 rounded-full flex items-center justify-center">
+                <Lightbulb class="w-5 h-5 text-white" />
               </div>
               <h3 class="text-responsive-lg font-semibold text-primary-800">Astuce du jour</h3>
             </div>

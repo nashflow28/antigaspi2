@@ -22,14 +22,14 @@
               >
                 <component
                   :is="icon"
-                  class="w-6 h-6"
+                  class="w-10 h-10"
                   :class="iconClass"
                 />
               </div>
               <h3 class="text-responsive-xl font-semibold text-neutral-900">{{ title }}</h3>
             </div>
             <button
-              class="p-2 hover:bg-neutral-100 rounded-lg transition-colors"
+              class="p-2 hover:transition-colors"
               @click="closeModal"
             >
               <XMarkIcon class="w-5 h-5 text-neutral-400" />
@@ -51,7 +51,7 @@
               >
                 {{ section.title }}
               </h4>
-              <div class="space-y-1">
+              <div class="space-y-2">
                 <!-- SECURITY FIX: Replace unsafe v-html with secure rendering -->
                 <div
                   v-for="(item, itemIndex) in section.items"
@@ -75,14 +75,14 @@
         <div class="px-6 py-4 bg-neutral-50 rounded-b-2xl">
           <div class="flex justify-end gap-3">
             <button
-              class="px-4 py-2 text-neutral-600 hover:text-neutral-800 font-medium transition-colors"
+              class="px-4 py-3 text-neutral-600 hover:transition-colors"
               @click="closeModal"
             >
               Fermer
             </button>
             <button
               v-if="actionButton"
-              class="px-6 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 font-medium transition-colors"
+              class="px-6 py-3 bg-primary-600 text-white rounded-lg hover:transition-colors"
               @click="handleAction"
             >
               {{ actionButton }}

@@ -28,7 +28,7 @@
 
             <select
               v-model="selectedDateRange"
-              class="w-full rounded-lg border border-neutral-300 bg-white px-4 py-2.5 text-responsive-sm text-neutral-700 shadow-sm transition focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500"
+              class="w-full rounded-lg border border-neutral-300 bg-white px-4 py-3.5 text-responsive-sm text-neutral-700 shadow-sm transition focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500"
             >
               <option value="today">Aujourd'hui</option>
               <option value="week">Cette semaine</option>
@@ -42,7 +42,7 @@
               :disabled="filteredReservations.length === 0"
               @click="exportReservations"
             >
-              <ArrowDownTrayIcon class="h-4 w-4" />
+              <ArrowDownTrayIcon class="h-5 w-5" />
               Exporter
             </Button>
           </div>
@@ -64,7 +64,7 @@
                 <p class="text-responsive-xl font-semibold">{{ stat.value }}</p>
               </div>
               <div class="rounded-xl bg-white/20 p-3">
-                <component :is="stat.icon" class="h-6 w-6" />
+                <component :is="stat.icon" class="h-10 w-10" />
               </div>
             </div>
           </Card>
@@ -101,7 +101,7 @@
           <div class="flex items-center gap-4">
             <select
               v-model="sortBy"
-              class="w-full rounded-lg border border-neutral-300 bg-white px-4 py-2.5 text-responsive-sm text-neutral-700 shadow-sm transition focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500"
+              class="w-full rounded-lg border border-neutral-300 bg-white px-4 py-3.5 text-responsive-sm text-neutral-700 shadow-sm transition focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500"
             >
               <option value="created_at">Plus récent</option>
               <option value="pickup_date">Date de récupération</option>
@@ -168,7 +168,7 @@
                   <!-- Customer Info -->
                   <div class="mb-3">
                     <div class="flex items-center gap-2 text-neutral-600 text-responsive-sm">
-                      <UserIcon class="w-4 h-4" />
+                      <UserIcon class="w-5 h-5" />
                       <span class="font-medium">{{ reservation.consumer.name }}</span>
                       <span>•</span>
                       <span>{{ reservation.consumer.phone }}</span>
@@ -214,7 +214,7 @@
                       class="flex-1 gap-2 border-emerald-500 bg-emerald-500 text-white hover:border-emerald-600 hover:bg-emerald-600"
                       @click="updateReservationStatus(reservation, 'confirmed')"
                     >
-                      <CheckIcon class="h-4 w-4" />
+                      <CheckIcon class="h-5 w-5" />
                       Confirmer
                     </Button>
                   </template>
@@ -226,7 +226,7 @@
                       class="flex-1 gap-2 border-accent-blue bg-accent-blue text-white hover:border-accent-blue/90 hover:bg-accent-blue/90"
                       @click="markAsReady(reservation)"
                     >
-                      <BellIcon class="h-4 w-4" />
+                      <BellIcon class="h-5 w-5" />
                       Marquer prêt
                     </Button>
                   </template>
@@ -238,7 +238,7 @@
                       class="flex-1 gap-2 border-emerald-500 bg-emerald-500 text-white hover:border-emerald-600 hover:bg-emerald-600"
                       @click="updateReservationStatus(reservation, 'completed')"
                     >
-                      <CheckCircleIcon class="h-4 w-4" />
+                      <CheckCircleIcon class="h-5 w-5" />
                       Marquer récupérée
                     </Button>
                   </template>
@@ -250,7 +250,7 @@
                       class="flex-1 gap-2"
                       @click="contactCustomer(reservation)"
                     >
-                      <PhoneIcon class="h-4 w-4" />
+                      <PhoneIcon class="h-5 w-5" />
                       Contacter
                     </Button>
                   </template>
@@ -264,37 +264,37 @@
                       :class="{ 'bg-neutral-100': openDropdown === reservation.id }"
                       @click="toggleDropdown(reservation.id)"
                     >
-                      <EllipsisVerticalIcon class="h-4 w-4" />
+                      <EllipsisVerticalIcon class="h-5 w-5" />
                     </Button>
 
                     <!-- Dropdown menu -->
                     <div
                       v-if="openDropdown === reservation.id"
-                      class="absolute right-0 top-full mt-1 bg-white border border-neutral-200 rounded-lg shadow-lg py-1 z-10 min-w-[160px]"
+                      class="absolute right-0 top-full mt-1 bg-white border border-neutral-200 rounded-lg shadow-lg py-3 z-10 min-w-[160px]"
                     >
                       <button
-                        class="w-full px-3 py-2 text-left text-responsive-sm hover:bg-neutral-50 flex items-center gap-2"
+                        class="w-full px-4 py-3 text-left text-responsive-sm hover:bg-neutral-50 flex items-center gap-2"
                         @click="viewReservationDetails(reservation); closeDropdown()"
                       >
-                        <EyeIcon class="w-4 h-4" />
+                        <EyeIcon class="w-5 h-5" />
                         Voir détails
                       </button>
 
                       <button
-                        class="w-full px-3 py-2 text-left text-responsive-sm hover:bg-neutral-50 flex items-center gap-2"
+                        class="w-full px-4 py-3 text-left text-responsive-sm hover:bg-neutral-50 flex items-center gap-2"
                         @click="contactCustomer(reservation); closeDropdown()"
                       >
-                        <PhoneIcon class="w-4 h-4" />
+                        <PhoneIcon class="w-5 h-5" />
                         Contacter client
                       </button>
 
                       <template v-if="reservation.status === 'pending'">
                         <hr class="my-1 border-neutral-200">
                         <button
-                          class="w-full px-3 py-2 text-left text-responsive-sm hover:bg-red-50 text-red-600 flex items-center gap-2"
+                          class="w-full px-4 py-3 text-left text-responsive-sm hover:bg-red-50 text-red-600 flex items-center gap-2"
                           @click="updateReservationStatus(reservation, 'cancelled'); closeDropdown()"
                         >
-                          <XMarkIcon class="w-4 h-4" />
+                          <XMarkIcon class="w-5 h-5" />
                           Annuler
                         </button>
                       </template>
@@ -302,20 +302,20 @@
                       <template v-if="reservation.status === 'confirmed'">
                         <hr class="my-1 border-neutral-200">
                         <button
-                          class="w-full px-3 py-2 text-left text-responsive-sm hover:bg-green-50 text-green-600 flex items-center gap-2"
+                          class="w-full px-4 py-3 text-left text-responsive-sm hover:bg-green-50 text-green-600 flex items-center gap-2"
                           @click="updateReservationStatus(reservation, 'completed'); closeDropdown()"
                         >
-                          <CheckCircleIcon class="w-4 h-4" />
+                          <CheckCircleIcon class="w-5 h-5" />
                           Marquer récupérée
                         </button>
                       </template>
 
                       <hr class="my-1 border-neutral-200">
                       <button
-                        class="w-full px-3 py-2 text-left text-responsive-sm hover:bg-neutral-50 flex items-center gap-2"
+                        class="w-full px-4 py-3 text-left text-responsive-sm hover:bg-neutral-50 flex items-center gap-2"
                         @click="exportSingleReservation(reservation); closeDropdown()"
                       >
-                        <ArrowDownTrayIcon class="w-4 h-4" />
+                        <ArrowDownTrayIcon class="w-5 h-5" />
                         Exporter
                       </button>
                     </div>

@@ -24,7 +24,7 @@
         </slot>
       </a>
 
-      <div class="hidden items-center gap-1 lg:flex" role="menubar">
+      <div class="hidden items-center gap-2 lg:flex" role="menubar">
         <template v-for="item in items" :key="item.label">
           <Motion
             tag="a"
@@ -38,7 +38,7 @@
             :aria-current="item.active ? 'page' : undefined"
             @click.prevent="emit('item-click', item)"
           >
-            <component :is="item.icon" v-if="item.icon" class="h-4 w-4" />
+            <component :is="item.icon" v-if="item.icon" class="h-5 w-5" />
             <span>{{ item.label }}</span>
             <Transition name="indicator">
               <span
@@ -71,7 +71,7 @@
           @click="toggleMenu"
         >
           <svg
-            class="h-6 w-6"
+            class="h-10 w-10"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"

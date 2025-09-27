@@ -20,7 +20,7 @@
               class="button-outline-2025 text-responsive-sm"
               @click="refreshPoints"
             >
-              <RefreshCw class="w-4 h-4" :class="{ 'animate-spin': loading }" />
+              <RefreshCw class="w-5 h-5" :class="{ 'animate-spin': loading }" />
               Actualiser
             </button>
           </div>
@@ -43,7 +43,7 @@
                   </p>
                 </div>
                 <div class="p-3 bg-primary-100 rounded-xl">
-                  <Star class="w-8 h-8 text-primary-600" />
+                  <Star class="w-10 h-10 text-primary-600" />
                 </div>
               </div>
             </Card>
@@ -59,13 +59,13 @@
                   <p class="text-responsive-xs text-neutral-500">Dans 30 jours</p>
                 </div>
                 <div class="p-3 bg-accent-orange/15 rounded-xl">
-                  <Clock class="w-8 h-8 text-accent-orange" />
+                  <Clock class="w-10 h-10 text-accent-orange" />
                 </div>
               </div>
             </Card>
 
             <!-- Available Rewards -->
-            <Card class="cursor-pointer hover:shadow-modern-2025 transition-all duration-200" @click="scrollToRewards">
+            <Card class="cursor-pointer hover:transition-all duration-200" @click="scrollToRewards">
               <div class="flex items-center justify-between">
                 <div>
                   <p class="text-responsive-sm font-medium text-neutral-600">Récompenses</p>
@@ -75,7 +75,7 @@
                   <p class="text-responsive-xs text-neutral-500">Disponibles</p>
                 </div>
                 <div class="p-3 bg-accent-blue/10 rounded-xl">
-                  <Gift class="w-8 h-8 text-accent-blue" />
+                  <Gift class="w-10 h-10 text-accent-blue" />
                 </div>
               </div>
             </Card>
@@ -88,7 +88,7 @@
             <div class="flex items-center justify-between mb-6">
               <h3 class="text-responsive-xl font-semibold text-neutral-900">Répartition des Points</h3>
               <div class="flex items-center gap-2 text-responsive-sm text-neutral-600">
-                <TrendingUp class="w-4 h-4" />
+                <TrendingUp class="w-5 h-5" />
                 Par catégorie
               </div>
             </div>
@@ -134,7 +134,7 @@
                 class="flex items-center gap-3 p-3 bg-neutral-50 rounded-lg"
               >
                 <div :class="getPointTypeColor(activity.earned_from)" class="p-2 bg-white rounded-lg flex-shrink-0">
-                  <component :is="getPointTypeIcon(activity.earned_from)" class="w-4 h-4" />
+                  <component :is="getPointTypeIcon(activity.earned_from)" class="w-5 h-5" />
                 </div>
                 <div class="flex-1 min-w-0">
                   <p class="text-responsive-sm font-medium text-neutral-900 truncate">{{ activity.description }}</p>
@@ -161,7 +161,7 @@
             <div class="flex items-center justify-between mb-6">
               <h3 class="text-responsive-xl font-semibold text-neutral-900">Récompenses Disponibles</h3>
               <div class="flex items-center gap-2 text-responsive-sm text-neutral-600">
-                <Gift class="w-4 h-4" />
+                <Gift class="w-5 h-5" />
                 {{ availableRewards.length }} disponible(s)
               </div>
             </div>
@@ -170,12 +170,12 @@
               <div
                 v-for="reward in availableRewards"
                 :key="reward.id"
-                class="border border-neutral-200 rounded-xl p-6 hover:shadow-modern-2025 transition-all duration-200"
+                class="border border-neutral-200 rounded-xl p-6 hover:transition-all duration-200"
                 :class="canRedeem(reward.cost) ? 'bg-white hover:border-primary-300' : 'bg-neutral-50'"
               >
                 <div class="flex items-center gap-3 mb-4">
                   <div class="p-3 bg-nav-gradient rounded-xl">
-                    <component :is="reward.icon" class="w-6 h-6 text-white" />
+                    <component :is="reward.icon" class="w-10 h-10 text-white" />
                   </div>
                   <div>
                     <h4 class="font-semibold text-neutral-900">{{ reward.title }}</h4>
@@ -209,7 +209,7 @@
           <div class="px-6 py-4 border-b border-neutral-200">
             <div class="flex items-center justify-between">
               <h3 class="text-responsive-lg font-semibold text-neutral-900">Confirmer l'échange</h3>
-              <button class="p-2 hover:bg-neutral-100 rounded-lg transition-colors" @click="closeRedeemModal">
+              <button class="p-2 hover:transition-colors" @click="closeRedeemModal">
                 <X class="w-5 h-5 text-neutral-400" />
               </button>
             </div>
@@ -218,7 +218,7 @@
           <div class="px-6 py-6">
             <div class="text-center mb-6">
               <div class="p-4 bg-nav-gradient rounded-xl inline-block mb-4">
-                <component :is="selectedReward.icon" class="w-8 h-8 text-white" />
+                <component :is="selectedReward.icon" class="w-10 h-10 text-white" />
               </div>
               <h4 class="text-responsive-xl font-semibold text-neutral-900 mb-2">{{ selectedReward.title }}</h4>
               <p class="text-neutral-600">{{ selectedReward.description }}</p>
@@ -244,7 +244,7 @@
                 class="flex-1 button-primary-2025"
                 @click="confirmRedeem"
               >
-                <Loader2 v-if="redeeming" class="w-4 h-4 mr-2 animate-spin" />
+                <Loader2 v-if="redeeming" class="w-5 h-5 mr-2 animate-spin" />
                 {{ redeeming ? 'Échange...' : 'Confirmer' }}
               </button>
             </div>

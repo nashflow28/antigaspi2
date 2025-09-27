@@ -14,7 +14,7 @@
         <div class="mt-2 text-responsive-sm text-red-700">
           <ul
             v-if="Array.isArray(errors)"
-            class="list-disc space-y-1 pl-5"
+            class="list-disc space-y-2 pl-5"
           >
             <li v-for="(error, index) in errors" :key="index">
               {{ error }}
@@ -24,7 +24,7 @@
             {{ errors }}
           </p>
           <div v-else-if="errors && typeof errors === 'object'">
-            <ul class="list-disc space-y-1 pl-5">
+            <ul class="list-disc space-y-2 pl-5">
               <li
                 v-for="(fieldErrors, field) in errors"
                 :key="field"
@@ -47,7 +47,7 @@
           <button
             v-if="allowDismiss"
             type="button"
-            class="rounded-md bg-red-100 px-3 py-1 text-responsive-sm font-medium text-red-800 hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+            class="rounded-md bg-red-100 px-4 py-3 text-responsive-sm font-medium text-red-800 hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
             @click="dismissErrors"
           >
             Masquer
@@ -55,7 +55,7 @@
           <button
             v-if="allowRetry"
             type="button"
-            class="rounded-md bg-red-600 px-3 py-1 text-responsive-sm font-medium text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+            class="rounded-md bg-red-600 px-4 py-3 text-responsive-sm font-medium text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
             @click="retryAction"
           >
             Réessayer

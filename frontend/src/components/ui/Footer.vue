@@ -5,7 +5,7 @@
         tag="div"
         :initial="{ opacity: 0, y: 12 }"
         :enter="{ opacity: 1, y: 0, transition: { duration: 0.5 } }"
-        class="space-y-1"
+        class="space-y-2"
       >
         <slot name="brand" :year="currentYear">
           <p class="text-h3 font-semibold tracking-tight">{{ brandName }}</p>

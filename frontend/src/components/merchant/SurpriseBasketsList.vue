@@ -7,10 +7,10 @@
         <p class="text-neutral-600 mt-1">Gérez vos paniers surprise et maximisez vos ventes</p>
       </div>
       <button
-        class="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
+        class="px-4 py-3 bg-primary-600 text-white rounded-lg hover:transition-colors"
         @click="$emit('create')"
       >
-        <Plus class="w-4 h-4 inline mr-2" />
+        <Plus class="w-5 h-5 inline mr-2" />
         Nouveau panier
       </button>
     </div>
@@ -20,7 +20,7 @@
       <div class="bg-white rounded-xl border border-neutral-200 p-6">
         <div class="flex items-center">
           <div class="p-3 bg-primary-100 rounded-lg">
-            <Package class="w-6 h-6 text-primary-600" />
+            <Package class="w-10 h-10 text-primary-600" />
           </div>
           <div class="ml-4">
             <p class="text-responsive-sm font-medium text-neutral-600">Total</p>
@@ -32,7 +32,7 @@
       <div class="bg-white rounded-xl border border-neutral-200 p-6">
         <div class="flex items-center">
           <div class="p-3 bg-green-100 rounded-lg">
-            <CheckCircle class="w-6 h-6 text-green-600" />
+            <CheckCircle class="w-10 h-10 text-green-600" />
           </div>
           <div class="ml-4">
             <p class="text-responsive-sm font-medium text-neutral-600">Actifs</p>
@@ -44,7 +44,7 @@
       <div class="bg-white rounded-xl border border-neutral-200 p-6">
         <div class="flex items-center">
           <div class="p-3 bg-blue-100 rounded-lg">
-            <DollarSign class="w-6 h-6 text-blue-600" />
+            <DollarSign class="w-10 h-10 text-blue-600" />
           </div>
           <div class="ml-4">
             <p class="text-responsive-sm font-medium text-neutral-600">Revenus potentiels</p>
@@ -56,7 +56,7 @@
       <div class="bg-white rounded-xl border border-neutral-200 p-6">
         <div class="flex items-center">
           <div class="p-3 bg-orange-100 rounded-lg">
-            <TrendingUp class="w-6 h-6 text-orange-600" />
+            <TrendingUp class="w-10 h-10 text-orange-600" />
           </div>
           <div class="ml-4">
             <p class="text-responsive-sm font-medium text-neutral-600">Économies clients</p>
@@ -68,7 +68,7 @@
 
     <!-- Loading State -->
     <div v-if="loading" class="bg-white rounded-xl border border-neutral-200 p-8 text-center">
-      <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600 mx-auto mb-4" />
+      <div class="animate-spin rounded-full h-10 w-10 border-b-2 border-primary-600 mx-auto mb-4" />
       <p class="text-neutral-600">Chargement de vos paniers surprise...</p>
     </div>
 
@@ -80,10 +80,10 @@
         Créez votre premier panier surprise pour valoriser vos invendus et attirer de nouveaux clients
       </p>
       <button
-        class="px-6 py-3 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
+        class="px-6 py-3 bg-primary-600 text-white rounded-lg hover:transition-colors"
         @click="$emit('create')"
       >
-        <Plus class="w-4 h-4 inline mr-2" />
+        <Plus class="w-5 h-5 inline mr-2" />
         Créer mon premier panier
       </button>
     </div>
@@ -93,7 +93,7 @@
       <div
         v-for="basket in merchantBaskets"
         :key="basket.id"
-        class="bg-white rounded-xl border border-neutral-200 hover:shadow-lg transition-all duration-200 overflow-hidden"
+        class="bg-white rounded-xl border border-neutral-200 hover:transition-all duration-200 overflow-hidden"
       >
         <!-- Image -->
         <div class="relative h-48 bg-neutral-100">
@@ -110,7 +110,7 @@
           <!-- Status Badge -->
           <div class="absolute top-3 left-3">
             <span
-              class="px-2 py-1 text-responsive-xs font-medium rounded-full"
+              class="px-4 py-3 text-responsive-xs font-medium rounded-full"
               :class="basket.is_active
                 ? 'bg-green-100 text-green-800'
                 : 'bg-red-100 text-red-800'"
@@ -121,7 +121,7 @@
 
           <!-- Quantity Badge -->
           <div class="absolute top-3 right-3">
-            <span class="px-2 py-1 text-responsive-xs font-medium bg-primary-100 text-primary-800 rounded-full">
+            <span class="px-4 py-3 text-responsive-xs font-medium bg-primary-100 text-primary-800 rounded-full">
               {{ basket.quantity_available }} disponible(s)
             </span>
           </div>
@@ -133,44 +133,44 @@
             <h3 class="text-responsive-lg font-semibold text-neutral-900 line-clamp-1">{{ basket.name }}</h3>
             <div class="relative">
               <button
-                class="p-1 hover:bg-neutral-100 rounded-lg transition-colors"
+                class="p-1 hover:transition-colors"
                 @click="toggleDropdown(basket.id)"
               >
-                <MoreVertical class="w-4 h-4 text-neutral-500" />
+                <MoreVertical class="w-5 h-5 text-neutral-500" />
               </button>
 
               <!-- Dropdown Menu -->
               <div
                 v-if="openDropdown === basket.id"
-                class="absolute right-0 top-full mt-1 bg-white border border-neutral-200 rounded-lg shadow-lg z-10 py-1 w-48"
+                class="absolute right-0 top-full mt-1 bg-white border border-neutral-200 rounded-lg shadow-lg z-10 py-3 w-48"
               >
                 <button
-                  class="w-full px-4 py-2 text-left text-responsive-sm text-neutral-700 hover:bg-neutral-50 flex items-center"
+                  class="w-full px-4 py-3 text-left text-responsive-sm text-neutral-700 hover:bg-neutral-50 flex items-center"
                   @click="editBasket(basket)"
                 >
-                  <Edit class="w-4 h-4 mr-2" />
+                  <Edit class="w-5 h-5 mr-2" />
                   Modifier
                 </button>
                 <button
-                  class="w-full px-4 py-2 text-left text-responsive-sm text-neutral-700 hover:bg-neutral-50 flex items-center"
+                  class="w-full px-4 py-3 text-left text-responsive-sm text-neutral-700 hover:bg-neutral-50 flex items-center"
                   @click="toggleBasketStatus(basket)"
                 >
-                  <component :is="basket.is_active ? EyeOff : Eye" class="w-4 h-4 mr-2" />
+                  <component :is="basket.is_active ? EyeOff : Eye" class="w-5 h-5 mr-2" />
                   {{ basket.is_active ? 'Désactiver' : 'Activer' }}
                 </button>
                 <button
-                  class="w-full px-4 py-2 text-left text-responsive-sm text-neutral-700 hover:bg-neutral-50 flex items-center"
+                  class="w-full px-4 py-3 text-left text-responsive-sm text-neutral-700 hover:bg-neutral-50 flex items-center"
                   @click="viewBasket(basket)"
                 >
-                  <Eye class="w-4 h-4 mr-2" />
+                  <Eye class="w-5 h-5 mr-2" />
                   Voir les détails
                 </button>
                 <hr class="my-1">
                 <button
-                  class="w-full px-4 py-2 text-left text-responsive-sm text-red-600 hover:bg-red-50 flex items-center"
+                  class="w-full px-4 py-3 text-left text-responsive-sm text-red-600 hover:bg-red-50 flex items-center"
                   @click="confirmDelete(basket)"
                 >
-                  <Trash2 class="w-4 h-4 mr-2" />
+                  <Trash2 class="w-5 h-5 mr-2" />
                   Supprimer
                 </button>
               </div>
@@ -204,7 +204,7 @@
 
           <!-- Category -->
           <div v-if="basket.category" class="mb-4">
-            <span class="inline-flex items-center px-2 py-1 text-responsive-xs font-medium bg-neutral-100 text-neutral-800 rounded-full">
+            <span class="inline-flex items-center px-4 py-3 text-responsive-xs font-medium bg-neutral-100 text-neutral-800 rounded-full">
               {{ basket.category.name }}
             </span>
           </div>
@@ -212,13 +212,13 @@
           <!-- Actions -->
           <div class="flex items-center space-x-2">
             <button
-              class="flex-1 px-3 py-2 text-responsive-sm font-medium text-neutral-700 bg-neutral-100 hover:bg-neutral-200 rounded-lg transition-colors"
+              class="flex-1 px-4 py-3 text-responsive-sm font-medium text-neutral-700 bg-neutral-100 hover:transition-colors"
               @click="editBasket(basket)"
             >
               Modifier
             </button>
             <button
-              class="flex-1 px-3 py-2 text-responsive-sm font-medium text-white bg-primary-600 hover:bg-primary-700 rounded-lg transition-colors"
+              class="flex-1 px-4 py-3 text-responsive-sm font-medium text-white bg-primary-600 hover:transition-colors"
               @click="viewBasket(basket)"
             >
               Détails

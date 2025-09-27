@@ -4,7 +4,7 @@
       <div class="absolute inset-0 bg-emerald-500/10" />
       <div class="relative mx-auto flex max-w-6xl flex-col gap-12 px-6 py-16 md:flex-row md:items-center md:py-20">
         <div class="md:w-1/2">
-          <span class="inline-flex items-center rounded-full bg-emerald-100 px-3 py-1 text-responsive-sm font-medium text-emerald-700">
+          <span class="inline-flex items-center rounded-full bg-emerald-100 px-4 py-3 text-responsive-sm font-medium text-emerald-700">
             🌍 Anti-gaspillage alimentaire
           </span>
           <h1 class="mt-6 text-display-sm font-semibold leading-relaxed md:text-display-md">
@@ -36,7 +36,7 @@
                 <p class="text-responsive-sm font-semibold text-slate-700">Boulangerie du Marché</p>
                 <p class="text-responsive-xs text-slate-500">Panier surprise du soir</p>
               </div>
-              <span class="ml-auto rounded-full bg-emerald-100 px-2 py-1 text-responsive-xs font-semibold text-emerald-700">-65%</span>
+              <span class="ml-auto rounded-full bg-emerald-100 px-4 py-3 text-responsive-xs font-semibold text-emerald-700">-65%</span>
             </div>
             <ul class="mt-6 space-y-4 text-responsive-sm text-slate-600">
               <li class="flex items-center justify-between rounded-xl bg-slate-50 p-3">
@@ -96,19 +96,19 @@
           <h2 class="text-responsive-xl font-semibold">Fonctionnalités phares</h2>
           <ul class="mt-6 space-y-4 text-responsive-sm text-slate-600">
             <li class="flex items-start gap-3">
-              <span class="mt-1 inline-flex h-6 w-6 items-center justify-center rounded-full bg-emerald-500 text-responsive-xs font-semibold text-white">UX</span>
+              <span class="mt-1 inline-flex h-10 w-10 items-center justify-center rounded-full bg-emerald-500 text-responsive-xs font-semibold text-white">UX</span>
               <p>
                 Tableau de bord personnalisé, modules de recommandation et suivi des réservations avec une interface inspirée des applications grand public.
               </p>
             </li>
             <li class="flex items-start gap-3">
-              <span class="mt-1 inline-flex h-6 w-6 items-center justify-center rounded-full bg-emerald-500 text-responsive-xs font-semibold text-white">UI</span>
+              <span class="mt-1 inline-flex h-10 w-10 items-center justify-center rounded-full bg-emerald-500 text-responsive-xs font-semibold text-white">UI</span>
               <p>
                 Couleurs chaleureuses, typographies lisibles et composants soignés rappelant l'univers de Gaspiz tout en conservant l'identité Antigaspi.
               </p>
             </li>
             <li class="flex items-start gap-3">
-              <span class="mt-1 inline-flex h-6 w-6 items-center justify-center rounded-full bg-emerald-500 text-responsive-xs font-semibold text-white">Data</span>
+              <span class="mt-1 inline-flex h-10 w-10 items-center justify-center rounded-full bg-emerald-500 text-responsive-xs font-semibold text-white">Data</span>
               <p>
                 Indicateurs d'impact en temps réel, historique des économies réalisées et objectifs mensuels pour encourager la fidélité.
               </p>

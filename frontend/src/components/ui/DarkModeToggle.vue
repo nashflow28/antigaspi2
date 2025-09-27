@@ -20,7 +20,7 @@
     >
       <Sun
         v-show="!isDark"
-        class="w-5 h-5 text-amber-500 group-hover:scale-110 transition-transform duration-300"
+        class="w-5 h-5 text-amber-500 group-hover:transition-transform duration-300"
       />
     </Transition>
 
@@ -35,13 +35,13 @@
     >
       <Moon
         v-show="isDark"
-        class="w-5 h-5 text-indigo-400 group-hover:scale-110 transition-transform duration-300"
+        class="w-5 h-5 text-indigo-400 group-hover:transition-transform duration-300"
       />
     </Transition>
 
     <!-- Hover glow effect -->
     <div
-      class="absolute inset-0 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"
+      class="absolute inset-0 rounded-xl opacity-0 group-hover:transition-opacity duration-300 pointer-events-none"
       :class="[
         isDark
           ? 'bg-gradient-to-r from-indigo-500/20 to-purple-500/20'

@@ -49,7 +49,7 @@
                 </p>
               </div>
               <div class="p-3 bg-white/20 rounded-xl">
-                <UsersIcon class="w-8 h-8" />
+                <UsersIcon class="w-10 h-10" />
               </div>
             </div>
           </Card>
@@ -64,7 +64,7 @@
                 </p>
               </div>
               <div class="p-3 bg-white/20 rounded-xl">
-                <BuildingStorefrontIcon class="w-8 h-8" />
+                <BuildingStorefrontIcon class="w-10 h-10" />
               </div>
             </div>
           </Card>
@@ -79,7 +79,7 @@
                 </p>
               </div>
               <div class="p-3 bg-white/20 rounded-xl">
-                <ShoppingBagIcon class="w-8 h-8" />
+                <ShoppingBagIcon class="w-10 h-10" />
               </div>
             </div>
           </Card>
@@ -123,10 +123,10 @@
           <div class="flex items-center justify-between mb-6">
             <h3 class="text-responsive-xl font-semibold text-neutral-900">Croissance des utilisateurs</h3>
             <div class="flex gap-2">
-              <span class="px-3 py-1 bg-primary-100 text-primary-700 rounded-full text-responsive-sm">
+              <span class="px-4 py-3 bg-primary-100 text-primary-700 rounded-full text-responsive-sm">
                 Consommateurs
               </span>
-              <span class="px-3 py-1 bg-primary-100 text-primary-700 rounded-full text-responsive-sm">
+              <span class="px-4 py-3 bg-primary-100 text-primary-700 rounded-full text-responsive-sm">
                 Commerçants
               </span>
             </div>
@@ -144,7 +144,7 @@
           <div class="flex items-center justify-between mb-6">
             <h3 class="text-responsive-xl font-semibold text-neutral-900">Activité récente</h3>
             <button
-              class="text-primary-600 text-responsive-sm hover:text-primary-700 transition-colors"
+              class="text-primary-600 text-responsive-sm hover:transition-colors"
               @click="viewAllActivities"
             >
               Voir tout
@@ -155,7 +155,7 @@
             <div
               v-for="activity in recentActivities"
               :key="activity.id"
-              class="flex items-center gap-4 p-4 bg-neutral-50 rounded-lg hover:bg-neutral-100 transition-colors"
+              class="flex items-center gap-4 p-4 bg-neutral-50 rounded-lg hover:transition-colors"
             >
               <div class="flex-shrink-0">
                 <div
@@ -175,7 +175,7 @@
               <div class="flex-shrink-0">
                 <span
                   :class="getActivityStatusClass(activity.status)"
-                  class="px-2 py-1 rounded-full text-responsive-xs font-medium"
+                  class="px-4 py-3 rounded-full text-responsive-xs font-medium"
                 >
                   {{ activity.status }}
                 </span>
@@ -197,12 +197,12 @@
               <div class="flex items-center gap-3">
                 <div
                   :class="service.status === 'healthy' ? 'bg-primary-100' : 'bg-accent-red/15'"
-                  class="w-8 h-8 rounded-full flex items-center justify-center"
+                  class="w-10 h-10 rounded-full flex items-center justify-center"
                 >
                   <component
                     :is="service.status === 'healthy' ? CheckCircleIcon : ExclamationTriangleIcon"
                     :class="service.status === 'healthy' ? 'text-primary-600' : 'text-accent-red'"
-                    class="w-4 h-4"
+                    class="w-5 h-5"
                   />
                 </div>
                 <div>
@@ -269,7 +269,7 @@
         <Card>
           <div class="flex items-center gap-3 mb-4">
             <div class="p-2 bg-green-100 rounded-lg">
-              <GlobeEuropeAfricaIcon class="w-6 h-6 text-green-600" />
+              <GlobeEuropeAfricaIcon class="w-10 h-10 text-green-600" />
             </div>
             <h3 class="text-responsive-lg font-semibold text-neutral-900">Impact Environnemental</h3>
           </div>
@@ -307,7 +307,7 @@
               class="flex items-center gap-3 p-3 bg-neutral-50 rounded-lg"
             >
               <div class="flex-shrink-0">
-                <div class="w-8 h-8 bg-primary-100 text-primary-600 rounded-full flex items-center justify-center font-semibold text-responsive-sm">
+                <div class="w-10 h-10 bg-primary-100 text-primary-600 rounded-full flex items-center justify-center font-semibold text-responsive-sm">
                   {{ index + 1 }}
                 </div>
               </div>
@@ -378,7 +378,7 @@
               class="text-current opacity-60 hover:opacity-100 flex-shrink-0"
               @click="dismissAlert(alert.id)"
             >
-              <XMarkIcon class="w-4 h-4" />
+              <XMarkIcon class="w-5 h-5" />
             </button>
           </div>
         </div>

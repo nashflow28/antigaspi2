@@ -56,7 +56,7 @@
               <span class="relative z-10 flex items-center gap-3">
                 🌟 Découvrir les offres
               </span>
-              <div class="absolute inset-0 bg-nav-gradient opacity-0 group-hover:opacity-10 transition-opacity duration-300" />
+              <div class="absolute inset-0 bg-nav-gradient opacity-0 group-hover:transition-opacity duration-300" />
             </Button>
 
             <Button
@@ -150,18 +150,18 @@
           >
             <div class="relative">
               <!-- Icon avec gradient et animation -->
-              <div class="w-20 h-20 bg-nav-gradient rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-modern-2025 group-hover:shadow-modern-2025 group-hover:scale-110 transition-all duration-300">
+              <div class="w-20 h-20 bg-nav-gradient rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-modern-2025 group-hover:shadow-modern-2025 group-hover:transition-all duration-300">
                 <span class="text-responsive-xl">🔍</span>
               </div>
 
               <!-- Step number -->
-              <div class="absolute -top-4 -right-4 w-8 h-8 bg-accent-orange text-white rounded-full flex items-center justify-center text-responsive-sm font-semibold shadow-modern-2025">
+              <div class="absolute -top-4 -right-4 w-10 h-10 bg-accent-orange text-white rounded-full flex items-center justify-center text-responsive-sm font-semibold shadow-modern-2025">
                 1
               </div>
             </div>
 
             <div class="text-center">
-              <h3 class="text-responsive-xl font-semibold text-neutral-900 mb-4 group-hover:text-primary-600 transition-colors font-heading">
+              <h3 class="text-responsive-xl font-semibold text-neutral-900 mb-4 group-hover:transition-colors font-heading">
                 Découvrez
               </h3>
               <p class="text-neutral-600 leading-relaxed mb-6">
@@ -190,17 +190,17 @@
             style="animation-delay: 0.4s;"
           >
             <div class="relative">
-              <div class="w-20 h-20 bg-gradient-to-r from-accent-blue to-accent-blue/90 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-modern-2025 group-hover:shadow-modern-2025 group-hover:scale-110 transition-all duration-300">
+              <div class="w-20 h-20 bg-gradient-to-r from-accent-blue to-accent-blue/90 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-modern-2025 group-hover:shadow-modern-2025 group-hover:transition-all duration-300">
                 <span class="text-responsive-xl">⚡</span>
               </div>
 
-              <div class="absolute -top-4 -right-4 w-8 h-8 bg-accent-orange text-white rounded-full flex items-center justify-center text-responsive-sm font-semibold shadow-modern-2025">
+              <div class="absolute -top-4 -right-4 w-10 h-10 bg-accent-orange text-white rounded-full flex items-center justify-center text-responsive-sm font-semibold shadow-modern-2025">
                 2
               </div>
             </div>
 
             <div class="text-center">
-              <h3 class="text-responsive-xl font-semibold text-neutral-900 mb-4 group-hover:text-accent-blue transition-colors font-heading">
+              <h3 class="text-responsive-xl font-semibold text-neutral-900 mb-4 group-hover:transition-colors font-heading">
                 Réservez
               </h3>
               <p class="text-neutral-600 leading-relaxed mb-6">
@@ -228,17 +228,17 @@
             style="animation-delay: 0.6s;"
           >
             <div class="relative">
-              <div class="w-20 h-20 bg-gradient-to-r from-accent-orange to-accent-orange/90 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-modern-2025 group-hover:shadow-modern-2025 group-hover:scale-110 transition-all duration-300">
+              <div class="w-20 h-20 bg-gradient-to-r from-accent-orange to-accent-orange/90 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-modern-2025 group-hover:shadow-modern-2025 group-hover:transition-all duration-300">
                 <span class="text-responsive-xl">🌱</span>
               </div>
 
-              <div class="absolute -top-4 -right-4 w-8 h-8 bg-accent-orange text-white rounded-full flex items-center justify-center text-responsive-sm font-semibold shadow-modern-2025">
+              <div class="absolute -top-4 -right-4 w-10 h-10 bg-accent-orange text-white rounded-full flex items-center justify-center text-responsive-sm font-semibold shadow-modern-2025">
                 3
               </div>
             </div>
 
             <div class="text-center">
-              <h3 class="text-responsive-xl font-semibold text-neutral-900 mb-4 group-hover:text-accent-orange transition-colors font-heading">
+              <h3 class="text-responsive-xl font-semibold text-neutral-900 mb-4 group-hover:transition-colors font-heading">
                 Sauvez
               </h3>
               <p class="text-neutral-600 leading-relaxed mb-6">

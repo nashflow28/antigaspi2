@@ -32,7 +32,7 @@
         <Card>
           <div class="flex items-center">
             <div class="p-3 rounded-lg bg-blue-100">
-              <TagIcon class="w-6 h-6 text-blue-600" />
+              <TagIcon class="w-10 h-10 text-blue-600" />
             </div>
             <div class="ml-4">
               <p class="text-responsive-sm font-medium text-neutral-600">Total</p>
@@ -44,7 +44,7 @@
         <Card>
           <div class="flex items-center">
             <div class="p-3 rounded-lg bg-green-100">
-              <CheckCircleIcon class="w-6 h-6 text-green-600" />
+              <CheckCircleIcon class="w-10 h-10 text-green-600" />
             </div>
             <div class="ml-4">
               <p class="text-responsive-sm font-medium text-neutral-600">Actives</p>
@@ -56,7 +56,7 @@
         <Card>
           <div class="flex items-center">
             <div class="p-3 rounded-lg bg-purple-100">
-              <CubeIcon class="w-6 h-6 text-purple-600" />
+              <CubeIcon class="w-10 h-10 text-purple-600" />
             </div>
             <div class="ml-4">
               <p class="text-responsive-sm font-medium text-neutral-600">Avec Produits</p>
@@ -68,7 +68,7 @@
         <Card>
           <div class="flex items-center">
             <div class="p-3 rounded-lg bg-orange-100">
-              <ChartBarIcon class="w-6 h-6 text-orange-600" />
+              <ChartBarIcon class="w-10 h-10 text-orange-600" />
             </div>
             <div class="ml-4">
               <p class="text-responsive-sm font-medium text-neutral-600">Top Catégorie</p>
@@ -93,13 +93,13 @@
                   v-model="searchQuery"
                   type="text"
                   placeholder="Rechercher..."
-                  class="pl-10 pr-4 py-2 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  class="pl-10 pr-4 py-3 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                 >
               </div>
               <!-- Filter -->
               <select
                 v-model="filterStatus"
-                class="border border-neutral-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                class="border border-neutral-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
               >
                 <option value="">Tous</option>
                 <option value="active">Actives</option>
@@ -111,7 +111,7 @@
 
         <!-- Loading State -->
         <div v-if="loading" class="px-6 py-12 text-center">
-          <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600 mx-auto mb-4" />
+          <div class="animate-spin rounded-full h-10 w-10 border-b-2 border-primary-600 mx-auto mb-4" />
           <p class="text-neutral-500">Chargement des catégories...</p>
         </div>
 
@@ -156,7 +156,7 @@
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap">
                   <button
-                    class="inline-flex items-center px-2.5 py-0.5 rounded-full text-responsive-xs font-medium"
+                    class="inline-flex items-center px-4.5 py-0.5 rounded-full text-responsive-xs font-medium"
                     :class="category.is_active
                       ? 'bg-green-100 text-green-800 hover:bg-green-200'
                       : 'bg-red-100 text-red-800 hover:bg-red-200'"
@@ -172,14 +172,14 @@
                       title="Voir détails"
                       @click="viewCategory(category)"
                     >
-                      <EyeIcon class="w-4 h-4" />
+                      <EyeIcon class="w-5 h-5" />
                     </button>
                     <button
                       class="text-indigo-600 hover:text-indigo-900"
                       title="Modifier"
                       @click="editCategory(category)"
                     >
-                      <PencilIcon class="w-4 h-4" />
+                      <PencilIcon class="w-5 h-5" />
                     </button>
                     <button
                       class="text-red-600 hover:text-red-900"
@@ -188,7 +188,7 @@
                       :class="{ 'opacity-50 cursor-not-allowed': (category.products_count ?? 0) > 0 }"
                       @click="deleteCategory(category)"
                     >
-                      <TrashIcon class="w-4 h-4" />
+                      <TrashIcon class="w-5 h-5" />
                     </button>
                   </div>
                 </td>
@@ -234,12 +234,12 @@
             <div class="flex items-center justify-between">
               <div class="flex items-center gap-3">
                 <div class="p-2 rounded-xl bg-blue-100">
-                  <component :is="modal.icon" class="w-6 h-6 text-blue-600" />
+                  <component :is="modal.icon" class="w-10 h-10 text-blue-600" />
                 </div>
                 <h3 class="text-responsive-xl font-semibold text-neutral-900">{{ modal.title }}</h3>
               </div>
               <button
-                class="p-2 hover:bg-neutral-100 rounded-lg transition-colors"
+                class="p-2 hover:transition-colors"
                 @click="closeModal"
               >
                 <XMarkIcon class="w-5 h-5 text-neutral-400" />
@@ -260,7 +260,7 @@
                   type="text"
                   required
                   maxlength="100"
-                  class="w-full border border-neutral-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  class="w-full border border-neutral-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                   placeholder="Ex: Fruits et Légumes"
                 >
               </div>
@@ -275,7 +275,7 @@
                   required
                   maxlength="500"
                   rows="3"
-                  class="w-full border border-neutral-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  class="w-full border border-neutral-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                   placeholder="Description de la catégorie..."
                 />
               </div>
@@ -289,7 +289,7 @@
                   v-model="form.icon"
                   type="text"
                   maxlength="10"
-                  class="w-full border border-neutral-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  class="w-full border border-neutral-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                   placeholder="🥬"
                 >
               </div>
@@ -308,7 +308,7 @@
               <div class="flex justify-end gap-3 pt-4">
                 <button
                   type="button"
-                  class="px-4 py-2 text-neutral-600 hover:text-neutral-800 font-medium transition-colors"
+                  class="px-4 py-3 text-neutral-600 hover:transition-colors"
                   @click="closeModal"
                 >
                   Annuler
@@ -316,7 +316,7 @@
                 <button
                   type="submit"
                   :disabled="saving"
-                  class="px-6 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 font-medium transition-colors disabled:opacity-50"
+                  class="px-6 py-3 bg-primary-600 text-white rounded-lg hover:transition-colors disabled:opacity-50"
                 >
                   {{ saving ? 'Enregistrement...' : (editingCategory ? 'Modifier' : 'Créer') }}
                 </button>

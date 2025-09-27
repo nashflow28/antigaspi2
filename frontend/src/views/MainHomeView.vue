@@ -6,7 +6,7 @@
           <div class="flex h-14 w-14 items-center justify-center rounded-3xl bg-nav-gradient text-white shadow-card">
             <span class="text-h2 font-semibold">🌱</span>
           </div>
-          <div class="space-y-1">
+          <div class="space-y-2">
             <p class="text-small font-medium text-neutral-500">Bienvenue</p>
             <h1 class="text-h2 font-semibold text-neutral-900">Antigaspi</h1>
           </div>
@@ -78,8 +78,8 @@
               Parcourez une sélection de produits sauvés des invendus et soutenez les commerçants locaux.
             </p>
             <div class="flex flex-wrap items-center gap-3">
-              <span class="rounded-full border border-white/30 bg-white/10 px-4 py-2 text-small font-medium shadow-card">🇹🇬 Togo</span>
-              <span class="rounded-full border border-white/30 bg-white/10 px-4 py-2 text-small font-medium shadow-card">
+              <span class="rounded-full border border-white/30 bg-white/10 px-4 py-3 text-small font-medium shadow-card">🇹🇬 Togo</span>
+              <span class="rounded-full border border-white/30 bg-white/10 px-4 py-3 text-small font-medium shadow-card">
                 {{ totalProducts }} produits disponibles
               </span>
               <Button
@@ -159,7 +159,7 @@
           >
             <Skeleton class="aspect-square w-full" />
             <div class="space-y-2">
-              <Skeleton class="h-4 w-3/4" />
+              <Skeleton class="h-5 w-3/4" />
               <Skeleton class="h-3 w-1/2" />
               <Skeleton class="h-5 w-full" />
             </div>
@@ -200,7 +200,7 @@
                   <span class="text-h4 font-semibold">{{ product.price }} XOF</span>
                   <span v-if="product.originalPrice" class="text-caption text-neutral-500 line-through">{{ product.originalPrice }} XOF</span>
                 </div>
-                <span class="rounded-full bg-primary-100 px-3 py-1 text-caption font-medium text-primary-700">-{{ product.discount }}%</span>
+                <span class="rounded-full bg-primary-100 px-4 py-3 text-caption font-medium text-primary-700">-{{ product.discount }}%</span>
               </div>
             </div>
           </Card>
@@ -221,19 +221,19 @@
 
     <nav class="fixed bottom-0 left-0 right-0 border-t border-neutral-200/70 bg-surface-light/90 backdrop-blur-lg">
       <div class="mx-auto flex max-w-5xl items-center justify-around px-6 py-4">
-        <Button variant="ghost" class="flex h-full flex-col items-center gap-1 text-primary-600" @click="goToHome">
+        <Button variant="ghost" class="flex h-full flex-col items-center gap-2 text-primary-600" @click="goToHome">
           <span aria-hidden="true" class="text-responsive-lg">🏠</span>
           <span class="text-caption font-medium">Accueil</span>
         </Button>
-        <Button variant="ghost" class="flex h-full flex-col items-center gap-1 text-neutral-500" @click="goToDiscover">
+        <Button variant="ghost" class="flex h-full flex-col items-center gap-2 text-neutral-500" @click="goToDiscover">
           <span aria-hidden="true" class="text-responsive-lg">🔍</span>
           <span class="text-caption">Découvrir</span>
         </Button>
-        <Button variant="ghost" class="flex h-full flex-col items-center gap-1 text-neutral-500" @click="goToFavorites">
+        <Button variant="ghost" class="flex h-full flex-col items-center gap-2 text-neutral-500" @click="goToFavorites">
           <span aria-hidden="true" class="text-responsive-lg">❤️</span>
           <span class="text-caption">Favoris</span>
         </Button>
-        <Button variant="ghost" class="flex h-full flex-col items-center gap-1 text-neutral-500" @click="goToProfile">
+        <Button variant="ghost" class="flex h-full flex-col items-center gap-2 text-neutral-500" @click="goToProfile">
           <span aria-hidden="true" class="text-responsive-lg">👤</span>
           <span class="text-caption">Profil</span>
         </Button>

@@ -8,7 +8,7 @@
           @click="$emit('close')"
         >
           <svg
-            class="w-6 h-6"
+            class="w-10 h-10"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -50,7 +50,7 @@
             </svg>
             <div class="text-responsive-sm text-red-700">
               <p class="font-medium">Paiement impossible</p>
-              <ul class="mt-1 space-y-1">
+              <ul class="mt-1 space-y-2">
                 <li v-if="walletBalance < amount">• Solde insuffisant</li>
                 <li v-if="!walletActive">• Portefeuille désactivé</li>
                 <li v-if="exceedsDailyLimit">• Limite quotidienne dépassée</li>
@@ -97,7 +97,7 @@
         <div class="flex space-x-3 mt-6">
           <button
             type="button"
-            class="flex-1 px-4 py-3 border border-neutral-300 rounded-lg text-neutral-700 hover:bg-neutral-50 transition-colors"
+            class="flex-1 px-4 py-3 border border-neutral-300 rounded-lg text-neutral-700 hover:transition-colors"
             @click="$emit('close')"
           >
             Annuler
@@ -105,10 +105,10 @@
           <button
             type="submit"
             :disabled="loading || !pin || pin.length < 4"
-            class="flex-1 px-4 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            class="flex-1 px-4 py-3 bg-green-600 text-white rounded-lg hover:transition-colors"
           >
             <span v-if="loading" class="flex items-center justify-center">
-              <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
+              <svg class="animate-spin -ml-1 mr-2 h-5 w-5 text-white" fill="none" viewBox="0 0 24 24">
                 <circle
                   cx="12"
                   cy="12"
@@ -132,14 +132,14 @@
       <div v-if="!canPay" class="mt-6 space-y-3">
         <button
           v-if="walletBalance < amount"
-          class="w-full px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+          class="w-full px-4 py-3 bg-blue-600 text-white rounded-lg hover:transition-colors"
           @click="$emit('recharge')"
         >
           Recharger le portefeuille
         </button>
         <button
           v-if="!hasPin"
-          class="w-full px-4 py-3 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 transition-colors"
+          class="w-full px-4 py-3 bg-yellow-600 text-white rounded-lg hover:transition-colors"
           @click="$emit('setupPin')"
         >
           Configurer un code PIN

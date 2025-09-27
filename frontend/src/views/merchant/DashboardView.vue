@@ -29,7 +29,7 @@
         <div class="bg-white rounded-2xl shadow-lg p-6 border border-neutral-100">
           <div class="flex items-center space-x-4">
             <div class="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
-              <ShoppingBagIcon class="w-6 h-6 text-blue-600" />
+              <ShoppingBagIcon class="w-10 h-10 text-blue-600" />
             </div>
             <div>
               <p class="text-responsive-xl font-semibold text-neutral-900">{{ stats.total_products }}</p>
@@ -41,7 +41,7 @@
         <div class="bg-white rounded-2xl shadow-lg p-6 border border-neutral-100">
           <div class="flex items-center space-x-4">
             <div class="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center">
-              <ClockIcon class="w-6 h-6 text-green-600" />
+              <ClockIcon class="w-10 h-10 text-green-600" />
             </div>
             <div>
               <p class="text-responsive-xl font-semibold text-neutral-900">{{ stats.pending_reservations }}</p>
@@ -53,7 +53,7 @@
         <div class="bg-white rounded-2xl shadow-lg p-6 border border-neutral-100">
           <div class="flex items-center space-x-4">
             <div class="w-12 h-12 bg-yellow-100 rounded-xl flex items-center justify-center">
-              <BanknotesIcon class="w-6 h-6 text-yellow-600" />
+              <BanknotesIcon class="w-10 h-10 text-yellow-600" />
             </div>
             <div>
               <p class="text-responsive-xl font-semibold text-neutral-900">{{ Math.round(stats.total_revenue).toLocaleString('fr-FR') }} F CFA</p>
@@ -65,7 +65,7 @@
         <div class="bg-white rounded-2xl shadow-lg p-6 border border-neutral-100">
           <div class="flex items-center space-x-4">
             <div class="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center">
-              <CheckCircleIcon class="w-6 h-6 text-purple-600" />
+              <CheckCircleIcon class="w-10 h-10 text-purple-600" />
             </div>
             <div>
               <p class="text-responsive-xl font-semibold text-neutral-900">{{ stats.completed_reservations }}</p>
@@ -84,10 +84,10 @@
               <h2 class="text-responsive-xl font-semibold text-neutral-900">Réservations récentes</h2>
               <router-link
                 to="/merchant/reservations"
-                class="text-blue-600 hover:text-blue-700 text-responsive-sm font-medium flex items-center space-x-1"
+                class="text-blue-600 hover:text-blue-700 text-responsive-sm font-medium flex items-center space-x-2"
               >
                 <span>Voir tout</span>
-                <ArrowRightIcon class="w-4 h-4" />
+                <ArrowRightIcon class="w-5 h-5" />
               </router-link>
             </div>
           </div>
@@ -100,11 +100,11 @@
               <div
                 v-for="reservation in recentReservations"
                 :key="reservation.id"
-                class="flex items-center justify-between p-4 bg-neutral-50 rounded-xl hover:bg-neutral-100 transition-colors"
+                class="flex items-center justify-between p-4 bg-neutral-50 rounded-xl hover:transition-colors"
               >
                 <div class="flex items-center space-x-4">
                   <div class="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
-                    <UserIcon class="w-6 h-6 text-blue-600" />
+                    <UserIcon class="w-10 h-10 text-blue-600" />
                   </div>
                   <div>
                     <p class="font-medium text-neutral-900">{{ reservation.customer_name }}</p>
@@ -115,7 +115,7 @@
                 <div class="flex items-center space-x-3">
                   <span
                     :class="[
-                      'px-3 py-1 rounded-full text-responsive-sm font-medium',
+                      'px-4 py-3 rounded-full text-responsive-sm font-medium',
                       getStatusColor(reservation.status)
                     ]"
                   >
@@ -136,28 +136,28 @@
             <div class="space-y-3">
               <router-link
                 to="/merchant/products/create"
-                class="flex items-center space-x-3 p-3 bg-blue-50 hover:bg-blue-100 rounded-xl transition-colors"
+                class="flex items-center space-x-3 p-3 bg-blue-50 hover:transition-colors"
               >
                 <PlusIcon class="w-5 h-5 text-blue-600" />
                 <span class="font-medium text-blue-700">Ajouter un produit</span>
               </router-link>
               <router-link
                 to="/merchant/products"
-                class="flex items-center space-x-3 p-3 bg-green-50 hover:bg-green-100 rounded-xl transition-colors"
+                class="flex items-center space-x-3 p-3 bg-green-50 hover:transition-colors"
               >
                 <ShoppingBagIcon class="w-5 h-5 text-green-600" />
                 <span class="font-medium text-green-700">Gérer les produits</span>
               </router-link>
               <router-link
                 to="/merchant/reservations"
-                class="flex items-center space-x-3 p-3 bg-purple-50 hover:bg-purple-100 rounded-xl transition-colors"
+                class="flex items-center space-x-3 p-3 bg-purple-50 hover:transition-colors"
               >
                 <ClockIcon class="w-5 h-5 text-purple-600" />
                 <span class="font-medium text-purple-700">Voir les réservations</span>
               </router-link>
               <router-link
                 to="/profile"
-                class="flex items-center space-x-3 p-3 bg-neutral-50 hover:bg-neutral-100 rounded-xl transition-colors"
+                class="flex items-center space-x-3 p-3 bg-neutral-50 hover:transition-colors"
               >
                 <CogIcon class="w-5 h-5 text-neutral-600" />
                 <span class="font-medium text-neutral-700">Paramètres</span>
@@ -178,8 +178,8 @@
               </div>
               <div class="flex justify-between items-center">
                 <span class="text-neutral-600">Évaluation moyenne</span>
-                <div class="flex items-center space-x-1">
-                  <StarIcon class="w-4 h-4 text-yellow-400" />
+                <div class="flex items-center space-x-2">
+                  <StarIcon class="w-5 h-5 text-yellow-400" />
                   <span class="font-semibold">{{ stats.average_rating }}</span>
                 </div>
               </div>
@@ -199,7 +199,7 @@
             <h2 class="text-responsive-xl font-semibold text-neutral-900 mb-4">Notifications</h2>
             <div class="space-y-3">
               <div v-if="notifications.length === 0" class="text-center py-6">
-                <BellIcon class="w-8 h-8 text-neutral-400 mx-auto mb-2" />
+                <BellIcon class="w-10 h-10 text-neutral-400 mx-auto mb-2" />
                 <p class="text-neutral-500 text-responsive-sm">Aucune notification</p>
               </div>
               <div
@@ -227,10 +227,10 @@
             <h2 class="text-responsive-xl font-semibold text-neutral-900">Mes produits récents</h2>
             <router-link
               to="/merchant/products"
-              class="text-blue-600 hover:text-blue-700 text-responsive-sm font-medium flex items-center space-x-1"
+              class="text-blue-600 hover:text-blue-700 text-responsive-sm font-medium flex items-center space-x-2"
             >
               <span>Voir tout</span>
-              <ArrowRightIcon class="w-4 h-4" />
+              <ArrowRightIcon class="w-5 h-5" />
             </router-link>
           </div>
         </div>
@@ -242,7 +242,7 @@
               to="/merchant/products/create"
               class="inline-flex items-center mt-4 text-blue-600 hover:text-blue-700 font-medium"
             >
-              <PlusIcon class="w-4 h-4 mr-1" />
+              <PlusIcon class="w-5 h-5 mr-1" />
               Ajouter votre premier produit
             </router-link>
           </div>
@@ -250,7 +250,7 @@
             <div
               v-for="product in recentProducts"
               :key="product.id"
-              class="bg-neutral-50 rounded-xl p-4 hover:bg-neutral-100 transition-colors"
+              class="bg-neutral-50 rounded-xl p-4 hover:transition-colors"
             >
               <div class="aspect-square bg-neutral-200 rounded-lg mb-4 flex items-center justify-center">
                 <img
@@ -259,7 +259,7 @@
                   :alt="product.name"
                   class="w-full h-full object-cover rounded-lg"
                 >
-                <ShoppingBagIcon v-else class="w-8 h-8 text-neutral-400" />
+                <ShoppingBagIcon v-else class="w-10 h-10 text-neutral-400" />
               </div>
               <h3 class="font-medium text-neutral-900 mb-1">{{ product.name }}</h3>
               <p class="text-responsive-sm text-neutral-600 mb-2">{{ product.category }}</p>
@@ -268,7 +268,7 @@
                   <span class="text-responsive-lg font-semibold text-green-600">{{ Math.round(product.discounted_price).toLocaleString('fr-FR') }} F CFA</span>
                   <span class="text-responsive-sm text-neutral-500 line-through">{{ Math.round(product.original_price).toLocaleString('fr-FR') }} F CFA</span>
                 </div>
-                <span class="text-responsive-xs bg-blue-100 text-blue-700 px-2 py-1 rounded-full">
+                <span class="text-responsive-xs bg-blue-100 text-blue-700 px-4 py-3 rounded-full">
                   {{ product.quantity_available }} dispo
                 </span>
               </div>

@@ -49,7 +49,7 @@
                 </p>
               </div>
               <div class="p-3 bg-white/20 rounded-xl">
-                <UsersIcon class="w-8 h-8" />
+                <UsersIcon class="w-10 h-10" />
               </div>
             </div>
           </Card>
@@ -64,7 +64,7 @@
                 </p>
               </div>
               <div class="p-3 bg-white/20 rounded-xl">
-                <BuildingStorefrontIcon class="w-8 h-8" />
+                <BuildingStorefrontIcon class="w-10 h-10" />
               </div>
             </div>
           </Card>
@@ -79,7 +79,7 @@
                 </p>
               </div>
               <div class="p-3 bg-white/20 rounded-xl">
-                <ShoppingBagIcon class="w-8 h-8" />
+                <ShoppingBagIcon class="w-10 h-10" />
               </div>
             </div>
           </Card>
@@ -108,7 +108,7 @@
           <template #header>
             <div class="flex items-center justify-between">
               <h3 class="text-responsive-xl font-semibold text-neutral-900">Évolution du chiffre d'affaires</h3>
-              <select v-model="revenueChartPeriod" class="w-full px-4 py-2 text-responsive-sm text-neutral-900 bg-white border border-neutral-200 rounded-xl shadow-sm transition-all duration-200 focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+              <select v-model="revenueChartPeriod" class="w-full px-4 py-3 text-responsive-sm text-neutral-900 bg-white border border-neutral-200 rounded-xl shadow-sm transition-all duration-200 focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
                 <option value="7d">7 derniers jours</option>
                 <option value="30d">30 derniers jours</option>
                 <option value="90d">90 derniers jours</option>
@@ -159,7 +159,7 @@
             <div
               v-for="activity in recentActivities"
               :key="activity.id"
-              class="flex items-center gap-4 p-4 bg-neutral-50 rounded-lg hover:bg-neutral-100 transition-colors"
+              class="flex items-center gap-4 p-4 bg-neutral-50 rounded-lg hover:transition-colors"
             >
               <div class="flex-shrink-0">
                 <div
@@ -203,12 +203,12 @@
               <div class="flex items-center gap-3">
                 <div
                   :class="service.status === 'healthy' ? 'bg-primary-100' : 'bg-accent-red/15'"
-                  class="w-8 h-8 rounded-full flex items-center justify-center"
+                  class="w-10 h-10 rounded-full flex items-center justify-center"
                 >
                   <component
                     :is="service.status === 'healthy' ? CheckCircleIcon : ExclamationTriangleIcon"
                     :class="service.status === 'healthy' ? 'text-primary-600' : 'text-accent-red'"
-                    class="w-4 h-4"
+                    class="w-5 h-5"
                   />
                 </div>
                 <div>
@@ -234,7 +234,7 @@
                 class="text-responsive-xs"
                 @click="viewLogs"
               >
-                <DocumentTextIcon class="w-4 h-4 mr-1" />
+                <DocumentTextIcon class="w-5 h-5 mr-1" />
                 Logs
               </Button>
               <Button
@@ -243,7 +243,7 @@
                 class="text-responsive-xs"
                 @click="viewMetrics"
               >
-                <ChartBarIcon class="w-4 h-4 mr-1" />
+                <ChartBarIcon class="w-5 h-5 mr-1" />
                 Métriques
               </Button>
               <Button
@@ -252,7 +252,7 @@
                 class="text-responsive-xs"
                 @click="manageUsers"
               >
-                <UsersIcon class="w-4 h-4 mr-1" />
+                <UsersIcon class="w-5 h-5 mr-1" />
                 Utilisateurs
               </Button>
               <Button
@@ -261,7 +261,7 @@
                 class="text-responsive-xs"
                 @click="systemSettings"
               >
-                <CogIcon class="w-4 h-4 mr-1" />
+                <CogIcon class="w-5 h-5 mr-1" />
                 Paramètres
               </Button>
             </div>
@@ -275,7 +275,7 @@
         <Card>
           <div class="flex items-center gap-3 mb-4">
             <div class="p-2 bg-green-100 rounded-lg">
-              <GlobeEuropeAfricaIcon class="w-6 h-6 text-green-600" />
+              <GlobeEuropeAfricaIcon class="w-10 h-10 text-green-600" />
             </div>
             <h3 class="text-responsive-lg font-semibold text-neutral-900">Impact Environnemental</h3>
           </div>
@@ -315,7 +315,7 @@
               class="flex items-center gap-3 p-3 bg-neutral-50 rounded-lg"
             >
               <div class="flex-shrink-0">
-                <div class="w-8 h-8 bg-primary-100 text-primary-600 rounded-full flex items-center justify-center font-semibold text-responsive-sm">
+                <div class="w-10 h-10 bg-primary-100 text-primary-600 rounded-full flex items-center justify-center font-semibold text-responsive-sm">
                   {{ index + 1 }}
                 </div>
               </div>
@@ -392,7 +392,7 @@
               class="text-current opacity-60 hover:opacity-100 flex-shrink-0"
               @click="dismissAlert(alert.id)"
             >
-              <XMarkIcon class="w-4 h-4" />
+              <XMarkIcon class="w-5 h-5" />
             </Button>
           </div>
         </div>

@@ -50,7 +50,7 @@
                 <p class="text-responsive-xl font-semibold">{{ products.length }}</p>
               </div>
               <div class="rounded-xl bg-white/20 p-3">
-                <ShoppingBagIcon class="h-6 w-6" />
+                <ShoppingBagIcon class="h-10 w-10" />
               </div>
             </div>
           </Card>
@@ -65,7 +65,7 @@
                 <p class="text-responsive-xl font-semibold">{{ activeProducts.length }}</p>
               </div>
               <div class="rounded-xl bg-white/20 p-3">
-                <CheckCircleIcon class="h-6 w-6" />
+                <CheckCircleIcon class="h-10 w-10" />
               </div>
             </div>
           </Card>
@@ -80,7 +80,7 @@
                 <p class="text-responsive-xl font-semibold">{{ lowStockProducts.length }}</p>
               </div>
               <div class="rounded-xl bg-white/20 p-3">
-                <ExclamationTriangleIcon class="h-6 w-6" />
+                <ExclamationTriangleIcon class="h-10 w-10" />
               </div>
             </div>
           </Card>
@@ -95,7 +95,7 @@
                 <p class="text-responsive-xl font-semibold">{{ expiringSoonProducts.length }}</p>
               </div>
               <div class="rounded-xl bg-white/20 p-3">
-                <ClockIcon class="h-6 w-6" />
+                <ClockIcon class="h-10 w-10" />
               </div>
             </div>
           </Card>
@@ -137,7 +137,7 @@
             <select
               id="sort-by"
               v-model="sortBy"
-              class="rounded-lg border border-neutral-300 bg-white px-4 py-2 text-responsive-sm font-medium text-neutral-700 shadow-sm transition-colors focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/30"
+              class="rounded-lg border border-neutral-300 bg-white px-4 py-3 text-responsive-sm font-medium text-neutral-700 shadow-sm transition-colors focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/30"
             >
               <option value="created_at">Plus récent</option>
               <option value="name">Nom A-Z</option>
@@ -260,7 +260,7 @@
             <Button
               size="sm"
               variant="destructive"
-              class="px-3"
+              class="px-4"
               :left-icon="TrashIcon"
               @click="deleteProduct(product)"
             >
@@ -465,7 +465,7 @@
             <!-- Icon -->
             <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100 mb-4">
               <svg
-                class="h-6 w-6 text-red-600"
+                class="h-10 w-10 text-red-600"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"

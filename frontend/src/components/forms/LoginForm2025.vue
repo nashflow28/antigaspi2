@@ -75,7 +75,7 @@
           <Loader2 v-if="loading" class="w-5 h-5 animate-spin" />
           <span>{{ loading ? 'Connexion en cours...' : 'Se connecter' }}</span>
         </span>
-        <div class="absolute inset-0 bg-gradient-to-r from-primary-600 to-accent-blue/90 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+        <div class="absolute inset-0 bg-gradient-to-r from-primary-600 to-accent-blue/90 opacity-0 group-hover:transition-opacity duration-300" />
       </Button>
 
       <!-- Error Message Global -->

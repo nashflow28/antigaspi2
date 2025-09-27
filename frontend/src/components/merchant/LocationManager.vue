@@ -3,7 +3,7 @@
     <div class="flex items-center justify-between mb-6">
       <div class="flex items-center space-x-3">
         <div class="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
-          <MapPin class="w-6 h-6 text-blue-600" />
+          <MapPin class="w-10 h-10 text-blue-600" />
         </div>
         <div>
           <h3 class="text-responsive-lg font-semibold text-neutral-900">Géolocalisation</h3>
@@ -12,10 +12,10 @@
       </div>
       <button
         :disabled="loading"
-        class="text-blue-600 hover:text-blue-700 font-medium text-responsive-sm flex items-center space-x-1"
+        class="text-blue-600 hover:text-blue-700 font-medium text-responsive-sm flex items-center space-x-2"
         @click="getCurrentLocation"
       >
-        <RefreshCw class="w-4 h-4" :class="{ 'animate-spin': loading }" />
+        <RefreshCw class="w-5 h-5" :class="{ 'animate-spin': loading }" />
         <span>{{ loading ? 'Localisation...' : 'Me localiser' }}</span>
       </button>
     </div>
@@ -27,7 +27,7 @@
         Ajoutez la position de votre commerce pour que les clients puissent vous trouver facilement
       </p>
       <button
-        class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+        class="bg-blue-600 text-white px-4 py-3 rounded-lg hover:transition-colors"
         @click="showLocationModal = true"
       >
         Définir ma position
@@ -48,14 +48,14 @@
 
       <div class="flex space-x-3">
         <button
-          class="flex-1 bg-neutral-100 text-neutral-700 py-2 px-4 rounded-lg hover:bg-neutral-200 transition-colors"
+          class="flex-1 bg-neutral-100 text-neutral-700 py-3 px-4 rounded-lg hover:transition-colors"
           @click="showLocationModal = true"
         >
           Modifier
         </button>
         <button
           :disabled="loading"
-          class="flex-1 bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50"
+          class="flex-1 bg-blue-600 text-white py-3 px-4 rounded-lg hover:transition-colors disabled:opacity-50"
           @click="getCurrentLocation"
         >
           {{ loading ? 'Localisation...' : 'Relocaliser' }}
@@ -82,7 +82,7 @@
             <div class="flex items-center justify-between">
               <h3 class="text-responsive-lg font-semibold text-neutral-900">Définir votre position</h3>
               <button
-                class="p-2 hover:bg-neutral-100 rounded-lg transition-colors"
+                class="p-2 hover:transition-colors"
                 @click="closeModal"
               >
                 <X class="w-5 h-5 text-neutral-400" />
@@ -97,7 +97,7 @@
               <button
                 type="button"
                 :class="!mapSelectionMode ? 'bg-blue-600 text-white' : 'bg-neutral-200 text-neutral-700'"
-                class="px-4 py-2 rounded-lg font-medium transition-colors"
+                class="px-4 py-3 rounded-lg font-medium transition-colors"
                 @click="mapSelectionMode = false"
               >
                 Coordonnées manuelles
@@ -105,7 +105,7 @@
               <button
                 type="button"
                 :class="mapSelectionMode ? 'bg-blue-600 text-white' : 'bg-neutral-200 text-neutral-700'"
-                class="px-4 py-2 rounded-lg font-medium transition-colors"
+                class="px-4 py-3 rounded-lg font-medium transition-colors"
                 @click="toggleMapSelection"
               >
                 Sélection sur carte
@@ -120,10 +120,10 @@
                 </label>
                 <button
                   type="button"
-                  class="text-blue-600 hover:text-blue-700 text-responsive-sm flex items-center space-x-1"
+                  class="text-blue-600 hover:text-blue-700 text-responsive-sm flex items-center space-x-2"
                   @click="centerOnCurrentPosition"
                 >
-                  <MapPin class="w-4 h-4" />
+                  <MapPin class="w-5 h-5" />
                   <span>Ma position</span>
                 </button>
               </div>
@@ -150,7 +150,7 @@
                   min="-90"
                   max="90"
                   required
-                  class="w-full border border-neutral-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  class="w-full border border-neutral-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   placeholder="Ex: 5.3474"
                 >
               </div>
@@ -167,7 +167,7 @@
                   min="-180"
                   max="180"
                   required
-                  class="w-full border border-neutral-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  class="w-full border border-neutral-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   placeholder="Ex: -3.9857"
                 >
               </div>
@@ -200,7 +200,7 @@
             <div class="flex justify-end space-x-3 pt-4">
               <button
                 type="button"
-                class="px-4 py-2 text-neutral-600 hover:text-neutral-800 font-medium transition-colors"
+                class="px-4 py-3 text-neutral-600 hover:transition-colors"
                 @click="closeModal"
               >
                 Annuler
@@ -208,7 +208,7 @@
               <button
                 type="submit"
                 :disabled="saving"
-                class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium transition-colors disabled:opacity-50"
+                class="px-6 py-3 bg-blue-600 text-white rounded-lg hover:transition-colors disabled:opacity-50"
               >
                 {{ saving ? 'Enregistrement...' : 'Enregistrer' }}
               </button>
@@ -249,10 +249,10 @@
           </div>
           <div class="ml-4 flex-shrink-0 flex">
             <button
-              class="text-neutral-400 hover:text-neutral-600 transition-colors"
+              class="text-neutral-400 hover:transition-colors"
               @click="notification.show = false"
             >
-              <X class="w-4 h-4" />
+              <X class="w-5 h-5" />
             </button>
           </div>
         </div>

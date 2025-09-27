@@ -121,10 +121,10 @@
           <h3 class="text-responsive-lg font-semibold text-neutral-900">Produits inclus</h3>
           <button
             type="button"
-            class="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
+            class="px-4 py-3 bg-primary-600 text-white rounded-lg hover:transition-colors"
             @click="showProductSelector = true"
           >
-            <Plus class="w-4 h-4 inline mr-2" />
+            <Plus class="w-5 h-5 inline mr-2" />
             Ajouter des produits
           </button>
         </div>
@@ -153,7 +153,7 @@
                 v-else
                 class="w-12 h-12 bg-neutral-200 rounded-lg flex items-center justify-center"
               >
-                <Package class="w-6 h-6 text-neutral-400" />
+                <Package class="w-10 h-10 text-neutral-400" />
               </div>
               <div>
                 <h4 class="font-medium text-neutral-900">{{ item.product.name }}</h4>
@@ -165,26 +165,26 @@
                 <button
                   type="button"
                   :disabled="item.quantity <= 1"
-                  class="w-8 h-8 rounded-full border border-neutral-300 flex items-center justify-center hover:bg-neutral-100 disabled:opacity-50 disabled:cursor-not-allowed"
+                  class="w-10 h-10 rounded-full border border-neutral-300 flex items-center justify-center hover:bg-neutral-100 disabled:opacity-50 disabled:cursor-not-allowed"
                   @click="updateProductQuantity(item.product.id, item.quantity - 1)"
                 >
-                  <Minus class="w-4 h-4" />
+                  <Minus class="w-5 h-5" />
                 </button>
-                <span class="font-medium text-neutral-900 w-8 text-center">{{ item.quantity }}</span>
+                <span class="font-medium text-neutral-900 w-10 text-center">{{ item.quantity }}</span>
                 <button
                   type="button"
-                  class="w-8 h-8 rounded-full border border-neutral-300 flex items-center justify-center hover:bg-neutral-100"
+                  class="w-10 h-10 rounded-full border border-neutral-300 flex items-center justify-center hover:bg-neutral-100"
                   @click="updateProductQuantity(item.product.id, item.quantity + 1)"
                 >
-                  <Plus class="w-4 h-4" />
+                  <Plus class="w-5 h-5" />
                 </button>
               </div>
               <button
                 type="button"
-                class="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+                class="p-2 text-red-500 hover:transition-colors"
                 @click="removeProduct(item.product.id)"
               >
-                <Trash2 class="w-4 h-4" />
+                <Trash2 class="w-5 h-5" />
               </button>
             </div>
           </div>
@@ -276,7 +276,7 @@
       <div class="flex items-center justify-end space-x-4 pt-6">
         <button
           type="button"
-          class="px-6 py-3 border border-neutral-300 text-neutral-700 rounded-lg hover:bg-neutral-50 transition-colors"
+          class="px-6 py-3 border border-neutral-300 text-neutral-700 rounded-lg hover:transition-colors"
           @click="$emit('cancel')"
         >
           Annuler
@@ -284,10 +284,10 @@
         <button
           type="submit"
           :disabled="!canSubmit || creating"
-          class="px-6 py-3 bg-primary-600 text-white rounded-lg hover:bg-primary-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          class="px-6 py-3 bg-primary-600 text-white rounded-lg hover:transition-colors"
         >
           <div v-if="creating" class="flex items-center">
-            <div class="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2" />
+            <div class="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2" />
             Création...
           </div>
           <span v-else>Créer le panier surprise</span>

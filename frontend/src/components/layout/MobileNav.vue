@@ -1,23 +1,23 @@
 <template>
   <!-- Mobile Menu Button -->
   <button
-    class="md:hidden relative p-2 rounded-lg text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-primary-500 transition-colors"
+    class="md:hidden relative p-2 rounded-lg text-neutral-600 hover:text-neutral-900 hover:transition-colors"
     :class="{ 'text-primary-600': mobileMenuOpen }"
     @click="toggleMobileMenu"
   >
     <span class="sr-only">Ouvrir le menu</span>
-    <div class="w-6 h-6 relative">
+    <div class="w-10 h-10 relative">
       <!-- Hamburger lines -->
       <span
-        class="absolute block h-0.5 w-6 bg-current transform transition duration-300 ease-in-out"
+        class="absolute block h-0.5 w-10 bg-current transform transition duration-300 ease-in-out"
         :class="mobileMenuOpen ? 'rotate-45 translate-y-2.5' : 'translate-y-0'"
       />
       <span
-        class="absolute block h-0.5 w-6 bg-current transform transition duration-300 ease-in-out translate-y-2.5"
+        class="absolute block h-0.5 w-10 bg-current transform transition duration-300 ease-in-out translate-y-2.5"
         :class="mobileMenuOpen ? 'opacity-0' : 'opacity-100'"
       />
       <span
-        class="absolute block h-0.5 w-6 bg-current transform transition duration-300 ease-in-out translate-y-5"
+        class="absolute block h-0.5 w-10 bg-current transform transition duration-300 ease-in-out translate-y-5"
         :class="mobileMenuOpen ? '-rotate-45 -translate-y-2.5' : 'translate-y-0'"
       />
     </div>
@@ -56,13 +56,13 @@
         <!-- Mobile menu header -->
         <div class="flex items-center justify-between p-4 border-b border-neutral-200">
           <div class="flex items-center space-x-3">
-            <div class="w-8 h-8 bg-gradient-to-r from-primary-500 to-accent-blue/50 rounded-lg flex items-center justify-center">
+            <div class="w-10 h-10 bg-gradient-to-r from-primary-500 to-accent-blue/50 rounded-lg flex items-center justify-center">
               <span class="text-white text-responsive-lg">🌱</span>
             </div>
             <span class="text-responsive-lg font-semibold text-neutral-900 font-display">Antigaspi</span>
           </div>
           <button
-            class="p-2 rounded-lg text-neutral-400 hover:text-neutral-600 hover:bg-neutral-100 transition-colors"
+            class="p-2 rounded-lg text-neutral-400 hover:text-neutral-600 hover:transition-colors"
             @click="closeMobileMenu"
           >
             <X class="w-5 h-5" />
@@ -83,7 +83,7 @@
               </p>
               <p class="text-responsive-sm text-neutral-500">{{ authStore.user?.email }}</p>
               <span
-                class="inline-flex items-center px-2 py-0.5 rounded text-responsive-xs font-medium"
+                class="inline-flex items-center px-4 py-0.5 rounded text-responsive-xs font-medium"
                 :class="getRoleBadgeClasses(authStore.user?.role)"
               >
                 {{ getRoleLabel(authStore.user?.role) }}

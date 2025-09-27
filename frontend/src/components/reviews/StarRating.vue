@@ -1,5 +1,5 @@
 <template>
-  <div class="flex items-center space-x-1">
+  <div class="flex items-center space-x-2">
     <button
       v-for="star in 5"
       :key="star"

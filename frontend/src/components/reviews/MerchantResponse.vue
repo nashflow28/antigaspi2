@@ -4,8 +4,8 @@
     <div v-if="review.merchant_response && !isEditing" class="mb-4">
       <div class="flex items-start space-x-3">
         <div class="flex-shrink-0">
-          <div class="w-8 h-8 bg-gradient-to-r from-green-500 to-green-600 rounded-full flex items-center justify-center">
-            <BuildingStorefrontIcon class="w-4 h-4 text-white" />
+          <div class="w-10 h-10 bg-gradient-to-r from-green-500 to-green-600 rounded-full flex items-center justify-center">
+            <BuildingStorefrontIcon class="w-5 h-5 text-white" />
           </div>
         </div>
         <div class="flex-1 min-w-0">
@@ -18,14 +18,14 @@
           </div>
           <div class="flex items-center space-x-2 mt-2">
             <button
-              class="inline-flex items-center px-2 py-1 text-responsive-xs text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-full transition-colors"
+              class="inline-flex items-center px-4 py-3 text-responsive-xs text-blue-600 bg-blue-50 hover:transition-colors"
               @click="startEditing"
             >
               <PencilIcon class="w-3 h-3 mr-1" />
               Modifier
             </button>
             <button
-              class="inline-flex items-center px-2 py-1 text-responsive-xs text-red-600 bg-red-50 hover:bg-red-100 rounded-full transition-colors"
+              class="inline-flex items-center px-4 py-3 text-responsive-xs text-red-600 bg-red-50 hover:transition-colors"
               :disabled="deleting"
               @click="deleteResponse"
             >
@@ -51,7 +51,7 @@
           v-model="responseText"
           :placeholder="isEditing ? 'Modifiez votre réponse...' : 'Écrivez votre réponse à ce client...'"
           rows="3"
-          class="w-full border border-neutral-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-green-500 focus:border-transparent resize-none"
+          class="w-full border border-neutral-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-green-500 focus:border-transparent resize-none"
           :disabled="submitting"
         />
 
@@ -62,7 +62,7 @@
           <div class="flex items-center space-x-2">
             <button
               v-if="isEditing"
-              class="px-3 py-1 text-responsive-sm text-neutral-600 hover:text-neutral-800 transition-colors"
+              class="px-4 py-3 text-responsive-sm text-neutral-600 hover:transition-colors"
               :disabled="submitting"
               @click="cancelEditing"
             >
@@ -70,12 +70,12 @@
             </button>
             <button
               :disabled="!responseText.trim() || submitting || responseText.length > 1000"
-              class="inline-flex items-center px-4 py-2 text-responsive-sm bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              class="inline-flex items-center px-4 py-3 text-responsive-sm bg-green-600 text-white rounded-lg hover:transition-colors"
               @click="submitResponse"
             >
               <span v-if="submitting" class="inline-flex items-center">
                 <svg
-                  class="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
+                  class="animate-spin -ml-1 mr-2 h-5 w-5 text-white"
                   xmlns="http://www.w3.org/2000/svg"
                   fill="none"
                   viewBox="0 0 24 24"

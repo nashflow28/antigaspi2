@@ -12,7 +12,7 @@
       class="absolute inset-0 bg-white bg-opacity-75 flex items-center justify-center rounded-lg"
     >
       <div class="flex items-center space-x-3">
-        <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600" />
+        <div class="animate-spin rounded-full h-10 w-10 border-b-2 border-primary-600" />
         <span class="text-neutral-600">Chargement de la carte...</span>
       </div>
     </div>
@@ -41,7 +41,7 @@
         <h3 class="text-responsive-lg font-medium text-red-900 mb-1">Erreur de chargement</h3>
         <p class="text-red-600 text-responsive-sm">{{ error }}</p>
         <button
-          class="mt-3 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+          class="mt-3 px-4 py-3 bg-red-600 text-white rounded-lg hover:transition-colors"
           @click="initializeMap"
         >
           Réessayer

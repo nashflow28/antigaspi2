@@ -10,7 +10,7 @@
             class="p-2"
             @click="$router.go(-1)"
           >
-            <ArrowLeft class="w-6 h-6" />
+            <ArrowLeft class="w-10 h-10" />
           </Button>
           <div>
             <h1 class="text-responsive-xl lg:text-display-sm font-semibold text-neutral-900 mb-2">
@@ -29,7 +29,7 @@
         <!-- Loading State -->
         <div v-if="loadingProduct" class="flex justify-center items-center min-h-64">
           <div class="flex items-center gap-3">
-            <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600" />
+            <div class="animate-spin rounded-full h-10 w-10 border-b-2 border-primary-600" />
             <span class="text-neutral-600">Chargement du produit...</span>
           </div>
         </div>
@@ -72,7 +72,7 @@
                 />
                 <div
                   :class="[
-                    'absolute -top-6 left-0 w-8 h-8 rounded-full flex items-center justify-center text-responsive-sm font-semibold transition-all duration-300',
+                    'absolute -top-6 left-0 w-10 h-10 rounded-full flex items-center justify-center text-responsive-sm font-semibold transition-all duration-300',
                     step <= currentStep ? 'bg-primary-500 text-white' : 'bg-neutral-200 text-neutral-600'
                   ]"
                 >
@@ -132,12 +132,12 @@
                       <Badge variant="success">-{{ product.discount }}%</Badge>
                     </div>
                     <div class="flex items-center gap-4 text-responsive-sm text-neutral-600">
-                      <div class="flex items-center gap-1">
-                        <Clock class="w-4 h-4" />
+                      <div class="flex items-center gap-2">
+                        <Clock class="w-5 h-5" />
                         <span>{{ formatTimeLeft(product.expires_at) }}</span>
                       </div>
-                      <div class="flex items-center gap-1">
-                        <Package class="w-4 h-4" />
+                      <div class="flex items-center gap-2">
+                        <Package class="w-5 h-5" />
                         <span>{{ product.available_quantity - product.reserved_quantity }} disponibles</span>
                       </div>
                     </div>
@@ -396,15 +396,15 @@
                     <h4 class="font-semibold text-accent-blue/95 mb-3">Récupération</h4>
                     <div class="space-y-2 text-responsive-sm">
                       <div class="flex items-center gap-2">
-                        <MapPin class="w-4 h-4 text-accent-blue" />
+                        <MapPin class="w-5 h-5 text-accent-blue" />
                         <span>{{ product.merchant.name }}</span>
                       </div>
                       <div class="flex items-center gap-2">
-                        <Calendar class="w-4 h-4 text-accent-blue" />
+                        <Calendar class="w-5 h-5 text-accent-blue" />
                         <span>{{ formatPickupDateTime() }}</span>
                       </div>
                       <div class="flex items-center gap-2">
-                        <Phone class="w-4 h-4 text-accent-blue" />
+                        <Phone class="w-5 h-5 text-accent-blue" />
                         <span>{{ reservation.contact_phone }}</span>
                       </div>
                     </div>
@@ -435,7 +435,7 @@
                   <!-- Conditions -->
                   <div class="p-4 bg-accent-orange/10 rounded-xl border border-accent-orange/30">
                     <h4 class="font-semibold text-accent-orange/95 mb-3">⚠️ Conditions importantes</h4>
-                    <ul class="text-responsive-sm text-accent-orange/90 space-y-1">
+                    <ul class="text-responsive-sm text-accent-orange/90 space-y-2">
                       <li>• La réservation doit être récupérée dans les 24h après expiration</li>
                       <li>• En cas d'absence, le produit sera remis en vente</li>
                       <li>• Apportez une pièce d'identité pour la récupération</li>
@@ -464,7 +464,7 @@
                   variant="outline"
                   @click="previousStep"
                 >
-                  <ArrowLeft class="w-4 h-4 mr-2" />
+                  <ArrowLeft class="w-5 h-5 mr-2" />
                   Étape précédente
                 </Button>
                 <div v-else />
@@ -476,7 +476,7 @@
                   @click="nextStep"
                 >
                   Étape suivante
-                  <ArrowRight class="w-4 h-4 ml-2" />
+                  <ArrowRight class="w-5 h-5 ml-2" />
                 </Button>
 
                 <Button
@@ -501,7 +501,7 @@
                 <div class="space-y-3">
                   <div class="flex items-center gap-3">
                     <div class="w-12 h-12 bg-nav-gradient rounded-xl flex items-center justify-center">
-                      <Store class="w-6 h-6 text-white" />
+                      <Store class="w-10 h-10 text-white" />
                     </div>
                     <div>
                       <p class="font-semibold text-neutral-900">{{ product.merchant.name }}</p>
@@ -509,7 +509,7 @@
                     </div>
                   </div>
                   <div class="flex items-center gap-2 text-responsive-sm text-neutral-600">
-                    <MapPin class="w-4 h-4" />
+                    <MapPin class="w-5 h-5" />
                     <span>À {{ product.merchant.distance }}km de vous</span>
                   </div>
                 </div>
@@ -518,8 +518,8 @@
               <!-- Aide -->
               <Card variant="gradient" class="bg-gradient-to-br from-primary-50 to-primary-100 border-primary-200 animate-fade-in-up" style="animation-delay: 0.4s;">
                 <div class="flex items-center gap-3 mb-4">
-                  <div class="w-8 h-8 bg-primary-500 rounded-full flex items-center justify-center">
-                    <HelpCircle class="w-4 h-4 text-white" />
+                  <div class="w-10 h-10 bg-primary-500 rounded-full flex items-center justify-center">
+                    <HelpCircle class="w-5 h-5 text-white" />
                   </div>
                   <h3 class="text-responsive-lg font-semibold text-primary-800">Besoin d'aide ?</h3>
                 </div>
@@ -528,11 +528,11 @@
                 </p>
                 <div class="space-y-2 text-responsive-sm text-primary-700">
                   <div class="flex items-center gap-2">
-                    <Phone class="w-4 h-4" />
+                    <Phone class="w-5 h-5" />
                     <span>01 23 45 67 89</span>
                   </div>
                   <div class="flex items-center gap-2">
-                    <Mail class="w-4 h-4" />
+                    <Mail class="w-5 h-5" />
                     <span>support@antigaspi.com</span>
                   </div>
                 </div>

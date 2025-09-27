@@ -20,7 +20,7 @@
               <div class="flex-shrink-0">
                 <component
                   :is="getErrorIcon(error.severity)"
-                  class="h-6 w-6"
+                  class="h-10 w-10"
                   :class="getIconClasses(error.severity)"
                 />
               </div>

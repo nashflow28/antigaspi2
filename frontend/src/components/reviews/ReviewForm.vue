@@ -3,7 +3,7 @@
     <div class="flex items-center justify-between mb-6">
       <div class="flex items-center space-x-3">
         <div class="w-12 h-12 bg-yellow-100 rounded-xl flex items-center justify-center">
-          <Star class="w-6 h-6 text-yellow-600" />
+          <Star class="w-10 h-10 text-yellow-600" />
         </div>
         <div>
           <h3 class="text-responsive-lg font-semibold text-neutral-900">Donner votre avis</h3>
@@ -36,7 +36,7 @@
           v-model="form.title"
           type="text"
           maxlength="255"
-          class="w-full border border-neutral-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-yellow-500 focus:border-transparent"
+          class="w-full border border-neutral-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-yellow-500 focus:border-transparent"
           placeholder="Ex: Service rapide et produits frais"
         >
         <p v-if="errors.title" class="mt-1 text-responsive-sm text-red-600">{{ errors.title }}</p>
@@ -52,7 +52,7 @@
           v-model="form.comment"
           rows="4"
           maxlength="1000"
-          class="w-full border border-neutral-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-yellow-500 focus:border-transparent resize-none"
+          class="w-full border border-neutral-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-yellow-500 focus:border-transparent resize-none"
           placeholder="Décrivez votre expérience avec ce commerçant..."
         />
         <div class="flex justify-between mt-1">
@@ -69,7 +69,7 @@
         <select
           id="product"
           v-model="form.product_id"
-          class="w-full border border-neutral-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-yellow-500 focus:border-transparent"
+          class="w-full border border-neutral-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-yellow-500 focus:border-transparent"
         >
           <option value="">Avis général sur le commerçant</option>
           <option
@@ -87,7 +87,7 @@
         <button
           v-if="showCancel"
           type="button"
-          class="px-6 py-2 text-neutral-600 hover:text-neutral-800 font-medium transition-colors"
+          class="px-6 py-3 text-neutral-600 hover:transition-colors"
           @click="$emit('cancel')"
         >
           Annuler
@@ -95,11 +95,11 @@
         <button
           type="submit"
           :disabled="!form.rating || submitting"
-          class="px-6 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2"
+          class="px-6 py-3 bg-yellow-600 text-white rounded-lg hover:transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2"
         >
           <span>{{ submitting ? 'Publication...' : 'Publier l\'avis' }}</span>
-          <Send v-if="!submitting" class="w-4 h-4" />
-          <div v-else class="w-4 h-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+          <Send v-if="!submitting" class="w-5 h-5" />
+          <div v-else class="w-5 h-5 animate-spin rounded-full border-2 border-white border-t-transparent" />
         </button>
       </div>
     </form>
