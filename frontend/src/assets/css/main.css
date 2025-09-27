@@ -488,6 +488,60 @@
   .scroll-smooth {
     scroll-behavior: smooth;
   }
+
+  /* 🎨 Semantic Text Colors - 2025 Design System */
+  .text-heading {
+    @apply text-neutral-900;
+  }
+
+  .text-heading-secondary {
+    @apply text-neutral-800;
+  }
+
+  .text-body {
+    @apply text-neutral-700;
+  }
+
+  .text-body-emphasis {
+    @apply text-neutral-800;
+  }
+
+  .text-muted {
+    @apply text-neutral-500;
+  }
+
+  .text-placeholder {
+    @apply text-neutral-400;
+  }
+
+  .text-primary-emphasis {
+    @apply text-primary-700;
+  }
+
+  /* Dark mode variants */
+  .dark .text-heading {
+    @apply text-neutral-100;
+  }
+
+  .dark .text-heading-secondary {
+    @apply text-neutral-200;
+  }
+
+  .dark .text-body {
+    @apply text-neutral-300;
+  }
+
+  .dark .text-body-emphasis {
+    @apply text-neutral-200;
+  }
+
+  .dark .text-muted {
+    @apply text-neutral-400;
+  }
+
+  .dark .text-placeholder {
+    @apply text-neutral-500;
+  }
 }
 
 /* 🌙 Dark Mode Support */

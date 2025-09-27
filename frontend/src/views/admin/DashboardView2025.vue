@@ -4,7 +4,7 @@
     :header="header"
     class="bg-gradient-to-br from-purple-50 to-indigo-50"
   >
-    <div class="p-6">
+    <div class="container-2025 p-6">
       <!-- Header -->
       <div class="mb-6 sm:mb-8">
         <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 sm:gap-6">
@@ -917,11 +917,11 @@ const createRevenueChart = () => {
     }
 
     // console.log('📈 Canvas dimensions:', {
-      width: revenueChartCanvas.value.offsetWidth,
-      height: revenueChartCanvas.value.offsetHeight,
-      clientWidth: revenueChartCanvas.value.clientWidth,
-      clientHeight: revenueChartCanvas.value.clientHeight
-    })
+    //   width: revenueChartCanvas.value.offsetWidth,
+    //   height: revenueChartCanvas.value.offsetHeight,
+    //   clientWidth: revenueChartCanvas.value.clientWidth,
+    //   clientHeight: revenueChartCanvas.value.clientHeight
+    // })
 
     const ctx = revenueChartCanvas.value.getContext('2d')
     if (!ctx) {
@@ -1046,11 +1046,11 @@ const createUserGrowthChart = () => {
     }
 
     // console.log('🍩 Canvas dimensions:', {
-      width: userGrowthChartCanvas.value.offsetWidth,
-      height: userGrowthChartCanvas.value.offsetHeight,
-      clientWidth: userGrowthChartCanvas.value.clientWidth,
-      clientHeight: userGrowthChartCanvas.value.clientHeight
-    })
+    //   width: userGrowthChartCanvas.value.offsetWidth,
+    //   height: userGrowthChartCanvas.value.offsetHeight,
+    //   clientWidth: userGrowthChartCanvas.value.clientWidth,
+    //   clientHeight: userGrowthChartCanvas.value.clientHeight
+    // })
 
     const ctx = userGrowthChartCanvas.value.getContext('2d')
     if (!ctx) {

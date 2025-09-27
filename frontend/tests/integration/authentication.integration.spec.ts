@@ -1,9 +1,6 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { setActivePinia, createPinia } from 'pinia'
-import { mount } from '@vue/test-utils'
-import { createRouter, createWebHistory } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
-import LoginForm2025 from '@/components/forms/LoginForm2025.vue'
 
 // Mock API
 vi.mock('@/services/api', () => ({
@@ -22,16 +19,6 @@ vi.mock('@/composables/useNotifications', () => ({
     info: vi.fn()
   }
 }))
-
-// Mock router
-const router = createRouter({
-  history: createWebHistory(),
-  routes: [
-    { path: '/', component: { template: '<div>Home</div>' } },
-    { path: '/login', component: { template: '<div>Login</div>' } },
-    { path: '/dashboard', component: { template: '<div>Dashboard</div>' } }
-  ]
-})
 
 describe('Authentication Integration', () => {
   let authStore: ReturnType<typeof useAuthStore>

@@ -504,11 +504,11 @@ const loadModerationData = async () => {
       productsToModerate.value = data.productsToModerate
       flaggedReservations.value = data.flaggedReservations
       // console.log('✅ Données chargées avec succès:', {
-        stats: stats.value,
-        pendingMerchants: pendingMerchants.value.length,
-        productsToModerate: productsToModerate.value.length,
-        flaggedReservations: flaggedReservations.value.length
-      })
+      //   stats: stats.value,
+      //   pendingMerchants: pendingMerchants.value.length,
+      //   productsToModerate: productsToModerate.value.length,
+      //   flaggedReservations: flaggedReservations.value.length
+      // })
     } else {
       throw new Error(data.message || 'Erreur API')
     }

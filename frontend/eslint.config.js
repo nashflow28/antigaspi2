@@ -85,6 +85,9 @@ export default [
         Event: 'readonly',
         Element: 'readonly',
         confirm: 'readonly',
+        File: 'readonly',
+        HTMLInputElement: 'readonly',
+        Image: 'readonly',
 
         // Node.js globals for config files
         process: 'readonly',
@@ -105,7 +108,8 @@ export default [
         afterAll: 'readonly',
         vi: 'readonly',
         vitest: 'readonly',
-        MockedFunction: 'readonly'
+        MockedFunction: 'readonly',
+        performance: 'readonly'
       }
     },
     rules: {
@@ -141,7 +145,17 @@ export default [
       'public/**',
       'debug-*.js',
       'debug-scripts/**',
-      'test-*.js'
+      'test-*.js',
+      // Migration and utility scripts
+      '*.cjs',
+      'cleanup-*.cjs',
+      'count-*.cjs',
+      'fix-*.cjs',
+      'implement-*.cjs',
+      'migrate-*.cjs',
+      'validate-*.cjs',
+      'scripts/**',
+      'simple-xss-test.js'
     ]
   }
 ]
