@@ -19,10 +19,10 @@
 
         <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
           <div>
-            <h1 class="text-3xl lg:text-4xl font-bold text-neutral-900 mb-2">
+            <h1 class="text-responsive-xl lg:text-display-sm font-semibold text-neutral-900 mb-2">
               {{ product ? 'Modifier le produit' : 'Chargement...' }}
             </h1>
-            <p class="text-neutral-600 text-lg">
+            <p class="text-neutral-600 text-responsive-lg">
               {{ product ? product.name : 'Veuillez patienter...' }}
             </p>
           </div>
@@ -53,7 +53,7 @@
         <div class="flex items-center justify-center py-8">
           <AlertCircleIcon class="w-8 h-8 text-red-500 mr-3" />
           <div>
-            <h3 class="text-lg font-semibold text-red-800 mb-1">Erreur de chargement</h3>
+            <h3 class="text-responsive-lg font-semibold text-red-800 mb-1">Erreur de chargement</h3>
             <p class="text-red-600">{{ error }}</p>
           </div>
         </div>
@@ -66,13 +66,13 @@
           <div class="lg:col-span-2 space-y-6">
             <Card>
               <template #header>
-                <h3 class="text-xl font-semibold text-neutral-900">Informations générales</h3>
+                <h3 class="text-responsive-xl font-semibold text-neutral-900">Informations générales</h3>
               </template>
 
               <div class="space-y-6">
                 <!-- Product Name -->
                 <div>
-                  <label for="name" class="block text-sm font-medium text-neutral-700 mb-2">
+                  <label for="name" class="block text-responsive-sm font-medium text-neutral-700 mb-2">
                     Nom du produit <span class="text-red-500">*</span>
                   </label>
                   <Input
@@ -86,7 +86,7 @@
 
                 <!-- Description -->
                 <div>
-                  <label for="description" class="block text-sm font-medium text-neutral-700 mb-2">
+                  <label for="description" class="block text-responsive-sm font-medium text-neutral-700 mb-2">
                     Description
                   </label>
                   <textarea
@@ -97,12 +97,12 @@
                     :class="{ 'border-red-300 bg-red-50 focus:ring-red-500 focus:border-red-500': errors.description }"
                     placeholder="Décrivez votre produit..."
                   />
-                  <p v-if="errors.description" class="mt-2 text-sm text-red-600">{{ errors.description }}</p>
+                  <p v-if="errors.description" class="mt-2 text-responsive-sm text-red-600">{{ errors.description }}</p>
                 </div>
 
                 <!-- Category -->
                 <div>
-                  <label for="category" class="block text-sm font-medium text-neutral-700 mb-2">
+                  <label for="category" class="block text-responsive-sm font-medium text-neutral-700 mb-2">
                     Catégorie <span class="text-red-500">*</span>
                   </label>
                   <select
@@ -117,21 +117,21 @@
                       {{ category.name }}
                     </option>
                   </select>
-                  <p v-if="errors.category_id" class="mt-2 text-sm text-red-600">{{ errors.category_id }}</p>
+                  <p v-if="errors.category_id" class="mt-2 text-responsive-sm text-red-600">{{ errors.category_id }}</p>
                 </div>
               </div>
             </Card>
 
             <Card>
               <template #header>
-                <h3 class="text-xl font-semibold text-neutral-900">Prix et disponibilité</h3>
+                <h3 class="text-responsive-xl font-semibold text-neutral-900">Prix et disponibilité</h3>
               </template>
 
               <div class="space-y-6">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <!-- Original Price -->
                   <div>
-                    <label for="original_price" class="block text-sm font-medium text-neutral-700 mb-2">
+                    <label for="original_price" class="block text-responsive-sm font-medium text-neutral-700 mb-2">
                       Prix original (XOF) <span class="text-red-500">*</span>
                     </label>
                     <Input
@@ -148,7 +148,7 @@
 
                   <!-- Discounted Price -->
                   <div>
-                    <label for="discounted_price" class="block text-sm font-medium text-neutral-700 mb-2">
+                    <label for="discounted_price" class="block text-responsive-sm font-medium text-neutral-700 mb-2">
                       Prix réduit (XOF) <span class="text-red-500">*</span>
                     </label>
                     <Input
@@ -166,7 +166,7 @@
 
                 <!-- Quantity -->
                 <div>
-                  <label for="quantity_available" class="block text-sm font-medium text-neutral-700 mb-2">
+                  <label for="quantity_available" class="block text-responsive-sm font-medium text-neutral-700 mb-2">
                     Quantité disponible <span class="text-red-500">*</span>
                   </label>
                   <Input
@@ -182,7 +182,7 @@
 
                 <!-- Expiry Date -->
                 <div>
-                  <label for="expires_at" class="block text-sm font-medium text-neutral-700 mb-2">
+                  <label for="expires_at" class="block text-responsive-sm font-medium text-neutral-700 mb-2">
                     Date d'expiration
                   </label>
                   <Input
@@ -197,7 +197,7 @@
 
             <Card>
               <template #header>
-                <h3 class="text-xl font-semibold text-neutral-900">Image du produit</h3>
+                <h3 class="text-responsive-xl font-semibold text-neutral-900">Image du produit</h3>
               </template>
 
               <div class="space-y-4">
@@ -231,7 +231,7 @@
                     <CloudUploadIcon class="w-5 h-5 mr-2" />
                     {{ product.image_url ? 'Changer l\'image' : 'Ajouter une image' }}
                   </Button>
-                  <p class="text-sm text-neutral-500 mt-2">PNG, JPG jusqu'à 2MB</p>
+                  <p class="text-responsive-sm text-neutral-500 mt-2">PNG, JPG jusqu'à 2MB</p>
                 </div>
               </div>
             </Card>
@@ -262,55 +262,55 @@
           <div class="space-y-6">
             <Card>
               <template #header>
-                <h3 class="text-lg font-semibold text-neutral-900">Status</h3>
+                <h3 class="text-responsive-lg font-semibold text-neutral-900">Status</h3>
               </template>
 
               <div class="space-y-4">
                 <div class="flex items-center justify-between">
-                  <span class="text-sm font-medium text-neutral-700">Statut</span>
+                  <span class="text-responsive-sm font-medium text-neutral-700">Statut</span>
                   <Badge :variant="product.status === 'active' ? 'success' : 'secondary'">
                     {{ product.status === 'active' ? 'Actif' : 'Inactif' }}
                   </Badge>
                 </div>
 
                 <div class="flex items-center justify-between">
-                  <span class="text-sm font-medium text-neutral-700">Réduction</span>
+                  <span class="text-responsive-sm font-medium text-neutral-700">Réduction</span>
                   <Badge variant="warning">
                     -{{ Math.round(((product.original_price - product.discounted_price) / product.original_price) * 100) }}%
                   </Badge>
                 </div>
 
                 <div class="flex items-center justify-between">
-                  <span class="text-sm font-medium text-neutral-700">Créé le</span>
-                  <span class="text-sm text-neutral-500">{{ formatDate(product.created_at) }}</span>
+                  <span class="text-responsive-sm font-medium text-neutral-700">Créé le</span>
+                  <span class="text-responsive-sm text-neutral-500">{{ formatDate(product.created_at) }}</span>
                 </div>
 
                 <div class="flex items-center justify-between">
-                  <span class="text-sm font-medium text-neutral-700">Modifié le</span>
-                  <span class="text-sm text-neutral-500">{{ formatDate(product.updated_at) }}</span>
+                  <span class="text-responsive-sm font-medium text-neutral-700">Modifié le</span>
+                  <span class="text-responsive-sm text-neutral-500">{{ formatDate(product.updated_at) }}</span>
                 </div>
               </div>
             </Card>
 
             <Card>
               <template #header>
-                <h3 class="text-lg font-semibold text-neutral-900">Statistiques</h3>
+                <h3 class="text-responsive-lg font-semibold text-neutral-900">Statistiques</h3>
               </template>
 
               <div class="space-y-4">
                 <div class="flex items-center justify-between">
-                  <span class="text-sm font-medium text-neutral-700">Vues</span>
-                  <span class="text-sm font-semibold text-neutral-900">{{ product.views || 0 }}</span>
+                  <span class="text-responsive-sm font-medium text-neutral-700">Vues</span>
+                  <span class="text-responsive-sm font-semibold text-neutral-900">{{ product.views || 0 }}</span>
                 </div>
 
                 <div class="flex items-center justify-between">
-                  <span class="text-sm font-medium text-neutral-700">Réservations</span>
-                  <span class="text-sm font-semibold text-neutral-900">{{ product.reservations_count || 0 }}</span>
+                  <span class="text-responsive-sm font-medium text-neutral-700">Réservations</span>
+                  <span class="text-responsive-sm font-semibold text-neutral-900">{{ product.reservations_count || 0 }}</span>
                 </div>
 
                 <div class="flex items-center justify-between">
-                  <span class="text-sm font-medium text-neutral-700">Revenus</span>
-                  <span class="text-sm font-semibold text-primary-600">
+                  <span class="text-responsive-sm font-medium text-neutral-700">Revenus</span>
+                  <span class="text-responsive-sm font-semibold text-primary-600">
                     {{ formatPrice((product.reservations_count || 0) * product.discounted_price) }}
                   </span>
                 </div>

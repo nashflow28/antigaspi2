@@ -9,10 +9,10 @@
       <div class="container-2025 py-6">
         <div class="flex items-center justify-between animate-fade-in-up">
           <div>
-            <h1 class="text-3xl lg:text-4xl font-bold text-neutral-900 mb-2">
+            <h1 class="text-responsive-xl lg:text-display-sm font-semibold text-neutral-900 mb-2">
               Bonjour {{ authStore.user?.first_name }} ! 👋
             </h1>
-            <p class="text-lg text-neutral-600">
+            <p class="text-responsive-lg text-neutral-600">
               Découvrez vos économies et votre impact environnemental
             </p>
           </div>
@@ -37,11 +37,11 @@
         >
           <div class="flex items-center justify-between">
             <div>
-              <div class="text-2xl lg:text-3xl font-bold text-primary-600 mb-2">
+              <div class="text-responsive-xl lg:text-responsive-xl font-semibold text-primary-600 mb-2">
                 {{ formatPrice(userStats.totalSavings) }}
               </div>
-              <p class="text-sm text-neutral-600 font-medium">Économies totales</p>
-              <div class="flex items-center mt-2 text-xs text-primary-600">
+              <p class="text-responsive-sm text-neutral-600 font-medium">Économies totales</p>
+              <div class="flex items-center mt-2 text-responsive-xs text-primary-600">
                 <TrendingUp class="w-4 h-4 mr-1" />
                 <span>+{{ formatPrice(userStats.monthSavings) }} ce mois</span>
               </div>
@@ -61,11 +61,11 @@
         >
           <div class="flex items-center justify-between">
             <div>
-              <div class="text-2xl lg:text-3xl font-bold text-primary-600 mb-2">
+              <div class="text-responsive-xl lg:text-responsive-xl font-semibold text-primary-600 mb-2">
                 {{ userStats.productsSaved }}
               </div>
-              <p class="text-sm text-neutral-600 font-medium">Produits sauvés</p>
-              <div class="flex items-center mt-2 text-xs text-primary-600">
+              <p class="text-responsive-sm text-neutral-600 font-medium">Produits sauvés</p>
+              <div class="flex items-center mt-2 text-responsive-xs text-primary-600">
                 <Package class="w-4 h-4 mr-1" />
                 <span>{{ userStats.monthProducts }} ce mois</span>
               </div>
@@ -85,11 +85,11 @@
         >
           <div class="flex items-center justify-between">
             <div>
-              <div class="text-2xl lg:text-3xl font-bold text-accent-blue mb-2">
+              <div class="text-responsive-xl lg:text-responsive-xl font-semibold text-accent-blue mb-2">
                 {{ userStats.co2Saved }}kg
               </div>
-              <p class="text-sm text-neutral-600 font-medium">CO₂ évité</p>
-              <div class="flex items-center mt-2 text-xs text-accent-blue">
+              <p class="text-responsive-sm text-neutral-600 font-medium">CO₂ évité</p>
+              <div class="flex items-center mt-2 text-responsive-xs text-accent-blue">
                 <Leaf class="w-4 h-4 mr-1" />
                 <span>≈ {{ Math.round(userStats.co2Saved / 2.3) }} km en voiture</span>
               </div>
@@ -109,11 +109,11 @@
         >
           <div class="flex items-center justify-between">
             <div>
-              <div class="text-2xl lg:text-3xl font-bold text-accent-orange mb-2">
+              <div class="text-responsive-xl lg:text-responsive-xl font-semibold text-accent-orange mb-2">
                 {{ userStats.activeReservations }}
               </div>
-              <p class="text-sm text-neutral-600 font-medium">Réservations actives</p>
-              <div class="flex items-center mt-2 text-xs text-accent-orange">
+              <p class="text-responsive-sm text-neutral-600 font-medium">Réservations actives</p>
+              <div class="flex items-center mt-2 text-responsive-xs text-accent-orange">
                 <Clock class="w-4 h-4 mr-1" />
                 <span>À récupérer aujourd'hui</span>
               </div>
@@ -134,11 +134,11 @@
         >
           <div class="flex items-center justify-between">
             <div>
-              <div class="text-2xl lg:text-3xl font-bold text-indigo-600 mb-2">
+              <div class="text-responsive-xl lg:text-responsive-xl font-semibold text-indigo-600 mb-2">
                 {{ walletStore.formattedBalance || '0 XOF' }}
               </div>
-              <p class="text-sm text-neutral-600 font-medium">Mon portefeuille</p>
-              <div class="flex items-center mt-2 text-xs text-indigo-600">
+              <p class="text-responsive-sm text-neutral-600 font-medium">Mon portefeuille</p>
+              <div class="flex items-center mt-2 text-responsive-xs text-indigo-600">
                 <Wallet class="w-4 h-4 mr-1" />
                 <span v-if="walletStore.isActive">Actif</span>
                 <span v-else>Inactif</span>
@@ -158,8 +158,8 @@
           <Card class="animate-fade-in-up" style="animation-delay: 0.5s;">
             <div class="flex items-center justify-between mb-6">
               <div>
-                <h3 class="text-xl font-bold text-neutral-900 mb-1">Mes réservations récentes</h3>
-                <p class="text-sm text-neutral-600">Vos dernières réservations de produits</p>
+                <h3 class="text-responsive-xl font-semibold text-neutral-900 mb-1">Mes réservations récentes</h3>
+                <p class="text-responsive-sm text-neutral-600">Vos dernières réservations de produits</p>
               </div>
               <Button
                 variant="ghost"
@@ -201,12 +201,12 @@
                 class="flex items-center gap-4 p-4 rounded-xl border border-neutral-200 hover:border-primary-300 hover:shadow-card transition-all duration-200"
               >
                 <div class="w-16 h-16 bg-nav-gradient rounded-xl flex items-center justify-center">
-                  <span class="text-white font-bold">{{ reservation.merchant.name[0] }}</span>
+                  <span class="text-white font-semibold">{{ reservation.merchant.name[0] }}</span>
                 </div>
                 <div class="flex-1 min-w-0">
                   <h4 class="font-semibold text-neutral-900 mb-1">{{ reservation.product.name }}</h4>
-                  <p class="text-sm text-neutral-600 mb-1">{{ reservation.merchant.name }}</p>
-                  <div class="flex items-center gap-4 text-xs">
+                  <p class="text-responsive-sm text-neutral-600 mb-1">{{ reservation.merchant.name }}</p>
+                  <div class="flex items-center gap-4 text-responsive-xs">
                     <Badge variant="primary">{{ formatPrice(reservation.price) }}</Badge>
                     <span class="text-neutral-500">{{ formatDate(reservation.pickup_date) }}</span>
                   </div>
@@ -224,8 +224,8 @@
           <Card class="animate-fade-in-up" style="animation-delay: 0.6s;">
             <div class="flex items-center justify-between mb-6">
               <div>
-                <h3 class="text-xl font-bold text-neutral-900 mb-1">Recommandés pour vous</h3>
-                <p class="text-sm text-neutral-600">Basé sur vos préférences et votre localisation</p>
+                <h3 class="text-responsive-xl font-semibold text-neutral-900 mb-1">Recommandés pour vous</h3>
+                <p class="text-responsive-sm text-neutral-600">Basé sur vos préférences et votre localisation</p>
               </div>
               <Button
                 variant="ghost"
@@ -253,13 +253,13 @@
                     <h4 class="font-semibold text-neutral-900 mb-1 group-hover:text-primary-600 transition-colors">
                       {{ product.name }}
                     </h4>
-                    <p class="text-sm text-neutral-600">{{ product.merchant.name }}</p>
+                    <p class="text-responsive-sm text-neutral-600">{{ product.merchant.name }}</p>
                   </div>
                 </div>
                 <div class="flex items-center justify-between">
                   <div class="flex items-center gap-2">
-                    <span class="text-lg font-bold text-primary-600">{{ formatPrice(product.discounted_price) }}</span>
-                    <span class="text-sm text-neutral-400 line-through">{{ formatPrice(product.original_price) }}</span>
+                    <span class="text-responsive-lg font-semibold text-primary-600">{{ formatPrice(product.discounted_price) }}</span>
+                    <span class="text-responsive-sm text-neutral-400 line-through">{{ formatPrice(product.original_price) }}</span>
                   </div>
                   <Badge variant="success">-{{ product.discount }}%</Badge>
                 </div>
@@ -272,9 +272,9 @@
         <div class="space-y-6">
           <!-- Badge d'impact -->
           <Card variant="gradient" class="text-center animate-fade-in-up" style="animation-delay: 0.7s;">
-            <div class="text-6xl mb-4">🌍</div>
-            <h3 class="text-xl font-bold text-neutral-900 mb-2">Éco-Héros</h3>
-            <p class="text-sm text-neutral-600 mb-4">
+            <div class="text-display-lg mb-4">🌍</div>
+            <h3 class="text-responsive-xl font-semibold text-neutral-900 mb-2">Éco-Héros</h3>
+            <p class="text-responsive-sm text-neutral-600 mb-4">
               Vous avez évité le gaspillage de {{ userStats.productsSaved }} produits !
             </p>
             <div class="w-full bg-neutral-200 rounded-full h-2 mb-4">
@@ -283,14 +283,14 @@
                 :style="{ width: Math.min(100, (userStats.productsSaved / 100) * 100) + '%' }"
               />
             </div>
-            <p class="text-xs text-neutral-500">
+            <p class="text-responsive-xs text-neutral-500">
               Plus que {{ Math.max(0, 100 - userStats.productsSaved) }} produits pour le niveau suivant
             </p>
           </Card>
 
           <!-- Actions rapides -->
           <Card class="animate-fade-in-up" style="animation-delay: 0.8s;">
-            <h3 class="text-lg font-bold text-neutral-900 mb-4">Actions rapides</h3>
+            <h3 class="text-responsive-lg font-semibold text-neutral-900 mb-4">Actions rapides</h3>
             <div class="space-y-3">
               <router-link to="/products" class="flex items-center gap-3 p-3 rounded-xl hover:bg-primary-50 transition-colors group">
                 <div class="w-10 h-10 bg-primary-100 rounded-xl flex items-center justify-center group-hover:bg-primary-200 transition-colors">
@@ -298,7 +298,7 @@
                 </div>
                 <div>
                   <p class="font-medium text-neutral-900">Chercher des produits</p>
-                  <p class="text-xs text-neutral-600">Découvrez les offres près de chez vous</p>
+                  <p class="text-responsive-xs text-neutral-600">Découvrez les offres près de chez vous</p>
                 </div>
               </router-link>
 
@@ -308,7 +308,7 @@
                 </div>
                 <div>
                   <p class="font-medium text-neutral-900">Mes réservations</p>
-                  <p class="text-xs text-neutral-600">Gérer mes commandes en cours</p>
+                  <p class="text-responsive-xs text-neutral-600">Gérer mes commandes en cours</p>
                 </div>
               </router-link>
 
@@ -318,7 +318,7 @@
                 </div>
                 <div>
                   <p class="font-medium text-neutral-900">Mon profil</p>
-                  <p class="text-xs text-neutral-600">Paramètres et préférences</p>
+                  <p class="text-responsive-xs text-neutral-600">Paramètres et préférences</p>
                 </div>
               </router-link>
             </div>
@@ -330,9 +330,9 @@
               <div class="w-8 h-8 bg-primary-500 rounded-full flex items-center justify-center">
                 <Lightbulb class="w-4 h-4 text-white" />
               </div>
-              <h3 class="text-lg font-bold text-primary-800">Astuce du jour</h3>
+              <h3 class="text-responsive-lg font-semibold text-primary-800">Astuce du jour</h3>
             </div>
-            <p class="text-sm text-primary-700 mb-4">
+            <p class="text-responsive-sm text-primary-700 mb-4">
               {{ currentTip.text }}
             </p>
             <Button

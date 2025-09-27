@@ -3,7 +3,7 @@
     <div class="container mx-auto px-4 pt-10">
       <button
         type="button"
-        class="mb-6 inline-flex items-center gap-2 text-sm font-medium text-neutral-600 hover:text-neutral-900"
+        class="mb-6 inline-flex items-center gap-2 text-responsive-sm font-medium text-neutral-600 hover:text-neutral-900"
         @click="router.back()"
       >
         <ArrowLeft class="h-4 w-4" />
@@ -19,7 +19,7 @@
         <div class="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-neutral-100">
           <Package class="h-8 w-8 text-neutral-400" />
         </div>
-        <h2 class="text-xl font-semibold text-neutral-800">Panier introuvable</h2>
+        <h2 class="text-responsive-xl font-semibold text-neutral-800">Panier introuvable</h2>
         <p class="mt-2 text-neutral-500">Ce panier surprise n'est plus disponible ou n'existe pas.</p>
         <Button variant="primary" class="mt-6" @click="router.push({ name: 'surprise-baskets' })">
           Voir les autres paniers
@@ -43,7 +43,7 @@
             </div>
             <div class="absolute left-6 top-6 flex items-center gap-3">
               <Badge variant="success" class="font-semibold">-{{ basket.basket_discount_percentage }}%</Badge>
-              <span class="rounded-full bg-white/90 px-3 py-1 text-xs font-medium text-neutral-700 shadow-modern-2025">
+              <span class="rounded-full bg-white/90 px-3 py-1 text-responsive-xs font-medium text-neutral-700 shadow-modern-2025">
                 <Clock class="mr-1 inline-block h-4 w-4 text-primary-500" />
                 {{ timeLeft }}
               </span>
@@ -52,9 +52,9 @@
 
           <div class="space-y-6 p-6">
             <header class="space-y-2">
-              <h1 class="text-3xl font-bold text-neutral-900">{{ basket.name }}</h1>
+              <h1 class="text-responsive-xl font-semibold text-neutral-900">{{ basket.name }}</h1>
               <p v-if="basket.surprise_description" class="text-neutral-600">{{ basket.surprise_description }}</p>
-              <div class="flex flex-wrap items-center gap-3 text-sm text-neutral-500">
+              <div class="flex flex-wrap items-center gap-3 text-responsive-sm text-neutral-500">
                 <span class="inline-flex items-center gap-2 rounded-full bg-primary-50 px-3 py-1 text-primary-700">
                   <Store class="h-4 w-4" />
                   {{ basket.merchant.business_name }}
@@ -71,7 +71,7 @@
             </header>
 
             <section>
-              <h2 class="text-lg font-semibold text-neutral-900">Contenu surprise</h2>
+              <h2 class="text-responsive-lg font-semibold text-neutral-900">Contenu surprise</h2>
               <ul v-if="basket.surprise_basket_items?.length" class="mt-3 space-y-3">
                 <li
                   v-for="item in basket.surprise_basket_items"
@@ -80,12 +80,12 @@
                 >
                   <div>
                     <p class="font-medium text-neutral-800">{{ item.product.name }}</p>
-                    <p class="text-xs text-neutral-500">Quantité min : {{ item.quantity }}</p>
+                    <p class="text-responsive-xs text-neutral-500">Quantité min : {{ item.quantity }}</p>
                   </div>
-                  <span class="text-sm font-medium text-neutral-600">{{ formatPrice(item.total_price) }}</span>
+                  <span class="text-responsive-sm font-medium text-neutral-600">{{ formatPrice(item.total_price) }}</span>
                 </li>
               </ul>
-              <p v-else class="mt-3 text-sm text-neutral-500">
+              <p v-else class="mt-3 text-responsive-sm text-neutral-500">
                 Ce panier est une surprise ! Le commerçant sélectionne les meilleurs produits disponibles.
               </p>
             </section>
@@ -94,20 +94,20 @@
 
         <Card class="space-y-6 p-6">
           <div>
-            <h2 class="text-lg font-semibold text-neutral-900">Votre réservation</h2>
-            <p class="text-sm text-neutral-500">Réservez dès maintenant et récupérez votre panier avant l'expiration.</p>
+            <h2 class="text-responsive-lg font-semibold text-neutral-900">Votre réservation</h2>
+            <p class="text-responsive-sm text-neutral-500">Réservez dès maintenant et récupérez votre panier avant l'expiration.</p>
           </div>
 
           <div class="space-y-3 rounded-xl bg-neutral-50 p-4">
             <div class="flex items-center justify-between">
-              <span class="text-sm text-neutral-500">Prix réduit</span>
-              <span class="text-xl font-bold text-primary-600">{{ formattedDiscountedPrice }}</span>
+              <span class="text-responsive-sm text-neutral-500">Prix réduit</span>
+              <span class="text-responsive-xl font-semibold text-primary-600">{{ formattedDiscountedPrice }}</span>
             </div>
-            <div class="flex items-center justify-between text-sm text-neutral-500">
+            <div class="flex items-center justify-between text-responsive-sm text-neutral-500">
               <span>Valeur d'origine</span>
               <span class="line-through">{{ formattedOriginalPrice }}</span>
             </div>
-            <div class="flex items-center justify-between text-sm font-semibold text-primary-600">
+            <div class="flex items-center justify-between text-responsive-sm font-semibold text-primary-600">
               <span>Économies</span>
               <span>{{ formattedSavings }}</span>
             </div>
@@ -124,14 +124,14 @@
               class="input-field-2025"
               :disabled="maxQuantity === 0"
             >
-            <p class="text-xs text-neutral-500">{{ maxQuantity }} panier{{ maxQuantity > 1 ? 's' : '' }} restant{{ maxQuantity > 1 ? 's' : '' }}</p>
+            <p class="text-responsive-xs text-neutral-500">{{ maxQuantity }} panier{{ maxQuantity > 1 ? 's' : '' }} restant{{ maxQuantity > 1 ? 's' : '' }}</p>
           </div>
 
           <div class="space-y-4">
             <div>
               <div class="flex items-center justify-between">
-                <h3 class="text-sm font-semibold text-neutral-900">Moyen de paiement</h3>
-                <span class="text-xs text-neutral-500">Sélectionnez une option</span>
+                <h3 class="text-responsive-sm font-semibold text-neutral-900">Moyen de paiement</h3>
+                <span class="text-responsive-xs text-neutral-500">Sélectionnez une option</span>
               </div>
               <div class="mt-3 space-y-3">
                 <button
@@ -154,11 +154,11 @@
                   </div>
                   <div class="flex-1">
                     <p class="font-medium text-neutral-900">{{ option.label }}</p>
-                    <p class="text-xs text-neutral-500">{{ option.description }}</p>
+                    <p class="text-responsive-xs text-neutral-500">{{ option.description }}</p>
                   </div>
                   <span
                     v-if="paymentMethod === option.value"
-                    class="text-xs font-semibold text-primary-600"
+                    class="text-responsive-xs font-semibold text-primary-600"
                   >
                     Choisi
                   </span>
@@ -179,29 +179,29 @@
                 }"
                 :disabled="submitting"
               >
-              <p class="text-xs text-neutral-500">Utilisez un numéro enregistré sur le portefeuille sélectionné.</p>
-              <p v-if="phoneError" class="text-xs font-medium text-accent-red">{{ phoneError }}</p>
+              <p class="text-responsive-xs text-neutral-500">Utilisez un numéro enregistré sur le portefeuille sélectionné.</p>
+              <p v-if="phoneError" class="text-responsive-xs font-medium text-accent-red">{{ phoneError }}</p>
             </div>
 
             <p
               v-if="selectedPaymentOption?.instructions"
-              class="rounded-xl bg-neutral-50 p-3 text-xs text-neutral-600"
+              class="rounded-xl bg-neutral-50 p-3 text-responsive-xs text-neutral-600"
             >
               {{ selectedPaymentOption.instructions }}
             </p>
           </div>
 
-          <div class="rounded-xl bg-primary-50 p-4 text-sm text-primary-700">
+          <div class="rounded-xl bg-primary-50 p-4 text-responsive-sm text-primary-700">
             <p class="font-semibold">Montant à régler</p>
-            <p class="text-2xl font-bold">{{ totalReservationPrice }}</p>
-            <p v-if="quantity > 1" class="mt-1 text-xs text-primary-600">Soit {{ formattedDiscountedPrice }} par panier</p>
-            <p v-if="methodRequiresPhone" class="mt-2 text-xs">
+            <p class="text-responsive-xl font-semibold">{{ totalReservationPrice }}</p>
+            <p v-if="quantity > 1" class="mt-1 text-responsive-xs text-primary-600">Soit {{ formattedDiscountedPrice }} par panier</p>
+            <p v-if="methodRequiresPhone" class="mt-2 text-responsive-xs">
               Un SMS de validation sera envoyé par l'opérateur après la demande de paiement.
             </p>
-            <p v-else-if="paymentMethod === 'paystack'" class="mt-2 text-xs">
+            <p v-else-if="paymentMethod === 'paystack'" class="mt-2 text-responsive-xs">
               Une page sécurisée Paystack s'ouvrira pour finaliser le paiement.
             </p>
-            <p v-else-if="paymentMethod === 'on_site'" class="mt-2 text-xs">
+            <p v-else-if="paymentMethod === 'on_site'" class="mt-2 text-responsive-xs">
               Réglez ce montant directement auprès du commerçant lors du retrait.
             </p>
           </div>
@@ -219,10 +219,10 @@
               </span>
               <span v-else>{{ reserveButtonLabel }}</span>
             </button>
-            <p v-if="!authStore.isAuthenticated" class="text-center text-xs text-neutral-500">
+            <p v-if="!authStore.isAuthenticated" class="text-center text-responsive-xs text-neutral-500">
               Connectez-vous pour finaliser la réservation.
             </p>
-            <p v-else-if="!authStore.isConsumer" class="text-center text-xs text-neutral-500">
+            <p v-else-if="!authStore.isConsumer" class="text-center text-responsive-xs text-neutral-500">
               Seuls les consommateurs peuvent réserver des paniers.
             </p>
           </div>

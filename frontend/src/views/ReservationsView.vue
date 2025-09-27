@@ -4,7 +4,7 @@
       <div class="mx-auto max-w-6xl space-y-8 px-6 py-spacing-22">
         <div class="space-y-3">
           <p class="text-small uppercase tracking-wide text-white/80">Suivi des commandes</p>
-          <h1 class="text-display-sm font-semibold leading-tight">Mes réservations</h1>
+          <h1 class="text-display-sm font-semibold leading-relaxed">Mes réservations</h1>
           <p class="max-w-2xl text-body text-white/80">Visualisez l'ensemble de vos réservations, suivez leur statut et mesurez votre impact positif.</p>
         </div>
         <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">

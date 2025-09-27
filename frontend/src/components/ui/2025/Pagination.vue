@@ -2,7 +2,7 @@
   <div :class="wrapperClasses">
     <!-- Information -->
     <div v-if="showInfo" class="flex-1">
-      <p class="text-sm text-neutral-600">
+      <p class="text-responsive-sm text-neutral-600">
         Affichage {{ startItem }} à {{ endItem }} sur {{ total }} résultats
       </p>
     </div>
@@ -66,7 +66,7 @@
 
       <!-- Compact Page Info -->
       <div v-if="compact" class="flex items-center space-x-2">
-        <span class="text-sm text-neutral-600">
+        <span class="text-responsive-sm text-neutral-600">
           Page {{ currentPage }} sur {{ totalPages }}
         </span>
       </div>
@@ -85,7 +85,7 @@
 
     <!-- Page Size Selector -->
     <div v-if="showPageSize" class="flex items-center space-x-2">
-      <label for="page-size" class="text-sm text-neutral-600">
+      <label for="page-size" class="text-responsive-sm text-neutral-600">
         Éléments par page:
       </label>
       <Select

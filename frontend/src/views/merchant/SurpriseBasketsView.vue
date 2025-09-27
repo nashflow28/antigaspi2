@@ -9,10 +9,10 @@
       <div v-if="currentView === 'list'" class="mb-8">
         <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
           <div>
-            <h1 class="text-3xl lg:text-4xl font-bold text-neutral-900 mb-2">
+            <h1 class="text-responsive-xl lg:text-display-sm font-semibold text-neutral-900 mb-2">
               Paniers Surprise
             </h1>
-            <p class="text-neutral-600 text-lg">
+            <p class="text-neutral-600 text-responsive-lg">
               Créez des paniers mystère pour valoriser vos invendus
             </p>
           </div>
@@ -51,12 +51,12 @@
         </div>
 
         <div>
-          <h1 class="text-3xl lg:text-4xl font-bold text-neutral-900 mb-2">
+          <h1 class="text-responsive-xl lg:text-display-sm font-semibold text-neutral-900 mb-2">
             <template v-if="currentView === 'create'">Nouveau Panier Surprise</template>
             <template v-else-if="currentView === 'edit'">Modifier le Panier</template>
             <template v-else-if="currentView === 'detail'">Détails du Panier</template>
           </h1>
-          <p class="text-neutral-600 text-lg">
+          <p class="text-neutral-600 text-responsive-lg">
             <template v-if="currentView === 'create'">Créez un panier mystère attractif</template>
             <template v-else-if="currentView === 'edit'">{{ editingBasket?.name }}</template>
             <template v-else-if="currentView === 'detail'">{{ selectedBasket?.name }}</template>
@@ -78,7 +78,7 @@
           <AlertTriangleIcon class="w-8 h-8 text-accent-red mr-3" />
           <div>
             <p class="text-accent-red/90 font-medium">Erreur lors du chargement</p>
-            <p class="text-accent-red text-sm">{{ error }}</p>
+            <p class="text-accent-red text-responsive-sm">{{ error }}</p>
           </div>
         </div>
       </Card>
@@ -90,8 +90,8 @@
           <Card class="bg-gradient-to-r from-purple-500 to-purple-600 text-white">
             <div class="flex items-center justify-between">
               <div>
-                <p class="text-purple-100 text-sm font-medium">Total Paniers</p>
-                <p class="text-3xl font-bold">{{ baskets.length }}</p>
+                <p class="text-purple-100 text-responsive-sm font-medium">Total Paniers</p>
+                <p class="text-responsive-xl font-semibold">{{ baskets.length }}</p>
               </div>
               <div class="p-3 bg-white/20 rounded-xl">
                 <GiftIcon class="w-6 h-6" />
@@ -102,8 +102,8 @@
           <Card class="bg-gradient-to-r from-primary-500 to-primary-600 text-white">
             <div class="flex items-center justify-between">
               <div>
-                <p class="text-primary-100 text-sm font-medium">Actifs</p>
-                <p class="text-3xl font-bold">{{ activeBaskets.length }}</p>
+                <p class="text-primary-100 text-responsive-sm font-medium">Actifs</p>
+                <p class="text-responsive-xl font-semibold">{{ activeBaskets.length }}</p>
               </div>
               <div class="p-3 bg-white/20 rounded-xl">
                 <CheckCircleIcon class="w-6 h-6" />
@@ -114,8 +114,8 @@
           <Card class="bg-gradient-to-r from-accent-orange to-accent-orange/90 text-white">
             <div class="flex items-center justify-between">
               <div>
-                <p class="text-accent-orange/70 text-sm font-medium">Stock Total</p>
-                <p class="text-3xl font-bold">{{ totalStock }}</p>
+                <p class="text-accent-orange/70 text-responsive-sm font-medium">Stock Total</p>
+                <p class="text-responsive-xl font-semibold">{{ totalStock }}</p>
               </div>
               <div class="p-3 bg-white/20 rounded-xl">
                 <PackageIcon class="w-6 h-6" />
@@ -126,8 +126,8 @@
           <Card class="bg-gradient-to-r from-accent-blue/50 to-accent-blue/90 text-white">
             <div class="flex items-center justify-between">
               <div>
-                <p class="text-accent-blue/60 text-sm font-medium">Revenus Potentiels</p>
-                <p class="text-3xl font-bold">{{ formatPrice(totalRevenue) }}</p>
+                <p class="text-accent-blue/60 text-responsive-sm font-medium">Revenus Potentiels</p>
+                <p class="text-responsive-xl font-semibold">{{ formatPrice(totalRevenue) }}</p>
               </div>
               <div class="p-3 bg-white/20 rounded-xl">
                 <DollarSignIcon class="w-6 h-6" />
@@ -141,7 +141,7 @@
           <div class="w-20 h-20 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-6">
             <GiftIcon class="w-10 h-10 text-purple-500" />
           </div>
-          <h3 class="text-xl font-bold text-neutral-900 mb-2">Aucun panier surprise</h3>
+          <h3 class="text-responsive-xl font-semibold text-neutral-900 mb-2">Aucun panier surprise</h3>
           <p class="text-neutral-600 mb-6 max-w-md mx-auto">
             Créez votre premier panier surprise pour valoriser vos invendus et offrir des surprises à vos clients
           </p>
@@ -169,7 +169,7 @@
               <!-- Status Badge -->
               <div class="absolute top-4 right-4">
                 <span
-                  class="px-2 py-1 text-xs font-medium rounded-full"
+                  class="px-2 py-1 text-responsive-xs font-medium rounded-full"
                   :class="basket.is_active ? 'bg-primary-100 text-primary-700' : 'bg-neutral-100 text-neutral-600'"
                 >
                   {{ basket.is_active ? 'Actif' : 'Inactif' }}
@@ -178,7 +178,7 @@
 
               <!-- Discount Badge -->
               <div class="absolute bottom-4 left-4">
-                <span class="px-2 py-1 text-xs font-bold bg-accent-red/100 text-white rounded-full">
+                <span class="px-2 py-1 text-responsive-xs font-semibold bg-accent-red/100 text-white rounded-full">
                   -{{ Math.round(((basket.original_price - basket.discounted_price) / basket.original_price) * 100) }}%
                 </span>
               </div>
@@ -188,25 +188,25 @@
             <div class="p-6">
               <div class="flex items-start justify-between mb-4">
                 <div>
-                  <h3 class="font-bold text-neutral-900 mb-1">{{ basket.name }}</h3>
-                  <p class="text-sm text-neutral-600 line-clamp-2">{{ basket.description }}</p>
+                  <h3 class="font-semibold text-neutral-900 mb-1">{{ basket.name }}</h3>
+                  <p class="text-responsive-sm text-neutral-600 line-clamp-2">{{ basket.description }}</p>
                 </div>
               </div>
 
               <!-- Pricing -->
               <div class="flex items-center gap-2 mb-4">
-                <span class="text-lg font-bold text-primary-600">{{ formatPrice(basket.discounted_price) }}</span>
-                <span class="text-sm text-neutral-400 line-through">{{ formatPrice(basket.original_price) }}</span>
+                <span class="text-responsive-lg font-semibold text-primary-600">{{ formatPrice(basket.discounted_price) }}</span>
+                <span class="text-responsive-sm text-neutral-400 line-through">{{ formatPrice(basket.original_price) }}</span>
               </div>
 
               <!-- Stock -->
-              <div class="flex items-center gap-2 mb-4 text-sm text-neutral-600">
+              <div class="flex items-center gap-2 mb-4 text-responsive-sm text-neutral-600">
                 <PackageIcon class="w-4 h-4" />
                 <span>{{ basket.quantity_available }} disponible{{ basket.quantity_available > 1 ? 's' : '' }}</span>
               </div>
 
               <!-- Products Count -->
-              <div class="flex items-center gap-2 mb-6 text-sm text-neutral-600">
+              <div class="flex items-center gap-2 mb-6 text-responsive-sm text-neutral-600">
                 <LayersIcon class="w-4 h-4" />
                 <span>{{ basket.products?.length || 0 }} produit{{ (basket.products?.length || 0) > 1 ? 's' : '' }}</span>
               </div>

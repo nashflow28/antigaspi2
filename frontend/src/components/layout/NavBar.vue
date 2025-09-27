@@ -32,13 +32,13 @@
             :aria-current="$route.path === '/' ? 'page' : undefined"
           >
             <div class="w-10 h-10 bg-nav-gradient rounded-xl flex items-center justify-center shadow-card group-hover:shadow-glow transition-all duration-300">
-              <span class="text-white text-xl">🌱</span>
+              <span class="text-white text-responsive-xl">🌱</span>
             </div>
             <div class="flex flex-col">
-              <span class="text-2xl font-bold bg-nav-gradient bg-clip-text text-transparent font-display">
+              <span class="text-responsive-xl font-semibold bg-nav-gradient bg-clip-text text-transparent font-display">
                 Antigaspi
               </span>
-              <span class="text-xs text-neutral-500 font-medium -mt-1 font-heading">
+              <span class="text-responsive-xs text-neutral-500 font-medium -mt-1 font-heading">
                 Sauvons ensemble
               </span>
             </div>
@@ -161,17 +161,17 @@
                   >
                     <div class="relative">
                       <div class="w-10 h-10 bg-nav-gradient rounded-xl flex items-center justify-center shadow-card group-hover:shadow-glow transition-all duration-300">
-                        <span class="text-white font-bold text-sm">
+                        <span class="text-white font-semibold text-responsive-sm">
                           {{ userInitials }}
                         </span>
                       </div>
                       <div class="absolute -bottom-1 -right-1 w-4 h-4 bg-primary-500 rounded-full border-2 border-white shadow-card" />
                     </div>
                     <div class="flex flex-col text-left">
-                      <span class="font-semibold text-sm group-hover:text-white transition-colors">
+                      <span class="font-semibold text-responsive-sm group-hover:text-white transition-colors">
                         {{ authStore.user?.first_name }}
                       </span>
-                      <span class="text-xs text-neutral-400 group-hover:text-white/80 transition-colors">
+                      <span class="text-responsive-xs text-neutral-400 group-hover:text-white/80 transition-colors">
                         {{ authStore.user?.role }}
                       </span>
                     </div>
@@ -206,11 +206,11 @@
                       <div class="px-4 py-3 border-b border-white/10">
                         <div class="flex items-center space-x-3">
                           <div class="w-12 h-12 bg-nav-gradient rounded-xl flex items-center justify-center shadow-card">
-                            <span class="text-white font-bold">{{ userInitials }}</span>
+                            <span class="text-white font-semibold">{{ userInitials }}</span>
                           </div>
                           <div>
                             <p class="font-semibold text-neutral-900">{{ authStore.user?.first_name }} {{ authStore.user?.last_name }}</p>
-                            <p class="text-sm text-neutral-500">{{ authStore.user?.email }}</p>
+                            <p class="text-responsive-sm text-neutral-500">{{ authStore.user?.email }}</p>
                             <Badge variant="primary" size="sm" class="mt-1">{{ getRoleLabel(authStore.user?.role) }}</Badge>
                           </div>
                         </div>
@@ -220,7 +220,7 @@
                       <div class="py-2" role="group" aria-label="Navigation utilisateur">
                         <router-link
                           :to="getDashboardRoute()"
-                          class="flex items-center px-4 py-3 text-sm text-neutral-700 hover:bg-nav-gradient hover:text-white transition-all duration-200 group"
+                          class="flex items-center px-4 py-3 text-responsive-sm text-neutral-700 hover:bg-nav-gradient hover:text-white transition-all duration-200 group"
                           role="menuitem"
                           @click="showUserMenu = false"
                           @keydown="handleMenuItemKeydown"
@@ -230,7 +230,7 @@
                         </router-link>
                         <router-link
                           to="/profile"
-                          class="flex items-center px-4 py-3 text-sm text-neutral-700 hover:bg-gradient-to-r from-accent-blue to-accent-blue/90 hover:text-white transition-all duration-200 group"
+                          class="flex items-center px-4 py-3 text-responsive-sm text-neutral-700 hover:bg-gradient-to-r from-accent-blue to-accent-blue/90 hover:text-white transition-all duration-200 group"
                           @click="showUserMenu = false"
                         >
                           <Settings class="w-4 h-4 mr-3 group-hover:text-white" />
@@ -240,7 +240,7 @@
                         <template v-if="authStore.isConsumer">
                           <router-link
                             to="/surprise-baskets"
-                            class="flex items-center px-4 py-3 text-sm text-neutral-700 hover:bg-nav-gradient hover:text-white transition-all duration-200 group"
+                            class="flex items-center px-4 py-3 text-responsive-sm text-neutral-700 hover:bg-nav-gradient hover:text-white transition-all duration-200 group"
                             @click="showUserMenu = false"
                           >
                             <Gift class="w-4 h-4 mr-3 group-hover:text-white" />
@@ -248,7 +248,7 @@
                           </router-link>
                           <router-link
                             to="/reservations"
-                            class="flex items-center px-4 py-3 text-sm text-neutral-700 hover:bg-nav-gradient hover:text-white transition-all duration-200 group"
+                            class="flex items-center px-4 py-3 text-responsive-sm text-neutral-700 hover:bg-nav-gradient hover:text-white transition-all duration-200 group"
                             @click="showUserMenu = false"
                           >
                             <ShoppingBag class="w-4 h-4 mr-3 group-hover:text-white" />
@@ -256,7 +256,7 @@
                           </router-link>
                           <router-link
                             to="/wallet"
-                            class="flex items-center px-4 py-3 text-sm text-neutral-700 hover:bg-gradient-to-r from-accent-blue to-accent-blue/90 hover:text-white transition-all duration-200 group"
+                            class="flex items-center px-4 py-3 text-responsive-sm text-neutral-700 hover:bg-gradient-to-r from-accent-blue to-accent-blue/90 hover:text-white transition-all duration-200 group"
                             @click="showUserMenu = false"
                           >
                             <Wallet class="w-4 h-4 mr-3 group-hover:text-white" />
@@ -264,7 +264,7 @@
                           </router-link>
                           <router-link
                             to="/loyalty"
-                            class="flex items-center px-4 py-3 text-sm text-neutral-700 hover:bg-nav-gradient hover:text-white transition-all duration-200 group"
+                            class="flex items-center px-4 py-3 text-responsive-sm text-neutral-700 hover:bg-nav-gradient hover:text-white transition-all duration-200 group"
                             @click="showUserMenu = false"
                           >
                             <Star class="w-4 h-4 mr-3 group-hover:text-white" />
@@ -275,7 +275,7 @@
                         <template v-if="authStore.isMerchant">
                           <router-link
                             to="/merchant/products"
-                            class="flex items-center px-4 py-3 text-sm text-neutral-700 hover:bg-nav-gradient hover:text-white transition-all duration-200 group"
+                            class="flex items-center px-4 py-3 text-responsive-sm text-neutral-700 hover:bg-nav-gradient hover:text-white transition-all duration-200 group"
                             @click="showUserMenu = false"
                           >
                             <Package class="w-4 h-4 mr-3 group-hover:text-white" />
@@ -283,7 +283,7 @@
                           </router-link>
                           <router-link
                             to="/merchant/reservations"
-                            class="flex items-center px-4 py-3 text-sm text-neutral-700 hover:bg-nav-gradient hover:text-white transition-all duration-200 group"
+                            class="flex items-center px-4 py-3 text-responsive-sm text-neutral-700 hover:bg-nav-gradient hover:text-white transition-all duration-200 group"
                             @click="showUserMenu = false"
                           >
                             <ShoppingBag class="w-4 h-4 mr-3 group-hover:text-white" />
@@ -291,7 +291,7 @@
                           </router-link>
                           <router-link
                             to="/merchant/reviews/dashboard"
-                            class="flex items-center px-4 py-3 text-sm text-neutral-700 hover:bg-nav-gradient hover:text-white transition-all duration-200 group"
+                            class="flex items-center px-4 py-3 text-responsive-sm text-neutral-700 hover:bg-nav-gradient hover:text-white transition-all duration-200 group"
                             @click="showUserMenu = false"
                           >
                             <MessageSquare class="w-4 h-4 mr-3 group-hover:text-white" />
@@ -299,7 +299,7 @@
                           </router-link>
                           <router-link
                             to="/merchant/loyalty"
-                            class="flex items-center px-4 py-3 text-sm text-neutral-700 hover:bg-nav-gradient hover:text-white transition-all duration-200 group"
+                            class="flex items-center px-4 py-3 text-responsive-sm text-neutral-700 hover:bg-nav-gradient hover:text-white transition-all duration-200 group"
                             @click="showUserMenu = false"
                           >
                             <Star class="w-4 h-4 mr-3 group-hover:text-white" />
@@ -310,7 +310,7 @@
                         <template v-if="authStore.isAdmin">
                           <router-link
                             to="/admin/users"
-                            class="flex items-center px-4 py-3 text-sm text-neutral-700 hover:bg-nav-gradient hover:text-white transition-all duration-200 group"
+                            class="flex items-center px-4 py-3 text-responsive-sm text-neutral-700 hover:bg-nav-gradient hover:text-white transition-all duration-200 group"
                             @click="showUserMenu = false"
                           >
                             <User class="w-4 h-4 mr-3 group-hover:text-white" />
@@ -318,7 +318,7 @@
                           </router-link>
                           <router-link
                             to="/admin/merchants"
-                            class="flex items-center px-4 py-3 text-sm text-neutral-700 hover:bg-nav-gradient hover:text-white transition-all duration-200 group"
+                            class="flex items-center px-4 py-3 text-responsive-sm text-neutral-700 hover:bg-nav-gradient hover:text-white transition-all duration-200 group"
                             @click="showUserMenu = false"
                           >
                             <ShoppingBag class="w-4 h-4 mr-3 group-hover:text-white" />
@@ -326,7 +326,7 @@
                           </router-link>
                           <router-link
                             to="/admin/categories"
-                            class="flex items-center px-4 py-3 text-sm text-neutral-700 hover:bg-nav-gradient hover:text-white transition-all duration-200 group"
+                            class="flex items-center px-4 py-3 text-responsive-sm text-neutral-700 hover:bg-nav-gradient hover:text-white transition-all duration-200 group"
                             @click="showUserMenu = false"
                           >
                             <Package class="w-4 h-4 mr-3 group-hover:text-white" />
@@ -334,7 +334,7 @@
                           </router-link>
                           <router-link
                             to="/admin/reviews"
-                            class="flex items-center px-4 py-3 text-sm text-neutral-700 hover:bg-nav-gradient hover:text-white transition-all duration-200 group"
+                            class="flex items-center px-4 py-3 text-responsive-sm text-neutral-700 hover:bg-nav-gradient hover:text-white transition-all duration-200 group"
                             @click="showUserMenu = false"
                           >
                             <MessageSquare class="w-4 h-4 mr-3 group-hover:text-white" />
@@ -347,7 +347,7 @@
                       <div class="border-t border-white/10 pt-2 mt-2">
                         <Button
                           variant="ghost"
-                          class="mx-2 flex w-[calc(100%-1rem)] items-center justify-start gap-3 px-4 py-3 text-sm text-accent-red transition-all duration-200 hover:bg-accent-red/10 hover:text-accent-red/90"
+                          class="mx-2 flex w-[calc(100%-1rem)] items-center justify-start gap-3 px-4 py-3 text-responsive-sm text-accent-red transition-all duration-200 hover:bg-accent-red/10 hover:text-accent-red/90"
                           @click="handleLogout"
                         >
                           <LogOut class="w-4 h-4" />

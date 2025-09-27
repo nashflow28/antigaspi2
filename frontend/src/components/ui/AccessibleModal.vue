@@ -36,7 +36,7 @@
             <!-- Skip Link -->
             <a
               href="#modal-close"
-              class="skip-link sr-only focus:not-sr-only focus:absolute focus:top-2 focus:right-2 bg-primary-600 text-white px-2 py-1 rounded text-sm z-10"
+              class="skip-link sr-only focus:not-sr-only focus:absolute focus:top-2 focus:right-2 bg-primary-600 text-white px-2 py-1 rounded text-responsive-sm z-10"
             >
               Skip to close button
             </a>
@@ -74,7 +74,7 @@
               <p
                 v-if="description || slots.description"
                 :id="descriptionId"
-                class="text-sm text-neutral-600 dark:text-neutral-400 mt-2"
+                class="text-responsive-sm text-neutral-600 dark:text-neutral-400 mt-2"
               >
                 <slot name="description">{{ description }}</slot>
               </p>

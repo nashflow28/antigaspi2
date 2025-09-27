@@ -2,7 +2,7 @@
   <div class="edit-surprise-basket">
     <!-- Header -->
     <div class="mb-6">
-      <h2 class="text-2xl font-bold text-neutral-900 mb-2">
+      <h2 class="text-responsive-xl font-semibold text-neutral-900 mb-2">
         Modifier le Panier Surprise
       </h2>
       <p class="text-neutral-600">
@@ -14,12 +14,12 @@
     <form class="space-y-6" @submit.prevent="handleSubmit">
       <!-- Basic Information -->
       <div class="bg-white rounded-xl border border-neutral-200 p-6">
-        <h3 class="text-lg font-semibold text-neutral-900 mb-4">Informations générales</h3>
+        <h3 class="text-responsive-lg font-semibold text-neutral-900 mb-4">Informations générales</h3>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
           <!-- Name -->
           <div>
-            <label for="name" class="block text-sm font-medium text-neutral-700 mb-2">
+            <label for="name" class="block text-responsive-sm font-medium text-neutral-700 mb-2">
               Nom du panier surprise *
             </label>
             <input
@@ -34,7 +34,7 @@
 
           <!-- Category -->
           <div>
-            <label for="category" class="block text-sm font-medium text-neutral-700 mb-2">
+            <label for="category" class="block text-responsive-sm font-medium text-neutral-700 mb-2">
               Catégorie
             </label>
             <select
@@ -51,7 +51,7 @@
 
           <!-- Price -->
           <div>
-            <label for="price" class="block text-sm font-medium text-neutral-700 mb-2">
+            <label for="price" class="block text-responsive-sm font-medium text-neutral-700 mb-2">
               Prix du panier (XOF) *
             </label>
             <input
@@ -68,7 +68,7 @@
 
           <!-- Quantity -->
           <div>
-            <label for="quantity" class="block text-sm font-medium text-neutral-700 mb-2">
+            <label for="quantity" class="block text-responsive-sm font-medium text-neutral-700 mb-2">
               Nombre de paniers disponibles *
             </label>
             <input
@@ -85,7 +85,7 @@
 
         <!-- Description -->
         <div class="mt-6">
-          <label for="description" class="block text-sm font-medium text-neutral-700 mb-2">
+          <label for="description" class="block text-responsive-sm font-medium text-neutral-700 mb-2">
             Description générale
           </label>
           <textarea
@@ -99,7 +99,7 @@
 
         <!-- Surprise Description -->
         <div class="mt-6">
-          <label for="surprise-description" class="block text-sm font-medium text-neutral-700 mb-2">
+          <label for="surprise-description" class="block text-responsive-sm font-medium text-neutral-700 mb-2">
             Description mystère (visible par les clients)
           </label>
           <textarea
@@ -109,7 +109,7 @@
             class="w-full px-4 py-3 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
             placeholder="Ex: Un assortiment de viennoiseries fraîches du jour..."
           />
-          <p class="text-sm text-neutral-500 mt-1">
+          <p class="text-responsive-sm text-neutral-500 mt-1">
             Cette description sera visible par les clients sans révéler le contenu exact
           </p>
         </div>
@@ -117,7 +117,7 @@
 
       <!-- Status -->
       <div class="bg-white rounded-xl border border-neutral-200 p-6">
-        <h3 class="text-lg font-semibold text-neutral-900 mb-4">Statut</h3>
+        <h3 class="text-responsive-lg font-semibold text-neutral-900 mb-4">Statut</h3>
 
         <div class="flex items-center">
           <input
@@ -126,23 +126,23 @@
             type="checkbox"
             class="h-4 w-4 text-primary-600 focus:ring-primary-500 border-neutral-300 rounded"
           >
-          <label for="is-active" class="ml-2 block text-sm text-neutral-900">
+          <label for="is-active" class="ml-2 block text-responsive-sm text-neutral-900">
             Panier actif et visible par les clients
           </label>
         </div>
-        <p class="text-sm text-neutral-500 mt-1">
+        <p class="text-responsive-sm text-neutral-500 mt-1">
           Décochez pour désactiver temporairement ce panier surprise
         </p>
       </div>
 
       <!-- Additional Options -->
       <div class="bg-white rounded-xl border border-neutral-200 p-6">
-        <h3 class="text-lg font-semibold text-neutral-900 mb-4">Options avancées</h3>
+        <h3 class="text-responsive-lg font-semibold text-neutral-900 mb-4">Options avancées</h3>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
           <!-- Min Items -->
           <div>
-            <label for="min-items" class="block text-sm font-medium text-neutral-700 mb-2">
+            <label for="min-items" class="block text-responsive-sm font-medium text-neutral-700 mb-2">
               Nombre minimum d'articles
             </label>
             <input
@@ -157,7 +157,7 @@
 
           <!-- Max Items -->
           <div>
-            <label for="max-items" class="block text-sm font-medium text-neutral-700 mb-2">
+            <label for="max-items" class="block text-responsive-sm font-medium text-neutral-700 mb-2">
               Nombre maximum d'articles
             </label>
             <input
@@ -172,7 +172,7 @@
 
           <!-- Expiration Date -->
           <div>
-            <label for="expiration" class="block text-sm font-medium text-neutral-700 mb-2">
+            <label for="expiration" class="block text-responsive-sm font-medium text-neutral-700 mb-2">
               Date d'expiration
             </label>
             <input
@@ -185,7 +185,7 @@
 
           <!-- Image URL -->
           <div>
-            <label for="image" class="block text-sm font-medium text-neutral-700 mb-2">
+            <label for="image" class="block text-responsive-sm font-medium text-neutral-700 mb-2">
               URL de l'image
             </label>
             <input
@@ -202,8 +202,8 @@
       <!-- Current Products -->
       <div class="bg-white rounded-xl border border-neutral-200 p-6">
         <div class="flex items-center justify-between mb-4">
-          <h3 class="text-lg font-semibold text-neutral-900">Produits inclus</h3>
-          <p class="text-sm text-neutral-500">
+          <h3 class="text-responsive-lg font-semibold text-neutral-900">Produits inclus</h3>
+          <p class="text-responsive-sm text-neutral-500">
             {{ basket.basket_items_count }} produit(s) • Valeur: {{ formatCurrency(basket.total_original_value || 0) }}
           </p>
         </div>
@@ -229,7 +229,7 @@
               </div>
               <div>
                 <h4 class="font-medium text-neutral-900">{{ item.product.name }}</h4>
-                <p class="text-sm text-neutral-500">
+                <p class="text-responsive-sm text-neutral-500">
                   {{ item.quantity }} × {{ formatCurrency(item.unit_price) }} = {{ formatCurrency(item.total_price) }}
                 </p>
               </div>

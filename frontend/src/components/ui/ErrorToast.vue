@@ -26,10 +26,10 @@
               </div>
 
               <div class="ml-3 w-0 flex-1 pt-0.5">
-                <p class="text-sm font-medium text-neutral-900">
+                <p class="text-responsive-sm font-medium text-neutral-900">
                   {{ getErrorTitle(error.severity) }}
                 </p>
-                <p class="mt-1 text-sm text-neutral-500">
+                <p class="mt-1 text-responsive-sm text-neutral-500">
                   {{ error.userMessage }}
                 </p>
 
@@ -40,7 +40,7 @@
                 >
                   <button
                     type="button"
-                    class="rounded-md bg-white text-sm font-medium text-indigo-600 hover:text-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                    class="rounded-md bg-white text-responsive-sm font-medium text-indigo-600 hover:text-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
                     @click="retryError(error)"
                   >
                     Réessayer

@@ -9,8 +9,8 @@
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between items-center py-6">
           <div>
-            <h1 class="text-3xl font-bold text-neutral-900">Gestion des Catégories</h1>
-            <p class="mt-1 text-sm text-neutral-600">
+            <h1 class="text-responsive-xl font-semibold text-neutral-900">Gestion des Catégories</h1>
+            <p class="mt-1 text-responsive-sm text-neutral-600">
               Gérer les catégories de produits de la plateforme
             </p>
           </div>
@@ -35,8 +35,8 @@
               <TagIcon class="w-6 h-6 text-blue-600" />
             </div>
             <div class="ml-4">
-              <p class="text-sm font-medium text-neutral-600">Total</p>
-              <p class="text-2xl font-bold text-neutral-900">{{ stats.total_categories || 0 }}</p>
+              <p class="text-responsive-sm font-medium text-neutral-600">Total</p>
+              <p class="text-responsive-xl font-semibold text-neutral-900">{{ stats.total_categories || 0 }}</p>
             </div>
           </div>
         </Card>
@@ -47,8 +47,8 @@
               <CheckCircleIcon class="w-6 h-6 text-green-600" />
             </div>
             <div class="ml-4">
-              <p class="text-sm font-medium text-neutral-600">Actives</p>
-              <p class="text-2xl font-bold text-neutral-900">{{ stats.active_categories || 0 }}</p>
+              <p class="text-responsive-sm font-medium text-neutral-600">Actives</p>
+              <p class="text-responsive-xl font-semibold text-neutral-900">{{ stats.active_categories || 0 }}</p>
             </div>
           </div>
         </Card>
@@ -59,8 +59,8 @@
               <CubeIcon class="w-6 h-6 text-purple-600" />
             </div>
             <div class="ml-4">
-              <p class="text-sm font-medium text-neutral-600">Avec Produits</p>
-              <p class="text-2xl font-bold text-neutral-900">{{ stats.categories_with_products || 0 }}</p>
+              <p class="text-responsive-sm font-medium text-neutral-600">Avec Produits</p>
+              <p class="text-responsive-xl font-semibold text-neutral-900">{{ stats.categories_with_products || 0 }}</p>
             </div>
           </div>
         </Card>
@@ -71,8 +71,8 @@
               <ChartBarIcon class="w-6 h-6 text-orange-600" />
             </div>
             <div class="ml-4">
-              <p class="text-sm font-medium text-neutral-600">Top Catégorie</p>
-              <p class="text-lg font-bold text-neutral-900">
+              <p class="text-responsive-sm font-medium text-neutral-600">Top Catégorie</p>
+              <p class="text-responsive-lg font-semibold text-neutral-900">
                 {{ stats.top_categories && stats.top_categories.length > 0 ? stats.top_categories[0].name : 'Aucune' }}
               </p>
             </div>
@@ -84,7 +84,7 @@
       <Card>
         <div class="px-6 py-4 border-b border-neutral-200">
           <div class="flex justify-between items-center">
-            <h3 class="text-lg font-medium text-neutral-900">Liste des Catégories</h3>
+            <h3 class="text-responsive-lg font-medium text-neutral-900">Liste des Catégories</h3>
             <div class="flex items-center gap-4">
               <!-- Search -->
               <div class="relative">
@@ -120,19 +120,19 @@
           <table class="min-w-full divide-y divide-neutral-200">
             <thead class="bg-neutral-50">
               <tr>
-                <th class="px-6 py-3 text-left text-xs font-medium text-neutral-500 uppercase tracking-wider">
+                <th class="px-6 py-3 text-left text-responsive-xs font-medium text-neutral-500 uppercase tracking-wider">
                   Catégorie
                 </th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-neutral-500 uppercase tracking-wider">
+                <th class="px-6 py-3 text-left text-responsive-xs font-medium text-neutral-500 uppercase tracking-wider">
                   Description
                 </th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-neutral-500 uppercase tracking-wider">
+                <th class="px-6 py-3 text-left text-responsive-xs font-medium text-neutral-500 uppercase tracking-wider">
                   Produits
                 </th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-neutral-500 uppercase tracking-wider">
+                <th class="px-6 py-3 text-left text-responsive-xs font-medium text-neutral-500 uppercase tracking-wider">
                   Statut
                 </th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-neutral-500 uppercase tracking-wider">
+                <th class="px-6 py-3 text-left text-responsive-xs font-medium text-neutral-500 uppercase tracking-wider">
                   Actions
                 </th>
               </tr>
@@ -141,22 +141,22 @@
               <tr v-for="category in filteredCategories" :key="category.id" class="hover:bg-neutral-50">
                 <td class="px-6 py-4 whitespace-nowrap">
                   <div class="flex items-center">
-                    <span class="text-2xl mr-3">{{ category.icon || '📦' }}</span>
+                    <span class="text-responsive-xl mr-3">{{ category.icon || '📦' }}</span>
                     <div>
-                      <div class="text-sm font-medium text-neutral-900">{{ category.name }}</div>
-                      <div class="text-sm text-neutral-500">ID: {{ category.id }}</div>
+                      <div class="text-responsive-sm font-medium text-neutral-900">{{ category.name }}</div>
+                      <div class="text-responsive-sm text-neutral-500">ID: {{ category.id }}</div>
                     </div>
                   </div>
                 </td>
                 <td class="px-6 py-4">
-                  <div class="text-sm text-neutral-900 max-w-xs">{{ category.description }}</div>
+                  <div class="text-responsive-sm text-neutral-900 max-w-xs">{{ category.description }}</div>
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap">
-                  <div class="text-sm text-neutral-900">{{ (category.products_count ?? 0) }} produit(s)</div>
+                  <div class="text-responsive-sm text-neutral-900">{{ (category.products_count ?? 0) }} produit(s)</div>
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap">
                   <button
-                    class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
+                    class="inline-flex items-center px-2.5 py-0.5 rounded-full text-responsive-xs font-medium"
                     :class="category.is_active
                       ? 'bg-green-100 text-green-800 hover:bg-green-200'
                       : 'bg-red-100 text-red-800 hover:bg-red-200'"
@@ -165,7 +165,7 @@
                     {{ category.is_active ? 'Active' : 'Inactive' }}
                   </button>
                 </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                <td class="px-6 py-4 whitespace-nowrap text-responsive-sm font-medium">
                   <div class="flex items-center gap-2">
                     <button
                       class="text-blue-600 hover:text-blue-900"
@@ -200,7 +200,7 @@
         <!-- Empty State -->
         <div v-else class="px-6 py-12 text-center">
           <TagIcon class="w-12 h-12 text-neutral-400 mx-auto mb-4" />
-          <h3 class="text-lg font-medium text-neutral-900 mb-2">Aucune catégorie trouvée</h3>
+          <h3 class="text-responsive-lg font-medium text-neutral-900 mb-2">Aucune catégorie trouvée</h3>
           <p class="text-neutral-500 mb-6">
             {{ searchQuery ? 'Aucune catégorie ne correspond à votre recherche.' : 'Commencez par créer votre première catégorie.' }}
           </p>
@@ -236,7 +236,7 @@
                 <div class="p-2 rounded-xl bg-blue-100">
                   <component :is="modal.icon" class="w-6 h-6 text-blue-600" />
                 </div>
-                <h3 class="text-xl font-semibold text-neutral-900">{{ modal.title }}</h3>
+                <h3 class="text-responsive-xl font-semibold text-neutral-900">{{ modal.title }}</h3>
               </div>
               <button
                 class="p-2 hover:bg-neutral-100 rounded-lg transition-colors"
@@ -251,7 +251,7 @@
           <div class="px-6 py-6">
             <form class="space-y-6" @submit.prevent="saveCategory">
               <div>
-                <label for="name" class="block text-sm font-medium text-neutral-700 mb-2">
+                <label for="name" class="block text-responsive-sm font-medium text-neutral-700 mb-2">
                   Nom de la catégorie *
                 </label>
                 <input
@@ -266,7 +266,7 @@
               </div>
 
               <div>
-                <label for="description" class="block text-sm font-medium text-neutral-700 mb-2">
+                <label for="description" class="block text-responsive-sm font-medium text-neutral-700 mb-2">
                   Description *
                 </label>
                 <textarea
@@ -281,7 +281,7 @@
               </div>
 
               <div>
-                <label for="icon" class="block text-sm font-medium text-neutral-700 mb-2">
+                <label for="icon" class="block text-responsive-sm font-medium text-neutral-700 mb-2">
                   Icône (emoji)
                 </label>
                 <input
@@ -301,7 +301,7 @@
                     type="checkbox"
                     class="rounded border-neutral-300 text-primary-600 focus:ring-primary-500"
                   >
-                  <span class="ml-2 text-sm text-neutral-700">Catégorie active</span>
+                  <span class="ml-2 text-responsive-sm text-neutral-700">Catégorie active</span>
                 </label>
               </div>
 

@@ -6,8 +6,8 @@
           <Edit class="w-6 h-6 text-blue-600" />
         </div>
         <div>
-          <h3 class="text-lg font-semibold text-neutral-900">Modifier votre avis</h3>
-          <p class="text-neutral-600 text-sm">Mettez à jour votre expérience</p>
+          <h3 class="text-responsive-lg font-semibold text-neutral-900">Modifier votre avis</h3>
+          <p class="text-neutral-600 text-responsive-sm">Mettez à jour votre expérience</p>
         </div>
       </div>
       <button
@@ -21,7 +21,7 @@
     <form class="space-y-6" @submit.prevent="submitUpdate">
       <!-- Rating -->
       <div>
-        <label class="block text-sm font-medium text-neutral-700 mb-3">
+        <label class="block text-responsive-sm font-medium text-neutral-700 mb-3">
           Note générale *
         </label>
         <StarRating
@@ -29,12 +29,12 @@
           :size="32"
           :show-text="true"
         />
-        <p v-if="errors.rating" class="mt-1 text-sm text-red-600">{{ errors.rating }}</p>
+        <p v-if="errors.rating" class="mt-1 text-responsive-sm text-red-600">{{ errors.rating }}</p>
       </div>
 
       <!-- Title -->
       <div>
-        <label for="edit-title" class="block text-sm font-medium text-neutral-700 mb-2">
+        <label for="edit-title" class="block text-responsive-sm font-medium text-neutral-700 mb-2">
           Titre de votre avis
         </label>
         <input
@@ -45,12 +45,12 @@
           class="w-full border border-neutral-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           placeholder="Ex: Service rapide et produits frais"
         >
-        <p v-if="errors.title" class="mt-1 text-sm text-red-600">{{ errors.title }}</p>
+        <p v-if="errors.title" class="mt-1 text-responsive-sm text-red-600">{{ errors.title }}</p>
       </div>
 
       <!-- Comment -->
       <div>
-        <label for="edit-comment" class="block text-sm font-medium text-neutral-700 mb-2">
+        <label for="edit-comment" class="block text-responsive-sm font-medium text-neutral-700 mb-2">
           Votre commentaire
         </label>
         <textarea
@@ -62,8 +62,8 @@
           placeholder="Décrivez votre expérience mise à jour..."
         />
         <div class="flex justify-between mt-1">
-          <p v-if="errors.comment" class="text-sm text-red-600">{{ errors.comment }}</p>
-          <p class="text-xs text-neutral-500">{{ (form.comment?.length || 0) }}/1000 caractères</p>
+          <p v-if="errors.comment" class="text-responsive-sm text-red-600">{{ errors.comment }}</p>
+          <p class="text-responsive-xs text-neutral-500">{{ (form.comment?.length || 0) }}/1000 caractères</p>
         </div>
       </div>
 
@@ -123,7 +123,7 @@
     <!-- Delete Confirmation Modal -->
     <div v-if="showDeleteConfirm" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[120]">
       <div class="bg-white rounded-lg p-6 max-w-md w-mx-4">
-        <h3 class="text-lg font-semibold text-neutral-900 mb-4">Supprimer l'avis</h3>
+        <h3 class="text-responsive-lg font-semibold text-neutral-900 mb-4">Supprimer l'avis</h3>
         <p class="text-neutral-600 mb-6">
           Êtes-vous sûr de vouloir supprimer définitivement cet avis ? Cette action ne peut pas être annulée.
         </p>

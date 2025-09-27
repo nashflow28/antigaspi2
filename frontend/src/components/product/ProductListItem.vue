@@ -8,7 +8,7 @@
         </div>
 
         <!-- Badge de réduction -->
-        <div class="absolute -top-2 -right-2 bg-primary-500 text-white px-2 py-1 rounded-full text-xs font-bold shadow-card">
+        <div class="absolute -top-2 -right-2 bg-primary-500 text-white px-2 py-1 rounded-full text-responsive-xs font-semibold shadow-card">
           -{{ product.discount }}%
         </div>
       </div>
@@ -17,14 +17,14 @@
       <div class="flex-1 min-w-0 space-y-3">
         <!-- Titre et description -->
         <div>
-          <h3 class="text-xl font-bold text-neutral-900 mb-1 group-hover:text-primary-600 transition-colors">
+          <h3 class="text-responsive-xl font-semibold text-neutral-900 mb-1 group-hover:text-primary-600 transition-colors">
             {{ product.name }}
           </h3>
-          <p class="text-sm text-neutral-600 line-clamp-2">{{ product.description }}</p>
+          <p class="text-responsive-sm text-neutral-600 line-clamp-2">{{ product.description }}</p>
         </div>
 
         <!-- Informations marchand et timing -->
-        <div class="flex items-center gap-4 text-sm">
+        <div class="flex items-center gap-4 text-responsive-sm">
           <div class="flex items-center gap-1 text-neutral-600">
             <MapPin class="w-4 h-4" />
             <span class="font-medium">{{ product.merchant.name }}</span>
@@ -41,7 +41,7 @@
 
           <div class="flex items-center gap-1">
             <div class="w-2 h-2 bg-primary-500 rounded-full" />
-            <span class="text-sm text-neutral-600">
+            <span class="text-responsive-sm text-neutral-600">
               {{ product.available_quantity - product.reserved_quantity }} disponible{{ (product.available_quantity - product.reserved_quantity) > 1 ? 's' : '' }}
             </span>
           </div>
@@ -52,10 +52,10 @@
       <div class="flex items-center gap-6">
         <!-- Prix -->
         <div class="text-right">
-          <div class="text-2xl font-bold text-primary-600">
+          <div class="text-responsive-xl font-semibold text-primary-600">
             {{ formatPrice(product.discounted_price) }}
           </div>
-          <div class="text-sm text-neutral-400 line-through">
+          <div class="text-responsive-sm text-neutral-400 line-through">
             {{ formatPrice(product.original_price) }}
           </div>
         </div>

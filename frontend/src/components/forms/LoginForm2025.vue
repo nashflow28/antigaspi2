@@ -2,7 +2,7 @@
   <div class="space-y-8">
     <!-- Header moderne -->
     <div class="text-center animate-fade-in-up">
-      <h3 class="text-2xl font-bold text-neutral-900 mb-2">
+      <h3 class="text-responsive-xl font-semibold text-neutral-900 mb-2">
         Content de vous revoir !
       </h3>
       <p class="text-neutral-600">
@@ -51,12 +51,12 @@
             type="checkbox"
             class="rounded border-neutral-300 text-primary-600 focus:ring-primary-500"
           >
-          <span class="text-sm text-neutral-600">Se souvenir de moi</span>
+          <span class="text-responsive-sm text-neutral-600">Se souvenir de moi</span>
         </label>
 
         <router-link
           to="/forgot-password"
-          class="text-sm text-primary-600 hover:text-primary-700 font-medium"
+          class="text-responsive-sm text-primary-600 hover:text-primary-700 font-medium"
         >
           Mot de passe oublié ?
         </router-link>
@@ -83,8 +83,8 @@
         <div class="flex items-start gap-3">
           <AlertCircle class="w-5 h-5 text-red-500 mt-0.5 flex-shrink-0" />
           <div>
-            <h4 class="text-sm font-semibold text-red-800">Erreur de connexion</h4>
-            <p class="text-sm text-red-700 mt-1">{{ errorMessage }}</p>
+            <h4 class="text-responsive-sm font-semibold text-red-800">Erreur de connexion</h4>
+            <p class="text-responsive-sm text-red-700 mt-1">{{ errorMessage }}</p>
           </div>
         </div>
       </div>
@@ -96,7 +96,7 @@
         <div class="absolute inset-0 flex items-center">
           <div class="w-full border-t border-neutral-300" />
         </div>
-        <div class="relative flex justify-center text-sm">
+        <div class="relative flex justify-center text-responsive-sm">
           <span class="px-4 bg-white text-neutral-500">Ou continuez avec</span>
         </div>
       </div>
@@ -130,7 +130,7 @@
     </div>
 
     <!-- Sign Up Link -->
-    <div class="text-center text-sm text-neutral-600 animate-fade-in-up" style="animation-delay: 0.6s;">
+    <div class="text-center text-responsive-sm text-neutral-600 animate-fade-in-up" style="animation-delay: 0.6s;">
       Vous n'avez pas encore de compte ?
       <router-link
         to="/register"

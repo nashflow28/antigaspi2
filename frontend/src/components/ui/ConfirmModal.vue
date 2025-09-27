@@ -14,10 +14,10 @@
             <component :is="iconComponent" class="w-6 h-6" :class="iconClass" />
           </div>
           <div class="flex-1 min-w-0">
-            <h3 class="text-lg font-semibold text-neutral-900 mb-2">
+            <h3 class="text-responsive-lg font-semibold text-neutral-900 mb-2">
               {{ title }}
             </h3>
-            <p class="text-sm text-neutral-600 leading-relaxed">
+            <p class="text-responsive-sm text-neutral-600 leading-relaxed">
               {{ message }}
             </p>
           </div>

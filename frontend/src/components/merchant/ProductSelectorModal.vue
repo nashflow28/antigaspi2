@@ -3,7 +3,7 @@
     <div class="bg-white rounded-xl shadow-xl max-w-4xl w-full max-h-[80vh] overflow-hidden">
       <!-- Header -->
       <div class="flex items-center justify-between p-6 border-b border-neutral-200">
-        <h3 class="text-xl font-semibold text-neutral-900">Sélectionner des produits</h3>
+        <h3 class="text-responsive-xl font-semibold text-neutral-900">Sélectionner des produits</h3>
         <button
           class="p-2 hover:bg-neutral-100 rounded-lg transition-colors"
           @click="$emit('close')"
@@ -53,7 +53,7 @@
         <div v-else-if="filteredProducts.length === 0" class="p-8 text-center text-neutral-500">
           <Package class="w-12 h-12 mx-auto mb-3 text-neutral-300" />
           <p>Aucun produit trouvé</p>
-          <p class="text-sm">Essayez de modifier vos critères de recherche</p>
+          <p class="text-responsive-sm">Essayez de modifier vos critères de recherche</p>
         </div>
 
         <div v-else class="p-6">
@@ -82,18 +82,18 @@
                 <!-- Product Info -->
                 <div class="flex-1 min-w-0">
                   <h4 class="font-medium text-neutral-900 truncate">{{ product.name }}</h4>
-                  <p class="text-sm text-neutral-500 line-clamp-2">{{ product.description }}</p>
+                  <p class="text-responsive-sm text-neutral-500 line-clamp-2">{{ product.description }}</p>
 
                   <div class="mt-2 flex items-center justify-between">
                     <div class="flex items-center space-x-2">
-                      <span class="text-sm font-medium text-green-600">
+                      <span class="text-responsive-sm font-medium text-green-600">
                         {{ product.discounted_price }} XOF
                       </span>
-                      <span class="text-sm text-neutral-400 line-through">
+                      <span class="text-responsive-sm text-neutral-400 line-through">
                         {{ product.original_price }} XOF
                       </span>
                     </div>
-                    <span class="text-xs text-neutral-500">
+                    <span class="text-responsive-xs text-neutral-500">
                       Stock: {{ product.quantity_available }}
                     </span>
                   </div>
@@ -101,12 +101,12 @@
                   <!-- Quantity Selector -->
                   <div class="mt-3 flex items-center justify-between">
                     <div class="flex items-center space-x-2">
-                      <label class="text-sm text-neutral-700">Quantité:</label>
+                      <label class="text-responsive-sm text-neutral-700">Quantité:</label>
                       <div class="flex items-center space-x-1">
                         <button
                           type="button"
                           :disabled="getQuantity(product.id) <= 0"
-                          class="w-7 h-7 rounded-full border border-neutral-300 flex items-center justify-center hover:bg-neutral-100 disabled:opacity-50 disabled:cursor-not-allowed text-sm"
+                          class="w-7 h-7 rounded-full border border-neutral-300 flex items-center justify-center hover:bg-neutral-100 disabled:opacity-50 disabled:cursor-not-allowed text-responsive-sm"
                           @click="updateQuantity(product.id, getQuantity(product.id) - 1)"
                         >
                           <Minus class="w-3 h-3" />
@@ -116,13 +116,13 @@
                           type="number"
                           min="0"
                           :max="product.quantity_available"
-                          class="w-12 text-center text-sm border border-neutral-300 rounded py-1"
+                          class="w-12 text-center text-responsive-sm border border-neutral-300 rounded py-1"
                           @input="updateQuantity(product.id, parseInt(($event.target as HTMLInputElement).value) || 0)"
                         >
                         <button
                           type="button"
                           :disabled="getQuantity(product.id) >= product.quantity_available"
-                          class="w-7 h-7 rounded-full border border-neutral-300 flex items-center justify-center hover:bg-neutral-100 disabled:opacity-50 disabled:cursor-not-allowed text-sm"
+                          class="w-7 h-7 rounded-full border border-neutral-300 flex items-center justify-center hover:bg-neutral-100 disabled:opacity-50 disabled:cursor-not-allowed text-responsive-sm"
                           @click="updateQuantity(product.id, getQuantity(product.id) + 1)"
                         >
                           <Plus class="w-3 h-3" />
@@ -133,7 +133,7 @@
                     <!-- Toggle Button -->
                     <button
                       type="button"
-                      class="px-3 py-1 text-sm rounded-lg transition-colors"
+                      class="px-3 py-1 text-responsive-sm rounded-lg transition-colors"
                       :class="isSelected(product.id)
                         ? 'bg-red-100 text-red-700 hover:bg-red-200'
                         : 'bg-primary-100 text-primary-700 hover:bg-primary-200'"
@@ -152,7 +152,7 @@
       <!-- Footer -->
       <div class="p-6 border-t border-neutral-200 bg-neutral-50">
         <div class="flex items-center justify-between">
-          <div class="text-sm text-neutral-600">
+          <div class="text-responsive-sm text-neutral-600">
             {{ selectedProductsList.length }} produit(s) sélectionné(s)
           </div>
           <div class="flex items-center space-x-3">

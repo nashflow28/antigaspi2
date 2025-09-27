@@ -33,7 +33,7 @@
       >
         <div class="text-center">
           <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600 mx-auto mb-2" />
-          <p class="text-sm text-neutral-600">Chargement de la carte...</p>
+          <p class="text-responsive-sm text-neutral-600">Chargement de la carte...</p>
         </div>
       </div>
 
@@ -78,9 +78,9 @@
       >
         <div class="flex items-start space-x-2">
           <Info class="w-4 h-4 text-blue-500 mt-0.5 flex-shrink-0" />
-          <div class="text-sm text-neutral-700">
+          <div class="text-responsive-sm text-neutral-700">
             <p class="font-medium mb-1">Sélectionner un emplacement</p>
-            <p class="text-xs text-neutral-600">
+            <p class="text-responsive-xs text-neutral-600">
               Cliquez sur la carte ou utilisez la recherche pour choisir votre adresse
             </p>
           </div>
@@ -103,10 +103,10 @@
           </div>
           <div class="flex-1">
             <h4 class="font-medium text-green-900 mb-1">Emplacement sélectionné</h4>
-            <p class="text-sm text-green-700 mb-2">
+            <p class="text-responsive-sm text-green-700 mb-2">
               {{ selectedLocation.display_name || selectedLocation.formatted_address }}
             </p>
-            <div class="flex items-center space-x-4 text-xs text-green-600">
+            <div class="flex items-center space-x-4 text-responsive-xs text-green-600">
               <span>{{ selectedLocation.lat.toFixed(6) }}, {{ selectedLocation.lng.toFixed(6) }}</span>
               <span v-if="selectedLocation.distance">
                 {{ formatDistance(selectedLocation.distance) }} de votre position

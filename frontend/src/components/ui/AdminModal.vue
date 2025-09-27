@@ -26,7 +26,7 @@
                   :class="iconClass"
                 />
               </div>
-              <h3 class="text-xl font-semibold text-neutral-900">{{ title }}</h3>
+              <h3 class="text-responsive-xl font-semibold text-neutral-900">{{ title }}</h3>
             </div>
             <button
               class="p-2 hover:bg-neutral-100 rounded-lg transition-colors"
@@ -47,7 +47,7 @@
             >
               <h4
                 v-if="section.title"
-                class="font-semibold text-neutral-900 text-lg"
+                class="font-semibold text-neutral-900 text-responsive-lg"
               >
                 {{ section.title }}
               </h4>

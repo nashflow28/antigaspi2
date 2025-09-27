@@ -9,8 +9,8 @@
       <div class="bg-white shadow rounded-lg p-6 mb-6">
         <div class="flex items-center justify-between">
           <div>
-            <h1 class="text-2xl font-bold text-neutral-900">Modération des Commerçants</h1>
-            <p class="mt-1 text-sm text-neutral-500">Gérez les demandes d'inscription et surveiller l'activité des commerçants</p>
+            <h1 class="text-responsive-xl font-semibold text-neutral-900">Modération des Commerçants</h1>
+            <p class="mt-1 text-responsive-sm text-neutral-500">Gérez les demandes d'inscription et surveiller l'activité des commerçants</p>
           </div>
           <div class="flex items-center space-x-3">
             <button
@@ -58,8 +58,8 @@
               </div>
               <div class="ml-5 w-0 flex-1">
                 <dl>
-                  <dt class="text-sm font-medium text-neutral-500 truncate">Commerçants Actifs</dt>
-                  <dd class="text-lg font-medium text-neutral-900">{{ stats.activeMerchants }}</dd>
+                  <dt class="text-responsive-sm font-medium text-neutral-500 truncate">Commerçants Actifs</dt>
+                  <dd class="text-responsive-lg font-medium text-neutral-900">{{ stats.activeMerchants }}</dd>
                 </dl>
               </div>
             </div>
@@ -86,8 +86,8 @@
               </div>
               <div class="ml-5 w-0 flex-1">
                 <dl>
-                  <dt class="text-sm font-medium text-neutral-500 truncate">En Attente</dt>
-                  <dd class="text-lg font-medium text-neutral-900">{{ stats.pendingMerchants }}</dd>
+                  <dt class="text-responsive-sm font-medium text-neutral-500 truncate">En Attente</dt>
+                  <dd class="text-responsive-lg font-medium text-neutral-900">{{ stats.pendingMerchants }}</dd>
                 </dl>
               </div>
             </div>
@@ -114,8 +114,8 @@
               </div>
               <div class="ml-5 w-0 flex-1">
                 <dl>
-                  <dt class="text-sm font-medium text-neutral-500 truncate">Produits Publiés</dt>
-                  <dd class="text-lg font-medium text-neutral-900">{{ stats.totalProducts }}</dd>
+                  <dt class="text-responsive-sm font-medium text-neutral-500 truncate">Produits Publiés</dt>
+                  <dd class="text-responsive-lg font-medium text-neutral-900">{{ stats.totalProducts }}</dd>
                 </dl>
               </div>
             </div>
@@ -142,8 +142,8 @@
               </div>
               <div class="ml-5 w-0 flex-1">
                 <dl>
-                  <dt class="text-sm font-medium text-neutral-500 truncate">Réservations</dt>
-                  <dd class="text-lg font-medium text-neutral-900">{{ stats.totalReservations }}</dd>
+                  <dt class="text-responsive-sm font-medium text-neutral-500 truncate">Réservations</dt>
+                  <dd class="text-responsive-lg font-medium text-neutral-900">{{ stats.totalReservations }}</dd>
                 </dl>
               </div>
             </div>
@@ -162,7 +162,7 @@
                 'border-green-500 text-green-600': activeTab === tab.key,
                 'border-transparent text-neutral-500 hover:text-neutral-700 hover:border-neutral-300': activeTab !== tab.key
               }"
-              class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm"
+              class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-responsive-sm"
               @click="activeTab = tab.key"
             >
               {{ tab.label }}
@@ -172,7 +172,7 @@
                   'bg-green-100 text-green-600': activeTab === tab.key,
                   'bg-neutral-100 text-neutral-600': activeTab !== tab.key
                 }"
-                class="ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
+                class="ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-responsive-xs font-medium"
               >
                 {{ tab.count }}
               </span>
@@ -183,7 +183,7 @@
         <div class="p-6">
           <!-- Demandes d'inscription en attente -->
           <div v-if="activeTab === 'pending'" class="space-y-6">
-            <h3 class="text-lg font-medium text-neutral-900">Demandes d'inscription en attente</h3>
+            <h3 class="text-responsive-lg font-medium text-neutral-900">Demandes d'inscription en attente</h3>
             <div v-if="pendingMerchants.length === 0" class="text-center py-8">
               <svg
                 class="mx-auto h-12 w-12 text-neutral-400"
@@ -198,42 +198,42 @@
                   d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"
                 />
               </svg>
-              <p class="mt-2 text-sm text-neutral-500">Aucune demande en attente</p>
+              <p class="mt-2 text-responsive-sm text-neutral-500">Aucune demande en attente</p>
             </div>
             <div v-else class="space-y-4">
               <div v-for="merchant in pendingMerchants" :key="merchant.id" class="border border-neutral-200 rounded-lg p-6">
                 <div class="flex items-start justify-between">
                   <div class="flex-1">
-                    <h4 class="text-lg font-medium text-neutral-900">{{ merchant.business_name }}</h4>
-                    <p class="text-sm text-neutral-500 mt-1">{{ merchant.owner_name }}</p>
+                    <h4 class="text-responsive-lg font-medium text-neutral-900">{{ merchant.business_name }}</h4>
+                    <p class="text-responsive-sm text-neutral-500 mt-1">{{ merchant.owner_name }}</p>
                     <div class="mt-2 grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
-                        <p class="text-sm text-neutral-600"><strong>Email:</strong> {{ merchant.email }}</p>
-                        <p class="text-sm text-neutral-600"><strong>Téléphone:</strong> {{ merchant.phone }}</p>
-                        <p class="text-sm text-neutral-600"><strong>Adresse:</strong> {{ merchant.address }}</p>
+                        <p class="text-responsive-sm text-neutral-600"><strong>Email:</strong> {{ merchant.email }}</p>
+                        <p class="text-responsive-sm text-neutral-600"><strong>Téléphone:</strong> {{ merchant.phone }}</p>
+                        <p class="text-responsive-sm text-neutral-600"><strong>Adresse:</strong> {{ merchant.address }}</p>
                       </div>
                       <div>
-                        <p class="text-sm text-neutral-600"><strong>Type de commerce:</strong> {{ merchant.business_type }}</p>
-                        <p class="text-sm text-neutral-600"><strong>Description:</strong> {{ merchant.description }}</p>
-                        <p class="text-sm text-neutral-600"><strong>Demande:</strong> {{ formatDate(merchant.created_at) }}</p>
+                        <p class="text-responsive-sm text-neutral-600"><strong>Type de commerce:</strong> {{ merchant.business_type }}</p>
+                        <p class="text-responsive-sm text-neutral-600"><strong>Description:</strong> {{ merchant.description }}</p>
+                        <p class="text-responsive-sm text-neutral-600"><strong>Demande:</strong> {{ formatDate(merchant.created_at) }}</p>
                       </div>
                     </div>
                   </div>
                   <div class="ml-6 flex flex-col space-y-2">
                     <button
-                      class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm"
+                      class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-responsive-sm"
                       @click="approveMerchant(merchant)"
                     >
                       Approuver
                     </button>
                     <button
-                      class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg text-sm"
+                      class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg text-responsive-sm"
                       @click="rejectMerchant(merchant)"
                     >
                       Rejeter
                     </button>
                     <button
-                      class="bg-neutral-600 hover:bg-neutral-700 text-white px-4 py-2 rounded-lg text-sm"
+                      class="bg-neutral-600 hover:bg-neutral-700 text-white px-4 py-2 rounded-lg text-responsive-sm"
                       @click="viewMerchantDetails(merchant)"
                     >
                       Détails
@@ -246,7 +246,7 @@
 
           <!-- Produits à modérer -->
           <div v-if="activeTab === 'products'" class="space-y-6">
-            <h3 class="text-lg font-medium text-neutral-900">Produits à modérer</h3>
+            <h3 class="text-responsive-lg font-medium text-neutral-900">Produits à modérer</h3>
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               <div v-for="product in productsToModerate" :key="product.id" class="border border-neutral-200 rounded-lg overflow-hidden">
                 <div class="aspect-w-16 aspect-h-9 bg-neutral-200">
@@ -262,17 +262,17 @@
                 </div>
                 <div class="p-4">
                   <h4 class="font-medium text-neutral-900 truncate">{{ product.name || 'N/A' }}</h4>
-                  <p class="text-sm text-neutral-500 mt-1">{{ product.merchant_name || 'N/A' }}</p>
-                  <p class="text-lg font-bold text-green-600 mt-2">{{ product.price ? formatPrice(product.price) : '0' }} F CFA</p>
+                  <p class="text-responsive-sm text-neutral-500 mt-1">{{ product.merchant_name || 'N/A' }}</p>
+                  <p class="text-responsive-lg font-semibold text-green-600 mt-2">{{ product.price ? formatPrice(product.price) : '0' }} F CFA</p>
                   <div class="mt-4 flex space-x-2">
                     <button
-                      class="flex-1 bg-green-600 hover:bg-green-700 text-white px-3 py-2 rounded text-sm"
+                      class="flex-1 bg-green-600 hover:bg-green-700 text-white px-3 py-2 rounded text-responsive-sm"
                       @click="approveProduct(product)"
                     >
                       Approuver
                     </button>
                     <button
-                      class="flex-1 bg-red-600 hover:bg-red-700 text-white px-3 py-2 rounded text-sm"
+                      class="flex-1 bg-red-600 hover:bg-red-700 text-white px-3 py-2 rounded text-responsive-sm"
                       @click="rejectProduct(product)"
                     >
                       Rejeter
@@ -285,24 +285,24 @@
 
           <!-- Réservations signalées -->
           <div v-if="activeTab === 'reservations'" class="space-y-6">
-            <h3 class="text-lg font-medium text-neutral-900">Réservations signalées</h3>
+            <h3 class="text-responsive-lg font-medium text-neutral-900">Réservations signalées</h3>
             <div class="overflow-x-auto">
               <table class="min-w-full divide-y divide-neutral-200">
                 <thead class="bg-neutral-50">
                   <tr>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-neutral-500 uppercase tracking-wider">
+                    <th class="px-6 py-3 text-left text-responsive-xs font-medium text-neutral-500 uppercase tracking-wider">
                       Réservation
                     </th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-neutral-500 uppercase tracking-wider">
+                    <th class="px-6 py-3 text-left text-responsive-xs font-medium text-neutral-500 uppercase tracking-wider">
                       Client
                     </th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-neutral-500 uppercase tracking-wider">
+                    <th class="px-6 py-3 text-left text-responsive-xs font-medium text-neutral-500 uppercase tracking-wider">
                       Commerçant
                     </th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-neutral-500 uppercase tracking-wider">
+                    <th class="px-6 py-3 text-left text-responsive-xs font-medium text-neutral-500 uppercase tracking-wider">
                       Signalement
                     </th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-neutral-500 uppercase tracking-wider">
+                    <th class="px-6 py-3 text-left text-responsive-xs font-medium text-neutral-500 uppercase tracking-wider">
                       Actions
                     </th>
                   </tr>
@@ -310,21 +310,21 @@
                 <tbody class="bg-white divide-y divide-neutral-200">
                   <tr v-for="reservation in flaggedReservations" :key="reservation.id">
                     <td class="px-6 py-4 whitespace-nowrap">
-                      <div class="text-sm font-medium text-neutral-900">{{ reservation.product_name || 'N/A' }}</div>
-                      <div class="text-sm text-neutral-500">{{ reservation.total_price ? formatPrice(reservation.total_price) : '0' }} F CFA</div>
+                      <div class="text-responsive-sm font-medium text-neutral-900">{{ reservation.product_name || 'N/A' }}</div>
+                      <div class="text-responsive-sm text-neutral-500">{{ reservation.total_price ? formatPrice(reservation.total_price) : '0' }} F CFA</div>
                     </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-neutral-900">
+                    <td class="px-6 py-4 whitespace-nowrap text-responsive-sm text-neutral-900">
                       {{ reservation.customer_name || 'N/A' }}
                     </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-neutral-900">
+                    <td class="px-6 py-4 whitespace-nowrap text-responsive-sm text-neutral-900">
                       {{ reservation.merchant_name || 'N/A' }}
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap">
-                      <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
+                      <span class="px-2 inline-flex text-responsive-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
                         {{ reservation.flag_reason || 'Non spécifié' }}
                       </span>
                     </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
+                    <td class="px-6 py-4 whitespace-nowrap text-responsive-sm font-medium space-x-2">
                       <button
                         class="text-green-600 hover:text-green-900"
                         @click="resolveReservation(reservation)"

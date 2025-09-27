@@ -8,10 +8,10 @@
         <AlertCircle class="h-5 w-5 text-red-400" />
       </div>
       <div class="ml-3">
-        <h3 class="text-sm font-medium text-red-800">
+        <h3 class="text-responsive-sm font-medium text-red-800">
           {{ title || 'Erreurs de validation' }}
         </h3>
-        <div class="mt-2 text-sm text-red-700">
+        <div class="mt-2 text-responsive-sm text-red-700">
           <ul
             v-if="Array.isArray(errors)"
             class="list-disc space-y-1 pl-5"
@@ -47,7 +47,7 @@
           <button
             v-if="allowDismiss"
             type="button"
-            class="rounded-md bg-red-100 px-3 py-1 text-sm font-medium text-red-800 hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+            class="rounded-md bg-red-100 px-3 py-1 text-responsive-sm font-medium text-red-800 hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
             @click="dismissErrors"
           >
             Masquer
@@ -55,7 +55,7 @@
           <button
             v-if="allowRetry"
             type="button"
-            class="rounded-md bg-red-600 px-3 py-1 text-sm font-medium text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+            class="rounded-md bg-red-600 px-3 py-1 text-responsive-sm font-medium text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
             @click="retryAction"
           >
             Réessayer

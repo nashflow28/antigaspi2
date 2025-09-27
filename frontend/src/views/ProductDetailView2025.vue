@@ -11,7 +11,7 @@
     <!-- Error State -->
     <div v-else-if="error" class="container mx-auto px-4 py-16 text-center">
       <AlertCircle class="w-16 h-16 text-red-500 mx-auto mb-4" />
-      <h2 class="text-2xl font-bold text-neutral-900 mb-2">Produit introuvable</h2>
+      <h2 class="text-responsive-xl font-semibold text-neutral-900 mb-2">Produit introuvable</h2>
       <p class="text-neutral-600 mb-6">Le produit que vous recherchez n'existe pas ou a été supprimé.</p>
       <Button variant="primary" @click="$router.push('/products')">
         Retour au catalogue
@@ -21,7 +21,7 @@
     <!-- Product Detail -->
     <div v-else-if="product" class="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
       <!-- Breadcrumb -->
-      <nav class="flex items-center gap-2 text-sm text-neutral-600 mb-8">
+      <nav class="flex items-center gap-2 text-responsive-sm text-neutral-600 mb-8">
         <router-link to="/" class="hover:text-primary-600 transition-colors">Accueil</router-link>
         <ChevronRight class="w-4 h-4" />
         <router-link to="/products" class="hover:text-primary-600 transition-colors">Catalogue</router-link>
@@ -87,16 +87,16 @@
               <div class="flex items-center gap-3">
                 <MapPin class="w-5 h-5 text-neutral-500" />
                 <div>
-                  <p class="text-sm font-medium text-neutral-900">{{ product.merchant?.business_name }}</p>
-                  <p class="text-sm text-neutral-600">{{ product.merchant?.address }}</p>
+                  <p class="text-responsive-sm font-medium text-neutral-900">{{ product.merchant?.business_name }}</p>
+                  <p class="text-responsive-sm text-neutral-600">{{ product.merchant?.address }}</p>
                 </div>
               </div>
 
               <div class="flex items-center gap-3">
                 <Clock class="w-5 h-5 text-neutral-500" />
                 <div>
-                  <p class="text-sm font-medium text-neutral-900">Récupération</p>
-                  <p class="text-sm text-neutral-600">
+                  <p class="text-responsive-sm font-medium text-neutral-900">Récupération</p>
+                  <p class="text-responsive-sm text-neutral-600">
                     {{ formatExpiration(product.expiration_date) }}
                   </p>
                 </div>
@@ -122,16 +122,16 @@
               </Badge>
             </div>
 
-            <h1 class="text-3xl lg:text-4xl font-bold text-neutral-900 mb-4">
+            <h1 class="text-responsive-xl lg:text-display-sm font-semibold text-neutral-900 mb-4">
               {{ product.name }}
             </h1>
 
             <!-- Pricing -->
             <div class="flex items-center gap-4 mb-6">
-              <div class="text-3xl font-bold text-primary-600">
+              <div class="text-responsive-xl font-semibold text-primary-600">
                 {{ formatPrice(product.discounted_price) }} XOF
               </div>
-              <div v-if="product.original_price !== product.discounted_price" class="text-xl text-neutral-500 line-through">
+              <div v-if="product.original_price !== product.discounted_price" class="text-responsive-xl text-neutral-500 line-through">
                 {{ formatPrice(product.original_price) }} XOF
               </div>
               <Badge v-if="discountPercentage > 0" variant="success">
@@ -143,7 +143,7 @@
           <!-- Description -->
           <Card>
             <template #header>
-              <h3 class="text-lg font-semibold">Description</h3>
+              <h3 class="text-responsive-lg font-semibold">Description</h3>
             </template>
             <p class="text-neutral-700 leading-relaxed">
               {{ product.description || 'Aucune description disponible.' }}
@@ -154,11 +154,11 @@
           <Card variant="gradient">
             <div class="space-y-6">
               <div>
-                <h3 class="text-lg font-semibold text-neutral-900 mb-4">Réservation</h3>
+                <h3 class="text-responsive-lg font-semibold text-neutral-900 mb-4">Réservation</h3>
 
                 <!-- Quantity Selector -->
                 <div class="flex items-center gap-4 mb-6">
-                  <label class="text-sm font-medium text-neutral-700">Quantité :</label>
+                  <label class="text-responsive-sm font-medium text-neutral-700">Quantité :</label>
                   <div class="flex items-center border border-neutral-300 rounded-lg">
                     <Button
                       variant="ghost"
@@ -188,8 +188,8 @@
 
                 <!-- Total Price -->
                 <div class="flex items-center justify-between p-4 bg-primary-50 rounded-lg mb-6">
-                  <span class="text-sm font-medium text-primary-900">Total :</span>
-                  <span class="text-xl font-bold text-primary-600">
+                  <span class="text-responsive-sm font-medium text-primary-900">Total :</span>
+                  <span class="text-responsive-xl font-semibold text-primary-600">
                     {{ formatPrice(product.discounted_price * reservationQuantity) }} XOF
                   </span>
                 </div>
@@ -225,7 +225,7 @@
           <!-- Share Product -->
           <Card>
             <div class="flex items-center justify-between">
-              <h3 class="text-lg font-semibold text-neutral-900">Partager</h3>
+              <h3 class="text-responsive-lg font-semibold text-neutral-900">Partager</h3>
               <div class="flex gap-2">
                 <Button variant="ghost" size="sm" @click="shareProduct('facebook')">
                   <Facebook class="w-4 h-4" />
@@ -248,7 +248,7 @@
       <!-- Related Products -->
       <Card v-if="relatedProducts.length > 0">
         <template #header>
-          <h2 class="text-2xl font-bold text-neutral-900">Produits similaires</h2>
+          <h2 class="text-responsive-xl font-semibold text-neutral-900">Produits similaires</h2>
         </template>
 
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -274,9 +274,9 @@
 
             <div>
               <h3 class="font-semibold text-neutral-900 mb-1 truncate">{{ relatedProduct.name }}</h3>
-              <p class="text-sm text-neutral-600 mb-2">{{ relatedProduct.merchant?.business_name }}</p>
+              <p class="text-responsive-sm text-neutral-600 mb-2">{{ relatedProduct.merchant?.business_name }}</p>
               <div class="flex items-center gap-2">
-                <span class="font-bold text-primary-600">{{ formatPrice(relatedProduct.discounted_price) }} XOF</span>
+                <span class="font-semibold text-primary-600">{{ formatPrice(relatedProduct.discounted_price) }} XOF</span>
                 <Badge size="xs" :variant="relatedProduct.quantity > 0 ? 'success' : 'error'">
                   {{ relatedProduct.quantity }} restants
                 </Badge>

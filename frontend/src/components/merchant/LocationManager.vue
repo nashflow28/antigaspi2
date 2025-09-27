@@ -6,13 +6,13 @@
           <MapPin class="w-6 h-6 text-blue-600" />
         </div>
         <div>
-          <h3 class="text-lg font-semibold text-neutral-900">Géolocalisation</h3>
-          <p class="text-neutral-600 text-sm">Position de votre commerce</p>
+          <h3 class="text-responsive-lg font-semibold text-neutral-900">Géolocalisation</h3>
+          <p class="text-neutral-600 text-responsive-sm">Position de votre commerce</p>
         </div>
       </div>
       <button
         :disabled="loading"
-        class="text-blue-600 hover:text-blue-700 font-medium text-sm flex items-center space-x-1"
+        class="text-blue-600 hover:text-blue-700 font-medium text-responsive-sm flex items-center space-x-1"
         @click="getCurrentLocation"
       >
         <RefreshCw class="w-4 h-4" :class="{ 'animate-spin': loading }" />
@@ -22,7 +22,7 @@
 
     <div v-if="!hasLocation" class="text-center py-8 border-2 border-dashed border-neutral-300 rounded-xl">
       <MapPin class="w-12 h-12 text-neutral-400 mx-auto mb-4" />
-      <h4 class="text-lg font-medium text-neutral-900 mb-2">Aucune position définie</h4>
+      <h4 class="text-responsive-lg font-medium text-neutral-900 mb-2">Aucune position définie</h4>
       <p class="text-neutral-600 mb-4">
         Ajoutez la position de votre commerce pour que les clients puissent vous trouver facilement
       </p>
@@ -37,12 +37,12 @@
     <div v-else class="space-y-4">
       <div class="grid grid-cols-2 gap-4">
         <div class="bg-neutral-50 rounded-lg p-4">
-          <label class="text-sm font-medium text-neutral-700">Latitude</label>
-          <p class="text-lg text-neutral-900">{{ location.latitude?.toFixed(6) }}</p>
+          <label class="text-responsive-sm font-medium text-neutral-700">Latitude</label>
+          <p class="text-responsive-lg text-neutral-900">{{ location.latitude?.toFixed(6) }}</p>
         </div>
         <div class="bg-neutral-50 rounded-lg p-4">
-          <label class="text-sm font-medium text-neutral-700">Longitude</label>
-          <p class="text-lg text-neutral-900">{{ location.longitude?.toFixed(6) }}</p>
+          <label class="text-responsive-sm font-medium text-neutral-700">Longitude</label>
+          <p class="text-responsive-lg text-neutral-900">{{ location.longitude?.toFixed(6) }}</p>
         </div>
       </div>
 
@@ -80,7 +80,7 @@
           <!-- Header -->
           <div class="px-6 py-4 border-b border-neutral-200">
             <div class="flex items-center justify-between">
-              <h3 class="text-lg font-semibold text-neutral-900">Définir votre position</h3>
+              <h3 class="text-responsive-lg font-semibold text-neutral-900">Définir votre position</h3>
               <button
                 class="p-2 hover:bg-neutral-100 rounded-lg transition-colors"
                 @click="closeModal"
@@ -115,12 +115,12 @@
             <!-- Map Selection -->
             <div v-if="mapSelectionMode" class="mb-4">
               <div class="mb-2 flex items-center justify-between">
-                <label class="block text-sm font-medium text-neutral-700">
+                <label class="block text-responsive-sm font-medium text-neutral-700">
                   Cliquez sur la carte pour choisir votre position
                 </label>
                 <button
                   type="button"
-                  class="text-blue-600 hover:text-blue-700 text-sm flex items-center space-x-1"
+                  class="text-blue-600 hover:text-blue-700 text-responsive-sm flex items-center space-x-1"
                   @click="centerOnCurrentPosition"
                 >
                   <MapPin class="w-4 h-4" />
@@ -139,7 +139,7 @@
             <!-- Manual Coordinates (only show when not in map mode) -->
             <div v-else class="space-y-4">
               <div>
-                <label for="latitude" class="block text-sm font-medium text-neutral-700 mb-2">
+                <label for="latitude" class="block text-responsive-sm font-medium text-neutral-700 mb-2">
                   Latitude *
                 </label>
                 <input
@@ -156,7 +156,7 @@
               </div>
 
               <div>
-                <label for="longitude" class="block text-sm font-medium text-neutral-700 mb-2">
+                <label for="longitude" class="block text-responsive-sm font-medium text-neutral-700 mb-2">
                   Longitude *
                 </label>
                 <input
@@ -179,7 +179,7 @@
                 <CheckCircle class="w-5 h-5 text-green-600" />
                 <span class="font-medium text-green-800">Position sélectionnée</span>
               </div>
-              <div class="text-sm text-green-700 grid grid-cols-2 gap-2">
+              <div class="text-responsive-sm text-green-700 grid grid-cols-2 gap-2">
                 <div>
                   <strong>Latitude:</strong> {{ form.latitude.toFixed(6) }}
                 </div>
@@ -190,7 +190,7 @@
             </div>
 
             <div class="bg-blue-50 rounded-lg p-3">
-              <p class="text-sm text-blue-700">
+              <p class="text-responsive-sm text-blue-700">
                 <strong>Deux options :</strong><br>
                 • <strong>Coordonnées manuelles :</strong> Saisissez directement lat/long<br>
                 • <strong>Sélection sur carte :</strong> Cliquez sur votre emplacement exact
@@ -244,8 +244,8 @@
             />
           </div>
           <div class="ml-3 w-0 flex-1">
-            <p class="text-sm font-medium text-neutral-900">{{ notification.title }}</p>
-            <p class="mt-1 text-sm text-neutral-500">{{ notification.message }}</p>
+            <p class="text-responsive-sm font-medium text-neutral-900">{{ notification.title }}</p>
+            <p class="mt-1 text-responsive-sm text-neutral-500">{{ notification.message }}</p>
           </div>
           <div class="ml-4 flex-shrink-0 flex">
             <button

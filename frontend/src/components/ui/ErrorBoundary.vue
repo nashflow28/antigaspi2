@@ -14,10 +14,10 @@
         </div>
 
         <div class="space-y-2">
-          <h2 class="text-2xl font-semibold text-neutral-900">
+          <h2 class="text-responsive-xl font-semibold text-neutral-900">
             {{ errorInfo.title || 'Une erreur est survenue' }}
           </h2>
-          <p class="text-base text-neutral-600">
+          <p class="text-responsive-base text-neutral-600">
             {{ errorInfo.message || 'Nous nous excusons pour le désagrément. Veuillez réessayer ou contacter le support si le problème persiste.' }}
           </p>
         </div>
@@ -27,21 +27,21 @@
         v-if="isDev && errorDetails"
         class="rounded-xl border border-neutral-200 bg-white/70 text-left shadow-sm"
       >
-        <summary class="flex cursor-pointer items-center justify-between gap-3 px-4 py-3 text-sm font-medium text-neutral-700">
+        <summary class="flex cursor-pointer items-center justify-between gap-3 px-4 py-3 text-responsive-sm font-medium text-neutral-700">
           Détails techniques (Mode développement)
         </summary>
-        <div class="space-y-4 border-t border-neutral-100 bg-neutral-50/80 px-4 py-4 text-sm text-neutral-700">
+        <div class="space-y-4 border-t border-neutral-100 bg-neutral-50/80 px-4 py-4 text-responsive-sm text-neutral-700">
           <div v-if="errorDetails.stack" class="space-y-2">
             <h4 class="font-semibold text-neutral-800">Stack Trace</h4>
-            <pre class="max-h-64 overflow-auto rounded-lg bg-neutral-900/90 p-3 text-xs text-neutral-100">{{ errorDetails.stack }}</pre>
+            <pre class="max-h-64 overflow-auto rounded-lg bg-neutral-900/90 p-3 text-responsive-xs text-neutral-100">{{ errorDetails.stack }}</pre>
           </div>
           <div v-if="errorDetails.info" class="space-y-2">
             <h4 class="font-semibold text-neutral-800">Informations Vue</h4>
-            <pre class="max-h-48 overflow-auto rounded-lg bg-neutral-900/90 p-3 text-xs text-neutral-100">{{ errorDetails.info }}</pre>
+            <pre class="max-h-48 overflow-auto rounded-lg bg-neutral-900/90 p-3 text-responsive-xs text-neutral-100">{{ errorDetails.info }}</pre>
           </div>
           <div v-if="errorDetails.props" class="space-y-2">
             <h4 class="font-semibold text-neutral-800">Props du composant</h4>
-            <pre class="max-h-48 overflow-auto rounded-lg bg-neutral-900/90 p-3 text-xs text-neutral-100">{{ JSON.stringify(errorDetails.props, null, 2) }}</pre>
+            <pre class="max-h-48 overflow-auto rounded-lg bg-neutral-900/90 p-3 text-responsive-xs text-neutral-100">{{ JSON.stringify(errorDetails.props, null, 2) }}</pre>
           </div>
         </div>
       </details>
@@ -77,10 +77,10 @@
       </div>
 
       <div v-if="props.showSupportInfo" class="space-y-3 rounded-xl bg-neutral-50/70 px-5 py-4 text-center">
-        <p class="text-sm text-neutral-600">
+        <p class="text-responsive-sm text-neutral-600">
           Besoin d'aide ? Contactez notre support :
         </p>
-        <div class="flex flex-wrap items-center justify-center gap-2 text-sm font-medium text-neutral-700">
+        <div class="flex flex-wrap items-center justify-center gap-2 text-responsive-sm font-medium text-neutral-700">
           <a
             href="mailto:support@antigaspi.ci"
             class="flex items-center gap-2 text-primary-600 transition hover:text-primary-700"
@@ -89,7 +89,7 @@
             support@antigaspi.ci
           </a>
           <span class="text-neutral-400">•</span>
-          <span class="rounded-full bg-white px-3 py-1 text-xs font-semibold uppercase tracking-wide text-neutral-500">
+          <span class="rounded-full bg-white px-3 py-1 text-responsive-xs font-semibold uppercase tracking-wide text-neutral-500">
             ID: {{ errorId }}
           </span>
         </div>

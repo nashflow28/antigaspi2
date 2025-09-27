@@ -50,7 +50,7 @@
           <div v-if="loading" class="p-4 text-center text-neutral-500">
             <div class="flex items-center justify-center space-x-2">
               <div class="animate-spin w-4 h-4 border-2 border-primary-500 border-t-transparent rounded-full" />
-              <span class="text-sm">Recherche en cours...</span>
+              <span class="text-responsive-sm">Recherche en cours...</span>
             </div>
           </div>
 
@@ -58,7 +58,7 @@
           <div v-else-if="error" class="p-4 text-center text-red-500">
             <div class="flex items-center justify-center space-x-2">
               <AlertCircle class="w-4 h-4" />
-              <span class="text-sm">{{ error }}</span>
+              <span class="text-responsive-sm">{{ error }}</span>
             </div>
           </div>
 
@@ -80,14 +80,14 @@
                   <div class="font-medium text-neutral-900 truncate">
                     {{ result.display_name || result.formatted_address }}
                   </div>
-                  <div v-if="result.address" class="text-sm text-neutral-500 truncate">
+                  <div v-if="result.address" class="text-responsive-sm text-neutral-500 truncate">
                     {{ formatAddress(result.address) }}
                   </div>
                   <div class="flex items-center space-x-2 mt-1">
-                    <span class="text-xs text-neutral-400">
+                    <span class="text-responsive-xs text-neutral-400">
                       {{ result.type || 'Adresse' }}
                     </span>
-                    <span v-if="result.distance" class="text-xs text-primary-600">
+                    <span v-if="result.distance" class="text-responsive-xs text-primary-600">
                       {{ formatDistance(result.distance) }}
                     </span>
                   </div>
@@ -100,7 +100,7 @@
           <div v-else class="p-4 text-center text-neutral-500">
             <div class="flex items-center justify-center space-x-2">
               <MapPin class="w-4 h-4" />
-              <span class="text-sm">Aucun résultat trouvé</span>
+              <span class="text-responsive-sm">Aucun résultat trouvé</span>
             </div>
           </div>
         </div>
@@ -113,10 +113,10 @@
         <div class="flex items-start space-x-2">
           <MapPin class="w-4 h-4 text-primary-600 mt-0.5" />
           <div>
-            <div class="font-medium text-primary-900 text-sm">
+            <div class="font-medium text-primary-900 text-responsive-sm">
               {{ selectedLocation.display_name || selectedLocation.formatted_address }}
             </div>
-            <div class="text-xs text-primary-600 mt-1">
+            <div class="text-responsive-xs text-primary-600 mt-1">
               {{ selectedLocation.lat.toFixed(6) }}, {{ selectedLocation.lng.toFixed(6) }}
             </div>
           </div>

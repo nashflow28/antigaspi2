@@ -1,11 +1,11 @@
 <template>
   <div class="min-h-screen bg-neutral-50 p-4">
-    <h1 class="text-2xl font-bold text-neutral-900 mb-4">
+    <h1 class="text-responsive-xl font-semibold text-neutral-900 mb-4">
       🌱 Antigaspi - Simple Test View
     </h1>
 
     <div class="bg-white rounded-lg shadow p-6 mb-4">
-      <h2 class="text-lg font-semibold mb-2">Vue Application Status</h2>
+      <h2 class="text-responsive-lg font-semibold mb-2">Vue Application Status</h2>
       <p class="text-green-600">✅ Vue.js is working!</p>
       <p class="text-green-600">✅ Router is working!</p>
       <p class="text-green-600">✅ Components are rendering!</p>
@@ -38,7 +38,7 @@
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
       <div class="bg-green-50 rounded-lg border border-green-200 p-4">
         <h3 class="text-green-800 font-medium mb-2">✅ Success</h3>
-        <ul class="text-green-700 text-sm space-y-1">
+        <ul class="text-green-700 text-responsive-sm space-y-1">
           <li>• Vue 3 initialized</li>
           <li>• Tailwind CSS working</li>
           <li>• Router navigation active</li>
@@ -48,7 +48,7 @@
 
       <div class="bg-orange-50 rounded-lg border border-orange-200 p-4">
         <h3 class="text-orange-800 font-medium mb-2">🔧 Next Steps</h3>
-        <ul class="text-orange-700 text-sm space-y-1">
+        <ul class="text-orange-700 text-responsive-sm space-y-1">
           <li>• Test complex components</li>
           <li>• Enable MobileLayout</li>
           <li>• Connect to API</li>

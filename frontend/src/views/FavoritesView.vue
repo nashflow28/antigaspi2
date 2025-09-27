@@ -4,11 +4,11 @@
       <div class="container mx-auto px-6 py-10">
         <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           <div>
-            <p class="inline-flex items-center gap-2 rounded-full bg-primary-100/70 px-4 py-1 text-sm font-medium text-primary-700">
+            <p class="inline-flex items-center gap-2 rounded-full bg-primary-100/70 px-4 py-1 text-responsive-sm font-medium text-primary-700">
               <Heart class="h-4 w-4" />
               Mes coups de cœur AntiGaspi
             </p>
-            <h1 class="mt-3 text-4xl font-bold tracking-tight text-neutral-900">Vos commerçants & paniers favoris</h1>
+            <h1 class="mt-3 text-display-sm font-semibold tracking-tight text-neutral-900">Vos commerçants & paniers favoris</h1>
             <p class="mt-2 max-w-2xl text-neutral-600">
               Organisez vos découvertes, activez les notifications prioritaires et préparez vos prochaines réservations en un coup d'œil.
             </p>
@@ -41,7 +41,7 @@
       <section>
         <div v-if="!hasFavorites" class="rounded-3xl border border-dashed border-neutral-300 bg-white/70 p-12 text-center shadow-sm">
           <Heart class="mx-auto h-12 w-12 text-neutral-300" />
-          <h2 class="mt-4 text-2xl font-semibold text-neutral-800">Ajoutez vos premiers favoris</h2>
+          <h2 class="mt-4 text-responsive-xl font-semibold text-neutral-800">Ajoutez vos premiers favoris</h2>
           <p class="mt-2 text-neutral-500">
             Depuis un panier ou un commerçant, cliquez sur l'icône cœur pour les retrouver ici et recevoir leurs alertes.
           </p>
@@ -60,9 +60,9 @@
             <template #header>
               <div class="flex items-center justify-between">
                 <div>
-                  <p class="text-xs font-medium uppercase tracking-wide text-primary-600">{{ favorite.type === 'merchant' ? 'Commerçant' : 'Panier' }}</p>
-                  <h3 class="text-lg font-semibold text-neutral-900">{{ favorite.name }}</h3>
-                  <p v-if="favorite.description" class="text-sm text-neutral-500">{{ favorite.description }}</p>
+                  <p class="text-responsive-xs font-medium uppercase tracking-wide text-primary-600">{{ favorite.type === 'merchant' ? 'Commerçant' : 'Panier' }}</p>
+                  <h3 class="text-responsive-lg font-semibold text-neutral-900">{{ favorite.name }}</h3>
+                  <p v-if="favorite.description" class="text-responsive-sm text-neutral-500">{{ favorite.description }}</p>
                 </div>
                 <button
                   type="button"
@@ -75,12 +75,12 @@
               </div>
             </template>
 
-            <div class="space-y-3 text-sm text-neutral-600">
+            <div class="space-y-3 text-responsive-sm text-neutral-600">
               <p v-if="favorite.type === 'merchant' && favorite.merchant?.city" class="flex items-center gap-2">
                 <MapPin class="h-4 w-4 text-primary-500" />
                 {{ favorite.merchant.city }}
               </p>
-              <p class="text-xs text-neutral-400">Ajouté le {{ formatDate(favorite.addedAt) }}</p>
+              <p class="text-responsive-xs text-neutral-400">Ajouté le {{ formatDate(favorite.addedAt) }}</p>
             </div>
 
             <template #footer>
@@ -116,9 +116,9 @@
       <aside class="space-y-6">
         <Card class="bg-white/90">
           <template #header>
-            <h2 class="text-xl font-semibold text-neutral-900">Notifications prioritaires</h2>
+            <h2 class="text-responsive-xl font-semibold text-neutral-900">Notifications prioritaires</h2>
           </template>
-          <p class="text-sm text-neutral-600">
+          <p class="text-responsive-sm text-neutral-600">
             Activez les alertes pour recevoir un message dès qu'un panier similaire est publié par vos commerçants favoris.
           </p>
           <Button
@@ -132,9 +132,9 @@
 
         <Card class="bg-primary-500/95 text-white">
           <template #header>
-            <h2 class="text-lg font-semibold">Astuce AntiGaspi</h2>
+            <h2 class="text-responsive-lg font-semibold">Astuce AntiGaspi</h2>
           </template>
-          <p class="text-sm text-primary-50">
+          <p class="text-responsive-sm text-primary-50">
             Combinez vos favoris avec le portefeuille AntiGaspi pour réserver encore plus rapidement lors des publications flash.
           </p>
           <Button

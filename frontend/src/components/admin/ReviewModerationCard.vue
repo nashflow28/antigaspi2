@@ -4,7 +4,7 @@
       <!-- User Avatar -->
       <div class="flex-shrink-0">
         <div class="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
-          <span class="text-white text-sm font-medium">
+          <span class="text-white text-responsive-sm font-medium">
             {{ getInitials(review.user.name) }}
           </span>
         </div>
@@ -15,7 +15,7 @@
         <div class="flex items-center justify-between mb-3">
           <div class="flex items-center space-x-3">
             <span class="font-medium text-neutral-900">{{ review.user.name }}</span>
-            <span class="text-sm text-neutral-500">{{ review.user.email }}</span>
+            <span class="text-responsive-sm text-neutral-500">{{ review.user.email }}</span>
             <div class="flex items-center">
               <Star
                 v-for="star in 5"
@@ -24,12 +24,12 @@
                 :class="star <= review.rating ? 'text-yellow-400 fill-yellow-400' : 'text-neutral-300'"
               />
             </div>
-            <span v-if="review.is_verified_purchase" class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800">
+            <span v-if="review.is_verified_purchase" class="inline-flex items-center px-2 py-0.5 rounded text-responsive-xs font-medium bg-green-100 text-green-800">
               <ShieldCheck class="w-3 h-3 mr-1" />
               Achat vérifié
             </span>
           </div>
-          <span class="text-sm text-neutral-500">{{ review.time_ago }}</span>
+          <span class="text-responsive-sm text-neutral-500">{{ review.time_ago }}</span>
         </div>
 
         <!-- Review Content -->
@@ -37,17 +37,17 @@
           <h4 class="font-medium text-neutral-900">{{ review.title }}</h4>
         </div>
 
-        <div v-if="review.comment" class="text-neutral-700 text-sm leading-relaxed mb-3">
+        <div v-if="review.comment" class="text-neutral-700 text-responsive-sm leading-relaxed mb-3">
           {{ review.comment }}
         </div>
 
         <!-- Merchant and Product Info -->
         <div class="flex items-center space-x-4 mb-4">
-          <div class="inline-flex items-center text-xs text-purple-600 bg-purple-50 rounded-full px-3 py-1">
+          <div class="inline-flex items-center text-responsive-xs text-purple-600 bg-purple-50 rounded-full px-3 py-1">
             <Building class="w-3 h-3 mr-1" />
             {{ review.merchant.business_name }}
           </div>
-          <div v-if="review.product" class="inline-flex items-center text-xs text-blue-600 bg-blue-50 rounded-full px-3 py-1">
+          <div v-if="review.product" class="inline-flex items-center text-responsive-xs text-blue-600 bg-blue-50 rounded-full px-3 py-1">
             <Package class="w-3 h-3 mr-1" />
             {{ review.product.name }}
           </div>
@@ -58,8 +58,8 @@
           <div class="flex items-start space-x-2">
             <Building class="w-4 h-4 text-green-600 mt-0.5" />
             <div>
-              <p class="text-sm font-medium text-green-800">Réponse du commerçant :</p>
-              <p class="text-sm text-green-700 mt-1">{{ review.merchant_response }}</p>
+              <p class="text-responsive-sm font-medium text-green-800">Réponse du commerçant :</p>
+              <p class="text-responsive-sm text-green-700 mt-1">{{ review.merchant_response }}</p>
             </div>
           </div>
         </div>
@@ -68,7 +68,7 @@
         <div class="flex items-center space-x-3 mt-4">
           <button
             :disabled="!!processing"
-            class="inline-flex items-center px-4 py-2 text-sm bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            class="inline-flex items-center px-4 py-2 text-responsive-sm bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             @click="approveReview"
           >
             <Check class="w-4 h-4 mr-2" />
@@ -77,7 +77,7 @@
 
           <button
             :disabled="!!processing"
-            class="inline-flex items-center px-4 py-2 text-sm bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            class="inline-flex items-center px-4 py-2 text-responsive-sm bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             @click="rejectReview"
           >
             <X class="w-4 h-4 mr-2" />
@@ -85,7 +85,7 @@
           </button>
 
           <button
-            class="inline-flex items-center px-3 py-2 text-sm text-neutral-600 border border-neutral-300 rounded-lg hover:bg-neutral-50 transition-colors"
+            class="inline-flex items-center px-3 py-2 text-responsive-sm text-neutral-600 border border-neutral-300 rounded-lg hover:bg-neutral-50 transition-colors"
             @click="showDetails = !showDetails"
           >
             <Eye class="w-4 h-4 mr-2" />
@@ -95,7 +95,7 @@
 
         <!-- Detailed Information -->
         <div v-if="showDetails" class="mt-4 p-4 bg-neutral-50 rounded-lg">
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-responsive-sm">
             <div>
               <p class="font-medium text-neutral-900">Informations utilisateur</p>
               <p class="text-neutral-600">Email: {{ review.user.email }}</p>
@@ -123,14 +123,14 @@
     <div v-if="successMessage" class="p-3 bg-green-50 border border-green-200 rounded-lg">
       <div class="flex items-center">
         <CheckCircle class="w-5 h-5 text-green-600 mr-2" />
-        <span class="text-sm text-green-800">{{ successMessage }}</span>
+        <span class="text-responsive-sm text-green-800">{{ successMessage }}</span>
       </div>
     </div>
 
     <div v-if="errorMessage" class="p-3 bg-red-50 border border-red-200 rounded-lg">
       <div class="flex items-center">
         <AlertTriangle class="w-5 h-5 text-red-600 mr-2" />
-        <span class="text-sm text-red-800">{{ errorMessage }}</span>
+        <span class="text-responsive-sm text-red-800">{{ errorMessage }}</span>
       </div>
     </div>
   </div>

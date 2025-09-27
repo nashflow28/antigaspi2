@@ -9,10 +9,10 @@
       <div class="mb-8">
         <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
           <div>
-            <h1 class="text-3xl lg:text-4xl font-bold text-neutral-900 mb-2">
+            <h1 class="text-responsive-xl lg:text-display-sm font-semibold text-neutral-900 mb-2">
               Tableau de bord Administrateur
             </h1>
-            <p class="text-neutral-600 text-lg">
+            <p class="text-neutral-600 text-responsive-lg">
               Supervision globale de la plateforme Antigaspi
             </p>
           </div>
@@ -42,9 +42,9 @@
           <Card class="bg-gradient-to-r from-primary-500 to-primary-600 text-white">
             <div class="flex items-center justify-between">
               <div>
-                <p class="text-primary-100 text-sm font-medium">Utilisateurs Totaux</p>
-                <p class="text-3xl font-bold">{{ formatNumber(stats.totalUsers) }}</p>
-                <p class="text-primary-200 text-sm mt-1">
+                <p class="text-primary-100 text-responsive-sm font-medium">Utilisateurs Totaux</p>
+                <p class="text-responsive-xl font-semibold">{{ formatNumber(stats.totalUsers) }}</p>
+                <p class="text-primary-200 text-responsive-sm mt-1">
                   +{{ stats.newUsersThisMonth }} ce mois
                 </p>
               </div>
@@ -57,9 +57,9 @@
           <Card class="bg-gradient-to-r from-primary-500 to-primary-600 text-white">
             <div class="flex items-center justify-between">
               <div>
-                <p class="text-primary-100 text-sm font-medium">Commerçants Actifs</p>
-                <p class="text-3xl font-bold">{{ formatNumber(stats.activeMerchants) }}</p>
-                <p class="text-primary-200 text-sm mt-1">
+                <p class="text-primary-100 text-responsive-sm font-medium">Commerçants Actifs</p>
+                <p class="text-responsive-xl font-semibold">{{ formatNumber(stats.activeMerchants) }}</p>
+                <p class="text-primary-200 text-responsive-sm mt-1">
                   {{ stats.merchantGrowthRate }}% de croissance
                 </p>
               </div>
@@ -72,9 +72,9 @@
           <Card class="bg-gradient-to-r from-blue-500 to-blue-600 text-white">
             <div class="flex items-center justify-between">
               <div>
-                <p class="text-blue-100 text-sm font-medium">Produits Sauvés</p>
-                <p class="text-3xl font-bold">{{ formatNumber(stats.productsSaved) }}</p>
-                <p class="text-blue-200 text-sm mt-1">
+                <p class="text-blue-100 text-responsive-sm font-medium">Produits Sauvés</p>
+                <p class="text-responsive-xl font-semibold">{{ formatNumber(stats.productsSaved) }}</p>
+                <p class="text-blue-200 text-responsive-sm mt-1">
                   {{ formatNumber(stats.kgFoodSaved) }} kg sauvés
                 </p>
               </div>
@@ -87,14 +87,14 @@
           <Card class="bg-gradient-to-r from-orange-500 to-orange-600 text-white">
             <div class="flex items-center justify-between">
               <div>
-                <p class="text-orange-100 text-sm font-medium">Chiffre d'affaires</p>
-                <p class="text-3xl font-bold">{{ formatCurrency(stats.totalRevenue) }}</p>
-                <p class="text-orange-200 text-sm mt-1">
+                <p class="text-orange-100 text-responsive-sm font-medium">Chiffre d'affaires</p>
+                <p class="text-responsive-xl font-semibold">{{ formatCurrency(stats.totalRevenue) }}</p>
+                <p class="text-orange-200 text-responsive-sm mt-1">
                   +{{ stats.revenueGrowth }}% vs mois dernier
                 </p>
               </div>
               <div class="p-3 bg-white/20 rounded-xl">
-                <div class="text-lg font-bold">F CFA</div>
+                <div class="text-responsive-lg font-semibold">F CFA</div>
               </div>
             </div>
           </Card>
@@ -106,8 +106,8 @@
         <!-- Revenue Chart -->
         <Card>
           <div class="flex items-center justify-between mb-6">
-            <h3 class="text-xl font-semibold text-neutral-900">Évolution du chiffre d'affaires</h3>
-            <select v-model="revenueChartPeriod" class="input text-sm">
+            <h3 class="text-responsive-xl font-semibold text-neutral-900">Évolution du chiffre d'affaires</h3>
+            <select v-model="revenueChartPeriod" class="input text-responsive-sm">
               <option value="7d">7 derniers jours</option>
               <option value="30d">30 derniers jours</option>
               <option value="90d">90 derniers jours</option>
@@ -121,12 +121,12 @@
         <!-- User Growth Chart -->
         <Card>
           <div class="flex items-center justify-between mb-6">
-            <h3 class="text-xl font-semibold text-neutral-900">Croissance des utilisateurs</h3>
+            <h3 class="text-responsive-xl font-semibold text-neutral-900">Croissance des utilisateurs</h3>
             <div class="flex gap-2">
-              <span class="px-3 py-1 bg-primary-100 text-primary-700 rounded-full text-sm">
+              <span class="px-3 py-1 bg-primary-100 text-primary-700 rounded-full text-responsive-sm">
                 Consommateurs
               </span>
-              <span class="px-3 py-1 bg-primary-100 text-primary-700 rounded-full text-sm">
+              <span class="px-3 py-1 bg-primary-100 text-primary-700 rounded-full text-responsive-sm">
                 Commerçants
               </span>
             </div>
@@ -142,9 +142,9 @@
         <!-- Recent Activity -->
         <Card class="xl:col-span-2">
           <div class="flex items-center justify-between mb-6">
-            <h3 class="text-xl font-semibold text-neutral-900">Activité récente</h3>
+            <h3 class="text-responsive-xl font-semibold text-neutral-900">Activité récente</h3>
             <button
-              class="text-primary-600 text-sm hover:text-primary-700 transition-colors"
+              class="text-primary-600 text-responsive-sm hover:text-primary-700 transition-colors"
               @click="viewAllActivities"
             >
               Voir tout
@@ -168,14 +168,14 @@
 
               <div class="flex-grow min-w-0">
                 <p class="text-neutral-900 font-medium">{{ activity.title }}</p>
-                <p class="text-neutral-600 text-sm">{{ activity.description }}</p>
-                <p class="text-neutral-400 text-xs mt-1">{{ formatTimeAgo(activity.timestamp) }}</p>
+                <p class="text-neutral-600 text-responsive-sm">{{ activity.description }}</p>
+                <p class="text-neutral-400 text-responsive-xs mt-1">{{ formatTimeAgo(activity.timestamp) }}</p>
               </div>
 
               <div class="flex-shrink-0">
                 <span
                   :class="getActivityStatusClass(activity.status)"
-                  class="px-2 py-1 rounded-full text-xs font-medium"
+                  class="px-2 py-1 rounded-full text-responsive-xs font-medium"
                 >
                   {{ activity.status }}
                 </span>
@@ -186,7 +186,7 @@
 
         <!-- System Health -->
         <Card>
-          <h3 class="text-xl font-semibold text-neutral-900 mb-6">État du système</h3>
+          <h3 class="text-responsive-xl font-semibold text-neutral-900 mb-6">État du système</h3>
 
           <div class="space-y-4">
             <div
@@ -206,14 +206,14 @@
                   />
                 </div>
                 <div>
-                  <p class="font-medium text-sm">{{ service.name }}</p>
-                  <p class="text-xs text-neutral-500">{{ service.description }}</p>
+                  <p class="font-medium text-responsive-sm">{{ service.name }}</p>
+                  <p class="text-responsive-xs text-neutral-500">{{ service.description }}</p>
                 </div>
               </div>
 
               <div class="text-right">
-                <p class="text-sm font-medium">{{ service.uptime }}</p>
-                <p class="text-xs text-neutral-500">{{ service.responseTime }}</p>
+                <p class="text-responsive-sm font-medium">{{ service.uptime }}</p>
+                <p class="text-responsive-xs text-neutral-500">{{ service.responseTime }}</p>
               </div>
             </div>
           </div>
@@ -225,7 +225,7 @@
               <Button
                 variant="outline"
                 size="sm"
-                class="text-xs"
+                class="text-responsive-xs"
                 :left-icon="DocumentTextIcon"
                 @click="viewLogs"
               >
@@ -234,7 +234,7 @@
               <Button
                 variant="outline"
                 size="sm"
-                class="text-xs"
+                class="text-responsive-xs"
                 :left-icon="ChartBarIcon"
                 @click="viewMetrics"
               >
@@ -243,7 +243,7 @@
               <Button
                 variant="outline"
                 size="sm"
-                class="text-xs"
+                class="text-responsive-xs"
                 :left-icon="UsersIcon"
                 @click="manageUsers"
               >
@@ -252,7 +252,7 @@
               <Button
                 variant="outline"
                 size="sm"
-                class="text-xs"
+                class="text-responsive-xs"
                 :left-icon="CogIcon"
                 @click="systemSettings"
               >
@@ -271,26 +271,26 @@
             <div class="p-2 bg-green-100 rounded-lg">
               <GlobeEuropeAfricaIcon class="w-6 h-6 text-green-600" />
             </div>
-            <h3 class="text-lg font-semibold text-neutral-900">Impact Environnemental</h3>
+            <h3 class="text-responsive-lg font-semibold text-neutral-900">Impact Environnemental</h3>
           </div>
 
           <div class="space-y-4">
             <div class="flex items-center justify-between">
               <span class="text-neutral-600">CO₂ économisé</span>
-              <span class="font-bold text-green-600">{{ formatNumber(environmentalImpact.co2Saved) }} kg</span>
+              <span class="font-semibold text-green-600">{{ formatNumber(environmentalImpact.co2Saved) }} kg</span>
             </div>
             <div class="flex items-center justify-between">
               <span class="text-neutral-600">Eau économisée</span>
-              <span class="font-bold text-blue-600">{{ formatNumber(environmentalImpact.waterSaved) }} L</span>
+              <span class="font-semibold text-blue-600">{{ formatNumber(environmentalImpact.waterSaved) }} L</span>
             </div>
             <div class="flex items-center justify-between">
               <span class="text-neutral-600">Déchets évités</span>
-              <span class="font-bold text-orange-600">{{ formatNumber(environmentalImpact.wasteSaved) }} kg</span>
+              <span class="font-semibold text-orange-600">{{ formatNumber(environmentalImpact.wasteSaved) }} kg</span>
             </div>
           </div>
 
           <div class="mt-4 p-3 bg-green-50 rounded-lg">
-            <p class="text-green-700 text-sm font-medium">
+            <p class="text-green-700 text-responsive-sm font-medium">
               🌱 Équivalent à {{ environmentalImpact.treesEquivalent }} arbres plantés
             </p>
           </div>
@@ -298,7 +298,7 @@
 
         <!-- Top Merchants -->
         <Card>
-          <h3 class="text-lg font-semibold text-neutral-900 mb-4">Top Commerçants</h3>
+          <h3 class="text-responsive-lg font-semibold text-neutral-900 mb-4">Top Commerçants</h3>
 
           <div class="space-y-3">
             <div
@@ -307,16 +307,16 @@
               class="flex items-center gap-3 p-3 bg-neutral-50 rounded-lg"
             >
               <div class="flex-shrink-0">
-                <div class="w-8 h-8 bg-primary-100 text-primary-600 rounded-full flex items-center justify-center font-bold text-sm">
+                <div class="w-8 h-8 bg-primary-100 text-primary-600 rounded-full flex items-center justify-center font-semibold text-responsive-sm">
                   {{ index + 1 }}
                 </div>
               </div>
               <div class="flex-grow min-w-0">
-                <p class="font-medium text-sm truncate">{{ merchant.name }}</p>
-                <p class="text-xs text-neutral-500">{{ merchant.productsSold }} produits vendus</p>
+                <p class="font-medium text-responsive-sm truncate">{{ merchant.name }}</p>
+                <p class="text-responsive-xs text-neutral-500">{{ merchant.productsSold }} produits vendus</p>
               </div>
               <div class="text-right">
-                <p class="font-medium text-sm">{{ formatCurrency(merchant.revenue) }}</p>
+                <p class="font-medium text-responsive-sm">{{ formatCurrency(merchant.revenue) }}</p>
               </div>
             </div>
           </div>
@@ -324,7 +324,7 @@
 
         <!-- Popular Categories -->
         <Card>
-          <h3 class="text-lg font-semibold text-neutral-900 mb-4">Catégories Populaires</h3>
+          <h3 class="text-responsive-lg font-semibold text-neutral-900 mb-4">Catégories Populaires</h3>
 
           <div class="space-y-3">
             <div
@@ -333,10 +333,10 @@
               class="flex items-center justify-between"
             >
               <div class="flex items-center gap-3">
-                <span class="text-2xl">{{ category.icon }}</span>
+                <span class="text-responsive-xl">{{ category.icon }}</span>
                 <div>
-                  <p class="font-medium text-sm">{{ category.name }}</p>
-                  <p class="text-xs text-neutral-500">{{ category.productCount }} produits</p>
+                  <p class="font-medium text-responsive-sm">{{ category.name }}</p>
+                  <p class="text-responsive-xs text-neutral-500">{{ category.productCount }} produits</p>
                 </div>
               </div>
               <div class="text-right">
@@ -346,7 +346,7 @@
                     :style="{ width: `${category.percentage}%` }"
                   />
                 </div>
-                <p class="text-xs text-neutral-500 mt-1">{{ category.percentage }}%</p>
+                <p class="text-responsive-xs text-neutral-500 mt-1">{{ category.percentage }}%</p>
               </div>
             </div>
           </div>
@@ -355,7 +355,7 @@
 
       <!-- Alerts and Notifications -->
       <Card v-if="alerts.length > 0" class="mb-8">
-        <h3 class="text-lg font-semibold text-neutral-900 mb-4">Alertes et notifications</h3>
+        <h3 class="text-responsive-lg font-semibold text-neutral-900 mb-4">Alertes et notifications</h3>
 
         <div class="space-y-3">
           <div
@@ -371,8 +371,8 @@
             />
             <div class="flex-grow">
               <p class="font-medium">{{ alert.title }}</p>
-              <p class="text-sm opacity-80 mt-1">{{ alert.message }}</p>
-              <p class="text-xs opacity-60 mt-2">{{ formatTimeAgo(alert.timestamp) }}</p>
+              <p class="text-responsive-sm opacity-80 mt-1">{{ alert.message }}</p>
+              <p class="text-responsive-xs opacity-60 mt-2">{{ formatTimeAgo(alert.timestamp) }}</p>
             </div>
             <button
               class="text-current opacity-60 hover:opacity-100 flex-shrink-0"

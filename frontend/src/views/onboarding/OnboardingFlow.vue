@@ -3,22 +3,22 @@
     <div class="container mx-auto max-w-5xl px-6 py-12">
       <div class="mb-10 flex flex-col items-start justify-between gap-6 lg:flex-row lg:items-center">
         <div>
-          <p class="mb-2 inline-flex items-center gap-2 rounded-full bg-primary-100/60 px-4 py-1 text-sm font-semibold text-primary-700">
+          <p class="mb-2 inline-flex items-center gap-2 rounded-full bg-primary-100/60 px-4 py-1 text-responsive-sm font-semibold text-primary-700">
             <Sparkles class="h-4 w-4" />
             Guide de démarrage AntiGaspi
           </p>
-          <h1 class="text-4xl font-bold tracking-tight text-neutral-900">
+          <h1 class="text-display-sm font-semibold tracking-tight text-neutral-900">
             Bienvenue ! Faisons connaissance en quelques étapes
           </h1>
-          <p class="mt-3 max-w-xl text-lg text-neutral-600">
+          <p class="mt-3 max-w-xl text-responsive-lg text-neutral-600">
             Découvrez comment réserver des paniers surprise, suivre vos commerçants favoris et profiter du portefeuille AntiGaspi.
           </p>
         </div>
         <div class="w-full max-w-xs rounded-3xl border border-primary-200/60 bg-white/80 p-6 shadow-card backdrop-blur">
-          <p class="text-sm font-medium text-neutral-500">Progression</p>
+          <p class="text-responsive-sm font-medium text-neutral-500">Progression</p>
           <div class="mt-2 flex items-end justify-between">
-            <span class="text-4xl font-bold text-primary-600">{{ progress }}%</span>
-            <span class="text-sm text-neutral-500">Étape {{ currentStep + 1 }} sur {{ totalSteps }}</span>
+            <span class="text-display-sm font-semibold text-primary-600">{{ progress }}%</span>
+            <span class="text-responsive-sm text-neutral-500">Étape {{ currentStep + 1 }} sur {{ totalSteps }}</span>
           </div>
           <div class="mt-4 h-2.5 rounded-full bg-neutral-200/80">
             <div
@@ -26,7 +26,7 @@
               :style="{ width: `${progress}%` }"
             />
           </div>
-          <ul class="mt-4 space-y-2 text-sm text-neutral-500">
+          <ul class="mt-4 space-y-2 text-responsive-sm text-neutral-500">
             <li
               v-for="(step, index) in steps"
               :key="step.title"
@@ -52,14 +52,14 @@
             <div class="flex items-center gap-3">
               <component :is="activeStep.icon" class="h-10 w-10 rounded-2xl bg-primary-100 p-2 text-primary-600" />
               <div>
-                <p class="text-sm font-medium uppercase tracking-wide text-primary-600">{{ activeStep.category }}</p>
-                <h2 class="text-2xl font-semibold text-neutral-900">{{ activeStep.title }}</h2>
+                <p class="text-responsive-sm font-medium uppercase tracking-wide text-primary-600">{{ activeStep.category }}</p>
+                <h2 class="text-responsive-xl font-semibold text-neutral-900">{{ activeStep.title }}</h2>
               </div>
             </div>
           </template>
 
           <div class="space-y-6 text-neutral-600">
-            <p class="text-lg leading-relaxed text-neutral-700">
+            <p class="text-responsive-lg leading-relaxed text-neutral-700">
               {{ activeStep.description }}
             </p>
 
@@ -74,7 +74,7 @@
                 </div>
                 <div>
                   <p class="font-semibold text-neutral-800">{{ item.title }}</p>
-                  <p class="text-sm text-neutral-600">{{ item.content }}</p>
+                  <p class="text-responsive-sm text-neutral-600">{{ item.content }}</p>
                 </div>
               </li>
             </ul>
@@ -129,12 +129,12 @@
               <div class="flex items-center gap-3">
                 <component :is="insight.icon" class="h-9 w-9 rounded-2xl bg-primary-100 p-2 text-primary-600" />
                 <div>
-                  <p class="text-sm font-medium text-neutral-500">{{ insight.category }}</p>
-                  <h3 class="text-lg font-semibold text-neutral-900">{{ insight.title }}</h3>
+                  <p class="text-responsive-sm font-medium text-neutral-500">{{ insight.category }}</p>
+                  <h3 class="text-responsive-lg font-semibold text-neutral-900">{{ insight.title }}</h3>
                 </div>
               </div>
             </template>
-            <p class="text-sm leading-relaxed text-neutral-600">{{ insight.description }}</p>
+            <p class="text-responsive-sm leading-relaxed text-neutral-600">{{ insight.description }}</p>
           </Card>
         </div>
       </div>

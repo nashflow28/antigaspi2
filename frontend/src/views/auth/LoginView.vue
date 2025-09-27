@@ -4,13 +4,13 @@
       <!-- Header -->
       <div class="text-center">
         <router-link to="/" class="inline-flex items-center space-x-2 text-primary-600 hover:text-primary-500">
-          <span class="text-3xl">🥬</span>
-          <span class="text-2xl font-bold">Antigaspi</span>
+          <span class="text-responsive-xl">🥬</span>
+          <span class="text-responsive-xl font-semibold">Antigaspi</span>
         </router-link>
-        <h2 class="mt-6 text-3xl font-extrabold text-neutral-900">
+        <h2 class="mt-6 text-responsive-xl font-extrabold text-neutral-900">
           Connexion
         </h2>
-        <p class="mt-2 text-sm text-neutral-600">
+        <p class="mt-2 text-responsive-sm text-neutral-600">
           Connectez-vous à votre compte pour continuer
         </p>
       </div>
@@ -24,7 +24,7 @@
       <div class="text-center">
         <router-link
           to="/"
-          class="text-sm text-neutral-500 hover:text-neutral-700 underline"
+          class="text-responsive-sm text-neutral-500 hover:text-neutral-700 underline"
         >
           ← Retour à l'accueil
         </router-link>

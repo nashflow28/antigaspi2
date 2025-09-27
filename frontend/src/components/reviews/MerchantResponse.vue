@@ -10,22 +10,22 @@
         </div>
         <div class="flex-1 min-w-0">
           <div class="flex items-center space-x-2 mb-2">
-            <span class="text-sm font-medium text-neutral-900">Réponse du commerçant</span>
-            <span class="text-xs text-neutral-500">{{ formatDate(review.merchant_response_at) }}</span>
+            <span class="text-responsive-sm font-medium text-neutral-900">Réponse du commerçant</span>
+            <span class="text-responsive-xs text-neutral-500">{{ formatDate(review.merchant_response_at) }}</span>
           </div>
-          <div class="text-sm text-neutral-700 leading-relaxed bg-green-50 rounded-lg p-3">
+          <div class="text-responsive-sm text-neutral-700 leading-relaxed bg-green-50 rounded-lg p-3">
             {{ review.merchant_response }}
           </div>
           <div class="flex items-center space-x-2 mt-2">
             <button
-              class="inline-flex items-center px-2 py-1 text-xs text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-full transition-colors"
+              class="inline-flex items-center px-2 py-1 text-responsive-xs text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-full transition-colors"
               @click="startEditing"
             >
               <PencilIcon class="w-3 h-3 mr-1" />
               Modifier
             </button>
             <button
-              class="inline-flex items-center px-2 py-1 text-xs text-red-600 bg-red-50 hover:bg-red-100 rounded-full transition-colors"
+              class="inline-flex items-center px-2 py-1 text-responsive-xs text-red-600 bg-red-50 hover:bg-red-100 rounded-full transition-colors"
               :disabled="deleting"
               @click="deleteResponse"
             >
@@ -41,7 +41,7 @@
     <div v-else-if="!review.merchant_response || isEditing" class="space-y-3">
       <div class="flex items-center space-x-2">
         <BuildingStorefrontIcon class="w-5 h-5 text-green-600" />
-        <span class="text-sm font-medium text-neutral-900">
+        <span class="text-responsive-sm font-medium text-neutral-900">
           {{ isEditing ? 'Modifier votre réponse' : 'Répondre à cet avis' }}
         </span>
       </div>
@@ -56,13 +56,13 @@
         />
 
         <div class="flex items-center justify-between">
-          <span class="text-xs text-neutral-500">
+          <span class="text-responsive-xs text-neutral-500">
             {{ responseText.length }}/1000 caractères
           </span>
           <div class="flex items-center space-x-2">
             <button
               v-if="isEditing"
-              class="px-3 py-1 text-sm text-neutral-600 hover:text-neutral-800 transition-colors"
+              class="px-3 py-1 text-responsive-sm text-neutral-600 hover:text-neutral-800 transition-colors"
               :disabled="submitting"
               @click="cancelEditing"
             >
@@ -70,7 +70,7 @@
             </button>
             <button
               :disabled="!responseText.trim() || submitting || responseText.length > 1000"
-              class="inline-flex items-center px-4 py-2 text-sm bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              class="inline-flex items-center px-4 py-2 text-responsive-sm bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               @click="submitResponse"
             >
               <span v-if="submitting" class="inline-flex items-center">
@@ -105,7 +105,7 @@
     <div v-if="showSuccess" class="mt-3 p-3 bg-green-50 border border-green-200 rounded-lg">
       <div class="flex items-center">
         <CheckCircleIcon class="w-5 h-5 text-green-600 mr-2" />
-        <span class="text-sm text-green-800">{{ successMessage }}</span>
+        <span class="text-responsive-sm text-green-800">{{ successMessage }}</span>
       </div>
     </div>
 
@@ -113,7 +113,7 @@
     <div v-if="error" class="mt-3 p-3 bg-red-50 border border-red-200 rounded-lg">
       <div class="flex items-center">
         <ExclamationTriangleIcon class="w-5 h-5 text-red-600 mr-2" />
-        <span class="text-sm text-red-800">{{ error }}</span>
+        <span class="text-responsive-sm text-red-800">{{ error }}</span>
       </div>
     </div>
   </div>

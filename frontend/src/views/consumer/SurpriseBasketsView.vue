@@ -4,7 +4,7 @@
       <div class="container mx-auto px-4 py-8">
         <div class="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
           <div>
-            <nav class="text-sm text-neutral-500" aria-label="Fil d'Ariane">
+            <nav class="text-responsive-sm text-neutral-500" aria-label="Fil d'Ariane">
               <ol class="flex items-center gap-2">
                 <li>
                   <router-link to="/" class="hover:text-neutral-700">Accueil</router-link>
@@ -13,7 +13,7 @@
                 <li class="font-medium text-neutral-700">Paniers surprise</li>
               </ol>
             </nav>
-            <h1 class="mt-4 text-3xl font-bold text-neutral-900">Paniers surprise disponibles</h1>
+            <h1 class="mt-4 text-responsive-xl font-semibold text-neutral-900">Paniers surprise disponibles</h1>
             <p class="mt-2 text-neutral-600">
               {{ totalResults }} panier{{ totalResults > 1 ? 's' : '' }} disponible{{ totalResults > 1 ? 's' : '' }} près de chez vous
             </p>
@@ -45,8 +45,8 @@
             >
               <Package class="h-6 w-6 text-primary-500" />
               <div>
-                <p class="text-xs uppercase tracking-wide text-neutral-500">Impact</p>
-                <p class="text-sm font-semibold text-neutral-900">{{ totalResults }} commerçant{{ totalResults > 1 ? 's' : '' }}</p>
+                <p class="text-responsive-xs uppercase tracking-wide text-neutral-500">Impact</p>
+                <p class="text-responsive-sm font-semibold text-neutral-900">{{ totalResults }} commerçant{{ totalResults > 1 ? 's' : '' }}</p>
               </div>
             </Card>
           </div>
@@ -78,7 +78,7 @@
           <div class="flex h-16 w-16 items-center justify-center rounded-full bg-neutral-100">
             <Package class="h-8 w-8 text-neutral-400" />
           </div>
-          <h2 class="text-xl font-semibold text-neutral-800">Aucun panier ne correspond à vos filtres</h2>
+          <h2 class="text-responsive-xl font-semibold text-neutral-800">Aucun panier ne correspond à vos filtres</h2>
           <p class="mt-2 text-neutral-500">
             Ajustez vos critères pour découvrir d'autres paniers surprise disponibles.
           </p>
@@ -108,7 +108,7 @@
         <Card
           v-if="pagination.lastPage > 1"
           :no-padding="true"
-          class="flex items-center justify-between gap-4 rounded-2xl border border-neutral-200 bg-white px-4 py-3 text-sm text-neutral-600"
+          class="flex items-center justify-between gap-4 rounded-2xl border border-neutral-200 bg-white px-4 py-3 text-responsive-sm text-neutral-600"
         >
           <Button
             type="button"

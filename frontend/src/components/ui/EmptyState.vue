@@ -2,7 +2,7 @@
   <div class="flex flex-col items-center justify-center rounded-3xl border border-dashed border-primary-500/30 bg-primary-500/5 p-12 text-center shadow-card">
     <Transition name="empty-state-fade" appear>
       <div key="content" class="flex flex-col items-center gap-4">
-        <div class="text-4xl">
+        <div class="text-display-sm">
           <slot name="icon">
             <component :is="icon" v-if="isIconComponent" aria-hidden="true" />
             <span v-else aria-hidden="true">{{ icon }}</span>

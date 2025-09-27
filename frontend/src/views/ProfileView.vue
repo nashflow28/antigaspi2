@@ -3,7 +3,7 @@
     <div class="max-w-4xl mx-auto">
       <Card variant="elevated" class="mb-8">
         <div class="p-8">
-          <h1 class="text-2xl font-bold mb-4">Mon Profil</h1>
+          <h1 class="text-responsive-xl font-semibold mb-4">Mon Profil</h1>
           <p class="text-neutral-600">Gestion des informations personnelles</p>
 
           <!-- Performance Demo Integration -->

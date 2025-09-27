@@ -23,7 +23,7 @@
 
       <span
         v-if="timeLeft"
-        class="absolute bottom-4 left-4 inline-flex items-center gap-1 rounded-full bg-white/90 px-3 py-1 text-xs font-medium text-neutral-700 shadow-modern-2025"
+        class="absolute bottom-4 left-4 inline-flex items-center gap-1 rounded-full bg-white/90 px-3 py-1 text-responsive-xs font-medium text-neutral-700 shadow-modern-2025"
       >
         <Clock class="h-4 w-4 text-primary-500" />
         {{ timeLeft }}
@@ -32,15 +32,15 @@
 
     <div class="space-y-4 p-6">
       <div class="space-y-1">
-        <h3 class="text-lg font-semibold text-neutral-900 group-hover:text-primary-600 transition-colors">
+        <h3 class="text-responsive-lg font-semibold text-neutral-900 group-hover:text-primary-600 transition-colors">
           {{ basket.name }}
         </h3>
-        <p v-if="basket.surprise_description" class="line-clamp-2 text-sm text-neutral-600">
+        <p v-if="basket.surprise_description" class="line-clamp-2 text-responsive-sm text-neutral-600">
           {{ basket.surprise_description }}
         </p>
       </div>
 
-      <div class="flex flex-wrap items-center gap-3 text-sm text-neutral-500">
+      <div class="flex flex-wrap items-center gap-3 text-responsive-sm text-neutral-500">
         <span class="inline-flex items-center gap-1 rounded-full bg-primary-50 px-3 py-1 text-primary-700">
           <Store class="h-4 w-4" />
           {{ basket.merchant.business_name }}
@@ -53,17 +53,17 @@
 
       <div class="flex items-end justify-between">
         <div>
-          <div class="text-2xl font-bold text-primary-600">{{ formattedDiscountedPrice }}</div>
-          <div v-if="formattedOriginalPrice" class="text-sm text-neutral-400 line-through">
+          <div class="text-responsive-xl font-semibold text-primary-600">{{ formattedDiscountedPrice }}</div>
+          <div v-if="formattedOriginalPrice" class="text-responsive-sm text-neutral-400 line-through">
             {{ formattedOriginalPrice }}
           </div>
-          <div v-if="formattedSavings" class="text-xs text-primary-600 font-medium">
+          <div v-if="formattedSavings" class="text-responsive-xs text-primary-600 font-medium">
             Économisez {{ formattedSavings }}
           </div>
         </div>
         <div class="flex flex-col gap-2">
           <button
-            class="button-ghost-2025 text-sm"
+            class="button-ghost-2025 text-responsive-sm"
             type="button"
             data-testid="surprise-basket-view"
             @click="$emit('view', basket)"
@@ -71,7 +71,7 @@
             Voir les détails
           </button>
           <button
-            class="button-primary-2025 text-sm"
+            class="button-primary-2025 text-responsive-sm"
             type="button"
             :disabled="basket.quantity_available === 0"
             data-testid="surprise-basket-reserve"

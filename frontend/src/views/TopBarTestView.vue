@@ -7,13 +7,13 @@
           <!-- Logo et titre -->
           <div class="flex items-center gap-3">
             <div class="w-8 h-8 bg-blue-600 rounded-xl flex items-center justify-center">
-              <span class="text-white text-lg font-bold">🌱</span>
+              <span class="text-white text-responsive-lg font-semibold">🌱</span>
             </div>
             <div class="flex flex-col">
-              <h1 class="text-lg font-bold text-neutral-900">
+              <h1 class="text-responsive-lg font-semibold text-neutral-900">
                 Antigaspi
               </h1>
-              <p class="text-xs text-neutral-500">
+              <p class="text-responsive-xs text-neutral-500">
                 TopBar Test
               </p>
             </div>
@@ -37,7 +37,7 @@
               @click="handleNotifications"
             >
               🔔
-              <div class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full min-w-[18px] h-[18px] flex items-center justify-center px-1">
+              <div class="absolute -top-1 -right-1 bg-red-500 text-white text-responsive-xs rounded-full min-w-[18px] h-[18px] flex items-center justify-center px-1">
                 3
               </div>
             </button>
@@ -49,7 +49,7 @@
               @click="handleCart"
             >
               🛒
-              <div class="absolute -top-1 -right-1 bg-blue-500 text-white text-xs rounded-full min-w-[18px] h-[18px] flex items-center justify-center px-1">
+              <div class="absolute -top-1 -right-1 bg-blue-500 text-white text-responsive-xs rounded-full min-w-[18px] h-[18px] flex items-center justify-center px-1">
                 2
               </div>
             </button>
@@ -60,7 +60,7 @@
               @click="handleUser"
             >
               <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
-                <span class="text-white text-sm font-medium">U</span>
+                <span class="text-white text-responsive-sm font-medium">U</span>
               </div>
             </button>
           </div>
@@ -71,7 +71,7 @@
     <!-- Main content avec padding pour la TopBar -->
     <main class="pt-16 p-4">
       <div class="bg-white rounded-lg shadow p-6 mb-4">
-        <h2 class="text-xl font-bold text-neutral-900 mb-4">
+        <h2 class="text-responsive-xl font-semibold text-neutral-900 mb-4">
           🎯 TopBar Test Standalone
         </h2>
 
@@ -86,7 +86,7 @@
         <div class="mt-6 grid grid-cols-2 gap-4">
           <div class="bg-blue-50 p-4 rounded-lg">
             <h3 class="font-medium text-blue-900 mb-2">Actions TopBar</h3>
-            <div class="space-y-2 text-sm">
+            <div class="space-y-2 text-responsive-sm">
               <div>🔍 Recherche: {{ searchClicks }} clics</div>
               <div>🔔 Notifications: {{ notificationClicks }} clics</div>
               <div>🛒 Panier: {{ cartClicks }} clics</div>
@@ -99,19 +99,19 @@
             <div class="space-y-2">
               <router-link
                 to="/"
-                class="block text-blue-600 hover:text-blue-800 underline text-sm"
+                class="block text-blue-600 hover:text-blue-800 underline text-responsive-sm"
               >
                 → Retour à l'accueil
               </router-link>
               <router-link
                 to="/onboarding"
-                class="block text-blue-600 hover:text-blue-800 underline text-sm"
+                class="block text-blue-600 hover:text-blue-800 underline text-responsive-sm"
               >
                 → Onboarding
               </router-link>
               <router-link
                 to="/gaspiz-demo"
-                class="block text-blue-600 hover:text-blue-800 underline text-sm"
+                class="block text-blue-600 hover:text-blue-800 underline text-responsive-sm"
               >
                 → Gaspiz Demo
               </router-link>

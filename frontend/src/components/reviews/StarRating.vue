@@ -24,7 +24,7 @@
       />
     </button>
 
-    <span v-if="showText" class="ml-2 text-sm text-neutral-600">
+    <span v-if="showText" class="ml-2 text-responsive-sm text-neutral-600">
       {{ ratingText }}
     </span>
   </div>

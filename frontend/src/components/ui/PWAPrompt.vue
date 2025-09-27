@@ -11,16 +11,16 @@
             <!-- Icon -->
             <div class="shrink-0">
               <div class="w-12 h-12 bg-nav-gradient rounded-xl flex items-center justify-center">
-                <span class="text-white text-xl">🌱</span>
+                <span class="text-white text-responsive-xl">🌱</span>
               </div>
             </div>
 
             <!-- Content -->
             <div class="flex-1">
-              <h3 class="font-semibold text-neutral-900 dark:text-white text-sm mb-1">
+              <h3 class="font-semibold text-neutral-900 dark:text-white text-responsive-sm mb-1">
                 Installer Antigaspi
               </h3>
-              <p class="text-neutral-600 dark:text-neutral-300 text-xs leading-relaxed mb-4">
+              <p class="text-neutral-600 dark:text-neutral-300 text-responsive-xs leading-relaxed mb-4">
                 Ajoutez Antigaspi à votre écran d'accueil pour un accès rapide et une expérience native.
               </p>
 
@@ -83,10 +83,10 @@
 
             <!-- Content -->
             <div class="flex-1">
-              <h3 class="font-semibold text-blue-900 dark:text-blue-100 text-sm mb-1">
+              <h3 class="font-semibold text-blue-900 dark:text-blue-100 text-responsive-sm mb-1">
                 Mise à jour disponible
               </h3>
-              <p class="text-blue-700 dark:text-blue-200 text-xs leading-relaxed mb-4">
+              <p class="text-blue-700 dark:text-blue-200 text-responsive-xs leading-relaxed mb-4">
                 Une nouvelle version d'Antigaspi est disponible avec des améliorations et corrections.
               </p>
 
@@ -140,7 +140,7 @@
       >
         <div
           :class="[
-            'px-4 py-2 rounded-full shadow-lg text-sm font-medium flex items-center gap-2',
+            'px-4 py-2 rounded-full shadow-lg text-responsive-sm font-medium flex items-center gap-2',
             isOnline
               ? 'bg-green-500 text-white'
               : 'bg-red-500 text-white'

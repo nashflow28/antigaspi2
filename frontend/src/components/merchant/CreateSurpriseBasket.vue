@@ -2,7 +2,7 @@
   <div class="create-surprise-basket">
     <!-- Header -->
     <div class="mb-6">
-      <h2 class="text-2xl font-bold text-neutral-900 mb-2">
+      <h2 class="text-responsive-xl font-semibold text-neutral-900 mb-2">
         Créer un Panier Surprise
       </h2>
       <p class="text-neutral-600">
@@ -14,12 +14,12 @@
     <form class="space-y-6" @submit.prevent="handleSubmit">
       <!-- Basic Information -->
       <div class="bg-white rounded-xl border border-neutral-200 p-6">
-        <h3 class="text-lg font-semibold text-neutral-900 mb-4">Informations générales</h3>
+        <h3 class="text-responsive-lg font-semibold text-neutral-900 mb-4">Informations générales</h3>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
           <!-- Name -->
           <div>
-            <label for="name" class="block text-sm font-medium text-neutral-700 mb-2">
+            <label for="name" class="block text-responsive-sm font-medium text-neutral-700 mb-2">
               Nom du panier surprise *
             </label>
             <input
@@ -34,7 +34,7 @@
 
           <!-- Category -->
           <div>
-            <label for="category" class="block text-sm font-medium text-neutral-700 mb-2">
+            <label for="category" class="block text-responsive-sm font-medium text-neutral-700 mb-2">
               Catégorie
             </label>
             <select
@@ -51,7 +51,7 @@
 
           <!-- Price -->
           <div>
-            <label for="price" class="block text-sm font-medium text-neutral-700 mb-2">
+            <label for="price" class="block text-responsive-sm font-medium text-neutral-700 mb-2">
               Prix du panier (XOF) *
             </label>
             <input
@@ -68,7 +68,7 @@
 
           <!-- Quantity -->
           <div>
-            <label for="quantity" class="block text-sm font-medium text-neutral-700 mb-2">
+            <label for="quantity" class="block text-responsive-sm font-medium text-neutral-700 mb-2">
               Nombre de paniers disponibles *
             </label>
             <input
@@ -85,7 +85,7 @@
 
         <!-- Description -->
         <div class="mt-6">
-          <label for="description" class="block text-sm font-medium text-neutral-700 mb-2">
+          <label for="description" class="block text-responsive-sm font-medium text-neutral-700 mb-2">
             Description générale
           </label>
           <textarea
@@ -99,7 +99,7 @@
 
         <!-- Surprise Description -->
         <div class="mt-6">
-          <label for="surprise-description" class="block text-sm font-medium text-neutral-700 mb-2">
+          <label for="surprise-description" class="block text-responsive-sm font-medium text-neutral-700 mb-2">
             Description mystère (visible par les clients)
           </label>
           <textarea
@@ -109,7 +109,7 @@
             class="w-full px-4 py-3 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
             placeholder="Ex: Un assortiment de viennoiseries fraîches du jour..."
           />
-          <p class="text-sm text-neutral-500 mt-1">
+          <p class="text-responsive-sm text-neutral-500 mt-1">
             Cette description sera visible par les clients sans révéler le contenu exact
           </p>
         </div>
@@ -118,7 +118,7 @@
       <!-- Products Selection -->
       <div class="bg-white rounded-xl border border-neutral-200 p-6">
         <div class="flex items-center justify-between mb-4">
-          <h3 class="text-lg font-semibold text-neutral-900">Produits inclus</h3>
+          <h3 class="text-responsive-lg font-semibold text-neutral-900">Produits inclus</h3>
           <button
             type="button"
             class="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
@@ -133,7 +133,7 @@
         <div v-if="selectedProducts.length === 0" class="text-center py-8 text-neutral-500">
           <Package class="w-12 h-12 mx-auto mb-3 text-neutral-300" />
           <p>Aucun produit sélectionné</p>
-          <p class="text-sm">Ajoutez des produits pour créer votre panier surprise</p>
+          <p class="text-responsive-sm">Ajoutez des produits pour créer votre panier surprise</p>
         </div>
 
         <div v-else class="space-y-4">
@@ -157,7 +157,7 @@
               </div>
               <div>
                 <h4 class="font-medium text-neutral-900">{{ item.product.name }}</h4>
-                <p class="text-sm text-neutral-500">{{ item.product.original_price }} XOF l'unité</p>
+                <p class="text-responsive-sm text-neutral-500">{{ item.product.original_price }} XOF l'unité</p>
               </div>
             </div>
             <div class="flex items-center space-x-3">
@@ -191,17 +191,17 @@
 
           <!-- Summary -->
           <div class="mt-6 p-4 bg-green-50 border border-green-200 rounded-lg">
-            <div class="flex justify-between items-center text-sm">
+            <div class="flex justify-between items-center text-responsive-sm">
               <span class="text-green-700">Valeur totale des produits:</span>
               <span class="font-semibold text-green-900">{{ totalOriginalValue }} XOF</span>
             </div>
-            <div class="flex justify-between items-center text-sm mt-1">
+            <div class="flex justify-between items-center text-responsive-sm mt-1">
               <span class="text-green-700">Prix du panier:</span>
               <span class="font-semibold text-green-900">{{ form.discounted_price || 0 }} XOF</span>
             </div>
-            <div class="flex justify-between items-center text-sm mt-1">
+            <div class="flex justify-between items-center text-responsive-sm mt-1">
               <span class="text-green-700">Économies pour le client:</span>
-              <span class="font-bold text-green-900">{{ totalSavings }} XOF ({{ discountPercentage }}%)</span>
+              <span class="font-semibold text-green-900">{{ totalSavings }} XOF ({{ discountPercentage }}%)</span>
             </div>
           </div>
         </div>
@@ -209,12 +209,12 @@
 
       <!-- Additional Options -->
       <div class="bg-white rounded-xl border border-neutral-200 p-6">
-        <h3 class="text-lg font-semibold text-neutral-900 mb-4">Options avancées</h3>
+        <h3 class="text-responsive-lg font-semibold text-neutral-900 mb-4">Options avancées</h3>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
           <!-- Min Items -->
           <div>
-            <label for="min-items" class="block text-sm font-medium text-neutral-700 mb-2">
+            <label for="min-items" class="block text-responsive-sm font-medium text-neutral-700 mb-2">
               Nombre minimum d'articles
             </label>
             <input
@@ -229,7 +229,7 @@
 
           <!-- Max Items -->
           <div>
-            <label for="max-items" class="block text-sm font-medium text-neutral-700 mb-2">
+            <label for="max-items" class="block text-responsive-sm font-medium text-neutral-700 mb-2">
               Nombre maximum d'articles
             </label>
             <input
@@ -244,7 +244,7 @@
 
           <!-- Expiration Date -->
           <div>
-            <label for="expiration" class="block text-sm font-medium text-neutral-700 mb-2">
+            <label for="expiration" class="block text-responsive-sm font-medium text-neutral-700 mb-2">
               Date d'expiration
             </label>
             <input
@@ -258,7 +258,7 @@
 
           <!-- Image URL -->
           <div>
-            <label for="image" class="block text-sm font-medium text-neutral-700 mb-2">
+            <label for="image" class="block text-responsive-sm font-medium text-neutral-700 mb-2">
               URL de l'image
             </label>
             <input

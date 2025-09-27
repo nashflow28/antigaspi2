@@ -2,7 +2,7 @@
   <div class="bg-white rounded-lg shadow">
     <div class="p-6 border-b border-neutral-200">
       <div class="flex items-center justify-between">
-        <h3 class="text-lg font-semibold text-neutral-900">Historique des transactions</h3>
+        <h3 class="text-responsive-lg font-semibold text-neutral-900">Historique des transactions</h3>
         <button
           :disabled="loading"
           class="p-2 text-neutral-400 hover:text-neutral-600 disabled:opacity-50"
@@ -29,7 +29,7 @@
       <div class="mt-4 flex flex-wrap gap-4">
         <select
           v-model="filters.type"
-          class="px-3 py-2 border border-neutral-300 rounded-lg text-sm focus:ring-2 focus:ring-green-500 focus:border-transparent"
+          class="px-3 py-2 border border-neutral-300 rounded-lg text-responsive-sm focus:ring-2 focus:ring-green-500 focus:border-transparent"
           @change="applyFilters"
         >
           <option value="">Tous les types</option>
@@ -40,19 +40,19 @@
         <input
           v-model="filters.date_from"
           type="date"
-          class="px-3 py-2 border border-neutral-300 rounded-lg text-sm focus:ring-2 focus:ring-green-500 focus:border-transparent"
+          class="px-3 py-2 border border-neutral-300 rounded-lg text-responsive-sm focus:ring-2 focus:ring-green-500 focus:border-transparent"
           @change="applyFilters"
         >
 
         <input
           v-model="filters.date_to"
           type="date"
-          class="px-3 py-2 border border-neutral-300 rounded-lg text-sm focus:ring-2 focus:ring-green-500 focus:border-transparent"
+          class="px-3 py-2 border border-neutral-300 rounded-lg text-responsive-sm focus:ring-2 focus:ring-green-500 focus:border-transparent"
           @change="applyFilters"
         >
 
         <button
-          class="px-3 py-2 text-sm text-neutral-600 hover:text-neutral-800"
+          class="px-3 py-2 text-responsive-sm text-neutral-600 hover:text-neutral-800"
           @click="clearFilters"
         >
           Effacer filtres
@@ -89,7 +89,7 @@
               d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
             />
           </svg>
-          <p class="text-sm">Aucune transaction trouvée</p>
+          <p class="text-responsive-sm">Aucune transaction trouvée</p>
         </div>
       </div>
 
@@ -121,12 +121,12 @@
 
           <div class="flex-1 min-w-0">
             <div class="flex items-center justify-between">
-              <p class="text-sm font-medium text-neutral-900 truncate">
+              <p class="text-responsive-sm font-medium text-neutral-900 truncate">
                 {{ transaction.description }}
               </p>
               <div class="text-right">
                 <p
-                  class="text-sm font-semibold"
+                  class="text-responsive-sm font-semibold"
                   :class="getAmountClass(transaction.type)"
                 >
                   {{ transaction.formatted_amount }}
@@ -134,10 +134,10 @@
               </div>
             </div>
             <div class="flex items-center justify-between mt-1">
-              <p class="text-xs text-neutral-500">
+              <p class="text-responsive-xs text-neutral-500">
                 {{ formatDate(transaction.created_at) }}
               </p>
-              <p class="text-xs text-neutral-400">
+              <p class="text-responsive-xs text-neutral-400">
                 #{{ transaction.reference }}
               </p>
             </div>
@@ -148,20 +148,20 @@
       <!-- Pagination -->
       <div v-if="pagination && pagination.last_page > 1" class="p-4 border-t border-neutral-200">
         <div class="flex items-center justify-between">
-          <div class="text-sm text-neutral-700">
+          <div class="text-responsive-sm text-neutral-700">
             Affichage de {{ pagination.from }} à {{ pagination.to }} sur {{ pagination.total }} transactions
           </div>
           <div class="flex space-x-2">
             <button
               :disabled="pagination.current_page === 1"
-              class="px-3 py-1 text-sm border border-neutral-300 rounded disabled:opacity-50 disabled:cursor-not-allowed hover:bg-neutral-50"
+              class="px-3 py-1 text-responsive-sm border border-neutral-300 rounded disabled:opacity-50 disabled:cursor-not-allowed hover:bg-neutral-50"
               @click="changePage(pagination.current_page - 1)"
             >
               Précédent
             </button>
             <button
               :disabled="pagination.current_page === pagination.last_page"
-              class="px-3 py-1 text-sm border border-neutral-300 rounded disabled:opacity-50 disabled:cursor-not-allowed hover:bg-neutral-50"
+              class="px-3 py-1 text-responsive-sm border border-neutral-300 rounded disabled:opacity-50 disabled:cursor-not-allowed hover:bg-neutral-50"
               @click="changePage(pagination.current_page + 1)"
             >
               Suivant

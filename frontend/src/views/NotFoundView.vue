@@ -32,7 +32,7 @@
 
               <!-- Main 404 Icon -->
               <div class="z-10 text-center">
-                <div class="mb-2 text-8xl font-bold text-primary-500">404</div>
+                <div class="mb-2 text-8xl font-semibold text-primary-500">404</div>
                 <Frown class="mx-auto h-16 w-16 text-primary-600 animate-bounce" />
               </div>
             </div>
@@ -41,13 +41,13 @@
 
         <!-- Error Message -->
         <div class="space-y-4">
-          <h1 class="text-3xl font-bold text-neutral-900 lg:text-4xl">
+          <h1 class="text-responsive-xl font-semibold text-neutral-900 lg:text-display-sm">
             Page introuvable
           </h1>
-          <p class="text-lg text-neutral-600">
+          <p class="text-responsive-lg text-neutral-600">
             Oups ! La page que vous cherchez n'existe pas ou a été déplacée.
           </p>
-          <p class="text-sm text-neutral-500">
+          <p class="text-responsive-sm text-neutral-500">
             Peut-être avez-vous tapé une mauvaise adresse ou suivi un lien obsolète ?
           </p>
         </div>
@@ -79,7 +79,7 @@
 
           <!-- Quick Links -->
           <div class="rounded-3xl border border-neutral-200/70 bg-white/60 p-6 shadow-inner">
-            <p class="mb-4 text-sm font-medium text-neutral-600">
+            <p class="mb-4 text-responsive-sm font-medium text-neutral-600">
               Ou essayez ces liens populaires :
             </p>
             <div class="flex flex-wrap justify-center gap-3">
@@ -124,10 +124,10 @@
               <Info class="h-5 w-5 text-accent-blue" />
             </div>
             <div class="space-y-3">
-              <h3 class="text-lg font-semibold text-accent-blue">
+              <h3 class="text-responsive-lg font-semibold text-accent-blue">
                 Besoin d'aide ?
               </h3>
-              <p class="text-sm text-accent-blue/80">
+              <p class="text-responsive-sm text-accent-blue/80">
                 Si vous pensez qu'il s'agit d'une erreur, n'hésitez pas à nous contacter.
               </p>
               <div class="flex flex-col gap-2 sm:flex-row">

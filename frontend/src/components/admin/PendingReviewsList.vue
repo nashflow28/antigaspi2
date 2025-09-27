@@ -2,14 +2,14 @@
   <div class="bg-white rounded-2xl shadow-lg border border-neutral-100">
     <div class="px-6 py-4 border-b border-neutral-200">
       <div class="flex items-center justify-between">
-        <h3 class="text-xl font-semibold text-neutral-900">
+        <h3 class="text-responsive-xl font-semibold text-neutral-900">
           Avis en attente de modération
           <span v-if="pagination" class="text-neutral-500 font-normal">
             ({{ pagination.total }} au total)
           </span>
         </h3>
         <button
-          class="inline-flex items-center px-3 py-1 text-sm text-primary-600 hover:text-primary-700 transition-colors"
+          class="inline-flex items-center px-3 py-1 text-responsive-sm text-primary-600 hover:text-primary-700 transition-colors"
           :disabled="loading"
           @click="() => loadReviews()"
         >
@@ -29,7 +29,7 @@
       <!-- Empty State -->
       <div v-else-if="reviews.length === 0" class="px-6 py-8 text-center">
         <CheckCircle class="w-12 h-12 text-green-400 mx-auto mb-4" />
-        <h4 class="text-lg font-medium text-neutral-900 mb-2">Aucun avis en attente</h4>
+        <h4 class="text-responsive-lg font-medium text-neutral-900 mb-2">Aucun avis en attente</h4>
         <p class="text-neutral-600">Tous les avis ont été modérés !</p>
       </div>
 
@@ -51,21 +51,21 @@
     <!-- Pagination -->
     <div v-if="pagination && pagination.last_page > 1" class="px-6 py-4 border-t border-neutral-200">
       <div class="flex items-center justify-between">
-        <div class="text-sm text-neutral-500">
+        <div class="text-responsive-sm text-neutral-500">
           Page {{ pagination.current_page }} sur {{ pagination.last_page }}
           ({{ pagination.total }} avis au total)
         </div>
         <div class="flex space-x-2">
           <button
             :disabled="pagination.current_page <= 1"
-            class="px-3 py-1 text-sm border border-neutral-300 rounded disabled:opacity-50 disabled:cursor-not-allowed hover:bg-neutral-50"
+            class="px-3 py-1 text-responsive-sm border border-neutral-300 rounded disabled:opacity-50 disabled:cursor-not-allowed hover:bg-neutral-50"
             @click="loadPage(pagination.current_page - 1)"
           >
             Précédent
           </button>
           <button
             :disabled="pagination.current_page >= pagination.last_page"
-            class="px-3 py-1 text-sm border border-neutral-300 rounded disabled:opacity-50 disabled:cursor-not-allowed hover:bg-neutral-50"
+            class="px-3 py-1 text-responsive-sm border border-neutral-300 rounded disabled:opacity-50 disabled:cursor-not-allowed hover:bg-neutral-50"
             @click="loadPage(pagination.current_page + 1)"
           >
             Suivant

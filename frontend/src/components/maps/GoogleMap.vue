@@ -38,8 +38,8 @@
             />
           </svg>
         </div>
-        <h3 class="text-lg font-medium text-red-900 mb-1">Erreur de chargement</h3>
-        <p class="text-red-600 text-sm">{{ error }}</p>
+        <h3 class="text-responsive-lg font-medium text-red-900 mb-1">Erreur de chargement</h3>
+        <p class="text-red-600 text-responsive-sm">{{ error }}</p>
         <button
           class="mt-3 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
           @click="initializeMap"
@@ -211,7 +211,7 @@ const updateMarkers = () => {
       const infoWindow = new google.maps.InfoWindow({
         content: `<div class="p-3">
           <h3 class="font-semibold text-neutral-900">${markerData.title}</h3>
-          <p class="text-neutral-600 text-sm mt-1">${markerData.info}</p>
+          <p class="text-neutral-600 text-responsive-sm mt-1">${markerData.info}</p>
         </div>`
       })
 

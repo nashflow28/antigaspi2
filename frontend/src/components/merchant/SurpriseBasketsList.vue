@@ -3,7 +3,7 @@
     <!-- Header -->
     <div class="flex items-center justify-between mb-6">
       <div>
-        <h2 class="text-2xl font-bold text-neutral-900">Mes Paniers Surprise</h2>
+        <h2 class="text-responsive-xl font-semibold text-neutral-900">Mes Paniers Surprise</h2>
         <p class="text-neutral-600 mt-1">Gérez vos paniers surprise et maximisez vos ventes</p>
       </div>
       <button
@@ -23,8 +23,8 @@
             <Package class="w-6 h-6 text-primary-600" />
           </div>
           <div class="ml-4">
-            <p class="text-sm font-medium text-neutral-600">Total</p>
-            <p class="text-2xl font-bold text-neutral-900">{{ basketStats.total }}</p>
+            <p class="text-responsive-sm font-medium text-neutral-600">Total</p>
+            <p class="text-responsive-xl font-semibold text-neutral-900">{{ basketStats.total }}</p>
           </div>
         </div>
       </div>
@@ -35,8 +35,8 @@
             <CheckCircle class="w-6 h-6 text-green-600" />
           </div>
           <div class="ml-4">
-            <p class="text-sm font-medium text-neutral-600">Actifs</p>
-            <p class="text-2xl font-bold text-neutral-900">{{ basketStats.active }}</p>
+            <p class="text-responsive-sm font-medium text-neutral-600">Actifs</p>
+            <p class="text-responsive-xl font-semibold text-neutral-900">{{ basketStats.active }}</p>
           </div>
         </div>
       </div>
@@ -47,8 +47,8 @@
             <DollarSign class="w-6 h-6 text-blue-600" />
           </div>
           <div class="ml-4">
-            <p class="text-sm font-medium text-neutral-600">Revenus potentiels</p>
-            <p class="text-2xl font-bold text-neutral-900">{{ formatCurrency(basketStats.totalRevenue) }}</p>
+            <p class="text-responsive-sm font-medium text-neutral-600">Revenus potentiels</p>
+            <p class="text-responsive-xl font-semibold text-neutral-900">{{ formatCurrency(basketStats.totalRevenue) }}</p>
           </div>
         </div>
       </div>
@@ -59,8 +59,8 @@
             <TrendingUp class="w-6 h-6 text-orange-600" />
           </div>
           <div class="ml-4">
-            <p class="text-sm font-medium text-neutral-600">Économies clients</p>
-            <p class="text-2xl font-bold text-neutral-900">{{ formatCurrency(basketStats.totalSavings) }}</p>
+            <p class="text-responsive-sm font-medium text-neutral-600">Économies clients</p>
+            <p class="text-responsive-xl font-semibold text-neutral-900">{{ formatCurrency(basketStats.totalSavings) }}</p>
           </div>
         </div>
       </div>
@@ -75,7 +75,7 @@
     <!-- Empty State -->
     <div v-else-if="!hasMerchantBaskets" class="bg-white rounded-xl border border-neutral-200 p-12 text-center">
       <Package class="w-16 h-16 mx-auto mb-4 text-neutral-300" />
-      <h3 class="text-lg font-medium text-neutral-900 mb-2">Aucun panier surprise</h3>
+      <h3 class="text-responsive-lg font-medium text-neutral-900 mb-2">Aucun panier surprise</h3>
       <p class="text-neutral-600 mb-6">
         Créez votre premier panier surprise pour valoriser vos invendus et attirer de nouveaux clients
       </p>
@@ -110,7 +110,7 @@
           <!-- Status Badge -->
           <div class="absolute top-3 left-3">
             <span
-              class="px-2 py-1 text-xs font-medium rounded-full"
+              class="px-2 py-1 text-responsive-xs font-medium rounded-full"
               :class="basket.is_active
                 ? 'bg-green-100 text-green-800'
                 : 'bg-red-100 text-red-800'"
@@ -121,7 +121,7 @@
 
           <!-- Quantity Badge -->
           <div class="absolute top-3 right-3">
-            <span class="px-2 py-1 text-xs font-medium bg-primary-100 text-primary-800 rounded-full">
+            <span class="px-2 py-1 text-responsive-xs font-medium bg-primary-100 text-primary-800 rounded-full">
               {{ basket.quantity_available }} disponible(s)
             </span>
           </div>
@@ -130,7 +130,7 @@
         <!-- Content -->
         <div class="p-6">
           <div class="flex items-start justify-between mb-2">
-            <h3 class="text-lg font-semibold text-neutral-900 line-clamp-1">{{ basket.name }}</h3>
+            <h3 class="text-responsive-lg font-semibold text-neutral-900 line-clamp-1">{{ basket.name }}</h3>
             <div class="relative">
               <button
                 class="p-1 hover:bg-neutral-100 rounded-lg transition-colors"
@@ -145,21 +145,21 @@
                 class="absolute right-0 top-full mt-1 bg-white border border-neutral-200 rounded-lg shadow-lg z-10 py-1 w-48"
               >
                 <button
-                  class="w-full px-4 py-2 text-left text-sm text-neutral-700 hover:bg-neutral-50 flex items-center"
+                  class="w-full px-4 py-2 text-left text-responsive-sm text-neutral-700 hover:bg-neutral-50 flex items-center"
                   @click="editBasket(basket)"
                 >
                   <Edit class="w-4 h-4 mr-2" />
                   Modifier
                 </button>
                 <button
-                  class="w-full px-4 py-2 text-left text-sm text-neutral-700 hover:bg-neutral-50 flex items-center"
+                  class="w-full px-4 py-2 text-left text-responsive-sm text-neutral-700 hover:bg-neutral-50 flex items-center"
                   @click="toggleBasketStatus(basket)"
                 >
                   <component :is="basket.is_active ? EyeOff : Eye" class="w-4 h-4 mr-2" />
                   {{ basket.is_active ? 'Désactiver' : 'Activer' }}
                 </button>
                 <button
-                  class="w-full px-4 py-2 text-left text-sm text-neutral-700 hover:bg-neutral-50 flex items-center"
+                  class="w-full px-4 py-2 text-left text-responsive-sm text-neutral-700 hover:bg-neutral-50 flex items-center"
                   @click="viewBasket(basket)"
                 >
                   <Eye class="w-4 h-4 mr-2" />
@@ -167,7 +167,7 @@
                 </button>
                 <hr class="my-1">
                 <button
-                  class="w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-red-50 flex items-center"
+                  class="w-full px-4 py-2 text-left text-responsive-sm text-red-600 hover:bg-red-50 flex items-center"
                   @click="confirmDelete(basket)"
                 >
                   <Trash2 class="w-4 h-4 mr-2" />
@@ -177,25 +177,25 @@
             </div>
           </div>
 
-          <p v-if="basket.surprise_description" class="text-sm text-neutral-600 mb-3 line-clamp-2">
+          <p v-if="basket.surprise_description" class="text-responsive-sm text-neutral-600 mb-3 line-clamp-2">
             {{ basket.surprise_description }}
           </p>
 
           <!-- Price and Savings -->
           <div class="flex items-center justify-between mb-3">
             <div>
-              <span class="text-lg font-bold text-primary-600">{{ formatCurrency(basket.discounted_price) }}</span>
-              <span v-if="basket.total_original_value" class="text-sm text-neutral-400 ml-2 line-through">
+              <span class="text-responsive-lg font-semibold text-primary-600">{{ formatCurrency(basket.discounted_price) }}</span>
+              <span v-if="basket.total_original_value" class="text-responsive-sm text-neutral-400 ml-2 line-through">
                 {{ formatCurrency(basket.total_original_value) }}
               </span>
             </div>
-            <div v-if="basket.basket_discount_percentage" class="text-sm font-medium text-green-600">
+            <div v-if="basket.basket_discount_percentage" class="text-responsive-sm font-medium text-green-600">
               -{{ basket.basket_discount_percentage }}%
             </div>
           </div>
 
           <!-- Items Info -->
-          <div class="flex items-center justify-between text-sm text-neutral-500 mb-4">
+          <div class="flex items-center justify-between text-responsive-sm text-neutral-500 mb-4">
             <span>{{ basket.basket_items_count }} article(s)</span>
             <span v-if="basket.expiration_date">
               Expire le {{ formatDate(basket.expiration_date) }}
@@ -204,7 +204,7 @@
 
           <!-- Category -->
           <div v-if="basket.category" class="mb-4">
-            <span class="inline-flex items-center px-2 py-1 text-xs font-medium bg-neutral-100 text-neutral-800 rounded-full">
+            <span class="inline-flex items-center px-2 py-1 text-responsive-xs font-medium bg-neutral-100 text-neutral-800 rounded-full">
               {{ basket.category.name }}
             </span>
           </div>
@@ -212,13 +212,13 @@
           <!-- Actions -->
           <div class="flex items-center space-x-2">
             <button
-              class="flex-1 px-3 py-2 text-sm font-medium text-neutral-700 bg-neutral-100 hover:bg-neutral-200 rounded-lg transition-colors"
+              class="flex-1 px-3 py-2 text-responsive-sm font-medium text-neutral-700 bg-neutral-100 hover:bg-neutral-200 rounded-lg transition-colors"
               @click="editBasket(basket)"
             >
               Modifier
             </button>
             <button
-              class="flex-1 px-3 py-2 text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 rounded-lg transition-colors"
+              class="flex-1 px-3 py-2 text-responsive-sm font-medium text-white bg-primary-600 hover:bg-primary-700 rounded-lg transition-colors"
               @click="viewBasket(basket)"
             >
               Détails

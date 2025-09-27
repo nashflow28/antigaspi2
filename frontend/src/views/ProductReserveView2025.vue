@@ -13,10 +13,10 @@
             <ArrowLeft class="w-6 h-6" />
           </Button>
           <div>
-            <h1 class="text-3xl lg:text-4xl font-bold text-neutral-900 mb-2">
+            <h1 class="text-responsive-xl lg:text-display-sm font-semibold text-neutral-900 mb-2">
               Réserver un produit 🛒
             </h1>
-            <p class="text-lg text-neutral-600">
+            <p class="text-responsive-lg text-neutral-600">
               Finalisez votre réservation en quelques étapes
             </p>
           </div>
@@ -37,7 +37,7 @@
         <!-- Error State -->
         <Card v-else-if="productError" class="text-center py-16">
           <Package class="w-24 h-24 text-neutral-300 mx-auto mb-4" />
-          <h3 class="text-xl font-bold text-neutral-700 mb-2">Produit introuvable</h3>
+          <h3 class="text-responsive-xl font-semibold text-neutral-700 mb-2">Produit introuvable</h3>
           <p class="text-neutral-500 mb-6">
             Le produit que vous souhaitez réserver n'existe pas ou n'est plus disponible.
           </p>
@@ -51,8 +51,8 @@
           <!-- Étapes de réservation -->
           <Card class="mb-8 animate-fade-in-up">
             <div class="flex items-center justify-between mb-6">
-              <h2 class="text-xl font-bold text-neutral-900">Étapes de réservation</h2>
-              <div class="text-sm text-neutral-600">
+              <h2 class="text-responsive-xl font-semibold text-neutral-900">Étapes de réservation</h2>
+              <div class="text-responsive-sm text-neutral-600">
                 Étape {{ currentStep }} sur 4
               </div>
             </div>
@@ -72,7 +72,7 @@
                 />
                 <div
                   :class="[
-                    'absolute -top-6 left-0 w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold transition-all duration-300',
+                    'absolute -top-6 left-0 w-8 h-8 rounded-full flex items-center justify-center text-responsive-sm font-semibold transition-all duration-300',
                     step <= currentStep ? 'bg-primary-500 text-white' : 'bg-neutral-200 text-neutral-600'
                   ]"
                 >
@@ -82,7 +82,7 @@
             </div>
 
             <!-- Libellés des étapes -->
-            <div class="grid grid-cols-4 gap-4 text-center text-sm">
+            <div class="grid grid-cols-4 gap-4 text-center text-responsive-sm">
               <div :class="currentStep >= 1 ? 'text-primary-600 font-medium' : 'text-neutral-500'">
                 Détails produit
               </div>
@@ -104,7 +104,7 @@
               <!-- Étape 1: Détails du produit -->
               <Card v-if="currentStep === 1" class="animate-fade-in-up">
                 <template #header>
-                  <h3 class="text-xl font-bold text-neutral-900">Détails du produit</h3>
+                  <h3 class="text-responsive-xl font-semibold text-neutral-900">Détails du produit</h3>
                 </template>
 
                 <div class="flex gap-6 mb-6">
@@ -118,20 +118,20 @@
                     <Package v-else class="w-16 h-16 text-primary-400" />
                   </div>
                   <div class="flex-1">
-                    <h4 class="text-2xl font-bold text-neutral-900 mb-2">{{ product.name }}</h4>
+                    <h4 class="text-responsive-xl font-semibold text-neutral-900 mb-2">{{ product.name }}</h4>
                     <p class="text-neutral-600 mb-4">{{ product.description }}</p>
                     <div class="flex items-center gap-4 mb-4">
                       <div class="flex items-center gap-2">
-                        <span class="text-3xl font-bold text-primary-600">
+                        <span class="text-responsive-xl font-semibold text-primary-600">
                           {{ formatPrice(product.discounted_price) }}
                         </span>
-                        <span class="text-lg text-neutral-400 line-through">
+                        <span class="text-responsive-lg text-neutral-400 line-through">
                           {{ formatPrice(product.original_price) }}
                         </span>
                       </div>
                       <Badge variant="success">-{{ product.discount }}%</Badge>
                     </div>
-                    <div class="flex items-center gap-4 text-sm text-neutral-600">
+                    <div class="flex items-center gap-4 text-responsive-sm text-neutral-600">
                       <div class="flex items-center gap-1">
                         <Clock class="w-4 h-4" />
                         <span>{{ formatTimeLeft(product.expires_at) }}</span>
@@ -176,7 +176,7 @@
                         <Plus class="w-5 h-5" />
                       </Button>
                     </div>
-                    <p class="text-sm text-neutral-500 mt-1">
+                    <p class="text-responsive-sm text-neutral-500 mt-1">
                       Maximum {{ product.available_quantity - product.reserved_quantity }} disponible{{ (product.available_quantity - product.reserved_quantity) > 1 ? 's' : '' }}
                     </p>
                   </div>
@@ -198,7 +198,7 @@
               <!-- Étape 2: Informations récupération -->
               <Card v-if="currentStep === 2" class="animate-fade-in-up">
                 <template #header>
-                  <h3 class="text-xl font-bold text-neutral-900">Informations de récupération</h3>
+                  <h3 class="text-responsive-xl font-semibold text-neutral-900">Informations de récupération</h3>
                 </template>
 
                 <div class="space-y-6">
@@ -253,7 +253,7 @@
                       placeholder="+33 1 23 45 67 89"
                       required
                     />
-                    <p class="text-sm text-neutral-500 mt-1">
+                    <p class="text-responsive-sm text-neutral-500 mt-1">
                       Pour vous contacter en cas de problème
                     </p>
                   </div>
@@ -275,7 +275,7 @@
               <!-- Étape 3: Paiement -->
               <Card v-if="currentStep === 3" class="animate-fade-in-up">
                 <template #header>
-                  <h3 class="text-xl font-bold text-neutral-900">Choisissez votre moyen de paiement</h3>
+                  <h3 class="text-responsive-xl font-semibold text-neutral-900">Choisissez votre moyen de paiement</h3>
                 </template>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
@@ -304,12 +304,12 @@
                         <Badge
                           :variant="paymentMethod === option.value ? 'primary' : 'secondary'"
                           size="sm"
-                          class="text-xs"
+                          class="text-responsive-xs"
                         >
                           {{ option.description }}
                         </Badge>
                       </div>
-                      <p class="text-sm text-neutral-600 mt-1">{{ option.instructions }}</p>
+                      <p class="text-responsive-sm text-neutral-600 mt-1">{{ option.instructions }}</p>
                     </div>
                   </Button>
                 </div>
@@ -324,7 +324,7 @@
                     :error="mobileMoneyPhone && !/^\+?[0-9]{8,15}$/.test(mobileMoneyPhone) ? 'Format invalide' : undefined"
                     required
                   />
-                  <p class="text-xs text-neutral-500">
+                  <p class="text-responsive-xs text-neutral-500">
                     Utilisez un numéro enregistré sur le portefeuille sélectionné.
                   </p>
                 </div>
@@ -338,29 +338,29 @@
                     type="password"
                     maxlength="6"
                     placeholder="••••••"
-                    class="text-center text-lg tracking-widest"
+                    class="text-center text-responsive-lg tracking-widest"
                     required
                     @input="(e) => e.target.value = e.target.value.replace(/\D/g, '')"
                   />
-                  <div class="flex items-center justify-between text-xs text-neutral-500">
+                  <div class="flex items-center justify-between text-responsive-xs text-neutral-500">
                     <span>Solde disponible: {{ walletStore.formattedBalance }}</span>
                     <span v-if="!canPayWithWallet" class="text-red-600">Solde insuffisant</span>
                   </div>
                 </div>
 
-                <div class="mt-6 p-4 bg-primary-50 border border-primary-200 rounded-xl text-sm text-primary-700">
+                <div class="mt-6 p-4 bg-primary-50 border border-primary-200 rounded-xl text-responsive-sm text-primary-700">
                   <p class="font-semibold mb-1">Montant à payer</p>
-                  <p class="text-lg font-bold text-primary-800">{{ formatPrice(totalAmount) }}</p>
-                  <p v-if="methodRequiresPhone" class="mt-2 text-xs">
+                  <p class="text-responsive-lg font-semibold text-primary-800">{{ formatPrice(totalAmount) }}</p>
+                  <p v-if="methodRequiresPhone" class="mt-2 text-responsive-xs">
                     Un SMS de confirmation vous sera envoyé dès validation par l'opérateur.
                   </p>
-                  <p v-else-if="paymentMethod === 'paystack'" class="mt-2 text-xs">
+                  <p v-else-if="paymentMethod === 'paystack'" class="mt-2 text-responsive-xs">
                     Vous serez redirigé vers la page Paystack après la création de la réservation.
                   </p>
-                  <p v-else-if="paymentMethod === 'on_site'" class="mt-2 text-xs">
+                  <p v-else-if="paymentMethod === 'on_site'" class="mt-2 text-responsive-xs">
                     Réglez ce montant directement auprès du commerçant lors du retrait.
                   </p>
-                  <p v-else-if="paymentMethod === 'wallet'" class="mt-2 text-xs">
+                  <p v-else-if="paymentMethod === 'wallet'" class="mt-2 text-responsive-xs">
                     Le montant sera débité instantanément de votre portefeuille après saisie du PIN.
                   </p>
                 </div>
@@ -369,32 +369,32 @@
               <!-- Étape 4: Confirmation -->
               <Card v-if="currentStep === 4" class="animate-fade-in-up">
                 <template #header>
-                  <h3 class="text-xl font-bold text-neutral-900">Confirmation de réservation</h3>
+                  <h3 class="text-responsive-xl font-semibold text-neutral-900">Confirmation de réservation</h3>
                 </template>
 
                 <div class="space-y-6">
                   <!-- Récapitulatif produit -->
                   <div class="p-4 bg-primary-50 rounded-xl border border-primary-200">
-                    <h4 class="font-bold text-primary-800 mb-3">Produit réservé</h4>
+                    <h4 class="font-semibold text-primary-800 mb-3">Produit réservé</h4>
                     <div class="flex justify-between items-center mb-2">
                       <span>{{ product.name }}</span>
-                      <span class="font-bold">{{ formatPrice(product.discounted_price) }}</span>
+                      <span class="font-semibold">{{ formatPrice(product.discounted_price) }}</span>
                     </div>
                     <div class="flex justify-between items-center mb-2">
                       <span>Quantité: {{ reservation.quantity }}</span>
-                      <span class="font-bold text-primary-600">
+                      <span class="font-semibold text-primary-600">
                         {{ formatPrice(totalAmount) }}
                       </span>
                     </div>
-                    <div class="text-sm text-primary-700 pt-2 border-t border-primary-200">
+                    <div class="text-responsive-sm text-primary-700 pt-2 border-t border-primary-200">
                       Économie: {{ formatPrice(savingsAmount) }}
                     </div>
                   </div>
 
                   <!-- Récapitulatif récupération -->
                   <div class="p-4 bg-accent-blue/5 rounded-xl border border-accent-blue/30">
-                    <h4 class="font-bold text-accent-blue/95 mb-3">Récupération</h4>
-                    <div class="space-y-2 text-sm">
+                    <h4 class="font-semibold text-accent-blue/95 mb-3">Récupération</h4>
+                    <div class="space-y-2 text-responsive-sm">
                       <div class="flex items-center gap-2">
                         <MapPin class="w-4 h-4 text-accent-blue" />
                         <span>{{ product.merchant.name }}</span>
@@ -412,7 +412,7 @@
 
                   <!-- Récapitulatif paiement -->
                   <div class="p-4 bg-neutral-50 rounded-xl border border-neutral-200">
-                    <h4 class="font-bold text-neutral-800 mb-3">Paiement</h4>
+                    <h4 class="font-semibold text-neutral-800 mb-3">Paiement</h4>
                     <div class="flex items-center justify-between mb-2">
                       <span class="text-neutral-600">Méthode sélectionnée</span>
                       <span class="font-semibold text-neutral-900">{{ selectedPaymentOption?.label }}</span>
@@ -421,21 +421,21 @@
                       <span class="text-neutral-600">Montant</span>
                       <span class="font-semibold text-neutral-900">{{ formatPrice(totalAmount) }}</span>
                     </div>
-                    <div v-if="methodRequiresPhone" class="text-sm text-neutral-600">
+                    <div v-if="methodRequiresPhone" class="text-responsive-sm text-neutral-600">
                       Téléphone Mobile Money : <span class="font-medium">{{ mobileMoneyPhone }}</span>
                     </div>
-                    <div v-if="paymentMethod === 'wallet'" class="text-sm text-neutral-600">
+                    <div v-if="paymentMethod === 'wallet'" class="text-responsive-sm text-neutral-600">
                       Solde disponible : <span class="font-medium text-green-600">{{ walletStore.formattedBalance }}</span>
                     </div>
-                    <p class="text-xs text-neutral-500 mt-3">
+                    <p class="text-responsive-xs text-neutral-500 mt-3">
                       {{ selectedPaymentOption?.instructions }}
                     </p>
                   </div>
 
                   <!-- Conditions -->
                   <div class="p-4 bg-accent-orange/10 rounded-xl border border-accent-orange/30">
-                    <h4 class="font-bold text-accent-orange/95 mb-3">⚠️ Conditions importantes</h4>
-                    <ul class="text-sm text-accent-orange/90 space-y-1">
+                    <h4 class="font-semibold text-accent-orange/95 mb-3">⚠️ Conditions importantes</h4>
+                    <ul class="text-responsive-sm text-accent-orange/90 space-y-1">
                       <li>• La réservation doit être récupérée dans les 24h après expiration</li>
                       <li>• En cas d'absence, le produit sera remis en vente</li>
                       <li>• Apportez une pièce d'identité pour la récupération</li>
@@ -450,7 +450,7 @@
                       type="checkbox"
                       class="w-5 h-5 rounded border-neutral-300 text-primary-600 focus:ring-primary-500 focus:ring-2"
                     >
-                    <label for="accept-conditions" class="text-sm text-neutral-700">
+                    <label for="accept-conditions" class="text-responsive-sm text-neutral-700">
                       J'accepte les conditions de réservation et je m'engage à récupérer le produit aux horaires convenus
                     </label>
                   </div>
@@ -496,7 +496,7 @@
               <!-- Informations marchand -->
               <Card class="animate-fade-in-up" style="animation-delay: 0.2s;">
                 <template #header>
-                  <h3 class="text-lg font-bold text-neutral-900">Marchand</h3>
+                  <h3 class="text-responsive-lg font-semibold text-neutral-900">Marchand</h3>
                 </template>
                 <div class="space-y-3">
                   <div class="flex items-center gap-3">
@@ -505,10 +505,10 @@
                     </div>
                     <div>
                       <p class="font-semibold text-neutral-900">{{ product.merchant.name }}</p>
-                      <p class="text-sm text-neutral-600">{{ product.merchant.address }}</p>
+                      <p class="text-responsive-sm text-neutral-600">{{ product.merchant.address }}</p>
                     </div>
                   </div>
-                  <div class="flex items-center gap-2 text-sm text-neutral-600">
+                  <div class="flex items-center gap-2 text-responsive-sm text-neutral-600">
                     <MapPin class="w-4 h-4" />
                     <span>À {{ product.merchant.distance }}km de vous</span>
                   </div>
@@ -521,12 +521,12 @@
                   <div class="w-8 h-8 bg-primary-500 rounded-full flex items-center justify-center">
                     <HelpCircle class="w-4 h-4 text-white" />
                   </div>
-                  <h3 class="text-lg font-bold text-primary-800">Besoin d'aide ?</h3>
+                  <h3 class="text-responsive-lg font-semibold text-primary-800">Besoin d'aide ?</h3>
                 </div>
-                <p class="text-sm text-primary-700 mb-4">
+                <p class="text-responsive-sm text-primary-700 mb-4">
                   Une question sur votre réservation ?
                 </p>
-                <div class="space-y-2 text-sm text-primary-700">
+                <div class="space-y-2 text-responsive-sm text-primary-700">
                   <div class="flex items-center gap-2">
                     <Phone class="w-4 h-4" />
                     <span>01 23 45 67 89</span>
@@ -541,16 +541,16 @@
               <!-- Impact environnemental -->
               <Card variant="gradient" class="bg-gradient-to-br from-accent-orange/10 to-accent-blue/5 border-accent-orange/30 animate-fade-in-up" style="animation-delay: 0.6s;">
                 <div class="text-center">
-                  <div class="text-4xl mb-3">🌱</div>
-                  <h3 class="text-lg font-bold text-accent-orange/95 mb-2">Votre impact</h3>
-                  <p class="text-sm text-accent-orange/90 mb-3">
+                  <div class="text-display-sm mb-3">🌱</div>
+                  <h3 class="text-responsive-lg font-semibold text-accent-orange/95 mb-2">Votre impact</h3>
+                  <p class="text-responsive-sm text-accent-orange/90 mb-3">
                     En réservant ce produit, vous évitez le gaspillage et économisez environ :
                   </p>
                   <div class="space-y-2">
-                    <div class="text-2xl font-bold text-accent-orange">
+                    <div class="text-responsive-xl font-semibold text-accent-orange">
                       {{ Math.round((product.original_price - product.discounted_price) * reservation.quantity).toLocaleString('fr-FR') }} F CFA
                     </div>
-                    <div class="text-sm text-accent-orange/90">
+                    <div class="text-responsive-sm text-accent-orange/90">
                       ~{{ Math.round(reservation.quantity * 0.5 * 100) / 100 }}kg CO₂ évités
                     </div>
                   </div>

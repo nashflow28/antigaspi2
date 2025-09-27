@@ -9,7 +9,7 @@
       <div class="container mx-auto px-4 py-6">
         <div class="flex items-center justify-between">
           <div>
-            <h1 class="text-3xl font-bold text-neutral-900">Mes Points de Fidélité</h1>
+            <h1 class="text-responsive-xl font-semibold text-neutral-900">Mes Points de Fidélité</h1>
             <p class="text-neutral-600 mt-1">
               Gagnez des points et profitez de récompenses exclusives
             </p>
@@ -17,7 +17,7 @@
           <div class="flex items-center gap-3">
             <button
               :disabled="loading"
-              class="button-outline-2025 text-sm"
+              class="button-outline-2025 text-responsive-sm"
               @click="refreshPoints"
             >
               <RefreshCw class="w-4 h-4" :class="{ 'animate-spin': loading }" />
@@ -37,8 +37,8 @@
             <Card class="glow-effect">
               <div class="flex items-center justify-between">
                 <div>
-                  <p class="text-sm font-medium text-neutral-600">Points Totaux</p>
-                  <p class="text-3xl font-bold text-primary-600 mt-1">
+                  <p class="text-responsive-sm font-medium text-neutral-600">Points Totaux</p>
+                  <p class="text-responsive-xl font-semibold text-primary-600 mt-1">
                     {{ formatPoints(totalPoints) }}
                   </p>
                 </div>
@@ -52,11 +52,11 @@
             <Card class="">
               <div class="flex items-center justify-between">
                 <div>
-                  <p class="text-sm font-medium text-neutral-600">Points Expirent</p>
-                  <p class="text-2xl font-bold text-accent-orange mt-1">
+                  <p class="text-responsive-sm font-medium text-neutral-600">Points Expirent</p>
+                  <p class="text-responsive-xl font-semibold text-accent-orange mt-1">
                     {{ formatPoints(expiringPoints) }}
                   </p>
-                  <p class="text-xs text-neutral-500">Dans 30 jours</p>
+                  <p class="text-responsive-xs text-neutral-500">Dans 30 jours</p>
                 </div>
                 <div class="p-3 bg-accent-orange/15 rounded-xl">
                   <Clock class="w-8 h-8 text-accent-orange" />
@@ -68,11 +68,11 @@
             <Card class="cursor-pointer hover:shadow-modern-2025 transition-all duration-200" @click="scrollToRewards">
               <div class="flex items-center justify-between">
                 <div>
-                  <p class="text-sm font-medium text-neutral-600">Récompenses</p>
-                  <p class="text-2xl font-bold text-accent-blue mt-1">
+                  <p class="text-responsive-sm font-medium text-neutral-600">Récompenses</p>
+                  <p class="text-responsive-xl font-semibold text-accent-blue mt-1">
                     {{ availableRewards.length }}
                   </p>
-                  <p class="text-xs text-neutral-500">Disponibles</p>
+                  <p class="text-responsive-xs text-neutral-500">Disponibles</p>
                 </div>
                 <div class="p-3 bg-accent-blue/10 rounded-xl">
                   <Gift class="w-8 h-8 text-accent-blue" />
@@ -86,8 +86,8 @@
         <div class="lg:col-span-2">
           <Card class="">
             <div class="flex items-center justify-between mb-6">
-              <h3 class="text-xl font-semibold text-neutral-900">Répartition des Points</h3>
-              <div class="flex items-center gap-2 text-sm text-neutral-600">
+              <h3 class="text-responsive-xl font-semibold text-neutral-900">Répartition des Points</h3>
+              <div class="flex items-center gap-2 text-responsive-sm text-neutral-600">
                 <TrendingUp class="w-4 h-4" />
                 Par catégorie
               </div>
@@ -105,11 +105,11 @@
                   </div>
                   <div>
                     <p class="font-medium text-neutral-900">{{ getPointTypeLabel(breakdown.earned_from) }}</p>
-                    <p class="text-sm text-neutral-600">{{ formatPoints(parseInt(breakdown.total)) }} points</p>
+                    <p class="text-responsive-sm text-neutral-600">{{ formatPoints(parseInt(breakdown.total)) }} points</p>
                   </div>
                 </div>
                 <div class="text-right">
-                  <span class="text-lg font-bold text-neutral-900">{{ breakdown.total }}</span>
+                  <span class="text-responsive-lg font-semibold text-neutral-900">{{ breakdown.total }}</span>
                 </div>
               </div>
             </div>
@@ -117,7 +117,7 @@
             <div v-else class="text-center py-8">
               <Star class="w-16 h-16 text-neutral-300 mx-auto mb-4" />
               <p class="text-neutral-600">Aucun point gagné pour le moment</p>
-              <p class="text-sm text-neutral-500">Commencez par faire un achat ou laisser un avis !</p>
+              <p class="text-responsive-sm text-neutral-500">Commencez par faire un achat ou laisser un avis !</p>
             </div>
           </Card>
         </div>
@@ -125,7 +125,7 @@
         <!-- Recent Activity -->
         <div class="lg:col-span-1">
           <Card class="">
-            <h3 class="text-xl font-semibold text-neutral-900 mb-6">Activité Récente</h3>
+            <h3 class="text-responsive-xl font-semibold text-neutral-900 mb-6">Activité Récente</h3>
 
             <div v-if="recentHistory.length > 0" class="space-y-3">
               <div
@@ -137,11 +137,11 @@
                   <component :is="getPointTypeIcon(activity.earned_from)" class="w-4 h-4" />
                 </div>
                 <div class="flex-1 min-w-0">
-                  <p class="text-sm font-medium text-neutral-900 truncate">{{ activity.description }}</p>
-                  <p class="text-xs text-neutral-500">{{ formatDate(activity.created_at) }}</p>
+                  <p class="text-responsive-sm font-medium text-neutral-900 truncate">{{ activity.description }}</p>
+                  <p class="text-responsive-xs text-neutral-500">{{ formatDate(activity.created_at) }}</p>
                 </div>
                 <div class="text-right flex-shrink-0">
-                  <span :class="activity.points > 0 ? 'text-green-600' : 'text-red-600'" class="text-sm font-bold">
+                  <span :class="activity.points > 0 ? 'text-green-600' : 'text-red-600'" class="text-responsive-sm font-semibold">
                     {{ activity.points > 0 ? '+' : '' }}{{ activity.points }}
                   </span>
                 </div>
@@ -150,7 +150,7 @@
 
             <div v-else class="text-center py-6">
               <Clock class="w-12 h-12 text-neutral-300 mx-auto mb-3" />
-              <p class="text-neutral-600 text-sm">Aucune activité récente</p>
+              <p class="text-neutral-600 text-responsive-sm">Aucune activité récente</p>
             </div>
           </Card>
         </div>
@@ -159,8 +159,8 @@
         <div ref="rewardsSection" class="lg:col-span-3">
           <Card class="">
             <div class="flex items-center justify-between mb-6">
-              <h3 class="text-xl font-semibold text-neutral-900">Récompenses Disponibles</h3>
-              <div class="flex items-center gap-2 text-sm text-neutral-600">
+              <h3 class="text-responsive-xl font-semibold text-neutral-900">Récompenses Disponibles</h3>
+              <div class="flex items-center gap-2 text-responsive-sm text-neutral-600">
                 <Gift class="w-4 h-4" />
                 {{ availableRewards.length }} disponible(s)
               </div>
@@ -179,11 +179,11 @@
                   </div>
                   <div>
                     <h4 class="font-semibold text-neutral-900">{{ reward.title }}</h4>
-                    <p class="text-sm text-neutral-600">{{ reward.cost }} points</p>
+                    <p class="text-responsive-sm text-neutral-600">{{ reward.cost }} points</p>
                   </div>
                 </div>
 
-                <p class="text-sm text-neutral-600 mb-4">{{ reward.description }}</p>
+                <p class="text-responsive-sm text-neutral-600 mb-4">{{ reward.description }}</p>
 
                 <button
                   :disabled="!canRedeem(reward.cost)"
@@ -208,7 +208,7 @@
         <div class="relative w-full max-w-md bg-white rounded-2xl shadow-xl transform transition-all" @click.stop>
           <div class="px-6 py-4 border-b border-neutral-200">
             <div class="flex items-center justify-between">
-              <h3 class="text-lg font-semibold text-neutral-900">Confirmer l'échange</h3>
+              <h3 class="text-responsive-lg font-semibold text-neutral-900">Confirmer l'échange</h3>
               <button class="p-2 hover:bg-neutral-100 rounded-lg transition-colors" @click="closeRedeemModal">
                 <X class="w-5 h-5 text-neutral-400" />
               </button>
@@ -220,18 +220,18 @@
               <div class="p-4 bg-nav-gradient rounded-xl inline-block mb-4">
                 <component :is="selectedReward.icon" class="w-8 h-8 text-white" />
               </div>
-              <h4 class="text-xl font-semibold text-neutral-900 mb-2">{{ selectedReward.title }}</h4>
+              <h4 class="text-responsive-xl font-semibold text-neutral-900 mb-2">{{ selectedReward.title }}</h4>
               <p class="text-neutral-600">{{ selectedReward.description }}</p>
             </div>
 
             <div class="bg-neutral-50 rounded-xl p-4 mb-6">
               <div class="flex justify-between items-center">
                 <span class="text-neutral-600">Coût de l'échange :</span>
-                <span class="font-bold text-primary-600">{{ formatPoints(selectedReward.cost) }} points</span>
+                <span class="font-semibold text-primary-600">{{ formatPoints(selectedReward.cost) }} points</span>
               </div>
               <div class="flex justify-between items-center mt-2">
                 <span class="text-neutral-600">Points restants :</span>
-                <span class="font-bold text-neutral-900">{{ formatPoints(totalPoints - selectedReward.cost) }} points</span>
+                <span class="font-semibold text-neutral-900">{{ formatPoints(totalPoints - selectedReward.cost) }} points</span>
               </div>
             </div>
 

@@ -57,9 +57,9 @@
         <div class="flex items-center justify-between p-4 border-b border-neutral-200">
           <div class="flex items-center space-x-3">
             <div class="w-8 h-8 bg-gradient-to-r from-primary-500 to-accent-blue/50 rounded-lg flex items-center justify-center">
-              <span class="text-white text-lg">🌱</span>
+              <span class="text-white text-responsive-lg">🌱</span>
             </div>
-            <span class="text-lg font-semibold text-neutral-900 font-display">Antigaspi</span>
+            <span class="text-responsive-lg font-semibold text-neutral-900 font-display">Antigaspi</span>
           </div>
           <button
             class="p-2 rounded-lg text-neutral-400 hover:text-neutral-600 hover:bg-neutral-100 transition-colors"
@@ -73,7 +73,7 @@
         <div v-if="authStore.isAuthenticated" class="p-4 bg-neutral-50 border-b border-neutral-200">
           <div class="flex items-center space-x-3">
             <div class="w-12 h-12 bg-gradient-to-r from-primary-500 to-accent-blue/50 rounded-full flex items-center justify-center">
-              <span class="text-white font-medium text-lg">
+              <span class="text-white font-medium text-responsive-lg">
                 {{ authStore.user?.first_name?.charAt(0) }}{{ authStore.user?.last_name?.charAt(0) }}
               </span>
             </div>
@@ -81,9 +81,9 @@
               <p class="font-medium text-neutral-900 font-heading">
                 {{ authStore.user?.first_name }} {{ authStore.user?.last_name }}
               </p>
-              <p class="text-sm text-neutral-500">{{ authStore.user?.email }}</p>
+              <p class="text-responsive-sm text-neutral-500">{{ authStore.user?.email }}</p>
               <span
-                class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium"
+                class="inline-flex items-center px-2 py-0.5 rounded text-responsive-xs font-medium"
                 :class="getRoleBadgeClasses(authStore.user?.role)"
               >
                 {{ getRoleLabel(authStore.user?.role) }}
@@ -174,7 +174,7 @@
               <!-- Role-specific links -->
               <template v-if="authStore.user?.role === 'merchant'">
                 <div class="border-t border-neutral-200 pt-4 mt-4">
-                  <p class="text-sm font-medium text-neutral-500 uppercase tracking-wider mb-2">
+                  <p class="text-responsive-sm font-medium text-neutral-500 uppercase tracking-wider mb-2">
                     Espace Commerçant
                   </p>
                   <router-link
@@ -206,7 +206,7 @@
 
               <template v-if="authStore.user?.role === 'admin'">
                 <div class="border-t border-neutral-200 pt-4 mt-4">
-                  <p class="text-sm font-medium text-neutral-500 uppercase tracking-wider mb-2">
+                  <p class="text-responsive-sm font-medium text-neutral-500 uppercase tracking-wider mb-2">
                     Administration
                   </p>
                   <router-link
@@ -274,7 +274,7 @@
 
         <!-- App Info -->
         <div class="absolute bottom-0 left-0 right-0 p-4 bg-neutral-50 border-t border-neutral-200">
-          <p class="text-xs text-neutral-500 text-center">
+          <p class="text-responsive-xs text-neutral-500 text-center">
             Antigaspi © 2025<br>
             Lutter contre le gaspillage alimentaire
           </p>

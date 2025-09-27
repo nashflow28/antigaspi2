@@ -4,7 +4,7 @@
   <div v-else class="space-y-8">
     <!-- Header moderne -->
     <div class="text-center animate-fade-in-up">
-      <h3 class="text-2xl font-bold text-neutral-900 mb-2">
+      <h3 class="text-responsive-xl font-semibold text-neutral-900 mb-2">
         Content de vous revoir !
       </h3>
       <p class="text-neutral-600">
@@ -15,7 +15,7 @@
     <form class="space-y-6 animate-fade-in-up" style="animation-delay: 0.2s;" @submit.prevent="handleSubmit">
       <!-- Email Input -->
       <div class="form-group-2025">
-        <label for="email" class="block text-sm font-medium text-neutral-700 mb-2 flex items-center gap-2">
+        <label for="email" class="block text-responsive-sm font-medium text-neutral-700 mb-2 flex items-center gap-2">
           <span>Adresse email</span>
           <span class="text-accent-red">*</span>
         </label>
@@ -37,7 +37,7 @@
 
       <!-- Password Input -->
       <div class="form-group-2025">
-        <label for="password" class="block text-sm font-medium text-neutral-700 mb-2 flex items-center gap-2">
+        <label for="password" class="block text-responsive-sm font-medium text-neutral-700 mb-2 flex items-center gap-2">
           <span>Mot de passe</span>
           <span class="text-accent-red">*</span>
         </label>
@@ -76,12 +76,12 @@
             type="checkbox"
             class="w-4 h-4 text-primary-600 bg-white border-2 border-neutral-300 rounded focus:ring-primary-500 focus:ring-2"
           >
-          <label for="remember-me" class="text-sm text-neutral-700 font-medium">
+          <label for="remember-me" class="text-responsive-sm text-neutral-700 font-medium">
             Se souvenir de moi
           </label>
         </div>
 
-        <div class="text-sm">
+        <div class="text-responsive-sm">
           <a href="#" class="font-medium text-primary-600 hover:text-primary-700 transition-colors duration-200 hover:underline">
             Mot de passe oublié ?
           </a>
@@ -108,7 +108,7 @@
         <div class="absolute inset-0 flex items-center">
           <div class="w-full border-t border-neutral-200" />
         </div>
-        <div class="relative flex justify-center text-sm">
+        <div class="relative flex justify-center text-responsive-sm">
           <span class="px-4 bg-white text-neutral-500 font-medium">ou</span>
         </div>
       </div>
@@ -128,7 +128,7 @@
     </form>
 
     <!-- Footer Links -->
-    <div class="text-center text-sm text-neutral-500 animate-fade-in-up" style="animation-delay: 0.4s;">
+    <div class="text-center text-responsive-sm text-neutral-500 animate-fade-in-up" style="animation-delay: 0.4s;">
       <p>
         En vous connectant, vous acceptez nos
         <a href="#" class="text-primary-600 hover:text-primary-700 hover:underline transition-colors duration-200">

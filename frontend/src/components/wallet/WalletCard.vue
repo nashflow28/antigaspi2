@@ -8,17 +8,17 @@
           </svg>
         </div>
         <div>
-          <h3 class="text-lg font-semibold">Portefeuille</h3>
-          <p class="text-green-100 text-sm">{{ wallet?.currency || 'XOF' }}</p>
+          <h3 class="text-responsive-lg font-semibold">Portefeuille</h3>
+          <p class="text-green-100 text-responsive-sm">{{ wallet?.currency || 'XOF' }}</p>
         </div>
       </div>
       <div class="text-right">
-        <div class="text-2xl font-bold">{{ formattedBalance }}</div>
-        <div class="text-green-100 text-sm">Solde disponible</div>
+        <div class="text-responsive-xl font-semibold">{{ formattedBalance }}</div>
+        <div class="text-green-100 text-responsive-sm">Solde disponible</div>
       </div>
     </div>
 
-    <div class="flex items-center justify-between text-sm">
+    <div class="flex items-center justify-between text-responsive-sm">
       <div class="flex items-center space-x-4">
         <div class="flex items-center space-x-1">
           <div class="w-2 h-2 rounded-full" :class="wallet?.is_active ? 'bg-green-300' : 'bg-red-300'" />
@@ -45,7 +45,7 @@
     </div>
 
     <div v-if="wallet?.remaining_daily_limit !== undefined" class="mt-4">
-      <div class="flex justify-between text-sm text-green-100 mb-1">
+      <div class="flex justify-between text-responsive-sm text-green-100 mb-1">
         <span>Limite quotidienne restante</span>
         <span>{{ formatAmount(wallet.remaining_daily_limit) }}</span>
       </div>

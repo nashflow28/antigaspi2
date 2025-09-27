@@ -5,7 +5,7 @@
       <div class="container mx-auto px-4 py-6">
         <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
           <div>
-            <h1 class="text-3xl font-bold text-neutral-900">Centre d'avis</h1>
+            <h1 class="text-responsive-xl font-semibold text-neutral-900">Centre d'avis</h1>
             <p class="text-neutral-600 mt-1">
               Consultez et gérez les avis des commerçants
             </p>
@@ -13,7 +13,7 @@
 
           <!-- Merchant Selector -->
           <div class="flex items-center space-x-3">
-            <label for="merchant-select" class="text-sm font-medium text-neutral-700">
+            <label for="merchant-select" class="text-responsive-sm font-medium text-neutral-700">
               Commerçant :
             </label>
             <select
@@ -32,8 +32,8 @@
                 {{ merchant.business_name }}
               </option>
             </select>
-            <p v-if="merchantsLoading" class="text-xs text-neutral-500 mt-1">Chargement des commerçants...</p>
-            <p v-else-if="merchantsError" class="text-xs text-red-500 mt-1">{{ merchantsError }}</p>
+            <p v-if="merchantsLoading" class="text-responsive-xs text-neutral-500 mt-1">Chargement des commerçants...</p>
+            <p v-else-if="merchantsError" class="text-responsive-xs text-red-500 mt-1">{{ merchantsError }}</p>
           </div>
         </div>
       </div>
@@ -42,7 +42,7 @@
     <div class="container mx-auto px-4 py-8">
       <div v-if="!selectedMerchantId" class="text-center py-16">
         <Star class="w-16 h-16 text-neutral-400 mx-auto mb-4" />
-        <h2 class="text-xl font-semibold text-neutral-900 mb-2">Sélectionnez un commerçant</h2>
+        <h2 class="text-responsive-xl font-semibold text-neutral-900 mb-2">Sélectionnez un commerçant</h2>
         <p class="text-neutral-600">Choisissez un commerçant pour voir ses avis et en laisser un.</p>
       </div>
 
@@ -60,7 +60,7 @@
           <div class="flex items-center space-x-3">
             <Info class="w-6 h-6 text-yellow-600" />
             <div>
-              <h3 class="text-lg font-medium text-yellow-800">Connexion requise</h3>
+              <h3 class="text-responsive-lg font-medium text-yellow-800">Connexion requise</h3>
               <p class="text-yellow-700">
                 Connectez-vous pour laisser un avis sur ce commerçant.
               </p>

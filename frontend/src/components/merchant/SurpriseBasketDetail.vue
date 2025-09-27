@@ -5,9 +5,9 @@
       <div class="flex items-start justify-between">
         <div class="flex-1">
           <div class="flex items-center space-x-3 mb-3">
-            <h1 class="text-2xl font-bold text-neutral-900">{{ basket.name }}</h1>
+            <h1 class="text-responsive-xl font-semibold text-neutral-900">{{ basket.name }}</h1>
             <span
-              class="px-3 py-1 text-sm font-medium rounded-full"
+              class="px-3 py-1 text-responsive-sm font-medium rounded-full"
               :class="basket.is_active
                 ? 'bg-green-100 text-green-800'
                 : 'bg-red-100 text-red-800'"
@@ -23,20 +23,20 @@
           <!-- Stats Row -->
           <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
             <div class="bg-primary-50 rounded-lg p-3">
-              <p class="text-sm text-primary-600 font-medium">Prix</p>
-              <p class="text-lg font-bold text-primary-900">{{ formatCurrency(basket.discounted_price) }}</p>
+              <p class="text-responsive-sm text-primary-600 font-medium">Prix</p>
+              <p class="text-responsive-lg font-semibold text-primary-900">{{ formatCurrency(basket.discounted_price) }}</p>
             </div>
             <div class="bg-green-50 rounded-lg p-3">
-              <p class="text-sm text-green-600 font-medium">Économies</p>
-              <p class="text-lg font-bold text-green-900">{{ formatCurrency(basket.basket_savings || 0) }}</p>
+              <p class="text-responsive-sm text-green-600 font-medium">Économies</p>
+              <p class="text-responsive-lg font-semibold text-green-900">{{ formatCurrency(basket.basket_savings || 0) }}</p>
             </div>
             <div class="bg-blue-50 rounded-lg p-3">
-              <p class="text-sm text-blue-600 font-medium">Articles</p>
-              <p class="text-lg font-bold text-blue-900">{{ basket.basket_items_count }}</p>
+              <p class="text-responsive-sm text-blue-600 font-medium">Articles</p>
+              <p class="text-responsive-lg font-semibold text-blue-900">{{ basket.basket_items_count }}</p>
             </div>
             <div class="bg-orange-50 rounded-lg p-3">
-              <p class="text-sm text-orange-600 font-medium">Stock</p>
-              <p class="text-lg font-bold text-orange-900">{{ basket.quantity_available }}</p>
+              <p class="text-responsive-sm text-orange-600 font-medium">Stock</p>
+              <p class="text-responsive-lg font-semibold text-orange-900">{{ basket.quantity_available }}</p>
             </div>
           </div>
         </div>
@@ -65,7 +65,7 @@
       <div class="lg:col-span-2">
         <!-- Products in Basket -->
         <div class="bg-white rounded-xl border border-neutral-200 p-6">
-          <h2 class="text-lg font-semibold text-neutral-900 mb-4">Produits inclus</h2>
+          <h2 class="text-responsive-lg font-semibold text-neutral-900 mb-4">Produits inclus</h2>
 
           <div v-if="basket.surprise_basket_items && basket.surprise_basket_items.length > 0" class="space-y-4">
             <div
@@ -90,27 +90,27 @@
               <!-- Product Info -->
               <div class="flex-1 min-w-0">
                 <h3 class="font-medium text-neutral-900 truncate">{{ item.product.name }}</h3>
-                <p v-if="item.product.description" class="text-sm text-neutral-500 line-clamp-2">
+                <p v-if="item.product.description" class="text-responsive-sm text-neutral-500 line-clamp-2">
                   {{ item.product.description }}
                 </p>
 
                 <div class="mt-2 flex items-center justify-between">
                   <div class="flex items-center space-x-2">
-                    <span class="text-sm font-medium text-green-600">
+                    <span class="text-responsive-sm font-medium text-green-600">
                       {{ formatCurrency(item.unit_price) }} × {{ item.quantity }}
                     </span>
-                    <span class="text-sm text-neutral-400 line-through">
+                    <span class="text-responsive-sm text-neutral-400 line-through">
                       {{ formatCurrency(item.product.original_price) }}
                     </span>
                   </div>
-                  <span class="text-sm font-medium text-neutral-900">
+                  <span class="text-responsive-sm font-medium text-neutral-900">
                     = {{ formatCurrency(item.total_price) }}
                   </span>
                 </div>
 
                 <!-- Category Badge -->
                 <div v-if="item.product.category" class="mt-2">
-                  <span class="inline-flex items-center px-2 py-1 text-xs font-medium bg-neutral-100 text-neutral-800 rounded-full">
+                  <span class="inline-flex items-center px-2 py-1 text-responsive-xs font-medium bg-neutral-100 text-neutral-800 rounded-full">
                     {{ item.product.category.name }}
                   </span>
                 </div>
@@ -120,17 +120,17 @@
             <!-- Total Summary -->
             <div class="border-t border-neutral-200 pt-4">
               <div class="bg-green-50 border border-green-200 rounded-lg p-4">
-                <div class="flex justify-between items-center text-sm mb-2">
+                <div class="flex justify-between items-center text-responsive-sm mb-2">
                   <span class="text-green-700">Valeur totale des produits:</span>
                   <span class="font-semibold text-green-900">{{ formatCurrency(basket.total_original_value || 0) }}</span>
                 </div>
-                <div class="flex justify-between items-center text-sm mb-2">
+                <div class="flex justify-between items-center text-responsive-sm mb-2">
                   <span class="text-green-700">Prix du panier:</span>
                   <span class="font-semibold text-green-900">{{ formatCurrency(basket.discounted_price) }}</span>
                 </div>
-                <div class="flex justify-between items-center text-lg border-t border-green-200 pt-2">
+                <div class="flex justify-between items-center text-responsive-lg border-t border-green-200 pt-2">
                   <span class="text-green-700 font-medium">Économies pour le client:</span>
-                  <span class="font-bold text-green-900">
+                  <span class="font-semibold text-green-900">
                     {{ formatCurrency(basket.basket_savings || 0) }}
                     ({{ basket.basket_discount_percentage || 0 }}%)
                   </span>
@@ -141,7 +141,7 @@
 
           <div v-else class="text-center py-12 text-neutral-500">
             <Package class="w-16 h-16 mx-auto mb-4 text-neutral-300" />
-            <h3 class="text-lg font-medium text-neutral-900 mb-2">Aucun produit</h3>
+            <h3 class="text-responsive-lg font-medium text-neutral-900 mb-2">Aucun produit</h3>
             <p class="text-neutral-600 mb-4">
               Ce panier surprise ne contient aucun produit pour le moment
             </p>
@@ -159,24 +159,24 @@
       <div class="space-y-6">
         <!-- Basic Information -->
         <div class="bg-white rounded-xl border border-neutral-200 p-6">
-          <h3 class="text-lg font-semibold text-neutral-900 mb-4">Informations</h3>
+          <h3 class="text-responsive-lg font-semibold text-neutral-900 mb-4">Informations</h3>
 
           <div class="space-y-4">
             <!-- Category -->
             <div v-if="basket.category">
-              <p class="text-sm font-medium text-neutral-600">Catégorie</p>
+              <p class="text-responsive-sm font-medium text-neutral-600">Catégorie</p>
               <p class="text-neutral-900">{{ basket.category.name }}</p>
             </div>
 
             <!-- Mystery Description -->
             <div v-if="basket.surprise_description">
-              <p class="text-sm font-medium text-neutral-600">Description mystère</p>
+              <p class="text-responsive-sm font-medium text-neutral-600">Description mystère</p>
               <p class="text-neutral-900">{{ basket.surprise_description }}</p>
             </div>
 
             <!-- Item Range -->
             <div v-if="basket.min_items || basket.max_items">
-              <p class="text-sm font-medium text-neutral-600">Nombre d'articles</p>
+              <p class="text-responsive-sm font-medium text-neutral-600">Nombre d'articles</p>
               <p class="text-neutral-900">
                 <span v-if="basket.min_items && basket.max_items">
                   Entre {{ basket.min_items }} et {{ basket.max_items }} articles
@@ -192,19 +192,19 @@
 
             <!-- Expiration -->
             <div v-if="basket.expiration_date">
-              <p class="text-sm font-medium text-neutral-600">Date d'expiration</p>
+              <p class="text-responsive-sm font-medium text-neutral-600">Date d'expiration</p>
               <p class="text-neutral-900">{{ formatDate(basket.expiration_date) }}</p>
             </div>
 
             <!-- Creation Date -->
             <div>
-              <p class="text-sm font-medium text-neutral-600">Créé le</p>
+              <p class="text-responsive-sm font-medium text-neutral-600">Créé le</p>
               <p class="text-neutral-900">{{ formatDateTime(basket.created_at) }}</p>
             </div>
 
             <!-- Last Update -->
             <div v-if="basket.updated_at !== basket.created_at">
-              <p class="text-sm font-medium text-neutral-600">Dernière modification</p>
+              <p class="text-responsive-sm font-medium text-neutral-600">Dernière modification</p>
               <p class="text-neutral-900">{{ formatDateTime(basket.updated_at) }}</p>
             </div>
           </div>
@@ -212,7 +212,7 @@
 
         <!-- Image Preview -->
         <div v-if="basket.image_url" class="bg-white rounded-xl border border-neutral-200 p-6">
-          <h3 class="text-lg font-semibold text-neutral-900 mb-4">Image</h3>
+          <h3 class="text-responsive-lg font-semibold text-neutral-900 mb-4">Image</h3>
           <img
             :src="basket.image_url"
             :alt="basket.name"
@@ -222,7 +222,7 @@
 
         <!-- Quick Actions -->
         <div class="bg-white rounded-xl border border-neutral-200 p-6">
-          <h3 class="text-lg font-semibold text-neutral-900 mb-4">Actions</h3>
+          <h3 class="text-responsive-lg font-semibold text-neutral-900 mb-4">Actions</h3>
 
           <div class="space-y-3">
             <button

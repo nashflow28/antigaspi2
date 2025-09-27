@@ -12,14 +12,14 @@
       <div class="relative container-2025 py-32 lg:py-40">
         <div class="text-center max-w-5xl mx-auto">
           <!-- Badge avec animation -->
-          <div class="inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-sm rounded-full text-sm font-medium mb-8 animate-fade-in-up">
+          <div class="inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-sm rounded-full text-responsive-sm font-medium mb-8 animate-fade-in-up">
             <span class="w-2 h-2 bg-primary-400 rounded-full animate-pulse" />
             <span>Ensemble contre le gaspillage alimentaire</span>
           </div>
 
           <!-- Titre principal avec gradient text -->
           <h1
-            class="text-5xl md:text-7xl font-bold mb-8 animate-fade-in-up text-balance font-display"
+            class="text-display-md md:text-display-xl font-semibold mb-8 animate-fade-in-up text-balance font-display"
             style="animation-delay: 0.2s; font-size: 8rem;"
             data-testid="main-hero-title"
           >
@@ -33,7 +33,7 @@
           </h1>
 
           <!-- Sous-titre élégant -->
-          <p class="text-xl md:text-2xl lg:text-3xl mb-12 text-white/90 max-w-4xl mx-auto leading-relaxed animate-fade-in-up font-light" style="animation-delay: 0.4s;">
+          <p class="text-responsive-xl md:text-responsive-xl lg:text-responsive-xl mb-12 text-white/90 max-w-4xl mx-auto leading-relaxed animate-fade-in-up font-light" style="animation-delay: 0.4s;">
             Transformons les invendus en opportunités.
             <span class="text-accent-orange/70 font-medium">Économisez jusqu'à 70%</span>
             tout en protégeant l'environnement.
@@ -71,16 +71,16 @@
           <!-- Stats avec glassmorphism -->
           <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-16 animate-fade-in-up" style="animation-delay: 0.8s;">
             <div class="bg-white/60 backdrop-blur-md glass-border rounded-2xl p-6 text-center">
-              <div class="text-3xl font-bold text-accent-orange/70 mb-2">1,2M+</div>
-              <div class="text-sm text-white/80">Produits sauvés</div>
+              <div class="text-responsive-xl font-semibold text-accent-orange/70 mb-2">1,2M+</div>
+              <div class="text-responsive-sm text-white/80">Produits sauvés</div>
             </div>
             <div class="bg-white/60 backdrop-blur-md glass-border rounded-2xl p-6 text-center">
-              <div class="text-3xl font-bold text-primary-300 mb-2">50K+</div>
-              <div class="text-sm text-white/80">Utilisateurs actifs</div>
+              <div class="text-responsive-xl font-semibold text-primary-300 mb-2">50K+</div>
+              <div class="text-responsive-sm text-white/80">Utilisateurs actifs</div>
             </div>
             <div class="bg-white/60 backdrop-blur-md glass-border rounded-2xl p-6 text-center">
-              <div class="text-3xl font-bold text-accent-blue/70 mb-2">2,5K+</div>
-              <div class="text-sm text-white/80">Commerçants partenaires</div>
+              <div class="text-responsive-xl font-semibold text-accent-blue/70 mb-2">2,5K+</div>
+              <div class="text-responsive-sm text-white/80">Commerçants partenaires</div>
             </div>
           </div>
         </div>
@@ -104,14 +104,14 @@
       <div class="container-2025">
         <!-- Section Header -->
         <div class="text-center mb-20 animate-fade-in-up">
-          <div class="inline-flex items-center gap-2 px-4 py-2 bg-primary-50 rounded-full text-sm font-medium text-primary-600 mb-6">
+          <div class="inline-flex items-center gap-2 px-4 py-2 bg-primary-50 rounded-full text-responsive-sm font-medium text-primary-600 mb-6">
             <span class="w-2 h-2 bg-primary-500 rounded-full" />
             Processus simple en 3 étapes
           </div>
-          <h2 class="text-4xl lg:text-5xl font-semibold text-neutral-900 mb-6 text-balance font-display">
+          <h2 class="text-display-sm lg:text-display-md font-semibold text-neutral-900 mb-6 text-balance font-display">
             Comment ça marche ?
           </h2>
-          <p class="text-xl text-neutral-600 max-w-2xl mx-auto">
+          <p class="text-responsive-xl text-neutral-600 max-w-2xl mx-auto">
             Rejoignez la révolution anti-gaspillage en quelques clics
           </p>
         </div>
@@ -123,17 +123,17 @@
             <div class="relative">
               <!-- Icon avec gradient et animation -->
               <div class="w-20 h-20 bg-nav-gradient rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-card group-hover:shadow-card-2025 group-hover:scale-110 transition-all duration-300">
-                <span class="text-3xl">🔍</span>
+                <span class="text-responsive-xl">🔍</span>
               </div>
 
               <!-- Step number -->
-              <div class="absolute -top-4 -right-4 w-8 h-8 bg-accent-orange text-white rounded-full flex items-center justify-center text-sm font-bold shadow-card">
+              <div class="absolute -top-4 -right-4 w-8 h-8 bg-accent-orange text-white rounded-full flex items-center justify-center text-responsive-sm font-semibold shadow-card">
                 1
               </div>
             </div>
 
             <div class="text-center">
-              <h3 class="text-2xl font-semibold text-neutral-900 mb-4 group-hover:text-primary-600 transition-colors font-heading">
+              <h3 class="text-responsive-xl font-semibold text-neutral-900 mb-4 group-hover:text-primary-600 transition-colors font-heading">
                 Découvrez
               </h3>
               <p class="text-neutral-600 leading-relaxed mb-6">
@@ -141,7 +141,7 @@
               </p>
 
               <!-- Mini feature list -->
-              <div class="space-y-2 text-sm text-neutral-500">
+              <div class="space-y-2 text-responsive-sm text-neutral-500">
                 <div class="flex items-center gap-2">
                   <span class="w-1.5 h-1.5 bg-primary-500 rounded-full" />
                   <span>Géolocalisation intelligente</span>
@@ -158,23 +158,23 @@
           <Card :interactive="true" class="group glow-effect animate-fade-in-up" style="animation-delay: 0.4s;">
             <div class="relative">
               <div class="w-20 h-20 bg-gradient-to-r from-accent-blue to-accent-blue/90 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-card group-hover:shadow-card-2025 group-hover:scale-110 transition-all duration-300">
-                <span class="text-3xl">⚡</span>
+                <span class="text-responsive-xl">⚡</span>
               </div>
 
-              <div class="absolute -top-4 -right-4 w-8 h-8 bg-accent-orange text-white rounded-full flex items-center justify-center text-sm font-bold shadow-card">
+              <div class="absolute -top-4 -right-4 w-8 h-8 bg-accent-orange text-white rounded-full flex items-center justify-center text-responsive-sm font-semibold shadow-card">
                 2
               </div>
             </div>
 
             <div class="text-center">
-              <h3 class="text-2xl font-semibold text-neutral-900 mb-4 group-hover:text-accent-blue transition-colors font-heading">
+              <h3 class="text-responsive-xl font-semibold text-neutral-900 mb-4 group-hover:text-accent-blue transition-colors font-heading">
                 Réservez
               </h3>
               <p class="text-neutral-600 leading-relaxed mb-6">
                 Réservez instantanément vos produits favoris avec paiement sécurisé et confirmation immédiate.
               </p>
 
-              <div class="space-y-2 text-sm text-neutral-500">
+              <div class="space-y-2 text-responsive-sm text-neutral-500">
                 <div class="flex items-center gap-2">
                   <span class="w-1.5 h-1.5 bg-accent-blue/50 rounded-full" />
                   <span>Réservation instantanée</span>
@@ -191,23 +191,23 @@
           <Card :interactive="true" class="group glow-effect animate-fade-in-up" style="animation-delay: 0.6s;">
             <div class="relative">
               <div class="w-20 h-20 bg-gradient-to-r from-accent-orange to-accent-orange/90 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-card group-hover:shadow-card-2025 group-hover:scale-110 transition-all duration-300">
-                <span class="text-3xl">🌱</span>
+                <span class="text-responsive-xl">🌱</span>
               </div>
 
-              <div class="absolute -top-4 -right-4 w-8 h-8 bg-accent-orange text-white rounded-full flex items-center justify-center text-sm font-bold shadow-card">
+              <div class="absolute -top-4 -right-4 w-8 h-8 bg-accent-orange text-white rounded-full flex items-center justify-center text-responsive-sm font-semibold shadow-card">
                 3
               </div>
             </div>
 
             <div class="text-center">
-              <h3 class="text-2xl font-semibold text-neutral-900 mb-4 group-hover:text-accent-orange transition-colors font-heading">
+              <h3 class="text-responsive-xl font-semibold text-neutral-900 mb-4 group-hover:text-accent-orange transition-colors font-heading">
                 Sauvez
               </h3>
               <p class="text-neutral-600 leading-relaxed mb-6">
                 Récupérez vos achats et contribuez activement à la réduction du gaspillage alimentaire.
               </p>
 
-              <div class="space-y-2 text-sm text-neutral-500">
+              <div class="space-y-2 text-responsive-sm text-neutral-500">
                 <div class="flex items-center gap-2">
                   <span class="w-1.5 h-1.5 bg-accent-orange rounded-full" />
                   <span>Impact environnemental</span>
@@ -241,31 +241,31 @@
     <section class="py-20 bg-neutral-50">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="text-center mb-16">
-          <h2 class="text-3xl md:text-4xl font-bold text-neutral-900 mb-4">
+          <h2 class="text-responsive-xl md:text-display-sm font-semibold text-neutral-900 mb-4">
             Notre impact
           </h2>
         </div>
 
         <div class="grid md:grid-cols-3 gap-8 text-center">
           <div>
-            <div class="text-4xl md:text-5xl font-bold text-primary-600 mb-2">
+            <div class="text-display-sm md:text-display-md font-semibold text-primary-600 mb-2">
               1,234
             </div>
-            <p class="text-xl text-neutral-600">Produits sauvés</p>
+            <p class="text-responsive-xl text-neutral-600">Produits sauvés</p>
           </div>
 
           <div>
-            <div class="text-4xl md:text-5xl font-bold text-primary-600 mb-2">
+            <div class="text-display-sm md:text-display-md font-semibold text-primary-600 mb-2">
               567
             </div>
-            <p class="text-xl text-neutral-600">Utilisateurs actifs</p>
+            <p class="text-responsive-xl text-neutral-600">Utilisateurs actifs</p>
           </div>
 
           <div>
-            <div class="text-4xl md:text-5xl font-bold text-accent-orange mb-2">
+            <div class="text-display-sm md:text-display-md font-semibold text-accent-orange mb-2">
               89
             </div>
-            <p class="text-xl text-neutral-600">Commerçants partenaires</p>
+            <p class="text-responsive-xl text-neutral-600">Commerçants partenaires</p>
           </div>
         </div>
       </div>
@@ -274,10 +274,10 @@
     <!-- CTA Section -->
     <section class="py-20 bg-primary-600 text-white">
       <div class="max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8">
-        <h2 class="text-3xl md:text-4xl font-bold mb-6">
+        <h2 class="text-responsive-xl md:text-display-sm font-semibold mb-6">
           Prêt à faire la différence ?
         </h2>
-        <p class="text-xl mb-8 text-primary-100">
+        <p class="text-responsive-xl mb-8 text-primary-100">
           Rejoignez notre communauté et commencez à économiser tout en protégeant l'environnement
         </p>
 
@@ -286,14 +286,14 @@
             <Button
               as="router-link"
               to="/register"
-              class="bg-white text-primary-600 hover:bg-neutral-100 text-lg px-8 py-3"
+              class="bg-white text-primary-600 hover:bg-neutral-100 text-responsive-lg px-8 py-3"
             >
               Consommateur
             </Button>
             <Button
               as="router-link"
               to="/register"
-              class="bg-primary-500 hover:bg-primary-400 text-lg px-8 py-3"
+              class="bg-primary-500 hover:bg-primary-400 text-responsive-lg px-8 py-3"
             >
               Commerçant
             </Button>
@@ -304,7 +304,7 @@
           <Button
             as="router-link"
             to="/dashboard"
-            class="bg-white text-primary-600 hover:bg-neutral-100 text-lg px-8 py-3"
+            class="bg-white text-primary-600 hover:bg-neutral-100 text-responsive-lg px-8 py-3"
           >
             Accéder à mon tableau de bord
           </Button>

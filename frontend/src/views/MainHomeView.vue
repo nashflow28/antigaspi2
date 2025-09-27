@@ -73,7 +73,7 @@
         <div class="mx-auto flex max-w-5xl flex-col gap-6 px-6 py-spacing-22 lg:flex-row lg:items-center lg:justify-between">
           <div class="space-y-4">
             <p class="text-small uppercase tracking-wide text-white/80">Luttons contre le gaspillage</p>
-            <h2 class="text-display-sm font-semibold leading-tight">Découvrez les paniers solidaires près de chez vous</h2>
+            <h2 class="text-display-sm font-semibold leading-relaxed">Découvrez les paniers solidaires près de chez vous</h2>
             <p class="max-w-xl text-body text-white/80">
               Parcourez une sélection de produits sauvés des invendus et soutenez les commerçants locaux.
             </p>
@@ -222,19 +222,19 @@
     <nav class="fixed bottom-0 left-0 right-0 border-t border-neutral-200/70 bg-surface-light/90 backdrop-blur-lg">
       <div class="mx-auto flex max-w-5xl items-center justify-around px-6 py-4">
         <Button variant="ghost" class="flex h-full flex-col items-center gap-1 text-primary-600" @click="goToHome">
-          <span aria-hidden="true" class="text-lg">🏠</span>
+          <span aria-hidden="true" class="text-responsive-lg">🏠</span>
           <span class="text-caption font-medium">Accueil</span>
         </Button>
         <Button variant="ghost" class="flex h-full flex-col items-center gap-1 text-neutral-500" @click="goToDiscover">
-          <span aria-hidden="true" class="text-lg">🔍</span>
+          <span aria-hidden="true" class="text-responsive-lg">🔍</span>
           <span class="text-caption">Découvrir</span>
         </Button>
         <Button variant="ghost" class="flex h-full flex-col items-center gap-1 text-neutral-500" @click="goToFavorites">
-          <span aria-hidden="true" class="text-lg">❤️</span>
+          <span aria-hidden="true" class="text-responsive-lg">❤️</span>
           <span class="text-caption">Favoris</span>
         </Button>
         <Button variant="ghost" class="flex h-full flex-col items-center gap-1 text-neutral-500" @click="goToProfile">
-          <span aria-hidden="true" class="text-lg">👤</span>
+          <span aria-hidden="true" class="text-responsive-lg">👤</span>
           <span class="text-caption">Profil</span>
         </Button>
       </div>

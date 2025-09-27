@@ -1,6 +1,6 @@
 <template>
   <div id="app" class="min-h-screen bg-white">
-    <h1 class="text-4xl font-bold text-center py-20">Test Antigaspi - Frontend fonctionne !</h1>
+    <h1 class="text-display-sm font-semibold text-center py-20">Test Antigaspi - Frontend fonctionne !</h1>
     <router-view />
   </div>
 </template>

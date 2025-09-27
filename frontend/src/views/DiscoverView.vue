@@ -4,21 +4,21 @@
       <div class="container mx-auto px-6 py-10">
         <div class="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
           <div class="max-w-2xl">
-            <p class="inline-flex items-center gap-2 rounded-full bg-primary-100/70 px-4 py-1 text-sm font-medium text-primary-700">
+            <p class="inline-flex items-center gap-2 rounded-full bg-primary-100/70 px-4 py-1 text-responsive-sm font-medium text-primary-700">
               <Compass class="h-4 w-4" />
               Explorer les commerçants solidaires
             </p>
-            <h1 class="mt-3 text-4xl font-bold tracking-tight text-neutral-900">
+            <h1 class="mt-3 text-display-sm font-semibold tracking-tight text-neutral-900">
               Trouvez des paniers surprise près de chez vous
             </h1>
-            <p class="mt-3 text-lg text-neutral-600">
+            <p class="mt-3 text-responsive-lg text-neutral-600">
               Filtrez par catégorie, distance ou ambiance pour découvrir de nouveaux partenaires AntiGaspi et suivre vos coups de cœur.
             </p>
           </div>
           <Card class="w-full max-w-md bg-white/90">
             <template #header>
-              <h2 class="text-xl font-semibold text-neutral-900">Recherche intelligente</h2>
-              <p class="text-sm text-neutral-500">Affinez vos résultats en direct grâce aux filtres dynamiques.</p>
+              <h2 class="text-responsive-xl font-semibold text-neutral-900">Recherche intelligente</h2>
+              <p class="text-responsive-sm text-neutral-500">Affinez vos résultats en direct grâce aux filtres dynamiques.</p>
             </template>
             <div class="space-y-4">
               <div class="relative">
@@ -27,13 +27,13 @@
                   v-model="searchQuery"
                   type="text"
                   placeholder="Ex : Boulangerie, Lomé, petit-déjeuner"
-                  class="w-full rounded-2xl border border-neutral-200 bg-white px-11 py-3 text-sm shadow-inner focus:border-primary-400 focus:outline-none focus:ring-2 focus:ring-primary-200"
+                  class="w-full rounded-2xl border border-neutral-200 bg-white px-11 py-3 text-responsive-sm shadow-inner focus:border-primary-400 focus:outline-none focus:ring-2 focus:ring-primary-200"
                 >
               </div>
               <div class="grid gap-3 md:grid-cols-2">
                 <select
                   v-model="selectedCategory"
-                  class="rounded-2xl border border-neutral-200 px-4 py-3 text-sm focus:border-primary-400 focus:outline-none focus:ring-2 focus:ring-primary-200"
+                  class="rounded-2xl border border-neutral-200 px-4 py-3 text-responsive-sm focus:border-primary-400 focus:outline-none focus:ring-2 focus:ring-primary-200"
                 >
                   <option value="">Toutes les catégories</option>
                   <option
@@ -46,7 +46,7 @@
                 </select>
                 <select
                   v-model="selectedCity"
-                  class="rounded-2xl border border-neutral-200 px-4 py-3 text-sm focus:border-primary-400 focus:outline-none focus:ring-2 focus:ring-primary-200"
+                  class="rounded-2xl border border-neutral-200 px-4 py-3 text-responsive-sm focus:border-primary-400 focus:outline-none focus:ring-2 focus:ring-primary-200"
                 >
                   <option value="">Toutes les villes</option>
                   <option
@@ -60,7 +60,7 @@
               </div>
             </div>
             <template #footer>
-              <div class="flex items-center justify-between text-sm text-neutral-500">
+              <div class="flex items-center justify-between text-responsive-sm text-neutral-500">
                 <span>{{ filteredMerchants.length }} commerçant{{ filteredMerchants.length > 1 ? 's' : '' }} trouvés</span>
                 <Button
                   variant="ghost"
@@ -81,10 +81,10 @@
       <div class="grid gap-10 xl:grid-cols-[2fr_1fr]">
         <section class="space-y-6">
           <div class="flex items-center justify-between">
-            <h2 class="text-2xl font-semibold text-neutral-900">
+            <h2 class="text-responsive-xl font-semibold text-neutral-900">
               Commerçants à découvrir
             </h2>
-            <span class="text-sm text-neutral-500">Actualisé toutes les 5 minutes</span>
+            <span class="text-responsive-sm text-neutral-500">Actualisé toutes les 5 minutes</span>
           </div>
 
           <div v-if="merchantsLoading" class="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
@@ -100,7 +100,7 @@
 
           <div v-else-if="filteredMerchants.length === 0" class="rounded-3xl border border-dashed border-neutral-300 bg-white/70 p-12 text-center shadow-sm">
             <Compass class="mx-auto h-12 w-12 text-neutral-300" />
-            <h3 class="mt-4 text-xl font-semibold text-neutral-800">Aucun résultat pour le moment</h3>
+            <h3 class="mt-4 text-responsive-xl font-semibold text-neutral-800">Aucun résultat pour le moment</h3>
             <p class="mt-2 text-neutral-500">Essayez d'élargir vos filtres ou consultez les suggestions à droite.</p>
           </div>
 
@@ -113,16 +113,16 @@
               <template #header>
                 <div class="flex items-center justify-between">
                   <div>
-                    <h3 class="text-lg font-semibold text-neutral-900">{{ merchant.business_name }}</h3>
-                    <p class="text-sm text-neutral-500">{{ merchant.business_type }}</p>
+                    <h3 class="text-responsive-lg font-semibold text-neutral-900">{{ merchant.business_name }}</h3>
+                    <p class="text-responsive-sm text-neutral-500">{{ merchant.business_type }}</p>
                   </div>
-                  <span v-if="merchant.distance_km" class="rounded-full bg-primary-100/70 px-3 py-1 text-xs font-semibold text-primary-700">
+                  <span v-if="merchant.distance_km" class="rounded-full bg-primary-100/70 px-3 py-1 text-responsive-xs font-semibold text-primary-700">
                     {{ merchant.distance_km.toFixed(1) }} km
                   </span>
                 </div>
               </template>
 
-              <ul class="space-y-2 text-sm text-neutral-600">
+              <ul class="space-y-2 text-responsive-sm text-neutral-600">
                 <li class="flex items-center gap-2">
                   <MapPin class="h-4 w-4 text-primary-500" />
                   <span>{{ merchant.address || merchant.city }}</span>
@@ -162,8 +162,8 @@
         <aside class="space-y-8">
           <Card class="bg-white/90">
             <template #header>
-              <h2 class="text-xl font-semibold text-neutral-900">Tendances de la semaine</h2>
-              <p class="text-sm text-neutral-500">Basées sur les paniers les plus réservés.</p>
+              <h2 class="text-responsive-xl font-semibold text-neutral-900">Tendances de la semaine</h2>
+              <p class="text-responsive-sm text-neutral-500">Basées sur les paniers les plus réservés.</p>
             </template>
             <ul class="space-y-4">
               <li
@@ -176,8 +176,8 @@
                 </div>
                 <div>
                   <p class="font-semibold text-neutral-800">{{ product.name }}</p>
-                  <p class="text-sm text-neutral-500">{{ product.merchant.business_name }}</p>
-                  <p class="text-xs text-primary-600">{{ product.discount_percentage }}% d'économie</p>
+                  <p class="text-responsive-sm text-neutral-500">{{ product.merchant.business_name }}</p>
+                  <p class="text-responsive-xs text-primary-600">{{ product.discount_percentage }}% d'économie</p>
                 </div>
               </li>
             </ul>
@@ -185,8 +185,8 @@
 
           <Card class="bg-gradient-to-br from-primary-500/90 to-blue-500/90 text-white">
             <template #header>
-              <h2 class="text-xl font-semibold">Astuce communauté</h2>
-              <p class="text-sm text-primary-50">
+              <h2 class="text-responsive-xl font-semibold">Astuce communauté</h2>
+              <p class="text-responsive-sm text-primary-50">
                 Ajoutez vos commerçants préférés pour être prévenu en priorité lorsqu'ils publient un panier.
               </p>
             </template>

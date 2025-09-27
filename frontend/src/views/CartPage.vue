@@ -4,11 +4,11 @@
       <div class="container mx-auto px-6 py-10">
         <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           <div>
-            <p class="inline-flex items-center gap-2 rounded-full bg-primary-100/70 px-4 py-1 text-sm font-medium text-primary-700">
+            <p class="inline-flex items-center gap-2 rounded-full bg-primary-100/70 px-4 py-1 text-responsive-sm font-medium text-primary-700">
               <ShoppingCart class="h-4 w-4" />
               Mon panier AntiGaspi
             </p>
-            <h1 class="mt-3 text-4xl font-bold tracking-tight text-neutral-900">{{ headline }}</h1>
+            <h1 class="mt-3 text-display-sm font-semibold tracking-tight text-neutral-900">{{ headline }}</h1>
             <p class="mt-2 max-w-2xl text-neutral-600">
               Ajustez vos quantités, ajoutez un message au commerçant et finalisez votre réservation en toute sécurité.
             </p>
@@ -29,8 +29,8 @@
         <Card class="bg-white/90">
           <template #header>
             <div class="flex items-center justify-between">
-              <h2 class="text-2xl font-semibold text-neutral-900">Articles réservés</h2>
-              <span class="text-sm text-neutral-500">{{ itemsCount }} article{{ itemsCount > 1 ? 's' : '' }}</span>
+              <h2 class="text-responsive-xl font-semibold text-neutral-900">Articles réservés</h2>
+              <span class="text-responsive-sm text-neutral-500">{{ itemsCount }} article{{ itemsCount > 1 ? 's' : '' }}</span>
             </div>
           </template>
 
@@ -38,7 +38,7 @@
             <div class="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-neutral-100 text-neutral-400">
               <ShoppingCart class="h-8 w-8" />
             </div>
-            <h3 class="mt-4 text-xl font-semibold text-neutral-800">Votre panier est vide</h3>
+            <h3 class="mt-4 text-responsive-xl font-semibold text-neutral-800">Votre panier est vide</h3>
             <p class="mt-2 text-neutral-500">
               Découvrez les paniers surprise près de chez vous et revenez finaliser votre commande.
             </p>
@@ -61,9 +61,9 @@
               <div class="flex flex-1 items-start gap-4">
                 <div class="h-20 w-20 flex-shrink-0 rounded-2xl bg-neutral-100" aria-hidden="true" />
                 <div>
-                  <p class="text-lg font-semibold text-neutral-900">{{ item.name }}</p>
-                  <p v-if="item.merchantName" class="text-sm text-neutral-500">{{ item.merchantName }}</p>
-                  <div class="mt-2 flex items-center gap-3 text-sm">
+                  <p class="text-responsive-lg font-semibold text-neutral-900">{{ item.name }}</p>
+                  <p v-if="item.merchantName" class="text-responsive-sm text-neutral-500">{{ item.merchantName }}</p>
+                  <div class="mt-2 flex items-center gap-3 text-responsive-sm">
                     <span class="font-semibold text-primary-600">{{ formatPrice(item.price) }}</span>
                     <span v-if="item.originalPrice" class="text-neutral-400 line-through">{{ formatPrice(item.originalPrice) }}</span>
                   </div>
@@ -80,7 +80,7 @@
                   >
                     <Minus class="h-4 w-4" />
                   </button>
-                  <span class="w-8 text-center text-sm font-medium text-neutral-800">{{ item.quantity }}</span>
+                  <span class="w-8 text-center text-responsive-sm font-medium text-neutral-800">{{ item.quantity }}</span>
                   <button
                     type="button"
                     class="text-neutral-500 hover:text-neutral-800"
@@ -93,7 +93,7 @@
 
                 <button
                   type="button"
-                  class="flex items-center gap-2 rounded-full bg-neutral-100 px-4 py-2 text-sm text-neutral-500 transition hover:bg-neutral-200"
+                  class="flex items-center gap-2 rounded-full bg-neutral-100 px-4 py-2 text-responsive-sm text-neutral-500 transition hover:bg-neutral-200"
                   @click="removeItem(item.id)"
                 >
                   <Trash2 class="h-4 w-4" />
@@ -119,9 +119,9 @@
       <aside class="space-y-6">
         <Card class="bg-white/90">
           <template #header>
-            <h2 class="text-xl font-semibold text-neutral-900">Résumé de commande</h2>
+            <h2 class="text-responsive-xl font-semibold text-neutral-900">Résumé de commande</h2>
           </template>
-          <dl class="space-y-3 text-sm text-neutral-600">
+          <dl class="space-y-3 text-responsive-sm text-neutral-600">
             <div class="flex items-center justify-between">
               <dt>Sous-total</dt>
               <dd class="font-semibold text-neutral-800">{{ formattedTotal }}</dd>
@@ -130,21 +130,21 @@
               <dt>Frais de service</dt>
               <dd class="text-neutral-400">Offerts</dd>
             </div>
-            <div class="flex items-center justify-between border-t border-neutral-200 pt-3 text-base font-semibold text-neutral-900">
+            <div class="flex items-center justify-between border-t border-neutral-200 pt-3 text-responsive-base font-semibold text-neutral-900">
               <dt>Total</dt>
               <dd>{{ formattedTotal }}</dd>
             </div>
           </dl>
-          <p class="mt-4 text-xs text-neutral-500">
+          <p class="mt-4 text-responsive-xs text-neutral-500">
             Les commerçants confirment généralement en moins de 10 minutes. Vous recevrez une notification dès que votre panier sera prêt.
           </p>
         </Card>
 
         <Card class="bg-primary-500/95 text-white">
           <template #header>
-            <h2 class="text-lg font-semibold">Astuce AntiGaspi</h2>
+            <h2 class="text-responsive-lg font-semibold">Astuce AntiGaspi</h2>
           </template>
-          <p class="text-sm text-primary-50">
+          <p class="text-responsive-sm text-primary-50">
             Ajoutez vos commerçants favoris pour retrouver plus facilement leurs paniers et recevoir leurs alertes.
           </p>
           <Button

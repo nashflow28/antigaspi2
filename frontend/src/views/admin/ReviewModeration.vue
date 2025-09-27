@@ -9,10 +9,10 @@
       <div class="mb-8">
         <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
           <div>
-            <h1 class="text-3xl lg:text-4xl font-bold text-neutral-900 mb-2">
+            <h1 class="text-responsive-xl lg:text-display-sm font-semibold text-neutral-900 mb-2">
               Modération des Avis
             </h1>
-            <p class="text-neutral-600 text-lg">
+            <p class="text-neutral-600 text-responsive-lg">
               Gérez les avis en attente et les signalements
             </p>
           </div>
@@ -35,9 +35,9 @@
         <Card class="bg-gradient-to-r from-orange-500 to-orange-600 text-white">
           <div class="flex items-center justify-between">
             <div>
-              <p class="text-orange-100 text-sm font-medium">Avis en attente</p>
-              <p class="text-3xl font-bold">{{ stats.pending_reviews }}</p>
-              <p class="text-orange-200 text-sm mt-1">
+              <p class="text-orange-100 text-responsive-sm font-medium">Avis en attente</p>
+              <p class="text-responsive-xl font-semibold">{{ stats.pending_reviews }}</p>
+              <p class="text-orange-200 text-responsive-sm mt-1">
                 À modérer
               </p>
             </div>
@@ -50,9 +50,9 @@
         <Card class="bg-gradient-to-r from-red-500 to-red-600 text-white">
           <div class="flex items-center justify-between">
             <div>
-              <p class="text-red-100 text-sm font-medium">Signalements</p>
-              <p class="text-3xl font-bold">{{ stats.pending_reports }}</p>
-              <p class="text-red-200 text-sm mt-1">
+              <p class="text-red-100 text-responsive-sm font-medium">Signalements</p>
+              <p class="text-responsive-xl font-semibold">{{ stats.pending_reports }}</p>
+              <p class="text-red-200 text-responsive-sm mt-1">
                 En attente
               </p>
             </div>
@@ -65,9 +65,9 @@
         <Card class="bg-gradient-to-r from-blue-500 to-blue-600 text-white">
           <div class="flex items-center justify-between">
             <div>
-              <p class="text-blue-100 text-sm font-medium">Avis aujourd'hui</p>
-              <p class="text-3xl font-bold">{{ stats.reviews_today }}</p>
-              <p class="text-blue-200 text-sm mt-1">
+              <p class="text-blue-100 text-responsive-sm font-medium">Avis aujourd'hui</p>
+              <p class="text-responsive-xl font-semibold">{{ stats.reviews_today }}</p>
+              <p class="text-blue-200 text-responsive-sm mt-1">
                 Nouveaux avis
               </p>
             </div>
@@ -80,9 +80,9 @@
         <Card class="bg-gradient-to-r from-green-500 to-green-600 text-white">
           <div class="flex items-center justify-between">
             <div>
-              <p class="text-green-100 text-sm font-medium">Traités</p>
-              <p class="text-3xl font-bold">{{ stats.resolved_reports }}</p>
-              <p class="text-green-200 text-sm mt-1">
+              <p class="text-green-100 text-responsive-sm font-medium">Traités</p>
+              <p class="text-responsive-xl font-semibold">{{ stats.resolved_reports }}</p>
+              <p class="text-green-200 text-responsive-sm mt-1">
                 Signalements résolus
               </p>
             </div>
@@ -99,7 +99,7 @@
           <nav class="-mb-px flex space-x-8">
             <button
               :class="[
-                'py-2 px-1 border-b-2 font-medium text-sm',
+                'py-2 px-1 border-b-2 font-medium text-responsive-sm',
                 activeTab === 'pending'
                   ? 'border-primary-500 text-primary-600'
                   : 'border-transparent text-neutral-500 hover:text-neutral-700 hover:border-neutral-300'
@@ -107,13 +107,13 @@
               @click="activeTab = 'pending'"
             >
               Avis en attente
-              <span v-if="stats?.pending_reviews" class="ml-2 px-2 py-1 text-xs bg-orange-100 text-orange-800 rounded-full">
+              <span v-if="stats?.pending_reviews" class="ml-2 px-2 py-1 text-responsive-xs bg-orange-100 text-orange-800 rounded-full">
                 {{ stats.pending_reviews }}
               </span>
             </button>
             <button
               :class="[
-                'py-2 px-1 border-b-2 font-medium text-sm',
+                'py-2 px-1 border-b-2 font-medium text-responsive-sm',
                 activeTab === 'reported'
                   ? 'border-primary-500 text-primary-600'
                   : 'border-transparent text-neutral-500 hover:text-neutral-700 hover:border-neutral-300'
@@ -121,7 +121,7 @@
               @click="activeTab = 'reported'"
             >
               Avis signalés
-              <span v-if="stats?.pending_reports" class="ml-2 px-2 py-1 text-xs bg-red-100 text-red-800 rounded-full">
+              <span v-if="stats?.pending_reports" class="ml-2 px-2 py-1 text-responsive-xs bg-red-100 text-red-800 rounded-full">
                 {{ stats.pending_reports }}
               </span>
             </button>

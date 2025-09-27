@@ -15,7 +15,7 @@
               Catalogue 2025
             </Badge>
             <div class="space-y-3">
-              <h1 class="font-display text-4xl lg:text-5xl font-semibold text-neutral-900 leading-tight">
+              <h1 class="font-display text-display-sm lg:text-display-md font-semibold text-neutral-900 leading-relaxed">
                 Produits responsables à portée de main
               </h1>
               <p class="text-body text-neutral-600">
@@ -24,7 +24,7 @@
                 }}
               </p>
             </div>
-            <p class="text-sm text-neutral-500">
+            <p class="text-responsive-sm text-neutral-500">
               Explorez nos paniers anti-gaspi triés par impact, localisation et économies garanties.
             </p>
           </div>
@@ -87,10 +87,10 @@
           <template #header>
             <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
               <div class="space-y-1">
-                <h2 class="text-2xl font-heading font-semibold text-neutral-900 leading-tight">
+                <h2 class="text-responsive-xl font-heading font-semibold text-neutral-900 leading-relaxed">
                   Affiner votre recherche
                 </h2>
-                <p class="text-sm text-neutral-500">
+                <p class="text-responsive-sm text-neutral-500">
                   Combinez nos filtres intelligents pour trouver le panier idéal.
                 </p>
               </div>

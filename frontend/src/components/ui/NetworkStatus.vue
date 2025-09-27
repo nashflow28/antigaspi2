@@ -16,10 +16,10 @@
       <div class="flex items-center space-x-2">
         <div class="flex items-center space-x-1">
           <div :class="indicatorClasses" class="w-2 h-2 rounded-full" />
-          <span class="text-sm font-medium">{{ statusMessage }}</span>
+          <span class="text-responsive-sm font-medium">{{ statusMessage }}</span>
         </div>
 
-        <div v-if="pendingCount > 0" class="flex items-center space-x-1 text-xs">
+        <div v-if="pendingCount > 0" class="flex items-center space-x-1 text-responsive-xs">
           <Loader2 class="w-3 h-3 animate-spin" />
           <span>{{ pendingCount }} en attente</span>
         </div>

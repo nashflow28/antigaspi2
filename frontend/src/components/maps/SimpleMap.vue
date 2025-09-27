@@ -5,7 +5,7 @@
         <div class="mb-4">
           <MapPin class="w-16 h-16 text-neutral-400 mx-auto" />
         </div>
-        <h3 class="text-lg font-semibold text-neutral-700 mb-2">Carte des commerçants</h3>
+        <h3 class="text-responsive-lg font-semibold text-neutral-700 mb-2">Carte des commerçants</h3>
         <p class="text-neutral-500 mb-6 max-w-md">
           Configuration Google Maps en cours. En attendant, voici la liste des commerçants à proximité.
         </p>
@@ -21,15 +21,15 @@
             <div class="flex items-center justify-between">
               <div>
                 <h4 class="font-semibold text-neutral-900">{{ marker.title }}</h4>
-                <p class="text-sm text-neutral-600">{{ marker.info }}</p>
-                <div class="flex items-center mt-2 text-sm text-blue-600">
+                <p class="text-responsive-sm text-neutral-600">{{ marker.info }}</p>
+                <div class="flex items-center mt-2 text-responsive-sm text-blue-600">
                   <Navigation class="w-4 h-4 mr-1" />
                   <span>{{ marker.position.lat.toFixed(4) }}, {{ marker.position.lng.toFixed(4) }}</span>
                 </div>
               </div>
               <div class="flex flex-col items-center">
                 <div class="w-3 h-3 bg-green-500 rounded-full mb-1" />
-                <span class="text-xs text-neutral-500">Actif</span>
+                <span class="text-responsive-xs text-neutral-500">Actif</span>
               </div>
             </div>
           </div>
@@ -39,7 +39,7 @@
         <div v-if="showUserLocation && userLocation" class="mt-6 p-4 bg-blue-50 rounded-lg">
           <div class="flex items-center justify-center text-blue-700">
             <MapPin class="w-5 h-5 mr-2" />
-            <span class="text-sm">
+            <span class="text-responsive-sm">
               Votre position: {{ userLocation.latitude.toFixed(4) }}, {{ userLocation.longitude.toFixed(4) }}
             </span>
           </div>

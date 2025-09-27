@@ -17,7 +17,7 @@
         <div class="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
           <AlertCircle class="w-10 h-10 text-red-500" />
         </div>
-        <h3 class="text-lg font-semibold text-neutral-900 mb-2">
+        <h3 class="text-responsive-lg font-semibold text-neutral-900 mb-2">
           Erreur de chargement
         </h3>
         <p class="text-neutral-600 mb-4">{{ error }}</p>
@@ -49,9 +49,9 @@
                   Retour
                 </Button>
                 <div class="h-6 w-px bg-neutral-300" />
-                <span class="text-sm text-neutral-500">Réservation</span>
+                <span class="text-responsive-sm text-neutral-500">Réservation</span>
               </div>
-              <h1 class="text-2xl font-bold text-neutral-900">
+              <h1 class="text-responsive-xl font-semibold text-neutral-900">
                 {{ reservation.product.name }}
               </h1>
               <p class="text-neutral-600">
@@ -78,7 +78,7 @@
         <div class="lg:col-span-2 space-y-6">
           <!-- Product details -->
           <Card>
-            <h3 class="text-lg font-semibold text-neutral-900 mb-4">
+            <h3 class="text-responsive-lg font-semibold text-neutral-900 mb-4">
               Détails du produit
             </h3>
             <div class="flex gap-4">
@@ -103,7 +103,7 @@
                 <h4 class="font-semibold text-neutral-900 mb-2">
                   {{ reservation.product.name }}
                 </h4>
-                <div class="space-y-1 text-sm text-neutral-600">
+                <div class="space-y-1 text-responsive-sm text-neutral-600">
                   <div class="flex items-center gap-2">
                     <Store class="w-4 h-4" />
                     <span>{{ reservation.product.merchant.name }}</span>
@@ -123,48 +123,48 @@
 
           <!-- Reservation details -->
           <Card>
-            <h3 class="text-lg font-semibold text-neutral-900 mb-4">
+            <h3 class="text-responsive-lg font-semibold text-neutral-900 mb-4">
               Détails de la réservation
             </h3>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label class="text-sm font-medium text-neutral-700">Quantité réservée</label>
-                <p class="text-lg font-semibold text-neutral-900">{{ reservation.quantity }}</p>
+                <label class="text-responsive-sm font-medium text-neutral-700">Quantité réservée</label>
+                <p class="text-responsive-lg font-semibold text-neutral-900">{{ reservation.quantity }}</p>
               </div>
               <div>
-                <label class="text-sm font-medium text-neutral-700">Prix unitaire</label>
+                <label class="text-responsive-sm font-medium text-neutral-700">Prix unitaire</label>
                 <div class="flex items-center gap-2">
-                  <span class="text-lg font-semibold text-primary-600">
+                  <span class="text-responsive-lg font-semibold text-primary-600">
                     {{ formatPrice(reservation.discounted_price) }}
                   </span>
-                  <span class="text-sm text-neutral-500 line-through">
+                  <span class="text-responsive-sm text-neutral-500 line-through">
                     {{ formatPrice(reservation.original_price) }}
                   </span>
                 </div>
               </div>
               <div>
-                <label class="text-sm font-medium text-neutral-700">Montant total</label>
-                <p class="text-xl font-bold text-primary-600">
+                <label class="text-responsive-sm font-medium text-neutral-700">Montant total</label>
+                <p class="text-responsive-xl font-semibold text-primary-600">
                   {{ formatPrice(reservation.total_amount) }}
                 </p>
               </div>
               <div>
-                <label class="text-sm font-medium text-neutral-700">Date de retrait</label>
-                <p class="text-lg font-semibold text-neutral-900">
+                <label class="text-responsive-sm font-medium text-neutral-700">Date de retrait</label>
+                <p class="text-responsive-lg font-semibold text-neutral-900">
                   {{ formatDate(reservation.pickup_date) }}
                 </p>
               </div>
             </div>
 
             <div v-if="reservation.pickup_notes" class="mt-4 pt-4 border-t border-neutral-200">
-              <label class="text-sm font-medium text-neutral-700">Notes de retrait</label>
+              <label class="text-responsive-sm font-medium text-neutral-700">Notes de retrait</label>
               <p class="text-neutral-600 mt-1">{{ reservation.pickup_notes }}</p>
             </div>
           </Card>
 
           <!-- Actions -->
           <Card v-if="canPerformActions">
-            <h3 class="text-lg font-semibold text-neutral-900 mb-4">
+            <h3 class="text-responsive-lg font-semibold text-neutral-900 mb-4">
               Actions disponibles
             </h3>
             <div class="flex flex-wrap gap-3">
@@ -200,7 +200,7 @@
         <div class="space-y-6">
           <!-- Status timeline -->
           <Card>
-            <h3 class="text-lg font-semibold text-neutral-900 mb-4">
+            <h3 class="text-responsive-lg font-semibold text-neutral-900 mb-4">
               Suivi de la réservation
             </h3>
             <div class="space-y-4">
@@ -222,7 +222,7 @@
                   >
                     {{ step.title }}
                   </p>
-                  <p class="text-sm text-neutral-500">{{ step.description }}</p>
+                  <p class="text-responsive-sm text-neutral-500">{{ step.description }}</p>
                 </div>
               </div>
             </div>
@@ -236,22 +236,22 @@
               </div>
               <div>
                 <h3 class="font-semibold">Vos économies</h3>
-                <p class="text-sm opacity-90">Sur cette réservation</p>
+                <p class="text-responsive-sm opacity-90">Sur cette réservation</p>
               </div>
             </div>
             <div class="space-y-2">
               <div class="flex justify-between items-center">
-                <span class="text-sm">Prix original</span>
+                <span class="text-responsive-sm">Prix original</span>
                 <span>{{ formatPrice(reservation.original_price * reservation.quantity) }}</span>
               </div>
               <div class="flex justify-between items-center">
-                <span class="text-sm">Prix payé</span>
+                <span class="text-responsive-sm">Prix payé</span>
                 <span>{{ formatPrice(reservation.total_amount) }}</span>
               </div>
               <div class="border-t border-white/20 pt-2">
                 <div class="flex justify-between items-center">
                   <span class="font-semibold">Économisé</span>
-                  <span class="font-bold text-lg">
+                  <span class="font-semibold text-responsive-lg">
                     {{ formatPrice((reservation.original_price * reservation.quantity) - reservation.total_amount) }}
                   </span>
                 </div>

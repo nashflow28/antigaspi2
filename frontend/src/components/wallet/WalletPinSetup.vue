@@ -2,7 +2,7 @@
   <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
     <div class="bg-white rounded-xl p-6 w-full max-w-md">
       <div class="flex items-center justify-between mb-6">
-        <h3 class="text-xl font-semibold text-neutral-900">
+        <h3 class="text-responsive-xl font-semibold text-neutral-900">
           {{ hasPin ? 'Modifier le code PIN' : 'Configurer le code PIN' }}
         </h3>
         <button
@@ -28,7 +28,7 @@
       <form @submit.prevent="handleSubmit">
         <div class="space-y-4">
           <div v-if="hasPin">
-            <label class="block text-sm font-medium text-neutral-700 mb-2">
+            <label class="block text-responsive-sm font-medium text-neutral-700 mb-2">
               Code PIN actuel
             </label>
             <input
@@ -36,16 +36,16 @@
               type="password"
               maxlength="6"
               placeholder="••••••"
-              class="w-full px-4 py-3 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent text-center text-lg tracking-widest"
+              class="w-full px-4 py-3 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent text-center text-responsive-lg tracking-widest"
               :class="{'border-red-300': errors.currentPin}"
               required
               @input="formatPinInput"
             >
-            <p v-if="errors.currentPin" class="mt-1 text-sm text-red-600">{{ errors.currentPin }}</p>
+            <p v-if="errors.currentPin" class="mt-1 text-responsive-sm text-red-600">{{ errors.currentPin }}</p>
           </div>
 
           <div>
-            <label class="block text-sm font-medium text-neutral-700 mb-2">
+            <label class="block text-responsive-sm font-medium text-neutral-700 mb-2">
               {{ hasPin ? 'Nouveau code PIN' : 'Code PIN' }}
             </label>
             <input
@@ -53,16 +53,16 @@
               type="password"
               maxlength="6"
               placeholder="••••••"
-              class="w-full px-4 py-3 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent text-center text-lg tracking-widest"
+              class="w-full px-4 py-3 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent text-center text-responsive-lg tracking-widest"
               :class="{'border-red-300': errors.newPin}"
               required
               @input="formatPinInput"
             >
-            <p v-if="errors.newPin" class="mt-1 text-sm text-red-600">{{ errors.newPin }}</p>
+            <p v-if="errors.newPin" class="mt-1 text-responsive-sm text-red-600">{{ errors.newPin }}</p>
           </div>
 
           <div>
-            <label class="block text-sm font-medium text-neutral-700 mb-2">
+            <label class="block text-responsive-sm font-medium text-neutral-700 mb-2">
               Confirmer le {{ hasPin ? 'nouveau ' : '' }}code PIN
             </label>
             <input
@@ -70,12 +70,12 @@
               type="password"
               maxlength="6"
               placeholder="••••••"
-              class="w-full px-4 py-3 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent text-center text-lg tracking-widest"
+              class="w-full px-4 py-3 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent text-center text-responsive-lg tracking-widest"
               :class="{'border-red-300': errors.confirmPin}"
               required
               @input="formatPinInput"
             >
-            <p v-if="errors.confirmPin" class="mt-1 text-sm text-red-600">{{ errors.confirmPin }}</p>
+            <p v-if="errors.confirmPin" class="mt-1 text-responsive-sm text-red-600">{{ errors.confirmPin }}</p>
           </div>
 
           <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
@@ -83,9 +83,9 @@
               <svg class="w-5 h-5 text-yellow-500 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
                 <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
               </svg>
-              <div class="text-sm text-yellow-700">
+              <div class="text-responsive-sm text-yellow-700">
                 <p class="font-medium">Sécurité importante</p>
-                <ul class="mt-1 space-y-1 text-xs">
+                <ul class="mt-1 space-y-1 text-responsive-xs">
                   <li>• Le code PIN doit contenir 4 à 6 chiffres</li>
                   <li>• Évitez les codes évidents (1234, 0000, etc.)</li>
                   <li>• Ne partagez jamais votre code PIN</li>
@@ -97,7 +97,7 @@
 
           <!-- PIN Strength Indicator -->
           <div v-if="form.newPin" class="space-y-2">
-            <div class="flex justify-between text-sm">
+            <div class="flex justify-between text-responsive-sm">
               <span class="text-neutral-600">Force du PIN</span>
               <span :class="pinStrengthClass">{{ pinStrengthText }}</span>
             </div>
