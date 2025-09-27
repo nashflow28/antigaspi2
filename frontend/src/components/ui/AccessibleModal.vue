@@ -15,7 +15,7 @@
       >
         <!-- Backdrop -->
         <div
-          class="absolute inset-0 bg-black/50 backdrop-blur-sm"
+          class="relative sm:absolute inset-0 bg-black/50 backdrop-blur-sm"
           :aria-hidden="true"
         />
 
@@ -36,7 +36,7 @@
             <!-- Skip Link -->
             <a
               href="#modal-close"
-              class="skip-link sr-only focus:not-sr-only focus:absolute focus:top-2 focus:right-2 bg-primary-600 text-white px-4 py-3 rounded text-responsive-sm z-10"
+              class="skip-link sr-only focus:not-sr-only focus:relative sm:absolute focus:top-2 focus:right-2 bg-primary-600 text-white px-4 py-3 rounded text-responsive-sm z-10"
             >
               Skip to close button
             </a>
@@ -46,7 +46,7 @@
               v-if="hasHeader"
               :class="headerClasses"
             >
-              <div class="flex items-center justify-between">
+              <div class="flex items-center justify-start sm:justify-between">
                 <!-- Title -->
                 <h2
                   :id="titleId"
@@ -74,7 +74,7 @@
               <p
                 v-if="description || slots.description"
                 :id="descriptionId"
-                class="text-responsive-sm text-neutral-600 dark:text-neutral-400 mt-2"
+                class="text-responsive-sm text-body dark:text-placeholder mt-2"
               >
                 <slot name="description">{{ description }}</slot>
               </p>
@@ -97,7 +97,7 @@
               role="contentinfo"
             >
               <slot name="footer">
-                <div class="flex gap-3 justify-end">
+                <div class="flex gap-3 justify-center sm:justify-end">
                   <Button
                     v-if="showCancel"
                     variant="outline"

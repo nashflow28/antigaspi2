@@ -3,9 +3,9 @@
     <header
       class="sticky top-0 z-40 border-b border-white/50 bg-white/80 backdrop-blur-2xl shadow-[0_18px_40px_-24px_rgba(4,120,87,0.35)]"
     >
-      <div class="container-2025 py-10">
-        <div class="flex flex-col gap-8 lg:flex-row lg:items-center lg:justify-between">
-          <div class="space-y-5 max-w-2xl">
+      <div class="container px-4 sm:px-6 lg:px-8-2025 py-10">
+        <div class="flex flex-col gap-6 sm:gap-8 lg:flex-row lg:items-center lg:justify-between">
+          <div class="space-y-5 max-w-full sm:max-w-2xl">
             <Badge
               variant="primary"
               size="sm"
@@ -15,20 +15,20 @@
               Catalogue 2025
             </Badge>
             <div class="space-y-3">
-              <h1 class="font-display text-display-sm lg:text-display-md font-semibold text-neutral-900 leading-relaxed">
+              <h1 class="font-display text-display-sm lg:text-display-md font-semibold text-heading leading-relaxed">
                 Produits responsables à portée de main
               </h1>
-              <p class="text-body text-neutral-600">
+              <p class="text-body text-body">
                 {{ filteredProducts.length }} produit{{ filteredProducts.length > 1 ? 's' : '' }} disponible{{
                   filteredProducts.length > 1 ? 's' : ''
                 }}
               </p>
             </div>
-            <p class="text-responsive-sm text-neutral-500">
+            <p class="text-responsive-sm text-muted">
               Explorez nos paniers anti-gaspi triés par impact, localisation et économies garanties.
             </p>
           </div>
-          <Card variant="glass" class="w-full max-w-xl shadow-card animate-fade-in-up">
+          <Card variant="glass" class="w-full max-w-full sm:max-w-xl shadow-card animate-fade-in-up">
             <div class="flex flex-col gap-4 sm:flex-row sm:items-center">
               <Input
                 v-model="searchQuery"
@@ -44,7 +44,7 @@
                 variant="secondary"
                 size="md"
                 :left-icon="Filter"
-                class="w-full justify-between text-primary-700 sm:w-auto"
+                class="w-full justify-between text-primary-emphasis sm:w-auto"
                 @click="showFilters = !showFilters"
               >
                 <span class="flex items-center gap-2">
@@ -53,7 +53,7 @@
                     variant="primary"
                     size="sm"
                     rounded
-                    class="border border-primary-200/70 bg-primary-50/80 text-primary-700"
+                    class="border border-primary-200/70 bg-primary-50/80 text-primary-emphasis"
                   >
                     {{ activeFiltersCount }}
                   </Badge>
@@ -67,7 +67,7 @@
                 variant="outline"
                 size="sm"
                 rounded
-                class="border-primary-200/70 bg-primary-50/60 text-primary-700"
+                class="border-primary-200/70 bg-primary-50/60 text-primary-emphasis"
               >
                 {{ label }}
               </Badge>
@@ -77,7 +77,7 @@
       </div>
     </header>
 
-    <main class="container-2025 space-y-spacing-22 py-spacing-22">
+    <main class="container px-4 sm:px-6 lg:px-8-2025 space-y-spacing-22 py-spacing-22">
       <Transition name="fade">
         <Card
           v-if="showFilters"
@@ -87,17 +87,17 @@
           <template #header>
             <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
               <div class="space-y-2">
-                <h2 class="text-responsive-xl font-heading font-semibold text-neutral-900 leading-relaxed">
+                <h2 class="text-responsive-xl font-heading font-semibold text-heading leading-relaxed">
                   Affiner votre recherche
                 </h2>
-                <p class="text-responsive-sm text-neutral-500">
+                <p class="text-responsive-sm text-muted">
                   Combinez nos filtres intelligents pour trouver le panier idéal.
                 </p>
               </div>
               <Button
                 variant="ghost"
                 size="sm"
-                class="text-primary-600 hover:text-primary-700"
+                class="text-primary hover:text-primary-emphasis"
                 @click="showFilters = false"
               >
                 Fermer
@@ -105,12 +105,12 @@
             </div>
           </template>
 
-          <div class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
+          <div class="grid grid-cols-1 gap-4 sm:gap-6 md:grid-cols-2 lg:grid-cols-4">
             <label class="flex flex-col gap-2">
-              <span class="text-small font-medium text-neutral-600">Catégorie</span>
+              <span class="text-small font-medium text-body">Catégorie</span>
               <select
                 v-model="filters.category"
-                class="w-full rounded-2xl border border-neutral-200/80 bg-white/80 px-4 py-3 text-body text-neutral-600 shadow-sm transition focus:border-primary-400 focus:outline-none focus:ring-2 focus:ring-primary-200"
+                class="w-full rounded-2xl border border-neutral-200/80 bg-white/80 px-4 py-3 text-body text-body shadow-sm transition focus:border-primary-400 focus:outline-none focus:ring-2 focus:ring-primary-200"
               >
                 <option value="">Toutes les catégories</option>
                 <option value="bakery">Boulangerie</option>
@@ -122,7 +122,7 @@
             </label>
 
             <div class="flex flex-col gap-2">
-              <span class="text-small font-medium text-neutral-600">Distance</span>
+              <span class="text-small font-medium text-body">Distance</span>
               <Button
                 variant="secondary"
                 size="sm"
@@ -136,7 +136,7 @@
               </Button>
               <select
                 v-model="filters.maxDistance"
-                class="w-full rounded-2xl border border-neutral-200/80 bg-white/80 px-4 py-3 text-body text-neutral-600 shadow-sm transition focus:border-primary-400 focus:outline-none focus:ring-2 focus:ring-primary-200 disabled:cursor-not-allowed disabled:opacity-60"
+                class="w-full rounded-2xl border border-neutral-200/80 bg-white/80 px-4 py-3 text-body text-body shadow-sm transition focus:border-primary-400 focus:outline-none focus:ring-2 focus:ring-primary-200 disabled:cursor-not-allowed disabled:opacity-60"
                 :disabled="!userLocation"
               >
                 <option value="">{{ userLocation ? 'Toutes distances' : 'Activez votre position' }}</option>
@@ -149,10 +149,10 @@
             </div>
 
             <label class="flex flex-col gap-2">
-              <span class="text-small font-medium text-neutral-600">Prix maximum</span>
+              <span class="text-small font-medium text-body">Prix maximum</span>
               <select
                 v-model="filters.maxPrice"
-                class="w-full rounded-2xl border border-neutral-200/80 bg-white/80 px-4 py-3 text-body text-neutral-600 shadow-sm transition focus:border-primary-400 focus:outline-none focus:ring-2 focus:ring-primary-200"
+                class="w-full rounded-2xl border border-neutral-200/80 bg-white/80 px-4 py-3 text-body text-body shadow-sm transition focus:border-primary-400 focus:outline-none focus:ring-2 focus:ring-primary-200"
               >
                 <option value="">Tous les prix</option>
                 <option value="500">Moins de 500 F CFA</option>
@@ -163,10 +163,10 @@
             </label>
 
             <label class="flex flex-col gap-2">
-              <span class="text-small font-medium text-neutral-600">Réduction minimum</span>
+              <span class="text-small font-medium text-body">Réduction minimum</span>
               <select
                 v-model="filters.minDiscount"
-                class="w-full rounded-2xl border border-neutral-200/80 bg-white/80 px-4 py-3 text-body text-neutral-600 shadow-sm transition focus:border-primary-400 focus:outline-none focus:ring-2 focus:ring-primary-200"
+                class="w-full rounded-2xl border border-neutral-200/80 bg-white/80 px-4 py-3 text-body text-body shadow-sm transition focus:border-primary-400 focus:outline-none focus:ring-2 focus:ring-primary-200"
               >
                 <option value="">Toutes réductions</option>
                 <option value="20">20% et plus</option>
@@ -181,7 +181,7 @@
             <Button
               variant="ghost"
               size="sm"
-              class="text-neutral-600 hover:text-primary-700"
+              class="text-body hover:text-primary-emphasis"
               :disabled="activeFiltersCount === 0 && !searchQuery"
               @click="clearFilters"
             >
@@ -200,7 +200,7 @@
       </Transition>
 
       <section>
-        <div v-if="loading" class="grid grid-cols-1 gap-6 md:grid-cols-3 xl:grid-cols-4">
+        <div v-if="loading" class="grid grid-cols-1 gap-4 sm:gap-6 md:grid-cols-3 xl:grid-cols-4">
           <Card
             v-for="index in 8"
             :key="index"
@@ -229,7 +229,7 @@
         <div
           v-else
           data-test="products-grid"
-          class="grid grid-cols-1 gap-6 md:grid-cols-3 xl:grid-cols-4"
+          class="grid grid-cols-1 gap-4 sm:gap-6 md:grid-cols-3 xl:grid-cols-4"
         >
           <ProductCard
             v-for="product in filteredProducts"
@@ -442,7 +442,7 @@ const fetchProducts = async () => {
       throw new Error(data.message || 'Réponse inattendue de l’API')
     }
   } catch (error: any) {
-    console.error('Erreur lors du chargement des produits:', error)
+    // console.error('Erreur lors du chargement des produits:', error)
     notify.warning('Nous rencontrons un souci pour récupérer certains produits. Réessayez plus tard.', 'Chargement incomplet')
   } finally {
     loading.value = false
@@ -579,7 +579,7 @@ const onReserve = async (product: Product) => {
       'Paiement rapide'
     )
   } catch (error: any) {
-    console.error('Erreur lors de la réservation rapide:', error)
+    // console.error('Erreur lors de la réservation rapide:', error)
     const message = error?.message || 'Impossible d’initier la réservation rapide.'
     notify.error(message, 'Réservation rapide')
   } finally {

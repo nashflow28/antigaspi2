@@ -6,8 +6,8 @@
   >
     <!-- Page Header -->
     <div class="bg-white/60 backdrop-blur-md glass-border border-b backdrop-blur-lg sticky top-20 z-40">
-      <div class="container-2025 py-6">
-        <div class="flex items-center justify-between animate-fade-in-up">
+      <div class="container px-4 sm:px-6 lg:px-8-2025 py-6">
+        <div class="flex items-center justify-start sm:justify-between animate-fade-in-up">
           <div class="flex items-center gap-4">
             <Button
               variant="ghost"
@@ -18,10 +18,10 @@
               <ArrowLeft class="w-10 h-10" />
             </Button>
             <div>
-              <h1 class="text-responsive-xl lg:text-display-sm font-semibold text-neutral-900 mb-2">
+              <h1 class="text-responsive-xl lg:text-display-sm font-semibold text-heading mb-2">
                 Portefeuille électronique 💳
               </h1>
-              <p class="text-responsive-lg text-neutral-600">
+              <p class="text-responsive-lg text-body">
                 Gérez votre portefeuille et vos transactions
               </p>
             </div>
@@ -30,8 +30,8 @@
       </div>
     </div>
 
-    <div class="container-2025 py-8">
-      <div class="max-w-6xl mx-auto space-y-8">
+    <div class="container px-4 sm:px-6 lg:px-8-2025 py-6 sm:py-8">
+      <div class="max-w-full sm:max-w-6xl mx-auto space-y-8">
         <!-- Wallet Card -->
         <div class="animate-fade-in-up">
           <WalletCard
@@ -43,17 +43,17 @@
         </div>
 
         <!-- Quick Actions -->
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 animate-fade-in-up" style="animation-delay: 0.1s;">
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 animate-fade-in-up" style="animation-delay: 0.1s;">
           <Button
             variant="outline"
             class="p-4 h-auto flex-col justify-start"
             @click="showRechargeModal = true"
           >
             <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3 group-hover:transition-colors">
-              <Plus class="w-10 h-10 text-green-600" />
+              <Plus class="w-10 h-10 text-success" />
             </div>
-            <div class="font-medium text-neutral-900">Recharger</div>
-            <div class="text-responsive-sm text-neutral-500">Ajouter des fonds</div>
+            <div class="font-medium text-heading">Recharger</div>
+            <div class="text-responsive-sm text-muted">Ajouter des fonds</div>
           </Button>
 
           <Button
@@ -62,10 +62,10 @@
             @click="showTransferModal = true"
           >
             <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-3 group-hover:transition-colors">
-              <ArrowUpRight class="w-10 h-10 text-blue-600" />
+              <ArrowUpRight class="w-10 h-10 text-info" />
             </div>
-            <div class="font-medium text-neutral-900">Transférer</div>
-            <div class="text-responsive-sm text-neutral-500">Vers un autre utilisateur</div>
+            <div class="font-medium text-heading">Transférer</div>
+            <div class="text-responsive-sm text-muted">Vers un autre utilisateur</div>
           </Button>
 
           <Button
@@ -76,8 +76,8 @@
             <div class="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-3 group-hover:transition-colors">
               <Settings class="w-10 h-10 text-purple-600" />
             </div>
-            <div class="font-medium text-neutral-900">Paramètres</div>
-            <div class="text-responsive-sm text-neutral-500">PIN et limites</div>
+            <div class="font-medium text-heading">Paramètres</div>
+            <div class="text-responsive-sm text-muted">PIN et limites</div>
           </Button>
 
           <Button
@@ -88,13 +88,13 @@
             <div class="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-3 group-hover:transition-colors">
               <BarChart3 class="w-10 h-10 text-orange-600" />
             </div>
-            <div class="font-medium text-neutral-900">Statistiques</div>
-            <div class="text-responsive-sm text-neutral-500">Analyse des dépenses</div>
+            <div class="font-medium text-heading">Statistiques</div>
+            <div class="text-responsive-sm text-muted">Analyse des dépenses</div>
           </Button>
         </div>
 
         <!-- Main Content Grid -->
-        <div class="grid lg:grid-cols-3 gap-8">
+        <div class="grid lg:grid-cols-3 gap-6 sm:gap-8">
           <!-- Transactions -->
           <div class="lg:col-span-2 animate-fade-in-up" style="animation-delay: 0.2s;">
             <WalletTransactions
@@ -109,37 +109,37 @@
           <div class="space-y-6">
             <!-- Stats Overview -->
             <Card class="animate-fade-in-up" style="animation-delay: 0.3s;">
-              <h3 class="text-responsive-lg font-semibold text-neutral-900 mb-4">Aperçu mensuel</h3>
+              <h3 class="text-responsive-lg font-semibold text-heading mb-4">Aperçu mensuel</h3>
               <div v-if="walletStore.stats" class="space-y-4">
-                <div class="flex items-center justify-between p-3 bg-green-50 rounded-lg">
+                <div class="flex items-center justify-start sm:justify-between p-3 bg-green-50 rounded-lg">
                   <div class="flex items-center gap-2">
-                    <ArrowUp class="w-5 h-5 text-green-600" />
+                    <ArrowUp class="w-5 h-5 text-success" />
                     <span class="text-responsive-sm font-medium text-green-800">Crédits</span>
                   </div>
-                  <span class="font-semibold text-green-600">
+                  <span class="font-semibold text-success">
                     {{ formatAmount(walletStore.stats.period_stats.total_credits) }} XOF
                   </span>
                 </div>
-                <div class="flex items-center justify-between p-3 bg-red-50 rounded-lg">
+                <div class="flex items-center justify-start sm:justify-between p-3 bg-red-50 rounded-lg">
                   <div class="flex items-center gap-2">
-                    <ArrowDown class="w-5 h-5 text-red-600" />
+                    <ArrowDown class="w-5 h-5 text-error" />
                     <span class="text-responsive-sm font-medium text-red-800">Débits</span>
                   </div>
-                  <span class="font-semibold text-red-600">
+                  <span class="font-semibold text-error">
                     {{ formatAmount(walletStore.stats.period_stats.total_debits) }} XOF
                   </span>
                 </div>
-                <div class="flex items-center justify-between p-3 bg-neutral-50 rounded-lg">
+                <div class="flex items-center justify-start sm:justify-between p-3 bg-neutral-50 rounded-lg">
                   <div class="flex items-center gap-2">
-                    <Activity class="w-5 h-5 text-neutral-600" />
-                    <span class="text-responsive-sm font-medium text-neutral-800">Transactions</span>
+                    <Activity class="w-5 h-5 text-body" />
+                    <span class="text-responsive-sm font-medium text-heading-secondary">Transactions</span>
                   </div>
-                  <span class="font-semibold text-neutral-600">
+                  <span class="font-semibold text-body">
                     {{ walletStore.stats.period_stats.transaction_count }}
                   </span>
                 </div>
               </div>
-              <div v-else class="text-center py-4">
+              <div v-else class="text-left sm:text-center py-4">
                 <div class="animate-pulse">
                   <div class="h-5 bg-neutral-200 rounded w-3/4 mx-auto mb-2" />
                   <div class="h-5 bg-neutral-200 rounded w-1/2 mx-auto" />
@@ -149,10 +149,10 @@
 
             <!-- Daily Limit -->
             <Card class="animate-fade-in-up" style="animation-delay: 0.4s;">
-              <h3 class="text-responsive-lg font-semibold text-neutral-900 mb-4">Limite quotidienne</h3>
+              <h3 class="text-responsive-lg font-semibold text-heading mb-4">Limite quotidienne</h3>
               <div v-if="walletStore.wallet" class="space-y-3">
-                <div class="flex justify-between text-responsive-sm">
-                  <span class="text-neutral-600">Utilisée aujourd'hui</span>
+                <div class="flex justify-start sm:justify-between text-responsive-sm">
+                  <span class="text-body">Utilisée aujourd'hui</span>
                   <span class="font-medium">{{ formatAmount(walletStore.dailySpent) }} XOF</span>
                 </div>
                 <div class="w-full bg-neutral-200 rounded-full h-3">
@@ -161,8 +161,8 @@
                     :style="{ width: Math.min(walletStore.dailyLimitUsagePercentage, 100) + '%' }"
                   />
                 </div>
-                <div class="flex justify-between text-responsive-sm">
-                  <span class="text-neutral-600">Limite</span>
+                <div class="flex justify-start sm:justify-between text-responsive-sm">
+                  <span class="text-body">Limite</span>
                   <span class="font-medium">{{ formatAmount(walletStore.dailyLimit) }} XOF</span>
                 </div>
               </div>
@@ -177,13 +177,13 @@
                 <h3 class="text-responsive-lg font-semibold text-blue-800">Sécurité</h3>
               </div>
               <div class="space-y-2 text-responsive-sm">
-                <div class="flex items-center justify-between">
+                <div class="flex items-center justify-start sm:justify-between">
                   <span class="text-blue-700">Code PIN</span>
                   <span class="font-medium text-blue-800">
                     {{ walletStore.hasPin ? '✓ Configuré' : '⚠ Non configuré' }}
                   </span>
                 </div>
-                <div class="flex items-center justify-between">
+                <div class="flex items-center justify-start sm:justify-between">
                   <span class="text-blue-700">Statut</span>
                   <span class="font-medium text-blue-800">
                     {{ walletStore.isActive ? '✓ Actif' : '⚠ Inactif' }}
@@ -221,17 +221,17 @@
 
     <!-- Simplified Transfer Modal (basic implementation) -->
     <div v-if="showTransferModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-      <div class="bg-white rounded-xl p-6 w-full max-w-md">
-        <div class="flex items-center justify-between mb-6">
-          <h3 class="text-responsive-xl font-semibold text-neutral-900">Transfert (Bientôt disponible)</h3>
+      <div class="bg-white rounded-xl p-6 w-full max-w-full sm:max-w-md">
+        <div class="flex items-center justify-start sm:justify-between mb-6">
+          <h3 class="text-responsive-xl font-semibold text-heading">Transfert (Bientôt disponible)</h3>
           <button
-            class="text-neutral-400 hover:text-neutral-600"
+            class="text-placeholder hover:text-body"
             @click="showTransferModal = false"
           >
             <X class="w-10 h-10" />
           </Button>
         </div>
-        <p class="text-neutral-600 mb-4">
+        <p class="text-body mb-4">
           La fonctionnalité de transfert entre utilisateurs sera disponible dans une prochaine mise à jour.
         </p>
         <button
@@ -245,11 +245,11 @@
 
     <!-- Settings Modal -->
     <div v-if="showSettingsModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-      <div class="bg-white rounded-xl p-6 w-full max-w-md">
-        <div class="flex items-center justify-between mb-6">
-          <h3 class="text-responsive-xl font-semibold text-neutral-900">Paramètres du portefeuille</h3>
+      <div class="bg-white rounded-xl p-6 w-full max-w-full sm:max-w-md">
+        <div class="flex items-center justify-start sm:justify-between mb-6">
+          <h3 class="text-responsive-xl font-semibold text-heading">Paramètres du portefeuille</h3>
           <button
-            class="text-neutral-400 hover:text-neutral-600"
+            class="text-placeholder hover:text-body"
             @click="showSettingsModal = false"
           >
             <X class="w-10 h-10" />
@@ -257,18 +257,18 @@
         </div>
         <div class="space-y-4">
           <button
-            class="w-full flex items-center justify-between p-4 border border-neutral-200 rounded-lg hover:transition-colors"
+            class="w-full flex items-center justify-start sm:justify-between p-4 border border-neutral-200 rounded-lg hover:transition-colors"
             @click="() => { showSettingsModal = false; showPinSetupModal = true }"
           >
             <div class="flex items-center gap-3">
-              <Key class="w-5 h-5 text-neutral-600" />
+              <Key class="w-5 h-5 text-body" />
               <span class="font-medium">{{ walletStore.hasPin ? 'Modifier le PIN' : 'Configurer un PIN' }}</span>
             </div>
-            <ChevronRight class="w-5 h-5 text-neutral-400" />
+            <ChevronRight class="w-5 h-5 text-placeholder" />
           </Button>
 
           <div class="p-4 border border-neutral-200 rounded-lg">
-            <div class="flex items-center justify-between mb-2">
+            <div class="flex items-center justify-start sm:justify-between mb-2">
               <span class="font-medium">Activer/Désactiver le portefeuille</span>
               <button
                 :disabled="walletStore.loading"
@@ -282,7 +282,7 @@
                 />
               </Button>
             </div>
-            <p class="text-responsive-sm text-neutral-500">
+            <p class="text-responsive-sm text-muted">
               {{ walletStore.isActive ? 'Portefeuille activé' : 'Portefeuille désactivé' }}
             </p>
           </div>
@@ -292,17 +292,17 @@
 
     <!-- Stats Modal -->
     <div v-if="showStatsModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-      <div class="bg-white rounded-xl p-6 w-full max-w-md">
-        <div class="flex items-center justify-between mb-6">
-          <h3 class="text-responsive-xl font-semibold text-neutral-900">Statistiques détaillées</h3>
+      <div class="bg-white rounded-xl p-6 w-full max-w-full sm:max-w-md">
+        <div class="flex items-center justify-start sm:justify-between mb-6">
+          <h3 class="text-responsive-xl font-semibold text-heading">Statistiques détaillées</h3>
           <button
-            class="text-neutral-400 hover:text-neutral-600"
+            class="text-placeholder hover:text-body"
             @click="showStatsModal = false"
           >
             <X class="w-10 h-10" />
           </Button>
         </div>
-        <p class="text-neutral-600 mb-4">
+        <p class="text-body mb-4">
           Les statistiques détaillées avec graphiques seront disponibles dans une prochaine version.
         </p>
         <button

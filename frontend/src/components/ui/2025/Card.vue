@@ -174,11 +174,11 @@ const handleClick = (event: MouseEvent) => {
 }
 
 .ui-title {
-  @apply text-lg font-semibold text-neutral-900;
+  @apply text-lg font-semibold text-heading;
 }
 
 .ui-content {
-  @apply text-neutral-700;
+  @apply text-body-emphasis;
 }
 
 .ui-footer {

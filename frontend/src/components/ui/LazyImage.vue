@@ -1,5 +1,5 @@
 <template>
-  <div :class="containerClass" class="lazy-image-container">
+  <div :class="container px-4 sm:px-6 lg:px-8Class" class="lazy-image-container px-4 sm:px-6 lg:px-8">
     <img
       ref="imageRef"
       :data-src="optimizedSrc"
@@ -15,20 +15,20 @@
     <!-- Loading overlay -->
     <div
       v-if="isLoading"
-      class="absolute inset-0 flex items-center justify-center bg-neutral-100/80 backdrop-blur-sm"
+      class="relative sm:absolute inset-0 flex items-center justify-center bg-neutral-100/80 backdrop-blur-sm"
     >
-      <div class="flex items-center space-x-2">
+      <div class="flex items-center space-y-2 sm:space-y-0 sm:space-x-2">
         <div class="animate-spin rounded-full h-10 w-10 border-b-2 border-primary-600" />
-        <span class="text-responsive-sm text-neutral-600">{{ loadingText }}</span>
+        <span class="text-responsive-sm text-body">{{ loadingText }}</span>
       </div>
     </div>
 
     <!-- Error overlay -->
     <div
       v-if="hasError"
-      class="absolute inset-0 flex items-center justify-center bg-red-50/80 backdrop-blur-sm"
+      class="relative sm:absolute inset-0 flex items-center justify-center bg-red-50/80 backdrop-blur-sm"
     >
-      <div class="text-center text-red-600">
+      <div class="text-left sm:text-center text-error">
         <X class="w-10 h-10 mx-auto mb-2" />
         <span class="text-responsive-sm">{{ errorText }}</span>
       </div>
@@ -45,9 +45,9 @@
     >
       <div
         v-if="showSuccessOverlay"
-        class="absolute inset-0 flex items-center justify-center bg-green-50/80 backdrop-blur-sm"
+        class="relative sm:absolute inset-0 flex items-center justify-center bg-green-50/80 backdrop-blur-sm"
       >
-        <div class="flex items-center space-x-2 text-green-600">
+        <div class="flex items-center space-y-2 sm:space-y-0 sm:space-x-2 text-success">
           <Check class="w-5 h-5" />
           <span class="text-responsive-sm">Chargé</span>
         </div>

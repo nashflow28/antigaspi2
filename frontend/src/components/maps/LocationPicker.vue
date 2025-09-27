@@ -18,7 +18,7 @@
       <div
         ref="mapContainer"
         :class="[
-          'w-full border border-neutral-300 rounded-xl overflow-hidden',
+          'w-full border border-neutral-300 rounded-xl overflow-hidden sm:block',
           heightClass
         ]"
         :style="{ height: mapHeight }"
@@ -29,16 +29,16 @@
       <!-- Loading Overlay -->
       <div
         v-if="mapLoading"
-        class="absolute inset-0 bg-white bg-opacity-80 flex items-center justify-center rounded-xl"
+        class="relative sm:absolute inset-0 bg-white bg-opacity-80 flex items-center justify-center rounded-xl"
       >
-        <div class="text-center">
+        <div class="text-left sm:text-center">
           <div class="animate-spin rounded-full h-10 w-10 border-b-2 border-primary-600 mx-auto mb-2" />
-          <p class="text-responsive-sm text-neutral-600">Chargement de la carte...</p>
+          <p class="text-responsive-sm text-body">Chargement de la carte...</p>
         </div>
       </div>
 
       <!-- Map Controls -->
-      <div class="absolute top-4 right-4 flex flex-col space-y-2">
+      <div class="relative sm:absolute top-4 right-4 flex flex-col space-y-2">
         <!-- User Location Button -->
         <button
           v-if="enableUserLocation"
@@ -47,7 +47,7 @@
           title="Me localiser"
           @click="getCurrentLocation"
         >
-          <MapPin class="w-5 h-5 text-neutral-700" :class="{ 'animate-pulse': geoLoading }" />
+          <MapPin class="w-5 h-5 text-body-emphasis" :class="{ 'animate-pulse': geoLoading }" />
         </button>
 
         <!-- Reset View Button -->
@@ -57,7 +57,7 @@
           title="Réinitialiser la vue"
           @click="resetMapView"
         >
-          <RotateCcw class="w-5 h-5 text-neutral-700" />
+          <RotateCcw class="w-5 h-5 text-body-emphasis" />
         </button>
 
         <!-- Fullscreen Toggle -->
@@ -66,21 +66,21 @@
           :title="isFullscreen ? 'Quitter le plein écran' : 'Plein écran'"
           @click="toggleFullscreen"
         >
-          <Minimize v-if="isFullscreen" class="w-5 h-5 text-neutral-700" />
-          <Maximize v-else class="w-5 h-5 text-neutral-700" />
+          <Minimize v-if="isFullscreen" class="w-5 h-5 text-body-emphasis" />
+          <Maximize v-else class="w-5 h-5 text-body-emphasis" />
         </button>
       </div>
 
       <!-- Map Instructions -->
       <div
         v-if="!selectedLocation && showInstructions"
-        class="absolute bottom-4 left-4 right-4 bg-white bg-opacity-95 backdrop-blur-sm border border-neutral-200 rounded-lg p-3 shadow-sm"
+        class="relative sm:absolute bottom-4 left-4 right-4 bg-white bg-opacity-95 backdrop-blur-sm border border-neutral-200 rounded-lg p-3 shadow-sm"
       >
-        <div class="flex items-start space-x-2">
+        <div class="flex items-stretch sm:items-start space-y-2 sm:space-y-0 sm:space-x-2">
           <Info class="w-5 h-5 text-blue-500 mt-0.5 flex-shrink-0" />
-          <div class="text-responsive-sm text-neutral-700">
+          <div class="text-responsive-sm text-body-emphasis">
             <p class="font-medium mb-1">Sélectionner un emplacement</p>
-            <p class="text-responsive-xs text-neutral-600">
+            <p class="text-responsive-xs text-body">
               Cliquez sur la carte ou utilisez la recherche pour choisir votre adresse
             </p>
           </div>
@@ -88,7 +88,7 @@
             class="ml-auto p-1 hover:transition-colors"
             @click="showInstructions = false"
           >
-            <X class="w-3 h-3 text-neutral-400" />
+            <X class="w-3 h-3 text-placeholder" />
           </button>
         </div>
       </div>
@@ -96,17 +96,17 @@
 
     <!-- Selected Location Info -->
     <div v-if="selectedLocation" class="mt-4 p-4 bg-green-50 border border-green-200 rounded-xl">
-      <div class="flex items-start justify-between">
-        <div class="flex items-start space-x-3">
+      <div class="flex items-stretch sm:items-start justify-start sm:justify-between">
+        <div class="flex items-stretch sm:items-start space-y-3 sm:space-y-0 sm:space-x-3">
           <div class="p-2 bg-green-100 rounded-lg">
-            <MapPin class="w-5 h-5 text-green-600" />
+            <MapPin class="w-5 h-5 text-success" />
           </div>
           <div class="flex-1">
             <h4 class="font-medium text-green-900 mb-1">Emplacement sélectionné</h4>
             <p class="text-responsive-sm text-green-700 mb-2">
               {{ selectedLocation.display_name || selectedLocation.formatted_address }}
             </p>
-            <div class="flex items-center space-x-4 text-responsive-xs text-green-600">
+            <div class="flex items-center space-y-4 sm:space-y-0 sm:space-x-4 text-responsive-xs text-success">
               <span>{{ selectedLocation.lat.toFixed(6) }}, {{ selectedLocation.lng.toFixed(6) }}</span>
               <span v-if="selectedLocation.distance">
                 {{ formatDistance(selectedLocation.distance) }} de votre position
@@ -125,10 +125,10 @@
     </div>
 
     <!-- Action Buttons -->
-    <div v-if="showActions" class="mt-4 flex justify-end space-x-3">
+    <div v-if="showActions" class="mt-4 flex justify-center sm:justify-end space-y-3 sm:space-y-0 sm:space-x-3">
       <button
         v-if="allowClear"
-        class="px-4 py-3 text-neutral-700 bg-neutral-100 hover:transition-colors"
+        class="px-4 py-3 text-body-emphasis bg-neutral-100 hover:transition-colors"
         @click="clearSelection"
       >
         Effacer
@@ -241,7 +241,7 @@ const initializeMap = async () => {
 
     mapLoading.value = false
   } catch (error) {
-    console.error('Failed to initialize map:', error)
+    // console.error('Failed to initialize map:', error)
     mapLoading.value = false
     emit('error', 'Erreur lors du chargement de la carte')
   }
@@ -316,7 +316,7 @@ const addSelectedMarker = async (location: SearchResult) => {
     // Center map on marker
     map.setView([location.lat, location.lng], 15)
   } catch (error) {
-    console.error('Failed to add marker:', error)
+    // console.error('Failed to add marker:', error)
   }
 }
 
@@ -339,7 +339,7 @@ const addUserLocationMarker = async () => {
       icon: userIcon
     }).addTo(map)
   } catch (error) {
-    console.error('Failed to add user location marker:', error)
+    // console.error('Failed to add user location marker:', error)
   }
 }
 

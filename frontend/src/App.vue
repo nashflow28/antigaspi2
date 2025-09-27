@@ -1,7 +1,7 @@
 <template>
   <div
     id="app"
-    class="min-h-screen bg-neutral-50 text-neutral-900 antialiased transition-colors duration-300 dark:bg-neutral-950 dark:text-neutral-50"
+    class="min-h-screen bg-neutral-50 text-heading antialiased transition-colors duration-300 dark:bg-neutral-950 dark:text-neutral-50"
   >
     <Navigation
       :brand="navigationBrand"
@@ -14,13 +14,13 @@
         <div class="flex items-center gap-2">
           <Button
             variant="ghost"
-            class="relative hidden md:inline-flex"
+            class="relative hidden sm:block md:inline-flex"
             @click="handleCartClick"
           >
             <span>Mon panier</span>
             <span
               v-if="cartItemsCount > 0"
-              class="absolute -top-2 -right-2 flex h-5 w-5 items-center justify-center rounded-full bg-primary-500 text-caption font-semibold text-white"
+              class="relative sm:absolute -top-2 -right-2 flex h-5 w-5 items-center justify-center rounded-full bg-primary-500 text-caption font-semibold text-white"
             >
               {{ cartItemsCount > 99 ? '99+' : cartItemsCount }}
             </span>
@@ -61,7 +61,7 @@
         <div class="flex flex-col gap-2">
           <Button
             variant="ghost"
-            class="relative justify-between"
+            class="relative justify-start sm:justify-between"
             @click="handleCartClick"
           >
             <span>Mon panier</span>
@@ -106,9 +106,9 @@
     </Navigation>
 
     <main class="pt-20 sm:pt-24">
-      <router-view v-slot="{ Component }">
+      <router-view v-slot="{ Component: CurrentComponent }">
         <PageTransition>
-          <component :is="Component" />
+          <component :is="CurrentComponent" />
         </PageTransition>
       </router-view>
     </main>
@@ -130,9 +130,8 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted } from 'vue'
+import { computed, onMounted, type Component } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import type { Component } from 'vue'
 import {
   HomeIcon,
   MapIcon,
@@ -259,7 +258,7 @@ const handleNavItemClick = (item: { href: string }) => {
   }
 }
 
-const handleNavigationToggle = (_open: boolean) => {
+const handleNavigationToggle = () => {
   /* emitted for analytics or future integrations */
 }
 
@@ -294,9 +293,9 @@ onMounted(async () => {
       merchantsStore.fetchMerchants()
     ])
 
-    console.log('✅ Stores initialized successfully')
-  } catch (error) {
-    console.error('❌ Error initializing stores:', error)
+    // Stores initialized successfully
+  } catch {
+    // Error initializing stores
   }
 })
 </script>

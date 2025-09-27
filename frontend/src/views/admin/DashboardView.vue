@@ -6,13 +6,13 @@
   >
     <div class="p-6">
       <!-- Header -->
-      <div class="mb-8">
-        <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
+      <div class="mb-6 sm:mb-8">
+        <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 sm:gap-6">
           <div>
-            <h1 class="text-responsive-xl lg:text-display-sm font-semibold text-neutral-900 mb-2">
+            <h1 class="text-responsive-xl lg:text-display-sm font-semibold text-heading mb-2">
               Tableau de bord Administrateur
             </h1>
-            <p class="text-neutral-600 text-responsive-lg">
+            <p class="text-body text-responsive-lg">
               Supervision globale de la plateforme Antigaspi
             </p>
           </div>
@@ -38,7 +38,7 @@
         </div>
 
         <!-- Key Metrics -->
-        <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 mt-8">
+        <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mt-8">
           <Card class="bg-gradient-to-r from-primary-500 to-primary-600 text-white">
             <div class="flex items-center justify-between">
               <div>
@@ -102,11 +102,11 @@
       </div>
 
       <!-- Charts and Analytics -->
-      <div class="grid grid-cols-1 xl:grid-cols-2 gap-6 mb-8">
+      <div class="grid grid-cols-1 xl:grid-cols-2 gap-4 sm:gap-6 mb-6 sm:mb-8">
         <!-- Revenue Chart -->
         <Card>
           <div class="flex items-center justify-between mb-6">
-            <h3 class="text-responsive-xl font-semibold text-neutral-900">Évolution du chiffre d'affaires</h3>
+            <h3 class="text-responsive-xl font-semibold text-heading">Évolution du chiffre d'affaires</h3>
             <select v-model="revenueChartPeriod" class="input text-responsive-sm">
               <option value="7d">7 derniers jours</option>
               <option value="30d">30 derniers jours</option>
@@ -121,12 +121,12 @@
         <!-- User Growth Chart -->
         <Card>
           <div class="flex items-center justify-between mb-6">
-            <h3 class="text-responsive-xl font-semibold text-neutral-900">Croissance des utilisateurs</h3>
+            <h3 class="text-responsive-xl font-semibold text-heading">Croissance des utilisateurs</h3>
             <div class="flex gap-2">
-              <span class="px-4 py-3 bg-primary-100 text-primary-700 rounded-full text-responsive-sm">
+              <span class="px-4 py-3 bg-primary-100 text-primary-emphasis rounded-full text-responsive-sm">
                 Consommateurs
               </span>
-              <span class="px-4 py-3 bg-primary-100 text-primary-700 rounded-full text-responsive-sm">
+              <span class="px-4 py-3 bg-primary-100 text-primary-emphasis rounded-full text-responsive-sm">
                 Commerçants
               </span>
             </div>
@@ -138,13 +138,13 @@
       </div>
 
       <!-- Platform Activity -->
-      <div class="grid grid-cols-1 xl:grid-cols-3 gap-6 mb-8">
+      <div class="grid grid-cols-1 xl:grid-cols-3 gap-4 sm:gap-6 mb-6 sm:mb-8">
         <!-- Recent Activity -->
         <Card class="xl:col-span-2">
           <div class="flex items-center justify-between mb-6">
-            <h3 class="text-responsive-xl font-semibold text-neutral-900">Activité récente</h3>
+            <h3 class="text-responsive-xl font-semibold text-heading">Activité récente</h3>
             <button
-              class="text-primary-600 text-responsive-sm hover:transition-colors"
+              class="text-primary text-responsive-sm hover:transition-colors"
               @click="viewAllActivities"
             >
               Voir tout
@@ -167,9 +167,9 @@
               </div>
 
               <div class="flex-grow min-w-0">
-                <p class="text-neutral-900 font-medium">{{ activity.title }}</p>
-                <p class="text-neutral-600 text-responsive-sm">{{ activity.description }}</p>
-                <p class="text-neutral-400 text-responsive-xs mt-1">{{ formatTimeAgo(activity.timestamp) }}</p>
+                <p class="text-heading font-medium">{{ activity.title }}</p>
+                <p class="text-body text-responsive-sm">{{ activity.description }}</p>
+                <p class="text-placeholder text-responsive-xs mt-1">{{ formatTimeAgo(activity.timestamp) }}</p>
               </div>
 
               <div class="flex-shrink-0">
@@ -186,7 +186,7 @@
 
         <!-- System Health -->
         <Card>
-          <h3 class="text-responsive-xl font-semibold text-neutral-900 mb-6">État du système</h3>
+          <h3 class="text-responsive-xl font-semibold text-heading mb-6">État du système</h3>
 
           <div class="space-y-4">
             <div
@@ -201,26 +201,26 @@
                 >
                   <component
                     :is="service.status === 'healthy' ? CheckCircleIcon : ExclamationTriangleIcon"
-                    :class="service.status === 'healthy' ? 'text-primary-600' : 'text-accent-red'"
+                    :class="service.status === 'healthy' ? 'text-primary' : 'text-accent-red'"
                     class="w-5 h-5"
                   />
                 </div>
                 <div>
                   <p class="font-medium text-responsive-sm">{{ service.name }}</p>
-                  <p class="text-responsive-xs text-neutral-500">{{ service.description }}</p>
+                  <p class="text-responsive-xs text-muted">{{ service.description }}</p>
                 </div>
               </div>
 
               <div class="text-right">
                 <p class="text-responsive-sm font-medium">{{ service.uptime }}</p>
-                <p class="text-responsive-xs text-neutral-500">{{ service.responseTime }}</p>
+                <p class="text-responsive-xs text-muted">{{ service.responseTime }}</p>
               </div>
             </div>
           </div>
 
           <!-- Quick Actions -->
           <div class="mt-6 pt-6 border-t border-neutral-200">
-            <h4 class="font-semibold text-neutral-900 mb-3">Actions rapides</h4>
+            <h4 class="font-semibold text-heading mb-3">Actions rapides</h4>
             <div class="grid grid-cols-2 gap-2">
               <Button
                 variant="outline"
@@ -264,27 +264,27 @@
       </div>
 
       <!-- Performance Metrics -->
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 mb-6 sm:mb-8">
         <!-- Environmental Impact -->
         <Card>
           <div class="flex items-center gap-3 mb-4">
             <div class="p-2 bg-green-100 rounded-lg">
-              <GlobeEuropeAfricaIcon class="w-10 h-10 text-green-600" />
+              <GlobeEuropeAfricaIcon class="w-10 h-10 text-success" />
             </div>
-            <h3 class="text-responsive-lg font-semibold text-neutral-900">Impact Environnemental</h3>
+            <h3 class="text-responsive-lg font-semibold text-heading">Impact Environnemental</h3>
           </div>
 
           <div class="space-y-4">
             <div class="flex items-center justify-between">
-              <span class="text-neutral-600">CO₂ économisé</span>
-              <span class="font-semibold text-green-600">{{ formatNumber(environmentalImpact.co2Saved) }} kg</span>
+              <span class="text-body">CO₂ économisé</span>
+              <span class="font-semibold text-success">{{ formatNumber(environmentalImpact.co2Saved) }} kg</span>
             </div>
             <div class="flex items-center justify-between">
-              <span class="text-neutral-600">Eau économisée</span>
-              <span class="font-semibold text-blue-600">{{ formatNumber(environmentalImpact.waterSaved) }} L</span>
+              <span class="text-body">Eau économisée</span>
+              <span class="font-semibold text-info">{{ formatNumber(environmentalImpact.waterSaved) }} L</span>
             </div>
             <div class="flex items-center justify-between">
-              <span class="text-neutral-600">Déchets évités</span>
+              <span class="text-body">Déchets évités</span>
               <span class="font-semibold text-orange-600">{{ formatNumber(environmentalImpact.wasteSaved) }} kg</span>
             </div>
           </div>
@@ -298,7 +298,7 @@
 
         <!-- Top Merchants -->
         <Card>
-          <h3 class="text-responsive-lg font-semibold text-neutral-900 mb-4">Top Commerçants</h3>
+          <h3 class="text-responsive-lg font-semibold text-heading mb-4">Top Commerçants</h3>
 
           <div class="space-y-3">
             <div
@@ -307,13 +307,13 @@
               class="flex items-center gap-3 p-3 bg-neutral-50 rounded-lg"
             >
               <div class="flex-shrink-0">
-                <div class="w-10 h-10 bg-primary-100 text-primary-600 rounded-full flex items-center justify-center font-semibold text-responsive-sm">
+                <div class="w-10 h-10 bg-primary-100 text-primary rounded-full flex items-center justify-center font-semibold text-responsive-sm">
                   {{ index + 1 }}
                 </div>
               </div>
               <div class="flex-grow min-w-0">
                 <p class="font-medium text-responsive-sm truncate">{{ merchant.name }}</p>
-                <p class="text-responsive-xs text-neutral-500">{{ merchant.productsSold }} produits vendus</p>
+                <p class="text-responsive-xs text-muted">{{ merchant.productsSold }} produits vendus</p>
               </div>
               <div class="text-right">
                 <p class="font-medium text-responsive-sm">{{ formatCurrency(merchant.revenue) }}</p>
@@ -324,7 +324,7 @@
 
         <!-- Popular Categories -->
         <Card>
-          <h3 class="text-responsive-lg font-semibold text-neutral-900 mb-4">Catégories Populaires</h3>
+          <h3 class="text-responsive-lg font-semibold text-heading mb-4">Catégories Populaires</h3>
 
           <div class="space-y-3">
             <div
@@ -336,7 +336,7 @@
                 <span class="text-responsive-xl">{{ category.icon }}</span>
                 <div>
                   <p class="font-medium text-responsive-sm">{{ category.name }}</p>
-                  <p class="text-responsive-xs text-neutral-500">{{ category.productCount }} produits</p>
+                  <p class="text-responsive-xs text-muted">{{ category.productCount }} produits</p>
                 </div>
               </div>
               <div class="text-right">
@@ -346,7 +346,7 @@
                     :style="{ width: `${category.percentage}%` }"
                   />
                 </div>
-                <p class="text-responsive-xs text-neutral-500 mt-1">{{ category.percentage }}%</p>
+                <p class="text-responsive-xs text-muted mt-1">{{ category.percentage }}%</p>
               </div>
             </div>
           </div>
@@ -354,15 +354,15 @@
       </div>
 
       <!-- Alerts and Notifications -->
-      <Card v-if="alerts.length > 0" class="mb-8">
-        <h3 class="text-responsive-lg font-semibold text-neutral-900 mb-4">Alertes et notifications</h3>
+      <Card v-if="alerts.length > 0" class="mb-6 sm:mb-8">
+        <h3 class="text-responsive-lg font-semibold text-heading mb-4">Alertes et notifications</h3>
 
         <div class="space-y-3">
           <div
             v-for="alert in alerts"
             :key="alert.id"
             :class="getAlertClass(alert.type)"
-            class="flex items-start gap-3 p-4 rounded-lg border"
+            class="flex items-stretch sm:items-start gap-3 p-4 rounded-lg border"
           >
             <component
               :is="getAlertIcon(alert.type)"
@@ -546,12 +546,12 @@ const formatTimeAgo = (timestamp: string): string => {
 
 const getActivityIconClass = (type: string): string => {
   const classes: Record<string, string> = {
-    user_registered: 'bg-blue-100 text-blue-600',
-    merchant_joined: 'bg-green-100 text-green-600',
+    user_registered: 'bg-blue-100 text-info',
+    merchant_joined: 'bg-green-100 text-success',
     product_sold: 'bg-orange-100 text-orange-600',
-    alert: 'bg-red-100 text-red-600'
+    alert: 'bg-red-100 text-error'
   }
-  return classes[type] || 'bg-neutral-100 text-neutral-600'
+  return classes[type] || 'bg-neutral-100 text-body'
 }
 
 const getActivityIcon = (type: string) => {
@@ -571,7 +571,7 @@ const getActivityStatusClass = (status: string): string => {
     warning: 'bg-yellow-100 text-yellow-700',
     error: 'bg-red-100 text-red-700'
   }
-  return classes[status] || 'bg-neutral-100 text-neutral-700'
+  return classes[status] || 'bg-neutral-100 text-body-emphasis'
 }
 
 const getAlertClass = (type: string): string => {
@@ -581,7 +581,7 @@ const getAlertClass = (type: string): string => {
     info: 'bg-blue-50 border-blue-200 text-blue-800',
     success: 'bg-primary-50 border-primary-200 text-primary-800'
   }
-  return classes[type] || 'bg-neutral-50 border-neutral-200 text-neutral-800'
+  return classes[type] || 'bg-neutral-50 border-neutral-200 text-heading-secondary'
 }
 
 const getAlertIcon = (type: string) => {
@@ -598,10 +598,10 @@ const getAlertIconClass = (type: string): string => {
   const classes: Record<string, string> = {
     warning: 'text-accent-orange',
     error: 'text-accent-red',
-    info: 'text-blue-600',
-    success: 'text-primary-600'
+    info: 'text-info',
+    success: 'text-primary'
   }
-  return classes[type] || 'text-neutral-600'
+  return classes[type] || 'text-body'
 }
 
 const loadDashboardData = async () => {
@@ -631,7 +631,7 @@ const loadDashboardData = async () => {
       environmentalImpact.value = data.data.environmentalImpact
     }
   } catch (error) {
-    console.error('Error loading dashboard data:', error)
+    // console.error('Error loading dashboard data:', error)
     // Fallback to demo data
     loadDemoData()
   }
@@ -752,7 +752,7 @@ const loadSystemHealth = async () => {
       systemHealth.value = data.data
     }
   } catch (error) {
-    console.error('Error loading system health:', error)
+    // console.error('Error loading system health:', error)
     // Fallback to mock data for system health
     systemHealth.value = [
       {
@@ -784,9 +784,9 @@ const refreshData = async () => {
   isLoading.value = true
   try {
     await Promise.all([loadDashboardData(), loadSystemHealth()])
-    console.log('Data refreshed')
+    // console.log('Data refreshed')
   } catch (error) {
-    console.error('Error refreshing data:', error)
+    // console.error('Error refreshing data:', error)
   } finally {
     isLoading.value = false
   }
@@ -891,15 +891,15 @@ const systemSettings = () => {
 // Chart creation functions
 const createRevenueChart = () => {
   try {
-    console.log('📈 createRevenueChart: Début de création')
-    console.log('📈 revenueChartCanvas.value:', revenueChartCanvas.value)
+    // console.log('📈 createRevenueChart: Début de création')
+    // console.log('📈 revenueChartCanvas.value:', revenueChartCanvas.value)
 
     if (!revenueChartCanvas.value) {
-      console.error('❌ Canvas element not ready for revenue chart')
+      // console.error('❌ Canvas element not ready for revenue chart')
       return
     }
 
-    console.log('📈 Canvas dimensions:', {
+    // console.log('📈 Canvas dimensions:', {
       width: revenueChartCanvas.value.offsetWidth,
       height: revenueChartCanvas.value.offsetHeight,
       clientWidth: revenueChartCanvas.value.clientWidth,
@@ -908,15 +908,15 @@ const createRevenueChart = () => {
 
     const ctx = revenueChartCanvas.value.getContext('2d')
     if (!ctx) {
-      console.error('❌ Canvas context not available for revenue chart')
+      // console.error('❌ Canvas context not available for revenue chart')
       return
     }
 
-    console.log('📈 Canvas context obtenu:', ctx)
+    // console.log('📈 Canvas context obtenu:', ctx)
 
     // Destroy existing chart if it exists
     if (revenueChart) {
-      console.log('📈 Destruction du graphique existant')
+      // console.log('📈 Destruction du graphique existant')
       revenueChart.destroy()
     }
 
@@ -940,9 +940,9 @@ const createRevenueChart = () => {
     }
 
     const { labels, data } = generateRevenueData()
-    console.log('📈 Données du graphique:', { labels, data })
+    // console.log('📈 Données du graphique:', { labels, data })
 
-    console.log('📈 Tentative de création du graphique Chart.js...')
+    // console.log('📈 Tentative de création du graphique Chart.js...')
 
     revenueChart = new ChartJS(ctx, {
       type: 'line',
@@ -1002,33 +1002,33 @@ const createRevenueChart = () => {
       }
     })
 
-    console.log('📈 Instance Chart.js créée:', revenueChart)
-    console.log('Revenue chart created successfully')
+    // console.log('📈 Instance Chart.js créée:', revenueChart)
+    // console.log('Revenue chart created successfully')
 
     // Force resize to ensure visibility
     setTimeout(() => {
       if (revenueChart) {
         revenueChart.resize()
-        console.log('📈 Revenue chart resized')
+        // console.log('📈 Revenue chart resized')
       }
     }, 50)
 
   } catch (error) {
-    console.error('Error creating revenue chart:', error)
+    // console.error('Error creating revenue chart:', error)
   }
 }
 
 const createUserGrowthChart = () => {
   try {
-    console.log('🍩 createUserGrowthChart: Début de création')
-    console.log('🍩 userGrowthChartCanvas.value:', userGrowthChartCanvas.value)
+    // console.log('🍩 createUserGrowthChart: Début de création')
+    // console.log('🍩 userGrowthChartCanvas.value:', userGrowthChartCanvas.value)
 
     if (!userGrowthChartCanvas.value) {
-      console.error('❌ Canvas element not ready for user growth chart')
+      // console.error('❌ Canvas element not ready for user growth chart')
       return
     }
 
-    console.log('🍩 Canvas dimensions:', {
+    // console.log('🍩 Canvas dimensions:', {
       width: userGrowthChartCanvas.value.offsetWidth,
       height: userGrowthChartCanvas.value.offsetHeight,
       clientWidth: userGrowthChartCanvas.value.clientWidth,
@@ -1037,15 +1037,15 @@ const createUserGrowthChart = () => {
 
     const ctx = userGrowthChartCanvas.value.getContext('2d')
     if (!ctx) {
-      console.error('❌ Canvas context not available for user growth chart')
+      // console.error('❌ Canvas context not available for user growth chart')
       return
     }
 
-    console.log('🍩 Canvas context obtenu:', ctx)
+    // console.log('🍩 Canvas context obtenu:', ctx)
 
     // Destroy existing chart if it exists
     if (userGrowthChart) {
-      console.log('🍩 Destruction du graphique existant')
+      // console.log('🍩 Destruction du graphique existant')
       userGrowthChart.destroy()
     }
 
@@ -1062,9 +1062,9 @@ const createUserGrowthChart = () => {
       }]
     }
 
-    console.log('🍩 Données du graphique doughnut:', chartData)
+    // console.log('🍩 Données du graphique doughnut:', chartData)
 
-    console.log('🍩 Tentative de création du graphique doughnut Chart.js...')
+    // console.log('🍩 Tentative de création du graphique doughnut Chart.js...')
 
     userGrowthChart = new ChartJS(ctx, {
       type: 'doughnut',
@@ -1099,19 +1099,19 @@ const createUserGrowthChart = () => {
       }
     })
 
-    console.log('🍩 Instance Chart.js doughnut créée:', userGrowthChart)
-    console.log('User growth chart created successfully')
+    // console.log('🍩 Instance Chart.js doughnut créée:', userGrowthChart)
+    // console.log('User growth chart created successfully')
 
     // Force resize to ensure visibility
     setTimeout(() => {
       if (userGrowthChart) {
         userGrowthChart.resize()
-        console.log('🍩 User growth chart resized')
+        // console.log('🍩 User growth chart resized')
       }
     }, 50)
 
   } catch (error) {
-    console.error('Error creating user growth chart:', error)
+    // console.error('Error creating user growth chart:', error)
   }
 }
 
@@ -1122,27 +1122,27 @@ watch(revenueChartPeriod, () => {
 
 onMounted(async () => {
   try {
-    console.log('🚀 Dashboard: Initialisation...')
+    // console.log('🚀 Dashboard: Initialisation...')
 
     // Load data first
     await refreshData()
-    console.log('📊 Dashboard: Données chargées')
+    // console.log('📊 Dashboard: Données chargées')
 
     // Wait for DOM to be ready
     await nextTick()
-    console.log('🎨 Dashboard: DOM prêt')
+    // console.log('🎨 Dashboard: DOM prêt')
 
     // Create charts with delay to ensure canvas elements are fully rendered
     setTimeout(() => {
-      console.log('📈 Dashboard: Création des graphiques...')
+      // console.log('📈 Dashboard: Création des graphiques...')
       createRevenueChart()
       createUserGrowthChart()
-      console.log('✅ Dashboard: Graphiques créés')
+      // console.log('✅ Dashboard: Graphiques créés')
     }, 100)
 
-    console.log('✅ Admin dashboard loaded with charts')
+    // console.log('✅ Admin dashboard loaded with charts')
   } catch (error) {
-    console.error('❌ Error during dashboard initialization:', error)
+    // console.error('❌ Error during dashboard initialization:', error)
   }
 })
 </script>

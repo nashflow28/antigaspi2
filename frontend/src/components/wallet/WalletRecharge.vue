@@ -1,8 +1,8 @@
 <template>
   <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-    <Card class="w-full max-w-md">
-      <div class="flex items-center justify-between mb-6">
-        <h3 class="text-responsive-xl font-semibold text-neutral-900">Recharger le portefeuille</h3>
+    <Card class="w-full max-w-full sm:max-w-md">
+      <div class="flex items-center justify-start sm:justify-between mb-6">
+        <h3 class="text-responsive-xl font-semibold text-heading">Recharger le portefeuille</h3>
         <Button
           variant="ghost"
           size="sm"
@@ -43,10 +43,10 @@
                 :error="errors.amount"
                 required
               />
-              <span class="absolute right-3 top-3 text-neutral-500 text-responsive-sm">XOF</span>
+              <span class="relative sm:absolute right-3 top-3 text-muted text-responsive-sm">XOF</span>
             </div>
-            <p v-if="errors.amount" class="mt-1 text-responsive-sm text-red-600">{{ errors.amount }}</p>
-            <p class="mt-1 text-responsive-xs text-neutral-500">Montant minimum: 100 XOF, maximum: 1 000 000 XOF</p>
+            <p v-if="errors.amount" class="mt-1 text-responsive-sm text-error">{{ errors.amount }}</p>
+            <p class="mt-1 text-responsive-xs text-muted">Montant minimum: 100 XOF, maximum: 1 000 000 XOF</p>
           </div>
 
           <div>
@@ -66,13 +66,13 @@
                   type="radio"
                   class="sr-only"
                 >
-                <div class="flex items-center space-x-3 flex-1">
+                <div class="flex items-center space-y-3 sm:space-y-0 sm:space-x-3 flex-1">
                   <div class="w-10 h-10 bg-neutral-100 rounded-lg flex items-center justify-center">
-                    <component :is="method.icon" class="w-10 h-10 text-neutral-600" />
+                    <component :is="method.icon" class="w-10 h-10 text-body" />
                   </div>
                   <div>
-                    <div class="font-medium text-neutral-900">{{ method.name }}</div>
-                    <div class="text-responsive-sm text-neutral-500">{{ method.description }}</div>
+                    <div class="font-medium text-heading">{{ method.name }}</div>
+                    <div class="text-responsive-sm text-muted">{{ method.description }}</div>
                   </div>
                 </div>
                 <div
@@ -83,7 +83,7 @@
                 </div>
               </label>
             </div>
-            <p v-if="errors.payment_method" class="mt-1 text-responsive-sm text-red-600">{{ errors.payment_method }}</p>
+            <p v-if="errors.payment_method" class="mt-1 text-responsive-sm text-error">{{ errors.payment_method }}</p>
           </div>
 
           <div v-if="requiresPhone" class="space-y-2">
@@ -97,11 +97,11 @@
               placeholder="+228 XX XX XX XX"
               :error="errors.phone"
             />
-            <p v-if="errors.phone" class="text-responsive-sm text-red-600">{{ errors.phone }}</p>
+            <p v-if="errors.phone" class="text-responsive-sm text-error">{{ errors.phone }}</p>
           </div>
 
           <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
-            <div class="flex items-start space-x-2">
+            <div class="flex items-stretch sm:items-start space-y-2 sm:space-y-0 sm:space-x-2">
               <svg class="w-5 h-5 text-blue-500 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
                 <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
               </svg>
@@ -113,7 +113,7 @@
           </div>
         </div>
 
-        <div class="flex space-x-3 mt-6">
+        <div class="flex space-y-3 sm:space-y-0 sm:space-x-3 mt-6">
           <Button
             type="button"
             variant="outline"

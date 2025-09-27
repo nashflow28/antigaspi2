@@ -1,12 +1,12 @@
 <template>
-  <div class="flex flex-col items-center justify-center p-8 text-center">
+  <div class="flex flex-col items-center justify-center p-4 sm:p-6 lg:p-8 text-left sm:text-center">
     <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mb-4">
-      <ExclamationTriangleIcon class="w-10 h-10 text-red-600" />
+      <ExclamationTriangleIcon class="w-10 h-10 text-error" />
     </div>
-    <h3 class="text-responsive-lg font-semibold text-neutral-900 mb-2">
+    <h3 class="text-responsive-lg font-semibold text-heading mb-2">
       Erreur de chargement
     </h3>
-    <p class="text-neutral-600 mb-4">
+    <p class="text-body mb-4">
       Une erreur s'est produite lors du chargement de ce composant.
     </p>
     <button

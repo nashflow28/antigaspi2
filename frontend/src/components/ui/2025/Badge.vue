@@ -101,7 +101,7 @@ const sizeClasses = computed(() => {
 const variantClasses = computed(() => {
   const variants = {
     default: [
-      'bg-neutral-100 text-neutral-800',
+      'bg-neutral-100 text-heading-secondary',
       'hover:bg-neutral-200'
     ].join(' '),
 
@@ -112,7 +112,7 @@ const variantClasses = computed(() => {
     ].join(' '),
 
     secondary: [
-      'bg-neutral-100 text-neutral-600',
+      'bg-neutral-100 text-body',
       'hover:bg-neutral-200'
     ].join(' '),
 
@@ -141,9 +141,9 @@ const variantClasses = computed(() => {
     ].join(' '),
 
     outline: [
-      'bg-transparent text-neutral-600',
+      'bg-transparent text-body',
       'border border-neutral-300',
-      'hover:bg-neutral-50 hover:text-neutral-900'
+      'hover:bg-neutral-50 hover:text-heading'
     ].join(' ')
   }
 

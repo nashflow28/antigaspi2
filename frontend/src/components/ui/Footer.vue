@@ -1,6 +1,6 @@
 <template>
   <footer class="mt-24 bg-primary-700 text-neutral-50">
-    <div class="mx-auto flex max-w-7xl flex-col items-center justify-between gap-6 px-4 py-10 text-center sm:flex-row sm:text-left sm:px-6 lg:px-8">
+    <div class="mx-auto flex max-w-full sm:max-w-7xl flex-col items-center justify-start sm:justify-between gap-4 sm:gap-6 px-4 py-10 text-left sm:text-center sm:flex-row sm:text-left sm:px-6 lg:px-8">
       <Motion
         tag="div"
         :initial="{ opacity: 0, y: 12 }"

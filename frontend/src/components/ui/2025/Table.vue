@@ -2,8 +2,8 @@
   <div class="table-wrapper-2025 bg-white rounded-lg shadow-sm border border-neutral-200">
     <!-- Table Header -->
     <div v-if="title" class="px-6 py-4 border-b border-neutral-200">
-      <h3 class="text-responsive-lg font-semibold text-neutral-900">{{ title }}</h3>
-      <p v-if="description" class="text-responsive-sm text-neutral-600">{{ description }}</p>
+      <h3 class="text-responsive-lg font-semibold text-heading">{{ title }}</h3>
+      <p v-if="description" class="text-responsive-sm text-body">{{ description }}</p>
     </div>
 
     <!-- Table Container -->
@@ -15,7 +15,7 @@
             <th
               v-for="(column, index) in columns"
               :key="column.key || index"
-              class="px-6 py-3 text-left text-responsive-xs font-medium text-neutral-500 uppercase tracking-wider"
+              class="px-6 py-3 text-left text-responsive-xs font-medium text-muted uppercase tracking-wider"
             >
               {{ column.title }}
             </th>
@@ -48,8 +48,8 @@
 
           <!-- Empty State -->
           <tr v-if="data.length === 0">
-            <td :colspan="columns.length" class="text-center py-12">
-              <div class="text-neutral-500">
+            <td :colspan="columns.length" class="text-left sm:text-center py-8 sm:py-10 lg:py-12">
+              <div class="text-muted">
                 <p class="text-responsive-base font-medium">{{ emptyText }}</p>
                 <p class="text-responsive-sm">{{ emptyDescription }}</p>
               </div>

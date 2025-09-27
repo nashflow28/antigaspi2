@@ -84,10 +84,10 @@
       <!-- Tab Content -->
       <div class="tab-content">
         <!-- Current Session Steps -->
-        <div v-if="activeTab === 'current'" class="steps-container">
+        <div v-if="activeTab === 'current'" class="steps-container px-4 sm:px-6 lg:px-8">
           <div v-if="!currentSession || currentSession.steps.length === 0" class="empty-state">
-            <Brain class="w-10 h-10 text-neutral-400" />
-            <p class="text-responsive-sm text-neutral-600">No active thinking session</p>
+            <Brain class="w-10 h-10 text-placeholder" />
+            <p class="text-responsive-sm text-body">No active thinking session</p>
             <button class="button-start-empty" @click="startNewSession">
               Start Thinking Session
             </button>
@@ -148,10 +148,10 @@
         </div>
 
         <!-- Sessions History -->
-        <div v-if="activeTab === 'history'" class="history-container">
+        <div v-if="activeTab === 'history'" class="history-container px-4 sm:px-6 lg:px-8">
           <div v-if="sessions.length === 0" class="empty-state">
-            <History class="w-10 h-10 text-neutral-400" />
-            <p class="text-responsive-sm text-neutral-600">No completed sessions</p>
+            <History class="w-10 h-10 text-placeholder" />
+            <p class="text-responsive-sm text-body">No completed sessions</p>
           </div>
           <div v-else class="sessions-list">
             <div
@@ -179,7 +179,7 @@
         </div>
 
         <!-- Analytics -->
-        <div v-if="activeTab === 'analytics'" class="analytics-container">
+        <div v-if="activeTab === 'analytics'" class="analytics-container px-4 sm:px-6 lg:px-8">
           <div class="analytics-grid">
             <div class="analytics-component">
               <h4>Session Success Rate</h4>
@@ -211,7 +211,7 @@
           </div>
 
           <!-- Step Type Distribution -->
-          <div class="chart-container">
+          <div class="chart-container px-4 sm:px-6 lg:px-8">
             <h4>Step Type Distribution</h4>
             <div class="step-types">
               <div

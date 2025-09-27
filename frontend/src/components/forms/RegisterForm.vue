@@ -2,7 +2,7 @@
   <form class="space-y-6" @submit.prevent="handleSubmit">
     <!-- Role Selection -->
     <div>
-      <label class="block text-responsive-sm font-medium text-neutral-700 mb-3">
+      <label class="block text-responsive-sm font-medium text-body-emphasis mb-3">
         Je souhaite m'inscrire en tant que :
       </label>
       <div class="grid grid-cols-2 gap-4">
@@ -10,7 +10,7 @@
           class="relative flex cursor-pointer rounded-lg border p-4 focus:outline-none"
           :class="form.role === 'consumer'
             ? 'border-primary-600 bg-primary-50 text-primary-900'
-            : 'border-neutral-300 bg-white text-neutral-900 hover:bg-neutral-50'"
+            : 'border-neutral-300 bg-white text-heading hover:bg-neutral-50'"
         >
           <input
             v-model="form.role"
@@ -23,7 +23,7 @@
               <span class="text-responsive-xl mr-2">🛒</span>
               <span class="block text-responsive-sm font-medium">Consommateur</span>
             </div>
-            <span class="mt-1 block text-responsive-xs text-neutral-500">
+            <span class="mt-1 block text-responsive-xs text-muted">
               Découvrir et réserver des produits
             </span>
           </div>
@@ -33,7 +33,7 @@
           class="relative flex cursor-pointer rounded-lg border p-4 focus:outline-none"
           :class="form.role === 'merchant'
             ? 'border-primary-600 bg-primary-50 text-primary-900'
-            : 'border-neutral-300 bg-white text-neutral-900 hover:bg-neutral-50'"
+            : 'border-neutral-300 bg-white text-heading hover:bg-neutral-50'"
         >
           <input
             v-model="form.role"
@@ -46,19 +46,19 @@
               <span class="text-responsive-xl mr-2">🏪</span>
               <span class="block text-responsive-sm font-medium">Commerçant</span>
             </div>
-            <span class="mt-1 block text-responsive-xs text-neutral-500">
+            <span class="mt-1 block text-responsive-xs text-muted">
               Vendre mes invendus
             </span>
           </div>
         </label>
       </div>
-      <p v-if="errors.role" class="mt-1 text-responsive-sm text-red-600">{{ errors.role }}</p>
+      <p v-if="errors.role" class="mt-1 text-responsive-sm text-error">{{ errors.role }}</p>
     </div>
 
     <!-- Personal Information -->
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
       <div>
-        <label for="first_name" class="block text-responsive-sm font-medium text-neutral-700 mb-2">
+        <label for="first_name" class="block text-responsive-sm font-medium text-body-emphasis mb-2">
           Prénom
         </label>
         <input
@@ -71,11 +71,11 @@
           :class="{ 'border-red-500': errors.first_name }"
           placeholder="Votre prénom"
         >
-        <p v-if="errors.first_name" class="mt-1 text-responsive-sm text-red-600">{{ errors.first_name }}</p>
+        <p v-if="errors.first_name" class="mt-1 text-responsive-sm text-error">{{ errors.first_name }}</p>
       </div>
 
       <div>
-        <label for="last_name" class="block text-responsive-sm font-medium text-neutral-700 mb-2">
+        <label for="last_name" class="block text-responsive-sm font-medium text-body-emphasis mb-2">
           Nom
         </label>
         <input
@@ -88,13 +88,13 @@
           :class="{ 'border-red-500': errors.last_name }"
           placeholder="Votre nom"
         >
-        <p v-if="errors.last_name" class="mt-1 text-responsive-sm text-red-600">{{ errors.last_name }}</p>
+        <p v-if="errors.last_name" class="mt-1 text-responsive-sm text-error">{{ errors.last_name }}</p>
       </div>
     </div>
 
     <!-- Contact Information -->
     <div>
-      <label for="email" class="block text-responsive-sm font-medium text-neutral-700 mb-2">
+      <label for="email" class="block text-responsive-sm font-medium text-body-emphasis mb-2">
         Adresse e-mail
       </label>
       <input
@@ -107,12 +107,12 @@
         :class="{ 'border-red-500': errors.email }"
         placeholder="votre@email.com"
       >
-      <p v-if="errors.email" class="mt-1 text-responsive-sm text-red-600">{{ errors.email }}</p>
+      <p v-if="errors.email" class="mt-1 text-responsive-sm text-error">{{ errors.email }}</p>
     </div>
 
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
       <div>
-        <label for="phone" class="block text-responsive-sm font-medium text-neutral-700 mb-2">
+        <label for="phone" class="block text-responsive-sm font-medium text-body-emphasis mb-2">
           Téléphone
         </label>
         <input
@@ -124,11 +124,11 @@
           :class="{ 'border-red-500': errors.phone }"
           placeholder="+225 XX XX XX XX XX"
         >
-        <p v-if="errors.phone" class="mt-1 text-responsive-sm text-red-600">{{ errors.phone }}</p>
+        <p v-if="errors.phone" class="mt-1 text-responsive-sm text-error">{{ errors.phone }}</p>
       </div>
 
       <div>
-        <label for="city" class="block text-responsive-sm font-medium text-neutral-700 mb-2">
+        <label for="city" class="block text-responsive-sm font-medium text-body-emphasis mb-2">
           Ville
         </label>
         <input
@@ -140,17 +140,17 @@
           :class="{ 'border-red-500': errors.city }"
           placeholder="Abidjan, Bouaké, Yamoussoukro..."
         >
-        <p v-if="errors.city" class="mt-1 text-responsive-sm text-red-600">{{ errors.city }}</p>
+        <p v-if="errors.city" class="mt-1 text-responsive-sm text-error">{{ errors.city }}</p>
       </div>
     </div>
 
     <!-- Business Information (for merchants) -->
     <template v-if="form.role === 'merchant'">
       <div class="border-t border-neutral-200 pt-6">
-        <h3 class="text-responsive-lg font-medium text-neutral-900 mb-4">Informations commerciales</h3>
+        <h3 class="text-responsive-lg font-medium text-heading mb-4">Informations commerciales</h3>
 
         <div>
-          <label for="business_name" class="block text-responsive-sm font-medium text-neutral-700 mb-2">
+          <label for="business_name" class="block text-responsive-sm font-medium text-body-emphasis mb-2">
             Nom de l'entreprise
           </label>
           <input
@@ -162,11 +162,11 @@
             :class="{ 'border-red-500': errors.business_name }"
             placeholder="Nom de votre commerce"
           >
-          <p v-if="errors.business_name" class="mt-1 text-responsive-sm text-red-600">{{ errors.business_name }}</p>
+          <p v-if="errors.business_name" class="mt-1 text-responsive-sm text-error">{{ errors.business_name }}</p>
         </div>
 
         <div class="mt-4">
-          <label for="business_type" class="block text-responsive-sm font-medium text-neutral-700 mb-2">
+          <label for="business_type" class="block text-responsive-sm font-medium text-body-emphasis mb-2">
             Type de commerce
           </label>
           <select
@@ -188,14 +188,14 @@
             <option value="Traiteur">Traiteur</option>
             <option value="Autre">Autre</option>
           </select>
-          <p v-if="errors.business_type" class="mt-1 text-responsive-sm text-red-600">{{ errors.business_type }}</p>
+          <p v-if="errors.business_type" class="mt-1 text-responsive-sm text-error">{{ errors.business_type }}</p>
         </div>
       </div>
     </template>
 
     <!-- Password -->
     <div>
-      <label for="password" class="block text-responsive-sm font-medium text-neutral-700 mb-2">
+      <label for="password" class="block text-responsive-sm font-medium text-body-emphasis mb-2">
         Mot de passe
       </label>
       <div class="relative">
@@ -211,7 +211,7 @@
         >
         <button
           type="button"
-          class="absolute inset-y-0 right-0 pr-3 flex items-center text-neutral-400 hover:text-neutral-600"
+          class="relative sm:absolute inset-y-0 right-0 pr-3 flex items-center text-placeholder hover:text-body"
           @click="togglePasswordVisibility"
         >
           <svg
@@ -250,11 +250,11 @@
           </svg>
         </button>
       </div>
-      <p v-if="errors.password" class="mt-1 text-responsive-sm text-red-600">{{ errors.password }}</p>
+      <p v-if="errors.password" class="mt-1 text-responsive-sm text-error">{{ errors.password }}</p>
     </div>
 
     <div>
-      <label for="password_confirmation" class="block text-responsive-sm font-medium text-neutral-700 mb-2">
+      <label for="password_confirmation" class="block text-responsive-sm font-medium text-body-emphasis mb-2">
         Confirmer le mot de passe
       </label>
       <input
@@ -267,26 +267,26 @@
         :class="{ 'border-red-500': errors.password_confirmation }"
         placeholder="Retapez votre mot de passe"
       >
-      <p v-if="errors.password_confirmation" class="mt-1 text-responsive-sm text-red-600">{{ errors.password_confirmation }}</p>
+      <p v-if="errors.password_confirmation" class="mt-1 text-responsive-sm text-error">{{ errors.password_confirmation }}</p>
     </div>
 
     <!-- Terms and Conditions -->
-    <div class="flex items-start">
+    <div class="flex items-stretch sm:items-start">
       <input
         id="terms"
         v-model="form.acceptTerms"
         type="checkbox"
         required
-        class="h-5 w-5 text-primary-600 focus:ring-primary-500 border-neutral-300 rounded mt-1"
+        class="h-5 w-5 text-primary focus:ring-primary-500 border-neutral-300 rounded mt-1"
       >
-      <label for="terms" class="ml-2 block text-responsive-sm text-neutral-900">
+      <label for="terms" class="ml-2 block text-responsive-sm text-heading">
         J'accepte les
-        <a href="#" class="text-primary-600 hover:text-primary-500">conditions d'utilisation</a>
+        <a href="#" class="text-primary hover:text-primary-500">conditions d'utilisation</a>
         et la
-        <a href="#" class="text-primary-600 hover:text-primary-500">politique de confidentialité</a>
+        <a href="#" class="text-primary hover:text-primary-500">politique de confidentialité</a>
       </label>
     </div>
-    <p v-if="errors.acceptTerms" class="mt-1 text-responsive-sm text-red-600">{{ errors.acceptTerms }}</p>
+    <p v-if="errors.acceptTerms" class="mt-1 text-responsive-sm text-error">{{ errors.acceptTerms }}</p>
 
     <!-- Submit Button -->
     <div>
@@ -319,10 +319,10 @@
       </Button>
     </div>
 
-    <div class="text-center">
-      <p class="text-responsive-sm text-neutral-600">
+    <div class="text-left sm:text-center">
+      <p class="text-responsive-sm text-body">
         Déjà un compte ?
-        <router-link to="/login" class="font-medium text-primary-600 hover:text-primary-500">
+        <router-link to="/login" class="font-medium text-primary hover:text-primary-500">
           Se connecter
         </router-link>
       </p>
@@ -408,7 +408,7 @@ const validateForm = (): boolean => {
   }
 
   // Phone validation (optional but if provided, should be valid)
-  if (form.phone && !/^\+?[\d\s\-\(\)]{8,}$/.test(form.phone)) {
+  if (form.phone && !/^\+?[\d\s\-()]{8,}$/.test(form.phone)) {
     errors.value.phone = 'Veuillez saisir un numéro de téléphone valide'
   }
 
@@ -458,7 +458,7 @@ const handleSubmit = async () => {
     }
   } catch (error: any) {
     // L'erreur est déjà gérée par le store et affichée via les notifications
-    console.error('Register error:', error)
+    // console.error('Register error:', error)
   } finally {
     loading.value = false
   }

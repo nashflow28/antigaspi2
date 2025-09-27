@@ -68,20 +68,20 @@ const itemClasses = computed(() => {
 
     // States
     props.item.disabled ? [
-      'text-neutral-400 cursor-not-allowed'
+      'text-placeholder cursor-not-allowed'
     ] : [
-      'text-neutral-700 hover:bg-neutral-100',
-      props.item.danger ? 'hover:bg-red-50 hover:text-red-600' : ''
+      'text-body-emphasis hover:bg-neutral-100',
+      props.item.danger ? 'hover:bg-red-50 hover:text-error' : ''
     ],
 
     // Danger variant
-    props.item.danger && 'text-red-600'
+    props.item.danger && 'text-error'
   ].flat().filter(Boolean).join(' ')
 })
 
 const iconClasses = computed(() => [
   'mr-3 flex-shrink-0',
-  props.item.disabled ? 'text-neutral-400' : 'text-neutral-500',
+  props.item.disabled ? 'text-placeholder' : 'text-muted',
   props.item.danger && !props.item.disabled && 'text-red-500'
 ].filter(Boolean).join(' '))
 

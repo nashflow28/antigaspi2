@@ -77,8 +77,8 @@ const getTabClasses = (tab: Tab, index: number) => {
     'flex items-center px-4 py-2.5 text-sm border-b-2 -mb-px transition-colors',
     'focus:outline-none focus:ring-2 focus:ring-primary-500/50',
     isActive
-      ? 'border-primary-600 text-primary-600'
-      : 'border-transparent text-neutral-600 hover:text-neutral-900 hover:border-neutral-300',
+      ? 'border-primary-600 text-primary'
+      : 'border-transparent text-body hover:text-heading hover:border-neutral-300',
     tab.disabled && 'cursor-not-allowed opacity-50'
   ].filter(Boolean).join(' ')
 }

@@ -4,7 +4,7 @@
     :class="[
       isDark
         ? 'bg-dark-800/80 text-dark-200 border border-dark-600 hover:bg-dark-700'
-        : 'bg-white/80 text-neutral-700 border border-neutral-200 hover:bg-neutral-50'
+        : 'bg-white/80 text-body-emphasis border border-neutral-200 hover:bg-neutral-50'
     ]"
     :aria-label="isDark ? 'Activer le mode clair' : 'Activer le mode sombre'"
     @click="toggleDarkMode"
@@ -41,7 +41,7 @@
 
     <!-- Hover glow effect -->
     <div
-      class="absolute inset-0 rounded-xl opacity-0 group-hover:transition-opacity duration-300 pointer-events-none"
+      class="relative sm:absolute inset-0 rounded-xl opacity-0 group-hover:transition-opacity duration-300 pointer-events-none"
       :class="[
         isDark
           ? 'bg-gradient-to-r from-indigo-500/20 to-purple-500/20'

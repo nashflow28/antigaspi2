@@ -6,13 +6,13 @@
   >
     <div class="p-6">
       <!-- Header -->
-      <div class="mb-8">
-        <div class="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
+      <div class="mb-6 sm:mb-8">
+        <div class="flex flex-col gap-4 sm:gap-6 lg:flex-row lg:items-center lg:justify-between">
           <div>
-            <h1 class="mb-2 text-responsive-xl font-semibold text-neutral-900 lg:text-display-sm">
+            <h1 class="mb-2 text-responsive-xl font-semibold text-heading lg:text-display-sm">
               Mes Produits
             </h1>
-            <p class="text-responsive-lg text-neutral-600">
+            <p class="text-responsive-lg text-body">
               Gérez vos produits et réduisez le gaspillage
             </p>
           </div>
@@ -114,8 +114,8 @@
               :class="[
                 'rounded-lg',
                 activeFilter === filter.key
-                  ? 'border border-primary-200 bg-primary-50 text-primary-700 hover:bg-primary-100 hover:border-primary-300'
-                  : 'text-neutral-600'
+                  ? 'border border-primary-200 bg-primary-50 text-primary-emphasis hover:bg-primary-100 hover:border-primary-300'
+                  : 'text-body'
               ]"
               @click="activeFilter = filter.key"
             >
@@ -133,11 +133,11 @@
           </div>
 
           <div class="flex items-center gap-3">
-            <label for="sort-by" class="text-responsive-sm font-medium text-neutral-600">Trier par</label>
+            <label for="sort-by" class="text-responsive-sm font-medium text-body">Trier par</label>
             <select
               id="sort-by"
               v-model="sortBy"
-              class="rounded-lg border border-neutral-300 bg-white px-4 py-3 text-responsive-sm font-medium text-neutral-700 shadow-sm transition-colors focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/30"
+              class="rounded-lg border border-neutral-300 bg-white px-4 py-3 text-responsive-sm font-medium text-body-emphasis shadow-sm transition-colors focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/30"
             >
               <option value="created_at">Plus récent</option>
               <option value="name">Nom A-Z</option>
@@ -149,7 +149,7 @@
       </Card>
 
       <!-- Products Grid -->
-      <div v-if="filteredProducts.length > 0" class="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
+      <div v-if="filteredProducts.length > 0" class="grid grid-cols-1 gap-4 sm:gap-6 md:grid-cols-2 xl:grid-cols-3">
         <Card
           v-for="product in filteredProducts"
           :key="product.id"
@@ -164,7 +164,7 @@
               :alt="product.name"
               class="h-48 w-full rounded-xl object-cover"
             >
-            <div class="absolute left-3 top-3 flex flex-wrap gap-2">
+            <div class="relative sm:absolute left-3 top-3 flex flex-wrap gap-2">
               <Badge
                 v-if="!product.is_active"
                 variant="secondary"
@@ -192,7 +192,7 @@
               </Badge>
             </div>
 
-            <div class="absolute right-3 top-3">
+            <div class="relative sm:absolute right-3 top-3">
               <Badge
                 variant="primary"
                 size="sm"
@@ -207,26 +207,26 @@
           <!-- Product Info -->
           <div class="space-y-4">
             <div>
-              <h3 class="text-responsive-lg font-semibold text-neutral-900">{{ product.name }}</h3>
-              <p class="mt-2 line-clamp-2 text-responsive-sm text-neutral-600">{{ product.description }}</p>
+              <h3 class="text-responsive-lg font-semibold text-heading">{{ product.name }}</h3>
+              <p class="mt-2 line-clamp-2 text-responsive-sm text-body">{{ product.description }}</p>
             </div>
 
             <div class="flex items-center justify-between">
               <div class="flex items-center gap-2">
-                <span class="text-responsive-xl font-semibold text-primary-600">
+                <span class="text-responsive-xl font-semibold text-primary">
                   {{ Math.round(product.discounted_price).toLocaleString('fr-FR') }} F CFA
                 </span>
-                <span class="text-responsive-sm text-neutral-400 line-through">
+                <span class="text-responsive-sm text-placeholder line-through">
                   {{ Math.round(product.original_price).toLocaleString('fr-FR') }} F CFA
                 </span>
               </div>
 
               <div class="text-right">
-                <p class="text-responsive-sm text-neutral-600">Stock: {{ product.quantity_available }}</p>
+                <p class="text-responsive-sm text-body">Stock: {{ product.quantity_available }}</p>
               </div>
             </div>
 
-            <div class="flex items-center justify-between text-responsive-sm text-neutral-600">
+            <div class="flex items-center justify-between text-responsive-sm text-body">
               <span>Expire: {{ formatDate(product.expiration_date) }}</span>
               <span :class="getStatusColor(product)">{{ getStatusText(product) }}</span>
             </div>
@@ -271,10 +271,10 @@
       </div>
 
       <!-- Empty State -->
-      <div v-else class="py-12 text-center">
+      <div v-else class="py-8 sm:py-10 lg:py-12 text-left sm:text-center">
         <ShoppingBagIcon class="w-16 h-16 text-neutral-300 mx-auto mb-4" />
-        <h3 class="text-responsive-xl font-semibold text-neutral-900 mb-2">Aucun produit trouvé</h3>
-        <p class="text-neutral-600 mb-6">
+        <h3 class="text-responsive-xl font-semibold text-heading mb-2">Aucun produit trouvé</h3>
+        <p class="text-body mb-6">
           {{ searchQuery ? 'Aucun produit ne correspond à votre recherche.' : 'Commencez par ajouter votre premier produit.' }}
         </p>
         <Button
@@ -294,23 +294,23 @@
       >
         <Card
           variant="elevated"
-          class="w-full max-h-[90vh] max-w-2xl overflow-y-auto"
+          class="w-full max-h-[90vh] max-w-full sm:max-w-2xl overflow-y-auto"
         >
           <div class="mb-6 flex items-center justify-between">
-            <h2 class="text-responsive-xl font-semibold text-neutral-900">
+            <h2 class="text-responsive-xl font-semibold text-heading">
               {{ showAddProductModal ? 'Ajouter un produit' : 'Modifier le produit' }}
             </h2>
             <Button
               variant="ghost"
               size="sm"
               :left-icon="XMarkIcon"
-              class="text-neutral-400 hover:text-neutral-600"
+              class="text-placeholder hover:text-body"
               @click="closeModals"
             />
           </div>
 
           <form class="space-y-6" @submit.prevent="saveProduct">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
               <div>
                 <label class="label">Nom du produit *</label>
                 <input
@@ -342,7 +342,7 @@
               />
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
               <div>
                 <label class="label">Prix original (F CFA) *</label>
                 <input
@@ -377,7 +377,7 @@
               </div>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
               <div>
                 <label class="label">Quantité disponible *</label>
                 <input
@@ -409,7 +409,7 @@
                 @change="handleImageUpload"
               >
               <div v-if="productForm.image_url" class="mt-3">
-                <p class="text-responsive-sm text-neutral-600 mb-2">Aperçu :</p>
+                <p class="text-responsive-sm text-body mb-2">Aperçu :</p>
                 <img
                   :src="productForm.image_url"
                   alt="Aperçu du produit"
@@ -458,14 +458,14 @@
       >
         <Card
           variant="elevated"
-          class="w-full max-w-md transform shadow-2xl transition-all hover:scale-[1.02]"
+          class="w-full max-w-full sm:max-w-md transform shadow-2xl transition-all hover:scale-[1.02]"
           @click.stop
         >
-          <div class="text-center">
+          <div class="text-left sm:text-center">
             <!-- Icon -->
             <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100 mb-4">
               <svg
-                class="h-10 w-10 text-red-600"
+                class="h-10 w-10 text-error"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -480,14 +480,14 @@
             </div>
 
             <!-- Title -->
-            <h3 class="mb-2 text-responsive-lg font-semibold text-neutral-900">
+            <h3 class="mb-2 text-responsive-lg font-semibold text-heading">
               Supprimer le produit
             </h3>
 
             <!-- Message -->
-            <p class="mb-6 text-neutral-600">
+            <p class="mb-6 text-body">
               Êtes-vous sûr de vouloir supprimer
-              <span class="font-semibold text-neutral-900">"{{ productToDelete?.name }}"</span> ?
+              <span class="font-semibold text-heading">"{{ productToDelete?.name }}"</span> ?
               Cette action est irréversible.
             </p>
 
@@ -659,10 +659,10 @@ const formatDate = (date: string): string => {
 }
 
 const getStatusColor = (product: any): string => {
-  if (!product.is_active) return 'text-neutral-500'
+  if (!product.is_active) return 'text-muted'
   if (isExpiringSoon(product)) return 'text-accent-red'
   if (product.quantity_available <= 5) return 'text-accent-orange'
-  return 'text-primary-600'
+  return 'text-primary'
 }
 
 const getStatusText = (product: any): string => {

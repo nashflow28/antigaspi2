@@ -3,7 +3,7 @@
     <Motion
       v-if="sidebarOpen && isMobile"
       tag="div"
-      class="fixed inset-0 z-40 bg-neutral-950/45 backdrop-blur-sm lg:hidden"
+      class="fixed inset-0 z-40 bg-neutral-950/45 backdrop-blur-sm lg:hidden sm:block"
       :initial="{ opacity: 0 }"
       :enter="{ opacity: 1, transition: { duration: 0.2 } }"
       :leave="{ opacity: 0, transition: { duration: 0.2 } }"
@@ -22,7 +22,7 @@
           <slot name="sidebar-brand" :brand="sidebar.brand">
             <div
               v-if="sidebar.brand.logo"
-              class="flex h-10 w-10 items-center justify-center rounded-2xl bg-primary-500/15 text-primary-700 dark:text-primary-200"
+              class="flex h-10 w-10 items-center justify-center rounded-2xl bg-primary-500/15 text-primary-emphasis dark:text-primary-200"
             >
               <component :is="sidebar.brand.logo" />
             </div>
@@ -47,7 +47,7 @@
                 <span class="flex-1 truncate">{{ item.label }}</span>
                 <span
                   v-if="item.badge"
-                  class="rounded-full bg-primary-500/20 px-4 py-3 text-caption font-semibold text-primary-700 dark:text-primary-100"
+                  class="rounded-full bg-primary-500/20 px-4 py-3 text-caption font-semibold text-primary-emphasis dark:text-primary-100"
                 >
                   {{ item.badge }}
                 </span>
@@ -72,10 +72,10 @@
         :enter="{ y: 0, opacity: 1, transition: { duration: 0.4 } }"
       >
         <div class="px-4 sm:px-6 lg:px-8">
-          <div class="flex h-16 items-center justify-between gap-4">
+          <div class="flex h-16 items-center justify-start sm:justify-between gap-4">
             <button
               type="button"
-              class="rounded-2xl p-2 text-primary-700 transition-colors hover:bg-primary-200/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-400 lg:hidden"
+              class="rounded-2xl p-2 text-primary-emphasis transition-colors hover:bg-primary-200/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-400 lg:hidden sm:block"
               aria-label="Ouvrir le menu"
               @click="openSidebar"
             >
@@ -94,12 +94,12 @@
               </svg>
             </button>
 
-            <div class="flex flex-1 items-center justify-end gap-3">
+            <div class="flex flex-1 items-center justify-center sm:justify-end gap-3">
               <slot name="header-notifications">
-                <component :is="header.notifications" v-if="header.notifications" class="hidden sm:block" />
+                <component :is="header.notifications" v-if="header.notifications" class="hidden sm:block sm:block" />
               </slot>
               <slot name="header-actions">
-                <component :is="header.actions" v-if="header.actions" class="hidden items-center gap-2 sm:flex" />
+                <component :is="header.actions" v-if="header.actions" class="hidden sm:block items-center gap-2 sm:flex" />
               </slot>
               <slot name="header-user" :user="header.user">
                 <div class="flex items-center gap-3 rounded-2xl bg-primary-500/10 px-4 py-3 text-left text-primary-800 transition-colors hover:bg-primary-500/15 dark:bg-primary-500/10 dark:text-primary-100">
@@ -112,9 +112,9 @@
                   <span v-else class="flex h-9 w-9 items-center justify-center rounded-full bg-primary-500 text-white">
                     {{ header.user.name.charAt(0).toUpperCase() }}
                   </span>
-                  <div class="hidden sm:block">
+                  <div class="hidden sm:block sm:block">
                     <p class="text-small font-semibold">{{ header.user.name }}</p>
-                    <p class="text-caption text-primary-700/80 dark:text-primary-100/70">{{ header.user.email }}</p>
+                    <p class="text-caption text-primary-emphasis/80 dark:text-primary-100/70">{{ header.user.email }}</p>
                   </div>
                 </div>
               </slot>
@@ -191,7 +191,7 @@ watch(
 
 const wrapperClasses = computed(() =>
   [
-    'min-h-screen bg-neutral-50 text-neutral-800 dark:bg-neutral-900 dark:text-neutral-50',
+    'min-h-screen bg-neutral-50 text-heading-secondary dark:bg-neutral-900 dark:text-neutral-50',
     props.class ?? ''
   ]
     .filter(Boolean)
@@ -219,8 +219,8 @@ const navigationItemClasses = (item: NavigationEntry) =>
   [
     'group flex items-center gap-3 rounded-2xl px-4 py-3 text-small font-medium transition-all duration-200',
     item.active
-      ? 'bg-primary-500/10 text-primary-700 shadow-inner dark:text-primary-100'
-      : 'text-neutral-500 hover:bg-primary-200/20 hover:text-primary-700 dark:text-neutral-300 dark:hover:text-primary-100'
+      ? 'bg-primary-500/10 text-primary-emphasis shadow-inner dark:text-primary-100'
+      : 'text-muted hover:bg-primary-200/20 hover:text-primary-emphasis dark:text-neutral-300 dark:hover:text-primary-100'
   ]
     .filter(Boolean)
     .join(' ')

@@ -95,13 +95,13 @@ const variantClasses: Record<ButtonVariant, string> = {
   primary:
     'bg-nav-gradient text-white shadow-glow hover:shadow-card hover:brightness-[1.05] focus-visible:ring-primary-300',
   secondary:
-    'bg-white text-primary-700 border border-primary-200 shadow-card hover:border-primary-300 hover:bg-primary-50/60 hover:text-primary-800 dark:bg-neutral-900 dark:text-neutral-50 dark:border-primary-500/40 dark:hover:bg-primary-700/10',
+    'bg-white text-primary-emphasis border border-primary-200 shadow-card hover:border-primary-300 hover:bg-primary-50/60 hover:text-primary-800 dark:bg-neutral-900 dark:text-neutral-50 dark:border-primary-500/40 dark:hover:bg-primary-700/10',
   ghost:
-    'bg-transparent text-primary-600 dark:text-primary-200 hover:text-primary-800 hover:bg-primary-200/20 dark:hover:text-white dark:hover:bg-primary-800/30',
+    'bg-transparent text-primary dark:text-primary-200 hover:text-primary-800 hover:bg-primary-200/20 dark:hover:text-white dark:hover:bg-primary-800/30',
   outline:
-    'border border-primary-400 text-primary-700 bg-transparent hover:bg-primary-200/20 hover:text-primary-900 dark:text-primary-200 dark:border-primary-300/60 dark:hover:bg-primary-800/40',
+    'border border-primary-400 text-primary-emphasis bg-transparent hover:bg-primary-200/20 hover:text-primary-900 dark:text-primary-200 dark:border-primary-300/60 dark:hover:bg-primary-800/40',
   promo:
-    'bg-accent-orange text-neutral-900 shadow-card hover:shadow-glow hover:brightness-[1.03]',
+    'bg-accent-orange text-heading shadow-card hover:shadow-glow hover:brightness-[1.03]',
   destructive:
     'bg-accent-red text-white shadow-card hover:bg-accent-red/90 focus-visible:ring-accent-red/40'
 }

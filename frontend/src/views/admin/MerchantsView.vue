@@ -4,15 +4,15 @@
     :header="header"
     class="bg-neutral-50"
   >
-    <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-full sm:max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
       <!-- En-tête -->
       <div class="bg-white shadow rounded-lg p-6 mb-6">
-        <div class="flex items-center justify-between">
+        <div class="flex items-center justify-start sm:justify-between">
           <div>
-            <h1 class="text-responsive-xl font-semibold text-neutral-900">Modération des Commerçants</h1>
-            <p class="mt-1 text-responsive-sm text-neutral-500">Gérez les demandes d'inscription et surveiller l'activité des commerçants</p>
+            <h1 class="text-responsive-xl font-semibold text-heading">Modération des Commerçants</h1>
+            <p class="mt-1 text-responsive-sm text-muted">Gérez les demandes d'inscription et surveiller l'activité des commerçants</p>
           </div>
-          <div class="flex items-center space-x-3">
+          <div class="flex items-center space-y-3 sm:space-y-0 sm:space-x-3">
             <button
               class="bg-green-600 hover:bg-green-700 text-white px-4 py-3 rounded-lg flex items-center"
               @click="refreshData"
@@ -37,8 +37,8 @@
       </div>
 
       <!-- Statistiques modération -->
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
-        <div class="bg-white overflow-hidden shadow rounded-lg">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-6">
+        <div class="bg-white overflow-hidden sm:block shadow rounded-lg">
           <div class="p-5">
             <div class="flex items-center">
               <div class="flex-shrink-0">
@@ -58,20 +58,20 @@
               </div>
               <div class="ml-5 w-0 flex-1">
                 <dl>
-                  <dt class="text-responsive-sm font-medium text-neutral-500 truncate">Commerçants Actifs</dt>
-                  <dd class="text-responsive-lg font-medium text-neutral-900">{{ stats.activeMerchants }}</dd>
+                  <dt class="text-responsive-sm font-medium text-muted truncate">Commerçants Actifs</dt>
+                  <dd class="text-responsive-lg font-medium text-heading">{{ stats.activeMerchants }}</dd>
                 </dl>
               </div>
             </div>
           </div>
         </div>
 
-        <div class="bg-white overflow-hidden shadow rounded-lg">
+        <div class="bg-white overflow-hidden sm:block shadow rounded-lg">
           <div class="p-5">
             <div class="flex items-center">
               <div class="flex-shrink-0">
                 <svg
-                  class="h-10 w-10 text-yellow-600"
+                  class="h-10 w-10 text-warning"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -86,20 +86,20 @@
               </div>
               <div class="ml-5 w-0 flex-1">
                 <dl>
-                  <dt class="text-responsive-sm font-medium text-neutral-500 truncate">En Attente</dt>
-                  <dd class="text-responsive-lg font-medium text-neutral-900">{{ stats.pendingMerchants }}</dd>
+                  <dt class="text-responsive-sm font-medium text-muted truncate">En Attente</dt>
+                  <dd class="text-responsive-lg font-medium text-heading">{{ stats.pendingMerchants }}</dd>
                 </dl>
               </div>
             </div>
           </div>
         </div>
 
-        <div class="bg-white overflow-hidden shadow rounded-lg">
+        <div class="bg-white overflow-hidden sm:block shadow rounded-lg">
           <div class="p-5">
             <div class="flex items-center">
               <div class="flex-shrink-0">
                 <svg
-                  class="h-10 w-10 text-green-600"
+                  class="h-10 w-10 text-success"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -114,20 +114,20 @@
               </div>
               <div class="ml-5 w-0 flex-1">
                 <dl>
-                  <dt class="text-responsive-sm font-medium text-neutral-500 truncate">Produits Publiés</dt>
-                  <dd class="text-responsive-lg font-medium text-neutral-900">{{ stats.totalProducts }}</dd>
+                  <dt class="text-responsive-sm font-medium text-muted truncate">Produits Publiés</dt>
+                  <dd class="text-responsive-lg font-medium text-heading">{{ stats.totalProducts }}</dd>
                 </dl>
               </div>
             </div>
           </div>
         </div>
 
-        <div class="bg-white overflow-hidden shadow rounded-lg">
+        <div class="bg-white overflow-hidden sm:block shadow rounded-lg">
           <div class="p-5">
             <div class="flex items-center">
               <div class="flex-shrink-0">
                 <svg
-                  class="h-10 w-10 text-blue-600"
+                  class="h-10 w-10 text-info"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -142,8 +142,8 @@
               </div>
               <div class="ml-5 w-0 flex-1">
                 <dl>
-                  <dt class="text-responsive-sm font-medium text-neutral-500 truncate">Réservations</dt>
-                  <dd class="text-responsive-lg font-medium text-neutral-900">{{ stats.totalReservations }}</dd>
+                  <dt class="text-responsive-sm font-medium text-muted truncate">Réservations</dt>
+                  <dd class="text-responsive-lg font-medium text-heading">{{ stats.totalReservations }}</dd>
                 </dl>
               </div>
             </div>
@@ -154,13 +154,13 @@
       <!-- Onglets de modération -->
       <div class="bg-white shadow rounded-lg mb-6">
         <div class="border-b border-neutral-200">
-          <nav class="-mb-px flex space-x-8 px-6">
+          <nav class="-mb-px flex space-y-8 sm:space-y-0 sm:space-x-8 px-6">
             <button
               v-for="tab in tabs"
               :key="tab.key"
               :class="{
-                'border-green-500 text-green-600': activeTab === tab.key,
-                'border-transparent text-neutral-500 hover:text-neutral-700 hover:border-neutral-300': activeTab !== tab.key
+                'border-green-500 text-success': activeTab === tab.key,
+                'border-transparent text-muted hover:text-body-emphasis hover:border-neutral-300': activeTab !== tab.key
               }"
               class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-responsive-sm"
               @click="activeTab = tab.key"
@@ -169,8 +169,8 @@
               <span
                 v-if="tab.count > 0"
                 :class="{
-                  'bg-green-100 text-green-600': activeTab === tab.key,
-                  'bg-neutral-100 text-neutral-600': activeTab !== tab.key
+                  'bg-green-100 text-success': activeTab === tab.key,
+                  'bg-neutral-100 text-body': activeTab !== tab.key
                 }"
                 class="ml-2 inline-flex items-center px-4.5 py-0.5 rounded-full text-responsive-xs font-medium"
               >
@@ -183,10 +183,10 @@
         <div class="p-6">
           <!-- Demandes d'inscription en attente -->
           <div v-if="activeTab === 'pending'" class="space-y-6">
-            <h3 class="text-responsive-lg font-medium text-neutral-900">Demandes d'inscription en attente</h3>
-            <div v-if="pendingMerchants.length === 0" class="text-center py-8">
+            <h3 class="text-responsive-lg font-medium text-heading">Demandes d'inscription en attente</h3>
+            <div v-if="pendingMerchants.length === 0" class="text-left sm:text-center py-6 sm:py-8">
               <svg
-                class="mx-auto h-12 w-12 text-neutral-400"
+                class="mx-auto h-12 w-12 text-placeholder"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -198,24 +198,24 @@
                   d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"
                 />
               </svg>
-              <p class="mt-2 text-responsive-sm text-neutral-500">Aucune demande en attente</p>
+              <p class="mt-2 text-responsive-sm text-muted">Aucune demande en attente</p>
             </div>
             <div v-else class="space-y-4">
               <div v-for="merchant in pendingMerchants" :key="merchant.id" class="border border-neutral-200 rounded-lg p-6">
-                <div class="flex items-start justify-between">
+                <div class="flex items-stretch sm:items-start justify-start sm:justify-between">
                   <div class="flex-1">
-                    <h4 class="text-responsive-lg font-medium text-neutral-900">{{ merchant.business_name }}</h4>
-                    <p class="text-responsive-sm text-neutral-500 mt-1">{{ merchant.owner_name }}</p>
+                    <h4 class="text-responsive-lg font-medium text-heading">{{ merchant.business_name }}</h4>
+                    <p class="text-responsive-sm text-muted mt-1">{{ merchant.owner_name }}</p>
                     <div class="mt-2 grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
-                        <p class="text-responsive-sm text-neutral-600"><strong>Email:</strong> {{ merchant.email }}</p>
-                        <p class="text-responsive-sm text-neutral-600"><strong>Téléphone:</strong> {{ merchant.phone }}</p>
-                        <p class="text-responsive-sm text-neutral-600"><strong>Adresse:</strong> {{ merchant.address }}</p>
+                        <p class="text-responsive-sm text-body"><strong>Email:</strong> {{ merchant.email }}</p>
+                        <p class="text-responsive-sm text-body"><strong>Téléphone:</strong> {{ merchant.phone }}</p>
+                        <p class="text-responsive-sm text-body"><strong>Adresse:</strong> {{ merchant.address }}</p>
                       </div>
                       <div>
-                        <p class="text-responsive-sm text-neutral-600"><strong>Type de commerce:</strong> {{ merchant.business_type }}</p>
-                        <p class="text-responsive-sm text-neutral-600"><strong>Description:</strong> {{ merchant.description }}</p>
-                        <p class="text-responsive-sm text-neutral-600"><strong>Demande:</strong> {{ formatDate(merchant.created_at) }}</p>
+                        <p class="text-responsive-sm text-body"><strong>Type de commerce:</strong> {{ merchant.business_type }}</p>
+                        <p class="text-responsive-sm text-body"><strong>Description:</strong> {{ merchant.description }}</p>
+                        <p class="text-responsive-sm text-body"><strong>Demande:</strong> {{ formatDate(merchant.created_at) }}</p>
                       </div>
                     </div>
                   </div>
@@ -246,9 +246,9 @@
 
           <!-- Produits à modérer -->
           <div v-if="activeTab === 'products'" class="space-y-6">
-            <h3 class="text-responsive-lg font-medium text-neutral-900">Produits à modérer</h3>
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              <div v-for="product in productsToModerate" :key="product.id" class="border border-neutral-200 rounded-lg overflow-hidden">
+            <h3 class="text-responsive-lg font-medium text-heading">Produits à modérer</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+              <div v-for="product in productsToModerate" :key="product.id" class="border border-neutral-200 rounded-lg overflow-hidden sm:block">
                 <div class="aspect-w-16 aspect-h-9 bg-neutral-200">
                   <img
                     v-if="product.image_url"
@@ -257,14 +257,14 @@
                     class="w-full h-48 object-cover"
                   >
                   <div v-else class="w-full h-48 bg-neutral-300 flex items-center justify-center">
-                    <span class="text-neutral-500">Pas d'image</span>
+                    <span class="text-muted">Pas d'image</span>
                   </div>
                 </div>
                 <div class="p-4">
-                  <h4 class="font-medium text-neutral-900 truncate">{{ product.name || 'N/A' }}</h4>
-                  <p class="text-responsive-sm text-neutral-500 mt-1">{{ product.merchant_name || 'N/A' }}</p>
-                  <p class="text-responsive-lg font-semibold text-green-600 mt-2">{{ product.price ? formatPrice(product.price) : '0' }} F CFA</p>
-                  <div class="mt-4 flex space-x-2">
+                  <h4 class="font-medium text-heading truncate">{{ product.name || 'N/A' }}</h4>
+                  <p class="text-responsive-sm text-muted mt-1">{{ product.merchant_name || 'N/A' }}</p>
+                  <p class="text-responsive-lg font-semibold text-success mt-2">{{ product.price ? formatPrice(product.price) : '0' }} F CFA</p>
+                  <div class="mt-4 flex space-y-2 sm:space-y-0 sm:space-x-2">
                     <button
                       class="flex-1 bg-green-600 hover:bg-green-700 text-white px-4 py-3 rounded text-responsive-sm"
                       @click="approveProduct(product)"
@@ -285,24 +285,24 @@
 
           <!-- Réservations signalées -->
           <div v-if="activeTab === 'reservations'" class="space-y-6">
-            <h3 class="text-responsive-lg font-medium text-neutral-900">Réservations signalées</h3>
+            <h3 class="text-responsive-lg font-medium text-heading">Réservations signalées</h3>
             <div class="overflow-x-auto">
               <table class="min-w-full divide-y divide-neutral-200">
                 <thead class="bg-neutral-50">
                   <tr>
-                    <th class="px-6 py-3 text-left text-responsive-xs font-medium text-neutral-500 uppercase tracking-wider">
+                    <th class="px-6 py-3 text-left text-responsive-xs font-medium text-muted uppercase tracking-wider">
                       Réservation
                     </th>
-                    <th class="px-6 py-3 text-left text-responsive-xs font-medium text-neutral-500 uppercase tracking-wider">
+                    <th class="px-6 py-3 text-left text-responsive-xs font-medium text-muted uppercase tracking-wider">
                       Client
                     </th>
-                    <th class="px-6 py-3 text-left text-responsive-xs font-medium text-neutral-500 uppercase tracking-wider">
+                    <th class="px-6 py-3 text-left text-responsive-xs font-medium text-muted uppercase tracking-wider">
                       Commerçant
                     </th>
-                    <th class="px-6 py-3 text-left text-responsive-xs font-medium text-neutral-500 uppercase tracking-wider">
+                    <th class="px-6 py-3 text-left text-responsive-xs font-medium text-muted uppercase tracking-wider">
                       Signalement
                     </th>
-                    <th class="px-6 py-3 text-left text-responsive-xs font-medium text-neutral-500 uppercase tracking-wider">
+                    <th class="px-6 py-3 text-left text-responsive-xs font-medium text-muted uppercase tracking-wider">
                       Actions
                     </th>
                   </tr>
@@ -310,13 +310,13 @@
                 <tbody class="bg-white divide-y divide-neutral-200">
                   <tr v-for="reservation in flaggedReservations" :key="reservation.id">
                     <td class="px-6 py-4 whitespace-nowrap">
-                      <div class="text-responsive-sm font-medium text-neutral-900">{{ reservation.product_name || 'N/A' }}</div>
-                      <div class="text-responsive-sm text-neutral-500">{{ reservation.total_price ? formatPrice(reservation.total_price) : '0' }} F CFA</div>
+                      <div class="text-responsive-sm font-medium text-heading">{{ reservation.product_name || 'N/A' }}</div>
+                      <div class="text-responsive-sm text-muted">{{ reservation.total_price ? formatPrice(reservation.total_price) : '0' }} F CFA</div>
                     </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-responsive-sm text-neutral-900">
+                    <td class="px-6 py-4 whitespace-nowrap text-responsive-sm text-heading">
                       {{ reservation.customer_name || 'N/A' }}
                     </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-responsive-sm text-neutral-900">
+                    <td class="px-6 py-4 whitespace-nowrap text-responsive-sm text-heading">
                       {{ reservation.merchant_name || 'N/A' }}
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap">
@@ -324,15 +324,15 @@
                         {{ reservation.flag_reason || 'Non spécifié' }}
                       </span>
                     </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-responsive-sm font-medium space-x-2">
+                    <td class="px-6 py-4 whitespace-nowrap text-responsive-sm font-medium space-y-2 sm:space-y-0 sm:space-x-2">
                       <button
-                        class="text-green-600 hover:text-green-900"
+                        class="text-success hover:text-green-900"
                         @click="resolveReservation(reservation)"
                       >
                         Résoudre
                       </button>
                       <button
-                        class="text-blue-600 hover:text-blue-900"
+                        class="text-info hover:text-blue-900"
                         @click="viewReservationDetails(reservation)"
                       >
                         Détails
@@ -485,10 +485,10 @@ const tabs = computed(() => [
 ])
 
 const loadModerationData = async () => {
-  console.log('🔄 loadModerationData appelée')
+  // console.log('🔄 loadModerationData appelée')
   loading.value = true
   try {
-    console.log('📡 Appel API vers http://localhost:8000/api/admin/moderation')
+    // console.log('📡 Appel API vers http://localhost:8000/api/admin/moderation')
     const response = await fetch('http://localhost:8000/api/admin/moderation', {
       headers: {
         'Accept': 'application/json',
@@ -496,14 +496,14 @@ const loadModerationData = async () => {
       }
     })
     const data = await response.json()
-    console.log('📥 Réponse API:', data)
+    // console.log('📥 Réponse API:', data)
 
     if (data.success) {
       stats.value = data.stats
       pendingMerchants.value = data.pendingMerchants
       productsToModerate.value = data.productsToModerate
       flaggedReservations.value = data.flaggedReservations
-      console.log('✅ Données chargées avec succès:', {
+      // console.log('✅ Données chargées avec succès:', {
         stats: stats.value,
         pendingMerchants: pendingMerchants.value.length,
         productsToModerate: productsToModerate.value.length,
@@ -513,7 +513,7 @@ const loadModerationData = async () => {
       throw new Error(data.message || 'Erreur API')
     }
   } catch (error) {
-    console.error('❌ Erreur lors du chargement:', error)
+    // console.error('❌ Erreur lors du chargement:', error)
     showNotification('error', 'Erreur de chargement', 'Impossible de charger les données. Utilisation des données de démonstration.')
     loadDemoData()
   } finally {
@@ -712,7 +712,7 @@ const approveMerchant = async (merchant: PendingMerchant) => {
           throw new Error(data.message || 'Erreur lors de l\'approbation')
         }
       } catch (error) {
-        console.error('Erreur:', error)
+        // console.error('Erreur:', error)
         showNotification('error', 'Erreur d\'approbation', `Impossible d'approuver ${merchant.business_name}. ${error instanceof Error ? error.message : 'Erreur inconnue'}`)
       }
     },
@@ -752,7 +752,7 @@ const rejectMerchant = async (merchant: PendingMerchant) => {
           throw new Error(data.message || 'Erreur lors du rejet')
         }
       } catch (error) {
-        console.error('Erreur:', error)
+        // console.error('Erreur:', error)
         showNotification('error', 'Erreur de rejet', `Impossible de rejeter ${merchant.business_name}. ${error instanceof Error ? error.message : 'Erreur inconnue'}`)
       }
     },
@@ -810,7 +810,7 @@ const approveProduct = async (product: ProductToModerate) => {
           throw new Error(data.message || 'Erreur lors de l\'approbation')
         }
       } catch (error) {
-        console.error('Erreur:', error)
+        // console.error('Erreur:', error)
         showNotification('error', 'Erreur d\'approbation', `Impossible d'approuver "${product.name}". ${error instanceof Error ? error.message : 'Erreur inconnue'}`)
       }
     },
@@ -849,7 +849,7 @@ const rejectProduct = async (product: ProductToModerate) => {
           throw new Error(data.message || 'Erreur lors du rejet')
         }
       } catch (error) {
-        console.error('Erreur:', error)
+        // console.error('Erreur:', error)
         showNotification('error', 'Erreur de rejet', `Impossible de rejeter "${product.name}". ${error instanceof Error ? error.message : 'Erreur inconnue'}`)
       }
     },
@@ -888,7 +888,7 @@ const resolveReservation = async (reservation: FlaggedReservation) => {
           throw new Error(data.message || 'Erreur lors de la résolution')
         }
       } catch (error) {
-        console.error('Erreur:', error)
+        // console.error('Erreur:', error)
         showNotification('error', 'Erreur de résolution', `Impossible de résoudre le signalement. ${error instanceof Error ? error.message : 'Erreur inconnue'}`)
       }
     },
@@ -916,9 +916,9 @@ Date: ${reservation.created_at ? formatDate(reservation.created_at) : 'N/A'}`
 }
 
 onMounted(() => {
-  console.log('🚀 Composant MerchantsView monté')
-  console.log('📍 URL actuelle:', window.location.href)
-  console.log('🔑 Token localStorage:', localStorage.getItem('auth_token'))
+  // console.log('🚀 Composant MerchantsView monté')
+  // console.log('📍 URL actuelle:', window.location.href)
+  // console.log('🔑 Token localStorage:', localStorage.getItem('auth_token'))
   loadModerationData()
 })
 </script>

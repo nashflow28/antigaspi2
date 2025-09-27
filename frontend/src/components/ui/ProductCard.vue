@@ -4,7 +4,7 @@
     :class="articleClasses"
     :aria-label="`Réserver ${name}`"
   >
-    <div class="relative h-48 w-full overflow-hidden">
+    <div class="relative h-48 w-full overflow-hidden sm:block">
       <img
         :src="image"
         :alt="name"
@@ -12,7 +12,7 @@
       >
       <span
         v-if="discount"
-        class="absolute left-4 top-4 rounded-full bg-primary-700 px-4 py-3 text-caption font-semibold text-neutral-50 shadow-card"
+        class="relative sm:absolute left-4 top-4 rounded-full bg-primary-700 px-4 py-3 text-caption font-semibold text-neutral-50 shadow-card"
       >
         {{ discount }}
       </span>
@@ -20,10 +20,10 @@
 
     <div class="flex flex-1 flex-col gap-4 p-6">
       <div class="space-y-2">
-        <h3 class="text-h3 font-semibold text-neutral-900 dark:text-neutral-50">
+        <h3 class="text-h3 font-semibold text-heading dark:text-neutral-50">
           {{ name }}
         </h3>
-        <p class="text-small text-neutral-500 dark:text-neutral-300">
+        <p class="text-small text-muted dark:text-neutral-300">
           {{ merchant }}
         </p>
       </div>
@@ -32,26 +32,26 @@
         <span
           v-for="tag in tags"
           :key="tag"
-          class="rounded-full bg-primary-500/10 px-4 py-3 text-caption text-primary-700 dark:text-primary-200"
+          class="rounded-full bg-primary-500/10 px-4 py-3 text-caption text-primary-emphasis dark:text-primary-200"
         >
           {{ tag }}
         </span>
       </div>
 
-      <div class="mt-auto flex items-end justify-between">
+      <div class="mt-auto flex items-end justify-start sm:justify-between">
         <div>
           <p class="text-caption uppercase tracking-wide text-primary-500">
             Prix anti-gaspi
           </p>
           <div class="flex items-baseline gap-2">
-            <span class="text-h2 font-semibold text-primary-700 dark:text-primary-200">
+            <span class="text-h2 font-semibold text-primary-emphasis dark:text-primary-200">
               {{ price }}
             </span>
-            <span v-if="originalPrice" class="text-small text-neutral-400 line-through">
+            <span v-if="originalPrice" class="text-small text-placeholder line-through">
               {{ originalPrice }}
             </span>
           </div>
-          <p v-if="quantity" class="text-caption text-neutral-500">
+          <p v-if="quantity" class="text-caption text-muted">
             {{ quantity }}
           </p>
         </div>

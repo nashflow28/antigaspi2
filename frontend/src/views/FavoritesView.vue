@@ -1,15 +1,15 @@
 <template>
   <div class="min-h-screen bg-gradient-to-br from-neutral-50 via-white to-primary-50">
     <div class="border-b border-neutral-200/70 bg-white/80 backdrop-blur">
-      <div class="container mx-auto px-6 py-10">
+      <div class="container px-4 sm:px-6 lg:px-8 mx-auto px-6 py-10">
         <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           <div>
-            <p class="inline-flex items-center gap-2 rounded-full bg-primary-100/70 px-4 py-3 text-responsive-sm font-medium text-primary-700">
+            <p class="inline-flex items-center gap-2 rounded-full bg-primary-100/70 px-4 py-3 text-responsive-sm font-medium text-primary-emphasis">
               <Heart class="h-5 w-5" />
               Mes coups de cœur AntiGaspi
             </p>
-            <h1 class="mt-3 text-display-sm font-semibold tracking-tight text-neutral-900">Vos commerçants & paniers favoris</h1>
-            <p class="mt-2 max-w-2xl text-neutral-600">
+            <h1 class="mt-3 text-display-sm font-semibold tracking-tight text-heading">Vos commerçants & paniers favoris</h1>
+            <p class="mt-2 max-w-full sm:max-w-2xl text-body">
               Organisez vos découvertes, activez les notifications prioritaires et préparez vos prochaines réservations en un coup d'œil.
             </p>
           </div>
@@ -27,7 +27,7 @@
               v-if="hasFavorites"
               variant="ghost"
               size="sm"
-              class="text-neutral-500"
+              class="text-muted"
               @click="clearAll"
             >
               Effacer tout
@@ -37,12 +37,12 @@
       </div>
     </div>
 
-    <main class="container mx-auto grid gap-8 px-6 py-12 lg:grid-cols-[2fr_1fr]">
+    <main class="container px-4 sm:px-6 lg:px-8 mx-auto grid gap-6 sm:gap-8 px-6 py-8 sm:py-10 lg:py-12 lg:grid-cols-[2fr_1fr]">
       <section>
-        <div v-if="!hasFavorites" class="rounded-3xl border border-dashed border-neutral-300 bg-white/70 p-12 text-center shadow-sm">
+        <div v-if="!hasFavorites" class="rounded-3xl border border-dashed border-neutral-300 bg-white/70 p-6 sm:p-8 lg:p-12 text-left sm:text-center shadow-sm">
           <Heart class="mx-auto h-12 w-12 text-neutral-300" />
-          <h2 class="mt-4 text-responsive-xl font-semibold text-neutral-800">Ajoutez vos premiers favoris</h2>
-          <p class="mt-2 text-neutral-500">
+          <h2 class="mt-4 text-responsive-xl font-semibold text-heading-secondary">Ajoutez vos premiers favoris</h2>
+          <p class="mt-2 text-muted">
             Depuis un panier ou un commerçant, cliquez sur l'icône cœur pour les retrouver ici et recevoir leurs alertes.
           </p>
           <div class="mt-6 flex justify-center gap-3">
@@ -51,7 +51,7 @@
           </div>
         </div>
 
-        <div v-else class="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+        <div v-else class="grid gap-4 sm:gap-6 md:grid-cols-2 xl:grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
           <Card
             v-for="favorite in filteredFavorites"
             :key="`${favorite.type}-${favorite.id}`"
@@ -60,13 +60,13 @@
             <template #header>
               <div class="flex items-center justify-between">
                 <div>
-                  <p class="text-responsive-xs font-medium uppercase tracking-wide text-primary-600">{{ favorite.type === 'merchant' ? 'Commerçant' : 'Panier' }}</p>
-                  <h3 class="text-responsive-lg font-semibold text-neutral-900">{{ favorite.name }}</h3>
-                  <p v-if="favorite.description" class="text-responsive-sm text-neutral-500">{{ favorite.description }}</p>
+                  <p class="text-responsive-xs font-medium uppercase tracking-wide text-primary">{{ favorite.type === 'merchant' ? 'Commerçant' : 'Panier' }}</p>
+                  <h3 class="text-responsive-lg font-semibold text-heading">{{ favorite.name }}</h3>
+                  <p v-if="favorite.description" class="text-responsive-sm text-muted">{{ favorite.description }}</p>
                 </div>
                 <button
                   type="button"
-                  class="rounded-full bg-primary-50 p-2 text-primary-600 transition hover:bg-primary-100"
+                  class="rounded-full bg-primary-50 p-2 text-primary transition hover:bg-primary-100"
                   aria-label="Retirer des favoris"
                   @click="removeFavorite(favorite)"
                 >
@@ -75,12 +75,12 @@
               </div>
             </template>
 
-            <div class="space-y-3 text-responsive-sm text-neutral-600">
+            <div class="space-y-3 text-responsive-sm text-body">
               <p v-if="favorite.type === 'merchant' && favorite.merchant?.city" class="flex items-center gap-2">
                 <MapPin class="h-5 w-5 text-primary-500" />
                 {{ favorite.merchant.city }}
               </p>
-              <p class="text-responsive-xs text-neutral-400">Ajouté le {{ formatDate(favorite.addedAt) }}</p>
+              <p class="text-responsive-xs text-placeholder">Ajouté le {{ formatDate(favorite.addedAt) }}</p>
             </div>
 
             <template #footer>
@@ -88,7 +88,7 @@
                 <Button
                   variant="ghost"
                   size="sm"
-                  class="text-neutral-500"
+                  class="text-muted"
                   @click="goToDetail(favorite)"
                 >
                   Voir les détails
@@ -116,9 +116,9 @@
       <aside class="space-y-6">
         <Card class="bg-white/90">
           <template #header>
-            <h2 class="text-responsive-xl font-semibold text-neutral-900">Notifications prioritaires</h2>
+            <h2 class="text-responsive-xl font-semibold text-heading">Notifications prioritaires</h2>
           </template>
-          <p class="text-responsive-sm text-neutral-600">
+          <p class="text-responsive-sm text-body">
             Activez les alertes pour recevoir un message dès qu'un panier similaire est publié par vos commerçants favoris.
           </p>
           <Button

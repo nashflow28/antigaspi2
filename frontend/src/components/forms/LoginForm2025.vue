@@ -1,11 +1,11 @@
 <template>
   <div class="space-y-8">
     <!-- Header moderne -->
-    <div class="text-center animate-fade-in-up">
-      <h3 class="text-responsive-xl font-semibold text-neutral-900 mb-2">
+    <div class="text-left sm:text-center animate-fade-in-up">
+      <h3 class="text-responsive-xl font-semibold text-heading mb-2">
         Content de vous revoir !
       </h3>
-      <p class="text-neutral-600">
+      <p class="text-body">
         Connectez-vous pour accéder à votre compte Antigaspi
       </p>
     </div>
@@ -44,19 +44,19 @@
       </div>
 
       <!-- Remember Me -->
-      <div class="flex items-center justify-between">
+      <div class="flex items-center justify-start sm:justify-between">
         <label class="flex items-center gap-2">
           <input
             v-model="form.remember"
             type="checkbox"
-            class="rounded border-neutral-300 text-primary-600 focus:ring-primary-500"
+            class="rounded border-neutral-300 text-primary focus:ring-primary-500"
           >
-          <span class="text-responsive-sm text-neutral-600">Se souvenir de moi</span>
+          <span class="text-responsive-sm text-body">Se souvenir de moi</span>
         </label>
 
         <router-link
           to="/forgot-password"
-          class="text-responsive-sm text-primary-600 hover:text-primary-700 font-medium"
+          class="text-responsive-sm text-primary hover:text-primary-emphasis font-medium"
         >
           Mot de passe oublié ?
         </router-link>
@@ -69,18 +69,18 @@
         :loading="loading"
         :disabled="!isFormValid"
         full-width
-        class="glow-effect group relative overflow-hidden"
+        class="glow-effect group relative overflow-hidden sm:block"
       >
         <span class="relative z-10 flex items-center justify-center gap-2">
           <Loader2 v-if="loading" class="w-5 h-5 animate-spin" />
           <span>{{ loading ? 'Connexion en cours...' : 'Se connecter' }}</span>
         </span>
-        <div class="absolute inset-0 bg-gradient-to-r from-primary-600 to-accent-blue/90 opacity-0 group-hover:transition-opacity duration-300" />
+        <div class="relative sm:absolute inset-0 bg-gradient-to-r from-primary-600 to-accent-blue/90 opacity-0 group-hover:transition-opacity duration-300" />
       </Button>
 
       <!-- Error Message Global -->
       <div v-if="errorMessage" class="p-4 rounded-lg bg-red-50 border border-red-200">
-        <div class="flex items-start gap-3">
+        <div class="flex items-stretch sm:items-start gap-3">
           <AlertCircle class="w-5 h-5 text-red-500 mt-0.5 flex-shrink-0" />
           <div>
             <h4 class="text-responsive-sm font-semibold text-red-800">Erreur de connexion</h4>
@@ -93,15 +93,15 @@
     <!-- Social Login Options -->
     <div class="space-y-4 animate-fade-in-up" style="animation-delay: 0.4s;">
       <div class="relative">
-        <div class="absolute inset-0 flex items-center">
+        <div class="relative sm:absolute inset-0 flex items-center">
           <div class="w-full border-t border-neutral-300" />
         </div>
         <div class="relative flex justify-center text-responsive-sm">
-          <span class="px-4 bg-white text-neutral-500">Ou continuez avec</span>
+          <span class="px-4 bg-white text-muted">Ou continuez avec</span>
         </div>
       </div>
 
-      <div class="grid grid-cols-2 gap-4">
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <Button
           variant="outline"
           class="flex items-center justify-center gap-2 py-3"
@@ -130,11 +130,11 @@
     </div>
 
     <!-- Sign Up Link -->
-    <div class="text-center text-responsive-sm text-neutral-600 animate-fade-in-up" style="animation-delay: 0.6s;">
+    <div class="text-left sm:text-center text-responsive-sm text-body animate-fade-in-up" style="animation-delay: 0.6s;">
       Vous n'avez pas encore de compte ?
       <router-link
         to="/register"
-        class="font-semibold text-primary-600 hover:text-primary-700 ml-1"
+        class="font-semibold text-primary hover:text-primary-emphasis ml-1"
       >
         Créez votre compte
       </router-link>
@@ -236,12 +236,12 @@ const handleSubmit = async () => {
 
     logMigration('LoginForm', 'Login success', { email: form.value.email })
     router.push('/dashboard')
-  } catch (error: any) {
+  } catch (error: unknown) {
     // SECURITY FIX: Sanitize error messages to prevent XSS
-    const rawError = error.message || 'Une erreur est survenue lors de la connexion'
+    const rawError = (error instanceof Error ? error.message : String(error)) || 'Une erreur est survenue lors de la connexion'
     logXssAttempt(rawError, 'LoginForm error message')
     errorMessage.value = sanitizeErrorMessage(rawError)
-    logMigration('LoginForm', 'Login error', { error: error.message })
+    logMigration('LoginForm', 'Login error', { error: rawError })
   } finally {
     loading.value = false
   }
@@ -250,7 +250,7 @@ const handleSubmit = async () => {
 const handleSocialLogin = (provider: string) => {
   logMigration('LoginForm', 'Social login attempt', { provider })
   // Implementation for social login would go here
-  console.log(`Social login with ${provider}`)
+  // Social login implementation needed
 }
 </script>
 

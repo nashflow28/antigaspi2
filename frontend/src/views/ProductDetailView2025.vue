@@ -4,57 +4,57 @@
     <div v-if="loading" class="flex justify-center items-center min-h-screen">
       <div class="flex items-center gap-3">
         <div class="animate-spin rounded-full h-10 w-10 border-b-2 border-primary-600" />
-        <span class="text-neutral-600">Chargement du produit...</span>
+        <span class="text-body">Chargement du produit...</span>
       </div>
     </div>
 
     <!-- Error State -->
-    <div v-else-if="error" class="container mx-auto px-4 py-16 text-center">
+    <div v-else-if="error" class="container px-4 sm:px-6 lg:px-8 mx-auto px-4 py-12 sm:py-14 lg:py-16 text-left sm:text-center">
       <AlertCircle class="w-16 h-16 text-red-500 mx-auto mb-4" />
-      <h2 class="text-responsive-xl font-semibold text-neutral-900 mb-2">Produit introuvable</h2>
-      <p class="text-neutral-600 mb-6">Le produit que vous recherchez n'existe pas ou a été supprimé.</p>
+      <h2 class="text-responsive-xl font-semibold text-heading mb-2">Produit introuvable</h2>
+      <p class="text-body mb-6">Le produit que vous recherchez n'existe pas ou a été supprimé.</p>
       <Button variant="primary" @click="$router.push('/products')">
         Retour au catalogue
       </Button>
     </div>
 
     <!-- Product Detail -->
-    <div v-else-if="product" class="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <div v-else-if="product" class="container px-4 sm:px-6 lg:px-8 mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10 lg:py-12">
       <!-- Breadcrumb -->
-      <nav class="flex items-center gap-2 text-responsive-sm text-neutral-600 mb-8">
+      <nav class="flex items-center gap-2 text-responsive-sm text-body mb-6 sm:mb-8">
         <router-link to="/" class="hover:transition-colors">Accueil</router-link>
         <ChevronRight class="w-5 h-5" />
         <router-link to="/products" class="hover:transition-colors">Catalogue</router-link>
         <ChevronRight class="w-5 h-5" />
-        <span class="text-neutral-900 font-medium">{{ product.name }}</span>
+        <span class="text-heading font-medium">{{ product.name }}</span>
       </nav>
 
       <!-- Main Content -->
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-12">
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 sm:gap-12 mb-8 sm:mb-10 lg:mb-12">
         <!-- Product Image -->
         <div class="space-y-6">
           <Card
             variant="glass"
             :no-padding="true"
-            class="relative aspect-square bg-gradient-to-br from-primary-500 via-accent-blue to-accent-blue/90 rounded-3xl overflow-hidden shadow-modern-2025 glow-effect"
+            class="relative aspect-square bg-gradient-to-br from-primary-500 via-accent-blue to-accent-blue/90 rounded-3xl overflow-hidden sm:block shadow-modern-2025 glow-effect"
           >
             <!-- Product Image or Placeholder -->
-            <div v-if="product.image_url" class="absolute inset-0">
+            <div v-if="product.image_url" class="relative sm:absolute inset-0">
               <img
                 :src="product.image_url"
                 :alt="product.name"
                 class="w-full h-full object-cover"
               >
             </div>
-            <div v-else class="absolute inset-0 flex items-center justify-center">
+            <div v-else class="relative sm:absolute inset-0 flex items-center justify-center">
               <Package class="w-40 h-40 text-white/20" />
             </div>
 
             <!-- Glassmorphism overlay -->
-            <div class="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent" />
+            <div class="relative sm:absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent" />
 
             <!-- Stock Badge -->
-            <div class="absolute top-4 left-4">
+            <div class="relative sm:absolute top-4 left-4">
               <Badge
                 :variant="product.quantity > 5 ? 'success' : product.quantity > 0 ? 'warning' : 'error'"
                 class="backdrop-blur-md"
@@ -64,14 +64,14 @@
             </div>
 
             <!-- Discount Badge -->
-            <div v-if="discountPercentage > 0" class="absolute top-4 right-4">
+            <div v-if="discountPercentage > 0" class="relative sm:absolute top-4 right-4">
               <Badge variant="promo" class="backdrop-blur-md">
                 -{{ discountPercentage }}%
               </Badge>
             </div>
 
             <!-- Status Badge -->
-            <div class="absolute bottom-4 right-4">
+            <div class="relative sm:absolute bottom-4 right-4">
               <Badge
                 :variant="statusVariant"
                 class="backdrop-blur-md"
@@ -85,18 +85,18 @@
           <Card variant="elevated">
             <div class="space-y-4">
               <div class="flex items-center gap-3">
-                <MapPin class="w-5 h-5 text-neutral-500" />
+                <MapPin class="w-5 h-5 text-muted" />
                 <div>
-                  <p class="text-responsive-sm font-medium text-neutral-900">{{ product.merchant?.business_name }}</p>
-                  <p class="text-responsive-sm text-neutral-600">{{ product.merchant?.address }}</p>
+                  <p class="text-responsive-sm font-medium text-heading">{{ product.merchant?.business_name }}</p>
+                  <p class="text-responsive-sm text-body">{{ product.merchant?.address }}</p>
                 </div>
               </div>
 
               <div class="flex items-center gap-3">
-                <Clock class="w-5 h-5 text-neutral-500" />
+                <Clock class="w-5 h-5 text-muted" />
                 <div>
-                  <p class="text-responsive-sm font-medium text-neutral-900">Récupération</p>
-                  <p class="text-responsive-sm text-neutral-600">
+                  <p class="text-responsive-sm font-medium text-heading">Récupération</p>
+                  <p class="text-responsive-sm text-body">
                     {{ formatExpiration(product.expiration_date) }}
                   </p>
                 </div>
@@ -122,16 +122,16 @@
               </Badge>
             </div>
 
-            <h1 class="text-responsive-xl lg:text-display-sm font-semibold text-neutral-900 mb-4">
+            <h1 class="text-responsive-xl lg:text-display-sm font-semibold text-heading mb-4">
               {{ product.name }}
             </h1>
 
             <!-- Pricing -->
             <div class="flex items-center gap-4 mb-6">
-              <div class="text-responsive-xl font-semibold text-primary-600">
+              <div class="text-responsive-xl font-semibold text-primary">
                 {{ formatPrice(product.discounted_price) }} XOF
               </div>
-              <div v-if="product.original_price !== product.discounted_price" class="text-responsive-xl text-neutral-500 line-through">
+              <div v-if="product.original_price !== product.discounted_price" class="text-responsive-xl text-muted line-through">
                 {{ formatPrice(product.original_price) }} XOF
               </div>
               <Badge v-if="discountPercentage > 0" variant="success">
@@ -145,7 +145,7 @@
             <template #header>
               <h3 class="text-responsive-lg font-semibold">Description</h3>
             </template>
-            <p class="text-neutral-700 leading-relaxed">
+            <p class="text-body-emphasis leading-relaxed">
               {{ product.description || 'Aucune description disponible.' }}
             </p>
           </Card>
@@ -154,11 +154,11 @@
           <Card variant="gradient">
             <div class="space-y-6">
               <div>
-                <h3 class="text-responsive-lg font-semibold text-neutral-900 mb-4">Réservation</h3>
+                <h3 class="text-responsive-lg font-semibold text-heading mb-4">Réservation</h3>
 
                 <!-- Quantity Selector -->
                 <div class="flex items-center gap-4 mb-6">
-                  <label class="text-responsive-sm font-medium text-neutral-700">Quantité :</label>
+                  <label class="text-responsive-sm font-medium text-body-emphasis">Quantité :</label>
                   <div class="flex items-center border border-neutral-300 rounded-lg">
                     <Button
                       variant="ghost"
@@ -173,7 +173,7 @@
                       type="number"
                       min="1"
                       :max="product.quantity"
-                      class="w-16 text-center border-0 focus:ring-0 py-3"
+                      class="w-16 text-left sm:text-center border-0 focus:ring-0 py-3"
                     >
                     <Button
                       variant="ghost"
@@ -187,9 +187,9 @@
                 </div>
 
                 <!-- Total Price -->
-                <div class="flex items-center justify-between p-4 bg-primary-50 rounded-lg mb-6">
+                <div class="flex items-center justify-start sm:justify-between p-4 bg-primary-50 rounded-lg mb-6">
                   <span class="text-responsive-sm font-medium text-primary-900">Total :</span>
-                  <span class="text-responsive-xl font-semibold text-primary-600">
+                  <span class="text-responsive-xl font-semibold text-primary">
                     {{ formatPrice(product.discounted_price * reservationQuantity) }} XOF
                   </span>
                 </div>
@@ -224,8 +224,8 @@
 
           <!-- Share Product -->
           <Card>
-            <div class="flex items-center justify-between">
-              <h3 class="text-responsive-lg font-semibold text-neutral-900">Partager</h3>
+            <div class="flex items-center justify-start sm:justify-between">
+              <h3 class="text-responsive-lg font-semibold text-heading">Partager</h3>
               <div class="flex gap-2">
                 <Button variant="ghost" size="sm" @click="shareProduct('facebook')">
                   <Facebook class="w-5 h-5" />
@@ -248,10 +248,10 @@
       <!-- Related Products -->
       <Card v-if="relatedProducts.length > 0">
         <template #header>
-          <h2 class="text-responsive-xl font-semibold text-neutral-900">Produits similaires</h2>
+          <h2 class="text-responsive-xl font-semibold text-heading">Produits similaires</h2>
         </template>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
           <Card
             v-for="relatedProduct in relatedProducts"
             :key="relatedProduct.id"
@@ -260,7 +260,7 @@
             class="group cursor-pointer"
             @click="navigateToProduct(relatedProduct.id)"
           >
-            <div class="aspect-square bg-gradient-to-br from-neutral-200 to-neutral-300 rounded-lg overflow-hidden mb-4">
+            <div class="aspect-square bg-gradient-to-br from-neutral-200 to-neutral-300 rounded-lg overflow-hidden sm:block mb-4">
               <img
                 v-if="relatedProduct.image_url"
                 :src="relatedProduct.image_url"
@@ -268,15 +268,15 @@
                 class="w-full h-full object-cover group-hover:transition-transform duration-300"
               >
               <div v-else class="flex items-center justify-center h-full">
-                <Package class="w-12 h-12 text-neutral-400" />
+                <Package class="w-12 h-12 text-placeholder" />
               </div>
             </div>
 
             <div>
-              <h3 class="font-semibold text-neutral-900 mb-1 truncate">{{ relatedProduct.name }}</h3>
-              <p class="text-responsive-sm text-neutral-600 mb-2">{{ relatedProduct.merchant?.business_name }}</p>
+              <h3 class="font-semibold text-heading mb-1 truncate">{{ relatedProduct.name }}</h3>
+              <p class="text-responsive-sm text-body mb-2">{{ relatedProduct.merchant?.business_name }}</p>
               <div class="flex items-center gap-2">
-                <span class="font-semibold text-primary-600">{{ formatPrice(relatedProduct.discounted_price) }} XOF</span>
+                <span class="font-semibold text-primary">{{ formatPrice(relatedProduct.discounted_price) }} XOF</span>
                 <Badge size="xs" :variant="relatedProduct.quantity > 0 ? 'success' : 'error'">
                   {{ relatedProduct.quantity }} restants
                 </Badge>
@@ -403,7 +403,7 @@ const handleReservation = async () => {
 
     router.push('/reservations')
   } catch (error) {
-    console.error('Reservation error:', error)
+    // console.error('Reservation error:', error)
   } finally {
     reservationLoading.value = false
   }
@@ -427,7 +427,7 @@ const copyLink = async () => {
     await navigator.clipboard.writeText(window.location.href)
     logMigration('ProductDetailView', 'Link copied')
   } catch (error) {
-    console.error('Failed to copy link:', error)
+    // console.error('Failed to copy link:', error)
   }
 }
 

@@ -208,11 +208,11 @@ export const useLoyaltyPoints = () => {
 
   const getPointTypeColor = (type: string): string => {
     const colors: Record<string, string> = {
-      'purchase': 'text-green-600',
-      'review': 'text-blue-600',
+      'purchase': 'text-success',
+      'review': 'text-info',
       'referral': 'text-purple-600',
-      'bonus': 'text-yellow-600',
-      'redemption': 'text-red-600'
+      'bonus': 'text-warning',
+      'redemption': 'text-error'
     }
     return colors[type] || 'text-gray-600'
   }

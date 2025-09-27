@@ -1,17 +1,17 @@
 <template>
   <div class="bg-white rounded-2xl shadow-lg p-6 border border-neutral-100">
-    <div class="flex items-center justify-between mb-6">
-      <div class="flex items-center space-x-3">
+    <div class="flex items-center justify-start sm:justify-between mb-6">
+      <div class="flex items-center space-y-3 sm:space-y-0 sm:space-x-3">
         <div class="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
-          <Edit class="w-10 h-10 text-blue-600" />
+          <Edit class="w-10 h-10 text-info" />
         </div>
         <div>
-          <h3 class="text-responsive-lg font-semibold text-neutral-900">Modifier votre avis</h3>
-          <p class="text-neutral-600 text-responsive-sm">Mettez à jour votre expérience</p>
+          <h3 class="text-responsive-lg font-semibold text-heading">Modifier votre avis</h3>
+          <p class="text-body text-responsive-sm">Mettez à jour votre expérience</p>
         </div>
       </div>
       <button
-        class="text-neutral-400 hover:transition-colors"
+        class="text-placeholder hover:transition-colors"
         @click="$emit('cancel')"
       >
         <X class="w-10 h-10" />
@@ -21,7 +21,7 @@
     <form class="space-y-6" @submit.prevent="submitUpdate">
       <!-- Rating -->
       <div>
-        <label class="block text-responsive-sm font-medium text-neutral-700 mb-3">
+        <label class="block text-responsive-sm font-medium text-body-emphasis mb-3">
           Note générale *
         </label>
         <StarRating
@@ -29,12 +29,12 @@
           :size="32"
           :show-text="true"
         />
-        <p v-if="errors.rating" class="mt-1 text-responsive-sm text-red-600">{{ errors.rating }}</p>
+        <p v-if="errors.rating" class="mt-1 text-responsive-sm text-error">{{ errors.rating }}</p>
       </div>
 
       <!-- Title -->
       <div>
-        <label for="edit-title" class="block text-responsive-sm font-medium text-neutral-700 mb-2">
+        <label for="edit-title" class="block text-responsive-sm font-medium text-body-emphasis mb-2">
           Titre de votre avis
         </label>
         <input
@@ -45,12 +45,12 @@
           class="w-full border border-neutral-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           placeholder="Ex: Service rapide et produits frais"
         >
-        <p v-if="errors.title" class="mt-1 text-responsive-sm text-red-600">{{ errors.title }}</p>
+        <p v-if="errors.title" class="mt-1 text-responsive-sm text-error">{{ errors.title }}</p>
       </div>
 
       <!-- Comment -->
       <div>
-        <label for="edit-comment" class="block text-responsive-sm font-medium text-neutral-700 mb-2">
+        <label for="edit-comment" class="block text-responsive-sm font-medium text-body-emphasis mb-2">
           Votre commentaire
         </label>
         <textarea
@@ -61,24 +61,24 @@
           class="w-full border border-neutral-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
           placeholder="Décrivez votre expérience mise à jour..."
         />
-        <div class="flex justify-between mt-1">
-          <p v-if="errors.comment" class="text-responsive-sm text-red-600">{{ errors.comment }}</p>
-          <p class="text-responsive-xs text-neutral-500">{{ (form.comment?.length || 0) }}/1000 caractères</p>
+        <div class="flex justify-start sm:justify-between mt-1">
+          <p v-if="errors.comment" class="text-responsive-sm text-error">{{ errors.comment }}</p>
+          <p class="text-responsive-xs text-muted">{{ (form.comment?.length || 0) }}/1000 caractères</p>
         </div>
       </div>
 
       <!-- Action Buttons -->
-      <div class="flex justify-end space-x-3 pt-4">
+      <div class="flex justify-center sm:justify-end space-y-3 sm:space-y-0 sm:space-x-3 pt-4">
         <button
           type="button"
-          class="px-6 py-3 text-neutral-600 hover:transition-colors"
+          class="px-6 py-3 text-body hover:transition-colors"
           @click="$emit('cancel')"
         >
           Annuler
         </button>
         <button
           type="button"
-          class="px-6 py-3 bg-red-600 text-white rounded-lg hover:transition-colors flex items-center space-x-2"
+          class="px-6 py-3 bg-red-600 text-white rounded-lg hover:transition-colors flex items-center space-y-2 sm:space-y-0 sm:space-x-2"
           :disabled="submitting"
           @click="confirmDelete"
         >
@@ -88,7 +88,7 @@
         <button
           type="submit"
           :disabled="!form.rating || submitting"
-          class="px-6 py-3 bg-blue-600 text-white rounded-lg hover:transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2"
+          class="px-6 py-3 bg-blue-600 text-white rounded-lg hover:transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-y-2 sm:space-y-0 sm:space-x-2"
         >
           <span>{{ submitting ? 'Mise à jour...' : 'Mettre à jour' }}</span>
           <Save v-if="!submitting" class="w-5 h-5" />
@@ -122,14 +122,14 @@
 
     <!-- Delete Confirmation Modal -->
     <div v-if="showDeleteConfirm" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[120]">
-      <div class="bg-white rounded-lg p-6 max-w-md w-mx-4">
-        <h3 class="text-responsive-lg font-semibold text-neutral-900 mb-4">Supprimer l'avis</h3>
-        <p class="text-neutral-600 mb-6">
+      <div class="bg-white rounded-lg p-6 max-w-full sm:max-w-md w-mx-4">
+        <h3 class="text-responsive-lg font-semibold text-heading mb-4">Supprimer l'avis</h3>
+        <p class="text-body mb-6">
           Êtes-vous sûr de vouloir supprimer définitivement cet avis ? Cette action ne peut pas être annulée.
         </p>
-        <div class="flex justify-end space-x-3">
+        <div class="flex justify-center sm:justify-end space-y-3 sm:space-y-0 sm:space-x-3">
           <button
-            class="px-4 py-3 text-neutral-600 hover:transition-colors"
+            class="px-4 py-3 text-body hover:transition-colors"
             @click="showDeleteConfirm = false"
           >
             Annuler
@@ -215,7 +215,7 @@ const loadReview = async () => {
       showMessage('error', data.message || 'Impossible de charger l\'avis')
     }
   } catch (error) {
-    console.error('Error loading review:', error)
+    // console.error('Error loading review:', error)
     showMessage('error', 'Erreur de connexion')
   } finally {
     loading.value = false
@@ -270,7 +270,7 @@ const submitUpdate = async () => {
       }
     }
   } catch (error) {
-    console.error('Error updating review:', error)
+    // console.error('Error updating review:', error)
     showMessage('error', 'Erreur de connexion. Veuillez réessayer.')
   } finally {
     submitting.value = false
@@ -302,7 +302,7 @@ const deleteReview = async () => {
       showDeleteConfirm.value = false
     }
   } catch (error) {
-    console.error('Error deleting review:', error)
+    // console.error('Error deleting review:', error)
     showMessage('error', 'Erreur de connexion')
     showDeleteConfirm.value = false
   } finally {

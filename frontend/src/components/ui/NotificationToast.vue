@@ -1,14 +1,14 @@
 <template>
   <div
     v-if="isVisible"
-    class="fixed top-4 right-4 z-[110] max-w-sm w-full bg-white shadow-lg rounded-lg pointer-events-auto ring-1 ring-black ring-opacity-5 overflow-hidden transform transition-all duration-300 ease-in-out"
+    class="fixed top-4 right-4 z-[110] max-w-sm w-full bg-white shadow-lg rounded-lg pointer-events-auto ring-1 ring-black ring-opacity-5 overflow-hidden sm:block transform transition-all duration-300 ease-in-out"
     :class="{
       'translate-x-0': isVisible,
       'translate-x-full': !isVisible
     }"
   >
     <div class="p-4">
-      <div class="flex items-start">
+      <div class="flex items-stretch sm:items-start">
         <div class="flex-shrink-0">
           <svg
             class="h-10 w-10"
@@ -48,12 +48,12 @@
           </svg>
         </div>
         <div class="ml-3 w-0 flex-1 pt-0.5">
-          <p class="text-responsive-sm font-medium text-neutral-900">{{ title }}</p>
-          <p class="mt-1 text-responsive-sm text-neutral-500">{{ message }}</p>
+          <p class="text-responsive-sm font-medium text-heading">{{ title }}</p>
+          <p class="mt-1 text-responsive-sm text-muted">{{ message }}</p>
         </div>
         <div class="ml-4 flex-shrink-0 flex">
           <button
-            class="bg-white rounded-md inline-flex text-neutral-400 hover:text-neutral-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+            class="bg-white rounded-md inline-flex text-placeholder hover:text-muted focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
             @click="close"
           >
             <span class="sr-only">Fermer</span>

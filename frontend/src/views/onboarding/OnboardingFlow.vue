@@ -1,24 +1,24 @@
 <template>
   <div class="min-h-screen bg-gradient-to-br from-neutral-50 via-white to-primary-50">
-    <div class="container mx-auto max-w-5xl px-6 py-12">
-      <div class="mb-10 flex flex-col items-start justify-between gap-6 lg:flex-row lg:items-center">
+    <div class="container px-4 sm:px-6 lg:px-8 mx-auto max-w-5xl px-6 py-8 sm:py-10 lg:py-12">
+      <div class="mb-10 flex flex-col items-stretch sm:items-start justify-between gap-4 sm:gap-6 lg:flex-row lg:items-center">
         <div>
-          <p class="mb-2 inline-flex items-center gap-2 rounded-full bg-primary-100/60 px-4 py-3 text-responsive-sm font-semibold text-primary-700">
+          <p class="mb-2 inline-flex items-center gap-2 rounded-full bg-primary-100/60 px-4 py-3 text-responsive-sm font-semibold text-primary-emphasis">
             <Sparkles class="h-5 w-5" />
             Guide de démarrage AntiGaspi
           </p>
-          <h1 class="text-display-sm font-semibold tracking-tight text-neutral-900">
+          <h1 class="text-display-sm font-semibold tracking-tight text-heading">
             Bienvenue ! Faisons connaissance en quelques étapes
           </h1>
-          <p class="mt-3 max-w-xl text-responsive-lg text-neutral-600">
+          <p class="mt-3 max-w-full sm:max-w-xl text-responsive-lg text-body">
             Découvrez comment réserver des paniers surprise, suivre vos commerçants favoris et profiter du portefeuille AntiGaspi.
           </p>
         </div>
         <div class="w-full max-w-xs rounded-3xl border border-primary-200/60 bg-white/80 p-6 shadow-card backdrop-blur">
-          <p class="text-responsive-sm font-medium text-neutral-500">Progression</p>
+          <p class="text-responsive-sm font-medium text-muted">Progression</p>
           <div class="mt-2 flex items-end justify-between">
-            <span class="text-display-sm font-semibold text-primary-600">{{ progress }}%</span>
-            <span class="text-responsive-sm text-neutral-500">Étape {{ currentStep + 1 }} sur {{ totalSteps }}</span>
+            <span class="text-display-sm font-semibold text-primary">{{ progress }}%</span>
+            <span class="text-responsive-sm text-muted">Étape {{ currentStep + 1 }} sur {{ totalSteps }}</span>
           </div>
           <div class="mt-4 h-2.5 rounded-full bg-neutral-200/80">
             <div
@@ -26,7 +26,7 @@
               :style="{ width: `${progress}%` }"
             />
           </div>
-          <ul class="mt-4 space-y-2 text-responsive-sm text-neutral-500">
+          <ul class="mt-4 space-y-2 text-responsive-sm text-muted">
             <li
               v-for="(step, index) in steps"
               :key="step.title"
@@ -34,11 +34,11 @@
             >
               <span
                 class="flex h-10 w-10 items-center justify-center rounded-full border"
-                :class="index <= currentStep ? 'border-primary-500 bg-primary-500 text-white' : 'border-neutral-300 text-neutral-400'"
+                :class="index <= currentStep ? 'border-primary-500 bg-primary-500 text-white' : 'border-neutral-300 text-placeholder'"
               >
                 {{ index + 1 }}
               </span>
-              <span :class="index === currentStep ? 'font-semibold text-neutral-800' : ''">
+              <span :class="index === currentStep ? 'font-semibold text-heading-secondary' : ''">
                 {{ step.title }}
               </span>
             </li>
@@ -46,20 +46,20 @@
         </div>
       </div>
 
-      <div class="grid gap-6 lg:grid-cols-[2fr_1fr]">
+      <div class="grid gap-4 sm:gap-6 lg:grid-cols-[2fr_1fr]">
         <Card class="bg-white/80">
           <template #header>
             <div class="flex items-center gap-3">
-              <component :is="activeStep.icon" class="h-10 w-10 rounded-2xl bg-primary-100 p-2 text-primary-600" />
+              <component :is="activeStep.icon" class="h-10 w-10 rounded-2xl bg-primary-100 p-2 text-primary" />
               <div>
-                <p class="text-responsive-sm font-medium uppercase tracking-wide text-primary-600">{{ activeStep.category }}</p>
-                <h2 class="text-responsive-xl font-semibold text-neutral-900">{{ activeStep.title }}</h2>
+                <p class="text-responsive-sm font-medium uppercase tracking-wide text-primary">{{ activeStep.category }}</p>
+                <h2 class="text-responsive-xl font-semibold text-heading">{{ activeStep.title }}</h2>
               </div>
             </div>
           </template>
 
-          <div class="space-y-6 text-neutral-600">
-            <p class="text-responsive-lg leading-relaxed text-neutral-700">
+          <div class="space-y-6 text-body">
+            <p class="text-responsive-lg leading-relaxed text-body-emphasis">
               {{ activeStep.description }}
             </p>
 
@@ -67,14 +67,14 @@
               <li
                 v-for="item in activeStep.points"
                 :key="item.title"
-                class="flex items-start gap-3 rounded-2xl border border-neutral-200/70 bg-white/80 p-4 shadow-sm"
+                class="flex items-stretch sm:items-start gap-3 rounded-2xl border border-neutral-200/70 bg-white/80 p-4 shadow-sm"
               >
-                <div class="mt-1 flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-primary-100 text-primary-600">
+                <div class="mt-1 flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-primary-100 text-primary">
                   <component :is="item.icon" class="h-5 w-5" />
                 </div>
                 <div>
-                  <p class="font-semibold text-neutral-800">{{ item.title }}</p>
-                  <p class="text-responsive-sm text-neutral-600">{{ item.content }}</p>
+                  <p class="font-semibold text-heading-secondary">{{ item.title }}</p>
+                  <p class="text-responsive-sm text-body">{{ item.content }}</p>
                 </div>
               </li>
             </ul>
@@ -84,7 +84,7 @@
             <div class="flex flex-col-reverse gap-3 sm:flex-row sm:items-center sm:justify-between">
               <Button
                 variant="ghost"
-                class="text-neutral-500 hover:text-neutral-800"
+                class="text-muted hover:text-heading-secondary"
                 @click="skip"
               >
                 Passer le guide
@@ -127,14 +127,14 @@
           >
             <template #header>
               <div class="flex items-center gap-3">
-                <component :is="insight.icon" class="h-9 w-9 rounded-2xl bg-primary-100 p-2 text-primary-600" />
+                <component :is="insight.icon" class="h-9 w-9 rounded-2xl bg-primary-100 p-2 text-primary" />
                 <div>
-                  <p class="text-responsive-sm font-medium text-neutral-500">{{ insight.category }}</p>
-                  <h3 class="text-responsive-lg font-semibold text-neutral-900">{{ insight.title }}</h3>
+                  <p class="text-responsive-sm font-medium text-muted">{{ insight.category }}</p>
+                  <h3 class="text-responsive-lg font-semibold text-heading">{{ insight.title }}</h3>
                 </div>
               </div>
             </template>
-            <p class="text-responsive-sm leading-relaxed text-neutral-600">{{ insight.description }}</p>
+            <p class="text-responsive-sm leading-relaxed text-body">{{ insight.description }}</p>
           </Card>
         </div>
       </div>

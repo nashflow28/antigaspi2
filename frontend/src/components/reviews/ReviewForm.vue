@@ -1,13 +1,13 @@
 <template>
   <div class="bg-white rounded-2xl shadow-lg p-6 border border-neutral-100">
-    <div class="flex items-center justify-between mb-6">
-      <div class="flex items-center space-x-3">
+    <div class="flex items-center justify-start sm:justify-between mb-6">
+      <div class="flex items-center space-y-3 sm:space-y-0 sm:space-x-3">
         <div class="w-12 h-12 bg-yellow-100 rounded-xl flex items-center justify-center">
-          <Star class="w-10 h-10 text-yellow-600" />
+          <Star class="w-10 h-10 text-warning" />
         </div>
         <div>
-          <h3 class="text-responsive-lg font-semibold text-neutral-900">Donner votre avis</h3>
-          <p class="text-neutral-600 text-responsive-sm">Partagez votre expérience avec ce commerçant</p>
+          <h3 class="text-responsive-lg font-semibold text-heading">Donner votre avis</h3>
+          <p class="text-body text-responsive-sm">Partagez votre expérience avec ce commerçant</p>
         </div>
       </div>
     </div>
@@ -15,7 +15,7 @@
     <form class="space-y-6" @submit.prevent="submitReview">
       <!-- Rating -->
       <div>
-        <label class="block text-responsive-sm font-medium text-neutral-700 mb-3">
+        <label class="block text-responsive-sm font-medium text-body-emphasis mb-3">
           Note générale *
         </label>
         <StarRating
@@ -23,12 +23,12 @@
           :size="32"
           :show-text="true"
         />
-        <p v-if="errors.rating" class="mt-1 text-responsive-sm text-red-600">{{ errors.rating }}</p>
+        <p v-if="errors.rating" class="mt-1 text-responsive-sm text-error">{{ errors.rating }}</p>
       </div>
 
       <!-- Title -->
       <div>
-        <label for="title" class="block text-responsive-sm font-medium text-neutral-700 mb-2">
+        <label for="title" class="block text-responsive-sm font-medium text-body-emphasis mb-2">
           Titre de votre avis
         </label>
         <input
@@ -39,12 +39,12 @@
           class="w-full border border-neutral-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-yellow-500 focus:border-transparent"
           placeholder="Ex: Service rapide et produits frais"
         >
-        <p v-if="errors.title" class="mt-1 text-responsive-sm text-red-600">{{ errors.title }}</p>
+        <p v-if="errors.title" class="mt-1 text-responsive-sm text-error">{{ errors.title }}</p>
       </div>
 
       <!-- Comment -->
       <div>
-        <label for="comment" class="block text-responsive-sm font-medium text-neutral-700 mb-2">
+        <label for="comment" class="block text-responsive-sm font-medium text-body-emphasis mb-2">
           Votre commentaire
         </label>
         <textarea
@@ -55,15 +55,15 @@
           class="w-full border border-neutral-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-yellow-500 focus:border-transparent resize-none"
           placeholder="Décrivez votre expérience avec ce commerçant..."
         />
-        <div class="flex justify-between mt-1">
-          <p v-if="errors.comment" class="text-responsive-sm text-red-600">{{ errors.comment }}</p>
-          <p class="text-responsive-xs text-neutral-500">{{ (form.comment?.length || 0) }}/1000 caractères</p>
+        <div class="flex justify-start sm:justify-between mt-1">
+          <p v-if="errors.comment" class="text-responsive-sm text-error">{{ errors.comment }}</p>
+          <p class="text-responsive-xs text-muted">{{ (form.comment?.length || 0) }}/1000 caractères</p>
         </div>
       </div>
 
       <!-- Product Selection (if applicable) -->
       <div v-if="availableProducts.length > 0">
-        <label for="product" class="block text-responsive-sm font-medium text-neutral-700 mb-2">
+        <label for="product" class="block text-responsive-sm font-medium text-body-emphasis mb-2">
           Produit concerné (optionnel)
         </label>
         <select
@@ -83,11 +83,11 @@
       </div>
 
       <!-- Submit Buttons -->
-      <div class="flex justify-end space-x-3 pt-4">
+      <div class="flex justify-center sm:justify-end space-y-3 sm:space-y-0 sm:space-x-3 pt-4">
         <button
           v-if="showCancel"
           type="button"
-          class="px-6 py-3 text-neutral-600 hover:transition-colors"
+          class="px-6 py-3 text-body hover:transition-colors"
           @click="$emit('cancel')"
         >
           Annuler
@@ -95,7 +95,7 @@
         <button
           type="submit"
           :disabled="!form.rating || submitting"
-          class="px-6 py-3 bg-yellow-600 text-white rounded-lg hover:transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2"
+          class="px-6 py-3 bg-yellow-600 text-white rounded-lg hover:transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-y-2 sm:space-y-0 sm:space-x-2"
         >
           <span>{{ submitting ? 'Publication...' : 'Publier l\'avis' }}</span>
           <Send v-if="!submitting" class="w-5 h-5" />
@@ -246,7 +246,7 @@ const submitReview = async () => {
       }
     }
   } catch (error) {
-    console.error('Error submitting review:', error)
+    // console.error('Error submitting review:', error)
     showMessage('error', 'Erreur de connexion. Veuillez réessayer.')
   } finally {
     submitting.value = false

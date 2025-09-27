@@ -9,21 +9,21 @@
     <!-- Loading overlay -->
     <div
       v-if="loading"
-      class="absolute inset-0 bg-white bg-opacity-75 flex items-center justify-center rounded-lg"
+      class="relative sm:absolute inset-0 bg-white bg-opacity-75 flex items-center justify-center rounded-lg"
     >
-      <div class="flex items-center space-x-3">
+      <div class="flex items-center space-y-3 sm:space-y-0 sm:space-x-3">
         <div class="animate-spin rounded-full h-10 w-10 border-b-2 border-primary-600" />
-        <span class="text-neutral-600">Chargement de la carte...</span>
+        <span class="text-body">Chargement de la carte...</span>
       </div>
     </div>
 
     <!-- Error state -->
     <div
       v-if="error"
-      class="absolute inset-0 bg-red-50 border border-red-200 rounded-lg flex items-center justify-center"
+      class="relative sm:absolute inset-0 bg-red-50 border border-red-200 rounded-lg flex items-center justify-center"
     >
-      <div class="text-center p-6">
-        <div class="text-red-600 mb-2">
+      <div class="text-left sm:text-center p-6">
+        <div class="text-error mb-2">
           <svg
             class="w-12 h-12 mx-auto"
             fill="none"
@@ -39,7 +39,7 @@
           </svg>
         </div>
         <h3 class="text-responsive-lg font-medium text-red-900 mb-1">Erreur de chargement</h3>
-        <p class="text-red-600 text-responsive-sm">{{ error }}</p>
+        <p class="text-error text-responsive-sm">{{ error }}</p>
         <button
           class="mt-3 px-4 py-3 bg-red-600 text-white rounded-lg hover:transition-colors"
           @click="initializeMap"
@@ -51,6 +51,7 @@
   </div>
 </template>
 
+<!-- eslint-disable no-undef -->
 <script setup lang="ts">
 /// <reference types="@types/google.maps" />
 import { ref, onMounted, watch, nextTick } from 'vue'
@@ -149,7 +150,7 @@ const initializeMap = async () => {
     loading.value = false
 
   } catch (err) {
-    console.error('Error initializing Google Map:', err)
+    // console.error('Error initializing Google Map:', err)
     error.value = err instanceof Error ? err.message : 'Erreur de chargement de la carte'
     loading.value = false
   }
@@ -210,8 +211,8 @@ const updateMarkers = () => {
     if (markerData.info) {
       const infoWindow = new google.maps.InfoWindow({
         content: `<div class="p-3">
-          <h3 class="font-semibold text-neutral-900">${markerData.title}</h3>
-          <p class="text-neutral-600 text-responsive-sm mt-1">${markerData.info}</p>
+          <h3 class="font-semibold text-heading">${markerData.title}</h3>
+          <p class="text-body text-responsive-sm mt-1">${markerData.info}</p>
         </div>`
       })
 

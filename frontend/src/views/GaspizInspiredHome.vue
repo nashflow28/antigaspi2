@@ -1,8 +1,8 @@
 <template>
   <div class="min-h-screen bg-gradient-to-b from-emerald-50 to-white text-slate-900">
-    <header class="relative overflow-hidden bg-white">
-      <div class="absolute inset-0 bg-emerald-500/10" />
-      <div class="relative mx-auto flex max-w-6xl flex-col gap-12 px-6 py-16 md:flex-row md:items-center md:py-20">
+    <header class="relative overflow-hidden sm:block bg-white">
+      <div class="relative sm:absolute inset-0 bg-emerald-500/10" />
+      <div class="relative mx-auto flex max-w-full sm:max-w-6xl flex-col gap-8 sm:gap-12 px-6 py-12 sm:py-14 lg:py-16 md:flex-row md:items-center md:py-20">
         <div class="md:w-1/2">
           <span class="inline-flex items-center rounded-full bg-emerald-100 px-4 py-3 text-responsive-sm font-medium text-emerald-700">
             🌍 Anti-gaspillage alimentaire
@@ -29,7 +29,7 @@
           </div>
         </div>
         <div class="md:w-1/2">
-          <div class="relative mx-auto max-w-md rounded-3xl bg-white p-6 shadow-2xl">
+          <div class="relative mx-auto max-w-full sm:max-w-md rounded-3xl bg-white p-6 shadow-2xl">
             <div class="flex items-center gap-3">
               <div class="h-12 w-12 rounded-full bg-emerald-100" />
               <div>
@@ -39,15 +39,15 @@
               <span class="ml-auto rounded-full bg-emerald-100 px-4 py-3 text-responsive-xs font-semibold text-emerald-700">-65%</span>
             </div>
             <ul class="mt-6 space-y-4 text-responsive-sm text-slate-600">
-              <li class="flex items-center justify-between rounded-xl bg-slate-50 p-3">
+              <li class="flex items-center justify-start sm:justify-between rounded-xl bg-slate-50 p-3">
                 <span>Boulangerie artisanale</span>
                 <span class="font-semibold text-emerald-600">3213 XOF</span>
               </li>
-              <li class="flex items-center justify-between rounded-xl bg-slate-50 p-3">
+              <li class="flex items-center justify-start sm:justify-between rounded-xl bg-slate-50 p-3">
                 <span>Supérette bio locale</span>
                 <span class="font-semibold text-emerald-600">3606 XOF</span>
               </li>
-              <li class="flex items-center justify-between rounded-xl bg-slate-50 p-3">
+              <li class="flex items-center justify-start sm:justify-between rounded-xl bg-slate-50 p-3">
                 <span>Restaurant végétarien</span>
                 <span class="font-semibold text-emerald-600">4065 XOF</span>
               </li>
@@ -60,13 +60,13 @@
       </div>
     </header>
 
-    <main class="mx-auto max-w-6xl px-6 py-16">
+    <main class="mx-auto max-w-full sm:max-w-6xl px-6 py-12 sm:py-14 lg:py-16">
       <section>
         <h2 class="text-responsive-xl font-semibold text-slate-900">Pourquoi nos utilisateurs adorent</h2>
         <p class="mt-2 text-slate-600">
           Une interface pensée pour inspirer confiance, guider rapidement vers les meilleures offres et mettre en avant l'impact positif de chaque réservation.
         </p>
-        <div class="mt-10 grid gap-6 md:grid-cols-3">
+        <div class="mt-10 grid gap-4 sm:gap-6 md:grid-cols-3">
           <article class="rounded-2xl border border-slate-100 bg-white p-6 shadow-sm">
             <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-emerald-100 text-emerald-600">1</div>
             <h3 class="mt-4 text-responsive-lg font-semibold">Découverte en un clin d'œil</h3>
@@ -92,22 +92,22 @@
       </section>
 
       <section class="mt-20 grid gap-10 lg:grid-cols-[1.1fr_0.9fr]">
-        <div class="rounded-3xl bg-white p-8 shadow-lg">
+        <div class="rounded-3xl bg-white p-4 sm:p-6 lg:p-8 shadow-lg">
           <h2 class="text-responsive-xl font-semibold">Fonctionnalités phares</h2>
           <ul class="mt-6 space-y-4 text-responsive-sm text-slate-600">
-            <li class="flex items-start gap-3">
+            <li class="flex items-stretch sm:items-start gap-3">
               <span class="mt-1 inline-flex h-10 w-10 items-center justify-center rounded-full bg-emerald-500 text-responsive-xs font-semibold text-white">UX</span>
               <p>
                 Tableau de bord personnalisé, modules de recommandation et suivi des réservations avec une interface inspirée des applications grand public.
               </p>
             </li>
-            <li class="flex items-start gap-3">
+            <li class="flex items-stretch sm:items-start gap-3">
               <span class="mt-1 inline-flex h-10 w-10 items-center justify-center rounded-full bg-emerald-500 text-responsive-xs font-semibold text-white">UI</span>
               <p>
                 Couleurs chaleureuses, typographies lisibles et composants soignés rappelant l'univers de Gaspiz tout en conservant l'identité Antigaspi.
               </p>
             </li>
-            <li class="flex items-start gap-3">
+            <li class="flex items-stretch sm:items-start gap-3">
               <span class="mt-1 inline-flex h-10 w-10 items-center justify-center rounded-full bg-emerald-500 text-responsive-xs font-semibold text-white">Data</span>
               <p>
                 Indicateurs d'impact en temps réel, historique des économies réalisées et objectifs mensuels pour encourager la fidélité.
@@ -115,7 +115,7 @@
             </li>
           </ul>
         </div>
-        <div class="rounded-3xl bg-gradient-to-br from-emerald-500 via-emerald-400 to-teal-500 p-8 text-white shadow-xl">
+        <div class="rounded-3xl bg-gradient-to-br from-emerald-500 via-emerald-400 to-teal-500 p-4 sm:p-6 lg:p-8 text-white shadow-xl">
           <h2 class="text-responsive-xl font-semibold">Construisons la suite</h2>
           <p class="mt-4 text-responsive-sm text-emerald-50">
             Ce prototype illustre l'ambition de notre refonte produit : une expérience moderne, rassurante et engagée pour accélérer la lutte contre le gaspillage alimentaire.

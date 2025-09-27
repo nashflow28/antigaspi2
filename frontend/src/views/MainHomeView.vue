@@ -7,8 +7,8 @@
             <span class="text-h2 font-semibold">🌱</span>
           </div>
           <div class="space-y-2">
-            <p class="text-small font-medium text-neutral-500">Bienvenue</p>
-            <h1 class="text-h2 font-semibold text-neutral-900">Antigaspi</h1>
+            <p class="text-small font-medium text-muted">Bienvenue</p>
+            <h1 class="text-h2 font-semibold text-heading">Antigaspi</h1>
           </div>
         </div>
 
@@ -16,7 +16,7 @@
           <Button
             variant="ghost"
             size="icon"
-            class="text-neutral-500 hover:text-primary-600"
+            class="text-muted hover:text-primary"
             aria-label="Rechercher"
             @click="handleSearch"
           >
@@ -26,14 +26,14 @@
           <Button
             variant="ghost"
             size="icon"
-            class="relative text-neutral-500 hover:text-primary-600"
+            class="relative text-muted hover:text-primary"
             aria-label="Notifications"
             @click="handleNotifications"
           >
             <span aria-hidden="true">🔔</span>
             <span
               v-if="notificationsCount > 0"
-              class="absolute -right-1 -top-1 flex h-5 min-w-[18px] items-center justify-center rounded-full bg-accent-red px-1 text-caption font-semibold text-white shadow-card"
+              class="relative sm:absolute -right-1 -top-1 flex h-5 min-w-[18px] items-center justify-center rounded-full bg-accent-red px-1 text-caption font-semibold text-white shadow-card"
             >
               {{ notificationsCount }}
             </span>
@@ -42,14 +42,14 @@
           <Button
             variant="ghost"
             size="icon"
-            class="relative text-neutral-500 hover:text-primary-600"
+            class="relative text-muted hover:text-primary"
             aria-label="Panier"
             @click="handleCart"
           >
             <span aria-hidden="true">🛒</span>
             <span
               v-if="cartItems > 0"
-              class="absolute -right-1 -top-1 flex h-5 min-w-[18px] items-center justify-center rounded-full bg-primary-500 px-1 text-caption font-semibold text-white shadow-card"
+              class="relative sm:absolute -right-1 -top-1 flex h-5 min-w-[18px] items-center justify-center rounded-full bg-primary-500 px-1 text-caption font-semibold text-white shadow-card"
             >
               {{ cartItems }}
             </span>
@@ -58,7 +58,7 @@
           <Button
             variant="secondary"
             size="icon"
-            class="text-primary-700"
+            class="text-primary-emphasis"
             aria-label="Profil"
             @click="handleProfile"
           >
@@ -69,12 +69,12 @@
     </header>
 
     <main class="space-y-spacing-22 pb-spacing-30 pt-spacing-22">
-      <section class="relative overflow-hidden bg-nav-gradient text-white">
-        <div class="mx-auto flex max-w-5xl flex-col gap-6 px-6 py-spacing-22 lg:flex-row lg:items-center lg:justify-between">
+      <section class="relative overflow-hidden sm:block bg-nav-gradient text-white">
+        <div class="mx-auto flex max-w-5xl flex-col gap-4 sm:gap-6 px-6 py-spacing-22 lg:flex-row lg:items-center lg:justify-between">
           <div class="space-y-4">
             <p class="text-small uppercase tracking-wide text-white/80">Luttons contre le gaspillage</p>
             <h2 class="text-display-sm font-semibold leading-relaxed">Découvrez les paniers solidaires près de chez vous</h2>
-            <p class="max-w-xl text-body text-white/80">
+            <p class="max-w-full sm:max-w-xl text-body text-white/80">
               Parcourez une sélection de produits sauvés des invendus et soutenez les commerçants locaux.
             </p>
             <div class="flex flex-wrap items-center gap-3">
@@ -85,7 +85,7 @@
               <Button
                 variant="secondary"
                 size="sm"
-                class="bg-white/90 text-primary-700 hover:bg-white"
+                class="bg-white/90 text-primary-emphasis hover:bg-white"
                 @click="refreshProducts"
               >
                 Explorer les nouveautés
@@ -109,11 +109,11 @@
         <Card padding="lg" class="space-y-8">
           <template #header>
             <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-              <h3 class="text-h3 font-semibold text-neutral-900">Catégories populaires</h3>
+              <h3 class="text-h3 font-semibold text-heading">Catégories populaires</h3>
               <Button
                 variant="ghost"
                 size="sm"
-                class="text-primary-600"
+                class="text-primary"
                 @click="viewAllCategories"
               >
                 Voir toutes les catégories
@@ -121,17 +121,17 @@
             </div>
           </template>
 
-          <div class="grid grid-cols-2 gap-4 md:grid-cols-4">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 md:grid-cols-4">
             <Card
               v-for="category in categories"
               :key="category.id"
               padding="sm"
               hover="subtle"
-              class="flex cursor-pointer flex-col items-center gap-3 text-center"
+              class="flex cursor-pointer flex-col items-center gap-3 text-left sm:text-center"
               @click="selectCategory(category)"
             >
               <span class="text-display-sm" aria-hidden="true">{{ category.emoji }}</span>
-              <p class="text-small font-medium text-neutral-700">{{ category.name }}</p>
+              <p class="text-small font-medium text-body-emphasis">{{ category.name }}</p>
             </Card>
           </div>
         </Card>
@@ -139,18 +139,18 @@
 
       <section class="mx-auto max-w-5xl px-6">
         <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <h3 class="text-h3 font-semibold text-neutral-900">Produits disponibles</h3>
+          <h3 class="text-h3 font-semibold text-heading">Produits disponibles</h3>
           <Button
             variant="ghost"
             size="sm"
-            class="text-primary-600"
+            class="text-primary"
             @click="refreshProducts"
           >
             Actualiser
           </Button>
         </div>
 
-        <div v-if="loading" class="mt-8 grid grid-cols-1 gap-6 md:grid-cols-3 xl:grid-cols-4">
+        <div v-if="loading" class="mt-8 grid grid-cols-1 gap-4 sm:gap-6 md:grid-cols-3 xl:grid-cols-4">
           <Card
             v-for="index in 6"
             :key="index"
@@ -179,7 +179,7 @@
         <div
           v-else
           data-test="main-home-products"
-          class="mt-8 grid grid-cols-1 gap-6 md:grid-cols-3 xl:grid-cols-4"
+          class="mt-8 grid grid-cols-1 gap-4 sm:gap-6 md:grid-cols-3 xl:grid-cols-4"
         >
           <Card
             v-for="product in displayProducts"
@@ -193,14 +193,14 @@
               <span aria-hidden="true">{{ product.emoji }}</span>
             </div>
             <div class="mt-4 space-y-2">
-              <h4 class="text-h4 font-semibold text-neutral-900">{{ product.name }}</h4>
-              <p class="text-small text-neutral-500">{{ product.merchant }}</p>
+              <h4 class="text-h4 font-semibold text-heading">{{ product.name }}</h4>
+              <p class="text-small text-muted">{{ product.merchant }}</p>
               <div class="flex items-center justify-between">
-                <div class="flex items-center gap-2 text-primary-600">
+                <div class="flex items-center gap-2 text-primary">
                   <span class="text-h4 font-semibold">{{ product.price }} XOF</span>
-                  <span v-if="product.originalPrice" class="text-caption text-neutral-500 line-through">{{ product.originalPrice }} XOF</span>
+                  <span v-if="product.originalPrice" class="text-caption text-muted line-through">{{ product.originalPrice }} XOF</span>
                 </div>
-                <span class="rounded-full bg-primary-100 px-4 py-3 text-caption font-medium text-primary-700">-{{ product.discount }}%</span>
+                <span class="rounded-full bg-primary-100 px-4 py-3 text-caption font-medium text-primary-emphasis">-{{ product.discount }}%</span>
               </div>
             </div>
           </Card>
@@ -221,19 +221,19 @@
 
     <nav class="fixed bottom-0 left-0 right-0 border-t border-neutral-200/70 bg-surface-light/90 backdrop-blur-lg">
       <div class="mx-auto flex max-w-5xl items-center justify-around px-6 py-4">
-        <Button variant="ghost" class="flex h-full flex-col items-center gap-2 text-primary-600" @click="goToHome">
+        <Button variant="ghost" class="flex h-full flex-col items-center gap-2 text-primary" @click="goToHome">
           <span aria-hidden="true" class="text-responsive-lg">🏠</span>
           <span class="text-caption font-medium">Accueil</span>
         </Button>
-        <Button variant="ghost" class="flex h-full flex-col items-center gap-2 text-neutral-500" @click="goToDiscover">
+        <Button variant="ghost" class="flex h-full flex-col items-center gap-2 text-muted" @click="goToDiscover">
           <span aria-hidden="true" class="text-responsive-lg">🔍</span>
           <span class="text-caption">Découvrir</span>
         </Button>
-        <Button variant="ghost" class="flex h-full flex-col items-center gap-2 text-neutral-500" @click="goToFavorites">
+        <Button variant="ghost" class="flex h-full flex-col items-center gap-2 text-muted" @click="goToFavorites">
           <span aria-hidden="true" class="text-responsive-lg">❤️</span>
           <span class="text-caption">Favoris</span>
         </Button>
-        <Button variant="ghost" class="flex h-full flex-col items-center gap-2 text-neutral-500" @click="goToProfile">
+        <Button variant="ghost" class="flex h-full flex-col items-center gap-2 text-muted" @click="goToProfile">
           <span aria-hidden="true" class="text-responsive-lg">👤</span>
           <span class="text-caption">Profil</span>
         </Button>

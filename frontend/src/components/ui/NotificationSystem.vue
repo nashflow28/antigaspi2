@@ -1,6 +1,6 @@
 <template>
   <Teleport to="body">
-    <div class="pointer-events-none fixed inset-0 z-[110] flex items-start justify-end p-4 sm:p-6">
+    <div class="pointer-events-none fixed inset-0 z-[110] flex items-stretch sm:items-start justify-center sm:justify-end p-4 sm:p-6">
       <TransitionGroup name="toast-stack" tag="div" class="flex w-full max-w-sm flex-col gap-3 sm:max-w-md">
         <div v-for="notification in notifications" :key="notification.id" class="pointer-events-auto">
           <Toast

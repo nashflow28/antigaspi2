@@ -3,13 +3,13 @@
   <div class="sr-only focus-within:not-sr-only">
     <a
       href="#main-content"
-      class="absolute top-4 left-4 bg-primary-600 text-white px-4 py-3 rounded-lg z-[60] focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
+      class="relative sm:absolute top-4 left-4 bg-primary-600 text-white px-4 py-3 rounded-lg z-[60] focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
     >
       Aller au contenu principal
     </a>
     <a
       href="#main-nav"
-      class="absolute top-4 left-32 bg-primary-600 text-white px-4 py-3 rounded-lg z-[60] focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
+      class="relative sm:absolute top-4 left-32 bg-primary-600 text-white px-4 py-3 rounded-lg z-[60] focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
     >
       Aller à la navigation
     </a>
@@ -22,12 +22,12 @@
     aria-label="Navigation principale"
   >
     <div :class="navContainerClasses">
-      <div class="flex h-20 w-full items-center justify-between">
+      <div class="flex h-20 w-full items-center justify-start sm:justify-between">
         <!-- Logo and brand - Modernisé avec gradient et animation -->
         <div class="flex items-center animate-fade-in-right">
           <router-link
             to="/"
-            class="flex items-center space-x-3 p-2 rounded-xl transition-all duration-300 ease-spring hover:scale-105 hover:shadow-glow group"
+            class="flex items-center space-y-3 sm:space-y-0 sm:space-x-3 p-2 rounded-xl transition-all duration-300 ease-spring hover:scale-105 hover:shadow-glow group"
             aria-label="Antigaspi - Retour à l'accueil"
             :aria-current="$route.path === '/' ? 'page' : undefined"
           >
@@ -38,7 +38,7 @@
               <span class="text-responsive-xl font-semibold bg-nav-gradient bg-clip-text text-transparent font-display">
                 Antigaspi
               </span>
-              <span class="text-responsive-xs text-neutral-500 font-medium -mt-1 font-heading">
+              <span class="text-responsive-xs text-muted font-medium -mt-1 font-heading">
                 Sauvons ensemble
               </span>
             </div>
@@ -46,8 +46,8 @@
         </div>
 
         <!-- Desktop Navigation - Design moderne -->
-        <div class="hidden md:flex items-center space-x-8 animate-fade-in">
-          <ul class="flex items-center space-x-8" role="menubar" aria-label="Menu principal">
+        <div class="hidden sm:block md:flex items-center space-y-8 sm:space-y-0 sm:space-x-8 animate-fade-in">
+          <ul class="flex items-center space-y-8 sm:space-y-0 sm:space-x-8" role="menubar" aria-label="Menu principal">
             <!-- Navigation Links avec design moderne -->
             <li role="none">
               <router-link
@@ -59,7 +59,7 @@
                 aria-label="Parcourir les produits disponibles"
               >
                 <span class="relative z-10">Produits</span>
-                <div class="absolute inset-0 bg-nav-gradient opacity-0 group-hover:transition-opacity duration-200" />
+                <div class="relative sm:absolute inset-0 bg-nav-gradient opacity-0 group-hover:transition-opacity duration-200" />
               </router-link>
             </li>
 
@@ -73,7 +73,7 @@
                 aria-label="Explorer les paniers surprise disponibles"
               >
                 <span class="relative z-10">Paniers surprise</span>
-                <div class="absolute inset-0 bg-nav-gradient opacity-0 group-hover:transition-opacity duration-200" />
+                <div class="relative sm:absolute inset-0 bg-nav-gradient opacity-0 group-hover:transition-opacity duration-200" />
               </router-link>
             </li>
 
@@ -87,7 +87,7 @@
                 aria-label="Voir la carte des commerçants"
               >
                 <span class="relative z-10">Carte</span>
-                <div class="absolute inset-0 bg-nav-gradient opacity-0 group-hover:transition-opacity duration-200" />
+                <div class="relative sm:absolute inset-0 bg-nav-gradient opacity-0 group-hover:transition-opacity duration-200" />
               </router-link>
             </li>
 
@@ -101,7 +101,7 @@
                 aria-label="Consulter les avis clients"
               >
                 <span class="relative z-10">Avis</span>
-                <div class="absolute inset-0 bg-nav-gradient opacity-0 group-hover:transition-opacity duration-200" />
+                <div class="relative sm:absolute inset-0 bg-nav-gradient opacity-0 group-hover:transition-opacity duration-200" />
               </router-link>
             </li>
 
@@ -124,7 +124,7 @@
                     <LogIn class="w-5 h-5" aria-hidden="true" />
                     Connexion
                   </span>
-                  <div class="absolute inset-0 bg-gradient-to-r from-accent-blue to-accent-blue/90 opacity-0 group-hover:transition-opacity duration-200" />
+                  <div class="relative sm:absolute inset-0 bg-gradient-to-r from-accent-blue to-accent-blue/90 opacity-0 group-hover:transition-opacity duration-200" />
                 </router-link>
               </li>
               <li role="none">
@@ -152,7 +152,7 @@
               <li role="none">
                 <div ref="userMenuRef" class="relative">
                   <button
-                    class="flex items-center space-x-3 px-4 py-3 rounded-xl transition-all duration-200 ease-out hover:bg-nav-gradient hover:text-white hover:shadow-glow group"
+                    class="flex items-center space-y-3 sm:space-y-0 sm:space-x-3 px-4 py-3 rounded-xl transition-all duration-200 ease-out hover:bg-nav-gradient hover:text-white hover:shadow-glow group"
                     :aria-expanded="showUserMenu"
                     aria-haspopup="menu"
                     :aria-label="`Menu utilisateur - ${authStore.user?.first_name} ${authStore.user?.last_name}`"
@@ -165,13 +165,13 @@
                           {{ userInitials }}
                         </span>
                       </div>
-                      <div class="absolute -bottom-1 -right-1 w-5 h-5 bg-primary-500 rounded-full border-2 border-white shadow-card" />
+                      <div class="relative sm:absolute -bottom-1 -right-1 w-5 h-5 bg-primary-500 rounded-full border-2 border-white shadow-card" />
                     </div>
                     <div class="flex flex-col text-left">
                       <span class="font-semibold text-responsive-sm group-hover:transition-colors">
                         {{ authStore.user?.first_name }}
                       </span>
-                      <span class="text-responsive-xs text-neutral-400 group-hover:transition-colors">
+                      <span class="text-responsive-xs text-placeholder group-hover:transition-colors">
                         {{ authStore.user?.role }}
                       </span>
                     </div>
@@ -197,20 +197,20 @@
                       variant="glass"
                       rounded="xl"
                       no-padding
-                      class="absolute right-0 z-[200] mt-3 w-64 border border-white/30 py-3 shadow-xl shadow-primary-500/10 animate-fade-in-down"
+                      class="relative sm:absolute right-0 z-[200] mt-3 w-64 border border-white/30 py-3 shadow-xl shadow-primary-500/10 animate-fade-in-down"
                       role="menu"
                       :aria-labelledby="userMenuButtonId"
                       @keydown="handleDropdownKeydown"
                     >
                       <!-- User Info Header -->
                       <div class="px-4 py-3 border-b border-white/10">
-                        <div class="flex items-center space-x-3">
+                        <div class="flex items-center space-y-3 sm:space-y-0 sm:space-x-3">
                           <div class="w-12 h-12 bg-nav-gradient rounded-xl flex items-center justify-center shadow-card">
                             <span class="text-white font-semibold">{{ userInitials }}</span>
                           </div>
                           <div>
-                            <p class="font-semibold text-neutral-900">{{ authStore.user?.first_name }} {{ authStore.user?.last_name }}</p>
-                            <p class="text-responsive-sm text-neutral-500">{{ authStore.user?.email }}</p>
+                            <p class="font-semibold text-heading">{{ authStore.user?.first_name }} {{ authStore.user?.last_name }}</p>
+                            <p class="text-responsive-sm text-muted">{{ authStore.user?.email }}</p>
                             <Badge variant="primary" size="sm" class="mt-1">{{ getRoleLabel(authStore.user?.role) }}</Badge>
                           </div>
                         </div>
@@ -220,7 +220,7 @@
                       <div class="py-3" role="group" aria-label="Navigation utilisateur">
                         <router-link
                           :to="getDashboardRoute()"
-                          class="flex items-center px-4 py-3 text-responsive-sm text-neutral-700 hover:bg-nav-gradient hover:transition-all duration-200 group"
+                          class="flex items-center px-4 py-3 text-responsive-sm text-body-emphasis hover:bg-nav-gradient hover:transition-all duration-200 group"
                           role="menuitem"
                           @click="showUserMenu = false"
                           @keydown="handleMenuItemKeydown"
@@ -230,7 +230,7 @@
                         </router-link>
                         <router-link
                           to="/profile"
-                          class="flex items-center px-4 py-3 text-responsive-sm text-neutral-700 hover:bg-gradient-to-r from-accent-blue to-accent-blue/90 hover:transition-all duration-200 group"
+                          class="flex items-center px-4 py-3 text-responsive-sm text-body-emphasis hover:bg-gradient-to-r from-accent-blue to-accent-blue/90 hover:transition-all duration-200 group"
                           @click="showUserMenu = false"
                         >
                           <Settings class="w-5 h-5 mr-3 group-hover:text-white" />
@@ -240,7 +240,7 @@
                         <template v-if="authStore.isConsumer">
                           <router-link
                             to="/surprise-baskets"
-                            class="flex items-center px-4 py-3 text-responsive-sm text-neutral-700 hover:bg-nav-gradient hover:transition-all duration-200 group"
+                            class="flex items-center px-4 py-3 text-responsive-sm text-body-emphasis hover:bg-nav-gradient hover:transition-all duration-200 group"
                             @click="showUserMenu = false"
                           >
                             <Gift class="w-5 h-5 mr-3 group-hover:text-white" />
@@ -248,7 +248,7 @@
                           </router-link>
                           <router-link
                             to="/reservations"
-                            class="flex items-center px-4 py-3 text-responsive-sm text-neutral-700 hover:bg-nav-gradient hover:transition-all duration-200 group"
+                            class="flex items-center px-4 py-3 text-responsive-sm text-body-emphasis hover:bg-nav-gradient hover:transition-all duration-200 group"
                             @click="showUserMenu = false"
                           >
                             <ShoppingBag class="w-5 h-5 mr-3 group-hover:text-white" />
@@ -256,7 +256,7 @@
                           </router-link>
                           <router-link
                             to="/wallet"
-                            class="flex items-center px-4 py-3 text-responsive-sm text-neutral-700 hover:bg-gradient-to-r from-accent-blue to-accent-blue/90 hover:transition-all duration-200 group"
+                            class="flex items-center px-4 py-3 text-responsive-sm text-body-emphasis hover:bg-gradient-to-r from-accent-blue to-accent-blue/90 hover:transition-all duration-200 group"
                             @click="showUserMenu = false"
                           >
                             <Wallet class="w-5 h-5 mr-3 group-hover:text-white" />
@@ -264,7 +264,7 @@
                           </router-link>
                           <router-link
                             to="/loyalty"
-                            class="flex items-center px-4 py-3 text-responsive-sm text-neutral-700 hover:bg-nav-gradient hover:transition-all duration-200 group"
+                            class="flex items-center px-4 py-3 text-responsive-sm text-body-emphasis hover:bg-nav-gradient hover:transition-all duration-200 group"
                             @click="showUserMenu = false"
                           >
                             <Star class="w-5 h-5 mr-3 group-hover:text-white" />
@@ -275,7 +275,7 @@
                         <template v-if="authStore.isMerchant">
                           <router-link
                             to="/merchant/products"
-                            class="flex items-center px-4 py-3 text-responsive-sm text-neutral-700 hover:bg-nav-gradient hover:transition-all duration-200 group"
+                            class="flex items-center px-4 py-3 text-responsive-sm text-body-emphasis hover:bg-nav-gradient hover:transition-all duration-200 group"
                             @click="showUserMenu = false"
                           >
                             <Package class="w-5 h-5 mr-3 group-hover:text-white" />
@@ -283,7 +283,7 @@
                           </router-link>
                           <router-link
                             to="/merchant/reservations"
-                            class="flex items-center px-4 py-3 text-responsive-sm text-neutral-700 hover:bg-nav-gradient hover:transition-all duration-200 group"
+                            class="flex items-center px-4 py-3 text-responsive-sm text-body-emphasis hover:bg-nav-gradient hover:transition-all duration-200 group"
                             @click="showUserMenu = false"
                           >
                             <ShoppingBag class="w-5 h-5 mr-3 group-hover:text-white" />
@@ -291,7 +291,7 @@
                           </router-link>
                           <router-link
                             to="/merchant/reviews/dashboard"
-                            class="flex items-center px-4 py-3 text-responsive-sm text-neutral-700 hover:bg-nav-gradient hover:transition-all duration-200 group"
+                            class="flex items-center px-4 py-3 text-responsive-sm text-body-emphasis hover:bg-nav-gradient hover:transition-all duration-200 group"
                             @click="showUserMenu = false"
                           >
                             <MessageSquare class="w-5 h-5 mr-3 group-hover:text-white" />
@@ -299,7 +299,7 @@
                           </router-link>
                           <router-link
                             to="/merchant/loyalty"
-                            class="flex items-center px-4 py-3 text-responsive-sm text-neutral-700 hover:bg-nav-gradient hover:transition-all duration-200 group"
+                            class="flex items-center px-4 py-3 text-responsive-sm text-body-emphasis hover:bg-nav-gradient hover:transition-all duration-200 group"
                             @click="showUserMenu = false"
                           >
                             <Star class="w-5 h-5 mr-3 group-hover:text-white" />
@@ -310,7 +310,7 @@
                         <template v-if="authStore.isAdmin">
                           <router-link
                             to="/admin/users"
-                            class="flex items-center px-4 py-3 text-responsive-sm text-neutral-700 hover:bg-nav-gradient hover:transition-all duration-200 group"
+                            class="flex items-center px-4 py-3 text-responsive-sm text-body-emphasis hover:bg-nav-gradient hover:transition-all duration-200 group"
                             @click="showUserMenu = false"
                           >
                             <User class="w-5 h-5 mr-3 group-hover:text-white" />
@@ -318,7 +318,7 @@
                           </router-link>
                           <router-link
                             to="/admin/merchants"
-                            class="flex items-center px-4 py-3 text-responsive-sm text-neutral-700 hover:bg-nav-gradient hover:transition-all duration-200 group"
+                            class="flex items-center px-4 py-3 text-responsive-sm text-body-emphasis hover:bg-nav-gradient hover:transition-all duration-200 group"
                             @click="showUserMenu = false"
                           >
                             <ShoppingBag class="w-5 h-5 mr-3 group-hover:text-white" />
@@ -326,7 +326,7 @@
                           </router-link>
                           <router-link
                             to="/admin/categories"
-                            class="flex items-center px-4 py-3 text-responsive-sm text-neutral-700 hover:bg-nav-gradient hover:transition-all duration-200 group"
+                            class="flex items-center px-4 py-3 text-responsive-sm text-body-emphasis hover:bg-nav-gradient hover:transition-all duration-200 group"
                             @click="showUserMenu = false"
                           >
                             <Package class="w-5 h-5 mr-3 group-hover:text-white" />
@@ -334,7 +334,7 @@
                           </router-link>
                           <router-link
                             to="/admin/reviews"
-                            class="flex items-center px-4 py-3 text-responsive-sm text-neutral-700 hover:bg-nav-gradient hover:transition-all duration-200 group"
+                            class="flex items-center px-4 py-3 text-responsive-sm text-body-emphasis hover:bg-nav-gradient hover:transition-all duration-200 group"
                             @click="showUserMenu = false"
                           >
                             <MessageSquare class="w-5 h-5 mr-3 group-hover:text-white" />
@@ -363,7 +363,7 @@
         </div>
 
         <!-- Mobile Navigation -->
-        <div class="md:hidden flex items-center">
+        <div class="md:hidden sm:block flex items-center">
           <MobileNav />
         </div>
       </div>
@@ -500,7 +500,7 @@ const getRoleLabel = (role?: string): string => {
 
 // Close menus when clicking outside
 const handleClickOutside = (event: Event) => {
-  if (userMenuRef.value && !userMenuRef.value.contains(event.target as Node)) {
+  if (userMenuRef.value && !userMenuRef.value.contains(event.target as Element)) {
     showUserMenu.value = false
   }
 }

@@ -50,7 +50,7 @@ const computedClasses = computed(() => {
     'select-2025',
     'block w-full rounded-lg border transition-colors duration-200',
     'focus:ring-2 focus:ring-offset-2 focus:outline-none',
-    'disabled:bg-neutral-50 disabled:text-neutral-500 disabled:cursor-not-allowed'
+    'disabled:bg-neutral-50 disabled:text-muted disabled:cursor-not-allowed'
   ]
 
   // Size classes

@@ -127,7 +127,7 @@
         <!-- Breadcrumbs Tab -->
         <div v-if="activeTab === 'breadcrumbs'" class="breadcrumbs-list">
           <div v-if="breadcrumbs.length === 0" class="empty-state">
-            <Navigation class="w-10 h-10 text-neutral-400" />
+            <Navigation class="w-10 h-10 text-placeholder" />
             <p>Aucun breadcrumb enregistré</p>
           </div>
           <div v-else>
@@ -152,7 +152,7 @@
         <!-- User Actions Tab -->
         <div v-if="activeTab === 'actions'" class="actions-list">
           <div v-if="userActions.length === 0" class="empty-state">
-            <MousePointer class="w-10 h-10 text-neutral-400" />
+            <MousePointer class="w-10 h-10 text-placeholder" />
             <p>Aucune action utilisateur enregistrée</p>
           </div>
           <div v-else>

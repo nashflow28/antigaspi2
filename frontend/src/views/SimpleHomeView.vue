@@ -1,14 +1,14 @@
 <template>
   <div class="min-h-screen bg-neutral-50 p-4">
-    <h1 class="text-responsive-xl font-semibold text-neutral-900 mb-4">
+    <h1 class="text-responsive-xl font-semibold text-heading mb-4">
       🌱 Antigaspi - Simple Test View
     </h1>
 
     <div class="bg-white rounded-lg shadow p-6 mb-4">
       <h2 class="text-responsive-lg font-semibold mb-2">Vue Application Status</h2>
-      <p class="text-green-600">✅ Vue.js is working!</p>
-      <p class="text-green-600">✅ Router is working!</p>
-      <p class="text-green-600">✅ Components are rendering!</p>
+      <p class="text-success">✅ Vue.js is working!</p>
+      <p class="text-success">✅ Router is working!</p>
+      <p class="text-success">✅ Components are rendering!</p>
     </div>
 
     <div class="bg-blue-50 rounded-lg border border-blue-200 p-4 mb-4">
@@ -16,19 +16,19 @@
       <div class="space-y-2">
         <router-link
           to="/onboarding"
-          class="block text-blue-600 hover:text-blue-800 underline"
+          class="block text-info hover:text-blue-800 underline"
         >
           → Go to Onboarding
         </router-link>
         <router-link
           to="/gaspiz-demo"
-          class="block text-blue-600 hover:text-blue-800 underline"
+          class="block text-info hover:text-blue-800 underline"
         >
           → Go to Gaspiz Demo
         </router-link>
         <router-link
           to="/products"
-          class="block text-blue-600 hover:text-blue-800 underline"
+          class="block text-info hover:text-blue-800 underline"
         >
           → Go to Products
         </router-link>

@@ -165,7 +165,7 @@ const iconWrapperClasses = computed(() => [
 ].filter(Boolean).join(' '))
 
 const iconClasses = computed(() => [
-  'text-neutral-400',
+  'text-placeholder',
   props.variant === 'minimal' && 'text-neutral-300'
 ].filter(Boolean).join(' '))
 
@@ -185,12 +185,12 @@ const contentClasses = computed(() => [
 ].join(' '))
 
 const titleClasses = computed(() => [
-  'font-semibold text-neutral-900',
+  'font-semibold text-heading',
   sizeClasses.value.title
 ].join(' '))
 
 const descriptionClasses = computed(() => [
-  'text-neutral-600 leading-relaxed',
+  'text-body leading-relaxed',
   sizeClasses.value.description
 ].join(' '))
 

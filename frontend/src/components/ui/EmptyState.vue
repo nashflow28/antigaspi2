@@ -1,5 +1,5 @@
 <template>
-  <div class="flex flex-col items-center justify-center rounded-3xl border border-dashed border-primary-500/30 bg-primary-500/5 p-12 text-center shadow-card">
+  <div class="flex flex-col items-center justify-center rounded-3xl border border-dashed border-primary-500/30 bg-primary-500/5 p-6 sm:p-8 lg:p-12 text-left sm:text-center shadow-card">
     <Transition name="empty-state-fade" appear>
       <div key="content" class="flex flex-col items-center gap-4">
         <div class="text-display-sm">
@@ -8,10 +8,10 @@
             <span v-else aria-hidden="true">{{ icon }}</span>
           </slot>
         </div>
-        <h3 class="text-h2 font-semibold text-primary-700">
+        <h3 class="text-h2 font-semibold text-primary-emphasis">
           {{ title }}
         </h3>
-        <p class="max-w-xl text-body text-neutral-500">
+        <p class="max-w-full sm:max-w-xl text-body text-muted">
           {{ description }}
         </p>
         <Button v-if="actionLabel" variant="primary" @click="handleAction">

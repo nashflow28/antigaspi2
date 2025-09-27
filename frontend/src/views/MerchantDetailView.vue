@@ -1,42 +1,42 @@
 <template>
   <div class="min-h-screen bg-gradient-to-br from-neutral-50 via-white to-primary-50">
     <div class="border-b border-neutral-200/70 bg-white/80 backdrop-blur">
-      <div class="container mx-auto px-6 py-10">
-        <nav class="mb-6 text-responsive-sm text-neutral-500" aria-label="Fil d'Ariane">
+      <div class="container px-4 sm:px-6 lg:px-8 mx-auto px-6 py-10">
+        <nav class="mb-6 text-responsive-sm text-muted" aria-label="Fil d'Ariane">
           <ol class="flex items-center gap-2">
-            <li><router-link to="/" class="hover:text-neutral-700">Accueil</router-link></li>
-            <li class="text-neutral-400">/</li>
-            <li><router-link to="/discover" class="hover:text-neutral-700">Découvrir</router-link></li>
-            <li class="text-neutral-400">/</li>
-            <li class="font-medium text-neutral-700">{{ merchantName }}</li>
+            <li><router-link to="/" class="hover:text-body-emphasis">Accueil</router-link></li>
+            <li class="text-placeholder">/</li>
+            <li><router-link to="/discover" class="hover:text-body-emphasis">Découvrir</router-link></li>
+            <li class="text-placeholder">/</li>
+            <li class="font-medium text-body-emphasis">{{ merchantName }}</li>
           </ol>
         </nav>
         <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           <div>
-            <p class="inline-flex items-center gap-2 rounded-full bg-primary-100/70 px-4 py-3 text-responsive-sm font-medium text-primary-700">
+            <p class="inline-flex items-center gap-2 rounded-full bg-primary-100/70 px-4 py-3 text-responsive-sm font-medium text-primary-emphasis">
               <Store class="h-5 w-5" />
               Profil commerçant
             </p>
-            <h1 class="mt-3 text-display-sm font-semibold tracking-tight text-neutral-900">{{ merchantName }}</h1>
-            <p class="mt-2 max-w-3xl text-neutral-600">{{ merchantDescription }}</p>
+            <h1 class="mt-3 text-display-sm font-semibold tracking-tight text-heading">{{ merchantName }}</h1>
+            <p class="mt-2 max-w-3xl text-body">{{ merchantDescription }}</p>
           </div>
           <Button
             variant="secondary"
             class="w-full max-w-xs"
             @click="toggleFavorite"
           >
-            <Heart :class="isFavorite ? 'fill-primary-500 text-primary-500' : 'text-primary-600'" class="h-5 w-5" />
+            <Heart :class="isFavorite ? 'fill-primary-500 text-primary-500' : 'text-primary'" class="h-5 w-5" />
             <span class="ml-2">{{ isFavorite ? 'Retirer des favoris' : 'Ajouter aux favoris' }}</span>
           </Button>
         </div>
       </div>
     </div>
 
-    <main class="container mx-auto grid gap-8 px-6 py-12 lg:grid-cols-[2fr_1fr]">
+    <main class="container px-4 sm:px-6 lg:px-8 mx-auto grid gap-6 sm:gap-8 px-6 py-8 sm:py-10 lg:py-12 lg:grid-cols-[2fr_1fr]">
       <section class="space-y-6">
         <Card class="bg-white/90">
           <template #header>
-            <h2 class="text-responsive-xl font-semibold text-neutral-900">Informations principales</h2>
+            <h2 class="text-responsive-xl font-semibold text-heading">Informations principales</h2>
           </template>
 
           <div v-if="loading" class="space-y-4">
@@ -45,7 +45,7 @@
             <Skeleton class="h-5 w-1/3" />
           </div>
 
-          <div v-else class="space-y-4 text-responsive-sm text-neutral-600">
+          <div v-else class="space-y-4 text-responsive-sm text-body">
             <div class="grid gap-4 md:grid-cols-2">
               <p class="flex items-center gap-3">
                 <BadgeInfo class="h-5 w-5 text-primary-500" />
@@ -65,11 +65,11 @@
               </p>
             </div>
             <div v-if="openingHours.length" class="rounded-3xl bg-neutral-50 p-6">
-              <h3 class="text-responsive-base font-semibold text-neutral-800">Horaires d'ouverture</h3>
+              <h3 class="text-responsive-base font-semibold text-heading-secondary">Horaires d'ouverture</h3>
               <ul class="mt-3 grid gap-2 sm:grid-cols-2">
                 <li v-for="entry in openingHours" :key="entry.day" class="flex items-center justify-between text-responsive-sm">
-                  <span class="font-medium text-neutral-700">{{ entry.day }}</span>
-                  <span class="text-neutral-500">{{ entry.hours }}</span>
+                  <span class="font-medium text-body-emphasis">{{ entry.day }}</span>
+                  <span class="text-muted">{{ entry.hours }}</span>
                 </li>
               </ul>
             </div>
@@ -79,15 +79,15 @@
         <Card class="bg-white/90">
           <template #header>
             <div class="flex items-center justify-between">
-              <h2 class="text-responsive-xl font-semibold text-neutral-900">Paniers proposés</h2>
-              <span class="text-responsive-sm text-neutral-500">{{ merchantProductsCount }} disponible{{ merchantProductsCount > 1 ? 's' : '' }}</span>
+              <h2 class="text-responsive-xl font-semibold text-heading">Paniers proposés</h2>
+              <span class="text-responsive-sm text-muted">{{ merchantProductsCount }} disponible{{ merchantProductsCount > 1 ? 's' : '' }}</span>
             </div>
           </template>
 
-          <div v-if="!productsPreview.length" class="rounded-3xl border border-dashed border-neutral-300 bg-white/70 p-10 text-center">
+          <div v-if="!productsPreview.length" class="rounded-3xl border border-dashed border-neutral-300 bg-white/70 p-10 text-left sm:text-center">
             <Package class="mx-auto h-12 w-12 text-neutral-300" />
-            <h3 class="mt-3 text-responsive-lg font-semibold text-neutral-800">Pas de panier actif pour le moment</h3>
-            <p class="mt-2 text-neutral-500">Ajoutez ce commerçant à vos favoris pour être prévenu dès qu'un panier sera mis en ligne.</p>
+            <h3 class="mt-3 text-responsive-lg font-semibold text-heading-secondary">Pas de panier actif pour le moment</h3>
+            <p class="mt-2 text-muted">Ajoutez ce commerçant à vos favoris pour être prévenu dès qu'un panier sera mis en ligne.</p>
           </div>
 
           <ul v-else class="grid gap-4 md:grid-cols-2">
@@ -96,9 +96,9 @@
               :key="product.id"
               class="rounded-3xl border border-neutral-200 bg-white p-4 shadow-sm"
             >
-              <p class="text-responsive-sm font-semibold text-neutral-800">{{ product.name }}</p>
-              <p class="mt-1 text-responsive-xs text-neutral-500">{{ product.description }}</p>
-              <p class="mt-2 text-responsive-sm font-semibold text-primary-600">{{ formatPrice(product.discounted_price) }}</p>
+              <p class="text-responsive-sm font-semibold text-heading-secondary">{{ product.name }}</p>
+              <p class="mt-1 text-responsive-xs text-muted">{{ product.description }}</p>
+              <p class="mt-2 text-responsive-sm font-semibold text-primary">{{ formatPrice(product.discounted_price) }}</p>
             </li>
           </ul>
         </Card>
@@ -107,9 +107,9 @@
       <aside class="space-y-6">
         <Card class="bg-white/90">
           <template #header>
-            <h2 class="text-responsive-xl font-semibold text-neutral-900">Confiance & impact</h2>
+            <h2 class="text-responsive-xl font-semibold text-heading">Confiance & impact</h2>
           </template>
-          <div class="space-y-3 text-responsive-sm text-neutral-600">
+          <div class="space-y-3 text-responsive-sm text-body">
             <p v-if="merchantRating" class="flex items-center gap-2">
               <Star class="h-5 w-5 text-amber-400" />
               {{ merchantRating }} / 5 — {{ merchantReviews }} avis

@@ -6,13 +6,13 @@
   >
     <div class="p-6">
       <!-- Header -->
-      <div v-if="currentView === 'list'" class="mb-8">
-        <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
+      <div v-if="currentView === 'list'" class="mb-6 sm:mb-8">
+        <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 sm:gap-6">
           <div>
-            <h1 class="text-responsive-xl lg:text-display-sm font-semibold text-neutral-900 mb-2">
+            <h1 class="text-responsive-xl lg:text-display-sm font-semibold text-heading mb-2">
               Paniers Surprise
             </h1>
-            <p class="text-neutral-600 text-responsive-lg">
+            <p class="text-body text-responsive-lg">
               Créez des paniers mystère pour valoriser vos invendus
             </p>
           </div>
@@ -39,10 +39,10 @@
       </div>
 
       <!-- Navigation Header for other views -->
-      <div v-else class="mb-8">
+      <div v-else class="mb-6 sm:mb-8">
         <div class="flex items-center gap-4 mb-4">
           <button
-            class="flex items-center text-neutral-600 hover:transition-colors"
+            class="flex items-center text-body hover:transition-colors"
             @click="currentView = 'list'"
           >
             <ArrowLeftIcon class="w-5 h-5 mr-2" />
@@ -51,12 +51,12 @@
         </div>
 
         <div>
-          <h1 class="text-responsive-xl lg:text-display-sm font-semibold text-neutral-900 mb-2">
+          <h1 class="text-responsive-xl lg:text-display-sm font-semibold text-heading mb-2">
             <template v-if="currentView === 'create'">Nouveau Panier Surprise</template>
             <template v-else-if="currentView === 'edit'">Modifier le Panier</template>
             <template v-else-if="currentView === 'detail'">Détails du Panier</template>
           </h1>
-          <p class="text-neutral-600 text-responsive-lg">
+          <p class="text-body text-responsive-lg">
             <template v-if="currentView === 'create'">Créez un panier mystère attractif</template>
             <template v-else-if="currentView === 'edit'">{{ editingBasket?.name }}</template>
             <template v-else-if="currentView === 'detail'">{{ selectedBasket?.name }}</template>
@@ -66,15 +66,15 @@
 
       <!-- Loading State -->
       <Card v-if="loading && currentView === 'list'">
-        <div class="flex items-center justify-center py-12">
+        <div class="flex items-center justify-center py-8 sm:py-10 lg:py-12">
           <div class="animate-spin rounded-full h-10 w-10 border-b-2 border-primary-600" />
-          <span class="ml-3 text-neutral-600">Chargement des paniers surprise...</span>
+          <span class="ml-3 text-body">Chargement des paniers surprise...</span>
         </div>
       </Card>
 
       <!-- Error State -->
       <Card v-if="error" class="bg-accent-red/10 border-accent-red/30 mb-6">
-        <div class="flex items-center justify-center py-8">
+        <div class="flex items-center justify-center py-6 sm:py-8">
           <AlertTriangleIcon class="w-10 h-10 text-accent-red mr-3" />
           <div>
             <p class="text-accent-red/90 font-medium">Erreur lors du chargement</p>
@@ -86,7 +86,7 @@
       <!-- List View -->
       <div v-if="currentView === 'list' && !loading">
         <!-- Quick Stats -->
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 sm:gap-6 mb-6 sm:mb-8">
           <Card class="bg-gradient-to-r from-purple-500 to-purple-600 text-white">
             <div class="flex items-center justify-between">
               <div>
@@ -137,12 +137,12 @@
         </div>
 
         <!-- Empty State -->
-        <Card v-if="baskets.length === 0" class="text-center py-12">
+        <Card v-if="baskets.length === 0" class="text-left sm:text-center py-8 sm:py-10 lg:py-12">
           <div class="w-20 h-20 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-6">
             <GiftIcon class="w-10 h-10 text-purple-500" />
           </div>
-          <h3 class="text-responsive-xl font-semibold text-neutral-900 mb-2">Aucun panier surprise</h3>
-          <p class="text-neutral-600 mb-6 max-w-md mx-auto">
+          <h3 class="text-responsive-xl font-semibold text-heading mb-2">Aucun panier surprise</h3>
+          <p class="text-body mb-6 max-w-full sm:max-w-md mx-auto">
             Créez votre premier panier surprise pour valoriser vos invendus et offrir des surprises à vos clients
           </p>
           <Button
@@ -155,29 +155,29 @@
         </Card>
 
         <!-- Baskets Grid -->
-        <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
           <Card
             v-for="basket in baskets"
             :key="basket.id"
             interactive
-            class="glow-effect animate-fade-in-up overflow-hidden"
+            class="glow-effect animate-fade-in-up overflow-hidden sm:block"
           >
             <!-- Image/Icon -->
             <div class="relative h-48 bg-gradient-to-br from-purple-100 to-pink-100 flex items-center justify-center">
               <GiftIcon class="w-16 h-16 text-purple-500" />
 
               <!-- Status Badge -->
-              <div class="absolute top-4 right-4">
+              <div class="relative sm:absolute top-4 right-4">
                 <span
                   class="px-4 py-3 text-responsive-xs font-medium rounded-full"
-                  :class="basket.is_active ? 'bg-primary-100 text-primary-700' : 'bg-neutral-100 text-neutral-600'"
+                  :class="basket.is_active ? 'bg-primary-100 text-primary-emphasis' : 'bg-neutral-100 text-body'"
                 >
                   {{ basket.is_active ? 'Actif' : 'Inactif' }}
                 </span>
               </div>
 
               <!-- Discount Badge -->
-              <div class="absolute bottom-4 left-4">
+              <div class="relative sm:absolute bottom-4 left-4">
                 <span class="px-4 py-3 text-responsive-xs font-semibold bg-accent-red/100 text-white rounded-full">
                   -{{ Math.round(((basket.original_price - basket.discounted_price) / basket.original_price) * 100) }}%
                 </span>
@@ -186,27 +186,27 @@
 
             <!-- Content -->
             <div class="p-6">
-              <div class="flex items-start justify-between mb-4">
+              <div class="flex items-stretch sm:items-start justify-between mb-4">
                 <div>
-                  <h3 class="font-semibold text-neutral-900 mb-1">{{ basket.name }}</h3>
-                  <p class="text-responsive-sm text-neutral-600 line-clamp-2">{{ basket.description }}</p>
+                  <h3 class="font-semibold text-heading mb-1">{{ basket.name }}</h3>
+                  <p class="text-responsive-sm text-body line-clamp-2">{{ basket.description }}</p>
                 </div>
               </div>
 
               <!-- Pricing -->
               <div class="flex items-center gap-2 mb-4">
-                <span class="text-responsive-lg font-semibold text-primary-600">{{ formatPrice(basket.discounted_price) }}</span>
-                <span class="text-responsive-sm text-neutral-400 line-through">{{ formatPrice(basket.original_price) }}</span>
+                <span class="text-responsive-lg font-semibold text-primary">{{ formatPrice(basket.discounted_price) }}</span>
+                <span class="text-responsive-sm text-placeholder line-through">{{ formatPrice(basket.original_price) }}</span>
               </div>
 
               <!-- Stock -->
-              <div class="flex items-center gap-2 mb-4 text-responsive-sm text-neutral-600">
+              <div class="flex items-center gap-2 mb-4 text-responsive-sm text-body">
                 <PackageIcon class="w-5 h-5" />
                 <span>{{ basket.quantity_available }} disponible{{ basket.quantity_available > 1 ? 's' : '' }}</span>
               </div>
 
               <!-- Products Count -->
-              <div class="flex items-center gap-2 mb-6 text-responsive-sm text-neutral-600">
+              <div class="flex items-center gap-2 mb-6 text-responsive-sm text-body">
                 <LayersIcon class="w-5 h-5" />
                 <span>{{ basket.products?.length || 0 }} produit{{ (basket.products?.length || 0) > 1 ? 's' : '' }}</span>
               </div>
@@ -332,7 +332,7 @@ const loadBaskets = async () => {
 
   } catch (err: any) {
     error.value = err.message
-    console.error('Erreur lors du chargement des paniers surprise:', err)
+    // console.error('Erreur lors du chargement des paniers surprise:', err)
   } finally {
     loading.value = false
   }
@@ -354,13 +354,13 @@ const handleView = (basket: SurpriseBasket) => {
 }
 
 const handleBasketCreated = () => {
-  console.log('✅ Panier surprise créé avec succès')
+  // console.log('✅ Panier surprise créé avec succès')
   currentView.value = 'list'
   loadBaskets() // Recharger la liste
 }
 
 const handleBasketUpdated = () => {
-  console.log('✅ Panier surprise mis à jour avec succès')
+  // console.log('✅ Panier surprise mis à jour avec succès')
   currentView.value = 'list'
   editingBasket.value = null
   loadBaskets() // Recharger la liste

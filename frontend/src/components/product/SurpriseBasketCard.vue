@@ -1,5 +1,5 @@
 <template>
-  <Card class="group overflow-hidden">
+  <Card class="group overflow-hidden sm:block">
     <div class="relative h-48 w-full">
       <img
         v-if="basket.image_url"
@@ -14,7 +14,7 @@
         <Package class="h-12 w-12 text-primary-400" />
       </div>
 
-      <div class="absolute left-4 top-4 flex gap-2">
+      <div class="relative sm:absolute left-4 top-4 flex gap-2">
         <Badge variant="success" class="font-semibold">-{{ basket.basket_discount_percentage }}%</Badge>
         <Badge v-if="basket.quantity_available" variant="secondary">
           {{ basket.quantity_available }} restant{{ basket.quantity_available > 1 ? 's' : '' }}
@@ -23,7 +23,7 @@
 
       <span
         v-if="timeLeft"
-        class="absolute bottom-4 left-4 inline-flex items-center gap-2 rounded-full bg-white/90 px-4 py-3 text-responsive-xs font-medium text-neutral-700 shadow-modern-2025"
+        class="relative sm:absolute bottom-4 left-4 inline-flex items-center gap-2 rounded-full bg-white/90 px-4 py-3 text-responsive-xs font-medium text-body-emphasis shadow-modern-2025"
       >
         <Clock class="h-5 w-5 text-primary-500" />
         {{ timeLeft }}
@@ -32,16 +32,16 @@
 
     <div class="space-y-4 p-6">
       <div class="space-y-2">
-        <h3 class="text-responsive-lg font-semibold text-neutral-900 group-hover:transition-colors">
+        <h3 class="text-responsive-lg font-semibold text-heading group-hover:transition-colors">
           {{ basket.name }}
         </h3>
-        <p v-if="basket.surprise_description" class="line-clamp-2 text-responsive-sm text-neutral-600">
+        <p v-if="basket.surprise_description" class="line-clamp-2 text-responsive-sm text-body">
           {{ basket.surprise_description }}
         </p>
       </div>
 
-      <div class="flex flex-wrap items-center gap-3 text-responsive-sm text-neutral-500">
-        <span class="inline-flex items-center gap-2 rounded-full bg-primary-50 px-4 py-3 text-primary-700">
+      <div class="flex flex-wrap items-center gap-3 text-responsive-sm text-muted">
+        <span class="inline-flex items-center gap-2 rounded-full bg-primary-50 px-4 py-3 text-primary-emphasis">
           <Store class="h-5 w-5" />
           {{ basket.merchant.business_name }}
         </span>
@@ -51,13 +51,13 @@
         </span>
       </div>
 
-      <div class="flex items-end justify-between">
+      <div class="flex items-end justify-start sm:justify-between">
         <div>
-          <div class="text-responsive-xl font-semibold text-primary-600">{{ formattedDiscountedPrice }}</div>
-          <div v-if="formattedOriginalPrice" class="text-responsive-sm text-neutral-400 line-through">
+          <div class="text-responsive-xl font-semibold text-primary">{{ formattedDiscountedPrice }}</div>
+          <div v-if="formattedOriginalPrice" class="text-responsive-sm text-placeholder line-through">
             {{ formattedOriginalPrice }}
           </div>
-          <div v-if="formattedSavings" class="text-responsive-xs text-primary-600 font-medium">
+          <div v-if="formattedSavings" class="text-responsive-xs text-primary font-medium">
             Économisez {{ formattedSavings }}
           </div>
         </div>

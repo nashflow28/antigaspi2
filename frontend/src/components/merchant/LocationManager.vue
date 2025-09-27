@@ -1,18 +1,18 @@
 <template>
   <div class="bg-white rounded-2xl shadow-lg p-6 border border-neutral-100">
-    <div class="flex items-center justify-between mb-6">
-      <div class="flex items-center space-x-3">
+    <div class="flex items-center justify-start sm:justify-between mb-6">
+      <div class="flex items-center space-y-3 sm:space-y-0 sm:space-x-3">
         <div class="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
-          <MapPin class="w-10 h-10 text-blue-600" />
+          <MapPin class="w-10 h-10 text-info" />
         </div>
         <div>
-          <h3 class="text-responsive-lg font-semibold text-neutral-900">Géolocalisation</h3>
-          <p class="text-neutral-600 text-responsive-sm">Position de votre commerce</p>
+          <h3 class="text-responsive-lg font-semibold text-heading">Géolocalisation</h3>
+          <p class="text-body text-responsive-sm">Position de votre commerce</p>
         </div>
       </div>
       <button
         :disabled="loading"
-        class="text-blue-600 hover:text-blue-700 font-medium text-responsive-sm flex items-center space-x-2"
+        class="text-info hover:text-blue-700 font-medium text-responsive-sm flex items-center space-y-2 sm:space-y-0 sm:space-x-2"
         @click="getCurrentLocation"
       >
         <RefreshCw class="w-5 h-5" :class="{ 'animate-spin': loading }" />
@@ -20,10 +20,10 @@
       </button>
     </div>
 
-    <div v-if="!hasLocation" class="text-center py-8 border-2 border-dashed border-neutral-300 rounded-xl">
-      <MapPin class="w-12 h-12 text-neutral-400 mx-auto mb-4" />
-      <h4 class="text-responsive-lg font-medium text-neutral-900 mb-2">Aucune position définie</h4>
-      <p class="text-neutral-600 mb-4">
+    <div v-if="!hasLocation" class="text-left sm:text-center py-6 sm:py-8 border-2 border-dashed border-neutral-300 rounded-xl">
+      <MapPin class="w-12 h-12 text-placeholder mx-auto mb-4" />
+      <h4 class="text-responsive-lg font-medium text-heading mb-2">Aucune position définie</h4>
+      <p class="text-body mb-4">
         Ajoutez la position de votre commerce pour que les clients puissent vous trouver facilement
       </p>
       <button
@@ -35,20 +35,20 @@
     </div>
 
     <div v-else class="space-y-4">
-      <div class="grid grid-cols-2 gap-4">
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div class="bg-neutral-50 rounded-lg p-4">
-          <label class="text-responsive-sm font-medium text-neutral-700">Latitude</label>
-          <p class="text-responsive-lg text-neutral-900">{{ location.latitude?.toFixed(6) }}</p>
+          <label class="text-responsive-sm font-medium text-body-emphasis">Latitude</label>
+          <p class="text-responsive-lg text-heading">{{ location.latitude?.toFixed(6) }}</p>
         </div>
         <div class="bg-neutral-50 rounded-lg p-4">
-          <label class="text-responsive-sm font-medium text-neutral-700">Longitude</label>
-          <p class="text-responsive-lg text-neutral-900">{{ location.longitude?.toFixed(6) }}</p>
+          <label class="text-responsive-sm font-medium text-body-emphasis">Longitude</label>
+          <p class="text-responsive-lg text-heading">{{ location.longitude?.toFixed(6) }}</p>
         </div>
       </div>
 
-      <div class="flex space-x-3">
+      <div class="flex space-y-3 sm:space-y-0 sm:space-x-3">
         <button
-          class="flex-1 bg-neutral-100 text-neutral-700 py-3 px-4 rounded-lg hover:transition-colors"
+          class="flex-1 bg-neutral-100 text-body-emphasis py-3 px-4 rounded-lg hover:transition-colors"
           @click="showLocationModal = true"
         >
           Modifier
@@ -74,18 +74,18 @@
       <!-- Modal -->
       <div class="flex min-h-full items-center justify-center p-4">
         <div
-          class="relative w-full max-w-4xl bg-white rounded-2xl shadow-xl transform transition-all"
+          class="relative w-full max-w-full sm:max-w-4xl bg-white rounded-2xl shadow-xl transform transition-all"
           @click.stop
         >
           <!-- Header -->
           <div class="px-6 py-4 border-b border-neutral-200">
-            <div class="flex items-center justify-between">
-              <h3 class="text-responsive-lg font-semibold text-neutral-900">Définir votre position</h3>
+            <div class="flex items-center justify-start sm:justify-between">
+              <h3 class="text-responsive-lg font-semibold text-heading">Définir votre position</h3>
               <button
                 class="p-2 hover:transition-colors"
                 @click="closeModal"
               >
-                <X class="w-5 h-5 text-neutral-400" />
+                <X class="w-5 h-5 text-placeholder" />
               </button>
             </div>
           </div>
@@ -93,10 +93,10 @@
           <!-- Form -->
           <form class="px-6 py-6 space-y-4" @submit.prevent="saveLocation">
             <!-- Map Selection Mode Toggle -->
-            <div class="flex items-center justify-center space-x-4 mb-4">
+            <div class="flex items-center justify-center space-y-4 sm:space-y-0 sm:space-x-4 mb-4">
               <button
                 type="button"
-                :class="!mapSelectionMode ? 'bg-blue-600 text-white' : 'bg-neutral-200 text-neutral-700'"
+                :class="!mapSelectionMode ? 'bg-blue-600 text-white' : 'bg-neutral-200 text-body-emphasis'"
                 class="px-4 py-3 rounded-lg font-medium transition-colors"
                 @click="mapSelectionMode = false"
               >
@@ -104,7 +104,7 @@
               </button>
               <button
                 type="button"
-                :class="mapSelectionMode ? 'bg-blue-600 text-white' : 'bg-neutral-200 text-neutral-700'"
+                :class="mapSelectionMode ? 'bg-blue-600 text-white' : 'bg-neutral-200 text-body-emphasis'"
                 class="px-4 py-3 rounded-lg font-medium transition-colors"
                 @click="toggleMapSelection"
               >
@@ -114,13 +114,13 @@
 
             <!-- Map Selection -->
             <div v-if="mapSelectionMode" class="mb-4">
-              <div class="mb-2 flex items-center justify-between">
-                <label class="block text-responsive-sm font-medium text-neutral-700">
+              <div class="mb-2 flex items-center justify-start sm:justify-between">
+                <label class="block text-responsive-sm font-medium text-body-emphasis">
                   Cliquez sur la carte pour choisir votre position
                 </label>
                 <button
                   type="button"
-                  class="text-blue-600 hover:text-blue-700 text-responsive-sm flex items-center space-x-2"
+                  class="text-info hover:text-blue-700 text-responsive-sm flex items-center space-y-2 sm:space-y-0 sm:space-x-2"
                   @click="centerOnCurrentPosition"
                 >
                   <MapPin class="w-5 h-5" />
@@ -139,7 +139,7 @@
             <!-- Manual Coordinates (only show when not in map mode) -->
             <div v-else class="space-y-4">
               <div>
-                <label for="latitude" class="block text-responsive-sm font-medium text-neutral-700 mb-2">
+                <label for="latitude" class="block text-responsive-sm font-medium text-body-emphasis mb-2">
                   Latitude *
                 </label>
                 <input
@@ -156,7 +156,7 @@
               </div>
 
               <div>
-                <label for="longitude" class="block text-responsive-sm font-medium text-neutral-700 mb-2">
+                <label for="longitude" class="block text-responsive-sm font-medium text-body-emphasis mb-2">
                   Longitude *
                 </label>
                 <input
@@ -175,11 +175,11 @@
 
             <!-- Current Selection Display -->
             <div v-if="form.latitude && form.longitude" class="bg-green-50 rounded-lg p-3 border border-green-200">
-              <div class="flex items-center space-x-2 mb-2">
-                <CheckCircle class="w-5 h-5 text-green-600" />
+              <div class="flex items-center space-y-2 sm:space-y-0 sm:space-x-2 mb-2">
+                <CheckCircle class="w-5 h-5 text-success" />
                 <span class="font-medium text-green-800">Position sélectionnée</span>
               </div>
-              <div class="text-responsive-sm text-green-700 grid grid-cols-2 gap-2">
+              <div class="text-responsive-sm text-green-700 grid grid-cols-1 sm:grid-cols-2 gap-2">
                 <div>
                   <strong>Latitude:</strong> {{ form.latitude.toFixed(6) }}
                 </div>
@@ -197,10 +197,10 @@
               </p>
             </div>
 
-            <div class="flex justify-end space-x-3 pt-4">
+            <div class="flex justify-center sm:justify-end space-y-3 sm:space-y-0 sm:space-x-3 pt-4">
               <button
                 type="button"
-                class="px-4 py-3 text-neutral-600 hover:transition-colors"
+                class="px-4 py-3 text-body hover:transition-colors"
                 @click="closeModal"
               >
                 Annuler
@@ -228,7 +228,7 @@
           'border-blue-500': notification.type === 'info'
         }"
       >
-        <div class="flex items-start">
+        <div class="flex items-stretch sm:items-start">
           <div class="flex-shrink-0">
             <CheckCircle
               v-if="notification.type === 'success'"
@@ -244,12 +244,12 @@
             />
           </div>
           <div class="ml-3 w-0 flex-1">
-            <p class="text-responsive-sm font-medium text-neutral-900">{{ notification.title }}</p>
-            <p class="mt-1 text-responsive-sm text-neutral-500">{{ notification.message }}</p>
+            <p class="text-responsive-sm font-medium text-heading">{{ notification.title }}</p>
+            <p class="mt-1 text-responsive-sm text-muted">{{ notification.message }}</p>
           </div>
           <div class="ml-4 flex-shrink-0 flex">
             <button
-              class="text-neutral-400 hover:transition-colors"
+              class="text-placeholder hover:transition-colors"
               @click="notification.show = false"
             >
               <X class="w-5 h-5" />
@@ -322,10 +322,10 @@ const loadCurrentLocation = async () => {
       location.value.longitude = parseFloat(data.data.longitude)
       hasLocation.value = data.data.has_location
     } else {
-      console.error('Error loading location:', data.message)
+      // console.error('Error loading location:', data.message)
     }
   } catch (error) {
-    console.error('Error loading location:', error)
+    // console.error('Error loading location:', error)
   }
 }
 
@@ -398,7 +398,7 @@ const updateLocation = async (latitude: number, longitude: number) => {
       throw new Error(data.message || 'Erreur lors de la mise à jour')
     }
   } catch (error) {
-    console.error('Error updating location:', error)
+    // console.error('Error updating location:', error)
     showNotification('error', 'Erreur', error instanceof Error ? error.message : 'Erreur inconnue')
   }
 }

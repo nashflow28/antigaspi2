@@ -1,39 +1,39 @@
 <template>
   <div
-    class="min-h-screen bg-gradient-to-br from-neutral-50 via-primary-50/30 to-accent-blue/10 flex items-center py-16"
+    class="min-h-screen bg-gradient-to-br from-neutral-50 via-primary-50/30 to-accent-blue/10 flex items-center py-12 sm:py-14 lg:py-16"
   >
-    <div class="container-2025">
+    <div class="container px-4 sm:px-6 lg:px-8-2025">
       <div
-        class="mx-auto max-w-3xl rounded-4xl border border-neutral-200/70 bg-surface-light/95 p-10 text-center shadow-card backdrop-blur-xl"
+        class="mx-auto max-w-3xl rounded-4xl border border-neutral-200/70 bg-surface-light/95 p-10 text-left sm:text-center shadow-card backdrop-blur-xl"
       >
         <!-- 404 Illustration -->
         <div class="mb-10">
           <div class="relative">
             <!-- Background circle -->
             <div
-              class="mx-auto flex h-64 w-64 items-center justify-center overflow-hidden rounded-full bg-gradient-to-br from-primary-100 to-accent-blue/10"
+              class="mx-auto flex h-64 w-64 items-center justify-center overflow-hidden sm:block rounded-full bg-gradient-to-br from-primary-100 to-accent-blue/10"
             >
               <!-- Animated background pattern -->
-              <div class="absolute inset-0 opacity-10">
-                <div class="absolute top-4 left-8 h-10 w-10 animate-pulse rounded-full bg-primary-300" />
+              <div class="relative sm:absolute inset-0 opacity-10">
+                <div class="relative sm:absolute top-4 left-8 h-10 w-10 animate-pulse rounded-full bg-primary-300" />
                 <div
-                  class="absolute bottom-8 right-12 h-10 w-10 animate-pulse rounded-full bg-accent-blue/20"
+                  class="relative sm:absolute bottom-8 right-12 h-10 w-10 animate-pulse rounded-full bg-accent-blue/20"
                   style="animation-delay: 0.5s"
                 />
                 <div
-                  class="absolute top-16 right-6 h-5 w-5 animate-pulse rounded-full bg-accent-orange/30"
+                  class="relative sm:absolute top-16 right-6 h-5 w-5 animate-pulse rounded-full bg-accent-orange/30"
                   style="animation-delay: 1s"
                 />
                 <div
-                  class="absolute bottom-16 left-16 h-5 w-5 animate-pulse rounded-full bg-primary-300"
+                  class="relative sm:absolute bottom-16 left-16 h-5 w-5 animate-pulse rounded-full bg-primary-300"
                   style="animation-delay: 1.5s"
                 />
               </div>
 
               <!-- Main 404 Icon -->
-              <div class="z-10 text-center">
+              <div class="z-10 text-left sm:text-center">
                 <div class="mb-2 text-8xl font-semibold text-primary-500">404</div>
-                <Frown class="mx-auto h-16 w-16 text-primary-600 animate-bounce" />
+                <Frown class="mx-auto h-16 w-16 text-primary animate-bounce" />
               </div>
             </div>
           </div>
@@ -41,13 +41,13 @@
 
         <!-- Error Message -->
         <div class="space-y-4">
-          <h1 class="text-responsive-xl font-semibold text-neutral-900 lg:text-display-sm">
+          <h1 class="text-responsive-xl font-semibold text-heading lg:text-display-sm">
             Page introuvable
           </h1>
-          <p class="text-responsive-lg text-neutral-600">
+          <p class="text-responsive-lg text-body">
             Oups ! La page que vous cherchez n'existe pas ou a été déplacée.
           </p>
-          <p class="text-responsive-sm text-neutral-500">
+          <p class="text-responsive-sm text-muted">
             Peut-être avez-vous tapé une mauvaise adresse ou suivi un lien obsolète ?
           </p>
         </div>
@@ -79,7 +79,7 @@
 
           <!-- Quick Links -->
           <div class="rounded-3xl border border-neutral-200/70 bg-white/60 p-6 shadow-inner">
-            <p class="mb-4 text-responsive-sm font-medium text-neutral-600">
+            <p class="mb-4 text-responsive-sm font-medium text-body">
               Ou essayez ces liens populaires :
             </p>
             <div class="flex flex-wrap justify-center gap-3">
@@ -88,7 +88,7 @@
                 to="/products"
                 variant="ghost"
                 size="sm"
-                class="text-primary-600 transition-colors hover:bg-primary-50 hover:text-primary-700"
+                class="text-primary transition-colors hover:bg-primary-50 hover:text-primary-emphasis"
                 :left-icon="ShoppingBag"
               >
                 Catalogue
@@ -98,7 +98,7 @@
                 to="/dashboard"
                 variant="ghost"
                 size="sm"
-                class="text-primary-600 transition-colors hover:bg-primary-50 hover:text-primary-700"
+                class="text-primary transition-colors hover:bg-primary-50 hover:text-primary-emphasis"
                 :left-icon="BarChart3"
               >
                 Tableau de bord
@@ -108,7 +108,7 @@
                 to="/profile"
                 variant="ghost"
                 size="sm"
-                class="text-primary-600 transition-colors hover:bg-primary-50 hover:text-primary-700"
+                class="text-primary transition-colors hover:bg-primary-50 hover:text-primary-emphasis"
                 :left-icon="User"
               >
                 Profil
@@ -118,8 +118,8 @@
         </div>
 
         <!-- Help Section -->
-        <div class="mt-12 rounded-3xl border border-accent-blue/20 bg-accent-blue/10 p-8 text-left">
-          <div class="flex items-start gap-4">
+        <div class="mt-12 rounded-3xl border border-accent-blue/20 bg-accent-blue/10 p-4 sm:p-6 lg:p-8 text-left">
+          <div class="flex items-stretch sm:items-start gap-4">
             <div class="flex h-10 w-10 items-center justify-center rounded-2xl bg-white/80 shadow-card">
               <Info class="h-5 w-5 text-accent-blue" />
             </div>

@@ -2,21 +2,21 @@
   <div class="bg-white rounded-2xl shadow-lg border border-neutral-100">
     <!-- Header -->
     <div class="px-6 py-4 border-b border-neutral-200">
-      <div class="flex items-center justify-between">
-        <div class="flex items-center space-x-3">
+      <div class="flex items-center justify-start sm:justify-between">
+        <div class="flex items-center space-y-3 sm:space-y-0 sm:space-x-3">
           <div class="w-10 h-10 bg-yellow-100 rounded-xl flex items-center justify-center">
-            <MessageSquare class="w-5 h-5 text-yellow-600" />
+            <MessageSquare class="w-5 h-5 text-warning" />
           </div>
           <div>
-            <h3 class="text-responsive-lg font-semibold text-neutral-900">
+            <h3 class="text-responsive-lg font-semibold text-heading">
               Avis clients ({{ stats?.total_reviews || 0 }})
             </h3>
-            <div v-if="stats && stats.total_reviews > 0" class="flex items-center space-x-2">
+            <div v-if="stats && stats.total_reviews > 0" class="flex items-center space-y-2 sm:space-y-0 sm:space-x-2">
               <div class="flex items-center">
                 <Star class="w-5 h-5 text-yellow-400 fill-yellow-400" />
-                <span class="ml-1 text-responsive-sm font-medium text-neutral-900">{{ stats.average_rating }}</span>
+                <span class="ml-1 text-responsive-sm font-medium text-heading">{{ stats.average_rating }}</span>
               </div>
-              <span class="text-responsive-xs text-neutral-500">sur {{ stats.total_reviews }} avis</span>
+              <span class="text-responsive-xs text-muted">sur {{ stats.total_reviews }} avis</span>
             </div>
           </div>
         </div>
@@ -45,9 +45,9 @@
         <div
           v-for="rating in stats.rating_distribution"
           :key="rating.rating"
-          class="flex items-center space-x-2"
+          class="flex items-center space-y-2 sm:space-y-0 sm:space-x-2"
         >
-          <div class="flex items-center space-x-2 text-responsive-xs text-neutral-600 w-16">
+          <div class="flex items-center space-y-2 sm:space-y-0 sm:space-x-2 text-responsive-xs text-body w-16">
             <span>{{ rating.rating }}</span>
             <Star class="w-3 h-3 text-yellow-400 fill-yellow-400" />
           </div>
@@ -57,22 +57,22 @@
               :style="{ width: rating.percentage + '%' }"
             />
           </div>
-          <span class="text-responsive-xs text-neutral-500 w-10">{{ rating.count }}</span>
+          <span class="text-responsive-xs text-muted w-10">{{ rating.count }}</span>
         </div>
       </div>
     </div>
 
     <!-- Reviews List -->
     <div class="divide-y divide-neutral-200">
-      <div v-if="loading" class="px-6 py-8 text-center">
+      <div v-if="loading" class="px-6 py-6 sm:py-8 text-left sm:text-center">
         <div class="animate-spin rounded-full h-10 w-10 border-b-2 border-yellow-600 mx-auto" />
-        <p class="text-neutral-500 mt-2">Chargement des avis...</p>
+        <p class="text-muted mt-2">Chargement des avis...</p>
       </div>
 
-      <div v-else-if="reviews.length === 0" class="px-6 py-8 text-center">
-        <MessageSquare class="w-12 h-12 text-neutral-400 mx-auto mb-4" />
-        <h4 class="text-responsive-lg font-medium text-neutral-900 mb-2">Aucun avis</h4>
-        <p class="text-neutral-600">
+      <div v-else-if="reviews.length === 0" class="px-6 py-6 sm:py-8 text-left sm:text-center">
+        <MessageSquare class="w-12 h-12 text-placeholder mx-auto mb-4" />
+        <h4 class="text-responsive-lg font-medium text-heading mb-2">Aucun avis</h4>
+        <p class="text-body">
           {{ currentFilter ? 'Aucun avis avec cette note' : 'Soyez le premier à laisser un avis !' }}
         </p>
       </div>
@@ -83,7 +83,7 @@
         :key="review.id"
         class="px-6 py-4 hover:transition-colors"
       >
-        <div class="flex space-x-4">
+        <div class="flex space-y-4 sm:space-y-0 sm:space-x-4">
           <!-- User Avatar -->
           <div class="flex-shrink-0">
             <div class="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
@@ -94,9 +94,9 @@
           </div>
 
           <div class="flex-1 min-w-0">
-            <div class="flex items-center justify-between mb-2">
-              <div class="flex items-center space-x-2">
-                <span class="font-medium text-neutral-900">{{ review.user.name }}</span>
+            <div class="flex items-center justify-start sm:justify-between mb-2">
+              <div class="flex items-center space-y-2 sm:space-y-0 sm:space-x-2">
+                <span class="font-medium text-heading">{{ review.user.name }}</span>
                 <div class="flex items-center">
                   <Star
                     v-for="star in 5"
@@ -110,28 +110,28 @@
                   Achat vérifié
                 </span>
               </div>
-              <span class="text-responsive-sm text-neutral-500">{{ review.time_ago }}</span>
+              <span class="text-responsive-sm text-muted">{{ review.time_ago }}</span>
             </div>
 
             <div v-if="review.title" class="mb-2">
-              <h4 class="font-medium text-neutral-900">{{ review.title }}</h4>
+              <h4 class="font-medium text-heading">{{ review.title }}</h4>
             </div>
 
-            <div v-if="review.comment" class="text-neutral-700 text-responsive-sm leading-relaxed mb-2">
+            <div v-if="review.comment" class="text-body-emphasis text-responsive-sm leading-relaxed mb-2">
               {{ review.comment }}
             </div>
 
-            <div v-if="review.product" class="inline-flex items-center text-responsive-xs text-blue-600 bg-blue-50 rounded-full px-4 py-3">
+            <div v-if="review.product" class="inline-flex items-center text-responsive-xs text-info bg-blue-50 rounded-full px-4 py-3">
               <Package class="w-3 h-3 mr-1" />
               {{ review.product.name }}
             </div>
 
             <!-- Action buttons -->
-            <div v-if="authStore.isAuthenticated" class="flex space-x-2 mt-3">
+            <div v-if="authStore.isAuthenticated" class="flex space-y-2 sm:space-y-0 sm:space-x-2 mt-3">
               <!-- Edit button for user's own reviews -->
               <button
                 v-if="authStore.user?.id === review.user.id"
-                class="inline-flex items-center px-4 py-3 text-responsive-xs text-blue-600 bg-blue-50 hover:transition-colors"
+                class="inline-flex items-center px-4 py-3 text-responsive-xs text-info bg-blue-50 hover:transition-colors"
                 @click="editingReviewId = review.id"
               >
                 <Edit class="w-3 h-3 mr-1" />
@@ -141,7 +141,7 @@
               <!-- Report button for other users' reviews (consumers only) -->
               <button
                 v-if="authStore.user?.id !== review.user.id && authStore.isConsumer"
-                class="inline-flex items-center px-4 py-3 text-responsive-xs text-red-600 bg-red-50 hover:transition-colors"
+                class="inline-flex items-center px-4 py-3 text-responsive-xs text-error bg-red-50 hover:transition-colors"
                 @click="reportingReviewId = review.id"
               >
                 <Flag class="w-3 h-3 mr-1" />
@@ -151,7 +151,7 @@
               <!-- Reply button for merchants -->
               <button
                 v-if="authStore.isMerchant"
-                class="inline-flex items-center px-4 py-3 text-responsive-xs text-green-600 bg-green-50 hover:transition-colors"
+                class="inline-flex items-center px-4 py-3 text-responsive-xs text-success bg-green-50 hover:transition-colors"
                 @click="replyingToReviewId = review.id"
               >
                 <Reply class="w-3 h-3 mr-1" />
@@ -173,9 +173,9 @@
 
         <!-- Report Review Modal -->
         <div v-if="reportingReviewId === review.id" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[120]">
-          <div class="bg-white rounded-lg p-6 max-w-md w-full mx-4">
-            <h3 class="text-responsive-lg font-semibold text-neutral-900 mb-4">Signaler cet avis</h3>
-            <p class="text-neutral-600 mb-4">
+          <div class="bg-white rounded-lg p-6 max-w-full sm:max-w-md w-full mx-4">
+            <h3 class="text-responsive-lg font-semibold text-heading mb-4">Signaler cet avis</h3>
+            <p class="text-body mb-4">
               Pourquoi souhaitez-vous signaler cet avis ?
             </p>
             <div class="space-y-2 mb-6">
@@ -216,9 +216,9 @@
                 Langage offensant
               </label>
             </div>
-            <div class="flex justify-end space-x-3">
+            <div class="flex justify-center sm:justify-end space-y-3 sm:space-y-0 sm:space-x-3">
               <button
-                class="px-4 py-3 text-neutral-600 bg-neutral-100 rounded-lg hover:transition-colors"
+                class="px-4 py-3 text-body bg-neutral-100 rounded-lg hover:transition-colors"
                 @click="reportingReviewId = null; reportReason = ''"
               >
                 Annuler
@@ -235,9 +235,9 @@
 
         <!-- Reply to Review Modal -->
         <div v-if="replyingToReviewId === review.id" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[120]">
-          <div class="bg-white rounded-lg p-6 max-w-md w-full mx-4">
-            <h3 class="text-responsive-lg font-semibold text-neutral-900 mb-4">Répondre à cet avis</h3>
-            <p class="text-responsive-sm text-neutral-600 mb-4">
+          <div class="bg-white rounded-lg p-6 max-w-full sm:max-w-md w-full mx-4">
+            <h3 class="text-responsive-lg font-semibold text-heading mb-4">Répondre à cet avis</h3>
+            <p class="text-responsive-sm text-body mb-4">
               Répondez de manière professionnelle et constructive à l'avis de {{ review.user.name }}.
             </p>
             <textarea
@@ -247,12 +247,12 @@
               rows="4"
               maxlength="500"
             />
-            <div class="text-responsive-xs text-neutral-500 mt-1">
+            <div class="text-responsive-xs text-muted mt-1">
               {{ replyText?.length || 0 }}/500 caractères
             </div>
-            <div class="flex justify-end space-x-3 mt-4">
+            <div class="flex justify-center sm:justify-end space-y-3 sm:space-y-0 sm:space-x-3 mt-4">
               <button
-                class="px-4 py-3 text-neutral-600 bg-neutral-100 rounded-lg hover:transition-colors"
+                class="px-4 py-3 text-body bg-neutral-100 rounded-lg hover:transition-colors"
                 @click="replyingToReviewId = null; replyText = ''"
               >
                 Annuler
@@ -272,11 +272,11 @@
 
     <!-- Pagination -->
     <div v-if="pagination && pagination.last_page > 1" class="px-6 py-4 border-t border-neutral-200">
-      <div class="flex items-center justify-between">
-        <div class="text-responsive-sm text-neutral-500">
+      <div class="flex items-center justify-start sm:justify-between">
+        <div class="text-responsive-sm text-muted">
           Page {{ pagination.current_page }} sur {{ pagination.last_page }}
         </div>
-        <div class="flex space-x-2">
+        <div class="flex space-y-2 sm:space-y-0 sm:space-x-2">
           <button
             :disabled="pagination.current_page <= 1"
             class="px-4 py-3 text-responsive-sm border border-neutral-300 rounded disabled:opacity-50 disabled:cursor-not-allowed hover:bg-neutral-50"
@@ -369,7 +369,7 @@ const fetchStats = async () => {
       emit('statsUpdated', data.data)
     }
   } catch (error) {
-    console.error('Error fetching review stats:', error)
+    // console.error('Error fetching review stats:', error)
   }
 }
 
@@ -398,7 +398,7 @@ const fetchReviews = async (page: number = 1) => {
       pagination.value = data.pagination
     }
   } catch (error) {
-    console.error('Error fetching reviews:', error)
+    // console.error('Error fetching reviews:', error)
   } finally {
     loading.value = false
   }
@@ -465,7 +465,7 @@ const submitReport = async (reviewId: number) => {
       throw new Error(data.message || 'Erreur lors du signalement')
     }
   } catch (error) {
-    console.error('Error reporting review:', error)
+    // console.error('Error reporting review:', error)
     alert('Erreur lors du signalement. Veuillez réessayer.')
   }
 }
@@ -506,7 +506,7 @@ const submitReply = async (reviewId: number) => {
       throw new Error(data.message || 'Erreur lors de la publication')
     }
   } catch (error) {
-    console.error('Error submitting reply:', error)
+    // console.error('Error submitting reply:', error)
     alert('Erreur lors de la publication. Veuillez réessayer.')
   }
 }

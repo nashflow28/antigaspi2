@@ -6,16 +6,16 @@
   >
     <!-- Header -->
     <div class="bg-white/80 backdrop-blur-sm border-b border-neutral-200 sticky top-0 z-10">
-      <div class="container mx-auto px-4 py-6">
-        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+      <div class="container px-4 sm:px-6 lg:px-8 mx-auto px-4 py-6">
+        <div class="flex flex-col lg:flex-row lg:items-center justify-start sm:justify-between gap-4">
           <div>
-            <h1 class="text-responsive-xl font-semibold text-neutral-900">Dashboard Avis</h1>
-            <p class="text-neutral-600 mt-1">
+            <h1 class="text-responsive-xl font-semibold text-heading">Dashboard Avis</h1>
+            <p class="text-body mt-1">
               Gérez et analysez les avis clients de votre commerce
             </p>
           </div>
 
-          <div class="flex items-center space-x-3">
+          <div class="flex items-center space-y-3 sm:space-y-0 sm:space-x-3">
             <button
               class="inline-flex items-center px-4 py-3 bg-primary-600 text-white rounded-lg hover:transition-colors"
               :disabled="loading"
@@ -29,37 +29,37 @@
       </div>
     </div>
 
-    <div class="container mx-auto px-4 py-8">
+    <div class="container px-4 sm:px-6 lg:px-8 mx-auto px-4 py-6 sm:py-8">
       <!-- Loading State -->
-      <div v-if="loading && !dashboardData" class="text-center py-16">
+      <div v-if="loading && !dashboardData" class="text-left sm:text-center py-12 sm:py-14 lg:py-16">
         <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mx-auto" />
-        <p class="text-neutral-600 mt-4">Chargement du dashboard...</p>
+        <p class="text-body mt-4">Chargement du dashboard...</p>
       </div>
 
       <div v-else-if="dashboardData" class="space-y-8">
         <!-- Key Statistics -->
-        <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
           <div class="bg-white rounded-2xl shadow-lg border border-neutral-100 p-6">
-            <div class="flex items-center justify-between">
+            <div class="flex items-center justify-start sm:justify-between">
               <div>
-                <p class="text-neutral-600 text-responsive-sm font-medium">Total des avis</p>
-                <p class="text-responsive-xl font-semibold text-neutral-900">{{ dashboardData.stats.total_reviews }}</p>
-                <p class="text-responsive-sm text-neutral-500 mt-1">
+                <p class="text-body text-responsive-sm font-medium">Total des avis</p>
+                <p class="text-responsive-xl font-semibold text-heading">{{ dashboardData.stats.total_reviews }}</p>
+                <p class="text-responsive-sm text-muted mt-1">
                   {{ dashboardData.stats.verified_reviews }} vérifiés
                 </p>
               </div>
               <div class="p-3 bg-blue-100 rounded-xl">
-                <MessageSquare class="w-10 h-10 text-blue-600" />
+                <MessageSquare class="w-10 h-10 text-info" />
               </div>
             </div>
           </div>
 
           <div class="bg-white rounded-2xl shadow-lg border border-neutral-100 p-6">
-            <div class="flex items-center justify-between">
+            <div class="flex items-center justify-start sm:justify-between">
               <div>
-                <p class="text-neutral-600 text-responsive-sm font-medium">Note moyenne</p>
-                <div class="flex items-center space-x-2">
-                  <p class="text-responsive-xl font-semibold text-neutral-900">{{ dashboardData.stats.average_rating }}</p>
+                <p class="text-body text-responsive-sm font-medium">Note moyenne</p>
+                <div class="flex items-center space-y-2 sm:space-y-0 sm:space-x-2">
+                  <p class="text-responsive-xl font-semibold text-heading">{{ dashboardData.stats.average_rating }}</p>
                   <Star class="w-10 h-10 text-yellow-400 fill-yellow-400" />
                 </div>
                 <div class="flex mt-1">
@@ -72,32 +72,32 @@
                 </div>
               </div>
               <div class="p-3 bg-yellow-100 rounded-xl">
-                <Star class="w-10 h-10 text-yellow-600" />
+                <Star class="w-10 h-10 text-warning" />
               </div>
             </div>
           </div>
 
           <div class="bg-white rounded-2xl shadow-lg border border-neutral-100 p-6">
-            <div class="flex items-center justify-between">
+            <div class="flex items-center justify-start sm:justify-between">
               <div>
-                <p class="text-neutral-600 text-responsive-sm font-medium">Cette semaine</p>
-                <p class="text-responsive-xl font-semibold text-neutral-900">{{ dashboardData.stats.reviews_this_week }}</p>
-                <p class="text-responsive-sm text-green-600 mt-1">
+                <p class="text-body text-responsive-sm font-medium">Cette semaine</p>
+                <p class="text-responsive-xl font-semibold text-heading">{{ dashboardData.stats.reviews_this_week }}</p>
+                <p class="text-responsive-sm text-success mt-1">
                   +{{ dashboardData.stats.reviews_today }} aujourd'hui
                 </p>
               </div>
               <div class="p-3 bg-green-100 rounded-xl">
-                <Calendar class="w-10 h-10 text-green-600" />
+                <Calendar class="w-10 h-10 text-success" />
               </div>
             </div>
           </div>
 
           <div class="bg-white rounded-2xl shadow-lg border border-neutral-100 p-6">
-            <div class="flex items-center justify-between">
+            <div class="flex items-center justify-start sm:justify-between">
               <div>
-                <p class="text-neutral-600 text-responsive-sm font-medium">Ce mois</p>
-                <p class="text-responsive-xl font-semibold text-neutral-900">{{ dashboardData.stats.reviews_this_month }}</p>
-                <p class="text-responsive-sm text-neutral-500 mt-1">
+                <p class="text-body text-responsive-sm font-medium">Ce mois</p>
+                <p class="text-responsive-xl font-semibold text-heading">{{ dashboardData.stats.reviews_this_month }}</p>
+                <p class="text-responsive-sm text-muted mt-1">
                   {{ Math.round((dashboardData.stats.reviews_this_month / dashboardData.stats.total_reviews) * 100) }}% du total
                 </p>
               </div>
@@ -109,17 +109,17 @@
         </div>
 
         <!-- Charts Section -->
-        <div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
+        <div class="grid grid-cols-1 xl:grid-cols-2 gap-4 sm:gap-6">
           <!-- Rating Distribution -->
           <div class="bg-white rounded-2xl shadow-lg border border-neutral-100 p-6">
-            <h3 class="text-responsive-xl font-semibold text-neutral-900 mb-6">Répartition des notes</h3>
+            <h3 class="text-responsive-xl font-semibold text-heading mb-6">Répartition des notes</h3>
             <div class="space-y-4">
               <div
                 v-for="rating in dashboardData.stats.rating_distribution"
                 :key="rating.rating"
-                class="flex items-center space-x-4"
+                class="flex items-center space-y-4 sm:space-y-0 sm:space-x-4"
               >
-                <div class="flex items-center space-x-2 w-20">
+                <div class="flex items-center space-y-2 sm:space-y-0 sm:space-x-2 w-20">
                   <span class="text-responsive-sm font-medium">{{ rating.rating }}</span>
                   <Star class="w-5 h-5 text-yellow-400 fill-yellow-400" />
                 </div>
@@ -129,9 +129,9 @@
                     :style="{ width: rating.percentage + '%' }"
                   />
                 </div>
-                <div class="flex items-center space-x-2 w-20">
-                  <span class="text-responsive-sm text-neutral-600">{{ rating.count }}</span>
-                  <span class="text-responsive-xs text-neutral-500">({{ rating.percentage }}%)</span>
+                <div class="flex items-center space-y-2 sm:space-y-0 sm:space-x-2 w-20">
+                  <span class="text-responsive-sm text-body">{{ rating.count }}</span>
+                  <span class="text-responsive-xs text-muted">({{ rating.percentage }}%)</span>
                 </div>
               </div>
             </div>
@@ -139,28 +139,28 @@
 
           <!-- Monthly Trend -->
           <div class="bg-white rounded-2xl shadow-lg border border-neutral-100 p-6">
-            <h3 class="text-responsive-xl font-semibold text-neutral-900 mb-6">Évolution mensuelle</h3>
+            <h3 class="text-responsive-xl font-semibold text-heading mb-6">Évolution mensuelle</h3>
             <div v-if="dashboardData.monthly_trend.length > 0" class="space-y-3">
               <div
                 v-for="month in dashboardData.monthly_trend"
                 :key="month.month"
-                class="flex items-center justify-between p-3 bg-neutral-50 rounded-lg"
+                class="flex items-center justify-start sm:justify-between p-3 bg-neutral-50 rounded-lg"
               >
                 <div>
                   <p class="font-medium text-responsive-sm">{{ formatMonth(month.month) }}</p>
-                  <p class="text-responsive-xs text-neutral-500">{{ month.count }} avis</p>
+                  <p class="text-responsive-xs text-muted">{{ month.count }} avis</p>
                 </div>
                 <div class="text-right">
-                  <div class="flex items-center space-x-2">
+                  <div class="flex items-center space-y-2 sm:space-y-0 sm:space-x-2">
                     <Star class="w-5 h-5 text-yellow-400 fill-yellow-400" />
                     <span class="font-medium text-responsive-sm">{{ month.avg_rating }}</span>
                   </div>
                 </div>
               </div>
             </div>
-            <div v-else class="text-center py-8">
-              <BarChart3 class="w-12 h-12 text-neutral-400 mx-auto mb-4" />
-              <p class="text-neutral-600">Pas assez de données pour le graphique</p>
+            <div v-else class="text-left sm:text-center py-6 sm:py-8">
+              <BarChart3 class="w-12 h-12 text-placeholder mx-auto mb-4" />
+              <p class="text-body">Pas assez de données pour le graphique</p>
             </div>
           </div>
         </div>
@@ -168,31 +168,31 @@
         <!-- Product Performance -->
         <div class="bg-white rounded-2xl shadow-lg border border-neutral-100">
           <div class="px-6 py-4 border-b border-neutral-200">
-            <h3 class="text-responsive-xl font-semibold text-neutral-900">Performance par produit</h3>
-            <p class="text-neutral-600 text-responsive-sm">Vos produits les mieux notés</p>
+            <h3 class="text-responsive-xl font-semibold text-heading">Performance par produit</h3>
+            <p class="text-body text-responsive-sm">Vos produits les mieux notés</p>
           </div>
           <div class="p-6">
             <div v-if="dashboardData.product_stats.length > 0" class="space-y-4">
               <div
                 v-for="product in dashboardData.product_stats"
                 :key="product.product_id"
-                class="flex items-center justify-between p-4 bg-neutral-50 rounded-lg hover:transition-colors"
+                class="flex items-center justify-start sm:justify-between p-4 bg-neutral-50 rounded-lg hover:transition-colors"
               >
                 <div class="flex-1">
-                  <h4 class="font-medium text-neutral-900">{{ product.product_name }}</h4>
-                  <p class="text-responsive-sm text-neutral-600">{{ product.review_count }} avis</p>
+                  <h4 class="font-medium text-heading">{{ product.product_name }}</h4>
+                  <p class="text-responsive-sm text-body">{{ product.review_count }} avis</p>
                 </div>
-                <div class="flex items-center space-x-2">
-                  <div class="flex items-center space-x-2">
+                <div class="flex items-center space-y-2 sm:space-y-0 sm:space-x-2">
+                  <div class="flex items-center space-y-2 sm:space-y-0 sm:space-x-2">
                     <Star class="w-5 h-5 text-yellow-400 fill-yellow-400" />
                     <span class="font-medium">{{ product.avg_rating }}</span>
                   </div>
                 </div>
               </div>
             </div>
-            <div v-else class="text-center py-8">
-              <Package class="w-12 h-12 text-neutral-400 mx-auto mb-4" />
-              <p class="text-neutral-600">Aucun produit avec des avis pour le moment</p>
+            <div v-else class="text-left sm:text-center py-6 sm:py-8">
+              <Package class="w-12 h-12 text-placeholder mx-auto mb-4" />
+              <p class="text-body">Aucun produit avec des avis pour le moment</p>
             </div>
           </div>
         </div>
@@ -200,14 +200,14 @@
         <!-- Recent Reviews -->
         <div class="bg-white rounded-2xl shadow-lg border border-neutral-100">
           <div class="px-6 py-4 border-b border-neutral-200">
-            <div class="flex items-center justify-between">
+            <div class="flex items-center justify-start sm:justify-between">
               <div>
-                <h3 class="text-responsive-xl font-semibold text-neutral-900">Avis récents</h3>
-                <p class="text-neutral-600 text-responsive-sm">Derniers avis reçus</p>
+                <h3 class="text-responsive-xl font-semibold text-heading">Avis récents</h3>
+                <p class="text-body text-responsive-sm">Derniers avis reçus</p>
               </div>
               <router-link
                 to="/merchant/reviews"
-                class="text-primary-600 text-responsive-sm hover:transition-colors"
+                class="text-primary text-responsive-sm hover:transition-colors"
               >
                 Voir tous les avis
               </router-link>
@@ -220,7 +220,7 @@
                 :key="review.id"
                 class="px-6 py-4 hover:transition-colors"
               >
-                <div class="flex space-x-4">
+                <div class="flex space-y-4 sm:space-y-0 sm:space-x-4">
                   <!-- User Avatar -->
                   <div class="flex-shrink-0">
                     <div class="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
@@ -231,9 +231,9 @@
                   </div>
 
                   <div class="flex-1 min-w-0">
-                    <div class="flex items-center justify-between mb-2">
-                      <div class="flex items-center space-x-2">
-                        <span class="font-medium text-neutral-900">{{ review.user.name }}</span>
+                    <div class="flex items-center justify-start sm:justify-between mb-2">
+                      <div class="flex items-center space-y-2 sm:space-y-0 sm:space-x-2">
+                        <span class="font-medium text-heading">{{ review.user.name }}</span>
                         <div class="flex items-center">
                           <Star
                             v-for="star in 5"
@@ -247,18 +247,18 @@
                           Achat vérifié
                         </span>
                       </div>
-                      <span class="text-responsive-sm text-neutral-500">{{ review.time_ago }}</span>
+                      <span class="text-responsive-sm text-muted">{{ review.time_ago }}</span>
                     </div>
 
                     <div v-if="review.title" class="mb-2">
-                      <h4 class="font-medium text-neutral-900">{{ review.title }}</h4>
+                      <h4 class="font-medium text-heading">{{ review.title }}</h4>
                     </div>
 
-                    <div v-if="review.comment" class="text-neutral-700 text-responsive-sm leading-relaxed mb-2">
+                    <div v-if="review.comment" class="text-body-emphasis text-responsive-sm leading-relaxed mb-2">
                       {{ review.comment }}
                     </div>
 
-                    <div v-if="review.product" class="inline-flex items-center text-responsive-xs text-blue-600 bg-blue-50 rounded-full px-4 py-3">
+                    <div v-if="review.product" class="inline-flex items-center text-responsive-xs text-info bg-blue-50 rounded-full px-4 py-3">
                       <Package class="w-3 h-3 mr-1" />
                       {{ review.product.name }}
                     </div>
@@ -266,20 +266,20 @@
                 </div>
               </div>
             </div>
-            <div v-else class="px-6 py-8 text-center">
-              <MessageSquare class="w-12 h-12 text-neutral-400 mx-auto mb-4" />
-              <h4 class="text-responsive-lg font-medium text-neutral-900 mb-2">Aucun avis</h4>
-              <p class="text-neutral-600">Vous n'avez pas encore reçu d'avis clients.</p>
+            <div v-else class="px-6 py-6 sm:py-8 text-left sm:text-center">
+              <MessageSquare class="w-12 h-12 text-placeholder mx-auto mb-4" />
+              <h4 class="text-responsive-lg font-medium text-heading mb-2">Aucun avis</h4>
+              <p class="text-body">Vous n'avez pas encore reçu d'avis clients.</p>
             </div>
           </div>
         </div>
       </div>
 
       <!-- Error State -->
-      <div v-else-if="error" class="text-center py-16">
+      <div v-else-if="error" class="text-left sm:text-center py-12 sm:py-14 lg:py-16">
         <AlertTriangle class="w-16 h-16 text-red-500 mx-auto mb-4" />
-        <h2 class="text-responsive-xl font-semibold text-neutral-900 mb-2">Erreur de chargement</h2>
-        <p class="text-neutral-600 mb-4">{{ error }}</p>
+        <h2 class="text-responsive-xl font-semibold text-heading mb-2">Erreur de chargement</h2>
+        <p class="text-body mb-4">{{ error }}</p>
         <button
           class="inline-flex items-center px-4 py-3 bg-primary-600 text-white rounded-lg hover:transition-colors"
           @click="refreshData"
@@ -397,7 +397,7 @@ const loadDashboard = async () => {
       throw new Error(data.message || 'Erreur lors du chargement')
     }
   } catch (err) {
-    console.error('Error loading dashboard:', err)
+    // console.error('Error loading dashboard:', err)
     error.value = err instanceof Error ? err.message : 'Erreur inconnue'
   } finally {
     loading.value = false

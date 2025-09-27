@@ -6,11 +6,11 @@
   >
     <!-- Header -->
     <div class="bg-white/80 backdrop-blur-sm border-b border-neutral-200 sticky top-0 z-10">
-      <div class="container mx-auto px-4 py-6">
-        <div class="flex items-center justify-between">
+      <div class="container px-4 sm:px-6 lg:px-8 mx-auto px-4 py-6">
+        <div class="flex items-center justify-start sm:justify-between">
           <div>
-            <h1 class="text-responsive-xl font-semibold text-neutral-900">Gestion des Points de Fidélité</h1>
-            <p class="text-neutral-600 mt-1">
+            <h1 class="text-responsive-xl font-semibold text-heading">Gestion des Points de Fidélité</h1>
+            <p class="text-body mt-1">
               Attribuez des points à vos clients fidèles
             </p>
           </div>
@@ -38,49 +38,49 @@
       </div>
     </div>
 
-    <div class="container mx-auto px-4 py-8">
+    <div class="container px-4 sm:px-6 lg:px-8 mx-auto px-4 py-6 sm:py-8">
       <!-- Quick Stats -->
-      <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-4 sm:gap-6 mb-6 sm:mb-8">
         <Card>
-          <div class="flex items-center justify-between">
+          <div class="flex items-center justify-start sm:justify-between">
             <div>
-              <p class="text-responsive-sm font-medium text-neutral-600">Total Clients</p>
-              <p class="text-responsive-xl font-semibold text-primary-600 mt-1">{{ allUsersPoints.length }}</p>
+              <p class="text-responsive-sm font-medium text-body">Total Clients</p>
+              <p class="text-responsive-xl font-semibold text-primary mt-1">{{ allUsersPoints.length }}</p>
             </div>
             <div class="p-3 bg-primary-100 rounded-xl">
-              <Users class="w-10 h-10 text-primary-600" />
+              <Users class="w-10 h-10 text-primary" />
             </div>
           </div>
         </Card>
 
         <Card>
-          <div class="flex items-center justify-between">
+          <div class="flex items-center justify-start sm:justify-between">
             <div>
-              <p class="text-responsive-sm font-medium text-neutral-600">Points Distribués</p>
-              <p class="text-responsive-xl font-semibold text-green-600 mt-1">{{ totalPointsDistributed }}</p>
+              <p class="text-responsive-sm font-medium text-body">Points Distribués</p>
+              <p class="text-responsive-xl font-semibold text-success mt-1">{{ totalPointsDistributed }}</p>
             </div>
             <div class="p-3 bg-green-100 rounded-xl">
-              <TrendingUp class="w-10 h-10 text-green-600" />
+              <TrendingUp class="w-10 h-10 text-success" />
             </div>
           </div>
         </Card>
 
         <Card>
-          <div class="flex items-center justify-between">
+          <div class="flex items-center justify-start sm:justify-between">
             <div>
-              <p class="text-responsive-sm font-medium text-neutral-600">Clients Actifs</p>
-              <p class="text-responsive-xl font-semibold text-blue-600 mt-1">{{ activeCustomers }}</p>
+              <p class="text-responsive-sm font-medium text-body">Clients Actifs</p>
+              <p class="text-responsive-xl font-semibold text-info mt-1">{{ activeCustomers }}</p>
             </div>
             <div class="p-3 bg-blue-100 rounded-xl">
-              <Star class="w-10 h-10 text-blue-600" />
+              <Star class="w-10 h-10 text-info" />
             </div>
           </div>
         </Card>
 
         <Card>
-          <div class="flex items-center justify-between">
+          <div class="flex items-center justify-start sm:justify-between">
             <div>
-              <p class="text-responsive-sm font-medium text-neutral-600">Moyenne Points</p>
+              <p class="text-responsive-sm font-medium text-body">Moyenne Points</p>
               <p class="text-responsive-xl font-semibold text-purple-600 mt-1">{{ averagePoints }}</p>
             </div>
             <div class="p-3 bg-purple-100 rounded-xl">
@@ -92,12 +92,12 @@
 
       <!-- Customers List -->
       <Card>
-        <div class="flex items-center justify-between mb-6">
-          <h3 class="text-responsive-xl font-semibold text-neutral-900">Clients avec Points de Fidélité</h3>
+        <div class="flex items-center justify-start sm:justify-between mb-6">
+          <h3 class="text-responsive-xl font-semibold text-heading">Clients avec Points de Fidélité</h3>
           <div class="flex items-center gap-3">
             <!-- Search -->
             <div class="relative">
-              <Search class="w-5 h-5 absolute left-3 top-1/2 transform -translate-y-1/2 text-neutral-400" />
+              <Search class="w-5 h-5 relative sm:absolute left-3 top-1/2 transform -translate-y-1/2 text-placeholder" />
               <input
                 v-model="searchQuery"
                 type="text"
@@ -122,11 +122,11 @@
           <table class="w-full">
             <thead>
               <tr class="border-b border-neutral-200">
-                <th class="text-left py-3 px-4 font-semibold text-neutral-900">Client</th>
-                <th class="text-left py-3 px-4 font-semibold text-neutral-900">Email</th>
-                <th class="text-left py-3 px-4 font-semibold text-neutral-900">Points</th>
-                <th class="text-left py-3 px-4 font-semibold text-neutral-900">Dernière Activité</th>
-                <th class="text-left py-3 px-4 font-semibold text-neutral-900">Actions</th>
+                <th class="text-left py-3 px-4 font-semibold text-heading">Client</th>
+                <th class="text-left py-3 px-4 font-semibold text-heading">Email</th>
+                <th class="text-left py-3 px-4 font-semibold text-heading">Points</th>
+                <th class="text-left py-3 px-4 font-semibold text-heading">Dernière Activité</th>
+                <th class="text-left py-3 px-4 font-semibold text-heading">Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -141,19 +141,19 @@
                       {{ customer.name.charAt(0).toUpperCase() }}
                     </div>
                     <div>
-                      <p class="font-medium text-neutral-900">{{ customer.name }}</p>
-                      <p class="text-responsive-sm text-neutral-500">ID: {{ customer.id }}</p>
+                      <p class="font-medium text-heading">{{ customer.name }}</p>
+                      <p class="text-responsive-sm text-muted">ID: {{ customer.id }}</p>
                     </div>
                   </div>
                 </td>
-                <td class="py-4 px-4 text-neutral-600">{{ customer.email }}</td>
+                <td class="py-4 px-4 text-body">{{ customer.email }}</td>
                 <td class="py-4 px-4">
                   <div class="flex items-center gap-2">
                     <Star class="w-5 h-5 text-yellow-500" />
-                    <span class="font-semibold text-neutral-900">{{ formatPoints(customer.total_points) }}</span>
+                    <span class="font-semibold text-heading">{{ formatPoints(customer.total_points) }}</span>
                   </div>
                 </td>
-                <td class="py-4 px-4 text-neutral-600">
+                <td class="py-4 px-4 text-body">
                   {{ customer.last_activity ? formatDate(customer.last_activity) : 'Aucune' }}
                 </td>
                 <td class="py-4 px-4">
@@ -170,10 +170,10 @@
             </tbody>
           </table>
 
-          <div v-if="filteredCustomers.length === 0" class="text-center py-8">
+          <div v-if="filteredCustomers.length === 0" class="text-left sm:text-center py-6 sm:py-8">
             <Users class="w-16 h-16 text-neutral-300 mx-auto mb-4" />
-            <p class="text-neutral-600">Aucun client trouvé</p>
-            <p class="text-responsive-sm text-neutral-500">
+            <p class="text-body">Aucun client trouvé</p>
+            <p class="text-responsive-sm text-muted">
               {{ searchQuery ? 'Modifiez votre recherche' : 'Les clients apparaîtront ici une fois qu\'ils auront des points' }}
             </p>
           </div>
@@ -186,12 +186,12 @@
       <div class="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm transition-opacity" @click="closeAwardModal" />
 
       <div class="flex min-h-full items-center justify-center p-4">
-        <div class="relative w-full max-w-md bg-white rounded-2xl shadow-xl transform transition-all" @click.stop>
+        <div class="relative w-full max-w-full sm:max-w-md bg-white rounded-2xl shadow-xl transform transition-all" @click.stop>
           <div class="px-6 py-4 border-b border-neutral-200">
-            <div class="flex items-center justify-between">
-              <h3 class="text-responsive-lg font-semibold text-neutral-900">Attribuer des Points</h3>
+            <div class="flex items-center justify-start sm:justify-between">
+              <h3 class="text-responsive-lg font-semibold text-heading">Attribuer des Points</h3>
               <button class="p-2 hover:transition-colors" @click="closeAwardModal">
-                <X class="w-5 h-5 text-neutral-400" />
+                <X class="w-5 h-5 text-placeholder" />
               </button>
             </div>
           </div>
@@ -200,7 +200,7 @@
             <!-- Customer Selection -->
             <div v-if="!selectedCustomer">
               <Label>Sélectionner un client</Label>
-              <div class="text-responsive-xs text-neutral-500 mb-2">
+              <div class="text-responsive-xs text-muted mb-2">
                 Debug: {{ allUsersPoints.length }} clients chargés
               </div>
               <Select
@@ -219,9 +219,9 @@
             </div>
 
             <div v-else class="bg-neutral-50 rounded-lg p-3">
-              <p class="text-responsive-sm text-neutral-600">Client sélectionné:</p>
-              <p class="font-semibold text-neutral-900">{{ selectedCustomer.name }}</p>
-              <p class="text-responsive-sm text-neutral-600">{{ selectedCustomer.email }}</p>
+              <p class="text-responsive-sm text-body">Client sélectionné:</p>
+              <p class="font-semibold text-heading">{{ selectedCustomer.name }}</p>
+              <p class="text-responsive-sm text-body">{{ selectedCustomer.email }}</p>
             </div>
 
             <!-- Points Amount -->
@@ -272,7 +272,7 @@
                 type="date"
                 :min="tomorrow"
               />
-              <p class="text-responsive-xs text-neutral-500 mt-1">
+              <p class="text-responsive-xs text-muted mt-1">
                 Laissez vide pour une expiration automatique dans 1 an
               </p>
             </div>

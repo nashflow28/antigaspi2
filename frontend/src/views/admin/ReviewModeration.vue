@@ -6,13 +6,13 @@
   >
     <div class="p-6">
       <!-- Header -->
-      <div class="mb-8">
-        <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
+      <div class="mb-6 sm:mb-8">
+        <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 sm:gap-6">
           <div>
-            <h1 class="text-responsive-xl lg:text-display-sm font-semibold text-neutral-900 mb-2">
+            <h1 class="text-responsive-xl lg:text-display-sm font-semibold text-heading mb-2">
               Modération des Avis
             </h1>
-            <p class="text-neutral-600 text-responsive-lg">
+            <p class="text-body text-responsive-lg">
               Gérez les avis en attente et les signalements
             </p>
           </div>
@@ -31,7 +31,7 @@
       </div>
 
       <!-- Statistics Cards -->
-      <div v-if="stats" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 mb-8">
+      <div v-if="stats" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-6 sm:mb-8">
         <Card class="bg-gradient-to-r from-orange-500 to-orange-600 text-white">
           <div class="flex items-center justify-between">
             <div>
@@ -94,15 +94,15 @@
       </div>
 
       <!-- Tabs Navigation -->
-      <div class="mb-8">
+      <div class="mb-6 sm:mb-8">
         <div class="border-b border-neutral-200">
-          <nav class="-mb-px flex space-x-8">
+          <nav class="-mb-px flex space-y-8 sm:space-y-0 sm:space-x-8">
             <button
               :class="[
                 'py-3 px-1 border-b-2 font-medium text-responsive-sm',
                 activeTab === 'pending'
-                  ? 'border-primary-500 text-primary-600'
-                  : 'border-transparent text-neutral-500 hover:text-neutral-700 hover:border-neutral-300'
+                  ? 'border-primary-500 text-primary'
+                  : 'border-transparent text-muted hover:text-body-emphasis hover:border-neutral-300'
               ]"
               @click="activeTab = 'pending'"
             >
@@ -115,8 +115,8 @@
               :class="[
                 'py-3 px-1 border-b-2 font-medium text-responsive-sm',
                 activeTab === 'reported'
-                  ? 'border-primary-500 text-primary-600'
-                  : 'border-transparent text-neutral-500 hover:text-neutral-700 hover:border-neutral-300'
+                  ? 'border-primary-500 text-primary'
+                  : 'border-transparent text-muted hover:text-body-emphasis hover:border-neutral-300'
               ]"
               @click="activeTab = 'reported'"
             >
@@ -205,7 +205,7 @@ const loadStats = async () => {
       throw new Error(data.message || 'Erreur lors du chargement')
     }
   } catch (err) {
-    console.error('Error loading moderation stats:', err)
+    // console.error('Error loading moderation stats:', err)
     error.value = err instanceof Error ? err.message : 'Erreur inconnue'
   } finally {
     loading.value = false

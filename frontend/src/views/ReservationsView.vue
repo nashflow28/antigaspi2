@@ -1,11 +1,11 @@
 <template>
   <div class="min-h-screen bg-neutral-50">
     <section class="bg-nav-gradient text-white">
-      <div class="mx-auto max-w-6xl space-y-8 px-6 py-spacing-22">
+      <div class="mx-auto max-w-full sm:max-w-6xl space-y-8 px-6 py-spacing-22">
         <div class="space-y-3">
           <p class="text-small uppercase tracking-wide text-white/80">Suivi des commandes</p>
           <h1 class="text-display-sm font-semibold leading-relaxed">Mes réservations</h1>
-          <p class="max-w-2xl text-body text-white/80">Visualisez l'ensemble de vos réservations, suivez leur statut et mesurez votre impact positif.</p>
+          <p class="max-w-full sm:max-w-2xl text-body text-white/80">Visualisez l'ensemble de vos réservations, suivez leur statut et mesurez votre impact positif.</p>
         </div>
         <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <Card
@@ -25,20 +25,20 @@
       </div>
     </section>
 
-    <main class="mx-auto max-w-6xl space-y-spacing-22 px-6 py-spacing-22">
+    <main class="mx-auto max-w-full sm:max-w-6xl space-y-spacing-22 px-6 py-spacing-22">
       <div class="grid gap-spacing-22 lg:grid-cols-[320px,1fr]">
         <div class="space-y-6">
           <Card padding="lg" class="space-y-6">
             <template #header>
-              <h2 class="text-h3 font-semibold text-neutral-900">Filtres</h2>
+              <h2 class="text-h3 font-semibold text-heading">Filtres</h2>
             </template>
 
             <div class="space-y-4">
               <label class="flex flex-col gap-2">
-                <span class="text-small font-medium text-neutral-600">Statut</span>
+                <span class="text-small font-medium text-body">Statut</span>
                 <select
                   v-model="filters.status"
-                  class="w-full rounded-2xl border border-neutral-200 bg-surface-light px-4 py-3 text-body text-neutral-600 focus:border-primary-400 focus:outline-none focus:ring-2 focus:ring-primary-200"
+                  class="w-full rounded-2xl border border-neutral-200 bg-surface-light px-4 py-3 text-body text-body focus:border-primary-400 focus:outline-none focus:ring-2 focus:ring-primary-200"
                 >
                   <option value="">Tous les statuts</option>
                   <option value="pending">En attente</option>
@@ -51,10 +51,10 @@
               </label>
 
               <label class="flex flex-col gap-2">
-                <span class="text-small font-medium text-neutral-600">Période</span>
+                <span class="text-small font-medium text-body">Période</span>
                 <select
                   v-model="filters.period"
-                  class="w-full rounded-2xl border border-neutral-200 bg-surface-light px-4 py-3 text-body text-neutral-600 focus:border-primary-400 focus:outline-none focus:ring-2 focus:ring-primary-200"
+                  class="w-full rounded-2xl border border-neutral-200 bg-surface-light px-4 py-3 text-body text-body focus:border-primary-400 focus:outline-none focus:ring-2 focus:ring-primary-200"
                 >
                   <option value="">Toutes</option>
                   <option value="today">Aujourd'hui</option>
@@ -66,11 +66,11 @@
             </div>
 
             <div class="space-y-3 border-t border-neutral-200/70 pt-4">
-              <p class="text-small font-semibold text-neutral-700">Actions rapides</p>
+              <p class="text-small font-semibold text-body-emphasis">Actions rapides</p>
               <Button
                 variant="ghost"
                 size="sm"
-                class="w-full justify-center text-neutral-600"
+                class="w-full justify-center text-body"
                 :disabled="!hasFilters"
                 @click="clearFilters"
               >
@@ -88,7 +88,7 @@
               <Button
                 variant="ghost"
                 size="sm"
-                class="w-full justify-center text-primary-600"
+                class="w-full justify-center text-primary"
                 :left-icon="CheckCheck"
                 @click="markAllAsRead"
               >
@@ -97,7 +97,7 @@
             </div>
           </Card>
 
-          <Card variant="highlight" padding="lg" class="space-y-4 text-neutral-900">
+          <Card variant="highlight" padding="lg" class="space-y-4 text-heading">
             <template #header>
               <div class="flex items-center gap-3">
                 <div class="flex h-14 w-14 items-center justify-center rounded-2xl bg-white/20 text-white">
@@ -126,7 +126,7 @@
                   <Button
                     variant="ghost"
                     size="icon"
-                    :class="viewMode === 'list' ? 'bg-primary-100 text-primary-700' : 'text-neutral-500'"
+                    :class="viewMode === 'list' ? 'bg-primary-100 text-primary-emphasis' : 'text-muted'"
                     :aria-pressed="viewMode === 'list'"
                     aria-label="Vue liste"
                     :left-icon="List"
@@ -137,7 +137,7 @@
                   <Button
                     variant="ghost"
                     size="icon"
-                    :class="viewMode === 'grid' ? 'bg-primary-100 text-primary-700' : 'text-neutral-500'"
+                    :class="viewMode === 'grid' ? 'bg-primary-100 text-primary-emphasis' : 'text-muted'"
                     :aria-pressed="viewMode === 'grid'"
                     aria-label="Vue grille"
                     :left-icon="Grid3X3"
@@ -145,13 +145,13 @@
                   >
                     <span class="sr-only">Vue grille</span>
                   </Button>
-                  <p class="text-small text-neutral-500">
+                  <p class="text-small text-muted">
                     {{ filteredReservations.length }} réservation{{ filteredReservations.length > 1 ? 's' : '' }}
                   </p>
                 </div>
                 <select
                   v-model="sortBy"
-                  class="w-full rounded-2xl border border-neutral-200 bg-surface-light px-4 py-3 text-body text-neutral-600 focus:border-primary-400 focus:outline-none focus:ring-2 focus:ring-primary-200 sm:w-auto"
+                  class="w-full rounded-2xl border border-neutral-200 bg-surface-light px-4 py-3 text-body text-body focus:border-primary-400 focus:outline-none focus:ring-2 focus:ring-primary-200 sm:w-auto"
                 >
                   <option value="created_at_desc">Plus récentes</option>
                   <option value="created_at_asc">Plus anciennes</option>
@@ -161,7 +161,7 @@
               </div>
             </template>
 
-            <div v-if="loading" class="grid grid-cols-1 gap-6 md:grid-cols-3 xl:grid-cols-4">
+            <div v-if="loading" class="grid grid-cols-1 gap-4 sm:gap-6 md:grid-cols-3 xl:grid-cols-4">
               <Card
                 v-for="index in 6"
                 :key="index"
@@ -187,7 +187,7 @@
               <div
                 v-if="viewMode === 'grid'"
                 data-test="reservations-grid"
-                class="grid grid-cols-1 gap-6 md:grid-cols-3 xl:grid-cols-4"
+                class="grid grid-cols-1 gap-4 sm:gap-6 md:grid-cols-3 xl:grid-cols-4"
               >
                 <ReservationCard
                   v-for="reservation in filteredReservations"
@@ -228,7 +228,7 @@
                     :key="page"
                     variant="ghost"
                     size="sm"
-                    :class="page === currentPage ? 'bg-primary-100 text-primary-700' : 'text-neutral-600'"
+                    :class="page === currentPage ? 'bg-primary-100 text-primary-emphasis' : 'text-body'"
                     @click="currentPage = page"
                   >
                     {{ page }}

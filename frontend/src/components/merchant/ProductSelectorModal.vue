@@ -1,14 +1,14 @@
 <template>
   <div class="fixed inset-0 bg-black bg-opacity-50 z-[120] flex items-center justify-center p-4">
-    <div class="bg-white rounded-xl shadow-xl max-w-4xl w-full max-h-[80vh] overflow-hidden">
+    <div class="bg-white rounded-xl shadow-xl max-w-full sm:max-w-4xl w-full max-h-[80vh] overflow-hidden sm:block">
       <!-- Header -->
-      <div class="flex items-center justify-between p-6 border-b border-neutral-200">
-        <h3 class="text-responsive-xl font-semibold text-neutral-900">Sélectionner des produits</h3>
+      <div class="flex items-center justify-start sm:justify-between p-6 border-b border-neutral-200">
+        <h3 class="text-responsive-xl font-semibold text-heading">Sélectionner des produits</h3>
         <button
           class="p-2 hover:transition-colors"
           @click="$emit('close')"
         >
-          <X class="w-5 h-5 text-neutral-500" />
+          <X class="w-5 h-5 text-muted" />
         </button>
       </div>
 
@@ -18,7 +18,7 @@
           <!-- Search -->
           <div class="flex-1">
             <div class="relative">
-              <Search class="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-neutral-400" />
+              <Search class="relative sm:absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-placeholder" />
               <input
                 v-model="searchQuery"
                 type="text"
@@ -45,12 +45,12 @@
 
       <!-- Products List -->
       <div class="flex-1 overflow-y-auto max-h-96">
-        <div v-if="loading" class="p-8 text-center">
+        <div v-if="loading" class="p-4 sm:p-6 lg:p-8 text-left sm:text-center">
           <div class="animate-spin rounded-full h-10 w-10 border-b-2 border-primary-600 mx-auto mb-2" />
-          <p class="text-neutral-600">Chargement des produits...</p>
+          <p class="text-body">Chargement des produits...</p>
         </div>
 
-        <div v-else-if="filteredProducts.length === 0" class="p-8 text-center text-neutral-500">
+        <div v-else-if="filteredProducts.length === 0" class="p-4 sm:p-6 lg:p-8 text-left sm:text-center text-muted">
           <Package class="w-12 h-12 mx-auto mb-3 text-neutral-300" />
           <p>Aucun produit trouvé</p>
           <p class="text-responsive-sm">Essayez de modifier vos critères de recherche</p>
@@ -64,7 +64,7 @@
               class="border border-neutral-200 rounded-lg p-4 hover:transition-colors"
               :class="{ 'bg-primary-50 border-primary-200': isSelected(product.id) }"
             >
-              <div class="flex items-start space-x-3">
+              <div class="flex items-stretch sm:items-start space-y-3 sm:space-y-0 sm:space-x-3">
                 <!-- Product Image -->
                 <img
                   v-if="product.image_url"
@@ -76,33 +76,33 @@
                   v-else
                   class="w-16 h-16 bg-neutral-200 rounded-lg flex items-center justify-center flex-shrink-0"
                 >
-                  <Package class="w-10 h-10 text-neutral-400" />
+                  <Package class="w-10 h-10 text-placeholder" />
                 </div>
 
                 <!-- Product Info -->
                 <div class="flex-1 min-w-0">
-                  <h4 class="font-medium text-neutral-900 truncate">{{ product.name }}</h4>
-                  <p class="text-responsive-sm text-neutral-500 line-clamp-2">{{ product.description }}</p>
+                  <h4 class="font-medium text-heading truncate">{{ product.name }}</h4>
+                  <p class="text-responsive-sm text-muted line-clamp-2">{{ product.description }}</p>
 
-                  <div class="mt-2 flex items-center justify-between">
-                    <div class="flex items-center space-x-2">
-                      <span class="text-responsive-sm font-medium text-green-600">
+                  <div class="mt-2 flex items-center justify-start sm:justify-between">
+                    <div class="flex items-center space-y-2 sm:space-y-0 sm:space-x-2">
+                      <span class="text-responsive-sm font-medium text-success">
                         {{ product.discounted_price }} XOF
                       </span>
-                      <span class="text-responsive-sm text-neutral-400 line-through">
+                      <span class="text-responsive-sm text-placeholder line-through">
                         {{ product.original_price }} XOF
                       </span>
                     </div>
-                    <span class="text-responsive-xs text-neutral-500">
+                    <span class="text-responsive-xs text-muted">
                       Stock: {{ product.quantity_available }}
                     </span>
                   </div>
 
                   <!-- Quantity Selector -->
-                  <div class="mt-3 flex items-center justify-between">
-                    <div class="flex items-center space-x-2">
-                      <label class="text-responsive-sm text-neutral-700">Quantité:</label>
-                      <div class="flex items-center space-x-2">
+                  <div class="mt-3 flex items-center justify-start sm:justify-between">
+                    <div class="flex items-center space-y-2 sm:space-y-0 sm:space-x-2">
+                      <label class="text-responsive-sm text-body-emphasis">Quantité:</label>
+                      <div class="flex items-center space-y-2 sm:space-y-0 sm:space-x-2">
                         <button
                           type="button"
                           :disabled="getQuantity(product.id) <= 0"
@@ -116,7 +116,7 @@
                           type="number"
                           min="0"
                           :max="product.quantity_available"
-                          class="w-12 text-center text-responsive-sm border border-neutral-300 rounded py-3"
+                          class="w-12 text-left sm:text-center text-responsive-sm border border-neutral-300 rounded py-3"
                           @input="updateQuantity(product.id, parseInt(($event.target as HTMLInputElement).value) || 0)"
                         >
                         <button
@@ -136,7 +136,7 @@
                       class="px-4 py-3 text-responsive-sm rounded-lg transition-colors"
                       :class="isSelected(product.id)
                         ? 'bg-red-100 text-red-700 hover:bg-red-200'
-                        : 'bg-primary-100 text-primary-700 hover:bg-primary-200'"
+                        : 'bg-primary-100 text-primary-emphasis hover:bg-primary-200'"
                       @click="toggleProduct(product)"
                     >
                       {{ isSelected(product.id) ? 'Retirer' : 'Ajouter' }}
@@ -151,13 +151,13 @@
 
       <!-- Footer -->
       <div class="p-6 border-t border-neutral-200 bg-neutral-50">
-        <div class="flex items-center justify-between">
-          <div class="text-responsive-sm text-neutral-600">
+        <div class="flex items-center justify-start sm:justify-between">
+          <div class="text-responsive-sm text-body">
             {{ selectedProductsList.length }} produit(s) sélectionné(s)
           </div>
-          <div class="flex items-center space-x-3">
+          <div class="flex items-center space-y-3 sm:space-y-0 sm:space-x-3">
             <button
-              class="px-4 py-3 border border-neutral-300 text-neutral-700 rounded-lg hover:transition-colors"
+              class="px-4 py-3 border border-neutral-300 text-body-emphasis rounded-lg hover:transition-colors"
               @click="$emit('close')"
             >
               Annuler

@@ -2,30 +2,30 @@
   <div class="border-t border-neutral-200 pt-4 mt-4">
     <!-- Existing Response -->
     <div v-if="review.merchant_response && !isEditing" class="mb-4">
-      <div class="flex items-start space-x-3">
+      <div class="flex items-stretch sm:items-start space-y-3 sm:space-y-0 sm:space-x-3">
         <div class="flex-shrink-0">
           <div class="w-10 h-10 bg-gradient-to-r from-green-500 to-green-600 rounded-full flex items-center justify-center">
             <BuildingStorefrontIcon class="w-5 h-5 text-white" />
           </div>
         </div>
         <div class="flex-1 min-w-0">
-          <div class="flex items-center space-x-2 mb-2">
-            <span class="text-responsive-sm font-medium text-neutral-900">Réponse du commerçant</span>
-            <span class="text-responsive-xs text-neutral-500">{{ formatDate(review.merchant_response_at) }}</span>
+          <div class="flex items-center space-y-2 sm:space-y-0 sm:space-x-2 mb-2">
+            <span class="text-responsive-sm font-medium text-heading">Réponse du commerçant</span>
+            <span class="text-responsive-xs text-muted">{{ formatDate(review.merchant_response_at) }}</span>
           </div>
-          <div class="text-responsive-sm text-neutral-700 leading-relaxed bg-green-50 rounded-lg p-3">
+          <div class="text-responsive-sm text-body-emphasis leading-relaxed bg-green-50 rounded-lg p-3">
             {{ review.merchant_response }}
           </div>
-          <div class="flex items-center space-x-2 mt-2">
+          <div class="flex items-center space-y-2 sm:space-y-0 sm:space-x-2 mt-2">
             <button
-              class="inline-flex items-center px-4 py-3 text-responsive-xs text-blue-600 bg-blue-50 hover:transition-colors"
+              class="inline-flex items-center px-4 py-3 text-responsive-xs text-info bg-blue-50 hover:transition-colors"
               @click="startEditing"
             >
               <PencilIcon class="w-3 h-3 mr-1" />
               Modifier
             </button>
             <button
-              class="inline-flex items-center px-4 py-3 text-responsive-xs text-red-600 bg-red-50 hover:transition-colors"
+              class="inline-flex items-center px-4 py-3 text-responsive-xs text-error bg-red-50 hover:transition-colors"
               :disabled="deleting"
               @click="deleteResponse"
             >
@@ -39,9 +39,9 @@
 
     <!-- Response Form -->
     <div v-else-if="!review.merchant_response || isEditing" class="space-y-3">
-      <div class="flex items-center space-x-2">
-        <BuildingStorefrontIcon class="w-5 h-5 text-green-600" />
-        <span class="text-responsive-sm font-medium text-neutral-900">
+      <div class="flex items-center space-y-2 sm:space-y-0 sm:space-x-2">
+        <BuildingStorefrontIcon class="w-5 h-5 text-success" />
+        <span class="text-responsive-sm font-medium text-heading">
           {{ isEditing ? 'Modifier votre réponse' : 'Répondre à cet avis' }}
         </span>
       </div>
@@ -55,14 +55,14 @@
           :disabled="submitting"
         />
 
-        <div class="flex items-center justify-between">
-          <span class="text-responsive-xs text-neutral-500">
+        <div class="flex items-center justify-start sm:justify-between">
+          <span class="text-responsive-xs text-muted">
             {{ responseText.length }}/1000 caractères
           </span>
-          <div class="flex items-center space-x-2">
+          <div class="flex items-center space-y-2 sm:space-y-0 sm:space-x-2">
             <button
               v-if="isEditing"
-              class="px-4 py-3 text-responsive-sm text-neutral-600 hover:transition-colors"
+              class="px-4 py-3 text-responsive-sm text-body hover:transition-colors"
               :disabled="submitting"
               @click="cancelEditing"
             >
@@ -104,7 +104,7 @@
     <!-- Success Message -->
     <div v-if="showSuccess" class="mt-3 p-3 bg-green-50 border border-green-200 rounded-lg">
       <div class="flex items-center">
-        <CheckCircleIcon class="w-5 h-5 text-green-600 mr-2" />
+        <CheckCircleIcon class="w-5 h-5 text-success mr-2" />
         <span class="text-responsive-sm text-green-800">{{ successMessage }}</span>
       </div>
     </div>
@@ -112,7 +112,7 @@
     <!-- Error Message -->
     <div v-if="error" class="mt-3 p-3 bg-red-50 border border-red-200 rounded-lg">
       <div class="flex items-center">
-        <ExclamationTriangleIcon class="w-5 h-5 text-red-600 mr-2" />
+        <ExclamationTriangleIcon class="w-5 h-5 text-error mr-2" />
         <span class="text-responsive-sm text-red-800">{{ error }}</span>
       </div>
     </div>
@@ -234,7 +234,7 @@ const submitResponse = async () => {
       throw new Error(data.message || 'Erreur lors de l\'envoi')
     }
   } catch (err) {
-    console.error('Error submitting response:', err)
+    // console.error('Error submitting response:', err)
     error.value = err instanceof Error ? err.message : 'Erreur inconnue'
   } finally {
     submitting.value = false
@@ -276,7 +276,7 @@ const deleteResponse = async () => {
       throw new Error(data.message || 'Erreur lors de la suppression')
     }
   } catch (err) {
-    console.error('Error deleting response:', err)
+    // console.error('Error deleting response:', err)
     error.value = err instanceof Error ? err.message : 'Erreur inconnue'
   } finally {
     deleting.value = false

@@ -13,13 +13,13 @@
       class="fixed top-20 left-1/2 transform -translate-x-1/2 z-50 px-4 py-3 rounded-lg shadow-lg backdrop-blur-sm border"
       data-testid="network-status"
     >
-      <div class="flex items-center space-x-2">
-        <div class="flex items-center space-x-2">
+      <div class="flex items-center space-y-2 sm:space-y-0 sm:space-x-2">
+        <div class="flex items-center space-y-2 sm:space-y-0 sm:space-x-2">
           <div :class="indicatorClasses" class="w-2 h-2 rounded-full" />
           <span class="text-responsive-sm font-medium">{{ statusMessage }}</span>
         </div>
 
-        <div v-if="pendingCount > 0" class="flex items-center space-x-2 text-responsive-xs">
+        <div v-if="pendingCount > 0" class="flex items-center space-y-2 sm:space-y-0 sm:space-x-2 text-responsive-xs">
           <Loader2 class="w-3 h-3 animate-spin" />
           <span>{{ pendingCount }} en attente</span>
         </div>

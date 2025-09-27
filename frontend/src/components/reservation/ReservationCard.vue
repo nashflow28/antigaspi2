@@ -1,14 +1,14 @@
 <template>
   <Card class="hover:transition-all duration-300">
     <!-- En-tête avec statut -->
-    <div class="flex items-center justify-between mb-4">
+    <div class="flex items-center justify-start sm:justify-between mb-4">
       <div class="flex items-center gap-3">
         <div class="w-10 h-10 bg-primary-100 rounded-xl flex items-center justify-center">
-          <ShoppingBag class="w-5 h-5 text-primary-600" />
+          <ShoppingBag class="w-5 h-5 text-primary" />
         </div>
         <div>
-          <div class="font-medium text-neutral-900">{{ reservation.reservation_code }}</div>
-          <div class="text-responsive-sm text-neutral-500">
+          <div class="font-medium text-heading">{{ reservation.reservation_code }}</div>
+          <div class="text-responsive-sm text-muted">
             {{ formatDate(reservation.created_at) }}
           </div>
         </div>
@@ -42,7 +42,7 @@
           <div
             v-if="showActions"
             v-click-outside="() => showActions = false"
-            class="absolute right-0 top-10 bg-white border border-neutral-200 rounded-xl shadow-card z-10 py-3 min-w-[150px]"
+            class="relative sm:absolute right-0 top-10 bg-white border border-neutral-200 rounded-xl shadow-card z-10 py-3 min-w-[150px]"
           >
             <button
               class="w-full px-4 py-3 text-left text-responsive-sm hover:bg-neutral-50 flex items-center gap-2"
@@ -73,10 +73,10 @@
     </div>
 
     <!-- Contenu principal -->
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
       <!-- Informations produit -->
       <div>
-        <div class="flex items-start gap-4">
+        <div class="flex items-stretch sm:items-start gap-4">
           <!-- Image du produit -->
           <div class="w-16 h-16 bg-gradient-to-br from-primary-100 to-accent-blue/10 rounded-xl flex items-center justify-center flex-shrink-0">
             <Package class="w-10 h-10 text-primary-400" />
@@ -84,14 +84,14 @@
 
           <!-- Détails produit -->
           <div class="flex-1 min-w-0">
-            <h4 class="font-semibold text-neutral-900 mb-1 line-clamp-2">
+            <h4 class="font-semibold text-heading mb-1 line-clamp-2">
               {{ reservation.product.name }}
             </h4>
-            <div class="flex items-center gap-2 text-responsive-sm text-neutral-600 mb-2">
+            <div class="flex items-center gap-2 text-responsive-sm text-body mb-2">
               <MapPin class="w-5 h-5 flex-shrink-0" />
               <span class="truncate">{{ reservation.product.merchant.name }}</span>
             </div>
-            <div class="text-responsive-sm text-neutral-500">
+            <div class="text-responsive-sm text-muted">
               {{ reservation.product.merchant.address }}
             </div>
           </div>
@@ -99,16 +99,16 @@
 
         <!-- Prix et quantité -->
         <div class="mt-4 pt-4 border-t border-neutral-100">
-          <div class="flex items-center justify-between text-responsive-sm">
+          <div class="flex items-center justify-start sm:justify-between text-responsive-sm">
             <div class="flex items-center gap-2">
-              <span class="text-neutral-600">Quantité:</span>
+              <span class="text-body">Quantité:</span>
               <span class="font-medium">{{ reservation.quantity }}</span>
             </div>
             <div class="flex items-center gap-2">
-              <span class="text-responsive-lg font-semibold text-primary-600">
+              <span class="text-responsive-lg font-semibold text-primary">
                 {{ formatPrice(reservation.discounted_price * reservation.quantity) }}
               </span>
-              <span class="text-responsive-sm text-neutral-400 line-through">
+              <span class="text-responsive-sm text-placeholder line-through">
                 {{ formatPrice(reservation.original_price * reservation.quantity) }}
               </span>
             </div>
@@ -121,31 +121,31 @@
         <div class="space-y-4">
           <!-- Informations paiement -->
           <div v-if="paymentStatus" class="bg-primary-50 rounded-xl p-3 border border-primary-100">
-            <div class="flex items-center justify-between mb-2">
-              <span class="text-responsive-sm font-medium text-primary-700">Paiement</span>
+            <div class="flex items-center justify-start sm:justify-between mb-2">
+              <span class="text-responsive-sm font-medium text-primary-emphasis">Paiement</span>
               <span class="text-responsive-sm font-semibold text-primary-800">
                 {{ paymentStatusLabels[paymentStatus] }}
               </span>
             </div>
-            <div v-if="latestPayment" class="space-y-2 text-responsive-xs text-primary-700">
-              <div class="flex items-center justify-between">
+            <div v-if="latestPayment" class="space-y-2 text-responsive-xs text-primary-emphasis">
+              <div class="flex items-center justify-start sm:justify-between">
                 <span>Méthode</span>
                 <span class="font-medium">{{ paymentMethodLabels[latestPayment.payment_method] }}</span>
               </div>
-              <div class="flex items-center justify-between">
+              <div class="flex items-center justify-start sm:justify-between">
                 <span>Montant</span>
                 <span class="font-semibold">{{ formatPrice(latestPayment.amount || reservation.discounted_price * reservation.quantity) }}</span>
               </div>
-              <div v-if="latestPayment.customer_phone" class="flex items-center justify-between">
+              <div v-if="latestPayment.customer_phone" class="flex items-center justify-start sm:justify-between">
                 <span>Téléphone</span>
                 <span class="font-medium">{{ latestPayment.customer_phone }}</span>
               </div>
-              <div v-if="latestPayment.reference" class="flex items-center justify-between">
+              <div v-if="latestPayment.reference" class="flex items-center justify-start sm:justify-between">
                 <span>Référence</span>
                 <span class="font-medium">{{ latestPayment.reference }}</span>
               </div>
             </div>
-            <div v-else class="text-responsive-xs text-primary-700">
+            <div v-else class="text-responsive-xs text-primary-emphasis">
               Paiement en cours de synchronisation…
             </div>
           </div>
@@ -156,21 +156,21 @@
               <Clock class="w-5 h-5 text-accent-blue" />
             </div>
             <div>
-              <div class="font-medium text-neutral-900">
+              <div class="font-medium text-heading">
                 {{ formatPickupDate(reservation.pickup_date) }}
               </div>
-              <div class="text-responsive-sm text-neutral-500">
+              <div class="text-responsive-sm text-muted">
                 {{ formatPickupTime(reservation.pickup_date) }}
               </div>
             </div>
           </div>
 
           <!-- Notes de retrait -->
-          <div v-if="reservation.pickup_notes" class="flex items-start gap-3">
+          <div v-if="reservation.pickup_notes" class="flex items-stretch sm:items-start gap-3">
             <div class="w-10 h-10 bg-accent-orange/10 rounded-lg flex items-center justify-center flex-shrink-0">
               <MessageCircle class="w-5 h-5 text-accent-orange" />
             </div>
-            <div class="text-responsive-sm text-neutral-600">
+            <div class="text-responsive-sm text-body">
               {{ reservation.pickup_notes }}
             </div>
           </div>
@@ -178,8 +178,8 @@
           <!-- Countdown ou statut -->
           <div v-if="reservation.status !== 'completed' && reservation.status !== 'cancelled' && reservation.status !== 'expired'">
             <div class="bg-neutral-50 rounded-xl p-3">
-              <div class="flex items-center justify-between">
-                <span class="text-responsive-sm font-medium text-neutral-700">
+              <div class="flex items-center justify-start sm:justify-between">
+                <span class="text-responsive-sm font-medium text-body-emphasis">
                   {{ getStatusMessage() }}
                 </span>
                 <span v-if="timeLeft && timeLeft.total > 0" class="text-responsive-sm font-semibold text-accent-orange">
@@ -200,15 +200,15 @@
           <!-- Impact environnemental -->
           <div v-if="reservation.status === 'completed'" class="bg-primary-50 rounded-xl p-3">
             <div class="flex items-center gap-2 mb-2">
-              <Leaf class="w-5 h-5 text-primary-600" />
+              <Leaf class="w-5 h-5 text-primary" />
               <span class="text-responsive-sm font-medium text-primary-800">Impact positif</span>
             </div>
             <div class="grid grid-cols-2 gap-4 text-responsive-xs">
-              <div class="text-primary-700">
+              <div class="text-primary-emphasis">
                 <div class="font-semibold">{{ reservation.quantity }}kg</div>
                 <div>Nourriture sauvée</div>
               </div>
-              <div class="text-primary-700">
+              <div class="text-primary-emphasis">
                 <div class="font-semibold">{{ (reservation.quantity * 2.5).toFixed(1) }}kg</div>
                 <div>CO₂ évité</div>
               </div>
@@ -219,7 +219,7 @@
     </div>
 
     <!-- Actions en bas -->
-    <div v-if="!isExpiredOrCancelled" class="flex items-center justify-between mt-6 pt-4 border-t border-neutral-100">
+    <div v-if="!isExpiredOrCancelled" class="flex items-center justify-start sm:justify-between mt-6 pt-4 border-t border-neutral-100">
       <div class="flex items-center gap-2">
         <Button
           v-if="reservation.product.merchant.phone"
@@ -293,7 +293,7 @@ const statusClasses = {
   confirmed: 'bg-accent-blue/10 text-accent-blue/95',
   ready: 'bg-primary-100 text-primary-800',
   completed: 'bg-primary-100 text-primary-800',
-  cancelled: 'bg-neutral-100 text-neutral-600',
+  cancelled: 'bg-neutral-100 text-body',
   expired: 'bg-accent-red/15 text-accent-red/95'
 }
 
@@ -311,7 +311,7 @@ const paymentStatusClasses = {
   success: 'bg-primary-100 text-primary-800',
   failed: 'bg-accent-red/15 text-accent-red/95',
   on_site: 'bg-accent-blue/10 text-accent-blue/95',
-  refunded: 'bg-neutral-100 text-neutral-700'
+  refunded: 'bg-neutral-100 text-body-emphasis'
 } as const
 
 const paymentStatusLabels = {

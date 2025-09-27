@@ -1,6 +1,6 @@
 <template>
   <div :class="wrapperClasses" v-bind="otherAttrs">
-    <span aria-hidden="true" class="absolute inset-0 -translate-x-full animate-shimmer bg-gradient-to-r from-transparent via-white/60 to-transparent dark:via-white/10" />
+    <span aria-hidden="true" class="relative sm:absolute inset-0 -translate-x-full animate-shimmer bg-gradient-to-r from-transparent via-white/60 to-transparent dark:via-white/10" />
   </div>
 </template>
 

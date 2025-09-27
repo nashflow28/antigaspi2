@@ -1,5 +1,5 @@
 <template>
-  <div class="flex items-center space-x-2">
+  <div class="flex items-center space-y-2 sm:space-y-0 sm:space-x-2">
     <button
       v-for="star in 5"
       :key="star"
@@ -24,7 +24,7 @@
       />
     </button>
 
-    <span v-if="showText" class="ml-2 text-responsive-sm text-neutral-600">
+    <span v-if="showText" class="ml-2 text-responsive-sm text-body">
       {{ ratingText }}
     </span>
   </div>

@@ -1,11 +1,11 @@
 <template>
   <div class="bg-white rounded-lg shadow">
     <div class="p-6 border-b border-neutral-200">
-      <div class="flex items-center justify-between">
-        <h3 class="text-responsive-lg font-semibold text-neutral-900">Historique des transactions</h3>
+      <div class="flex items-center justify-start sm:justify-between">
+        <h3 class="text-responsive-lg font-semibold text-heading">Historique des transactions</h3>
         <button
           :disabled="loading"
-          class="p-2 text-neutral-400 hover:text-neutral-600 disabled:opacity-50"
+          class="p-2 text-placeholder hover:text-body disabled:opacity-50"
           @click="refreshTransactions"
         >
           <svg
@@ -52,7 +52,7 @@
         >
 
         <button
-          class="px-4 py-3 text-responsive-sm text-neutral-600 hover:text-neutral-800"
+          class="px-4 py-3 text-responsive-sm text-body hover:text-heading-secondary"
           @click="clearFilters"
         >
           Effacer filtres
@@ -63,7 +63,7 @@
     <div class="divide-y divide-neutral-200">
       <div v-if="loading && !transactions.length" class="p-6">
         <div class="animate-pulse space-y-4">
-          <div v-for="i in 3" :key="i" class="flex items-center space-x-4">
+          <div v-for="i in 3" :key="i" class="flex items-center space-y-4 sm:space-y-0 sm:space-x-4">
             <div class="w-10 h-10 bg-neutral-200 rounded-full" />
             <div class="flex-1 space-y-2">
               <div class="h-5 bg-neutral-200 rounded w-3/4" />
@@ -74,8 +74,8 @@
         </div>
       </div>
 
-      <div v-else-if="!transactions.length" class="p-6 text-center">
-        <div class="text-neutral-500">
+      <div v-else-if="!transactions.length" class="p-6 text-left sm:text-center">
+        <div class="text-muted">
           <svg
             class="w-12 h-12 mx-auto mb-4 text-neutral-300"
             fill="none"
@@ -98,7 +98,7 @@
         :key="transaction.id"
         class="p-4 hover:transition-colors"
       >
-        <div class="flex items-center space-x-4">
+        <div class="flex items-center space-y-4 sm:space-y-0 sm:space-x-4">
           <div
             class="w-10 h-10 rounded-full flex items-center justify-center"
             :class="getTransactionIconClass(transaction.type)"
@@ -120,8 +120,8 @@
           </div>
 
           <div class="flex-1 min-w-0">
-            <div class="flex items-center justify-between">
-              <p class="text-responsive-sm font-medium text-neutral-900 truncate">
+            <div class="flex items-center justify-start sm:justify-between">
+              <p class="text-responsive-sm font-medium text-heading truncate">
                 {{ transaction.description }}
               </p>
               <div class="text-right">
@@ -133,11 +133,11 @@
                 </p>
               </div>
             </div>
-            <div class="flex items-center justify-between mt-1">
-              <p class="text-responsive-xs text-neutral-500">
+            <div class="flex items-center justify-start sm:justify-between mt-1">
+              <p class="text-responsive-xs text-muted">
                 {{ formatDate(transaction.created_at) }}
               </p>
-              <p class="text-responsive-xs text-neutral-400">
+              <p class="text-responsive-xs text-placeholder">
                 #{{ transaction.reference }}
               </p>
             </div>
@@ -147,11 +147,11 @@
 
       <!-- Pagination -->
       <div v-if="pagination && pagination.last_page > 1" class="p-4 border-t border-neutral-200">
-        <div class="flex items-center justify-between">
-          <div class="text-responsive-sm text-neutral-700">
+        <div class="flex items-center justify-start sm:justify-between">
+          <div class="text-responsive-sm text-body-emphasis">
             Affichage de {{ pagination.from }} à {{ pagination.to }} sur {{ pagination.total }} transactions
           </div>
-          <div class="flex space-x-2">
+          <div class="flex space-y-2 sm:space-y-0 sm:space-x-2">
             <button
               :disabled="pagination.current_page === 1"
               class="px-4 py-3 text-responsive-sm border border-neutral-300 rounded disabled:opacity-50 disabled:cursor-not-allowed hover:bg-neutral-50"
@@ -222,14 +222,14 @@ const filters = ref({
 
 const getTransactionIconClass = (type: string) => {
   return type === 'credit'
-    ? 'bg-green-100 text-green-600'
-    : 'bg-red-100 text-red-600'
+    ? 'bg-green-100 text-success'
+    : 'bg-red-100 text-error'
 }
 
 const getAmountClass = (type: string) => {
   return type === 'credit'
-    ? 'text-green-600'
-    : 'text-red-600'
+    ? 'text-success'
+    : 'text-error'
 }
 
 const formatDate = (dateString: string): string => {

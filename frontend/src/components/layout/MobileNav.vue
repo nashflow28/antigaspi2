@@ -1,23 +1,23 @@
 <template>
   <!-- Mobile Menu Button -->
   <button
-    class="md:hidden relative p-2 rounded-lg text-neutral-600 hover:text-neutral-900 hover:transition-colors"
-    :class="{ 'text-primary-600': mobileMenuOpen }"
+    class="md:hidden sm:block relative p-2 rounded-lg text-body hover:text-heading hover:transition-colors"
+    :class="{ 'text-primary': mobileMenuOpen }"
     @click="toggleMobileMenu"
   >
     <span class="sr-only">Ouvrir le menu</span>
     <div class="w-10 h-10 relative">
       <!-- Hamburger lines -->
       <span
-        class="absolute block h-0.5 w-10 bg-current transform transition duration-300 ease-in-out"
+        class="relative sm:absolute block h-0.5 w-10 bg-current transform transition duration-300 ease-in-out"
         :class="mobileMenuOpen ? 'rotate-45 translate-y-2.5' : 'translate-y-0'"
       />
       <span
-        class="absolute block h-0.5 w-10 bg-current transform transition duration-300 ease-in-out translate-y-2.5"
+        class="relative sm:absolute block h-0.5 w-10 bg-current transform transition duration-300 ease-in-out translate-y-2.5"
         :class="mobileMenuOpen ? 'opacity-0' : 'opacity-100'"
       />
       <span
-        class="absolute block h-0.5 w-10 bg-current transform transition duration-300 ease-in-out translate-y-5"
+        class="relative sm:absolute block h-0.5 w-10 bg-current transform transition duration-300 ease-in-out translate-y-5"
         :class="mobileMenuOpen ? '-rotate-45 -translate-y-2.5' : 'translate-y-0'"
       />
     </div>
@@ -35,7 +35,7 @@
     >
       <div
         v-if="mobileMenuOpen"
-        class="fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden"
+        class="fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden sm:block"
         @click="closeMobileMenu"
       />
     </Transition>
@@ -51,18 +51,18 @@
     >
       <div
         v-if="mobileMenuOpen"
-        class="fixed right-0 top-0 h-full w-80 bg-white shadow-2xl z-50 md:hidden overflow-y-auto"
+        class="fixed right-0 top-0 h-full w-80 bg-white shadow-2xl z-50 md:hidden sm:block overflow-y-auto"
       >
         <!-- Mobile menu header -->
-        <div class="flex items-center justify-between p-4 border-b border-neutral-200">
-          <div class="flex items-center space-x-3">
+        <div class="flex items-center justify-start sm:justify-between p-4 border-b border-neutral-200">
+          <div class="flex items-center space-y-3 sm:space-y-0 sm:space-x-3">
             <div class="w-10 h-10 bg-gradient-to-r from-primary-500 to-accent-blue/50 rounded-lg flex items-center justify-center">
               <span class="text-white text-responsive-lg">🌱</span>
             </div>
-            <span class="text-responsive-lg font-semibold text-neutral-900 font-display">Antigaspi</span>
+            <span class="text-responsive-lg font-semibold text-heading font-display">Antigaspi</span>
           </div>
           <button
-            class="p-2 rounded-lg text-neutral-400 hover:text-neutral-600 hover:transition-colors"
+            class="p-2 rounded-lg text-placeholder hover:text-body hover:transition-colors"
             @click="closeMobileMenu"
           >
             <X class="w-5 h-5" />
@@ -71,17 +71,17 @@
 
         <!-- User Profile Section (if authenticated) -->
         <div v-if="authStore.isAuthenticated" class="p-4 bg-neutral-50 border-b border-neutral-200">
-          <div class="flex items-center space-x-3">
+          <div class="flex items-center space-y-3 sm:space-y-0 sm:space-x-3">
             <div class="w-12 h-12 bg-gradient-to-r from-primary-500 to-accent-blue/50 rounded-full flex items-center justify-center">
               <span class="text-white font-medium text-responsive-lg">
                 {{ authStore.user?.first_name?.charAt(0) }}{{ authStore.user?.last_name?.charAt(0) }}
               </span>
             </div>
             <div>
-              <p class="font-medium text-neutral-900 font-heading">
+              <p class="font-medium text-heading font-heading">
                 {{ authStore.user?.first_name }} {{ authStore.user?.last_name }}
               </p>
-              <p class="text-responsive-sm text-neutral-500">{{ authStore.user?.email }}</p>
+              <p class="text-responsive-sm text-muted">{{ authStore.user?.email }}</p>
               <span
                 class="inline-flex items-center px-4 py-0.5 rounded text-responsive-xs font-medium"
                 :class="getRoleBadgeClasses(authStore.user?.role)"
@@ -174,7 +174,7 @@
               <!-- Role-specific links -->
               <template v-if="authStore.user?.role === 'merchant'">
                 <div class="border-t border-neutral-200 pt-4 mt-4">
-                  <p class="text-responsive-sm font-medium text-neutral-500 uppercase tracking-wider mb-2">
+                  <p class="text-responsive-sm font-medium text-muted uppercase tracking-wider mb-2">
                     Espace Commerçant
                   </p>
                   <router-link
@@ -206,7 +206,7 @@
 
               <template v-if="authStore.user?.role === 'admin'">
                 <div class="border-t border-neutral-200 pt-4 mt-4">
-                  <p class="text-responsive-sm font-medium text-neutral-500 uppercase tracking-wider mb-2">
+                  <p class="text-responsive-sm font-medium text-muted uppercase tracking-wider mb-2">
                     Administration
                   </p>
                   <router-link
@@ -240,7 +240,7 @@
             <!-- Logout Button -->
             <div class="border-t border-neutral-200 pt-4 mt-4">
               <button
-                class="mobile-nav-link text-red-600 hover:bg-red-50"
+                class="mobile-nav-link text-error hover:bg-red-50"
                 @click="handleLogout"
               >
                 <LogOut class="w-5 h-5" />
@@ -262,7 +262,7 @@
               </router-link>
               <router-link
                 to="/auth/register"
-                class="mobile-nav-link bg-primary-50 text-primary-700 border border-primary-200"
+                class="mobile-nav-link bg-primary-50 text-primary-emphasis border border-primary-200"
                 @click="closeMobileMenu"
               >
                 <UserPlus class="w-5 h-5" />
@@ -273,8 +273,8 @@
         </nav>
 
         <!-- App Info -->
-        <div class="absolute bottom-0 left-0 right-0 p-4 bg-neutral-50 border-t border-neutral-200">
-          <p class="text-responsive-xs text-neutral-500 text-center">
+        <div class="relative sm:absolute bottom-0 left-0 right-0 p-4 bg-neutral-50 border-t border-neutral-200">
+          <p class="text-responsive-xs text-muted text-left sm:text-center">
             Antigaspi © 2025<br>
             Lutter contre le gaspillage alimentaire
           </p>
@@ -343,6 +343,6 @@ router.afterEach(() => {
 }
 
 .mobile-nav-link.router-link-active {
-  @apply bg-primary-100 text-primary-700 border border-primary-200;
+  @apply bg-primary-100 text-primary-emphasis border border-primary-200;
 }
 </style>

@@ -6,18 +6,18 @@
     <Card
       variant="elevated"
       rounded="xl"
-      class="w-full max-w-2xl space-y-6 bg-white/80 p-8 text-center shadow-xl backdrop-blur"
+      class="w-full max-w-full sm:max-w-2xl space-y-6 bg-white/80 p-4 sm:p-6 lg:p-8 text-left sm:text-center shadow-xl backdrop-blur"
     >
       <div class="flex flex-col items-center gap-4">
-        <div class="flex h-16 w-16 items-center justify-center rounded-full bg-red-100 text-red-600 shadow-inner">
+        <div class="flex h-16 w-16 items-center justify-center rounded-full bg-red-100 text-error shadow-inner">
           <AlertTriangle class="h-10 w-10" />
         </div>
 
         <div class="space-y-2">
-          <h2 class="text-responsive-xl font-semibold text-neutral-900">
+          <h2 class="text-responsive-xl font-semibold text-heading">
             {{ errorInfo.title || 'Une erreur est survenue' }}
           </h2>
-          <p class="text-responsive-base text-neutral-600">
+          <p class="text-responsive-base text-body">
             {{ errorInfo.message || 'Nous nous excusons pour le désagrément. Veuillez réessayer ou contacter le support si le problème persiste.' }}
           </p>
         </div>
@@ -27,20 +27,20 @@
         v-if="isDev && errorDetails"
         class="rounded-xl border border-neutral-200 bg-white/70 text-left shadow-sm"
       >
-        <summary class="flex cursor-pointer items-center justify-between gap-3 px-4 py-3 text-responsive-sm font-medium text-neutral-700">
+        <summary class="flex cursor-pointer items-center justify-start sm:justify-between gap-3 px-4 py-3 text-responsive-sm font-medium text-body-emphasis">
           Détails techniques (Mode développement)
         </summary>
-        <div class="space-y-4 border-t border-neutral-100 bg-neutral-50/80 px-4 py-4 text-responsive-sm text-neutral-700">
+        <div class="space-y-4 border-t border-neutral-100 bg-neutral-50/80 px-4 py-4 text-responsive-sm text-body-emphasis">
           <div v-if="errorDetails.stack" class="space-y-2">
-            <h4 class="font-semibold text-neutral-800">Stack Trace</h4>
+            <h4 class="font-semibold text-heading-secondary">Stack Trace</h4>
             <pre class="max-h-64 overflow-auto rounded-lg bg-neutral-900/90 p-3 text-responsive-xs text-neutral-100">{{ errorDetails.stack }}</pre>
           </div>
           <div v-if="errorDetails.info" class="space-y-2">
-            <h4 class="font-semibold text-neutral-800">Informations Vue</h4>
+            <h4 class="font-semibold text-heading-secondary">Informations Vue</h4>
             <pre class="max-h-48 overflow-auto rounded-lg bg-neutral-900/90 p-3 text-responsive-xs text-neutral-100">{{ errorDetails.info }}</pre>
           </div>
           <div v-if="errorDetails.props" class="space-y-2">
-            <h4 class="font-semibold text-neutral-800">Props du composant</h4>
+            <h4 class="font-semibold text-heading-secondary">Props du composant</h4>
             <pre class="max-h-48 overflow-auto rounded-lg bg-neutral-900/90 p-3 text-responsive-xs text-neutral-100">{{ JSON.stringify(errorDetails.props, null, 2) }}</pre>
           </div>
         </div>
@@ -76,20 +76,20 @@
         </Button>
       </div>
 
-      <div v-if="props.showSupportInfo" class="space-y-3 rounded-xl bg-neutral-50/70 px-5 py-4 text-center">
-        <p class="text-responsive-sm text-neutral-600">
+      <div v-if="props.showSupportInfo" class="space-y-3 rounded-xl bg-neutral-50/70 px-5 py-4 text-left sm:text-center">
+        <p class="text-responsive-sm text-body">
           Besoin d'aide ? Contactez notre support :
         </p>
-        <div class="flex flex-wrap items-center justify-center gap-2 text-responsive-sm font-medium text-neutral-700">
+        <div class="flex flex-wrap items-center justify-center gap-2 text-responsive-sm font-medium text-body-emphasis">
           <a
             href="mailto:support@antigaspi.ci"
-            class="flex items-center gap-2 text-primary-600 transition hover:text-primary-700"
+            class="flex items-center gap-2 text-primary transition hover:text-primary-emphasis"
           >
             <Mail class="h-5 w-5" />
             support@antigaspi.ci
           </a>
-          <span class="text-neutral-400">•</span>
-          <span class="rounded-full bg-white px-4 py-3 text-responsive-xs font-semibold uppercase tracking-wide text-neutral-500">
+          <span class="text-placeholder">•</span>
+          <span class="rounded-full bg-white px-4 py-3 text-responsive-xs font-semibold uppercase tracking-wide text-muted">
             ID: {{ errorId }}
           </span>
         </div>
@@ -160,7 +160,7 @@ const generateErrorId = (): string => {
 
 // Capture d'erreurs Vue
 onErrorCaptured((error: Error, instance, info: string) => {
-  console.error('Error captured by ErrorBoundary:', error)
+  // console.error('Error captured by ErrorBoundary:', error)
 
   const componentName = 'UnknownComponent'
   const details: ErrorDetails = {

@@ -48,16 +48,16 @@ const computedClasses = computed(() => {
 
   // Variant classes
   const variantClasses = {
-    default: 'text-neutral-700',
-    muted: 'text-neutral-500',
-    success: 'text-primary-700',
+    default: 'text-body-emphasis',
+    muted: 'text-muted',
+    success: 'text-primary-emphasis',
     warning: 'text-amber-700',
     error: 'text-red-700'
   }
 
   // State classes
   if (props.disabled) {
-    baseClasses.push('text-neutral-400 cursor-not-allowed')
+    baseClasses.push('text-placeholder cursor-not-allowed')
   }
 
   baseClasses.push(sizeClasses[props.size])

@@ -209,9 +209,9 @@ const inputClasses = computed(() => {
   const baseClasses = [
     // Base input styles
     'flex-1 bg-transparent',
-    'text-neutral-900 placeholder-neutral-400',
+    'text-heading placeholder-neutral-400',
     'focus:outline-none',
-    'disabled:cursor-not-allowed disabled:text-neutral-500',
+    'disabled:cursor-not-allowed disabled:text-muted',
 
     // Size classes
     sizeInputClasses.value,
@@ -253,30 +253,30 @@ const variantContainerClasses = computed(() => {
 })
 
 const labelClasses = computed(() => [
-  'block text-sm font-medium text-neutral-700 mb-1',
-  props.disabled && 'text-neutral-500'
+  'block text-sm font-medium text-body-emphasis mb-1',
+  props.disabled && 'text-muted'
 ].filter(Boolean).join(' '))
 
 const iconClasses = computed(() => [
-  'text-neutral-400 flex-shrink-0',
+  'text-placeholder flex-shrink-0',
   props.size === 'sm' && 'mx-2',
   props.size === 'md' && 'mx-2',
   props.size === 'lg' && 'mx-3'
 ].filter(Boolean).join(' '))
 
 const clearButtonClasses = computed(() => [
-  'text-neutral-400 hover:text-neutral-600',
+  'text-placeholder hover:text-body',
   'rounded-full p-1 hover:bg-neutral-100',
   'transition-colors flex-shrink-0',
   'mr-1'
 ].join(' '))
 
 const helpTextClasses = computed(() => [
-  'mt-1 text-sm text-neutral-500'
+  'mt-1 text-sm text-muted'
 ].join(' '))
 
 const errorTextClasses = computed(() => [
-  'mt-1 text-sm text-red-600'
+  'mt-1 text-sm text-error'
 ].join(' '))
 
 // Methods

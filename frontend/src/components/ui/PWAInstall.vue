@@ -74,7 +74,7 @@ const handleBeforeInstallPrompt = (e: Event) => {
 }
 
 const handleAppInstalled = () => {
-  console.log('PWA was installed')
+  // console.log('PWA was installed')
   showInstallPrompt.value = false
   showFloatingButton.value = false
   deferredPrompt.value = null
@@ -87,9 +87,9 @@ const installApp = async () => {
     const { outcome } = await deferredPrompt.value.userChoice
 
     if (outcome === 'accepted') {
-      console.log('User accepted the PWA install prompt')
+      // console.log('User accepted the PWA install prompt')
     } else {
-      console.log('User dismissed the PWA install prompt')
+      // console.log('User dismissed the PWA install prompt')
       localStorage.setItem('pwa-prompt-dismissed', Date.now().toString())
     }
 

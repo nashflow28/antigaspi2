@@ -23,7 +23,7 @@
       />
 
       <span
-        class="pointer-events-none absolute inset-x-3 bottom-1 h-0.5 rounded-full bg-primary-500 transition-transform duration-200"
+        class="pointer-events-none relative sm:absolute inset-x-3 bottom-1 h-0.5 rounded-full bg-primary-500 transition-transform duration-200"
         :style="focusUnderlineStyle"
         aria-hidden="true"
       />
@@ -51,7 +51,7 @@
     <p
       v-else-if="helperText"
       :id="`${textareaId}-helper`"
-      class="text-caption text-neutral-500"
+      class="text-caption text-muted"
     >
       {{ helperText }}
     </p>
@@ -100,7 +100,7 @@ const attrs = useAttrs()
 const isFocused = ref(false)
 
 const baseClasses =
-  'flex w-full rounded-2xl border bg-white/95 px-4 py-3 text-body text-neutral-700 transition-all duration-200 ease-spring-out placeholder:text-neutral-400 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-300 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-50 dark:bg-neutral-900 dark:text-neutral-100 dark:placeholder:text-neutral-400 dark:focus-visible:ring-offset-neutral-900 disabled:cursor-not-allowed disabled:opacity-60 resize-y'
+  'flex w-full rounded-2xl border bg-white/95 px-4 py-3 text-body text-body-emphasis transition-all duration-200 ease-spring-out placeholder:text-placeholder focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-300 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-50 dark:bg-neutral-900 dark:text-neutral-100 dark:placeholder:text-placeholder dark:focus-visible:ring-offset-neutral-900 disabled:cursor-not-allowed disabled:opacity-60 resize-y'
 
 const variantClasses: Record<TextareaVariant, string> = {
   subtle:
@@ -134,8 +134,8 @@ const textareaClass = computed(() => [
 ])
 
 const labelClass = computed(() => [
-  'text-small font-medium text-neutral-600 transition-colors dark:text-neutral-200',
-  isFocused.value && !props.error ? 'text-primary-600' : '',
+  'text-small font-medium text-body transition-colors dark:text-neutral-200',
+  isFocused.value && !props.error ? 'text-primary' : '',
   props.error ? 'text-accent-red' : ''
 ])
 

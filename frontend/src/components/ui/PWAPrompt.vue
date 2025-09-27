@@ -7,7 +7,7 @@
         class="fixed bottom-4 left-4 right-4 md:left-auto md:right-4 md:max-w-sm z-50"
       >
         <div class="bg-white dark:bg-dark-800 rounded-2xl shadow-2xl border border-neutral-200 dark:border-dark-700 p-6">
-          <div class="flex items-start gap-4">
+          <div class="flex items-stretch sm:items-start gap-4">
             <!-- Icon -->
             <div class="shrink-0">
               <div class="w-12 h-12 bg-nav-gradient rounded-xl flex items-center justify-center">
@@ -17,10 +17,10 @@
 
             <!-- Content -->
             <div class="flex-1">
-              <h3 class="font-semibold text-neutral-900 dark:text-white text-responsive-sm mb-1">
+              <h3 class="font-semibold text-heading dark:text-white text-responsive-sm mb-1">
                 Installer Antigaspi
               </h3>
-              <p class="text-neutral-600 dark:text-neutral-300 text-responsive-xs leading-relaxed mb-4">
+              <p class="text-body dark:text-neutral-300 text-responsive-xs leading-relaxed mb-4">
                 Ajoutez Antigaspi à votre écran d'accueil pour un accès rapide et une expérience native.
               </p>
 
@@ -53,7 +53,7 @@
               variant="ghost"
               size="icon"
               :left-icon="X"
-              class="shrink-0 text-neutral-400 hover:text-neutral-600 dark:hover:transition-colors"
+              class="shrink-0 text-placeholder hover:text-body dark:hover:transition-colors"
               aria-label="Fermer"
               @click="dismissInstallPrompt"
             >
@@ -73,7 +73,7 @@
         class="fixed top-4 left-4 right-4 md:left-auto md:right-4 md:max-w-sm z-50"
       >
         <div class="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-2xl shadow-xl p-6">
-          <div class="flex items-start gap-4">
+          <div class="flex items-stretch sm:items-start gap-4">
             <!-- Icon -->
             <div class="shrink-0">
               <div class="w-10 h-10 bg-blue-500 rounded-lg flex items-center justify-center">
@@ -119,7 +119,7 @@
               variant="ghost"
               size="icon"
               :left-icon="X"
-              class="shrink-0 text-blue-400 hover:text-blue-600 dark:hover:transition-colors"
+              class="shrink-0 text-blue-400 hover:text-info dark:hover:transition-colors"
               aria-label="Fermer"
               @click="dismissUpdatePrompt"
             >
@@ -212,7 +212,7 @@ const handleInstall = async () => {
       announce('Application installée avec succès')
     }
   } catch (error) {
-    console.error('Installation failed:', error)
+    // console.error('Installation failed:', error)
     announce('Échec de l\'installation')
   } finally {
     installing.value = false
@@ -234,7 +234,7 @@ const handleUpdate = async () => {
     await updateServiceWorker()
     announce('Mise à jour en cours...')
   } catch (error) {
-    console.error('Update failed:', error)
+    // console.error('Update failed:', error)
     announce('Échec de la mise à jour')
   } finally {
     updating.value = false

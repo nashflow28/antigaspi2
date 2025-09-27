@@ -6,13 +6,13 @@
   >
     <div class="p-6">
       <!-- Header -->
-      <div class="mb-8">
-        <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
+      <div class="mb-6 sm:mb-8">
+        <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 sm:gap-6">
           <div>
-            <h1 class="text-responsive-xl lg:text-display-sm font-semibold text-neutral-900 mb-2">
+            <h1 class="text-responsive-xl lg:text-display-sm font-semibold text-heading mb-2">
               Réservations
             </h1>
-            <p class="text-neutral-600 text-responsive-lg">
+            <p class="text-body text-responsive-lg">
               Gérez les réservations de vos clients
             </p>
           </div>
@@ -28,7 +28,7 @@
 
             <select
               v-model="selectedDateRange"
-              class="w-full rounded-lg border border-neutral-300 bg-white px-4 py-3.5 text-responsive-sm text-neutral-700 shadow-sm transition focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500"
+              class="w-full rounded-lg border border-neutral-300 bg-white px-4 py-3.5 text-responsive-sm text-body-emphasis shadow-sm transition focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500"
             >
               <option value="today">Aujourd'hui</option>
               <option value="week">Cette semaine</option>
@@ -90,7 +90,7 @@
                   v-if="filter.count !== null"
                   size="xs"
                   variant="outline"
-                  class="bg-white/40 text-neutral-600"
+                  class="bg-white/40 text-body"
                 >
                   {{ filter.count }}
                 </Badge>
@@ -101,7 +101,7 @@
           <div class="flex items-center gap-4">
             <select
               v-model="sortBy"
-              class="w-full rounded-lg border border-neutral-300 bg-white px-4 py-3.5 text-responsive-sm text-neutral-700 shadow-sm transition focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500"
+              class="w-full rounded-lg border border-neutral-300 bg-white px-4 py-3.5 text-responsive-sm text-body-emphasis shadow-sm transition focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500"
             >
               <option value="created_at">Plus récent</option>
               <option value="pickup_date">Date de récupération</option>
@@ -119,7 +119,7 @@
           :key="reservation.id"
           class="transition-shadow hover:shadow-lg"
         >
-          <div class="flex flex-col lg:flex-row gap-6">
+          <div class="flex flex-col lg:flex-row gap-4 sm:gap-6">
             <!-- Product Image -->
             <div class="flex-shrink-0">
               <img
@@ -136,10 +136,10 @@
                   <!-- Header with status -->
                   <div class="flex items-start justify-between mb-2">
                     <div>
-                      <h3 class="font-semibold text-responsive-lg text-neutral-900 mb-1">
+                      <h3 class="font-semibold text-responsive-lg text-heading mb-1">
                         {{ reservation.product.name }}
                       </h3>
-                      <p class="text-responsive-sm text-neutral-600">
+                      <p class="text-responsive-sm text-body">
                         Code: <span class="font-mono font-medium">{{ reservation.reservation_code }}</span>
                       </p>
                     </div>
@@ -167,7 +167,7 @@
 
                   <!-- Customer Info -->
                   <div class="mb-3">
-                    <div class="flex items-center gap-2 text-neutral-600 text-responsive-sm">
+                    <div class="flex items-center gap-2 text-body text-responsive-sm">
                       <UserIcon class="w-5 h-5" />
                       <span class="font-medium">{{ reservation.consumer.name }}</span>
                       <span>•</span>
@@ -178,19 +178,19 @@
                   <!-- Reservation Details Grid -->
                   <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 text-responsive-sm">
                     <div>
-                      <p class="text-neutral-500">Quantité</p>
+                      <p class="text-muted">Quantité</p>
                       <p class="font-medium">{{ reservation.quantity }}</p>
                     </div>
                     <div>
-                      <p class="text-neutral-500">Montant</p>
+                      <p class="text-muted">Montant</p>
                       <p class="font-medium">{{ formatPrice(reservation.total_amount) }}</p>
                     </div>
                     <div>
-                      <p class="text-neutral-500">Récupération</p>
+                      <p class="text-muted">Récupération</p>
                       <p class="font-medium">{{ formatDateTime(reservation.pickup_date) }}</p>
                     </div>
                     <div>
-                      <p class="text-neutral-500">Expire</p>
+                      <p class="text-muted">Expire</p>
                       <p :class="isExpired(reservation) ? 'text-accent-red font-medium' : 'font-medium'">
                         {{ formatDateTime(reservation.expires_at) }}
                       </p>
@@ -199,8 +199,8 @@
 
                   <!-- Notes -->
                   <div v-if="reservation.notes" class="mt-3">
-                    <p class="text-neutral-500 text-responsive-sm">Notes:</p>
-                    <p class="text-neutral-700 text-responsive-sm">{{ reservation.notes }}</p>
+                    <p class="text-muted text-responsive-sm">Notes:</p>
+                    <p class="text-body-emphasis text-responsive-sm">{{ reservation.notes }}</p>
                   </div>
                 </div>
 
@@ -270,7 +270,7 @@
                     <!-- Dropdown menu -->
                     <div
                       v-if="openDropdown === reservation.id"
-                      class="absolute right-0 top-full mt-1 bg-white border border-neutral-200 rounded-lg shadow-lg py-3 z-10 min-w-[160px]"
+                      class="relative sm:absolute right-0 top-full mt-1 bg-white border border-neutral-200 rounded-lg shadow-lg py-3 z-10 min-w-[160px]"
                     >
                       <button
                         class="w-full px-4 py-3 text-left text-responsive-sm hover:bg-neutral-50 flex items-center gap-2"
@@ -291,7 +291,7 @@
                       <template v-if="reservation.status === 'pending'">
                         <hr class="my-1 border-neutral-200">
                         <button
-                          class="w-full px-4 py-3 text-left text-responsive-sm hover:bg-red-50 text-red-600 flex items-center gap-2"
+                          class="w-full px-4 py-3 text-left text-responsive-sm hover:bg-red-50 text-error flex items-center gap-2"
                           @click="updateReservationStatus(reservation, 'cancelled'); closeDropdown()"
                         >
                           <XMarkIcon class="w-5 h-5" />
@@ -302,7 +302,7 @@
                       <template v-if="reservation.status === 'confirmed'">
                         <hr class="my-1 border-neutral-200">
                         <button
-                          class="w-full px-4 py-3 text-left text-responsive-sm hover:bg-green-50 text-green-600 flex items-center gap-2"
+                          class="w-full px-4 py-3 text-left text-responsive-sm hover:bg-green-50 text-success flex items-center gap-2"
                           @click="updateReservationStatus(reservation, 'completed'); closeDropdown()"
                         >
                           <CheckCircleIcon class="w-5 h-5" />
@@ -328,10 +328,10 @@
       </div>
 
       <!-- Empty State -->
-      <div v-else class="text-center py-12">
+      <div v-else class="text-left sm:text-center py-8 sm:py-10 lg:py-12">
         <BookmarkIcon class="w-16 h-16 text-neutral-300 mx-auto mb-4" />
-        <h3 class="text-responsive-xl font-semibold text-neutral-900 mb-2">Aucune réservation trouvée</h3>
-        <p class="text-neutral-600">
+        <h3 class="text-responsive-xl font-semibold text-heading mb-2">Aucune réservation trouvée</h3>
+        <p class="text-body">
           {{ searchQuery ? 'Aucune réservation ne correspond à votre recherche.' : 'Les nouvelles réservations apparaîtront ici.' }}
         </p>
       </div>
@@ -342,15 +342,15 @@
         class="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-[120]"
         @click.self="showDetailsModal = false"
       >
-        <Card class="w-full max-h-[90vh] max-w-2xl overflow-y-auto" rounded="xl">
+        <Card class="w-full max-h-[90vh] max-w-full sm:max-w-2xl overflow-y-auto" rounded="xl">
           <div class="mb-6 flex items-center justify-between">
-            <h2 class="text-responsive-xl font-semibold text-neutral-900">
+            <h2 class="text-responsive-xl font-semibold text-heading">
               Détails de la réservation
             </h2>
             <Button
               variant="ghost"
               size="sm"
-              class="text-neutral-400 hover:text-neutral-600"
+              class="text-placeholder hover:text-body"
               @click="showDetailsModal = false"
             >
               <XMarkIcon class="h-5 w-5" />
@@ -359,13 +359,13 @@
 
           <div v-if="selectedReservation" class="space-y-6">
             <!-- Reservation Info -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
               <div>
-                <p class="text-responsive-xs font-semibold uppercase tracking-wide text-neutral-500">Code de réservation</p>
+                <p class="text-responsive-xs font-semibold uppercase tracking-wide text-muted">Code de réservation</p>
                 <p class="font-mono text-responsive-lg">{{ selectedReservation.reservation_code }}</p>
               </div>
               <div>
-                <p class="text-responsive-xs font-semibold uppercase tracking-wide text-neutral-500">Statut</p>
+                <p class="text-responsive-xs font-semibold uppercase tracking-wide text-muted">Statut</p>
                 <Badge
                   :variant="getStatusBadgeVariant(selectedReservation.status)"
                   size="sm"
@@ -381,11 +381,11 @@
               <h3 class="text-responsive-lg font-semibold mb-4">Informations client</h3>
               <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <p class="text-responsive-xs font-semibold uppercase tracking-wide text-neutral-500">Nom</p>
+                  <p class="text-responsive-xs font-semibold uppercase tracking-wide text-muted">Nom</p>
                   <p>{{ selectedReservation.consumer.name }}</p>
                 </div>
                 <div>
-                  <p class="text-responsive-xs font-semibold uppercase tracking-wide text-neutral-500">Téléphone</p>
+                  <p class="text-responsive-xs font-semibold uppercase tracking-wide text-muted">Téléphone</p>
                   <p>{{ selectedReservation.consumer.phone }}</p>
                 </div>
               </div>
@@ -402,14 +402,14 @@
                 >
                 <div class="flex-grow">
                   <h4 class="font-semibold">{{ selectedReservation.product.name }}</h4>
-                  <p class="text-neutral-600 text-responsive-sm">{{ selectedReservation.product.description }}</p>
+                  <p class="text-body text-responsive-sm">{{ selectedReservation.product.description }}</p>
                   <div class="mt-2 grid grid-cols-2 gap-4 text-responsive-sm">
                     <div>
-                      <span class="text-neutral-500">Prix unitaire:</span>
+                      <span class="text-muted">Prix unitaire:</span>
                       <span class="ml-1 font-medium">{{ formatPrice(selectedReservation.discounted_price) }}</span>
                     </div>
                     <div>
-                      <span class="text-neutral-500">Quantité:</span>
+                      <span class="text-muted">Quantité:</span>
                       <span class="ml-1 font-medium">{{ selectedReservation.quantity }}</span>
                     </div>
                   </div>
@@ -425,7 +425,7 @@
                   <div class="w-3 h-3 bg-primary-500 rounded-full" />
                   <div>
                     <p class="text-responsive-sm font-medium">Réservation créée</p>
-                    <p class="text-responsive-xs text-neutral-500">{{ formatDateTime(selectedReservation.created_at) }}</p>
+                    <p class="text-responsive-xs text-muted">{{ formatDateTime(selectedReservation.created_at) }}</p>
                   </div>
                 </div>
 
@@ -433,7 +433,7 @@
                   <div class="w-3 h-3 bg-primary-500 rounded-full" />
                   <div>
                     <p class="text-responsive-sm font-medium">Confirmée</p>
-                    <p class="text-responsive-xs text-neutral-500">{{ formatDateTime(selectedReservation.confirmed_at) }}</p>
+                    <p class="text-responsive-xs text-muted">{{ formatDateTime(selectedReservation.confirmed_at) }}</p>
                   </div>
                 </div>
 
@@ -441,7 +441,7 @@
                   <div class="w-3 h-3 bg-blue-500 rounded-full" />
                   <div>
                     <p class="text-responsive-sm font-medium">Récupérée</p>
-                    <p class="text-responsive-xs text-neutral-500">{{ formatDateTime(selectedReservation.pickup_date) }}</p>
+                    <p class="text-responsive-xs text-muted">{{ formatDateTime(selectedReservation.pickup_date) }}</p>
                   </div>
                 </div>
               </div>
@@ -450,7 +450,7 @@
             <!-- Notes -->
             <div v-if="selectedReservation.notes">
               <h3 class="text-responsive-lg font-semibold mb-4">Notes</h3>
-              <p class="text-neutral-700">{{ selectedReservation.notes }}</p>
+              <p class="text-body-emphasis">{{ selectedReservation.notes }}</p>
             </div>
           </div>
         </Card>
@@ -696,7 +696,7 @@ const updateReservationStatus = async (reservation: any, newStatus: string) => {
         endpoint = `http://localhost:8000/api/reservations/${reservation.id}/cancel`
         break
       default:
-        console.error('Unknown status:', newStatus)
+        // console.error('Unknown status:', newStatus)
         return
     }
 
@@ -714,23 +714,23 @@ const updateReservationStatus = async (reservation: any, newStatus: string) => {
     }
 
     const data = await response.json()
-    console.log(`Updated reservation ${reservation.id} to status: ${newStatus}`, data)
+    // console.log(`Updated reservation ${reservation.id} to status: ${newStatus}`, data)
 
     // Reload reservations to get updated data
     await loadReservations()
   } catch (error) {
-    console.error('Error updating reservation status:', error)
+    // console.error('Error updating reservation status:', error)
   }
 }
 
 const markAsReady = async (reservation: any) => {
-  console.log('markAsReady called with reservation:', reservation)
-  console.log('Reservation ID:', reservation.id)
-  console.log('Auth token:', authStore.token)
+  // console.log('markAsReady called with reservation:', reservation)
+  // console.log('Reservation ID:', reservation.id)
+  // console.log('Auth token:', authStore.token)
   try {
-    console.log('Making API call to mark reservation as ready...')
+    // console.log('Making API call to mark reservation as ready...')
     const url = `http://localhost:8000/api/reservations/${reservation.id}/ready`
-    console.log('API URL:', url)
+    // console.log('API URL:', url)
     const response = await fetch(url, {
       method: 'POST',
       headers: {
@@ -740,22 +740,22 @@ const markAsReady = async (reservation: any) => {
       }
     })
 
-    console.log('Response status:', response.status)
-    console.log('Response ok:', response.ok)
+    // console.log('Response status:', response.status)
+    // console.log('Response ok:', response.ok)
 
     if (!response.ok) {
       const errorText = await response.text()
-      console.error('Error response:', errorText)
+      // console.error('Error response:', errorText)
       throw new Error(`HTTP error! status: ${response.status}, body: ${errorText}`)
     }
 
     const data = await response.json()
-    console.log(`Marked reservation ${reservation.id} as ready`, data)
+    // console.log(`Marked reservation ${reservation.id} as ready`, data)
 
     // Reload reservations to get updated data
     await loadReservations()
   } catch (error) {
-    console.error('Error marking reservation as ready:', error)
+    // console.error('Error marking reservation as ready:', error)
   }
 }
 
@@ -862,7 +862,7 @@ const loadReservations = async () => {
     }
 
     const data = await response.json()
-    console.log('Loaded merchant reservations:', data)
+    // console.log('Loaded merchant reservations:', data)
 
     if (data.success && data.data) {
       // Transform API data to match component interface
@@ -893,7 +893,7 @@ const loadReservations = async () => {
       reservations.value = []
     }
   } catch (error) {
-    console.error('Error loading reservations:', error)
+    // console.error('Error loading reservations:', error)
     reservations.value = []
   } finally {
     loading.value = false

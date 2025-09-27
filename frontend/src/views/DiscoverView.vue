@@ -1,28 +1,28 @@
 <template>
   <div class="min-h-screen bg-gradient-to-b from-neutral-50 via-white to-primary-50">
     <div class="border-b border-neutral-200/70 bg-white/80 backdrop-blur">
-      <div class="container mx-auto px-6 py-10">
-        <div class="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
-          <div class="max-w-2xl">
-            <p class="inline-flex items-center gap-2 rounded-full bg-primary-100/70 px-4 py-3 text-responsive-sm font-medium text-primary-700">
+      <div class="container px-4 sm:px-6 lg:px-8 mx-auto px-6 py-10">
+        <div class="flex flex-col gap-4 sm:gap-6 lg:flex-row lg:items-center lg:justify-between">
+          <div class="max-w-full sm:max-w-2xl">
+            <p class="inline-flex items-center gap-2 rounded-full bg-primary-100/70 px-4 py-3 text-responsive-sm font-medium text-primary-emphasis">
               <Compass class="h-5 w-5" />
               Explorer les commerçants solidaires
             </p>
-            <h1 class="mt-3 text-display-sm font-semibold tracking-tight text-neutral-900">
+            <h1 class="mt-3 text-display-sm font-semibold tracking-tight text-heading">
               Trouvez des paniers surprise près de chez vous
             </h1>
-            <p class="mt-3 text-responsive-lg text-neutral-600">
+            <p class="mt-3 text-responsive-lg text-body">
               Filtrez par catégorie, distance ou ambiance pour découvrir de nouveaux partenaires AntiGaspi et suivre vos coups de cœur.
             </p>
           </div>
-          <Card class="w-full max-w-md bg-white/90">
+          <Card class="w-full max-w-full sm:max-w-md bg-white/90">
             <template #header>
-              <h2 class="text-responsive-xl font-semibold text-neutral-900">Recherche intelligente</h2>
-              <p class="text-responsive-sm text-neutral-500">Affinez vos résultats en direct grâce aux filtres dynamiques.</p>
+              <h2 class="text-responsive-xl font-semibold text-heading">Recherche intelligente</h2>
+              <p class="text-responsive-sm text-muted">Affinez vos résultats en direct grâce aux filtres dynamiques.</p>
             </template>
             <div class="space-y-4">
               <div class="relative">
-                <Search class="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-neutral-400" />
+                <Search class="relative sm:absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-placeholder" />
                 <input
                   v-model="searchQuery"
                   type="text"
@@ -60,12 +60,12 @@
               </div>
             </div>
             <template #footer>
-              <div class="flex items-center justify-between text-responsive-sm text-neutral-500">
+              <div class="flex items-center justify-between text-responsive-sm text-muted">
                 <span>{{ filteredMerchants.length }} commerçant{{ filteredMerchants.length > 1 ? 's' : '' }} trouvés</span>
                 <Button
                   variant="ghost"
                   size="sm"
-                  class="text-primary-600"
+                  class="text-primary"
                   @click="resetFilters"
                 >
                   Réinitialiser
@@ -77,17 +77,17 @@
       </div>
     </div>
 
-    <main class="container mx-auto px-6 py-12">
+    <main class="container px-4 sm:px-6 lg:px-8 mx-auto px-6 py-8 sm:py-10 lg:py-12">
       <div class="grid gap-10 xl:grid-cols-[2fr_1fr]">
         <section class="space-y-6">
           <div class="flex items-center justify-between">
-            <h2 class="text-responsive-xl font-semibold text-neutral-900">
+            <h2 class="text-responsive-xl font-semibold text-heading">
               Commerçants à découvrir
             </h2>
-            <span class="text-responsive-sm text-neutral-500">Actualisé toutes les 5 minutes</span>
+            <span class="text-responsive-sm text-muted">Actualisé toutes les 5 minutes</span>
           </div>
 
-          <div v-if="merchantsLoading" class="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+          <div v-if="merchantsLoading" class="grid gap-4 md:grid-cols-2 xl:grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
             <Card v-for="n in 6" :key="n" class="bg-white/80">
               <Skeleton class="h-48 w-full rounded-2xl" />
               <div class="mt-4 space-y-2">
@@ -98,13 +98,13 @@
             </Card>
           </div>
 
-          <div v-else-if="filteredMerchants.length === 0" class="rounded-3xl border border-dashed border-neutral-300 bg-white/70 p-12 text-center shadow-sm">
+          <div v-else-if="filteredMerchants.length === 0" class="rounded-3xl border border-dashed border-neutral-300 bg-white/70 p-6 sm:p-8 lg:p-12 text-left sm:text-center shadow-sm">
             <Compass class="mx-auto h-12 w-12 text-neutral-300" />
-            <h3 class="mt-4 text-responsive-xl font-semibold text-neutral-800">Aucun résultat pour le moment</h3>
-            <p class="mt-2 text-neutral-500">Essayez d'élargir vos filtres ou consultez les suggestions à droite.</p>
+            <h3 class="mt-4 text-responsive-xl font-semibold text-heading-secondary">Aucun résultat pour le moment</h3>
+            <p class="mt-2 text-muted">Essayez d'élargir vos filtres ou consultez les suggestions à droite.</p>
           </div>
 
-          <div v-else class="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+          <div v-else class="grid gap-4 sm:gap-6 md:grid-cols-2 xl:grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
             <Card
               v-for="merchant in filteredMerchants"
               :key="merchant.id"
@@ -113,16 +113,16 @@
               <template #header>
                 <div class="flex items-center justify-between">
                   <div>
-                    <h3 class="text-responsive-lg font-semibold text-neutral-900">{{ merchant.business_name }}</h3>
-                    <p class="text-responsive-sm text-neutral-500">{{ merchant.business_type }}</p>
+                    <h3 class="text-responsive-lg font-semibold text-heading">{{ merchant.business_name }}</h3>
+                    <p class="text-responsive-sm text-muted">{{ merchant.business_type }}</p>
                   </div>
-                  <span v-if="merchant.distance_km" class="rounded-full bg-primary-100/70 px-4 py-3 text-responsive-xs font-semibold text-primary-700">
+                  <span v-if="merchant.distance_km" class="rounded-full bg-primary-100/70 px-4 py-3 text-responsive-xs font-semibold text-primary-emphasis">
                     {{ merchant.distance_km.toFixed(1) }} km
                   </span>
                 </div>
               </template>
 
-              <ul class="space-y-2 text-responsive-sm text-neutral-600">
+              <ul class="space-y-2 text-responsive-sm text-body">
                 <li class="flex items-center gap-2">
                   <MapPin class="h-5 w-5 text-primary-500" />
                   <span>{{ merchant.address || merchant.city }}</span>
@@ -138,12 +138,12 @@
                   <Button
                     variant="ghost"
                     size="sm"
-                    class="text-neutral-600"
+                    class="text-body"
                     @click="toggleFavoriteMerchant(merchant)"
                   >
                     <Heart
                       class="h-5 w-5"
-                      :class="isMerchantFavorite(merchant.id) ? 'fill-primary-500 text-primary-500' : 'text-neutral-400'"
+                      :class="isMerchantFavorite(merchant.id) ? 'fill-primary-500 text-primary-500' : 'text-placeholder'"
                     />
                     <span class="ml-1">{{ isMerchantFavorite(merchant.id) ? 'Retirer' : 'Ajouter' }}</span>
                   </Button>
@@ -162,22 +162,22 @@
         <aside class="space-y-8">
           <Card class="bg-white/90">
             <template #header>
-              <h2 class="text-responsive-xl font-semibold text-neutral-900">Tendances de la semaine</h2>
-              <p class="text-responsive-sm text-neutral-500">Basées sur les paniers les plus réservés.</p>
+              <h2 class="text-responsive-xl font-semibold text-heading">Tendances de la semaine</h2>
+              <p class="text-responsive-sm text-muted">Basées sur les paniers les plus réservés.</p>
             </template>
             <ul class="space-y-4">
               <li
                 v-for="product in topProducts"
                 :key="product.id"
-                class="flex items-start gap-3 rounded-2xl bg-neutral-50 p-4"
+                class="flex items-stretch sm:items-start gap-3 rounded-2xl bg-neutral-50 p-4"
               >
-                <div class="flex h-10 w-10 items-center justify-center rounded-2xl bg-primary-100 text-primary-600">
+                <div class="flex h-10 w-10 items-center justify-center rounded-2xl bg-primary-100 text-primary">
                   <Package class="h-5 w-5" />
                 </div>
                 <div>
-                  <p class="font-semibold text-neutral-800">{{ product.name }}</p>
-                  <p class="text-responsive-sm text-neutral-500">{{ product.merchant.business_name }}</p>
-                  <p class="text-responsive-xs text-primary-600">{{ product.discount_percentage }}% d'économie</p>
+                  <p class="font-semibold text-heading-secondary">{{ product.name }}</p>
+                  <p class="text-responsive-sm text-muted">{{ product.merchant.business_name }}</p>
+                  <p class="text-responsive-xs text-primary">{{ product.discount_percentage }}% d'économie</p>
                 </div>
               </li>
             </ul>

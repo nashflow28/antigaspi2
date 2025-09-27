@@ -3,11 +3,11 @@
   <LoginForm2025 v-if="useDesignSystem2025().isEnabled" />
   <div v-else class="space-y-8">
     <!-- Header moderne -->
-    <div class="text-center animate-fade-in-up">
-      <h3 class="text-responsive-xl font-semibold text-neutral-900 mb-2">
+    <div class="text-left sm:text-center animate-fade-in-up">
+      <h3 class="text-responsive-xl font-semibold text-heading mb-2">
         Content de vous revoir !
       </h3>
-      <p class="text-neutral-600">
+      <p class="text-body">
         Connectez-vous pour accéder à votre compte Antigaspi
       </p>
     </div>
@@ -15,7 +15,7 @@
     <form class="space-y-6 animate-fade-in-up" style="animation-delay: 0.2s;" @submit.prevent="handleSubmit">
       <!-- Email Input -->
       <div class="form-group-2025">
-        <label for="email" class="block text-responsive-sm font-medium text-neutral-700 mb-2 flex items-center gap-2">
+        <label for="email" class="block text-responsive-sm font-medium text-body-emphasis mb-2 flex items-center gap-2">
           <span>Adresse email</span>
           <span class="text-accent-red">*</span>
         </label>
@@ -30,14 +30,14 @@
           class="pl-12"
         >
           <template #icon>
-            <Mail class="w-5 h-5 text-neutral-400" />
+            <Mail class="w-5 h-5 text-placeholder" />
           </template>
         </Input>
       </div>
 
       <!-- Password Input -->
       <div class="form-group-2025">
-        <label for="password" class="block text-responsive-sm font-medium text-neutral-700 mb-2 flex items-center gap-2">
+        <label for="password" class="block text-responsive-sm font-medium text-body-emphasis mb-2 flex items-center gap-2">
           <span>Mot de passe</span>
           <span class="text-accent-red">*</span>
         </label>
@@ -53,12 +53,12 @@
             class="pl-12 pr-12"
           >
             <template #icon>
-              <Lock class="w-5 h-5 text-neutral-400" />
+              <Lock class="w-5 h-5 text-placeholder" />
             </template>
           </Input>
           <button
             type="button"
-            class="absolute inset-y-0 right-0 pr-4 flex items-center text-neutral-400 hover:transition-colors duration-200"
+            class="relative sm:absolute inset-y-0 right-0 pr-4 flex items-center text-placeholder hover:transition-colors duration-200"
             @click="togglePasswordVisibility"
           >
             <Eye v-if="!showPassword" class="w-5 h-5" />
@@ -68,21 +68,21 @@
       </div>
 
       <!-- Options et liens -->
-      <div class="flex items-center justify-between">
+      <div class="flex items-center justify-start sm:justify-between">
         <div class="flex items-center gap-2">
           <input
             id="remember-me"
             v-model="form.remember"
             type="checkbox"
-            class="w-5 h-5 text-primary-600 bg-white border-2 border-neutral-300 rounded focus:ring-primary-500 focus:ring-2"
+            class="w-5 h-5 text-primary bg-white border-2 border-neutral-300 rounded focus:ring-primary-500 focus:ring-2"
           >
-          <label for="remember-me" class="text-responsive-sm text-neutral-700 font-medium">
+          <label for="remember-me" class="text-responsive-sm text-body-emphasis font-medium">
             Se souvenir de moi
           </label>
         </div>
 
         <div class="text-responsive-sm">
-          <a href="#" class="font-medium text-primary-600 hover:transition-colors duration-200 hover:underline">
+          <a href="#" class="font-medium text-primary hover:transition-colors duration-200 hover:underline">
             Mot de passe oublié ?
           </a>
         </div>
@@ -94,32 +94,32 @@
         variant="primary"
         size="lg"
         :disabled="loading"
-        class="w-full glow-effect group relative overflow-hidden"
+        class="w-full glow-effect group relative overflow-hidden sm:block"
       >
         <span class="relative z-10 flex items-center justify-center gap-2">
           <Loader2 v-if="loading" class="w-5 h-5 animate-spin" />
           <span>{{ loading ? 'Connexion en cours...' : 'Se connecter' }}</span>
         </span>
-        <div class="absolute inset-0 bg-gradient-to-r from-primary-600 to-accent-blue/90 opacity-0 group-hover:transition-opacity duration-300" />
+        <div class="relative sm:absolute inset-0 bg-gradient-to-r from-primary-600 to-accent-blue/90 opacity-0 group-hover:transition-opacity duration-300" />
       </Button>
 
       <!-- Divider -->
       <div class="relative">
-        <div class="absolute inset-0 flex items-center">
+        <div class="relative sm:absolute inset-0 flex items-center">
           <div class="w-full border-t border-neutral-200" />
         </div>
         <div class="relative flex justify-center text-responsive-sm">
-          <span class="px-4 bg-white text-neutral-500 font-medium">ou</span>
+          <span class="px-4 bg-white text-muted font-medium">ou</span>
         </div>
       </div>
 
       <!-- Register Link -->
-      <div class="text-center">
-        <p class="text-neutral-600">
+      <div class="text-left sm:text-center">
+        <p class="text-body">
           Pas encore de compte ?
           <router-link
             to="/register"
-            class="font-medium text-primary-600 hover:transition-colors duration-200 hover:underline ml-1"
+            class="font-medium text-primary hover:transition-colors duration-200 hover:underline ml-1"
           >
             Créer un compte
           </router-link>
@@ -128,14 +128,14 @@
     </form>
 
     <!-- Footer Links -->
-    <div class="text-center text-responsive-sm text-neutral-500 animate-fade-in-up" style="animation-delay: 0.4s;">
+    <div class="text-left sm:text-center text-responsive-sm text-muted animate-fade-in-up" style="animation-delay: 0.4s;">
       <p>
         En vous connectant, vous acceptez nos
-        <a href="#" class="text-primary-600 hover:text-primary-700 hover:transition-colors duration-200">
+        <a href="#" class="text-primary hover:text-primary-emphasis hover:transition-colors duration-200">
           Conditions d'utilisation
         </a>
         et notre
-        <a href="#" class="text-primary-600 hover:text-primary-700 hover:transition-colors duration-200">
+        <a href="#" class="text-primary hover:text-primary-emphasis hover:transition-colors duration-200">
           Politique de confidentialité
         </a>
       </p>
@@ -217,7 +217,7 @@ const handleSubmit = async () => {
     }
   } catch (error: any) {
     // L'erreur est déjà gérée par le store et affichée via les notifications
-    console.error('Login error:', error)
+    // console.error('Login error:', error)
   } finally {
     loading.value = false
   }

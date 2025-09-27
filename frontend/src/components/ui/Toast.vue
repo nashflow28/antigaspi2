@@ -60,17 +60,17 @@
           </svg>
         </span>
         <div class="flex-1 space-y-2">
-          <p v-if="title" class="text-small font-semibold text-neutral-800 dark:text-neutral-100">
+          <p v-if="title" class="text-small font-semibold text-heading-secondary dark:text-neutral-100">
             {{ title }}
           </p>
-          <p v-if="description" class="text-caption text-neutral-500 dark:text-neutral-300">
+          <p v-if="description" class="text-caption text-muted dark:text-neutral-300">
             {{ description }}
           </p>
           <Button
             v-if="actionLabel"
             variant="ghost"
             size="sm"
-            class="px-0 text-primary-600 dark:text-primary-200"
+            class="px-0 text-primary dark:text-primary-200"
             @click="handleAction"
           >
             {{ actionLabel }}
@@ -78,7 +78,7 @@
         </div>
         <button
           type="button"
-          class="rounded-2xl p-2 text-neutral-400 transition hover:text-neutral-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-400"
+          class="rounded-2xl p-2 text-placeholder transition hover:text-body focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-400"
           aria-label="Fermer la notification"
           @click="handleClose"
         >

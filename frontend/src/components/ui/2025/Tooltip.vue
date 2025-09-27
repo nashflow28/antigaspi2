@@ -96,7 +96,7 @@ const variantClasses = computed(() => {
   const variants = {
     default: 'bg-neutral-900 text-white',
     dark: 'bg-neutral-900 text-white',
-    light: 'bg-white text-neutral-900 border border-neutral-200',
+    light: 'bg-white text-heading border border-neutral-200',
     error: 'bg-red-600 text-white',
     warning: 'bg-yellow-500 text-white',
     success: 'bg-green-600 text-white'

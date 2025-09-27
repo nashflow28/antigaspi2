@@ -6,11 +6,11 @@
   >
     <!-- Header -->
     <div class="bg-white shadow-sm">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex justify-between items-center py-6">
+      <div class="max-w-full sm:max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-start sm:justify-between items-center py-6">
           <div>
-            <h1 class="text-responsive-xl font-semibold text-neutral-900">Gestion des Catégories</h1>
-            <p class="mt-1 text-responsive-sm text-neutral-600">
+            <h1 class="text-responsive-xl font-semibold text-heading">Gestion des Catégories</h1>
+            <p class="mt-1 text-responsive-sm text-body">
               Gérer les catégories de produits de la plateforme
             </p>
           </div>
@@ -27,16 +27,16 @@
     </div>
 
     <!-- Stats Cards -->
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-      <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+    <div class="max-w-full sm:max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-4 sm:gap-6 mb-6 sm:mb-8">
         <Card>
           <div class="flex items-center">
             <div class="p-3 rounded-lg bg-blue-100">
-              <TagIcon class="w-10 h-10 text-blue-600" />
+              <TagIcon class="w-10 h-10 text-info" />
             </div>
             <div class="ml-4">
-              <p class="text-responsive-sm font-medium text-neutral-600">Total</p>
-              <p class="text-responsive-xl font-semibold text-neutral-900">{{ stats.total_categories || 0 }}</p>
+              <p class="text-responsive-sm font-medium text-body">Total</p>
+              <p class="text-responsive-xl font-semibold text-heading">{{ stats.total_categories || 0 }}</p>
             </div>
           </div>
         </Card>
@@ -44,11 +44,11 @@
         <Card>
           <div class="flex items-center">
             <div class="p-3 rounded-lg bg-green-100">
-              <CheckCircleIcon class="w-10 h-10 text-green-600" />
+              <CheckCircleIcon class="w-10 h-10 text-success" />
             </div>
             <div class="ml-4">
-              <p class="text-responsive-sm font-medium text-neutral-600">Actives</p>
-              <p class="text-responsive-xl font-semibold text-neutral-900">{{ stats.active_categories || 0 }}</p>
+              <p class="text-responsive-sm font-medium text-body">Actives</p>
+              <p class="text-responsive-xl font-semibold text-heading">{{ stats.active_categories || 0 }}</p>
             </div>
           </div>
         </Card>
@@ -59,8 +59,8 @@
               <CubeIcon class="w-10 h-10 text-purple-600" />
             </div>
             <div class="ml-4">
-              <p class="text-responsive-sm font-medium text-neutral-600">Avec Produits</p>
-              <p class="text-responsive-xl font-semibold text-neutral-900">{{ stats.categories_with_products || 0 }}</p>
+              <p class="text-responsive-sm font-medium text-body">Avec Produits</p>
+              <p class="text-responsive-xl font-semibold text-heading">{{ stats.categories_with_products || 0 }}</p>
             </div>
           </div>
         </Card>
@@ -71,8 +71,8 @@
               <ChartBarIcon class="w-10 h-10 text-orange-600" />
             </div>
             <div class="ml-4">
-              <p class="text-responsive-sm font-medium text-neutral-600">Top Catégorie</p>
-              <p class="text-responsive-lg font-semibold text-neutral-900">
+              <p class="text-responsive-sm font-medium text-body">Top Catégorie</p>
+              <p class="text-responsive-lg font-semibold text-heading">
                 {{ stats.top_categories && stats.top_categories.length > 0 ? stats.top_categories[0].name : 'Aucune' }}
               </p>
             </div>
@@ -83,12 +83,12 @@
       <!-- Categories Table -->
       <Card>
         <div class="px-6 py-4 border-b border-neutral-200">
-          <div class="flex justify-between items-center">
-            <h3 class="text-responsive-lg font-medium text-neutral-900">Liste des Catégories</h3>
+          <div class="flex justify-start sm:justify-between items-center">
+            <h3 class="text-responsive-lg font-medium text-heading">Liste des Catégories</h3>
             <div class="flex items-center gap-4">
               <!-- Search -->
               <div class="relative">
-                <MagnifyingGlassIcon class="w-5 h-5 absolute left-3 top-1/2 transform -translate-y-1/2 text-neutral-400" />
+                <MagnifyingGlassIcon class="w-5 h-5 relative sm:absolute left-3 top-1/2 transform -translate-y-1/2 text-placeholder" />
                 <input
                   v-model="searchQuery"
                   type="text"
@@ -110,9 +110,9 @@
         </div>
 
         <!-- Loading State -->
-        <div v-if="loading" class="px-6 py-12 text-center">
+        <div v-if="loading" class="px-6 py-8 sm:py-10 lg:py-12 text-left sm:text-center">
           <div class="animate-spin rounded-full h-10 w-10 border-b-2 border-primary-600 mx-auto mb-4" />
-          <p class="text-neutral-500">Chargement des catégories...</p>
+          <p class="text-muted">Chargement des catégories...</p>
         </div>
 
         <!-- Categories List -->
@@ -120,19 +120,19 @@
           <table class="min-w-full divide-y divide-neutral-200">
             <thead class="bg-neutral-50">
               <tr>
-                <th class="px-6 py-3 text-left text-responsive-xs font-medium text-neutral-500 uppercase tracking-wider">
+                <th class="px-6 py-3 text-left text-responsive-xs font-medium text-muted uppercase tracking-wider">
                   Catégorie
                 </th>
-                <th class="px-6 py-3 text-left text-responsive-xs font-medium text-neutral-500 uppercase tracking-wider">
+                <th class="px-6 py-3 text-left text-responsive-xs font-medium text-muted uppercase tracking-wider">
                   Description
                 </th>
-                <th class="px-6 py-3 text-left text-responsive-xs font-medium text-neutral-500 uppercase tracking-wider">
+                <th class="px-6 py-3 text-left text-responsive-xs font-medium text-muted uppercase tracking-wider">
                   Produits
                 </th>
-                <th class="px-6 py-3 text-left text-responsive-xs font-medium text-neutral-500 uppercase tracking-wider">
+                <th class="px-6 py-3 text-left text-responsive-xs font-medium text-muted uppercase tracking-wider">
                   Statut
                 </th>
-                <th class="px-6 py-3 text-left text-responsive-xs font-medium text-neutral-500 uppercase tracking-wider">
+                <th class="px-6 py-3 text-left text-responsive-xs font-medium text-muted uppercase tracking-wider">
                   Actions
                 </th>
               </tr>
@@ -143,16 +143,16 @@
                   <div class="flex items-center">
                     <span class="text-responsive-xl mr-3">{{ category.icon || '📦' }}</span>
                     <div>
-                      <div class="text-responsive-sm font-medium text-neutral-900">{{ category.name }}</div>
-                      <div class="text-responsive-sm text-neutral-500">ID: {{ category.id }}</div>
+                      <div class="text-responsive-sm font-medium text-heading">{{ category.name }}</div>
+                      <div class="text-responsive-sm text-muted">ID: {{ category.id }}</div>
                     </div>
                   </div>
                 </td>
                 <td class="px-6 py-4">
-                  <div class="text-responsive-sm text-neutral-900 max-w-xs">{{ category.description }}</div>
+                  <div class="text-responsive-sm text-heading max-w-xs">{{ category.description }}</div>
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap">
-                  <div class="text-responsive-sm text-neutral-900">{{ (category.products_count ?? 0) }} produit(s)</div>
+                  <div class="text-responsive-sm text-heading">{{ (category.products_count ?? 0) }} produit(s)</div>
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap">
                   <button
@@ -168,7 +168,7 @@
                 <td class="px-6 py-4 whitespace-nowrap text-responsive-sm font-medium">
                   <div class="flex items-center gap-2">
                     <button
-                      class="text-blue-600 hover:text-blue-900"
+                      class="text-info hover:text-blue-900"
                       title="Voir détails"
                       @click="viewCategory(category)"
                     >
@@ -182,7 +182,7 @@
                       <PencilIcon class="w-5 h-5" />
                     </button>
                     <button
-                      class="text-red-600 hover:text-red-900"
+                      class="text-error hover:text-red-900"
                       title="Supprimer"
                       :disabled="(category.products_count ?? 0) > 0"
                       :class="{ 'opacity-50 cursor-not-allowed': (category.products_count ?? 0) > 0 }"
@@ -198,10 +198,10 @@
         </div>
 
         <!-- Empty State -->
-        <div v-else class="px-6 py-12 text-center">
-          <TagIcon class="w-12 h-12 text-neutral-400 mx-auto mb-4" />
-          <h3 class="text-responsive-lg font-medium text-neutral-900 mb-2">Aucune catégorie trouvée</h3>
-          <p class="text-neutral-500 mb-6">
+        <div v-else class="px-6 py-8 sm:py-10 lg:py-12 text-left sm:text-center">
+          <TagIcon class="w-12 h-12 text-placeholder mx-auto mb-4" />
+          <h3 class="text-responsive-lg font-medium text-heading mb-2">Aucune catégorie trouvée</h3>
+          <p class="text-muted mb-6">
             {{ searchQuery ? 'Aucune catégorie ne correspond à votre recherche.' : 'Commencez par créer votre première catégorie.' }}
           </p>
           <Button
@@ -226,23 +226,23 @@
       <!-- Modal -->
       <div class="flex min-h-full items-center justify-center p-4">
         <div
-          class="relative w-full max-w-lg bg-white rounded-2xl shadow-2xl transform transition-all"
+          class="relative w-full max-w-full sm:max-w-lg bg-white rounded-2xl shadow-2xl transform transition-all"
           @click.stop
         >
           <!-- Header -->
           <div class="px-6 py-4 border-b border-neutral-200">
-            <div class="flex items-center justify-between">
+            <div class="flex items-center justify-start sm:justify-between">
               <div class="flex items-center gap-3">
                 <div class="p-2 rounded-xl bg-blue-100">
-                  <component :is="modal.icon" class="w-10 h-10 text-blue-600" />
+                  <component :is="modal.icon" class="w-10 h-10 text-info" />
                 </div>
-                <h3 class="text-responsive-xl font-semibold text-neutral-900">{{ modal.title }}</h3>
+                <h3 class="text-responsive-xl font-semibold text-heading">{{ modal.title }}</h3>
               </div>
               <button
                 class="p-2 hover:transition-colors"
                 @click="closeModal"
               >
-                <XMarkIcon class="w-5 h-5 text-neutral-400" />
+                <XMarkIcon class="w-5 h-5 text-placeholder" />
               </button>
             </div>
           </div>
@@ -251,7 +251,7 @@
           <div class="px-6 py-6">
             <form class="space-y-6" @submit.prevent="saveCategory">
               <div>
-                <label for="name" class="block text-responsive-sm font-medium text-neutral-700 mb-2">
+                <label for="name" class="block text-responsive-sm font-medium text-body-emphasis mb-2">
                   Nom de la catégorie *
                 </label>
                 <input
@@ -266,7 +266,7 @@
               </div>
 
               <div>
-                <label for="description" class="block text-responsive-sm font-medium text-neutral-700 mb-2">
+                <label for="description" class="block text-responsive-sm font-medium text-body-emphasis mb-2">
                   Description *
                 </label>
                 <textarea
@@ -281,7 +281,7 @@
               </div>
 
               <div>
-                <label for="icon" class="block text-responsive-sm font-medium text-neutral-700 mb-2">
+                <label for="icon" class="block text-responsive-sm font-medium text-body-emphasis mb-2">
                   Icône (emoji)
                 </label>
                 <input
@@ -299,16 +299,16 @@
                   <input
                     v-model="form.is_active"
                     type="checkbox"
-                    class="rounded border-neutral-300 text-primary-600 focus:ring-primary-500"
+                    class="rounded border-neutral-300 text-primary focus:ring-primary-500"
                   >
-                  <span class="ml-2 text-responsive-sm text-neutral-700">Catégorie active</span>
+                  <span class="ml-2 text-responsive-sm text-body-emphasis">Catégorie active</span>
                 </label>
               </div>
 
-              <div class="flex justify-end gap-3 pt-4">
+              <div class="flex justify-center sm:justify-end gap-3 pt-4">
                 <button
                   type="button"
-                  class="px-4 py-3 text-neutral-600 hover:transition-colors"
+                  class="px-4 py-3 text-body hover:transition-colors"
                   @click="closeModal"
                 >
                   Annuler
@@ -473,7 +473,7 @@ const loadCategories = async () => {
       throw new Error(data.message || 'Erreur lors du chargement')
     }
   } catch (error) {
-    console.error('Error loading categories:', error)
+    // console.error('Error loading categories:', error)
     notify.error('Impossible de charger les catégories', 'Erreur')
   } finally {
     loading.value = false
@@ -497,7 +497,7 @@ const loadStats = async () => {
       stats.value = data.data
     }
   } catch (error) {
-    console.error('Error loading stats:', error)
+    // console.error('Error loading stats:', error)
   }
 }
 
@@ -571,7 +571,7 @@ const saveCategory = async () => {
       throw new Error(data.message || 'Erreur lors de l\'enregistrement')
     }
   } catch (error) {
-    console.error('Error saving category:', error)
+    // console.error('Error saving category:', error)
     notify.error(error instanceof Error ? error.message : 'Erreur inconnue', 'Erreur')
   } finally {
     saving.value = false
@@ -616,7 +616,7 @@ const deleteCategory = async (category: Category) => {
         throw new Error(data.message || 'Erreur lors de la suppression')
       }
     } catch (error) {
-      console.error('Error deleting category:', error)
+      // console.error('Error deleting category:', error)
       notify.error(error instanceof Error ? error.message : 'Erreur inconnue', 'Erreur')
     }
   }
@@ -644,7 +644,7 @@ const toggleCategoryStatus = async (category: Category) => {
       throw new Error(data.message || 'Erreur lors du changement de statut')
     }
   } catch (error) {
-    console.error('Error toggling status:', error)
+    // console.error('Error toggling status:', error)
     notify.error(error instanceof Error ? error.message : 'Erreur inconnue', 'Erreur')
   }
 }

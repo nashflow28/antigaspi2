@@ -2,10 +2,10 @@
   <div class="surprise-basket-detail">
     <!-- Header -->
     <div class="bg-white rounded-xl border border-neutral-200 p-6 mb-6">
-      <div class="flex items-start justify-between">
+      <div class="flex items-stretch sm:items-start justify-start sm:justify-between">
         <div class="flex-1">
-          <div class="flex items-center space-x-3 mb-3">
-            <h1 class="text-responsive-xl font-semibold text-neutral-900">{{ basket.name }}</h1>
+          <div class="flex items-center space-y-3 sm:space-y-0 sm:space-x-3 mb-3">
+            <h1 class="text-responsive-xl font-semibold text-heading">{{ basket.name }}</h1>
             <span
               class="px-4 py-3 text-responsive-sm font-medium rounded-full"
               :class="basket.is_active
@@ -16,22 +16,22 @@
             </span>
           </div>
 
-          <p v-if="basket.description" class="text-neutral-600 mb-4">
+          <p v-if="basket.description" class="text-body mb-4">
             {{ basket.description }}
           </p>
 
           <!-- Stats Row -->
-          <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
             <div class="bg-primary-50 rounded-lg p-3">
-              <p class="text-responsive-sm text-primary-600 font-medium">Prix</p>
+              <p class="text-responsive-sm text-primary font-medium">Prix</p>
               <p class="text-responsive-lg font-semibold text-primary-900">{{ formatCurrency(basket.discounted_price) }}</p>
             </div>
             <div class="bg-green-50 rounded-lg p-3">
-              <p class="text-responsive-sm text-green-600 font-medium">Économies</p>
+              <p class="text-responsive-sm text-success font-medium">Économies</p>
               <p class="text-responsive-lg font-semibold text-green-900">{{ formatCurrency(basket.basket_savings || 0) }}</p>
             </div>
             <div class="bg-blue-50 rounded-lg p-3">
-              <p class="text-responsive-sm text-blue-600 font-medium">Articles</p>
+              <p class="text-responsive-sm text-info font-medium">Articles</p>
               <p class="text-responsive-lg font-semibold text-blue-900">{{ basket.basket_items_count }}</p>
             </div>
             <div class="bg-orange-50 rounded-lg p-3">
@@ -41,7 +41,7 @@
           </div>
         </div>
 
-        <div class="flex items-center space-x-3 ml-6">
+        <div class="flex items-center space-y-3 sm:space-y-0 sm:space-x-3 ml-6">
           <button
             class="px-4 py-3 bg-primary-600 text-white rounded-lg hover:transition-colors"
             @click="$emit('edit', basket)"
@@ -50,7 +50,7 @@
             Modifier
           </button>
           <button
-            class="p-2 text-neutral-500 hover:transition-colors"
+            class="p-2 text-muted hover:transition-colors"
             @click="$emit('close')"
           >
             <X class="w-5 h-5" />
@@ -60,18 +60,18 @@
     </div>
 
     <!-- Main Content Grid -->
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
       <!-- Left Column - Products -->
       <div class="lg:col-span-2">
         <!-- Products in Basket -->
         <div class="bg-white rounded-xl border border-neutral-200 p-6">
-          <h2 class="text-responsive-lg font-semibold text-neutral-900 mb-4">Produits inclus</h2>
+          <h2 class="text-responsive-lg font-semibold text-heading mb-4">Produits inclus</h2>
 
           <div v-if="basket.surprise_basket_items && basket.surprise_basket_items.length > 0" class="space-y-4">
             <div
               v-for="item in basket.surprise_basket_items"
               :key="item.id"
-              class="flex items-center space-x-4 p-4 bg-neutral-50 rounded-lg"
+              class="flex items-center space-y-4 sm:space-y-0 sm:space-x-4 p-4 bg-neutral-50 rounded-lg"
             >
               <!-- Product Image -->
               <img
@@ -84,33 +84,33 @@
                 v-else
                 class="w-16 h-16 bg-neutral-200 rounded-lg flex items-center justify-center flex-shrink-0"
               >
-                <Package class="w-10 h-10 text-neutral-400" />
+                <Package class="w-10 h-10 text-placeholder" />
               </div>
 
               <!-- Product Info -->
               <div class="flex-1 min-w-0">
-                <h3 class="font-medium text-neutral-900 truncate">{{ item.product.name }}</h3>
-                <p v-if="item.product.description" class="text-responsive-sm text-neutral-500 line-clamp-2">
+                <h3 class="font-medium text-heading truncate">{{ item.product.name }}</h3>
+                <p v-if="item.product.description" class="text-responsive-sm text-muted line-clamp-2">
                   {{ item.product.description }}
                 </p>
 
-                <div class="mt-2 flex items-center justify-between">
-                  <div class="flex items-center space-x-2">
-                    <span class="text-responsive-sm font-medium text-green-600">
+                <div class="mt-2 flex items-center justify-start sm:justify-between">
+                  <div class="flex items-center space-y-2 sm:space-y-0 sm:space-x-2">
+                    <span class="text-responsive-sm font-medium text-success">
                       {{ formatCurrency(item.unit_price) }} × {{ item.quantity }}
                     </span>
-                    <span class="text-responsive-sm text-neutral-400 line-through">
+                    <span class="text-responsive-sm text-placeholder line-through">
                       {{ formatCurrency(item.product.original_price) }}
                     </span>
                   </div>
-                  <span class="text-responsive-sm font-medium text-neutral-900">
+                  <span class="text-responsive-sm font-medium text-heading">
                     = {{ formatCurrency(item.total_price) }}
                   </span>
                 </div>
 
                 <!-- Category Badge -->
                 <div v-if="item.product.category" class="mt-2">
-                  <span class="inline-flex items-center px-4 py-3 text-responsive-xs font-medium bg-neutral-100 text-neutral-800 rounded-full">
+                  <span class="inline-flex items-center px-4 py-3 text-responsive-xs font-medium bg-neutral-100 text-heading-secondary rounded-full">
                     {{ item.product.category.name }}
                   </span>
                 </div>
@@ -120,15 +120,15 @@
             <!-- Total Summary -->
             <div class="border-t border-neutral-200 pt-4">
               <div class="bg-green-50 border border-green-200 rounded-lg p-4">
-                <div class="flex justify-between items-center text-responsive-sm mb-2">
+                <div class="flex justify-start sm:justify-between items-center text-responsive-sm mb-2">
                   <span class="text-green-700">Valeur totale des produits:</span>
                   <span class="font-semibold text-green-900">{{ formatCurrency(basket.total_original_value || 0) }}</span>
                 </div>
-                <div class="flex justify-between items-center text-responsive-sm mb-2">
+                <div class="flex justify-start sm:justify-between items-center text-responsive-sm mb-2">
                   <span class="text-green-700">Prix du panier:</span>
                   <span class="font-semibold text-green-900">{{ formatCurrency(basket.discounted_price) }}</span>
                 </div>
-                <div class="flex justify-between items-center text-responsive-lg border-t border-green-200 pt-2">
+                <div class="flex justify-start sm:justify-between items-center text-responsive-lg border-t border-green-200 pt-2">
                   <span class="text-green-700 font-medium">Économies pour le client:</span>
                   <span class="font-semibold text-green-900">
                     {{ formatCurrency(basket.basket_savings || 0) }}
@@ -139,10 +139,10 @@
             </div>
           </div>
 
-          <div v-else class="text-center py-12 text-neutral-500">
+          <div v-else class="text-left sm:text-center py-8 sm:py-10 lg:py-12 text-muted">
             <Package class="w-16 h-16 mx-auto mb-4 text-neutral-300" />
-            <h3 class="text-responsive-lg font-medium text-neutral-900 mb-2">Aucun produit</h3>
-            <p class="text-neutral-600 mb-4">
+            <h3 class="text-responsive-lg font-medium text-heading mb-2">Aucun produit</h3>
+            <p class="text-body mb-4">
               Ce panier surprise ne contient aucun produit pour le moment
             </p>
             <button
@@ -159,25 +159,25 @@
       <div class="space-y-6">
         <!-- Basic Information -->
         <div class="bg-white rounded-xl border border-neutral-200 p-6">
-          <h3 class="text-responsive-lg font-semibold text-neutral-900 mb-4">Informations</h3>
+          <h3 class="text-responsive-lg font-semibold text-heading mb-4">Informations</h3>
 
           <div class="space-y-4">
             <!-- Category -->
             <div v-if="basket.category">
-              <p class="text-responsive-sm font-medium text-neutral-600">Catégorie</p>
-              <p class="text-neutral-900">{{ basket.category.name }}</p>
+              <p class="text-responsive-sm font-medium text-body">Catégorie</p>
+              <p class="text-heading">{{ basket.category.name }}</p>
             </div>
 
             <!-- Mystery Description -->
             <div v-if="basket.surprise_description">
-              <p class="text-responsive-sm font-medium text-neutral-600">Description mystère</p>
-              <p class="text-neutral-900">{{ basket.surprise_description }}</p>
+              <p class="text-responsive-sm font-medium text-body">Description mystère</p>
+              <p class="text-heading">{{ basket.surprise_description }}</p>
             </div>
 
             <!-- Item Range -->
             <div v-if="basket.min_items || basket.max_items">
-              <p class="text-responsive-sm font-medium text-neutral-600">Nombre d'articles</p>
-              <p class="text-neutral-900">
+              <p class="text-responsive-sm font-medium text-body">Nombre d'articles</p>
+              <p class="text-heading">
                 <span v-if="basket.min_items && basket.max_items">
                   Entre {{ basket.min_items }} et {{ basket.max_items }} articles
                 </span>
@@ -192,27 +192,27 @@
 
             <!-- Expiration -->
             <div v-if="basket.expiration_date">
-              <p class="text-responsive-sm font-medium text-neutral-600">Date d'expiration</p>
-              <p class="text-neutral-900">{{ formatDate(basket.expiration_date) }}</p>
+              <p class="text-responsive-sm font-medium text-body">Date d'expiration</p>
+              <p class="text-heading">{{ formatDate(basket.expiration_date) }}</p>
             </div>
 
             <!-- Creation Date -->
             <div>
-              <p class="text-responsive-sm font-medium text-neutral-600">Créé le</p>
-              <p class="text-neutral-900">{{ formatDateTime(basket.created_at) }}</p>
+              <p class="text-responsive-sm font-medium text-body">Créé le</p>
+              <p class="text-heading">{{ formatDateTime(basket.created_at) }}</p>
             </div>
 
             <!-- Last Update -->
             <div v-if="basket.updated_at !== basket.created_at">
-              <p class="text-responsive-sm font-medium text-neutral-600">Dernière modification</p>
-              <p class="text-neutral-900">{{ formatDateTime(basket.updated_at) }}</p>
+              <p class="text-responsive-sm font-medium text-body">Dernière modification</p>
+              <p class="text-heading">{{ formatDateTime(basket.updated_at) }}</p>
             </div>
           </div>
         </div>
 
         <!-- Image Preview -->
         <div v-if="basket.image_url" class="bg-white rounded-xl border border-neutral-200 p-6">
-          <h3 class="text-responsive-lg font-semibold text-neutral-900 mb-4">Image</h3>
+          <h3 class="text-responsive-lg font-semibold text-heading mb-4">Image</h3>
           <img
             :src="basket.image_url"
             :alt="basket.name"
@@ -222,7 +222,7 @@
 
         <!-- Quick Actions -->
         <div class="bg-white rounded-xl border border-neutral-200 p-6">
-          <h3 class="text-responsive-lg font-semibold text-neutral-900 mb-4">Actions</h3>
+          <h3 class="text-responsive-lg font-semibold text-heading mb-4">Actions</h3>
 
           <div class="space-y-3">
             <button
@@ -235,7 +235,7 @@
 
             <button
               :disabled="updating"
-              class="w-full px-4 py-3 border border-neutral-300 text-neutral-700 rounded-lg hover:transition-colors flex items-center justify-center disabled:opacity-50"
+              class="w-full px-4 py-3 border border-neutral-300 text-body-emphasis rounded-lg hover:transition-colors flex items-center justify-center disabled:opacity-50"
               @click="toggleStatus"
             >
               <component :is="basket.is_active ? EyeOff : Eye" class="w-5 h-5 mr-2" />
@@ -244,7 +244,7 @@
 
             <button
               :disabled="deleting"
-              class="w-full px-4 py-3 border border-red-300 text-red-600 rounded-lg hover:transition-colors flex items-center justify-center disabled:opacity-50"
+              class="w-full px-4 py-3 border border-red-300 text-error rounded-lg hover:transition-colors flex items-center justify-center disabled:opacity-50"
               @click="confirmDelete"
             >
               <Trash2 class="w-5 h-5 mr-2" />

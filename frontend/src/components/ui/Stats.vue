@@ -8,18 +8,18 @@
         :enter="{ opacity: 1, y: 0, transition: { duration: 0.4, delay: index * 0.08 } }"
       >
         <slot name="stat" :stat="stat" :index="index">
-          <div class="flex items-center justify-between">
-            <span class="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary-500/15 text-primary-700 dark:text-primary-200">
+          <div class="flex items-center justify-start sm:justify-between">
+            <span class="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary-500/15 text-primary-emphasis dark:text-primary-200">
               <component :is="stat.icon" v-if="stat.icon" />
             </span>
             <span class="text-caption uppercase tracking-[0.18em] text-primary-500">Impact</span>
           </div>
 
-          <div class="mt-4 flex items-baseline gap-2 text-h1 text-primary-700 dark:text-primary-100">
+          <div class="mt-4 flex items-baseline gap-2 text-h1 text-primary-emphasis dark:text-primary-100">
             <AnimatedCounter :value="stat.value" />
             <span v-if="stat.suffix" class="text-small font-medium text-primary-500/80">{{ stat.suffix }}</span>
           </div>
-          <p class="mt-2 text-small text-neutral-500 dark:text-neutral-300">{{ stat.label }}</p>
+          <p class="mt-2 text-small text-muted dark:text-neutral-300">{{ stat.label }}</p>
         </slot>
       </Motion>
     </template>

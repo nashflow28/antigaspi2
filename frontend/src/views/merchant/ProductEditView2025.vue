@@ -4,25 +4,25 @@
     :header="header"
     class="bg-gradient-to-br from-green-50 to-blue-50"
   >
-    <div class="container-2025 py-6">
+    <div class="container px-4 sm:px-6 lg:px-8-2025 py-6">
       <!-- Header -->
-      <div class="mb-8">
+      <div class="mb-6 sm:mb-8">
         <div class="flex items-center gap-4 mb-4">
           <router-link
             to="/merchant/products"
-            class="flex items-center text-neutral-600 hover:transition-colors"
+            class="flex items-center text-body hover:transition-colors"
           >
             <ArrowLeftIcon class="w-5 h-5 mr-2" />
             Retour aux produits
           </router-link>
         </div>
 
-        <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
+        <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 sm:gap-6">
           <div>
-            <h1 class="text-responsive-xl lg:text-display-sm font-semibold text-neutral-900 mb-2">
+            <h1 class="text-responsive-xl lg:text-display-sm font-semibold text-heading mb-2">
               {{ product ? 'Modifier le produit' : 'Chargement...' }}
             </h1>
-            <p class="text-neutral-600 text-responsive-lg">
+            <p class="text-body text-responsive-lg">
               {{ product ? product.name : 'Veuillez patienter...' }}
             </p>
           </div>
@@ -42,37 +42,37 @@
 
       <!-- Loading State -->
       <Card v-if="!product && !error">
-        <div class="flex items-center justify-center py-12">
+        <div class="flex items-center justify-center py-8 sm:py-10 lg:py-12">
           <div class="animate-spin rounded-full h-10 w-10 border-b-2 border-primary-600" />
-          <span class="ml-3 text-neutral-600">Chargement du produit...</span>
+          <span class="ml-3 text-body">Chargement du produit...</span>
         </div>
       </Card>
 
       <!-- Error State -->
       <Card v-if="error" variant="bordered" class="bg-red-50 border-red-200">
-        <div class="flex items-center justify-center py-8">
+        <div class="flex items-center justify-center py-6 sm:py-8">
           <AlertCircleIcon class="w-10 h-10 text-red-500 mr-3" />
           <div>
             <h3 class="text-responsive-lg font-semibold text-red-800 mb-1">Erreur de chargement</h3>
-            <p class="text-red-600">{{ error }}</p>
+            <p class="text-error">{{ error }}</p>
           </div>
         </div>
       </Card>
 
       <!-- Main Form -->
       <form v-if="product && !error" @submit.prevent="saveProduct">
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8">
           <!-- Main Form -->
           <div class="lg:col-span-2 space-y-6">
             <Card>
               <template #header>
-                <h3 class="text-responsive-xl font-semibold text-neutral-900">Informations générales</h3>
+                <h3 class="text-responsive-xl font-semibold text-heading">Informations générales</h3>
               </template>
 
               <div class="space-y-6">
                 <!-- Product Name -->
                 <div>
-                  <label for="name" class="block text-responsive-sm font-medium text-neutral-700 mb-2">
+                  <label for="name" class="block text-responsive-sm font-medium text-body-emphasis mb-2">
                     Nom du produit <span class="text-red-500">*</span>
                   </label>
                   <Input
@@ -86,29 +86,29 @@
 
                 <!-- Description -->
                 <div>
-                  <label for="description" class="block text-responsive-sm font-medium text-neutral-700 mb-2">
+                  <label for="description" class="block text-responsive-sm font-medium text-body-emphasis mb-2">
                     Description
                   </label>
                   <textarea
                     id="description"
                     v-model="product.description"
                     rows="4"
-                    class="w-full px-4 py-3 text-neutral-900 bg-white border border-neutral-200 rounded-xl shadow-sm placeholder:text-neutral-400 transition-all duration-200 focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                    class="w-full px-4 py-3 text-heading bg-white border border-neutral-200 rounded-xl shadow-sm placeholder:text-placeholder transition-all duration-200 focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                     :class="{ 'border-red-300 bg-red-50 focus:ring-red-500 focus:border-red-500': errors.description }"
                     placeholder="Décrivez votre produit..."
                   />
-                  <p v-if="errors.description" class="mt-2 text-responsive-sm text-red-600">{{ errors.description }}</p>
+                  <p v-if="errors.description" class="mt-2 text-responsive-sm text-error">{{ errors.description }}</p>
                 </div>
 
                 <!-- Category -->
                 <div>
-                  <label for="category" class="block text-responsive-sm font-medium text-neutral-700 mb-2">
+                  <label for="category" class="block text-responsive-sm font-medium text-body-emphasis mb-2">
                     Catégorie <span class="text-red-500">*</span>
                   </label>
                   <select
                     id="category"
                     v-model="product.category_id"
-                    class="w-full px-4 py-3 text-neutral-900 bg-white border border-neutral-200 rounded-xl shadow-sm transition-all duration-200 focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                    class="w-full px-4 py-3 text-heading bg-white border border-neutral-200 rounded-xl shadow-sm transition-all duration-200 focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                     :class="{ 'border-red-300 bg-red-50 focus:ring-red-500 focus:border-red-500': errors.category_id }"
                     required
                   >
@@ -117,21 +117,21 @@
                       {{ category.name }}
                     </option>
                   </select>
-                  <p v-if="errors.category_id" class="mt-2 text-responsive-sm text-red-600">{{ errors.category_id }}</p>
+                  <p v-if="errors.category_id" class="mt-2 text-responsive-sm text-error">{{ errors.category_id }}</p>
                 </div>
               </div>
             </Card>
 
             <Card>
               <template #header>
-                <h3 class="text-responsive-xl font-semibold text-neutral-900">Prix et disponibilité</h3>
+                <h3 class="text-responsive-xl font-semibold text-heading">Prix et disponibilité</h3>
               </template>
 
               <div class="space-y-6">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <!-- Original Price -->
                   <div>
-                    <label for="original_price" class="block text-responsive-sm font-medium text-neutral-700 mb-2">
+                    <label for="original_price" class="block text-responsive-sm font-medium text-body-emphasis mb-2">
                       Prix original (XOF) <span class="text-red-500">*</span>
                     </label>
                     <Input
@@ -148,7 +148,7 @@
 
                   <!-- Discounted Price -->
                   <div>
-                    <label for="discounted_price" class="block text-responsive-sm font-medium text-neutral-700 mb-2">
+                    <label for="discounted_price" class="block text-responsive-sm font-medium text-body-emphasis mb-2">
                       Prix réduit (XOF) <span class="text-red-500">*</span>
                     </label>
                     <Input
@@ -166,7 +166,7 @@
 
                 <!-- Quantity -->
                 <div>
-                  <label for="quantity_available" class="block text-responsive-sm font-medium text-neutral-700 mb-2">
+                  <label for="quantity_available" class="block text-responsive-sm font-medium text-body-emphasis mb-2">
                     Quantité disponible <span class="text-red-500">*</span>
                   </label>
                   <Input
@@ -182,7 +182,7 @@
 
                 <!-- Expiry Date -->
                 <div>
-                  <label for="expires_at" class="block text-responsive-sm font-medium text-neutral-700 mb-2">
+                  <label for="expires_at" class="block text-responsive-sm font-medium text-body-emphasis mb-2">
                     Date d'expiration
                   </label>
                   <Input
@@ -197,7 +197,7 @@
 
             <Card>
               <template #header>
-                <h3 class="text-responsive-xl font-semibold text-neutral-900">Image du produit</h3>
+                <h3 class="text-responsive-xl font-semibold text-heading">Image du produit</h3>
               </template>
 
               <div class="space-y-4">
@@ -215,12 +215,12 @@
                 </div>
 
                 <!-- Image Upload -->
-                <div class="border-2 border-dashed border-neutral-300 rounded-xl p-6 text-center hover:transition-colors">
+                <div class="border-2 border-dashed border-neutral-300 rounded-xl p-6 text-left sm:text-center hover:transition-colors">
                   <input
                     ref="imageInput"
                     type="file"
                     accept="image/*"
-                    class="hidden"
+                    class="hidden sm:block"
                     @change="handleImageUpload"
                   >
                   <Button
@@ -231,14 +231,14 @@
                     <CloudUploadIcon class="w-5 h-5 mr-2" />
                     {{ product.image_url ? 'Changer l\'image' : 'Ajouter une image' }}
                   </Button>
-                  <p class="text-responsive-sm text-neutral-500 mt-2">PNG, JPG jusqu'à 2MB</p>
+                  <p class="text-responsive-sm text-muted mt-2">PNG, JPG jusqu'à 2MB</p>
                 </div>
               </div>
             </Card>
 
             <!-- Actions -->
             <Card>
-              <div class="flex flex-col sm:flex-row gap-4 justify-end">
+              <div class="flex flex-col sm:flex-row gap-4 justify-center sm:justify-end">
                 <Button
                   variant="ghost"
                   :disabled="saving"
@@ -262,55 +262,55 @@
           <div class="space-y-6">
             <Card>
               <template #header>
-                <h3 class="text-responsive-lg font-semibold text-neutral-900">Status</h3>
+                <h3 class="text-responsive-lg font-semibold text-heading">Status</h3>
               </template>
 
               <div class="space-y-4">
                 <div class="flex items-center justify-between">
-                  <span class="text-responsive-sm font-medium text-neutral-700">Statut</span>
+                  <span class="text-responsive-sm font-medium text-body-emphasis">Statut</span>
                   <Badge :variant="product.status === 'active' ? 'success' : 'secondary'">
                     {{ product.status === 'active' ? 'Actif' : 'Inactif' }}
                   </Badge>
                 </div>
 
                 <div class="flex items-center justify-between">
-                  <span class="text-responsive-sm font-medium text-neutral-700">Réduction</span>
+                  <span class="text-responsive-sm font-medium text-body-emphasis">Réduction</span>
                   <Badge variant="warning">
                     -{{ Math.round(((product.original_price - product.discounted_price) / product.original_price) * 100) }}%
                   </Badge>
                 </div>
 
                 <div class="flex items-center justify-between">
-                  <span class="text-responsive-sm font-medium text-neutral-700">Créé le</span>
-                  <span class="text-responsive-sm text-neutral-500">{{ formatDate(product.created_at) }}</span>
+                  <span class="text-responsive-sm font-medium text-body-emphasis">Créé le</span>
+                  <span class="text-responsive-sm text-muted">{{ formatDate(product.created_at) }}</span>
                 </div>
 
                 <div class="flex items-center justify-between">
-                  <span class="text-responsive-sm font-medium text-neutral-700">Modifié le</span>
-                  <span class="text-responsive-sm text-neutral-500">{{ formatDate(product.updated_at) }}</span>
+                  <span class="text-responsive-sm font-medium text-body-emphasis">Modifié le</span>
+                  <span class="text-responsive-sm text-muted">{{ formatDate(product.updated_at) }}</span>
                 </div>
               </div>
             </Card>
 
             <Card>
               <template #header>
-                <h3 class="text-responsive-lg font-semibold text-neutral-900">Statistiques</h3>
+                <h3 class="text-responsive-lg font-semibold text-heading">Statistiques</h3>
               </template>
 
               <div class="space-y-4">
                 <div class="flex items-center justify-between">
-                  <span class="text-responsive-sm font-medium text-neutral-700">Vues</span>
-                  <span class="text-responsive-sm font-semibold text-neutral-900">{{ product.views || 0 }}</span>
+                  <span class="text-responsive-sm font-medium text-body-emphasis">Vues</span>
+                  <span class="text-responsive-sm font-semibold text-heading">{{ product.views || 0 }}</span>
                 </div>
 
                 <div class="flex items-center justify-between">
-                  <span class="text-responsive-sm font-medium text-neutral-700">Réservations</span>
-                  <span class="text-responsive-sm font-semibold text-neutral-900">{{ product.reservations_count || 0 }}</span>
+                  <span class="text-responsive-sm font-medium text-body-emphasis">Réservations</span>
+                  <span class="text-responsive-sm font-semibold text-heading">{{ product.reservations_count || 0 }}</span>
                 </div>
 
                 <div class="flex items-center justify-between">
-                  <span class="text-responsive-sm font-medium text-neutral-700">Revenus</span>
-                  <span class="text-responsive-sm font-semibold text-primary-600">
+                  <span class="text-responsive-sm font-medium text-body-emphasis">Revenus</span>
+                  <span class="text-responsive-sm font-semibold text-primary">
                     {{ formatPrice((product.reservations_count || 0) * product.discounted_price) }}
                   </span>
                 </div>
@@ -393,7 +393,7 @@ const loadCategories = async () => {
       { id: 3, name: 'Fruits & Légumes' }
     ]
   } catch (err) {
-    console.error('Error loading categories:', err)
+    // console.error('Error loading categories:', err)
   }
 }
 

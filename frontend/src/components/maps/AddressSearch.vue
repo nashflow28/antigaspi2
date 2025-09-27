@@ -20,19 +20,19 @@
         >
 
         <!-- Search Icon -->
-        <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-          <Search class="w-5 h-5 text-neutral-400" />
+        <div class="relative sm:absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+          <Search class="w-5 h-5 text-placeholder" />
         </div>
 
         <!-- Loading/Clear Button -->
-        <div class="absolute inset-y-0 right-0 pr-4 flex items-center">
+        <div class="relative sm:absolute inset-y-0 right-0 pr-4 flex items-center">
           <button
             v-if="searchQuery && !loading"
             class="p-1 hover:transition-colors"
             type="button"
             @click="clearSearch"
           >
-            <X class="w-5 h-5 text-neutral-400" />
+            <X class="w-5 h-5 text-placeholder" />
           </button>
           <div v-else-if="loading" class="p-1">
             <div class="animate-spin w-5 h-5 border-2 border-primary-500 border-t-transparent rounded-full" />
@@ -44,19 +44,19 @@
       <Transition name="dropdown">
         <div
           v-if="showResults && (results.length > 0 || loading || error)"
-          class="absolute top-full left-0 right-0 mt-2 bg-white border border-neutral-200 rounded-xl shadow-lg z-50 max-h-60 overflow-y-auto"
+          class="relative sm:absolute top-full left-0 right-0 mt-2 bg-white border border-neutral-200 rounded-xl shadow-lg z-50 max-h-60 overflow-y-auto"
         >
           <!-- Loading State -->
-          <div v-if="loading" class="p-4 text-center text-neutral-500">
-            <div class="flex items-center justify-center space-x-2">
+          <div v-if="loading" class="p-4 text-left sm:text-center text-muted">
+            <div class="flex items-center justify-center space-y-2 sm:space-y-0 sm:space-x-2">
               <div class="animate-spin w-5 h-5 border-2 border-primary-500 border-t-transparent rounded-full" />
               <span class="text-responsive-sm">Recherche en cours...</span>
             </div>
           </div>
 
           <!-- Error State -->
-          <div v-else-if="error" class="p-4 text-center text-red-500">
-            <div class="flex items-center justify-center space-x-2">
+          <div v-else-if="error" class="p-4 text-left sm:text-center text-red-500">
+            <div class="flex items-center justify-center space-y-2 sm:space-y-0 sm:space-x-2">
               <AlertCircle class="w-5 h-5" />
               <span class="text-responsive-sm">{{ error }}</span>
             </div>
@@ -74,20 +74,20 @@
               type="button"
               @click="selectResult(result)"
             >
-              <div class="flex items-start space-x-3">
-                <MapPin class="w-5 h-5 text-neutral-400 mt-1 flex-shrink-0" />
+              <div class="flex items-stretch sm:items-start space-y-3 sm:space-y-0 sm:space-x-3">
+                <MapPin class="w-5 h-5 text-placeholder mt-1 flex-shrink-0" />
                 <div class="flex-1 min-w-0">
-                  <div class="font-medium text-neutral-900 truncate">
+                  <div class="font-medium text-heading truncate">
                     {{ result.display_name || result.formatted_address }}
                   </div>
-                  <div v-if="result.address" class="text-responsive-sm text-neutral-500 truncate">
+                  <div v-if="result.address" class="text-responsive-sm text-muted truncate">
                     {{ formatAddress(result.address) }}
                   </div>
-                  <div class="flex items-center space-x-2 mt-1">
-                    <span class="text-responsive-xs text-neutral-400">
+                  <div class="flex items-center space-y-2 sm:space-y-0 sm:space-x-2 mt-1">
+                    <span class="text-responsive-xs text-placeholder">
                       {{ result.type || 'Adresse' }}
                     </span>
-                    <span v-if="result.distance" class="text-responsive-xs text-primary-600">
+                    <span v-if="result.distance" class="text-responsive-xs text-primary">
                       {{ formatDistance(result.distance) }}
                     </span>
                   </div>
@@ -97,8 +97,8 @@
           </div>
 
           <!-- No Results -->
-          <div v-else class="p-4 text-center text-neutral-500">
-            <div class="flex items-center justify-center space-x-2">
+          <div v-else class="p-4 text-left sm:text-center text-muted">
+            <div class="flex items-center justify-center space-y-2 sm:space-y-0 sm:space-x-2">
               <MapPin class="w-5 h-5" />
               <span class="text-responsive-sm">Aucun résultat trouvé</span>
             </div>
@@ -109,14 +109,14 @@
 
     <!-- Selected Location Display -->
     <div v-if="selectedLocation" class="mt-3 p-3 bg-primary-50 border border-primary-200 rounded-lg">
-      <div class="flex items-start justify-between">
-        <div class="flex items-start space-x-2">
-          <MapPin class="w-5 h-5 text-primary-600 mt-0.5" />
+      <div class="flex items-stretch sm:items-start justify-start sm:justify-between">
+        <div class="flex items-stretch sm:items-start space-y-2 sm:space-y-0 sm:space-x-2">
+          <MapPin class="w-5 h-5 text-primary mt-0.5" />
           <div>
             <div class="font-medium text-primary-900 text-responsive-sm">
               {{ selectedLocation.display_name || selectedLocation.formatted_address }}
             </div>
-            <div class="text-responsive-xs text-primary-600 mt-1">
+            <div class="text-responsive-xs text-primary mt-1">
               {{ selectedLocation.lat.toFixed(6) }}, {{ selectedLocation.lng.toFixed(6) }}
             </div>
           </div>
@@ -183,7 +183,7 @@ const emit = defineEmits<{
 
 const { position, getCurrentPosition } = useGeolocation()
 
-const searchInput = ref<HTMLInputElement>()
+const searchInput = ref<HTMLElement>()
 const searchQuery = ref('')
 const results = ref<SearchResult[]>([])
 const selectedLocation = ref<SearchResult | null>(null)
@@ -257,7 +257,7 @@ const debouncedSearch = debounce(async (query: string) => {
 
     results.value = searchResults
   } catch (err) {
-    console.error('Search error:', err)
+    // console.error('Search error:', err)
     error.value = err instanceof Error ? err.message : 'Erreur de recherche'
     emit('error', error.value)
   } finally {

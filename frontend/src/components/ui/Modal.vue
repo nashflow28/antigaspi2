@@ -7,7 +7,7 @@
         @click.self="onOverlayClick"
       >
         <div
-          class="modal-overlay absolute inset-0 bg-overlay"
+          class="modal-overlay relative sm:absolute inset-0 bg-overlay"
           aria-hidden="true"
           @click="onOverlayClick"
         />
@@ -20,15 +20,15 @@
           :class="['modal-panel', modalClass]"
           v-bind="otherAttrs"
         >
-          <header v-if="title || showCloseButton" class="flex items-start justify-between gap-4 px-6 py-5">
+          <header v-if="title || showCloseButton" class="flex items-stretch sm:items-start justify-start sm:justify-between gap-4 px-6 py-5">
             <div class="space-y-2">
-              <h2 v-if="title" :id="modalTitleId" class="text-h2 font-semibold text-primary-700 dark:text-primary-200">
+              <h2 v-if="title" :id="modalTitleId" class="text-h2 font-semibold text-primary-emphasis dark:text-primary-200">
                 {{ title }}
               </h2>
               <p
                 v-if="description"
                 :id="modalDescriptionId"
-                class="text-small text-neutral-500 dark:text-neutral-300"
+                class="text-small text-muted dark:text-neutral-300"
               >
                 {{ description }}
               </p>
@@ -120,9 +120,9 @@ const sizeClasses: Record<ModalSize, string> = {
 
 const variantClasses: Record<ModalVariant, string> = {
   surface:
-    'bg-white text-neutral-800 border border-neutral-200 shadow-card dark:bg-neutral-900 dark:text-neutral-50 dark:border-neutral-800',
+    'bg-white text-heading-secondary border border-neutral-200 shadow-card dark:bg-neutral-900 dark:text-neutral-50 dark:border-neutral-800',
   glass:
-    'bg-white/90 text-neutral-800 border border-primary-500/15 shadow-glow backdrop-blur-xl dark:bg-neutral-900/80 dark:text-neutral-50',
+    'bg-white/90 text-heading-secondary border border-primary-500/15 shadow-glow backdrop-blur-xl dark:bg-neutral-900/80 dark:text-neutral-50',
   dark: 'bg-neutral-900 text-neutral-50 border border-neutral-700 shadow-glow'
 }
 

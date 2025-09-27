@@ -190,7 +190,7 @@ const closeButtonClasses = computed(() => [
   'absolute top-4 right-4 z-10',
   'flex items-center justify-center',
   'w-8 h-8 rounded-full',
-  'text-neutral-400 hover:text-neutral-600',
+  'text-placeholder hover:text-body',
   'hover:bg-neutral-100 transition-colors',
   'focus:outline-none focus:ring-2 focus:ring-primary-500/50'
 ].join(' '))
@@ -201,12 +201,12 @@ const headerClasses = computed(() => [
 ].join(' '))
 
 const titleClasses = computed(() => [
-  'text-xl font-semibold text-neutral-900',
+  'text-xl font-semibold text-heading',
   'mb-1'
 ].join(' '))
 
 const descriptionClasses = computed(() => [
-  'text-sm text-neutral-600'
+  'text-sm text-body'
 ].join(' '))
 
 const contentClasses = computed(() => [

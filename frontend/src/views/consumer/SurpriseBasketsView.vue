@@ -1,20 +1,20 @@
 <template>
   <div class="min-h-screen bg-gradient-to-br from-neutral-50 to-neutral-100">
     <header class="border-b border-neutral-200 bg-white/80 backdrop-blur-sm">
-      <div class="container mx-auto px-4 py-8">
-        <div class="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
+      <div class="container px-4 sm:px-6 lg:px-8 mx-auto px-4 py-6 sm:py-8">
+        <div class="flex flex-col gap-4 sm:gap-6 lg:flex-row lg:items-center lg:justify-between">
           <div>
-            <nav class="text-responsive-sm text-neutral-500" aria-label="Fil d'Ariane">
+            <nav class="text-responsive-sm text-muted" aria-label="Fil d'Ariane">
               <ol class="flex items-center gap-2">
                 <li>
-                  <router-link to="/" class="hover:text-neutral-700">Accueil</router-link>
+                  <router-link to="/" class="hover:text-body-emphasis">Accueil</router-link>
                 </li>
-                <li class="text-neutral-400">/</li>
-                <li class="font-medium text-neutral-700">Paniers surprise</li>
+                <li class="text-placeholder">/</li>
+                <li class="font-medium text-body-emphasis">Paniers surprise</li>
               </ol>
             </nav>
-            <h1 class="mt-4 text-responsive-xl font-semibold text-neutral-900">Paniers surprise disponibles</h1>
-            <p class="mt-2 text-neutral-600">
+            <h1 class="mt-4 text-responsive-xl font-semibold text-heading">Paniers surprise disponibles</h1>
+            <p class="mt-2 text-body">
               {{ totalResults }} panier{{ totalResults > 1 ? 's' : '' }} disponible{{ totalResults > 1 ? 's' : '' }} près de chez vous
             </p>
           </div>
@@ -45,8 +45,8 @@
             >
               <Package class="h-10 w-10 text-primary-500" />
               <div>
-                <p class="text-responsive-xs uppercase tracking-wide text-neutral-500">Impact</p>
-                <p class="text-responsive-sm font-semibold text-neutral-900">{{ totalResults }} commerçant{{ totalResults > 1 ? 's' : '' }}</p>
+                <p class="text-responsive-xs uppercase tracking-wide text-muted">Impact</p>
+                <p class="text-responsive-sm font-semibold text-heading">{{ totalResults }} commerçant{{ totalResults > 1 ? 's' : '' }}</p>
               </div>
             </Card>
           </div>
@@ -54,7 +54,7 @@
       </div>
     </header>
 
-    <main id="main-content" class="container mx-auto grid grid-cols-1 gap-8 px-4 py-10 lg:grid-cols-[320px_1fr]">
+    <main id="main-content" class="container px-4 sm:px-6 lg:px-8 mx-auto grid grid-cols-1 gap-6 sm:gap-8 px-4 py-10 lg:grid-cols-[320px_1fr]">
       <div v-if="showFilters" class="space-y-6">
         <SurpriseBasketFilters v-model="filters" :categories="availableCategories" @reset="handleFiltersReset" />
       </div>
@@ -64,7 +64,7 @@
           v-if="loading"
           class="flex min-h-[200px] items-center justify-center rounded-2xl border border-dashed border-neutral-200 bg-white"
         >
-          <div class="flex items-center gap-3 text-neutral-600">
+          <div class="flex items-center gap-3 text-body">
             <span class="inline-flex h-10 w-10 animate-spin rounded-full border-2 border-neutral-200 border-t-primary-500" />
             Chargement des paniers surprise...
           </div>
@@ -73,13 +73,13 @@
         <Card
           v-else-if="surpriseBaskets.length === 0"
           :no-padding="true"
-          class="flex flex-col items-center gap-3 px-8 py-16 text-center"
+          class="flex flex-col items-center gap-3 px-4 sm:px-6 lg:px-8 py-12 sm:py-14 lg:py-16 text-left sm:text-center"
         >
           <div class="flex h-16 w-16 items-center justify-center rounded-full bg-neutral-100">
-            <Package class="h-10 w-10 text-neutral-400" />
+            <Package class="h-10 w-10 text-placeholder" />
           </div>
-          <h2 class="text-responsive-xl font-semibold text-neutral-800">Aucun panier ne correspond à vos filtres</h2>
-          <p class="mt-2 text-neutral-500">
+          <h2 class="text-responsive-xl font-semibold text-heading-secondary">Aucun panier ne correspond à vos filtres</h2>
+          <p class="mt-2 text-muted">
             Ajustez vos critères pour découvrir d'autres paniers surprise disponibles.
           </p>
           <Button
@@ -94,7 +94,7 @@
 
         <div
           v-else
-          class="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3"
+          class="grid grid-cols-1 gap-4 sm:gap-6 md:grid-cols-2 xl:grid-cols-1 sm:grid-cols-2 lg:grid-cols-3"
         >
           <SurpriseBasketCard
             v-for="basket in surpriseBaskets"
@@ -108,7 +108,7 @@
         <Card
           v-if="pagination.lastPage > 1"
           :no-padding="true"
-          class="flex items-center justify-between gap-4 rounded-2xl border border-neutral-200 bg-white px-4 py-3 text-responsive-sm text-neutral-600"
+          class="flex items-center justify-between gap-4 rounded-2xl border border-neutral-200 bg-white px-4 py-3 text-responsive-sm text-body"
         >
           <Button
             type="button"

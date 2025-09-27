@@ -84,9 +84,9 @@ const wrapperClasses = computed(() => [
 
 const colorClasses = computed(() => {
   const variants = {
-    default: 'text-neutral-600',
-    primary: 'text-primary-600',
-    muted: 'text-neutral-400'
+    default: 'text-body',
+    primary: 'text-primary',
+    muted: 'text-placeholder'
   }
   return variants[props.variant]
 })

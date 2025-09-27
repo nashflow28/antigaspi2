@@ -2,11 +2,11 @@
   <div class="min-h-screen bg-gradient-to-br from-neutral-50 to-neutral-100">
     <!-- Header -->
     <div class="bg-white/80 backdrop-blur-sm border-b border-neutral-200 sticky top-0 z-10">
-      <div class="container mx-auto px-4 py-6">
-        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+      <div class="container px-4 sm:px-6 lg:px-8 mx-auto px-4 py-6">
+        <div class="flex flex-col lg:flex-row lg:items-center justify-start sm:justify-between gap-4">
           <div>
-            <h1 class="text-responsive-xl font-semibold text-neutral-900">Carte des commerçants</h1>
-            <p class="text-neutral-600 mt-1">
+            <h1 class="text-responsive-xl font-semibold text-heading">Carte des commerçants</h1>
+            <p class="text-body mt-1">
               {{ merchantsLoading ? 'Chargement...' : `${merchantsWithLocation.length} commerçant${merchantsWithLocation.length > 1 ? 's' : ''} référencé${merchantsWithLocation.length > 1 ? 's' : ''}` }}
             </p>
           </div>
@@ -15,7 +15,7 @@
           <div class="flex flex-col sm:flex-row gap-3">
             <button
               :disabled="geoLoading"
-              class="inline-flex items-center px-4 py-3 text-responsive-sm font-medium text-neutral-700 bg-white border border-neutral-300 rounded-lg hover:transition-colors"
+              class="inline-flex items-center px-4 py-3 text-responsive-sm font-medium text-body-emphasis bg-white border border-neutral-300 rounded-lg hover:transition-colors"
               @click="getCurrentLocation"
             >
               <MapPin class="w-5 h-5 mr-2" :class="{ 'animate-pulse': geoLoading }" />
@@ -35,21 +35,21 @@
     </div>
 
     <!-- Map Container -->
-    <div class="container mx-auto px-4 py-8">
+    <div class="container px-4 sm:px-6 lg:px-8 mx-auto px-4 py-6 sm:py-8">
       <div class="bg-white rounded-2xl shadow-lg p-6">
         <div
           ref="mapContainer"
-          class="w-full rounded-lg border border-neutral-300 map-container"
+          class="w-full rounded-lg border border-neutral-300 map-container px-4 sm:px-6 lg:px-8"
           style="height: 600px;"
         >
           <!-- Map will be loaded here -->
         </div>
 
         <!-- Loading overlay -->
-        <div v-if="merchantsLoading" class="absolute inset-6 bg-white/80 rounded-lg flex items-center justify-center">
-          <div class="text-center">
+        <div v-if="merchantsLoading" class="relative sm:absolute inset-6 bg-white/80 rounded-lg flex items-center justify-center">
+          <div class="text-left sm:text-center">
             <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4" />
-            <p class="text-neutral-600">Chargement des commerçants...</p>
+            <p class="text-body">Chargement des commerçants...</p>
           </div>
         </div>
       </div>
@@ -66,57 +66,57 @@
       <!-- Modal -->
       <div class="flex min-h-full items-center justify-center p-4">
         <div
-          class="relative w-full max-w-lg bg-white rounded-2xl shadow-xl transform transition-all"
+          class="relative w-full max-w-full sm:max-w-lg bg-white rounded-2xl shadow-xl transform transition-all"
           @click.stop
         >
           <!-- Header -->
           <div class="px-6 py-4 border-b border-neutral-200">
-            <div class="flex items-center justify-between">
-              <h3 class="text-responsive-lg font-semibold text-neutral-900">{{ selectedMerchant.business_name }}</h3>
+            <div class="flex items-center justify-start sm:justify-between">
+              <h3 class="text-responsive-lg font-semibold text-heading">{{ selectedMerchant.business_name }}</h3>
               <button
                 class="p-2 hover:transition-colors"
                 @click="selectedMerchant = null"
               >
-                <X class="w-5 h-5 text-neutral-400" />
+                <X class="w-5 h-5 text-placeholder" />
               </button>
             </div>
           </div>
 
           <!-- Content -->
           <div class="px-6 py-6 space-y-4">
-            <div class="flex items-center space-x-3 text-neutral-600">
+            <div class="flex items-center space-y-3 sm:space-y-0 sm:space-x-3 text-body">
               <Building class="w-5 h-5" />
               <span>{{ selectedMerchant.business_type }}</span>
             </div>
 
-            <div class="flex items-center space-x-3 text-neutral-600">
+            <div class="flex items-center space-y-3 sm:space-y-0 sm:space-x-3 text-body">
               <MapPin class="w-5 h-5" />
               <span>{{ selectedMerchant.user?.address || selectedMerchant.user?.city || selectedMerchant.city }}</span>
             </div>
 
-            <div v-if="selectedMerchant.distance_km" class="flex items-center space-x-3 text-neutral-600">
+            <div v-if="selectedMerchant.distance_km" class="flex items-center space-y-3 sm:space-y-0 sm:space-x-3 text-body">
               <Navigation class="w-5 h-5" />
               <span>{{ selectedMerchant.distance_km.toFixed(1) }} km de votre position</span>
             </div>
 
-            <div class="flex items-center space-x-3 text-neutral-600">
+            <div class="flex items-center space-y-3 sm:space-y-0 sm:space-x-3 text-body">
               <Phone class="w-5 h-5" />
               <span>{{ selectedMerchant.user?.phone || 'Non renseigné' }}</span>
             </div>
 
             <div class="bg-green-50 rounded-lg p-4">
-              <div class="flex items-center space-x-2 text-green-700 mb-2">
+              <div class="flex items-center space-y-2 sm:space-y-0 sm:space-x-2 text-green-700 mb-2">
                 <Package class="w-5 h-5" />
                 <span class="font-medium">{{ selectedMerchant.products_count ?? 0 }} produit(s) disponible(s)</span>
               </div>
-              <p class="text-green-600 text-responsive-sm">
+              <p class="text-success text-responsive-sm">
                 Commerçant vérifié ✓
               </p>
             </div>
           </div>
 
           <!-- Actions -->
-          <div class="px-6 py-4 border-t border-neutral-200 flex justify-end space-x-3">
+          <div class="px-6 py-4 border-t border-neutral-200 flex justify-center sm:justify-end space-y-3 sm:space-y-0 sm:space-x-3">
             <button
               class="px-6 py-3 bg-primary-600 text-white rounded-lg hover:transition-colors"
               @click="viewMerchantProducts"
@@ -206,10 +206,10 @@ const addMerchantMarkers = async () => {
       // Add popup with merchant info
       const popup = L.popup().setContent(`
         <div class="p-3">
-          <h4 class="font-semibold text-neutral-900 mb-2">${merchant.business_name}</h4>
-          <p class="text-responsive-sm text-neutral-600 mb-1">${merchant.business_type}</p>
-          <p class="text-responsive-sm text-neutral-600 mb-2">${merchant.products_count} produit(s) disponible(s)</p>
-          <div class="mt-3 text-center">
+          <h4 class="font-semibold text-heading mb-2">${merchant.business_name}</h4>
+          <p class="text-responsive-sm text-body mb-1">${merchant.business_type}</p>
+          <p class="text-responsive-sm text-body mb-2">${merchant.products_count} produit(s) disponible(s)</p>
+          <div class="mt-3 text-left sm:text-center">
             <button id="details-btn-${merchant.id}" class="bg-blue-600 text-white px-4 py-3 rounded-lg text-responsive-sm hover:transition-colors">
               Voir les détails
             </button>

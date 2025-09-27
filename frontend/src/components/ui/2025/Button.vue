@@ -126,7 +126,7 @@ const variantClasses = computed(() => {
     ].join(' '),
 
     secondary: [
-      'bg-white text-neutral-700',
+      'bg-white text-body-emphasis',
       'border border-neutral-300',
       'hover:bg-neutral-50 hover:border-neutral-400',
       'focus:ring-neutral-500',
@@ -135,16 +135,16 @@ const variantClasses = computed(() => {
     ].join(' '),
 
     ghost: [
-      'text-neutral-600 bg-transparent',
-      'hover:text-neutral-900 hover:bg-neutral-100',
+      'text-body bg-transparent',
+      'hover:text-heading hover:bg-neutral-100',
       'focus:ring-neutral-500',
       'active:bg-neutral-200'
     ].join(' '),
 
     outline: [
-      'bg-transparent text-primary-600',
+      'bg-transparent text-primary',
       'border border-primary-600',
-      'hover:bg-primary-50 hover:text-primary-700',
+      'hover:bg-primary-50 hover:text-primary-emphasis',
       'focus:ring-primary-500',
       'active:bg-primary-100'
     ].join(' '),

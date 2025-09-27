@@ -23,7 +23,7 @@ const SANITIZATION_CONFIGS = {
     ALLOWED_TAGS: ['b', 'i', 'u', 'strong', 'em', 'span'],
     ALLOWED_ATTR: ['class'],
     ALLOWED_CLASSES: {
-      'span': ['text-green-600', 'text-yellow-600', 'text-blue-600', 'text-red-600', 'inline-block', 'w-2', 'h-2', 'bg-primary-600', 'rounded-full', 'mr-2', 'mt-1.5', 'flex-shrink-0']
+      'span': ['text-success', 'text-warning', 'text-info', 'text-error', 'inline-block', 'w-2', 'h-2', 'bg-primary-600', 'rounded-full', 'mr-2', 'mt-1.5', 'flex-shrink-0']
     }
   },
 
@@ -32,7 +32,7 @@ const SANITIZATION_CONFIGS = {
     ALLOWED_TAGS: ['span'],
     ALLOWED_ATTR: ['class'],
     ALLOWED_CLASSES: {
-      'span': ['inline-block', 'w-2', 'h-2', 'bg-primary-600', 'rounded-full', 'mr-2', 'mt-1.5', 'flex-shrink-0', 'text-green-600', 'text-yellow-600', 'text-blue-600', 'text-red-600']
+      'span': ['inline-block', 'w-2', 'h-2', 'bg-primary-600', 'rounded-full', 'mr-2', 'mt-1.5', 'flex-shrink-0', 'text-success', 'text-warning', 'text-info', 'text-error']
     }
   }
 }
@@ -132,10 +132,10 @@ export function createSafeFormattedLine(line: string): string {
   // Then apply safe formatting replacements
   const formatted = sanitizedLine
     .replace(/^• /, '<span class="inline-block w-2 h-2 bg-primary-600 rounded-full mr-2 mt-1.5 flex-shrink-0"></span>')
-    .replace(/^✅ /, '<span class="text-green-600 mr-2">✅</span>')
-    .replace(/^⚠️ /, '<span class="text-yellow-600 mr-2">⚠️</span>')
-    .replace(/^ℹ️ /, '<span class="text-blue-600 mr-2">ℹ️</span>')
-    .replace(/^❌ /, '<span class="text-red-600 mr-2">❌</span>')
+    .replace(/^✅ /, '<span class="text-success mr-2">✅</span>')
+    .replace(/^⚠️ /, '<span class="text-warning mr-2">⚠️</span>')
+    .replace(/^ℹ️ /, '<span class="text-info mr-2">ℹ️</span>')
+    .replace(/^❌ /, '<span class="text-error mr-2">❌</span>')
 
   // Final sanitization pass with admin modal config
   return sanitizeHtml(formatted, 'ADMIN_MODAL')
@@ -184,7 +184,7 @@ export function logXssAttempt(content: string, context: string): void {
 
     // In production, this should send to security monitoring service
     if (import.meta.env.PROD) {
-      // TODO: Send to security monitoring service
+      // Future: Integrate with security monitoring service
       // securityService.reportXssAttempt({ content, context, timestamp: new Date() })
     }
   }

@@ -8,7 +8,7 @@
       <span>{{ label }}</span>
       <span
         v-if="helperText && !error"
-        class="text-caption text-neutral-400"
+        class="text-caption text-placeholder"
       >
         {{ helperText }}
       </span>
@@ -17,7 +17,7 @@
     <div class="relative">
       <span
         v-if="normalizedLeftIcon"
-        class="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-neutral-400"
+        class="pointer-events-none relative sm:absolute left-4 top-1/2 -translate-y-1/2 text-placeholder"
       >
         <component :is="normalizedLeftIcon" />
       </span>
@@ -38,13 +38,13 @@
 
       <span
         v-if="normalizedRightIcon"
-        class="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-neutral-400"
+        class="pointer-events-none relative sm:absolute right-4 top-1/2 -translate-y-1/2 text-placeholder"
       >
         <component :is="normalizedRightIcon" />
       </span>
 
       <span
-        class="pointer-events-none absolute inset-x-3 bottom-1 h-0.5 rounded-full bg-primary-500 transition-transform duration-200"
+        class="pointer-events-none relative sm:absolute inset-x-3 bottom-1 h-0.5 rounded-full bg-primary-500 transition-transform duration-200"
         :style="focusUnderlineStyle"
         aria-hidden="true"
       />
@@ -72,7 +72,7 @@
     <p
       v-else-if="helperText"
       :id="`${inputId}-helper`"
-      class="text-caption text-neutral-500"
+      class="text-caption text-muted"
     >
       {{ helperText }}
     </p>
@@ -129,7 +129,7 @@ const attrs = useAttrs()
 const isFocused = ref(false)
 
 const baseClasses =
-  'flex w-full rounded-2xl border bg-white/95 px-4 py-3 text-body text-neutral-700 placeholder:text-neutral-400 transition-all duration-200 ease-spring-out focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-300 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-50 disabled:cursor-not-allowed disabled:opacity-60 dark:bg-neutral-900 dark:text-neutral-50 dark:placeholder:text-neutral-400 dark:focus-visible:ring-offset-neutral-900'
+  'flex w-full rounded-2xl border bg-white/95 px-4 py-3 text-body text-body-emphasis placeholder:text-placeholder transition-all duration-200 ease-spring-out focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-300 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-50 disabled:cursor-not-allowed disabled:opacity-60 dark:bg-neutral-900 dark:text-neutral-50 dark:placeholder:text-placeholder dark:focus-visible:ring-offset-neutral-900'
 
 const variantClasses: Record<InputVariant, string> = {
   subtle:
@@ -181,8 +181,8 @@ const normalizedLeftIcon = computed(() => normalizeIcon(props.leftIcon))
 const normalizedRightIcon = computed(() => normalizeIcon(props.rightIcon))
 
 const labelClass = computed(() => [
-  'flex items-center justify-between text-small font-medium text-neutral-600 transition-colors dark:text-neutral-200',
-  isFocused.value && !props.error ? 'text-primary-600' : '',
+  'flex items-center justify-between text-small font-medium text-body transition-colors dark:text-neutral-200',
+  isFocused.value && !props.error ? 'text-primary' : '',
   props.error ? 'text-accent-red' : ''
 ])
 

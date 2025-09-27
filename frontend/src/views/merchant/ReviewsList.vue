@@ -6,19 +6,19 @@
   >
     <!-- Header -->
     <div class="bg-white/80 backdrop-blur-sm border-b border-neutral-200 sticky top-0 z-10">
-      <div class="container mx-auto px-4 py-6">
-        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+      <div class="container px-4 sm:px-6 lg:px-8 mx-auto px-4 py-6">
+        <div class="flex flex-col lg:flex-row lg:items-center justify-start sm:justify-between gap-4">
           <div>
-            <h1 class="text-responsive-xl font-semibold text-neutral-900">Mes Avis</h1>
-            <p class="text-neutral-600 mt-1">
+            <h1 class="text-responsive-xl font-semibold text-heading">Mes Avis</h1>
+            <p class="text-body mt-1">
               Consultez et répondez aux avis de vos clients
             </p>
           </div>
 
-          <div class="flex items-center space-x-3">
+          <div class="flex items-center space-y-3 sm:space-y-0 sm:space-x-3">
             <router-link
               to="/merchant/reviews/dashboard"
-              class="inline-flex items-center px-4 py-3 border border-primary-600 text-primary-600 rounded-lg hover:transition-colors"
+              class="inline-flex items-center px-4 py-3 border border-primary-600 text-primary rounded-lg hover:transition-colors"
             >
               <ChartBarIcon class="w-5 h-5 mr-2" />
               Dashboard
@@ -28,14 +28,14 @@
       </div>
     </div>
 
-    <div class="container mx-auto px-4 py-8">
+    <div class="container px-4 sm:px-6 lg:px-8 mx-auto px-4 py-6 sm:py-8">
       <!-- Filters -->
-      <div class="bg-white rounded-2xl shadow-lg border border-neutral-100 p-6 mb-8">
-        <h3 class="text-responsive-lg font-semibold text-neutral-900 mb-4">Filtres</h3>
+      <div class="bg-white rounded-2xl shadow-lg border border-neutral-100 p-6 mb-6 sm:mb-8">
+        <h3 class="text-responsive-lg font-semibold text-heading mb-4">Filtres</h3>
         <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
           <!-- Rating Filter -->
           <div>
-            <label class="block text-responsive-sm font-medium text-neutral-700 mb-2">Note</label>
+            <label class="block text-responsive-sm font-medium text-body-emphasis mb-2">Note</label>
             <select
               v-model="filters.rating"
               class="w-full border border-neutral-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
@@ -52,7 +52,7 @@
 
           <!-- Product Filter -->
           <div>
-            <label class="block text-responsive-sm font-medium text-neutral-700 mb-2">Produit</label>
+            <label class="block text-responsive-sm font-medium text-body-emphasis mb-2">Produit</label>
             <select
               v-model="filters.product_id"
               class="w-full border border-neutral-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
@@ -71,7 +71,7 @@
 
           <!-- Verified Filter -->
           <div>
-            <label class="block text-responsive-sm font-medium text-neutral-700 mb-2">Type</label>
+            <label class="block text-responsive-sm font-medium text-body-emphasis mb-2">Type</label>
             <select
               v-model="filters.verified_only"
               class="w-full border border-neutral-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
@@ -84,7 +84,7 @@
 
           <!-- Sort Filter -->
           <div>
-            <label class="block text-responsive-sm font-medium text-neutral-700 mb-2">Tri</label>
+            <label class="block text-responsive-sm font-medium text-body-emphasis mb-2">Tri</label>
             <select
               v-model="filters.sort"
               class="w-full border border-neutral-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
@@ -102,15 +102,15 @@
       <!-- Reviews List -->
       <div class="bg-white rounded-2xl shadow-lg border border-neutral-100">
         <div class="px-6 py-4 border-b border-neutral-200">
-          <div class="flex items-center justify-between">
-            <h3 class="text-responsive-xl font-semibold text-neutral-900">
+          <div class="flex items-center justify-start sm:justify-between">
+            <h3 class="text-responsive-xl font-semibold text-heading">
               Avis clients
-              <span v-if="pagination" class="text-neutral-500 font-normal">
+              <span v-if="pagination" class="text-muted font-normal">
                 ({{ pagination.total }} au total)
               </span>
             </h3>
             <button
-              class="inline-flex items-center px-4 py-3 text-responsive-sm text-primary-600 hover:transition-colors"
+              class="inline-flex items-center px-4 py-3 text-responsive-sm text-primary hover:transition-colors"
               :disabled="loading"
               @click="() => loadReviews()"
             >
@@ -122,16 +122,16 @@
 
         <div class="divide-y divide-neutral-200">
           <!-- Loading State -->
-          <div v-if="loading" class="px-6 py-8 text-center">
+          <div v-if="loading" class="px-6 py-6 sm:py-8 text-left sm:text-center">
             <div class="animate-spin rounded-full h-10 w-10 border-b-2 border-primary-600 mx-auto" />
-            <p class="text-neutral-500 mt-2">Chargement des avis...</p>
+            <p class="text-muted mt-2">Chargement des avis...</p>
           </div>
 
           <!-- Empty State -->
-          <div v-else-if="reviews.length === 0" class="px-6 py-8 text-center">
-            <ChatBubbleLeftRightIcon class="w-12 h-12 text-neutral-400 mx-auto mb-4" />
-            <h4 class="text-responsive-lg font-medium text-neutral-900 mb-2">Aucun avis</h4>
-            <p class="text-neutral-600">
+          <div v-else-if="reviews.length === 0" class="px-6 py-6 sm:py-8 text-left sm:text-center">
+            <ChatBubbleLeftRightIcon class="w-12 h-12 text-placeholder mx-auto mb-4" />
+            <h4 class="text-responsive-lg font-medium text-heading mb-2">Aucun avis</h4>
+            <p class="text-body">
               {{ hasActiveFilters ? 'Aucun avis ne correspond à vos critères' : 'Vous n\'avez pas encore reçu d\'avis clients' }}
             </p>
           </div>
@@ -143,7 +143,7 @@
             :key="review.id"
             class="px-6 py-6 hover:transition-colors"
           >
-            <div class="flex space-x-4">
+            <div class="flex space-y-4 sm:space-y-0 sm:space-x-4">
               <!-- User Avatar -->
               <div class="flex-shrink-0">
                 <div class="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
@@ -154,9 +154,9 @@
               </div>
 
               <div class="flex-1 min-w-0">
-                <div class="flex items-center justify-between mb-3">
-                  <div class="flex items-center space-x-3">
-                    <span class="font-medium text-neutral-900">{{ review.user.name }}</span>
+                <div class="flex items-center justify-start sm:justify-between mb-3">
+                  <div class="flex items-center space-y-3 sm:space-y-0 sm:space-x-3">
+                    <span class="font-medium text-heading">{{ review.user.name }}</span>
                     <div class="flex items-center">
                       <StarIcon
                         v-for="star in 5"
@@ -170,18 +170,18 @@
                       Achat vérifié
                     </span>
                   </div>
-                  <span class="text-responsive-sm text-neutral-500">{{ review.time_ago }}</span>
+                  <span class="text-responsive-sm text-muted">{{ review.time_ago }}</span>
                 </div>
 
                 <div v-if="review.title" class="mb-3">
-                  <h4 class="font-medium text-neutral-900">{{ review.title }}</h4>
+                  <h4 class="font-medium text-heading">{{ review.title }}</h4>
                 </div>
 
-                <div v-if="review.comment" class="text-neutral-700 text-responsive-sm leading-relaxed mb-3">
+                <div v-if="review.comment" class="text-body-emphasis text-responsive-sm leading-relaxed mb-3">
                   {{ review.comment }}
                 </div>
 
-                <div v-if="review.product" class="inline-flex items-center text-responsive-xs text-blue-600 bg-blue-50 rounded-full px-4 py-3 mb-4">
+                <div v-if="review.product" class="inline-flex items-center text-responsive-xs text-info bg-blue-50 rounded-full px-4 py-3 mb-4">
                   <ArchiveBoxIcon class="w-3 h-3 mr-1" />
                   {{ review.product.name }}
                 </div>
@@ -200,12 +200,12 @@
 
         <!-- Pagination -->
         <div v-if="pagination && pagination.last_page > 1" class="px-6 py-4 border-t border-neutral-200">
-          <div class="flex items-center justify-between">
-            <div class="text-responsive-sm text-neutral-500">
+          <div class="flex items-center justify-start sm:justify-between">
+            <div class="text-responsive-sm text-muted">
               Page {{ pagination.current_page }} sur {{ pagination.last_page }}
               ({{ pagination.total }} avis au total)
             </div>
-            <div class="flex space-x-2">
+            <div class="flex space-y-2 sm:space-y-0 sm:space-x-2">
               <button
                 :disabled="pagination.current_page <= 1"
                 class="px-4 py-3 text-responsive-sm border border-neutral-300 rounded disabled:opacity-50 disabled:cursor-not-allowed hover:bg-neutral-50"
@@ -317,7 +317,7 @@ const loadProducts = async () => {
       products.value = data.data
     }
   } catch (err) {
-    console.error('Error loading products:', err)
+    // console.error('Error loading products:', err)
   }
 }
 
@@ -358,7 +358,7 @@ const loadReviews = async (page: number = 1) => {
       throw new Error(data.message || 'Erreur lors du chargement')
     }
   } catch (err) {
-    console.error('Error loading reviews:', err)
+    // console.error('Error loading reviews:', err)
     error.value = err instanceof Error ? err.message : 'Erreur inconnue'
   } finally {
     loading.value = false

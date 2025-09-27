@@ -21,7 +21,7 @@
     <div v-if="$slots.footer || showDefaultActions" :class="footerClasses">
       <slot name="footer" :loading="loading" :errors="errors">
         <!-- Default Actions -->
-        <div v-if="showDefaultActions" class="flex items-center justify-end space-x-3">
+        <div v-if="showDefaultActions" class="flex items-center justify-center sm:justify-end space-y-3 sm:space-y-0 sm:space-x-3">
           <Button
             v-if="showCancelButton"
             type="button"
@@ -147,11 +147,11 @@ const headerClasses = computed(() => [
 ].filter(Boolean).join(' '))
 
 const titleClasses = computed(() => [
-  'text-xl font-semibold text-neutral-900 mb-2'
+  'text-xl font-semibold text-heading mb-2'
 ].join(' '))
 
 const descriptionClasses = computed(() => [
-  'text-sm text-neutral-600'
+  'text-sm text-body'
 ].join(' '))
 
 const contentClasses = computed(() => [
@@ -164,7 +164,7 @@ const footerClasses = computed(() => [
 ].filter(Boolean).join(' '))
 
 const globalErrorClasses = computed(() => [
-  'mt-4 p-3 bg-red-50 border border-red-200 rounded-md text-sm text-red-600'
+  'mt-4 p-3 bg-red-50 border border-red-200 rounded-md text-sm text-error'
 ].join(' '))
 
 // Methods
