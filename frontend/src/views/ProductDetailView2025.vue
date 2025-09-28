@@ -405,25 +405,25 @@ const statusLabel = computed(() => {
 })
 
 // Methods
-const formatPrice = (price) => {
+const formatPrice = (price: number) => {
   return new Intl.NumberFormat('fr-FR').format(price)
 }
 
-const formatExpiration = (date) => {
+const formatExpiration = (date: string | Date) => {
   return new Intl.DateTimeFormat('fr-FR', {
     dateStyle: 'medium',
     timeStyle: 'short'
   }).format(new Date(date))
 }
 
-const getCategoryVariant = (categoryName) => {
-  const variants = {
+const getCategoryVariant = (categoryName?: string) => {
+  const variants: Record<string, string> = {
     'Boulangerie': 'warning',
     'Fruits et Légumes': 'success',
     'Produits laitiers': 'info',
     'Viandes': 'error'
   }
-  return variants[categoryName] || 'default'
+  return categoryName ? variants[categoryName] || 'default' : 'default'
 }
 
 const increaseQuantity = () => {
@@ -495,7 +495,7 @@ const addToWishlist = () => {
   })
 }
 
-const shareProduct = (platform) => {
+const shareProduct = (platform: 'facebook' | 'twitter' | 'whatsapp') => {
   logMigration('ProductDetailView', 'Product shared', { platform })
   // Share logic would go here
 }
@@ -509,7 +509,7 @@ const copyLink = async () => {
   }
 }
 
-const navigateToProduct = (productId) => {
+const navigateToProduct = (productId: number) => {
   router.push(`/products/${productId}`)
 }
 
