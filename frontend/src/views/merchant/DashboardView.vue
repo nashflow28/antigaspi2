@@ -4,31 +4,28 @@
     :header="header"
     class="bg-gradient-to-br from-surface-light via-surface-light to-primary-50 dark:from-surface-dark dark:via-surface-darker dark:to-primary-950"
   >
-    <div class="mx-auto w-full max-w-7xl px-3 py-6 sm:px-6 sm:py-8">
-      <!-- Header -->
-      <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h1 class="text-2xl font-semibold text-neutral-900 dark:text-neutral-50">
-            Tableau de bord commerçant
-          </h1>
-          <p class="text-neutral-600 dark:text-neutral-300">
-            Gérez vos produits, vos réservations et vos performances
-          </p>
-        </div>
-        <Button
-          tag="router-link"
-          to="/merchant/products?action=create"
-          variant="primary"
-          size="md"
-          class="shadow-glow"
-        >
-          <PlusIcon class="h-4 w-4" />
-          <span> Nouveau produit </span>
-        </Button>
-      </div>
+    <div class="mx-auto w-full max-w-7xl space-y-8 px-3 py-6 sm:px-6 sm:py-8">
+      <DashboardHeader
+        eyebrow="Commerçant"
+        title="Tableau de bord commerçant"
+        subtitle="Gérez vos produits, vos réservations et vos performances"
+      >
+        <template #actions>
+          <Button
+            tag="router-link"
+            to="/merchant/products?action=create"
+            variant="primary"
+            size="lg"
+            class="gap-2 shadow-glow"
+          >
+            <PlusIcon class="h-5 w-5" />
+            <span>Nouveau produit</span>
+          </Button>
+        </template>
+      </DashboardHeader>
 
       <!-- Statistics Cards -->
-      <StatCardGrid class="mt-8" columns="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 xl:gap-6">
+      <StatCardGrid columns="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 xl:gap-6">
         <StatCard
           v-for="stat in statHighlights"
           :key="stat.id"
@@ -303,7 +300,7 @@ import {
   BellIcon
 } from '@heroicons/vue/24/outline'
 import { Card, Button, Badge } from '@/components/ui/2025'
-import { QuickActionsCard, StatCard, StatCardGrid } from '@/components/dashboard/2025'
+import { DashboardHeader, QuickActionsCard, StatCard, StatCardGrid } from '@/components/dashboard/2025'
 import type { BadgeVariant } from '@/components/ui/2025'
 
 const authStore = useAuthStore()

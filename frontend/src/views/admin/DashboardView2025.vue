@@ -2,152 +2,124 @@
   <DashboardLayout
     :sidebar="sidebar"
     :header="header"
-    class="bg-gradient-to-br from-purple-50 to-indigo-50"
+    class="bg-gradient-to-br from-surface-light via-surface-light to-primary-50 dark:from-surface-dark dark:via-surface-darker dark:to-primary-950"
   >
-    <div class="container p-6">
-      <!-- Header -->
-      <div class="mt-4 sm:mb-3xl">
-        <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3 sm:gap-6">
-          <div>
-            <h1 class="text-xl lg:text-3xl font-semibold text-gray-900 mt-2">
-              Tableau de bord Administrateur
-            </h1>
-            <p class="text-gray-700 text-lg">
-              Supervision globale de la plateforme Antigaspi
-            </p>
-          </div>
+    <div class="mx-auto w-full max-w-7xl space-y-8 px-3 py-6 sm:px-6 sm:py-8">
+      <DashboardHeader
+        eyebrow="Administration"
+        title="Tableau de bord administrateur"
+        subtitle="Supervisez la santé de la plateforme, les performances et l'impact environnemental"
+      >
+        <template #meta>
+          <Select v-model="selectedPeriod" size="sm" class="min-w-[180px]">
+            <option value="today">Aujourd'hui</option>
+            <option value="week">Cette semaine</option>
+            <option value="month">Ce mois</option>
+            <option value="year">Cette année</option>
+          </Select>
+        </template>
+        <template #actions>
+          <Button
+            variant="primary"
+            size="lg"
+            class="gap-2"
+            :loading="isLoading"
+            @click="refreshData"
+          >
+            <ArrowPathIcon class="h-5 w-5" />
+            Actualiser
+          </Button>
+        </template>
+      </DashboardHeader>
 
-          <div class="flex flex-col sm:flex-row gap-3">
-            <select v-model="selectedPeriod" class="w-full select-2025">
-              <option value="today">Aujourd'hui</option>
-              <option value="week">Cette semaine</option>
-              <option value="month">Ce mois</option>
-              <option value="year">Cette année</option>
-            </select>
-
-            <Button
-              variant="primary"
-              class="glow-effect"
-              :disabled="isLoading"
-              @click="refreshData"
-            >
-              <ArrowPathIcon class="h-4 w-4 mr-2" :class="{ 'animate-spin': isLoading }" />
-              Actualiser
-            </Button>
-          </div>
-        </div>
-
-        <!-- Key Metrics -->
-        <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6 mt-8">
-          <Card class="bg-gradient-to-r from-blue-500 to-blue-600 text-white">
-            <div class="flex items-center justify-between">
-              <div>
-                <p class="text-blue-100 text-sm font-medium">Utilisateurs Totaux</p>
-                <p class="text-xl font-semibold">{{ formatNumber(stats.totalUsers) }}</p>
-                <p class="text-blue-200 text-sm mt-1">
-                  +{{ stats.newUsersThisMonth }} ce mois
-                </p>
-              </div>
-              <div class="p-3 bg-white/20 rounded">
-                <UsersIcon class="h-6 w-6" />
-              </div>
-            </div>
-          </Card>
-
-          <Card class="bg-gradient-to-r from-blue-500 to-blue-600 text-white">
-            <div class="flex items-center justify-between">
-              <div>
-                <p class="text-blue-100 text-sm font-medium">Commerçants Actifs</p>
-                <p class="text-xl font-semibold">{{ formatNumber(stats.activeMerchants) }}</p>
-                <p class="text-blue-200 text-sm mt-1">
-                  {{ stats.merchantGrowthRate }}% de croissance
-                </p>
-              </div>
-              <div class="p-3 bg-white/20 rounded">
-                <BuildingStorefrontIcon class="h-6 w-6" />
-              </div>
-            </div>
-          </Card>
-
-          <Card class="bg-gradient-to-r from-blue-500 to-blue-600 text-white">
-            <div class="flex items-center justify-between">
-              <div>
-                <p class="text-secondary-100 text-sm font-medium">Produits Sauvés</p>
-                <p class="text-xl font-semibold">{{ formatNumber(stats.productsSaved) }}</p>
-                <p class="text-secondary-200 text-sm mt-1">
-                  {{ formatNumber(stats.kgFoodSaved) }} kg sauvés
-                </p>
-              </div>
-              <div class="p-3 bg-white/20 rounded">
-                <ShoppingBagIcon class="h-6 w-6" />
-              </div>
-            </div>
-          </Card>
-
-          <Card class="bg-gradient-to-r from-orange-500 to-orange-600 text-white">
-            <div class="flex items-center justify-between">
-              <div>
-                <p class="text-orange-100 text-sm font-medium">Chiffre d'affaires</p>
-                <p class="text-xl font-semibold">{{ formatCurrency(stats.totalRevenue) }}</p>
-                <p class="text-orange-200 text-sm mt-1">
-                  +{{ stats.revenueGrowth }}% vs mois dernier
-                </p>
-              </div>
-              <div class="p-3 bg-white/20 rounded">
-                <div class="text-lg font-semibold">F CFA</div>
-              </div>
-            </div>
-          </Card>
-        </div>
-      </div>
+      <StatCardGrid :columns="'grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4'">
+        <StatCard
+          title="Utilisateurs totaux"
+          :value="formatNumber(stats.totalUsers)"
+          :description="`+${formatNumber(stats.newUsersThisMonth)} ce mois`"
+          :icon="UsersIcon"
+          accent="primary"
+        />
+        <StatCard
+          title="Commerçants actifs"
+          :value="formatNumber(stats.activeMerchants)"
+          :description="`${stats.merchantGrowthRate}% de croissance`"
+          :icon="BuildingStorefrontIcon"
+          accent="success"
+        />
+        <StatCard
+          title="Produits sauvés"
+          :value="formatNumber(stats.productsSaved)"
+          :description="`${formatNumber(stats.kgFoodSaved)} kg sauvés`"
+          :icon="ShoppingBagIcon"
+          accent="info"
+        />
+        <StatCard
+          title="Chiffre d'affaires"
+          :value="formatCurrency(stats.totalRevenue)"
+          :description="`+${stats.revenueGrowth}% vs mois dernier`"
+          :icon="BanknotesIcon"
+          accent="warning"
+          variant="gradient"
+        />
+      </StatCardGrid>
 
       <!-- Charts and Analytics -->
-      <div class="grid grid-cols-1 xl:grid-cols-2 gap-3 sm:gap-6 mt-4 sm:mb-3xl">
+      <div class="grid grid-cols-1 gap-6 xl:grid-cols-2">
         <!-- Revenue Chart -->
-        <Card>
+        <Card variant="glass">
           <template #header>
-            <div class="flex items-center justify-between">
-              <h3 class="text-xl font-semibold text-gray-900">Évolution du chiffre d'affaires</h3>
-              <select v-model="revenueChartPeriod" class="w-full text-sm select-2025">
+            <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <h3 class="text-xl font-semibold text-neutral-900 dark:text-neutral-50">Évolution du chiffre d'affaires</h3>
+                <p class="text-sm text-neutral-500 dark:text-neutral-400">Revenus cumulés sur la période sélectionnée</p>
+              </div>
+              <Select v-model="revenueChartPeriod" size="sm" class="min-w-[160px]">
                 <option value="7d">7 derniers jours</option>
                 <option value="30d">30 derniers jours</option>
                 <option value="90d">90 derniers jours</option>
-              </select>
+              </Select>
             </div>
           </template>
-          <div class="h-9xl">
-            <canvas ref="revenueChartCanvas" class="w-full h-full" />
+          <div class="h-80">
+            <canvas ref="revenueChartCanvas" class="h-full w-full" />
           </div>
         </Card>
 
         <!-- User Growth Chart -->
-        <Card>
+        <Card variant="glass">
           <template #header>
-            <div class="flex items-center justify-between">
-              <h3 class="text-xl font-semibold text-gray-900">Croissance des utilisateurs</h3>
-              <div class="flex gap-2">
-                <Badge variant="primary" size="sm">Consommateurs</Badge>
+            <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <h3 class="text-xl font-semibold text-neutral-900 dark:text-neutral-50">Croissance des utilisateurs</h3>
+                <p class="text-sm text-neutral-500 dark:text-neutral-400">Évolution hebdomadaire des profils actifs</p>
+              </div>
+              <div class="flex flex-wrap gap-2">
+                <Badge variant="success" size="sm">Consommateurs</Badge>
                 <Badge variant="primary" size="sm">Commerçants</Badge>
               </div>
             </div>
           </template>
-          <div class="h-9xl">
-            <canvas ref="userGrowthChartCanvas" class="w-full h-full" />
+          <div class="h-80">
+            <canvas ref="userGrowthChartCanvas" class="h-full w-full" />
           </div>
         </Card>
       </div>
 
       <!-- Platform Activity -->
-      <div class="grid grid-cols-1 xl:grid-cols-3 gap-3 sm:gap-6 mt-4 sm:mb-3xl">
+      <div class="grid grid-cols-1 gap-6 xl:grid-cols-3">
         <!-- Recent Activity -->
-        <Card class="xl:col-span-2">
+        <Card variant="glass" class="xl:col-span-2">
           <template #header>
-            <div class="flex items-center justify-between">
-              <h3 class="text-xl font-semibold text-gray-900">Activité récente</h3>
+            <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <h3 class="text-xl font-semibold text-neutral-900 dark:text-neutral-50">Activité récente</h3>
+                <p class="text-sm text-neutral-500 dark:text-neutral-400">Suivi temps réel des opérations clés</p>
+              </div>
               <Button
                 variant="ghost"
                 size="sm"
-                class="text-blue-600 hover:text-blue-900"
+                class="text-primary-600 hover:text-primary-700 dark:text-primary-300"
                 @click="viewAllActivities"
               >
                 Voir tout
@@ -159,28 +131,20 @@
             <div
               v-for="activity in recentActivities"
               :key="activity.id"
-              class="flex items-center gap-3 p-4 bg-gray-50 rounded hover:transition-colors"
+              class="flex items-center gap-4 rounded-2xl border border-neutral-200/60 bg-surface-light/70 p-4 transition-colors duration-200 hover:border-primary-400/40 hover:bg-primary-500/5 dark:border-neutral-700/60 dark:bg-surface-dark/70"
             >
-              <div class="flex-shrink-0">
-                <div
-                  :class="getActivityIconClass(activity.type)"
-                  class="h-6 w-6 rounded-full flex items-center justify-center"
-                >
-                  <component :is="getActivityIcon(activity.type)" class="h-4 w-4" />
-                </div>
+              <div class="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-xl" :class="getActivityIconClass(activity.type)">
+                <component :is="getActivityIcon(activity.type)" class="h-5 w-5" />
               </div>
 
-              <div class="flex-grow min-w-none">
-                <p class="text-gray-900 font-medium">{{ activity.title }}</p>
-                <p class="text-gray-700 text-sm">{{ activity.description }}</p>
-                <p class="text-gray-400 text-xs mt-1">{{ formatTimeAgo(activity.timestamp) }}</p>
+              <div class="flex-grow space-y-1">
+                <p class="text-sm font-semibold text-neutral-900 dark:text-neutral-50">{{ activity.title }}</p>
+                <p class="text-sm text-neutral-500 dark:text-neutral-400">{{ activity.description }}</p>
+                <p class="text-xs text-neutral-400">{{ formatTimeAgo(activity.timestamp) }}</p>
               </div>
 
               <div class="flex-shrink-0">
-                <Badge
-                  :variant="getActivityStatusVariant(activity.status)"
-                  size="sm"
-                >
+                <Badge :variant="getActivityStatusVariant(activity.status)" size="sm">
                   {{ activity.status }}
                 </Badge>
               </div>
@@ -189,79 +153,58 @@
         </Card>
 
         <!-- System Health -->
-        <Card>
+        <Card variant="glass">
           <template #header>
-            <h3 class="text-xl font-semibold text-gray-900">État du système</h3>
+            <h3 class="text-xl font-semibold text-neutral-900 dark:text-neutral-50">État du système</h3>
           </template>
 
           <div class="space-y-4">
             <div
               v-for="service in systemHealth"
               :key="service.name"
-              class="flex items-center justify-between p-3 bg-gray-50 rounded"
+              class="flex items-center justify-between rounded-2xl border border-neutral-200/60 bg-surface-light/70 p-4 dark:border-neutral-700/60 dark:bg-surface-dark/70"
             >
               <div class="flex items-center gap-3">
                 <div
-                  :class="service.status === 'healthy' ? 'bg-blue-100' : 'bg-red-600/15'"
-                  class="h-6 w-6 rounded-full flex items-center justify-center"
+                  :class="service.status === 'healthy' ? 'bg-primary-500/10 text-primary-600' : 'bg-accent-red/10 text-accent-red'"
+                  class="flex h-10 w-10 items-center justify-center rounded-xl"
                 >
                   <component
                     :is="service.status === 'healthy' ? CheckCircleIcon : ExclamationTriangleIcon"
-                    :class="service.status === 'healthy' ? 'text-blue-600' : 'text-red-600'"
-                    class="h-4 w-4"
+                    class="h-5 w-5"
                   />
                 </div>
                 <div>
-                  <p class="font-medium text-sm">{{ service.name }}</p>
-                  <p class="text-xs text-gray-500">{{ service.description }}</p>
+                  <p class="text-sm font-semibold text-neutral-900 dark:text-neutral-50">{{ service.name }}</p>
+                  <p class="text-xs text-neutral-500 dark:text-neutral-400">{{ service.description }}</p>
                 </div>
               </div>
 
               <div class="text-right">
-                <p class="text-sm font-medium">{{ service.uptime }}</p>
-                <p class="text-xs text-gray-500">{{ service.responseTime }}</p>
+                <p class="text-sm font-semibold text-neutral-900 dark:text-neutral-100">{{ service.uptime }}</p>
+                <p class="text-xs text-neutral-500 dark:text-neutral-400">{{ service.responseTime }}</p>
               </div>
             </div>
           </div>
 
           <!-- Quick Actions -->
-          <div class="mt-6 pt-2xl border-t border-gray-200">
-            <h4 class="font-semibold text-gray-900 mb-4">Actions rapides</h4>
-            <div class="grid grid-cols-2 gap-2">
-              <Button
-                variant="outline"
-                size="sm"
-                class="text-xs"
-                @click="viewLogs"
-              >
-                <DocumentTextIcon class="h-4 w-4 mr-1" />
+          <div class="mt-6 border-t border-neutral-200/60 pt-6 dark:border-neutral-700/60">
+            <h4 class="mb-4 text-sm font-semibold text-neutral-900 dark:text-neutral-50">Actions rapides</h4>
+            <div class="grid grid-cols-2 gap-3">
+              <Button variant="outline" size="sm" class="justify-start gap-2 text-xs" @click="viewLogs">
+                <DocumentTextIcon class="h-4 w-4" />
                 Logs
               </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                class="text-xs"
-                @click="viewMetrics"
-              >
-                <ChartBarIcon class="h-4 w-4 mr-1" />
+              <Button variant="outline" size="sm" class="justify-start gap-2 text-xs" @click="viewMetrics">
+                <ChartBarIcon class="h-4 w-4" />
                 Métriques
               </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                class="text-xs"
-                @click="manageUsers"
-              >
-                <UsersIcon class="h-4 w-4 mr-1" />
+              <Button variant="outline" size="sm" class="justify-start gap-2 text-xs" @click="manageUsers">
+                <UsersIcon class="h-4 w-4" />
                 Utilisateurs
               </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                class="text-xs"
-                @click="systemSettings"
-              >
-                <CogIcon class="h-4 w-4 mr-1" />
+              <Button variant="outline" size="sm" class="justify-start gap-2 text-xs" @click="systemSettings">
+                <CogIcon class="h-4 w-4" />
                 Paramètres
               </Button>
             </div>
@@ -270,93 +213,89 @@
       </div>
 
       <!-- Performance Metrics -->
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-3 sm:gap-6 mt-4 sm:mb-3xl">
+      <div class="grid grid-cols-1 gap-6 md:grid-cols-3">
         <!-- Environmental Impact -->
-        <Card>
-          <div class="flex items-center gap-3 mt-3">
-            <div class="p-2 bg-green-100 rounded">
-              <GlobeEuropeAfricaIcon class="h-6 w-6 text-green-600" />
+        <Card variant="glass">
+          <div class="flex items-center gap-3">
+            <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-primary-500/10 text-primary-600 dark:text-primary-300">
+              <GlobeEuropeAfricaIcon class="h-6 w-6" />
             </div>
-            <h3 class="text-lg font-semibold text-gray-900">Impact Environnemental</h3>
+            <h3 class="text-lg font-semibold text-neutral-900 dark:text-neutral-50">Impact environnemental</h3>
           </div>
 
-          <div class="space-y-4">
+          <div class="mt-6 space-y-4">
             <div class="flex items-center justify-between">
-              <span class="text-gray-700">CO₂ économisé</span>
-              <span class="font-semibold text-green-600">{{ formatNumber(environmentalImpact.co2Saved) }} kg</span>
+              <span class="text-sm text-neutral-600 dark:text-neutral-300">CO₂ économisé</span>
+              <span class="text-sm font-semibold text-primary-600 dark:text-primary-300">{{ formatNumber(environmentalImpact.co2Saved) }} kg</span>
             </div>
             <div class="flex items-center justify-between">
-              <span class="text-gray-700">Eau économisée</span>
-              <span class="font-semibold text-info">{{ formatNumber(environmentalImpact.waterSaved) }} L</span>
+              <span class="text-sm text-neutral-600 dark:text-neutral-300">Eau économisée</span>
+              <span class="text-sm font-semibold text-accent-blue">{{ formatNumber(environmentalImpact.waterSaved) }} L</span>
             </div>
             <div class="flex items-center justify-between">
-              <span class="text-gray-700">Déchets évités</span>
-              <span class="font-semibold text-blue-600">{{ formatNumber(environmentalImpact.wasteSaved) }} kg</span>
+              <span class="text-sm text-neutral-600 dark:text-neutral-300">Déchets évités</span>
+              <span class="text-sm font-semibold text-primary-600 dark:text-primary-300">{{ formatNumber(environmentalImpact.wasteSaved) }} kg</span>
             </div>
           </div>
 
-          <div class="mt-4 p-3 bg-green-50 rounded">
-            <p class="text-green-700 text-sm font-medium">
-              🌱 Équivalent à {{ environmentalImpact.treesEquivalent }} arbres plantés
-            </p>
+          <div class="mt-6 rounded-2xl bg-primary-500/10 p-4 text-sm font-semibold text-primary-600 dark:text-primary-300">
+            🌱 Équivalent à {{ environmentalImpact.treesEquivalent }} arbres plantés
           </div>
         </Card>
 
         <!-- Top Merchants -->
-        <Card>
+        <Card variant="glass">
           <template #header>
-            <h3 class="text-lg font-semibold text-gray-900">Top Commerçants</h3>
+            <h3 class="text-lg font-semibold text-neutral-900 dark:text-neutral-50">Top commerçants</h3>
           </template>
 
-          <div class="space-y-2">
+          <div class="space-y-3">
             <div
               v-for="(merchant, index) in topMerchants"
               :key="merchant.id"
-              class="flex items-center gap-3 p-3 bg-gray-50 rounded"
+              class="flex items-center gap-3 rounded-2xl border border-neutral-200/60 bg-surface-light/70 p-3 dark:border-neutral-700/60 dark:bg-surface-dark/70"
             >
-              <div class="flex-shrink-0">
-                <div class="h-6 w-6 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center font-semibold text-sm">
-                  {{ index + 1 }}
-                </div>
+              <div class="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-primary-500/10 text-sm font-semibold text-primary-600 dark:text-primary-300">
+                {{ index + 1 }}
               </div>
-              <div class="flex-grow min-w-none">
-                <p class="font-medium text-sm truncate">{{ merchant.name }}</p>
-                <p class="text-xs text-gray-500">{{ merchant.productsSold }} produits vendus</p>
+              <div class="min-w-0 flex-1">
+                <p class="truncate text-sm font-semibold text-neutral-900 dark:text-neutral-50">{{ merchant.name }}</p>
+                <p class="text-xs text-neutral-500 dark:text-neutral-400">{{ merchant.productsSold }} produits vendus</p>
               </div>
-              <div class="text-right">
-                <p class="font-medium text-sm">{{ formatCurrency(merchant.revenue) }}</p>
+              <div class="text-right text-sm font-semibold text-neutral-900 dark:text-neutral-100">
+                {{ formatCurrency(merchant.revenue) }}
               </div>
             </div>
           </div>
         </Card>
 
         <!-- Popular Categories -->
-        <Card>
+        <Card variant="glass">
           <template #header>
-            <h3 class="text-lg font-semibold text-gray-900">Catégories Populaires</h3>
+            <h3 class="text-lg font-semibold text-neutral-900 dark:text-neutral-50">Catégories populaires</h3>
           </template>
 
-          <div class="space-y-2">
+          <div class="space-y-3">
             <div
               v-for="category in popularCategories"
               :key="category.id"
-              class="flex items-center justify-between"
+              class="flex items-center justify-between gap-4"
             >
               <div class="flex items-center gap-3">
                 <span class="text-xl">{{ category.icon }}</span>
                 <div>
-                  <p class="font-medium text-sm">{{ category.name }}</p>
-                  <p class="text-xs text-gray-500">{{ category.productCount }} produits</p>
+                  <p class="text-sm font-semibold text-neutral-900 dark:text-neutral-50">{{ category.name }}</p>
+                  <p class="text-xs text-neutral-500 dark:text-neutral-400">{{ category.productCount }} produits</p>
                 </div>
               </div>
-              <div class="text-right">
-                <div class="w-12 bg-gray-200 rounded-full h-4">
+              <div class="flex flex-col items-end gap-1">
+                <div class="h-2.5 w-24 overflow-hidden rounded-full bg-neutral-200/70 dark:bg-neutral-700/60">
                   <div
-                    class="bg-blue-500 h-4 rounded-full"
+                    class="h-full rounded-full bg-primary-500"
                     :style="{ width: `${category.percentage}%` }"
                   />
                 </div>
-                <p class="text-xs text-gray-500 mt-1">{{ category.percentage }}%</p>
+                <p class="text-xs text-neutral-500 dark:text-neutral-400">{{ category.percentage }}%</p>
               </div>
             </div>
           </div>
@@ -364,32 +303,30 @@
       </div>
 
       <!-- Alerts and Notifications -->
-      <Card v-if="alerts.length > 0" class="mt-4 sm:mb-3xl">
+      <Card v-if="alerts.length > 0" variant="glass">
         <template #header>
-          <h3 class="text-lg font-semibold text-gray-900">Alertes et notifications</h3>
+          <h3 class="text-lg font-semibold text-neutral-900 dark:text-neutral-50">Alertes et notifications</h3>
         </template>
 
-        <div class="space-y-2">
+        <div class="space-y-3">
           <div
             v-for="alert in alerts"
             :key="alert.id"
+            class="flex items-start gap-4 rounded-2xl border bg-surface-light/70 p-4 transition-colors duration-200 dark:bg-surface-dark/70"
             :class="getAlertClass(alert.type)"
-            class="flex items-stretch sm:items-start gap-3 p-4 rounded border"
           >
-            <component
-              :is="getAlertIcon(alert.type)"
-              :class="getAlertIconClass(alert.type)"
-              class="h-4 w-4 flex-shrink-0 mt-0.5"
-            />
-            <div class="flex-grow">
-              <p class="font-medium">{{ alert.title }}</p>
-              <p class="text-sm opacity-80 mt-1">{{ alert.message }}</p>
-              <p class="text-xs opacity-60 mt-2">{{ formatTimeAgo(alert.timestamp) }}</p>
+            <div class="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-surface-light/90 dark:bg-surface-dark/80" :class="getAlertIconClass(alert.type)">
+              <component :is="getAlertIcon(alert.type)" class="h-5 w-5" />
+            </div>
+            <div class="flex-1 space-y-1">
+              <p class="text-sm font-semibold text-neutral-900 dark:text-neutral-50">{{ alert.title }}</p>
+              <p class="text-sm text-neutral-500 dark:text-neutral-400">{{ alert.message }}</p>
+              <p class="text-xs text-neutral-400">{{ formatTimeAgo(alert.timestamp) }}</p>
             </div>
             <Button
               variant="ghost"
               size="sm"
-              class="text-current opacity-60 hover:opacity-100 flex-shrink-0"
+              class="flex-shrink-0 text-neutral-500 hover:text-neutral-700 dark:text-neutral-400 dark:hover:text-neutral-200"
               @click="dismissAlert(alert.id)"
             >
               <XMarkIcon class="h-4 w-4" />
@@ -436,7 +373,8 @@ import {
   ShoppingCartIcon,
   BellIcon,
   ShieldExclamationIcon,
-  InformationCircleIcon
+  InformationCircleIcon,
+  BanknotesIcon
 } from '@heroicons/vue/24/outline'
 import {
   Chart as ChartJS,
@@ -457,6 +395,12 @@ import {
 import Card from '@/components/ui/2025/Card.vue'
 import Button from '@/components/ui/2025/Button.vue'
 import Badge from '@/components/ui/2025/Badge.vue'
+import Select from '@/components/ui/2025/Select.vue'
+import {
+  DashboardHeader,
+  StatCard,
+  StatCardGrid
+} from '@/components/dashboard/2025'
 
 ChartJS.register(
   CategoryScale,
@@ -563,12 +507,12 @@ const formatTimeAgo = (timestamp: string): string => {
 
 const getActivityIconClass = (type: string): string => {
   const classes: Record<string, string> = {
-    user_registered: 'bg-blue-100 text-info',
-    merchant_joined: 'bg-green-100 text-green-600',
-    product_sold: 'bg-yellow-100 text-blue-600',
-    alert: 'bg-red-100 text-red-600'
+    user_registered: 'bg-primary-500/10 text-primary-600 dark:text-primary-300',
+    merchant_joined: 'bg-primary-500/10 text-primary-600 dark:text-primary-300',
+    product_sold: 'bg-accent-orange/10 text-accent-orange',
+    alert: 'bg-accent-red/10 text-accent-red'
   }
-  return classes[type] || 'bg-gray-100 text-gray-700'
+  return classes[type] || 'bg-neutral-200/60 text-neutral-600 dark:bg-neutral-800/70 dark:text-neutral-300'
 }
 
 const getActivityIcon = (type: string) => {
@@ -593,12 +537,12 @@ const getActivityStatusVariant = (status: string) => {
 
 const getAlertClass = (type: string): string => {
   const classes: Record<string, string> = {
-    warning: 'bg-orange-500/10 border-orange-500/30 text-orange-500/95',
-    error: 'bg-red-600/10 border-red-600/30 text-red-600/95',
-    info: 'bg-blue-50 border-blue-200 text-gray-800',
-    success: 'bg-blue-50 border-blue-200 text-blue-800'
+    warning: 'border-accent-orange/40 bg-accent-orange/10 text-accent-orange',
+    error: 'border-accent-red/50 bg-accent-red/10 text-accent-red',
+    info: 'border-primary-400/40 bg-primary-500/10 text-primary-700 dark:text-primary-300',
+    success: 'border-primary-500/40 bg-primary-500/10 text-primary-600 dark:text-primary-300'
   }
-  return classes[type] || 'bg-gray-50 border-gray-200 text-gray-800'
+  return classes[type] || 'border-neutral-200/60 text-neutral-700 dark:border-neutral-700/60 dark:text-neutral-300'
 }
 
 const getAlertIcon = (type: string) => {
@@ -613,12 +557,12 @@ const getAlertIcon = (type: string) => {
 
 const getAlertIconClass = (type: string): string => {
   const classes: Record<string, string> = {
-    warning: 'text-orange-500',
-    error: 'text-red-600',
-    info: 'text-info',
-    success: 'text-blue-600'
+    warning: 'text-accent-orange',
+    error: 'text-accent-red',
+    info: 'text-primary-600 dark:text-primary-300',
+    success: 'text-primary-600 dark:text-primary-300'
   }
-  return classes[type] || 'text-gray-700'
+  return classes[type] || 'text-neutral-600 dark:text-neutral-300'
 }
 
 const loadDashboardData = async () => {

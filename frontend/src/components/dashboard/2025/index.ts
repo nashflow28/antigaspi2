@@ -1,3 +1,6 @@
 export { default as StatCard } from './StatCard.vue'
 export { default as StatCardGrid } from './StatCardGrid.vue'
 export { default as QuickActionsCard } from './QuickActionsCard.vue'
+export { default as DashboardHeader } from './DashboardHeader.vue'
+export { default as DashboardFilterBar } from './DashboardFilterBar.vue'
+export { default as DataTableCard } from './DataTableCard.vue'

@@ -1,21 +1,21 @@
 <template>
-  <div class="table-wrapper-2025 bg-white rounded shadow-sm border border-gray-200">
+  <div class="table-wrapper-2025 rounded-2xl border border-neutral-200/70 bg-surface-light shadow-card transition-all duration-300 dark:border-neutral-700/60 dark:bg-surface-dark">
     <!-- Table Header -->
-    <div v-if="title" class="px-4 py-4 border-b border-gray-200">
-      <h3 class="text-lg font-semibold text-gray-900">{{ title }}</h3>
-      <p v-if="description" class="text-sm text-gray-700">{{ description }}</p>
+    <div v-if="title" class="border-b border-neutral-200/70 px-4 py-4 dark:border-neutral-700/60">
+      <h3 class="text-lg font-semibold text-neutral-900 dark:text-neutral-50">{{ title }}</h3>
+      <p v-if="description" class="text-sm text-neutral-600 dark:text-neutral-300">{{ description }}</p>
     </div>
 
     <!-- Table Container -->
     <div class="overflow-x-auto">
       <table class="w-full text-sm">
         <!-- Table Head -->
-        <thead v-if="!hideHeader" class="bg-gray-50/50 border-b border-gray-200">
+        <thead v-if="!hideHeader" class="border-b border-neutral-200/70 bg-surface-muted/60 dark:border-neutral-700/60 dark:bg-surface-dark/80">
           <tr>
             <th
               v-for="(column, index) in columns"
               :key="column.key || index"
-              class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+              class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-neutral-500 dark:text-neutral-400"
             >
               {{ column.title }}
             </th>
@@ -23,16 +23,16 @@
         </thead>
 
         <!-- Table Body -->
-        <tbody class="divide-y divide-neutral-200">
+        <tbody class="divide-y divide-neutral-200/70 dark:divide-neutral-700/60">
           <tr
             v-for="(row, rowIndex) in data"
             :key="rowIndex"
-            class="hover:bg-gray-50"
+            class="transition-colors duration-200 hover:bg-primary-500/5 dark:hover:bg-primary-500/10"
           >
             <td
               v-for="(column, colIndex) in columns"
               :key="column.key || colIndex"
-              class="px-4 py-4 whitespace-nowrap"
+              class="whitespace-nowrap px-4 py-4 text-sm text-neutral-700 dark:text-neutral-200"
             >
               <slot
                 :name="'cell(' + column.key + ')'"
@@ -48,9 +48,9 @@
 
           <!-- Empty State -->
           <tr v-if="data.length === 0">
-            <td :colspan="columns.length" class="text-left sm:text-center py-8 sm:py-12 lg:py-16">
-              <div class="text-gray-500">
-                <p class="text-base font-medium">{{ emptyText }}</p>
+            <td :colspan="columns.length" class="py-10 text-left sm:py-12 sm:text-center lg:py-16">
+              <div class="text-neutral-500 dark:text-neutral-400">
+                <p class="text-base font-medium text-neutral-700 dark:text-neutral-200">{{ emptyText }}</p>
                 <p class="text-sm">{{ emptyDescription }}</p>
               </div>
             </td>
