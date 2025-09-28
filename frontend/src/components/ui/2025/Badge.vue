@@ -90,10 +90,10 @@ const computedClasses = computed(() => {
 
 const sizeClasses = computed(() => {
   const sizes = {
-    xs: 'px-3 py-1 text-xs rounded',
-    sm: 'px-2 py-xs text-xs rounded',
-    md: 'px-3 py-1 text-sm rounded',
-    lg: 'px-3 py-2 text-base rounded'
+    xs: 'px-xs py-1 text-xs rounded-full',
+    sm: 'px-sm py-xs text-xs rounded-full',
+    md: 'px-md py-sm text-sm rounded-full',
+    lg: 'px-lg py-sm text-base rounded-full'
   }
   return sizes[props.size]
 })
@@ -101,49 +101,50 @@ const sizeClasses = computed(() => {
 const variantClasses = computed(() => {
   const variants = {
     default: [
-      'bg-gray-100 text-gray-800',
-      'hover:bg-gray-200'
+      'bg-neutral-100 text-neutral-700 dark:bg-neutral-800 dark:text-neutral-100',
+      'hover:bg-neutral-200 dark:hover:bg-neutral-700'
     ].join(' '),
 
     primary: [
-      'bg-blue-100 text-blue-800',
-      'hover:bg-blue-200',
-      'ring-1 ring-primary-600/20'
+      'bg-primary-100 text-primary-700',
+      'hover:bg-primary-200',
+      'ring-1 ring-primary-500/20'
     ].join(' '),
 
     secondary: [
-      'bg-gray-100 text-gray-700',
-      'hover:bg-gray-200'
+      'bg-surface-light text-neutral-700 dark:bg-surface-dark dark:text-neutral-200',
+      'hover:bg-neutral-100 dark:hover:bg-neutral-700',
+      'ring-1 ring-neutral-400/20 dark:ring-neutral-600/30'
     ].join(' '),
 
     success: [
-      'bg-green-100 text-green-800',
-      'hover:bg-blue-200',
-      'ring-1 ring-green-600/20'
+      'bg-primary-50 text-primary-700',
+      'hover:bg-primary-100',
+      'ring-1 ring-primary-500/30'
     ].join(' '),
 
     warning: [
-      'bg-yellow-100 text-yellow-800',
-      'hover:bg-yellow-200',
-      'ring-1 ring-yellow-600/20'
+      'bg-accent-orange/10 text-accent-orange',
+      'hover:bg-accent-orange/20',
+      'ring-1 ring-accent-orange/30'
     ].join(' '),
 
     error: [
-      'bg-red-100 text-red-800',
-      'hover:bg-red-200',
-      'ring-1 ring-red-600/20'
+      'bg-accent-red/10 text-accent-red',
+      'hover:bg-accent-red/20',
+      'ring-1 ring-accent-red/30'
     ].join(' '),
 
     info: [
-      'bg-blue-100 text-gray-800',
-      'hover:bg-secondary-200',
-      'ring-1 ring-blue-600/20'
+      'bg-accent-blue/10 text-accent-blue',
+      'hover:bg-accent-blue/20',
+      'ring-1 ring-accent-blue/30'
     ].join(' '),
 
     outline: [
-      'bg-transparent text-gray-700',
-      'border border-gray-300',
-      'hover:bg-gray-50 hover:text-gray-900'
+      'bg-transparent text-neutral-700 dark:text-neutral-200',
+      'border border-neutral-300 dark:border-neutral-600',
+      'hover:bg-neutral-100 dark:hover:bg-neutral-700'
     ].join(' ')
   }
 

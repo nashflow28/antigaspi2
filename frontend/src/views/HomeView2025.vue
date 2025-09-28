@@ -1,12 +1,12 @@
 <template>
   <div class="min-h-screen">
     <!-- Hero Section - Design moderne avec glassmorphism et gradients -->
-    <section class="relative bg-gradient-to-br from-blue-500 via-primary-600 to-blue-500/90 text-white overflow-hidden sm:block" data-testid="hero-section">
+    <section class="relative bg-gradient-to-br from-primary-500 via-primary-600 to-primary-500/90 text-white overflow-hidden sm:block" data-testid="hero-section">
       <!-- Background decorative elements -->
       <div class="relative sm:absolute inset-0">
-        <div class="relative sm:absolute top-0 left-0 w-72 h-72 bg-orange-500/20 rounded-full blur-3xl animate-pulse-glow" />
-        <div class="relative sm:absolute bottom-0 right-0 w-96 h-96 bg-blue-500/20 rounded-full blur-3xl animate-pulse-glow" style="animation-delay: 1s;" />
-        <div class="relative sm:absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-9xl bg-white/10 rounded-full blur-2xl" />
+        <div class="relative sm:absolute top-0 left-0 w-72 h-72 bg-accent-orange/20 rounded-full blur-3xl animate-pulse-glow" />
+        <div class="relative sm:absolute bottom-0 right-0 w-96 h-96 bg-primary-50 dark:bg-primary-500/20 rounded-full blur-3xl animate-pulse-glow" style="animation-delay: 1s;" />
+        <div class="relative sm:absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-9xl bg-surface-light dark:bg-surface-dark/10 rounded-full blur-2xl" />
       </div>
 
       <div :class="[layoutContainerClass, 'relative py-24 sm:py-28 lg:padding-y-md2 lg:py-40']">
@@ -16,10 +16,10 @@
             variant="outline"
             size="md"
             rounded
-            class="bg-white/10 text-white/90 border-white/30 backdrop-blur-sm mt-4 sm:mb-3xl animate-fade-in-up"
+            class="bg-surface-light dark:bg-surface-dark/10 text-white/90 border-white/30 backdrop-blur-sm mt-4 sm:mb-3xl animate-fade-in-up"
           >
             <span class="flex items-center gap-2">
-              <span class="h-4 w-4 rounded-full bg-blue-300 animate-pulse" />
+              <span class="h-4 w-4 rounded-full bg-primary-300 animate-pulse" />
               Ensemble contre le gaspillage alimentaire
             </span>
           </Badge>
@@ -30,7 +30,7 @@
             style="animation-delay: 0.2s; font-size: 8rem;"
             data-testid="main-hero-title"
           >
-            <span class="bg-gradient-to-r from-white via-primary-100 to-orange-500/70 bg-clip-text text-transparent">
+            <span class="bg-gradient-to-r from-white via-primary-100 to-accent-orange/70 bg-clip-text text-transparent">
               Sauvons
             </span>
             <br>
@@ -42,7 +42,7 @@
           <!-- Sous-titre élégant -->
           <p class="text-xl md:text-xl lg:text-xl mb-3xl sm:mb-10 lg:mb-12 text-white/90 max-w-full sm:max-w-4xl mx-auto leading-relaxed animate-fade-in-up font-light" style="animation-delay: 0.4s;">
             Transformons les invendus en opportunités.
-            <span class="text-orange-500/70 font-medium">Économisez jusqu'à 70%</span>
+            <span class="text-accent-orange/70 font-medium">Économisez jusqu'à 70%</span>
             tout en protégeant l'environnement.
           </p>
 
@@ -50,20 +50,20 @@
           <div class="flex flex-col sm:flex-row gap-3 sm:gap-6 justify-center items-center animate-fade-in-up" style="animation-delay: 0.6s;">
             <Button
               size="lg"
-              class="bg-white text-blue-600 hover:bg-white hover:text-blue-900 hover:scale-105 shadow-md hover:shadow-xl group relative overflow-hidden sm:block"
+              class="bg-surface-light dark:bg-surface-dark text-primary-600 dark:text-primary-400 hover:bg-surface-light dark:bg-surface-dark hover:text-primary-900 dark:text-primary-100 hover:scale-105 shadow-md hover:shadow-xl group relative overflow-hidden sm:block"
               @click="$router.push('/products')"
             >
               <span class="relative z-10 flex items-center gap-3">
                 🌟 Découvrir les offres
               </span>
-              <div class="relative sm:absolute inset-0 bg-gradient-to-r from-blue-600 to-blue-700 opacity-0 group-hover:transition-opacity duration-300" />
+              <div class="relative sm:absolute inset-0 bg-gradient-to-r from-primary-600 to-primary-700 opacity-0 group-hover:transition-opacity duration-300" />
             </Button>
 
             <Button
               v-if="!authStore.isAuthenticated"
               variant="outline"
               size="lg"
-              class="border-white/30 text-white hover:bg-white hover:text-blue-600 hover:scale-105"
+              class="border-white/30 text-white hover:bg-surface-light dark:bg-surface-dark hover:text-primary-600 dark:text-primary-400 hover:scale-105"
               @click="$router.push('/register')"
             >
               <span class="flex items-center gap-2">
@@ -79,7 +79,7 @@
               rounded="xl"
               class="text-left sm:text-center backdrop-blur-md"
             >
-              <div class="text-xl font-semibold text-orange-500/70 mt-2">1,2M+</div>
+              <div class="text-xl font-semibold text-accent-orange/70 mt-2">1,2M+</div>
               <div class="text-sm text-white/80">Produits sauvés</div>
             </Card>
             <Card
@@ -87,7 +87,7 @@
               rounded="xl"
               class="text-left sm:text-center backdrop-blur-md"
             >
-              <div class="text-xl font-semibold text-blue-300 mt-2">50K+</div>
+              <div class="text-xl font-semibold text-primary-300 mt-2">50K+</div>
               <div class="text-sm text-white/80">Utilisateurs actifs</div>
             </Card>
             <Card
@@ -95,7 +95,7 @@
               rounded="xl"
               class="text-left sm:text-center backdrop-blur-md"
             >
-              <div class="text-xl font-semibold text-blue-500/70 mt-2">2,5K+</div>
+              <div class="text-xl font-semibold text-primary-500 dark:text-primary-300/70 mt-2">2,5K+</div>
               <div class="text-sm text-white/80">Commerçants partenaires</div>
             </Card>
           </div>
@@ -105,7 +105,7 @@
       <!-- Wave divider -->
       <div class="relative sm:absolute bottom-0 left-0 right-0">
         <svg
-          class="w-full h-12 text-gray-50"
+          class="w-full h-12 text-neutral-50"
           fill="currentColor"
           viewBox="0 0 1200 120"
           preserveAspectRatio="none"
@@ -116,7 +116,7 @@
     </section>
 
     <!-- Features Section - Design moderne avec cards interactives -->
-    <section class="py-24 sm:py-28 lg:padding-y-md2 bg-gradient-to-b from-gray-50 to-white relative">
+    <section class="py-24 sm:py-28 lg:padding-y-md2 bg-gradient-to-b from-surface-light to-white relative">
       <div :class="layoutContainerClass">
         <!-- Section Header -->
         <div class="text-left sm:text-center mb-16 sm:mb-18 lg:mb-20 animate-fade-in-up">
@@ -124,17 +124,17 @@
             variant="primary"
             size="md"
             rounded
-            class="bg-blue-50 text-blue-600 mt-4"
+            class="bg-primary-50 dark:bg-primary-500/10 text-primary-600 dark:text-primary-400 mt-4"
           >
             <span class="flex items-center gap-2">
-              <span class="h-4 w-4 rounded-full bg-blue-500" />
+              <span class="h-4 w-4 rounded-full bg-primary-50 dark:bg-primary-500/20" />
               Processus simple en 3 étapes
             </span>
           </Badge>
-          <h2 class="text-3xl lg:text-3xl font-semibold text-gray-900 mt-4 text-balance font-display">
+          <h2 class="text-3xl lg:text-3xl font-semibold text-neutral-900 dark:text-neutral-100 mt-4 text-balance font-display">
             Comment ça marche ?
           </h2>
-          <p class="text-xl text-gray-700 max-w-full sm:max-w-80 mx-auto">
+          <p class="text-xl text-neutral-600 dark:text-neutral-300 max-w-full sm:max-w-80 mx-auto">
             Rejoignez la révolution anti-gaspillage en quelques clics
           </p>
         </div>
@@ -150,32 +150,32 @@
           >
             <div class="relative">
               <!-- Icon avec gradient et animation -->
-              <div class="w-20 h-12 bg-gradient-to-r from-blue-600 to-blue-700 rounded flex items-center justify-center mx-auto mt-4 shadow-xl group-hover:shadow-xl group-hover:transition-all duration-300">
+              <div class="w-20 h-12 bg-gradient-to-r from-primary-600 to-primary-700 rounded flex items-center justify-center mx-auto mt-4 shadow-xl group-hover:shadow-xl group-hover:transition-all duration-300">
                 <span class="text-xl">🔍</span>
               </div>
 
               <!-- Step number -->
-              <div class="relative sm:absolute -top-4 -right-4 h-6 w-6 bg-orange-500 text-white rounded-full flex items-center justify-center text-sm font-semibold shadow-xl">
+              <div class="relative sm:absolute -top-4 -right-4 h-6 w-6 bg-accent-orange text-white rounded-full flex items-center justify-center text-sm font-semibold shadow-xl">
                 1
               </div>
             </div>
 
             <div class="text-left sm:text-center">
-              <h3 class="text-xl font-semibold text-gray-900 mt-3 group-hover:transition-colors font-heading">
+              <h3 class="text-xl font-semibold text-neutral-900 dark:text-neutral-100 mt-3 group-hover:transition-colors font-heading">
                 Découvrez
               </h3>
-              <p class="text-gray-700 leading-relaxed mt-4">
+              <p class="text-neutral-600 dark:text-neutral-300 leading-relaxed mt-4">
                 Explorez les offres exclusives des commerçants locaux et trouvez des produits de qualité à prix réduits.
               </p>
 
               <!-- Mini feature list -->
-              <div class="space-y-4 text-sm text-gray-500">
+              <div class="space-y-4 text-sm text-neutral-500 dark:text-neutral-400">
                 <div class="flex items-center gap-2">
-                  <span class="w-xs.5 h-3.5 bg-blue-500 rounded-full" />
+                  <span class="w-xs.5 h-3.5 bg-primary-50 dark:bg-primary-500/20 rounded-full" />
                   <span>Géolocalisation intelligente</span>
                 </div>
                 <div class="flex items-center gap-2">
-                  <span class="w-xs.5 h-3.5 bg-blue-500 rounded-full" />
+                  <span class="w-xs.5 h-3.5 bg-primary-50 dark:bg-primary-500/20 rounded-full" />
                   <span>Filtres avancés</span>
                 </div>
               </div>
@@ -190,30 +190,30 @@
             style="animation-delay: 0.4s;"
           >
             <div class="relative">
-              <div class="w-20 h-12 bg-gradient-to-r from-blue-500 to-blue-500/90 rounded flex items-center justify-center mx-auto mt-4 shadow-xl group-hover:shadow-xl group-hover:transition-all duration-300">
+              <div class="w-20 h-12 bg-gradient-to-r from-primary-500 to-primary-500/90 rounded flex items-center justify-center mx-auto mt-4 shadow-xl group-hover:shadow-xl group-hover:transition-all duration-300">
                 <span class="text-xl">⚡</span>
               </div>
 
-              <div class="relative sm:absolute -top-4 -right-4 h-6 w-6 bg-orange-500 text-white rounded-full flex items-center justify-center text-sm font-semibold shadow-xl">
+              <div class="relative sm:absolute -top-4 -right-4 h-6 w-6 bg-accent-orange text-white rounded-full flex items-center justify-center text-sm font-semibold shadow-xl">
                 2
               </div>
             </div>
 
             <div class="text-left sm:text-center">
-              <h3 class="text-xl font-semibold text-gray-900 mt-3 group-hover:transition-colors font-heading">
+              <h3 class="text-xl font-semibold text-neutral-900 dark:text-neutral-100 mt-3 group-hover:transition-colors font-heading">
                 Réservez
               </h3>
-              <p class="text-gray-700 leading-relaxed mt-4">
+              <p class="text-neutral-600 dark:text-neutral-300 leading-relaxed mt-4">
                 Réservez instantanément vos produits favoris avec paiement sécurisé et confirmation immédiate.
               </p>
 
-              <div class="space-y-4 text-sm text-gray-500">
+              <div class="space-y-4 text-sm text-neutral-500 dark:text-neutral-400">
                 <div class="flex items-center gap-2">
-                  <span class="w-xs.5 h-3.5 bg-blue-500/50 rounded-full" />
+                  <span class="w-xs.5 h-3.5 bg-primary-50 dark:bg-primary-500/20 rounded-full" />
                   <span>Réservation instantanée</span>
                 </div>
                 <div class="flex items-center gap-2">
-                  <span class="w-xs.5 h-3.5 bg-blue-500/50 rounded-full" />
+                  <span class="w-xs.5 h-3.5 bg-primary-50 dark:bg-primary-500/20 rounded-full" />
                   <span>Paiement sécurisé</span>
                 </div>
               </div>
@@ -228,30 +228,30 @@
             style="animation-delay: 0.6s;"
           >
             <div class="relative">
-              <div class="w-20 h-12 bg-gradient-to-r from-orange-500 to-orange-500/90 rounded flex items-center justify-center mx-auto mt-4 shadow-xl group-hover:shadow-xl group-hover:transition-all duration-300">
+              <div class="w-20 h-12 bg-gradient-to-r from-accent-orange to-accent-orange/90 rounded flex items-center justify-center mx-auto mt-4 shadow-xl group-hover:shadow-xl group-hover:transition-all duration-300">
                 <span class="text-xl">🌱</span>
               </div>
 
-              <div class="relative sm:absolute -top-4 -right-4 h-6 w-6 bg-orange-500 text-white rounded-full flex items-center justify-center text-sm font-semibold shadow-xl">
+              <div class="relative sm:absolute -top-4 -right-4 h-6 w-6 bg-accent-orange text-white rounded-full flex items-center justify-center text-sm font-semibold shadow-xl">
                 3
               </div>
             </div>
 
             <div class="text-left sm:text-center">
-              <h3 class="text-xl font-semibold text-gray-900 mt-3 group-hover:transition-colors font-heading">
+              <h3 class="text-xl font-semibold text-neutral-900 dark:text-neutral-100 mt-3 group-hover:transition-colors font-heading">
                 Sauvez
               </h3>
-              <p class="text-gray-700 leading-relaxed mt-4">
+              <p class="text-neutral-600 dark:text-neutral-300 leading-relaxed mt-4">
                 Récupérez vos achats et contribuez activement à la réduction du gaspillage alimentaire.
               </p>
 
-              <div class="space-y-4 text-sm text-gray-500">
+              <div class="space-y-4 text-sm text-neutral-500 dark:text-neutral-400">
                 <div class="flex items-center gap-2">
-                  <span class="w-xs.5 h-3.5 bg-orange-500 rounded-full" />
+                  <span class="w-xs.5 h-3.5 bg-accent-orange rounded-full" />
                   <span>Impact environnemental</span>
                 </div>
                 <div class="flex items-center gap-2">
-                  <span class="w-xs.5 h-3.5 bg-orange-500 rounded-full" />
+                  <span class="w-xs.5 h-3.5 bg-accent-orange rounded-full" />
                   <span>Économies réalisées</span>
                 </div>
               </div>
@@ -275,59 +275,59 @@
     </section>
 
     <!-- Stats Section -->
-    <section class="py-16 sm:py-16-2 lg:py-16-3 bg-gray-50">
+    <section class="py-16 sm:py-16-2 lg:py-16-3 bg-neutral-50 dark:bg-neutral-900/60">
       <div class="max-w-full sm:max-w-7xl mx-auto px-3">
         <div class="text-left sm:text-center mb-12 sm:mb-14 lg:mb-16">
-          <h2 class="text-xl md:text-3xl font-semibold text-gray-900 mt-3">
+          <h2 class="text-xl md:text-3xl font-semibold text-neutral-900 dark:text-neutral-100 mt-3">
             Notre impact
           </h2>
         </div>
 
         <div class="grid md:grid-cols-3 gap-6 sm:gap-8 text-left sm:text-center">
           <div>
-            <div class="text-3xl md:text-3xl font-semibold text-blue-600 mt-2">
+            <div class="text-3xl md:text-3xl font-semibold text-primary-600 dark:text-primary-400 mt-2">
               1,234
             </div>
-            <p class="text-xl text-gray-700">Produits sauvés</p>
+            <p class="text-xl text-neutral-600 dark:text-neutral-300">Produits sauvés</p>
           </div>
 
           <div>
-            <div class="text-3xl md:text-3xl font-semibold text-blue-600 mt-2">
+            <div class="text-3xl md:text-3xl font-semibold text-primary-600 dark:text-primary-400 mt-2">
               567
             </div>
-            <p class="text-xl text-gray-700">Utilisateurs actifs</p>
+            <p class="text-xl text-neutral-600 dark:text-neutral-300">Utilisateurs actifs</p>
           </div>
 
           <div>
-            <div class="text-3xl md:text-3xl font-semibold text-orange-500 mt-2">
+            <div class="text-3xl md:text-3xl font-semibold text-accent-orange mt-2">
               89
             </div>
-            <p class="text-xl text-gray-700">Commerçants partenaires</p>
+            <p class="text-xl text-neutral-600 dark:text-neutral-300">Commerçants partenaires</p>
           </div>
         </div>
       </div>
     </section>
 
     <!-- CTA Section -->
-    <section class="py-16 sm:py-16-2 lg:py-16-3 bg-blue-600 text-white">
+    <section class="py-16 sm:py-16-2 lg:py-16-3 bg-primary-600 text-white">
       <div class="max-w-full sm:max-w-4xl mx-auto text-left sm:text-center px-3">
         <h2 class="text-xl md:text-3xl font-semibold mt-4">
           Prêt à faire la différence ?
         </h2>
-        <p class="text-xl mt-4 sm:mb-3xl text-blue-100">
+        <p class="text-xl mt-4 sm:mb-3xl text-primary-100">
           Rejoignez notre communauté et commencez à économiser tout en protégeant l'environnement
         </p>
 
         <template v-if="!authStore.isAuthenticated">
           <div class="space-y-4 sm:space-x-4">
             <Button
-              class="bg-white text-blue-600 hover:bg-gray-100 text-lg px-6 py-3"
+              class="bg-surface-light dark:bg-surface-dark text-primary-600 dark:text-primary-400 hover:bg-neutral-100 dark:bg-neutral-800 text-lg px-6 py-3"
               @click="$router.push('/register')"
             >
               Consommateur
             </Button>
             <Button
-              class="bg-blue-500 hover:bg-blue-400 text-lg px-6 py-3"
+              class="bg-primary-50 dark:bg-primary-500/20 text-primary-700 dark:text-primary-100 hover:bg-primary-400 hover:text-white text-lg px-6 py-3"
               @click="$router.push('/register')"
             >
               Commerçant
@@ -337,7 +337,7 @@
 
         <template v-else>
           <Button
-            class="bg-white text-blue-600 hover:bg-gray-100 text-lg px-6 py-3"
+            class="bg-surface-light dark:bg-surface-dark text-primary-600 dark:text-primary-400 hover:bg-neutral-100 dark:bg-neutral-800 text-lg px-6 py-3"
             @click="$router.push('/dashboard')"
           >
             Accéder à mon tableau de bord

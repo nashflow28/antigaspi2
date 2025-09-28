@@ -1,7 +1,7 @@
 <template>
-  <div class="min-h-screen bg-gradient-to-br from-gray-50 via-surface-light to-blue-50/15">
+  <div class="min-h-screen bg-gradient-to-br from-surface-light via-surface-light to-primary-50/15 dark:from-surface-dark dark:via-surface-dark dark:to-surface-darker">
     <header
-      class="sticky top-0 z-40 border-b border-white/50 bg-white/80 backdrop-blur-2xl shadow-[0_18px_40px_-24px_rgba(4,120,87,0.35)]"
+      class="sticky top-0 z-40 border-b border-white/50 bg-surface-light/80 dark:bg-surface-dark/70 backdrop-blur-2xl shadow-[0_18px_40px_-24px_rgba(4,120,87,0.35)]"
     >
       <div class="container px-3 sm:px-4 lg:px-6 py-12">
         <div class="flex flex-col gap-4 sm:gap-8 lg:flex-row lg:items-center lg:justify-between">
@@ -15,16 +15,16 @@
               Catalogue 2025
             </Badge>
             <div class="space-y-2">
-              <h1 class="font-display text-3xl lg:text-3xl font-semibold text-gray-900 leading-relaxed">
+              <h1 class="font-display text-3xl lg:text-3xl font-semibold text-neutral-900 dark:text-neutral-100 leading-relaxed">
                 Produits responsables à portée de main
               </h1>
-              <p class="text-gray-700 text-gray-700">
+              <p class="text-neutral-600 dark:text-neutral-300">
                 {{ filteredProducts.length }} produit{{ filteredProducts.length > 1 ? 's' : '' }} disponible{{
                   filteredProducts.length > 1 ? 's' : ''
                 }}
               </p>
             </div>
-            <p class="text-sm text-gray-500">
+            <p class="text-sm text-neutral-500 dark:text-neutral-400">
               Explorez nos paniers anti-gaspi triés par impact, localisation et économies garanties.
             </p>
           </div>
@@ -44,7 +44,7 @@
                 variant="secondary"
                 size="md"
                 :left-icon="Filter"
-                class="w-full justify-between text-blue-900 sm:w-auto"
+                class="w-full justify-between text-primary-900 dark:text-primary-100 sm:w-auto"
                 @click="showFilters = !showFilters"
               >
                 <span class="flex items-center gap-2">
@@ -53,7 +53,7 @@
                     variant="primary"
                     size="sm"
                     rounded
-                    class="border border-blue-200/70 bg-blue-50/80 text-blue-900"
+                    class="border border-primary-200/70 bg-primary-50 dark:bg-primary-500/10 text-primary-900 dark:text-primary-100"
                   >
                     {{ activeFiltersCount }}
                   </Badge>
@@ -67,7 +67,7 @@
                 variant="outline"
                 size="sm"
                 rounded
-                class="border-blue-200/70 bg-blue-50/60 text-blue-900"
+                class="border-primary-200/70 bg-primary-50 dark:bg-primary-500/10 text-primary-900 dark:text-primary-100"
               >
                 {{ label }}
               </Badge>
@@ -87,17 +87,17 @@
           <template #header>
             <div class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
               <div class="space-y-4">
-                <h2 class="text-xl font-heading font-semibold text-gray-900 leading-relaxed">
+                <h2 class="text-xl font-heading font-semibold text-neutral-900 dark:text-neutral-100 leading-relaxed">
                   Affiner votre recherche
                 </h2>
-                <p class="text-sm text-gray-500">
+                <p class="text-sm text-neutral-500 dark:text-neutral-400">
                   Combinez nos filtres intelligents pour trouver le panier idéal.
                 </p>
               </div>
               <Button
                 variant="ghost"
                 size="sm"
-                class="text-blue-600 hover:text-blue-900"
+                class="text-primary-600 dark:text-primary-400 hover:text-primary-900 dark:hover:text-primary-200"
                 @click="showFilters = false"
               >
                 Fermer
@@ -107,10 +107,10 @@
 
           <div class="grid grid-cols-1 gap-3 sm:gap-4 md:grid-cols-2 lg:grid-cols-4">
             <label class="flex flex-col gap-2">
-              <span class="text-sm font-medium text-gray-700">Catégorie</span>
+              <span class="text-sm font-medium text-neutral-600 dark:text-neutral-300">Catégorie</span>
               <select
                 v-model="filters.category"
-                class="w-full rounded-modern border border-gray-200/80 bg-white/80 px-3 py-3 text-gray-700 text-gray-700 shadow-sm transition focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-200"
+                class="w-full rounded-modern border border-neutral-200/80 dark:border-neutral-700/60 bg-surface-light/80 dark:bg-surface-dark/70 px-3 py-3 text-neutral-600 dark:text-neutral-300 shadow-sm transition focus:border-primary-400 focus:outline-none focus:ring-2 focus:ring-primary-200"
               >
                 <option value="">Toutes les catégories</option>
                 <option value="bakery">Boulangerie</option>
@@ -122,7 +122,7 @@
             </label>
 
             <div class="flex flex-col gap-2">
-              <span class="text-sm font-medium text-gray-700">Distance</span>
+              <span class="text-sm font-medium text-neutral-600 dark:text-neutral-300">Distance</span>
               <Button
                 variant="secondary"
                 size="sm"
@@ -136,7 +136,7 @@
               </Button>
               <select
                 v-model="filters.maxDistance"
-                class="w-full rounded-modern border border-gray-200/80 bg-white/80 px-3 py-3 text-gray-700 text-gray-700 shadow-sm transition focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-200 disabled:cursor-not-allowed disabled:opacity-60"
+                class="w-full rounded-modern border border-neutral-200/80 dark:border-neutral-700/60 bg-surface-light/80 dark:bg-surface-dark/70 px-3 py-3 text-neutral-600 dark:text-neutral-300 shadow-sm transition focus:border-primary-400 focus:outline-none focus:ring-2 focus:ring-primary-200 disabled:cursor-not-allowed disabled:opacity-60"
                 :disabled="!userLocation"
               >
                 <option value="">{{ userLocation ? 'Toutes distances' : 'Activez votre position' }}</option>
@@ -149,10 +149,10 @@
             </div>
 
             <label class="flex flex-col gap-2">
-              <span class="text-sm font-medium text-gray-700">Prix maximum</span>
+              <span class="text-sm font-medium text-neutral-600 dark:text-neutral-300">Prix maximum</span>
               <select
                 v-model="filters.maxPrice"
-                class="w-full rounded-modern border border-gray-200/80 bg-white/80 px-3 py-3 text-gray-700 text-gray-700 shadow-sm transition focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-200"
+                class="w-full rounded-modern border border-neutral-200/80 dark:border-neutral-700/60 bg-surface-light/80 dark:bg-surface-dark/70 px-3 py-3 text-neutral-600 dark:text-neutral-300 shadow-sm transition focus:border-primary-400 focus:outline-none focus:ring-2 focus:ring-primary-200"
               >
                 <option value="">Tous les prix</option>
                 <option value="500">Moins de 500 F CFA</option>
@@ -163,10 +163,10 @@
             </label>
 
             <label class="flex flex-col gap-2">
-              <span class="text-sm font-medium text-gray-700">Réduction minimum</span>
+              <span class="text-sm font-medium text-neutral-600 dark:text-neutral-300">Réduction minimum</span>
               <select
                 v-model="filters.minDiscount"
-                class="w-full rounded-modern border border-gray-200/80 bg-white/80 px-3 py-3 text-gray-700 text-gray-700 shadow-sm transition focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-200"
+                class="w-full rounded-modern border border-neutral-200/80 dark:border-neutral-700/60 bg-surface-light/80 dark:bg-surface-dark/70 px-3 py-3 text-neutral-600 dark:text-neutral-300 shadow-sm transition focus:border-primary-400 focus:outline-none focus:ring-2 focus:ring-primary-200"
               >
                 <option value="">Toutes réductions</option>
                 <option value="20">20% et plus</option>
@@ -177,11 +177,11 @@
             </label>
           </div>
 
-          <div class="mt-8 flex flex-col gap-3 border-t border-gray-200/70 padding-t-xl sm:flex-row sm:items-center sm:justify-between">
+          <div class="mt-8 flex flex-col gap-3 border-t border-neutral-200 dark:border-neutral-700/70 padding-t-xl sm:flex-row sm:items-center sm:justify-between">
             <Button
               variant="ghost"
               size="sm"
-              class="text-gray-700 hover:text-blue-900"
+              class="text-neutral-600 dark:text-neutral-300 hover:text-primary-900 dark:hover:text-primary-200"
               :disabled="activeFiltersCount === 0 && !searchQuery"
               @click="clearFilters"
             >

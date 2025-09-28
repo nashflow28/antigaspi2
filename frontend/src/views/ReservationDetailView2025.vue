@@ -1,12 +1,12 @@
 <template>
-  <div class="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50">
+  <div class="min-h-screen bg-gradient-to-br from-surface-light to-primary-50 dark:from-surface-dark dark:to-surface-darker">
     <!-- Loading state -->
     <div v-if="loading" class="container py-6 sm:py-8">
       <Card class="animate-pulse">
         <div class="space-y-4">
-          <div class="h-10 bg-gray-200 rounded w-xs/3" />
-          <div class="h-4 bg-gray-200 rounded w-3/4" />
-          <div class="h-4 bg-gray-200 rounded w-1/2" />
+          <div class="h-10 bg-neutral-200 dark:bg-neutral-700 rounded w-xs/3" />
+          <div class="h-4 bg-neutral-200 dark:bg-neutral-700 rounded w-3/4" />
+          <div class="h-4 bg-neutral-200 dark:bg-neutral-700 rounded w-1/2" />
         </div>
       </Card>
     </div>
@@ -14,13 +14,13 @@
     <!-- Error state -->
     <div v-else-if="error" class="container py-6 sm:py-8">
       <Card class="text-left sm:text-center py-8 sm:py-12 lg:py-16">
-        <div class="w-20 h-12 bg-red-100 rounded-full flex items-center justify-center mx-auto mt-3">
-          <AlertCircle class="h-6 w-6 text-red-500" />
+        <div class="w-20 h-12 bg-accent-red/10 rounded-full flex items-center justify-center mx-auto mt-3">
+          <AlertCircle class="h-6 w-6 text-accent-red" />
         </div>
-        <h3 class="text-lg font-semibold text-gray-900 mt-2">
+        <h3 class="text-lg font-semibold text-neutral-900 dark:text-neutral-100 mt-2">
           Erreur de chargement
         </h3>
-        <p class="text-gray-700 mt-3">{{ error }}</p>
+        <p class="text-neutral-600 dark:text-neutral-300 mt-3">{{ error }}</p>
         <div class="flex gap-4 justify-center">
           <Button variant="primary" @click="loadReservation">
             Réessayer
@@ -35,7 +35,7 @@
     <!-- Main content -->
     <div v-else-if="reservation" class="container py-6 sm:py-8">
       <!-- Header -->
-      <div class="bg-white/60 backdrop-blur-md border-b mt-4 sm:mb-3xl">
+      <div class="bg-surface-light dark:bg-surface-dark/60 backdrop-blur-md border-b mt-4 sm:mb-3xl">
         <div class="container py-6">
           <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3">
             <div>
@@ -48,13 +48,13 @@
                   <ArrowLeft class="h-4 w-4" />
                   Retour
                 </Button>
-                <div class="h-10 w-px bg-gray-300" />
-                <span class="text-sm text-gray-500">Réservation</span>
+                <div class="h-10 w-px bg-neutral-300 dark:bg-neutral-600" />
+                <span class="text-sm text-neutral-500 dark:text-neutral-400">Réservation</span>
               </div>
-              <h1 class="text-xl font-semibold text-gray-900">
+              <h1 class="text-xl font-semibold text-neutral-900 dark:text-neutral-100">
                 {{ reservation.product.name }}
               </h1>
-              <p class="text-gray-700">
+              <p class="text-neutral-600 dark:text-neutral-300">
                 Code: {{ reservation.reservation_code }}
               </p>
             </div>
@@ -78,7 +78,7 @@
         <div class="lg:col-span-2 space-y-6">
           <!-- Product details -->
           <Card>
-            <h3 class="text-lg font-semibold text-gray-900 mt-3">
+            <h3 class="text-lg font-semibold text-neutral-900 dark:text-neutral-100 mt-3">
               Détails du produit
             </h3>
             <div class="flex gap-3">
@@ -94,16 +94,16 @@
               </div>
               <div
                 v-else
-                class="w-6xl h-6xl bg-gray-100 rounded flex items-center justify-center flex-shrink-0"
+                class="w-6xl h-6xl bg-neutral-100 dark:bg-neutral-800 rounded flex items-center justify-center flex-shrink-0"
               >
-                <Package class="h-6 w-6 text-gray-400" />
+                <Package class="h-6 w-6 text-neutral-400 dark:text-neutral-500" />
               </div>
 
               <div class="flex-1">
-                <h4 class="font-semibold text-gray-900 mt-2">
+                <h4 class="font-semibold text-neutral-900 dark:text-neutral-100 mt-2">
                   {{ reservation.product.name }}
                 </h4>
-                <div class="space-y-4 text-sm text-gray-700">
+                <div class="space-y-4 text-sm text-neutral-600 dark:text-neutral-300">
                   <div class="flex items-center gap-2">
                     <Store class="h-4 w-4" />
                     <span>{{ reservation.product.merchant.name }}</span>
@@ -123,48 +123,48 @@
 
           <!-- Reservation details -->
           <Card>
-            <h3 class="text-lg font-semibold text-gray-900 mt-3">
+            <h3 class="text-lg font-semibold text-neutral-900 dark:text-neutral-100 mt-3">
               Détails de la réservation
             </h3>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
               <div>
-                <label class="text-sm font-medium text-gray-800">Quantité réservée</label>
-                <p class="text-lg font-semibold text-gray-900">{{ reservation.quantity }}</p>
+                <label class="text-sm font-medium text-neutral-800 dark:text-neutral-200">Quantité réservée</label>
+                <p class="text-lg font-semibold text-neutral-900 dark:text-neutral-100">{{ reservation.quantity }}</p>
               </div>
               <div>
-                <label class="text-sm font-medium text-gray-800">Prix unitaire</label>
+                <label class="text-sm font-medium text-neutral-800 dark:text-neutral-200">Prix unitaire</label>
                 <div class="flex items-center gap-2">
-                  <span class="text-lg font-semibold text-blue-600">
+                  <span class="text-lg font-semibold text-primary-600 dark:text-primary-400">
                     {{ formatPrice(reservation.discounted_price) }}
                   </span>
-                  <span class="text-sm text-gray-500 line-through">
+                  <span class="text-sm text-neutral-500 dark:text-neutral-400 line-through">
                     {{ formatPrice(reservation.original_price) }}
                   </span>
                 </div>
               </div>
               <div>
-                <label class="text-sm font-medium text-gray-800">Montant total</label>
-                <p class="text-xl font-semibold text-blue-600">
+                <label class="text-sm font-medium text-neutral-800 dark:text-neutral-200">Montant total</label>
+                <p class="text-xl font-semibold text-primary-600 dark:text-primary-400">
                   {{ formatPrice(reservation.total_amount) }}
                 </p>
               </div>
               <div>
-                <label class="text-sm font-medium text-gray-800">Date de retrait</label>
-                <p class="text-lg font-semibold text-gray-900">
+                <label class="text-sm font-medium text-neutral-800 dark:text-neutral-200">Date de retrait</label>
+                <p class="text-lg font-semibold text-neutral-900 dark:text-neutral-100">
                   {{ formatDate(reservation.pickup_date) }}
                 </p>
               </div>
             </div>
 
-            <div v-if="reservation.pickup_notes" class="mt-4 padding-t-lg border-t border-gray-200">
-              <label class="text-sm font-medium text-gray-800">Notes de retrait</label>
-              <p class="text-gray-700 mt-1">{{ reservation.pickup_notes }}</p>
+            <div v-if="reservation.pickup_notes" class="mt-4 padding-t-lg border-t border-neutral-200 dark:border-neutral-700">
+              <label class="text-sm font-medium text-neutral-800 dark:text-neutral-200">Notes de retrait</label>
+              <p class="text-neutral-600 dark:text-neutral-300 mt-1">{{ reservation.pickup_notes }}</p>
             </div>
           </Card>
 
           <!-- Actions -->
           <Card v-if="canPerformActions">
-            <h3 class="text-lg font-semibold text-gray-900 mt-3">
+            <h3 class="text-lg font-semibold text-neutral-900 dark:text-neutral-100 mt-3">
               Actions disponibles
             </h3>
             <div class="flex flex-wrap gap-4">
@@ -200,7 +200,7 @@
         <div class="space-y-6">
           <!-- Status timeline -->
           <Card>
-            <h3 class="text-lg font-semibold text-gray-900 mt-3">
+            <h3 class="text-lg font-semibold text-neutral-900 dark:text-neutral-100 mt-3">
               Suivi de la réservation
             </h3>
             <div class="space-y-4">
@@ -211,27 +211,27 @@
               >
                 <div
                   class="h-6 w-6 rounded-full flex items-center justify-center flex-shrink-0"
-                  :class="step.completed ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-500'"
+                  :class="step.completed ? 'bg-primary-50 dark:bg-primary-500/20 text-primary-900 dark:text-primary-100' : 'bg-neutral-200 dark:bg-neutral-700 text-neutral-500 dark:text-neutral-400'"
                 >
                   <component :is="step.icon" class="h-4 w-4" />
                 </div>
                 <div class="flex-1">
                   <p
                     class="font-medium"
-                    :class="step.completed ? 'text-gray-900' : 'text-gray-500'"
+                    :class="step.completed ? 'text-neutral-900 dark:text-neutral-100' : 'text-neutral-500 dark:text-neutral-400'"
                   >
                     {{ step.title }}
                   </p>
-                  <p class="text-sm text-gray-500">{{ step.description }}</p>
+                  <p class="text-sm text-neutral-500 dark:text-neutral-400">{{ step.description }}</p>
                 </div>
               </div>
             </div>
           </Card>
 
           <!-- Savings summary -->
-          <Card class="bg-gradient-to-r from-orange-500 to-orange-500/90 text-white">
+          <Card class="bg-gradient-to-r from-accent-orange to-accent-orange/90 text-white">
             <div class="flex items-center gap-4 mt-3">
-              <div class="w-12 h-10 bg-white/20 rounded flex items-center justify-center">
+              <div class="w-12 h-10 bg-surface-light dark:bg-surface-dark/20 rounded flex items-center justify-center">
                 <DollarSign class="h-6 w-6" />
               </div>
               <div>
@@ -248,7 +248,7 @@
                 <span class="text-sm">Prix payé</span>
                 <span>{{ formatPrice(reservation.total_amount) }}</span>
               </div>
-              <div class="border-t border-white/20 padding-t-sm">
+              <div class="border-t border-neutral-200/20 dark:border-neutral-700/20 padding-t-sm">
                 <div class="flex justify-between items-center">
                   <span class="font-semibold">Économisé</span>
                   <span class="font-semibold text-lg">

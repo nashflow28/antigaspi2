@@ -299,6 +299,46 @@
   }
 
   /* Padding utilities */
+  .px-xs {
+    @apply px-1;
+  }
+
+  .px-sm {
+    @apply px-2;
+  }
+
+  .px-md {
+    @apply px-3;
+  }
+
+  .px-lg {
+    @apply px-4;
+  }
+
+  .px-xl {
+    @apply px-5;
+  }
+
+  .py-xs {
+    @apply py-1;
+  }
+
+  .py-sm {
+    @apply py-2;
+  }
+
+  .py-md {
+    @apply py-3;
+  }
+
+  .py-lg {
+    @apply py-4;
+  }
+
+  .py-xl {
+    @apply py-5;
+  }
+
   .padding-x-md {
     @apply px-4;
   }

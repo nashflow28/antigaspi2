@@ -140,6 +140,14 @@ Pour ajouter de nouveaux composants :
 4. Tester l'accessibilité
 5. Vérifier la responsivité
 
+## Validation visuelle (mai 2025)
+
+- ✅ Boutons : vérification Storybook clair/sombre + responsive → tokens `primary`, `neutral`, `surface`, `accent` appliqués.
+- ✅ Cartes : états par variante (`default`, `glass`, `gradient`, `bordered`) conformes aux ombres `shadow-card` et fonds `surface`.
+- ✅ Badges : déclinaisons `default`, `status` et `outline` compatibles tokens + halo `ring` vérifié.
+- ✅ Inputs : focus states et variantes (`default`, `outline`, `filled`) testés en desktop/mobile (claire/sombre).
+- ✅ Vues migrées (Dashboard, Home, Product, Reservation) : audit visuel responsive → remplacement complet des anciens tokens Tailwind (`gray-*`, `blue-*`).
+
 ---
 
 *Maintenu par l'équipe AntiGaspi - Design System 2025*
