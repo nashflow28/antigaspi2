@@ -202,6 +202,10 @@ class ApiService {
     return this.request<ApiResponse<Product>>(`/products/${id}`)
   }
 
+  async getProductById(id: number): Promise<ApiResponse<Product>> {
+    return this.getProduct(id)
+  }
+
   async createProduct(product: Partial<Product>): Promise<ApiResponse<Product>> {
     return this.request<ApiResponse<Product>>('/products', {
       method: 'POST',
@@ -266,6 +270,13 @@ class ApiService {
   async cancelReservation(id: number): Promise<ApiResponse<null>> {
     return this.request<ApiResponse<null>>(`/reservations/${id}/cancel`, {
       method: 'POST'
+    }, true)
+  }
+
+  async updateReservationStatus(id: number, status: Reservation['status']): Promise<ApiResponse<Reservation>> {
+    return this.request<ApiResponse<Reservation>>(`/reservations/${id}/status`, {
+      method: 'PATCH',
+      body: JSON.stringify({ status })
     }, true)
   }
 

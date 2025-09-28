@@ -56,6 +56,13 @@ export const useCartStore = defineStore('cart', () => {
 
   const itemsCount = computed(() => items.value.reduce((total, item) => total + item.quantity, 0))
   const totalAmount = computed(() => items.value.reduce((total, item) => total + item.price * item.quantity, 0))
+  const totalSavings = computed(() => items.value.reduce((total, item) => {
+    const basePrice = resolvePrice(item.originalPrice)
+    return total + Math.max(0, basePrice - item.price) * item.quantity
+  }, 0))
+  const totalQuantity = computed(() => itemsCount.value)
+  const totalPrice = computed(() => totalAmount.value)
+  const isEmpty = computed(() => totalQuantity.value === 0)
 
   const emitCartNotification = (type: 'error' | 'info' | 'success', payload: CartNotificationPayload) => {
     const { title = 'Panier', message, action, onClose, operation } = payload
@@ -175,7 +182,7 @@ export const useCartStore = defineStore('cart', () => {
   const upsertItem = (payload: AddItemPayload) => {
     const quantity = payload.quantity && payload.quantity > 0 ? Math.floor(payload.quantity) : 1
 
-    if (!payload.id || !payload.name) {
+    if (!payload.id) {
       const message = 'Article invalide'
       if (!payload.silent) {
         emitCartError({
@@ -195,23 +202,30 @@ export const useCartStore = defineStore('cart', () => {
       return { success: false, error: message }
     }
 
-    const existing = items.value.find(item => item.id === payload.id)
+    const normalizedMerchantId = payload.merchantId ?? null
+    const existing = items.value.find(item =>
+      item.id === payload.id && (item.merchantId ?? null) === normalizedMerchantId
+    )
+    const normalizedName = payload.name && payload.name.trim().length > 0
+      ? payload.name.trim()
+      : 'Produit anti-gaspi'
     if (existing) {
       existing.quantity += quantity
       existing.price = resolvePrice(payload.price)
       existing.originalPrice = payload.originalPrice ? resolvePrice(payload.originalPrice) : existing.originalPrice ?? null
       existing.imageUrl = payload.imageUrl ?? existing.imageUrl
-      existing.merchantId = payload.merchantId ?? existing.merchantId
+      existing.merchantId = normalizedMerchantId
       existing.merchantName = payload.merchantName ?? existing.merchantName
+      existing.name = normalizedName
     } else {
       items.value.push({
         id: payload.id,
-        name: payload.name,
+        name: normalizedName,
         price: resolvePrice(payload.price),
         originalPrice: payload.originalPrice ? resolvePrice(payload.originalPrice) : null,
         quantity,
         imageUrl: payload.imageUrl ?? null,
-        merchantId: payload.merchantId ?? null,
+        merchantId: normalizedMerchantId,
         merchantName: payload.merchantName ?? null
       })
     }
@@ -306,11 +320,17 @@ export const useCartStore = defineStore('cart', () => {
     return { success: true }
   }
 
+  hydrateFromStorage()
+
   return {
     // State
     items,
     itemsCount,
     totalAmount,
+    totalQuantity,
+    totalPrice,
+    totalSavings,
+    isEmpty,
     isHydrated,
     pendingOperation,
 

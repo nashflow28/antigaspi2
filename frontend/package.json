@@ -10,7 +10,7 @@
     "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix",
     "type-check": "vue-tsc --noEmit",
     "test:unit": "vitest run",
-    "test:coverage": "vitest run --coverage.enabled true --coverage.reporter=json-summary --coverage.reporter=text-summary",
+    "test:coverage": "vitest run --config vitest.reports.config.ts --coverage",
     "test:e2e": "playwright test",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",

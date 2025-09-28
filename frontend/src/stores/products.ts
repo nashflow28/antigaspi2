@@ -67,6 +67,13 @@ export const useProductsStore = defineStore('products', () => {
     return Array.from(uniqueMerchants.values())
   })
 
+  const selectedProduct = computed<Product | null>({
+    get: () => currentProduct.value,
+    set: value => {
+      currentProduct.value = value
+    }
+  })
+
   // setError removed - using useNotifications composable
 
   // clearError removed - using useNotifications composable
@@ -117,7 +124,11 @@ export const useProductsStore = defineStore('products', () => {
     try {
       loading.value = true
 
-      const response = await apiService.getProduct(id)
+      const resolver = typeof (apiService as any).getProductById === 'function'
+        ? (apiService as any).getProductById.bind(apiService)
+        : apiService.getProduct.bind(apiService)
+
+      const response = await resolver(id)
       currentProduct.value = response.data
 
       return { success: true }
@@ -217,10 +228,39 @@ export const useProductsStore = defineStore('products', () => {
     }
   }
 
+  const getProductsByCategory = (categoryId: number) => {
+    return products.value.filter(product => {
+      const productCategoryId = product.category?.id ?? (product as any).categoryId
+      return productCategoryId === categoryId
+    })
+  }
+
+  const getProductsByPriceRange = (min: number, max: number) => {
+    return products.value.filter(product => {
+      const price = typeof (product as any).price === 'number'
+        ? (product as any).price
+        : parseFloat((product as any).discounted_price ?? (product as any).original_price)
+
+      return price >= min && price <= max
+    })
+  }
+
+  const searchProducts = (query: string) => {
+    const normalizedQuery = query.toLowerCase()
+    return products.value.filter(product => {
+      return product.name.toLowerCase().includes(normalizedQuery) ||
+        product.description.toLowerCase().includes(normalizedQuery)
+    })
+  }
+
+  const fetchProductById = (id: number) => fetchProduct(id)
+  const addProduct = (payload: Partial<Product>) => createProduct(payload)
+
   return {
     // State
     products,
     currentProduct,
+    selectedProduct,
     loading,
     filters,
     pagination,
@@ -233,10 +273,15 @@ export const useProductsStore = defineStore('products', () => {
     // Actions
     fetchProducts,
     fetchProduct,
+    fetchProductById,
     createProduct,
+    addProduct,
     updateProduct,
     deleteProduct,
     setFilters,
-    clearFilters
+    clearFilters,
+    getProductsByCategory,
+    getProductsByPriceRange,
+    searchProducts
   }
 })
