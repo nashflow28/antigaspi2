@@ -1,62 +1,81 @@
 # Migration des primitives React vers Vue
 
-## Primitives React existantes
-- **Button** : bouton animé multi-variantes avec états de chargement et icônes optionnelles.【F:react-design-system/src/components/ui/Button.tsx†L1-L112】
-- **Card** : carte composée (header/content/footer) avec variantes de style, effets hover et options de padding.【F:react-design-system/src/components/ui/Card.tsx†L1-L131】
-- **DashboardLayout** : layout complet avec sidebar réactive, en-tête sticky et gestion mobile du menu.【F:react-design-system/src/components/ui/DashboardLayout.tsx†L1-L163】
-- **EmptyState** : bloc de repli centré avec icône, texte et CTA optionnel.【F:react-design-system/src/components/ui/EmptyState.tsx†L1-L36】
-- **Footer** : pied de page marketing avec signature de marque et liens sociaux animés.【F:react-design-system/src/components/ui/Footer.tsx†L1-L40】
-- **Input** : champ texte avec variantes (subtle/filled/transparent), gestion d’icônes et messages d’aide/erreur animés.【F:react-design-system/src/components/ui/Input.tsx†L1-L141】
-- **Modal** (+ `ConfirmationModal`) : fenêtre modale accessible avec variantes de taille/style et footer d’actions.【F:react-design-system/src/components/ui/Modal.tsx†L1-L194】
-- **Navigation** : barre supérieure responsive avec menu mobile, états actifs et toggle de thème intégré.【F:react-design-system/src/components/ui/Navigation.tsx†L1-L151】
-- **ProductCard** : carte produit dédiée (image, prix remisé, tags, CTA « Réserver »).【F:react-design-system/src/components/ui/ProductCard.tsx†L1-L83】
-- **Skeleton** : placeholder simple avec options d’arrondis et animation shimmer.【F:react-design-system/src/components/ui/Skeleton.tsx†L1-L25】
-- **Stats** : grille de KPI animés (compteur framer-motion, icône, suffixe).【F:react-design-system/src/components/ui/Stats.tsx†L1-L57】
-- **Textarea** : zone de saisie multi-variantes avec focus animés et messages d’aide/erreur.【F:react-design-system/src/components/ui/Textarea.tsx†L1-L120】
-- **ThemeToggle** : bouton toggle clair/sombre appliquant la classe `dark` au document.【F:react-design-system/src/components/ui/ThemeToggle.tsx†L1-L48】
-- **Toast** : notification flottante avec tonalités (success/info/warning/error), action secondaire et fermeture.【F:react-design-system/src/components/ui/Toast.tsx†L1-L106】
+## État des primitives Vue 2025
 
-## Composants Vue actuels sur le même périmètre UI
-- **Button** : bouton composable (variantes, tailles, icônes, états de chargement).【F:frontend/src/components/ui/Button.vue†L1-L158】
-- **Card** : carte polyvalente avec slots header/footer et variantes hover/padding.【F:frontend/src/components/ui/Card.vue†L1-L78】
-- **AccessibleModal** : modale accessible (focus trap, slots header/body/footer, actions confirm/cancel).【F:frontend/src/components/ui/AccessibleModal.vue†L1-L200】
-- **AdminModal** : modale de contenu riche avec header iconique et actions personnalisées.【F:frontend/src/components/ui/AdminModal.vue†L1-L136】
-- **ConfirmModal** : modale de confirmation légère avec variantes danger/success/warning.【F:frontend/src/components/ui/ConfirmModal.vue†L1-L123】
-- **SimpleTopBar** : barre supérieure fixe avec actions (recherche, notifications, panier, menu utilisateur).【F:frontend/src/components/ui/SimpleTopBar.vue†L1-L167】
-- **PageTransition** : wrapper de transition de page (fade/slide) selon navigation et préférences d’animation.【F:frontend/src/components/ui/PageTransition.vue†L1-L192】
-- **DarkModeToggle** : switch clair/sombre persistant (localStorage + media query).【F:frontend/src/components/ui/DarkModeToggle.vue†L1-L129】
-- **NotificationToast** : toast individuel (types, auto-dismiss, fermeture).【F:frontend/src/components/ui/NotificationToast.vue†L1-L90】
-- **NotificationSystem** : pile de notifications avec icônes, barre de progression et gestion store/composable.【F:frontend/src/components/ui/NotificationSystem.vue†L1-L125】
-- **NotificationContainer** : conteneur d’alertes store (auth/produits/réservations).【F:frontend/src/components/ui/NotificationContainer.vue†L1-L78】
-- **Skeleton** : placeholder shimmer avec arrondis configurables.【F:frontend/src/components/ui/Skeleton.vue†L1-L24】
+### Primitives livrées
+- **DashboardLayout.vue** : fournit la grille complète dashboard avec sidebar animée, overlay mobile et slots pour la brand, la navigation, les actions header et l'utilisateur, tout en gérant les points de rupture Tailwind via `@vueuse/motion`.【F:frontend/src/components/ui/DashboardLayout.vue†L1-L200】
+- **Button.vue** : variations `primary/secondary/ghost/outline/promo/destructive` + tailles `xs-xl`, icônes gauche/droite et état `loading` animés.【F:frontend/src/components/ui/2025/Button.vue†L1-L200】
+- **Card.vue** : variantes `default/glass/gradient/bordered/elevated`, options `interactive`, padding, arrondis et ombres configurables pour les conteneurs 2025.【F:frontend/src/components/ui/2025/Card.vue†L1-L200】
+- **Badge.vue** : 8 variantes tonales, tailles `xs-lg`, icônes optionnelles et badge dismissible pour signaux d'état ou KPI.【F:frontend/src/components/ui/2025/Badge.vue†L1-L170】
+- **EmptyState.vue** : support icône/image/slot, actions primaires et secondaires réutilisant les boutons DS et gabarits `default/minimal/illustration` dimensionnés (`sm-lg`).【F:frontend/src/components/ui/2025/EmptyState.vue†L1-L200】
+- **Input.vue** : champ contrôlé avec label, icônes, bouton clear, variantes `default/outline/filled`, tailles `sm-lg`, textes d'aide/erreur et modifiers `number`.【F:frontend/src/components/ui/2025/Input.vue†L1-L200】
+- **Label.vue** : cinq tailles et variantes tonales (`default/muted/success/warning/error`) avec gestion disabled pour cohérence formulaire.【F:frontend/src/components/ui/2025/Label.vue†L1-L76】
+- **Form.vue** : gabarit de formulaire avec header/footer, erreurs globales, actions par défaut (`Button` primaire/outline) et variantes `default/contained/minimal` + tailles `sm-lg`.【F:frontend/src/components/ui/2025/Form.vue†L1-L190】
+- **Select.vue** : wrapper stylé avec tailles `xs-xl`, variantes `default/success/warning/error`, focus ring DS et prise en charge disabled/required.【F:frontend/src/components/ui/2025/Select.vue†L1-L100】
+- **Dropdown.vue** & **DropdownItem.vue** : menu accessible avec placements configurables, déclencheur 2025 et éléments avec icônes, séparateurs, états danger/disabled.【F:frontend/src/components/ui/2025/Dropdown.vue†L1-L200】【F:frontend/src/components/ui/2025/DropdownItem.vue†L1-L105】
+- **Tabs.vue** : tabs clavier avec état actif, icônes optionnelles et événements `tab-change` pour la navigation secondaire.【F:frontend/src/components/ui/2025/Tabs.vue†L1-L103】
+- **Modal.vue** : téléportée, focus trap, variantes `default/glass/minimal/alert`, tailles `xs-full`, close button optionnel et overlay configurable.【F:frontend/src/components/ui/2025/Modal.vue†L1-L200】
+- **Table.vue** : table responsive avec slots cellule, header optionnel, empty state intégré et styles DS (border/hover).【F:frontend/src/components/ui/2025/Table.vue†L1-L90】
+- **Pagination.vue** : navigation paginée combinant boutons DS, modes compact/complet et sélecteur de taille via `Select`.【F:frontend/src/components/ui/2025/Pagination.vue†L1-L200】
+- **Tooltip.vue** : info-bulle avec placements multiples, variantes (`dark/light/error/warning/success`), flèche et offset configurables.【F:frontend/src/components/ui/2025/Tooltip.vue†L1-L200】
+- **Loading.vue** : états `spinner/dots/pulse/skeleton/progress/custom` avec variantes de taille, overlay et textes de statut.【F:frontend/src/components/ui/2025/Loading.vue†L1-L193】
+- **Grid.vue** : composant utilitaire pour la grille responsive (cols/gap alignements) encapsulant la nomenclature Tailwind 2025.【F:frontend/src/components/ui/2025/Grid.vue†L1-L132】
+- **index.ts** : export centralisé des composants + types (ButtonVariant, ModalSize, etc.) pour consommation des vues 2025.【F:frontend/src/components/ui/2025/index.ts†L1-L32】
 
-## Table de correspondance et état de migration
-| Composant React | Rôle principal | Cible Vue actuelle | Statut de migration | Notes |
-| --- | --- | --- | --- | --- |
-| Button | Bouton d’action multi-variantes.【F:react-design-system/src/components/ui/Button.tsx†L6-L112】 | Button.【F:frontend/src/components/ui/Button.vue†L1-L158】 | OK | Prise en charge des variantes 2025, icônes et états de chargement natifs. |
-| Card | Conteneur carte avec sous-composants.【F:react-design-system/src/components/ui/Card.tsx†L6-L131】 | Card.【F:frontend/src/components/ui/Card.vue†L1-L78】 | OK | Slots header/footer et options de padding/hover alignées sur le DS. |
-| DashboardLayout | Layout dashboard sidebar + header.【F:react-design-system/src/components/ui/DashboardLayout.tsx†L5-L159】 | (à créer) – SimpleTopBar ne couvre qu’une barre supérieure.【F:frontend/src/components/ui/SimpleTopBar.vue†L1-L167】 | À faire | Construire un layout Vue complet (sidebar responsive, header actions) pour remplacer `DashboardLayout`. |
-| EmptyState | État vide avec CTA.【F:react-design-system/src/components/ui/EmptyState.tsx†L5-L31】 | Aucun équivalent direct | À faire | Créer un composant Vue réutilisable d’état vide (icône, titre, description, action). |
-| Footer | Pied de page marketing.【F:react-design-system/src/components/ui/Footer.tsx†L4-L37】 | Aucun équivalent direct | À faire | Implémenter un footer Vue stylé cohérent DS. |
-| Input | Champ texte riche.【F:react-design-system/src/components/ui/Input.tsx†L6-L133】 | Aucun équivalent direct | À faire | Besoin d’un composant Input Vue avec variantes, icônes et messages. |
-| Modal / ConfirmationModal | Modale générique + confirmation.【F:react-design-system/src/components/ui/Modal.tsx†L6-L190】 | AccessibleModal / AdminModal / ConfirmModal.【F:frontend/src/components/ui/AccessibleModal.vue†L1-L200】【F:frontend/src/components/ui/AdminModal.vue†L1-L136】【F:frontend/src/components/ui/ConfirmModal.vue†L1-L123】 | Partiel | Fonctionnalités présentes mais multiples implémentations ; converger vers une base unique alignée sur le DS React. |
-| Navigation | Barre nav responsive + thème.【F:react-design-system/src/components/ui/Navigation.tsx†L24-L146】 | SimpleTopBar + DarkModeToggle.【F:frontend/src/components/ui/SimpleTopBar.vue†L1-L167】【F:frontend/src/components/ui/DarkModeToggle.vue†L1-L118】 | À compléter | Vue couvre topbar et toggle mais pas menu desktop/mobile unifié ; créer une `Navigation` Vue complète. |
-| ProductCard | Carte produit CTA.【F:react-design-system/src/components/ui/ProductCard.tsx†L6-L78】 | Aucun équivalent direct | À faire | À implémenter en Vue (peut réutiliser Card + CTA). |
-| Skeleton | Placeholder animé.【F:react-design-system/src/components/ui/Skeleton.tsx†L4-L21】 | Skeleton.【F:frontend/src/components/ui/Skeleton.vue†L1-L24】 | OK | Placeholder shimmer léger, arrondis configurables comme sur React. |
-| Stats | Grille de KPI animés.【F:react-design-system/src/components/ui/Stats.tsx†L4-L54】 | Aucun équivalent direct | À faire | Créer composant `Stats` Vue avec compteur animé/variants. |
-| Textarea | Zone de texte riche.【F:react-design-system/src/components/ui/Textarea.tsx†L6-L112】 | Aucun équivalent direct | À faire | Développer Textarea Vue calquée sur Input. |
-| ThemeToggle | Switch thème.【F:react-design-system/src/components/ui/ThemeToggle.tsx†L5-L45】 | DarkModeToggle.【F:frontend/src/components/ui/DarkModeToggle.vue†L1-L118】 | OK | Fonctionnalité équivalente (persistante + animation). |
-| Toast | Notification flottante.【F:react-design-system/src/components/ui/Toast.tsx†L6-L100】 | NotificationToast / NotificationSystem.【F:frontend/src/components/ui/NotificationToast.vue†L1-L90】【F:frontend/src/components/ui/NotificationSystem.vue†L1-L125】 | Partiel | Vue possède un toast unitaire et un système multi-toasts ; aligner design (bordure, actions ghost) et API. |
+### Couverture vs primitives React
+| Composant React | Cible Vue 2025 | Statut | Notes |
+| --- | --- | --- | --- |
+| DashboardLayout | `DashboardLayout.vue` | ✅ Livré | Implémente sidebar responsive, header sticky et slots (plus riche que la version React).【F:frontend/src/components/ui/DashboardLayout.vue†L1-L200】 |
+| EmptyState | `EmptyState.vue` | ✅ Livré | Prend en charge icône/image + actions, à brancher partout où un fallback est nécessaire.【F:frontend/src/components/ui/2025/EmptyState.vue†L1-L200】 |
+| Input | `Input.vue` | ✅ Livré | Prêt pour la migration des formulaires (icônes, messages, clear).【F:frontend/src/components/ui/2025/Input.vue†L1-L200】 |
+| Button | `Button.vue` | ✅ Livré | Variantes/tailles alignées, y compris `promo` et `destructive`.【F:frontend/src/components/ui/2025/Button.vue†L1-L200】 |
+| Card | `Card.vue` | ✅ Livré | Slots header/footer, variantes glass/gradient/elevated disponibles.【F:frontend/src/components/ui/2025/Card.vue†L1-L200】 |
+| Badge | `Badge.vue` | ✅ Livré | Couleurs statut + mode dismissible pour badges dynamiques.【F:frontend/src/components/ui/2025/Badge.vue†L1-L170】 |
+| Modal / ConfirmationModal | `Modal.vue` + boutons DS | ✅ Livré | Supporte tailles, variantes et close behavior personnalisable.【F:frontend/src/components/ui/2025/Modal.vue†L1-L200】 |
+| Navigation | (à produire) | 🚧 À faire | Les vues utilisent encore `SimpleTopBar`/layouts spécifiques ; une primitive `Navigation` 2025 reste à factoriser. |
+| ProductCard | (à produire) | 🚧 À faire | Non implémenté côté Vue ; restera à construire à partir de `Card`/`Badge`. |
+| Skeleton | `Loading.vue` (`type='skeleton'`) | ✅ Livré | Alternative plus flexible que le composant Skeleton React.【F:frontend/src/components/ui/2025/Loading.vue†L1-L142】 |
+| Stats | (à produire) | 🚧 À faire | Aucun équivalent 2025 (utiliser `Card` + `Badge` en attendant). |
+| Textarea | (à produire) | 🚧 À faire | À décliner à partir de `Input` (comportements partagés). |
+| ThemeToggle | `DarkModeToggle.vue` (legacy) | 🚧 Harmonisation | Implémentation existante hors dossier 2025 ; prévoir refonte alignée DS. |
+| Toast | `NotificationToast.vue` / système legacy | 🚧 Harmonisation | Design 2025 pas encore porté (couleurs/bordures). |
 
-## Lots navigation grand public (vue côté client)
+## Checklists par vue prioritaire
 
-| Vue | Primitives DS utilisées | Statut |
-| --- | --- | --- |
-| `DiscoverView` | `Card`, `Button`, `Skeleton`, toasts globaux | ✅ Intégrée (liste des commerçants + favoris) |
-| `CartPage` | `Card`, `Button`, `formatPrice`, toasts du store panier | ✅ Intégrée (résumé commande) |
-| `CheckoutView` | `Card`, `Button`, `Skeleton`, notifications | ✅ Intégrée (formulaire paiement) |
-| `FavoritesView` | `Card`, `Button`, `useFavoritesStore` + toasts | ✅ Intégrée (gestion favoris) |
-| `MerchantDetailView` | `Card`, `Button`, `Skeleton`, `useMerchantsStore` | ✅ Intégrée (fiche détaillée) |
-| `PublicReviewsView` | `Card`, `Button`, `Skeleton`, `useMerchantsStore` | ✅ Intégrée (retours communauté) |
-| `OnboardingFlow` | `Card`, `Button`, `useOnboardingStore` | ✅ Intégrée (guide onboarding) |
+### ProductDetailView2025
+**Tokens & composants 2025**
+- Fond gradient `from-surface-light` → `to-surface-darker` pour respecter les tokens surface/dark mode.【F:frontend/src/views/ProductDetailView2025.vue†L1-L39】
+- `Card` variantes `glass`, `elevated` et `gradient` + `Badge` `success/promo` pour les états produit/prix.【F:frontend/src/views/ProductDetailView2025.vue†L36-L140】
+- Boutons DS (`primary`, `ghost`, `success`) sur CTA, sélecteur de quantité et navigation.【F:frontend/src/views/ProductDetailView2025.vue†L16-L200】
 
+**Validation QA recommandée**
+- Vérifier les fallback visuels (icône `Package` et overlay) lorsqu’une image produit manque.【F:frontend/src/views/ProductDetailView2025.vue†L41-L52】
+- Tester le calcul prix total et les désactivations (`:disabled`) des boutons +/- selon stock disponible.【F:frontend/src/views/ProductDetailView2025.vue†L159-L199】
+- Contrôler l’état erreur « Produit introuvable » (alert + CTA retour) pour cohérence tonalités rouge.【F:frontend/src/views/ProductDetailView2025.vue†L11-L19】
+
+### ReservationDetailView2025
+**Tokens & composants 2025**
+- Fond gradient surface/primary et skeleton `Card` pour loading state.【F:frontend/src/views/ReservationDetailView2025.vue†L1-L33】
+- Header sticky avec `Button` ghost, séparateur et `Badge` statut (`size="lg"`).【F:frontend/src/views/ReservationDetailView2025.vue†L37-L71】
+- Cartes détaillant produit/réservation + actions conditionnelles (`destructive`, `outline`).【F:frontend/src/views/ReservationDetailView2025.vue†L80-L195】
+
+**Validation QA recommandée**
+- S’assurer que le badge de statut change bien de variante selon `reservation.status` (success/warning/error).【F:frontend/src/views/ReservationDetailView2025.vue†L64-L70】
+- Vérifier les options d’action (annulation, contact, reçu) et leur accessibilité (icônes + texte).【F:frontend/src/views/ReservationDetailView2025.vue†L170-L195】
+- Tester le fallback image produit (bloc neutre + icône) et la cohérence des données marchand (adresse/téléphone).【F:frontend/src/views/ReservationDetailView2025.vue†L84-L120】
+
+### DashboardView2025
+**Tokens & composants 2025**
+- `DashboardLayout` appliquant fond gradient global et slots sidebar/header.【F:frontend/src/views/DashboardView2025.vue†L1-L27】
+- Grille de `Card` `glass` interactives pour les KPI, badges succès et CTA `ghost`/`primary`.【F:frontend/src/views/DashboardView2025.vue†L32-L173】
+- États chargement/vides stylés à l’intérieur des cartes récentes (squelettes + fallback CTA).【F:frontend/src/views/DashboardView2025.vue†L175-L195】
+
+**Validation QA recommandée**
+- Contrôler le header sticky (blur + border) et la persistance du badge CO₂ dans les différentes largeurs.【F:frontend/src/views/DashboardView2025.vue†L7-L24】
+- Vérifier l’animation retardée (`animation-delay`) des cartes KPI pour éviter les clignotements.【F:frontend/src/views/DashboardView2025.vue†L32-L151】
+- Tester les scénarios récents : chargement (squelette), liste vide (fallback), navigation CTA « Voir tout ».【F:frontend/src/views/DashboardView2025.vue†L175-L195】
+
+## Statut des tests visuels & snapshots
+- `frontend/tests/design-validation.spec.ts` couvre actuellement homepage, profil et dashboard marchand : vérification gradients, responsive mobile, typos Inter, persistance dark mode et accessibilité du toggle (pas de snapshot, assertions CSS/DOM).【F:frontend/tests/design-validation.spec.ts†L1-L149】
+- `frontend/tests/simple-design-test.spec.ts` fournit un smoke visuel léger (titre, navigation responsive, police Inter) mais sans ciblage des vues 2025 ni capture `toHaveScreenshot`.【F:frontend/tests/simple-design-test.spec.ts†L1-L39】
+- Aucune validation automatisée ne cible encore `ProductDetailView2025` ou `ReservationDetailView2025` ; planifier des scénarios Playwright avec enregistrement de snapshots (desktop/mobile, clair/sombre) et baselines à intégrer dans la CI pour répondre aux exigences de phase 3.
