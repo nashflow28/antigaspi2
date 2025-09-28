@@ -56,10 +56,10 @@
             <!-- Stock Badge -->
             <div class="relative sm:absolute top-4 left-4">
               <Badge
-                :variant="product.quantity > 5 ? 'success' : product.quantity > 0 ? 'warning' : 'error'"
+                :variant="availableQuantity > 5 ? 'success' : availableQuantity > 0 ? 'warning' : 'error'"
                 class="backdrop-blur-md"
               >
-                {{ product.quantity > 0 ? `${product.quantity} en stock` : 'Rupture de stock' }}
+                {{ availableQuantity > 0 ? `${availableQuantity} en stock` : 'Rupture de stock' }}
               </Badge>
             </div>
 
@@ -172,13 +172,13 @@
                       v-model.number="reservationQuantity"
                       type="number"
                       min="1"
-                      :max="product.quantity"
+                      :max="maxReservationQuantity"
                       class="w-12 text-left sm:text-center border-0 focus:ring-0 py-3 bg-transparent text-neutral-900 dark:text-neutral-100"
                     >
                     <Button
                       variant="ghost"
                       size="sm"
-                      :disabled="reservationQuantity >= product.quantity"
+                      :disabled="reservationQuantity >= availableQuantity"
                       @click="increaseQuantity"
                     >
                       <Plus class="h-4 w-4" />
@@ -199,7 +199,7 @@
                   <Button
                     size="lg"
                     full-width
-                    :disabled="product.quantity === 0 || loading"
+                    :disabled="availableQuantity === 0 || reservationLoading"
                     :loading="reservationLoading"
                     @click="handleReservation"
                   >
@@ -277,8 +277,8 @@
               <p class="text-sm text-neutral-600 dark:text-neutral-300 mt-2">{{ relatedProduct.merchant?.business_name }}</p>
               <div class="flex items-center gap-2">
                 <span class="font-semibold text-primary-600 dark:text-primary-400">{{ formatPrice(relatedProduct.discounted_price) }} XOF</span>
-                <Badge size="xs" :variant="relatedProduct.quantity > 0 ? 'success' : 'error'">
-                  {{ relatedProduct.quantity }} restants
+                <Badge size="xs" :variant="relatedProduct.quantity_available > 0 ? 'success' : 'error'">
+                  {{ relatedProduct.quantity_available }} restants
                 </Badge>
               </div>
             </div>
@@ -290,9 +290,14 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useDesignSystem2025 } from '@/composables/useDesignSystem2025'
+import { apiService } from '@/services/api'
+import { notify } from '@/composables/useNotifications'
+import { useAuthStore } from '@/stores/auth'
+import { useReservationsStore } from '@/stores/reservations'
+import { usePaymentsStore } from '@/stores/payments'
 
 // Import 2025 components
 import Button from '@/components/ui/2025/Button.vue'
@@ -309,6 +314,9 @@ import {
 const route = useRoute()
 const router = useRouter()
 const { logMigration } = useDesignSystem2025()
+const authStore = useAuthStore()
+const reservationsStore = useReservationsStore()
+const paymentsStore = usePaymentsStore()
 
 // Log migration usage - ProductDetailView successfully migrated to 2025 Design System
 logMigration('ProductDetailView', 'Using 2025 components', {
@@ -317,17 +325,50 @@ logMigration('ProductDetailView', 'Using 2025 components', {
 })
 
 // Reactive state
+interface ProductDetail {
+  id: number
+  name: string
+  description: string | null
+  original_price: number
+  discounted_price: number
+  quantity_available: number
+  expiration_date: string
+  image_url?: string | null
+  discount_percentage: number
+  category?: { id?: number; name?: string }
+  merchant?: { business_name?: string; address?: string | null; phone?: string | null }
+  is_surprise_basket?: boolean
+  is_expired?: boolean
+  is_expiring_soon?: boolean
+}
+
+interface RelatedProduct {
+  id: number
+  name: string
+  discounted_price: number
+  quantity_available: number
+  merchant?: { business_name?: string }
+  image_url?: string | null
+}
+
 const loading = ref(true)
 const error = ref('')
-const product = ref(null)
-const relatedProducts = ref([])
+const product = ref<ProductDetail | null>(null)
+const relatedProducts = ref<RelatedProduct[]>([])
 const reservationQuantity = ref(1)
 const reservationLoading = ref(false)
 const isInWishlist = ref(false)
 
+const availableQuantity = computed(() => product.value?.quantity_available ?? 0)
+const maxReservationQuantity = computed(() => Math.max(availableQuantity.value, 1))
+
 // Computed
 const discountPercentage = computed(() => {
   if (!product.value) return 0
+  if (typeof product.value.discount_percentage === 'number' && product.value.discount_percentage > 0) {
+    return Math.round(product.value.discount_percentage)
+  }
+
   const { original_price, discounted_price } = product.value
   if (original_price <= discounted_price) return 0
   return Math.round(((original_price - discounted_price) / original_price) * 100)
@@ -335,6 +376,9 @@ const discountPercentage = computed(() => {
 
 const statusVariant = computed(() => {
   if (!product.value) return 'default'
+  if (product.value.is_expired || availableQuantity.value === 0) return 'error'
+  if (product.value.is_expiring_soon) return 'warning'
+
   const now = new Date()
   const expiration = new Date(product.value.expiration_date)
   const hoursUntilExpiration = (expiration.getTime() - now.getTime()) / (1000 * 60 * 60)
@@ -346,6 +390,10 @@ const statusVariant = computed(() => {
 
 const statusLabel = computed(() => {
   if (!product.value) return ''
+  if (product.value.is_expired) return 'Expiré'
+  if (availableQuantity.value === 0) return 'Rupture'
+  if (product.value.is_expiring_soon) return 'Expire bientôt'
+
   const now = new Date()
   const expiration = new Date(product.value.expiration_date)
   const hoursUntilExpiration = (expiration.getTime() - now.getTime()) / (1000 * 60 * 60)
@@ -379,7 +427,7 @@ const getCategoryVariant = (categoryName) => {
 }
 
 const increaseQuantity = () => {
-  if (reservationQuantity.value < product.value.quantity) {
+  if (product.value && reservationQuantity.value < availableQuantity.value) {
     reservationQuantity.value++
   }
 }
@@ -391,25 +439,55 @@ const decreaseQuantity = () => {
 }
 
 const handleReservation = async () => {
+  if (!product.value) return
+
+  if (availableQuantity.value === 0) {
+    notify.info('Ce produit est actuellement en rupture de stock.', 'Réservation')
+    return
+  }
+
+  if (!authStore.isAuthenticated) {
+    notify.info('Connectez-vous pour réserver ce produit.', 'Connexion requise')
+    router.push({ name: 'login', query: { redirect: `/products/${product.value.id}` } })
+    return
+  }
+
   reservationLoading.value = true
 
   try {
-    // Simulation de la réservation
-    await new Promise(resolve => setTimeout(resolve, 1000))
-    logMigration('ProductDetailView', 'Reservation created', {
+    const response = await reservationsStore.createReservation({
       productId: product.value.id,
-      quantity: reservationQuantity.value
+      quantity: reservationQuantity.value,
+      paymentMethod: 'paystack',
+      customerPhone: authStore.user?.phone || undefined,
+      customerEmail: authStore.user?.email || undefined
     })
 
-    router.push('/reservations')
-  } catch {
-    // console.error('Reservation error:', error)
+    if (!response.success) {
+      notify.error(response.error || 'Impossible de créer la réservation pour le moment.', 'Réservation')
+      return
+    }
+
+    if (response.payment) {
+      paymentsStore.recordPayment(response.payment)
+      if (response.payment.checkout_url) {
+        window.open(response.payment.checkout_url, '_blank', 'noopener')
+      }
+    }
+
+    notify.success('Votre réservation a bien été enregistrée.', 'Réservation')
+    router.push({ name: 'reservations' })
+  } catch (err) {
+    const message = err instanceof Error ? err.message : 'Erreur inattendue lors de la réservation.'
+    notify.error(message, 'Réservation')
   } finally {
     reservationLoading.value = false
   }
 }
 
 const addToWishlist = () => {
+  if (!product.value) return
+
   isInWishlist.value = !isInWishlist.value
   logMigration('ProductDetailView', 'Wishlist toggle', {
     productId: product.value.id,
@@ -435,45 +513,104 @@ const navigateToProduct = (productId) => {
   router.push(`/products/${productId}`)
 }
 
-// Load product data
-onMounted(async () => {
-  try {
-    // Simulation du chargement des données
-    await new Promise(resolve => setTimeout(resolve, 500))
+const hydrateProduct = (apiProduct: any): ProductDetail | null => {
+  if (!apiProduct) return null
 
-    // Mock product data
-    product.value = {
-      id: route.params.id,
-      name: 'Pain artisanal complet',
-      description: 'Pain complet artisanal fait avec des ingrédients biologiques. Parfait pour un petit-déjeuner nutritif.',
-      original_price: 800,
-      discounted_price: 400,
-      quantity: 8,
-      expiration_date: new Date(Date.now() + 6 * 60 * 60 * 1000).toISOString(),
-      image_url: '/images/bread-artisan.jpg',
-      category: { name: 'Boulangerie' },
-      merchant: {
-        business_name: 'Boulangerie Martin',
-        address: '123 Avenue de la Paix, Lomé'
-      },
-      is_surprise_basket: false
+  return {
+    id: Number(apiProduct.id ?? 0),
+    name: apiProduct.name,
+    description: apiProduct.description ?? null,
+    original_price: Number(apiProduct.original_price ?? 0),
+    discounted_price: Number(apiProduct.discounted_price ?? 0),
+    quantity_available: Number(apiProduct.quantity_available ?? 0),
+    expiration_date: apiProduct.expiration_date,
+    image_url: apiProduct.image_url ?? null,
+    discount_percentage: Number(apiProduct.discount_percentage ?? 0),
+    category: apiProduct.category,
+    merchant: apiProduct.merchant ? {
+      business_name: apiProduct.merchant.business_name ?? apiProduct.merchant.name,
+      address: apiProduct.merchant.address ?? apiProduct.merchant.city ?? null,
+      phone: apiProduct.merchant.phone ?? null
+    } : undefined,
+    is_surprise_basket: Boolean(apiProduct.is_surprise_basket),
+    is_expired: Boolean(apiProduct.is_expired),
+    is_expiring_soon: Boolean(apiProduct.is_expiring_soon)
+  }
+}
+
+const hydrateRelatedProducts = (products: any[]): RelatedProduct[] => {
+  if (!Array.isArray(products)) return []
+
+  return products.map(item => ({
+    id: item.id,
+    name: item.name,
+    discounted_price: Number(item.discounted_price ?? 0),
+    quantity_available: Number(item.quantity_available ?? item.quantity ?? 0),
+    merchant: item.merchant ? { business_name: item.merchant.business_name ?? item.merchant.name } : undefined,
+    image_url: item.image_url ?? null
+  }))
+}
+
+const fetchProduct = async () => {
+  try {
+    loading.value = true
+    error.value = ''
+
+    const productId = Number(route.params.id)
+    if (Number.isNaN(productId)) {
+      error.value = 'Identifiant de produit invalide.'
+      return
     }
 
-    relatedProducts.value = [
-      {
-        id: 2,
-        name: 'Croissants artisanaux',
-        discounted_price: 100,
-        quantity: 5,
-        merchant: { business_name: 'Boulangerie Martin' },
-        image_url: '/images/croissants.jpg'
-      }
-      // ... more related products
-    ]
-  } catch {
-    error.value = 'Erreur lors du chargement du produit'
+    const response = await apiService.getProduct(productId)
+
+    if (!response.success) {
+      error.value = response.message || 'Erreur lors du chargement du produit.'
+      return
+    }
+
+    const hydratedProduct = hydrateProduct(response.data)
+
+    if (!hydratedProduct) {
+      error.value = 'Produit introuvable.'
+      return
+    }
+
+    product.value = hydratedProduct
+    reservationQuantity.value = 1
+
+    const related = (response.data as any)?.related_products ?? []
+    relatedProducts.value = hydrateRelatedProducts(related)
+  } catch (err) {
+    const message = err instanceof Error ? err.message : 'Erreur lors du chargement du produit.'
+    error.value = message
   } finally {
     loading.value = false
+  }
+}
+
+onMounted(fetchProduct)
+
+watch(() => route.params.id, () => {
+  fetchProduct()
+})
+
+watch(availableQuantity, (quantity) => {
+  if (quantity <= 0) {
+    reservationQuantity.value = 1
+    return
+  }
+
+  if (reservationQuantity.value > quantity) {
+    reservationQuantity.value = quantity
+  }
+})
+
+watch(reservationQuantity, (quantity) => {
+  if (quantity < 1) {
+    reservationQuantity.value = 1
+  } else if (quantity > availableQuantity.value && availableQuantity.value > 0) {
+    reservationQuantity.value = availableQuantity.value
   }
 })
 </script>
