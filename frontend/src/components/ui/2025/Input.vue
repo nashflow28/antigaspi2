@@ -187,8 +187,9 @@ const containerClasses = computed(() => {
   const baseClasses = [
     // Base container styles
     'relative flex items-center',
-    'border border-gray-300',
-    'transition-all duration-200',
+    'border border-neutral-300 dark:border-neutral-700',
+    'bg-surface-light dark:bg-surface-dark',
+    'transition-all duration-200 ease-spring-out',
 
     // Size classes
     sizeContainerClasses.value,
@@ -197,9 +198,9 @@ const containerClasses = computed(() => {
     variantContainerClasses.value,
 
     // State classes
-    props.error && 'border-red-500 ring-1 ring-red-500/20',
-    isFocused.value && !props.error && 'border-blue-500 ring-1 ring-primary-500/20',
-    props.disabled && 'bg-gray-50 border-gray-200 cursor-not-allowed'
+    props.error && 'border-accent-red ring-1 ring-accent-red/20',
+    isFocused.value && !props.error && 'border-primary-500 ring-1 ring-primary-400/30',
+    props.disabled && 'bg-neutral-100 dark:bg-neutral-800 border-neutral-200 dark:border-neutral-700 cursor-not-allowed'
   ].filter(Boolean)
 
   return baseClasses.join(' ')
@@ -209,9 +210,10 @@ const inputClasses = computed(() => {
   const baseClasses = [
     // Base input styles
     'flex-1 bg-transparent',
-    'text-gray-900 placeholder-neutral-400',
+    'text-neutral-900 dark:text-neutral-50',
+    'placeholder-neutral-400 dark:placeholder-neutral-500',
     'focus:outline-none',
-    'disabled:cursor-not-allowed disabled:text-gray-500',
+    'disabled:cursor-not-allowed disabled:text-neutral-500 dark:disabled:text-neutral-500',
 
     // Size classes
     sizeInputClasses.value,
@@ -227,9 +229,9 @@ const inputClasses = computed(() => {
 
 const sizeContainerClasses = computed(() => {
   const sizes = {
-    sm: 'h-10 px-3 rounded',
-    md: 'h-10 px-3 rounded',
-    lg: 'h-10 px-3 rounded'
+    sm: 'h-10 px-md rounded-lg',
+    md: 'h-11 px-lg rounded-xl',
+    lg: 'h-12 px-xl rounded-xl'
   }
   return sizes[props.size]
 })
@@ -245,38 +247,38 @@ const sizeInputClasses = computed(() => {
 
 const variantContainerClasses = computed(() => {
   const variants = {
-    default: 'bg-white hover:border-gray-400',
-    outline: 'bg-transparent border-2 hover:border-gray-400',
-    filled: 'bg-gray-50 border-transparent hover:bg-gray-100'
+    default: 'hover:border-neutral-400 dark:hover:border-neutral-500',
+    outline: 'bg-transparent dark:bg-transparent border-2 hover:border-primary-400 dark:hover:border-primary-500',
+    filled: 'bg-neutral-100 dark:bg-neutral-800 border-transparent hover:bg-neutral-200 dark:hover:bg-neutral-700'
   }
   return variants[props.variant]
 })
 
 const labelClasses = computed(() => [
-  'block text-sm font-medium text-gray-800 mb-1',
-  props.disabled && 'text-gray-500'
+  'block text-sm font-medium text-neutral-800 dark:text-neutral-200 mb-1',
+  props.disabled && 'text-neutral-500 dark:text-neutral-500'
 ].filter(Boolean).join(' '))
 
 const iconClasses = computed(() => [
-  'text-gray-400 flex-shrink-0',
+  'text-neutral-400 dark:text-neutral-500 flex-shrink-0',
   props.size === 'sm' && 'mx-sm',
   props.size === 'md' && 'mx-sm',
   props.size === 'lg' && 'mx-md'
 ].filter(Boolean).join(' '))
 
 const clearButtonClasses = computed(() => [
-  'text-gray-400 hover:text-gray-700',
-  'rounded-full p-1 hover:bg-gray-100',
+  'text-neutral-400 dark:text-neutral-300 hover:text-neutral-600 dark:hover:text-neutral-100',
+  'rounded-full p-1 hover:bg-neutral-100 dark:hover:bg-neutral-700',
   'transition-colors flex-shrink-0',
   'mr-1'
 ].join(' '))
 
 const helpTextClasses = computed(() => [
-  'mt-1 text-sm text-gray-500'
+  'mt-1 text-sm text-neutral-500 dark:text-neutral-400'
 ].join(' '))
 
 const errorTextClasses = computed(() => [
-  'mt-1 text-sm text-red-600'
+  'mt-1 text-sm text-accent-red'
 ].join(' '))
 
 // Methods

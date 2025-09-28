@@ -73,7 +73,8 @@ const computedClasses = computed(() => {
       'cursor-pointer',
       'hover:scale-[1.02]',
       'active:scale-[0.98]',
-      'focus:outline-none focus:ring-2 focus:ring-blue-500/50'
+      'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-400/60',
+      'focus-visible:ring-offset-2 focus-visible:ring-offset-surface-light dark:focus-visible:ring-offset-surface-dark'
     ].filter(Boolean).join(' '),
 
     // Shadow
@@ -92,35 +93,36 @@ const computedClasses = computed(() => {
 const variantClasses = computed(() => {
   const variants = {
     default: [
-      'bg-white',
-      'border border-gray-200',
-      'hover:border-gray-300'
+      'bg-surface-light text-neutral-900',
+      'dark:bg-surface-dark dark:text-neutral-50',
+      'border border-neutral-200 dark:border-neutral-700',
+      'shadow-card hover:shadow-glow'
     ].join(' '),
 
     glass: [
-      'bg-white/60 backdrop-blur-md',
-      'border border-white/20',
-      'hover:bg-white/70',
-      'shadow-glass'
+      'bg-surface-light/70 dark:bg-surface-dark/70',
+      'backdrop-blur-xl',
+      'border border-neutral-200/60 dark:border-neutral-700/60',
+      'shadow-glow hover:shadow-card'
     ].join(' '),
 
     gradient: [
-      'bg-gradient-to-br from-white to-neutral-50',
-      'border border-gray-200',
-      'hover:from-gray-50 hover:to-gray-100'
+      'bg-gradient-to-br from-primary-500/15 via-surface-light to-primary-500/10',
+      'dark:from-primary-500/20 dark:via-surface-dark dark:to-primary-500/10',
+      'border border-primary-500/10 dark:border-primary-500/20',
+      'text-neutral-900 dark:text-neutral-100'
     ].join(' '),
 
     bordered: [
-      'bg-white',
-      'border-2 border-blue-200',
-      'hover:border-blue-300'
+      'bg-surface-light dark:bg-surface-dark',
+      'border-2 border-primary-400/50 dark:border-primary-500/60',
+      'hover:border-primary-500'
     ].join(' '),
 
     elevated: [
-      'bg-white',
-      'border-0',
-      'shadow-ui-elevated',
-      'hover:shadow-ui-elevated-hover'
+      'bg-surface-light dark:bg-surface-dark',
+      'border border-neutral-200/60 dark:border-neutral-700/60',
+      'shadow-card hover:shadow-glow'
     ].join(' ')
   }
 
@@ -146,10 +148,10 @@ const shadowClasses = computed(() => {
 const roundedClasses = computed(() => {
   const roundedOptions = {
     none: 'rounded-none',
-    sm: 'rounded',
-    md: 'rounded',
-    lg: 'rounded',
-    xl: 'rounded',
+    sm: 'rounded-lg',
+    md: 'rounded-xl',
+    lg: 'rounded-2xl',
+    xl: 'rounded-3xl',
     full: 'rounded-full'
   }
 
@@ -170,19 +172,19 @@ const handleClick = (event: MouseEvent) => {
 }
 
 .ui-header {
-  @apply border-b border-gray-200 pb-4 mb-4;
+  @apply border-b border-neutral-200 dark:border-neutral-700 pb-4 mb-4;
 }
 
 .ui-title {
-  @apply text-lg font-semibold text-gray-900;
+  @apply text-lg font-semibold text-neutral-900 dark:text-neutral-50;
 }
 
 .ui-content {
-  @apply text-gray-800;
+  @apply text-neutral-700 dark:text-neutral-200;
 }
 
 .ui-footer {
-  @apply border-t border-gray-200 pt-4 mt-4;
+  @apply border-t border-neutral-200 dark:border-neutral-700 pt-4 mt-4;
 }
 
 .shadow-glass {

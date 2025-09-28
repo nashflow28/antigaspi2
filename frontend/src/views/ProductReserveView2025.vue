@@ -1,7 +1,7 @@
 <template>
-  <div class="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50">
+  <div class="min-h-screen bg-gradient-to-br from-surface-light to-primary-50 dark:from-surface-dark dark:to-surface-darker">
     <!-- Page Header -->
-    <div class="bg-white/60 backdrop-blur-md glass-border border-b backdrop-blur-lg sticky top-20 z-40">
+    <div class="bg-surface-light dark:bg-surface-dark/60 backdrop-blur-md glass-border border-b backdrop-blur-lg sticky top-20 z-40">
       <div class="container py-6">
         <div class="flex items-center gap-3 animate-fade-in-up">
           <Button
@@ -13,10 +13,10 @@
             <ArrowLeft class="h-6 w-6" />
           </Button>
           <div>
-            <h1 class="text-xl lg:text-3xl font-semibold text-gray-900 mt-2">
+            <h1 class="text-xl lg:text-3xl font-semibold text-neutral-900 dark:text-neutral-100 mt-2">
               Réserver un produit 🛒
             </h1>
-            <p class="text-lg text-gray-700">
+            <p class="text-lg text-neutral-600 dark:text-neutral-300">
               Finalisez votre réservation en quelques étapes
             </p>
           </div>
@@ -29,16 +29,16 @@
         <!-- Loading State -->
         <div v-if="loadingProduct" class="flex justify-center items-center min-h-9xl">
           <div class="flex items-center gap-3">
-            <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600" />
-            <span class="text-gray-700">Chargement du produit...</span>
+            <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600" />
+            <span class="text-neutral-600 dark:text-neutral-300">Chargement du produit...</span>
           </div>
         </div>
 
         <!-- Error State -->
         <Card v-else-if="productError" class="text-left sm:text-center py-16 sm:py-16 lg:py-16">
-          <Package class="w-6xl h-6xl text-gray-500 mx-auto mt-3" />
-          <h3 class="text-xl font-semibold text-gray-800 mt-2">Produit introuvable</h3>
-          <p class="text-gray-500 mt-4">
+          <Package class="w-6xl h-6xl text-neutral-500 dark:text-neutral-400 mx-auto mt-3" />
+          <h3 class="text-xl font-semibold text-neutral-800 dark:text-neutral-200 mt-2">Produit introuvable</h3>
+          <p class="text-neutral-500 dark:text-neutral-400 mt-4">
             Le produit que vous souhaitez réserver n'existe pas ou n'est plus disponible.
           </p>
           <Button variant="primary" @click="$router.push('/products')">
@@ -51,8 +51,8 @@
           <!-- Étapes de réservation -->
           <Card class="mt-4 sm:mb-3xl animate-fade-in-up">
             <div class="flex items-center justify-start sm:justify-between mt-4">
-              <h2 class="text-xl font-semibold text-gray-900">Étapes de réservation</h2>
-              <div class="text-sm text-gray-700">
+              <h2 class="text-xl font-semibold text-neutral-900 dark:text-neutral-100">Étapes de réservation</h2>
+              <div class="text-sm text-neutral-600 dark:text-neutral-300">
                 Étape {{ currentStep }} sur 4
               </div>
             </div>
@@ -67,13 +67,13 @@
                 <div
                   :class="[
                     'w-full h-4 rounded-full transition-all duration-300',
-                    step <= currentStep ? 'bg-blue-500' : 'bg-gray-200'
+                    step <= currentStep ? 'bg-primary-50 dark:bg-primary-500/20' : 'bg-neutral-200 dark:bg-neutral-700'
                   ]"
                 />
                 <div
                   :class="[
                     'relative sm:absolute -top-6 left-0 h-6 w-6 rounded-full flex items-center justify-center text-sm font-semibold transition-all duration-300',
-                    step <= currentStep ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-700'
+                    step <= currentStep ? 'bg-primary-50 dark:bg-primary-500/20 text-primary-900 dark:text-primary-100' : 'bg-neutral-200 dark:bg-neutral-700 text-neutral-600 dark:text-neutral-300'
                   ]"
                 >
                   {{ step }}
@@ -83,16 +83,16 @@
 
             <!-- Libellés des étapes -->
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-left sm:text-center text-sm">
-              <div :class="currentStep >= 1 ? 'text-blue-600 font-medium' : 'text-gray-500'">
+              <div :class="currentStep >= 1 ? 'text-primary-600 dark:text-primary-400 font-medium' : 'text-neutral-500 dark:text-neutral-400'">
                 Détails produit
               </div>
-              <div :class="currentStep >= 2 ? 'text-blue-600 font-medium' : 'text-gray-500'">
+              <div :class="currentStep >= 2 ? 'text-primary-600 dark:text-primary-400 font-medium' : 'text-neutral-500 dark:text-neutral-400'">
                 Informations récupération
               </div>
-              <div :class="currentStep >= 3 ? 'text-blue-600 font-medium' : 'text-gray-500'">
+              <div :class="currentStep >= 3 ? 'text-primary-600 dark:text-primary-400 font-medium' : 'text-neutral-500 dark:text-neutral-400'">
                 Paiement
               </div>
-              <div :class="currentStep >= 4 ? 'text-blue-600 font-medium' : 'text-gray-500'">
+              <div :class="currentStep >= 4 ? 'text-primary-600 dark:text-primary-400 font-medium' : 'text-neutral-500 dark:text-neutral-400'">
                 Confirmation
               </div>
             </div>
@@ -104,34 +104,34 @@
               <!-- Étape 1: Détails du produit -->
               <Card v-if="currentStep === 1" class="animate-fade-in-up">
                 <template #header>
-                  <h3 class="text-xl font-semibold text-gray-900">Détails du produit</h3>
+                  <h3 class="text-xl font-semibold text-neutral-900 dark:text-neutral-100">Détails du produit</h3>
                 </template>
 
                 <div class="flex gap-3 sm:gap-4 mt-4">
-                  <div class="w-7xl h-7xl bg-gradient-to-br from-blue-100 to-blue-500/10 rounded flex items-center justify-center flex-shrink-0 overflow-hidden sm:block">
+                  <div class="w-7xl h-7xl bg-gradient-to-br from-primary-100 to-primary-500/10 rounded flex items-center justify-center flex-shrink-0 overflow-hidden sm:block">
                     <img
                       v-if="product.image_url"
                       :src="product.image_url"
                       :alt="product.name"
                       class="w-full h-full object-cover"
                     >
-                    <Package v-else class="w-12 h-10 text-blue-400" />
+                    <Package v-else class="w-12 h-10 text-primary-400" />
                   </div>
                   <div class="flex-1">
-                    <h4 class="text-xl font-semibold text-gray-900 mt-2">{{ product.name }}</h4>
-                    <p class="text-gray-700 mt-3">{{ product.description }}</p>
+                    <h4 class="text-xl font-semibold text-neutral-900 dark:text-neutral-100 mt-2">{{ product.name }}</h4>
+                    <p class="text-neutral-600 dark:text-neutral-300 mt-3">{{ product.description }}</p>
                     <div class="flex items-center gap-3 mt-3">
                       <div class="flex items-center gap-2">
-                        <span class="text-xl font-semibold text-blue-600">
+                        <span class="text-xl font-semibold text-primary-600 dark:text-primary-400">
                           {{ formatPrice(product.discounted_price) }}
                         </span>
-                        <span class="text-lg text-gray-400 line-through">
+                        <span class="text-lg text-neutral-400 dark:text-neutral-500 line-through">
                           {{ formatPrice(product.original_price) }}
                         </span>
                       </div>
                       <Badge variant="success">-{{ product.discount }}%</Badge>
                     </div>
-                    <div class="flex items-center gap-3 text-sm text-gray-700">
+                    <div class="flex items-center gap-3 text-sm text-neutral-600 dark:text-neutral-300">
                       <div class="flex items-center gap-2">
                         <Clock class="h-4 w-4" />
                         <span>{{ formatTimeLeft(product.expires_at) }}</span>
@@ -176,7 +176,7 @@
                         <Plus class="h-4 w-4" />
                       </Button>
                     </div>
-                    <p class="text-sm text-gray-500 mt-1">
+                    <p class="text-sm text-neutral-500 dark:text-neutral-400 mt-1">
                       Maximum {{ product.available_quantity - product.reserved_quantity }} disponible{{ (product.available_quantity - product.reserved_quantity) > 1 ? 's' : '' }}
                     </p>
                   </div>
@@ -188,7 +188,7 @@
                       id="notes"
                       v-model="reservation.notes"
                       placeholder="Allergies, préférences particulières..."
-                      class="w-full px-3 py-3 text-gray-900 bg-white border border-gray-200 rounded shadow-sm placeholder:text-gray-400 transition-all duration-200 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      class="w-full px-3 py-3 text-neutral-900 dark:text-neutral-100 bg-surface-light dark:bg-surface-dark border border-neutral-200 dark:border-neutral-700 rounded shadow-sm placeholder:text-neutral-400 dark:text-neutral-500 transition-all duration-200 focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                       rows="3"
                     />
                   </div>
@@ -198,7 +198,7 @@
               <!-- Étape 2: Informations récupération -->
               <Card v-if="currentStep === 2" class="animate-fade-in-up">
                 <template #header>
-                  <h3 class="text-xl font-semibold text-gray-900">Informations de récupération</h3>
+                  <h3 class="text-xl font-semibold text-neutral-900 dark:text-neutral-100">Informations de récupération</h3>
                 </template>
 
                 <div class="space-y-6">
@@ -226,7 +226,7 @@
                         <select
                           id="pickup-time"
                           v-model="reservation.pickup_time"
-                          class="w-full px-3 py-3 text-gray-900 bg-white border border-gray-200 rounded shadow-sm transition-all duration-200 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                          class="w-full px-3 py-3 text-neutral-900 dark:text-neutral-100 bg-surface-light dark:bg-surface-dark border border-neutral-200 dark:border-neutral-700 rounded shadow-sm transition-all duration-200 focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                           required
                         >
                           <option value="">Choisir un créneau</option>
@@ -253,7 +253,7 @@
                       placeholder="+33 1 23 45 67 89"
                       required
                     />
-                    <p class="text-sm text-gray-500 mt-1">
+                    <p class="text-sm text-neutral-500 dark:text-neutral-400 mt-1">
                       Pour vous contacter en cas de problème
                     </p>
                   </div>
@@ -265,7 +265,7 @@
                       id="pickup-instructions"
                       v-model="reservation.pickup_instructions"
                       placeholder="Comment vous trouver, indications spéciales..."
-                      class="w-full px-3 py-3 text-gray-900 bg-white border border-gray-200 rounded shadow-sm placeholder:text-gray-400 transition-all duration-200 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      class="w-full px-3 py-3 text-neutral-900 dark:text-neutral-100 bg-surface-light dark:bg-surface-dark border border-neutral-200 dark:border-neutral-700 rounded shadow-sm placeholder:text-neutral-400 dark:text-neutral-500 transition-all duration-200 focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                       rows="3"
                     />
                   </div>
@@ -275,7 +275,7 @@
               <!-- Étape 3: Paiement -->
               <Card v-if="currentStep === 3" class="animate-fade-in-up">
                 <template #header>
-                  <h3 class="text-xl font-semibold text-gray-900">Choisissez votre moyen de paiement</h3>
+                  <h3 class="text-xl font-semibold text-neutral-900 dark:text-neutral-100">Choisissez votre moyen de paiement</h3>
                 </template>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mt-4">
@@ -287,20 +287,20 @@
                     class="p-4 text-left flex gap-3 items-stretch sm:items-start h-auto justify-start"
                     :class="[
                       paymentMethod === option.value
-                        ? 'border-blue-500 bg-blue-50 shadow-sm'
-                        : 'border-gray-200 hover:border-blue-200 hover:bg-blue-50/40'
+                        ? 'border-primary-500 bg-primary-50 dark:bg-primary-500/10 shadow-sm'
+                        : 'border-neutral-200 dark:border-neutral-700 hover:border-primary-200 hover:bg-primary-50 dark:bg-primary-500/10'
                     ]"
                     @click="paymentMethod = option.value"
                   >
                     <div
                       class="h-6 w-6 rounded-full flex items-center justify-center"
-                      :class="paymentMethod === option.value ? 'bg-blue-500 text-white' : 'bg-gray-100 text-gray-700'"
+                      :class="paymentMethod === option.value ? 'bg-primary-50 dark:bg-primary-500/20 text-primary-900 dark:text-primary-100' : 'bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-300'"
                     >
                       <component :is="option.icon" class="h-4 w-4" />
                     </div>
                     <div class="flex-1">
                       <div class="flex items-center justify-start sm:justify-between">
-                        <p class="font-semibold text-gray-900">{{ option.label }}</p>
+                        <p class="font-semibold text-neutral-900 dark:text-neutral-100">{{ option.label }}</p>
                         <Badge
                           :variant="paymentMethod === option.value ? 'primary' : 'secondary'"
                           size="sm"
@@ -309,7 +309,7 @@
                           {{ option.description }}
                         </Badge>
                       </div>
-                      <p class="text-sm text-gray-700 mt-1">{{ option.instructions }}</p>
+                      <p class="text-sm text-neutral-600 dark:text-neutral-300 mt-1">{{ option.instructions }}</p>
                     </div>
                   </Button>
                 </div>
@@ -324,7 +324,7 @@
                     :error="mobileMoneyPhone && !/^\+?[0-9]{8,15}$/.test(mobileMoneyPhone) ? 'Format invalide' : undefined"
                     required
                   />
-                  <p class="text-xs text-gray-500">
+                  <p class="text-xs text-neutral-500 dark:text-neutral-400">
                     Utilisez un numéro enregistré sur le portefeuille sélectionné.
                   </p>
                 </div>
@@ -342,15 +342,15 @@
                     required
                     @input="(e) => e.target.value = e.target.value.replace(/\D/g, '')"
                   />
-                  <div class="flex items-center justify-start sm:justify-between text-xs text-gray-500">
+                  <div class="flex items-center justify-start sm:justify-between text-xs text-neutral-500 dark:text-neutral-400">
                     <span>Solde disponible: {{ walletStore.formattedBalance }}</span>
-                    <span v-if="!canPayWithWallet" class="text-red-600">Solde insuffisant</span>
+                    <span v-if="!canPayWithWallet" class="text-accent-red">Solde insuffisant</span>
                   </div>
                 </div>
 
-                <div class="mt-6 p-4 bg-blue-50 border border-blue-200 rounded text-sm text-blue-900">
+                <div class="mt-6 p-4 bg-primary-50 dark:bg-primary-500/10 border border-primary-200 rounded text-sm text-primary-900 dark:text-primary-100">
                   <p class="font-semibold mb-1">Montant à payer</p>
-                  <p class="text-lg font-semibold text-blue-800">{{ formatPrice(totalAmount) }}</p>
+                  <p class="text-lg font-semibold text-primary-700 dark:text-primary-300">{{ formatPrice(totalAmount) }}</p>
                   <p v-if="methodRequiresPhone" class="mt-2 text-xs">
                     Un SMS de confirmation vous sera envoyé dès validation par l'opérateur.
                   </p>
@@ -369,73 +369,73 @@
               <!-- Étape 4: Confirmation -->
               <Card v-if="currentStep === 4" class="animate-fade-in-up">
                 <template #header>
-                  <h3 class="text-xl font-semibold text-gray-900">Confirmation de réservation</h3>
+                  <h3 class="text-xl font-semibold text-neutral-900 dark:text-neutral-100">Confirmation de réservation</h3>
                 </template>
 
                 <div class="space-y-6">
                   <!-- Récapitulatif produit -->
-                  <div class="p-4 bg-blue-50 rounded border border-blue-200">
-                    <h4 class="font-semibold text-blue-800 mb-4">Produit réservé</h4>
+                  <div class="p-4 bg-primary-50 dark:bg-primary-500/10 rounded border border-primary-200">
+                    <h4 class="font-semibold text-primary-700 dark:text-primary-300 mb-4">Produit réservé</h4>
                     <div class="flex justify-start sm:justify-between items-center mt-2">
                       <span>{{ product.name }}</span>
                       <span class="font-semibold">{{ formatPrice(product.discounted_price) }}</span>
                     </div>
                     <div class="flex justify-start sm:justify-between items-center mt-2">
                       <span>Quantité: {{ reservation.quantity }}</span>
-                      <span class="font-semibold text-blue-600">
+                      <span class="font-semibold text-primary-600 dark:text-primary-400">
                         {{ formatPrice(totalAmount) }}
                       </span>
                     </div>
-                    <div class="text-sm text-blue-900 padding-t-sm border-t border-blue-200">
+                    <div class="text-sm text-primary-900 dark:text-primary-100 padding-t-sm border-t border-primary-200">
                       Économie: {{ formatPrice(savingsAmount) }}
                     </div>
                   </div>
 
                   <!-- Récapitulatif récupération -->
-                  <div class="p-4 bg-blue-500/5 rounded border border-blue-500/30">
-                    <h4 class="font-semibold text-blue-500/95 mb-4">Récupération</h4>
+                  <div class="p-4 bg-primary-50 dark:bg-primary-500/10 rounded border border-primary-500/30">
+                    <h4 class="font-semibold text-primary-500 dark:text-primary-300/95 mb-4">Récupération</h4>
                     <div class="space-y-4 text-sm">
                       <div class="flex items-center gap-2">
-                        <MapPin class="h-4 w-4 text-blue-500" />
+                        <MapPin class="h-4 w-4 text-primary-500 dark:text-primary-300" />
                         <span>{{ product.merchant.name }}</span>
                       </div>
                       <div class="flex items-center gap-2">
-                        <Calendar class="h-4 w-4 text-blue-500" />
+                        <Calendar class="h-4 w-4 text-primary-500 dark:text-primary-300" />
                         <span>{{ formatPickupDateTime() }}</span>
                       </div>
                       <div class="flex items-center gap-2">
-                        <Phone class="h-4 w-4 text-blue-500" />
+                        <Phone class="h-4 w-4 text-primary-500 dark:text-primary-300" />
                         <span>{{ reservation.contact_phone }}</span>
                       </div>
                     </div>
                   </div>
 
                   <!-- Récapitulatif paiement -->
-                  <div class="p-4 bg-gray-50 rounded border border-gray-200">
-                    <h4 class="font-semibold text-gray-800 mb-4">Paiement</h4>
+                  <div class="p-4 bg-neutral-50 dark:bg-neutral-900/60 rounded border border-neutral-200 dark:border-neutral-700">
+                    <h4 class="font-semibold text-neutral-800 dark:text-neutral-200 mb-4">Paiement</h4>
                     <div class="flex items-center justify-start sm:justify-between mt-2">
-                      <span class="text-gray-700">Méthode sélectionnée</span>
-                      <span class="font-semibold text-gray-900">{{ selectedPaymentOption?.label }}</span>
+                      <span class="text-neutral-600 dark:text-neutral-300">Méthode sélectionnée</span>
+                      <span class="font-semibold text-neutral-900 dark:text-neutral-100">{{ selectedPaymentOption?.label }}</span>
                     </div>
                     <div class="flex items-center justify-start sm:justify-between mt-2">
-                      <span class="text-gray-700">Montant</span>
-                      <span class="font-semibold text-gray-900">{{ formatPrice(totalAmount) }}</span>
+                      <span class="text-neutral-600 dark:text-neutral-300">Montant</span>
+                      <span class="font-semibold text-neutral-900 dark:text-neutral-100">{{ formatPrice(totalAmount) }}</span>
                     </div>
-                    <div v-if="methodRequiresPhone" class="text-sm text-gray-700">
+                    <div v-if="methodRequiresPhone" class="text-sm text-neutral-600 dark:text-neutral-300">
                       Téléphone Mobile Money : <span class="font-medium">{{ mobileMoneyPhone }}</span>
                     </div>
-                    <div v-if="paymentMethod === 'wallet'" class="text-sm text-gray-700">
-                      Solde disponible : <span class="font-medium text-green-600">{{ walletStore.formattedBalance }}</span>
+                    <div v-if="paymentMethod === 'wallet'" class="text-sm text-neutral-600 dark:text-neutral-300">
+                      Solde disponible : <span class="font-medium text-primary-600">{{ walletStore.formattedBalance }}</span>
                     </div>
-                    <p class="text-xs text-gray-500 mt-3">
+                    <p class="text-xs text-neutral-500 dark:text-neutral-400 mt-3">
                       {{ selectedPaymentOption?.instructions }}
                     </p>
                   </div>
 
                   <!-- Conditions -->
-                  <div class="p-4 bg-orange-500/10 rounded border border-orange-500/30">
-                    <h4 class="font-semibold text-orange-500/95 mb-4">⚠️ Conditions importantes</h4>
-                    <ul class="text-sm text-orange-500/90 space-y-4">
+                  <div class="p-4 bg-accent-orange/10 rounded border border-accent-orange/30">
+                    <h4 class="font-semibold text-accent-orange/95 mb-4">⚠️ Conditions importantes</h4>
+                    <ul class="text-sm text-accent-orange/90 space-y-4">
                       <li>• La réservation doit être récupérée dans les 24h après expiration</li>
                       <li>• En cas d'absence, le produit sera remis en vente</li>
                       <li>• Apportez une pièce d'identité pour la récupération</li>
@@ -448,9 +448,9 @@
                       id="accept-conditions"
                       v-model="acceptConditions"
                       type="checkbox"
-                      class="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 focus:ring-2"
+                      class="h-4 w-4 rounded border-neutral-300 dark:border-neutral-600 text-primary-600 dark:text-primary-400 focus:ring-primary-500 focus:ring-2"
                     >
-                    <label for="accept-conditions" class="text-sm text-gray-800">
+                    <label for="accept-conditions" class="text-sm text-neutral-800 dark:text-neutral-200">
                       J'accepte les conditions de réservation et je m'engage à récupérer le produit aux horaires convenus
                     </label>
                   </div>
@@ -496,19 +496,19 @@
               <!-- Informations marchand -->
               <Card class="animate-fade-in-up" style="animation-delay: 0.2s;">
                 <template #header>
-                  <h3 class="text-lg font-semibold text-gray-900">Marchand</h3>
+                  <h3 class="text-lg font-semibold text-neutral-900 dark:text-neutral-100">Marchand</h3>
                 </template>
                 <div class="space-y-2">
                   <div class="flex items-center gap-3">
-                    <div class="w-12 h-10 bg-gradient-to-r from-blue-600 to-blue-700 rounded flex items-center justify-center">
+                    <div class="w-12 h-10 bg-gradient-to-r from-primary-600 to-primary-700 rounded flex items-center justify-center">
                       <Store class="h-6 w-6 text-white" />
                     </div>
                     <div>
-                      <p class="font-semibold text-gray-900">{{ product.merchant.name }}</p>
-                      <p class="text-sm text-gray-700">{{ product.merchant.address }}</p>
+                      <p class="font-semibold text-neutral-900 dark:text-neutral-100">{{ product.merchant.name }}</p>
+                      <p class="text-sm text-neutral-600 dark:text-neutral-300">{{ product.merchant.address }}</p>
                     </div>
                   </div>
-                  <div class="flex items-center gap-2 text-sm text-gray-700">
+                  <div class="flex items-center gap-2 text-sm text-neutral-600 dark:text-neutral-300">
                     <MapPin class="h-4 w-4" />
                     <span>À {{ product.merchant.distance }}km de vous</span>
                   </div>
@@ -516,17 +516,17 @@
               </Card>
 
               <!-- Aide -->
-              <Card variant="gradient" class="bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200 animate-fade-in-up" style="animation-delay: 0.4s;">
+              <Card variant="gradient" class="bg-gradient-to-br from-primary-50 to-primary-100 border-primary-200 animate-fade-in-up" style="animation-delay: 0.4s;">
                 <div class="flex items-center gap-3 mt-3">
-                  <div class="h-6 w-6 bg-blue-500 rounded-full flex items-center justify-center">
+                  <div class="h-6 w-6 bg-primary-50 dark:bg-primary-500/20 rounded-full flex items-center justify-center">
                     <HelpCircle class="h-4 w-4 text-white" />
                   </div>
-                  <h3 class="text-lg font-semibold text-blue-800">Besoin d'aide ?</h3>
+                  <h3 class="text-lg font-semibold text-primary-700 dark:text-primary-300">Besoin d'aide ?</h3>
                 </div>
-                <p class="text-sm text-blue-900 mt-3">
+                <p class="text-sm text-primary-900 dark:text-primary-100 mt-3">
                   Une question sur votre réservation ?
                 </p>
-                <div class="space-y-4 text-sm text-blue-900">
+                <div class="space-y-4 text-sm text-primary-900 dark:text-primary-100">
                   <div class="flex items-center gap-2">
                     <Phone class="h-4 w-4" />
                     <span>01 23 45 67 89</span>
@@ -539,18 +539,18 @@
               </Card>
 
               <!-- Impact environnemental -->
-              <Card variant="gradient" class="bg-gradient-to-br from-orange-500/10 to-blue-500/5 border-orange-500/30 animate-fade-in-up" style="animation-delay: 0.6s;">
+              <Card variant="gradient" class="bg-gradient-to-br from-accent-orange/10 to-primary-500/5 border-accent-orange/30 animate-fade-in-up" style="animation-delay: 0.6s;">
                 <div class="text-left sm:text-center">
                   <div class="text-3xl mb-4">🌱</div>
-                  <h3 class="text-lg font-semibold text-orange-500/95 mt-2">Votre impact</h3>
-                  <p class="text-sm text-orange-500/90 mb-4">
+                  <h3 class="text-lg font-semibold text-accent-orange/95 mt-2">Votre impact</h3>
+                  <p class="text-sm text-accent-orange/90 mb-4">
                     En réservant ce produit, vous évitez le gaspillage et économisez environ :
                   </p>
                   <div class="space-y-4">
-                    <div class="text-xl font-semibold text-orange-500">
+                    <div class="text-xl font-semibold text-accent-orange">
                       {{ Math.round((product.original_price - product.discounted_price) * reservation.quantity).toLocaleString('fr-FR') }} F CFA
                     </div>
-                    <div class="text-sm text-orange-500/90">
+                    <div class="text-sm text-accent-orange/90">
                       ~{{ Math.round(reservation.quantity * 0.5 * 100) / 100 }}kg CO₂ évités
                     </div>
                   </div>
