@@ -2,256 +2,198 @@
   <DashboardLayout
     :sidebar="sidebar"
     :header="header"
-    class="bg-gray-50"
+    class="bg-gradient-to-br from-surface-light via-surface-light to-primary-50 dark:from-surface-dark dark:via-surface-darker dark:to-primary-950"
   >
-    <!-- Header -->
-    <div class="bg-white shadow-sm">
-      <div class="max-w-full sm:max-w-7xl mx-auto px-3 sm:px-4 lg:px-6">
-        <div class="flex justify-start sm:justify-between items-center py-6">
-          <div>
-            <h1 class="text-xl font-semibold text-gray-900">Gestion des Catégories</h1>
-            <p class="mt-1 text-sm text-gray-700">
-              Gérer les catégories de produits de la plateforme
-            </p>
-          </div>
+    <div class="mx-auto w-full max-w-7xl space-y-8 px-3 py-6 sm:px-6 sm:py-8">
+      <DashboardHeader
+        eyebrow="Administration"
+        title="Gestion des catégories"
+        subtitle="Gérez, filtrez et suivez les catégories produits de la plateforme"
+      >
+        <template #actions>
           <Button
             variant="primary"
-            class="flex items-center gap-2"
+            size="lg"
+            class="gap-2"
             @click="openCreateModal"
           >
-            <PlusIcon class="h-4 w-4" />
-            Nouvelle Catégorie
+            <PlusIcon class="h-5 w-5" />
+            Nouvelle catégorie
           </Button>
-        </div>
-      </div>
-    </div>
+        </template>
+      </DashboardHeader>
 
-    <!-- Stats Cards -->
-    <div class="max-w-full sm:max-w-7xl mx-auto px-3 sm:px-4 lg:px-6 py-6">
-      <div class="grid grid-cols-1 md:grid-cols-4 gap-3 sm:gap-6 mt-4 sm:mb-3xl">
-        <Card>
-          <div class="flex items-center">
-            <div class="p-3 rounded bg-blue-100">
-              <TagIcon class="h-6 w-6 text-info" />
-            </div>
-            <div class="ml-6">
-              <p class="text-sm font-medium text-gray-700">Total</p>
-              <p class="text-xl font-semibold text-gray-900">{{ stats.total_categories || 0 }}</p>
-            </div>
-          </div>
-        </Card>
+      <StatCardGrid :columns="'grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4'">
+        <StatCard
+          title="Total"
+          :value="formatCount(stats.total_categories)"
+          description="Catégories référencées"
+          :icon="TagIcon"
+          accent="primary"
+        />
+        <StatCard
+          title="Actives"
+          :value="formatCount(stats.active_categories)"
+          description="Disponibles à la réservation"
+          :icon="CheckCircleIcon"
+          accent="success"
+          :trend="activationTrend"
+        />
+        <StatCard
+          title="Avec produits"
+          :value="formatCount(stats.categories_with_products)"
+          description="Catégories reliées à des offres"
+          :icon="CubeIcon"
+          accent="info"
+        />
+        <StatCard
+          title="Top catégorie"
+          :value="topCategoryName"
+          :description="topCategoryDescription"
+          :icon="ChartBarIcon"
+          accent="warning"
+        />
+      </StatCardGrid>
 
-        <Card>
-          <div class="flex items-center">
-            <div class="p-3 rounded bg-green-100">
-              <CheckCircleIcon class="h-6 w-6 text-green-600" />
-            </div>
-            <div class="ml-6">
-              <p class="text-sm font-medium text-gray-700">Actives</p>
-              <p class="text-xl font-semibold text-gray-900">{{ stats.active_categories || 0 }}</p>
-            </div>
-          </div>
-        </Card>
-
-        <Card>
-          <div class="flex items-center">
-            <div class="p-3 rounded bg-blue-100">
-              <CubeIcon class="h-6 w-6 text-purple-600" />
-            </div>
-            <div class="ml-6">
-              <p class="text-sm font-medium text-gray-700">Avec Produits</p>
-              <p class="text-xl font-semibold text-gray-900">{{ stats.categories_with_products || 0 }}</p>
-            </div>
-          </div>
-        </Card>
-
-        <Card>
-          <div class="flex items-center">
-            <div class="p-3 rounded bg-yellow-100">
-              <ChartBarIcon class="h-6 w-6 text-blue-600" />
-            </div>
-            <div class="ml-6">
-              <p class="text-sm font-medium text-gray-700">Top Catégorie</p>
-              <p class="text-lg font-semibold text-gray-900">
-                {{ stats.top_categories && stats.top_categories.length > 0 ? stats.top_categories[0].name : 'Aucune' }}
-              </p>
-            </div>
-          </div>
-        </Card>
-      </div>
-
-      <!-- Categories Table -->
-      <Card>
-        <div class="px-4 py-4 border-b border-gray-200">
-          <div class="flex justify-start sm:justify-between items-center">
-            <h3 class="text-lg font-medium text-gray-900">Liste des Catégories</h3>
-            <div class="flex items-center gap-3">
-              <!-- Search -->
-              <div class="relative">
-                <MagnifyingGlassIcon class="h-4 w-4 relative sm:absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-                <input
-                  v-model="searchQuery"
-                  type="text"
-                  placeholder="Rechercher..."
-                  class="pl-10 pr-4 py-3 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                >
-              </div>
-              <!-- Filter -->
-              <select
-                v-model="filterStatus"
-                class="border border-gray-300 rounded px-3 py-3 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+      <DataTableCard
+        title="Liste des catégories"
+        description="Surveillez l'état des catégories et accédez rapidement aux actions de gestion"
+        :columns="categoryTableColumns"
+        :rows="filteredCategories"
+        :loading="loading"
+        loading-text="Chargement des catégories..."
+        empty-title="Aucune catégorie"
+        empty-description="Créez votre première catégorie pour alimenter le catalogue"
+      >
+        <template #filters>
+          <DashboardFilterBar
+            v-model:search="searchQuery"
+            :filters="categoryFilters"
+            placeholder="Rechercher une catégorie..."
+            @filter-change="handleFilterChange"
+          >
+            <template #actions>
+              <Button
+                variant="secondary"
+                size="sm"
+                class="whitespace-nowrap"
+                @click="refreshCategories"
               >
-                <option value="">Tous</option>
-                <option value="active">Actives</option>
-                <option value="inactive">Inactives</option>
-              </select>
+                Actualiser
+              </Button>
+            </template>
+          </DashboardFilterBar>
+        </template>
+
+        <template #cell-name="{ row }">
+          <div class="flex items-center gap-4">
+            <span class="text-2xl">{{ row.icon || '📦' }}</span>
+            <div class="space-y-1">
+              <p class="text-sm font-semibold text-neutral-900 dark:text-neutral-50">{{ row.name }}</p>
+              <p class="text-xs text-neutral-500 dark:text-neutral-400">ID : {{ row.id }}</p>
             </div>
           </div>
-        </div>
+        </template>
 
-        <!-- Loading State -->
-        <div v-if="loading" class="px-4 py-8 sm:py-12 lg:py-16 text-left sm:text-center">
-          <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mt-3" />
-          <p class="text-gray-500">Chargement des catégories...</p>
-        </div>
-
-        <!-- Categories List -->
-        <div v-else-if="filteredCategories.length > 0" class="overflow-x-auto">
-          <table class="min-w-full divide-y divide-neutral-200">
-            <thead class="bg-gray-50">
-              <tr>
-                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Catégorie
-                </th>
-                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Description
-                </th>
-                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Produits
-                </th>
-                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Statut
-                </th>
-                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Actions
-                </th>
-              </tr>
-            </thead>
-            <tbody class="bg-white divide-y divide-neutral-200">
-              <tr v-for="category in filteredCategories" :key="category.id" class="hover:bg-gray-50">
-                <td class="px-4 py-4 whitespace-nowrap">
-                  <div class="flex items-center">
-                    <span class="text-xl mr-4">{{ category.icon || '📦' }}</span>
-                    <div>
-                      <div class="text-sm font-medium text-gray-900">{{ category.name }}</div>
-                      <div class="text-sm text-gray-500">ID: {{ category.id }}</div>
-                    </div>
-                  </div>
-                </td>
-                <td class="px-4 py-4">
-                  <div class="text-sm text-gray-900 max-w-xs">{{ category.description }}</div>
-                </td>
-                <td class="px-4 py-4 whitespace-nowrap">
-                  <div class="text-sm text-gray-900">{{ (category.products_count ?? 0) }} produit(s)</div>
-                </td>
-                <td class="px-4 py-4 whitespace-nowrap">
-                  <button
-                    class="inline-flex items-center px-3.5 py-1 rounded-full text-xs font-medium"
-                    :class="category.is_active
-                      ? 'bg-green-100 text-green-800 hover:bg-blue-200'
-                      : 'bg-red-100 text-red-800 hover:bg-red-200'"
-                    @click="toggleCategoryStatus(category)"
-                  >
-                    {{ category.is_active ? 'Active' : 'Inactive' }}
-                  </button>
-                </td>
-                <td class="px-4 py-4 whitespace-nowrap text-sm font-medium">
-                  <div class="flex items-center gap-2">
-                    <button
-                      class="text-info hover:text-secondary-900"
-                      title="Voir détails"
-                      @click="viewCategory(category)"
-                    >
-                      <EyeIcon class="h-4 w-4" />
-                    </button>
-                    <button
-                      class="text-indigo-600 hover:text-indigo-900"
-                      title="Modifier"
-                      @click="editCategory(category)"
-                    >
-                      <PencilIcon class="h-4 w-4" />
-                    </button>
-                    <button
-                      class="text-red-600 hover:text-red-900"
-                      title="Supprimer"
-                      :disabled="(category.products_count ?? 0) > 0"
-                      :class="{ 'opacity-50 cursor-not-allowed': (category.products_count ?? 0) > 0 }"
-                      @click="deleteCategory(category)"
-                    >
-                      <TrashIcon class="h-4 w-4" />
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-
-        <!-- Empty State -->
-        <div v-else class="px-4 py-8 sm:py-12 lg:py-16 text-left sm:text-center">
-          <TagIcon class="w-12 h-10 text-gray-400 mx-auto mt-3" />
-          <h3 class="text-lg font-medium text-gray-900 mt-2">Aucune catégorie trouvée</h3>
-          <p class="text-gray-500 mt-4">
-            {{ searchQuery ? 'Aucune catégorie ne correspond à votre recherche.' : 'Commencez par créer votre première catégorie.' }}
+        <template #cell-description="{ row }">
+          <p class="text-sm text-neutral-600 dark:text-neutral-300">
+            {{ row.description }}
           </p>
+        </template>
+
+        <template #cell-products_count="{ row }">
+          <p class="text-sm font-semibold text-neutral-900 dark:text-neutral-100">
+            {{ formatCount(row.products_count ?? 0) }}
+            <span class="font-normal text-neutral-500 dark:text-neutral-400">produit(s)</span>
+          </p>
+        </template>
+
+        <template #cell-is_active="{ row }">
           <Button
-            v-if="!searchQuery"
-            variant="primary"
-            @click="openCreateModal"
+            variant="ghost"
+            size="sm"
+            class="rounded-full px-4 py-1.5 text-xs font-semibold transition-colors"
+            :class="row.is_active
+              ? 'bg-primary-500/10 text-primary-600 hover:bg-primary-500/15 dark:text-primary-300'
+              : 'bg-accent-red/10 text-accent-red hover:bg-accent-red/15'"
+            @click="toggleCategoryStatus(row)"
           >
-            Créer une catégorie
+            {{ row.is_active ? 'Active' : 'Inactive' }}
           </Button>
-        </div>
-      </Card>
+        </template>
+
+        <template #cell-actions="{ row }">
+          <div class="flex items-center justify-end gap-2">
+            <Button
+              variant="ghost"
+              size="sm"
+              class="text-primary-600 hover:text-primary-700 dark:text-primary-300"
+              @click="viewCategory(row)"
+            >
+              <EyeIcon class="h-4 w-4" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              class="text-neutral-600 hover:text-neutral-800 dark:text-neutral-300"
+              @click="editCategory(row)"
+            >
+              <PencilIcon class="h-4 w-4" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              class="text-accent-red hover:text-accent-red/80"
+              :disabled="(row.products_count ?? 0) > 0"
+              :class="{ 'opacity-40 cursor-not-allowed': (row.products_count ?? 0) > 0 }"
+              @click="deleteCategory(row)"
+            >
+              <TrashIcon class="h-4 w-4" />
+            </Button>
+          </div>
+        </template>
+      </DataTableCard>
     </div>
 
     <!-- Create/Edit Modal Form -->
     <div v-if="modal.show && modal.type === 'form'" class="fixed inset-0 z-[120] overflow-y-auto">
       <!-- Backdrop -->
       <div
-        class="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm transition-opacity"
+        class="fixed inset-0 bg-overlay/90 backdrop-blur-2xl transition-opacity"
         @click="closeModal"
       />
 
       <!-- Modal -->
       <div class="flex min-h-screen items-center justify-center p-4">
         <div
-          class="relative w-full max-w-xl bg-white rounded shadow-80 transform transition-all"
+          class="relative w-full max-w-xl overflow-hidden rounded-3xl border border-neutral-200/70 bg-surface-light shadow-glow transition-all dark:border-neutral-700/60 dark:bg-surface-dark"
           @click.stop
         >
           <!-- Header -->
-          <div class="px-4 py-4 border-b border-gray-200">
-            <div class="flex items-center justify-start sm:justify-between">
+          <div class="border-b border-neutral-200/70 bg-surface-light/80 px-6 py-5 dark:border-neutral-700/60 dark:bg-surface-dark/80">
+            <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
               <div class="flex items-center gap-3">
-                <div class="p-2 rounded bg-blue-100">
-                  <component :is="modal.icon" class="h-6 w-6 text-info" />
+                <div class="flex h-11 w-11 items-center justify-center rounded-2xl bg-primary-500/10 text-primary-600 dark:text-primary-300">
+                  <component :is="modal.icon" class="h-6 w-6" />
                 </div>
-                <h3 class="text-xl font-semibold text-gray-900">{{ modal.title }}</h3>
+                <h3 class="text-xl font-semibold text-neutral-900 dark:text-neutral-50">{{ modal.title }}</h3>
               </div>
-              <button
-                class="p-2 hover:transition-colors"
+              <Button
+                variant="ghost"
+                size="sm"
+                class="text-neutral-500 hover:text-neutral-700 dark:text-neutral-400 dark:hover:text-neutral-200"
                 @click="closeModal"
               >
-                <XMarkIcon class="h-4 w-4 text-gray-400" />
-              </button>
+                <XMarkIcon class="h-4 w-4" />
+              </Button>
             </div>
           </div>
 
           <!-- Form Content -->
-          <div class="px-4 py-6">
+          <div class="px-6 py-6">
             <form class="space-y-6" @submit.prevent="saveCategory">
               <div>
-                <label for="name" class="block text-sm font-medium text-gray-800 mt-2">
+                <label for="name" class="mt-2 block text-sm font-medium text-neutral-700 dark:text-neutral-200">
                   Nom de la catégorie *
                 </label>
                 <input
@@ -260,13 +202,13 @@
                   type="text"
                   required
                   maxlength="100"
-                  class="w-full border border-gray-300 rounded px-3 py-3 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  class="mt-2 w-full rounded-xl border border-neutral-200/70 bg-surface-light px-4 py-3 text-neutral-900 outline-none transition focus:border-primary-500 focus:ring-2 focus:ring-primary-500 dark:border-neutral-700/60 dark:bg-surface-dark dark:text-neutral-100"
                   placeholder="Ex: Fruits et Légumes"
                 >
               </div>
 
               <div>
-                <label for="description" class="block text-sm font-medium text-gray-800 mt-2">
+                <label for="description" class="mt-2 block text-sm font-medium text-neutral-700 dark:text-neutral-200">
                   Description *
                 </label>
                 <textarea
@@ -275,13 +217,13 @@
                   required
                   maxlength="500"
                   rows="3"
-                  class="w-full border border-gray-300 rounded px-3 py-3 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  class="mt-2 w-full rounded-xl border border-neutral-200/70 bg-surface-light px-4 py-3 text-neutral-900 outline-none transition focus:border-primary-500 focus:ring-2 focus:ring-primary-500 dark:border-neutral-700/60 dark:bg-surface-dark dark:text-neutral-100"
                   placeholder="Description de la catégorie..."
                 />
               </div>
 
               <div>
-                <label for="icon" class="block text-sm font-medium text-gray-800 mt-2">
+                <label for="icon" class="mt-2 block text-sm font-medium text-neutral-700 dark:text-neutral-200">
                   Icône (emoji)
                 </label>
                 <input
@@ -289,37 +231,39 @@
                   v-model="form.icon"
                   type="text"
                   maxlength="10"
-                  class="w-full border border-gray-300 rounded px-3 py-3 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  class="mt-2 w-full rounded-xl border border-neutral-200/70 bg-surface-light px-4 py-3 text-neutral-900 outline-none transition focus:border-primary-500 focus:ring-2 focus:ring-primary-500 dark:border-neutral-700/60 dark:bg-surface-dark dark:text-neutral-100"
                   placeholder="🥬"
                 >
               </div>
 
               <div v-if="editingCategory">
-                <label class="flex items-center">
+                <label class="flex items-center gap-3 text-sm text-neutral-600 dark:text-neutral-300">
                   <input
                     v-model="form.is_active"
                     type="checkbox"
-                    class="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                    class="h-4 w-4 rounded border-neutral-300 text-primary-600 focus:ring-primary-500"
                   >
-                  <span class="ml-2 text-sm text-gray-800">Catégorie active</span>
+                  <span>Catégorie active</span>
                 </label>
               </div>
 
-              <div class="flex justify-center sm:justify-end gap-3 padding-t-lg">
-                <button
-                  type="button"
-                  class="px-3 py-3 text-gray-700 hover:transition-colors"
+              <div class="flex flex-col-reverse gap-3 pt-6 sm:flex-row sm:justify-end">
+                <Button
+                  variant="ghost"
+                  size="md"
+                  class="justify-center text-neutral-600 hover:text-neutral-800 dark:text-neutral-300"
                   @click="closeModal"
                 >
                   Annuler
-                </button>
-                <button
+                </Button>
+                <Button
                   type="submit"
-                  :disabled="saving"
-                  class="px-4 py-3 bg-blue-600 text-white rounded hover:transition-colors disabled:opacity-50"
+                  variant="primary"
+                  size="md"
+                  :loading="saving"
                 >
-                  {{ saving ? 'Enregistrement...' : (editingCategory ? 'Modifier' : 'Créer') }}
-                </button>
+                  {{ saving ? 'Enregistrement...' : editingCategory ? 'Modifier' : 'Créer' }}
+                </Button>
               </div>
             </form>
           </div>
@@ -351,7 +295,15 @@ import { notify } from '@/composables/useNotifications'
 import AdminModal from '@/components/ui/AdminModal.vue'
 import DashboardLayout from '@/components/ui/DashboardLayout.vue'
 import Button from '@/components/ui/2025/Button.vue'
-import Card from '@/components/ui/2025/Card.vue'
+import {
+  DashboardHeader,
+  DashboardFilterBar,
+  DataTableCard,
+  StatCard,
+  StatCardGrid
+} from '@/components/dashboard/2025'
+import type { DashboardFilter } from '@/components/dashboard/2025/DashboardFilterBar.vue'
+import type { DataTableColumn } from '@/components/dashboard/2025/DataTableCard.vue'
 import { useDashboardLayout } from '@/composables/useDashboardLayout'
 import {
   PlusIcon,
@@ -359,7 +311,6 @@ import {
   CheckCircleIcon,
   CubeIcon,
   ChartBarIcon,
-  MagnifyingGlassIcon,
   EyeIcon,
   PencilIcon,
   TrashIcon,
@@ -408,6 +359,57 @@ const stats = ref<CategoryStats>({
 const searchQuery = ref('')
 const filterStatus = ref('')
 
+const numberFormatter = new Intl.NumberFormat('fr-FR')
+const formatCount = (value?: number) => numberFormatter.format(value ?? 0)
+
+const categoryTableColumns: DataTableColumn[] = [
+  { key: 'name', title: 'Catégorie' },
+  { key: 'description', title: 'Description' },
+  { key: 'products_count', title: 'Produits', align: 'center' },
+  { key: 'is_active', title: 'Statut', align: 'center' },
+  { key: 'actions', title: 'Actions', align: 'right' }
+]
+
+const categoryFilters = computed<DashboardFilter[]>(() => [
+  {
+    id: 'status',
+    label: 'Statut',
+    value: filterStatus.value,
+    options: [
+      { label: 'Tous', value: '' },
+      { label: 'Actives', value: 'active' },
+      { label: 'Inactives', value: 'inactive' }
+    ]
+  }
+])
+
+const topCategory = computed(() => stats.value.top_categories?.[0] ?? null)
+const topCategoryName = computed(() => topCategory.value?.name ?? 'Aucune')
+const topCategoryDescription = computed(() =>
+  topCategory.value
+    ? `${formatCount(topCategory.value.products_count)} produits`
+    : 'Aucune donnée récente'
+)
+
+const activationRate = computed(() => {
+  if (!stats.value.total_categories) {
+    return 0
+  }
+  return Math.round((stats.value.active_categories / stats.value.total_categories) * 100)
+})
+
+const activationTrend = computed(() => {
+  if (!stats.value.total_categories) {
+    return null
+  }
+
+  return {
+    value: `${activationRate.value}%`,
+    label: 'actives',
+    tone: 'positive' as const
+  }
+})
+
 // Modal state
 const modal = ref({
   show: false,
@@ -450,6 +452,12 @@ const filteredCategories = computed(() => {
 
   return filtered
 })
+
+const handleFilterChange = ({ id, value }: { id: string; value: string }) => {
+  if (id === 'status') {
+    filterStatus.value = value
+  }
+}
 
 // Methods
 const loadCategories = async () => {
@@ -499,6 +507,10 @@ const loadStats = async () => {
   } catch (error) {
     // console.error('Error loading stats:', error)
   }
+}
+
+const refreshCategories = async () => {
+  await Promise.all([loadCategories(), loadStats()])
 }
 
 const openCreateModal = () => {
@@ -681,6 +693,6 @@ const handleModalAction = () => {
 
 // Lifecycle
 onMounted(async () => {
-  await Promise.all([loadCategories(), loadStats()])
+  await refreshCategories()
 })
 </script>

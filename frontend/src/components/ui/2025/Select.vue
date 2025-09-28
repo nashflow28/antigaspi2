@@ -48,26 +48,25 @@ const emit = defineEmits<{
 const computedClasses = computed(() => {
   const baseClasses = [
     'select-2025',
-    'block w-full rounded border transition-colors duration-200',
-    'focus:ring-2 focus:ring-offset-2 focus:outline-none',
-    'disabled:bg-neutral-50 disabled:text-neutral-500 disabled:cursor-not-allowed'
+    'block w-full rounded-xl border bg-surface-light text-neutral-700 shadow-card transition-all duration-200',
+    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 focus-visible:ring-offset-surface-light',
+    'dark:bg-surface-dark dark:text-neutral-100 dark:border-neutral-700/70 dark:focus-visible:ring-offset-surface-dark',
+    'disabled:bg-surface-muted/60 disabled:text-neutral-400 disabled:opacity-70 disabled:cursor-not-allowed'
   ]
 
-  // Size classes
   const sizeClasses = {
-    xs: 'px-3 py-xs text-xs',
-    sm: 'px-3 py-1 text-sm',
-    md: 'px-3 py-2 text-sm',
-    lg: 'px-3 py-2.5 text-base',
-    xl: 'px-3 py-3 text-lg'
+    xs: 'px-3 py-1 text-xs',
+    sm: 'px-3 py-2 text-sm',
+    md: 'px-3 py-2.5 text-sm',
+    lg: 'px-4 py-3 text-base',
+    xl: 'px-5 py-4 text-lg'
   }
 
-  // Variant classes
   const variantClasses = {
-    default: 'border-neutral-300 focus:border-primary-500 focus:ring-primary-500',
-    success: 'border-primary-400 focus:border-primary-600 focus:ring-primary-500',
-    warning: 'border-accent-orange/60 focus:border-accent-orange focus:ring-accent-orange',
-    error: 'border-accent-red/60 focus:border-accent-red focus:ring-accent-red'
+    default: 'border-neutral-200/80 focus-visible:border-primary-500',
+    success: 'border-primary-400/60 text-primary-600 focus-visible:border-primary-500 dark:text-primary-300',
+    warning: 'border-accent-orange/60 text-accent-orange focus-visible:border-accent-orange',
+    error: 'border-accent-red/60 text-accent-red focus-visible:border-accent-red'
   }
 
   baseClasses.push(sizeClasses[props.size])
