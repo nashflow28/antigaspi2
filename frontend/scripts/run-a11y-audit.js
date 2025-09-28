@@ -7,6 +7,14 @@ import { fileURLToPath } from 'url'
 import { chromium } from 'playwright'
 import axe from 'axe-core'
 
+import {
+  ensurePlaywrightChromium,
+  npmCmd,
+  computeBuildCacheKey,
+  loadCachedBuildKey,
+  writeBuildCacheKey
+} from './utils/runtime.js'
+
 const __filename = fileURLToPath(import.meta.url)
 const _unused_dirname = path.dirname(__filename)
 const PROJECT_ROOT = path.resolve(_unused_dirname, '..')
@@ -14,8 +22,9 @@ const RESULTS_DIR = path.join(PROJECT_ROOT, 'test-results')
 const A11Y_REPORT_PATH = path.join(RESULTS_DIR, 'a11y-report.json')
 const PREVIEW_PORT = process.env.A11Y_PREVIEW_PORT || 4173
 const PREVIEW_URL = `http://127.0.0.1:${PREVIEW_PORT}`
-const npmCmd = process.platform === 'win32' ? 'npm.cmd' : 'npm'
-let cachedChromiumPath = ''
+const computeCurrentBuildKey = () => computeBuildCacheKey(PROJECT_ROOT)
+const readCachedBuildKey = () => loadCachedBuildKey(PROJECT_ROOT)
+const persistBuildKey = hash => writeBuildCacheKey(PROJECT_ROOT, hash)
 
 if (!fs.existsSync(RESULTS_DIR)) {
   fs.mkdirSync(RESULTS_DIR, { recursive: true })
@@ -53,42 +62,18 @@ async function waitForServer(url, timeoutMs = 30000) {
   throw new Error(`Preview server did not start within ${timeoutMs}ms`)
 }
 
-function ensureChromiumBinary() {
-  if (cachedChromiumPath && fs.existsSync(cachedChromiumPath)) {
-    return cachedChromiumPath
-  }
-
-  let executablePath = ''
-  try {
-    executablePath = chromium.executablePath?.() || ''
-  } catch (error) {
-    executablePath = ''
-  }
-
-  if (!executablePath || !fs.existsSync(executablePath)) {
-    const result = spawnSync(npmCmd, ['exec', 'playwright', 'install', 'chromium'], {
-      cwd: PROJECT_ROOT,
-      stdio: 'inherit'
-    })
-
-    if (result.status !== 0) {
-      throw new Error('Failed to install Playwright Chromium browser')
-    }
-
-    executablePath = chromium.executablePath?.() || ''
-  }
-
-  if (!executablePath || !fs.existsSync(executablePath)) {
-    throw new Error('Chromium executable not found after installation')
-  }
-
-  cachedChromiumPath = executablePath
-  return cachedChromiumPath
-}
-
 async function runAudit() {
   console.log('♿ Running accessibility audit with Playwright + axe-core...')
-  runNpmScript('build')
+  const distDir = path.join(PROJECT_ROOT, 'dist')
+  const currentHash = computeCurrentBuildKey()
+  const cachedHash = readCachedBuildKey()
+
+  if (fs.existsSync(distDir) && cachedHash === currentHash) {
+    console.log('   • Reusing cached production build for accessibility audit')
+  } else {
+    runNpmScript('build')
+    persistBuildKey(currentHash)
+  }
 
   const previewProcess = spawn(npmCmd, ['run', 'preview', '--', '--host', '127.0.0.1', '--port', `${PREVIEW_PORT}`, '--strictPort'], {
     cwd: PROJECT_ROOT,
@@ -99,8 +84,8 @@ async function runAudit() {
     await waitForServer(PREVIEW_URL)
 
     try {
-      const executablePath = ensureChromiumBinary()
-      const browser = await chromium.launch({ args: ['--no-sandbox'], executablePath, headless: true })
+      const executablePath = ensurePlaywrightChromium({ cwd: PROJECT_ROOT })
+      const browser = await chromium.launch({ args: ['--no-sandbox', '--disable-dev-shm-usage'], executablePath, headless: true })
       const page = await browser.newPage()
       await page.goto(PREVIEW_URL, { waitUntil: 'networkidle' })
       await page.addScriptTag({ content: axe.source })

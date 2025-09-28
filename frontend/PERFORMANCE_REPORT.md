@@ -1,7 +1,7 @@
 
 # 🚀 Performance Analysis Report
 
-**Generated on:** 2025-09-28T17:09:06.876Z
+**Generated on:** 2025-09-28T18:38:37.842Z
 
 ## 📊 Bundle Analysis
 
@@ -11,7 +11,23 @@
 - **Lazy Loading Coverage:** 95%
 
 ### Components
-- **Total Components:** 134
+- **Total Components:** 137
+
+### Production Bundle Snapshot
+- **Build re-used:** No
+- **Bundle Size:** 2.81 MB
+- **Artifacts:** non trackés
+- **Top Assets:**
+  - bundle-analysis.html — 1389.02 kB
+  - assets/js/vendor-charts-D3WJeo9S.js — 181.55 kB
+  - assets/js/vendor-maps-BTJzpr_t.js — 144.74 kB
+  - assets/css/index-B-7VGJfq.css — 132.60 kB
+  - assets/js/vendor-vue-gNgYsul5.js — 101.98 kB
+- **Scores Lighthouse** (env. [object Object]):
+  - Performance: 62/100
+  - Accessibilité: 87/100
+  - Best Practices: 92/100
+  - SEO: 92/100
 
 ## ✅ Current Optimizations
 

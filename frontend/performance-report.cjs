@@ -7,13 +7,18 @@
 const fs = require('fs')
 const path = require('path')
 
+const RESULTS_DIR = path.join(__dirname, 'test-results')
+const BUILD_STATS_PATH = path.join(RESULTS_DIR, 'build-stats.json')
+const LIGHTHOUSE_REPORT_PATH = path.join(RESULTS_DIR, 'lighthouse-report.json')
+
 class PerformanceAnalyzer {
   constructor() {
     this.results = {
       bundleSize: {},
       routeAnalysis: {},
       optimizations: [],
-      recommendations: []
+      recommendations: [],
+      externalMetrics: {}
     }
   }
 
@@ -23,6 +28,7 @@ class PerformanceAnalyzer {
     this.analyzeBundleConfig()
     this.analyzeRoutes()
     this.analyzeComponents()
+    this.loadExternalMetrics()
     this.generateRecommendations()
     this.generateReport()
   }
@@ -103,6 +109,50 @@ class PerformanceAnalyzer {
     }
   }
 
+  loadExternalMetrics() {
+    const metrics = {}
+
+    if (fs.existsSync(BUILD_STATS_PATH)) {
+      try {
+        metrics.build = JSON.parse(fs.readFileSync(BUILD_STATS_PATH, 'utf8'))
+      } catch (error) {
+        console.warn('⚠️  Unable to parse build stats artifact:', error.message)
+      }
+    }
+
+    if (fs.existsSync(LIGHTHOUSE_REPORT_PATH)) {
+      try {
+        const lighthouseReport = JSON.parse(fs.readFileSync(LIGHTHOUSE_REPORT_PATH, 'utf8'))
+        if (lighthouseReport?.categories?.performance) {
+          metrics.lighthouse = {
+            performance: Math.round((lighthouseReport.categories.performance.score || 0) * 100),
+            accessibility: Math.round(((lighthouseReport.categories.accessibility?.score) || 0) * 100),
+            bestPractices: Math.round(((lighthouseReport.categories['best-practices']?.score) || 0) * 100),
+            seo: Math.round(((lighthouseReport.categories.seo?.score) || 0) * 100),
+            environment: lighthouseReport.environment || 'preview'
+          }
+        } else if (lighthouseReport?.status === 'SKIPPED') {
+          metrics.lighthouse = {
+            status: lighthouseReport.status,
+            reason: lighthouseReport.reason,
+            environment: lighthouseReport.environment
+          }
+        }
+      } catch (error) {
+        console.warn('⚠️  Unable to parse Lighthouse artifact:', error.message)
+      }
+    }
+
+    this.results.externalMetrics = metrics
+
+    if (!metrics.build) {
+      this.results.recommendations.push('Générer les statistiques de build via `npm run validate:phase3`.')
+    }
+    if (!metrics.lighthouse) {
+      this.results.recommendations.push('Exécuter Lighthouse (inclus dans `npm run validate:phase3`) pour disposer d’une référence de score.')
+    }
+  }
+
   countVueFiles(dir) {
     let count = 0
     try {
@@ -153,6 +203,9 @@ class PerformanceAnalyzer {
 ### Components
 - **Total Components:** ${this.results.bundleSize.components || 'N/A'}
 
+### Production Bundle Snapshot
+${this.renderBuildMetrics()}
+
 ## ✅ Current Optimizations
 
 ${this.results.optimizations.map(opt => `- ${opt}`).join('\n')}
@@ -199,6 +252,30 @@ ${this.results.recommendations.map(rec => `- ${rec}`).join('\n')}
     fs.writeFileSync('PERFORMANCE_REPORT.md', report)
     console.log('\n💾 Report saved to PERFORMANCE_REPORT.md')
   }
+}
+
+PerformanceAnalyzer.prototype.renderBuildMetrics = function renderBuildMetrics() {
+  const metrics = this.results.externalMetrics
+  if (!metrics.build) {
+    return '- Aucun bundle analysé (exécuter `npm run validate:phase3`).'
+  }
+
+  const build = metrics.build
+  const bundleSizeMB = ((build.bundleSizeMB ?? (build.totalSize ? build.totalSize / 1024 / 1024 : 0)) || 0).toFixed(2)
+  const largestAssets = Array.isArray(build.assets)
+    ? build.assets.slice(0, 5).map(asset => `  - ${asset.file} — ${((asset.sizeKB ?? (asset.size || 0) / 1024)).toFixed(2)} kB`).join('\n')
+    : '  - Assets data unavailable'
+
+  let lighthouseBlock = '- Lighthouse report non disponible.'
+  if (metrics.lighthouse) {
+    if (metrics.lighthouse.status === 'SKIPPED') {
+      lighthouseBlock = `- Audit Lighthouse non exécuté (${metrics.lighthouse.reason || 'raison inconnue'}).`
+    } else {
+      lighthouseBlock = `- **Scores Lighthouse** (env. ${metrics.lighthouse.environment || 'preview'}):\n  - Performance: ${metrics.lighthouse.performance || 0}/100\n  - Accessibilité: ${metrics.lighthouse.accessibility || 0}/100\n  - Best Practices: ${metrics.lighthouse.bestPractices || 0}/100\n  - SEO: ${metrics.lighthouse.seo || 0}/100`
+    }
+  }
+
+  return `- **Build re-used:** ${build.reusedBuild ? 'Yes' : 'No'}\n- **Bundle Size:** ${bundleSizeMB} MB\n- **Artifacts:** ${build.artifacts ? JSON.stringify(build.artifacts) : 'non trackés'}\n- **Top Assets:**\n${largestAssets}\n${lighthouseBlock}`
 }
 
 // Run analysis
