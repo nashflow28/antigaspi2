@@ -300,6 +300,11 @@ module.exports = {
 - **CLS** : < 0.1
 - **FID** : < 100ms
 
+## 🔍 Vérifications mai 2025
+
+- ✅ Palette UI synchronisée : Tooltip, Tabs, Pagination, Modal, Select, EmptyState & co utilisent désormais uniquement les tokens `primary`/`neutral`/`accent` (revue Storybook clair/sombre + responsive locale).
+- ✅ Vues 2025 (ProductDetail, ReservationDetail, Admin Dashboard, Merchant Product Edit) vérifiées visuellement après remplacement des anciennes classes (`gray-*`, `blue-*`) par les utilitaires tokens.
+
 ---
 
 ## 🎯 Checklist Design 2025

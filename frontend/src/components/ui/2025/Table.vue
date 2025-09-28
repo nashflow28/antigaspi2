@@ -3,7 +3,7 @@
     <!-- Table Header -->
     <div v-if="title" class="border-b border-neutral-200/70 px-4 py-4 dark:border-neutral-700/60">
       <h3 class="text-lg font-semibold text-neutral-900 dark:text-neutral-50">{{ title }}</h3>
-      <p v-if="description" class="text-sm text-neutral-600 dark:text-neutral-300">{{ description }}</p>
+      <p v-if="description" class="text-sm text-neutral-600 dark:text-neutral-300">{{ description }}</p>e
     </div>
 
     <!-- Table Container -->

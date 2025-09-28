@@ -2,7 +2,7 @@
   <DashboardLayout
     :sidebar="sidebar"
     :header="header"
-    class="bg-gradient-to-br from-green-50 to-blue-50"
+    class="bg-gradient-to-br from-primary-50 to-accent-blue/10"
   >
     <div class="container px-3 sm:px-4 lg:px-6 py-6">
       <!-- Header -->
@@ -10,7 +10,7 @@
         <div class="flex items-center gap-3 mt-3">
           <router-link
             to="/merchant/products"
-            class="flex items-center text-gray-700 hover:transition-colors"
+            class="flex items-center text-neutral-600 hover:transition-colors"
           >
             <ArrowLeftIcon class="h-4 w-4 mr-2" />
             Retour aux produits
@@ -19,10 +19,10 @@
 
         <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3 sm:gap-6">
           <div>
-            <h1 class="text-xl lg:text-3xl font-semibold text-gray-900 mt-2">
+            <h1 class="text-xl lg:text-3xl font-semibold text-neutral-900 mt-2">
               {{ product ? 'Modifier le produit' : 'Chargement...' }}
             </h1>
-            <p class="text-gray-700 text-lg">
+            <p class="text-neutral-600 text-lg">
               {{ product ? product.name : 'Veuillez patienter...' }}
             </p>
           </div>
@@ -43,18 +43,18 @@
       <!-- Loading State -->
       <Card v-if="!product && !error">
         <div class="flex items-center justify-center py-8 sm:py-12 lg:py-16">
-          <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600" />
-          <span class="ml-4 text-gray-700">Chargement du produit...</span>
+          <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-500" />
+          <span class="ml-4 text-neutral-600">Chargement du produit...</span>
         </div>
       </Card>
 
       <!-- Error State -->
-      <Card v-if="error" variant="bordered" class="bg-red-50 border-red-200">
+      <Card v-if="error" variant="bordered" class="bg-accent-red/10 border-accent-red/40">
         <div class="flex items-center justify-center py-6 sm:py-8">
-          <AlertCircleIcon class="h-6 w-6 text-red-500 mr-4" />
+          <AlertCircleIcon class="h-6 w-6 text-accent-red mr-4" />
           <div>
-            <h3 class="text-lg font-semibold text-red-800 mb-1">Erreur de chargement</h3>
-            <p class="text-red-600">{{ error }}</p>
+            <h3 class="text-lg font-semibold text-accent-red mb-1">Erreur de chargement</h3>
+            <p class="text-accent-red">{{ error }}</p>
           </div>
         </div>
       </Card>
@@ -66,14 +66,14 @@
           <div class="lg:col-span-2 space-y-6">
             <Card>
               <template #header>
-                <h3 class="text-xl font-semibold text-gray-900">Informations générales</h3>
+                <h3 class="text-xl font-semibold text-neutral-900">Informations générales</h3>
               </template>
 
               <div class="space-y-6">
                 <!-- Product Name -->
                 <div>
-                  <label for="name" class="block text-sm font-medium text-gray-800 mt-2">
-                    Nom du produit <span class="text-red-500">*</span>
+                  <label for="name" class="block text-sm font-medium text-neutral-800 mt-2">
+                    Nom du produit <span class="text-accent-red">*</span>
                   </label>
                   <Input
                     id="name"
@@ -86,30 +86,30 @@
 
                 <!-- Description -->
                 <div>
-                  <label for="description" class="block text-sm font-medium text-gray-800 mt-2">
+                  <label for="description" class="block text-sm font-medium text-neutral-800 mt-2">
                     Description
                   </label>
                   <textarea
                     id="description"
                     v-model="product.description"
                     rows="4"
-                    class="w-full px-3 py-3 text-gray-900 bg-white border border-gray-200 rounded shadow-sm placeholder:text-gray-400 transition-all duration-200 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                    :class="{ 'border-red-300 bg-red-50 focus:ring-red-500 focus:border-red-500': errors.description }"
+                    class="w-full px-3 py-3 text-neutral-900 bg-white border border-neutral-200 rounded shadow-sm placeholder:text-neutral-400 transition-all duration-200 focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                    :class="{ 'border-accent-red/60 bg-accent-red/10 focus:ring-accent-red focus:border-accent-red': errors.description }"
                     placeholder="Décrivez votre produit..."
                   />
-                  <p v-if="errors.description" class="mt-2 text-sm text-red-600">{{ errors.description }}</p>
+                  <p v-if="errors.description" class="mt-2 text-sm text-accent-red">{{ errors.description }}</p>
                 </div>
 
                 <!-- Category -->
                 <div>
-                  <label for="category" class="block text-sm font-medium text-gray-800 mt-2">
-                    Catégorie <span class="text-red-500">*</span>
+                  <label for="category" class="block text-sm font-medium text-neutral-800 mt-2">
+                    Catégorie <span class="text-accent-red">*</span>
                   </label>
                   <select
                     id="category"
                     v-model="product.category_id"
-                    class="w-full px-3 py-3 text-gray-900 bg-white border border-gray-200 rounded shadow-sm transition-all duration-200 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                    :class="{ 'border-red-300 bg-red-50 focus:ring-red-500 focus:border-red-500': errors.category_id }"
+                    class="w-full px-3 py-3 text-neutral-900 bg-white border border-neutral-200 rounded shadow-sm transition-all duration-200 focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                    :class="{ 'border-accent-red/60 bg-accent-red/10 focus:ring-accent-red focus:border-accent-red': errors.category_id }"
                     required
                   >
                     <option value="">Sélectionner une catégorie</option>
@@ -117,22 +117,22 @@
                       {{ category.name }}
                     </option>
                   </select>
-                  <p v-if="errors.category_id" class="mt-2 text-sm text-red-600">{{ errors.category_id }}</p>
+                  <p v-if="errors.category_id" class="mt-2 text-sm text-accent-red">{{ errors.category_id }}</p>
                 </div>
               </div>
             </Card>
 
             <Card>
               <template #header>
-                <h3 class="text-xl font-semibold text-gray-900">Prix et disponibilité</h3>
+                <h3 class="text-xl font-semibold text-neutral-900">Prix et disponibilité</h3>
               </template>
 
               <div class="space-y-6">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                   <!-- Original Price -->
                   <div>
-                    <label for="original_price" class="block text-sm font-medium text-gray-800 mt-2">
-                      Prix original (XOF) <span class="text-red-500">*</span>
+                    <label for="original_price" class="block text-sm font-medium text-neutral-800 mt-2">
+                      Prix original (XOF) <span class="text-accent-red">*</span>
                     </label>
                     <Input
                       id="original_price"
@@ -148,8 +148,8 @@
 
                   <!-- Discounted Price -->
                   <div>
-                    <label for="discounted_price" class="block text-sm font-medium text-gray-800 mt-2">
-                      Prix réduit (XOF) <span class="text-red-500">*</span>
+                    <label for="discounted_price" class="block text-sm font-medium text-neutral-800 mt-2">
+                      Prix réduit (XOF) <span class="text-accent-red">*</span>
                     </label>
                     <Input
                       id="discounted_price"
@@ -166,8 +166,8 @@
 
                 <!-- Quantity -->
                 <div>
-                  <label for="quantity_available" class="block text-sm font-medium text-gray-800 mt-2">
-                    Quantité disponible <span class="text-red-500">*</span>
+                  <label for="quantity_available" class="block text-sm font-medium text-neutral-800 mt-2">
+                    Quantité disponible <span class="text-accent-red">*</span>
                   </label>
                   <Input
                     id="quantity_available"
@@ -182,7 +182,7 @@
 
                 <!-- Expiry Date -->
                 <div>
-                  <label for="expires_at" class="block text-sm font-medium text-gray-800 mt-2">
+                  <label for="expires_at" class="block text-sm font-medium text-neutral-800 mt-2">
                     Date d'expiration
                   </label>
                   <Input
@@ -197,7 +197,7 @@
 
             <Card>
               <template #header>
-                <h3 class="text-xl font-semibold text-gray-900">Image du produit</h3>
+                <h3 class="text-xl font-semibold text-neutral-900">Image du produit</h3>
               </template>
 
               <div class="space-y-4">
@@ -215,7 +215,7 @@
                 </div>
 
                 <!-- Image Upload -->
-                <div class="border-2 border-dashed border-gray-300 rounded p-6 text-left sm:text-center hover:transition-colors">
+                <div class="border-2 border-dashed border-neutral-300 rounded p-6 text-left sm:text-center hover:transition-colors">
                   <input
                     ref="imageInput"
                     type="file"
@@ -231,7 +231,7 @@
                     <CloudUploadIcon class="h-4 w-4 mr-2" />
                     {{ product.image_url ? 'Changer l\'image' : 'Ajouter une image' }}
                   </Button>
-                  <p class="text-sm text-gray-500 mt-2">PNG, JPG jusqu'à 2MB</p>
+                  <p class="text-sm text-neutral-500 mt-2">PNG, JPG jusqu'à 2MB</p>
                 </div>
               </div>
             </Card>
@@ -262,55 +262,55 @@
           <div class="space-y-6">
             <Card>
               <template #header>
-                <h3 class="text-lg font-semibold text-gray-900">Status</h3>
+                <h3 class="text-lg font-semibold text-neutral-900">Status</h3>
               </template>
 
               <div class="space-y-4">
                 <div class="flex items-center justify-between">
-                  <span class="text-sm font-medium text-gray-800">Statut</span>
+                  <span class="text-sm font-medium text-neutral-800">Statut</span>
                   <Badge :variant="product.status === 'active' ? 'success' : 'secondary'">
                     {{ product.status === 'active' ? 'Actif' : 'Inactif' }}
                   </Badge>
                 </div>
 
                 <div class="flex items-center justify-between">
-                  <span class="text-sm font-medium text-gray-800">Réduction</span>
+                  <span class="text-sm font-medium text-neutral-800">Réduction</span>
                   <Badge variant="warning">
                     -{{ Math.round(((product.original_price - product.discounted_price) / product.original_price) * 100) }}%
                   </Badge>
                 </div>
 
                 <div class="flex items-center justify-between">
-                  <span class="text-sm font-medium text-gray-800">Créé le</span>
-                  <span class="text-sm text-gray-500">{{ formatDate(product.created_at) }}</span>
+                  <span class="text-sm font-medium text-neutral-800">Créé le</span>
+                  <span class="text-sm text-neutral-500">{{ formatDate(product.created_at) }}</span>
                 </div>
 
                 <div class="flex items-center justify-between">
-                  <span class="text-sm font-medium text-gray-800">Modifié le</span>
-                  <span class="text-sm text-gray-500">{{ formatDate(product.updated_at) }}</span>
+                  <span class="text-sm font-medium text-neutral-800">Modifié le</span>
+                  <span class="text-sm text-neutral-500">{{ formatDate(product.updated_at) }}</span>
                 </div>
               </div>
             </Card>
 
             <Card>
               <template #header>
-                <h3 class="text-lg font-semibold text-gray-900">Statistiques</h3>
+                <h3 class="text-lg font-semibold text-neutral-900">Statistiques</h3>
               </template>
 
-              <div class="space-y-4">
+                <div class="space-y-4">
                 <div class="flex items-center justify-between">
-                  <span class="text-sm font-medium text-gray-800">Vues</span>
-                  <span class="text-sm font-semibold text-gray-900">{{ product.views || 0 }}</span>
+                  <span class="text-sm font-medium text-neutral-800">Vues</span>
+                  <span class="text-sm font-semibold text-neutral-900">{{ product.views || 0 }}</span>
                 </div>
 
                 <div class="flex items-center justify-between">
-                  <span class="text-sm font-medium text-gray-800">Réservations</span>
-                  <span class="text-sm font-semibold text-gray-900">{{ product.reservations_count || 0 }}</span>
+                  <span class="text-sm font-medium text-neutral-800">Réservations</span>
+                  <span class="text-sm font-semibold text-neutral-900">{{ product.reservations_count || 0 }}</span>
                 </div>
 
                 <div class="flex items-center justify-between">
-                  <span class="text-sm font-medium text-gray-800">Revenus</span>
-                  <span class="text-sm font-semibold text-blue-600">
+                  <span class="text-sm font-medium text-neutral-800">Revenus</span>
+                  <span class="text-sm font-semibold text-primary-600">
                     {{ formatPrice((product.reservations_count || 0) * product.discounted_price) }}
                   </span>
                 </div>

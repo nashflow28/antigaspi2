@@ -106,7 +106,7 @@ const formClasses = computed(() => [
 const variantClasses = computed(() => {
   const variants = {
     default: '',
-    contained: 'bg-white border border-gray-200 rounded shadow-sm',
+    contained: 'bg-white border border-neutral-200 rounded shadow-sm',
     minimal: 'bg-transparent'
   }
   return variants[props.variant]
@@ -143,15 +143,15 @@ const spacingClasses = computed(() => {
 })
 
 const headerClasses = computed(() => [
-  props.variant === 'contained' && 'border-b border-gray-200 pb-lg mt-4'
+  props.variant === 'contained' && 'border-b border-neutral-200 pb-lg mt-4'
 ].filter(Boolean).join(' '))
 
 const titleClasses = computed(() => [
-  'text-xl font-semibold text-gray-900 mt-2'
+  'text-xl font-semibold text-neutral-900 mt-2'
 ].join(' '))
 
 const descriptionClasses = computed(() => [
-  'text-sm text-gray-700'
+  'text-sm text-neutral-600'
 ].join(' '))
 
 const contentClasses = computed(() => [
@@ -160,7 +160,7 @@ const contentClasses = computed(() => [
 
 const footerClasses = computed(() => [
   'pt-2xl',
-  props.variant === 'contained' && 'border-t border-gray-200 mt-6'
+  props.variant === 'contained' && 'border-t border-neutral-200 mt-6'
 ].filter(Boolean).join(' '))
 
 const globalErrorClasses = computed(() => [

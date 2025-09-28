@@ -132,6 +132,7 @@
               v-for="activity in recentActivities"
               :key="activity.id"
               class="flex items-center gap-4 rounded-2xl border border-neutral-200/60 bg-surface-light/70 p-4 transition-colors duration-200 hover:border-primary-400/40 hover:bg-primary-500/5 dark:border-neutral-700/60 dark:bg-surface-dark/70"
+
             >
               <div class="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-xl" :class="getActivityIconClass(activity.type)">
                 <component :is="getActivityIcon(activity.type)" class="h-5 w-5" />
@@ -155,6 +156,7 @@
         <!-- System Health -->
         <Card variant="glass">
           <template #header>
+
             <h3 class="text-xl font-semibold text-neutral-900 dark:text-neutral-50">État du système</h3>
           </template>
 
