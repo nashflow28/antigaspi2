@@ -1,7 +1,7 @@
 <template>
   <div
     v-if="isVisible"
-    class="fixed top-4 right-4 z-[110] max-w-sm w-full bg-white shadow-lg rounded-lg pointer-events-auto ring-1 ring-black ring-opacity-5 overflow-hidden sm:block transform transition-all duration-300 ease-in-out"
+    class="fixed top-4 right-4 z-[110] max-w-sm w-full bg-white shadow-lg rounded pointer-events-auto ring-1 ring-black ring-opacity-5 overflow-hidden sm:block transform transition-all duration-300 ease-in-out"
     :class="{
       'translate-x-0': isVisible,
       'translate-x-full': !isVisible
@@ -11,7 +11,7 @@
       <div class="flex items-stretch sm:items-start">
         <div class="flex-shrink-0">
           <svg
-            class="h-10 w-10"
+            class="h-8 w-8"
             :class="iconClass"
             fill="none"
             viewBox="0 0 24 24"
@@ -47,17 +47,17 @@
             />
           </svg>
         </div>
-        <div class="ml-3 w-0 flex-1 pt-0.5">
-          <p class="text-responsive-sm font-medium text-heading">{{ title }}</p>
-          <p class="mt-1 text-responsive-sm text-muted">{{ message }}</p>
+        <div class="ml-4 w-none flex-1 pt-0.5">
+          <p class="text-sm font-medium text-gray-900">{{ title }}</p>
+          <p class="mt-1 text-sm text-gray-500">{{ message }}</p>
         </div>
-        <div class="ml-4 flex-shrink-0 flex">
+        <div class="ml-6 flex-shrink-0 flex">
           <button
-            class="bg-white rounded-md inline-flex text-placeholder hover:text-muted focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+            class="bg-white rounded inline-flex text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
             @click="close"
           >
             <span class="sr-only">Fermer</span>
-            <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+            <svg class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
               <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
             </svg>
           </button>
@@ -91,13 +91,13 @@ const isVisible = ref(false)
 const iconClass = computed(() => {
   switch (props.type) {
     case 'success':
-      return 'text-green-400'
+      return 'text-blue-400'
     case 'error':
       return 'text-red-400'
     case 'warning':
       return 'text-yellow-400'
     default:
-      return 'text-blue-400'
+      return 'text-secondary-400'
   }
 })
 

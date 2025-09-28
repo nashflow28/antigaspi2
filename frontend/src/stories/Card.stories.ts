@@ -87,18 +87,18 @@ const meta: Meta<CardComponent & StoryProps> = {
       >
         <template v-if="args.showHeader" #header>
           <div class="flex flex-col gap-1">
-            <h3 class="text-h3 font-semibold text-heading dark:text-neutral-50">{{ args.title }}</h3>
-            <p class="text-small text-muted dark:text-neutral-300">{{ args.subtitle }}</p>
+            <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-50">{{ args.title }}</h3>
+            <p class="text-sm text-gray-500 dark:text-gray-300">{{ args.subtitle }}</p>
           </div>
         </template>
 
-        <p class="text-body text-body dark:text-neutral-200">
+        <p class="text-gray-700 text-gray-700 dark:text-gray-200">
           {{ args.body }}
         </p>
 
         <template v-if="args.showFooter" #footer>
           <div class="flex items-center justify-between gap-4">
-            <span class="text-small text-muted dark:text-placeholder">{{ args.footerLabel }}</span>
+            <span class="text-sm text-gray-500 dark:text-gray-400">{{ args.footerLabel }}</span>
             <Button size="sm" variant="secondary">Voir le détail</Button>
           </div>
         </template>

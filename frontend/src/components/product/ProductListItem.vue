@@ -1,47 +1,47 @@
 <template>
   <Card class="group cursor-pointer p-6 hover:transition-all duration-300">
-    <div class="flex items-center gap-4 sm:gap-6">
+    <div class="flex items-center gap-3 sm:gap-6">
       <!-- Image du produit -->
-      <div class="relative w-24 h-24 flex-shrink-0 overflow-hidden sm:block rounded-2xl">
-        <div class="relative sm:absolute inset-0 bg-gradient-to-br from-primary-100 to-accent-blue/10 flex items-center justify-center">
-          <Package class="w-10 h-10 text-primary-400 opacity-50" />
+      <div class="relative w-6xl h-6xl flex-shrink-0 overflow-hidden sm:block rounded">
+        <div class="relative sm:absolute inset-0 bg-gradient-to-br from-blue-100 to-blue-500/10 flex items-center justify-center">
+          <Package class="h-6 w-6 text-blue-400 opacity-50" />
         </div>
 
         <!-- Badge de réduction -->
-        <div class="relative sm:absolute -top-2 -right-2 bg-primary-500 text-white px-4 py-3 rounded-full text-responsive-xs font-semibold shadow-card">
+        <div class="relative sm:absolute -top-2 -right-2 bg-blue-500 text-white px-3 py-3 rounded-full text-xs font-semibold shadow-lg">
           -{{ product.discount }}%
         </div>
       </div>
 
       <!-- Contenu principal -->
-      <div class="flex-1 min-w-0 space-y-3">
+      <div class="flex-1 min-w-none space-y-2">
         <!-- Titre et description -->
         <div>
-          <h3 class="text-responsive-xl font-semibold text-heading mb-1 group-hover:transition-colors">
+          <h3 class="text-xl font-semibold text-gray-900 mb-1 group-hover:transition-colors">
             {{ product.name }}
           </h3>
-          <p class="text-responsive-sm text-body line-clamp-2">{{ product.description }}</p>
+          <p class="text-sm text-gray-700 line-clamp-2">{{ product.description }}</p>
         </div>
 
         <!-- Informations marchand et timing -->
-        <div class="flex items-center gap-4 text-responsive-sm">
-          <div class="flex items-center gap-2 text-body">
-            <MapPin class="w-5 h-5" />
+        <div class="flex items-center gap-3 text-sm">
+          <div class="flex items-center gap-2 text-gray-700">
+            <MapPin class="h-4 w-4" />
             <span class="font-medium">{{ product.merchant.name }}</span>
           </div>
 
-          <div class="flex items-center gap-2 text-muted">
+          <div class="flex items-center gap-2 text-gray-500">
             <span>{{ product.merchant.distance }}km</span>
           </div>
 
-          <div class="flex items-center gap-2 text-accent-orange">
-            <Clock class="w-5 h-5" />
+          <div class="flex items-center gap-2 text-orange-500">
+            <Clock class="h-4 w-4" />
             <span class="font-medium">{{ formatTimeLeft(product.expires_at) }}</span>
           </div>
 
           <div class="flex items-center gap-2">
-            <div class="w-2 h-2 bg-primary-500 rounded-full" />
-            <span class="text-responsive-sm text-body">
+            <div class="h-4 w-4 bg-blue-500 rounded-full" />
+            <span class="text-sm text-gray-700">
               {{ product.available_quantity - product.reserved_quantity }} disponible{{ (product.available_quantity - product.reserved_quantity) > 1 ? 's' : '' }}
             </span>
           </div>
@@ -49,13 +49,13 @@
       </div>
 
       <!-- Prix et actions -->
-      <div class="flex items-center gap-4 sm:gap-6">
+      <div class="flex items-center gap-3 sm:gap-6">
         <!-- Prix -->
         <div class="text-right">
-          <div class="text-responsive-xl font-semibold text-primary">
+          <div class="text-xl font-semibold text-blue-600">
             {{ formatPrice(product.discounted_price) }}
           </div>
-          <div class="text-responsive-sm text-placeholder line-through">
+          <div class="text-sm text-gray-400 line-through">
             {{ formatPrice(product.original_price) }}
           </div>
         </div>

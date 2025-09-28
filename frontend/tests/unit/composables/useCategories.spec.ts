@@ -58,7 +58,7 @@ describe('useCategories Composable', () => {
   })
 
   it('should set loading state correctly', async () => {
-    let resolvePromise: (value: any) => void
+    let resolvePromise: () => void
     const apiPromise = new Promise(resolve => {
       resolvePromise = resolve
     })

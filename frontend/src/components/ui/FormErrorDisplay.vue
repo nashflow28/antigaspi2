@@ -1,20 +1,20 @@
 <template>
   <div
     v-if="hasErrors"
-    class="rounded-md border border-red-200 bg-red-50 p-4"
+    class="rounded border border-red-200 bg-red-50 p-4"
   >
     <div class="flex">
       <div class="flex-shrink-0">
-        <AlertCircle class="h-5 w-5 text-red-400" />
+        <AlertCircle class="h-4 w-4 text-red-400" />
       </div>
-      <div class="ml-3">
-        <h3 class="text-responsive-sm font-medium text-red-800">
+      <div class="ml-4">
+        <h3 class="text-sm font-medium text-red-800">
           {{ title || 'Erreurs de validation' }}
         </h3>
-        <div class="mt-2 text-responsive-sm text-red-700">
+        <div class="mt-2 text-sm text-red-700">
           <ul
             v-if="Array.isArray(errors)"
-            class="list-disc space-y-2 pl-5"
+            class="list-disc space-y-4 pl-5"
           >
             <li v-for="(error, index) in errors" :key="index">
               {{ error }}
@@ -24,7 +24,7 @@
             {{ errors }}
           </p>
           <div v-else-if="errors && typeof errors === 'object'">
-            <ul class="list-disc space-y-2 pl-5">
+            <ul class="list-disc space-y-4 pl-5">
               <li
                 v-for="(fieldErrors, field) in errors"
                 :key="field"
@@ -47,7 +47,7 @@
           <button
             v-if="allowDismiss"
             type="button"
-            class="rounded-md bg-red-100 px-4 py-3 text-responsive-sm font-medium text-red-800 hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+            class="rounded bg-red-100 px-3 py-3 text-sm font-medium text-red-800 hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
             @click="dismissErrors"
           >
             Masquer
@@ -55,7 +55,7 @@
           <button
             v-if="allowRetry"
             type="button"
-            class="rounded-md bg-red-600 px-4 py-3 text-responsive-sm font-medium text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+            class="rounded bg-red-600 px-3 py-3 text-sm font-medium text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
             @click="retryAction"
           >
             Réessayer
@@ -65,16 +65,16 @@
 
       <div
         v-if="allowDismiss"
-        class="ml-auto pl-3"
+        class="ml-auto pl-md"
       >
-        <div class="-mx-1.5 -my-1.5">
+        <div class="-mx-xs.5 -my-xs.5">
           <button
             type="button"
-            class="inline-flex rounded-md bg-red-50 p-1.5 text-red-500 hover:bg-red-100 focus:outline-none focus:ring-2 focus:ring-red-600 focus:ring-offset-2 focus:ring-offset-red-50"
+            class="inline-flex rounded bg-red-50 p-1.5 text-red-500 hover:bg-red-100 focus:outline-none focus:ring-2 focus:ring-red-600 focus:ring-offset-2 focus:ring-offset-red-50"
             @click="dismissErrors"
           >
             <span class="sr-only">Fermer</span>
-            <X class="h-5 w-5" />
+            <X class="h-4 w-4" />
           </button>
         </div>
       </div>

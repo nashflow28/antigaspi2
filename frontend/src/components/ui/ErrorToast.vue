@@ -12,7 +12,7 @@
         <div
           v-for="error in visibleErrors"
           :key="error.id"
-          class="pointer-events-auto w-full max-w-sm overflow-hidden sm:block rounded-lg bg-white shadow-lg ring-1 ring-black ring-opacity-5"
+          class="pointer-events-auto w-full max-w-sm overflow-hidden sm:block rounded bg-white shadow-lg ring-1 ring-black ring-opacity-5"
           :class="getErrorClasses(error.severity)"
         >
           <div class="p-4">
@@ -20,27 +20,27 @@
               <div class="flex-shrink-0">
                 <component
                   :is="getErrorIcon(error.severity)"
-                  class="h-10 w-10"
+                  class="h-8 w-8"
                   :class="getIconClasses(error.severity)"
                 />
               </div>
 
-              <div class="ml-3 w-0 flex-1 pt-0.5">
-                <p class="text-responsive-sm font-medium text-heading">
+              <div class="ml-4 w-none flex-1 pt-0.5">
+                <p class="text-sm font-medium text-gray-900">
                   {{ getErrorTitle(error.severity) }}
                 </p>
-                <p class="mt-1 text-responsive-sm text-muted">
+                <p class="mt-1 text-sm text-gray-500">
                   {{ error.userMessage }}
                 </p>
 
                 <!-- Action buttons for critical errors -->
                 <div
                   v-if="error.severity === 'critical' && error.retryable"
-                  class="mt-3 flex space-y-7 sm:space-y-0 sm:space-x-7"
+                  class="mt-3 flex space-y-7 sm:space-x-7"
                 >
                   <button
                     type="button"
-                    class="rounded-md bg-white text-responsive-sm font-medium text-indigo-600 hover:text-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                    class="rounded bg-white text-sm font-medium text-indigo-600 hover:text-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
                     @click="retryError(error)"
                   >
                     Réessayer
@@ -48,14 +48,14 @@
                 </div>
               </div>
 
-              <div class="ml-4 flex flex-shrink-0">
+              <div class="ml-6 flex flex-shrink-0">
                 <button
                   type="button"
-                  class="inline-flex rounded-md bg-white text-placeholder hover:text-muted focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                  class="inline-flex rounded bg-white text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
                   @click="dismissError(error.id)"
                 >
                   <span class="sr-only">Fermer</span>
-                  <X class="h-5 w-5" />
+                  <X class="h-4 w-4" />
                 </button>
               </div>
             </div>
@@ -64,7 +64,7 @@
           <!-- Auto-dismiss progress bar -->
           <div
             v-if="error.severity !== 'critical' && getTimeRemaining(error) > 0"
-            class="h-1 bg-neutral-200"
+            class="h-3 bg-gray-200"
           >
             <div
               class="h-full transition-all duration-100 ease-linear"
@@ -155,7 +155,7 @@ const getErrorClasses = (severity: ErrorSeverity): string => {
     case 'error': return 'border-l-4 border-orange-400'
     case 'warning': return 'border-l-4 border-yellow-400'
     case 'info': return 'border-l-4 border-blue-400'
-    default: return 'border-l-4 border-gray-400'
+    default: return 'border-l-4 border-surface-400'
   }
 }
 
@@ -164,8 +164,8 @@ const getIconClasses = (severity: ErrorSeverity): string => {
     case 'critical': return 'text-red-400'
     case 'error': return 'text-orange-400'
     case 'warning': return 'text-yellow-400'
-    case 'info': return 'text-blue-400'
-    default: return 'text-gray-400'
+    case 'info': return 'text-secondary-400'
+    default: return 'text-surface-400'
   }
 }
 
@@ -173,8 +173,8 @@ const getProgressClasses = (severity: ErrorSeverity): string => {
   switch (severity) {
     case 'error': return 'bg-orange-400'
     case 'warning': return 'bg-yellow-400'
-    case 'info': return 'bg-blue-400'
-    default: return 'bg-gray-400'
+    case 'info': return 'bg-secondary-400'
+    default: return 'bg-gray-50-400'
   }
 }
 

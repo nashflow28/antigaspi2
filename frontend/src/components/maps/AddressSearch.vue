@@ -9,7 +9,7 @@
           type="text"
           :placeholder="placeholder"
           :disabled="loading"
-          class="w-full pl-12 pr-12 py-3 bg-white border border-neutral-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200 shadow-sm"
+          class="w-full pl-12 pr-12 py-3 bg-white border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 shadow-sm"
           @input="handleInput"
           @focus="showResults = true"
           @blur="handleBlur"
@@ -20,8 +20,8 @@
         >
 
         <!-- Search Icon -->
-        <div class="relative sm:absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-          <Search class="w-5 h-5 text-placeholder" />
+        <div class="relative sm:absolute inset-y-0 left-0 pl-lg flex items-center pointer-events-none">
+          <Search class="h-4 w-4 text-gray-400" />
         </div>
 
         <!-- Loading/Clear Button -->
@@ -32,10 +32,10 @@
             type="button"
             @click="clearSearch"
           >
-            <X class="w-5 h-5 text-placeholder" />
+            <X class="h-4 w-4 text-gray-400" />
           </button>
           <div v-else-if="loading" class="p-1">
-            <div class="animate-spin w-5 h-5 border-2 border-primary-500 border-t-transparent rounded-full" />
+            <div class="animate-spin h-4 w-4 border-2 border-blue-500 border-t-transparent rounded-full" />
           </div>
         </div>
       </div>
@@ -44,21 +44,21 @@
       <Transition name="dropdown">
         <div
           v-if="showResults && (results.length > 0 || loading || error)"
-          class="relative sm:absolute top-full left-0 right-0 mt-2 bg-white border border-neutral-200 rounded-xl shadow-lg z-50 max-h-60 overflow-y-auto"
+          class="relative sm:absolute top-full left-0 right-0 mt-2 bg-white border border-gray-200 rounded shadow-lg z-50 max-h-60 overflow-y-auto"
         >
           <!-- Loading State -->
-          <div v-if="loading" class="p-4 text-left sm:text-center text-muted">
-            <div class="flex items-center justify-center space-y-2 sm:space-y-0 sm:space-x-2">
-              <div class="animate-spin w-5 h-5 border-2 border-primary-500 border-t-transparent rounded-full" />
-              <span class="text-responsive-sm">Recherche en cours...</span>
+          <div v-if="loading" class="p-4 text-left sm:text-center text-gray-500">
+            <div class="flex items-center justify-center space-y-4 sm:space-x-2">
+              <div class="animate-spin h-4 w-4 border-2 border-blue-500 border-t-transparent rounded-full" />
+              <span class="text-sm">Recherche en cours...</span>
             </div>
           </div>
 
           <!-- Error State -->
           <div v-else-if="error" class="p-4 text-left sm:text-center text-red-500">
-            <div class="flex items-center justify-center space-y-2 sm:space-y-0 sm:space-x-2">
-              <AlertCircle class="w-5 h-5" />
-              <span class="text-responsive-sm">{{ error }}</span>
+            <div class="flex items-center justify-center space-y-4 sm:space-x-2">
+              <AlertCircle class="h-4 w-4" />
+              <span class="text-sm">{{ error }}</span>
             </div>
           </div>
 
@@ -68,26 +68,26 @@
               v-for="(result, index) in results"
               :key="`${result.place_id || result.lat}-${index}`"
               :class="[
-                'w-full text-left px-4 py-3 hover:transition-colors border-b border-neutral-100 last:border-b-0',
-                { 'bg-primary-50': index === selectedIndex }
+                'w-full text-left px-3 py-3 hover:transition-colors border-b border-gray-100 last:border-b-0',
+                { 'bg-blue-50': index === selectedIndex }
               ]"
               type="button"
               @click="selectResult(result)"
             >
-              <div class="flex items-stretch sm:items-start space-y-3 sm:space-y-0 sm:space-x-3">
-                <MapPin class="w-5 h-5 text-placeholder mt-1 flex-shrink-0" />
-                <div class="flex-1 min-w-0">
-                  <div class="font-medium text-heading truncate">
+              <div class="flex items-stretch sm:items-start space-y-2 sm:space-x-3">
+                <MapPin class="h-4 w-4 text-gray-400 mt-1 flex-shrink-0" />
+                <div class="flex-1 min-w-none">
+                  <div class="font-medium text-gray-900 truncate">
                     {{ result.display_name || result.formatted_address }}
                   </div>
-                  <div v-if="result.address" class="text-responsive-sm text-muted truncate">
+                  <div v-if="result.address" class="text-sm text-gray-500 truncate">
                     {{ formatAddress(result.address) }}
                   </div>
-                  <div class="flex items-center space-y-2 sm:space-y-0 sm:space-x-2 mt-1">
-                    <span class="text-responsive-xs text-placeholder">
+                  <div class="flex items-center space-y-4 sm:space-x-2 mt-1">
+                    <span class="text-xs text-gray-400">
                       {{ result.type || 'Adresse' }}
                     </span>
-                    <span v-if="result.distance" class="text-responsive-xs text-primary">
+                    <span v-if="result.distance" class="text-xs text-blue-600">
                       {{ formatDistance(result.distance) }}
                     </span>
                   </div>
@@ -97,10 +97,10 @@
           </div>
 
           <!-- No Results -->
-          <div v-else class="p-4 text-left sm:text-center text-muted">
-            <div class="flex items-center justify-center space-y-2 sm:space-y-0 sm:space-x-2">
-              <MapPin class="w-5 h-5" />
-              <span class="text-responsive-sm">Aucun résultat trouvé</span>
+          <div v-else class="p-4 text-left sm:text-center text-gray-500">
+            <div class="flex items-center justify-center space-y-4 sm:space-x-2">
+              <MapPin class="h-4 w-4" />
+              <span class="text-sm">Aucun résultat trouvé</span>
             </div>
           </div>
         </div>
@@ -108,15 +108,15 @@
     </div>
 
     <!-- Selected Location Display -->
-    <div v-if="selectedLocation" class="mt-3 p-3 bg-primary-50 border border-primary-200 rounded-lg">
+    <div v-if="selectedLocation" class="mt-3 p-3 bg-blue-50 border border-blue-200 rounded">
       <div class="flex items-stretch sm:items-start justify-start sm:justify-between">
-        <div class="flex items-stretch sm:items-start space-y-2 sm:space-y-0 sm:space-x-2">
-          <MapPin class="w-5 h-5 text-primary mt-0.5" />
+        <div class="flex items-stretch sm:items-start space-y-4 sm:space-x-2">
+          <MapPin class="h-4 w-4 text-blue-600 mt-0.5" />
           <div>
-            <div class="font-medium text-primary-900 text-responsive-sm">
+            <div class="font-medium text-blue-900 text-sm">
               {{ selectedLocation.display_name || selectedLocation.formatted_address }}
             </div>
-            <div class="text-responsive-xs text-primary mt-1">
+            <div class="text-xs text-blue-600 mt-1">
               {{ selectedLocation.lat.toFixed(6) }}, {{ selectedLocation.lng.toFixed(6) }}
             </div>
           </div>
@@ -126,7 +126,7 @@
           type="button"
           @click="clearSelection"
         >
-          <X class="w-3 h-3 text-primary-500" />
+          <X class="w-xs h-3 text-blue-500" />
         </button>
       </div>
     </div>

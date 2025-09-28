@@ -125,9 +125,9 @@ const triggerClasses = computed(() => [
 
 const menuClasses = computed(() => [
   'absolute z-50',
-  'bg-white rounded-lg shadow-lg',
-  'border border-neutral-200',
-  'py-1',
+  'bg-white rounded shadow-lg',
+  'border border-gray-200',
+  'py-xs',
   placementClasses.value,
   variantClasses.value
 ].filter(Boolean).join(' '))
@@ -147,13 +147,13 @@ const placementClasses = computed(() => {
 const variantClasses = computed(() => {
   const variants = {
     default: 'backdrop-blur-sm',
-    minimal: 'shadow-sm border-neutral-100'
+    minimal: 'shadow-sm border-gray-100'
   }
   return variants[props.variant]
 })
 
 const itemsClasses = computed(() => [
-  'max-h-64 overflow-y-auto'
+  'max-h-9xl overflow-y-auto'
 ].join(' '))
 
 const menuStyle = computed(() => {

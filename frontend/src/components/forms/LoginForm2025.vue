@@ -2,17 +2,17 @@
   <div class="space-y-8">
     <!-- Header moderne -->
     <div class="text-left sm:text-center animate-fade-in-up">
-      <h3 class="text-responsive-xl font-semibold text-heading mb-2">
+      <h3 class="text-xl font-semibold text-gray-900 mt-2">
         Content de vous revoir !
       </h3>
-      <p class="text-body">
+      <p class="text-gray-700">
         Connectez-vous pour accéder à votre compte Antigaspi
       </p>
     </div>
 
     <form class="space-y-6 animate-fade-in-up" style="animation-delay: 0.2s;" @submit.prevent="handleSubmit">
       <!-- Email Input -->
-      <div class="space-y-2">
+      <div class="space-y-4">
         <Input
           id="email"
           v-model="form.email"
@@ -27,7 +27,7 @@
       </div>
 
       <!-- Password Input -->
-      <div class="space-y-2">
+      <div class="space-y-4">
         <Input
           id="password"
           v-model="form.password"
@@ -49,14 +49,14 @@
           <input
             v-model="form.remember"
             type="checkbox"
-            class="rounded border-neutral-300 text-primary focus:ring-primary-500"
+            class="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
           >
-          <span class="text-responsive-sm text-body">Se souvenir de moi</span>
+          <span class="text-sm text-gray-700">Se souvenir de moi</span>
         </label>
 
         <router-link
           to="/forgot-password"
-          class="text-responsive-sm text-primary hover:text-primary-emphasis font-medium"
+          class="text-sm text-blue-600 hover:text-blue-900 font-medium"
         >
           Mot de passe oublié ?
         </router-link>
@@ -72,19 +72,19 @@
         class="glow-effect group relative overflow-hidden sm:block"
       >
         <span class="relative z-10 flex items-center justify-center gap-2">
-          <Loader2 v-if="loading" class="w-5 h-5 animate-spin" />
+          <Loader2 v-if="loading" class="h-4 w-4 animate-spin" />
           <span>{{ loading ? 'Connexion en cours...' : 'Se connecter' }}</span>
         </span>
-        <div class="relative sm:absolute inset-0 bg-gradient-to-r from-primary-600 to-accent-blue/90 opacity-0 group-hover:transition-opacity duration-300" />
+        <div class="relative sm:absolute inset-0 bg-gradient-to-r from-blue-600 to-blue-500/90 opacity-0 group-hover:transition-opacity duration-300" />
       </Button>
 
       <!-- Error Message Global -->
-      <div v-if="errorMessage" class="p-4 rounded-lg bg-red-50 border border-red-200">
+      <div v-if="errorMessage" class="p-4 rounded bg-red-50 border border-red-200">
         <div class="flex items-stretch sm:items-start gap-3">
-          <AlertCircle class="w-5 h-5 text-red-500 mt-0.5 flex-shrink-0" />
+          <AlertCircle class="h-4 w-4 text-red-500 mt-0.5 flex-shrink-0" />
           <div>
-            <h4 class="text-responsive-sm font-semibold text-red-800">Erreur de connexion</h4>
-            <p class="text-responsive-sm text-red-700 mt-1">{{ errorMessage }}</p>
+            <h4 class="text-sm font-semibold text-red-800">Erreur de connexion</h4>
+            <p class="text-sm text-red-700 mt-1">{{ errorMessage }}</p>
           </div>
         </div>
       </div>
@@ -94,20 +94,20 @@
     <div class="space-y-4 animate-fade-in-up" style="animation-delay: 0.4s;">
       <div class="relative">
         <div class="relative sm:absolute inset-0 flex items-center">
-          <div class="w-full border-t border-neutral-300" />
+          <div class="w-full border-t border-gray-300" />
         </div>
-        <div class="relative flex justify-center text-responsive-sm">
-          <span class="px-4 bg-white text-muted">Ou continuez avec</span>
+        <div class="relative flex justify-center text-sm">
+          <span class="px-3 bg-white text-gray-500">Ou continuez avec</span>
         </div>
       </div>
 
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <Button
           variant="outline"
           class="flex items-center justify-center gap-2 py-3"
           @click="handleSocialLogin('google')"
         >
-          <svg class="w-5 h-5" viewBox="0 0 24 24">
+          <svg class="h-4 w-4" viewBox="0 0 24 24">
             <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
             <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
             <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" />
@@ -121,7 +121,7 @@
           class="flex items-center justify-center gap-2 py-3"
           @click="handleSocialLogin('facebook')"
         >
-          <svg class="w-5 h-5" fill="#1877F2" viewBox="0 0 24 24">
+          <svg class="h-4 w-4" fill="#1877F2" viewBox="0 0 24 24">
             <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
           </svg>
           Facebook
@@ -130,11 +130,11 @@
     </div>
 
     <!-- Sign Up Link -->
-    <div class="text-left sm:text-center text-responsive-sm text-body animate-fade-in-up" style="animation-delay: 0.6s;">
+    <div class="text-left sm:text-center text-sm text-gray-700 animate-fade-in-up" style="animation-delay: 0.6s;">
       Vous n'avez pas encore de compte ?
       <router-link
         to="/register"
-        class="font-semibold text-primary hover:text-primary-emphasis ml-1"
+        class="font-semibold text-blue-600 hover:text-blue-900 ml-1"
       >
         Créez votre compte
       </router-link>

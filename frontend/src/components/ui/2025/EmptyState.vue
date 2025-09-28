@@ -17,7 +17,7 @@
         >
         <div v-else :class="defaultIconClasses">
           <svg
-            class="w-full h-full text-neutral-300"
+            class="w-full h-full text-gray-500"
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
@@ -136,19 +136,19 @@ const wrapperClasses = computed(() => [
 const sizeClasses = computed(() => {
   const sizes = {
     sm: {
-      wrapper: 'py-8 px-4 space-y-3',
+      wrapper: 'py-8 px-3 space-y-2',
       icon: 48,
       title: 'text-base',
       description: 'text-sm'
     },
     md: {
-      wrapper: 'py-12 px-6 space-y-4',
+      wrapper: 'py-16 px-4 space-y-4',
       icon: 64,
       title: 'text-lg',
       description: 'text-base'
     },
     lg: {
-      wrapper: 'py-16 px-8 space-y-6',
+      wrapper: 'py-16 px-6 space-y-6',
       icon: 80,
       title: 'text-xl',
       description: 'text-lg'
@@ -161,36 +161,36 @@ const iconSize = computed(() => sizeClasses.value.icon)
 
 const iconWrapperClasses = computed(() => [
   'flex-shrink-0',
-  props.variant === 'illustration' && 'mb-2'
+  props.variant === 'illustration' && 'mt-2'
 ].filter(Boolean).join(' '))
 
 const iconClasses = computed(() => [
-  'text-placeholder',
-  props.variant === 'minimal' && 'text-neutral-300'
+  'text-gray-400',
+  props.variant === 'minimal' && 'text-gray-500'
 ].filter(Boolean).join(' '))
 
 const imageClasses = computed(() => [
-  'max-w-full h-auto max-h-20'
+  'max-w-full h-auto max-h-12'
 ].join(' '))
 
 const defaultIconClasses = computed(() => [
   'flex items-center justify-center',
-  'rounded-full bg-neutral-100',
-  'w-16 h-16'
+  'rounded-full bg-gray-100',
+  'w-12 h-10'
 ].join(' '))
 
 const contentClasses = computed(() => [
-  'flex-1 max-w-md',
+  'flex-1 max-w-xl',
   props.centered ? 'text-center' : 'text-left'
 ].join(' '))
 
 const titleClasses = computed(() => [
-  'font-semibold text-heading',
+  'font-semibold text-gray-900',
   sizeClasses.value.title
 ].join(' '))
 
 const descriptionClasses = computed(() => [
-  'text-body leading-relaxed',
+  'text-gray-700 leading-relaxed',
   sizeClasses.value.description
 ].join(' '))
 

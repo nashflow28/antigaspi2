@@ -1,45 +1,45 @@
 <template>
   <div class="relative">
-    <div class="w-full bg-neutral-100 rounded-lg border-2 border-dashed border-neutral-300" :style="{ minHeight: height || '400px' }">
-      <div class="h-full flex flex-col items-center justify-center p-4 sm:p-6 lg:p-8 text-left sm:text-center">
-        <div class="mb-4">
-          <MapPin class="w-16 h-16 text-placeholder mx-auto" />
+    <div class="w-full bg-gray-100 rounded border-2 border-dashed border-gray-300" :style="{ minHeight: height || '400px' }">
+      <div class="h-full flex flex-col items-center justify-center p-4 sm:p-6 lg:px-6 text-left sm:text-center">
+        <div class="mt-3">
+          <MapPin class="w-12 h-10 text-gray-400 mx-auto" />
         </div>
-        <h3 class="text-responsive-lg font-semibold text-body-emphasis mb-2">Carte des commerçants</h3>
-        <p class="text-muted mb-6 max-w-full sm:max-w-md">
+        <h3 class="text-lg font-semibold text-gray-800 mt-2">Carte des commerçants</h3>
+        <p class="text-gray-500 mt-4 max-w-xl">
           Configuration Google Maps en cours. En attendant, voici la liste des commerçants à proximité.
         </p>
 
         <!-- Liste des marchands -->
-        <div class="w-full max-w-full sm:max-w-2xl space-y-3">
+        <div class="w-full max-w-full sm:max-w-80 space-y-2">
           <div
             v-for="marker in markers"
             :key="marker.id"
-            class="bg-white rounded-lg border border-neutral-200 p-4 hover:transition-shadow cursor-pointer"
+            class="bg-white rounded border border-gray-200 p-4 hover:transition-shadow cursor-pointer"
             @click="$emit('markerClick', marker)"
           >
             <div class="flex items-center justify-start sm:justify-between">
               <div>
-                <h4 class="font-semibold text-heading">{{ marker.title }}</h4>
-                <p class="text-responsive-sm text-body">{{ marker.info }}</p>
-                <div class="flex items-center mt-2 text-responsive-sm text-info">
-                  <Navigation class="w-5 h-5 mr-1" />
+                <h4 class="font-semibold text-gray-900">{{ marker.title }}</h4>
+                <p class="text-sm text-gray-700">{{ marker.info }}</p>
+                <div class="flex items-center mt-2 text-sm text-info">
+                  <Navigation class="h-4 w-4 mr-1" />
                   <span>{{ marker.position.lat.toFixed(4) }}, {{ marker.position.lng.toFixed(4) }}</span>
                 </div>
               </div>
               <div class="flex flex-col items-center">
-                <div class="w-3 h-3 bg-green-500 rounded-full mb-1" />
-                <span class="text-responsive-xs text-muted">Actif</span>
+                <div class="w-xs h-3 bg-blue-500 rounded-full mb-1" />
+                <span class="text-xs text-gray-500">Actif</span>
               </div>
             </div>
           </div>
         </div>
 
         <!-- Position utilisateur -->
-        <div v-if="showUserLocation && userLocation" class="mt-6 p-4 bg-blue-50 rounded-lg">
-          <div class="flex items-center justify-center text-blue-700">
-            <MapPin class="w-5 h-5 mr-2" />
-            <span class="text-responsive-sm">
+        <div v-if="showUserLocation && userLocation" class="mt-6 p-4 bg-blue-50 rounded">
+          <div class="flex items-center justify-center text-secondary-700">
+            <MapPin class="h-4 w-4 mr-2" />
+            <span class="text-sm">
               Votre position: {{ userLocation.latitude.toFixed(4) }}, {{ userLocation.longitude.toFixed(4) }}
             </span>
           </div>

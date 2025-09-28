@@ -12,7 +12,7 @@
       viewBox="0 0 24 24"
       fill="none"
       stroke="currentColor"
-      class="h-5 w-5"
+      class="h-4 w-4"
       :animate="{ rotate: isDark ? 180 : 0 }"
       :transition="{ duration: 0.4, ease: 'easeInOut' }"
     >

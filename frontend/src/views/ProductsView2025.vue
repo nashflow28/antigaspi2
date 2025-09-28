@@ -1,35 +1,35 @@
 <template>
-  <div class="min-h-screen bg-gradient-to-br from-neutral-50 via-surface-light to-primary-50/15">
+  <div class="min-h-screen bg-gradient-to-br from-gray-50 via-surface-light to-blue-50/15">
     <header
       class="sticky top-0 z-40 border-b border-white/50 bg-white/80 backdrop-blur-2xl shadow-[0_18px_40px_-24px_rgba(4,120,87,0.35)]"
     >
-      <div class="container px-4 sm:px-6 lg:px-8-2025 py-10">
-        <div class="flex flex-col gap-6 sm:gap-8 lg:flex-row lg:items-center lg:justify-between">
-          <div class="space-y-5 max-w-full sm:max-w-2xl">
+      <div class="container px-3 sm:px-4 lg:px-6 py-12">
+        <div class="flex flex-col gap-4 sm:gap-8 lg:flex-row lg:items-center lg:justify-between">
+          <div class="space-y-5 max-w-full sm:max-w-80">
             <Badge
               variant="primary"
               size="sm"
               rounded
-              class="w-max px-4 py-3 shadow-sm shadow-primary-200/40"
+              class="w-max px-3 py-3 shadow-sm shadow-primary-200/40"
             >
               Catalogue 2025
             </Badge>
-            <div class="space-y-3">
-              <h1 class="font-display text-display-sm lg:text-display-md font-semibold text-heading leading-relaxed">
+            <div class="space-y-2">
+              <h1 class="font-display text-3xl lg:text-3xl font-semibold text-gray-900 leading-relaxed">
                 Produits responsables à portée de main
               </h1>
-              <p class="text-body text-body">
+              <p class="text-gray-700 text-gray-700">
                 {{ filteredProducts.length }} produit{{ filteredProducts.length > 1 ? 's' : '' }} disponible{{
                   filteredProducts.length > 1 ? 's' : ''
                 }}
               </p>
             </div>
-            <p class="text-responsive-sm text-muted">
+            <p class="text-sm text-gray-500">
               Explorez nos paniers anti-gaspi triés par impact, localisation et économies garanties.
             </p>
           </div>
-          <Card variant="glass" class="w-full max-w-full sm:max-w-xl shadow-card animate-fade-in-up">
-            <div class="flex flex-col gap-4 sm:flex-row sm:items-center">
+          <Card variant="glass" class="w-full max-w-xl shadow-lg animate-fade-in-up">
+            <div class="flex flex-col gap-3 sm:flex-row sm:items-center">
               <Input
                 v-model="searchQuery"
                 :left-icon="Search"
@@ -44,7 +44,7 @@
                 variant="secondary"
                 size="md"
                 :left-icon="Filter"
-                class="w-full justify-between text-primary-emphasis sm:w-auto"
+                class="w-full justify-between text-blue-900 sm:w-auto"
                 @click="showFilters = !showFilters"
               >
                 <span class="flex items-center gap-2">
@@ -53,7 +53,7 @@
                     variant="primary"
                     size="sm"
                     rounded
-                    class="border border-primary-200/70 bg-primary-50/80 text-primary-emphasis"
+                    class="border border-blue-200/70 bg-blue-50/80 text-blue-900"
                   >
                     {{ activeFiltersCount }}
                   </Badge>
@@ -67,7 +67,7 @@
                 variant="outline"
                 size="sm"
                 rounded
-                class="border-primary-200/70 bg-primary-50/60 text-primary-emphasis"
+                class="border-blue-200/70 bg-blue-50/60 text-blue-900"
               >
                 {{ label }}
               </Badge>
@@ -77,27 +77,27 @@
       </div>
     </header>
 
-    <main class="container px-4 sm:px-6 lg:px-8-2025 space-y-spacing-22 py-spacing-22">
+    <main class="container px-3 sm:px-4 lg:px-6 space-y-20 py-20">
       <Transition name="fade">
         <Card
           v-if="showFilters"
           variant="glass"
-          class="animate-fade-in-up shadow-card"
+          class="animate-fade-in-up shadow-lg"
         >
           <template #header>
-            <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-              <div class="space-y-2">
-                <h2 class="text-responsive-xl font-heading font-semibold text-heading leading-relaxed">
+            <div class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+              <div class="space-y-4">
+                <h2 class="text-xl font-heading font-semibold text-gray-900 leading-relaxed">
                   Affiner votre recherche
                 </h2>
-                <p class="text-responsive-sm text-muted">
+                <p class="text-sm text-gray-500">
                   Combinez nos filtres intelligents pour trouver le panier idéal.
                 </p>
               </div>
               <Button
                 variant="ghost"
                 size="sm"
-                class="text-primary hover:text-primary-emphasis"
+                class="text-blue-600 hover:text-blue-900"
                 @click="showFilters = false"
               >
                 Fermer
@@ -105,12 +105,12 @@
             </div>
           </template>
 
-          <div class="grid grid-cols-1 gap-4 sm:gap-6 md:grid-cols-2 lg:grid-cols-4">
+          <div class="grid grid-cols-1 gap-3 sm:gap-4 md:grid-cols-2 lg:grid-cols-4">
             <label class="flex flex-col gap-2">
-              <span class="text-small font-medium text-body">Catégorie</span>
+              <span class="text-sm font-medium text-gray-700">Catégorie</span>
               <select
                 v-model="filters.category"
-                class="w-full rounded-2xl border border-neutral-200/80 bg-white/80 px-4 py-3 text-body text-body shadow-sm transition focus:border-primary-400 focus:outline-none focus:ring-2 focus:ring-primary-200"
+                class="w-full rounded-modern border border-gray-200/80 bg-white/80 px-3 py-3 text-gray-700 text-gray-700 shadow-sm transition focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-200"
               >
                 <option value="">Toutes les catégories</option>
                 <option value="bakery">Boulangerie</option>
@@ -122,7 +122,7 @@
             </label>
 
             <div class="flex flex-col gap-2">
-              <span class="text-small font-medium text-body">Distance</span>
+              <span class="text-sm font-medium text-gray-700">Distance</span>
               <Button
                 variant="secondary"
                 size="sm"
@@ -136,7 +136,7 @@
               </Button>
               <select
                 v-model="filters.maxDistance"
-                class="w-full rounded-2xl border border-neutral-200/80 bg-white/80 px-4 py-3 text-body text-body shadow-sm transition focus:border-primary-400 focus:outline-none focus:ring-2 focus:ring-primary-200 disabled:cursor-not-allowed disabled:opacity-60"
+                class="w-full rounded-modern border border-gray-200/80 bg-white/80 px-3 py-3 text-gray-700 text-gray-700 shadow-sm transition focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-200 disabled:cursor-not-allowed disabled:opacity-60"
                 :disabled="!userLocation"
               >
                 <option value="">{{ userLocation ? 'Toutes distances' : 'Activez votre position' }}</option>
@@ -149,10 +149,10 @@
             </div>
 
             <label class="flex flex-col gap-2">
-              <span class="text-small font-medium text-body">Prix maximum</span>
+              <span class="text-sm font-medium text-gray-700">Prix maximum</span>
               <select
                 v-model="filters.maxPrice"
-                class="w-full rounded-2xl border border-neutral-200/80 bg-white/80 px-4 py-3 text-body text-body shadow-sm transition focus:border-primary-400 focus:outline-none focus:ring-2 focus:ring-primary-200"
+                class="w-full rounded-modern border border-gray-200/80 bg-white/80 px-3 py-3 text-gray-700 text-gray-700 shadow-sm transition focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-200"
               >
                 <option value="">Tous les prix</option>
                 <option value="500">Moins de 500 F CFA</option>
@@ -163,10 +163,10 @@
             </label>
 
             <label class="flex flex-col gap-2">
-              <span class="text-small font-medium text-body">Réduction minimum</span>
+              <span class="text-sm font-medium text-gray-700">Réduction minimum</span>
               <select
                 v-model="filters.minDiscount"
-                class="w-full rounded-2xl border border-neutral-200/80 bg-white/80 px-4 py-3 text-body text-body shadow-sm transition focus:border-primary-400 focus:outline-none focus:ring-2 focus:ring-primary-200"
+                class="w-full rounded-modern border border-gray-200/80 bg-white/80 px-3 py-3 text-gray-700 text-gray-700 shadow-sm transition focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-200"
               >
                 <option value="">Toutes réductions</option>
                 <option value="20">20% et plus</option>
@@ -177,11 +177,11 @@
             </label>
           </div>
 
-          <div class="mt-8 flex flex-col gap-3 border-t border-neutral-200/70 pt-6 sm:flex-row sm:items-center sm:justify-between">
+          <div class="mt-8 flex flex-col gap-3 border-t border-gray-200/70 padding-t-xl sm:flex-row sm:items-center sm:justify-between">
             <Button
               variant="ghost"
               size="sm"
-              class="text-body hover:text-primary-emphasis"
+              class="text-gray-700 hover:text-blue-900"
               :disabled="activeFiltersCount === 0 && !searchQuery"
               @click="clearFilters"
             >
@@ -200,7 +200,7 @@
       </Transition>
 
       <section>
-        <div v-if="loading" class="grid grid-cols-1 gap-4 sm:gap-6 md:grid-cols-3 xl:grid-cols-4">
+        <div v-if="loading" class="grid grid-cols-1 gap-3 sm:gap-4 md:grid-cols-3 xl:grid-cols-4">
           <Card
             v-for="index in 8"
             :key="index"
@@ -208,11 +208,11 @@
             :no-padding="true"
             class="space-y-4 p-4"
           >
-            <Skeleton class="aspect-square w-full rounded-2xl" />
-            <div class="space-y-2">
-              <Skeleton class="h-5 w-2/3 rounded-full" />
+            <Skeleton class="aspect-square w-full rounded-modern" />
+            <div class="space-y-4">
+              <Skeleton class="h-4 w-4/3 rounded-full" />
               <Skeleton class="h-3 w-1/2 rounded-full" />
-              <Skeleton class="h-5 w-full rounded-xl" />
+              <Skeleton class="h-4 w-full rounded" />
             </div>
           </Card>
         </div>
@@ -229,7 +229,7 @@
         <div
           v-else
           data-test="products-grid"
-          class="grid grid-cols-1 gap-4 sm:gap-6 md:grid-cols-3 xl:grid-cols-4"
+          class="grid grid-cols-1 gap-3 sm:gap-4 md:grid-cols-3 xl:grid-cols-4"
         >
           <ProductCard
             v-for="product in filteredProducts"

@@ -1,10 +1,10 @@
 <template>
   <button
-    class="relative inline-flex items-center justify-center p-2 rounded-xl transition-all duration-300 ease-out-expo group focus-2025"
+    class="relative inline-flex items-center justify-center p-2 rounded transition-all duration-300 ease-out-expo group focus-2025"
     :class="[
       isDark
         ? 'bg-dark-800/80 text-dark-200 border border-dark-600 hover:bg-dark-700'
-        : 'bg-white/80 text-body-emphasis border border-neutral-200 hover:bg-neutral-50'
+        : 'bg-white/80 text-gray-800 border border-gray-200 hover:bg-gray-50'
     ]"
     :aria-label="isDark ? 'Activer le mode clair' : 'Activer le mode sombre'"
     @click="toggleDarkMode"
@@ -20,7 +20,7 @@
     >
       <Sun
         v-show="!isDark"
-        class="w-5 h-5 text-amber-500 group-hover:transition-transform duration-300"
+        class="h-4 w-4 text-amber-500 group-hover:transition-transform duration-300"
       />
     </Transition>
 
@@ -35,13 +35,13 @@
     >
       <Moon
         v-show="isDark"
-        class="w-5 h-5 text-indigo-400 group-hover:transition-transform duration-300"
+        class="h-4 w-4 text-indigo-400 group-hover:transition-transform duration-300"
       />
     </Transition>
 
     <!-- Hover glow effect -->
     <div
-      class="relative sm:absolute inset-0 rounded-xl opacity-0 group-hover:transition-opacity duration-300 pointer-events-none"
+      class="relative sm:absolute inset-0 rounded opacity-0 group-hover:transition-opacity duration-300 pointer-events-none"
       :class="[
         isDark
           ? 'bg-gradient-to-r from-indigo-500/20 to-purple-500/20'

@@ -2,23 +2,23 @@
   <DashboardLayout
     :sidebar="sidebar"
     :header="header"
-    class="bg-neutral-50"
+    class="bg-gray-50"
   >
-    <div class="max-w-full sm:max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-full sm:max-w-7xl mx-auto py-6 px-3 sm:px-4 lg:px-6">
       <!-- En-tête -->
-      <div class="bg-white shadow rounded-lg p-6 mb-6">
+      <div class="bg-white shadow rounded p-6 mt-4">
         <div class="flex items-center justify-between">
           <div>
-            <h1 class="text-responsive-xl font-semibold text-heading">Gestion des Utilisateurs</h1>
-            <p class="mt-1 text-responsive-sm text-muted">Gérez les consommateurs et commerçants de la plateforme</p>
+            <h1 class="text-xl font-semibold text-gray-900">Gestion des Utilisateurs</h1>
+            <p class="mt-1 text-sm text-gray-500">Gérez les consommateurs et commerçants de la plateforme</p>
           </div>
-          <div class="flex items-center space-y-3 sm:space-y-0 sm:space-x-3">
+          <div class="flex items-center space-y-2 sm:space-x-3">
             <button
-              class="bg-green-600 hover:bg-green-700 text-white px-4 py-3 rounded-lg flex items-center"
+              class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-3 rounded flex items-center"
               @click="refreshData"
             >
               <svg
-                class="w-5 h-5 mr-2"
+                class="h-4 w-4 mr-2"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -37,13 +37,13 @@
       </div>
 
       <!-- Statistiques utilisateurs -->
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-6">
-        <div class="bg-white overflow-hidden sm:block shadow rounded-lg">
-          <div class="p-5">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6 mt-4">
+        <div class="bg-white overflow-hidden sm:block shadow rounded">
+          <div class="p-6">
             <div class="flex items-center">
               <div class="flex-shrink-0">
                 <svg
-                  class="h-10 w-10 text-success"
+                  class="h-8 w-8 text-green-600"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -56,22 +56,22 @@
                   />
                 </svg>
               </div>
-              <div class="ml-5 w-0 flex-1">
+              <div class="ml-5 w-none flex-1">
                 <dl>
-                  <dt class="text-responsive-sm font-medium text-muted truncate">Total Utilisateurs</dt>
-                  <dd class="text-responsive-lg font-medium text-heading">{{ stats.totalUsers }}</dd>
+                  <dt class="text-sm font-medium text-gray-500 truncate">Total Utilisateurs</dt>
+                  <dd class="text-lg font-medium text-gray-900">{{ stats.totalUsers }}</dd>
                 </dl>
               </div>
             </div>
           </div>
         </div>
 
-        <div class="bg-white overflow-hidden sm:block shadow rounded-lg">
-          <div class="p-5">
+        <div class="bg-white overflow-hidden sm:block shadow rounded">
+          <div class="p-6">
             <div class="flex items-center">
               <div class="flex-shrink-0">
                 <svg
-                  class="h-10 w-10 text-info"
+                  class="h-8 w-8 text-info"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -84,22 +84,22 @@
                   />
                 </svg>
               </div>
-              <div class="ml-5 w-0 flex-1">
+              <div class="ml-5 w-none flex-1">
                 <dl>
-                  <dt class="text-responsive-sm font-medium text-muted truncate">Consommateurs</dt>
-                  <dd class="text-responsive-lg font-medium text-heading">{{ stats.consumers }}</dd>
+                  <dt class="text-sm font-medium text-gray-500 truncate">Consommateurs</dt>
+                  <dd class="text-lg font-medium text-gray-900">{{ stats.consumers }}</dd>
                 </dl>
               </div>
             </div>
           </div>
         </div>
 
-        <div class="bg-white overflow-hidden sm:block shadow rounded-lg">
-          <div class="p-5">
+        <div class="bg-white overflow-hidden sm:block shadow rounded">
+          <div class="p-6">
             <div class="flex items-center">
               <div class="flex-shrink-0">
                 <svg
-                  class="h-10 w-10 text-orange-600"
+                  class="h-8 w-8 text-blue-600"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -112,22 +112,22 @@
                   />
                 </svg>
               </div>
-              <div class="ml-5 w-0 flex-1">
+              <div class="ml-5 w-none flex-1">
                 <dl>
-                  <dt class="text-responsive-sm font-medium text-muted truncate">Commerçants</dt>
-                  <dd class="text-responsive-lg font-medium text-heading">{{ stats.merchants }}</dd>
+                  <dt class="text-sm font-medium text-gray-500 truncate">Commerçants</dt>
+                  <dd class="text-lg font-medium text-gray-900">{{ stats.merchants }}</dd>
                 </dl>
               </div>
             </div>
           </div>
         </div>
 
-        <div class="bg-white overflow-hidden sm:block shadow rounded-lg">
-          <div class="p-5">
+        <div class="bg-white overflow-hidden sm:block shadow rounded">
+          <div class="p-6">
             <div class="flex items-center">
               <div class="flex-shrink-0">
                 <svg
-                  class="h-10 w-10 text-error"
+                  class="h-8 w-8 text-red-600"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -140,10 +140,10 @@
                   />
                 </svg>
               </div>
-              <div class="ml-5 w-0 flex-1">
+              <div class="ml-5 w-none flex-1">
                 <dl>
-                  <dt class="text-responsive-sm font-medium text-muted truncate">Comptes Suspendus</dt>
-                  <dd class="text-responsive-lg font-medium text-heading">{{ stats.suspended }}</dd>
+                  <dt class="text-sm font-medium text-gray-500 truncate">Comptes Suspendus</dt>
+                  <dd class="text-lg font-medium text-gray-900">{{ stats.suspended }}</dd>
                 </dl>
               </div>
             </div>
@@ -152,22 +152,22 @@
       </div>
 
       <!-- Filtres et recherche -->
-      <div class="bg-white shadow rounded-lg p-6 mb-6">
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div class="bg-white shadow rounded p-6 mt-4">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
           <div>
-            <label class="block text-responsive-sm font-medium text-body-emphasis mb-2">Recherche</label>
+            <label class="block text-sm font-medium text-gray-800 mt-2">Recherche</label>
             <input
               v-model="filters.search"
               type="text"
               placeholder="Nom, email, téléphone..."
-              class="w-full border border-neutral-300 rounded-lg px-4 py-3 focus:ring-green-500 focus:border-green-500"
+              class="w-full border border-gray-300 rounded px-3 py-3 focus:ring-green-500 focus:border-blue-500"
             >
           </div>
           <div>
-            <label class="block text-responsive-sm font-medium text-body-emphasis mb-2">Rôle</label>
+            <label class="block text-sm font-medium text-gray-800 mt-2">Rôle</label>
             <select
               v-model="filters.role"
-              class="w-full border border-neutral-300 rounded-lg px-4 py-3 focus:ring-green-500 focus:border-green-500"
+              class="w-full border border-gray-300 rounded px-3 py-3 focus:ring-green-500 focus:border-blue-500"
             >
               <option value="">Tous les rôles</option>
               <option value="consumer">Consommateur</option>
@@ -176,10 +176,10 @@
             </select>
           </div>
           <div>
-            <label class="block text-responsive-sm font-medium text-body-emphasis mb-2">Statut</label>
+            <label class="block text-sm font-medium text-gray-800 mt-2">Statut</label>
             <select
               v-model="filters.status"
-              class="w-full border border-neutral-300 rounded-lg px-4 py-3 focus:ring-green-500 focus:border-green-500"
+              class="w-full border border-gray-300 rounded px-3 py-3 focus:ring-green-500 focus:border-blue-500"
             >
               <option value="">Tous les statuts</option>
               <option value="active">Actif</option>
@@ -189,7 +189,7 @@
           </div>
           <div class="flex items-end">
             <button
-              class="w-full bg-green-600 hover:bg-green-700 text-white px-4 py-3 rounded-lg"
+              class="w-full bg-blue-600 hover:bg-blue-700 text-white px-3 py-3 rounded"
               @click="applyFilters"
             >
               Filtrer
@@ -199,96 +199,96 @@
       </div>
 
       <!-- Liste des utilisateurs -->
-      <div class="bg-white shadow overflow-hidden sm:block rounded-lg">
-        <div class="px-6 py-4 border-b border-neutral-200">
-          <h3 class="text-responsive-lg font-medium text-heading">Liste des Utilisateurs</h3>
+      <div class="bg-white shadow overflow-hidden sm:block rounded">
+        <div class="px-4 py-4 border-b border-gray-200">
+          <h3 class="text-lg font-medium text-gray-900">Liste des Utilisateurs</h3>
         </div>
 
         <div class="overflow-x-auto">
           <table class="min-w-full divide-y divide-neutral-200">
-            <thead class="bg-neutral-50">
+            <thead class="bg-gray-50">
               <tr>
-                <th class="px-6 py-3 text-left text-responsive-xs font-medium text-muted uppercase tracking-wider">
+                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Utilisateur
                 </th>
-                <th class="px-6 py-3 text-left text-responsive-xs font-medium text-muted uppercase tracking-wider">
+                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Rôle
                 </th>
-                <th class="px-6 py-3 text-left text-responsive-xs font-medium text-muted uppercase tracking-wider">
+                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Statut
                 </th>
-                <th class="px-6 py-3 text-left text-responsive-xs font-medium text-muted uppercase tracking-wider">
+                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Inscription
                 </th>
-                <th class="px-6 py-3 text-left text-responsive-xs font-medium text-muted uppercase tracking-wider">
+                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Dernière Activité
                 </th>
-                <th class="px-6 py-3 text-left text-responsive-xs font-medium text-muted uppercase tracking-wider">
+                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Actions
                 </th>
               </tr>
             </thead>
             <tbody class="bg-white divide-y divide-neutral-200">
               <tr v-for="user in paginatedUsers" :key="user.id">
-                <td class="px-6 py-4 whitespace-nowrap">
+                <td class="px-4 py-4 whitespace-nowrap">
                   <div class="flex items-center">
-                    <div class="h-10 w-10 flex-shrink-0">
-                      <img class="h-10 w-10 rounded-full" :src="user.avatar" :alt="user.name">
+                    <div class="h-8 w-8 flex-shrink-0">
+                      <img class="h-8 w-8 rounded-full" :src="user.avatar" :alt="user.name">
                     </div>
-                    <div class="ml-4">
-                      <div class="text-responsive-sm font-medium text-heading">{{ user.name }}</div>
-                      <div class="text-responsive-sm text-muted">{{ user.email }}</div>
-                      <div class="text-responsive-sm text-placeholder">{{ user.phone }}</div>
+                    <div class="ml-6">
+                      <div class="text-sm font-medium text-gray-900">{{ user.name }}</div>
+                      <div class="text-sm text-gray-500">{{ user.email }}</div>
+                      <div class="text-sm text-gray-400">{{ user.phone }}</div>
                     </div>
                   </div>
                 </td>
-                <td class="px-6 py-4 whitespace-nowrap">
+                <td class="px-4 py-4 whitespace-nowrap">
                   <span
                     :class="{
                       'bg-green-100 text-green-800': user.role === 'consumer',
-                      'bg-orange-100 text-orange-800': user.role === 'merchant',
-                      'bg-purple-100 text-purple-800': user.role === 'admin'
+                      'bg-yellow-100 text-yellow-800': user.role === 'merchant',
+                      'bg-blue-100 text-blue-800': user.role === 'admin'
                     }"
-                    class="px-4 inline-flex text-responsive-xs leading-5 font-semibold rounded-full"
+                    class="px-3 inline-flex text-xs leading-5 font-semibold rounded-full"
                   >
                     {{ getRoleLabel(user.role) }}
                   </span>
                 </td>
-                <td class="px-6 py-4 whitespace-nowrap">
+                <td class="px-4 py-4 whitespace-nowrap">
                   <span
                     :class="{
                       'bg-green-100 text-green-800': user.status === 'active',
                       'bg-red-100 text-red-800': user.status === 'suspended',
                       'bg-yellow-100 text-yellow-800': user.status === 'pending'
                     }"
-                    class="px-4 inline-flex text-responsive-xs leading-5 font-semibold rounded-full"
+                    class="px-3 inline-flex text-xs leading-5 font-semibold rounded-full"
                   >
                     {{ getStatusLabel(user.status) }}
                   </span>
                 </td>
-                <td class="px-6 py-4 whitespace-nowrap text-responsive-sm text-muted">
+                <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-500">
                   {{ formatDate(user.created_at) }}
                 </td>
-                <td class="px-6 py-4 whitespace-nowrap text-responsive-sm text-muted">
+                <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-500">
                   {{ formatDate(user.last_activity) }}
                 </td>
-                <td class="px-6 py-4 whitespace-nowrap text-responsive-sm font-medium space-y-2 sm:space-y-0 sm:space-x-2">
+                <td class="px-4 py-4 whitespace-nowrap text-sm font-medium space-y-4 sm:space-x-2">
                   <button
-                    class="text-success hover:text-green-900"
+                    class="text-green-600 hover:text-blue-900"
                     @click="viewUser(user)"
                   >
                     Voir
                   </button>
                   <button
                     v-if="user.status !== 'suspended'"
-                    class="text-error hover:text-red-900"
+                    class="text-red-600 hover:text-red-900"
                     @click="suspendUser(user)"
                   >
                     Suspendre
                   </button>
                   <button
                     v-else
-                    class="text-success hover:text-green-900"
+                    class="text-green-600 hover:text-blue-900"
                     @click="unsuspendUser(user)"
                   >
                     Réactiver
@@ -300,18 +300,18 @@
         </div>
 
         <!-- Pagination -->
-        <div class="bg-white px-4 py-3 flex items-center justify-between border-t border-neutral-200 sm:px-6">
+        <div class="bg-white px-3 py-3 flex items-center justify-between border-t border-gray-200 sm:px-4">
           <div class="flex-1 flex justify-between sm:hidden sm:block">
             <button
               :disabled="currentPage === 1"
-              class="relative inline-flex items-center px-4 py-3 border border-neutral-300 text-responsive-sm font-medium rounded-md text-body-emphasis bg-white hover:bg-neutral-50 disabled:opacity-50"
+              class="relative inline-flex items-center px-3 py-3 border border-gray-300 text-sm font-medium rounded text-gray-800 bg-white hover:bg-gray-50 disabled:opacity-50"
               @click="previousPage"
             >
               Précédent
             </button>
             <button
               :disabled="currentPage === totalPages"
-              class="ml-3 relative inline-flex items-center px-4 py-3 border border-neutral-300 text-responsive-sm font-medium rounded-md text-body-emphasis bg-white hover:bg-neutral-50 disabled:opacity-50"
+              class="ml-4 relative inline-flex items-center px-3 py-3 border border-gray-300 text-sm font-medium rounded text-gray-800 bg-white hover:bg-gray-50 disabled:opacity-50"
               @click="nextPage"
             >
               Suivant
@@ -319,15 +319,15 @@
           </div>
           <div class="hidden sm:block sm:flex-1 sm:flex sm:items-center sm:justify-between">
             <div>
-              <p class="text-responsive-sm text-body-emphasis">
+              <p class="text-sm text-gray-800">
                 Affichage de <span class="font-medium">{{ startItem }}</span> à <span class="font-medium">{{ endItem }}</span> sur <span class="font-medium">{{ totalUsers }}</span> utilisateurs
               </p>
             </div>
             <div>
-              <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px">
+              <nav class="relative z-0 inline-flex rounded shadow-sm -space-x-px">
                 <button
                   :disabled="currentPage === 1"
-                  class="relative inline-flex items-center px-4 py-3 rounded-l-md border border-neutral-300 bg-white text-responsive-sm font-medium text-muted hover:bg-neutral-50 disabled:opacity-50"
+                  class="relative inline-flex items-center px-3 py-3 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50"
                   @click="previousPage"
                 >
                   Précédent
@@ -336,17 +336,17 @@
                   v-for="page in displayPages"
                   :key="page"
                   :class="{
-                    'bg-green-50 border-green-500 text-success': page === currentPage,
-                    'bg-white border-neutral-300 text-muted hover:bg-neutral-50': page !== currentPage
+                    'bg-green-50 border-blue-500 text-green-600': page === currentPage,
+                    'bg-white border-gray-300 text-gray-500 hover:bg-gray-50': page !== currentPage
                   }"
-                  class="relative inline-flex items-center px-4 py-3 border text-responsive-sm font-medium"
+                  class="relative inline-flex items-center px-3 py-3 border text-sm font-medium"
                   @click="goToPage(page)"
                 >
                   {{ page }}
                 </button>
                 <button
                   :disabled="currentPage === totalPages"
-                  class="relative inline-flex items-center px-4 py-3 rounded-r-md border border-neutral-300 bg-white text-responsive-sm font-medium text-muted hover:bg-neutral-50 disabled:opacity-50"
+                  class="relative inline-flex items-center px-3 py-3 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50"
                   @click="nextPage"
                 >
                   Suivant

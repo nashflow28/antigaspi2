@@ -1,11 +1,11 @@
 #!/usr/bin/env node
 
-const fs = require('fs');
-const path = require('path');
-const { execSync } = require('child_process');
+const fs = require('fs')
+const path = require('path')
+const { execSync } = require('child_process')
 
-console.log('📱 MIGRATION TYPOGRAPHY RESPONSIVE MOBILE - 2025 DESIGN SYSTEM');
-console.log('==============================================================\n');
+console.log('📱 MIGRATION TYPOGRAPHY RESPONSIVE MOBILE - 2025 DESIGN SYSTEM')
+console.log('==============================================================\n')
 
 // Mapping des tailles de texte vers responsive mobile-first
 const typographyMappings = {
@@ -21,8 +21,8 @@ const typographyMappings = {
   'text-4xl': 'text-display-sm',      // 3rem avec letterspacing
   'text-5xl': 'text-display-md',      // 4rem avec letterspacing
   'text-6xl': 'text-display-lg',      // 5rem avec letterspacing
-  'text-7xl': 'text-display-xl',      // 6rem avec letterspacing
-};
+  'text-7xl': 'text-display-xl'      // 6rem avec letterspacing
+}
 
 // Classes à ignorer (déjà responsive ou spéciales)
 const skipClasses = [
@@ -37,24 +37,24 @@ const skipClasses = [
   'text-display-xl',
   'text-h1', 'text-h2', 'text-h3', 'text-h4',
   'text-body', 'text-caption', 'text-small'
-];
+]
 
 // Compteurs pour statistiques
-let totalFiles = 0;
-let migratedFiles = 0;
-let totalReplacements = 0;
-const replacementsBySize = {};
+let totalFiles = 0
+let migratedFiles = 0
+let totalReplacements = 0
+const replacementsBySize = {}
 
 // Initialiser compteurs
 Object.keys(typographyMappings).forEach(size => {
-  replacementsBySize[size] = 0;
-});
+  replacementsBySize[size] = 0
+})
 
 function migrateFile(filePath) {
   try {
-    let content = fs.readFileSync(filePath, 'utf8');
-    let originalContent = content;
-    let fileReplacements = 0;
+    let content = fs.readFileSync(filePath, 'utf8')
+    const originalContent = content
+    let fileReplacements = 0
 
     // Appliquer tous les mappings de typography
     Object.entries(typographyMappings).forEach(([oldSize, newSize]) => {
@@ -66,23 +66,23 @@ function migrateFile(filePath) {
         new RegExp(`(class='[^']*?)\\b${oldSize}\\b([^']*')`, 'g'),
         // Capture dans :class bindings
         new RegExp(`(:class="[^"]*?)\\b${oldSize}\\b([^"]*")`, 'g'),
-        new RegExp(`(:class='[^']*?)\\b${oldSize}\\b([^']*')`, 'g'),
-      ];
+        new RegExp(`(:class='[^']*?)\\b${oldSize}\\b([^']*')`, 'g')
+      ]
 
       patterns.forEach(pattern => {
-        const matches = content.match(pattern);
+        const matches = content.match(pattern)
         if (matches) {
-          const beforeReplace = content;
-          content = content.replace(pattern, `$1${newSize}$2`);
-          const newMatches = beforeReplace.match(pattern);
+          const beforeReplace = content
+          content = content.replace(pattern, `$1${newSize}$2`)
+          const newMatches = beforeReplace.match(pattern)
           if (newMatches) {
-            const count = newMatches.length;
-            replacementsBySize[oldSize] += count;
-            fileReplacements += count;
+            const count = newMatches.length
+            replacementsBySize[oldSize] += count
+            fileReplacements += count
           }
         }
-      });
-    });
+      })
+    })
 
     // Optimisations spéciales pour mobile
     // Remplacer font-bold par font-semibold pour mobile (plus lisible)
@@ -98,96 +98,96 @@ function migrateFile(filePath) {
         replacement: '$1leading-relaxed$2',
         description: 'leading-tight → leading-relaxed (mobile lisibilité)'
       }
-    ];
+    ]
 
     mobileFontOptimizations.forEach(opt => {
-      const beforeCount = (content.match(opt.pattern) || []).length;
+      const beforeCount = (content.match(opt.pattern) || []).length
       if (beforeCount > 0) {
-        content = content.replace(opt.pattern, opt.replacement);
-        fileReplacements += beforeCount;
-        console.log(`   📝 ${opt.description}: ${beforeCount} optimisations`);
+        content = content.replace(opt.pattern, opt.replacement)
+        fileReplacements += beforeCount
+        console.log(`   📝 ${opt.description}: ${beforeCount} optimisations`)
       }
-    });
+    })
 
     // Si des changements ont été effectués, sauvegarder le fichier
     if (content !== originalContent) {
-      fs.writeFileSync(filePath, content);
-      migratedFiles++;
-      totalReplacements += fileReplacements;
-      console.log(`✅ ${path.relative(process.cwd(), filePath)}: ${fileReplacements} optimisations`);
+      fs.writeFileSync(filePath, content)
+      migratedFiles++
+      totalReplacements += fileReplacements
+      console.log(`✅ ${path.relative(process.cwd(), filePath)}: ${fileReplacements} optimisations`)
     }
 
   } catch (error) {
-    console.error(`❌ Erreur lors de la migration de ${filePath}:`, error.message);
+    console.error(`❌ Erreur lors de la migration de ${filePath}:`, error.message)
   }
 }
 
 function scanDirectory(dirPath) {
-  const items = fs.readdirSync(dirPath);
+  const items = fs.readdirSync(dirPath)
 
   items.forEach(item => {
-    const fullPath = path.join(dirPath, item);
-    const stat = fs.statSync(fullPath);
+    const fullPath = path.join(dirPath, item)
+    const stat = fs.statSync(fullPath)
 
     if (stat.isDirectory()) {
       // Ignorer node_modules et .git
       if (!['node_modules', '.git', 'dist'].includes(item)) {
-        scanDirectory(fullPath);
+        scanDirectory(fullPath)
       }
     } else if (item.endsWith('.vue')) {
-      totalFiles++;
-      migrateFile(fullPath);
+      totalFiles++
+      migrateFile(fullPath)
     }
-  });
+  })
 }
 
 // Créer backup avant migration
-console.log('📦 Création d\'un backup...');
+console.log('📦 Création d\'un backup...')
 try {
-  execSync('git add -A && git commit -m "backup avant migration typography mobile"');
-  console.log('✅ Backup créé avec Git\n');
+  execSync('git add -A && git commit -m "backup avant migration typography mobile"')
+  console.log('✅ Backup créé avec Git\n')
 } catch (error) {
-  console.log('⚠️ Backup Git déjà créé\n');
+  console.log('⚠️ Backup Git déjà créé\n')
 }
 
 // Lancer la migration
-const startTime = Date.now();
-console.log('🚀 Début de la migration typography responsive...\n');
+const startTime = Date.now()
+console.log('🚀 Début de la migration typography responsive...\n')
 
-scanDirectory(path.join(process.cwd(), 'src'));
+scanDirectory(path.join(process.cwd(), 'src'))
 
-const endTime = Date.now();
-const duration = ((endTime - startTime) / 1000).toFixed(2);
+const endTime = Date.now()
+const duration = ((endTime - startTime) / 1000).toFixed(2)
 
 // Statistiques finales
-console.log('\n📊 RÉSULTATS MIGRATION TYPOGRAPHY');
-console.log('=================================');
-console.log(`📁 Fichiers scannés: ${totalFiles}`);
-console.log(`✅ Fichiers optimisés: ${migratedFiles}`);
-console.log(`🔄 Total optimisations: ${totalReplacements}`);
-console.log(`⏱️ Durée: ${duration}s\n`);
+console.log('\n📊 RÉSULTATS MIGRATION TYPOGRAPHY')
+console.log('=================================')
+console.log(`📁 Fichiers scannés: ${totalFiles}`)
+console.log(`✅ Fichiers optimisés: ${migratedFiles}`)
+console.log(`🔄 Total optimisations: ${totalReplacements}`)
+console.log(`⏱️ Durée: ${duration}s\n`)
 
-console.log('📈 DÉTAIL PAR TAILLE:');
+console.log('📈 DÉTAIL PAR TAILLE:')
 Object.entries(replacementsBySize).forEach(([size, count]) => {
   if (count > 0) {
-    console.log(`   ${size} → ${typographyMappings[size]}: ${count} optimisations`);
+    console.log(`   ${size} → ${typographyMappings[size]}: ${count} optimisations`)
   }
-});
+})
 
 // Calculer impact mobile typography
-const typographyImpact = Math.min(100, (totalReplacements / 1425) * 100);
-console.log(`\n📱 IMPACT MOBILE TYPOGRAPHY: ${typographyImpact.toFixed(1)}% des tailles non-responsive optimisées`);
+const typographyImpact = Math.min(100, (totalReplacements / 1425) * 100)
+console.log(`\n📱 IMPACT MOBILE TYPOGRAPHY: ${typographyImpact.toFixed(1)}% des tailles non-responsive optimisées`)
 
 // Vérifications post-migration
-console.log('\n🔍 Vérification des classes responsive appliquées...');
+console.log('\n🔍 Vérification des classes responsive appliquées...')
 try {
-  const responsiveCount = parseInt(execSync(`rg "text-responsive-" src --type vue | wc -l`, { encoding: 'utf8' }).trim());
-  console.log(`✅ Classes responsive actives: ${responsiveCount}`);
+  const responsiveCount = parseInt(execSync('rg "text-responsive-" src --type vue | wc -l', { encoding: 'utf8' }).trim())
+  console.log(`✅ Classes responsive actives: ${responsiveCount}`)
 
-  const displayCount = parseInt(execSync(`rg "text-display-" src --type vue | wc -l`, { encoding: 'utf8' }).trim());
-  console.log(`✅ Classes display responsive: ${displayCount}`);
+  const displayCount = parseInt(execSync('rg "text-display-" src --type vue | wc -l', { encoding: 'utf8' }).trim())
+  console.log(`✅ Classes display responsive: ${displayCount}`)
 } catch (error) {
-  console.log('⚠️ Impossible de vérifier les classes responsive');
+  console.log('⚠️ Impossible de vérifier les classes responsive')
 }
 
-console.log('\n✨ MIGRATION TYPOGRAPHY TERMINÉE - Prêt pour touch optimization');
+console.log('\n✨ MIGRATION TYPOGRAPHY TERMINÉE - Prêt pour touch optimization')

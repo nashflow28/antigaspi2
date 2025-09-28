@@ -1,10 +1,10 @@
 <template>
   <Card class="space-y-6">
     <div class="flex items-center justify-start sm:justify-between">
-      <h2 class="text-responsive-lg font-semibold text-heading">Filtres</h2>
+      <h2 class="text-lg font-semibold text-gray-900">Filtres</h2>
       <button
         type="button"
-        class="text-responsive-sm text-primary hover:text-primary-emphasis"
+        class="text-sm text-blue-600 hover:text-blue-900"
         :disabled="!hasActiveFilters"
         @click="handleReset"
       >
@@ -12,7 +12,7 @@
       </button>
     </div>
 
-    <div class="grid grid-cols-1 gap-5">
+    <div class="grid grid-cols-1 gap-6">
       <div>
         <label class="label-2025">Catégorie</label>
         <select
@@ -31,7 +31,7 @@
         </select>
       </div>
 
-      <div class="grid grid-cols-1 gap-5 sm:grid-cols-2">
+      <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
         <div>
           <label class="label-2025">Prix min</label>
           <select

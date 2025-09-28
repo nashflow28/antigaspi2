@@ -1,26 +1,26 @@
 <template>
-  <div class="min-h-screen bg-gradient-to-br from-neutral-50 to-neutral-100">
+  <div class="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
     <!-- Header -->
-    <div class="bg-white/80 backdrop-blur-sm border-b border-neutral-200 sticky top-0 z-10">
-      <div class="container px-4 sm:px-6 lg:px-8 mx-auto px-4 py-6">
-        <div class="flex flex-col lg:flex-row lg:items-center justify-start sm:justify-between gap-4">
+    <div class="bg-white/80 backdrop-blur-sm border-b border-gray-200 sticky top-0 z-10">
+      <div class="container px-3 py-4 mx-auto">
+        <div class="flex flex-col lg:flex-row lg:items-center justify-start sm:justify-between gap-3">
           <div>
-            <h1 class="text-responsive-xl font-semibold text-heading">Centre d'avis</h1>
-            <p class="text-body mt-1">
+            <h1 class="text-xl font-semibold text-gray-900">Centre d'avis</h1>
+            <p class="text-gray-700 mt-1">
               Consultez et gérez les avis des commerçants
             </p>
           </div>
 
           <!-- Merchant Selector -->
-          <div class="flex items-center space-y-3 sm:space-y-0 sm:space-x-3">
-            <label for="merchant-select" class="text-responsive-sm font-medium text-body-emphasis">
+          <div class="flex items-center space-y-2 sm:space-x-3">
+            <label for="merchant-select" class="text-sm font-medium text-gray-800">
               Commerçant :
             </label>
             <select
               id="merchant-select"
               v-model="selectedMerchantId"
               :disabled="merchantsLoading"
-              class="border border-neutral-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-yellow-500 focus:border-transparent"
+              class="border border-gray-300 rounded px-3 py-3 focus:ring-2 focus:ring-yellow-500 focus:border-transparent"
               @change="onMerchantChange"
             >
               <option value="">Sélectionner un commerçant</option>
@@ -32,18 +32,18 @@
                 {{ merchant.business_name }}
               </option>
             </select>
-            <p v-if="merchantsLoading" class="text-responsive-xs text-muted mt-1">Chargement des commerçants...</p>
-            <p v-else-if="merchantsError" class="text-responsive-xs text-red-500 mt-1">{{ merchantsError }}</p>
+            <p v-if="merchantsLoading" class="text-xs text-gray-500 mt-1">Chargement des commerçants...</p>
+            <p v-else-if="merchantsError" class="text-xs text-red-500 mt-1">{{ merchantsError }}</p>
           </div>
         </div>
       </div>
     </div>
 
-    <div class="container px-4 sm:px-6 lg:px-8 mx-auto px-4 py-6 sm:py-8">
-      <div v-if="!selectedMerchantId" class="text-left sm:text-center py-12 sm:py-14 lg:py-16">
-        <Star class="w-16 h-16 text-placeholder mx-auto mb-4" />
-        <h2 class="text-responsive-xl font-semibold text-heading mb-2">Sélectionnez un commerçant</h2>
-        <p class="text-body">Choisissez un commerçant pour voir ses avis et en laisser un.</p>
+    <div class="container px-3 py-6 mx-auto">
+      <div v-if="!selectedMerchantId" class="text-left sm:text-center py-16 sm:py-16 lg:py-16">
+        <Star class="w-12 h-10 text-gray-400 mx-auto mt-3" />
+        <h2 class="text-xl font-semibold text-gray-900 mt-2">Sélectionnez un commerçant</h2>
+        <p class="text-gray-700">Choisissez un commerçant pour voir ses avis et en laisser un.</p>
       </div>
 
       <div v-else class="space-y-8">
@@ -56,24 +56,24 @@
           />
         </div>
 
-        <div v-else-if="!authStore.isAuthenticated" class="bg-yellow-50 border border-yellow-200 rounded-2xl p-6">
-          <div class="flex items-center space-y-3 sm:space-y-0 sm:space-x-3">
-            <Info class="w-10 h-10 text-warning" />
+        <div v-else-if="!authStore.isAuthenticated" class="bg-yellow-50 border border-yellow-200 rounded p-6">
+          <div class="flex items-center space-y-2 sm:space-x-3">
+            <Info class="h-6 w-6 text-yellow-500" />
             <div>
-              <h3 class="text-responsive-lg font-medium text-yellow-800">Connexion requise</h3>
+              <h3 class="text-lg font-medium text-yellow-800">Connexion requise</h3>
               <p class="text-yellow-700">
                 Connectez-vous pour laisser un avis sur ce commerçant.
               </p>
-              <div class="mt-3 space-y-3 sm:space-y-0 sm:space-x-3">
+              <div class="mt-3 space-y-2 sm:space-x-3">
                 <router-link
                   to="/login"
-                  class="inline-flex items-center px-4 py-3 bg-yellow-600 text-white rounded-lg hover:transition-colors"
+                  class="inline-flex items-center px-3 py-3 bg-yellow-600 text-white rounded hover:transition-colors"
                 >
                   Se connecter
                 </router-link>
                 <router-link
                   to="/register"
-                  class="inline-flex items-center px-4 py-3 border border-yellow-600 text-yellow-700 rounded-lg hover:transition-colors"
+                  class="inline-flex items-center px-3 py-3 border border-yellow-600 text-yellow-700 rounded hover:transition-colors"
                 >
                   S'inscrire
                 </router-link>

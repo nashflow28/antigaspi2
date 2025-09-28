@@ -1,5 +1,5 @@
 <template>
-  <div class="flex items-center space-y-2 sm:space-y-0 sm:space-x-2">
+  <div class="flex items-center space-y-4 sm:space-x-2">
     <button
       v-for="star in 5"
       :key="star"
@@ -15,7 +15,7 @@
       <Star
         :size="size"
         :class="[
-          star <= rating ? 'text-yellow-400 fill-yellow-400' : 'text-neutral-300',
+          star <= rating ? 'text-yellow-400 fill-yellow-400' : 'text-gray-500',
           !readonly && star <= hoverRating ? 'text-yellow-400 fill-yellow-400' : '',
           !readonly ? 'hover:text-yellow-300' : ''
         ]"
@@ -24,7 +24,7 @@
       />
     </button>
 
-    <span v-if="showText" class="ml-2 text-responsive-sm text-body">
+    <span v-if="showText" class="ml-2 text-sm text-gray-700">
       {{ ratingText }}
     </span>
   </div>

@@ -20,15 +20,15 @@
           :class="['modal-panel', modalClass]"
           v-bind="otherAttrs"
         >
-          <header v-if="title || showCloseButton" class="flex items-stretch sm:items-start justify-start sm:justify-between gap-4 px-6 py-5">
-            <div class="space-y-2">
-              <h2 v-if="title" :id="modalTitleId" class="text-h2 font-semibold text-primary-emphasis dark:text-primary-200">
+          <header v-if="title || showCloseButton" class="flex items-stretch sm:items-start justify-start sm:justify-between gap-3 px-4 py-xl">
+            <div class="space-y-4">
+              <h2 v-if="title" :id="modalTitleId" class="text-h2 font-semibold text-blue-900 dark:text-blue-200">
                 {{ title }}
               </h2>
               <p
                 v-if="description"
                 :id="modalDescriptionId"
-                class="text-small text-muted dark:text-neutral-300"
+                class="text-sm text-gray-500 dark:text-gray-500"
               >
                 {{ description }}
               </p>
@@ -42,7 +42,7 @@
               @click="emitClose"
             >
               <svg
-                class="h-5 w-5"
+                class="h-4 w-4"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -57,13 +57,13 @@
             </Button>
           </header>
 
-          <section class="px-6 pb-6">
+          <section class="px-4 pb-2xl">
             <slot />
           </section>
 
           <footer
             v-if="$slots.footer"
-            class="mt-6 flex flex-col gap-3 border-t border-neutral-200/60 px-6 pb-6 pt-4 dark:border-neutral-700/60 sm:flex-row sm:items-center sm:justify-end"
+            class="mt-6 flex flex-col gap-3 border-t border-gray-200/60 px-4 pb-2xl pt-4 dark:border-gray-700/60 sm:flex-row sm:items-center sm:justify-end"
           >
             <slot name="footer" />
           </footer>
@@ -111,19 +111,19 @@ const modalTitleId = `modal-title-${generatedId}`
 const modalDescriptionId = `modal-description-${generatedId}`
 
 const sizeClasses: Record<ModalSize, string> = {
-  sm: 'max-w-md',
-  default: 'max-w-lg',
-  lg: 'max-w-2xl',
+  sm: 'max-w-xl',
+  default: 'max-w-xl',
+  lg: 'max-w-80',
   xl: 'max-w-4xl',
-  full: 'max-w-6xl mx-4'
+  full: 'max-w-6xl mx-lg'
 }
 
 const variantClasses: Record<ModalVariant, string> = {
   surface:
-    'bg-white text-heading-secondary border border-neutral-200 shadow-card dark:bg-neutral-900 dark:text-neutral-50 dark:border-neutral-800',
+    'bg-white text-gray-800 border border-gray-200 shadow-lg dark:bg-gray-900 dark:text-gray-50 dark:border-gray-800',
   glass:
-    'bg-white/90 text-heading-secondary border border-primary-500/15 shadow-glow backdrop-blur-xl dark:bg-neutral-900/80 dark:text-neutral-50',
-  dark: 'bg-neutral-900 text-neutral-50 border border-neutral-700 shadow-glow'
+    'bg-white/90 text-gray-800 border border-blue-500/15 shadow-xl backdrop-blur-xl dark:bg-gray-900/80 dark:text-gray-50',
+  dark: 'bg-gray-900 text-gray-50 border border-gray-700 shadow-xl'
 }
 
 const externalClass = computed(() => (attrs.class as string | undefined) ?? '')
@@ -133,7 +133,7 @@ const otherAttrs = computed(() => {
 })
 
 const modalClass = computed(() => [
-  'relative w-full rounded-3xl transition-all duration-300 ease-[0.22,1,0.36,1] transform-gpu',
+  'relative w-full rounded transition-all duration-300 ease-[0.22,1,0.36,1] transform-gpu',
   sizeClasses[props.size],
   variantClasses[props.variant],
   externalClass.value

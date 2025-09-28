@@ -10,17 +10,17 @@
     <div
       v-if="showStatus"
       :class="statusClasses"
-      class="fixed top-20 left-1/2 transform -translate-x-1/2 z-50 px-4 py-3 rounded-lg shadow-lg backdrop-blur-sm border"
+      class="fixed top-20 left-1/2 transform -translate-x-1/2 z-50 px-3 py-3 rounded shadow-lg backdrop-blur-sm border"
       data-testid="network-status"
     >
-      <div class="flex items-center space-y-2 sm:space-y-0 sm:space-x-2">
-        <div class="flex items-center space-y-2 sm:space-y-0 sm:space-x-2">
-          <div :class="indicatorClasses" class="w-2 h-2 rounded-full" />
-          <span class="text-responsive-sm font-medium">{{ statusMessage }}</span>
+      <div class="flex items-center space-y-4 sm:space-x-2">
+        <div class="flex items-center space-y-4 sm:space-x-2">
+          <div :class="indicatorClasses" class="h-4 w-4 rounded-full" />
+          <span class="text-sm font-medium">{{ statusMessage }}</span>
         </div>
 
-        <div v-if="pendingCount > 0" class="flex items-center space-y-2 sm:space-y-0 sm:space-x-2 text-responsive-xs">
-          <Loader2 class="w-3 h-3 animate-spin" />
+        <div v-if="pendingCount > 0" class="flex items-center space-y-4 sm:space-x-2 text-xs">
+          <Loader2 class="w-xs h-3 animate-spin" />
           <span>{{ pendingCount }} en attente</span>
         </div>
       </div>
@@ -55,7 +55,7 @@ const statusClasses = computed(() => {
   if (pendingRequestsCount.value > 0) {
     return 'bg-yellow-50 border-yellow-200 text-yellow-700'
   }
-  return 'bg-green-50 border-green-200 text-green-700'
+  return 'bg-green-50 border-blue-200 text-green-700'
 })
 
 const indicatorClasses = computed(() => {
@@ -65,7 +65,7 @@ const indicatorClasses = computed(() => {
   if (pendingRequestsCount.value > 0) {
     return 'bg-yellow-500 animate-pulse'
   }
-  return 'bg-green-500'
+  return 'bg-blue-500'
 })
 
 const pendingCount = computed(() => pendingRequestsCount.value)

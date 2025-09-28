@@ -6,18 +6,18 @@
   >
     <div class="p-6">
       <!-- Header -->
-      <div class="mb-6 sm:mb-8">
-        <div class="flex flex-col gap-4 sm:gap-6 lg:flex-row lg:items-center lg:justify-between">
+      <div class="mt-4 sm:mb-3xl">
+        <div class="flex flex-col gap-3 sm:gap-6 lg:flex-row lg:items-center lg:justify-between">
           <div>
-            <h1 class="mb-2 text-responsive-xl font-semibold text-heading lg:text-display-sm">
+            <h1 class="mt-2 text-xl font-semibold text-gray-900 lg:text-3xl">
               Mes Produits
             </h1>
-            <p class="text-responsive-lg text-body">
+            <p class="text-lg text-gray-700">
               Gérez vos produits et réduisez le gaspillage
             </p>
           </div>
 
-          <div class="flex flex-col gap-4 sm:flex-row">
+          <div class="flex flex-col gap-3 sm:flex-row">
             <Button
               variant="primary"
               size="lg"
@@ -39,48 +39,48 @@
         </div>
 
         <!-- Quick stats -->
-        <div class="mt-6 grid grid-cols-1 gap-4 md:grid-cols-4">
+        <div class="mt-6 grid grid-cols-1 gap-3 md:grid-cols-4">
           <Card
             variant="elevated"
-            class="bg-gradient-to-r from-primary-500 to-primary-600 text-white shadow-lg shadow-primary-500/20"
+            class="bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-lg shadow-primary-500/20"
           >
             <div class="flex items-center justify-between">
               <div>
-                <p class="text-responsive-sm font-medium text-primary-100">Total Produits</p>
-                <p class="text-responsive-xl font-semibold">{{ products.length }}</p>
+                <p class="text-sm font-medium text-blue-100">Total Produits</p>
+                <p class="text-xl font-semibold">{{ products.length }}</p>
               </div>
-              <div class="rounded-xl bg-white/20 p-3">
-                <ShoppingBagIcon class="h-10 w-10" />
+              <div class="rounded bg-white/20 p-3">
+                <ShoppingBagIcon class="h-8 w-8" />
               </div>
             </div>
           </Card>
 
           <Card
             variant="elevated"
-            class="bg-gradient-to-r from-primary-500 to-primary-600 text-white shadow-lg shadow-primary-500/20"
+            class="bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-lg shadow-primary-500/20"
           >
             <div class="flex items-center justify-between">
               <div>
-                <p class="text-responsive-sm font-medium text-primary-100">Produits Actifs</p>
-                <p class="text-responsive-xl font-semibold">{{ activeProducts.length }}</p>
+                <p class="text-sm font-medium text-blue-100">Produits Actifs</p>
+                <p class="text-xl font-semibold">{{ activeProducts.length }}</p>
               </div>
-              <div class="rounded-xl bg-white/20 p-3">
-                <CheckCircleIcon class="h-10 w-10" />
+              <div class="rounded bg-white/20 p-3">
+                <CheckCircleIcon class="h-8 w-8" />
               </div>
             </div>
           </Card>
 
           <Card
             variant="elevated"
-            class="bg-gradient-to-r from-accent-orange to-accent-orange/90 text-white shadow-lg shadow-accent-orange/20"
+            class="bg-gradient-to-r from-orange-500 to-orange-500/90 text-white shadow-lg shadow-orange-500/20"
           >
             <div class="flex items-center justify-between">
               <div>
-                <p class="text-responsive-sm font-medium text-accent-orange/80">Stock Faible</p>
-                <p class="text-responsive-xl font-semibold">{{ lowStockProducts.length }}</p>
+                <p class="text-sm font-medium text-orange-500/80">Stock Faible</p>
+                <p class="text-xl font-semibold">{{ lowStockProducts.length }}</p>
               </div>
-              <div class="rounded-xl bg-white/20 p-3">
-                <ExclamationTriangleIcon class="h-10 w-10" />
+              <div class="rounded bg-white/20 p-3">
+                <ExclamationTriangleIcon class="h-8 w-8" />
               </div>
             </div>
           </Card>
@@ -91,11 +91,11 @@
           >
             <div class="flex items-center justify-between">
               <div>
-                <p class="text-responsive-sm font-medium text-accent-red/70">Expire Bientôt</p>
-                <p class="text-responsive-xl font-semibold">{{ expiringSoonProducts.length }}</p>
+                <p class="text-sm font-medium text-red-600/70">Expire Bientôt</p>
+                <p class="text-xl font-semibold">{{ expiringSoonProducts.length }}</p>
               </div>
-              <div class="rounded-xl bg-white/20 p-3">
-                <ClockIcon class="h-10 w-10" />
+              <div class="rounded bg-white/20 p-3">
+                <ClockIcon class="h-8 w-8" />
               </div>
             </div>
           </Card>
@@ -103,8 +103,8 @@
       </div>
 
       <!-- Filters and Controls -->
-      <Card class="mb-6">
-        <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+      <Card class="mt-4">
+        <div class="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
           <div class="flex flex-wrap gap-2">
             <Button
               v-for="filter in filters"
@@ -112,10 +112,10 @@
               size="sm"
               :variant="activeFilter === filter.key ? 'secondary' : 'ghost'"
               :class="[
-                'rounded-lg',
+                'rounded',
                 activeFilter === filter.key
-                  ? 'border border-primary-200 bg-primary-50 text-primary-emphasis hover:bg-primary-100 hover:border-primary-300'
-                  : 'text-body'
+                  ? 'border border-blue-200 bg-blue-50 text-blue-900 hover:bg-blue-100 hover:border-blue-300'
+                  : 'text-gray-700'
               ]"
               @click="activeFilter = filter.key"
             >
@@ -133,11 +133,11 @@
           </div>
 
           <div class="flex items-center gap-3">
-            <label for="sort-by" class="text-responsive-sm font-medium text-body">Trier par</label>
+            <label for="sort-by" class="text-sm font-medium text-gray-700">Trier par</label>
             <select
               id="sort-by"
               v-model="sortBy"
-              class="rounded-lg border border-neutral-300 bg-white px-4 py-3 text-responsive-sm font-medium text-body-emphasis shadow-sm transition-colors focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/30"
+              class="rounded border border-gray-300 bg-white px-3 py-3 text-sm font-medium text-gray-800 shadow-sm transition-colors focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/30"
             >
               <option value="created_at">Plus récent</option>
               <option value="name">Nom A-Z</option>
@@ -149,7 +149,7 @@
       </Card>
 
       <!-- Products Grid -->
-      <div v-if="filteredProducts.length > 0" class="grid grid-cols-1 gap-4 sm:gap-6 md:grid-cols-2 xl:grid-cols-3">
+      <div v-if="filteredProducts.length > 0" class="grid grid-cols-1 gap-3 sm:gap-6 md:grid-cols-2 xl:grid-cols-3">
         <Card
           v-for="product in filteredProducts"
           :key="product.id"
@@ -162,7 +162,7 @@
             <img
               :src="product.image_url || '/images/placeholder.jpg'"
               :alt="product.name"
-              class="h-48 w-full rounded-xl object-cover"
+              class="h-8xl w-full rounded object-cover"
             >
             <div class="relative sm:absolute left-3 top-3 flex flex-wrap gap-2">
               <Badge
@@ -170,7 +170,7 @@
                 variant="secondary"
                 size="xs"
                 rounded
-                class="bg-neutral-500 text-white hover:bg-neutral-500/90"
+                class="bg-gray-500 text-white hover:bg-gray-500/90"
               >
                 Inactif
               </Badge>
@@ -207,26 +207,26 @@
           <!-- Product Info -->
           <div class="space-y-4">
             <div>
-              <h3 class="text-responsive-lg font-semibold text-heading">{{ product.name }}</h3>
-              <p class="mt-2 line-clamp-2 text-responsive-sm text-body">{{ product.description }}</p>
+              <h3 class="text-lg font-semibold text-gray-900">{{ product.name }}</h3>
+              <p class="mt-2 line-clamp-2 text-sm text-gray-700">{{ product.description }}</p>
             </div>
 
             <div class="flex items-center justify-between">
               <div class="flex items-center gap-2">
-                <span class="text-responsive-xl font-semibold text-primary">
+                <span class="text-xl font-semibold text-blue-600">
                   {{ Math.round(product.discounted_price).toLocaleString('fr-FR') }} F CFA
                 </span>
-                <span class="text-responsive-sm text-placeholder line-through">
+                <span class="text-sm text-gray-400 line-through">
                   {{ Math.round(product.original_price).toLocaleString('fr-FR') }} F CFA
                 </span>
               </div>
 
               <div class="text-right">
-                <p class="text-responsive-sm text-body">Stock: {{ product.quantity_available }}</p>
+                <p class="text-sm text-gray-700">Stock: {{ product.quantity_available }}</p>
               </div>
             </div>
 
-            <div class="flex items-center justify-between text-responsive-sm text-body">
+            <div class="flex items-center justify-between text-sm text-gray-700">
               <span>Expire: {{ formatDate(product.expiration_date) }}</span>
               <span :class="getStatusColor(product)">{{ getStatusText(product) }}</span>
             </div>
@@ -251,7 +251,7 @@
               :left-icon="product.is_active ? EyeSlashIcon : EyeIcon"
               :class="product.is_active
                 ? 'border-amber-300 text-amber-600 hover:bg-amber-50'
-                : 'border-emerald-300 text-emerald-600 hover:bg-emerald-50'"
+                : 'border-emerald-300 text-blue-600 hover:bg-emerald-50'"
               @click="toggleProductStatus(product)"
             >
               {{ product.is_active ? 'Désactiver' : 'Activer' }}
@@ -260,7 +260,7 @@
             <Button
               size="sm"
               variant="destructive"
-              class="px-4"
+              class="px-3"
               :left-icon="TrashIcon"
               @click="deleteProduct(product)"
             >
@@ -271,10 +271,10 @@
       </div>
 
       <!-- Empty State -->
-      <div v-else class="py-8 sm:py-10 lg:py-12 text-left sm:text-center">
-        <ShoppingBagIcon class="w-16 h-16 text-neutral-300 mx-auto mb-4" />
-        <h3 class="text-responsive-xl font-semibold text-heading mb-2">Aucun produit trouvé</h3>
-        <p class="text-body mb-6">
+      <div v-else class="py-8 sm:py-12 lg:py-16 text-left sm:text-center">
+        <ShoppingBagIcon class="w-12 h-10 text-gray-500 mx-auto mt-3" />
+        <h3 class="text-xl font-semibold text-gray-900 mt-2">Aucun produit trouvé</h3>
+        <p class="text-gray-700 mt-4">
           {{ searchQuery ? 'Aucun produit ne correspond à votre recherche.' : 'Commencez par ajouter votre premier produit.' }}
         </p>
         <Button
@@ -294,23 +294,23 @@
       >
         <Card
           variant="elevated"
-          class="w-full max-h-[90vh] max-w-full sm:max-w-2xl overflow-y-auto"
+          class="w-full max-h-[90vh] max-w-full sm:max-w-80 overflow-y-auto"
         >
-          <div class="mb-6 flex items-center justify-between">
-            <h2 class="text-responsive-xl font-semibold text-heading">
+          <div class="mt-4 flex items-center justify-between">
+            <h2 class="text-xl font-semibold text-gray-900">
               {{ showAddProductModal ? 'Ajouter un produit' : 'Modifier le produit' }}
             </h2>
             <Button
               variant="ghost"
               size="sm"
               :left-icon="XMarkIcon"
-              class="text-placeholder hover:text-body"
+              class="text-gray-400 hover:text-gray-700"
               @click="closeModals"
             />
           </div>
 
           <form class="space-y-6" @submit.prevent="saveProduct">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-6">
               <div>
                 <label class="label">Nom du produit *</label>
                 <input
@@ -342,7 +342,7 @@
               />
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-3 sm:gap-6">
               <div>
                 <label class="label">Prix original (F CFA) *</label>
                 <input
@@ -371,13 +371,13 @@
                 <input
                   :value="calculatedDiscountedPrice"
                   type="text"
-                  class="input w-full bg-neutral-100"
+                  class="input w-full bg-gray-100"
                   disabled
                 >
               </div>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-6">
               <div>
                 <label class="label">Quantité disponible *</label>
                 <input
@@ -409,11 +409,11 @@
                 @change="handleImageUpload"
               >
               <div v-if="productForm.image_url" class="mt-3">
-                <p class="text-responsive-sm text-body mb-2">Aperçu :</p>
+                <p class="text-sm text-gray-700 mt-2">Aperçu :</p>
                 <img
                   :src="productForm.image_url"
                   alt="Aperçu du produit"
-                  class="w-32 h-32 object-cover rounded-lg border"
+                  class="w-7xl h-7xl object-cover rounded border"
                 >
               </div>
             </div>
@@ -423,12 +423,12 @@
                 id="is_active"
                 v-model="productForm.is_active"
                 type="checkbox"
-                class="w-5 h-5"
+                class="h-4 w-4"
               >
               <label for="is_active" class="label mb-0">Produit actif</label>
             </div>
 
-            <div class="flex gap-4 pt-4">
+            <div class="flex gap-3 padding-t-lg">
               <Button
                 type="button"
                 variant="secondary"
@@ -458,14 +458,14 @@
       >
         <Card
           variant="elevated"
-          class="w-full max-w-full sm:max-w-md transform shadow-2xl transition-all hover:scale-[1.02]"
+          class="w-full max-w-xl transform shadow-80 transition-all hover:scale-[1.02]"
           @click.stop
         >
           <div class="text-left sm:text-center">
             <!-- Icon -->
-            <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100 mb-4">
+            <div class="mx-auto flex items-center justify-center h-6 w-6 rounded-full bg-red-100 mt-3">
               <svg
-                class="h-10 w-10 text-error"
+                class="h-8 w-8 text-red-600"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -480,14 +480,14 @@
             </div>
 
             <!-- Title -->
-            <h3 class="mb-2 text-responsive-lg font-semibold text-heading">
+            <h3 class="mt-2 text-lg font-semibold text-gray-900">
               Supprimer le produit
             </h3>
 
             <!-- Message -->
-            <p class="mb-6 text-body">
+            <p class="mt-4 text-gray-700">
               Êtes-vous sûr de vouloir supprimer
-              <span class="font-semibold text-heading">"{{ productToDelete?.name }}"</span> ?
+              <span class="font-semibold text-gray-900">"{{ productToDelete?.name }}"</span> ?
               Cette action est irréversible.
             </p>
 
@@ -659,10 +659,10 @@ const formatDate = (date: string): string => {
 }
 
 const getStatusColor = (product: any): string => {
-  if (!product.is_active) return 'text-muted'
-  if (isExpiringSoon(product)) return 'text-accent-red'
-  if (product.quantity_available <= 5) return 'text-accent-orange'
-  return 'text-primary'
+  if (!product.is_active) return 'text-gray-500'
+  if (isExpiringSoon(product)) return 'text-red-600'
+  if (product.quantity_available <= 5) return 'text-orange-500'
+  return 'text-blue-600'
 }
 
 const getStatusText = (product: any): string => {

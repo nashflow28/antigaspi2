@@ -79,14 +79,14 @@ const wrapperClasses = computed(() => [
     props.transparent ? 'bg-white/70' : 'bg-white/90',
     'backdrop-blur-sm'
   ],
-  props.text && 'space-y-2'
+  props.text && 'space-y-4'
 ].flat().filter(Boolean).join(' '))
 
 const colorClasses = computed(() => {
   const variants = {
-    default: 'text-body',
-    primary: 'text-primary',
-    muted: 'text-placeholder'
+    default: 'text-gray-700',
+    primary: 'text-blue-600',
+    muted: 'text-gray-400'
   }
   return variants[props.variant]
 })
@@ -94,11 +94,11 @@ const colorClasses = computed(() => {
 // Spinner
 const spinnerClasses = computed(() => [
   'inline-block animate-spin',
-  props.size === 'xs' && 'w-4 h-4',
-  props.size === 'sm' && 'w-5 h-5',
-  props.size === 'md' && 'w-6 h-6',
-  props.size === 'lg' && 'w-8 h-8',
-  props.size === 'xl' && 'w-10 h-10',
+  props.size === 'xs' && 'h-6 w-6',
+  props.size === 'sm' && 'h-4 w-4',
+  props.size === 'md' && 'w-12 h-10',
+  props.size === 'lg' && 'w-xxl h-12',
+  props.size === 'xl' && 'h-6 w-6',
   colorClasses.value
 ].filter(Boolean).join(' '))
 
@@ -113,45 +113,45 @@ const dotsClasses = computed(() => [
 
 const dotClasses = computed(() => [
   'animate-bounce rounded-full bg-current',
-  props.size === 'xs' && 'w-1 h-1',
-  props.size === 'sm' && 'w-1.5 h-1.5',
-  props.size === 'md' && 'w-2 h-2',
-  props.size === 'lg' && 'w-2.5 h-2.5',
-  props.size === 'xl' && 'w-3 h-3',
+  props.size === 'xs' && 'w-xs h-3',
+  props.size === 'sm' && 'w-xs.5 h-3.5',
+  props.size === 'md' && 'h-4 w-4',
+  props.size === 'lg' && 'w-sm.5 h-4.5',
+  props.size === 'xl' && 'w-xs h-3',
   colorClasses.value
 ].filter(Boolean).join(' '))
 
 // Pulse
 const pulseClasses = computed(() => [
-  'animate-pulse rounded bg-neutral-300',
-  props.size === 'xs' && 'w-8 h-8',
-  props.size === 'sm' && 'w-10 h-10',
-  props.size === 'md' && 'w-12 h-12',
-  props.size === 'lg' && 'w-16 h-16',
-  props.size === 'xl' && 'w-20 h-20'
+  'animate-pulse rounded bg-gray-300',
+  props.size === 'xs' && 'w-xxl h-12',
+  props.size === 'sm' && 'h-6 w-6',
+  props.size === 'md' && 'w-12 h-10',
+  props.size === 'lg' && 'w-12 h-10',
+  props.size === 'xl' && 'w-20 h-12'
 ].filter(Boolean).join(' '))
 
 // Skeleton
 const skeletonClasses = computed(() => [
-  'animate-pulse space-y-2'
+  'animate-pulse space-y-4'
 ].join(' '))
 
 const skeletonLineClasses = computed(() => [
-  'h-4 bg-neutral-300 rounded last:w-2/3'
+  'h-10 bg-gray-300 rounded last:w-sm/3'
 ].join(' '))
 
 // Progress
 const progressClasses = computed(() => [
-  'w-full bg-neutral-200 rounded-full overflow-hidden',
-  props.size === 'xs' && 'h-1',
-  props.size === 'sm' && 'h-2',
+  'w-full bg-gray-200 rounded-full overflow-hidden',
+  props.size === 'xs' && 'h-3',
+  props.size === 'sm' && 'h-4',
   props.size === 'md' && 'h-3',
-  props.size === 'lg' && 'h-4',
-  props.size === 'xl' && 'h-6'
+  props.size === 'lg' && 'h-10',
+  props.size === 'xl' && 'h-10'
 ].filter(Boolean).join(' '))
 
 const progressBarClasses = computed(() => [
-  'h-full bg-gradient-to-r from-primary-500 to-primary-600',
+  'h-full bg-gradient-to-r from-blue-500 to-blue-600',
   'transition-all duration-300 ease-out rounded-full'
 ].join(' '))
 

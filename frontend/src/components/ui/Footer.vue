@@ -1,25 +1,25 @@
 <template>
-  <footer class="mt-24 bg-primary-700 text-neutral-50">
-    <div class="mx-auto flex max-w-full sm:max-w-7xl flex-col items-center justify-start sm:justify-between gap-4 sm:gap-6 px-4 py-10 text-left sm:text-center sm:flex-row sm:text-left sm:px-6 lg:px-8">
+  <footer class="mt-24 bg-blue-700 text-gray-50">
+    <div class="mx-auto flex max-w-full sm:max-w-7xl flex-col items-center justify-start sm:justify-between gap-3 sm:gap-6 px-3 py-12 text-left sm:text-center sm:flex-row sm:text-left sm:px-4 lg:px-6">
       <Motion
         tag="div"
         :initial="{ opacity: 0, y: 12 }"
         :enter="{ opacity: 1, y: 0, transition: { duration: 0.5 } }"
-        class="space-y-2"
+        class="space-y-4"
       >
         <slot name="brand" :year="currentYear">
-          <p class="text-h3 font-semibold tracking-tight">{{ brandName }}</p>
-          <p class="text-small text-neutral-100/80">© {{ currentYear }} — {{ tagline }}</p>
+          <p class="text-lg font-semibold tracking-tight">{{ brandName }}</p>
+          <p class="text-sm text-gray-100/80">© {{ currentYear }} — {{ tagline }}</p>
         </slot>
       </Motion>
 
-      <div class="flex items-center gap-4 text-neutral-100/80">
+      <div class="flex items-center gap-3 text-gray-100/80">
         <slot name="socials" :networks="networks">
           <template v-for="network in networks" :key="network.name">
             <Motion
               tag="a"
               :href="network.href"
-              class="flex h-10 w-10 items-center justify-center rounded-2xl bg-white/10 transition hover:bg-white/20"
+              class="flex h-8 w-8 items-center justify-center rounded bg-white/10 transition hover:bg-white/20"
               :hovered="{ scale: 1.08 }"
               :tapped="{ scale: 0.95 }"
               :aria-label="`Ouvrir ${network.name}`"
@@ -27,7 +27,7 @@
               <component
                 :is="network.icon"
                 v-if="network.icon"
-                class="h-5 w-5"
+                class="h-4 w-4"
                 aria-hidden="true"
               />
               <span v-else class="sr-only">{{ network.name }}</span>
@@ -82,7 +82,7 @@ const networks = computed(() =>
           return h(
             'svg',
             {
-              class: 'h-5 w-5',
+              class: 'h-4 w-4',
               fill: 'currentColor',
               viewBox: '0 0 24 24',
               'aria-hidden': 'true'

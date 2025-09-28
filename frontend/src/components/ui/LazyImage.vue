@@ -1,5 +1,5 @@
 <template>
-  <div :class="container px-4 sm:px-6 lg:px-8Class" class="lazy-image-container px-4 sm:px-6 lg:px-8">
+  <div :class="container px-3 sm:px-4 lg:padding-x-xxlClass" class="lazy-image-container px-3 sm:px-4 lg:px-6">
     <img
       ref="imageRef"
       :data-src="optimizedSrc"
@@ -15,11 +15,11 @@
     <!-- Loading overlay -->
     <div
       v-if="isLoading"
-      class="relative sm:absolute inset-0 flex items-center justify-center bg-neutral-100/80 backdrop-blur-sm"
+      class="relative sm:absolute inset-0 flex items-center justify-center bg-gray-100/80 backdrop-blur-sm"
     >
-      <div class="flex items-center space-y-2 sm:space-y-0 sm:space-x-2">
-        <div class="animate-spin rounded-full h-10 w-10 border-b-2 border-primary-600" />
-        <span class="text-responsive-sm text-body">{{ loadingText }}</span>
+      <div class="flex items-center space-y-4 sm:space-x-2">
+        <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600" />
+        <span class="text-sm text-gray-700">{{ loadingText }}</span>
       </div>
     </div>
 
@@ -28,9 +28,9 @@
       v-if="hasError"
       class="relative sm:absolute inset-0 flex items-center justify-center bg-red-50/80 backdrop-blur-sm"
     >
-      <div class="text-left sm:text-center text-error">
-        <X class="w-10 h-10 mx-auto mb-2" />
-        <span class="text-responsive-sm">{{ errorText }}</span>
+      <div class="text-left sm:text-center text-red-600">
+        <X class="h-6 w-6 mx-auto mt-2" />
+        <span class="text-sm">{{ errorText }}</span>
       </div>
     </div>
 
@@ -47,9 +47,9 @@
         v-if="showSuccessOverlay"
         class="relative sm:absolute inset-0 flex items-center justify-center bg-green-50/80 backdrop-blur-sm"
       >
-        <div class="flex items-center space-y-2 sm:space-y-0 sm:space-x-2 text-success">
-          <Check class="w-5 h-5" />
-          <span class="text-responsive-sm">Chargé</span>
+        <div class="flex items-center space-y-4 sm:space-x-2 text-green-600">
+          <Check class="h-4 w-4" />
+          <span class="text-sm">Chargé</span>
         </div>
       </div>
     </Transition>

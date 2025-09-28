@@ -1,15 +1,15 @@
 <template>
-  <div class="bg-white rounded-lg shadow">
-    <div class="p-6 border-b border-neutral-200">
+  <div class="bg-white rounded shadow">
+    <div class="p-6 border-b border-gray-200">
       <div class="flex items-center justify-start sm:justify-between">
-        <h3 class="text-responsive-lg font-semibold text-heading">Historique des transactions</h3>
+        <h3 class="text-lg font-semibold text-gray-900">Historique des transactions</h3>
         <button
           :disabled="loading"
-          class="p-2 text-placeholder hover:text-body disabled:opacity-50"
+          class="p-2 text-gray-400 hover:text-gray-700 disabled:opacity-50"
           @click="refreshTransactions"
         >
           <svg
-            class="w-5 h-5"
+            class="h-4 w-4"
             :class="{'animate-spin': loading}"
             fill="none"
             stroke="currentColor"
@@ -26,10 +26,10 @@
       </div>
 
       <!-- Filtres -->
-      <div class="mt-4 flex flex-wrap gap-4">
+      <div class="mt-4 flex flex-wrap gap-3">
         <select
           v-model="filters.type"
-          class="px-4 py-3 border border-neutral-300 rounded-lg text-responsive-sm focus:ring-2 focus:ring-green-500 focus:border-transparent"
+          class="px-3 py-3 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-green-500 focus:border-transparent"
           @change="applyFilters"
         >
           <option value="">Tous les types</option>
@@ -40,19 +40,19 @@
         <input
           v-model="filters.date_from"
           type="date"
-          class="px-4 py-3 border border-neutral-300 rounded-lg text-responsive-sm focus:ring-2 focus:ring-green-500 focus:border-transparent"
+          class="px-3 py-3 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-green-500 focus:border-transparent"
           @change="applyFilters"
         >
 
         <input
           v-model="filters.date_to"
           type="date"
-          class="px-4 py-3 border border-neutral-300 rounded-lg text-responsive-sm focus:ring-2 focus:ring-green-500 focus:border-transparent"
+          class="px-3 py-3 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-green-500 focus:border-transparent"
           @change="applyFilters"
         >
 
         <button
-          class="px-4 py-3 text-responsive-sm text-body hover:text-heading-secondary"
+          class="px-3 py-3 text-sm text-gray-700 hover:text-gray-800"
           @click="clearFilters"
         >
           Effacer filtres
@@ -63,21 +63,21 @@
     <div class="divide-y divide-neutral-200">
       <div v-if="loading && !transactions.length" class="p-6">
         <div class="animate-pulse space-y-4">
-          <div v-for="i in 3" :key="i" class="flex items-center space-y-4 sm:space-y-0 sm:space-x-4">
-            <div class="w-10 h-10 bg-neutral-200 rounded-full" />
-            <div class="flex-1 space-y-2">
-              <div class="h-5 bg-neutral-200 rounded w-3/4" />
-              <div class="h-3 bg-neutral-200 rounded w-1/2" />
+          <div v-for="i in 3" :key="i" class="flex items-center space-y-4 sm:space-x-4">
+            <div class="h-6 w-6 bg-gray-200 rounded-full" />
+            <div class="flex-1 space-y-4">
+              <div class="h-4 bg-gray-200 rounded w-3/4" />
+              <div class="h-3 bg-gray-200 rounded w-1/2" />
             </div>
-            <div class="h-5 bg-neutral-200 rounded w-20" />
+            <div class="h-4 bg-gray-200 rounded w-20" />
           </div>
         </div>
       </div>
 
       <div v-else-if="!transactions.length" class="p-6 text-left sm:text-center">
-        <div class="text-muted">
+        <div class="text-gray-500">
           <svg
-            class="w-12 h-12 mx-auto mb-4 text-neutral-300"
+            class="w-12 h-10 mx-auto mt-3 text-gray-500"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -89,7 +89,7 @@
               d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
             />
           </svg>
-          <p class="text-responsive-sm">Aucune transaction trouvée</p>
+          <p class="text-sm">Aucune transaction trouvée</p>
         </div>
       </div>
 
@@ -98,12 +98,12 @@
         :key="transaction.id"
         class="p-4 hover:transition-colors"
       >
-        <div class="flex items-center space-y-4 sm:space-y-0 sm:space-x-4">
+        <div class="flex items-center space-y-4 sm:space-x-4">
           <div
-            class="w-10 h-10 rounded-full flex items-center justify-center"
+            class="h-6 w-6 rounded-full flex items-center justify-center"
             :class="getTransactionIconClass(transaction.type)"
           >
-            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+            <svg class="h-4 w-4" fill="currentColor" viewBox="0 0 20 20">
               <path
                 v-if="transaction.type === 'credit'"
                 fill-rule="evenodd"
@@ -119,14 +119,14 @@
             </svg>
           </div>
 
-          <div class="flex-1 min-w-0">
+          <div class="flex-1 min-w-none">
             <div class="flex items-center justify-start sm:justify-between">
-              <p class="text-responsive-sm font-medium text-heading truncate">
+              <p class="text-sm font-medium text-gray-900 truncate">
                 {{ transaction.description }}
               </p>
               <div class="text-right">
                 <p
-                  class="text-responsive-sm font-semibold"
+                  class="text-sm font-semibold"
                   :class="getAmountClass(transaction.type)"
                 >
                   {{ transaction.formatted_amount }}
@@ -134,10 +134,10 @@
               </div>
             </div>
             <div class="flex items-center justify-start sm:justify-between mt-1">
-              <p class="text-responsive-xs text-muted">
+              <p class="text-xs text-gray-500">
                 {{ formatDate(transaction.created_at) }}
               </p>
-              <p class="text-responsive-xs text-placeholder">
+              <p class="text-xs text-gray-400">
                 #{{ transaction.reference }}
               </p>
             </div>
@@ -146,22 +146,22 @@
       </div>
 
       <!-- Pagination -->
-      <div v-if="pagination && pagination.last_page > 1" class="p-4 border-t border-neutral-200">
+      <div v-if="pagination && pagination.last_page > 1" class="p-4 border-t border-gray-200">
         <div class="flex items-center justify-start sm:justify-between">
-          <div class="text-responsive-sm text-body-emphasis">
+          <div class="text-sm text-gray-800">
             Affichage de {{ pagination.from }} à {{ pagination.to }} sur {{ pagination.total }} transactions
           </div>
-          <div class="flex space-y-2 sm:space-y-0 sm:space-x-2">
+          <div class="flex space-y-4 sm:space-x-2">
             <button
               :disabled="pagination.current_page === 1"
-              class="px-4 py-3 text-responsive-sm border border-neutral-300 rounded disabled:opacity-50 disabled:cursor-not-allowed hover:bg-neutral-50"
+              class="px-3 py-3 text-sm border border-gray-300 rounded disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
               @click="changePage(pagination.current_page - 1)"
             >
               Précédent
             </button>
             <button
               :disabled="pagination.current_page === pagination.last_page"
-              class="px-4 py-3 text-responsive-sm border border-neutral-300 rounded disabled:opacity-50 disabled:cursor-not-allowed hover:bg-neutral-50"
+              class="px-3 py-3 text-sm border border-gray-300 rounded disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
               @click="changePage(pagination.current_page + 1)"
             >
               Suivant
@@ -222,14 +222,14 @@ const filters = ref({
 
 const getTransactionIconClass = (type: string) => {
   return type === 'credit'
-    ? 'bg-green-100 text-success'
-    : 'bg-red-100 text-error'
+    ? 'bg-green-100 text-green-600'
+    : 'bg-red-100 text-red-600'
 }
 
 const getAmountClass = (type: string) => {
   return type === 'credit'
-    ? 'text-success'
-    : 'text-error'
+    ? 'text-green-600'
+    : 'text-red-600'
 }
 
 const formatDate = (dateString: string): string => {

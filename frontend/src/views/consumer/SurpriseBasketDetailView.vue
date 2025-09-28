@@ -1,26 +1,26 @@
 <template>
-  <div class="min-h-screen bg-gradient-to-br from-neutral-50 to-primary-50 pb-16">
-    <div class="container px-4 sm:px-6 lg:px-8 mx-auto px-4 pt-10">
+  <div class="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50 pb-16">
+    <div class="container px-3 sm:px-4 lg:px-6 mx-auto px-3 pt-10">
       <button
         type="button"
-        class="mb-6 inline-flex items-center gap-2 text-responsive-sm font-medium text-body hover:text-heading"
+        class="mt-4 inline-flex items-center gap-2 text-sm font-medium text-gray-700 hover:text-gray-900"
         @click="router.back()"
       >
-        <ArrowLeft class="h-5 w-5" />
+        <ArrowLeft class="h-4 w-4" />
         Retour
       </button>
 
-      <Card v-if="isLoading" class="flex min-h-[240px] items-center justify-center text-muted">
-        <span class="inline-flex h-10 w-10 animate-spin rounded-full border-2 border-neutral-200 border-t-primary-500" />
-        <span class="ml-3">Chargement du panier surprise...</span>
+      <Card v-if="isLoading" class="flex min-h-[240px] items-center justify-center text-gray-500">
+        <span class="inline-flex h-8 w-8 animate-spin rounded-full border-2 border-gray-200 border-t-primary-500" />
+        <span class="ml-4">Chargement du panier surprise...</span>
       </Card>
 
-      <Card v-else-if="!basket" class="text-left sm:text-center py-12 sm:py-14 lg:py-16">
-        <div class="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-neutral-100">
-          <Package class="h-10 w-10 text-placeholder" />
+      <Card v-else-if="!basket" class="text-left sm:text-center py-16 sm:py-16 lg:py-16">
+        <div class="mx-auto mt-3 flex icon-xl items-center justify-center rounded-full bg-gray-100">
+          <Package class="h-8 w-8 text-gray-400" />
         </div>
-        <h2 class="text-responsive-xl font-semibold text-heading-secondary">Panier introuvable</h2>
-        <p class="mt-2 text-muted">Ce panier surprise n'est plus disponible ou n'existe pas.</p>
+        <h2 class="text-xl font-semibold text-gray-800">Panier introuvable</h2>
+        <p class="mt-2 text-gray-500">Ce panier surprise n'est plus disponible ou n'existe pas.</p>
         <Button variant="primary" class="mt-6" @click="router.push({ name: 'surprise-baskets' })">
           Voir les autres paniers
         </Button>
@@ -28,7 +28,7 @@
 
       <div v-else class="grid gap-6 sm:gap-8 lg:grid-cols-[2fr_1fr]">
         <Card class="overflow-hidden sm:block">
-          <div class="relative h-64 w-full">
+          <div class="relative h-9xl w-full">
             <img
               v-if="basket.image_url"
               :src="basket.image_url"
@@ -37,55 +37,55 @@
             >
             <div
               v-else
-              class="flex h-full w-full items-center justify-center bg-gradient-to-br from-primary-50 to-accent-blue/5"
+              class="flex h-full w-full items-center justify-center bg-gradient-to-br from-blue-50 to-blue-500/5"
             >
-              <Package class="h-12 w-12 text-primary-400" />
+              <Package class="h-6 w-6 text-blue-400" />
             </div>
             <div class="relative sm:absolute left-6 top-6 flex items-center gap-3">
               <Badge variant="success" class="font-semibold">-{{ basket.basket_discount_percentage }}%</Badge>
-              <span class="rounded-full bg-white/90 px-4 py-3 text-responsive-xs font-medium text-body-emphasis shadow-modern-2025">
-                <Clock class="mr-1 inline-block h-5 w-5 text-primary-500" />
+              <span class="rounded-full bg-white/90 px-3 py-3 text-xs font-medium text-gray-800 shadow-xl">
+                <Clock class="mr-1 inline-block h-4 w-4 text-blue-500" />
                 {{ timeLeft }}
               </span>
             </div>
           </div>
 
           <div class="space-y-6 p-6">
-            <header class="space-y-2">
-              <h1 class="text-responsive-xl font-semibold text-heading">{{ basket.name }}</h1>
-              <p v-if="basket.surprise_description" class="text-body">{{ basket.surprise_description }}</p>
-              <div class="flex flex-wrap items-center gap-3 text-responsive-sm text-muted">
-                <span class="inline-flex items-center gap-2 rounded-full bg-primary-50 px-4 py-3 text-primary-emphasis">
-                  <Store class="h-5 w-5" />
+            <header class="space-y-4">
+              <h1 class="text-xl font-semibold text-gray-900">{{ basket.name }}</h1>
+              <p v-if="basket.surprise_description" class="text-gray-700">{{ basket.surprise_description }}</p>
+              <div class="flex flex-wrap items-center gap-3 text-sm text-gray-500">
+                <span class="inline-flex items-center gap-2 rounded-full bg-blue-50 px-3 py-3 text-blue-900">
+                  <Store class="h-4 w-4" />
                   {{ basket.merchant.business_name }}
                 </span>
-                <span v-if="basket.category?.name" class="inline-flex items-center gap-2 rounded-full bg-accent-blue/5 px-4 py-3 text-accent-blue/90">
-                  <Tag class="h-5 w-5" />
+                <span v-if="basket.category?.name" class="inline-flex items-center gap-2 rounded-full bg-blue-500/5 px-3 py-3 text-blue-500/90">
+                  <Tag class="h-4 w-4" />
                   {{ basket.category.name }}
                 </span>
-                <span class="inline-flex items-center gap-2 rounded-full bg-neutral-100 px-4 py-3 text-body">
-                  <ShieldCheck class="h-5 w-5" />
+                <span class="inline-flex items-center gap-2 rounded-full bg-gray-100 px-3 py-3 text-gray-700">
+                  <ShieldCheck class="h-4 w-4" />
                   Retrait garanti avant expiration
                 </span>
               </div>
             </header>
 
             <section>
-              <h2 class="text-responsive-lg font-semibold text-heading">Contenu surprise</h2>
-              <ul v-if="basket.surprise_basket_items?.length" class="mt-3 space-y-3">
+              <h2 class="text-lg font-semibold text-gray-900">Contenu surprise</h2>
+              <ul v-if="basket.surprise_basket_items?.length" class="mt-3 space-y-2">
                 <li
                   v-for="item in basket.surprise_basket_items"
                   :key="item.id"
-                  class="flex items-stretch sm:items-start justify-start sm:justify-between rounded-xl bg-neutral-50 px-4 py-3"
+                  class="flex items-stretch sm:items-start justify-start sm:justify-between rounded bg-gray-50 px-3 py-3"
                 >
                   <div>
-                    <p class="font-medium text-heading-secondary">{{ item.product.name }}</p>
-                    <p class="text-responsive-xs text-muted">Quantité min : {{ item.quantity }}</p>
+                    <p class="font-medium text-gray-800">{{ item.product.name }}</p>
+                    <p class="text-xs text-gray-500">Quantité min : {{ item.quantity }}</p>
                   </div>
-                  <span class="text-responsive-sm font-medium text-body">{{ formatPrice(item.total_price) }}</span>
+                  <span class="text-sm font-medium text-gray-700">{{ formatPrice(item.total_price) }}</span>
                 </li>
               </ul>
-              <p v-else class="mt-3 text-responsive-sm text-muted">
+              <p v-else class="mt-3 text-sm text-gray-500">
                 Ce panier est une surprise ! Le commerçant sélectionne les meilleurs produits disponibles.
               </p>
             </section>
@@ -94,26 +94,26 @@
 
         <Card class="space-y-6 p-6">
           <div>
-            <h2 class="text-responsive-lg font-semibold text-heading">Votre réservation</h2>
-            <p class="text-responsive-sm text-muted">Réservez dès maintenant et récupérez votre panier avant l'expiration.</p>
+            <h2 class="text-lg font-semibold text-gray-900">Votre réservation</h2>
+            <p class="text-sm text-gray-500">Réservez dès maintenant et récupérez votre panier avant l'expiration.</p>
           </div>
 
-          <div class="space-y-3 rounded-xl bg-neutral-50 p-4">
+          <div class="space-y-2 rounded bg-gray-50 p-4">
             <div class="flex items-center justify-start sm:justify-between">
-              <span class="text-responsive-sm text-muted">Prix réduit</span>
-              <span class="text-responsive-xl font-semibold text-primary">{{ formattedDiscountedPrice }}</span>
+              <span class="text-sm text-gray-500">Prix réduit</span>
+              <span class="text-xl font-semibold text-blue-600">{{ formattedDiscountedPrice }}</span>
             </div>
-            <div class="flex items-center justify-start sm:justify-between text-responsive-sm text-muted">
+            <div class="flex items-center justify-start sm:justify-between text-sm text-gray-500">
               <span>Valeur d'origine</span>
               <span class="line-through">{{ formattedOriginalPrice }}</span>
             </div>
-            <div class="flex items-center justify-start sm:justify-between text-responsive-sm font-semibold text-primary">
+            <div class="flex items-center justify-start sm:justify-between text-sm font-semibold text-blue-600">
               <span>Économies</span>
               <span>{{ formattedSavings }}</span>
             </div>
           </div>
 
-          <div class="space-y-3">
+          <div class="space-y-2">
             <Label for="quantity">Quantité</Label>
             <input
               id="quantity"
@@ -124,41 +124,41 @@
               class="input-field-2025"
               :disabled="maxQuantity === 0"
             >
-            <p class="text-responsive-xs text-muted">{{ maxQuantity }} panier{{ maxQuantity > 1 ? 's' : '' }} restant{{ maxQuantity > 1 ? 's' : '' }}</p>
+            <p class="text-xs text-gray-500">{{ maxQuantity }} panier{{ maxQuantity > 1 ? 's' : '' }} restant{{ maxQuantity > 1 ? 's' : '' }}</p>
           </div>
 
           <div class="space-y-4">
             <div>
               <div class="flex items-center justify-start sm:justify-between">
-                <h3 class="text-responsive-sm font-semibold text-heading">Moyen de paiement</h3>
-                <span class="text-responsive-xs text-muted">Sélectionnez une option</span>
+                <h3 class="text-sm font-semibold text-gray-900">Moyen de paiement</h3>
+                <span class="text-xs text-gray-500">Sélectionnez une option</span>
               </div>
-              <div class="mt-3 space-y-3">
+              <div class="mt-3 space-y-2">
                 <button
                   v-for="option in paymentOptions"
                   :key="option.value"
                   type="button"
-                  class="flex w-full items-stretch sm:items-start gap-3 rounded-xl border p-4 text-left transition-all"
+                  class="flex w-full items-stretch sm:items-start gap-3 rounded border p-4 text-left transition-all"
                   :class="[
                     paymentMethod === option.value
-                      ? 'border-primary-500 bg-primary-50 shadow-sm'
-                      : 'border-neutral-200 hover:border-primary-200 hover:bg-primary-50/40'
+                      ? 'border-blue-500 bg-blue-50 shadow-sm'
+                      : 'border-gray-200 hover:border-blue-200 hover:bg-blue-50/40'
                   ]"
                   @click="paymentMethod = option.value"
                 >
                   <div
-                    class="flex h-10 w-10 items-center justify-center rounded-full"
-                    :class="paymentMethod === option.value ? 'bg-primary-500 text-white' : 'bg-neutral-100 text-body'"
+                    class="flex h-8 w-8 items-center justify-center rounded-full"
+                    :class="paymentMethod === option.value ? 'bg-blue-500 text-white' : 'bg-gray-100 text-gray-700'"
                   >
-                    <component :is="option.icon" class="h-5 w-5" />
+                    <component :is="option.icon" class="h-4 w-4" />
                   </div>
                   <div class="flex-1">
-                    <p class="font-medium text-heading">{{ option.label }}</p>
-                    <p class="text-responsive-xs text-muted">{{ option.description }}</p>
+                    <p class="font-medium text-gray-900">{{ option.label }}</p>
+                    <p class="text-xs text-gray-500">{{ option.description }}</p>
                   </div>
                   <span
                     v-if="paymentMethod === option.value"
-                    class="text-responsive-xs font-semibold text-primary"
+                    class="text-xs font-semibold text-blue-600"
                   >
                     Choisi
                   </span>
@@ -166,7 +166,7 @@
               </div>
             </div>
 
-            <div v-if="methodRequiresPhone" class="space-y-2">
+            <div v-if="methodRequiresPhone" class="space-y-4">
               <Label for="mobile-money-phone">Numéro Mobile Money</Label>
               <input
                 id="mobile-money-phone"
@@ -175,38 +175,38 @@
                 placeholder="+228 90 00 00 00"
                 class="input-field-2025"
                 :class="{
-                  'border-accent-red/50 focus:border-accent-red/50 focus:ring-accent-red/20': mobileMoneyPhone && !isPhoneValid
+                  'border-red-600/50 focus:border-red-600/50 focus:ring-accent-red/20': mobileMoneyPhone && !isPhoneValid
                 }"
                 :disabled="submitting"
               >
-              <p class="text-responsive-xs text-muted">Utilisez un numéro enregistré sur le portefeuille sélectionné.</p>
-              <p v-if="phoneError" class="text-responsive-xs font-medium text-accent-red">{{ phoneError }}</p>
+              <p class="text-xs text-gray-500">Utilisez un numéro enregistré sur le portefeuille sélectionné.</p>
+              <p v-if="phoneError" class="text-xs font-medium text-red-600">{{ phoneError }}</p>
             </div>
 
             <p
               v-if="selectedPaymentOption?.instructions"
-              class="rounded-xl bg-neutral-50 p-3 text-responsive-xs text-body"
+              class="rounded bg-gray-50 p-3 text-xs text-gray-700"
             >
               {{ selectedPaymentOption.instructions }}
             </p>
           </div>
 
-          <div class="rounded-xl bg-primary-50 p-4 text-responsive-sm text-primary-emphasis">
+          <div class="rounded bg-blue-50 p-4 text-sm text-blue-900">
             <p class="font-semibold">Montant à régler</p>
-            <p class="text-responsive-xl font-semibold">{{ totalReservationPrice }}</p>
-            <p v-if="quantity > 1" class="mt-1 text-responsive-xs text-primary">Soit {{ formattedDiscountedPrice }} par panier</p>
-            <p v-if="methodRequiresPhone" class="mt-2 text-responsive-xs">
+            <p class="text-xl font-semibold">{{ totalReservationPrice }}</p>
+            <p v-if="quantity > 1" class="mt-1 text-xs text-blue-600">Soit {{ formattedDiscountedPrice }} par panier</p>
+            <p v-if="methodRequiresPhone" class="mt-2 text-xs">
               Un SMS de validation sera envoyé par l'opérateur après la demande de paiement.
             </p>
-            <p v-else-if="paymentMethod === 'paystack'" class="mt-2 text-responsive-xs">
+            <p v-else-if="paymentMethod === 'paystack'" class="mt-2 text-xs">
               Une page sécurisée Paystack s'ouvrira pour finaliser le paiement.
             </p>
-            <p v-else-if="paymentMethod === 'on_site'" class="mt-2 text-responsive-xs">
+            <p v-else-if="paymentMethod === 'on_site'" class="mt-2 text-xs">
               Réglez ce montant directement auprès du commerçant lors du retrait.
             </p>
           </div>
 
-          <div class="space-y-2">
+          <div class="space-y-4">
             <button
               type="button"
               class="button-primary-2025 w-full"
@@ -214,15 +214,15 @@
               @click="reserveBasket"
             >
               <span v-if="submitting" class="inline-flex items-center gap-2">
-                <Loader2 class="h-5 w-5 animate-spin" />
+                <Loader2 class="h-4 w-4 animate-spin" />
                 Réservation en cours...
               </span>
               <span v-else>{{ reserveButtonLabel }}</span>
             </button>
-            <p v-if="!authStore.isAuthenticated" class="text-left sm:text-center text-responsive-xs text-muted">
+            <p v-if="!authStore.isAuthenticated" class="text-left sm:text-center text-xs text-gray-500">
               Connectez-vous pour finaliser la réservation.
             </p>
-            <p v-else-if="!authStore.isConsumer" class="text-left sm:text-center text-responsive-xs text-muted">
+            <p v-else-if="!authStore.isConsumer" class="text-left sm:text-center text-xs text-gray-500">
               Seuls les consommateurs peuvent réserver des paniers.
             </p>
           </div>

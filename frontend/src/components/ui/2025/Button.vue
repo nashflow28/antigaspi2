@@ -104,11 +104,11 @@ const computedClasses = computed(() => {
 
 const sizeClasses = computed(() => {
   const sizes = {
-    xs: 'px-2.5 py-1.5 text-xs gap-1 rounded-md',
-    sm: 'px-3 py-2 text-sm gap-1.5 rounded-md',
-    md: 'px-4 py-2.5 text-sm gap-2 rounded-lg',
-    lg: 'px-6 py-3 text-base gap-2 rounded-lg',
-    xl: 'px-8 py-4 text-lg gap-2.5 rounded-xl'
+    xs: 'px-2 py-1 text-xs gap-2 rounded',
+    sm: 'px-3 py-2 text-sm gap-2 rounded',
+    md: 'px-3 py-2.5 text-sm gap-2 rounded',
+    lg: 'px-4 py-3 text-base gap-2 rounded',
+    xl: 'px-6 py-4 text-lg gap-3 rounded'
   }
   return sizes[props.size]
 })
@@ -116,46 +116,46 @@ const sizeClasses = computed(() => {
 const variantClasses = computed(() => {
   const variants = {
     primary: [
-      'bg-gradient-to-r from-primary-600 to-primary-700',
-      'text-white border border-primary-600',
-      'hover:from-primary-700 hover:to-primary-800',
-      'focus:ring-primary-500',
-      'active:from-primary-800 active:to-primary-900',
-      'shadow-lg shadow-primary-500/25',
-      'hover:shadow-xl hover:shadow-primary-500/30'
+      'bg-gradient-to-r from-blue-600 to-blue-700',
+      'text-white border border-blue-600',
+      'hover:from-blue-700 hover:to-blue-800',
+      'focus:ring-blue-500',
+      'active:from-blue-800 active:to-blue-900',
+      'shadow-lg shadow-blue-500/25',
+      'hover:shadow-xl hover:shadow-blue-500/30'
     ].join(' '),
 
     secondary: [
-      'bg-white text-body-emphasis',
-      'border border-neutral-300',
-      'hover:bg-neutral-50 hover:border-neutral-400',
-      'focus:ring-neutral-500',
-      'active:bg-neutral-100',
+      'bg-white text-gray-800',
+      'border border-gray-300',
+      'hover:bg-gray-50 hover:border-gray-400',
+      'focus:ring-gray-500',
+      'active:bg-gray-100',
       'shadow-sm hover:shadow-md'
     ].join(' '),
 
     ghost: [
-      'text-body bg-transparent',
-      'hover:text-heading hover:bg-neutral-100',
-      'focus:ring-neutral-500',
-      'active:bg-neutral-200'
+      'text-gray-700 bg-transparent',
+      'hover:text-gray-900 hover:bg-gray-100',
+      'focus:ring-gray-500',
+      'active:bg-gray-200'
     ].join(' '),
 
     outline: [
-      'bg-transparent text-primary',
-      'border border-primary-600',
-      'hover:bg-primary-50 hover:text-primary-emphasis',
-      'focus:ring-primary-500',
-      'active:bg-primary-100'
+      'bg-transparent text-blue-600',
+      'border border-blue-600',
+      'hover:bg-blue-50 hover:text-blue-900',
+      'focus:ring-blue-500',
+      'active:bg-blue-100'
     ].join(' '),
 
     promo: [
-      'bg-gradient-to-r from-accent-orange to-accent-yellow',
-      'text-white border border-accent-orange',
-      'hover:from-accent-orange/90 hover:to-accent-yellow/90',
-      'focus:ring-accent-orange',
-      'shadow-lg shadow-accent-orange/25',
-      'hover:shadow-xl hover:shadow-accent-orange/30'
+      'bg-gradient-to-r from-orange-500 to-yellow-500',
+      'text-white border border-orange-500',
+      'hover:from-orange-500/90 hover:to-yellow-500/90',
+      'focus:ring-orange-500',
+      'shadow-lg shadow-orange-500/25',
+      'hover:shadow-xl hover:shadow-orange-500/30'
     ].join(' '),
 
     destructive: [
@@ -179,23 +179,23 @@ const variantClasses = computed(() => {
     ].join(' '),
 
     success: [
-      'bg-green-600 text-white',
-      'border border-green-600',
-      'hover:bg-green-700 hover:border-green-700',
+      'bg-blue-600 text-white',
+      'border border-blue-600',
+      'hover:bg-blue-700 hover:border-blue-700',
       'focus:ring-green-500',
-      'active:bg-green-800',
+      'active:bg-blue-800',
       'shadow-lg shadow-green-500/25',
       'hover:shadow-xl hover:shadow-green-500/30'
     ].join(' '),
 
     warning: [
-      'bg-accent-orange text-white',
-      'border border-accent-orange',
-      'hover:bg-accent-orange/90 hover:border-accent-orange/90',
-      'focus:ring-accent-orange',
-      'active:bg-accent-orange/80',
-      'shadow-lg shadow-accent-orange/25',
-      'hover:shadow-xl hover:shadow-accent-orange/30'
+      'bg-orange-500 text-white',
+      'border border-orange-500',
+      'hover:bg-orange-500/90 hover:border-orange-500/90',
+      'focus:ring-orange-500',
+      'active:bg-orange-500/80',
+      'shadow-lg shadow-orange-500/25',
+      'hover:shadow-xl hover:shadow-orange-500/30'
     ].join(' ')
   }
 

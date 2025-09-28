@@ -7,63 +7,63 @@
     />
 
     <!-- Modal -->
-    <div class="flex min-h-full items-center justify-center p-4">
+    <div class="flex min-h-screen items-center justify-center p-4">
       <div
-        class="relative w-full max-w-full sm:max-w-lg bg-white rounded-2xl shadow-2xl transform transition-all"
+        class="relative w-full max-w-xl bg-white rounded shadow-80 transform transition-all"
         @click.stop
       >
         <!-- Header -->
-        <div class="px-6 py-4 border-b border-neutral-200">
+        <div class="px-4 py-4 border-b border-gray-200">
           <div class="flex items-center justify-start sm:justify-between">
             <div class="flex items-center gap-3">
               <div
-                class="p-2 rounded-xl"
+                class="p-2 rounded"
                 :class="iconBgClass"
               >
                 <component
                   :is="icon"
-                  class="w-10 h-10"
+                  class="h-6 w-6"
                   :class="iconClass"
                 />
               </div>
-              <h3 class="text-responsive-xl font-semibold text-heading">{{ title }}</h3>
+              <h3 class="text-xl font-semibold text-gray-900">{{ title }}</h3>
             </div>
             <button
               class="p-2 hover:transition-colors"
               @click="closeModal"
             >
-              <XMarkIcon class="w-5 h-5 text-placeholder" />
+              <XMarkIcon class="h-4 w-4 text-gray-400" />
             </button>
           </div>
         </div>
 
         <!-- Content -->
-        <div class="px-6 py-6">
+        <div class="px-4 py-6">
           <div class="space-y-4">
             <div
               v-for="(section, index) in contentSections"
               :key="index"
-              class="space-y-2"
+              class="space-y-4"
             >
               <h4
                 v-if="section.title"
-                class="font-semibold text-heading text-responsive-lg"
+                class="font-semibold text-gray-900 text-lg"
               >
                 {{ section.title }}
               </h4>
-              <div class="space-y-2">
+              <div class="space-y-4">
                 <!-- SECURITY FIX: Replace unsafe v-html with secure rendering -->
                 <div
                   v-for="(item, itemIndex) in section.items"
                   :key="itemIndex"
-                  class="text-body flex items-stretch sm:items-start gap-2"
+                  class="text-gray-700 flex items-stretch sm:items-start gap-2"
                 >
                   <!-- Safe rendering of sanitized content -->
-                  <span v-if="item.type === 'bullet'" class="inline-block w-2 h-2 bg-primary-600 rounded-full mr-2 mt-1.5 flex-shrink-0" />
-                  <span v-else-if="item.type === 'success'" class="text-success mr-2">✅</span>
-                  <span v-else-if="item.type === 'warning'" class="text-warning mr-2">⚠️</span>
+                  <span v-if="item.type === 'bullet'" class="inline-block h-4 w-4 bg-blue-600 rounded-full mr-2 mt-1.5 flex-shrink-0" />
+                  <span v-else-if="item.type === 'success'" class="text-green-600 mr-2">✅</span>
+                  <span v-else-if="item.type === 'warning'" class="text-yellow-500 mr-2">⚠️</span>
                   <span v-else-if="item.type === 'info'" class="text-info mr-2">ℹ️</span>
-                  <span v-else-if="item.type === 'error'" class="text-error mr-2">❌</span>
+                  <span v-else-if="item.type === 'error'" class="text-red-600 mr-2">❌</span>
                   <span>{{ item.text }}</span>
                 </div>
               </div>
@@ -72,17 +72,17 @@
         </div>
 
         <!-- Footer -->
-        <div class="px-6 py-4 bg-neutral-50 rounded-b-2xl">
+        <div class="px-4 py-4 bg-gray-50 rounded-b-2xl">
           <div class="flex justify-center sm:justify-end gap-3">
             <button
-              class="px-4 py-3 text-body hover:transition-colors"
+              class="px-3 py-3 text-gray-700 hover:transition-colors"
               @click="closeModal"
             >
               Fermer
             </button>
             <button
               v-if="actionButton"
-              class="px-6 py-3 bg-primary-600 text-white rounded-lg hover:transition-colors"
+              class="px-4 py-3 bg-blue-600 text-white rounded hover:transition-colors"
               @click="handleAction"
             >
               {{ actionButton }}
@@ -140,9 +140,9 @@ const iconBgClass = computed(() => {
 const iconClass = computed(() => {
   const classes = {
     info: 'text-info',
-    success: 'text-success',
-    warning: 'text-warning',
-    error: 'text-error'
+    success: 'text-green-600',
+    warning: 'text-yellow-500',
+    error: 'text-red-600'
   }
   return classes[props.type]
 })

@@ -6,21 +6,21 @@
         v-if="showInstallPrompt"
         class="fixed bottom-4 left-4 right-4 md:left-auto md:right-4 md:max-w-sm z-50"
       >
-        <div class="bg-white dark:bg-dark-800 rounded-2xl shadow-2xl border border-neutral-200 dark:border-dark-700 p-6">
-          <div class="flex items-stretch sm:items-start gap-4">
+        <div class="bg-white dark:bg-dark-800 rounded shadow-80 border border-gray-200 dark:border-dark-700 p-6">
+          <div class="flex items-stretch sm:items-start gap-3">
             <!-- Icon -->
             <div class="shrink-0">
-              <div class="w-12 h-12 bg-nav-gradient rounded-xl flex items-center justify-center">
-                <span class="text-white text-responsive-xl">🌱</span>
+              <div class="w-12 h-10 bg-gradient-to-r from-blue-600 to-blue-700 rounded flex items-center justify-center">
+                <span class="text-white text-xl">🌱</span>
               </div>
             </div>
 
             <!-- Content -->
             <div class="flex-1">
-              <h3 class="font-semibold text-heading dark:text-white text-responsive-sm mb-1">
+              <h3 class="font-semibold text-gray-900 dark:text-white text-sm mb-1">
                 Installer Antigaspi
               </h3>
-              <p class="text-body dark:text-neutral-300 text-responsive-xs leading-relaxed mb-4">
+              <p class="text-gray-700 dark:text-gray-500 text-xs leading-relaxed mt-3">
                 Ajoutez Antigaspi à votre écran d'accueil pour un accès rapide et une expérience native.
               </p>
 
@@ -53,7 +53,7 @@
               variant="ghost"
               size="icon"
               :left-icon="X"
-              class="shrink-0 text-placeholder hover:text-body dark:hover:transition-colors"
+              class="shrink-0 text-gray-400 hover:text-gray-700 dark:hover:transition-colors"
               aria-label="Fermer"
               @click="dismissInstallPrompt"
             >
@@ -72,21 +72,21 @@
         v-if="showUpdatePrompt"
         class="fixed top-4 left-4 right-4 md:left-auto md:right-4 md:max-w-sm z-50"
       >
-        <div class="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-2xl shadow-xl p-6">
-          <div class="flex items-stretch sm:items-start gap-4">
+        <div class="bg-blue-50 dark:bg-secondary-900/20 border border-blue-200 dark:border-blue-800 rounded shadow-xl p-6">
+          <div class="flex items-stretch sm:items-start gap-3">
             <!-- Icon -->
             <div class="shrink-0">
-              <div class="w-10 h-10 bg-blue-500 rounded-lg flex items-center justify-center">
-                <RefreshCw class="w-5 h-5 text-white" />
+              <div class="h-6 w-6 bg-blue-500 rounded flex items-center justify-center">
+                <RefreshCw class="h-4 w-4 text-white" />
               </div>
             </div>
 
             <!-- Content -->
             <div class="flex-1">
-              <h3 class="font-semibold text-blue-900 dark:text-blue-100 text-responsive-sm mb-1">
+              <h3 class="font-semibold text-secondary-900 dark:text-secondary-100 text-sm mb-1">
                 Mise à jour disponible
               </h3>
-              <p class="text-blue-700 dark:text-blue-200 text-responsive-xs leading-relaxed mb-4">
+              <p class="text-secondary-700 dark:text-secondary-200 text-xs leading-relaxed mt-3">
                 Une nouvelle version d'Antigaspi est disponible avec des améliorations et corrections.
               </p>
 
@@ -119,7 +119,7 @@
               variant="ghost"
               size="icon"
               :left-icon="X"
-              class="shrink-0 text-blue-400 hover:text-info dark:hover:transition-colors"
+              class="shrink-0 text-secondary-400 hover:text-info dark:hover:transition-colors"
               aria-label="Fermer"
               @click="dismissUpdatePrompt"
             >
@@ -140,15 +140,15 @@
       >
         <div
           :class="[
-            'px-4 py-3 rounded-full shadow-lg text-responsive-sm font-medium flex items-center gap-2',
+            'px-3 py-3 rounded-full shadow-lg text-sm font-medium flex items-center gap-2',
             isOnline
-              ? 'bg-green-500 text-white'
+              ? 'bg-blue-500 text-white'
               : 'bg-red-500 text-white'
           ]"
         >
           <div
             :class="[
-              'w-2 h-2 rounded-full',
+              'h-4 w-4 rounded-full',
               isOnline ? 'bg-white' : 'bg-white animate-pulse'
             ]"
           />
@@ -211,7 +211,7 @@ const handleInstall = async () => {
       showInstallPrompt.value = false
       announce('Application installée avec succès')
     }
-  } catch (error) {
+  } catch {
     // console.error('Installation failed:', error)
     announce('Échec de l\'installation')
   } finally {
@@ -233,7 +233,7 @@ const handleUpdate = async () => {
   try {
     await updateServiceWorker()
     announce('Mise à jour en cours...')
-  } catch (error) {
+  } catch {
     // console.error('Update failed:', error)
     announce('Échec de la mise à jour')
   } finally {

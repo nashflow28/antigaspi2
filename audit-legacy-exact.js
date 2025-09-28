@@ -48,19 +48,7 @@ function analyzeFile(filePath) {
   const usages = classMatches.length;
 
   fileCount++;
-  totalLegacyUsages += usages; // FIX: Ajouter à totalLegacyUsages
-
-  if (usages > 0) {
-    legacyFiles.push({
-      file: filePath.replace('C:\\xampp\\htdocs\\antigaspi2\\frontend\\src\\', '').replace(/\\/g, '/'),
-      usages: usages
-    });
-  }
-}
-
-analyzeDirectory(frontendPath);
-
-// Calcul du score selon la formule officielle
+function analyzeFile(filePath) {  const content = fs.readFileSync(filePath, "utf8");  // VRAIE REGEX POUR LEGACY PATTERNS - Patterns custom non-standard seulement  const legacyPatterns = [    /btext-headingb/g,    /btext-bodyb/g,    /btext-mutedb/g,    /btext-placeholderb/g,    /bbg-surfaceb/g,    /bcontainer-2025b/g,    /btext-heading-secondaryb/g,    /btext-body-emphasisb/g,    /btext-primary-emphasisb/g  ];  let usages = 0;  legacyPatterns.forEach(pattern => {    const matches = content.match(pattern) || [];    usages += matches.length;  });  fileCount++;  totalLegacyUsages += usages;  if (usages > 0) {    legacyFiles.push({      file: filePath.replace("C:\xampp\htdocs\antigaspi2\frontend\src\\", "").replace(/\/g, "/"),      usages: usages    });  }}
 const score = Math.max(0, 100 - (totalLegacyUsages * 0.05));
 
 console.log('\n🎯 RÉSULTATS AUDIT EXACT');
@@ -122,4 +110,3 @@ if (score >= 95) {
   console.log('   🔴 INSUFFISANT - Migration critique requise');
 }
 
-console.log('\n=== FIN AUDIT EXACT ===');

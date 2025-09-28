@@ -1,6 +1,6 @@
 <template>
   <Card class="group overflow-hidden sm:block">
-    <div class="relative h-48 w-full">
+    <div class="relative h-8xl w-full">
       <img
         v-if="basket.image_url"
         :src="basket.image_url"
@@ -9,9 +9,9 @@
       >
       <div
         v-else
-        class="flex h-full w-full items-center justify-center bg-gradient-to-br from-primary-50 to-accent-blue/5"
+        class="flex h-full w-full items-center justify-center bg-gradient-to-br from-blue-50 to-blue-500/5"
       >
-        <Package class="h-12 w-12 text-primary-400" />
+        <Package class="h-6 w-6 text-blue-400" />
       </div>
 
       <div class="relative sm:absolute left-4 top-4 flex gap-2">
@@ -23,47 +23,47 @@
 
       <span
         v-if="timeLeft"
-        class="relative sm:absolute bottom-4 left-4 inline-flex items-center gap-2 rounded-full bg-white/90 px-4 py-3 text-responsive-xs font-medium text-body-emphasis shadow-modern-2025"
+        class="relative sm:absolute bottom-4 left-4 inline-flex items-center gap-2 rounded-full bg-white/90 px-3 py-3 text-xs font-medium text-gray-800 shadow-xl"
       >
-        <Clock class="h-5 w-5 text-primary-500" />
+        <Clock class="h-4 w-4 text-blue-500" />
         {{ timeLeft }}
       </span>
     </div>
 
     <div class="space-y-4 p-6">
-      <div class="space-y-2">
-        <h3 class="text-responsive-lg font-semibold text-heading group-hover:transition-colors">
+      <div class="space-y-4">
+        <h3 class="text-lg font-semibold text-gray-900 group-hover:transition-colors">
           {{ basket.name }}
         </h3>
-        <p v-if="basket.surprise_description" class="line-clamp-2 text-responsive-sm text-body">
+        <p v-if="basket.surprise_description" class="line-clamp-2 text-sm text-gray-700">
           {{ basket.surprise_description }}
         </p>
       </div>
 
-      <div class="flex flex-wrap items-center gap-3 text-responsive-sm text-muted">
-        <span class="inline-flex items-center gap-2 rounded-full bg-primary-50 px-4 py-3 text-primary-emphasis">
-          <Store class="h-5 w-5" />
+      <div class="flex flex-wrap items-center gap-3 text-sm text-gray-500">
+        <span class="inline-flex items-center gap-2 rounded-full bg-blue-50 px-3 py-3 text-blue-900">
+          <Store class="h-4 w-4" />
           {{ basket.merchant.business_name }}
         </span>
-        <span v-if="basket.category?.name" class="inline-flex items-center gap-2 rounded-full bg-accent-blue/5 px-4 py-3 text-accent-blue/90">
-          <Tag class="h-5 w-5" />
+        <span v-if="basket.category?.name" class="inline-flex items-center gap-2 rounded-full bg-blue-500/5 px-3 py-3 text-blue-500/90">
+          <Tag class="h-4 w-4" />
           {{ basket.category.name }}
         </span>
       </div>
 
       <div class="flex items-end justify-start sm:justify-between">
         <div>
-          <div class="text-responsive-xl font-semibold text-primary">{{ formattedDiscountedPrice }}</div>
-          <div v-if="formattedOriginalPrice" class="text-responsive-sm text-placeholder line-through">
+          <div class="text-xl font-semibold text-blue-600">{{ formattedDiscountedPrice }}</div>
+          <div v-if="formattedOriginalPrice" class="text-sm text-gray-400 line-through">
             {{ formattedOriginalPrice }}
           </div>
-          <div v-if="formattedSavings" class="text-responsive-xs text-primary font-medium">
+          <div v-if="formattedSavings" class="text-xs text-blue-600 font-medium">
             Économisez {{ formattedSavings }}
           </div>
         </div>
         <div class="flex flex-col gap-2">
           <button
-            class="button-ghost-2025 text-responsive-sm"
+            class="button-ghost-2025 text-sm"
             type="button"
             data-testid="surprise-basket-view"
             @click="$emit('view', basket)"
@@ -71,7 +71,7 @@
             Voir les détails
           </button>
           <button
-            class="button-primary-2025 text-responsive-sm"
+            class="button-primary-2025 text-sm"
             type="button"
             :disabled="basket.quantity_available === 0"
             data-testid="surprise-basket-reserve"

@@ -50,7 +50,7 @@ const meta: Meta<DarkModeToggleComponent & StoryProps> = {
     },
     template: `
       <div class="flex items-center gap-6">
-        <span class="text-small text-body dark:text-neutral-300">Basculer le thème</span>
+        <span class="text-sm text-gray-700 dark:text-gray-300">Basculer le thème</span>
         <DarkModeToggle />
       </div>
     `

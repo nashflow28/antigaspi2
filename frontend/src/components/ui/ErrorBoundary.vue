@@ -1,23 +1,23 @@
 <template>
   <div
     v-if="hasError"
-    class="flex min-h-[400px] items-center justify-center rounded-[32px] bg-gradient-to-br from-rose-50 via-red-50 to-red-100 px-6 py-10 sm:px-10"
+    class="flex min-h-[400px] items-center justify-center rounded-[32px] bg-gradient-to-br from-rose-50 via-red-50 to-red-100 px-4 py-12 sm:px-10"
   >
     <Card
       variant="elevated"
       rounded="xl"
-      class="w-full max-w-full sm:max-w-2xl space-y-6 bg-white/80 p-4 sm:p-6 lg:p-8 text-left sm:text-center shadow-xl backdrop-blur"
+      class="w-full max-w-full sm:max-w-80 space-y-6 bg-white/80 p-4 sm:p-6 lg:p-12 text-left sm:text-center shadow-xl backdrop-blur"
     >
-      <div class="flex flex-col items-center gap-4">
-        <div class="flex h-16 w-16 items-center justify-center rounded-full bg-red-100 text-error shadow-inner">
-          <AlertTriangle class="h-10 w-10" />
+      <div class="flex flex-col items-center gap-3">
+        <div class="flex icon-xl items-center justify-center rounded-full bg-red-100 text-red-600 shadow-inner">
+          <AlertTriangle class="h-8 w-8" />
         </div>
 
-        <div class="space-y-2">
-          <h2 class="text-responsive-xl font-semibold text-heading">
+        <div class="space-y-4">
+          <h2 class="text-xl font-semibold text-gray-900">
             {{ errorInfo.title || 'Une erreur est survenue' }}
           </h2>
-          <p class="text-responsive-base text-body">
+          <p class="text-base text-gray-700">
             {{ errorInfo.message || 'Nous nous excusons pour le désagrément. Veuillez réessayer ou contacter le support si le problème persiste.' }}
           </p>
         </div>
@@ -25,23 +25,23 @@
 
       <details
         v-if="isDev && errorDetails"
-        class="rounded-xl border border-neutral-200 bg-white/70 text-left shadow-sm"
+        class="rounded border border-gray-200 bg-white/70 text-left shadow-sm"
       >
-        <summary class="flex cursor-pointer items-center justify-start sm:justify-between gap-3 px-4 py-3 text-responsive-sm font-medium text-body-emphasis">
+        <summary class="flex cursor-pointer items-center justify-start sm:justify-between gap-3 px-3 py-3 text-sm font-medium text-gray-800">
           Détails techniques (Mode développement)
         </summary>
-        <div class="space-y-4 border-t border-neutral-100 bg-neutral-50/80 px-4 py-4 text-responsive-sm text-body-emphasis">
-          <div v-if="errorDetails.stack" class="space-y-2">
-            <h4 class="font-semibold text-heading-secondary">Stack Trace</h4>
-            <pre class="max-h-64 overflow-auto rounded-lg bg-neutral-900/90 p-3 text-responsive-xs text-neutral-100">{{ errorDetails.stack }}</pre>
+        <div class="space-y-4 border-t border-gray-100 bg-gray-50/80 px-3 py-4 text-sm text-gray-800">
+          <div v-if="errorDetails.stack" class="space-y-4">
+            <h4 class="font-semibold text-gray-800">Stack Trace</h4>
+            <pre class="max-h-9xl overflow-auto rounded bg-gray-900/90 p-3 text-xs text-gray-100">{{ errorDetails.stack }}</pre>
           </div>
-          <div v-if="errorDetails.info" class="space-y-2">
-            <h4 class="font-semibold text-heading-secondary">Informations Vue</h4>
-            <pre class="max-h-48 overflow-auto rounded-lg bg-neutral-900/90 p-3 text-responsive-xs text-neutral-100">{{ errorDetails.info }}</pre>
+          <div v-if="errorDetails.info" class="space-y-4">
+            <h4 class="font-semibold text-gray-800">Informations Vue</h4>
+            <pre class="max-h-8xl overflow-auto rounded bg-gray-900/90 p-3 text-xs text-gray-100">{{ errorDetails.info }}</pre>
           </div>
-          <div v-if="errorDetails.props" class="space-y-2">
-            <h4 class="font-semibold text-heading-secondary">Props du composant</h4>
-            <pre class="max-h-48 overflow-auto rounded-lg bg-neutral-900/90 p-3 text-responsive-xs text-neutral-100">{{ JSON.stringify(errorDetails.props, null, 2) }}</pre>
+          <div v-if="errorDetails.props" class="space-y-4">
+            <h4 class="font-semibold text-gray-800">Props du composant</h4>
+            <pre class="max-h-8xl overflow-auto rounded bg-gray-900/90 p-3 text-xs text-gray-100">{{ JSON.stringify(errorDetails.props, null, 2) }}</pre>
           </div>
         </div>
       </details>
@@ -53,7 +53,7 @@
           class="gap-2"
           @click="retry"
         >
-          <RefreshCw class="h-5 w-5" />
+          <RefreshCw class="h-4 w-4" />
           Réessayer
         </Button>
         <Button
@@ -62,7 +62,7 @@
           class="gap-2"
           @click="goHome"
         >
-          <Home class="h-5 w-5" />
+          <Home class="h-4 w-4" />
           Retour à l'accueil
         </Button>
         <Button
@@ -71,25 +71,25 @@
           class="gap-2"
           @click="clearError"
         >
-          <X class="h-5 w-5" />
+          <X class="h-4 w-4" />
           Effacer l'erreur
         </Button>
       </div>
 
-      <div v-if="props.showSupportInfo" class="space-y-3 rounded-xl bg-neutral-50/70 px-5 py-4 text-left sm:text-center">
-        <p class="text-responsive-sm text-body">
+      <div v-if="props.showSupportInfo" class="space-y-2 rounded bg-gray-50/70 px-xl py-4 text-left sm:text-center">
+        <p class="text-sm text-gray-700">
           Besoin d'aide ? Contactez notre support :
         </p>
-        <div class="flex flex-wrap items-center justify-center gap-2 text-responsive-sm font-medium text-body-emphasis">
+        <div class="flex flex-wrap items-center justify-center gap-2 text-sm font-medium text-gray-800">
           <a
             href="mailto:support@antigaspi.ci"
-            class="flex items-center gap-2 text-primary transition hover:text-primary-emphasis"
+            class="flex items-center gap-2 text-blue-600 transition hover:text-blue-900"
           >
-            <Mail class="h-5 w-5" />
+            <Mail class="h-4 w-4" />
             support@antigaspi.ci
           </a>
-          <span class="text-placeholder">•</span>
-          <span class="rounded-full bg-white px-4 py-3 text-responsive-xs font-semibold uppercase tracking-wide text-muted">
+          <span class="text-gray-400">•</span>
+          <span class="rounded-full bg-white px-3 py-3 text-xs font-semibold uppercase tracking-wide text-gray-500">
             ID: {{ errorId }}
           </span>
         </div>

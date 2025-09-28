@@ -2,7 +2,7 @@
   <div v-if="isDev && showDashboard" class="error-dashboard">
     <div class="dashboard-header">
       <div class="dashboard-title">
-        <Bug class="w-5 h-5" />
+        <Bug class="h-4 w-4" />
         <span>Error Dashboard</span>
         <span v-if="errorQueue.length > 0" class="error-count">{{ errorQueue.length }}</span>
       </div>
@@ -13,7 +13,7 @@
           title="Clear all errors"
           @click="clearAllErrors"
         >
-          <Trash2 class="w-5 h-5" />
+          <Trash2 class="h-4 w-4" />
         </Button>
         <Button
           variant="ghost"
@@ -21,7 +21,7 @@
           title="Close dashboard"
           @click="showDashboard = false"
         >
-          <X class="w-5 h-5" />
+          <X class="h-4 w-4" />
         </Button>
       </div>
     </div>
@@ -30,7 +30,7 @@
       <!-- Stats -->
       <div class="stats-grid">
         <Card class="stat-item">
-          <AlertTriangle class="w-5 h-5 text-red-500" />
+          <AlertTriangle class="h-4 w-4 text-red-500" />
           <div>
             <div class="stat-value">{{ errorQueue.length }}</div>
             <div class="stat-label">Erreurs en attente</div>
@@ -38,7 +38,7 @@
         </Card>
 
         <Card class="stat-item">
-          <Activity class="w-5 h-5 text-blue-500" />
+          <Activity class="h-4 w-4 text-blue-500" />
           <div>
             <div class="stat-value">{{ breadcrumbs.length }}</div>
             <div class="stat-label">Breadcrumbs</div>
@@ -46,7 +46,7 @@
         </Card>
 
         <Card class="stat-item">
-          <MousePointer class="w-5 h-5 text-green-500" />
+          <MousePointer class="h-4 w-4 text-green-600-500" />
           <div>
             <div class="stat-value">{{ userActions.length }}</div>
             <div class="stat-label">Actions utilisateur</div>
@@ -54,7 +54,7 @@
         </Card>
 
         <Card class="stat-item">
-          <Wifi class="w-5 h-5" :class="isOnline ? 'text-green-500' : 'text-red-500'" />
+          <Wifi class="h-4 w-4" :class="isOnline ? 'text-green-600-500' : 'text-red-500'" />
           <div>
             <div class="stat-value">{{ isOnline ? 'En ligne' : 'Hors ligne' }}</div>
             <div class="stat-label">Statut réseau</div>
@@ -73,7 +73,7 @@
           ]"
           @click="activeTab = tab.id"
         >
-          <component :is="tab.icon" class="w-5 h-5" />
+          <component :is="tab.icon" class="h-4 w-4" />
           {{ tab.label }}
         </button>
       </div>
@@ -83,7 +83,7 @@
         <!-- Errors Tab -->
         <div v-if="activeTab === 'errors'" class="errors-list">
           <div v-if="errorQueue.length === 0" class="empty-state">
-            <CheckCircle class="w-10 h-10 text-green-500" />
+            <CheckCircle class="h-6 w-6 text-green-600-500" />
             <p>Aucune erreur en attente</p>
           </div>
           <div v-else>
@@ -127,7 +127,7 @@
         <!-- Breadcrumbs Tab -->
         <div v-if="activeTab === 'breadcrumbs'" class="breadcrumbs-list">
           <div v-if="breadcrumbs.length === 0" class="empty-state">
-            <Navigation class="w-10 h-10 text-placeholder" />
+            <Navigation class="h-6 w-6 text-gray-400" />
             <p>Aucun breadcrumb enregistré</p>
           </div>
           <div v-else>
@@ -152,7 +152,7 @@
         <!-- User Actions Tab -->
         <div v-if="activeTab === 'actions'" class="actions-list">
           <div v-if="userActions.length === 0" class="empty-state">
-            <MousePointer class="w-10 h-10 text-placeholder" />
+            <MousePointer class="h-6 w-6 text-gray-400" />
             <p>Aucune action utilisateur enregistrée</p>
           </div>
           <div v-else>
@@ -183,7 +183,7 @@
     title="Open Error Dashboard"
     @click="showDashboard = true"
   >
-    <Bug class="w-5 h-5" />
+    <Bug class="h-4 w-4" />
     <Badge v-if="errorQueue.length > 0" variant="warning" class="toggle-indicator">{{ errorQueue.length }}</Badge>
   </button>
 </template>
@@ -256,7 +256,7 @@ if (typeof window !== 'undefined') {
   height: 600px;
   background: white;
   border: 1px solid #e5e7eb;
-  border-radius: 12px;
+  rounded: 12px;
   box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
   z-index: 9999;
   display: flex;
@@ -271,7 +271,7 @@ if (typeof window !== 'undefined') {
   padding: 16px 20px;
   border-bottom: 1px solid #e5e7eb;
   background: #f9fafb;
-  border-radius: 12px 12px 0 0;
+  rounded: 12px 12px 0 0;
 }
 
 .dashboard-title {
@@ -287,7 +287,7 @@ if (typeof window !== 'undefined') {
   color: white;
   font-size: 12px;
   padding: 2px 6px;
-  border-radius: 9999px;
+  rounded: 9999px;
   min-width: 20px;
   text-align: center;
 }
@@ -319,7 +319,7 @@ if (typeof window !== 'undefined') {
   gap: 8px;
   padding: 8px;
   background: #f9fafb;
-  border-radius: 6px;
+  rounded: 6px;
 }
 
 .stat-value {
@@ -385,7 +385,7 @@ if (typeof window !== 'undefined') {
 .action-item {
   padding: 12px;
   border: 1px solid #e5e7eb;
-  border-radius: 8px;
+  rounded: 8px;
   margin-bottom: 8px;
 }
 
@@ -409,14 +409,14 @@ if (typeof window !== 'undefined') {
   font-size: 11px;
   background: #f3f4f6;
   padding: 2px 6px;
-  border-radius: 4px;
+  rounded: 4px;
 }
 
 .error-severity,
 .error-category {
   font-size: 10px;
   padding: 2px 6px;
-  border-radius: 4px;
+  rounded: 4px;
   text-transform: uppercase;
   font-weight: 600;
 }
@@ -467,7 +467,7 @@ if (typeof window !== 'undefined') {
   background: #1f2937;
   color: #f9fafb;
   padding: 8px;
-  border-radius: 4px;
+  rounded: 4px;
   overflow-x: auto;
   font-size: 11px;
   margin-top: 8px;
@@ -489,7 +489,7 @@ if (typeof window !== 'undefined') {
   font-size: 11px;
   padding: 2px 6px;
   background: #e5e7eb;
-  border-radius: 4px;
+  rounded: 4px;
   text-transform: uppercase;
   font-weight: 600;
 }
@@ -504,7 +504,7 @@ if (typeof window !== 'undefined') {
 .breadcrumb-data,
 .action-data {
   background: #f9fafb;
-  border-radius: 4px;
+  rounded: 4px;
   padding: 8px;
   margin-top: 8px;
 }
@@ -532,7 +532,7 @@ if (typeof window !== 'undefined') {
   background: #dc2626;
   color: white;
   border: none;
-  border-radius: 50%;
+  rounded: 50%;
   cursor: pointer;
   box-shadow: 0 10px 25px -5px rgba(220, 38, 38, 0.4);
   z-index: 9998;

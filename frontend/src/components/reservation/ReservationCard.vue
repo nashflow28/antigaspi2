@@ -1,14 +1,14 @@
 <template>
   <Card class="hover:transition-all duration-300">
     <!-- En-tête avec statut -->
-    <div class="flex items-center justify-start sm:justify-between mb-4">
+    <div class="flex items-center justify-start sm:justify-between mt-3">
       <div class="flex items-center gap-3">
-        <div class="w-10 h-10 bg-primary-100 rounded-xl flex items-center justify-center">
-          <ShoppingBag class="w-5 h-5 text-primary" />
+        <div class="h-6 w-6 bg-blue-100 rounded flex items-center justify-center">
+          <ShoppingBag class="h-4 w-4 text-blue-600" />
         </div>
         <div>
-          <div class="font-medium text-heading">{{ reservation.reservation_code }}</div>
-          <div class="text-responsive-sm text-muted">
+          <div class="font-medium text-gray-900">{{ reservation.reservation_code }}</div>
+          <div class="text-sm text-gray-500">
             {{ formatDate(reservation.created_at) }}
           </div>
         </div>
@@ -42,29 +42,29 @@
           <div
             v-if="showActions"
             v-click-outside="() => showActions = false"
-            class="relative sm:absolute right-0 top-10 bg-white border border-neutral-200 rounded-xl shadow-card z-10 py-3 min-w-[150px]"
+            class="relative sm:absolute right-0 top-10 bg-white border border-gray-200 rounded shadow-lg z-10 py-3 min-w-[150px]"
           >
             <button
-              class="w-full px-4 py-3 text-left text-responsive-sm hover:bg-neutral-50 flex items-center gap-2"
+              class="w-full px-3 py-3 text-left text-sm hover:bg-gray-50 flex items-center gap-2"
               @click="$emit('view', reservation.id); showActions = false"
             >
-              <Eye class="w-5 h-5" />
+              <Eye class="h-4 w-4" />
               Voir détails
             </button>
             <button
               v-if="reservation.product.merchant.phone"
-              class="w-full px-4 py-3 text-left text-responsive-sm hover:bg-neutral-50 flex items-center gap-2"
+              class="w-full px-3 py-3 text-left text-sm hover:bg-gray-50 flex items-center gap-2"
               @click="$emit('contact', reservation); showActions = false"
             >
-              <Phone class="w-5 h-5" />
+              <Phone class="h-4 w-4" />
               Contacter
             </button>
             <button
               v-if="canCancel"
-              class="w-full px-4 py-3 text-left text-responsive-sm hover:bg-neutral-50 text-accent-red flex items-center gap-2"
+              class="w-full px-3 py-3 text-left text-sm hover:bg-gray-50 text-red-600 flex items-center gap-2"
               @click="$emit('cancel', reservation.id); showActions = false"
             >
-              <X class="w-5 h-5" />
+              <X class="h-4 w-4" />
               Annuler
             </button>
           </div>
@@ -73,42 +73,42 @@
     </div>
 
     <!-- Contenu principal -->
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-6">
       <!-- Informations produit -->
       <div>
-        <div class="flex items-stretch sm:items-start gap-4">
+        <div class="flex items-stretch sm:items-start gap-3">
           <!-- Image du produit -->
-          <div class="w-16 h-16 bg-gradient-to-br from-primary-100 to-accent-blue/10 rounded-xl flex items-center justify-center flex-shrink-0">
-            <Package class="w-10 h-10 text-primary-400" />
+          <div class="w-12 h-10 bg-gradient-to-br from-blue-100 to-blue-500/10 rounded flex items-center justify-center flex-shrink-0">
+            <Package class="h-6 w-6 text-blue-400" />
           </div>
 
           <!-- Détails produit -->
-          <div class="flex-1 min-w-0">
-            <h4 class="font-semibold text-heading mb-1 line-clamp-2">
+          <div class="flex-1 min-w-none">
+            <h4 class="font-semibold text-gray-900 mb-1 line-clamp-2">
               {{ reservation.product.name }}
             </h4>
-            <div class="flex items-center gap-2 text-responsive-sm text-body mb-2">
-              <MapPin class="w-5 h-5 flex-shrink-0" />
+            <div class="flex items-center gap-2 text-sm text-gray-700 mt-2">
+              <MapPin class="h-4 w-4 flex-shrink-0" />
               <span class="truncate">{{ reservation.product.merchant.name }}</span>
             </div>
-            <div class="text-responsive-sm text-muted">
+            <div class="text-sm text-gray-500">
               {{ reservation.product.merchant.address }}
             </div>
           </div>
         </div>
 
         <!-- Prix et quantité -->
-        <div class="mt-4 pt-4 border-t border-neutral-100">
-          <div class="flex items-center justify-start sm:justify-between text-responsive-sm">
+        <div class="mt-4 padding-t-lg border-t border-gray-100">
+          <div class="flex items-center justify-start sm:justify-between text-sm">
             <div class="flex items-center gap-2">
-              <span class="text-body">Quantité:</span>
+              <span class="text-gray-700">Quantité:</span>
               <span class="font-medium">{{ reservation.quantity }}</span>
             </div>
             <div class="flex items-center gap-2">
-              <span class="text-responsive-lg font-semibold text-primary">
+              <span class="text-lg font-semibold text-blue-600">
                 {{ formatPrice(reservation.discounted_price * reservation.quantity) }}
               </span>
-              <span class="text-responsive-sm text-placeholder line-through">
+              <span class="text-sm text-gray-400 line-through">
                 {{ formatPrice(reservation.original_price * reservation.quantity) }}
               </span>
             </div>
@@ -120,14 +120,14 @@
       <div>
         <div class="space-y-4">
           <!-- Informations paiement -->
-          <div v-if="paymentStatus" class="bg-primary-50 rounded-xl p-3 border border-primary-100">
-            <div class="flex items-center justify-start sm:justify-between mb-2">
-              <span class="text-responsive-sm font-medium text-primary-emphasis">Paiement</span>
-              <span class="text-responsive-sm font-semibold text-primary-800">
+          <div v-if="paymentStatus" class="bg-blue-50 rounded p-3 border border-blue-100">
+            <div class="flex items-center justify-start sm:justify-between mt-2">
+              <span class="text-sm font-medium text-blue-900">Paiement</span>
+              <span class="text-sm font-semibold text-blue-800">
                 {{ paymentStatusLabels[paymentStatus] }}
               </span>
             </div>
-            <div v-if="latestPayment" class="space-y-2 text-responsive-xs text-primary-emphasis">
+            <div v-if="latestPayment" class="space-y-4 text-xs text-blue-900">
               <div class="flex items-center justify-start sm:justify-between">
                 <span>Méthode</span>
                 <span class="font-medium">{{ paymentMethodLabels[latestPayment.payment_method] }}</span>
@@ -145,21 +145,21 @@
                 <span class="font-medium">{{ latestPayment.reference }}</span>
               </div>
             </div>
-            <div v-else class="text-responsive-xs text-primary-emphasis">
+            <div v-else class="text-xs text-blue-900">
               Paiement en cours de synchronisation…
             </div>
           </div>
 
           <!-- Date et heure de retrait -->
           <div class="flex items-center gap-3">
-            <div class="w-10 h-10 bg-accent-blue/10 rounded-lg flex items-center justify-center">
-              <Clock class="w-5 h-5 text-accent-blue" />
+            <div class="h-6 w-6 bg-blue-500/10 rounded flex items-center justify-center">
+              <Clock class="h-4 w-4 text-blue-500" />
             </div>
             <div>
-              <div class="font-medium text-heading">
+              <div class="font-medium text-gray-900">
                 {{ formatPickupDate(reservation.pickup_date) }}
               </div>
-              <div class="text-responsive-sm text-muted">
+              <div class="text-sm text-gray-500">
                 {{ formatPickupTime(reservation.pickup_date) }}
               </div>
             </div>
@@ -167,30 +167,30 @@
 
           <!-- Notes de retrait -->
           <div v-if="reservation.pickup_notes" class="flex items-stretch sm:items-start gap-3">
-            <div class="w-10 h-10 bg-accent-orange/10 rounded-lg flex items-center justify-center flex-shrink-0">
-              <MessageCircle class="w-5 h-5 text-accent-orange" />
+            <div class="h-6 w-6 bg-orange-500/10 rounded flex items-center justify-center flex-shrink-0">
+              <MessageCircle class="h-4 w-4 text-orange-500" />
             </div>
-            <div class="text-responsive-sm text-body">
+            <div class="text-sm text-gray-700">
               {{ reservation.pickup_notes }}
             </div>
           </div>
 
           <!-- Countdown ou statut -->
           <div v-if="reservation.status !== 'completed' && reservation.status !== 'cancelled' && reservation.status !== 'expired'">
-            <div class="bg-neutral-50 rounded-xl p-3">
+            <div class="bg-gray-50 rounded p-3">
               <div class="flex items-center justify-start sm:justify-between">
-                <span class="text-responsive-sm font-medium text-body-emphasis">
+                <span class="text-sm font-medium text-gray-800">
                   {{ getStatusMessage() }}
                 </span>
-                <span v-if="timeLeft && timeLeft.total > 0" class="text-responsive-sm font-semibold text-accent-orange">
+                <span v-if="timeLeft && timeLeft.total > 0" class="text-sm font-semibold text-orange-500">
                   {{ formatTimeLeft() }}
                 </span>
               </div>
 
               <!-- Barre de progression pour le temps restant -->
-              <div v-if="timeLeft && timeLeft.total > 0" class="mt-2 w-full bg-neutral-200 rounded-full h-1">
+              <div v-if="timeLeft && timeLeft.total > 0" class="mt-2 w-full bg-gray-200 rounded-full h-3">
                 <div
-                  class="bg-accent-orange h-1 rounded-full transition-all duration-300"
+                  class="bg-orange-500 h-3 rounded-full transition-all duration-300"
                   :style="{ width: `${Math.max(0, Math.min(100, (timeLeft.total / (24 * 60 * 60 * 1000)) * 100))}%` }"
                 />
               </div>
@@ -198,17 +198,17 @@
           </div>
 
           <!-- Impact environnemental -->
-          <div v-if="reservation.status === 'completed'" class="bg-primary-50 rounded-xl p-3">
-            <div class="flex items-center gap-2 mb-2">
-              <Leaf class="w-5 h-5 text-primary" />
-              <span class="text-responsive-sm font-medium text-primary-800">Impact positif</span>
+          <div v-if="reservation.status === 'completed'" class="bg-blue-50 rounded p-3">
+            <div class="flex items-center gap-2 mt-2">
+              <Leaf class="h-4 w-4 text-blue-600" />
+              <span class="text-sm font-medium text-blue-800">Impact positif</span>
             </div>
-            <div class="grid grid-cols-2 gap-4 text-responsive-xs">
-              <div class="text-primary-emphasis">
+            <div class="grid grid-cols-2 gap-3 text-xs">
+              <div class="text-blue-900">
                 <div class="font-semibold">{{ reservation.quantity }}kg</div>
                 <div>Nourriture sauvée</div>
               </div>
-              <div class="text-primary-emphasis">
+              <div class="text-blue-900">
                 <div class="font-semibold">{{ (reservation.quantity * 2.5).toFixed(1) }}kg</div>
                 <div>CO₂ évité</div>
               </div>
@@ -219,7 +219,7 @@
     </div>
 
     <!-- Actions en bas -->
-    <div v-if="!isExpiredOrCancelled" class="flex items-center justify-start sm:justify-between mt-6 pt-4 border-t border-neutral-100">
+    <div v-if="!isExpiredOrCancelled" class="flex items-center justify-start sm:justify-between mt-6 padding-t-lg border-t border-gray-100">
       <div class="flex items-center gap-2">
         <Button
           v-if="reservation.product.merchant.phone"
@@ -244,7 +244,7 @@
         v-if="canCancel"
         variant="ghost"
         size="sm"
-        class="text-accent-red hover:bg-accent-red/10"
+        class="text-red-600 hover:bg-red-600/10"
         :left-icon="X"
         @click="$emit('cancel', reservation.id)"
       >
@@ -289,12 +289,12 @@ const timeLeft = ref<{
 
 // Classes de statut
 const statusClasses = {
-  pending: 'bg-accent-orange/15 text-accent-orange/95',
-  confirmed: 'bg-accent-blue/10 text-accent-blue/95',
-  ready: 'bg-primary-100 text-primary-800',
-  completed: 'bg-primary-100 text-primary-800',
-  cancelled: 'bg-neutral-100 text-body',
-  expired: 'bg-accent-red/15 text-accent-red/95'
+  pending: 'bg-orange-500/15 text-orange-500/95',
+  confirmed: 'bg-blue-500/10 text-blue-500/95',
+  ready: 'bg-blue-100 text-blue-800',
+  completed: 'bg-blue-100 text-blue-800',
+  cancelled: 'bg-gray-100 text-gray-700',
+  expired: 'bg-red-600/15 text-red-600/95'
 }
 
 const statusLabels = {
@@ -307,11 +307,11 @@ const statusLabels = {
 }
 
 const paymentStatusClasses = {
-  pending: 'bg-accent-orange/15 text-accent-orange/95',
-  success: 'bg-primary-100 text-primary-800',
-  failed: 'bg-accent-red/15 text-accent-red/95',
-  on_site: 'bg-accent-blue/10 text-accent-blue/95',
-  refunded: 'bg-neutral-100 text-body-emphasis'
+  pending: 'bg-orange-500/15 text-orange-500/95',
+  success: 'bg-blue-100 text-blue-800',
+  failed: 'bg-red-600/15 text-red-600/95',
+  on_site: 'bg-blue-500/10 text-blue-500/95',
+  refunded: 'bg-gray-100 text-gray-800'
 } as const
 
 const paymentStatusLabels = {

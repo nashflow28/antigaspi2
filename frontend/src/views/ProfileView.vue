@@ -1,10 +1,10 @@
 <template>
-  <div class="min-h-screen bg-gradient-to-br from-neutral-50 via-white to-primary-50 p-6">
+  <div class="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50 p-6">
     <div class="max-w-full sm:max-w-4xl mx-auto">
-      <Card variant="elevated" class="mb-6 sm:mb-8">
-        <div class="p-4 sm:p-6 lg:p-8">
-          <h1 class="text-responsive-xl font-semibold mb-4">Mon Profil</h1>
-          <p class="text-body">Gestion des informations personnelles</p>
+      <Card variant="elevated" class="mt-4 sm:mb-3xl">
+        <div class="p-4 sm:p-6 lg:p-12">
+          <h1 class="text-xl font-semibold mt-3">Mon Profil</h1>
+          <p class="text-gray-700">Gestion des informations personnelles</p>
 
           <!-- Performance Demo Integration -->
           <div class="mt-8">

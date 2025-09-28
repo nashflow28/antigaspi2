@@ -6,24 +6,24 @@
   >
     <div class="p-6">
       <!-- Header -->
-      <div class="mb-6 sm:mb-8">
-        <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 sm:gap-6">
+      <div class="mt-4 sm:mb-3xl">
+        <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3 sm:gap-6">
           <div>
-            <h1 class="text-responsive-xl lg:text-display-sm font-semibold text-heading mb-2">
+            <h1 class="text-xl lg:text-3xl font-semibold text-gray-900 mt-2">
               Modération des Avis
             </h1>
-            <p class="text-body text-responsive-lg">
+            <p class="text-gray-700 text-lg">
               Gérez les avis en attente et les signalements
             </p>
           </div>
 
-          <div class="flex flex-col sm:flex-row gap-4">
+          <div class="flex flex-col sm:flex-row gap-3">
             <Button
               variant="outline"
               :disabled="loading"
               @click="refreshData"
             >
-              <RefreshCw class="w-5 h-5 mr-2" :class="{ 'animate-spin': loading }" />
+              <RefreshCw class="h-4 w-4 mr-2" :class="{ 'animate-spin': loading }" />
               Actualiser
             </Button>
           </div>
@@ -31,18 +31,18 @@
       </div>
 
       <!-- Statistics Cards -->
-      <div v-if="stats" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-6 sm:mb-8">
+      <div v-if="stats" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6 mt-4 sm:mb-3xl">
         <Card class="bg-gradient-to-r from-orange-500 to-orange-600 text-white">
           <div class="flex items-center justify-between">
             <div>
-              <p class="text-orange-100 text-responsive-sm font-medium">Avis en attente</p>
-              <p class="text-responsive-xl font-semibold">{{ stats.pending_reviews }}</p>
-              <p class="text-orange-200 text-responsive-sm mt-1">
+              <p class="text-orange-100 text-sm font-medium">Avis en attente</p>
+              <p class="text-xl font-semibold">{{ stats.pending_reviews }}</p>
+              <p class="text-orange-200 text-sm mt-1">
                 À modérer
               </p>
             </div>
-            <div class="p-3 bg-white/20 rounded-xl">
-              <Clock class="w-10 h-10" />
+            <div class="p-3 bg-white/20 rounded">
+              <Clock class="h-6 w-6" />
             </div>
           </div>
         </Card>
@@ -50,14 +50,14 @@
         <Card class="bg-gradient-to-r from-red-500 to-red-600 text-white">
           <div class="flex items-center justify-between">
             <div>
-              <p class="text-red-100 text-responsive-sm font-medium">Signalements</p>
-              <p class="text-responsive-xl font-semibold">{{ stats.pending_reports }}</p>
-              <p class="text-red-200 text-responsive-sm mt-1">
+              <p class="text-red-100 text-sm font-medium">Signalements</p>
+              <p class="text-xl font-semibold">{{ stats.pending_reports }}</p>
+              <p class="text-red-200 text-sm mt-1">
                 En attente
               </p>
             </div>
-            <div class="p-3 bg-white/20 rounded-xl">
-              <AlertTriangle class="w-10 h-10" />
+            <div class="p-3 bg-white/20 rounded">
+              <AlertTriangle class="h-6 w-6" />
             </div>
           </div>
         </Card>
@@ -65,14 +65,14 @@
         <Card class="bg-gradient-to-r from-blue-500 to-blue-600 text-white">
           <div class="flex items-center justify-between">
             <div>
-              <p class="text-blue-100 text-responsive-sm font-medium">Avis aujourd'hui</p>
-              <p class="text-responsive-xl font-semibold">{{ stats.reviews_today }}</p>
-              <p class="text-blue-200 text-responsive-sm mt-1">
+              <p class="text-secondary-100 text-sm font-medium">Avis aujourd'hui</p>
+              <p class="text-xl font-semibold">{{ stats.reviews_today }}</p>
+              <p class="text-secondary-200 text-sm mt-1">
                 Nouveaux avis
               </p>
             </div>
-            <div class="p-3 bg-white/20 rounded-xl">
-              <MessageSquare class="w-10 h-10" />
+            <div class="p-3 bg-white/20 rounded">
+              <MessageSquare class="h-6 w-6" />
             </div>
           </div>
         </Card>
@@ -80,48 +80,48 @@
         <Card class="bg-gradient-to-r from-green-500 to-green-600 text-white">
           <div class="flex items-center justify-between">
             <div>
-              <p class="text-green-100 text-responsive-sm font-medium">Traités</p>
-              <p class="text-responsive-xl font-semibold">{{ stats.resolved_reports }}</p>
-              <p class="text-green-200 text-responsive-sm mt-1">
+              <p class="text-blue-100 text-sm font-medium">Traités</p>
+              <p class="text-xl font-semibold">{{ stats.resolved_reports }}</p>
+              <p class="text-blue-200 text-sm mt-1">
                 Signalements résolus
               </p>
             </div>
-            <div class="p-3 bg-white/20 rounded-xl">
-              <CheckCircle class="w-10 h-10" />
+            <div class="p-3 bg-white/20 rounded">
+              <CheckCircle class="h-6 w-6" />
             </div>
           </div>
         </Card>
       </div>
 
       <!-- Tabs Navigation -->
-      <div class="mb-6 sm:mb-8">
-        <div class="border-b border-neutral-200">
-          <nav class="-mb-px flex space-y-8 sm:space-y-0 sm:space-x-8">
+      <div class="mt-4 sm:mb-3xl">
+        <div class="border-b border-gray-200">
+          <nav class="-mb-px flex space-y-8 sm:space-x-8">
             <button
               :class="[
-                'py-3 px-1 border-b-2 font-medium text-responsive-sm',
+                'py-3 px-1 border-b-2 font-medium text-sm',
                 activeTab === 'pending'
-                  ? 'border-primary-500 text-primary'
-                  : 'border-transparent text-muted hover:text-body-emphasis hover:border-neutral-300'
+                  ? 'border-blue-500 text-blue-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-800 hover:border-gray-300'
               ]"
               @click="activeTab = 'pending'"
             >
               Avis en attente
-              <span v-if="stats?.pending_reviews" class="ml-2 px-4 py-3 text-responsive-xs bg-orange-100 text-orange-800 rounded-full">
+              <span v-if="stats?.pending_reviews" class="ml-2 px-3 py-3 text-xs bg-yellow-100 text-yellow-800 rounded-full">
                 {{ stats.pending_reviews }}
               </span>
             </button>
             <button
               :class="[
-                'py-3 px-1 border-b-2 font-medium text-responsive-sm',
+                'py-3 px-1 border-b-2 font-medium text-sm',
                 activeTab === 'reported'
-                  ? 'border-primary-500 text-primary'
-                  : 'border-transparent text-muted hover:text-body-emphasis hover:border-neutral-300'
+                  ? 'border-blue-500 text-blue-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-800 hover:border-gray-300'
               ]"
               @click="activeTab = 'reported'"
             >
               Avis signalés
-              <span v-if="stats?.pending_reports" class="ml-2 px-4 py-3 text-responsive-xs bg-red-100 text-red-800 rounded-full">
+              <span v-if="stats?.pending_reports" class="ml-2 px-3 py-3 text-xs bg-red-100 text-red-800 rounded-full">
                 {{ stats.pending_reports }}
               </span>
             </button>

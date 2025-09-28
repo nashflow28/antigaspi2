@@ -1,25 +1,25 @@
 <template>
-  <section class="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+  <section class="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
     <template v-for="(stat, index) in stats" :key="stat.label">
       <Motion
         tag="div"
-        class="rounded-3xl border border-primary-500/15 bg-white/90 p-6 shadow-card backdrop-blur-md transition-all dark:bg-neutral-900/80"
+        class="rounded border border-blue-500/15 bg-white/90 p-6 shadow-lg backdrop-blur-md transition-all dark:bg-gray-900/80"
         :initial="{ opacity: 0, y: 16 }"
         :enter="{ opacity: 1, y: 0, transition: { duration: 0.4, delay: index * 0.08 } }"
       >
         <slot name="stat" :stat="stat" :index="index">
           <div class="flex items-center justify-start sm:justify-between">
-            <span class="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary-500/15 text-primary-emphasis dark:text-primary-200">
+            <span class="flex h-6 w-6 items-center justify-center rounded bg-blue-500/15 text-blue-900 dark:text-blue-200">
               <component :is="stat.icon" v-if="stat.icon" />
             </span>
-            <span class="text-caption uppercase tracking-[0.18em] text-primary-500">Impact</span>
+            <span class="text-xs uppercase tracking-[0.18em] text-blue-500">Impact</span>
           </div>
 
-          <div class="mt-4 flex items-baseline gap-2 text-h1 text-primary-emphasis dark:text-primary-100">
+          <div class="mt-4 flex items-baseline gap-2 text-h1 text-blue-900 dark:text-blue-100">
             <AnimatedCounter :value="stat.value" />
-            <span v-if="stat.suffix" class="text-small font-medium text-primary-500/80">{{ stat.suffix }}</span>
+            <span v-if="stat.suffix" class="text-sm font-medium text-blue-500/80">{{ stat.suffix }}</span>
           </div>
-          <p class="mt-2 text-small text-muted dark:text-neutral-300">{{ stat.label }}</p>
+          <p class="mt-2 text-sm text-gray-500 dark:text-gray-500">{{ stat.label }}</p>
         </slot>
       </Motion>
     </template>

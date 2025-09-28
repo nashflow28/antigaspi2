@@ -90,10 +90,10 @@ const computedClasses = computed(() => {
 
 const sizeClasses = computed(() => {
   const sizes = {
-    xs: 'px-2 py-0.5 text-xs rounded',
-    sm: 'px-2.5 py-1 text-xs rounded-md',
-    md: 'px-3 py-1.5 text-sm rounded-md',
-    lg: 'px-4 py-2 text-base rounded-lg'
+    xs: 'px-3 py-1 text-xs rounded',
+    sm: 'px-2 py-xs text-xs rounded',
+    md: 'px-3 py-1 text-sm rounded',
+    lg: 'px-3 py-2 text-base rounded'
   }
   return sizes[props.size]
 })
@@ -101,24 +101,24 @@ const sizeClasses = computed(() => {
 const variantClasses = computed(() => {
   const variants = {
     default: [
-      'bg-neutral-100 text-heading-secondary',
-      'hover:bg-neutral-200'
+      'bg-gray-100 text-gray-800',
+      'hover:bg-gray-200'
     ].join(' '),
 
     primary: [
-      'bg-primary-100 text-primary-800',
-      'hover:bg-primary-200',
+      'bg-blue-100 text-blue-800',
+      'hover:bg-blue-200',
       'ring-1 ring-primary-600/20'
     ].join(' '),
 
     secondary: [
-      'bg-neutral-100 text-body',
-      'hover:bg-neutral-200'
+      'bg-gray-100 text-gray-700',
+      'hover:bg-gray-200'
     ].join(' '),
 
     success: [
       'bg-green-100 text-green-800',
-      'hover:bg-green-200',
+      'hover:bg-blue-200',
       'ring-1 ring-green-600/20'
     ].join(' '),
 
@@ -135,15 +135,15 @@ const variantClasses = computed(() => {
     ].join(' '),
 
     info: [
-      'bg-blue-100 text-blue-800',
-      'hover:bg-blue-200',
+      'bg-blue-100 text-gray-800',
+      'hover:bg-secondary-200',
       'ring-1 ring-blue-600/20'
     ].join(' '),
 
     outline: [
-      'bg-transparent text-body',
-      'border border-neutral-300',
-      'hover:bg-neutral-50 hover:text-heading'
+      'bg-transparent text-gray-700',
+      'border border-gray-300',
+      'hover:bg-gray-50 hover:text-gray-900'
     ].join(' ')
   }
 

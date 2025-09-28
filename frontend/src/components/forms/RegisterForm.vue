@@ -2,15 +2,15 @@
   <form class="space-y-6" @submit.prevent="handleSubmit">
     <!-- Role Selection -->
     <div>
-      <label class="block text-responsive-sm font-medium text-body-emphasis mb-3">
+      <label class="block text-sm font-medium text-gray-800 mb-2">
         Je souhaite m'inscrire en tant que :
       </label>
-      <div class="grid grid-cols-2 gap-4">
+      <div class="grid grid-cols-2 gap-3">
         <label
-          class="relative flex cursor-pointer rounded-lg border p-4 focus:outline-none"
+          class="relative flex cursor-pointer rounded border p-4 focus:outline-none"
           :class="form.role === 'consumer'
-            ? 'border-primary-600 bg-primary-50 text-primary-900'
-            : 'border-neutral-300 bg-white text-heading hover:bg-neutral-50'"
+            ? 'border-blue-600 bg-blue-50 text-blue-900'
+            : 'border-gray-300 bg-white text-gray-900 hover:bg-gray-50'"
         >
           <input
             v-model="form.role"
@@ -20,20 +20,20 @@
           >
           <div class="flex flex-col">
             <div class="flex items-center">
-              <span class="text-responsive-xl mr-2">🛒</span>
-              <span class="block text-responsive-sm font-medium">Consommateur</span>
+              <span class="text-xl mr-2">🛒</span>
+              <span class="block text-sm font-medium">Consommateur</span>
             </div>
-            <span class="mt-1 block text-responsive-xs text-muted">
+            <span class="mt-1 block text-xs text-gray-500">
               Découvrir et réserver des produits
             </span>
           </div>
         </label>
 
         <label
-          class="relative flex cursor-pointer rounded-lg border p-4 focus:outline-none"
+          class="relative flex cursor-pointer rounded border p-4 focus:outline-none"
           :class="form.role === 'merchant'
-            ? 'border-primary-600 bg-primary-50 text-primary-900'
-            : 'border-neutral-300 bg-white text-heading hover:bg-neutral-50'"
+            ? 'border-blue-600 bg-blue-50 text-blue-900'
+            : 'border-gray-300 bg-white text-gray-900 hover:bg-gray-50'"
         >
           <input
             v-model="form.role"
@@ -43,22 +43,22 @@
           >
           <div class="flex flex-col">
             <div class="flex items-center">
-              <span class="text-responsive-xl mr-2">🏪</span>
-              <span class="block text-responsive-sm font-medium">Commerçant</span>
+              <span class="text-xl mr-2">🏪</span>
+              <span class="block text-sm font-medium">Commerçant</span>
             </div>
-            <span class="mt-1 block text-responsive-xs text-muted">
+            <span class="mt-1 block text-xs text-gray-500">
               Vendre mes invendus
             </span>
           </div>
         </label>
       </div>
-      <p v-if="errors.role" class="mt-1 text-responsive-sm text-error">{{ errors.role }}</p>
+      <p v-if="errors.role" class="mt-1 text-sm text-red-600">{{ errors.role }}</p>
     </div>
 
     <!-- Personal Information -->
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
       <div>
-        <label for="first_name" class="block text-responsive-sm font-medium text-body-emphasis mb-2">
+        <label for="first_name" class="block text-sm font-medium text-gray-800 mt-2">
           Prénom
         </label>
         <input
@@ -71,11 +71,11 @@
           :class="{ 'border-red-500': errors.first_name }"
           placeholder="Votre prénom"
         >
-        <p v-if="errors.first_name" class="mt-1 text-responsive-sm text-error">{{ errors.first_name }}</p>
+        <p v-if="errors.first_name" class="mt-1 text-sm text-red-600">{{ errors.first_name }}</p>
       </div>
 
       <div>
-        <label for="last_name" class="block text-responsive-sm font-medium text-body-emphasis mb-2">
+        <label for="last_name" class="block text-sm font-medium text-gray-800 mt-2">
           Nom
         </label>
         <input
@@ -88,13 +88,13 @@
           :class="{ 'border-red-500': errors.last_name }"
           placeholder="Votre nom"
         >
-        <p v-if="errors.last_name" class="mt-1 text-responsive-sm text-error">{{ errors.last_name }}</p>
+        <p v-if="errors.last_name" class="mt-1 text-sm text-red-600">{{ errors.last_name }}</p>
       </div>
     </div>
 
     <!-- Contact Information -->
     <div>
-      <label for="email" class="block text-responsive-sm font-medium text-body-emphasis mb-2">
+      <label for="email" class="block text-sm font-medium text-gray-800 mt-2">
         Adresse e-mail
       </label>
       <input
@@ -107,12 +107,12 @@
         :class="{ 'border-red-500': errors.email }"
         placeholder="votre@email.com"
       >
-      <p v-if="errors.email" class="mt-1 text-responsive-sm text-error">{{ errors.email }}</p>
+      <p v-if="errors.email" class="mt-1 text-sm text-red-600">{{ errors.email }}</p>
     </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
       <div>
-        <label for="phone" class="block text-responsive-sm font-medium text-body-emphasis mb-2">
+        <label for="phone" class="block text-sm font-medium text-gray-800 mt-2">
           Téléphone
         </label>
         <input
@@ -124,11 +124,11 @@
           :class="{ 'border-red-500': errors.phone }"
           placeholder="+225 XX XX XX XX XX"
         >
-        <p v-if="errors.phone" class="mt-1 text-responsive-sm text-error">{{ errors.phone }}</p>
+        <p v-if="errors.phone" class="mt-1 text-sm text-red-600">{{ errors.phone }}</p>
       </div>
 
       <div>
-        <label for="city" class="block text-responsive-sm font-medium text-body-emphasis mb-2">
+        <label for="city" class="block text-sm font-medium text-gray-800 mt-2">
           Ville
         </label>
         <input
@@ -140,17 +140,17 @@
           :class="{ 'border-red-500': errors.city }"
           placeholder="Abidjan, Bouaké, Yamoussoukro..."
         >
-        <p v-if="errors.city" class="mt-1 text-responsive-sm text-error">{{ errors.city }}</p>
+        <p v-if="errors.city" class="mt-1 text-sm text-red-600">{{ errors.city }}</p>
       </div>
     </div>
 
     <!-- Business Information (for merchants) -->
     <template v-if="form.role === 'merchant'">
-      <div class="border-t border-neutral-200 pt-6">
-        <h3 class="text-responsive-lg font-medium text-heading mb-4">Informations commerciales</h3>
+      <div class="border-t border-gray-200 pt-8">
+        <h3 class="text-lg font-medium text-gray-900 mt-3">Informations commerciales</h3>
 
         <div>
-          <label for="business_name" class="block text-responsive-sm font-medium text-body-emphasis mb-2">
+          <label for="business_name" class="block text-sm font-medium text-gray-800 mt-2">
             Nom de l'entreprise
           </label>
           <input
@@ -162,11 +162,11 @@
             :class="{ 'border-red-500': errors.business_name }"
             placeholder="Nom de votre commerce"
           >
-          <p v-if="errors.business_name" class="mt-1 text-responsive-sm text-error">{{ errors.business_name }}</p>
+          <p v-if="errors.business_name" class="mt-1 text-sm text-red-600">{{ errors.business_name }}</p>
         </div>
 
         <div class="mt-4">
-          <label for="business_type" class="block text-responsive-sm font-medium text-body-emphasis mb-2">
+          <label for="business_type" class="block text-sm font-medium text-gray-800 mt-2">
             Type de commerce
           </label>
           <select
@@ -188,14 +188,14 @@
             <option value="Traiteur">Traiteur</option>
             <option value="Autre">Autre</option>
           </select>
-          <p v-if="errors.business_type" class="mt-1 text-responsive-sm text-error">{{ errors.business_type }}</p>
+          <p v-if="errors.business_type" class="mt-1 text-sm text-red-600">{{ errors.business_type }}</p>
         </div>
       </div>
     </template>
 
     <!-- Password -->
     <div>
-      <label for="password" class="block text-responsive-sm font-medium text-body-emphasis mb-2">
+      <label for="password" class="block text-sm font-medium text-gray-800 mt-2">
         Mot de passe
       </label>
       <div class="relative">
@@ -211,12 +211,12 @@
         >
         <button
           type="button"
-          class="relative sm:absolute inset-y-0 right-0 pr-3 flex items-center text-placeholder hover:text-body"
+          class="relative sm:absolute inset-y-0 right-0 pr-4 flex items-center text-gray-400 hover:text-gray-700"
           @click="togglePasswordVisibility"
         >
           <svg
             v-if="!showPassword"
-            class="w-5 h-5"
+            class="w-4 h-4"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -236,7 +236,7 @@
           </svg>
           <svg
             v-else
-            class="w-5 h-5"
+            class="w-4 h-4"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -250,11 +250,11 @@
           </svg>
         </button>
       </div>
-      <p v-if="errors.password" class="mt-1 text-responsive-sm text-error">{{ errors.password }}</p>
+      <p v-if="errors.password" class="mt-1 text-sm text-red-600">{{ errors.password }}</p>
     </div>
 
     <div>
-      <label for="password_confirmation" class="block text-responsive-sm font-medium text-body-emphasis mb-2">
+      <label for="password_confirmation" class="block text-sm font-medium text-gray-800 mt-2">
         Confirmer le mot de passe
       </label>
       <input
@@ -267,7 +267,7 @@
         :class="{ 'border-red-500': errors.password_confirmation }"
         placeholder="Retapez votre mot de passe"
       >
-      <p v-if="errors.password_confirmation" class="mt-1 text-responsive-sm text-error">{{ errors.password_confirmation }}</p>
+      <p v-if="errors.password_confirmation" class="mt-1 text-sm text-red-600">{{ errors.password_confirmation }}</p>
     </div>
 
     <!-- Terms and Conditions -->
@@ -277,16 +277,16 @@
         v-model="form.acceptTerms"
         type="checkbox"
         required
-        class="h-5 w-5 text-primary focus:ring-primary-500 border-neutral-300 rounded mt-1"
+        class="w-4 h-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded mt-1"
       >
-      <label for="terms" class="ml-2 block text-responsive-sm text-heading">
+      <label for="terms" class="ml-2 block text-sm text-gray-900">
         J'accepte les
-        <a href="#" class="text-primary hover:text-primary-500">conditions d'utilisation</a>
+        <a href="#" class="text-blue-600 hover:text-blue-700">conditions d'utilisation</a>
         et la
-        <a href="#" class="text-primary hover:text-primary-500">politique de confidentialité</a>
+        <a href="#" class="text-blue-600 hover:text-blue-700">politique de confidentialité</a>
       </label>
     </div>
-    <p v-if="errors.acceptTerms" class="mt-1 text-responsive-sm text-error">{{ errors.acceptTerms }}</p>
+    <p v-if="errors.acceptTerms" class="mt-1 text-sm text-red-600">{{ errors.acceptTerms }}</p>
 
     <!-- Submit Button -->
     <div>
@@ -300,7 +300,7 @@
       >
         <svg
           v-if="loading"
-          class="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
+          class="animate-spin mr-2 w-4 h-4 text-white"
           xmlns="http://www.w3.org/2000/svg"
           fill="none"
           viewBox="0 0 24 24"
@@ -320,9 +320,9 @@
     </div>
 
     <div class="text-left sm:text-center">
-      <p class="text-responsive-sm text-body">
+      <p class="text-sm text-gray-700">
         Déjà un compte ?
-        <router-link to="/login" class="font-medium text-primary hover:text-primary-500">
+        <router-link to="/login" class="font-medium text-blue-600 hover:text-blue-700">
           Se connecter
         </router-link>
       </p>
@@ -456,7 +456,7 @@ const handleSubmit = async () => {
         router.push('/dashboard')
       }
     }
-  } catch (error: any) {
+  } catch {
     // L'erreur est déjà gérée par le store et affichée via les notifications
     // console.error('Register error:', error)
   } finally {

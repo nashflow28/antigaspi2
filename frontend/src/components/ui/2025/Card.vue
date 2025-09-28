@@ -73,7 +73,7 @@ const computedClasses = computed(() => {
       'cursor-pointer',
       'hover:scale-[1.02]',
       'active:scale-[0.98]',
-      'focus:outline-none focus:ring-2 focus:ring-primary-500/50'
+      'focus:outline-none focus:ring-2 focus:ring-blue-500/50'
     ].filter(Boolean).join(' '),
 
     // Shadow
@@ -93,8 +93,8 @@ const variantClasses = computed(() => {
   const variants = {
     default: [
       'bg-white',
-      'border border-neutral-200',
-      'hover:border-neutral-300'
+      'border border-gray-200',
+      'hover:border-gray-300'
     ].join(' '),
 
     glass: [
@@ -106,14 +106,14 @@ const variantClasses = computed(() => {
 
     gradient: [
       'bg-gradient-to-br from-white to-neutral-50',
-      'border border-neutral-200',
-      'hover:from-neutral-50 hover:to-neutral-100'
+      'border border-gray-200',
+      'hover:from-gray-50 hover:to-gray-100'
     ].join(' '),
 
     bordered: [
       'bg-white',
-      'border-2 border-primary-200',
-      'hover:border-primary-300'
+      'border-2 border-blue-200',
+      'hover:border-blue-300'
     ].join(' '),
 
     elevated: [
@@ -144,16 +144,16 @@ const shadowClasses = computed(() => {
 })
 
 const roundedClasses = computed(() => {
-  const rounded = {
+  const roundedOptions = {
     none: 'rounded-none',
-    sm: 'rounded-sm',
-    md: 'rounded-md',
-    lg: 'rounded-lg',
-    xl: 'rounded-xl',
+    sm: 'rounded',
+    md: 'rounded',
+    lg: 'rounded',
+    xl: 'rounded',
     full: 'rounded-full'
   }
 
-  return rounded[props.rounded]
+  return roundedOptions[props.rounded]
 })
 
 // Methods
@@ -170,19 +170,19 @@ const handleClick = (event: MouseEvent) => {
 }
 
 .ui-header {
-  @apply border-b border-neutral-200 pb-4 mb-4;
+  @apply border-b border-gray-200 pb-4 mb-4;
 }
 
 .ui-title {
-  @apply text-lg font-semibold text-heading;
+  @apply text-lg font-semibold text-gray-900;
 }
 
 .ui-content {
-  @apply text-body-emphasis;
+  @apply text-gray-800;
 }
 
 .ui-footer {
-  @apply border-t border-neutral-200 pt-4 mt-4;
+  @apply border-t border-gray-200 pt-4 mt-4;
 }
 
 .shadow-glass {

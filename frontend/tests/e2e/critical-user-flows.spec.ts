@@ -96,8 +96,8 @@ test.describe('Critical User Flows', () => {
       try {
         await page.click(link.selector, { timeout: 3000 })
         // Allow some flexibility in URL matching
-        await page.waitForURL(new RegExp(link.expectedUrl.replace('/', '\/')), { timeout: 5000 })
-      } catch (error) {
+        await page.waitForURL(new RegExp(link.expectedUrl.replace('/', '/')), { timeout: 5000 })
+      } catch {
         // If specific navigation fails, just ensure page doesn't crash
         console.log(`Navigation to ${link.expectedUrl} not available or failed`)
       }

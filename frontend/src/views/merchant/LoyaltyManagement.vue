@@ -2,15 +2,15 @@
   <DashboardLayout
     :sidebar="sidebar"
     :header="header"
-    class="bg-gradient-to-br from-neutral-50 to-neutral-100"
+    class="bg-gradient-to-br from-gray-50 to-gray-100"
   >
     <!-- Header -->
-    <div class="bg-white/80 backdrop-blur-sm border-b border-neutral-200 sticky top-0 z-10">
-      <div class="container px-4 sm:px-6 lg:px-8 mx-auto px-4 py-6">
+    <div class="bg-white/80 backdrop-blur-sm border-b border-gray-200 sticky top-0 z-10">
+      <div class="container px-3 sm:px-4 lg:px-6 mx-auto px-3 py-6">
         <div class="flex items-center justify-start sm:justify-between">
           <div>
-            <h1 class="text-responsive-xl font-semibold text-heading">Gestion des Points de Fidélité</h1>
-            <p class="text-body mt-1">
+            <h1 class="text-xl font-semibold text-gray-900">Gestion des Points de Fidélité</h1>
+            <p class="text-gray-700 mt-1">
               Attribuez des points à vos clients fidèles
             </p>
           </div>
@@ -38,17 +38,17 @@
       </div>
     </div>
 
-    <div class="container px-4 sm:px-6 lg:px-8 mx-auto px-4 py-6 sm:py-8">
+    <div class="container px-3 sm:px-4 lg:px-6 mx-auto px-3 py-6 sm:py-8">
       <!-- Quick Stats -->
-      <div class="grid grid-cols-1 md:grid-cols-4 gap-4 sm:gap-6 mb-6 sm:mb-8">
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-3 sm:gap-6 mt-4 sm:mb-3xl">
         <Card>
           <div class="flex items-center justify-start sm:justify-between">
             <div>
-              <p class="text-responsive-sm font-medium text-body">Total Clients</p>
-              <p class="text-responsive-xl font-semibold text-primary mt-1">{{ allUsersPoints.length }}</p>
+              <p class="text-sm font-medium text-gray-700">Total Clients</p>
+              <p class="text-xl font-semibold text-blue-600 mt-1">{{ allUsersPoints.length }}</p>
             </div>
-            <div class="p-3 bg-primary-100 rounded-xl">
-              <Users class="w-10 h-10 text-primary" />
+            <div class="p-3 bg-blue-100 rounded">
+              <Users class="h-6 w-6 text-blue-600" />
             </div>
           </div>
         </Card>
@@ -56,23 +56,11 @@
         <Card>
           <div class="flex items-center justify-start sm:justify-between">
             <div>
-              <p class="text-responsive-sm font-medium text-body">Points Distribués</p>
-              <p class="text-responsive-xl font-semibold text-success mt-1">{{ totalPointsDistributed }}</p>
+              <p class="text-sm font-medium text-gray-700">Points Distribués</p>
+              <p class="text-xl font-semibold text-green-600 mt-1">{{ totalPointsDistributed }}</p>
             </div>
-            <div class="p-3 bg-green-100 rounded-xl">
-              <TrendingUp class="w-10 h-10 text-success" />
-            </div>
-          </div>
-        </Card>
-
-        <Card>
-          <div class="flex items-center justify-start sm:justify-between">
-            <div>
-              <p class="text-responsive-sm font-medium text-body">Clients Actifs</p>
-              <p class="text-responsive-xl font-semibold text-info mt-1">{{ activeCustomers }}</p>
-            </div>
-            <div class="p-3 bg-blue-100 rounded-xl">
-              <Star class="w-10 h-10 text-info" />
+            <div class="p-3 bg-green-100 rounded">
+              <TrendingUp class="h-6 w-6 text-green-600" />
             </div>
           </div>
         </Card>
@@ -80,11 +68,23 @@
         <Card>
           <div class="flex items-center justify-start sm:justify-between">
             <div>
-              <p class="text-responsive-sm font-medium text-body">Moyenne Points</p>
-              <p class="text-responsive-xl font-semibold text-purple-600 mt-1">{{ averagePoints }}</p>
+              <p class="text-sm font-medium text-gray-700">Clients Actifs</p>
+              <p class="text-xl font-semibold text-info mt-1">{{ activeCustomers }}</p>
             </div>
-            <div class="p-3 bg-purple-100 rounded-xl">
-              <Award class="w-10 h-10 text-purple-600" />
+            <div class="p-3 bg-blue-100 rounded">
+              <Star class="h-6 w-6 text-info" />
+            </div>
+          </div>
+        </Card>
+
+        <Card>
+          <div class="flex items-center justify-start sm:justify-between">
+            <div>
+              <p class="text-sm font-medium text-gray-700">Moyenne Points</p>
+              <p class="text-xl font-semibold text-purple-600 mt-1">{{ averagePoints }}</p>
+            </div>
+            <div class="p-3 bg-blue-100 rounded">
+              <Award class="h-6 w-6 text-purple-600" />
             </div>
           </div>
         </Card>
@@ -92,23 +92,23 @@
 
       <!-- Customers List -->
       <Card>
-        <div class="flex items-center justify-start sm:justify-between mb-6">
-          <h3 class="text-responsive-xl font-semibold text-heading">Clients avec Points de Fidélité</h3>
+        <div class="flex items-center justify-start sm:justify-between mt-4">
+          <h3 class="text-xl font-semibold text-gray-900">Clients avec Points de Fidélité</h3>
           <div class="flex items-center gap-3">
             <!-- Search -->
             <div class="relative">
-              <Search class="w-5 h-5 relative sm:absolute left-3 top-1/2 transform -translate-y-1/2 text-placeholder" />
+              <Search class="h-4 w-4 relative sm:absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
               <input
                 v-model="searchQuery"
                 type="text"
                 placeholder="Rechercher un client..."
-                class="pl-9 pr-4 py-3 border border-neutral-200 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                class="pl-9 pr-4 py-3 border border-gray-200 rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               >
             </div>
             <!-- Sort -->
             <select
               v-model="sortBy"
-              class="px-4 py-3 border border-neutral-200 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+              class="px-3 py-3 border border-gray-200 rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
             >
               <option value="total_points">Trier par points</option>
               <option value="name">Trier par nom</option>
@@ -121,42 +121,42 @@
         <div class="overflow-x-auto">
           <table class="w-full">
             <thead>
-              <tr class="border-b border-neutral-200">
-                <th class="text-left py-3 px-4 font-semibold text-heading">Client</th>
-                <th class="text-left py-3 px-4 font-semibold text-heading">Email</th>
-                <th class="text-left py-3 px-4 font-semibold text-heading">Points</th>
-                <th class="text-left py-3 px-4 font-semibold text-heading">Dernière Activité</th>
-                <th class="text-left py-3 px-4 font-semibold text-heading">Actions</th>
+              <tr class="border-b border-gray-200">
+                <th class="text-left py-3 px-3 font-semibold text-gray-900">Client</th>
+                <th class="text-left py-3 px-3 font-semibold text-gray-900">Email</th>
+                <th class="text-left py-3 px-3 font-semibold text-gray-900">Points</th>
+                <th class="text-left py-3 px-3 font-semibold text-gray-900">Dernière Activité</th>
+                <th class="text-left py-3 px-3 font-semibold text-gray-900">Actions</th>
               </tr>
             </thead>
             <tbody>
               <tr
                 v-for="customer in filteredCustomers"
                 :key="customer.id"
-                class="border-b border-neutral-100 hover:transition-colors"
+                class="border-b border-gray-100 hover:transition-colors"
               >
-                <td class="py-4 px-4">
+                <td class="py-4 px-3">
                   <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 bg-nav-gradient rounded-full flex items-center justify-center text-white font-semibold">
+                    <div class="h-6 w-6 bg-gradient-to-r from-blue-600 to-blue-700 rounded-full flex items-center justify-center text-white font-semibold">
                       {{ customer.name.charAt(0).toUpperCase() }}
                     </div>
                     <div>
-                      <p class="font-medium text-heading">{{ customer.name }}</p>
-                      <p class="text-responsive-sm text-muted">ID: {{ customer.id }}</p>
+                      <p class="font-medium text-gray-900">{{ customer.name }}</p>
+                      <p class="text-sm text-gray-500">ID: {{ customer.id }}</p>
                     </div>
                   </div>
                 </td>
-                <td class="py-4 px-4 text-body">{{ customer.email }}</td>
-                <td class="py-4 px-4">
+                <td class="py-4 px-3 text-gray-700">{{ customer.email }}</td>
+                <td class="py-4 px-3">
                   <div class="flex items-center gap-2">
-                    <Star class="w-5 h-5 text-yellow-500" />
-                    <span class="font-semibold text-heading">{{ formatPoints(customer.total_points) }}</span>
+                    <Star class="h-4 w-4 text-yellow-500" />
+                    <span class="font-semibold text-gray-900">{{ formatPoints(customer.total_points) }}</span>
                   </div>
                 </td>
-                <td class="py-4 px-4 text-body">
+                <td class="py-4 px-3 text-gray-700">
                   {{ customer.last_activity ? formatDate(customer.last_activity) : 'Aucune' }}
                 </td>
-                <td class="py-4 px-4">
+                <td class="py-4 px-3">
                   <Button
                     variant="primary"
                     size="sm"
@@ -171,9 +171,9 @@
           </table>
 
           <div v-if="filteredCustomers.length === 0" class="text-left sm:text-center py-6 sm:py-8">
-            <Users class="w-16 h-16 text-neutral-300 mx-auto mb-4" />
-            <p class="text-body">Aucun client trouvé</p>
-            <p class="text-responsive-sm text-muted">
+            <Users class="w-12 h-10 text-gray-500 mx-auto mt-3" />
+            <p class="text-gray-700">Aucun client trouvé</p>
+            <p class="text-sm text-gray-500">
               {{ searchQuery ? 'Modifiez votre recherche' : 'Les clients apparaîtront ici une fois qu\'ils auront des points' }}
             </p>
           </div>
@@ -185,22 +185,22 @@
     <div v-if="showAwardModal" class="fixed inset-0 z-[9999] overflow-y-auto">
       <div class="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm transition-opacity" @click="closeAwardModal" />
 
-      <div class="flex min-h-full items-center justify-center p-4">
-        <div class="relative w-full max-w-full sm:max-w-md bg-white rounded-2xl shadow-xl transform transition-all" @click.stop>
-          <div class="px-6 py-4 border-b border-neutral-200">
+      <div class="flex min-h-screen items-center justify-center p-4">
+        <div class="relative w-full max-w-xl bg-white rounded shadow-xl transform transition-all" @click.stop>
+          <div class="px-4 py-4 border-b border-gray-200">
             <div class="flex items-center justify-start sm:justify-between">
-              <h3 class="text-responsive-lg font-semibold text-heading">Attribuer des Points</h3>
+              <h3 class="text-lg font-semibold text-gray-900">Attribuer des Points</h3>
               <button class="p-2 hover:transition-colors" @click="closeAwardModal">
-                <X class="w-5 h-5 text-placeholder" />
+                <X class="h-4 w-4 text-gray-400" />
               </button>
             </div>
           </div>
 
-          <form class="px-6 py-6 space-y-4" @submit.prevent="submitAward">
+          <form class="px-4 py-6 space-y-4" @submit.prevent="submitAward">
             <!-- Customer Selection -->
             <div v-if="!selectedCustomer">
               <Label>Sélectionner un client</Label>
-              <div class="text-responsive-xs text-muted mb-2">
+              <div class="text-xs text-gray-500 mt-2">
                 Debug: {{ allUsersPoints.length }} clients chargés
               </div>
               <Select
@@ -218,10 +218,10 @@
               </Select>
             </div>
 
-            <div v-else class="bg-neutral-50 rounded-lg p-3">
-              <p class="text-responsive-sm text-body">Client sélectionné:</p>
-              <p class="font-semibold text-heading">{{ selectedCustomer.name }}</p>
-              <p class="text-responsive-sm text-body">{{ selectedCustomer.email }}</p>
+            <div v-else class="bg-gray-50 rounded p-3">
+              <p class="text-sm text-gray-700">Client sélectionné:</p>
+              <p class="font-semibold text-gray-900">{{ selectedCustomer.name }}</p>
+              <p class="text-sm text-gray-700">{{ selectedCustomer.email }}</p>
             </div>
 
             <!-- Points Amount -->
@@ -259,7 +259,7 @@
                 v-model="awardForm.description"
                 required
                 rows="3"
-                class="w-full px-4 py-3 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                class="w-full px-3 py-3 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 placeholder="Décrivez pourquoi vous attribuez ces points..."
               />
             </div>
@@ -272,13 +272,13 @@
                 type="date"
                 :min="tomorrow"
               />
-              <p class="text-responsive-xs text-muted mt-1">
+              <p class="text-xs text-gray-500 mt-1">
                 Laissez vide pour une expiration automatique dans 1 an
               </p>
             </div>
 
             <!-- Actions -->
-            <div class="flex gap-3 pt-4">
+            <div class="flex gap-3 padding-t-lg">
               <Button
                 type="button"
                 class="flex-1"

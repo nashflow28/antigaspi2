@@ -23,14 +23,14 @@ const props = withDefaults(
 const attrs = useAttrs()
 
 const rounding: Record<SkeletonRadius, string> = {
-  sm: 'rounded-lg',
-  md: 'rounded-2xl',
-  lg: 'rounded-3xl',
+  sm: 'rounded',
+  md: 'rounded',
+  lg: 'rounded',
   full: 'rounded-full'
 }
 
 const wrapperClasses = computed(() => [
-  'relative overflow-hidden bg-neutral-200/70 dark:bg-neutral-800/60',
+  'relative overflow-hidden bg-gray-200/70 dark:bg-gray-800/60',
   rounding[props.rounded],
   (attrs.class as string | undefined) ?? ''
 ])

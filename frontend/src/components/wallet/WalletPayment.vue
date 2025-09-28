@@ -1,14 +1,14 @@
 <template>
   <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-    <div class="bg-white rounded-xl p-6 w-full max-w-full sm:max-w-md">
-      <div class="flex items-center justify-start sm:justify-between mb-6">
-        <h3 class="text-responsive-xl font-semibold text-heading">Paiement Portefeuille</h3>
+    <div class="bg-white rounded p-6 w-full max-w-xl">
+      <div class="flex items-center justify-start sm:justify-between mt-4">
+        <h3 class="text-xl font-semibold text-gray-900">Paiement Portefeuille</h3>
         <button
-          class="text-placeholder hover:text-body"
+          class="text-gray-400 hover:text-gray-700"
           @click="$emit('close')"
         >
           <svg
-            class="w-10 h-10"
+            class="h-6 w-6"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -24,33 +24,33 @@
       </div>
 
       <!-- Résumé du paiement -->
-      <div class="bg-neutral-50 rounded-lg p-4 mb-6">
-        <div class="flex items-center justify-start sm:justify-between mb-2">
-          <span class="text-responsive-sm text-body">Montant à payer</span>
-          <span class="text-responsive-lg font-semibold text-heading">{{ formatAmount(amount) }} XOF</span>
+      <div class="bg-gray-50 rounded p-4 mt-4">
+        <div class="flex items-center justify-start sm:justify-between mt-2">
+          <span class="text-sm text-gray-700">Montant à payer</span>
+          <span class="text-lg font-semibold text-gray-900">{{ formatAmount(amount) }} XOF</span>
         </div>
-        <div class="flex items-center justify-start sm:justify-between mb-2">
-          <span class="text-responsive-sm text-body">Solde actuel</span>
-          <span class="text-responsive-sm font-medium text-success">{{ formatAmount(walletBalance) }} XOF</span>
+        <div class="flex items-center justify-start sm:justify-between mt-2">
+          <span class="text-sm text-gray-700">Solde actuel</span>
+          <span class="text-sm font-medium text-green-600">{{ formatAmount(walletBalance) }} XOF</span>
         </div>
         <div class="flex items-center justify-start sm:justify-between">
-          <span class="text-responsive-sm text-body">Solde après paiement</span>
-          <span class="text-responsive-sm font-medium" :class="remainingBalance >= 0 ? 'text-success' : 'text-error'">
+          <span class="text-sm text-gray-700">Solde après paiement</span>
+          <span class="text-sm font-medium" :class="remainingBalance >= 0 ? 'text-green-600' : 'text-red-600'">
             {{ formatAmount(remainingBalance) }} XOF
           </span>
         </div>
       </div>
 
       <!-- Vérifications de sécurité -->
-      <div v-if="!canPay" class="mb-6">
-        <div class="bg-red-50 border border-red-200 rounded-lg p-4">
-          <div class="flex items-stretch sm:items-start space-y-2 sm:space-y-0 sm:space-x-2">
-            <svg class="w-5 h-5 text-red-500 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+      <div v-if="!canPay" class="mt-4">
+        <div class="bg-red-50 border border-red-200 rounded p-4">
+          <div class="flex items-stretch sm:items-start space-y-4 sm:space-x-2">
+            <svg class="h-4 w-4 text-red-500 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
               <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
             </svg>
-            <div class="text-responsive-sm text-red-700">
+            <div class="text-sm text-red-700">
               <p class="font-medium">Paiement impossible</p>
-              <ul class="mt-1 space-y-2">
+              <ul class="mt-1 space-y-4">
                 <li v-if="walletBalance < amount">• Solde insuffisant</li>
                 <li v-if="!walletActive">• Portefeuille désactivé</li>
                 <li v-if="exceedsDailyLimit">• Limite quotidienne dépassée</li>
@@ -64,7 +64,7 @@
       <form v-else @submit.prevent="handlePayment">
         <div class="space-y-4">
           <div>
-            <label class="block text-responsive-sm font-medium text-body-emphasis mb-2">
+            <label class="block text-sm font-medium text-gray-800 mt-2">
               Code PIN du portefeuille
             </label>
             <input
@@ -72,21 +72,21 @@
               type="password"
               maxlength="6"
               placeholder="••••••"
-              class="w-full px-4 py-3 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent text-left sm:text-center text-responsive-lg tracking-widest"
+              class="w-full px-3 py-3 border border-gray-300 rounded focus:ring-2 focus:ring-green-500 focus:border-transparent text-left sm:text-center text-lg tracking-widest"
               :class="{'border-red-300': error}"
               required
               autocomplete="off"
               @input="formatPinInput"
             >
-            <p v-if="error" class="mt-1 text-responsive-sm text-error">{{ error }}</p>
+            <p v-if="error" class="mt-1 text-sm text-red-600">{{ error }}</p>
           </div>
 
-          <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
-            <div class="flex items-stretch sm:items-start space-y-2 sm:space-y-0 sm:space-x-2">
-              <svg class="w-5 h-5 text-blue-500 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+          <div class="bg-blue-50 border border-blue-200 rounded p-4">
+            <div class="flex items-stretch sm:items-start space-y-4 sm:space-x-2">
+              <svg class="h-4 w-4 text-blue-500 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
                 <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
               </svg>
-              <div class="text-responsive-sm text-blue-700">
+              <div class="text-sm text-secondary-700">
                 <p class="font-medium">Information</p>
                 <p>{{ description || 'Le montant sera débité instantanément de votre portefeuille.' }}</p>
               </div>
@@ -94,10 +94,10 @@
           </div>
         </div>
 
-        <div class="flex space-y-3 sm:space-y-0 sm:space-x-3 mt-6">
+        <div class="flex space-y-2 sm:space-x-3 mt-6">
           <button
             type="button"
-            class="flex-1 px-4 py-3 border border-neutral-300 rounded-lg text-body-emphasis hover:transition-colors"
+            class="flex-1 px-3 py-3 border border-gray-300 rounded text-gray-800 hover:transition-colors"
             @click="$emit('close')"
           >
             Annuler
@@ -105,10 +105,10 @@
           <button
             type="submit"
             :disabled="loading || !pin || pin.length < 4"
-            class="flex-1 px-4 py-3 bg-green-600 text-white rounded-lg hover:transition-colors"
+            class="flex-1 px-3 py-3 bg-blue-600 text-white rounded hover:transition-colors"
           >
             <span v-if="loading" class="flex items-center justify-center">
-              <svg class="animate-spin -ml-1 mr-2 h-5 w-5 text-white" fill="none" viewBox="0 0 24 24">
+              <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
                 <circle
                   cx="12"
                   cy="12"
@@ -129,17 +129,17 @@
       </form>
 
       <!-- Actions alternatives si paiement impossible -->
-      <div v-if="!canPay" class="mt-6 space-y-3">
+      <div v-if="!canPay" class="mt-6 space-y-2">
         <button
           v-if="walletBalance < amount"
-          class="w-full px-4 py-3 bg-blue-600 text-white rounded-lg hover:transition-colors"
+          class="w-full px-3 py-3 bg-blue-600 text-white rounded hover:transition-colors"
           @click="$emit('recharge')"
         >
           Recharger le portefeuille
         </button>
         <button
           v-if="!hasPin"
-          class="w-full px-4 py-3 bg-yellow-600 text-white rounded-lg hover:transition-colors"
+          class="w-full px-3 py-3 bg-yellow-600 text-white rounded hover:transition-colors"
           @click="$emit('setupPin')"
         >
           Configurer un code PIN

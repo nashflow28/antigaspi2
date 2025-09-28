@@ -2,30 +2,30 @@
   <div class="relative">
     <div
       ref="mapElement"
-      :class="['w-full rounded-lg', heightClass]"
+      :class="['w-full rounded', heightClass]"
       :style="{ minHeight: height || '400px' }"
     />
 
     <!-- Loading overlay -->
     <div
       v-if="loading"
-      class="relative sm:absolute inset-0 bg-white bg-opacity-75 flex items-center justify-center rounded-lg"
+      class="relative sm:absolute inset-0 bg-white bg-opacity-75 flex items-center justify-center rounded"
     >
-      <div class="flex items-center space-y-3 sm:space-y-0 sm:space-x-3">
-        <div class="animate-spin rounded-full h-10 w-10 border-b-2 border-primary-600" />
-        <span class="text-body">Chargement de la carte...</span>
+      <div class="flex items-center space-y-2 sm:space-x-3">
+        <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600" />
+        <span class="text-gray-700">Chargement de la carte...</span>
       </div>
     </div>
 
     <!-- Error state -->
     <div
       v-if="error"
-      class="relative sm:absolute inset-0 bg-red-50 border border-red-200 rounded-lg flex items-center justify-center"
+      class="relative sm:absolute inset-0 bg-red-50 border border-red-200 rounded flex items-center justify-center"
     >
       <div class="text-left sm:text-center p-6">
-        <div class="text-error mb-2">
+        <div class="text-red-600 mt-2">
           <svg
-            class="w-12 h-12 mx-auto"
+            class="w-12 h-10 mx-auto"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -38,10 +38,10 @@
             />
           </svg>
         </div>
-        <h3 class="text-responsive-lg font-medium text-red-900 mb-1">Erreur de chargement</h3>
-        <p class="text-error text-responsive-sm">{{ error }}</p>
+        <h3 class="text-lg font-medium text-red-900 mb-1">Erreur de chargement</h3>
+        <p class="text-red-600 text-sm">{{ error }}</p>
         <button
-          class="mt-3 px-4 py-3 bg-red-600 text-white rounded-lg hover:transition-colors"
+          class="mt-3 px-3 py-3 bg-red-600 text-white rounded hover:transition-colors"
           @click="initializeMap"
         >
           Réessayer
@@ -177,7 +177,7 @@ const addUserLocationMarker = () => {
   })
 
   const infoWindow = new google.maps.InfoWindow({
-    content: '<div class="p-2"><strong>Votre position</strong></div>'
+    content: '<div class="p-3"><strong>Votre position</strong></div>'
   })
 
   userLocationMarker.value.addListener('click', () => {
@@ -211,8 +211,8 @@ const updateMarkers = () => {
     if (markerData.info) {
       const infoWindow = new google.maps.InfoWindow({
         content: `<div class="p-3">
-          <h3 class="font-semibold text-heading">${markerData.title}</h3>
-          <p class="text-body text-responsive-sm mt-1">${markerData.info}</p>
+          <h3 class="font-semibold text-gray-900">${markerData.title}</h3>
+          <p class="text-gray-700 text-sm mt-1">${markerData.info}</p>
         </div>`
       })
 

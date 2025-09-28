@@ -1,118 +1,118 @@
 <template>
   <div class="space-y-4">
-    <div class="flex space-y-4 sm:space-y-0 sm:space-x-4">
+    <div class="flex space-y-4 sm:space-x-4">
       <!-- User Avatar -->
       <div class="flex-shrink-0">
-        <div class="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
-          <span class="text-white text-responsive-sm font-medium">
+        <div class="w-12 h-10 bg-gradient-to-r from-blue-500 to-blue-600 rounded-full flex items-center justify-center">
+          <span class="text-white text-sm font-medium">
             {{ getInitials(review.user.name) }}
           </span>
         </div>
       </div>
 
-      <div class="flex-1 min-w-0">
+      <div class="flex-1 min-w-none">
         <!-- Review Header -->
-        <div class="flex items-center justify-start sm:justify-between mb-3">
-          <div class="flex items-center space-y-3 sm:space-y-0 sm:space-x-3">
-            <span class="font-medium text-heading">{{ review.user.name }}</span>
-            <span class="text-responsive-sm text-muted">{{ review.user.email }}</span>
+        <div class="flex items-center justify-start sm:justify-between mb-4">
+          <div class="flex items-center space-y-2 sm:space-x-3">
+            <span class="font-medium text-gray-900">{{ review.user.name }}</span>
+            <span class="text-sm text-gray-500">{{ review.user.email }}</span>
             <div class="flex items-center">
               <Star
                 v-for="star in 5"
                 :key="star"
-                class="w-5 h-5"
-                :class="star <= review.rating ? 'text-yellow-400 fill-yellow-400' : 'text-neutral-300'"
+                class="h-4 w-4"
+                :class="star <= review.rating ? 'text-yellow-400 fill-yellow-400' : 'text-gray-500'"
               />
             </div>
-            <span v-if="review.is_verified_purchase" class="inline-flex items-center px-4 py-0.5 rounded text-responsive-xs font-medium bg-green-100 text-green-800">
+            <span v-if="review.is_verified_purchase" class="inline-flex items-center px-3 py-1 rounded text-xs font-medium bg-green-100 text-green-800">
               <ShieldCheck class="w-3 h-3 mr-1" />
               Achat vérifié
             </span>
           </div>
-          <span class="text-responsive-sm text-muted">{{ review.time_ago }}</span>
+          <span class="text-sm text-gray-500">{{ review.time_ago }}</span>
         </div>
 
         <!-- Review Content -->
-        <div v-if="review.title" class="mb-3">
-          <h4 class="font-medium text-heading">{{ review.title }}</h4>
+        <div v-if="review.title" class="mb-4">
+          <h4 class="font-medium text-gray-900">{{ review.title }}</h4>
         </div>
 
-        <div v-if="review.comment" class="text-body-emphasis text-responsive-sm leading-relaxed mb-3">
+        <div v-if="review.comment" class="text-gray-800 text-sm leading-relaxed mb-4">
           {{ review.comment }}
         </div>
 
         <!-- Merchant and Product Info -->
-        <div class="flex items-center space-y-4 sm:space-y-0 sm:space-x-4 mb-4">
-          <div class="inline-flex items-center text-responsive-xs text-purple-600 bg-purple-50 rounded-full px-4 py-3">
+        <div class="flex items-center space-y-4 sm:space-x-4 mt-3">
+          <div class="inline-flex items-center text-xs text-purple-600 bg-purple-50 rounded-full px-3 py-3">
             <Building class="w-3 h-3 mr-1" />
             {{ review.merchant.business_name }}
           </div>
-          <div v-if="review.product" class="inline-flex items-center text-responsive-xs text-info bg-blue-50 rounded-full px-4 py-3">
+          <div v-if="review.product" class="inline-flex items-center text-xs text-info bg-blue-50 rounded-full px-3 py-3">
             <Package class="w-3 h-3 mr-1" />
             {{ review.product.name }}
           </div>
         </div>
 
         <!-- Merchant Response if exists -->
-        <div v-if="review.merchant_response" class="mt-4 p-3 bg-green-50 border border-green-200 rounded-lg">
-          <div class="flex items-stretch sm:items-start space-y-2 sm:space-y-0 sm:space-x-2">
-            <Building class="w-5 h-5 text-success mt-0.5" />
+        <div v-if="review.merchant_response" class="mt-4 p-3 bg-green-50 border border-blue-200 rounded">
+          <div class="flex items-stretch sm:items-start space-y-4 sm:space-x-2">
+            <Building class="h-4 w-4 text-green-600 mt-0.5" />
             <div>
-              <p class="text-responsive-sm font-medium text-green-800">Réponse du commerçant :</p>
-              <p class="text-responsive-sm text-green-700 mt-1">{{ review.merchant_response }}</p>
+              <p class="text-sm font-medium text-green-800">Réponse du commerçant :</p>
+              <p class="text-sm text-green-700 mt-1">{{ review.merchant_response }}</p>
             </div>
           </div>
         </div>
 
         <!-- Admin Actions -->
-        <div class="flex items-center space-y-3 sm:space-y-0 sm:space-x-3 mt-4">
+        <div class="flex items-center space-y-2 sm:space-x-3 mt-4">
           <button
             :disabled="!!processing"
-            class="inline-flex items-center px-4 py-3 text-responsive-sm bg-green-600 text-white rounded-lg hover:transition-colors"
+            class="inline-flex items-center px-3 py-3 text-sm bg-blue-600 text-white rounded hover:transition-colors"
             @click="approveReview"
           >
-            <Check class="w-5 h-5 mr-2" />
+            <Check class="h-4 w-4 mr-2" />
             {{ processing === 'approve' ? 'Approbation...' : 'Approuver' }}
           </button>
 
           <button
             :disabled="!!processing"
-            class="inline-flex items-center px-4 py-3 text-responsive-sm bg-red-600 text-white rounded-lg hover:transition-colors"
+            class="inline-flex items-center px-3 py-3 text-sm bg-red-600 text-white rounded hover:transition-colors"
             @click="rejectReview"
           >
-            <X class="w-5 h-5 mr-2" />
+            <X class="h-4 w-4 mr-2" />
             {{ processing === 'reject' ? 'Rejet...' : 'Rejeter' }}
           </button>
 
           <button
-            class="inline-flex items-center px-4 py-3 text-responsive-sm text-body border border-neutral-300 rounded-lg hover:transition-colors"
+            class="inline-flex items-center px-3 py-3 text-sm text-gray-700 border border-gray-300 rounded hover:transition-colors"
             @click="showDetails = !showDetails"
           >
-            <Eye class="w-5 h-5 mr-2" />
+            <Eye class="h-4 w-4 mr-2" />
             {{ showDetails ? 'Masquer' : 'Détails' }}
           </button>
         </div>
 
         <!-- Detailed Information -->
-        <div v-if="showDetails" class="mt-4 p-4 bg-neutral-50 rounded-lg">
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-responsive-sm">
+        <div v-if="showDetails" class="mt-4 p-4 bg-gray-50 rounded">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
             <div>
-              <p class="font-medium text-heading">Informations utilisateur</p>
-              <p class="text-body">Email: {{ review.user.email }}</p>
-              <p class="text-body">ID: {{ review.user.id }}</p>
+              <p class="font-medium text-gray-900">Informations utilisateur</p>
+              <p class="text-gray-700">Email: {{ review.user.email }}</p>
+              <p class="text-gray-700">ID: {{ review.user.id }}</p>
             </div>
             <div>
-              <p class="font-medium text-heading">Informations commerçant</p>
-              <p class="text-body">Propriétaire: {{ review.merchant.owner_name }}</p>
-              <p class="text-body">ID: {{ review.merchant.id }}</p>
+              <p class="font-medium text-gray-900">Informations commerçant</p>
+              <p class="text-gray-700">Propriétaire: {{ review.merchant.owner_name }}</p>
+              <p class="text-gray-700">ID: {{ review.merchant.id }}</p>
             </div>
             <div>
-              <p class="font-medium text-heading">Date de création</p>
-              <p class="text-body">{{ formatDate(review.created_at) }}</p>
+              <p class="font-medium text-gray-900">Date de création</p>
+              <p class="text-gray-700">{{ formatDate(review.created_at) }}</p>
             </div>
             <div v-if="review.product">
-              <p class="font-medium text-heading">Produit</p>
-              <p class="text-body">{{ review.product.name }} (ID: {{ review.product.id }})</p>
+              <p class="font-medium text-gray-900">Produit</p>
+              <p class="text-gray-700">{{ review.product.name }} (ID: {{ review.product.id }})</p>
             </div>
           </div>
         </div>
@@ -120,17 +120,17 @@
     </div>
 
     <!-- Success/Error Messages -->
-    <div v-if="successMessage" class="p-3 bg-green-50 border border-green-200 rounded-lg">
+    <div v-if="successMessage" class="p-3 bg-green-50 border border-blue-200 rounded">
       <div class="flex items-center">
-        <CheckCircle class="w-5 h-5 text-success mr-2" />
-        <span class="text-responsive-sm text-green-800">{{ successMessage }}</span>
+        <CheckCircle class="h-4 w-4 text-green-600 mr-2" />
+        <span class="text-sm text-green-800">{{ successMessage }}</span>
       </div>
     </div>
 
-    <div v-if="errorMessage" class="p-3 bg-red-50 border border-red-200 rounded-lg">
+    <div v-if="errorMessage" class="p-3 bg-red-50 border border-red-200 rounded">
       <div class="flex items-center">
-        <AlertTriangle class="w-5 h-5 text-error mr-2" />
-        <span class="text-responsive-sm text-red-800">{{ errorMessage }}</span>
+        <AlertTriangle class="h-4 w-4 text-red-600 mr-2" />
+        <span class="text-sm text-red-800">{{ errorMessage }}</span>
       </div>
     </div>
   </div>

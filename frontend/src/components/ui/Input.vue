@@ -1,5 +1,5 @@
 <template>
-  <div class="space-y-2">
+  <div class="space-y-4">
     <label
       v-if="label"
       :for="inputId"
@@ -8,7 +8,7 @@
       <span>{{ label }}</span>
       <span
         v-if="helperText && !error"
-        class="text-caption text-placeholder"
+        class="text-xs text-gray-400"
       >
         {{ helperText }}
       </span>
@@ -17,7 +17,7 @@
     <div class="relative">
       <span
         v-if="normalizedLeftIcon"
-        class="pointer-events-none relative sm:absolute left-4 top-1/2 -translate-y-1/2 text-placeholder"
+        class="pointer-events-none relative sm:absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
       >
         <component :is="normalizedLeftIcon" />
       </span>
@@ -38,13 +38,13 @@
 
       <span
         v-if="normalizedRightIcon"
-        class="pointer-events-none relative sm:absolute right-4 top-1/2 -translate-y-1/2 text-placeholder"
+        class="pointer-events-none relative sm:absolute right-4 top-1/2 -translate-y-1/2 text-gray-400"
       >
         <component :is="normalizedRightIcon" />
       </span>
 
       <span
-        class="pointer-events-none relative sm:absolute inset-x-3 bottom-1 h-0.5 rounded-full bg-primary-500 transition-transform duration-200"
+        class="pointer-events-none relative sm:absolute inset-x-3 bottom-1 h-0.5 rounded-full bg-blue-500 transition-transform duration-200"
         :style="focusUnderlineStyle"
         aria-hidden="true"
       />
@@ -53,10 +53,10 @@
     <p
       v-if="error"
       :id="`${inputId}-error`"
-      class="flex items-center gap-2 text-small text-accent-red"
+      class="flex items-center gap-2 text-sm text-red-600"
     >
       <svg
-        class="h-5 w-5"
+        class="h-4 w-4"
         viewBox="0 0 20 20"
         fill="currentColor"
         aria-hidden="true"
@@ -72,7 +72,7 @@
     <p
       v-else-if="helperText"
       :id="`${inputId}-helper`"
-      class="text-caption text-muted"
+      class="text-xs text-gray-500"
     >
       {{ helperText }}
     </p>
@@ -129,20 +129,20 @@ const attrs = useAttrs()
 const isFocused = ref(false)
 
 const baseClasses =
-  'flex w-full rounded-2xl border bg-white/95 px-4 py-3 text-body text-body-emphasis placeholder:text-placeholder transition-all duration-200 ease-spring-out focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-300 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-50 disabled:cursor-not-allowed disabled:opacity-60 dark:bg-neutral-900 dark:text-neutral-50 dark:placeholder:text-placeholder dark:focus-visible:ring-offset-neutral-900'
+  'flex w-full rounded border bg-white/95 px-3 py-3 text-gray-700 text-gray-800 placeholder:text-gray-400 transition-all duration-200 ease-spring-out focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-300 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-50 disabled:cursor-not-allowed disabled:opacity-60 dark:bg-gray-900 dark:text-gray-50 dark:placeholder:text-gray-400 dark:focus-visible:ring-offset-neutral-900'
 
 const variantClasses: Record<InputVariant, string> = {
   subtle:
-    'border-neutral-200 hover:border-primary-300 focus:border-primary-400 focus:bg-white dark:border-neutral-700 dark:focus:border-primary-500',
+    'border-gray-200 hover:border-blue-300 focus:border-blue-400 focus:bg-white dark:border-gray-700 dark:focus:border-blue-500',
   filled:
-    'border-transparent bg-neutral-100 hover:bg-neutral-100 focus:bg-white dark:bg-neutral-800/70 dark:hover:bg-neutral-800',
+    'border-transparent bg-gray-100 hover:bg-gray-100 focus:bg-white dark:bg-gray-800/70 dark:hover:bg-gray-800',
   transparent:
-    'border-primary-500/20 bg-primary-500/5 hover:border-primary-500/40 focus:bg-white dark:bg-primary-900/30 dark:border-primary-700/40'
+    'border-blue-500/20 bg-blue-500/5 hover:border-blue-500/40 focus:bg-white dark:bg-blue-900/30 dark:border-blue-700/40'
 }
 
 const sizeClasses: Record<InputSize, string> = {
-  sm: 'h-11 text-small',
-  md: 'h-12',
+  sm: 'h-8 text-sm',
+  md: 'h-10',
   lg: 'h-14 text-h4'
 }
 
@@ -161,7 +161,7 @@ const inputClass = computed(() => [
   sizeClasses[props.size],
   props.leftIcon ? 'pl-12' : '',
   props.rightIcon ? 'pr-12' : '',
-  props.error ? 'border-accent-red focus-visible:ring-accent-red/60' : '',
+  props.error ? 'border-red-600 focus-visible:ring-accent-red/60' : '',
   externalClass.value
 ])
 
@@ -181,9 +181,9 @@ const normalizedLeftIcon = computed(() => normalizeIcon(props.leftIcon))
 const normalizedRightIcon = computed(() => normalizeIcon(props.rightIcon))
 
 const labelClass = computed(() => [
-  'flex items-center justify-between text-small font-medium text-body transition-colors dark:text-neutral-200',
-  isFocused.value && !props.error ? 'text-primary' : '',
-  props.error ? 'text-accent-red' : ''
+  'flex items-center justify-between text-sm font-medium text-gray-700 transition-colors dark:text-gray-200',
+  isFocused.value && !props.error ? 'text-blue-600' : '',
+  props.error ? 'text-red-600' : ''
 ])
 
 const describedBy = computed(() => {

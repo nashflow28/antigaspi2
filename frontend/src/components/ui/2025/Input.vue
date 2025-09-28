@@ -187,7 +187,7 @@ const containerClasses = computed(() => {
   const baseClasses = [
     // Base container styles
     'relative flex items-center',
-    'border border-neutral-300',
+    'border border-gray-300',
     'transition-all duration-200',
 
     // Size classes
@@ -198,8 +198,8 @@ const containerClasses = computed(() => {
 
     // State classes
     props.error && 'border-red-500 ring-1 ring-red-500/20',
-    isFocused.value && !props.error && 'border-primary-500 ring-1 ring-primary-500/20',
-    props.disabled && 'bg-neutral-50 border-neutral-200 cursor-not-allowed'
+    isFocused.value && !props.error && 'border-blue-500 ring-1 ring-primary-500/20',
+    props.disabled && 'bg-gray-50 border-gray-200 cursor-not-allowed'
   ].filter(Boolean)
 
   return baseClasses.join(' ')
@@ -209,9 +209,9 @@ const inputClasses = computed(() => {
   const baseClasses = [
     // Base input styles
     'flex-1 bg-transparent',
-    'text-heading placeholder-neutral-400',
+    'text-gray-900 placeholder-neutral-400',
     'focus:outline-none',
-    'disabled:cursor-not-allowed disabled:text-muted',
+    'disabled:cursor-not-allowed disabled:text-gray-500',
 
     // Size classes
     sizeInputClasses.value,
@@ -227,9 +227,9 @@ const inputClasses = computed(() => {
 
 const sizeContainerClasses = computed(() => {
   const sizes = {
-    sm: 'h-9 px-3 rounded-md',
-    md: 'h-10 px-3 rounded-lg',
-    lg: 'h-12 px-4 rounded-lg'
+    sm: 'h-10 px-3 rounded',
+    md: 'h-10 px-3 rounded',
+    lg: 'h-10 px-3 rounded'
   }
   return sizes[props.size]
 })
@@ -245,38 +245,38 @@ const sizeInputClasses = computed(() => {
 
 const variantContainerClasses = computed(() => {
   const variants = {
-    default: 'bg-white hover:border-neutral-400',
-    outline: 'bg-transparent border-2 hover:border-neutral-400',
-    filled: 'bg-neutral-50 border-transparent hover:bg-neutral-100'
+    default: 'bg-white hover:border-gray-400',
+    outline: 'bg-transparent border-2 hover:border-gray-400',
+    filled: 'bg-gray-50 border-transparent hover:bg-gray-100'
   }
   return variants[props.variant]
 })
 
 const labelClasses = computed(() => [
-  'block text-sm font-medium text-body-emphasis mb-1',
-  props.disabled && 'text-muted'
+  'block text-sm font-medium text-gray-800 mb-1',
+  props.disabled && 'text-gray-500'
 ].filter(Boolean).join(' '))
 
 const iconClasses = computed(() => [
-  'text-placeholder flex-shrink-0',
-  props.size === 'sm' && 'mx-2',
-  props.size === 'md' && 'mx-2',
-  props.size === 'lg' && 'mx-3'
+  'text-gray-400 flex-shrink-0',
+  props.size === 'sm' && 'mx-sm',
+  props.size === 'md' && 'mx-sm',
+  props.size === 'lg' && 'mx-md'
 ].filter(Boolean).join(' '))
 
 const clearButtonClasses = computed(() => [
-  'text-placeholder hover:text-body',
-  'rounded-full p-1 hover:bg-neutral-100',
+  'text-gray-400 hover:text-gray-700',
+  'rounded-full p-1 hover:bg-gray-100',
   'transition-colors flex-shrink-0',
   'mr-1'
 ].join(' '))
 
 const helpTextClasses = computed(() => [
-  'mt-1 text-sm text-muted'
+  'mt-1 text-sm text-gray-500'
 ].join(' '))
 
 const errorTextClasses = computed(() => [
-  'mt-1 text-sm text-error'
+  'mt-1 text-sm text-red-600'
 ].join(' '))
 
 // Methods

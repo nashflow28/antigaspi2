@@ -279,7 +279,7 @@ export const animationClasses = {
   // Hover effects
   hoverScale: 'hover:scale-105',
   hoverShadow: 'hover:shadow-lg',
-  hoverGlow: 'hover:shadow-glow',
+  hoverGlow: 'hover:shadow-xl',
   hoverLift: 'hover:-translate-y-1',
 
   // Focus effects

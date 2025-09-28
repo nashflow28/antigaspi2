@@ -21,7 +21,7 @@
     <div v-if="$slots.footer || showDefaultActions" :class="footerClasses">
       <slot name="footer" :loading="loading" :errors="errors">
         <!-- Default Actions -->
-        <div v-if="showDefaultActions" class="flex items-center justify-center sm:justify-end space-y-3 sm:space-y-0 sm:space-x-3">
+        <div v-if="showDefaultActions" class="flex items-center justify-center sm:justify-end space-y-2 sm:space-x-3">
           <Button
             v-if="showCancelButton"
             type="button"
@@ -106,7 +106,7 @@ const formClasses = computed(() => [
 const variantClasses = computed(() => {
   const variants = {
     default: '',
-    contained: 'bg-white border border-neutral-200 rounded-lg shadow-sm',
+    contained: 'bg-white border border-gray-200 rounded shadow-sm',
     minimal: 'bg-transparent'
   }
   return variants[props.variant]
@@ -115,18 +115,18 @@ const variantClasses = computed(() => {
 const sizeClasses = computed(() => {
   const sizes = {
     sm: {
-      wrapper: 'max-w-md',
+      wrapper: 'max-w-xl',
       padding: 'p-4',
       spacing: 'space-y-4'
     },
     md: {
-      wrapper: 'max-w-lg',
+      wrapper: 'max-w-xl',
       padding: 'p-6',
       spacing: 'space-y-6'
     },
     lg: {
-      wrapper: 'max-w-2xl',
-      padding: 'p-8',
+      wrapper: 'max-w-80',
+      padding: 'p-12',
       spacing: 'space-y-8'
     }
   }
@@ -135,7 +135,7 @@ const sizeClasses = computed(() => {
 
 const spacingClasses = computed(() => {
   const spacing = {
-    compact: 'space-y-3',
+    compact: 'space-y-2',
     normal: 'space-y-4',
     relaxed: 'space-y-6'
   }
@@ -143,15 +143,15 @@ const spacingClasses = computed(() => {
 })
 
 const headerClasses = computed(() => [
-  props.variant === 'contained' && 'border-b border-neutral-200 pb-4 mb-6'
+  props.variant === 'contained' && 'border-b border-gray-200 pb-lg mt-4'
 ].filter(Boolean).join(' '))
 
 const titleClasses = computed(() => [
-  'text-xl font-semibold text-heading mb-2'
+  'text-xl font-semibold text-gray-900 mt-2'
 ].join(' '))
 
 const descriptionClasses = computed(() => [
-  'text-sm text-body'
+  'text-sm text-gray-700'
 ].join(' '))
 
 const contentClasses = computed(() => [
@@ -159,12 +159,12 @@ const contentClasses = computed(() => [
 ].join(' '))
 
 const footerClasses = computed(() => [
-  'pt-6',
-  props.variant === 'contained' && 'border-t border-neutral-200 mt-6'
+  'pt-2xl',
+  props.variant === 'contained' && 'border-t border-gray-200 mt-6'
 ].filter(Boolean).join(' '))
 
 const globalErrorClasses = computed(() => [
-  'mt-4 p-3 bg-red-50 border border-red-200 rounded-md text-sm text-error'
+  'mt-4 p-3 bg-red-50 border border-red-200 rounded text-sm text-red-600'
 ].join(' '))
 
 // Methods

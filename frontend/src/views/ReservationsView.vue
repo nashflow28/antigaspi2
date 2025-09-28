@@ -1,44 +1,44 @@
 <template>
-  <div class="min-h-screen bg-neutral-50">
-    <section class="bg-nav-gradient text-white">
-      <div class="mx-auto max-w-full sm:max-w-6xl space-y-8 px-6 py-spacing-22">
-        <div class="space-y-3">
-          <p class="text-small uppercase tracking-wide text-white/80">Suivi des commandes</p>
-          <h1 class="text-display-sm font-semibold leading-relaxed">Mes réservations</h1>
-          <p class="max-w-full sm:max-w-2xl text-body text-white/80">Visualisez l'ensemble de vos réservations, suivez leur statut et mesurez votre impact positif.</p>
+  <div class="min-h-screen bg-gray-50">
+    <section class="bg-gradient-to-r from-blue-600 to-blue-700 text-white">
+      <div class="mx-auto max-w-full sm:max-w-6xl space-y-8 px-4 py-20">
+        <div class="space-y-2">
+          <p class="text-sm uppercase tracking-wide text-white/80">Suivi des commandes</p>
+          <h1 class="text-3xl font-semibold leading-relaxed">Mes réservations</h1>
+          <p class="max-w-full sm:max-w-80 text-gray-700 text-white/80">Visualisez l'ensemble de vos réservations, suivez leur statut et mesurez votre impact positif.</p>
         </div>
-        <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
           <Card
             v-for="item in statCards"
             :key="item.title"
             variant="glass"
             padding="lg"
-            class="shadow-card"
+            class="shadow-lg"
           >
-            <div class="space-y-2">
-              <p class="text-caption uppercase tracking-wide text-white/80">{{ item.title }}</p>
-              <p class="text-display-sm font-semibold">{{ item.value }}</p>
-              <p class="text-small text-white/70">{{ item.subtitle }}</p>
+            <div class="space-y-4">
+              <p class="text-xs uppercase tracking-wide text-white/80">{{ item.title }}</p>
+              <p class="text-3xl font-semibold">{{ item.value }}</p>
+              <p class="text-sm text-white/70">{{ item.subtitle }}</p>
             </div>
           </Card>
         </div>
       </div>
     </section>
 
-    <main class="mx-auto max-w-full sm:max-w-6xl space-y-spacing-22 px-6 py-spacing-22">
+    <main class="mx-auto max-w-full sm:max-w-6xl space-y-20 px-4 py-20">
       <div class="grid gap-spacing-22 lg:grid-cols-[320px,1fr]">
         <div class="space-y-6">
           <Card padding="lg" class="space-y-6">
             <template #header>
-              <h2 class="text-h3 font-semibold text-heading">Filtres</h2>
+              <h2 class="text-lg font-semibold text-gray-900">Filtres</h2>
             </template>
 
             <div class="space-y-4">
               <label class="flex flex-col gap-2">
-                <span class="text-small font-medium text-body">Statut</span>
+                <span class="text-sm font-medium text-gray-700">Statut</span>
                 <select
                   v-model="filters.status"
-                  class="w-full rounded-2xl border border-neutral-200 bg-surface-light px-4 py-3 text-body text-body focus:border-primary-400 focus:outline-none focus:ring-2 focus:ring-primary-200"
+                  class="w-full rounded-modern border border-gray-200 bg-gray-100 px-3 py-3 text-gray-700 text-gray-700 focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-200"
                 >
                   <option value="">Tous les statuts</option>
                   <option value="pending">En attente</option>
@@ -51,10 +51,10 @@
               </label>
 
               <label class="flex flex-col gap-2">
-                <span class="text-small font-medium text-body">Période</span>
+                <span class="text-sm font-medium text-gray-700">Période</span>
                 <select
                   v-model="filters.period"
-                  class="w-full rounded-2xl border border-neutral-200 bg-surface-light px-4 py-3 text-body text-body focus:border-primary-400 focus:outline-none focus:ring-2 focus:ring-primary-200"
+                  class="w-full rounded-modern border border-gray-200 bg-gray-100 px-3 py-3 text-gray-700 text-gray-700 focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-200"
                 >
                   <option value="">Toutes</option>
                   <option value="today">Aujourd'hui</option>
@@ -65,12 +65,12 @@
               </label>
             </div>
 
-            <div class="space-y-3 border-t border-neutral-200/70 pt-4">
-              <p class="text-small font-semibold text-body-emphasis">Actions rapides</p>
+            <div class="space-y-2 border-t border-gray-200/70 padding-t-lg">
+              <p class="text-sm font-semibold text-gray-800">Actions rapides</p>
               <Button
                 variant="ghost"
                 size="sm"
-                class="w-full justify-center text-body"
+                class="w-full justify-center text-gray-700"
                 :disabled="!hasFilters"
                 @click="clearFilters"
               >
@@ -88,7 +88,7 @@
               <Button
                 variant="ghost"
                 size="sm"
-                class="w-full justify-center text-primary"
+                class="w-full justify-center text-blue-600"
                 :left-icon="CheckCheck"
                 @click="markAllAsRead"
               >
@@ -97,36 +97,36 @@
             </div>
           </Card>
 
-          <Card variant="highlight" padding="lg" class="space-y-4 text-heading">
+          <Card variant="highlight" padding="lg" class="space-y-4 text-gray-900">
             <template #header>
               <div class="flex items-center gap-3">
-                <div class="flex h-14 w-14 items-center justify-center rounded-2xl bg-white/20 text-white">
-                  <Leaf class="h-7 w-7" />
+                <div class="flex h-14 w-14 items-center justify-center rounded-modern bg-white/20 text-white">
+                  <Leaf class="h-7 w-12" />
                 </div>
                 <div>
-                  <p class="text-small uppercase tracking-wide text-white/80">Impact du mois</p>
-                  <h3 class="text-h3 font-semibold text-white">Votre contribution</h3>
+                  <p class="text-sm uppercase tracking-wide text-white/80">Impact du mois</p>
+                  <h3 class="text-lg font-semibold text-white">Votre contribution</h3>
                 </div>
               </div>
             </template>
 
-            <ul class="space-y-2 text-white/90">
-              <li class="flex items-center justify-between text-body"><span>Nourriture sauvée</span><strong>{{ monthlyImpact.food }} kg</strong></li>
-              <li class="flex items-center justify-between text-body"><span>CO₂ évité</span><strong>{{ monthlyImpact.co2 }} kg</strong></li>
-              <li class="flex items-center justify-between text-body"><span>Économies réalisées</span><strong>{{ formatPrice(monthlyImpact.savings) }}</strong></li>
+            <ul class="space-y-4 text-white/90">
+              <li class="flex items-center justify-between text-gray-700"><span>Nourriture sauvée</span><strong>{{ monthlyImpact.food }} kg</strong></li>
+              <li class="flex items-center justify-between text-gray-700"><span>CO₂ évité</span><strong>{{ monthlyImpact.co2 }} kg</strong></li>
+              <li class="flex items-center justify-between text-gray-700"><span>Économies réalisées</span><strong>{{ formatPrice(monthlyImpact.savings) }}</strong></li>
             </ul>
           </Card>
         </div>
 
         <div class="space-y-6">
-          <Card padding="lg" class="space-y-6 shadow-card">
+          <Card padding="lg" class="space-y-6 shadow-lg">
             <template #header>
-              <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+              <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <div class="flex items-center gap-3">
                   <Button
                     variant="ghost"
                     size="icon"
-                    :class="viewMode === 'list' ? 'bg-primary-100 text-primary-emphasis' : 'text-muted'"
+                    :class="viewMode === 'list' ? 'bg-blue-100 text-blue-900' : 'text-gray-500'"
                     :aria-pressed="viewMode === 'list'"
                     aria-label="Vue liste"
                     :left-icon="List"
@@ -137,7 +137,7 @@
                   <Button
                     variant="ghost"
                     size="icon"
-                    :class="viewMode === 'grid' ? 'bg-primary-100 text-primary-emphasis' : 'text-muted'"
+                    :class="viewMode === 'grid' ? 'bg-blue-100 text-blue-900' : 'text-gray-500'"
                     :aria-pressed="viewMode === 'grid'"
                     aria-label="Vue grille"
                     :left-icon="Grid3X3"
@@ -145,13 +145,13 @@
                   >
                     <span class="sr-only">Vue grille</span>
                   </Button>
-                  <p class="text-small text-muted">
+                  <p class="text-sm text-gray-500">
                     {{ filteredReservations.length }} réservation{{ filteredReservations.length > 1 ? 's' : '' }}
                   </p>
                 </div>
                 <select
                   v-model="sortBy"
-                  class="w-full rounded-2xl border border-neutral-200 bg-surface-light px-4 py-3 text-body text-body focus:border-primary-400 focus:outline-none focus:ring-2 focus:ring-primary-200 sm:w-auto"
+                  class="w-full rounded-modern border border-gray-200 bg-gray-100 px-3 py-3 text-gray-700 text-gray-700 focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-200 sm:w-auto"
                 >
                   <option value="created_at_desc">Plus récentes</option>
                   <option value="created_at_asc">Plus anciennes</option>
@@ -161,15 +161,15 @@
               </div>
             </template>
 
-            <div v-if="loading" class="grid grid-cols-1 gap-4 sm:gap-6 md:grid-cols-3 xl:grid-cols-4">
+            <div v-if="loading" class="grid grid-cols-1 gap-3 sm:gap-4 md:grid-cols-3 xl:grid-cols-4">
               <Card
                 v-for="index in 6"
                 :key="index"
                 padding="sm"
                 class="space-y-4"
               >
-                <Skeleton class="h-24 w-full" />
-                <Skeleton class="h-5 w-3/4" />
+                <Skeleton class="h-6xl w-full" />
+                <Skeleton class="h-4 w-3/4" />
                 <Skeleton class="h-3 w-1/2" />
               </Card>
             </div>
@@ -187,7 +187,7 @@
               <div
                 v-if="viewMode === 'grid'"
                 data-test="reservations-grid"
-                class="grid grid-cols-1 gap-4 sm:gap-6 md:grid-cols-3 xl:grid-cols-4"
+                class="grid grid-cols-1 gap-3 sm:gap-4 md:grid-cols-3 xl:grid-cols-4"
               >
                 <ReservationCard
                   v-for="reservation in filteredReservations"
@@ -213,7 +213,7 @@
               </div>
             </div>
 
-            <div v-if="filteredReservations.length > 0 && totalPages > 1" class="border-t border-neutral-200/70 pt-6">
+            <div v-if="filteredReservations.length > 0 && totalPages > 1" class="border-t border-gray-200/70 padding-t-xl">
               <div class="flex items-center justify-center gap-3">
                 <Button
                   variant="outline"
@@ -228,7 +228,7 @@
                     :key="page"
                     variant="ghost"
                     size="sm"
-                    :class="page === currentPage ? 'bg-primary-100 text-primary-emphasis' : 'text-body'"
+                    :class="page === currentPage ? 'bg-blue-100 text-blue-900' : 'text-gray-700'"
                     @click="currentPage = page"
                   >
                     {{ page }}

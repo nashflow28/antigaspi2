@@ -2,15 +2,15 @@
   <DashboardLayout
     :sidebar="sidebar"
     :header="header"
-    class="bg-neutral-50"
+    class="bg-gray-50"
   >
     <!-- Header -->
     <div class="bg-white shadow-sm">
-      <div class="max-w-full sm:max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="max-w-full sm:max-w-7xl mx-auto px-3 sm:px-4 lg:px-6">
         <div class="flex justify-start sm:justify-between items-center py-6">
           <div>
-            <h1 class="text-responsive-xl font-semibold text-heading">Gestion des Catégories</h1>
-            <p class="mt-1 text-responsive-sm text-body">
+            <h1 class="text-xl font-semibold text-gray-900">Gestion des Catégories</h1>
+            <p class="mt-1 text-sm text-gray-700">
               Gérer les catégories de produits de la plateforme
             </p>
           </div>
@@ -19,7 +19,7 @@
             class="flex items-center gap-2"
             @click="openCreateModal"
           >
-            <PlusIcon class="w-5 h-5" />
+            <PlusIcon class="h-4 w-4" />
             Nouvelle Catégorie
           </Button>
         </div>
@@ -27,52 +27,52 @@
     </div>
 
     <!-- Stats Cards -->
-    <div class="max-w-full sm:max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-      <div class="grid grid-cols-1 md:grid-cols-4 gap-4 sm:gap-6 mb-6 sm:mb-8">
+    <div class="max-w-full sm:max-w-7xl mx-auto px-3 sm:px-4 lg:px-6 py-6">
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-3 sm:gap-6 mt-4 sm:mb-3xl">
         <Card>
           <div class="flex items-center">
-            <div class="p-3 rounded-lg bg-blue-100">
-              <TagIcon class="w-10 h-10 text-info" />
+            <div class="p-3 rounded bg-blue-100">
+              <TagIcon class="h-6 w-6 text-info" />
             </div>
-            <div class="ml-4">
-              <p class="text-responsive-sm font-medium text-body">Total</p>
-              <p class="text-responsive-xl font-semibold text-heading">{{ stats.total_categories || 0 }}</p>
+            <div class="ml-6">
+              <p class="text-sm font-medium text-gray-700">Total</p>
+              <p class="text-xl font-semibold text-gray-900">{{ stats.total_categories || 0 }}</p>
             </div>
           </div>
         </Card>
 
         <Card>
           <div class="flex items-center">
-            <div class="p-3 rounded-lg bg-green-100">
-              <CheckCircleIcon class="w-10 h-10 text-success" />
+            <div class="p-3 rounded bg-green-100">
+              <CheckCircleIcon class="h-6 w-6 text-green-600" />
             </div>
-            <div class="ml-4">
-              <p class="text-responsive-sm font-medium text-body">Actives</p>
-              <p class="text-responsive-xl font-semibold text-heading">{{ stats.active_categories || 0 }}</p>
-            </div>
-          </div>
-        </Card>
-
-        <Card>
-          <div class="flex items-center">
-            <div class="p-3 rounded-lg bg-purple-100">
-              <CubeIcon class="w-10 h-10 text-purple-600" />
-            </div>
-            <div class="ml-4">
-              <p class="text-responsive-sm font-medium text-body">Avec Produits</p>
-              <p class="text-responsive-xl font-semibold text-heading">{{ stats.categories_with_products || 0 }}</p>
+            <div class="ml-6">
+              <p class="text-sm font-medium text-gray-700">Actives</p>
+              <p class="text-xl font-semibold text-gray-900">{{ stats.active_categories || 0 }}</p>
             </div>
           </div>
         </Card>
 
         <Card>
           <div class="flex items-center">
-            <div class="p-3 rounded-lg bg-orange-100">
-              <ChartBarIcon class="w-10 h-10 text-orange-600" />
+            <div class="p-3 rounded bg-blue-100">
+              <CubeIcon class="h-6 w-6 text-purple-600" />
             </div>
-            <div class="ml-4">
-              <p class="text-responsive-sm font-medium text-body">Top Catégorie</p>
-              <p class="text-responsive-lg font-semibold text-heading">
+            <div class="ml-6">
+              <p class="text-sm font-medium text-gray-700">Avec Produits</p>
+              <p class="text-xl font-semibold text-gray-900">{{ stats.categories_with_products || 0 }}</p>
+            </div>
+          </div>
+        </Card>
+
+        <Card>
+          <div class="flex items-center">
+            <div class="p-3 rounded bg-yellow-100">
+              <ChartBarIcon class="h-6 w-6 text-blue-600" />
+            </div>
+            <div class="ml-6">
+              <p class="text-sm font-medium text-gray-700">Top Catégorie</p>
+              <p class="text-lg font-semibold text-gray-900">
                 {{ stats.top_categories && stats.top_categories.length > 0 ? stats.top_categories[0].name : 'Aucune' }}
               </p>
             </div>
@@ -82,24 +82,24 @@
 
       <!-- Categories Table -->
       <Card>
-        <div class="px-6 py-4 border-b border-neutral-200">
+        <div class="px-4 py-4 border-b border-gray-200">
           <div class="flex justify-start sm:justify-between items-center">
-            <h3 class="text-responsive-lg font-medium text-heading">Liste des Catégories</h3>
-            <div class="flex items-center gap-4">
+            <h3 class="text-lg font-medium text-gray-900">Liste des Catégories</h3>
+            <div class="flex items-center gap-3">
               <!-- Search -->
               <div class="relative">
-                <MagnifyingGlassIcon class="w-5 h-5 relative sm:absolute left-3 top-1/2 transform -translate-y-1/2 text-placeholder" />
+                <MagnifyingGlassIcon class="h-4 w-4 relative sm:absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
                 <input
                   v-model="searchQuery"
                   type="text"
                   placeholder="Rechercher..."
-                  class="pl-10 pr-4 py-3 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  class="pl-10 pr-4 py-3 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 >
               </div>
               <!-- Filter -->
               <select
                 v-model="filterStatus"
-                class="border border-neutral-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                class="border border-gray-300 rounded px-3 py-3 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               >
                 <option value="">Tous</option>
                 <option value="active">Actives</option>
@@ -110,85 +110,85 @@
         </div>
 
         <!-- Loading State -->
-        <div v-if="loading" class="px-6 py-8 sm:py-10 lg:py-12 text-left sm:text-center">
-          <div class="animate-spin rounded-full h-10 w-10 border-b-2 border-primary-600 mx-auto mb-4" />
-          <p class="text-muted">Chargement des catégories...</p>
+        <div v-if="loading" class="px-4 py-8 sm:py-12 lg:py-16 text-left sm:text-center">
+          <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mt-3" />
+          <p class="text-gray-500">Chargement des catégories...</p>
         </div>
 
         <!-- Categories List -->
         <div v-else-if="filteredCategories.length > 0" class="overflow-x-auto">
           <table class="min-w-full divide-y divide-neutral-200">
-            <thead class="bg-neutral-50">
+            <thead class="bg-gray-50">
               <tr>
-                <th class="px-6 py-3 text-left text-responsive-xs font-medium text-muted uppercase tracking-wider">
+                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Catégorie
                 </th>
-                <th class="px-6 py-3 text-left text-responsive-xs font-medium text-muted uppercase tracking-wider">
+                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Description
                 </th>
-                <th class="px-6 py-3 text-left text-responsive-xs font-medium text-muted uppercase tracking-wider">
+                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Produits
                 </th>
-                <th class="px-6 py-3 text-left text-responsive-xs font-medium text-muted uppercase tracking-wider">
+                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Statut
                 </th>
-                <th class="px-6 py-3 text-left text-responsive-xs font-medium text-muted uppercase tracking-wider">
+                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Actions
                 </th>
               </tr>
             </thead>
             <tbody class="bg-white divide-y divide-neutral-200">
-              <tr v-for="category in filteredCategories" :key="category.id" class="hover:bg-neutral-50">
-                <td class="px-6 py-4 whitespace-nowrap">
+              <tr v-for="category in filteredCategories" :key="category.id" class="hover:bg-gray-50">
+                <td class="px-4 py-4 whitespace-nowrap">
                   <div class="flex items-center">
-                    <span class="text-responsive-xl mr-3">{{ category.icon || '📦' }}</span>
+                    <span class="text-xl mr-4">{{ category.icon || '📦' }}</span>
                     <div>
-                      <div class="text-responsive-sm font-medium text-heading">{{ category.name }}</div>
-                      <div class="text-responsive-sm text-muted">ID: {{ category.id }}</div>
+                      <div class="text-sm font-medium text-gray-900">{{ category.name }}</div>
+                      <div class="text-sm text-gray-500">ID: {{ category.id }}</div>
                     </div>
                   </div>
                 </td>
-                <td class="px-6 py-4">
-                  <div class="text-responsive-sm text-heading max-w-xs">{{ category.description }}</div>
+                <td class="px-4 py-4">
+                  <div class="text-sm text-gray-900 max-w-xs">{{ category.description }}</div>
                 </td>
-                <td class="px-6 py-4 whitespace-nowrap">
-                  <div class="text-responsive-sm text-heading">{{ (category.products_count ?? 0) }} produit(s)</div>
+                <td class="px-4 py-4 whitespace-nowrap">
+                  <div class="text-sm text-gray-900">{{ (category.products_count ?? 0) }} produit(s)</div>
                 </td>
-                <td class="px-6 py-4 whitespace-nowrap">
+                <td class="px-4 py-4 whitespace-nowrap">
                   <button
-                    class="inline-flex items-center px-4.5 py-0.5 rounded-full text-responsive-xs font-medium"
+                    class="inline-flex items-center px-3.5 py-1 rounded-full text-xs font-medium"
                     :class="category.is_active
-                      ? 'bg-green-100 text-green-800 hover:bg-green-200'
+                      ? 'bg-green-100 text-green-800 hover:bg-blue-200'
                       : 'bg-red-100 text-red-800 hover:bg-red-200'"
                     @click="toggleCategoryStatus(category)"
                   >
                     {{ category.is_active ? 'Active' : 'Inactive' }}
                   </button>
                 </td>
-                <td class="px-6 py-4 whitespace-nowrap text-responsive-sm font-medium">
+                <td class="px-4 py-4 whitespace-nowrap text-sm font-medium">
                   <div class="flex items-center gap-2">
                     <button
-                      class="text-info hover:text-blue-900"
+                      class="text-info hover:text-secondary-900"
                       title="Voir détails"
                       @click="viewCategory(category)"
                     >
-                      <EyeIcon class="w-5 h-5" />
+                      <EyeIcon class="h-4 w-4" />
                     </button>
                     <button
                       class="text-indigo-600 hover:text-indigo-900"
                       title="Modifier"
                       @click="editCategory(category)"
                     >
-                      <PencilIcon class="w-5 h-5" />
+                      <PencilIcon class="h-4 w-4" />
                     </button>
                     <button
-                      class="text-error hover:text-red-900"
+                      class="text-red-600 hover:text-red-900"
                       title="Supprimer"
                       :disabled="(category.products_count ?? 0) > 0"
                       :class="{ 'opacity-50 cursor-not-allowed': (category.products_count ?? 0) > 0 }"
                       @click="deleteCategory(category)"
                     >
-                      <TrashIcon class="w-5 h-5" />
+                      <TrashIcon class="h-4 w-4" />
                     </button>
                   </div>
                 </td>
@@ -198,10 +198,10 @@
         </div>
 
         <!-- Empty State -->
-        <div v-else class="px-6 py-8 sm:py-10 lg:py-12 text-left sm:text-center">
-          <TagIcon class="w-12 h-12 text-placeholder mx-auto mb-4" />
-          <h3 class="text-responsive-lg font-medium text-heading mb-2">Aucune catégorie trouvée</h3>
-          <p class="text-muted mb-6">
+        <div v-else class="px-4 py-8 sm:py-12 lg:py-16 text-left sm:text-center">
+          <TagIcon class="w-12 h-10 text-gray-400 mx-auto mt-3" />
+          <h3 class="text-lg font-medium text-gray-900 mt-2">Aucune catégorie trouvée</h3>
+          <p class="text-gray-500 mt-4">
             {{ searchQuery ? 'Aucune catégorie ne correspond à votre recherche.' : 'Commencez par créer votre première catégorie.' }}
           </p>
           <Button
@@ -224,34 +224,34 @@
       />
 
       <!-- Modal -->
-      <div class="flex min-h-full items-center justify-center p-4">
+      <div class="flex min-h-screen items-center justify-center p-4">
         <div
-          class="relative w-full max-w-full sm:max-w-lg bg-white rounded-2xl shadow-2xl transform transition-all"
+          class="relative w-full max-w-xl bg-white rounded shadow-80 transform transition-all"
           @click.stop
         >
           <!-- Header -->
-          <div class="px-6 py-4 border-b border-neutral-200">
+          <div class="px-4 py-4 border-b border-gray-200">
             <div class="flex items-center justify-start sm:justify-between">
               <div class="flex items-center gap-3">
-                <div class="p-2 rounded-xl bg-blue-100">
-                  <component :is="modal.icon" class="w-10 h-10 text-info" />
+                <div class="p-2 rounded bg-blue-100">
+                  <component :is="modal.icon" class="h-6 w-6 text-info" />
                 </div>
-                <h3 class="text-responsive-xl font-semibold text-heading">{{ modal.title }}</h3>
+                <h3 class="text-xl font-semibold text-gray-900">{{ modal.title }}</h3>
               </div>
               <button
                 class="p-2 hover:transition-colors"
                 @click="closeModal"
               >
-                <XMarkIcon class="w-5 h-5 text-placeholder" />
+                <XMarkIcon class="h-4 w-4 text-gray-400" />
               </button>
             </div>
           </div>
 
           <!-- Form Content -->
-          <div class="px-6 py-6">
+          <div class="px-4 py-6">
             <form class="space-y-6" @submit.prevent="saveCategory">
               <div>
-                <label for="name" class="block text-responsive-sm font-medium text-body-emphasis mb-2">
+                <label for="name" class="block text-sm font-medium text-gray-800 mt-2">
                   Nom de la catégorie *
                 </label>
                 <input
@@ -260,13 +260,13 @@
                   type="text"
                   required
                   maxlength="100"
-                  class="w-full border border-neutral-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  class="w-full border border-gray-300 rounded px-3 py-3 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   placeholder="Ex: Fruits et Légumes"
                 >
               </div>
 
               <div>
-                <label for="description" class="block text-responsive-sm font-medium text-body-emphasis mb-2">
+                <label for="description" class="block text-sm font-medium text-gray-800 mt-2">
                   Description *
                 </label>
                 <textarea
@@ -275,13 +275,13 @@
                   required
                   maxlength="500"
                   rows="3"
-                  class="w-full border border-neutral-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  class="w-full border border-gray-300 rounded px-3 py-3 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   placeholder="Description de la catégorie..."
                 />
               </div>
 
               <div>
-                <label for="icon" class="block text-responsive-sm font-medium text-body-emphasis mb-2">
+                <label for="icon" class="block text-sm font-medium text-gray-800 mt-2">
                   Icône (emoji)
                 </label>
                 <input
@@ -289,7 +289,7 @@
                   v-model="form.icon"
                   type="text"
                   maxlength="10"
-                  class="w-full border border-neutral-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  class="w-full border border-gray-300 rounded px-3 py-3 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   placeholder="🥬"
                 >
               </div>
@@ -299,16 +299,16 @@
                   <input
                     v-model="form.is_active"
                     type="checkbox"
-                    class="rounded border-neutral-300 text-primary focus:ring-primary-500"
+                    class="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                   >
-                  <span class="ml-2 text-responsive-sm text-body-emphasis">Catégorie active</span>
+                  <span class="ml-2 text-sm text-gray-800">Catégorie active</span>
                 </label>
               </div>
 
-              <div class="flex justify-center sm:justify-end gap-3 pt-4">
+              <div class="flex justify-center sm:justify-end gap-3 padding-t-lg">
                 <button
                   type="button"
-                  class="px-4 py-3 text-body hover:transition-colors"
+                  class="px-3 py-3 text-gray-700 hover:transition-colors"
                   @click="closeModal"
                 >
                   Annuler
@@ -316,7 +316,7 @@
                 <button
                   type="submit"
                   :disabled="saving"
-                  class="px-6 py-3 bg-primary-600 text-white rounded-lg hover:transition-colors disabled:opacity-50"
+                  class="px-4 py-3 bg-blue-600 text-white rounded hover:transition-colors disabled:opacity-50"
                 >
                   {{ saving ? 'Enregistrement...' : (editingCategory ? 'Modifier' : 'Créer') }}
                 </button>

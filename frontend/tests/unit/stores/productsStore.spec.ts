@@ -86,7 +86,7 @@ describe('Products Store', () => {
     })
 
     it('should set loading state during fetch', async () => {
-      let resolvePromise: (value: any) => void
+      let resolvePromise: () => void
       const apiPromise = new Promise(resolve => {
         resolvePromise = resolve
       })

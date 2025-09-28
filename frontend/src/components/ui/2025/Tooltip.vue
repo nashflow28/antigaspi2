@@ -86,7 +86,7 @@ const position = ref({ x: 0, y: 0 })
 
 // Computed
 const tooltipClasses = computed(() => [
-  'fixed z-50 px-3 py-2 text-xs font-medium rounded-lg shadow-lg',
+  'fixed z-50 px-3 py-2 text-xs font-medium rounded shadow-lg',
   'pointer-events-none',
   variantClasses.value,
   'transform-gpu'
@@ -94,12 +94,12 @@ const tooltipClasses = computed(() => [
 
 const variantClasses = computed(() => {
   const variants = {
-    default: 'bg-neutral-900 text-white',
-    dark: 'bg-neutral-900 text-white',
-    light: 'bg-white text-heading border border-neutral-200',
+    default: 'bg-gray-900 text-white',
+    dark: 'bg-gray-900 text-white',
+    light: 'bg-white text-gray-900 border border-gray-200',
     error: 'bg-red-600 text-white',
     warning: 'bg-yellow-500 text-white',
-    success: 'bg-green-600 text-white'
+    success: 'bg-blue-600 text-white'
   }
   return variants[props.variant]
 })
@@ -107,14 +107,14 @@ const variantClasses = computed(() => {
 const arrowClasses = computed(() => {
   if (!props.arrow) return ''
 
-  const base = 'absolute w-2 h-2 transform rotate-45'
+  const base = 'absolute h-4 w-4 transform rotate-45'
   const variantArrow = {
-    default: 'bg-neutral-900',
-    dark: 'bg-neutral-900',
-    light: 'bg-white border-l border-t border-neutral-200',
+    default: 'bg-gray-900',
+    dark: 'bg-gray-900',
+    light: 'bg-white border-l border-t border-gray-200',
     error: 'bg-red-600',
     warning: 'bg-yellow-500',
-    success: 'bg-green-600'
+    success: 'bg-blue-600'
   }
 
   const placementArrow = {

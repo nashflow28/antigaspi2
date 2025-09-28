@@ -10,7 +10,7 @@
         <span aria-hidden="true" class="mt-1">
           <svg
             v-if="tone === 'success'"
-            class="h-5 w-5 text-primary-500"
+            class="h-4 w-4 text-blue-500"
             viewBox="0 0 20 20"
             fill="currentColor"
           >
@@ -22,7 +22,7 @@
           </svg>
           <svg
             v-else-if="tone === 'info'"
-            class="h-5 w-5 text-accent-blue"
+            class="h-4 w-4 text-blue-500"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -36,7 +36,7 @@
           </svg>
           <svg
             v-else-if="tone === 'warning'"
-            class="h-5 w-5 text-accent-orange"
+            class="h-4 w-4 text-orange-500"
             viewBox="0 0 20 20"
             fill="currentColor"
           >
@@ -48,7 +48,7 @@
           </svg>
           <svg
             v-else
-            class="h-5 w-5 text-accent-red"
+            class="h-4 w-4 text-red-600"
             viewBox="0 0 20 20"
             fill="currentColor"
           >
@@ -59,18 +59,18 @@
             />
           </svg>
         </span>
-        <div class="flex-1 space-y-2">
-          <p v-if="title" class="text-small font-semibold text-heading-secondary dark:text-neutral-100">
+        <div class="flex-1 space-y-4">
+          <p v-if="title" class="text-sm font-semibold text-gray-800 dark:text-gray-100">
             {{ title }}
           </p>
-          <p v-if="description" class="text-caption text-muted dark:text-neutral-300">
+          <p v-if="description" class="text-xs text-gray-500 dark:text-gray-500">
             {{ description }}
           </p>
           <Button
             v-if="actionLabel"
             variant="ghost"
             size="sm"
-            class="px-0 text-primary dark:text-primary-200"
+            class="px-0 text-blue-600 dark:text-blue-200"
             @click="handleAction"
           >
             {{ actionLabel }}
@@ -78,12 +78,12 @@
         </div>
         <button
           type="button"
-          class="rounded-2xl p-2 text-placeholder transition hover:text-body focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-400"
+          class="rounded p-2 text-gray-400 transition hover:text-gray-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400"
           aria-label="Fermer la notification"
           @click="handleClose"
         >
           <svg
-            class="h-5 w-5"
+            class="h-4 w-4"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -131,16 +131,16 @@ const emit = defineEmits<{
 }>()
 
 const toneClasses: Record<ToastTone, string> = {
-  success: 'border-primary-500',
-  info: 'border-accent-blue',
-  warning: 'border-accent-orange',
-  error: 'border-accent-red'
+  success: 'border-blue-500',
+  info: 'border-blue-500',
+  warning: 'border-orange-500',
+  error: 'border-red-600'
 }
 
 const { isOpen, tone, title, description, actionLabel, position } = toRefs(props)
 
 const toastClasses = computed(() => [
-  'flex w-full items-start gap-3 rounded-3xl border-l-4 bg-white p-4 shadow-toast dark:bg-neutral-900',
+  'flex w-full items-start gap-3 rounded border-l-4 bg-white p-4 shadow-md dark:bg-gray-900',
   toneClasses[tone.value]
 ])
 

@@ -2,7 +2,7 @@
   <div v-if="isDev && showPanel" class="sequential-thinking-panel">
     <div class="panel-header">
       <div class="panel-title">
-        <Brain class="w-5 h-5" />
+        <Brain class="h-4 w-4" />
         <span>Sequential Thinking</span>
         <span v-if="isRecording" class="recording-indicator">🔴 REC</span>
       </div>
@@ -13,13 +13,13 @@
           title="Export session"
           @click="exportCurrentSession"
         >
-          <Download class="w-5 h-5" />
+          <Download class="h-4 w-4" />
         </button>
         <button class="button-clear" title="Clear old sessions" @click="clearOldSessions">
-          <Trash2 class="w-5 h-5" />
+          <Trash2 class="h-4 w-4" />
         </button>
         <button class="button-close" title="Close panel" @click="togglePanel">
-          <X class="w-5 h-5" />
+          <X class="h-4 w-4" />
         </button>
       </div>
     </div>
@@ -54,7 +54,7 @@
             class="button-start"
             @click="startNewSession"
           >
-            <Play class="w-5 h-5 mr-1" />
+            <Play class="h-4 w-4 mr-1" />
             Start
           </button>
           <button
@@ -62,7 +62,7 @@
             class="button-stop"
             @click="endCurrentSession"
           >
-            <Square class="w-5 h-5 mr-1" />
+            <Square class="h-4 w-4 mr-1" />
             Stop
           </button>
         </div>
@@ -76,7 +76,7 @@
           :class="['tab', { 'tab-active': activeTab === tab.id }]"
           @click="activeTab = tab.id"
         >
-          <component :is="tab.icon" class="w-5 h-5" />
+          <component :is="tab.icon" class="h-4 w-4" />
           {{ tab.label }}
         </button>
       </div>
@@ -84,10 +84,10 @@
       <!-- Tab Content -->
       <div class="tab-content">
         <!-- Current Session Steps -->
-        <div v-if="activeTab === 'current'" class="steps-container px-4 sm:px-6 lg:px-8">
+        <div v-if="activeTab === 'current'" class="steps-container px-3 sm:px-4 lg:px-6">
           <div v-if="!currentSession || currentSession.steps.length === 0" class="empty-state">
-            <Brain class="w-10 h-10 text-placeholder" />
-            <p class="text-responsive-sm text-body">No active thinking session</p>
+            <Brain class="h-6 w-6 text-gray-400" />
+            <p class="text-sm text-gray-700">No active thinking session</p>
             <button class="button-start-empty" @click="startNewSession">
               Start Thinking Session
             </button>
@@ -148,10 +148,10 @@
         </div>
 
         <!-- Sessions History -->
-        <div v-if="activeTab === 'history'" class="history-container px-4 sm:px-6 lg:px-8">
+        <div v-if="activeTab === 'history'" class="history-container px-3 sm:px-4 lg:px-6">
           <div v-if="sessions.length === 0" class="empty-state">
-            <History class="w-10 h-10 text-placeholder" />
-            <p class="text-responsive-sm text-body">No completed sessions</p>
+            <History class="h-6 w-6 text-gray-400" />
+            <p class="text-sm text-gray-700">No completed sessions</p>
           </div>
           <div v-else class="sessions-list">
             <div
@@ -179,7 +179,7 @@
         </div>
 
         <!-- Analytics -->
-        <div v-if="activeTab === 'analytics'" class="analytics-container px-4 sm:px-6 lg:px-8">
+        <div v-if="activeTab === 'analytics'" class="analytics-container px-3 sm:px-4 lg:px-6">
           <div class="analytics-grid">
             <div class="analytics-component">
               <h4>Session Success Rate</h4>
@@ -211,7 +211,7 @@
           </div>
 
           <!-- Step Type Distribution -->
-          <div class="chart-container px-4 sm:px-6 lg:px-8">
+          <div class="chart-container px-3 sm:px-4 lg:px-6">
             <h4>Step Type Distribution</h4>
             <div class="step-types">
               <div
@@ -242,7 +242,7 @@
     title="Open Sequential Thinking Panel"
     @click="showPanel = true"
   >
-    <Brain class="w-5 h-5" />
+    <Brain class="h-4 w-4" />
     <span v-if="currentSessionSteps > 0" class="step-indicator">{{ currentSessionSteps }}</span>
   </button>
 </template>

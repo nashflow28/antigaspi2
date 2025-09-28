@@ -11,7 +11,7 @@
     @keydown="handleKeydown"
   >
     <!-- Separator -->
-    <div v-if="item.separator" class="my-1 border-t border-neutral-200" />
+    <div v-if="item.separator" class="my-xs border-t border-gray-200" />
 
     <!-- Regular Item -->
     <template v-else>
@@ -62,26 +62,26 @@ const itemClasses = computed(() => {
   }
 
   return [
-    'flex items-center w-full px-4 py-2 text-sm text-left',
+    'flex items-center w-full px-3 py-2 text-sm text-left',
     'transition-colors duration-150',
-    'focus:outline-none focus:bg-neutral-100',
+    'focus:outline-none focus:bg-gray-100',
 
     // States
     props.item.disabled ? [
-      'text-placeholder cursor-not-allowed'
+      'text-gray-400 cursor-not-allowed'
     ] : [
-      'text-body-emphasis hover:bg-neutral-100',
-      props.item.danger ? 'hover:bg-red-50 hover:text-error' : ''
+      'text-gray-800 hover:bg-gray-100',
+      props.item.danger ? 'hover:bg-red-50 hover:text-red-600' : ''
     ],
 
     // Danger variant
-    props.item.danger && 'text-error'
+    props.item.danger && 'text-red-600'
   ].flat().filter(Boolean).join(' ')
 })
 
 const iconClasses = computed(() => [
-  'mr-3 flex-shrink-0',
-  props.item.disabled ? 'text-placeholder' : 'text-muted',
+  'mr-4 flex-shrink-0',
+  props.item.disabled ? 'text-gray-400' : 'text-gray-500',
   props.item.danger && !props.item.disabled && 'text-red-500'
 ].filter(Boolean).join(' '))
 

@@ -6,18 +6,18 @@
   >
     <div class="p-6">
       <!-- Header -->
-      <div v-if="currentView === 'list'" class="mb-6 sm:mb-8">
-        <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 sm:gap-6">
+      <div v-if="currentView === 'list'" class="mt-4 sm:mb-3xl">
+        <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3 sm:gapadding-xl">
           <div>
-            <h1 class="text-responsive-xl lg:text-display-sm font-semibold text-heading mb-2">
+            <h1 class="text-xl lg:text-3xl font-semibold text-gray-900 mt-2">
               Paniers Surprise
             </h1>
-            <p class="text-body text-responsive-lg">
+            <p class="text-gray-700 text-lg">
               Créez des paniers mystère pour valoriser vos invendus
             </p>
           </div>
 
-          <div class="flex gap-4">
+          <div class="flex gap-3">
             <Button
               variant="ghost"
               :disabled="loading"
@@ -39,24 +39,24 @@
       </div>
 
       <!-- Navigation Header for other views -->
-      <div v-else class="mb-6 sm:mb-8">
-        <div class="flex items-center gap-4 mb-4">
+      <div v-else class="mt-4 sm:mb-3xl">
+        <div class="flex items-center gap-3 mt-3">
           <button
-            class="flex items-center text-body hover:transition-colors"
+            class="flex items-center text-gray-700 hover:transition-colors"
             @click="currentView = 'list'"
           >
-            <ArrowLeftIcon class="w-5 h-5 mr-2" />
+            <ArrowLeftIcon class="h-4 w-4 mr-2" />
             Retour aux paniers
           </button>
         </div>
 
         <div>
-          <h1 class="text-responsive-xl lg:text-display-sm font-semibold text-heading mb-2">
+          <h1 class="text-xl lg:text-3xl font-semibold text-gray-900 mt-2">
             <template v-if="currentView === 'create'">Nouveau Panier Surprise</template>
             <template v-else-if="currentView === 'edit'">Modifier le Panier</template>
             <template v-else-if="currentView === 'detail'">Détails du Panier</template>
           </h1>
-          <p class="text-body text-responsive-lg">
+          <p class="text-gray-700 text-lg">
             <template v-if="currentView === 'create'">Créez un panier mystère attractif</template>
             <template v-else-if="currentView === 'edit'">{{ editingBasket?.name }}</template>
             <template v-else-if="currentView === 'detail'">{{ selectedBasket?.name }}</template>
@@ -66,19 +66,19 @@
 
       <!-- Loading State -->
       <Card v-if="loading && currentView === 'list'">
-        <div class="flex items-center justify-center py-8 sm:py-10 lg:py-12">
-          <div class="animate-spin rounded-full h-10 w-10 border-b-2 border-primary-600" />
-          <span class="ml-3 text-body">Chargement des paniers surprise...</span>
+        <div class="flex items-center justify-center py-8 sm:py-12 lg:py-16">
+          <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600" />
+          <span class="ml-4 text-gray-700">Chargement des paniers surprise...</span>
         </div>
       </Card>
 
       <!-- Error State -->
-      <Card v-if="error" class="bg-accent-red/10 border-accent-red/30 mb-6">
+      <Card v-if="error" class="bg-red-600/10 border-red-600/30 mt-4">
         <div class="flex items-center justify-center py-6 sm:py-8">
-          <AlertTriangleIcon class="w-10 h-10 text-accent-red mr-3" />
+          <AlertTriangleIcon class="h-6 w-6 text-red-600 mr-4" />
           <div>
-            <p class="text-accent-red/90 font-medium">Erreur lors du chargement</p>
-            <p class="text-accent-red text-responsive-sm">{{ error }}</p>
+            <p class="text-red-600/90 font-medium">Erreur lors du chargement</p>
+            <p class="text-red-600 text-sm">{{ error }}</p>
           </div>
         </div>
       </Card>
@@ -86,63 +86,63 @@
       <!-- List View -->
       <div v-if="currentView === 'list' && !loading">
         <!-- Quick Stats -->
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 sm:gap-6 mb-6 sm:mb-8">
-          <Card class="bg-gradient-to-r from-purple-500 to-purple-600 text-white">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-3 sm:gapadding-xl mt-4 sm:mb-3xl">
+          <Card class="bg-gradient-to-r from-purple-500 to-blue-600 text-white">
             <div class="flex items-center justify-between">
               <div>
-                <p class="text-purple-100 text-responsive-sm font-medium">Total Paniers</p>
-                <p class="text-responsive-xl font-semibold">{{ baskets.length }}</p>
+                <p class="text-purple-100 text-sm font-medium">Total Paniers</p>
+                <p class="text-xl font-semibold">{{ baskets.length }}</p>
               </div>
-              <div class="p-3 bg-white/20 rounded-xl">
-                <GiftIcon class="w-10 h-10" />
+              <div class="p-3 bg-white/20 rounded">
+                <GiftIcon class="h-6 w-6" />
               </div>
             </div>
           </Card>
 
-          <Card class="bg-gradient-to-r from-primary-500 to-primary-600 text-white">
+          <Card class="bg-gradient-to-r from-blue-500 to-blue-600 text-white">
             <div class="flex items-center justify-between">
               <div>
-                <p class="text-primary-100 text-responsive-sm font-medium">Actifs</p>
-                <p class="text-responsive-xl font-semibold">{{ activeBaskets.length }}</p>
+                <p class="text-blue-100 text-sm font-medium">Actifs</p>
+                <p class="text-xl font-semibold">{{ activeBaskets.length }}</p>
               </div>
-              <div class="p-3 bg-white/20 rounded-xl">
-                <CheckCircleIcon class="w-10 h-10" />
+              <div class="p-3 bg-white/20 rounded">
+                <CheckCircleIcon class="h-6 w-6" />
               </div>
             </div>
           </Card>
 
-          <Card class="bg-gradient-to-r from-accent-orange to-accent-orange/90 text-white">
+          <Card class="bg-gradient-to-r from-orange-500 to-orange-500/90 text-white">
             <div class="flex items-center justify-between">
               <div>
-                <p class="text-accent-orange/70 text-responsive-sm font-medium">Stock Total</p>
-                <p class="text-responsive-xl font-semibold">{{ totalStock }}</p>
+                <p class="text-orange-500/70 text-sm font-medium">Stock Total</p>
+                <p class="text-xl font-semibold">{{ totalStock }}</p>
               </div>
-              <div class="p-3 bg-white/20 rounded-xl">
-                <PackageIcon class="w-10 h-10" />
+              <div class="p-3 bg-white/20 rounded">
+                <PackageIcon class="h-6 w-6" />
               </div>
             </div>
           </Card>
 
-          <Card class="bg-gradient-to-r from-accent-blue/50 to-accent-blue/90 text-white">
+          <Card class="bg-gradient-to-r from-blue-500/50 to-blue-500/90 text-white">
             <div class="flex items-center justify-between">
               <div>
-                <p class="text-accent-blue/60 text-responsive-sm font-medium">Revenus Potentiels</p>
-                <p class="text-responsive-xl font-semibold">{{ formatPrice(totalRevenue) }}</p>
+                <p class="text-blue-500/60 text-sm font-medium">Revenus Potentiels</p>
+                <p class="text-xl font-semibold">{{ formatPrice(totalRevenue) }}</p>
               </div>
-              <div class="p-3 bg-white/20 rounded-xl">
-                <DollarSignIcon class="w-10 h-10" />
+              <div class="p-3 bg-white/20 rounded">
+                <DollarSignIcon class="h-6 w-6" />
               </div>
             </div>
           </Card>
         </div>
 
         <!-- Empty State -->
-        <Card v-if="baskets.length === 0" class="text-left sm:text-center py-8 sm:py-10 lg:py-12">
-          <div class="w-20 h-20 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-6">
-            <GiftIcon class="w-10 h-10 text-purple-500" />
+        <Card v-if="baskets.length === 0" class="text-left sm:text-center py-8 sm:py-12 lg:py-16">
+          <div class="w-20 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mt-4">
+            <GiftIcon class="h-6 w-6 text-purple-500" />
           </div>
-          <h3 class="text-responsive-xl font-semibold text-heading mb-2">Aucun panier surprise</h3>
-          <p class="text-body mb-6 max-w-full sm:max-w-md mx-auto">
+          <h3 class="text-xl font-semibold text-gray-900 mt-2">Aucun panier surprise</h3>
+          <p class="text-gray-700 mt-4 max-w-xl mx-auto">
             Créez votre premier panier surprise pour valoriser vos invendus et offrir des surprises à vos clients
           </p>
           <Button
@@ -155,7 +155,7 @@
         </Card>
 
         <!-- Baskets Grid -->
-        <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+        <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gapadding-xl">
           <Card
             v-for="basket in baskets"
             :key="basket.id"
@@ -163,14 +163,14 @@
             class="glow-effect animate-fade-in-up overflow-hidden sm:block"
           >
             <!-- Image/Icon -->
-            <div class="relative h-48 bg-gradient-to-br from-purple-100 to-pink-100 flex items-center justify-center">
-              <GiftIcon class="w-16 h-16 text-purple-500" />
+            <div class="relative h-8xl bg-gradient-to-br from-purple-100 to-pink-100 flex items-center justify-center">
+              <GiftIcon class="w-12 h-10 text-purple-500" />
 
               <!-- Status Badge -->
               <div class="relative sm:absolute top-4 right-4">
                 <span
-                  class="px-4 py-3 text-responsive-xs font-medium rounded-full"
-                  :class="basket.is_active ? 'bg-primary-100 text-primary-emphasis' : 'bg-neutral-100 text-body'"
+                  class="px-3 py-3 text-xs font-medium rounded-full"
+                  :class="basket.is_active ? 'bg-blue-100 text-blue-900' : 'bg-gray-100 text-gray-700'"
                 >
                   {{ basket.is_active ? 'Actif' : 'Inactif' }}
                 </span>
@@ -178,7 +178,7 @@
 
               <!-- Discount Badge -->
               <div class="relative sm:absolute bottom-4 left-4">
-                <span class="px-4 py-3 text-responsive-xs font-semibold bg-accent-red/100 text-white rounded-full">
+                <span class="px-3 py-3 text-xs font-semibold bg-red-600/100 text-white rounded-full">
                   -{{ Math.round(((basket.original_price - basket.discounted_price) / basket.original_price) * 100) }}%
                 </span>
               </div>
@@ -186,28 +186,28 @@
 
             <!-- Content -->
             <div class="p-6">
-              <div class="flex items-stretch sm:items-start justify-between mb-4">
+              <div class="flex items-stretch sm:items-start justify-between mt-3">
                 <div>
-                  <h3 class="font-semibold text-heading mb-1">{{ basket.name }}</h3>
-                  <p class="text-responsive-sm text-body line-clamp-2">{{ basket.description }}</p>
+                  <h3 class="font-semibold text-gray-900 mb-1">{{ basket.name }}</h3>
+                  <p class="text-sm text-gray-700 line-clamp-2">{{ basket.description }}</p>
                 </div>
               </div>
 
               <!-- Pricing -->
-              <div class="flex items-center gap-2 mb-4">
-                <span class="text-responsive-lg font-semibold text-primary">{{ formatPrice(basket.discounted_price) }}</span>
-                <span class="text-responsive-sm text-placeholder line-through">{{ formatPrice(basket.original_price) }}</span>
+              <div class="flex items-center gap-2 mt-3">
+                <span class="text-lg font-semibold text-blue-600">{{ formatPrice(basket.discounted_price) }}</span>
+                <span class="text-sm text-gray-400 line-through">{{ formatPrice(basket.original_price) }}</span>
               </div>
 
               <!-- Stock -->
-              <div class="flex items-center gap-2 mb-4 text-responsive-sm text-body">
-                <PackageIcon class="w-5 h-5" />
+              <div class="flex items-center gap-2 mt-3 text-sm text-gray-700">
+                <PackageIcon class="h-4 w-4" />
                 <span>{{ basket.quantity_available }} disponible{{ basket.quantity_available > 1 ? 's' : '' }}</span>
               </div>
 
               <!-- Products Count -->
-              <div class="flex items-center gap-2 mb-6 text-responsive-sm text-body">
-                <LayersIcon class="w-5 h-5" />
+              <div class="flex items-center gap-2 mt-4 text-sm text-gray-700">
+                <LayersIcon class="h-4 w-4" />
                 <span>{{ basket.products?.length || 0 }} produit{{ (basket.products?.length || 0) > 1 ? 's' : '' }}</span>
               </div>
 

@@ -129,7 +129,7 @@ const modalClasses = computed(() => [
   // Base modal
   'relative w-full max-h-full',
   'transform transition-all duration-300',
-  'shadow-2xl',
+  'shadow-80',
 
   // Size
   sizeClasses.value,
@@ -148,12 +148,12 @@ const sizeClasses = computed(() => {
   const sizes = {
     xs: 'max-w-xs',
     sm: 'max-w-sm',
-    md: 'max-w-md',
-    lg: 'max-w-lg',
+    md: 'max-w-xl',
+    lg: 'max-w-xl',
     xl: 'max-w-xl',
-    '2xl': 'max-w-2xl',
-    '3xl': 'max-w-3xl',
-    full: 'max-w-full mx-4'
+    '2xl': 'max-w-80',
+    '3xl': 'max-w-6xl',
+    full: 'max-w-full mx-lg'
   }
   return sizes[props.size]
 })
@@ -161,24 +161,24 @@ const sizeClasses = computed(() => {
 const variantClasses = computed(() => {
   const variants = {
     default: [
-      'bg-white rounded-xl',
-      'border border-neutral-200'
+      'bg-white rounded',
+      'border border-gray-200'
     ].join(' '),
 
     glass: [
-      'bg-white/90 backdrop-blur-xl rounded-2xl',
+      'bg-white/90 backdrop-blur-xl rounded',
       'border border-white/20',
       'shadow-glass'
     ].join(' '),
 
     minimal: [
-      'bg-white rounded-lg',
+      'bg-white rounded',
       'shadow-xl'
     ].join(' '),
 
     alert: [
-      'bg-white rounded-lg',
-      'border-l-4 border-accent-orange',
+      'bg-white rounded',
+      'border-l-4 border-orange-500',
       'shadow-xl'
     ].join(' ')
   }
@@ -189,37 +189,37 @@ const variantClasses = computed(() => {
 const closeButtonClasses = computed(() => [
   'absolute top-4 right-4 z-10',
   'flex items-center justify-center',
-  'w-8 h-8 rounded-full',
-  'text-placeholder hover:text-body',
-  'hover:bg-neutral-100 transition-colors',
-  'focus:outline-none focus:ring-2 focus:ring-primary-500/50'
+  'w-xxl h-12 rounded-full',
+  'text-gray-400 hover:text-gray-700',
+  'hover:bg-gray-100 transition-colors',
+  'focus:outline-none focus:ring-2 focus:ring-blue-500/50'
 ].join(' '))
 
 const headerClasses = computed(() => [
-  'px-6 pt-6',
-  'pb-4'
+  'px-4 pt-2xl',
+  'pb-lg'
 ].join(' '))
 
 const titleClasses = computed(() => [
-  'text-xl font-semibold text-heading',
+  'text-xl font-semibold text-gray-900',
   'mb-1'
 ].join(' '))
 
 const descriptionClasses = computed(() => [
-  'text-sm text-body'
+  'text-sm text-gray-700'
 ].join(' '))
 
 const contentClasses = computed(() => [
   props.scrollable ? 'flex-1 overflow-y-auto' : '',
-  'px-6',
-  !props.title ? 'pt-6' : '',
-  !props.$slots.footer ? 'pb-6' : 'pb-4'
+  'px-4',
+  !props.title ? 'pt-2xl' : '',
+  !props.$slots.footer ? 'pb-2xl' : 'pb-lg'
 ].filter(Boolean).join(' '))
 
 const footerClasses = computed(() => [
-  'px-6 pb-6',
-  'border-t border-neutral-200',
-  'bg-neutral-50/50'
+  'px-4 pb-2xl',
+  'border-t border-gray-200',
+  'bg-gray-50/50'
 ].join(' '))
 
 // Methods

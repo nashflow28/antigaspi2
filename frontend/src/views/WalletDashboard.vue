@@ -2,26 +2,26 @@
   <DashboardLayout
     :sidebar="sidebar"
     :header="header"
-    class="bg-gradient-to-br from-neutral-50 to-primary-50"
+    class="bg-gradient-to-br from-gray-50 to-blue-50"
   >
     <!-- Page Header -->
     <div class="bg-white/60 backdrop-blur-md glass-border border-b backdrop-blur-lg sticky top-20 z-40">
-      <div class="container px-4 sm:px-6 lg:px-8-2025 py-6">
+      <div class="container px-3 py-4">
         <div class="flex items-center justify-start sm:justify-between animate-fade-in-up">
-          <div class="flex items-center gap-4">
+          <div class="flex items-center gap-3">
             <Button
               variant="ghost"
               size="sm"
               class="p-2"
               @click="$router.go(-1)"
             >
-              <ArrowLeft class="w-10 h-10" />
+              <ArrowLeft class="h-6 w-6" />
             </Button>
             <div>
-              <h1 class="text-responsive-xl lg:text-display-sm font-semibold text-heading mb-2">
+              <h1 class="text-xl lg:text-3xl font-semibold text-gray-900 mt-2">
                 Portefeuille électronique 💳
               </h1>
-              <p class="text-responsive-lg text-body">
+              <p class="text-lg text-gray-700">
                 Gérez votre portefeuille et vos transactions
               </p>
             </div>
@@ -30,8 +30,8 @@
       </div>
     </div>
 
-    <div class="container px-4 sm:px-6 lg:px-8-2025 py-6 sm:py-8">
-      <div class="max-w-full sm:max-w-6xl mx-auto space-y-8">
+    <div class="container px-3 py-6">
+      <div class="max-w-full sm:max-w-6xl mx-auto space-y-6">
         <!-- Wallet Card -->
         <div class="animate-fade-in-up">
           <WalletCard
@@ -43,17 +43,17 @@
         </div>
 
         <!-- Quick Actions -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 animate-fade-in-up" style="animation-delay: 0.1s;">
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 animate-fade-in-up" style="animation-delay: 0.1s;">
           <Button
             variant="outline"
             class="p-4 h-auto flex-col justify-start"
             @click="showRechargeModal = true"
           >
-            <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3 group-hover:transition-colors">
-              <Plus class="w-10 h-10 text-success" />
+            <div class="w-12 h-10 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:transition-colors">
+              <Plus class="h-6 w-6 text-green-600" />
             </div>
-            <div class="font-medium text-heading">Recharger</div>
-            <div class="text-responsive-sm text-muted">Ajouter des fonds</div>
+            <div class="font-medium text-gray-900">Recharger</div>
+            <div class="text-sm text-gray-500">Ajouter des fonds</div>
           </Button>
 
           <Button
@@ -61,11 +61,11 @@
             class="p-4 h-auto flex-col justify-start"
             @click="showTransferModal = true"
           >
-            <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-3 group-hover:transition-colors">
-              <ArrowUpRight class="w-10 h-10 text-info" />
+            <div class="w-12 h-10 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:transition-colors">
+              <ArrowUpRight class="h-6 w-6 text-info" />
             </div>
-            <div class="font-medium text-heading">Transférer</div>
-            <div class="text-responsive-sm text-muted">Vers un autre utilisateur</div>
+            <div class="font-medium text-gray-900">Transférer</div>
+            <div class="text-sm text-gray-500">Vers un autre utilisateur</div>
           </Button>
 
           <Button
@@ -73,11 +73,11 @@
             class="p-4 h-auto flex-col justify-start"
             @click="showSettingsModal = true"
           >
-            <div class="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-3 group-hover:transition-colors">
-              <Settings class="w-10 h-10 text-purple-600" />
+            <div class="w-12 h-10 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:transition-colors">
+              <Settings class="h-6 w-6 text-purple-600" />
             </div>
-            <div class="font-medium text-heading">Paramètres</div>
-            <div class="text-responsive-sm text-muted">PIN et limites</div>
+            <div class="font-medium text-gray-900">Paramètres</div>
+            <div class="text-sm text-gray-500">PIN et limites</div>
           </Button>
 
           <Button
@@ -85,16 +85,16 @@
             class="p-4 h-auto flex-col justify-start"
             @click="showStatsModal = true"
           >
-            <div class="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-3 group-hover:transition-colors">
-              <BarChart3 class="w-10 h-10 text-orange-600" />
+            <div class="w-12 h-10 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:transition-colors">
+              <BarChart3 class="h-6 w-6 text-blue-600" />
             </div>
-            <div class="font-medium text-heading">Statistiques</div>
-            <div class="text-responsive-sm text-muted">Analyse des dépenses</div>
+            <div class="font-medium text-gray-900">Statistiques</div>
+            <div class="text-sm text-gray-500">Analyse des dépenses</div>
           </Button>
         </div>
 
         <!-- Main Content Grid -->
-        <div class="grid lg:grid-cols-3 gap-6 sm:gap-8">
+        <div class="grid lg:grid-cols-3 gapadding-xl sm:gap-8">
           <!-- Transactions -->
           <div class="lg:col-span-2 animate-fade-in-up" style="animation-delay: 0.2s;">
             <WalletTransactions
@@ -106,63 +106,63 @@
           </div>
 
           <!-- Sidebar -->
-          <div class="space-y-6">
+          <div class="space-y-4">
             <!-- Stats Overview -->
             <Card class="animate-fade-in-up" style="animation-delay: 0.3s;">
-              <h3 class="text-responsive-lg font-semibold text-heading mb-4">Aperçu mensuel</h3>
+              <h3 class="text-lg font-semibold text-gray-900 mt-3">Aperçu mensuel</h3>
               <div v-if="walletStore.stats" class="space-y-4">
-                <div class="flex items-center justify-start sm:justify-between p-3 bg-green-50 rounded-lg">
+                <div class="flex items-center justify-start sm:justify-between p-3 bg-green-50 rounded">
                   <div class="flex items-center gap-2">
-                    <ArrowUp class="w-5 h-5 text-success" />
-                    <span class="text-responsive-sm font-medium text-green-800">Crédits</span>
+                    <ArrowUp class="h-4 w-4 text-green-600" />
+                    <span class="text-sm font-medium text-green-800">Crédits</span>
                   </div>
-                  <span class="font-semibold text-success">
+                  <span class="font-semibold text-green-600">
                     {{ formatAmount(walletStore.stats.period_stats.total_credits) }} XOF
                   </span>
                 </div>
-                <div class="flex items-center justify-start sm:justify-between p-3 bg-red-50 rounded-lg">
+                <div class="flex items-center justify-start sm:justify-between p-3 bg-red-50 rounded">
                   <div class="flex items-center gap-2">
-                    <ArrowDown class="w-5 h-5 text-error" />
-                    <span class="text-responsive-sm font-medium text-red-800">Débits</span>
+                    <ArrowDown class="h-4 w-4 text-red-600" />
+                    <span class="text-sm font-medium text-red-800">Débits</span>
                   </div>
-                  <span class="font-semibold text-error">
+                  <span class="font-semibold text-red-600">
                     {{ formatAmount(walletStore.stats.period_stats.total_debits) }} XOF
                   </span>
                 </div>
-                <div class="flex items-center justify-start sm:justify-between p-3 bg-neutral-50 rounded-lg">
+                <div class="flex items-center justify-start sm:justify-between p-3 bg-gray-50 rounded">
                   <div class="flex items-center gap-2">
-                    <Activity class="w-5 h-5 text-body" />
-                    <span class="text-responsive-sm font-medium text-heading-secondary">Transactions</span>
+                    <Activity class="h-4 w-4 text-gray-700" />
+                    <span class="text-sm font-medium text-gray-800">Transactions</span>
                   </div>
-                  <span class="font-semibold text-body">
+                  <span class="font-semibold text-gray-700">
                     {{ walletStore.stats.period_stats.transaction_count }}
                   </span>
                 </div>
               </div>
               <div v-else class="text-left sm:text-center py-4">
                 <div class="animate-pulse">
-                  <div class="h-5 bg-neutral-200 rounded w-3/4 mx-auto mb-2" />
-                  <div class="h-5 bg-neutral-200 rounded w-1/2 mx-auto" />
+                  <div class="h-4 bg-gray-200 rounded w-3/4 mx-auto mt-2" />
+                  <div class="h-4 bg-gray-200 rounded w-1/2 mx-auto" />
                 </div>
               </div>
             </Card>
 
             <!-- Daily Limit -->
             <Card class="animate-fade-in-up" style="animation-delay: 0.4s;">
-              <h3 class="text-responsive-lg font-semibold text-heading mb-4">Limite quotidienne</h3>
-              <div v-if="walletStore.wallet" class="space-y-3">
-                <div class="flex justify-start sm:justify-between text-responsive-sm">
-                  <span class="text-body">Utilisée aujourd'hui</span>
+              <h3 class="text-lg font-semibold text-gray-900 mt-3">Limite quotidienne</h3>
+              <div v-if="walletStore.wallet" class="space-y-2">
+                <div class="flex justify-start sm:justify-between text-sm">
+                  <span class="text-gray-700">Utilisée aujourd'hui</span>
                   <span class="font-medium">{{ formatAmount(walletStore.dailySpent) }} XOF</span>
                 </div>
-                <div class="w-full bg-neutral-200 rounded-full h-3">
+                <div class="w-full bg-gray-200 rounded-full h-3">
                   <div
-                    class="bg-gradient-to-r from-primary-500 to-primary-600 h-3 rounded-full transition-all duration-300"
+                    class="bg-gradient-to-r from-blue-500 to-blue-600 h-3 rounded-full transition-all duration-300"
                     :style="{ width: Math.min(walletStore.dailyLimitUsagePercentage, 100) + '%' }"
                   />
                 </div>
-                <div class="flex justify-start sm:justify-between text-responsive-sm">
-                  <span class="text-body">Limite</span>
+                <div class="flex justify-start sm:justify-between text-sm">
+                  <span class="text-gray-700">Limite</span>
                   <span class="font-medium">{{ formatAmount(walletStore.dailyLimit) }} XOF</span>
                 </div>
               </div>
@@ -170,29 +170,29 @@
 
             <!-- Security -->
             <Card class="bg-gradient-to-br from-blue-50 to-indigo-50 border-blue-200 animate-fade-in-up" style="animation-delay: 0.5s;">
-              <div class="flex items-center gap-3 mb-4">
-                <div class="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center">
-                  <Shield class="w-5 h-5 text-white" />
+              <div class="flex items-center gapadding-md mt-3">
+                <div class="h-6 w-6 bg-blue-500 rounded-full flex items-center justify-center">
+                  <Shield class="h-4 w-4 text-white" />
                 </div>
-                <h3 class="text-responsive-lg font-semibold text-blue-800">Sécurité</h3>
+                <h3 class="text-lg font-semibold text-gray-800">Sécurité</h3>
               </div>
-              <div class="space-y-2 text-responsive-sm">
+              <div class="space-y-4 text-sm">
                 <div class="flex items-center justify-start sm:justify-between">
-                  <span class="text-blue-700">Code PIN</span>
-                  <span class="font-medium text-blue-800">
+                  <span class="text-secondary-700">Code PIN</span>
+                  <span class="font-medium text-gray-800">
                     {{ walletStore.hasPin ? '✓ Configuré' : '⚠ Non configuré' }}
                   </span>
                 </div>
                 <div class="flex items-center justify-start sm:justify-between">
-                  <span class="text-blue-700">Statut</span>
-                  <span class="font-medium text-blue-800">
+                  <span class="text-secondary-700">Statut</span>
+                  <span class="font-medium text-gray-800">
                     {{ walletStore.isActive ? '✓ Actif' : '⚠ Inactif' }}
                   </span>
                 </div>
               </div>
               <button
                 v-if="!walletStore.hasPin"
-                class="w-full mt-4 px-4 py-3 bg-blue-600 text-white rounded-lg hover:transition-colors text-responsive-sm font-medium"
+                class="w-full mt-4 px-3 py-3 bg-blue-600 text-white rounded hover:transition-colors text-sm font-medium"
                 @click="showPinSetupModal = true"
               >
                 Configurer un PIN
@@ -221,21 +221,21 @@
 
     <!-- Simplified Transfer Modal (basic implementation) -->
     <div v-if="showTransferModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-      <div class="bg-white rounded-xl p-6 w-full max-w-full sm:max-w-md">
-        <div class="flex items-center justify-start sm:justify-between mb-6">
-          <h3 class="text-responsive-xl font-semibold text-heading">Transfert (Bientôt disponible)</h3>
+      <div class="bg-white rounded p-6 w-full max-w-xl">
+        <div class="flex items-center justify-start sm:justify-between mt-4">
+          <h3 class="text-xl font-semibold text-gray-900">Transfert (Bientôt disponible)</h3>
           <button
-            class="text-placeholder hover:text-body"
+            class="text-gray-400 hover:text-gray-700"
             @click="showTransferModal = false"
           >
-            <X class="w-10 h-10" />
+            <X class="h-6 w-6" />
           </Button>
         </div>
-        <p class="text-body mb-4">
+        <p class="text-gray-700 mt-3">
           La fonctionnalité de transfert entre utilisateurs sera disponible dans une prochaine mise à jour.
         </p>
         <button
-          class="w-full px-4 py-3 bg-primary-600 text-white rounded-lg hover:transition-colors"
+          class="w-full px-3 py-3 bg-blue-600 text-white rounded hover:transition-colors"
           @click="showTransferModal = false"
         >
           Compris
@@ -245,44 +245,44 @@
 
     <!-- Settings Modal -->
     <div v-if="showSettingsModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-      <div class="bg-white rounded-xl p-6 w-full max-w-full sm:max-w-md">
-        <div class="flex items-center justify-start sm:justify-between mb-6">
-          <h3 class="text-responsive-xl font-semibold text-heading">Paramètres du portefeuille</h3>
+      <div class="bg-white rounded p-6 w-full max-w-xl">
+        <div class="flex items-center justify-start sm:justify-between mt-4">
+          <h3 class="text-xl font-semibold text-gray-900">Paramètres du portefeuille</h3>
           <button
-            class="text-placeholder hover:text-body"
+            class="text-gray-400 hover:text-gray-700"
             @click="showSettingsModal = false"
           >
-            <X class="w-10 h-10" />
+            <X class="h-6 w-6" />
           </Button>
         </div>
         <div class="space-y-4">
           <button
-            class="w-full flex items-center justify-start sm:justify-between p-4 border border-neutral-200 rounded-lg hover:transition-colors"
+            class="w-full flex items-center justify-start sm:justify-between p-4 border border-gray-200 rounded hover:transition-colors"
             @click="() => { showSettingsModal = false; showPinSetupModal = true }"
           >
-            <div class="flex items-center gap-3">
-              <Key class="w-5 h-5 text-body" />
+            <div class="flex items-center gapadding-md">
+              <Key class="h-4 w-4 text-gray-700" />
               <span class="font-medium">{{ walletStore.hasPin ? 'Modifier le PIN' : 'Configurer un PIN' }}</span>
             </div>
-            <ChevronRight class="w-5 h-5 text-placeholder" />
+            <ChevronRight class="h-4 w-4 text-gray-400" />
           </Button>
 
-          <div class="p-4 border border-neutral-200 rounded-lg">
-            <div class="flex items-center justify-start sm:justify-between mb-2">
+          <div class="p-4 border border-gray-200 rounded">
+            <div class="flex items-center justify-start sm:justify-between mt-2">
               <span class="font-medium">Activer/Désactiver le portefeuille</span>
               <button
                 :disabled="walletStore.loading"
-                class="relative inline-flex h-10 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
-                :class="walletStore.isActive ? 'bg-primary-600' : 'bg-neutral-200'"
+                class="relative inline-flex h-10 w-80 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                :class="walletStore.isActive ? 'bg-blue-600' : 'bg-gray-200'"
                 @click="toggleWalletStatus"
               >
                 <span
-                  class="inline-block h-5 w-5 transform rounded-full bg-white transition-transform"
+                  class="inline-block h-4 w-4 transform rounded-full bg-white transition-transform"
                   :class="walletStore.isActive ? 'translate-x-6' : 'translate-x-1'"
                 />
               </Button>
             </div>
-            <p class="text-responsive-sm text-muted">
+            <p class="text-sm text-gray-500">
               {{ walletStore.isActive ? 'Portefeuille activé' : 'Portefeuille désactivé' }}
             </p>
           </div>
@@ -292,21 +292,21 @@
 
     <!-- Stats Modal -->
     <div v-if="showStatsModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-      <div class="bg-white rounded-xl p-6 w-full max-w-full sm:max-w-md">
-        <div class="flex items-center justify-start sm:justify-between mb-6">
-          <h3 class="text-responsive-xl font-semibold text-heading">Statistiques détaillées</h3>
+      <div class="bg-white rounded p-6 w-full max-w-xl">
+        <div class="flex items-center justify-start sm:justify-between mt-4">
+          <h3 class="text-xl font-semibold text-gray-900">Statistiques détaillées</h3>
           <button
-            class="text-placeholder hover:text-body"
+            class="text-gray-400 hover:text-gray-700"
             @click="showStatsModal = false"
           >
-            <X class="w-10 h-10" />
+            <X class="h-6 w-6" />
           </Button>
         </div>
-        <p class="text-body mb-4">
+        <p class="text-gray-700 mt-3">
           Les statistiques détaillées avec graphiques seront disponibles dans une prochaine version.
         </p>
         <button
-          class="w-full px-4 py-3 bg-primary-600 text-white rounded-lg hover:transition-colors"
+          class="w-full px-3 py-3 bg-blue-600 text-white rounded hover:transition-colors"
           @click="showStatsModal = false"
         >
           Fermer

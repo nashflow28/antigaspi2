@@ -4,21 +4,21 @@
     :header="header"
     class="bg-gradient-to-br from-purple-50 to-indigo-50"
   >
-    <div class="container-2025 p-6">
+    <div class="container p-6">
       <!-- Header -->
-      <div class="mb-6 sm:mb-8">
-        <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 sm:gap-6">
+      <div class="mt-4 sm:mb-3xl">
+        <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3 sm:gap-6">
           <div>
-            <h1 class="text-responsive-xl lg:text-display-sm font-semibold text-heading mb-2">
+            <h1 class="text-xl lg:text-3xl font-semibold text-gray-900 mt-2">
               Tableau de bord Administrateur
             </h1>
-            <p class="text-body text-responsive-lg">
+            <p class="text-gray-700 text-lg">
               Supervision globale de la plateforme Antigaspi
             </p>
           </div>
 
-          <div class="flex flex-col sm:flex-row gap-4">
-            <select v-model="selectedPeriod" class="w-full px-4 py-3 text-heading bg-white border border-neutral-200 rounded-xl shadow-sm transition-all duration-200 focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+          <div class="flex flex-col sm:flex-row gap-3">
+            <select v-model="selectedPeriod" class="w-full select-2025">
               <option value="today">Aujourd'hui</option>
               <option value="week">Cette semaine</option>
               <option value="month">Ce mois</option>
@@ -31,40 +31,25 @@
               :disabled="isLoading"
               @click="refreshData"
             >
-              <ArrowPathIcon class="w-5 h-5 mr-2" :class="{ 'animate-spin': isLoading }" />
+              <ArrowPathIcon class="h-4 w-4 mr-2" :class="{ 'animate-spin': isLoading }" />
               Actualiser
             </Button>
           </div>
         </div>
 
         <!-- Key Metrics -->
-        <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mt-8">
-          <Card class="bg-gradient-to-r from-primary-500 to-primary-600 text-white">
+        <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6 mt-8">
+          <Card class="bg-gradient-to-r from-blue-500 to-blue-600 text-white">
             <div class="flex items-center justify-between">
               <div>
-                <p class="text-primary-100 text-responsive-sm font-medium">Utilisateurs Totaux</p>
-                <p class="text-responsive-xl font-semibold">{{ formatNumber(stats.totalUsers) }}</p>
-                <p class="text-primary-200 text-responsive-sm mt-1">
+                <p class="text-blue-100 text-sm font-medium">Utilisateurs Totaux</p>
+                <p class="text-xl font-semibold">{{ formatNumber(stats.totalUsers) }}</p>
+                <p class="text-blue-200 text-sm mt-1">
                   +{{ stats.newUsersThisMonth }} ce mois
                 </p>
               </div>
-              <div class="p-3 bg-white/20 rounded-xl">
-                <UsersIcon class="w-10 h-10" />
-              </div>
-            </div>
-          </Card>
-
-          <Card class="bg-gradient-to-r from-primary-500 to-primary-600 text-white">
-            <div class="flex items-center justify-between">
-              <div>
-                <p class="text-primary-100 text-responsive-sm font-medium">Commerçants Actifs</p>
-                <p class="text-responsive-xl font-semibold">{{ formatNumber(stats.activeMerchants) }}</p>
-                <p class="text-primary-200 text-responsive-sm mt-1">
-                  {{ stats.merchantGrowthRate }}% de croissance
-                </p>
-              </div>
-              <div class="p-3 bg-white/20 rounded-xl">
-                <BuildingStorefrontIcon class="w-10 h-10" />
+              <div class="p-3 bg-white/20 rounded">
+                <UsersIcon class="h-6 w-6" />
               </div>
             </div>
           </Card>
@@ -72,14 +57,29 @@
           <Card class="bg-gradient-to-r from-blue-500 to-blue-600 text-white">
             <div class="flex items-center justify-between">
               <div>
-                <p class="text-blue-100 text-responsive-sm font-medium">Produits Sauvés</p>
-                <p class="text-responsive-xl font-semibold">{{ formatNumber(stats.productsSaved) }}</p>
-                <p class="text-blue-200 text-responsive-sm mt-1">
+                <p class="text-blue-100 text-sm font-medium">Commerçants Actifs</p>
+                <p class="text-xl font-semibold">{{ formatNumber(stats.activeMerchants) }}</p>
+                <p class="text-blue-200 text-sm mt-1">
+                  {{ stats.merchantGrowthRate }}% de croissance
+                </p>
+              </div>
+              <div class="p-3 bg-white/20 rounded">
+                <BuildingStorefrontIcon class="h-6 w-6" />
+              </div>
+            </div>
+          </Card>
+
+          <Card class="bg-gradient-to-r from-blue-500 to-blue-600 text-white">
+            <div class="flex items-center justify-between">
+              <div>
+                <p class="text-secondary-100 text-sm font-medium">Produits Sauvés</p>
+                <p class="text-xl font-semibold">{{ formatNumber(stats.productsSaved) }}</p>
+                <p class="text-secondary-200 text-sm mt-1">
                   {{ formatNumber(stats.kgFoodSaved) }} kg sauvés
                 </p>
               </div>
-              <div class="p-3 bg-white/20 rounded-xl">
-                <ShoppingBagIcon class="w-10 h-10" />
+              <div class="p-3 bg-white/20 rounded">
+                <ShoppingBagIcon class="h-6 w-6" />
               </div>
             </div>
           </Card>
@@ -87,14 +87,14 @@
           <Card class="bg-gradient-to-r from-orange-500 to-orange-600 text-white">
             <div class="flex items-center justify-between">
               <div>
-                <p class="text-orange-100 text-responsive-sm font-medium">Chiffre d'affaires</p>
-                <p class="text-responsive-xl font-semibold">{{ formatCurrency(stats.totalRevenue) }}</p>
-                <p class="text-orange-200 text-responsive-sm mt-1">
+                <p class="text-orange-100 text-sm font-medium">Chiffre d'affaires</p>
+                <p class="text-xl font-semibold">{{ formatCurrency(stats.totalRevenue) }}</p>
+                <p class="text-orange-200 text-sm mt-1">
                   +{{ stats.revenueGrowth }}% vs mois dernier
                 </p>
               </div>
-              <div class="p-3 bg-white/20 rounded-xl">
-                <div class="text-responsive-lg font-semibold">F CFA</div>
+              <div class="p-3 bg-white/20 rounded">
+                <div class="text-lg font-semibold">F CFA</div>
               </div>
             </div>
           </Card>
@@ -102,20 +102,20 @@
       </div>
 
       <!-- Charts and Analytics -->
-      <div class="grid grid-cols-1 xl:grid-cols-2 gap-4 sm:gap-6 mb-6 sm:mb-8">
+      <div class="grid grid-cols-1 xl:grid-cols-2 gap-3 sm:gap-6 mt-4 sm:mb-3xl">
         <!-- Revenue Chart -->
         <Card>
           <template #header>
             <div class="flex items-center justify-between">
-              <h3 class="text-responsive-xl font-semibold text-heading">Évolution du chiffre d'affaires</h3>
-              <select v-model="revenueChartPeriod" class="w-full px-4 py-3 text-responsive-sm text-heading bg-white border border-neutral-200 rounded-xl shadow-sm transition-all duration-200 focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+              <h3 class="text-xl font-semibold text-gray-900">Évolution du chiffre d'affaires</h3>
+              <select v-model="revenueChartPeriod" class="w-full text-sm select-2025">
                 <option value="7d">7 derniers jours</option>
                 <option value="30d">30 derniers jours</option>
                 <option value="90d">90 derniers jours</option>
               </select>
             </div>
           </template>
-          <div class="h-64">
+          <div class="h-9xl">
             <canvas ref="revenueChartCanvas" class="w-full h-full" />
           </div>
         </Card>
@@ -124,30 +124,30 @@
         <Card>
           <template #header>
             <div class="flex items-center justify-between">
-              <h3 class="text-responsive-xl font-semibold text-heading">Croissance des utilisateurs</h3>
+              <h3 class="text-xl font-semibold text-gray-900">Croissance des utilisateurs</h3>
               <div class="flex gap-2">
                 <Badge variant="primary" size="sm">Consommateurs</Badge>
                 <Badge variant="primary" size="sm">Commerçants</Badge>
               </div>
             </div>
           </template>
-          <div class="h-64">
+          <div class="h-9xl">
             <canvas ref="userGrowthChartCanvas" class="w-full h-full" />
           </div>
         </Card>
       </div>
 
       <!-- Platform Activity -->
-      <div class="grid grid-cols-1 xl:grid-cols-3 gap-4 sm:gap-6 mb-6 sm:mb-8">
+      <div class="grid grid-cols-1 xl:grid-cols-3 gap-3 sm:gap-6 mt-4 sm:mb-3xl">
         <!-- Recent Activity -->
         <Card class="xl:col-span-2">
           <template #header>
             <div class="flex items-center justify-between">
-              <h3 class="text-responsive-xl font-semibold text-heading">Activité récente</h3>
+              <h3 class="text-xl font-semibold text-gray-900">Activité récente</h3>
               <Button
                 variant="ghost"
                 size="sm"
-                class="text-primary hover:text-primary-emphasis"
+                class="text-blue-600 hover:text-blue-900"
                 @click="viewAllActivities"
               >
                 Voir tout
@@ -159,21 +159,21 @@
             <div
               v-for="activity in recentActivities"
               :key="activity.id"
-              class="flex items-center gap-4 p-4 bg-neutral-50 rounded-lg hover:transition-colors"
+              class="flex items-center gap-3 p-4 bg-gray-50 rounded hover:transition-colors"
             >
               <div class="flex-shrink-0">
                 <div
                   :class="getActivityIconClass(activity.type)"
-                  class="w-10 h-10 rounded-full flex items-center justify-center"
+                  class="h-6 w-6 rounded-full flex items-center justify-center"
                 >
-                  <component :is="getActivityIcon(activity.type)" class="w-5 h-5" />
+                  <component :is="getActivityIcon(activity.type)" class="h-4 w-4" />
                 </div>
               </div>
 
-              <div class="flex-grow min-w-0">
-                <p class="text-heading font-medium">{{ activity.title }}</p>
-                <p class="text-body text-responsive-sm">{{ activity.description }}</p>
-                <p class="text-placeholder text-responsive-xs mt-1">{{ formatTimeAgo(activity.timestamp) }}</p>
+              <div class="flex-grow min-w-none">
+                <p class="text-gray-900 font-medium">{{ activity.title }}</p>
+                <p class="text-gray-700 text-sm">{{ activity.description }}</p>
+                <p class="text-gray-400 text-xs mt-1">{{ formatTimeAgo(activity.timestamp) }}</p>
               </div>
 
               <div class="flex-shrink-0">
@@ -191,77 +191,77 @@
         <!-- System Health -->
         <Card>
           <template #header>
-            <h3 class="text-responsive-xl font-semibold text-heading">État du système</h3>
+            <h3 class="text-xl font-semibold text-gray-900">État du système</h3>
           </template>
 
           <div class="space-y-4">
             <div
               v-for="service in systemHealth"
               :key="service.name"
-              class="flex items-center justify-between p-3 bg-neutral-50 rounded-lg"
+              class="flex items-center justify-between p-3 bg-gray-50 rounded"
             >
               <div class="flex items-center gap-3">
                 <div
-                  :class="service.status === 'healthy' ? 'bg-primary-100' : 'bg-accent-red/15'"
-                  class="w-10 h-10 rounded-full flex items-center justify-center"
+                  :class="service.status === 'healthy' ? 'bg-blue-100' : 'bg-red-600/15'"
+                  class="h-6 w-6 rounded-full flex items-center justify-center"
                 >
                   <component
                     :is="service.status === 'healthy' ? CheckCircleIcon : ExclamationTriangleIcon"
-                    :class="service.status === 'healthy' ? 'text-primary' : 'text-accent-red'"
-                    class="w-5 h-5"
+                    :class="service.status === 'healthy' ? 'text-blue-600' : 'text-red-600'"
+                    class="h-4 w-4"
                   />
                 </div>
                 <div>
-                  <p class="font-medium text-responsive-sm">{{ service.name }}</p>
-                  <p class="text-responsive-xs text-muted">{{ service.description }}</p>
+                  <p class="font-medium text-sm">{{ service.name }}</p>
+                  <p class="text-xs text-gray-500">{{ service.description }}</p>
                 </div>
               </div>
 
               <div class="text-right">
-                <p class="text-responsive-sm font-medium">{{ service.uptime }}</p>
-                <p class="text-responsive-xs text-muted">{{ service.responseTime }}</p>
+                <p class="text-sm font-medium">{{ service.uptime }}</p>
+                <p class="text-xs text-gray-500">{{ service.responseTime }}</p>
               </div>
             </div>
           </div>
 
           <!-- Quick Actions -->
-          <div class="mt-6 pt-6 border-t border-neutral-200">
-            <h4 class="font-semibold text-heading mb-3">Actions rapides</h4>
+          <div class="mt-6 pt-2xl border-t border-gray-200">
+            <h4 class="font-semibold text-gray-900 mb-4">Actions rapides</h4>
             <div class="grid grid-cols-2 gap-2">
               <Button
                 variant="outline"
                 size="sm"
-                class="text-responsive-xs"
+                class="text-xs"
                 @click="viewLogs"
               >
-                <DocumentTextIcon class="w-5 h-5 mr-1" />
+                <DocumentTextIcon class="h-4 w-4 mr-1" />
                 Logs
               </Button>
               <Button
                 variant="outline"
                 size="sm"
-                class="text-responsive-xs"
+                class="text-xs"
                 @click="viewMetrics"
               >
-                <ChartBarIcon class="w-5 h-5 mr-1" />
+                <ChartBarIcon class="h-4 w-4 mr-1" />
                 Métriques
               </Button>
               <Button
                 variant="outline"
                 size="sm"
-                class="text-responsive-xs"
+                class="text-xs"
                 @click="manageUsers"
               >
-                <UsersIcon class="w-5 h-5 mr-1" />
+                <UsersIcon class="h-4 w-4 mr-1" />
                 Utilisateurs
               </Button>
               <Button
                 variant="outline"
                 size="sm"
-                class="text-responsive-xs"
+                class="text-xs"
                 @click="systemSettings"
               >
-                <CogIcon class="w-5 h-5 mr-1" />
+                <CogIcon class="h-4 w-4 mr-1" />
                 Paramètres
               </Button>
             </div>
@@ -270,33 +270,33 @@
       </div>
 
       <!-- Performance Metrics -->
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 mb-6 sm:mb-8">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-3 sm:gap-6 mt-4 sm:mb-3xl">
         <!-- Environmental Impact -->
         <Card>
-          <div class="flex items-center gap-3 mb-4">
-            <div class="p-2 bg-green-100 rounded-lg">
-              <GlobeEuropeAfricaIcon class="w-10 h-10 text-success" />
+          <div class="flex items-center gap-3 mt-3">
+            <div class="p-2 bg-green-100 rounded">
+              <GlobeEuropeAfricaIcon class="h-6 w-6 text-green-600" />
             </div>
-            <h3 class="text-responsive-lg font-semibold text-heading">Impact Environnemental</h3>
+            <h3 class="text-lg font-semibold text-gray-900">Impact Environnemental</h3>
           </div>
 
           <div class="space-y-4">
             <div class="flex items-center justify-between">
-              <span class="text-body">CO₂ économisé</span>
-              <span class="font-semibold text-success">{{ formatNumber(environmentalImpact.co2Saved) }} kg</span>
+              <span class="text-gray-700">CO₂ économisé</span>
+              <span class="font-semibold text-green-600">{{ formatNumber(environmentalImpact.co2Saved) }} kg</span>
             </div>
             <div class="flex items-center justify-between">
-              <span class="text-body">Eau économisée</span>
+              <span class="text-gray-700">Eau économisée</span>
               <span class="font-semibold text-info">{{ formatNumber(environmentalImpact.waterSaved) }} L</span>
             </div>
             <div class="flex items-center justify-between">
-              <span class="text-body">Déchets évités</span>
-              <span class="font-semibold text-orange-600">{{ formatNumber(environmentalImpact.wasteSaved) }} kg</span>
+              <span class="text-gray-700">Déchets évités</span>
+              <span class="font-semibold text-blue-600">{{ formatNumber(environmentalImpact.wasteSaved) }} kg</span>
             </div>
           </div>
 
-          <div class="mt-4 p-3 bg-green-50 rounded-lg">
-            <p class="text-green-700 text-responsive-sm font-medium">
+          <div class="mt-4 p-3 bg-green-50 rounded">
+            <p class="text-green-700 text-sm font-medium">
               🌱 Équivalent à {{ environmentalImpact.treesEquivalent }} arbres plantés
             </p>
           </div>
@@ -305,26 +305,26 @@
         <!-- Top Merchants -->
         <Card>
           <template #header>
-            <h3 class="text-responsive-lg font-semibold text-heading">Top Commerçants</h3>
+            <h3 class="text-lg font-semibold text-gray-900">Top Commerçants</h3>
           </template>
 
-          <div class="space-y-3">
+          <div class="space-y-2">
             <div
               v-for="(merchant, index) in topMerchants"
               :key="merchant.id"
-              class="flex items-center gap-3 p-3 bg-neutral-50 rounded-lg"
+              class="flex items-center gap-3 p-3 bg-gray-50 rounded"
             >
               <div class="flex-shrink-0">
-                <div class="w-10 h-10 bg-primary-100 text-primary rounded-full flex items-center justify-center font-semibold text-responsive-sm">
+                <div class="h-6 w-6 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center font-semibold text-sm">
                   {{ index + 1 }}
                 </div>
               </div>
-              <div class="flex-grow min-w-0">
-                <p class="font-medium text-responsive-sm truncate">{{ merchant.name }}</p>
-                <p class="text-responsive-xs text-muted">{{ merchant.productsSold }} produits vendus</p>
+              <div class="flex-grow min-w-none">
+                <p class="font-medium text-sm truncate">{{ merchant.name }}</p>
+                <p class="text-xs text-gray-500">{{ merchant.productsSold }} produits vendus</p>
               </div>
               <div class="text-right">
-                <p class="font-medium text-responsive-sm">{{ formatCurrency(merchant.revenue) }}</p>
+                <p class="font-medium text-sm">{{ formatCurrency(merchant.revenue) }}</p>
               </div>
             </div>
           </div>
@@ -333,30 +333,30 @@
         <!-- Popular Categories -->
         <Card>
           <template #header>
-            <h3 class="text-responsive-lg font-semibold text-heading">Catégories Populaires</h3>
+            <h3 class="text-lg font-semibold text-gray-900">Catégories Populaires</h3>
           </template>
 
-          <div class="space-y-3">
+          <div class="space-y-2">
             <div
               v-for="category in popularCategories"
               :key="category.id"
               class="flex items-center justify-between"
             >
               <div class="flex items-center gap-3">
-                <span class="text-responsive-xl">{{ category.icon }}</span>
+                <span class="text-xl">{{ category.icon }}</span>
                 <div>
-                  <p class="font-medium text-responsive-sm">{{ category.name }}</p>
-                  <p class="text-responsive-xs text-muted">{{ category.productCount }} produits</p>
+                  <p class="font-medium text-sm">{{ category.name }}</p>
+                  <p class="text-xs text-gray-500">{{ category.productCount }} produits</p>
                 </div>
               </div>
               <div class="text-right">
-                <div class="w-16 bg-neutral-200 rounded-full h-2">
+                <div class="w-12 bg-gray-200 rounded-full h-4">
                   <div
-                    class="bg-primary-500 h-2 rounded-full"
+                    class="bg-blue-500 h-4 rounded-full"
                     :style="{ width: `${category.percentage}%` }"
                   />
                 </div>
-                <p class="text-responsive-xs text-muted mt-1">{{ category.percentage }}%</p>
+                <p class="text-xs text-gray-500 mt-1">{{ category.percentage }}%</p>
               </div>
             </div>
           </div>
@@ -364,27 +364,27 @@
       </div>
 
       <!-- Alerts and Notifications -->
-      <Card v-if="alerts.length > 0" class="mb-6 sm:mb-8">
+      <Card v-if="alerts.length > 0" class="mt-4 sm:mb-3xl">
         <template #header>
-          <h3 class="text-responsive-lg font-semibold text-heading">Alertes et notifications</h3>
+          <h3 class="text-lg font-semibold text-gray-900">Alertes et notifications</h3>
         </template>
 
-        <div class="space-y-3">
+        <div class="space-y-2">
           <div
             v-for="alert in alerts"
             :key="alert.id"
             :class="getAlertClass(alert.type)"
-            class="flex items-stretch sm:items-start gap-3 p-4 rounded-lg border"
+            class="flex items-stretch sm:items-start gap-3 p-4 rounded border"
           >
             <component
               :is="getAlertIcon(alert.type)"
               :class="getAlertIconClass(alert.type)"
-              class="w-5 h-5 flex-shrink-0 mt-0.5"
+              class="h-4 w-4 flex-shrink-0 mt-0.5"
             />
             <div class="flex-grow">
               <p class="font-medium">{{ alert.title }}</p>
-              <p class="text-responsive-sm opacity-80 mt-1">{{ alert.message }}</p>
-              <p class="text-responsive-xs opacity-60 mt-2">{{ formatTimeAgo(alert.timestamp) }}</p>
+              <p class="text-sm opacity-80 mt-1">{{ alert.message }}</p>
+              <p class="text-xs opacity-60 mt-2">{{ formatTimeAgo(alert.timestamp) }}</p>
             </div>
             <Button
               variant="ghost"
@@ -392,7 +392,7 @@
               class="text-current opacity-60 hover:opacity-100 flex-shrink-0"
               @click="dismissAlert(alert.id)"
             >
-              <XMarkIcon class="w-5 h-5" />
+              <XMarkIcon class="h-4 w-4" />
             </Button>
           </div>
         </div>
@@ -564,11 +564,11 @@ const formatTimeAgo = (timestamp: string): string => {
 const getActivityIconClass = (type: string): string => {
   const classes: Record<string, string> = {
     user_registered: 'bg-blue-100 text-info',
-    merchant_joined: 'bg-green-100 text-success',
-    product_sold: 'bg-orange-100 text-orange-600',
-    alert: 'bg-red-100 text-error'
+    merchant_joined: 'bg-green-100 text-green-600',
+    product_sold: 'bg-yellow-100 text-blue-600',
+    alert: 'bg-red-100 text-red-600'
   }
-  return classes[type] || 'bg-neutral-100 text-body'
+  return classes[type] || 'bg-gray-100 text-gray-700'
 }
 
 const getActivityIcon = (type: string) => {
@@ -593,12 +593,12 @@ const getActivityStatusVariant = (status: string) => {
 
 const getAlertClass = (type: string): string => {
   const classes: Record<string, string> = {
-    warning: 'bg-accent-orange/10 border-accent-orange/30 text-accent-orange/95',
-    error: 'bg-accent-red/10 border-accent-red/30 text-accent-red/95',
-    info: 'bg-blue-50 border-blue-200 text-blue-800',
-    success: 'bg-primary-50 border-primary-200 text-primary-800'
+    warning: 'bg-orange-500/10 border-orange-500/30 text-orange-500/95',
+    error: 'bg-red-600/10 border-red-600/30 text-red-600/95',
+    info: 'bg-blue-50 border-blue-200 text-gray-800',
+    success: 'bg-blue-50 border-blue-200 text-blue-800'
   }
-  return classes[type] || 'bg-neutral-50 border-neutral-200 text-heading-secondary'
+  return classes[type] || 'bg-gray-50 border-gray-200 text-gray-800'
 }
 
 const getAlertIcon = (type: string) => {
@@ -613,12 +613,12 @@ const getAlertIcon = (type: string) => {
 
 const getAlertIconClass = (type: string): string => {
   const classes: Record<string, string> = {
-    warning: 'text-accent-orange',
-    error: 'text-accent-red',
+    warning: 'text-orange-500',
+    error: 'text-red-600',
     info: 'text-info',
-    success: 'text-primary'
+    success: 'text-blue-600'
   }
-  return classes[type] || 'text-body'
+  return classes[type] || 'text-gray-700'
 }
 
 const loadDashboardData = async () => {

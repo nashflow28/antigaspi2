@@ -40,7 +40,7 @@ const meta: Meta<SkeletonComponent & StoryProps> = {
     template: `
       <Skeleton
         :rounded="args.rounded"
-        :class="['bg-neutral-200/70 dark:bg-neutral-800/60', args.widthClass, args.heightClass].join(' ')"
+        :class="['bg-gray-200/70 dark:bg-gray-800/60', args.widthClass, args.heightClass].join(' ')"
       />
     `
   })

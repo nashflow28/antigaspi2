@@ -23,7 +23,7 @@ const SANITIZATION_CONFIGS = {
     ALLOWED_TAGS: ['b', 'i', 'u', 'strong', 'em', 'span'],
     ALLOWED_ATTR: ['class'],
     ALLOWED_CLASSES: {
-      'span': ['text-success', 'text-warning', 'text-info', 'text-error', 'inline-block', 'w-2', 'h-2', 'bg-primary-600', 'rounded-full', 'mr-2', 'mt-1.5', 'flex-shrink-0']
+      'span': ['text-success', 'text-warning', 'text-info', 'text-error', 'inline-block', 'w-2', 'h-2', 'bg-blue-600', 'rounded-full', 'mr-2', 'mt-1.5', 'flex-shrink-0']
     }
   },
 
@@ -32,7 +32,7 @@ const SANITIZATION_CONFIGS = {
     ALLOWED_TAGS: ['span'],
     ALLOWED_ATTR: ['class'],
     ALLOWED_CLASSES: {
-      'span': ['inline-block', 'w-2', 'h-2', 'bg-primary-600', 'rounded-full', 'mr-2', 'mt-1.5', 'flex-shrink-0', 'text-success', 'text-warning', 'text-info', 'text-error']
+      'span': ['inline-block', 'w-2', 'h-2', 'bg-blue-600', 'rounded-full', 'mr-2', 'mt-1.5', 'flex-shrink-0', 'text-success', 'text-warning', 'text-info', 'text-error']
     }
   }
 }
@@ -131,7 +131,7 @@ export function createSafeFormattedLine(line: string): string {
 
   // Then apply safe formatting replacements
   const formatted = sanitizedLine
-    .replace(/^• /, '<span class="inline-block w-2 h-2 bg-primary-600 rounded-full mr-2 mt-1.5 flex-shrink-0"></span>')
+    .replace(/^• /, '<span class="inline-block w-2 h-2 bg-blue-600 rounded-full mr-2 mt-1.5 flex-shrink-0"></span>')
     .replace(/^✅ /, '<span class="text-success mr-2">✅</span>')
     .replace(/^⚠️ /, '<span class="text-warning mr-2">⚠️</span>')
     .replace(/^ℹ️ /, '<span class="text-info mr-2">ℹ️</span>')

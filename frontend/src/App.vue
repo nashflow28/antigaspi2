@@ -1,7 +1,7 @@
 <template>
   <div
     id="app"
-    class="min-h-screen bg-neutral-50 text-heading antialiased transition-colors duration-300 dark:bg-neutral-950 dark:text-neutral-50"
+    class="min-h-screen bg-gray-50 text-gray-900 antialiased transition-colors duration-300 dark:bg-gray-50-dark dark:text-gray-50"
   >
     <Navigation
       :brand="navigationBrand"
@@ -20,7 +20,7 @@
             <span>Mon panier</span>
             <span
               v-if="cartItemsCount > 0"
-              class="relative sm:absolute -top-2 -right-2 flex h-5 w-5 items-center justify-center rounded-full bg-primary-500 text-caption font-semibold text-white"
+              class="relative sm:absolute -top-2 -right-2 flex h-4 w-4 items-center justify-center rounded-full bg-blue-500 text-xs font-semibold text-white"
             >
               {{ cartItemsCount > 99 ? '99+' : cartItemsCount }}
             </span>
@@ -67,7 +67,7 @@
             <span>Mon panier</span>
             <span
               v-if="cartItemsCount > 0"
-              class="flex h-10 min-w-[1.5rem] items-center justify-center rounded-full bg-primary-500 px-4 text-caption font-semibold text-white"
+              class="flex h-10 min-w-[1.5rem] items-center justify-center rounded-full bg-blue-500 px-3 text-xs font-semibold text-white"
             >
               {{ cartItemsCount > 99 ? '99+' : cartItemsCount }}
             </span>
@@ -105,7 +105,7 @@
       </template>
     </Navigation>
 
-    <main class="pt-20 sm:pt-24">
+    <main class="pt-24 sm:pt-32">
       <router-view v-slot="{ Component: CurrentComponent }">
         <PageTransition>
           <component :is="CurrentComponent" />
@@ -113,7 +113,7 @@
       </router-view>
     </main>
 
-    <Footer class="border-t border-primary-500/10 bg-primary-800 text-neutral-50" />
+    <Footer class="border-t border-blue-500/10 bg-blue-800 text-gray-50" />
 
     <NotificationContainer />
     <NotificationSystem />

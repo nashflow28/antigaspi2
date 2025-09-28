@@ -2,7 +2,7 @@
   <div :class="wrapperClasses">
     <!-- Information -->
     <div v-if="showInfo" class="flex-1">
-      <p class="text-responsive-sm text-body">
+      <p class="text-sm text-gray-700">
         Affichage {{ startItem }} à {{ endItem }} sur {{ total }} résultats
       </p>
     </div>
@@ -21,7 +21,7 @@
       </Button>
 
       <!-- Page Numbers -->
-      <div v-if="!compact" class="flex items-center space-y-2 sm:space-y-0 sm:space-x-2">
+      <div v-if="!compact" class="flex items-center space-y-4 sm:space-x-2">
         <!-- First Page -->
         <Button
           v-if="showFirstLast && currentPage > 3"
@@ -33,7 +33,7 @@
         </Button>
 
         <!-- First Ellipsis -->
-        <span v-if="showFirstLast && currentPage > 4" class="px-4 text-muted">
+        <span v-if="showFirstLast && currentPage > 4" class="px-3 text-gray-500">
           ...
         </span>
 
@@ -49,7 +49,7 @@
         </Button>
 
         <!-- Last Ellipsis -->
-        <span v-if="showFirstLast && currentPage < totalPages - 3" class="px-4 text-muted">
+        <span v-if="showFirstLast && currentPage < totalPages - 3" class="px-3 text-gray-500">
           ...
         </span>
 
@@ -65,8 +65,8 @@
       </div>
 
       <!-- Compact Page Info -->
-      <div v-if="compact" class="flex items-center space-y-2 sm:space-y-0 sm:space-x-2">
-        <span class="text-responsive-sm text-body">
+      <div v-if="compact" class="flex items-center space-y-4 sm:space-x-2">
+        <span class="text-sm text-gray-700">
           Page {{ currentPage }} sur {{ totalPages }}
         </span>
       </div>
@@ -84,8 +84,8 @@
     </nav>
 
     <!-- Page Size Selector -->
-    <div v-if="showPageSize" class="flex items-center space-y-2 sm:space-y-0 sm:space-x-2">
-      <label for="page-size" class="text-responsive-sm text-body">
+    <div v-if="showPageSize" class="flex items-center space-y-4 sm:space-x-2">
+      <label for="page-size" class="text-sm text-gray-700">
         Éléments par page:
       </label>
       <Select

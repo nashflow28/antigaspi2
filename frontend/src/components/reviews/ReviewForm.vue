@@ -1,13 +1,13 @@
 <template>
-  <div class="bg-white rounded-2xl shadow-lg p-6 border border-neutral-100">
-    <div class="flex items-center justify-start sm:justify-between mb-6">
-      <div class="flex items-center space-y-3 sm:space-y-0 sm:space-x-3">
-        <div class="w-12 h-12 bg-yellow-100 rounded-xl flex items-center justify-center">
-          <Star class="w-10 h-10 text-warning" />
+  <div class="bg-white rounded shadow-lg p-6 border border-gray-100">
+    <div class="flex items-center justify-start sm:justify-between mt-4">
+      <div class="flex items-center space-y-2 sm:space-x-3">
+        <div class="w-12 h-10 bg-yellow-100 rounded flex items-center justify-center">
+          <Star class="h-6 w-6 text-yellow-500" />
         </div>
         <div>
-          <h3 class="text-responsive-lg font-semibold text-heading">Donner votre avis</h3>
-          <p class="text-body text-responsive-sm">Partagez votre expérience avec ce commerçant</p>
+          <h3 class="text-lg font-semibold text-gray-900">Donner votre avis</h3>
+          <p class="text-gray-700 text-sm">Partagez votre expérience avec ce commerçant</p>
         </div>
       </div>
     </div>
@@ -15,7 +15,7 @@
     <form class="space-y-6" @submit.prevent="submitReview">
       <!-- Rating -->
       <div>
-        <label class="block text-responsive-sm font-medium text-body-emphasis mb-3">
+        <label class="block text-sm font-medium text-gray-800 mb-4">
           Note générale *
         </label>
         <StarRating
@@ -23,12 +23,12 @@
           :size="32"
           :show-text="true"
         />
-        <p v-if="errors.rating" class="mt-1 text-responsive-sm text-error">{{ errors.rating }}</p>
+        <p v-if="errors.rating" class="mt-1 text-sm text-red-600">{{ errors.rating }}</p>
       </div>
 
       <!-- Title -->
       <div>
-        <label for="title" class="block text-responsive-sm font-medium text-body-emphasis mb-2">
+        <label for="title" class="block text-sm font-medium text-gray-800 mt-2">
           Titre de votre avis
         </label>
         <input
@@ -36,15 +36,15 @@
           v-model="form.title"
           type="text"
           maxlength="255"
-          class="w-full border border-neutral-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-yellow-500 focus:border-transparent"
+          class="w-full border border-gray-300 rounded px-3 py-3 focus:ring-2 focus:ring-yellow-500 focus:border-transparent"
           placeholder="Ex: Service rapide et produits frais"
         >
-        <p v-if="errors.title" class="mt-1 text-responsive-sm text-error">{{ errors.title }}</p>
+        <p v-if="errors.title" class="mt-1 text-sm text-red-600">{{ errors.title }}</p>
       </div>
 
       <!-- Comment -->
       <div>
-        <label for="comment" class="block text-responsive-sm font-medium text-body-emphasis mb-2">
+        <label for="comment" class="block text-sm font-medium text-gray-800 mt-2">
           Votre commentaire
         </label>
         <textarea
@@ -52,24 +52,24 @@
           v-model="form.comment"
           rows="4"
           maxlength="1000"
-          class="w-full border border-neutral-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-yellow-500 focus:border-transparent resize-none"
+          class="w-full border border-gray-300 rounded px-3 py-3 focus:ring-2 focus:ring-yellow-500 focus:border-transparent resize-none"
           placeholder="Décrivez votre expérience avec ce commerçant..."
         />
         <div class="flex justify-start sm:justify-between mt-1">
-          <p v-if="errors.comment" class="text-responsive-sm text-error">{{ errors.comment }}</p>
-          <p class="text-responsive-xs text-muted">{{ (form.comment?.length || 0) }}/1000 caractères</p>
+          <p v-if="errors.comment" class="text-sm text-red-600">{{ errors.comment }}</p>
+          <p class="text-xs text-gray-500">{{ (form.comment?.length || 0) }}/1000 caractères</p>
         </div>
       </div>
 
       <!-- Product Selection (if applicable) -->
       <div v-if="availableProducts.length > 0">
-        <label for="product" class="block text-responsive-sm font-medium text-body-emphasis mb-2">
+        <label for="product" class="block text-sm font-medium text-gray-800 mt-2">
           Produit concerné (optionnel)
         </label>
         <select
           id="product"
           v-model="form.product_id"
-          class="w-full border border-neutral-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-yellow-500 focus:border-transparent"
+          class="w-full border border-gray-300 rounded px-3 py-3 focus:ring-2 focus:ring-yellow-500 focus:border-transparent"
         >
           <option value="">Avis général sur le commerçant</option>
           <option
@@ -83,11 +83,11 @@
       </div>
 
       <!-- Submit Buttons -->
-      <div class="flex justify-center sm:justify-end space-y-3 sm:space-y-0 sm:space-x-3 pt-4">
+      <div class="flex justify-center sm:justify-end space-y-2 sm:space-x-3 padding-t-lg">
         <button
           v-if="showCancel"
           type="button"
-          class="px-6 py-3 text-body hover:transition-colors"
+          class="px-4 py-3 text-gray-700 hover:transition-colors"
           @click="$emit('cancel')"
         >
           Annuler
@@ -95,11 +95,11 @@
         <button
           type="submit"
           :disabled="!form.rating || submitting"
-          class="px-6 py-3 bg-yellow-600 text-white rounded-lg hover:transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-y-2 sm:space-y-0 sm:space-x-2"
+          class="px-4 py-3 bg-yellow-600 text-white rounded hover:transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-y-4 sm:space-x-2"
         >
           <span>{{ submitting ? 'Publication...' : 'Publier l\'avis' }}</span>
-          <Send v-if="!submitting" class="w-5 h-5" />
-          <div v-else class="w-5 h-5 animate-spin rounded-full border-2 border-white border-t-transparent" />
+          <Send v-if="!submitting" class="h-4 w-4" />
+          <div v-else class="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
         </button>
       </div>
     </form>
@@ -107,15 +107,15 @@
     <!-- Success/Error Messages -->
     <div
       v-if="message.show"
-      class="mt-4 p-4 rounded-lg"
+      class="mt-4 p-4 rounded"
       :class="{
-        'bg-green-50 border border-green-200': message.type === 'success',
+        'bg-green-50 border border-blue-200': message.type === 'success',
         'bg-red-50 border border-red-200': message.type === 'error'
       }"
     >
       <div class="flex items-center">
-        <CheckCircle v-if="message.type === 'success'" class="w-5 h-5 text-green-500 mr-2" />
-        <XCircle v-if="message.type === 'error'" class="w-5 h-5 text-red-500 mr-2" />
+        <CheckCircle v-if="message.type === 'success'" class="h-4 w-4 text-green-600-500 mr-2" />
+        <XCircle v-if="message.type === 'error'" class="h-4 w-4 text-red-500 mr-2" />
         <p
           :class="{
             'text-green-700': message.type === 'success',

@@ -4,7 +4,7 @@
     :class="articleClasses"
     :aria-label="`Réserver ${name}`"
   >
-    <div class="relative h-48 w-full overflow-hidden sm:block">
+    <div class="relative h-8xl w-full overflow-hidden sm:block">
       <img
         :src="image"
         :alt="name"
@@ -12,18 +12,18 @@
       >
       <span
         v-if="discount"
-        class="relative sm:absolute left-4 top-4 rounded-full bg-primary-700 px-4 py-3 text-caption font-semibold text-neutral-50 shadow-card"
+        class="relative sm:absolute left-4 top-4 rounded-full bg-blue-700 px-3 py-3 text-xs font-semibold text-gray-50 shadow-lg"
       >
         {{ discount }}
       </span>
     </div>
 
-    <div class="flex flex-1 flex-col gap-4 p-6">
-      <div class="space-y-2">
-        <h3 class="text-h3 font-semibold text-heading dark:text-neutral-50">
+    <div class="flex flex-1 flex-col gap-3 p-6">
+      <div class="space-y-4">
+        <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-50">
           {{ name }}
         </h3>
-        <p class="text-small text-muted dark:text-neutral-300">
+        <p class="text-sm text-gray-500 dark:text-gray-500">
           {{ merchant }}
         </p>
       </div>
@@ -32,7 +32,7 @@
         <span
           v-for="tag in tags"
           :key="tag"
-          class="rounded-full bg-primary-500/10 px-4 py-3 text-caption text-primary-emphasis dark:text-primary-200"
+          class="rounded-full bg-blue-500/10 px-3 py-3 text-xs text-blue-900 dark:text-blue-200"
         >
           {{ tag }}
         </span>
@@ -40,18 +40,18 @@
 
       <div class="mt-auto flex items-end justify-start sm:justify-between">
         <div>
-          <p class="text-caption uppercase tracking-wide text-primary-500">
+          <p class="text-xs uppercase tracking-wide text-blue-500">
             Prix anti-gaspi
           </p>
           <div class="flex items-baseline gap-2">
-            <span class="text-h2 font-semibold text-primary-emphasis dark:text-primary-200">
+            <span class="text-h2 font-semibold text-blue-900 dark:text-blue-200">
               {{ price }}
             </span>
-            <span v-if="originalPrice" class="text-small text-placeholder line-through">
+            <span v-if="originalPrice" class="text-sm text-gray-400 line-through">
               {{ originalPrice }}
             </span>
           </div>
-          <p v-if="quantity" class="text-caption text-muted">
+          <p v-if="quantity" class="text-xs text-gray-500">
             {{ quantity }}
           </p>
         </div>
@@ -105,7 +105,7 @@ const emit = defineEmits<{
 const attrs = useAttrs()
 
 const baseClasses =
-  'group relative flex flex-col overflow-hidden rounded-3xl border border-primary-500/15 bg-white shadow-card transition-all duration-300 hover:-translate-y-1 hover:scale-[1.02] hover:shadow-glow dark:bg-neutral-900'
+  'group relative flex flex-col overflow-hidden rounded border border-blue-500/15 bg-white shadow-lg transition-all duration-300 hover:-translate-y-1 hover:scale-[1.02] hover:shadow-xl dark:bg-gray-900'
 
 const externalClass = computed(() => (attrs.class as string | undefined) ?? '')
 

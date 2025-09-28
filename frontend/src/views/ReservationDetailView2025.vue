@@ -1,27 +1,27 @@
 <template>
-  <div class="min-h-screen bg-gradient-to-br from-neutral-50 to-primary-50">
+  <div class="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50">
     <!-- Loading state -->
-    <div v-if="loading" class="container px-4 sm:px-6 lg:px-8-2025 py-6 sm:py-8">
+    <div v-if="loading" class="container py-6 sm:py-8">
       <Card class="animate-pulse">
         <div class="space-y-4">
-          <div class="h-10 bg-neutral-200 rounded w-1/3" />
-          <div class="h-5 bg-neutral-200 rounded w-3/4" />
-          <div class="h-5 bg-neutral-200 rounded w-1/2" />
+          <div class="h-10 bg-gray-200 rounded w-xs/3" />
+          <div class="h-4 bg-gray-200 rounded w-3/4" />
+          <div class="h-4 bg-gray-200 rounded w-1/2" />
         </div>
       </Card>
     </div>
 
     <!-- Error state -->
-    <div v-else-if="error" class="container px-4 sm:px-6 lg:px-8-2025 py-6 sm:py-8">
-      <Card class="text-left sm:text-center py-8 sm:py-10 lg:py-12">
-        <div class="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
-          <AlertCircle class="w-10 h-10 text-red-500" />
+    <div v-else-if="error" class="container py-6 sm:py-8">
+      <Card class="text-left sm:text-center py-8 sm:py-12 lg:py-16">
+        <div class="w-20 h-12 bg-red-100 rounded-full flex items-center justify-center mx-auto mt-3">
+          <AlertCircle class="h-6 w-6 text-red-500" />
         </div>
-        <h3 class="text-responsive-lg font-semibold text-heading mb-2">
+        <h3 class="text-lg font-semibold text-gray-900 mt-2">
           Erreur de chargement
         </h3>
-        <p class="text-body mb-4">{{ error }}</p>
-        <div class="flex gap-3 justify-center">
+        <p class="text-gray-700 mt-3">{{ error }}</p>
+        <div class="flex gap-4 justify-center">
           <Button variant="primary" @click="loadReservation">
             Réessayer
           </Button>
@@ -33,38 +33,38 @@
     </div>
 
     <!-- Main content -->
-    <div v-else-if="reservation" class="container px-4 sm:px-6 lg:px-8-2025 py-6 sm:py-8">
+    <div v-else-if="reservation" class="container py-6 sm:py-8">
       <!-- Header -->
-      <div class="bg-white/60 backdrop-blur-md border-b mb-6 sm:mb-8">
-        <div class="container px-4 sm:px-6 lg:px-8-2025 py-6">
-          <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+      <div class="bg-white/60 backdrop-blur-md border-b mt-4 sm:mb-3xl">
+        <div class="container py-6">
+          <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3">
             <div>
-              <div class="flex items-center gap-3 mb-2">
+              <div class="flex items-center gap-4 mt-2">
                 <Button
                   variant="ghost"
                   size="sm"
                   @click="$router.push('/reservations')"
                 >
-                  <ArrowLeft class="w-5 h-5" />
+                  <ArrowLeft class="h-4 w-4" />
                   Retour
                 </Button>
-                <div class="h-10 w-px bg-neutral-300" />
-                <span class="text-responsive-sm text-muted">Réservation</span>
+                <div class="h-10 w-px bg-gray-300" />
+                <span class="text-sm text-gray-500">Réservation</span>
               </div>
-              <h1 class="text-responsive-xl font-semibold text-heading">
+              <h1 class="text-xl font-semibold text-gray-900">
                 {{ reservation.product.name }}
               </h1>
-              <p class="text-body">
+              <p class="text-gray-700">
                 Code: {{ reservation.reservation_code }}
               </p>
             </div>
 
             <!-- Status badge -->
-            <div class="flex items-center gap-3">
+            <div class="flex items-center gap-4">
               <Badge
                 :variant="getStatusVariant(reservation.status)"
                 size="lg"
-                class="px-4 py-3"
+                class="px-3 py-3"
               >
                 {{ getStatusText(reservation.status) }}
               </Badge>
@@ -78,13 +78,13 @@
         <div class="lg:col-span-2 space-y-6">
           <!-- Product details -->
           <Card>
-            <h3 class="text-responsive-lg font-semibold text-heading mb-4">
+            <h3 class="text-lg font-semibold text-gray-900 mt-3">
               Détails du produit
             </h3>
-            <div class="flex gap-4">
+            <div class="flex gap-3">
               <div
                 v-if="reservation.product.image_url"
-                class="w-24 h-24 rounded-xl overflow-hidden sm:block flex-shrink-0"
+                class="w-6xl h-6xl rounded overflow-hidden sm:block flex-shrink-0"
               >
                 <img
                   :src="reservation.product.image_url"
@@ -94,26 +94,26 @@
               </div>
               <div
                 v-else
-                class="w-24 h-24 bg-neutral-100 rounded-xl flex items-center justify-center flex-shrink-0"
+                class="w-6xl h-6xl bg-gray-100 rounded flex items-center justify-center flex-shrink-0"
               >
-                <Package class="w-10 h-10 text-placeholder" />
+                <Package class="h-6 w-6 text-gray-400" />
               </div>
 
               <div class="flex-1">
-                <h4 class="font-semibold text-heading mb-2">
+                <h4 class="font-semibold text-gray-900 mt-2">
                   {{ reservation.product.name }}
                 </h4>
-                <div class="space-y-2 text-responsive-sm text-body">
+                <div class="space-y-4 text-sm text-gray-700">
                   <div class="flex items-center gap-2">
-                    <Store class="w-5 h-5" />
+                    <Store class="h-4 w-4" />
                     <span>{{ reservation.product.merchant.name }}</span>
                   </div>
                   <div class="flex items-center gap-2">
-                    <MapPin class="w-5 h-5" />
+                    <MapPin class="h-4 w-4" />
                     <span>{{ reservation.product.merchant.address }}</span>
                   </div>
                   <div class="flex items-center gap-2">
-                    <Phone class="w-5 h-5" />
+                    <Phone class="h-4 w-4" />
                     <span>{{ reservation.product.merchant.phone }}</span>
                   </div>
                 </div>
@@ -123,57 +123,57 @@
 
           <!-- Reservation details -->
           <Card>
-            <h3 class="text-responsive-lg font-semibold text-heading mb-4">
+            <h3 class="text-lg font-semibold text-gray-900 mt-3">
               Détails de la réservation
             </h3>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
               <div>
-                <label class="text-responsive-sm font-medium text-body-emphasis">Quantité réservée</label>
-                <p class="text-responsive-lg font-semibold text-heading">{{ reservation.quantity }}</p>
+                <label class="text-sm font-medium text-gray-800">Quantité réservée</label>
+                <p class="text-lg font-semibold text-gray-900">{{ reservation.quantity }}</p>
               </div>
               <div>
-                <label class="text-responsive-sm font-medium text-body-emphasis">Prix unitaire</label>
+                <label class="text-sm font-medium text-gray-800">Prix unitaire</label>
                 <div class="flex items-center gap-2">
-                  <span class="text-responsive-lg font-semibold text-primary">
+                  <span class="text-lg font-semibold text-blue-600">
                     {{ formatPrice(reservation.discounted_price) }}
                   </span>
-                  <span class="text-responsive-sm text-muted line-through">
+                  <span class="text-sm text-gray-500 line-through">
                     {{ formatPrice(reservation.original_price) }}
                   </span>
                 </div>
               </div>
               <div>
-                <label class="text-responsive-sm font-medium text-body-emphasis">Montant total</label>
-                <p class="text-responsive-xl font-semibold text-primary">
+                <label class="text-sm font-medium text-gray-800">Montant total</label>
+                <p class="text-xl font-semibold text-blue-600">
                   {{ formatPrice(reservation.total_amount) }}
                 </p>
               </div>
               <div>
-                <label class="text-responsive-sm font-medium text-body-emphasis">Date de retrait</label>
-                <p class="text-responsive-lg font-semibold text-heading">
+                <label class="text-sm font-medium text-gray-800">Date de retrait</label>
+                <p class="text-lg font-semibold text-gray-900">
                   {{ formatDate(reservation.pickup_date) }}
                 </p>
               </div>
             </div>
 
-            <div v-if="reservation.pickup_notes" class="mt-4 pt-4 border-t border-neutral-200">
-              <label class="text-responsive-sm font-medium text-body-emphasis">Notes de retrait</label>
-              <p class="text-body mt-1">{{ reservation.pickup_notes }}</p>
+            <div v-if="reservation.pickup_notes" class="mt-4 padding-t-lg border-t border-gray-200">
+              <label class="text-sm font-medium text-gray-800">Notes de retrait</label>
+              <p class="text-gray-700 mt-1">{{ reservation.pickup_notes }}</p>
             </div>
           </Card>
 
           <!-- Actions -->
           <Card v-if="canPerformActions">
-            <h3 class="text-responsive-lg font-semibold text-heading mb-4">
+            <h3 class="text-lg font-semibold text-gray-900 mt-3">
               Actions disponibles
             </h3>
-            <div class="flex flex-wrap gap-3">
+            <div class="flex flex-wrap gap-4">
               <Button
                 v-if="reservation.status === 'pending'"
                 variant="destructive"
                 @click="cancelReservation"
               >
-                <X class="w-5 h-5" />
+                <X class="h-4 w-4" />
                 Annuler la réservation
               </Button>
 
@@ -181,7 +181,7 @@
                 variant="outline"
                 @click="contactMerchant"
               >
-                <Phone class="w-5 h-5" />
+                <Phone class="h-4 w-4" />
                 Contacter le commerçant
               </Button>
 
@@ -189,7 +189,7 @@
                 variant="outline"
                 @click="downloadReceipt"
               >
-                <Download class="w-5 h-5" />
+                <Download class="h-4 w-4" />
                 Télécharger le reçu
               </Button>
             </div>
@@ -200,58 +200,58 @@
         <div class="space-y-6">
           <!-- Status timeline -->
           <Card>
-            <h3 class="text-responsive-lg font-semibold text-heading mb-4">
+            <h3 class="text-lg font-semibold text-gray-900 mt-3">
               Suivi de la réservation
             </h3>
             <div class="space-y-4">
               <div
                 v-for="(step, index) in statusSteps"
                 :key="index"
-                class="flex items-center gap-3"
+                class="flex items-center gap-4"
               >
                 <div
-                  class="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0"
-                  :class="step.completed ? 'bg-primary-500 text-white' : 'bg-neutral-200 text-muted'"
+                  class="h-6 w-6 rounded-full flex items-center justify-center flex-shrink-0"
+                  :class="step.completed ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-500'"
                 >
-                  <component :is="step.icon" class="w-5 h-5" />
+                  <component :is="step.icon" class="h-4 w-4" />
                 </div>
                 <div class="flex-1">
                   <p
                     class="font-medium"
-                    :class="step.completed ? 'text-heading' : 'text-muted'"
+                    :class="step.completed ? 'text-gray-900' : 'text-gray-500'"
                   >
                     {{ step.title }}
                   </p>
-                  <p class="text-responsive-sm text-muted">{{ step.description }}</p>
+                  <p class="text-sm text-gray-500">{{ step.description }}</p>
                 </div>
               </div>
             </div>
           </Card>
 
           <!-- Savings summary -->
-          <Card class="bg-gradient-to-r from-accent-orange to-accent-orange/90 text-white">
-            <div class="flex items-center gap-3 mb-4">
-              <div class="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
-                <DollarSign class="w-10 h-10" />
+          <Card class="bg-gradient-to-r from-orange-500 to-orange-500/90 text-white">
+            <div class="flex items-center gap-4 mt-3">
+              <div class="w-12 h-10 bg-white/20 rounded flex items-center justify-center">
+                <DollarSign class="h-6 w-6" />
               </div>
               <div>
                 <h3 class="font-semibold">Vos économies</h3>
-                <p class="text-responsive-sm opacity-90">Sur cette réservation</p>
+                <p class="text-sm opacity-90">Sur cette réservation</p>
               </div>
             </div>
-            <div class="space-y-2">
+            <div class="space-y-4">
               <div class="flex justify-between items-center">
-                <span class="text-responsive-sm">Prix original</span>
+                <span class="text-sm">Prix original</span>
                 <span>{{ formatPrice(reservation.original_price * reservation.quantity) }}</span>
               </div>
               <div class="flex justify-between items-center">
-                <span class="text-responsive-sm">Prix payé</span>
+                <span class="text-sm">Prix payé</span>
                 <span>{{ formatPrice(reservation.total_amount) }}</span>
               </div>
-              <div class="border-t border-white/20 pt-2">
+              <div class="border-t border-white/20 padding-t-sm">
                 <div class="flex justify-between items-center">
                   <span class="font-semibold">Économisé</span>
-                  <span class="font-semibold text-responsive-lg">
+                  <span class="font-semibold text-lg">
                     {{ formatPrice((reservation.original_price * reservation.quantity) - reservation.total_amount) }}
                   </span>
                 </div>
@@ -272,7 +272,7 @@ import { notify } from '@/composables/useNotifications'
 import { apiService } from '@/services/api'
 import { useReservationsStore } from '@/stores/reservations'
 import {
-  AlertCircle, ArrowLeft, Calendar, Check, Clock, DollarSign,
+  AlertCircle, ArrowLeft, Calendar, Check, DollarSign,
   Download, MapPin, Package, Phone, Store, Truck, X
 } from 'lucide-vue-next'
 import type { Reservation } from '@/types'

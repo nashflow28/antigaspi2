@@ -1,42 +1,42 @@
 <template>
-  <div class="min-h-screen bg-gradient-to-br from-neutral-50 to-neutral-100">
+  <div class="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
     <!-- Loading State -->
     <div v-if="loading" class="flex justify-center items-center min-h-screen">
       <div class="flex items-center gap-3">
-        <div class="animate-spin rounded-full h-10 w-10 border-b-2 border-primary-600" />
-        <span class="text-body">Chargement du produit...</span>
+        <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600" />
+        <span class="text-gray-700">Chargement du produit...</span>
       </div>
     </div>
 
     <!-- Error State -->
-    <div v-else-if="error" class="container px-4 sm:px-6 lg:px-8 mx-auto px-4 py-12 sm:py-14 lg:py-16 text-left sm:text-center">
-      <AlertCircle class="w-16 h-16 text-red-500 mx-auto mb-4" />
-      <h2 class="text-responsive-xl font-semibold text-heading mb-2">Produit introuvable</h2>
-      <p class="text-body mb-6">Le produit que vous recherchez n'existe pas ou a été supprimé.</p>
+    <div v-else-if="error" class="container px-3 sm:px-4 lg:px-6 mx-auto px-3 py-16 sm:py-16 lg:py-16 text-left sm:text-center">
+      <AlertCircle class="w-12 h-10 text-red-500 mx-auto mt-3" />
+      <h2 class="text-xl font-semibold text-gray-900 mt-2">Produit introuvable</h2>
+      <p class="text-gray-700 mt-4">Le produit que vous recherchez n'existe pas ou a été supprimé.</p>
       <Button variant="primary" @click="$router.push('/products')">
         Retour au catalogue
       </Button>
     </div>
 
     <!-- Product Detail -->
-    <div v-else-if="product" class="container px-4 sm:px-6 lg:px-8 mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10 lg:py-12">
+    <div v-else-if="product" class="container px-3 sm:px-4 lg:px-6 mx-auto px-3 sm:px-4 lg:px-6 py-8 sm:py-12 lg:py-16">
       <!-- Breadcrumb -->
-      <nav class="flex items-center gap-2 text-responsive-sm text-body mb-6 sm:mb-8">
+      <nav class="flex items-center gap-2 text-sm text-gray-700 mt-4 sm:mb-3xl">
         <router-link to="/" class="hover:transition-colors">Accueil</router-link>
-        <ChevronRight class="w-5 h-5" />
+        <ChevronRight class="h-4 w-4" />
         <router-link to="/products" class="hover:transition-colors">Catalogue</router-link>
-        <ChevronRight class="w-5 h-5" />
-        <span class="text-heading font-medium">{{ product.name }}</span>
+        <ChevronRight class="h-4 w-4" />
+        <span class="text-gray-900 font-medium">{{ product.name }}</span>
       </nav>
 
       <!-- Main Content -->
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 sm:gap-12 mb-8 sm:mb-10 lg:mb-12">
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 sm:gap-12 mb-3xl sm:mb-10 lg:mb-12">
         <!-- Product Image -->
         <div class="space-y-6">
           <Card
             variant="glass"
             :no-padding="true"
-            class="relative aspect-square bg-gradient-to-br from-primary-500 via-accent-blue to-accent-blue/90 rounded-3xl overflow-hidden sm:block shadow-modern-2025 glow-effect"
+            class="relative aspect-square bg-gradient-to-br from-blue-500 via-blue-500 to-blue-500/90 rounded overflow-hidden sm:block shadow-xl glow-effect"
           >
             <!-- Product Image or Placeholder -->
             <div v-if="product.image_url" class="relative sm:absolute inset-0">
@@ -85,18 +85,18 @@
           <Card variant="elevated">
             <div class="space-y-4">
               <div class="flex items-center gap-3">
-                <MapPin class="w-5 h-5 text-muted" />
+                <MapPin class="h-4 w-4 text-gray-500" />
                 <div>
-                  <p class="text-responsive-sm font-medium text-heading">{{ product.merchant?.business_name }}</p>
-                  <p class="text-responsive-sm text-body">{{ product.merchant?.address }}</p>
+                  <p class="text-sm font-medium text-gray-900">{{ product.merchant?.business_name }}</p>
+                  <p class="text-sm text-gray-700">{{ product.merchant?.address }}</p>
                 </div>
               </div>
 
               <div class="flex items-center gap-3">
-                <Clock class="w-5 h-5 text-muted" />
+                <Clock class="h-4 w-4 text-gray-500" />
                 <div>
-                  <p class="text-responsive-sm font-medium text-heading">Récupération</p>
-                  <p class="text-responsive-sm text-body">
+                  <p class="text-sm font-medium text-gray-900">Récupération</p>
+                  <p class="text-sm text-gray-700">
                     {{ formatExpiration(product.expiration_date) }}
                   </p>
                 </div>
@@ -109,7 +109,7 @@
         <div class="space-y-8">
           <!-- Header -->
           <div>
-            <div class="flex items-center gap-3 mb-2">
+            <div class="flex items-center gap-3 mt-2">
               <Badge :variant="getCategoryVariant(product.category?.name)">
                 {{ product.category?.name }}
               </Badge>
@@ -122,16 +122,16 @@
               </Badge>
             </div>
 
-            <h1 class="text-responsive-xl lg:text-display-sm font-semibold text-heading mb-4">
+            <h1 class="text-xl lg:text-3xl font-semibold text-gray-900 mt-3">
               {{ product.name }}
             </h1>
 
             <!-- Pricing -->
-            <div class="flex items-center gap-4 mb-6">
-              <div class="text-responsive-xl font-semibold text-primary">
+            <div class="flex items-center gap-3 mt-4">
+              <div class="text-xl font-semibold text-blue-600">
                 {{ formatPrice(product.discounted_price) }} XOF
               </div>
-              <div v-if="product.original_price !== product.discounted_price" class="text-responsive-xl text-muted line-through">
+              <div v-if="product.original_price !== product.discounted_price" class="text-xl text-gray-500 line-through">
                 {{ formatPrice(product.original_price) }} XOF
               </div>
               <Badge v-if="discountPercentage > 0" variant="success">
@@ -143,9 +143,9 @@
           <!-- Description -->
           <Card>
             <template #header>
-              <h3 class="text-responsive-lg font-semibold">Description</h3>
+              <h3 class="text-lg font-semibold">Description</h3>
             </template>
-            <p class="text-body-emphasis leading-relaxed">
+            <p class="text-gray-800 leading-relaxed">
               {{ product.description || 'Aucune description disponible.' }}
             </p>
           </Card>
@@ -154,26 +154,26 @@
           <Card variant="gradient">
             <div class="space-y-6">
               <div>
-                <h3 class="text-responsive-lg font-semibold text-heading mb-4">Réservation</h3>
+                <h3 class="text-lg font-semibold text-gray-900 mt-3">Réservation</h3>
 
                 <!-- Quantity Selector -->
-                <div class="flex items-center gap-4 mb-6">
-                  <label class="text-responsive-sm font-medium text-body-emphasis">Quantité :</label>
-                  <div class="flex items-center border border-neutral-300 rounded-lg">
+                <div class="flex items-center gap-3 mt-4">
+                  <label class="text-sm font-medium text-gray-800">Quantité :</label>
+                  <div class="flex items-center border border-gray-300 rounded">
                     <Button
                       variant="ghost"
                       size="sm"
                       :disabled="reservationQuantity <= 1"
                       @click="decreaseQuantity"
                     >
-                      <Minus class="w-5 h-5" />
+                      <Minus class="h-4 w-4" />
                     </Button>
                     <input
                       v-model.number="reservationQuantity"
                       type="number"
                       min="1"
                       :max="product.quantity"
-                      class="w-16 text-left sm:text-center border-0 focus:ring-0 py-3"
+                      class="w-12 text-left sm:text-center border-0 focus:ring-0 py-3"
                     >
                     <Button
                       variant="ghost"
@@ -181,21 +181,21 @@
                       :disabled="reservationQuantity >= product.quantity"
                       @click="increaseQuantity"
                     >
-                      <Plus class="w-5 h-5" />
+                      <Plus class="h-4 w-4" />
                     </Button>
                   </div>
                 </div>
 
                 <!-- Total Price -->
-                <div class="flex items-center justify-start sm:justify-between p-4 bg-primary-50 rounded-lg mb-6">
-                  <span class="text-responsive-sm font-medium text-primary-900">Total :</span>
-                  <span class="text-responsive-xl font-semibold text-primary">
+                <div class="flex items-center justify-start sm:justify-between p-4 bg-blue-50 rounded mt-4">
+                  <span class="text-sm font-medium text-blue-900">Total :</span>
+                  <span class="text-xl font-semibold text-blue-600">
                     {{ formatPrice(product.discounted_price * reservationQuantity) }} XOF
                   </span>
                 </div>
 
                 <!-- Action Buttons -->
-                <div class="space-y-3">
+                <div class="space-y-2">
                   <Button
                     size="lg"
                     full-width
@@ -203,7 +203,7 @@
                     :loading="reservationLoading"
                     @click="handleReservation"
                   >
-                    <ShoppingCart class="w-5 h-5 mr-2" />
+                    <ShoppingCart class="h-4 w-4 mr-2" />
                     {{ reservationLoading ? 'Réservation...' : 'Réserver maintenant' }}
                   </Button>
 
@@ -214,7 +214,7 @@
                     :disabled="loading"
                     @click="addToWishlist"
                   >
-                    <Heart :class="['w-5 h-5 mr-2', isInWishlist && 'fill-current text-red-500']" />
+                    <Heart :class="['h-4 w-4 mr-2', isInWishlist && 'fill-current text-red-500']" />
                     {{ isInWishlist ? 'Retiré des favoris' : 'Ajouter aux favoris' }}
                   </Button>
                 </div>
@@ -225,19 +225,19 @@
           <!-- Share Product -->
           <Card>
             <div class="flex items-center justify-start sm:justify-between">
-              <h3 class="text-responsive-lg font-semibold text-heading">Partager</h3>
+              <h3 class="text-lg font-semibold text-gray-900">Partager</h3>
               <div class="flex gap-2">
                 <Button variant="ghost" size="sm" @click="shareProduct('facebook')">
-                  <Facebook class="w-5 h-5" />
+                  <Facebook class="h-4 w-4" />
                 </Button>
                 <Button variant="ghost" size="sm" @click="shareProduct('twitter')">
-                  <Twitter class="w-5 h-5" />
+                  <Twitter class="h-4 w-4" />
                 </Button>
                 <Button variant="ghost" size="sm" @click="shareProduct('whatsapp')">
-                  <MessageCircle class="w-5 h-5" />
+                  <MessageCircle class="h-4 w-4" />
                 </Button>
                 <Button variant="ghost" size="sm" @click="copyLink">
-                  <Copy class="w-5 h-5" />
+                  <Copy class="h-4 w-4" />
                 </Button>
               </div>
             </div>
@@ -248,10 +248,10 @@
       <!-- Related Products -->
       <Card v-if="relatedProducts.length > 0">
         <template #header>
-          <h2 class="text-responsive-xl font-semibold text-heading">Produits similaires</h2>
+          <h2 class="text-xl font-semibold text-gray-900">Produits similaires</h2>
         </template>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
           <Card
             v-for="relatedProduct in relatedProducts"
             :key="relatedProduct.id"
@@ -260,7 +260,7 @@
             class="group cursor-pointer"
             @click="navigateToProduct(relatedProduct.id)"
           >
-            <div class="aspect-square bg-gradient-to-br from-neutral-200 to-neutral-300 rounded-lg overflow-hidden sm:block mb-4">
+            <div class="aspect-square bg-gradient-to-br from-neutral-200 to-neutral-300 rounded overflow-hidden sm:block mt-3">
               <img
                 v-if="relatedProduct.image_url"
                 :src="relatedProduct.image_url"
@@ -268,15 +268,15 @@
                 class="w-full h-full object-cover group-hover:transition-transform duration-300"
               >
               <div v-else class="flex items-center justify-center h-full">
-                <Package class="w-12 h-12 text-placeholder" />
+                <Package class="w-12 h-10 text-gray-400" />
               </div>
             </div>
 
             <div>
-              <h3 class="font-semibold text-heading mb-1 truncate">{{ relatedProduct.name }}</h3>
-              <p class="text-responsive-sm text-body mb-2">{{ relatedProduct.merchant?.business_name }}</p>
+              <h3 class="font-semibold text-gray-900 mb-1 truncate">{{ relatedProduct.name }}</h3>
+              <p class="text-sm text-gray-700 mt-2">{{ relatedProduct.merchant?.business_name }}</p>
               <div class="flex items-center gap-2">
-                <span class="font-semibold text-primary">{{ formatPrice(relatedProduct.discounted_price) }} XOF</span>
+                <span class="font-semibold text-blue-600">{{ formatPrice(relatedProduct.discounted_price) }} XOF</span>
                 <Badge size="xs" :variant="relatedProduct.quantity > 0 ? 'success' : 'error'">
                   {{ relatedProduct.quantity }} restants
                 </Badge>
@@ -402,7 +402,7 @@ const handleReservation = async () => {
     })
 
     router.push('/reservations')
-  } catch (error) {
+  } catch {
     // console.error('Reservation error:', error)
   } finally {
     reservationLoading.value = false
@@ -426,7 +426,7 @@ const copyLink = async () => {
   try {
     await navigator.clipboard.writeText(window.location.href)
     logMigration('ProductDetailView', 'Link copied')
-  } catch (error) {
+  } catch {
     // console.error('Failed to copy link:', error)
   }
 }
@@ -470,7 +470,7 @@ onMounted(async () => {
       }
       // ... more related products
     ]
-  } catch (err) {
+  } catch {
     error.value = 'Erreur lors du chargement du produit'
   } finally {
     loading.value = false
@@ -487,7 +487,7 @@ onMounted(async () => {
   box-shadow: 0 25px 50px rgba(16, 185, 129, 0.2);
 }
 
-.shadow-modern-2025 {
+.shadow-xl {
   box-shadow:
     0 1px 3px rgba(0, 0, 0, 0.1),
     0 10px 25px rgba(0, 0, 0, 0.05),

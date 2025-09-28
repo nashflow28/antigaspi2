@@ -15,7 +15,7 @@
           class="install-btn"
           @click="installApp"
         >
-          <Download class="w-5 h-5 mr-2" />
+          <Download class="h-4 w-4 mr-2" />
           Installer
         </Button>
         <Button
@@ -24,7 +24,7 @@
           class="dismiss-btn"
           @click="dismissPrompt"
         >
-          <X class="w-5 h-5" />
+          <X class="h-4 w-4" />
         </Button>
       </div>
     </div>
@@ -38,7 +38,7 @@
       @click="showInstallPrompt = true"
     >
       <div class="floating-content">
-        <Download class="w-5 h-5" />
+        <Download class="h-4 w-4" />
         <span>Installer l'app</span>
       </div>
     </div>
@@ -137,7 +137,7 @@ const isRecentlyDismissed = (): boolean => {
   background: linear-gradient(135deg, #10B981, #059669);
   color: white;
   padding: 16px 20px;
-  border-radius: 16px;
+  rounded: 16px;
   box-shadow: 0 10px 25px -5px rgba(16, 185, 129, 0.4);
   z-index: 9999;
   animation: slideInUp 0.3s ease-out;
@@ -206,7 +206,7 @@ const isRecentlyDismissed = (): boolean => {
   background: linear-gradient(135deg, #10B981, #059669);
   color: white;
   padding: 12px 16px;
-  border-radius: 50px;
+  rounded: 50px;
   box-shadow: 0 4px 20px rgba(16, 185, 129, 0.4);
   cursor: pointer;
   z-index: 9998;

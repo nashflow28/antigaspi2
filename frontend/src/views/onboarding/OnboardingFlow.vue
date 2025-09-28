@@ -1,44 +1,44 @@
 <template>
-  <div class="min-h-screen bg-gradient-to-br from-neutral-50 via-white to-primary-50">
-    <div class="container px-4 sm:px-6 lg:px-8 mx-auto max-w-5xl px-6 py-8 sm:py-10 lg:py-12">
-      <div class="mb-10 flex flex-col items-stretch sm:items-start justify-between gap-4 sm:gap-6 lg:flex-row lg:items-center">
+  <div class="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50">
+    <div class="container px-3 sm:px-4 lg:px-6 mx-auto max-w-5xl px-4 py-8 sm:py-12 lg:py-16">
+      <div class="mb-10 flex flex-col items-stretch sm:items-start justify-between gap-3 sm:gap-4 lg:flex-row lg:items-center">
         <div>
-          <p class="mb-2 inline-flex items-center gap-2 rounded-full bg-primary-100/60 px-4 py-3 text-responsive-sm font-semibold text-primary-emphasis">
-            <Sparkles class="h-5 w-5" />
+          <p class="mt-2 inline-flex items-center gap-2 rounded-full bg-blue-100/60 px-3 py-3 text-sm font-semibold text-blue-900">
+            <Sparkles class="h-4 w-4" />
             Guide de démarrage AntiGaspi
           </p>
-          <h1 class="text-display-sm font-semibold tracking-tight text-heading">
+          <h1 class="text-3xl font-semibold tracking-tight text-gray-900">
             Bienvenue ! Faisons connaissance en quelques étapes
           </h1>
-          <p class="mt-3 max-w-full sm:max-w-xl text-responsive-lg text-body">
+          <p class="mt-3 max-w-xl text-lg text-gray-700">
             Découvrez comment réserver des paniers surprise, suivre vos commerçants favoris et profiter du portefeuille AntiGaspi.
           </p>
         </div>
-        <div class="w-full max-w-xs rounded-3xl border border-primary-200/60 bg-white/80 p-6 shadow-card backdrop-blur">
-          <p class="text-responsive-sm font-medium text-muted">Progression</p>
+        <div class="w-full max-w-xs rounded border border-blue-200/60 bg-white/80 p-6 shadow-lg backdrop-blur">
+          <p class="text-sm font-medium text-gray-500">Progression</p>
           <div class="mt-2 flex items-end justify-between">
-            <span class="text-display-sm font-semibold text-primary">{{ progress }}%</span>
-            <span class="text-responsive-sm text-muted">Étape {{ currentStep + 1 }} sur {{ totalSteps }}</span>
+            <span class="text-3xl font-semibold text-blue-600">{{ progress }}%</span>
+            <span class="text-sm text-gray-500">Étape {{ currentStep + 1 }} sur {{ totalSteps }}</span>
           </div>
-          <div class="mt-4 h-2.5 rounded-full bg-neutral-200/80">
+          <div class="mt-4 h-4.5 rounded-full bg-gray-200/80">
             <div
-              class="h-2.5 rounded-full bg-gradient-to-r from-primary-500 via-cyan-500 to-blue-500 transition-all duration-500"
+              class="h-4.5 rounded-full bg-gradient-to-r from-blue-500 via-cyan-500 to-blue-500 transition-all duration-500"
               :style="{ width: `${progress}%` }"
             />
           </div>
-          <ul class="mt-4 space-y-2 text-responsive-sm text-muted">
+          <ul class="mt-4 space-y-4 text-sm text-gray-500">
             <li
               v-for="(step, index) in steps"
               :key="step.title"
               class="flex items-center gap-2"
             >
               <span
-                class="flex h-10 w-10 items-center justify-center rounded-full border"
-                :class="index <= currentStep ? 'border-primary-500 bg-primary-500 text-white' : 'border-neutral-300 text-placeholder'"
+                class="flex h-8 w-8 items-center justify-center rounded-full border"
+                :class="index <= currentStep ? 'border-blue-500 bg-blue-500 text-white' : 'border-gray-300 text-gray-400'"
               >
                 {{ index + 1 }}
               </span>
-              <span :class="index === currentStep ? 'font-semibold text-heading-secondary' : ''">
+              <span :class="index === currentStep ? 'font-semibold text-gray-800' : ''">
                 {{ step.title }}
               </span>
             </li>
@@ -46,20 +46,20 @@
         </div>
       </div>
 
-      <div class="grid gap-4 sm:gap-6 lg:grid-cols-[2fr_1fr]">
+      <div class="grid gap-3 sm:gap-4 lg:grid-cols-[2fr_1fr]">
         <Card class="bg-white/80">
           <template #header>
             <div class="flex items-center gap-3">
-              <component :is="activeStep.icon" class="h-10 w-10 rounded-2xl bg-primary-100 p-2 text-primary" />
+              <component :is="activeStep.icon" class="h-8 w-8 rounded bg-blue-100 p-2 text-blue-600" />
               <div>
-                <p class="text-responsive-sm font-medium uppercase tracking-wide text-primary">{{ activeStep.category }}</p>
-                <h2 class="text-responsive-xl font-semibold text-heading">{{ activeStep.title }}</h2>
+                <p class="text-sm font-medium uppercase tracking-wide text-blue-600">{{ activeStep.category }}</p>
+                <h2 class="text-xl font-semibold text-gray-900">{{ activeStep.title }}</h2>
               </div>
             </div>
           </template>
 
-          <div class="space-y-6 text-body">
-            <p class="text-responsive-lg leading-relaxed text-body-emphasis">
+          <div class="space-y-6 text-gray-700">
+            <p class="text-lg leading-relaxed text-gray-800">
               {{ activeStep.description }}
             </p>
 
@@ -67,14 +67,14 @@
               <li
                 v-for="item in activeStep.points"
                 :key="item.title"
-                class="flex items-stretch sm:items-start gap-3 rounded-2xl border border-neutral-200/70 bg-white/80 p-4 shadow-sm"
+                class="flex items-stretch sm:items-start gap-3 rounded border border-gray-200/70 bg-white/80 p-4 shadow-sm"
               >
-                <div class="mt-1 flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-primary-100 text-primary">
-                  <component :is="item.icon" class="h-5 w-5" />
+                <div class="mt-1 flex h-8 w-8 flex-shrink-0 items-center justify-center rounded bg-blue-100 text-blue-600">
+                  <component :is="item.icon" class="h-4 w-4" />
                 </div>
                 <div>
-                  <p class="font-semibold text-heading-secondary">{{ item.title }}</p>
-                  <p class="text-responsive-sm text-body">{{ item.content }}</p>
+                  <p class="font-semibold text-gray-800">{{ item.title }}</p>
+                  <p class="text-sm text-gray-700">{{ item.content }}</p>
                 </div>
               </li>
             </ul>
@@ -84,7 +84,7 @@
             <div class="flex flex-col-reverse gap-3 sm:flex-row sm:items-center sm:justify-between">
               <Button
                 variant="ghost"
-                class="text-muted hover:text-heading-secondary"
+                class="text-gray-500 hover:text-gray-800"
                 @click="skip"
               >
                 Passer le guide
@@ -127,14 +127,14 @@
           >
             <template #header>
               <div class="flex items-center gap-3">
-                <component :is="insight.icon" class="h-9 w-9 rounded-2xl bg-primary-100 p-2 text-primary" />
+                <component :is="insight.icon" class="h-10 w-9 rounded bg-blue-100 p-2 text-blue-600" />
                 <div>
-                  <p class="text-responsive-sm font-medium text-muted">{{ insight.category }}</p>
-                  <h3 class="text-responsive-lg font-semibold text-heading">{{ insight.title }}</h3>
+                  <p class="text-sm font-medium text-gray-500">{{ insight.category }}</p>
+                  <h3 class="text-lg font-semibold text-gray-900">{{ insight.title }}</h3>
                 </div>
               </div>
             </template>
-            <p class="text-responsive-sm leading-relaxed text-body">{{ insight.description }}</p>
+            <p class="text-sm leading-relaxed text-gray-700">{{ insight.description }}</p>
           </Card>
         </div>
       </div>

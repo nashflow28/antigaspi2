@@ -36,7 +36,7 @@
             <!-- Skip Link -->
             <a
               href="#modal-close"
-              class="skip-link sr-only focus:not-sr-only focus:relative sm:absolute focus:top-2 focus:right-2 bg-primary-600 text-white px-4 py-3 rounded text-responsive-sm z-10"
+              class="skip-link sr-only focus:not-sr-only focus:relative sm:absolute focus:top-2 focus:right-2 bg-blue-600 text-white px-3 py-3 rounded text-sm z-10"
             >
               Skip to close button
             </a>
@@ -62,7 +62,7 @@
                   variant="ghost"
                   size="icon"
                   :aria-label="closeAriaLabel"
-                  class="ml-4 -mr-2 shrink-0"
+                  class="ml-6 -mr-2 shrink-0"
                   :left-icon="X"
                   @click="close"
                 >
@@ -74,7 +74,7 @@
               <p
                 v-if="description || slots.description"
                 :id="descriptionId"
-                class="text-responsive-sm text-body dark:text-placeholder mt-2"
+                class="text-sm text-gray-700 dark:text-gray-400 mt-2"
               >
                 <slot name="description">{{ description }}</slot>
               </p>
@@ -252,10 +252,10 @@ const modalClasses = computed(() => {
     'relative',
     'bg-white',
     'dark:bg-dark-800',
-    'rounded-xl',
-    'shadow-2xl',
+    'rounded',
+    'shadow-80',
     'border',
-    'border-gray-200',
+    'border-surface-200',
     'dark:border-dark-700',
     'max-h-[90vh]',
     'flex',
@@ -266,9 +266,9 @@ const modalClasses = computed(() => {
   const sizeClasses = {
     xs: ['w-full', 'max-w-xs'],
     sm: ['w-full', 'max-w-sm'],
-    md: ['w-full', 'max-w-md'],
-    lg: ['w-full', 'max-w-lg'],
-    xl: ['w-full', 'max-w-2xl'],
+    md: ['w-full', 'max-w-xl'],
+    lg: ['w-full', 'max-w-xl'],
+    xl: ['w-full', 'max-w-80'],
     full: ['w-full', 'h-full', 'max-w-none', 'max-h-none', 'rounded-none']
   }
 
@@ -279,10 +279,10 @@ const modalClasses = computed(() => {
 })
 
 const headerClasses = computed(() => [
-  'px-6',
+  'px-4',
   'py-4',
   'border-b',
-  'border-gray-200',
+  'border-surface-200',
   'dark:border-dark-700',
   'shrink-0'
 ])
@@ -290,13 +290,13 @@ const headerClasses = computed(() => [
 const titleClasses = computed(() => [
   'text-lg',
   'font-semibold',
-  'text-gray-900',
+  'text-surface-900',
   'dark:text-white',
   'leading-6'
 ])
 
 const bodyClasses = computed(() => [
-  'px-6',
+  'px-4',
   'py-4',
   'flex-1',
   {
@@ -306,12 +306,12 @@ const bodyClasses = computed(() => [
 ])
 
 const footerClasses = computed(() => [
-  'px-6',
+  'px-4',
   'py-4',
-  'bg-gray-50',
+  'bg-gray-50-50',
   'dark:bg-dark-900',
   'border-t',
-  'border-gray-200',
+  'border-surface-200',
   'dark:border-dark-700',
   'rounded-b-xl',
   'shrink-0'
@@ -439,7 +439,7 @@ onUnmounted(() => {
   color: white;
   padding: 8px;
   text-decoration: none;
-  border-radius: 4px;
+  rounded: 4px;
   z-index: 100;
 }
 

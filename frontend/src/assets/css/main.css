@@ -256,6 +256,135 @@
     @apply space-y-2;
   }
 
+  /* Icon sizing utilities */
+  .icon-sm {
+    @apply w-5 h-5;
+  }
+
+  .icon-md {
+    @apply w-10 h-10;
+  }
+
+  .height-sm {
+    @apply h-5;
+  }
+
+  .width-sm {
+    @apply w-5;
+  }
+
+  .rounded-modern {
+    @apply rounded-2xl;
+  }
+
+  /* Spacing utilities */
+  .spacing-xs {
+    @apply mt-1;
+  }
+
+  .spacing-sm-top {
+    @apply mt-2;
+  }
+
+  .spacing-sm {
+    @apply mb-2;
+  }
+
+  .spacing-md {
+    @apply mb-4;
+  }
+
+  .spacing-lg {
+    @apply mb-6;
+  }
+
+  /* Padding utilities */
+  .padding-x-md {
+    @apply px-4;
+  }
+
+  .padding-x-lg {
+    @apply px-6;
+  }
+
+  .padding-x-xl {
+    @apply px-8;
+  }
+
+  .padding-x-xxl {
+    @apply px-8;
+  }
+
+  .padding-y-md {
+    @apply py-3;
+  }
+
+  .padding-y-lg {
+    @apply py-6;
+  }
+
+  .padding-y-xl {
+    @apply py-6 sm:py-8;
+  }
+
+  .padding-y-xxl {
+    @apply py-10;
+  }
+
+  .padding-x-sm {
+    @apply px-3;
+  }
+
+  .padding-xl {
+    @apply p-6;
+  }
+
+  .padding-lg {
+    @apply p-4;
+  }
+
+  .padding-md {
+    @apply p-3;
+  }
+
+  /* Gap utilities */
+  .gap-sm {
+    @apply gap-2;
+  }
+
+  .gap-md {
+    @apply gap-4;
+  }
+
+  .gap-lg {
+    @apply gap-6;
+  }
+
+  /* Spacing group utilities */
+  .spacing-group-none {
+    @apply space-y-0;
+  }
+
+  .spacing-group-sm {
+    @apply space-y-3;
+  }
+
+  .spacing-group-lg {
+    @apply space-y-6;
+  }
+
+  .spacing-group-xl {
+    @apply space-y-8;
+  }
+
+  .spacing-x-sm {
+    @apply space-x-2;
+  }
+
+  .margin-r-sm {
+    @apply mr-2;
+  }
+
   .form-label {
     @apply block text-sm font-medium text-neutral-700 mb-2;
   }
@@ -477,77 +606,6 @@
   /* Container utilities */
   .container-fluid {
     @apply w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
-  }
-
-  /* Container for 2025 components - maintains consistency with legacy during progressive migration */
-  .container-2025 {
-    @apply w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
-  }
-
-  /* Smooth scrolling */
-  .scroll-smooth {
-    scroll-behavior: smooth;
-  }
-
-  /* 🎨 Semantic Text Colors - 2025 Design System */
-  .text-heading {
-    @apply text-neutral-900;
-  }
-
-  .text-heading-secondary {
-    @apply text-neutral-800;
-  }
-
-  .text-body {
-    @apply text-neutral-700;
-  }
-
-  .text-body-emphasis {
-    @apply text-neutral-800;
-  }
-
-  .text-muted {
-    @apply text-neutral-500;
-  }
-
-  .text-placeholder {
-    @apply text-neutral-400;
-  }
-
-  .text-primary-emphasis {
-    @apply text-primary-700;
-  }
-
-  /* Dark mode variants */
-  .dark .text-heading {
-    @apply text-neutral-100;
-  }
-
-  .dark .text-heading-secondary {
-    @apply text-neutral-200;
-  }
-
-  .dark .text-body {
-    @apply text-neutral-300;
-  }
-
-  .dark .text-body-emphasis {
-    @apply text-neutral-200;
-  }
-
-  .dark .text-muted {
-    @apply text-neutral-400;
-  }
-
-  .dark .text-placeholder {
-    @apply text-neutral-500;
-  }
-}
-
-/* 🌙 Dark Mode Support */
-@media (prefers-color-scheme: dark) {
-  .dark {
-    @apply bg-neutral-900 text-neutral-100;
   }
 
   .dark .card {

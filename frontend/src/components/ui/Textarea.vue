@@ -1,5 +1,5 @@
 <template>
-  <div class="space-y-2">
+  <div class="space-y-4">
     <label
       v-if="label"
       :for="textareaId"
@@ -23,7 +23,7 @@
       />
 
       <span
-        class="pointer-events-none relative sm:absolute inset-x-3 bottom-1 h-0.5 rounded-full bg-primary-500 transition-transform duration-200"
+        class="pointer-events-none relative sm:absolute inset-x-3 bottom-1 h-0.5 rounded-full bg-blue-500 transition-transform duration-200"
         :style="focusUnderlineStyle"
         aria-hidden="true"
       />
@@ -32,10 +32,10 @@
     <p
       v-if="error"
       :id="`${textareaId}-error`"
-      class="flex items-center gap-2 text-small text-accent-red"
+      class="flex items-center gap-2 text-sm text-red-600"
     >
       <svg
-        class="h-5 w-5"
+        class="h-4 w-4"
         viewBox="0 0 20 20"
         fill="currentColor"
         aria-hidden="true"
@@ -51,7 +51,7 @@
     <p
       v-else-if="helperText"
       :id="`${textareaId}-helper`"
-      class="text-caption text-muted"
+      class="text-xs text-gray-500"
     >
       {{ helperText }}
     </p>
@@ -100,20 +100,20 @@ const attrs = useAttrs()
 const isFocused = ref(false)
 
 const baseClasses =
-  'flex w-full rounded-2xl border bg-white/95 px-4 py-3 text-body text-body-emphasis transition-all duration-200 ease-spring-out placeholder:text-placeholder focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-300 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-50 dark:bg-neutral-900 dark:text-neutral-100 dark:placeholder:text-placeholder dark:focus-visible:ring-offset-neutral-900 disabled:cursor-not-allowed disabled:opacity-60 resize-y'
+  'flex w-full rounded border bg-white/95 px-3 py-3 text-gray-700 text-gray-800 transition-all duration-200 ease-spring-out placeholder:text-gray-400 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-300 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-50 dark:bg-gray-900 dark:text-gray-100 dark:placeholder:text-gray-400 dark:focus-visible:ring-offset-neutral-900 disabled:cursor-not-allowed disabled:opacity-60 resize-y'
 
 const variantClasses: Record<TextareaVariant, string> = {
   subtle:
-    'border-neutral-200 hover:border-primary-300 focus:border-primary-400 dark:border-neutral-700 dark:focus:border-primary-500',
+    'border-gray-200 hover:border-blue-300 focus:border-blue-400 dark:border-gray-700 dark:focus:border-blue-500',
   filled:
-    'border-transparent bg-neutral-100 hover:bg-neutral-50 focus:bg-white dark:bg-neutral-800/70 dark:hover:bg-neutral-800',
+    'border-transparent bg-gray-100 hover:bg-gray-50 focus:bg-white dark:bg-gray-800/70 dark:hover:bg-gray-800',
   transparent:
-    'border-primary-500/20 bg-primary-500/5 hover:border-primary-500/40 focus:bg-white dark:bg-primary-900/30 dark:border-primary-700/40'
+    'border-blue-500/20 bg-blue-500/5 hover:border-blue-500/40 focus:bg-white dark:bg-blue-900/30 dark:border-blue-700/40'
 }
 
 const sizeClasses: Record<TextareaSize, string> = {
   md: 'min-h-[120px]',
-  lg: 'min-h-[180px] text-body'
+  lg: 'min-h-[180px] text-gray-700'
 }
 
 const externalClass = computed(() => (attrs.class as string | undefined) ?? '')
@@ -129,14 +129,14 @@ const textareaClass = computed(() => [
   baseClasses,
   variantClasses[props.variant],
   sizeClasses[props.size],
-  props.error ? 'border-accent-red focus-visible:ring-accent-red/60' : '',
+  props.error ? 'border-red-600 focus-visible:ring-accent-red/60' : '',
   externalClass.value
 ])
 
 const labelClass = computed(() => [
-  'text-small font-medium text-body transition-colors dark:text-neutral-200',
-  isFocused.value && !props.error ? 'text-primary' : '',
-  props.error ? 'text-accent-red' : ''
+  'text-sm font-medium text-gray-700 transition-colors dark:text-gray-200',
+  isFocused.value && !props.error ? 'text-blue-600' : '',
+  props.error ? 'text-red-600' : ''
 ])
 
 const describedBy = computed(() => {

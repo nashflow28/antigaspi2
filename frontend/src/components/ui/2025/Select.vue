@@ -48,24 +48,24 @@ const emit = defineEmits<{
 const computedClasses = computed(() => {
   const baseClasses = [
     'select-2025',
-    'block w-full rounded-lg border transition-colors duration-200',
+    'block w-full rounded border transition-colors duration-200',
     'focus:ring-2 focus:ring-offset-2 focus:outline-none',
-    'disabled:bg-neutral-50 disabled:text-muted disabled:cursor-not-allowed'
+    'disabled:bg-gray-50 disabled:text-gray-500 disabled:cursor-not-allowed'
   ]
 
   // Size classes
   const sizeClasses = {
-    xs: 'px-2 py-1 text-xs',
-    sm: 'px-3 py-1.5 text-sm',
+    xs: 'px-3 py-xs text-xs',
+    sm: 'px-3 py-1 text-sm',
     md: 'px-3 py-2 text-sm',
-    lg: 'px-4 py-2.5 text-base',
-    xl: 'px-4 py-3 text-lg'
+    lg: 'px-3 py-2.5 text-base',
+    xl: 'px-3 py-3 text-lg'
   }
 
   // Variant classes
   const variantClasses = {
-    default: 'border-neutral-300 focus:border-primary-500 focus:ring-primary-500',
-    success: 'border-green-300 focus:border-green-500 focus:ring-green-500',
+    default: 'border-gray-300 focus:border-blue-500 focus:ring-blue-500',
+    success: 'border-blue-300 focus:border-blue-500 focus:ring-green-500',
     warning: 'border-amber-300 focus:border-amber-500 focus:ring-amber-500',
     error: 'border-red-300 focus:border-red-500 focus:ring-red-500'
   }
