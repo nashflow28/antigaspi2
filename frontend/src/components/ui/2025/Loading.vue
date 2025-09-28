@@ -84,9 +84,9 @@ const wrapperClasses = computed(() => [
 
 const colorClasses = computed(() => {
   const variants = {
-    default: 'text-gray-700',
-    primary: 'text-blue-600',
-    muted: 'text-gray-400'
+    default: 'text-neutral-600',
+    primary: 'text-primary-600',
+    muted: 'text-neutral-400'
   }
   return variants[props.variant]
 })
@@ -123,7 +123,7 @@ const dotClasses = computed(() => [
 
 // Pulse
 const pulseClasses = computed(() => [
-  'animate-pulse rounded bg-gray-300',
+  'animate-pulse rounded bg-neutral-300',
   props.size === 'xs' && 'w-xxl h-12',
   props.size === 'sm' && 'h-6 w-6',
   props.size === 'md' && 'w-12 h-10',
@@ -137,12 +137,12 @@ const skeletonClasses = computed(() => [
 ].join(' '))
 
 const skeletonLineClasses = computed(() => [
-  'h-10 bg-gray-300 rounded last:w-sm/3'
+  'h-10 bg-neutral-300 rounded last:w-sm/3'
 ].join(' '))
 
 // Progress
 const progressClasses = computed(() => [
-  'w-full bg-gray-200 rounded-full overflow-hidden',
+  'w-full bg-neutral-200 rounded-full overflow-hidden',
   props.size === 'xs' && 'h-3',
   props.size === 'sm' && 'h-4',
   props.size === 'md' && 'h-3',
@@ -151,7 +151,7 @@ const progressClasses = computed(() => [
 ].filter(Boolean).join(' '))
 
 const progressBarClasses = computed(() => [
-  'h-full bg-gradient-to-r from-blue-500 to-blue-600',
+  'h-full bg-gradient-to-r from-primary-500 to-primary-600',
   'transition-all duration-300 ease-out rounded-full'
 ].join(' '))
 

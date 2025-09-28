@@ -50,7 +50,7 @@ const computedClasses = computed(() => {
     'select-2025',
     'block w-full rounded border transition-colors duration-200',
     'focus:ring-2 focus:ring-offset-2 focus:outline-none',
-    'disabled:bg-gray-50 disabled:text-gray-500 disabled:cursor-not-allowed'
+    'disabled:bg-neutral-50 disabled:text-neutral-500 disabled:cursor-not-allowed'
   ]
 
   // Size classes
@@ -64,10 +64,10 @@ const computedClasses = computed(() => {
 
   // Variant classes
   const variantClasses = {
-    default: 'border-gray-300 focus:border-blue-500 focus:ring-blue-500',
-    success: 'border-blue-300 focus:border-blue-500 focus:ring-green-500',
-    warning: 'border-amber-300 focus:border-amber-500 focus:ring-amber-500',
-    error: 'border-red-300 focus:border-red-500 focus:ring-red-500'
+    default: 'border-neutral-300 focus:border-primary-500 focus:ring-primary-500',
+    success: 'border-primary-400 focus:border-primary-600 focus:ring-primary-500',
+    warning: 'border-accent-orange/60 focus:border-accent-orange focus:ring-accent-orange',
+    error: 'border-accent-red/60 focus:border-accent-red focus:ring-accent-red'
   }
 
   baseClasses.push(sizeClasses[props.size])

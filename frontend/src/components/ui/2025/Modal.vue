@@ -162,7 +162,7 @@ const variantClasses = computed(() => {
   const variants = {
     default: [
       'bg-white rounded',
-      'border border-gray-200'
+      'border border-neutral-200'
     ].join(' '),
 
     glass: [
@@ -178,7 +178,7 @@ const variantClasses = computed(() => {
 
     alert: [
       'bg-white rounded',
-      'border-l-4 border-orange-500',
+      'border-l-4 border-accent-orange',
       'shadow-xl'
     ].join(' ')
   }
@@ -190,9 +190,9 @@ const closeButtonClasses = computed(() => [
   'absolute top-4 right-4 z-10',
   'flex items-center justify-center',
   'w-xxl h-12 rounded-full',
-  'text-gray-400 hover:text-gray-700',
-  'hover:bg-gray-100 transition-colors',
-  'focus:outline-none focus:ring-2 focus:ring-blue-500/50'
+  'text-neutral-400 hover:text-neutral-700',
+  'hover:bg-neutral-100 transition-colors',
+  'focus:outline-none focus:ring-2 focus:ring-primary-500/50'
 ].join(' '))
 
 const headerClasses = computed(() => [
@@ -201,12 +201,12 @@ const headerClasses = computed(() => [
 ].join(' '))
 
 const titleClasses = computed(() => [
-  'text-xl font-semibold text-gray-900',
+  'text-xl font-semibold text-neutral-900',
   'mb-1'
 ].join(' '))
 
 const descriptionClasses = computed(() => [
-  'text-sm text-gray-700'
+  'text-sm text-neutral-600'
 ].join(' '))
 
 const contentClasses = computed(() => [
@@ -218,8 +218,8 @@ const contentClasses = computed(() => [
 
 const footerClasses = computed(() => [
   'px-4 pb-2xl',
-  'border-t border-gray-200',
-  'bg-gray-50/50'
+  'border-t border-neutral-200',
+  'bg-neutral-50/50'
 ].join(' '))
 
 // Methods

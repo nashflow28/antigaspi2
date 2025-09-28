@@ -145,7 +145,7 @@
             <template #header>
               <h3 class="text-lg font-semibold">Description</h3>
             </template>
-            <p class="text-neutral-700 dark:text-neutral-300 leading-relaxed">
+            <p class="text-neutral-600 dark:text-neutral-300 leading-relaxed">
               {{ product.description || 'Aucune description disponible.' }}
             </p>
           </Card>

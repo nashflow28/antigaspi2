@@ -94,12 +94,12 @@ const tooltipClasses = computed(() => [
 
 const variantClasses = computed(() => {
   const variants = {
-    default: 'bg-gray-900 text-white',
-    dark: 'bg-gray-900 text-white',
-    light: 'bg-white text-gray-900 border border-gray-200',
-    error: 'bg-red-600 text-white',
-    warning: 'bg-yellow-500 text-white',
-    success: 'bg-blue-600 text-white'
+    default: 'bg-neutral-900 text-white',
+    dark: 'bg-neutral-900 text-white',
+    light: 'bg-surface-light text-neutral-900 border border-neutral-200',
+    error: 'bg-accent-red text-white',
+    warning: 'bg-accent-orange text-neutral-900',
+    success: 'bg-primary-600 text-white'
   }
   return variants[props.variant]
 })
@@ -109,12 +109,12 @@ const arrowClasses = computed(() => {
 
   const base = 'absolute h-4 w-4 transform rotate-45'
   const variantArrow = {
-    default: 'bg-gray-900',
-    dark: 'bg-gray-900',
-    light: 'bg-white border-l border-t border-gray-200',
-    error: 'bg-red-600',
-    warning: 'bg-yellow-500',
-    success: 'bg-blue-600'
+    default: 'bg-neutral-900',
+    dark: 'bg-neutral-900',
+    light: 'bg-surface-light border-l border-t border-neutral-200',
+    error: 'bg-accent-red',
+    warning: 'bg-accent-orange',
+    success: 'bg-primary-600'
   }
 
   const placementArrow = {
