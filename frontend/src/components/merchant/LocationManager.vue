@@ -223,7 +223,7 @@
       <div
         class="bg-white rounded shadow-lg border-l-4 p-4 max-w-sm"
         :class="{
-          'border-blue-500': notification.type === 'success',
+          'border-emerald-500': notification.type === 'success',
           'border-red-500': notification.type === 'error',
           'border-blue-500': notification.type === 'info'
         }"

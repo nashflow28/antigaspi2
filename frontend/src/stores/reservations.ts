@@ -8,6 +8,7 @@ export const useReservationsStore = defineStore('reservations', () => {
   const reservations = ref<Reservation[]>([])
   const merchantReservations = ref<Reservation[]>([])
   const loading = ref(false)
+  const selectedReservation = ref<Reservation | null>(null)
 
   const normalizeReservation = (reservation: Reservation): Reservation => {
     const normalizedQuantity = reservation.quantity ?? reservation.quantity_reserved ?? 0
@@ -37,12 +38,29 @@ export const useReservationsStore = defineStore('reservations', () => {
     reservations.value.filter(r => r.status === 'cancelled')
   )
 
+  const activeReservations = computed(() =>
+    reservations.value.filter(r => ['pending', 'confirmed'].includes(r.status))
+  )
+
   const totalSavings = computed(() =>
     completedReservations.value.reduce((total, reservation) => {
       const savings = (reservation.original_price - reservation.discounted_price) * reservation.quantity
       return total + savings
     }, 0)
   )
+
+  const totalReservationValue = computed(() => {
+    return reservations.value.reduce((total, reservation) => {
+      const explicitTotal = (reservation as any).totalPrice
+      if (typeof explicitTotal === 'number') {
+        return total + explicitTotal
+      }
+
+      const unitPrice = (reservation as any).discounted_price ?? (reservation as any).price ?? 0
+      const quantity = reservation.quantity ?? 0
+      return total + unitPrice * quantity
+    }, 0)
+  })
 
   const pendingMerchantReservations = computed(() =>
     merchantReservations.value.filter(r => r.status === 'pending')
@@ -84,6 +102,9 @@ export const useReservationsStore = defineStore('reservations', () => {
 
       const response = await apiService.getReservations()
       reservations.value = response.data.map(normalizeReservation)
+      if (reservations.value.length > 0) {
+        selectedReservation.value = reservations.value[0]
+      }
 
       return { success: true }
     } catch (err: any) {
@@ -108,6 +129,8 @@ export const useReservationsStore = defineStore('reservations', () => {
       reservations.value.unshift(normalizedReservation)
 
       const payment: Payment | null = response.payment ?? null
+
+      selectedReservation.value = normalizedReservation
 
       notify.success('Réservation créée avec succès', 'Réservations', { duration: 3000 })
 
@@ -204,6 +227,74 @@ export const useReservationsStore = defineStore('reservations', () => {
   const clearReservations = () => {
     reservations.value = []
     merchantReservations.value = []
+    selectedReservation.value = null
+  }
+
+  const updateStatus = async (id: number, status: Reservation['status']) => {
+    try {
+      loading.value = true
+
+      const api = apiService as any
+      let response: { data?: Reservation } | undefined
+
+      if (typeof api.updateReservationStatus === 'function') {
+        response = await api.updateReservationStatus(id, status)
+      } else if (status === 'cancelled') {
+        await cancelReservation(id)
+        return { success: true }
+      } else if (status === 'confirmed') {
+        response = await apiService.confirmReservation(id)
+      } else {
+        const current = getReservationById(id)
+        if (current) {
+          response = { data: { ...current, status } as Reservation }
+        }
+      }
+
+      if (response?.data) {
+        const normalized = normalizeReservation(response.data)
+        const index = reservations.value.findIndex(r => r.id === id)
+        if (index !== -1) {
+          reservations.value[index] = normalized
+        }
+
+        const merchantIndex = merchantReservations.value.findIndex(r => r.id === id)
+        if (merchantIndex !== -1) {
+          merchantReservations.value[merchantIndex] = normalized
+        }
+
+        selectedReservation.value = normalized
+      }
+
+      return { success: true, data: response?.data ?? null }
+    } catch (err: any) {
+      createRetryableNotification(
+        err.message || 'Erreur lors de la mise à jour de la réservation',
+        () => updateStatus(id, status)
+      )
+      return { success: false, error: err.message }
+    } finally {
+      loading.value = false
+    }
+  }
+
+  const validateReservationData = (payload: Partial<ReservationCreationPayload>) => {
+    if (!payload) return false
+    const hasProduct = typeof payload.productId === 'number' && payload.productId > 0
+    const hasQuantity = typeof payload.quantity === 'number' && payload.quantity > 0
+
+    if (!hasProduct || !hasQuantity) {
+      return false
+    }
+
+    if (payload.pickupDate) {
+      const pickupTime = Date.parse(payload.pickupDate)
+      if (Number.isNaN(pickupTime)) {
+        return false
+      }
+    }
+
+    return true
   }
 
   return {
@@ -211,13 +302,16 @@ export const useReservationsStore = defineStore('reservations', () => {
     reservations,
     merchantReservations,
     loading,
+    selectedReservation,
 
     // Getters
     pendingReservations,
     confirmedReservations,
     completedReservations,
     cancelledReservations,
+    activeReservations,
     totalSavings,
+    totalReservationValue,
     pendingMerchantReservations,
     confirmedMerchantReservations,
 
@@ -228,6 +322,8 @@ export const useReservationsStore = defineStore('reservations', () => {
     fetchMerchantReservations,
     confirmReservation,
     getReservationById,
-    clearReservations
+    clearReservations,
+    updateStatus,
+    validateReservationData
   }
 })
