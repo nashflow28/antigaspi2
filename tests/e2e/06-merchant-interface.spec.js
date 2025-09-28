@@ -10,6 +10,11 @@ test.describe('Interface Merchant - Tests E2E', () => {
 
     // Wait for redirect to merchant dashboard
     await page.waitForURL('**/merchant/dashboard', { timeout: 10000 });
+
+    // Ensure tests start in light theme by default
+    await page.evaluate(() => localStorage.setItem('theme', 'light'));
+    await page.reload();
+    await page.waitForLoadState('networkidle');
   });
 
   test('Merchant dashboard should load with business stats', async ({ page }) => {
@@ -17,13 +22,31 @@ test.describe('Interface Merchant - Tests E2E', () => {
     await expect(page).toHaveURL(/.*\/merchant\/dashboard$/);
 
     // Check welcome message for merchant
-    await expect(page.locator('text=Bienvenue, text=Dashboard, text=Tableau de bord')).toBeVisible();
+    await expect(page.locator('text=Tableau de bord commerçant')).toBeVisible();
 
     // Check business stats cards
-    await expect(page.locator('text=Produits, text=Réservations, text=Revenus')).toBeVisible();
+    await expect(page.locator('text=Produits actifs')).toBeVisible();
+    await expect(page.locator('text=Réservations en attente')).toBeVisible();
+    await expect(page.locator('text=Réservations terminées')).toBeVisible();
+    await expect(page.locator('text=Revenus du mois')).toBeVisible();
 
     // Check recent sections
-    await expect(page.locator('text=Réservations récentes, text=Produits récents')).toBeVisible();
+    await expect(page.locator('text=Réservations récentes')).toBeVisible();
+    await expect(page.locator('text=Mes produits récents')).toBeVisible();
+  });
+
+  test('Merchant dashboard supports dark mode theme', async ({ page }) => {
+    // Activate dark mode and reload dashboard
+    await page.evaluate(() => localStorage.setItem('theme', 'dark'));
+    await page.reload();
+    await page.waitForLoadState('networkidle');
+
+    // Document element should now have the dark class
+    await expect(page.locator('html')).toHaveClass(/dark/);
+
+    // Key dashboard content should remain visible
+    await expect(page.locator('text=Tableau de bord commerçant')).toBeVisible();
+    await expect(page.locator('text=Réservations récentes')).toBeVisible();
   });
 
   test('Products management page should show merchant products', async ({ page }) => {
