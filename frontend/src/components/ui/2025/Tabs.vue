@@ -1,7 +1,7 @@
 <template>
   <div class="tabs-2025">
     <!-- Tab List -->
-    <div class="flex border-b border-gray-200" role="tablist">
+    <div class="flex border-b border-neutral-200" role="tablist">
       <button
         v-for="(tab, index) in tabs"
         :key="tab.key || index"
@@ -75,10 +75,10 @@ const getTabClasses = (tab: Tab, index: number) => {
 
   return [
     'flex items-center px-3 py-2.5 text-sm border-b-2 -mb-px transition-colors',
-    'focus:outline-none focus:ring-2 focus:ring-blue-500/50',
+    'focus:outline-none focus:ring-2 focus:ring-primary-500/50',
     isActive
-      ? 'border-blue-600 text-blue-600'
-      : 'border-transparent text-gray-700 hover:text-gray-900 hover:border-gray-300',
+      ? 'border-primary-600 text-primary-600'
+      : 'border-transparent text-neutral-600 hover:text-neutral-900 hover:border-neutral-300',
     tab.disabled && 'cursor-not-allowed opacity-50'
   ].filter(Boolean).join(' ')
 }

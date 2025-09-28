@@ -17,7 +17,7 @@
         >
         <div v-else :class="defaultIconClasses">
           <svg
-            class="w-full h-full text-gray-500"
+            class="w-full h-full text-neutral-500"
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
@@ -165,8 +165,8 @@ const iconWrapperClasses = computed(() => [
 ].filter(Boolean).join(' '))
 
 const iconClasses = computed(() => [
-  'text-gray-400',
-  props.variant === 'minimal' && 'text-gray-500'
+  'text-neutral-400',
+  props.variant === 'minimal' && 'text-neutral-500'
 ].filter(Boolean).join(' '))
 
 const imageClasses = computed(() => [
@@ -175,7 +175,7 @@ const imageClasses = computed(() => [
 
 const defaultIconClasses = computed(() => [
   'flex items-center justify-center',
-  'rounded-full bg-gray-100',
+  'rounded-full bg-neutral-100',
   'w-12 h-10'
 ].join(' '))
 
@@ -185,12 +185,12 @@ const contentClasses = computed(() => [
 ].join(' '))
 
 const titleClasses = computed(() => [
-  'font-semibold text-gray-900',
+  'font-semibold text-neutral-900',
   sizeClasses.value.title
 ].join(' '))
 
 const descriptionClasses = computed(() => [
-  'text-gray-700 leading-relaxed',
+  'text-neutral-600 leading-relaxed',
   sizeClasses.value.description
 ].join(' '))
 

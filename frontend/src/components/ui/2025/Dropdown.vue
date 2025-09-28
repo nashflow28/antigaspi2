@@ -126,7 +126,7 @@ const triggerClasses = computed(() => [
 const menuClasses = computed(() => [
   'absolute z-50',
   'bg-white rounded shadow-lg',
-  'border border-gray-200',
+  'border border-neutral-200',
   'py-xs',
   placementClasses.value,
   variantClasses.value
@@ -147,7 +147,7 @@ const placementClasses = computed(() => {
 const variantClasses = computed(() => {
   const variants = {
     default: 'backdrop-blur-sm',
-    minimal: 'shadow-sm border-gray-100'
+    minimal: 'shadow-sm border-neutral-100'
   }
   return variants[props.variant]
 })
