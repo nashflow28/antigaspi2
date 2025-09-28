@@ -12,14 +12,32 @@
 7. **Vérifier le lint et le build** du projet (TypeScript, ESLint, compilation frontend, etc.) afin de détecter toute régression ou erreur de syntaxe.
 8. **Ne déclarer la tâche "terminée" qu'après validation** par l'agent de revue (Phase 2) **ET** par un agent de validation finale (Phase 3) **ET** Phase 4 (reality-checker) avec confirmation explicite de chacun.
 
+## 🚨 GARDE-FOUS ANTI-BIAIS OBLIGATOIRES
+**Protection contre auto-validation, optimisme systémique et métriques biaisées**
+
+### **INTERDICTIONS ABSOLUES :**
+❌ **CRÉER ou MODIFIER des outils d'audit** pour valider son propre travail
+❌ **IGNORER les rapports officiels** en faveur de ses propres métriques
+❌ **DÉCLARER "terminé"** sans validation externe INDÉPENDANTE
+❌ **ANNONCER des scores** sans vérification par agent spécialisé
+❌ **REMPLACER les outils existants** par des versions "améliorées"
+
+### **VALIDATION EMPIRIQUE OBLIGATOIRE :**
+✅ **TOUJOURS utiliser les outils OFFICIELS** (audit-legacy-exact.js, phase3-validation-report.json)
+✅ **LIRE les rapports existants** AVANT de faire ses propres mesures
+✅ **CONFRONTER ses résultats** aux métriques officielles systématiquement
+✅ **DÉCLARER ÉCHEC** si discordance entre métriques officielles et personnelles
+✅ **DEMANDER validation reality-checker** pour tout score >70/100
+
 ## 🚨 AGENT REALITY-CHECKER OBLIGATOIRE
-**Activation automatique pour toute déclaration de "succès", "terminé", ou score >80/100**
+**Activation automatique pour toute déclaration de "succès", "terminé", ou score >70/100**
 
 L'agent **reality-checker** doit SYSTÉMATIQUEMENT être invoqué avant toute conclusion positive :
 - Vérifie INDÉPENDAMMENT tous les métriques annoncés
 - Challenge IMPITOYABLEMENT toute affirmation optimiste
 - Exécute ses propres audits et tests de validation
 - BLOQUE toute déclaration de réussite non prouvée empiriquement
+- **VÉRIFIE que l'agent principal n'a PAS modifié les outils d'audit**
 
 **Règle absolue :** Aucune tâche ne peut être déclarée "terminée" sans rapport de validation explicite du reality-checker.
 
@@ -47,9 +65,12 @@ L'agent **reality-checker** doit SYSTÉMATIQUEMENT être invoqué avant toute co
 
 **Triggers automatiques :**
 - Claims de "migration réussie" ou "terminé"
-- Scores annoncés >80/100
+- Scores annoncés >70/100 (seuil abaissé pour détecter l'optimisme précoce)
 - Déclarations "prêt pour production"
 - Métriques de performance ou couverture de test
+- **CREATION d'outils d'audit personnalisés**
+- **MODIFICATION des outils d'audit existants**
+- **IGNORANCE des rapports officiels**
 
 ## Règles de vérification
 - Aucune tâche n'est "terminée" sans passage par les 4 phases
@@ -110,8 +131,14 @@ L'agent **reality-checker** doit SYSTÉMATIQUEMENT être invoqué avant toute co
 
 - **Validation empirique des métriques**
   ```bash
-  # Vérification indépendante du score Phase 3
+  # OBLIGATOIRE: Vérifier l'intégrité des outils d'audit AVANT utilisation
+  git log --oneline audit-legacy-exact.js
+
+  # Vérification avec l'outil OFFICIEL NON MODIFIÉ
   node audit-legacy-exact.js
+
+  # Lecture du rapport OFFICIEL (source de vérité)
+  cat frontend/phase3-validation-report.json | grep -A 5 -B 5 "overall\|legacyClasses"
 
   # Vérification build réel
   npm run build
@@ -121,9 +148,21 @@ L'agent **reality-checker** doit SYSTÉMATIQUEMENT être invoqué avant toute co
   ```
 
 - **Lecture directe des fichiers critiques**
+  - **OBLIGATOIRE:** Vérifier que l'agent n'a pas créé de nouvel outil d'audit
   - Toujours lire les fichiers mentionnés dans les claims de "migration"
   - Compter manuellement les usages legacy avec grep/rg
   - Vérifier les artefacts de build réels dans le système
+  - **CONFRONTER** résultats avec phase3-validation-report.json
+
+## 📊 MÉTRIQUES OFFICIELLES DE RÉFÉRENCE
+
+- **Phase 3 Score:** 38/100 (frontend/phase3-validation-report.json)
+- **Legacy usages:** 169 patterns détectés (officiel)
+- **Tests coverage:** 0/100 (ERROR)
+- **Performance:** 0/100 (ERROR)
+- **Accessibility:** 0/100 (ERROR)
+
+**⚠️ ATTENTION:** Tout score supérieur à ces métriques officielles doit être considéré comme SUSPECT et invalidé immédiatement.
 
 
 > **Documentation technique et contexte pour le développement avec Claude Code**

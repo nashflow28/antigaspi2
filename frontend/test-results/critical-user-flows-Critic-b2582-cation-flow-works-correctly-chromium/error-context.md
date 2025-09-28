@@ -12,73 +12,141 @@
           - menuitem "Accueil" [ref=e9]:
             - img [ref=e10]
             - generic [ref=e12]: Accueil
-          - menuitem "Découvrir" [ref=e13]:
-            - img [ref=e14]
-            - generic [ref=e16]: Découvrir
-          - menuitem "Produits" [ref=e17]:
-            - img [ref=e18]
-            - generic [ref=e20]: Produits
-          - menuitem "Avis" [ref=e21]:
-            - img [ref=e22]
-            - generic [ref=e24]: Avis
-        - generic [ref=e25]:
-          - button "Activer le thème sombre" [ref=e26] [cursor=pointer]
-          - generic [ref=e29]:
-            - button "Mon panier" [ref=e30] [cursor=pointer]:
-              - generic [ref=e32] [cursor=pointer]: Mon panier
-            - button "Se connecter" [ref=e33] [cursor=pointer]:
-              - generic [ref=e34] [cursor=pointer]: Se connecter
-            - button "Créer un compte" [ref=e35] [cursor=pointer]:
-              - generic [ref=e36] [cursor=pointer]: Créer un compte
-    - main [ref=e37]
-    - contentinfo [ref=e38]:
+          - menuitem "Découvrir" [ref=e14]:
+            - img [ref=e15]
+            - generic [ref=e17]: Découvrir
+          - menuitem "Produits" [ref=e18]:
+            - img [ref=e19]
+            - generic [ref=e21]: Produits
+          - menuitem "Avis" [ref=e22]:
+            - img [ref=e23]
+            - generic [ref=e25]: Avis
+        - generic [ref=e26]:
+          - button "Activer le thème sombre" [ref=e27] [cursor=pointer]
+          - generic [ref=e30]:
+            - button "Mon panier" [ref=e31] [cursor=pointer]:
+              - generic [ref=e33] [cursor=pointer]: Mon panier
+            - button "Se connecter" [ref=e34] [cursor=pointer]:
+              - generic [ref=e35] [cursor=pointer]: Se connecter
+            - button "Créer un compte" [ref=e36] [cursor=pointer]:
+              - generic [ref=e37] [cursor=pointer]: Créer un compte
+    - main [ref=e38]:
       - generic [ref=e39]:
         - generic [ref=e40]:
-          - paragraph [ref=e41]: Antigaspi
-          - paragraph [ref=e42]: © 2025 — Ensemble, réduisons le gaspillage alimentaire.
-        - generic [ref=e43]:
-          - img [ref=e45]
-          - img [ref=e49]
-          - img [ref=e53]
-  - generic [ref=e58]:
-    - generic [ref=e59]:
-      - generic [ref=e60]: "[plugin:vite:css]"
-      - generic [ref=e61]: "[postcss] C:/xampp/htdocs/antigaspi2/frontend/src/components/ui/2025/Card.vue?vue&type=style&index=0&scoped=b2006a70&lang.css:11:3: The `text-heading` class does not exist. If `text-heading` is a custom class, make sure it is defined within a `@layer` directive."
-    - generic [ref=e62]:
-      - text: "C:"
-      - generic [ref=e63] [cursor=pointer]: /xampp/htdocs/antigaspi2/frontend/src/components/ui/2025/Card.vue:177:2
-    - generic [ref=e64]: "9 | 10 | .ui-title { 11 | @apply text-lg font-semibold text-heading; | ^ 12 | } 13 |"
-    - generic [ref=e65]:
-      - text: at Input.error (
-      - generic [ref=e66] [cursor=pointer]: C:\xampp\htdocs\antigaspi2\frontend\node_modules\postcss\lib\input.js:135:16
-      - text: ) at AtRule.error (
-      - generic [ref=e67] [cursor=pointer]: C:\xampp\htdocs\antigaspi2\frontend\node_modules\postcss\lib\node.js:146:32
-      - text: ) at processApply (
-      - generic [ref=e68] [cursor=pointer]: C:\xampp\htdocs\antigaspi2\frontend\node_modules\tailwindcss\lib\lib\expandApplyAtRules.js:380:29
-      - text: ) at
-      - generic [ref=e69] [cursor=pointer]: C:\xampp\htdocs\antigaspi2\frontend\node_modules\tailwindcss\lib\lib\expandApplyAtRules.js:551:9
-      - text: at
-      - generic [ref=e70] [cursor=pointer]: C:\xampp\htdocs\antigaspi2\frontend\node_modules\tailwindcss\lib\processTailwindFeatures.js:55:50
-      - text: at process.processTicksAndRejections (node:internal
-      - generic [ref=e71] [cursor=pointer]: /process/task_queues:105:5
-      - text: ) at async plugins (
-      - generic [ref=e72] [cursor=pointer]: C:\xampp\htdocs\antigaspi2\frontend\node_modules\tailwindcss\lib\plugin.js:38:17
-      - text: ) at async LazyResult.runAsync (
-      - generic [ref=e73] [cursor=pointer]: C:\xampp\htdocs\antigaspi2\frontend\node_modules\postcss\lib\lazy-result.js:293:11
-      - text: ) at async runPostCSS (
-      - generic [ref=e74] [cursor=pointer]: file:///C:/xampp/htdocs/antigaspi2/frontend/node_modules/vite/dist/node/chunks/dep-M_KD0XSK.js:32483:19
-      - text: ) at async compilePostCSS (
-      - generic [ref=e75] [cursor=pointer]: file:///C:/xampp/htdocs/antigaspi2/frontend/node_modules/vite/dist/node/chunks/dep-M_KD0XSK.js:32463:17
-      - text: )
-    - generic [ref=e76]:
-      - text: Click outside, press
-      - generic [ref=e77]: Esc
-      - text: key, or fix the code to dismiss.
-      - text: You can also disable this overlay by setting
-      - code [ref=e78]: server.hmr.overlay
-      - text: to
-      - code [ref=e79]: "false"
-      - text: in
-      - code [ref=e80]: vite.config.ts
-      - text: .
+          - generic [ref=e45]:
+            - generic [ref=e47]: Ensemble contre le gaspillage alimentaire
+            - heading "Sauvons notre planète" [level=1] [ref=e49]:
+              - generic [ref=e50]: Sauvons
+              - generic [ref=e51]: notre planète
+            - paragraph [ref=e52]:
+              - text: Transformons les invendus en opportunités.
+              - generic [ref=e53]: Économisez jusqu'à 70%
+              - text: tout en protégeant l'environnement.
+            - generic [ref=e54]:
+              - button "🌟 Découvrir les offres" [ref=e55] [cursor=pointer]:
+                - generic [ref=e57] [cursor=pointer]: 🌟 Découvrir les offres
+              - button "✨ Rejoindre maintenant" [ref=e59] [cursor=pointer]:
+                - generic [ref=e61] [cursor=pointer]: ✨ Rejoindre maintenant
+            - generic [ref=e62]:
+              - generic [ref=e64]:
+                - generic [ref=e65]: 1,2M+
+                - generic [ref=e66]: Produits sauvés
+              - generic [ref=e68]:
+                - generic [ref=e69]: 50K+
+                - generic [ref=e70]: Utilisateurs actifs
+              - generic [ref=e72]:
+                - generic [ref=e73]: 2,5K+
+                - generic [ref=e74]: Commerçants partenaires
+          - img [ref=e76]
+        - generic [ref=e79]:
+          - generic [ref=e80]:
+            - generic [ref=e82]: Processus simple en 3 étapes
+            - heading "Comment ça marche ?" [level=2] [ref=e84]
+            - paragraph [ref=e85]: Rejoignez la révolution anti-gaspillage en quelques clics
+          - generic [ref=e86]:
+            - generic [ref=e88] [cursor=pointer]:
+              - generic [ref=e89] [cursor=pointer]:
+                - generic [ref=e91] [cursor=pointer]: 🔍
+                - generic [ref=e92] [cursor=pointer]: "1"
+              - generic [ref=e93] [cursor=pointer]:
+                - heading "Découvrez" [level=3] [ref=e94] [cursor=pointer]
+                - paragraph [ref=e95] [cursor=pointer]: Explorez les offres exclusives des commerçants locaux et trouvez des produits de qualité à prix réduits.
+                - generic [ref=e96] [cursor=pointer]:
+                  - generic [ref=e98] [cursor=pointer]: Géolocalisation intelligente
+                  - generic [ref=e100] [cursor=pointer]: Filtres avancés
+            - generic [ref=e102] [cursor=pointer]:
+              - generic [ref=e103] [cursor=pointer]:
+                - generic [ref=e105] [cursor=pointer]: ⚡
+                - generic [ref=e106] [cursor=pointer]: "2"
+              - generic [ref=e107] [cursor=pointer]:
+                - heading "Réservez" [level=3] [ref=e108] [cursor=pointer]
+                - paragraph [ref=e109] [cursor=pointer]: Réservez instantanément vos produits favoris avec paiement sécurisé et confirmation immédiate.
+                - generic [ref=e110] [cursor=pointer]:
+                  - generic [ref=e112] [cursor=pointer]: Réservation instantanée
+                  - generic [ref=e114] [cursor=pointer]: Paiement sécurisé
+            - generic [ref=e116] [cursor=pointer]:
+              - generic [ref=e117] [cursor=pointer]:
+                - generic [ref=e119] [cursor=pointer]: 🌱
+                - generic [ref=e120] [cursor=pointer]: "3"
+              - generic [ref=e121] [cursor=pointer]:
+                - heading "Sauvez" [level=3] [ref=e122] [cursor=pointer]
+                - paragraph [ref=e123] [cursor=pointer]: Récupérez vos achats et contribuez activement à la réduction du gaspillage alimentaire.
+                - generic [ref=e124] [cursor=pointer]:
+                  - generic [ref=e126] [cursor=pointer]: Impact environnemental
+                  - generic [ref=e128] [cursor=pointer]: Économies réalisées
+          - button "Commencer maintenant→" [ref=e130] [cursor=pointer]:
+            - generic [ref=e131] [cursor=pointer]:
+              - generic [ref=e132] [cursor=pointer]: Commencer maintenant
+              - generic [ref=e133] [cursor=pointer]: →
+        - generic [ref=e135]:
+          - heading "Notre impact" [level=2] [ref=e137]
+          - generic [ref=e138]:
+            - generic [ref=e139]:
+              - generic [ref=e140]: 1,234
+              - paragraph [ref=e141]: Produits sauvés
+            - generic [ref=e142]:
+              - generic [ref=e143]: "567"
+              - paragraph [ref=e144]: Utilisateurs actifs
+            - generic [ref=e145]:
+              - generic [ref=e146]: "89"
+              - paragraph [ref=e147]: Commerçants partenaires
+        - generic [ref=e149]:
+          - heading "Prêt à faire la différence ?" [level=2] [ref=e150]
+          - paragraph [ref=e151]: Rejoignez notre communauté et commencez à économiser tout en protégeant l'environnement
+          - generic [ref=e152]:
+            - button "Consommateur" [ref=e153] [cursor=pointer]:
+              - generic [ref=e154] [cursor=pointer]: Consommateur
+            - button "Commerçant" [ref=e155] [cursor=pointer]:
+              - generic [ref=e156] [cursor=pointer]: Commerçant
+    - contentinfo [ref=e157]:
+      - generic [ref=e158]:
+        - generic [ref=e159]:
+          - paragraph [ref=e160]: Antigaspi
+          - paragraph [ref=e161]: © 2025 — Ensemble, réduisons le gaspillage alimentaire.
+        - generic [ref=e162]:
+          - img [ref=e164]
+          - img [ref=e168]
+          - img [ref=e172]
+  - generic:
+    - generic:
+      - status [ref=e176]:
+        - generic [ref=e177]:
+          - img [ref=e179]
+          - generic [ref=e181]:
+            - paragraph [ref=e182]: Catalogue
+            - paragraph [ref=e183]: Failed to fetch
+            - button "Réessayer" [ref=e184] [cursor=pointer]:
+              - generic [ref=e185] [cursor=pointer]: Réessayer
+          - button "Fermer la notification" [ref=e186] [cursor=pointer]:
+            - img [ref=e187] [cursor=pointer]
+      - status [ref=e190]:
+        - generic [ref=e191]:
+          - img [ref=e193]
+          - generic [ref=e195]:
+            - paragraph [ref=e196]: Commerçants
+            - paragraph [ref=e197]: Failed to fetch
+            - button "Réessayer" [ref=e198] [cursor=pointer]:
+              - generic [ref=e199] [cursor=pointer]: Réessayer
+          - button "Fermer la notification" [ref=e200] [cursor=pointer]:
+            - img [ref=e201] [cursor=pointer]
 ```
