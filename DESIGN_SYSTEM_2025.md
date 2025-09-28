@@ -219,14 +219,14 @@ Toggle automatique avec :
 
 ### Mobile-First Adaptations
 ```css
-/* Cards plus petites sur mobile */
+/* Panels plus petits sur mobile */
 @media (max-width: 768px) {
-  .card-2025 { @apply p-4 rounded-2xl; }
+  .surface-panel { @apply p-4 rounded-2xl; }
 }
 
-/* Boutons adaptés */
+/* Boutons adaptés via l'attribut data-size exposé par Button.vue */
 @media (max-width: 768px) {
-  .btn-2025 { @apply px-4 py-2.5 text-sm; }
+  [data-size='lg'] { @apply px-4 py-2.5 text-sm; }
 }
 ```
 

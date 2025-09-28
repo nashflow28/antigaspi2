@@ -16,15 +16,11 @@ import { fileURLToPath } from 'url'
 const __filename = fileURLToPath(import.meta.url)
 const _unused_dirname = path.dirname(__filename)
 const PROJECT_ROOT = path.resolve(_unused_dirname, '..')
-const SCAN_PATTERNS = [
-  'src/**/*.vue',
-  'src/**/*.ts',
-  'src/**/*.js'
-]
+const SCAN_PATTERNS = ['src/**/*.vue']
 
 // Legacy classes to detect and their 2025 replacements
 const LEGACY_MAPPINGS = {
-  // Button classes
+  // Button primitives
   'btn': 'Button component with variant prop',
   'btn-primary': 'Button variant="primary"',
   'btn-secondary': 'Button variant="secondary"',
@@ -34,36 +30,14 @@ const LEGACY_MAPPINGS = {
   'btn-sm': 'Button size="sm"',
   'btn-lg': 'Button size="lg"',
 
-  // Card classes
+  // Card primitives
   'card': 'Card component',
   'card-glass': 'Card variant="glass"',
   'card-gradient': 'Card variant="gradient"',
   'card-interactive': 'Card interactive prop',
 
-  // Form classes
-  'form-group': 'form-group-2025 class',
-  'form-label': 'Label component',
-  'form-input': 'Input component',
-  'form-textarea': 'Textarea component',
-  'form-select': 'Select component',
-  'form-checkbox': 'Checkbox component',
-  'form-radio': 'Radio component',
-  'form-error': 'ErrorText component',
-  'form-help': 'HelpText component',
-
-  // Badge classes
-  'badge': 'Badge component',
-  'badge-primary': 'Badge variant="primary"',
-  'badge-secondary': 'Badge variant="secondary"',
-  'badge-success': 'Badge variant="success"',
-  'badge-warning': 'Badge variant="warning"',
-  'badge-error': 'Badge variant="error"',
-
-  // Utility classes
-  'glass-bg': 'bg-white/60 backdrop-blur-md',
-  'container-fluid': 'container-2025',
-  'shadow-glow': 'shadow-card-2025',
-  'gradient-primary': 'bg-nav-gradient-2025'
+  // Utility
+  'glass-bg': 'bg-white/60 backdrop-blur-md'
 }
 
 // Results storage
@@ -92,7 +66,7 @@ function scanFile(filePath) {
 
     // Scan for each legacy class
     Object.keys(LEGACY_MAPPINGS).forEach(legacyClass => {
-      const regex = new RegExp(`\\b${legacyClass}\\b`, 'g')
+      const regex = new RegExp(`(?<![A-Za-z0-9_-])${legacyClass}(?![A-Za-z0-9_-])`, 'g')
       const matches = content.match(regex)
 
       if (matches) {

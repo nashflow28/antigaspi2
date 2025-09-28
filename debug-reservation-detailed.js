@@ -61,7 +61,7 @@ async function debugReservationDetailed() {
     console.log('\n🔄 Step 3: Login as djamichou@gmail.com');
     await page.fill('input[type="email"], input[name="email"], #email', 'djamichou@gmail.com');
     await page.fill('input[type="password"], input[name="password"], #password', 'password');
-    await page.click('button[type="submit"], button:has-text("Login"), .btn:has-text("Login")');
+    await page.click('button[type="submit"], button:has-text("Login"), [data-variant="primary"]:has-text("Login")');
     await page.waitForLoadState('networkidle');
     console.log('✅ Login completed');
 
@@ -80,7 +80,7 @@ async function debugReservationDetailed() {
     console.log('📝 Step 1: Confirming quantity...');
     const quantityInput = page.locator('input[type="number"], .quantity input');
     await quantityInput.fill('1');
-    await page.click('button:has-text("Étape suivante"), .btn:has-text("suivante")');
+    await page.click('button:has-text("Étape suivante"), [data-variant]:has-text("suivante")');
     await page.waitForTimeout(1000);
     console.log('✅ Step 1 completed');
 
@@ -89,7 +89,7 @@ async function debugReservationDetailed() {
     await page.fill('input[type="date"], #pickup-date', '2025-09-22');
     await page.selectOption('select, #pickup-time', '14:00');
     await page.fill('input[type="tel"], #contact-phone', '+22890000000');
-    await page.click('button:has-text("Étape suivante"), .btn:has-text("suivante")');
+    await page.click('button:has-text("Étape suivante"), [data-variant]:has-text("suivante")');
     await page.waitForTimeout(1000);
     console.log('✅ Step 2 completed');
 
@@ -139,7 +139,7 @@ async function debugReservationDetailed() {
       console.log('⚠️ Wallet PIN field not found');
     }
 
-    await page.click('button:has-text("Étape suivante"), .btn:has-text("suivante")');
+    await page.click('button:has-text("Étape suivante"), [data-variant]:has-text("suivante")');
     await page.waitForTimeout(1000);
     console.log('✅ Step 3 completed');
 
@@ -152,7 +152,7 @@ async function debugReservationDetailed() {
     // Clear previous network logs
     console.log('\n🎯 ===== FINAL RESERVATION REQUEST MONITORING =====');
 
-    await page.click('button:has-text("Confirmer"), .btn:has-text("Confirmer")');
+    await page.click('button:has-text("Confirmer"), [data-variant]:has-text("Confirmer")');
 
     // Wait for the request to complete
     await page.waitForTimeout(5000);

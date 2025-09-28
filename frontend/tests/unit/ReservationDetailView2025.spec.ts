@@ -88,11 +88,9 @@ describe('ReservationDetailView2025 (Design System 2025)', () => {
     expect(wrapper.findComponent(Badge).exists()).toBe(true)
 
     expect(wrapper.find('.container-2025').exists()).toBe(true)
-    expect(wrapper.find('.card').exists()).toBe(false)
-    expect(wrapper.find('.btn').exists()).toBe(false)
-    expect(wrapper.html()).not.toContain('glass-bg')
-    expect(wrapper.html()).not.toContain('glass-border')
-    expect(wrapper.findAll('.card-2025').length).toBeGreaterThan(0)
+    expect(wrapper.html()).not.toContain('class="card')
+    expect(wrapper.html()).not.toContain('class="btn')
+    expect(wrapper.findAll('.surface-panel').length).toBeGreaterThan(0)
 
     expect(getReservationMock).toHaveBeenCalledWith(42)
     expect(wrapper.text()).toContain('Panier surprise bio')

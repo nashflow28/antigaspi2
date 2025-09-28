@@ -64,7 +64,7 @@ test.describe('Design Validation Tests', () => {
     expect(bodyFont).toContain('Inter')
 
     // Check if primary colors are applied
-    const primaryButton = page.locator('.btn-primary').first()
+    const primaryButton = page.locator('[data-variant="primary"]').first()
     if (await primaryButton.isVisible()) {
       const bgColor = await primaryButton.evaluate(el => getComputedStyle(el).backgroundColor)
       // Should have some color (not transparent)

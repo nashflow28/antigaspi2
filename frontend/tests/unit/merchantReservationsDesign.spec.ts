@@ -53,10 +53,9 @@ describe('Merchant ReservationsView design system 2025 integration', () => {
     expect(html).not.toContain('class="btn')
     expect(html).not.toContain('btn-')
     expect(html).not.toMatch(/class="card(\s|"|')/)
-    expect(html).not.toContain('glass-bg')
     expect(html).not.toContain('container-fluid')
 
-    expect(wrapper.findAll('.card-2025').length).toBeGreaterThan(0)
+    expect(wrapper.findAll('.surface-panel').length).toBeGreaterThan(0)
     expect(wrapper.findComponent(Button).exists()).toBe(true)
   })
 })

@@ -1,6 +1,7 @@
 <template>
   <div
     :class="computedClasses"
+    :data-variant="props.variant"
     @click="handleClick"
   >
     <!-- Header -->
@@ -61,7 +62,7 @@ const computedClasses = computed(() => {
   const baseClasses = [
     // Base component styles
     'ui-2025',
-    'card-2025',
+    'surface-panel',
     'overflow-hidden',
     'transition-all duration-300',
 

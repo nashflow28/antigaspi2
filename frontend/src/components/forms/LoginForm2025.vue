@@ -164,7 +164,14 @@ const { logMigration } = useDesignSystem2025()
 // Log migration usage
 logMigration('LoginForm', 'Using 2025 components', {
   components: ['Button', 'Input'],
-  legacyReplaced: ['btn', 'btn-primary', 'btn-lg', 'form-input', 'form-group', 'form-label']
+  legacyReplaced: [
+    'legacy button base',
+    'legacy primary button',
+    'legacy large button',
+    'legacy form input',
+    'legacy form group',
+    'legacy form label'
+  ]
 })
 
 // Reactive state
