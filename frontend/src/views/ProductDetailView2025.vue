@@ -199,12 +199,23 @@
                   <Button
                     size="lg"
                     full-width
+                    :disabled="availableQuantity === 0"
+                    @click="goToReservation"
+                  >
+                    <ShoppingCart class="h-4 w-4 mr-2" />
+                    Commencer la réservation
+                  </Button>
+
+                  <Button
+                    variant="secondary"
+                    size="lg"
+                    full-width
                     :disabled="availableQuantity === 0 || reservationLoading"
                     :loading="reservationLoading"
                     @click="handleReservation"
                   >
                     <ShoppingCart class="h-4 w-4 mr-2" />
-                    {{ reservationLoading ? 'Réservation...' : 'Réserver maintenant' }}
+                    {{ reservationLoading ? 'Réservation...' : 'Réserver en 1 clic' }}
                   </Button>
 
                   <Button
@@ -212,12 +223,12 @@
                     size="lg"
                     full-width
                     :disabled="loading"
-                  @click="addToWishlist"
-                >
-                  <Heart :class="['h-4 w-4 mr-2', isInWishlist && 'fill-current text-accent-red']" />
-                  {{ isInWishlist ? 'Retiré des favoris' : 'Ajouter aux favoris' }}
-                </Button>
-              </div>
+                    @click="addToWishlist"
+                  >
+                    <Heart :class="['h-4 w-4 mr-2', isInWishlist && 'fill-current text-accent-red']" />
+                    {{ isInWishlist ? 'Retiré des favoris' : 'Ajouter aux favoris' }}
+                  </Button>
+                </div>
             </div>
           </div>
         </Card>
@@ -456,6 +467,31 @@ const decreaseQuantity = () => {
   if (reservationQuantity.value > 1) {
     reservationQuantity.value--
   }
+}
+
+const goToReservation = () => {
+  if (!product.value) return
+
+  if (availableQuantity.value === 0) {
+    notify.info('Ce produit est actuellement en rupture de stock.', 'Réservation')
+    return
+  }
+
+  const quantity = sanitizedReservationQuantity.value
+  const targetRoute = {
+    name: 'product-reserve' as const,
+    params: { id: product.value.id },
+    query: quantity > 0 ? { quantity: String(quantity) } : undefined
+  }
+
+  if (!authStore.isAuthenticated) {
+    notify.info('Connectez-vous pour réserver ce produit.', 'Connexion requise')
+    const resolved = router.resolve(targetRoute)
+    router.push({ name: 'login', query: { redirect: resolved.href } })
+    return
+  }
+
+  router.push(targetRoute)
 }
 
 const handleReservation = async () => {

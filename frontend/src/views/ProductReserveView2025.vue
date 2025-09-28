@@ -565,7 +565,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, type Component } from 'vue'
+import { ref, computed, onMounted, watch, type Component } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { useReservationsStore } from '@/stores/reservations'
@@ -810,6 +810,38 @@ const validateQuantity = () => {
   }
 }
 
+const parseQuantityFromRoute = () => {
+  const { quantity } = route.query
+
+  if (Array.isArray(quantity)) {
+    return Number(quantity[0])
+  }
+
+  if (quantity === undefined) {
+    return null
+  }
+
+  const parsed = Number(quantity)
+
+  if (!Number.isFinite(parsed) || parsed <= 0) {
+    return null
+  }
+
+  return Math.floor(parsed)
+}
+
+const applyInitialQuantity = () => {
+  if (!product.value) return
+
+  const initialQuantity = parseQuantityFromRoute()
+  if (!initialQuantity) return
+
+  const maxQuantity = availableQuantity.value
+  const safeQuantity = maxQuantity > 0 ? Math.min(initialQuantity, maxQuantity) : 1
+
+  reservation.value.quantity = safeQuantity
+}
+
 const nextStep = () => {
   if (canProceedToNextStep.value && currentStep.value < 4) {
     currentStep.value++
@@ -923,9 +955,15 @@ onMounted(async () => {
   paymentsStore.clearPayment()
   await fetchProduct()
 
+  applyInitialQuantity()
+
   // Load wallet information for authenticated users
   if (authStore.isAuthenticated) {
     await walletStore.fetchWallet()
   }
+})
+
+watch(() => route.query.quantity, () => {
+  applyInitialQuantity()
 })
 </script>
