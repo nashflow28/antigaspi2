@@ -190,7 +190,7 @@
                 <div class="flex items-center justify-start sm:justify-between p-4 bg-primary-50 dark:bg-primary-500/10 rounded-xl mt-4">
                   <span class="text-sm font-medium text-primary-900 dark:text-primary-100">Total :</span>
                   <span class="text-xl font-semibold text-primary-600 dark:text-primary-300">
-                    {{ formatPrice(product.discounted_price * reservationQuantity) }} XOF
+                    {{ formatPrice(product.discounted_price * sanitizedReservationQuantity) }} XOF
                   </span>
                 </div>
 
@@ -362,6 +362,26 @@ const isInWishlist = ref(false)
 const availableQuantity = computed(() => product.value?.quantity_available ?? 0)
 const maxReservationQuantity = computed(() => Math.max(availableQuantity.value, 1))
 
+const normalizeReservationQuantity = (value: unknown): number => {
+  const numericValue = typeof value === 'number' ? value : Number(value)
+
+  if (!Number.isFinite(numericValue)) {
+    return 1
+  }
+
+  const flooredValue = Math.floor(numericValue)
+  const minimumValue = Math.max(flooredValue, 1)
+  const available = availableQuantity.value
+
+  if (available > 0) {
+    return Math.min(minimumValue, available)
+  }
+
+  return minimumValue
+}
+
+const sanitizedReservationQuantity = computed(() => normalizeReservationQuantity(reservationQuantity.value))
+
 // Computed
 const discountPercentage = computed(() => {
   if (!product.value) return 0
@@ -457,7 +477,7 @@ const handleReservation = async () => {
   try {
     const response = await reservationsStore.createReservation({
       productId: product.value.id,
-      quantity: reservationQuantity.value,
+      quantity: sanitizedReservationQuantity.value,
       paymentMethod: 'paystack',
       customerPhone: authStore.user?.phone || undefined,
       customerEmail: authStore.user?.email || undefined
@@ -595,22 +615,19 @@ watch(() => route.params.id, () => {
   fetchProduct()
 })
 
-watch(availableQuantity, (quantity) => {
-  if (quantity <= 0) {
-    reservationQuantity.value = 1
-    return
-  }
+watch(availableQuantity, () => {
+  const safeQuantity = normalizeReservationQuantity(reservationQuantity.value)
 
-  if (reservationQuantity.value > quantity) {
-    reservationQuantity.value = quantity
+  if (reservationQuantity.value !== safeQuantity) {
+    reservationQuantity.value = safeQuantity
   }
 })
 
 watch(reservationQuantity, (quantity) => {
-  if (quantity < 1) {
-    reservationQuantity.value = 1
-  } else if (quantity > availableQuantity.value && availableQuantity.value > 0) {
-    reservationQuantity.value = availableQuantity.value
+  const safeQuantity = normalizeReservationQuantity(quantity)
+
+  if (quantity !== safeQuantity) {
+    reservationQuantity.value = safeQuantity
   }
 })
 </script>
