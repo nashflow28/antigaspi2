@@ -1,11 +1,11 @@
 <template>
-  <div class="min-h-screen bg-gray-50">
-    <section class="bg-gradient-to-r from-blue-600 to-blue-700 text-white">
-      <div class="mx-auto max-w-full sm:max-w-6xl space-y-8 px-4 py-20">
+  <div class="min-h-screen bg-surface-light">
+    <section class="bg-gradient-to-r from-primary-600 to-primary-700 text-surface-light">
+      <div class="mx-auto max-w-full space-y-8 px-4 py-20 sm:max-w-6xl">
         <div class="space-y-2">
-          <p class="text-sm uppercase tracking-wide text-white/80">Suivi des commandes</p>
+          <p class="text-sm uppercase tracking-wide text-surface-light/80">Suivi des commandes</p>
           <h1 class="text-3xl font-semibold leading-relaxed">Mes réservations</h1>
-          <p class="max-w-full sm:max-w-80 text-gray-700 text-white/80">Visualisez l'ensemble de vos réservations, suivez leur statut et mesurez votre impact positif.</p>
+          <p class="max-w-full text-surface-light/80 sm:max-w-80">Visualisez l'ensemble de vos réservations, suivez leur statut et mesurez votre impact positif.</p>
         </div>
         <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
           <Card
@@ -16,29 +16,29 @@
             class="shadow-lg"
           >
             <div class="space-y-4">
-              <p class="text-xs uppercase tracking-wide text-white/80">{{ item.title }}</p>
+              <p class="text-xs uppercase tracking-wide text-surface-light/80">{{ item.title }}</p>
               <p class="text-3xl font-semibold">{{ item.value }}</p>
-              <p class="text-sm text-white/70">{{ item.subtitle }}</p>
+              <p class="text-sm text-surface-light/70">{{ item.subtitle }}</p>
             </div>
           </Card>
         </div>
       </div>
     </section>
 
-    <main class="mx-auto max-w-full sm:max-w-6xl space-y-20 px-4 py-20">
+    <main class="mx-auto max-w-full space-y-20 px-4 py-20 sm:max-w-6xl">
       <div class="grid gap-spacing-22 lg:grid-cols-[320px,1fr]">
         <div class="space-y-6">
           <Card padding="lg" class="space-y-6">
             <template #header>
-              <h2 class="text-lg font-semibold text-gray-900">Filtres</h2>
+              <h2 class="text-lg font-semibold text-neutral-900">Filtres</h2>
             </template>
 
             <div class="space-y-4">
               <label class="flex flex-col gap-2">
-                <span class="text-sm font-medium text-gray-700">Statut</span>
+                <span class="text-sm font-medium text-neutral-700">Statut</span>
                 <select
                   v-model="filters.status"
-                  class="w-full rounded-modern border border-gray-200 bg-gray-100 px-3 py-3 text-gray-700 text-gray-700 focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-200"
+                  class="w-full rounded-modern border border-neutral-200 bg-neutral-100 px-3 py-3 text-neutral-700 focus:border-primary-400 focus:outline-none focus:ring-2 focus:ring-primary-200"
                 >
                   <option value="">Tous les statuts</option>
                   <option value="pending">En attente</option>
@@ -51,10 +51,10 @@
               </label>
 
               <label class="flex flex-col gap-2">
-                <span class="text-sm font-medium text-gray-700">Période</span>
+                <span class="text-sm font-medium text-neutral-700">Période</span>
                 <select
                   v-model="filters.period"
-                  class="w-full rounded-modern border border-gray-200 bg-gray-100 px-3 py-3 text-gray-700 text-gray-700 focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-200"
+                  class="w-full rounded-modern border border-neutral-200 bg-neutral-100 px-3 py-3 text-neutral-700 focus:border-primary-400 focus:outline-none focus:ring-2 focus:ring-primary-200"
                 >
                   <option value="">Toutes</option>
                   <option value="today">Aujourd'hui</option>
@@ -65,12 +65,12 @@
               </label>
             </div>
 
-            <div class="space-y-2 border-t border-gray-200/70 padding-t-lg">
-              <p class="text-sm font-semibold text-gray-800">Actions rapides</p>
+            <div class="space-y-2 border-t border-neutral-200/70 padding-t-lg">
+              <p class="text-sm font-semibold text-neutral-800">Actions rapides</p>
               <Button
                 variant="ghost"
                 size="sm"
-                class="w-full justify-center text-gray-700"
+                class="w-full justify-center text-neutral-700"
                 :disabled="!hasFilters"
                 @click="clearFilters"
               >
@@ -88,7 +88,7 @@
               <Button
                 variant="ghost"
                 size="sm"
-                class="w-full justify-center text-blue-600"
+                class="w-full justify-center text-primary-600"
                 :left-icon="CheckCheck"
                 @click="markAllAsRead"
               >
@@ -97,23 +97,23 @@
             </div>
           </Card>
 
-          <Card variant="highlight" padding="lg" class="space-y-4 text-gray-900">
+          <Card variant="highlight" padding="lg" class="space-y-4 text-neutral-900">
             <template #header>
               <div class="flex items-center gap-3">
-                <div class="flex h-14 w-14 items-center justify-center rounded-modern bg-white/20 text-white">
+                <div class="flex h-14 w-14 items-center justify-center rounded-modern bg-surface-light/20 text-surface-light">
                   <Leaf class="h-7 w-12" />
                 </div>
                 <div>
-                  <p class="text-sm uppercase tracking-wide text-white/80">Impact du mois</p>
-                  <h3 class="text-lg font-semibold text-white">Votre contribution</h3>
+                  <p class="text-sm uppercase tracking-wide text-surface-light/80">Impact du mois</p>
+                  <h3 class="text-lg font-semibold text-surface-light">Votre contribution</h3>
                 </div>
               </div>
             </template>
 
-            <ul class="space-y-4 text-white/90">
-              <li class="flex items-center justify-between text-gray-700"><span>Nourriture sauvée</span><strong>{{ monthlyImpact.food }} kg</strong></li>
-              <li class="flex items-center justify-between text-gray-700"><span>CO₂ évité</span><strong>{{ monthlyImpact.co2 }} kg</strong></li>
-              <li class="flex items-center justify-between text-gray-700"><span>Économies réalisées</span><strong>{{ formatPrice(monthlyImpact.savings) }}</strong></li>
+            <ul class="space-y-4 text-surface-light/90">
+              <li class="flex items-center justify-between text-surface-light"><span>Nourriture sauvée</span><strong>{{ monthlyImpact.food }} kg</strong></li>
+              <li class="flex items-center justify-between text-surface-light"><span>CO₂ évité</span><strong>{{ monthlyImpact.co2 }} kg</strong></li>
+              <li class="flex items-center justify-between text-surface-light"><span>Économies réalisées</span><strong>{{ formatPrice(monthlyImpact.savings) }}</strong></li>
             </ul>
           </Card>
         </div>
@@ -126,7 +126,7 @@
                   <Button
                     variant="ghost"
                     size="icon"
-                    :class="viewMode === 'list' ? 'bg-blue-100 text-blue-900' : 'text-gray-500'"
+                    :class="viewMode === 'list' ? 'bg-primary-100 text-primary-900' : 'text-neutral-500'"
                     :aria-pressed="viewMode === 'list'"
                     aria-label="Vue liste"
                     :left-icon="List"
@@ -137,7 +137,7 @@
                   <Button
                     variant="ghost"
                     size="icon"
-                    :class="viewMode === 'grid' ? 'bg-blue-100 text-blue-900' : 'text-gray-500'"
+                    :class="viewMode === 'grid' ? 'bg-primary-100 text-primary-900' : 'text-neutral-500'"
                     :aria-pressed="viewMode === 'grid'"
                     aria-label="Vue grille"
                     :left-icon="Grid3X3"
@@ -145,13 +145,13 @@
                   >
                     <span class="sr-only">Vue grille</span>
                   </Button>
-                  <p class="text-sm text-gray-500">
+                  <p class="text-sm text-neutral-500">
                     {{ filteredReservations.length }} réservation{{ filteredReservations.length > 1 ? 's' : '' }}
                   </p>
                 </div>
                 <select
                   v-model="sortBy"
-                  class="w-full rounded-modern border border-gray-200 bg-gray-100 px-3 py-3 text-gray-700 text-gray-700 focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-200 sm:w-auto"
+                  class="w-full rounded-modern border border-neutral-200 bg-neutral-100 px-3 py-3 text-neutral-700 focus:border-primary-400 focus:outline-none focus:ring-2 focus:ring-primary-200 sm:w-auto"
                 >
                   <option value="created_at_desc">Plus récentes</option>
                   <option value="created_at_asc">Plus anciennes</option>
@@ -213,7 +213,7 @@
               </div>
             </div>
 
-            <div v-if="filteredReservations.length > 0 && totalPages > 1" class="border-t border-gray-200/70 padding-t-xl">
+            <div v-if="filteredReservations.length > 0 && totalPages > 1" class="border-t border-neutral-200/70 padding-t-xl">
               <div class="flex items-center justify-center gap-3">
                 <Button
                   variant="outline"
@@ -228,7 +228,7 @@
                     :key="page"
                     variant="ghost"
                     size="sm"
-                    :class="page === currentPage ? 'bg-blue-100 text-blue-900' : 'text-gray-700'"
+                    :class="page === currentPage ? 'bg-primary-100 text-primary-900' : 'text-neutral-700'"
                     @click="currentPage = page"
                   >
                     {{ page }}

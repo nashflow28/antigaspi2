@@ -1,14 +1,14 @@
 <template>
-  <div class="min-h-screen bg-gray-50">
-    <header class="sticky top-0 z-40 border-b border-gray-200/70 bg-gray-100/80 backdrop-blur-xl">
+  <div class="min-h-screen bg-surface-light">
+    <header class="sticky top-0 z-40 border-b border-neutral-200/70 bg-surface-light/80 backdrop-blur-xl">
       <div class="mx-auto flex max-w-5xl items-center justify-between px-4 py-6">
         <div class="flex items-center gap-3">
-          <div class="flex h-14 w-14 items-center justify-center rounded bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-lg">
+          <div class="flex h-14 w-14 items-center justify-center rounded bg-gradient-to-r from-primary-600 to-primary-700 text-surface-light shadow-lg">
             <span class="text-h2 font-semibold">🌱</span>
           </div>
           <div class="space-y-4">
-            <p class="text-sm font-medium text-gray-500">Bienvenue</p>
-            <h1 class="text-h2 font-semibold text-gray-900">Antigaspi</h1>
+            <p class="text-sm font-medium text-neutral-500">Bienvenue</p>
+            <h1 class="text-h2 font-semibold text-neutral-900">Antigaspi</h1>
           </div>
         </div>
 
@@ -16,7 +16,7 @@
           <Button
             variant="ghost"
             size="icon"
-            class="text-gray-500 hover:text-blue-600"
+            class="text-neutral-500 hover:text-primary-600"
             aria-label="Rechercher"
             @click="handleSearch"
           >
@@ -26,14 +26,14 @@
           <Button
             variant="ghost"
             size="icon"
-            class="relative text-gray-500 hover:text-blue-600"
+            class="relative text-neutral-500 hover:text-primary-600"
             aria-label="Notifications"
             @click="handleNotifications"
           >
             <span aria-hidden="true">🔔</span>
             <span
               v-if="notificationsCount > 0"
-              class="relative sm:absolute -right-1 -top-1 flex h-4 min-w-[18px] items-center justify-center rounded-full bg-red-600 px-1 text-xs font-semibold text-white shadow-lg"
+              class="relative sm:absolute -right-1 -top-1 flex h-4 min-w-[18px] items-center justify-center rounded-full bg-accent-red px-1 text-xs font-semibold text-surface-light shadow-lg"
             >
               {{ notificationsCount }}
             </span>
@@ -42,14 +42,14 @@
           <Button
             variant="ghost"
             size="icon"
-            class="relative text-gray-500 hover:text-blue-600"
+            class="relative text-neutral-500 hover:text-primary-600"
             aria-label="Panier"
             @click="handleCart"
           >
             <span aria-hidden="true">🛒</span>
             <span
               v-if="cartItems > 0"
-              class="relative sm:absolute -right-1 -top-1 flex h-4 min-w-[18px] items-center justify-center rounded-full bg-blue-500 px-1 text-xs font-semibold text-white shadow-lg"
+              class="relative sm:absolute -right-1 -top-1 flex h-4 min-w-[18px] items-center justify-center rounded-full bg-primary-500 px-1 text-xs font-semibold text-surface-light shadow-lg"
             >
               {{ cartItems }}
             </span>
@@ -58,7 +58,7 @@
           <Button
             variant="secondary"
             size="icon"
-            class="text-blue-900"
+            class="text-primary-900"
             aria-label="Profil"
             @click="handleProfile"
           >
@@ -69,35 +69,35 @@
     </header>
 
     <main class="space-y-20 pb-spacing-30 pt-spacing-22">
-      <section class="relative overflow-hidden sm:block bg-gradient-to-r from-blue-600 to-blue-700 text-white">
+      <section class="relative overflow-hidden sm:block bg-gradient-to-r from-primary-600 to-primary-700 text-surface-light">
         <div class="mx-auto flex max-w-5xl flex-col gap-3 sm:gap-6 px-4 py-20 lg:flex-row lg:items-center lg:justify-between">
           <div class="space-y-4">
-            <p class="text-sm uppercase tracking-wide text-white/80">Luttons contre le gaspillage</p>
+            <p class="text-sm uppercase tracking-wide text-surface-light/80">Luttons contre le gaspillage</p>
             <h2 class="text-3xl font-semibold leading-relaxed">Découvrez les paniers solidaires près de chez vous</h2>
-            <p class="max-w-xl text-gray-700 text-white/80">
+            <p class="max-w-xl text-surface-light/80">
               Parcourez une sélection de produits sauvés des invendus et soutenez les commerçants locaux.
             </p>
             <div class="flex flex-wrap items-center gap-3">
-              <span class="rounded-full border border-white/30 bg-white/10 px-3 py-3 text-sm font-medium shadow-lg">🇹🇬 Togo</span>
-              <span class="rounded-full border border-white/30 bg-white/10 px-3 py-3 text-sm font-medium shadow-lg">
+              <span class="rounded-full border border-surface-light/30 bg-surface-light/10 px-3 py-3 text-sm font-medium shadow-lg">🇹🇬 Togo</span>
+              <span class="rounded-full border border-surface-light/30 bg-surface-light/10 px-3 py-3 text-sm font-medium shadow-lg">
                 {{ totalProducts }} produits disponibles
               </span>
               <Button
                 variant="secondary"
                 size="sm"
-                class="bg-white/90 text-blue-900 hover:bg-white"
+                class="bg-surface-light/90 text-primary-900 hover:bg-surface-light"
                 @click="refreshProducts"
               >
                 Explorer les nouveautés
               </Button>
             </div>
           </div>
-          <Card variant="glass" padding="lg" class="w-full max-w-sm text-left text-white">
+          <Card variant="glass" padding="lg" class="w-full max-w-sm text-left text-surface-light">
             <template #header>
-              <p class="text-sm uppercase tracking-wide text-white/70">Votre impact</p>
+              <p class="text-sm uppercase tracking-wide text-surface-light/70">Votre impact</p>
               <h3 class="text-h2 font-semibold">Vous avez déjà sauvé 24 kg</h3>
             </template>
-            <div class="space-y-2 text-white/90">
+            <div class="space-y-2 text-surface-light/90">
               <p>Continuez à réserver les paniers pour soutenir les producteurs et réduire le gaspillage alimentaire.</p>
               <Button variant="promo" class="w-full" @click="handleProfile">Voir mon profil</Button>
             </div>
@@ -109,11 +109,11 @@
         <Card padding="lg" class="space-y-8">
           <template #header>
             <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-              <h3 class="text-lg font-semibold text-gray-900">Catégories populaires</h3>
+              <h3 class="text-lg font-semibold text-neutral-900">Catégories populaires</h3>
               <Button
                 variant="ghost"
                 size="sm"
-                class="text-blue-600"
+                class="text-primary-600"
                 @click="viewAllCategories"
               >
                 Voir toutes les catégories
@@ -131,7 +131,7 @@
               @click="selectCategory(category)"
             >
               <span class="text-3xl" aria-hidden="true">{{ category.emoji }}</span>
-              <p class="text-sm font-medium text-gray-800">{{ category.name }}</p>
+              <p class="text-sm font-medium text-neutral-800">{{ category.name }}</p>
             </Card>
           </div>
         </Card>
@@ -139,11 +139,11 @@
 
       <section class="mx-auto max-w-5xl px-4">
         <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <h3 class="text-lg font-semibold text-gray-900">Produits disponibles</h3>
+          <h3 class="text-lg font-semibold text-neutral-900">Produits disponibles</h3>
           <Button
             variant="ghost"
             size="sm"
-            class="text-blue-600"
+            class="text-primary-600"
             @click="refreshProducts"
           >
             Actualiser
@@ -189,18 +189,18 @@
             class="flex cursor-pointer flex-col"
             @click="viewProduct(product)"
           >
-            <div class="flex aspect-square items-center justify-center rounded bg-gray-100 text-3xl">
+            <div class="flex aspect-square items-center justify-center rounded bg-neutral-100 text-3xl">
               <span aria-hidden="true">{{ product.emoji }}</span>
             </div>
             <div class="mt-4 space-y-4">
-              <h4 class="text-h4 font-semibold text-gray-900">{{ product.name }}</h4>
-              <p class="text-sm text-gray-500">{{ product.merchant }}</p>
+              <h4 class="text-h4 font-semibold text-neutral-900">{{ product.name }}</h4>
+              <p class="text-sm text-neutral-500">{{ product.merchant }}</p>
               <div class="flex items-center justify-between">
-                <div class="flex items-center gap-2 text-blue-600">
+                <div class="flex items-center gap-2 text-primary-600">
                   <span class="text-h4 font-semibold">{{ product.price }} XOF</span>
-                  <span v-if="product.originalPrice" class="text-xs text-gray-500 line-through">{{ product.originalPrice }} XOF</span>
+                  <span v-if="product.originalPrice" class="text-xs text-neutral-500 line-through">{{ product.originalPrice }} XOF</span>
                 </div>
-                <span class="rounded-full bg-blue-100 px-3 py-3 text-xs font-medium text-blue-900">-{{ product.discount }}%</span>
+                <span class="rounded-full bg-primary-100 px-3 py-3 text-xs font-medium text-primary-900">-{{ product.discount }}%</span>
               </div>
             </div>
           </Card>
@@ -219,21 +219,21 @@
       </section>
     </main>
 
-    <nav class="fixed bottom-0 left-0 right-0 border-t border-gray-200/70 bg-gray-100/90 backdrop-blur-lg">
+    <nav class="fixed bottom-0 left-0 right-0 border-t border-neutral-200/70 bg-surface-light/90 backdrop-blur-lg">
       <div class="mx-auto flex max-w-5xl items-center justify-around px-4 py-4">
-        <Button variant="ghost" class="flex h-full flex-col items-center gap-2 text-blue-600" @click="goToHome">
+        <Button variant="ghost" class="flex h-full flex-col items-center gap-2 text-primary-600" @click="goToHome">
           <span aria-hidden="true" class="text-lg">🏠</span>
           <span class="text-xs font-medium">Accueil</span>
         </Button>
-        <Button variant="ghost" class="flex h-full flex-col items-center gap-2 text-gray-500" @click="goToDiscover">
+        <Button variant="ghost" class="flex h-full flex-col items-center gap-2 text-neutral-500" @click="goToDiscover">
           <span aria-hidden="true" class="text-lg">🔍</span>
           <span class="text-xs">Découvrir</span>
         </Button>
-        <Button variant="ghost" class="flex h-full flex-col items-center gap-2 text-gray-500" @click="goToFavorites">
+        <Button variant="ghost" class="flex h-full flex-col items-center gap-2 text-neutral-500" @click="goToFavorites">
           <span aria-hidden="true" class="text-lg">❤️</span>
           <span class="text-xs">Favoris</span>
         </Button>
-        <Button variant="ghost" class="flex h-full flex-col items-center gap-2 text-gray-500" @click="goToProfile">
+        <Button variant="ghost" class="flex h-full flex-col items-center gap-2 text-neutral-500" @click="goToProfile">
           <span aria-hidden="true" class="text-lg">👤</span>
           <span class="text-xs">Profil</span>
         </Button>

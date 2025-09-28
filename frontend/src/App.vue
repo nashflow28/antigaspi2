@@ -1,7 +1,7 @@
 <template>
   <div
     id="app"
-    class="min-h-screen bg-gray-50 text-gray-900 antialiased transition-colors duration-300 dark:bg-gray-50-dark dark:text-gray-50"
+    class="min-h-screen bg-surface-light text-neutral-900 antialiased transition-colors duration-300 dark:bg-surface-dark dark:text-neutral-50"
   >
     <Navigation
       :brand="navigationBrand"
@@ -18,12 +18,14 @@
             @click="handleCartClick"
           >
             <span>Mon panier</span>
-            <span
+            <Badge
               v-if="cartItemsCount > 0"
-              class="relative sm:absolute -top-2 -right-2 flex h-4 w-4 items-center justify-center rounded-full bg-blue-500 text-xs font-semibold text-white"
+              variant="primary"
+              size="xs"
+              class="relative sm:absolute -top-2 -right-2 min-w-4 justify-center px-2 py-0.5 text-[10px]"
             >
               {{ cartItemsCount > 99 ? '99+' : cartItemsCount }}
-            </span>
+            </Badge>
           </Button>
 
           <template v-if="isAuthenticated">
@@ -65,12 +67,14 @@
             @click="handleCartClick"
           >
             <span>Mon panier</span>
-            <span
+            <Badge
               v-if="cartItemsCount > 0"
-              class="flex h-10 min-w-[1.5rem] items-center justify-center rounded-full bg-blue-500 px-3 text-xs font-semibold text-white"
+              variant="primary"
+              size="sm"
+              class="flex min-w-[1.5rem] justify-center px-3"
             >
               {{ cartItemsCount > 99 ? '99+' : cartItemsCount }}
-            </span>
+            </Badge>
           </Button>
 
           <template v-if="isAuthenticated">
@@ -113,7 +117,7 @@
       </router-view>
     </main>
 
-    <Footer class="border-t border-blue-500/10 bg-blue-800 text-gray-50" />
+    <Footer class="border-t border-primary-500/10 bg-primary-800 text-neutral-50" />
 
     <NotificationContainer />
     <NotificationSystem />
@@ -149,6 +153,7 @@ import PageTransition from '@/components/ui/PageTransition.vue'
 import NotificationContainer from '@/components/ui/NotificationContainer.vue'
 import NotificationSystem from '@/components/ui/NotificationSystem.vue'
 import Button from '@/components/ui/Button.vue'
+import Badge from '@/components/ui/2025/Badge.vue'
 
 const authStore = useAuthStore()
 const productsStore = useProductsStore()
