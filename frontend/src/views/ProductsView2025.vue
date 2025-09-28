@@ -269,32 +269,16 @@ import { notify } from '@/composables/useNotifications'
 import { useAuthStore } from '@/stores/auth'
 import { useReservationsStore } from '@/stores/reservations'
 import { usePaymentsStore } from '@/stores/payments'
-
-interface Product {
-  id: number
-  name: string
-  description: string
-  original_price: number
-  discounted_price: number
-  discount: number
-  merchant: {
-    name: string
-    address: string
-    distance: number | null
-  }
-  expires_at: Date
-  available_quantity: number
-  reserved_quantity: number
-  category?: string
-  image_url?: string
-}
+import { apiService } from '@/services/api'
+import type { ProductFilters } from '@/types'
+import { normalizeProduct, type NormalizedProduct } from '@/utils/productNormalizer'
 
 const router = useRouter()
 const authStore = useAuthStore()
 const reservationsStore = useReservationsStore()
 const paymentsStore = usePaymentsStore()
 
-const products = ref<Product[]>([])
+const products = ref<NormalizedProduct[]>([])
 const loading = ref(true)
 const searchQuery = ref('')
 const showFilters = ref(false)
@@ -393,79 +377,58 @@ const fetchProducts = async () => {
   try {
     loading.value = true
 
-    let url = 'http://localhost:8000/api/products'
-    const params = new URLSearchParams()
+    const filtersPayload: ProductFilters = {}
+
+    if (filters.value.category) {
+      filtersPayload.category = filters.value.category
+    }
+
+    if (filters.value.maxPrice) {
+      const maxPrice = Number(filters.value.maxPrice)
+      if (!Number.isNaN(maxPrice)) {
+        filtersPayload.max_price = maxPrice
+      }
+    }
+
+    if (filters.value.minDiscount) {
+      const minDiscount = Number(filters.value.minDiscount)
+      if (!Number.isNaN(minDiscount)) {
+        filtersPayload.min_discount = minDiscount
+      }
+    }
+
+    if (filters.value.maxDistance) {
+      const maxDistance = Number(filters.value.maxDistance)
+      if (!Number.isNaN(maxDistance)) {
+        filtersPayload.max_distance = maxDistance
+      }
+    }
 
     if (userLocation.value) {
-      params.append('latitude', userLocation.value.latitude.toString())
-      params.append('longitude', userLocation.value.longitude.toString())
+      filtersPayload.latitude = userLocation.value.latitude
+      filtersPayload.longitude = userLocation.value.longitude
     }
 
-    if (params.toString()) {
-      url += '?' + params.toString()
+    const response = await apiService.getProducts(filtersPayload)
+
+    if (!response?.success || !Array.isArray(response.data)) {
+      throw new Error(response?.message || 'Réponse inattendue de l’API')
     }
 
-    const response = await fetch(url, {
-      method: 'GET',
-      headers: {
-        Accept: 'application/json',
-        'Content-Type': 'application/json'
-      }
-    })
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`)
-    }
-
-    const data = await response.json()
-
-    if (data.success) {
-      products.value = data.data.map((product: any) => ({
-        id: product.id,
-        name: product.name,
-        description: product.description,
-        original_price: parseFloat(product.original_price),
-        discounted_price: parseFloat(product.discounted_price),
-        discount: product.discount_percentage,
-        category: getCategoryKey(product.category?.name),
-        merchant: {
-          name: product.merchant?.business_name || 'Commerçant inconnu',
-          address: product.merchant?.address || product.merchant?.city || 'Adresse non renseignée',
-          distance: product.merchant?.distance_km ?? null
-        },
-        expires_at: new Date(product.expiration_date),
-        available_quantity: product.quantity_available,
-        reserved_quantity: 0,
-        image_url: product.image_url
-      }))
-    } else {
-      throw new Error(data.message || 'Réponse inattendue de l’API')
-    }
+    products.value = response.data.map(normalizeProduct)
   } catch (error: any) {
-    // console.error('Erreur lors du chargement des produits:', error)
-    notify.warning('Nous rencontrons un souci pour récupérer certains produits. Réessayez plus tard.', 'Chargement incomplet')
+    const message = error?.message || 'Nous rencontrons un souci pour récupérer certains produits. Réessayez plus tard.'
+    notify.warning(message, 'Chargement incomplet')
   } finally {
     loading.value = false
   }
 }
 
-const getCategoryKey = (categoryName: string) => {
-  const categoryMap: Record<string, string> = {
-    'Fruits et Légumes': 'produce',
-    'Boulangerie': 'bakery',
-    'Plats préparés': 'prepared',
-    'Épicerie': 'dairy',
-    'Produits laitiers': 'dairy',
-    'Viandes': 'meat'
-  }
-  return categoryMap[categoryName] || 'other'
-}
-
-const getAvailableQuantity = (product: Product) => {
+const getAvailableQuantity = (product: NormalizedProduct) => {
   return Math.max(product.available_quantity - product.reserved_quantity, 0)
 }
 
-const isProductSoldOut = (product: Product) => {
+const isProductSoldOut = (product: NormalizedProduct) => {
   return getAvailableQuantity(product) <= 0
 }
 
@@ -478,21 +441,21 @@ const formatDiscount = (discount: number) => {
   return `-${Math.round(discount)}%`
 }
 
-const formatQuantity = (product: Product) => {
+const formatQuantity = (product: NormalizedProduct) => {
   const available = getAvailableQuantity(product)
   if (available === 0) return 'Complet'
   if (available === 1) return '1 restant'
   return `${available} restants`
 }
 
-const formatMerchant = (product: Product) => {
+const formatMerchant = (product: NormalizedProduct) => {
   const distance = product.merchant.distance
   const distanceLabel =
     typeof distance === 'number' && !Number.isNaN(distance) ? ` • ${distance.toFixed(1)} km` : ''
   return `${product.merchant.name}${distanceLabel}`
 }
 
-const getProductTags = (product: Product) => {
+const getProductTags = (product: NormalizedProduct) => {
   const tags: string[] = []
 
   if (product.category) {
@@ -523,11 +486,11 @@ const applyFilters = () => {
   notify.success('Affichage mis à jour selon vos préférences.', 'Filtres appliqués')
 }
 
-const viewProduct = (product: Product) => {
+const viewProduct = (product: NormalizedProduct) => {
   router.push(`/products/${product.id}`)
 }
 
-const onReserve = async (product: Product) => {
+const onReserve = async (product: NormalizedProduct) => {
   if (isProductSoldOut(product)) {
     notify.info('Ce produit est complet pour le moment.', 'Réservation rapide')
     return

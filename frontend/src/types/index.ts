@@ -188,6 +188,10 @@ export interface ProductFilters {
   max_expiry_days?: number
   page?: number
   per_page?: number
+  latitude?: number
+  longitude?: number
+  min_discount?: number
+  max_distance?: number
 }
 
 export interface PaginatedResponse<T> {
