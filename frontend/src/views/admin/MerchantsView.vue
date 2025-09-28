@@ -2,382 +2,422 @@
   <DashboardLayout
     :sidebar="sidebar"
     :header="header"
-    class="bg-gray-50"
+    class="bg-gradient-to-br from-surface-light via-surface-light to-primary-50 dark:from-surface-dark dark:via-surface-darker dark:to-primary-950"
   >
-    <div class="max-w-full sm:max-w-7xl mx-auto py-6 px-3 sm:px-4 lg:px-6">
-      <!-- En-tête -->
-      <div class="bg-white shadow rounded p-6 mt-4">
-        <div class="flex items-center justify-start sm:justify-between">
-          <div>
-            <h1 class="text-xl font-semibold text-gray-900">Modération des Commerçants</h1>
-            <p class="mt-1 text-sm text-gray-500">Gérez les demandes d'inscription et surveiller l'activité des commerçants</p>
-          </div>
-          <div class="flex items-center space-y-2 sm:space-x-3">
-            <button
-              class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-3 rounded flex items-center"
-              @click="refreshData"
+    <div class="mx-auto w-full max-w-7xl space-y-8 px-3 py-6 sm:px-6 sm:py-8">
+      <DashboardHeader
+        data-testid="merchants-header"
+        eyebrow="Administration"
+        title="Modération des commerçants"
+        subtitle="Gérez les demandes d'inscription et surveillez l'activité des commerçants"
+      >
+        <template #actions>
+          <Button
+            variant="secondary"
+            size="lg"
+            class="gap-2"
+            :loading="loading"
+            @click="refreshData"
+          >
+            <ArrowPathIcon class="h-5 w-5" />
+            Actualiser
+          </Button>
+        </template>
+      </DashboardHeader>
+
+      <StatCardGrid
+        data-testid="merchants-stats-grid"
+        :columns="'grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4'"
+      >
+        <StatCard
+          title="Commerçants actifs"
+          :value="formatNumber(stats.activeMerchants)"
+          description="Partenaires disponibles"
+          :icon="BuildingStorefrontIcon"
+          accent="success"
+        />
+        <StatCard
+          title="En attente"
+          :value="formatNumber(stats.pendingMerchants)"
+          description="Demandes à valider"
+          :icon="ClockIcon"
+          accent="warning"
+        />
+        <StatCard
+          title="Produits publiés"
+          :value="formatNumber(stats.totalProducts)"
+          description="Offres à modérer"
+          :icon="CubeIcon"
+          accent="info"
+        />
+        <StatCard
+          title="Réservations"
+          :value="formatNumber(stats.totalReservations)"
+          description="Signalements reçus"
+          :icon="TicketIcon"
+          accent="primary"
+        />
+      </StatCardGrid>
+
+      <section class="space-y-6" data-testid="merchants-moderation">
+        <DashboardTabs
+          data-testid="merchants-tabs"
+          v-model="activeTab"
+          :tabs="moderationTabs"
+        />
+
+        <Loading
+          v-if="loading"
+          text="Chargement des données de modération..."
+          variant="primary"
+          centered
+        />
+
+        <template v-else>
+          <Card
+            v-if="activeTab === 'pending'"
+            data-testid="pending-merchants-section"
+            variant="glass"
+          >
+            <template #header>
+              <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                  <h3 class="text-lg font-semibold text-neutral-900 dark:text-neutral-50">
+                    Demandes d'inscription en attente
+                  </h3>
+                  <p class="text-sm text-neutral-500 dark:text-neutral-400">
+                    Vérifiez les informations avant d'activer un nouveau commerçant
+                  </p>
+                </div>
+                <Badge variant="warning" size="sm" class="uppercase tracking-wide">
+                  {{ formatNumber(pendingMerchants.length) }} en attente
+                </Badge>
+              </div>
+            </template>
+
+            <EmptyState
+              v-if="pendingMerchants.length === 0"
+              title="Aucune demande en attente"
+              description="Les nouvelles demandes apparaîtront ici dès leur réception."
+              :icon="UsersIcon"
+            />
+
+            <Grid
+              v-else
+              data-testid="pending-merchants-list"
+              cols="1"
+              colsMd="2"
+              gap="lg"
             >
-              <svg
-                class="h-4 w-4 mr-2"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
+              <Card
+                v-for="merchant in pendingMerchants"
+                :key="merchant.id"
+                variant="bordered"
+                class="h-full"
               >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
-                />
-              </svg>
-              Actualiser
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <!-- Statistiques modération -->
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6 mt-4">
-        <div class="bg-white overflow-hidden sm:block shadow rounded">
-          <div class="p-6">
-            <div class="flex items-center">
-              <div class="flex-shrink-0">
-                <svg
-                  class="h-8 w-8 text-blue-600"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
-                  />
-                </svg>
-              </div>
-              <div class="ml-5 w-none flex-1">
-                <dl>
-                  <dt class="text-sm font-medium text-gray-500 truncate">Commerçants Actifs</dt>
-                  <dd class="text-lg font-medium text-gray-900">{{ stats.activeMerchants }}</dd>
-                </dl>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="bg-white overflow-hidden sm:block shadow rounded">
-          <div class="p-6">
-            <div class="flex items-center">
-              <div class="flex-shrink-0">
-                <svg
-                  class="h-8 w-8 text-yellow-500"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-                  />
-                </svg>
-              </div>
-              <div class="ml-5 w-none flex-1">
-                <dl>
-                  <dt class="text-sm font-medium text-gray-500 truncate">En Attente</dt>
-                  <dd class="text-lg font-medium text-gray-900">{{ stats.pendingMerchants }}</dd>
-                </dl>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="bg-white overflow-hidden sm:block shadow rounded">
-          <div class="p-6">
-            <div class="flex items-center">
-              <div class="flex-shrink-0">
-                <svg
-                  class="h-8 w-8 text-green-600"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"
-                  />
-                </svg>
-              </div>
-              <div class="ml-5 w-none flex-1">
-                <dl>
-                  <dt class="text-sm font-medium text-gray-500 truncate">Produits Publiés</dt>
-                  <dd class="text-lg font-medium text-gray-900">{{ stats.totalProducts }}</dd>
-                </dl>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="bg-white overflow-hidden sm:block shadow rounded">
-          <div class="p-6">
-            <div class="flex items-center">
-              <div class="flex-shrink-0">
-                <svg
-                  class="h-8 w-8 text-info"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
-                  />
-                </svg>
-              </div>
-              <div class="ml-5 w-none flex-1">
-                <dl>
-                  <dt class="text-sm font-medium text-gray-500 truncate">Réservations</dt>
-                  <dd class="text-lg font-medium text-gray-900">{{ stats.totalReservations }}</dd>
-                </dl>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Onglets de modération -->
-      <div class="bg-white shadow rounded mt-4">
-        <div class="border-b border-gray-200">
-          <nav class="-mb-px flex space-y-8 sm:space-x-8 px-4">
-            <button
-              v-for="tab in tabs"
-              :key="tab.key"
-              :class="{
-                'border-blue-500 text-green-600': activeTab === tab.key,
-                'border-transparent text-gray-500 hover:text-gray-800 hover:border-gray-300': activeTab !== tab.key
-              }"
-              class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm"
-              @click="activeTab = tab.key"
-            >
-              {{ tab.label }}
-              <span
-                v-if="tab.count > 0"
-                :class="{
-                  'bg-green-100 text-green-600': activeTab === tab.key,
-                  'bg-gray-100 text-gray-700': activeTab !== tab.key
-                }"
-                class="ml-2 inline-flex items-center px-3.5 py-1 rounded-full text-xs font-medium"
-              >
-                {{ tab.count }}
-              </span>
-            </button>
-          </nav>
-        </div>
-
-        <div class="p-6">
-          <!-- Demandes d'inscription en attente -->
-          <div v-if="activeTab === 'pending'" class="space-y-6">
-            <h3 class="text-lg font-medium text-gray-900">Demandes d'inscription en attente</h3>
-            <div v-if="pendingMerchants.length === 0" class="text-left sm:text-center py-6 sm:py-8">
-              <svg
-                class="mx-auto h-6 w-6 text-gray-400"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"
-                />
-              </svg>
-              <p class="mt-2 text-sm text-gray-500">Aucune demande en attente</p>
-            </div>
-            <div v-else class="space-y-4">
-              <div v-for="merchant in pendingMerchants" :key="merchant.id" class="border border-gray-200 rounded p-6">
-                <div class="flex items-stretch sm:items-start justify-start sm:justify-between">
-                  <div class="flex-1">
-                    <h4 class="text-lg font-medium text-gray-900">{{ merchant.business_name }}</h4>
-                    <p class="text-sm text-gray-500 mt-1">{{ merchant.owner_name }}</p>
-                    <div class="mt-2 grid grid-cols-1 md:grid-cols-2 gap-3">
+                <div class="flex flex-col gap-4">
+                  <div class="flex flex-col gap-3">
+                    <div class="flex items-center justify-between gap-3">
                       <div>
-                        <p class="text-sm text-gray-700"><strong>Email:</strong> {{ merchant.email }}</p>
-                        <p class="text-sm text-gray-700"><strong>Téléphone:</strong> {{ merchant.phone }}</p>
-                        <p class="text-sm text-gray-700"><strong>Adresse:</strong> {{ merchant.address }}</p>
+                        <h4 class="text-base font-semibold text-neutral-900 dark:text-neutral-50">
+                          {{ merchant.business_name }}
+                        </h4>
+                        <p class="text-sm text-neutral-500 dark:text-neutral-400">
+                          {{ merchant.business_type }}
+                        </p>
                       </div>
-                      <div>
-                        <p class="text-sm text-gray-700"><strong>Type de commerce:</strong> {{ merchant.business_type }}</p>
-                        <p class="text-sm text-gray-700"><strong>Description:</strong> {{ merchant.description }}</p>
-                        <p class="text-sm text-gray-700"><strong>Demande:</strong> {{ formatDate(merchant.created_at) }}</p>
+                      <Badge variant="info" size="sm">{{ formatDate(merchant.created_at) }}</Badge>
+                    </div>
+                    <div class="space-y-2 text-sm text-neutral-600 dark:text-neutral-300">
+                      <div class="flex items-center gap-2">
+                        <UserIcon class="h-4 w-4 text-primary-500" />
+                        <span>{{ merchant.owner_name }}</span>
+                      </div>
+                      <div class="flex items-center gap-2">
+                        <EnvelopeIcon class="h-4 w-4 text-primary-500" />
+                        <span>{{ merchant.email }}</span>
+                      </div>
+                      <div class="flex items-center gap-2">
+                        <PhoneIcon class="h-4 w-4 text-primary-500" />
+                        <span>{{ merchant.phone }}</span>
+                      </div>
+                      <div class="flex items-start gap-2">
+                        <MapPinIcon class="mt-0.5 h-4 w-4 text-primary-500" />
+                        <span>{{ merchant.address }}</span>
                       </div>
                     </div>
+                    <p class="text-sm leading-relaxed text-neutral-600 dark:text-neutral-300">
+                      {{ merchant.description }}
+                    </p>
                   </div>
-                  <div class="ml-8 flex flex-col space-y-4">
-                    <button
-                      class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-3 rounded text-sm"
+
+                  <div class="flex flex-col gap-2 sm:flex-row sm:justify-end">
+                    <Button
+                      variant="success"
+                      size="sm"
+                      class="gap-2"
                       @click="approveMerchant(merchant)"
                     >
+                      <CheckCircleIcon class="h-4 w-4" />
                       Approuver
-                    </button>
-                    <button
-                      class="bg-red-600 hover:bg-red-700 text-white px-3 py-3 rounded text-sm"
+                    </Button>
+                    <Button
+                      variant="destructive"
+                      size="sm"
+                      class="gap-2"
                       @click="rejectMerchant(merchant)"
                     >
+                      <XCircleIcon class="h-4 w-4" />
                       Rejeter
-                    </button>
-                    <button
-                      class="bg-gray-600 hover:bg-gray-700 text-white px-3 py-3 rounded text-sm"
-                      @click="viewMerchantDetails(merchant)"
-                    >
-                      Détails
-                    </button>
+                    </Button>
                   </div>
                 </div>
-              </div>
-            </div>
-          </div>
+              </Card>
+            </Grid>
+          </Card>
 
-          <!-- Produits à modérer -->
-          <div v-if="activeTab === 'products'" class="space-y-6">
-            <h3 class="text-lg font-medium text-gray-900">Produits à modérer</h3>
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6">
-              <div v-for="product in productsToModerate" :key="product.id" class="border border-gray-200 rounded overflow-hidden sm:block">
-                <div class="aspect-w-12 aspect-h-10 bg-gray-200">
-                  <img
-                    v-if="product.image_url"
-                    :src="product.image_url"
-                    :alt="product.name"
-                    class="w-full h-8xl object-cover"
-                  >
-                  <div v-else class="w-full h-8xl bg-gray-300 flex items-center justify-center">
-                    <span class="text-gray-500">Pas d'image</span>
-                  </div>
+          <Card
+            v-else-if="activeTab === 'products'"
+            data-testid="products-moderation-section"
+            variant="glass"
+          >
+            <template #header>
+              <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                  <h3 class="text-lg font-semibold text-neutral-900 dark:text-neutral-50">
+                    Produits à modérer
+                  </h3>
+                  <p class="text-sm text-neutral-500 dark:text-neutral-400">
+                    Validez la conformité des offres et leur contenu
+                  </p>
                 </div>
-                <div class="p-4">
-                  <h4 class="font-medium text-gray-900 truncate">{{ product.name || 'N/A' }}</h4>
-                  <p class="text-sm text-gray-500 mt-1">{{ product.merchant_name || 'N/A' }}</p>
-                  <p class="text-lg font-semibold text-green-600 mt-2">{{ product.price ? formatPrice(product.price) : '0' }} F CFA</p>
-                  <div class="mt-4 flex space-y-4 sm:space-x-2">
-                    <button
-                      class="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-3 py-3 rounded text-sm"
+                <Badge variant="info" size="sm" class="uppercase tracking-wide">
+                  {{ formatNumber(productsToModerate.length) }} produits
+                </Badge>
+              </div>
+            </template>
+
+            <EmptyState
+              v-if="productsToModerate.length === 0"
+              title="Aucun produit à modérer"
+              description="Tous les produits soumis ont déjà été traités."
+              :icon="CubeIcon"
+            />
+
+            <Grid
+              v-else
+              data-testid="products-list"
+              cols="1"
+              colsMd="2"
+              gap="lg"
+            >
+              <Card
+                v-for="product in productsToModerate"
+                :key="product.id"
+                variant="bordered"
+                class="h-full"
+              >
+                <div class="flex flex-col gap-4">
+                  <div class="overflow-hidden rounded-2xl border border-neutral-200/60 dark:border-neutral-700/60">
+                    <img
+                      :src="product.image_url"
+                      :alt="product.name"
+                      class="h-40 w-full object-cover"
+                      loading="lazy"
+                    >
+                  </div>
+                  <div class="space-y-2">
+                    <div class="flex items-center justify-between gap-3">
+                      <div>
+                        <h4 class="text-base font-semibold text-neutral-900 dark:text-neutral-50">
+                          {{ product.name }}
+                        </h4>
+                        <p class="text-sm text-neutral-500 dark:text-neutral-400">
+                          {{ product.merchant_name }}
+                        </p>
+                      </div>
+                      <Badge variant="primary" size="sm">
+                        {{ product.category }}
+                      </Badge>
+                    </div>
+                    <p class="text-sm leading-relaxed text-neutral-600 dark:text-neutral-300">
+                      {{ product.description }}
+                    </p>
+                    <p class="text-lg font-semibold text-primary-600 dark:text-primary-300">
+                      {{ product.price ? formatPrice(product.price) : '0' }} F CFA
+                    </p>
+                  </div>
+                  <div class="flex flex-col gap-2 sm:flex-row sm:justify-end">
+                    <Button
+                      variant="success"
+                      size="sm"
+                      class="gap-2"
                       @click="approveProduct(product)"
                     >
-                      Approuver
-                    </button>
-                    <button
-                      class="flex-1 bg-red-600 hover:bg-red-700 text-white px-3 py-3 rounded text-sm"
+                      <CheckCircleIcon class="h-4 w-4" />
+                      Publier
+                    </Button>
+                    <Button
+                      variant="destructive"
+                      size="sm"
+                      class="gap-2"
                       @click="rejectProduct(product)"
                     >
+                      <XCircleIcon class="h-4 w-4" />
                       Rejeter
-                    </button>
+                    </Button>
                   </div>
                 </div>
+              </Card>
+            </Grid>
+          </Card>
+
+          <Card
+            v-else
+            data-testid="reservations-moderation-section"
+            variant="glass"
+          >
+            <template #header>
+              <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                  <h3 class="text-lg font-semibold text-neutral-900 dark:text-neutral-50">
+                    Réservations signalées
+                  </h3>
+                  <p class="text-sm text-neutral-500 dark:text-neutral-400">
+                    Analysez les signalements des utilisateurs et prenez les mesures nécessaires
+                  </p>
+                </div>
+                <Badge variant="error" size="sm" class="uppercase tracking-wide">
+                  {{ formatNumber(flaggedReservations.length) }} signalements
+                </Badge>
               </div>
-            </div>
-          </div>
+            </template>
 
-          <!-- Réservations signalées -->
-          <div v-if="activeTab === 'reservations'" class="space-y-6">
-            <h3 class="text-lg font-medium text-gray-900">Réservations signalées</h3>
-            <div class="overflow-x-auto">
-              <table class="min-w-full divide-y divide-neutral-200">
-                <thead class="bg-gray-50">
-                  <tr>
-                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Réservation
-                    </th>
-                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Client
-                    </th>
-                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Commerçant
-                    </th>
-                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Signalement
-                    </th>
-                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Actions
-                    </th>
-                  </tr>
-                </thead>
-                <tbody class="bg-white divide-y divide-neutral-200">
-                  <tr v-for="reservation in flaggedReservations" :key="reservation.id">
-                    <td class="px-4 py-4 whitespace-nowrap">
-                      <div class="text-sm font-medium text-gray-900">{{ reservation.product_name || 'N/A' }}</div>
-                      <div class="text-sm text-gray-500">{{ reservation.total_price ? formatPrice(reservation.total_price) : '0' }} F CFA</div>
-                    </td>
-                    <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
-                      {{ reservation.customer_name || 'N/A' }}
-                    </td>
-                    <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
-                      {{ reservation.merchant_name || 'N/A' }}
-                    </td>
-                    <td class="px-4 py-4 whitespace-nowrap">
-                      <span class="px-3 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
-                        {{ reservation.flag_reason || 'Non spécifié' }}
-                      </span>
-                    </td>
-                    <td class="px-4 py-4 whitespace-nowrap text-sm font-medium space-y-4 sm:space-x-2">
-                      <button
-                        class="text-green-600 hover:text-blue-900"
-                        @click="resolveReservation(reservation)"
-                      >
-                        Résoudre
-                      </button>
-                      <button
-                        class="text-info hover:text-secondary-900"
-                        @click="viewReservationDetails(reservation)"
-                      >
-                        Détails
-                      </button>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-      </div>
+            <EmptyState
+              v-if="flaggedReservations.length === 0"
+              title="Aucun signalement actif"
+              description="Continuez de surveiller les réservations pour maintenir un haut niveau de confiance."
+              :icon="ShieldExclamationIcon"
+            />
 
-      <!-- Modal de confirmation -->
-      <ConfirmModal
-        :is-open="confirmModal.isOpen"
-        :type="confirmModal.type"
-        :title="confirmModal.title"
-        :message="confirmModal.message"
-        :confirm-text="confirmModal.confirmText"
-        :cancel-text="confirmModal.cancelText"
-        @confirm="confirmModal.onConfirm"
-        @cancel="closeConfirmModal"
+            <div
+              v-else
+              data-testid="reservations-list"
+              class="space-y-4"
+            >
+              <Card
+                v-for="reservation in flaggedReservations"
+                :key="reservation.id"
+                variant="bordered"
+              >
+                <div class="flex flex-col gap-3">
+                  <div class="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
+                    <div>
+                      <h4 class="text-base font-semibold text-neutral-900 dark:text-neutral-50">
+                        {{ reservation.product_name }}
+                      </h4>
+                      <p class="text-sm text-neutral-500 dark:text-neutral-400">
+                        {{ reservation.customer_name }} • {{ reservation.merchant_name }}
+                      </p>
+                    </div>
+                    <Badge variant="warning" size="sm">
+                      {{ reservation.flag_reason }}
+                    </Badge>
+                  </div>
+                  <div class="flex flex-wrap items-center gap-4 text-sm text-neutral-600 dark:text-neutral-300">
+                    <div class="flex items-center gap-2">
+                      <CreditCardIcon class="h-4 w-4 text-primary-500" />
+                      <span>{{ reservation.total_price ? formatPrice(reservation.total_price) : '0' }} F CFA</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                      <CalendarDaysIcon class="h-4 w-4 text-primary-500" />
+                      <span>{{ formatDate(reservation.created_at) }}</span>
+                    </div>
+                  </div>
+                  <div class="flex flex-col gap-2 sm:flex-row sm:justify-end">
+                    <Button
+                      variant="success"
+                      size="sm"
+                      class="gap-2"
+                      @click="resolveReservation(reservation)"
+                    >
+                      <ShieldCheckIcon class="h-4 w-4" />
+                      Résoudre
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      class="gap-2 text-neutral-600 hover:text-neutral-800 dark:text-neutral-300"
+                      @click="dismissReservation(reservation)"
+                    >
+                      <ArrowUturnLeftIcon class="h-4 w-4" />
+                      Ignorer
+                    </Button>
+                  </div>
+                </div>
+              </Card>
+            </div>
+          </Card>
+        </template>
+      </section>
+    </div>
+
+    <ConfirmModal
+      :is-open="confirmModal.value.isOpen"
+      :type="confirmModal.value.type"
+      :title="confirmModal.value.title"
+      :message="confirmModal.value.message"
+      :confirm-text="confirmModal.value.confirmText"
+      :cancel-text="confirmModal.value.cancelText"
+      @confirm="confirmModal.value.onConfirm"
+      @cancel="closeConfirmModal"
+    />
+
+    <div class="fixed top-4 right-4 z-[110] space-y-3">
+      <NotificationToast
+        v-for="notification in notifications"
+        :key="notification.id"
+        :type="notification.type"
+        :title="notification.title"
+        :message="notification.message"
+        @close="removeNotification(notification.id)"
       />
-
-      <!-- Notifications toast -->
-      <div class="fixed top-4 right-4 z-[110] space-y-4">
-        <NotificationToast
-          v-for="notification in notifications"
-          :key="notification.id"
-          :type="notification.type"
-          :title="notification.title"
-          :message="notification.message"
-          @close="removeNotification(notification.id)"
-        />
-      </div>
     </div>
   </DashboardLayout>
 </template>
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
+import {
+  ArrowPathIcon,
+  BuildingStorefrontIcon,
+  ClockIcon,
+  CubeIcon,
+  TicketIcon,
+  UsersIcon,
+  UserIcon,
+  EnvelopeIcon,
+  PhoneIcon,
+  MapPinIcon,
+  CheckCircleIcon,
+  XCircleIcon,
+  ShieldExclamationIcon,
+  ShieldCheckIcon,
+  CalendarDaysIcon,
+  CreditCardIcon,
+  ArrowUturnLeftIcon
+} from '@heroicons/vue/24/outline'
 import ConfirmModal from '@/components/ui/ConfirmModal.vue'
 import NotificationToast from '@/components/ui/NotificationToast.vue'
 import DashboardLayout from '@/components/ui/DashboardLayout.vue'
+import { Button, Card, Badge, EmptyState, Grid, Loading } from '@/components/ui/2025'
+import {
+  DashboardHeader,
+  StatCard,
+  StatCardGrid,
+  DashboardTabs
+} from '@/components/dashboard/2025'
+import type { DashboardTab } from '@/components/dashboard/2025/DashboardTabs.vue'
 import { useDashboardLayout } from '@/composables/useDashboardLayout'
 
 interface ModerationStats {
@@ -446,10 +486,8 @@ const stats = ref<ModerationStats>({
 const activeTab = ref('pending')
 const loading = ref(false)
 
-// Notification system
 const notifications = ref<Notification[]>([])
 
-// Confirm modal
 const confirmModal = ref<ConfirmModalData>({
   isOpen: false,
   type: 'warning',
@@ -466,54 +504,71 @@ const pendingMerchants = ref<PendingMerchant[]>([])
 const productsToModerate = ref<ProductToModerate[]>([])
 const flaggedReservations = ref<FlaggedReservation[]>([])
 
-const tabs = computed(() => [
+const moderationTabs = computed<DashboardTab[]>(() => [
   {
     key: 'pending',
     label: 'Commerçants en attente',
-    count: pendingMerchants.value.length
+    count: pendingMerchants.value.length,
+    description: 'Examinez chaque demande avant de la rendre visible sur la plateforme'
   },
   {
     key: 'products',
     label: 'Produits à modérer',
-    count: productsToModerate.value.length
+    count: productsToModerate.value.length,
+    description: 'Validez la qualité et la conformité des offres publiées'
   },
   {
     key: 'reservations',
     label: 'Réservations signalées',
-    count: flaggedReservations.value.length
+    count: flaggedReservations.value.length,
+    description: 'Analysez les signalements pour assurer une expérience fiable'
   }
 ])
 
+const numberFormatter = new Intl.NumberFormat('fr-FR')
+const formatNumber = (value: number) => numberFormatter.format(value)
+
+const formatDate = (dateString?: string | null): string => {
+  if (!dateString) {
+    return '—'
+  }
+  const date = new Date(dateString)
+  if (Number.isNaN(date.getTime())) {
+    return '—'
+  }
+  return date.toLocaleDateString('fr-FR', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit'
+  })
+}
+
+const formatPrice = (price: number): string => {
+  return numberFormatter.format(price ?? 0)
+}
+
 const loadModerationData = async () => {
-  // console.log('🔄 loadModerationData appelée')
   loading.value = true
   try {
-    // console.log('📡 Appel API vers http://localhost:8000/api/admin/moderation')
     const response = await fetch('http://localhost:8000/api/admin/moderation', {
       headers: {
-        'Accept': 'application/json',
-        'Authorization': `Bearer ${localStorage.getItem('auth_token')}`
+        Accept: 'application/json',
+        Authorization: `Bearer ${localStorage.getItem('auth_token')}`
       }
     })
     const data = await response.json()
-    // console.log('📥 Réponse API:', data)
 
     if (data.success) {
       stats.value = data.stats
       pendingMerchants.value = data.pendingMerchants
       productsToModerate.value = data.productsToModerate
       flaggedReservations.value = data.flaggedReservations
-      // console.log('✅ Données chargées avec succès:', {
-      //   stats: stats.value,
-      //   pendingMerchants: pendingMerchants.value.length,
-      //   productsToModerate: productsToModerate.value.length,
-      //   flaggedReservations: flaggedReservations.value.length
-      // })
     } else {
       throw new Error(data.message || 'Erreur API')
     }
   } catch (error) {
-    // console.error('❌ Erreur lors du chargement:', error)
     showNotification('error', 'Erreur de chargement', 'Impossible de charger les données. Utilisation des données de démonstration.')
     loadDemoData()
   } finally {
@@ -523,75 +578,66 @@ const loadModerationData = async () => {
 
 const loadDemoData = () => {
   stats.value = {
-    activeMerchants: 156,
+    activeMerchants: 18,
     pendingMerchants: 3,
-    totalProducts: 247,
-    totalReservations: 1034
+    totalProducts: 124,
+    totalReservations: 12
   }
 
   pendingMerchants.value = [
     {
       id: 1,
-      business_name: 'Supermarché Plateau',
-      owner_name: 'Mamadou Koné',
-      email: 'supermarche.plateau@email.com',
-      phone: '+225 27 20 30 40 50',
+      business_name: 'Boulangerie du Centre',
+      owner_name: 'Kouamé Isabelle',
+      email: 'isabelle@boulangerieducentre.ci',
+      phone: '+225 07 23 45 67 89',
       address: 'Plateau, Abidjan',
-      business_type: 'Supermarché',
-      description: 'Supermarché généraliste avec section fruits et légumes',
-      created_at: '2024-09-10T13:20:00Z'
+      business_type: 'Boulangerie artisanale',
+      description: 'Pains et viennoiseries artisanales préparées chaque matin avec des ingrédients locaux.',
+      created_at: '2024-09-14T09:30:00Z'
     },
     {
       id: 2,
-      business_name: 'Épicerie du Quartier',
-      owner_name: 'Awa Traoré',
-      email: 'epicerie.quartier@email.com',
-      phone: '+225 05 66 77 88 99',
-      address: 'Cocody, Abidjan',
-      business_type: 'Épicerie',
-      description: 'Petite épicerie de proximité',
-      created_at: '2024-09-12T08:15:00Z'
+      business_name: 'Fruits & Fraîcheur',
+      owner_name: 'Traoré Mamadou',
+      email: 'contact@fruitsfraicheur.ci',
+      phone: '+225 05 11 22 33 44',
+      address: 'Yopougon, Abidjan',
+      business_type: 'Primeur',
+      description: 'Sélection de fruits et légumes de saison issus de producteurs locaux.',
+      created_at: '2024-09-13T14:15:00Z'
     },
     {
       id: 3,
-      business_name: 'Pâtisserie Moderne',
-      owner_name: 'Jean-Claude Bamba',
-      email: 'patisserie.moderne@email.com',
-      phone: '+225 07 44 55 66 77',
-      address: 'Marcory, Abidjan',
-      business_type: 'Pâtisserie',
-      description: 'Pâtisserie artisanale avec viennoiseries fraîches',
-      created_at: '2024-09-14T16:30:00Z'
+      business_name: 'Saveurs d\'Afrique',
+      owner_name: 'Diabaté Aminata',
+      email: 'hello@saveursdafrique.ci',
+      phone: '+225 07 98 76 54 32',
+      address: 'Cocody, Abidjan',
+      business_type: 'Restaurant',
+      description: 'Cuisine fusion africaine avec des menus anti-gaspillage créatifs.',
+      created_at: '2024-09-12T11:20:00Z'
     }
   ]
 
   productsToModerate.value = [
     {
       id: 1,
-      name: 'Lot de croissants artisanaux',
-      merchant_name: 'Boulangerie Martin',
-      price: 800,
-      image_url: 'https://images.unsplash.com/photo-1555507036-ab794f4afe8c?w=400',
-      description: 'Croissants frais du matin',
-      category: 'Viennoiserie'
+      name: 'Assortiment de viennoiseries',
+      merchant_name: 'Boulangerie du Centre',
+      price: 2500,
+      image_url: 'https://images.unsplash.com/photo-1499636136210-6f4ee915583e?auto=format&fit=crop&w=600&q=80',
+      description: 'Lot de 6 viennoiseries du jour à récupérer avant 18h.',
+      category: 'Boulangerie'
     },
     {
       id: 2,
-      name: 'Légumes biologiques variés',
-      merchant_name: 'Marché Bio',
-      price: 1500,
-      image_url: 'https://images.unsplash.com/photo-1540420773420-3366772f4999?w=400',
-      description: 'Assortiment de légumes bio de saison',
-      category: 'Légumes'
-    },
-    {
-      id: 3,
-      name: 'Yaourts nature fermiers',
-      merchant_name: 'Ferme Laitière',
-      price: 600,
-      image_url: 'https://images.unsplash.com/photo-1571212515416-ffa4c1b7b6c4?w=400',
-      description: 'Yaourts nature faits maison',
-      category: 'Produits laitiers'
+      name: 'Panier de fruits de saison',
+      merchant_name: 'Fruits & Fraîcheur',
+      price: 3500,
+      image_url: 'https://images.unsplash.com/photo-1582407947304-fd86f028f716?auto=format&fit=crop&w=600&q=80',
+      description: 'Panier composé de fruits variés en fin de marché.',
+      category: 'Primeur'
     }
   ]
 
@@ -617,28 +663,12 @@ const loadDemoData = () => {
   ]
 }
 
-const formatDate = (dateString: string): string => {
-  const date = new Date(dateString)
-  return date.toLocaleDateString('fr-FR', {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit'
-  })
-}
-
-const formatPrice = (price: number): string => {
-  return price.toLocaleString('fr-FR')
-}
-
 const refreshData = async () => {
   showNotification('info', 'Actualisation', 'Chargement des données...')
   await loadModerationData()
   showNotification('success', 'Actualisation terminée', 'Les données ont été rechargées avec succès.')
 }
 
-// Utility functions for notifications and modals
 const showNotification = (type: Notification['type'], title: string, message: string) => {
   const notification: Notification = {
     id: Date.now().toString(),
@@ -680,7 +710,6 @@ const closeConfirmModal = () => {
   confirmModal.value.isOpen = false
 }
 
-// Actions pour les commerçants
 const approveMerchant = async (merchant: PendingMerchant) => {
   showConfirmModal(
     'success',
@@ -692,8 +721,8 @@ const approveMerchant = async (merchant: PendingMerchant) => {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'Accept': 'application/json',
-            'Authorization': `Bearer ${localStorage.getItem('auth_token')}`
+            Accept: 'application/json',
+            Authorization: `Bearer ${localStorage.getItem('auth_token')}`
           }
         })
 
@@ -709,11 +738,10 @@ const approveMerchant = async (merchant: PendingMerchant) => {
           stats.value.activeMerchants++
           showNotification('success', 'Commerçant approuvé', `${merchant.business_name} a été approuvé avec succès.`)
         } else {
-          throw new Error(data.message || 'Erreur lors de l\'approbation')
+          throw new Error(data.message || "Erreur lors de l'approbation")
         }
       } catch (error) {
-        // console.error('Erreur:', error)
-        showNotification('error', 'Erreur d\'approbation', `Impossible d'approuver ${merchant.business_name}. ${error instanceof Error ? error.message : 'Erreur inconnue'}`)
+        showNotification('error', "Erreur d'approbation", `Impossible d'approuver ${merchant.business_name}. ${error instanceof Error ? error.message : 'Erreur inconnue'}`)
       }
     },
     'Approuver',
@@ -732,10 +760,10 @@ const rejectMerchant = async (merchant: PendingMerchant) => {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'Accept': 'application/json',
-            'Authorization': `Bearer ${localStorage.getItem('auth_token')}`
+            Accept: 'application/json',
+            Authorization: `Bearer ${localStorage.getItem('auth_token')}`
           },
-          body: JSON.stringify({ reason: 'Rejeté par l\'administrateur' })
+          body: JSON.stringify({ reason: "Rejeté par l'administrateur" })
         })
 
         if (!response.ok) {
@@ -752,7 +780,6 @@ const rejectMerchant = async (merchant: PendingMerchant) => {
           throw new Error(data.message || 'Erreur lors du rejet')
         }
       } catch (error) {
-        // console.error('Erreur:', error)
         showNotification('error', 'Erreur de rejet', `Impossible de rejeter ${merchant.business_name}. ${error instanceof Error ? error.message : 'Erreur inconnue'}`)
       }
     },
@@ -761,39 +788,19 @@ const rejectMerchant = async (merchant: PendingMerchant) => {
   )
 }
 
-const viewMerchantDetails = (merchant: PendingMerchant) => {
-  const details = `Propriétaire: ${merchant.owner_name || 'N/A'}
-Email: ${merchant.email || 'N/A'}
-Téléphone: ${merchant.phone || 'N/A'}
-Adresse: ${merchant.address || 'N/A'}
-Type: ${merchant.business_type || 'N/A'}
-Description: ${merchant.description || 'N/A'}
-Demande: ${merchant.created_at ? formatDate(merchant.created_at) : 'N/A'}`
-
-  showConfirmModal(
-    'success',
-    `Détails de ${merchant.business_name || 'Marchand'}`,
-    details,
-    () => {}, // Pas d'action à confirmer, juste pour afficher les infos
-    'Fermer',
-    ''
-  )
-}
-
-// Actions pour les produits
 const approveProduct = async (product: ProductToModerate) => {
   showConfirmModal(
     'success',
     'Approuver le produit',
-    `Êtes-vous sûr de vouloir approuver le produit "${product.name}" ?`,
+    `Valider la mise en ligne de ${product.name} ?`,
     async () => {
       try {
         const response = await fetch(`http://localhost:8000/api/admin/products/${product.id}/approve`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'Accept': 'application/json',
-            'Authorization': `Bearer ${localStorage.getItem('auth_token')}`
+            Accept: 'application/json',
+            Authorization: `Bearer ${localStorage.getItem('auth_token')}`
           }
         })
 
@@ -805,16 +812,16 @@ const approveProduct = async (product: ProductToModerate) => {
 
         if (data.success) {
           productsToModerate.value = productsToModerate.value.filter(p => p.id !== product.id)
-          showNotification('success', 'Produit approuvé', `"${product.name}" a été approuvé.`)
+          stats.value.totalProducts--
+          showNotification('success', 'Produit approuvé', `${product.name} est désormais publié.`)
         } else {
-          throw new Error(data.message || 'Erreur lors de l\'approbation')
+          throw new Error(data.message || "Erreur lors de l'approbation")
         }
       } catch (error) {
-        // console.error('Erreur:', error)
-        showNotification('error', 'Erreur d\'approbation', `Impossible d'approuver "${product.name}". ${error instanceof Error ? error.message : 'Erreur inconnue'}`)
+        showNotification('error', "Erreur d'approbation", `Impossible d'approuver ${product.name}. ${error instanceof Error ? error.message : 'Erreur inconnue'}`)
       }
     },
-    'Approuver',
+    'Publier',
     'Annuler'
   )
 }
@@ -823,17 +830,17 @@ const rejectProduct = async (product: ProductToModerate) => {
   showConfirmModal(
     'danger',
     'Rejeter le produit',
-    `Êtes-vous sûr de vouloir rejeter le produit "${product.name}" ? Cette action peut être définitive.`,
+    `Êtes-vous sûr de vouloir rejeter ${product.name} ?`,
     async () => {
       try {
         const response = await fetch(`http://localhost:8000/api/admin/products/${product.id}/reject`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'Accept': 'application/json',
-            'Authorization': `Bearer ${localStorage.getItem('auth_token')}`
+            Accept: 'application/json',
+            Authorization: `Bearer ${localStorage.getItem('auth_token')}`
           },
-          body: JSON.stringify({ reason: 'Rejeté par l\'administrateur' })
+          body: JSON.stringify({ reason: 'Produit non conforme' })
         })
 
         if (!response.ok) {
@@ -844,13 +851,13 @@ const rejectProduct = async (product: ProductToModerate) => {
 
         if (data.success) {
           productsToModerate.value = productsToModerate.value.filter(p => p.id !== product.id)
-          showNotification('success', 'Produit rejeté', `"${product.name}" a été rejeté.`)
+          stats.value.totalProducts--
+          showNotification('success', 'Produit rejeté', `${product.name} a été retiré de la modération.`)
         } else {
           throw new Error(data.message || 'Erreur lors du rejet')
         }
       } catch (error) {
-        // console.error('Erreur:', error)
-        showNotification('error', 'Erreur de rejet', `Impossible de rejeter "${product.name}". ${error instanceof Error ? error.message : 'Erreur inconnue'}`)
+        showNotification('error', 'Erreur de rejet', `Impossible de rejeter ${product.name}. ${error instanceof Error ? error.message : 'Erreur inconnue'}`)
       }
     },
     'Rejeter',
@@ -858,20 +865,19 @@ const rejectProduct = async (product: ProductToModerate) => {
   )
 }
 
-// Actions pour les réservations
 const resolveReservation = async (reservation: FlaggedReservation) => {
   showConfirmModal(
     'success',
     'Résoudre le signalement',
-    `Êtes-vous sûr de vouloir marquer le signalement de "${reservation.product_name}" comme résolu ?`,
+    `Marquer le signalement pour ${reservation.product_name} comme résolu ?`,
     async () => {
       try {
         const response = await fetch(`http://localhost:8000/api/admin/reservations/${reservation.id}/resolve`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'Accept': 'application/json',
-            'Authorization': `Bearer ${localStorage.getItem('auth_token')}`
+            Accept: 'application/json',
+            Authorization: `Bearer ${localStorage.getItem('auth_token')}`
           }
         })
 
@@ -883,12 +889,12 @@ const resolveReservation = async (reservation: FlaggedReservation) => {
 
         if (data.success) {
           flaggedReservations.value = flaggedReservations.value.filter(r => r.id !== reservation.id)
-          showNotification('success', 'Signalement résolu', 'Signalement marqué comme résolu.')
+          stats.value.totalReservations--
+          showNotification('success', 'Signalement résolu', `${reservation.product_name} a été marqué comme résolu.`)
         } else {
           throw new Error(data.message || 'Erreur lors de la résolution')
         }
       } catch (error) {
-        // console.error('Erreur:', error)
         showNotification('error', 'Erreur de résolution', `Impossible de résoudre le signalement. ${error instanceof Error ? error.message : 'Erreur inconnue'}`)
       }
     },
@@ -897,28 +903,22 @@ const resolveReservation = async (reservation: FlaggedReservation) => {
   )
 }
 
-const viewReservationDetails = (reservation: FlaggedReservation) => {
-  const details = `Produit: ${reservation.product_name || 'N/A'}
-Client: ${reservation.customer_name || 'N/A'}
-Commerçant: ${reservation.merchant_name || 'N/A'}
-Montant: ${reservation.total_price ? formatPrice(reservation.total_price) : '0'} F CFA
-Motif: ${reservation.flag_reason || 'Non spécifié'}
-Date: ${reservation.created_at ? formatDate(reservation.created_at) : 'N/A'}`
-
+const dismissReservation = async (reservation: FlaggedReservation) => {
   showConfirmModal(
-    'success',
-    'Détails du signalement',
-    details,
-    () => {}, // Pas d'action à confirmer, juste pour afficher les infos
-    'Fermer',
-    ''
+    'warning',
+    'Ignorer le signalement',
+    `Ignorer le signalement concernant ${reservation.product_name} ?`,
+    async () => {
+      flaggedReservations.value = flaggedReservations.value.filter(r => r.id !== reservation.id)
+      stats.value.totalReservations--
+      showNotification('info', 'Signalement ignoré', `${reservation.product_name} a été retiré de la liste des signalements.`)
+    },
+    'Ignorer',
+    'Annuler'
   )
 }
 
-onMounted(() => {
-  // console.log('🚀 Composant MerchantsView monté')
-  // console.log('📍 URL actuelle:', window.location.href)
-  // console.log('🔑 Token localStorage:', localStorage.getItem('auth_token'))
-  loadModerationData()
+onMounted(async () => {
+  await loadModerationData()
 })
 </script>

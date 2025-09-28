@@ -2,393 +2,254 @@
   <DashboardLayout
     :sidebar="sidebar"
     :header="header"
-    class="bg-gray-50"
+    class="bg-gradient-to-br from-surface-light via-surface-light to-primary-50 dark:from-surface-dark dark:via-surface-darker dark:to-primary-950"
   >
-    <div class="max-w-full sm:max-w-7xl mx-auto py-6 px-3 sm:px-4 lg:px-6">
-      <!-- En-tête -->
-      <div class="bg-white shadow rounded p-6 mt-4">
-        <div class="flex items-center justify-between">
-          <div>
-            <h1 class="text-xl font-semibold text-gray-900">Gestion des Utilisateurs</h1>
-            <p class="mt-1 text-sm text-gray-500">Gérez les consommateurs et commerçants de la plateforme</p>
-          </div>
-          <div class="flex items-center space-y-2 sm:space-x-3">
-            <button
-              class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-3 rounded flex items-center"
-              @click="refreshData"
-            >
-              <svg
-                class="h-4 w-4 mr-2"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
-                />
-              </svg>
-              Actualiser
-            </button>
-          </div>
-        </div>
-      </div>
+    <div class="mx-auto w-full max-w-7xl space-y-8 px-3 py-6 sm:px-6 sm:py-8">
+      <DashboardHeader
+        data-testid="users-header"
+        eyebrow="Administration"
+        title="Gestion des utilisateurs"
+        subtitle="Gérez les consommateurs et commerçants de la plateforme"
+      >
+        <template #actions>
+          <Button
+            data-testid="users-refresh"
+            variant="secondary"
+            size="lg"
+            class="gap-2"
+            :loading="loading"
+            @click="refreshData"
+          >
+            <ArrowPathIcon class="h-5 w-5" />
+            Actualiser
+          </Button>
+        </template>
+      </DashboardHeader>
 
-      <!-- Statistiques utilisateurs -->
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6 mt-4">
-        <div class="bg-white overflow-hidden sm:block shadow rounded">
-          <div class="p-6">
-            <div class="flex items-center">
-              <div class="flex-shrink-0">
-                <svg
-                  class="h-8 w-8 text-green-600"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"
-                  />
-                </svg>
-              </div>
-              <div class="ml-5 w-none flex-1">
-                <dl>
-                  <dt class="text-sm font-medium text-gray-500 truncate">Total Utilisateurs</dt>
-                  <dd class="text-lg font-medium text-gray-900">{{ stats.totalUsers }}</dd>
-                </dl>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="bg-white overflow-hidden sm:block shadow rounded">
-          <div class="p-6">
-            <div class="flex items-center">
-              <div class="flex-shrink-0">
-                <svg
-                  class="h-8 w-8 text-info"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-                  />
-                </svg>
-              </div>
-              <div class="ml-5 w-none flex-1">
-                <dl>
-                  <dt class="text-sm font-medium text-gray-500 truncate">Consommateurs</dt>
-                  <dd class="text-lg font-medium text-gray-900">{{ stats.consumers }}</dd>
-                </dl>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="bg-white overflow-hidden sm:block shadow rounded">
-          <div class="p-6">
-            <div class="flex items-center">
-              <div class="flex-shrink-0">
-                <svg
-                  class="h-8 w-8 text-blue-600"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
-                  />
-                </svg>
-              </div>
-              <div class="ml-5 w-none flex-1">
-                <dl>
-                  <dt class="text-sm font-medium text-gray-500 truncate">Commerçants</dt>
-                  <dd class="text-lg font-medium text-gray-900">{{ stats.merchants }}</dd>
-                </dl>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="bg-white overflow-hidden sm:block shadow rounded">
-          <div class="p-6">
-            <div class="flex items-center">
-              <div class="flex-shrink-0">
-                <svg
-                  class="h-8 w-8 text-red-600"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728L5.636 5.636m12.728 12.728L5.636 5.636"
-                  />
-                </svg>
-              </div>
-              <div class="ml-5 w-none flex-1">
-                <dl>
-                  <dt class="text-sm font-medium text-gray-500 truncate">Comptes Suspendus</dt>
-                  <dd class="text-lg font-medium text-gray-900">{{ stats.suspended }}</dd>
-                </dl>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Filtres et recherche -->
-      <div class="bg-white shadow rounded p-6 mt-4">
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
-          <div>
-            <label class="block text-sm font-medium text-gray-800 mt-2">Recherche</label>
-            <input
-              v-model="filters.search"
-              type="text"
-              placeholder="Nom, email, téléphone..."
-              class="w-full border border-gray-300 rounded px-3 py-3 focus:ring-green-500 focus:border-blue-500"
-            >
-          </div>
-          <div>
-            <label class="block text-sm font-medium text-gray-800 mt-2">Rôle</label>
-            <select
-              v-model="filters.role"
-              class="w-full border border-gray-300 rounded px-3 py-3 focus:ring-green-500 focus:border-blue-500"
-            >
-              <option value="">Tous les rôles</option>
-              <option value="consumer">Consommateur</option>
-              <option value="merchant">Commerçant</option>
-              <option value="admin">Administrateur</option>
-            </select>
-          </div>
-          <div>
-            <label class="block text-sm font-medium text-gray-800 mt-2">Statut</label>
-            <select
-              v-model="filters.status"
-              class="w-full border border-gray-300 rounded px-3 py-3 focus:ring-green-500 focus:border-blue-500"
-            >
-              <option value="">Tous les statuts</option>
-              <option value="active">Actif</option>
-              <option value="suspended">Suspendu</option>
-              <option value="pending">En attente</option>
-            </select>
-          </div>
-          <div class="flex items-end">
-            <button
-              class="w-full bg-blue-600 hover:bg-blue-700 text-white px-3 py-3 rounded"
-              @click="applyFilters"
-            >
-              Filtrer
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <!-- Liste des utilisateurs -->
-      <div class="bg-white shadow overflow-hidden sm:block rounded">
-        <div class="px-4 py-4 border-b border-gray-200">
-          <h3 class="text-lg font-medium text-gray-900">Liste des Utilisateurs</h3>
-        </div>
-
-        <div class="overflow-x-auto">
-          <table class="min-w-full divide-y divide-neutral-200">
-            <thead class="bg-gray-50">
-              <tr>
-                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Utilisateur
-                </th>
-                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Rôle
-                </th>
-                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Statut
-                </th>
-                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Inscription
-                </th>
-                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Dernière Activité
-                </th>
-                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Actions
-                </th>
-              </tr>
-            </thead>
-            <tbody class="bg-white divide-y divide-neutral-200">
-              <tr v-for="user in paginatedUsers" :key="user.id">
-                <td class="px-4 py-4 whitespace-nowrap">
-                  <div class="flex items-center">
-                    <div class="h-8 w-8 flex-shrink-0">
-                      <img class="h-8 w-8 rounded-full" :src="user.avatar" :alt="user.name">
-                    </div>
-                    <div class="ml-6">
-                      <div class="text-sm font-medium text-gray-900">{{ user.name }}</div>
-                      <div class="text-sm text-gray-500">{{ user.email }}</div>
-                      <div class="text-sm text-gray-400">{{ user.phone }}</div>
-                    </div>
-                  </div>
-                </td>
-                <td class="px-4 py-4 whitespace-nowrap">
-                  <span
-                    :class="{
-                      'bg-green-100 text-green-800': user.role === 'consumer',
-                      'bg-yellow-100 text-yellow-800': user.role === 'merchant',
-                      'bg-blue-100 text-blue-800': user.role === 'admin'
-                    }"
-                    class="px-3 inline-flex text-xs leading-5 font-semibold rounded-full"
-                  >
-                    {{ getRoleLabel(user.role) }}
-                  </span>
-                </td>
-                <td class="px-4 py-4 whitespace-nowrap">
-                  <span
-                    :class="{
-                      'bg-green-100 text-green-800': user.status === 'active',
-                      'bg-red-100 text-red-800': user.status === 'suspended',
-                      'bg-yellow-100 text-yellow-800': user.status === 'pending'
-                    }"
-                    class="px-3 inline-flex text-xs leading-5 font-semibold rounded-full"
-                  >
-                    {{ getStatusLabel(user.status) }}
-                  </span>
-                </td>
-                <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-500">
-                  {{ formatDate(user.created_at) }}
-                </td>
-                <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-500">
-                  {{ formatDate(user.last_activity) }}
-                </td>
-                <td class="px-4 py-4 whitespace-nowrap text-sm font-medium space-y-4 sm:space-x-2">
-                  <button
-                    class="text-green-600 hover:text-blue-900"
-                    @click="viewUser(user)"
-                  >
-                    Voir
-                  </button>
-                  <button
-                    v-if="user.status !== 'suspended'"
-                    class="text-red-600 hover:text-red-900"
-                    @click="suspendUser(user)"
-                  >
-                    Suspendre
-                  </button>
-                  <button
-                    v-else
-                    class="text-green-600 hover:text-blue-900"
-                    @click="unsuspendUser(user)"
-                  >
-                    Réactiver
-                  </button>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-
-        <!-- Pagination -->
-        <div class="bg-white px-3 py-3 flex items-center justify-between border-t border-gray-200 sm:px-4">
-          <div class="flex-1 flex justify-between sm:hidden sm:block">
-            <button
-              :disabled="currentPage === 1"
-              class="relative inline-flex items-center px-3 py-3 border border-gray-300 text-sm font-medium rounded text-gray-800 bg-white hover:bg-gray-50 disabled:opacity-50"
-              @click="previousPage"
-            >
-              Précédent
-            </button>
-            <button
-              :disabled="currentPage === totalPages"
-              class="ml-4 relative inline-flex items-center px-3 py-3 border border-gray-300 text-sm font-medium rounded text-gray-800 bg-white hover:bg-gray-50 disabled:opacity-50"
-              @click="nextPage"
-            >
-              Suivant
-            </button>
-          </div>
-          <div class="hidden sm:block sm:flex-1 sm:flex sm:items-center sm:justify-between">
-            <div>
-              <p class="text-sm text-gray-800">
-                Affichage de <span class="font-medium">{{ startItem }}</span> à <span class="font-medium">{{ endItem }}</span> sur <span class="font-medium">{{ totalUsers }}</span> utilisateurs
-              </p>
-            </div>
-            <div>
-              <nav class="relative z-0 inline-flex rounded shadow-sm -space-x-px">
-                <button
-                  :disabled="currentPage === 1"
-                  class="relative inline-flex items-center px-3 py-3 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50"
-                  @click="previousPage"
-                >
-                  Précédent
-                </button>
-                <button
-                  v-for="page in displayPages"
-                  :key="page"
-                  :class="{
-                    'bg-green-50 border-blue-500 text-green-600': page === currentPage,
-                    'bg-white border-gray-300 text-gray-500 hover:bg-gray-50': page !== currentPage
-                  }"
-                  class="relative inline-flex items-center px-3 py-3 border text-sm font-medium"
-                  @click="goToPage(page)"
-                >
-                  {{ page }}
-                </button>
-                <button
-                  :disabled="currentPage === totalPages"
-                  class="relative inline-flex items-center px-3 py-3 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50"
-                  @click="nextPage"
-                >
-                  Suivant
-                </button>
-              </nav>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Modal de confirmation -->
-      <ConfirmModal
-        :is-open="confirmModal.isOpen"
-        :type="confirmModal.type"
-        :title="confirmModal.title"
-        :message="confirmModal.message"
-        :confirm-text="confirmModal.confirmText"
-        :cancel-text="confirmModal.cancelText"
-        @confirm="confirmModal.onConfirm"
-        @cancel="closeConfirmModal"
-      />
-
-      <!-- Notifications toast -->
-      <div class="fixed top-4 right-4 z-[110] space-y-4">
-        <NotificationToast
-          v-for="notification in notifications"
-          :key="notification.id"
-          :type="notification.type"
-          :title="notification.title"
-          :message="notification.message"
-          @close="removeNotification(notification.id)"
+      <StatCardGrid
+        data-testid="users-stats-grid"
+        :columns="'grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4'"
+      >
+        <StatCard
+          title="Total utilisateurs"
+          :value="formatNumber(stats.totalUsers)"
+          description="Profils actifs sur la plateforme"
+          :icon="UserGroupIcon"
+          accent="primary"
         />
-      </div>
+        <StatCard
+          title="Consommateurs"
+          :value="formatNumber(stats.consumers)"
+          description="Utilisateurs côté client"
+          :icon="UserCircleIcon"
+          accent="success"
+        />
+        <StatCard
+          title="Commerçants"
+          :value="formatNumber(stats.merchants)"
+          description="Boutiques référencées"
+          :icon="BuildingStorefrontIcon"
+          accent="info"
+        />
+        <StatCard
+          title="Comptes suspendus"
+          :value="formatNumber(stats.suspended)"
+          description="En attente d\'action"
+          :icon="ShieldExclamationIcon"
+          accent="warning"
+        />
+      </StatCardGrid>
+
+      <DataTableCard
+        data-testid="users-table"
+        title="Liste des utilisateurs"
+        description="Suivez les comptes actifs et intervenez rapidement en cas de problème"
+        :columns="userTableColumns"
+        :rows="paginatedUsers"
+        :loading="loading"
+        loading-text="Chargement des utilisateurs..."
+        empty-title="Aucun utilisateur"
+        empty-description="Aucun compte n\'a encore été enregistré."
+        variant="glass"
+      >
+        <template #filters>
+          <DashboardFilterBar
+            data-testid="users-filters"
+            v-model:search="searchQuery"
+            :filters="dashboardFilters"
+            placeholder="Rechercher un utilisateur..."
+            @update:filters="handleFiltersUpdate"
+            @search="applyFilters"
+          >
+            <template #actions>
+              <Button
+                variant="ghost"
+                size="sm"
+                class="whitespace-nowrap text-neutral-600 hover:text-primary-600 dark:text-neutral-300"
+                @click="resetFilters"
+              >
+                Réinitialiser
+              </Button>
+              <Button
+                variant="secondary"
+                size="sm"
+                class="gap-2 whitespace-nowrap"
+                :loading="loading"
+                @click="refreshData"
+              >
+                <ArrowPathIcon class="h-4 w-4" />
+                Actualiser
+              </Button>
+            </template>
+          </DashboardFilterBar>
+        </template>
+
+        <template #cell-profile="{ row }">
+          <div class="flex items-center gap-4">
+            <div class="flex h-12 w-12 items-center justify-center overflow-hidden rounded-2xl border border-primary-500/30 bg-primary-500/10">
+              <img
+                :src="row.avatar"
+                :alt="row.name"
+                class="h-full w-full object-cover"
+                loading="lazy"
+              >
+            </div>
+            <div class="space-y-1">
+              <p class="text-sm font-semibold text-neutral-900 dark:text-neutral-50">{{ row.name }}</p>
+              <p class="text-sm text-neutral-500 dark:text-neutral-400">{{ row.email }}</p>
+              <p class="text-xs text-neutral-400 dark:text-neutral-500">{{ row.phone }}</p>
+            </div>
+          </div>
+        </template>
+
+        <template #cell-role="{ row }">
+          <Badge
+            :variant="getRoleBadgeVariant(row.role)"
+            size="sm"
+            class="uppercase tracking-wide"
+          >
+            {{ getRoleLabel(row.role) }}
+          </Badge>
+        </template>
+
+        <template #cell-status="{ row }">
+          <Badge
+            :variant="getStatusBadgeVariant(row.status)"
+            size="sm"
+            class="uppercase tracking-wide"
+          >
+            {{ getStatusLabel(row.status) }}
+          </Badge>
+        </template>
+
+        <template #cell-created_at="{ value }">
+          <span class="text-sm text-neutral-600 dark:text-neutral-300">{{ formatDate(value) }}</span>
+        </template>
+
+        <template #cell-last_activity="{ value }">
+          <span class="text-sm text-neutral-600 dark:text-neutral-300">{{ formatDate(value) }}</span>
+        </template>
+
+        <template #cell-actions="{ row }">
+          <div class="flex items-center justify-end gap-2">
+            <Button
+              variant="ghost"
+              size="sm"
+              class="text-primary-600 hover:text-primary-700 dark:text-primary-300"
+              :aria-label="`Voir ${row.name}`"
+              @click="viewUser(row)"
+            >
+              <EyeIcon class="h-4 w-4" />
+              <span class="sr-only">Voir</span>
+            </Button>
+            <Button
+              v-if="row.status !== 'suspended'"
+              variant="ghost"
+              size="sm"
+              class="text-accent-red hover:text-accent-red/80"
+              :aria-label="`Suspendre ${row.name}`"
+              @click="suspendUser(row)"
+            >
+              <PauseCircleIcon class="h-4 w-4" />
+              <span class="sr-only">Suspendre</span>
+            </Button>
+            <Button
+              v-else
+              variant="ghost"
+              size="sm"
+              class="text-primary-600 hover:text-primary-700 dark:text-primary-300"
+              :aria-label="`Réactiver ${row.name}`"
+              @click="unsuspendUser(row)"
+            >
+              <PlayCircleIcon class="h-4 w-4" />
+              <span class="sr-only">Réactiver</span>
+            </Button>
+          </div>
+        </template>
+
+        <template #footer>
+          <Pagination
+            data-testid="users-pagination"
+            :current-page="currentPage"
+            :total-pages="totalPages"
+            :total="totalUsers"
+            :page-size="pageSize"
+            @page-change="handlePageChange"
+          />
+        </template>
+      </DataTableCard>
+    </div>
+
+    <ConfirmModal
+      :is-open="confirmModal.isOpen"
+      :type="confirmModal.type"
+      :title="confirmModal.title"
+      :message="confirmModal.message"
+      :confirm-text="confirmModal.confirmText"
+      :cancel-text="confirmModal.cancelText"
+      @confirm="confirmModal.onConfirm"
+      @cancel="closeConfirmModal"
+    />
+
+    <div class="fixed top-4 right-4 z-[110] space-y-3">
+      <NotificationToast
+        v-for="notification in notifications"
+        :key="notification.id"
+        :type="notification.type"
+        :title="notification.title"
+        :message="notification.message"
+        @close="removeNotification(notification.id)"
+      />
     </div>
   </DashboardLayout>
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, computed, onMounted } from 'vue'
+import { ref, reactive, computed, onMounted, watch } from 'vue'
+import {
+  ArrowPathIcon,
+  UserGroupIcon,
+  UserCircleIcon,
+  BuildingStorefrontIcon,
+  ShieldExclamationIcon,
+  EyeIcon,
+  PauseCircleIcon,
+  PlayCircleIcon
+} from '@heroicons/vue/24/outline'
 import ConfirmModal from '@/components/ui/ConfirmModal.vue'
 import NotificationToast from '@/components/ui/NotificationToast.vue'
 import DashboardLayout from '@/components/ui/DashboardLayout.vue'
+import { Button, Badge, Pagination } from '@/components/ui/2025'
+import {
+  DashboardHeader,
+  StatCard,
+  StatCardGrid,
+  DashboardFilterBar,
+  DataTableCard
+} from '@/components/dashboard/2025'
+import type { DashboardFilter } from '@/components/dashboard/2025/DashboardFilterBar.vue'
+import type { DataTableColumn } from '@/components/dashboard/2025/DataTableCard.vue'
+import type { BadgeVariant } from '@/components/ui/2025/Badge.vue'
 import { useDashboardLayout } from '@/composables/useDashboardLayout'
 
 interface User {
@@ -437,10 +298,8 @@ const stats = ref<UserStats>({
 const users = ref<User[]>([])
 const loading = ref(false)
 
-// Notification system
 const notifications = ref<Notification[]>([])
 
-// Confirm modal
 const confirmModal = reactive<ConfirmModalData>({
   isOpen: false,
   type: 'warning',
@@ -457,15 +316,46 @@ const filters = reactive({
   status: ''
 })
 
+const searchQuery = ref('')
+
+const dashboardFilters = ref<DashboardFilter[]>([
+  {
+    id: 'role',
+    label: 'Rôle',
+    value: '',
+    options: [
+      { label: 'Tous les rôles', value: '' },
+      { label: 'Consommateur', value: 'consumer' },
+      { label: 'Commerçant', value: 'merchant' },
+      { label: 'Administrateur', value: 'admin' }
+    ]
+  },
+  {
+    id: 'status',
+    label: 'Statut',
+    value: '',
+    options: [
+      { label: 'Tous les statuts', value: '' },
+      { label: 'Actif', value: 'active' },
+      { label: 'Suspendu', value: 'suspended' },
+      { label: 'En attente', value: 'pending' }
+    ]
+  }
+])
+
+const userTableColumns: DataTableColumn[] = [
+  { key: 'profile', title: 'Utilisateur' },
+  { key: 'role', title: 'Rôle', align: 'center' },
+  { key: 'status', title: 'Statut', align: 'center' },
+  { key: 'created_at', title: 'Inscription' },
+  { key: 'last_activity', title: 'Dernière activité' },
+  { key: 'actions', title: 'Actions', align: 'right', width: '140px' }
+]
+
 const { sidebar, header } = useDashboardLayout('admin')
 
 const currentPage = ref(1)
-const itemsPerPage = 10
-
-const totalUsers = computed(() => filteredUsers.value.length)
-const totalPages = computed(() => Math.ceil(totalUsers.value / itemsPerPage))
-const startItem = computed(() => (currentPage.value - 1) * itemsPerPage + 1)
-const endItem = computed(() => Math.min(currentPage.value * itemsPerPage, totalUsers.value))
+const pageSize = ref(10)
 
 const filteredUsers = computed(() => {
   return users.value.filter(user => {
@@ -481,23 +371,112 @@ const filteredUsers = computed(() => {
   })
 })
 
+const totalUsers = computed(() => filteredUsers.value.length)
+const totalPages = computed(() => Math.max(1, Math.ceil(totalUsers.value / pageSize.value) || 1))
+
 const paginatedUsers = computed(() => {
-  const start = (currentPage.value - 1) * itemsPerPage
-  const end = start + itemsPerPage
+  const start = (currentPage.value - 1) * pageSize.value
+  const end = start + pageSize.value
   return filteredUsers.value.slice(start, end)
 })
 
-const displayPages = computed(() => {
-  const pages = []
-  const maxDisplayPages = 5
-  const startPage = Math.max(1, currentPage.value - Math.floor(maxDisplayPages / 2))
-  const endPage = Math.min(totalPages.value, startPage + maxDisplayPages - 1)
+const numberFormatter = new Intl.NumberFormat('fr-FR')
+const formatNumber = (value: number) => numberFormatter.format(value)
 
-  for (let i = startPage; i <= endPage; i++) {
-    pages.push(i)
+const roleBadgeVariants: Record<User['role'], BadgeVariant> = {
+  consumer: 'primary',
+  merchant: 'info',
+  admin: 'secondary'
+}
+
+const statusBadgeVariants: Record<User['status'], BadgeVariant> = {
+  active: 'success',
+  suspended: 'error',
+  pending: 'warning'
+}
+
+const getRoleBadgeVariant = (role: User['role']) => roleBadgeVariants[role] ?? 'default'
+const getStatusBadgeVariant = (status: User['status']) => statusBadgeVariants[status] ?? 'default'
+
+const getRoleLabel = (role: string): string => {
+  const labels: Record<string, string> = {
+    consumer: 'Consommateur',
+    merchant: 'Commerçant',
+    admin: 'Administrateur'
   }
+  return labels[role] || role
+}
 
-  return pages
+const getStatusLabel = (status: string): string => {
+  const labels: Record<string, string> = {
+    active: 'Actif',
+    suspended: 'Suspendu',
+    pending: 'En attente'
+  }
+  return labels[status] || status
+}
+
+const formatDate = (dateString?: string | null): string => {
+  if (!dateString) {
+    return '—'
+  }
+  const date = new Date(dateString)
+  if (Number.isNaN(date.getTime())) {
+    return '—'
+  }
+  return date.toLocaleDateString('fr-FR', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit'
+  })
+}
+
+const syncFilters = (filtersList: DashboardFilter[]) => {
+  const role = filtersList.find(filter => filter.id === 'role')?.value ?? ''
+  const status = filtersList.find(filter => filter.id === 'status')?.value ?? ''
+
+  filters.role = role
+  filters.status = status
+  applyFilters()
+}
+
+const handleFiltersUpdate = (updated: DashboardFilter[]) => {
+  dashboardFilters.value = updated
+  syncFilters(updated)
+}
+
+const resetFilters = () => {
+  searchQuery.value = ''
+  dashboardFilters.value = dashboardFilters.value.map(filter => ({
+    ...filter,
+    value: ''
+  }))
+  syncFilters(dashboardFilters.value)
+}
+
+const applyFilters = () => {
+  currentPage.value = 1
+}
+
+const handlePageChange = (page: number) => {
+  currentPage.value = Math.min(Math.max(page, 1), totalPages.value)
+}
+
+watch(searchQuery, value => {
+  filters.search = value
+  applyFilters()
+})
+
+watch(filteredUsers, () => {
+  if (totalUsers.value === 0) {
+    currentPage.value = 1
+    return
+  }
+  if (currentPage.value > totalPages.value) {
+    currentPage.value = totalPages.value
+  }
 })
 
 const loadUsers = async () => {
@@ -505,8 +484,8 @@ const loadUsers = async () => {
   try {
     const response = await fetch('http://localhost:8000/api/admin/users', {
       headers: {
-        'Accept': 'application/json',
-        'Authorization': `Bearer ${localStorage.getItem('auth_token')}`
+        Accept: 'application/json',
+        Authorization: `Bearer ${localStorage.getItem('auth_token')}`
       }
     })
     const data = await response.json()
@@ -518,7 +497,6 @@ const loadUsers = async () => {
       throw new Error(data.message || 'Erreur API')
     }
   } catch (error) {
-    // console.error('Erreur lors du chargement des utilisateurs:', error)
     showNotification('error', 'Erreur de chargement', 'Impossible de charger les données. Utilisation des données de démo.')
     loadDemoUsers()
   } finally {
@@ -675,36 +653,6 @@ const updateStats = () => {
   }
 }
 
-const getRoleLabel = (role: string): string => {
-  const labels: Record<string, string> = {
-    consumer: 'Consommateur',
-    merchant: 'Commerçant',
-    admin: 'Administrateur'
-  }
-  return labels[role] || role
-}
-
-const getStatusLabel = (status: string): string => {
-  const labels: Record<string, string> = {
-    active: 'Actif',
-    suspended: 'Suspendu',
-    pending: 'En attente'
-  }
-  return labels[status] || status
-}
-
-const formatDate = (dateString: string): string => {
-  const date = new Date(dateString)
-  return date.toLocaleDateString('fr-FR', {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit'
-  })
-}
-
-// Utility functions for notifications and modals
 const showNotification = (type: Notification['type'], title: string, message: string) => {
   const notification: Notification = {
     id: Date.now().toString(),
@@ -752,41 +700,14 @@ const refreshData = async () => {
   showNotification('success', 'Actualisation terminée', 'Les données ont été rechargées avec succès.')
 }
 
-const applyFilters = () => {
-  currentPage.value = 1
-  // Force re-computation of filtered users
-  // This is needed because the filters are reactive and should update automatically
-}
-
-const previousPage = () => {
-  if (currentPage.value > 1) {
-    currentPage.value--
-  }
-}
-
-const nextPage = () => {
-  if (currentPage.value < totalPages.value) {
-    currentPage.value++
-  }
-}
-
-const goToPage = (page: number) => {
-  currentPage.value = page
-}
-
 const viewUser = (user: User) => {
-  const userDetails = `Email: ${user.email}
-Téléphone: ${user.phone}
-Rôle: ${getRoleLabel(user.role)}
-Statut: ${getStatusLabel(user.status)}
-Inscription: ${formatDate(user.created_at)}
-Dernière activité: ${formatDate(user.last_activity)}`
+  const userDetails = `Email: ${user.email}\nTéléphone: ${user.phone}\nRôle: ${getRoleLabel(user.role)}\nStatut: ${getStatusLabel(user.status)}\nInscription: ${formatDate(user.created_at)}\nDernière activité: ${formatDate(user.last_activity)}`
 
   showConfirmModal(
     'success',
     `Profil de ${user.name}`,
     userDetails,
-    () => {}, // Pas d'action à confirmer, juste pour afficher les infos
+    () => {},
     'Fermer',
     ''
   )
@@ -795,7 +716,7 @@ Dernière activité: ${formatDate(user.last_activity)}`
 const suspendUser = async (user: User) => {
   showConfirmModal(
     'danger',
-    'Suspendre l\'utilisateur',
+    "Suspendre l'utilisateur",
     `Êtes-vous sûr de vouloir suspendre ${user.name} ? Cette action peut être annulée.`,
     async () => {
       try {
@@ -803,8 +724,8 @@ const suspendUser = async (user: User) => {
           method: 'PATCH',
           headers: {
             'Content-Type': 'application/json',
-            'Accept': 'application/json',
-            'Authorization': `Bearer ${localStorage.getItem('auth_token')}`
+            Accept: 'application/json',
+            Authorization: `Bearer ${localStorage.getItem('auth_token')}`
           }
         })
 
@@ -822,7 +743,6 @@ const suspendUser = async (user: User) => {
           throw new Error(data.message || 'Erreur lors de la suspension')
         }
       } catch (error) {
-        // console.error('Erreur lors de la suspension:', error)
         showNotification('error', 'Erreur de suspension', `Impossible de suspendre ${user.name}. ${error instanceof Error ? error.message : 'Erreur inconnue'}`)
       }
     },
@@ -834,7 +754,7 @@ const suspendUser = async (user: User) => {
 const unsuspendUser = async (user: User) => {
   showConfirmModal(
     'success',
-    'Réactiver l\'utilisateur',
+    "Réactiver l'utilisateur",
     `Êtes-vous sûr de vouloir réactiver ${user.name} ?`,
     async () => {
       try {
@@ -842,8 +762,8 @@ const unsuspendUser = async (user: User) => {
           method: 'PATCH',
           headers: {
             'Content-Type': 'application/json',
-            'Accept': 'application/json',
-            'Authorization': `Bearer ${localStorage.getItem('auth_token')}`
+            Accept: 'application/json',
+            Authorization: `Bearer ${localStorage.getItem('auth_token')}`
           }
         })
 
@@ -858,10 +778,9 @@ const unsuspendUser = async (user: User) => {
           updateStats()
           showNotification('success', 'Utilisateur réactivé', `${user.name} a été réactivé avec succès.`)
         } else {
-          throw new Error(data.message || 'Erreur lors de la réactivation')
+          throw new Error(data.message || "Erreur lors de la réactivation")
         }
       } catch (error) {
-        // console.error('Erreur lors de la réactivation:', error)
         showNotification('error', 'Erreur de réactivation', `Impossible de réactiver ${user.name}. ${error instanceof Error ? error.message : 'Erreur inconnue'}`)
       }
     },
@@ -870,7 +789,8 @@ const unsuspendUser = async (user: User) => {
   )
 }
 
-onMounted(() => {
-  loadUsers()
+onMounted(async () => {
+  await loadUsers()
+  syncFilters(dashboardFilters.value)
 })
 </script>

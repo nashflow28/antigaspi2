@@ -196,6 +196,58 @@ test.describe('Interface Admin - Tests E2E', () => {
     }
   });
 
+  test('Users management view exposes the 2025 dashboard patterns', async ({ page }) => {
+    const usersNavLink = page.locator('a[href="/admin/users"], a:has-text("Utilisateurs")').first();
+
+    if (await usersNavLink.count() === 0) {
+      test.skip('Users navigation not available in this environment');
+      return;
+    }
+
+    await usersNavLink.click();
+    await expect(page).toHaveURL(/.*\/admin\/users$/);
+
+    await expect(page.locator('[data-testid="users-header"]')).toBeVisible();
+    await expect(page.locator('[data-testid="users-stats-grid"]')).toBeVisible();
+    await expect(page.locator('[data-testid="users-filters"]')).toBeVisible();
+    await expect(page.locator('[data-testid="users-table"]')).toBeVisible();
+    await expect(page.locator('[data-testid="users-pagination"]')).toBeVisible();
+
+    const tableRows = page.locator('[data-testid="users-table"] table tbody tr');
+    expect(await tableRows.count()).toBeGreaterThan(0);
+  });
+
+  test('Merchants moderation view exposes tabs and responsive cards', async ({ page }) => {
+    const merchantsNavLink = page.locator('a[href="/admin/merchants"], a:has-text("Commerçants")').first();
+
+    if (await merchantsNavLink.count() === 0) {
+      test.skip('Merchants navigation not available in this environment');
+      return;
+    }
+
+    await merchantsNavLink.click();
+    await expect(page).toHaveURL(/.*\/admin\/merchants$/);
+
+    await expect(page.locator('[data-testid="merchants-header"]')).toBeVisible();
+    await expect(page.locator('[data-testid="merchants-stats-grid"]')).toBeVisible();
+    await expect(page.locator('[data-testid="merchants-tabs"]')).toBeVisible();
+
+    const tabButtons = page.locator('[data-testid="merchants-tabs"] button');
+    await expect(tabButtons.first()).toBeVisible();
+
+    await expect(page.locator('[data-testid="pending-merchants-section"]')).toBeVisible();
+
+    if (await tabButtons.count() > 1) {
+      await tabButtons.nth(1).click();
+      await expect(page.locator('[data-testid="products-moderation-section"]')).toBeVisible();
+    }
+
+    if (await tabButtons.count() > 2) {
+      await tabButtons.nth(2).click();
+      await expect(page.locator('[data-testid="reservations-moderation-section"]')).toBeVisible();
+    }
+  });
+
   test('Data refresh should work', async ({ page }) => {
     // Look for refresh button
     const refreshButton = page.locator('button').filter({ hasText: /actualiser|refresh|rafraîchir/i }).first();
