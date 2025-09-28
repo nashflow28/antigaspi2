@@ -2,380 +2,346 @@
   <DashboardLayout
     :sidebar="sidebar"
     :header="header"
-    class="bg-gradient-to-br from-purple-50 to-indigo-50"
+    class="bg-gradient-to-br from-surface-light via-surface-light to-primary-50 dark:from-surface-dark dark:via-surface-darker dark:to-primary-950"
   >
-    <div class="p-6">
+    <div class="mx-auto w-full max-w-7xl space-y-8 px-3 py-6 sm:px-6 sm:py-8">
       <!-- Header -->
-      <div class="mt-4 sm:mb-3xl">
-        <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3 sm:gap-6">
-          <div>
-            <h1 class="text-xl lg:text-3xl font-semibold text-gray-900 mt-2">
-              Tableau de bord Administrateur
-            </h1>
-            <p class="text-gray-700 text-lg">
-              Supervision globale de la plateforme Antigaspi
-            </p>
-          </div>
-
-          <div class="flex flex-col sm:flex-row gap-3">
-            <select v-model="selectedPeriod" class="input">
-              <option value="today">Aujourd'hui</option>
-              <option value="week">Cette semaine</option>
-              <option value="month">Ce mois</option>
-              <option value="year">Cette année</option>
-            </select>
-
-            <Button
-              variant="primary"
-              class="glow-effect"
-              :disabled="isLoading"
-              :left-icon="ArrowPathIcon"
-              @click="refreshData"
-            >
-              Actualiser
-            </Button>
-          </div>
+      <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <h1 class="text-2xl font-semibold text-neutral-900 dark:text-neutral-50">
+            Tableau de bord administrateur
+          </h1>
+          <p class="text-neutral-600 dark:text-neutral-300">
+            Supervision globale de la plateforme AntiGaspi
+          </p>
         </div>
-
-        <!-- Key Metrics -->
-        <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6 mt-8">
-          <Card class="bg-gradient-to-r from-blue-500 to-blue-600 text-white">
-            <div class="flex items-center justify-between">
-              <div>
-                <p class="text-blue-100 text-sm font-medium">Utilisateurs Totaux</p>
-                <p class="text-xl font-semibold">{{ formatNumber(stats.totalUsers) }}</p>
-                <p class="text-blue-200 text-sm mt-1">
-                  +{{ stats.newUsersThisMonth }} ce mois
-                </p>
-              </div>
-              <div class="p-3 bg-white/20 rounded">
-                <UsersIcon class="h-6 w-6" />
-              </div>
-            </div>
-          </Card>
-
-          <Card class="bg-gradient-to-r from-blue-500 to-blue-600 text-white">
-            <div class="flex items-center justify-between">
-              <div>
-                <p class="text-blue-100 text-sm font-medium">Commerçants Actifs</p>
-                <p class="text-xl font-semibold">{{ formatNumber(stats.activeMerchants) }}</p>
-                <p class="text-blue-200 text-sm mt-1">
-                  {{ stats.merchantGrowthRate }}% de croissance
-                </p>
-              </div>
-              <div class="p-3 bg-white/20 rounded">
-                <BuildingStorefrontIcon class="h-6 w-6" />
-              </div>
-            </div>
-          </Card>
-
-          <Card class="bg-gradient-to-r from-blue-500 to-blue-600 text-white">
-            <div class="flex items-center justify-between">
-              <div>
-                <p class="text-secondary-100 text-sm font-medium">Produits Sauvés</p>
-                <p class="text-xl font-semibold">{{ formatNumber(stats.productsSaved) }}</p>
-                <p class="text-secondary-200 text-sm mt-1">
-                  {{ formatNumber(stats.kgFoodSaved) }} kg sauvés
-                </p>
-              </div>
-              <div class="p-3 bg-white/20 rounded">
-                <ShoppingBagIcon class="h-6 w-6" />
-              </div>
-            </div>
-          </Card>
-
-          <Card class="bg-gradient-to-r from-orange-500 to-orange-600 text-white">
-            <div class="flex items-center justify-between">
-              <div>
-                <p class="text-orange-100 text-sm font-medium">Chiffre d'affaires</p>
-                <p class="text-xl font-semibold">{{ formatCurrency(stats.totalRevenue) }}</p>
-                <p class="text-orange-200 text-sm mt-1">
-                  +{{ stats.revenueGrowth }}% vs mois dernier
-                </p>
-              </div>
-              <div class="p-3 bg-white/20 rounded">
-                <div class="text-lg font-semibold">F CFA</div>
-              </div>
-            </div>
-          </Card>
+        <div class="flex flex-col gap-3 sm:flex-row sm:items-center">
+          <Select v-model="selectedPeriod" size="sm" class="min-w-[180px]">
+            <option value="today">Aujourd'hui</option>
+            <option value="week">Cette semaine</option>
+            <option value="month">Ce mois</option>
+            <option value="year">Cette année</option>
+          </Select>
+          <Button
+            variant="primary"
+            :loading="isLoading"
+            @click="refreshData"
+          >
+            <ArrowPathIcon class="h-4 w-4" />
+            <span>Actualiser</span>
+          </Button>
         </div>
       </div>
 
+      <!-- Key Metrics -->
+      <StatCardGrid columns="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 xl:gap-6">
+        <StatCard
+          v-for="stat in statHighlights"
+          :key="stat.id"
+          :title="stat.title"
+          :value="stat.value"
+          :description="stat.description"
+          :icon="stat.icon"
+          :accent="stat.accent"
+          :trend="stat.trend"
+        />
+      </StatCardGrid>
+
       <!-- Charts and Analytics -->
-      <div class="grid grid-cols-1 xl:grid-cols-2 gap-3 sm:gap-6 mt-4 sm:mb-3xl">
-        <!-- Revenue Chart -->
+      <div class="grid grid-cols-1 gap-6 xl:grid-cols-2">
         <Card>
-          <div class="flex items-center justify-between mt-4">
-            <h3 class="text-xl font-semibold text-gray-900">Évolution du chiffre d'affaires</h3>
-            <select v-model="revenueChartPeriod" class="input text-sm">
-              <option value="7d">7 derniers jours</option>
-              <option value="30d">30 derniers jours</option>
-              <option value="90d">90 derniers jours</option>
-            </select>
-          </div>
-          <div class="h-9xl">
-            <canvas ref="revenueChartCanvas" class="w-full h-full" />
+          <template #header>
+            <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <h3 class="text-xl font-semibold text-neutral-900 dark:text-neutral-50">
+                  Évolution du chiffre d'affaires
+                </h3>
+                <p class="text-sm text-neutral-500 dark:text-neutral-400">
+                  Revenus cumulés sur la période sélectionnée
+                </p>
+              </div>
+              <Select v-model="revenueChartPeriod" size="sm" class="min-w-[150px]">
+                <option value="7d">7 derniers jours</option>
+                <option value="30d">30 derniers jours</option>
+                <option value="90d">90 derniers jours</option>
+              </Select>
+            </div>
+          </template>
+          <div class="h-80">
+            <canvas ref="revenueChartCanvas" class="h-full w-full" />
           </div>
         </Card>
 
-        <!-- User Growth Chart -->
         <Card>
-          <div class="flex items-center justify-between mt-4">
-            <h3 class="text-xl font-semibold text-gray-900">Croissance des utilisateurs</h3>
-            <div class="flex gap-2">
-              <span class="px-3 py-3 bg-blue-100 text-blue-900 rounded-full text-sm">
-                Consommateurs
-              </span>
-              <span class="px-3 py-3 bg-blue-100 text-blue-900 rounded-full text-sm">
-                Commerçants
-              </span>
+          <template #header>
+            <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <h3 class="text-xl font-semibold text-neutral-900 dark:text-neutral-50">
+                  Répartition des utilisateurs
+                </h3>
+                <p class="text-sm text-neutral-500 dark:text-neutral-400">
+                  Consommateurs, commerçants et administrateurs actifs
+                </p>
+              </div>
+              <div class="flex flex-wrap gap-2">
+                <Badge variant="success" size="sm">Consommateurs</Badge>
+                <Badge variant="warning" size="sm">Commerçants</Badge>
+                <Badge variant="primary" size="sm">Administrateurs</Badge>
+              </div>
             </div>
-          </div>
-          <div class="h-9xl">
-            <canvas ref="userGrowthChartCanvas" class="w-full h-full" />
+          </template>
+          <div class="h-80">
+            <canvas ref="userGrowthChartCanvas" class="h-full w-full" />
           </div>
         </Card>
       </div>
 
       <!-- Platform Activity -->
-      <div class="grid grid-cols-1 xl:grid-cols-3 gap-3 sm:gap-6 mt-4 sm:mb-3xl">
-        <!-- Recent Activity -->
+      <div class="grid grid-cols-1 gap-6 xl:grid-cols-3">
         <Card class="xl:col-span-2">
-          <div class="flex items-center justify-between mt-4">
-            <h3 class="text-xl font-semibold text-gray-900">Activité récente</h3>
-            <button
-              class="text-blue-600 text-sm hover:transition-colors"
-              @click="viewAllActivities"
-            >
-              Voir tout
-            </button>
-          </div>
+          <template #header>
+            <div class="flex items-center justify-between">
+              <div>
+                <h3 class="text-xl font-semibold text-neutral-900 dark:text-neutral-50">
+                  Activité récente
+                </h3>
+                <p class="text-sm text-neutral-500 dark:text-neutral-400">
+                  Derniers événements sur la plateforme
+                </p>
+              </div>
+              <Button
+                variant="ghost"
+                size="sm"
+                class="text-primary-600 hover:text-primary-700 dark:text-primary-300"
+                @click="viewAllActivities"
+              >
+                Voir tout
+              </Button>
+            </div>
+          </template>
 
           <div class="space-y-4">
             <div
               v-for="activity in recentActivities"
               :key="activity.id"
-              class="flex items-center gap-3 p-4 bg-gray-50 rounded hover:transition-colors"
+              class="flex flex-col gap-4 rounded-xl border border-transparent bg-surface-light/70 p-4 transition-colors duration-200 hover:border-primary-400/30 hover:bg-primary-500/5 dark:bg-surface-dark/60"
             >
-              <div class="flex-shrink-0">
+              <div class="flex items-start gap-4">
                 <div
+                  class="flex h-10 w-10 items-center justify-center rounded-xl"
                   :class="getActivityIconClass(activity.type)"
-                  class="h-6 w-6 rounded-full flex items-center justify-center"
                 >
-                  <component :is="getActivityIcon(activity.type)" class="h-4 w-4" />
+                  <component :is="getActivityIcon(activity.type)" class="h-5 w-5" />
                 </div>
-              </div>
-
-              <div class="flex-grow min-w-none">
-                <p class="text-gray-900 font-medium">{{ activity.title }}</p>
-                <p class="text-gray-700 text-sm">{{ activity.description }}</p>
-                <p class="text-gray-400 text-xs mt-1">{{ formatTimeAgo(activity.timestamp) }}</p>
-              </div>
-
-              <div class="flex-shrink-0">
-                <span
-                  :class="getActivityStatusClass(activity.status)"
-                  class="px-3 py-3 rounded-full text-xs font-medium"
-                >
-                  {{ activity.status }}
-                </span>
+                <div class="flex-1 space-y-1">
+                  <p class="text-sm font-semibold text-neutral-900 dark:text-neutral-50">
+                    {{ activity.title }}
+                  </p>
+                  <p class="text-sm text-neutral-500 dark:text-neutral-400">
+                    {{ activity.description }}
+                  </p>
+                  <p class="text-xs text-neutral-400">
+                    {{ formatTimeAgo(activity.timestamp) }} · {{ activity.user }}
+                  </p>
+                </div>
+                <Badge :variant="getActivityStatusVariant(activity.status)" size="sm">
+                  {{ formatActivityStatus(activity.status) }}
+                </Badge>
               </div>
             </div>
           </div>
         </Card>
 
-        <!-- System Health -->
-        <Card>
-          <h3 class="text-xl font-semibold text-gray-900 mt-4">État du système</h3>
-
-          <div class="space-y-4">
-            <div
-              v-for="service in systemHealth"
-              :key="service.name"
-              class="flex items-center justify-between p-3 bg-gray-50 rounded"
-            >
-              <div class="flex items-center gap-4">
-                <div
-                  :class="service.status === 'healthy' ? 'bg-blue-100' : 'bg-red-600/15'"
-                  class="h-6 w-6 rounded-full flex items-center justify-center"
-                >
-                  <component
-                    :is="service.status === 'healthy' ? CheckCircleIcon : ExclamationTriangleIcon"
-                    :class="service.status === 'healthy' ? 'text-blue-600' : 'text-red-600'"
-                    class="h-4 w-4"
-                  />
+        <div class="space-y-6">
+          <Card>
+            <template #header>
+              <h3 class="text-xl font-semibold text-neutral-900 dark:text-neutral-50">
+                État du système
+              </h3>
+            </template>
+            <div class="space-y-4">
+              <div
+                v-for="service in systemHealth"
+                :key="service.name"
+                class="flex items-center justify-between rounded-xl bg-surface-light/70 p-3 dark:bg-surface-dark/60"
+              >
+                <div class="flex items-center gap-4">
+                  <div
+                    class="flex h-10 w-10 items-center justify-center rounded-full"
+                    :class="service.status === 'healthy' ? 'bg-primary-500/10 text-primary-600' : 'bg-accent-red/10 text-accent-red'"
+                  >
+                    <component
+                      :is="service.status === 'healthy' ? CheckCircleIcon : ExclamationTriangleIcon"
+                      class="h-5 w-5"
+                    />
+                  </div>
+                  <div>
+                    <p class="text-sm font-semibold text-neutral-900 dark:text-neutral-50">
+                      {{ service.name }}
+                    </p>
+                    <p class="text-xs text-neutral-500 dark:text-neutral-400">
+                      {{ service.description }}
+                    </p>
+                  </div>
                 </div>
-                <div>
-                  <p class="font-medium text-sm">{{ service.name }}</p>
-                  <p class="text-xs text-gray-500">{{ service.description }}</p>
+                <div class="text-right text-sm text-neutral-500 dark:text-neutral-400">
+                  <p class="font-semibold text-neutral-900 dark:text-neutral-100">
+                    {{ service.uptime }}
+                  </p>
+                  <p>{{ service.responseTime }}</p>
                 </div>
               </div>
-
-              <div class="text-right">
-                <p class="text-sm font-medium">{{ service.uptime }}</p>
-                <p class="text-xs text-gray-500">{{ service.responseTime }}</p>
-              </div>
             </div>
-          </div>
+          </Card>
 
-          <!-- Quick Actions -->
-          <div class="mt-6 pt-2xl border-t border-gray-200">
-            <h4 class="font-semibold text-gray-900 mb-4">Actions rapides</h4>
-            <div class="grid grid-cols-2 gap-2">
-              <Button
-                variant="outline"
-                size="sm"
-                class="text-xs"
-                :left-icon="DocumentTextIcon"
-                @click="viewLogs"
-              >
-                Logs
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                class="text-xs"
-                :left-icon="ChartBarIcon"
-                @click="viewMetrics"
-              >
-                Métriques
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                class="text-xs"
-                :left-icon="UsersIcon"
-                @click="manageUsers"
-              >
-                Utilisateurs
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                class="text-xs"
-                :left-icon="CogIcon"
-                @click="systemSettings"
-              >
-                Paramètres
-              </Button>
-            </div>
-          </div>
-        </Card>
+          <QuickActionsCard
+            title="Actions rapides"
+            :actions="quickActions"
+            @action="handleQuickAction"
+          />
+        </div>
       </div>
 
       <!-- Performance Metrics -->
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-3 sm:gap-6 mt-4 sm:mb-3xl">
-        <!-- Environmental Impact -->
+      <div class="grid grid-cols-1 gap-6 md:grid-cols-3">
         <Card>
-          <div class="flex items-center gap-4 mt-3">
-            <div class="p-2 bg-green-100 rounded">
-              <GlobeEuropeAfricaIcon class="h-6 w-6 text-green-600" />
+          <template #header>
+            <div class="flex items-center gap-4">
+              <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-primary-500/10 text-primary-600">
+                <GlobeEuropeAfricaIcon class="h-5 w-5" />
+              </div>
+              <div>
+                <h3 class="text-lg font-semibold text-neutral-900 dark:text-neutral-50">
+                  Impact environnemental
+                </h3>
+                <p class="text-xs text-neutral-500 dark:text-neutral-400">
+                  Bilan de la semaine
+                </p>
+              </div>
             </div>
-            <h3 class="text-lg font-semibold text-gray-900">Impact Environnemental</h3>
-          </div>
-
-          <div class="space-y-4">
+          </template>
+          <dl class="space-y-4 text-sm text-neutral-600 dark:text-neutral-300">
             <div class="flex items-center justify-between">
-              <span class="text-gray-700">CO₂ économisé</span>
-              <span class="font-semibold text-green-600">{{ formatNumber(environmentalImpact.co2Saved) }} kg</span>
+              <dt>CO₂ économisé</dt>
+              <dd class="font-semibold text-primary-600 dark:text-primary-300">
+                {{ formatNumber(environmentalImpact.co2Saved) }} kg
+              </dd>
             </div>
             <div class="flex items-center justify-between">
-              <span class="text-gray-700">Eau économisée</span>
-              <span class="font-semibold text-info">{{ formatNumber(environmentalImpact.waterSaved) }} L</span>
+              <dt>Eau économisée</dt>
+              <dd class="font-semibold text-primary-600 dark:text-primary-300">
+                {{ formatNumber(environmentalImpact.waterSaved) }} L
+              </dd>
             </div>
             <div class="flex items-center justify-between">
-              <span class="text-gray-700">Déchets évités</span>
-              <span class="font-semibold text-blue-600">{{ formatNumber(environmentalImpact.wasteSaved) }} kg</span>
+              <dt>Déchets évités</dt>
+              <dd class="font-semibold text-primary-600 dark:text-primary-300">
+                {{ formatNumber(environmentalImpact.wasteSaved) }} kg
+              </dd>
             </div>
-          </div>
-
-          <div class="mt-4 p-3 bg-green-50 rounded">
-            <p class="text-green-700 text-sm font-medium">
-              🌱 Équivalent à {{ environmentalImpact.treesEquivalent }} arbres plantés
-            </p>
+          </dl>
+          <div class="mt-4 rounded-xl bg-primary-500/10 p-4 text-sm font-medium text-primary-700 dark:text-primary-300">
+            🌱 Équivalent à {{ environmentalImpact.treesEquivalent }} arbres plantés
           </div>
         </Card>
 
-        <!-- Top Merchants -->
         <Card>
-          <h3 class="text-lg font-semibold text-gray-900 mt-3">Top Commerçants</h3>
-
-          <div class="space-y-2">
+          <template #header>
+            <h3 class="text-lg font-semibold text-neutral-900 dark:text-neutral-50">
+              Top commerçants
+            </h3>
+          </template>
+          <div class="space-y-3">
             <div
               v-for="(merchant, index) in topMerchants"
               :key="merchant.id"
-              class="flex items-center gap-4 p-3 bg-gray-50 rounded"
+              class="flex items-center justify-between rounded-xl bg-surface-light/70 p-3 dark:bg-surface-dark/60"
             >
-              <div class="flex-shrink-0">
-                <div class="h-6 w-6 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center font-semibold text-sm">
+              <div class="flex items-center gap-3">
+                <span class="flex h-8 w-8 items-center justify-center rounded-full bg-primary-500/10 text-sm font-semibold text-primary-600">
                   {{ index + 1 }}
+                </span>
+                <div>
+                  <p class="text-sm font-semibold text-neutral-900 dark:text-neutral-50">
+                    {{ merchant.name }}
+                  </p>
+                  <p class="text-xs text-neutral-500 dark:text-neutral-400">
+                    {{ merchant.productsSold }} produits vendus
+                  </p>
                 </div>
               </div>
-              <div class="flex-grow min-w-none">
-                <p class="font-medium text-sm truncate">{{ merchant.name }}</p>
-                <p class="text-xs text-gray-500">{{ merchant.productsSold }} produits vendus</p>
-              </div>
-              <div class="text-right">
-                <p class="font-medium text-sm">{{ formatCurrency(merchant.revenue) }}</p>
-              </div>
+              <span class="text-sm font-semibold text-primary-600 dark:text-primary-300">
+                {{ formatCurrency(merchant.revenue) }}
+              </span>
             </div>
           </div>
         </Card>
 
-        <!-- Popular Categories -->
         <Card>
-          <h3 class="text-lg font-semibold text-gray-900 mt-3">Catégories Populaires</h3>
-
-          <div class="space-y-2">
+          <template #header>
+            <h3 class="text-lg font-semibold text-neutral-900 dark:text-neutral-50">
+              Catégories populaires
+            </h3>
+          </template>
+          <div class="space-y-3">
             <div
               v-for="category in popularCategories"
-              :key="category.id"
-              class="flex items-center justify-between"
+              :key="category.name"
+              class="flex items-center justify-between rounded-xl bg-surface-light/70 p-3 dark:bg-surface-dark/60"
             >
-              <div class="flex items-center gap-4">
-                <span class="text-xl">{{ category.icon }}</span>
-                <div>
-                  <p class="font-medium text-sm">{{ category.name }}</p>
-                  <p class="text-xs text-gray-500">{{ category.productCount }} produits</p>
-                </div>
+              <div>
+                <p class="text-sm font-semibold text-neutral-900 dark:text-neutral-50">
+                  {{ category.name }}
+                </p>
+                <p class="text-xs text-neutral-500 dark:text-neutral-400">
+                  {{ category.percentage }}% des ventes
+                </p>
               </div>
-              <div class="text-right">
-                <div class="w-12 bg-gray-200 rounded-full h-4">
-                  <div
-                    class="bg-blue-500 h-4 rounded-full"
-                    :style="{ width: `${category.percentage}%` }"
-                  />
-                </div>
-                <p class="text-xs text-gray-500 mt-1">{{ category.percentage }}%</p>
-              </div>
+              <Badge variant="secondary" size="sm">
+                {{ category.products }} produits
+              </Badge>
             </div>
           </div>
         </Card>
       </div>
 
-      <!-- Alerts and Notifications -->
-      <Card v-if="alerts.length > 0" class="mt-4 sm:mb-3xl">
-        <h3 class="text-lg font-semibold text-gray-900 mt-3">Alertes et notifications</h3>
-
-        <div class="space-y-2">
+      <!-- Alerts -->
+      <Card>
+        <template #header>
+          <div class="flex items-center justify-between">
+            <h3 class="text-xl font-semibold text-neutral-900 dark:text-neutral-50">
+              Alertes & notifications
+            </h3>
+            <Badge variant="warning" size="sm">
+              {{ alerts.length }} alertes actives
+            </Badge>
+          </div>
+        </template>
+        <div class="space-y-3">
           <div
             v-for="alert in alerts"
             :key="alert.id"
+            class="flex items-start gap-4 rounded-xl border p-4"
             :class="getAlertClass(alert.type)"
-            class="flex items-stretch sm:items-start gap-4 p-4 rounded border"
           >
             <component
               :is="getAlertIcon(alert.type)"
               :class="getAlertIconClass(alert.type)"
-              class="h-4 w-4 flex-shrink-0 mt-0.5"
+              class="h-5 w-5 flex-shrink-0"
             />
-            <div class="flex-grow">
-              <p class="font-medium">{{ alert.title }}</p>
-              <p class="text-sm opacity-80 mt-1">{{ alert.message }}</p>
-              <p class="text-xs opacity-60 mt-2">{{ formatTimeAgo(alert.timestamp) }}</p>
+            <div class="flex-1 space-y-1">
+              <p class="text-sm font-semibold text-neutral-900 dark:text-neutral-50">
+                {{ alert.title }}
+              </p>
+              <p class="text-sm text-neutral-500 dark:text-neutral-400">
+                {{ alert.message }}
+              </p>
+              <p class="text-xs text-neutral-400">
+                {{ formatTimeAgo(alert.timestamp) }}
+              </p>
             </div>
             <button
-              class="text-current opacity-60 hover:opacity-100 flex-shrink-0"
+              class="text-neutral-400 transition hover:text-neutral-600 dark:text-neutral-500 dark:hover:text-neutral-300"
               @click="dismissAlert(alert.id)"
             >
               <XMarkIcon class="h-4 w-4" />
@@ -384,7 +350,6 @@
         </div>
       </Card>
 
-      <!-- Modal for detailed info -->
       <AdminModal
         :show="modal.show"
         :title="modal.title"
@@ -400,14 +365,12 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, nextTick, watch } from 'vue'
+import { computed, nextTick, onMounted, ref, watch } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 import { formatPrice } from '@/utils/currency'
 import AdminModal from '@/components/ui/AdminModal.vue'
 import DashboardLayout from '@/components/ui/DashboardLayout.vue'
 import { useDashboardLayout } from '@/composables/useDashboardLayout'
-import Button from '@/components/ui/2025/Button.vue'
-import Card from '@/components/ui/2025/Card.vue'
 import {
   ArrowPathIcon,
   UsersIcon,
@@ -424,8 +387,13 @@ import {
   ShoppingCartIcon,
   BellIcon,
   ShieldExclamationIcon,
-  InformationCircleIcon
+  InformationCircleIcon,
+  BanknotesIcon,
+  ArrowTrendingUpIcon
 } from '@heroicons/vue/24/outline'
+import { Card, Button, Select, Badge } from '@/components/ui/2025'
+import { QuickActionsCard, StatCard, StatCardGrid } from '@/components/dashboard/2025'
+import type { BadgeVariant } from '@/components/ui/2025'
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -455,20 +423,18 @@ ChartJS.register(
   LineController
 )
 
-// Reactive data
+const authStore = useAuthStore()
+const { sidebar, header } = useDashboardLayout('admin')
+
 const selectedPeriod = ref('month')
 const revenueChartPeriod = ref('30d')
 const isLoading = ref(false)
 
-// Chart references
 const revenueChartCanvas = ref<HTMLCanvasElement | null>(null)
 const userGrowthChartCanvas = ref<HTMLCanvasElement | null>(null)
 let revenueChart: any = null
 let userGrowthChart: any = null
 
-// Store and utilities
-const authStore = useAuthStore()
-const { sidebar, header } = useDashboardLayout('admin')
 const stats = ref({
   totalUsers: 0,
   newUsersThisMonth: 0,
@@ -481,38 +447,32 @@ const stats = ref({
 })
 
 const recentActivities = ref<any[]>([])
-
 const systemHealth = ref<any[]>([])
-
 const environmentalImpact = ref({
   co2Saved: 0,
   waterSaved: 0,
   wasteSaved: 0,
   treesEquivalent: 0
 })
-
 const topMerchants = ref<any[]>([])
-
 const popularCategories = ref<any[]>([])
-
 const alerts = ref([
   {
     id: 1,
     type: 'warning',
     title: 'Limite de stockage atteinte',
-    message: 'L\'espace de stockage des images est à 85% de sa capacité.',
+    message: "L'espace de stockage des images est à 85% de sa capacité.",
     timestamp: '2024-01-15T09:30:00Z'
   },
   {
     id: 2,
     type: 'info',
     title: 'Mise à jour disponible',
-    message: 'Une nouvelle version de l\'API est disponible avec des corrections de sécurité.',
+    message: "Une nouvelle version de l'API est disponible avec des corrections de sécurité.",
     timestamp: '2024-01-14T16:20:00Z'
   }
 ])
 
-// Modal state
 const modal = ref({
   show: false,
   title: '',
@@ -523,21 +483,56 @@ const modal = ref({
   action: null as (() => void) | null
 })
 
-// Methods
-const formatNumber = (num: number): string => {
-  return new Intl.NumberFormat('fr-FR').format(num)
-}
+const formatNumber = (num: number): string => new Intl.NumberFormat('fr-FR').format(num)
+const formatCurrency = (amount: number): string => formatPrice(amount)
 
-const formatCurrency = (amount: number): string => {
-  return formatPrice(amount)
-}
+const statHighlights = computed(() => [
+  {
+    id: 'users',
+    title: 'Utilisateurs totaux',
+    value: formatNumber(stats.value.totalUsers),
+    description: `${formatNumber(stats.value.newUsersThisMonth)} nouveaux ce mois`,
+    icon: UsersIcon,
+    accent: 'primary' as const,
+    trend: {
+      value: `+${formatNumber(stats.value.newUsersThisMonth)}`,
+      label: 'sur 30 jours',
+      icon: ArrowTrendingUpIcon,
+      tone: 'positive' as const
+    }
+  },
+  {
+    id: 'merchants',
+    title: 'Commerçants actifs',
+    value: formatNumber(stats.value.activeMerchants),
+    description: `${stats.value.merchantGrowthRate}% de croissance`,
+    icon: BuildingStorefrontIcon,
+    accent: 'success' as const
+  },
+  {
+    id: 'products',
+    title: 'Produits sauvés',
+    value: formatNumber(stats.value.productsSaved),
+    description: `${formatNumber(stats.value.kgFoodSaved)} kg sauvés`,
+    icon: ShoppingBagIcon,
+    accent: 'info' as const
+  },
+  {
+    id: 'revenue',
+    title: "Chiffre d'affaires",
+    value: formatCurrency(stats.value.totalRevenue),
+    description: `+${stats.value.revenueGrowth}% vs. mois dernier`,
+    icon: BanknotesIcon,
+    accent: 'warning' as const
+  }
+])
 
 const formatTimeAgo = (timestamp: string): string => {
   const date = new Date(timestamp)
   const now = new Date()
   const diffInHours = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60))
 
-  if (diffInHours < 1) return 'Il y a moins d\'une heure'
+  if (diffInHours < 1) return "Il y a moins d'une heure"
   if (diffInHours < 24) return `Il y a ${diffInHours}h`
 
   const diffInDays = Math.floor(diffInHours / 24)
@@ -546,12 +541,12 @@ const formatTimeAgo = (timestamp: string): string => {
 
 const getActivityIconClass = (type: string): string => {
   const classes: Record<string, string> = {
-    user_registered: 'bg-blue-100 text-info',
-    merchant_joined: 'bg-green-100 text-green-600',
-    product_sold: 'bg-yellow-100 text-blue-600',
-    alert: 'bg-red-100 text-red-600'
+    user_registered: 'bg-primary-500/10 text-primary-600',
+    merchant_joined: 'bg-primary-500/10 text-primary-600',
+    product_sold: 'bg-accent-orange/15 text-accent-orange',
+    alert: 'bg-accent-red/10 text-accent-red'
   }
-  return classes[type] || 'bg-gray-100 text-gray-700'
+  return classes[type] || 'bg-neutral-200/80 text-neutral-600 dark:bg-neutral-800/80 dark:text-neutral-200'
 }
 
 const getActivityIcon = (type: string) => {
@@ -564,24 +559,34 @@ const getActivityIcon = (type: string) => {
   return icons[type] || BellIcon
 }
 
-const getActivityStatusClass = (status: string): string => {
-  const classes: Record<string, string> = {
-    success: 'bg-green-100 text-green-700',
-    completed: 'bg-blue-100 text-secondary-700',
-    warning: 'bg-yellow-100 text-yellow-700',
-    error: 'bg-red-100 text-red-700'
+const getActivityStatusVariant = (status: string): BadgeVariant => {
+  const variants: Record<string, BadgeVariant> = {
+    success: 'success',
+    completed: 'primary',
+    warning: 'warning',
+    error: 'error'
   }
-  return classes[status] || 'bg-gray-100 text-gray-800'
+  return variants[status] || 'secondary'
+}
+
+const formatActivityStatus = (status: string): string => {
+  const labels: Record<string, string> = {
+    success: 'Succès',
+    completed: 'Terminé',
+    warning: 'Attention',
+    error: 'Erreur'
+  }
+  return labels[status] || status
 }
 
 const getAlertClass = (type: string): string => {
   const classes: Record<string, string> = {
-    warning: 'bg-orange-500/10 border-orange-500/30 text-orange-500/95',
-    error: 'bg-red-600/10 border-red-600/30 text-red-600/95',
-    info: 'bg-blue-50 border-blue-200 text-gray-800',
-    success: 'bg-blue-50 border-blue-200 text-blue-800'
+    warning: 'border-accent-orange/30 bg-accent-orange/10 text-accent-orange',
+    error: 'border-accent-red/30 bg-accent-red/10 text-accent-red',
+    info: 'border-primary-400/30 bg-primary-500/10 text-primary-700 dark:text-primary-300',
+    success: 'border-primary-400/30 bg-primary-500/10 text-primary-700 dark:text-primary-300'
   }
-  return classes[type] || 'bg-gray-50 border-gray-200 text-gray-800'
+  return classes[type] || 'border-neutral-200 bg-surface-light text-neutral-700 dark:border-neutral-700 dark:bg-surface-dark dark:text-neutral-200'
 }
 
 const getAlertIcon = (type: string) => {
@@ -596,12 +601,12 @@ const getAlertIcon = (type: string) => {
 
 const getAlertIconClass = (type: string): string => {
   const classes: Record<string, string> = {
-    warning: 'text-orange-500',
-    error: 'text-red-600',
-    info: 'text-info',
-    success: 'text-blue-600'
+    warning: 'text-accent-orange',
+    error: 'text-accent-red',
+    info: 'text-primary-600 dark:text-primary-300',
+    success: 'text-primary-600 dark:text-primary-300'
   }
-  return classes[type] || 'text-gray-700'
+  return classes[type] || 'text-neutral-500 dark:text-neutral-300'
 }
 
 const loadDashboardData = async () => {
@@ -609,9 +614,9 @@ const loadDashboardData = async () => {
     const response = await fetch('http://localhost:8000/api/admin/dashboard', {
       method: 'GET',
       headers: {
-        'Accept': 'application/json',
+        Accept: 'application/json',
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${authStore.token}`
+        Authorization: `Bearer ${authStore.token}`
       }
     })
 
@@ -621,113 +626,75 @@ const loadDashboardData = async () => {
 
     const data = await response.json()
     if (data.success) {
-      // Update stats
       stats.value = data.data.stats
-
-      // Update other data
       topMerchants.value = data.data.topMerchants
       popularCategories.value = data.data.popularCategories
       recentActivities.value = data.data.recentActivities
       environmentalImpact.value = data.data.environmentalImpact
     }
   } catch (error) {
-    // console.error('Error loading dashboard data:', error)
-    // Fallback to demo data
     loadDemoData()
   }
 }
 
 const loadDemoData = () => {
-  // Demo statistics for the platform
   stats.value = {
-    totalUsers: 1247,
-    newUsersThisMonth: 89,
+    totalUsers: 1248,
+    newUsersThisMonth: 42,
     activeMerchants: 156,
-    merchantGrowthRate: 23,
-    productsSaved: 3429,
-    kgFoodSaved: 2156,
-    totalRevenue: 1847250, // In F CFA
-    revenueGrowth: 15
+    merchantGrowthRate: 5.4,
+    productsSaved: 18450,
+    kgFoodSaved: 9320,
+    totalRevenue: 42000000,
+    revenueGrowth: 8.2
   }
 
-  // Demo top merchants
   topMerchants.value = [
-    {
-      id: 1,
-      name: 'Boulangerie Martin',
-      business_name: 'Boulangerie Martin',
-      revenue: 185000,
-      products_sold: 156,
-      location: 'Cocody, Abidjan'
-    },
-    {
-      id: 2,
-      name: 'Épicerie Aya',
-      business_name: 'Épicerie Aya',
-      revenue: 142000,
-      products_sold: 98,
-      location: 'Plateau, Abidjan'
-    },
-    {
-      id: 3,
-      name: 'Fruits & Légumes Bio',
-      business_name: 'Bio Fresh',
-      revenue: 95000,
-      products_sold: 124,
-      location: 'Marcory, Abidjan'
-    }
+    { id: 1, name: 'Boulangerie Martin', productsSold: 452, revenue: 11800000 },
+    { id: 2, name: 'Primeur Bio Lyon', productsSold: 389, revenue: 9400000 },
+    { id: 3, name: 'Épicerie Solidaire 13', productsSold: 328, revenue: 7200000 }
   ]
 
-  // Demo popular categories
   popularCategories.value = [
-    { name: 'Boulangerie', percentage: 35, count: 892 },
-    { name: 'Fruits & Légumes', percentage: 28, count: 671 },
-    { name: 'Épicerie', percentage: 18, count: 412 },
-    { name: 'Produits Laitiers', percentage: 12, count: 298 },
-    { name: 'Plats Préparés', percentage: 7, count: 156 }
+    { name: 'Boulangerie', percentage: 32, products: 128 },
+    { name: 'Fruits & Légumes', percentage: 28, products: 96 },
+    { name: 'Épicerie', percentage: 18, products: 74 }
   ]
 
-  // Demo recent activities
   recentActivities.value = [
     {
       id: 1,
+      title: 'Nouvel utilisateur inscrit',
       type: 'user_registered',
-      description: 'Nouveau consommateur inscrit',
-      user: 'Kouassi Jean',
-      timestamp: new Date(Date.now() - 1000 * 60 * 30).toISOString(), // 30 minutes ago
+      description: 'Marie Diallo a rejoint la plateforme',
+      user: 'Marie Diallo',
+      timestamp: new Date(Date.now() - 1000 * 60 * 60 * 2).toISOString(),
       status: 'success'
     },
     {
       id: 2,
+      title: 'Commerçant validé',
       type: 'merchant_joined',
-      description: 'Nouveau commerçant approuvé',
-      user: 'Supermarché Express',
-      timestamp: new Date(Date.now() - 1000 * 60 * 60 * 2).toISOString(), // 2 hours ago
+      description: 'La Ferme du Coin est maintenant active',
+      user: 'La Ferme du Coin',
+      timestamp: new Date(Date.now() - 1000 * 60 * 60 * 5).toISOString(),
       status: 'completed'
     },
     {
       id: 3,
+      title: 'Produit vendu',
       type: 'product_sold',
-      description: 'Produit réservé avec succès',
-      user: 'Pain complet - Boulangerie Martin',
-      timestamp: new Date(Date.now() - 1000 * 60 * 60 * 4).toISOString(), // 4 hours ago
-      status: 'success'
-    },
-    {
-      id: 4,
-      type: 'user_registered',
-      description: 'Nouveau consommateur inscrit',
-      user: 'Traoré Fatou',
-      timestamp: new Date(Date.now() - 1000 * 60 * 60 * 6).toISOString(), // 6 hours ago
+      description: '25 paniers anti-gaspi vendus',
+      user: 'Boulangerie Martin',
+      timestamp: new Date(Date.now() - 1000 * 60 * 60 * 8).toISOString(),
       status: 'success'
     }
   ]
 
-  // Demo environmental impact
   environmentalImpact.value = {
-    co2Saved: 845, // kg
-    waterSaved: 12450, // litres
-    wasteSaved: 2156, // kg
+    co2Saved: 845,
+    waterSaved: 12450,
+    wasteSaved: 2156,
     treesEquivalent: 28
   }
 }
@@ -737,9 +704,9 @@ const loadSystemHealth = async () => {
     const response = await fetch('http://localhost:8000/api/admin/system-health', {
       method: 'GET',
       headers: {
-        'Accept': 'application/json',
+        Accept: 'application/json',
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${authStore.token}`
+        Authorization: `Bearer ${authStore.token}`
       }
     })
 
@@ -752,8 +719,6 @@ const loadSystemHealth = async () => {
       systemHealth.value = data.data
     }
   } catch (error) {
-    // console.error('Error loading system health:', error)
-    // Fallback to mock data for system health
     systemHealth.value = [
       {
         name: 'API Backend',
@@ -784,9 +749,6 @@ const refreshData = async () => {
   isLoading.value = true
   try {
     await Promise.all([loadDashboardData(), loadSystemHealth()])
-    // console.log('Data refreshed')
-  } catch (error) {
-    // console.error('Error refreshing data:', error)
   } finally {
     isLoading.value = false
   }
@@ -799,8 +761,14 @@ const dismissAlert = (alertId: number) => {
   }
 }
 
-// Modal functions
-const showModal = (title: string, content: string, type: 'info' | 'success' | 'warning' | 'error' = 'info', icon?: any, actionButton?: string, action?: () => void) => {
+const showModal = (
+  title: string,
+  content: string,
+  type: 'info' | 'success' | 'warning' | 'error' = 'info',
+  icon?: any,
+  actionButton?: string,
+  action?: () => void
+) => {
   modal.value.title = title
   modal.value.content = content
   modal.value.type = type
@@ -816,47 +784,46 @@ const closeModal = () => {
 }
 
 const handleModalAction = () => {
-  if (modal.value.action) {
-    modal.value.action()
-  }
+  modal.value.action?.()
   closeModal()
 }
 
-// Navigation and actions
 const viewAllActivities = () => {
-  const content = `Activités récentes détaillées:\n\n${recentActivities.value.map(activity =>
-    `• ${activity.description}: ${activity.user}\n  ${formatTimeAgo(activity.timestamp)}`
-  ).join('\n\n')}`
+  const content = `Activités récentes détaillées:\n\n${recentActivities.value
+    .map(activity => `• ${activity.description} — ${activity.user}\n  ${formatTimeAgo(activity.timestamp)}`)
+    .join('\n\n')}`
 
   showModal('🔍 Voir toutes les activités', content, 'info', DocumentTextIcon, 'Gérer les activités')
 }
 
-// Quick actions
 const viewLogs = () => {
-  const content = '📋 Logs système\n\n' +
-    '✅ API Backend: 1,247 requêtes (99.9% succès)\n' +
-    '✅ Base de données: 3,421 requêtes (98.7% < 50ms)\n' +
+  const content =
+    '📋 Logs système\n\n' +
+    '✅ API Backend: 1 247 requêtes (99,9% succès)\n' +
+    '✅ Base de données: 3 421 requêtes (98,7% < 50ms)\n' +
     '⚠️ Frontend: 2 erreurs JavaScript détectées\n' +
-    'ℹ️ Cache Redis: 15,672 hits (94.3% ratio)\n\n' +
+    'ℹ️ Cache Redis: 15 672 hits (94,3% ratio)\n\n' +
     `Dernière vérification: ${new Date().toLocaleTimeString('fr-FR')}`
 
   showModal('📋 Logs système', content, 'info', DocumentTextIcon, 'Voir tous les logs')
 }
 
 const viewMetrics = () => {
-  const content = '📊 Métriques détaillées\n\n' +
-    '👥 Utilisateurs actifs: 247 (dernières 24h)\n' +
+  const content =
+    '📊 Métriques détaillées\n\n' +
+    '👥 Utilisateurs actifs: 247 (24h)\n' +
     '🏪 Nouveaux commerçants: 12 (cette semaine)\n' +
     '📦 Produits ajoutés: 156 (aujourd\'hui)\n' +
-    `💰 CA moyen/commande: ${formatCurrency(stats.value.totalRevenue / stats.value.productsSaved)}\n` +
-    `🌍 Impact CO2: ${environmentalImpact.value.co2Saved}kg économisés\n\n` +
+    `💰 CA moyen/commande: ${formatCurrency(stats.value.totalRevenue / Math.max(stats.value.productsSaved, 1))}\n` +
+    `🌍 Impact CO₂: ${environmentalImpact.value.co2Saved} kg économisés\n\n` +
     `Période: ${selectedPeriod.value}`
 
   showModal('📊 Métriques détaillées', content, 'info', ChartBarIcon, 'Voir analytics')
 }
 
 const manageUsers = () => {
-  const content = '👥 Gestion utilisateurs\n\n' +
+  const content =
+    '👥 Gestion utilisateurs\n\n' +
     '📊 Statistiques:\n' +
     `• Total: ${formatNumber(stats.value.totalUsers)} utilisateurs\n` +
     `• Consommateurs: ${formatNumber(stats.value.totalUsers - stats.value.activeMerchants)}\n` +
@@ -865,13 +832,14 @@ const manageUsers = () => {
     '🚀 Accès rapide:\n' +
     '• Utilisateurs en attente de validation\n' +
     '• Comptes signalés\n' +
-    '• Statistiques d\'engagement'
+    "• Statistiques d'engagement"
 
   showModal('👥 Gestion utilisateurs', content, 'info', UsersIcon, 'Accéder à la gestion')
 }
 
 const systemSettings = () => {
-  const content = '⚙️ Paramètres système\n\n' +
+  const content =
+    '⚙️ Paramètres système\n\n' +
     '🔧 Configuration actuelle:\n' +
     '• Mode: Production\n' +
     '• Version API: v1.2.3\n' +
@@ -887,188 +855,153 @@ const systemSettings = () => {
   showModal('⚙️ Paramètres système', content, 'warning', CogIcon, 'Accéder aux paramètres')
 }
 
-// Lifecycle
-// Chart creation functions
+const quickActions = computed(() => [
+  {
+    id: 'logs',
+    label: 'Logs système',
+    description: 'Surveillez la santé des services',
+    icon: DocumentTextIcon,
+    tone: 'neutral' as const,
+    handler: viewLogs
+  },
+  {
+    id: 'metrics',
+    label: 'Métriques',
+    description: 'Analyse détaillée des performances',
+    icon: ChartBarIcon,
+    tone: 'primary' as const,
+    handler: viewMetrics
+  },
+  {
+    id: 'users',
+    label: 'Utilisateurs',
+    description: 'Gérez les comptes et droits',
+    icon: UsersIcon,
+    tone: 'success' as const,
+    handler: manageUsers
+  },
+  {
+    id: 'settings',
+    label: 'Paramètres',
+    description: 'Configuration de la plateforme',
+    icon: CogIcon,
+    tone: 'warning' as const,
+    handler: systemSettings
+  }
+])
+
+const handleQuickAction = (action: (typeof quickActions.value)[number]) => {
+  action.handler?.()
+}
+
 const createRevenueChart = () => {
   try {
-    // console.log('📈 createRevenueChart: Début de création')
-    // console.log('📈 revenueChartCanvas.value:', revenueChartCanvas.value)
-
     if (!revenueChartCanvas.value) {
-      // console.error('❌ Canvas element not ready for revenue chart')
       return
     }
-
-    // console.log('📈 Canvas dimensions:', {
-      width: revenueChartCanvas.value.offsetWidth,
-      height: revenueChartCanvas.value.offsetHeight,
-      clientWidth: revenueChartCanvas.value.clientWidth,
-      clientHeight: revenueChartCanvas.value.clientHeight
-    })
 
     const ctx = revenueChartCanvas.value.getContext('2d')
     if (!ctx) {
-      // console.error('❌ Canvas context not available for revenue chart')
       return
     }
 
-    // console.log('📈 Canvas context obtenu:', ctx)
-
-    // Destroy existing chart if it exists
     if (revenueChart) {
-      // console.log('📈 Destruction du graphique existant')
       revenueChart.destroy()
     }
 
-    // Generate demo data based on selected period
-    const generateRevenueData = () => {
-      const days = revenueChartPeriod.value === '7d' ? 7 : revenueChartPeriod.value === '30d' ? 30 : 90
-      const labels = []
-      const data = []
+    const days = revenueChartPeriod.value === '7d' ? 7 : revenueChartPeriod.value === '30d' ? 30 : 90
+    const labels: string[] = []
+    const data: number[] = []
 
-      for (let i = days - 1; i >= 0; i--) {
-        const date = new Date()
-        date.setDate(date.getDate() - i)
-        labels.push(date.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit' }))
-
-        // Generate realistic revenue data with some randomness
-        const baseRevenue = 45000 + Math.random() * 30000
-        data.push(Math.round(baseRevenue))
-      }
-
-      return { labels, data }
+    for (let i = days - 1; i >= 0; i--) {
+      const date = new Date()
+      date.setDate(date.getDate() - i)
+      labels.push(date.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit' }))
+      const baseRevenue = 45_000 + Math.random() * 30_000
+      data.push(Math.round(baseRevenue))
     }
-
-    const { labels, data } = generateRevenueData()
-    // console.log('📈 Données du graphique:', { labels, data })
-
-    // console.log('📈 Tentative de création du graphique Chart.js...')
 
     revenueChart = new ChartJS(ctx, {
       type: 'line',
       data: {
         labels,
-        datasets: [{
-          label: 'Chiffre d\'affaires (F CFA)',
-          data,
-          borderColor: '#10B981',
-          backgroundColor: 'rgba(16, 185, 129, 0.1)',
-          borderWidth: 3,
-          fill: true,
-          tension: 0.4,
-          pointBackgroundColor: '#10B981',
-          pointBorderColor: '#ffffff',
-          pointBorderWidth: 2,
-          pointRadius: 5
-        }]
+        datasets: [
+          {
+            label: "Chiffre d'affaires (F CFA)",
+            data,
+            borderColor: '#0ea5e9',
+            backgroundColor: 'rgba(14,165,233,0.15)',
+            borderWidth: 3,
+            fill: true,
+            tension: 0.4,
+            pointBackgroundColor: '#0ea5e9',
+            pointBorderColor: '#ffffff',
+            pointBorderWidth: 2,
+            pointRadius: 4
+          }
+        ]
       },
       options: {
         responsive: true,
         maintainAspectRatio: false,
         plugins: {
-          legend: {
-            display: false
-          },
+          legend: { display: false },
           tooltip: {
-            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+            backgroundColor: 'rgba(15,23,42,0.85)',
             titleColor: '#ffffff',
             bodyColor: '#ffffff',
-            borderColor: '#10B981',
-            borderWidth: 1,
             callbacks: {
-              label: (context) => {
-                return `${context.parsed.y.toLocaleString()} F CFA`
-              }
+              label: (context) => ` ${formatCurrency(context.parsed.y as number)} F CFA`
             }
           }
         },
         scales: {
           x: {
-            grid: {
-              display: false
-            }
+            grid: { color: 'rgba(148,163,184,0.2)' },
+            ticks: { color: '#64748b' }
           },
           y: {
-            grid: {
-              color: 'rgba(0, 0, 0, 0.05)'
-            },
+            grid: { color: 'rgba(148,163,184,0.2)' },
             ticks: {
-              callback: (value) => {
-                return (value as number).toLocaleString() + ' F'
-              }
+              color: '#64748b',
+              callback: (value) => formatNumber(Number(value))
             }
           }
         }
       }
     })
-
-    // console.log('📈 Instance Chart.js créée:', revenueChart)
-    // console.log('Revenue chart created successfully')
-
-    // Force resize to ensure visibility
-    setTimeout(() => {
-      if (revenueChart) {
-        revenueChart.resize()
-        // console.log('📈 Revenue chart resized')
-      }
-    }, 50)
-
   } catch (error) {
-    // console.error('Error creating revenue chart:', error)
+    // silently ignore chart errors
   }
 }
 
 const createUserGrowthChart = () => {
   try {
-    // console.log('🍩 createUserGrowthChart: Début de création')
-    // console.log('🍩 userGrowthChartCanvas.value:', userGrowthChartCanvas.value)
-
     if (!userGrowthChartCanvas.value) {
-      // console.error('❌ Canvas element not ready for user growth chart')
       return
     }
-
-    // console.log('🍩 Canvas dimensions:', {
-      width: userGrowthChartCanvas.value.offsetWidth,
-      height: userGrowthChartCanvas.value.offsetHeight,
-      clientWidth: userGrowthChartCanvas.value.clientWidth,
-      clientHeight: userGrowthChartCanvas.value.clientHeight
-    })
 
     const ctx = userGrowthChartCanvas.value.getContext('2d')
     if (!ctx) {
-      // console.error('❌ Canvas context not available for user growth chart')
       return
     }
 
-    // console.log('🍩 Canvas context obtenu:', ctx)
-
-    // Destroy existing chart if it exists
     if (userGrowthChart) {
-      // console.log('🍩 Destruction du graphique existant')
       userGrowthChart.destroy()
     }
 
-    const chartData = {
-      labels: ['Consommateurs', 'Commerçants', 'Administrateurs'],
-      datasets: [{
-        data: [1091, 156, 1], // Based on demo data: 1091 consumers, 156 merchants, 1 admin
-        backgroundColor: [
-          '#10B981', // Green for consumers
-          '#F59E0B', // Orange for merchants
-          '#8B5CF6'  // Purple for admins
-        ],
-        borderWidth: 0
-      }]
-    }
-
-    // console.log('🍩 Données du graphique doughnut:', chartData)
-
-    // console.log('🍩 Tentative de création du graphique doughnut Chart.js...')
-
     userGrowthChart = new ChartJS(ctx, {
       type: 'doughnut',
-      data: chartData,
+      data: {
+        labels: ['Consommateurs', 'Commerçants', 'Administrateurs'],
+        datasets: [
+          {
+            data: [1091, 156, 1],
+            backgroundColor: ['#10B981', '#F59E0B', '#6366F1'],
+            borderWidth: 0
+          }
+        ]
+      },
       options: {
         responsive: true,
         maintainAspectRatio: false,
@@ -1078,13 +1011,11 @@ const createUserGrowthChart = () => {
             labels: {
               padding: 20,
               usePointStyle: true,
-              font: {
-                size: 12
-              }
+              color: '#64748b'
             }
           },
           tooltip: {
-            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+            backgroundColor: 'rgba(15,23,42,0.85)',
             titleColor: '#ffffff',
             bodyColor: '#ffffff',
             callbacks: {
@@ -1099,50 +1030,24 @@ const createUserGrowthChart = () => {
       }
     })
 
-    // console.log('🍩 Instance Chart.js doughnut créée:', userGrowthChart)
-    // console.log('User growth chart created successfully')
-
-    // Force resize to ensure visibility
     setTimeout(() => {
-      if (userGrowthChart) {
-        userGrowthChart.resize()
-        // console.log('🍩 User growth chart resized')
-      }
+      userGrowthChart?.resize()
     }, 50)
-
   } catch (error) {
-    // console.error('Error creating user growth chart:', error)
+    // silently ignore chart errors
   }
 }
 
-// Watch for period changes to update charts
 watch(revenueChartPeriod, () => {
   createRevenueChart()
 })
 
 onMounted(async () => {
-  try {
-    // console.log('🚀 Dashboard: Initialisation...')
-
-    // Load data first
-    await refreshData()
-    // console.log('📊 Dashboard: Données chargées')
-
-    // Wait for DOM to be ready
-    await nextTick()
-    // console.log('🎨 Dashboard: DOM prêt')
-
-    // Create charts with delay to ensure canvas elements are fully rendered
-    setTimeout(() => {
-      // console.log('📈 Dashboard: Création des graphiques...')
-      createRevenueChart()
-      createUserGrowthChart()
-      // console.log('✅ Dashboard: Graphiques créés')
-    }, 100)
-
-    // console.log('✅ Admin dashboard loaded with charts')
-  } catch (error) {
-    // console.error('❌ Error during dashboard initialization:', error)
-  }
+  await refreshData()
+  await nextTick()
+  setTimeout(() => {
+    createRevenueChart()
+    createUserGrowthChart()
+  }, 100)
 })
 </script>

@@ -10,6 +10,11 @@ test.describe('Interface Admin - Tests E2E', () => {
 
     // Wait for redirect to admin dashboard
     await page.waitForURL('**/admin/dashboard', { timeout: 10000 });
+
+    // Ensure default theme for baseline assertions
+    await page.evaluate(() => localStorage.setItem('theme', 'light'));
+    await page.reload();
+    await page.waitForLoadState('networkidle');
   });
 
   test('Admin dashboard should load with platform statistics', async ({ page }) => {
@@ -35,83 +40,35 @@ test.describe('Interface Admin - Tests E2E', () => {
     await expect(page.locator('text=État du système')).toBeVisible();
   });
 
-  test('Quick action buttons should show alerts', async ({ page }) => {
-    // Test Logs button
-    const logsButton = page.locator('button').filter({ hasText: /logs/i }).first();
-    if (await logsButton.count() > 0) {
-      // Set up dialog handler
-      let dialogMessage = '';
-      page.on('dialog', async dialog => {
-        dialogMessage = dialog.message();
-        await dialog.accept();
-      });
+  test('Quick action buttons should open contextual modals', async ({ page }) => {
+    const openAndAssertModal = async (label, expectedTitle) => {
+      const actionButton = page.locator('button, a').filter({ hasText: new RegExp(label, 'i') }).first();
+      if (await actionButton.count() === 0) {
+        return;
+      }
 
-      await logsButton.click();
-      await page.waitForTimeout(500);
+      await actionButton.click();
+      const modalTitle = page.locator('text=' + expectedTitle).first();
+      await expect(modalTitle).toBeVisible();
+      await page.locator('button', { hasText: /fermer/i }).first().click();
+      await expect(modalTitle).not.toBeVisible();
+    };
 
-      expect(dialogMessage).toContain('Logs système');
-    }
-
-    // Test Metrics button
-    const metricsButton = page.locator('button').filter({ hasText: /métriques/i }).first();
-    if (await metricsButton.count() > 0) {
-      let dialogMessage = '';
-      page.on('dialog', async dialog => {
-        dialogMessage = dialog.message();
-        await dialog.accept();
-      });
-
-      await metricsButton.click();
-      await page.waitForTimeout(500);
-
-      expect(dialogMessage).toContain('Métriques détaillées');
-    }
-
-    // Test Users button
-    const usersButton = page.locator('button').filter({ hasText: /utilisateurs/i }).first();
-    if (await usersButton.count() > 0) {
-      let dialogMessage = '';
-      page.on('dialog', async dialog => {
-        dialogMessage = dialog.message();
-        await dialog.accept();
-      });
-
-      await usersButton.click();
-      await page.waitForTimeout(500);
-
-      expect(dialogMessage).toContain('Gestion utilisateurs');
-    }
-
-    // Test Settings button
-    const settingsButton = page.locator('button').filter({ hasText: /paramètres/i }).first();
-    if (await settingsButton.count() > 0) {
-      let dialogMessage = '';
-      page.on('dialog', async dialog => {
-        dialogMessage = dialog.message();
-        await dialog.accept();
-      });
-
-      await settingsButton.click();
-      await page.waitForTimeout(500);
-
-      expect(dialogMessage).toContain('Paramètres système');
-    }
+    await openAndAssertModal('Logs', 'Logs système');
+    await openAndAssertModal('Métriques', 'Métriques détaillées');
+    await openAndAssertModal('Utilisateurs', 'Gestion utilisateurs');
+    await openAndAssertModal('Paramètres', 'Paramètres système');
   });
 
   test('View all activities button should show alert', async ({ page }) => {
     const viewAllButton = page.locator('button').filter({ hasText: /voir tout/i }).first();
 
     if (await viewAllButton.count() > 0) {
-      let dialogMessage = '';
-      page.on('dialog', async dialog => {
-        dialogMessage = dialog.message();
-        await dialog.accept();
-      });
-
       await viewAllButton.click();
-      await page.waitForTimeout(500);
-
-      expect(dialogMessage).toContain('Voir toutes les activités');
+      const modalTitle = page.locator('text=Voir toutes les activités').first();
+      await expect(modalTitle).toBeVisible();
+      await page.locator('button', { hasText: /fermer/i }).first().click();
+      await expect(modalTitle).not.toBeVisible();
     }
   });
 
@@ -136,15 +93,13 @@ test.describe('Interface Admin - Tests E2E', () => {
   test('Top merchants section should display merchant data', async ({ page }) => {
     await expect(page.locator('text=Top commerçants')).toBeVisible();
 
-    // Check if there are merchants displayed
-    const hasMerchants = await page.locator('[data-testid="merchant-card"], .merchant-card').count() > 0;
-    const hasEmptyState = await page.locator('text=aucun commerçant, text=pas de commerçant').count() > 0;
+    const merchantRows = page.locator('text=produits vendus');
+    const hasRows = await merchantRows.count() > 0;
+    const hasEmptyState = await page.locator('text=aucun commerçant').count() > 0;
 
-    // Should either show merchants or empty state
-    expect(hasMerchants || hasEmptyState).toBe(true);
+    expect(hasRows || hasEmptyState).toBe(true);
 
-    // If merchants are shown, check for revenue in F CFA
-    if (hasMerchants) {
+    if (hasRows) {
       await expect(page.locator('text=F CFA')).toBeVisible();
     }
   });
@@ -152,52 +107,38 @@ test.describe('Interface Admin - Tests E2E', () => {
   test('Popular categories section should show category data', async ({ page }) => {
     await expect(page.locator('text=Catégories populaires')).toBeVisible();
 
-    // Check if categories are displayed
-    const hasCategories = await page.locator('[data-testid="category-item"], .category-item').count() > 0;
+    const hasCategories = await page.locator('text=% des ventes').count() > 0;
 
-    // Should show at least some categories or empty state
     expect(hasCategories || true).toBe(true);
-
-    // If categories are shown, check for percentage displays
-    if (hasCategories) {
-      const hasPercentages = await page.locator('text=%').count() > 0;
-      expect(hasPercentages).toBe(true);
-    }
   });
 
   test('Recent activities should show platform activities', async ({ page }) => {
     await expect(page.locator('text=Activité récente')).toBeVisible();
 
-    // Check if activities are displayed
-    const hasActivities = await page.locator('[data-testid="activity-item"], .activity-item').count() > 0;
-    const hasEmptyState = await page.locator('text=aucune activité, text=pas d\'activité').count() > 0;
+    const hasActivities = await page.locator('text=il y a').count() > 0 || await page.locator('text=Il y a').count() > 0;
+    const hasEmptyState = await page.locator('text=aucune activité').count() > 0;
 
-    // Should either show activities or empty state
     expect(hasActivities || hasEmptyState).toBe(true);
-
-    // If activities are shown, check for timestamps
-    if (hasActivities) {
-      const hasTimestamps = await page.locator('text=il y a, text=ago, text=minutes, text=heures').count() > 0;
-      expect(hasTimestamps || true).toBe(true); // Some formats might not match
-    }
   });
 
   test('Environmental impact section should show eco stats', async ({ page }) => {
     // Look for environmental impact data
-    const hasEcoSection = await page.locator('text=Impact environnemental, text=CO2, text=économisé').count() > 0;
+    const hasEcoSection = await page.locator('text=Impact environnemental').count() > 0;
 
     if (hasEcoSection) {
       // Check for environmental metrics
-      await expect(page.locator('text=CO2, text=eau, text=déchets')).toBeVisible();
+      await expect(page.locator('text=CO₂ économisé')).toBeVisible();
+      await expect(page.locator('text=Eau économisée')).toBeVisible();
+      await expect(page.locator('text=Déchets évités')).toBeVisible();
     }
   });
 
   test('Revenue chart should be present', async ({ page }) => {
     // Check for revenue chart section
-    await expect(page.locator('text=Évolution du chiffre d\'affaires, text=revenus')).toBeVisible();
+    await expect(page.locator('text=Évolution du chiffre d\'affaires')).toBeVisible();
 
     // Should have period selector
-    const hasPeriodSelect = await page.locator('select').filter({ hasText: /jour|semaine|mois/i }).count() > 0;
+    const hasPeriodSelect = await page.locator('select').filter({ has: page.locator('option[value="7d"]') }).count() > 0;
 
     // Should have chart placeholder or actual chart
     const hasChartArea = await page.locator('canvas, svg, .chart').count() > 0;
@@ -207,18 +148,26 @@ test.describe('Interface Admin - Tests E2E', () => {
   });
 
   test('User growth chart should be present', async ({ page }) => {
-    // Check for user growth chart section
-    await expect(page.locator('text=Croissance des utilisateurs')).toBeVisible();
+    await expect(page.locator('text=Répartition des utilisateurs')).toBeVisible();
 
-    // Should show user type badges
     await expect(page.locator('text=Consommateurs')).toBeVisible();
     await expect(page.locator('text=Commerçants')).toBeVisible();
+    await expect(page.locator('text=Administrateurs')).toBeVisible();
 
-    // Should have chart area or placeholder
     const hasChartArea = await page.locator('canvas, svg, .chart').count() > 0;
     const hasChartPlaceholder = await page.locator('text=Chart.js, text=graphique').count() > 0;
 
     expect(hasChartArea || hasChartPlaceholder).toBe(true);
+  });
+
+  test('Admin dashboard supports dark mode theme', async ({ page }) => {
+    await page.evaluate(() => localStorage.setItem('theme', 'dark'));
+    await page.reload();
+    await page.waitForLoadState('networkidle');
+
+    await expect(page.locator('html')).toHaveClass(/dark/);
+    await expect(page.locator('text=Tableau de bord administrateur')).toBeVisible();
+    await expect(page.locator('text=Activité récente')).toBeVisible();
   });
 
   test('Admin navigation should work properly', async ({ page }) => {
