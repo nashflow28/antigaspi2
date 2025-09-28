@@ -12,7 +12,7 @@
         <Button
           variant="secondary"
           size="sm"
-          class="install-btn"
+          class="install-action"
           @click="installApp"
         >
           <Download class="h-4 w-4 mr-2" />
@@ -21,7 +21,7 @@
         <Button
           variant="ghost"
           size="sm"
-          class="dismiss-btn"
+          class="dismiss-action"
           @click="dismissPrompt"
         >
           <X class="h-4 w-4" />
@@ -176,25 +176,25 @@ const isRecentlyDismissed = (): boolean => {
   gap: 8px;
 }
 
-.install-btn {
+.install-action {
   background: rgba(255, 255, 255, 0.2) !important;
   color: white !important;
   border: 1px solid rgba(255, 255, 255, 0.3) !important;
 }
 
-.install-btn:hover {
+.install-action:hover {
   background: rgba(255, 255, 255, 0.3) !important;
   transform: translateY(-1px);
 }
 
-.dismiss-btn {
+.dismiss-action {
   background: transparent !important;
   color: white !important;
   border: none !important;
   opacity: 0.8;
 }
 
-.dismiss-btn:hover {
+.dismiss-action:hover {
   background: rgba(255, 255, 255, 0.1) !important;
   opacity: 1;
 }
@@ -266,7 +266,7 @@ const isRecentlyDismissed = (): boolean => {
     font-size: 12px;
   }
 
-  .install-btn {
+  .install-action {
     padding: 6px 12px !important;
     font-size: 12px !important;
   }

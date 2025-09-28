@@ -5,6 +5,9 @@
     :disabled="disabled"
     :href="tag === 'a' ? href : undefined"
     :to="tag === 'router-link' ? to : undefined"
+    :data-variant="props.variant"
+    :data-size="props.size"
+    :data-state="loading ? 'loading' : disabled ? 'disabled' : 'default'"
     :class="computedClasses"
     @click="handleClick"
   >

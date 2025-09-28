@@ -10,7 +10,7 @@
 
 ### **État Actuel Diagnostiqué**
 - ✅ **47 composants UI** déjà présents avec design moderne
-- ⚠️ **Classes legacy** : `.btn`, `.card`, `.form-*` utilisées dans 15+ vues
+- ✅ **Nettoyage legacy** : primitives `.btn`, `.card` et utilitaires associés remplacés par les composants 2025
 - ✅ **Tailwind avancé** : Tokens, gradients, animations déjà implémentés
 - ⚠️ **Complexité sous-estimée** : ProductDetailView = 500+ lignes
 

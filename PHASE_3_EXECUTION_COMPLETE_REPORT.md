@@ -52,7 +52,7 @@ La **Phase 3 de migration UI vers le design system 2025** a été **exécutée a
 ### **2. Outils d'Automatisation**
 
 #### **Scripts de Migration (/frontend/scripts/)**
-- ✅ **audit-legacy-classes.js** - Détection 851 usages legacy
+- ✅ **audit-legacy-classes.js** - Score 0 usage legacy (primitives `.btn`, `.card`, `glass-bg` retirées)
 - ✅ **migrate-ui-component.js** - Migration interactive
 - ✅ **capture-baseline-screenshots.js** - Screenshots baseline
 - ✅ **validate-phase3.js** - Validation quality gates
@@ -82,21 +82,17 @@ VITE_MIGRATION_DEBUG=true   // Debug mode
 ### **2. Component Wrapper Pattern**
 ```vue
 <template>
-  <!-- Version 2025 si feature flag active -->
-  <Button2025 v-if="useDesignSystem2025().isEnabled" />
-
-  <!-- Fallback legacy sinon -->
-  <button v-else class="btn btn-primary" />
+  <Button2025
+    :data-variant="action.variant"
+    :data-size="action.size"
+    @click="action.onClick"
+  />
 </template>
 ```
 
 ### **3. Legacy Class Mapping**
 ```typescript
-const legacyMapping = {
-  'btn-primary': { variant: 'primary' },
-  'btn-sm': { size: 'sm' },
-  'card-glass': { variant: 'glass' }
-}
+const legacyMapping = {}
 ```
 
 ---

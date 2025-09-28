@@ -107,7 +107,6 @@ const COMPONENT_MIGRATIONS = {
 
 // Class replacements that don't require component migration
 const CLASS_REPLACEMENTS = {
-  'glass-bg': 'bg-white/60 backdrop-blur-md border border-white/20',
   'container-fluid': 'container mx-auto px-4 sm:px-6 lg:px-8',
   'shadow-glow': 'shadow-lg shadow-primary-500/20',
   'gradient-primary': 'bg-gradient-to-r from-primary-600 to-primary-700',
