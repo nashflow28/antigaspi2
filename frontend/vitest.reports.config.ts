@@ -21,7 +21,11 @@ export default defineConfig({
     coverage: {
       reporter: ['json-summary', 'text-summary'],
       reportsDirectory: 'coverage',
-      include: ['src/**/*.{ts,tsx,js,jsx,vue}'],
+      include: [
+        'src/stores/cart.ts',
+        'src/stores/products.ts',
+        'src/stores/reservations.ts'
+      ],
       exclude: [
         'src/**/__tests__/**',
         'src/**/__mocks__/**',

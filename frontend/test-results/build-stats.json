@@ -1,13 +1,14 @@
 {
-  "generatedAt": "2025-09-28T17:07:35.329Z",
+  "generatedAt": "2025-09-28T18:38:07.313Z",
   "buildSucceeded": true,
-  "totalSize": 2925922,
-  "bundleSizeMB": 2.79,
+  "reusedBuild": false,
+  "totalSize": 2944846,
+  "bundleSizeMB": 2.81,
   "assets": [
     {
       "file": "bundle-analysis.html",
-      "size": 1418446,
-      "sizeKB": 1385.2
+      "size": 1422356,
+      "sizeKB": 1389.02
     },
     {
       "file": "assets/js/vendor-charts-D3WJeo9S.js",
@@ -20,9 +21,9 @@
       "sizeKB": 144.74
     },
     {
-      "file": "assets/css/index-BqimbjWH.css",
-      "size": 132407,
-      "sizeKB": 129.3
+      "file": "assets/css/index-B-7VGJfq.css",
+      "size": 135785,
+      "sizeKB": 132.6
     },
     {
       "file": "assets/js/vendor-vue-gNgYsul5.js",
@@ -30,12 +31,12 @@
       "sizeKB": 101.98
     },
     {
-      "file": "assets/js/index-0uCQhIZA.js",
-      "size": 77827,
-      "sizeKB": 76
+      "file": "assets/js/index-5Dc-MIm7.js",
+      "size": 78063,
+      "sizeKB": 76.23
     },
     {
-      "file": "assets/js/SurpriseBasketsView-BLxuGiHW.js",
+      "file": "assets/js/SurpriseBasketsView-B0hSFKI7.js",
       "size": 48034,
       "sizeKB": 46.91
     },
@@ -50,42 +51,47 @@
       "sizeKB": 34.4
     },
     {
-      "file": "assets/js/WalletDashboard-BnY8QN96.js",
+      "file": "assets/js/WalletDashboard-B1UvdGMX.js",
       "size": 34660,
       "sizeKB": 33.85
     },
     {
-      "file": "assets/js/ReviewsView-BdUBvifd.js",
+      "file": "assets/js/ReviewsView-B35GkfDt.js",
       "size": 29510,
       "sizeKB": 28.82
     },
     {
-      "file": "assets/js/DashboardView-H3dLP6hf.js",
-      "size": 29427,
-      "sizeKB": 28.74
-    },
-    {
-      "file": "assets/js/ProductReserveView2025-CcXVqLbR.js",
+      "file": "assets/js/ProductReserveView2025-yY4sWCVT.js",
       "size": 27539,
       "sizeKB": 26.89
     },
     {
-      "file": "assets/js/ReviewModeration-DNHmS_qe.js",
+      "file": "assets/js/ReviewModeration-CrcjzmXP.js",
       "size": 26752,
       "sizeKB": 26.13
     },
     {
-      "file": "assets/js/DashboardView2025-oWYyFyv2.js",
-      "size": 24700,
-      "sizeKB": 24.12
+      "file": "assets/js/DashboardView-CHddUofT.js",
+      "size": 26629,
+      "sizeKB": 26
     },
     {
-      "file": "assets/js/ReservationsView-Ctq9-R5p.js",
+      "file": "assets/js/DashboardView2025-JZ22eikL.js",
+      "size": 25835,
+      "sizeKB": 25.23
+    },
+    {
+      "file": "assets/js/ReservationsView-h69I9Pwd.js",
       "size": 23327,
       "sizeKB": 22.78
     },
     {
-      "file": "assets/js/ReservationsView-OOuvVdE1.js",
+      "file": "assets/js/CategoriesView-BGH5WwG_.js",
+      "size": 23153,
+      "sizeKB": 22.61
+    },
+    {
+      "file": "assets/js/ReservationsView-UCA66PNX.js",
       "size": 22835,
       "sizeKB": 22.3
     },
@@ -95,17 +101,17 @@
       "sizeKB": 21.55
     },
     {
-      "file": "assets/js/ProductsView-BZORXS_i.js",
+      "file": "assets/js/ProductsView--tIy0LvU.js",
       "size": 20679,
       "sizeKB": 20.19
     },
     {
-      "file": "assets/js/MerchantsView-eBBWxIh4.js",
+      "file": "assets/js/MerchantsView-DO2RMrGl.js",
       "size": 20630,
       "sizeKB": 20.15
     },
     {
-      "file": "assets/js/UsersView-D1TF2US2.js",
+      "file": "assets/js/UsersView-C-OLR8Go.js",
       "size": 19431,
       "sizeKB": 18.98
     },
@@ -115,24 +121,19 @@
       "sizeKB": 18.22
     },
     {
-      "file": "assets/js/ProductsView2025-D2HbwKN0.js",
+      "file": "assets/js/ProductsView2025-CivWabYB.js",
       "size": 17952,
       "sizeKB": 17.53
     },
     {
-      "file": "assets/js/DashboardView2025-DKaJNpw6.js",
+      "file": "assets/js/DashboardView2025-Blwhz13q.js",
       "size": 16834,
       "sizeKB": 16.44
     },
     {
-      "file": "assets/js/ReviewsList-BTSadXD1.js",
+      "file": "assets/js/ReviewsList-B6QaUgdK.js",
       "size": 16655,
       "sizeKB": 16.26
-    },
-    {
-      "file": "assets/js/CategoriesView-D4Sh4kp9.js",
-      "size": 16067,
-      "sizeKB": 15.69
     },
     {
       "file": "assets/css/leaflet-Dgihpmma.css",
@@ -140,77 +141,77 @@
       "sizeKB": 14.68
     },
     {
-      "file": "assets/js/SurpriseBasketDetailView-tXunopJH.js",
+      "file": "assets/js/SurpriseBasketDetailView-CzIAoo8e.js",
       "size": 13942,
       "sizeKB": 13.62
     },
     {
-      "file": "assets/js/RegisterView-BcI2AQZy.js",
+      "file": "assets/js/RegisterView-f0GfIVHH.js",
       "size": 13384,
       "sizeKB": 13.07
     },
     {
-      "file": "assets/js/LoyaltyManagement-BZ5HKEgK.js",
-      "size": 13241,
-      "sizeKB": 12.93
-    },
-    {
-      "file": "assets/js/LoginView-BEI80aCT.js",
+      "file": "assets/js/LoginView-C8LtPUaV.js",
       "size": 12923,
       "sizeKB": 12.62
     },
     {
-      "file": "assets/js/HomeView2025-DbJ6d722.js",
+      "file": "assets/js/HomeView2025-BX3v1bTs.js",
       "size": 12786,
       "sizeKB": 12.49
     },
     {
-      "file": "assets/js/ProductDetailView2025-BpbXyogd.js",
+      "file": "assets/js/ProductDetailView2025-B_3iwYiF.js",
       "size": 12629,
       "sizeKB": 12.33
     },
     {
-      "file": "assets/js/CheckoutView-CJ77Q08d.js",
+      "file": "assets/js/CheckoutView-CHo2kdoF.js",
       "size": 12567,
       "sizeKB": 12.27
     },
     {
-      "file": "assets/js/ReservationDetailView2025-CQ2m-YaE.js",
+      "file": "assets/js/ProductEditView2025-Ua6gVZwC.js",
+      "size": 12458,
+      "sizeKB": 12.17
+    },
+    {
+      "file": "assets/js/ReservationDetailView2025-CX44c0lV.js",
       "size": 12356,
       "sizeKB": 12.07
     },
     {
-      "file": "assets/js/ProductEditView2025-B6fs4x2Y.js",
-      "size": 12248,
-      "sizeKB": 11.96
+      "file": "assets/js/LoyaltyManagement-DaJZUHXb.js",
+      "size": 11954,
+      "sizeKB": 11.67
     },
     {
-      "file": "assets/js/ReviewsDashboard-DtWTC5yx.js",
+      "file": "assets/js/ReviewsDashboard-_rHT-lYR.js",
       "size": 11900,
       "sizeKB": 11.62
     },
     {
-      "file": "assets/js/SurpriseBasketsView-CGG3dATX.js",
+      "file": "assets/js/SurpriseBasketsView-CY6VXytp.js",
       "size": 11417,
       "sizeKB": 11.15
     },
     {
-      "file": "assets/js/DiscoverView-M4YY9tRi.js",
+      "file": "assets/js/DiscoverView-_gMAwDrJ.js",
       "size": 10906,
       "sizeKB": 10.65
     },
     {
-      "file": "assets/js/MerchantsMapView-BW-V3IyX.js",
+      "file": "assets/js/MerchantsMapView-DKox8L8N.js",
       "size": 10573,
       "sizeKB": 10.33
     },
     {
-      "file": "assets/js/LoyaltyDashboard-C3Ou3Wkm.js",
+      "file": "assets/js/LoyaltyDashboard-D__9ANC5.js",
       "size": 10231,
       "sizeKB": 9.99
     },
     {
-      "file": "assets/js/MerchantDetailView-51ie9c2O.js",
+      "file": "assets/js/MerchantDetailView-C1shU2tA.js",
       "size": 9129,
       "sizeKB": 8.92
     },
@@ -220,22 +221,22 @@
       "sizeKB": 8.34
     },
     {
-      "file": "assets/js/PublicReviewsView-C6uqFded.js",
+      "file": "assets/js/PublicReviewsView-Dgasj4JO.js",
       "size": 8446,
       "sizeKB": 8.25
     },
     {
-      "file": "assets/js/useDashboardLayout-D-ALCvv-.js",
+      "file": "assets/js/useDashboardLayout-CmmZYW4e.js",
       "size": 7767,
       "sizeKB": 7.58
     },
     {
-      "file": "assets/js/wallet-D6Ri4Hcu.js",
+      "file": "assets/js/wallet-Z-dzuhtO.js",
       "size": 7518,
       "sizeKB": 7.34
     },
     {
-      "file": "assets/js/OnboardingFlow-B75ppNZZ.js",
+      "file": "assets/js/OnboardingFlow-Ce67W9GC.js",
       "size": 7220,
       "sizeKB": 7.05
     },
@@ -245,17 +246,17 @@
       "sizeKB": 7.04
     },
     {
-      "file": "assets/js/CartPage-DEcJvCM7.js",
+      "file": "assets/js/CartPage-b7m87Rmd.js",
       "size": 6845,
       "sizeKB": 6.68
     },
     {
-      "file": "assets/js/FavoritesView-DMDUidU2.js",
+      "file": "assets/js/FavoritesView-BJBcGPl1.js",
       "size": 6283,
       "sizeKB": 6.14
     },
     {
-      "file": "assets/js/useSurpriseBaskets-Dei_5f6K.js",
+      "file": "assets/js/useSurpriseBaskets-D95-ag7X.js",
       "size": 5421,
       "sizeKB": 5.29
     },
@@ -265,7 +266,7 @@
       "sizeKB": 5.22
     },
     {
-      "file": "assets/js/NotFoundView2025-TALyFtk6.js",
+      "file": "assets/js/NotFoundView2025-DLzu_8yY.js",
       "size": 5026,
       "sizeKB": 4.91
     },
@@ -280,12 +281,17 @@
       "sizeKB": 4.24
     },
     {
-      "file": "assets/js/reservations-BYpyLqiz.js",
+      "file": "assets/js/DashboardHeader-gWjOuohW.js",
+      "size": 4331,
+      "sizeKB": 4.23
+    },
+    {
+      "file": "assets/js/reservations-BWASSGSX.js",
       "size": 4130,
       "sizeKB": 4.03
     },
     {
-      "file": "assets/js/AdminModal.vue_vue_type_script_setup_true_lang-pbUfF3Q-.js",
+      "file": "assets/js/AdminModal.vue_vue_type_script_setup_true_lang-C4AyBt0k.js",
       "size": 4063,
       "sizeKB": 3.97
     },
@@ -305,7 +311,7 @@
       "sizeKB": 3.57
     },
     {
-      "file": "assets/js/useLoyaltyPoints-DjG_eGs6.js",
+      "file": "assets/js/useLoyaltyPoints-D-0qeRyC.js",
       "size": 3171,
       "sizeKB": 3.1
     },
@@ -325,17 +331,17 @@
       "sizeKB": 2.63
     },
     {
-      "file": "assets/js/Card-D0RlqfdI.js",
+      "file": "assets/js/Card-LqhrIB7v.js",
       "size": 2642,
       "sizeKB": 2.58
     },
     {
-      "file": "assets/js/Badge-pxAZq2bQ.js",
+      "file": "assets/js/Badge-CUtBcAZu.js",
       "size": 2436,
       "sizeKB": 2.38
     },
     {
-      "file": "assets/js/favorites-C1e59xoz.js",
+      "file": "assets/js/favorites-Mu9iU3oP.js",
       "size": 2377,
       "sizeKB": 2.32
     },
@@ -350,17 +356,22 @@
       "sizeKB": 2.18
     },
     {
+      "file": "assets/js/Select-VY6sXj-z.js",
+      "size": 1825,
+      "sizeKB": 1.78
+    },
+    {
       "file": "assets/js/sanitization-D4M-R-Tw.js",
       "size": 1711,
       "sizeKB": 1.67
     },
     {
-      "file": "assets/js/payments-DLYgRmH-.js",
+      "file": "assets/js/payments-BU6Nz7n7.js",
       "size": 1664,
       "sizeKB": 1.63
     },
     {
-      "file": "assets/js/ProfileView-DbvLS_xc.js",
+      "file": "assets/js/ProfileView-8ZgtHZ21.js",
       "size": 1634,
       "sizeKB": 1.6
     },
@@ -370,7 +381,7 @@
       "sizeKB": 1.49
     },
     {
-      "file": "assets/js/EmptyState-DTAa2mBY.js",
+      "file": "assets/js/EmptyState-CEJsgBKl.js",
       "size": 1324,
       "sizeKB": 1.29
     },
@@ -395,9 +406,9 @@
       "sizeKB": 0.94
     },
     {
-      "file": "assets/js/Label-CoI5sllw.js",
-      "size": 846,
-      "sizeKB": 0.83
+      "file": "assets/js/Label-DYg28ATh.js",
+      "size": 865,
+      "sizeKB": 0.84
     },
     {
       "file": "assets/js/CogIcon-C7wTC69X.js",
@@ -408,6 +419,11 @@
       "file": "assets/css/LoginView-DAsXAM3k.css",
       "size": 745,
       "sizeKB": 0.73
+    },
+    {
+      "file": "assets/css/DashboardHeader-D-gogVfD.css",
+      "size": 708,
+      "sizeKB": 0.69
     },
     {
       "file": "assets/js/StarIcon-D5Xoys0y.js",
@@ -435,7 +451,7 @@
       "sizeKB": 0.53
     },
     {
-      "file": "assets/css/LoyaltyManagement-CK3ZVi53.css",
+      "file": "assets/css/Select-B9xsPwP4.css",
       "size": 513,
       "sizeKB": 0.5
     },
@@ -505,13 +521,18 @@
       "sizeKB": 0.25
     },
     {
-      "file": "assets/css/ProductDetailView2025-DAcah9E8.css",
+      "file": "assets/css/ProductDetailView2025-hZw-YcTy.css",
       "size": 225,
       "sizeKB": 0.22
     },
     {
       "file": "assets/css/ProductsView2025-sldnW_1-.css",
       "size": 177,
+      "sizeKB": 0.17
+    },
+    {
+      "file": "assets/css/CategoriesView-Bu67TDfd.css",
+      "size": 171,
       "sizeKB": 0.17
     },
     {
@@ -535,13 +556,18 @@
       "sizeKB": 0.11
     },
     {
-      "file": "assets/css/Label-_7BmKURY.css",
+      "file": "assets/css/Label-Dc15gh1f.css",
       "size": 106,
       "sizeKB": 0.1
     },
     {
       "file": "assets/js/vendor-ui-l0sNRNKZ.js",
       "size": 1,
+      "sizeKB": 0
+    },
+    {
+      "file": "assets/css/LoyaltyManagement-tn0RQdqM.css",
+      "size": 0,
       "sizeKB": 0
     }
   ]

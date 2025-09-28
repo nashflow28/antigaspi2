@@ -14,6 +14,14 @@ import { launch as launchChrome } from 'chrome-launcher'
 import { chromium } from 'playwright'
 import axe from 'axe-core'
 
+import {
+  ensurePlaywrightChromium,
+  npmCmd,
+  computeBuildCacheKey,
+  loadCachedBuildKey,
+  writeBuildCacheKey
+} from './utils/runtime.js'
+
 const __filename = fileURLToPath(import.meta.url)
 const _unused_dirname = path.dirname(__filename)
 
@@ -33,13 +41,10 @@ const A11Y_ARTIFACT = path.join(RESULTS_DIR, 'a11y-report.json')
 const PREVIEW_PORT = 4173
 const PREVIEW_URL = `http://127.0.0.1:${PREVIEW_PORT}`
 let lastBuildSucceeded = false
-let cachedChromiumPath = ''
 
 if (!fs.existsSync(RESULTS_DIR)) {
   fs.mkdirSync(RESULTS_DIR, { recursive: true })
 }
-
-const npmCmd = process.platform === 'win32' ? 'npm.cmd' : 'npm'
 
 function runNpmScript(script, args = []) {
   const commandArgs = ['run', script]
@@ -106,39 +111,9 @@ async function withPreviewServer(callback, options = {}) {
   }
 }
 
-function ensureChromiumBinary() {
-  if (cachedChromiumPath && fs.existsSync(cachedChromiumPath)) {
-    return cachedChromiumPath
-  }
-
-  let executablePath = ''
-  try {
-    executablePath = chromium.executablePath?.() || ''
-  } catch (error) {
-    executablePath = ''
-  }
-
-  if (!executablePath || !fs.existsSync(executablePath)) {
-    console.log('   • Installing Playwright Chromium browser (one-time setup)...')
-    const result = spawnSync(npmCmd, ['exec', 'playwright', 'install', 'chromium'], {
-      cwd: PROJECT_ROOT,
-      stdio: 'inherit'
-    })
-
-    if (result.status !== 0) {
-      throw new Error('Failed to install Playwright Chromium browser')
-    }
-
-    executablePath = chromium.executablePath?.() || ''
-  }
-
-  if (!executablePath || !fs.existsSync(executablePath)) {
-    throw new Error('Chromium executable not found after installation')
-  }
-
-  cachedChromiumPath = executablePath
-  return cachedChromiumPath
-}
+const computeCurrentBuildKey = () => computeBuildCacheKey(PROJECT_ROOT)
+const readCachedBuildKey = () => loadCachedBuildKey(PROJECT_ROOT)
+const persistBuildKey = hash => writeBuildCacheKey(PROJECT_ROOT, hash)
 const VALIDATION_RESULTS = {
   timestamp: new Date().toISOString(),
   scores: {},
@@ -334,9 +309,9 @@ function collectBuildStats(distDir) {
 }
 
 async function runLighthouseAudit(url) {
-  const chromePath = ensureChromiumBinary()
+  const chromePath = ensurePlaywrightChromium({ cwd: PROJECT_ROOT })
   const chrome = await launchChrome({
-    chromeFlags: ['--headless', '--no-sandbox'],
+    chromeFlags: ['--headless=new', '--no-sandbox', '--disable-dev-shm-usage'],
     chromePath
   })
   try {
@@ -361,7 +336,7 @@ async function runLighthouseAudit(url) {
 }
 
 async function runAccessibilityAudit(url) {
-  const executablePath = ensureChromiumBinary()
+  const executablePath = ensurePlaywrightChromium({ cwd: PROJECT_ROOT })
   const browser = await chromium.launch({ args: ['--no-sandbox'], executablePath, headless: true })
   try {
     const page = await browser.newPage()
@@ -380,23 +355,34 @@ async function validatePerformance() {
   console.log('⚡ Validating performance impact...')
 
   try {
+    const currentHash = computeCurrentBuildKey()
+    const distDir = path.join(PROJECT_ROOT, 'dist')
     let buildError
+    let reusedBuild = false
+
     try {
-      runNpmScript('build')
-      lastBuildSucceeded = true
+      if (fs.existsSync(distDir) && readCachedBuildKey() === currentHash) {
+        console.log('   • Using cached production build (no source changes detected)')
+        lastBuildSucceeded = true
+        reusedBuild = true
+      } else {
+        runNpmScript('build')
+        lastBuildSucceeded = true
+        persistBuildKey(currentHash)
+      }
     } catch (error) {
       lastBuildSucceeded = false
       buildError = error
       VALIDATION_RESULTS.warnings.push('Production build failed – falling back to dev server for audits')
     }
 
-    const distDir = path.join(PROJECT_ROOT, 'dist')
     const { assets, totalSize } = lastBuildSucceeded ? collectBuildStats(distDir) : { assets: [], totalSize: 0 }
     const bundleSizeMB = +(totalSize / 1024 / 1024).toFixed(2)
 
     const buildStats = {
       generatedAt: new Date().toISOString(),
       buildSucceeded: lastBuildSucceeded,
+      reusedBuild,
       totalSize,
       bundleSizeMB,
       assets: assets.sort((a, b) => b.size - a.size)
@@ -421,7 +407,7 @@ async function validatePerformance() {
         details: {
           bundleSize: totalSize,
           bundleSizeMB,
-          environment: lastBuildSucceeded ? 'preview' : 'dev',
+          environment: lastBuildSucceeded ? (reusedBuild ? 'cached-preview' : 'preview') : 'dev',
           lighthouse: {
             performance: performanceScore,
             metrics: {
@@ -459,7 +445,7 @@ async function validatePerformance() {
         details: {
           bundleSize: totalSize,
           bundleSizeMB,
-          environment: lastBuildSucceeded ? 'preview' : 'dev',
+          environment: lastBuildSucceeded ? (reusedBuild ? 'cached-preview' : 'preview') : 'dev',
           error: lighthouseError.message,
           artifacts: {
             buildStats: path.relative(PROJECT_ROOT, BUILD_STATS_ARTIFACT),
