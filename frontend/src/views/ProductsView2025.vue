@@ -298,31 +298,100 @@ const DEFAULT_CATEGORY_LABELS: Record<string, string> = {
   other: 'Autres'
 }
 
-const CATEGORY_DISPLAY_ORDER = ['bakery', 'dairy', 'meat', 'produce', 'prepared', 'other']
+const CATEGORY_DISPLAY_ORDER = ['bakery', 'dairy', 'meat', 'produce', 'prepared', 'other'] as const
+const CATEGORY_ORDER_MAP = new Map(CATEGORY_DISPLAY_ORDER.map((slug, index) => [slug, index]))
 
 const categoryLabels = ref<Record<string, string>>({ ...DEFAULT_CATEGORY_LABELS })
 const categorySlugToId = ref<Record<string, number>>({})
 
-const categoryOptions = computed(() => {
-  const labels = categoryLabels.value
-  const seen = new Set<string>()
+type CategoryMetadata = {
+  slug: string
+  label?: string
+  id?: number | null
+}
 
-  const orderedOptions = CATEGORY_DISPLAY_ORDER
-    .filter(slug => Boolean(labels[slug]))
-    .map(slug => {
-      seen.add(slug)
-      return {
-        slug,
-        label: labels[slug]
+const mergeCategoryMetadata = (items: CategoryMetadata[]) => {
+  if (!items.length) {
+    return
+  }
+
+  const labelsToMerge: Record<string, string> = {}
+  const idsToMerge: Record<string, number> = {}
+  const fallbackSlugsToRemove = new Set<string>()
+
+  items.forEach(item => {
+    if (!item.slug) {
+      return
+    }
+
+    if (typeof item.id === 'number' && Number.isFinite(item.id)) {
+      idsToMerge[item.slug] = item.id
+    }
+
+    if (item.label) {
+      labelsToMerge[item.slug] = item.label
+
+      const fallbackSlug = Object.entries(DEFAULT_CATEGORY_LABELS)
+        .find(([, defaultLabel]) => defaultLabel === item.label)?.[0]
+
+      if (fallbackSlug) {
+        fallbackSlugsToRemove.add(fallbackSlug)
+      }
+    }
+  })
+
+  if (Object.keys(idsToMerge).length > 0) {
+    categorySlugToId.value = { ...categorySlugToId.value, ...idsToMerge }
+  }
+
+  if (Object.keys(labelsToMerge).length > 0) {
+    const mergedLabels: Record<string, string> = { ...categoryLabels.value, ...labelsToMerge }
+
+    fallbackSlugsToRemove.forEach(slug => {
+      if (slug !== 'other' && !(slug in labelsToMerge) && slug in mergedLabels) {
+        delete mergedLabels[slug]
       }
     })
 
-  const additionalOptions = Object.entries(labels)
-    .filter(([slug]) => !seen.has(slug))
-    .map(([slug, label]) => ({ slug, label }))
-    .sort((a, b) => a.label.localeCompare(b.label, 'fr'))
+    categoryLabels.value = mergedLabels
+  }
+}
 
-  return [...orderedOptions, ...additionalOptions]
+const categoryOptions = computed(() => {
+  const entries = Object.entries(categoryLabels.value)
+    .map(([slug, label]) => ({ slug, label }))
+
+  const resolveOrderKey = (slug: string, label: string): number => {
+    if (CATEGORY_ORDER_MAP.has(slug)) {
+      return CATEGORY_ORDER_MAP.get(slug) as number
+    }
+
+    const matchedPrefix = slug.match(/^([a-z0-9-]+)-(\d+)$/)?.[1]
+    if (matchedPrefix && CATEGORY_ORDER_MAP.has(matchedPrefix)) {
+      return CATEGORY_ORDER_MAP.get(matchedPrefix) as number
+    }
+
+    const fallbackSlug = Object.entries(DEFAULT_CATEGORY_LABELS)
+      .find(([, defaultLabel]) => defaultLabel === label)?.[0]
+
+    if (fallbackSlug && CATEGORY_ORDER_MAP.has(fallbackSlug)) {
+      return CATEGORY_ORDER_MAP.get(fallbackSlug) as number
+    }
+
+    return Number.POSITIVE_INFINITY
+  }
+
+  return entries
+    .sort((a, b) => {
+      const orderA = resolveOrderKey(a.slug, a.label)
+      const orderB = resolveOrderKey(b.slug, b.label)
+
+      if (orderA !== orderB) {
+        return orderA - orderB
+      }
+
+      return a.label.localeCompare(b.label, 'fr')
+    })
 })
 
 const filters = ref({
@@ -410,23 +479,13 @@ const loadCategories = async () => {
       return
     }
 
-    const slugToId: Record<string, number> = {}
-    const labels: Record<string, string> = {}
+    const metadata: CategoryMetadata[] = response.data.map(category => ({
+      slug: getCategoryKey(category),
+      label: category.name,
+      id: category.id
+    }))
 
-    response.data.forEach(category => {
-      const slug = getCategoryKey(category.name)
-
-      if (typeof category.id === 'number' && Number.isFinite(category.id) && !(slug in slugToId)) {
-        slugToId[slug] = category.id
-      }
-
-      if (category.name) {
-        labels[slug] = category.name
-      }
-    })
-
-    categorySlugToId.value = { ...categorySlugToId.value, ...slugToId }
-    categoryLabels.value = { ...categoryLabels.value, ...labels }
+    mergeCategoryMetadata(metadata)
   } catch (error) {
     console.warn('Impossible de charger les catégories', error)
   }
@@ -478,6 +537,14 @@ const fetchProducts = async () => {
     }
 
     products.value = response.data.map(normalizeProduct)
+
+    const productMetadata: CategoryMetadata[] = response.data.map(item => ({
+      slug: getCategoryKey(item.category),
+      label: item.category?.name,
+      id: item.category?.id
+    }))
+
+    mergeCategoryMetadata(productMetadata)
   } catch (error: any) {
     const message = error?.message || 'Nous rencontrons un souci pour récupérer certains produits. Réessayez plus tard.'
     notify.warning(message, 'Chargement incomplet')
