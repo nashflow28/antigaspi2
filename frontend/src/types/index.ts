@@ -109,12 +109,77 @@ export interface AdminDashboardEnvironmentalImpact {
   [key: string]: unknown
 }
 
+export interface AdminDashboardUserDistributionEntry {
+  id?: number | string
+  label?: string
+  role?: string
+  value?: number
+  count?: number
+  total?: number
+  [key: string]: unknown
+}
+
 export interface AdminDashboardData {
   stats?: AdminDashboardStats
   topMerchants?: AdminDashboardMerchant[]
   popularCategories?: AdminDashboardCategory[]
   recentActivities?: AdminDashboardActivity[]
   environmentalImpact?: AdminDashboardEnvironmentalImpact
+  userDistribution?: AdminDashboardUserDistributionEntry[] | Record<string, unknown>
+  [key: string]: unknown
+}
+
+export interface AnalyticsFilters {
+  start_date?: string
+  end_date?: string
+  merchant_id?: number | string | null
+  [key: string]: unknown
+}
+
+export interface AnalyticsDailyBreakdownEntry {
+  date: string
+  merchant_id?: number | null
+  total_reservations?: number
+  total_revenue?: number
+  products_saved_from_waste?: number
+  new_users?: number
+  [key: string]: unknown
+}
+
+export interface AnalyticsSummary {
+  total_reservations?: number
+  total_revenue?: number
+  products_saved_from_waste?: number
+  new_users?: number
+  event_count?: number
+  [key: string]: unknown
+}
+
+export interface AnalyticsEventCount {
+  name?: string
+  category?: string
+  count?: number
+  [key: string]: unknown
+}
+
+export interface AnalyticsRecentEvent {
+  id: number | string
+  name?: string
+  category?: string
+  properties?: Record<string, unknown> | null
+  occurred_at?: string | null
+  [key: string]: unknown
+}
+
+export interface AnalyticsStatsResponse {
+  success: boolean
+  filters?: AnalyticsFilters
+  summary?: AnalyticsSummary
+  daily_breakdown?: AnalyticsDailyBreakdownEntry[]
+  top_events?: AnalyticsEventCount[]
+  events_by_category?: AnalyticsEventCount[]
+  recent_events?: AnalyticsRecentEvent[]
+  message?: string
   [key: string]: unknown
 }
 
