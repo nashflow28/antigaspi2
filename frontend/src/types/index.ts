@@ -283,6 +283,12 @@ export interface ApiResponse<T> {
   }
 }
 
+export interface MerchantLocation {
+  latitude: number | null
+  longitude: number | null
+  has_location?: boolean
+}
+
 export interface ReservationCreationPayload {
   productId: number
   quantity: number
