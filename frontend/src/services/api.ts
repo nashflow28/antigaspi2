@@ -23,7 +23,8 @@ import type {
   LoyaltyPoint,
   AnalyticsStatsResponse,
   Review,
-  ReviewStats
+  ReviewStats,
+  MerchantLocation
 } from '@/types'
 
 const DEFAULT_API_BASE_URL = 'http://localhost:8000/api'
@@ -320,6 +321,14 @@ class ApiService {
     return this.request<ApiResponse<Reservation>>(`/reservations/${id}/confirm`, {
       method: 'POST'
     }, true)
+  }
+
+  async getMerchantLocation(): Promise<ApiResponse<MerchantLocation>> {
+    return this.get<ApiResponse<MerchantLocation>>('/merchants/location', true)
+  }
+
+  async updateMerchantLocation(payload: { latitude: number; longitude: number }): Promise<ApiResponse<MerchantLocation>> {
+    return this.put<ApiResponse<MerchantLocation>>('/merchants/location', payload, true)
   }
 
   // Reviews

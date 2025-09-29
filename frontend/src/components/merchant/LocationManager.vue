@@ -263,11 +263,9 @@
 
 <script setup lang="ts">
 import { ref, onMounted, nextTick } from 'vue'
-import { useAuthStore } from '@/stores/auth'
+import apiService from '@/services/api'
 import { MapPin, RefreshCw, X, CheckCircle, XCircle, Info } from 'lucide-vue-next'
 import 'leaflet/dist/leaflet.css'
-
-const authStore = useAuthStore()
 
 // State
 const loading = ref(false)
@@ -304,28 +302,34 @@ const showNotification = (type: 'success' | 'error' | 'info', title: string, mes
   }, 5000)
 }
 
+const toNumberOrNull = (value: unknown): number | null => {
+  if (value === null || value === undefined) {
+    return null
+  }
+
+  const numeric = Number(value)
+  return Number.isFinite(numeric) ? numeric : null
+}
+
 const loadCurrentLocation = async () => {
   try {
-    const token = authStore.token
+    const response = await apiService.getMerchantLocation()
 
-    const response = await fetch('http://localhost:8000/api/merchants/location', {
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'Accept': 'application/json'
-      }
-    })
+    if (response.success && response.data) {
+      const latitude = toNumberOrNull(response.data.latitude)
+      const longitude = toNumberOrNull(response.data.longitude)
 
-    const data = await response.json()
-
-    if (data.success) {
-      location.value.latitude = parseFloat(data.data.latitude)
-      location.value.longitude = parseFloat(data.data.longitude)
-      hasLocation.value = data.data.has_location
-    } else {
-      // console.error('Error loading location:', data.message)
+      location.value.latitude = latitude
+      location.value.longitude = longitude
+      form.value.latitude = latitude
+      form.value.longitude = longitude
+      hasLocation.value = Boolean(response.data.has_location ?? (latitude !== null && longitude !== null))
+    } else if (response.message) {
+      showNotification('error', 'Erreur', response.message)
     }
   } catch (error) {
-    // console.error('Error loading location:', error)
+    const errorMessage = error instanceof Error ? error.message : 'Erreur lors du chargement de la localisation'
+    showNotification('error', 'Erreur', errorMessage)
   }
 }
 
@@ -342,9 +346,13 @@ const getCurrentLocation = () => {
       const latitude = position.coords.latitude
       const longitude = position.coords.longitude
 
-      // Auto-save the location
-      await updateLocation(latitude, longitude)
-      loading.value = false
+      try {
+        await updateLocation(latitude, longitude)
+      } catch (error) {
+        // Notification already handled in updateLocation
+      } finally {
+        loading.value = false
+      }
     },
     (error) => {
       loading.value = false
@@ -374,32 +382,27 @@ const getCurrentLocation = () => {
 
 const updateLocation = async (latitude: number, longitude: number) => {
   try {
-    const token = authStore.token
+    const response = await apiService.updateMerchantLocation({ latitude, longitude })
 
-    const response = await fetch('http://localhost:8000/api/merchants/location', {
-      method: 'PUT',
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'Accept': 'application/json',
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ latitude, longitude })
-    })
-
-    const data = await response.json()
-
-    if (data.success) {
-      location.value.latitude = parseFloat(data.data.latitude)
-      location.value.longitude = parseFloat(data.data.longitude)
-      hasLocation.value = true
-
-      showNotification('success', 'Position enregistrée', 'Votre position a été mise à jour avec succès')
-    } else {
-      throw new Error(data.message || 'Erreur lors de la mise à jour')
+    if (!response.success) {
+      throw new Error(response.message || 'Erreur lors de la mise à jour de la position')
     }
+
+    const updatedLatitude = toNumberOrNull(response.data?.latitude) ?? latitude
+    const updatedLongitude = toNumberOrNull(response.data?.longitude) ?? longitude
+
+    location.value.latitude = updatedLatitude
+    location.value.longitude = updatedLongitude
+    form.value.latitude = updatedLatitude
+    form.value.longitude = updatedLongitude
+    hasLocation.value = updatedLatitude !== null && updatedLongitude !== null
+
+    const successMessage = response.message || 'Votre position a été mise à jour avec succès'
+    showNotification('success', 'Position enregistrée', successMessage)
   } catch (error) {
-    // console.error('Error updating location:', error)
-    showNotification('error', 'Erreur', error instanceof Error ? error.message : 'Erreur inconnue')
+    const errorMessage = error instanceof Error ? error.message : 'Erreur inconnue lors de la mise à jour'
+    showNotification('error', 'Erreur', errorMessage)
+    throw error
   }
 }
 
