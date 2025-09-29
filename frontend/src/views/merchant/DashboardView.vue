@@ -283,7 +283,6 @@
 
 <script setup lang="ts">
 import { computed, onMounted, reactive, ref } from 'vue'
-import { useAuthStore } from '@/stores/auth'
 import LocationManager from '@/components/merchant/LocationManager.vue'
 import DashboardLayout from '@/components/ui/DashboardLayout.vue'
 import { useDashboardLayout } from '@/composables/useDashboardLayout'
@@ -302,9 +301,20 @@ import {
 import { Card, Button, Badge } from '@/components/ui/2025'
 import { DashboardHeader, QuickActionsCard, StatCard, StatCardGrid } from '@/components/dashboard/2025'
 import type { BadgeVariant } from '@/components/ui/2025'
+import { notify } from '@/composables/useNotifications'
+import { apiService } from '@/services/api'
+import type { ApiResponse, Product, Reservation } from '@/types'
 
-const authStore = useAuthStore()
 const { sidebar, header } = useDashboardLayout('merchant')
+
+type WithOptionalMeta<T> = T & {
+  meta?: Record<string, unknown>
+  metrics?: Record<string, unknown>
+  summary?: Record<string, unknown>
+}
+
+type MerchantReservationsResponse = WithOptionalMeta<ApiResponse<Reservation[]>>
+type MerchantProductsResponse = WithOptionalMeta<ApiResponse<Product[]>>
 
 const stats = reactive({
   total_products: 0,
@@ -442,93 +452,272 @@ const handleQuickAction = (action: (typeof quickActions)[number]) => {
   }
 }
 
+const parseNumber = (value: unknown) => {
+  if (typeof value === 'number') {
+    return Number.isFinite(value) ? value : null
+  }
+
+  if (typeof value === 'string' && value.trim() !== '') {
+    const parsed = Number(value)
+    return Number.isNaN(parsed) ? null : parsed
+  }
+
+  return null
+}
+
+const extractMetric = (
+  sources: Array<Record<string, unknown> | undefined>,
+  keys: string[],
+  fallback: number
+) => {
+  for (const source of sources) {
+    if (!source) {
+      continue
+    }
+
+    for (const key of keys) {
+      if (!(key in source)) {
+        continue
+      }
+
+      const value = parseNumber((source as Record<string, unknown>)[key])
+      if (value !== null) {
+        return value
+      }
+    }
+  }
+
+  return fallback
+}
+
+type ReservationsLoadResult = {
+  items: Array<{
+    id: number
+    customer_name: string
+    product_name: string
+    total_amount: number
+    status: string
+    created_at: string
+  }>
+  rawData: Reservation[]
+  response: MerchantReservationsResponse | null
+}
+
+type ProductsLoadResult = {
+  items: Array<{
+    id: number
+    name: string
+    category: string
+    discounted_price: number
+    original_price: number
+    quantity_available: number
+    image_url: string | null
+  }>
+  rawData: Product[]
+  response: MerchantProductsResponse | null
+}
+
+const loadRecentReservations = async (): Promise<ReservationsLoadResult> => {
+  const emptyResult: ReservationsLoadResult = {
+    items: [],
+    rawData: [],
+    response: null
+  }
+
+  try {
+    const response = await apiService.getMerchantReservations({ per_page: 5 }) as MerchantReservationsResponse
+
+    if (!response?.success) {
+      const message = response?.message || 'Impossible de charger les réservations récentes.'
+      notify.error(message)
+      recentReservations.value = []
+      return { ...emptyResult, response }
+    }
+
+    const reservationsData = Array.isArray(response.data) ? response.data : []
+
+    const mappedReservations = reservationsData.map(res => {
+      const consumer = (res as Reservation).consumer || (res as any).user || {}
+      const customerName = `${(consumer as any)?.first_name || ''} ${(consumer as any)?.last_name || ''}`.trim()
+      const product = (res as Reservation).product || {}
+
+      return {
+        id: res.id,
+        customer_name: customerName || (consumer as any)?.name || 'Client',
+        product_name: (product as any)?.name || 'Produit inconnu',
+        total_amount: parseNumber((res as any)?.total_amount) ?? parseNumber((res as any)?.discounted_price) ?? 0,
+        status: (res as any)?.status || 'pending',
+        created_at: (res as any)?.created_at || new Date().toISOString()
+      }
+    })
+
+    recentReservations.value = mappedReservations
+
+    return {
+      items: mappedReservations,
+      rawData: reservationsData,
+      response
+    }
+  } catch (error) {
+    notify.error('Erreur lors du chargement des réservations récentes.')
+    recentReservations.value = []
+    return emptyResult
+  }
+}
+
+const loadRecentProducts = async (): Promise<ProductsLoadResult> => {
+  const emptyResult: ProductsLoadResult = {
+    items: [],
+    rawData: [],
+    response: null
+  }
+
+  try {
+    const response = await apiService.getMerchantProducts({ per_page: 5 }) as MerchantProductsResponse
+
+    if (!response?.success) {
+      const message = response?.message || 'Impossible de charger les produits récents.'
+      notify.error(message)
+      recentProducts.value = []
+      return { ...emptyResult, response }
+    }
+
+    const productsData = Array.isArray(response.data) ? response.data : []
+
+    const mappedProducts = productsData.map(product => ({
+      id: product.id,
+      name: product.name,
+      category: (product.category as any)?.name || 'Catégorie',
+      discounted_price: parseNumber((product as any)?.discounted_price) ?? 0,
+      original_price: parseNumber((product as any)?.original_price) ?? 0,
+      quantity_available: (product as any)?.quantity_available ?? 0,
+      image_url: (product as any)?.image_url || null
+    }))
+
+    recentProducts.value = mappedProducts
+
+    return {
+      items: mappedProducts,
+      rawData: productsData,
+      response
+    }
+  } catch (error) {
+    notify.error('Erreur lors du chargement des produits récents.')
+    recentProducts.value = []
+    return emptyResult
+  }
+}
+
+const hydrateStats = (
+  reservationsResult: ReservationsLoadResult,
+  productsResult: ProductsLoadResult
+) => {
+  const reservationsRaw = reservationsResult.response
+  const productsRaw = productsResult.response
+
+  const reservationsMetaSources = [
+    reservationsRaw?.meta,
+    reservationsRaw?.metrics,
+    reservationsRaw?.summary
+  ]
+
+  const productsMetaSources = [
+    productsRaw?.meta,
+    productsRaw?.metrics,
+    productsRaw?.summary
+  ]
+
+  const reservationsPagination = reservationsRaw?.pagination
+  const productsPagination = productsRaw?.pagination
+
+  const rawReservations = reservationsResult.rawData
+
+  const totalReservations =
+    parseNumber(reservationsPagination?.total) ?? rawReservations.length
+
+  const pendingFromData = rawReservations.filter(res => (res as any)?.status === 'pending').length
+  const completedFromData = rawReservations.filter(res => (res as any)?.status === 'completed').length
+  const revenueFromData = rawReservations.reduce((sum, reservation) => {
+    const amount = parseNumber((reservation as any)?.total_amount) ?? 0
+    return sum + amount
+  }, 0)
+  const productsSoldFromData = rawReservations.reduce((sum, reservation) => {
+    const quantity = parseNumber((reservation as any)?.quantity_reserved) ?? parseNumber((reservation as any)?.quantity) ?? 0
+    return sum + quantity
+  }, 0)
+
+  stats.total_products =
+    parseNumber(productsPagination?.total) ??
+    extractMetric(productsMetaSources, ['total_products', 'products_total', 'products_count', 'count'], productsResult.rawData.length)
+
+  stats.pending_reservations = extractMetric(
+    [...reservationsMetaSources, reservationsPagination as Record<string, unknown> | undefined],
+    ['pending_reservations', 'pending_count', 'pending'],
+    pendingFromData
+  )
+
+  stats.completed_reservations = extractMetric(
+    [...reservationsMetaSources, reservationsPagination as Record<string, unknown> | undefined],
+    ['completed_reservations', 'completed_count', 'completed'],
+    completedFromData
+  )
+
+  stats.total_revenue = extractMetric(
+    reservationsMetaSources,
+    ['total_revenue', 'revenue_total', 'revenue'],
+    revenueFromData
+  )
+
+  stats.products_sold = extractMetric(
+    [...reservationsMetaSources, ...productsMetaSources],
+    ['products_sold', 'items_sold', 'sold_count'],
+    productsSoldFromData
+  )
+
+  const computedConversion = totalReservations > 0 ? Math.round((stats.completed_reservations / totalReservations) * 100) : 0
+
+  stats.conversion_rate = extractMetric(
+    reservationsMetaSources,
+    ['conversion_rate', 'conversion'],
+    computedConversion
+  )
+
+  stats.average_rating = extractMetric(
+    [...productsMetaSources, ...reservationsMetaSources],
+    ['average_rating', 'avg_rating'],
+    0
+  )
+
+  stats.co2_saved = extractMetric(
+    [...reservationsMetaSources, ...productsMetaSources],
+    ['co2_saved', 'co2_saved_kg', 'co2_reduction'],
+    0
+  )
+}
+
 const loadDashboardData = async () => {
   try {
-    stats.total_products = 8
-    stats.pending_reservations = 3
-    stats.total_revenue = 160_928
-    stats.completed_reservations = 15
-    stats.conversion_rate = 67
-    stats.average_rating = 4.5
-    stats.products_sold = 23
-    stats.co2_saved = 48.5
+    const [reservationsResult, productsResult] = await Promise.all([
+      loadRecentReservations(),
+      loadRecentProducts()
+    ])
 
-    await loadRecentReservations()
-    await loadRecentProducts()
+    hydrateStats(reservationsResult, productsResult)
 
-    notifications.value = [
-      {
-        id: 1,
-        title: 'Nouvelle réservation',
-        message: 'Vous avez reçu une nouvelle réservation de Marie Dubois',
-        created_at: new Date().toISOString()
-      }
-    ]
-  } catch (error) {
-    // console.error('Error loading dashboard data:', error)
-  }
-}
+    notifications.value = reservationsResult.rawData.slice(0, 3).map(reservation => {
+      const consumer = (reservation as any)?.consumer || (reservation as any)?.user || {}
+      const customerName = `${consumer?.first_name || ''} ${consumer?.last_name || ''}`.trim() || consumer?.name || 'Client'
+      const productName = (reservation as any)?.product?.name || 'Produit'
 
-const loadRecentReservations = async () => {
-  try {
-    const response = await fetch('http://localhost:8000/api/reservations/merchant/list?per_page=5', {
-      method: 'GET',
-      headers: {
-        Accept: 'application/json',
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${authStore.token}`
+      return {
+        id: reservation.id,
+        title: (reservation as any)?.status === 'pending' ? 'Nouvelle réservation' : `Réservation ${getStatusText((reservation as any)?.status)}`,
+        message: `${productName} pour ${customerName}`,
+        created_at: (reservation as any)?.created_at || new Date().toISOString()
       }
     })
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`)
-    }
-
-    const data = await response.json()
-    if (data.success && data.data) {
-      recentReservations.value = data.data.map((res: any) => ({
-        id: res.id,
-        customer_name: `${res.consumer?.first_name || ''} ${res.consumer?.last_name || ''}`.trim() || 'Client',
-        product_name: res.product?.name || 'Produit inconnu',
-        total_amount: parseFloat(res.total_amount || 0),
-        status: res.status,
-        created_at: res.created_at
-      }))
-    }
   } catch (error) {
-    recentReservations.value = []
-  }
-}
-
-const loadRecentProducts = async () => {
-  try {
-    const response = await fetch('http://localhost:8000/api/products/merchant?per_page=5', {
-      method: 'GET',
-      headers: {
-        Accept: 'application/json',
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${authStore.token}`
-      }
-    })
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`)
-    }
-
-    const data = await response.json()
-    if (data.success && data.data) {
-      recentProducts.value = data.data.map((product: any) => ({
-        id: product.id,
-        name: product.name,
-        category: product.category?.name || 'Catégorie',
-        discounted_price: parseFloat(product.discounted_price || 0),
-        original_price: parseFloat(product.original_price || 0),
-        quantity_available: product.quantity_available || 0,
-        image_url: product.image_url || null
-      }))
-    }
-  } catch (error) {
-    recentProducts.value = []
+    notify.error('Une erreur est survenue lors du chargement du tableau de bord.')
   }
 }
 

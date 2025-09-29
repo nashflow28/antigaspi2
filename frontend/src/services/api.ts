@@ -209,8 +209,28 @@ class ApiService {
     return this.request<ApiResponse<Product[]>>(endpoint)
   }
 
-  async getMerchantProducts(): Promise<ApiResponse<Product[]>> {
-    return this.request<ApiResponse<Product[]>>('/products/merchant', {}, true)
+  async getMerchantProducts(
+    params?: Record<string, string | number | boolean | null | undefined>
+  ): Promise<ApiResponse<Product[]>> {
+    let query = ''
+
+    if (params) {
+      const searchParams = new URLSearchParams()
+
+      Object.entries(params).forEach(([key, value]) => {
+        if (value === undefined || value === null || value === '') {
+          return
+        }
+        searchParams.append(key, String(value))
+      })
+
+      const serializedParams = searchParams.toString()
+      if (serializedParams) {
+        query = `?${serializedParams}`
+      }
+    }
+
+    return this.request<ApiResponse<Product[]>>(`/products/merchant${query}`, {}, true)
   }
 
   async getProduct(id: number): Promise<ApiResponse<Product>> {
@@ -313,12 +333,44 @@ class ApiService {
     }, true)
   }
 
-  async getMerchantReservations(): Promise<ApiResponse<Reservation[]>> {
-    return this.request<ApiResponse<Reservation[]>>('/reservations/merchant/list', {}, true)
+  async getMerchantReservations(
+    params?: Record<string, string | number | boolean | null | undefined>
+  ): Promise<ApiResponse<Reservation[]>> {
+    let query = ''
+
+    if (params) {
+      const searchParams = new URLSearchParams()
+
+      Object.entries(params).forEach(([key, value]) => {
+        if (value === undefined || value === null || value === '') {
+          return
+        }
+        searchParams.append(key, String(value))
+      })
+
+      const serializedParams = searchParams.toString()
+      if (serializedParams) {
+        query = `?${serializedParams}`
+      }
+    }
+
+    return this.request<ApiResponse<Reservation[]>>(`/reservations/merchant/list${query}`, {}, true)
   }
 
   async confirmReservation(id: number): Promise<ApiResponse<Reservation>> {
     return this.request<ApiResponse<Reservation>>(`/reservations/${id}/confirm`, {
+      method: 'POST'
+    }, true)
+  }
+
+  async completeReservation(id: number): Promise<ApiResponse<Reservation>> {
+    return this.request<ApiResponse<Reservation>>(`/reservations/${id}/complete`, {
+      method: 'POST'
+    }, true)
+  }
+
+  async markReservationReady(id: number): Promise<ApiResponse<Reservation>> {
+    return this.request<ApiResponse<Reservation>>(`/reservations/${id}/ready`, {
       method: 'POST'
     }, true)
   }
