@@ -208,13 +208,17 @@
             :key="index"
             variant="glass"
             :no-padding="true"
-            class="space-y-4 p-4"
+            class="product-card-skeleton"
           >
-            <Skeleton class="aspect-square w-full rounded-modern" />
-            <div class="space-y-4">
-              <Skeleton class="h-4 w-4/3 rounded-full" />
-              <Skeleton class="h-3 w-1/2 rounded-full" />
-              <Skeleton class="h-4 w-full rounded" />
+            <div class="flex h-full flex-col">
+              <div class="product-card-skeleton-image" />
+              <div class="flex flex-col gap-4 p-6">
+                <Loading
+                  type="skeleton"
+                  :skeleton-lines="3"
+                  class="product-card-skeleton-lines"
+                />
+              </div>
             </div>
           </Card>
         </div>
@@ -223,9 +227,13 @@
           v-else-if="filteredProducts.length === 0"
           title="Aucun produit trouvé"
           description="Essayez de modifier votre recherche ou supprimez certains filtres pour découvrir d'autres paniers disponibles."
-          action-label="Réinitialiser les filtres"
-          icon="📦"
-          @action="clearFilters"
+          :icon="PackageSearch"
+          :primary-action="{
+            text: 'Réinitialiser les filtres',
+            variant: 'primary',
+            onClick: clearFilters
+          }"
+          variant="illustration"
         />
 
         <div
@@ -244,10 +252,13 @@
             :discount="formatDiscount(product.discount)"
             :quantity="formatQuantity(product)"
             :tags="getProductTags(product)"
+            :stock-badges="getStockBadges(product)"
             :reserve-loading="quickReserveLoadingId === product.id"
-            :reserve-disabled="isProductSoldOut(product) || quickReserveLoadingId === product.id"
-            :on-reserve="() => onReserve(product)"
-            class="h-full cursor-pointer transition-transform duration-300 hover:scale-[1.01]"
+            :reserve-disabled="isProductSoldOut(product)"
+            :disabled="isProductSoldOut(product) || quickReserveLoadingId === product.id"
+            :aria-label="`Réserver ${product.name}`"
+            class="h-full"
+            @reserve="() => onReserve(product)"
             @click="() => viewProduct(product)"
           />
         </div>
@@ -259,14 +270,14 @@
 <script setup lang="ts">
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
-import { Search, Filter, MapPin } from 'lucide-vue-next'
+import { Search, Filter, MapPin, PackageSearch } from 'lucide-vue-next'
 import Button from '@/components/ui/2025/Button.vue'
 import Card from '@/components/ui/2025/Card.vue'
 import Input from '@/components/ui/2025/Input.vue'
 import Badge from '@/components/ui/2025/Badge.vue'
-import EmptyState from '@/components/ui/EmptyState.vue'
-import Skeleton from '@/components/ui/Skeleton.vue'
-import ProductCard from '@/components/ui/ProductCard.vue'
+import EmptyState from '@/components/ui/2025/EmptyState.vue'
+import Loading from '@/components/ui/2025/Loading.vue'
+import ProductCard from '@/components/ui/2025/ProductCard.vue'
 import { notify } from '@/composables/useNotifications'
 import { useAuthStore } from '@/stores/auth'
 import { useReservationsStore } from '@/stores/reservations'
@@ -775,6 +786,25 @@ const getProductTags = (product: NormalizedProduct) => {
   return tags
 }
 
+const getStockBadges = (product: NormalizedProduct) => {
+  const badges: { label: string; variant?: string }[] = []
+  const available = getAvailableQuantity(product)
+
+  if (available <= 0) {
+    badges.push({ label: 'Rupture de stock', variant: 'error' })
+  } else if (available <= 3) {
+    badges.push({ label: 'Stock limité', variant: 'warning' })
+  } else {
+    badges.push({ label: `${available} en stock`, variant: 'success' })
+  }
+
+  if (product.reserved_quantity > 0) {
+    badges.push({ label: `${product.reserved_quantity} réservés`, variant: 'info' })
+  }
+
+  return badges
+}
+
 const clearFilters = async () => {
   isResettingFilters.value = true
 
@@ -963,5 +993,21 @@ onBeforeUnmount(() => {
 .fade-enter-from,
 .fade-leave-to {
   opacity: 0;
+}
+
+.product-card-skeleton {
+  @apply overflow-hidden rounded-3xl border border-neutral-200/60 bg-surface-light/80 shadow-card dark:border-neutral-700/60 dark:bg-surface-dark/70;
+}
+
+.product-card-skeleton-image {
+  @apply aspect-[4/3] w-full bg-gradient-to-br from-neutral-200/70 via-neutral-100/60 to-white dark:from-neutral-800/50 dark:via-neutral-700/40 dark:to-neutral-800/40;
+}
+
+.product-card-skeleton-lines :deep(.h-10) {
+  @apply h-4 rounded-lg bg-neutral-200 dark:bg-neutral-700;
+}
+
+.product-card-skeleton-lines :deep(.last\:w-sm\/3) {
+  @apply w-1/2;
 }
 </style>
