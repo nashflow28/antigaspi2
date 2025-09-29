@@ -20,6 +20,7 @@
 - **Tooltip.vue** : info-bulle avec placements multiples, variantes (`dark/light/error/warning/success`), flèche et offset configurables.【F:frontend/src/components/ui/2025/Tooltip.vue†L1-L200】
 - **Loading.vue** : états `spinner/dots/pulse/skeleton/progress/custom` avec variantes de taille, overlay et textes de statut.【F:frontend/src/components/ui/2025/Loading.vue†L1-L193】
 - **Grid.vue** : composant utilitaire pour la grille responsive (cols/gap alignements) encapsulant la nomenclature Tailwind 2025.【F:frontend/src/components/ui/2025/Grid.vue†L1-L132】
+- **Navigation.vue** : barre accessible avec skip links, gradients 2025, gestion du menu mobile (`v-model:mobileOpen`) et CTA authentification via `authCta`. Slots `brand/primary/secondary/utilities/mobile-*` exposés pour personnaliser brand, liens principaux et actions.【F:frontend/src/components/ui/2025/Navigation.vue†L1-L340】
 - **index.ts** : export centralisé des composants + types (ButtonVariant, ModalSize, etc.) pour consommation des vues 2025.【F:frontend/src/components/ui/2025/index.ts†L1-L32】
 
 ### Couverture vs primitives React
@@ -32,13 +33,29 @@
 | Card | `Card.vue` | ✅ Livré | Slots header/footer, variantes glass/gradient/elevated disponibles.【F:frontend/src/components/ui/2025/Card.vue†L1-L200】 |
 | Badge | `Badge.vue` | ✅ Livré | Couleurs statut + mode dismissible pour badges dynamiques.【F:frontend/src/components/ui/2025/Badge.vue†L1-L170】 |
 | Modal / ConfirmationModal | `Modal.vue` + boutons DS | ✅ Livré | Supporte tailles, variantes et close behavior personnalisable.【F:frontend/src/components/ui/2025/Modal.vue†L1-L200】 |
-| Navigation | (à produire) | 🚧 À faire | Les vues utilisent encore `SimpleTopBar`/layouts spécifiques ; une primitive `Navigation` 2025 reste à factoriser. |
+| Navigation | `Navigation.vue` | ✅ Livré | Skip links, ARIA et menu mobile contrôlable (`v-model:mobileOpen`) + CTA auth via `authCta`. Slots pour brand/menus permettent d'étendre la barre selon les vues.【F:frontend/src/components/ui/2025/Navigation.vue†L1-L340】 |
 | ProductCard | (à produire) | 🚧 À faire | Non implémenté côté Vue ; restera à construire à partir de `Card`/`Badge`. |
 | Skeleton | `Loading.vue` (`type='skeleton'`) | ✅ Livré | Alternative plus flexible que le composant Skeleton React.【F:frontend/src/components/ui/2025/Loading.vue†L1-L142】 |
 | Stats | (à produire) | 🚧 À faire | Aucun équivalent 2025 (utiliser `Card` + `Badge` en attendant). |
 | Textarea | (à produire) | 🚧 À faire | À décliner à partir de `Input` (comportements partagés). |
 | ThemeToggle | `2025/ThemeToggle.vue` | ✅ Livré | Composant aligné tokens 2025 (hover/focus, animations réduites) + persistance store (localStorage + media query) vérifiée par Playwright (`frontend/tests/e2e/theme-toggle.spec.ts`).【F:frontend/src/components/ui/2025/ThemeToggle.vue†L1-L141】【F:frontend/tests/e2e/theme-toggle.spec.ts†L1-L59】 |
 | Toast | `NotificationToast.vue` / système legacy | 🚧 Harmonisation | Design 2025 pas encore porté (couleurs/bordures). |
+
+### Navigation.vue — API 2025
+
+Le composant expose une API complète pour migrer les topbars React vers Vue tout en conservant l’accessibilité clavier :
+
+| API | Type | Description |
+| --- | --- | --- |
+| `brand` | `NavigationBrand` | Nom, lien (`to`/`href`), tagline et logo optionnel affichés dans le slot `brand`.【F:frontend/src/components/ui/2025/Navigation.vue†L34-L72】【F:frontend/src/components/layout/NavBar.vue†L6-L32】 |
+| `main-links` | `NavigationLink[]` | Tableau rendu par défaut sur desktop/mobile avec rôles `menubar/menuitem`, badges et icônes. Les slots `primary`/`mobile-primary` permettent d’overrider le rendu.【F:frontend/src/components/ui/2025/Navigation.vue†L74-L168】 |
+| `secondary-links` | `NavigationLink[]` | Actions secondaires par défaut. Peut être remplacé via `#secondary`/`#mobile-secondary`.【F:frontend/src/components/ui/2025/Navigation.vue†L170-L237】 |
+| `auth-cta` | `{ login?: NavigationLink; primary?: NavigationCta }` | Configure le lien « Connexion » et le CTA principal (variant `Button`). Utilisé nativement sur desktop/mobile et exposé dans les slots pour personnalisation.【F:frontend/src/components/ui/2025/Navigation.vue†L170-L237】【F:frontend/src/components/layout/NavBar.vue†L44-L109】 |
+| `v-model:mobileOpen` | `boolean` | Contrôle l’état du menu mobile. Le composant gère l’`Escape`, ferme sur clic et émet `@toggle-mobile`.【F:frontend/src/components/ui/2025/Navigation.vue†L241-L314】 |
+| Slots | `brand`, `primary`, `secondary`, `utilities`, `mobile-primary`, `mobile-secondary`, `mobile-footer` | Injection avancée pour remplacer la brand, ajouter des toggles (DarkMode), ou proposer des contenus spécifiques mobile (profil).【F:frontend/src/components/ui/2025/Navigation.vue†L34-L237】 |
+| Events | `@link-click`, `@cta-click`, `@update:mobileOpen` | Hooks pour analytics/route guards lors des clics nav & CTA.【F:frontend/src/components/ui/2025/Navigation.vue†L316-L340】 |
+
+> ℹ️ `NavBar.vue` consomme désormais la primitive, délègue les slots brand/actions et raccorde `DarkModeToggle` ainsi que le menu utilisateur responsive.【F:frontend/src/components/layout/NavBar.vue†L1-L273】
 
 ## Checklists par vue prioritaire
 
