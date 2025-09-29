@@ -17,7 +17,7 @@ Ce dossier contient l'implémentation Vue des primitives UI alignées avec le de
 | `Stats` | `src/components/ui/Stats.vue` | KPI animés (compteur framer-motion, suffixes). |
 | `Input` / `Textarea` | `src/components/ui/Input.vue`, `Textarea.vue` | Champs de saisie multi-variantes avec labels flottants, helper text et messages d'erreur animés. |
 | `Skeleton` | `src/components/ui/Skeleton.vue` | Placeholders shimmer avec tokens d'arrondis (`sm` → `full`). |
-| `ThemeToggle` | `src/components/ui/ThemeToggle.vue` | Toggle persistant du thème (`localStorage` + media query). |
+| `ThemeToggle` | `src/components/ui/2025/ThemeToggle.vue` | Toggle persistant du thème (`localStorage` + media query). |
 
 > ℹ️ Les autres utilitaires (ex. `LazyImage`, `NetworkStatus`, `PageTransition`) réutilisent ces primitives et les tokens décrits ci-dessous.
 

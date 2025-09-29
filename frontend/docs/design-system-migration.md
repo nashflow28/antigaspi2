@@ -38,7 +38,7 @@
 | Skeleton | `Loading.vue` (`type='skeleton'`) | ✅ Livré | Alternative plus flexible que le composant Skeleton React.【F:frontend/src/components/ui/2025/Loading.vue†L1-L142】 |
 | Stats | (à produire) | 🚧 À faire | Aucun équivalent 2025 (utiliser `Card` + `Badge` en attendant). |
 | Textarea | (à produire) | 🚧 À faire | À décliner à partir de `Input` (comportements partagés). |
-| ThemeToggle | `DarkModeToggle.vue` (legacy) | 🚧 Harmonisation | Implémentation existante hors dossier 2025 ; prévoir refonte alignée DS. |
+| ThemeToggle | `2025/ThemeToggle.vue` | ✅ Livré | Composant aligné tokens 2025 (hover/focus, animations réduites) + persistance store (localStorage + media query) vérifiée par Playwright (`frontend/tests/e2e/theme-toggle.spec.ts`).【F:frontend/src/components/ui/2025/ThemeToggle.vue†L1-L141】【F:frontend/tests/e2e/theme-toggle.spec.ts†L1-L59】 |
 | Toast | `NotificationToast.vue` / système legacy | 🚧 Harmonisation | Design 2025 pas encore porté (couleurs/bordures). |
 
 ### Navigation.vue — API 2025
@@ -95,4 +95,5 @@ Le composant expose une API complète pour migrer les topbars React vers Vue tou
 ## Statut des tests visuels & snapshots
 - `frontend/tests/design-validation.spec.ts` couvre actuellement homepage, profil et dashboard marchand : vérification gradients, responsive mobile, typos Inter, persistance dark mode et accessibilité du toggle (pas de snapshot, assertions CSS/DOM).【F:frontend/tests/design-validation.spec.ts†L1-L149】
 - `frontend/tests/simple-design-test.spec.ts` fournit un smoke visuel léger (titre, navigation responsive, police Inter) mais sans ciblage des vues 2025 ni capture `toHaveScreenshot`.【F:frontend/tests/simple-design-test.spec.ts†L1-L39】
+- `frontend/tests/e2e/theme-toggle.spec.ts` vérifie le nouveau `ThemeToggle` : focus clavier, aria-label dynamique, persistance localStorage et rechargement, servant de garde-fou accessibilité/UX. 【F:frontend/tests/e2e/theme-toggle.spec.ts†L1-L59】
 - Aucune validation automatisée ne cible encore `ProductDetailView2025` ou `ReservationDetailView2025` ; planifier des scénarios Playwright avec enregistrement de snapshots (desktop/mobile, clair/sombre) et baselines à intégrer dans la CI pour répondre aux exigences de phase 3.

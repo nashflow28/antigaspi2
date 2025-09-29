@@ -79,6 +79,81 @@
               <span class="text-xs text-neutral-500 dark:text-dark-300">
                 {{ getRoleLabel(authStore.user?.role) }}
               </span>
+            </div>
+          </router-link>
+        </div>
+
+        <!-- Desktop Navigation - Design moderne -->
+        <div class="hidden sm:block md:flex items-center space-y-8 sm:space-x-8 animate-fade-in">
+          <ul class="flex items-center space-y-8 sm:space-x-8" role="menubar" aria-label="Menu principal">
+            <!-- Navigation Links avec design moderne -->
+            <li role="none">
+              <router-link
+                to="/products"
+                class="nav-link relative group"
+                active-class="nav-link-active"
+                role="menuitem"
+                :aria-current="$route.path === '/products' ? 'page' : undefined"
+                aria-label="Parcourir les produits disponibles"
+              >
+                <span class="relative z-10">Produits</span>
+                <div class="relative sm:absolute inset-0 bg-gradient-to-r from-blue-600 to-blue-700 opacity-0 group-hover:transition-opacity duration-200" />
+              </router-link>
+            </li>
+
+            <li role="none">
+              <router-link
+                to="/surprise-baskets"
+                class="nav-link relative group"
+                active-class="nav-link-active"
+                role="menuitem"
+                :aria-current="$route.path.startsWith('/surprise-baskets') ? 'page' : undefined"
+                aria-label="Explorer les paniers surprise disponibles"
+              >
+                <span class="relative z-10">Paniers surprise</span>
+                <div class="relative sm:absolute inset-0 bg-gradient-to-r from-blue-600 to-blue-700 opacity-0 group-hover:transition-opacity duration-200" />
+              </router-link>
+            </li>
+
+            <li role="none">
+              <router-link
+                to="/merchants/map"
+                class="nav-link relative group"
+                active-class="nav-link-active"
+                role="menuitem"
+                :aria-current="$route.path === '/merchants/map' ? 'page' : undefined"
+                aria-label="Voir la carte des commerçants"
+              >
+                <span class="relative z-10">Carte</span>
+                <div class="relative sm:absolute inset-0 bg-gradient-to-r from-blue-600 to-blue-700 opacity-0 group-hover:transition-opacity duration-200" />
+              </router-link>
+            </li>
+
+            <li role="none">
+              <router-link
+                to="/reviews"
+                class="nav-link relative group"
+                active-class="nav-link-active"
+                role="menuitem"
+                :aria-current="$route.path === '/reviews' ? 'page' : undefined"
+                aria-label="Consulter les avis clients"
+              >
+                <span class="relative z-10">Avis</span>
+                <div class="relative sm:absolute inset-0 bg-gradient-to-r from-blue-600 to-blue-700 opacity-0 group-hover:transition-opacity duration-200" />
+              </router-link>
+            </li>
+
+            <!-- Theme Toggle -->
+            <li role="none">
+              <ThemeToggle />
+            </li>
+
+            <template v-if="!authStore.isAuthenticated">
+              <li role="none">
+                <router-link
+                  to="/login"
+                  data-testid="nav-login"
+                  class="nav-link relative group"
             </span>
             <ChevronDown
               class="h-4 w-4 text-neutral-500 transition-transform duration-300 group-hover:text-primary-600"
@@ -248,6 +323,10 @@ import {
   MapPin
 } from 'lucide-vue-next'
 import { useAuthStore } from '@/stores/auth'
+import { LogIn, UserPlus, User, Settings, LogOut, ChevronDown, Package, ShoppingBag, MessageSquare, Star, Gift, Wallet } from 'lucide-vue-next'
+import MobileNav from '@/components/layout/MobileNav.vue'
+import { useAccessibility } from '@/composables/useAccessibility'
+import { Button, Badge, Card, ThemeToggle } from '@/components/ui/2025'
 import DarkModeToggle from '@/components/ui/DarkModeToggle.vue'
 import Button from '@/components/ui/2025/Button.vue'
 import Badge from '@/components/ui/2025/Badge.vue'
