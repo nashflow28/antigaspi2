@@ -320,6 +320,25 @@ const DEFAULT_CATEGORY_LABELS: Record<string, string> = {
   other: 'Autres'
 }
 
+const normalizeCategoryLabel = (label: string): string => {
+  return label
+    .toLowerCase()
+    .normalize('NFKD')
+    .replace(/&/g, ' et ')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9]+/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim()
+}
+
+const DEFAULT_NORMALIZED_LABEL_TO_SLUG: Record<string, string> = Object.entries(DEFAULT_CATEGORY_LABELS).reduce(
+  (acc, [slug, label]) => {
+    acc[normalizeCategoryLabel(label)] = slug
+    return acc
+  },
+  {} as Record<string, string>
+)
+
 const CATEGORY_DISPLAY_ORDER = ['bakery', 'dairy', 'meat', 'produce', 'prepared', 'other'] as const
 const CATEGORY_ORDER_MAP = new Map(CATEGORY_DISPLAY_ORDER.map((slug, index) => [slug, index]))
 
@@ -340,42 +359,97 @@ const mergeCategoryMetadata = (items: CategoryMetadata[]) => {
   const labelsToMerge: Record<string, string> = {}
   const idsToMerge: Record<string, number> = {}
   const fallbackSlugsToRemove = new Set<string>()
+  const fallbackSlugToNormalizedSlug: Record<string, string> = {}
+  const shortSlugToId: Record<string, number> = {}
 
   items.forEach(item => {
     if (!item.slug) {
       return
     }
 
-    if (typeof item.id === 'number' && Number.isFinite(item.id)) {
-      idsToMerge[item.slug] = item.id
+    const hasValidId = typeof item.id === 'number' && Number.isFinite(item.id)
+    if (!hasValidId) {
+      return
     }
 
-    if (item.label) {
-      labelsToMerge[item.slug] = item.label
+    const normalizedSlug = item.slug
+    const categoryId = item.id as number
+    idsToMerge[normalizedSlug] = categoryId
 
-      const fallbackSlug = Object.entries(DEFAULT_CATEGORY_LABELS)
-        .find(([, defaultLabel]) => defaultLabel === item.label)?.[0]
+    const slugMatch = normalizedSlug.match(/^(.*)-(\d+)$/)
+    if (slugMatch) {
+      const baseSlug = slugMatch[1]
+      shortSlugToId[baseSlug] = categoryId
 
-      if (fallbackSlug) {
-        fallbackSlugsToRemove.add(fallbackSlug)
+      if (DEFAULT_CATEGORY_LABELS[baseSlug] && baseSlug !== 'other') {
+        fallbackSlugsToRemove.add(baseSlug)
+        fallbackSlugToNormalizedSlug[baseSlug] = normalizedSlug
       }
+    }
+
+    const trimmedLabel = typeof item.label === 'string' ? item.label.trim() : ''
+    const normalizedDefaultSlug = trimmedLabel
+      ? DEFAULT_NORMALIZED_LABEL_TO_SLUG[normalizeCategoryLabel(trimmedLabel)]
+      : undefined
+
+    if (normalizedDefaultSlug && normalizedDefaultSlug !== 'other') {
+      fallbackSlugsToRemove.add(normalizedDefaultSlug)
+      fallbackSlugToNormalizedSlug[normalizedDefaultSlug] = normalizedSlug
+    }
+
+    if (trimmedLabel) {
+      labelsToMerge[normalizedSlug] = normalizedDefaultSlug
+        ? DEFAULT_CATEGORY_LABELS[normalizedDefaultSlug]
+        : trimmedLabel
+    } else if (slugMatch && DEFAULT_CATEGORY_LABELS[slugMatch[1]]) {
+      labelsToMerge[normalizedSlug] = DEFAULT_CATEGORY_LABELS[slugMatch[1]]
     }
   })
 
   if (Object.keys(idsToMerge).length > 0) {
-    categorySlugToId.value = { ...categorySlugToId.value, ...idsToMerge }
+    const updatedIds: Record<string, number> = { ...categorySlugToId.value }
+
+    Object.entries(idsToMerge).forEach(([slug, id]) => {
+      updatedIds[slug] = id
+    })
+
+    Object.entries(shortSlugToId).forEach(([slug, id]) => {
+      updatedIds[slug] = id
+    })
+
+    categorySlugToId.value = updatedIds
   }
 
   if (Object.keys(labelsToMerge).length > 0) {
     const mergedLabels: Record<string, string> = { ...categoryLabels.value, ...labelsToMerge }
 
     fallbackSlugsToRemove.forEach(slug => {
-      if (slug !== 'other' && !(slug in labelsToMerge) && slug in mergedLabels) {
+      if (slug !== 'other') {
         delete mergedLabels[slug]
       }
     })
 
-    categoryLabels.value = mergedLabels
+    const sanitizedLabels = Object.entries(mergedLabels).reduce((acc, [slug, label]) => {
+      if (slug === 'other' || /-\d+$/.test(slug)) {
+        acc[slug] = label
+      }
+      return acc
+    }, {} as Record<string, string>)
+
+    if (!('other' in sanitizedLabels)) {
+      sanitizedLabels.other = DEFAULT_CATEGORY_LABELS.other
+    }
+
+    categoryLabels.value = sanitizedLabels
+  }
+
+  const currentCategory = filters.value.category
+  if (currentCategory) {
+    if (fallbackSlugToNormalizedSlug[currentCategory]) {
+      filters.value.category = fallbackSlugToNormalizedSlug[currentCategory]
+    } else if (!(currentCategory in categoryLabels.value)) {
+      filters.value.category = ''
+    }
   }
 }
 
