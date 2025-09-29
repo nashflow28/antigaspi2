@@ -599,7 +599,7 @@ interface ReserveProduct {
     distance?: number
     phone?: string
   }
-  expires_at: Date
+  expires_at: Date | null
   available_quantity: number
   reserved_quantity: number
   image_url?: string | null
@@ -747,7 +747,11 @@ const formatPrice = (price: number) => {
   return `${Math.round(price).toLocaleString('fr-FR')} F CFA`
 }
 
-const formatTimeLeft = (expiresAt: Date) => {
+const formatTimeLeft = (expiresAt: Date | null | undefined) => {
+  if (!expiresAt || Number.isNaN(expiresAt.getTime())) {
+    return 'Date non renseignée'
+  }
+
   const now = new Date()
   const diff = expiresAt.getTime() - now.getTime()
 
@@ -780,8 +784,13 @@ const getTodayDate = () => {
 }
 
 const getMaxPickupDate = () => {
-  if (!product.value) return getTodayDate()
-  const maxDate = new Date(product.value.expires_at)
+  const expiresAt = product.value?.expires_at
+
+  if (!expiresAt || Number.isNaN(expiresAt.getTime())) {
+    return ''
+  }
+
+  const maxDate = new Date(expiresAt)
   maxDate.setDate(maxDate.getDate() + 1)
   return maxDate.toISOString().split('T')[0]
 }
@@ -915,6 +924,12 @@ const fetchProduct = async () => {
     const response = await apiService.getProduct(productId)
     const apiProduct = response.data
 
+    const expirationDateRaw = apiProduct.expiration_date
+    const parsedExpiration = expirationDateRaw ? new Date(expirationDateRaw) : null
+    const expiresAt = parsedExpiration && !Number.isNaN(parsedExpiration.getTime())
+      ? parsedExpiration
+      : null
+
     product.value = {
       id: apiProduct.id,
       name: apiProduct.name,
@@ -928,7 +943,7 @@ const fetchProduct = async () => {
         distance: apiProduct.merchant?.distance,
         phone: apiProduct.merchant?.phone
       },
-      expires_at: new Date(apiProduct.expiration_date),
+      expires_at: expiresAt,
       available_quantity: apiProduct.quantity_available,
       reserved_quantity: (apiProduct as any).reserved_quantity ?? 0,
       image_url: apiProduct.image_url
