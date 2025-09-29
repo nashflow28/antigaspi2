@@ -249,8 +249,8 @@
 
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue'
-import { useAuthStore } from '@/stores/auth'
 import { notify } from '@/composables/useNotifications'
+import apiService from '@/services/api'
 import {
   RefreshCw,
   CheckCircle,
@@ -312,12 +312,10 @@ const emit = defineEmits<{
   reportResolved: []
 }>()
 
-const authStore = useAuthStore()
 const reports = ref<Report[]>([])
 const pagination = ref<Pagination | null>(null)
 const loading = ref(false)
 const processing = ref<number | null>(null)
-const error = ref<string | null>(null)
 
 const filters = ref({
   status: '',
@@ -368,40 +366,25 @@ const getStatusClass = (status: string) => {
 
 const loadReports = async (page: number = 1) => {
   loading.value = true
-  error.value = null
 
   try {
-    const params = new URLSearchParams({
-      page: page.toString(),
-      per_page: '10'
+    const response = await apiService.getReportedReviews({
+      page,
+      perPage: 10,
+      status: filters.value.status || undefined,
+      reason: filters.value.reason || undefined
     })
 
-    if (filters.value.status) params.append('status', filters.value.status)
-    if (filters.value.reason) params.append('reason', filters.value.reason)
-
-    const response = await fetch(`http://localhost:8000/api/admin/reviews/reported?${params}`, {
-      method: 'GET',
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${authStore.token}`
-      }
-    })
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`)
-    }
-
-    const data = await response.json()
-    if (data.success) {
-      reports.value = data.data
-      pagination.value = data.pagination
+    if (response.success) {
+      reports.value = response.data
+      pagination.value = response.pagination ?? null
     } else {
-      throw new Error(data.message || 'Erreur lors du chargement')
+      const message = response.message || 'Erreur lors du chargement des signalements'
+      notify.error(message, 'Modération des avis')
     }
   } catch (err) {
-    // console.error('Error loading reported reviews:', err)
-    error.value = err instanceof Error ? err.message : 'Erreur inconnue'
+    const message = err instanceof Error ? err.message : 'Erreur lors du chargement des signalements'
+    notify.error(message, 'Modération des avis')
   } finally {
     loading.value = false
   }
@@ -433,41 +416,29 @@ const resolveReport = async (reportId: number, action: 'dismiss' | 'remove_revie
   processing.value = reportId
 
   try {
-    const response = await fetch(`http://localhost:8000/api/admin/reviews/reports/${reportId}/resolve`, {
-      method: 'POST',
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${authStore.token}`
-      },
-      body: JSON.stringify({
-        action,
-        notes: `Action: ${actionLabels[action]} par l'administrateur`
-      })
+    const response = await apiService.resolveReviewReport(reportId, {
+      action,
+      notes: `Action: ${actionLabels[action]} par l'administrateur`
     })
 
-    if (!response.ok) {
-      const errorData = await response.json()
-      throw new Error(errorData.message || `HTTP error! status: ${response.status}`)
-    }
+    if (response.success) {
+      const updatedReport = response.data
 
-    const data = await response.json()
-    if (data.success) {
-      // Update the report in the list
       const reportIndex = reports.value.findIndex(r => r.id === reportId)
-      if (reportIndex !== -1) {
-        reports.value[reportIndex].status = data.data.status
-        reports.value[reportIndex].admin_notes = data.data.admin_notes
-        reports.value[reportIndex].reviewed_at = data.data.reviewed_at
+      if (reportIndex !== -1 && updatedReport) {
+        reports.value[reportIndex] = {
+          ...reports.value[reportIndex],
+          ...updatedReport
+        }
       }
 
       emit('reportResolved')
     } else {
-      throw new Error(data.message || 'Erreur lors de la résolution')
+      const message = response.message || 'Erreur lors de la résolution du signalement'
+      notify.error(message, 'Modération des avis')
     }
   } catch (err) {
-    // console.error('Error resolving report:', err)
-    notify.error(err instanceof Error ? err.message : 'Erreur inconnue')
+    notify.error(err instanceof Error ? err.message : 'Erreur lors de la résolution du signalement', 'Modération des avis')
   } finally {
     processing.value = null
   }

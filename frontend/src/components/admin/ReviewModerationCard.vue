@@ -138,7 +138,8 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import { useAuthStore } from '@/stores/auth'
+import { notify } from '@/composables/useNotifications'
+import apiService from '@/services/api'
 import {
   Star,
   ShieldCheck,
@@ -186,7 +187,6 @@ const emit = defineEmits<{
   rejected: [reviewId: number]
 }>()
 
-const authStore = useAuthStore()
 const processing = ref<'approve' | 'reject' | null>(null)
 const showDetails = ref(false)
 const successMessage = ref('')
@@ -212,32 +212,22 @@ const approveReview = async () => {
   successMessage.value = ''
 
   try {
-    const response = await fetch(`http://localhost:8000/api/admin/reviews/${props.review.id}/approve`, {
-      method: 'POST',
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${authStore.token}`
-      }
-    })
+    const response = await apiService.approveReview(props.review.id)
 
-    if (!response.ok) {
-      const errorData = await response.json()
-      throw new Error(errorData.message || `HTTP error! status: ${response.status}`)
-    }
-
-    const data = await response.json()
-    if (data.success) {
+    if (response.success) {
       successMessage.value = 'Avis approuvé avec succès'
       setTimeout(() => {
         emit('approved', props.review.id)
       }, 1000)
     } else {
-      throw new Error(data.message || 'Erreur lors de l\'approbation')
+      const message = response.message || 'Erreur lors de l\'approbation de l\'avis'
+      errorMessage.value = message
+      notify.error(message, 'Modération des avis')
     }
   } catch (err) {
-    // console.error('Error approving review:', err)
-    errorMessage.value = err instanceof Error ? err.message : 'Erreur inconnue'
+    const message = err instanceof Error ? err.message : 'Erreur lors de l\'approbation de l\'avis'
+    errorMessage.value = message
+    notify.error(message, 'Modération des avis')
   } finally {
     processing.value = null
   }
@@ -253,35 +243,24 @@ const rejectReview = async () => {
   successMessage.value = ''
 
   try {
-    const response = await fetch(`http://localhost:8000/api/admin/reviews/${props.review.id}/reject`, {
-      method: 'POST',
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${authStore.token}`
-      },
-      body: JSON.stringify({
-        reason: 'Rejeté par l\'administrateur'
-      })
+    const response = await apiService.rejectReview(props.review.id, {
+      reason: 'Rejeté par l\'administrateur'
     })
 
-    if (!response.ok) {
-      const errorData = await response.json()
-      throw new Error(errorData.message || `HTTP error! status: ${response.status}`)
-    }
-
-    const data = await response.json()
-    if (data.success) {
+    if (response.success) {
       successMessage.value = 'Avis rejeté et supprimé'
       setTimeout(() => {
         emit('rejected', props.review.id)
       }, 1000)
     } else {
-      throw new Error(data.message || 'Erreur lors du rejet')
+      const message = response.message || 'Erreur lors du rejet de l\'avis'
+      errorMessage.value = message
+      notify.error(message, 'Modération des avis')
     }
   } catch (err) {
-    // console.error('Error rejecting review:', err)
-    errorMessage.value = err instanceof Error ? err.message : 'Erreur inconnue'
+    const message = err instanceof Error ? err.message : 'Erreur lors du rejet de l\'avis'
+    errorMessage.value = message
+    notify.error(message, 'Modération des avis')
   } finally {
     processing.value = null
   }

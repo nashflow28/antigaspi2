@@ -418,6 +418,79 @@ class ApiService {
     return this.request<ApiResponse<AdminSystemHealthService[]>>('/admin/system-health', {}, true)
   }
 
+  async getPendingReviews(params?: { page?: number; perPage?: number }): Promise<ApiResponse<Review[]>> {
+    const searchParams = new URLSearchParams()
+
+    if (params?.page) {
+      searchParams.append('page', String(params.page))
+    }
+
+    if (params?.perPage) {
+      searchParams.append('per_page', String(params.perPage))
+    }
+
+    const query = searchParams.toString()
+    const endpoint = `/admin/reviews/pending${query ? `?${query}` : ''}`
+
+    return this.request<ApiResponse<Review[]>>(endpoint, {}, true)
+  }
+
+  async getReportedReviews(params?: {
+    page?: number
+    perPage?: number
+    status?: string
+    reason?: string
+  }): Promise<ApiResponse<any>> {
+    const searchParams = new URLSearchParams()
+
+    if (params?.page) {
+      searchParams.append('page', String(params.page))
+    }
+
+    if (params?.perPage) {
+      searchParams.append('per_page', String(params.perPage))
+    }
+
+    if (params?.status) {
+      searchParams.append('status', params.status)
+    }
+
+    if (params?.reason) {
+      searchParams.append('reason', params.reason)
+    }
+
+    const query = searchParams.toString()
+    const endpoint = `/admin/reviews/reported${query ? `?${query}` : ''}`
+
+    return this.request<ApiResponse<any>>(endpoint, {}, true)
+  }
+
+  async approveReview(reviewId: number): Promise<ApiResponse<Review>> {
+    return this.request<ApiResponse<Review>>(`/admin/reviews/${reviewId}/approve`, {
+      method: 'POST'
+    }, true)
+  }
+
+  async rejectReview(
+    reviewId: number,
+    payload?: { reason?: string }
+  ): Promise<ApiResponse<Review>> {
+    return this.request<ApiResponse<Review>>(`/admin/reviews/${reviewId}/reject`, {
+      method: 'POST',
+      body: JSON.stringify(payload ?? {})
+    }, true)
+  }
+
+  async resolveReviewReport(
+    reportId: number,
+    payload: { action: 'dismiss' | 'remove_review' | 'warn_user'; notes?: string }
+  ): Promise<ApiResponse<any>> {
+    return this.request<ApiResponse<any>>(`/admin/reviews/reports/${reportId}/resolve`, {
+      method: 'POST',
+      body: JSON.stringify(payload)
+    }, true)
+  }
+
   async getAnalyticsStats(params?: {
     startDate?: string
     endDate?: string
