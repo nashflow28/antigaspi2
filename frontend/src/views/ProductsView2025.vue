@@ -257,7 +257,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue'
+import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { Search, Filter, MapPin } from 'lucide-vue-next'
 import Button from '@/components/ui/2025/Button.vue'
@@ -285,6 +285,28 @@ const loading = ref(true)
 const searchQuery = ref('')
 const showFilters = ref(false)
 const quickReserveLoadingId = ref<number | null>(null)
+
+const DEFAULT_PER_PAGE = 50
+
+type PaginationState = {
+  currentPage: number
+  lastPage: number
+  perPage: number
+  total: number
+}
+
+const pagination = ref<PaginationState>({
+  currentPage: 1,
+  lastPage: 1,
+  perPage: DEFAULT_PER_PAGE,
+  total: 0
+})
+
+const currentPage = ref(1)
+const isResettingFilters = ref(false)
+let pendingReload = false
+let isFetchingProducts = false
+let searchDebounce: ReturnType<typeof setTimeout> | null = null
 
 const defaultProductImage =
   'https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=600&q=80'
@@ -491,11 +513,30 @@ const loadCategories = async () => {
   }
 }
 
-const fetchProducts = async () => {
-  try {
-    loading.value = true
+const resetPagination = () => {
+  currentPage.value = 1
+  pagination.value = {
+    ...pagination.value,
+    currentPage: 1,
+    lastPage: 1,
+    total: 0
+  }
+}
 
-    const filtersPayload: ProductFilters = {}
+const fetchProducts = async () => {
+  if (isFetchingProducts) {
+    pendingReload = true
+    return
+  }
+
+  isFetchingProducts = true
+  loading.value = true
+
+  try {
+    const filtersPayload: ProductFilters = {
+      page: currentPage.value,
+      per_page: pagination.value.perPage || DEFAULT_PER_PAGE
+    }
 
     if (filters.value.category) {
       const categoryId = categorySlugToId.value[filters.value.category]
@@ -530,26 +571,87 @@ const fetchProducts = async () => {
       filtersPayload.longitude = userLocation.value.longitude
     }
 
+    if (searchQuery.value.trim()) {
+      filtersPayload.search = searchQuery.value.trim()
+    }
+
     const response = await apiService.getProducts(filtersPayload)
 
     if (!response?.success || !Array.isArray(response.data)) {
       throw new Error(response?.message || 'Réponse inattendue de l’API')
     }
 
-    products.value = response.data.map(normalizeProduct)
-
-    const productMetadata: CategoryMetadata[] = response.data.map(item => ({
+    const aggregatedProducts: NormalizedProduct[] = response.data.map(normalizeProduct)
+    const aggregatedMetadata: CategoryMetadata[] = response.data.map(item => ({
       slug: getCategoryKey(item.category),
       label: item.category?.name,
       id: item.category?.id
     }))
 
-    mergeCategoryMetadata(productMetadata)
+    const paginationInfo = response.pagination
+
+    if (paginationInfo) {
+      const lastPage = Number(paginationInfo.last_page) || 1
+      const currentApiPage = Number(paginationInfo.current_page) || currentPage.value
+
+      pagination.value = {
+        currentPage: currentApiPage,
+        lastPage,
+        perPage: Number(paginationInfo.per_page) || (filtersPayload.per_page ?? DEFAULT_PER_PAGE),
+        total: Number(paginationInfo.total) || aggregatedProducts.length
+      }
+
+      if (lastPage > currentApiPage) {
+        for (let page = currentApiPage + 1; page <= lastPage; page++) {
+          try {
+            const paginatedResponse = await apiService.getProducts({
+              ...filtersPayload,
+              page
+            })
+
+            if (!paginatedResponse?.success || !Array.isArray(paginatedResponse.data)) {
+              break
+            }
+
+            aggregatedProducts.push(...paginatedResponse.data.map(normalizeProduct))
+            aggregatedMetadata.push(
+              ...paginatedResponse.data.map(item => ({
+                slug: getCategoryKey(item.category),
+                label: item.category?.name,
+                id: item.category?.id
+              }))
+            )
+          } catch (error) {
+            console.warn('Impossible de récupérer une page supplémentaire de produits', error)
+            break
+          }
+        }
+      }
+    } else {
+      pagination.value = {
+        currentPage: currentPage.value,
+        lastPage: currentPage.value,
+        perPage: filtersPayload.per_page ?? DEFAULT_PER_PAGE,
+        total: aggregatedProducts.length
+      }
+    }
+
+    products.value = aggregatedProducts
+
+    if (aggregatedMetadata.length > 0) {
+      mergeCategoryMetadata(aggregatedMetadata)
+    }
   } catch (error: any) {
     const message = error?.message || 'Nous rencontrons un souci pour récupérer certains produits. Réessayez plus tard.'
     notify.warning(message, 'Chargement incomplet')
   } finally {
+    isFetchingProducts = false
     loading.value = false
+
+    if (pendingReload) {
+      pendingReload = false
+      fetchProducts()
+    }
   }
 }
 
@@ -599,7 +701,9 @@ const getProductTags = (product: NormalizedProduct) => {
   return tags
 }
 
-const clearFilters = () => {
+const clearFilters = async () => {
+  isResettingFilters.value = true
+
   filters.value = {
     category: '',
     radius: '',
@@ -607,11 +711,21 @@ const clearFilters = () => {
     minDiscount: ''
   }
   searchQuery.value = ''
+
+  await nextTick()
+
+  isResettingFilters.value = false
+
+  resetPagination()
+  fetchProducts()
+
   notify.info('Tous les filtres ont été supprimés.', 'Filtres réinitialisés')
 }
 
 const applyFilters = () => {
   showFilters.value = false
+  resetPagination()
+  fetchProducts()
   notify.success('Affichage mis à jour selon vos préférences.', 'Filtres appliqués')
 }
 
@@ -695,6 +809,7 @@ const enableLocationFilter = () => {
       }
       locationLoading.value = false
       notify.success('Nous affinons les paniers en fonction de votre position.', 'Position activée')
+      resetPagination()
       fetchProducts()
     },
     (error) => {
@@ -726,6 +841,42 @@ const enableLocationFilter = () => {
 onMounted(() => {
   loadCategories()
   fetchProducts()
+})
+
+const scheduleFiltersReload = () => {
+  if (isResettingFilters.value) {
+    return
+  }
+
+  resetPagination()
+  fetchProducts()
+}
+
+watch(() => filters.value.category, scheduleFiltersReload)
+watch(() => filters.value.radius, scheduleFiltersReload)
+watch(() => filters.value.maxPrice, scheduleFiltersReload)
+watch(() => filters.value.minDiscount, scheduleFiltersReload)
+
+watch(searchQuery, () => {
+  if (isResettingFilters.value) {
+    return
+  }
+
+  if (searchDebounce) {
+    clearTimeout(searchDebounce)
+  }
+
+  searchDebounce = setTimeout(() => {
+    resetPagination()
+    fetchProducts()
+  }, 350)
+})
+
+onBeforeUnmount(() => {
+  if (searchDebounce) {
+    clearTimeout(searchDebounce)
+    searchDebounce = null
+  }
 })
 </script>
 
