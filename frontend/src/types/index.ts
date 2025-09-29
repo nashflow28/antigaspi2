@@ -385,6 +385,7 @@ export interface ProductFilters {
   category?: string
   category_id?: number
   merchant?: string
+  merchant_id?: number
   max_price?: number
   max_expiry_days?: number
   page?: number
@@ -403,6 +404,51 @@ export interface PaginatedResponse<T> {
   total: number
   from: number
   to: number
+}
+
+export interface ReviewUserSummary {
+  id: number
+  name: string
+}
+
+export interface ReviewProductSummary {
+  id: number
+  name: string
+}
+
+export interface ReviewReplySummary {
+  id?: number
+  reply: string
+  created_at?: string
+  updated_at?: string
+  [key: string]: unknown
+}
+
+export interface Review {
+  id: number
+  rating: number
+  title?: string | null
+  comment?: string | null
+  time_ago?: string
+  is_verified_purchase?: boolean
+  user: ReviewUserSummary
+  product?: ReviewProductSummary
+  reply?: ReviewReplySummary | null
+  [key: string]: unknown
+}
+
+export interface ReviewRatingDistributionEntry {
+  rating: number
+  count: number
+  percentage: number
+}
+
+export interface ReviewStats {
+  total_reviews: number
+  average_rating: number
+  verified_reviews?: number
+  rating_distribution: ReviewRatingDistributionEntry[]
+  [key: string]: unknown
 }
 
 // Merchant-specific types

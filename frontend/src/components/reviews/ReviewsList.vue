@@ -302,34 +302,9 @@ import { ref, onMounted, watch } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 import { MessageSquare, Star, ShieldCheck, Package, Edit, Flag, Reply } from 'lucide-vue-next'
 import EditReviewForm from './EditReviewForm.vue'
-
-interface Review {
-  id: number
-  rating: number
-  title: string
-  comment: string
-  time_ago: string
-  is_verified_purchase: boolean
-  user: {
-    id: number
-    name: string
-  }
-  product?: {
-    id: number
-    name: string
-  }
-}
-
-interface Stats {
-  total_reviews: number
-  average_rating: number
-  verified_reviews: number
-  rating_distribution: Array<{
-    rating: number
-    count: number
-    percentage: number
-  }>
-}
+import apiService from '@/services/api'
+import { notify } from '@/composables/useNotifications'
+import type { ApiResponse, Review, ReviewStats } from '@/types'
 
 interface Props {
   merchantId: number
@@ -338,14 +313,15 @@ interface Props {
 
 const props = defineProps<Props>()
 const emit = defineEmits<{
-  statsUpdated: [stats: Stats]
+  statsUpdated: [stats: ReviewStats]
 }>()
 
 const authStore = useAuthStore()
 
 const reviews = ref<Review[]>([])
-const stats = ref<Stats | null>(null)
-const pagination = ref<any>(null)
+const stats = ref<ReviewStats | null>(null)
+type ReviewsPagination = ApiResponse<Review[]>['pagination']
+const pagination = ref<ReviewsPagination | null>(null)
 const loading = ref(false)
 const currentFilter = ref('')
 const editingReviewId = ref<number | null>(null)
@@ -358,47 +334,66 @@ const getInitials = (name: string) => {
   return name.split(' ').map(part => part[0]).join('').toUpperCase().slice(0, 2)
 }
 
-const fetchStats = async () => {
-  try {
-    const params = new URLSearchParams({ merchant_id: props.merchantId.toString() })
-    const response = await fetch(`http://localhost:8000/api/reviews/stats?${params}`)
-    const data = await response.json()
+const fetchStats = async (): Promise<void> => {
+  if (!props.merchantId) {
+    stats.value = null
+    return
+  }
 
-    if (data.success) {
-      stats.value = data.data
-      emit('statsUpdated', data.data)
+  try {
+    const response = await apiService.getReviewStats({
+      merchant_id: props.merchantId,
+      ...(props.productId ? { product_id: props.productId } : {})
+    })
+
+    if (response.success) {
+      stats.value = response.data
+      emit('statsUpdated', response.data)
+    } else {
+      const message = response.message || "Impossible de récupérer les statistiques d'avis du commerçant."
+      notify.error(message, 'Avis commerçants')
     }
   } catch (error) {
-    // console.error('Error fetching review stats:', error)
+    const message = error instanceof Error
+      ? error.message
+      : "Impossible de récupérer les statistiques d'avis du commerçant."
+    notify.error(message, 'Avis commerçants')
   }
 }
 
-const fetchReviews = async (page: number = 1) => {
+const fetchReviews = async (page = 1): Promise<void> => {
+  if (!props.merchantId) {
+    reviews.value = []
+    pagination.value = null
+    return
+  }
+
   loading.value = true
 
   try {
-    const params = new URLSearchParams({
-      merchant_id: props.merchantId.toString(),
-      page: page.toString()
+    const response = await apiService.getReviewsList({
+      merchant_id: props.merchantId,
+      page,
+      ...(props.productId ? { product_id: props.productId } : {}),
+      ...(currentFilter.value ? { rating: currentFilter.value } : {})
     })
 
-    if (props.productId) {
-      params.append('product_id', props.productId.toString())
-    }
-
-    if (currentFilter.value) {
-      params.append('rating', currentFilter.value)
-    }
-
-    const response = await fetch(`http://localhost:8000/api/reviews?${params}`)
-    const data = await response.json()
-
-    if (data.success) {
-      reviews.value = data.data
-      pagination.value = data.pagination
+    if (response.success) {
+      reviews.value = response.data ?? []
+      pagination.value = response.pagination ?? null
+    } else {
+      reviews.value = []
+      pagination.value = null
+      const message = response.message || "Impossible de charger les avis du commerçant."
+      notify.error(message, 'Avis commerçants')
     }
   } catch (error) {
-    // console.error('Error fetching reviews:', error)
+    reviews.value = []
+    pagination.value = null
+    const message = error instanceof Error
+      ? error.message
+      : "Impossible de charger les avis du commerçant."
+    notify.error(message, 'Avis commerçants')
   } finally {
     loading.value = false
   }
@@ -422,99 +417,73 @@ const onReviewUpdated = (updatedReview: any) => {
   editingReviewId.value = null
   // Refresh stats
   fetchStats()
+  fetchReviews(pagination.value?.current_page || 1)
 }
 
 const onReviewDeleted = () => {
   editingReviewId.value = null
   // Refresh the entire list
-  fetchReviews()
+  fetchReviews(pagination.value?.current_page || 1)
   fetchStats()
 }
 
 const submitReport = async (reviewId: number) => {
+  if (!reportReason.value) {
+    notify.warning('Veuillez sélectionner une raison de signalement.', 'Avis commerçants')
+    return
+  }
+
   try {
-    const token = localStorage.getItem('auth_token')
-    if (!token) {
-      throw new Error('Token d\'authentification manquant')
-    }
+    const response = await apiService.reportReview(reviewId, reportReason.value)
 
-    if (!reportReason.value) {
-      alert('Veuillez sélectionner une raison')
-      return
-    }
-
-    const response = await fetch('http://localhost:8000/api/reviews/report', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        review_id: reviewId,
-        reason: reportReason.value
-      })
-    })
-
-    const data = await response.json()
-
-    if (data.success) {
-      alert('Avis signalé avec succès. Notre équipe va examiner votre signalement.')
+    if (response.success) {
+      notify.success(
+        response.message || 'Avis signalé avec succès. Notre équipe va examiner votre signalement.',
+        'Avis commerçants'
+      )
       reportingReviewId.value = null
       reportReason.value = ''
     } else {
-      throw new Error(data.message || 'Erreur lors du signalement')
+      notify.error(response.message || 'Erreur lors du signalement de cet avis.', 'Avis commerçants')
     }
   } catch (error) {
-    // console.error('Error reporting review:', error)
-    alert('Erreur lors du signalement. Veuillez réessayer.')
+    const message = error instanceof Error
+      ? error.message
+      : 'Erreur lors du signalement de cet avis. Veuillez réessayer.'
+    notify.error(message, 'Avis commerçants')
   }
 }
 
 const submitReply = async (reviewId: number) => {
+  if (!replyText.value.trim()) {
+    notify.warning('Veuillez écrire une réponse avant de la publier.', 'Avis commerçants')
+    return
+  }
+
   try {
-    const token = localStorage.getItem('auth_token')
-    if (!token) {
-      throw new Error('Token d\'authentification manquant')
-    }
+    const response = await apiService.replyToReview(reviewId, replyText.value.trim())
 
-    if (!replyText.value.trim()) {
-      alert('Veuillez écrire une réponse')
-      return
-    }
-
-    const response = await fetch('http://localhost:8000/api/reviews/reply', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        review_id: reviewId,
-        reply: replyText.value.trim()
-      })
-    })
-
-    const data = await response.json()
-
-    if (data.success) {
-      alert('Réponse publiée avec succès!')
+    if (response.success) {
+      notify.success(response.message || 'Réponse publiée avec succès !', 'Avis commerçants')
       replyingToReviewId.value = null
       replyText.value = ''
       // Refresh reviews to show the new reply
-      fetchReviews()
+      fetchReviews(pagination.value?.current_page || 1)
     } else {
-      throw new Error(data.message || 'Erreur lors de la publication')
+      notify.error(response.message || 'Erreur lors de la publication de la réponse.', 'Avis commerçants')
     }
   } catch (error) {
-    // console.error('Error submitting reply:', error)
-    alert('Erreur lors de la publication. Veuillez réessayer.')
+    const message = error instanceof Error
+      ? error.message
+      : 'Erreur lors de la publication de la réponse. Veuillez réessayer.'
+    notify.error(message, 'Avis commerçants')
   }
 }
 
 // Expose refresh method to parent
-const refreshReviews = () => {
-  fetchStats()
-  fetchReviews()
+const refreshReviews = async () => {
+  await fetchStats()
+  await fetchReviews(pagination.value?.current_page || 1)
 }
 
 // Expose methods to parent component
@@ -523,6 +492,11 @@ defineExpose({
 })
 
 watch(() => props.merchantId, () => {
+  fetchStats()
+  fetchReviews()
+})
+
+watch(() => props.productId, () => {
   fetchStats()
   fetchReviews()
 })
