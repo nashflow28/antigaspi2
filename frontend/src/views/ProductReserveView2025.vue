@@ -150,7 +150,7 @@
                     <Label>Quantité souhaitée</Label>
                     <div class="flex items-center gap-3">
                       <Button
-                        :disabled="reservation.quantity <= 1"
+                        :disabled="availableQuantity === 0 || reservation.quantity <= minQuantity"
                         variant="outline"
                         size="sm"
                         class="p-3"
@@ -161,13 +161,13 @@
                       <Input
                         v-model.number="reservation.quantity"
                         type="number"
-                        :min="1"
-                        :max="product.available_quantity - product.reserved_quantity"
+                        :min="minQuantity"
+                        :max="availableQuantity"
                         class="w-20 text-left sm:text-center"
                         @input="validateQuantity"
                       />
                       <Button
-                        :disabled="reservation.quantity >= (product.available_quantity - product.reserved_quantity)"
+                        :disabled="availableQuantity === 0 || reservation.quantity >= availableQuantity"
                         variant="outline"
                         size="sm"
                         class="p-3"
@@ -177,7 +177,7 @@
                       </Button>
                     </div>
                     <p class="text-sm text-neutral-500 dark:text-neutral-400 mt-1">
-                      Maximum {{ product.available_quantity - product.reserved_quantity }} disponible{{ (product.available_quantity - product.reserved_quantity) > 1 ? 's' : '' }}
+                      Maximum {{ availableQuantity }} disponible{{ availableQuantity > 1 ? 's' : '' }}
                     </p>
                   </div>
 
@@ -706,8 +706,10 @@ const canPayWithWallet = computed(() => {
 
 const availableQuantity = computed(() => {
   if (!product.value) return 0
-  return product.value.available_quantity - product.value.reserved_quantity
+  return Math.max(product.value.available_quantity - product.value.reserved_quantity, 0)
 })
+
+const minQuantity = computed(() => (availableQuantity.value > 0 ? 1 : 0))
 
 const totalAmount = computed(() => {
   if (!product.value) return 0
@@ -804,7 +806,8 @@ const increaseQuantity = () => {
 }
 
 const decreaseQuantity = () => {
-  if (reservation.value.quantity > 1) {
+  const minValue = minQuantity.value
+  if (reservation.value.quantity > minValue) {
     reservation.value.quantity--
   }
 }
@@ -812,8 +815,9 @@ const decreaseQuantity = () => {
 const validateQuantity = () => {
   if (!product.value) return
   const maxQuantity = availableQuantity.value
-  if (reservation.value.quantity < 1) {
-    reservation.value.quantity = 1
+  const minValue = minQuantity.value
+  if (reservation.value.quantity < minValue) {
+    reservation.value.quantity = minValue
   } else if (reservation.value.quantity > maxQuantity) {
     reservation.value.quantity = maxQuantity
   }
@@ -842,13 +846,21 @@ const parseQuantityFromRoute = () => {
 const applyInitialQuantity = () => {
   if (!product.value) return
 
-  const initialQuantity = parseQuantityFromRoute()
-  if (!initialQuantity) return
-
   const maxQuantity = availableQuantity.value
-  const safeQuantity = maxQuantity > 0 ? Math.min(initialQuantity, maxQuantity) : 1
+  const initialQuantity = parseQuantityFromRoute()
+  const minValue = minQuantity.value
 
-  reservation.value.quantity = safeQuantity
+  if (maxQuantity === 0) {
+    reservation.value.quantity = minValue
+    return
+  }
+
+  if (!initialQuantity) {
+    reservation.value.quantity = Math.min(Math.max(reservation.value.quantity, minValue), maxQuantity)
+    return
+  }
+
+  reservation.value.quantity = Math.min(initialQuantity, maxQuantity)
 }
 
 const nextStep = () => {
