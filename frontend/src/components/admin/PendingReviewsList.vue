@@ -78,8 +78,9 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import { useAuthStore } from '@/stores/auth'
 import ReviewModerationCard from '@/components/admin/ReviewModerationCard.vue'
+import { notify } from '@/composables/useNotifications'
+import apiService from '@/services/api'
 import {
   RefreshCw,
   CheckCircle
@@ -122,45 +123,29 @@ const emit = defineEmits<{
   reviewRejected: []
 }>()
 
-const authStore = useAuthStore()
 const reviews = ref<Review[]>([])
 const pagination = ref<Pagination | null>(null)
 const loading = ref(false)
-const error = ref<string | null>(null)
 
 const loadReviews = async (page: number = 1) => {
   loading.value = true
-  error.value = null
 
   try {
-    const params = new URLSearchParams({
-      page: page.toString(),
-      per_page: '10'
+    const response = await apiService.getPendingReviews({
+      page,
+      perPage: 10
     })
 
-    const response = await fetch(`http://localhost:8000/api/admin/reviews/pending?${params}`, {
-      method: 'GET',
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${authStore.token}`
-      }
-    })
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`)
-    }
-
-    const data = await response.json()
-    if (data.success) {
-      reviews.value = data.data
-      pagination.value = data.pagination
+    if (response.success) {
+      reviews.value = response.data
+      pagination.value = response.pagination ?? null
     } else {
-      throw new Error(data.message || 'Erreur lors du chargement')
+      const message = response.message || 'Erreur lors du chargement des avis en attente'
+      notify.error(message, 'Modération des avis')
     }
   } catch (err) {
-    // console.error('Error loading pending reviews:', err)
-    error.value = err instanceof Error ? err.message : 'Erreur inconnue'
+    const message = err instanceof Error ? err.message : 'Erreur lors du chargement des avis en attente'
+    notify.error(message, 'Modération des avis')
   } finally {
     loading.value = false
   }

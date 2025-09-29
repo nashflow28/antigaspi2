@@ -155,6 +155,9 @@ import DashboardLayout from '@/components/ui/DashboardLayout.vue'
 import Button from '@/components/ui/2025/Button.vue'
 import Card from '@/components/ui/2025/Card.vue'
 import { useDashboardLayout } from '@/composables/useDashboardLayout'
+import { notify } from '@/composables/useNotifications'
+import apiService from '@/services/api'
+import type { ApiResponse } from '@/types'
 import {
   RefreshCw,
   Clock,
@@ -185,28 +188,19 @@ const loadStats = async () => {
   error.value = null
 
   try {
-    const response = await fetch('http://localhost:8000/api/admin/reviews/stats', {
-      method: 'GET',
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${authStore.token}`
-      }
-    })
+    const response = await apiService.get<ApiResponse<{ stats: ModerationStats }>>('/admin/reviews/stats')
 
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`)
-    }
-
-    const data = await response.json()
-    if (data.success) {
-      stats.value = data.data.stats
+    if (response.success) {
+      stats.value = response.data.stats
     } else {
-      throw new Error(data.message || 'Erreur lors du chargement')
+      const message = response.message || 'Erreur lors du chargement des statistiques de modération'
+      error.value = message
+      notify.error(message, 'Modération des avis')
     }
   } catch (err) {
-    // console.error('Error loading moderation stats:', err)
-    error.value = err instanceof Error ? err.message : 'Erreur inconnue'
+    const message = err instanceof Error ? err.message : 'Erreur lors du chargement des statistiques de modération'
+    error.value = message
+    notify.error(message, 'Modération des avis')
   } finally {
     loading.value = false
   }
@@ -221,6 +215,8 @@ const onReviewApproved = () => {
   if (stats.value) {
     stats.value.pending_reviews = Math.max(0, stats.value.pending_reviews - 1)
   }
+
+  loadStats()
 }
 
 const onReviewRejected = () => {
@@ -228,6 +224,8 @@ const onReviewRejected = () => {
   if (stats.value) {
     stats.value.pending_reviews = Math.max(0, stats.value.pending_reviews - 1)
   }
+
+  loadStats()
 }
 
 const onReportResolved = () => {
@@ -236,6 +234,8 @@ const onReportResolved = () => {
     stats.value.pending_reports = Math.max(0, stats.value.pending_reports - 1)
     stats.value.resolved_reports = stats.value.resolved_reports + 1
   }
+
+  loadStats()
 }
 
 onMounted(() => {
