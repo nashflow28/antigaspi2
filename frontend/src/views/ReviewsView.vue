@@ -102,6 +102,7 @@ import { Star, Info } from 'lucide-vue-next'
 import { storeToRefs } from 'pinia'
 import { useMerchantsStore } from '@/stores/merchants'
 import { notify } from '@/composables/useNotifications'
+import apiService from '@/services/api'
 
 interface Product {
   id: number
@@ -139,21 +140,21 @@ const onMerchantChange = async () => {
   // Fetch products for the selected merchant
   // This is a simplified example - in a real app you'd call the products API
   try {
-    const response = await fetch(`http://localhost:8000/api/products?merchant_id=${selectedMerchantId.value}`)
-    const data = await response.json()
+    const response = await apiService.getProducts({ merchant_id: selectedMerchantId.value })
 
-    if (data.success) {
-      availableProducts.value = data.data.map((product: any) => ({
+    if (response.success) {
+      availableProducts.value = response.data.map(product => ({
         id: product.id,
         name: product.name
       }))
     } else {
       availableProducts.value = []
-      notify.error(data.message || 'Impossible de charger les produits du commerçant')
+      notify.error(response.message || 'Impossible de charger les produits du commerçant', 'Avis commerçants')
     }
   } catch (error) {
-    notify.error('Erreur lors du chargement des produits du commerçant')
     availableProducts.value = []
+    const message = error instanceof Error ? error.message : 'Erreur lors du chargement des produits du commerçant'
+    notify.error(message, 'Avis commerçants')
   }
 }
 

@@ -21,7 +21,9 @@ import type {
   LoyaltyAwardPayload,
   LoyaltyParticipantSummary,
   LoyaltyPoint,
-  AnalyticsStatsResponse
+  AnalyticsStatsResponse,
+  Review,
+  ReviewStats
 } from '@/types'
 
 const DEFAULT_API_BASE_URL = 'http://localhost:8000/api'
@@ -317,6 +319,59 @@ class ApiService {
   async confirmReservation(id: number): Promise<ApiResponse<Reservation>> {
     return this.request<ApiResponse<Reservation>>(`/reservations/${id}/confirm`, {
       method: 'POST'
+    }, true)
+  }
+
+  // Reviews
+  async getReviewStats(params: { merchant_id: number; product_id?: number }): Promise<ApiResponse<ReviewStats>> {
+    const searchParams = new URLSearchParams()
+
+    Object.entries(params).forEach(([key, value]) => {
+      if (value === undefined || value === null || value === '') {
+        return
+      }
+      searchParams.append(key, String(value))
+    })
+
+    const query = searchParams.toString()
+    const endpoint = query ? `/reviews/stats?${query}` : '/reviews/stats'
+
+    return this.get<ApiResponse<ReviewStats>>(endpoint, false)
+  }
+
+  async getReviewsList(params: {
+    merchant_id: number
+    product_id?: number
+    rating?: number | string
+    page?: number
+    per_page?: number
+  }): Promise<ApiResponse<Review[]>> {
+    const searchParams = new URLSearchParams()
+
+    Object.entries(params).forEach(([key, value]) => {
+      if (value === undefined || value === null || value === '') {
+        return
+      }
+      searchParams.append(key, String(value))
+    })
+
+    const query = searchParams.toString()
+    const endpoint = query ? `/reviews?${query}` : '/reviews'
+
+    return this.get<ApiResponse<Review[]>>(endpoint, false)
+  }
+
+  async reportReview(reviewId: number, reason: string): Promise<ApiResponse<null>> {
+    return this.post<ApiResponse<null>>('/reviews/report', {
+      review_id: reviewId,
+      reason
+    }, true)
+  }
+
+  async replyToReview(reviewId: number, reply: string): Promise<ApiResponse<Review>> {
+    return this.post<ApiResponse<Review>>('/reviews/reply', {
+      review_id: reviewId,
+      reply
     }, true)
   }
 
