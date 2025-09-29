@@ -113,11 +113,13 @@
                 class="w-full rounded-modern border border-neutral-200/80 dark:border-neutral-700/60 bg-surface-light/80 dark:bg-surface-dark/70 px-3 py-3 text-neutral-600 dark:text-neutral-300 shadow-sm transition focus:border-primary-400 focus:outline-none focus:ring-2 focus:ring-primary-200"
               >
                 <option value="">Toutes les catégories</option>
-                <option value="bakery">Boulangerie</option>
-                <option value="dairy">Produits laitiers</option>
-                <option value="meat">Viandes</option>
-                <option value="produce">Fruits &amp; Légumes</option>
-                <option value="prepared">Plats préparés</option>
+                <option
+                  v-for="category in categoryOptions"
+                  :key="category.slug"
+                  :value="category.slug"
+                >
+                  {{ category.label }}
+                </option>
               </select>
             </label>
 
@@ -271,7 +273,7 @@ import { useReservationsStore } from '@/stores/reservations'
 import { usePaymentsStore } from '@/stores/payments'
 import { apiService } from '@/services/api'
 import type { ProductFilters } from '@/types'
-import { normalizeProduct, type NormalizedProduct } from '@/utils/productNormalizer'
+import { normalizeProduct, getCategoryKey, type NormalizedProduct } from '@/utils/productNormalizer'
 
 const router = useRouter()
 const authStore = useAuthStore()
@@ -287,7 +289,7 @@ const quickReserveLoadingId = ref<number | null>(null)
 const defaultProductImage =
   'https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=600&q=80'
 
-const CATEGORY_LABELS: Record<string, string> = {
+const DEFAULT_CATEGORY_LABELS: Record<string, string> = {
   bakery: 'Boulangerie',
   dairy: 'Produits laitiers',
   meat: 'Viandes',
@@ -295,6 +297,33 @@ const CATEGORY_LABELS: Record<string, string> = {
   prepared: 'Plats préparés',
   other: 'Autres'
 }
+
+const CATEGORY_DISPLAY_ORDER = ['bakery', 'dairy', 'meat', 'produce', 'prepared', 'other']
+
+const categoryLabels = ref<Record<string, string>>({ ...DEFAULT_CATEGORY_LABELS })
+const categorySlugToId = ref<Record<string, number>>({})
+
+const categoryOptions = computed(() => {
+  const labels = categoryLabels.value
+  const seen = new Set<string>()
+
+  const orderedOptions = CATEGORY_DISPLAY_ORDER
+    .filter(slug => Boolean(labels[slug]))
+    .map(slug => {
+      seen.add(slug)
+      return {
+        slug,
+        label: labels[slug]
+      }
+    })
+
+  const additionalOptions = Object.entries(labels)
+    .filter(([slug]) => !seen.has(slug))
+    .map(([slug, label]) => ({ slug, label }))
+    .sort((a, b) => a.label.localeCompare(b.label, 'fr'))
+
+  return [...orderedOptions, ...additionalOptions]
+})
 
 const filters = ref({
   category: '',
@@ -314,7 +343,7 @@ const activeFilterLabels = computed(() => {
   const labels: string[] = []
 
   if (filters.value.category) {
-    labels.push(CATEGORY_LABELS[filters.value.category] ?? filters.value.category)
+    labels.push(categoryLabels.value[filters.value.category] ?? filters.value.category)
   }
 
   if (filters.value.radius) {
@@ -373,6 +402,36 @@ const filteredProducts = computed(() => {
   return result
 })
 
+const loadCategories = async () => {
+  try {
+    const response = await apiService.getCategories()
+
+    if (!response?.success || !Array.isArray(response.data)) {
+      return
+    }
+
+    const slugToId: Record<string, number> = {}
+    const labels: Record<string, string> = {}
+
+    response.data.forEach(category => {
+      const slug = getCategoryKey(category.name)
+
+      if (typeof category.id === 'number' && Number.isFinite(category.id) && !(slug in slugToId)) {
+        slugToId[slug] = category.id
+      }
+
+      if (category.name) {
+        labels[slug] = category.name
+      }
+    })
+
+    categorySlugToId.value = { ...categorySlugToId.value, ...slugToId }
+    categoryLabels.value = { ...categoryLabels.value, ...labels }
+  } catch (error) {
+    console.warn('Impossible de charger les catégories', error)
+  }
+}
+
 const fetchProducts = async () => {
   try {
     loading.value = true
@@ -380,7 +439,10 @@ const fetchProducts = async () => {
     const filtersPayload: ProductFilters = {}
 
     if (filters.value.category) {
-      filtersPayload.category = filters.value.category
+      const categoryId = categorySlugToId.value[filters.value.category]
+      if (typeof categoryId === 'number') {
+        filtersPayload.category_id = categoryId
+      }
     }
 
     if (filters.value.maxPrice) {
@@ -459,7 +521,7 @@ const getProductTags = (product: NormalizedProduct) => {
   const tags: string[] = []
 
   if (product.category) {
-    const label = CATEGORY_LABELS[product.category] ?? product.category
+    const label = categoryLabels.value[product.category] ?? product.category
     tags.push(label)
   }
 
@@ -595,6 +657,7 @@ const enableLocationFilter = () => {
 }
 
 onMounted(() => {
+  loadCategories()
   fetchProducts()
 })
 </script>
