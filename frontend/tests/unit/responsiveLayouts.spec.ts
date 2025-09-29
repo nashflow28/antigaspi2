@@ -43,7 +43,7 @@ vi.mock('@/stores/payments', () => ({
   })
 }))
 
-vi.mock('@/components/ui/ProductCard.vue', () => ({
+vi.mock('@/components/ui/2025/ProductCard.vue', () => ({
   default: {
     name: 'ProductCard',
     props: [
@@ -55,8 +55,10 @@ vi.mock('@/components/ui/ProductCard.vue', () => ({
       'discount',
       'quantity',
       'tags',
+      'stockBadges',
       'reserveLoading',
       'reserveDisabled',
+      'disabled',
       'onReserve'
     ],
     template: '<div class="product-card">Product</div>'
@@ -89,8 +91,13 @@ const globalStubs = {
   },
   EmptyState: {
     name: 'EmptyState',
-    props: ['title', 'description', 'actionLabel', 'icon'],
+    props: ['title', 'description', 'icon', 'primaryAction', 'variant'],
     template: '<div class="empty"><slot /></div>'
+  },
+  Loading: {
+    name: 'Loading',
+    props: ['type', 'skeletonLines'],
+    template: '<div class="loading" />'
   },
   Toast: {
     name: 'Toast',
