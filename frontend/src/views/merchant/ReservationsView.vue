@@ -461,7 +461,6 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted } from 'vue'
-import { useAuthStore } from '@/stores/auth'
 import { formatPrice } from '@/utils/currency'
 import {
   MagnifyingGlassIcon,
@@ -484,9 +483,8 @@ import Card from '@/components/ui/2025/Card.vue'
 import Button from '@/components/ui/2025/Button.vue'
 import Badge from '@/components/ui/2025/Badge.vue'
 import Input from '@/components/ui/2025/Input.vue'
-
-// Auth store
-const authStore = useAuthStore()
+import { apiService } from '@/services/api'
+import { notify } from '@/composables/useNotifications'
 
 // Reactive data
 const reservations = ref<any[]>([])
@@ -683,79 +681,55 @@ const isUrgent = (reservation: any): boolean => {
 
 const updateReservationStatus = async (reservation: any, newStatus: string) => {
   try {
-    let endpoint = ''
-
+    let response
     switch (newStatus) {
       case 'confirmed':
-        endpoint = `http://localhost:8000/api/reservations/${reservation.id}/confirm`
+        response = await apiService.confirmReservation(reservation.id)
         break
       case 'completed':
-        endpoint = `http://localhost:8000/api/reservations/${reservation.id}/complete`
+        response = await apiService.completeReservation(reservation.id)
         break
       case 'cancelled':
-        endpoint = `http://localhost:8000/api/reservations/${reservation.id}/cancel`
+        response = await apiService.cancelReservation(reservation.id)
         break
       default:
-        // console.error('Unknown status:', newStatus)
         return
     }
 
-    const response = await fetch(endpoint, {
-      method: 'POST',
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${authStore.token}`
-      }
-    })
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`)
+    if (!response.success) {
+      notify.error(response.message || 'Impossible de mettre à jour la réservation.')
+      return
     }
 
-    const data = await response.json()
-    // console.log(`Updated reservation ${reservation.id} to status: ${newStatus}`, data)
+    const successMessage =
+      newStatus === 'confirmed'
+        ? 'Réservation confirmée avec succès.'
+        : newStatus === 'completed'
+          ? 'Réservation marquée comme récupérée.'
+          : 'Réservation annulée.'
 
-    // Reload reservations to get updated data
+    notify.success(successMessage)
+
     await loadReservations()
   } catch (error) {
-    // console.error('Error updating reservation status:', error)
+    notify.error('Une erreur est survenue lors de la mise à jour de la réservation.')
   }
 }
 
 const markAsReady = async (reservation: any) => {
-  // console.log('markAsReady called with reservation:', reservation)
-  // console.log('Reservation ID:', reservation.id)
-  // console.log('Auth token:', authStore.token)
   try {
-    // console.log('Making API call to mark reservation as ready...')
-    const url = `http://localhost:8000/api/reservations/${reservation.id}/ready`
-    // console.log('API URL:', url)
-    const response = await fetch(url, {
-      method: 'POST',
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${authStore.token}`
-      }
-    })
+    const response = await apiService.markReservationReady(reservation.id)
 
-    // console.log('Response status:', response.status)
-    // console.log('Response ok:', response.ok)
-
-    if (!response.ok) {
-      const errorText = await response.text()
-      // console.error('Error response:', errorText)
-      throw new Error(`HTTP error! status: ${response.status}, body: ${errorText}`)
+    if (!response.success) {
+      notify.error(response.message || 'Impossible de marquer la réservation comme prête.')
+      return
     }
 
-    const data = await response.json()
-    // console.log(`Marked reservation ${reservation.id} as ready`, data)
+    notify.success('Réservation marquée comme prête.')
 
-    // Reload reservations to get updated data
     await loadReservations()
   } catch (error) {
-    // console.error('Error marking reservation as ready:', error)
+    notify.error("Une erreur est survenue lors de la préparation de la réservation.")
   }
 }
 
@@ -848,52 +822,46 @@ const exportSingleReservation = (reservation: any) => {
 const loadReservations = async () => {
   try {
     loading.value = true
-    const response = await fetch('http://localhost:8000/api/reservations/merchant/list', {
-      method: 'GET',
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${authStore.token}`
-      }
-    })
+    const response = await apiService.getMerchantReservations()
 
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`)
-    }
-
-    const data = await response.json()
-    // console.log('Loaded merchant reservations:', data)
-
-    if (data.success && data.data) {
-      // Transform API data to match component interface
-      reservations.value = data.data.map((res: any) => ({
-        id: res.id,
-        reservation_code: res.reservation_code,
-        status: res.status,
-        quantity: parseInt(res.quantity || 1),
-        total_amount: parseFloat(res.total_amount || 0),
-        notes: res.pickup_notes || null,
-        created_at: res.created_at,
-        confirmed_at: res.confirmed_at || null,
-        expires_at: res.expires_at,
-        pickup_date: res.pickup_date,
-        discounted_price: parseFloat(res.discounted_price || 0),
-        product: {
-          id: res.product?.id || 0,
-          name: res.product?.name || 'Produit inconnu',
-          description: res.product?.description || '',
-          image_url: res.product?.image_url || '/images/placeholder.jpg'
-        },
-        consumer: {
-          name: `${res.user?.first_name || ''} ${res.user?.last_name || ''}`.trim() || 'Client',
-          phone: res.user?.phone || 'N/A'
-        }
-      }))
-    } else {
+    if (!response.success) {
+      notify.error(response.message || 'Impossible de récupérer les réservations.')
       reservations.value = []
+      return
     }
+
+    const data = Array.isArray(response.data) ? response.data : []
+
+    reservations.value = data.map(res => ({
+      ...res,
+      reservation_code: (res as any)?.reservation_code,
+      status: (res as any)?.status,
+      quantity: Number((res as any)?.quantity ?? 1),
+      total_amount: Number((res as any)?.total_amount ?? 0),
+      discounted_price: Number((res as any)?.discounted_price ?? (res as any)?.product?.discounted_price ?? 0),
+      notes: (res as any)?.pickup_notes ?? null,
+      created_at: (res as any)?.created_at,
+      confirmed_at: (res as any)?.confirmed_at ?? null,
+      expires_at: (res as any)?.expires_at,
+      pickup_date: (res as any)?.pickup_date,
+      product: {
+        id: (res as any)?.product?.id || 0,
+        name: (res as any)?.product?.name || 'Produit inconnu',
+        description: (res as any)?.product?.description || '',
+        image_url: (res as any)?.product?.image_url || '/images/placeholder.jpg',
+        ...((res as any)?.product || {})
+      },
+      consumer: {
+        name:
+          `${(res as any)?.consumer?.first_name || ''} ${(res as any)?.consumer?.last_name || ''}`.trim() ||
+          (res as any)?.consumer?.name ||
+          `${(res as any)?.user?.first_name || ''} ${(res as any)?.user?.last_name || ''}`.trim() ||
+          'Client',
+        phone: (res as any)?.consumer?.phone || (res as any)?.user?.phone || 'N/A'
+      }
+    }))
   } catch (error) {
-    // console.error('Error loading reservations:', error)
+    notify.error('Une erreur est survenue lors du chargement des réservations.')
     reservations.value = []
   } finally {
     loading.value = false
