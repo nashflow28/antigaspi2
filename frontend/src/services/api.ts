@@ -14,6 +14,12 @@ import type {
   PaymentApiResponse,
   AdminDashboardData,
   AdminSystemHealthService
+  LoyaltyPointsSummary,
+  LoyaltyRedemptionPayload,
+  LoyaltyRedemptionData,
+  LoyaltyAwardPayload,
+  LoyaltyParticipantSummary,
+  LoyaltyPoint
 } from '@/types'
 
 const DEFAULT_API_BASE_URL = 'http://localhost:8000/api'
@@ -335,6 +341,29 @@ class ApiService {
 
   async getAdminSystemHealth(): Promise<ApiResponse<AdminSystemHealthService[]>> {
     return this.request<ApiResponse<AdminSystemHealthService[]>>('/admin/system-health', {}, true)
+  // Loyalty points
+  async getLoyaltyPoints(): Promise<ApiResponse<LoyaltyPointsSummary>> {
+    return this.request<ApiResponse<LoyaltyPointsSummary>>('/loyalty/my-points', {}, true)
+  }
+
+  async redeemLoyaltyPoints(payload: LoyaltyRedemptionPayload): Promise<ApiResponse<LoyaltyRedemptionData>> {
+    return this.request<ApiResponse<LoyaltyRedemptionData>>('/loyalty/redeem', {
+      method: 'POST',
+      body: JSON.stringify(payload)
+    }, true)
+  }
+
+  async awardLoyaltyPoints(payload: LoyaltyAwardPayload, scope: 'merchant' | 'admin' = 'merchant'): Promise<ApiResponse<LoyaltyPoint>> {
+    const endpoint = scope === 'admin' ? '/admin/loyalty/award' : '/merchants/loyalty/award'
+    return this.request<ApiResponse<LoyaltyPoint>>(endpoint, {
+      method: 'POST',
+      body: JSON.stringify(payload)
+    }, true)
+  }
+
+  async getLoyaltyParticipants(scope: 'merchant' | 'admin' = 'merchant'): Promise<ApiResponse<LoyaltyParticipantSummary[]>> {
+    const endpoint = scope === 'admin' ? '/admin/loyalty/users' : '/merchants/loyalty/customers'
+    return this.request<ApiResponse<LoyaltyParticipantSummary[]>>(endpoint, {}, true)
   }
 }
 

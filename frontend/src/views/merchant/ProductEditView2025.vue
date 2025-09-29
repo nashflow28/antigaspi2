@@ -329,6 +329,8 @@ import { useRoute, useRouter } from 'vue-router'
 import { useDashboardLayout } from '@/composables/useDashboardLayout'
 import { notify } from '@/composables/useNotifications'
 import { formatPrice } from '@/utils/currency'
+import { apiService } from '@/services/api'
+import type { Category } from '@/types'
 import {
   ArrowLeftIcon,
   TrashIcon,
@@ -348,37 +350,89 @@ const router = useRouter()
 const { sidebar, header } = useDashboardLayout('merchant')
 
 // State
-const product = ref(null)
-const categories = ref([])
+type EditableProduct = {
+  id: number
+  name: string
+  description?: string | null
+  category_id?: number | null
+  original_price: number
+  discounted_price: number
+  quantity_available: number
+  expires_at?: string | null
+  expiration_date?: string | null
+  image_url?: string | null
+  status?: string | null
+  created_at?: string | null
+  updated_at?: string | null
+  views?: number
+  reservations_count?: number
+  [key: string]: unknown
+}
+
+const product = ref<EditableProduct | null>(null)
+const categories = ref<Category[]>([])
 const loading = ref(false)
 const saving = ref(false)
-const error = ref(null)
-const errors = ref({})
-const imageInput = ref(null)
+const error = ref<string | null>(null)
+const errors = ref<Record<string, string>>({})
+const imageInput = ref<HTMLInputElement | null>(null)
+
+const transformProductData = (apiProduct: any): EditableProduct => {
+  if (!apiProduct) {
+    throw new Error('Produit introuvable')
+  }
+
+  const originalPrice = Number(apiProduct.original_price ?? apiProduct.price ?? 0)
+  const discountedPrice = Number(apiProduct.discounted_price ?? apiProduct.price_discounted ?? apiProduct.price ?? 0)
+  const quantity = Number(apiProduct.quantity_available ?? apiProduct.quantity ?? 0)
+
+  return {
+    ...apiProduct,
+    id: Number(apiProduct.id),
+    name: apiProduct.name ?? '',
+    description: apiProduct.description ?? '',
+    category_id: apiProduct.category_id ?? apiProduct.category?.id ?? null,
+    original_price: Number.isNaN(originalPrice) ? 0 : originalPrice,
+    discounted_price: Number.isNaN(discountedPrice) ? 0 : discountedPrice,
+    quantity_available: Number.isNaN(quantity) ? 0 : quantity,
+    expires_at: apiProduct.expires_at ?? apiProduct.expiration_date ?? null,
+    expiration_date: apiProduct.expiration_date ?? apiProduct.expires_at ?? null,
+    image_url: apiProduct.image_url ?? null,
+    status: apiProduct.status ?? (apiProduct.is_active === false ? 'inactive' : 'active'),
+    created_at: apiProduct.created_at ?? null,
+    updated_at: apiProduct.updated_at ?? null,
+    views: apiProduct.views ?? apiProduct.metrics?.views ?? 0,
+    reservations_count: apiProduct.reservations_count ?? apiProduct.metrics?.reservations_count ?? 0
+  }
+}
 
 // Methods
 const loadProduct = async () => {
   loading.value = true
   try {
-    // Mock product data - replace with actual API call
-    product.value = {
-      id: route.params.id,
-      name: 'Pain complet artisanal',
-      description: 'Pain frais du jour avec farine complète bio',
-      category_id: 1,
-      original_price: 500,
-      discounted_price: 300,
-      quantity_available: 10,
-      expires_at: '2025-09-26T18:00',
-      image_url: null,
-      status: 'active',
-      created_at: '2025-09-20T10:00:00Z',
-      updated_at: '2025-09-25T15:30:00Z',
-      views: 45,
-      reservations_count: 3
+    error.value = null
+
+    const productId = Number(route.params.id)
+    if (Number.isNaN(productId)) {
+      throw new Error('Identifiant de produit invalide')
     }
+
+    const resolver = typeof (apiService as any).getMerchantProduct === 'function'
+      ? (apiService as any).getMerchantProduct.bind(apiService)
+      : apiService.getProduct.bind(apiService)
+
+    const response = await resolver(productId)
+
+    if (!response?.success) {
+      throw new Error(response?.message || 'Erreur lors du chargement du produit')
+    }
+
+    const apiProduct = (response.data as any)?.product ?? response.data
+    product.value = transformProductData(apiProduct)
   } catch (err) {
-    error.value = 'Erreur lors du chargement du produit'
+    const message = err instanceof Error ? err.message : 'Erreur lors du chargement du produit'
+    error.value = message
+    notify.error(message)
   } finally {
     loading.value = false
   }
@@ -386,14 +440,14 @@ const loadProduct = async () => {
 
 const loadCategories = async () => {
   try {
-    // Mock categories - replace with actual API call
-    categories.value = [
-      { id: 1, name: 'Boulangerie' },
-      { id: 2, name: 'Pâtisserie' },
-      { id: 3, name: 'Fruits & Légumes' }
-    ]
+    const response = await apiService.getCategories()
+    if (!response?.success) {
+      throw new Error(response?.message || 'Erreur lors du chargement des catégories')
+    }
+    categories.value = response.data || []
   } catch (err) {
-    // console.error('Error loading categories:', err)
+    const message = err instanceof Error ? err.message : 'Erreur lors du chargement des catégories'
+    notify.error(message)
   }
 }
 
@@ -402,12 +456,60 @@ const saveProduct = async () => {
   errors.value = {}
 
   try {
-    // Mock save - replace with actual API call
-    await new Promise(resolve => setTimeout(resolve, 1000))
+    if (!product.value) {
+      throw new Error('Aucun produit à enregistrer')
+    }
+
+    const productId = Number(product.value.id)
+    if (Number.isNaN(productId)) {
+      throw new Error('Identifiant de produit invalide')
+    }
+
+    const originalPriceValue = Number(product.value.original_price ?? 0)
+    const discountedPriceValue = Number(product.value.discounted_price ?? 0)
+    const safeOriginalPrice = Number.isNaN(originalPriceValue) ? 0 : originalPriceValue
+    const safeDiscountedPrice = Number.isNaN(discountedPriceValue) ? 0 : discountedPriceValue
+
+    const payload: Record<string, unknown> = {
+      name: product.value.name,
+      description: product.value.description ?? '',
+      category_id: product.value.category_id ?? null,
+      original_price: safeOriginalPrice.toString(),
+      discounted_price: safeDiscountedPrice.toString(),
+      quantity_available: Number.isNaN(Number(product.value.quantity_available))
+        ? 0
+        : Number(product.value.quantity_available),
+      expiration_date: product.value.expires_at ?? product.value.expiration_date ?? null,
+      image_url: product.value.image_url ?? null
+    }
+
+    if (product.value.status) {
+      payload.is_active = product.value.status === 'active'
+    }
+
+    const response = await apiService.updateProduct(productId, payload)
+
+    if (!response?.success) {
+      throw new Error(response?.message || 'Erreur lors de la mise à jour du produit')
+    }
+
+    const updatedProduct = (response.data as any)?.product ?? response.data
+    product.value = transformProductData(updatedProduct)
+
     notify.success('Produit mis à jour avec succès')
     router.push('/merchant/products')
-  } catch (err) {
-    notify.error('Erreur lors de la sauvegarde')
+  } catch (err: any) {
+    const validationErrors = err?.response?.data?.errors
+    if (validationErrors && typeof validationErrors === 'object') {
+      errors.value = Object.keys(validationErrors).reduce<Record<string, string>>((acc, key) => {
+        const value = validationErrors[key]
+        acc[key] = Array.isArray(value) ? value.join(', ') : String(value)
+        return acc
+      }, {})
+    }
+
+    const message = err instanceof Error ? err.message : 'Erreur lors de la sauvegarde'
+    notify.error(message)
   } finally {
     saving.value = false
   }
@@ -417,31 +519,61 @@ const deleteProduct = async () => {
   if (!confirm('Êtes-vous sûr de vouloir supprimer ce produit ?')) return
 
   try {
-    // Mock delete - replace with actual API call
-    await new Promise(resolve => setTimeout(resolve, 500))
+    if (!product.value) {
+      throw new Error('Produit introuvable')
+    }
+
+    await apiService.deleteProduct(product.value.id)
     notify.success('Produit supprimé avec succès')
     router.push('/merchant/products')
   } catch (err) {
-    notify.error('Erreur lors de la suppression')
+    const message = err instanceof Error ? err.message : 'Erreur lors de la suppression'
+    notify.error(message)
   }
 }
 
-const handleImageUpload = async (event) => {
-  const file = event.target.files?.[0]
+const handleImageUpload = async (event: Event) => {
+  const target = event.target as HTMLInputElement | null
+  const file = target?.files?.[0]
   if (!file) return
 
   try {
-    // Mock upload - replace with actual API call
-    const url = URL.createObjectURL(file)
-    product.value.image_url = url
+    const formData = new FormData()
+    formData.append('image', file)
+
+    const response = await apiService.postFormData('/products/upload-image', formData, true)
+
+    const data = (response as any)?.data ?? response
+    const imageUrl = data?.image_url ?? data?.url ?? null
+
+    if (!imageUrl) {
+      throw new Error('URL de l\'image introuvable dans la réponse')
+    }
+
+    if (product.value) {
+      product.value.image_url = imageUrl
+    }
+
     notify.success('Image ajoutée avec succès')
   } catch (err) {
-    notify.error('Erreur lors du téléchargement de l\'image')
+    const message = err?.response?.data?.message
+      || (err instanceof Error ? err.message : 'Erreur lors du téléchargement de l\'image')
+    notify.error(message)
+  }
+
+  if (target) {
+    target.value = ''
+  }
+
+  if (imageInput.value) {
+    imageInput.value.value = ''
   }
 }
 
 const removeImage = () => {
-  product.value.image_url = null
+  if (product.value) {
+    product.value.image_url = null
+  }
   notify.success('Image supprimée')
 }
 
