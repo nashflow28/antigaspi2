@@ -145,7 +145,7 @@
 
 <script setup lang="ts">
 import { ref, reactive } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { Mail, Lock, Eye, EyeOff, Loader2 } from 'lucide-vue-next'
 import type { LoginCredentials } from '@/types'
@@ -157,7 +157,12 @@ import Input from '@/components/ui/2025/Input.vue'
 import Button from '@/components/ui/2025/Button.vue'
 
 const router = useRouter()
+const route = useRoute()
 const authStore = useAuthStore()
+
+const isValidRedirect = (target: unknown): target is string => {
+  return typeof target === 'string' && target.startsWith('/') && !target.startsWith('//')
+}
 
 const loading = ref(false)
 const showPassword = ref(false)
@@ -206,6 +211,12 @@ const handleSubmit = async () => {
 
     if (result.success) {
       // Rediriger selon le rôle de l'utilisateur
+      const redirectTarget = route.query.redirect
+      if (isValidRedirect(redirectTarget)) {
+        router.push(redirectTarget)
+        return
+      }
+
       const user = authStore.user
       if (user?.role === 'admin') {
         router.push('/admin/dashboard')
