@@ -413,7 +413,7 @@ import {
 // Import 2025 Design System components
 import Card from '@/components/ui/2025/Card.vue'
 import Button from '@/components/ui/2025/Button.vue'
-import Badge from '@/components/ui/2025/Badge.vue'
+import Badge, { type BadgeVariant } from '@/components/ui/2025/Badge.vue'
 import Select from '@/components/ui/2025/Select.vue'
 import {
   DashboardHeader,
@@ -865,12 +865,12 @@ const getActivityIcon = (type: string) => {
   return icons[type] || BellIcon
 }
 
-const getActivityStatusVariant = (status: string) => {
-  const variants: Record<string, string> = {
+const getActivityStatusVariant = (status: string): BadgeVariant => {
+  const variants: Record<string, BadgeVariant> = {
     success: 'success',
     completed: 'primary',
     warning: 'warning',
-    error: 'destructive'
+    error: 'error'
   }
   return variants[status] || 'secondary'
 }
