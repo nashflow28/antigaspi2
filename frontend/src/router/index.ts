@@ -331,7 +331,7 @@ router.beforeEach(async (to, _from, next) => {
 
   // Check if route requires authentication
   if (to.meta.requiresAuth && !authStore.isAuthenticated) {
-    next('/login')
+    next({ name: 'login', query: { redirect: to.fullPath } })
     return
   }
 
@@ -374,7 +374,7 @@ router.beforeEach(async (to, _from, next) => {
           next('/dashboard')
           break
         default:
-          next('/login')
+          next({ name: 'login', query: { redirect: to.fullPath } })
       }
       return
     }
