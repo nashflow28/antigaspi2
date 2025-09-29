@@ -1,43 +1,17 @@
 import { ref, computed } from 'vue'
-import axios from 'axios'
 import { notify } from '@/composables/useNotifications'
-
-// Types
-interface LoyaltyPoint {
-  id: number
-  user_id: number
-  points: number
-  earned_from: 'purchase' | 'review' | 'referral' | 'bonus' | 'redemption'
-  reference_id?: number
-  description: string
-  expires_at?: string
-  created_at: string
-}
-
-interface PointsBreakdown {
-  earned_from: string
-  total: string
-}
-
-interface LoyaltyPointsData {
-  total_points: number
-  expiring_soon: number
-  breakdown: PointsBreakdown[]
-  recent_history: LoyaltyPoint[]
-}
-
-interface UserPointsSummary {
-  id: number
-  name: string
-  email: string
-  total_points: number
-  last_activity: string
-}
+import apiService from '@/services/api'
+import type {
+  LoyaltyPointsSummary,
+  LoyaltyParticipantSummary,
+  LoyaltyAwardPayload,
+  LoyaltyRedemptionPayload
+} from '@/types'
 
 export const useLoyaltyPoints = () => {
   // State
-  const points = ref<LoyaltyPointsData | null>(null)
-  const allUsersPoints = ref<UserPointsSummary[]>([])
+  const points = ref<LoyaltyPointsSummary | null>(null)
+  const allUsersPoints = ref<LoyaltyParticipantSummary[]>([])
   const loading = ref(false)
   const error = ref<string | null>(null)
 
@@ -47,144 +21,92 @@ export const useLoyaltyPoints = () => {
   const recentHistory = computed(() => points.value?.recent_history || [])
   const pointsBreakdown = computed(() => points.value?.breakdown || [])
 
+  const getErrorMessage = (err: unknown, fallback: string): string => {
+    if (err instanceof Error && err.message) {
+      return err.message
+    }
+
+    if (typeof err === 'string' && err.length > 0) {
+      return err
+    }
+
+    if (err && typeof err === 'object' && 'message' in err && typeof (err as any).message === 'string') {
+      return (err as { message: string }).message
+    }
+
+    return fallback
+  }
+
+  const reportError = (err: unknown, fallback: string, title?: string) => {
+    const message = getErrorMessage(err, fallback)
+    error.value = message
+    notify.error(message, title)
+  }
+
   // Methods
   const fetchMyPoints = async (): Promise<void> => {
     loading.value = true
     error.value = null
 
     try {
-      const token = localStorage.getItem('auth_token')
-      if (!token) {
-        throw new Error('Token d\'authentification manquant')
-      }
-
-      const response = await axios.get('http://localhost:8000/api/loyalty/my-points', {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
-      })
-
-      if (response.data.success) {
-        points.value = response.data.data
-      } else {
-        throw new Error('Erreur lors de la récupération des points')
-      }
-    } catch (err: any) {
-      error.value = err.response?.data?.message || err.message
-      notify.error('Erreur lors de la récupération des points')
+      const response = await apiService.getLoyaltyPoints()
+      points.value = response.data
+    } catch (err) {
+      reportError(err, 'Erreur lors de la récupération des points')
     } finally {
       loading.value = false
     }
   }
 
-  const awardPoints = async (data: {
-    user_id: number
-    points: number
-    earned_from: 'purchase' | 'review' | 'referral' | 'bonus'
-    reference_id?: number
-    description: string
-    expires_at?: string
-  }): Promise<boolean> => {
+  const awardPoints = async (
+    data: LoyaltyAwardPayload,
+    scope: 'merchant' | 'admin' = 'merchant'
+  ): Promise<boolean> => {
     loading.value = true
     error.value = null
 
     try {
-      const token = localStorage.getItem('auth_token')
-      if (!token) {
-        throw new Error('Token d\'authentification manquant')
-      }
-
-      // Always use merchant endpoint for now, as this composable is used in merchant context
-      const endpoint = 'http://localhost:8000/api/merchants/loyalty/award'
-
-      const response = await axios.post(endpoint, data, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
-      })
-
-      if (response.data.success) {
-        notify.success('Points attribués avec succès')
-        return true
-      } else {
-        throw new Error('Erreur lors de l\'attribution des points')
-      }
-    } catch (err: any) {
-      error.value = err.response?.data?.message || err.message
-      notify.error('Erreur lors de l\'attribution des points')
+      const response = await apiService.awardLoyaltyPoints(data, scope)
+      notify.success(response.message || 'Points attribués avec succès')
+      return true
+    } catch (err) {
+      reportError(err, 'Erreur lors de l\'attribution des points')
       return false
     } finally {
       loading.value = false
     }
   }
 
-  const redeemPoints = async (data: {
-    points: number
-    description: string
-  }): Promise<boolean> => {
+  const redeemPoints = async (data: LoyaltyRedemptionPayload): Promise<boolean> => {
     loading.value = true
     error.value = null
 
     try {
-      const token = localStorage.getItem('auth_token')
-      if (!token) {
-        throw new Error('Token d\'authentification manquant')
-      }
-
-      const response = await axios.post('http://localhost:8000/api/loyalty/redeem', data, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
-      })
-
-      if (response.data.success) {
-        notify.success('Points échangés avec succès')
-        // Refresh points after redemption
-        await fetchMyPoints()
-        return true
-      } else {
-        throw new Error(response.data.message || 'Erreur lors de l\'échange des points')
-      }
-    } catch (err: any) {
-      error.value = err.response?.data?.message || err.message
-      notify.error('Impossible d\'échanger vos points. Vérifiez que vous avez suffisamment de points.', 'Erreur d\'échange')
+      const response = await apiService.redeemLoyaltyPoints(data)
+      notify.success(response.message || 'Points échangés avec succès')
+      await fetchMyPoints()
+      return true
+    } catch (err) {
+      reportError(
+        err,
+        'Impossible d\'échanger vos points. Vérifiez que vous avez suffisamment de points.',
+        'Erreur d\'échange'
+      )
       return false
     } finally {
       loading.value = false
     }
   }
 
-  const fetchAllUsersPoints = async (): Promise<void> => {
+  const fetchAllUsersPoints = async (scope: 'merchant' | 'admin' = 'merchant'): Promise<void> => {
     loading.value = true
     error.value = null
 
     try {
-      const token = localStorage.getItem('auth_token')
-      if (!token) {
-        throw new Error('Token d\'authentification manquant')
-      }
-
-      // Always use merchant endpoint for now, as this composable is used in merchant context
-      const endpoint = 'http://localhost:8000/api/merchants/loyalty/customers'
-
-      const response = await axios.get(endpoint, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
-      })
-
-      if (response.data.success) {
-        allUsersPoints.value = response.data.data
-      } else {
-        throw new Error('Erreur lors de la récupération des points')
-      }
-    } catch (err: any) {
-      error.value = err.response?.data?.message || err.message
-      notify.error('Erreur lors de la récupération des points: ' + (err.response?.data?.message || err.message))
+      const response = await apiService.getLoyaltyParticipants(scope)
+      allUsersPoints.value = response.data
+    } catch (err) {
+      reportError(err, 'Erreur lors de la récupération des points')
     } finally {
       loading.value = false
     }
