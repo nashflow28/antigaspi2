@@ -16,6 +16,7 @@ export interface NormalizedProduct {
   available_quantity: number
   reserved_quantity: number
   category?: string
+  category_id?: number | null
   image_url?: string
 }
 
@@ -28,12 +29,63 @@ const CATEGORY_KEY_MAP: Record<string, string> = {
   'Viandes': 'meat'
 }
 
-export const getCategoryKey = (categoryName?: string | null): string => {
-  if (!categoryName) {
+type CategoryInput =
+  | string
+  | null
+  | undefined
+  | { id?: number | null; name?: string | null }
+
+const slugify = (value: string): string => {
+  return value
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+}
+
+const getCategoryBaseSlug = (name?: string | null): string | undefined => {
+  if (!name) {
+    return undefined
+  }
+
+  const trimmedName = name.trim()
+
+  if (!trimmedName) {
+    return undefined
+  }
+
+  return CATEGORY_KEY_MAP[trimmedName] || slugify(trimmedName)
+}
+
+export const getCategoryKey = (category?: CategoryInput): string => {
+  if (!category) {
     return 'other'
   }
 
-  return CATEGORY_KEY_MAP[categoryName] || 'other'
+  let id: number | null = null
+  let name: string | null | undefined
+
+  if (typeof category === 'string') {
+    name = category
+  } else if (typeof category === 'object') {
+    id = typeof category.id === 'number' && Number.isFinite(category.id)
+      ? category.id
+      : null
+    name = category.name
+  }
+
+  const baseSlug = getCategoryBaseSlug(name)
+
+  if (id !== null) {
+    if (baseSlug) {
+      return `${baseSlug}-${id}`
+    }
+
+    return `category-${id}`
+  }
+
+  return baseSlug || 'other'
 }
 
 export const normalizeProduct = (product: ApiProduct): NormalizedProduct => {
@@ -84,7 +136,10 @@ export const normalizeProduct = (product: ApiProduct): NormalizedProduct => {
     expires_at: product.expiration_date ? new Date(product.expiration_date) : null,
     available_quantity: Number.isFinite(availableQuantity) ? availableQuantity : 0,
     reserved_quantity: 0,
-    category: getCategoryKey(product.category?.name),
+    category: getCategoryKey(product.category),
+    category_id: typeof product.category?.id === 'number' && Number.isFinite(product.category.id)
+      ? product.category.id
+      : null,
     image_url: product.image_url || undefined
   }
 }
