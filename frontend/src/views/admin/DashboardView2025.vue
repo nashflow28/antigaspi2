@@ -427,7 +427,9 @@ import type {
   AdminDashboardEnvironmentalImpact,
   AdminDashboardMerchant,
   AdminDashboardStats,
-  AdminSystemHealthService
+  AdminDashboardUserDistributionEntry,
+  AdminSystemHealthService,
+  AnalyticsDailyBreakdownEntry
 } from '@/types'
 
 ChartJS.register(
@@ -482,6 +484,9 @@ const environmentalImpact = ref<AdminDashboardEnvironmentalImpact>({
 const topMerchants = ref<AdminDashboardMerchant[]>([])
 
 const popularCategories = ref<AdminDashboardCategory[]>([])
+
+const revenueTrends = ref<{ labels: string[]; values: number[] }>({ labels: [], values: [] })
+const userDistribution = ref<{ label: string; value: number }[]>([])
 
 interface DashboardAlert {
   id: number | string
@@ -627,6 +632,187 @@ const normalizeSystemHealth = (services?: AdminSystemHealthService[]): AdminSyst
   }))
 }
 
+const userDistributionColors = ['#10B981', '#F59E0B', '#8B5CF6', '#14B8A6', '#6366F1']
+
+const formatDateForApi = (date: Date): string => {
+  const year = date.getFullYear()
+  const month = `${date.getMonth() + 1}`.padStart(2, '0')
+  const day = `${date.getDate()}`.padStart(2, '0')
+  return `${year}-${month}-${day}`
+}
+
+const formatRevenueLabel = (date: Date, period: string): string => {
+  if (Number.isNaN(date.getTime())) {
+    return ''
+  }
+
+  const options: Intl.DateTimeFormatOptions =
+    period === '90d'
+      ? { day: '2-digit', month: 'short' }
+      : { day: '2-digit', month: '2-digit' }
+
+  return date.toLocaleDateString('fr-FR', options)
+}
+
+const buildRevenueFallbackDataset = (period: string) => {
+  const days = period === '7d' ? 7 : period === '30d' ? 30 : 90
+  const labels: string[] = []
+  const values: number[] = []
+  const today = new Date()
+
+  for (let i = days - 1; i >= 0; i--) {
+    const date = new Date(today)
+    date.setDate(today.getDate() - i)
+    labels.push(formatRevenueLabel(date, period))
+    values.push(0)
+  }
+
+  return { labels, values }
+}
+
+const transformAnalyticsToRevenueTrends = (entries?: AnalyticsDailyBreakdownEntry[]) => {
+  if (!Array.isArray(entries) || entries.length === 0) {
+    return { labels: [] as string[], values: [] as number[] }
+  }
+
+  const sortedEntries = [...entries].sort((a, b) => {
+    const dateA = new Date(a.date ?? '')
+    const dateB = new Date(b.date ?? '')
+    return dateA.getTime() - dateB.getTime()
+  })
+
+  const labels: string[] = []
+  const values: number[] = []
+  let cumulativeRevenue = 0
+
+  sortedEntries.forEach(entry => {
+    const date = new Date(entry.date ?? '')
+    labels.push(formatRevenueLabel(date, revenueChartPeriod.value))
+    cumulativeRevenue += normalizeNumber(entry.total_revenue, 0)
+    values.push(Math.round(cumulativeRevenue))
+  })
+
+  return { labels, values }
+}
+
+const resolveUserLabel = (rawLabel: string, fallbackIndex: number) => {
+  const sanitized = rawLabel?.toString().trim()
+  if (!sanitized) {
+    return `Segment ${fallbackIndex + 1}`
+  }
+
+  const normalized = sanitized.toLowerCase().replace(/[^a-z]/g, '')
+
+  if (normalized.includes('consumer')) {
+    return 'Consommateurs'
+  }
+
+  if (normalized.includes('merchant')) {
+    return 'Commerçants'
+  }
+
+  if (normalized.includes('admin')) {
+    return 'Administrateurs'
+  }
+
+  return sanitized.charAt(0).toUpperCase() + sanitized.slice(1)
+}
+
+const computeUserDistributionFallback = (currentStats: AdminDashboardStats) => {
+  const totalUsers = Math.max(normalizeNumber(currentStats.totalUsers, 0), 0)
+  const merchants = Math.max(normalizeNumber(currentStats.activeMerchants, 0), 0)
+  const hasUsers = totalUsers > 0
+  const estimatedAdmins = hasUsers ? Math.min(Math.max(totalUsers - merchants, 0), 5) : 0
+  const adminCount = estimatedAdmins > 0 ? Math.max(estimatedAdmins, 1) : 0
+  let consumers = totalUsers - merchants - adminCount
+
+  if (consumers < 0) {
+    consumers = Math.max(totalUsers - merchants, 0)
+  }
+
+  return [
+    { label: 'Consommateurs', value: Math.max(consumers, 0) },
+    { label: 'Commerçants', value: merchants },
+    { label: 'Administrateurs', value: adminCount }
+  ]
+}
+
+const normalizeUserDistribution = (
+  distribution?: AdminDashboardUserDistributionEntry[] | Record<string, unknown>,
+  fallbackStats?: AdminDashboardStats
+) => {
+  if (Array.isArray(distribution) && distribution.length > 0) {
+    const normalized = distribution
+      .map((entry, index) => ({
+        label: resolveUserLabel(entry.label ?? entry.role ?? `Segment ${index + 1}`, index),
+        value: normalizeNumber(entry.value ?? entry.count ?? entry.total, 0)
+      }))
+      .filter(segment => segment.value >= 0)
+
+    if (normalized.length > 0) {
+      return normalized
+    }
+  } else if (distribution && typeof distribution === 'object') {
+    const normalized = Object.entries(distribution)
+      .map(([key, value], index) => ({
+        label: resolveUserLabel(key, index),
+        value: normalizeNumber(value as number, 0)
+      }))
+      .filter(segment => segment.value >= 0)
+
+    if (normalized.length > 0) {
+      return normalized
+    }
+  }
+
+  if (fallbackStats) {
+    return computeUserDistributionFallback(fallbackStats)
+  }
+
+  return [] as { label: string; value: number }[]
+}
+
+const computeDateRangeForPeriod = (period: string) => {
+  const endDate = new Date()
+  const startDate = new Date(endDate)
+
+  if (period === '7d') {
+    startDate.setDate(endDate.getDate() - 6)
+  } else if (period === '30d') {
+    startDate.setDate(endDate.getDate() - 29)
+  } else {
+    startDate.setDate(endDate.getDate() - 89)
+  }
+
+  return {
+    startDate: formatDateForApi(startDate),
+    endDate: formatDateForApi(endDate)
+  }
+}
+
+const loadRevenueTrendsForPeriod = async () => {
+  try {
+    const { startDate, endDate } = computeDateRangeForPeriod(revenueChartPeriod.value)
+    const analyticsResponse = await apiService.getAnalyticsStats({ startDate, endDate })
+
+    if (!analyticsResponse.success) {
+      throw new Error(analyticsResponse.message || 'Impossible de charger les tendances de revenus.')
+    }
+
+    const dataset = transformAnalyticsToRevenueTrends(analyticsResponse.daily_breakdown)
+
+    if (dataset.labels.length === 0) {
+      revenueTrends.value = buildRevenueFallbackDataset(revenueChartPeriod.value)
+    } else {
+      revenueTrends.value = dataset
+    }
+  } catch (error) {
+    const message = toErrorMessage(error)
+    handleApiError('Erreur de chargement des tendances de revenus', message)
+    revenueTrends.value = buildRevenueFallbackDataset(revenueChartPeriod.value)
+  }
+}
+
 // Modal state
 const modal = ref({
   show: false,
@@ -734,6 +920,8 @@ const loadDashboardData = async () => {
     popularCategories.value = normalizePopularCategories(dashboardData?.popularCategories)
     recentActivities.value = normalizeRecentActivities(dashboardData?.recentActivities)
     environmentalImpact.value = normalizeEnvironmentalImpact(dashboardData?.environmentalImpact)
+    userDistribution.value = normalizeUserDistribution(dashboardData?.userDistribution, stats.value)
+    await loadRevenueTrendsForPeriod()
   } catch (error) {
     const message = toErrorMessage(error)
     handleApiError('Erreur de chargement du tableau de bord', message)
@@ -898,26 +1086,10 @@ const createRevenueChart = () => {
       revenueChart.destroy()
     }
 
-    // Generate demo data based on selected period
-    const generateRevenueData = () => {
-      const days = revenueChartPeriod.value === '7d' ? 7 : revenueChartPeriod.value === '30d' ? 30 : 90
-      const labels = []
-      const data = []
-
-      for (let i = days - 1; i >= 0; i--) {
-        const date = new Date()
-        date.setDate(date.getDate() - i)
-        labels.push(date.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit' }))
-
-        // Generate realistic revenue data with some randomness
-        const baseRevenue = 45000 + Math.random() * 30000
-        data.push(Math.round(baseRevenue))
-      }
-
-      return { labels, data }
-    }
-
-    const { labels, data } = generateRevenueData()
+    const fallbackDataset = buildRevenueFallbackDataset(revenueChartPeriod.value)
+    const dataset = revenueTrends.value
+    const labels = dataset.labels.length ? dataset.labels : fallbackDataset.labels
+    const data = dataset.values.length ? dataset.values : fallbackDataset.values
     // console.log('📈 Données du graphique:', { labels, data })
 
     // console.log('📈 Tentative de création du graphique Chart.js...')
@@ -1027,15 +1199,19 @@ const createUserGrowthChart = () => {
       userGrowthChart.destroy()
     }
 
+    const distribution = userDistribution.value.length
+      ? userDistribution.value
+      : computeUserDistributionFallback(stats.value)
+
+    const labels = distribution.map(segment => segment.label)
+    const values = distribution.map(segment => segment.value)
+    const colors = distribution.map((_, index) => userDistributionColors[index % userDistributionColors.length])
+
     const chartData = {
-      labels: ['Consommateurs', 'Commerçants', 'Administrateurs'],
+      labels,
       datasets: [{
-        data: [1091, 156, 1], // Based on demo data: 1091 consumers, 156 merchants, 1 admin
-        backgroundColor: [
-          '#10B981', // Green for consumers
-          '#F59E0B', // Orange for merchants
-          '#8B5CF6'  // Purple for admins
-        ],
+        data: values,
+        backgroundColor: colors,
         borderWidth: 0
       }]
     }
@@ -1068,8 +1244,11 @@ const createUserGrowthChart = () => {
             callbacks: {
               label: (context) => {
                 const total = context.dataset.data.reduce((a: number, b: number) => a + b, 0)
-                const percentage = ((context.parsed as number / total) * 100).toFixed(1)
-                return `${context.label}: ${context.parsed} (${percentage}%)`
+                const value = typeof context.parsed === 'number'
+                  ? context.parsed
+                  : Number(context.parsed ?? 0)
+                const percentage = total > 0 ? ((value / total) * 100).toFixed(1) : '0.0'
+                return `${context.label}: ${value} (${percentage}%)`
               }
             }
           }
@@ -1094,9 +1273,29 @@ const createUserGrowthChart = () => {
 }
 
 // Watch for period changes to update charts
-watch(revenueChartPeriod, () => {
-  createRevenueChart()
+watch(revenueChartPeriod, async () => {
+  await loadRevenueTrendsForPeriod()
 })
+
+watch(
+  revenueTrends,
+  () => {
+    nextTick(() => {
+      createRevenueChart()
+    })
+  },
+  { deep: true, flush: 'post' }
+)
+
+watch(
+  userDistribution,
+  () => {
+    nextTick(() => {
+      createUserGrowthChart()
+    })
+  },
+  { deep: true, flush: 'post' }
+)
 
 onMounted(async () => {
   try {

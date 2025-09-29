@@ -20,7 +20,8 @@ import type {
   LoyaltyRedemptionData,
   LoyaltyAwardPayload,
   LoyaltyParticipantSummary,
-  LoyaltyPoint
+  LoyaltyPoint,
+  AnalyticsStatsResponse
 } from '@/types'
 
 const DEFAULT_API_BASE_URL = 'http://localhost:8000/api'
@@ -360,6 +361,31 @@ class ApiService {
 
   async getAdminSystemHealth(): Promise<ApiResponse<AdminSystemHealthService[]>> {
     return this.request<ApiResponse<AdminSystemHealthService[]>>('/admin/system-health', {}, true)
+  }
+
+  async getAnalyticsStats(params?: {
+    startDate?: string
+    endDate?: string
+    merchantId?: number | string
+  }): Promise<AnalyticsStatsResponse> {
+    const searchParams = new URLSearchParams()
+
+    if (params?.startDate) {
+      searchParams.append('start_date', params.startDate)
+    }
+
+    if (params?.endDate) {
+      searchParams.append('end_date', params.endDate)
+    }
+
+    if (params?.merchantId !== undefined && params?.merchantId !== null) {
+      searchParams.append('merchant_id', String(params.merchantId))
+    }
+
+    const query = searchParams.toString()
+    const endpoint = `/analytics/stats${query ? `?${query}` : ''}`
+
+    return this.request<AnalyticsStatsResponse>(endpoint, {}, true)
   }
 
   // Loyalty points
