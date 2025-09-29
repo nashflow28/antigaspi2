@@ -97,7 +97,7 @@
                 <div>
                   <p class="text-sm font-medium text-neutral-900 dark:text-neutral-100">Récupération</p>
                   <p class="text-sm text-neutral-600 dark:text-neutral-300">
-                    {{ formatExpiration(product.expiration_date) }}
+                    {{ expirationDisplay }}
                   </p>
                 </div>
               </div>
@@ -343,7 +343,7 @@ interface ProductDetail {
   original_price: number
   discounted_price: number
   quantity_available: number
-  expiration_date: string
+  expiration_date: string | null
   image_url?: string | null
   discount_percentage: number
   category?: { id?: number; name?: string }
@@ -405,13 +405,24 @@ const discountPercentage = computed(() => {
   return Math.round(((original_price - discounted_price) / original_price) * 100)
 })
 
+const expirationFallbackLabel = 'Date non renseignée'
+
 const statusVariant = computed(() => {
   if (!product.value) return 'default'
-  if (product.value.is_expired || availableQuantity.value === 0) return 'error'
+  if (availableQuantity.value === 0 || product.value.is_expired) return 'error'
   if (product.value.is_expiring_soon) return 'warning'
 
-  const now = new Date()
+  if (!product.value.expiration_date) {
+    return 'default'
+  }
+
   const expiration = new Date(product.value.expiration_date)
+
+  if (Number.isNaN(expiration.getTime())) {
+    return 'default'
+  }
+
+  const now = new Date()
   const hoursUntilExpiration = (expiration.getTime() - now.getTime()) / (1000 * 60 * 60)
 
   if (hoursUntilExpiration < 6) return 'error'
@@ -420,13 +431,19 @@ const statusVariant = computed(() => {
 })
 
 const statusLabel = computed(() => {
-  if (!product.value) return ''
+  if (!product.value) return expirationFallbackLabel
   if (product.value.is_expired) return 'Expiré'
   if (availableQuantity.value === 0) return 'Rupture'
   if (product.value.is_expiring_soon) return 'Expire bientôt'
+  if (!product.value.expiration_date) return expirationFallbackLabel
+
+  const expiration = new Date(product.value.expiration_date)
+
+  if (Number.isNaN(expiration.getTime())) {
+    return expirationFallbackLabel
+  }
 
   const now = new Date()
-  const expiration = new Date(product.value.expiration_date)
   const hoursUntilExpiration = (expiration.getTime() - now.getTime()) / (1000 * 60 * 60)
 
   if (hoursUntilExpiration < 0) return 'Expiré'
@@ -440,12 +457,24 @@ const formatPrice = (price: number) => {
   return new Intl.NumberFormat('fr-FR').format(price)
 }
 
-const formatExpiration = (date: string | Date) => {
+const formatExpiration = (date: string | Date | null | undefined) => {
+  if (!date) {
+    return expirationFallbackLabel
+  }
+
+  const expirationDate = new Date(date)
+
+  if (Number.isNaN(expirationDate.getTime())) {
+    return expirationFallbackLabel
+  }
+
   return new Intl.DateTimeFormat('fr-FR', {
     dateStyle: 'medium',
     timeStyle: 'short'
-  }).format(new Date(date))
+  }).format(expirationDate)
 }
+
+const expirationDisplay = computed(() => formatExpiration(product.value?.expiration_date ?? null))
 
 const getCategoryVariant = (categoryName?: string) => {
   const variants: Record<string, string> = {
@@ -579,7 +608,9 @@ const hydrateProduct = (apiProduct: any): ProductDetail | null => {
     original_price: Number(apiProduct.original_price ?? 0),
     discounted_price: Number(apiProduct.discounted_price ?? 0),
     quantity_available: Number(apiProduct.quantity_available ?? 0),
-    expiration_date: apiProduct.expiration_date,
+    expiration_date: typeof apiProduct.expiration_date === 'string' && apiProduct.expiration_date.trim() !== ''
+      ? apiProduct.expiration_date
+      : null,
     image_url: apiProduct.image_url ?? null,
     discount_percentage: Number(apiProduct.discount_percentage ?? 0),
     category: apiProduct.category,
