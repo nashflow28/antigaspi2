@@ -132,7 +132,6 @@
               v-for="activity in recentActivities"
               :key="activity.id"
               class="flex items-center gap-4 rounded-2xl border border-neutral-200/60 bg-surface-light/70 p-4 transition-colors duration-200 hover:border-primary-400/40 hover:bg-primary-500/5 dark:border-neutral-700/60 dark:bg-surface-dark/70"
-
             >
               <div class="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-xl" :class="getActivityIconClass(activity.type)">
                 <component :is="getActivityIcon(activity.type)" class="h-5 w-5" />
@@ -156,7 +155,6 @@
         <!-- System Health -->
         <Card variant="glass">
           <template #header>
-
             <h3 class="text-xl font-semibold text-neutral-900 dark:text-neutral-50">État du système</h3>
           </template>
 
@@ -193,19 +191,39 @@
           <div class="mt-6 border-t border-neutral-200/60 pt-6 dark:border-neutral-700/60">
             <h4 class="mb-4 text-sm font-semibold text-neutral-900 dark:text-neutral-50">Actions rapides</h4>
             <div class="grid grid-cols-2 gap-3">
-              <Button variant="outline" size="sm" class="justify-start gap-2 text-xs" @click="viewLogs">
+              <Button
+                variant="outline"
+                size="sm"
+                class="justify-start gap-2 text-xs"
+                @click="viewLogs"
+              >
                 <DocumentTextIcon class="h-4 w-4" />
                 Logs
               </Button>
-              <Button variant="outline" size="sm" class="justify-start gap-2 text-xs" @click="viewMetrics">
+              <Button
+                variant="outline"
+                size="sm"
+                class="justify-start gap-2 text-xs"
+                @click="viewMetrics"
+              >
                 <ChartBarIcon class="h-4 w-4" />
                 Métriques
               </Button>
-              <Button variant="outline" size="sm" class="justify-start gap-2 text-xs" @click="manageUsers">
+              <Button
+                variant="outline"
+                size="sm"
+                class="justify-start gap-2 text-xs"
+                @click="manageUsers"
+              >
                 <UsersIcon class="h-4 w-4" />
                 Utilisateurs
               </Button>
-              <Button variant="outline" size="sm" class="justify-start gap-2 text-xs" @click="systemSettings">
+              <Button
+                variant="outline"
+                size="sm"
+                class="justify-start gap-2 text-xs"
+                @click="systemSettings"
+              >
                 <CogIcon class="h-4 w-4" />
                 Paramètres
               </Button>
@@ -354,7 +372,6 @@
 
 <script setup lang="ts">
 import { ref, onMounted, nextTick, watch } from 'vue'
-import { useAuthStore } from '@/stores/auth'
 import { formatPrice } from '@/utils/currency'
 import AdminModal from '@/components/ui/AdminModal.vue'
 import DashboardLayout from '@/components/ui/DashboardLayout.vue'
@@ -403,6 +420,15 @@ import {
   StatCard,
   StatCardGrid
 } from '@/components/dashboard/2025'
+import apiService from '@/services/api'
+import type {
+  AdminDashboardActivity,
+  AdminDashboardCategory,
+  AdminDashboardEnvironmentalImpact,
+  AdminDashboardMerchant,
+  AdminDashboardStats,
+  AdminSystemHealthService
+} from '@/types'
 
 ChartJS.register(
   CategoryScale,
@@ -430,9 +456,8 @@ let revenueChart: any = null
 let userGrowthChart: any = null
 
 // Store and utilities
-const authStore = useAuthStore()
 const { sidebar, header } = useDashboardLayout('admin')
-const stats = ref({
+const stats = ref<AdminDashboardStats>({
   totalUsers: 0,
   newUsersThisMonth: 0,
   activeMerchants: 0,
@@ -443,37 +468,164 @@ const stats = ref({
   revenueGrowth: 0
 })
 
-const recentActivities = ref<any[]>([])
+const recentActivities = ref<AdminDashboardActivity[]>([])
 
-const systemHealth = ref<any[]>([])
+const systemHealth = ref<AdminSystemHealthService[]>([])
 
-const environmentalImpact = ref({
+const environmentalImpact = ref<AdminDashboardEnvironmentalImpact>({
   co2Saved: 0,
   waterSaved: 0,
   wasteSaved: 0,
   treesEquivalent: 0
 })
 
-const topMerchants = ref<any[]>([])
+const topMerchants = ref<AdminDashboardMerchant[]>([])
 
-const popularCategories = ref<any[]>([])
+const popularCategories = ref<AdminDashboardCategory[]>([])
 
-const alerts = ref([
-  {
-    id: 1,
-    type: 'warning',
-    title: 'Limite de stockage atteinte',
-    message: 'L\'espace de stockage des images est à 85% de sa capacité.',
-    timestamp: '2024-01-15T09:30:00Z'
-  },
-  {
-    id: 2,
-    type: 'info',
-    title: 'Mise à jour disponible',
-    message: 'Une nouvelle version de l\'API est disponible avec des corrections de sécurité.',
-    timestamp: '2024-01-14T16:20:00Z'
+interface DashboardAlert {
+  id: number | string
+  type: 'info' | 'success' | 'warning' | 'error'
+  title: string
+  message: string
+  timestamp: string
+}
+
+const alerts = ref<DashboardAlert[]>([])
+
+const normalizeNumber = (value: unknown, fallback = 0): number => {
+  if (typeof value === 'number' && Number.isFinite(value)) {
+    return value
   }
-])
+
+  if (typeof value === 'string') {
+    const parsed = Number(value)
+    if (Number.isFinite(parsed)) {
+      return parsed
+    }
+  }
+
+  return fallback
+}
+
+const toErrorMessage = (error: unknown): string => {
+  if (error instanceof Error) {
+    return error.message
+  }
+
+  if (typeof error === 'string') {
+    return error
+  }
+
+  return 'Une erreur inattendue est survenue.'
+}
+
+const handleApiError = (title: string, message: string) => {
+  const alertId = `error-${title}`
+  const timestamp = new Date().toISOString()
+  const alert: DashboardAlert = {
+    id: alertId,
+    type: 'error',
+    title,
+    message,
+    timestamp
+  }
+
+  const existingIndex = alerts.value.findIndex(existingAlert => existingAlert.id === alertId)
+  if (existingIndex !== -1) {
+    alerts.value[existingIndex] = alert
+  } else {
+    alerts.value.push(alert)
+  }
+}
+
+const normalizeStats = (statsData?: AdminDashboardStats): AdminDashboardStats => {
+  const base = stats.value
+
+  if (!statsData) {
+    return { ...base }
+  }
+
+  return {
+    totalUsers: normalizeNumber(statsData.totalUsers ?? statsData.total_users, base.totalUsers ?? 0),
+    newUsersThisMonth: normalizeNumber(statsData.newUsersThisMonth ?? statsData.new_users_this_month, base.newUsersThisMonth ?? 0),
+    activeMerchants: normalizeNumber(statsData.activeMerchants ?? statsData.active_merchants, base.activeMerchants ?? 0),
+    merchantGrowthRate: normalizeNumber(statsData.merchantGrowthRate ?? statsData.merchant_growth_rate, base.merchantGrowthRate ?? 0),
+    productsSaved: normalizeNumber(statsData.productsSaved ?? statsData.products_saved, base.productsSaved ?? 0),
+    kgFoodSaved: normalizeNumber(statsData.kgFoodSaved ?? statsData.kg_food_saved, base.kgFoodSaved ?? 0),
+    totalRevenue: normalizeNumber(statsData.totalRevenue ?? statsData.total_revenue, base.totalRevenue ?? 0),
+    revenueGrowth: normalizeNumber(statsData.revenueGrowth ?? statsData.revenue_growth, base.revenueGrowth ?? 0)
+  }
+}
+
+const normalizeTopMerchants = (merchants?: AdminDashboardMerchant[]): AdminDashboardMerchant[] => {
+  if (!Array.isArray(merchants)) {
+    return []
+  }
+
+  return merchants.map((merchant, index) => ({
+    ...merchant,
+    id: merchant.id ?? index,
+    name: merchant.name ?? merchant.business_name ?? `Commerçant ${index + 1}`,
+    revenue: normalizeNumber(merchant.revenue, 0),
+    productsSold: normalizeNumber(merchant.productsSold ?? merchant.products_sold, 0)
+  }))
+}
+
+const normalizePopularCategories = (categories?: AdminDashboardCategory[]): AdminDashboardCategory[] => {
+  if (!Array.isArray(categories)) {
+    return []
+  }
+
+  return categories.map((category, index) => ({
+    ...category,
+    id: category.id ?? index,
+    name: category.name ?? `Catégorie ${index + 1}`,
+    productCount: normalizeNumber(category.productCount ?? category.product_count, 0),
+    percentage: normalizeNumber(category.percentage, 0)
+  }))
+}
+
+const normalizeRecentActivities = (activities?: AdminDashboardActivity[]): AdminDashboardActivity[] => {
+  if (!Array.isArray(activities)) {
+    return []
+  }
+
+  return activities.map((activity, index) => ({
+    ...activity,
+    id: activity.id ?? index,
+    title: activity.title ?? activity.description ?? `Activité ${index + 1}`,
+    description: activity.description ?? activity.title ?? '',
+    timestamp: activity.timestamp ?? new Date().toISOString(),
+    status: activity.status ?? 'info'
+  }))
+}
+
+const normalizeEnvironmentalImpact = (impact?: AdminDashboardEnvironmentalImpact): AdminDashboardEnvironmentalImpact => {
+  const base = environmentalImpact.value
+
+  return {
+    co2Saved: normalizeNumber(impact?.co2Saved ?? impact?.co2_saved, base.co2Saved ?? 0),
+    waterSaved: normalizeNumber(impact?.waterSaved ?? impact?.water_saved, base.waterSaved ?? 0),
+    wasteSaved: normalizeNumber(impact?.wasteSaved ?? impact?.waste_saved, base.wasteSaved ?? 0),
+    treesEquivalent: normalizeNumber(impact?.treesEquivalent ?? impact?.trees_equivalent, base.treesEquivalent ?? 0)
+  }
+}
+
+const normalizeSystemHealth = (services?: AdminSystemHealthService[]): AdminSystemHealthService[] => {
+  if (!Array.isArray(services)) {
+    return []
+  }
+
+  return services.map((service, index) => ({
+    ...service,
+    name: service.name ?? `Service ${index + 1}`,
+    description: service.description ?? '',
+    status: service.status ?? 'unknown',
+    uptime: service.uptime ?? service.uptime_percentage ?? '',
+    responseTime: service.responseTime ?? service.response_time ?? ''
+  }))
+}
 
 // Modal state
 const modal = ref({
@@ -569,177 +721,40 @@ const getAlertIconClass = (type: string): string => {
 
 const loadDashboardData = async () => {
   try {
-    const response = await fetch('http://localhost:8000/api/admin/dashboard', {
-      method: 'GET',
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${authStore.token}`
-      }
-    })
+    const response = await apiService.getAdminDashboard()
 
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`)
+    if (!response.success) {
+      throw new Error(response.message || 'Impossible de charger le tableau de bord administrateur.')
     }
 
-    const data = await response.json()
-    if (data.success) {
-      // Update stats
-      stats.value = data.data.stats
+    const dashboardData = response.data
 
-      // Update other data
-      topMerchants.value = data.data.topMerchants
-      popularCategories.value = data.data.popularCategories
-      recentActivities.value = data.data.recentActivities
-      environmentalImpact.value = data.data.environmentalImpact
-    }
+    stats.value = normalizeStats(dashboardData?.stats)
+    topMerchants.value = normalizeTopMerchants(dashboardData?.topMerchants)
+    popularCategories.value = normalizePopularCategories(dashboardData?.popularCategories)
+    recentActivities.value = normalizeRecentActivities(dashboardData?.recentActivities)
+    environmentalImpact.value = normalizeEnvironmentalImpact(dashboardData?.environmentalImpact)
   } catch (error) {
-    // console.error('Error loading dashboard data:', error)
-    // Fallback to demo data
-    loadDemoData()
-  }
-}
-
-const loadDemoData = () => {
-  // Demo statistics for the platform
-  stats.value = {
-    totalUsers: 1247,
-    newUsersThisMonth: 89,
-    activeMerchants: 156,
-    merchantGrowthRate: 23,
-    productsSaved: 3429,
-    kgFoodSaved: 2156,
-    totalRevenue: 1847250, // In F CFA
-    revenueGrowth: 15
-  }
-
-  // Demo top merchants
-  topMerchants.value = [
-    {
-      id: 1,
-      name: 'Boulangerie Martin',
-      business_name: 'Boulangerie Martin',
-      revenue: 185000,
-      products_sold: 156,
-      location: 'Cocody, Abidjan'
-    },
-    {
-      id: 2,
-      name: 'Épicerie Aya',
-      business_name: 'Épicerie Aya',
-      revenue: 142000,
-      products_sold: 98,
-      location: 'Plateau, Abidjan'
-    },
-    {
-      id: 3,
-      name: 'Fruits & Légumes Bio',
-      business_name: 'Bio Fresh',
-      revenue: 95000,
-      products_sold: 124,
-      location: 'Marcory, Abidjan'
-    }
-  ]
-
-  // Demo popular categories
-  popularCategories.value = [
-    { name: 'Boulangerie', percentage: 35, count: 892 },
-    { name: 'Fruits & Légumes', percentage: 28, count: 671 },
-    { name: 'Épicerie', percentage: 18, count: 412 },
-    { name: 'Produits Laitiers', percentage: 12, count: 298 },
-    { name: 'Plats Préparés', percentage: 7, count: 156 }
-  ]
-
-  // Demo recent activities
-  recentActivities.value = [
-    {
-      id: 1,
-      type: 'user_registered',
-      description: 'Nouveau consommateur inscrit',
-      user: 'Kouassi Jean',
-      timestamp: new Date(Date.now() - 1000 * 60 * 30).toISOString(), // 30 minutes ago
-      status: 'success'
-    },
-    {
-      id: 2,
-      type: 'merchant_joined',
-      description: 'Nouveau commerçant approuvé',
-      user: 'Supermarché Express',
-      timestamp: new Date(Date.now() - 1000 * 60 * 60 * 2).toISOString(), // 2 hours ago
-      status: 'completed'
-    },
-    {
-      id: 3,
-      type: 'product_sold',
-      description: 'Produit réservé avec succès',
-      user: 'Pain complet - Boulangerie Martin',
-      timestamp: new Date(Date.now() - 1000 * 60 * 60 * 4).toISOString(), // 4 hours ago
-      status: 'success'
-    },
-    {
-      id: 4,
-      type: 'user_registered',
-      description: 'Nouveau consommateur inscrit',
-      user: 'Traoré Fatou',
-      timestamp: new Date(Date.now() - 1000 * 60 * 60 * 6).toISOString(), // 6 hours ago
-      status: 'success'
-    }
-  ]
-
-  // Demo environmental impact
-  environmentalImpact.value = {
-    co2Saved: 845, // kg
-    waterSaved: 12450, // litres
-    wasteSaved: 2156, // kg
-    treesEquivalent: 28
+    const message = toErrorMessage(error)
+    handleApiError('Erreur de chargement du tableau de bord', message)
+    throw error instanceof Error ? error : new Error(message)
   }
 }
 
 const loadSystemHealth = async () => {
   try {
-    const response = await fetch('http://localhost:8000/api/admin/system-health', {
-      method: 'GET',
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${authStore.token}`
-      }
-    })
+    const response = await apiService.getAdminSystemHealth()
 
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`)
+    if (!response.success) {
+      throw new Error(response.message || "Impossible de charger l'état du système.")
     }
 
-    const data = await response.json()
-    if (data.success) {
-      systemHealth.value = data.data
-    }
+    systemHealth.value = normalizeSystemHealth(response.data)
   } catch (error) {
-    // console.error('Error loading system health:', error)
-    // Fallback to mock data for system health
-    systemHealth.value = [
-      {
-        name: 'API Backend',
-        description: 'Services Laravel',
-        status: 'healthy',
-        uptime: '99.9%',
-        responseTime: '45ms'
-      },
-      {
-        name: 'Base de données',
-        description: 'MySQL Principal',
-        status: 'healthy',
-        uptime: '99.8%',
-        responseTime: '12ms'
-      },
-      {
-        name: 'Frontend',
-        description: 'Application Vue.js',
-        status: 'healthy',
-        uptime: '100%',
-        responseTime: '120ms'
-      }
-    ]
+    const message = toErrorMessage(error)
+    handleApiError("Erreur de chargement de l'état du système", message)
+    systemHealth.value = []
+    throw error instanceof Error ? error : new Error(message)
   }
 }
 
@@ -755,7 +770,7 @@ const refreshData = async () => {
   }
 }
 
-const dismissAlert = (alertId: number) => {
+const dismissAlert = (alertId: number | string) => {
   const index = alerts.value.findIndex(alert => alert.id === alertId)
   if (index !== -1) {
     alerts.value.splice(index, 1)

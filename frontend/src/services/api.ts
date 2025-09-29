@@ -12,6 +12,8 @@ import type {
   ReservationCreationPayload,
   ReservationCreationResponse,
   PaymentApiResponse,
+  AdminDashboardData,
+  AdminSystemHealthService
   LoyaltyPointsSummary,
   LoyaltyRedemptionPayload,
   LoyaltyRedemptionData,
@@ -333,6 +335,12 @@ class ApiService {
     }, true)
   }
 
+  async getAdminDashboard(): Promise<ApiResponse<AdminDashboardData>> {
+    return this.request<ApiResponse<AdminDashboardData>>('/admin/dashboard', {}, true)
+  }
+
+  async getAdminSystemHealth(): Promise<ApiResponse<AdminSystemHealthService[]>> {
+    return this.request<ApiResponse<AdminSystemHealthService[]>>('/admin/system-health', {}, true)
   // Loyalty points
   async getLoyaltyPoints(): Promise<ApiResponse<LoyaltyPointsSummary>> {
     return this.request<ApiResponse<LoyaltyPointsSummary>>('/loyalty/my-points', {}, true)
