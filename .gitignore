@@ -69,3 +69,7 @@ local_config.php
 config.local.php
 *storybook.log
 storybook-static
+
+# Visual regression snapshots
+/frontend/tests/visual/product-detail-2025.spec.ts-snapshots/
+/frontend/tests/visual/reservation-detail-2025.spec.ts-snapshots/
