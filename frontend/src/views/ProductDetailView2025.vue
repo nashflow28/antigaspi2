@@ -163,7 +163,7 @@
                     <Button
                       variant="ghost"
                       size="sm"
-                      :disabled="reservationQuantity <= 1"
+                      :disabled="reservationQuantity <= minReservationQuantity"
                       @click="decreaseQuantity"
                     >
                       <Minus class="h-4 w-4" />
@@ -171,14 +171,14 @@
                     <input
                       v-model.number="reservationQuantity"
                       type="number"
-                      min="1"
+                      :min="minReservationQuantity"
                       :max="maxReservationQuantity"
                       class="w-12 text-left sm:text-center border-0 focus:ring-0 py-3 bg-transparent text-neutral-900 dark:text-neutral-100"
                     >
                     <Button
                       variant="ghost"
                       size="sm"
-                      :disabled="reservationQuantity >= availableQuantity"
+                      :disabled="reservationQuantity >= maxReservationQuantity"
                       @click="increaseQuantity"
                     >
                       <Plus class="h-4 w-4" />
@@ -371,24 +371,28 @@ const reservationLoading = ref(false)
 const isInWishlist = ref(false)
 
 const availableQuantity = computed(() => product.value?.quantity_available ?? 0)
-const maxReservationQuantity = computed(() => Math.max(availableQuantity.value, 1))
+const minReservationQuantity = computed(() => (availableQuantity.value === 0 ? 0 : 1))
+const maxReservationQuantity = computed(() => {
+  const available = availableQuantity.value
+  return available > 0 ? available : minReservationQuantity.value
+})
 
 const normalizeReservationQuantity = (value: unknown): number => {
   const numericValue = typeof value === 'number' ? value : Number(value)
 
   if (!Number.isFinite(numericValue)) {
-    return 1
+    return minReservationQuantity.value
   }
 
   const flooredValue = Math.floor(numericValue)
-  const minimumValue = Math.max(flooredValue, 1)
+  const minimumValue = Math.max(flooredValue, minReservationQuantity.value)
   const available = availableQuantity.value
 
   if (available > 0) {
     return Math.min(minimumValue, available)
   }
 
-  return minimumValue
+  return Math.min(minimumValue, minReservationQuantity.value)
 }
 
 const sanitizedReservationQuantity = computed(() => normalizeReservationQuantity(reservationQuantity.value))
@@ -487,13 +491,13 @@ const getCategoryVariant = (categoryName?: string) => {
 }
 
 const increaseQuantity = () => {
-  if (product.value && reservationQuantity.value < availableQuantity.value) {
+  if (product.value && reservationQuantity.value < maxReservationQuantity.value) {
     reservationQuantity.value++
   }
 }
 
 const decreaseQuantity = () => {
-  if (reservationQuantity.value > 1) {
+  if (reservationQuantity.value > minReservationQuantity.value) {
     reservationQuantity.value--
   }
 }
@@ -502,6 +506,7 @@ const goToReservation = () => {
   if (!product.value) return
 
   if (availableQuantity.value === 0) {
+    reservationQuantity.value = minReservationQuantity.value
     notify.info('Ce produit est actuellement en rupture de stock.', 'Réservation')
     return
   }
@@ -664,7 +669,7 @@ const fetchProduct = async () => {
     }
 
     product.value = hydratedProduct
-    reservationQuantity.value = 1
+    reservationQuantity.value = minReservationQuantity.value
 
     const related = (response.data as any)?.related_products ?? []
     relatedProducts.value = hydrateRelatedProducts(related)
