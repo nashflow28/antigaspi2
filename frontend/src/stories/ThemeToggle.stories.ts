@@ -1,16 +1,16 @@
 import { onMounted } from 'vue'
 import type { Meta, StoryObj } from '@storybook/vue3'
-import DarkModeToggle from '@/components/ui/DarkModeToggle.vue'
+import ThemeToggle, { type ThemeMode } from '@/components/ui/2025/ThemeToggle.vue'
 
-type DarkModeToggleComponent = typeof DarkModeToggle;
+type ThemeToggleComponent = typeof ThemeToggle;
 
 type StoryProps = {
-  initialTheme: 'light' | 'dark';
+  initialTheme: ThemeMode;
 };
 
-const meta: Meta<DarkModeToggleComponent & StoryProps> = {
-  title: 'UI/Dark Mode Toggle',
-  component: DarkModeToggle,
+const meta: Meta<ThemeToggleComponent & StoryProps> = {
+  title: 'Design System 2025/Theme Toggle',
+  component: ThemeToggle,
   tags: ['autodocs'],
   parameters: {
     layout: 'centered'
@@ -25,7 +25,7 @@ const meta: Meta<DarkModeToggleComponent & StoryProps> = {
     }
   },
   render: (args, { globals }) => ({
-    components: { DarkModeToggle },
+    components: { ThemeToggle },
     setup() {
       onMounted(() => {
         if (typeof window === 'undefined') {
@@ -42,7 +42,7 @@ const meta: Meta<DarkModeToggleComponent & StoryProps> = {
           (navigator as Navigator & { vibrate?: (pattern?: number | number[]) => boolean }).vibrate = () => false
         }
 
-        const targetTheme = args.initialTheme ?? (globals.theme as 'light' | 'dark' | undefined) ?? 'light'
+        const targetTheme = args.initialTheme ?? (globals.theme as ThemeMode | undefined) ?? 'light'
         document.documentElement.classList.toggle('dark', targetTheme === 'dark')
       })
 
@@ -51,7 +51,7 @@ const meta: Meta<DarkModeToggleComponent & StoryProps> = {
     template: `
       <div class="flex items-center gap-6">
         <span class="text-sm text-gray-700 dark:text-gray-300">Basculer le thème</span>
-        <DarkModeToggle />
+        <ThemeToggle />
       </div>
     `
   })

@@ -105,9 +105,9 @@
               </router-link>
             </li>
 
-            <!-- Dark Mode Toggle -->
+            <!-- Theme Toggle -->
             <li role="none">
-              <DarkModeToggle aria-label="Basculer entre mode clair et mode sombre" />
+              <ThemeToggle />
             </li>
 
             <template v-if="!authStore.isAuthenticated">
@@ -376,12 +376,9 @@ import { ref, computed, onMounted, onUnmounted, nextTick } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { LogIn, UserPlus, User, Settings, LogOut, ChevronDown, Package, ShoppingBag, MessageSquare, Star, Gift, Wallet } from 'lucide-vue-next'
-import DarkModeToggle from '@/components/ui/DarkModeToggle.vue'
 import MobileNav from '@/components/layout/MobileNav.vue'
 import { useAccessibility } from '@/composables/useAccessibility'
-import Button from '@/components/ui/2025/Button.vue'
-import Badge from '@/components/ui/2025/Badge.vue'
-import Card from '@/components/ui/2025/Card.vue'
+import { Button, Badge, Card, ThemeToggle } from '@/components/ui/2025'
 
 const router = useRouter()
 const authStore = useAuthStore()

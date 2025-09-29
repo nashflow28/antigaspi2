@@ -16,6 +16,7 @@ export { default as Select } from './Select.vue'
 export { default as Table } from './Table.vue'
 export { default as Tabs } from './Tabs.vue'
 export { default as Tooltip } from './Tooltip.vue'
+export { default as ThemeToggle } from './ThemeToggle.vue'
 
 // Types exports
 export type { ButtonVariant, ButtonSize } from './Button.vue'
@@ -34,3 +35,4 @@ export type { Tab } from './Tabs.vue'
 export type { FormSize, FormVariant } from './Form.vue'
 export type { GridCols, GridGap, GridAlign, GridJustify } from './Grid.vue'
 export type { ProductCardTag, ProductCardBadge } from './ProductCard.vue'
+export type { ThemeMode } from './ThemeToggle.vue'

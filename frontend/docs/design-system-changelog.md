@@ -15,7 +15,7 @@
 ## Instructions revue & QA
 1. **Design tokens** : vérifier que toute nouvelle couleur/ombre/animation ajoutée dans une PR est déclarée dans `tailwind.config.js` côté Vue *et* React. Pas d'hex direct dans les composants.【F:frontend/tailwind.config.js†L8-L134】
 2. **Accessibilité** : contrôler la présence des attributs ARIA (`role="dialog"`, aria-live des toasts) et des focus rings `focus-visible:ring-primary-400`. Refuser les surcharges CSS qui masquent le focus.【F:frontend/src/components/ui/Modal.vue†L68-L152】【F:frontend/src/components/ui/Toast.vue†L1-L129】
-3. **Dark mode** : déclencher la classe `dark` (via `ThemeToggle`) et inspecter les composants mis à jour (Navigation, Modales, Toasters) pour éviter les contrastes insuffisants. Prévoir une capture avant/après pour les PR modifiant ces surfaces.【F:frontend/src/components/ui/ThemeToggle.vue†L1-L129】
+3. **Dark mode** : déclencher la classe `dark` (via `ThemeToggle`) et inspecter les composants mis à jour (Navigation, Modales, Toasters) pour éviter les contrastes insuffisants. Prévoir une capture avant/après pour les PR modifiant ces surfaces.【F:frontend/src/components/ui/2025/ThemeToggle.vue†L1-L141】
 4. **Tests manuels** :
    - Navigation mobile (ouverture/fermeture drawer, focus trap) sur `Navigation.vue` + validation du `ThemeToggle` global.
    - Empilage de 3 toasts simultanés pour observer la minuterie et le dismiss manuel.

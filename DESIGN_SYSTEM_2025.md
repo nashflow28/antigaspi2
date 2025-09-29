@@ -125,9 +125,9 @@ Les primitives Vue/React reposent sur une couche commune de tokens déclarés da
 
 Placeholders shimmer pour chargements avec arrondis configurables.
 
-### DarkModeToggle
+### ThemeToggle
 ```vue
-<DarkModeToggle />
+<ThemeToggle />
 ```
 
 Toggle automatique avec :
@@ -259,7 +259,7 @@ Toggle automatique avec :
 import Button from '@/components/ui/Button.vue'
 import Card from '@/components/ui/Card.vue'
 import Skeleton from '@/components/ui/Skeleton.vue'
-import DarkModeToggle from '@/components/ui/DarkModeToggle.vue'
+import ThemeToggle from '@/components/ui/2025/ThemeToggle.vue'
 </script>
 ```
 

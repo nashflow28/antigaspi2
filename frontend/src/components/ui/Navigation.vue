@@ -139,7 +139,7 @@ import { computed, ref, useId, useSlots, type Component } from 'vue'
 import { MotionComponent as Motion } from '@vueuse/motion'
 import { useWindowScroll } from '@vueuse/core'
 import Button from './Button.vue'
-import ThemeToggle from './ThemeToggle.vue'
+import { ThemeToggle } from '@/components/ui/2025'
 
 interface NavigationItem {
   label: string
