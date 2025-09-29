@@ -73,7 +73,8 @@ class ApiService {
     if (!response.ok) {
       if (withAuth && response.status === 401) {
         localStorage.removeItem('auth_token')
-        window.location.href = '/login'
+        const currentPath = window.location.pathname + window.location.search + window.location.hash
+        window.location.href = `/login?redirect=${encodeURIComponent(currentPath)}`
         return Promise.reject(new Error('Authentication failed'))
       }
 
