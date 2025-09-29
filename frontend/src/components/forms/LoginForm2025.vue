@@ -144,7 +144,7 @@
 
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { useDesignSystem2025 } from '@/composables/useDesignSystem2025'
 
@@ -159,6 +159,7 @@ import { sanitizeErrorMessage, logXssAttempt } from '@/utils/sanitization'
 // Composables
 const router = useRouter()
 const authStore = useAuthStore()
+const route = useRoute()
 const { logMigration } = useDesignSystem2025()
 
 // Log migration usage
@@ -189,6 +190,10 @@ const errors = ref({
   email: '',
   password: ''
 })
+
+const isValidRedirect = (target: unknown): target is string => {
+  return typeof target === 'string' && target.startsWith('/') && !target.startsWith('//')
+}
 
 // Computed
 const isFormValid = computed(() => {
@@ -235,14 +240,30 @@ const handleSubmit = async () => {
   errorMessage.value = ''
 
   try {
-    await authStore.login({
+    const result = await authStore.login({
       email: form.value.email,
       password: form.value.password,
       remember: form.value.remember
     })
 
-    logMigration('LoginForm', 'Login success', { email: form.value.email })
-    router.push('/dashboard')
+    if (result.success) {
+      logMigration('LoginForm', 'Login success', { email: form.value.email })
+
+      const redirectTarget = route.query.redirect
+      if (isValidRedirect(redirectTarget)) {
+        router.push(redirectTarget)
+        return
+      }
+
+      const user = authStore.user
+      if (user?.role === 'admin') {
+        router.push('/admin/dashboard')
+      } else if (user?.role === 'merchant') {
+        router.push('/merchant/dashboard')
+      } else {
+        router.push('/dashboard')
+      }
+    }
   } catch (error: unknown) {
     // SECURITY FIX: Sanitize error messages to prevent XSS
     const rawError = (error instanceof Error ? error.message : String(error)) || 'Une erreur est survenue lors de la connexion'
