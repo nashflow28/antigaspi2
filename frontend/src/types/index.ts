@@ -191,7 +191,7 @@ export interface ProductFilters {
   latitude?: number
   longitude?: number
   min_discount?: number
-  max_distance?: number
+  radius?: number
 }
 
 export interface PaginatedResponse<T> {

@@ -135,7 +135,7 @@
                 {{ locationLoading ? 'Localisation...' : userLocation ? 'Position activée' : 'Près de moi' }}
               </Button>
               <select
-                v-model="filters.maxDistance"
+                v-model="filters.radius"
                 class="w-full rounded-modern border border-neutral-200/80 dark:border-neutral-700/60 bg-surface-light/80 dark:bg-surface-dark/70 px-3 py-3 text-neutral-600 dark:text-neutral-300 shadow-sm transition focus:border-primary-400 focus:outline-none focus:ring-2 focus:ring-primary-200 disabled:cursor-not-allowed disabled:opacity-60"
                 :disabled="!userLocation"
               >
@@ -298,7 +298,7 @@ const CATEGORY_LABELS: Record<string, string> = {
 
 const filters = ref({
   category: '',
-  maxDistance: '',
+  radius: '',
   maxPrice: '',
   minDiscount: ''
 })
@@ -317,8 +317,8 @@ const activeFilterLabels = computed(() => {
     labels.push(CATEGORY_LABELS[filters.value.category] ?? filters.value.category)
   }
 
-  if (filters.value.maxDistance) {
-    labels.push(`≤ ${filters.value.maxDistance} km`)
+  if (filters.value.radius) {
+    labels.push(`≤ ${filters.value.radius} km`)
   }
 
   if (filters.value.maxPrice) {
@@ -349,8 +349,8 @@ const filteredProducts = computed(() => {
     result = result.filter(product => product.category === filters.value.category)
   }
 
-  if (filters.value.maxDistance) {
-    const maxDist = parseFloat(filters.value.maxDistance)
+  if (filters.value.radius) {
+    const maxDist = parseFloat(filters.value.radius)
     result = result.filter(product => {
       const distance = product.merchant.distance
       if (distance === null || Number.isNaN(distance)) {
@@ -397,10 +397,10 @@ const fetchProducts = async () => {
       }
     }
 
-    if (filters.value.maxDistance) {
-      const maxDistance = Number(filters.value.maxDistance)
-      if (!Number.isNaN(maxDistance)) {
-        filtersPayload.max_distance = maxDistance
+    if (filters.value.radius) {
+      const radius = Number(filters.value.radius)
+      if (!Number.isNaN(radius)) {
+        filtersPayload.radius = radius
       }
     }
 
@@ -473,7 +473,7 @@ const getProductTags = (product: NormalizedProduct) => {
 const clearFilters = () => {
   filters.value = {
     category: '',
-    maxDistance: '',
+    radius: '',
     maxPrice: '',
     minDiscount: ''
   }
