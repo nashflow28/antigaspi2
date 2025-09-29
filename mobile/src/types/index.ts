@@ -202,6 +202,7 @@ export interface RegisterData {
 export interface ProductFilters {
   search?: string
   category?: string
+  category_id?: number
   merchant?: string
   max_price?: number
   max_expiry_days?: number
