@@ -11,7 +11,9 @@ import type {
   PaymentMethod,
   ReservationCreationPayload,
   ReservationCreationResponse,
-  PaymentApiResponse
+  PaymentApiResponse,
+  AdminDashboardData,
+  AdminSystemHealthService
 } from '@/types'
 
 const DEFAULT_API_BASE_URL = 'http://localhost:8000/api'
@@ -325,6 +327,14 @@ class ApiService {
       method: 'POST',
       body: JSON.stringify(body)
     }, true)
+  }
+
+  async getAdminDashboard(): Promise<ApiResponse<AdminDashboardData>> {
+    return this.request<ApiResponse<AdminDashboardData>>('/admin/dashboard', {}, true)
+  }
+
+  async getAdminSystemHealth(): Promise<ApiResponse<AdminSystemHealthService[]>> {
+    return this.request<ApiResponse<AdminSystemHealthService[]>>('/admin/system-health', {}, true)
   }
 }
 

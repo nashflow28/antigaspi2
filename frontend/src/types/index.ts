@@ -47,6 +47,88 @@ export interface Product {
   is_active?: boolean
 }
 
+export interface AdminDashboardStats {
+  totalUsers: number
+  newUsersThisMonth: number
+  activeMerchants: number
+  merchantGrowthRate: number
+  productsSaved: number
+  kgFoodSaved: number
+  totalRevenue: number
+  revenueGrowth: number
+  total_users?: number
+  new_users_this_month?: number
+  active_merchants?: number
+  merchant_growth_rate?: number
+  products_saved?: number
+  kg_food_saved?: number
+  total_revenue?: number
+  revenue_growth?: number
+}
+
+export interface AdminDashboardMerchant {
+  id: number | string
+  name?: string
+  business_name?: string
+  revenue?: number
+  productsSold?: number
+  products_sold?: number
+  location?: string
+  [key: string]: unknown
+}
+
+export interface AdminDashboardCategory {
+  id?: number | string
+  name?: string
+  icon?: string
+  productCount?: number
+  product_count?: number
+  percentage?: number
+  [key: string]: unknown
+}
+
+export interface AdminDashboardActivity {
+  id: number | string
+  title?: string
+  description?: string
+  timestamp?: string
+  status?: string
+  type?: string
+  [key: string]: unknown
+}
+
+export interface AdminDashboardEnvironmentalImpact {
+  co2Saved?: number
+  co2_saved?: number
+  waterSaved?: number
+  water_saved?: number
+  wasteSaved?: number
+  waste_saved?: number
+  treesEquivalent?: number
+  trees_equivalent?: number
+  [key: string]: unknown
+}
+
+export interface AdminDashboardData {
+  stats?: AdminDashboardStats
+  topMerchants?: AdminDashboardMerchant[]
+  popularCategories?: AdminDashboardCategory[]
+  recentActivities?: AdminDashboardActivity[]
+  environmentalImpact?: AdminDashboardEnvironmentalImpact
+  [key: string]: unknown
+}
+
+export interface AdminSystemHealthService {
+  name?: string
+  description?: string
+  status?: string
+  uptime?: string
+  uptime_percentage?: string
+  responseTime?: string
+  response_time?: string
+  [key: string]: unknown
+}
+
 export type PaymentMethod = 'flooz' | 'tmoney' | 'paystack' | 'on_site' | 'wallet'
 
 export type PaymentStatus = 'pending' | 'success' | 'failed' | 'on_site' | 'refunded'
