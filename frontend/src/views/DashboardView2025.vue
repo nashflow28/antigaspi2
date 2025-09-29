@@ -351,6 +351,8 @@ import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { useWalletStore } from '@/stores/wallet'
 import { formatPrice } from '@/utils/currency'
+import { apiService } from '@/services/api'
+import type { Reservation } from '@/types'
 import {
   TrendingUp, DollarSign, Package, ShoppingBag, Leaf, TreePine,
   Clock, Calendar, ArrowRight, Search, User, Lightbulb, Wallet
@@ -383,7 +385,7 @@ interface ReservationItem {
   merchant: { name: string }
   product: { name: string }
   price: number
-  pickup_date: string
+  pickup_date: Date
   status: string
 }
 
@@ -419,37 +421,45 @@ const ecoTips = ref([
 const currentTipIndex = ref(0)
 const currentTip = computed(() => ecoTips.value[currentTipIndex.value])
 
+const normalizeRecentReservation = (reservation: Reservation): ReservationItem => {
+  const merchant = reservation.product?.merchant ?? { name: 'Commerçant inconnu' }
+  const merchantName =
+    merchant?.name ||
+    (merchant as unknown as { business_name?: string })?.business_name ||
+    'Commerçant inconnu'
+
+  const totalAmount =
+    reservation.total_amount ??
+    reservation.discounted_price ??
+    reservation.product?.discounted_price ??
+    0
+
+  const pickupDate = reservation.pickup_date || reservation.created_at
+
+  return {
+    id: reservation.id,
+    product: {
+      name: reservation.product?.name || 'Produit inconnu'
+    },
+    merchant: {
+      name: merchantName
+    },
+    price: Number(totalAmount),
+    pickup_date: pickupDate ? new Date(pickupDate) : new Date(),
+    status: reservation.status
+  }
+}
+
 // Load recent reservations
 const loadRecentReservations = async () => {
+  loading.value = true
   try {
-    const response = await fetch('http://localhost:8000/api/reservations?per_page=3', {
-      method: 'GET',
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${authStore.token}`
-      }
-    })
+    const response = await apiService.getReservations({ per_page: 3 })
 
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`)
-    }
-
-    const data = await response.json()
-    if (data.success && data.data) {
-      // Transform API data to match dashboard interface
-      recentReservations.value = data.data.map((res: any) => ({
-        id: res.id,
-        product: {
-          name: res.product?.name || 'Produit inconnu'
-        },
-        merchant: {
-          name: res.product?.merchant?.name || res.product?.merchant?.business_name || 'Commerçant inconnu'
-        },
-        price: parseFloat(res.total_amount || 0),
-        pickup_date: res.pickup_date ? new Date(res.pickup_date) : new Date(res.created_at),
-        status: res.status
-      }))
+    if (response.success && Array.isArray(response.data)) {
+      recentReservations.value = response.data.map(normalizeRecentReservation)
+    } else {
+      recentReservations.value = []
     }
   } catch (error) {
     // console.error('Erreur lors du chargement des réservations récentes:', error)

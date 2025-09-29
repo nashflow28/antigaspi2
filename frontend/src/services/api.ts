@@ -7,13 +7,14 @@ import type {
   Product,
   ProductFilters,
   Reservation,
+  ReservationFilters,
   Category,
   PaymentMethod,
   ReservationCreationPayload,
   ReservationCreationResponse,
   PaymentApiResponse,
   AdminDashboardData,
-  AdminSystemHealthService
+  AdminSystemHealthService,
   LoyaltyPointsSummary,
   LoyaltyRedemptionPayload,
   LoyaltyRedemptionData,
@@ -250,8 +251,26 @@ class ApiService {
   }
 
   // Reservations
-  async getReservations(): Promise<ApiResponse<Reservation[]>> {
-    return this.request<ApiResponse<Reservation[]>>('/reservations', {}, true)
+  async getReservations(
+    params?: (ReservationFilters & { page?: number; per_page?: number }) | undefined
+  ): Promise<ApiResponse<Reservation[]>> {
+    let query = ''
+
+    if (params) {
+      const searchParams = new URLSearchParams()
+
+      Object.entries(params).forEach(([key, value]) => {
+        if (value === undefined || value === null || value === '') return
+        searchParams.append(key, String(value))
+      })
+
+      const serializedParams = searchParams.toString()
+      if (serializedParams) {
+        query = `?${serializedParams}`
+      }
+    }
+
+    return this.request<ApiResponse<Reservation[]>>(`/reservations${query}`, {}, true)
   }
 
   async getReservation(id: number): Promise<ApiResponse<Reservation>> {
