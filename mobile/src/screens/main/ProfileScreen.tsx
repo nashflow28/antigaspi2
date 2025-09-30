@@ -1,7 +1,6 @@
 import React from 'react'
 import {
   View,
-  Text,
   StyleSheet,
   TouchableOpacity,
   Alert,
@@ -10,8 +9,11 @@ import { useDispatch, useSelector } from 'react-redux'
 import { logoutUser } from '../../store/slices/authSlice'
 import { AppDispatch, RootState } from '../../store'
 import { Ionicons } from '@expo/vector-icons'
+import { Button, Card, Badge, Typography } from '../../components/2025'
+import { useTheme } from '../../theme'
 
 const ProfileScreen: React.FC = () => {
+  const theme = useTheme()
   const dispatch = useDispatch<AppDispatch>()
   const { user } = useSelector((state: RootState) => state.auth)
 
@@ -31,42 +33,54 @@ const ProfileScreen: React.FC = () => {
   }
 
   return (
-    <View style={styles.container}>
-      <View style={styles.header}>
-        <View style={styles.avatar}>
-          <Ionicons name="person" size={40} color="#10B981" />
+    <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
+      <Card variant="elevated" style={{ alignItems: 'center', paddingVertical: theme.spacing['2xl'], paddingTop: theme.spacing['3xl'], marginBottom: theme.spacing.lg }}>
+        <View style={[styles.avatar, { backgroundColor: theme.colors.neutral[100], marginBottom: theme.spacing.md }]}>
+          <Ionicons name="person" size={40} color={theme.colors.primary[500]} />
         </View>
-        <Text style={styles.name}>
+        <Typography variant="h2" weight="bold" style={{ marginBottom: theme.spacing.xs }}>
           {user?.first_name} {user?.last_name}
-        </Text>
-        <Text style={styles.email}>{user?.email}</Text>
-        <Text style={styles.role}>{user?.role === 'consumer' ? 'Consommateur' : 'Commerçant'}</Text>
-      </View>
+        </Typography>
+        <Typography variant="body" color="secondary" style={{ marginBottom: theme.spacing.sm }}>
+          {user?.email}
+        </Typography>
+        <Badge variant={user?.role === 'consumer' ? 'primary' : 'promo'} size="md">
+          {user?.role === 'consumer' ? 'Consommateur' : 'Commerçant'}
+        </Badge>
+      </Card>
 
-      <View style={styles.menu}>
-        <TouchableOpacity style={styles.menuItem}>
-          <Ionicons name="person-outline" size={24} color="#374151" />
-          <Text style={styles.menuText}>Modifier le profil</Text>
-          <Ionicons name="chevron-forward" size={20} color="#9CA3AF" />
+      <Card variant="elevated" style={{ marginHorizontal: theme.spacing.lg, overflow: 'hidden' }}>
+        <TouchableOpacity style={[styles.menuItem, { paddingHorizontal: theme.spacing.lg, paddingVertical: theme.spacing.md, borderBottomWidth: 1, borderBottomColor: theme.colors.border }]}>
+          <Ionicons name="person-outline" size={24} color={theme.colors.text} />
+          <Typography variant="body" style={{ flex: 1, marginLeft: theme.spacing.md }}>
+            Modifier le profil
+          </Typography>
+          <Ionicons name="chevron-forward" size={20} color={theme.colors.neutral[400]} />
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.menuItem}>
-          <Ionicons name="notifications-outline" size={24} color="#374151" />
-          <Text style={styles.menuText}>Notifications</Text>
-          <Ionicons name="chevron-forward" size={20} color="#9CA3AF" />
+        <TouchableOpacity style={[styles.menuItem, { paddingHorizontal: theme.spacing.lg, paddingVertical: theme.spacing.md, borderBottomWidth: 1, borderBottomColor: theme.colors.border }]}>
+          <Ionicons name="notifications-outline" size={24} color={theme.colors.text} />
+          <Typography variant="body" style={{ flex: 1, marginLeft: theme.spacing.md }}>
+            Notifications
+          </Typography>
+          <Ionicons name="chevron-forward" size={20} color={theme.colors.neutral[400]} />
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.menuItem}>
-          <Ionicons name="help-circle-outline" size={24} color="#374151" />
-          <Text style={styles.menuText}>Aide & Support</Text>
-          <Ionicons name="chevron-forward" size={20} color="#9CA3AF" />
+        <TouchableOpacity style={[styles.menuItem, { paddingHorizontal: theme.spacing.lg, paddingVertical: theme.spacing.md, borderBottomWidth: 1, borderBottomColor: theme.colors.border }]}>
+          <Ionicons name="help-circle-outline" size={24} color={theme.colors.text} />
+          <Typography variant="body" style={{ flex: 1, marginLeft: theme.spacing.md }}>
+            Aide & Support
+          </Typography>
+          <Ionicons name="chevron-forward" size={20} color={theme.colors.neutral[400]} />
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.menuItem} onPress={handleLogout}>
-          <Ionicons name="log-out-outline" size={24} color="#EF4444" />
-          <Text style={[styles.menuText, { color: '#EF4444' }]}>Déconnexion</Text>
+        <TouchableOpacity style={[styles.menuItem, { paddingHorizontal: theme.spacing.lg, paddingVertical: theme.spacing.md }]} onPress={handleLogout}>
+          <Ionicons name="log-out-outline" size={24} color={theme.colors.error[500]} />
+          <Typography variant="body" style={{ flex: 1, marginLeft: theme.spacing.md, color: theme.colors.error[500] }}>
+            Déconnexion
+          </Typography>
         </TouchableOpacity>
-      </View>
+      </Card>
     </View>
   )
 }
@@ -74,63 +88,17 @@ const ProfileScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f8f9fa',
-  },
-  header: {
-    backgroundColor: '#ffffff',
-    alignItems: 'center',
-    paddingVertical: 40,
-    paddingTop: 60,
-    marginBottom: 20,
   },
   avatar: {
     width: 80,
     height: 80,
-    backgroundColor: '#F3F4F6',
     borderRadius: 40,
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 16,
-  },
-  name: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#1F2937',
-    marginBottom: 4,
-  },
-  email: {
-    fontSize: 16,
-    color: '#6B7280',
-    marginBottom: 8,
-  },
-  role: {
-    fontSize: 14,
-    color: '#10B981',
-    fontWeight: '600',
-    backgroundColor: '#ECFDF5',
-    paddingHorizontal: 12,
-    paddingVertical: 4,
-    borderRadius: 16,
-  },
-  menu: {
-    backgroundColor: '#ffffff',
-    marginHorizontal: 20,
-    borderRadius: 12,
-    overflow: 'hidden',
   },
   menuItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 20,
-    paddingVertical: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: '#F3F4F6',
-  },
-  menuText: {
-    flex: 1,
-    fontSize: 16,
-    color: '#374151',
-    marginLeft: 16,
   },
 })
 
