@@ -163,15 +163,18 @@ describe('Card Component', () => {
 
     it('does not call onPress if pressable is false', () => {
       const onPress = jest.fn()
-      const { getByText } = renderWithTheme(
+      const { queryByRole, getByText } = renderWithTheme(
         <Card pressable={false} onPress={onPress}>
           <Text>Not Pressable</Text>
         </Card>
       )
 
+      // Should not have button role when pressable={false}
+      expect(queryByRole('button')).toBeNull()
+
+      // Verify text content exists but is not pressable
       const content = getByText('Not Pressable')
-      // Should not throw, and onPress should not be called
-      expect(() => fireEvent.press(content)).not.toThrow()
+      expect(content).toBeTruthy()
       expect(onPress).not.toHaveBeenCalled()
     })
   })
@@ -187,7 +190,7 @@ describe('Card Component', () => {
     })
 
     it('uses custom accessibility label', () => {
-      const { getByA11yLabel } = renderWithTheme(
+      const { getByLabelText } = renderWithTheme(
         <Card
           pressable
           onPress={() => {}}
@@ -196,7 +199,7 @@ describe('Card Component', () => {
           <Text>Content</Text>
         </Card>
       )
-      expect(getByA11yLabel('Product Card')).toBeTruthy()
+      expect(getByLabelText('Product Card')).toBeTruthy()
     })
 
     it('has accessibility hint', () => {
@@ -285,12 +288,12 @@ describe('Card Component', () => {
 
   describe('Edge Cases', () => {
     it('handles empty children', () => {
-      const { container } = renderWithTheme(
+      const { root } = renderWithTheme(
         <Card>
           <></>
         </Card>
       )
-      expect(container).toBeTruthy()
+      expect(root).toBeTruthy()
     })
 
     it('handles complex nested content', () => {

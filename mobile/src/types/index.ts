@@ -206,6 +206,7 @@ export interface ProductFilters {
   merchant?: string
   max_price?: number
   max_expiry_days?: number
+  radius?: number
   page?: number
   per_page?: number
 }

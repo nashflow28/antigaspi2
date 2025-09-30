@@ -351,7 +351,7 @@ const ReservationsScreen: React.FC<Props> = ({ navigation }) => {
             variant="primary"
             size="sm"
             onPress={() => showQRCode(item)}
-            icon={<Ionicons name="qr-code-outline" size={16} color={theme.colors.textInverse} />}
+            leftIcon={<Ionicons name="qr-code-outline" size={16} color={theme.colors.textInverse} />}
           >
             QR Code
           </Button>
@@ -361,7 +361,7 @@ const ReservationsScreen: React.FC<Props> = ({ navigation }) => {
           variant="secondary"
           size="sm"
           onPress={() => navigation.navigate('ProductDetails', { productId: item.product.id })}
-          icon={<Ionicons name="eye-outline" size={16} color={theme.colors.primary[500]} />}
+          leftIcon={<Ionicons name="eye-outline" size={16} color={theme.colors.primary[500]} />}
         >
           Voir
         </Button>
@@ -371,7 +371,7 @@ const ReservationsScreen: React.FC<Props> = ({ navigation }) => {
             variant="destructive"
             size="sm"
             onPress={() => handleCancelReservation(item)}
-            icon={<Ionicons name="close-outline" size={16} color={theme.colors.textInverse} />}
+            leftIcon={<Ionicons name="close-outline" size={16} color={theme.colors.textInverse} />}
           >
             Annuler
           </Button>

@@ -136,7 +136,10 @@ export const Card: React.FC<CardProps> = ({
     </View>
   )
 
-  if (pressable && onPress) {
+  // Only make pressable if pressable prop is explicitly true AND onPress exists
+  const shouldBePressable = pressable === true && onPress !== undefined
+
+  if (shouldBePressable) {
     return (
       <TouchableOpacity
         onPress={onPress}

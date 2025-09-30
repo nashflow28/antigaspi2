@@ -241,8 +241,8 @@ describe('Badge Component', () => {
 
   describe('Edge Cases', () => {
     it('handles empty string', () => {
-      const { container } = renderWithTheme(<Badge></Badge>)
-      expect(container).toBeTruthy()
+      const { root } = renderWithTheme(<Badge></Badge>)
+      expect(root).toBeTruthy()
     })
 
     it('handles very long text', () => {

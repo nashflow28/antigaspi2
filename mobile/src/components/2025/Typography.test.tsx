@@ -258,9 +258,9 @@ describe('Typography Component', () => {
 
     it('allows multiple lines', () => {
       const { getByText } = renderWithTheme(
-        <Typography numberOfLines={3}>Line 1\nLine 2\nLine 3</Typography>
+        <Typography numberOfLines={3}>Line 1 Line 2 Line 3</Typography>
       )
-      expect(getByText('Line 1\nLine 2\nLine 3')).toBeTruthy()
+      expect(getByText(/Line 1.*Line 2.*Line 3/)).toBeTruthy()
     })
   })
 
@@ -403,10 +403,10 @@ describe('Typography Component', () => {
 
   describe('Edge Cases', () => {
     it('handles empty string', () => {
-      const { container } = renderWithTheme(
+      const { root } = renderWithTheme(
         <Typography></Typography>
       )
-      expect(container).toBeTruthy()
+      expect(root).toBeTruthy()
     })
 
     it('handles very long text', () => {

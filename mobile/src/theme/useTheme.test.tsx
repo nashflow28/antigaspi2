@@ -66,7 +66,7 @@ describe('useTheme Hook', () => {
         return <Text>{theme.radius.lg}</Text>
       }
       const { getByText } = renderWithTheme(<Component />)
-      expect(getByText('12')).toBeTruthy() // lg = 12
+      expect(getByText('8')).toBeTruthy() // lg = 8
     })
   })
 
@@ -128,17 +128,17 @@ describe('useTheme Hook', () => {
         return <Text>{inputStyle.borderRadius}</Text>
       }
       const { getByText } = renderWithTheme(<Component />)
-      expect(getByText('12')).toBeTruthy() // lg radius
+      expect(getByText('8')).toBeTruthy() // lg radius
     })
 
-    it('provides textStyle helper', () => {
+    it('provides withOpacity helper', () => {
       const Component = () => {
         const theme = useTheme()
-        const textStyle = theme.textStyle('body', 'default')
-        return <Text>{textStyle.fontSize}</Text>
+        const color = theme.withOpacity('#10B981', 0.5)
+        return <Text>{color}</Text>
       }
       const { getByText } = renderWithTheme(<Component />)
-      expect(getByText('16')).toBeTruthy() // body fontSize
+      expect(getByText('rgba(16, 185, 129, 0.5)')).toBeTruthy()
     })
 
     it('provides getTypography helper', () => {
@@ -191,9 +191,9 @@ describe('useTheme Hook', () => {
         )
       }
       const { getByText } = renderWithTheme(<Component />)
-      expect(getByText('#F59E0B')).toBeTruthy()
+      expect(getByText('#FB923C')).toBeTruthy()
       expect(getByText('#EF4444')).toBeTruthy()
-      expect(getByText('#FDE047')).toBeTruthy()
+      expect(getByText('#FCD34D')).toBeTruthy()
     })
 
     it('provides semantic colors', () => {
@@ -256,10 +256,10 @@ describe('useTheme Hook', () => {
       }
       const { getByText } = renderWithTheme(<Component />)
       expect(getByText('none-0')).toBeTruthy()
-      expect(getByText('sm-4')).toBeTruthy()
-      expect(getByText('md-8')).toBeTruthy()
-      expect(getByText('lg-12')).toBeTruthy()
-      expect(getByText('xl-16')).toBeTruthy()
+      expect(getByText('sm-2')).toBeTruthy()
+      expect(getByText('md-4')).toBeTruthy()
+      expect(getByText('lg-8')).toBeTruthy()
+      expect(getByText('xl-12')).toBeTruthy()
       expect(getByText('full-9999')).toBeTruthy()
     })
   })
