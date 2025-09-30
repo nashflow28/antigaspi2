@@ -7,7 +7,6 @@ import {
   TouchableOpacity,
   StatusBar,
   Alert,
-  Modal,
   TextInput,
   ActivityIndicator,
   Dimensions,
@@ -34,6 +33,8 @@ import {
 import paymentService from '../../services/paymentService'
 import offlineService from '../../services/offlineService'
 import analyticsService from '../../services/analyticsService'
+import { Button, Card, Badge, Typography, Modal as Modal2025 } from '../../components/2025'
+import { useTheme } from '../../theme'
 
 interface Props {
   route: any
@@ -43,6 +44,7 @@ interface Props {
 const { width } = Dimensions.get('window')
 
 const ProductDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
+  const theme = useTheme()
   const dispatch = useDispatch<AppDispatch>()
   const { productId } = route.params
   const { products, loading } = useSelector((state: RootState) => state.products)
@@ -434,9 +436,11 @@ const ProductDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
 
   if (loading || !product) {
     return (
-      <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#10B981" />
-        <Text style={styles.loadingText}>Chargement du produit...</Text>
+      <View style={[styles.loadingContainer, { backgroundColor: theme.colors.background }]}>
+        <ActivityIndicator size="large" color={theme.colors.primary[500]} />
+        <Typography variant="body" color="secondary" style={{ marginTop: theme.spacing.md }}>
+          Chargement du produit...
+        </Typography>
       </View>
     )
   }
@@ -446,17 +450,19 @@ const ProductDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
   const totalAmount = discountedUnitPrice * quantity
 
   return (
-    <View style={styles.container}>
-      <StatusBar backgroundColor="#10B981" barStyle="light-content" />
+    <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
+      <StatusBar backgroundColor={theme.colors.primary[500]} barStyle="light-content" />
 
       {/* Header avec navigation */}
-      <View style={styles.header}>
+      <View style={[styles.header, { backgroundColor: theme.colors.primary[500] }]}>
         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-          <Ionicons name="arrow-back" size={24} color="#ffffff" />
+          <Ionicons name="arrow-back" size={24} color={theme.colors.textInverse} />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Détail du produit</Text>
+        <Typography variant="h3" weight="semibold" style={{ color: theme.colors.textInverse }}>
+          Détail du produit
+        </Typography>
         <TouchableOpacity style={styles.shareButton}>
-          <Ionicons name="share-outline" size={24} color="#ffffff" />
+          <Ionicons name="share-outline" size={24} color={theme.colors.textInverse} />
         </TouchableOpacity>
       </View>
 
@@ -470,148 +476,179 @@ const ProductDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
             transition={200}
           />
           <View style={styles.discountBadge}>
-            <Text style={styles.discountText}>-{product.discount_percentage}%</Text>
+            <Badge variant="warning" size="lg">
+              -{product.discount_percentage}%
+            </Badge>
           </View>
           {product.quantity_available <= 5 && (
             <View style={styles.lowStockBadge}>
-              <Text style={styles.lowStockText}>Stock faible</Text>
+              <Badge variant="error" size="md">
+                Stock faible
+              </Badge>
             </View>
           )}
         </View>
 
         {/* Informations principales */}
-        <View style={styles.contentContainer}>
+        <Card variant="elevated" style={{ margin: theme.spacing.md }}>
           <View style={styles.titleSection}>
-            <Text style={styles.productName}>{product.name}</Text>
+            <Typography variant="h2" weight="bold" style={{ marginBottom: theme.spacing.sm }}>
+              {product.name}
+            </Typography>
             <View style={styles.priceContainer}>
-              <Text style={styles.discountedPrice}>
+              <Typography variant="h1" weight="bold" color="primary" style={{ marginRight: theme.spacing.sm }}>
                 {discountedUnitPrice.toLocaleString()} F CFA
-              </Text>
-              <Text style={styles.originalPrice}>
+              </Typography>
+              <Typography variant="h3" color="secondary" style={{ textDecorationLine: 'line-through' }}>
                 {originalUnitPrice.toLocaleString()} F CFA
-              </Text>
+              </Typography>
             </View>
-            <Text style={styles.savings}>
+            <Typography variant="body" color="success" weight="medium" style={{ marginTop: theme.spacing.xs }}>
               Vous économisez {product.savings.toLocaleString()} F CFA
-            </Text>
+            </Typography>
           </View>
 
           {/* Informations sur l'expiration */}
-          <View style={styles.expirySection}>
+          <View style={[styles.expirySection, {
+            backgroundColor: theme.colors.warning[50],
+            padding: theme.spacing.md,
+            borderRadius: theme.radius.md,
+            marginBottom: theme.spacing.lg
+          }]}>
             <View style={styles.expiryHeader}>
               <Ionicons name="time-outline" size={20} color={getStatusColor()} />
-              <Text style={[styles.expiryText, { color: getStatusColor() }]}>
+              <Typography variant="body" weight="semibold" style={{ color: getStatusColor(), marginLeft: theme.spacing.xs }}>
                 {formatTimeLeft(product.expiration_date)}
-              </Text>
+              </Typography>
             </View>
-            <Text style={styles.expiryDate}>
+            <Typography variant="caption" color="secondary" style={{ marginTop: theme.spacing.xs }}>
               Expire le {new Date(product.expiration_date).toLocaleDateString('fr-FR')}
-            </Text>
+            </Typography>
           </View>
 
           {/* Description */}
-          <View style={styles.descriptionSection}>
-            <Text style={styles.sectionTitle}>Description</Text>
-            <Text style={styles.description}>{product.description}</Text>
+          <View style={{ marginBottom: theme.spacing.lg }}>
+            <Typography variant="h3" weight="semibold" style={{ marginBottom: theme.spacing.sm }}>
+              Description
+            </Typography>
+            <Typography variant="body" color="secondary">
+              {product.description}
+            </Typography>
           </View>
 
           {/* Informations marchand */}
-          <View style={styles.merchantSection}>
-            <Text style={styles.sectionTitle}>Marchand</Text>
+          <View style={{ marginBottom: theme.spacing.lg }}>
+            <Typography variant="h3" weight="semibold" style={{ marginBottom: theme.spacing.sm }}>
+              Marchand
+            </Typography>
             <View style={styles.merchantInfo}>
-              <View style={styles.merchantIcon}>
-                <Ionicons name="storefront" size={24} color="#10B981" />
+              <View style={[styles.merchantIcon, { backgroundColor: theme.colors.primary[50] }]}>
+                <Ionicons name="storefront" size={24} color={theme.colors.primary[500]} />
               </View>
               <View style={styles.merchantDetails}>
-                <Text style={styles.merchantName}>{product.merchant.business_name}</Text>
-                <Text style={styles.merchantType}>{product.merchant.business_type}</Text>
+                <Typography variant="body" weight="semibold">
+                  {product.merchant.business_name}
+                </Typography>
+                <Typography variant="caption" color="secondary">
+                  {product.merchant.business_type}
+                </Typography>
                 <View style={styles.locationInfo}>
-                  <Ionicons name="location-outline" size={16} color="#6B7280" />
-                  <Text style={styles.locationText}>
+                  <Ionicons name="location-outline" size={16} color={theme.colors.neutral[500]} />
+                  <Typography variant="caption" color="secondary" style={{ marginLeft: theme.spacing.xs }}>
                     {product.merchant.city}
                     {distance && ` • À ${distance} km`}
-                  </Text>
+                  </Typography>
                 </View>
               </View>
-              <TouchableOpacity style={styles.callButton}>
-                <Ionicons name="call" size={20} color="#10B981" />
+              <TouchableOpacity style={[styles.callButton, { backgroundColor: theme.colors.primary[50] }]}>
+                <Ionicons name="call" size={20} color={theme.colors.primary[500]} />
               </TouchableOpacity>
             </View>
           </View>
 
           {/* Stock disponible */}
-          <View style={styles.stockSection}>
-            <Text style={styles.sectionTitle}>Disponibilité</Text>
+          <View style={{ marginBottom: theme.spacing.lg }}>
+            <Typography variant="h3" weight="semibold" style={{ marginBottom: theme.spacing.sm }}>
+              Disponibilité
+            </Typography>
             <View style={styles.stockInfo}>
               <Ionicons
                 name="cube-outline"
                 size={20}
-                color={product.quantity_available > 5 ? '#10B981' : '#F59E0B'}
+                color={product.quantity_available > 5 ? theme.colors.success[500] : theme.colors.warning[500]}
               />
-              <Text style={styles.stockText}>
+              <Typography variant="body" color="secondary" style={{ marginLeft: theme.spacing.xs }}>
                 {product.quantity_available} unité(s) disponible(s)
-              </Text>
+              </Typography>
             </View>
           </View>
-        </View>
+        </Card>
       </ScrollView>
 
       {/* Bouton de réservation fixe */}
-      <View style={styles.bottomContainer}>
-        <TouchableOpacity
-          style={[
-            styles.reserveButton,
-            product.quantity_available === 0 && styles.disabledButton
-          ]}
+      <View style={[styles.bottomContainer, {
+        backgroundColor: theme.colors.surface.light,
+        padding: theme.spacing.md,
+        borderTopWidth: 1,
+        borderTopColor: theme.colors.border
+      }]}>
+        <Button
+          variant={product.quantity_available === 0 ? 'ghost' : 'primary'}
+          size="lg"
+          fullWidth
           onPress={openReservationModal}
           disabled={product.quantity_available === 0}
+          accessibilityLabel={product.quantity_available === 0 ? 'Produit en rupture de stock' : 'Réserver ce produit'}
         >
-          <Text style={styles.reserveButtonText}>
-            {product.quantity_available === 0 ? 'Rupture de stock' : 'Réserver maintenant'}
-          </Text>
-        </TouchableOpacity>
+          {product.quantity_available === 0 ? 'Rupture de stock' : 'Réserver maintenant'}
+        </Button>
       </View>
 
       {/* Modal de réservation */}
-      <Modal
+      <Modal2025
         visible={showReservationModal}
-        transparent
-        animationType="slide"
-        onRequestClose={() => setShowReservationModal(false)}
+        variant="bottom"
+        dismissable
+        onClose={() => setShowReservationModal(false)}
+        title="Réserver ce produit"
       >
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalContent}>
-            <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>Réserver ce produit</Text>
-              <TouchableOpacity onPress={() => setShowReservationModal(false)}>
-                <Ionicons name="close" size={24} color="#6B7280" />
-              </TouchableOpacity>
-            </View>
 
-            <View style={styles.modalBody}>
-              <View style={styles.quantitySection}>
-                <Text style={styles.inputLabel}>Quantité</Text>
+            <View style={{ padding: theme.spacing.md }}>
+              <View style={{ marginBottom: theme.spacing.lg }}>
+                <Typography variant="body" weight="medium" style={{ marginBottom: theme.spacing.sm }}>
+                  Quantité
+                </Typography>
                 <View style={styles.quantityControls}>
                   <TouchableOpacity
-                    style={styles.quantityButton}
+                    style={[styles.quantityButton, { backgroundColor: theme.colors.primary[50] }]}
                     onPress={() => setQuantity(Math.max(1, quantity - 1))}
                   >
-                    <Ionicons name="remove" size={20} color="#10B981" />
+                    <Ionicons name="remove" size={20} color={theme.colors.primary[500]} />
                   </TouchableOpacity>
-                  <Text style={styles.quantityText}>{quantity}</Text>
+                  <Typography variant="h2" weight="semibold" style={{ marginHorizontal: theme.spacing.lg, minWidth: 40, textAlign: 'center' }}>
+                    {quantity}
+                  </Typography>
                   <TouchableOpacity
-                    style={styles.quantityButton}
+                    style={[styles.quantityButton, { backgroundColor: theme.colors.primary[50] }]}
                     onPress={() => setQuantity(Math.min(product.quantity_available, quantity + 1))}
                   >
-                    <Ionicons name="add" size={20} color="#10B981" />
+                    <Ionicons name="add" size={20} color={theme.colors.primary[500]} />
                   </TouchableOpacity>
                 </View>
               </View>
 
-              <View style={styles.notesSection}>
-                <Text style={styles.inputLabel}>Notes (optionnel)</Text>
+              <View style={{ marginBottom: theme.spacing.lg }}>
+                <Typography variant="body" weight="medium" style={{ marginBottom: theme.spacing.sm }}>
+                  Notes (optionnel)
+                </Typography>
                 <TextInput
-                  style={styles.notesInput}
+                  style={[styles.notesInput, {
+                    backgroundColor: theme.colors.neutral[50],
+                    borderRadius: theme.radius.md,
+                    padding: theme.spacing.sm,
+                    borderWidth: 1,
+                    borderColor: theme.colors.border
+                  }]}
                   placeholder="Instructions particulières..."
                   value={notes}
                   onChangeText={setNotes}
@@ -620,8 +657,10 @@ const ProductDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
                 />
               </View>
 
-              <View style={styles.paymentSection}>
-                <Text style={styles.inputLabel}>Moyen de paiement</Text>
+              <View style={{ marginBottom: theme.spacing.lg }}>
+                <Typography variant="body" weight="medium" style={{ marginBottom: theme.spacing.sm }}>
+                  Moyen de paiement
+                </Typography>
                 <View style={styles.paymentOptionsContainer}>
                   {paymentOptions.map(option => (
                     <TouchableOpacity
@@ -639,31 +678,47 @@ const ProductDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
                 </View>
 
                 {isMobileMoneyMethod(selectedPaymentMethod) && (
-                  <View style={styles.mobileMoneySection}>
-                    <Text style={styles.helperText}>
+                  <View style={{ marginTop: theme.spacing.md, gap: theme.spacing.sm }}>
+                    <Typography variant="caption" color="secondary">
                       {selectedMobileProvider?.name ?? 'Mobile Money'} nécessite un numéro Mobile Money actif.
-                    </Text>
+                    </Typography>
                     <TextInput
-                      style={styles.phoneInput}
+                      style={[styles.phoneInput, {
+                        backgroundColor: theme.colors.neutral[50],
+                        borderRadius: theme.radius.md,
+                        padding: theme.spacing.sm,
+                        borderWidth: 1,
+                        borderColor: theme.colors.border
+                      }]}
                       placeholder="Numéro Mobile Money"
                       value={customerPhone}
                       onChangeText={setCustomerPhone}
                       keyboardType="phone-pad"
                     />
-                    <Text style={styles.feeText}>
+                    <Typography variant="caption" color="success" weight="medium">
                       Frais estimés : {paymentService.formatCurrency(paymentService.calculateFees(totalAmount, selectedPaymentMethod))}
-                    </Text>
+                    </Typography>
                     {selectedMobileProvider && (
-                      <Text style={styles.helperText}>Code USSD : {selectedMobileProvider.ussdCode}</Text>
+                      <Typography variant="caption" color="secondary">
+                        Code USSD : {selectedMobileProvider.ussdCode}
+                      </Typography>
                     )}
                   </View>
                 )}
 
                 {selectedPaymentMethod === 'wallet' && (
-                  <View style={styles.mobileMoneySection}>
-                    <Text style={styles.helperText}>Entrez le code PIN de votre portefeuille.</Text>
+                  <View style={{ marginTop: theme.spacing.md, gap: theme.spacing.sm }}>
+                    <Typography variant="caption" color="secondary">
+                      Entrez le code PIN de votre portefeuille.
+                    </Typography>
                     <TextInput
-                      style={styles.walletPinInput}
+                      style={[styles.walletPinInput, {
+                        backgroundColor: theme.colors.neutral[50],
+                        borderRadius: theme.radius.md,
+                        padding: theme.spacing.sm,
+                        borderWidth: 1,
+                        borderColor: theme.colors.border
+                      }]}
                       placeholder="Code PIN"
                       value={walletPin}
                       onChangeText={setWalletPin}
@@ -674,34 +729,40 @@ const ProductDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
                 )}
               </View>
 
-              <View style={styles.totalSection}>
-                <Text style={styles.totalLabel}>Total</Text>
-                <Text style={styles.totalAmount}>
+              <View style={[styles.totalSection, {
+                paddingTop: theme.spacing.md,
+                borderTopWidth: 1,
+                borderTopColor: theme.colors.border,
+                marginBottom: theme.spacing.md
+              }]}>
+                <Typography variant="h3" weight="semibold">Total</Typography>
+                <Typography variant="h2" weight="bold" color="primary">
                   {totalAmount.toLocaleString()} F CFA
-                </Text>
+                </Typography>
+              </View>
+
+              <View style={{ flexDirection: 'row', gap: theme.spacing.sm }}>
+                <Button
+                  variant="secondary"
+                  size="lg"
+                  style={{ flex: 1 }}
+                  onPress={() => setShowReservationModal(false)}
+                >
+                  Annuler
+                </Button>
+                <Button
+                  variant="primary"
+                  size="lg"
+                  style={{ flex: 1 }}
+                  onPress={handleReservation}
+                  disabled={reservationLoading}
+                  loading={reservationLoading}
+                >
+                  {reservationLoading ? 'Réservation...' : 'Confirmer'}
+                </Button>
               </View>
             </View>
-
-            <View style={styles.modalFooter}>
-              <TouchableOpacity
-                style={styles.cancelButton}
-                onPress={() => setShowReservationModal(false)}
-              >
-                <Text style={styles.cancelButtonText}>Annuler</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={[styles.confirmButton, reservationLoading && styles.disabledButton]}
-                onPress={handleReservation}
-                disabled={reservationLoading}
-              >
-                <Text style={styles.confirmButtonText}>
-                  {reservationLoading ? 'Réservation...' : 'Confirmer'}
-                </Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        </View>
-      </Modal>
+      </Modal2025>
     </View>
   )
 }
@@ -709,21 +770,13 @@ const ProductDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f8f9fa',
   },
   loadingContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#f8f9fa',
-  },
-  loadingText: {
-    marginTop: 16,
-    fontSize: 16,
-    color: '#6B7280',
   },
   header: {
-    backgroundColor: '#10B981',
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
@@ -758,102 +811,21 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 16,
     right: 16,
-    backgroundColor: '#F59E0B',
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 16,
-  },
-  discountText: {
-    color: '#ffffff',
-    fontWeight: '600',
-    fontSize: 14,
   },
   lowStockBadge: {
     position: 'absolute',
     top: 16,
     left: 16,
-    backgroundColor: '#EF4444',
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 16,
   },
-  lowStockText: {
-    color: '#ffffff',
-    fontWeight: '600',
-    fontSize: 12,
-  },
-  contentContainer: {
-    backgroundColor: '#ffffff',
-    margin: 16,
-    borderRadius: 12,
-    padding: 20,
-  },
-  titleSection: {
-    marginBottom: 20,
-  },
-  productName: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#1F2937',
-    marginBottom: 12,
-  },
+  titleSection: {},
   priceContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 8,
   },
-  discountedPrice: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    color: '#10B981',
-    marginRight: 12,
-  },
-  originalPrice: {
-    fontSize: 18,
-    color: '#9CA3AF',
-    textDecorationLine: 'line-through',
-  },
-  savings: {
-    fontSize: 16,
-    color: '#059669',
-    fontWeight: '500',
-  },
-  expirySection: {
-    backgroundColor: '#FEF3C7',
-    padding: 16,
-    borderRadius: 8,
-    marginBottom: 20,
-  },
+  expirySection: {},
   expiryHeader: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 4,
-  },
-  expiryText: {
-    fontSize: 16,
-    fontWeight: '600',
-    marginLeft: 8,
-  },
-  expiryDate: {
-    fontSize: 14,
-    color: '#6B7280',
-  },
-  descriptionSection: {
-    marginBottom: 20,
-  },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: '#1F2937',
-    marginBottom: 12,
-  },
-  description: {
-    fontSize: 16,
-    color: '#6B7280',
-    lineHeight: 24,
-  },
-  merchantSection: {
-    marginBottom: 20,
   },
   merchantInfo: {
     flexDirection: 'row',
@@ -862,7 +834,6 @@ const styles = StyleSheet.create({
   merchantIcon: {
     width: 48,
     height: 48,
-    backgroundColor: '#ECFDF5',
     borderRadius: 24,
     justifyContent: 'center',
     alignItems: 'center',
@@ -871,102 +842,22 @@ const styles = StyleSheet.create({
   merchantDetails: {
     flex: 1,
   },
-  merchantName: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#1F2937',
-    marginBottom: 4,
-  },
-  merchantType: {
-    fontSize: 14,
-    color: '#6B7280',
-    marginBottom: 4,
-  },
   locationInfo: {
     flexDirection: 'row',
     alignItems: 'center',
   },
-  locationText: {
-    fontSize: 14,
-    color: '#6B7280',
-    marginLeft: 4,
-  },
   callButton: {
     width: 40,
     height: 40,
-    backgroundColor: '#ECFDF5',
     borderRadius: 20,
     justifyContent: 'center',
     alignItems: 'center',
-  },
-  stockSection: {
-    marginBottom: 20,
   },
   stockInfo: {
     flexDirection: 'row',
     alignItems: 'center',
   },
-  stockText: {
-    fontSize: 16,
-    color: '#6B7280',
-    marginLeft: 8,
-  },
-  bottomContainer: {
-    backgroundColor: '#ffffff',
-    padding: 16,
-    borderTopWidth: 1,
-    borderTopColor: '#E5E7EB',
-  },
-  reserveButton: {
-    backgroundColor: '#10B981',
-    paddingVertical: 16,
-    borderRadius: 12,
-    alignItems: 'center',
-  },
-  disabledButton: {
-    backgroundColor: '#9CA3AF',
-  },
-  reserveButtonText: {
-    color: '#ffffff',
-    fontSize: 18,
-    fontWeight: '600',
-  },
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    justifyContent: 'flex-end',
-  },
-  modalContent: {
-    backgroundColor: '#ffffff',
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-    paddingBottom: 20,
-  },
-  modalHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    padding: 20,
-    borderBottomWidth: 1,
-    borderBottomColor: '#E5E7EB',
-  },
-  modalTitle: {
-    fontSize: 20,
-    fontWeight: '600',
-    color: '#1F2937',
-  },
-  modalBody: {
-    padding: 20,
-  },
-  quantitySection: {
-    marginBottom: 20,
-  },
-  inputLabel: {
-    fontSize: 16,
-    fontWeight: '500',
-    color: '#374151',
-    marginBottom: 8,
-  },
+  bottomContainer: {},
   quantityControls: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -975,33 +866,13 @@ const styles = StyleSheet.create({
   quantityButton: {
     width: 40,
     height: 40,
-    backgroundColor: '#ECFDF5',
     borderRadius: 20,
     justifyContent: 'center',
     alignItems: 'center',
   },
-  quantityText: {
-    fontSize: 20,
-    fontWeight: '600',
-    color: '#1F2937',
-    marginHorizontal: 20,
-    minWidth: 40,
-    textAlign: 'center',
-  },
-  notesSection: {
-    marginBottom: 20,
-  },
   notesInput: {
-    backgroundColor: '#F9FAFB',
-    borderRadius: 8,
-    padding: 12,
     fontSize: 16,
     textAlignVertical: 'top',
-    borderWidth: 1,
-    borderColor: '#E5E7EB',
-  },
-  paymentSection: {
-    marginBottom: 20,
   },
   paymentOptionsContainer: {
     flexDirection: 'row',
@@ -1033,81 +904,16 @@ const styles = StyleSheet.create({
   paymentEmoji: {
     fontSize: 18,
   },
-  mobileMoneySection: {
-    marginTop: 16,
-    gap: 8,
-  },
-  helperText: {
-    fontSize: 13,
-    color: '#6B7280',
-  },
   phoneInput: {
-    backgroundColor: '#F9FAFB',
-    borderRadius: 8,
-    padding: 12,
     fontSize: 16,
-    borderWidth: 1,
-    borderColor: '#E5E7EB',
-  },
-  feeText: {
-    fontSize: 14,
-    color: '#059669',
-    fontWeight: '500',
   },
   walletPinInput: {
-    backgroundColor: '#F9FAFB',
-    borderRadius: 8,
-    padding: 12,
     fontSize: 16,
-    borderWidth: 1,
-    borderColor: '#E5E7EB',
   },
   totalSection: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingTop: 16,
-    borderTopWidth: 1,
-    borderTopColor: '#E5E7EB',
-  },
-  totalLabel: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: '#1F2937',
-  },
-  totalAmount: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#10B981',
-  },
-  modalFooter: {
-    flexDirection: 'row',
-    paddingHorizontal: 20,
-    gap: 12,
-  },
-  cancelButton: {
-    flex: 1,
-    paddingVertical: 14,
-    borderRadius: 8,
-    alignItems: 'center',
-    backgroundColor: '#F3F4F6',
-  },
-  cancelButtonText: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#6B7280',
-  },
-  confirmButton: {
-    flex: 1,
-    paddingVertical: 14,
-    borderRadius: 8,
-    alignItems: 'center',
-    backgroundColor: '#10B981',
-  },
-  confirmButtonText: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#ffffff',
   },
 })
 
