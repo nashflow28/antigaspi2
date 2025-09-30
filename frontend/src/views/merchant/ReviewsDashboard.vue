@@ -307,6 +307,8 @@ import {
 } from 'lucide-vue-next'
 import DashboardLayout from '@/components/ui/DashboardLayout.vue'
 import { useDashboardLayout } from '@/composables/useDashboardLayout'
+import { notify } from '@/composables/useNotifications'
+import { apiService } from '@/services/api'
 
 interface DashboardData {
   merchant: {
@@ -377,44 +379,34 @@ const loadDashboard = async () => {
   error.value = null
 
   try {
-    const response = await fetch('http://localhost:8000/api/merchants/reviews/dashboard', {
-      method: 'GET',
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${authStore.token}`
-      }
-    })
+    const { success, data, message } = await apiService.getMerchantReviewsDashboard<DashboardData>()
 
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`)
-    }
-
-    const data = await response.json()
-    if (data.success) {
-      dashboardData.value = data.data
+    if (success) {
+      dashboardData.value = data
     } else {
-      throw new Error(data.message || 'Erreur lors du chargement')
+      throw new Error(message || 'Erreur lors du chargement du tableau de bord des avis')
     }
   } catch (err) {
-    // console.error('Error loading dashboard:', err)
-    error.value = err instanceof Error ? err.message : 'Erreur inconnue'
+    const errorMessage = err instanceof Error ? err.message : 'Erreur inconnue'
+    error.value = errorMessage
+    notify.error(errorMessage, 'Tableau de bord des avis')
   } finally {
     loading.value = false
   }
 }
 
 const refreshData = () => {
-  loadDashboard()
-}
-
-onMounted(() => {
-  // Check if user is merchant
   if (authStore.user?.role !== 'merchant') {
-    error.value = 'Accès réservé aux commerçants'
+    const message = 'Accès réservé aux commerçants'
+    error.value = message
+    notify.error(message, 'Tableau de bord des avis')
     return
   }
 
   loadDashboard()
+}
+
+onMounted(() => {
+  refreshData()
 })
 </script>
