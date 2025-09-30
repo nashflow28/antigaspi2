@@ -1,27 +1,34 @@
 import React from 'react'
 import {
   View,
-  Text,
   StyleSheet,
   ActivityIndicator,
   StatusBar,
 } from 'react-native'
+import { Typography } from '../components/2025'
+import { useTheme } from '../theme'
 
 const SplashScreen: React.FC = () => {
-  return (
-    <View style={styles.container}>
-      <StatusBar backgroundColor="#10B981" barStyle="light-content" />
+  const theme = useTheme()
 
-      {/* Logo ou titre de l'app */}
-      <View style={styles.logoContainer}>
-        <Text style={styles.title}>🌱 Antigaspi</Text>
-        <Text style={styles.subtitle}>Luttons contre le gaspillage</Text>
+  return (
+    <View style={[styles.container, { backgroundColor: theme.colors.primary[500], paddingHorizontal: theme.spacing.lg }]}>
+      <StatusBar backgroundColor={theme.colors.primary[500]} barStyle="light-content" />
+
+      <View style={{ alignItems: 'center', marginBottom: theme.spacing['4xl'] }}>
+        <Typography variant="displayXl" weight="bold" style={{ color: theme.colors.textInverse, marginBottom: theme.spacing.sm, textAlign: 'center' }}>
+          🌱 Antigaspi
+        </Typography>
+        <Typography variant="h3" style={{ color: theme.colors.textInverse, opacity: 0.9, textAlign: 'center', fontWeight: '300' }}>
+          Luttons contre le gaspillage
+        </Typography>
       </View>
 
-      {/* Indicateur de chargement */}
-      <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#ffffff" />
-        <Text style={styles.loadingText}>Chargement...</Text>
+      <View style={{ alignItems: 'center' }}>
+        <ActivityIndicator size="large" color={theme.colors.textInverse} />
+        <Typography variant="body" style={{ marginTop: theme.spacing.md, color: theme.colors.textInverse, opacity: 0.8 }}>
+          Chargement...
+        </Typography>
       </View>
     </View>
   )
@@ -30,37 +37,8 @@ const SplashScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#10B981', // Vert primaire d'Antigaspi
     justifyContent: 'center',
     alignItems: 'center',
-    paddingHorizontal: 20,
-  },
-  logoContainer: {
-    alignItems: 'center',
-    marginBottom: 60,
-  },
-  title: {
-    fontSize: 42,
-    fontWeight: 'bold',
-    color: '#ffffff',
-    marginBottom: 8,
-    textAlign: 'center',
-  },
-  subtitle: {
-    fontSize: 18,
-    color: '#ffffff',
-    opacity: 0.9,
-    textAlign: 'center',
-    fontWeight: '300',
-  },
-  loadingContainer: {
-    alignItems: 'center',
-  },
-  loadingText: {
-    marginTop: 16,
-    fontSize: 16,
-    color: '#ffffff',
-    opacity: 0.8,
   },
 })
 
