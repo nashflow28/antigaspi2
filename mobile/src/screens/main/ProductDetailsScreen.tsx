@@ -45,6 +45,7 @@ const { width } = Dimensions.get('window')
 
 const ProductDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
   const theme = useTheme()
+  const styles = createStyles(theme)
   const dispatch = useDispatch<AppDispatch>()
   const { productId } = route.params
   const { products, loading } = useSelector((state: RootState) => state.products)
@@ -767,7 +768,7 @@ const ProductDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
   )
 }
 
-const styles = StyleSheet.create({
+const createStyles = (theme: ReturnType<typeof useTheme>) => StyleSheet.create({
   container: {
     flex: 1,
   },
@@ -801,7 +802,7 @@ const styles = StyleSheet.create({
   imageContainer: {
     position: 'relative',
     height: 300,
-    backgroundColor: '#ffffff',
+    backgroundColor: theme.colors.surface.light,
   },
   productImage: {
     width: '100%',
@@ -886,12 +887,12 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: '#E5E7EB',
-    backgroundColor: '#ffffff',
+    borderColor: theme.colors.border,
+    backgroundColor: theme.colors.surface.light,
   },
   paymentOptionSelected: {
-    borderColor: '#10B981',
-    backgroundColor: '#ECFDF5',
+    borderColor: theme.colors.primary[500],
+    backgroundColor: theme.colors.primary[50],
   },
   paymentOptionIcon: {
     marginRight: 8,
