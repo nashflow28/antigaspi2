@@ -9,7 +9,6 @@ import {
   StatusBar,
   FlatList,
   RefreshControl,
-  Modal,
   Alert,
 } from 'react-native'
 import { useDispatch, useSelector } from 'react-redux'
@@ -20,6 +19,7 @@ import { Image } from 'expo-image'
 import { Product, ProductFilters } from '../../types'
 import analyticsService from '../../services/analyticsService'
 import { useTheme } from '../../theme'
+import { Modal, Button } from '../../components/2025'
 
 interface Props {
   navigation: any
@@ -248,60 +248,57 @@ const ProductsScreen: React.FC<Props> = ({ navigation, route }) => {
       {/* Modal Filtres */}
       <Modal
         visible={showFilters}
-        animationType="slide"
-        transparent={true}
-        onRequestClose={() => setShowFilters(false)}
-      >
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalContent}>
-            <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>Filtres</Text>
-              <TouchableOpacity onPress={() => setShowFilters(false)}>
-                <Ionicons name="close" size={24} color={theme.colors.text} />
-              </TouchableOpacity>
-            </View>
-
-            <ScrollView style={styles.modalBody}>
-              <View style={styles.filterSection}>
-                <Text style={styles.filterSectionTitle}>Prix maximum</Text>
-                <TextInput
-                  style={styles.filterInput}
-                  placeholder="Ex: 5000"
-                  placeholderTextColor={theme.colors.textTertiary}
-                  keyboardType="numeric"
-                  value={localFilters.max_price?.toString() || ''}
-                  onChangeText={(text) => setLocalFilters({
-                    ...localFilters,
-                    max_price: text ? parseFloat(text) : undefined,
-                  })}
-                />
-              </View>
-
-              <View style={styles.filterSection}>
-                <Text style={styles.filterSectionTitle}>Distance maximum (km)</Text>
-                <TextInput
-                  style={styles.filterInput}
-                  placeholder="Ex: 5"
-                  placeholderTextColor={theme.colors.textTertiary}
-                  keyboardType="numeric"
-                  value={localFilters.radius?.toString() || ''}
-                  onChangeText={(text) => setLocalFilters({
-                    ...localFilters,
-                    radius: text ? parseFloat(text) : undefined,
-                  })}
-                />
-              </View>
-            </ScrollView>
-
-            <View style={styles.modalFooter}>
-              <TouchableOpacity style={styles.clearButton} onPress={clearFilters}>
-                <Text style={styles.clearButtonText}>Réinitialiser</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.applyButton} onPress={applyFilters}>
-                <Text style={styles.applyButtonText}>Appliquer</Text>
-              </TouchableOpacity>
-            </View>
+        onClose={() => setShowFilters(false)}
+        title="Filtres"
+        variant="bottom"
+        scrollable
+        footer={
+          <View style={{ flexDirection: 'row', gap: theme.spacing.sm }}>
+            <Button
+              variant="secondary"
+              onPress={clearFilters}
+              style={{ flex: 1 }}
+            >
+              Réinitialiser
+            </Button>
+            <Button
+              variant="primary"
+              onPress={applyFilters}
+              style={{ flex: 1 }}
+            >
+              Appliquer
+            </Button>
           </View>
+        }
+      >
+        <View style={styles.filterSection}>
+          <Text style={styles.filterSectionTitle}>Prix maximum</Text>
+          <TextInput
+            style={styles.filterInput}
+            placeholder="Ex: 5000"
+            placeholderTextColor={theme.colors.textTertiary}
+            keyboardType="numeric"
+            value={localFilters.max_price?.toString() || ''}
+            onChangeText={(text) => setLocalFilters({
+              ...localFilters,
+              max_price: text ? parseFloat(text) : undefined,
+            })}
+          />
+        </View>
+
+        <View style={styles.filterSection}>
+          <Text style={styles.filterSectionTitle}>Distance maximum (km)</Text>
+          <TextInput
+            style={styles.filterInput}
+            placeholder="Ex: 5"
+            placeholderTextColor={theme.colors.textTertiary}
+            keyboardType="numeric"
+            value={localFilters.radius?.toString() || ''}
+            onChangeText={(text) => setLocalFilters({
+              ...localFilters,
+              radius: text ? parseFloat(text) : undefined,
+            })}
+          />
         </View>
       </Modal>
     </View>
@@ -492,32 +489,6 @@ const createStyles = (theme: ReturnType<typeof useTheme>) => StyleSheet.create({
     textAlign: 'center',
     paddingHorizontal: theme.spacing.xl,
   },
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: theme.colors.overlay,
-    justifyContent: 'flex-end',
-  },
-  modalContent: {
-    backgroundColor: theme.colors.background,
-    borderTopLeftRadius: theme.radius['2xl'],
-    borderTopRightRadius: theme.radius['2xl'],
-    maxHeight: '80%',
-  },
-  modalHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    padding: theme.spacing.lg,
-    borderBottomWidth: 1,
-    borderBottomColor: theme.colors.border,
-  },
-  modalTitle: {
-    ...theme.getTypography('h3'),
-    color: theme.colors.text,
-  },
-  modalBody: {
-    padding: theme.spacing.lg,
-  },
   filterSection: {
     marginBottom: theme.spacing.lg,
   },
@@ -531,33 +502,6 @@ const createStyles = (theme: ReturnType<typeof useTheme>) => StyleSheet.create({
     ...theme.inputStyle(false),
     ...theme.getTypography('body'),
     color: theme.colors.text,
-  },
-  modalFooter: {
-    flexDirection: 'row',
-    gap: theme.spacing.md,
-    padding: theme.spacing.lg,
-    borderTopWidth: 1,
-    borderTopColor: theme.colors.border,
-  },
-  clearButton: {
-    flex: 1,
-    ...theme.buttonStyle('ghost', 'md'),
-  },
-  clearButtonText: {
-    ...theme.getTypography('body'),
-    color: theme.colors.text,
-    fontWeight: '600',
-    textAlign: 'center',
-  },
-  applyButton: {
-    flex: 1,
-    ...theme.buttonStyle('primary', 'md'),
-  },
-  applyButtonText: {
-    ...theme.getTypography('body'),
-    color: theme.colors.textInverse,
-    fontWeight: '600',
-    textAlign: 'center',
   },
 })
 

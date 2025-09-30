@@ -2,6 +2,7 @@ import React from 'react'
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import { Ionicons } from '@expo/vector-icons'
+import { useTheme } from '../theme'
 
 // Screens
 import HomeScreen from '../screens/main/HomeScreen'
@@ -29,6 +30,8 @@ const ProductsStack = () => (
 )
 
 const MainNavigator: React.FC = () => {
+  const theme = useTheme()
+
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
@@ -49,8 +52,8 @@ const MainNavigator: React.FC = () => {
 
           return <Ionicons name={iconName} size={size} color={color} />
         },
-        tabBarActiveTintColor: '#10B981', // Vert primaire d'Antigaspi
-        tabBarInactiveTintColor: 'gray',
+        tabBarActiveTintColor: theme.colors.primary[500],
+        tabBarInactiveTintColor: theme.colors.gray[400],
         headerShown: false,
         tabBarStyle: {
           paddingBottom: 5,

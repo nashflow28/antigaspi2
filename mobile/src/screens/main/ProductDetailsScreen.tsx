@@ -70,12 +70,12 @@ const ProductDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
       {
         id: 'on_site' as PaymentMethod,
         label: 'Paiement sur place',
-        icon: <Ionicons name="storefront" size={18} color="#10B981" />,
+        icon: <Ionicons name="storefront" size={18} color={theme.colors.primary[500]} />,
       },
       {
         id: 'wallet' as PaymentMethod,
         label: 'Mon portefeuille',
-        icon: <Ionicons name="wallet" size={18} color="#10B981" />,
+        icon: <Ionicons name="wallet" size={18} color={theme.colors.primary[500]} />,
       },
       ...mobileProviders.map(provider => ({
         id: provider.id as PaymentMethod,
@@ -428,13 +428,6 @@ const ProductDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
     return `${diffDays} jour(s) restant(s)`
   }
 
-  const getStatusColor = () => {
-    if (!product) return '#6B7280'
-    if (product.days_until_expiration <= 1) return '#EF4444'
-    if (product.days_until_expiration <= 3) return '#F59E0B'
-    return '#10B981'
-  }
-
   if (loading || !product) {
     return (
       <View style={[styles.loadingContainer, { backgroundColor: theme.colors.background }]}>
@@ -517,8 +510,8 @@ const ProductDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
             marginBottom: theme.spacing.lg
           }]}>
             <View style={styles.expiryHeader}>
-              <Ionicons name="time-outline" size={20} color={getStatusColor()} />
-              <Typography variant="body" weight="semibold" style={{ color: getStatusColor(), marginLeft: theme.spacing.xs }}>
+              <Ionicons name="time-outline" size={20} color={theme.getExpirationStatusColor(product?.days_until_expiration)} />
+              <Typography variant="body" weight="semibold" style={{ color: theme.getExpirationStatusColor(product?.days_until_expiration), marginLeft: theme.spacing.xs }}>
                 {formatTimeLeft(product.expiration_date)}
               </Typography>
             </View>
@@ -791,7 +784,7 @@ const createStyles = (theme: ReturnType<typeof useTheme>) => StyleSheet.create({
   headerTitle: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#ffffff',
+    color: theme.colors.surface.light,
   },
   shareButton: {
     padding: 8,
@@ -899,7 +892,7 @@ const createStyles = (theme: ReturnType<typeof useTheme>) => StyleSheet.create({
   },
   paymentOptionLabel: {
     fontSize: 15,
-    color: '#1F2937',
+    color: theme.colors.text,
     fontWeight: '500',
   },
   paymentEmoji: {

@@ -2,8 +2,12 @@ import React from 'react'
 import { View, Text, StyleSheet } from 'react-native'
 import { useSelector } from 'react-redux'
 import { RootState } from '../store'
+import { useTheme } from '../theme'
 
 const ConnectivityBanner: React.FC = () => {
+  const theme = useTheme()
+  const styles = createStyles(theme)
+
   const { isOnline, pendingActions, isSyncing, lastSyncError } = useSelector(
     (state: RootState) => state.connectivity
   )
@@ -41,32 +45,33 @@ const ConnectivityBanner: React.FC = () => {
   )
 }
 
-const styles = StyleSheet.create({
-  container: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    paddingVertical: 12,
-    paddingHorizontal: 20,
-    zIndex: 1000,
-  },
-  offline: {
-    backgroundColor: '#B91C1C',
-  },
-  syncing: {
-    backgroundColor: '#2563EB',
-  },
-  title: {
-    color: '#FFFFFF',
-    fontWeight: '700',
-    fontSize: 14,
-    marginBottom: 2,
-  },
-  subtitle: {
-    color: '#F9FAFB',
-    fontSize: 12,
-  },
-})
+const createStyles = (theme: ReturnType<typeof useTheme>) =>
+  StyleSheet.create({
+    container: {
+      position: 'absolute',
+      top: 0,
+      left: 0,
+      right: 0,
+      paddingVertical: theme.spacing.sm,
+      paddingHorizontal: theme.spacing.lg,
+      zIndex: 1000,
+    },
+    offline: {
+      backgroundColor: theme.colors.semantic.error,
+    },
+    syncing: {
+      backgroundColor: theme.colors.semantic.info,
+    },
+    title: {
+      color: theme.colors.surface.light,
+      fontWeight: '700',
+      fontSize: 14,
+      marginBottom: 2,
+    },
+    subtitle: {
+      color: theme.colors.gray[50],
+      fontSize: 12,
+    },
+  })
 
 export default ConnectivityBanner

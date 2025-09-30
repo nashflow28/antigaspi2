@@ -135,6 +135,71 @@ export const useTheme = () => {
     },
 
     /**
+     * Get color based on product expiration status
+     * @param daysUntilExpiration - Days until product expires
+     * @example getExpirationStatusColor(2) // returns warning color
+     */
+    getExpirationStatusColor: (daysUntilExpiration?: number): string => {
+      if (!daysUntilExpiration) return theme.colors.gray[500]
+      if (daysUntilExpiration <= 1) return theme.colors.semantic.error
+      if (daysUntilExpiration <= 3) return theme.colors.semantic.warning
+      return theme.colors.semantic.success
+    },
+
+    /**
+     * Get color based on reservation status
+     * @param status - Reservation status
+     * @param pendingAction - Optional pending action (delete, update)
+     * @example getReservationStatusColor('confirmed') // returns info color
+     */
+    getReservationStatusColor: (status: string, pendingAction?: string): string => {
+      if (pendingAction) {
+        return pendingAction === 'delete'
+          ? theme.colors.semantic.warning
+          : theme.colors.accent.blue
+      }
+
+      switch (status) {
+        case 'pending':
+          return theme.colors.semantic.warning
+        case 'confirmed':
+          return theme.colors.semantic.info
+        case 'ready':
+          return theme.colors.semantic.success
+        case 'completed':
+          return theme.colors.primary[600]
+        case 'cancelled':
+          return theme.colors.semantic.error
+        case 'expired':
+          return theme.colors.gray[400]
+        default:
+          return theme.colors.gray[500]
+      }
+    },
+
+    /**
+     * Get color based on payment status
+     * @param status - Payment status
+     * @example getPaymentStatusColor('success') // returns success color
+     */
+    getPaymentStatusColor: (status: string): string => {
+      switch (status) {
+        case 'pending':
+          return theme.colors.semantic.warning
+        case 'processing':
+          return theme.colors.semantic.info
+        case 'success':
+          return theme.colors.semantic.success
+        case 'failed':
+          return theme.colors.semantic.error
+        case 'refunded':
+          return theme.colors.gray[400]
+        default:
+          return theme.colors.gray[500]
+      }
+    },
+
+    /**
      * Create card style preset
      * @param elevated - Add elevation/shadow
      * @example cardStyle(true)

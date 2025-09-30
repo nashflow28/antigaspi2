@@ -148,22 +148,6 @@ const ReservationsScreen: React.FC<Props> = ({ navigation }) => {
     })
   }
 
-  const getStatusColor = (reservation: Reservation) => {
-    if (reservation.pendingSync) {
-      return reservation.pendingAction === 'delete' ? '#F59E0B' : '#0EA5E9'
-    }
-
-    switch (reservation.status) {
-      case 'pending': return '#F59E0B'
-      case 'confirmed': return '#3B82F6'
-      case 'ready': return '#10B981'
-      case 'completed': return '#059669'
-      case 'cancelled': return '#EF4444'
-      case 'expired': return '#9CA3AF'
-      default: return '#6B7280'
-    }
-  }
-
   const getStatusText = (reservation: Reservation) => {
     if (reservation.pendingSync) {
       if (reservation.pendingAction === 'delete') {
@@ -180,17 +164,6 @@ const ReservationsScreen: React.FC<Props> = ({ navigation }) => {
       case 'cancelled': return 'Annulée'
       case 'expired': return 'Expirée'
       default: return reservation.status
-    }
-  }
-
-  const getPaymentStatusColor = (status?: string) => {
-    switch (status) {
-      case 'pending': return '#F59E0B'
-      case 'completed':
-      case 'success': return '#10B981'
-      case 'failed': return '#EF4444'
-      case 'refunded': return '#9CA3AF'
-      default: return '#6B7280'
     }
   }
 
@@ -454,8 +427,8 @@ const ReservationsScreen: React.FC<Props> = ({ navigation }) => {
           <RefreshControl
             refreshing={refreshing}
             onRefresh={onRefresh}
-            colors={['#10B981']}
-            tintColor="#10B981"
+            colors={[theme.colors.primary[500]]}
+            tintColor={theme.colors.primary[500]}
           />
         }
         ListEmptyComponent={renderEmpty}

@@ -8,6 +8,7 @@ import Constants from 'expo-constants';
 import { Platform } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios, { AxiosInstance } from 'axios';
+import { designSystem2025 } from '../theme/designSystem2025';
 
 // Configuration des notifications
 Notifications.setNotificationHandler({
@@ -161,7 +162,7 @@ class NotificationService {
         name: 'Nouveaux Produits',
         importance: Notifications.AndroidImportance.DEFAULT,
         vibrationPattern: [0, 250, 250, 250],
-        lightColor: '#10B981',
+        lightColor: designSystem2025.colors.semantic.success,
         sound: 'default',
       });
 
@@ -170,7 +171,7 @@ class NotificationService {
         name: 'Réservations',
         importance: Notifications.AndroidImportance.HIGH,
         vibrationPattern: [0, 250, 250, 250],
-        lightColor: '#F59E0B',
+        lightColor: designSystem2025.colors.semantic.warning,
         sound: 'default',
       });
 
@@ -179,7 +180,7 @@ class NotificationService {
         name: 'Promotions',
         importance: Notifications.AndroidImportance.DEFAULT,
         vibrationPattern: [0, 250, 250, 250],
-        lightColor: '#3B82F6',
+        lightColor: designSystem2025.colors.semantic.info,
         sound: 'default',
       });
 
@@ -188,7 +189,7 @@ class NotificationService {
         name: 'Produits Expirant',
         importance: Notifications.AndroidImportance.HIGH,
         vibrationPattern: [0, 500],
-        lightColor: '#EF4444',
+        lightColor: designSystem2025.colors.semantic.error,
         sound: 'default',
       });
     }
