@@ -290,7 +290,7 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
-import { useAuthStore } from '@/stores/auth'
+import apiService from '@/services/api'
 import { notify } from '@/composables/useNotifications'
 import AdminModal from '@/components/ui/AdminModal.vue'
 import DashboardLayout from '@/components/ui/DashboardLayout.vue'
@@ -341,7 +341,6 @@ interface CategoryStats {
   }>
 }
 
-const authStore = useAuthStore()
 // Notification store removed - using useNotifications composable
 const { sidebar, header } = useDashboardLayout('admin')
 
@@ -460,57 +459,62 @@ const handleFilterChange = ({ id, value }: { id: string; value: string }) => {
 }
 
 // Methods
-const loadCategories = async () => {
+const loadCategories = async ({ notifyOnError = true }: { notifyOnError?: boolean } = {}) => {
+  loading.value = true
   try {
-    loading.value = true
-    const token = authStore.token
+    const response = await apiService.getAdminCategories()
 
-    const response = await fetch('http://localhost:8000/api/admin/categories', {
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'Accept': 'application/json'
-      }
-    })
-
-    const data = await response.json()
-
-    if (data.success) {
-      categories.value = data.data
-      // Les products_count viennent maintenant de l'API
-    } else {
-      throw new Error(data.message || 'Erreur lors du chargement')
+    if (!response.success) {
+      throw new Error(response.message || 'Erreur lors du chargement des catégories')
     }
+
+    const categoriesData = Array.isArray(response.data) ? response.data : []
+    categories.value = categoriesData.map(category => ({
+      ...category,
+      description: typeof category.description === 'string' ? category.description : '',
+      icon: typeof category.icon === 'string' ? category.icon : '',
+      is_active: typeof category.is_active === 'boolean'
+        ? category.is_active
+        : typeof (category as Record<string, unknown>).isActive === 'boolean'
+          ? Boolean((category as Record<string, unknown>).isActive)
+          : true
+    }))
   } catch (error) {
-    // console.error('Error loading categories:', error)
-    notify.error('Impossible de charger les catégories', 'Erreur')
+    if (notifyOnError) {
+      notify.error(error instanceof Error ? error.message : 'Impossible de charger les catégories', 'Erreur')
+    }
+    throw error
   } finally {
     loading.value = false
   }
 }
 
-const loadStats = async () => {
+const loadStats = async ({ notifyOnError = false }: { notifyOnError?: boolean } = {}) => {
   try {
-    const token = authStore.token
+    const response = await apiService.getAdminCategoryStats()
 
-    const response = await fetch('http://localhost:8000/api/admin/categories/stats', {
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'Accept': 'application/json'
+    if (response.success && response.data) {
+      stats.value = {
+        total_categories: response.data.total_categories ?? 0,
+        active_categories: response.data.active_categories ?? 0,
+        categories_with_products: response.data.categories_with_products ?? 0,
+        top_categories: response.data.top_categories ?? []
       }
-    })
-
-    const data = await response.json()
-
-    if (data.success) {
-      stats.value = data.data
     }
   } catch (error) {
-    // console.error('Error loading stats:', error)
+    if (notifyOnError) {
+      notify.error(error instanceof Error ? error.message : 'Impossible de charger les statistiques', 'Erreur')
+    }
   }
 }
 
 const refreshCategories = async () => {
-  await Promise.all([loadCategories(), loadStats()])
+  try {
+    await loadCategories()
+  } catch (error) {
+    // Les erreurs sont déjà gérées par loadCategories
+  }
+  await loadStats()
 }
 
 const openCreateModal = () => {
@@ -554,36 +558,20 @@ const editCategory = (category: Category) => {
 const saveCategory = async () => {
   try {
     saving.value = true
-    const token = authStore.token
+    const payload = { ...form.value }
+    const response = editingCategory.value
+      ? await apiService.updateAdminCategory(editingCategory.value.id, payload)
+      : await apiService.createAdminCategory(payload)
 
-    const url = editingCategory.value
-      ? `http://localhost:8000/api/admin/categories/${editingCategory.value.id}`
-      : 'http://localhost:8000/api/admin/categories'
-
-    const method = editingCategory.value ? 'PUT' : 'POST'
-
-    const response = await fetch(url, {
-      method,
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'Accept': 'application/json',
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(form.value)
-    })
-
-    const data = await response.json()
-
-    if (data.success) {
-      notify.success(data.message, 'Succès')
-      closeModal()
-      await loadCategories()
-      await loadStats()
-    } else {
-      throw new Error(data.message || 'Erreur lors de l\'enregistrement')
+    if (!response.success) {
+      throw new Error(response.message || "Erreur lors de l'enregistrement")
     }
+
+    notify.success(response.message ?? 'Catégorie enregistrée avec succès', 'Succès')
+    closeModal()
+    await loadCategories({ notifyOnError: false }).catch(() => undefined)
+    await loadStats()
   } catch (error) {
-    // console.error('Error saving category:', error)
     notify.error(error instanceof Error ? error.message : 'Erreur inconnue', 'Erreur')
   } finally {
     saving.value = false
@@ -608,27 +596,16 @@ const deleteCategory = async (category: Category) => {
 
   modal.value.action = async () => {
     try {
-      const token = authStore.token
+      const response = await apiService.deleteAdminCategory(category.id)
 
-      const response = await fetch(`http://localhost:8000/api/admin/categories/${category.id}`, {
-        method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Accept': 'application/json'
-        }
-      })
-
-      const data = await response.json()
-
-      if (data.success) {
-        notify.success(data.message, 'Succès')
-        await loadCategories()
-        await loadStats()
-      } else {
-        throw new Error(data.message || 'Erreur lors de la suppression')
+      if (!response.success) {
+        throw new Error(response.message || 'Erreur lors de la suppression')
       }
+
+      notify.success(response.message ?? 'Catégorie supprimée avec succès', 'Succès')
+      await loadCategories({ notifyOnError: false }).catch(() => undefined)
+      await loadStats()
     } catch (error) {
-      // console.error('Error deleting category:', error)
       notify.error(error instanceof Error ? error.message : 'Erreur inconnue', 'Erreur')
     }
   }
@@ -636,27 +613,26 @@ const deleteCategory = async (category: Category) => {
 
 const toggleCategoryStatus = async (category: Category) => {
   try {
-    const token = authStore.token
+    const response = await apiService.toggleCategory(category.id)
 
-    const response = await fetch(`http://localhost:8000/api/admin/categories/${category.id}/toggle`, {
-      method: 'PATCH',
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'Accept': 'application/json'
-      }
-    })
-
-    const data = await response.json()
-
-    if (data.success) {
-      notify.success(data.message, 'Succès')
-      category.is_active = !category.is_active
-      await loadStats()
-    } else {
-      throw new Error(data.message || 'Erreur lors du changement de statut')
+    if (!response.success) {
+      throw new Error(response.message || 'Erreur lors du changement de statut')
     }
+
+    const updatedCategory = response.data as Partial<Category> | undefined
+    if (updatedCategory) {
+      category.is_active = typeof updatedCategory.is_active === 'boolean'
+        ? updatedCategory.is_active
+        : typeof (updatedCategory as Record<string, unknown>).isActive === 'boolean'
+          ? Boolean((updatedCategory as Record<string, unknown>).isActive)
+          : !category.is_active
+    } else {
+      category.is_active = !category.is_active
+    }
+
+    notify.success(response.message ?? 'Statut mis à jour avec succès', 'Succès')
+    await loadStats()
   } catch (error) {
-    // console.error('Error toggling status:', error)
     notify.error(error instanceof Error ? error.message : 'Erreur inconnue', 'Erreur')
   }
 }

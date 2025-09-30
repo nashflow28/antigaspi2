@@ -236,6 +236,7 @@ import {
   PauseCircleIcon,
   PlayCircleIcon
 } from '@heroicons/vue/24/outline'
+import apiService from '@/services/api'
 import ConfirmModal from '@/components/ui/ConfirmModal.vue'
 import NotificationToast from '@/components/ui/NotificationToast.vue'
 import DashboardLayout from '@/components/ui/DashboardLayout.vue'
@@ -288,12 +289,14 @@ interface ConfirmModalData {
   onConfirm: () => void
 }
 
-const stats = ref<UserStats>({
+const defaultUserStats: UserStats = {
   totalUsers: 0,
   consumers: 0,
   merchants: 0,
   suspended: 0
-})
+}
+
+const stats = ref<UserStats>({ ...defaultUserStats })
 
 const users = ref<User[]>([])
 const loading = ref(false)
@@ -479,169 +482,47 @@ watch(filteredUsers, () => {
   }
 })
 
-const loadUsers = async () => {
+const loadUsers = async ({ notifyOnError = true }: { notifyOnError?: boolean } = {}) => {
   loading.value = true
   try {
-    const response = await fetch('http://localhost:8000/api/admin/users', {
-      headers: {
-        Accept: 'application/json',
-        Authorization: `Bearer ${localStorage.getItem('auth_token')}`
-      }
+    const response = await apiService.getAdminUsers({
+      search: filters.search || undefined,
+      role: filters.role || undefined,
+      status: filters.status || undefined
     })
-    const data = await response.json()
 
-    if (data.success) {
-      users.value = data.data
-      stats.value = data.stats
-    } else {
-      throw new Error(data.message || 'Erreur API')
+    if (!response.success) {
+      throw new Error(response.message || 'Erreur lors du chargement des utilisateurs')
     }
+
+    const payload = response.data ?? { users: [] as User[] }
+    const fetchedUsers = Array.isArray(payload.users) ? (payload.users as User[]) : []
+
+    users.value = fetchedUsers
+
+    if (payload.stats) {
+      stats.value = {
+        totalUsers: payload.stats.totalUsers ?? defaultUserStats.totalUsers,
+        consumers: payload.stats.consumers ?? defaultUserStats.consumers,
+        merchants: payload.stats.merchants ?? defaultUserStats.merchants,
+        suspended: payload.stats.suspended ?? defaultUserStats.suspended
+      }
+    } else {
+      updateStats()
+    }
+
+    return response
   } catch (error) {
-    showNotification('error', 'Erreur de chargement', 'Impossible de charger les données. Utilisation des données de démo.')
-    loadDemoUsers()
+    if (notifyOnError) {
+      const message = error instanceof Error
+        ? error.message
+        : 'Une erreur est survenue lors du chargement des utilisateurs.'
+      showNotification('error', 'Erreur de chargement', message)
+    }
+    throw error
   } finally {
     loading.value = false
   }
-}
-
-const loadDemoUsers = () => {
-  const demoUsers: User[] = [
-    {
-      id: 1,
-      name: 'Djamila Koné',
-      email: 'djamila.kone@email.com',
-      phone: '+225 07 45 67 89 12',
-      role: 'consumer',
-      status: 'active',
-      avatar: 'https://ui-avatars.com/api/?name=Djamila+Kone&background=10B981&color=fff',
-      created_at: '2024-08-20T09:15:00Z',
-      last_activity: '2024-09-15T10:30:00Z'
-    },
-    {
-      id: 2,
-      name: 'Amadou Traoré',
-      email: 'amadou.traore@email.com',
-      phone: '+225 07 12 34 56 78',
-      role: 'consumer',
-      status: 'active',
-      avatar: 'https://ui-avatars.com/api/?name=Amadou+Traore&background=10B981&color=fff',
-      created_at: '2024-01-15T10:30:00Z',
-      last_activity: '2024-09-14T16:45:00Z'
-    },
-    {
-      id: 3,
-      name: 'Fatou Coulibaly',
-      email: 'fatou.coulibaly@email.com',
-      phone: '+225 05 87 65 43 21',
-      role: 'merchant',
-      status: 'active',
-      avatar: 'https://ui-avatars.com/api/?name=Fatou+Coulibaly&background=F59E0B&color=fff',
-      created_at: '2024-02-20T14:15:00Z',
-      last_activity: '2024-09-15T09:20:00Z'
-    },
-    {
-      id: 4,
-      name: 'Jean Dupont',
-      email: 'jean.dupont@email.com',
-      phone: '+225 01 23 45 67 89',
-      role: 'consumer',
-      status: 'active',
-      avatar: 'https://ui-avatars.com/api/?name=Jean+Dupont&background=10B981&color=fff',
-      created_at: '2024-01-10T08:45:00Z',
-      last_activity: '2024-09-13T18:30:00Z'
-    },
-    {
-      id: 5,
-      name: 'Boulangerie Martin',
-      email: 'boulangerie.martin@email.com',
-      phone: '+225 02 34 56 78 90',
-      role: 'merchant',
-      status: 'active',
-      avatar: 'https://ui-avatars.com/api/?name=Boulangerie+Martin&background=F59E0B&color=fff',
-      created_at: '2024-03-05T11:20:00Z',
-      last_activity: '2024-09-14T14:15:00Z'
-    },
-    {
-      id: 6,
-      name: 'Koffi Asante',
-      email: 'koffi.asante@email.com',
-      phone: '+225 09 87 65 43 21',
-      role: 'consumer',
-      status: 'suspended',
-      avatar: 'https://ui-avatars.com/api/?name=Koffi+Asante&background=EF4444&color=fff',
-      created_at: '2024-02-28T16:00:00Z',
-      last_activity: '2024-08-15T12:00:00Z'
-    },
-    {
-      id: 7,
-      name: 'Aicha Diabaté',
-      email: 'aicha.diabate@email.com',
-      phone: '+225 06 11 22 33 44',
-      role: 'consumer',
-      status: 'active',
-      avatar: 'https://ui-avatars.com/api/?name=Aicha+Diabate&background=10B981&color=fff',
-      created_at: '2024-04-12T09:30:00Z',
-      last_activity: '2024-09-15T11:45:00Z'
-    },
-    {
-      id: 8,
-      name: 'Mariam Ouattara',
-      email: 'mariam.ouattara@email.com',
-      phone: '+225 08 33 44 55 66',
-      role: 'consumer',
-      status: 'active',
-      avatar: 'https://ui-avatars.com/api/?name=Mariam+Ouattara&background=10B981&color=fff',
-      created_at: '2024-06-18T14:20:00Z',
-      last_activity: '2024-09-14T20:10:00Z'
-    },
-    {
-      id: 9,
-      name: 'Épicerie Moderne',
-      email: 'epicerie.moderne@email.com',
-      phone: '+225 27 45 67 89 01',
-      role: 'merchant',
-      status: 'active',
-      avatar: 'https://ui-avatars.com/api/?name=Epicerie+Moderne&background=F59E0B&color=fff',
-      created_at: '2024-05-10T11:30:00Z',
-      last_activity: '2024-09-15T08:45:00Z'
-    },
-    {
-      id: 10,
-      name: 'Supermarché Plateau',
-      email: 'supermarche.plateau@email.com',
-      phone: '+225 27 20 30 40 50',
-      role: 'merchant',
-      status: 'pending',
-      avatar: 'https://ui-avatars.com/api/?name=Supermarche+Plateau&background=F59E0B&color=fff',
-      created_at: '2024-09-10T13:20:00Z',
-      last_activity: '2024-09-10T13:20:00Z'
-    },
-    {
-      id: 11,
-      name: 'Youssouf Bamba',
-      email: 'youssouf.bamba@email.com',
-      phone: '+225 09 11 22 33 44',
-      role: 'consumer',
-      status: 'active',
-      avatar: 'https://ui-avatars.com/api/?name=Youssouf+Bamba&background=10B981&color=fff',
-      created_at: '2024-07-05T16:40:00Z',
-      last_activity: '2024-09-15T12:20:00Z'
-    },
-    {
-      id: 12,
-      name: 'Admin Système',
-      email: 'admin@antigaspi.com',
-      phone: '+225 01 00 00 00 00',
-      role: 'admin',
-      status: 'active',
-      avatar: 'https://ui-avatars.com/api/?name=Admin+Systeme&background=8B5CF6&color=fff',
-      created_at: '2024-01-01T00:00:00Z',
-      last_activity: '2024-09-15T12:00:00Z'
-    }
-  ]
-
-  users.value = demoUsers
-  updateStats()
 }
 
 const updateStats = () => {
@@ -696,8 +577,16 @@ const closeConfirmModal = () => {
 
 const refreshData = async () => {
   showNotification('info', 'Actualisation', 'Chargement des données...')
-  await loadUsers()
-  showNotification('success', 'Actualisation terminée', 'Les données ont été rechargées avec succès.')
+  try {
+    const response = await loadUsers({ notifyOnError: false })
+    const successMessage = response?.message || 'Les données ont été rechargées avec succès.'
+    showNotification('success', 'Actualisation terminée', successMessage)
+  } catch (error) {
+    const message = error instanceof Error
+      ? error.message
+      : 'Une erreur est survenue lors de la mise à jour des utilisateurs.'
+    showNotification('error', 'Actualisation impossible', message)
+  }
 }
 
 const viewUser = (user: User) => {
@@ -720,30 +609,28 @@ const suspendUser = async (user: User) => {
     `Êtes-vous sûr de vouloir suspendre ${user.name} ? Cette action peut être annulée.`,
     async () => {
       try {
-        const response = await fetch(`http://localhost:8000/api/admin/users/${user.id}/suspend`, {
-          method: 'PATCH',
-          headers: {
-            'Content-Type': 'application/json',
-            Accept: 'application/json',
-            Authorization: `Bearer ${localStorage.getItem('auth_token')}`
-          }
-        })
+        const response = await apiService.suspendAdminUser(user.id)
 
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`)
+        if (!response.success) {
+          throw new Error(response.message || 'Erreur lors de la suspension')
         }
 
-        const data = await response.json()
-
-        if (data.success) {
-          user.status = 'suspended'
-          updateStats()
-          showNotification('success', 'Utilisateur suspendu', `${user.name} a été suspendu avec succès.`)
+        const updatedUser = response.data as Partial<User> | undefined
+        if (updatedUser) {
+          Object.assign(user, {
+            ...user,
+            ...updatedUser,
+            status: (updatedUser.status ?? 'suspended') as User['status']
+          })
         } else {
-          throw new Error(data.message || 'Erreur lors de la suspension')
+          user.status = 'suspended'
         }
+
+        updateStats()
+        showNotification('success', 'Utilisateur suspendu', response.message ?? `${user.name} a été suspendu avec succès.`)
       } catch (error) {
-        showNotification('error', 'Erreur de suspension', `Impossible de suspendre ${user.name}. ${error instanceof Error ? error.message : 'Erreur inconnue'}`)
+        const message = error instanceof Error ? error.message : 'Erreur inconnue'
+        showNotification('error', 'Erreur de suspension', `Impossible de suspendre ${user.name}. ${message}`)
       }
     },
     'Suspendre',
@@ -758,30 +645,28 @@ const unsuspendUser = async (user: User) => {
     `Êtes-vous sûr de vouloir réactiver ${user.name} ?`,
     async () => {
       try {
-        const response = await fetch(`http://localhost:8000/api/admin/users/${user.id}/unsuspend`, {
-          method: 'PATCH',
-          headers: {
-            'Content-Type': 'application/json',
-            Accept: 'application/json',
-            Authorization: `Bearer ${localStorage.getItem('auth_token')}`
-          }
-        })
+        const response = await apiService.unsuspendAdminUser(user.id)
 
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`)
+        if (!response.success) {
+          throw new Error(response.message || "Erreur lors de la réactivation")
         }
 
-        const data = await response.json()
-
-        if (data.success) {
-          user.status = 'active'
-          updateStats()
-          showNotification('success', 'Utilisateur réactivé', `${user.name} a été réactivé avec succès.`)
+        const updatedUser = response.data as Partial<User> | undefined
+        if (updatedUser) {
+          Object.assign(user, {
+            ...user,
+            ...updatedUser,
+            status: (updatedUser.status ?? 'active') as User['status']
+          })
         } else {
-          throw new Error(data.message || "Erreur lors de la réactivation")
+          user.status = 'active'
         }
+
+        updateStats()
+        showNotification('success', 'Utilisateur réactivé', response.message ?? `${user.name} a été réactivé avec succès.`)
       } catch (error) {
-        showNotification('error', 'Erreur de réactivation', `Impossible de réactiver ${user.name}. ${error instanceof Error ? error.message : 'Erreur inconnue'}`)
+        const message = error instanceof Error ? error.message : 'Erreur inconnue'
+        showNotification('error', 'Erreur de réactivation', `Impossible de réactiver ${user.name}. ${message}`)
       }
     },
     'Réactiver',
@@ -790,7 +675,11 @@ const unsuspendUser = async (user: User) => {
 }
 
 onMounted(async () => {
-  await loadUsers()
+  try {
+    await loadUsers()
+  } catch (error) {
+    // Les erreurs sont déjà notifiées par loadUsers
+  }
   syncFilters(dashboardFilters.value)
 })
 </script>
