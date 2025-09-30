@@ -1,14 +1,11 @@
 import React, { useEffect, useState } from 'react'
 import {
   View,
-  Text,
   StyleSheet,
-  ScrollView,
   TouchableOpacity,
   StatusBar,
   FlatList,
   RefreshControl,
-  Modal,
   Alert,
   Dimensions,
 } from 'react-native'
@@ -25,6 +22,8 @@ import QRCode from 'react-native-qrcode-svg'
 import { Reservation } from '../../types'
 import offlineService from '../../services/offlineService'
 import analyticsService from '../../services/analyticsService'
+import { Button, Card, Badge, Typography, Modal as Modal2025 } from '../../components/2025'
+import { useTheme } from '../../theme'
 
 interface Props {
   navigation: any
@@ -33,6 +32,7 @@ interface Props {
 const { width } = Dimensions.get('window')
 
 const ReservationsScreen: React.FC<Props> = ({ navigation }) => {
+  const theme = useTheme()
   const dispatch = useDispatch<AppDispatch>()
   const { reservations, loading } = useSelector((state: RootState) => state.reservations)
   const { user } = useSelector((state: RootState) => state.auth)
@@ -240,44 +240,65 @@ const ReservationsScreen: React.FC<Props> = ({ navigation }) => {
     return ['confirmed', 'ready'].includes(reservation.status)
   }
 
+  const getStatusVariant = (reservation: Reservation): 'primary' | 'secondary' | 'success' | 'error' | 'warning' | 'neutral' => {
+    if (reservation.pendingSync) return 'warning'
+    switch (reservation.status) {
+      case 'pending': return 'warning'
+      case 'confirmed': case 'ready': return 'primary'
+      case 'completed': return 'success'
+      case 'cancelled': case 'expired': return 'error'
+      default: return 'neutral'
+    }
+  }
+
+  const getPaymentVariant = (status?: string): 'success' | 'warning' | 'error' | 'neutral' => {
+    switch (status) {
+      case 'pending': return 'warning'
+      case 'completed': case 'success': return 'success'
+      case 'failed': return 'error'
+      case 'refunded': return 'neutral'
+      default: return 'neutral'
+    }
+  }
+
   const renderReservation = ({ item }: { item: Reservation }) => (
-    <View style={styles.reservationCard}>
+    <Card variant="elevated" style={{ marginBottom: theme.spacing.sm, padding: theme.spacing.md }}>
       {/* Header de la réservation */}
       <View style={styles.reservationHeader}>
         <View>
-          <Text style={styles.reservationCode}>#{item.reservation_code}</Text>
-          <Text style={styles.reservationDate}>
+          <Typography variant="body" weight="semibold">
+            #{item.reservation_code}
+          </Typography>
+          <Typography variant="caption" color="secondary" style={{ marginTop: theme.spacing.xs }}>
             {formatDate(item.created_at || '')}
-          </Text>
+          </Typography>
         </View>
         <View style={styles.statusContainer}>
-          <View style={[styles.statusBadge, { backgroundColor: getStatusColor(item) }]}>
-            <Text style={styles.statusText}>{getStatusText(item)}</Text>
-          </View>
+          <Badge variant={getStatusVariant(item)} size="sm">
+            {getStatusText(item)}
+          </Badge>
           {item.payment_status && !item.pendingSync && (
-            <View style={[styles.paymentBadge, { backgroundColor: getPaymentStatusColor(item.payment_status) }]}>
-              <Text style={styles.paymentText}>{getPaymentStatusText(item.payment_status)}</Text>
-            </View>
+            <Badge variant={getPaymentVariant(item.payment_status)} size="sm" style={{ marginTop: theme.spacing.xs }}>
+              {getPaymentStatusText(item.payment_status)}
+            </Badge>
           )}
         </View>
       </View>
 
       {item.pendingSync && (
-        <Text
-          style={[
-            styles.syncInfo,
-            item.pendingAction === 'delete' && { color: '#F59E0B' },
-          ]}
+        <Typography
+          variant="caption"
+          style={{ color: item.pendingAction === 'delete' ? theme.colors.warning[500] : theme.colors.info[500], marginBottom: theme.spacing.sm }}
         >
           {item.pendingAction === 'delete'
             ? 'Annulation en attente de synchronisation'
             : 'Créée hors ligne - envoi automatique dès connexion'}
-        </Text>
+        </Typography>
       )}
 
       {/* Produit */}
-      <View style={styles.productSection}>
-        <View style={styles.productImage}>
+      <View style={[styles.productSection, { marginBottom: theme.spacing.sm }]}>
+        <View style={[styles.productImage, { marginRight: theme.spacing.sm }]}>
           <Image
             source={{ uri: item.product.image_url || 'https://via.placeholder.com/80x80?text=Produit' }}
             style={styles.image}
@@ -285,120 +306,142 @@ const ReservationsScreen: React.FC<Props> = ({ navigation }) => {
           />
         </View>
         <View style={styles.productInfo}>
-          <Text style={styles.productName}>{item.product.name}</Text>
-          <Text style={styles.merchantName}>{item.product.merchant.name}</Text>
+          <Typography variant="body" weight="semibold" style={{ marginBottom: theme.spacing.xs }}>
+            {item.product.name}
+          </Typography>
+          <Typography variant="caption" color="secondary" style={{ marginBottom: theme.spacing.sm }}>
+            {item.product.merchant.name}
+          </Typography>
           <View style={styles.quantityPriceContainer}>
-            <Text style={styles.quantity}>Quantité: {item.quantity}</Text>
-            <Text style={styles.totalAmount}>
+            <Typography variant="caption" color="secondary">
+              Quantité: {item.quantity}
+            </Typography>
+            <Typography variant="body" weight="bold" color="primary">
               {Math.round(item.total_amount || 0).toLocaleString()} F CFA
-            </Text>
+            </Typography>
           </View>
         </View>
       </View>
 
       {/* Informations de retrait */}
       {(item.pickup_date || item.pickup_time) && (
-        <View style={styles.pickupSection}>
-          <Ionicons name="calendar-outline" size={16} color="#6B7280" />
-          <Text style={styles.pickupText}>
+        <View style={[styles.pickupSection, { paddingTop: theme.spacing.sm, borderTopWidth: 1, borderTopColor: theme.colors.border, marginBottom: theme.spacing.sm }]}>
+          <Ionicons name="calendar-outline" size={16} color={theme.colors.neutral[500]} />
+          <Typography variant="caption" color="secondary" style={{ marginLeft: theme.spacing.sm }}>
             Retrait: {item.pickup_date && new Date(item.pickup_date).toLocaleDateString('fr-FR')}
             {item.pickup_time && ` à ${item.pickup_time}`}
-          </Text>
+          </Typography>
         </View>
       )}
 
       {/* Notes */}
       {item.notes && (
-        <View style={styles.notesSection}>
-          <Ionicons name="document-text-outline" size={16} color="#6B7280" />
-          <Text style={styles.notesText}>{item.notes}</Text>
+        <View style={[styles.notesSection, { marginBottom: theme.spacing.sm }]}>
+          <Ionicons name="document-text-outline" size={16} color={theme.colors.neutral[500]} />
+          <Typography variant="caption" color="secondary" style={{ marginLeft: theme.spacing.sm, flex: 1 }}>
+            {item.notes}
+          </Typography>
         </View>
       )}
 
       {/* Actions */}
-      <View style={styles.actionsContainer}>
+      <View style={[styles.actionsContainer, { gap: theme.spacing.sm, marginTop: theme.spacing.sm, paddingTop: theme.spacing.sm, borderTopWidth: 1, borderTopColor: theme.colors.border }]}>
         {canShowQR(item) && (
-          <TouchableOpacity
-            style={styles.qrButton}
+          <Button
+            variant="primary"
+            size="sm"
             onPress={() => showQRCode(item)}
+            icon={<Ionicons name="qr-code-outline" size={16} color={theme.colors.textInverse} />}
           >
-            <Ionicons name="qr-code-outline" size={18} color="#ffffff" />
-            <Text style={styles.qrButtonText}>QR Code</Text>
-          </TouchableOpacity>
+            QR Code
+          </Button>
         )}
 
-        <TouchableOpacity
-          style={styles.detailsButton}
+        <Button
+          variant="secondary"
+          size="sm"
           onPress={() => navigation.navigate('ProductDetails', { productId: item.product.id })}
+          icon={<Ionicons name="eye-outline" size={16} color={theme.colors.primary[500]} />}
         >
-          <Ionicons name="eye-outline" size={18} color="#10B981" />
-          <Text style={styles.detailsButtonText}>Voir produit</Text>
-        </TouchableOpacity>
+          Voir
+        </Button>
 
         {canCancel(item) && (
-          <TouchableOpacity
-            style={styles.cancelButton}
+          <Button
+            variant="destructive"
+            size="sm"
             onPress={() => handleCancelReservation(item)}
+            icon={<Ionicons name="close-outline" size={16} color={theme.colors.textInverse} />}
           >
-            <Ionicons name="close-outline" size={18} color="#EF4444" />
-            <Text style={styles.cancelButtonText}>Annuler</Text>
-          </TouchableOpacity>
+            Annuler
+          </Button>
         )}
       </View>
-    </View>
+    </Card>
   )
 
   const renderEmpty = () => (
-    <View style={styles.emptyContainer}>
-      <Ionicons name="bookmark-outline" size={64} color="#D1D5DB" />
-      <Text style={styles.emptyTitle}>Aucune réservation</Text>
-      <Text style={styles.emptySubtitle}>
+    <View style={[styles.emptyContainer, { paddingVertical: theme.spacing['4xl'] }]}>
+      <Ionicons name="bookmark-outline" size={64} color={theme.colors.neutral[300]} />
+      <Typography variant="h3" weight="semibold" style={{ marginTop: theme.spacing.md, marginBottom: theme.spacing.sm }}>
+        Aucune réservation
+      </Typography>
+      <Typography variant="body" color="secondary" style={{ textAlign: 'center', marginBottom: theme.spacing.lg, paddingHorizontal: theme.spacing['2xl'] }}>
         {activeTab === 'active' && 'Vous n\'avez aucune réservation active'}
         {activeTab === 'completed' && 'Vous n\'avez aucune réservation terminée'}
         {activeTab === 'cancelled' && 'Vous n\'avez aucune réservation annulée'}
-      </Text>
-      <TouchableOpacity
-        style={styles.browseButton}
+      </Typography>
+      <Button
+        variant="primary"
+        size="lg"
         onPress={() => navigation.navigate('Products')}
       >
-        <Text style={styles.browseButtonText}>Parcourir les produits</Text>
-      </TouchableOpacity>
+        Parcourir les produits
+      </Button>
     </View>
   )
 
   return (
-    <View style={styles.container}>
-      <StatusBar backgroundColor="#10B981" barStyle="light-content" />
+    <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
+      <StatusBar backgroundColor={theme.colors.primary[500]} barStyle="light-content" />
 
       {/* Header */}
-      <View style={styles.header}>
-        <Text style={styles.headerTitle}>Mes réservations</Text>
-        <Text style={styles.headerSubtitle}>
+      <View style={[styles.header, { backgroundColor: theme.colors.primary[500], paddingHorizontal: theme.spacing.lg, paddingTop: theme.spacing['2xl'], paddingBottom: theme.spacing.lg }]}>
+        <Typography variant="h2" weight="bold" style={{ color: theme.colors.textInverse, marginBottom: theme.spacing.xs }}>
+          Mes réservations
+        </Typography>
+        <Typography variant="caption" style={{ color: theme.colors.textInverse, opacity: 0.9 }}>
           {reservations.length} réservation(s) au total
-        </Text>
+        </Typography>
       </View>
 
       {/* Tabs */}
-      <View style={styles.tabsContainer}>
-        {[
-          { key: 'active', label: 'Actives', count: reservations.filter(r => ['pending', 'confirmed', 'ready'].includes(r.status)).length },
-          { key: 'completed', label: 'Terminées', count: reservations.filter(r => r.status === 'completed').length },
-          { key: 'cancelled', label: 'Annulées', count: reservations.filter(r => ['cancelled', 'expired'].includes(r.status)).length },
-        ].map((tab) => (
-          <TouchableOpacity
-            key={tab.key}
-            style={[styles.tab, activeTab === tab.key && styles.activeTab]}
-            onPress={() => handleTabChange(tab.key as any)}
-          >
-            <Text style={[styles.tabText, activeTab === tab.key && styles.activeTabText]}>
-              {tab.label}
-            </Text>
-            <Text style={[styles.tabCount, activeTab === tab.key && styles.activeTabCount]}>
-              {tab.count}
-            </Text>
-          </TouchableOpacity>
-        ))}
-      </View>
+      <Card variant="elevated" style={{ marginHorizontal: theme.spacing.md, marginTop: theme.spacing.md, padding: theme.spacing.xs }}>
+        <View style={styles.tabsContainer}>
+          {[
+            { key: 'active', label: 'Actives', count: reservations.filter(r => ['pending', 'confirmed', 'ready'].includes(r.status)).length },
+            { key: 'completed', label: 'Terminées', count: reservations.filter(r => r.status === 'completed').length },
+            { key: 'cancelled', label: 'Annulées', count: reservations.filter(r => ['cancelled', 'expired'].includes(r.status)).length },
+          ].map((tab) => (
+            <TouchableOpacity
+              key={tab.key}
+              style={[
+                styles.tab,
+                { flex: 1, paddingVertical: theme.spacing.sm, alignItems: 'center', borderRadius: theme.radius.md },
+                activeTab === tab.key && { backgroundColor: theme.colors.primary[500] }
+              ]}
+              onPress={() => handleTabChange(tab.key as any)}
+            >
+              <Typography variant="caption" weight="medium" style={{ color: activeTab === tab.key ? theme.colors.textInverse : theme.colors.neutral[600] }}>
+                {tab.label}
+              </Typography>
+              <Typography variant="caption" style={{ color: activeTab === tab.key ? theme.colors.textInverse : theme.colors.neutral[400], opacity: activeTab === tab.key ? 0.9 : 1, marginTop: theme.spacing.xs }}>
+                {tab.count}
+              </Typography>
+            </TouchableOpacity>
+          ))}
+        </View>
+      </Card>
 
       {/* Liste des réservations */}
       <FlatList
@@ -419,68 +462,58 @@ const ReservationsScreen: React.FC<Props> = ({ navigation }) => {
       />
 
       {/* Modal QR Code */}
-      <Modal
+      <Modal2025
         visible={showQRModal}
-        transparent
-        animationType="fade"
-        onRequestClose={() => setShowQRModal(false)}
+        variant="center"
+        dismissable
+        onClose={() => setShowQRModal(false)}
+        title="QR Code de retrait"
       >
-        <View style={styles.qrModalOverlay}>
-          <View style={styles.qrModalContent}>
-            <View style={styles.qrModalHeader}>
-              <Text style={styles.qrModalTitle}>QR Code de retrait</Text>
-              <TouchableOpacity onPress={() => setShowQRModal(false)}>
-                <Ionicons name="close" size={24} color="#6B7280" />
-              </TouchableOpacity>
+        {selectedReservation && (
+          <View style={{ padding: theme.spacing.lg, alignItems: 'center' }}>
+            <Typography variant="body" color="secondary" style={{ marginBottom: theme.spacing.lg, textAlign: 'center' }}>
+              Réservation #{selectedReservation.reservation_code}
+            </Typography>
+
+            <View style={[styles.qrCodeContainer, { padding: theme.spacing.lg, backgroundColor: theme.colors.surface.light, borderRadius: theme.radius.lg, marginBottom: theme.spacing.lg }]}>
+              <QRCode
+                value={JSON.stringify({
+                  reservation_id: selectedReservation.id,
+                  reservation_code: selectedReservation.reservation_code,
+                  customer_id: user?.id,
+                  product_id: selectedReservation.product.id,
+                  quantity: selectedReservation.quantity,
+                  total_amount: selectedReservation.total_amount
+                })}
+                size={200}
+                color={theme.colors.text}
+                backgroundColor={theme.colors.surface.light}
+              />
             </View>
 
-            {selectedReservation && (
-              <View style={styles.qrModalBody}>
-                <Text style={styles.qrModalSubtitle}>
-                  Réservation #{selectedReservation.reservation_code}
-                </Text>
+            <View style={{ width: '100%' }}>
+              <Typography variant="caption" color="secondary" style={{ textAlign: 'center', marginBottom: theme.spacing.md }}>
+                Présentez ce QR code au marchand pour récupérer votre commande
+              </Typography>
 
-                <View style={styles.qrCodeContainer}>
-                  <QRCode
-                    value={JSON.stringify({
-                      reservation_id: selectedReservation.id,
-                      reservation_code: selectedReservation.reservation_code,
-                      customer_id: user?.id,
-                      product_id: selectedReservation.product.id,
-                      quantity: selectedReservation.quantity,
-                      total_amount: selectedReservation.total_amount
-                    })}
-                    size={200}
-                    color="#1F2937"
-                    backgroundColor="#ffffff"
-                  />
-                </View>
-
-                <View style={styles.qrInfo}>
-                  <Text style={styles.qrInfoText}>
-                    Présentez ce QR code au marchand pour récupérer votre commande
-                  </Text>
-
-                  <View style={styles.reservationSummary}>
-                    <Text style={styles.summaryText}>
-                      📦 {selectedReservation.product.name}
-                    </Text>
-                    <Text style={styles.summaryText}>
-                      🏪 {selectedReservation.product.merchant.name}
-                    </Text>
-                    <Text style={styles.summaryText}>
-                      📊 Quantité: {selectedReservation.quantity}
-                    </Text>
-                    <Text style={styles.summaryText}>
-                      💰 Total: {Math.round(selectedReservation.total_amount || 0).toLocaleString()} F CFA
-                    </Text>
-                  </View>
-                </View>
+              <View style={{ backgroundColor: theme.colors.neutral[50], padding: theme.spacing.md, borderRadius: theme.radius.md, gap: theme.spacing.sm }}>
+                <Typography variant="caption">
+                  📦 {selectedReservation.product.name}
+                </Typography>
+                <Typography variant="caption">
+                  🏪 {selectedReservation.product.merchant.name}
+                </Typography>
+                <Typography variant="caption">
+                  📊 Quantité: {selectedReservation.quantity}
+                </Typography>
+                <Typography variant="caption" weight="semibold">
+                  💰 Total: {Math.round(selectedReservation.total_amount || 0).toLocaleString()} F CFA
+                </Typography>
               </View>
-            )}
+            </View>
           </View>
-        </View>
-      </Modal>
+        )}
+      </Modal2025>
     </View>
   )
 }
@@ -488,130 +521,32 @@ const ReservationsScreen: React.FC<Props> = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f8f9fa',
   },
-  header: {
-    backgroundColor: '#10B981',
-    paddingHorizontal: 20,
-    paddingTop: 40,
-    paddingBottom: 20,
-  },
-  headerTitle: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#ffffff',
-    marginBottom: 4,
-  },
-  headerSubtitle: {
-    fontSize: 14,
-    color: '#ffffff',
-    opacity: 0.9,
-  },
+  header: {},
   tabsContainer: {
     flexDirection: 'row',
-    backgroundColor: '#ffffff',
-    marginHorizontal: 16,
-    marginTop: 16,
-    borderRadius: 12,
-    padding: 4,
   },
-  tab: {
-    flex: 1,
-    paddingVertical: 12,
-    alignItems: 'center',
-    borderRadius: 8,
-  },
-  activeTab: {
-    backgroundColor: '#10B981',
-  },
-  tabText: {
-    fontSize: 14,
-    fontWeight: '500',
-    color: '#6B7280',
-  },
-  activeTabText: {
-    color: '#ffffff',
-  },
-  tabCount: {
-    fontSize: 12,
-    color: '#9CA3AF',
-    marginTop: 2,
-  },
-  activeTabCount: {
-    color: '#ffffff',
-    opacity: 0.9,
-  },
+  tab: {},
   listContent: {
     padding: 16,
     paddingBottom: 100,
-  },
-  reservationCard: {
-    backgroundColor: '#ffffff',
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 12,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
   },
   reservationHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'flex-start',
-    marginBottom: 12,
-  },
-  syncInfo: {
-    fontSize: 12,
-    color: '#0EA5E9',
-    fontWeight: '500',
-    marginBottom: 8,
-  },
-  reservationCode: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#1F2937',
-  },
-  reservationDate: {
-    fontSize: 12,
-    color: '#6B7280',
-    marginTop: 2,
   },
   statusContainer: {
     alignItems: 'flex-end',
-    gap: 4,
-  },
-  statusBadge: {
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 12,
-  },
-  statusText: {
-    color: '#ffffff',
-    fontSize: 12,
-    fontWeight: '600',
-  },
-  paymentBadge: {
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 12,
-  },
-  paymentText: {
-    color: '#ffffff',
-    fontSize: 10,
-    fontWeight: '600',
   },
   productSection: {
     flexDirection: 'row',
-    marginBottom: 12,
   },
   productImage: {
     width: 60,
     height: 60,
     borderRadius: 8,
     overflow: 'hidden',
-    marginRight: 12,
   },
   image: {
     width: '100%',
@@ -620,204 +555,29 @@ const styles = StyleSheet.create({
   productInfo: {
     flex: 1,
   },
-  productName: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#1F2937',
-    marginBottom: 4,
-  },
-  merchantName: {
-    fontSize: 14,
-    color: '#6B7280',
-    marginBottom: 8,
-  },
   quantityPriceContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
   },
-  quantity: {
-    fontSize: 14,
-    color: '#6B7280',
-  },
-  totalAmount: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#10B981',
-  },
   pickupSection: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 8,
-    paddingTop: 8,
-    borderTopWidth: 1,
-    borderTopColor: '#F3F4F6',
-  },
-  pickupText: {
-    fontSize: 14,
-    color: '#6B7280',
-    marginLeft: 8,
   },
   notesSection: {
     flexDirection: 'row',
     alignItems: 'flex-start',
-    marginBottom: 8,
-  },
-  notesText: {
-    fontSize: 14,
-    color: '#6B7280',
-    marginLeft: 8,
-    flex: 1,
   },
   actionsContainer: {
     flexDirection: 'row',
     justifyContent: 'flex-end',
-    gap: 8,
-    marginTop: 12,
-    paddingTop: 12,
-    borderTopWidth: 1,
-    borderTopColor: '#F3F4F6',
-  },
-  qrButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#10B981',
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    borderRadius: 6,
-  },
-  qrButtonText: {
-    color: '#ffffff',
-    fontSize: 12,
-    fontWeight: '600',
-    marginLeft: 4,
-  },
-  detailsButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#ECFDF5',
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    borderRadius: 6,
-  },
-  detailsButtonText: {
-    color: '#10B981',
-    fontSize: 12,
-    fontWeight: '600',
-    marginLeft: 4,
-  },
-  cancelButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#FEE2E2',
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    borderRadius: 6,
-  },
-  cancelButtonText: {
-    color: '#EF4444',
-    fontSize: 12,
-    fontWeight: '600',
-    marginLeft: 4,
   },
   emptyContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    paddingVertical: 60,
   },
-  emptyTitle: {
-    fontSize: 20,
-    fontWeight: '600',
-    color: '#1F2937',
-    marginTop: 16,
-    marginBottom: 8,
-  },
-  emptySubtitle: {
-    fontSize: 16,
-    color: '#6B7280',
-    textAlign: 'center',
-    marginBottom: 24,
-    paddingHorizontal: 40,
-  },
-  browseButton: {
-    backgroundColor: '#10B981',
-    paddingHorizontal: 24,
-    paddingVertical: 12,
-    borderRadius: 8,
-  },
-  browseButtonText: {
-    color: '#ffffff',
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  qrModalOverlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 20,
-  },
-  qrModalContent: {
-    backgroundColor: '#ffffff',
-    borderRadius: 20,
-    width: '100%',
-    maxWidth: 350,
-  },
-  qrModalHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    padding: 20,
-    borderBottomWidth: 1,
-    borderBottomColor: '#E5E7EB',
-  },
-  qrModalTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: '#1F2937',
-  },
-  qrModalBody: {
-    padding: 20,
-    alignItems: 'center',
-  },
-  qrModalSubtitle: {
-    fontSize: 16,
-    color: '#6B7280',
-    marginBottom: 20,
-    textAlign: 'center',
-  },
-  qrCodeContainer: {
-    padding: 20,
-    backgroundColor: '#ffffff',
-    borderRadius: 12,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
-    marginBottom: 20,
-  },
-  qrInfo: {
-    width: '100%',
-  },
-  qrInfoText: {
-    fontSize: 14,
-    color: '#6B7280',
-    textAlign: 'center',
-    marginBottom: 16,
-    lineHeight: 20,
-  },
-  reservationSummary: {
-    backgroundColor: '#F9FAFB',
-    padding: 16,
-    borderRadius: 8,
-    gap: 8,
-  },
-  summaryText: {
-    fontSize: 14,
-    color: '#374151',
-  },
+  qrCodeContainer: {},
 })
 
 export default ReservationsScreen
