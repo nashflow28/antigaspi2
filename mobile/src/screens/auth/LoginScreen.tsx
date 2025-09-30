@@ -1,7 +1,6 @@
 import React, { useState } from 'react'
 import {
   View,
-  Text,
   TextInput,
   TouchableOpacity,
   StyleSheet,
@@ -15,12 +14,15 @@ import { useDispatch, useSelector } from 'react-redux'
 import { loginUser } from '../../store/slices/authSlice'
 import { AppDispatch, RootState } from '../../store'
 import { LoginCredentials } from '../../types'
+import { Button, Card, Typography } from '../../components/2025'
+import { useTheme } from '../../theme'
 
 interface Props {
   navigation: any
 }
 
 const LoginScreen: React.FC<Props> = ({ navigation }) => {
+  const theme = useTheme()
   const dispatch = useDispatch<AppDispatch>()
   const { loading, error } = useSelector((state: RootState) => state.auth)
 
@@ -50,24 +52,38 @@ const LoginScreen: React.FC<Props> = ({ navigation }) => {
 
   return (
     <KeyboardAvoidingView
-      style={styles.container}
+      style={[styles.container, { backgroundColor: theme.colors.background }]}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
-      <StatusBar backgroundColor="#10B981" barStyle="light-content" />
+      <StatusBar backgroundColor={theme.colors.primary[500]} barStyle="light-content" />
 
-      <ScrollView contentContainerStyle={styles.scrollContent} keyboardShouldPersistTaps="handled">
+      <ScrollView contentContainerStyle={[styles.scrollContent, { paddingHorizontal: theme.spacing.lg }]} keyboardShouldPersistTaps="handled">
         {/* Header */}
-        <View style={styles.header}>
-          <Text style={styles.title}>🌱 Antigaspi</Text>
-          <Text style={styles.subtitle}>Connectez-vous à votre compte</Text>
+        <View style={[styles.header, { alignItems: 'center', marginBottom: theme.spacing['2xl'] }]}>
+          <Typography variant="displayXl" weight="bold" style={{ color: theme.colors.primary[500], marginBottom: theme.spacing.sm }}>
+            🌱 Antigaspi
+          </Typography>
+          <Typography variant="body" color="secondary" style={{ textAlign: 'center' }}>
+            Connectez-vous à votre compte
+          </Typography>
         </View>
 
         {/* Form */}
-        <View style={styles.form}>
-          <View style={styles.inputContainer}>
-            <Text style={styles.label}>Email</Text>
+        <Card variant="elevated" style={{ padding: theme.spacing.lg, marginBottom: theme.spacing.lg }}>
+          <View style={{ marginBottom: theme.spacing.lg }}>
+            <Typography variant="body" weight="semibold" style={{ marginBottom: theme.spacing.sm }}>
+              Email
+            </Typography>
             <TextInput
-              style={styles.input}
+              style={[styles.input, {
+                backgroundColor: theme.colors.surface.light,
+                paddingHorizontal: theme.spacing.md,
+                paddingVertical: theme.spacing.sm,
+                borderRadius: theme.radius.md,
+                borderWidth: 1,
+                borderColor: theme.colors.border,
+                fontSize: 16
+              }]}
               placeholder="votre@email.com"
               value={credentials.email}
               onChangeText={(text) => setCredentials({ ...credentials, email: text })}
@@ -77,10 +93,20 @@ const LoginScreen: React.FC<Props> = ({ navigation }) => {
             />
           </View>
 
-          <View style={styles.inputContainer}>
-            <Text style={styles.label}>Mot de passe</Text>
+          <View style={{ marginBottom: theme.spacing.lg }}>
+            <Typography variant="body" weight="semibold" style={{ marginBottom: theme.spacing.sm }}>
+              Mot de passe
+            </Typography>
             <TextInput
-              style={styles.input}
+              style={[styles.input, {
+                backgroundColor: theme.colors.surface.light,
+                paddingHorizontal: theme.spacing.md,
+                paddingVertical: theme.spacing.sm,
+                borderRadius: theme.radius.md,
+                borderWidth: 1,
+                borderColor: theme.colors.border,
+                fontSize: 16
+              }]}
               placeholder="Votre mot de passe"
               value={credentials.password}
               onChangeText={(text) => setCredentials({ ...credentials, password: text })}
@@ -90,52 +116,66 @@ const LoginScreen: React.FC<Props> = ({ navigation }) => {
           </View>
 
           {error && (
-            <View style={styles.errorContainer}>
-              <Text style={styles.errorText}>{error}</Text>
+            <View style={{ backgroundColor: theme.colors.error[50], padding: theme.spacing.sm, borderRadius: theme.radius.md, marginBottom: theme.spacing.lg }}>
+              <Typography variant="caption" style={{ color: theme.colors.error[600], textAlign: 'center' }}>
+                {error}
+              </Typography>
             </View>
           )}
 
-          <TouchableOpacity
-            style={[styles.loginButton, loading && styles.disabledButton]}
+          <Button
+            variant="primary"
+            size="lg"
+            fullWidth
             onPress={handleLogin}
             disabled={loading}
+            loading={loading}
           >
-            <Text style={styles.loginButtonText}>
-              {loading ? 'Connexion...' : 'Se connecter'}
-            </Text>
-          </TouchableOpacity>
+            {loading ? 'Connexion...' : 'Se connecter'}
+          </Button>
+        </Card>
 
-          {/* Comptes de test */}
-          <View style={styles.testAccountsContainer}>
-            <Text style={styles.testAccountsTitle}>Comptes de test :</Text>
+        {/* Comptes de test */}
+        <Card variant="flat" style={{ backgroundColor: theme.colors.info[50], padding: theme.spacing.md, marginBottom: theme.spacing.lg }}>
+          <Typography variant="caption" weight="semibold" style={{ marginBottom: theme.spacing.sm, textAlign: 'center' }}>
+            Comptes de test :
+          </Typography>
 
-            <TouchableOpacity
-              style={styles.testButton}
-              onPress={() => setCredentials({
-                email: 'jean.dupont@email.com',
-                password: 'password'
-              })}
-            >
-              <Text style={styles.testButtonText}>👤 Consumer</Text>
-            </TouchableOpacity>
+          <Button
+            variant="secondary"
+            size="md"
+            fullWidth
+            style={{ marginBottom: theme.spacing.sm }}
+            onPress={() => setCredentials({
+              email: 'jean.dupont@email.com',
+              password: 'password'
+            })}
+          >
+            👤 Consumer
+          </Button>
 
-            <TouchableOpacity
-              style={styles.testButton}
-              onPress={() => setCredentials({
-                email: 'boulangerie.martin@email.com',
-                password: 'password'
-              })}
-            >
-              <Text style={styles.testButtonText}>🏪 Merchant</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
+          <Button
+            variant="secondary"
+            size="md"
+            fullWidth
+            onPress={() => setCredentials({
+              email: 'boulangerie.martin@email.com',
+              password: 'password'
+            })}
+          >
+            🏪 Merchant
+          </Button>
+        </Card>
 
         {/* Footer */}
-        <View style={styles.footer}>
-          <Text style={styles.footerText}>Pas encore de compte ?</Text>
+        <View style={[styles.footer, { flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }]}>
+          <Typography variant="caption" color="secondary" style={{ marginRight: theme.spacing.xs }}>
+            Pas encore de compte ?
+          </Typography>
           <TouchableOpacity onPress={() => navigation.navigate('Register')}>
-            <Text style={styles.linkText}>Créer un compte</Text>
+            <Typography variant="caption" weight="semibold" style={{ color: theme.colors.primary[500] }}>
+              Créer un compte
+            </Typography>
           </TouchableOpacity>
         </View>
       </ScrollView>
@@ -146,116 +186,14 @@ const LoginScreen: React.FC<Props> = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f8f9fa',
   },
   scrollContent: {
     flexGrow: 1,
     justifyContent: 'center',
-    paddingHorizontal: 20,
   },
-  header: {
-    alignItems: 'center',
-    marginBottom: 40,
-  },
-  title: {
-    fontSize: 36,
-    fontWeight: 'bold',
-    color: '#10B981',
-    marginBottom: 8,
-  },
-  subtitle: {
-    fontSize: 16,
-    color: '#6B7280',
-    textAlign: 'center',
-  },
-  form: {
-    marginBottom: 30,
-  },
-  inputContainer: {
-    marginBottom: 20,
-  },
-  label: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#374151',
-    marginBottom: 8,
-  },
-  input: {
-    backgroundColor: '#ffffff',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: '#D1D5DB',
-    fontSize: 16,
-  },
-  errorContainer: {
-    backgroundColor: '#FEE2E2',
-    padding: 12,
-    borderRadius: 8,
-    marginBottom: 20,
-  },
-  errorText: {
-    color: '#DC2626',
-    fontSize: 14,
-    textAlign: 'center',
-  },
-  loginButton: {
-    backgroundColor: '#10B981',
-    paddingVertical: 14,
-    borderRadius: 8,
-    alignItems: 'center',
-    marginBottom: 20,
-  },
-  disabledButton: {
-    opacity: 0.6,
-  },
-  loginButtonText: {
-    color: '#ffffff',
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  testAccountsContainer: {
-    backgroundColor: '#EEF2FF',
-    padding: 16,
-    borderRadius: 8,
-    marginBottom: 20,
-  },
-  testAccountsTitle: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#374151',
-    marginBottom: 12,
-    textAlign: 'center',
-  },
-  testButton: {
-    backgroundColor: '#6366F1',
-    paddingVertical: 8,
-    paddingHorizontal: 16,
-    borderRadius: 6,
-    marginVertical: 4,
-    alignItems: 'center',
-  },
-  testButtonText: {
-    color: '#ffffff',
-    fontSize: 14,
-    fontWeight: '500',
-  },
-  footer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  footerText: {
-    fontSize: 14,
-    color: '#6B7280',
-    marginRight: 4,
-  },
-  linkText: {
-    fontSize: 14,
-    color: '#10B981',
-    fontWeight: '600',
-  },
+  header: {},
+  input: {},
+  footer: {},
 })
 
 export default LoginScreen
