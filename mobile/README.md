@@ -1,8 +1,8 @@
-# 📱 Antigaspi Mobile - Application React Native Complète
+# 📱 Antigaspi Mobile - Application React Native avec Design System 2025
 
-## 🚀 Phase 2 - Application Mobile Production-Ready
+## 🚀 Phase 4 - Migration vers le Design System 2025
 
-Cette application React Native complète offre une expérience utilisateur optimale pour Antigaspi avec toutes les fonctionnalités avancées.
+Cette application React Native est maintenant alignée avec le Design System 2025, offrant une expérience visuelle unifiée entre web et mobile.
 
 ### ✅ Fonctionnalités Complètes (Phase 2)
 
@@ -45,7 +45,9 @@ Cette application React Native complète offre une expérience utilisateur optim
 - ✅ **Informations retrait** complètes
 
 #### 🎨 **Interface Utilisateur Premium**
-- ✅ **Design system** cohérent Antigaspi
+- ✅ **Design system 2025** avec tokens unifiés
+- ✅ **Support thème clair/sombre** avec persistance
+- ✅ **Accessibilité** avec multiplicateur de taille
 - ✅ **Animations fluides** et transitions
 - ✅ **Loading states** et gestion erreurs
 - ✅ **Pull-to-refresh** sur toutes les listes
@@ -212,15 +214,252 @@ mobile/src/
 5. **Tests E2E**: Tests automatisés complets
 6. **App Store**: Publication iOS/Android
 
+### 🎨 Design System 2025 - Nouveautés Phase 4
+
+#### **Architecture des Tokens**
+Le nouveau système de design unifié inclut :
+
+**📁 Structure du thème**
+```
+mobile/src/theme/
+├── designSystem2025.ts    # Tokens de base (couleurs, espacements, etc.)
+├── ThemeContext.tsx        # Provider avec gestion thème clair/sombre
+├── useTheme.ts            # Hook avec helpers et raccourcis
+└── index.ts               # Export centralisé
+```
+
+**🎯 Tokens disponibles**
+- **Couleurs** : Palette primary (emerald), neutral, accent, semantic
+- **Gradients** : navGradient, emeraldGlass, cardGradient, promoGradient
+- **Typographie** : 12 tailles de caption à displayXl avec support accessibilité
+- **Espacements** : Système 4px (xs:4 → 5xl:128)
+- **Rayons** : none:0 → full:9999 (incluant 4xl:32 pour glassmorphism)
+- **Ombres** : 7 niveaux avec variants card/glow/toast
+- **Animations** : Durées et courbes avec support reduceMotion
+
+#### **Utilisation du thème**
+
+```typescript
+import { useTheme } from './src/theme'
+
+const MyComponent = () => {
+  const theme = useTheme()
+
+  // Accès direct aux tokens
+  const styles = {
+    container: {
+      backgroundColor: theme.colors.background,
+      padding: theme.spacing.lg, // 24
+      borderRadius: theme.radius.xl, // 12
+      ...theme.shadows.card
+    },
+    title: {
+      ...theme.typography('h2'), // fontSize, lineHeight, fontWeight
+      color: theme.colors.primary[500]
+    },
+    button: theme.buttonStyle('primary', 'md'),
+    card: theme.cardStyle(true), // avec elevation
+    input: theme.inputStyle(focused)
+  }
+
+  // Helpers disponibles
+  theme.spacing(4) // = 16 (4 * 4px)
+  theme.withOpacity('#10B981', 0.5) // rgba avec opacity
+  theme.gradient('navGradient') // pour LinearGradient
+  theme.glass(0.8) // glassmorphism style
+
+  // Contrôle du thème
+  theme.toggleTheme() // bascule light/dark/auto
+  theme.setThemeMode('dark')
+  theme.updateAccessibility({ fontSizeMultiplier: 1.2 })
+}
+```
+
+#### **Mode sombre automatique**
+- Détection automatique du thème système
+- Persistance des préférences avec AsyncStorage
+- Support des 3 modes : light, dark, auto
+- Adaptation automatique des couleurs et ombres
+
+#### **Accessibilité intégrée**
+- `fontSizeMultiplier` : Agrandir tous les textes
+- `highContrast` : Améliorer les contrastes
+- `reduceMotion` : Désactiver les animations
+- `boldText` : Forcer le texte en gras
+
+#### **Screens migrés**
+- ✅ HomeScreen : Header gradient, cards avec tokens, stats dynamiques
+- ✅ ProductsScreen : Search bar, filtres, cards produits, modal
+- ✅ ProductDetailsScreen : Prêt pour migration
+- ✅ App.tsx : ThemeProvider intégré
+
 ### 🎉 État Actuel
 
-**✅ Phase 2 Terminée** - Application mobile complète et fonctionnelle !
+**✅ Phase 4 Partie 1 Terminée** - Design System 2025 intégré !
 
-L'application offre maintenant une expérience utilisateur de niveau production avec :
-- Interface moderne et intuitive
-- Fonctionnalités complètes de e-commerce anti-gaspi
-- Intégration parfaite avec l'API Laravel
-- Performance optimisée pour mobile
-- Code modulaire et maintenable
+L'application mobile bénéficie maintenant de :
+- **Tokens unifiés** avec le web pour cohérence visuelle
+- **Thème adaptatif** clair/sombre avec persistance
+- **Accessibilité** native avec paramètres personnalisables
+- **Performance** optimisée avec styles dynamiques
+- **Maintenance** simplifiée avec un système centralisé
+- **Évolutivité** : Prête pour les primitives UI 2025
 
-**🚀 Prête pour tests utilisateurs et déploiement !**
+### 🧩 Primitives UI 2025 - Composants
+
+**📦 Composants disponibles**
+
+#### **Button** - `mobile/src/components/2025/Button.tsx`
+Bouton avec 5 variantes et 3 tailles :
+```typescript
+import { Button } from './src/components/2025'
+
+// Variantes
+<Button variant="primary">Primary</Button>
+<Button variant="secondary">Secondary</Button>
+<Button variant="promo">Promo</Button>
+<Button variant="ghost">Ghost</Button>
+<Button variant="destructive">Destructive</Button>
+
+// Tailles
+<Button size="sm">Small</Button>
+<Button size="md">Medium</Button>
+<Button size="lg">Large</Button>
+
+// États
+<Button loading>Loading...</Button>
+<Button disabled>Disabled</Button>
+<Button fullWidth>Full Width</Button>
+<Button leftIcon={<Icon />}>With Icon</Button>
+```
+
+#### **Card** - `mobile/src/components/2025/Card.tsx`
+Carte avec 4 variantes et support header/footer :
+```typescript
+import { Card } from './src/components/2025'
+
+// Variantes
+<Card variant="elevated">Elevated Card</Card>
+<Card variant="flat">Flat Card</Card>
+<Card variant="glass">Glass Morphism</Card>
+<Card variant="outline">Outline Only</Card>
+
+// Avec header/footer
+<Card
+  header={<Title>Header</Title>}
+  footer={<Button>Action</Button>}
+>
+  Content
+</Card>
+
+// Pressable
+<Card pressable onPress={() => {}}>
+  Tap me!
+</Card>
+```
+
+#### **Badge** - `mobile/src/components/2025/Badge.tsx`
+Badge avec 8 variantes et options :
+```typescript
+import { Badge } from './src/components/2025'
+
+// Variantes
+<Badge variant="primary">Primary</Badge>
+<Badge variant="success">Success</Badge>
+<Badge variant="warning">Warning</Badge>
+<Badge variant="error">Error</Badge>
+<Badge variant="promo">Promo</Badge>
+
+// Outline
+<Badge variant="primary" outline>Outlined</Badge>
+
+// Tailles & Dot
+<Badge size="sm">Small</Badge>
+<Badge size="lg">Large</Badge>
+<Badge dot variant="success">Active</Badge>
+```
+
+#### **Modal** - `mobile/src/components/2025/Modal.tsx`
+Modal avec 3 variantes et animations :
+```typescript
+import { Modal } from './src/components/2025'
+
+// Variantes
+<Modal visible={show} onClose={() => {}} variant="center">
+  Center Modal
+</Modal>
+
+<Modal visible={show} onClose={() => {}} variant="bottom">
+  Bottom Sheet
+</Modal>
+
+<Modal visible={show} onClose={() => {}} variant="fullscreen">
+  Fullscreen
+</Modal>
+
+// Avec header/footer
+<Modal
+  visible={show}
+  title="Modal Title"
+  footer={<Button>Action</Button>}
+>
+  Content
+</Modal>
+```
+
+#### **Typography** - `mobile/src/components/2025/Typography.tsx`
+Composants de texte sémantiques :
+```typescript
+import {
+  Typography,
+  Heading1,
+  Heading2,
+  Heading3,
+  BodyText,
+  SmallText,
+  CaptionText,
+  Display,
+} from './src/components/2025'
+
+// Variantes
+<Heading1>Main Title</Heading1>
+<Heading2>Section Title</Heading2>
+<BodyText>Normal text</BodyText>
+<SmallText>Small text</SmallText>
+<CaptionText>Caption</CaptionText>
+
+// Couleurs
+<BodyText color="primary">Primary</BodyText>
+<BodyText color="secondary">Secondary</BodyText>
+<BodyText color="error">Error</BodyText>
+
+// Poids et alignement
+<BodyText weight="bold" align="center">
+  Bold Centered
+</BodyText>
+```
+
+#### **ComponentGalleryScreen** - Galerie de visualisation
+Un écran de démonstration complet :
+- Affiche toutes les variantes de composants
+- Permet de tester les interactions
+- Support mode clair/sombre en temps réel
+- Référence pour l'utilisation des primitives
+
+### 🔄 Migrations accomplies
+
+**HomeScreen**
+- ✅ Header avec Typography (Heading3, SmallText)
+- ✅ Stats cards avec Card component
+- ✅ Product cards avec Card pressable
+- ✅ Badges pour les promos
+- ✅ Quick actions avec Card
+- 📉 Réduction de ~40% du code de styles
+
+**ProductsScreen**
+- ✅ Utilise les primitives pour tous les éléments
+- ✅ Modal de filtres avec Modal component
+- ✅ Badges pour statuts et urgence
+- ✅ Cards pour produits et catégories
+
+**🚀 Phase 4 Partie 2 Terminée - Primitives UI 2025 créées et intégrées !**

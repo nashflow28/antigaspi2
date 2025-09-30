@@ -5,6 +5,7 @@ import AppNavigator from './src/navigation/AppNavigator'
 import { store, AppDispatch, RootState } from './src/store'
 import offlineService from './src/services/offlineService'
 import ConnectivityBanner from './src/components/ConnectivityBanner'
+import { ThemeProvider } from './src/theme'
 import {
   setConnectivity,
   setSyncQueueSize,
@@ -93,7 +94,9 @@ const AppContent: React.FC = () => {
 export default function App() {
   return (
     <Provider store={store}>
-      <AppContent />
+      <ThemeProvider>
+        <AppContent />
+      </ThemeProvider>
     </Provider>
   )
 }

@@ -1,7 +1,6 @@
 import React, { useEffect } from 'react'
 import {
   View,
-  Text,
   StyleSheet,
   ScrollView,
   TouchableOpacity,
@@ -13,6 +12,8 @@ import { useDispatch, useSelector } from 'react-redux'
 import { AppDispatch, RootState } from '../../store'
 import { fetchProducts, fetchCategories } from '../../store/slices/productsSlice'
 import { Ionicons } from '@expo/vector-icons'
+import { useTheme } from '../../theme'
+import { Card, Badge, Typography, Heading3, BodyText, SmallText, CaptionText } from '../../components/2025'
 
 interface Props {
   navigation: any
@@ -22,6 +23,7 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
   const dispatch = useDispatch<AppDispatch>()
   const { user } = useSelector((state: RootState) => state.auth)
   const { products, categories, loading } = useSelector((state: RootState) => state.products)
+  const theme = useTheme()
 
   const [refreshing, setRefreshing] = React.useState(false)
 
@@ -56,47 +58,55 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
   const featuredProducts = products.slice(0, 5)
   const totalSavings = products.reduce((sum, product) => sum + product.savings, 0)
 
+  const styles = createStyles(theme)
+
   return (
     <View style={styles.container}>
-      <StatusBar backgroundColor="#10B981" barStyle="light-content" />
+      <StatusBar backgroundColor={theme.colors.primary[500]} barStyle="light-content" />
 
       <ScrollView
         style={styles.scrollView}
         refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={['#10B981']} />
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={[theme.colors.primary[500]]} />
         }
       >
         {/* Header */}
         <View style={styles.header}>
           <View>
-            <Text style={styles.greeting}>
+            <Heading3 color="inverse">
               {getGreeting()}, {user?.first_name}! 👋
-            </Text>
-            <Text style={styles.subtitle}>Découvrez les meilleures offres du jour</Text>
+            </Heading3>
+            <SmallText color="inverse" style={{ opacity: 0.9, marginTop: theme.spacing.xs }}>
+              Découvrez les meilleures offres du jour
+            </SmallText>
           </View>
           <TouchableOpacity style={styles.profileButton}>
-            <Ionicons name="person-circle-outline" size={32} color="#ffffff" />
+            <Ionicons name="person-circle-outline" size={32} color={theme.colors.textInverse} />
           </TouchableOpacity>
         </View>
 
         {/* Stats Cards */}
         <View style={styles.statsContainer}>
-          <View style={styles.statCard}>
-            <Text style={styles.statNumber}>{products.length}</Text>
-            <Text style={styles.statLabel}>Produits disponibles</Text>
-            <Ionicons name="bag-outline" size={24} color="#10B981" />
-          </View>
+          <Card variant="elevated" style={styles.statCard}>
+            <Typography variant="h2">{products.length}</Typography>
+            <CaptionText color="secondary" align="center" style={{ marginBottom: theme.spacing.sm }}>
+              Produits disponibles
+            </CaptionText>
+            <Ionicons name="bag-outline" size={24} color={theme.colors.primary[500]} />
+          </Card>
 
-          <View style={styles.statCard}>
-            <Text style={styles.statNumber}>{Math.round(totalSavings).toLocaleString()}</Text>
-            <Text style={styles.statLabel}>F CFA économisés</Text>
-            <Ionicons name="trending-down-outline" size={24} color="#F59E0B" />
-          </View>
+          <Card variant="elevated" style={styles.statCard}>
+            <Typography variant="h2">{Math.round(totalSavings).toLocaleString()}</Typography>
+            <CaptionText color="secondary" align="center" style={{ marginBottom: theme.spacing.sm }}>
+              F CFA économisés
+            </CaptionText>
+            <Ionicons name="trending-down-outline" size={24} color={theme.colors.accent.orange} />
+          </Card>
         </View>
 
         {/* Categories */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Catégories populaires</Text>
+          <Heading3 style={{ marginBottom: theme.spacing.md }}>Catégories populaires</Heading3>
           <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.categoriesScroll}>
             {categories.map((category) => (
               <TouchableOpacity
@@ -105,9 +115,9 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
                 onPress={() => navigation.navigate('Products', { categoryId: category.id })}
               >
                 <View style={styles.categoryIcon}>
-                  <Text style={styles.categoryEmoji}>🥖</Text>
+                  <Typography style={styles.categoryEmoji}>🥖</Typography>
                 </View>
-                <Text style={styles.categoryName}>{category.name}</Text>
+                <CaptionText align="center" weight="medium">{category.name}</CaptionText>
               </TouchableOpacity>
             ))}
           </ScrollView>
@@ -116,68 +126,82 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
         {/* Featured Products */}
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>Offres du moment</Text>
+            <Heading3>Offres du moment</Heading3>
             <TouchableOpacity onPress={() => navigation.navigate('Products')}>
-              <Text style={styles.seeAllText}>Voir tout</Text>
+              <SmallText color="primary" weight="semibold">Voir tout</SmallText>
             </TouchableOpacity>
           </View>
 
           {featuredProducts.map((product) => (
-            <TouchableOpacity
+            <Card
               key={product.id}
-              style={styles.productCard}
+              variant="elevated"
+              pressable
               onPress={() => navigation.navigate('ProductDetails', { productId: product.id })}
+              style={styles.productCard}
             >
-              <View style={styles.productImage}>
-                <Text style={styles.productEmoji}>🥐</Text>
-              </View>
+              <View style={styles.productLayout}>
+                <View style={styles.productImage}>
+                  <Typography style={styles.productEmoji}>🥐</Typography>
+                </View>
 
-              <View style={styles.productInfo}>
-                <Text style={styles.productName}>{product.name}</Text>
-                <Text style={styles.merchantName}>{product.merchant.business_name}</Text>
+                <View style={styles.productInfo}>
+                  <BodyText weight="semibold">{product.name}</BodyText>
+                  <SmallText color="secondary" style={{ marginBottom: theme.spacing.sm }}>
+                    {product.merchant.business_name}
+                  </SmallText>
 
-                <View style={styles.priceContainer}>
-                  <Text style={styles.discountedPrice}>
-                    {Math.round(parseFloat(product.discounted_price)).toLocaleString()} F CFA
-                  </Text>
-                  <Text style={styles.originalPrice}>
-                    {Math.round(parseFloat(product.original_price)).toLocaleString()} F CFA
-                  </Text>
-                  <View style={styles.discountBadge}>
-                    <Text style={styles.discountText}>-{product.discount_percentage}%</Text>
+                  <View style={styles.priceContainer}>
+                    <BodyText color="primary" weight="bold">
+                      {Math.round(parseFloat(product.discounted_price)).toLocaleString()} F CFA
+                    </BodyText>
+                    <SmallText color="tertiary" style={{ textDecorationLine: 'line-through', marginRight: theme.spacing.sm }}>
+                      {Math.round(parseFloat(product.original_price)).toLocaleString()} F CFA
+                    </SmallText>
+                    <Badge variant="warning" size="sm">
+                      -{product.discount_percentage}%
+                    </Badge>
+                  </View>
+
+                  <View style={styles.productFooter}>
+                    <CaptionText color="error">
+                      Expire dans {product.days_until_expiration} jour(s)
+                    </CaptionText>
+                    <CaptionText color="secondary">Stock: {product.quantity_available}</CaptionText>
                   </View>
                 </View>
-
-                <View style={styles.productFooter}>
-                  <Text style={styles.expiryText}>
-                    Expire dans {product.days_until_expiration} jour(s)
-                  </Text>
-                  <Text style={styles.stockText}>Stock: {product.quantity_available}</Text>
-                </View>
               </View>
-            </TouchableOpacity>
+            </Card>
           ))}
         </View>
 
         {/* Quick Actions */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Actions rapides</Text>
+          <Heading3 style={{ marginBottom: theme.spacing.md }}>Actions rapides</Heading3>
           <View style={styles.quickActions}>
-            <TouchableOpacity
-              style={styles.quickAction}
+            <Card
+              variant="elevated"
+              pressable
               onPress={() => navigation.navigate('Reservations')}
-            >
-              <Ionicons name="bookmark-outline" size={24} color="#10B981" />
-              <Text style={styles.quickActionText}>Mes réservations</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
               style={styles.quickAction}
-              onPress={() => navigation.navigate('Products')}
             >
-              <Ionicons name="search-outline" size={24} color="#10B981" />
-              <Text style={styles.quickActionText}>Rechercher</Text>
-            </TouchableOpacity>
+              <Ionicons name="bookmark-outline" size={24} color={theme.colors.primary[500]} />
+              <SmallText align="center" weight="medium" style={{ marginTop: theme.spacing.sm }}>
+                Mes réservations
+              </SmallText>
+            </Card>
+
+            <Card
+              variant="elevated"
+              pressable
+              onPress={() => navigation.navigate('Products')}
+              style={styles.quickAction}
+            >
+              <Ionicons name="search-outline" size={24} color={theme.colors.primary[500]} />
+              <SmallText align="center" weight="medium" style={{ marginTop: theme.spacing.sm }}>
+                Rechercher
+              </SmallText>
+            </Card>
           </View>
         </View>
       </ScrollView>
@@ -185,132 +209,78 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
   )
 }
 
-const styles = StyleSheet.create({
+const createStyles = (theme: ReturnType<typeof useTheme>) => StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f8f9fa',
+    backgroundColor: theme.colors.backgroundSecondary,
   },
   scrollView: {
     flex: 1,
   },
   header: {
-    backgroundColor: '#10B981',
-    padding: 20,
-    paddingTop: 40,
+    backgroundColor: theme.colors.primary[500],
+    padding: theme.spacing.lg,
+    paddingTop: theme.spacing['2xl'],
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
   },
-  greeting: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#ffffff',
-  },
-  subtitle: {
-    fontSize: 14,
-    color: '#ffffff',
-    opacity: 0.9,
-    marginTop: 4,
-  },
   profileButton: {
-    padding: 4,
+    padding: theme.spacing.xs,
   },
   statsContainer: {
     flexDirection: 'row',
-    padding: 20,
-    gap: 12,
+    padding: theme.spacing.lg,
+    gap: theme.spacing.md,
   },
   statCard: {
     flex: 1,
-    backgroundColor: '#ffffff',
-    padding: 16,
-    borderRadius: 12,
     alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  statNumber: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#1F2937',
-    marginBottom: 4,
-  },
-  statLabel: {
-    fontSize: 12,
-    color: '#6B7280',
-    textAlign: 'center',
-    marginBottom: 8,
   },
   section: {
-    padding: 20,
+    padding: theme.spacing.lg,
   },
   sectionHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 16,
-  },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#1F2937',
-    marginBottom: 16,
-  },
-  seeAllText: {
-    fontSize: 14,
-    color: '#10B981',
-    fontWeight: '600',
+    marginBottom: theme.spacing.md,
   },
   categoriesScroll: {
-    marginHorizontal: -20,
-    paddingHorizontal: 20,
+    marginHorizontal: -theme.spacing.lg,
+    paddingHorizontal: theme.spacing.lg,
   },
   categoryCard: {
     alignItems: 'center',
-    marginRight: 16,
+    marginRight: theme.spacing.md,
     width: 80,
   },
   categoryIcon: {
     width: 60,
     height: 60,
-    backgroundColor: '#F3F4F6',
-    borderRadius: 30,
+    backgroundColor: theme.colors.backgroundTertiary,
+    borderRadius: theme.radius.full,
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 8,
+    marginBottom: theme.spacing.sm,
   },
   categoryEmoji: {
     fontSize: 24,
   },
-  categoryName: {
-    fontSize: 12,
-    color: '#374151',
-    textAlign: 'center',
-    fontWeight: '500',
-  },
   productCard: {
-    backgroundColor: '#ffffff',
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 12,
+    marginBottom: theme.spacing.md,
+  },
+  productLayout: {
     flexDirection: 'row',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
   },
   productImage: {
     width: 60,
     height: 60,
-    backgroundColor: '#F3F4F6',
-    borderRadius: 8,
+    backgroundColor: theme.colors.backgroundTertiary,
+    borderRadius: theme.radius.lg,
     justifyContent: 'center',
     alignItems: 'center',
-    marginRight: 12,
+    marginRight: theme.spacing.md,
   },
   productEmoji: {
     fontSize: 24,
@@ -318,79 +288,22 @@ const styles = StyleSheet.create({
   productInfo: {
     flex: 1,
   },
-  productName: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#1F2937',
-    marginBottom: 2,
-  },
-  merchantName: {
-    fontSize: 14,
-    color: '#6B7280',
-    marginBottom: 8,
-  },
   priceContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 8,
-  },
-  discountedPrice: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#10B981',
-    marginRight: 8,
-  },
-  originalPrice: {
-    fontSize: 14,
-    color: '#9CA3AF',
-    textDecorationLine: 'line-through',
-    marginRight: 8,
-  },
-  discountBadge: {
-    backgroundColor: '#FEF3C7',
-    paddingHorizontal: 6,
-    paddingVertical: 2,
-    borderRadius: 4,
-  },
-  discountText: {
-    fontSize: 12,
-    color: '#D97706',
-    fontWeight: '600',
+    marginBottom: theme.spacing.sm,
   },
   productFooter: {
     flexDirection: 'row',
     justifyContent: 'space-between',
   },
-  expiryText: {
-    fontSize: 12,
-    color: '#EF4444',
-  },
-  stockText: {
-    fontSize: 12,
-    color: '#6B7280',
-  },
   quickActions: {
     flexDirection: 'row',
-    gap: 12,
+    gap: theme.spacing.md,
   },
   quickAction: {
     flex: 1,
-    backgroundColor: '#ffffff',
-    padding: 16,
-    borderRadius: 12,
     alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  quickActionText: {
-    fontSize: 14,
-    color: '#374151',
-    fontWeight: '500',
-    marginTop: 8,
-    textAlign: 'center',
   },
 })
 
