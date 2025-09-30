@@ -149,9 +149,10 @@
 
 <script setup lang="ts">
 import { ref, reactive, onMounted } from 'vue'
-import { useAuthStore } from '@/stores/auth'
 import StarRating from './StarRating.vue'
 import { Edit, X, Save, Trash2, CheckCircle, XCircle } from 'lucide-vue-next'
+import apiService from '@/services/api'
+import type { ApiResponse } from '@/types'
 
 interface Props {
   reviewId: number
@@ -164,8 +165,6 @@ const emit = defineEmits<{
   deleted: []
   cancel: []
 }>()
-
-const authStore = useAuthStore()
 
 const form = reactive({
   rating: 0,
@@ -198,25 +197,18 @@ const showMessage = (type: 'success' | 'error', text: string) => {
 const loadReview = async () => {
   try {
     loading.value = true
-    const response = await fetch(`http://localhost:8000/api/reviews/${props.reviewId}`, {
-      headers: {
-        'Authorization': `Bearer ${authStore.token}`,
-        'Accept': 'application/json'
-      }
-    })
+    const response = await apiService.get<ApiResponse<any>>(`/reviews/${props.reviewId}`)
 
-    const data = await response.json()
-
-    if (response.ok && data.success) {
-      form.rating = data.data.rating
-      form.title = data.data.title || ''
-      form.comment = data.data.comment || ''
+    if (response.success) {
+      form.rating = response.data.rating
+      form.title = response.data.title || ''
+      form.comment = response.data.comment || ''
     } else {
-      showMessage('error', data.message || 'Impossible de charger l\'avis')
+      showMessage('error', response.message || 'Impossible de charger l\'avis')
     }
   } catch (error) {
-    // console.error('Error loading review:', error)
-    showMessage('error', 'Erreur de connexion')
+    const message = error instanceof Error ? error.message : null
+    showMessage('error', message || 'Une erreur est survenue. Veuillez réessayer.')
   } finally {
     loading.value = false
   }
@@ -243,35 +235,32 @@ const submitUpdate = async () => {
   submitting.value = true
 
   try {
-    const response = await fetch(`http://localhost:8000/api/reviews/${props.reviewId}`, {
-      method: 'PUT',
-      headers: {
-        'Authorization': `Bearer ${authStore.token}`,
-        'Accept': 'application/json',
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        rating: form.rating,
-        title: form.title || null,
-        comment: form.comment || null
-      })
+    const response = await apiService.updateReview(props.reviewId, {
+      rating: form.rating,
+      title: form.title || null,
+      comment: form.comment || null
     })
 
-    const data = await response.json()
-
-    if (response.ok && data.success) {
+    if (response.success) {
       showMessage('success', 'Avis mis à jour avec succès !')
-      emit('success', data.data)
+      emit('success', response.data)
     } else {
-      if (data.errors) {
-        errors.value = data.errors
+      const validationErrors = (response as typeof response & { errors?: Record<string, string[] | string> }).errors
+
+      if (validationErrors) {
+        errors.value = Object.fromEntries(
+          Object.entries(validationErrors).map(([field, messages]) => [
+            field,
+            Array.isArray(messages) ? messages[0] : messages
+          ])
+        )
       } else {
-        showMessage('error', data.message || 'Erreur lors de la mise à jour')
+        showMessage('error', response.message || 'Une erreur est survenue. Veuillez réessayer.')
       }
     }
   } catch (error) {
-    // console.error('Error updating review:', error)
-    showMessage('error', 'Erreur de connexion. Veuillez réessayer.')
+    const message = error instanceof Error ? error.message : null
+    showMessage('error', message || 'Une erreur est survenue. Veuillez réessayer.')
   } finally {
     submitting.value = false
   }
@@ -285,25 +274,17 @@ const deleteReview = async () => {
   deleting.value = true
 
   try {
-    const response = await fetch(`http://localhost:8000/api/reviews/${props.reviewId}`, {
-      method: 'DELETE',
-      headers: {
-        'Authorization': `Bearer ${authStore.token}`,
-        'Accept': 'application/json'
-      }
-    })
+    const response = await apiService.delete<ApiResponse<null>>(`/reviews/${props.reviewId}`)
 
-    const data = await response.json()
-
-    if (response.ok && data.success) {
+    if (response.success) {
       emit('deleted')
     } else {
-      showMessage('error', data.message || 'Erreur lors de la suppression')
+      showMessage('error', response.message || 'Erreur lors de la suppression')
       showDeleteConfirm.value = false
     }
   } catch (error) {
-    // console.error('Error deleting review:', error)
-    showMessage('error', 'Erreur de connexion')
+    const message = error instanceof Error ? error.message : null
+    showMessage('error', message || 'Une erreur est survenue. Veuillez réessayer.')
     showDeleteConfirm.value = false
   } finally {
     deleting.value = false

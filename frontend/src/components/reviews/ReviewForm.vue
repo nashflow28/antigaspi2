@@ -131,9 +131,9 @@
 
 <script setup lang="ts">
 import { ref, reactive } from 'vue'
-import { useAuthStore } from '@/stores/auth'
 import StarRating from './StarRating.vue'
 import { Star, Send, CheckCircle, XCircle } from 'lucide-vue-next'
+import apiService from '@/services/api'
 
 interface Product {
   id: number
@@ -156,8 +156,6 @@ const emit = defineEmits<{
   success: [review: any]
   cancel: []
 }>()
-
-const authStore = useAuthStore()
 
 const form = reactive({
   rating: 0,
@@ -206,27 +204,15 @@ const submitReview = async () => {
   submitting.value = true
 
   try {
-
-    const response = await fetch('http://localhost:8000/api/reviews', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${authStore.token}`,
-        'Accept': 'application/json',
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        merchant_id: props.merchantId,
-        product_id: form.product_id,
-        rating: form.rating,
-        title: form.title || null,
-        comment: form.comment || null
-      })
+    const response = await apiService.createReview({
+      merchant_id: props.merchantId,
+      product_id: form.product_id,
+      rating: form.rating,
+      title: form.title || null,
+      comment: form.comment || null
     })
 
-
-    const data = await response.json()
-
-    if (response.ok && data.success) {
+    if (response.success) {
       showMessage('success', 'Votre avis a été publié avec succès !')
 
       // Reset form
@@ -235,19 +221,24 @@ const submitReview = async () => {
       form.comment = ''
       form.product_id = props.productId || null
 
-      emit('success', data.data)
+      emit('success', response.data)
     } else {
-      if (response.status === 409) {
-        showMessage('error', data.message || 'Vous avez déjà donné un avis')
-      } else if (data.errors) {
-        errors.value = data.errors
+      const validationErrors = (response as typeof response & { errors?: Record<string, string[] | string> }).errors
+
+      if (validationErrors) {
+        errors.value = Object.fromEntries(
+          Object.entries(validationErrors).map(([field, messages]) => [
+            field,
+            Array.isArray(messages) ? messages[0] : messages
+          ])
+        )
       } else {
-        showMessage('error', data.message || 'Erreur lors de la publication de l\'avis')
+        showMessage('error', response.message || 'Une erreur est survenue. Veuillez réessayer.')
       }
     }
   } catch (error) {
-    // console.error('Error submitting review:', error)
-    showMessage('error', 'Erreur de connexion. Veuillez réessayer.')
+    const message = error instanceof Error ? error.message : null
+    showMessage('error', message || 'Une erreur est survenue. Veuillez réessayer.')
   } finally {
     submitting.value = false
   }
