@@ -1,5 +1,6 @@
 import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios'
 import AsyncStorage from '@react-native-async-storage/async-storage'
+import Constants from 'expo-constants'
 import {
   ApiResponse,
   AuthResponse,
@@ -17,11 +18,23 @@ import {
   MobileMoneyPaymentPayload
 } from '../types'
 
+// Configuration dynamique de l'API via app.json
+const getApiBaseUrl = (): string => {
+  const configUrl = Constants.expoConfig?.extra?.apiUrl
+  if (configUrl && typeof configUrl === 'string') {
+    return configUrl
+  }
+  // Fallback pour développement local
+  return 'http://localhost:8000/api'
+}
+
 class ApiService {
   private api: AxiosInstance
-  private baseURL = 'http://localhost:8000/api' // Votre backend Laravel
+  private baseURL: string
 
   constructor() {
+    this.baseURL = getApiBaseUrl()
+
     this.api = axios.create({
       baseURL: this.baseURL,
       timeout: 10000,

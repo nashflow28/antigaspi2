@@ -65,6 +65,7 @@ Route::prefix('products')->group(function () {
         // Routes d'écriture avec rate limiting strict
         Route::middleware('throttle:write')->group(function () {
             Route::post('/', [ProductController::class, 'store']); // Ajouter un produit (commerçant)
+            Route::post('/upload-image', [ProductController::class, 'uploadImage']); // Upload image produit
             Route::put('/{id}', [ProductController::class, 'update']); // Modifier un produit
             Route::delete('/{id}', [ProductController::class, 'destroy']); // Supprimer un produit
         });

@@ -10,6 +10,16 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios, { AxiosInstance } from 'axios';
 import { designSystem2025 } from '../theme/designSystem2025';
 
+// Configuration dynamique de l'API via app.json
+const getApiBaseUrl = (): string => {
+  const configUrl = Constants.expoConfig?.extra?.apiUrl
+  if (configUrl && typeof configUrl === 'string') {
+    return configUrl
+  }
+  // Fallback pour développement local
+  return 'http://localhost:8000/api'
+}
+
 // Configuration des notifications
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -49,7 +59,7 @@ class NotificationService {
   private listenersRegistered = false;
 
   constructor() {
-    this.baseURL = 'http://localhost:8000/api';
+    this.baseURL = getApiBaseUrl();
     this.http = axios.create({
       baseURL: this.baseURL,
       timeout: 10000,

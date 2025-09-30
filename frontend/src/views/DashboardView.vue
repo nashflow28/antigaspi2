@@ -356,6 +356,7 @@ import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { useWalletStore } from '@/stores/wallet'
 import { formatPrice } from '@/utils/currency'
+import apiService from '@/services/api'
 import {
   TrendingUp, DollarSign, Package, ShoppingBag, Leaf, TreePine,
   Clock, Calendar, ArrowRight, Search, User, Lightbulb, Wallet
@@ -425,20 +426,7 @@ const currentTip = computed(() => ecoTips.value[currentTipIndex.value])
 // Load recent reservations
 const loadRecentReservations = async () => {
   try {
-    const response = await fetch('http://localhost:8000/api/reservations?per_page=3', {
-      method: 'GET',
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${authStore.token}`
-      }
-    })
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`)
-    }
-
-    const data = await response.json()
+    const data = await apiService.get('/reservations?per_page=3')
     if (data.success && data.data) {
       // Transform API data to match dashboard interface
       recentReservations.value = data.data.map((res: any) => ({

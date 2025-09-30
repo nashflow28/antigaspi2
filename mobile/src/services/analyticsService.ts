@@ -8,6 +8,16 @@ import * as Device from 'expo-device';
 import { Platform } from 'react-native';
 import axios, { AxiosInstance } from 'axios';
 
+// Configuration dynamique de l'API via app.json
+const getApiBaseUrl = (): string => {
+  const configUrl = Constants.expoConfig?.extra?.apiUrl
+  if (configUrl && typeof configUrl === 'string') {
+    return configUrl
+  }
+  // Fallback pour développement local
+  return 'http://localhost:8000/api'
+}
+
 export interface AnalyticsEvent {
   name: string;
   category: string;
@@ -61,7 +71,7 @@ class AnalyticsService {
   private readonly MAX_QUEUE_SIZE = 100;
 
   constructor() {
-    this.baseURL = 'http://localhost:8000/api';
+    this.baseURL = getApiBaseUrl();
     this.sessionId = this.generateSessionId();
     this.http = axios.create({ baseURL: this.baseURL });
   }

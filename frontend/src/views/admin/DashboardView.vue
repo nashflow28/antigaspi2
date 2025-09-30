@@ -368,6 +368,7 @@
 import { computed, nextTick, onMounted, ref, watch } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 import { formatPrice } from '@/utils/currency'
+import apiService from '@/services/api'
 import AdminModal from '@/components/ui/AdminModal.vue'
 import DashboardLayout from '@/components/ui/DashboardLayout.vue'
 import { useDashboardLayout } from '@/composables/useDashboardLayout'
@@ -611,20 +612,7 @@ const getAlertIconClass = (type: string): string => {
 
 const loadDashboardData = async () => {
   try {
-    const response = await fetch('http://localhost:8000/api/admin/dashboard', {
-      method: 'GET',
-      headers: {
-        Accept: 'application/json',
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${authStore.token}`
-      }
-    })
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`)
-    }
-
-    const data = await response.json()
+    const data = await apiService.get('/admin/dashboard')
     if (data.success) {
       stats.value = data.data.stats
       topMerchants.value = data.data.topMerchants
@@ -701,20 +689,7 @@ const loadDemoData = () => {
 
 const loadSystemHealth = async () => {
   try {
-    const response = await fetch('http://localhost:8000/api/admin/system-health', {
-      method: 'GET',
-      headers: {
-        Accept: 'application/json',
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${authStore.token}`
-      }
-    })
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`)
-    }
-
-    const data = await response.json()
+    const data = await apiService.get('/admin/system-health')
     if (data.success) {
       systemHealth.value = data.data
     }
