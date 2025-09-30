@@ -27,6 +27,16 @@ import type {
   MerchantLocation
 } from '@/types'
 
+export interface MerchantReviewProductSummary {
+  id: number
+  name: string
+  review_count: number
+}
+
+export interface ReviewResponsePayload {
+  response: string
+}
+
 const DEFAULT_API_BASE_URL = 'http://localhost:8000/api'
 const API_BASE_URL = (import.meta?.env?.VITE_API_BASE_URL as string | undefined) || DEFAULT_API_BASE_URL
 
@@ -122,6 +132,52 @@ class ApiService {
       method: 'PATCH',
       body: data ? JSON.stringify(data) : undefined
     }, withAuth)
+  }
+
+  // Reviews
+  async getMerchantReviewProducts(): Promise<ApiResponse<MerchantReviewProductSummary[]>> {
+    return this.get<ApiResponse<MerchantReviewProductSummary[]>>('/merchants/reviews/products', true)
+  }
+
+  async getMerchantReviews(params: Record<string, string | number | boolean | null | undefined> = {}): Promise<ApiResponse<Review[]>> {
+    const searchParams = new URLSearchParams()
+
+    Object.entries(params).forEach(([key, value]) => {
+      if (value !== undefined && value !== null && value !== '') {
+        searchParams.append(key, String(value))
+      }
+    })
+
+    const query = searchParams.toString()
+    const endpoint = query ? `/merchants/reviews/list?${query}` : '/merchants/reviews/list'
+
+    return this.get<ApiResponse<Review[]>>(endpoint, true)
+  }
+
+  async createReview(data: {
+    merchant_id: number
+    product_id?: number | null
+    rating: number
+    title?: string | null
+    comment?: string | null
+  }): Promise<ApiResponse<Review>> {
+    return this.post<ApiResponse<Review>>('/reviews', data, true)
+  }
+
+  async updateReview(reviewId: number, data: {
+    rating: number
+    title?: string | null
+    comment?: string | null
+  }): Promise<ApiResponse<Review>> {
+    return this.put<ApiResponse<Review>>(`/reviews/${reviewId}`, data, true)
+  }
+
+  async respondToReview(reviewId: number, payload: ReviewResponsePayload, { update = false } = {}): Promise<ApiResponse<Review>> {
+    if (update) {
+      return this.put<ApiResponse<Review>>(`/merchants/reviews/${reviewId}/response`, payload, true)
+    }
+
+    return this.post<ApiResponse<Review>>(`/merchants/reviews/${reviewId}/respond`, payload, true)
   }
 
   async delete<T>(url: string, withAuth = true): Promise<T> {

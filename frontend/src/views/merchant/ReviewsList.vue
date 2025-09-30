@@ -233,6 +233,7 @@ import { ref, onMounted, computed } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 import { useDashboardLayout } from '@/composables/useDashboardLayout'
 import MerchantResponse from '@/components/reviews/MerchantResponse.vue'
+import apiService from '@/services/api'
 import {
   ChatBubbleLeftRightIcon,
   StarIcon,
@@ -299,25 +300,12 @@ const getInitials = (name: string) => {
 
 const loadProducts = async () => {
   try {
-    const response = await fetch('http://localhost:8000/api/merchants/reviews/products', {
-      method: 'GET',
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${authStore.token}`
-      }
-    })
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`)
+    const { success, data } = await apiService.getMerchantReviewProducts()
+    if (success) {
+      products.value = data
     }
-
-    const data = await response.json()
-    if (data.success) {
-      products.value = data.data
-    }
-  } catch (err) {
-    // console.error('Error loading products:', err)
+  } catch (_error) {
+    // console.error('Error loading products:', _error)
   }
 }
 
@@ -326,36 +314,20 @@ const loadReviews = async (page: number = 1) => {
   error.value = null
 
   try {
-    const params = new URLSearchParams({
-      page: page.toString(),
-      per_page: '20'
+    const response = await apiService.getMerchantReviews({
+      page,
+      per_page: 20,
+      rating: filters.value.rating,
+      product_id: filters.value.product_id,
+      verified_only: filters.value.verified_only,
+      sort: filters.value.sort
     })
 
-    // Add filters
-    if (filters.value.rating) params.append('rating', filters.value.rating)
-    if (filters.value.product_id) params.append('product_id', filters.value.product_id)
-    if (filters.value.verified_only) params.append('verified_only', filters.value.verified_only)
-    if (filters.value.sort) params.append('sort', filters.value.sort)
-
-    const response = await fetch(`http://localhost:8000/api/merchants/reviews/list?${params}`, {
-      method: 'GET',
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${authStore.token}`
-      }
-    })
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`)
-    }
-
-    const data = await response.json()
-    if (data.success) {
-      reviews.value = data.data
-      pagination.value = data.pagination
+    if (response.success) {
+      reviews.value = response.data as Review[]
+      pagination.value = response.pagination || null
     } else {
-      throw new Error(data.message || 'Erreur lors du chargement')
+      throw new Error(response.message || 'Erreur lors du chargement')
     }
   } catch (err) {
     // console.error('Error loading reviews:', err)
@@ -396,7 +368,6 @@ const onResponseDeleted = (reviewId: number) => {
 }
 
 onMounted(async () => {
-  // Check if user is merchant
   if (authStore.user?.role !== 'merchant') {
     error.value = 'Accès réservé aux commerçants'
     return

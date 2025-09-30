@@ -121,7 +121,6 @@
 
 <script setup lang="ts">
 import { ref, watch } from 'vue'
-import { useAuthStore } from '@/stores/auth'
 import {
   BuildingStorefrontIcon,
   PencilIcon,
@@ -129,6 +128,8 @@ import {
   CheckCircleIcon,
   ExclamationTriangleIcon
 } from '@heroicons/vue/24/outline'
+import apiService from '@/services/api'
+import type { ApiResponse } from '@/types'
 
 interface Review {
   id: number
@@ -147,7 +148,6 @@ const emit = defineEmits<{
   responseDeleted: [reviewId: number]
 }>()
 
-const authStore = useAuthStore()
 const responseText = ref('')
 const isEditing = ref(false)
 const submitting = ref(false)
@@ -187,30 +187,12 @@ const submitResponse = async () => {
 
   try {
     const isUpdate = isEditing.value && props.review.merchant_response
-    const endpoint = isUpdate
-      ? `http://localhost:8000/api/merchants/reviews/${props.review.id}/response`
-      : `http://localhost:8000/api/merchants/reviews/${props.review.id}/respond`
+    const data = await apiService.respondToReview(
+      props.review.id,
+      { response: responseText.value.trim() },
+      { update: Boolean(isUpdate) }
+    )
 
-    const method = isUpdate ? 'PUT' : 'POST'
-
-    const response = await fetch(endpoint, {
-      method,
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${authStore.token}`
-      },
-      body: JSON.stringify({
-        response: responseText.value.trim()
-      })
-    })
-
-    if (!response.ok) {
-      const errorData = await response.json()
-      throw new Error(errorData.message || `HTTP error! status: ${response.status}`)
-    }
-
-    const data = await response.json()
     if (data.success) {
       // Emit the appropriate event
       if (isUpdate) {
@@ -234,8 +216,8 @@ const submitResponse = async () => {
       throw new Error(data.message || 'Erreur lors de l\'envoi')
     }
   } catch (err) {
-    // console.error('Error submitting response:', err)
-    error.value = err instanceof Error ? err.message : 'Erreur inconnue'
+    const message = err instanceof Error ? err.message : null
+    error.value = message || 'Une erreur est survenue. Veuillez réessayer.'
   } finally {
     submitting.value = false
   }
@@ -250,21 +232,8 @@ const deleteResponse = async () => {
   error.value = null
 
   try {
-    const response = await fetch(`http://localhost:8000/api/merchants/reviews/${props.review.id}/response`, {
-      method: 'DELETE',
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${authStore.token}`
-      }
-    })
+    const data = await apiService.delete<ApiResponse<any>>(`/merchants/reviews/${props.review.id}/response`)
 
-    if (!response.ok) {
-      const errorData = await response.json()
-      throw new Error(errorData.message || `HTTP error! status: ${response.status}`)
-    }
-
-    const data = await response.json()
     if (data.success) {
       emit('responseDeleted', props.review.id)
       successMessage.value = 'Réponse supprimée avec succès'
@@ -276,8 +245,8 @@ const deleteResponse = async () => {
       throw new Error(data.message || 'Erreur lors de la suppression')
     }
   } catch (err) {
-    // console.error('Error deleting response:', err)
-    error.value = err instanceof Error ? err.message : 'Erreur inconnue'
+    const message = err instanceof Error ? err.message : null
+    error.value = message || 'Une erreur est survenue. Veuillez réessayer.'
   } finally {
     deleting.value = false
   }
