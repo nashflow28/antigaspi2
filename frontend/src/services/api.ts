@@ -139,6 +139,10 @@ class ApiService {
     return this.get<ApiResponse<MerchantReviewProductSummary[]>>('/merchants/reviews/products', true)
   }
 
+  async getMerchantReviewsDashboard<T = unknown>(): Promise<ApiResponse<T>> {
+    return this.get<ApiResponse<T>>('/merchants/reviews/dashboard', true)
+  }
+
   async getMerchantReviews(params: Record<string, string | number | boolean | null | undefined> = {}): Promise<ApiResponse<Review[]>> {
     const searchParams = new URLSearchParams()
 
