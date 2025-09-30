@@ -407,6 +407,7 @@ import {
   CreditCardIcon,
   ArrowUturnLeftIcon
 } from '@heroicons/vue/24/outline'
+import apiService from '@/services/api'
 import ConfirmModal from '@/components/ui/ConfirmModal.vue'
 import NotificationToast from '@/components/ui/NotificationToast.vue'
 import DashboardLayout from '@/components/ui/DashboardLayout.vue'
@@ -476,12 +477,14 @@ interface ConfirmModalData {
   onConfirm: () => void
 }
 
-const stats = ref<ModerationStats>({
+const defaultModerationStats: ModerationStats = {
   activeMerchants: 0,
   pendingMerchants: 0,
   totalProducts: 0,
   totalReservations: 0
-})
+}
+
+const stats = ref<ModerationStats>({ ...defaultModerationStats })
 
 const activeTab = ref('pending')
 const loading = ref(false)
@@ -549,124 +552,77 @@ const formatPrice = (price: number): string => {
   return numberFormatter.format(price ?? 0)
 }
 
-const loadModerationData = async () => {
+const loadModerationData = async ({ notifyOnError = true }: { notifyOnError?: boolean } = {}) => {
   loading.value = true
   try {
-    const response = await fetch('http://localhost:8000/api/admin/moderation', {
-      headers: {
-        Accept: 'application/json',
-        Authorization: `Bearer ${localStorage.getItem('auth_token')}`
-      }
-    })
-    const data = await response.json()
+    const response = await apiService.getAdminModerationData()
 
-    if (data.success) {
-      stats.value = data.stats
-      pendingMerchants.value = data.pendingMerchants
-      productsToModerate.value = data.productsToModerate
-      flaggedReservations.value = data.flaggedReservations
-    } else {
-      throw new Error(data.message || 'Erreur API')
+    if (!response.success) {
+      throw new Error(response.message || 'Erreur lors du chargement des données de modération')
     }
+
+    const payload = response.data ?? {
+      stats: defaultModerationStats,
+      pendingMerchants: [],
+      productsToModerate: [],
+      flaggedReservations: []
+    }
+
+    const statsData = payload.stats ?? defaultModerationStats
+    stats.value = {
+      activeMerchants: statsData.activeMerchants ?? defaultModerationStats.activeMerchants,
+      pendingMerchants: statsData.pendingMerchants ?? defaultModerationStats.pendingMerchants,
+      totalProducts: statsData.totalProducts ?? defaultModerationStats.totalProducts,
+      totalReservations: statsData.totalReservations ?? defaultModerationStats.totalReservations
+    }
+
+    const pending = Array.isArray(payload.pendingMerchants)
+      ? payload.pendingMerchants
+      : Array.isArray((payload as Record<string, unknown>).pending_merchants)
+        ? (payload as Record<string, unknown>).pending_merchants
+        : []
+    pendingMerchants.value = pending as PendingMerchant[]
+
+    const products = Array.isArray(payload.productsToModerate)
+      ? payload.productsToModerate
+      : Array.isArray((payload as Record<string, unknown>).products_to_moderate)
+        ? (payload as Record<string, unknown>).products_to_moderate
+        : []
+    productsToModerate.value = products as ProductToModerate[]
+
+    const reservations = Array.isArray(payload.flaggedReservations)
+      ? payload.flaggedReservations
+      : Array.isArray((payload as Record<string, unknown>).flagged_reservations)
+        ? (payload as Record<string, unknown>).flagged_reservations
+        : []
+    flaggedReservations.value = reservations as FlaggedReservation[]
+
+    return response
   } catch (error) {
-    showNotification('error', 'Erreur de chargement', 'Impossible de charger les données. Utilisation des données de démonstration.')
-    loadDemoData()
+    if (notifyOnError) {
+      const message = error instanceof Error
+        ? error.message
+        : 'Une erreur est survenue lors du chargement des données de modération.'
+      showNotification('error', 'Erreur de chargement', message)
+    }
+    throw error
   } finally {
     loading.value = false
   }
 }
 
-const loadDemoData = () => {
-  stats.value = {
-    activeMerchants: 18,
-    pendingMerchants: 3,
-    totalProducts: 124,
-    totalReservations: 12
-  }
-
-  pendingMerchants.value = [
-    {
-      id: 1,
-      business_name: 'Boulangerie du Centre',
-      owner_name: 'Kouamé Isabelle',
-      email: 'isabelle@boulangerieducentre.ci',
-      phone: '+225 07 23 45 67 89',
-      address: 'Plateau, Abidjan',
-      business_type: 'Boulangerie artisanale',
-      description: 'Pains et viennoiseries artisanales préparées chaque matin avec des ingrédients locaux.',
-      created_at: '2024-09-14T09:30:00Z'
-    },
-    {
-      id: 2,
-      business_name: 'Fruits & Fraîcheur',
-      owner_name: 'Traoré Mamadou',
-      email: 'contact@fruitsfraicheur.ci',
-      phone: '+225 05 11 22 33 44',
-      address: 'Yopougon, Abidjan',
-      business_type: 'Primeur',
-      description: 'Sélection de fruits et légumes de saison issus de producteurs locaux.',
-      created_at: '2024-09-13T14:15:00Z'
-    },
-    {
-      id: 3,
-      business_name: 'Saveurs d\'Afrique',
-      owner_name: 'Diabaté Aminata',
-      email: 'hello@saveursdafrique.ci',
-      phone: '+225 07 98 76 54 32',
-      address: 'Cocody, Abidjan',
-      business_type: 'Restaurant',
-      description: 'Cuisine fusion africaine avec des menus anti-gaspillage créatifs.',
-      created_at: '2024-09-12T11:20:00Z'
-    }
-  ]
-
-  productsToModerate.value = [
-    {
-      id: 1,
-      name: 'Assortiment de viennoiseries',
-      merchant_name: 'Boulangerie du Centre',
-      price: 2500,
-      image_url: 'https://images.unsplash.com/photo-1499636136210-6f4ee915583e?auto=format&fit=crop&w=600&q=80',
-      description: 'Lot de 6 viennoiseries du jour à récupérer avant 18h.',
-      category: 'Boulangerie'
-    },
-    {
-      id: 2,
-      name: 'Panier de fruits de saison',
-      merchant_name: 'Fruits & Fraîcheur',
-      price: 3500,
-      image_url: 'https://images.unsplash.com/photo-1582407947304-fd86f028f716?auto=format&fit=crop&w=600&q=80',
-      description: 'Panier composé de fruits variés en fin de marché.',
-      category: 'Primeur'
-    }
-  ]
-
-  flaggedReservations.value = [
-    {
-      id: 1,
-      product_name: 'Pain artisanal',
-      customer_name: 'Kouassi Jean',
-      merchant_name: 'Boulangerie du Centre',
-      total_price: 500,
-      flag_reason: 'Produit non conforme',
-      created_at: '2024-09-13T14:20:00Z'
-    },
-    {
-      id: 2,
-      product_name: 'Fruits de saison',
-      customer_name: 'Marie Ouattara',
-      merchant_name: 'Marché Fruits',
-      total_price: 1200,
-      flag_reason: 'Problème de livraison',
-      created_at: '2024-09-14T10:45:00Z'
-    }
-  ]
-}
-
 const refreshData = async () => {
   showNotification('info', 'Actualisation', 'Chargement des données...')
-  await loadModerationData()
-  showNotification('success', 'Actualisation terminée', 'Les données ont été rechargées avec succès.')
+  try {
+    const response = await loadModerationData({ notifyOnError: false })
+    const successMessage = response?.message || 'Les données ont été rechargées avec succès.'
+    showNotification('success', 'Actualisation terminée', successMessage)
+  } catch (error) {
+    const message = error instanceof Error
+      ? error.message
+      : 'Une erreur est survenue lors de l’actualisation des données.'
+    showNotification('error', 'Actualisation impossible', message)
+  }
 }
 
 const showNotification = (type: Notification['type'], title: string, message: string) => {
@@ -717,31 +673,19 @@ const approveMerchant = async (merchant: PendingMerchant) => {
     `Êtes-vous sûr de vouloir approuver la demande d'inscription de ${merchant.business_name} ?`,
     async () => {
       try {
-        const response = await fetch(`http://localhost:8000/api/admin/merchants/${merchant.id}/approve`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Accept: 'application/json',
-            Authorization: `Bearer ${localStorage.getItem('auth_token')}`
-          }
-        })
+        const response = await apiService.approveMerchant(merchant.id)
 
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`)
+        if (!response.success) {
+          throw new Error(response.message || "Erreur lors de l'approbation")
         }
 
-        const data = await response.json()
-
-        if (data.success) {
-          pendingMerchants.value = pendingMerchants.value.filter(m => m.id !== merchant.id)
-          stats.value.pendingMerchants--
-          stats.value.activeMerchants++
-          showNotification('success', 'Commerçant approuvé', `${merchant.business_name} a été approuvé avec succès.`)
-        } else {
-          throw new Error(data.message || "Erreur lors de l'approbation")
-        }
+        pendingMerchants.value = pendingMerchants.value.filter(m => m.id !== merchant.id)
+        stats.value.pendingMerchants = Math.max(0, stats.value.pendingMerchants - 1)
+        stats.value.activeMerchants = Math.max(0, stats.value.activeMerchants + 1)
+        showNotification('success', 'Commerçant approuvé', response.message ?? `${merchant.business_name} a été approuvé avec succès.`)
       } catch (error) {
-        showNotification('error', "Erreur d'approbation", `Impossible d'approuver ${merchant.business_name}. ${error instanceof Error ? error.message : 'Erreur inconnue'}`)
+        const message = error instanceof Error ? error.message : 'Erreur inconnue'
+        showNotification('error', "Erreur d'approbation", `Impossible d'approuver ${merchant.business_name}. ${message}`)
       }
     },
     'Approuver',
@@ -756,31 +700,18 @@ const rejectMerchant = async (merchant: PendingMerchant) => {
     `Êtes-vous sûr de vouloir rejeter la demande d'inscription de ${merchant.business_name} ? Cette action peut être définitive.`,
     async () => {
       try {
-        const response = await fetch(`http://localhost:8000/api/admin/merchants/${merchant.id}/reject`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Accept: 'application/json',
-            Authorization: `Bearer ${localStorage.getItem('auth_token')}`
-          },
-          body: JSON.stringify({ reason: "Rejeté par l'administrateur" })
-        })
+        const response = await apiService.rejectMerchant(merchant.id, { reason: "Rejeté par l'administrateur" })
 
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`)
+        if (!response.success) {
+          throw new Error(response.message || 'Erreur lors du rejet')
         }
 
-        const data = await response.json()
-
-        if (data.success) {
-          pendingMerchants.value = pendingMerchants.value.filter(m => m.id !== merchant.id)
-          stats.value.pendingMerchants--
-          showNotification('success', 'Commerçant rejeté', `${merchant.business_name} a été rejeté.`)
-        } else {
-          throw new Error(data.message || 'Erreur lors du rejet')
-        }
+        pendingMerchants.value = pendingMerchants.value.filter(m => m.id !== merchant.id)
+        stats.value.pendingMerchants = Math.max(0, stats.value.pendingMerchants - 1)
+        showNotification('success', 'Commerçant rejeté', response.message ?? `${merchant.business_name} a été rejeté.`)
       } catch (error) {
-        showNotification('error', 'Erreur de rejet', `Impossible de rejeter ${merchant.business_name}. ${error instanceof Error ? error.message : 'Erreur inconnue'}`)
+        const message = error instanceof Error ? error.message : 'Erreur inconnue'
+        showNotification('error', 'Erreur de rejet', `Impossible de rejeter ${merchant.business_name}. ${message}`)
       }
     },
     'Rejeter',
@@ -795,30 +726,18 @@ const approveProduct = async (product: ProductToModerate) => {
     `Valider la mise en ligne de ${product.name} ?`,
     async () => {
       try {
-        const response = await fetch(`http://localhost:8000/api/admin/products/${product.id}/approve`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Accept: 'application/json',
-            Authorization: `Bearer ${localStorage.getItem('auth_token')}`
-          }
-        })
+        const response = await apiService.approveProduct(product.id)
 
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`)
+        if (!response.success) {
+          throw new Error(response.message || "Erreur lors de l'approbation")
         }
 
-        const data = await response.json()
-
-        if (data.success) {
-          productsToModerate.value = productsToModerate.value.filter(p => p.id !== product.id)
-          stats.value.totalProducts--
-          showNotification('success', 'Produit approuvé', `${product.name} est désormais publié.`)
-        } else {
-          throw new Error(data.message || "Erreur lors de l'approbation")
-        }
+        productsToModerate.value = productsToModerate.value.filter(p => p.id !== product.id)
+        stats.value.totalProducts = Math.max(0, stats.value.totalProducts - 1)
+        showNotification('success', 'Produit approuvé', response.message ?? `${product.name} est désormais publié.`)
       } catch (error) {
-        showNotification('error', "Erreur d'approbation", `Impossible d'approuver ${product.name}. ${error instanceof Error ? error.message : 'Erreur inconnue'}`)
+        const message = error instanceof Error ? error.message : 'Erreur inconnue'
+        showNotification('error', "Erreur d'approbation", `Impossible d'approuver ${product.name}. ${message}`)
       }
     },
     'Publier',
@@ -833,31 +752,18 @@ const rejectProduct = async (product: ProductToModerate) => {
     `Êtes-vous sûr de vouloir rejeter ${product.name} ?`,
     async () => {
       try {
-        const response = await fetch(`http://localhost:8000/api/admin/products/${product.id}/reject`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Accept: 'application/json',
-            Authorization: `Bearer ${localStorage.getItem('auth_token')}`
-          },
-          body: JSON.stringify({ reason: 'Produit non conforme' })
-        })
+        const response = await apiService.rejectProduct(product.id, { reason: 'Produit non conforme' })
 
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`)
+        if (!response.success) {
+          throw new Error(response.message || 'Erreur lors du rejet')
         }
 
-        const data = await response.json()
-
-        if (data.success) {
-          productsToModerate.value = productsToModerate.value.filter(p => p.id !== product.id)
-          stats.value.totalProducts--
-          showNotification('success', 'Produit rejeté', `${product.name} a été retiré de la modération.`)
-        } else {
-          throw new Error(data.message || 'Erreur lors du rejet')
-        }
+        productsToModerate.value = productsToModerate.value.filter(p => p.id !== product.id)
+        stats.value.totalProducts = Math.max(0, stats.value.totalProducts - 1)
+        showNotification('success', 'Produit rejeté', response.message ?? `${product.name} a été retiré de la modération.`)
       } catch (error) {
-        showNotification('error', 'Erreur de rejet', `Impossible de rejeter ${product.name}. ${error instanceof Error ? error.message : 'Erreur inconnue'}`)
+        const message = error instanceof Error ? error.message : 'Erreur inconnue'
+        showNotification('error', 'Erreur de rejet', `Impossible de rejeter ${product.name}. ${message}`)
       }
     },
     'Rejeter',
@@ -872,30 +778,18 @@ const resolveReservation = async (reservation: FlaggedReservation) => {
     `Marquer le signalement pour ${reservation.product_name} comme résolu ?`,
     async () => {
       try {
-        const response = await fetch(`http://localhost:8000/api/admin/reservations/${reservation.id}/resolve`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Accept: 'application/json',
-            Authorization: `Bearer ${localStorage.getItem('auth_token')}`
-          }
-        })
+        const response = await apiService.resolveReservationFlag(reservation.id)
 
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`)
+        if (!response.success) {
+          throw new Error(response.message || 'Erreur lors de la résolution')
         }
 
-        const data = await response.json()
-
-        if (data.success) {
-          flaggedReservations.value = flaggedReservations.value.filter(r => r.id !== reservation.id)
-          stats.value.totalReservations--
-          showNotification('success', 'Signalement résolu', `${reservation.product_name} a été marqué comme résolu.`)
-        } else {
-          throw new Error(data.message || 'Erreur lors de la résolution')
-        }
+        flaggedReservations.value = flaggedReservations.value.filter(r => r.id !== reservation.id)
+        stats.value.totalReservations = Math.max(0, stats.value.totalReservations - 1)
+        showNotification('success', 'Signalement résolu', response.message ?? `${reservation.product_name} a été marqué comme résolu.`)
       } catch (error) {
-        showNotification('error', 'Erreur de résolution', `Impossible de résoudre le signalement. ${error instanceof Error ? error.message : 'Erreur inconnue'}`)
+        const message = error instanceof Error ? error.message : 'Erreur inconnue'
+        showNotification('error', 'Erreur de résolution', `Impossible de résoudre le signalement. ${message}`)
       }
     },
     'Résoudre',
@@ -919,6 +813,10 @@ const dismissReservation = async (reservation: FlaggedReservation) => {
 }
 
 onMounted(async () => {
-  await loadModerationData()
+  try {
+    await loadModerationData()
+  } catch (error) {
+    // Les erreurs sont déjà notifiées par loadModerationData
+  }
 })
 </script>

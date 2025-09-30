@@ -27,6 +27,85 @@ import type {
   MerchantLocation
 } from '@/types'
 
+type QueryParams = Record<string, string | number | boolean | null | undefined>
+
+export interface AdminUsersStats {
+  totalUsers: number
+  consumers: number
+  merchants: number
+  suspended: number
+}
+
+export interface AdminUsersPayload {
+  users: User[]
+  stats?: AdminUsersStats
+  [key: string]: unknown
+}
+
+export interface AdminModerationStats {
+  activeMerchants: number
+  pendingMerchants: number
+  totalProducts: number
+  totalReservations: number
+}
+
+export interface AdminPendingMerchant {
+  id: number
+  business_name?: string
+  owner_name?: string
+  email?: string
+  phone?: string
+  address?: string
+  business_type?: string
+  description?: string
+  created_at?: string
+  [key: string]: unknown
+}
+
+export interface AdminModerationProduct {
+  id: number
+  name?: string
+  merchant_name?: string
+  price?: number
+  image_url?: string
+  description?: string
+  category?: string
+  [key: string]: unknown
+}
+
+export interface AdminModerationReservation {
+  id: number
+  product_name?: string
+  customer_name?: string
+  merchant_name?: string
+  total_price?: number
+  flag_reason?: string
+  created_at?: string
+  [key: string]: unknown
+}
+
+export interface AdminModerationPayload {
+  stats: AdminModerationStats
+  pendingMerchants: AdminPendingMerchant[]
+  productsToModerate: AdminModerationProduct[]
+  flaggedReservations: AdminModerationReservation[]
+  [key: string]: unknown
+}
+
+export interface AdminCategoryStats {
+  total_categories: number
+  active_categories: number
+  categories_with_products: number
+  top_categories: Array<{ id: number; name?: string; products_count: number }>
+}
+
+export type AdminCategory = Category & {
+  is_active?: boolean
+  icon?: string
+  products_count?: number
+  [key: string]: unknown
+}
+
 export interface MerchantReviewProductSummary {
   id: number
   name: string
@@ -106,6 +185,85 @@ class ApiService {
     }
 
     return data
+  }
+
+  private buildQueryString(params?: QueryParams): string {
+    if (!params) {
+      return ''
+    }
+
+    const searchParams = new URLSearchParams()
+
+    Object.entries(params).forEach(([key, value]) => {
+      if (value === undefined || value === null || value === '') {
+        return
+      }
+      searchParams.append(key, String(value))
+    })
+
+    const query = searchParams.toString()
+    return query ? `?${query}` : ''
+  }
+
+  private toNumber(value: unknown, fallback = 0): number {
+    if (typeof value === 'number' && Number.isFinite(value)) {
+      return value
+    }
+
+    if (typeof value === 'string' && value.trim() !== '') {
+      const parsed = Number(value)
+      if (!Number.isNaN(parsed)) {
+        return parsed
+      }
+    }
+
+    return fallback
+  }
+
+  private ensureArray<T>(value: unknown): T[] {
+    if (Array.isArray(value)) {
+      return value as T[]
+    }
+    return []
+  }
+
+  private normalizeAdminUsersStats(raw?: Record<string, unknown>): AdminUsersStats | undefined {
+    if (!raw) {
+      return undefined
+    }
+
+    return {
+      totalUsers: this.toNumber(raw.totalUsers ?? raw.total_users ?? raw.total),
+      consumers: this.toNumber(raw.consumers ?? raw.consumer ?? raw.consumers_count ?? raw.total_consumers),
+      merchants: this.toNumber(raw.merchants ?? raw.merchant ?? raw.merchants_count ?? raw.total_merchants),
+      suspended: this.toNumber(raw.suspended ?? raw.suspended_count ?? raw.total_suspended)
+    }
+  }
+
+  private normalizeModerationStats(raw?: Record<string, unknown>): AdminModerationStats {
+    return {
+      activeMerchants: this.toNumber(raw?.activeMerchants ?? raw?.active_merchants),
+      pendingMerchants: this.toNumber(raw?.pendingMerchants ?? raw?.pending_merchants),
+      totalProducts: this.toNumber(raw?.totalProducts ?? raw?.total_products),
+      totalReservations: this.toNumber(raw?.totalReservations ?? raw?.total_reservations)
+    }
+  }
+
+  private normalizeCategoryStats(raw?: Record<string, unknown>): AdminCategoryStats {
+    const topCategoriesRaw = raw?.top_categories ?? raw?.topCategories
+    const topCategories = this.ensureArray<{ id: number; name?: string; products_count?: number; productsCount?: number }>(topCategoriesRaw)
+      .map(category => ({
+        id: category.id,
+        name: category.name,
+        products_count: this.toNumber(category.products_count ?? category.productsCount)
+      }))
+
+    return {
+      total_categories: this.toNumber(raw?.total_categories ?? raw?.totalCategories),
+      active_categories: this.toNumber(raw?.active_categories ?? raw?.activeCategories),
+      categories_with_products: this.toNumber(raw?.categories_with_products ?? raw?.categoriesWithProducts),
+      top_categories: topCategories
+    }
   }
 
   // Generic HTTP methods
@@ -635,6 +793,168 @@ class ApiService {
     const endpoint = `/analytics/stats${query ? `?${query}` : ''}`
 
     return this.request<AnalyticsStatsResponse>(endpoint, {}, true)
+  }
+
+  // Admin - Users
+  async getAdminUsers(params?: QueryParams): Promise<ApiResponse<AdminUsersPayload>> {
+    const query = this.buildQueryString(params)
+    const response = await this.get<ApiResponse<User[] | Record<string, unknown>> & { stats?: Record<string, unknown> }>(`/admin/users${query}`, true)
+
+    const rawData = response.data
+    const users = Array.isArray(rawData)
+      ? (rawData as User[])
+      : this.ensureArray<User>((rawData as Record<string, unknown> | undefined)?.users)
+
+    const additionalData = Array.isArray(rawData) ? {} : (rawData as Record<string, unknown> | undefined) ?? {}
+    const extraData: Record<string, unknown> = { ...additionalData }
+    delete extraData.users
+    delete extraData.stats
+
+    const stats = this.normalizeAdminUsersStats((additionalData.stats as Record<string, unknown> | undefined) ?? response.stats)
+
+    return {
+      success: response.success,
+      message: response.message,
+      data: {
+        ...extraData,
+        users,
+        stats
+      },
+      pagination: response.pagination
+    }
+  }
+
+  async suspendAdminUser(userId: number): Promise<ApiResponse<User>> {
+    return this.patch<ApiResponse<User>>(`/admin/users/${userId}/suspend`, {}, true)
+  }
+
+  async unsuspendAdminUser(userId: number): Promise<ApiResponse<User>> {
+    return this.patch<ApiResponse<User>>(`/admin/users/${userId}/unsuspend`, {}, true)
+  }
+
+  // Admin - Merchants & moderation
+  async getAdminMerchants(params?: QueryParams): Promise<ApiResponse<Record<string, unknown>>> {
+    const query = this.buildQueryString(params)
+    return this.get<ApiResponse<Record<string, unknown>>>(`/admin/merchants${query}`, true)
+  }
+
+  async getAdminModerationData(params?: QueryParams): Promise<ApiResponse<AdminModerationPayload>> {
+    const query = this.buildQueryString(params)
+    const response = await this.get<ApiResponse<Record<string, unknown>> & Record<string, unknown>>(`/admin/moderation${query}`, true)
+
+    const rawData = ((response.data ?? {}) as Record<string, unknown>) || {}
+    const stats = this.normalizeModerationStats(
+      (rawData.stats as Record<string, unknown> | undefined) ?? (response.stats as Record<string, unknown> | undefined)
+    )
+    const pendingMerchants = this.ensureArray<AdminPendingMerchant>(
+      rawData.pendingMerchants ?? rawData.pending_merchants ?? (response as Record<string, unknown>).pendingMerchants
+    )
+    const productsToModerate = this.ensureArray<AdminModerationProduct>(
+      rawData.productsToModerate ?? rawData.products_to_moderate ?? (response as Record<string, unknown>).productsToModerate
+    )
+    const flaggedReservations = this.ensureArray<AdminModerationReservation>(
+      rawData.flaggedReservations ?? rawData.flagged_reservations ?? (response as Record<string, unknown>).flaggedReservations
+    )
+
+    const extraData: Record<string, unknown> = { ...rawData }
+    delete extraData.stats
+    delete extraData.pendingMerchants
+    delete extraData.pending_merchants
+    delete extraData.productsToModerate
+    delete extraData.products_to_moderate
+    delete extraData.flaggedReservations
+    delete extraData.flagged_reservations
+
+    return {
+      success: response.success,
+      message: response.message,
+      data: {
+        ...extraData,
+        stats,
+        pendingMerchants,
+        productsToModerate,
+        flaggedReservations
+      },
+      pagination: response.pagination
+    }
+  }
+
+  async approveMerchant(merchantId: number): Promise<ApiResponse<Record<string, unknown>>> {
+    return this.post<ApiResponse<Record<string, unknown>>>(`/admin/merchants/${merchantId}/approve`, {}, true)
+  }
+
+  async rejectMerchant(merchantId: number, payload: Record<string, unknown> = {}): Promise<ApiResponse<Record<string, unknown>>> {
+    return this.post<ApiResponse<Record<string, unknown>>>(`/admin/merchants/${merchantId}/reject`, payload, true)
+  }
+
+  async approveProduct(productId: number): Promise<ApiResponse<Record<string, unknown>>> {
+    return this.post<ApiResponse<Record<string, unknown>>>(`/admin/products/${productId}/approve`, {}, true)
+  }
+
+  async rejectProduct(productId: number, payload: Record<string, unknown> = {}): Promise<ApiResponse<Record<string, unknown>>> {
+    return this.post<ApiResponse<Record<string, unknown>>>(`/admin/products/${productId}/reject`, payload, true)
+  }
+
+  async resolveReservationFlag(reservationId: number, payload: Record<string, unknown> = {}): Promise<ApiResponse<Record<string, unknown>>> {
+    return this.post<ApiResponse<Record<string, unknown>>>(`/admin/reservations/${reservationId}/resolve`, payload, true)
+  }
+
+  // Admin - Categories
+  async getAdminCategories(params?: QueryParams): Promise<ApiResponse<AdminCategory[]>> {
+    const query = this.buildQueryString(params)
+    const response = await this.get<ApiResponse<unknown>>(`/admin/categories${query}`, true)
+
+    const rawData = response.data as Record<string, unknown> | AdminCategory[] | undefined
+    const categoriesSource = Array.isArray(rawData) ? rawData : (rawData?.categories as unknown) ?? rawData
+    const categories = this.ensureArray<Record<string, unknown>>(categoriesSource).map(item => {
+      const category = { ...(item as AdminCategory) }
+      const isActive = typeof category.is_active === 'boolean'
+        ? category.is_active
+        : typeof (category as Record<string, unknown>).isActive === 'boolean'
+          ? Boolean((category as Record<string, unknown>).isActive)
+          : true
+
+      return {
+        ...category,
+        description: typeof category.description === 'string' ? category.description : '',
+        is_active: isActive
+      } as AdminCategory
+    })
+
+    return {
+      success: response.success,
+      message: response.message,
+      data: categories,
+      pagination: response.pagination
+    }
+  }
+
+  async getAdminCategoryStats(): Promise<ApiResponse<AdminCategoryStats>> {
+    const response = await this.get<ApiResponse<Record<string, unknown>>>(`/admin/categories/stats`, true)
+    const stats = this.normalizeCategoryStats(response.data as Record<string, unknown>)
+
+    return {
+      success: response.success,
+      message: response.message,
+      data: stats,
+      pagination: response.pagination
+    }
+  }
+
+  async createAdminCategory(payload: Partial<Category> & { is_active?: boolean }): Promise<ApiResponse<AdminCategory>> {
+    return this.post<ApiResponse<AdminCategory>>('/admin/categories', payload, true)
+  }
+
+  async updateAdminCategory(categoryId: number, payload: Partial<Category> & { is_active?: boolean }): Promise<ApiResponse<AdminCategory>> {
+    return this.put<ApiResponse<AdminCategory>>(`/admin/categories/${categoryId}`, payload, true)
+  }
+
+  async deleteAdminCategory(categoryId: number): Promise<ApiResponse<null>> {
+    return this.delete<ApiResponse<null>>(`/admin/categories/${categoryId}`, true)
+  }
+
+  async toggleCategory(categoryId: number): Promise<ApiResponse<AdminCategory>> {
+    return this.patch<ApiResponse<AdminCategory>>(`/admin/categories/${categoryId}/toggle`, {}, true)
   }
 
   // Loyalty points
