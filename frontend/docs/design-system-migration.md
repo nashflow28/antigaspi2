@@ -34,7 +34,7 @@
 | Badge | `Badge.vue` | ✅ Livré | Couleurs statut + mode dismissible pour badges dynamiques.【F:frontend/src/components/ui/2025/Badge.vue†L1-L170】 |
 | Modal / ConfirmationModal | `Modal.vue` + boutons DS | ✅ Livré | Supporte tailles, variantes et close behavior personnalisable.【F:frontend/src/components/ui/2025/Modal.vue†L1-L200】 |
 | Navigation | `Navigation.vue` | ✅ Livré | Skip links, ARIA et menu mobile contrôlable (`v-model:mobileOpen`) + CTA auth via `authCta`. Slots pour brand/menus permettent d'étendre la barre selon les vues.【F:frontend/src/components/ui/2025/Navigation.vue†L1-L340】 |
-| ProductCard | (à produire) | 🚧 À faire | Non implémenté côté Vue ; restera à construire à partir de `Card`/`Badge`. |
+| ProductCard | `ProductCard.vue` | ✅ Livré | Carte produit avec image, badges discount/stock, tags, prix et support variantes/interactive. Utilisée dans `ProductsView2025` avec test coverage complet.【F:frontend/src/components/ui/2025/ProductCard.vue†L1-L280】【F:frontend/src/views/ProductsView2025.vue†L244】【F:frontend/tests/unit/components/ui/2025/ProductCard.spec.ts†L1-L59】 |
 | Skeleton | `Loading.vue` (`type='skeleton'`) | ✅ Livré | Alternative plus flexible que le composant Skeleton React.【F:frontend/src/components/ui/2025/Loading.vue†L1-L142】 |
 | Stats | (à produire) | 🚧 À faire | Aucun équivalent 2025 (utiliser `Card` + `Badge` en attendant). |
 | Textarea | (à produire) | 🚧 À faire | À décliner à partir de `Input` (comportements partagés). |
