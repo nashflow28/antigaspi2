@@ -214,9 +214,6 @@ const handleSubmit = async () => {
       console.log('[LoginForm] User role:', authStore.user?.role)
       console.log('[LoginForm] isAuthenticated:', authStore.isAuthenticated)
 
-      // Wait a tiny bit to ensure reactive state is fully updated
-      await new Promise(resolve => setTimeout(resolve, 50))
-
       // Check for redirect query parameter
       const redirectTarget = route.query.redirect
       if (isValidRedirect(redirectTarget)) {
@@ -225,10 +222,19 @@ const handleSubmit = async () => {
         return
       }
 
-      // Trigger router guard by attempting to stay on /login
-      // The guard will detect we're authenticated and redirect us to the correct dashboard
-      console.log('[LoginForm] Forcing router guard check by navigating to /login')
-      await router.push('/login')
+      // Direct redirect based on user role
+      const user = authStore.user
+      console.log('[LoginForm] Checking user role for redirect...')
+      if (user?.role === 'admin') {
+        console.log('[LoginForm] Redirecting admin to /admin/dashboard')
+        await router.push('/admin/dashboard')
+      } else if (user?.role === 'merchant') {
+        console.log('[LoginForm] Redirecting merchant to /merchant/dashboard')
+        await router.push('/merchant/dashboard')
+      } else {
+        console.log('[LoginForm] Redirecting consumer to /dashboard')
+        await router.push('/dashboard')
+      }
     }
   } catch {
     // L'erreur est déjà gérée par le store et affichée via les notifications

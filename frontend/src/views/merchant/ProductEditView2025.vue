@@ -220,13 +220,14 @@
                     ref="imageInput"
                     type="file"
                     accept="image/*"
-                    class="hidden sm:block"
+                    class="hidden"
                     @change="handleImageUpload"
                   >
                   <Button
+                    type="button"
                     variant="ghost"
                     class="w-full"
-                    @click="$refs.imageInput.click()"
+                    @click.prevent="imageInput?.click()"
                   >
                     <CloudUploadIcon class="h-4 w-4 mr-2" />
                     {{ product.image_url ? 'Changer l\'image' : 'Ajouter une image' }}
@@ -533,18 +534,26 @@ const deleteProduct = async () => {
 }
 
 const handleImageUpload = async (event: Event) => {
+  console.log('[ProductEditView2025] handleImageUpload called')
   const target = event.target as HTMLInputElement | null
   const file = target?.files?.[0]
-  if (!file) return
+  console.log('[ProductEditView2025] File selected:', file?.name, file?.type, file?.size)
+  if (!file) {
+    console.log('[ProductEditView2025] No file selected, returning')
+    return
+  }
 
   try {
     const formData = new FormData()
     formData.append('image', file)
+    console.log('[ProductEditView2025] Uploading to /products/upload-image...')
 
     const response = await apiService.postFormData('/products/upload-image', formData, true)
+    console.log('[ProductEditView2025] Upload response:', response)
 
     const data = (response as any)?.data ?? response
     const imageUrl = data?.image_url ?? data?.url ?? null
+    console.log('[ProductEditView2025] Extracted image URL:', imageUrl)
 
     if (!imageUrl) {
       throw new Error('URL de l\'image introuvable dans la réponse')
@@ -552,10 +561,12 @@ const handleImageUpload = async (event: Event) => {
 
     if (product.value) {
       product.value.image_url = imageUrl
+      console.log('[ProductEditView2025] Image URL set in product.value')
     }
 
     notify.success('Image ajoutée avec succès')
   } catch (err) {
+    console.error('[ProductEditView2025] Upload error:', err)
     const message = err?.response?.data?.message
       || (err instanceof Error ? err.message : 'Erreur lors du téléchargement de l\'image')
     notify.error(message)

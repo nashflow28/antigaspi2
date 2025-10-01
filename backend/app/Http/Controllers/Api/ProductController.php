@@ -234,6 +234,70 @@ class ProductController extends Controller
         }
     }
 
+    /**
+     * Show merchant's own product (without active filter)
+     */
+    public function showOwn($id): JsonResponse
+    {
+        try {
+            $user = JWTAuth::parseToken()->authenticate();
+
+            if (!$user->isMerchant()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Seuls les commerçants peuvent accéder à cette ressource'
+                ], 403);
+            }
+
+            $product = Product::with(['merchant.user', 'category'])
+                ->findOrFail($id);
+
+            // Verify product belongs to this merchant
+            if ($product->merchant->user_id !== $user->id) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Vous ne pouvez accéder qu\'à vos propres produits'
+                ], 403);
+            }
+
+            $productData = [
+                'id' => $product->id,
+                'name' => $product->name,
+                'description' => $product->description,
+                'original_price' => $product->original_price,
+                'discounted_price' => $product->discounted_price,
+                'quantity_available' => $product->quantity_available,
+                'expiration_date' => $product->expiration_date,
+                'image_url' => $product->image_url,
+                'is_active' => $product->is_active,
+                'discount_percentage' => $product->discount_percentage,
+                'savings' => $product->savings,
+                'days_until_expiration' => $product->days_until_expiration,
+                'is_expired' => $product->isExpired(),
+                'is_expiring_soon' => $product->isExpiringSoon(),
+                'category' => [
+                    'id' => $product->category->id,
+                    'name' => $product->category->name,
+                    'icon' => $product->category->icon,
+                ],
+                'created_at' => $product->created_at,
+                'updated_at' => $product->updated_at,
+            ];
+
+            return response()->json([
+                'success' => true,
+                'data' => $productData
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Produit non trouvé',
+                'error' => $e->getMessage()
+            ], 404);
+        }
+    }
+
     public function store(Request $request): JsonResponse
     {
         try {
@@ -336,7 +400,7 @@ class ProductController extends Controller
                 'discounted_price' => 'sometimes|numeric|min:0',
                 'quantity_available' => 'sometimes|integer|min:0',
                 'expiration_date' => 'sometimes|date',
-                'image_url' => 'sometimes|string',
+                'image_url' => 'sometimes|string|max:255',
                 'is_active' => 'sometimes|boolean',
             ]);
 

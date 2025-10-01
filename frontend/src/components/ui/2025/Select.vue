@@ -1,7 +1,7 @@
 <template>
   <select
     :id="id"
-    v-model="modelValue"
+    :value="modelValue"
     :name="name"
     :disabled="disabled"
     :required="required"

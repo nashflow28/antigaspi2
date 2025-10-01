@@ -39,7 +39,9 @@
       "Bash(test:*)",
       "Bash(npm test:*)",
       "Bash(git commit:*)",
-      "Bash(npx --package=typescript@5.9.2 tsc --noEmit src/screens/main/ProductDetailsScreen.tsx)"
+      "Bash(npx --package=typescript@5.9.2 tsc --noEmit src/screens/main/ProductDetailsScreen.tsx)",
+      "Bash(\"C:\\xampp\\mysql\\bin\\mysql.exe\" -u root -e \"SELECT m.id as merchant_id, m.business_name, u.email FROM merchants m JOIN users u ON m.user_id = u.id WHERE u.email = ''marie.martin@email.com'';\" antigaspi_fresh)",
+      "Bash(\"C:\\xampp\\mysql\\bin\\mysql.exe\" -u root -e \"SELECT id, name, merchant_id, original_price, discounted_price, quantity_available, is_active FROM products WHERE merchant_id = 1;\" antigaspi_fresh)"
     ],
     "deny": [],
     "ask": []

@@ -61,6 +61,7 @@ Route::prefix('products')->group(function () {
     // Routes protégées (gestion des produits)
     Route::middleware('jwt.auth')->group(function () {
         Route::get('/merchant', [ProductController::class, 'merchantProducts']); // Produits du commerçant connecté
+        Route::get('/merchant/{id}', [ProductController::class, 'showOwn']); // Voir son propre produit (même inactif)
 
         // Routes d'écriture avec rate limiting strict
         Route::middleware('throttle:write')->group(function () {

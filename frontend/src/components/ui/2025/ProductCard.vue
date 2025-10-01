@@ -340,7 +340,7 @@ const handleReserve = (event?: MouseEvent) => {
 }
 
 .product-card-2025[data-state='disabled'] {
-  @apply saturate-75;
+  @apply saturate-50;
 }
 
 .product-card-2025[data-state='disabled'] .product-card__cta :deep(button) {

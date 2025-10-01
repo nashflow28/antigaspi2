@@ -455,6 +455,10 @@ class ApiService {
     return this.request<ApiResponse<Product>>(`/products/${id}`)
   }
 
+  async getMerchantProduct(id: number): Promise<ApiResponse<Product>> {
+    return this.request<ApiResponse<Product>>(`/products/merchant/${id}`, {}, true)
+  }
+
   async getProductById(id: number): Promise<ApiResponse<Product>> {
     return this.getProduct(id)
   }

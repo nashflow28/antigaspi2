@@ -49,11 +49,17 @@
           <X :size="16" />
         </button>
 
-        <component
-          :is="rightIcon"
+        <button
           v-if="rightIcon"
-          :class="iconClasses"
-        />
+          type="button"
+          class="flex items-center justify-center"
+          @click="emit('click:right-icon')"
+        >
+          <component
+            :is="rightIcon"
+            :class="iconClasses"
+          />
+        </button>
       </div>
     </div>
 
@@ -120,6 +126,7 @@ const emit = defineEmits<{
   input: [event: Event]
   keydown: [event: KeyboardEvent]
   clear: []
+  'click:right-icon': []
 }>()
 
 // Refs
