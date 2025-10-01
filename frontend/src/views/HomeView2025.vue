@@ -345,11 +345,96 @@
         </template>
       </div>
     </section>
+
+    <!-- Featured Products Section -->
+    <section class="py-16 bg-gray-50">
+      <div :class="layoutContainerClass">
+        <div class="mb-8">
+          <h2 class="text-3xl font-semibold text-gray-900 mb-2">
+            Produits en vedette
+          </h2>
+          <p class="text-gray-600">
+            Découvrez les meilleures offres anti-gaspillage près de chez vous
+          </p>
+        </div>
+
+        <!-- Loading State -->
+        <div v-if="loading" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <Card v-for="i in 4" :key="i" class="animate-pulse">
+            <div class="h-48 bg-gray-200 rounded-lg mb-4" />
+            <div class="h-4 bg-gray-200 rounded w-3/4 mb-2" />
+            <div class="h-4 bg-gray-200 rounded w-1/2" />
+          </Card>
+        </div>
+
+        <!-- Products Grid -->
+        <div v-else-if="featuredProducts.length > 0" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <article
+            v-for="product in featuredProducts"
+            :key="product.id"
+            class="product-card bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow cursor-pointer"
+            @click="$router.push(`/products/${product.id}`)"
+          >
+            <div class="aspect-square overflow-hidden rounded-t-lg">
+              <img
+                v-if="product.image_url"
+                :src="product.image_url"
+                :alt="product.name"
+                class="w-full h-full object-cover"
+              >
+              <div v-else class="w-full h-full bg-gray-200 flex items-center justify-center">
+                <span class="text-4xl">📦</span>
+              </div>
+            </div>
+            <div class="p-4">
+              <h3 class="font-semibold text-gray-900 mb-1">
+                {{ product.name }}
+              </h3>
+              <p class="text-sm text-gray-500 mb-2">
+                {{ product.category }}
+              </p>
+              <div class="flex items-center justify-between">
+                <div>
+                  <span class="text-lg font-bold text-primary-600">
+                    {{ product.discounted_price }} XOF
+                  </span>
+                  <span class="text-sm text-gray-400 line-through ml-2">
+                    {{ product.original_price }} XOF
+                  </span>
+                </div>
+                <Badge variant="success" size="sm">
+                  -{{ Math.round((1 - product.discounted_price / product.original_price) * 100) }}%
+                </Badge>
+              </div>
+            </div>
+          </article>
+        </div>
+
+        <!-- Empty State -->
+        <div v-else class="text-center py-12">
+          <p class="text-gray-500">Aucun produit disponible pour le moment</p>
+        </div>
+
+        <!-- View All Button -->
+        <div v-if="featuredProducts.length > 0" class="mt-8 text-center">
+          <Button
+            variant="outline"
+            size="lg"
+            @click="$router.push('/products')"
+          >
+            Voir tous les produits
+          </Button>
+        </div>
+      </div>
+    </section>
   </div>
 </template>
 
 <script setup lang="ts">
+import { ref, onMounted } from 'vue'
 import { useAuthStore } from '@/stores/auth'
+import { apiService } from '@/services/api'
+import type { Product } from '@/types'
 
 // Import 2025 Design System components
 import Card from '@/components/ui/2025/Card.vue'
@@ -357,6 +442,19 @@ import Button from '@/components/ui/2025/Button.vue'
 import Badge from '@/components/ui/2025/Badge.vue'
 
 const authStore = useAuthStore()
-
 const layoutContainerClass = 'mx-auto w-full max-w-7xl px-3 sm:px-4 lg:px-6'
+
+const featuredProducts = ref<Product[]>([])
+const loading = ref(true)
+
+onMounted(async () => {
+  try {
+    const response = await apiService.getProducts({ limit: 8, is_active: true })
+    featuredProducts.value = response.data.slice(0, 8) // Show first 8 products
+  } catch (error) {
+    console.error('Failed to load featured products:', error)
+  } finally {
+    loading.value = false
+  }
+})
 </script>

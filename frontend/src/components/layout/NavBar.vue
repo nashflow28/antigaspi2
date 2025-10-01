@@ -390,7 +390,7 @@ const authCta = computed(() => {
   }
 
   const primary: NavigationCta = {
-    label: "S'inscrire",
+    label: 'Inscription',
     to: '/register',
     icon: UserPlus,
     variant: 'primary',

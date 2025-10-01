@@ -298,11 +298,17 @@ const router = createRouter({
 })
 
 router.beforeEach(async (to, _from, next) => {
+  console.log('[Router Guard] Navigating to:', to.path, 'from:', _from.path)
   const authStore = useAuthStore()
   const onboardingStore = useOnboardingStore()
 
+  console.log('[Router Guard] authStore.token:', !!authStore.token)
+  console.log('[Router Guard] authStore.user:', authStore.user)
+  console.log('[Router Guard] authStore.isAuthenticated:', authStore.isAuthenticated)
+
   // Initialize stores if not already done
   if (authStore.token && !authStore.user) {
+    console.log('[Router Guard] Token exists but no user, initializing auth...')
     await authStore.initAuth()
   }
 
@@ -331,23 +337,28 @@ router.beforeEach(async (to, _from, next) => {
 
   // Check if route requires authentication
   if (to.meta.requiresAuth && !authStore.isAuthenticated) {
+    console.log('[Router Guard] Route requires auth but user not authenticated, redirecting to login')
     next({ name: 'login', query: { redirect: to.fullPath } })
     return
   }
 
   // Hide auth pages for authenticated users
   if (to.meta.hideForAuth && authStore.isAuthenticated) {
+    console.log('[Router Guard] Auth page accessed by authenticated user, redirecting to dashboard')
     // Redirect to appropriate dashboard based on role
     if (authStore.user) {
       switch (authStore.user.role) {
         case 'admin':
+          console.log('[Router Guard] Redirecting admin to /admin/dashboard')
           next('/admin/dashboard')
           break
         case 'merchant':
+          console.log('[Router Guard] Redirecting merchant to /merchant/dashboard')
           next('/merchant/dashboard')
           break
         case 'consumer':
         default:
+          console.log('[Router Guard] Redirecting consumer to /dashboard')
           next('/dashboard')
       }
     } else {
@@ -361,7 +372,10 @@ router.beforeEach(async (to, _from, next) => {
     const userRole = authStore.user.role
     const allowedRoles = to.meta.roles as string[]
 
+    console.log('[Router Guard] Checking role-based access - User role:', userRole, 'Allowed:', allowedRoles)
+
     if (!allowedRoles.includes(userRole)) {
+      console.log('[Router Guard] User role not allowed for this route, redirecting')
       // Redirect to appropriate dashboard based on role
       switch (userRole) {
         case 'admin':
@@ -380,6 +394,7 @@ router.beforeEach(async (to, _from, next) => {
     }
   }
 
+  console.log('[Router Guard] All checks passed, proceeding to route')
   next()
 })
 
