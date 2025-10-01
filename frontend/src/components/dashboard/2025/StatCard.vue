@@ -1,5 +1,5 @@
 <template>
-  <Card :variant="variant" class="h-full">
+  <Card :variant="variant" class="h-full" data-testid="stat-card">
     <div class="flex items-start justify-between gap-4">
       <div class="space-y-2">
         <p class="text-sm font-medium text-neutral-500 dark:text-neutral-400">

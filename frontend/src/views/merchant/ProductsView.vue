@@ -149,7 +149,7 @@
       </Card>
 
       <!-- Products Grid -->
-      <div v-if="filteredProducts.length > 0" class="grid grid-cols-1 gap-3 sm:gap-6 md:grid-cols-2 xl:grid-cols-3">
+      <div v-if="filteredProducts.length > 0" class="grid grid-cols-1 gap-3 sm:gap-6 md:grid-cols-2 xl:grid-cols-3" data-testid="product-list">
         <Card
           v-for="product in filteredProducts"
           :key="product.id"
@@ -315,6 +315,7 @@
                 <label class="label">Nom du produit *</label>
                 <input
                   v-model="productForm.name"
+                  name="name"
                   type="text"
                   class="input w-full"
                   required
@@ -323,7 +324,7 @@
 
               <div>
                 <label class="label">Catégorie</label>
-                <select v-model="productForm.category_id" class="input w-full">
+                <select v-model="productForm.category_id" name="category_id" class="input w-full">
                   <option value="">Sélectionner une catégorie</option>
                   <option v-for="category in categories" :key="category.id" :value="category.id">
                     {{ category.name }}
@@ -336,6 +337,7 @@
               <label class="label">Description</label>
               <textarea
                 v-model="productForm.description"
+                name="description"
                 class="input w-full"
                 rows="3"
                 placeholder="Décrivez votre produit..."
@@ -347,6 +349,7 @@
                 <label class="label">Prix original (F CFA) *</label>
                 <input
                   v-model.number="productForm.original_price"
+                  name="original_price"
                   type="number"
                   step="0.01"
                   class="input w-full"
@@ -358,6 +361,7 @@
                 <label class="label">Remise (%) *</label>
                 <input
                   v-model.number="productForm.discount_percentage"
+                  name="discount_percentage"
                   type="number"
                   min="1"
                   max="90"
@@ -382,6 +386,7 @@
                 <label class="label">Quantité disponible *</label>
                 <input
                   v-model.number="productForm.quantity_available"
+                  name="quantity_available"
                   type="number"
                   min="1"
                   class="input w-full"
@@ -393,6 +398,7 @@
                 <label class="label">Date d'expiration *</label>
                 <input
                   v-model="productForm.expiration_date"
+                  name="expiration_date"
                   type="date"
                   class="input w-full"
                   required

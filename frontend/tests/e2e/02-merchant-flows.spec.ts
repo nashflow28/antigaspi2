@@ -20,8 +20,12 @@ test.describe('Merchant Flows - Complete Management', () => {
     await page.goto('http://localhost:3000/login')
     await page.fill('input[type="email"]', 'marie.martin@email.com')
     await page.fill('input[type="password"]', 'password')
-    await page.click('button[type="submit"]')
-    await page.waitForTimeout(2000)
+
+    // Wait for actual navigation instead of arbitrary timeout
+    await Promise.all([
+      page.waitForURL('**/merchant/dashboard', { timeout: 10000 }),
+      page.click('button[type="submit"]')
+    ])
 
     const currentUrl = page.url()
     if (currentUrl.includes('/merchant/dashboard')) {
@@ -73,9 +77,9 @@ test.describe('Merchant Flows - Complete Management', () => {
       logBug('Add product button not found')
     }
 
-    // Count products
-    const productRows = page.locator('table tbody tr, .product-item')
-    const productCount = await productRows.count()
+    // Count products (Card components in grid)
+    const productCards = page.locator('[data-testid="product-list"] > *')
+    const productCount = await productCards.count()
     console.log(`Merchant has ${productCount} products`)
 
     await page.screenshot({ path: 'test-results/merchant-03-products-list.png', fullPage: true })
@@ -85,15 +89,17 @@ test.describe('Merchant Flows - Complete Management', () => {
 
     if (await addProductBtn.isVisible()) {
       await addProductBtn.click()
-      await page.waitForTimeout(1000)
+
+      // Wait for modal to be visible
+      await page.waitForSelector('form', { state: 'visible', timeout: 5000 })
 
       // Fill product form
       const productName = `Test Product ${timestamp}`
-      await page.fill('input[name="name"], input[placeholder*="Nom"]', productName)
-      await page.fill('textarea[name="description"], textarea[placeholder*="Description"]', 'Test product description for automated testing')
+      await page.fill('input[name="name"]', productName)
+      await page.fill('textarea[name="description"]', 'Test product description for automated testing')
 
       // Select category
-      const categorySelect = page.locator('select[name="category_id"], select[name="category"]')
+      const categorySelect = page.locator('select[name="category_id"]')
       if (await categorySelect.isVisible()) {
         await categorySelect.selectOption({ index: 1 })
         console.log('✅ Category selected')
@@ -101,10 +107,10 @@ test.describe('Merchant Flows - Complete Management', () => {
         logBug('Category select not found')
       }
 
-      // Fill prices
-      await page.fill('input[name="original_price"], input[placeholder*="Prix original"]', '1000')
-      await page.fill('input[name="discounted_price"], input[placeholder*="Prix réduit"]', '500')
-      await page.fill('input[name="quantity_available"], input[placeholder*="Quantité"]', '10')
+      // Fill prices (use discount percentage, not discounted price)
+      await page.fill('input[name="original_price"]', '1000')
+      await page.fill('input[name="discount_percentage"]', '50')
+      await page.fill('input[name="quantity_available"]', '10')
 
       // Fill expiration date
       const expirationInput = page.locator('input[type="date"], input[name*="expiration"]')
@@ -225,7 +231,7 @@ test.describe('Merchant Flows - Complete Management', () => {
     await page.goto('http://localhost:3000/merchant/products')
     await page.waitForLoadState('networkidle')
 
-    const initialCount = await page.locator('table tbody tr, .product-item').count()
+    const initialCount = await page.locator('[data-testid="product-list"] > *').count()
     console.log(`Initial product count: ${initialCount}`)
 
     const deleteBtn = page.locator('button:has-text("Supprimer"), button[aria-label*="Supprimer"]').first()
@@ -259,7 +265,7 @@ test.describe('Merchant Flows - Complete Management', () => {
           await confirmBtn.click()
           await page.waitForTimeout(2000)
 
-          const finalCount = await page.locator('table tbody tr, .product-item').count()
+          const finalCount = await page.locator('[data-testid="product-list"] > *').count()
           console.log(`Final product count: ${finalCount}`)
 
           if (finalCount < initialCount) {
