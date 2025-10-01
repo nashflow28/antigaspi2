@@ -213,6 +213,12 @@ const handleSubmit = async () => {
       console.log('[LoginForm] Login successful, authStore.user:', authStore.user)
       console.log('[LoginForm] User role:', authStore.user?.role)
       console.log('[LoginForm] isAuthenticated:', authStore.isAuthenticated)
+      console.log('[LoginForm] token:', authStore.token?.substring(0, 20) + '...')
+
+      // Small delay to ensure reactive state propagates
+      await new Promise(resolve => setTimeout(resolve, 100))
+
+      console.log('[LoginForm] After delay - isAuthenticated:', authStore.isAuthenticated)
 
       // Check for redirect query parameter
       const redirectTarget = route.query.redirect
@@ -225,16 +231,22 @@ const handleSubmit = async () => {
       // Direct redirect based on user role
       const user = authStore.user
       console.log('[LoginForm] Checking user role for redirect...')
+      let targetPath = '/dashboard'
+
       if (user?.role === 'admin') {
-        console.log('[LoginForm] Redirecting admin to /admin/dashboard')
-        await router.push('/admin/dashboard')
+        targetPath = '/admin/dashboard'
+        console.log('[LoginForm] Redirecting admin to', targetPath)
       } else if (user?.role === 'merchant') {
-        console.log('[LoginForm] Redirecting merchant to /merchant/dashboard')
-        await router.push('/merchant/dashboard')
+        targetPath = '/merchant/dashboard'
+        console.log('[LoginForm] Redirecting merchant to', targetPath)
       } else {
-        console.log('[LoginForm] Redirecting consumer to /dashboard')
-        await router.push('/dashboard')
+        console.log('[LoginForm] Redirecting consumer to', targetPath)
       }
+
+      console.log('[LoginForm] About to call router.push with:', targetPath)
+      const navigationResult = await router.push(targetPath)
+      console.log('[LoginForm] Navigation result:', navigationResult)
+      console.log('[LoginForm] Current route after push:', router.currentRoute.value.path)
     }
   } catch {
     // L'erreur est déjà gérée par le store et affichée via les notifications
