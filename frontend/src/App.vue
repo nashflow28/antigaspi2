@@ -15,6 +15,7 @@
           <Button
             variant="ghost"
             class="relative hidden sm:block md:inline-flex"
+            data-testid="cart-button"
             @click="handleCartClick"
           >
             <span>Mon panier</span>
@@ -45,6 +46,7 @@
           <template v-else>
             <Button
               variant="ghost"
+              data-testid="login-button"
               @click="handleLoginClick"
             >
               Connexion

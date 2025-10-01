@@ -239,6 +239,7 @@
         <div
           v-else
           data-test="products-grid"
+          data-testid="product-list"
           class="grid grid-cols-1 gap-3 sm:gap-4 md:grid-cols-3 xl:grid-cols-4"
         >
           <ProductCard
@@ -257,6 +258,7 @@
             :reserve-disabled="isProductSoldOut(product)"
             :disabled="isProductSoldOut(product) || quickReserveLoadingId === product.id"
             :aria-label="`Réserver ${product.name}`"
+            data-testid="product-card"
             class="h-full"
             @reserve="() => onReserve(product)"
             @click="() => viewProduct(product)"

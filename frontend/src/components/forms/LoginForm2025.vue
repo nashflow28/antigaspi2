@@ -21,6 +21,7 @@
           placeholder="votre@email.com"
           autocomplete="email"
           required
+          data-testid="email-input"
           :left-icon="Mail"
           :error="errors.email"
         />
@@ -36,6 +37,7 @@
           placeholder="Votre mot de passe"
           autocomplete="current-password"
           required
+          data-testid="password-input"
           :left-icon="Lock"
           :right-icon="showPassword ? EyeOff : Eye"
           :error="errors.password"
@@ -69,6 +71,7 @@
         :loading="loading"
         :disabled="!isFormValid"
         full-width
+        data-testid="submit-login"
         class="glow-effect group relative overflow-hidden sm:block"
       >
         <span class="relative z-10 flex items-center justify-center gap-2">
