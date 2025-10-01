@@ -15,16 +15,22 @@ test.describe('Admin & UI/UX Comprehensive Tests', () => {
     // ========== 1. ADMIN LOGIN ==========
     console.log('\n========== ADMIN LOGIN ==========')
     await page.goto('http://localhost:3000/login')
+    await page.waitForLoadState('networkidle')
+
     await page.fill('input[type="email"]', 'admin@antigaspi.com')
     await page.fill('input[type="password"]', 'password')
-    await page.click('button[type="submit"]')
-    await page.waitForTimeout(2000)
+
+    // Wait for navigation to admin area
+    await Promise.all([
+      page.waitForURL(/\/admin/, { timeout: 10000 }),
+      page.click('button[type="submit"]')
+    ]).catch(() => {
+      logBug(`Admin login failed - URL: ${page.url()}`)
+    })
 
     const currentUrl = page.url()
     if (currentUrl.includes('/admin')) {
       console.log('✅ Admin logged in successfully')
-    } else {
-      logBug(`Admin login failed - URL: ${currentUrl}`)
     }
 
     await page.screenshot({ path: 'test-results/admin-01-login.png', fullPage: true })
