@@ -21,6 +21,7 @@
             <Button
               variant="primary"
               size="lg"
+              data-testid="add-product-btn"
               :left-icon="PlusIcon"
               class="shadow-lg shadow-primary-500/25"
               @click="showAddProductModal = true"
@@ -309,12 +310,13 @@
             />
           </div>
 
-          <form class="space-y-6" @submit.prevent="saveProduct">
+          <form class="space-y-6" novalidate @submit.prevent="saveProduct">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-6">
               <div>
                 <label class="label">Nom du produit *</label>
                 <input
                   v-model="productForm.name"
+                  data-testid="product-name"
                   name="name"
                   type="text"
                   class="input w-full"
@@ -349,6 +351,7 @@
                 <label class="label">Prix original (F CFA) *</label>
                 <input
                   v-model.number="productForm.original_price"
+                  data-testid="product-price"
                   name="original_price"
                   type="number"
                   step="0.01"
@@ -445,6 +448,7 @@
               </Button>
               <Button
                 type="submit"
+                data-testid="save-product-btn"
                 class="flex-1"
                 :disabled="isSubmitting"
               >
@@ -803,15 +807,20 @@ const saveProduct = async () => {
 
     await loadProducts()
     closeModals()
-  } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : String(error)
+  } catch (error: any) {
+    const errorMessage = error?.response?.data?.message || error?.message || String(error)
 
     if (errorMessage.includes('Authentication')) {
       notify.error('Session expirée. Veuillez vous reconnecter.', 'Authentification requise')
     } else if (errorMessage.includes('Failed to fetch') || errorMessage.includes('NetworkError')) {
       notify.error('Erreur de connexion au serveur. Vérifiez que le serveur backend fonctionne.', 'Erreur réseau')
     } else {
-      notify.error('Erreur lors de l\'enregistrement du produit.')
+      notify.error(errorMessage, 'Erreur', {
+        action: {
+          label: 'Réessayer',
+          callback: () => saveProduct()
+        }
+      })
     }
   } finally {
     isSubmitting.value = false

@@ -1,0 +1,102 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e3]:
+  - navigation "Navigation principale" [ref=e4]:
+    - generic [ref=e5]:
+      - link "Antigaspi" [ref=e6] [cursor=pointer]:
+        - /url: /
+        - generic [ref=e7] [cursor=pointer]: Antigaspi
+      - menubar [ref=e8]:
+        - menuitem "Accueil" [ref=e9]:
+          - img [ref=e10]
+          - generic [ref=e12]: Accueil
+        - menuitem "Découvrir" [ref=e13]:
+          - img [ref=e14]
+          - generic [ref=e16]: Découvrir
+        - menuitem "Produits" [ref=e17]:
+          - img [ref=e18]
+          - generic [ref=e20]: Produits
+        - menuitem "Avis" [ref=e21]:
+          - img [ref=e22]
+          - generic [ref=e24]: Avis
+      - generic [ref=e25]:
+        - button "Activer le thème sombre" [ref=e26] [cursor=pointer]:
+          - generic [ref=e27] [cursor=pointer]: Activer le thème sombre
+          - img [ref=e29] [cursor=pointer]
+        - generic [ref=e35]:
+          - button "Mon panier 1" [active] [ref=e36] [cursor=pointer]:
+            - generic [ref=e37] [cursor=pointer]:
+              - generic [ref=e38] [cursor=pointer]: Mon panier
+              - generic [ref=e39] [cursor=pointer]: "1"
+          - button "Connexion" [ref=e40] [cursor=pointer]:
+            - generic [ref=e41] [cursor=pointer]: Connexion
+          - button "Inscription" [ref=e42] [cursor=pointer]:
+            - generic [ref=e43] [cursor=pointer]: Inscription
+  - main [ref=e44]:
+    - generic [ref=e45]:
+      - generic [ref=e48]:
+        - generic [ref=e49]:
+          - paragraph [ref=e50]:
+            - img [ref=e51]
+            - text: Mon panier AntiGaspi
+          - heading "Récapitulatif de vos paniers" [level=1] [ref=e55]
+          - paragraph [ref=e56]: Ajustez vos quantités, ajoutez un message au commerçant et finalisez votre réservation en toute sécurité.
+        - button "Continuer mes découvertes" [ref=e57] [cursor=pointer]:
+          - generic [ref=e58] [cursor=pointer]: Continuer mes découvertes
+      - main [ref=e59]:
+        - article [ref=e61]:
+          - generic [ref=e63]:
+            - heading "Articles réservés" [level=2] [ref=e64]
+            - generic [ref=e65]: 1 article
+          - list [ref=e67]:
+            - listitem [ref=e68]:
+              - generic [ref=e71]:
+                - paragraph [ref=e72]: Test Product
+                - generic [ref=e74]: 250 F CFA
+              - generic [ref=e75]:
+                - generic [ref=e76]:
+                  - button "Diminuer la quantité" [ref=e77] [cursor=pointer]:
+                    - img [ref=e78] [cursor=pointer]
+                  - generic [ref=e79]: "1"
+                  - button "Augmenter la quantité" [ref=e80] [cursor=pointer]:
+                    - img [ref=e81] [cursor=pointer]
+                - button "Retirer" [ref=e82] [cursor=pointer]:
+                  - img [ref=e83] [cursor=pointer]
+                  - text: Retirer
+          - generic [ref=e87]:
+            - button "Vider le panier" [ref=e88] [cursor=pointer]:
+              - generic [ref=e89] [cursor=pointer]: Vider le panier
+            - button "Procéder au paiement" [ref=e90] [cursor=pointer]:
+              - generic [ref=e91] [cursor=pointer]: Procéder au paiement
+        - complementary [ref=e92]:
+          - article [ref=e93]:
+            - heading "Résumé de commande" [level=2] [ref=e95]
+            - generic [ref=e96]:
+              - generic [ref=e97]:
+                - generic [ref=e98]:
+                  - term [ref=e99]: Sous-total
+                  - definition [ref=e100]: 250 F CFA
+                - generic [ref=e101]:
+                  - term [ref=e102]: Frais de service
+                  - definition [ref=e103]: Offerts
+                - generic [ref=e104]:
+                  - term [ref=e105]: Total
+                  - definition [ref=e106]: 250 F CFA
+              - paragraph [ref=e107]: Les commerçants confirment généralement en moins de 10 minutes. Vous recevrez une notification dès que votre panier sera prêt.
+          - article [ref=e108]:
+            - heading "Astuce AntiGaspi" [level=2] [ref=e110]
+            - generic [ref=e111]:
+              - paragraph [ref=e112]: Ajoutez vos commerçants favoris pour retrouver plus facilement leurs paniers et recevoir leurs alertes.
+              - button "Gérer mes favoris" [ref=e113] [cursor=pointer]:
+                - generic [ref=e114] [cursor=pointer]: Gérer mes favoris
+  - contentinfo [ref=e115]:
+    - generic [ref=e116]:
+      - generic [ref=e117]:
+        - paragraph [ref=e118]: Antigaspi
+        - paragraph [ref=e119]: © 2025 — Ensemble, réduisons le gaspillage alimentaire.
+      - generic [ref=e120]:
+        - img [ref=e122]
+        - img [ref=e126]
+        - img [ref=e130]
+```

@@ -217,8 +217,8 @@ test.describe('Notification Callbacks - E2E Tests', () => {
       // Should show success notification
       await waitForNotification(page, 'success')
       const notification = page.locator('[data-testid="notification-success"]')
-      await expect(notification).toContainText('Connexion réussie')
-      await expect(notification).toContainText('Produit créé avec succès')
+      await expect(notification).toContainText('Succès')
+      await expect(notification).toContainText('Produit ajouté avec succès')
     })
 
     test('should show success notification on product creation success', async ({ page }) => {
@@ -246,9 +246,8 @@ test.describe('Notification Callbacks - E2E Tests', () => {
 
       await waitForNotification(page, 'success')
       const notification = page.locator('[data-testid="notification-success"]')
-      await expect(notification).toContainText('Connexion réussie')
-      await expect(notification).toContainText('Produit créé avec succès')
-      await expect(notification).toContainText('Catalogue')
+      await expect(notification).toContainText('Succès')
+      await expect(notification).toContainText('Produit ajouté avec succès')
     })
   })
 

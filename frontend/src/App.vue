@@ -23,6 +23,7 @@
               v-if="cartItemsCount > 0"
               variant="primary"
               size="xs"
+              data-testid="cart-count"
               class="relative sm:absolute -top-2 -right-2 min-w-4 justify-center px-2 py-0.5 text-[10px]"
             >
               {{ cartItemsCount > 99 ? '99+' : cartItemsCount }}
@@ -32,6 +33,7 @@
           <template v-if="isAuthenticated">
             <Button
               variant="ghost"
+              data-testid="user-profile"
               @click="goToDashboard"
             >
               Mon espace

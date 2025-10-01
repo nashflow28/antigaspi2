@@ -1,0 +1,148 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e3]:
+  - navigation "Navigation principale" [ref=e4]:
+    - generic [ref=e5]:
+      - link "Antigaspi" [ref=e6] [cursor=pointer]:
+        - /url: /
+        - generic [ref=e7] [cursor=pointer]: Antigaspi
+      - menubar [ref=e8]:
+        - menuitem "Accueil" [ref=e9]:
+          - img [ref=e10]
+          - generic [ref=e12]: Accueil
+        - menuitem "Découvrir" [ref=e13]:
+          - img [ref=e14]
+          - generic [ref=e16]: Découvrir
+        - menuitem "Produits" [ref=e17]:
+          - img [ref=e18]
+          - generic [ref=e20]: Produits
+        - menuitem "Avis" [ref=e21]:
+          - img [ref=e22]
+          - generic [ref=e24]: Avis
+        - menuitem "Tableau de bord" [ref=e25]:
+          - img [ref=e26]
+          - generic [ref=e28]: Tableau de bord
+      - generic [ref=e30]:
+        - button "Activer le thème clair" [ref=e31] [cursor=pointer]:
+          - generic [ref=e32] [cursor=pointer]: Activer le thème clair
+          - img [ref=e34] [cursor=pointer]
+        - generic [ref=e36]:
+          - button "Mon panier" [ref=e37] [cursor=pointer]:
+            - generic [ref=e39] [cursor=pointer]: Mon panier
+          - button "Mon espace" [ref=e40] [cursor=pointer]:
+            - generic [ref=e41] [cursor=pointer]: Mon espace
+          - button "Se déconnecter" [ref=e42] [cursor=pointer]:
+            - generic [ref=e43] [cursor=pointer]: Se déconnecter
+  - main [ref=e44]:
+    - generic [ref=e46]:
+      - generic [ref=e49]:
+        - generic [ref=e50]:
+          - generic [ref=e51]:
+            - button "Retour" [ref=e52] [cursor=pointer]:
+              - generic [ref=e53] [cursor=pointer]:
+                - img [ref=e54] [cursor=pointer]
+                - text: Retour
+            - generic [ref=e57]: Réservation
+          - heading "Panier signature anti-gaspi" [level=1] [ref=e58]
+          - paragraph [ref=e59]: "Code: ANT-512"
+        - generic [ref=e61]: Confirmée
+      - generic [ref=e62]:
+        - generic [ref=e63]:
+          - generic [ref=e65]:
+            - heading "Détails du produit" [level=3] [ref=e66]
+            - generic [ref=e67]:
+              - img "Panier signature anti-gaspi" [ref=e69]
+              - generic [ref=e70]:
+                - heading "Panier signature anti-gaspi" [level=4] [ref=e71]
+                - generic [ref=e72]:
+                  - generic [ref=e73]:
+                    - img [ref=e74]
+                    - generic [ref=e78]: La Ferme Urbaine
+                  - generic [ref=e79]:
+                    - img [ref=e80]
+                    - generic [ref=e83]: 12 avenue des Serres, Abidjan
+                  - generic [ref=e84]:
+                    - img [ref=e85]
+                    - generic [ref=e87]: +225 01 23 45 67
+          - generic [ref=e89]:
+            - heading "Détails de la réservation" [level=3] [ref=e90]
+            - generic [ref=e91]:
+              - generic [ref=e92]:
+                - generic [ref=e93]: Quantité réservée
+                - paragraph [ref=e94]: "2"
+              - generic [ref=e95]:
+                - generic [ref=e96]: Prix unitaire
+                - generic [ref=e97]:
+                  - generic [ref=e98]: 8 400 F CFA
+                  - generic [ref=e99]: 12 000 F CFA
+              - generic [ref=e100]:
+                - generic [ref=e101]: Montant total
+                - paragraph [ref=e102]: 16 800 F CFA
+              - generic [ref=e103]:
+                - generic [ref=e104]: Date de retrait
+                - paragraph [ref=e105]: mercredi 19 juin 2030 à 09:30
+            - generic [ref=e106]:
+              - generic [ref=e107]: Notes de retrait
+              - paragraph [ref=e108]: Présentez votre QR code et votre sac isotherme à l'arrivée.
+          - generic [ref=e110]:
+            - heading "Actions disponibles" [level=3] [ref=e111]
+            - generic [ref=e112]:
+              - button "Contacter le commerçant" [ref=e113] [cursor=pointer]:
+                - generic [ref=e114] [cursor=pointer]:
+                  - img [ref=e115] [cursor=pointer]
+                  - text: Contacter le commerçant
+              - button "Télécharger le reçu" [ref=e117] [cursor=pointer]:
+                - generic [ref=e118] [cursor=pointer]:
+                  - img [ref=e119] [cursor=pointer]
+                  - text: Télécharger le reçu
+        - generic [ref=e122]:
+          - generic [ref=e124]:
+            - heading "Suivi de la réservation" [level=3] [ref=e125]
+            - generic [ref=e126]:
+              - generic [ref=e127]:
+                - img [ref=e129]
+                - generic [ref=e131]:
+                  - paragraph [ref=e132]: Réservation créée
+                  - paragraph [ref=e133]: Votre réservation a été enregistrée
+              - generic [ref=e134]:
+                - img [ref=e136]
+                - generic [ref=e138]:
+                  - paragraph [ref=e139]: Confirmée
+                  - paragraph [ref=e140]: Le commerçant a confirmé votre réservation
+              - generic [ref=e141]:
+                - img [ref=e143]
+                - generic [ref=e148]:
+                  - paragraph [ref=e149]: Prête
+                  - paragraph [ref=e150]: Votre commande est prête à être récupérée
+              - generic [ref=e151]:
+                - img [ref=e153]
+                - generic [ref=e155]:
+                  - paragraph [ref=e156]: Récupérée
+                  - paragraph [ref=e157]: Vous avez récupéré votre commande
+          - generic [ref=e159]:
+            - generic [ref=e160]:
+              - img [ref=e162]
+              - generic [ref=e164]:
+                - heading "Vos économies" [level=3] [ref=e165]
+                - paragraph [ref=e166]: Sur cette réservation
+            - generic [ref=e167]:
+              - generic [ref=e168]:
+                - generic [ref=e169]: Prix original
+                - generic [ref=e170]: 24 000 F CFA
+              - generic [ref=e171]:
+                - generic [ref=e172]: Prix payé
+                - generic [ref=e173]: 16 800 F CFA
+              - generic [ref=e175]:
+                - generic [ref=e176]: Économisé
+                - generic [ref=e177]: 7 200 F CFA
+  - contentinfo [ref=e178]:
+    - generic [ref=e179]:
+      - generic [ref=e180]:
+        - paragraph [ref=e181]: Antigaspi
+        - paragraph [ref=e182]: © 2025 — Ensemble, réduisons le gaspillage alimentaire.
+      - generic [ref=e183]:
+        - img [ref=e185]
+        - img [ref=e189]
+        - img [ref=e193]
+```

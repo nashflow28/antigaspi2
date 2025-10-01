@@ -54,7 +54,7 @@
 
       <div class="product-card__body">
         <div class="space-y-2">
-          <h3 class="product-card__title">
+          <h3 class="product-card__title" data-testid="product-name">
             {{ name }}
           </h3>
           <p class="product-card__merchant">
@@ -90,7 +90,7 @@
               Prix anti-gaspi
             </p>
             <div class="product-card__pricing-values">
-              <span class="product-card__price">{{ price }}</span>
+              <span class="product-card__price" data-testid="product-price">{{ price }}</span>
               <span v-if="originalPrice" class="product-card__original-price">{{ originalPrice }}</span>
             </div>
             <p
@@ -112,6 +112,7 @@
               <Button
                 :variant="isPromo ? 'promo' : 'primary'"
                 size="sm"
+                data-testid="add-to-cart"
                 :aria-label="ariaLabel"
                 :loading="reserveLoading"
                 :disabled="isDisabled"

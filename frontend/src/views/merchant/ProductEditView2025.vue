@@ -78,6 +78,7 @@
                   <Input
                     id="name"
                     v-model="product.name"
+                    data-testid="product-name"
                     :error="errors.name"
                     placeholder="Ex: Pain complet artisanal"
                     required
@@ -154,6 +155,7 @@
                     <Input
                       id="discounted_price"
                       v-model="product.discounted_price"
+                      data-testid="product-price"
                       type="number"
                       :error="errors.discounted_price"
                       placeholder="0"
@@ -250,6 +252,7 @@
                 <Button
                   variant="primary"
                   type="submit"
+                  data-testid="save-product-btn"
                   :disabled="saving"
                   :loading="saving"
                 >

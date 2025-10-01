@@ -1,0 +1,185 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e3]:
+  - navigation "Navigation principale" [ref=e4]:
+    - generic [ref=e5]:
+      - link "Antigaspi" [ref=e6] [cursor=pointer]:
+        - /url: /
+        - generic [ref=e7] [cursor=pointer]: Antigaspi
+      - menubar [ref=e8]:
+        - menuitem "Accueil" [ref=e9]:
+          - img [ref=e10]
+          - generic [ref=e12]: Accueil
+        - menuitem "Découvrir" [ref=e13]:
+          - img [ref=e14]
+          - generic [ref=e16]: Découvrir
+        - menuitem "Produits" [ref=e17]:
+          - img [ref=e18]
+          - generic [ref=e20]: Produits
+        - menuitem "Avis" [ref=e21]:
+          - img [ref=e22]
+          - generic [ref=e24]: Avis
+        - menuitem "Tableau de bord" [ref=e25]:
+          - img [ref=e26]
+          - generic [ref=e28]: Tableau de bord
+      - generic [ref=e30]:
+        - button "Activer le thème sombre" [ref=e31] [cursor=pointer]:
+          - generic [ref=e32] [cursor=pointer]: Activer le thème sombre
+          - img [ref=e34] [cursor=pointer]
+        - generic [ref=e40]:
+          - button "Mon panier" [ref=e41] [cursor=pointer]:
+            - generic [ref=e43] [cursor=pointer]: Mon panier
+          - button "Mon espace" [ref=e44] [cursor=pointer]:
+            - generic [ref=e45] [cursor=pointer]: Mon espace
+          - button "Se déconnecter" [ref=e46] [cursor=pointer]:
+            - generic [ref=e47] [cursor=pointer]: Se déconnecter
+  - main [ref=e48]:
+    - generic [ref=e49]:
+      - generic [ref=e51]:
+        - generic [ref=e52]:
+          - img [ref=e54]
+          - heading "Espace Commerçant" [level=1] [ref=e56]
+        - navigation [ref=e57]:
+          - generic [ref=e58]:
+            - img [ref=e60]
+            - generic [ref=e62]: Vue d’ensemble
+          - generic [ref=e63]:
+            - img [ref=e65]
+            - generic [ref=e67]: Produits
+          - generic [ref=e68]:
+            - img [ref=e70]
+            - generic [ref=e72]: Réservations
+          - generic [ref=e73]:
+            - img [ref=e75]
+            - generic [ref=e77]: Avis clients
+          - generic [ref=e78]:
+            - img [ref=e80]
+            - generic [ref=e82]: Paniers surprise
+          - generic [ref=e83]:
+            - img [ref=e85]
+            - generic [ref=e87]: Fidélité
+      - generic [ref=e88]:
+        - generic [ref=e93]:
+          - generic [ref=e94]: M
+          - generic [ref=e95]:
+            - paragraph [ref=e96]: Marie Martin
+            - paragraph [ref=e97]: marie.martin@email.com
+        - generic [ref=e99]:
+          - generic [ref=e100]:
+            - link "Retour aux produits" [ref=e102] [cursor=pointer]:
+              - /url: /merchant/products
+              - img [ref=e103] [cursor=pointer]
+              - text: Retour aux produits
+            - generic [ref=e105]:
+              - generic [ref=e106]:
+                - heading "Modifier le produit" [level=1] [ref=e107]
+                - paragraph [ref=e108]: Pain complet artisanal
+              - button "Supprimer" [ref=e110] [cursor=pointer]:
+                - generic [ref=e111] [cursor=pointer]:
+                  - img [ref=e112] [cursor=pointer]
+                  - text: Supprimer
+          - generic [ref=e116]:
+            - generic [ref=e117]:
+              - generic [ref=e118]:
+                - heading "Informations générales" [level=3] [ref=e120]
+                - generic [ref=e122]:
+                  - generic [ref=e123]:
+                    - generic [ref=e124]:
+                      - text: Nom du produit
+                      - generic [ref=e125]: "*"
+                    - textbox "Nom du produit *" [ref=e128]: Pain complet artisanal
+                  - generic [ref=e129]:
+                    - generic [ref=e130]: Description
+                    - textbox "Description" [ref=e131]: Pain complet aux graines, fabriquÚ le matin mÛme
+                  - generic [ref=e132]:
+                    - generic [ref=e133]:
+                      - text: Catégorie
+                      - generic [ref=e134]: "*"
+                    - combobox "Catégorie *" [ref=e135]:
+                      - option "Sélectionner une catégorie"
+                      - option "Boulangerie" [selected]
+                      - option "Fruits & LÚgumes"
+                      - option "╔picerie"
+                      - option "Laitier"
+                      - option "Viandes"
+              - generic [ref=e136]:
+                - heading "Prix et disponibilité" [level=3] [ref=e138]
+                - generic [ref=e140]:
+                  - generic [ref=e141]:
+                    - generic [ref=e142]:
+                      - generic [ref=e143]:
+                        - text: Prix original (XOF)
+                        - generic [ref=e144]: "*"
+                      - spinbutton "Prix original (XOF) *" [ref=e147]: "500"
+                    - generic [ref=e148]:
+                      - generic [ref=e149]:
+                        - text: Prix réduit (XOF)
+                        - generic [ref=e150]: "*"
+                      - spinbutton "Prix réduit (XOF) *" [ref=e153]: "250"
+                  - generic [ref=e154]:
+                    - generic [ref=e155]:
+                      - text: Quantité disponible
+                      - generic [ref=e156]: "*"
+                    - spinbutton "Quantité disponible *" [ref=e159]: "15"
+                  - generic [ref=e160]:
+                    - generic [ref=e161]: Date d'expiration
+                    - textbox "Date d'expiration" [ref=e164]
+              - generic [ref=e165]:
+                - heading "Image du produit" [level=3] [ref=e167]
+                - generic [ref=e169]:
+                  - generic [ref=e170]:
+                    - img "Pain complet artisanal" [ref=e171]
+                    - button "Supprimer l'image" [ref=e172] [cursor=pointer]:
+                      - generic [ref=e173] [cursor=pointer]:
+                        - img [ref=e174] [cursor=pointer]
+                        - text: Supprimer l'image
+                  - generic [ref=e177]:
+                    - button "Changer l'image" [ref=e178] [cursor=pointer]:
+                      - generic [ref=e179] [cursor=pointer]:
+                        - img [ref=e180] [cursor=pointer]
+                        - text: Changer l'image
+                    - paragraph [ref=e183]: PNG, JPG jusqu'à 2MB
+              - generic [ref=e186]:
+                - button "Annuler" [ref=e187] [cursor=pointer]:
+                  - generic [ref=e188] [cursor=pointer]: Annuler
+                - button "Enregistrer les modifications" [ref=e189] [cursor=pointer]:
+                  - generic [ref=e190] [cursor=pointer]: Enregistrer les modifications
+            - generic [ref=e191]:
+              - generic [ref=e192]:
+                - heading "Status" [level=3] [ref=e194]
+                - generic [ref=e196]:
+                  - generic [ref=e197]:
+                    - generic [ref=e198]: Statut
+                    - generic [ref=e199]: Actif
+                  - generic [ref=e200]:
+                    - generic [ref=e201]: Réduction
+                    - generic [ref=e202]: "-50%"
+                  - generic [ref=e203]:
+                    - generic [ref=e204]: Créé le
+                    - generic [ref=e205]: 25 sept. 2025, 16:24
+                  - generic [ref=e206]:
+                    - generic [ref=e207]: Modifié le
+                    - generic [ref=e208]: 01 oct. 2025, 08:57
+              - generic [ref=e209]:
+                - heading "Statistiques" [level=3] [ref=e211]
+                - generic [ref=e213]:
+                  - generic [ref=e214]:
+                    - generic [ref=e215]: Vues
+                    - generic [ref=e216]: "0"
+                  - generic [ref=e217]:
+                    - generic [ref=e218]: Réservations
+                    - generic [ref=e219]: "0"
+                  - generic [ref=e220]:
+                    - generic [ref=e221]: Revenus
+                    - generic [ref=e222]: 0 F CFA
+  - contentinfo [ref=e223]:
+    - generic [ref=e224]:
+      - generic [ref=e225]:
+        - paragraph [ref=e226]: Antigaspi
+        - paragraph [ref=e227]: © 2025 — Ensemble, réduisons le gaspillage alimentaire.
+      - generic [ref=e228]:
+        - img [ref=e230]
+        - img [ref=e234]
+        - img [ref=e238]
+```

@@ -368,10 +368,11 @@
         </div>
 
         <!-- Products Grid -->
-        <div v-else-if="featuredProducts.length > 0" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div v-else-if="featuredProducts.length > 0" data-testid="product-list" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           <article
             v-for="product in featuredProducts"
             :key="product.id"
+            data-testid="product-card"
             class="product-card bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow cursor-pointer"
             @click="$router.push(`/products/${product.id}`)"
           >
@@ -387,7 +388,7 @@
               </div>
             </div>
             <div class="p-4">
-              <h3 class="font-semibold text-gray-900 mb-1">
+              <h3 class="font-semibold text-gray-900 mb-1" data-testid="product-name">
                 {{ product.name }}
               </h3>
               <p class="text-sm text-gray-500 mb-2">
@@ -395,7 +396,7 @@
               </p>
               <div class="flex items-center justify-between">
                 <div>
-                  <span class="text-lg font-bold text-primary-600">
+                  <span class="text-lg font-bold text-primary-600" data-testid="product-price">
                     {{ product.discounted_price }} XOF
                   </span>
                   <span class="text-sm text-gray-400 line-through ml-2">
