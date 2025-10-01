@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test'
+import * as fs from 'fs'
 
 const BUGS_FOUND: string[] = []
 
@@ -129,7 +130,6 @@ test.describe('Buttons Styling Quick Test', () => {
     }
 
     // Save bugs to file
-    const fs = require('fs')
     fs.writeFileSync('test-results/bugs-buttons.json', JSON.stringify(BUGS_FOUND, null, 2))
   })
 })
