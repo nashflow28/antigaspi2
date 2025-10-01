@@ -127,15 +127,20 @@ test.describe('Merchant Flows - Complete Management', () => {
       // Submit
       const submitBtn = page.locator('button[type="submit"], button:has-text("Enregistrer")')
       await submitBtn.click()
-      await page.waitForTimeout(2000)
 
-      // Check for success
-      const successNotif = page.locator('[role="alert"]:has-text("succès"), .notification:has-text("succès")')
-      if (await successNotif.count() > 0) {
-        console.log('✅ Product created successfully')
-      } else {
+      // Wait for success notification (Toast uses role="status")
+      try {
+        await page.waitForSelector('[role="status"]', { state: 'visible', timeout: 5000 })
+        const notificationText = await page.locator('[role="status"]').textContent()
+        if (notificationText?.toLowerCase().includes('succès')) {
+          console.log('✅ Product created successfully with notification')
+        }
+      } catch {
         logBug('No success notification after product creation')
       }
+
+      // Wait for modal to close and products to reload
+      await page.waitForTimeout(1000)
 
       // Check if redirected to products list
       await page.waitForTimeout(1000)
@@ -172,38 +177,39 @@ test.describe('Merchant Flows - Complete Management', () => {
       // ========== 6. TEST IMAGE UPLOAD ==========
       console.log('\n========== TESTING IMAGE UPLOAD ==========')
 
-      const addImageBtn = page.locator('button:has-text("Ajouter une image"), button:has-text("Changer")')
-      if (await addImageBtn.isVisible()) {
-        console.log('✅ Add image button found')
+      // Direct file input (no button, just input[type="file"])
+      const fileInput = page.locator('input[type="file"]')
+      if (await fileInput.isVisible()) {
+        console.log('✅ File input found')
 
-        // Click button
-        await addImageBtn.click()
-        await page.waitForTimeout(500)
-
-        // Upload image
-        const fileInput = page.locator('input[type="file"]')
+        // Upload image directly to file input
         const imagePath = path.resolve('C:/xampp/htdocs/antigaspi2/IMAGES_PRODUITS/pain.jpeg')
+        await fileInput.setInputFiles(imagePath)
+        console.log('✅ Image file selected')
 
-        await fileInput.first().setInputFiles(imagePath)
-        console.log('Image file selected')
+        // Wait for upload and preview to appear
+        await page.waitForTimeout(1000)
 
-        // Wait for upload
-        await page.waitForTimeout(3000)
-
-        // Check if image preview appears
-        const imagePreview = page.locator('img[src*="storage"], img[src*="products"]')
-        if (await imagePreview.isVisible()) {
+        // Check if image preview appears (base64 data URL or server path)
+        const imagePreview = page.locator('img[alt="Aperçu du produit"]')
+        try {
+          await imagePreview.waitFor({ state: 'visible', timeout: 3000 })
           console.log('✅ Image preview displayed')
-        } else {
+        } catch {
           logBug('Image preview not displayed after upload')
         }
 
         await page.screenshot({ path: 'test-results/merchant-07-after-image-upload.png', fullPage: true })
 
-        // Save product
-        const saveBtn = page.locator('button:has-text("Enregistrer")')
-        await saveBtn.click()
-        await page.waitForTimeout(2000)
+        // Save product (submit button in modal form)
+        const saveBtn = page.locator('button[type="submit"]:has-text("Enregistrer")').first()
+        try {
+          await saveBtn.waitFor({ state: 'visible', timeout: 5000 })
+          await saveBtn.click()
+          await page.waitForTimeout(2000)
+        } catch (error) {
+          logBug('Save button not found or not clickable after image upload')
+        }
 
         // Check for errors in console
         const errorAlerts = page.locator('[role="alert"]:has-text("erreur"), .error, .text-red')
@@ -220,7 +226,7 @@ test.describe('Merchant Flows - Complete Management', () => {
 
         await page.screenshot({ path: 'test-results/merchant-08-after-save.png', fullPage: true })
       } else {
-        logBug('Add image button not found')
+        logBug('File input not found for image upload')
       }
     } else {
       logBug('Edit button not found')
@@ -259,8 +265,8 @@ test.describe('Merchant Flows - Complete Management', () => {
 
         await page.screenshot({ path: 'test-results/merchant-09-delete-modal.png', fullPage: true })
 
-        // Confirm deletion
-        const confirmBtn = page.locator('button:has-text("Confirmer"), button:has-text("Oui")')
+        // Confirm deletion (button says "Supprimer" in modal)
+        const confirmBtn = page.locator('button:has-text("Supprimer")').last()
         if (await confirmBtn.isVisible()) {
           await confirmBtn.click()
           await page.waitForTimeout(2000)
@@ -303,23 +309,26 @@ test.describe('Merchant Flows - Complete Management', () => {
 
     await page.screenshot({ path: 'test-results/merchant-10-reservations.png', fullPage: true })
 
-    // ========== 9. TEST RESPONSIVE SIDEBAR ==========
-    console.log('\n========== TESTING SIDEBAR NAVIGATION ==========')
+    // ========== 9. TEST HEADER NAVIGATION ==========
+    console.log('\n========== TESTING HEADER NAVIGATION ==========')
 
-    const sidebar = page.locator('aside, nav, [data-testid="sidebar"]')
-    if (await sidebar.isVisible()) {
-      console.log('✅ Sidebar visible')
+    // Navigation is in header, not sidebar in this app
+    const headerNav = page.locator('header nav, [role="navigation"]')
+    if (await headerNav.isVisible()) {
+      console.log('✅ Header navigation visible')
 
-      // Check sidebar links
-      const navLinks = sidebar.locator('a')
+      // Check navigation links (Accueil, Découvrir, Produits, etc.)
+      const navLinks = headerNav.locator('a[href^="/"]')
       const linksCount = await navLinks.count()
-      console.log(`Found ${linksCount} navigation links in sidebar`)
+      console.log(`Found ${linksCount} navigation links in header`)
 
       if (linksCount < 3) {
-        logBug('Too few navigation links in sidebar')
+        logBug('Too few navigation links in header')
+      } else {
+        console.log('✅ Navigation links found')
       }
     } else {
-      logBug('Sidebar not visible')
+      logBug('Header navigation not visible')
     }
 
     // ========== 10. CHECK NOTIFICATIONS ==========

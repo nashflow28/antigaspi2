@@ -460,6 +460,9 @@
       <div
         v-if="showDeleteConfirmModal"
         class="fixed inset-0 bg-black/50 flex items-center justify-center z-[120] p-4"
+        role="dialog"
+        aria-labelledby="delete-modal-title"
+        aria-modal="true"
         @click="cancelDelete"
       >
         <Card
@@ -486,7 +489,7 @@
             </div>
 
             <!-- Title -->
-            <h3 class="mt-2 text-lg font-semibold text-gray-900">
+            <h3 id="delete-modal-title" class="mt-2 text-lg font-semibold text-gray-900">
               Supprimer le produit
             </h3>
 
