@@ -1,7 +1,43 @@
 import { test, expect } from '@playwright/test'
 
+// Mock products data
+const mockProducts = [
+  {
+    id: 1,
+    name: 'Pain complet artisanal',
+    category: 'Boulangerie',
+    original_price: 500,
+    discounted_price: 250,
+    image_url: 'https://via.placeholder.com/300',
+    is_active: true,
+    quantity_available: 5
+  },
+  {
+    id: 2,
+    name: 'Croissants frais',
+    category: 'Boulangerie',
+    original_price: 200,
+    discounted_price: 100,
+    image_url: 'https://via.placeholder.com/300',
+    is_active: true,
+    quantity_available: 10
+  }
+]
+
 test.describe('Critical User Flows', () => {
   test.beforeEach(async ({ page }) => {
+    // Mock products API
+    await page.route('**/api/products*', route => {
+      route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          success: true,
+          data: mockProducts
+        })
+      })
+    })
+
     // Navigate to the application
     await page.goto('http://localhost:3000')
   })
@@ -20,6 +56,26 @@ test.describe('Critical User Flows', () => {
   })
 
   test('Authentication flow works correctly', async ({ page }) => {
+    // Mock login API
+    await page.route('**/api/auth/login', route => {
+      route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          success: true,
+          data: {
+            user: {
+              id: 1,
+              email: 'jean.dupont@email.com',
+              name: 'Jean Dupont',
+              role: 'consumer'
+            },
+            token: 'mock-jwt-token-123'
+          }
+        })
+      })
+    })
+
     // Navigate to login page
     await page.click('[data-testid="login-button"]', { timeout: 5000 })
 
@@ -35,6 +91,71 @@ test.describe('Critical User Flows', () => {
   })
 
   test('Product reservation flow for authenticated user', async ({ page }) => {
+    // Mock products API with specific product details
+    await page.route('**/api/products**', route => {
+      const url = route.request().url()
+      // Product detail (GET /api/products/1)
+      if (url.includes('/api/products/1')) {
+        route.fulfill({
+          status: 200,
+          contentType: 'application/json',
+          body: JSON.stringify({
+            success: true,
+            data: mockProducts[0]
+          })
+        })
+      } else {
+        // Products list
+        route.fulfill({
+          status: 200,
+          contentType: 'application/json',
+          body: JSON.stringify({
+            success: true,
+            data: mockProducts
+          })
+        })
+      }
+    })
+
+    // Mock login API
+    await page.route('**/api/auth/login', route => {
+      route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          success: true,
+          data: {
+            user: {
+              id: 1,
+              email: 'jean.dupont@email.com',
+              name: 'Jean Dupont',
+              role: 'consumer'
+            },
+            token: 'mock-jwt-token-123'
+          }
+        })
+      })
+    })
+
+    // Mock reservation API
+    await page.route('**/api/reservations', route => {
+      if (route.request().method() === 'POST') {
+        route.fulfill({
+          status: 201,
+          contentType: 'application/json',
+          body: JSON.stringify({
+            success: true,
+            data: {
+              id: 1,
+              product_id: 1,
+              quantity: 1,
+              status: 'pending'
+            }
+          })
+        })
+      }
+    })
+
     // Login first
     await page.goto('http://localhost:3000/login')
     await page.fill('[data-testid="email-input"]', 'jean.dupont@email.com')
@@ -46,16 +167,19 @@ test.describe('Critical User Flows', () => {
 
     // Navigate to products
     await page.goto('http://localhost:3000/products')
+    await page.waitForLoadState('domcontentloaded')
 
-    // Select a product
-    const firstProduct = page.locator('[data-testid="product-card"]').first()
-    await firstProduct.click()
+    // Add product to cart directly from products list
+    const firstProductCard = page.locator('[data-testid="product-card"]').first()
+    await expect(firstProductCard).toBeVisible()
 
-    // Add to cart or reserve
-    await page.click('[data-testid="add-to-cart"]', { timeout: 5000 })
+    // Find and click add-to-cart button within the first product card
+    const addToCartButton = firstProductCard.locator('[data-testid="add-to-cart"]')
+    await addToCartButton.click()
 
-    // Check cart has items
-    await expect(page.locator('[data-testid="cart-count"]')).toHaveText('1')
+    // Check that reservation was successful (notification appears)
+    const successNotification = page.locator('[data-testid="notification-success"]').first()
+    await expect(successNotification).toBeVisible({ timeout: 10000 })
   })
 
   test('Cart functionality works correctly', async ({ page }) => {

@@ -56,6 +56,7 @@
             <li
               v-for="item in items"
               :key="item.id"
+              data-testid="cart-item"
               class="flex flex-col gap-3 py-6 md:flex-row md:items-center md:justify-between"
             >
               <div class="flex flex-1 items-stretch sm:items-start gap-3">
@@ -132,7 +133,7 @@
             </div>
             <div class="flex items-center justify-between border-t border-gray-200 pt-3 text-base font-semibold text-gray-900">
               <dt>Total</dt>
-              <dd>{{ formattedTotal }}</dd>
+              <dd data-testid="cart-total">{{ formattedTotal }}</dd>
             </div>
           </dl>
           <p class="mt-4 text-xs text-gray-500">

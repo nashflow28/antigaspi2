@@ -210,6 +210,7 @@
                     variant="secondary"
                     size="lg"
                     full-width
+                    data-testid="add-to-cart"
                     :disabled="availableQuantity === 0 || reservationLoading"
                     :loading="reservationLoading"
                     @click="handleReservation"
