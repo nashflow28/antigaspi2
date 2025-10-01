@@ -278,6 +278,12 @@ const router = createRouter({
       meta: { requiresAuth: true, roles: ['admin'] }
     },
     {
+      path: '/admin/products',
+      name: 'admin-products',
+      component: () => import('@/views/admin/ProductsView.vue'),
+      meta: { requiresAuth: true, roles: ['admin'] }
+    },
+    {
       path: '/gaspiz-demo',
       name: 'gaspiz-demo',
       component: () => import('@/views/GaspizInspiredHome.vue'),
