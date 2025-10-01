@@ -74,24 +74,39 @@ test.describe('Consumer Flows - Complete Journey', () => {
       await passwordInputs.first().fill(newUserPassword)
     }
 
-    // Submit form and wait for navigation
-    await Promise.all([
-      page.waitForURL(/\/(dashboard|products)/, { timeout: 10000 }),
-      page.click('button[type="submit"]')
-    ]).catch(async () => {
-      // If navigation fails, check for errors
-      const errorElements = page.locator('[role="status"]')
-      const errorCount = await errorElements.count()
+    // Check terms and conditions checkbox
+    const termsCheckbox = page.locator('input[type="checkbox"]#terms, input[type="checkbox"][id="terms"]')
+    if (await termsCheckbox.isVisible()) {
+      await termsCheckbox.check()
+    }
 
-      if (errorCount > 0) {
-        const errorText = await errorElements.first().textContent()
-        if (errorText) {
-          logBug(`Signup error: ${errorText}`)
-        }
+    // Submit form and wait for success notification
+    await page.click('button[type="submit"]')
+
+    // Wait for either success notification or error
+    try {
+      await page.waitForSelector('[role="status"]', { state: 'visible', timeout: 10000 })
+      const notificationText = await page.locator('[role="status"]').textContent()
+
+      if (notificationText?.toLowerCase().includes('réussie') || notificationText?.toLowerCase().includes('bienvenue')) {
+        console.log('✅ Signup successful!')
+
+        // Wait for navigation or check if already authenticated
+        await page.waitForURL(/\/(dashboard|products|accueil)/, { timeout: 5000 }).catch(() => {
+          // Navigation might not happen if notification blocks it, check auth state
+        })
       } else {
-        logBug(`Signup failed - still on: ${page.url()}`)
+        logBug(`Signup error: ${notificationText}`)
       }
-    })
+    } catch {
+      // No notification appeared, check URL
+      const currentUrl = page.url()
+      if (!currentUrl.includes('/register')) {
+        console.log('✅ Signup succeeded (no notification but navigated)')
+      } else {
+        logBug(`Signup failed - still on: ${currentUrl}`)
+      }
+    }
 
     const currentUrl = page.url()
     if (currentUrl.includes('/dashboard') || currentUrl.includes('/products')) {
@@ -102,11 +117,14 @@ test.describe('Consumer Flows - Complete Journey', () => {
 
     // ========== 3. LOGOUT ==========
     console.log('\n========== TESTING LOGOUT ==========')
-    const logoutButton = page.locator('button:has-text("Déconnexion"), a:has-text("Déconnexion")')
+    const logoutButton = page.locator('button:has-text("Se déconnecter"), a:has-text("Se déconnecter"), button:has-text("Déconnexion"), a:has-text("Déconnexion")')
     if (await logoutButton.isVisible()) {
       await logoutButton.click()
-      await page.waitForTimeout(1000)
+      await page.waitForTimeout(2000)
       console.log('✅ Logout button clicked')
+
+      // Wait for redirect to home/login
+      await page.waitForURL(/\/(login|accueil|\/)$/, { timeout: 5000 }).catch(() => {})
     } else {
       logBug('Logout button not found')
     }
