@@ -43,7 +43,7 @@ test.describe('Admin Core Flows', () => {
     await page.waitForLoadState('networkidle')
 
     // Check for analytics/stats
-    const statsCards = page.locator('[data-testid="stat"], .stat-card, .metric-card')
+    const statsCards = page.locator('[data-testid="stat-card"], [data-testid="stat"], .stat-card, .metric-card')
     const statsCount = await statsCards.count()
     console.log(`Found ${statsCount} statistics cards`)
 

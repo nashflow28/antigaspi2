@@ -1,5 +1,6 @@
 <template>
   <div
+    v-bind="$attrs"
     :class="computedClasses"
     :data-variant="props.variant"
     @click="handleClick"

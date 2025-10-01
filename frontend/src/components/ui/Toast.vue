@@ -149,7 +149,10 @@ const positionClasses: Record<ToastPosition, string> = {
   stacked: 'pointer-events-auto z-50 w-full'
 }
 
-const rootClasses = computed(() => positionClasses[position.value])
+const rootClasses = computed(() => [
+  positionClasses[position.value],
+  'bg-white dark:bg-gray-900 rounded shadow-md'
+])
 
 const handleClose = () => {
   props.onClose?.()

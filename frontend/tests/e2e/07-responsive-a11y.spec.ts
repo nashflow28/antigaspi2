@@ -45,7 +45,7 @@ test.describe('Responsive Design & Accessibility Tests', () => {
     await page.goto('http://localhost:3000/products')
     await page.waitForLoadState('networkidle')
 
-    const visibleProducts = page.locator('[data-testid="product-card"]:visible, .product-card:visible, article:visible')
+    const visibleProducts = page.locator('[data-testid="product-card-2025"]:visible, [role="article"]:visible, article:visible')
     const visibleCount = await visibleProducts.count()
     console.log(`${visibleCount} products visible on page`)
 
@@ -64,7 +64,7 @@ test.describe('Responsive Design & Accessibility Tests', () => {
       }
 
       // Check first product has price
-      const firstProductPrice = visibleProducts.first().locator(':text("XOF"), :text("€")')
+      const firstProductPrice = visibleProducts.first().locator(':text("CFA"), :text("XOF"), :text("€"), :text("F ")')
       if (await firstProductPrice.count() > 0) {
         console.log('✅ Product prices displayed')
       } else {
