@@ -47,13 +47,13 @@
               variant="ghost"
               @click="handleLoginClick"
             >
-              Se connecter
+              Connexion
             </Button>
             <Button
               variant="primary"
               @click="handleRegisterClick"
             >
-              Créer un compte
+              Inscription
             </Button>
           </template>
         </div>
@@ -96,13 +96,13 @@
               variant="ghost"
               @click="handleLoginClick"
             >
-              Se connecter
+              Connexion
             </Button>
             <Button
               variant="primary"
               @click="handleRegisterClick"
             >
-              Créer un compte
+              Inscription
             </Button>
           </template>
         </div>

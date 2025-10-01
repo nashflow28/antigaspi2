@@ -63,6 +63,7 @@
         </label>
         <input
           id="first_name"
+          name="first_name"
           v-model="form.first_name"
           type="text"
           required
@@ -80,6 +81,7 @@
         </label>
         <input
           id="last_name"
+          name="last_name"
           v-model="form.last_name"
           type="text"
           required
@@ -117,6 +119,7 @@
         </label>
         <input
           id="phone"
+          name="phone"
           v-model="form.phone"
           type="tel"
           autocomplete="tel"
@@ -133,6 +136,7 @@
         </label>
         <input
           id="city"
+          name="city"
           v-model="form.city"
           type="text"
           required
