@@ -58,12 +58,11 @@ test.describe('Consumer Flows - Complete Journey', () => {
     await page.waitForURL('**/register', { timeout: 5000 }).catch(() => {})
 
     // Fill signup form
-    await page.fill('input[name="first_name"], input[placeholder*="Prénom"]', 'Test')
-    await page.fill('input[name="last_name"], input[placeholder*="Nom"]', 'Consumer')
+    await page.fill('input[name="first_name"]', 'Test')
+    await page.fill('input[name="last_name"]', 'Consumer')
     await page.fill('input[type="email"]', newUserEmail)
-    await page.fill('input[name="phone"], input[placeholder*="Téléphone"]', '0123456789')
-    await page.fill('input[name="address"], input[placeholder*="Adresse"]', '123 Test Street')
-    await page.fill('input[name="city"], input[placeholder*="Ville"]', 'Lomé')
+    await page.fill('input[name="phone"]', '0123456789')
+    await page.fill('input[name="city"]', 'Lomé')
 
     const passwordInputs = page.locator('input[type="password"]')
     const passwordCount = await passwordInputs.count()
@@ -75,31 +74,28 @@ test.describe('Consumer Flows - Complete Journey', () => {
       await passwordInputs.first().fill(newUserPassword)
     }
 
-    // Submit form
-    await page.click('button[type="submit"]')
-    await page.waitForTimeout(2000)
+    // Submit form and wait for navigation
+    await Promise.all([
+      page.waitForURL(/\/(dashboard|products)/, { timeout: 10000 }),
+      page.click('button[type="submit"]')
+    ]).catch(async () => {
+      // If navigation fails, check for errors
+      const errorElements = page.locator('[role="status"]')
+      const errorCount = await errorElements.count()
 
-    // Check for errors
-    const errorElements = page.locator('[role="alert"], .error, .text-red-500, .text-red-600')
-    const errorCount = await errorElements.count()
-
-    if (errorCount > 0) {
-      for (let i = 0; i < errorCount; i++) {
-        const errorText = await errorElements.nth(i).textContent()
-        if (errorText && errorText.trim()) {
+      if (errorCount > 0) {
+        const errorText = await errorElements.first().textContent()
+        if (errorText) {
           logBug(`Signup error: ${errorText}`)
         }
+      } else {
+        logBug(`Signup failed - still on: ${page.url()}`)
       }
-    }
+    })
 
-    // Wait for redirect or success
-    await page.waitForTimeout(2000)
     const currentUrl = page.url()
-
     if (currentUrl.includes('/dashboard') || currentUrl.includes('/products')) {
       console.log('✅ Signup successful - redirected to:', currentUrl)
-    } else {
-      logBug(`Signup may have failed - still on: ${currentUrl}`)
     }
 
     await page.screenshot({ path: 'test-results/02-after-signup.png', fullPage: true })
@@ -122,14 +118,18 @@ test.describe('Consumer Flows - Complete Journey', () => {
 
     await page.fill('input[type="email"]', newUserEmail)
     await page.fill('input[type="password"]', newUserPassword)
-    await page.click('button[type="submit"]')
-    await page.waitForTimeout(2000)
+
+    // Wait for navigation after login
+    await Promise.all([
+      page.waitForURL(/\/(dashboard|products)/, { timeout: 10000 }),
+      page.click('button[type="submit"]')
+    ]).catch(() => {
+      logBug(`Login failed - still on: ${page.url()}`)
+    })
 
     const loginUrl = page.url()
     if (loginUrl.includes('/dashboard') || loginUrl.includes('/products')) {
       console.log('✅ Login successful')
-    } else {
-      logBug(`Login failed - still on: ${loginUrl}`)
     }
 
     await page.screenshot({ path: 'test-results/03-after-login.png', fullPage: true })
@@ -197,17 +197,19 @@ test.describe('Consumer Flows - Complete Journey', () => {
 
       if (await reserveButton.isVisible()) {
         await reserveButton.click()
-        await page.waitForTimeout(2000)
 
-        // Check for success notification/modal
-        const successElements = page.locator('[role="alert"], .notification, .modal, :has-text("succès"), :has-text("réservé")')
-        const successCount = await successElements.count()
-
-        if (successCount > 0) {
-          console.log('✅ Reservation success notification displayed')
-        } else {
+        // Wait for success notification (Toast uses role="status")
+        try {
+          await page.waitForSelector('[role="status"]', { state: 'visible', timeout: 5000 })
+          const notificationText = await page.locator('[role="status"]').textContent()
+          if (notificationText?.toLowerCase().includes('succès') || notificationText?.toLowerCase().includes('réserv')) {
+            console.log('✅ Reservation success notification displayed')
+          }
+        } catch {
           logBug('No success notification after reservation')
         }
+
+        await page.waitForTimeout(1000)
 
         // Check modal styling
         const modals = page.locator('.modal, [role="dialog"]')
