@@ -1,0 +1,206 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e3]:
+  - navigation "Navigation principale" [ref=e4]:
+    - generic [ref=e5]:
+      - link "Antigaspi" [ref=e6] [cursor=pointer]:
+        - /url: /
+        - generic [ref=e7] [cursor=pointer]: Antigaspi
+      - menubar [ref=e8]:
+        - menuitem "Accueil" [ref=e9]:
+          - img [ref=e10]
+          - generic [ref=e12]: Accueil
+        - menuitem "Découvrir" [ref=e13]:
+          - img [ref=e14]
+          - generic [ref=e16]: Découvrir
+        - menuitem "Produits" [ref=e17]:
+          - img [ref=e18]
+          - generic [ref=e20]: Produits
+        - menuitem "Avis" [ref=e21]:
+          - img [ref=e22]
+          - generic [ref=e24]: Avis
+        - menuitem "Tableau de bord" [ref=e25]:
+          - img [ref=e26]
+          - generic [ref=e28]: Tableau de bord
+      - generic [ref=e30]:
+        - button "Activer le thème sombre" [ref=e31] [cursor=pointer]:
+          - generic [ref=e32] [cursor=pointer]: Activer le thème sombre
+          - img [ref=e34] [cursor=pointer]
+        - generic [ref=e40]:
+          - button "Mon panier" [ref=e41] [cursor=pointer]:
+            - generic [ref=e43] [cursor=pointer]: Mon panier
+          - button "Mon espace" [ref=e44] [cursor=pointer]:
+            - generic [ref=e45] [cursor=pointer]: Mon espace
+          - button "Se déconnecter" [ref=e46] [cursor=pointer]:
+            - generic [ref=e47] [cursor=pointer]: Se déconnecter
+  - main [ref=e48]:
+    - generic [ref=e49]:
+      - generic [ref=e51]:
+        - generic [ref=e52]:
+          - img [ref=e54]
+          - heading "Espace Commerçant" [level=1] [ref=e56]
+        - navigation [ref=e57]:
+          - generic [ref=e58]:
+            - img [ref=e60]
+            - generic [ref=e62]: Vue d’ensemble
+          - generic [ref=e63]:
+            - img [ref=e65]
+            - generic [ref=e67]: Produits
+          - generic [ref=e68]:
+            - img [ref=e70]
+            - generic [ref=e72]: Réservations
+          - generic [ref=e73]:
+            - img [ref=e75]
+            - generic [ref=e77]: Avis clients
+          - generic [ref=e78]:
+            - img [ref=e80]
+            - generic [ref=e82]: Paniers surprise
+          - generic [ref=e83]:
+            - img [ref=e85]
+            - generic [ref=e87]: Fidélité
+      - generic [ref=e88]:
+        - generic [ref=e93]:
+          - generic [ref=e94]: M
+          - generic [ref=e95]:
+            - paragraph [ref=e96]: merchant@test.com
+            - paragraph [ref=e97]: merchant@test.com
+        - generic [ref=e99]:
+          - generic [ref=e100]:
+            - generic [ref=e103]:
+              - paragraph [ref=e104]: Commerçant
+              - heading "Tableau de bord commerçant" [level=1] [ref=e105]
+              - paragraph [ref=e106]: Gérez vos produits, vos réservations et vos performances
+            - generic [ref=e109]:
+              - img [ref=e110]
+              - generic [ref=e112]: Nouveau produit
+          - generic [ref=e113]:
+            - generic [ref=e116]:
+              - generic [ref=e117]:
+                - paragraph [ref=e118]: Produits actifs
+                - paragraph [ref=e119]: "0"
+                - paragraph [ref=e120]: Disponibles dans votre vitrine
+              - img [ref=e122]
+            - generic [ref=e126]:
+              - generic [ref=e127]:
+                - paragraph [ref=e128]: Réservations en attente
+                - paragraph [ref=e129]: "0"
+                - paragraph [ref=e130]: À confirmer dès que possible
+              - img [ref=e132]
+            - generic [ref=e136]:
+              - generic [ref=e137]:
+                - paragraph [ref=e138]: Revenus du mois
+                - paragraph [ref=e139]: 0 F CFA
+                - paragraph [ref=e140]: Chiffre d’affaires estimé
+              - img [ref=e142]
+            - generic [ref=e146]:
+              - generic [ref=e147]:
+                - paragraph [ref=e148]: Réservations terminées
+                - paragraph [ref=e149]: "0"
+                - paragraph [ref=e150]: Clients satisfaits ce mois
+              - img [ref=e152]
+          - generic [ref=e154]:
+            - generic [ref=e155]:
+              - generic [ref=e157]:
+                - generic [ref=e158]:
+                  - heading "Réservations récentes" [level=2] [ref=e159]
+                  - paragraph [ref=e160]: Les 5 dernières réservations enregistrées
+                - generic [ref=e162]:
+                  - generic [ref=e163]: Voir tout
+                  - img [ref=e164]
+              - generic [ref=e167]:
+                - img [ref=e169]
+                - paragraph [ref=e171]: Aucune réservation récente
+            - generic [ref=e172]:
+              - generic [ref=e173]:
+                - heading "Actions rapides" [level=2] [ref=e176]
+                - generic [ref=e178]:
+                  - generic [ref=e180]:
+                    - generic [ref=e181]:
+                      - img [ref=e183]
+                      - generic [ref=e185]:
+                        - paragraph [ref=e186]: Ajouter un produit
+                        - paragraph [ref=e187]: Créez une nouvelle offre
+                    - img [ref=e188]
+                  - generic [ref=e191]:
+                    - generic [ref=e192]:
+                      - img [ref=e194]
+                      - generic [ref=e196]:
+                        - paragraph [ref=e197]: Gérer les produits
+                        - paragraph [ref=e198]: Modifiez vos fiches actuelles
+                    - img [ref=e199]
+                  - generic [ref=e202]:
+                    - generic [ref=e203]:
+                      - img [ref=e205]
+                      - generic [ref=e207]:
+                        - paragraph [ref=e208]: Voir les réservations
+                        - paragraph [ref=e209]: Suivez les commandes en cours
+                    - img [ref=e210]
+                  - generic [ref=e213]:
+                    - generic [ref=e214]:
+                      - img [ref=e216]
+                      - generic [ref=e218]:
+                        - paragraph [ref=e219]: Paramètres
+                        - paragraph [ref=e220]: Mettez à jour votre profil
+                    - img [ref=e221]
+              - generic [ref=e223]:
+                - generic [ref=e224]:
+                  - generic [ref=e225]:
+                    - img [ref=e227]
+                    - generic [ref=e230]:
+                      - heading "Géolocalisation" [level=3] [ref=e231]
+                      - paragraph [ref=e232]: Position de votre commerce
+                  - button "Me localiser" [ref=e233] [cursor=pointer]:
+                    - img [ref=e234] [cursor=pointer]
+                    - generic [ref=e239] [cursor=pointer]: Me localiser
+                - generic [ref=e240]:
+                  - img [ref=e241]
+                  - heading "Aucune position définie" [level=4] [ref=e244]
+                  - paragraph [ref=e245]: Ajoutez la position de votre commerce pour que les clients puissent vous trouver facilement
+                  - button "Définir ma position" [ref=e246] [cursor=pointer]
+              - generic [ref=e247]:
+                - heading "Performance" [level=2] [ref=e249]
+                - generic [ref=e251]:
+                  - generic [ref=e252]:
+                    - term [ref=e253]: Taux de conversion
+                    - definition [ref=e254]: 0%
+                  - generic [ref=e255]:
+                    - term [ref=e256]: Évaluation moyenne
+                    - definition [ref=e257]:
+                      - img [ref=e258]
+                      - generic [ref=e260]: "0"
+                  - generic [ref=e261]:
+                    - term [ref=e262]: Produits vendus
+                    - definition [ref=e263]: "0"
+                  - generic [ref=e264]:
+                    - term [ref=e265]: Impact CO₂
+                    - definition [ref=e266]: "-0kg"
+              - generic [ref=e267]:
+                - heading "Notifications" [level=2] [ref=e269]
+                - generic [ref=e271]:
+                  - img [ref=e272]
+                  - paragraph [ref=e274]: Aucune notification
+          - generic [ref=e275]:
+            - generic [ref=e277]:
+              - generic [ref=e278]:
+                - heading "Mes produits récents" [level=2] [ref=e279]
+                - paragraph [ref=e280]: Les dernières offres ajoutées à votre vitrine
+              - generic [ref=e282]:
+                - generic [ref=e283]: Voir tout
+                - img [ref=e284]
+            - generic [ref=e287]:
+              - img [ref=e289]
+              - paragraph [ref=e291]: Aucun produit ajouté
+              - generic [ref=e293]:
+                - img [ref=e294]
+                - generic [ref=e296]: Ajouter votre premier produit
+  - contentinfo [ref=e297]:
+    - generic [ref=e298]:
+      - generic [ref=e299]:
+        - paragraph [ref=e300]: Antigaspi
+        - paragraph [ref=e301]: © 2025 — Ensemble, réduisons le gaspillage alimentaire.
+      - generic [ref=e302]:
+        - img [ref=e304]
+        - img [ref=e308]
+        - img [ref=e312]
+```

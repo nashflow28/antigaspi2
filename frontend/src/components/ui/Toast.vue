@@ -5,6 +5,7 @@
       :class="rootClasses"
       role="status"
       aria-live="assertive"
+      :data-testid="`notification-${tone}`"
     >
       <div :class="toastClasses">
         <span aria-hidden="true" class="mt-1">
@@ -70,6 +71,7 @@
             v-if="actionLabel"
             variant="ghost"
             size="sm"
+            data-testid="notification-action-btn"
             class="px-0 text-blue-600 dark:text-blue-200"
             @click="handleAction"
           >

@@ -51,51 +51,49 @@
               - generic [ref=e62]: "*"
             - generic [ref=e63]:
               - img [ref=e64]
-              - textbox "Adresse email *" [ref=e67]: jean.dupont@email.com
+              - textbox "Adresse email *" [ref=e67]: test@test.com
           - generic [ref=e69]:
             - generic [ref=e70]:
               - text: Mot de passe
               - generic [ref=e71]: "*"
             - generic [ref=e72]:
               - img [ref=e73]
-              - textbox "Mot de passe *" [ref=e76]: password
+              - textbox "Mot de passe *" [ref=e76]: wrong
               - button [ref=e78] [cursor=pointer]:
                 - img [ref=e79] [cursor=pointer]
-          - generic [ref=e82]:
-            - generic [ref=e83]:
-              - checkbox "Se souvenir de moi" [ref=e84]
-              - generic [ref=e85]: Se souvenir de moi
-            - link "Mot de passe oublié ?" [ref=e86] [cursor=pointer]:
+            - paragraph [ref=e82]: Le mot de passe doit contenir au moins 6 caractères
+          - generic [ref=e83]:
+            - generic [ref=e84]:
+              - checkbox "Se souvenir de moi" [ref=e85]
+              - generic [ref=e86]: Se souvenir de moi
+            - link "Mot de passe oublié ?" [ref=e87] [cursor=pointer]:
               - /url: /forgot-password
-          - button "Connexion en cours..." [active] [ref=e87]:
-            - img [ref=e88]
-            - generic [ref=e91]:
-              - img [ref=e92]
-              - generic [ref=e94]: Connexion en cours...
-        - generic [ref=e96]:
-          - generic [ref=e101]: Ou continuez avec
-          - generic [ref=e102]:
-            - button "Google" [ref=e103] [cursor=pointer]:
-              - generic [ref=e104] [cursor=pointer]:
-                - img [ref=e105] [cursor=pointer]
+          - button "Se connecter" [disabled] [ref=e88]:
+            - generic [ref=e91]: Se connecter
+        - generic [ref=e93]:
+          - generic [ref=e98]: Ou continuez avec
+          - generic [ref=e99]:
+            - button "Google" [ref=e100] [cursor=pointer]:
+              - generic [ref=e101] [cursor=pointer]:
+                - img [ref=e102] [cursor=pointer]
                 - text: Google
-            - button "Facebook" [ref=e110] [cursor=pointer]:
-              - generic [ref=e111] [cursor=pointer]:
-                - img [ref=e112] [cursor=pointer]
+            - button "Facebook" [ref=e107] [cursor=pointer]:
+              - generic [ref=e108] [cursor=pointer]:
+                - img [ref=e109] [cursor=pointer]
                 - text: Facebook
-        - generic [ref=e114]:
+        - generic [ref=e111]:
           - text: Vous n'avez pas encore de compte ?
-          - link "Créez votre compte" [ref=e115] [cursor=pointer]:
+          - link "Créez votre compte" [ref=e112] [cursor=pointer]:
             - /url: /register
-      - link "← Retour à l'accueil" [ref=e117] [cursor=pointer]:
+      - link "← Retour à l'accueil" [ref=e114] [cursor=pointer]:
         - /url: /
-  - contentinfo [ref=e118]:
-    - generic [ref=e119]:
+  - contentinfo [ref=e115]:
+    - generic [ref=e116]:
+      - generic [ref=e117]:
+        - paragraph [ref=e118]: Antigaspi
+        - paragraph [ref=e119]: © 2025 — Ensemble, réduisons le gaspillage alimentaire.
       - generic [ref=e120]:
-        - paragraph [ref=e121]: Antigaspi
-        - paragraph [ref=e122]: © 2025 — Ensemble, réduisons le gaspillage alimentaire.
-      - generic [ref=e123]:
-        - img [ref=e125]
-        - img [ref=e129]
-        - img [ref=e133]
+        - img [ref=e122]
+        - img [ref=e126]
+        - img [ref=e130]
 ```

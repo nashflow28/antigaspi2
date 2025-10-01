@@ -2,7 +2,9 @@ import { test, expect, type Page } from '@playwright/test'
 
 // Helper to wait for notification to appear
 const waitForNotification = async (page: Page, type: 'success' | 'error' | 'warning' | 'info') => {
-  return page.waitForSelector(`[data-testid="notification-${type}"]`, { timeout: 5000 })
+  const locator = page.locator(`[data-testid="notification-${type}"]`)
+  await locator.waitFor({ state: 'visible', timeout: 5000 })
+  return locator
 }
 
 // Helper to click notification action button
@@ -30,9 +32,9 @@ test.describe('Notification Callbacks - E2E Tests', () => {
       })
 
       // Attempt login
-      await page.fill('[data-testid="email"]', 'wrong@test.com')
-      await page.fill('[data-testid="password"]', 'wrongpassword')
-      await page.click('[data-testid="login-btn"]')
+      await page.fill('[data-testid="email-input"]', 'wrong@test.com')
+      await page.fill('[data-testid="password-input"]', 'wrongpassword')
+      await page.click('[data-testid="submit-login"]')
 
       // Wait for error notification
       const errorNotification = await waitForNotification(page, 'error')
@@ -78,9 +80,9 @@ test.describe('Notification Callbacks - E2E Tests', () => {
       })
 
       // Fill login form
-      await page.fill('[data-testid="email"]', 'test@test.com')
-      await page.fill('[data-testid="password"]', 'password')
-      await page.click('[data-testid="login-btn"]')
+      await page.fill('[data-testid="email-input"]', 'test@test.com')
+      await page.fill('[data-testid="password-input"]', 'password')
+      await page.click('[data-testid="submit-login"]')
 
       // Wait for error notification
       await waitForNotification(page, 'error')
@@ -113,9 +115,9 @@ test.describe('Notification Callbacks - E2E Tests', () => {
         })
       })
 
-      await page.fill('[data-testid="email"]', 'test@test.com')
-      await page.fill('[data-testid="password"]', 'password')
-      await page.click('[data-testid="login-btn"]')
+      await page.fill('[data-testid="email-input"]', 'test@test.com')
+      await page.fill('[data-testid="password-input"]', 'password')
+      await page.click('[data-testid="submit-login"]')
 
       // Should show success notification
       await waitForNotification(page, 'success')
@@ -263,9 +265,9 @@ test.describe('Notification Callbacks - E2E Tests', () => {
         })
       })
 
-      await page.fill('[data-testid="email"]', 'test@test.com')
-      await page.fill('[data-testid="password"]', 'password')
-      await page.click('[data-testid="login-btn"]')
+      await page.fill('[data-testid="email-input"]', 'test@test.com')
+      await page.fill('[data-testid="password-input"]', 'password')
+      await page.click('[data-testid="submit-login"]')
 
       // Success notification should appear
       await waitForNotification(page, 'success')
@@ -292,9 +294,9 @@ test.describe('Notification Callbacks - E2E Tests', () => {
         })
       })
 
-      await page.fill('[data-testid="email"]', 'wrong@test.com')
-      await page.fill('[data-testid="password"]', 'wrong')
-      await page.click('[data-testid="login-btn"]')
+      await page.fill('[data-testid="email-input"]', 'wrong@test.com')
+      await page.fill('[data-testid="password-input"]', 'wrong')
+      await page.click('[data-testid="submit-login"]')
 
       const errorNotification = await waitForNotification(page, 'error')
       await expect(errorNotification).toBeVisible()
@@ -320,9 +322,9 @@ test.describe('Notification Callbacks - E2E Tests', () => {
         })
       })
 
-      await page.fill('[data-testid="email"]', 'test@test.com')
-      await page.fill('[data-testid="password"]', 'wrong')
-      await page.click('[data-testid="login-btn"]')
+      await page.fill('[data-testid="email-input"]', 'test@test.com')
+      await page.fill('[data-testid="password-input"]', 'wrong')
+      await page.click('[data-testid="submit-login"]')
 
       const errorNotification = await waitForNotification(page, 'error')
       await expect(errorNotification).toBeVisible()
@@ -346,9 +348,9 @@ test.describe('Notification Callbacks - E2E Tests', () => {
         })
       })
 
-      await page.fill('[data-testid="email"]', 'test@test.com')
-      await page.fill('[data-testid="password"]', 'password')
-      await page.click('[data-testid="login-btn"]')
+      await page.fill('[data-testid="email-input"]', 'test@test.com')
+      await page.fill('[data-testid="password-input"]', 'password')
+      await page.click('[data-testid="submit-login"]')
 
       await waitForNotification(page, 'success')
       const notification = page.locator('[data-testid="notification-success"]')
