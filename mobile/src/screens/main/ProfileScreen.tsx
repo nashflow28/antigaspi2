@@ -1,35 +1,29 @@
-import React from 'react'
+import React, { useState } from 'react'
 import {
   View,
   StyleSheet,
   TouchableOpacity,
-  Alert,
 } from 'react-native'
 import { useDispatch, useSelector } from 'react-redux'
 import { logoutUser } from '../../store/slices/authSlice'
 import { AppDispatch, RootState } from '../../store'
 import { Ionicons } from '@expo/vector-icons'
-import { Button, Card, Badge, Typography } from '../../components/2025'
+import { Button, Card, Badge, Typography, Modal } from '../../components/2025'
 import { useTheme } from '../../theme'
 
 const ProfileScreen: React.FC = () => {
   const theme = useTheme()
   const dispatch = useDispatch<AppDispatch>()
-  const { user } = useSelector((state: RootState) => state.auth)
+  const { user, loading } = useSelector((state: RootState) => state.auth)
+  const [showLogoutModal, setShowLogoutModal] = useState(false)
 
   const handleLogout = () => {
-    Alert.alert(
-      'Déconnexion',
-      'Êtes-vous sûr de vouloir vous déconnecter ?',
-      [
-        { text: 'Annuler', style: 'cancel' },
-        {
-          text: 'Déconnexion',
-          style: 'destructive',
-          onPress: () => dispatch(logoutUser()),
-        },
-      ]
-    )
+    setShowLogoutModal(true)
+  }
+
+  const confirmLogout = async () => {
+    setShowLogoutModal(false)
+    await dispatch(logoutUser())
   }
 
   return (
@@ -81,6 +75,39 @@ const ProfileScreen: React.FC = () => {
           </Typography>
         </TouchableOpacity>
       </Card>
+
+      {/* ✅ FIX: Modal de confirmation déconnexion (compatible web) */}
+      <Modal
+        visible={showLogoutModal}
+        onClose={() => setShowLogoutModal(false)}
+        variant="center"
+        title="Déconnexion"
+        dismissable={!loading}
+        showCloseButton={false}
+      >
+        <Typography variant="body" color="secondary" style={{ marginBottom: theme.spacing.xl }}>
+          Êtes-vous sûr de vouloir vous déconnecter ?
+        </Typography>
+        <View style={{ flexDirection: 'row', gap: theme.spacing.md }}>
+          <Button
+            variant="secondary"
+            onPress={() => setShowLogoutModal(false)}
+            disabled={loading}
+            style={{ flex: 1 }}
+          >
+            Annuler
+          </Button>
+          <Button
+            variant="destructive"
+            onPress={confirmLogout}
+            loading={loading}
+            disabled={loading}
+            style={{ flex: 1 }}
+          >
+            Déconnexion
+          </Button>
+        </View>
+      </Modal>
     </View>
   )
 }
