@@ -21,7 +21,7 @@ return [
 
     'allowed_origins' => env('APP_ENV') === 'production'
         ? [env('FRONTEND_URL', 'https://antigaspi.com')]
-        : ['http://localhost:3000', 'http://localhost:3003', 'http://127.0.0.1:3000', 'http://127.0.0.1:3003'],
+        : ['*'], // Allow all origins in development
 
     'allowed_origins_patterns' => [],
 

@@ -56,13 +56,6 @@
     },
     "plugins": [
       [
-        "expo-notifications",
-        {
-          "icon": "./assets/notification-icon.png",
-          "color": "#10B981"
-        }
-      ],
-      [
         "expo-location",
         {
           "locationAlwaysAndWhenInUsePermission": "Permettre à Antigaspi d'accéder à votre position pour trouver les commerces proches."
@@ -71,7 +64,7 @@
       "expo-updates"
     ],
     "extra": {
-      "apiUrl": "http://localhost:8000/api"
+      "apiUrl": "http://192.168.1.81:8000/api"
     },
     "scheme": "antigaspi"
   }
