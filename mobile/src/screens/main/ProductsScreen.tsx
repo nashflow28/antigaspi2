@@ -9,17 +9,18 @@ import {
   StatusBar,
   FlatList,
   RefreshControl,
-  Alert,
+  ActivityIndicator,
 } from 'react-native'
 import { useDispatch, useSelector } from 'react-redux'
 import { AppDispatch, RootState } from '../../store'
-import { fetchProducts, fetchCategories, setFilters } from '../../store/slices/productsSlice'
+import { fetchProducts, fetchCategories, setFilters, clearFilters as clearFiltersAction, fetchMoreProducts, resetProducts } from '../../store/slices/productsSlice'
 import { Ionicons } from '@expo/vector-icons'
 import { Image } from 'expo-image'
 import { Product, ProductFilters } from '../../types'
 import analyticsService from '../../services/analyticsService'
 import { useTheme } from '../../theme'
 import { Modal, Button } from '../../components/2025'
+import { showErrorAlert } from '../../utils/errorHandling'
 
 interface Props {
   navigation: any
@@ -28,7 +29,7 @@ interface Props {
 
 const ProductsScreen: React.FC<Props> = ({ navigation, route }) => {
   const dispatch = useDispatch<AppDispatch>()
-  const { products, categories, loading, filters } = useSelector((state: RootState) => state.products)
+  const { products, categories, loading, loadingMore, filters, currentPage, hasMore } = useSelector((state: RootState) => state.products)
   const theme = useTheme()
 
   const [searchQuery, setSearchQuery] = useState('')
@@ -49,20 +50,30 @@ const ProductsScreen: React.FC<Props> = ({ navigation, route }) => {
   }, [])
 
   useEffect(() => {
-    // Recherche en temps réel
+    // Recherche en temps réel avec debounce pour éviter surcharge API
     const searchFilters = {
       ...localFilters,
       search: searchQuery || undefined,
     }
     dispatch(setFilters(searchFilters))
-    dispatch(fetchProducts(searchFilters))
+
+    // Reset products before fetching new filtered results
+    dispatch(resetProducts())
+
+    // Debounce de 300ms pour éviter trop d'appels API
+    const timer = setTimeout(() => {
+      dispatch(fetchProducts(searchFilters))
+    }, 300)
+
+    // Cleanup: annuler le timer si searchQuery/localFilters changent avant 300ms
+    return () => clearTimeout(timer)
   }, [searchQuery, localFilters])
 
   const loadData = async () => {
     try {
       await dispatch(fetchProducts(filters))
     } catch (error) {
-      Alert.alert('Erreur', 'Impossible de charger les produits')
+      showErrorAlert(error, 'Chargement des produits', () => loadData())
     }
   }
 
@@ -70,7 +81,7 @@ const ProductsScreen: React.FC<Props> = ({ navigation, route }) => {
     try {
       await dispatch(fetchCategories())
     } catch (error) {
-      Alert.alert('Erreur', 'Impossible de charger les catégories')
+      showErrorAlert(error, 'Chargement des catégories', () => loadCategories())
       if (error instanceof Error) {
         void analyticsService.trackError(error, 'loadCategories')
       } else {
@@ -96,12 +107,28 @@ const ProductsScreen: React.FC<Props> = ({ navigation, route }) => {
   }
 
   const clearFilters = () => {
+    // ✅ FIX: Synchroniser avec Redux pour éviter les filtres fantômes
+    dispatch(clearFiltersAction())
     setLocalFilters({})
     setSearchQuery('')
   }
 
   const applyFilters = () => {
     setShowFilters(false)
+  }
+
+  const loadMore = () => {
+    // Only load more if:
+    // 1. Not already loading
+    // 2. Not loading more
+    // 3. Has more pages
+    if (!loading && !loadingMore && hasMore) {
+      const searchFilters = {
+        ...localFilters,
+        search: searchQuery || undefined,
+      }
+      dispatch(fetchMoreProducts({ filters: searchFilters, page: currentPage + 1 }))
+    }
   }
 
   const renderProduct = ({ item }: { item: Product }) => (
@@ -155,6 +182,17 @@ const ProductsScreen: React.FC<Props> = ({ navigation, route }) => {
       </View>
     </TouchableOpacity>
   )
+
+  const renderFooter = () => {
+    if (!loadingMore) return null
+
+    return (
+      <View style={styles.loadingMore}>
+        <ActivityIndicator size="small" color={theme.colors.primary[500]} />
+        <Text style={styles.loadingMoreText}>Chargement...</Text>
+      </View>
+    )
+  }
 
   return (
     <View style={styles.container}>
@@ -234,6 +272,9 @@ const ProductsScreen: React.FC<Props> = ({ navigation, route }) => {
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={[theme.colors.primary[500]]} />
         }
         contentContainerStyle={styles.listContent}
+        onEndReached={loadMore}
+        onEndReachedThreshold={0.5}
+        ListFooterComponent={renderFooter}
         ListEmptyComponent={
           <View style={styles.emptyState}>
             <Ionicons name="basket-outline" size={64} color={theme.colors.textTertiary} />
@@ -502,6 +543,17 @@ const createStyles = (theme: ReturnType<typeof useTheme>) => StyleSheet.create({
     ...theme.inputStyle(false),
     ...theme.getTypography('body'),
     color: theme.colors.text,
+  },
+  loadingMore: {
+    paddingVertical: theme.spacing.lg,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    gap: theme.spacing.sm,
+  },
+  loadingMoreText: {
+    ...theme.getTypography('body'),
+    color: theme.colors.textSecondary,
   },
 })
 

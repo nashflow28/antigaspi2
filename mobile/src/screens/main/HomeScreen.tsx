@@ -80,7 +80,10 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
               Découvrez les meilleures offres du jour
             </SmallText>
           </View>
-          <TouchableOpacity style={styles.profileButton}>
+          <TouchableOpacity
+            style={styles.profileButton}
+            onPress={() => navigation.navigate('Profile')}
+          >
             <Ionicons name="person-circle-outline" size={32} color={theme.colors.textInverse} />
           </TouchableOpacity>
         </View>
