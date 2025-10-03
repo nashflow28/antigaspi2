@@ -6,7 +6,7 @@ const initialState: AuthState = {
   user: null,
   token: null,
   isAuthenticated: false,
-  loading: false,
+  loading: true, // ✅ FIX: Démarrer en loading pour afficher le SplashScreen pendant la restauration
   error: null,
 }
 
@@ -139,8 +139,21 @@ const authSlice = createSlice({
         state.loading = false
         state.error = null
       })
+      // ✅ FIX: Déconnexion locale même si l'appel API échoue (offline/network error)
+      .addCase(logoutUser.rejected, (state) => {
+        state.user = null
+        state.token = null
+        state.isAuthenticated = false
+        state.loading = false
+        state.error = null
+      })
 
       // Load stored auth
+      // ✅ FIX: Activer le loading pendant la restauration pour éviter le flash de l'écran de connexion
+      .addCase(loadStoredAuth.pending, (state) => {
+        state.loading = true
+        state.error = null
+      })
       .addCase(loadStoredAuth.fulfilled, (state, action) => {
         if (action.payload) {
           state.user = action.payload.user
@@ -148,6 +161,10 @@ const authSlice = createSlice({
           state.isAuthenticated = true
         }
         state.loading = false
+      })
+      .addCase(loadStoredAuth.rejected, (state) => {
+        state.loading = false
+        state.isAuthenticated = false
       })
 
       // Refresh profile

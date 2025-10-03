@@ -35,6 +35,8 @@ import offlineService from '../../services/offlineService'
 import analyticsService from '../../services/analyticsService'
 import { Button, Card, Badge, Typography, Modal as Modal2025 } from '../../components/2025'
 import { useTheme } from '../../theme'
+import { showErrorAlert } from '../../utils/errorHandling'
+import { useToast } from '../../contexts/ToastContext'
 
 interface Props {
   route: any
@@ -47,6 +49,7 @@ const ProductDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
   const theme = useTheme()
   const styles = createStyles(theme)
   const dispatch = useDispatch<AppDispatch>()
+  const toast = useToast()
   const { productId } = route.params
   const { products, loading } = useSelector((state: RootState) => state.products)
   const { user } = useSelector((state: RootState) => state.auth)
@@ -59,6 +62,8 @@ const ProductDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
   const [notes, setNotes] = useState('')
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<PaymentMethod>('on_site')
   const [customerPhone, setCustomerPhone] = useState(user?.phone ?? '')
+  // ⚠️ SÉCURITÉ: PIN stocké temporairement en mémoire, effacé immédiatement après usage
+  // Ne JAMAIS persister ce PIN dans AsyncStorage ou logs
   const [walletPin, setWalletPin] = useState('')
   const [userLocation, setUserLocation] = useState<any>(null)
   const [distance, setDistance] = useState<number | null>(null)
@@ -136,13 +141,13 @@ const ProductDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
     } else {
       // Sinon charger depuis l'API
       try {
-        await dispatch(fetchProduct(productId))
-        const updatedProduct = products.find(p => p.id === productId)
-        if (updatedProduct) {
-          setProduct(updatedProduct)
+        const result = await dispatch(fetchProduct(productId))
+        // ✅ FIX: Utiliser directement le payload retourné au lieu de chercher dans le tableau obsolète
+        if (fetchProduct.fulfilled.match(result)) {
+          setProduct(result.payload as Product)
         }
       } catch (error) {
-        Alert.alert('Erreur', 'Impossible de charger le produit')
+        showErrorAlert(error, 'Chargement du produit')
         if (error instanceof Error) {
           void analyticsService.trackError(error, 'loadProduct')
         } else {
@@ -277,10 +282,30 @@ const ProductDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
     })
   }
 
-  const calculateDistance = (coords: any) => {
-    // Simulation d'une distance - en production, utilisez les coordonnées réelles du marchand
-    const simulatedDistance = Math.random() * 5 + 0.5 // Entre 0.5 et 5.5 km
-    setDistance(Math.round(simulatedDistance * 10) / 10)
+  const calculateDistance = (coords: { latitude: number; longitude: number }) => {
+    // Vérifier que le marchand a des coordonnées GPS
+    if (!product || !product.merchant.latitude || !product.merchant.longitude) {
+      setDistance(null)
+      return
+    }
+
+    // Formule de Haversine pour calculer la distance entre deux points GPS
+    const R = 6371 // Rayon de la Terre en km
+    const dLat = ((product.merchant.latitude - coords.latitude) * Math.PI) / 180
+    const dLon = ((product.merchant.longitude - coords.longitude) * Math.PI) / 180
+
+    const a =
+      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos((coords.latitude * Math.PI) / 180) *
+        Math.cos((product.merchant.latitude * Math.PI) / 180) *
+        Math.sin(dLon / 2) *
+        Math.sin(dLon / 2)
+
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
+    const distanceKm = R * c
+
+    // Arrondir à 1 décimale (ex: 2.3 km)
+    setDistance(Math.round(distanceKm * 10) / 10)
   }
 
   const handleReservation = async () => {
@@ -307,6 +332,17 @@ const ProductDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
 
     if (selectedPaymentMethod === 'wallet' && walletPin.trim().length < 4) {
       Alert.alert('Code PIN requis', 'Veuillez renseigner votre code PIN portefeuille (4 à 6 chiffres).')
+      return
+    }
+
+    // ⚠️ SÉCURITÉ: Empêcher paiement wallet en mode offline
+    // Le PIN ne doit JAMAIS être stocké dans AsyncStorage (offline queue)
+    if (!isOnline && selectedPaymentMethod === 'wallet') {
+      Alert.alert(
+        'Connexion requise',
+        'Le paiement par portefeuille nécessite une connexion internet active pour des raisons de sécurité.',
+        [{ text: 'OK' }]
+      )
       return
     }
 
@@ -375,12 +411,10 @@ const ProductDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
           merchantId: product.merchant.id,
         })
 
-        Alert.alert(
-          'Réservation enregistrée hors ligne',
-          'Nous enverrons votre demande dès que la connexion sera rétablie.'
-        )
+        // ✅ Use toast for non-blocking success message
+        toast.showInfo('Réservation enregistrée hors ligne. Nous l\'enverrons dès le retour du réseau.', 4000)
       } catch (error) {
-        Alert.alert('Erreur', 'Impossible de préparer la synchronisation hors ligne.')
+        showErrorAlert(error, 'Synchronisation offline')
         if (error instanceof Error) {
           void analyticsService.trackError(error, 'queueReservation')
         }
@@ -405,10 +439,10 @@ const ProductDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
         })
         await handlePaymentFeedback(response.payment, selectedPaymentMethod, response)
       } else {
-        Alert.alert('Erreur', result.payload as string)
+        showErrorAlert(new Error(result.payload as string), 'Création réservation', () => handleReservation())
       }
     } catch (error) {
-      Alert.alert('Erreur', 'Impossible de créer la réservation')
+      showErrorAlert(error, 'Création réservation', () => handleReservation())
       if (error instanceof Error) {
         void analyticsService.trackError(error, 'createReservation')
       }
@@ -603,7 +637,12 @@ const ProductDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
         visible={showReservationModal}
         variant="bottom"
         dismissable
-        onClose={() => setShowReservationModal(false)}
+        onClose={() => {
+          setShowReservationModal(false)
+          // ⚠️ SÉCURITÉ: Effacer le PIN quand modal se ferme
+          setWalletPin('')
+          setCustomerPhone(user?.phone ?? '')
+        }}
         title="Réserver ce produit"
       >
 
