@@ -4,6 +4,7 @@ import {
   StyleSheet,
   TouchableOpacity,
   Alert,
+  Switch,
 } from 'react-native'
 import { useDispatch, useSelector } from 'react-redux'
 import { logoutUser } from '../../store/slices/authSlice'
@@ -14,6 +15,7 @@ import { useTheme } from '../../theme'
 
 const ProfileScreen: React.FC = () => {
   const theme = useTheme()
+  const { mode, setThemeMode } = theme
   const dispatch = useDispatch<AppDispatch>()
   const { user, loading } = useSelector((state: RootState) => state.auth)
   const [showLogoutModal, setShowLogoutModal] = useState(false)
@@ -56,13 +58,84 @@ const ProfileScreen: React.FC = () => {
           <Ionicons name="chevron-forward" size={20} color={theme.colors.neutral[400]} />
         </TouchableOpacity>
 
-        <TouchableOpacity style={[styles.menuItem, { paddingHorizontal: theme.spacing.lg, paddingVertical: theme.spacing.md, borderBottomWidth: 1, borderBottomColor: theme.colors.border }]}>
+        <TouchableOpacity
+          style={[
+            styles.menuItem,
+            {
+              paddingHorizontal: theme.spacing.lg,
+              paddingVertical: theme.spacing.md,
+              borderBottomWidth: 1,
+              borderBottomColor: theme.colors.border,
+            },
+          ]}
+        >
           <Ionicons name="notifications-outline" size={24} color={theme.colors.text} />
           <Typography variant="body" style={{ flex: 1, marginLeft: theme.spacing.md }}>
             Notifications
           </Typography>
           <Ionicons name="chevron-forward" size={20} color={theme.colors.neutral[400]} />
         </TouchableOpacity>
+
+        <View
+          style={[
+            styles.menuItemBlock,
+            {
+              paddingHorizontal: theme.spacing.lg,
+              paddingVertical: theme.spacing.md,
+              borderBottomWidth: 1,
+              borderBottomColor: theme.colors.border,
+              backgroundColor: theme.colors.surface,
+              gap: theme.spacing.md,
+            },
+          ]}
+        >
+          <View style={styles.menuItemHeader}>
+            <Ionicons name="moon-outline" size={24} color={theme.colors.text} />
+            <View style={{ flex: 1, marginLeft: theme.spacing.md }}>
+              <Typography variant="body" weight="medium">
+                Thème sombre
+              </Typography>
+              <Typography variant="caption" color="secondary">
+                Activez ou désactivez le mode sombre de l'application
+              </Typography>
+            </View>
+            <Switch
+              value={mode === 'dark'}
+              onValueChange={(value) => setThemeMode(value ? 'dark' : 'light')}
+              trackColor={{ false: theme.colors.neutral[200], true: theme.colors.primary[400] }}
+              thumbColor={mode === 'dark' ? theme.colors.primary[600] : theme.colors.neutral[0]}
+            />
+          </View>
+          <View
+            style={[
+              styles.menuItemFooter,
+              {
+                marginTop: theme.spacing.md,
+                gap: theme.spacing.sm,
+              },
+            ]}
+          >
+            <Badge variant={mode === 'auto' ? 'primary' : 'neutral'} size="sm">
+              {mode === 'auto'
+                ? 'Synchronisé avec le système'
+                : mode === 'dark'
+                ? 'Mode sombre'
+                : 'Mode clair'}
+            </Badge>
+            <TouchableOpacity
+              onPress={() => setThemeMode('auto')}
+              style={{ paddingVertical: theme.spacing.xs }}
+              disabled={mode === 'auto'}
+            >
+              <Typography
+                variant="caption"
+                style={{ color: mode === 'auto' ? theme.colors.neutral[400] : theme.colors.primary[500] }}
+              >
+                Revenir au mode automatique
+              </Typography>
+            </TouchableOpacity>
+          </View>
+        </View>
 
         <TouchableOpacity style={[styles.menuItem, { paddingHorizontal: theme.spacing.lg, paddingVertical: theme.spacing.md, borderBottomWidth: 1, borderBottomColor: theme.colors.border }]}>
           <Ionicons name="help-circle-outline" size={24} color={theme.colors.text} />
@@ -130,6 +203,18 @@ const styles = StyleSheet.create({
   menuItem: {
     flexDirection: 'row',
     alignItems: 'center',
+  },
+  menuItemBlock: {
+    flexDirection: 'column',
+  },
+  menuItemHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  menuItemFooter: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
   },
 })
 
