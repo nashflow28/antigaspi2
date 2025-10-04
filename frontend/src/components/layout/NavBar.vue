@@ -4,9 +4,8 @@
       <div class="flex justify-between h-16">
         <!-- Logo and brand -->
         <div class="flex items-center">
-          <router-link to="/" class="flex items-center space-x-2">
-            <div class="text-2xl">🥬</div>
-            <span class="text-xl font-bold text-primary-600">Antigaspi</span>
+          <router-link to="/" class="flex items-center max-w-full shrink-0">
+            <BrandLogo class="max-w-[9rem] sm:max-w-full" />
           </router-link>
         </div>
 
@@ -201,6 +200,7 @@
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
+import BrandLogo from '@/components/ui/BrandLogo.vue'
 
 const router = useRouter()
 const authStore = useAuthStore()
