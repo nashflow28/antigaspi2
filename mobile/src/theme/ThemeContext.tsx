@@ -116,13 +116,14 @@ export const ThemeProvider: React.FC<{ children: ReactNode }> = ({ children }) =
   // Generate theme colors based on mode
   const getThemeColors = (): ThemeColors => {
     const base = baseColors
+    const neutralPalette = base.neutral
 
     if (isDark) {
       return {
         // Keep base colors
         primary: base.primary,
-        neutral: base.neutral,
-        gray: base.neutral,
+        neutral: neutralPalette,
+        gray: neutralPalette,
         accent: base.accent,
         semantic: base.semantic,
         surface: base.surface,
@@ -162,8 +163,8 @@ export const ThemeProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     return {
       // Keep base colors
       primary: base.primary,
-      neutral: base.neutral,
-      gray: base.neutral,
+      neutral: neutralPalette,
+      gray: neutralPalette,
       accent: base.accent,
       semantic: base.semantic,
       surface: base.surface,
