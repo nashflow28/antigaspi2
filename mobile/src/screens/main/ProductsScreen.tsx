@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import {
   View,
   Text,
@@ -10,6 +10,7 @@ import {
   FlatList,
   RefreshControl,
   ActivityIndicator,
+  Switch,
 } from 'react-native'
 import { useDispatch, useSelector } from 'react-redux'
 import { AppDispatch, RootState } from '../../store'
@@ -19,6 +20,7 @@ import { Image } from 'expo-image'
 import { Product, ProductFilters } from '../../types'
 import analyticsService from '../../services/analyticsService'
 import { useTheme } from '../../theme'
+import type { ThemeMode } from '../../theme'
 import { Modal, Button } from '../../components/2025'
 import { showErrorAlert } from '../../utils/errorHandling'
 import { getImageUrl } from '../../utils/imageHelpers'
@@ -37,6 +39,8 @@ const ProductsScreen: React.FC<Props> = ({ navigation, route }) => {
   const [showFilters, setShowFilters] = useState(false)
   const [localFilters, setLocalFilters] = useState<ProductFilters>({})
   const [refreshing, setRefreshing] = useState(false)
+  const [darkModeEnabled, setDarkModeEnabled] = useState(theme.mode !== 'light')
+  const previousThemeModeRef = useRef<ThemeMode>(theme.mode)
 
   const styles = createStyles(theme)
 
@@ -69,6 +73,14 @@ const ProductsScreen: React.FC<Props> = ({ navigation, route }) => {
     // Cleanup: annuler le timer si searchQuery/localFilters changent avant 300ms
     return () => clearTimeout(timer)
   }, [searchQuery, localFilters])
+
+  useEffect(() => {
+    setDarkModeEnabled(theme.mode !== 'light')
+
+    if (theme.mode !== 'light') {
+      previousThemeModeRef.current = theme.mode
+    }
+  }, [theme.mode])
 
   const loadData = async () => {
     try {
@@ -195,6 +207,29 @@ const ProductsScreen: React.FC<Props> = ({ navigation, route }) => {
     )
   }
 
+  const handleDarkModeToggle = (value: boolean) => {
+    setDarkModeEnabled(value)
+
+    const applyTheme = async () => {
+      if (!value) {
+        if (theme.mode !== 'light') {
+          previousThemeModeRef.current = theme.mode
+        }
+        await theme.setThemeMode('light')
+        return
+      }
+
+      const restoredMode =
+        previousThemeModeRef.current === 'light'
+          ? 'dark'
+          : previousThemeModeRef.current
+
+      await theme.setThemeMode(restoredMode)
+    }
+
+    void applyTheme()
+  }
+
   return (
     <View style={styles.container}>
       <StatusBar backgroundColor={theme.colors.background} barStyle={theme.isDark ? "light-content" : "dark-content"} />
@@ -225,6 +260,23 @@ const ProductsScreen: React.FC<Props> = ({ navigation, route }) => {
             </View>
           )}
         </TouchableOpacity>
+      </View>
+
+      <View style={styles.themeToggleRow}>
+        <View style={styles.themeToggleTextContainer}>
+          <Text style={styles.themeToggleLabel}>Mode sombre</Text>
+          <Text style={styles.themeToggleStatus}>{darkModeEnabled ? 'activé' : 'désactivé'}</Text>
+        </View>
+        <Switch
+          value={darkModeEnabled}
+          onValueChange={handleDarkModeToggle}
+          thumbColor={darkModeEnabled ? theme.colors.primary[500] : theme.colors.neutral[300]}
+          trackColor={{
+            false: theme.withOpacity(theme.colors.neutral[400], 0.3),
+            true: theme.withOpacity(theme.colors.primary[500], 0.35),
+          }}
+          ios_backgroundColor={theme.withOpacity(theme.colors.neutral[500], 0.3)}
+        />
       </View>
 
       {/* Catégories horizontales */}
@@ -361,11 +413,40 @@ const ProductsScreen: React.FC<Props> = ({ navigation, route }) => {
   )
 }
 
-const createStyles = (theme: ReturnType<typeof useTheme>) => StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: theme.colors.background,
-  },
+const createStyles = (theme: ReturnType<typeof useTheme>) => {
+  const inactiveBackground = theme.isDark
+    ? theme.withOpacity(theme.colors.neutral[300], 0.16)
+    : theme.colors.backgroundSecondary
+  const inactiveBorder = theme.isDark ? theme.colors.neutral[500] : theme.colors.border
+
+  return StyleSheet.create({
+    themeToggleRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      paddingHorizontal: theme.spacing.md,
+      paddingBottom: theme.spacing.sm,
+      gap: theme.spacing.md,
+    },
+    themeToggleTextContainer: {
+      flex: 1,
+      gap: theme.spacing.xs,
+    },
+    themeToggleLabel: {
+      ...theme.getTypography('small'),
+      color: theme.colors.textSecondary,
+      textTransform: 'uppercase',
+      letterSpacing: 0.5,
+    },
+    themeToggleStatus: {
+      ...theme.getTypography('body'),
+      color: theme.colors.text,
+      fontWeight: '600',
+    },
+    container: {
+      flex: 1,
+      backgroundColor: theme.colors.background,
+    },
   header: {
     flexDirection: 'row',
     paddingHorizontal: theme.spacing.md,
@@ -426,10 +507,10 @@ const createStyles = (theme: ReturnType<typeof useTheme>) => StyleSheet.create({
     minHeight: 36,
     paddingHorizontal: theme.spacing.lg,
     paddingVertical: theme.spacing.sm,
-    backgroundColor: theme.colors.backgroundSecondary,
+    backgroundColor: inactiveBackground,
     borderRadius: theme.radius.full,
     borderWidth: 1,
-    borderColor: theme.colors.border,
+    borderColor: inactiveBorder,
     alignItems: 'center',
   },
   categoryChipActive: {
@@ -571,6 +652,7 @@ const createStyles = (theme: ReturnType<typeof useTheme>) => StyleSheet.create({
     ...theme.getTypography('body'),
     color: theme.colors.textSecondary,
   },
-})
+  })
+}
 
 export default ProductsScreen
