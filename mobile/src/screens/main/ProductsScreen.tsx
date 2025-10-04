@@ -472,14 +472,15 @@ const createStyles = (theme: ReturnType<typeof useTheme>) => {
     gap: theme.spacing.sm,
   },
   categoryChip: {
-    minHeight: 36,
+    height: 36,
+    maxWidth: 150,
     paddingHorizontal: theme.spacing.lg,
-    paddingVertical: theme.spacing.sm,
     backgroundColor: inactiveBackground,
     borderRadius: theme.radius.full,
     borderWidth: 1,
     borderColor: inactiveBorder,
     alignItems: 'center',
+    justifyContent: 'center',
   },
   categoryChipActive: {
     backgroundColor: theme.colors.primary[500],
