@@ -26,6 +26,7 @@ export interface ThemeColors {
   // Primary colors
   primary: typeof baseColors.primary
   neutral: typeof baseColors.neutral
+  gray: typeof baseColors.neutral
   accent: typeof baseColors.accent
   semantic: typeof baseColors.semantic
 
@@ -121,6 +122,7 @@ export const ThemeProvider: React.FC<{ children: ReactNode }> = ({ children }) =
         // Keep base colors
         primary: base.primary,
         neutral: base.neutral,
+        gray: base.neutral,
         accent: base.accent,
         semantic: base.semantic,
         surface: base.surface,
@@ -161,6 +163,7 @@ export const ThemeProvider: React.FC<{ children: ReactNode }> = ({ children }) =
       // Keep base colors
       primary: base.primary,
       neutral: base.neutral,
+      gray: base.neutral,
       accent: base.accent,
       semantic: base.semantic,
       surface: base.surface,
