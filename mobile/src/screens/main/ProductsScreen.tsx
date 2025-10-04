@@ -28,6 +28,19 @@ interface Props {
   route?: any
 }
 
+const getActiveFilterCount = (filters: ProductFilters): number =>
+  Object.values(filters).reduce((count, value) => {
+    if (value === undefined || value === null) {
+      return count
+    }
+
+    if (typeof value === 'string' && value.trim().length === 0) {
+      return count
+    }
+
+    return count + 1
+  }, 0)
+
 const ProductsScreen: React.FC<Props> = ({ navigation, route }) => {
   const dispatch = useDispatch<AppDispatch>()
   const { products, categories, loading, loadingMore, filters, currentPage, hasMore } = useSelector((state: RootState) => state.products)
@@ -39,6 +52,7 @@ const ProductsScreen: React.FC<Props> = ({ navigation, route }) => {
   const [refreshing, setRefreshing] = useState(false)
 
   const styles = createStyles(theme)
+  const activeFilterCount = getActiveFilterCount(localFilters)
 
   useEffect(() => {
     loadData()
@@ -219,9 +233,9 @@ const ProductsScreen: React.FC<Props> = ({ navigation, route }) => {
 
         <TouchableOpacity style={styles.filterButton} onPress={() => setShowFilters(true)}>
           <Ionicons name="filter" size={20} color={theme.colors.primary[500]} />
-          {Object.keys(localFilters).length > 0 && (
-            <View style={styles.filterBadge}>
-              <Text style={styles.filterBadgeText}>{Object.keys(localFilters).length}</Text>
+          {activeFilterCount > 0 && (
+            <View style={styles.filterBadge} testID="active-filter-badge">
+              <Text style={styles.filterBadgeText}>{activeFilterCount}</Text>
             </View>
           )}
         </TouchableOpacity>
@@ -335,10 +349,24 @@ const ProductsScreen: React.FC<Props> = ({ navigation, route }) => {
             placeholderTextColor={theme.colors.textTertiary}
             keyboardType="numeric"
             value={localFilters.max_price?.toString() || ''}
-            onChangeText={(text) => setLocalFilters({
-              ...localFilters,
-              max_price: text ? parseFloat(text) : undefined,
-            })}
+            onChangeText={(text) =>
+              setLocalFilters((previousFilters) => {
+                const updatedFilters = { ...previousFilters }
+
+                if (text.trim().length === 0) {
+                  delete updatedFilters.max_price
+                } else {
+                  const parsedValue = parseFloat(text)
+                  updatedFilters.max_price = Number.isNaN(parsedValue) ? undefined : parsedValue
+                }
+
+                if (updatedFilters.max_price === undefined) {
+                  delete updatedFilters.max_price
+                }
+
+                return updatedFilters
+              })
+            }
           />
         </View>
 
@@ -350,10 +378,24 @@ const ProductsScreen: React.FC<Props> = ({ navigation, route }) => {
             placeholderTextColor={theme.colors.textTertiary}
             keyboardType="numeric"
             value={localFilters.radius?.toString() || ''}
-            onChangeText={(text) => setLocalFilters({
-              ...localFilters,
-              radius: text ? parseFloat(text) : undefined,
-            })}
+            onChangeText={(text) =>
+              setLocalFilters((previousFilters) => {
+                const updatedFilters = { ...previousFilters }
+
+                if (text.trim().length === 0) {
+                  delete updatedFilters.radius
+                } else {
+                  const parsedValue = parseFloat(text)
+                  updatedFilters.radius = Number.isNaN(parsedValue) ? undefined : parsedValue
+                }
+
+                if (updatedFilters.radius === undefined) {
+                  delete updatedFilters.radius
+                }
+
+                return updatedFilters
+              })
+            }
           />
         </View>
       </Modal>
