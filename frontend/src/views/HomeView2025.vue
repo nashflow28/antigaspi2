@@ -346,6 +346,45 @@
       </div>
     </section>
 
+    <!-- Categories Section -->
+    <section class="py-16 bg-white">
+      <div :class="layoutContainerClass">
+        <div class="mb-8">
+          <h2 class="text-3xl font-semibold text-gray-900 mb-2">
+            Catégories populaires
+          </h2>
+          <p class="text-gray-600">
+            Explorez nos produits par catégorie
+          </p>
+        </div>
+
+        <!-- Loading State -->
+        <div v-if="categoriesLoading" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
+          <Card v-for="i in 5" :key="i" class="animate-pulse">
+            <div class="h-24 bg-gray-200 rounded-lg mb-4" />
+            <div class="h-4 bg-gray-200 rounded w-3/4 mx-auto" />
+          </Card>
+        </div>
+
+        <!-- Categories Grid -->
+        <div v-else-if="categories.length > 0" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
+          <Card
+            v-for="category in categories"
+            :key="category.id"
+            variant="elevated"
+            interactive
+            class="text-center cursor-pointer hover:shadow-lg transition-shadow"
+            @click="$router.push(`/products?category=${category.id}`)"
+          >
+            <div class="flex flex-col items-center justify-center p-6">
+              <div class="text-4xl mb-3">{{ category.icon || '📦' }}</div>
+              <h3 class="font-semibold text-gray-900">{{ category.name }}</h3>
+            </div>
+          </Card>
+        </div>
+      </div>
+    </section>
+
     <!-- Featured Products Section -->
     <section class="py-16 bg-gray-50">
       <div :class="layoutContainerClass">
@@ -379,7 +418,7 @@
             <div class="aspect-square overflow-hidden rounded-t-lg">
               <img
                 v-if="product.image_url"
-                :src="product.image_url"
+                :src="getImageUrl(product.image_url)"
                 :alt="product.name"
                 class="w-full h-full object-cover"
               >
@@ -435,7 +474,7 @@
 import { ref, onMounted } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 import { apiService } from '@/services/api'
-import type { Product } from '@/types'
+import type { Product, Category } from '@/types'
 
 // Import 2025 Design System components
 import Card from '@/components/ui/2025/Card.vue'
@@ -446,16 +485,39 @@ const authStore = useAuthStore()
 const layoutContainerClass = 'mx-auto w-full max-w-7xl px-3 sm:px-4 lg:px-6'
 
 const featuredProducts = ref<Product[]>([])
+const categories = ref<Category[]>([])
 const loading = ref(true)
+const categoriesLoading = ref(true)
+
+// Helper to build full image URL
+const getImageUrl = (imageUrl: string | null | undefined): string => {
+  if (!imageUrl) return ''
+  if (imageUrl.startsWith('http')) return imageUrl
+  const baseUrl = import.meta.env.VITE_API_BASE_URL?.replace('/api', '') || 'http://localhost:8000'
+  return `${baseUrl}/${imageUrl}`
+}
 
 onMounted(async () => {
   try {
+    // Load featured products
     const response = await apiService.getProducts({ limit: 8, is_active: true })
     featuredProducts.value = response.data.slice(0, 8) // Show first 8 products
   } catch (error) {
     console.error('Failed to load featured products:', error)
   } finally {
     loading.value = false
+  }
+
+  try {
+    // Load categories
+    const categoriesResponse = await apiService.getCategories()
+    if (categoriesResponse.success && categoriesResponse.data) {
+      categories.value = categoriesResponse.data
+    }
+  } catch (error) {
+    console.error('Failed to load categories:', error)
+  } finally {
+    categoriesLoading.value = false
   }
 })
 </script>

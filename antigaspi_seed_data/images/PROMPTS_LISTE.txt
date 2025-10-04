@@ -1,0 +1,121 @@
+═══════════════════════════════════════════════════════════════════════════════
+📋 LISTE DES 15 PROMPTS POUR CHATGPT/DALL-E
+═══════════════════════════════════════════════════════════════════════════════
+
+Copie-colle UN prompt à la fois dans ChatGPT Plus (https://chat.openai.com)
+Télécharge l'image générée et renomme-la avec le nom exact indiqué.
+
+───────────────────────────────────────────────────────────────────────────────
+🥖 BOULANGERIE (3 images)
+───────────────────────────────────────────────────────────────────────────────
+
+[1] baguette-traditionnelle.jpg
+
+Generate a professional product photography of a traditional French baguette bread, centered on a clean white background, studio lighting, high quality commercial style, 512x512 pixels, realistic photo
+
+───────────────────────────────────────────────────────────────────────────────
+
+[2] croissant-au-beurre.jpg
+
+Generate a professional product photography of a golden butter croissant, centered on a clean white background, studio lighting, high quality commercial style, 512x512 pixels, realistic photo, perfectly baked
+
+───────────────────────────────────────────────────────────────────────────────
+
+[3] pain-complet.jpg
+
+Generate a professional product photography of a whole grain bread loaf with visible seeds, centered on a clean white background, studio lighting, high quality commercial style, 512x512 pixels, realistic photo
+
+───────────────────────────────────────────────────────────────────────────────
+🍽️ RESTAURANT (3 images)
+───────────────────────────────────────────────────────────────────────────────
+
+[4] plat-poulet-braise-riz.jpg
+
+Generate a professional product photography of a grilled chicken dish with white rice on a plate, centered on a clean white background, studio lighting, high quality commercial style, 512x512 pixels, realistic photo, appetizing presentation
+
+───────────────────────────────────────────────────────────────────────────────
+
+[5] soupe-legumes.jpg
+
+Generate a professional product photography of a vegetable soup in a white bowl, centered on a clean white background, studio lighting, high quality commercial style, 512x512 pixels, realistic photo, fresh vegetables visible
+
+───────────────────────────────────────────────────────────────────────────────
+
+[6] tarte-aux-fruits.jpg
+
+Generate a professional product photography of a fruit tart with mixed fresh fruits on top, centered on a clean white background, studio lighting, high quality commercial style, 512x512 pixels, realistic photo, bakery quality
+
+───────────────────────────────────────────────────────────────────────────────
+🥕 FRUITS & LÉGUMES (3 images)
+───────────────────────────────────────────────────────────────────────────────
+
+[7] tomates-fraiches.jpg
+
+Generate a professional product photography of fresh red tomatoes, 3-4 tomatoes grouped together, centered on a clean white background, studio lighting, high quality commercial style, 512x512 pixels, realistic photo, ripe and glossy
+
+───────────────────────────────────────────────────────────────────────────────
+
+[8] pommes-rouges.jpg
+
+Generate a professional product photography of red apples, 3 apples grouped together, centered on a clean white background, studio lighting, high quality commercial style, 512x512 pixels, realistic photo, fresh and shiny
+
+───────────────────────────────────────────────────────────────────────────────
+
+[9] carottes-bio.jpg
+
+Generate a professional product photography of fresh organic carrots with green tops, 4-5 carrots grouped together, centered on a clean white background, studio lighting, high quality commercial style, 512x512 pixels, realistic photo
+
+───────────────────────────────────────────────────────────────────────────────
+🛒 SUPERMARCHÉ (3 images)
+───────────────────────────────────────────────────────────────────────────────
+
+[10] sachet-lait.jpg
+
+Generate a professional product photography of a milk carton or plastic pouch, 1 liter, centered on a clean white background, studio lighting, high quality commercial style, 512x512 pixels, realistic photo, clean packaging
+
+───────────────────────────────────────────────────────────────────────────────
+
+[11] riz-parfume-5kg.jpg
+
+Generate a professional product photography of a 5kg bag of white rice, centered on a clean white background, studio lighting, high quality commercial style, 512x512 pixels, realistic photo, commercial packaging
+
+───────────────────────────────────────────────────────────────────────────────
+
+[12] huile-vegetale.jpg
+
+Generate a professional product photography of a vegetable oil bottle, 1 liter, clear or yellow oil visible, centered on a clean white background, studio lighting, high quality commercial style, 512x512 pixels, realistic photo
+
+───────────────────────────────────────────────────────────────────────────────
+🥩 BOUCHERIE (3 images)
+───────────────────────────────────────────────────────────────────────────────
+
+[13] steak-boeuf-cru.jpg
+
+Generate a professional product photography of raw beef steak, fresh red meat, centered on a clean white background, studio lighting, high quality commercial style, 512x512 pixels, realistic photo, butcher quality
+
+───────────────────────────────────────────────────────────────────────────────
+
+[14] poulet-entier-cru.jpg
+
+Generate a professional product photography of a whole raw chicken, centered on a clean white background, studio lighting, high quality commercial style, 512x512 pixels, realistic photo, butcher quality
+
+───────────────────────────────────────────────────────────────────────────────
+
+[15] cotes-agneau-crues.jpg
+
+Generate a professional product photography of raw lamb chops, 3-4 pieces, centered on a clean white background, studio lighting, high quality commercial style, 512x512 pixels, realistic photo, butcher quality
+
+═══════════════════════════════════════════════════════════════════════════════
+✅ CHECKLIST
+═══════════════════════════════════════════════════════════════════════════════
+
+Après génération, place toutes les 15 images dans:
+C:\xampp\htdocs\antigaspi2\antigaspi_seed_data\images\
+
+Vérifie:
+□ 15 fichiers JPG
+□ Noms exacts (avec tirets et .jpg)
+□ Fond blanc/neutre
+□ Qualité suffisante
+
+═══════════════════════════════════════════════════════════════════════════════

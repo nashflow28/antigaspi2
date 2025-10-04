@@ -12,8 +12,10 @@ import { useDispatch, useSelector } from 'react-redux'
 import { AppDispatch, RootState } from '../../store'
 import { fetchProducts, fetchCategories } from '../../store/slices/productsSlice'
 import { Ionicons } from '@expo/vector-icons'
+import { Image } from 'expo-image'
 import { useTheme } from '../../theme'
 import { Card, Badge, Typography, Heading3, BodyText, SmallText, CaptionText } from '../../components/2025'
+import { getImageUrl } from '../../utils/imageHelpers'
 
 interface Props {
   navigation: any
@@ -144,9 +146,12 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
               style={styles.productCard}
             >
               <View style={styles.productLayout}>
-                <View style={styles.productImage}>
-                  <Typography style={styles.productEmoji}>🥐</Typography>
-                </View>
+                <Image
+                  source={{ uri: getImageUrl(product.image_url) }}
+                  style={styles.productImage}
+                  contentFit="cover"
+                  transition={200}
+                />
 
                 <View style={styles.productInfo}>
                   <BodyText weight="semibold">{product.name}</BodyText>
@@ -277,12 +282,9 @@ const createStyles = (theme: ReturnType<typeof useTheme>) => StyleSheet.create({
     flexDirection: 'row',
   },
   productImage: {
-    width: 60,
-    height: 60,
-    backgroundColor: theme.colors.backgroundTertiary,
+    width: 80,
+    height: 80,
     borderRadius: theme.radius.lg,
-    justifyContent: 'center',
-    alignItems: 'center',
     marginRight: theme.spacing.md,
   },
   productEmoji: {

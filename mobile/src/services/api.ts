@@ -1,6 +1,8 @@
 import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import Constants from 'expo-constants'
+import { Alert } from 'react-native'
+import { navigate } from '../navigation/NavigationRef'
 import {
   ApiResponse,
   AuthResponse,
@@ -27,6 +29,9 @@ const getApiBaseUrl = (): string => {
   // Fallback pour développement local
   return 'http://localhost:8000/api'
 }
+
+// Export pour utilisation dans d'autres services (ex: imageHelpers)
+export const API_BASE_URL = getApiBaseUrl()
 
 class ApiService {
   private api: AxiosInstance
@@ -65,9 +70,20 @@ class ApiService {
       (response) => response,
       async (error) => {
         if (error.response?.status === 401) {
-          // Token expiré, déconnecter l'utilisateur
+          // ✅ Token expiré, déconnecter l'utilisateur
           await AsyncStorage.multiRemove(['auth_token', 'user_data'])
-          // Rediriger vers login (à implémenter avec navigation)
+
+          // ✅ Rediriger vers login avec message explicite
+          Alert.alert(
+            'Session expirée',
+            'Votre session a expiré. Veuillez vous reconnecter.',
+            [
+              {
+                text: 'OK',
+                onPress: () => navigate('Login')
+              }
+            ]
+          )
         }
         return Promise.reject(error)
       }

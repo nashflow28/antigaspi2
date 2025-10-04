@@ -3,6 +3,7 @@ import {
   View,
   StyleSheet,
   TouchableOpacity,
+  Alert,
 } from 'react-native'
 import { useDispatch, useSelector } from 'react-redux'
 import { logoutUser } from '../../store/slices/authSlice'
@@ -44,7 +45,10 @@ const ProfileScreen: React.FC = () => {
       </Card>
 
       <Card variant="elevated" style={{ marginHorizontal: theme.spacing.lg, overflow: 'hidden' }}>
-        <TouchableOpacity style={[styles.menuItem, { paddingHorizontal: theme.spacing.lg, paddingVertical: theme.spacing.md, borderBottomWidth: 1, borderBottomColor: theme.colors.border }]}>
+        <TouchableOpacity
+          style={[styles.menuItem, { paddingHorizontal: theme.spacing.lg, paddingVertical: theme.spacing.md, borderBottomWidth: 1, borderBottomColor: theme.colors.border }]}
+          onPress={() => Alert.alert('Bientôt disponible', 'La modification du profil sera bientôt disponible.')}
+        >
           <Ionicons name="person-outline" size={24} color={theme.colors.text} />
           <Typography variant="body" style={{ flex: 1, marginLeft: theme.spacing.md }}>
             Modifier le profil

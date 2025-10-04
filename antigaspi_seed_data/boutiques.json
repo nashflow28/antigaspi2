@@ -1,0 +1,44 @@
+{
+  "boutiques": [
+    {
+      "id": 1,
+      "nom": "Boulangerie Soleil",
+      "categorie": "boulangerie",
+      "adresse": "12 Avenue de la Liberté, Lomé, Togo",
+      "telephone": "+228 22 45 67 89",
+      "horaires": "Lun-Sam: 6h-20h, Dim: 7h-13h"
+    },
+    {
+      "id": 2,
+      "nom": "Restaurant Le Gourmet",
+      "categorie": "restaurant",
+      "adresse": "25 Boulevard du 13 Janvier, Lomé, Togo",
+      "telephone": "+228 22 56 78 90",
+      "horaires": "Lun-Dim: 11h-23h"
+    },
+    {
+      "id": 3,
+      "nom": "Marché Vert",
+      "categorie": "fruits_legumes",
+      "adresse": "8 Rue du Commerce, Lomé, Togo",
+      "telephone": "+228 22 34 56 78",
+      "horaires": "Lun-Sam: 7h-18h"
+    },
+    {
+      "id": 4,
+      "nom": "SuperMarché Togo+",
+      "categorie": "supermarche",
+      "adresse": "156 Route Nationale, Lomé, Togo",
+      "telephone": "+228 22 67 89 01",
+      "horaires": "Lun-Dim: 8h-21h"
+    },
+    {
+      "id": 5,
+      "nom": "Boucherie Centrale",
+      "categorie": "boucherie",
+      "adresse": "42 Rue des Artisans, Lomé, Togo",
+      "telephone": "+228 22 78 90 12",
+      "horaires": "Mar-Sam: 8h-19h, Dim: 8h-14h"
+    }
+  ]
+}

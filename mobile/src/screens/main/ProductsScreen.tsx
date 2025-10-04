@@ -21,6 +21,7 @@ import analyticsService from '../../services/analyticsService'
 import { useTheme } from '../../theme'
 import { Modal, Button } from '../../components/2025'
 import { showErrorAlert } from '../../utils/errorHandling'
+import { getImageUrl } from '../../utils/imageHelpers'
 
 interface Props {
   navigation: any
@@ -137,7 +138,7 @@ const ProductsScreen: React.FC<Props> = ({ navigation, route }) => {
       onPress={() => navigation.navigate('ProductDetails', { productId: item.id })}
     >
       <Image
-        source={{ uri: item.image_url || 'https://via.placeholder.com/150' }}
+        source={{ uri: getImageUrl(item.image_url) }}
         style={styles.productImage}
         contentFit="cover"
         transition={200}
