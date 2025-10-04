@@ -16,6 +16,7 @@ import { Image } from 'expo-image'
 import { useTheme } from '../../theme'
 import { Card, Badge, Typography, Heading3, BodyText, SmallText, CaptionText } from '../../components/2025'
 import { getImageUrl } from '../../utils/imageHelpers'
+import { getCategoryEmoji } from '../../utils/categoryEmojis'
 
 interface Props {
   navigation: any
@@ -120,7 +121,9 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
                 onPress={() => navigation.navigate('Products', { categoryId: category.id })}
               >
                 <View style={styles.categoryIcon}>
-                  <Typography style={styles.categoryEmoji}>🥖</Typography>
+                  <Typography style={styles.categoryEmoji}>
+                    {getCategoryEmoji(String(category.name ?? category.id))}
+                  </Typography>
                 </View>
                 <CaptionText align="center" weight="medium">{category.name}</CaptionText>
               </TouchableOpacity>
