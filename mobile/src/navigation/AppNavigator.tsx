@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react'
-import { NavigationContainer, NavigationContainerRef } from '@react-navigation/native'
+import { NavigationContainer } from '@react-navigation/native'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import { useSelector, useDispatch } from 'react-redux'
 import { RootState, AppDispatch } from '../store'
@@ -11,6 +11,7 @@ import analyticsService from '../services/analyticsService'
 import SplashScreen from '../screens/SplashScreen'
 import AuthNavigator from './AuthNavigator'
 import MainNavigator from './MainNavigator'
+import { navigationRef, flushPendingActions } from './NavigationRef'
 
 const Stack = createNativeStackNavigator()
 
@@ -18,7 +19,6 @@ const AppNavigator: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>()
   const { isAuthenticated, loading, user, token } = useSelector((state: RootState) => state.auth)
   const notificationsReady = useRef(false)
-  const navigationRef = useRef<NavigationContainerRef<any>>(null)
   const previousRouteRef = useRef<string | undefined>()
   const analyticsUserRef = useRef<string | null>(null)
 
@@ -63,7 +63,7 @@ const AppNavigator: React.FC = () => {
             analyticsUserRef.current = userId
 
             await analyticsService.track('User Authenticated', 'User', {
-              screen: navigationRef.current?.getCurrentRoute()?.name ?? 'App',
+              screen: navigationRef.getCurrentRoute()?.name ?? 'App',
             })
           }
         } else if (!loading && analyticsUserRef.current) {
@@ -90,7 +90,8 @@ const AppNavigator: React.FC = () => {
     <NavigationContainer
       ref={navigationRef}
       onReady={() => {
-        const initialRoute = navigationRef.current?.getCurrentRoute()?.name
+        flushPendingActions()
+        const initialRoute = navigationRef.getCurrentRoute()?.name
         previousRouteRef.current = initialRoute ?? undefined
         if (initialRoute) {
           void analyticsService.trackScreen(initialRoute)
@@ -98,7 +99,7 @@ const AppNavigator: React.FC = () => {
       }}
       onStateChange={() => {
         const previousRouteName = previousRouteRef.current
-        const currentRouteName = navigationRef.current?.getCurrentRoute()?.name
+        const currentRouteName = navigationRef.getCurrentRoute()?.name
 
         if (currentRouteName && currentRouteName !== previousRouteName) {
           void analyticsService.trackScreen(currentRouteName, {
@@ -125,3 +126,4 @@ const AppNavigator: React.FC = () => {
 }
 
 export default AppNavigator
+
