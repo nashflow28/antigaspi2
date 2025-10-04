@@ -10,6 +10,7 @@ import {
   TextInput,
   ActivityIndicator,
   Dimensions,
+  Linking,
 } from 'react-native'
 import { useDispatch, useSelector } from 'react-redux'
 import { AppDispatch, RootState } from '../../store'
@@ -69,6 +70,46 @@ const ProductDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
   const [distance, setDistance] = useState<number | null>(null)
 
   const mobileProviders = useMemo(() => paymentService.getAvailableProviders(), [])
+
+  const handleCallMerchant = async () => {
+    if (!product || !product.merchant.phone?.trim()) {
+      Alert.alert(
+        'Numéro indisponible',
+        "Ce marchand n'a pas renseigné de numéro de téléphone."
+      )
+      return
+    }
+
+    const sanitizedPhone = product.merchant.phone.replace(/[^\d+]/g, '')
+    if (!sanitizedPhone) {
+      Alert.alert(
+        'Numéro invalide',
+        "Le numéro de téléphone du marchand est invalide."
+      )
+      return
+    }
+
+    const phoneUrl = `tel:${sanitizedPhone}`
+
+    try {
+      const supported = await Linking.canOpenURL(phoneUrl)
+      if (!supported) {
+        Alert.alert('Appel impossible', "Votre appareil ne permet pas d'initier un appel téléphonique.")
+        return
+      }
+
+      await Linking.openURL(phoneUrl)
+      void analyticsService.track('Merchant Phone Call Started', 'Engagement', {
+        productId: product.id,
+        merchantId: product.merchant.id,
+      })
+    } catch (error) {
+      Alert.alert('Erreur', "Impossible d'ouvrir l'application téléphone.")
+      if (error instanceof Error) {
+        void analyticsService.trackError(error, 'handleCallMerchant')
+      }
+    }
+  }
 
   const paymentOptions = useMemo(
     () => [
@@ -476,6 +517,7 @@ const ProductDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
   const discountedUnitPrice = Math.round(parseFloat(product.discounted_price))
   const originalUnitPrice = Math.round(parseFloat(product.original_price))
   const totalAmount = discountedUnitPrice * quantity
+  const hasMerchantPhone = Boolean(product.merchant.phone?.trim())
 
   return (
     <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
@@ -588,8 +630,24 @@ const ProductDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
                   </Typography>
                 </View>
               </View>
-              <TouchableOpacity style={[styles.callButton, { backgroundColor: theme.colors.primary[50] }]}>
-                <Ionicons name="call" size={20} color={theme.colors.primary[500]} />
+              <TouchableOpacity
+                onPress={handleCallMerchant}
+                disabled={!hasMerchantPhone}
+                style={[
+                  styles.callButton,
+                  {
+                    backgroundColor: hasMerchantPhone
+                      ? theme.colors.primary[50]
+                      : theme.colors.neutral[100],
+                  },
+                  !hasMerchantPhone && styles.callButtonDisabled,
+                ]}
+              >
+                <Ionicons
+                  name="call"
+                  size={20}
+                  color={hasMerchantPhone ? theme.colors.primary[500] : theme.colors.neutral[400]}
+                />
               </TouchableOpacity>
             </View>
           </View>
@@ -885,6 +943,9 @@ const createStyles = (theme: ReturnType<typeof useTheme>) => StyleSheet.create({
     borderRadius: 20,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  callButtonDisabled: {
+    opacity: 0.6,
   },
   stockInfo: {
     flexDirection: 'row',
