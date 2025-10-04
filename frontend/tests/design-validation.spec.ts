@@ -147,4 +147,35 @@ test.describe('Design Validation Tests', () => {
     await menuToggle.press('Enter')
     await expect(page.locator(`#${menuId}`)).toBeHidden()
   })
+
+  test('Hero heading maintains responsive typography scale', async ({ page }) => {
+    const breakpoints = [
+      { viewport: { width: 375, height: 812 }, minFont: 34, maxFont: 40 },
+      { viewport: { width: 834, height: 1112 }, minFont: 56, maxFont: 64 },
+      { viewport: { width: 1440, height: 900 }, minFont: 70, maxFont: 100 }
+    ]
+
+    for (const { viewport, minFont, maxFont } of breakpoints) {
+      await page.setViewportSize(viewport)
+      await page.goto('http://localhost:3008')
+
+      const heroTitle = page.locator('[data-testid="main-hero-title"]').first()
+      await expect(heroTitle).toBeVisible()
+
+      const { fontSize, lineHeight } = await heroTitle.evaluate(element => {
+        const { fontSize, lineHeight } = getComputedStyle(element)
+        return {
+          fontSize: parseFloat(fontSize),
+          lineHeight: parseFloat(lineHeight)
+        }
+      })
+
+      expect(fontSize).toBeGreaterThanOrEqual(minFont)
+      expect(fontSize).toBeLessThanOrEqual(maxFont)
+
+      const ratio = lineHeight / fontSize
+      expect(ratio).toBeGreaterThan(1.04)
+      expect(ratio).toBeLessThan(1.16)
+    }
+  })
 })
