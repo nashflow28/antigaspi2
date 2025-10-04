@@ -15,6 +15,7 @@ import { loginUser } from '../../store/slices/authSlice'
 import { AppDispatch, RootState } from '../../store'
 import { LoginCredentials } from '../../types'
 import { Button, Card, Typography } from '../../components/2025'
+import BrandLogo from '../../components/BrandLogo'
 import { useTheme } from '../../theme'
 
 interface Props {
@@ -60,9 +61,7 @@ const LoginScreen: React.FC<Props> = ({ navigation }) => {
       <ScrollView contentContainerStyle={[styles.scrollContent, { paddingHorizontal: theme.spacing.lg }]} keyboardShouldPersistTaps="handled">
         {/* Header */}
         <View style={[styles.header, { alignItems: 'center', marginBottom: theme.spacing['2xl'] }]}>
-          <Typography variant="displayXl" weight="bold" style={{ color: theme.colors.primary[500], marginBottom: theme.spacing.sm }}>
-            🌱 Antigaspi
-          </Typography>
+          <BrandLogo color={theme.colors.primary[500]} style={{ marginBottom: theme.spacing.sm }} />
           <Typography variant="body" color="secondary" style={{ textAlign: 'center' }}>
             Connectez-vous à votre compte
           </Typography>

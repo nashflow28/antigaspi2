@@ -8,6 +8,7 @@ import { render } from '@testing-library/react-native'
 import { View, Text } from 'react-native'
 import { ThemeProvider } from '../../theme/ThemeContext'
 import { Button, Card, Typography } from '../../components/2025'
+import BrandLogo from '../../components/BrandLogo'
 
 // Helper to wrap components with ThemeProvider
 const renderWithTheme = (component: React.ReactElement) => {
@@ -137,9 +138,7 @@ describe('Authentication Flow - Design System 2025', () => {
     it('all auth components use theme context', () => {
       const { root } = renderWithTheme(
         <View>
-          <Typography variant="displayXl" weight="bold">
-            🌱 Antigaspi
-          </Typography>
+          <BrandLogo />
           <Card variant="elevated">
             <Button variant="primary" size="lg">
               Se connecter

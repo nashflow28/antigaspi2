@@ -8,6 +8,7 @@ import { render } from '@testing-library/react-native'
 import { View, Text } from 'react-native'
 import { ThemeProvider } from '../../theme/ThemeContext'
 import { Button, Card, Typography } from '../../components/2025'
+import BrandLogo from '../../components/BrandLogo'
 
 // Helper to wrap components with ThemeProvider
 const renderWithTheme = (component: React.ReactElement) => {
@@ -19,9 +20,7 @@ describe('Navigation Flow - Design System 2025', () => {
     it('renders splash screen branding', () => {
       const { getByText } = renderWithTheme(
         <View>
-          <Typography variant="displayXl" weight="bold">
-            🌱 Antigaspi
-          </Typography>
+          <BrandLogo />
           <Typography variant="h3">
             Luttons contre le gaspillage
           </Typography>
@@ -254,7 +253,7 @@ describe('Navigation Flow - Design System 2025', () => {
     it('all navigation screens use Design System 2025', () => {
       const { root } = renderWithTheme(
         <View>
-          <Typography variant="displayXl">🌱 Antigaspi</Typography>
+          <BrandLogo />
           <Card variant="elevated">
             <Typography variant="h3">Screen Content</Typography>
             <Button variant="primary">Action</Button>
