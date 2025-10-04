@@ -19,8 +19,8 @@
 
           <!-- Titre principal avec gradient text -->
           <h1
-            class="text-3xl md:text-5xl font-semibold mt-4 sm:mb-3xl animate-fade-in-up text-balance font-display"
-            style="animation-delay: 0.2s; font-size: 8rem;"
+            class="text-4xl sm:text-6xl lg:text-7xl xl:text-8xl font-semibold mt-4 sm:mb-3xl animate-fade-in-up text-balance font-display leading-[1.08] sm:leading-[1.1]"
+            style="animation-delay: 0.2s;"
             data-testid="main-hero-title"
           >
             <span class="bg-gradient-to-r from-white via-primary-100 to-orange-500/70 bg-clip-text text-transparent">
