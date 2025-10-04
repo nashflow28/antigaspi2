@@ -36,6 +36,7 @@ import paymentService from '../../services/paymentService'
 import { Button, Card, Badge, Typography, Modal as Modal2025 } from '../../components/2025'
 import { useTheme } from '../../theme'
 import { showErrorAlert } from '../../utils/errorHandling'
+import { getImageUrl } from '../../utils/imageHelpers'
 // import { useToast } from '../../contexts/ToastContext' // Désactivé pour le web
 
 interface Props {
@@ -431,7 +432,7 @@ const ProductDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
         {/* Image du produit */}
         <View style={styles.imageContainer}>
           <Image
-            source={{ uri: product.image_url || 'https://via.placeholder.com/400x300?text=Produit' }}
+            source={{ uri: getImageUrl(product.image_url) }}
             style={styles.productImage}
             contentFit="cover"
             transition={200}
