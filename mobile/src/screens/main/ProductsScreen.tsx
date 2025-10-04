@@ -361,7 +361,13 @@ const ProductsScreen: React.FC<Props> = ({ navigation, route }) => {
   )
 }
 
-const createStyles = (theme: ReturnType<typeof useTheme>) => StyleSheet.create({
+const createStyles = (theme: ReturnType<typeof useTheme>) => {
+  const inactiveBackground = theme.isDark
+    ? theme.withOpacity(theme.colors.neutral[300], 0.16)
+    : theme.colors.backgroundSecondary
+  const inactiveBorder = theme.isDark ? theme.colors.neutral[500] : theme.colors.border
+
+  return StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: theme.colors.background,
@@ -426,10 +432,10 @@ const createStyles = (theme: ReturnType<typeof useTheme>) => StyleSheet.create({
     minHeight: 36,
     paddingHorizontal: theme.spacing.lg,
     paddingVertical: theme.spacing.sm,
-    backgroundColor: theme.colors.backgroundSecondary,
+    backgroundColor: inactiveBackground,
     borderRadius: theme.radius.full,
     borderWidth: 1,
-    borderColor: theme.colors.border,
+    borderColor: inactiveBorder,
     alignItems: 'center',
   },
   categoryChipActive: {
@@ -571,6 +577,7 @@ const createStyles = (theme: ReturnType<typeof useTheme>) => StyleSheet.create({
     ...theme.getTypography('body'),
     color: theme.colors.textSecondary,
   },
-})
+  })
+}
 
 export default ProductsScreen
