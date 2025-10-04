@@ -53,7 +53,7 @@ const MainNavigator: React.FC = () => {
           return <Ionicons name={iconName} size={size} color={color} />
         },
         tabBarActiveTintColor: theme.colors.primary[500],
-        tabBarInactiveTintColor: theme.colors.gray[400],
+        tabBarInactiveTintColor: theme.colors.neutral[400],
         headerShown: false,
         tabBarStyle: {
           paddingBottom: 5,

@@ -140,7 +140,7 @@ export const useTheme = () => {
      * @example getExpirationStatusColor(2) // returns warning color
      */
     getExpirationStatusColor: (daysUntilExpiration?: number): string => {
-      if (!daysUntilExpiration) return theme.colors.gray[500]
+      if (!daysUntilExpiration) return theme.colors.neutral[500]
       if (daysUntilExpiration <= 1) return theme.colors.semantic.error
       if (daysUntilExpiration <= 3) return theme.colors.semantic.warning
       return theme.colors.semantic.success
@@ -171,9 +171,9 @@ export const useTheme = () => {
         case 'cancelled':
           return theme.colors.semantic.error
         case 'expired':
-          return theme.colors.gray[400]
+          return theme.colors.neutral[400]
         default:
-          return theme.colors.gray[500]
+          return theme.colors.neutral[500]
       }
     },
 
@@ -193,9 +193,9 @@ export const useTheme = () => {
         case 'failed':
           return theme.colors.semantic.error
         case 'refunded':
-          return theme.colors.gray[400]
+          return theme.colors.neutral[400]
         default:
-          return theme.colors.gray[500]
+          return theme.colors.neutral[500]
       }
     },
 
