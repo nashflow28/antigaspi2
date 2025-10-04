@@ -2,7 +2,6 @@ import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import Constants from 'expo-constants'
 import { Alert } from 'react-native'
-import { navigate } from '../navigation/NavigationRef'
 import {
   ApiResponse,
   AuthResponse,
@@ -73,14 +72,16 @@ class ApiService {
           // ✅ Token expiré, déconnecter l'utilisateur
           await AsyncStorage.multiRemove(['auth_token', 'user_data'])
 
-          // ✅ Rediriger vers login avec message explicite
+          // ✅ Afficher message de session expirée
           Alert.alert(
             'Session expirée',
             'Votre session a expiré. Veuillez vous reconnecter.',
             [
               {
                 text: 'OK',
-                onPress: () => navigate('Login')
+                onPress: () => {
+                  console.log('Session expirée - Redirection manuelle nécessaire')
+                }
               }
             ]
           )

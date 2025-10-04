@@ -16,7 +16,6 @@ import { useDispatch, useSelector } from 'react-redux'
 import { AppDispatch, RootState } from '../../store'
 import { fetchProduct } from '../../store/slices/productsSlice'
 import {
-  addOfflineReservation,
   createReservation,
 } from '../../store/slices/reservationsSlice'
 import { Ionicons } from '@expo/vector-icons'
@@ -32,12 +31,12 @@ import {
   Reservation,
 } from '../../types'
 import paymentService from '../../services/paymentService'
-import offlineService from '../../services/offlineService'
-import analyticsService from '../../services/analyticsService'
+// import offlineService from '../../services/offlineService'
+// import analyticsService from '../../services/analyticsService' // Désactivé pour le web
 import { Button, Card, Badge, Typography, Modal as Modal2025 } from '../../components/2025'
 import { useTheme } from '../../theme'
 import { showErrorAlert } from '../../utils/errorHandling'
-import { useToast } from '../../contexts/ToastContext'
+// import { useToast } from '../../contexts/ToastContext' // Désactivé pour le web
 
 interface Props {
   route: any
@@ -50,7 +49,7 @@ const ProductDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
   const theme = useTheme()
   const styles = createStyles(theme)
   const dispatch = useDispatch<AppDispatch>()
-  const toast = useToast()
+  // const toast = useToast() // Désactivé pour le web
   const { productId } = route.params
   const { products, loading } = useSelector((state: RootState) => state.products)
   const { user } = useSelector((state: RootState) => state.auth)
@@ -99,15 +98,10 @@ const ProductDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
       }
 
       await Linking.openURL(phoneUrl)
-      void analyticsService.track('Merchant Phone Call Started', 'Engagement', {
-        productId: product.id,
-        merchantId: product.merchant.id,
-      })
+      // analyticsService tracking disabled for web
     } catch (error) {
       Alert.alert('Erreur', "Impossible d'ouvrir l'application téléphone.")
-      if (error instanceof Error) {
-        void analyticsService.trackError(error, 'handleCallMerchant')
-      }
+      // analyticsService tracking disabled for web
     }
   }
 
@@ -155,23 +149,12 @@ const ProductDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
       setWalletPin('')
     }
 
-    void analyticsService.track('Payment Method Selected', 'Payment', {
-      method,
-      productId: product?.id,
-      merchantId: product?.merchant.id,
-      screen: 'ProductDetails',
-    })
+    // analyticsService tracking disabled for web
   }
 
   const openReservationModal = () => {
     setShowReservationModal(true)
-    if (product) {
-      void analyticsService.track('Reservation Modal Opened', 'Reservation', {
-        productId: product.id,
-        merchantId: product.merchant.id,
-        paymentMethod: selectedPaymentMethod,
-      })
-    }
+    // analyticsService tracking disabled for web
   }
 
   const loadProduct = async () => {
@@ -189,13 +172,7 @@ const ProductDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
         }
       } catch (error) {
         showErrorAlert(error, 'Chargement du produit')
-        if (error instanceof Error) {
-          void analyticsService.trackError(error, 'loadProduct')
-        } else {
-          void analyticsService.track('Product Load Failed', 'System', {
-            productId,
-          })
-        }
+        // analyticsService tracking disabled for web
         navigation.goBack()
       }
     }
@@ -210,13 +187,7 @@ const ProductDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
         calculateDistance(location.coords)
       }
     } catch (error) {
-      if (error instanceof Error) {
-        void analyticsService.trackError(error, 'getUserLocation')
-      } else {
-        void analyticsService.track('Location Access Failed', 'System', {
-          details: String(error),
-        })
-      }
+      // analyticsService tracking disabled for web
     }
   }
 
@@ -243,12 +214,7 @@ const ProductDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
       const amount = payment?.amount ?? amountBase * quantity
       const ussd = paymentService.generateUSSDString(method, reference, amount)
 
-      void analyticsService.trackPurchase(amount, 'XOF', method, product.id.toString(), {
-        status,
-        reference,
-        reservationCode: response.data?.reservation_code,
-        merchantId: product.merchant.id,
-      })
+      // analyticsService tracking disabled for web
 
       let message = ''
       switch (status) {
@@ -283,11 +249,7 @@ const ProductDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
     }
 
     if (method === 'wallet') {
-      void analyticsService.trackPurchase(totalAmount, 'XOF', method, product.id.toString(), {
-        status: payment?.status ?? 'pending',
-        reservationCode: response.data?.reservation_code,
-        merchantId: product.merchant.id,
-      })
+      // analyticsService tracking disabled for web
       Alert.alert(
         payment?.status === 'success' ? 'Paiement wallet validé' : 'Réservation enregistrée',
         payment?.status === 'success'
@@ -316,11 +278,7 @@ const ProductDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
         { text: 'OK' }
       ]
     )
-    void analyticsService.track('On-Site Payment Selected', 'Payment', {
-      reservationCode: response.data?.reservation_code,
-      productId: product.id,
-      merchantId: product.merchant.id,
-    })
+    // analyticsService tracking disabled for web
   }
 
   const calculateDistance = (coords: { latitude: number; longitude: number }) => {
@@ -352,12 +310,7 @@ const ProductDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
   const handleReservation = async () => {
     if (!product || !user) return
 
-    void analyticsService.track('Reservation Attempt', 'Reservation', {
-      productId: product.id,
-      quantity,
-      paymentMethod: selectedPaymentMethod,
-      merchantId: product.merchant.id,
-    })
+    // analyticsService tracking disabled for web
 
     if (quantity > product.quantity_available) {
       Alert.alert('Erreur', 'Quantité demandée supérieure au stock disponible')
@@ -397,69 +350,13 @@ const ProductDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
       walletPin: selectedPaymentMethod === 'wallet' ? walletPin : undefined,
     }
 
+    // Offline functionality disabled for web - always use online mode
     if (!isOnline) {
-      try {
-        await offlineService.queueSyncAction('create', '/reservations', {
-          action: 'createReservation',
-          payload: reservationData,
-        })
-
-        const now = Date.now()
-        const tempReservation: Reservation = {
-          id: -now,
-          reservation_code: `TMP-${now}`,
-          quantity,
-          original_price: parseFloat(product.original_price),
-          discounted_price: parseFloat(product.discounted_price),
-          total_amount: totalAmount,
-          status: 'pending',
-          payment_status: 'pending',
-          notes,
-          pickup_date: reservationData.pickupDate || undefined,
-          pickup_time: reservationData.pickupTime || undefined,
-          created_at: new Date().toISOString(),
-          product: {
-            id: product.id,
-            name: product.name,
-            description: product.description,
-            image_url: product.image_url,
-            merchant: {
-              id: product.merchant.id,
-              name: product.merchant.business_name,
-              business_type: product.merchant.business_type,
-              address: product.merchant.address,
-              city: product.merchant.city,
-              phone: product.merchant.phone,
-            },
-            category: product.category,
-          },
-          consumer: user || undefined,
-          pendingSync: true,
-          pendingAction: 'create',
-        }
-
-        dispatch(addOfflineReservation(tempReservation))
-        setShowReservationModal(false)
-        setQuantity(1)
-        setNotes('')
-        setWalletPin('')
-        setSelectedPaymentMethod('on_site')
-        setCustomerPhone(user?.phone ?? '')
-
-        void analyticsService.trackReservation(String(product.id), quantity, totalAmount, {
-          paymentMethod: selectedPaymentMethod,
-          offline: true,
-          merchantId: product.merchant.id,
-        })
-
-        // ✅ Use toast for non-blocking success message
-        toast.showInfo('Réservation enregistrée hors ligne. Nous l\'enverrons dès le retour du réseau.', 4000)
-      } catch (error) {
-        showErrorAlert(error, 'Synchronisation offline')
-        if (error instanceof Error) {
-          void analyticsService.trackError(error, 'queueReservation')
-        }
-      }
+      Alert.alert(
+        'Connexion requise',
+        'Une connexion internet est nécessaire pour créer une réservation.',
+        [{ text: 'OK' }]
+      )
       return
     }
 
@@ -473,20 +370,14 @@ const ProductDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
         setWalletPin('')
         setSelectedPaymentMethod('on_site')
         setCustomerPhone(user?.phone ?? '')
-        await analyticsService.trackReservation(String(product.id), quantity, totalAmount, {
-          paymentMethod: selectedPaymentMethod,
-          reservationCode: response.data.reservation_code,
-          merchantId: product.merchant.id,
-        })
+        // analyticsService tracking disabled for web
         await handlePaymentFeedback(response.payment, selectedPaymentMethod, response)
       } else {
         showErrorAlert(new Error(result.payload as string), 'Création réservation', () => handleReservation())
       }
     } catch (error) {
       showErrorAlert(error, 'Création réservation', () => handleReservation())
-      if (error instanceof Error) {
-        void analyticsService.trackError(error, 'createReservation')
-      }
+      // analyticsService tracking disabled for web
     }
   }
 

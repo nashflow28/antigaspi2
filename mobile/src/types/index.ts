@@ -245,8 +245,11 @@ export interface ProductsState {
   products: Product[]
   categories: Category[]
   loading: boolean
+  loadingMore: boolean
   error: string | null
   filters: ProductFilters
+  currentPage: number
+  hasMore: boolean
 }
 
 export interface ReservationsState {

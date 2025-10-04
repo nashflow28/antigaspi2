@@ -3,6 +3,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import { Ionicons } from '@expo/vector-icons'
 import { useTheme } from '../theme'
+import ErrorBoundary from '../components/ErrorBoundary'
 
 // Screens
 import HomeScreen from '../screens/main/HomeScreen'
@@ -23,10 +24,12 @@ const HomeStack = () => (
 )
 
 const ProductsStack = () => (
-  <Stack.Navigator screenOptions={{ headerShown: false }}>
-    <Stack.Screen name="ProductsMain" component={ProductsScreen} />
-    <Stack.Screen name="ProductDetails" component={ProductDetailsScreen} />
-  </Stack.Navigator>
+  <ErrorBoundary>
+    <Stack.Navigator screenOptions={{ headerShown: false }}>
+      <Stack.Screen name="ProductsMain" component={ProductsScreen} />
+      <Stack.Screen name="ProductDetails" component={ProductDetailsScreen} />
+    </Stack.Navigator>
+  </ErrorBoundary>
 )
 
 const MainNavigator: React.FC = () => {

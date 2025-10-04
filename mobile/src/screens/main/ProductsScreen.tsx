@@ -17,7 +17,7 @@ import { fetchProducts, fetchCategories, setFilters, clearFilters as clearFilter
 import { Ionicons } from '@expo/vector-icons'
 import { Image } from 'expo-image'
 import { Product, ProductFilters } from '../../types'
-import analyticsService from '../../services/analyticsService'
+// import analyticsService from '../../services/analyticsService' // Désactivé pour le web
 import { useTheme } from '../../theme'
 import { Modal, Button } from '../../components/2025'
 import { showErrorAlert } from '../../utils/errorHandling'
@@ -97,13 +97,14 @@ const ProductsScreen: React.FC<Props> = ({ navigation, route }) => {
       await dispatch(fetchCategories())
     } catch (error) {
       showErrorAlert(error, 'Chargement des catégories', () => loadCategories())
-      if (error instanceof Error) {
-        void analyticsService.trackError(error, 'loadCategories')
-      } else {
-        void analyticsService.track('Categories Load Failed', 'System', {
-          details: String(error),
-        })
-      }
+      // Analytics désactivé pour le web
+      // if (error instanceof Error) {
+      //   void analyticsService.trackError(error, 'loadCategories')
+      // } else {
+      //   void analyticsService.track('Categories Load Failed', 'System', {
+      //     details: String(error),
+      //   })
+      // }
     }
   }
 

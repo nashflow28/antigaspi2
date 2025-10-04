@@ -1,7 +1,7 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit'
 import { ReservationsState, Reservation, ReservationCreationPayload, ReservationCreationResponse } from '../../types'
 import apiService from '../../services/api'
-import offlineService from '../../services/offlineService'
+// import offlineService from '../../services/offlineService' // Désactivé temporairement pour le web
 
 const initialState: ReservationsState = {
   reservations: [],
@@ -15,11 +15,6 @@ export const createReservation = createAsyncThunk(
   async (payload: ReservationCreationPayload, { rejectWithValue }) => {
     try {
       const response = await apiService.createReservation(payload)
-      await offlineService.setCache(`reservation_${response.data.id}`, response.data)
-      const cachedReservations = await offlineService.getCache<Reservation[]>('my_reservations')
-      if (cachedReservations) {
-        await offlineService.setCache('my_reservations', [response.data, ...cachedReservations])
-      }
       return response
     } catch (error: any) {
       return rejectWithValue(error.message)
@@ -30,22 +25,10 @@ export const createReservation = createAsyncThunk(
 export const fetchMyReservations = createAsyncThunk(
   'reservations/fetchMy',
   async (_, { rejectWithValue }) => {
-    const cacheKey = 'my_reservations'
-    const cachedReservations = await offlineService.getCache<Reservation[]>(cacheKey)
-    const isOnline = offlineService.getConnectivityStatus()
-
-    if (!isOnline && cachedReservations) {
-      return cachedReservations
-    }
-
     try {
       const response = await apiService.getMyReservations()
-      await offlineService.setCache(cacheKey, response.data)
       return response.data
     } catch (error: any) {
-      if (cachedReservations) {
-        return cachedReservations
-      }
       return rejectWithValue(error.message)
     }
   }
@@ -54,22 +37,10 @@ export const fetchMyReservations = createAsyncThunk(
 export const fetchReservation = createAsyncThunk(
   'reservations/fetch',
   async (id: number, { rejectWithValue }) => {
-    const cacheKey = `reservation_${id}`
-    const cachedReservation = await offlineService.getCache<Reservation>(cacheKey)
-    const isOnline = offlineService.getConnectivityStatus()
-
-    if (!isOnline && cachedReservation) {
-      return cachedReservation
-    }
-
     try {
       const response = await apiService.getReservation(id)
-      await offlineService.setCache(cacheKey, response.data)
       return response.data
     } catch (error: any) {
-      if (cachedReservation) {
-        return cachedReservation
-      }
       return rejectWithValue(error.message)
     }
   }
@@ -80,14 +51,6 @@ export const cancelReservation = createAsyncThunk(
   async (id: number, { rejectWithValue }) => {
     try {
       const response = await apiService.cancelReservation(id)
-      await offlineService.setCache(`reservation_${id}`, response.data)
-      const cachedList = await offlineService.getCache<Reservation[]>('my_reservations')
-      if (cachedList) {
-        const updatedList = cachedList.map(reservation =>
-          reservation.id === id ? response.data : reservation
-        )
-        await offlineService.setCache('my_reservations', updatedList)
-      }
       return response.data
     } catch (error: any) {
       return rejectWithValue(error.message)

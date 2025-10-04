@@ -7,9 +7,9 @@ import { ThemeProvider } from './src/theme'
 import MainNavigator from './src/navigation/MainNavigator'
 import ConnectivityBanner from './src/components/ConnectivityBanner'
 
-// Version simplifiée sans offlineService ni AppNavigator complexe
+// Version simplifiée sans authentification
 export default function App() {
-  console.log('🚀 App simplifiée démarrée - Sans offlineService')
+  console.log('🚀 App simplifiée démarrée - Sans authentification')
 
   return (
     <Provider store={store}>
