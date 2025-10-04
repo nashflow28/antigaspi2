@@ -241,10 +241,17 @@ const ProductsScreen: React.FC<Props> = ({ navigation, route }) => {
           ]}
           onPress={() => clearFilters()}
         >
-          <Text style={[
-            styles.categoryChipText,
-            !localFilters.category && styles.categoryChipTextActive,
-          ]}>Toutes</Text>
+          <Text
+            numberOfLines={1}
+            ellipsizeMode="tail"
+            style={[
+              styles.categoryChipText,
+              !localFilters.category && styles.categoryChipTextActive,
+              { flexShrink: 1 },
+            ]}
+          >
+            Toutes
+          </Text>
         </TouchableOpacity>
 
         {categories.map((category) => (
@@ -256,10 +263,17 @@ const ProductsScreen: React.FC<Props> = ({ navigation, route }) => {
             ]}
             onPress={() => handleCategoryFilter(category.id)}
           >
-            <Text style={[
-              styles.categoryChipText,
-              localFilters.category === category.id.toString() && styles.categoryChipTextActive,
-            ]}>{category.name}</Text>
+            <Text
+              numberOfLines={1}
+              ellipsizeMode="tail"
+              style={[
+                styles.categoryChipText,
+                localFilters.category === category.id.toString() && styles.categoryChipTextActive,
+                { flexShrink: 1 },
+              ]}
+            >
+              {category.name}
+            </Text>
           </TouchableOpacity>
         ))}
       </ScrollView>
@@ -409,13 +423,14 @@ const createStyles = (theme: ReturnType<typeof useTheme>) => StyleSheet.create({
     gap: theme.spacing.sm,
   },
   categoryChip: {
-    paddingHorizontal: theme.spacing.md,
+    minHeight: 36,
+    paddingHorizontal: theme.spacing.lg,
     paddingVertical: theme.spacing.sm,
     backgroundColor: theme.colors.backgroundSecondary,
     borderRadius: theme.radius.full,
-    marginRight: theme.spacing.sm,
     borderWidth: 1,
     borderColor: theme.colors.border,
+    alignItems: 'center',
   },
   categoryChipActive: {
     backgroundColor: theme.colors.primary[500],
