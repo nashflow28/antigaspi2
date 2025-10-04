@@ -468,7 +468,8 @@ const createStyles = (theme: ReturnType<typeof useTheme>) => {
   },
   categoriesContent: {
     paddingHorizontal: theme.spacing.md,
-    paddingVertical: theme.spacing.sm,
+    paddingTop: theme.spacing.sm,
+    paddingBottom: theme.spacing.md,
     gap: theme.spacing.sm,
   },
   categoryChip: {
