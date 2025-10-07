@@ -179,6 +179,10 @@ class ApiService {
     return this.request<ApiResponse<Category[]>>('GET', '/categories')
   }
 
+  async getMerchants(): Promise<ApiResponse<any[]>> {
+    return this.request<ApiResponse<any[]>>('GET', '/merchants')
+  }
+
   // === RÉSERVATIONS ===
 
   async createReservation(payload: ReservationCreationPayload): Promise<ReservationCreationResponse> {

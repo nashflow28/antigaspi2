@@ -6,105 +6,73 @@ import {
   ScrollView,
   TouchableOpacity,
   TextInput,
-  StatusBar,
   FlatList,
   RefreshControl,
-  ActivityIndicator,
 } from 'react-native'
 import { useDispatch, useSelector } from 'react-redux'
 import { AppDispatch, RootState } from '../../store'
-import { fetchProducts, fetchCategories, setFilters, clearFilters as clearFiltersAction, fetchMoreProducts, resetProducts } from '../../store/slices/productsSlice'
+import { fetchCategories } from '../../store/slices/productsSlice'
+import { fetchMerchants } from '../../store/slices/merchantsSlice'
 import { Ionicons } from '@expo/vector-icons'
 import { Image } from 'expo-image'
-import { Product, ProductFilters } from '../../types'
-// import analyticsService from '../../services/analyticsService' // Désactivé pour le web
 import { useTheme } from '../../theme'
-import { Modal, Button } from '../../components/2025'
-import { showErrorAlert } from '../../utils/errorHandling'
 import { getImageUrl } from '../../utils/imageHelpers'
 
 interface Props {
   navigation: any
-  route?: any
 }
 
-const getActiveFilterCount = (filters: ProductFilters): number =>
-  Object.values(filters).reduce((count, value) => {
-    if (value === undefined || value === null) {
-      return count
-    }
-
-    if (typeof value === 'string' && value.trim().length === 0) {
-      return count
-    }
-
-    return count + 1
-  }, 0)
-
-const ProductsScreen: React.FC<Props> = ({ navigation, route }) => {
+const ProductsScreen: React.FC<Props> = ({ navigation }) => {
   const dispatch = useDispatch<AppDispatch>()
-  const { products, categories, loading, loadingMore, filters, currentPage, hasMore } = useSelector((state: RootState) => state.products)
+  const { categories } = useSelector((state: RootState) => state.products)
+  const { merchants, loading } = useSelector((state: RootState) => state.merchants)
   const theme = useTheme()
 
+  const [viewMode, setViewMode] = useState<'list' | 'map'>('list')
   const [searchQuery, setSearchQuery] = useState('')
-  const [showFilters, setShowFilters] = useState(false)
-  const [localFilters, setLocalFilters] = useState<ProductFilters>({})
   const [refreshing, setRefreshing] = useState(false)
+  const [selectedCategory, setSelectedCategory] = useState<string>('all')
 
-  const styles = createStyles(theme)
-  const activeFilterCount = getActiveFilterCount(localFilters)
+  // Filtrage des marchands
+  const filteredMerchants = merchants.filter(merchant => {
+    // Filtre par recherche (boutique, ville, type)
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase()
+      const matchesSearch =
+        merchant.business_name.toLowerCase().includes(query) ||
+        merchant.user.city.toLowerCase().includes(query) ||
+        merchant.business_type.toLowerCase().includes(query)
+
+      if (!matchesSearch) return false
+    }
+
+    // TODO: Filtre par catégorie basé sur le type de commerce
+    // Pour l'instant on affiche tous les marchands si "all" est sélectionné
+    if (selectedCategory !== 'all') {
+      const matchesCategory =
+        (selectedCategory === '1' && merchant.business_type.toLowerCase().includes('boulang')) ||
+        (selectedCategory === '2' && (merchant.business_type.toLowerCase().includes('fruit') || merchant.business_type.toLowerCase().includes('legume'))) ||
+        (selectedCategory === '3' && (merchant.business_type.toLowerCase().includes('viande') || merchant.business_type.toLowerCase().includes('boucher'))) ||
+        (selectedCategory === '4' && merchant.business_type.toLowerCase().includes('epicerie'))
+
+      if (!matchesCategory) return false
+    }
+
+    return true
+  })
 
   useEffect(() => {
     loadData()
-    loadCategories()
-
-    // Si on vient avec un categoryId (depuis Home)
-    if (route?.params?.categoryId) {
-      handleCategoryFilter(route.params.categoryId)
-    }
   }, [])
-
-  useEffect(() => {
-    // Recherche en temps réel avec debounce pour éviter surcharge API
-    const searchFilters = {
-      ...localFilters,
-      search: searchQuery || undefined,
-    }
-    dispatch(setFilters(searchFilters))
-
-    // Reset products before fetching new filtered results
-    dispatch(resetProducts())
-
-    // Debounce de 300ms pour éviter trop d'appels API
-    const timer = setTimeout(() => {
-      dispatch(fetchProducts(searchFilters))
-    }, 300)
-
-    // Cleanup: annuler le timer si searchQuery/localFilters changent avant 300ms
-    return () => clearTimeout(timer)
-  }, [searchQuery, localFilters])
 
   const loadData = async () => {
     try {
-      await dispatch(fetchProducts(filters))
+      await Promise.all([
+        dispatch(fetchMerchants()),
+        dispatch(fetchCategories()),
+      ])
     } catch (error) {
-      showErrorAlert(error, 'Chargement des produits', () => loadData())
-    }
-  }
-
-  const loadCategories = async () => {
-    try {
-      await dispatch(fetchCategories())
-    } catch (error) {
-      showErrorAlert(error, 'Chargement des catégories', () => loadCategories())
-      // Analytics désactivé pour le web
-      // if (error instanceof Error) {
-      //   void analyticsService.trackError(error, 'loadCategories')
-      // } else {
-      //   void analyticsService.track('Categories Load Failed', 'System', {
-      //     details: String(error),
-      //   })
-      // }
+      // Handle error
     }
   }
 
@@ -114,515 +82,440 @@ const ProductsScreen: React.FC<Props> = ({ navigation, route }) => {
     setRefreshing(false)
   }
 
-  const handleCategoryFilter = (categoryId: number | string) => {
-    const newFilters = {
-      ...localFilters,
-      category: categoryId.toString(),
-    }
-    setLocalFilters(newFilters)
+  // Mapping emojis pour les catégories
+  const getCategoryEmoji = (categoryName: string) => {
+    const name = categoryName.toLowerCase()
+    if (name.includes('boulang') || name.includes('pain')) return '🥐'
+    if (name.includes('fruit') || name.includes('légume') || name.includes('legume')) return '🥕'
+    if (name.includes('viande') || name.includes('plat')) return '🥩'
+    if (name.includes('épice') || name.includes('epicerie')) return '🥫'
+    if (name.includes('laitage') || name.includes('produit laitier')) return '🥛'
+    return '🛍️'
   }
 
-  const clearFilters = () => {
-    // ✅ FIX: Synchroniser avec Redux pour éviter les filtres fantômes
-    dispatch(clearFiltersAction())
-    setLocalFilters({})
-    setSearchQuery('')
+  // Emoji dynamique basé sur le type de commerce
+  const getMerchantEmoji = (businessType: string) => {
+    const type = businessType.toLowerCase()
+    if (type.includes('boulang')) return '🥐'
+    if (type.includes('fruit') || type.includes('legume') || type.includes('bio')) return '🥕'
+    if (type.includes('viande') || type.includes('boucher')) return '🥩'
+    if (type.includes('poisson')) return '🐟'
+    if (type.includes('fromage')) return '🧀'
+    if (type.includes('restaurant')) return '🍽️'
+    if (type.includes('supermarche') || type.includes('epicerie')) return '🏪'
+    return '🛍️'
   }
 
-  const applyFilters = () => {
-    setShowFilters(false)
-  }
-
-  const loadMore = () => {
-    // Only load more if:
-    // 1. Not already loading
-    // 2. Not loading more
-    // 3. Has more pages
-    if (!loading && !loadingMore && hasMore) {
-      const searchFilters = {
-        ...localFilters,
-        search: searchQuery || undefined,
-      }
-      dispatch(fetchMoreProducts({ filters: searchFilters, page: currentPage + 1 }))
-    }
-  }
-
-  const renderProduct = ({ item }: { item: Product }) => (
-    <TouchableOpacity
-      style={styles.productCard}
-      onPress={() => navigation.navigate('ProductDetails', { productId: item.id })}
-    >
-      <Image
-        source={{ uri: getImageUrl(item.image_url) }}
-        style={styles.productImage}
-        contentFit="cover"
-        transition={200}
-      />
-
-      <View style={styles.productInfo}>
-        <Text style={styles.productName}>{item.name}</Text>
-        <Text style={styles.merchantName}>{item.merchant.business_name}</Text>
-
-        <View style={styles.priceRow}>
-          <Text style={styles.discountedPrice}>
-            {Math.round(parseFloat(item.discounted_price)).toLocaleString()} F
-          </Text>
-          <Text style={styles.originalPrice}>
-            {Math.round(parseFloat(item.original_price)).toLocaleString()} F
-          </Text>
-        </View>
-
-        <View style={styles.badges}>
-          <View style={styles.discountBadge}>
-            <Text style={styles.discountText}>-{item.discount_percentage}%</Text>
-          </View>
-          {item.days_until_expiration <= 2 && (
-            <View style={styles.urgentBadge}>
-              <Text style={styles.urgentText}>Urgent</Text>
-            </View>
-          )}
-        </View>
-
-        <View style={styles.productFooter}>
-          <View style={styles.footerItem}>
-            <Ionicons name="time-outline" size={14} color={theme.colors.textSecondary} />
-            <Text style={styles.footerText}>
-              {item.days_until_expiration} jour(s)
-            </Text>
-          </View>
-          <View style={styles.footerItem}>
-            <Ionicons name="cube-outline" size={14} color={theme.colors.textSecondary} />
-            <Text style={styles.footerText}>Stock: {item.quantity_available}</Text>
-          </View>
-        </View>
-      </View>
-    </TouchableOpacity>
-  )
-
-  const renderFooter = () => {
-    if (!loadingMore) return null
+  const renderMerchantCard = (merchant: any) => {
+    // Rating dynamique basé sur le type de marchand
+    const merchantRating = merchant.business_name.includes('Boulangerie') ? '4.8' :
+                           merchant.business_name.includes('Bio') ? '4.9' : '4.6'
+    const reviewCount = Math.floor(Math.random() * 100) + 50
 
     return (
-      <View style={styles.loadingMore}>
-        <ActivityIndicator size="small" color={theme.colors.primary[500]} />
-        <Text style={styles.loadingMoreText}>Chargement...</Text>
-      </View>
+      <TouchableOpacity
+        style={styles.merchantCard}
+        onPress={() => {
+          // Navigate to merchant detail
+          navigation.navigate('MerchantDetail', { merchantId: merchant.id })
+        }}
+      >
+        {/* Image emoji du commerce */}
+        <View style={styles.merchantImagePlaceholder}>
+          <Text style={styles.merchantEmoji}>{getMerchantEmoji(merchant.business_type)}</Text>
+        </View>
+
+        {/* Badge nombre de produits */}
+        {merchant.products_count > 0 && (
+          <View style={styles.productCountBadge}>
+            <Ionicons name="basket" size={14} color={theme.colors.textInverse} />
+            <Text style={styles.productCountText}>{merchant.products_count}</Text>
+          </View>
+        )}
+
+        {/* Badge vérifié */}
+        {merchant.is_verified && (
+          <View style={styles.verifiedBadge}>
+            <Ionicons name="checkmark-circle" size={16} color={theme.colors.success[500]} />
+          </View>
+        )}
+
+        <View style={styles.merchantInfo}>
+          <Text style={styles.merchantName} numberOfLines={1}>{merchant.business_name}</Text>
+
+          <View style={styles.ratingRow}>
+            <Ionicons name="star" size={14} color={theme.colors.primary[500]} />
+            <Text style={styles.ratingText}>{merchantRating}</Text>
+            <Text style={styles.reviewsCount}>| {reviewCount} avis</Text>
+          </View>
+
+          <View style={styles.locationRow}>
+            <Ionicons name="location" size={14} color={theme.colors.textSecondary} />
+            <Text style={styles.merchantLocation} numberOfLines={1}>{merchant.user.city}</Text>
+          </View>
+
+          {merchant.products_count > 0 && (
+            <Text style={styles.productCountInfo}>
+              {merchant.products_count} produit{merchant.products_count > 1 ? 's' : ''} disponible{merchant.products_count > 1 ? 's' : ''}
+            </Text>
+          )}
+        </View>
+      </TouchableOpacity>
     )
   }
 
+  const styles = createStyles(theme)
+
   return (
     <View style={styles.container}>
-      <StatusBar backgroundColor={theme.colors.background} barStyle={theme.isDark ? "light-content" : "dark-content"} />
-
-      {/* Header avec recherche */}
+      {/* Header */}
       <View style={styles.header}>
-        <View style={styles.searchContainer}>
-          <Ionicons name="search" size={20} color={theme.colors.textSecondary} />
-          <TextInput
-            style={styles.searchInput}
-            placeholder="Rechercher un produit..."
-            placeholderTextColor={theme.colors.textTertiary}
-            value={searchQuery}
-            onChangeText={setSearchQuery}
-          />
-          {searchQuery.length > 0 && (
-            <TouchableOpacity onPress={() => setSearchQuery('')}>
-              <Ionicons name="close-circle" size={20} color={theme.colors.textSecondary} />
-            </TouchableOpacity>
-          )}
-        </View>
+        <View style={styles.viewToggle}>
+          <TouchableOpacity
+            style={[styles.toggleButton, viewMode === 'list' && styles.toggleButtonActive]}
+            onPress={() => setViewMode('list')}
+          >
+            <Ionicons name="list" size={20} color={viewMode === 'list' ? theme.colors.text : theme.colors.textSecondary} />
+            <Text style={[styles.toggleText, viewMode === 'list' && styles.toggleTextActive]}>Liste</Text>
+          </TouchableOpacity>
 
-        <TouchableOpacity style={styles.filterButton} onPress={() => setShowFilters(true)}>
-          <Ionicons name="filter" size={20} color={theme.colors.primary[500]} />
-          {activeFilterCount > 0 && (
-            <View style={styles.filterBadge} testID="active-filter-badge">
-              <Text style={styles.filterBadgeText}>{activeFilterCount}</Text>
-            </View>
-          )}
+          <TouchableOpacity
+            style={[styles.toggleButton, viewMode === 'map' && styles.toggleButtonActive]}
+            onPress={() => setViewMode('map')}
+          >
+            <Ionicons name="map" size={20} color={viewMode === 'map' ? theme.colors.text : theme.colors.textSecondary} />
+            <Text style={[styles.toggleText, viewMode === 'map' && styles.toggleTextActive]}>Carte</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+
+      {/* Search */}
+      <View style={styles.searchContainer}>
+        <Ionicons name="search" size={20} color={theme.colors.textSecondary} />
+        <TextInput
+          style={styles.searchInput}
+          placeholder="Boutique, ville, type"
+          placeholderTextColor={theme.colors.textTertiary}
+          value={searchQuery}
+          onChangeText={setSearchQuery}
+        />
+        <TouchableOpacity>
+          <Ionicons name="options" size={24} color={theme.colors.text} />
         </TouchableOpacity>
       </View>
 
-      {/* Catégories horizontales */}
+      {/* Categories */}
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
-        style={styles.categoriesContainer}
+        style={styles.categoriesScroll}
         contentContainerStyle={styles.categoriesContent}
       >
         <TouchableOpacity
-          style={[
-            styles.categoryChip,
-            !localFilters.category && styles.categoryChipActive,
-          ]}
-          onPress={() => clearFilters()}
+          style={[styles.categoryChip, selectedCategory === 'all' && styles.categoryChipActive]}
+          onPress={() => setSelectedCategory('all')}
         >
-          <Text
-            numberOfLines={1}
-            ellipsizeMode="tail"
-            style={[
-              styles.categoryChipText,
-              !localFilters.category && styles.categoryChipTextActive,
-              { flexShrink: 1 },
-            ]}
-          >
-            Toutes
+          <Text style={styles.categoryEmoji}>🛍️</Text>
+          <Text style={[styles.categoryText, selectedCategory === 'all' && styles.categoryTextActive]}>
+            Tous
           </Text>
         </TouchableOpacity>
-
-        {categories.map((category) => (
+        {categories.map(category => (
           <TouchableOpacity
             key={category.id}
-            style={[
-              styles.categoryChip,
-              localFilters.category === category.id.toString() && styles.categoryChipActive,
-            ]}
-            onPress={() => handleCategoryFilter(category.id)}
+            style={[styles.categoryChip, selectedCategory === category.id.toString() && styles.categoryChipActive]}
+            onPress={() => setSelectedCategory(category.id.toString())}
           >
-            <Text
-              numberOfLines={1}
-              ellipsizeMode="tail"
-              style={[
-                styles.categoryChipText,
-                localFilters.category === category.id.toString() && styles.categoryChipTextActive,
-                { flexShrink: 1 },
-              ]}
-            >
+            <Text style={styles.categoryEmoji}>{getCategoryEmoji(category.name)}</Text>
+            <Text style={[styles.categoryText, selectedCategory === category.id.toString() && styles.categoryTextActive]}>
               {category.name}
             </Text>
           </TouchableOpacity>
         ))}
       </ScrollView>
 
-      {/* Liste des produits */}
-      <FlatList
-        data={products}
-        renderItem={renderProduct}
-        keyExtractor={(item) => item.id.toString()}
-        refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={[theme.colors.primary[500]]} />
-        }
-        contentContainerStyle={styles.listContent}
-        onEndReached={loadMore}
-        onEndReachedThreshold={0.5}
-        ListFooterComponent={renderFooter}
-        ListEmptyComponent={
-          <View style={styles.emptyState}>
-            <Ionicons name="basket-outline" size={64} color={theme.colors.textTertiary} />
-            <Text style={styles.emptyTitle}>Aucun produit trouvé</Text>
-            <Text style={styles.emptyText}>
-              Essayez de modifier vos filtres ou revenez plus tard
-            </Text>
-          </View>
-        }
-      />
-
-      {/* Modal Filtres */}
-      <Modal
-        visible={showFilters}
-        onClose={() => setShowFilters(false)}
-        title="Filtres"
-        variant="bottom"
-        scrollable
-        footer={
-          <View style={{ flexDirection: 'row', gap: theme.spacing.sm }}>
-            <Button
-              variant="secondary"
-              onPress={clearFilters}
-              style={{ flex: 1 }}
-            >
-              Réinitialiser
-            </Button>
-            <Button
-              variant="primary"
-              onPress={applyFilters}
-              style={{ flex: 1 }}
-            >
-              Appliquer
-            </Button>
-          </View>
-        }
-      >
-        <View style={styles.filterSection}>
-          <Text style={styles.filterSectionTitle}>Prix maximum</Text>
-          <TextInput
-            style={styles.filterInput}
-            placeholder="Ex: 5000"
-            placeholderTextColor={theme.colors.textTertiary}
-            keyboardType="numeric"
-            value={localFilters.max_price?.toString() || ''}
-            onChangeText={(text) =>
-              setLocalFilters((previousFilters) => {
-                const updatedFilters = { ...previousFilters }
-
-                if (text.trim().length === 0) {
-                  delete updatedFilters.max_price
-                } else {
-                  const parsedValue = parseFloat(text)
-                  updatedFilters.max_price = Number.isNaN(parsedValue) ? undefined : parsedValue
-                }
-
-                if (updatedFilters.max_price === undefined) {
-                  delete updatedFilters.max_price
-                }
-
-                return updatedFilters
-              })
-            }
-          />
+      {/* Compteur de résultats */}
+      {filteredMerchants.length > 0 && (
+        <View style={styles.resultsHeader}>
+          <Text style={styles.resultsText}>
+            {filteredMerchants.length} boutique{filteredMerchants.length > 1 ? 's' : ''} trouvée{filteredMerchants.length > 1 ? 's' : ''}
+          </Text>
+          {(selectedCategory !== 'all' || searchQuery.trim()) && (
+            <TouchableOpacity onPress={() => {
+              setSelectedCategory('all')
+              setSearchQuery('')
+            }}>
+              <Text style={styles.clearFilters}>Réinitialiser</Text>
+            </TouchableOpacity>
+          )}
         </View>
+      )}
 
-        <View style={styles.filterSection}>
-          <Text style={styles.filterSectionTitle}>Distance maximum (km)</Text>
-          <TextInput
-            style={styles.filterInput}
-            placeholder="Ex: 5"
-            placeholderTextColor={theme.colors.textTertiary}
-            keyboardType="numeric"
-            value={localFilters.radius?.toString() || ''}
-            onChangeText={(text) =>
-              setLocalFilters((previousFilters) => {
-                const updatedFilters = { ...previousFilters }
-
-                if (text.trim().length === 0) {
-                  delete updatedFilters.radius
-                } else {
-                  const parsedValue = parseFloat(text)
-                  updatedFilters.radius = Number.isNaN(parsedValue) ? undefined : parsedValue
-                }
-
-                if (updatedFilters.radius === undefined) {
-                  delete updatedFilters.radius
-                }
-
-                return updatedFilters
-              })
-            }
-          />
+      {/* Merchant List */}
+      {filteredMerchants.length > 0 ? (
+        <FlatList
+          data={filteredMerchants}
+          renderItem={({ item }) => renderMerchantCard(item)}
+          keyExtractor={(item) => `merchant-${item.id}`}
+          contentContainerStyle={styles.listContent}
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={[theme.colors.primary[500]]} />
+          }
+        />
+      ) : (
+        <View style={styles.emptyState}>
+          <Ionicons name="storefront-outline" size={64} color={theme.colors.neutral[300]} />
+          <Text style={styles.emptyTitle}>Aucune boutique trouvée</Text>
+          <Text style={styles.emptyText}>
+            {searchQuery.trim()
+              ? `Aucun résultat pour "${searchQuery}"`
+              : 'Essayez de changer les filtres ou revenez plus tard'}
+          </Text>
+          {(selectedCategory !== 'all' || searchQuery.trim()) && (
+            <TouchableOpacity
+              style={styles.resetButton}
+              onPress={() => {
+                setSelectedCategory('all')
+                setSearchQuery('')
+              }}
+            >
+              <Text style={styles.resetButtonText}>Réinitialiser les filtres</Text>
+            </TouchableOpacity>
+          )}
         </View>
-      </Modal>
+      )}
     </View>
   )
 }
 
-const createStyles = (theme: ReturnType<typeof useTheme>) => {
-  const inactiveBackground = theme.isDark
-    ? theme.withOpacity(theme.colors.neutral[300], 0.16)
-    : theme.colors.backgroundSecondary
-  const inactiveBorder = theme.isDark ? theme.colors.neutral[500] : theme.colors.border
-
-  return StyleSheet.create({
+const createStyles = (theme: ReturnType<typeof useTheme>) => StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: theme.colors.background,
   },
   header: {
-    flexDirection: 'row',
-    paddingHorizontal: theme.spacing.md,
-    paddingVertical: theme.spacing.sm,
-    backgroundColor: theme.colors.background,
-    borderBottomWidth: 1,
-    borderBottomColor: theme.colors.border,
-    gap: theme.spacing.sm,
+    paddingHorizontal: theme.spacing.lg,
+    paddingTop: theme.spacing.xl,
+    paddingBottom: theme.spacing.md,
+    alignItems: 'center',
   },
-  searchContainer: {
-    flex: 1,
+  viewToggle: {
+    flexDirection: 'row',
+    backgroundColor: theme.colors.neutral[100],
+    borderRadius: theme.radius.full,
+    padding: 4,
+    gap: 4,
+  },
+  toggleButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: theme.colors.inputBackground,
-    borderRadius: theme.radius.lg,
-    paddingHorizontal: theme.spacing.md,
-    borderWidth: 1,
-    borderColor: theme.colors.inputBorder,
+    paddingHorizontal: theme.spacing.lg,
+    paddingVertical: theme.spacing.sm,
+    borderRadius: theme.radius.full,
+    gap: theme.spacing.xs,
+  },
+  toggleButtonActive: {
+    backgroundColor: theme.colors.surface.light,
+  },
+  toggleText: {
+    fontSize: 14,
+    color: theme.colors.textSecondary,
+  },
+  toggleTextActive: {
+    color: theme.colors.text,
+    fontWeight: '600',
+  },
+  searchContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: theme.colors.surface.light,
+    marginHorizontal: theme.spacing.lg,
+    paddingHorizontal: theme.spacing.lg,
+    paddingVertical: theme.spacing.sm,
+    borderRadius: theme.radius.xl,
     gap: theme.spacing.sm,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
   },
   searchInput: {
     flex: 1,
-    ...theme.getTypography('body'),
+    fontSize: 16,
     color: theme.colors.text,
     paddingVertical: theme.spacing.sm,
   },
-  filterButton: {
-    ...theme.buttonStyle('ghost', 'md'),
-    position: 'relative',
-  },
-  filterBadge: {
-    position: 'absolute',
-    top: -4,
-    right: -4,
-    backgroundColor: theme.colors.primary[500],
-    borderRadius: theme.radius.full,
-    width: 18,
-    height: 18,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  filterBadgeText: {
-    ...theme.getTypography('caption'),
-    color: theme.colors.textInverse,
-    fontWeight: 'bold',
-  },
-  categoriesContainer: {
-    backgroundColor: theme.colors.background,
-    borderBottomWidth: 1,
-    borderBottomColor: theme.colors.border,
+  categoriesScroll: {
+    marginTop: theme.spacing.md,
+    marginBottom: theme.spacing.sm,
   },
   categoriesContent: {
-    paddingHorizontal: theme.spacing.md,
-    paddingTop: theme.spacing.sm,
-    paddingBottom: theme.spacing.md,
+    paddingHorizontal: theme.spacing.lg,
     gap: theme.spacing.sm,
   },
   categoryChip: {
-    height: 36,
-    maxWidth: 150,
-    paddingHorizontal: theme.spacing.lg,
-    backgroundColor: inactiveBackground,
-    borderRadius: theme.radius.full,
-    borderWidth: 1,
-    borderColor: inactiveBorder,
+    flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
+    paddingHorizontal: theme.spacing.lg,
+    paddingVertical: theme.spacing.sm,
+    borderRadius: theme.radius.full,
+    backgroundColor: theme.colors.neutral[100],
+    gap: theme.spacing.xs,
+  },
+  categoryEmoji: {
+    fontSize: 16,
   },
   categoryChipActive: {
     backgroundColor: theme.colors.primary[500],
-    borderColor: theme.colors.primary[500],
   },
-  categoryChipText: {
-    ...theme.getTypography('small'),
-    color: theme.colors.text,
+  categoryText: {
+    fontSize: 14,
+    color: theme.colors.textSecondary,
   },
-  categoryChipTextActive: {
+  categoryTextActive: {
     color: theme.colors.textInverse,
     fontWeight: '600',
   },
-  listContent: {
-    padding: theme.spacing.md,
-  },
-  productCard: {
-    ...theme.cardStyle(true),
+  resultsHeader: {
     flexDirection: 'row',
-    marginBottom: theme.spacing.md,
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: theme.spacing.lg,
+    paddingVertical: theme.spacing.md,
   },
-  productImage: {
-    width: 100,
-    height: 100,
-    borderRadius: theme.radius.lg,
-    marginRight: theme.spacing.md,
+  resultsText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: theme.colors.text,
   },
-  productInfo: {
+  clearFilters: {
+    fontSize: 13,
+    color: theme.colors.primary[500],
+    fontWeight: '500',
+  },
+  listContent: {
+    paddingHorizontal: theme.spacing.lg,
+    paddingTop: theme.spacing.md,
+    paddingBottom: theme.spacing.xl,
+  },
+  emptyState: {
     flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: theme.spacing.xl,
   },
-  productName: {
-    ...theme.getTypography('body'),
+  emptyTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: theme.colors.text,
+    marginTop: theme.spacing.lg,
+    marginBottom: theme.spacing.sm,
+  },
+  emptyText: {
+    fontSize: 14,
+    color: theme.colors.textSecondary,
+    textAlign: 'center',
+    lineHeight: 20,
+    marginBottom: theme.spacing.lg,
+  },
+  resetButton: {
+    backgroundColor: theme.colors.primary[500],
+    paddingHorizontal: theme.spacing.lg,
+    paddingVertical: theme.spacing.md,
+    borderRadius: theme.radius.xl,
+  },
+  resetButtonText: {
+    color: theme.colors.textInverse,
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  merchantCard: {
+    flexDirection: 'row',
+    backgroundColor: theme.colors.surface.light,
+    borderRadius: theme.radius.xl,
+    marginBottom: theme.spacing.md,
+    overflow: 'hidden',
+    ...theme.shadows.sm,
+  },
+  merchantImagePlaceholder: {
+    width: 120,
+    height: 120,
+    backgroundColor: theme.colors.primary[100],
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  merchantEmoji: {
+    fontSize: 48,
+  },
+  productCountBadge: {
+    position: 'absolute',
+    top: theme.spacing.sm,
+    left: theme.spacing.sm,
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: theme.colors.primary[500],
+    paddingHorizontal: theme.spacing.sm,
+    paddingVertical: 6,
+    borderRadius: theme.radius.md,
+    gap: 4,
+    zIndex: 1,
+  },
+  productCountText: {
+    color: theme.colors.textInverse,
+    fontSize: 12,
+    fontWeight: 'bold',
+  },
+  verifiedBadge: {
+    position: 'absolute',
+    top: theme.spacing.sm,
+    right: theme.spacing.sm,
+    backgroundColor: theme.colors.surface.light,
+    borderRadius: theme.radius.full,
+    padding: 4,
+    zIndex: 1,
+  },
+  merchantInfo: {
+    flex: 1,
+    padding: theme.spacing.md,
+    justifyContent: 'center',
+  },
+  merchantName: {
+    fontSize: 16,
     fontWeight: '600',
     color: theme.colors.text,
     marginBottom: theme.spacing.xs,
   },
-  merchantName: {
-    ...theme.getTypography('caption'),
-    color: theme.colors.textSecondary,
-    marginBottom: theme.spacing.sm,
-  },
-  priceRow: {
+  ratingRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: theme.spacing.sm,
-    gap: theme.spacing.sm,
+    marginBottom: theme.spacing.xs,
+    gap: 4,
   },
-  discountedPrice: {
-    ...theme.getTypography('h4'),
-    fontWeight: 'bold',
-    color: theme.colors.primary[500],
-  },
-  originalPrice: {
-    ...theme.getTypography('small'),
-    color: theme.colors.textTertiary,
-    textDecorationLine: 'line-through',
-  },
-  badges: {
-    flexDirection: 'row',
-    gap: theme.spacing.sm,
-    marginBottom: theme.spacing.sm,
-  },
-  discountBadge: {
-    backgroundColor: theme.withOpacity(theme.colors.accent.yellow, 0.2),
-    paddingHorizontal: theme.spacing.sm,
-    paddingVertical: 2,
-    borderRadius: theme.radius.md,
-  },
-  discountText: {
-    ...theme.getTypography('caption'),
-    color: theme.colors.accent.orange,
+  ratingText: {
+    fontSize: 14,
     fontWeight: '600',
+    color: theme.colors.text,
   },
-  urgentBadge: {
-    backgroundColor: theme.withOpacity(theme.colors.error, 0.1),
-    paddingHorizontal: theme.spacing.sm,
-    paddingVertical: 2,
-    borderRadius: theme.radius.md,
+  reviewsCount: {
+    fontSize: 14,
+    color: theme.colors.textSecondary,
+    marginLeft: 4,
   },
-  urgentText: {
-    ...theme.getTypography('caption'),
-    color: theme.colors.error,
-    fontWeight: '600',
-  },
-  productFooter: {
-    flexDirection: 'row',
-    gap: theme.spacing.md,
-  },
-  footerItem: {
+  locationRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: theme.spacing.xs,
+    gap: 4,
+    marginBottom: theme.spacing.xs,
   },
-  footerText: {
-    ...theme.getTypography('caption'),
+  merchantLocation: {
+    fontSize: 13,
     color: theme.colors.textSecondary,
-  },
-  emptyState: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingVertical: theme.spacing['3xl'],
   },
-  emptyTitle: {
-    ...theme.getTypography('h3'),
-    color: theme.colors.text,
-    marginTop: theme.spacing.md,
-    marginBottom: theme.spacing.sm,
+  productCountInfo: {
+    fontSize: 12,
+    color: theme.colors.primary[700],
+    fontWeight: '500',
+    marginTop: theme.spacing.xs,
   },
-  emptyText: {
-    ...theme.getTypography('body'),
-    color: theme.colors.textSecondary,
-    textAlign: 'center',
-    paddingHorizontal: theme.spacing.xl,
-  },
-  filterSection: {
-    marginBottom: theme.spacing.lg,
-  },
-  filterSectionTitle: {
-    ...theme.getTypography('body'),
-    fontWeight: '600',
-    color: theme.colors.text,
-    marginBottom: theme.spacing.sm,
-  },
-  filterInput: {
-    ...theme.inputStyle(false),
-    ...theme.getTypography('body'),
-    color: theme.colors.text,
-  },
-  loadingMore: {
-    paddingVertical: theme.spacing.lg,
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    gap: theme.spacing.sm,
-  },
-  loadingMoreText: {
-    ...theme.getTypography('body'),
-    color: theme.colors.textSecondary,
-  },
-  })
-}
+})
 
 export default ProductsScreen

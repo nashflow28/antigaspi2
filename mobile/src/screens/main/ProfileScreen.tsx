@@ -12,6 +12,7 @@ import { AppDispatch, RootState } from '../../store'
 import { Ionicons } from '@expo/vector-icons'
 import { Button, Card, Badge, Typography, Modal } from '../../components/2025'
 import { useTheme } from '../../theme'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 
 const ProfileScreen: React.FC = () => {
   const theme = useTheme()
@@ -26,7 +27,14 @@ const ProfileScreen: React.FC = () => {
 
   const confirmLogout = async () => {
     setShowLogoutModal(false)
-    await dispatch(logoutUser())
+    try {
+      // Nettoyer complètement le cache
+      await AsyncStorage.clear()
+      // Déconnexion
+      await dispatch(logoutUser())
+    } catch (error) {
+      console.error('Erreur déconnexion:', error)
+    }
   }
 
   return (
@@ -145,11 +153,15 @@ const ProfileScreen: React.FC = () => {
           <Ionicons name="chevron-forward" size={20} color={theme.colors.neutral[400]} />
         </TouchableOpacity>
 
-        <TouchableOpacity style={[styles.menuItem, { paddingHorizontal: theme.spacing.lg, paddingVertical: theme.spacing.md }]} onPress={handleLogout}>
-          <Ionicons name="log-out-outline" size={24} color={theme.colors.error[500]} />
-          <Typography variant="body" style={{ flex: 1, marginLeft: theme.spacing.md, color: theme.colors.error[500] }}>
+        <TouchableOpacity
+          style={[styles.menuItem, { paddingHorizontal: theme.spacing.lg, paddingVertical: theme.spacing.md, backgroundColor: theme.withOpacity(theme.colors.semantic.error, 0.1) }]}
+          onPress={handleLogout}
+        >
+          <Ionicons name="log-out-outline" size={24} color={theme.colors.semantic.error} />
+          <Typography variant="body" style={{ flex: 1, marginLeft: theme.spacing.md, color: theme.colors.semantic.error, fontWeight: '600' }}>
             Déconnexion
           </Typography>
+          <Ionicons name="exit-outline" size={20} color={theme.colors.semantic.error} />
         </TouchableOpacity>
       </Card>
 
