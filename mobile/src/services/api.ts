@@ -32,6 +32,23 @@ const getApiBaseUrl = (): string => {
 // Export pour utilisation dans d'autres services (ex: imageHelpers)
 export const API_BASE_URL = getApiBaseUrl()
 
+// Helper pour transformer camelCase en snake_case (Laravel attend snake_case)
+const toSnakeCase = (obj: any): any => {
+  if (obj === null || typeof obj !== 'object') {
+    return obj
+  }
+
+  if (Array.isArray(obj)) {
+    return obj.map(toSnakeCase)
+  }
+
+  return Object.keys(obj).reduce((result: any, key: string) => {
+    const snakeKey = key.replace(/([A-Z])/g, '_$1').toLowerCase()
+    result[snakeKey] = toSnakeCase(obj[key])
+    return result
+  }, {})
+}
+
 class ApiService {
   private api: AxiosInstance
   private baseURL: string
@@ -151,7 +168,7 @@ class ApiService {
   }
 
   async getProfile(): Promise<ApiResponse<User>> {
-    return this.request<ApiResponse<User>>('GET', '/auth/profile')
+    return this.request<ApiResponse<User>>('GET', '/auth/me')
   }
 
   // === PRODUITS ===
@@ -186,19 +203,15 @@ class ApiService {
   // === RÉSERVATIONS ===
 
   async createReservation(payload: ReservationCreationPayload): Promise<ReservationCreationResponse> {
-    return this.request<ReservationCreationResponse>('POST', '/reservations', payload)
+    // Transformer camelCase → snake_case pour Laravel
+    const snakeCasePayload = toSnakeCase(payload)
+    return this.request<ReservationCreationResponse>('POST', '/reservations', snakeCasePayload)
   }
 
   async initiateMobileMoneyPayment(payload: MobileMoneyPaymentPayload): Promise<PaymentInitiationResponse> {
-    return this.request<PaymentInitiationResponse>('POST', '/payments/mobile-money', {
-      reservation_id: payload.reservationId,
-      provider: payload.provider,
-      customer_phone: payload.customerPhone,
-      customer_email: payload.customerEmail,
-      currency: payload.currency,
-      notes: payload.notes,
-      reference: payload.reference,
-    })
+    // Transformer camelCase → snake_case pour Laravel
+    const snakeCasePayload = toSnakeCase(payload)
+    return this.request<PaymentInitiationResponse>('POST', '/payments/mobile-money', snakeCasePayload)
   }
 
   async getPayment(paymentId: number): Promise<ApiResponse<Payment>> {
@@ -206,7 +219,7 @@ class ApiService {
   }
 
   async getMyReservations(): Promise<ApiResponse<Reservation[]>> {
-    return this.request<ApiResponse<Reservation[]>>('GET', '/reservations/my')
+    return this.request<ApiResponse<Reservation[]>>('GET', '/reservations')
   }
 
   async getReservation(id: number): Promise<ApiResponse<Reservation>> {

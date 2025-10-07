@@ -91,31 +91,16 @@ const ReservationsScreen: React.FC<Props> = ({ navigation }) => {
           style: 'destructive',
           onPress: async () => {
             if (!isOnline) {
-              try {
-                await offlineService.queueSyncAction('update', '/reservations/cancel', {
-                  action: 'cancelReservation',
-                  reservationId: reservation.id,
-                })
-                dispatch(
-                  markReservationSyncPending({
-                    id: reservation.id,
-                    pendingAction: 'delete',
-                  })
-                )
-                Alert.alert(
-                  'Annulation hors ligne',
-                  'La demande sera synchronisée dès que la connexion sera de retour.'
-                )
-                void analyticsService.track('Reservation Cancel Queued', 'Reservation', {
-                  reservationCode: reservation.reservation_code,
-                  offline: true,
-                })
-              } catch (error) {
-                Alert.alert('Erreur', 'Impossible de mettre en attente cette annulation.')
-                if (error instanceof Error) {
-                  void analyticsService.trackError(error, 'cancelReservationOffline')
-                }
-              }
+              // NOTE: offlineService désactivé pour compatibilité web
+              // TODO: Réimplémenter la gestion offline proprement
+              Alert.alert(
+                'Connexion requise',
+                'Vous devez être connecté à Internet pour annuler une réservation.'
+              )
+              void analyticsService.track('Reservation Cancel Failed', 'Reservation', {
+                reservationCode: reservation.reservation_code,
+                reason: 'offline',
+              })
               return
             }
 

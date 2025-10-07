@@ -401,13 +401,9 @@ class NotificationService {
     if (count !== undefined) {
       await Notifications.setBadgeCountAsync(count);
     } else {
-      // Obtenir le nombre depuis le backend
-      try {
-        const response = await this.http.get('/notifications/badge');
-        await Notifications.setBadgeCountAsync(response.data.count || 0);
-      } catch (error) {
-        console.error('Erreur lors de la mise à jour du badge:', error);
-      }
+      // NOTE: Endpoint /notifications/badge n'existe pas dans l'API Laravel
+      // Utiliser le badge local uniquement ou implémenter l'endpoint backend
+      await Notifications.setBadgeCountAsync(0);
     }
   }
 
@@ -436,8 +432,14 @@ class NotificationService {
   async savePreferences(preferences: NotificationPreferences): Promise<void> {
     try {
       await AsyncStorage.setItem('notification_preferences', JSON.stringify(preferences));
-      // Synchroniser avec le backend
-      await this.http.post('/notifications/preferences', preferences);
+
+      // NOTE: L'API Laravel attend PATCH /users/{id} avec prefers_email_notifications,
+      // prefers_sms_notifications, prefers_push_notifications (booléens)
+      // POST /notifications/preferences n'existe pas
+      // TODO: Implémenter l'appel correct vers /users/{userId} avec PATCH
+
+      // Synchronisation backend désactivée temporairement
+      // await this.http.post('/notifications/preferences', preferences);
     } catch (error) {
       console.error('Erreur lors de la sauvegarde des préférences:', error);
     }
