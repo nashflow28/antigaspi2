@@ -12,7 +12,8 @@
     "dev": "echo \"Frontend development server will be configured in Stage 2\"",
     "build": "echo \"Build process will be configured in Stage 2\"",
     "lint": "echo \"Linting will be configured in Stage 2\"",
-    "format": "echo \"Formatting will be configured in Stage 2\""
+    "format": "echo \"Formatting will be configured in Stage 2\"",
+    "prepare": "husky"
   },
   "repository": {
     "type": "git",

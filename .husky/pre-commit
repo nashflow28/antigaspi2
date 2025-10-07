@@ -1,0 +1,43 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+echo "🧪 Running critical tests before commit..."
+echo ""
+
+# Change to mobile directory
+cd mobile || exit 1
+
+# Run unit tests (fast - 4s)
+echo "📝 Running Typography unit tests..."
+npm run test:unit:typography || {
+  echo ""
+  echo "❌ Unit tests failed! Fix errors before committing."
+  exit 1
+}
+
+echo ""
+echo "✅ Unit tests passed!"
+echo ""
+
+# Check if Expo server is running on port 9001
+echo "🌐 Checking if Expo server is running on port 9001..."
+if ! curl -s http://localhost:9001 > /dev/null 2>&1; then
+  echo "⚠️  WARNING: Expo server not running on port 9001"
+  echo "   Skipping E2E tests (run manually: npm run test:critical)"
+  echo ""
+  echo "✅ Pre-commit checks completed (E2E tests skipped)"
+  exit 0
+fi
+
+# Run E2E critical tests (13s)
+echo "🎭 Running E2E critical tests..."
+npm run test:critical || {
+  echo ""
+  echo "❌ E2E tests failed! Fix errors before committing."
+  echo "   View the full report: open mobile/e2e-reports/critical/index.html"
+  exit 1
+}
+
+echo ""
+echo "✅ All critical tests passed! Safe to commit."
+echo ""
