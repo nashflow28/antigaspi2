@@ -91,13 +91,18 @@ export const Typography: React.FC<TypographyProps> = ({
     }
   }, [color, theme.colors])
 
-  const textStyle: TextStyle = useMemo(() => ({
-    ...baseStyle,
-    color: getColor,
-    textAlign: align,
-    ...(weight && theme.typography.fontWeight && { fontWeight: theme.typography.fontWeight[weight] }),
-    ...style,
-  }), [baseStyle, getColor, align, weight, theme.typography.fontWeight, style])
+  const textStyle: TextStyle = useMemo(() => {
+    // Flatten style if it's an array (React Native Web compatibility)
+    const flatStyle = Array.isArray(style) ? Object.assign({}, ...style) : style
+
+    return {
+      ...baseStyle,
+      color: getColor,
+      textAlign: align,
+      ...(weight && theme.typography.fontWeight && { fontWeight: theme.typography.fontWeight[weight] }),
+      ...flatStyle,
+    }
+  }, [baseStyle, getColor, align, weight, theme.typography.fontWeight, style])
 
   return (
     <Text style={textStyle} numberOfLines={numberOfLines} {...rest}>

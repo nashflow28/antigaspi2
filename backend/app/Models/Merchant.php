@@ -90,6 +90,12 @@ class Merchant extends Model
 
     public function getAverageRatingAttribute(): ?float
     {
-        return $this->reviews()->avg('rating');
+        // Calculate average rating from product reviews since reviews table
+        // doesn't have merchant_id in current database schema
+        $productIds = $this->products()->pluck('id');
+        if ($productIds->isEmpty()) {
+            return null;
+        }
+        return \App\Models\Review::whereIn('product_id', $productIds)->avg('rating');
     }
 }
