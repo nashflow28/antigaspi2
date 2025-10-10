@@ -22,8 +22,16 @@ class TestAuthentication:
 
         # Launch Expo Go
         self.device.app_start("host.exp.exponent")
-        time.sleep(5)  # Wait for app to load
-        print("[OK] App launched")
+        time.sleep(3)  # Wait for Expo Go to load
+        print("[OK] Expo Go launched")
+
+        # Click on Antigaspi app in "Recently opened" list
+        width, height = self.device.window_size()
+        antigaspi_app_y = int(height * 0.48)  # Position of Antigaspi in the list
+        self.device.click(width // 2, antigaspi_app_y)
+        print("[CLICK] Opening Antigaspi app...")
+        time.sleep(7)  # Wait for app to fully load
+        print("[OK] Antigaspi app loaded")
 
     def teardown(self):
         """Cleanup after tests"""
@@ -87,7 +95,7 @@ class TestAuthentication:
 
         # Type email
         print(f"[INPUT] Typing email: {email}")
-        self.device.send_keys(email, clear=True)
+        self.device.send_keys(email)  # Removed clear=True to fix ADB keyboard error
         time.sleep(1)
         self.take_screenshot('04-email-entered')
 
@@ -98,7 +106,7 @@ class TestAuthentication:
 
         # Type password
         print(f"[INPUT] Typing password")
-        self.device.send_keys(password, clear=True)
+        self.device.send_keys(password)  # Removed clear=True to fix ADB keyboard error
         time.sleep(1)
         self.take_screenshot('05-password-entered')
 

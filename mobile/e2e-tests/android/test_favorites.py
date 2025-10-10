@@ -20,9 +20,20 @@ class TestFavorites:
         self.device.press("home")
         time.sleep(1)
 
-        # Launch app and login
+        # Launch Expo Go
         self.device.app_start("host.exp.exponent")
-        time.sleep(5)
+        time.sleep(3)
+        print("[OK] Expo Go launched")
+
+        # Click on Antigaspi app in "Recently opened" list
+        width, height = self.device.window_size()
+        antigaspi_app_y = int(height * 0.48)
+        self.device.click(width // 2, antigaspi_app_y)
+        print("[CLICK] Opening Antigaspi app...")
+        time.sleep(7)
+        print("[OK] Antigaspi app loaded")
+
+        # Login
         self.quick_login()
         print("[OK] Setup complete")
 
@@ -31,10 +42,10 @@ class TestFavorites:
         width, height = self.device.window_size()
         self.device.click(width // 2, int(height * 0.35))
         time.sleep(0.5)
-        self.device.send_keys("jean.dupont@email.com", clear=True)
+        self.device.send_keys("jean.dupont@email.com")  # Removed clear=True
         self.device.click(width // 2, int(height * 0.45))
         time.sleep(0.5)
-        self.device.send_keys("password", clear=True)
+        self.device.send_keys("password")  # Removed clear=True
         self.device.click(width // 2, int(height * 0.55))
         time.sleep(5)
 

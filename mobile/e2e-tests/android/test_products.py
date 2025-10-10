@@ -20,9 +20,18 @@ class TestProducts:
         self.device.press("home")
         time.sleep(1)
 
-        # Launch app
+        # Launch Expo Go
         self.device.app_start("host.exp.exponent")
-        time.sleep(5)
+        time.sleep(3)
+        print("[OK] Expo Go launched")
+
+        # Click on Antigaspi app in "Recently opened" list
+        width, height = self.device.window_size()
+        antigaspi_app_y = int(height * 0.48)
+        self.device.click(width // 2, antigaspi_app_y)
+        print("[CLICK] Opening Antigaspi app...")
+        time.sleep(7)
+        print("[OK] Antigaspi app loaded")
 
         # Login first
         self.quick_login()
@@ -35,12 +44,12 @@ class TestProducts:
         # Email field
         self.device.click(width // 2, int(height * 0.35))
         time.sleep(0.5)
-        self.device.send_keys("jean.dupont@email.com", clear=True)
+        self.device.send_keys("jean.dupont@email.com")  # Removed clear=True
 
         # Password field
         self.device.click(width // 2, int(height * 0.45))
         time.sleep(0.5)
-        self.device.send_keys("password", clear=True)
+        self.device.send_keys("password")  # Removed clear=True
 
         # Login button
         self.device.click(width // 2, int(height * 0.55))
@@ -176,7 +185,7 @@ class TestProducts:
         # Type search query
         search_term = "pain"
         print(f"[INPUT] Searching for: {search_term}")
-        self.device.send_keys(search_term, clear=True)
+        self.device.send_keys(search_term)  # Removed clear=True
         time.sleep(2)
         self.take_screenshot('08-search-results')
 
