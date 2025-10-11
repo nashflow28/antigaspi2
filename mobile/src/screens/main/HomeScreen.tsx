@@ -339,29 +339,34 @@ const createStyles = (theme: ReturnType<typeof useTheme>) => StyleSheet.create({
   },
   categoriesScroll: {
     marginTop: theme.spacing.md,
+    marginBottom: theme.spacing.xs,
   },
   categoriesContent: {
     paddingHorizontal: theme.spacing.lg,
-    gap: theme.spacing.sm,
+    paddingRight: theme.spacing.xl, // Padding final pour indiquer qu'on peut scroller
   },
   categoryItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: theme.spacing.lg,
-    paddingVertical: theme.spacing.sm,
+    justifyContent: 'center',
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    marginRight: theme.spacing.md, // Espacement entre chips
     borderRadius: theme.radius.full,
     backgroundColor: theme.colors.surface.light,
     borderWidth: 1,
     borderColor: theme.colors.border,
-    gap: theme.spacing.sm,
+    minHeight: 40, // Hauteur minimale pour éviter la compression
   },
   categoryEmoji: {
     fontSize: 20,
+    marginRight: 6,
   },
   categoryText: {
     fontSize: 14,
     color: theme.colors.text,
     fontWeight: '500',
+    maxWidth: 120, // Largeur max pour éviter les chips trop larges
   },
   filtersRow: {
     flexDirection: 'row',
