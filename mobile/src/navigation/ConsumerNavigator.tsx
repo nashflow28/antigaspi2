@@ -36,6 +36,14 @@ const ProductsStack = () => (
   </ErrorBoundary>
 )
 
+const OrdersStack = () => (
+  <Stack.Navigator screenOptions={{ headerShown: false }}>
+    <Stack.Screen name="OrdersMain" component={ReservationsScreen} />
+    <Stack.Screen name="ProductDetails" component={ProductDetailsScreen} />
+    <Stack.Screen name="MerchantDetail" component={MerchantDetailScreen} />
+  </Stack.Navigator>
+)
+
 const ConsumerNavigator: React.FC = () => {
   const theme = useTheme()
 
@@ -89,7 +97,7 @@ const ConsumerNavigator: React.FC = () => {
       />
       <Tab.Screen
         name="Orders"
-        component={ReservationsScreen}
+        component={OrdersStack}
         options={{ title: 'Commande' }}
       />
       <Tab.Screen
