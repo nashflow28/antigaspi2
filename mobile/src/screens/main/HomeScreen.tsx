@@ -106,10 +106,16 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
         onPress={() => setSelectedCategory(id)}
       >
         <Text style={styles.categoryEmoji}>{emoji}</Text>
-        <Text style={[
-          styles.categoryText,
-          isActive && { color: theme.colors.textInverse }
-        ]}>{name}</Text>
+        <Text
+          style={[
+            styles.categoryText,
+            isActive && { color: theme.colors.textInverse }
+          ]}
+          numberOfLines={1}
+          ellipsizeMode="tail"
+        >
+          {name}
+        </Text>
       </TouchableOpacity>
     )
   }
