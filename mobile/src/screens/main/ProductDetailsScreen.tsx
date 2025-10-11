@@ -68,6 +68,31 @@ const ProductDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
   const discountedPrice = Math.round(parseFloat(product.discounted_price))
   const originalPrice = Math.round(parseFloat(product.original_price))
 
+  const handleReserve = () => {
+    Alert.alert(
+      'Confirmer la réservation',
+      `Voulez-vous réserver ${product.name} pour ${discountedPrice} F CFA ?`,
+      [
+        {
+          text: 'Annuler',
+          style: 'cancel',
+        },
+        {
+          text: 'Confirmer',
+          onPress: () => {
+            // TODO: Implémenter la logique de réservation via l'API
+            Alert.alert('Succès', 'Produit réservé avec succès !', [
+              {
+                text: 'OK',
+                onPress: () => navigation.navigate('Reservations'),
+              },
+            ])
+          },
+        },
+      ],
+    )
+  }
+
   return (
     <View style={styles.container}>
       <StatusBar barStyle="light-content" />
@@ -117,6 +142,7 @@ const ProductDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
         <TouchableOpacity
           style={styles.reserveButton}
           disabled={product.quantity_available === 0}
+          onPress={handleReserve}
         >
           <Ionicons name="cart" size={20} color="#fff" />
           <Text style={styles.reserveButtonText}>
