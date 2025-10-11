@@ -11,6 +11,7 @@ import {
 import { useDispatch, useSelector } from 'react-redux'
 import { AppDispatch, RootState } from '../../store'
 import { fetchProduct } from '../../store/slices/productsSlice'
+import { createReservation } from '../../store/slices/reservationsSlice'
 import { Ionicons } from '@expo/vector-icons'
 import { Image } from 'expo-image'
 import { Product } from '../../types'
@@ -27,6 +28,7 @@ const ProductDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
   const { products, loading } = useSelector((state: RootState) => state.products)
 
   const [product, setProduct] = useState<Product | null>(null)
+  const [reserving, setReserving] = useState(false)
 
   useEffect(() => {
     loadProduct()
@@ -68,7 +70,7 @@ const ProductDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
   const discountedPrice = Math.round(parseFloat(product.discounted_price))
   const originalPrice = Math.round(parseFloat(product.original_price))
 
-  const handleReserve = () => {
+  const handleReserve = async () => {
     Alert.alert(
       'Confirmer la réservation',
       `Voulez-vous réserver ${product.name} pour ${discountedPrice} F CFA ?`,
@@ -79,14 +81,38 @@ const ProductDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
         },
         {
           text: 'Confirmer',
-          onPress: () => {
-            // TODO: Implémenter la logique de réservation via l'API
-            Alert.alert('Succès', 'Produit réservé avec succès !', [
-              {
-                text: 'OK',
-                onPress: () => navigation.navigate('Reservations'),
-              },
-            ])
+          onPress: async () => {
+            setReserving(true)
+            try {
+              const result = await dispatch(createReservation({
+                productId: product.id,
+                quantity: 1,
+                paymentMethod: 'on_site', // Paiement sur place
+                notes: null,
+              }))
+
+              if (createReservation.fulfilled.match(result)) {
+                Alert.alert('Succès', 'Produit réservé avec succès !', [
+                  {
+                    text: 'Voir mes réservations',
+                    onPress: () => navigation.navigate('Reservations'),
+                  },
+                  {
+                    text: 'OK',
+                    style: 'cancel',
+                  },
+                ])
+                // Recharger le produit pour mettre à jour la quantité disponible
+                await loadProduct()
+              } else if (createReservation.rejected.match(result)) {
+                const errorMessage = result.payload as string || 'Impossible de créer la réservation'
+                Alert.alert('Erreur', errorMessage)
+              }
+            } catch (error: any) {
+              Alert.alert('Erreur', error.message || 'Une erreur est survenue lors de la réservation')
+            } finally {
+              setReserving(false)
+            }
           },
         },
       ],
@@ -140,13 +166,13 @@ const ProductDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
       {/* Bouton Réserver */}
       <View style={styles.bottomBar}>
         <TouchableOpacity
-          style={styles.reserveButton}
-          disabled={product.quantity_available === 0}
+          style={[styles.reserveButton, (product.quantity_available === 0 || reserving) && styles.reserveButtonDisabled]}
+          disabled={product.quantity_available === 0 || reserving}
           onPress={handleReserve}
         >
           <Ionicons name="cart" size={20} color="#fff" />
           <Text style={styles.reserveButtonText}>
-            {product.quantity_available === 0 ? 'Rupture de stock' : 'Réserver'}
+            {reserving ? 'Réservation en cours...' : product.quantity_available === 0 ? 'Rupture de stock' : 'Réserver'}
           </Text>
         </TouchableOpacity>
       </View>
@@ -227,6 +253,10 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
     borderRadius: 12,
     gap: 8,
+  },
+  reserveButtonDisabled: {
+    backgroundColor: '#ccc',
+    opacity: 0.6,
   },
   reserveButtonText: {
     color: '#fff',
