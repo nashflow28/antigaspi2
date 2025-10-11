@@ -216,7 +216,11 @@ const ProductsScreen: React.FC<Props> = ({ navigation }) => {
           onPress={() => setSelectedCategory('all')}
         >
           <Text style={styles.categoryEmoji}>🛍️</Text>
-          <Text style={[styles.categoryText, selectedCategory === 'all' && styles.categoryTextActive]}>
+          <Text
+            style={[styles.categoryText, selectedCategory === 'all' && styles.categoryTextActive]}
+            numberOfLines={1}
+            ellipsizeMode="tail"
+          >
             Tous
           </Text>
         </TouchableOpacity>
@@ -227,7 +231,11 @@ const ProductsScreen: React.FC<Props> = ({ navigation }) => {
             onPress={() => setSelectedCategory(category.id.toString())}
           >
             <Text style={styles.categoryEmoji}>{getCategoryEmoji(category.name)}</Text>
-            <Text style={[styles.categoryText, selectedCategory === category.id.toString() && styles.categoryTextActive]}>
+            <Text
+              style={[styles.categoryText, selectedCategory === category.id.toString() && styles.categoryTextActive]}
+              numberOfLines={1}
+              ellipsizeMode="tail"
+            >
               {category.name}
             </Text>
           </TouchableOpacity>
@@ -345,23 +353,26 @@ const createStyles = (theme: ReturnType<typeof useTheme>) => StyleSheet.create({
   },
   categoriesScroll: {
     marginTop: theme.spacing.md,
-    marginBottom: theme.spacing.sm,
+    marginBottom: theme.spacing.xs,
   },
   categoriesContent: {
     paddingHorizontal: theme.spacing.lg,
-    gap: theme.spacing.sm,
+    paddingRight: theme.spacing.xl, // Padding final pour indiquer le scroll
   },
   categoryChip: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: theme.spacing.lg,
-    paddingVertical: theme.spacing.sm,
+    justifyContent: 'center',
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    marginRight: theme.spacing.md, // Espacement entre chips
     borderRadius: theme.radius.full,
     backgroundColor: theme.colors.neutral[100],
-    gap: theme.spacing.xs,
+    minHeight: 40, // Hauteur minimale pour éviter la compression
   },
   categoryEmoji: {
     fontSize: 16,
+    marginRight: 6,
   },
   categoryChipActive: {
     backgroundColor: theme.colors.primary[500],
@@ -369,6 +380,7 @@ const createStyles = (theme: ReturnType<typeof useTheme>) => StyleSheet.create({
   categoryText: {
     fontSize: 14,
     color: theme.colors.textSecondary,
+    maxWidth: 120, // Largeur max pour éviter les chips trop larges
   },
   categoryTextActive: {
     color: theme.colors.textInverse,
