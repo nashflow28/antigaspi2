@@ -26,7 +26,8 @@ const getApiBaseUrl = (): string => {
     return configUrl
   }
   // Fallback pour développement local
-  return 'http://localhost:8000/api'
+  // 10.0.2.2 est l'adresse spéciale pour localhost sur émulateur Android
+  return 'http://10.0.2.2:8000/api'
 }
 
 // Export pour utilisation dans d'autres services (ex: imageHelpers)
@@ -52,6 +53,7 @@ const toSnakeCase = (obj: any): any => {
 class ApiService {
   private api: AxiosInstance
   private baseURL: string
+  private onUnauthorizedCallback?: () => void
 
   constructor() {
     this.baseURL = getApiBaseUrl()
@@ -66,6 +68,11 @@ class ApiService {
     })
 
     this.setupInterceptors()
+  }
+
+  // Enregistrer un callback pour gérer les erreurs 401 (session expirée)
+  setOnUnauthorizedCallback(callback: () => void) {
+    this.onUnauthorizedCallback = callback
   }
 
   private setupInterceptors() {
@@ -89,6 +96,11 @@ class ApiService {
           // ✅ Token expiré, déconnecter l'utilisateur
           await AsyncStorage.multiRemove(['auth_token', 'user_data'])
 
+          // ✅ Notifier le Redux store pour mettre à jour l'état d'authentification
+          if (this.onUnauthorizedCallback) {
+            this.onUnauthorizedCallback()
+          }
+
           // ✅ Afficher message de session expirée
           Alert.alert(
             'Session expirée',
@@ -97,7 +109,7 @@ class ApiService {
               {
                 text: 'OK',
                 onPress: () => {
-                  console.log('Session expirée - Redirection manuelle nécessaire')
+                  console.log('Session expirée - Redirection automatique vers login')
                 }
               }
             ]
