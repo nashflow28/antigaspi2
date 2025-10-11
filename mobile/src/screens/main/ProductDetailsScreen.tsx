@@ -12,6 +12,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { AppDispatch, RootState } from '../../store'
 import { fetchProduct } from '../../store/slices/productsSlice'
 import { createReservation } from '../../store/slices/reservationsSlice'
+import { useToast } from '../../contexts/ToastContext'
 import { Ionicons } from '@expo/vector-icons'
 import { Image } from 'expo-image'
 import { Product } from '../../types'
@@ -26,6 +27,7 @@ const ProductDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
   const dispatch = useDispatch<AppDispatch>()
   const { productId } = route.params
   const { products, loading } = useSelector((state: RootState) => state.products)
+  const { showSuccess, showError } = useToast()
 
   const [product, setProduct] = useState<Product | null>(null)
   const [reserving, setReserving] = useState(false)
@@ -48,13 +50,13 @@ const ProductDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
           setProduct(result.payload as Product)
         } else if (fetchProduct.rejected.match(result)) {
           console.error('Failed to fetch product:', result.error)
-          Alert.alert('Erreur', 'Impossible de charger le produit')
+          showError('Impossible de charger le produit')
           navigation.goBack()
         }
       }
     } catch (error: any) {
       console.error('Error loading product:', error)
-      Alert.alert('Erreur', `Impossible de charger le produit: ${error.message || 'Erreur inconnue'}`)
+      showError(`Impossible de charger le produit: ${error.message || 'Erreur inconnue'}`)
       navigation.goBack()
     }
   }
@@ -92,24 +94,19 @@ const ProductDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
               }))
 
               if (createReservation.fulfilled.match(result)) {
-                Alert.alert('Succès', 'Produit réservé avec succès !', [
-                  {
-                    text: 'Voir mes réservations',
-                    onPress: () => navigation.navigate('Reservations'),
-                  },
-                  {
-                    text: 'OK',
-                    style: 'cancel',
-                  },
-                ])
+                showSuccess('Produit réservé avec succès ! 🎉')
                 // Recharger le produit pour mettre à jour la quantité disponible
                 await loadProduct()
+                // Navigation automatique vers les réservations après 1.5 secondes
+                setTimeout(() => {
+                  navigation.navigate('Orders')
+                }, 1500)
               } else if (createReservation.rejected.match(result)) {
                 const errorMessage = result.payload as string || 'Impossible de créer la réservation'
-                Alert.alert('Erreur', errorMessage)
+                showError(errorMessage)
               }
             } catch (error: any) {
-              Alert.alert('Erreur', error.message || 'Une erreur est survenue lors de la réservation')
+              showError(error.message || 'Une erreur est survenue lors de la réservation')
             } finally {
               setReserving(false)
             }

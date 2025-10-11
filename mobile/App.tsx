@@ -4,6 +4,7 @@ import { Provider, useDispatch } from 'react-redux'
 import { store, AppDispatch } from './src/store'
 import { clearAuth } from './src/store/slices/authSlice'
 import { ThemeProvider } from './src/theme'
+import { ToastProvider } from './src/contexts/ToastContext'
 import AppNavigator from './src/navigation/AppNavigator'
 import apiService from './src/services/api'
 
@@ -29,9 +30,11 @@ export default function App() {
   return (
     <Provider store={store}>
       <ThemeProvider>
-        <View style={{ flex: 1 }}>
-          <AppContent />
-        </View>
+        <ToastProvider>
+          <View style={{ flex: 1 }}>
+            <AppContent />
+          </View>
+        </ToastProvider>
       </ThemeProvider>
     </Provider>
   )

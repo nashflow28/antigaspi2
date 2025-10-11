@@ -7,11 +7,11 @@ import {
   TouchableOpacity,
   StatusBar,
   RefreshControl,
-  Alert,
 } from 'react-native'
 import { useDispatch, useSelector } from 'react-redux'
 import { AppDispatch, RootState } from '../../store'
 import { fetchProducts, fetchCategories } from '../../store/slices/productsSlice'
+import { useToast } from '../../contexts/ToastContext'
 import { Ionicons } from '@expo/vector-icons'
 import { Image } from 'expo-image'
 import { useTheme } from '../../theme'
@@ -26,6 +26,7 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
   const dispatch = useDispatch<AppDispatch>()
   const { user } = useSelector((state: RootState) => state.auth)
   const { products, categories, loading } = useSelector((state: RootState) => state.products)
+  const { showError } = useToast()
   const theme = useTheme()
 
   const [refreshing, setRefreshing] = useState(false)
@@ -44,7 +45,7 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
         dispatch(fetchCategories()),
       ])
     } catch (error) {
-      Alert.alert('Erreur', 'Impossible de charger les données')
+      showError('Impossible de charger les données')
     }
   }
 
