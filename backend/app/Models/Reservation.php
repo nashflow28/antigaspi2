@@ -15,28 +15,34 @@ class Reservation extends Model
     protected $fillable = [
         'user_id',
         'product_id',
-        'quantity_reserved',
+        'quantity',
         'total_amount',
         'status',
         'payment_status',
         'latest_payment_id',
-        'reservation_code',
-        'reserved_at',
-        'confirmed_at',
-        'expires_at',
+        'pickup_date',
+        'pickup_time',
         'notes',
+        'merchant_notes',
+        'confirmed_at',
+        'ready_at',
+        'completed_at',
+        'cancelled_at',
     ];
 
     protected function casts(): array
     {
         return [
-            'quantity_reserved' => 'integer',
+            'quantity' => 'integer',
             'total_amount' => 'decimal:2',
             'payment_status' => PaymentStatus::class,
             'latest_payment_id' => 'integer',
-            'reserved_at' => 'datetime',
+            'pickup_date' => 'date',
+            'pickup_time' => 'datetime:H:i',
             'confirmed_at' => 'datetime',
-            'expires_at' => 'datetime',
+            'ready_at' => 'datetime',
+            'completed_at' => 'datetime',
+            'cancelled_at' => 'datetime',
         ];
     }
 
@@ -45,12 +51,6 @@ class Reservation extends Model
         parent::boot();
 
         static::creating(function ($reservation) {
-            if (empty($reservation->reservation_code)) {
-                $reservation->reservation_code = 'RES' . str_pad(rand(1, 999999), 6, '0', STR_PAD_LEFT);
-            }
-            if (empty($reservation->expires_at)) {
-                $reservation->expires_at = now()->addHours(24);
-            }
             if (empty($reservation->payment_status)) {
                 $reservation->payment_status = PaymentStatus::PENDING;
             }
@@ -97,12 +97,6 @@ class Reservation extends Model
         return $query->where('status', 'cancelled');
     }
 
-    public function scopeExpired($query)
-    {
-        return $query->where('expires_at', '<', now())
-                    ->whereIn('status', ['pending', 'confirmed']);
-    }
-
     public function scopeByUser($query, $userId)
     {
         return $query->where('user_id', $userId);
@@ -140,19 +134,14 @@ class Reservation extends Model
         return $this->status === 'cancelled';
     }
 
-    public function isExpired(): bool
-    {
-        return $this->expires_at < now() && !in_array($this->status, ['completed', 'cancelled']);
-    }
-
     public function canBeCancelled(): bool
     {
-        return in_array($this->status, ['pending', 'confirmed']) && !$this->isExpired();
+        return in_array($this->status, ['pending', 'confirmed']);
     }
 
     public function confirm(): bool
     {
-        if ($this->isPending() && !$this->isExpired()) {
+        if ($this->isPending()) {
             $this->update([
                 'status' => 'confirmed',
                 'confirmed_at' => now(),
@@ -166,7 +155,10 @@ class Reservation extends Model
     public function complete(): bool
     {
         if ($this->isConfirmed() || $this->isReady()) {
-            $this->update(['status' => 'completed']);
+            $this->update([
+                'status' => 'completed',
+                'completed_at' => now(),
+            ]);
             return true;
         }
         return false;
@@ -177,9 +169,10 @@ class Reservation extends Model
         if ($this->canBeCancelled()) {
             $this->update([
                 'status' => 'cancelled',
+                'cancelled_at' => now(),
                 'payment_status' => PaymentStatus::FAILED,
             ]);
-            $this->product->increment('quantity_available', $this->quantity_reserved);
+            $this->product->increment('quantity_available', $this->quantity);
             return true;
         }
         return false;
@@ -196,23 +189,9 @@ class Reservation extends Model
 
         if ($status === PaymentStatus::FAILED && $this->canBeCancelled()) {
             $attributes['status'] = 'cancelled';
+            $attributes['cancelled_at'] = now();
         }
 
         $this->fill($attributes)->save();
-    }
-
-    public function getTimeUntilExpirationAttribute(): string
-    {
-        if ($this->isExpired()) {
-            return 'Expiré';
-        }
-
-        $diff = now()->diff($this->expires_at);
-
-        if ($diff->h > 0) {
-            return $diff->h . 'h ' . $diff->i . 'min';
-        }
-
-        return $diff->i . 'min';
     }
 }

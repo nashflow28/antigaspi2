@@ -12,29 +12,30 @@ class ReservationResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'reservation_code' => $this->reservation_code,
-            'quantity' => $this->quantity_reserved,
+            'quantity' => $this->quantity,
             'original_price' => (float) $this->product->original_price,
             'discounted_price' => (float) $this->product->discounted_price,
             'total_amount' => (float) $this->total_amount,
             'status' => $this->status,
             'payment_status' => $this->payment_status?->value ?? $this->payment_status,
             'notes' => $this->notes,
+            'merchant_notes' => $this->merchant_notes,
 
             'created_at' => $this->created_at,
-            'reserved_at' => $this->reserved_at,
+            'updated_at' => $this->updated_at,
             'confirmed_at' => $this->confirmed_at,
-            'expires_at' => $this->expires_at,
-            'pickup_date' => $this->pickup_date ?? $this->expires_at,
-            'pickup_notes' => $this->pickup_notes ?? $this->notes,
+            'ready_at' => $this->ready_at,
+            'completed_at' => $this->completed_at,
+            'cancelled_at' => $this->cancelled_at,
+            'pickup_date' => $this->pickup_date,
+            'pickup_time' => $this->pickup_time,
 
             'is_pending' => $this->isPending(),
             'is_confirmed' => $this->isConfirmed(),
+            'is_ready' => $this->isReady(),
             'is_completed' => $this->isCompleted(),
             'is_cancelled' => $this->isCancelled(),
-            'is_expired' => $this->isExpired(),
             'can_be_cancelled' => $this->canBeCancelled(),
-            'time_until_expiration' => $this->time_until_expiration,
             'latest_payment' => $this->whenLoaded('latestPayment', fn () => new PaymentResource($this->latestPayment)),
 
             'product' => [
@@ -83,10 +84,10 @@ class ReservationResource extends JsonResource
             'environmental_impact' => $this->when(
                 $this->isCompleted(),
                 [
-                    'food_saved_kg' => $this->quantity_reserved,
-                    'co2_saved_kg' => round($this->quantity_reserved * 2.5, 1),
+                    'food_saved_kg' => $this->quantity,
+                    'co2_saved_kg' => round($this->quantity * 2.5, 1),
                     'money_saved' => round(
-                        ($this->product->original_price - $this->product->discounted_price) * $this->quantity_reserved,
+                        ($this->product->original_price - $this->product->discounted_price) * $this->quantity,
                         2
                     ),
                 ]
