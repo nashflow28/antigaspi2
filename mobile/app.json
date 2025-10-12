@@ -47,6 +47,7 @@
         "VIBRATE",
         "RECEIVE_BOOT_COMPLETED"
       ],
+      "usesCleartextTraffic": true,
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false
     },
@@ -61,10 +62,11 @@
           "locationAlwaysAndWhenInUsePermission": "Permettre à Antigaspi d'accéder à votre position pour trouver les commerces proches."
         }
       ],
-      "expo-updates"
+      "expo-updates",
+      "expo-font"
     ],
     "extra": {
-      "apiUrl": "http://localhost:8000/api"
+      "apiUrl": "http://10.0.2.2:8000/api"
     },
     "scheme": "antigaspi"
   }

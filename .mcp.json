@@ -1,0 +1,16 @@
+{
+  "mcpServers": {
+    "mobile-mcp": {
+      "command": "npx",
+      "args": ["-y", "mobile-mcp"],
+      "env": {}
+    },
+    "adb-mcp": {
+      "command": "C:\\xampp\\htdocs\\antigaspi2\\mobile\\adb-mcp\\venv\\Scripts\\python.exe",
+      "args": ["C:\\xampp\\htdocs\\antigaspi2\\mobile\\adb-mcp\\server.py"],
+      "env": {
+        "PYTHONPATH": "C:\\xampp\\htdocs\\antigaspi2\\mobile\\adb-mcp"
+      }
+    }
+  }
+}

@@ -32,14 +32,16 @@ const LoginScreen: React.FC<Props> = ({ navigation }) => {
     password: '',
   })
 
-  const handleLogin = async () => {
-    if (!credentials.email || !credentials.password) {
+  const handleLogin = async (creds?: LoginCredentials) => {
+    const loginCreds = creds || credentials
+
+    if (!loginCreds.email || !loginCreds.password) {
       Alert.alert('Erreur', 'Veuillez remplir tous les champs')
       return
     }
 
     try {
-      const result = await dispatch(loginUser(credentials))
+      const result = await dispatch(loginUser(loginCreds))
       if (loginUser.fulfilled.match(result)) {
         // La navigation sera gérée automatiquement par AppNavigator
         Alert.alert('Succès', 'Connexion réussie!')
@@ -145,10 +147,14 @@ const LoginScreen: React.FC<Props> = ({ navigation }) => {
             size="md"
             fullWidth
             style={{ marginBottom: theme.spacing.sm }}
-            onPress={() => setCredentials({
-              email: 'jean.dupont@email.com',
-              password: 'password'
-            })}
+            onPress={() => {
+              const consumerCreds = {
+                email: 'jean.dupont@email.com',
+                password: 'password'
+              }
+              setCredentials(consumerCreds)
+              handleLogin(consumerCreds)
+            }}
           >
             👤 Consumer
           </Button>
@@ -157,10 +163,14 @@ const LoginScreen: React.FC<Props> = ({ navigation }) => {
             variant="secondary"
             size="md"
             fullWidth
-            onPress={() => setCredentials({
-              email: 'boulangerie.martin@email.com',
-              password: 'password'
-            })}
+            onPress={() => {
+              const merchantCreds = {
+                email: 'boulangerie.martin@email.com',
+                password: 'password'
+              }
+              setCredentials(merchantCreds)
+              handleLogin(merchantCreds)
+            }}
           >
             🏪 Merchant
           </Button>
