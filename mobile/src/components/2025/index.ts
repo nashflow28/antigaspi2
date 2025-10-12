@@ -28,3 +28,6 @@ export {
   Display,
 } from './Typography'
 export type { TypographyProps, TypographyVariant, TypographyColor } from './Typography'
+
+export { default as Toast } from './Toast'
+export type { ToastProps, ToastVariant } from './Toast'

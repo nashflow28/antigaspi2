@@ -46,10 +46,24 @@ const ProductFormScreen: React.FC<Props> = ({ route, navigation }) => {
 
   const loadCategories = async () => {
     try {
-      const response = await apiService.get('/products/categories/list')
+      // Utiliser endpoint merchant qui filtre par business_type
+      const response = await apiService.get('/categories/merchant')
       setCategories(response.data.data || [])
+
+      // Debug: afficher les catégories autorisées
+      if (response.data.merchant_business_type) {
+        console.log('Merchant business type:', response.data.merchant_business_type)
+        console.log('Catégories autorisées:', response.data.allowed_categories_count)
+      }
     } catch (error) {
       console.error('Erreur chargement catégories:', error)
+      // Fallback: essayer l'endpoint public si erreur
+      try {
+        const fallbackResponse = await apiService.get('/products/categories/list')
+        setCategories(fallbackResponse.data.data || [])
+      } catch (fallbackError) {
+        console.error('Erreur fallback catégories:', fallbackError)
+      }
     }
   }
 

@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React from 'react'
 import {
   View,
   StyleSheet,
@@ -10,7 +10,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { logoutUser } from '../../store/slices/authSlice'
 import { AppDispatch, RootState } from '../../store'
 import { Ionicons } from '@expo/vector-icons'
-import { Button, Card, Badge, Typography, Modal } from '../../components/2025'
+import { Card, Badge, Typography } from '../../components/2025'
 import { useTheme } from '../../theme'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 
@@ -19,21 +19,38 @@ const ProfileScreen: React.FC = () => {
   const { mode, setThemeMode } = theme
   const dispatch = useDispatch<AppDispatch>()
   const { user, loading } = useSelector((state: RootState) => state.auth)
-  const [showLogoutModal, setShowLogoutModal] = useState(false)
 
   const handleLogout = () => {
-    setShowLogoutModal(true)
+    console.log('🔴 handleLogout clicked!')
+    Alert.alert(
+      'Déconnexion',
+      'Êtes-vous sûr de vouloir vous déconnecter ?',
+      [
+        {
+          text: 'Annuler',
+          style: 'cancel',
+          onPress: () => console.log('🟢 Déconnexion annulée')
+        },
+        {
+          text: 'Déconnexion',
+          style: 'destructive',
+          onPress: confirmLogout
+        }
+      ],
+      { cancelable: true }
+    )
   }
 
   const confirmLogout = async () => {
-    setShowLogoutModal(false)
+    console.log('🔴 Confirmation déconnexion')
     try {
       // Nettoyer complètement le cache
       await AsyncStorage.clear()
       // Déconnexion
       await dispatch(logoutUser())
+      console.log('✅ Déconnexion réussie')
     } catch (error) {
-      console.error('Erreur déconnexion:', error)
+      console.error('❌ Erreur déconnexion:', error)
     }
   }
 
@@ -152,51 +169,32 @@ const ProfileScreen: React.FC = () => {
           </Typography>
           <Ionicons name="chevron-forward" size={20} color={theme.colors.neutral[400]} />
         </TouchableOpacity>
-
-        <TouchableOpacity
-          style={[styles.menuItem, { paddingHorizontal: theme.spacing.lg, paddingVertical: theme.spacing.md, backgroundColor: theme.withOpacity(theme.colors.semantic.error, 0.1) }]}
-          onPress={handleLogout}
-        >
-          <Ionicons name="log-out-outline" size={24} color={theme.colors.semantic.error} />
-          <Typography variant="body" style={{ flex: 1, marginLeft: theme.spacing.md, color: theme.colors.semantic.error, fontWeight: '600' }}>
-            Déconnexion
-          </Typography>
-          <Ionicons name="exit-outline" size={20} color={theme.colors.semantic.error} />
-        </TouchableOpacity>
       </Card>
 
-      {/* ✅ FIX: Modal de confirmation déconnexion (compatible web) */}
-      <Modal
-        visible={showLogoutModal}
-        onClose={() => setShowLogoutModal(false)}
-        variant="center"
-        title="Déconnexion"
-        dismissable={!loading}
-        showCloseButton={false}
+      {/* Bouton déconnexion séparé pour éviter les conflits avec Card */}
+      <TouchableOpacity
+        style={[
+          styles.logoutButton,
+          {
+            marginHorizontal: theme.spacing.lg,
+            marginTop: theme.spacing.md,
+            paddingHorizontal: theme.spacing.lg,
+            paddingVertical: theme.spacing.md,
+            backgroundColor: theme.withOpacity(theme.colors.semantic.error, 0.1),
+            borderRadius: theme.radius.lg,
+            flexDirection: 'row',
+            alignItems: 'center',
+          }
+        ]}
+        onPress={handleLogout}
+        activeOpacity={0.7}
       >
-        <Typography variant="body" color="secondary" style={{ marginBottom: theme.spacing.xl }}>
-          Êtes-vous sûr de vouloir vous déconnecter ?
+        <Ionicons name="log-out-outline" size={24} color={theme.colors.semantic.error} />
+        <Typography variant="body" style={{ flex: 1, marginLeft: theme.spacing.md, color: theme.colors.semantic.error, fontWeight: '600' }}>
+          Déconnexion
         </Typography>
-        <View style={{ flexDirection: 'row', gap: theme.spacing.md }}>
-          <Button
-            variant="secondary"
-            onPress={() => setShowLogoutModal(false)}
-            disabled={loading}
-            style={{ flex: 1 }}
-          >
-            Annuler
-          </Button>
-          <Button
-            variant="destructive"
-            onPress={confirmLogout}
-            loading={loading}
-            disabled={loading}
-            style={{ flex: 1 }}
-          >
-            Déconnexion
-          </Button>
-        </View>
-      </Modal>
+        <Ionicons name="exit-outline" size={20} color={theme.colors.semantic.error} />
+      </TouchableOpacity>
     </View>
   )
 }

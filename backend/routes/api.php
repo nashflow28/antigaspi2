@@ -164,8 +164,13 @@ Route::prefix('notifications')->middleware('jwt.auth')->group(function () {
     Route::patch('/preferences', [NotificationController::class, 'updatePreferences']);
 });
 
-// Routes des catégories (alternative)
-Route::get('categories', [ProductController::class, 'categories']);
+// Routes des catégories
+Route::get('categories', [ProductController::class, 'categories']); // Toutes les catégories (public)
+
+// Catégories pour merchant (restreintes selon business_type) - protégé
+Route::middleware('jwt.auth')->group(function () {
+    Route::get('categories/merchant', [ProductController::class, 'merchantCategories']);
+});
 
 // Route publique principale des commerçants
 Route::get('merchants', [MerchantController::class, 'index']);

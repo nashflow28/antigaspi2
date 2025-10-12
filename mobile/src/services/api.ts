@@ -142,6 +142,28 @@ class ApiService {
     }
   }
 
+  // === MÉTHODES HTTP GÉNÉRIQUES ===
+
+  async get<T = any>(url: string, config?: AxiosRequestConfig): Promise<T> {
+    return this.request<T>('GET', url, undefined, config)
+  }
+
+  async post<T = any>(url: string, data?: any, config?: AxiosRequestConfig): Promise<T> {
+    return this.request<T>('POST', url, data, config)
+  }
+
+  async put<T = any>(url: string, data?: any, config?: AxiosRequestConfig): Promise<T> {
+    return this.request<T>('PUT', url, data, config)
+  }
+
+  async delete<T = any>(url: string, config?: AxiosRequestConfig): Promise<T> {
+    return this.request<T>('DELETE', url, undefined, config)
+  }
+
+  async patch<T = any>(url: string, data?: any, config?: AxiosRequestConfig): Promise<T> {
+    return this.request<T>('PATCH', url, data, config)
+  }
+
   // === AUTHENTIFICATION ===
 
   async login(credentials: LoginCredentials): Promise<AuthResponse> {
@@ -171,8 +193,8 @@ class ApiService {
     try {
       await this.request('POST', '/auth/logout')
     } catch (error) {
-      // Continuer même si l'API échoue
-      console.error('Logout API error:', error)
+      // Continuer même si l'API échoue (log silencieux)
+      console.log('Info: Logout API call failed, proceeding with local cleanup')
     } finally {
       // Toujours nettoyer le stockage local
       await AsyncStorage.multiRemove(['auth_token', 'user_data'])

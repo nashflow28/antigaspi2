@@ -661,4 +661,72 @@ class ProductController extends Controller
             ], 500);
         }
     }
+
+    /**
+     * Get categories for authenticated merchant based on business_type
+     */
+    public function merchantCategories(): JsonResponse
+    {
+        try {
+            $user = JWTAuth::parseToken()->authenticate();
+
+            if (!$user->isMerchant()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Seuls les commerçants peuvent accéder à cette ressource'
+                ], 403);
+            }
+
+            $merchant = $user->merchant;
+            $businessType = strtolower($merchant->business_type);
+
+            // Mapping business_type → category IDs autorisés
+            // Basé sur l'analyse BDD: 1=Boulangerie, 2=Fruits & Légumes, 3=Viandes, 4=Épicerie, 5=Laitier, 6=Plats cuisinés
+            $categoryMapping = [
+                'boulangerie' => [1], // Boulangerie uniquement
+                'primeur' => [2], // Fruits & Légumes
+                'bio' => [2], // Fruits & Légumes
+                'fruits' => [2], // Fruits & Légumes
+                'legumes' => [2], // Fruits & Légumes
+                'boucherie' => [3], // Viandes
+                'boucher' => [3], // Viandes
+                'épicerie' => [4], // Épicerie
+                'epicerie' => [4], // Épicerie
+                'supermarché' => [1, 2, 3, 4, 5, 6], // Toutes catégories
+                'supermarche' => [1, 2, 3, 4, 5, 6], // Toutes catégories
+                'restaurant' => [1, 3, 5, 6], // Boulangerie, Viande, Laitier, Plats cuisinés
+            ];
+
+            // Déterminer catégories autorisées
+            $allowedCategoryIds = [];
+            foreach ($categoryMapping as $type => $categoryIds) {
+                if (str_contains($businessType, $type)) {
+                    $allowedCategoryIds = array_merge($allowedCategoryIds, $categoryIds);
+                }
+            }
+
+            // Si aucun match, autoriser toutes catégories (fallback sécurisé)
+            if (empty($allowedCategoryIds)) {
+                $allowedCategoryIds = Category::active()->pluck('id')->toArray();
+            }
+
+            $categories = Category::active()
+                ->whereIn('id', array_unique($allowedCategoryIds))
+                ->get(['id', 'name', 'description', 'icon']);
+
+            return response()->json([
+                'success' => true,
+                'data' => $categories,
+                'merchant_business_type' => $merchant->business_type,
+                'allowed_categories_count' => count($categories)
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Erreur lors de la récupération des catégories',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
 }
