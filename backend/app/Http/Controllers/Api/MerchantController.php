@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\Merchant;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Tymon\JWTAuth\Facades\JWTAuth;
 
@@ -436,6 +438,8 @@ class MerchantController extends Controller
      */
     public function uploadPhoto(Request $request): JsonResponse
     {
+        $uploadedPath = null; // 🐛 BUG FIX #3: Track uploaded file for cleanup on error
+
         try {
             $user = JWTAuth::parseToken()->authenticate();
 
@@ -454,14 +458,15 @@ class MerchantController extends Controller
                 ], 404);
             }
 
+            // 🐛 EDGE CASE #1: Empty files already prevented by 'image' validation + getimagesize()
             // Validation
             $validator = Validator::make($request->all(), [
-                'photo' => 'required|image|mimes:jpeg,jpg,png|max:5120', // 5MB max, removed GIF for security
+                'photo' => 'required|image|mimes:jpeg,jpg,png|max:1024', // 🔒 SECURITY: Max 1MB for merchants
             ], [
                 'photo.required' => 'Aucune photo fournie',
                 'photo.image' => 'Le fichier doit être une image',
                 'photo.mimes' => 'Formats acceptés: jpeg, jpg, png',
-                'photo.max' => 'La photo ne peut pas dépasser 5MB',
+                'photo.max' => 'La photo ne peut pas dépasser 1MB',
             ]);
 
             if ($validator->fails()) {
@@ -476,41 +481,136 @@ class MerchantController extends Controller
 
             // 🔒 SECURITY: Verify actual MIME type (not just extension)
             $mimeType = $photo->getMimeType();
-            $allowedMimes = ['image/jpeg', 'image/jpg', 'image/png'];
-            if (!in_array($mimeType, $allowedMimes)) {
+
+            // 🐛 BUG FIX #1: Guard contre null getMimeType()
+            if (is_null($mimeType) || empty($mimeType)) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Type de fichier invalide',
+                    'message' => 'Impossible de déterminer le type du fichier. Fichier corrompu ?'
                 ], 422);
             }
 
-            // 🔒 SECURITY: Use secure random filename with real extension
-            $extension = $photo->extension(); // Uses real MIME type, not client-provided
+            // 🐛 BUG FIX #17: Proper MIME type mapping (image/jpg is INVALID, only image/jpeg is correct)
+            // Mapping MIME types → extensions (always use first extension for consistency)
+            $allowedMimeTypes = [
+                'image/jpeg' => ['jpg', 'jpeg'], // Standard JPEG (always use .jpg, not .jpeg)
+                'image/png' => ['png'],
+            ];
+
+            if (!array_key_exists($mimeType, $allowedMimeTypes)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Type de fichier non autorisé. Formats acceptés : JPEG, PNG',
+                    'error' => "MIME type '{$mimeType}' non supporté. Types valides : image/jpeg, image/png"
+                ], 422);
+            }
+
+            // 🔒 SECURITY: Validate image dimensions (max 1000x1000px for merchant photos)
+            $imageInfo = getimagesize($photo->getRealPath());
+            if ($imageInfo === false) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Impossible de lire les dimensions de l\'image. Fichier corrompu ?'
+                ], 422);
+            }
+
+            [$width, $height] = $imageInfo;
+            if ($width > 1000 || $height > 1000) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Image trop grande. Dimensions maximales : 1000x1000px',
+                    'error' => "Current dimensions: {$width}x{$height}px"
+                ], 422);
+            }
+
+            // 🐛 BUG FIX #17: Use first extension from mapping for consistency (.jpg, not .jpeg)
+            // 🔒 SECURITY: Extension determined by server-verified MIME type, not client input
+            $extension = $allowedMimeTypes[$mimeType][0];
             $filename = \Illuminate\Support\Str::random(40) . '.' . $extension;
 
             // 🔒 SECURITY: Delete old photo safely using Storage facade
             if ($merchant->photo_url) {
                 $oldPath = str_replace('/storage/', '', $merchant->photo_url);
-                \Illuminate\Support\Facades\Storage::disk('public')->delete($oldPath);
+
+                // 🐛 BUG FIX #6: Validate path to prevent traversal attacks
+                if (str_contains($oldPath, '..') || str_contains($oldPath, '//')) {
+                    \Log::error('Path traversal attempt detected in merchant photo deletion', [
+                        'merchant_id' => $merchant->id,
+                        'suspicious_path' => $oldPath
+                    ]);
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Invalid file path detected'
+                    ], 400);
+                }
+
+                // 🐛 BUG FIX #5: Verify deletion success
+                // 🐛 BUG FIX #13: Standardize Storage facade usage
+                if (!Storage::disk('public')->delete($oldPath)) {
+                    \Log::warning('Failed to delete old merchant photo', [
+                        'merchant_id' => $merchant->id,
+                        'path' => $oldPath,
+                        'exists' => Storage::disk('public')->exists($oldPath)
+                    ]);
+                }
             }
 
-            // 🔒 SECURITY: Use Storage facade for secure file handling
-            $path = $photo->storeAs('merchants', $filename, 'public');
-            $photoUrl = '/storage/' . $path;
+            // 🐛 BUG FIX #12: Wrapper upload + DB update dans transaction atomique
+            // 🐛 BUG FIX #13: Standardize DB facade usage
+            DB::beginTransaction();
 
-            // Mettre à jour la base de données
-            $merchant->update(['photo_url' => $photoUrl]);
+            try {
+                // 🔒 SECURITY: Use Storage facade for secure file handling
+                $path = $photo->storeAs('merchants', $filename, 'public');
+                $uploadedPath = $path; // Track uploaded path for cleanup
+                $photoUrl = '/storage/' . $path;
 
-            return response()->json([
-                'success' => true,
-                'message' => 'Photo uploadée avec succès',
-                'data' => [
-                    'photo_url' => $photoUrl,
-                    'full_url' => url($photoUrl),
-                ]
-            ]);
+                // Mettre à jour la base de données (dans transaction)
+                $merchant->update(['photo_url' => $photoUrl]);
+
+                // Commit transaction si tout réussit
+                DB::commit();
+
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Photo uploadée avec succès',
+                    'data' => [
+                        'photo_url' => $photoUrl,
+                        'full_url' => url($photoUrl),
+                    ]
+                ]);
+
+            } catch (\Exception $dbException) {
+                // Rollback transaction DB
+                // 🐛 BUG FIX #13: Standardize DB facade usage
+                DB::rollBack();
+
+                // Cleanup fichier uploadé car DB update a échoué
+                if ($uploadedPath && Storage::disk('public')->exists($uploadedPath)) {
+                    Storage::disk('public')->delete($uploadedPath);
+                    \Log::warning('Cleaned up orphan file after DB transaction failure', [
+                        'path' => $uploadedPath,
+                        'merchant_id' => $merchant->id
+                    ]);
+                }
+
+                // Re-throw pour être capturé par catch externe
+                throw $dbException;
+            }
 
         } catch (\Exception $e) {
+            // 🐛 BUG FIX #12: Cleanup déjà géré par catch interne (transaction)
+            // Pas de double cleanup ici pour éviter suppression erronée
+
+            // 🐛 BUG FIX #4: Conditionner trace logs à environnement local
+            \Log::error('MERCHANT PHOTO UPLOAD ERROR', [
+                'merchant_id' => $merchant->id ?? null,
+                'error' => $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+                'trace' => app()->isLocal() ? $e->getTraceAsString() : null
+            ]);
+
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur lors de l\'upload de la photo',
@@ -581,19 +681,22 @@ class MerchantController extends Controller
                 ], 404);
             }
 
+            // 🐛 EDGE CASE #2: Prevent empty arrays with min:1 (at least 1 day required)
             // Validation
             $validator = Validator::make($request->all(), [
-                'opening_hours' => 'required|array',
+                'opening_hours' => 'required|array|min:1',
                 'opening_hours.*.day' => 'required|string|in:monday,tuesday,wednesday,thursday,friday,saturday,sunday',
                 'opening_hours.*.is_open' => 'required|boolean',
                 // 🐛 BUG FIX: Add time format validation (HH:MM)
-                'opening_hours.*.morning_start' => 'nullable|string|regex:/^([0-1][0-9]|2[0-3]):[0-5][0-9]$/',
-                'opening_hours.*.morning_end' => 'nullable|string|regex:/^([0-1][0-9]|2[0-3]):[0-5][0-9]$/',
-                'opening_hours.*.afternoon_start' => 'nullable|string|regex:/^([0-1][0-9]|2[0-3]):[0-5][0-9]$/',
-                'opening_hours.*.afternoon_end' => 'nullable|string|regex:/^([0-1][0-9]|2[0-3]):[0-5][0-9]$/',
+                // ⚠️ CRITICAL: Array syntax required for regex with | alternation (otherwise Laravel treats | as rule separator)
+                'opening_hours.*.morning_start' => ['nullable', 'string', 'regex:/^([0-1][0-9]|2[0-3]):[0-5][0-9]$/'],
+                'opening_hours.*.morning_end' => ['nullable', 'string', 'regex:/^([0-1][0-9]|2[0-3]):[0-5][0-9]$/'],
+                'opening_hours.*.afternoon_start' => ['nullable', 'string', 'regex:/^([0-1][0-9]|2[0-3]):[0-5][0-9]$/'],
+                'opening_hours.*.afternoon_end' => ['nullable', 'string', 'regex:/^([0-1][0-9]|2[0-3]):[0-5][0-9]$/'],
             ], [
                 'opening_hours.required' => 'Les heures d\'ouverture sont requises',
                 'opening_hours.array' => 'Les heures d\'ouverture doivent être au format tableau',
+                'opening_hours.min' => 'Au moins un jour doit être défini',
                 'opening_hours.*.morning_start.regex' => 'L\'heure de début du matin doit être au format HH:MM (ex: 08:00)',
                 'opening_hours.*.morning_end.regex' => 'L\'heure de fin du matin doit être au format HH:MM (ex: 12:00)',
                 'opening_hours.*.afternoon_start.regex' => 'L\'heure de début d\'après-midi doit être au format HH:MM (ex: 14:00)',
@@ -610,6 +713,17 @@ class MerchantController extends Controller
 
             // 🐛 BUG FIX: Validate time logic (end > start)
             $openingHours = $request->opening_hours;
+
+            // 🐛 BUG FIX #9: Validate no duplicate days
+            $days = array_column($openingHours, 'day');
+            if (count($days) !== count(array_unique($days))) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Erreur de validation',
+                    'errors' => ['opening_hours' => ['Chaque jour ne peut apparaître qu\'une seule fois']]
+                ], 422);
+            }
+
             foreach ($openingHours as $index => $hours) {
                 if ($hours['is_open']) {
                     // Morning validation
@@ -638,9 +752,10 @@ class MerchantController extends Controller
                         }
                     }
 
+                    // 🐛 BUG FIX #8: Allow continuous opening (changed <= to <)
                     // Validate afternoon starts after morning ends
                     if (!empty($hours['morning_end']) && !empty($hours['afternoon_start'])) {
-                        if ($hours['afternoon_start'] <= $hours['morning_end']) {
+                        if ($hours['afternoon_start'] < $hours['morning_end']) {
                             return response()->json([
                                 'success' => false,
                                 'message' => 'Erreur de validation',
@@ -667,6 +782,15 @@ class MerchantController extends Controller
             ]);
 
         } catch (\Exception $e) {
+            // 🐛 BUG FIX #4: Conditionner trace logs à environnement local
+            \Log::error('MERCHANT OPENING HOURS UPDATE ERROR', [
+                'merchant_id' => $merchant->id ?? null,
+                'error' => $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+                'trace' => app()->isLocal() ? $e->getTraceAsString() : null
+            ]);
+
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur lors de la mise à jour des heures d\'ouverture',
