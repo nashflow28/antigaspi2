@@ -321,4 +321,357 @@ class MerchantController extends Controller
             ], 500);
         }
     }
+
+    /**
+     * Met à jour le profil du commerçant
+     */
+    public function updateProfile(Request $request): JsonResponse
+    {
+        try {
+            $user = JWTAuth::parseToken()->authenticate();
+
+            if ($user->role !== 'merchant') {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Accès non autorisé. Compte commerçant requis.'
+                ], 403);
+            }
+
+            $merchant = $user->merchant;
+            if (!$merchant) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Profil commerçant non trouvé.'
+                ], 404);
+            }
+
+            // Validation
+            $validator = Validator::make($request->all(), [
+                'business_name' => 'nullable|string|max:255',
+                'business_type' => 'nullable|string|max:255',
+                'description' => 'nullable|string|max:1000',
+                'siret' => 'nullable|string|max:14|unique:merchants,siret,' . $merchant->id,
+                'phone' => 'nullable|string|max:20',
+                'address' => 'nullable|string|max:500',
+                'city' => 'nullable|string|max:255',
+            ], [
+                'business_name.max' => 'Le nom de l\'entreprise ne peut pas dépasser 255 caractères',
+                'description.max' => 'La description ne peut pas dépasser 1000 caractères',
+                'siret.unique' => 'Ce numéro SIRET est déjà utilisé',
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Données invalides',
+                    'errors' => $validator->errors()
+                ], 422);
+            }
+
+            // Mise à jour du merchant
+            $merchantData = [];
+            if ($request->filled('business_name')) {
+                $merchantData['business_name'] = $request->business_name;
+            }
+            if ($request->filled('business_type')) {
+                $merchantData['business_type'] = $request->business_type;
+            }
+            if ($request->filled('description')) {
+                $merchantData['description'] = $request->description;
+            }
+            if ($request->filled('siret')) {
+                $merchantData['siret'] = $request->siret;
+            }
+
+            if (!empty($merchantData)) {
+                $merchant->update($merchantData);
+            }
+
+            // Mise à jour de l'utilisateur
+            $userData = [];
+            if ($request->filled('phone')) {
+                $userData['phone'] = $request->phone;
+            }
+            if ($request->filled('address')) {
+                $userData['address'] = $request->address;
+            }
+            if ($request->filled('city')) {
+                $userData['city'] = $request->city;
+            }
+
+            if (!empty($userData)) {
+                $user->update($userData);
+            }
+
+            // Recharger les relations
+            $merchant->load('user');
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Profil mis à jour avec succès',
+                'data' => [
+                    'id' => $merchant->id,
+                    'business_name' => $merchant->business_name,
+                    'business_type' => $merchant->business_type,
+                    'description' => $merchant->description,
+                    'siret' => $merchant->siret,
+                    'photo_url' => $merchant->photo_url,
+                    'phone' => $merchant->user->phone,
+                    'address' => $merchant->user->address,
+                    'city' => $merchant->user->city,
+                ]
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Erreur lors de la mise à jour du profil',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Upload la photo du commerçant
+     */
+    public function uploadPhoto(Request $request): JsonResponse
+    {
+        try {
+            $user = JWTAuth::parseToken()->authenticate();
+
+            if ($user->role !== 'merchant') {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Accès non autorisé. Compte commerçant requis.'
+                ], 403);
+            }
+
+            $merchant = $user->merchant;
+            if (!$merchant) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Profil commerçant non trouvé.'
+                ], 404);
+            }
+
+            // Validation
+            $validator = Validator::make($request->all(), [
+                'photo' => 'required|image|mimes:jpeg,jpg,png|max:5120', // 5MB max, removed GIF for security
+            ], [
+                'photo.required' => 'Aucune photo fournie',
+                'photo.image' => 'Le fichier doit être une image',
+                'photo.mimes' => 'Formats acceptés: jpeg, jpg, png',
+                'photo.max' => 'La photo ne peut pas dépasser 5MB',
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Fichier invalide',
+                    'errors' => $validator->errors()
+                ], 422);
+            }
+
+            $photo = $request->file('photo');
+
+            // 🔒 SECURITY: Verify actual MIME type (not just extension)
+            $mimeType = $photo->getMimeType();
+            $allowedMimes = ['image/jpeg', 'image/jpg', 'image/png'];
+            if (!in_array($mimeType, $allowedMimes)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Type de fichier invalide',
+                ], 422);
+            }
+
+            // 🔒 SECURITY: Use secure random filename with real extension
+            $extension = $photo->extension(); // Uses real MIME type, not client-provided
+            $filename = \Illuminate\Support\Str::random(40) . '.' . $extension;
+
+            // 🔒 SECURITY: Delete old photo safely using Storage facade
+            if ($merchant->photo_url) {
+                $oldPath = str_replace('/storage/', '', $merchant->photo_url);
+                \Illuminate\Support\Facades\Storage::disk('public')->delete($oldPath);
+            }
+
+            // 🔒 SECURITY: Use Storage facade for secure file handling
+            $path = $photo->storeAs('merchants', $filename, 'public');
+            $photoUrl = '/storage/' . $path;
+
+            // Mettre à jour la base de données
+            $merchant->update(['photo_url' => $photoUrl]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Photo uploadée avec succès',
+                'data' => [
+                    'photo_url' => $photoUrl,
+                    'full_url' => url($photoUrl),
+                ]
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Erreur lors de l\'upload de la photo',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Obtient les heures d'ouverture du commerçant
+     */
+    public function getOpeningHours(): JsonResponse
+    {
+        try {
+            $user = JWTAuth::parseToken()->authenticate();
+
+            if ($user->role !== 'merchant') {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Accès non autorisé. Compte commerçant requis.'
+                ], 403);
+            }
+
+            $merchant = $user->merchant;
+            if (!$merchant) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Profil commerçant non trouvé.'
+                ], 404);
+            }
+
+            return response()->json([
+                'success' => true,
+                'data' => [
+                    'opening_hours' => $merchant->opening_hours ?? [],
+                ]
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Erreur lors de la récupération des heures d\'ouverture',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Met à jour les heures d'ouverture du commerçant
+     */
+    public function updateOpeningHours(Request $request): JsonResponse
+    {
+        try {
+            $user = JWTAuth::parseToken()->authenticate();
+
+            if ($user->role !== 'merchant') {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Accès non autorisé. Compte commerçant requis.'
+                ], 403);
+            }
+
+            $merchant = $user->merchant;
+            if (!$merchant) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Profil commerçant non trouvé.'
+                ], 404);
+            }
+
+            // Validation
+            $validator = Validator::make($request->all(), [
+                'opening_hours' => 'required|array',
+                'opening_hours.*.day' => 'required|string|in:monday,tuesday,wednesday,thursday,friday,saturday,sunday',
+                'opening_hours.*.is_open' => 'required|boolean',
+                // 🐛 BUG FIX: Add time format validation (HH:MM)
+                'opening_hours.*.morning_start' => 'nullable|string|regex:/^([0-1][0-9]|2[0-3]):[0-5][0-9]$/',
+                'opening_hours.*.morning_end' => 'nullable|string|regex:/^([0-1][0-9]|2[0-3]):[0-5][0-9]$/',
+                'opening_hours.*.afternoon_start' => 'nullable|string|regex:/^([0-1][0-9]|2[0-3]):[0-5][0-9]$/',
+                'opening_hours.*.afternoon_end' => 'nullable|string|regex:/^([0-1][0-9]|2[0-3]):[0-5][0-9]$/',
+            ], [
+                'opening_hours.required' => 'Les heures d\'ouverture sont requises',
+                'opening_hours.array' => 'Les heures d\'ouverture doivent être au format tableau',
+                'opening_hours.*.morning_start.regex' => 'L\'heure de début du matin doit être au format HH:MM (ex: 08:00)',
+                'opening_hours.*.morning_end.regex' => 'L\'heure de fin du matin doit être au format HH:MM (ex: 12:00)',
+                'opening_hours.*.afternoon_start.regex' => 'L\'heure de début d\'après-midi doit être au format HH:MM (ex: 14:00)',
+                'opening_hours.*.afternoon_end.regex' => 'L\'heure de fin d\'après-midi doit être au format HH:MM (ex: 18:00)',
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Données invalides',
+                    'errors' => $validator->errors()
+                ], 422);
+            }
+
+            // 🐛 BUG FIX: Validate time logic (end > start)
+            $openingHours = $request->opening_hours;
+            foreach ($openingHours as $index => $hours) {
+                if ($hours['is_open']) {
+                    // Morning validation
+                    if (!empty($hours['morning_start']) && !empty($hours['morning_end'])) {
+                        if ($hours['morning_start'] >= $hours['morning_end']) {
+                            return response()->json([
+                                'success' => false,
+                                'message' => 'Erreur de validation',
+                                'errors' => [
+                                    "opening_hours.{$index}.morning_end" => ["L'heure de fin doit être après l'heure de début"]
+                                ]
+                            ], 422);
+                        }
+                    }
+
+                    // Afternoon validation
+                    if (!empty($hours['afternoon_start']) && !empty($hours['afternoon_end'])) {
+                        if ($hours['afternoon_start'] >= $hours['afternoon_end']) {
+                            return response()->json([
+                                'success' => false,
+                                'message' => 'Erreur de validation',
+                                'errors' => [
+                                    "opening_hours.{$index}.afternoon_end" => ["L'heure de fin doit être après l'heure de début"]
+                                ]
+                            ], 422);
+                        }
+                    }
+
+                    // Validate afternoon starts after morning ends
+                    if (!empty($hours['morning_end']) && !empty($hours['afternoon_start'])) {
+                        if ($hours['afternoon_start'] <= $hours['morning_end']) {
+                            return response()->json([
+                                'success' => false,
+                                'message' => 'Erreur de validation',
+                                'errors' => [
+                                    "opening_hours.{$index}.afternoon_start" => ["L'heure de début d'après-midi doit être après la fin du matin"]
+                                ]
+                            ], 422);
+                        }
+                    }
+                }
+            }
+
+            // Mettre à jour les heures d'ouverture
+            $merchant->update([
+                'opening_hours' => $openingHours,
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Heures d\'ouverture mises à jour avec succès',
+                'data' => [
+                    'opening_hours' => $merchant->opening_hours,
+                ]
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Erreur lors de la mise à jour des heures d\'ouverture',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
 }

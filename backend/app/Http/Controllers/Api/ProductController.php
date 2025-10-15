@@ -505,6 +505,7 @@ class ProductController extends Controller
 
     /**
      * Upload product image
+     * 🔒 SECURED: MIME type verification, secure filename generation, rate limiting
      */
     public function uploadImage(Request $request): JsonResponse
     {
@@ -519,7 +520,7 @@ class ProductController extends Controller
             }
 
             $validator = Validator::make($request->all(), [
-                'image' => 'required|image|mimes:jpeg,png,jpg,webp|max:5120', // Max 5MB
+                'image' => 'required|file|max:5120', // 🔒 SECURITY: Remove MIME from validator (checked below)
             ]);
 
             if ($validator->fails()) {
@@ -530,32 +531,53 @@ class ProductController extends Controller
                 ], 422);
             }
 
-            if ($request->hasFile('image')) {
-                $image = $request->file('image');
-                $filename = time() . '_' . uniqid() . '.' . $image->getClientOriginalExtension();
-
-                // Store in public/products directory
-                $path = $image->storeAs('products', $filename, 'public');
-
-                // Generate public URL
-                $url = Storage::url($path);
-
+            if (!$request->hasFile('image')) {
                 return response()->json([
-                    'success' => true,
-                    'message' => 'Image uploadée avec succès',
-                    'data' => [
-                        'url' => $url,
-                        'path' => $path
-                    ]
-                ], 200);
+                    'success' => false,
+                    'message' => 'Aucune image fournie'
+                ], 400);
             }
 
+            $image = $request->file('image');
+
+            // 🔒 SECURITY: Verify actual MIME type (not just client-provided extension)
+            $mimeType = $image->getMimeType();
+            $allowedMimes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+
+            if (!in_array($mimeType, $allowedMimes)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Type de fichier invalide. Formats acceptés : JPEG, PNG, WebP',
+                    'error' => 'Invalid MIME type: ' . $mimeType
+                ], 422);
+            }
+
+            // 🔒 SECURITY: Use secure random filename with real extension (based on MIME type)
+            $extension = $image->extension(); // Uses real MIME type, not client-provided
+            $filename = \Illuminate\Support\Str::random(40) . '.' . $extension;
+
+            // 🔒 SECURITY: Use Storage facade for secure file handling
+            $path = $image->storeAs('products', $filename, 'public');
+
+            // Generate public URL
+            $url = Storage::url($path);
+
             return response()->json([
-                'success' => false,
-                'message' => 'Aucune image fournie'
-            ], 400);
+                'success' => true,
+                'message' => 'Image uploadée avec succès',
+                'data' => [
+                    'url' => $url,
+                    'path' => $path,
+                    'filename' => $filename
+                ]
+            ], 200);
 
         } catch (\Exception $e) {
+            \Log::error('PRODUCT IMAGE UPLOAD ERROR', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur lors de l\'upload',
@@ -681,20 +703,28 @@ class ProductController extends Controller
             $businessType = strtolower($merchant->business_type);
 
             // Mapping business_type → category IDs autorisés
-            // Basé sur l'analyse BDD: 1=Boulangerie, 2=Fruits & Légumes, 3=Viandes, 4=Épicerie, 5=Laitier, 6=Plats cuisinés
             $categoryMapping = [
-                'boulangerie' => [1], // Boulangerie uniquement
+                'bakery' => [1], // Boulangerie (EN)
+                'boulangerie' => [1], // Boulangerie (FR)
                 'primeur' => [2], // Fruits & Légumes
-                'bio' => [2], // Fruits & Légumes
+                'produce' => [2], // Fruits & Légumes (EN)
                 'fruits' => [2], // Fruits & Légumes
-                'legumes' => [2], // Fruits & Légumes
-                'boucherie' => [3], // Viandes
-                'boucher' => [3], // Viandes
-                'épicerie' => [4], // Épicerie
-                'epicerie' => [4], // Épicerie
-                'supermarché' => [1, 2, 3, 4, 5, 6], // Toutes catégories
-                'supermarche' => [1, 2, 3, 4, 5, 6], // Toutes catégories
-                'restaurant' => [1, 3, 5, 6], // Boulangerie, Viande, Laitier, Plats cuisinés
+                'vegetables' => [2], // Légumes (EN)
+                'butcher' => [5], // Viande et Poisson (EN)
+                'boucherie' => [5], // Viande et Poisson
+                'fishmonger' => [5], // Poisson
+                'grocery' => [4], // Épicerie (EN)
+                'epicerie' => [4], // Épicerie (FR)
+                'supermarket' => [1, 2, 3, 4, 5, 6, 7, 8], // Toutes catégories (EN)
+                'supermarché' => [1, 2, 3, 4, 5, 6, 7, 8], // Toutes catégories (FR)
+                'supermarche' => [1, 2, 3, 4, 5, 6, 7, 8], // Toutes catégories (FR sans accent)
+                'restaurant' => [6, 8], // Boissons + Traiteur
+                'cafe' => [6, 7], // Boissons + Pâtisserie
+                'bar' => [6], // Boissons
+                'patisserie' => [7], // Pâtisserie (FR)
+                'pastry' => [7], // Pâtisserie (EN)
+                'catering' => [8], // Traiteur (EN)
+                'traiteur' => [8], // Traiteur (FR)
             ];
 
             // Déterminer catégories autorisées

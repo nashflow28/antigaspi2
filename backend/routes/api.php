@@ -50,6 +50,10 @@ Route::prefix('auth')->middleware('throttle:auth')->group(function () {
 Route::prefix('analytics')->middleware('jwt.auth')->group(function () {
     Route::post('/events', [AnalyticsController::class, 'storeEvents']);
     Route::get('/stats', [AnalyticsController::class, 'stats']);
+    Route::get('/merchant-stats', [AnalyticsController::class, 'merchantStats']); // Stats merchant dashboard
+    Route::get('/merchant-revenue-chart', [AnalyticsController::class, 'merchantRevenueChart']); // Graphique CA
+    Route::get('/merchant-products-chart', [AnalyticsController::class, 'merchantProductsChart']); // Top produits
+    Route::get('/merchant-reservations-chart', [AnalyticsController::class, 'merchantReservationsChart']); // Tendance réservations
 });
 
 // Routes des produits - Rate limiting temporairement désactivé
@@ -63,10 +67,13 @@ Route::prefix('products')->group(function () {
         Route::get('/merchant', [ProductController::class, 'merchantProducts']); // Produits du commerçant connecté
         Route::get('/merchant/{id}', [ProductController::class, 'showOwn']); // Voir son propre produit (même inactif)
 
+        // 🔒 SECURITY: Upload image with ultra-strict rate limiting (5 requests/minute, same as MerchantController)
+        Route::post('/upload-image', [ProductController::class, 'uploadImage'])
+            ->middleware('throttle:5,1'); // Ultra-strict for file uploads
+
         // Routes d'écriture avec rate limiting strict
         Route::middleware('throttle:write')->group(function () {
             Route::post('/', [ProductController::class, 'store']); // Ajouter un produit (commerçant)
-            Route::post('/upload-image', [ProductController::class, 'uploadImage']); // Upload image produit
             Route::put('/{id}', [ProductController::class, 'update']); // Modifier un produit
             Route::delete('/{id}', [ProductController::class, 'destroy']); // Supprimer un produit
         });
@@ -177,6 +184,17 @@ Route::get('merchants', [MerchantController::class, 'index']);
 
 // Routes des commerçants (protégées)
 Route::prefix('merchants')->middleware('jwt.auth')->group(function () {
+    // Gestion du profil commerçant
+    Route::put('/profile', [MerchantController::class, 'updateProfile']); // Mettre à jour profil
+
+    // 🔒 SECURITY: Rate limiting strict pour l'upload de photo (5 requêtes/minute)
+    Route::post('/profile/photo', [MerchantController::class, 'uploadPhoto'])
+        ->middleware('throttle:5,1'); // Upload photo profil
+
+    // Gestion des heures d'ouverture
+    Route::get('/opening-hours', [MerchantController::class, 'getOpeningHours']); // Obtenir heures d'ouverture
+    Route::put('/opening-hours', [MerchantController::class, 'updateOpeningHours']); // Mettre à jour heures d'ouverture
+
     // Gestion de la géolocalisation
     Route::get('/location', [MerchantController::class, 'getLocation']); // Obtenir coordonnées GPS
     Route::put('/location', [MerchantController::class, 'updateLocation']); // Mettre à jour coordonnées GPS
@@ -203,6 +221,7 @@ Route::prefix('merchants')->middleware('jwt.auth')->group(function () {
 
     // Gestion des points de fidélité pour commerçants
     Route::prefix('loyalty')->group(function () {
+        Route::get('/stats', [\App\Http\Controllers\Api\LoyaltyPointController::class, 'getMerchantStats']); // Statistiques programme fidélité
         Route::get('/customers', [\App\Http\Controllers\Api\LoyaltyPointController::class, 'getMerchantCustomers']); // Clients du commerçant
         Route::post('/award', [\App\Http\Controllers\Api\LoyaltyPointController::class, 'awardPoints']); // Attribuer des points
     });
