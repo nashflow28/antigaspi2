@@ -2,6 +2,7 @@ import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import Constants from 'expo-constants'
 import { Alert } from 'react-native'
+import * as NavigationRef from '../navigation/NavigationRef'
 import {
   ApiResponse,
   AuthResponse,
@@ -16,18 +17,61 @@ import {
   User,
   Payment,
   PaymentInitiationResponse,
-  MobileMoneyPaymentPayload
+  MobileMoneyPaymentPayload,
+  Review,
+  ReviewStats,
 } from '../types'
 
-// Configuration dynamique de l'API via app.json
+// Configuration dynamique de l'API (web/native) avec overrides propres
 const getApiBaseUrl = (): string => {
+  // 1) WEB (Expo Web / navigateur):
+  //    - Priorité à EXPO_PUBLIC_API_URL (configurée via env)
+  //    - Sinon auto-déduction depuis le hostname en gérant localhost vs LAN
+  try {
+    const { Platform } = require('react-native')
+    if (Platform.OS === 'web') {
+      // a) Variable d'env publique Expo si fournie
+      const envUrl = (process.env.EXPO_PUBLIC_API_URL as string | undefined)?.trim()
+      if (envUrl) {
+        console.log('🔗 API URL (EXPO_PUBLIC_API_URL):', envUrl)
+        return envUrl
+      }
+
+      // b) Déduction depuis l'hôte courant (utile si ouvert depuis un téléphone)
+      if (typeof window !== 'undefined' && window.location?.hostname) {
+        const host = window.location.hostname
+        // Si localhost/127 -> forcer 127 (évite IPv6 ::1 et soucis DNS)
+        if (host === 'localhost' || host === '127.0.0.1' || host === '::1') {
+          const url = 'http://127.0.0.1:8000/api'
+          console.log('🔗 API URL (web localhost):', url)
+          return url
+        }
+        // Sinon, utiliser l’IP/host courant (accès LAN)
+        const url = `http://${host}:8000/api`
+        console.log('🔗 API URL (web from current host):', url)
+        return url
+      }
+
+      // c) Fallback ultime web
+      const url = 'http://127.0.0.1:8000/api'
+      console.log('🔗 API URL (web fallback):', url)
+      return url
+    }
+  } catch (_) {
+    // Non-critique: on continue vers les branches natives
+  }
+
+  // 2) NATIVE (Android/iOS): priorité à app.json -> extra.apiUrl
   const configUrl = Constants.expoConfig?.extra?.apiUrl
   if (configUrl && typeof configUrl === 'string') {
+    console.log('🔗 API URL (from app.json extra):', configUrl)
     return configUrl
   }
-  // Fallback pour développement local
-  // 10.0.2.2 est l'adresse spéciale pour localhost sur émulateur Android
-  return 'http://10.0.2.2:8000/api'
+
+  // 3) Émulateur Android (localhost côté hôte)
+  const url = 'http://10.0.2.2:8000/api'
+  console.log('🔗 API URL (android emulator fallback):', url)
+  return url
 }
 
 // Export pour utilisation dans d'autres services (ex: imageHelpers)
@@ -110,6 +154,7 @@ class ApiService {
                 text: 'OK',
                 onPress: () => {
                   console.log('Session expirée - Redirection automatique vers login')
+                  NavigationRef.navigate('Login')
                 }
               }
             ]
@@ -170,9 +215,13 @@ class ApiService {
     const response = await this.request<AuthResponse>('POST', '/auth/login', credentials)
 
     if (response.success && response.data.token) {
-      // Sauvegarder le token et les données utilisateur
-      await AsyncStorage.setItem('auth_token', response.data.token)
-      await AsyncStorage.setItem('user_data', JSON.stringify(response.data.user))
+      try {
+        // Sauvegarder le token et les données utilisateur
+        await AsyncStorage.setItem('auth_token', response.data.token)
+        await AsyncStorage.setItem('user_data', JSON.stringify(response.data.user))
+      } catch (error) {
+        // Ne pas échouer si AsyncStorage échoue - juste en continuer
+      }
     }
 
     return response
@@ -262,6 +311,80 @@ class ApiService {
 
   async cancelReservation(id: number): Promise<ApiResponse<Reservation>> {
     return this.request<ApiResponse<Reservation>>('POST', `/reservations/${id}/cancel`)
+  }
+
+  // === FAVORIS ===
+
+  async getFavorites(): Promise<ApiResponse<Product[]>> {
+    return this.request<ApiResponse<Product[]>>('GET', '/favorites')
+  }
+
+  async getFavoriteIds(): Promise<ApiResponse<number[]>> {
+    return this.request<ApiResponse<number[]>>('GET', '/favorites/batch-check')
+  }
+
+  async toggleFavorite(productId: number): Promise<{ success: boolean; message: string; is_favorite: boolean }> {
+    return this.request<{ success: boolean; message: string; is_favorite: boolean }>(
+      'POST',
+      `/favorites/${productId}/toggle`
+    )
+  }
+
+  async checkFavorite(productId: number): Promise<{ success: boolean; is_favorite: boolean }> {
+    return this.request<{ success: boolean; is_favorite: boolean }>(
+      'GET',
+      `/favorites/check/${productId}`
+    )
+  }
+
+  // === REVIEWS (AVIS) ===
+
+  async getReviews(params: {
+    merchantId: number
+    productId?: number
+    rating?: number
+    page?: number
+    perPage?: number
+  }): Promise<ApiResponse<Review[]>> {
+    const queryParams = new URLSearchParams()
+    queryParams.append('merchant_id', params.merchantId.toString())
+
+    if (params.productId) queryParams.append('product_id', params.productId.toString())
+    if (params.rating) queryParams.append('rating', params.rating.toString())
+    if (params.page) queryParams.append('page', params.page.toString())
+    if (params.perPage) queryParams.append('per_page', params.perPage.toString())
+
+    return this.request<ApiResponse<Review[]>>('GET', `/reviews?${queryParams.toString()}`)
+  }
+
+  async getReviewStats(merchantId: number): Promise<ApiResponse<ReviewStats>> {
+    return this.request<ApiResponse<ReviewStats>>('GET', `/reviews/stats?merchant_id=${merchantId}`)
+  }
+
+  async createReview(data: {
+    merchantId: number
+    productId?: number
+    rating: number
+    title?: string
+    comment?: string
+  }): Promise<ApiResponse<any>> {
+    const snakeCaseData = toSnakeCase(data)
+    return this.request<ApiResponse<any>>('POST', '/reviews', snakeCaseData)
+  }
+
+  async updateReview(
+    reviewId: number,
+    data: {
+      rating: number
+      title?: string
+      comment?: string
+    }
+  ): Promise<ApiResponse<any>> {
+    return this.request<ApiResponse<any>>('PUT', `/reviews/${reviewId}`, data)
+  }
+
+  async deleteReview(reviewId: number): Promise<ApiResponse<any>> {
+    return this.request<ApiResponse<any>>('DELETE', `/reviews/${reviewId}`)
   }
 
   // === UTILITAIRES ===

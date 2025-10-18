@@ -7,7 +7,7 @@
 
 import React, { useMemo } from 'react'
 import {
-  TouchableOpacity,
+  Pressable,
   Text,
   View,
   ActivityIndicator,
@@ -228,11 +228,13 @@ export const Button: React.FC<ButtonProps> = ({
   }
 
   return (
-    <TouchableOpacity
-      style={containerStyle}
+    <Pressable
+      style={({ pressed }) => [
+        containerStyle,
+        pressed && { opacity: 0.7 },
+      ]}
       onPress={onPress}
       disabled={disabled || loading}
-      activeOpacity={0.7}
       accessibilityRole="button"
       accessibilityLabel={getAccessibilityLabel()}
       accessibilityHint={accessibilityHint}
@@ -242,7 +244,7 @@ export const Button: React.FC<ButtonProps> = ({
       }}
     >
       {renderContent()}
-    </TouchableOpacity>
+    </Pressable>
   )
 }
 

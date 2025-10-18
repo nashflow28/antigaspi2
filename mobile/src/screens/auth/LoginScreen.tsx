@@ -42,6 +42,7 @@ const LoginScreen: React.FC<Props> = ({ navigation }) => {
 
     try {
       const result = await dispatch(loginUser(loginCreds))
+
       if (loginUser.fulfilled.match(result)) {
         // La navigation sera gérée automatiquement par AppNavigator
         Alert.alert('Succès', 'Connexion réussie!')
@@ -149,8 +150,8 @@ const LoginScreen: React.FC<Props> = ({ navigation }) => {
             style={{ marginBottom: theme.spacing.sm }}
             onPress={() => {
               const consumerCreds = {
-                email: 'jean.dupont@email.com',
-                password: 'password'
+                email: 'consumer@antigaspi.com',
+                password: 'consumer123'
               }
               setCredentials(consumerCreds)
               handleLogin(consumerCreds)
@@ -165,8 +166,8 @@ const LoginScreen: React.FC<Props> = ({ navigation }) => {
             fullWidth
             onPress={() => {
               const merchantCreds = {
-                email: 'boulangerie.martin@email.com',
-                password: 'password'
+                email: 'merchant@antigaspi.com',
+                password: 'merchant123'
               }
               setCredentials(merchantCreds)
               handleLogin(merchantCreds)
