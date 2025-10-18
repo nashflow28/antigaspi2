@@ -100,19 +100,18 @@ const ProductsScreen: React.FC<Props> = ({ navigation }) => {
 
   const loadData = async () => {
     try {
+      // TOUJOURS charger les catégories (pour la barre de filtres)
+      await dispatch(fetchCategories())
+
       if (contentMode === 'merchants') {
-        await Promise.all([
-          dispatch(fetchMerchants()),
-          dispatch(fetchCategories()),
-        ])
+        await dispatch(fetchMerchants())
       } else {
-        await Promise.all([
-          dispatch(fetchProducts({ per_page: 100 })),
-          dispatch(fetchCategories()),
-        ])
+        await dispatch(fetchProducts({ per_page: 100 }))
       }
+
+      console.log('Categories loaded:', categories.length)
     } catch (error) {
-      // Handle error
+      console.error('Error loading data:', error)
     }
   }
 
@@ -324,53 +323,55 @@ const ProductsScreen: React.FC<Props> = ({ navigation }) => {
         </TouchableOpacity>
       </View>
 
-      {/* Categories */}
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        style={styles.categoriesScroll}
-        contentContainerStyle={styles.categoriesContent}
-      >
-        <TouchableOpacity
-          style={[styles.categoryChip, selectedCategory === 'all' && styles.categoryChipActive]}
-          onPress={() => setSelectedCategory('all')}
+      {/* Categories - Barre compacte scrollable */}
+      {categories && categories.length > 0 && (
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          style={styles.categoriesScroll}
+          contentContainerStyle={styles.categoriesContent}
         >
-          <Text style={styles.categoryEmoji}>🛍️</Text>
-          <Typography
-            variant="caption"
-            weight="medium"
-            style={{
-              maxWidth: 120,
-              ...(selectedCategory === 'all' && { color: theme.colors.textInverse })
-            }}
-            numberOfLines={1}
-            ellipsizeMode="tail"
-          >
-            Tous
-          </Typography>
-        </TouchableOpacity>
-        {categories.map(category => (
           <TouchableOpacity
-            key={category.id}
-            style={[styles.categoryChip, selectedCategory === category.id.toString() && styles.categoryChipActive]}
-            onPress={() => setSelectedCategory(category.id.toString())}
+            style={[styles.categoryChip, selectedCategory === 'all' && styles.categoryChipActive]}
+            onPress={() => setSelectedCategory('all')}
           >
-            <Text style={styles.categoryEmoji}>{getCategoryEmoji(category.name)}</Text>
+            <Text style={styles.categoryEmoji}>🛍️</Text>
             <Typography
               variant="caption"
               weight="medium"
               style={{
                 maxWidth: 120,
-                ...(selectedCategory === category.id.toString() && { color: theme.colors.textInverse })
+                ...(selectedCategory === 'all' && { color: theme.colors.textInverse })
               }}
               numberOfLines={1}
               ellipsizeMode="tail"
             >
-              {category.name}
+              Tous
             </Typography>
           </TouchableOpacity>
-        ))}
-      </ScrollView>
+          {categories.map(category => (
+            <TouchableOpacity
+              key={category.id}
+              style={[styles.categoryChip, selectedCategory === category.id.toString() && styles.categoryChipActive]}
+              onPress={() => setSelectedCategory(category.id.toString())}
+            >
+              <Text style={styles.categoryEmoji}>{getCategoryEmoji(category.name)}</Text>
+              <Typography
+                variant="caption"
+                weight="medium"
+                style={{
+                  maxWidth: 120,
+                  ...(selectedCategory === category.id.toString() && { color: theme.colors.textInverse })
+                }}
+                numberOfLines={1}
+                ellipsizeMode="tail"
+              >
+                {category.name}
+              </Typography>
+            </TouchableOpacity>
+          ))}
+        </ScrollView>
+      )}
 
       {/* Compteur de résultats */}
       {contentMode === 'merchants' ? (
