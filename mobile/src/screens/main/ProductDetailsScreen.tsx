@@ -308,8 +308,57 @@ const ProductDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
         </View>
       </ScrollView>
 
-      {/* Bouton Réserver */}
+      {/* Sticky Bottom Bar - Avis + Réserver */}
       <View style={styles.bottomBar}>
+        {/* Section Avis Compacte - Toujours visible */}
+        {reviewStats && reviewStats.total_reviews > 0 && (
+          <>
+            <View style={styles.bottomBarReviews}>
+              {/* Rating + Count */}
+              <View style={styles.reviewsQuickInfo}>
+                <StarRating rating={reviewStats.average_rating} size={16} />
+                <Typography variant="caption" weight="semibold" style={{ marginLeft: 6 }}>
+                  {reviewStats.average_rating.toFixed(1)} ({reviewStats.total_reviews} avis)
+                </Typography>
+              </View>
+
+              {/* Boutons Rapides */}
+              <View style={styles.reviewsQuickActions}>
+                <TouchableOpacity
+                  style={styles.reviewIconButton}
+                  onPress={() => navigation.navigate('ReviewsList', {
+                    merchantId: product.merchant?.id,
+                    merchantName: product.merchant?.business_name || 'Marchand',
+                  })}
+                >
+                  <Ionicons name="star-outline" size={20} color={theme.colors.primary[600]} />
+                  <Typography variant="caption" color="primary" style={{ marginTop: 2 }}>
+                    Voir
+                  </Typography>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  style={styles.reviewIconButton}
+                  onPress={() => navigation.navigate('AddReview', {
+                    merchantId: product.merchant?.id,
+                    productId: product.id,
+                    merchantName: product.merchant?.business_name || 'Marchand',
+                  })}
+                >
+                  <Ionicons name="create-outline" size={20} color={theme.colors.primary[600]} />
+                  <Typography variant="caption" color="primary" style={{ marginTop: 2 }}>
+                    Donner
+                  </Typography>
+                </TouchableOpacity>
+              </View>
+            </View>
+
+            {/* Divider */}
+            <View style={styles.bottomBarDivider} />
+          </>
+        )}
+
+        {/* Bouton Réserver */}
         <Button
           variant="primary"
           size="lg"
@@ -353,8 +402,35 @@ const createStyles = (theme: ReturnType<typeof useTheme>) => StyleSheet.create({
   },
   bottomBar: {
     padding: 16,
+    paddingTop: 12,
     borderTopWidth: 1,
     borderTopColor: theme.colors.borderLight,
+    backgroundColor: theme.colors.background,
+  },
+  bottomBarReviews: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 12,
+  },
+  reviewsQuickInfo: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  reviewsQuickActions: {
+    flexDirection: 'row',
+    gap: 16,
+  },
+  reviewIconButton: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 8,
+    minWidth: 48,
+  },
+  bottomBarDivider: {
+    height: 1,
+    backgroundColor: theme.colors.borderLight,
+    marginBottom: 12,
   },
   reviewsSection: {
     marginTop: 24,
