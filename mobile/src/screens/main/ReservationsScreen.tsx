@@ -142,12 +142,12 @@ const ReservationsScreen: React.FC<Props> = ({ navigation }) => {
     }
 
     switch (reservation.status) {
-      case 'pending': return 'En attente'
-      case 'confirmed': return 'Confirmée'
-      case 'ready': return 'Prête'
-      case 'completed': return 'Terminée'
-      case 'cancelled': return 'Annulée'
-      case 'expired': return 'Expirée'
+      case 'pending': return '⏳ Confirmation commerçant'
+      case 'confirmed': return '✓ Confirmée - À retirer'
+      case 'ready': return '✓ Prête pour retrait'
+      case 'completed': return '✓ Produit retiré'
+      case 'cancelled': return '✗ Annulée'
+      case 'expired': return '✗ Expirée'
       default: return reservation.status
     }
   }
