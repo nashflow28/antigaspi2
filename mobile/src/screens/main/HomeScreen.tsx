@@ -317,10 +317,17 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
             )}
 
             <View style={styles.priceRow}>
-              <Typography variant="h3" weight="bold" color="primary">
-                {formatCurrency(discountedPrice)}
-              </Typography>
-              <Typography variant="body" color="tertiary" style={{ textDecorationLine: 'line-through' }}>
+              <View style={{ flexDirection: 'row', alignItems: 'baseline', gap: 8, marginBottom: 4 }}>
+                <Typography variant="h3" weight="bold" color="primary" style={{ fontSize: 24 }}>
+                  {formatCurrency(discountedPrice)}
+                </Typography>
+                {discountPercent > 0 && (
+                  <Typography variant="caption" weight="bold" style={{ color: theme.colors.error[500], fontSize: 13 }}>
+                    -{discountPercent}%
+                  </Typography>
+                )}
+              </View>
+              <Typography variant="body" color="tertiary" style={{ textDecorationLine: 'line-through', opacity: 0.6, fontSize: 14 }}>
                 {formatCurrency(originalPrice)}
               </Typography>
             </View>

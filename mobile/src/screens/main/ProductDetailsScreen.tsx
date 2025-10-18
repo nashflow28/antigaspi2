@@ -102,6 +102,7 @@ const ProductDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
 
   const discountedPrice = Math.round(parseFloat(product.discounted_price) || 0)
   const originalPrice = Math.round(parseFloat(product.original_price) || 0)
+  const discountPercent = Math.round(((originalPrice - discountedPrice) / originalPrice) * 100)
 
   const handleReserve = async () => {
     // Guard contre les appels multiples simultanés
@@ -194,12 +195,21 @@ const ProductDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
             {product.merchant?.business_name || 'Marchand'} | {product.merchant?.city || 'Ville'}
           </Typography>
 
-          <Typography variant="h3" weight="bold" color="primary">
-            {formatCurrency(discountedPrice)}
-          </Typography>
-          <Typography variant="body" color="tertiary" style={{ textDecorationLine: 'line-through', marginBottom: theme.spacing.md }}>
-            {formatCurrency(originalPrice)}
-          </Typography>
+          <View style={{ marginBottom: theme.spacing.md }}>
+            <View style={{ flexDirection: 'row', alignItems: 'baseline', gap: 8, marginBottom: 4 }}>
+              <Typography variant="h2" weight="bold" color="primary" style={{ fontSize: 32 }}>
+                {formatCurrency(discountedPrice)}
+              </Typography>
+              {discountPercent > 0 && (
+                <Typography variant="body" weight="bold" style={{ color: theme.colors.error[500] }}>
+                  -{discountPercent}%
+                </Typography>
+              )}
+            </View>
+            <Typography variant="body" color="tertiary" style={{ textDecorationLine: 'line-through', opacity: 0.6, fontSize: 16 }}>
+              {formatCurrency(originalPrice)}
+            </Typography>
+          </View>
 
           <Typography variant="body" style={{ marginBottom: theme.spacing.md }}>
             Quantité disponible: {product.quantity_available}

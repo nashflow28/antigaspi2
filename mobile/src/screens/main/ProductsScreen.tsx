@@ -260,10 +260,17 @@ const ProductsScreen: React.FC<Props> = ({ navigation }) => {
               {product.merchant?.business_name} | {product.merchant?.city}
             </Typography>
             <View style={styles.priceRow}>
-              <Typography variant="body" weight="bold" color="primary">
-                {formatCurrency(discountedPrice)}
-              </Typography>
-              <Typography variant="caption" color="tertiary" style={{ textDecorationLine: 'line-through', fontSize: 12 }}>
+              <View style={{ flexDirection: 'row', alignItems: 'baseline', gap: 6 }}>
+                <Typography variant="h3" weight="bold" color="primary" style={{ fontSize: 18 }}>
+                  {formatCurrency(discountedPrice)}
+                </Typography>
+                {discountPercent > 0 && (
+                  <Typography variant="caption" weight="bold" style={{ color: theme.colors.error[500], fontSize: 11 }}>
+                    -{discountPercent}%
+                  </Typography>
+                )}
+              </View>
+              <Typography variant="caption" color="tertiary" style={{ textDecorationLine: 'line-through', fontSize: 11, opacity: 0.6 }}>
                 {formatCurrency(originalPrice)}
               </Typography>
             </View>
