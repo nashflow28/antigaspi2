@@ -7,6 +7,7 @@ import {
   Switch,
 } from 'react-native'
 import { useDispatch, useSelector } from 'react-redux'
+import { useNavigation } from '@react-navigation/native'
 import { logoutUser } from '../../store/slices/authSlice'
 import { AppDispatch, RootState } from '../../store'
 import { Ionicons } from '@expo/vector-icons'
@@ -16,6 +17,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage'
 
 const ProfileScreen: React.FC = () => {
   const theme = useTheme()
+  const navigation = useNavigation()
   const { mode, setThemeMode } = theme
   const dispatch = useDispatch<AppDispatch>()
   const { user, loading } = useSelector((state: RootState) => state.auth)
@@ -74,7 +76,13 @@ const ProfileScreen: React.FC = () => {
       <Card variant="elevated" style={{ marginHorizontal: theme.spacing.lg, overflow: 'hidden' }}>
         <TouchableOpacity
           style={[styles.menuItem, { paddingHorizontal: theme.spacing.lg, paddingVertical: theme.spacing.md, borderBottomWidth: 1, borderBottomColor: theme.colors.border }]}
-          onPress={() => Alert.alert('Bientôt disponible', 'La modification du profil sera bientôt disponible.')}
+          onPress={() => {
+            if (user?.role === 'merchant') {
+              (navigation as any).navigate('ProfileEdit')
+            } else {
+              Alert.alert('Bientôt disponible', 'La modification du profil sera bientôt disponible.')
+            }
+          }}
         >
           <Ionicons name="person-outline" size={24} color={theme.colors.text} />
           <Typography variant="body" style={{ flex: 1, marginLeft: theme.spacing.md }}>
@@ -82,6 +90,19 @@ const ProfileScreen: React.FC = () => {
           </Typography>
           <Ionicons name="chevron-forward" size={20} color={theme.colors.neutral[400]} />
         </TouchableOpacity>
+
+        {user?.role === 'merchant' && (
+          <TouchableOpacity
+            style={[styles.menuItem, { paddingHorizontal: theme.spacing.lg, paddingVertical: theme.spacing.md, borderBottomWidth: 1, borderBottomColor: theme.colors.border }]}
+            onPress={() => (navigation as any).navigate('OpeningHours')}
+          >
+            <Ionicons name="time-outline" size={24} color={theme.colors.text} />
+            <Typography variant="body" style={{ flex: 1, marginLeft: theme.spacing.md }}>
+              Heures d'ouverture
+            </Typography>
+            <Ionicons name="chevron-forward" size={20} color={theme.colors.neutral[400]} />
+          </TouchableOpacity>
+        )}
 
         <TouchableOpacity
           style={[
@@ -93,6 +114,13 @@ const ProfileScreen: React.FC = () => {
               borderBottomColor: theme.colors.border,
             },
           ]}
+          onPress={() => {
+            if (user?.role === 'merchant') {
+              (navigation as any).navigate('Notifications')
+            } else {
+              Alert.alert('Bientôt disponible', 'Les notifications seront bientôt disponibles.')
+            }
+          }}
         >
           <Ionicons name="notifications-outline" size={24} color={theme.colors.text} />
           <Typography variant="body" style={{ flex: 1, marginLeft: theme.spacing.md }}>
@@ -109,7 +137,7 @@ const ProfileScreen: React.FC = () => {
               paddingVertical: theme.spacing.md,
               borderBottomWidth: 1,
               borderBottomColor: theme.colors.border,
-              backgroundColor: theme.colors.surface,
+              backgroundColor: theme.colors.surface.light,
               gap: theme.spacing.md,
             },
           ]}
@@ -128,7 +156,7 @@ const ProfileScreen: React.FC = () => {
               value={mode === 'dark'}
               onValueChange={(value) => setThemeMode(value ? 'dark' : 'light')}
               trackColor={{ false: theme.colors.neutral[200], true: theme.colors.primary[400] }}
-              thumbColor={mode === 'dark' ? theme.colors.primary[600] : theme.colors.neutral[0]}
+              thumbColor={mode === 'dark' ? theme.colors.primary[600] : theme.colors.neutral[50]}
             />
           </View>
           <View
@@ -225,6 +253,10 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
+  },
+  logoutButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
 })
 

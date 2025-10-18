@@ -8,6 +8,7 @@ import {
   StatusBar,
   Dimensions,
   Alert,
+  Linking,
 } from 'react-native'
 import { useDispatch, useSelector } from 'react-redux'
 import { AppDispatch, RootState } from '../../store'
@@ -15,8 +16,10 @@ import { fetchProducts } from '../../store/slices/productsSlice'
 import { Ionicons } from '@expo/vector-icons'
 import { Image } from 'expo-image'
 import { useTheme } from '../../theme'
-import { Product } from '../../types'
+import { Product, Merchant } from '../../types'
 import { getImageUrl } from '../../utils/imageHelpers'
+import { formatCurrency } from '../../utils/currencyHelpers'
+import { Button, Card, Badge, Typography } from '../../components/2025'
 
 const { width } = Dimensions.get('window')
 
@@ -32,26 +35,42 @@ const MerchantDetailScreen: React.FC<Props> = ({ route, navigation }) => {
   const { products } = useSelector((state: RootState) => state.products)
 
   const [merchantProducts, setMerchantProducts] = useState<Product[]>([])
-  const [merchant, setMerchant] = useState<any>(null)
+  const [merchant, setMerchant] = useState<Merchant | null>(null)
+  const [activeTab, setActiveTab] = useState<'products' | 'info' | 'reviews'>('products')
 
+  // ✅ FIX: Race condition + Memory leak + Undefined access
   useEffect(() => {
-    loadMerchantData()
-  }, [merchantId])
+    let isMounted = true
 
-  const loadMerchantData = async () => {
-    try {
-      if (products.length === 0) {
-        await dispatch(fetchProducts({ per_page: 50 }))
+    const loadMerchantData = async () => {
+      try {
+        if (products.length === 0) {
+          await dispatch(fetchProducts({ per_page: 50 }))
+        }
+        const merchantProds = products.filter(p => p.merchant?.id === merchantId)
+
+        // ✅ Validation robuste avant setState
+        if (isMounted && merchantProds.length > 0) {
+          const firstProduct = merchantProds[0]
+          if (firstProduct && firstProduct.merchant) {
+            setMerchantProducts(merchantProds)
+            setMerchant(firstProduct.merchant)
+          }
+        }
+      } catch (error) {
+        if (isMounted) {
+          Alert.alert('Erreur', 'Impossible de charger les données du marchand')
+        }
       }
-      const merchantProds = products.filter(p => p.merchant.id === merchantId)
-      if (merchantProds.length > 0) {
-        setMerchantProducts(merchantProds)
-        setMerchant(merchantProds[0].merchant)
-      }
-    } catch (error) {
-      Alert.alert('Erreur', 'Impossible de charger les données du marchand')
     }
-  }
+
+    loadMerchantData()
+
+    // ✅ Cleanup pour éviter memory leak
+    return () => {
+      isMounted = false
+    }
+  }, [merchantId, products, dispatch]) // ✅ Dépendances complètes
 
   // Emoji dynamique basé sur le nom du marchand
   const getMerchantEmoji = (businessName: string) => {
@@ -64,50 +83,90 @@ const MerchantDetailScreen: React.FC<Props> = ({ route, navigation }) => {
     return '🛍️'
   }
 
-  // Rating dynamique
-  const merchantRating = merchant?.business_name.includes('Boulangerie') ? '4.8' :
-                         merchant?.business_name.includes('Bio') ? '4.9' : '4.6'
-  const orderCount = Math.floor(Math.random() * 200) + 100
-
   // ✅ FIX: Create styles BEFORE using them
   const styles = createStyles(theme)
 
   if (!merchant) {
     return (
       <View style={[styles.container, { justifyContent: 'center', alignItems: 'center' }]}>
-        <Text>Chargement...</Text>
+        <Typography variant="body">Chargement...</Typography>
       </View>
     )
   }
 
   const renderProductCard = (product: Product) => {
-    const discountedPrice = Math.round(parseFloat(product.discounted_price))
+    // ✅ FIX: Fallback pour éviter NaN si discounted_price invalide
+    const discountedPrice = Math.round(parseFloat(product.discounted_price) || 0)
     const isOutOfStock = product.quantity_available === 0
 
     return (
       <TouchableOpacity
         key={product.id}
-        style={styles.productCard}
         onPress={() => navigation.navigate('ProductDetails', { productId: product.id })}
       >
-        <Image
-          source={{ uri: getImageUrl(product.image_url) }}
-          style={styles.productImage}
-          contentFit="cover"
-        />
-        {isOutOfStock && (
-          <View style={styles.soldOutBadge}>
-            <Text style={styles.soldOutText}>Victime de son succès</Text>
+        <Card variant="elevated" style={{ width: 160, overflow: 'hidden' }}>
+          <Image
+            source={{ uri: getImageUrl(product.image_url) }}
+            style={styles.productImage}
+            contentFit="cover"
+          />
+          {isOutOfStock && (
+            <View style={styles.soldOutBadge}>
+              <Badge variant="error" size="sm" style={{ width: '100%' }}>
+                Victime de son succès
+              </Badge>
+            </View>
+          )}
+          <View style={styles.productCardInfo}>
+            <Typography variant="body" weight="semibold" numberOfLines={1} style={{ marginBottom: 4 }}>
+              {product.name}
+            </Typography>
+            <Typography variant="h4" weight="bold" color="primary">
+              {formatCurrency(discountedPrice)}
+            </Typography>
           </View>
-        )}
-        <View style={styles.productCardInfo}>
-          <Text style={styles.productCardName} numberOfLines={1}>
-            {product.name}
-          </Text>
-          <Text style={styles.productCardPrice}>{discountedPrice}€</Text>
-        </View>
+        </Card>
       </TouchableOpacity>
     )
+  }
+
+  // ✅ ÉTAPE 3: Contact Handlers (Fixed with error handling)
+  const handleCall = async () => {
+    if (!merchant?.phone) {
+      Alert.alert('Téléphone non disponible', 'Ce marchand n\'a pas renseigné de numéro de téléphone.')
+      return
+    }
+
+    try {
+      const url = `tel:${merchant.phone}`
+      const canOpen = await Linking.canOpenURL(url)
+      if (canOpen) {
+        await Linking.openURL(url)
+      } else {
+        Alert.alert('Erreur', 'Impossible d\'appeler depuis cet appareil.')
+      }
+    } catch (error) {
+      Alert.alert('Erreur', 'Une erreur est survenue lors de l\'appel.')
+    }
+  }
+
+  const handleMessage = async () => {
+    if (!merchant?.phone) {
+      Alert.alert('Téléphone non disponible', 'Ce marchand n\'a pas renseigné de numéro de téléphone.')
+      return
+    }
+
+    try {
+      const url = `sms:${merchant.phone}`
+      const canOpen = await Linking.canOpenURL(url)
+      if (canOpen) {
+        await Linking.openURL(url)
+      } else {
+        Alert.alert('Erreur', 'Impossible d\'envoyer un SMS depuis cet appareil.')
+      }
+    } catch (error) {
+      Alert.alert('Erreur', 'Une erreur est survenue lors de l\'envoi du message.')
+    }
   }
 
   return (
@@ -119,10 +178,12 @@ const MerchantDetailScreen: React.FC<Props> = ({ route, navigation }) => {
         {/* Placeholder for map - can be replaced with actual map component */}
         <View style={styles.mapPlaceholder}>
           <Ionicons name="location" size={48} color={theme.colors.error} />
-          <Text style={styles.mapText}>Carte interactive</Text>
-          <Text style={styles.mapSubtext}>
+          <Typography variant="body" weight="semibold" style={{ marginTop: theme.spacing.sm }}>
+            Carte interactive
+          </Typography>
+          <Typography variant="caption" color="secondary" style={{ marginTop: 4, textAlign: 'center', paddingHorizontal: theme.spacing.lg }}>
             {merchant.address}, {merchant.city}
-          </Text>
+          </Typography>
         </View>
 
         {/* Header buttons */}
@@ -149,49 +210,120 @@ const MerchantDetailScreen: React.FC<Props> = ({ route, navigation }) => {
               <Text style={styles.logoEmoji}>{getMerchantEmoji(merchant.business_name)}</Text>
             </View>
             <View style={styles.merchantInfo}>
-              <Text style={styles.merchantName}>{merchant.business_name}</Text>
-              <View style={styles.ratingRow}>
-                <Ionicons name="star" size={16} color={theme.colors.primary[500]} />
-                <Text style={styles.ratingText}>{merchantRating}</Text>
-                <Text style={styles.ordersText}>• {orderCount} commandes</Text>
-              </View>
+              <Typography variant="h3" weight="bold" style={{ marginBottom: 4 }}>
+                {merchant.business_name}
+              </Typography>
+              <Typography variant="caption" color="secondary">
+                {merchant.city} • {merchant.business_type}
+              </Typography>
             </View>
           </View>
 
-          <Text style={styles.description}>
+          <Typography variant="body" color="secondary" style={{ lineHeight: 20, marginBottom: theme.spacing.md }}>
             {merchant.business_name.includes('Boulangerie')
               ? 'Boulangerie artisanale proposant du pain frais et des pâtisseries fait maison. Venez découvrir nos spécialités locales et profiter de nos offres anti-gaspi !'
               : merchant.business_name.includes('Bio')
               ? 'Produits biologiques et locaux. Nous sélectionnons les meilleurs produits pour vous permettre de manger sainement tout en luttant contre le gaspillage.'
               : `${merchant.business_name} vous propose des produits de qualité à prix réduits. Profitez de nos offres anti-gaspi et contribuez à la lutte contre le gaspillage alimentaire !`}
-          </Text>
+          </Typography>
 
           {/* Info Pills */}
           <View style={styles.infoPills}>
             <View style={styles.pill}>
               <Ionicons name="time-outline" size={16} color={theme.colors.text} />
-              <Text style={styles.pillText}>8h - 19h</Text>
+              <Typography variant="caption" weight="medium" style={{ fontSize: 13 }}>
+                8h - 19h
+              </Typography>
             </View>
             <View style={styles.pill}>
               <Ionicons name="location-outline" size={16} color={theme.colors.text} />
-              <Text style={styles.pillText}>{merchant.city}</Text>
+              <Typography variant="caption" weight="medium" style={{ fontSize: 13 }}>
+                {merchant.city}
+              </Typography>
             </View>
             <View style={styles.pill}>
               <Ionicons name="card-outline" size={16} color={theme.colors.text} />
-              <Text style={styles.pillText}>CB • Cash</Text>
+              <Typography variant="caption" weight="medium" style={{ fontSize: 13 }}>
+                CB • Cash
+              </Typography>
             </View>
           </View>
         </View>
 
-        {/* Products Section */}
-        <View style={styles.productsSection}>
+        {/* Tabs Navigation */}
+        <View style={styles.tabsContainer}>
+          <TouchableOpacity
+            style={[styles.tab, activeTab === 'products' && styles.tabActive]}
+            onPress={() => setActiveTab('products')}
+          >
+            <Ionicons
+              name="storefront"
+              size={20}
+              color={activeTab === 'products' ? theme.colors.primary[600] : theme.colors.textSecondary}
+            />
+            <Typography
+              variant="body"
+              weight="semibold"
+              style={{
+                fontSize: 14,
+                color: activeTab === 'products' ? theme.colors.textInverse : theme.colors.textSecondary,
+              }}
+            >
+              Produits
+            </Typography>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.tab, activeTab === 'info' && styles.tabActive]}
+            onPress={() => setActiveTab('info')}
+          >
+            <Ionicons
+              name="information-circle"
+              size={20}
+              color={activeTab === 'info' ? theme.colors.primary[600] : theme.colors.textSecondary}
+            />
+            <Typography
+              variant="body"
+              weight="semibold"
+              style={{
+                fontSize: 14,
+                color: activeTab === 'info' ? theme.colors.textInverse : theme.colors.textSecondary,
+              }}
+            >
+              Infos
+            </Typography>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.tab, activeTab === 'reviews' && styles.tabActive]}
+            onPress={() => setActiveTab('reviews')}
+          >
+            <Ionicons
+              name="star"
+              size={20}
+              color={activeTab === 'reviews' ? theme.colors.primary[600] : theme.colors.textSecondary}
+            />
+            <Typography
+              variant="body"
+              weight="semibold"
+              style={{
+                fontSize: 14,
+                color: activeTab === 'reviews' ? theme.colors.textInverse : theme.colors.textSecondary,
+              }}
+            >
+              Avis
+            </Typography>
+          </TouchableOpacity>
+        </View>
+
+        {/* Tab Content - Products */}
+        {activeTab === 'products' && (
+          <View style={styles.productsSection}>
           <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>Produits disponibles</Text>
-            <View style={styles.productCountBadge}>
-              <Text style={styles.productCountText}>
-                {merchantProducts.filter(p => p.quantity_available > 0).length} disponible{merchantProducts.filter(p => p.quantity_available > 0).length > 1 ? 's' : ''}
-              </Text>
-            </View>
+            <Typography variant="h4" weight="bold">
+              Produits disponibles
+            </Typography>
+            <Badge variant="primary" size="sm">
+              {merchantProducts.filter(p => p.quantity_available > 0).length} disponible{merchantProducts.filter(p => p.quantity_available > 0).length > 1 ? 's' : ''}
+            </Badge>
           </View>
           {merchantProducts.length > 0 ? (
             <ScrollView
@@ -203,21 +335,31 @@ const MerchantDetailScreen: React.FC<Props> = ({ route, navigation }) => {
             </ScrollView>
           ) : (
             <View style={styles.emptyProducts}>
-              <Text style={styles.emptyProductsText}>Aucun produit disponible pour le moment</Text>
+              <Typography variant="body" color="secondary" style={{ textAlign: 'center' }}>
+                Aucun produit disponible pour le moment
+              </Typography>
             </View>
           )}
-        </View>
+          </View>
+        )}
 
-        {/* Address Section */}
-        <View style={styles.addressSection}>
-          <Text style={[styles.sectionTitle, { paddingHorizontal: theme.spacing.lg, marginBottom: theme.spacing.md }]}>Adresse</Text>
+        {/* Tab Content - Info */}
+        {activeTab === 'info' && (
+          <View>
+            {/* Address Section */}
+            <View style={styles.addressSection}>
+          <Typography variant="h4" weight="bold" style={{ paddingHorizontal: theme.spacing.lg, marginBottom: theme.spacing.md }}>
+            Adresse
+          </Typography>
           <View style={[styles.addressCard, { marginHorizontal: theme.spacing.lg }]}>
             <Ionicons name="location" size={24} color={theme.colors.primary[500]} />
             <View style={styles.addressInfo}>
-              <Text style={styles.addressText}>{merchant.address}</Text>
-              <Text style={styles.cityText}>
-                {merchant.postal_code} {merchant.city}
-              </Text>
+              <Typography variant="body" weight="semibold" style={{ marginBottom: 4 }}>
+                {merchant.address}
+              </Typography>
+              <Typography variant="caption" color="secondary">
+                {merchant.city}
+              </Typography>
             </View>
             <TouchableOpacity style={styles.directionButton}>
               <Ionicons name="navigate" size={20} color={theme.colors.primary[500]} />
@@ -227,36 +369,76 @@ const MerchantDetailScreen: React.FC<Props> = ({ route, navigation }) => {
 
         {/* Payment Methods */}
         <View style={styles.paymentSection}>
-          <Text style={[styles.sectionTitle, { paddingHorizontal: theme.spacing.lg, marginBottom: theme.spacing.md }]}>Moyens de paiement acceptés</Text>
+          <Typography variant="h4" weight="bold" style={{ paddingHorizontal: theme.spacing.lg, marginBottom: theme.spacing.md }}>
+            Moyens de paiement acceptés
+          </Typography>
           <View style={[styles.paymentMethods, { paddingHorizontal: theme.spacing.lg }]}>
             <View style={styles.paymentCard}>
               <Ionicons name="card" size={24} color={theme.colors.primary[500]} />
-              <Text style={styles.paymentText}>Carte bancaire</Text>
+              <Typography variant="caption" weight="medium" style={{ fontSize: 11, textAlign: 'center' }}>
+                Carte bancaire
+              </Typography>
             </View>
             <View style={styles.paymentCard}>
               <Ionicons name="cash" size={24} color={theme.colors.success[500]} />
-              <Text style={styles.paymentText}>Espèces</Text>
+              <Typography variant="caption" weight="medium" style={{ fontSize: 11, textAlign: 'center' }}>
+                Espèces
+              </Typography>
             </View>
             <View style={styles.paymentCard}>
               <Ionicons name="phone-portrait" size={24} color={theme.colors.primary[500]} />
-              <Text style={styles.paymentText}>Mobile Money</Text>
+              <Typography variant="caption" weight="medium" style={{ fontSize: 11, textAlign: 'center' }}>
+                Mobile Money
+              </Typography>
             </View>
           </View>
-        </View>
+            </View>
+          </View>
+        )}
+
+        {/* Tab Content - Reviews */}
+        {activeTab === 'reviews' && (
+          <View style={styles.reviewsContainer}>
+            <Typography variant="h4" weight="bold" style={{ paddingHorizontal: theme.spacing.lg, marginBottom: theme.spacing.md }}>
+              Avis clients
+            </Typography>
+            <View style={{ paddingHorizontal: theme.spacing.lg }}>
+              <View style={[styles.emptyProducts, { marginTop: theme.spacing.xl }]}>
+                <Ionicons name="star-outline" size={64} color={theme.colors.neutral[300]} />
+                <Typography variant="h4" weight="bold" style={{ marginTop: theme.spacing.lg, marginBottom: theme.spacing.sm }}>
+                  Aucun avis pour le moment
+                </Typography>
+                <Typography variant="body" color="secondary" style={{ textAlign: 'center', lineHeight: 20 }}>
+                  Les avis clients seront bientôt disponibles.{'\n'}Consultez les informations et produits du marchand !
+                </Typography>
+              </View>
+            </View>
+          </View>
+        )}
 
         <View style={{ height: 100 }} />
       </ScrollView>
 
       {/* Bottom Contact Bar */}
       <View style={styles.bottomBar}>
-        <TouchableOpacity style={styles.callButton}>
-          <Ionicons name="call" size={20} color={theme.colors.textInverse} />
-          <Text style={styles.callButtonText}>Appeler</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.messageButton}>
-          <Ionicons name="chatbubble" size={20} color={theme.colors.primary[500]} />
-          <Text style={styles.messageButtonText}>Message</Text>
-        </TouchableOpacity>
+        <Button
+          variant="primary"
+          size="md"
+          onPress={handleCall}
+          leftIcon={<Ionicons name="call" size={20} color={theme.colors.textInverse} />}
+          style={{ flex: 1 }}
+        >
+          Appeler
+        </Button>
+        <Button
+          variant="secondary"
+          size="md"
+          onPress={handleMessage}
+          leftIcon={<Ionicons name="chatbubble" size={20} color={theme.colors.primary[500]} />}
+          style={{ flex: 1 }}
+        >
+          Message
+        </Button>
       </View>
     </View>
   )
@@ -281,19 +463,6 @@ const createStyles = (theme: ReturnType<typeof useTheme>) => StyleSheet.create({
     backgroundColor: theme.colors.neutral[200],
     justifyContent: 'center',
     alignItems: 'center',
-  },
-  mapText: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: theme.colors.text,
-    marginTop: theme.spacing.sm,
-  },
-  mapSubtext: {
-    fontSize: 13,
-    color: theme.colors.textSecondary,
-    marginTop: 4,
-    textAlign: 'center',
-    paddingHorizontal: theme.spacing.lg,
   },
   headerButtons: {
     position: 'absolute',
@@ -344,33 +513,6 @@ const createStyles = (theme: ReturnType<typeof useTheme>) => StyleSheet.create({
   merchantInfo: {
     flex: 1,
   },
-  merchantName: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: theme.colors.text,
-    marginBottom: 4,
-  },
-  ratingRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-  },
-  ratingText: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: theme.colors.text,
-  },
-  ordersText: {
-    fontSize: 14,
-    color: theme.colors.textSecondary,
-    marginLeft: 4,
-  },
-  description: {
-    fontSize: 14,
-    color: theme.colors.textSecondary,
-    lineHeight: 20,
-    marginBottom: theme.spacing.md,
-  },
   infoPills: {
     flexDirection: 'row',
     flexWrap: 'wrap',
@@ -385,11 +527,6 @@ const createStyles = (theme: ReturnType<typeof useTheme>) => StyleSheet.create({
     borderRadius: theme.radius.full,
     gap: 6,
   },
-  pillText: {
-    fontSize: 13,
-    color: theme.colors.text,
-    fontWeight: '500',
-  },
   productsSection: {
     marginTop: theme.spacing.lg,
   },
@@ -400,42 +537,14 @@ const createStyles = (theme: ReturnType<typeof useTheme>) => StyleSheet.create({
     paddingHorizontal: theme.spacing.lg,
     marginBottom: theme.spacing.md,
   },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: theme.colors.text,
-  },
-  productCountBadge: {
-    backgroundColor: theme.colors.primary[100],
-    paddingHorizontal: theme.spacing.md,
-    paddingVertical: 6,
-    borderRadius: theme.radius.full,
-  },
-  productCountText: {
-    fontSize: 12,
-    color: theme.colors.primary[700],
-    fontWeight: '600',
-  },
   emptyProducts: {
     paddingHorizontal: theme.spacing.lg,
     paddingVertical: theme.spacing.xl,
     alignItems: 'center',
   },
-  emptyProductsText: {
-    fontSize: 14,
-    color: theme.colors.textSecondary,
-    textAlign: 'center',
-  },
   productsScroll: {
     paddingHorizontal: theme.spacing.lg,
     gap: theme.spacing.md,
-  },
-  productCard: {
-    width: 160,
-    backgroundColor: theme.colors.surface.light,
-    borderRadius: theme.radius.xl,
-    overflow: 'hidden',
-    ...theme.shadows.sm,
   },
   productImage: {
     width: '100%',
@@ -446,30 +555,9 @@ const createStyles = (theme: ReturnType<typeof useTheme>) => StyleSheet.create({
     top: theme.spacing.sm,
     left: theme.spacing.sm,
     right: theme.spacing.sm,
-    backgroundColor: theme.colors.error,
-    paddingVertical: 6,
-    paddingHorizontal: theme.spacing.sm,
-    borderRadius: theme.radius.md,
-  },
-  soldOutText: {
-    color: theme.colors.textInverse,
-    fontSize: 11,
-    fontWeight: '600',
-    textAlign: 'center',
   },
   productCardInfo: {
     padding: theme.spacing.sm,
-  },
-  productCardName: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: theme.colors.text,
-    marginBottom: 4,
-  },
-  productCardPrice: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: theme.colors.primary[500],
   },
   addressSection: {
     marginTop: theme.spacing.lg,
@@ -484,16 +572,6 @@ const createStyles = (theme: ReturnType<typeof useTheme>) => StyleSheet.create({
   },
   addressInfo: {
     flex: 1,
-  },
-  addressText: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: theme.colors.text,
-    marginBottom: 4,
-  },
-  cityText: {
-    fontSize: 13,
-    color: theme.colors.textSecondary,
   },
   directionButton: {
     width: 40,
@@ -518,12 +596,6 @@ const createStyles = (theme: ReturnType<typeof useTheme>) => StyleSheet.create({
     alignItems: 'center',
     gap: theme.spacing.xs,
   },
-  paymentText: {
-    fontSize: 11,
-    color: theme.colors.text,
-    textAlign: 'center',
-    fontWeight: '500',
-  },
   bottomBar: {
     flexDirection: 'row',
     padding: theme.spacing.lg,
@@ -532,35 +604,30 @@ const createStyles = (theme: ReturnType<typeof useTheme>) => StyleSheet.create({
     borderTopColor: theme.colors.border,
     backgroundColor: theme.colors.surface.light,
   },
-  callButton: {
+  tabsContainer: {
+    flexDirection: 'row',
+    backgroundColor: theme.colors.surface.light,
+    marginHorizontal: theme.spacing.lg,
+    marginTop: theme.spacing.lg,
+    borderRadius: theme.radius.xl,
+    padding: 4,
+    gap: 4,
+  },
+  tab: {
     flex: 1,
     flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: theme.spacing.sm,
+    paddingHorizontal: theme.spacing.xs,
+    borderRadius: theme.radius.lg,
+    gap: 6,
+  },
+  tabActive: {
     backgroundColor: theme.colors.primary[500],
-    paddingVertical: theme.spacing.md,
-    borderRadius: theme.radius.xl,
-    justifyContent: 'center',
-    alignItems: 'center',
-    gap: theme.spacing.sm,
   },
-  callButtonText: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: theme.colors.textInverse,
-  },
-  messageButton: {
-    flex: 1,
-    flexDirection: 'row',
-    backgroundColor: theme.colors.primary[100],
-    paddingVertical: theme.spacing.md,
-    borderRadius: theme.radius.xl,
-    justifyContent: 'center',
-    alignItems: 'center',
-    gap: theme.spacing.sm,
-  },
-  messageButtonText: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: theme.colors.primary[500],
+  reviewsContainer: {
+    marginTop: theme.spacing.lg,
   },
 })
 

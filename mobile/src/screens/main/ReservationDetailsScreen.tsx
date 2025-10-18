@@ -196,7 +196,7 @@ const ReservationDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
             <View style={styles.timelineContent}>
               <Typography variant="body" weight="semibold">Réservation créée</Typography>
               <Typography variant="caption" color="secondary">
-                {new Date(reservation.created_at).toLocaleDateString('fr-FR', {
+                {new Date(reservation.created_at || new Date()).toLocaleDateString('fr-FR', {
                   day: 'numeric',
                   month: 'long',
                   hour: '2-digit',
