@@ -299,6 +299,12 @@ const router = createRouter({
       path: '/:pathMatch(.*)*',
       name: 'not-found',
       component: () => import('@/views/NotFoundView2025.vue')
+    },
+    {
+      path: '/products/:productId/reviews/add',
+      name: 'ReviewAdd',
+      component: () => import('@/views/ReviewAddView.vue'),
+      meta: { requiresAuth: true }
     }
   ]
 })
