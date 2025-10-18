@@ -100,18 +100,22 @@ const ProductsScreen: React.FC<Props> = ({ navigation }) => {
 
   const loadData = async () => {
     try {
-      // TOUJOURS charger les catégories (pour la barre de filtres)
-      await dispatch(fetchCategories())
-
+      // Charger les catégories ET les données en parallèle (comme HomeScreen)
       if (contentMode === 'merchants') {
-        await dispatch(fetchMerchants())
+        await Promise.all([
+          dispatch(fetchCategories()),
+          dispatch(fetchMerchants())
+        ])
       } else {
-        await dispatch(fetchProducts({ per_page: 100 }))
+        await Promise.all([
+          dispatch(fetchCategories()),
+          dispatch(fetchProducts({ per_page: 100 }))
+        ])
       }
 
-      console.log('Categories loaded:', categories.length)
+      console.log('✅ Data loaded - Categories:', categories.length, 'Products:', products.length, 'Merchants:', merchants.length)
     } catch (error) {
-      console.error('Error loading data:', error)
+      console.error('❌ Error loading data:', error)
     }
   }
 
