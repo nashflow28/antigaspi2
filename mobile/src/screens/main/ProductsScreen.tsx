@@ -548,10 +548,13 @@ const createStyles = (theme: ReturnType<typeof useTheme>) => StyleSheet.create({
   categoriesScroll: {
     marginTop: theme.spacing.sm,
     marginBottom: theme.spacing.xs,
+    maxHeight: 50, // FIX: Hauteur fixe pour éviter que les chips soient coupés
+    height: 50, // FIX: Hauteur fixe pour le conteneur
   },
   categoriesContent: {
     paddingHorizontal: theme.spacing.md,
     paddingRight: theme.spacing.lg,
+    alignItems: 'center', // FIX: Centre verticalement les chips
   },
   categoryChip: {
     flexDirection: 'row',
@@ -565,6 +568,8 @@ const createStyles = (theme: ReturnType<typeof useTheme>) => StyleSheet.create({
     borderWidth: 1,
     borderColor: theme.colors.border,
     minHeight: 32,
+    height: 32, // FIX: Hauteur fixe pour éviter la déformation
+    maxHeight: 32, // FIX: Hauteur maximale pour empêcher l'expansion
   },
   categoryEmoji: {
     fontSize: 14,
