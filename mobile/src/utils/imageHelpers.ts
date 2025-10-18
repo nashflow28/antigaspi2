@@ -1,13 +1,18 @@
 import { API_BASE_URL } from '../services/api'
 
 /**
- * Build full image URL from relative path
+ * Build full image URL from relative path with category-aware fallback
  * @param imageUrl - Relative or absolute image URL
- * @returns Full image URL or placeholder
+ * @param categoryName - Optional category name for smart placeholder
+ * @returns Full image URL or category-specific placeholder
  */
-export const getImageUrl = (imageUrl: string | null | undefined): string => {
+export const getImageUrl = (
+  imageUrl: string | null | undefined,
+  categoryName?: string
+): string => {
+  // If no image, return category-specific placeholder
   if (!imageUrl) {
-    return 'https://via.placeholder.com/400'
+    return getCategoryPlaceholder(categoryName)
   }
 
   // If already a full URL, return as is

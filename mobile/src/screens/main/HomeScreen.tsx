@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   StatusBar,
   RefreshControl,
+  Alert,
 } from 'react-native'
 import { useDispatch, useSelector } from 'react-redux'
 import { AppDispatch, RootState } from '../../store'
@@ -17,6 +18,10 @@ import { Image } from 'expo-image'
 import { useTheme } from '../../theme'
 import { Product } from '../../types'
 import { getImageUrl } from '../../utils/imageHelpers'
+import { formatCurrency } from '../../utils/currencyHelpers'
+import FavoriteButton from '../../components/FavoriteButton'
+import locationService, { UserLocation } from '../../services/locationService'
+import { Button, Card, Badge, Typography } from '../../components/2025'
 
 interface Props {
   navigation: any
@@ -33,15 +38,37 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
   const [selectedCategory, setSelectedCategory] = useState<string>('all')
   const [showAvailable, setShowAvailable] = useState(true)
   const [maxDistance, setMaxDistance] = useState(10)
+  const [userLocation, setUserLocation] = useState<UserLocation | null>(null)
+  const [distanceEnabled, setDistanceEnabled] = useState(false)
+  const [locationPermissionGranted, setLocationPermissionGranted] = useState(false)
 
   useEffect(() => {
     loadData()
+    initLocation()
   }, [])
+
+  const initLocation = async () => {
+    try {
+      const hasPermission = await locationService.hasLocationPermission()
+      if (hasPermission) {
+        setLocationPermissionGranted(true)
+        const position = await locationService.getCurrentPosition()
+        if (position) {
+          setUserLocation(position)
+        }
+      } else {
+        // Demander permission au premier usage du filtre distance
+        setLocationPermissionGranted(false)
+      }
+    } catch (error) {
+      console.error('Erreur initialisation géolocalisation:', error)
+    }
+  }
 
   const loadData = async () => {
     try {
       await Promise.all([
-        dispatch(fetchProducts({ per_page: 20 })),
+        dispatch(fetchProducts({ per_page: 100 })),
         dispatch(fetchCategories()),
       ])
     } catch (error) {
@@ -69,8 +96,8 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
     }
   }
 
-  // Filtrage des produits selon catégorie et disponibilité
-  const filteredProducts = products.filter(product => {
+  // Filtrage des produits selon catégorie, disponibilité et distance
+  const filteredProducts = (products || []).filter(product => {
     // Filtre par catégorie
     if (selectedCategory !== 'all' && product.category.id !== parseInt(selectedCategory)) {
       return false
@@ -81,8 +108,41 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
       return false
     }
 
+    // Filtre par distance (si activé et position utilisateur disponible)
+    if (distanceEnabled && userLocation && product.merchant) {
+      const { latitude, longitude } = product.merchant
+      if (latitude != null && longitude != null) {
+        const distanceResult = locationService.calculateDistance(
+          userLocation.latitude,
+          userLocation.longitude,
+          latitude,
+          longitude
+        )
+        if (distanceResult.distance > maxDistance) {
+          return false
+        }
+      }
+    }
+
     return true
   })
+
+  // Tri des produits par distance si filtre distance actif
+  const sortedProducts = distanceEnabled && userLocation
+    ? [...filteredProducts].sort((a, b) => {
+        const distA = locationService.calculateDistanceFromUser(
+          userLocation,
+          a.merchant?.latitude || null,
+          a.merchant?.longitude || null
+        )
+        const distB = locationService.calculateDistanceFromUser(
+          userLocation,
+          b.merchant?.latitude || null,
+          b.merchant?.longitude || null
+        )
+        return (distA?.distance || Infinity) - (distB?.distance || Infinity)
+      })
+    : filteredProducts
 
   // Mapping des emojis par catégorie
   const getCategoryEmoji = (categoryName: string) => {
@@ -107,89 +167,165 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
         onPress={() => setSelectedCategory(id)}
       >
         <Text style={styles.categoryEmoji}>{emoji}</Text>
-        <Text
-          style={[
-            styles.categoryText,
-            isActive && { color: theme.colors.textInverse }
-          ]}
+        <Typography
+          variant="caption"
+          weight="medium"
+          style={{
+            maxWidth: 120,
+            ...(isActive && { color: theme.colors.textInverse })
+          }}
           numberOfLines={1}
           ellipsizeMode="tail"
         >
           {name}
-        </Text>
+        </Typography>
       </TouchableOpacity>
     )
   }
 
+  const handleDistanceFilterPress = async () => {
+    if (!locationPermissionGranted) {
+      // Demander permission
+      Alert.alert(
+        'Autorisation requise',
+        'Antigaspi a besoin d\'accéder à votre position pour afficher les produits proches de vous.',
+        [
+          { text: 'Annuler', style: 'cancel' },
+          {
+            text: 'Autoriser',
+            onPress: async () => {
+              const granted = await locationService.requestLocationPermission()
+              if (granted) {
+                setLocationPermissionGranted(true)
+                const position = await locationService.getCurrentPosition()
+                if (position) {
+                  setUserLocation(position)
+                  setDistanceEnabled(true)
+                } else {
+                  showError('Impossible de récupérer votre position')
+                }
+              } else {
+                showError('Permission de localisation refusée')
+              }
+            },
+          },
+        ]
+      )
+      return
+    }
+
+    if (!distanceEnabled) {
+      // Activer le filtre distance avec la distance actuelle
+      setDistanceEnabled(true)
+    } else {
+      // Changer la distance ou désactiver
+      Alert.alert(
+        'Filtre distance',
+        'Choisissez une distance maximum',
+        [
+          { text: '< 5 km', onPress: () => setMaxDistance(5) },
+          { text: '< 10 km', onPress: () => setMaxDistance(10) },
+          { text: '< 20 km', onPress: () => setMaxDistance(20) },
+          { text: 'Désactiver', style: 'destructive', onPress: () => setDistanceEnabled(false) },
+          { text: 'Annuler', style: 'cancel' },
+        ]
+      )
+    }
+  }
+
   const renderProductCard = (product: Product) => {
     const timeSlot = getTimeSlot(product)
-    const discountedPrice = Math.round(parseFloat(product.discounted_price))
-    const originalPrice = Math.round(parseFloat(product.original_price))
+    const discountedPrice = Math.round(parseFloat(product.discounted_price) || 0)
+    const originalPrice = Math.round(parseFloat(product.original_price) || 0)
 
     // Calcul du discount en pourcentage
     const discountPercent = Math.round(((originalPrice - discountedPrice) / originalPrice) * 100)
 
+    // Calcul de la distance si position utilisateur disponible
+    const distanceInfo = locationService.calculateDistanceFromUser(
+      userLocation,
+      product.merchant?.latitude || null,
+      product.merchant?.longitude || null
+    )
+
     return (
       <TouchableOpacity
         key={product.id}
-        style={styles.productCard}
         onPress={() => navigation.navigate('ProductDetails', { productId: product.id })}
       >
-        {/* Badge horaire */}
-        <View style={[styles.timeBadge, { backgroundColor: timeSlot.color }]}>
-          <Text style={styles.timeBadgeText}>{timeSlot.text}</Text>
-        </View>
-
-        {/* Image */}
-        <View style={styles.imageContainer}>
-          <Image
-            source={{ uri: getImageUrl(product.image_url) }}
-            style={styles.productImage}
-            contentFit="cover"
-            transition={200}
-          />
-
-          {/* Badge panier */}
-          <View style={styles.cartBadge}>
-            <Ionicons name="cart" size={16} color={theme.colors.textInverse} />
-            <Text style={styles.cartBadgeText}>{product.quantity_available}</Text>
+        <Card variant="elevated" style={{ marginBottom: theme.spacing.lg, overflow: 'hidden' }}>
+          {/* Badge horaire */}
+          <View style={styles.timeBadge}>
+            <Badge variant="primary" size="sm" style={{ backgroundColor: timeSlot.color }}>
+              {timeSlot.text}
+            </Badge>
           </View>
 
-          {/* Badge discount */}
-          {discountPercent > 0 && (
-            <View style={styles.discountBadge}>
-              <Text style={styles.discountText}>-{discountPercent}%</Text>
+          {/* Image */}
+          <View style={styles.imageContainer}>
+            <Image
+              source={{ uri: getImageUrl(product.image_url, product.category?.name) }}
+              style={styles.productImage}
+              contentFit="cover"
+              transition={200}
+            />
+
+            {/* Badge panier (quantity) */}
+            <View style={styles.cartBadge}>
+              <Ionicons name="cart" size={16} color={theme.colors.text} />
+              <Typography variant="caption" weight="semibold" style={{ marginLeft: 4 }}>
+                {product.quantity_available}
+              </Typography>
             </View>
-          )}
-        </View>
 
-        {/* Info produit */}
-        <View style={styles.productInfo}>
-          <Text style={styles.productName} numberOfLines={1}>
-            {product.name}
-          </Text>
-          <Text style={styles.merchantName} numberOfLines={1}>
-            {product.merchant.business_name}
-          </Text>
+            {/* Badge discount */}
+            {discountPercent > 0 && (
+              <View style={styles.discountBadge}>
+                <Badge variant="error" size="sm">
+                  -{discountPercent}%
+                </Badge>
+              </View>
+            )}
 
-          <View style={styles.ratingRow}>
-            <Ionicons name="star" size={14} color={theme.colors.primary[500]} />
-            <Text style={styles.ratingText}>
-              {product.merchant.business_name.includes('Boulangerie') ? '4.8' : '4.5'}
-            </Text>
-            <Text style={styles.reviewsText}>
-              ({Math.floor(Math.random() * 50) + 20})
-            </Text>
-            <Text style={styles.locationText} numberOfLines={1}>
-              {product.merchant.city}
-            </Text>
+            {/* Bouton Favoris */}
+            <View style={styles.favoriteButton}>
+              <FavoriteButton productId={product.id} size={22} />
+            </View>
           </View>
 
-          <View style={styles.priceRow}>
-            <Text style={styles.currentPrice}>{discountedPrice} F CFA</Text>
-            <Text style={styles.originalPriceStrike}>{originalPrice} F CFA</Text>
+          {/* Info produit */}
+          <View style={styles.productInfo}>
+            <Typography variant="body" weight="semibold" numberOfLines={1} style={{ marginBottom: theme.spacing.xs }}>
+              {product.name}
+            </Typography>
+            <Typography variant="caption" color="secondary" numberOfLines={1} style={{ marginBottom: theme.spacing.xs }}>
+              {product.merchant.business_name}
+            </Typography>
+
+            {/* Location info */}
+            {distanceInfo ? (
+              <View style={[styles.distanceBadge, { marginBottom: theme.spacing.sm }]}>
+                <Ionicons name="location" size={12} color={theme.colors.primary[600]} />
+                <Typography variant="caption" weight="semibold" color="primary" style={{ marginLeft: 4 }}>
+                  {distanceInfo.formatted}
+                </Typography>
+              </View>
+            ) : (
+              <Typography variant="caption" color="secondary" numberOfLines={1} style={{ marginBottom: theme.spacing.sm }}>
+                📍 {product.merchant.city}
+              </Typography>
+            )}
+
+            <View style={styles.priceRow}>
+              <Typography variant="h3" weight="bold" color="primary">
+                {formatCurrency(discountedPrice)}
+              </Typography>
+              <Typography variant="body" color="tertiary" style={{ textDecorationLine: 'line-through' }}>
+                {formatCurrency(originalPrice)}
+              </Typography>
+            </View>
           </View>
-        </View>
+        </Card>
       </TouchableOpacity>
     )
   }
@@ -209,11 +345,13 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
         {/* Header */}
         <View style={styles.header}>
           <View>
-            <Text style={styles.greeting}>Bonjour {user?.first_name || 'Invité'}</Text>
+            <Typography variant="h2" weight="bold" color="primary" style={{ marginBottom: theme.spacing.xs }}>
+              Bonjour {user?.first_name || 'Invité'}
+            </Typography>
             <View style={styles.locationRow}>
-              <Text style={styles.locationQuestion}>Qu'allons-nous sauver au </Text>
-              <Text style={styles.locationName}>Togo</Text>
-              <Text style={styles.locationQuestion}> ?</Text>
+              <Typography variant="body" color="secondary">Qu'allons-nous sauver au </Typography>
+              <Typography variant="body" weight="semibold" color="primary">Togo</Typography>
+              <Typography variant="body" color="secondary"> ?</Typography>
             </View>
           </View>
           <TouchableOpacity style={styles.refreshButton} onPress={onRefresh}>
@@ -228,14 +366,20 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
           style={styles.categoriesScroll}
           contentContainerStyle={styles.categoriesContent}
         >
-          {renderCategoryItem('all', 'Tous', '🛍️')}
-          {categories.map(category =>
-            renderCategoryItem(
+          {renderCategoryItem('all', `Tous (${products?.length || 0})`, '🛍️')}
+          {categories && Array.isArray(categories) && categories.map(category => {
+            // Compter produits par catégorie (avec filtre disponibilité)
+            const categoryProductCount = (products || []).filter(
+              p => p.category.id === category.id &&
+              (showAvailable ? p.quantity_available > 0 : true)
+            ).length
+
+            return renderCategoryItem(
               category.id.toString(),
-              category.name,
+              `${category.name} (${categoryProductCount})`,
               getCategoryEmoji(category.name)
             )
-          )}
+          })}
         </ScrollView>
 
         {/* Filtres */}
@@ -244,9 +388,12 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
             style={[styles.filterChip, showAvailable && styles.filterChipActive]}
             onPress={() => setShowAvailable(!showAvailable)}
           >
-            <Text style={[styles.filterText, showAvailable && styles.filterTextActive]}>
+            <Typography
+              variant="caption"
+              style={{ color: showAvailable ? theme.colors.primary[700] : theme.colors.textSecondary, fontWeight: showAvailable ? '500' : '400' }}
+            >
               🏷️ Produits disponibles
-            </Text>
+            </Typography>
             <Ionicons
               name={showAvailable ? "toggle" : "toggle-outline"}
               size={24}
@@ -254,22 +401,47 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
             />
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.distanceFilter}>
-            <Ionicons name="location" size={16} color={theme.colors.primary[500]} />
-            <Text style={styles.distanceText}>{'< 10 km'}</Text>
-            <Ionicons name="toggle" size={24} color={theme.colors.neutral[300]} />
+          <TouchableOpacity
+            style={[
+              styles.distanceFilter,
+              distanceEnabled && styles.distanceFilterActive
+            ]}
+            onPress={handleDistanceFilterPress}
+          >
+            <Ionicons
+              name="location"
+              size={16}
+              color={distanceEnabled ? theme.colors.primary[600] : theme.colors.textSecondary}
+            />
+            <Typography
+              variant="caption"
+              weight="medium"
+              style={{ color: distanceEnabled ? theme.colors.primary[700] : theme.colors.textSecondary, fontWeight: distanceEnabled ? '600' : '500' }}
+            >
+              {`< ${maxDistance} km`}
+            </Typography>
+            <Ionicons
+              name={distanceEnabled ? "toggle" : "toggle-outline"}
+              size={24}
+              color={distanceEnabled ? theme.colors.primary[500] : theme.colors.neutral[300]}
+            />
           </TouchableOpacity>
         </View>
 
         {/* Compteur de résultats */}
-        {filteredProducts.length > 0 && (
+        {sortedProducts.length > 0 && (
           <View style={styles.resultsHeader}>
-            <Text style={styles.resultsText}>
-              {filteredProducts.length} produit{filteredProducts.length > 1 ? 's' : ''} trouvé{filteredProducts.length > 1 ? 's' : ''}
-            </Text>
-            {selectedCategory !== 'all' && (
-              <TouchableOpacity onPress={() => setSelectedCategory('all')}>
-                <Text style={styles.clearFilters}>Effacer les filtres</Text>
+            <Typography variant="body" weight="semibold">
+              {sortedProducts.length} produit{sortedProducts.length > 1 ? 's' : ''} trouvé{sortedProducts.length > 1 ? 's' : ''}
+            </Typography>
+            {(selectedCategory !== 'all' || distanceEnabled) && (
+              <TouchableOpacity onPress={() => {
+                setSelectedCategory('all')
+                setDistanceEnabled(false)
+              }}>
+                <Typography variant="caption" weight="medium" color="primary">
+                  Effacer les filtres
+                </Typography>
               </TouchableOpacity>
             )}
           </View>
@@ -277,15 +449,43 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
 
         {/* Produits */}
         <View style={styles.productsGrid}>
-          {filteredProducts.length > 0 ? (
-            filteredProducts.map(product => renderProductCard(product))
+          {sortedProducts.length > 0 ? (
+            sortedProducts.map(product => renderProductCard(product))
           ) : (
             <View style={styles.emptyState}>
               <Ionicons name="basket-outline" size={64} color={theme.colors.neutral[300]} />
-              <Text style={styles.emptyTitle}>Aucun produit disponible</Text>
-              <Text style={styles.emptyText}>
-                Essayez de changer les filtres ou revenez plus tard
-              </Text>
+              {selectedCategory === 'all' ? (
+                <>
+                  <Typography variant="h3" weight="bold" style={{ marginTop: theme.spacing.lg, marginBottom: theme.spacing.sm }}>
+                    Aucun produit disponible
+                  </Typography>
+                  <Typography variant="body" color="secondary" style={{ textAlign: 'center', lineHeight: 20 }}>
+                    {showAvailable
+                      ? "Aucun produit disponible actuellement.\nRevenez plus tard ou désactivez le filtre 'Produits disponibles'."
+                      : "Aucun produit dans la base de données.\nRevenez plus tard."}
+                  </Typography>
+                </>
+              ) : (
+                <>
+                  <Typography variant="h3" weight="bold" style={{ marginTop: theme.spacing.lg, marginBottom: theme.spacing.sm }}>
+                    Aucun produit dans cette catégorie
+                  </Typography>
+                  <Typography variant="body" color="secondary" style={{ textAlign: 'center', lineHeight: 20 }}>
+                    {showAvailable
+                      ? `Aucun produit disponible dans "${(categories || []).find(c => c.id.toString() === selectedCategory)?.name || 'cette catégorie'}".\nEssayez une autre catégorie ou désactivez le filtre disponibilité.`
+                      : `Aucun produit dans "${(categories || []).find(c => c.id.toString() === selectedCategory)?.name || 'cette catégorie'}".\nEssayez une autre catégorie.`}
+                  </Typography>
+                  <Button
+                    variant="primary"
+                    size="md"
+                    onPress={() => setSelectedCategory('all')}
+                    leftIcon={<Ionicons name="refresh" size={20} color={theme.colors.textInverse} />}
+                    style={{ marginTop: theme.spacing.lg }}
+                  >
+                    Voir tous les produits
+                  </Button>
+                </>
+              )}
             </View>
           )}
         </View>
@@ -310,24 +510,9 @@ const createStyles = (theme: ReturnType<typeof useTheme>) => StyleSheet.create({
     paddingTop: theme.spacing.xl,
     paddingBottom: theme.spacing.md,
   },
-  greeting: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    color: theme.colors.primary[500],
-    marginBottom: 4,
-  },
   locationRow: {
     flexDirection: 'row',
     alignItems: 'center',
-  },
-  locationQuestion: {
-    fontSize: 14,
-    color: theme.colors.textSecondary,
-  },
-  locationName: {
-    fontSize: 14,
-    color: theme.colors.primary[500],
-    fontWeight: '600',
   },
   refreshButton: {
     width: 48,
@@ -343,7 +528,7 @@ const createStyles = (theme: ReturnType<typeof useTheme>) => StyleSheet.create({
   },
   categoriesContent: {
     paddingHorizontal: theme.spacing.lg,
-    paddingRight: theme.spacing.xl, // Padding final pour indiquer qu'on peut scroller
+    paddingRight: theme.spacing.xl,
   },
   categoryItem: {
     flexDirection: 'row',
@@ -351,22 +536,16 @@ const createStyles = (theme: ReturnType<typeof useTheme>) => StyleSheet.create({
     justifyContent: 'center',
     paddingHorizontal: 16,
     paddingVertical: 10,
-    marginRight: theme.spacing.md, // Espacement entre chips
+    marginRight: theme.spacing.md,
     borderRadius: theme.radius.full,
     backgroundColor: theme.colors.surface.light,
     borderWidth: 1,
     borderColor: theme.colors.border,
-    minHeight: 40, // Hauteur minimale pour éviter la compression
+    minHeight: 40,
   },
   categoryEmoji: {
     fontSize: 20,
     marginRight: 6,
-  },
-  categoryText: {
-    fontSize: 14,
-    color: theme.colors.text,
-    fontWeight: '500',
-    maxWidth: 120, // Largeur max pour éviter les chips trop larges
   },
   filtersRow: {
     flexDirection: 'row',
@@ -390,14 +569,6 @@ const createStyles = (theme: ReturnType<typeof useTheme>) => StyleSheet.create({
     backgroundColor: theme.colors.primary[50],
     borderColor: theme.colors.primary[200],
   },
-  filterText: {
-    fontSize: 13,
-    color: theme.colors.textSecondary,
-  },
-  filterTextActive: {
-    color: theme.colors.primary[700],
-    fontWeight: '500',
-  },
   distanceFilter: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -405,12 +576,23 @@ const createStyles = (theme: ReturnType<typeof useTheme>) => StyleSheet.create({
     paddingVertical: theme.spacing.sm,
     borderRadius: theme.radius.lg,
     backgroundColor: theme.colors.surface.light,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
     gap: 4,
   },
-  distanceText: {
-    fontSize: 13,
-    color: theme.colors.text,
-    fontWeight: '500',
+  distanceFilterActive: {
+    backgroundColor: theme.colors.primary[50],
+    borderColor: theme.colors.primary[200],
+  },
+  distanceBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: theme.colors.primary[50],
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: theme.radius.md,
+    gap: 4,
+    marginLeft: 'auto',
   },
   resultsHeader: {
     flexDirection: 'row',
@@ -419,57 +601,22 @@ const createStyles = (theme: ReturnType<typeof useTheme>) => StyleSheet.create({
     paddingHorizontal: theme.spacing.lg,
     paddingVertical: theme.spacing.sm,
   },
-  resultsText: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: theme.colors.text,
-  },
-  clearFilters: {
-    fontSize: 13,
-    color: theme.colors.primary[500],
-    fontWeight: '500',
-  },
   productsGrid: {
     paddingHorizontal: theme.spacing.lg,
     paddingBottom: theme.spacing.xl,
-  },
-  productCard: {
-    backgroundColor: theme.colors.surface.light,
-    borderRadius: theme.radius.xl,
-    marginBottom: theme.spacing.lg,
-    overflow: 'hidden',
-    ...theme.shadows.md,
   },
   timeBadge: {
     position: 'absolute',
     top: theme.spacing.md,
     left: theme.spacing.md,
     maxWidth: '35%',
-    paddingVertical: theme.spacing.xs,
-    paddingHorizontal: theme.spacing.md,
-    borderRadius: theme.radius.full,
     zIndex: 1,
-  },
-  timeBadgeText: {
-    color: theme.colors.textInverse,
-    fontSize: 12,
-    fontWeight: '600',
-    textAlign: 'center',
   },
   discountBadge: {
     position: 'absolute',
     bottom: theme.spacing.md,
     right: theme.spacing.md,
-    backgroundColor: theme.colors.error,
-    paddingVertical: 6,
-    paddingHorizontal: theme.spacing.sm,
-    borderRadius: theme.radius.md,
     zIndex: 2,
-  },
-  discountText: {
-    color: theme.colors.textInverse,
-    fontSize: 12,
-    fontWeight: 'bold',
   },
   imageContainer: {
     position: 'relative',
@@ -492,79 +639,25 @@ const createStyles = (theme: ReturnType<typeof useTheme>) => StyleSheet.create({
     borderRadius: theme.radius.md,
     gap: 4,
   },
-  cartBadgeText: {
-    color: theme.colors.text,
-    fontSize: 14,
-    fontWeight: '600',
+  favoriteButton: {
+    position: 'absolute',
+    top: theme.spacing.md,
+    right: theme.spacing.md,
+    zIndex: 3,
   },
   productInfo: {
     padding: theme.spacing.md,
-  },
-  productName: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: theme.colors.text,
-    marginBottom: 4,
-  },
-  merchantName: {
-    fontSize: 13,
-    color: theme.colors.textSecondary,
-    marginBottom: theme.spacing.xs,
-  },
-  ratingRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: theme.spacing.sm,
-    gap: 4,
-  },
-  ratingText: {
-    fontSize: 13,
-    fontWeight: '600',
-    color: theme.colors.text,
-  },
-  reviewsText: {
-    fontSize: 13,
-    color: theme.colors.textSecondary,
-    marginRight: theme.spacing.sm,
-  },
-  locationText: {
-    fontSize: 13,
-    color: theme.colors.textSecondary,
-    flex: 1,
   },
   priceRow: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: theme.spacing.sm,
   },
-  currentPrice: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: theme.colors.primary[500],
-  },
-  originalPriceStrike: {
-    fontSize: 16,
-    color: theme.colors.textTertiary,
-    textDecorationLine: 'line-through',
-  },
   emptyState: {
     alignItems: 'center',
     justifyContent: 'center',
     paddingVertical: theme.spacing['3xl'],
     paddingHorizontal: theme.spacing.xl,
-  },
-  emptyTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: theme.colors.text,
-    marginTop: theme.spacing.lg,
-    marginBottom: theme.spacing.sm,
-  },
-  emptyText: {
-    fontSize: 14,
-    color: theme.colors.textSecondary,
-    textAlign: 'center',
-    lineHeight: 20,
   },
 })
 

@@ -19,9 +19,6 @@ import { useTheme } from '../../theme'
 import { getImageUrl } from '../../utils/imageHelpers'
 import { formatCurrency } from '../../utils/currencyHelpers'
 import FavoriteButton from '../../components/FavoriteButton'
-import MerchantCard from '../../components/merchants/MerchantCard'
-import MerchantsSkeleton from '../../components/merchants/MerchantsSkeleton'
-import MerchantsEmptyState from '../../components/merchants/MerchantsEmptyState'
 import { Product } from '../../types'
 import { Button, Card, Badge, Typography } from '../../components/2025'
 
@@ -151,10 +148,61 @@ const ProductsScreen: React.FC<Props> = ({ navigation }) => {
 
   const renderMerchantCard = (merchant: any) => {
     return (
-      <MerchantCard
-        merchant={merchant}
-        onPress={() => navigation.navigate('MerchantDetail', { merchantId: merchant.id })}
-      />
+      <TouchableOpacity
+        onPress={() => {
+          // Navigate to merchant detail
+          navigation.navigate('MerchantDetail', { merchantId: merchant.id })
+        }}
+      >
+        <Card variant="elevated" style={{ marginBottom: theme.spacing.md, flexDirection: 'row', overflow: 'hidden' }}>
+          {/* Image emoji du commerce */}
+          <View style={styles.merchantImagePlaceholder}>
+            <Text style={styles.merchantEmoji}>{getMerchantEmoji(merchant.business_type)}</Text>
+          </View>
+
+          {/* Badge nombre de produits */}
+          {merchant.products_count > 0 && (
+            <View style={styles.productCountBadge}>
+              <Badge variant="primary" size="sm" style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+                <Ionicons name="basket" size={14} color={theme.colors.textInverse} />
+                <Typography variant="caption" weight="bold" style={{ color: theme.colors.textInverse }}>
+                  {merchant.products_count}
+                </Typography>
+              </Badge>
+            </View>
+          )}
+
+          {/* Badge vérifié */}
+          {merchant.is_verified && (
+            <View style={styles.verifiedBadge}>
+              <Ionicons name="checkmark-circle" size={16} color={theme.colors.success[500]} />
+            </View>
+          )}
+
+          <View style={styles.merchantInfo}>
+            <Typography variant="body" weight="semibold" numberOfLines={1} style={{ marginBottom: theme.spacing.xs }}>
+              {merchant.business_name}
+            </Typography>
+
+            <Typography variant="caption" color="secondary" style={{ marginBottom: theme.spacing.xs }}>
+              {merchant.business_type}
+            </Typography>
+
+            <View style={styles.locationRow}>
+              <Ionicons name="location" size={14} color={theme.colors.textSecondary} />
+              <Typography variant="caption" color="secondary" numberOfLines={1} style={{ marginLeft: 4, flex: 1 }}>
+                {merchant.user.city}
+              </Typography>
+            </View>
+
+            {merchant.products_count > 0 && (
+              <Typography variant="caption" weight="medium" color="primary" style={{ marginTop: theme.spacing.xs }}>
+                {merchant.products_count} produit{merchant.products_count > 1 ? 's' : ''} disponible{merchant.products_count > 1 ? 's' : ''}
+              </Typography>
+            )}
+          </View>
+        </Card>
+      </TouchableOpacity>
     )
   }
 
@@ -172,7 +220,7 @@ const ProductsScreen: React.FC<Props> = ({ navigation }) => {
           {/* Image Container */}
           <View style={styles.productImageContainer}>
             <Image
-              source={{ uri: getImageUrl(product.image_url) }}
+              source={{ uri: getImageUrl(product.image_url, product.category?.name) }}
               style={styles.productImage}
               contentFit="cover"
               transition={200}
@@ -359,9 +407,7 @@ const ProductsScreen: React.FC<Props> = ({ navigation }) => {
       {/* Liste conditionnelle selon mode */}
       {contentMode === 'merchants' ? (
         // Mode Marchands
-        merchantsLoading && filteredMerchants.length === 0 ? (
-          <MerchantsSkeleton />
-        ) : filteredMerchants.length > 0 ? (
+        filteredMerchants.length > 0 ? (
           <FlatList
             data={filteredMerchants}
             renderItem={({ item }) => renderMerchantCard(item)}
@@ -372,14 +418,29 @@ const ProductsScreen: React.FC<Props> = ({ navigation }) => {
             }
           />
         ) : (
-          <MerchantsEmptyState
-            searchQuery={searchQuery}
-            onRetry={() => {
-              setSelectedCategory('all')
-              setSearchQuery('')
-              loadData()
-            }}
-          />
+          <View style={styles.emptyState}>
+            <Ionicons name="storefront-outline" size={64} color={theme.colors.neutral[300]} />
+            <Typography variant="h3" weight="bold" style={{ marginTop: theme.spacing.lg, marginBottom: theme.spacing.sm }}>
+              Aucune boutique trouvée
+            </Typography>
+            <Typography variant="body" color="secondary" style={{ textAlign: 'center', lineHeight: 20, marginBottom: theme.spacing.lg }}>
+              {searchQuery.trim()
+                ? `Aucun résultat pour "${searchQuery}"`
+                : 'Essayez de changer les filtres ou revenez plus tard'}
+            </Typography>
+            {(selectedCategory !== 'all' || searchQuery.trim()) && (
+              <Button
+                variant="primary"
+                size="md"
+                onPress={() => {
+                  setSelectedCategory('all')
+                  setSearchQuery('')
+                }}
+              >
+                Réinitialiser les filtres
+              </Button>
+            )}
+          </View>
         )
       ) : (
         // Mode Produits
@@ -518,6 +579,42 @@ const createStyles = (theme: ReturnType<typeof useTheme>) => StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: theme.spacing.xl,
+  },
+  merchantImagePlaceholder: {
+    width: 120,
+    height: 120,
+    backgroundColor: theme.colors.primary[100],
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  merchantEmoji: {
+    fontSize: 48,
+  },
+  productCountBadge: {
+    position: 'absolute',
+    top: theme.spacing.sm,
+    left: theme.spacing.sm,
+    zIndex: 1,
+  },
+  verifiedBadge: {
+    position: 'absolute',
+    top: theme.spacing.sm,
+    right: theme.spacing.sm,
+    backgroundColor: theme.colors.surface.light,
+    borderRadius: theme.radius.full,
+    padding: 4,
+    zIndex: 1,
+  },
+  merchantInfo: {
+    flex: 1,
+    padding: theme.spacing.md,
+    justifyContent: 'center',
+  },
+  locationRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    marginBottom: theme.spacing.xs,
   },
   productsRow: {
     justifyContent: 'space-between',

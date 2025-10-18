@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useRef } from 'react'
 import {
   View,
   Text,
@@ -12,11 +12,17 @@ import { useDispatch, useSelector } from 'react-redux'
 import { AppDispatch, RootState } from '../../store'
 import { fetchProduct } from '../../store/slices/productsSlice'
 import { createReservation } from '../../store/slices/reservationsSlice'
+import { fetchReviewStats } from '../../store/slices/reviewsSlice'
 import { useToast } from '../../contexts/ToastContext'
 import { Ionicons } from '@expo/vector-icons'
 import { Image } from 'expo-image'
 import { Product } from '../../types'
+import { useTheme } from '../../theme'
 import { getImageUrl } from '../../utils/imageHelpers'
+import { formatCurrency } from '../../utils/currencyHelpers'
+import FavoriteButton from '../../components/FavoriteButton'
+import StarRating from '../../components/reviews/StarRating'
+import { Button, Card, Typography } from '../../components/2025'
 
 interface Props {
   route: any
@@ -25,16 +31,41 @@ interface Props {
 
 const ProductDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
   const dispatch = useDispatch<AppDispatch>()
+  const theme = useTheme()
   const { productId } = route.params
   const { products, loading } = useSelector((state: RootState) => state.products)
+  const { stats: reviewStats } = useSelector((state: RootState) => state.reviews)
   const { showSuccess, showError } = useToast()
 
   const [product, setProduct] = useState<Product | null>(null)
   const [reserving, setReserving] = useState(false)
+  const [selectedQuantity, setSelectedQuantity] = useState(1)
+  const navigationTimeoutRef = useRef<NodeJS.Timeout | null>(null)
 
   useEffect(() => {
     loadProduct()
   }, [productId])
+
+  useEffect(() => {
+    if (product) {
+      setSelectedQuantity(1) // Reset quantité quand nouveau produit
+    }
+  }, [product?.id])
+
+  // Cleanup timeout on unmount to prevent memory leak
+  useEffect(() => {
+    return () => {
+      if (navigationTimeoutRef.current) {
+        clearTimeout(navigationTimeoutRef.current)
+      }
+    }
+  }, [])
+
+  useEffect(() => {
+    if (product?.merchant?.id) {
+      dispatch(fetchReviewStats(product.merchant.id))
+    }
+  }, [product?.merchant?.id])
 
   const loadProduct = async () => {
     try {
@@ -63,43 +94,52 @@ const ProductDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
 
   if (loading || !product) {
     return (
-      <View style={styles.container}>
-        <Text>Chargement...</Text>
+      <View style={{ flex: 1, backgroundColor: theme.colors.background, alignItems: 'center', justifyContent: 'center' }}>
+        <Typography variant="body">Chargement...</Typography>
       </View>
     )
   }
 
-  const discountedPrice = Math.round(parseFloat(product.discounted_price))
-  const originalPrice = Math.round(parseFloat(product.original_price))
+  const discountedPrice = Math.round(parseFloat(product.discounted_price) || 0)
+  const originalPrice = Math.round(parseFloat(product.original_price) || 0)
 
   const handleReserve = async () => {
+    // Guard contre les appels multiples simultanés
+    if (reserving) return
+
+    setReserving(true) // Bloquer immédiatement pour éviter double clic
+    const totalPrice = discountedPrice * selectedQuantity
+
     Alert.alert(
       'Confirmer la réservation',
-      `Voulez-vous réserver ${product.name} pour ${discountedPrice} F CFA ?`,
+      `Voulez-vous réserver ${selectedQuantity} ${product.name}${selectedQuantity > 1 ? 's' : ''} pour ${formatCurrency(totalPrice)} ?\n\n(${formatCurrency(discountedPrice)} × ${selectedQuantity})`,
       [
         {
           text: 'Annuler',
           style: 'cancel',
+          onPress: () => setReserving(false),
         },
         {
           text: 'Confirmer',
           onPress: async () => {
-            setReserving(true)
             try {
               const result = await dispatch(createReservation({
                 productId: product.id,
-                quantity: 1,
+                quantity: selectedQuantity,
                 paymentMethod: 'on_site', // Paiement sur place
                 notes: null,
               }))
 
               if (createReservation.fulfilled.match(result)) {
-                showSuccess('Produit réservé avec succès ! 🎉')
+                const reservation = result.payload
+                showSuccess(`${selectedQuantity} produit${selectedQuantity > 1 ? 's' : ''} réservé${selectedQuantity > 1 ? 's' : ''} avec succès ! 🎉`)
                 // Recharger le produit pour mettre à jour la quantité disponible
                 await loadProduct()
-                // Navigation automatique vers les réservations après 1.5 secondes
-                setTimeout(() => {
-                  navigation.navigate('Orders')
+                // Navigation automatique vers les détails de la réservation après 1.5 secondes
+                navigationTimeoutRef.current = setTimeout(() => {
+                  navigation.navigate('ReservationDetails', {
+                    reservationId: reservation.data.id
+                  })
                 }, 1500)
               } else if (createReservation.rejected.match(result)) {
                 const errorMessage = result.payload as string || 'Impossible de créer la réservation'
@@ -116,22 +156,29 @@ const ProductDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
     )
   }
 
+  const styles = createStyles(theme)
+
   return (
     <View style={styles.container}>
-      <StatusBar barStyle="light-content" />
+      <StatusBar barStyle={theme.isDark ? 'light-content' : 'dark-content'} />
 
       <ScrollView style={styles.scrollView}>
         {/* Header */}
         <View style={styles.header}>
           <TouchableOpacity onPress={() => navigation.goBack()}>
-            <Ionicons name="arrow-back" size={24} color="#000" />
+            <Ionicons name="arrow-back" size={24} color={theme.colors.text} />
           </TouchableOpacity>
-          <Text style={styles.headerTitle}>Détails du produit</Text>
+          <Typography variant="h3" weight="semibold" style={{ flex: 1, textAlign: 'center' }}>
+            Détails du produit
+          </Typography>
+          <View style={styles.headerActions}>
+            <FavoriteButton productId={product.id} size={24} />
+          </View>
         </View>
 
         {/* Image */}
         <Image
-          source={{ uri: getImageUrl(product.image_url) }}
+          source={{ uri: getImageUrl(product.image_url, product.category?.name) }}
           style={styles.productImage}
           contentFit="cover"
           transition={200}
@@ -139,48 +186,139 @@ const ProductDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
 
         {/* Info */}
         <View style={styles.content}>
-          <Text style={styles.productName}>{product.name}</Text>
+          <Typography variant="h2" weight="bold" style={{ marginBottom: theme.spacing.sm }}>
+            {product.name}
+          </Typography>
 
-          <Text style={styles.merchantName}>
+          <Typography variant="body" color="secondary" style={{ marginBottom: theme.spacing.md }}>
             {product.merchant?.business_name || 'Marchand'} | {product.merchant?.city || 'Ville'}
-          </Text>
+          </Typography>
 
-          <Text style={styles.price}>{discountedPrice} F CFA</Text>
-          <Text style={styles.originalPrice}>{originalPrice} F CFA</Text>
+          <Typography variant="h3" weight="bold" color="primary">
+            {formatCurrency(discountedPrice)}
+          </Typography>
+          <Typography variant="body" color="tertiary" style={{ textDecorationLine: 'line-through', marginBottom: theme.spacing.md }}>
+            {formatCurrency(originalPrice)}
+          </Typography>
 
-          <Text style={styles.quantity}>Quantité: {product.quantity_available}</Text>
+          <Typography variant="body" style={{ marginBottom: theme.spacing.md }}>
+            Quantité disponible: {product.quantity_available}
+          </Typography>
+
+          {/* Sélecteur de quantité */}
+          <View style={styles.quantitySelector}>
+            <Typography variant="body" weight="semibold" style={{ marginBottom: theme.spacing.md }}>
+              Quantité à réserver :
+            </Typography>
+            <View style={styles.quantityControls}>
+              <TouchableOpacity
+                style={[styles.quantityButton, selectedQuantity <= 1 && styles.quantityButtonDisabled]}
+                disabled={selectedQuantity <= 1}
+                onPress={() => setSelectedQuantity(Math.max(1, selectedQuantity - 1))}
+              >
+                <Ionicons name="remove" size={20} color={selectedQuantity <= 1 ? theme.colors.neutral[400] : theme.colors.primary[600]} />
+              </TouchableOpacity>
+
+              <Typography variant="h3" weight="bold" style={{ minWidth: 40, textAlign: 'center' }}>
+                {selectedQuantity}
+              </Typography>
+
+              <TouchableOpacity
+                style={[styles.quantityButton, selectedQuantity >= product.quantity_available && styles.quantityButtonDisabled]}
+                disabled={selectedQuantity >= product.quantity_available}
+                onPress={() => setSelectedQuantity(Math.min(product.quantity_available, selectedQuantity + 1))}
+              >
+                <Ionicons name="add" size={20} color={selectedQuantity >= product.quantity_available ? theme.colors.neutral[400] : theme.colors.primary[600]} />
+              </TouchableOpacity>
+            </View>
+
+            <Typography variant="caption" color="secondary" style={{ textAlign: 'center' }}>
+              ({product.quantity_available} disponible{product.quantity_available > 1 ? 's' : ''})
+            </Typography>
+          </View>
 
           {product.description && (
-            <Text style={styles.description}>{product.description}</Text>
+            <Typography variant="body" color="secondary" style={{ marginBottom: theme.spacing.md, lineHeight: 20 }}>
+              {product.description}
+            </Typography>
           )}
 
-          <Text style={styles.category}>
+          <Typography variant="body" color="secondary">
             Catégorie: {product.category?.name || 'Non catégorisé'}
-          </Text>
+          </Typography>
+
+          {/* Section Avis Clients */}
+          <View style={styles.reviewsSection}>
+            <View style={styles.reviewsHeader}>
+              <Typography variant="h3" weight="bold" style={{ marginBottom: theme.spacing.md }}>
+                Avis clients
+              </Typography>
+              {reviewStats && (
+                <View style={styles.reviewsStatsRow}>
+                  <StarRating rating={reviewStats.average_rating} size={18} />
+                  <Typography variant="body" weight="semibold" style={{ marginLeft: theme.spacing.sm }}>
+                    {reviewStats.average_rating.toFixed(1)}
+                  </Typography>
+                  <Typography variant="body" color="secondary" style={{ marginLeft: theme.spacing.xs }}>
+                    ({reviewStats.total_reviews} avis)
+                  </Typography>
+                </View>
+              )}
+            </View>
+
+            <View style={styles.reviewsActions}>
+              <Button
+                variant="secondary"
+                size="sm"
+                onPress={() => navigation.navigate('ReviewsList', {
+                  merchantId: product.merchant?.id,
+                  merchantName: product.merchant?.business_name || 'Marchand',
+                })}
+                leftIcon={<Ionicons name="star-outline" size={20} color={theme.colors.primary[600]} />}
+                style={{ flex: 1 }}
+              >
+                Voir tous les avis
+              </Button>
+
+              <Button
+                variant="primary"
+                size="sm"
+                onPress={() => navigation.navigate('AddReview', {
+                  merchantId: product.merchant?.id,
+                  productId: product.id,
+                  merchantName: product.merchant?.business_name || 'Marchand',
+                })}
+                leftIcon={<Ionicons name="create-outline" size={20} color={theme.colors.textInverse} />}
+                style={{ flex: 1 }}
+              >
+                Donner un avis
+              </Button>
+            </View>
+          </View>
         </View>
       </ScrollView>
 
       {/* Bouton Réserver */}
       <View style={styles.bottomBar}>
-        <TouchableOpacity
-          style={[styles.reserveButton, (product.quantity_available === 0 || reserving) && styles.reserveButtonDisabled]}
+        <Button
+          variant="primary"
+          size="lg"
           disabled={product.quantity_available === 0 || reserving}
           onPress={handleReserve}
+          leftIcon={<Ionicons name="cart" size={20} color={theme.colors.textInverse} />}
+          style={{ width: '100%' }}
         >
-          <Ionicons name="cart" size={20} color="#fff" />
-          <Text style={styles.reserveButtonText}>
-            {reserving ? 'Réservation en cours...' : product.quantity_available === 0 ? 'Rupture de stock' : 'Réserver'}
-          </Text>
-        </TouchableOpacity>
+          {reserving ? 'Réservation en cours...' : product.quantity_available === 0 ? 'Rupture de stock' : 'Réserver'}
+        </Button>
       </View>
     </View>
   )
 }
 
-const styles = StyleSheet.create({
+const createStyles = (theme: ReturnType<typeof useTheme>) => StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: theme.colors.background,
   },
   scrollView: {
     flex: 1,
@@ -188,12 +326,13 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'space-between',
     padding: 16,
     gap: 16,
   },
-  headerTitle: {
-    fontSize: 18,
-    fontWeight: '600',
+  headerActions: {
+    flexDirection: 'row',
+    gap: 8,
   },
   productImage: {
     width: '100%',
@@ -202,63 +341,55 @@ const styles = StyleSheet.create({
   content: {
     padding: 16,
   },
-  productName: {
-    fontSize: 24,
-    fontWeight: '700',
-    marginBottom: 8,
-  },
-  merchantName: {
-    fontSize: 16,
-    color: '#666',
-    marginBottom: 16,
-  },
-  price: {
-    fontSize: 20,
-    fontWeight: '700',
-    color: '#10B981',
-  },
-  originalPrice: {
-    fontSize: 16,
-    color: '#999',
-    textDecorationLine: 'line-through',
-    marginBottom: 16,
-  },
-  quantity: {
-    fontSize: 16,
-    marginBottom: 16,
-  },
-  description: {
-    fontSize: 14,
-    color: '#666',
-    marginBottom: 16,
-    lineHeight: 20,
-  },
-  category: {
-    fontSize: 14,
-    color: '#666',
-  },
   bottomBar: {
     padding: 16,
     borderTopWidth: 1,
-    borderTopColor: '#eee',
+    borderTopColor: theme.colors.borderLight,
   },
-  reserveButton: {
-    backgroundColor: '#DCB253',
+  reviewsSection: {
+    marginTop: 24,
+    paddingTop: 24,
+    borderTopWidth: 1,
+    borderTopColor: theme.colors.borderLight,
+  },
+  reviewsHeader: {
+    marginBottom: 16,
+  },
+  reviewsStatsRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  reviewsActions: {
+    flexDirection: 'row',
+    gap: 12,
+  },
+  quantitySelector: {
+    marginTop: 16,
+    marginBottom: 16,
+    padding: 16,
+    backgroundColor: theme.colors.surface.light,
+    borderRadius: 12,
+    ...theme.shadows.sm,
+  },
+  quantityControls: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 16,
-    borderRadius: 12,
-    gap: 8,
+    gap: 16,
+    marginBottom: 8,
   },
-  reserveButtonDisabled: {
-    backgroundColor: '#ccc',
-    opacity: 0.6,
+  quantityButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: theme.colors.primary[50],
+    alignItems: 'center',
+    justifyContent: 'center',
+    ...theme.shadows.sm,
   },
-  reserveButtonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: '600',
+  quantityButtonDisabled: {
+    backgroundColor: theme.colors.neutral[100],
+    opacity: 0.5,
   },
 })
 
