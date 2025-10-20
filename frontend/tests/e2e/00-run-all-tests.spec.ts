@@ -128,7 +128,7 @@ test.describe('Complete Application Test Suite', () => {
 `
 
     fs.writeFileSync(path.join(resultsDir, 'comprehensive-report.html'), htmlReport)
-    console.log(`\n📄 HTML report generated: test-results/comprehensive-report.html`)
+    console.log('\n📄 HTML report generated: test-results/comprehensive-report.html')
 
     // Generate JSON summary
     const jsonReport = {
@@ -147,7 +147,7 @@ test.describe('Complete Application Test Suite', () => {
       JSON.stringify(jsonReport, null, 2)
     )
 
-    console.log(`📄 JSON report generated: test-results/comprehensive-report.json`)
+    console.log('📄 JSON report generated: test-results/comprehensive-report.json')
     console.log('\n' + '='.repeat(80))
   })
 })

@@ -230,18 +230,18 @@
                     {{ isInWishlist ? 'Retiré des favoris' : 'Ajouter aux favoris' }}
                   </Button>
                 </div>
+              </div>
             </div>
-          </div>
-        </Card>
+          </Card>
 
-        <!-- Share Product -->
-        <Card>
-          <div class="flex items-center justify-start sm:justify-between">
-            <h3 class="text-lg font-semibold text-neutral-900 dark:text-neutral-100">Partager</h3>
-            <div class="flex gap-2">
-              <Button variant="ghost" size="sm" @click="shareProduct('facebook')">
-                <Facebook class="h-4 w-4" />
-              </Button>
+          <!-- Share Product -->
+          <Card>
+            <div class="flex items-center justify-start sm:justify-between">
+              <h3 class="text-lg font-semibold text-neutral-900 dark:text-neutral-100">Partager</h3>
+              <div class="flex gap-2">
+                <Button variant="ghost" size="sm" @click="shareProduct('facebook')">
+                  <Facebook class="h-4 w-4" />
+                </Button>
                 <Button variant="ghost" size="sm" @click="shareProduct('twitter')">
                   <Twitter class="h-4 w-4" />
                 </Button>

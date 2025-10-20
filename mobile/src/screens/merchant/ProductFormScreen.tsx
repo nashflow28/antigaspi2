@@ -14,9 +14,10 @@ import {
 import { Ionicons } from '@expo/vector-icons'
 import * as ImagePicker from 'expo-image-picker'
 import { useTheme } from '../../theme'
-import { Product, Category } from '../../types'
+import { Product } from '../../types'
 import apiService from '../../services/api'
 import { getImageUrl } from '../../utils/imageHelpers'
+import { TEST_IDS } from '../../utils/testIds'
 
 interface Props {
   route: any
@@ -28,44 +29,17 @@ const ProductFormScreen: React.FC<Props> = ({ route, navigation }) => {
   const { mode, product } = route.params || { mode: 'create', product: null }
 
   const [loading, setLoading] = useState(false)
-  const [categories, setCategories] = useState<Category[]>([])
 
   // Form state
   const [name, setName] = useState(product?.name || '')
   const [description, setDescription] = useState(product?.description || '')
-  const [categoryId, setCategoryId] = useState(product?.category?.id?.toString() || '')
+  // categoryId removed - automatically uses merchant's category
   const [originalPrice, setOriginalPrice] = useState(product?.original_price || '')
   const [discountedPrice, setDiscountedPrice] = useState(product?.discounted_price || '')
   const [quantity, setQuantity] = useState(product?.quantity_available?.toString() || '')
   const [expirationDate, setExpirationDate] = useState(product?.expiration_date || '')
   const [imageUri, setImageUri] = useState<string | null>(product?.image_url ? getImageUrl(product.image_url) : null)
 
-  useEffect(() => {
-    loadCategories()
-  }, [])
-
-  const loadCategories = async () => {
-    try {
-      // Utiliser endpoint merchant qui filtre par business_type
-      const response = await apiService.get('/categories/merchant')
-      setCategories(response.data.data || [])
-
-      // Debug: afficher les catégories autorisées
-      if (response.data.merchant_business_type) {
-        console.log('Merchant business type:', response.data.merchant_business_type)
-        console.log('Catégories autorisées:', response.data.allowed_categories_count)
-      }
-    } catch (error) {
-      console.error('Erreur chargement catégories:', error)
-      // Fallback: essayer l'endpoint public si erreur
-      try {
-        const fallbackResponse = await apiService.get('/products/categories/list')
-        setCategories(fallbackResponse.data.data || [])
-      } catch (fallbackError) {
-        console.error('Erreur fallback catégories:', fallbackError)
-      }
-    }
-  }
 
   const pickImage = async () => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync()
@@ -114,35 +88,47 @@ const ProductFormScreen: React.FC<Props> = ({ route, navigation }) => {
   }
 
   const validateForm = (): boolean => {
+    console.log('🔵 validateForm appelé')
     if (!name.trim()) {
+      console.error('❌ Nom du produit requis')
       Alert.alert('Erreur', 'Le nom du produit est requis')
       return false
     }
-    if (!categoryId) {
-      Alert.alert('Erreur', 'Veuillez sélectionner une catégorie')
-      return false
-    }
-    if (!originalPrice || parseFloat(originalPrice) <= 0) {
+    // categoryId validation removed - automatically uses merchant's category
+    const originalPriceNum = parseFloat(originalPrice)
+    if (!originalPrice || isNaN(originalPriceNum) || originalPriceNum <= 0) {
+      console.error('❌ Prix original invalide:', originalPrice)
       Alert.alert('Erreur', 'Le prix original doit être supérieur à 0')
       return false
     }
-    if (!discountedPrice || parseFloat(discountedPrice) <= 0) {
+    const discountedPriceNum = parseFloat(discountedPrice)
+    if (!discountedPrice || isNaN(discountedPriceNum) || discountedPriceNum <= 0) {
+      console.error('❌ Prix réduit invalide:', discountedPrice)
       Alert.alert('Erreur', 'Le prix réduit doit être supérieur à 0')
       return false
     }
-    if (parseFloat(discountedPrice) >= parseFloat(originalPrice)) {
+    if (discountedPriceNum >= originalPriceNum) {
+      console.error('❌ Prix réduit >= Prix original:', { discountedPriceNum, originalPriceNum })
       Alert.alert('Erreur', 'Le prix réduit doit être inférieur au prix original')
       return false
     }
     if (!quantity || parseInt(quantity) < 0) {
+      console.error('❌ Quantité invalide:', quantity)
       Alert.alert('Erreur', 'La quantité doit être supérieure ou égale à 0')
       return false
     }
+    console.log('✅ Validation réussie !')
     return true
   }
 
   const handleSubmit = async () => {
-    if (!validateForm()) return
+    console.log('🔴 handleSubmit appelé')
+    console.log('Form data:', { name, originalPrice, discountedPrice, quantity, expirationDate })
+
+    if (!validateForm()) {
+      console.log('❌ Validation échouée')
+      return
+    }
 
     try {
       setLoading(true)
@@ -151,13 +137,15 @@ const ProductFormScreen: React.FC<Props> = ({ route, navigation }) => {
 
       // Upload image si une nouvelle image a été sélectionnée
       if (imageUri && !imageUri.startsWith('http')) {
+        console.log('📤 Upload image en cours...')
         uploadedImageUrl = await uploadImage(imageUri)
+        console.log('✅ Image uploadée:', uploadedImageUrl)
       }
 
       const productData = {
         name: name.trim(),
         description: description.trim(),
-        category_id: parseInt(categoryId),
+        // category_id removed - automatically uses merchant's category
         original_price: parseFloat(originalPrice),
         discounted_price: parseFloat(discountedPrice),
         quantity_available: parseInt(quantity),
@@ -165,25 +153,53 @@ const ProductFormScreen: React.FC<Props> = ({ route, navigation }) => {
         image_url: uploadedImageUrl,
       }
 
+      console.log('📤 Envoi requête API:', mode === 'create' ? 'POST /products' : `PUT /products/${product.id}`)
+      console.log('📦 Données envoyées:', JSON.stringify(productData, null, 2))
+
       if (mode === 'create') {
-        await apiService.post('/products', productData)
+        const response = await apiService.post('/products', productData)
+        console.log('✅ Réponse API reçue:', response.data)
         Alert.alert('Succès', 'Produit créé avec succès')
       } else {
-        await apiService.put(`/products/${product.id}`, productData)
+        const response = await apiService.put(`/products/${product.id}`, productData)
+        console.log('✅ Réponse API reçue:', response.data)
         Alert.alert('Succès', 'Produit modifié avec succès')
       }
 
+      console.log('🔙 Navigation retour vers liste produits')
       navigation.goBack()
     } catch (error: any) {
-      console.error('Erreur sauvegarde produit:', error)
-      Alert.alert('Erreur', error.response?.data?.message || 'Impossible de sauvegarder le produit')
+      console.error('❌ ERREUR COMPLÈTE:', error)
+      console.error('❌ Error response:', error.response)
+      console.error('❌ Error data:', error.response?.data)
+      console.error('❌ Error status:', error.response?.status)
+
+      let errorMessage = 'Impossible de sauvegarder le produit'
+
+      if (error.response?.status === 401) {
+        errorMessage = 'Session expirée. Veuillez vous reconnecter.'
+      } else if (error.response?.status === 422) {
+        const errors = error.response?.data?.errors
+        if (errors) {
+          errorMessage = Object.values(errors).flat().join('\n')
+        } else {
+          errorMessage = error.response?.data?.message || 'Erreurs de validation'
+        }
+      } else if (error.response?.data?.message) {
+        errorMessage = error.response.data.message
+      } else if (error.message) {
+        errorMessage = error.message
+      }
+
+      console.error('❌ Message erreur affiché:', errorMessage)
+      Alert.alert('Erreur', errorMessage)
     } finally {
       setLoading(false)
     }
   }
 
   return (
-    <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
+    <View style={[styles.container, { backgroundColor: theme.colors.background }]} testID={TEST_IDS.productFormScreen}>
       <StatusBar barStyle="dark-content" backgroundColor={theme.colors.background} />
 
       {/* Header */}
@@ -202,17 +218,18 @@ const ProductFormScreen: React.FC<Props> = ({ route, navigation }) => {
       <ScrollView style={styles.content} contentContainerStyle={styles.scrollContent}>
         {/* Image */}
         <View style={styles.section}>
-          <Text style={[styles.label, { color: theme.colors.text.primary }]}>Photo du produit</Text>
+          <Text style={[styles.label, { color: theme.colors.text }]}>Photo du produit</Text>
           <TouchableOpacity
             style={[styles.imagePicker, { backgroundColor: theme.colors.surface.light, borderColor: theme.colors.border }]}
             onPress={pickImage}
+            testID={TEST_IDS.imagePickerButton}
           >
             {imageUri ? (
               <Image source={{ uri: imageUri }} style={styles.imagePreview} />
             ) : (
               <View style={styles.imagePlaceholder}>
                 <Ionicons name="camera" size={48} color={theme.colors.neutral[300]} />
-                <Text style={[styles.imageText, { color: theme.colors.text.secondary }]}>
+                <Text style={[styles.imageText, { color: theme.colors.textSecondary }]}>
                   Appuyez pour ajouter une photo
                 </Text>
               </View>
@@ -222,116 +239,89 @@ const ProductFormScreen: React.FC<Props> = ({ route, navigation }) => {
 
         {/* Nom */}
         <View style={styles.section}>
-          <Text style={[styles.label, { color: theme.colors.text.primary }]}>Nom du produit *</Text>
+          <Text style={[styles.label, { color: theme.colors.text }]}>Nom du produit *</Text>
           <TextInput
-            style={[styles.input, { backgroundColor: theme.colors.surface.light, color: theme.colors.text.primary, borderColor: theme.colors.border }]}
+            style={[styles.input, { backgroundColor: theme.colors.surface.light, color: theme.colors.text, borderColor: theme.colors.border }]}
             value={name}
             onChangeText={setName}
             placeholder="Ex: Pain complet artisanal"
-            placeholderTextColor={theme.colors.text.secondary}
+            placeholderTextColor={theme.colors.textSecondary}
+            testID={TEST_IDS.productNameInput}
           />
         </View>
 
         {/* Description */}
         <View style={styles.section}>
-          <Text style={[styles.label, { color: theme.colors.text.primary }]}>Description</Text>
+          <Text style={[styles.label, { color: theme.colors.text }]}>Description</Text>
           <TextInput
-            style={[styles.input, styles.textArea, { backgroundColor: theme.colors.surface.light, color: theme.colors.text.primary, borderColor: theme.colors.border }]}
+            style={[styles.input, styles.textArea, { backgroundColor: theme.colors.surface.light, color: theme.colors.text, borderColor: theme.colors.border }]}
             value={description}
             onChangeText={setDescription}
             placeholder="Décrivez votre produit..."
-            placeholderTextColor={theme.colors.text.secondary}
+            placeholderTextColor={theme.colors.textSecondary}
             multiline
             numberOfLines={4}
+            testID={TEST_IDS.productDescriptionInput}
           />
         </View>
 
-        {/* Catégorie */}
-        <View style={styles.section}>
-          <Text style={[styles.label, { color: theme.colors.text.primary }]}>Catégorie *</Text>
-          <View style={styles.categoryContainer}>
-            {categories.map((cat) => (
-              <TouchableOpacity
-                key={cat.id}
-                style={[
-                  styles.categoryChip,
-                  {
-                    backgroundColor: categoryId === cat.id.toString()
-                      ? theme.colors.primary[500]
-                      : theme.colors.surface.light,
-                    borderColor: categoryId === cat.id.toString()
-                      ? theme.colors.primary[500]
-                      : theme.colors.border,
-                  }
-                ]}
-                onPress={() => setCategoryId(cat.id.toString())}
-              >
-                <Text style={[
-                  styles.categoryText,
-                  {
-                    color: categoryId === cat.id.toString()
-                      ? 'white'
-                      : theme.colors.text.primary
-                  }
-                ]}>
-                  {cat.name}
-                </Text>
-              </TouchableOpacity>
-            ))}
-          </View>
-        </View>
+        {/* Catégorie - Removed: automatically uses merchant's category */}
 
         {/* Prix */}
         <View style={styles.row}>
           <View style={[styles.section, styles.halfWidth]}>
-            <Text style={[styles.label, { color: theme.colors.text.primary }]}>Prix original *</Text>
+            <Text style={[styles.label, { color: theme.colors.text }]}>Prix original *</Text>
             <TextInput
-              style={[styles.input, { backgroundColor: theme.colors.surface.light, color: theme.colors.text.primary, borderColor: theme.colors.border }]}
+              style={[styles.input, { backgroundColor: theme.colors.surface.light, color: theme.colors.text, borderColor: theme.colors.border }]}
               value={originalPrice}
               onChangeText={setOriginalPrice}
               placeholder="500"
-              placeholderTextColor={theme.colors.text.secondary}
+              placeholderTextColor={theme.colors.textSecondary}
               keyboardType="numeric"
+              testID={TEST_IDS.originalPriceInput}
             />
           </View>
 
           <View style={[styles.section, styles.halfWidth]}>
-            <Text style={[styles.label, { color: theme.colors.text.primary }]}>Prix réduit *</Text>
+            <Text style={[styles.label, { color: theme.colors.text }]}>Prix réduit *</Text>
             <TextInput
-              style={[styles.input, { backgroundColor: theme.colors.surface.light, color: theme.colors.text.primary, borderColor: theme.colors.border }]}
+              style={[styles.input, { backgroundColor: theme.colors.surface.light, color: theme.colors.text, borderColor: theme.colors.border }]}
               value={discountedPrice}
               onChangeText={setDiscountedPrice}
               placeholder="250"
-              placeholderTextColor={theme.colors.text.secondary}
+              placeholderTextColor={theme.colors.textSecondary}
               keyboardType="numeric"
+              testID={TEST_IDS.discountedPriceInput}
             />
           </View>
         </View>
 
         {/* Quantité */}
         <View style={styles.section}>
-          <Text style={[styles.label, { color: theme.colors.text.primary }]}>Quantité disponible *</Text>
+          <Text style={[styles.label, { color: theme.colors.text }]}>Quantité disponible *</Text>
           <TextInput
-            style={[styles.input, { backgroundColor: theme.colors.surface.light, color: theme.colors.text.primary, borderColor: theme.colors.border }]}
+            style={[styles.input, { backgroundColor: theme.colors.surface.light, color: theme.colors.text, borderColor: theme.colors.border }]}
             value={quantity}
             onChangeText={setQuantity}
             placeholder="10"
-            placeholderTextColor={theme.colors.text.secondary}
+            placeholderTextColor={theme.colors.textSecondary}
             keyboardType="numeric"
+            testID={TEST_IDS.quantityInput}
           />
         </View>
 
         {/* Date d'expiration */}
         <View style={styles.section}>
-          <Text style={[styles.label, { color: theme.colors.text.primary }]}>Date d'expiration</Text>
+          <Text style={[styles.label, { color: theme.colors.text }]}>Date d'expiration</Text>
           <TextInput
-            style={[styles.input, { backgroundColor: theme.colors.surface.light, color: theme.colors.text.primary, borderColor: theme.colors.border }]}
+            style={[styles.input, { backgroundColor: theme.colors.surface.light, color: theme.colors.text, borderColor: theme.colors.border }]}
             value={expirationDate}
             onChangeText={setExpirationDate}
             placeholder="AAAA-MM-JJ"
-            placeholderTextColor={theme.colors.text.secondary}
+            placeholderTextColor={theme.colors.textSecondary}
+            testID={TEST_IDS.expirationDateInput}
           />
-          <Text style={[styles.helperText, { color: theme.colors.text.secondary }]}>
+          <Text style={[styles.helperText, { color: theme.colors.textSecondary }]}>
             Format: 2025-12-31
           </Text>
         </View>
@@ -339,8 +329,12 @@ const ProductFormScreen: React.FC<Props> = ({ route, navigation }) => {
         {/* Bouton de soumission */}
         <TouchableOpacity
           style={[styles.submitButton, { backgroundColor: theme.colors.primary[500] }]}
-          onPress={handleSubmit}
+          onPress={() => {
+            console.log('🟢 Bouton cliqué !')
+            handleSubmit()
+          }}
           disabled={loading}
+          testID={TEST_IDS.submitProductButton}
         >
           {loading ? (
             <ActivityIndicator color="white" />
@@ -424,21 +418,7 @@ const styles = StyleSheet.create({
     marginTop: 12,
     fontSize: 14,
   },
-  categoryContainer: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 8,
-  },
-  categoryChip: {
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 20,
-    borderWidth: 1,
-  },
-  categoryText: {
-    fontSize: 14,
-    fontWeight: '500',
-  },
+  // categoryContainer, categoryChip, categoryText removed - category is automatic
   row: {
     flexDirection: 'row',
     gap: 12,

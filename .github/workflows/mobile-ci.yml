@@ -1,0 +1,42 @@
+name: Mobile CI
+
+on:
+  push:
+    branches: [ "**" ]
+  pull_request:
+    branches: [ "**" ]
+
+concurrency:
+  group: mobile-ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  mobile-tests:
+    name: Mobile Jest + Type Check
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: mobile
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+          cache: npm
+          cache-dependency-path: mobile/package-lock.json
+
+      - name: Install dependencies (mobile)
+        run: npm ci
+
+      - name: Type check
+        run: npm run type-check
+
+      - name: Run Jest tests
+        env:
+          CI: true
+        run: npm test -- --maxWorkers=50%
+

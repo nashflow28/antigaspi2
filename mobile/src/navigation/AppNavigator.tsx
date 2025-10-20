@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { NavigationContainer } from '@react-navigation/native'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import { useSelector, useDispatch } from 'react-redux'
@@ -16,15 +16,17 @@ const Stack = createNativeStackNavigator()
 
 const AppNavigator: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>()
-  const { isAuthenticated, loading } = useSelector((state: RootState) => state.auth)
-  const previousRouteRef = useRef<string | undefined>()
+  const { isAuthenticated } = useSelector((state: RootState) => state.auth)
+  const [hydrated, setHydrated] = useState(false)
+  const previousRouteRef = useRef<string | undefined>(undefined)
 
   useEffect(() => {
-    // Charger les données d'authentification sauvegardées au démarrage
+    // Charger l'état d'auth local sans bloquer les écrans pendant les requêtes réseau
     dispatch(loadStoredAuth())
+      .finally(() => setHydrated(true))
   }, [dispatch])
 
-  if (loading) {
+  if (!hydrated) {
     return <SplashScreen />
   }
 

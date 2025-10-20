@@ -6,8 +6,15 @@ import { useTheme } from '../theme'
 
 // Merchant Screens (à créer)
 import MerchantDashboardScreen from '../screens/merchant/MerchantDashboardScreen'
+import MerchantAnalyticsScreen from '../screens/merchant/MerchantAnalyticsScreen'
 import MerchantProductsScreen from '../screens/merchant/MerchantProductsScreen'
 import MerchantReservationsScreen from '../screens/merchant/MerchantReservationsScreen'
+import MerchantReviewsScreen from '../screens/merchant/MerchantReviewsScreen'
+import MerchantLoyaltyScreen from '../screens/merchant/MerchantLoyaltyScreen'
+import MerchantProfileEditScreen from '../screens/merchant/MerchantProfileEditScreen'
+import MerchantOpeningHoursScreen from '../screens/merchant/MerchantOpeningHoursScreen'
+import MerchantNotificationsScreen from '../screens/merchant/MerchantNotificationsScreen'
+import NotificationSettingsScreen from '../screens/merchant/NotificationSettingsScreen'
 import ProfileScreen from '../screens/main/ProfileScreen'
 import ProductFormScreen from '../screens/merchant/ProductFormScreen'
 
@@ -22,11 +29,52 @@ const ProductsStack = () => (
   </Stack.Navigator>
 )
 
+// Stack Navigator pour le dashboard
+const DashboardStack = () => (
+  <Stack.Navigator screenOptions={{ headerShown: false }}>
+    <Stack.Screen name="DashboardMain" component={MerchantDashboardScreen} />
+    <Stack.Screen name="Analytics" component={MerchantAnalyticsScreen} />
+  </Stack.Navigator>
+)
+
+// Stack Navigator pour les réservations
+const ReservationsStack = () => (
+  <Stack.Navigator screenOptions={{ headerShown: false }}>
+    <Stack.Screen name="ReservationsMain" component={MerchantReservationsScreen} />
+  </Stack.Navigator>
+)
+
+// Stack Navigator pour les avis clients
+const ReviewsStack = () => (
+  <Stack.Navigator screenOptions={{ headerShown: false }}>
+    <Stack.Screen name="ReviewsMain" component={MerchantReviewsScreen} />
+  </Stack.Navigator>
+)
+
+// Stack Navigator pour le programme fidélité
+const LoyaltyStack = () => (
+  <Stack.Navigator screenOptions={{ headerShown: false }}>
+    <Stack.Screen name="LoyaltyMain" component={MerchantLoyaltyScreen} />
+  </Stack.Navigator>
+)
+
+// Stack Navigator pour le compte
+const AccountStack = () => (
+  <Stack.Navigator screenOptions={{ headerShown: false }}>
+    <Stack.Screen name="AccountMain" component={ProfileScreen} />
+    <Stack.Screen name="ProfileEdit" component={MerchantProfileEditScreen} />
+    <Stack.Screen name="OpeningHours" component={MerchantOpeningHoursScreen} />
+    <Stack.Screen name="Notifications" component={MerchantNotificationsScreen} />
+    <Stack.Screen name="NotificationSettings" component={NotificationSettingsScreen} />
+  </Stack.Navigator>
+)
+
 const MerchantNavigator: React.FC = () => {
   const theme = useTheme()
 
   return (
     <Tab.Navigator
+      initialRouteName="Dashboard"
       screenOptions={({ route }) => ({
         tabBarIcon: ({ focused, color, size }) => {
           let iconName: keyof typeof Ionicons.glyphMap
@@ -37,6 +85,10 @@ const MerchantNavigator: React.FC = () => {
             iconName = focused ? 'cube' : 'cube-outline'
           } else if (route.name === 'Reservations') {
             iconName = focused ? 'receipt' : 'receipt-outline'
+          } else if (route.name === 'Reviews') {
+            iconName = focused ? 'star' : 'star-outline'
+          } else if (route.name === 'Loyalty') {
+            iconName = focused ? 'gift' : 'gift-outline'
           } else if (route.name === 'Account') {
             iconName = focused ? 'person' : 'person-outline'
           } else {
@@ -53,12 +105,13 @@ const MerchantNavigator: React.FC = () => {
           height: 60,
           backgroundColor: theme.colors.surface.light,
           borderTopColor: theme.colors.border,
+          pointerEvents: 'auto',
         },
       })}
     >
       <Tab.Screen
         name="Dashboard"
-        component={MerchantDashboardScreen}
+        component={DashboardStack}
         options={{ title: 'Tableau de bord' }}
       />
       <Tab.Screen
@@ -68,12 +121,22 @@ const MerchantNavigator: React.FC = () => {
       />
       <Tab.Screen
         name="Reservations"
-        component={MerchantReservationsScreen}
+        component={ReservationsStack}
         options={{ title: 'Réservations' }}
       />
       <Tab.Screen
+        name="Reviews"
+        component={ReviewsStack}
+        options={{ title: 'Avis' }}
+      />
+      <Tab.Screen
+        name="Loyalty"
+        component={LoyaltyStack}
+        options={{ title: 'Fidélité' }}
+      />
+      <Tab.Screen
         name="Account"
-        component={ProfileScreen}
+        component={AccountStack}
         options={{ title: 'Compte' }}
       />
     </Tab.Navigator>

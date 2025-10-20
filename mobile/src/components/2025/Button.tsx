@@ -43,6 +43,7 @@ export interface ButtonProps {
   // Accessibility
   accessibilityLabel?: string
   accessibilityHint?: string
+  testID?: string
 
   // Style overrides
   style?: ViewStyle
@@ -61,6 +62,7 @@ export const Button: React.FC<ButtonProps> = ({
   onPress,
   accessibilityLabel,
   accessibilityHint,
+  testID,
   style,
   textStyle,
 }) => {
@@ -238,6 +240,8 @@ export const Button: React.FC<ButtonProps> = ({
       accessibilityRole="button"
       accessibilityLabel={getAccessibilityLabel()}
       accessibilityHint={accessibilityHint}
+      testID={testID}
+      accessible={true}
       accessibilityState={{
         disabled: disabled || loading,
         busy: loading,

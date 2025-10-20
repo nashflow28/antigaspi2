@@ -6,7 +6,7 @@ const initialState: AuthState = {
   user: null,
   token: null,
   isAuthenticated: false,
-  loading: true, // ✅ FIX: Démarrer en loading pour afficher le SplashScreen pendant la restauration
+  loading: true, // ⚠️ TEST 6: Forcer SplashScreen pour identifier si c'est lui qui freeze
   error: null,
 }
 

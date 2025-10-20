@@ -74,6 +74,15 @@ return new class extends Migration
         $columns = is_array($columns) ? $columns : [$columns];
         $indexName = $indexName ?: $table . '_' . implode('_', $columns) . '_index';
 
+        // Check if all columns exist in the table
+        $tableColumns = collect(DB::select("SHOW COLUMNS FROM {$table}"))->pluck('Field');
+        foreach ($columns as $column) {
+            if (!$tableColumns->contains($column)) {
+                // Column doesn't exist yet, skip index creation
+                return;
+            }
+        }
+
         // Check if index exists
         $exists = collect(DB::select("SHOW INDEX FROM {$table}"))
             ->where('Key_name', $indexName)

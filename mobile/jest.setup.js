@@ -47,3 +47,14 @@ global.appearance = {
   getColorScheme: () => 'light',
   addChangeListener: () => ({ remove: () => {} }),
 }
+
+// Mock ToastContext to fix "useToast must be used within a ToastProvider" errors
+jest.mock('./src/contexts/ToastContext', () => ({
+  useToast: () => ({
+    showSuccess: jest.fn(),
+    showError: jest.fn(),
+    showInfo: jest.fn(),
+    showWarning: jest.fn(),
+  }),
+  ToastProvider: ({ children }) => children,
+}))

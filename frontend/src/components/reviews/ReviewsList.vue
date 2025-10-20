@@ -384,7 +384,7 @@ const fetchReviews = async (page = 1): Promise<void> => {
     } else {
       reviews.value = []
       pagination.value = null
-      const message = response.message || "Impossible de charger les avis du commerçant."
+      const message = response.message || 'Impossible de charger les avis du commerçant.'
       notify.error(message, 'Avis commerçants')
     }
   } catch (error) {
@@ -392,7 +392,7 @@ const fetchReviews = async (page = 1): Promise<void> => {
     pagination.value = null
     const message = error instanceof Error
       ? error.message
-      : "Impossible de charger les avis du commerçant."
+      : 'Impossible de charger les avis du commerçant.'
     notify.error(message, 'Avis commerçants')
   } finally {
     loading.value = false

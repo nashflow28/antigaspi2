@@ -61,8 +61,8 @@
 
       <section class="space-y-6" data-testid="merchants-moderation">
         <DashboardTabs
-          data-testid="merchants-tabs"
           v-model="activeTab"
+          data-testid="merchants-tabs"
           :tabs="moderationTabs"
         />
 
@@ -106,7 +106,7 @@
               v-else
               data-testid="pending-merchants-list"
               cols="1"
-              colsMd="2"
+              cols-md="2"
               gap="lg"
             >
               <Card
@@ -208,7 +208,7 @@
               v-else
               data-testid="products-list"
               cols="1"
-              colsMd="2"
+              cols-md="2"
               gap="lg"
             >
               <Card

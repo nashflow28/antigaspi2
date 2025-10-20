@@ -1,0 +1,172 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - generic [ref=e3]:
+    - navigation "Navigation principale" [ref=e4]:
+      - generic [ref=e5]:
+        - link "Antigaspi" [ref=e6] [cursor=pointer]:
+          - /url: /
+          - generic [ref=e7] [cursor=pointer]: Antigaspi
+        - menubar [ref=e8]:
+          - menuitem "Accueil" [ref=e9]:
+            - img [ref=e10]
+            - generic [ref=e12]: Accueil
+          - menuitem "Découvrir" [ref=e13]:
+            - img [ref=e14]
+            - generic [ref=e16]: Découvrir
+          - menuitem "Produits" [ref=e17]:
+            - img [ref=e18]
+            - generic [ref=e20]: Produits
+          - menuitem "Avis" [ref=e22]:
+            - img [ref=e23]
+            - generic [ref=e25]: Avis
+        - generic [ref=e26]:
+          - button "Activer le thème clair" [ref=e27] [cursor=pointer]:
+            - generic [ref=e28] [cursor=pointer]: Activer le thème clair
+            - img [ref=e30] [cursor=pointer]
+          - generic [ref=e32]:
+            - button "Mon panier" [ref=e33] [cursor=pointer]:
+              - generic [ref=e35] [cursor=pointer]: Mon panier
+            - button "Connexion" [ref=e36] [cursor=pointer]:
+              - generic [ref=e37] [cursor=pointer]: Connexion
+            - button "Inscription" [ref=e38] [cursor=pointer]:
+              - generic [ref=e39] [cursor=pointer]: Inscription
+    - main [ref=e40]:
+      - generic [ref=e42]:
+        - navigation [ref=e43]:
+          - link "Accueil" [ref=e44] [cursor=pointer]:
+            - /url: /
+          - img [ref=e45]
+          - link "Catalogue" [ref=e47] [cursor=pointer]:
+            - /url: /products
+          - img [ref=e48]
+          - generic [ref=e50]: Panier signature anti-gaspi
+        - generic [ref=e51]:
+          - generic [ref=e52]:
+            - generic [ref=e53]:
+              - generic:
+                - img "Panier signature anti-gaspi" [ref=e55]
+                - generic [ref=e58]: 9 en stock
+                - generic [ref=e60]: "-40%"
+                - generic [ref=e62]: Frais
+            - generic [ref=e65]:
+              - generic [ref=e66]:
+                - img [ref=e67]
+                - generic [ref=e70]:
+                  - paragraph [ref=e71]: La Ferme Urbaine
+                  - paragraph [ref=e72]: 12 avenue des Serres, Abidjan
+              - generic [ref=e73]:
+                - img [ref=e74]
+                - generic [ref=e77]:
+                  - paragraph [ref=e78]: Récupération
+                  - paragraph [ref=e79]: 18 juin 2030, 17:00
+          - generic [ref=e80]:
+            - generic [ref=e81]:
+              - generic [ref=e82]:
+                - generic [ref=e83]: Fruits et Légumes
+                - generic [ref=e84]: Panier Surprise
+              - heading "Panier signature anti-gaspi" [level=1] [ref=e85]
+              - generic [ref=e86]:
+                - generic [ref=e87]: 10 900 XOF
+                - generic [ref=e88]: 18 000 XOF
+                - generic [ref=e89]: Économisez 7 100 XOF
+            - generic [ref=e90]:
+              - heading "Description" [level=3] [ref=e92]
+              - paragraph [ref=e94]: Sélection premium de fruits et légumes sauvés du gaspillage, avec conseils de dégustation.
+            - generic [ref=e98]:
+              - heading "Réservation" [level=3] [ref=e99]
+              - generic [ref=e100]:
+                - generic [ref=e101]: "Quantité :"
+                - generic [ref=e102]:
+                  - button [disabled] [ref=e103]:
+                    - img [ref=e105]
+                  - spinbutton [ref=e106]: "1"
+                  - button [ref=e107] [cursor=pointer]:
+                    - img [ref=e109] [cursor=pointer]
+              - generic [ref=e110]:
+                - generic [ref=e111]: "Total :"
+                - generic [ref=e112]: 10 900 XOF
+              - generic [ref=e113]:
+                - button "Commencer la réservation" [ref=e114] [cursor=pointer]:
+                  - generic [ref=e115] [cursor=pointer]:
+                    - img [ref=e116] [cursor=pointer]
+                    - text: Commencer la réservation
+                - button "Réserver en 1 clic" [ref=e120] [cursor=pointer]:
+                  - generic [ref=e121] [cursor=pointer]:
+                    - img [ref=e122] [cursor=pointer]
+                    - text: Réserver en 1 clic
+                - button "Ajouter aux favoris" [ref=e126] [cursor=pointer]:
+                  - generic [ref=e127] [cursor=pointer]:
+                    - img [ref=e128] [cursor=pointer]
+                    - text: Ajouter aux favoris
+            - generic [ref=e132]:
+              - heading "Partager" [level=3] [ref=e133]
+              - generic [ref=e134]:
+                - button [ref=e135] [cursor=pointer]:
+                  - img [ref=e137] [cursor=pointer]
+                - button [ref=e139] [cursor=pointer]:
+                  - img [ref=e141] [cursor=pointer]
+                - button [ref=e143] [cursor=pointer]:
+                  - img [ref=e145] [cursor=pointer]
+                - button [ref=e147] [cursor=pointer]:
+                  - img [ref=e149] [cursor=pointer]
+        - generic [ref=e152]:
+          - heading "Produits similaires" [level=2] [ref=e154]
+          - generic [ref=e156]:
+            - generic [ref=e158] [cursor=pointer]:
+              - img "Mini panier brunch" [ref=e160] [cursor=pointer]
+              - generic [ref=e161] [cursor=pointer]:
+                - heading "Mini panier brunch" [level=3] [ref=e162] [cursor=pointer]
+                - paragraph [ref=e163] [cursor=pointer]: Atelier des Saveurs
+                - generic [ref=e164] [cursor=pointer]:
+                  - generic [ref=e165] [cursor=pointer]: 6 900 XOF
+                  - generic [ref=e166] [cursor=pointer]: 6 restants
+            - generic [ref=e168] [cursor=pointer]:
+              - img "Sélection fromagère" [ref=e170] [cursor=pointer]
+              - generic [ref=e171] [cursor=pointer]:
+                - heading "Sélection fromagère" [level=3] [ref=e172] [cursor=pointer]
+                - paragraph [ref=e173] [cursor=pointer]: Maison du Terroir
+                - generic [ref=e174] [cursor=pointer]:
+                  - generic [ref=e175] [cursor=pointer]: 12 900 XOF
+                  - generic [ref=e176] [cursor=pointer]: 4 restants
+            - generic [ref=e178] [cursor=pointer]:
+              - img "Panier découverte bio" [ref=e180] [cursor=pointer]
+              - generic [ref=e181] [cursor=pointer]:
+                - heading "Panier découverte bio" [level=3] [ref=e182] [cursor=pointer]
+                - paragraph [ref=e183] [cursor=pointer]: Marché Bio Riviera
+                - generic [ref=e184] [cursor=pointer]:
+                  - generic [ref=e185] [cursor=pointer]: 8 200 XOF
+                  - generic [ref=e186] [cursor=pointer]: 10 restants
+    - contentinfo [ref=e187]:
+      - generic [ref=e188]:
+        - generic [ref=e189]:
+          - paragraph [ref=e190]: Antigaspi
+          - paragraph [ref=e191]: © 2025 — Ensemble, réduisons le gaspillage alimentaire.
+        - generic [ref=e192]:
+          - img [ref=e194]
+          - img [ref=e198]
+          - img [ref=e202]
+  - generic:
+    - generic:
+      - status [ref=e206]:
+        - generic [ref=e207]:
+          - img [ref=e209]
+          - generic [ref=e211]:
+            - paragraph [ref=e212]: Catalogue
+            - paragraph [ref=e213]: Unexpected token '<', "<br /> <b>"... is not valid JSON
+            - button "Réessayer" [ref=e214] [cursor=pointer]:
+              - generic [ref=e215] [cursor=pointer]: Réessayer
+          - button "Fermer la notification" [ref=e216] [cursor=pointer]:
+            - img [ref=e217] [cursor=pointer]
+      - status [ref=e220]:
+        - generic [ref=e221]:
+          - img [ref=e223]
+          - generic [ref=e225]:
+            - paragraph [ref=e226]: Commerçants
+            - paragraph [ref=e227]: Unexpected token '<', "<br /> <b>"... is not valid JSON
+            - button "Réessayer" [ref=e228] [cursor=pointer]:
+              - generic [ref=e229] [cursor=pointer]: Réessayer
+          - button "Fermer la notification" [ref=e230] [cursor=pointer]:
+            - img [ref=e231] [cursor=pointer]
+```

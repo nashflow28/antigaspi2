@@ -17,15 +17,18 @@ const getApiBaseUrl = (): string => {
     return configUrl
   }
   // Fallback pour développement local
-  return 'http://localhost:8000/api'
+  // 10.0.2.2 est l'adresse spéciale pour localhost sur émulateur Android
+  return 'http://10.0.2.2:8000/api'
 }
 
 // Configuration des notifications
 Notifications.setNotificationHandler({
-  handleNotification: async () => ({
+  handleNotification: async (): Promise<Notifications.NotificationBehavior> => ({
     shouldShowAlert: true,
     shouldPlaySound: true,
     shouldSetBadge: true,
+    shouldShowBanner: true,
+    shouldShowList: true,
   }),
 });
 
@@ -73,12 +76,8 @@ class NotificationService {
       async (config) => {
         const token = await AsyncStorage.getItem('auth_token');
 
-        if (token) {
-          if (!config.headers) {
-            config.headers = {};
-          }
-
-          (config.headers as Record<string, string>).Authorization = `Bearer ${token}`;
+        if (token && config.headers) {
+          config.headers.Authorization = `Bearer ${token}`;
         }
 
         return config;

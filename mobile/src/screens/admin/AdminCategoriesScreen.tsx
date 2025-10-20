@@ -14,10 +14,10 @@ const AdminCategoriesScreen: React.FC = () => {
       </View>
       <View style={styles.content}>
         <Ionicons name="grid-outline" size={64} color={theme.colors.neutral[300]} />
-        <Text style={[styles.text, { color: theme.colors.text.secondary }]}>
+        <Text style={[styles.text, { color: theme.colors.textSecondary }]}>
           Écran de gestion des catégories
         </Text>
-        <Text style={[styles.subtext, { color: theme.colors.text.secondary }]}>
+        <Text style={[styles.subtext, { color: theme.colors.textSecondary }]}>
           (CRUD catégories de produits)
         </Text>
       </View>

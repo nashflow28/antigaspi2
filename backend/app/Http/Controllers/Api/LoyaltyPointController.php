@@ -206,6 +206,99 @@ class LoyaltyPointController extends Controller
     }
 
     /**
+     * Get merchant's loyalty program stats (Merchant only)
+     */
+    public function getMerchantStats(Request $request): JsonResponse
+    {
+        try {
+            $user = $request->user();
+
+            if (!$user || $user->role !== 'merchant') {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Accès réservé aux commerçants'
+                ], 403);
+            }
+
+            $merchant = $user->merchant;
+            if (!$merchant) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Profil commerçant non trouvé'
+                ], 404);
+            }
+
+            // Get all customers who made purchases with this merchant
+            $customerIds = DB::table('reservations')
+                ->join('products', 'reservations.product_id', '=', 'products.id')
+                ->where('products.merchant_id', $merchant->id)
+                ->where('reservations.status', 'completed')
+                ->distinct()
+                ->pluck('reservations.user_id');
+
+            // Total points distributed by this merchant
+            $totalPointsDistributed = LoyaltyPoint::whereIn('user_id', $customerIds)
+                ->where('earned_from', 'reservation')
+                ->where('points', '>', 0)
+                ->sum('points');
+
+            // Points distributed this month
+            $monthlyPoints = LoyaltyPoint::whereIn('user_id', $customerIds)
+                ->where('earned_from', 'reservation')
+                ->where('points', '>', 0)
+                ->whereMonth('created_at', now()->month)
+                ->whereYear('created_at', now()->year)
+                ->sum('points');
+
+            // Number of customers with points
+            $customersWithPoints = User::whereIn('id', $customerIds)
+                ->whereHas('loyaltyPoints', function($query) {
+                    $query->where('points', '>', 0);
+                })
+                ->count();
+
+            // Top 5 loyal customers
+            $topCustomers = User::whereIn('id', $customerIds)
+                ->with(['loyaltyPoints' => function($query) {
+                    $query->active();
+                }])
+                ->get()
+                ->map(function ($user) {
+                    $totalPoints = $user->loyaltyPoints->sum('points');
+                    return [
+                        'id' => $user->id,
+                        'name' => $user->name ?: trim($user->first_name . ' ' . $user->last_name),
+                        'email' => $user->email,
+                        'total_points' => $totalPoints,
+                    ];
+                })
+                ->filter(function($customer) {
+                    return $customer['total_points'] > 0;
+                })
+                ->sortByDesc('total_points')
+                ->take(5)
+                ->values();
+
+            return response()->json([
+                'success' => true,
+                'data' => [
+                    'total_points_distributed' => (int) $totalPointsDistributed,
+                    'monthly_points_distributed' => (int) $monthlyPoints,
+                    'customers_with_points' => $customersWithPoints,
+                    'top_customers' => $topCustomers,
+                ]
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Erreur lors de la récupération des statistiques',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
      * Get merchant's customers with their loyalty points (Merchant only)
      */
     public function getMerchantCustomers(Request $request): JsonResponse

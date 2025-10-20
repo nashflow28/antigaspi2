@@ -126,10 +126,10 @@ const AdminUsersScreen: React.FC = () => {
             <Ionicons name="person" size={24} color={theme.colors.primary[500]} />
           </View>
           <View style={styles.userDetails}>
-            <Text style={[styles.userName, { color: theme.colors.text.primary }]}>
+            <Text style={[styles.userName, { color: theme.colors.text }]}>
               {item.first_name} {item.last_name}
             </Text>
-            <Text style={[styles.userEmail, { color: theme.colors.text.secondary }]}>
+            <Text style={[styles.userEmail, { color: theme.colors.textSecondary }]}>
               {item.email}
             </Text>
             <View style={styles.badges}>
@@ -237,7 +237,7 @@ const AdminUsersScreen: React.FC = () => {
         ListEmptyComponent={
           <View style={[styles.emptyState, { backgroundColor: theme.colors.surface.light }]}>
             <Ionicons name="people-outline" size={64} color={theme.colors.neutral[300]} />
-            <Text style={[styles.emptyText, { color: theme.colors.text.secondary }]}>
+            <Text style={[styles.emptyText, { color: theme.colors.textSecondary }]}>
               Aucun utilisateur trouvé
             </Text>
           </View>

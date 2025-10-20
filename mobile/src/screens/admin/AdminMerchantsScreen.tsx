@@ -14,10 +14,10 @@ const AdminMerchantsScreen: React.FC = () => {
       </View>
       <View style={styles.content}>
         <Ionicons name="storefront-outline" size={64} color={theme.colors.neutral[300]} />
-        <Text style={[styles.text, { color: theme.colors.text.secondary }]}>
+        <Text style={[styles.text, { color: theme.colors.textSecondary }]}>
           Écran de gestion des commerçants
         </Text>
-        <Text style={[styles.subtext, { color: theme.colors.text.secondary }]}>
+        <Text style={[styles.subtext, { color: theme.colors.textSecondary }]}>
           (Vérification et validation)
         </Text>
       </View>

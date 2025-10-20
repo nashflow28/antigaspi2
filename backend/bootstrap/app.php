@@ -33,8 +33,8 @@ return Application::configure(basePath: dirname(__DIR__))
             'throttle.api' => \App\Http\Middleware\ThrottleApiRequests::class,
         ]);
 
-        // Configuration du rate limiting pour l'API - TEMPORAIREMENT DÉSACTIVÉ
-        // $middleware->throttleApi();
+        // Configuration du rate limiting pour l'API - RÉACTIVÉ (Fix sécurité CRITICAL)
+        $middleware->throttleApi();
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

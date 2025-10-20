@@ -1,0 +1,44 @@
+src/navigation/AppNavigator.logout.int.test.tsx(28,18): error TS2322: Type 'Reducer<AuthState>' is not assignable to type 'Reducer<AuthState, UnknownAction, { user: { id: number; email: string; role: string; first_name: string; last_name: string; city: string; created_at: string; updated_at: string; }; token: string; isAuthenticated: boolean; loading: boolean; error: null; }>'.
+  Types of parameters 'state' and 'state' are incompatible.
+    Type 'AuthState | { user: { id: number; email: string; role: string; first_name: string; last_name: string; city: string; created_at: string; updated_at: string; }; token: string; isAuthenticated: boolean; loading: boolean; error: null; } | undefined' is not assignable to type 'AuthState | undefined'.
+      Type '{ user: { id: number; email: string; role: string; first_name: string; last_name: string; city: string; created_at: string; updated_at: string; }; token: string; isAuthenticated: boolean; loading: boolean; error: null; }' is not assignable to type 'AuthState'.
+        The types of 'user.role' are incompatible between these types.
+          Type 'string' is not assignable to type '"consumer" | "merchant" | "admin"'.
+src/navigation/AppNavigator.logout.refactored.int.test.tsx(96,12): error TS2571: Object is of type 'unknown'.
+src/navigation/AppNavigator.logout.refactored.int.test.tsx(97,12): error TS2571: Object is of type 'unknown'.
+src/navigation/AppNavigator.logout.refactored.int.test.tsx(109,14): error TS18046: 'authState' is of type 'unknown'.
+src/navigation/AppNavigator.logout.refactored.int.test.tsx(110,14): error TS18046: 'authState' is of type 'unknown'.
+src/navigation/AppNavigator.logout.refactored.int.test.tsx(111,14): error TS18046: 'authState' is of type 'unknown'.
+src/screens/main/ProductsScreen.int.test.tsx(41,7): error TS2322: Type 'Reducer<AuthState>' is not assignable to type 'Reducer<AuthState, UnknownAction, { user: { id: number; email: string; role: string; first_name: string; last_name: string; city: string; created_at: string; updated_at: string; }; token: string; isAuthenticated: boolean; loading: boolean; error: null; }>'.
+  Types of parameters 'state' and 'state' are incompatible.
+    Type 'AuthState | { user: { id: number; email: string; role: string; first_name: string; last_name: string; city: string; created_at: string; updated_at: string; }; token: string; isAuthenticated: boolean; loading: boolean; error: null; } | undefined' is not assignable to type 'AuthState | undefined'.
+      Type '{ user: { id: number; email: string; role: string; first_name: string; last_name: string; city: string; created_at: string; updated_at: string; }; token: string; isAuthenticated: boolean; loading: boolean; error: null; }' is not assignable to type 'AuthState'.
+        The types of 'user.role' are incompatible between these types.
+          Type 'string' is not assignable to type '"consumer" | "merchant" | "admin"'.
+src/screens/main/ProductsScreen.int.test.tsx(42,7): error TS2322: Type 'Reducer<ProductsState>' is not assignable to type 'Reducer<ProductsState, UnknownAction, { products: { id: number; name: string; description: string; original_price: string; discounted_price: string; quantity_available: number; ... 8 more ...; merchant: { ...; }; }[]; ... 6 more ...; hasMore: boolean; }>'.
+  Types of parameters 'state' and 'state' are incompatible.
+    Type 'ProductsState | { products: { id: number; name: string; description: string; original_price: string; discounted_price: string; quantity_available: number; expiration_date: string; ... 7 more ...; merchant: { ...; }; }[]; ... 6 more ...; hasMore: boolean; } | undefined' is not assignable to type 'ProductsState | undefined'.
+      Type '{ products: { id: number; name: string; description: string; original_price: string; discounted_price: string; quantity_available: number; expiration_date: string; expiry_date: string; image_url: null; ... 5 more ...; merchant: { ...; }; }[]; ... 6 more ...; hasMore: boolean; }' is not assignable to type 'ProductsState'.
+        Types of property 'products' are incompatible.
+          Type '{ id: number; name: string; description: string; original_price: string; discounted_price: string; quantity_available: number; expiration_date: string; expiry_date: string; image_url: null; ... 5 more ...; merchant: { ...; }; }[]' is not assignable to type 'Product[]'.
+            Type '{ id: number; name: string; description: string; original_price: string; discounted_price: string; quantity_available: number; expiration_date: string; expiry_date: string; image_url: null; ... 5 more ...; merchant: { ...; }; }' is not assignable to type 'Product'.
+              Types of property 'image_url' are incompatible.
+                Type 'null' is not assignable to type 'string | undefined'.
+src/screens/main/ProductsScreen.refactored.int.test.tsx(66,13): error TS2322: Type 'null' is not assignable to type 'string | undefined'.
+src/screens/main/ProfileScreen.int.test.tsx(37,16): error TS2322: Type 'Reducer<AuthState>' is not assignable to type 'Reducer<AuthState, UnknownAction, { user: { id: number; email: string; role: string; first_name: string; last_name: string; }; token: string; isAuthenticated: boolean; loading: boolean; error: null; }>'.
+  Types of parameters 'state' and 'state' are incompatible.
+    Type 'AuthState | { user: { id: number; email: string; role: string; first_name: string; last_name: string; }; token: string; isAuthenticated: boolean; loading: boolean; error: null; } | undefined' is not assignable to type 'AuthState | undefined'.
+      Type '{ user: { id: number; email: string; role: string; first_name: string; last_name: string; }; token: string; isAuthenticated: boolean; loading: boolean; error: null; }' is not assignable to type 'AuthState'.
+        Types of property 'user' are incompatible.
+          Type '{ id: number; email: string; role: string; first_name: string; last_name: string; }' is missing the following properties from type 'User': city, created_at, updated_at
+src/store/slices/authSlice.test.ts(31,16): error TS2353: Object literal may only specify known properties, and 'auth' does not exist in type 'Reducer<{ auth: AuthState; }, UnknownAction, any>'.
+src/test-utils/factories.ts(71,3): error TS2322: Type 'null' is not assignable to type 'string | undefined'.
+src/test-utils/factories.ts(73,3): error TS2322: Type 'null' is not assignable to type 'string | undefined'.
+src/test-utils/factories.ts(74,3): error TS2322: Type 'null' is not assignable to type 'string | undefined'.
+src/test-utils/factories.ts(75,3): error TS2322: Type 'Product' is not assignable to type '{ id: number; name: string; description?: string | undefined; image_url?: string | null | undefined; original_price?: number | undefined; discounted_price?: number | undefined; discount_percentage?: number | undefined; expiration_date?: string | undefined; merchant: { ...; }; category?: Category | ... 1 more ... | u...'.
+  Types of property 'original_price' are incompatible.
+    Type 'string' is not assignable to type 'number'.
+src/test-utils/test-utils.tsx(9,26): error TS2305: Module '"@reduxjs/toolkit"' has no exported member 'PreloadedState'.
+src/test-utils/test-utils.tsx(56,7): error TS2322: Type 'Record<string, any>' is not assignable to type 'Reducer<{ [x: string]: ...; }, UnknownAction, any>'.
+  Type 'Record<string, any>' provides no match for the signature '(state: any, action: UnknownAction): { [x: string]: ...; }'.
+src/test-utils/test-utils.tsx(64,7): error TS2353: Object literal may only specify known properties, and 'auth' does not exist in type 'Reducer<{ auth: AuthState; products: ProductsState; reservations: ReservationsState; merchants: MerchantsState; favorites: FavoritesState; reviews: ReviewsState; }, UnknownAction, any>'.

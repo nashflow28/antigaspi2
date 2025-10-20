@@ -243,6 +243,7 @@ export const ThemeProvider: React.FC<{ children: ReactNode }> = ({ children }) =
 
   // Load saved preferences on mount
   useEffect(() => {
+    // ✅ RÉACTIVÉ: Freeze résolu après relance propre
     loadSavedPreferences()
 
     // Listen to system theme changes

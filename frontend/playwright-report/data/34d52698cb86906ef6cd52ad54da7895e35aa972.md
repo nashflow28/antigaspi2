@@ -1,0 +1,153 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - generic [ref=e3]:
+    - navigation "Navigation principale" [ref=e4]:
+      - generic [ref=e5]:
+        - link "Antigaspi" [ref=e6] [cursor=pointer]:
+          - /url: /
+          - generic [ref=e7] [cursor=pointer]: Antigaspi
+        - generic [ref=e8]:
+          - button "Activer le thème clair" [ref=e9] [cursor=pointer]:
+            - generic [ref=e10] [cursor=pointer]: Activer le thème clair
+            - img [ref=e12] [cursor=pointer]
+          - button "Ouvrir la navigation" [ref=e14] [cursor=pointer]:
+            - img [ref=e16] [cursor=pointer]
+    - main [ref=e18]:
+      - generic [ref=e20]:
+        - navigation [ref=e21]:
+          - link "Accueil" [ref=e22] [cursor=pointer]:
+            - /url: /
+          - img [ref=e23]
+          - link "Catalogue" [ref=e25] [cursor=pointer]:
+            - /url: /products
+          - img [ref=e26]
+          - generic [ref=e28]: Panier signature anti-gaspi
+        - generic [ref=e29]:
+          - generic [ref=e30]:
+            - generic [ref=e32]:
+              - img "Panier signature anti-gaspi" [ref=e34]
+              - generic [ref=e36]: 9 en stock
+              - generic [ref=e38]: "-40%"
+              - generic [ref=e40]: Frais
+            - generic [ref=e43]:
+              - generic [ref=e44]:
+                - img [ref=e45]
+                - generic [ref=e48]:
+                  - paragraph [ref=e49]: La Ferme Urbaine
+                  - paragraph [ref=e50]: 12 avenue des Serres, Abidjan
+              - generic [ref=e51]:
+                - img [ref=e52]
+                - generic [ref=e55]:
+                  - paragraph [ref=e56]: Récupération
+                  - paragraph [ref=e57]: 18 juin 2030, 17:00
+          - generic [ref=e58]:
+            - generic [ref=e59]:
+              - generic [ref=e60]:
+                - generic [ref=e61]: Fruits et Légumes
+                - generic [ref=e62]: Panier Surprise
+              - heading "Panier signature anti-gaspi" [level=1] [ref=e63]
+              - generic [ref=e64]:
+                - generic [ref=e65]: 10 900 XOF
+                - generic [ref=e66]: 18 000 XOF
+                - generic [ref=e67]: Économisez 7 100 XOF
+            - generic [ref=e68]:
+              - heading "Description" [level=3] [ref=e70]
+              - paragraph [ref=e72]: Sélection premium de fruits et légumes sauvés du gaspillage, avec conseils de dégustation.
+            - generic [ref=e76]:
+              - heading "Réservation" [level=3] [ref=e77]
+              - generic [ref=e78]:
+                - generic [ref=e79]: "Quantité :"
+                - generic [ref=e80]:
+                  - button [disabled] [ref=e81]:
+                    - img [ref=e83]
+                  - spinbutton [ref=e84]: "1"
+                  - button [ref=e85] [cursor=pointer]:
+                    - img [ref=e87] [cursor=pointer]
+              - generic [ref=e88]:
+                - generic [ref=e89]: "Total :"
+                - generic [ref=e90]: 10 900 XOF
+              - generic [ref=e91]:
+                - button "Commencer la réservation" [ref=e92] [cursor=pointer]:
+                  - generic [ref=e93] [cursor=pointer]:
+                    - img [ref=e94] [cursor=pointer]
+                    - text: Commencer la réservation
+                - button "Réserver en 1 clic" [ref=e98] [cursor=pointer]:
+                  - generic [ref=e99] [cursor=pointer]:
+                    - img [ref=e100] [cursor=pointer]
+                    - text: Réserver en 1 clic
+                - button "Ajouter aux favoris" [ref=e104] [cursor=pointer]:
+                  - generic [ref=e105] [cursor=pointer]:
+                    - img [ref=e106] [cursor=pointer]
+                    - text: Ajouter aux favoris
+            - generic [ref=e110]:
+              - heading "Partager" [level=3] [ref=e111]
+              - generic [ref=e112]:
+                - button [ref=e113] [cursor=pointer]:
+                  - img [ref=e115] [cursor=pointer]
+                - button [ref=e117] [cursor=pointer]:
+                  - img [ref=e119] [cursor=pointer]
+                - button [ref=e121] [cursor=pointer]:
+                  - img [ref=e123] [cursor=pointer]
+                - button [ref=e125] [cursor=pointer]:
+                  - img [ref=e127] [cursor=pointer]
+        - generic [ref=e130]:
+          - heading "Produits similaires" [level=2] [ref=e132]
+          - generic [ref=e134]:
+            - generic [ref=e136] [cursor=pointer]:
+              - img "Mini panier brunch" [ref=e138] [cursor=pointer]
+              - generic [ref=e139] [cursor=pointer]:
+                - heading "Mini panier brunch" [level=3] [ref=e140] [cursor=pointer]
+                - paragraph [ref=e141] [cursor=pointer]: Atelier des Saveurs
+                - generic [ref=e142] [cursor=pointer]:
+                  - generic [ref=e143] [cursor=pointer]: 6 900 XOF
+                  - generic [ref=e144] [cursor=pointer]: 6 restants
+            - generic [ref=e146] [cursor=pointer]:
+              - img "Sélection fromagère" [ref=e148] [cursor=pointer]
+              - generic [ref=e149] [cursor=pointer]:
+                - heading "Sélection fromagère" [level=3] [ref=e150] [cursor=pointer]
+                - paragraph [ref=e151] [cursor=pointer]: Maison du Terroir
+                - generic [ref=e152] [cursor=pointer]:
+                  - generic [ref=e153] [cursor=pointer]: 12 900 XOF
+                  - generic [ref=e154] [cursor=pointer]: 4 restants
+            - generic [ref=e156] [cursor=pointer]:
+              - img "Panier découverte bio" [ref=e158] [cursor=pointer]
+              - generic [ref=e159] [cursor=pointer]:
+                - heading "Panier découverte bio" [level=3] [ref=e160] [cursor=pointer]
+                - paragraph [ref=e161] [cursor=pointer]: Marché Bio Riviera
+                - generic [ref=e162] [cursor=pointer]:
+                  - generic [ref=e163] [cursor=pointer]: 8 200 XOF
+                  - generic [ref=e164] [cursor=pointer]: 10 restants
+    - contentinfo [ref=e165]:
+      - generic [ref=e166]:
+        - generic [ref=e167]:
+          - paragraph [ref=e168]: Antigaspi
+          - paragraph [ref=e169]: © 2025 — Ensemble, réduisons le gaspillage alimentaire.
+        - generic [ref=e170]:
+          - img [ref=e172]
+          - img [ref=e176]
+          - img [ref=e180]
+  - generic:
+    - generic:
+      - status [ref=e184]:
+        - generic [ref=e185]:
+          - img [ref=e187]
+          - generic [ref=e189]:
+            - paragraph [ref=e190]: Catalogue
+            - paragraph [ref=e191]: Unexpected token '<', "<br /> <b>"... is not valid JSON
+            - button "Réessayer" [ref=e192] [cursor=pointer]:
+              - generic [ref=e193] [cursor=pointer]: Réessayer
+          - button "Fermer la notification" [ref=e194] [cursor=pointer]:
+            - img [ref=e195] [cursor=pointer]
+      - status [ref=e198]:
+        - generic [ref=e199]:
+          - img [ref=e201]
+          - generic [ref=e203]:
+            - paragraph [ref=e204]: Commerçants
+            - paragraph [ref=e205]: Unexpected token '<', "<br /> <b>"... is not valid JSON
+            - button "Réessayer" [ref=e206] [cursor=pointer]:
+              - generic [ref=e207] [cursor=pointer]: Réessayer
+          - button "Fermer la notification" [ref=e208] [cursor=pointer]:
+            - img [ref=e209] [cursor=pointer]
+```

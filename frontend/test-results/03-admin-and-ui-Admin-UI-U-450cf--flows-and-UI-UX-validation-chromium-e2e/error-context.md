@@ -1,0 +1,119 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e3]:
+  - navigation "Navigation principale" [ref=e4]:
+    - generic [ref=e5]:
+      - link "Antigaspi" [ref=e6] [cursor=pointer]:
+        - /url: /
+        - generic [ref=e7] [cursor=pointer]: Antigaspi
+      - generic [ref=e8]:
+        - button "Activer le thème sombre" [ref=e9] [cursor=pointer]:
+          - generic [ref=e10] [cursor=pointer]: Activer le thème sombre
+          - img [ref=e12] [cursor=pointer]
+        - button "Ouvrir la navigation" [ref=e18] [cursor=pointer]:
+          - img [ref=e20] [cursor=pointer]
+  - main [ref=e22]:
+    - generic [ref=e23]:
+      - generic [ref=e24]:
+        - generic [ref=e29]:
+          - generic [ref=e31]: Ensemble contre le gaspillage alimentaire
+          - heading "Sauvons notre planète" [level=1] [ref=e33]:
+            - generic [ref=e34]: Sauvons
+            - generic [ref=e35]: notre planète
+          - paragraph [ref=e36]:
+            - text: Transformons les invendus en opportunités.
+            - generic [ref=e37]: Économisez jusqu'à 70%
+            - text: tout en protégeant l'environnement.
+          - generic [ref=e38]:
+            - button "🌟 Découvrir les offres" [ref=e39] [cursor=pointer]:
+              - generic [ref=e41] [cursor=pointer]: 🌟 Découvrir les offres
+            - button "✨ Rejoindre maintenant" [ref=e42] [cursor=pointer]:
+              - generic [ref=e44] [cursor=pointer]: ✨ Rejoindre maintenant
+          - generic [ref=e45]:
+            - generic [ref=e47]:
+              - generic [ref=e48]: 1,2M+
+              - generic [ref=e49]: Produits sauvés
+            - generic [ref=e51]:
+              - generic [ref=e52]: 50K+
+              - generic [ref=e53]: Utilisateurs actifs
+            - generic [ref=e55]:
+              - generic [ref=e56]: 2,5K+
+              - generic [ref=e57]: Commerçants partenaires
+        - img [ref=e59]
+      - generic [ref=e62]:
+        - generic [ref=e63]:
+          - generic [ref=e65]: Processus simple en 3 étapes
+          - heading "Comment ça marche ?" [level=2] [ref=e67]
+          - paragraph [ref=e68]: Rejoignez la révolution anti-gaspillage en quelques clics
+        - generic [ref=e69]:
+          - generic [ref=e71] [cursor=pointer]:
+            - generic [ref=e72] [cursor=pointer]:
+              - generic [ref=e74] [cursor=pointer]: 🔍
+              - generic [ref=e75] [cursor=pointer]: "1"
+            - generic [ref=e76] [cursor=pointer]:
+              - heading "Découvrez" [level=3] [ref=e77] [cursor=pointer]
+              - paragraph [ref=e78] [cursor=pointer]: Explorez les offres exclusives des commerçants locaux et trouvez des produits de qualité à prix réduits.
+              - generic [ref=e79] [cursor=pointer]:
+                - generic [ref=e81] [cursor=pointer]: Géolocalisation intelligente
+                - generic [ref=e83] [cursor=pointer]: Filtres avancés
+          - generic [ref=e85] [cursor=pointer]:
+            - generic [ref=e86] [cursor=pointer]:
+              - generic [ref=e88] [cursor=pointer]: ⚡
+              - generic [ref=e89] [cursor=pointer]: "2"
+            - generic [ref=e90] [cursor=pointer]:
+              - heading "Réservez" [level=3] [ref=e91] [cursor=pointer]
+              - paragraph [ref=e92] [cursor=pointer]: Réservez instantanément vos produits favoris avec paiement sécurisé et confirmation immédiate.
+              - generic [ref=e93] [cursor=pointer]:
+                - generic [ref=e95] [cursor=pointer]: Réservation instantanée
+                - generic [ref=e97] [cursor=pointer]: Paiement sécurisé
+          - generic [ref=e99] [cursor=pointer]:
+            - generic [ref=e100] [cursor=pointer]:
+              - generic [ref=e102] [cursor=pointer]: 🌱
+              - generic [ref=e103] [cursor=pointer]: "3"
+            - generic [ref=e104] [cursor=pointer]:
+              - heading "Sauvez" [level=3] [ref=e105] [cursor=pointer]
+              - paragraph [ref=e106] [cursor=pointer]: Récupérez vos achats et contribuez activement à la réduction du gaspillage alimentaire.
+              - generic [ref=e107] [cursor=pointer]:
+                - generic [ref=e109] [cursor=pointer]: Impact environnemental
+                - generic [ref=e111] [cursor=pointer]: Économies réalisées
+        - button "Commencer maintenant→" [ref=e113] [cursor=pointer]:
+          - generic [ref=e114] [cursor=pointer]:
+            - generic [ref=e115] [cursor=pointer]: Commencer maintenant
+            - generic [ref=e116] [cursor=pointer]: →
+      - generic [ref=e118]:
+        - heading "Notre impact" [level=2] [ref=e120]
+        - generic [ref=e121]:
+          - generic [ref=e122]:
+            - generic [ref=e123]: 1,234
+            - paragraph [ref=e124]: Produits sauvés
+          - generic [ref=e125]:
+            - generic [ref=e126]: "567"
+            - paragraph [ref=e127]: Utilisateurs actifs
+          - generic [ref=e128]:
+            - generic [ref=e129]: "89"
+            - paragraph [ref=e130]: Commerçants partenaires
+      - generic [ref=e132]:
+        - heading "Prêt à faire la différence ?" [level=2] [ref=e133]
+        - paragraph [ref=e134]: Rejoignez notre communauté et commencez à économiser tout en protégeant l'environnement
+        - generic [ref=e135]:
+          - button "Consommateur" [ref=e136] [cursor=pointer]:
+            - generic [ref=e137] [cursor=pointer]: Consommateur
+          - button "Commerçant" [ref=e138] [cursor=pointer]:
+            - generic [ref=e139] [cursor=pointer]: Commerçant
+      - generic [ref=e142]:
+        - heading "Catégories populaires" [level=2] [ref=e143]
+        - paragraph [ref=e144]: Explorez nos produits par catégorie
+      - generic [ref=e168]:
+        - heading "Produits en vedette" [level=2] [ref=e169]
+        - paragraph [ref=e170]: Découvrez les meilleures offres anti-gaspillage près de chez vous
+  - contentinfo [ref=e192]:
+    - generic [ref=e193]:
+      - generic [ref=e194]:
+        - paragraph [ref=e195]: Antigaspi
+        - paragraph [ref=e196]: © 2025 — Ensemble, réduisons le gaspillage alimentaire.
+      - generic [ref=e197]:
+        - img [ref=e199]
+        - img [ref=e203]
+        - img [ref=e207]
+```

@@ -22,7 +22,9 @@ import { getImageUrl } from '../../utils/imageHelpers'
 import { formatCurrency } from '../../utils/currencyHelpers'
 import FavoriteButton from '../../components/FavoriteButton'
 import StarRating from '../../components/reviews/StarRating'
-import { Button, Card, Typography } from '../../components/2025'
+import { Button, Card, Typography, Modal } from '../../components/2025'
+import Constants from 'expo-constants'
+import { TEST_IDS } from '../../utils/testIds'
 
 interface Props {
   route: any
@@ -41,6 +43,7 @@ const ProductDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
   const [reserving, setReserving] = useState(false)
   const [selectedQuantity, setSelectedQuantity] = useState(1)
   const navigationTimeoutRef = useRef<NodeJS.Timeout | null>(null)
+  const [confirmVisible, setConfirmVisible] = useState(false)
 
   useEffect(() => {
     loadProduct()
@@ -104,55 +107,57 @@ const ProductDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
   const originalPrice = Math.round(parseFloat(product.original_price) || 0)
   const discountPercent = Math.round(((originalPrice - discountedPrice) / originalPrice) * 100)
 
-  const handleReserve = async () => {
+  const isTestMode = Boolean((Constants?.expoConfig as any)?.extra?.testMode)
+
+  const performReservation = async () => {
     // Guard contre les appels multiples simultanés
     if (reserving) return
 
     setReserving(true) // Bloquer immédiatement pour éviter double clic
     const totalPrice = discountedPrice * selectedQuantity
+    try {
+      const result = await dispatch(createReservation({
+        productId: product.id,
+        quantity: selectedQuantity,
+        paymentMethod: 'on_site', // Paiement sur place
+        notes: null,
+      }))
 
+      if (createReservation.fulfilled.match(result)) {
+        const reservation = result.payload
+        showSuccess(`${selectedQuantity} produit${selectedQuantity > 1 ? 's' : ''} réservé${selectedQuantity > 1 ? 's' : ''} avec succès ! 🎉`)
+        // Recharger le produit pour mettre à jour la quantité disponible
+        await loadProduct()
+        // Navigation automatique vers les détails de la réservation après 1.5 secondes
+        navigationTimeoutRef.current = setTimeout(() => {
+          navigation.navigate('ReservationDetails', {
+            reservationId: reservation.data.id
+          })
+        }, 1500)
+      } else if (createReservation.rejected.match(result)) {
+        const errorMessage = result.payload as string || 'Impossible de créer la réservation'
+        showError(errorMessage)
+      }
+    } catch (error: any) {
+      showError(error.message || 'Une erreur est survenue lors de la réservation')
+    } finally {
+      setReserving(false)
+    }
+  }
+
+  const handleReserve = async () => {
+    if (isTestMode) {
+      setConfirmVisible(true)
+      return
+    }
+    // Default path with native Alert
+    const totalPrice = discountedPrice * selectedQuantity
     Alert.alert(
       'Confirmer la réservation',
       `Voulez-vous réserver ${selectedQuantity} ${product.name}${selectedQuantity > 1 ? 's' : ''} pour ${formatCurrency(totalPrice)} ?\n\n(${formatCurrency(discountedPrice)} × ${selectedQuantity})`,
       [
-        {
-          text: 'Annuler',
-          style: 'cancel',
-          onPress: () => setReserving(false),
-        },
-        {
-          text: 'Confirmer',
-          onPress: async () => {
-            try {
-              const result = await dispatch(createReservation({
-                productId: product.id,
-                quantity: selectedQuantity,
-                paymentMethod: 'on_site', // Paiement sur place
-                notes: null,
-              }))
-
-              if (createReservation.fulfilled.match(result)) {
-                const reservation = result.payload
-                showSuccess(`${selectedQuantity} produit${selectedQuantity > 1 ? 's' : ''} réservé${selectedQuantity > 1 ? 's' : ''} avec succès ! 🎉`)
-                // Recharger le produit pour mettre à jour la quantité disponible
-                await loadProduct()
-                // Navigation automatique vers les détails de la réservation après 1.5 secondes
-                navigationTimeoutRef.current = setTimeout(() => {
-                  navigation.navigate('ReservationDetails', {
-                    reservationId: reservation.data.id
-                  })
-                }, 1500)
-              } else if (createReservation.rejected.match(result)) {
-                const errorMessage = result.payload as string || 'Impossible de créer la réservation'
-                showError(errorMessage)
-              }
-            } catch (error: any) {
-              showError(error.message || 'Une erreur est survenue lors de la réservation')
-            } finally {
-              setReserving(false)
-            }
-          },
-        },
+        { text: 'Annuler', style: 'cancel' },
+        { text: 'Confirmer', onPress: () => performReservation() },
       ],
     )
   }
@@ -160,7 +165,7 @@ const ProductDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
   const styles = createStyles(theme)
 
   return (
-    <View style={styles.container}>
+    <View style={styles.container} testID={TEST_IDS.productDetailsScreen}>
       <StatusBar barStyle={theme.isDark ? 'light-content' : 'dark-content'} />
 
       <ScrollView style={styles.scrollView}>
@@ -366,10 +371,49 @@ const ProductDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
           onPress={handleReserve}
           leftIcon={<Ionicons name="cart" size={20} color={theme.colors.textInverse} />}
           style={{ width: '100%' }}
+          testID={TEST_IDS.reserveButton}
+          accessibilityLabel={TEST_IDS.reserveButton}
         >
           {reserving ? 'Réservation en cours...' : product.quantity_available === 0 ? 'Rupture de stock' : 'Réserver'}
         </Button>
       </View>
+
+      {/* Test-mode confirmation modal for MCP */}
+      {isTestMode && (
+        <Modal
+          visible={confirmVisible}
+          onClose={() => setConfirmVisible(false)}
+          title="Confirmer la réservation"
+          variant="center"
+          testID={TEST_IDS.reservationModal}
+          footer={
+            <View style={{ flexDirection: 'row', gap: 12 }}>
+              <Button
+                variant="ghost"
+                onPress={() => setConfirmVisible(false)}
+                testID={TEST_IDS.cancelButton}
+              >
+                Annuler
+              </Button>
+              <Button
+                variant="primary"
+                onPress={async () => {
+                  setConfirmVisible(false)
+                  await performReservation()
+                }}
+                testID={TEST_IDS.confirmButton}
+              >
+                Confirmer
+              </Button>
+            </View>
+          }
+        >
+          <Typography variant="body">
+            Voulez-vous réserver {selectedQuantity} {product.name}
+            {selectedQuantity > 1 ? 's' : ''} ?
+          </Typography>
+        </Modal>
+      )}
     </View>
   )
 }

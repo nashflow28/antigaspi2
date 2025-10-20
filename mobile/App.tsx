@@ -23,9 +23,11 @@ const AppContent = () => {
   return <AppNavigator />
 }
 
-// TEST PROGRESSIF 3: Full app with AppNavigator
+// ✅ APP FINALE: Tous les providers + AppNavigator
+// ThemeProvider AsyncStorage désactivé (fix freeze)
+// loadStoredAuth() actif dans AppNavigator
 export default function App() {
-  console.log('🧪 TEST 3: Redux + Theme + Navigation')
+  console.log('✅ APP FINALE: Redux + Theme + Toast + Navigation')
 
   return (
     <Provider store={store}>

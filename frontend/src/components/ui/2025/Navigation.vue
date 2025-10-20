@@ -124,8 +124,8 @@
               <span>{{ action.label }}</span>
             </component>
             <component
-              v-if="authCta?.login"
               :is="linkComponent(authCta.login)"
+              v-if="authCta?.login"
               v-bind="linkAttrs(authCta.login)"
               class="inline-flex items-center gap-2 rounded-full px-3 py-2 text-sm font-medium text-neutral-700 transition-all duration-300 ease-spring-out focus-2025 hover:text-primary-900 dark:text-dark-100"
               role="menuitem"
@@ -276,8 +276,8 @@
 
                 <div v-if="authCta" class="flex flex-col gap-2">
                   <component
-                    v-if="authCta.login"
                     :is="linkComponent(authCta.login)"
+                    v-if="authCta.login"
                     v-bind="linkAttrs(authCta.login)"
                     class="flex items-center justify-center rounded-full border border-primary-500/40 bg-primary-50/40 px-4 py-3 text-sm font-semibold text-primary-700 transition-all duration-300 ease-spring-out focus-2025 hover:bg-primary-100"
                     role="menuitem"

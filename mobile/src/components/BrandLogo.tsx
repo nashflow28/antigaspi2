@@ -71,12 +71,12 @@ const BrandLogo: React.FC<BrandLogoProps> = ({
       { fontSize } as TextStyle,
       customColorStyle,
       style,
-    ],
+    ] as TextStyle | TextStyle[],
     [fontSize, customColorStyle, style]
   )
 
   return (
-    <Typography variant="displayXl" weight={weight} align={align} color={typographyColor} style={combinedStyle} {...rest}>
+    <Typography variant="displayXl" weight={weight} align={align} color={typographyColor} style={combinedStyle as any} {...rest}>
       {text}
     </Typography>
   )

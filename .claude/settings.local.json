@@ -1,4 +1,6 @@
 {
+  "enableAllProjectMcpServers": true,
+  "enabledMcpjsonServers": ["mobile-mcp", "adb-mcp"],
   "permissions": {
     "allow": [
       "Bash(\"C:\\xampp\\mysql\\bin\\mysql.exe\":*)",
@@ -41,7 +43,11 @@
       "Bash(git commit:*)",
       "Bash(npx --package=typescript@5.9.2 tsc --noEmit src/screens/main/ProductDetailsScreen.tsx)",
       "Bash(\"C:\\xampp\\mysql\\bin\\mysql.exe\" -u root -e \"SELECT m.id as merchant_id, m.business_name, u.email FROM merchants m JOIN users u ON m.user_id = u.id WHERE u.email = ''marie.martin@email.com'';\" antigaspi_fresh)",
-      "Bash(\"C:\\xampp\\mysql\\bin\\mysql.exe\" -u root -e \"SELECT id, name, merchant_id, original_price, discounted_price, quantity_available, is_active FROM products WHERE merchant_id = 1;\" antigaspi_fresh)"
+      "Bash(\"C:\\xampp\\mysql\\bin\\mysql.exe\" -u root -e \"SELECT id, name, merchant_id, original_price, discounted_price, quantity_available, is_active FROM products WHERE merchant_id = 1;\" antigaspi_fresh)",
+      "Bash(C:xamppmysqlbinmysql.exe -u root -e \"SELECT COUNT(*) as total_products FROM products;\" antigaspi_fresh)",
+      "Bash(C:xamppmysqlbinmysql.exe:*)",
+      "Bash(C:xamppmysqlbinmysql.exe -u root -e \"SELECT m.business_name as merchant, COUNT(p.id) as nb_produits FROM merchants m LEFT JOIN products p ON m.id = p.merchant_id GROUP BY m.id, m.business_name;\" antigaspi_fresh)",
+      "Bash(python:*)"
     ],
     "deny": [],
     "ask": []

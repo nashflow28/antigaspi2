@@ -1,0 +1,26 @@
+--- a/src/store/slices/__tests__/authSlice.test.ts
++++ b/src/store/slices/__tests__/authSlice.test.ts
+@@ -59,7 +59,7 @@ describe('authSlice', () => {
+       expect(state).toEqual({
+         user: null,
+         token: null,
+         isAuthenticated: false,
+-        loading: false,
++        loading: true, // ⚠️ Initial state has loading=true for SplashScreen
+         error: null,
+       })
+     })
+@@ -559,9 +559,9 @@ describe('authSlice', () => {
+
+       const state = store.getState().auth
+-      // State should remain authenticated (logout failed)
+-      expect(state.isAuthenticated).toBe(true)
+-      expect(state.user).toEqual(mockUser)
+-      expect(state.token).toBe('test-token-123')
++      // ⚠️ FIX: Le logoutUser.rejected déconnecte localement même si l'API échoue (offline)
++      expect(state.isAuthenticated).toBe(false)
++      expect(state.user).toBeNull()
++      expect(state.token).toBeNull()
+     })
+   })
+ })

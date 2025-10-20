@@ -26,7 +26,6 @@ class AdminUserSeeder extends Seeder
                 'city' => 'Paris',
                 'address' => '1 Avenue de la République, Paris',
                 'is_active' => true,
-                'status' => 'active',
                 'email_verified_at' => now(),
             ]
         );
@@ -43,7 +42,6 @@ class AdminUserSeeder extends Seeder
                 'city' => 'Lyon',
                 'address' => '12 Rue des Commerçants, Lyon',
                 'is_active' => true,
-                'status' => 'active',
                 'email_verified_at' => now(),
             ]
         );
@@ -82,7 +80,6 @@ class AdminUserSeeder extends Seeder
                 'city' => 'Marseille',
                 'address' => '5 Rue des Consommateurs, Marseille',
                 'is_active' => true,
-                'status' => 'active',
                 'email_verified_at' => now(),
             ]
         );

@@ -1,0 +1,358 @@
+  11 affirmations incorrectes détectées et vérifiées empiriquement :
+
+  Erreur #1 : Compte des screens
+
+  - Affirmation initiale : "8 consumer screens"
+  - Réalité vérifiée : 9 screens
+  - Preuve : ls -1 src/screens/main/*.tsx (excluant .test et .original)
+  - Liste complète : AddReviewScreen, FavoritesScreen, HomeScreen, MerchantDetailScreen, ProductDetailsScreen,
+  ProductsScreen, ProfileScreen, ReservationsScreen, ReviewsListScreen
+
+  Erreur #2 : Rôle de ProductsScreen
+
+  - Affirmation initiale : "Liste des produits", "Product cards (image, nom, prix, merchant)"
+  - Réalité vérifiée : Liste des MARCHANDS via merchantsSlice
+  - Preuve :
+    - ProductsScreen.tsx:28-29 → const { merchants, loading } = useSelector((state: RootState) =>
+  state.merchants)
+    - ProductsScreen.tsx:71 → dispatch(fetchMerchants())
+    - ProductsScreen.tsx:109 → renderMerchantCard() function
+
+  Erreur #3 : Alert quantité dans ProductDetailsScreen
+
+  - Affirmation initiale : "Alert choix quantité avant réservation"
+  - Réalité vérifiée : Quantité FORCÉE à 1, aucun dialogue de sélection
+  - Preuve : ProductDetailsScreen.tsx:103 → quantity: 1, (hardcodé)
+
+  Erreur #4 : Navigation post-réservation
+
+  - Affirmation initiale : "Navigation vers ReservationDetails"
+  - Réalité vérifiée : Navigation vers 'Orders'
+  - Preuve : ProductDetailsScreen.tsx:114 → navigation.navigate('Orders')
+
+  Erreur #5 : Toast confirmation dans FavoritesScreen
+
+  - Affirmation initiale : "Toast confirmation"
+  - Réalité vérifiée : Alert.alert utilisé
+  - Preuve : FavoritesScreen.tsx:45-56 → Alert.alert('Retirer des favoris', ...)
+
+  Erreur #6 : Optimistic update favoris
+
+  - Affirmation initiale : "Optimistic update via optimisticToggleFavorite"
+  - Réalité vérifiée : Refetch complet après toggle, pas d'optimistic update
+  - Preuve : FavoritesScreen.tsx:54 → await loadFavorites() (refetch, pas optimistic)
+
+  Erreur #7 : Filtrage ReviewsListScreen
+
+  - Affirmation initiale : "Filtrage par rating (1-5 étoiles)"
+  - Réalité vérifiée : Aucun UI de filtrage
+  - Preuve : Grep "rating" dans ReviewsListScreen.tsx → aucun picker/filter UI
+
+  Erreur #8 : Pull to refresh ReviewsListScreen
+
+  - Affirmation initiale : "Pull to refresh"
+  - Réalité vérifiée : Aucun RefreshControl
+  - Preuve : Grep "RefreshControl" → aucun résultat
+
+  Erreur #9 : Pagination ReviewsListScreen
+
+  - Affirmation initiale : "Pagination (page suivante)"
+  - Réalité vérifiée : Aucun UI de pagination
+  - Preuve : Grep "pagination" → aucun bouton next/previous
+
+  Erreur #10 : Onglets MerchantDetailScreen
+
+  - Affirmation initiale : "Onglets (Produits / Avis)"
+  - Réalité vérifiée : Aucun système d'onglets
+  - Preuve : Grep "Tab" dans MerchantDetailScreen.tsx → aucun résultat
+
+  Erreur #11 : Bouton appel MerchantDetailScreen
+
+  - Affirmation initiale : "Bouton appeler (Linking.openURL tel:)"
+  - Réalité vérifiée : Aucun bouton téléphone, pas de Linking
+  - Preuve : Grep "Linking" et "openURL" → aucun résultat
+
+  Erreur #12 : Devise MerchantDetailScreen
+
+  - Affirmation initiale : "Affichage F CFA"
+  - Réalité vérifiée : Affichage en € (euro)
+  - Preuve : MerchantDetailScreen.tsx:107 → {discountedPrice}€
+
+  Erreur #13 : Usage Design System 2025
+
+  - Affirmation initiale : "Utilisé systématiquement dans tous les screens"
+  - Réalité vérifiée : NON utilisé dans Home, Products, ProductDetails, MerchantDetail
+  - Preuve : Grep imports DS 2025 → uniquement dans ReservationsScreen et ProfileScreen
+
+  ---
+  ✅ II. ÉTAT RÉEL DES FONCTIONNALITÉS (VÉRIFIÉ EMPIRIQUEMENT)
+
+  🏠 HomeScreen (797 lignes) - ✅ COMPLET
+
+  Fonctionnalités EXISTANTES :
+  - ✅ Product cards avec images et prix (F CFA correct)
+  - ✅ Géolocalisation Feature #4 (distance badges: < 5km, 10km, 20km)
+  - ✅ Filtrage par catégories (boulangerie, fruits, etc.)
+  - ✅ Filtrage par disponibilité (stock disponible)
+  - ✅ Pull to refresh (RefreshControl)
+  - ✅ FavoriteButton sur chaque card
+  - ✅ Navigation vers ProductDetails
+  - ✅ Badge "🚚 Livraison disponible"
+  - ✅ Calcul distance Haversine avec expo-location
+
+  Référence : src/screens/main/HomeScreen.tsx
+
+  ---
+  🏪 ProductsScreen (536 lignes) -⚠️ MARCHANDS SEULEMENT
+
+  Fonctionnalités EXISTANTES :
+  - ✅ Liste des MARCHANDS (pas des produits)
+  - ✅ Filtrage par recherche (business_name, city, business_type)
+  - ✅ Filtrage par catégories (mapping vers business_type)
+  - ✅ Merchant cards (emoji placeholder, badge, nom, ville, type)
+  - ✅ Rating étoiles + nombre d'avis
+  - ✅ Compteur de produits disponibles
+  - ✅ Navigation vers MerchantDetail
+
+  Fonctionnalités ABSENTES :
+  - ❌ Affichage direct des produits (doit naviguer vers merchant → produits)
+  - ❌ Images réelles des marchands (emojis placeholders uniquement)
+
+  Référence : src/screens/main/ProductsScreen.tsx:28-29, 71, 109
+
+  ---
+  📦 ProductDetailsScreen (394 lignes) - ⚠️ INCOMPLET
+
+  Fonctionnalités EXISTANTES :
+  - ✅ Image produit (expo-image)
+  - ✅ Nom, description, catégorie
+  - ✅ Prix réduit + prix original barré (F CFA correct)
+  - ✅ Quantité disponible affichée
+  - ✅ Nom et ville du marchand
+  - ✅ FavoriteButton dans header
+  - ✅ Section avis clients avec moyenne + total
+  - ✅ StarRating component
+  - ✅ Bouton "Voir tous les avis" → ReviewsList
+  - ✅ Bouton "Donner un avis" → AddReview
+  - ✅ Bouton "Réserver" avec confirmation Alert
+  - ✅ État loading pendant réservation
+  - ✅ Désactivation si rupture de stock
+
+  Fonctionnalités ABSENTES/INCORRECTES :
+  - ❌ Quantité forcée à 1 (pas de choix utilisateur) - ProductDetailsScreen.tsx:103
+  - ❌ Navigation vers 'Orders' au lieu de détails réservation - ProductDetailsScreen.tsx:114
+  - ❌ Pas de preview photos multiples
+  - ❌ Pas d'informations nutritionnelles
+
+  Référence : src/screens/main/ProductDetailsScreen.tsx
+
+  ---
+  ⭐ FavoritesScreen (382 lignes) - ⚠️ BASIQUE
+
+  Fonctionnalités EXISTANTES :
+  - ✅ Liste des produits favoris avec images
+  - ✅ Affichage prix réduit + original barré (F CFA)
+  - ✅ Badge catégorie
+  - ✅ Nom marchand + ville
+  - ✅ Bouton retirer favori (icône cœur)
+  - ✅ Alert de confirmation (pas Toast) - FavoritesScreen.tsx:45-56
+  - ✅ Rechargement après suppression
+  - ✅ Empty state si aucun favori
+  - ✅ Navigation vers ProductDetails
+
+  Fonctionnalités ABSENTES :
+  - ❌ Pas d'optimistic update (refetch complet) - FavoritesScreen.tsx:54
+  - ❌ Pas de Toast (utilise Alert à la place)
+  - ❌ Pas de tri (date ajout, prix, distance)
+  - ❌ Pas de filtrage par catégorie
+  - ❌ Pas de pull to refresh
+
+  Référence : src/screens/main/FavoritesScreen.tsx
+
+  ---
+  📝 ReservationsScreen (540 lignes) - ✅ COMPLET
+
+  Fonctionnalités EXISTANTES :
+  - ✅ Liste réservations avec statut (pending, confirmed, cancelled)
+  - ✅ Filtrage par statut (tabs: Toutes, En attente, Confirmées, Annulées)
+  - ✅ Product card (image, nom, prix)
+  - ✅ Informations marchand
+  - ✅ Date et heure réservation
+  - ✅ Badge statut avec couleurs
+  - ✅ Bouton "Annuler" pour pending/confirmed
+  - ✅ Alert confirmation annulation
+  - ✅ Toast feedback succès/erreur
+  - ✅ Empty state par filtre
+  - ✅ Design System 2025 (Typography, Card, Badge)
+
+  Référence : src/screens/main/ReservationsScreen.tsx
+
+  ---
+  💬 ReviewsListScreen (107 lignes) - ❌ MINIMAL
+
+  Fonctionnalités EXISTANTES :
+  - ✅ Liste avis avec FlatList
+  - ✅ StarRating affichage
+  - ✅ Titre et commentaire avis
+  - ✅ Date formatée
+  - ✅ Nom utilisateur
+  - ✅ Header avec nom marchand
+
+  Fonctionnalités ABSENTES :
+  - ❌ Pas de filtrage par rating (aucun picker 1-5 étoiles)
+  - ❌ Pas de pull to refresh (pas de RefreshControl)
+  - ❌ Pas de pagination UI (pas de boutons page suivante)
+  - ❌ Pas de tri (récents, meilleurs, pires)
+  - ❌ Pas d'indicateur si avis utile/pas utile
+
+  Référence : src/screens/main/ReviewsListScreen.tsx
+
+  ---
+  ✍️ AddReviewScreen (73 lignes) - ✅ BASIQUE MAIS FONCTIONNEL
+
+  Fonctionnalités EXISTANTES :
+  - ✅ Formulaire simple (rating, titre, commentaire)
+  - ✅ Validation champs obligatoires
+  - ✅ Soumission API
+  - ✅ Toast feedback
+  - ✅ Navigation retour après succès
+
+  Référence : src/screens/main/AddReviewScreen.tsx
+
+  ---
+  🏪 MerchantDetailScreen (568 lignes) - ⚠️ TRÈS INCOMPLET
+
+  Fonctionnalités EXISTANTES :
+  - ✅ Header avec nom, ville, type marchand
+  - ✅ Section statistiques (rating, avis, produits)
+  - ✅ Liste produits du marchand
+  - ✅ Product cards (image, nom, description)
+  - ✅ Badge catégorie et disponibilité
+  - ✅ Navigation vers ProductDetails
+
+  Fonctionnalités ABSENTES/INCORRECTES :
+  - ❌ Devise en € au lieu de F CFA - MerchantDetailScreen.tsx:107
+  - ❌ Pas d'onglets Produits/Avis (tout dans un ScrollView)
+  - ❌ Pas de bouton téléphone/Linking (pas de contact direct)
+  - ❌ Pas de pull to refresh
+  - ❌ Pas d'horaires d'ouverture
+  - ❌ Pas d'adresse complète/map
+  - ❌ Pas de section "À propos"
+
+  Référence : src/screens/main/MerchantDetailScreen.tsx
+
+  ---
+  👤 ProfileScreen (263 lignes) - ✅ COMPLET
+
+  Fonctionnalités EXISTANTES :
+  - ✅ Informations utilisateur (nom, email, téléphone)
+  - ✅ Menu items avec navigation
+  - ✅ Dark mode toggle
+  - ✅ Déconnexion avec confirmation
+  - ✅ Design System 2025 (Typography, Card)
+
+  Référence : src/screens/main/ProfileScreen.tsx
+
+  ---
+  🔴 III. GAPS ET TRAVAIL RESTANT
+
+  BUGS CRITIQUES À CORRIGER
+
+  1. ProductDetailsScreen - Quantité réservation
+    - Bug : Quantité forcée à 1 (ligne 103)
+    - Fix requis : Ajouter Alert avec input numérique (1-quantité_disponible)
+  2. ProductDetailsScreen - Navigation
+    - Bug : Navigation vers 'Orders' au lieu de détails réservation (ligne 114)
+    - Fix requis : Créer ReservationDetailsScreen et naviguer vers celui-ci avec reservationId
+  3. MerchantDetailScreen - Devise
+    - Bug : Prix en € au lieu de F CFA (ligne 107)
+    - Fix requis : Changer {discountedPrice}€ en {discountedPrice} F CFA
+  4. FavoritesScreen - UX
+    - Bug : Alert au lieu de Toast (ligne 45)
+    - Fix requis : Remplacer Alert par Toast pour confirmation discrète
+
+  FONCTIONNALITÉS MANQUANTES
+
+  ProductsScreen (Actuellement marchands seulement)
+
+  - ❌ Afficher les produits directement (pas seulement via marchands)
+  - ❌ Toggle vue marchands/produits
+  - ❌ Filtres avancés produits (prix, distance)
+
+  ReviewsListScreen (Trop minimaliste)
+
+  - ❌ Filtrage par rating (1-5 étoiles)
+  - ❌ Pull to refresh
+  - ❌ Pagination UI (page suivante/précédente)
+  - ❌ Tri (récents, meilleurs, pires)
+
+  MerchantDetailScreen (Incomplet)
+
+  - ❌ Onglets Produits/Avis (actuellement tout mélangé)
+  - ❌ Bouton téléphone avec Linking.openURL
+  - ❌ Horaires d'ouverture
+  - ❌ Adresse complète + map
+  - ❌ Pull to refresh
+  - ❌ Section "À propos"
+
+  FavoritesScreen (Basique)
+
+  - ❌ Optimistic update (actuellement refetch complet)
+  - ❌ Toast au lieu d'Alert
+  - ❌ Tri (date, prix, distance)
+  - ❌ Filtrage par catégorie
+  - ❌ Pull to refresh
+
+  Général
+
+  - ❌ ReservationDetailsScreen (n'existe pas encore)
+  - ❌ Design System 2025 non utilisé dans Home/Products/ProductDetails/MerchantDetail
+  - ❌ Animations de transition entre écrans
+  - ❌ Skeleton loaders pendant chargement
+  - ❌ Offline mode avec cache
+
+  ---
+  📋 IV. RÉSUMÉ EXÉCUTIF
+
+  ✅ CE QUI FONCTIONNE BIEN
+
+  1. HomeScreen : Géolocalisation Feature #4 complète et fonctionnelle
+  2. ReservationsScreen : Gestion réservations avec filtrage et annulation
+  3. ProfileScreen : Profil utilisateur complet avec dark mode
+  4. Redux Integration : 5 slices fonctionnels (products, reservations, favorites, reviews, merchants)
+  5. API Service : 20+ endpoints bien intégrés
+  6. Navigation : Stack + Tab navigation fonctionnelle
+
+  ⚠️ CE QUI NÉCESSITE AMÉLIORATION
+
+  1. ProductsScreen : Devrait afficher produits, pas juste marchands
+  2. ProductDetailsScreen : Quantité fixe, navigation incorrecte
+  3. FavoritesScreen : Alert au lieu de Toast, pas d'optimistic update
+  4. ReviewsListScreen : Trop minimaliste, manque filtres/pagination
+  5. MerchantDetailScreen : Devise incorrecte, manque onglets et contact
+
+  ❌ CE QUI MANQUE COMPLÈTEMENT
+
+  1. ReservationDetailsScreen : Écran de détails réservation après création
+  2. Design System 2025 uniformisé : Utilisé seulement dans 2/9 screens
+  3. Fonctionnalités avancées : Tri, filtres avancés, animations, offline mode
+
+  ---
+  📊 SCORE DE COMPLÉTUDE RÉEL
+
+  Fonctionnalités Consumer Implémentées : 68/100
+
+  - Navigation & Architecture : 90/100 ✅
+  - HomeScreen (géolocalisation) : 95/100 ✅
+  - ProductsScreen : 50/100 ⚠️ (marchands seulement)***
+  - ProductDetailsScreen : 75/100 ⚠️ (bugs quantité/navigation)***
+  - ReservationsScreen : 95/100 ✅
+  - FavoritesScreen : 65/100 ⚠️ (Alert, pas optimistic)
+  - ReviewsListScreen : 40/100 ❌ (trop minimal)
+  - MerchantDetailScreen : 55/100 ⚠️ (devise, manque tabs/contact)***
+  - Design System uniformité : 30/100 ❌
+
+  ---
+  🎯 CONCLUSION HONNÊTE : L'application consumer dispose d'une base fonctionnelle solide (navigation,
+  réservations, géolocalisation) mais présente 3 bugs critiques et plusieurs écrans incomplets qui nécessitent
+  des corrections avant d'atteindre un niveau "production-ready".

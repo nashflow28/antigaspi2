@@ -32,6 +32,7 @@ export interface CardProps {
   // Accessibility
   accessibilityLabel?: string
   accessibilityHint?: string
+  testID?: string
 
   // Style overrides
   style?: ViewStyle
@@ -50,6 +51,7 @@ export const Card: React.FC<CardProps> = ({
   onPress,
   accessibilityLabel,
   accessibilityHint,
+  testID,
   style,
   contentStyle,
   headerStyle,
@@ -129,7 +131,7 @@ export const Card: React.FC<CardProps> = ({
   }), [theme.spacing.md, theme.colors.divider, footerStyle])
 
   const renderCard = () => (
-    <View style={containerStyle}>
+    <View style={containerStyle} testID={pressable ? undefined : testID}>
       {header && <View style={headerContainerStyle}>{header}</View>}
       <View style={contentPadding}>{children}</View>
       {footer && <View style={footerContainerStyle}>{footer}</View>}
@@ -149,6 +151,7 @@ export const Card: React.FC<CardProps> = ({
         accessibilityLabel={accessibilityLabel}
         accessibilityHint={accessibilityHint}
         accessible={true}
+        testID={testID}
       >
         {renderCard()}
       </TouchableOpacity>

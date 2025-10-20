@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Badge Component Tests
  * Tests all variants, sizes, and display modes

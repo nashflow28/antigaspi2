@@ -17,6 +17,7 @@ import { LoginCredentials } from '../../types'
 import { Button, Card, Typography } from '../../components/2025'
 import BrandLogo from '../../components/BrandLogo'
 import { useTheme } from '../../theme'
+import { TEST_IDS } from '../../utils/testIds'
 
 interface Props {
   navigation: any
@@ -58,6 +59,7 @@ const LoginScreen: React.FC<Props> = ({ navigation }) => {
     <KeyboardAvoidingView
       style={[styles.container, { backgroundColor: theme.colors.background }]}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      testID={TEST_IDS.loginScreen}
     >
       <StatusBar backgroundColor={theme.colors.primary[500]} barStyle="light-content" />
 
@@ -92,6 +94,8 @@ const LoginScreen: React.FC<Props> = ({ navigation }) => {
               keyboardType="email-address"
               autoCapitalize="none"
               autoCorrect={false}
+              testID={TEST_IDS.loginEmail}
+              accessibilityLabel={TEST_IDS.loginEmail}
             />
           </View>
 
@@ -114,6 +118,8 @@ const LoginScreen: React.FC<Props> = ({ navigation }) => {
               onChangeText={(text) => setCredentials({ ...credentials, password: text })}
               secureTextEntry
               autoCapitalize="none"
+              testID={TEST_IDS.loginPassword}
+              accessibilityLabel={TEST_IDS.loginPassword}
             />
           </View>
 
@@ -132,6 +138,8 @@ const LoginScreen: React.FC<Props> = ({ navigation }) => {
             onPress={handleLogin}
             disabled={loading}
             loading={loading}
+            testID={TEST_IDS.loginSubmit}
+            accessibilityLabel={TEST_IDS.loginSubmit}
           >
             {loading ? 'Connexion...' : 'Se connecter'}
           </Button>
@@ -156,6 +164,8 @@ const LoginScreen: React.FC<Props> = ({ navigation }) => {
               setCredentials(consumerCreds)
               handleLogin(consumerCreds)
             }}
+            testID={TEST_IDS.loginConsumerQuick}
+            accessibilityLabel={TEST_IDS.loginConsumerQuick}
           >
             👤 Consumer
           </Button>
@@ -167,11 +177,13 @@ const LoginScreen: React.FC<Props> = ({ navigation }) => {
             onPress={() => {
               const merchantCreds = {
                 email: 'merchant@antigaspi.com',
-                password: 'merchant123'
+                password: 'password'
               }
               setCredentials(merchantCreds)
               handleLogin(merchantCreds)
             }}
+            testID={TEST_IDS.loginMerchantQuick}
+            accessibilityLabel={TEST_IDS.loginMerchantQuick}
           >
             🏪 Merchant
           </Button>

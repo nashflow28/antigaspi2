@@ -1,0 +1,202 @@
+===================================================================
+            PROCHAINES ETAPES POUR COMPLETER L'ANALYSE
+===================================================================
+
+OBJECTIF: Passer de 17% a 80% de tests empiriques
+
+TEMPS ESTIME: 1-2 jours intensifs
+
+===================================================================
+                    BLOC 1: TESTS API (2h)
+===================================================================
+
+ACTIONS:
+1. Demarrer backend: php artisan serve
+2. Tester 20 endpoints principaux avec curl
+3. Documenter reponses et bugs
+
+ENDPOINTS A TESTER:
+- GET /api/products (liste)
+- GET /api/products/{id} (detail)
+- GET /api/categories
+- GET /api/merchants
+- POST /api/reservations (CRITIQUE - bug predit)
+- GET /api/reservations/my
+- POST /api/reservations/{id}/cancel
+- GET /api/favorites
+- POST /api/favorites
+- DELETE /api/favorites/{id}
+- GET /api/reviews
+- POST /api/reviews
+
+RESULTAT ATTENDU: Document avec status chaque endpoint
+
+===================================================================
+              BLOC 2: TESTS AUTOMATISES BACKEND (30min)
+===================================================================
+
+COMMANDES:
+- php artisan test
+- ./vendor/bin/pint --test
+
+RESULTAT ATTENDU:
+- X/Y tests PASS
+- X% couverture
+- X erreurs lint
+
+===================================================================
+              BLOC 3: TESTS MOBILE EMULATEUR (2h)
+===================================================================
+
+ACTIONS:
+1. Lancer: npx expo start
+2. Lancer emulateur Android/iOS
+3. Tester workflow complet consumer:
+   - Login
+   - Navigation 5 onglets
+   - Affichage produits
+   - Creation reservation (CRITIQUE - crash predit)
+   - Affichage reservations
+   - QR code
+   - Annulation
+   - Logout
+
+RESULTAT ATTENDU:
+- Document avec screenshots
+- Liste bugs detectes
+- Erreurs console
+
+===================================================================
+            BLOC 4: TESTS AUTOMATISES MOBILE (30min)
+===================================================================
+
+COMMANDES:
+- npm test
+- npm run lint
+- npx tsc --noEmit
+- npm run build
+
+RESULTAT ATTENDU:
+- X/Y tests PASS
+- X% couverture
+- X erreurs TypeScript
+- Build: SUCCESS/FAIL
+
+===================================================================
+              BLOC 5: VERIFICATION DB COMPLETE (3h)
+===================================================================
+
+ACTIONS:
+1. Verifier structure 15 tables restantes
+2. Verifier foreign keys
+3. Verifier indexes performance
+4. Verifier contraintes unicite
+
+RESULTAT ATTENDU:
+- Document structure 20/20 tables
+- Liste foreign keys
+- Liste indexes
+
+===================================================================
+              BLOC 6: CORRECTION BUG quantity (1h)
+===================================================================
+
+FICHIERS A MODIFIER:
+1. backend/app/Models/Reservation.php
+   - Ligne 18: quantity -> quantity_reserved
+   - Ligne 36: quantity -> quantity_reserved
+   - Ligne 175: $this->quantity -> $this->quantity_reserved
+
+2. backend/app/Http/Controllers/Api/ReservationController.php
+   - Ligne 86: 'quantity' -> 'quantity_reserved'
+
+RE-TESTER:
+- Creation reservation
+- Annulation reservation
+- Stock produit
+
+RESULTAT ATTENDU:
+- Bug corrige: OUI
+- Tests: PASS
+
+===================================================================
+            BLOC 7: VALIDATION MULTI-AGENTS (1 jour)
+===================================================================
+
+INVOQUER:
+1. @code-reviewer: Audit backend complet
+2. @security-auditor: Audit vulnerabilites
+3. @bug-hunter: Tests mobile complets
+4. @reality-checker: Validation finale
+
+RESULTAT ATTENDU:
+- 4 rapports de validation
+- Approbation de chaque agent
+
+===================================================================
+                      CHECKLIST FINALE
+===================================================================
+
+Avant de declarer "TERMINE":
+
+[ ] 20/20 endpoints API testes
+[ ] Mobile teste sur emulateur
+[ ] php artisan test: >90% PASS
+[ ] npm test: >90% PASS
+[ ] Bug quantity corrige
+[ ] 20/20 tables DB verifiees
+[ ] Foreign keys verifiees
+[ ] Indexes verifies
+[ ] @code-reviewer: APPROUVE
+[ ] @security-auditor: APPROUVE
+[ ] @bug-hunter: APPROUVE
+[ ] @reality-checker: APPROUVE
+
+CRITERES:
+- Tests empiriques: >80%
+- Tests auto: >90% PASS
+- Bugs critiques: 0
+- Build prod: SUCCESS
+
+===================================================================
+                        TIMELINE
+===================================================================
+
+JOUR 1 (Critique - 6h):
+- Matin: Blocs 1+2 (Tests API + auto backend)
+- Apres-midi: Bloc 3 (Tests mobile emulateur)
+- Fin: Bloc 4 (Tests auto mobile)
+- Soir: Bloc 6 (Fix bug quantity)
+
+JOUR 2 (Verification - 4h):
+- Matin: Bloc 5 (DB complete)
+- Apres-midi: Bloc 7 (Validation multi-agents)
+
+TOTAL: 1-2 jours intensifs
+
+===================================================================
+                      PRIORITES
+===================================================================
+
+CRITIQUE (AUJOURD'HUI):
+1. Tester API endpoints (2h)
+2. Tester mobile emulateur (2h)
+3. Corriger bug quantity (1h)
+4. Re-tester apres fix (30min)
+
+HAUTE (DEMAIN):
+5. DB complete (3h)
+6. Tests automatises (1h)
+7. Validation multi-agents (4h)
+
+===================================================================
+
+Plan Controller
+Date: 16 Octobre 2025
+
+STATUT ACTUEL: 17% tests empiriques
+OBJECTIF: 80% tests empiriques
+GAP: 63 points
+TEMPS: 1-2 jours
+
+===================================================================

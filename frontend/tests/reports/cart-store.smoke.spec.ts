@@ -34,7 +34,7 @@ const buildCartItem = () => ({
 
 describe('Cart store smoke tests', () => {
   const createStorageStub = () => {
-    let store = new Map<string, string>()
+    const store = new Map<string, string>()
     return {
       get length() {
         return store.size

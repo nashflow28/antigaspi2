@@ -1,0 +1,99 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e3]:
+  - navigation "Navigation principale" [ref=e4]:
+    - generic [ref=e5]:
+      - link "Antigaspi" [ref=e6] [cursor=pointer]:
+        - /url: /
+        - generic [ref=e7] [cursor=pointer]: Antigaspi
+      - menubar [ref=e8]:
+        - menuitem "Accueil" [ref=e9]:
+          - img [ref=e10]
+          - generic [ref=e12]: Accueil
+        - menuitem "Découvrir" [ref=e13]:
+          - img [ref=e14]
+          - generic [ref=e16]: Découvrir
+        - menuitem "Produits" [ref=e17]:
+          - img [ref=e18]
+          - generic [ref=e20]: Produits
+        - menuitem "Avis" [ref=e21]:
+          - img [ref=e22]
+          - generic [ref=e24]: Avis
+      - generic [ref=e25]:
+        - button "Activer le thème sombre" [ref=e26] [cursor=pointer]:
+          - generic [ref=e27] [cursor=pointer]: Activer le thème sombre
+          - img [ref=e29] [cursor=pointer]
+        - generic [ref=e35]:
+          - button "Mon panier" [ref=e36] [cursor=pointer]:
+            - generic [ref=e38] [cursor=pointer]: Mon panier
+          - button "Connexion" [ref=e39] [cursor=pointer]:
+            - generic [ref=e40] [cursor=pointer]: Connexion
+          - button "Inscription" [ref=e41] [cursor=pointer]:
+            - generic [ref=e42] [cursor=pointer]: Inscription
+  - main [ref=e43]:
+    - generic [ref=e45]:
+      - generic [ref=e46]:
+        - link "🥬 Antigaspi" [ref=e47] [cursor=pointer]:
+          - /url: /
+          - generic [ref=e48] [cursor=pointer]: 🥬
+          - generic [ref=e49] [cursor=pointer]: Antigaspi
+        - heading "Connexion" [level=2] [ref=e50]
+        - paragraph [ref=e51]: Connectez-vous à votre compte pour continuer
+      - generic [ref=e54]:
+        - generic [ref=e55]:
+          - heading "Content de vous revoir !" [level=3] [ref=e56]
+          - paragraph [ref=e57]: Connectez-vous pour accéder à votre compte Antigaspi
+        - generic [ref=e58]:
+          - generic [ref=e60]:
+            - generic [ref=e61]:
+              - text: Adresse email
+              - generic [ref=e62]: "*"
+            - generic [ref=e63]:
+              - img [ref=e64]
+              - textbox "Adresse email *" [ref=e67]: wrong@test.com
+          - generic [ref=e69]:
+            - generic [ref=e70]:
+              - text: Mot de passe
+              - generic [ref=e71]: "*"
+            - generic [ref=e72]:
+              - img [ref=e73]
+              - textbox "Mot de passe *" [ref=e76]: wrong
+              - button [ref=e78] [cursor=pointer]:
+                - img [ref=e79] [cursor=pointer]
+            - paragraph [ref=e82]: Le mot de passe doit contenir au moins 6 caractères
+          - generic [ref=e83]:
+            - generic [ref=e84]:
+              - checkbox "Se souvenir de moi" [ref=e85]
+              - generic [ref=e86]: Se souvenir de moi
+            - link "Mot de passe oublié ?" [ref=e87] [cursor=pointer]:
+              - /url: /forgot-password
+          - button "Se connecter" [disabled] [ref=e88]:
+            - generic [ref=e91]: Se connecter
+        - generic [ref=e93]:
+          - generic [ref=e98]: Ou continuez avec
+          - generic [ref=e99]:
+            - button "Google" [ref=e100] [cursor=pointer]:
+              - generic [ref=e101] [cursor=pointer]:
+                - img [ref=e102] [cursor=pointer]
+                - text: Google
+            - button "Facebook" [ref=e107] [cursor=pointer]:
+              - generic [ref=e108] [cursor=pointer]:
+                - img [ref=e109] [cursor=pointer]
+                - text: Facebook
+        - generic [ref=e111]:
+          - text: Vous n'avez pas encore de compte ?
+          - link "Créez votre compte" [ref=e112] [cursor=pointer]:
+            - /url: /register
+      - link "← Retour à l'accueil" [ref=e114] [cursor=pointer]:
+        - /url: /
+  - contentinfo [ref=e115]:
+    - generic [ref=e116]:
+      - generic [ref=e117]:
+        - paragraph [ref=e118]: Antigaspi
+        - paragraph [ref=e119]: © 2025 — Ensemble, réduisons le gaspillage alimentaire.
+      - generic [ref=e120]:
+        - img [ref=e122]
+        - img [ref=e126]
+        - img [ref=e130]
+```

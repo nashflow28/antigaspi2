@@ -74,8 +74,8 @@
       >
         <template #filters>
           <DashboardFilterBar
-            data-testid="users-filters"
             v-model:search="searchQuery"
+            data-testid="users-filters"
             :filters="dashboardFilters"
             placeholder="Rechercher un utilisateur..."
             @update:filters="handleFiltersUpdate"
@@ -648,7 +648,7 @@ const unsuspendUser = async (user: User) => {
         const response = await apiService.unsuspendAdminUser(user.id)
 
         if (!response.success) {
-          throw new Error(response.message || "Erreur lors de la réactivation")
+          throw new Error(response.message || 'Erreur lors de la réactivation')
         }
 
         const updatedUser = response.data as Partial<User> | undefined

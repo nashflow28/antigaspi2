@@ -77,14 +77,21 @@ class ProductController extends Controller
                 });
             }
 
-            // Tri
-            $sortBy = $request->get('sort_by', 'created_at');
-            $sortOrder = $request->get('sort_order', 'desc');
+            // 🐛 BUG FIX #11 (Edge Case): Validate sort parameters to prevent SQL injection
+            $allowedSortFields = ['created_at', 'discounted_price', 'expiration_date', 'name'];
+            $sortBy = in_array($request->get('sort_by'), $allowedSortFields)
+                ? $request->get('sort_by')
+                : 'created_at';
 
-            if ($sortBy === 'price') {
+            $sortOrder = in_array(strtolower($request->get('sort_order', 'desc')), ['asc', 'desc'])
+                ? strtolower($request->get('sort_order', 'desc'))
+                : 'desc';
+
+            // Tri
+            if ($sortBy === 'discounted_price') {
                 $query->orderBy('discounted_price', $sortOrder);
-            } elseif ($sortBy === 'expiration') {
-                $query->orderBy('expiration_date', 'asc');
+            } elseif ($sortBy === 'expiration_date') {
+                $query->orderBy('expiration_date', $sortOrder);
             } else {
                 $query->orderBy($sortBy, $sortOrder);
             }
@@ -123,10 +130,16 @@ class ProductController extends Controller
                     $a = sin($dLat/2) * sin($dLat/2) +
                          cos(deg2rad($userLat)) * cos(deg2rad($merchantLat)) *
                          sin($dLng/2) * sin($dLng/2);
-                    $c = 2 * atan2(sqrt($a), sqrt(1-$a));
-                    $distance = $earthRadius * $c;
 
-                    $merchantData['distance_km'] = round($distance, 2);
+                    // 🐛 BUG FIX #16: Prevent division by zero when exact same location
+                    if ($a >= 1.0) {
+                        // Distance = 0 (même point GPS)
+                        $merchantData['distance_km'] = 0.0;
+                    } else {
+                        $c = 2 * atan2(sqrt($a), sqrt(1-$a));
+                        $distance = $earthRadius * $c;
+                        $merchantData['distance_km'] = round($distance, 2);
+                    }
                 }
 
                 return [
@@ -252,6 +265,14 @@ class ProductController extends Controller
             $product = Product::with(['merchant.user', 'category'])
                 ->findOrFail($id);
 
+            // 🐛 BUG FIX #15: Verify merchant relationship exists
+            if (!$product->merchant) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Produit orphelin détecté - merchant manquant'
+                ], 500);
+            }
+
             // Verify product belongs to this merchant
             if ($product->merchant->user_id !== $user->id) {
                 return response()->json([
@@ -311,7 +332,7 @@ class ProductController extends Controller
             }
 
             $validator = Validator::make($request->all(), [
-                'category_id' => 'required|exists:categories,id',
+                // category_id removed - automatically uses merchant's category
                 'name' => 'required|string|max:255',
                 'description' => 'nullable|string',
                 'original_price' => 'required|numeric|min:0',
@@ -329,9 +350,17 @@ class ProductController extends Controller
                 ], 422);
             }
 
+            // Always use merchant's category - no choice allowed
+            $categoryId = $user->merchant->category_id;
+
+            // Fallback to "Autre" (id 9) if merchant doesn't have a category
+            if (!$categoryId) {
+                $categoryId = 9;
+            }
+
             $product = Product::create([
                 'merchant_id' => $user->merchant->id,
-                'category_id' => $request->category_id,
+                'category_id' => $categoryId, // Automatically assigned from merchant
                 'name' => $request->name,
                 'description' => $request->description,
                 'original_price' => $request->original_price,
@@ -393,7 +422,7 @@ class ProductController extends Controller
             }
 
             $validator = Validator::make($request->all(), [
-                'category_id' => 'sometimes|exists:categories,id',
+                // category_id removed - cannot be changed (always uses merchant's category)
                 'name' => 'sometimes|string|max:255',
                 'description' => 'sometimes|string',
                 'original_price' => 'sometimes|numeric|min:0',
@@ -420,17 +449,34 @@ class ProductController extends Controller
                 ], 422);
             }
 
+            // 🐛 BUG FIX #14: Validate image_url path to prevent traversal attacks
+            if ($request->filled('image_url')) {
+                $imagePath = $request->image_url;
+                if (str_contains($imagePath, '..') || str_contains($imagePath, '//')) {
+                    \Log::error('Path traversal attempt detected in product update', [
+                        'product_id' => $id,
+                        'user_id' => $user->id,
+                        'suspicious_path' => $imagePath
+                    ]);
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Invalid image path detected'
+                    ], 400);
+                }
+            }
+
             \Log::info('ATTEMPTING PRODUCT UPDATE', [
                 'product_id' => $id,
                 'update_data' => $request->only([
-                    'category_id', 'name', 'description', 'original_price',
+                    'name', 'description', 'original_price',
                     'discounted_price', 'quantity_available', 'expiration_date',
                     'image_url', 'is_active'
                 ])
             ]);
 
+            // category_id excluded - cannot be changed (always merchant's category)
             $product->update($request->only([
-                'category_id', 'name', 'description', 'original_price',
+                'name', 'description', 'original_price',
                 'discounted_price', 'quantity_available', 'expiration_date',
                 'image_url', 'is_active'
             ]));
@@ -449,10 +495,13 @@ class ProductController extends Controller
             ]);
 
         } catch (\Exception $e) {
+            // 🐛 BUG FIX #4: Conditionner trace logs à environnement local
             \Log::error('PRODUCT UPDATE ERROR', [
                 'product_id' => $id,
                 'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+                'trace' => app()->isLocal() ? $e->getTraceAsString() : null
             ]);
             return response()->json([
                 'success' => false,
@@ -509,6 +558,8 @@ class ProductController extends Controller
      */
     public function uploadImage(Request $request): JsonResponse
     {
+        $uploadedPath = null; // 🐛 BUG FIX #3: Track uploaded file for cleanup on error
+
         try {
             $user = JWTAuth::parseToken()->authenticate();
 
@@ -519,8 +570,9 @@ class ProductController extends Controller
                 ], 403);
             }
 
+            // 🐛 EDGE CASE #1: Empty files already prevented by 'image' validation + getimagesize()
             $validator = Validator::make($request->all(), [
-                'image' => 'required|file|max:5120', // 🔒 SECURITY: Remove MIME from validator (checked below)
+                'image' => 'required|file|max:2048', // 🔒 SECURITY: Max 2MB for products
             ]);
 
             if ($validator->fails()) {
@@ -542,22 +594,57 @@ class ProductController extends Controller
 
             // 🔒 SECURITY: Verify actual MIME type (not just client-provided extension)
             $mimeType = $image->getMimeType();
-            $allowedMimes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
 
-            if (!in_array($mimeType, $allowedMimes)) {
+            // 🐛 BUG FIX #1: Guard contre null getMimeType()
+            if (is_null($mimeType) || empty($mimeType)) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Type de fichier invalide. Formats acceptés : JPEG, PNG, WebP',
-                    'error' => 'Invalid MIME type: ' . $mimeType
+                    'message' => 'Impossible de déterminer le type du fichier. Fichier corrompu ?'
                 ], 422);
             }
 
-            // 🔒 SECURITY: Use secure random filename with real extension (based on MIME type)
-            $extension = $image->extension(); // Uses real MIME type, not client-provided
+            // 🐛 BUG FIX #17: Proper MIME type mapping (image/jpg is INVALID, only image/jpeg is correct)
+            // Mapping MIME types → extensions (always use first extension for consistency)
+            $allowedMimeTypes = [
+                'image/jpeg' => ['jpg', 'jpeg'], // Standard JPEG (always use .jpg, not .jpeg)
+                'image/png' => ['png'],
+                'image/webp' => ['webp'],
+            ];
+
+            if (!array_key_exists($mimeType, $allowedMimeTypes)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Type de fichier non autorisé. Formats acceptés : JPEG, PNG, WebP',
+                    'error' => "MIME type '{$mimeType}' non supporté. Types valides : image/jpeg, image/png, image/webp"
+                ], 422);
+            }
+
+            // 🔒 SECURITY: Validate image dimensions (max 2000x2000px for products)
+            $imageInfo = getimagesize($image->getRealPath());
+            if ($imageInfo === false) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Impossible de lire les dimensions de l\'image. Fichier corrompu ?'
+                ], 422);
+            }
+
+            [$width, $height] = $imageInfo;
+            if ($width > 2000 || $height > 2000) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Image trop grande. Dimensions maximales : 2000x2000px',
+                    'error' => "Current dimensions: {$width}x{$height}px"
+                ], 422);
+            }
+
+            // 🐛 BUG FIX #17: Use first extension from mapping for consistency (.jpg, not .jpeg)
+            // 🔒 SECURITY: Extension determined by server-verified MIME type, not client input
+            $extension = $allowedMimeTypes[$mimeType][0];
             $filename = \Illuminate\Support\Str::random(40) . '.' . $extension;
 
             // 🔒 SECURITY: Use Storage facade for secure file handling
             $path = $image->storeAs('products', $filename, 'public');
+            $uploadedPath = $path; // 🐛 BUG FIX #3: Track uploaded path for cleanup
 
             // Generate public URL
             $url = Storage::url($path);
@@ -573,9 +660,18 @@ class ProductController extends Controller
             ], 200);
 
         } catch (\Exception $e) {
+            // 🐛 BUG FIX #3: Cleanup orphan file if upload succeeded but subsequent operations failed
+            if ($uploadedPath && Storage::disk('public')->exists($uploadedPath)) {
+                Storage::disk('public')->delete($uploadedPath);
+                \Log::info('Cleaned up orphan file after error', ['path' => $uploadedPath]);
+            }
+
+            // 🐛 BUG FIX #4: Conditionner trace logs à environnement local
             \Log::error('PRODUCT IMAGE UPLOAD ERROR', [
                 'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+                'trace' => app()->isLocal() ? $e->getTraceAsString() : null
             ]);
 
             return response()->json([

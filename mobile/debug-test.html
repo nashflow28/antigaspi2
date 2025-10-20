@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug Antigaspi Mobile</title>
+    <style>
+        body {
+            font-family: monospace;
+            padding: 20px;
+            background: #1a1a1a;
+            color: #00ff00;
+        }
+        h1 { color: #00ffff; }
+        .error { color: #ff0000; background: #ffeeee; padding: 10px; margin: 10px 0; }
+        .success { color: #00ff00; background: #eeffee; padding: 10px; margin: 10px 0; }
+        .info { color: #0000ff; background: #eeeeff; padding: 10px; margin: 10px 0; }
+        #logs {
+            border: 1px solid #00ff00;
+            padding: 15px;
+            margin-top: 20px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .log-entry {
+            margin: 5px 0;
+            padding: 5px;
+            border-left: 3px solid #00ff00;
+            padding-left: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔍 Antigaspi Mobile Debug Console</h1>
+
+    <div id="status">Chargement...</div>
+
+    <h2>Tests de connexion:</h2>
+    <div id="tests">
+        <div id="test-metro">⏳ Test Metro Bundler...</div>
+        <div id="test-backend">⏳ Test Backend API...</div>
+        <div id="test-bundle">⏳ Test Bundle JS...</div>
+    </div>
+
+    <h2>Logs en temps réel:</h2>
+    <div id="logs"></div>
+
+    <script>
+        const logsDiv = document.getElementById('logs');
+
+        function addLog(message, type = 'info') {
+            const entry = document.createElement('div');
+            entry.className = 'log-entry';
+            entry.style.borderLeftColor = type === 'error' ? '#ff0000' : type === 'success' ? '#00ff00' : '#0000ff';
+            entry.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+            logsDiv.insertBefore(entry, logsDiv.firstChild);
+        }
+
+        // Override console methods to capture logs
+        const originalConsoleLog = console.log;
+        const originalConsoleError = console.error;
+        const originalConsoleWarn = console.warn;
+
+        console.log = function(...args) {
+            addLog(args.join(' '), 'info');
+            originalConsoleLog.apply(console, args);
+        };
+
+        console.error = function(...args) {
+            addLog('ERROR: ' + args.join(' '), 'error');
+            originalConsoleError.apply(console, args);
+        };
+
+        console.warn = function(...args) {
+            addLog('WARN: ' + args.join(' '), 'info');
+            originalConsoleWarn.apply(console, args);
+        };
+
+        // Capture window errors
+        window.addEventListener('error', (event) => {
+            addLog(`UNCAUGHT ERROR: ${event.message} at ${event.filename}:${event.lineno}`, 'error');
+        });
+
+        window.addEventListener('unhandledrejection', (event) => {
+            addLog(`UNHANDLED PROMISE REJECTION: ${event.reason}`, 'error');
+        });
+
+        // Test 1: Metro Bundler
+        async function testMetro() {
+            const testDiv = document.getElementById('test-metro');
+            try {
+                const response = await fetch('http://localhost:8081/status');
+                if (response.ok) {
+                    testDiv.innerHTML = '✅ Metro Bundler: OK';
+                    testDiv.className = 'success';
+                    addLog('Metro Bundler is running', 'success');
+                } else {
+                    testDiv.innerHTML = `⚠️ Metro Bundler: HTTP ${response.status}`;
+                    testDiv.className = 'error';
+                }
+            } catch (error) {
+                testDiv.innerHTML = '❌ Metro Bundler: OFFLINE';
+                testDiv.className = 'error';
+                addLog(`Metro connection error: ${error.message}`, 'error');
+            }
+        }
+
+        // Test 2: Backend API
+        async function testBackend() {
+            const testDiv = document.getElementById('test-backend');
+            try {
+                const response = await fetch('http://localhost:8000/api/health');
+                if (response.ok) {
+                    testDiv.innerHTML = '✅ Backend API: OK';
+                    testDiv.className = 'success';
+                    addLog('Backend API is running', 'success');
+                } else {
+                    testDiv.innerHTML = `⚠️ Backend API: HTTP ${response.status}`;
+                    testDiv.className = 'error';
+                }
+            } catch (error) {
+                testDiv.innerHTML = '❌ Backend API: OFFLINE';
+                testDiv.className = 'error';
+                addLog(`Backend connection error: ${error.message}`, 'error');
+            }
+        }
+
+        // Test 3: Load JS Bundle
+        async function testBundle() {
+            const testDiv = document.getElementById('test-bundle');
+            addLog('Starting to load JS bundle...', 'info');
+
+            try {
+                // First, check if the bundle endpoint is available
+                const bundleUrl = 'http://localhost:8081/index.bundle?platform=web&dev=true&hot=false';
+                addLog(`Fetching bundle from: ${bundleUrl}`, 'info');
+
+                const response = await fetch(bundleUrl);
+                if (!response.ok) {
+                    throw new Error(`Bundle HTTP ${response.status}: ${response.statusText}`);
+                }
+
+                const bundleText = await response.text();
+                addLog(`Bundle loaded: ${(bundleText.length / 1024).toFixed(2)} KB`, 'success');
+
+                // Create script element
+                const script = document.createElement('script');
+                script.textContent = bundleText;
+                script.onerror = (error) => {
+                    testDiv.innerHTML = '❌ Bundle JS: EXECUTION ERROR';
+                    testDiv.className = 'error';
+                    addLog(`Script execution error: ${error}`, 'error');
+                };
+
+                script.onload = () => {
+                    testDiv.innerHTML = '✅ Bundle JS: LOADED';
+                    testDiv.className = 'success';
+                    addLog('JS Bundle executed successfully', 'success');
+                };
+
+                document.body.appendChild(script);
+
+                // Wait a bit for execution
+                setTimeout(() => {
+                    if (!testDiv.textContent.includes('✅')) {
+                        testDiv.innerHTML = '⚠️ Bundle JS: LOADED BUT NO CONFIRMATION';
+                        testDiv.className = 'info';
+                    }
+                }, 2000);
+
+            } catch (error) {
+                testDiv.innerHTML = '❌ Bundle JS: LOAD ERROR';
+                testDiv.className = 'error';
+                addLog(`Bundle load error: ${error.message}`, 'error');
+                console.error('Full error:', error);
+            }
+        }
+
+        // Run all tests
+        addLog('Starting debug tests...', 'info');
+        testMetro();
+        testBackend();
+
+        // Wait a bit before loading bundle to see other tests
+        setTimeout(testBundle, 1000);
+    </script>
+</body>
+</html>

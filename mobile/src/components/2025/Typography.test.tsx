@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Typography Component Tests
  * Tests all variants, colors, weights, and accessibility

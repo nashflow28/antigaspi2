@@ -121,7 +121,7 @@ export const ComponentGalleryScreen: React.FC = () => {
           <BodyText color="secondary" style={styles.subsectionTitle}>
             Variantes Solid
           </BodyText>
-          <Card variant="elevated" style={[styles.card, styles.badgeContainer]}>
+          <Card variant="elevated" style={[styles.card, styles.badgeContainer] as any}>
             <Badge variant="primary">Primary</Badge>
             <Badge variant="secondary">Secondary</Badge>
             <Badge variant="promo">Promo</Badge>
@@ -135,7 +135,7 @@ export const ComponentGalleryScreen: React.FC = () => {
           <BodyText color="secondary" style={styles.subsectionTitle}>
             Variantes Outline
           </BodyText>
-          <Card variant="elevated" style={[styles.card, styles.badgeContainer]}>
+          <Card variant="elevated" style={[styles.card, styles.badgeContainer] as any}>
             <Badge variant="primary" outline>Primary</Badge>
             <Badge variant="secondary" outline>Secondary</Badge>
             <Badge variant="promo" outline>Promo</Badge>
@@ -145,7 +145,7 @@ export const ComponentGalleryScreen: React.FC = () => {
           <BodyText color="secondary" style={styles.subsectionTitle}>
             Tailles et Dot
           </BodyText>
-          <Card variant="elevated" style={[styles.card, styles.badgeContainer]}>
+          <Card variant="elevated" style={[styles.card, styles.badgeContainer] as any}>
             <Badge variant="primary" size="sm">Small</Badge>
             <Badge variant="primary" size="md">Medium</Badge>
             <Badge variant="primary" size="lg">Large</Badge>

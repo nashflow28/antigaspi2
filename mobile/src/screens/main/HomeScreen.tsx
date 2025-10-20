@@ -22,6 +22,7 @@ import { formatCurrency } from '../../utils/currencyHelpers'
 import FavoriteButton from '../../components/FavoriteButton'
 import locationService, { UserLocation } from '../../services/locationService'
 import { Button, Card, Badge, Typography } from '../../components/2025'
+import { TEST_IDS } from '../../utils/testIds'
 
 interface Props {
   navigation: any
@@ -233,7 +234,7 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
     }
   }
 
-  const renderProductCard = (product: Product) => {
+  const renderProductCard = (product: Product, index?: number) => {
     const timeSlot = getTimeSlot(product)
     const discountedPrice = Math.round(parseFloat(product.discounted_price) || 0)
     const originalPrice = Math.round(parseFloat(product.original_price) || 0)
@@ -252,6 +253,8 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
       <TouchableOpacity
         key={product.id}
         onPress={() => navigation.navigate('ProductDetails', { productId: product.id })}
+        testID={typeof index === 'number' ? TEST_IDS.productCard(index) : undefined}
+        accessibilityLabel={typeof index === 'number' ? TEST_IDS.productCard(index) : undefined}
       >
         <Card variant="elevated" style={{ marginBottom: theme.spacing.lg, overflow: 'hidden' }}>
           {/* Badge horaire */}
@@ -340,7 +343,7 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
   const styles = createStyles(theme)
 
   return (
-    <View style={styles.container}>
+    <View style={styles.container} testID={TEST_IDS.homeScreen}>
       <StatusBar backgroundColor={theme.colors.background} barStyle="dark-content" />
 
       <ScrollView
@@ -455,9 +458,9 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
         )}
 
         {/* Produits */}
-        <View style={styles.productsGrid}>
+        <View style={styles.productsGrid} testID={TEST_IDS.productList}>
           {sortedProducts.length > 0 ? (
-            sortedProducts.map(product => renderProductCard(product))
+            sortedProducts.map((product, index) => renderProductCard(product, index))
           ) : (
             <View style={styles.emptyState}>
               <Ionicons name="basket-outline" size={64} color={theme.colors.neutral[300]} />
@@ -532,6 +535,8 @@ const createStyles = (theme: ReturnType<typeof useTheme>) => StyleSheet.create({
   categoriesScroll: {
     marginTop: theme.spacing.md,
     marginBottom: theme.spacing.xs,
+    // Ensure visible lane height for horizontal chips
+    minHeight: 56,
   },
   categoriesContent: {
     paddingHorizontal: theme.spacing.lg,
@@ -548,7 +553,10 @@ const createStyles = (theme: ReturnType<typeof useTheme>) => StyleSheet.create({
     backgroundColor: theme.colors.surface.light,
     borderWidth: 1,
     borderColor: theme.colors.border,
+    // Prevent size jumps and overflow in horizontal scroll
     minHeight: 40,
+    maxWidth: 200,
+    flexShrink: 0,
   },
   categoryEmoji: {
     fontSize: 20,

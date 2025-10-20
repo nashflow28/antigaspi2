@@ -15,7 +15,7 @@ class Reservation extends Model
     protected $fillable = [
         'user_id',
         'product_id',
-        'quantity',
+        'quantity_reserved',
         'total_amount',
         'status',
         'payment_status',
@@ -33,7 +33,7 @@ class Reservation extends Model
     protected function casts(): array
     {
         return [
-            'quantity' => 'integer',
+            'quantity_reserved' => 'integer',
             'total_amount' => 'decimal:2',
             'payment_status' => PaymentStatus::class,
             'latest_payment_id' => 'integer',
@@ -172,7 +172,7 @@ class Reservation extends Model
                 'cancelled_at' => now(),
                 'payment_status' => PaymentStatus::FAILED,
             ]);
-            $this->product->increment('quantity_available', $this->quantity);
+            $this->product->increment('quantity_available', $this->quantity_reserved);
             return true;
         }
         return false;

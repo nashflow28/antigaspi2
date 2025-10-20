@@ -24,6 +24,7 @@ import { Reservation } from '../../types'
 import analyticsService from '../../services/analyticsService'
 import { Button, Card, Badge, Typography, Modal as Modal2025 } from '../../components/2025'
 import { useTheme } from '../../theme'
+import { TEST_IDS } from '../../utils/testIds'
 
 interface Props {
   navigation: any
@@ -219,8 +220,13 @@ const ReservationsScreen: React.FC<Props> = ({ navigation }) => {
     }
   }
 
-  const renderReservation = ({ item }: { item: Reservation }) => (
-    <Card variant="elevated" style={{ marginBottom: theme.spacing.sm, padding: theme.spacing.md }}>
+  const renderReservation = ({ item, index }: { item: Reservation; index: number }) => (
+    <Card
+      variant="elevated"
+      style={{ marginBottom: theme.spacing.sm, padding: theme.spacing.md }}
+      testID={TEST_IDS.reservationCard(index)}
+      accessibilityLabel={`Réservation ${item.reservation_code}`}
+    >
       {/* Header de la réservation */}
       <View style={styles.reservationHeader}>
         <View>
@@ -310,6 +316,8 @@ const ReservationsScreen: React.FC<Props> = ({ navigation }) => {
             size="sm"
             onPress={() => showQRCode(item)}
             leftIcon={<Ionicons name="qr-code-outline" size={16} color={theme.colors.textInverse} />}
+            testID={`show-qr-${item.id}`}
+            accessibilityLabel={`Afficher QR code pour ${item.reservation_code}`}
           >
             QR Code
           </Button>
@@ -320,6 +328,8 @@ const ReservationsScreen: React.FC<Props> = ({ navigation }) => {
           size="sm"
           onPress={() => navigation.navigate('ProductDetails', { productId: item.product.id })}
           leftIcon={<Ionicons name="eye-outline" size={16} color={theme.colors.primary[500]} />}
+          testID={`view-product-${item.product.id}`}
+          accessibilityLabel={`Voir produit ${item.product.name}`}
         >
           Voir
         </Button>
@@ -330,6 +340,8 @@ const ReservationsScreen: React.FC<Props> = ({ navigation }) => {
             size="sm"
             onPress={() => handleCancelReservation(item)}
             leftIcon={<Ionicons name="close-outline" size={16} color={theme.colors.textInverse} />}
+            testID={TEST_IDS.cancelReservationButton(item.id)}
+            accessibilityLabel={`Annuler réservation ${item.reservation_code}`}
           >
             Annuler
           </Button>
@@ -339,7 +351,7 @@ const ReservationsScreen: React.FC<Props> = ({ navigation }) => {
   )
 
   const renderEmpty = () => (
-    <View style={[styles.emptyContainer, { paddingVertical: theme.spacing['4xl'] }]}>
+    <View style={[styles.emptyContainer, { paddingVertical: theme.spacing['4xl'] }]} testID={TEST_IDS.emptyState}>
       <Ionicons name="bookmark-outline" size={64} color={theme.colors.neutral[300]} />
       <Typography variant="h3" weight="semibold" style={{ marginTop: theme.spacing.md, marginBottom: theme.spacing.sm }}>
         Aucune réservation
@@ -353,6 +365,7 @@ const ReservationsScreen: React.FC<Props> = ({ navigation }) => {
         variant="primary"
         size="lg"
         onPress={() => navigation.navigate('Products')}
+        testID="browse-products-button"
       >
         Parcourir les produits
       </Button>
@@ -360,7 +373,10 @@ const ReservationsScreen: React.FC<Props> = ({ navigation }) => {
   )
 
   return (
-    <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
+    <View
+      style={[styles.container, { backgroundColor: theme.colors.background }]}
+      testID={TEST_IDS.reservationsScreen}
+    >
       <StatusBar backgroundColor={theme.colors.primary[500]} barStyle="light-content" />
 
       {/* Header */}
@@ -389,6 +405,8 @@ const ReservationsScreen: React.FC<Props> = ({ navigation }) => {
                 activeTab === tab.key && { backgroundColor: theme.colors.primary[500] }
               ]}
               onPress={() => handleTabChange(tab.key as any)}
+              testID={`tab-${tab.key}`}
+              accessibilityLabel={`${tab.label} (${tab.count})`}
             >
               <Typography variant="caption" weight="medium" style={{ color: activeTab === tab.key ? theme.colors.textInverse : theme.colors.neutral[600] }}>
                 {tab.label}
@@ -407,6 +425,7 @@ const ReservationsScreen: React.FC<Props> = ({ navigation }) => {
         renderItem={renderReservation}
         keyExtractor={(item) => item.id.toString()}
         contentContainerStyle={styles.listContent}
+        testID={TEST_IDS.reservationsList}
         showsVerticalScrollIndicator={false}
         refreshControl={
           <RefreshControl
@@ -426,6 +445,7 @@ const ReservationsScreen: React.FC<Props> = ({ navigation }) => {
         dismissable
         onClose={() => setShowQRModal(false)}
         title="QR Code de retrait"
+        testID="qr-code-modal"
       >
         {selectedReservation && (
           <View style={{ padding: theme.spacing.lg, alignItems: 'center' }}>

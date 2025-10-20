@@ -1,0 +1,62 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e3]:
+  - navigation "Navigation principale" [ref=e4]:
+    - generic [ref=e5]:
+      - link "Antigaspi" [ref=e6] [cursor=pointer]:
+        - /url: /
+        - generic [ref=e7] [cursor=pointer]: Antigaspi
+      - menubar [ref=e8]:
+        - menuitem "Accueil" [ref=e9]:
+          - img [ref=e10]
+          - generic [ref=e12]: Accueil
+        - menuitem "Découvrir" [ref=e13]:
+          - img [ref=e14]
+          - generic [ref=e16]: Découvrir
+        - menuitem "Produits" [ref=e17]:
+          - img [ref=e18]
+          - generic [ref=e20]: Produits
+        - menuitem "Avis" [ref=e22]:
+          - img [ref=e23]
+          - generic [ref=e25]: Avis
+      - generic [ref=e26]:
+        - button "Activer le thème sombre" [ref=e27] [cursor=pointer]:
+          - generic [ref=e28] [cursor=pointer]: Activer le thème sombre
+          - img [ref=e30] [cursor=pointer]
+        - generic [ref=e36]:
+          - button "Mon panier" [ref=e37] [cursor=pointer]:
+            - generic [ref=e39] [cursor=pointer]: Mon panier
+          - button "Connexion" [ref=e40] [cursor=pointer]:
+            - generic [ref=e41] [cursor=pointer]: Connexion
+          - button "Inscription" [ref=e42] [cursor=pointer]:
+            - generic [ref=e43] [cursor=pointer]: Inscription
+  - main [ref=e44]:
+    - generic [ref=e45]:
+      - generic [ref=e48]:
+        - generic [ref=e49]:
+          - generic [ref=e50]: Catalogue 2025
+          - generic [ref=e51]:
+            - heading "Produits responsables à portée de main" [level=1] [ref=e52]
+            - paragraph [ref=e53]: 0 produit disponible
+          - paragraph [ref=e54]: Explorez nos paniers anti-gaspi triés par impact, localisation et économies garanties.
+        - generic [ref=e57]:
+          - generic [ref=e59]:
+            - img [ref=e60]
+            - textbox "Rechercher des produits responsables..." [ref=e63]
+          - button "Filtres 0" [ref=e64] [cursor=pointer]:
+            - img [ref=e65] [cursor=pointer]
+            - generic [ref=e68] [cursor=pointer]:
+              - generic [ref=e69] [cursor=pointer]: Filtres
+              - generic [ref=e70] [cursor=pointer]: "0"
+      - main [ref=e71]
+  - contentinfo [ref=e154]:
+    - generic [ref=e155]:
+      - generic [ref=e156]:
+        - paragraph [ref=e157]: Antigaspi
+        - paragraph [ref=e158]: © 2025 — Ensemble, réduisons le gaspillage alimentaire.
+      - generic [ref=e159]:
+        - img [ref=e161]
+        - img [ref=e165]
+        - img [ref=e169]
+```

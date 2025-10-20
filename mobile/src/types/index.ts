@@ -8,11 +8,19 @@ export interface User {
   role: 'consumer' | 'merchant' | 'admin'
   city: string
   phone?: string
+  address?: string
   created_at: string
   updated_at: string
   prefers_email_notifications?: boolean
   prefers_sms_notifications?: boolean
   prefers_push_notifications?: boolean
+  merchant?: {
+    business_name?: string
+    business_type?: string
+    description?: string
+    siret?: string
+    photo_url?: string
+  }
 }
 
 export interface Merchant {
@@ -23,6 +31,8 @@ export interface Merchant {
   address?: string
   phone: string
   is_verified: boolean
+  latitude?: number | null
+  longitude?: number | null
 }
 
 export interface Category {
@@ -258,8 +268,61 @@ export interface ReservationsState {
   error: string | null
 }
 
+export interface FavoritesState {
+  favoriteIds: number[] // IDs des produits favoris
+  favorites: Product[] // Détails complets des favoris
+  loading: boolean
+  error: string | null
+}
+
+// Reviews types
+export interface Review {
+  id: number
+  rating: number
+  title?: string | null
+  comment?: string | null
+  stars: string // Visual representation "★★★★★"
+  time_ago: string // "Il y a 2 jours"
+  is_verified_purchase: boolean
+  user: {
+    id: number
+    name: string // "Jean D."
+  }
+  product?: {
+    id: number
+    name: string
+  } | null
+  merchant_response?: string | null
+  merchant_response_at?: string | null
+  created_at: string
+  updated_at?: string
+}
+
+export interface ReviewStats {
+  total_reviews: number
+  average_rating: number
+  verified_reviews: number
+  rating_distribution: Array<{
+    rating: number // 1-5
+    count: number
+    percentage: number
+  }>
+}
+
+export interface ReviewsState {
+  reviews: Review[]
+  stats: ReviewStats | null
+  loading: boolean
+  error: string | null
+  currentPage: number
+  totalPages: number
+  hasMore: boolean
+}
+
 export interface RootState {
   auth: AuthState
   products: ProductsState
   reservations: ReservationsState
+  favorites: FavoritesState
+  reviews: ReviewsState
 }

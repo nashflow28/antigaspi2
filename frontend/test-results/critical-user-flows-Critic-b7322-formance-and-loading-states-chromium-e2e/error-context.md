@@ -1,0 +1,172 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - generic [ref=e3]:
+    - navigation "Navigation principale" [ref=e4]:
+      - generic [ref=e5]:
+        - link "Antigaspi" [ref=e6] [cursor=pointer]:
+          - /url: /
+          - generic [ref=e7] [cursor=pointer]: Antigaspi
+        - menubar [ref=e8]:
+          - menuitem "Accueil" [ref=e9]:
+            - img [ref=e10]
+            - generic [ref=e12]: Accueil
+          - menuitem "Découvrir" [ref=e14]:
+            - img [ref=e15]
+            - generic [ref=e17]: Découvrir
+          - menuitem "Produits" [ref=e18]:
+            - img [ref=e19]
+            - generic [ref=e21]: Produits
+          - menuitem "Avis" [ref=e22]:
+            - img [ref=e23]
+            - generic [ref=e25]: Avis
+        - generic [ref=e26]:
+          - button "Activer le thème sombre" [ref=e27] [cursor=pointer]:
+            - generic [ref=e28] [cursor=pointer]: Activer le thème sombre
+            - img [ref=e30] [cursor=pointer]
+          - generic [ref=e36]:
+            - button "Mon panier" [ref=e37] [cursor=pointer]:
+              - generic [ref=e39] [cursor=pointer]: Mon panier
+            - button "Connexion" [ref=e40] [cursor=pointer]:
+              - generic [ref=e41] [cursor=pointer]: Connexion
+            - button "Inscription" [ref=e42] [cursor=pointer]:
+              - generic [ref=e43] [cursor=pointer]: Inscription
+    - main [ref=e44]:
+      - generic [ref=e45]:
+        - generic [ref=e46]:
+          - generic [ref=e51]:
+            - generic [ref=e53]: Ensemble contre le gaspillage alimentaire
+            - heading "Sauvons notre planète" [level=1] [ref=e55]:
+              - generic [ref=e56]: Sauvons
+              - generic [ref=e57]: notre planète
+            - paragraph [ref=e58]:
+              - text: Transformons les invendus en opportunités.
+              - generic [ref=e59]: Économisez jusqu'à 70%
+              - text: tout en protégeant l'environnement.
+            - generic [ref=e60]:
+              - button "🌟 Découvrir les offres" [ref=e61] [cursor=pointer]:
+                - generic [ref=e63] [cursor=pointer]: 🌟 Découvrir les offres
+              - button "✨ Rejoindre maintenant" [ref=e65] [cursor=pointer]:
+                - generic [ref=e67] [cursor=pointer]: ✨ Rejoindre maintenant
+            - generic [ref=e68]:
+              - generic [ref=e70]:
+                - generic [ref=e71]: 1,2M+
+                - generic [ref=e72]: Produits sauvés
+              - generic [ref=e74]:
+                - generic [ref=e75]: 50K+
+                - generic [ref=e76]: Utilisateurs actifs
+              - generic [ref=e78]:
+                - generic [ref=e79]: 2,5K+
+                - generic [ref=e80]: Commerçants partenaires
+          - img [ref=e82]
+        - generic [ref=e85]:
+          - generic [ref=e86]:
+            - generic [ref=e88]: Processus simple en 3 étapes
+            - heading "Comment ça marche ?" [level=2] [ref=e90]
+            - paragraph [ref=e91]: Rejoignez la révolution anti-gaspillage en quelques clics
+          - generic [ref=e92]:
+            - generic [ref=e94] [cursor=pointer]:
+              - generic [ref=e95] [cursor=pointer]:
+                - generic [ref=e97] [cursor=pointer]: 🔍
+                - generic [ref=e98] [cursor=pointer]: "1"
+              - generic [ref=e99] [cursor=pointer]:
+                - heading "Découvrez" [level=3] [ref=e100] [cursor=pointer]
+                - paragraph [ref=e101] [cursor=pointer]: Explorez les offres exclusives des commerçants locaux et trouvez des produits de qualité à prix réduits.
+                - generic [ref=e102] [cursor=pointer]:
+                  - generic [ref=e104] [cursor=pointer]: Géolocalisation intelligente
+                  - generic [ref=e106] [cursor=pointer]: Filtres avancés
+            - generic [ref=e108] [cursor=pointer]:
+              - generic [ref=e109] [cursor=pointer]:
+                - generic [ref=e111] [cursor=pointer]: ⚡
+                - generic [ref=e112] [cursor=pointer]: "2"
+              - generic [ref=e113] [cursor=pointer]:
+                - heading "Réservez" [level=3] [ref=e114] [cursor=pointer]
+                - paragraph [ref=e115] [cursor=pointer]: Réservez instantanément vos produits favoris avec paiement sécurisé et confirmation immédiate.
+                - generic [ref=e116] [cursor=pointer]:
+                  - generic [ref=e118] [cursor=pointer]: Réservation instantanée
+                  - generic [ref=e120] [cursor=pointer]: Paiement sécurisé
+            - generic [ref=e122] [cursor=pointer]:
+              - generic [ref=e123] [cursor=pointer]:
+                - generic [ref=e125] [cursor=pointer]: 🌱
+                - generic [ref=e126] [cursor=pointer]: "3"
+              - generic [ref=e127] [cursor=pointer]:
+                - heading "Sauvez" [level=3] [ref=e128] [cursor=pointer]
+                - paragraph [ref=e129] [cursor=pointer]: Récupérez vos achats et contribuez activement à la réduction du gaspillage alimentaire.
+                - generic [ref=e130] [cursor=pointer]:
+                  - generic [ref=e132] [cursor=pointer]: Impact environnemental
+                  - generic [ref=e134] [cursor=pointer]: Économies réalisées
+          - button "Commencer maintenant→" [ref=e136] [cursor=pointer]:
+            - generic [ref=e137] [cursor=pointer]:
+              - generic [ref=e138] [cursor=pointer]: Commencer maintenant
+              - generic [ref=e139] [cursor=pointer]: →
+        - generic [ref=e141]:
+          - heading "Notre impact" [level=2] [ref=e143]
+          - generic [ref=e144]:
+            - generic [ref=e145]:
+              - generic [ref=e146]: 1,234
+              - paragraph [ref=e147]: Produits sauvés
+            - generic [ref=e148]:
+              - generic [ref=e149]: "567"
+              - paragraph [ref=e150]: Utilisateurs actifs
+            - generic [ref=e151]:
+              - generic [ref=e152]: "89"
+              - paragraph [ref=e153]: Commerçants partenaires
+        - generic [ref=e155]:
+          - heading "Prêt à faire la différence ?" [level=2] [ref=e156]
+          - paragraph [ref=e157]: Rejoignez notre communauté et commencez à économiser tout en protégeant l'environnement
+          - generic [ref=e158]:
+            - button "Consommateur" [ref=e159] [cursor=pointer]:
+              - generic [ref=e160] [cursor=pointer]: Consommateur
+            - button "Commerçant" [ref=e161] [cursor=pointer]:
+              - generic [ref=e162] [cursor=pointer]: Commerçant
+        - generic [ref=e165]:
+          - heading "Catégories populaires" [level=2] [ref=e166]
+          - paragraph [ref=e167]: Explorez nos produits par catégorie
+        - generic [ref=e169]:
+          - generic [ref=e170]:
+            - heading "Produits en vedette" [level=2] [ref=e171]
+            - paragraph [ref=e172]: Découvrez les meilleures offres anti-gaspillage près de chez vous
+          - generic [ref=e173]:
+            - article [ref=e174] [cursor=pointer]:
+              - img "Pain complet artisanal" [ref=e176] [cursor=pointer]
+              - generic [ref=e177] [cursor=pointer]:
+                - heading "Pain complet artisanal" [level=3] [ref=e178] [cursor=pointer]
+                - paragraph [ref=e179] [cursor=pointer]: Boulangerie
+                - generic [ref=e180] [cursor=pointer]:
+                  - generic [ref=e181] [cursor=pointer]:
+                    - generic [ref=e182] [cursor=pointer]: 250 XOF
+                    - generic [ref=e183] [cursor=pointer]: 500 XOF
+                  - generic [ref=e184] [cursor=pointer]: "-50%"
+            - article [ref=e185] [cursor=pointer]:
+              - img "Croissants frais" [ref=e187] [cursor=pointer]
+              - generic [ref=e188] [cursor=pointer]:
+                - heading "Croissants frais" [level=3] [ref=e189] [cursor=pointer]
+                - paragraph [ref=e190] [cursor=pointer]: Boulangerie
+                - generic [ref=e191] [cursor=pointer]:
+                  - generic [ref=e192] [cursor=pointer]:
+                    - generic [ref=e193] [cursor=pointer]: 100 XOF
+                    - generic [ref=e194] [cursor=pointer]: 200 XOF
+                  - generic [ref=e195] [cursor=pointer]: "-50%"
+          - button "Voir tous les produits" [ref=e197] [cursor=pointer]:
+            - generic [ref=e198] [cursor=pointer]: Voir tous les produits
+    - contentinfo [ref=e199]:
+      - generic [ref=e200]:
+        - generic [ref=e201]:
+          - paragraph [ref=e202]: Antigaspi
+          - paragraph [ref=e203]: © 2025 — Ensemble, réduisons le gaspillage alimentaire.
+        - generic [ref=e204]:
+          - img [ref=e206]
+          - img [ref=e210]
+          - img [ref=e214]
+  - status [ref=e218]:
+    - generic [ref=e219]:
+      - img [ref=e221]
+      - generic [ref=e223]:
+        - paragraph [ref=e224]: Commerçants
+        - paragraph [ref=e225]: Unexpected token '<', "<br /> <b>"... is not valid JSON
+        - button "Réessayer" [ref=e226] [cursor=pointer]:
+          - generic [ref=e227] [cursor=pointer]: Réessayer
+      - button "Fermer la notification" [ref=e228] [cursor=pointer]:
+        - img [ref=e229] [cursor=pointer]
+```

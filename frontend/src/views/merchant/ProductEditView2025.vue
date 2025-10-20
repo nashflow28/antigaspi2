@@ -301,7 +301,7 @@
                 <h3 class="text-lg font-semibold text-neutral-900">Statistiques</h3>
               </template>
 
-                <div class="space-y-4">
+              <div class="space-y-4">
                 <div class="flex items-center justify-between">
                   <span class="text-sm font-medium text-neutral-800">Vues</span>
                   <span class="text-sm font-semibold text-neutral-900">{{ product.views || 0 }}</span>

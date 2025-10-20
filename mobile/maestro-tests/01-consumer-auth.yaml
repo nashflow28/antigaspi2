@@ -1,0 +1,89 @@
+appId: host.exp.exponent  # Expo Go app ID
+name: Consumer Authentication Flow
+tags:
+  - authentication
+  - consumer
+  - critical
+
+---
+# Test 1: Login with valid credentials
+- launchApp
+- assertVisible: "Antigaspi"
+
+# Wait for login screen to load
+- waitForAnimationToEnd
+
+# Check login form is visible
+- assertVisible: "Email"
+- assertVisible: "Password"
+- assertVisible:
+    text: "Se connecter"
+    enabled: true
+
+# Fill login form
+- tapOn: "Email"
+- inputText: "jean.dupont@email.com"
+
+- tapOn: "Password"
+- inputText: "password"
+
+# Submit login
+- tapOn: "Se connecter"
+
+# Wait for navigation
+- waitForAnimationToEnd:
+    timeout: 10000
+
+# Verify successful login - should see user name or home screen
+- assertVisible:
+    text: "Jean Dupont|Accueil|Produits"  # Either user name or navigation
+    timeout: 10000
+
+---
+# Test 2: Logout
+- tapOn:
+    text: "Profil|Profile"
+
+- waitForAnimationToEnd
+
+# Should see profile info
+- assertVisible: "Jean Dupont"
+- assertVisible: "jean.dupont@email.com"
+
+# Tap logout button
+- tapOn:
+    text: "Déconnexion|Logout"
+
+# Confirm logout if modal appears
+- tapOn:
+    text: "Confirmer|OK"
+    optional: true
+
+- waitForAnimationToEnd:
+    timeout: 5000
+
+# Should be back on login screen
+- assertVisible: "Se connecter"
+- assertVisible: "Email"
+- assertVisible: "Password"
+
+---
+# Test 3: Login with invalid credentials
+- tapOn: "Email"
+- inputText: "invalid@example.com"
+
+- tapOn: "Password"
+- inputText: "wrongpassword"
+
+- tapOn: "Se connecter"
+
+- waitForAnimationToEnd:
+    timeout: 5000
+
+# Should see error message
+- assertVisible:
+    text: "Identifiants invalides|Invalid credentials|Erreur"
+    timeout: 5000
+
+# Should still be on login screen
+- assertVisible: "Se connecter"

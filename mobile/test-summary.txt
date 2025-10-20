@@ -1,0 +1,30 @@
+      at renderInternal (node_modules/@testing-library/react-native/src/render.tsx:69:33)
+      at renderInternal (node_modules/@testing-library/react-native/src/render.tsx:44:10)
+      at Object.<anonymous> (src/screens/main/__tests__/ProductDetailsScreen.test.tsx:248:33)
+
+FAIL ./debug-web.spec.ts
+  ● Test suite failed to run
+
+    Playwright Test needs to be invoked via 'npx playwright test' and excluded from Jest test runs.
+    Creating one directory for Playwright tests and one for Jest is the recommended way of doing it.
+    See https://playwright.dev/docs/intro for more information about Playwright Test.
+
+    [0m [90m 1 |[39m [36mimport[39m { test[33m,[39m expect } [36mfrom[39m [32m'@playwright/test'[39m
+     [90m 2 |[39m
+    [31m[1m>[22m[39m[90m 3 |[39m test[33m.[39mdescribe([32m'Debug Mobile Web App'[39m[33m,[39m () [33m=>[39m {
+     [90m   |[39m      [31m[1m^[22m[39m
+     [90m 4 |[39m   test([32m'Capture all console errors and take screenshots'[39m[33m,[39m [36masync[39m ({ page }) [33m=>[39m {
+     [90m 5 |[39m     [36mconst[39m consoleMessages[33m:[39m string[] [33m=[39m []
+     [90m 6 |[39m     [36mconst[39m errors[33m:[39m string[] [33m=[39m [][0m
+
+      at throwIfRunningInsideJest (node_modules/playwright/lib/common/testType.js:272:11)
+      at TestTypeImpl._describe (node_modules/playwright/lib/common/testType.js:113:5)
+      at Function.describe (node_modules/playwright/lib/transform/transform.js:275:12)
+      at Object.describe (debug-web.spec.ts:3:6)
+
+
+Test Suites: 10 failed, 14 passed, 24 total
+Tests:       55 failed, 444 passed, 499 total
+Snapshots:   0 total
+Time:        21.797 s
+Ran all test suites.

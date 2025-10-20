@@ -100,6 +100,11 @@ class User extends Authenticatable implements JWTSubject
         return $this->hasOne(Wallet::class);
     }
 
+    public function favorites(): HasMany
+    {
+        return $this->hasMany(Favorite::class);
+    }
+
     // Scopes
     public function scopeConsumers($query)
     {

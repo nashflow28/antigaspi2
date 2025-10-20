@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test API Backend</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+        }
+        .test {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .success {
+            background: #d4edda;
+            border-color: #28a745;
+        }
+        .error {
+            background: #f8d7da;
+            border-color: #dc3545;
+        }
+        button {
+            padding: 10px 20px;
+            margin: 5px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <h1>Test API Backend AntiGaspi</h1>
+
+    <div id="health" class="test">
+        <h2>1. Health Check</h2>
+        <button onclick="testHealth()">Test Health</button>
+        <pre id="health-result">En attente...</pre>
+    </div>
+
+    <div id="login" class="test">
+        <h2>2. Login Test</h2>
+        <button onclick="testLogin()">Test Login</button>
+        <pre id="login-result">En attente...</pre>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:8000/api';
+        let authToken = null;
+
+        async function testHealth() {
+            const result = document.getElementById('health-result');
+            try {
+                const response = await fetch(`${API_URL}/health`);
+                const data = await response.json();
+                result.textContent = response.ok ? 
+                    `OK! ${JSON.stringify(data, null, 2)}` : 
+                    'API non disponible';
+            } catch (error) {
+                result.textContent = `Erreur: ${error.message}`;
+            }
+        }
+
+        async function testLogin() {
+            const result = document.getElementById('login-result');
+            try {
+                const response = await fetch(`${API_URL}/auth/login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        email: 'jean.dupont@email.com',
+                        password: 'password'
+                    })
+                });
+                const data = await response.json();
+                if (response.ok && data.success) {
+                    authToken = data.data.token;
+                    result.textContent = `Login OK! User: ${data.data.user.name}`;
+                } else {
+                    result.textContent = 'Erreur de login';
+                }
+            } catch (error) {
+                result.textContent = `Erreur: ${error.message}`;
+            }
+        }
+
+        window.onload = () => testHealth();
+    </script>
+</body>
+</html>

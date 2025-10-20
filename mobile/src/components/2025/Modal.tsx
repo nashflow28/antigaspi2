@@ -41,6 +41,9 @@ export interface ModalProps {
   dismissable?: boolean
   showCloseButton?: boolean
 
+  // Testing
+  testID?: string
+
   // Style overrides
   style?: ViewStyle
   contentStyle?: ViewStyle
@@ -62,6 +65,7 @@ export const Modal: React.FC<ModalProps> = ({
   scrollable = true,
   dismissable = true,
   showCloseButton = true,
+  testID,
   style,
   contentStyle,
   headerStyle,
@@ -300,6 +304,7 @@ export const Modal: React.FC<ModalProps> = ({
         />
         <Animated.View
           style={[contentContainerStyle, getAnimationTransform()]}
+          testID={testID}
         >
           {renderHeader()}
           {renderContent()}

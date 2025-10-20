@@ -13,6 +13,7 @@ use App\Http\Controllers\Api\MerchantController;
 use App\Http\Controllers\Api\ReviewController;
 use App\Http\Controllers\Api\SurpriseBasketController;
 use App\Http\Controllers\Api\NotificationController;
+use App\Http\Controllers\Api\FavoriteController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\WalletController;
 
@@ -67,9 +68,10 @@ Route::prefix('products')->group(function () {
         Route::get('/merchant', [ProductController::class, 'merchantProducts']); // Produits du commerçant connecté
         Route::get('/merchant/{id}', [ProductController::class, 'showOwn']); // Voir son propre produit (même inactif)
 
-        // 🔒 SECURITY: Upload image with ultra-strict rate limiting (5 requests/minute, same as MerchantController)
+        // 🔒 SECURITY: Upload image with strict rate limiting (10 requests/minute)
+        // 🐛 BUG FIX #10: Adjusted from 5 to 10 req/min for better UX
         Route::post('/upload-image', [ProductController::class, 'uploadImage'])
-            ->middleware('throttle:5,1'); // Ultra-strict for file uploads
+            ->middleware('throttle:10,1'); // Strict but UX-friendly for file uploads
 
         // Routes d'écriture avec rate limiting strict
         Route::middleware('throttle:write')->group(function () {
@@ -119,6 +121,19 @@ Route::prefix('reservations')->middleware('jwt.auth')->group(function () {
         Route::post('/{id}/confirm', [ReservationController::class, 'confirm']); // Confirmer une réservation
         Route::post('/{id}/ready', [ReservationController::class, 'markReady']); // Marquer comme prêt
         Route::post('/{id}/complete', [ReservationController::class, 'complete']); // Marquer comme terminée
+    });
+});
+
+// Routes des favoris (toutes protégées)
+Route::prefix('favorites')->middleware('jwt.auth')->group(function () {
+    // Routes de consultation
+    Route::get('/', [FavoriteController::class, 'index']); // Mes favoris
+    Route::get('/batch-check', [FavoriteController::class, 'batchCheck']); // Tous les IDs favoris
+    Route::get('/check/{productId}', [FavoriteController::class, 'check']); // Vérifier si favori
+
+    // Routes d'écriture avec rate limiting strict
+    Route::middleware('throttle:write')->group(function () {
+        Route::post('/{productId}/toggle', [FavoriteController::class, 'toggle']); // Toggle favori
     });
 });
 
@@ -187,9 +202,10 @@ Route::prefix('merchants')->middleware('jwt.auth')->group(function () {
     // Gestion du profil commerçant
     Route::put('/profile', [MerchantController::class, 'updateProfile']); // Mettre à jour profil
 
-    // 🔒 SECURITY: Rate limiting strict pour l'upload de photo (5 requêtes/minute)
+    // 🔒 SECURITY: Rate limiting strict pour l'upload de photo (10 requêtes/minute)
+    // 🐛 BUG FIX #10: Adjusted from 5 to 10 req/min for better UX
     Route::post('/profile/photo', [MerchantController::class, 'uploadPhoto'])
-        ->middleware('throttle:5,1'); // Upload photo profil
+        ->middleware('throttle:10,1'); // Upload photo profil
 
     // Gestion des heures d'ouverture
     Route::get('/opening-hours', [MerchantController::class, 'getOpeningHours']); // Obtenir heures d'ouverture

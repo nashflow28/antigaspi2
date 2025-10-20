@@ -17,7 +17,7 @@ const initialState: ProductsState = {
 // Actions asynchrones
 export const fetchProducts = createAsyncThunk(
   'products/fetchProducts',
-  async (filters?: ProductFilters, { rejectWithValue }) => {
+  async (filters: ProductFilters | undefined, { rejectWithValue }) => {
     // Version simplifiée sans cache offline pour le web
     try {
       const response = await apiService.getProducts(filters)
@@ -56,7 +56,7 @@ export const fetchMoreProducts = createAsyncThunk(
   'products/fetchMoreProducts',
   async ({ filters, page }: { filters?: ProductFilters; page: number }, { rejectWithValue }) => {
     try {
-      const response = await apiService.getProducts({ ...filters, page })
+      const response = await apiService.getProducts({ ...filters, page, per_page: 20 })
       return response.data
     } catch (error: any) {
       return rejectWithValue(error.message)
@@ -70,9 +70,13 @@ const productsSlice = createSlice({
   reducers: {
     setFilters: (state, action: PayloadAction<ProductFilters>) => {
       state.filters = { ...state.filters, ...action.payload }
+      state.currentPage = 1
+      state.hasMore = true
     },
     clearFilters: (state) => {
       state.filters = {}
+      state.currentPage = 1
+      state.hasMore = true
     },
     clearError: (state) => {
       state.error = null
@@ -140,7 +144,7 @@ const productsSlice = createSlice({
         state.loadingMore = false
         state.products = [...state.products, ...action.payload]
         state.currentPage += 1
-        state.hasMore = action.payload.length > 0
+        state.hasMore = action.payload.length >= 20
         state.error = null
       })
       .addCase(fetchMoreProducts.rejected, (state, action) => {

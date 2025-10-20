@@ -4,6 +4,8 @@ import connectivitySlice from './slices/connectivitySlice'
 import productsSlice from './slices/productsSlice'
 import reservationsSlice from './slices/reservationsSlice'
 import merchantsSlice from './slices/merchantsSlice'
+import favoritesSlice from './slices/favoritesSlice'
+import reviewsSlice from './slices/reviewsSlice'
 
 export const store = configureStore({
   reducer: {
@@ -12,6 +14,8 @@ export const store = configureStore({
     products: productsSlice,
     reservations: reservationsSlice,
     merchants: merchantsSlice,
+    favorites: favoritesSlice,
+    reviews: reviewsSlice,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

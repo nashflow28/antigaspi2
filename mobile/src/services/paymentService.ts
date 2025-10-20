@@ -11,6 +11,7 @@ import {
   PaymentInitiationResponse,
   Payment
 } from '../types';
+import { formatCurrency as formatCurrencyUtil } from '../utils/currencyHelpers';
 
 export interface PaymentProvider {
   id: string;
@@ -117,7 +118,7 @@ class PaymentService {
         throw new Error('Numéro de téléphone invalide pour ce provider');
       }
 
-      if (request.amount < 100) {
+      if (!isFinite(request.amount) || isNaN(request.amount) || request.amount < 100) {
         throw new Error('Le montant minimum est de 100 XOF');
       }
 
@@ -230,13 +231,13 @@ class PaymentService {
    */
   validatePhoneNumber(phone: string, provider: MobileMoneyProvider): boolean {
     const patterns: Record<MobileMoneyProvider, RegExp> = {
-      flooz: /^(228)?[79]\d{7}$/,     // Togo: 7XXXXXXX ou 9XXXXXXX
-      tmoney: /^(228)?[79]\d{7}$/,    // Togo: 7XXXXXXX ou 9XXXXXXX
-      orange_money: /^(225|221|223|226|224)?[0-9]{8,10}$/,
-      mtn_momo: /^(233|225|237|229)?[0-9]{8,10}$/
+      flooz: /^(\+?228)?(90|93|96|97)\d{6}$/,     // Togo: 90/93/96/97 + 6 digits
+      tmoney: /^(\+?228)?(91|92|98|99)\d{6}$/,    // Togo: 91/92/98/99 + 6 digits
+      orange_money: /^(\+?225|\+?221|\+?223|\+?226|\+?224)?[0-9]{8,10}$/,
+      mtn_momo: /^(\+?233|\+?225|\+?237|\+?229)?[0-9]{8,10}$/
     };
 
-    const cleanPhone = phone.replace(/[\s\-\(\)]/g, '');
+    const cleanPhone = phone.replace(/[\s\-\(\)+]/g, '');
     return patterns[provider]?.test(cleanPhone) || false;
   }
 
@@ -338,14 +339,10 @@ class PaymentService {
 
   /**
    * Formater un montant en devise locale
+   * Utilise l'utilitaire centralisé pour cohérence dans toute l'app
    */
   formatCurrency(amount: number, currency: string = 'XOF'): string {
-    return new Intl.NumberFormat('fr-TG', {
-      style: 'currency',
-      currency: currency,
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0
-    }).format(amount);
+    return formatCurrencyUtil(amount);
   }
 }
 

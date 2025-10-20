@@ -74,8 +74,8 @@
       >
         <template #filters>
           <DashboardFilterBar
-            data-testid="products-filters"
             v-model:search="searchQuery"
+            data-testid="products-filters"
             :filters="dashboardFilters"
             placeholder="Rechercher un produit..."
             @update:filters="handleFiltersUpdate"

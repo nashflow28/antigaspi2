@@ -9,8 +9,10 @@ import {
   StatusBar,
 } from 'react-native'
 import { Ionicons } from '@expo/vector-icons'
+import { useNavigation } from '@react-navigation/native'
 import { useTheme } from '../../theme'
 import apiService from '../../services/api'
+import { TEST_IDS } from '../../utils/testIds'
 
 interface Stats {
   active_products: number
@@ -30,6 +32,7 @@ interface Reservation {
 
 const MerchantDashboardScreen: React.FC = () => {
   const theme = useTheme()
+  const navigation = useNavigation()
   const [stats, setStats] = useState<Stats>({
     active_products: 0,
     pending_reservations: 0,
@@ -48,7 +51,7 @@ const MerchantDashboardScreen: React.FC = () => {
     try {
       setLoading(true)
       // Charger les stats
-      const statsResponse = await apiService.get('/analytics/stats?role=merchant')
+      const statsResponse = await apiService.get('/analytics/merchant-stats')
       setStats(statsResponse.data || {
         active_products: 0,
         pending_reservations: 0,
@@ -57,7 +60,7 @@ const MerchantDashboardScreen: React.FC = () => {
       })
 
       // Charger les réservations récentes
-      const reservationsResponse = await apiService.get('/reservations/merchant?limit=5')
+      const reservationsResponse = await apiService.get('/reservations/merchant/list?limit=5')
       setRecentReservations(reservationsResponse.data.data || [])
     } catch (error) {
       console.error('Erreur chargement dashboard:', error)
@@ -113,7 +116,7 @@ const MerchantDashboardScreen: React.FC = () => {
   }
 
   return (
-    <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
+    <View style={[styles.container, { backgroundColor: theme.colors.background }]} testID={TEST_IDS.merchantDashboard}>
       <StatusBar barStyle="dark-content" backgroundColor={theme.colors.background} />
 
       {/* Header */}
@@ -135,16 +138,26 @@ const MerchantDashboardScreen: React.FC = () => {
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
       >
+        {/* Button to Analytics */}
+        <TouchableOpacity
+          style={[styles.analyticsButton, { backgroundColor: theme.colors.primary[500] }]}
+          onPress={() => (navigation as any).navigate('Analytics')}
+        >
+          <Ionicons name="stats-chart" size={20} color="white" />
+          <Text style={styles.analyticsButtonText}>Voir statistiques détaillées</Text>
+          <Ionicons name="chevron-forward" size={20} color="white" />
+        </TouchableOpacity>
+
         {/* Stats Cards */}
         <View style={styles.statsContainer}>
-          <View style={[styles.statCard, { backgroundColor: theme.colors.surface.light }]}>
+          <View style={[styles.statCard, { backgroundColor: theme.colors.surface.light }]} testID={TEST_IDS.activeProductsCard}>
             <View style={[styles.statIcon, { backgroundColor: theme.withOpacity(theme.colors.primary[500], 0.1) }]}>
               <Ionicons name="cube" size={24} color={theme.colors.primary[500]} />
             </View>
-            <Text style={[styles.statValue, { color: theme.colors.text.primary }]}>
+            <Text style={[styles.statValue, { color: theme.colors.text }]}>
               {stats.active_products}
             </Text>
-            <Text style={[styles.statLabel, { color: theme.colors.text.secondary }]}>
+            <Text style={[styles.statLabel, { color: theme.colors.textSecondary }]}>
               Produits actifs
             </Text>
           </View>
@@ -153,22 +166,22 @@ const MerchantDashboardScreen: React.FC = () => {
             <View style={[styles.statIcon, { backgroundColor: theme.withOpacity(theme.colors.semantic.warning, 0.1) }]}>
               <Ionicons name="hourglass" size={24} color={theme.colors.semantic.warning} />
             </View>
-            <Text style={[styles.statValue, { color: theme.colors.text.primary }]}>
+            <Text style={[styles.statValue, { color: theme.colors.text }]}>
               {stats.pending_reservations}
             </Text>
-            <Text style={[styles.statLabel, { color: theme.colors.text.secondary }]}>
+            <Text style={[styles.statLabel, { color: theme.colors.textSecondary }]}>
               En attente
             </Text>
           </View>
 
-          <View style={[styles.statCard, { backgroundColor: theme.colors.surface.light }]}>
+          <View style={[styles.statCard, { backgroundColor: theme.colors.surface.light }]} testID={TEST_IDS.totalSalesCard}>
             <View style={[styles.statIcon, { backgroundColor: theme.withOpacity(theme.colors.semantic.success, 0.1) }]}>
               <Ionicons name="cash" size={24} color={theme.colors.semantic.success} />
             </View>
-            <Text style={[styles.statValue, { color: theme.colors.text.primary }]}>
+            <Text style={[styles.statValue, { color: theme.colors.text }]}>
               {stats.todays_revenue.toLocaleString()} F
             </Text>
-            <Text style={[styles.statLabel, { color: theme.colors.text.secondary }]}>
+            <Text style={[styles.statLabel, { color: theme.colors.textSecondary }]}>
               Revenus aujourd'hui
             </Text>
           </View>
@@ -177,7 +190,7 @@ const MerchantDashboardScreen: React.FC = () => {
         {/* Réservations récentes */}
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
-            <Text style={[styles.sectionTitle, { color: theme.colors.text.primary }]}>
+            <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>
               Réservations récentes
             </Text>
             <TouchableOpacity>
@@ -190,7 +203,7 @@ const MerchantDashboardScreen: React.FC = () => {
           {recentReservations.length === 0 ? (
             <View style={[styles.emptyState, { backgroundColor: theme.colors.surface.light }]}>
               <Ionicons name="receipt-outline" size={48} color={theme.colors.neutral[300]} />
-              <Text style={[styles.emptyText, { color: theme.colors.text.secondary }]}>
+              <Text style={[styles.emptyText, { color: theme.colors.textSecondary }]}>
                 Aucune réservation récente
               </Text>
             </View>
@@ -204,10 +217,10 @@ const MerchantDashboardScreen: React.FC = () => {
                   <View style={styles.customerInfo}>
                     <Ionicons name="person-circle" size={40} color={theme.colors.primary[500]} />
                     <View style={styles.customerDetails}>
-                      <Text style={[styles.customerName, { color: theme.colors.text.primary }]}>
+                      <Text style={[styles.customerName, { color: theme.colors.text }]}>
                         {reservation.customer_name}
                       </Text>
-                      <Text style={[styles.productName, { color: theme.colors.text.secondary }]}>
+                      <Text style={[styles.productName, { color: theme.colors.textSecondary }]}>
                         {reservation.product_name}
                       </Text>
                     </View>
@@ -219,10 +232,10 @@ const MerchantDashboardScreen: React.FC = () => {
                   </View>
                 </View>
                 <View style={styles.reservationFooter}>
-                  <Text style={[styles.reservationDate, { color: theme.colors.text.secondary }]}>
+                  <Text style={[styles.reservationDate, { color: theme.colors.textSecondary }]}>
                     {formatDate(reservation.created_at)}
                   </Text>
-                  <Text style={[styles.quantity, { color: theme.colors.text.secondary }]}>
+                  <Text style={[styles.quantity, { color: theme.colors.textSecondary }]}>
                     Qté: {reservation.quantity}
                   </Text>
                 </View>
@@ -263,6 +276,22 @@ const styles = StyleSheet.create({
     padding: 8,
   },
   content: {
+    flex: 1,
+  },
+  analyticsButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginHorizontal: 16,
+    marginTop: 16,
+    padding: 14,
+    borderRadius: 12,
+    gap: 8,
+  },
+  analyticsButtonText: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: '600',
     flex: 1,
   },
   statsContainer: {

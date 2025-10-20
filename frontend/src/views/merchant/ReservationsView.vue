@@ -729,7 +729,7 @@ const markAsReady = async (reservation: any) => {
 
     await loadReservations()
   } catch (error) {
-    notify.error("Une erreur est survenue lors de la préparation de la réservation.")
+    notify.error('Une erreur est survenue lors de la préparation de la réservation.')
   }
 }
 

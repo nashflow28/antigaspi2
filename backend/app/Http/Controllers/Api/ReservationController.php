@@ -83,7 +83,7 @@ class ReservationController extends Controller
                 $reservation = Reservation::create([
                     'user_id' => $user->id,
                     'product_id' => $product->id,
-                    'quantity' => $request->quantity,
+                    'quantity_reserved' => $request->quantity,
                     'total_amount' => $totalAmount,
                     'status' => 'pending',
                     'notes' => $request->notes,

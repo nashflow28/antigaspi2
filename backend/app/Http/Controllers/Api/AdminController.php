@@ -45,10 +45,10 @@ class AdminController extends Controller
                 ? round((($activeMerchants - $lastMonthMerchants) / $lastMonthMerchants) * 100, 1)
                 : 0;
 
-            // Produits et revenus
-            $completedReservations = Reservation::where('status', 'completed')->get();
-            $productsSaved = $completedReservations->sum('quantity_reserved');
-            $totalRevenue = $completedReservations->sum('total_amount');
+            // 🐛 BUG FIX #18: Use SQL aggregation instead of loading all records into memory
+            // Avoid memory leak by using database-level SUM() instead of Collection->sum()
+            $productsSaved = Reservation::where('status', 'completed')->sum('quantity_reserved');
+            $totalRevenue = Reservation::where('status', 'completed')->sum('total_amount');
 
             // Croissance des revenus
             $lastMonthRevenue = Reservation::where('status', 'completed')

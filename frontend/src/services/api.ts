@@ -934,7 +934,7 @@ class ApiService {
   }
 
   async getAdminCategoryStats(): Promise<ApiResponse<AdminCategoryStats>> {
-    const response = await this.get<ApiResponse<Record<string, unknown>>>(`/admin/categories/stats`, true)
+    const response = await this.get<ApiResponse<Record<string, unknown>>>('/admin/categories/stats', true)
     const stats = this.normalizeCategoryStats(response.data as Record<string, unknown>)
 
     return {

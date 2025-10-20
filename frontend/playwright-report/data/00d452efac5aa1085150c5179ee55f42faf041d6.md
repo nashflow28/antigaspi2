@@ -1,0 +1,171 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - generic [ref=e3]:
+    - navigation "Navigation principale" [ref=e4]:
+      - generic [ref=e5]:
+        - link "Antigaspi" [ref=e6] [cursor=pointer]:
+          - /url: /
+          - generic [ref=e7] [cursor=pointer]: Antigaspi
+        - menubar [ref=e8]:
+          - menuitem "Accueil" [ref=e9]:
+            - img [ref=e10]
+            - generic [ref=e12]: Accueil
+          - menuitem "Découvrir" [ref=e13]:
+            - img [ref=e14]
+            - generic [ref=e16]: Découvrir
+          - menuitem "Produits" [ref=e17]:
+            - img [ref=e18]
+            - generic [ref=e20]: Produits
+          - menuitem "Avis" [ref=e21]:
+            - img [ref=e22]
+            - generic [ref=e24]: Avis
+          - menuitem "Tableau de bord" [ref=e25]:
+            - img [ref=e26]
+            - generic [ref=e28]: Tableau de bord
+        - generic [ref=e30]:
+          - button "Activer le thème sombre" [ref=e31] [cursor=pointer]:
+            - generic [ref=e32] [cursor=pointer]: Activer le thème sombre
+            - img [ref=e34] [cursor=pointer]
+          - generic [ref=e40]:
+            - button "Mon panier" [ref=e41] [cursor=pointer]:
+              - generic [ref=e43] [cursor=pointer]: Mon panier
+            - button "Mon espace" [ref=e44] [cursor=pointer]:
+              - generic [ref=e45] [cursor=pointer]: Mon espace
+            - button "Se déconnecter" [ref=e46] [cursor=pointer]:
+              - generic [ref=e47] [cursor=pointer]: Se déconnecter
+    - main [ref=e48]:
+      - generic [ref=e50]:
+        - generic [ref=e53]:
+          - generic [ref=e54]:
+            - generic [ref=e55]:
+              - button "Retour" [ref=e56] [cursor=pointer]:
+                - generic [ref=e57] [cursor=pointer]:
+                  - img [ref=e58] [cursor=pointer]
+                  - text: Retour
+              - generic [ref=e61]: Réservation
+            - heading "Panier signature anti-gaspi" [level=1] [ref=e62]
+            - paragraph [ref=e63]: "Code: ANT-512"
+          - generic [ref=e65]: Confirmée
+        - generic [ref=e66]:
+          - generic [ref=e67]:
+            - generic [ref=e69]:
+              - heading "Détails du produit" [level=3] [ref=e70]
+              - generic [ref=e71]:
+                - img "Panier signature anti-gaspi" [ref=e73]
+                - generic [ref=e74]:
+                  - heading "Panier signature anti-gaspi" [level=4] [ref=e75]
+                  - generic [ref=e76]:
+                    - generic [ref=e77]:
+                      - img [ref=e78]
+                      - generic [ref=e82]: La Ferme Urbaine
+                    - generic [ref=e83]:
+                      - img [ref=e84]
+                      - generic [ref=e87]: 12 avenue des Serres, Abidjan
+                    - generic [ref=e88]:
+                      - img [ref=e89]
+                      - generic [ref=e91]: +225 01 23 45 67
+            - generic [ref=e93]:
+              - heading "Détails de la réservation" [level=3] [ref=e94]
+              - generic [ref=e95]:
+                - generic [ref=e96]:
+                  - generic [ref=e97]: Quantité réservée
+                  - paragraph [ref=e98]: "2"
+                - generic [ref=e99]:
+                  - generic [ref=e100]: Prix unitaire
+                  - generic [ref=e101]:
+                    - generic [ref=e102]: 8 400 F CFA
+                    - generic [ref=e103]: 12 000 F CFA
+                - generic [ref=e104]:
+                  - generic [ref=e105]: Montant total
+                  - paragraph [ref=e106]: 16 800 F CFA
+                - generic [ref=e107]:
+                  - generic [ref=e108]: Date de retrait
+                  - paragraph [ref=e109]: mercredi 19 juin 2030 à 09:30
+              - generic [ref=e110]:
+                - generic [ref=e111]: Notes de retrait
+                - paragraph [ref=e112]: Présentez votre QR code et votre sac isotherme à l'arrivée.
+            - generic [ref=e114]:
+              - heading "Actions disponibles" [level=3] [ref=e115]
+              - generic [ref=e116]:
+                - button "Contacter le commerçant" [ref=e117] [cursor=pointer]:
+                  - generic [ref=e118] [cursor=pointer]:
+                    - img [ref=e119] [cursor=pointer]
+                    - text: Contacter le commerçant
+                - button "Télécharger le reçu" [ref=e121] [cursor=pointer]:
+                  - generic [ref=e122] [cursor=pointer]:
+                    - img [ref=e123] [cursor=pointer]
+                    - text: Télécharger le reçu
+          - generic [ref=e126]:
+            - generic [ref=e128]:
+              - heading "Suivi de la réservation" [level=3] [ref=e129]
+              - generic [ref=e130]:
+                - generic [ref=e131]:
+                  - img [ref=e133]
+                  - generic [ref=e135]:
+                    - paragraph [ref=e136]: Réservation créée
+                    - paragraph [ref=e137]: Votre réservation a été enregistrée
+                - generic [ref=e138]:
+                  - img [ref=e140]
+                  - generic [ref=e142]:
+                    - paragraph [ref=e143]: Confirmée
+                    - paragraph [ref=e144]: Le commerçant a confirmé votre réservation
+                - generic [ref=e145]:
+                  - img [ref=e147]
+                  - generic [ref=e152]:
+                    - paragraph [ref=e153]: Prête
+                    - paragraph [ref=e154]: Votre commande est prête à être récupérée
+                - generic [ref=e155]:
+                  - img [ref=e157]
+                  - generic [ref=e159]:
+                    - paragraph [ref=e160]: Récupérée
+                    - paragraph [ref=e161]: Vous avez récupéré votre commande
+            - generic [ref=e163]:
+              - generic [ref=e164]:
+                - img [ref=e166]
+                - generic [ref=e168]:
+                  - heading "Vos économies" [level=3] [ref=e169]
+                  - paragraph [ref=e170]: Sur cette réservation
+              - generic [ref=e171]:
+                - generic [ref=e172]:
+                  - generic [ref=e173]: Prix original
+                  - generic [ref=e174]: 24 000 F CFA
+                - generic [ref=e175]:
+                  - generic [ref=e176]: Prix payé
+                  - generic [ref=e177]: 16 800 F CFA
+                - generic [ref=e179]:
+                  - generic [ref=e180]: Économisé
+                  - generic [ref=e181]: 7 200 F CFA
+    - contentinfo [ref=e182]:
+      - generic [ref=e183]:
+        - generic [ref=e184]:
+          - paragraph [ref=e185]: Antigaspi
+          - paragraph [ref=e186]: © 2025 — Ensemble, réduisons le gaspillage alimentaire.
+        - generic [ref=e187]:
+          - img [ref=e189]
+          - img [ref=e193]
+          - img [ref=e197]
+  - generic:
+    - generic:
+      - status [ref=e201]:
+        - generic [ref=e202]:
+          - img [ref=e204]
+          - generic [ref=e206]:
+            - paragraph [ref=e207]: Catalogue
+            - paragraph [ref=e208]: Unexpected token '<', "<br /> <b>"... is not valid JSON
+            - button "Réessayer" [ref=e209] [cursor=pointer]:
+              - generic [ref=e210] [cursor=pointer]: Réessayer
+          - button "Fermer la notification" [ref=e211] [cursor=pointer]:
+            - img [ref=e212] [cursor=pointer]
+      - status [ref=e215]:
+        - generic [ref=e216]:
+          - img [ref=e218]
+          - generic [ref=e220]:
+            - paragraph [ref=e221]: Commerçants
+            - paragraph [ref=e222]: Unexpected token '<', "<br /> <b>"... is not valid JSON
+            - button "Réessayer" [ref=e223] [cursor=pointer]:
+              - generic [ref=e224] [cursor=pointer]: Réessayer
+          - button "Fermer la notification" [ref=e225] [cursor=pointer]:
+            - img [ref=e226] [cursor=pointer]
+```

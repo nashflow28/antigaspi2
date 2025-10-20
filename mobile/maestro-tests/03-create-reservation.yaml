@@ -1,0 +1,143 @@
+appId: host.exp.exponent
+name: Create Reservation Flow
+tags:
+  - reservation
+  - consumer
+  - critical
+
+---
+# Prerequisites: Login first
+- runFlow: 01-consumer-auth.yaml
+
+---
+# Test: Create reservation with quantity 1
+- tapOn: "Produits|Products"
+
+- waitForAnimationToEnd
+
+# Click on a product
+- tapOn: "Croissants artisanaux"
+
+- waitForAnimationToEnd
+
+# Verify reserve button is enabled
+- assertVisible:
+    text: "Réserver|Reserve"
+    enabled: true
+
+# Default quantity should be 1
+- assertVisible: "1"
+
+# Tap reserve button
+- tapOn: "Réserver|Reserve"
+
+- waitForAnimationToEnd:
+    timeout: 10000
+
+# Should see success notification
+- assertVisible:
+    text: "Réservation créée|Reservation created|Succès"
+    timeout: 10000
+
+---
+# Test: Verify reservation appears in list
+- tapOn:
+    point: "5%,10%"  # Back button
+    optional: true
+
+- waitForAnimationToEnd
+
+# Navigate to reservations
+- tapOn: "Réservations|Reservations"
+
+- waitForAnimationToEnd
+
+# Should see the reservation
+- assertVisible: "Croissants artisanaux"
+- assertVisible: "100 XOF"  # Price
+- assertVisible: "En attente|Pending"  # Status
+
+---
+# Test: Create reservation with quantity > 1
+- tapOn: "Produits|Products"
+
+- waitForAnimationToEnd
+
+# Click on a different product
+- tapOn: "Bananes mûres"
+
+- waitForAnimationToEnd
+
+# Increment quantity to 3
+- tapOn: "+"  # Quantity increment button
+- tapOn: "+"
+- tapOn: "+"
+
+# Verify quantity is 4 (1 default + 3 clicks)
+- assertVisible: "4"
+
+# Reserve
+- tapOn: "Réserver|Reserve"
+
+- waitForAnimationToEnd:
+    timeout: 10000
+
+# Should see success
+- assertVisible:
+    text: "Réservation créée|Succès"
+    timeout: 10000
+
+---
+# Test: Verify total price calculation
+- tapOn:
+    point: "5%,10%"  # Back button
+    optional: true
+
+- tapOn: "Réservations|Reservations"
+
+- waitForAnimationToEnd
+
+# Click on the banana reservation
+- tapOn: "Bananes mûres"
+
+- waitForAnimationToEnd
+
+# Verify quantity and total
+- assertVisible: "4"  # Quantity
+- assertVisible: "600 XOF"  # Total: 150 XOF x 4 = 600 XOF
+
+---
+# Test: Cancel reservation
+- assertVisible:
+    text: "Annuler|Cancel"
+    enabled: true
+
+- tapOn: "Annuler|Cancel"
+
+- waitForAnimationToEnd
+
+# Confirm cancellation in modal
+- tapOn: "Confirmer|OK"
+
+- waitForAnimationToEnd:
+    timeout: 5000
+
+# Should see success notification
+- assertVisible:
+    text: "Annulée|Cancelled"
+    timeout: 5000
+
+# Go back to list
+- tapOn:
+    point: "5%,10%"
+
+- waitForAnimationToEnd
+
+# Switch to cancelled tab
+- tapOn: "Annulées|Cancelled"
+
+- waitForAnimationToEnd
+
+# Should see cancelled reservation
+- assertVisible: "Bananes mûres"
+- assertVisible: "Annulée|Cancelled"

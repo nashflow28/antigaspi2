@@ -41,7 +41,7 @@ const MerchantReservationsScreen: React.FC = () => {
   const loadReservations = async () => {
     try {
       setLoading(true)
-      const response = await apiService.get('/reservations/merchant')
+      const response = await apiService.get('/reservations/merchant/list')
       setReservations(response.data.data || [])
     } catch (error) {
       console.error('Erreur chargement réservations:', error)
@@ -56,16 +56,6 @@ const MerchantReservationsScreen: React.FC = () => {
     loadReservations()
   }
 
-  const updateReservationStatus = async (reservationId: number, status: string) => {
-    try {
-      await apiService.put(`/reservations/${reservationId}`, { status })
-      loadReservations()
-    } catch (error) {
-      console.error('Erreur mise à jour statut:', error)
-      Alert.alert('Erreur', 'Impossible de mettre à jour le statut')
-    }
-  }
-
   const handleConfirm = (reservation: Reservation) => {
     Alert.alert(
       'Confirmer la réservation',
@@ -74,7 +64,37 @@ const MerchantReservationsScreen: React.FC = () => {
         { text: 'Annuler', style: 'cancel' },
         {
           text: 'Confirmer',
-          onPress: () => updateReservationStatus(reservation.id, 'confirmed'),
+          onPress: async () => {
+            try {
+              await apiService.post(`/reservations/${reservation.id}/confirm`)
+              loadReservations()
+            } catch (error) {
+              console.error('Erreur confirmation:', error)
+              Alert.alert('Erreur', 'Impossible de confirmer la réservation')
+            }
+          },
+        },
+      ]
+    )
+  }
+
+  const handleMarkReady = (reservation: Reservation) => {
+    Alert.alert(
+      'Marquer comme prête',
+      `La commande est-elle prête à être récupérée ?`,
+      [
+        { text: 'Non', style: 'cancel' },
+        {
+          text: 'Oui, prête',
+          onPress: async () => {
+            try {
+              await apiService.post(`/reservations/${reservation.id}/ready`)
+              loadReservations()
+            } catch (error) {
+              console.error('Erreur marquage prêt:', error)
+              Alert.alert('Erreur', 'Impossible de marquer la réservation comme prête')
+            }
+          },
         },
       ]
     )
@@ -88,7 +108,15 @@ const MerchantReservationsScreen: React.FC = () => {
         { text: 'Non', style: 'cancel' },
         {
           text: 'Oui, terminée',
-          onPress: () => updateReservationStatus(reservation.id, 'completed'),
+          onPress: async () => {
+            try {
+              await apiService.post(`/reservations/${reservation.id}/complete`)
+              loadReservations()
+            } catch (error) {
+              console.error('Erreur finalisation:', error)
+              Alert.alert('Erreur', 'Impossible de marquer la réservation comme terminée')
+            }
+          },
         },
       ]
     )
@@ -103,7 +131,15 @@ const MerchantReservationsScreen: React.FC = () => {
         {
           text: 'Annuler',
           style: 'destructive',
-          onPress: () => updateReservationStatus(reservation.id, 'cancelled'),
+          onPress: async () => {
+            try {
+              await apiService.post(`/reservations/${reservation.id}/cancel`)
+              loadReservations()
+            } catch (error) {
+              console.error('Erreur annulation:', error)
+              Alert.alert('Erreur', 'Impossible d\'annuler la réservation')
+            }
+          },
         },
       ]
     )
@@ -115,6 +151,8 @@ const MerchantReservationsScreen: React.FC = () => {
         return theme.colors.semantic.warning
       case 'confirmed':
         return theme.colors.semantic.success
+      case 'ready':
+        return theme.colors.semantic.info || '#3B82F6'
       case 'completed':
         return theme.colors.primary[500]
       case 'cancelled':
@@ -130,6 +168,8 @@ const MerchantReservationsScreen: React.FC = () => {
         return 'En attente'
       case 'confirmed':
         return 'Confirmée'
+      case 'ready':
+        return 'Prête'
       case 'completed':
         return 'Terminée'
       case 'cancelled':
@@ -160,10 +200,10 @@ const MerchantReservationsScreen: React.FC = () => {
         <View style={styles.customerInfo}>
           <Ionicons name="person-circle" size={48} color={theme.colors.primary[500]} />
           <View style={styles.customerDetails}>
-            <Text style={[styles.customerName, { color: theme.colors.text.primary }]}>
+            <Text style={[styles.customerName, { color: theme.colors.text }]}>
               {item.customer_name}
             </Text>
-            <Text style={[styles.customerContact, { color: theme.colors.text.secondary }]}>
+            <Text style={[styles.customerContact, { color: theme.colors.textSecondary }]}>
               {item.customer_phone}
             </Text>
           </View>
@@ -177,11 +217,11 @@ const MerchantReservationsScreen: React.FC = () => {
 
       {/* Product Info */}
       <View style={styles.productInfo}>
-        <Text style={[styles.productName, { color: theme.colors.text.primary }]}>
+        <Text style={[styles.productName, { color: theme.colors.text }]}>
           {item.product_name}
         </Text>
         <View style={styles.detailsRow}>
-          <Text style={[styles.detailText, { color: theme.colors.text.secondary }]}>
+          <Text style={[styles.detailText, { color: theme.colors.textSecondary }]}>
             Quantité: {item.quantity}
           </Text>
           <Text style={[styles.amount, { color: theme.colors.primary[500] }]}>
@@ -213,6 +253,25 @@ const MerchantReservationsScreen: React.FC = () => {
       {item.status === 'confirmed' && (
         <View style={styles.actions}>
           <TouchableOpacity
+            style={[styles.actionButton, { backgroundColor: theme.colors.semantic.info || '#3B82F6' }]}
+            onPress={() => handleMarkReady(item)}
+          >
+            <Ionicons name="cube" size={20} color="white" />
+            <Text style={styles.actionButtonText}>Prête</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.actionButton, styles.completeButton, { backgroundColor: theme.colors.primary[500] }]}
+            onPress={() => handleComplete(item)}
+          >
+            <Ionicons name="checkmark-done-circle" size={20} color="white" />
+            <Text style={styles.actionButtonText}>Terminée</Text>
+          </TouchableOpacity>
+        </View>
+      )}
+
+      {item.status === 'ready' && (
+        <View style={styles.actions}>
+          <TouchableOpacity
             style={[styles.actionButton, styles.completeButton, { backgroundColor: theme.colors.primary[500] }]}
             onPress={() => handleComplete(item)}
           >
@@ -224,7 +283,7 @@ const MerchantReservationsScreen: React.FC = () => {
 
       {/* Date */}
       <View style={styles.footer}>
-        <Text style={[styles.dateText, { color: theme.colors.text.secondary }]}>
+        <Text style={[styles.dateText, { color: theme.colors.textSecondary }]}>
           {formatDate(item.created_at)}
         </Text>
       </View>
@@ -297,7 +356,7 @@ const MerchantReservationsScreen: React.FC = () => {
         ListEmptyComponent={
           <View style={[styles.emptyState, { backgroundColor: theme.colors.surface.light }]}>
             <Ionicons name="receipt-outline" size={64} color={theme.colors.neutral[300]} />
-            <Text style={[styles.emptyText, { color: theme.colors.text.secondary }]}>
+            <Text style={[styles.emptyText, { color: theme.colors.textSecondary }]}>
               Aucune réservation {filter !== 'all' && getStatusText(filter).toLowerCase()}
             </Text>
           </View>

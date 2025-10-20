@@ -5,11 +5,14 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\AnalyticsDaily;
 use App\Models\AnalyticsEvent;
+use App\Models\Product;
+use App\Models\Reservation;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
+use Tymon\JWTAuth\Facades\JWTAuth;
 
 class AnalyticsController extends Controller
 {
@@ -49,6 +52,234 @@ class AnalyticsController extends Controller
             'success' => true,
             'stored' => $stored,
         ]);
+    }
+
+    /**
+     * Statistiques en temps réel pour le tableau de bord merchant
+     */
+    public function merchantStats(Request $request): JsonResponse
+    {
+        try {
+            $user = JWTAuth::parseToken()->authenticate();
+
+            if (!$user->isMerchant()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Accès réservé aux commerçants'
+                ], 403);
+            }
+
+            $merchantId = $user->merchant->id;
+
+            // Statistiques produits
+            $totalProducts = Product::where('merchant_id', $merchantId)->count();
+            $activeProducts = Product::where('merchant_id', $merchantId)
+                ->where('is_active', true)
+                ->where('quantity_available', '>', 0)
+                ->where('expiration_date', '>=', now()->toDateString())
+                ->count();
+
+            // Statistiques réservations
+            $reservations = Reservation::whereHas('product', function ($query) use ($merchantId) {
+                $query->where('merchant_id', $merchantId);
+            });
+
+            $totalReservations = (clone $reservations)->count();
+            $pendingReservations = (clone $reservations)->where('status', 'pending')->count();
+            $confirmedReservations = (clone $reservations)->where('status', 'confirmed')->count();
+            $completedReservations = (clone $reservations)->where('status', 'completed')->count();
+
+            // Revenus du jour
+            $todaysRevenue = (clone $reservations)
+                ->where('status', 'completed')
+                ->whereDate('updated_at', now()->toDateString())
+                ->sum('total_amount');
+
+            // Total des ventes (depuis merchant.total_sales)
+            $totalSales = $user->merchant->total_sales;
+
+            return response()->json([
+                'success' => true,
+                'data' => [
+                    'active_products' => $activeProducts,
+                    'pending_reservations' => $pendingReservations,
+                    'todays_revenue' => (float) $todaysRevenue,
+                    'total_products' => $totalProducts,
+                    'total_reservations' => $totalReservations,
+                    'confirmed_reservations' => $confirmedReservations,
+                    'completed_reservations' => $completedReservations,
+                    'total_sales' => (float) $totalSales,
+                ]
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Erreur lors du calcul des statistiques',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Revenue chart data for merchant (évolution CA)
+     */
+    public function merchantRevenueChart(Request $request): JsonResponse
+    {
+        try {
+            $user = JWTAuth::parseToken()->authenticate();
+
+            if (!$user->isMerchant()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Accès réservé aux commerçants'
+                ], 403);
+            }
+
+            $merchantId = $user->merchant->id;
+            $period = $request->query('period', 'week'); // week, month, quarter
+
+            $days = match($period) {
+                'week' => 7,
+                'month' => 30,
+                'quarter' => 90,
+                default => 7,
+            };
+
+            // Récupérer les revenus par jour
+            $revenues = Reservation::whereHas('product', function ($query) use ($merchantId) {
+                    $query->where('merchant_id', $merchantId);
+                })
+                ->where('status', 'completed')
+                ->where('updated_at', '>=', now()->subDays($days))
+                ->selectRaw('DATE(updated_at) as date, SUM(total_amount) as revenue')
+                ->groupBy('date')
+                ->orderBy('date')
+                ->get();
+
+            return response()->json([
+                'success' => true,
+                'data' => [
+                    'period' => $period,
+                    'days' => $days,
+                    'chart_data' => $revenues->map(fn($item) => [
+                        'date' => $item->date,
+                        'revenue' => (float) $item->revenue,
+                    ])
+                ]
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Erreur lors du calcul des revenus',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Top products chart data for merchant
+     */
+    public function merchantProductsChart(Request $request): JsonResponse
+    {
+        try {
+            $user = JWTAuth::parseToken()->authenticate();
+
+            if (!$user->isMerchant()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Accès réservé aux commerçants'
+                ], 403);
+            }
+
+            $merchantId = $user->merchant->id;
+            $limit = $request->query('limit', 10);
+
+            // Top produits les plus réservés
+            $topProducts = Reservation::join('products', 'reservations.product_id', '=', 'products.id')
+                ->where('products.merchant_id', $merchantId)
+                ->where('reservations.status', 'completed')
+                ->selectRaw('products.id, products.name, SUM(reservations.quantity_reserved) as total_sold')
+                ->groupBy('products.id', 'products.name')
+                ->orderByDesc('total_sold')
+                ->limit($limit)
+                ->get();
+
+            return response()->json([
+                'success' => true,
+                'data' => [
+                    'chart_data' => $topProducts->map(fn($item) => [
+                        'product_id' => $item->id,
+                        'product_name' => $item->name,
+                        'total_sold' => (int) $item->total_sold,
+                    ])
+                ]
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Erreur lors du calcul des produits',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Reservations trend chart data for merchant
+     */
+    public function merchantReservationsChart(Request $request): JsonResponse
+    {
+        try {
+            $user = JWTAuth::parseToken()->authenticate();
+
+            if (!$user->isMerchant()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Accès réservé aux commerçants'
+                ], 403);
+            }
+
+            $merchantId = $user->merchant->id;
+            $period = $request->query('period', 'week');
+
+            $days = match($period) {
+                'week' => 7,
+                'month' => 30,
+                'quarter' => 90,
+                default => 7,
+            };
+
+            // Tendance des réservations
+            $reservations = Reservation::whereHas('product', function ($query) use ($merchantId) {
+                    $query->where('merchant_id', $merchantId);
+                })
+                ->where('created_at', '>=', now()->subDays($days))
+                ->selectRaw('DATE(created_at) as date, COUNT(*) as count')
+                ->groupBy('date')
+                ->orderBy('date')
+                ->get();
+
+            return response()->json([
+                'success' => true,
+                'data' => [
+                    'period' => $period,
+                    'days' => $days,
+                    'chart_data' => $reservations->map(fn($item) => [
+                        'date' => $item->date,
+                        'count' => (int) $item->count,
+                    ])
+                ]
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Erreur lors du calcul des réservations',
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
 
     public function stats(Request $request): JsonResponse

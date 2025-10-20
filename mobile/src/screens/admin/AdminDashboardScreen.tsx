@@ -88,7 +88,7 @@ const AdminDashboardScreen: React.FC = () => {
       >
         {/* Statistiques principales */}
         <View style={styles.section}>
-          <Text style={[styles.sectionTitle, { color: theme.colors.text.primary }]}>
+          <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>
             Vue d'ensemble
           </Text>
 
@@ -98,10 +98,10 @@ const AdminDashboardScreen: React.FC = () => {
               <View style={[styles.statIcon, { backgroundColor: theme.withOpacity(theme.colors.primary[500], 0.1) }]}>
                 <Ionicons name="people" size={28} color={theme.colors.primary[500]} />
               </View>
-              <Text style={[styles.statValue, { color: theme.colors.text.primary }]}>
+              <Text style={[styles.statValue, { color: theme.colors.text }]}>
                 {stats.total_users.toLocaleString()}
               </Text>
-              <Text style={[styles.statLabel, { color: theme.colors.text.secondary }]}>
+              <Text style={[styles.statLabel, { color: theme.colors.textSecondary }]}>
                 Utilisateurs
               </Text>
             </View>
@@ -111,10 +111,10 @@ const AdminDashboardScreen: React.FC = () => {
               <View style={[styles.statIcon, { backgroundColor: theme.withOpacity(theme.colors.semantic.info, 0.1) }]}>
                 <Ionicons name="storefront" size={28} color={theme.colors.semantic.info} />
               </View>
-              <Text style={[styles.statValue, { color: theme.colors.text.primary }]}>
+              <Text style={[styles.statValue, { color: theme.colors.text }]}>
                 {stats.total_merchants.toLocaleString()}
               </Text>
-              <Text style={[styles.statLabel, { color: theme.colors.text.secondary }]}>
+              <Text style={[styles.statLabel, { color: theme.colors.textSecondary }]}>
                 Commerçants
               </Text>
             </View>
@@ -124,10 +124,10 @@ const AdminDashboardScreen: React.FC = () => {
               <View style={[styles.statIcon, { backgroundColor: theme.withOpacity(theme.colors.semantic.warning, 0.1) }]}>
                 <Ionicons name="cube" size={28} color={theme.colors.semantic.warning} />
               </View>
-              <Text style={[styles.statValue, { color: theme.colors.text.primary }]}>
+              <Text style={[styles.statValue, { color: theme.colors.text }]}>
                 {stats.total_products.toLocaleString()}
               </Text>
-              <Text style={[styles.statLabel, { color: theme.colors.text.secondary }]}>
+              <Text style={[styles.statLabel, { color: theme.colors.textSecondary }]}>
                 Produits
               </Text>
               <Text style={[styles.statSubLabel, { color: theme.colors.semantic.success }]}>
@@ -140,10 +140,10 @@ const AdminDashboardScreen: React.FC = () => {
               <View style={[styles.statIcon, { backgroundColor: theme.withOpacity(theme.colors.semantic.success, 0.1) }]}>
                 <Ionicons name="receipt" size={28} color={theme.colors.semantic.success} />
               </View>
-              <Text style={[styles.statValue, { color: theme.colors.text.primary }]}>
+              <Text style={[styles.statValue, { color: theme.colors.text }]}>
                 {stats.total_reservations.toLocaleString()}
               </Text>
-              <Text style={[styles.statLabel, { color: theme.colors.text.secondary }]}>
+              <Text style={[styles.statLabel, { color: theme.colors.textSecondary }]}>
                 Réservations
               </Text>
             </View>
@@ -165,7 +165,7 @@ const AdminDashboardScreen: React.FC = () => {
 
         {/* Actions rapides */}
         <View style={styles.section}>
-          <Text style={[styles.sectionTitle, { color: theme.colors.text.primary }]}>
+          <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>
             Actions rapides
           </Text>
 
@@ -174,7 +174,7 @@ const AdminDashboardScreen: React.FC = () => {
               style={[styles.actionCard, { backgroundColor: theme.colors.surface.light }]}
             >
               <Ionicons name="people-outline" size={32} color={theme.colors.primary[500]} />
-              <Text style={[styles.actionText, { color: theme.colors.text.primary }]}>
+              <Text style={[styles.actionText, { color: theme.colors.text }]}>
                 Gérer utilisateurs
               </Text>
             </TouchableOpacity>
@@ -183,7 +183,7 @@ const AdminDashboardScreen: React.FC = () => {
               style={[styles.actionCard, { backgroundColor: theme.colors.surface.light }]}
             >
               <Ionicons name="cube-outline" size={32} color={theme.colors.primary[500]} />
-              <Text style={[styles.actionText, { color: theme.colors.text.primary }]}>
+              <Text style={[styles.actionText, { color: theme.colors.text }]}>
                 Gérer produits
               </Text>
             </TouchableOpacity>
@@ -192,7 +192,7 @@ const AdminDashboardScreen: React.FC = () => {
               style={[styles.actionCard, { backgroundColor: theme.colors.surface.light }]}
             >
               <Ionicons name="storefront-outline" size={32} color={theme.colors.primary[500]} />
-              <Text style={[styles.actionText, { color: theme.colors.text.primary }]}>
+              <Text style={[styles.actionText, { color: theme.colors.text }]}>
                 Gérer commerçants
               </Text>
             </TouchableOpacity>
@@ -201,7 +201,7 @@ const AdminDashboardScreen: React.FC = () => {
               style={[styles.actionCard, { backgroundColor: theme.colors.surface.light }]}
             >
               <Ionicons name="grid-outline" size={32} color={theme.colors.primary[500]} />
-              <Text style={[styles.actionText, { color: theme.colors.text.primary }]}>
+              <Text style={[styles.actionText, { color: theme.colors.text }]}>
                 Gérer catégories
               </Text>
             </TouchableOpacity>

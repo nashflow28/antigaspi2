@@ -15,7 +15,8 @@ const getApiBaseUrl = (): string => {
     return configUrl
   }
   // Fallback pour développement local
-  return 'http://localhost:8000/api'
+  // 10.0.2.2 est l'adresse spéciale pour localhost sur émulateur Android
+  return 'http://10.0.2.2:8000/api'
 }
 
 export interface AnalyticsEvent {

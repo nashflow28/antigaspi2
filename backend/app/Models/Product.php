@@ -75,6 +75,11 @@ class Product extends Model
         return $this->hasMany(SurpriseBasketItem::class, 'product_id');
     }
 
+    public function favorites(): HasMany
+    {
+        return $this->hasMany(Favorite::class);
+    }
+
     // Scopes
     public function scopeActive($query)
     {

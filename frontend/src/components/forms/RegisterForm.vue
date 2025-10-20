@@ -63,8 +63,8 @@
         </label>
         <input
           id="first_name"
-          name="first_name"
           v-model="form.first_name"
+          name="first_name"
           type="text"
           required
           autocomplete="given-name"
@@ -81,8 +81,8 @@
         </label>
         <input
           id="last_name"
-          name="last_name"
           v-model="form.last_name"
+          name="last_name"
           type="text"
           required
           autocomplete="family-name"
@@ -119,8 +119,8 @@
         </label>
         <input
           id="phone"
-          name="phone"
           v-model="form.phone"
+          name="phone"
           type="tel"
           autocomplete="tel"
           class="input-2025"
@@ -136,8 +136,8 @@
         </label>
         <input
           id="city"
-          name="city"
           v-model="form.city"
+          name="city"
           type="text"
           required
           class="input-2025"

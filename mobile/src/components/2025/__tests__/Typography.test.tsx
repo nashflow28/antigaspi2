@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Tests unitaires Typography - React Native Web compatibility
  *

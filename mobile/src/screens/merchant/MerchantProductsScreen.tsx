@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useCallback } from 'react'
 import {
   View,
   Text,
@@ -9,12 +9,15 @@ import {
   RefreshControl,
   Alert,
   Image,
+  ActivityIndicator,
 } from 'react-native'
 import { Ionicons } from '@expo/vector-icons'
+import { useFocusEffect } from '@react-navigation/native'
 import { useTheme } from '../../theme'
 import { Product } from '../../types'
 import apiService from '../../services/api'
 import { getImageUrl } from '../../utils/imageHelpers'
+import { TEST_IDS } from '../../utils/testIds'
 
 interface Props {
   navigation: any
@@ -26,17 +29,28 @@ const MerchantProductsScreen: React.FC<Props> = ({ navigation }) => {
   const [refreshing, setRefreshing] = useState(false)
   const [loading, setLoading] = useState(true)
 
-  useEffect(() => {
-    loadProducts()
-  }, [])
+  // Recharger la liste à chaque fois que l'écran devient actif
+  useFocusEffect(
+    useCallback(() => {
+      loadProducts()
+    }, [])
+  )
 
   const loadProducts = async () => {
     try {
       setLoading(true)
+      console.log('📦 [MerchantProducts] Chargement des produits...')
       const response = await apiService.get('/products/merchant')
-      setProducts(response.data.data || [])
+      console.log('📦 [MerchantProducts] Réponse API complète:', response)
+      console.log('📦 [MerchantProducts] response.data:', response.data)
+      console.log('📦 [MerchantProducts] Nombre de produits:', response.data?.length)
+      // ✅ FIX: apiService.get retourne déjà {data: [...], pagination: {...}}
+      // donc response.data contient directement l'array de produits
+      setProducts(response.data || [])
+      console.log('📦 [MerchantProducts] Produits définis dans le state:', response.data?.length)
     } catch (error) {
-      console.error('Erreur chargement produits:', error)
+      console.error('❌ [MerchantProducts] Erreur chargement produits:', error)
+      console.error('❌ [MerchantProducts] Error details:', error.response?.data)
     } finally {
       setLoading(false)
       setRefreshing(false)
@@ -67,11 +81,20 @@ const MerchantProductsScreen: React.FC<Props> = ({ navigation }) => {
           style: 'destructive',
           onPress: async () => {
             try {
+              console.log('🗑️ [MerchantProducts] Suppression du produit:', productId)
+              setLoading(true)
               await apiService.delete(`/products/${productId}`)
-              loadProducts()
+              console.log('✅ [MerchantProducts] Produit supprimé avec succès')
+
+              // Recharger la liste
+              await loadProducts()
+
+              Alert.alert('Succès', 'Le produit a été supprimé')
             } catch (error) {
-              console.error('Erreur suppression:', error)
+              console.error('❌ [MerchantProducts] Erreur suppression:', error)
               Alert.alert('Erreur', 'Impossible de supprimer le produit')
+            } finally {
+              setLoading(false)
             }
           },
         },
@@ -99,17 +122,17 @@ const MerchantProductsScreen: React.FC<Props> = ({ navigation }) => {
 
         {/* Infos */}
         <View style={styles.productInfo}>
-          <Text style={[styles.productName, { color: theme.colors.text.primary }]}>
+          <Text style={[styles.productName, { color: theme.colors.text }]}>
             {item.name}
           </Text>
-          <Text style={[styles.productCategory, { color: theme.colors.text.secondary }]}>
+          <Text style={[styles.productCategory, { color: theme.colors.textSecondary }]}>
             {item.category?.name}
           </Text>
           <View style={styles.priceRow}>
             <Text style={[styles.productPrice, { color: theme.colors.primary[500] }]}>
               {item.discounted_price} F CFA
             </Text>
-            <Text style={[styles.productOriginalPrice, { color: theme.colors.text.secondary }]}>
+            <Text style={[styles.productOriginalPrice, { color: theme.colors.textSecondary }]}>
               {item.original_price} F CFA
             </Text>
           </View>
@@ -156,7 +179,7 @@ const MerchantProductsScreen: React.FC<Props> = ({ navigation }) => {
   )
 
   return (
-    <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
+    <View style={[styles.container, { backgroundColor: theme.colors.background }]} testID={TEST_IDS.merchantProducts}>
       <StatusBar barStyle="dark-content" backgroundColor={theme.colors.background} />
 
       {/* Header */}
@@ -166,6 +189,8 @@ const MerchantProductsScreen: React.FC<Props> = ({ navigation }) => {
           <TouchableOpacity
             style={styles.addButton}
             onPress={handleCreateProduct}
+            testID={TEST_IDS.addProductButton}
+            accessibilityLabel="Ajouter un nouveau produit"
           >
             <Ionicons name="add-circle" size={32} color="white" />
           </TouchableOpacity>
@@ -178,21 +203,29 @@ const MerchantProductsScreen: React.FC<Props> = ({ navigation }) => {
         renderItem={renderProduct}
         keyExtractor={(item) => item.id.toString()}
         contentContainerStyle={styles.listContent}
+        testID={TEST_IDS.merchantProductsList}
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
         ListEmptyComponent={
           <View style={[styles.emptyState, { backgroundColor: theme.colors.surface.light }]}>
             <Ionicons name="cube-outline" size={64} color={theme.colors.neutral[300]} />
-            <Text style={[styles.emptyText, { color: theme.colors.text.secondary }]}>
+            <Text style={[styles.emptyText, { color: theme.colors.textSecondary }]}>
               Aucun produit
             </Text>
-            <Text style={[styles.emptySubtext, { color: theme.colors.text.secondary }]}>
+            <Text style={[styles.emptySubtext, { color: theme.colors.textSecondary }]}>
               Appuyez sur + pour ajouter votre premier produit
             </Text>
           </View>
         }
       />
+
+      {/* Overlay de chargement */}
+      {loading && (
+        <View style={styles.loadingOverlay}>
+          <ActivityIndicator size="large" color={theme.colors.primary[500]} />
+        </View>
+      )}
     </View>
   )
 }
@@ -307,6 +340,17 @@ const styles = StyleSheet.create({
     marginTop: 8,
     fontSize: 14,
     textAlign: 'center',
+  },
+  loadingOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    zIndex: 1000,
   },
 })
 

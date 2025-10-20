@@ -19,36 +19,14 @@ class MerchantReviewController extends Controller
      */
     public function dashboard(Request $request): JsonResponse
     {
-        // Temporary JWT validation until middleware is fixed
-        try {
-            $token = $request->bearerToken();
-            if (!$token) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Token requis'
-                ], 401);
-            }
+        $user = Auth::user();
 
-            $user = \Tymon\JWTAuth\Facades\JWTAuth::setToken($token)->authenticate();
-            if (!$user) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Token invalide'
-                ], 401);
-            }
-
-            // Verify user is a merchant
-            if ($user->role !== 'merchant') {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Accès réservé aux commerçants'
-                ], 403);
-            }
-        } catch (\Exception $e) {
+        // Verify user is a merchant
+        if ($user->role !== 'merchant') {
             return response()->json([
                 'success' => false,
-                'message' => 'Erreur d\'authentification: ' . $e->getMessage()
-            ], 401);
+                'message' => 'Accès réservé aux commerçants'
+            ], 403);
         }
 
         $merchant = $user->merchant;

@@ -15,6 +15,9 @@ class Merchant extends Model
         'user_id',
         'business_name',
         'business_type',
+        'category_id',
+        'photo_url',
+        'description',
         'siret',
         'latitude',
         'longitude',
@@ -40,6 +43,11 @@ class Merchant extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function category(): BelongsTo
+    {
+        return $this->belongsTo(Category::class);
     }
 
     public function products(): HasMany
