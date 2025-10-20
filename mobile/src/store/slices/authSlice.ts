@@ -2,7 +2,7 @@ import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit'
 import { AuthState, User, LoginCredentials, RegisterData, AuthResponse } from '../../types'
 import apiService from '../../services/api'
 
-const initialState: AuthState = {
+export const authInitialState: AuthState = {
   user: null,
   token: null,
   isAuthenticated: false,
@@ -80,7 +80,7 @@ export const refreshProfile = createAsyncThunk(
 
 const authSlice = createSlice({
   name: 'auth',
-  initialState,
+  initialState: authInitialState,
   reducers: {
     clearError: (state) => {
       state.error = null
@@ -175,4 +175,5 @@ const authSlice = createSlice({
 })
 
 export const { clearError, clearAuth } = authSlice.actions
-export default authSlice.reducer
+export const authReducer = authSlice.reducer
+export default authReducer

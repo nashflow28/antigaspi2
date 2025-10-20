@@ -1,17 +1,20 @@
 // @ts-nocheck
 import React from 'react'
-import { render, fireEvent, waitFor } from '@testing-library/react-native'
-import { Provider } from 'react-redux'
-import { configureStore } from '@reduxjs/toolkit'
-import { ThemeProvider } from '../../../theme/ThemeContext'
+import { fireEvent, waitFor } from '@testing-library/react-native'
+import { PreloadedState } from '@reduxjs/toolkit'
 import ProductsScreen from '../ProductsScreen'
-import productsSlice from '../../../store/slices/productsSlice'
-import merchantsSlice from '../../../store/slices/merchantsSlice'
-import authSlice from '../../../store/slices/authSlice'
-import favoritesSlice from '../../../store/slices/favoritesSlice'
-import connectivitySlice from '../../../store/slices/connectivitySlice'
-import reservationsSlice from '../../../store/slices/reservationsSlice'
-import reviewsSlice from '../../../store/slices/reviewsSlice'
+import {
+  renderWithProviders as renderWithAppProviders,
+  setupStore,
+  buildProductsState,
+  buildAuthState,
+  buildConnectivityState,
+  buildMerchantsState,
+  buildFavoritesState,
+  buildReservationsState,
+  buildReviewsState,
+} from '../../../test-utils'
+import { RootState } from '../../../store'
 
 // Mock navigation
 const mockNavigate = jest.fn()
@@ -130,78 +133,69 @@ const mockCategories = [
   { id: 4, name: 'Épicerie', description: 'Produits secs' },
 ]
 
-// Create test store (matching real store structure from store/index.ts)
-const createTestStore = (initialState = {}) => {
-  return configureStore({
-    reducer: {
-      auth: authSlice,
-      connectivity: connectivitySlice,
-      products: productsSlice,
-      reservations: reservationsSlice,
-      merchants: merchantsSlice,
-      favorites: favoritesSlice,
-      reviews: reviewsSlice,
-    },
-    preloadedState: {
-      auth: {
-        user: initialState.user || { id: 1, first_name: 'Test', last_name: 'User', email: 'test@test.com', role: 'consumer', city: 'Lomé', created_at: '2025-01-01', updated_at: '2025-01-01' },
-        token: 'test-token',
-        isAuthenticated: true,
-        loading: false,
-        error: null,
-      },
-      connectivity: {
-        isConnected: true,
-        isInternetReachable: true,
-      },
-      products: {
-        products: initialState.products || mockProducts,
-        categories: initialState.categories || mockCategories,
-        loading: initialState.loading || false,
-        loadingMore: initialState.loadingMore || false,
-        error: initialState.error || null,
-        filters: initialState.filters || {},
-        currentPage: initialState.currentPage || 1,
-        hasMore: initialState.hasMore !== undefined ? initialState.hasMore : true,
-      },
-      reservations: {
-        reservations: [],
-        loading: false,
-        error: null,
-      },
-      merchants: {
-        merchants: initialState.merchants || mockMerchants,
-        loading: initialState.loading || false,
-        error: initialState.error || null,
-      },
-      favorites: {
-        favoriteIds: initialState.favoriteIds || [],
-        favorites: initialState.favorites || [],
-        loading: initialState.loading || false,
-        error: initialState.error || null,
-      },
-      reviews: {
-        reviews: [],
-        stats: null,
-        loading: false,
-        error: null,
-        currentPage: 1,
-        totalPages: 1,
-        hasMore: false,
-      },
-    },
-  })
+const mockUser = {
+  id: 1,
+  first_name: 'Test',
+  last_name: 'User',
+  email: 'test@test.com',
+  role: 'consumer',
+  city: 'Lomé',
+  created_at: '2025-01-01',
+  updated_at: '2025-01-01',
 }
 
-// Helper to render with providers
-const renderWithProviders = (component: React.ReactElement, store = createTestStore()) => {
-  return render(
-    <Provider store={store}>
-      <ThemeProvider>
-        {component}
-      </ThemeProvider>
-    </Provider>
-  )
+const buildPreloadedState = (
+  overrides: Partial<RootState> = {}
+): PreloadedState<RootState> => {
+  const base: PreloadedState<RootState> = {
+    auth: {
+      ...buildAuthState(),
+      user: mockUser,
+      token: 'test-token',
+      isAuthenticated: true,
+      loading: false,
+    },
+    connectivity: {
+      ...buildConnectivityState(),
+    },
+    products: buildProductsState({
+      products: mockProducts,
+      categories: mockCategories,
+    }),
+    reservations: {
+      ...buildReservationsState(),
+    },
+    merchants: {
+      ...buildMerchantsState(),
+      merchants: mockMerchants,
+    },
+    favorites: {
+      ...buildFavoritesState(),
+    },
+    reviews: {
+      ...buildReviewsState(),
+    },
+  }
+
+  return {
+    ...base,
+    ...overrides,
+    auth: { ...base.auth, ...overrides.auth },
+    connectivity: { ...base.connectivity, ...overrides.connectivity },
+    products: { ...base.products, ...overrides.products },
+    reservations: { ...base.reservations, ...overrides.reservations },
+    merchants: { ...base.merchants, ...overrides.merchants },
+    favorites: { ...base.favorites, ...overrides.favorites },
+    reviews: { ...base.reviews, ...overrides.reviews },
+  }
+}
+
+const createStore = (overrides?: Partial<RootState>) =>
+  setupStore(buildPreloadedState(overrides))
+
+const renderScreen = (overrides?: Partial<RootState>) => {
+  const store = createStore(overrides)
+  return renderWithAppProviders(<ProductsScreen navigation={mockNavigation} />, { store })
 }
 
 describe('ProductsScreen', () => {
@@ -211,27 +205,19 @@ describe('ProductsScreen', () => {
 
   describe('Rendering - Mode Toggle', () => {
     it('renders without crashing', () => {
-      const { getByText } = renderWithProviders(
-        <ProductsScreen navigation={mockNavigation} />
-      )
+      const { getByText } = renderScreen()
       expect(getByText('Boutiques')).toBeTruthy()
       expect(getByText('Produits')).toBeTruthy()
     })
 
     it('renders in merchants mode by default', () => {
-      const store = createTestStore()
-      const { getByText } = renderWithProviders(
-        <ProductsScreen navigation={mockNavigation} />,
-        store
-      )
+      const { getByText } = renderScreen()
       // Merchants should be displayed
       expect(getByText('Boulangerie Martin')).toBeTruthy()
     })
 
     it('switches to products mode when products button is pressed', async () => {
-      const { getByText } = renderWithProviders(
-        <ProductsScreen navigation={mockNavigation} />
-      )
+      const { getByText } = renderScreen()
 
       const productsButton = getByText('Produits')
       fireEvent.press(productsButton)
@@ -242,9 +228,7 @@ describe('ProductsScreen', () => {
     })
 
     it('switches back to merchants mode when boutiques button is pressed', async () => {
-      const { getByText } = renderWithProviders(
-        <ProductsScreen navigation={mockNavigation} />
-      )
+      const { getByText } = renderScreen()
 
       // Switch to products
       const productsButton = getByText('Produits')
@@ -266,9 +250,7 @@ describe('ProductsScreen', () => {
 
   describe('Rendering - Merchants Mode', () => {
     it('displays all merchants in list', () => {
-      const { getByText } = renderWithProviders(
-        <ProductsScreen navigation={mockNavigation} />
-      )
+      const { getByText } = renderScreen()
 
       expect(getByText('Boulangerie Martin')).toBeTruthy()
       expect(getByText('Fruits Bio Nature')).toBeTruthy()
@@ -276,9 +258,7 @@ describe('ProductsScreen', () => {
     })
 
     it('displays merchant business types', () => {
-      const { getByText } = renderWithProviders(
-        <ProductsScreen navigation={mockNavigation} />
-      )
+      const { getByText } = renderScreen()
 
       expect(getByText('Boulangerie artisanale')).toBeTruthy()
       expect(getByText('Fruits et légumes bio')).toBeTruthy()
@@ -286,9 +266,7 @@ describe('ProductsScreen', () => {
     })
 
     it('displays merchant cities', () => {
-      const { getByText } = renderWithProviders(
-        <ProductsScreen navigation={mockNavigation} />
-      )
+      const { getByText } = renderScreen()
 
       expect(getByText('Lomé')).toBeTruthy()
       expect(getByText('Sokodé')).toBeTruthy()
@@ -296,9 +274,7 @@ describe('ProductsScreen', () => {
     })
 
     it('displays product count for each merchant', () => {
-      const { getByText } = renderWithProviders(
-        <ProductsScreen navigation={mockNavigation} />
-      )
+      const { getByText } = renderScreen()
 
       expect(getByText('8 produits disponibles')).toBeTruthy()
       expect(getByText('15 produits disponibles')).toBeTruthy()
@@ -308,9 +284,7 @@ describe('ProductsScreen', () => {
 
   describe('Rendering - Products Mode', () => {
     it('displays all products in grid when in products mode', async () => {
-      const { getByText } = renderWithProviders(
-        <ProductsScreen navigation={mockNavigation} />
-      )
+      const { getByText } = renderScreen()
 
       const productsButton = getByText('Produits')
       fireEvent.press(productsButton)
@@ -323,9 +297,7 @@ describe('ProductsScreen', () => {
     })
 
     it('displays product prices correctly', async () => {
-      const { getByText } = renderWithProviders(
-        <ProductsScreen navigation={mockNavigation} />
-      )
+      const { getByText } = renderScreen()
 
       fireEvent.press(getByText('Produits'))
 
@@ -337,9 +309,7 @@ describe('ProductsScreen', () => {
     })
 
     it('displays discount percentages', async () => {
-      const { getAllByText } = renderWithProviders(
-        <ProductsScreen navigation={mockNavigation} />
-      )
+      const { getAllByText } = renderScreen()
 
       fireEvent.press(getAllByText('Produits')[0])
 
@@ -350,9 +320,7 @@ describe('ProductsScreen', () => {
     })
 
     it('displays product quantities as badges', async () => {
-      const { getByText } = renderWithProviders(
-        <ProductsScreen navigation={mockNavigation} />
-      )
+      const { getByText } = renderScreen()
 
       fireEvent.press(getByText('Produits'))
 
@@ -364,9 +332,7 @@ describe('ProductsScreen', () => {
     })
 
     it('displays merchant name and city for each product', async () => {
-      const { getByText, getAllByText } = renderWithProviders(
-        <ProductsScreen navigation={mockNavigation} />
-      )
+      const { getByText, getAllByText } = renderScreen()
 
       fireEvent.press(getByText('Produits'))
 
@@ -379,17 +345,13 @@ describe('ProductsScreen', () => {
 
   describe('Search Functionality', () => {
     it('renders search input', () => {
-      const { getByPlaceholderText } = renderWithProviders(
-        <ProductsScreen navigation={mockNavigation} />
-      )
+      const { getByPlaceholderText } = renderScreen()
 
       expect(getByPlaceholderText('Boutique, ville, type')).toBeTruthy()
     })
 
     it('filters merchants by business name', async () => {
-      const { getByPlaceholderText, getByText, queryByText } = renderWithProviders(
-        <ProductsScreen navigation={mockNavigation} />
-      )
+      const { getByPlaceholderText, getByText, queryByText } = renderScreen()
 
       const searchInput = getByPlaceholderText('Boutique, ville, type')
       fireEvent.changeText(searchInput, 'Boulangerie')
@@ -401,9 +363,7 @@ describe('ProductsScreen', () => {
     })
 
     it('filters merchants by city', async () => {
-      const { getByPlaceholderText, getByText, queryByText } = renderWithProviders(
-        <ProductsScreen navigation={mockNavigation} />
-      )
+      const { getByPlaceholderText, getByText, queryByText } = renderScreen()
 
       const searchInput = getByPlaceholderText('Boutique, ville, type')
       fireEvent.changeText(searchInput, 'Lomé')
@@ -416,9 +376,7 @@ describe('ProductsScreen', () => {
     })
 
     it('filters products by product name in products mode', async () => {
-      const { getByPlaceholderText, getByText, queryByText } = renderWithProviders(
-        <ProductsScreen navigation={mockNavigation} />
-      )
+      const { getByPlaceholderText, getByText, queryByText } = renderScreen()
 
       fireEvent.press(getByText('Produits'))
 
@@ -432,9 +390,7 @@ describe('ProductsScreen', () => {
     })
 
     it('shows empty state when search returns no results', async () => {
-      const { getByPlaceholderText, getByText } = renderWithProviders(
-        <ProductsScreen navigation={mockNavigation} />
-      )
+      const { getByPlaceholderText, getByText } = renderScreen()
 
       const searchInput = getByPlaceholderText('Boutique, ville, type')
       fireEvent.changeText(searchInput, 'NonExistentMerchant')
@@ -447,9 +403,7 @@ describe('ProductsScreen', () => {
 
   describe('Category Filtering', () => {
     it('renders category chips including "Tous"', () => {
-      const { getByText } = renderWithProviders(
-        <ProductsScreen navigation={mockNavigation} />
-      )
+      const { getByText } = renderScreen()
 
       expect(getByText('Tous')).toBeTruthy()
       expect(getByText('Boulangerie')).toBeTruthy()
@@ -458,9 +412,7 @@ describe('ProductsScreen', () => {
     })
 
     it('filters products by category when chip is pressed', async () => {
-      const { getByText, queryByText } = renderWithProviders(
-        <ProductsScreen navigation={mockNavigation} />
-      )
+      const { getByText, queryByText } = renderScreen()
 
       // Switch to products mode
       fireEvent.press(getByText('Produits'))
@@ -481,9 +433,7 @@ describe('ProductsScreen', () => {
     })
 
     it('shows all items when "Tous" category is selected', async () => {
-      const { getByText } = renderWithProviders(
-        <ProductsScreen navigation={mockNavigation} />
-      )
+      const { getByText } = renderScreen()
 
       fireEvent.press(getByText('Produits'))
 
@@ -505,9 +455,7 @@ describe('ProductsScreen', () => {
     })
 
     it('filters merchants by category approximation', async () => {
-      const { getByText, queryByText } = renderWithProviders(
-        <ProductsScreen navigation={mockNavigation} />
-      )
+      const { getByText, queryByText } = renderScreen()
 
       // In merchants mode, filter by Boulangerie
       fireEvent.press(getByText('Boulangerie'))
@@ -521,9 +469,7 @@ describe('ProductsScreen', () => {
 
   describe('Results Counter', () => {
     it('displays merchant count in merchants mode', async () => {
-      const { getByText } = renderWithProviders(
-        <ProductsScreen navigation={mockNavigation} />
-      )
+      const { getByText } = renderScreen()
 
       await waitFor(() => {
         expect(getByText('3 boutiques trouvées')).toBeTruthy()
@@ -531,9 +477,7 @@ describe('ProductsScreen', () => {
     })
 
     it('displays product count in products mode', async () => {
-      const { getByText } = renderWithProviders(
-        <ProductsScreen navigation={mockNavigation} />
-      )
+      const { getByText } = renderScreen()
 
       fireEvent.press(getByText('Produits'))
 
@@ -543,9 +487,7 @@ describe('ProductsScreen', () => {
     })
 
     it('updates count when filtering', async () => {
-      const { getByText, getByPlaceholderText } = renderWithProviders(
-        <ProductsScreen navigation={mockNavigation} />
-      )
+      const { getByText, getByPlaceholderText } = renderScreen()
 
       const searchInput = getByPlaceholderText('Boutique, ville, type')
       fireEvent.changeText(searchInput, 'Boulangerie')
@@ -558,9 +500,7 @@ describe('ProductsScreen', () => {
 
   describe('Reset Filters', () => {
     it('shows reset button when filters are active', async () => {
-      const { getByText, getByPlaceholderText } = renderWithProviders(
-        <ProductsScreen navigation={mockNavigation} />
-      )
+      const { getByText, getByPlaceholderText } = renderScreen()
 
       const searchInput = getByPlaceholderText('Boutique, ville, type')
       fireEvent.changeText(searchInput, 'Test')
@@ -571,9 +511,7 @@ describe('ProductsScreen', () => {
     })
 
     it('resets all filters when reset button is pressed', async () => {
-      const { getByText, getByPlaceholderText } = renderWithProviders(
-        <ProductsScreen navigation={mockNavigation} />
-      )
+      const { getByText, getByPlaceholderText } = renderScreen()
 
       // Apply filters
       const searchInput = getByPlaceholderText('Boutique, ville, type')
@@ -595,9 +533,7 @@ describe('ProductsScreen', () => {
 
   describe('Navigation - Merchants Mode', () => {
     it('navigates to MerchantDetail when merchant card is pressed', async () => {
-      const { getByText } = renderWithProviders(
-        <ProductsScreen navigation={mockNavigation} />
-      )
+      const { getByText } = renderScreen()
 
       const merchantCard = getByText('Boulangerie Martin')
       fireEvent.press(merchantCard)
@@ -610,9 +546,7 @@ describe('ProductsScreen', () => {
 
   describe('Navigation - Products Mode', () => {
     it('navigates to ProductDetails when product card is pressed', async () => {
-      const { getByText } = renderWithProviders(
-        <ProductsScreen navigation={mockNavigation} />
-      )
+      const { getByText } = renderScreen()
 
       fireEvent.press(getByText('Produits'))
 
@@ -629,11 +563,9 @@ describe('ProductsScreen', () => {
 
   describe('Empty States', () => {
     it('shows empty state when no merchants match filters', async () => {
-      const store = createTestStore({ merchants: [] })
-      const { getByText } = renderWithProviders(
-        <ProductsScreen navigation={mockNavigation} />,
-        store
-      )
+      const { getByText } = renderScreen({
+        merchants: { merchants: [] },
+      })
 
       await waitFor(() => {
         expect(getByText('Aucune boutique trouvée')).toBeTruthy()
@@ -641,11 +573,9 @@ describe('ProductsScreen', () => {
     })
 
     it('shows empty state when no products match filters', async () => {
-      const store = createTestStore({ products: [] })
-      const { getByText } = renderWithProviders(
-        <ProductsScreen navigation={mockNavigation} />,
-        store
-      )
+      const { getByText } = renderScreen({
+        products: { products: [] },
+      })
 
       fireEvent.press(getByText('Produits'))
 
@@ -655,9 +585,7 @@ describe('ProductsScreen', () => {
     })
 
     it('shows reset button in empty state when filters active', async () => {
-      const { getByText, getByPlaceholderText } = renderWithProviders(
-        <ProductsScreen navigation={mockNavigation} />
-      )
+      const { getByText, getByPlaceholderText } = renderScreen()
 
       const searchInput = getByPlaceholderText('Boutique, ville, type')
       fireEvent.changeText(searchInput, 'NonExistent')
@@ -683,11 +611,9 @@ describe('ProductsScreen', () => {
         },
       ]
 
-      const store = createTestStore({ products: productsWithoutStock })
-      const { getByText, queryByText } = renderWithProviders(
-        <ProductsScreen navigation={mockNavigation} />,
-        store
-      )
+      const { getByText, queryByText } = renderScreen({
+        products: buildProductsState({ products: productsWithoutStock }),
+      })
 
       fireEvent.press(getByText('Produits'))
 

@@ -22,7 +22,7 @@ interface MerchantsState {
   error: string | null
 }
 
-const initialState: MerchantsState = {
+export const merchantsInitialState: MerchantsState = {
   merchants: [],
   loading: false,
   error: null,
@@ -46,7 +46,7 @@ export const fetchMerchants = createAsyncThunk(
 
 const merchantsSlice = createSlice({
   name: 'merchants',
-  initialState,
+  initialState: merchantsInitialState,
   reducers: {
     clearMerchants: (state) => {
       state.merchants = []
@@ -71,4 +71,5 @@ const merchantsSlice = createSlice({
 })
 
 export const { clearMerchants } = merchantsSlice.actions
-export default merchantsSlice.reducer
+export const merchantsReducer = merchantsSlice.reducer
+export default merchantsReducer

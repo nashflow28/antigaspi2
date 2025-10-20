@@ -10,6 +10,18 @@
 // Helpers de rendu
 export { render, renderWithProviders, createTestStore } from './test-utils'
 
+// Store helpers
+export {
+  setupStore,
+  buildProductsState,
+  buildAuthState,
+  buildConnectivityState,
+  buildReservationsState,
+  buildMerchantsState,
+  buildFavoritesState,
+  buildReviewsState,
+} from './setupStore'
+
 // Factories de données
 export {
   createTestUser,

@@ -6,7 +6,7 @@ import { configureStore } from '@reduxjs/toolkit'
 import { ThemeProvider } from '../../../theme/ThemeContext'
 import MerchantDetailScreen from '../MerchantDetailScreen'
 import merchantsSlice from '../../../store/slices/merchantsSlice'
-import productsSlice from '../../../store/slices/productsSlice'
+import productsReducer from '../../../store/slices/productsSlice'
 import reviewsSlice from '../../../store/slices/reviewsSlice'
 import authSlice from '../../../store/slices/authSlice'
 
@@ -115,7 +115,7 @@ const createTestStore = (initialState = {}) => {
   return configureStore({
     reducer: {
       merchants: merchantsSlice,
-      products: productsSlice,
+      products: productsReducer,
       reviews: reviewsSlice,
       auth: authSlice,
     },

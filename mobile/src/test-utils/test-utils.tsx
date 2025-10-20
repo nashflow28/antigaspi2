@@ -9,14 +9,16 @@ import { Provider } from 'react-redux'
 import { configureStore, PreloadedState } from '@reduxjs/toolkit'
 import { ThemeProvider } from '../theme'
 
-import authReducer from '../store/slices/authSlice'
-import productsReducer from '../store/slices/productsSlice'
-import reservationsReducer from '../store/slices/reservationsSlice'
-import merchantsReducer from '../store/slices/merchantsSlice'
-import favoritesReducer from '../store/slices/favoritesSlice'
-import reviewsReducer from '../store/slices/reviewsSlice'
+import { authReducer } from '../store/slices/authSlice'
+import { productsReducer } from '../store/slices/productsSlice'
+import { reservationsReducer } from '../store/slices/reservationsSlice'
+import { merchantsReducer } from '../store/slices/merchantsSlice'
+import { favoritesReducer } from '../store/slices/favoritesSlice'
+import { reviewsReducer } from '../store/slices/reviewsSlice'
+import { connectivityReducer } from '../store/slices/connectivitySlice'
 
 import { RootState } from '../store'
+import { setupStore } from './setupStore'
 
 interface ExtendedRenderOptions extends Omit<RenderOptions, 'queries'> {
   preloadedState?: PreloadedState<RootState>
@@ -46,6 +48,7 @@ export const createTestStore = (options?: PreloadedState<RootState> | CreateStor
   if (minimal && preloadedState) {
     const reducers: Record<string, any> = {}
     if ('auth' in preloadedState) reducers.auth = authReducer
+    if ('connectivity' in preloadedState) reducers.connectivity = connectivityReducer
     if ('products' in preloadedState) reducers.products = productsReducer
     if ('reservations' in preloadedState) reducers.reservations = reservationsReducer
     if ('merchants' in preloadedState) reducers.merchants = merchantsReducer
@@ -58,18 +61,8 @@ export const createTestStore = (options?: PreloadedState<RootState> | CreateStor
     })
   }
 
-  // Mode complet (par défaut): tous les reducers
-  return configureStore({
-    reducer: {
-      auth: authReducer,
-      products: productsReducer,
-      reservations: reservationsReducer,
-      merchants: merchantsReducer,
-      favorites: favoritesReducer,
-      reviews: reviewsReducer,
-    },
-    preloadedState,
-  })
+  // Mode complet (par défaut): tous les reducers via setupStore
+  return setupStore(preloadedState)
 }
 
 /**

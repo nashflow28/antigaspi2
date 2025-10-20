@@ -2,7 +2,7 @@ import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit'
 import { Review, ReviewStats, ReviewsState } from '../../types'
 import apiService from '../../services/api'
 
-const initialState: ReviewsState = {
+export const reviewsInitialState: ReviewsState = {
   reviews: [],
   stats: null,
   loading: false,
@@ -126,7 +126,7 @@ export const deleteReview = createAsyncThunk(
 
 const reviewsSlice = createSlice({
   name: 'reviews',
-  initialState,
+  initialState: reviewsInitialState,
   reducers: {
     clearReviews: (state) => {
       state.reviews = []
@@ -137,7 +137,7 @@ const reviewsSlice = createSlice({
     clearError: (state) => {
       state.error = null
     },
-    resetReviewsState: () => initialState,
+    resetReviewsState: () => reviewsInitialState,
   },
   extraReducers: (builder) => {
     // Fetch Reviews
@@ -240,4 +240,5 @@ const reviewsSlice = createSlice({
 })
 
 export const { clearReviews, clearError, resetReviewsState } = reviewsSlice.actions
-export default reviewsSlice.reducer
+export const reviewsReducer = reviewsSlice.reducer
+export default reviewsReducer

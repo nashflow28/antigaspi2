@@ -4,7 +4,7 @@ import { render, fireEvent, waitFor } from '@testing-library/react-native'
 import { Provider } from 'react-redux'
 import { configureStore } from '@reduxjs/toolkit'
 import MerchantProductsScreen from '../MerchantProductsScreen'
-import productsSlice from '../../../store/slices/productsSlice'
+import productsReducer from '../../../store/slices/productsSlice'
 import authSlice from '../../../store/slices/authSlice'
 import { ThemeProvider } from '../../../theme/ThemeContext'
 import { TEST_IDS } from '../../../utils/testIds'
@@ -55,7 +55,7 @@ const mockProducts = [
 const createTestStore = (products = mockProducts) => {
   return configureStore({
     reducer: {
-      products: productsSlice,
+      products: productsReducer,
       auth: authSlice,
     },
     preloadedState: {

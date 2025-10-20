@@ -3,7 +3,7 @@ import { ReservationsState, Reservation, ReservationCreationPayload, Reservation
 import apiService from '../../services/api'
 // import offlineService from '../../services/offlineService' // Désactivé temporairement pour le web
 
-const initialState: ReservationsState = {
+export const reservationsInitialState: ReservationsState = {
   reservations: [],
   loading: false,
   error: null,
@@ -60,7 +60,7 @@ export const cancelReservation = createAsyncThunk(
 
 const reservationsSlice = createSlice({
   name: 'reservations',
-  initialState,
+  initialState: reservationsInitialState,
   reducers: {
     clearError: (state) => {
       state.error = null
@@ -153,4 +153,5 @@ export const {
   clearPendingReservations,
   updateReservation,
 } = reservationsSlice.actions
-export default reservationsSlice.reducer
+export const reservationsReducer = reservationsSlice.reducer
+export default reservationsReducer

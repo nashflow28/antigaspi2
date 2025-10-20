@@ -4,7 +4,7 @@ import { render, waitFor } from '@testing-library/react-native'
 import { Provider } from 'react-redux'
 import { configureStore } from '@reduxjs/toolkit'
 import ProductDetailsScreen from '../ProductDetailsScreen'
-import productsSlice from '../../../store/slices/productsSlice'
+import productsReducer from '../../../store/slices/productsSlice'
 import authSlice from '../../../store/slices/authSlice'
 import merchantsSlice from '../../../store/slices/merchantsSlice'
 import favoritesSlice from '../../../store/slices/favoritesSlice'
@@ -54,7 +54,7 @@ const mockProduct = {
 const createTestStore = (productInStore = true) => {
   return configureStore({
     reducer: {
-      products: productsSlice,
+      products: productsReducer,
       auth: authSlice,
       merchants: merchantsSlice,
       favorites: favoritesSlice,
@@ -262,7 +262,7 @@ describe('ProductDetailsScreen', () => {
       const unavailableProduct = { ...mockProduct, quantity_available: 0 }
       const store = configureStore({
         reducer: {
-          products: productsSlice,
+          products: productsReducer,
           auth: authSlice,
           merchants: merchantsSlice,
           favorites: favoritesSlice,
@@ -328,7 +328,7 @@ describe('ProductDetailsScreen', () => {
       const unavailableProduct = { ...mockProduct, quantity_available: 0 }
       const store = configureStore({
         reducer: {
-          products: productsSlice,
+          products: productsReducer,
           auth: authSlice,
           merchants: merchantsSlice,
           favorites: favoritesSlice,
@@ -457,7 +457,7 @@ describe('ProductDetailsScreen', () => {
     it('shows quantity selector when reserving product', async () => {
       const authenticatedStore = configureStore({
         reducer: {
-          products: productsSlice,
+          products: productsReducer,
           auth: authSlice,
           merchants: merchantsSlice,
           favorites: favoritesSlice,
@@ -529,7 +529,7 @@ describe('ProductDetailsScreen', () => {
     it('shows favorite button for authenticated users', () => {
       const authenticatedStore = configureStore({
         reducer: {
-          products: productsSlice,
+          products: productsReducer,
           auth: authSlice,
           merchants: merchantsSlice,
           favorites: favoritesSlice,
