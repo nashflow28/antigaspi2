@@ -121,27 +121,38 @@ describe('Test Utils Infrastructure', () => {
       expect(state.reviews).toBeDefined()
     })
 
-    it('crée un store minimal avec uniquement les reducers spécifiés', () => {
+    it('fusionne en profondeur les overrides fournis', () => {
       const store = createTestStore({
-        preloadedState: {
-          auth: {
-            user: createTestUser(),
-            token: 'token',
-            isAuthenticated: true,
-            loading: false,
-            error: null,
-          },
+        products: {
+          products: [
+            {
+              id: 42,
+              name: 'Produit de test',
+              description: 'Produit injecté pour les tests',
+              original_price: '1000',
+              discounted_price: '800',
+              quantity_available: 5,
+              expiration_date: '2025-01-01T00:00:00Z',
+              discount_percentage: 20,
+              savings: 200,
+              days_until_expiration: 2,
+              category: { id: 1, name: 'Catégorie test' },
+              merchant: createTestMerchant(),
+              created_at: '2025-01-01T00:00:00Z',
+              is_active: true,
+            },
+          ],
+          loading: true,
         },
-        minimal: true, // ✅ Mode minimal
       })
 
       const state = store.getState()
 
-      // Uniquement auth doit être présent
-      expect(state.auth).toBeDefined()
-      expect((state as any).products).toBeUndefined()
-      expect((state as any).reservations).toBeUndefined()
-      expect((state as any).merchants).toBeUndefined()
+      expect(state.products.products).toHaveLength(1)
+      expect(state.products.loading).toBe(true)
+      // Les propriétés non surchargées doivent conserver leur valeur par défaut
+      expect(state.products.hasMore).toBe(true)
+      expect(state.products.filters).toEqual({})
     })
   })
 

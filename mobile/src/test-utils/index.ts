@@ -8,9 +8,11 @@
  */
 
 // Helpers de rendu
-export { render, renderWithProviders, createTestStore } from './test-utils'
+export { render, renderWithProviders } from './test-utils'
 
 // Store helpers
+export { createTestStore } from './store'
+
 export {
   setupStore,
   buildProductsState,

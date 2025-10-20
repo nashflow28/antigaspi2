@@ -1,13 +1,15 @@
 // @ts-nocheck
 import React from 'react'
-import { render, fireEvent, waitFor } from '@testing-library/react-native'
-import { Provider } from 'react-redux'
-import { configureStore } from '@reduxjs/toolkit'
+import type { DeepPartial } from 'redux'
+import {
+  render,
+  fireEvent,
+  waitFor,
+  createTestUser,
+} from '@test-utils'
 import MerchantProductsScreen from '../MerchantProductsScreen'
-import productsReducer from '../../../store/slices/productsSlice'
-import authSlice from '../../../store/slices/authSlice'
-import { ThemeProvider } from '../../../theme/ThemeContext'
 import { TEST_IDS } from '../../../utils/testIds'
+import type { RootState } from '../../../store'
 
 // Mock navigation
 const mockNavigate = jest.fn()
@@ -51,42 +53,51 @@ const mockProducts = [
   },
 ]
 
-// Create test store
-const createTestStore = (products = mockProducts) => {
-  return configureStore({
-    reducer: {
-      products: productsReducer,
-      auth: authSlice,
-    },
-    preloadedState: {
-      products: {
-        products,
-        categories: [],
-        loading: false,
-        loadingMore: false,
-        error: null,
-        filters: {},
-        currentPage: 1,
-        hasMore: false,
+const buildBaseState = (products = mockProducts): DeepPartial<RootState> => ({
+  auth: {
+    user: createTestUser({
+      id: 2,
+      first_name: 'Marie',
+      last_name: 'Martin',
+      email: 'boulangerie.martin@email.com',
+      role: 'merchant',
+      merchant: {
+        business_name: 'Boulangerie Martin',
+        business_type: 'Boulangerie artisanale',
       },
-      auth: {
-        user: {
-          id: 2,
-          first_name: 'Marie',
-          last_name: 'Martin',
-          email: 'boulangerie.martin@email.com',
-          role: 'merchant',
-          merchant: {
-            id: 1,
-            business_name: 'Boulangerie Martin',
-          },
-        },
-        token: 'test-token',
-        isAuthenticated: true,
-        loading: false,
-        error: null,
-      },
+    }),
+    token: 'test-token',
+    isAuthenticated: true,
+    loading: false,
+    error: null,
+  },
+  products: {
+    products,
+    loading: false,
+    loadingMore: false,
+    error: null,
+  },
+})
+
+const renderScreen = (overrides: DeepPartial<RootState> = {}) => {
+  const productsOverride = overrides.products?.products as RootState['products']['products'] | undefined
+  const baseState = buildBaseState(productsOverride)
+
+  const preloadedState: DeepPartial<RootState> = {
+    ...baseState,
+    ...overrides,
+    auth: {
+      ...baseState.auth,
+      ...(overrides.auth ?? {}),
     },
+    products: {
+      ...baseState.products,
+      ...(overrides.products ?? {}),
+    },
+  }
+
+  return render(<MerchantProductsScreen navigation={mockNavigation} />, {
+    preloadedState,
   })
 }
 
@@ -98,17 +109,6 @@ jest.mock('@react-navigation/native', () => ({
   }),
 }))
 
-// Helper to render with providers
-const renderWithProviders = (component: React.ReactElement, store: any) => {
-  return render(
-    <Provider store={store}>
-      <ThemeProvider>
-        {component}
-      </ThemeProvider>
-    </Provider>
-  )
-}
-
 describe('MerchantProductsScreen', () => {
   beforeEach(() => {
     jest.clearAllMocks()
@@ -116,31 +116,19 @@ describe('MerchantProductsScreen', () => {
 
   describe('Rendering', () => {
     it('renders without crashing', () => {
-      const store = createTestStore()
-      const { getByTestId } = renderWithProviders(
-        <MerchantProductsScreen navigation={mockNavigation} />,
-        store
-      )
+      const { getByTestId } = renderScreen()
 
       expect(getByTestId(TEST_IDS.merchantProducts)).toBeTruthy()
     })
 
     it('displays products list with testID', () => {
-      const store = createTestStore()
-      const { getByTestId } = renderWithProviders(
-        <MerchantProductsScreen navigation={mockNavigation} />,
-        store
-      )
+      const { getByTestId } = renderScreen()
 
       expect(getByTestId(TEST_IDS.merchantProductsList)).toBeTruthy()
     })
 
     it('displays all product names', () => {
-      const store = createTestStore()
-      const { getByText } = renderWithProviders(
-        <MerchantProductsScreen navigation={mockNavigation} />,
-        store
-      )
+      const { getByText } = renderScreen()
 
       expect(getByText('Pain artisanal')).toBeTruthy()
       expect(getByText('Croissants')).toBeTruthy()
@@ -148,11 +136,7 @@ describe('MerchantProductsScreen', () => {
     })
 
     it('displays product prices in F CFA format', () => {
-      const store = createTestStore()
-      const { getAllByText } = renderWithProviders(
-        <MerchantProductsScreen navigation={mockNavigation} />,
-        store
-      )
+      const { getAllByText } = renderScreen()
 
       const priceElements = getAllByText(/F CFA/i)
       expect(priceElements.length).toBeGreaterThan(0)
@@ -161,21 +145,13 @@ describe('MerchantProductsScreen', () => {
 
   describe('Add Product Button', () => {
     it('displays add product button with testID', () => {
-      const store = createTestStore()
-      const { getByTestId } = renderWithProviders(
-        <MerchantProductsScreen navigation={mockNavigation} />,
-        store
-      )
+      const { getByTestId } = renderScreen()
 
       expect(getByTestId(TEST_IDS.addProductButton)).toBeTruthy()
     })
 
     it('navigates to ProductForm when add button is pressed', async () => {
-      const store = createTestStore()
-      const { getByTestId } = renderWithProviders(
-        <MerchantProductsScreen navigation={mockNavigation} />,
-        store
-      )
+      const { getByTestId } = renderScreen()
 
       const addButton = getByTestId(TEST_IDS.addProductButton)
       fireEvent.press(addButton)
@@ -188,32 +164,20 @@ describe('MerchantProductsScreen', () => {
 
   describe('Product Status Display', () => {
     it('shows active status for active products', () => {
-      const store = createTestStore()
-      const { getAllByText } = renderWithProviders(
-        <MerchantProductsScreen navigation={mockNavigation} />,
-        store
-      )
+      const { getAllByText } = renderScreen()
 
       const activeElements = getAllByText(/Actif/i)
       expect(activeElements.length).toBeGreaterThan(0)
     })
 
     it('shows inactive status for inactive products', () => {
-      const store = createTestStore()
-      const { getByText } = renderWithProviders(
-        <MerchantProductsScreen navigation={mockNavigation} />,
-        store
-      )
+      const { getByText } = renderScreen()
 
       expect(getByText(/Inactif/i)).toBeTruthy()
     })
 
     it('displays quantity available for each product', () => {
-      const store = createTestStore()
-      const { getByText } = renderWithProviders(
-        <MerchantProductsScreen navigation={mockNavigation} />,
-        store
-      )
+      const { getByText } = renderScreen()
 
       expect(getByText(/Stock.*10/i)).toBeTruthy()
       expect(getByText(/Stock.*20/i)).toBeTruthy()
@@ -223,22 +187,14 @@ describe('MerchantProductsScreen', () => {
 
   describe('Product Actions', () => {
     it('displays edit button for each product', () => {
-      const store = createTestStore()
-      const { getAllByTestId } = renderWithProviders(
-        <MerchantProductsScreen navigation={mockNavigation} />,
-        store
-      )
+      const { getAllByTestId } = renderScreen()
 
       // Should have edit buttons for all products
       expect(getAllByTestId(/edit-product-/i).length).toBe(3)
     })
 
     it('navigates to ProductForm when edit button is pressed', async () => {
-      const store = createTestStore()
-      const { getAllByTestId } = renderWithProviders(
-        <MerchantProductsScreen navigation={mockNavigation} />,
-        store
-      )
+      const { getAllByTestId } = renderScreen()
 
       const editButtons = getAllByTestId(/edit-product-/i)
       fireEvent.press(editButtons[0])
@@ -249,11 +205,7 @@ describe('MerchantProductsScreen', () => {
     })
 
     it('displays delete button for each product', () => {
-      const store = createTestStore()
-      const { getAllByTestId } = renderWithProviders(
-        <MerchantProductsScreen navigation={mockNavigation} />,
-        store
-      )
+      const { getAllByTestId } = renderScreen()
 
       // Should have delete buttons for all products
       expect(getAllByTestId(/delete-product-/i).length).toBe(3)
@@ -262,22 +214,18 @@ describe('MerchantProductsScreen', () => {
 
   describe('Empty State', () => {
     it('displays empty state when no products', () => {
-      const store = createTestStore([])
-      const { getByText, getByTestId } = renderWithProviders(
-        <MerchantProductsScreen navigation={mockNavigation} />,
-        store
-      )
+      const { getByText, getByTestId } = renderScreen({
+        products: { products: [] },
+      })
 
       expect(getByTestId(TEST_IDS.emptyState)).toBeTruthy()
       expect(getByText('Aucun produit')).toBeTruthy()
     })
 
     it('displays add product button in empty state', () => {
-      const store = createTestStore([])
-      const { getByTestId } = renderWithProviders(
-        <MerchantProductsScreen navigation={mockNavigation} />,
-        store
-      )
+      const { getByTestId } = renderScreen({
+        products: { products: [] },
+      })
 
       expect(getByTestId(TEST_IDS.addProductButton)).toBeTruthy()
     })
@@ -285,11 +233,7 @@ describe('MerchantProductsScreen', () => {
 
   describe('Product Filtering', () => {
     it('can filter by active products', () => {
-      const store = createTestStore()
-      const { getByText } = renderWithProviders(
-        <MerchantProductsScreen navigation={mockNavigation} />,
-        store
-      )
+      const { getByText } = renderScreen()
 
       // Active products should be visible
       expect(getByText('Pain artisanal')).toBeTruthy()
@@ -297,11 +241,7 @@ describe('MerchantProductsScreen', () => {
     })
 
     it('can filter by inactive products', () => {
-      const store = createTestStore()
-      const { getByText } = renderWithProviders(
-        <MerchantProductsScreen navigation={mockNavigation} />,
-        store
-      )
+      const { getByText } = renderScreen()
 
       // Inactive products should be visible
       expect(getByText('Baguette')).toBeTruthy()
@@ -310,22 +250,14 @@ describe('MerchantProductsScreen', () => {
 
   describe('Product Details Display', () => {
     it('displays original price for products', () => {
-      const store = createTestStore()
-      const { getByText } = renderWithProviders(
-        <MerchantProductsScreen navigation={mockNavigation} />,
-        store
-      )
+      const { getByText } = renderScreen()
 
       // Should show original prices
       expect(getByText(/500.*F CFA/i)).toBeTruthy()
     })
 
     it('displays discounted price for products', () => {
-      const store = createTestStore()
-      const { getByText } = renderWithProviders(
-        <MerchantProductsScreen navigation={mockNavigation} />,
-        store
-      )
+      const { getByText } = renderScreen()
 
       // Should show discounted prices
       expect(getByText(/250.*F CFA/i)).toBeTruthy()
@@ -333,11 +265,7 @@ describe('MerchantProductsScreen', () => {
     })
 
     it('displays product count in header', () => {
-      const store = createTestStore()
-      const { getByText } = renderWithProviders(
-        <MerchantProductsScreen navigation={mockNavigation} />,
-        store
-      )
+      const { getByText } = renderScreen()
 
       expect(getByText(/3.*produit/i)).toBeTruthy()
     })
@@ -345,21 +273,13 @@ describe('MerchantProductsScreen', () => {
 
   describe('Search Functionality', () => {
     it('displays search input field', () => {
-      const store = createTestStore()
-      const { getByTestId } = renderWithProviders(
-        <MerchantProductsScreen navigation={mockNavigation} />,
-        store
-      )
+      const { getByTestId } = renderScreen()
 
       expect(getByTestId('search-input')).toBeTruthy()
     })
 
     it('filters products when searching', async () => {
-      const store = createTestStore()
-      const { getByTestId, getByText, queryByText } = renderWithProviders(
-        <MerchantProductsScreen navigation={mockNavigation} />,
-        store
-      )
+      const { getByTestId, getByText, queryByText } = renderScreen()
 
       const searchInput = getByTestId('search-input')
       fireEvent.changeText(searchInput, 'Pain')
@@ -373,11 +293,7 @@ describe('MerchantProductsScreen', () => {
 
   describe('Pull to Refresh', () => {
     it('can refresh products list', async () => {
-      const store = createTestStore()
-      const { getByTestId } = renderWithProviders(
-        <MerchantProductsScreen navigation={mockNavigation} />,
-        store
-      )
+      const { getByTestId } = renderScreen()
 
       const list = getByTestId(TEST_IDS.merchantProductsList)
       expect(list).toBeTruthy()
