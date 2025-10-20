@@ -3,7 +3,7 @@ import { ProductsState, Product, Category, ProductFilters } from '../../types'
 import apiService from '../../services/api'
 // import offlineService from '../../services/offlineService' // Désactivé temporairement pour le web
 
-const initialState: ProductsState = {
+export const productsInitialState: ProductsState = {
   products: [],
   categories: [],
   loading: false,
@@ -66,7 +66,7 @@ export const fetchMoreProducts = createAsyncThunk(
 
 const productsSlice = createSlice({
   name: 'products',
-  initialState,
+  initialState: productsInitialState,
   reducers: {
     setFilters: (state, action: PayloadAction<ProductFilters>) => {
       state.filters = { ...state.filters, ...action.payload }
@@ -155,4 +155,5 @@ const productsSlice = createSlice({
 })
 
 export const { setFilters, clearFilters, clearError, updateProduct, resetProducts } = productsSlice.actions
-export default productsSlice.reducer
+export const productsReducer = productsSlice.reducer
+export default productsReducer

@@ -6,7 +6,7 @@ import { configureStore } from '@reduxjs/toolkit'
 import { NavigationContainer } from '@react-navigation/native'
 import { ThemeProvider } from '../../../theme/ThemeContext'
 import FavoritesScreen from '../FavoritesScreen'
-import productsSlice from '../../../store/slices/productsSlice'
+import productsReducer from '../../../store/slices/productsSlice'
 import favoritesSlice from '../../../store/slices/favoritesSlice'
 import authSlice from '../../../store/slices/authSlice'
 
@@ -85,7 +85,7 @@ const mockFavoriteProducts = [
 const createTestStore = (initialState = {}) => {
   return configureStore({
     reducer: {
-      products: productsSlice,
+      products: productsReducer,
       favorites: favoritesSlice,
       auth: authSlice,
     },

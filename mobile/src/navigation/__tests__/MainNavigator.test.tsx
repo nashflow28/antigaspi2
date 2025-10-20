@@ -5,7 +5,7 @@ import { Provider } from 'react-redux'
 import { configureStore } from '@reduxjs/toolkit'
 import MainNavigator from '../MainNavigator'
 import authSlice from '../../store/slices/authSlice'
-import productsSlice from '../../store/slices/productsSlice'
+import productsReducer from '../../store/slices/productsSlice'
 import merchantsSlice from '../../store/slices/merchantsSlice'
 import favoritesSlice from '../../store/slices/favoritesSlice'
 
@@ -29,7 +29,7 @@ const createTestStore = (userRole: 'consumer' | 'merchant' | 'admin' | null) => 
   return configureStore({
     reducer: {
       auth: authSlice,
-      products: productsSlice,
+      products: productsReducer,
       merchants: merchantsSlice,
       favorites: favoritesSlice,
     },

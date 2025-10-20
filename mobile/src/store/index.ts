@@ -1,21 +1,21 @@
 import { configureStore } from '@reduxjs/toolkit'
-import authSlice from './slices/authSlice'
-import connectivitySlice from './slices/connectivitySlice'
-import productsSlice from './slices/productsSlice'
-import reservationsSlice from './slices/reservationsSlice'
-import merchantsSlice from './slices/merchantsSlice'
-import favoritesSlice from './slices/favoritesSlice'
-import reviewsSlice from './slices/reviewsSlice'
+import { authReducer } from './slices/authSlice'
+import { connectivityReducer } from './slices/connectivitySlice'
+import { productsReducer } from './slices/productsSlice'
+import { reservationsReducer } from './slices/reservationsSlice'
+import { merchantsReducer } from './slices/merchantsSlice'
+import { favoritesReducer } from './slices/favoritesSlice'
+import { reviewsReducer } from './slices/reviewsSlice'
 
 export const store = configureStore({
   reducer: {
-    auth: authSlice,
-    connectivity: connectivitySlice,
-    products: productsSlice,
-    reservations: reservationsSlice,
-    merchants: merchantsSlice,
-    favorites: favoritesSlice,
-    reviews: reviewsSlice,
+    auth: authReducer,
+    connectivity: connectivityReducer,
+    products: productsReducer,
+    reservations: reservationsReducer,
+    merchants: merchantsReducer,
+    favorites: favoritesReducer,
+    reviews: reviewsReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

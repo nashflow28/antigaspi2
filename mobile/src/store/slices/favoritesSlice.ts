@@ -2,7 +2,7 @@ import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit'
 import { FavoritesState, Product } from '../../types'
 import apiService from '../../services/api'
 
-const initialState: FavoritesState = {
+export const favoritesInitialState: FavoritesState = {
   favoriteIds: [], // Cache local des IDs favoris pour accès rapide
   favorites: [], // Produits favoris complets (pour écran Favoris)
   loading: false,
@@ -66,7 +66,7 @@ export const checkFavorite = createAsyncThunk(
 
 const favoritesSlice = createSlice({
   name: 'favorites',
-  initialState,
+  initialState: favoritesInitialState,
   reducers: {
     clearError: (state) => {
       state.error = null
@@ -151,4 +151,5 @@ const favoritesSlice = createSlice({
 })
 
 export const { clearError, optimisticToggleFavorite } = favoritesSlice.actions
-export default favoritesSlice.reducer
+export const favoritesReducer = favoritesSlice.reducer
+export default favoritesReducer

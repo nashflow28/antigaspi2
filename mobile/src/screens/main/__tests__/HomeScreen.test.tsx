@@ -4,7 +4,7 @@ import { render, fireEvent, waitFor } from '@testing-library/react-native'
 import { Provider } from 'react-redux'
 import { configureStore } from '@reduxjs/toolkit'
 import HomeScreen from '../HomeScreen'
-import productsSlice from '../../../store/slices/productsSlice'
+import productsReducer from '../../../store/slices/productsSlice'
 import authSlice from '../../../store/slices/authSlice'
 import merchantsSlice from '../../../store/slices/merchantsSlice'
 import favoritesSlice from '../../../store/slices/favoritesSlice'
@@ -87,7 +87,7 @@ const mockCategories = [
 const createTestStore = (initialState = {}) => {
   return configureStore({
     reducer: {
-      products: productsSlice,
+      products: productsReducer,
       auth: authSlice,
       merchants: merchantsSlice,
       favorites: favoritesSlice,

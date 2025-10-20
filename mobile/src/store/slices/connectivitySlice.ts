@@ -8,7 +8,7 @@ export interface ConnectivityState {
   lastSyncError: string | null
 }
 
-const initialState: ConnectivityState = {
+export const connectivityInitialState: ConnectivityState = {
   isOnline: true,
   lastChangeAt: null,
   isSyncing: false,
@@ -18,7 +18,7 @@ const initialState: ConnectivityState = {
 
 const connectivitySlice = createSlice({
   name: 'connectivity',
-  initialState,
+  initialState: connectivityInitialState,
   reducers: {
     setConnectivity: (state, action: PayloadAction<boolean>) => {
       state.isOnline = action.payload
@@ -40,4 +40,5 @@ const connectivitySlice = createSlice({
 })
 
 export const { setConnectivity, setSyncQueueSize, setSyncStatus, setSyncError } = connectivitySlice.actions
-export default connectivitySlice.reducer
+export const connectivityReducer = connectivitySlice.reducer
+export default connectivityReducer
