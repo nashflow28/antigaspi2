@@ -1,14 +1,14 @@
 // @ts-nocheck
 import React from 'react'
-import { render, fireEvent, waitFor } from '@testing-library/react-native'
-import { Provider } from 'react-redux'
-import { configureStore } from '@reduxjs/toolkit'
-import { ThemeProvider } from '../../../theme/ThemeContext'
+import type { DeepPartial } from 'redux'
+import {
+  render,
+  fireEvent,
+  waitFor,
+  createTestUser,
+} from '@test-utils'
 import MerchantDetailScreen from '../MerchantDetailScreen'
-import merchantsSlice from '../../../store/slices/merchantsSlice'
-import productsReducer from '../../../store/slices/productsSlice'
-import reviewsSlice from '../../../store/slices/reviewsSlice'
-import authSlice from '../../../store/slices/authSlice'
+import type { RootState } from '../../../store'
 
 // Mock navigation
 const mockNavigate = jest.fn()
@@ -110,56 +110,77 @@ const mockReviews = [
   },
 ]
 
-// Create test store
-const createTestStore = (initialState = {}) => {
-  return configureStore({
-    reducer: {
-      merchants: merchantsSlice,
-      products: productsReducer,
-      reviews: reviewsSlice,
-      auth: authSlice,
-    },
-    preloadedState: {
-      merchants: {
-        merchants: initialState.merchants || [mockMerchant],
-        currentMerchant: initialState.currentMerchant || mockMerchant,
-        loading: false,
-        error: null,
-      },
-      products: {
-        products: initialState.products || mockProducts,
-        categories: [],
-        loading: false,
-        error: null,
-      },
-      reviews: {
-        reviews: initialState.reviews || mockReviews,
-        stats: {
-          average_rating: 4.5,
-          total_reviews: 2,
-        },
-        loading: false,
-        error: null,
-      },
-      auth: {
-        user: { id: 1, name: 'Test User', role: 'consumer' },
-        token: 'test-token',
-        isAuthenticated: true,
-      },
-    },
-  })
+const baseStats = {
+  average_rating: 4.5,
+  total_reviews: 2,
 }
 
-// Helper to render with providers
-const renderWithProviders = (component: React.ReactElement, store = createTestStore()) => {
-  return render(
-    <Provider store={store}>
-      <ThemeProvider>
-        {component}
-      </ThemeProvider>
-    </Provider>
-  )
+const buildPreloadedState = (overrides: DeepPartial<RootState> = {}): DeepPartial<RootState> => {
+  const baseAuth = {
+    user: createTestUser({ role: 'consumer' }),
+    token: 'test-token',
+    isAuthenticated: true,
+    loading: false,
+    error: null,
+  }
+
+  const baseMerchants = {
+    merchants: [mockMerchant],
+    currentMerchant: mockMerchant,
+    loading: false,
+    error: null,
+  }
+
+  const baseProducts = {
+    products: mockProducts,
+    categories: [],
+    loading: false,
+    loadingMore: false,
+    error: null,
+  }
+
+  const baseReviews = {
+    reviews: mockReviews,
+    stats: baseStats,
+    loading: false,
+    error: null,
+  }
+
+  const overrideStats = overrides.reviews?.stats
+
+  return {
+    ...overrides,
+    auth: {
+      ...baseAuth,
+      ...(overrides.auth ?? {}),
+    },
+    merchants: {
+      ...baseMerchants,
+      ...(overrides.merchants ?? {}),
+    },
+    products: {
+      ...baseProducts,
+      ...(overrides.products ?? {}),
+    },
+    reviews: {
+      ...baseReviews,
+      ...(overrides.reviews ?? {}),
+      stats:
+        overrideStats === null
+          ? null
+          : {
+              ...baseStats,
+              ...(overrideStats ?? {}),
+            },
+    },
+  }
 }
+
+const renderScreen = (overrides: DeepPartial<RootState> = {}) =>
+  render(
+    <MerchantDetailScreen navigation={mockNavigation} route={mockRoute} />,
+    { preloadedState: buildPreloadedState(overrides) }
+  )
 
 describe('MerchantDetailScreen', () => {
   beforeEach(() => {
@@ -168,38 +189,28 @@ describe('MerchantDetailScreen', () => {
 
   describe('Rendering - Header', () => {
     it('renders without crashing', () => {
-      const { getByText } = renderWithProviders(
-        <MerchantDetailScreen navigation={mockNavigation} route={mockRoute} />
-      )
+      const { getByText } = renderScreen()
       expect(getByText('Boulangerie Martin')).toBeTruthy()
     })
 
     it('displays merchant name', () => {
-      const { getByText } = renderWithProviders(
-        <MerchantDetailScreen navigation={mockNavigation} route={mockRoute} />
-      )
+      const { getByText } = renderScreen()
       expect(getByText('Boulangerie Martin')).toBeTruthy()
     })
 
     it('displays merchant business type', () => {
-      const { getByText } = renderWithProviders(
-        <MerchantDetailScreen navigation={mockNavigation} route={mockRoute} />
-      )
+      const { getByText } = renderScreen()
       expect(getByText('Boulangerie artisanale')).toBeTruthy()
     })
 
     it('displays verified badge for verified merchants', () => {
-      const { getByTestId } = renderWithProviders(
-        <MerchantDetailScreen navigation={mockNavigation} route={mockRoute} />
-      )
+      const { getByTestId } = renderScreen()
       const verifiedBadge = getByTestId(/checkmark-circle/i) || getByTestId(/verified/i)
       expect(verifiedBadge).toBeTruthy()
     })
 
     it('displays back button', () => {
-      const { getByTestId } = renderWithProviders(
-        <MerchantDetailScreen navigation={mockNavigation} route={mockRoute} />
-      )
+      const { getByTestId } = renderScreen()
       const backButton = getByTestId(/arrow-back/i) || getByTestId(/back-button/i)
       expect(backButton).toBeTruthy()
     })
@@ -207,9 +218,7 @@ describe('MerchantDetailScreen', () => {
 
   describe('Navigation - Back Button', () => {
     it('navigates back when back button is pressed', async () => {
-      const { getByTestId } = renderWithProviders(
-        <MerchantDetailScreen navigation={mockNavigation} route={mockRoute} />
-      )
+      const { getByTestId } = renderScreen()
 
       const backButton = getByTestId(/arrow-back/i) || getByTestId(/back-button/i)
       fireEvent.press(backButton)
@@ -222,25 +231,19 @@ describe('MerchantDetailScreen', () => {
 
   describe('Tabs', () => {
     it('renders all three tabs', () => {
-      const { getByText } = renderWithProviders(
-        <MerchantDetailScreen navigation={mockNavigation} route={mockRoute} />
-      )
+      const { getByText } = renderScreen()
       expect(getByText('Produits')).toBeTruthy()
       expect(getByText('Infos')).toBeTruthy()
       expect(getByText('Avis')).toBeTruthy()
     })
 
     it('displays products tab by default', () => {
-      const { getByText } = renderWithProviders(
-        <MerchantDetailScreen navigation={mockNavigation} route={mockRoute} />
-      )
+      const { getByText } = renderScreen()
       expect(getByText('Pain complet')).toBeTruthy()
     })
 
     it('switches to info tab when clicked', async () => {
-      const { getByText } = renderWithProviders(
-        <MerchantDetailScreen navigation={mockNavigation} route={mockRoute} />
-      )
+      const { getByText } = renderScreen()
 
       const infoTab = getByText('Infos')
       fireEvent.press(infoTab)
@@ -251,9 +254,7 @@ describe('MerchantDetailScreen', () => {
     })
 
     it('switches to reviews tab when clicked', async () => {
-      const { getByText } = renderWithProviders(
-        <MerchantDetailScreen navigation={mockNavigation} route={mockRoute} />
-      )
+      const { getByText } = renderScreen()
 
       const reviewsTab = getByText('Avis')
       fireEvent.press(reviewsTab)
@@ -266,25 +267,19 @@ describe('MerchantDetailScreen', () => {
 
   describe('Products Tab', () => {
     it('displays merchant products', () => {
-      const { getByText } = renderWithProviders(
-        <MerchantDetailScreen navigation={mockNavigation} route={mockRoute} />
-      )
+      const { getByText } = renderScreen()
       expect(getByText('Pain complet')).toBeTruthy()
       expect(getByText('Croissants')).toBeTruthy()
     })
 
     it('displays product prices', () => {
-      const { getByText } = renderWithProviders(
-        <MerchantDetailScreen navigation={mockNavigation} route={mockRoute} />
-      )
+      const { getByText } = renderScreen()
       expect(getByText('250 F CFA')).toBeTruthy()
       expect(getByText('150 F CFA')).toBeTruthy()
     })
 
     it('navigates to ProductDetails when product is clicked', async () => {
-      const { getByText } = renderWithProviders(
-        <MerchantDetailScreen navigation={mockNavigation} route={mockRoute} />
-      )
+      const { getByText } = renderScreen()
 
       const productCard = getByText('Pain complet')
       fireEvent.press(productCard)
@@ -295,20 +290,16 @@ describe('MerchantDetailScreen', () => {
     })
 
     it('shows empty state when merchant has no products', () => {
-      const store = createTestStore({ products: [] })
-      const { getByText } = renderWithProviders(
-        <MerchantDetailScreen navigation={mockNavigation} route={mockRoute} />,
-        store
-      )
+      const { getByText } = renderScreen({
+        products: { products: [] },
+      })
       expect(getByText(/Aucun produit/i)).toBeTruthy()
     })
   })
 
   describe('Info Tab', () => {
     it('displays merchant address', async () => {
-      const { getByText } = renderWithProviders(
-        <MerchantDetailScreen navigation={mockNavigation} route={mockRoute} />
-      )
+      const { getByText } = renderScreen()
 
       fireEvent.press(getByText('Infos'))
 
@@ -318,9 +309,7 @@ describe('MerchantDetailScreen', () => {
     })
 
     it('displays merchant phone number', async () => {
-      const { getByText } = renderWithProviders(
-        <MerchantDetailScreen navigation={mockNavigation} route={mockRoute} />
-      )
+      const { getByText } = renderScreen()
 
       fireEvent.press(getByText('Infos'))
 
@@ -330,9 +319,7 @@ describe('MerchantDetailScreen', () => {
     })
 
     it('displays merchant city', async () => {
-      const { getByText } = renderWithProviders(
-        <MerchantDetailScreen navigation={mockNavigation} route={mockRoute} />
-      )
+      const { getByText } = renderScreen()
 
       fireEvent.press(getByText('Infos'))
 
@@ -342,9 +329,7 @@ describe('MerchantDetailScreen', () => {
     })
 
     it('displays call button', async () => {
-      const { getByText, getByTestId } = renderWithProviders(
-        <MerchantDetailScreen navigation={mockNavigation} route={mockRoute} />
-      )
+      const { getByText, getByTestId } = renderScreen()
 
       fireEvent.press(getByText('Infos'))
 
@@ -357,9 +342,7 @@ describe('MerchantDetailScreen', () => {
 
   describe('Reviews Tab', () => {
     it('displays merchant reviews', async () => {
-      const { getByText } = renderWithProviders(
-        <MerchantDetailScreen navigation={mockNavigation} route={mockRoute} />
-      )
+      const { getByText } = renderScreen()
 
       fireEvent.press(getByText('Avis'))
 
@@ -370,9 +353,7 @@ describe('MerchantDetailScreen', () => {
     })
 
     it('displays review ratings', async () => {
-      const { getByText } = renderWithProviders(
-        <MerchantDetailScreen navigation={mockNavigation} route={mockRoute} />
-      )
+      const { getByText } = renderScreen()
 
       fireEvent.press(getByText('Avis'))
 
@@ -383,9 +364,7 @@ describe('MerchantDetailScreen', () => {
     })
 
     it('displays reviewer names', async () => {
-      const { getByText } = renderWithProviders(
-        <MerchantDetailScreen navigation={mockNavigation} route={mockRoute} />
-      )
+      const { getByText } = renderScreen()
 
       fireEvent.press(getByText('Avis'))
 
@@ -396,9 +375,7 @@ describe('MerchantDetailScreen', () => {
     })
 
     it('displays average rating', async () => {
-      const { getByText } = renderWithProviders(
-        <MerchantDetailScreen navigation={mockNavigation} route={mockRoute} />
-      )
+      const { getByText } = renderScreen()
 
       fireEvent.press(getByText('Avis'))
 
@@ -408,11 +385,9 @@ describe('MerchantDetailScreen', () => {
     })
 
     it('shows empty state when no reviews', async () => {
-      const store = createTestStore({ reviews: [] })
-      const { getByText } = renderWithProviders(
-        <MerchantDetailScreen navigation={mockNavigation} route={mockRoute} />,
-        store
-      )
+      const { getByText } = renderScreen({
+        reviews: { reviews: [] },
+      })
 
       fireEvent.press(getByText('Avis'))
 
@@ -424,9 +399,7 @@ describe('MerchantDetailScreen', () => {
 
   describe('Pull to Refresh', () => {
     it('allows refresh on products tab', async () => {
-      const { getByTestId } = renderWithProviders(
-        <MerchantDetailScreen navigation={mockNavigation} route={mockRoute} />
-      )
+      const { getByTestId } = renderScreen()
 
       const scrollView = getByTestId(/scrollview/i) || getByTestId(/flatlist/i)
       expect(scrollView).toBeTruthy()
@@ -435,13 +408,10 @@ describe('MerchantDetailScreen', () => {
 
   describe('Loading State', () => {
     it('displays loading indicator when loading merchant data', () => {
-      const store = createTestStore({ currentMerchant: null })
+      const { getByTestId, store } = renderScreen({
+        merchants: { currentMerchant: null },
+      })
       store.dispatch = jest.fn()
-
-      const { getByTestId } = renderWithProviders(
-        <MerchantDetailScreen navigation={mockNavigation} route={mockRoute} />,
-        store
-      )
 
       // Should show loading state
       const loading = getByTestId(/loading/i) || getByTestId(/activityindicator/i)
@@ -451,18 +421,14 @@ describe('MerchantDetailScreen', () => {
 
   describe('Product Count Badge', () => {
     it('displays product count in header', () => {
-      const { getByText } = renderWithProviders(
-        <MerchantDetailScreen navigation={mockNavigation} route={mockRoute} />
-      )
+      const { getByText } = renderScreen()
       expect(getByText(/8 produits/i) || getByText('8')).toBeTruthy()
     })
   })
 
   describe('Contact Options', () => {
     it('displays phone icon for contact', async () => {
-      const { getByText, getByTestId } = renderWithProviders(
-        <MerchantDetailScreen navigation={mockNavigation} route={mockRoute} />
-      )
+      const { getByText, getByTestId } = renderScreen()
 
       fireEvent.press(getByText('Infos'))
 
@@ -473,9 +439,7 @@ describe('MerchantDetailScreen', () => {
     })
 
     it('displays location icon for address', async () => {
-      const { getByText, getByTestId } = renderWithProviders(
-        <MerchantDetailScreen navigation={mockNavigation} route={mockRoute} />
-      )
+      const { getByText, getByTestId } = renderScreen()
 
       fireEvent.press(getByText('Infos'))
 
