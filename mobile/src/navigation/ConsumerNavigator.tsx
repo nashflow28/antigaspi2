@@ -11,8 +11,13 @@ import ProductsScreen from '../screens/main/ProductsScreen'
 import FavoritesScreen from '../screens/main/FavoritesScreen'
 import ReservationsScreen from '../screens/main/ReservationsScreen'
 import ProfileScreen from '../screens/main/ProfileScreen'
+import ProfileEditScreen from '../screens/main/ProfileEditScreen'
 import ProductDetailsScreen from '../screens/main/ProductDetailsScreen'
+import ReservationDetailsScreen from '../screens/main/ReservationDetailsScreen'
 import MerchantDetailScreen from '../screens/main/MerchantDetailScreen'
+import ReviewsListScreen from '../screens/main/ReviewsListScreen'
+import AddReviewScreen from '../screens/main/AddReviewScreen'
+import NotificationSettingsScreen from '../screens/merchant/NotificationSettingsScreen'
 
 const Tab = createBottomTabNavigator()
 const Stack = createNativeStackNavigator()
@@ -22,7 +27,10 @@ const HomeStack = () => (
   <Stack.Navigator screenOptions={{ headerShown: false }}>
     <Stack.Screen name="HomeMain" component={HomeScreen} />
     <Stack.Screen name="ProductDetails" component={ProductDetailsScreen} />
+    <Stack.Screen name="ReservationDetails" component={ReservationDetailsScreen} />
     <Stack.Screen name="MerchantDetail" component={MerchantDetailScreen} />
+    <Stack.Screen name="ReviewsList" component={ReviewsListScreen} />
+    <Stack.Screen name="AddReview" component={AddReviewScreen} />
   </Stack.Navigator>
 )
 
@@ -31,16 +39,46 @@ const ProductsStack = () => (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
       <Stack.Screen name="ProductsMain" component={ProductsScreen} />
       <Stack.Screen name="ProductDetails" component={ProductDetailsScreen} />
+      <Stack.Screen name="ReservationDetails" component={ReservationDetailsScreen} />
       <Stack.Screen name="MerchantDetail" component={MerchantDetailScreen} />
+      <Stack.Screen name="ReviewsList" component={ReviewsListScreen} />
+      <Stack.Screen name="AddReview" component={AddReviewScreen} />
     </Stack.Navigator>
   </ErrorBoundary>
+)
+
+const FavoritesStack = () => (
+  <Stack.Navigator screenOptions={{ headerShown: false }}>
+    <Stack.Screen name="FavoritesMain" component={FavoritesScreen} />
+    <Stack.Screen name="ProductDetails" component={ProductDetailsScreen} />
+    <Stack.Screen name="ReservationDetails" component={ReservationDetailsScreen} />
+    <Stack.Screen name="MerchantDetail" component={MerchantDetailScreen} />
+    <Stack.Screen name="ReviewsList" component={ReviewsListScreen} />
+    <Stack.Screen name="AddReview" component={AddReviewScreen} />
+  </Stack.Navigator>
 )
 
 const OrdersStack = () => (
   <Stack.Navigator screenOptions={{ headerShown: false }}>
     <Stack.Screen name="OrdersMain" component={ReservationsScreen} />
+    <Stack.Screen name="ReservationDetails" component={ReservationDetailsScreen} />
     <Stack.Screen name="ProductDetails" component={ProductDetailsScreen} />
     <Stack.Screen name="MerchantDetail" component={MerchantDetailScreen} />
+    <Stack.Screen name="ReviewsList" component={ReviewsListScreen} />
+    <Stack.Screen name="AddReview" component={AddReviewScreen} />
+  </Stack.Navigator>
+)
+
+const AccountStack = () => (
+  <Stack.Navigator screenOptions={{ headerShown: false }}>
+    <Stack.Screen name="AccountMain" component={ProfileScreen} />
+    <Stack.Screen name="ProfileEdit" component={ProfileEditScreen} />
+    <Stack.Screen name="Notifications" component={NotificationSettingsScreen} />
+    <Stack.Screen name="ProductDetails" component={ProductDetailsScreen} />
+    <Stack.Screen name="ReservationDetails" component={ReservationDetailsScreen} />
+    <Stack.Screen name="MerchantDetail" component={MerchantDetailScreen} />
+    <Stack.Screen name="ReviewsList" component={ReviewsListScreen} />
+    <Stack.Screen name="AddReview" component={AddReviewScreen} />
   </Stack.Navigator>
 )
 
@@ -49,6 +87,7 @@ const ConsumerNavigator: React.FC = () => {
 
   return (
     <Tab.Navigator
+      initialRouteName="Home"
       screenOptions={({ route }) => ({
         tabBarIcon: ({ focused, color, size }) => {
           let iconName: keyof typeof Ionicons.glyphMap
@@ -77,6 +116,7 @@ const ConsumerNavigator: React.FC = () => {
           height: 60,
           backgroundColor: theme.colors.surface.light,
           borderTopColor: theme.colors.border,
+          pointerEvents: 'auto',
         },
       })}
     >
@@ -92,7 +132,7 @@ const ConsumerNavigator: React.FC = () => {
       />
       <Tab.Screen
         name="Favorites"
-        component={FavoritesScreen}
+        component={FavoritesStack}
         options={{ title: 'Favoris' }}
       />
       <Tab.Screen
@@ -102,7 +142,7 @@ const ConsumerNavigator: React.FC = () => {
       />
       <Tab.Screen
         name="Account"
-        component={ProfileScreen}
+        component={AccountStack}
         options={{ title: 'Compte' }}
       />
     </Tab.Navigator>

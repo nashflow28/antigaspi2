@@ -5,6 +5,7 @@ import {
   TouchableOpacity,
   Alert,
   Switch,
+  Platform,
 } from 'react-native'
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigation } from '@react-navigation/native'
@@ -14,6 +15,7 @@ import { Ionicons } from '@expo/vector-icons'
 import { Card, Badge, Typography } from '../../components/2025'
 import { useTheme } from '../../theme'
 import AsyncStorage from '@react-native-async-storage/async-storage'
+import { TEST_IDS } from '../../utils/testIds'
 
 const ProfileScreen: React.FC = () => {
   const theme = useTheme()
@@ -24,23 +26,34 @@ const ProfileScreen: React.FC = () => {
 
   const handleLogout = () => {
     console.log('🔴 handleLogout clicked!')
-    Alert.alert(
-      'Déconnexion',
-      'Êtes-vous sûr de vouloir vous déconnecter ?',
-      [
-        {
-          text: 'Annuler',
-          style: 'cancel',
-          onPress: () => console.log('🟢 Déconnexion annulée')
-        },
-        {
-          text: 'Déconnexion',
-          style: 'destructive',
-          onPress: confirmLogout
-        }
-      ],
-      { cancelable: true }
-    )
+    // Sur le web, Alert peut ne pas afficher correctement les boutons => bypass
+    if (Platform.OS === 'web') {
+      confirmLogout()
+      return
+    }
+
+    try {
+      Alert.alert(
+        'Déconnexion',
+        'Êtes-vous sûr de vouloir vous déconnecter ?',
+        [
+          {
+            text: 'Annuler',
+            style: 'cancel',
+            onPress: () => console.log('🟢 Déconnexion annulée')
+          },
+          {
+            text: 'Déconnexion',
+            style: 'destructive',
+            onPress: confirmLogout
+          }
+        ],
+        { cancelable: true }
+      )
+    } catch (_) {
+      // Fallback ultime si Alert échoue
+      confirmLogout()
+    }
   }
 
   const confirmLogout = async () => {
@@ -57,15 +70,15 @@ const ProfileScreen: React.FC = () => {
   }
 
   return (
-    <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
+    <View style={[styles.container, { backgroundColor: theme.colors.background }]} testID={TEST_IDS.profileScreen}>
       <Card variant="elevated" style={{ alignItems: 'center', paddingVertical: theme.spacing['2xl'], paddingTop: theme.spacing['3xl'], marginBottom: theme.spacing.lg }}>
         <View style={[styles.avatar, { backgroundColor: theme.colors.neutral[100], marginBottom: theme.spacing.md }]}>
           <Ionicons name="person" size={40} color={theme.colors.primary[500]} />
         </View>
-        <Typography variant="h2" weight="bold" style={{ marginBottom: theme.spacing.xs }}>
+        <Typography variant="h2" weight="bold" style={{ marginBottom: theme.spacing.xs }} testID={TEST_IDS.profileName}>
           {user?.first_name} {user?.last_name}
         </Typography>
-        <Typography variant="body" color="secondary" style={{ marginBottom: theme.spacing.sm }}>
+        <Typography variant="body" color="secondary" style={{ marginBottom: theme.spacing.sm }} testID={TEST_IDS.profileEmail}>
           {user?.email}
         </Typography>
         <Badge variant={user?.role === 'consumer' ? 'primary' : 'promo'} size="md">
@@ -76,13 +89,9 @@ const ProfileScreen: React.FC = () => {
       <Card variant="elevated" style={{ marginHorizontal: theme.spacing.lg, overflow: 'hidden' }}>
         <TouchableOpacity
           style={[styles.menuItem, { paddingHorizontal: theme.spacing.lg, paddingVertical: theme.spacing.md, borderBottomWidth: 1, borderBottomColor: theme.colors.border }]}
-          onPress={() => {
-            if (user?.role === 'merchant') {
-              (navigation as any).navigate('ProfileEdit')
-            } else {
-              Alert.alert('Bientôt disponible', 'La modification du profil sera bientôt disponible.')
-            }
-          }}
+          onPress={() => (navigation as any).navigate('ProfileEdit')}
+          testID={TEST_IDS.editProfileButton}
+          accessibilityLabel="Modifier le profil"
         >
           <Ionicons name="person-outline" size={24} color={theme.colors.text} />
           <Typography variant="body" style={{ flex: 1, marginLeft: theme.spacing.md }}>
@@ -114,13 +123,7 @@ const ProfileScreen: React.FC = () => {
               borderBottomColor: theme.colors.border,
             },
           ]}
-          onPress={() => {
-            if (user?.role === 'merchant') {
-              (navigation as any).navigate('Notifications')
-            } else {
-              Alert.alert('Bientôt disponible', 'Les notifications seront bientôt disponibles.')
-            }
-          }}
+          onPress={() => (navigation as any).navigate('Notifications')}
         >
           <Ionicons name="notifications-outline" size={24} color={theme.colors.text} />
           <Typography variant="body" style={{ flex: 1, marginLeft: theme.spacing.md }}>
@@ -216,6 +219,8 @@ const ProfileScreen: React.FC = () => {
         ]}
         onPress={handleLogout}
         activeOpacity={0.7}
+        testID={TEST_IDS.logoutButton}
+        accessibilityLabel="Se déconnecter"
       >
         <Ionicons name="log-out-outline" size={24} color={theme.colors.semantic.error} />
         <Typography variant="body" style={{ flex: 1, marginLeft: theme.spacing.md, color: theme.colors.semantic.error, fontWeight: '600' }}>
