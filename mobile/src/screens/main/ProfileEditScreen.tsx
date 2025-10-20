@@ -29,13 +29,25 @@ interface ProfileFormData {
   city: string
 }
 
+const MAX_PHOTO_SIZE_BYTES = 5 * 1024 * 1024
+const PHONE_REGEX = /^\+228 \d{2} \d{2} \d{2} \d{2}$/
+
 /**
  * ProfileEditScreen - Consumer profile editing screen
  * Allows consumers to update their personal information and photo
  */
-const ProfileEditScreen: React.FC = () => {
+interface ProfileEditScreenProps {
+  navigation?: {
+    goBack: () => void
+    navigate?: (...args: any[]) => void
+    setOptions?: (...args: any[]) => void
+  }
+}
+
+const ProfileEditScreen: React.FC<ProfileEditScreenProps> = ({ navigation: navigationOverride }) => {
   const theme = useTheme()
-  const navigation = useNavigation()
+  const defaultNavigation = useNavigation<any>()
+  const navigation = navigationOverride ?? defaultNavigation
   const dispatch = useDispatch<AppDispatch>()
   const { user } = useSelector((state: RootState) => state.auth)
 
@@ -98,8 +110,15 @@ const ProfileEditScreen: React.FC = () => {
       })
 
       if (!result.canceled && result.assets[0]) {
-        setPhotoUri(result.assets[0].uri)
-        await uploadPhoto(result.assets[0].uri)
+        const asset = result.assets[0]
+
+        if (asset.fileSize && asset.fileSize > MAX_PHOTO_SIZE_BYTES) {
+          Alert.alert('Photo trop lourde', 'La photo ne doit pas dépasser 5 MB')
+          return
+        }
+
+        setPhotoUri(asset.uri)
+        await uploadPhoto(asset)
       }
     } catch (error) {
       console.error('Erreur sélection image:', error)
@@ -107,20 +126,19 @@ const ProfileEditScreen: React.FC = () => {
     }
   }
 
-  const uploadPhoto = async (uri: string) => {
+  const uploadPhoto = async (asset: ImagePicker.ImagePickerAsset) => {
     try {
       setUploading(true)
 
       // Create FormData
       const formData = new FormData()
-      const filename = uri.split('/').pop() || 'photo.jpg'
-      const match = /\.(\w+)$/.exec(filename)
-      const type = match ? `image/${match[1]}` : 'image/jpeg'
+      const filename = asset.fileName || asset.uri.split('/').pop() || 'photo.jpg'
+      const mimeType = asset.mimeType || asset.type || 'image/jpeg'
 
       formData.append('photo', {
-        uri,
+        uri: asset.uri,
         name: filename,
-        type,
+        type: mimeType,
       } as any)
 
       const response = await apiService.post('/consumers/profile/photo', formData, {
@@ -130,6 +148,9 @@ const ProfileEditScreen: React.FC = () => {
       })
 
       if (response.data.success) {
+        if (response.data.data?.photo_url) {
+          setPhotoUri(response.data.data.photo_url)
+        }
         Alert.alert('Succès', 'Photo mise à jour avec succès')
       }
     } catch (error: any) {
@@ -144,28 +165,52 @@ const ProfileEditScreen: React.FC = () => {
   }
 
   const handleSave = async () => {
+    const sanitizedData: ProfileFormData = {
+      first_name: formData.first_name.trim(),
+      last_name: formData.last_name.trim(),
+      email: formData.email.trim(),
+      phone: formData.phone.trim(),
+      address: formData.address.trim(),
+      city: formData.city.trim(),
+    }
+
+    setFormData(sanitizedData)
+
+    if (!sanitizedData.first_name || !sanitizedData.last_name) {
+      Alert.alert('Erreur', 'Le prénom et le nom sont requis')
+      return
+    }
+
+    if (sanitizedData.first_name.length < 2) {
+      Alert.alert('Erreur', 'Le prénom doit contenir au moins 2 caractères')
+      return
+    }
+
+    if (sanitizedData.last_name.length < 2) {
+      Alert.alert('Erreur', 'Le nom doit contenir au moins 2 caractères')
+      return
+    }
+
+    if (!sanitizedData.email) {
+      Alert.alert('Erreur', "L'email est requis")
+      return
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    if (!emailRegex.test(sanitizedData.email)) {
+      Alert.alert('Erreur', 'Adresse email invalide')
+      return
+    }
+
+    if (sanitizedData.phone && !PHONE_REGEX.test(sanitizedData.phone)) {
+      Alert.alert('Erreur', 'Format de téléphone invalide (+228 12 34 56 78)')
+      return
+    }
+
     try {
       setLoading(true)
 
-      // Validation
-      if (!formData.first_name.trim() || !formData.last_name.trim()) {
-        Alert.alert('Erreur', 'Le prénom et le nom sont requis')
-        return
-      }
-
-      if (!formData.email.trim()) {
-        Alert.alert('Erreur', "L'email est requis")
-        return
-      }
-
-      // Email validation
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-      if (!emailRegex.test(formData.email)) {
-        Alert.alert('Erreur', 'Adresse email invalide')
-        return
-      }
-
-      const response = await apiService.put('/consumers/profile', formData)
+      const response = await apiService.put('/consumers/profile', sanitizedData)
 
       if (response.data.success) {
         Alert.alert('Succès', 'Profil mis à jour avec succès', [

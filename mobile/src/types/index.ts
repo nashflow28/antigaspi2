@@ -9,6 +9,7 @@ export interface User {
   city: string
   phone?: string
   address?: string
+  photo_url?: string | null
   created_at: string
   updated_at: string
   prefers_email_notifications?: boolean

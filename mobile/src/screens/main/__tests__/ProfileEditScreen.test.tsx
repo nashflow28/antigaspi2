@@ -9,6 +9,7 @@ import ProfileEditScreen from '../ProfileEditScreen'
 import authSlice from '../../../store/slices/authSlice'
 import * as ImagePicker from 'expo-image-picker'
 import apiService from '../../../services/api'
+import { Alert } from 'react-native'
 
 // Mock ImagePicker
 jest.mock('expo-image-picker', () => ({
@@ -85,8 +86,22 @@ const renderWithProviders = (component: React.ReactElement, store = createTestSt
 }
 
 describe('ProfileEditScreen', () => {
+  let alertSpy: jest.SpyInstance
+
   beforeEach(() => {
     jest.clearAllMocks()
+    mockGoBack.mockReset()
+    mockNavigate.mockReset()
+    alertSpy = jest.spyOn(Alert, 'alert').mockImplementation((title, message, buttons) => {
+      if (buttons && buttons[0]?.onPress) {
+        buttons[0].onPress()
+      }
+      return 0
+    })
+  })
+
+  afterEach(() => {
+    alertSpy.mockRestore()
   })
 
   describe('Rendering', () => {
@@ -242,6 +257,10 @@ describe('ProfileEditScreen', () => {
       // Alert should be shown (mocked in jest)
       await waitFor(() => {
         expect(apiService.put).not.toHaveBeenCalled()
+        expect(alertSpy).toHaveBeenCalled()
+        const [title, message] = alertSpy.mock.calls[0]
+        expect(title).toBe('Erreur')
+        expect(message).toBe('Le prénom et le nom sont requis')
       })
     })
 
@@ -258,6 +277,50 @@ describe('ProfileEditScreen', () => {
 
       await waitFor(() => {
         expect(apiService.put).not.toHaveBeenCalled()
+        expect(alertSpy).toHaveBeenCalled()
+        const lastCall = alertSpy.mock.calls[alertSpy.mock.calls.length - 1] as [string, string]
+        const [, message] = lastCall
+        expect(message).toBe('Le prénom et le nom sont requis')
+      })
+    })
+
+    it('shows error when first name is too short', async () => {
+      const { getByDisplayValue, getByText } = renderWithProviders(
+        <ProfileEditScreen navigation={mockNavigation} />
+      )
+
+      const firstNameInput = getByDisplayValue('Jean')
+      fireEvent.changeText(firstNameInput, 'J')
+
+      const saveButton = getByText('Enregistrer les modifications')
+      fireEvent.press(saveButton)
+
+      await waitFor(() => {
+        expect(apiService.put).not.toHaveBeenCalled()
+        expect(alertSpy).toHaveBeenCalled()
+        const lastCall = alertSpy.mock.calls[alertSpy.mock.calls.length - 1] as [string, string]
+        const [, message] = lastCall
+        expect(message).toBe('Le prénom doit contenir au moins 2 caractères')
+      })
+    })
+
+    it('shows error when last name is too short', async () => {
+      const { getByDisplayValue, getByText } = renderWithProviders(
+        <ProfileEditScreen navigation={mockNavigation} />
+      )
+
+      const lastNameInput = getByDisplayValue('Dupont')
+      fireEvent.changeText(lastNameInput, 'D')
+
+      const saveButton = getByText('Enregistrer les modifications')
+      fireEvent.press(saveButton)
+
+      await waitFor(() => {
+        expect(apiService.put).not.toHaveBeenCalled()
+        expect(alertSpy).toHaveBeenCalled()
+        const lastCall = alertSpy.mock.calls[alertSpy.mock.calls.length - 1] as [string, string]
+        const [, message] = lastCall
+        expect(message).toBe('Le nom doit contenir au moins 2 caractères')
       })
     })
 
@@ -274,6 +337,10 @@ describe('ProfileEditScreen', () => {
 
       await waitFor(() => {
         expect(apiService.put).not.toHaveBeenCalled()
+        expect(alertSpy).toHaveBeenCalled()
+        const lastCall = alertSpy.mock.calls[alertSpy.mock.calls.length - 1] as [string, string]
+        const [, message] = lastCall
+        expect(message).toBe("L'email est requis")
       })
     })
 
@@ -290,6 +357,30 @@ describe('ProfileEditScreen', () => {
 
       await waitFor(() => {
         expect(apiService.put).not.toHaveBeenCalled()
+        expect(alertSpy).toHaveBeenCalled()
+        const lastCall = alertSpy.mock.calls[alertSpy.mock.calls.length - 1] as [string, string]
+        const [, message] = lastCall
+        expect(message).toBe('Adresse email invalide')
+      })
+    })
+
+    it('shows error when phone format is invalid', async () => {
+      const { getByDisplayValue, getByText } = renderWithProviders(
+        <ProfileEditScreen navigation={mockNavigation} />
+      )
+
+      const phoneInput = getByDisplayValue('+228 90 12 34 56')
+      fireEvent.changeText(phoneInput, '90000000')
+
+      const saveButton = getByText('Enregistrer les modifications')
+      fireEvent.press(saveButton)
+
+      await waitFor(() => {
+        expect(apiService.put).not.toHaveBeenCalled()
+        expect(alertSpy).toHaveBeenCalled()
+        const lastCall = alertSpy.mock.calls[alertSpy.mock.calls.length - 1] as [string, string]
+        const [, message] = lastCall
+        expect(message).toBe('Format de téléphone invalide (+228 12 34 56 78)')
       })
     })
   })
@@ -399,6 +490,30 @@ describe('ProfileEditScreen', () => {
 
       await waitFor(() => {
         expect(ImagePicker.requestMediaLibraryPermissionsAsync).toHaveBeenCalled()
+      })
+    })
+
+    it('prevents upload when selected photo exceeds 5 MB', async () => {
+      ;(ImagePicker.requestMediaLibraryPermissionsAsync as jest.Mock).mockResolvedValue({
+        status: 'granted',
+      })
+      ;(ImagePicker.launchImageLibraryAsync as jest.Mock).mockResolvedValue({
+        canceled: false,
+        assets: [{ uri: 'file://large-photo.jpg', fileSize: 6 * 1024 * 1024 }],
+      })
+
+      const { getByText } = renderWithProviders(
+        <ProfileEditScreen navigation={mockNavigation} />
+      )
+
+      const changePhotoButton = getByText('Changer la photo')
+      fireEvent.press(changePhotoButton)
+
+      await waitFor(() => {
+        expect(apiService.post).not.toHaveBeenCalled()
+        expect(alertSpy).toHaveBeenCalled()
+        const lastCall = alertSpy.mock.calls[alertSpy.mock.calls.length - 1] as [string, string]
+        expect(lastCall[0]).toBe('Photo trop lourde')
       })
     })
 

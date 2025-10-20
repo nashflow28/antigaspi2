@@ -14,6 +14,7 @@ use App\Http\Controllers\Api\ReviewController;
 use App\Http\Controllers\Api\SurpriseBasketController;
 use App\Http\Controllers\Api\NotificationController;
 use App\Http\Controllers\Api\FavoriteController;
+use App\Http\Controllers\Api\ConsumerController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\WalletController;
 
@@ -184,6 +185,12 @@ Route::prefix('notifications')->middleware('jwt.auth')->group(function () {
     Route::post('/subscriptions', [NotificationController::class, 'subscribe']);
     Route::delete('/subscriptions', [NotificationController::class, 'unsubscribe']);
     Route::patch('/preferences', [NotificationController::class, 'updatePreferences']);
+});
+
+// Routes du profil consommateur
+Route::prefix('consumers')->middleware('jwt.auth')->group(function () {
+    Route::put('/profile', [ConsumerController::class, 'updateProfile'])->middleware('throttle:write');
+    Route::post('/profile/photo', [ConsumerController::class, 'uploadPhoto'])->middleware('throttle:10,1');
 });
 
 // Routes des catégories
