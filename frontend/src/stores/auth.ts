@@ -35,18 +35,39 @@ export const useAuthStore = defineStore('auth', () => {
 
   // clearError removed - using useNotifications composable
 
+  const persistUser = (userData: User | null) => {
+    if (userData) {
+      localStorage.setItem('user', JSON.stringify(userData))
+    } else {
+      localStorage.removeItem('user')
+    }
+  }
+
+  const setUser = (userData: User | null) => {
+    user.value = userData
+    persistUser(userData)
+  }
+
+  const updateStoredUser = (updates: Partial<User>) => {
+    if (!user.value) {
+      return null
+    }
+
+    const updatedUser = { ...user.value, ...updates }
+    setUser(updatedUser)
+    return updatedUser
+  }
+
   const setAuth = (authToken: string, userData: User) => {
     token.value = authToken
-    user.value = userData
+    setUser(userData)
     localStorage.setItem('auth_token', authToken)
-    localStorage.setItem('user', JSON.stringify(userData))
   }
 
   const clearAuth = () => {
     token.value = null
-    user.value = null
+    setUser(null)
     localStorage.removeItem('auth_token')
-    localStorage.removeItem('user')
   }
 
   const login = async (credentials: LoginCredentials) => {
@@ -120,7 +141,7 @@ export const useAuthStore = defineStore('auth', () => {
     try {
       loading.value = true
       const response = await apiService.getCurrentUser()
-      user.value = response.data
+      setUser(response.data)
     } catch (err: any) {
       console.error('Failed to get current user:', err.message)
       notify.error('Session expir\u00e9e, veuillez vous reconnecter', 'Authentification')
@@ -153,6 +174,8 @@ export const useAuthStore = defineStore('auth', () => {
     register,
     logout,
     getCurrentUser,
-    initAuth
+    initAuth,
+    setUser,
+    updateStoredUser
   }
 })

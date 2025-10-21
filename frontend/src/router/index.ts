@@ -155,6 +155,12 @@ const router = createRouter({
       meta: { requiresAuth: true }
     },
     {
+      path: '/notifications',
+      name: 'notifications',
+      component: () => import('@/views/NotificationsCenterView.vue'),
+      meta: { requiresAuth: true }
+    },
+    {
       path: '/reservations',
       name: 'reservations',
       component: () => import('@/views/ReservationsView.vue'),

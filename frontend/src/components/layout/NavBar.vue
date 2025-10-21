@@ -328,10 +328,11 @@ import {
   Star,
   Gift,
   Wallet,
-  MapPin
+  MapPin,
+  Bell
 } from 'lucide-vue-next'
 import { useAuthStore } from '@/stores/auth'
-import { LogIn, UserPlus, User, Settings, LogOut, ChevronDown, Package, ShoppingBag, MessageSquare, Star, Gift, Wallet } from 'lucide-vue-next'
+import { LogIn, UserPlus, User, Settings, LogOut, ChevronDown, Package, ShoppingBag, MessageSquare, Star, Gift, Wallet, Bell } from 'lucide-vue-next'
 import MobileNav from '@/components/layout/MobileNav.vue'
 import { useAccessibility } from '@/composables/useAccessibility'
 import { Button, Badge, Card, ThemeToggle } from '@/components/ui/2025'
@@ -431,6 +432,11 @@ const userMenuLinks = computed<UserMenuLink[]>(() => {
       to: '/profile',
       label: 'Mon profil',
       icon: Settings
+    },
+    {
+      to: '/notifications',
+      label: 'Notifications',
+      icon: Bell
     }
   ]
 

@@ -186,7 +186,17 @@ class ApiService {
       }
 
       const message = (data as ApiResponse<unknown>)?.message || `HTTP error! status: ${response.status}`
-      throw new Error(message)
+      const error = new Error(message)
+      ;(error as any).status = response.status
+
+      if (data && typeof data === 'object') {
+        ;(error as any).response = {
+          status: response.status,
+          data
+        }
+      }
+
+      throw error
     }
 
     return data
