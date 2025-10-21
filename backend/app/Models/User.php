@@ -30,6 +30,7 @@ class User extends Authenticatable implements JWTSubject
         'prefers_email_notifications',
         'prefers_sms_notifications',
         'prefers_push_notifications',
+        'notification_settings',
     ];
 
     protected $hidden = [
@@ -47,6 +48,7 @@ class User extends Authenticatable implements JWTSubject
             'prefers_email_notifications' => 'boolean',
             'prefers_sms_notifications' => 'boolean',
             'prefers_push_notifications' => 'boolean',
+            'notification_settings' => 'array',
         ];
     }
 

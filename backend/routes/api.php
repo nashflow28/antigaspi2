@@ -202,6 +202,8 @@ Route::prefix('notifications')->middleware('jwt.auth')->group(function () {
     Route::post('/subscriptions', [NotificationController::class, 'subscribe']);
     Route::delete('/subscriptions', [NotificationController::class, 'unsubscribe']);
     Route::patch('/preferences', [NotificationController::class, 'updatePreferences']);
+    Route::get('/settings', [NotificationController::class, 'getLegacyPreferences']);
+    Route::patch('/settings', [NotificationController::class, 'updateLegacyPreferences']);
 });
 
 // Routes du profil consommateur

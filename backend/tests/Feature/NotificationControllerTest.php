@@ -117,4 +117,64 @@ class NotificationControllerTest extends TestCase
         $this->assertTrue($user->prefers_sms_notifications);
         $this->assertTrue($user->prefers_push_notifications);
     }
+
+    public function test_user_can_fetch_legacy_notification_settings(): void
+    {
+        $user = User::factory()->create([
+            'notification_settings' => [
+                'enabled' => false,
+                'new_products' => true,
+                'reservations' => false,
+                'promotions' => true,
+                'expiring_products' => false,
+                'quiet_hours_enabled' => true,
+                'quiet_hours_start' => '21:30',
+                'quiet_hours_end' => '07:15',
+            ],
+        ]);
+
+        $response = $this->actingAsUser($user)->getJson('/api/notifications/settings');
+
+        $response->assertOk()
+            ->assertJsonPath('data.enabled', false)
+            ->assertJsonPath('data.reservations', false)
+            ->assertJsonPath('data.quiet_hours_enabled', true)
+            ->assertJsonPath('data.quiet_hours_start', '21:30')
+            ->assertJsonPath('data.quiet_hours_end', '07:15');
+    }
+
+    public function test_user_can_update_legacy_notification_settings(): void
+    {
+        $user = User::factory()->create();
+
+        $response = $this->actingAsUser($user)->patchJson('/api/notifications/settings', [
+            'enabled' => false,
+            'new_products' => true,
+            'reservations' => false,
+            'promotions' => true,
+            'expiring_products' => true,
+            'quiet_hours_enabled' => true,
+            'quiet_hours_start' => '20:00',
+            'quiet_hours_end' => '06:30',
+        ]);
+
+        $response->assertOk()
+            ->assertJsonPath('data.enabled', false)
+            ->assertJsonPath('data.quiet_hours_enabled', true)
+            ->assertJsonPath('data.quiet_hours_start', '20:00')
+            ->assertJsonPath('data.quiet_hours_end', '06:30');
+
+        $user->refresh();
+
+        $this->assertEquals([
+            'enabled' => false,
+            'new_products' => true,
+            'reservations' => false,
+            'promotions' => true,
+            'expiring_products' => true,
+            'quiet_hours_enabled' => true,
+            'quiet_hours_start' => '20:00',
+            'quiet_hours_end' => '06:30',
+        ], $user->notification_settings);
+    }
 }
