@@ -253,6 +253,27 @@ class ReviewControllerTest extends TestCase
     }
 
     /** @test */
+    public function test_create_review_rejects_media_payload()
+    {
+        $token = JWTAuth::fromUser($this->consumer);
+
+        $response = $this->withHeader('Authorization', 'Bearer ' . $token)
+            ->postJson('/api/reviews', [
+                'merchant_id' => $this->merchantModel->id,
+                'rating' => 5,
+                'comment' => 'Test avec média',
+                'media' => ['image1.jpg'],
+            ]);
+
+        $response->assertStatus(422)
+            ->assertJson([
+                'success' => false,
+                'message' => "L'ajout de médias pour les avis n'est pas encore pris en charge.",
+            ])
+            ->assertJsonValidationErrors(['media']);
+    }
+
+    /** @test */
     public function test_create_review_validates_rating_range()
     {
         $token = JWTAuth::fromUser($this->consumer);

@@ -91,18 +91,40 @@ class ReviewController extends Controller
             $data = json_decode($request->getContent(), true) ?: [];
         }
 
-        $validator = Validator::make($data, [
+        $mediaFields = ['media', 'media_urls', 'photos', 'images', 'attachments'];
+
+        $rules = [
             'merchant_id' => 'required|exists:merchants,id',
             'product_id' => 'nullable|exists:products,id',
             'rating' => 'required|integer|between:1,5',
             'title' => 'nullable|string|max:255',
             'comment' => 'nullable|string|max:1000',
-        ]);
+        ];
+
+        foreach ($mediaFields as $field) {
+            $rules[$field] = 'prohibited';
+        }
+
+        $messages = [];
+        foreach ($mediaFields as $field) {
+            $messages[$field . '.prohibited'] = "L'ajout de médias pour les avis n'est pas encore pris en charge.";
+        }
+
+        $validator = Validator::make($data, $rules, $messages);
 
         if ($validator->fails()) {
+            $errorMessage = 'Données invalides';
+
+            foreach ($mediaFields as $field) {
+                if ($validator->errors()->has($field)) {
+                    $errorMessage = "L'ajout de médias pour les avis n'est pas encore pris en charge.";
+                    break;
+                }
+            }
+
             return response()->json([
                 'success' => false,
-                'message' => 'Données invalides',
+                'message' => $errorMessage,
                 'errors' => $validator->errors()
             ], 422);
         }
