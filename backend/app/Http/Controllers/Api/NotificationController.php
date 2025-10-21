@@ -3,11 +3,14 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\Notification;
+use App\Models\Notification as NotificationModel;
+use App\Models\User;
+use App\Notifications\AdminBroadcastNotification;
 use App\Services\PushSubscriptionService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Notification as NotificationFacade;
 use Illuminate\Validation\Rule;
 
 class NotificationController extends Controller
@@ -20,7 +23,7 @@ class NotificationController extends Controller
     {
         $user = $request->user();
 
-        $query = Notification::where('user_id', $user->id)
+        $query = NotificationModel::where('user_id', $user->id)
             ->orderByDesc('created_at');
 
         if ($request->boolean('unread')) {
@@ -41,7 +44,7 @@ class NotificationController extends Controller
         ]);
     }
 
-    public function markAsRead(Request $request, Notification $notification): JsonResponse
+    public function markAsRead(Request $request, NotificationModel $notification): JsonResponse
     {
         Gate::authorize('update', $notification);
 
@@ -60,7 +63,7 @@ class NotificationController extends Controller
     {
         $user = $request->user();
 
-        Notification::where('user_id', $user->id)
+        NotificationModel::where('user_id', $user->id)
             ->where('is_read', false)
             ->update([
                 'is_read' => true,
@@ -179,6 +182,67 @@ class NotificationController extends Controller
             'success' => true,
             'data' => $this->normalizeLegacyPreferences($data),
         ]);
+    }
+
+    public function broadcast(Request $request): JsonResponse
+    {
+        $user = $request->user();
+
+        if (!$user || !$user->isAdmin()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Accès réservé aux administrateurs',
+            ], 403);
+        }
+
+        $data = $request->validate([
+            'title' => ['required', 'string', 'max:120'],
+            'message' => ['required', 'string', 'max:1000'],
+            'channels' => ['nullable', 'array'],
+            'channels.*' => ['string', Rule::in(['database', 'mail', 'sms', 'push'])],
+            'roles' => ['nullable', 'array'],
+            'roles.*' => ['string', Rule::in(['consumer', 'merchant', 'admin'])],
+            'action_url' => ['nullable', 'url'],
+            'payload' => ['nullable', 'array'],
+        ]);
+
+        $channels = $data['channels'] ?? ['database', 'push'];
+        $channels[] = 'database';
+        $channels = array_values(array_unique($channels));
+
+        $roles = array_filter($data['roles'] ?? []);
+
+        $query = User::query()
+            ->where('is_active', true);
+
+        if (!empty($roles)) {
+            $query->whereIn('role', $roles);
+        }
+
+        $recipientCount = 0;
+
+        $query->chunkById(500, function ($users) use (&$recipientCount, $channels, $data) {
+            $recipientCount += $users->count();
+
+            NotificationFacade::send(
+                $users,
+                new AdminBroadcastNotification(
+                    $data['title'],
+                    $data['message'],
+                    $channels,
+                    $data['action_url'] ?? null,
+                    $data['payload'] ?? []
+                )
+            );
+        });
+
+        return response()->json([
+            'success' => true,
+            'data' => [
+                'recipient_count' => $recipientCount,
+                'channels' => $channels,
+            ],
+        ], 202);
     }
 
     private function normalizeLegacyPreferences(array $settings): array

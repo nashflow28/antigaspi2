@@ -204,6 +204,7 @@ Route::prefix('notifications')->middleware('jwt.auth')->group(function () {
     Route::patch('/preferences', [NotificationController::class, 'updatePreferences']);
     Route::get('/settings', [NotificationController::class, 'getLegacyPreferences']);
     Route::patch('/settings', [NotificationController::class, 'updateLegacyPreferences']);
+    Route::post('/broadcast', [NotificationController::class, 'broadcast'])->middleware('throttle:write');
 });
 
 // Routes du profil consommateur
