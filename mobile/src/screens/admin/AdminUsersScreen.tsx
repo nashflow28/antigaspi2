@@ -1,7 +1,6 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useCallback } from 'react'
 import {
   View,
-  Text,
   StyleSheet,
   FlatList,
   TouchableOpacity,
@@ -9,19 +8,24 @@ import {
   RefreshControl,
   Alert,
   TextInput,
+  ActivityIndicator,
 } from 'react-native'
 import { Ionicons } from '@expo/vector-icons'
 import { useTheme } from '../../theme'
 import { User } from '../../types'
 import apiService from '../../services/api'
+import { Button, Badge, Card, Typography } from '../../components/2025'
+
+type RoleFilter = 'all' | 'consumer' | 'merchant' | 'admin'
 
 const AdminUsersScreen: React.FC = () => {
   const theme = useTheme()
   const [users, setUsers] = useState<User[]>([])
   const [filteredUsers, setFilteredUsers] = useState<User[]>([])
   const [refreshing, setRefreshing] = useState(false)
+  const [loading, setLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState('')
-  const [roleFilter, setRoleFilter] = useState<'all' | 'consumer' | 'merchant' | 'admin'>('all')
+  const [roleFilter, setRoleFilter] = useState<RoleFilter>('all')
 
   useEffect(() => {
     loadUsers()
@@ -33,56 +37,73 @@ const AdminUsersScreen: React.FC = () => {
 
   const loadUsers = async () => {
     try {
+      setLoading(true)
       const response = await apiService.get('/admin/users')
       setUsers(response.data.data || [])
-    } catch (error) {
+    } catch (error: any) {
       console.error('Erreur chargement utilisateurs:', error)
+      Alert.alert('Erreur', 'Impossible de charger les utilisateurs')
     } finally {
+      setLoading(false)
       setRefreshing(false)
     }
   }
 
-  const filterUsers = () => {
-    let filtered = users
+  const filterUsers = useCallback(() => {
+    let filtered = [...users]
 
     if (roleFilter !== 'all') {
       filtered = filtered.filter(u => u.role === roleFilter)
     }
 
     if (searchQuery.trim()) {
-      filtered = filtered.filter(u =>
-        u.first_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        u.last_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        u.email.toLowerCase().includes(searchQuery.toLowerCase())
+      const query = searchQuery.toLowerCase()
+      filtered = filtered.filter(
+        u =>
+          u.first_name.toLowerCase().includes(query) ||
+          u.last_name.toLowerCase().includes(query) ||
+          u.email.toLowerCase().includes(query)
       )
     }
 
     setFilteredUsers(filtered)
-  }
+  }, [users, searchQuery, roleFilter])
 
-  const onRefresh = () => {
+  const handleRefresh = () => {
     setRefreshing(true)
     loadUsers()
   }
 
-  const toggleUserStatus = async (userId: number, currentStatus: boolean) => {
+  const toggleUserStatus = async (user: User) => {
+    const isSuspended = user.is_suspended || false
+
     Alert.alert(
-      currentStatus ? 'Bloquer l\'utilisateur' : 'Débloquer l\'utilisateur',
-      currentStatus
-        ? 'Voulez-vous vraiment bloquer cet utilisateur ?'
-        : 'Voulez-vous vraiment débloquer cet utilisateur ?',
+      isSuspended ? 'Débloquer l\'utilisateur' : 'Bloquer l\'utilisateur',
+      isSuspended
+        ? `Voulez-vous vraiment débloquer ${user.first_name} ${user.last_name} ?`
+        : `Voulez-vous vraiment bloquer ${user.first_name} ${user.last_name} ?`,
       [
         { text: 'Annuler', style: 'cancel' },
         {
-          text: currentStatus ? 'Bloquer' : 'Débloquer',
-          style: currentStatus ? 'destructive' : 'default',
+          text: isSuspended ? 'Débloquer' : 'Bloquer',
+          style: isSuspended ? 'default' : 'destructive',
           onPress: async () => {
             try {
-              await apiService.put(`/admin/users/${userId}/block`, {
-                is_blocked: !currentStatus
-              })
-              loadUsers()
-            } catch (error) {
+              const endpoint = isSuspended
+                ? `/admin/users/${user.id}/unsuspend`
+                : `/admin/users/${user.id}/suspend`
+
+              await apiService.patch(endpoint)
+
+              // Mise à jour optimiste
+              setUsers(prev =>
+                prev.map(u =>
+                  u.id === user.id ? { ...u, is_suspended: !isSuspended } : u
+                )
+              )
+
+              Alert.alert('Succès', isSuspended ? 'Utilisateur débloqué' : 'Utilisateur bloqué')
+            } catch (error: any) {
               console.error('Erreur mise à jour statut:', error)
               Alert.alert('Erreur', 'Impossible de mettre à jour le statut')
             }
@@ -92,16 +113,16 @@ const AdminUsersScreen: React.FC = () => {
     )
   }
 
-  const getRoleBadgeColor = (role: string) => {
+  const getRoleBadgeVariant = (role: string): 'primary' | 'success' | 'warning' | 'error' => {
     switch (role) {
       case 'admin':
-        return theme.colors.semantic.error
+        return 'error'
       case 'merchant':
-        return theme.colors.semantic.warning
+        return 'warning'
       case 'consumer':
-        return theme.colors.semantic.success
+        return 'success'
       default:
-        return theme.colors.neutral[400]
+        return 'primary'
     }
   }
 
@@ -118,130 +139,213 @@ const AdminUsersScreen: React.FC = () => {
     }
   }
 
-  const renderUser = ({ item }: { item: User }) => (
-    <View style={[styles.userCard, { backgroundColor: theme.colors.surface.light }]}>
-      <View style={styles.userHeader}>
-        <View style={styles.userInfo}>
-          <View style={[styles.avatar, { backgroundColor: theme.withOpacity(theme.colors.primary[500], 0.1) }]}>
-            <Ionicons name="person" size={24} color={theme.colors.primary[500]} />
-          </View>
-          <View style={styles.userDetails}>
-            <Text style={[styles.userName, { color: theme.colors.text }]}>
+  const renderUserCard = ({ item }: { item: User }) => (
+    <Card style={styles.userCard}>
+      <View style={styles.cardHeader}>
+        <View style={styles.iconContainer}>
+          <Ionicons name="person" size={24} color={theme.colors.primary[500]} />
+        </View>
+        <View style={styles.cardContent}>
+          <View style={styles.titleRow}>
+            <Typography variant="h4" weight="semibold" style={{ flex: 1 }}>
               {item.first_name} {item.last_name}
-            </Text>
-            <Text style={[styles.userEmail, { color: theme.colors.textSecondary }]}>
-              {item.email}
-            </Text>
-            <View style={styles.badges}>
-              <View style={[styles.roleBadge, { backgroundColor: theme.withOpacity(getRoleBadgeColor(item.role), 0.1) }]}>
-                <Text style={[styles.roleText, { color: getRoleBadgeColor(item.role) }]}>
-                  {getRoleLabel(item.role)}
-                </Text>
-              </View>
+            </Typography>
+            <Badge variant={getRoleBadgeVariant(item.role)}>
+              {getRoleLabel(item.role)}
+            </Badge>
+          </View>
+          <Typography variant="caption" color="secondary">
+            {item.email}
+          </Typography>
+          <View style={styles.statsRow}>
+            <View style={styles.statItem}>
+              <Ionicons name="location-outline" size={14} color={theme.colors.neutral[500]} />
+              <Typography variant="caption" color="secondary" style={{ marginLeft: 4 }}>
+                {item.city}
+              </Typography>
             </View>
+            {item.is_suspended && (
+              <Badge variant="error" size="sm">
+                Bloqué
+              </Badge>
+            )}
           </View>
         </View>
       </View>
-
-      <View style={styles.userActions}>
-        <TouchableOpacity
-          style={[
-            styles.actionButton,
-            {
-              backgroundColor: theme.withOpacity(
-                theme.colors.semantic.error,
-                0.1
-              )
-            }
-          ]}
-          onPress={() => toggleUserStatus(item.id, false)}
+      <View style={styles.actions}>
+        <Button
+          variant={item.is_suspended ? 'primary' : 'destructive'}
+          size="sm"
+          onPress={() => toggleUserStatus(item)}
+          style={{ flex: 1 }}
+          leftIcon={
+            <Ionicons
+              name={item.is_suspended ? 'checkmark-circle' : 'ban'}
+              size={16}
+              color="#FFFFFF"
+            />
+          }
         >
-          <Ionicons name="ban" size={18} color={theme.colors.semantic.error} />
-          <Text style={[styles.actionText, { color: theme.colors.semantic.error }]}>
-            Bloquer
-          </Text>
+          {item.is_suspended ? 'Débloquer' : 'Bloquer'}
+        </Button>
+      </View>
+    </Card>
+  )
+
+  const renderHeader = () => (
+    <View style={styles.header}>
+      <Typography variant="h2" weight="bold" style={{ marginBottom: 16 }}>
+        Gestion des utilisateurs
+      </Typography>
+
+      {/* Barre de recherche */}
+      <View style={[styles.searchBar, { backgroundColor: theme.colors.surface.light }]}>
+        <Ionicons name="search" size={20} color={theme.colors.neutral[500]} />
+        <TextInput
+          style={[styles.searchInput, { color: theme.colors.text }]}
+          placeholder="Rechercher un utilisateur..."
+          placeholderTextColor={theme.colors.neutral[400]}
+          value={searchQuery}
+          onChangeText={setSearchQuery}
+        />
+        {searchQuery.length > 0 && (
+          <TouchableOpacity onPress={() => setSearchQuery('')}>
+            <Ionicons name="close-circle" size={20} color={theme.colors.neutral[500]} />
+          </TouchableOpacity>
+        )}
+      </View>
+
+      {/* Filtres par rôle */}
+      <View style={styles.filtersRow}>
+        <TouchableOpacity
+          onPress={() => setRoleFilter('all')}
+          style={[
+            styles.filterChip,
+            {
+              backgroundColor:
+                roleFilter === 'all' ? theme.colors.primary[500] : theme.colors.surface.light,
+            },
+          ]}
+        >
+          <Typography
+            variant="caption"
+            weight="medium"
+            style={{ color: roleFilter === 'all' ? '#FFFFFF' : theme.colors.text }}
+          >
+            Tous ({users.length})
+          </Typography>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          onPress={() => setRoleFilter('consumer')}
+          style={[
+            styles.filterChip,
+            {
+              backgroundColor:
+                roleFilter === 'consumer' ? theme.colors.success[500] : theme.colors.surface.light,
+            },
+          ]}
+        >
+          <Typography
+            variant="caption"
+            weight="medium"
+            style={{
+              color: roleFilter === 'consumer' ? '#FFFFFF' : theme.colors.text,
+            }}
+          >
+            Consommateurs ({users.filter(u => u.role === 'consumer').length})
+          </Typography>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          onPress={() => setRoleFilter('merchant')}
+          style={[
+            styles.filterChip,
+            {
+              backgroundColor:
+                roleFilter === 'merchant' ? theme.colors.warning[500] : theme.colors.surface.light,
+            },
+          ]}
+        >
+          <Typography
+            variant="caption"
+            weight="medium"
+            style={{
+              color: roleFilter === 'merchant' ? '#FFFFFF' : theme.colors.text,
+            }}
+          >
+            Commerçants ({users.filter(u => u.role === 'merchant').length})
+          </Typography>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          onPress={() => setRoleFilter('admin')}
+          style={[
+            styles.filterChip,
+            {
+              backgroundColor:
+                roleFilter === 'admin' ? theme.colors.error[500] : theme.colors.surface.light,
+            },
+          ]}
+        >
+          <Typography
+            variant="caption"
+            weight="medium"
+            style={{
+              color: roleFilter === 'admin' ? '#FFFFFF' : theme.colors.text,
+            }}
+          >
+            Admins ({users.filter(u => u.role === 'admin').length})
+          </Typography>
         </TouchableOpacity>
       </View>
     </View>
   )
 
+  if (loading) {
+    return (
+      <View
+        style={[styles.container, styles.centered, { backgroundColor: theme.colors.background }]}
+      >
+        <ActivityIndicator size="large" color={theme.colors.primary[500]} />
+        <Typography variant="body" color="secondary" style={{ marginTop: 12 }}>
+          Chargement des utilisateurs...
+        </Typography>
+      </View>
+    )
+  }
+
   return (
     <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
       <StatusBar barStyle="dark-content" backgroundColor={theme.colors.background} />
 
-      {/* Header */}
-      <View style={[styles.header, { backgroundColor: theme.colors.primary[500] }]}>
-        <View style={styles.headerContent}>
-          <Text style={styles.headerTitle}>Utilisateurs</Text>
-          <TouchableOpacity onPress={loadUsers}>
-            <Ionicons name="refresh" size={24} color="white" />
-          </TouchableOpacity>
-        </View>
-
-        {/* Search */}
-        <View style={[styles.searchContainer, { backgroundColor: 'rgba(255, 255, 255, 0.2)' }]}>
-          <Ionicons name="search" size={20} color="rgba(255, 255, 255, 0.8)" />
-          <TextInput
-            style={styles.searchInput}
-            placeholder="Rechercher..."
-            placeholderTextColor="rgba(255, 255, 255, 0.6)"
-            value={searchQuery}
-            onChangeText={setSearchQuery}
-          />
-        </View>
-
-        {/* Role Filters */}
-        <View style={styles.filtersContainer}>
-          {[
-            { value: 'all', label: 'Tous', count: users.length },
-            { value: 'consumer', label: 'Consommateurs', count: users.filter(u => u.role === 'consumer').length },
-            { value: 'merchant', label: 'Commerçants', count: users.filter(u => u.role === 'merchant').length },
-            { value: 'admin', label: 'Admins', count: users.filter(u => u.role === 'admin').length },
-          ].map((filter) => (
-            <TouchableOpacity
-              key={filter.value}
-              style={[
-                styles.filterChip,
-                {
-                  backgroundColor: roleFilter === filter.value
-                    ? 'white'
-                    : 'rgba(255, 255, 255, 0.2)',
-                }
-              ]}
-              onPress={() => setRoleFilter(filter.value as any)}
-            >
-              <Text style={[
-                styles.filterText,
-                {
-                  color: roleFilter === filter.value
-                    ? theme.colors.primary[500]
-                    : 'white'
-                }
-              ]}>
-                {filter.label} ({filter.count})
-              </Text>
-            </TouchableOpacity>
-          ))}
-        </View>
-      </View>
-
-      {/* Liste des utilisateurs */}
       <FlatList
         data={filteredUsers}
-        renderItem={renderUser}
-        keyExtractor={(item) => item.id.toString()}
-        contentContainerStyle={styles.listContent}
-        refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-        }
+        keyExtractor={item => `user-${item.id}`}
+        renderItem={renderUserCard}
+        ListHeaderComponent={renderHeader}
         ListEmptyComponent={
-          <View style={[styles.emptyState, { backgroundColor: theme.colors.surface.light }]}>
-            <Ionicons name="people-outline" size={64} color={theme.colors.neutral[300]} />
-            <Text style={[styles.emptyText, { color: theme.colors.textSecondary }]}>
+          <View style={styles.emptyState}>
+            <Ionicons name="people-outline" size={64} color={theme.colors.neutral[400]} />
+            <Typography variant="h4" weight="semibold" style={{ marginTop: 16 }}>
               Aucun utilisateur trouvé
-            </Text>
+            </Typography>
+            <Typography variant="body" color="secondary" style={{ marginTop: 8 }}>
+              {searchQuery
+                ? 'Essayez de modifier votre recherche'
+                : 'Aucun utilisateur enregistré pour le moment'}
+            </Typography>
           </View>
         }
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={handleRefresh}
+            colors={[theme.colors.primary[500]]}
+          />
+        }
+        contentContainerStyle={styles.listContent}
+        showsVerticalScrollIndicator={false}
       />
     </View>
   )
@@ -251,128 +355,84 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
+  centered: {
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  listContent: {
+    paddingHorizontal: 16,
+    paddingBottom: 24,
+  },
   header: {
-    paddingTop: 50,
+    paddingTop: 16,
     paddingBottom: 16,
-    paddingHorizontal: 20,
   },
-  headerContent: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 16,
-  },
-  headerTitle: {
-    color: 'white',
-    fontSize: 28,
-    fontWeight: 'bold',
-  },
-  searchContainer: {
+  searchBar: {
     flexDirection: 'row',
     alignItems: 'center',
+    padding: 12,
     borderRadius: 12,
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    marginBottom: 12,
+    marginBottom: 16,
   },
   searchInput: {
     flex: 1,
     marginLeft: 8,
-    color: 'white',
-    fontSize: 16,
+    fontSize: 15,
   },
-  filtersContainer: {
+  filtersRow: {
     flexDirection: 'row',
-    flexWrap: 'wrap',
     gap: 8,
+    flexWrap: 'wrap',
   },
   filterChip: {
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 16,
-  },
-  filterText: {
-    fontSize: 13,
-    fontWeight: '600',
-  },
-  listContent: {
-    padding: 16,
-    flexGrow: 1,
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 20,
   },
   userCard: {
-    borderRadius: 12,
-    padding: 16,
     marginBottom: 12,
   },
-  userHeader: {
-    marginBottom: 12,
-  },
-  userInfo: {
+  cardHeader: {
     flexDirection: 'row',
-    alignItems: 'flex-start',
+    alignItems: 'center',
+    marginBottom: 12,
   },
-  avatar: {
+  iconContainer: {
     width: 48,
     height: 48,
-    borderRadius: 24,
-    alignItems: 'center',
+    borderRadius: 12,
+    backgroundColor: '#EEF2FF',
     justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 12,
   },
-  userDetails: {
-    marginLeft: 12,
+  cardContent: {
     flex: 1,
   },
-  userName: {
-    fontSize: 16,
-    fontWeight: '600',
-    marginBottom: 4,
-  },
-  userEmail: {
-    fontSize: 14,
-    marginBottom: 8,
-  },
-  badges: {
+  titleRow: {
     flexDirection: 'row',
-    gap: 6,
+    alignItems: 'center',
+    marginBottom: 4,
+    gap: 8,
   },
-  roleBadge: {
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 10,
+  statsRow: {
+    flexDirection: 'row',
+    marginTop: 8,
+    alignItems: 'center',
+    gap: 12,
   },
-  roleText: {
-    fontSize: 11,
-    fontWeight: '600',
+  statItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
-  userActions: {
+  actions: {
     flexDirection: 'row',
     gap: 8,
   },
-  actionButton: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 10,
-    borderRadius: 8,
-    gap: 6,
-  },
-  actionText: {
-    fontSize: 13,
-    fontWeight: '600',
-  },
   emptyState: {
-    flex: 1,
-    padding: 40,
-    borderRadius: 12,
     alignItems: 'center',
-    justifyContent: 'center',
-    marginTop: 40,
-  },
-  emptyText: {
-    marginTop: 16,
-    fontSize: 16,
-    textAlign: 'center',
+    paddingVertical: 60,
+    paddingHorizontal: 32,
   },
 })
 
