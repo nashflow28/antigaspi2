@@ -322,6 +322,300 @@
         </Card>
       </div>
 
+      <!-- Advanced Analytics & Reports -->
+      <section class="space-y-6">
+        <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <h2 class="text-2xl font-semibold text-neutral-900 dark:text-neutral-50">Analyses avancées &amp; rapports</h2>
+            <p class="text-sm text-neutral-500 dark:text-neutral-400">
+              Explorez les performances détaillées, exportez des rapports et comparez les zones clés de la plateforme.
+            </p>
+          </div>
+          <Badge variant="primary" size="sm" class="self-start sm:self-auto">Nouveau</Badge>
+        </div>
+
+        <Card variant="glass">
+          <template #header>
+            <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <h3 class="text-xl font-semibold text-neutral-900 dark:text-neutral-50">Rapports personnalisés</h3>
+                <p class="text-sm text-neutral-500 dark:text-neutral-400">
+                  Sélectionnez une plage de dates sur mesure puis exportez les indicateurs clés au format CSV ou PDF.
+                </p>
+              </div>
+              <div class="flex flex-wrap gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  class="gap-2"
+                  :disabled="analyticsLoading"
+                  @click="exportAnalytics('csv')"
+                >
+                  <ArrowDownTrayIcon class="h-4 w-4" />
+                  Export CSV
+                </Button>
+                <Button
+                  variant="primary"
+                  size="sm"
+                  class="gap-2"
+                  :disabled="analyticsLoading"
+                  @click="exportAnalytics('pdf')"
+                >
+                  <DocumentArrowDownIcon class="h-4 w-4" />
+                  Export PDF
+                </Button>
+              </div>
+            </div>
+          </template>
+
+          <div class="space-y-6">
+            <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+              <div
+                class="rounded-2xl bg-surface-light/80 p-4 shadow-sm ring-1 ring-neutral-200/60 dark:bg-surface-dark/80 dark:ring-neutral-700/60"
+              >
+                <p class="text-xs uppercase tracking-wide text-neutral-500 dark:text-neutral-400">Réservations</p>
+                <p class="mt-2 text-2xl font-semibold text-neutral-900 dark:text-neutral-50">
+                  {{ formatNumber(analyticsSummary.total_reservations ?? 0) }}
+                </p>
+              </div>
+              <div
+                class="rounded-2xl bg-surface-light/80 p-4 shadow-sm ring-1 ring-neutral-200/60 dark:bg-surface-dark/80 dark:ring-neutral-700/60"
+              >
+                <p class="text-xs uppercase tracking-wide text-neutral-500 dark:text-neutral-400">Revenus</p>
+                <p class="mt-2 text-2xl font-semibold text-neutral-900 dark:text-neutral-50">
+                  {{ formatCurrency(analyticsSummary.total_revenue ?? 0) }}
+                </p>
+              </div>
+              <div
+                class="rounded-2xl bg-surface-light/80 p-4 shadow-sm ring-1 ring-neutral-200/60 dark:bg-surface-dark/80 dark:ring-neutral-700/60"
+              >
+                <p class="text-xs uppercase tracking-wide text-neutral-500 dark:text-neutral-400">Produits sauvés</p>
+                <p class="mt-2 text-2xl font-semibold text-neutral-900 dark:text-neutral-50">
+                  {{ formatNumber(analyticsSummary.products_saved_from_waste ?? 0) }}
+                </p>
+              </div>
+              <div
+                class="rounded-2xl bg-surface-light/80 p-4 shadow-sm ring-1 ring-neutral-200/60 dark:bg-surface-dark/80 dark:ring-neutral-700/60"
+              >
+                <p class="text-xs uppercase tracking-wide text-neutral-500 dark:text-neutral-400">Nouveaux utilisateurs</p>
+                <p class="mt-2 text-2xl font-semibold text-neutral-900 dark:text-neutral-50">
+                  {{ formatNumber(analyticsSummary.new_users ?? 0) }}
+                </p>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 gap-4 lg:grid-cols-12">
+              <div class="lg:col-span-4">
+                <Input
+                  v-model="analyticsRange.start"
+                  type="date"
+                  label="Date de début"
+                  variant="filled"
+                  :max="analyticsRange.end || todayIso"
+                  :disabled="analyticsLoading"
+                />
+              </div>
+              <div class="lg:col-span-4">
+                <Input
+                  v-model="analyticsRange.end"
+                  type="date"
+                  label="Date de fin"
+                  variant="filled"
+                  :min="analyticsRange.start"
+                  :max="todayIso"
+                  :disabled="analyticsLoading"
+                />
+              </div>
+              <div class="flex flex-col justify-end gap-2 lg:col-span-4">
+                <div class="flex flex-wrap items-center gap-2">
+                  <Button
+                    variant="primary"
+                    class="gap-2"
+                    :loading="analyticsLoading"
+                    @click="applyCustomRange"
+                  >
+                    <CalendarDaysIcon class="h-4 w-4" />
+                    Appliquer la période
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    class="gap-2"
+                    :disabled="!isCustomRangeModified || analyticsLoading"
+                    @click="resetCustomRange"
+                  >
+                    <ArrowPathIcon class="h-4 w-4" />
+                    Réinitialiser
+                  </Button>
+                </div>
+                <p v-if="analyticsRangeError" class="text-sm text-accent-red">
+                  {{ analyticsRangeError }}
+                </p>
+                <p
+                  v-else-if="analyticsLastUpdated"
+                  class="text-xs text-neutral-500 dark:text-neutral-400"
+                >
+                  Actualisé {{ formatTimeAgo(analyticsLastUpdated) }}
+                </p>
+              </div>
+            </div>
+
+            <div class="flex flex-wrap items-center gap-3 text-sm text-neutral-500 dark:text-neutral-400">
+              <span class="inline-flex items-center gap-2 rounded-full bg-primary-500/10 px-3 py-1 text-primary-600 dark:text-primary-300">
+                <ChartBarIcon class="h-4 w-4" />
+                {{ formatNumber(analyticsSummary.event_count ?? 0) }} évènements suivis
+              </span>
+              <span
+                v-if="analyticsLoading"
+                class="inline-flex items-center gap-2 rounded-full bg-neutral-200/70 px-3 py-1 text-neutral-600 dark:bg-neutral-800/80 dark:text-neutral-300"
+              >
+                Calcul en cours...
+              </span>
+            </div>
+
+            <div
+              v-if="analyticsError"
+              class="rounded-2xl border border-accent-red/40 bg-accent-red/10 p-4 text-sm text-accent-red"
+            >
+              {{ analyticsError }}
+            </div>
+          </div>
+        </Card>
+
+        <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
+          <Card variant="glass">
+            <template #header>
+              <div class="flex items-center justify-between gap-4">
+                <div>
+                  <h3 class="text-xl font-semibold text-neutral-900 dark:text-neutral-50">Répartition géographique</h3>
+                  <p class="text-sm text-neutral-500 dark:text-neutral-400">
+                    Les zones où l'activité est la plus forte sur la période sélectionnée.
+                  </p>
+                </div>
+                <Badge variant="outline" size="sm" class="gap-1 text-xs">
+                  <MapPinIcon class="h-4 w-4" />
+                  {{ geographicDistribution.length }}
+                </Badge>
+              </div>
+            </template>
+
+            <div v-if="geographicDistribution.length > 0" class="space-y-4">
+              <div
+                v-for="entry in geographicDistribution"
+                :key="entry.city"
+                class="space-y-3 rounded-2xl border border-neutral-200/60 bg-surface-light/70 p-4 transition-colors duration-200 hover:border-primary-400/50 dark:border-neutral-700/60 dark:bg-surface-dark/70"
+              >
+                <div class="flex items-center justify-between gap-4">
+                  <div class="flex items-center gap-3">
+                    <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-primary-500/10 text-primary-600 dark:text-primary-300">
+                      <MapPinIcon class="h-5 w-5" />
+                    </div>
+                    <div>
+                      <p class="text-sm font-semibold text-neutral-900 dark:text-neutral-50">{{ entry.city }}</p>
+                      <p class="text-xs text-neutral-500 dark:text-neutral-400">
+                        {{ formatNumber(entry.reservationCount) }} réservations · {{ formatCurrency(entry.totalRevenue) }}
+                      </p>
+                    </div>
+                  </div>
+                  <Badge variant="primary" size="sm">{{ entry.percentage.toFixed(1) }}%</Badge>
+                </div>
+                <div class="h-2.5 w-full overflow-hidden rounded-full bg-neutral-200/70 dark:bg-neutral-700/60">
+                  <div
+                    class="h-full rounded-full bg-primary-500"
+                    :style="{ width: `${Math.min(entry.percentage, 100)}%` }"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div
+              v-else
+              class="rounded-2xl border border-dashed border-neutral-300/70 bg-surface-light/60 p-6 text-center text-sm text-neutral-500 dark:border-neutral-700/60 dark:bg-surface-dark/70 dark:text-neutral-400"
+            >
+              Aucune donnée géographique disponible pour la période sélectionnée.
+            </div>
+          </Card>
+
+          <Card variant="glass">
+            <template #header>
+              <div class="flex items-center justify-between gap-4">
+                <div>
+                  <h3 class="text-xl font-semibold text-neutral-900 dark:text-neutral-50">Comparaison des commerçants</h3>
+                  <p class="text-sm text-neutral-500 dark:text-neutral-400">
+                    Analysez les revenus, le volume et l'évolution par commerçant.
+                  </p>
+                </div>
+                <Badge variant="outline" size="sm" class="gap-1 text-xs">
+                  <TrophyIcon class="h-4 w-4" />
+                  {{ merchantPerformance.length }}
+                </Badge>
+              </div>
+            </template>
+
+            <div
+              v-if="merchantPerformance.length > 0"
+              class="overflow-hidden rounded-2xl border border-neutral-200/60 dark:border-neutral-700/60"
+            >
+              <table class="min-w-full divide-y divide-neutral-200/60 dark:divide-neutral-700/60">
+                <thead class="bg-neutral-50/80 dark:bg-neutral-800/50">
+                  <tr>
+                    <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-neutral-500 dark:text-neutral-300">
+                      Commerçant
+                    </th>
+                    <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-neutral-500 dark:text-neutral-300">
+                      Réservations
+                    </th>
+                    <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-neutral-500 dark:text-neutral-300">
+                      Chiffre d'affaires
+                    </th>
+                    <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-neutral-500 dark:text-neutral-300">
+                      Panier moyen
+                    </th>
+                    <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-neutral-500 dark:text-neutral-300">
+                      Évolution
+                    </th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-neutral-200/60 dark:divide-neutral-700/60">
+                  <tr
+                    v-for="entry in merchantPerformance"
+                    :key="entry.merchantId"
+                    :class="[
+                      'bg-surface-light/70 text-sm text-neutral-600 transition-colors duration-200 dark:bg-surface-dark/70 dark:text-neutral-300',
+                      entry.isSelected
+                        ? 'border-l-4 border-primary-500 bg-primary-500/5 font-semibold text-neutral-900 dark:border-primary-400/80 dark:text-neutral-100'
+                        : ''
+                    ]"
+                  >
+                    <td class="px-4 py-3 text-neutral-900 dark:text-neutral-50">
+                      {{ entry.merchantName }}
+                    </td>
+                    <td class="px-4 py-3">
+                      {{ formatNumber(entry.reservationCount) }}
+                    </td>
+                    <td class="px-4 py-3 text-neutral-900 dark:text-neutral-50">
+                      {{ formatCurrency(entry.totalRevenue) }}
+                    </td>
+                    <td class="px-4 py-3">
+                      {{ formatCurrency(entry.averageOrderValue) }}
+                    </td>
+                    <td class="px-4 py-3 font-semibold" :class="getGrowthTextClass(entry.growthRate)">
+                      {{ formatGrowthRate(entry.growthRate) }}
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div
+              v-else
+              class="rounded-2xl border border-dashed border-neutral-300/70 bg-surface-light/60 p-6 text-center text-sm text-neutral-500 dark:border-neutral-700/60 dark:bg-surface-dark/70 dark:text-neutral-400"
+            >
+              Aucune donnée de performance commerçant disponible pour cette période.
+            </div>
+          </Card>
+        </div>
+      </section>
+
       <!-- Alerts and Notifications -->
       <Card v-if="alerts.length > 0" variant="glass">
         <template #header>
@@ -371,7 +665,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, nextTick, watch } from 'vue'
+import { ref, reactive, computed, onMounted, nextTick, watch } from 'vue'
 import { formatPrice } from '@/utils/currency'
 import AdminModal from '@/components/ui/AdminModal.vue'
 import DashboardLayout from '@/components/ui/DashboardLayout.vue'
@@ -393,7 +687,12 @@ import {
   BellIcon,
   ShieldExclamationIcon,
   InformationCircleIcon,
-  BanknotesIcon
+  BanknotesIcon,
+  ArrowDownTrayIcon,
+  DocumentArrowDownIcon,
+  CalendarDaysIcon,
+  MapPinIcon,
+  TrophyIcon
 } from '@heroicons/vue/24/outline'
 import {
   Chart as ChartJS,
@@ -415,6 +714,7 @@ import Card from '@/components/ui/2025/Card.vue'
 import Button from '@/components/ui/2025/Button.vue'
 import Badge, { type BadgeVariant } from '@/components/ui/2025/Badge.vue'
 import Select from '@/components/ui/2025/Select.vue'
+import Input from '@/components/ui/2025/Input.vue'
 import {
   DashboardHeader,
   StatCard,
@@ -429,8 +729,12 @@ import type {
   AdminDashboardStats,
   AdminDashboardUserDistributionEntry,
   AdminSystemHealthService,
-  AnalyticsDailyBreakdownEntry
+  AnalyticsDailyBreakdownEntry,
+  AnalyticsSummary,
+  AnalyticsGeographicDistributionEntry,
+  AnalyticsMerchantPerformanceEntry
 } from '@/types'
+import jsPDF from 'jspdf'
 
 ChartJS.register(
   CategoryScale,
@@ -488,6 +792,40 @@ const popularCategories = ref<AdminDashboardCategory[]>([])
 const revenueTrends = ref<{ labels: string[]; values: number[] }>({ labels: [], values: [] })
 const userDistribution = ref<{ label: string; value: number }[]>([])
 
+interface GeographicDistributionRow {
+  city: string
+  reservationCount: number
+  totalRevenue: number
+  percentage: number
+}
+
+interface MerchantPerformanceRow {
+  merchantId: number | string
+  merchantName: string
+  reservationCount: number
+  totalRevenue: number
+  averageOrderValue: number
+  growthRate: number | null
+  isSelected: boolean
+}
+
+const analyticsSummary = ref<AnalyticsSummary>({
+  total_reservations: 0,
+  total_revenue: 0,
+  products_saved_from_waste: 0,
+  new_users: 0,
+  event_count: 0
+})
+const analyticsDailyBreakdown = ref<AnalyticsDailyBreakdownEntry[]>([])
+const analyticsRange = reactive<{ start: string; end: string }>({ start: '', end: '' })
+const defaultAnalyticsWindow = reactive<{ start: string; end: string }>({ start: '', end: '' })
+const analyticsLoading = ref(false)
+const analyticsError = ref<string | null>(null)
+const analyticsRangeError = ref<string | null>(null)
+const analyticsLastUpdated = ref<string | null>(null)
+const geographicDistribution = ref<GeographicDistributionRow[]>([])
+const merchantPerformance = ref<MerchantPerformanceRow[]>([])
+
 interface DashboardAlert {
   id: number | string
   type: 'info' | 'success' | 'warning' | 'error'
@@ -511,6 +849,15 @@ const normalizeNumber = (value: unknown, fallback = 0): number => {
   }
 
   return fallback
+}
+
+const toOptionalNumber = (value: unknown): number | null => {
+  if (value === null || value === undefined) {
+    return null
+  }
+
+  const parsed = Number(value)
+  return Number.isFinite(parsed) ? parsed : null
 }
 
 const toErrorMessage = (error: unknown): string => {
@@ -632,6 +979,152 @@ const normalizeSystemHealth = (services?: AdminSystemHealthService[]): AdminSyst
   }))
 }
 
+const normalizeAnalyticsSummary = (summary?: AnalyticsSummary): AnalyticsSummary => {
+  return {
+    total_reservations: normalizeNumber(summary?.total_reservations ?? summary?.totalReservations, 0),
+    total_revenue: normalizeNumber(summary?.total_revenue ?? summary?.totalRevenue, 0),
+    products_saved_from_waste: normalizeNumber(
+      summary?.products_saved_from_waste ?? summary?.productsSavedFromWaste,
+      0
+    ),
+    new_users: normalizeNumber(summary?.new_users ?? summary?.newUsers, 0),
+    event_count: normalizeNumber(summary?.event_count ?? summary?.eventCount, 0)
+  }
+}
+
+const normalizeGeographicDistribution = (
+  distribution?: AnalyticsGeographicDistributionEntry[] | Record<string, unknown>
+): GeographicDistributionRow[] => {
+  const items: GeographicDistributionRow[] = []
+
+  if (Array.isArray(distribution)) {
+    distribution.forEach((entry, index) => {
+      const reservationCount = normalizeNumber(
+        entry?.reservation_count ?? (entry as Record<string, unknown>)?.reservationCount,
+        0
+      )
+      const totalRevenue = normalizeNumber(
+        entry?.total_revenue ?? (entry as Record<string, unknown>)?.totalRevenue,
+        0
+      )
+
+      items.push({
+        city: (entry?.city ?? `Zone ${index + 1}`).toString(),
+        reservationCount,
+        totalRevenue,
+        percentage: normalizeNumber(entry?.percentage, 0)
+      })
+    })
+  } else if (distribution && typeof distribution === 'object') {
+    Object.entries(distribution).forEach(([key, value], index) => {
+      if (typeof value === 'number') {
+        items.push({
+          city: key || `Zone ${index + 1}`,
+          reservationCount: normalizeNumber(value, 0),
+          totalRevenue: 0,
+          percentage: 0
+        })
+        return
+      }
+
+      const entry = value as AnalyticsGeographicDistributionEntry
+      const reservationCount = normalizeNumber(
+        entry?.reservation_count ?? (entry as Record<string, unknown>)?.count,
+        0
+      )
+      const totalRevenue = normalizeNumber(
+        entry?.total_revenue ?? (entry as Record<string, unknown>)?.revenue,
+        0
+      )
+
+      items.push({
+        city: key || (entry?.city ?? `Zone ${index + 1}`).toString(),
+        reservationCount,
+        totalRevenue,
+        percentage: normalizeNumber(entry?.percentage, 0)
+      })
+    })
+  }
+
+  const totalReservations = items.reduce((acc, entry) => acc + entry.reservationCount, 0)
+
+  return items
+    .map(entry => ({
+      ...entry,
+      percentage:
+        totalReservations > 0
+          ? Math.round(((entry.reservationCount / totalReservations) * 100 + Number.EPSILON) * 10) / 10
+          : 0
+    }))
+    .sort((a, b) => b.reservationCount - a.reservationCount)
+}
+
+const normalizeMerchantPerformance = (
+  performance?: AnalyticsMerchantPerformanceEntry[] | Record<string, unknown>
+): MerchantPerformanceRow[] => {
+  const rows: MerchantPerformanceRow[] = []
+
+  if (Array.isArray(performance)) {
+    performance.forEach((entry, index) => {
+      rows.push({
+        merchantId: entry?.merchant_id ?? index,
+        merchantName: (entry?.merchant_name ?? `Commerçant ${index + 1}`).toString(),
+        reservationCount: normalizeNumber(
+          entry?.reservation_count ?? (entry as Record<string, unknown>)?.reservationCount,
+          0
+        ),
+        totalRevenue: normalizeNumber(
+          entry?.total_revenue ?? (entry as Record<string, unknown>)?.totalRevenue,
+          0
+        ),
+        averageOrderValue: normalizeNumber(
+          entry?.average_order_value ?? (entry as Record<string, unknown>)?.averageOrderValue,
+          0
+        ),
+        growthRate: toOptionalNumber(entry?.growth_rate ?? (entry as Record<string, unknown>)?.growthRate),
+        isSelected: Boolean(entry?.is_selected ?? (entry as Record<string, unknown>)?.isSelected)
+      })
+    })
+  } else if (performance && typeof performance === 'object') {
+    Object.entries(performance).forEach(([key, value], index) => {
+      if (typeof value === 'number') {
+        rows.push({
+          merchantId: key || index,
+          merchantName: key || `Commerçant ${index + 1}`,
+          reservationCount: normalizeNumber(value, 0),
+          totalRevenue: 0,
+          averageOrderValue: 0,
+          growthRate: null,
+          isSelected: false
+        })
+        return
+      }
+
+      const entry = value as AnalyticsMerchantPerformanceEntry
+      rows.push({
+        merchantId: entry?.merchant_id ?? key ?? index,
+        merchantName: (entry?.merchant_name ?? key ?? `Commerçant ${index + 1}`).toString(),
+        reservationCount: normalizeNumber(
+          entry?.reservation_count ?? (entry as Record<string, unknown>)?.reservationCount,
+          0
+        ),
+        totalRevenue: normalizeNumber(
+          entry?.total_revenue ?? (entry as Record<string, unknown>)?.totalRevenue,
+          0
+        ),
+        averageOrderValue: normalizeNumber(
+          entry?.average_order_value ?? (entry as Record<string, unknown>)?.averageOrderValue,
+          0
+        ),
+        growthRate: toOptionalNumber(entry?.growth_rate ?? (entry as Record<string, unknown>)?.growthRate),
+        isSelected: Boolean(entry?.is_selected ?? (entry as Record<string, unknown>)?.isSelected)
+      })
+    })
+  }
+
+  return rows.sort((a, b) => b.totalRevenue - a.totalRevenue)
+}
+
 const userDistributionColors = ['#10B981', '#F59E0B', '#8B5CF6', '#14B8A6', '#6366F1']
 
 const formatDateForApi = (date: Date): string => {
@@ -640,6 +1133,30 @@ const formatDateForApi = (date: Date): string => {
   const day = `${date.getDate()}`.padStart(2, '0')
   return `${year}-${month}-${day}`
 }
+
+const todayIso = formatDateForApi(new Date())
+
+const setDefaultAnalyticsRange = () => {
+  const end = new Date()
+  const start = new Date(end)
+  start.setDate(end.getDate() - 29)
+
+  const startFormatted = formatDateForApi(start)
+  const endFormatted = formatDateForApi(end)
+
+  analyticsRange.start = startFormatted
+  analyticsRange.end = endFormatted
+  defaultAnalyticsWindow.start = startFormatted
+  defaultAnalyticsWindow.end = endFormatted
+}
+
+setDefaultAnalyticsRange()
+
+const isCustomRangeModified = computed(
+  () =>
+    analyticsRange.start !== defaultAnalyticsWindow.start ||
+    analyticsRange.end !== defaultAnalyticsWindow.end
+)
 
 const formatRevenueLabel = (date: Date, period: string): string => {
   if (Number.isNaN(date.getTime())) {
@@ -770,6 +1287,268 @@ const normalizeUserDistribution = (
   }
 
   return [] as { label: string; value: number }[]
+}
+
+const formatGrowthRate = (rate: number | null): string => {
+  if (rate === null || Number.isNaN(rate)) {
+    return 'N/A'
+  }
+
+  const formatted = Math.abs(rate).toFixed(Math.abs(rate) >= 100 ? 0 : 1)
+  return `${rate > 0 ? '+' : rate < 0 ? '-' : ''}${rate === 0 ? '0.0' : formatted}%`
+}
+
+const getGrowthTextClass = (rate: number | null): string => {
+  if (rate === null || Number.isNaN(rate)) {
+    return 'text-neutral-500 dark:text-neutral-400'
+  }
+
+  if (rate > 0) {
+    return 'text-primary-600 dark:text-primary-300'
+  }
+
+  if (rate < 0) {
+    return 'text-accent-red'
+  }
+
+  return 'text-neutral-500 dark:text-neutral-400'
+}
+
+const csvValue = (value: string | number | null | undefined): string => {
+  if (value === null || value === undefined) {
+    return ''
+  }
+
+  const stringValue = String(value)
+  if (/[",\n]/.test(stringValue)) {
+    return `"${stringValue.replace(/"/g, '""')}"`
+  }
+
+  return stringValue
+}
+
+const buildAnalyticsCsv = (): string => {
+  const lines: string[] = []
+  const summary = analyticsSummary.value
+
+  lines.push('Section,Indicateur,Valeur')
+  lines.push(`Synthèse,Réservations totales,${csvValue(summary.total_reservations)}`)
+  lines.push(`Synthèse,Revenus totaux (F CFA),${csvValue(summary.total_revenue?.toFixed(2))}`)
+  lines.push(`Synthèse,Produits sauvés,${csvValue(summary.products_saved_from_waste)}`)
+  lines.push(`Synthèse,Nouveaux utilisateurs,${csvValue(summary.new_users)}`)
+  lines.push(`Synthèse,Évènements suivis,${csvValue(summary.event_count)}`)
+
+  lines.push('')
+  lines.push('Répartition géographique,Ville,Réservations,Revenu (F CFA),Part (%)')
+  geographicDistribution.value.forEach(entry => {
+    lines.push(
+      `Géographie,${csvValue(entry.city)},${csvValue(entry.reservationCount)},${csvValue(entry.totalRevenue.toFixed(2))},${csvValue(
+        entry.percentage.toFixed(1)
+      )}`
+    )
+  })
+
+  lines.push('')
+  lines.push('Performances commerçants,Commerçant,Réservations,Revenu (F CFA),Panier moyen (F CFA),Évolution (%)')
+  merchantPerformance.value.forEach(entry => {
+    lines.push(
+      `Commerçants,${csvValue(entry.merchantName)},${csvValue(entry.reservationCount)},${csvValue(entry.totalRevenue.toFixed(2))},${csvValue(
+        entry.averageOrderValue.toFixed(2)
+      )},${csvValue(formatGrowthRate(entry.growthRate))}`
+    )
+  })
+
+  if (analyticsDailyBreakdown.value.length > 0) {
+    lines.push('')
+    lines.push('Détails quotidiens,Date,Réservations,Produits sauvés,Revenu (F CFA),Nouveaux utilisateurs')
+    analyticsDailyBreakdown.value.forEach(entry => {
+      lines.push(
+        `Quotidien,${csvValue(entry.date)},${csvValue(entry.total_reservations ?? 0)},${csvValue(
+          entry.products_saved_from_waste ?? 0
+        )},${csvValue((entry.total_revenue ?? 0).toFixed(2))},${csvValue(entry.new_users ?? 0)}`
+      )
+    })
+  }
+
+  return lines.join('\n')
+}
+
+const downloadAnalyticsCsv = () => {
+  const blob = new Blob([buildAnalyticsCsv()], { type: 'text/csv;charset=utf-8;' })
+  const url = URL.createObjectURL(blob)
+  const link = document.createElement('a')
+  link.href = url
+  link.download = `analytics-${analyticsRange.start || 'start'}-${analyticsRange.end || 'end'}.csv`
+  document.body.appendChild(link)
+  link.click()
+  document.body.removeChild(link)
+  URL.revokeObjectURL(url)
+}
+
+const exportAnalyticsPdf = () => {
+  const doc = new jsPDF({ unit: 'pt' })
+  const marginX = 48
+  const marginBottom = 40
+  let cursorY = 64
+
+  const ensureSpace = (needed: number) => {
+    const pageHeight = doc.internal.pageSize.getHeight()
+    if (cursorY + needed > pageHeight - marginBottom) {
+      doc.addPage()
+      cursorY = 64
+      doc.setFontSize(12)
+    }
+  }
+
+  const addSectionTitle = (title: string) => {
+    ensureSpace(28)
+    doc.setFontSize(14)
+    doc.text(title, marginX, cursorY)
+    cursorY += 20
+    doc.setFontSize(12)
+  }
+
+  const addLine = (text: string, spacing = 16) => {
+    ensureSpace(spacing)
+    doc.text(text, marginX, cursorY)
+    cursorY += spacing
+  }
+
+  doc.setFontSize(18)
+  doc.text('Rapport analytics avancé', marginX, cursorY)
+  cursorY += 28
+  doc.setFontSize(12)
+  addLine(`Période: ${analyticsRange.start || 'N/A'} → ${analyticsRange.end || 'N/A'}`)
+  if (analyticsLastUpdated.value) {
+    addLine(`Dernière mise à jour: ${new Date(analyticsLastUpdated.value).toLocaleString('fr-FR')}`)
+  }
+
+  addSectionTitle('Synthèse')
+  addLine(`Réservations totales: ${formatNumber(analyticsSummary.value.total_reservations ?? 0)}`)
+  addLine(`Revenus totaux: ${formatCurrency(analyticsSummary.value.total_revenue ?? 0)}`)
+  addLine(
+    `Produits sauvés: ${formatNumber(analyticsSummary.value.products_saved_from_waste ?? 0)}`
+  )
+  addLine(`Nouveaux utilisateurs: ${formatNumber(analyticsSummary.value.new_users ?? 0)}`)
+  addLine(`Évènements suivis: ${formatNumber(analyticsSummary.value.event_count ?? 0)}`)
+
+  if (geographicDistribution.value.length > 0) {
+    addSectionTitle('Top zones géographiques')
+    geographicDistribution.value.slice(0, 6).forEach(entry => {
+      addLine(
+        `${entry.city} • ${formatNumber(entry.reservationCount)} réservations • ${formatCurrency(entry.totalRevenue)} • ${entry.percentage.toFixed(1)}%`
+      )
+    })
+  }
+
+  if (merchantPerformance.value.length > 0) {
+    addSectionTitle('Performance des commerçants')
+    merchantPerformance.value.slice(0, 6).forEach(entry => {
+      addLine(
+        `${entry.merchantName} • ${formatNumber(entry.reservationCount)} réservations • ${formatCurrency(entry.totalRevenue)} • Panier moyen ${formatCurrency(entry.averageOrderValue)} • ${formatGrowthRate(entry.growthRate)}`
+      )
+    })
+  }
+
+  if (analyticsDailyBreakdown.value.length > 0) {
+    addSectionTitle('Tendance quotidienne (extrait)')
+    analyticsDailyBreakdown.value.slice(0, 10).forEach(entry => {
+      addLine(
+        `${entry.date} • ${formatNumber(entry.total_reservations ?? 0)} réservations • ${formatCurrency(entry.total_revenue ?? 0)}`
+      )
+    })
+  }
+
+  doc.save(`analytics-${analyticsRange.start || 'start'}-${analyticsRange.end || 'end'}.pdf`)
+}
+
+const exportAnalytics = (format: 'csv' | 'pdf') => {
+  if (analyticsLoading.value) {
+    return
+  }
+
+  if (format === 'csv') {
+    downloadAnalyticsCsv()
+  } else {
+    exportAnalyticsPdf()
+  }
+}
+
+const validateAnalyticsRange = (): boolean => {
+  analyticsRangeError.value = null
+
+  if (!analyticsRange.start || !analyticsRange.end) {
+    analyticsRangeError.value = 'Veuillez sélectionner une date de début et une date de fin.'
+    return false
+  }
+
+  const start = new Date(analyticsRange.start)
+  const end = new Date(analyticsRange.end)
+
+  if (Number.isNaN(start.getTime()) || Number.isNaN(end.getTime())) {
+    analyticsRangeError.value = 'La plage de dates sélectionnée est invalide.'
+    return false
+  }
+
+  if (start > end) {
+    analyticsRangeError.value = 'La date de début doit précéder la date de fin.'
+    return false
+  }
+
+  return true
+}
+
+const applyCustomRange = async () => {
+  if (!validateAnalyticsRange()) {
+    return
+  }
+
+  await loadAdvancedAnalytics()
+}
+
+const resetCustomRange = async () => {
+  setDefaultAnalyticsRange()
+  analyticsRangeError.value = null
+  await loadAdvancedAnalytics()
+}
+
+const loadAdvancedAnalytics = async () => {
+  analyticsLoading.value = true
+  analyticsError.value = null
+
+  try {
+    const response = await apiService.getAnalyticsStats({
+      startDate: analyticsRange.start,
+      endDate: analyticsRange.end
+    })
+
+    if (!response.success) {
+      throw new Error(response.message || 'Impossible de charger les analytics avancés.')
+    }
+
+    analyticsSummary.value = normalizeAnalyticsSummary(response.summary)
+    analyticsDailyBreakdown.value = Array.isArray(response.daily_breakdown)
+      ? response.daily_breakdown
+      : []
+    geographicDistribution.value = normalizeGeographicDistribution(
+      (response as Record<string, unknown>).geographic_distribution ??
+        (response as Record<string, unknown>).geographicDistribution
+    )
+    merchantPerformance.value = normalizeMerchantPerformance(
+      (response as Record<string, unknown>).merchant_performance ??
+        (response as Record<string, unknown>).merchantPerformance
+    )
+    analyticsLastUpdated.value = new Date().toISOString()
+  } catch (error) {
+    const message = toErrorMessage(error)
+    analyticsError.value = message
+    geographicDistribution.value = []
+    merchantPerformance.value = []
+    analyticsDailyBreakdown.value = []
+    handleApiError('Erreur de chargement des analytics avancés', message)
+  } finally {
+    analyticsLoading.value = false
+  }
 }
 
 const computeDateRangeForPeriod = (period: string) => {
@@ -949,7 +1728,7 @@ const loadSystemHealth = async () => {
 const refreshData = async () => {
   isLoading.value = true
   try {
-    await Promise.all([loadDashboardData(), loadSystemHealth()])
+    await Promise.all([loadDashboardData(), loadSystemHealth(), loadAdvancedAnalytics()])
     // console.log('Data refreshed')
   } catch (error) {
     // console.error('Error refreshing data:', error)
