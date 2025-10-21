@@ -41,13 +41,16 @@ export const useSurpriseBaskets = () => {
           perPage: response.data.per_page,
           total: response.data.total
         }
+        return true
       } else {
         notify.error(response.message || 'Erreur lors du chargement des paniers surprise')
+        return false
       }
     } catch (error) {
       console.error('Error loading surprise baskets:', error)
       const message = error instanceof Error ? error.message : 'Erreur lors du chargement des paniers surprise'
       notify.error(message || 'Erreur lors du chargement des paniers surprise')
+      return false
     } finally {
       loading.value = false
     }
@@ -63,13 +66,22 @@ export const useSurpriseBaskets = () => {
 
       if (response.success) {
         merchantBaskets.value = response.data.data
+        pagination.value = {
+          currentPage: response.data.current_page,
+          lastPage: response.data.last_page,
+          perPage: response.data.per_page,
+          total: response.data.total
+        }
+        return true
       } else {
         notify.error(response.message || 'Erreur lors du chargement de vos paniers surprise')
+        return false
       }
     } catch (error) {
       console.error('Error loading merchant baskets:', error)
       const message = error instanceof Error ? error.message : 'Erreur lors du chargement de vos paniers surprise'
       notify.error(message || 'Erreur lors du chargement de vos paniers surprise')
+      return false
     } finally {
       loading.value = false
     }
