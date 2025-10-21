@@ -115,10 +115,17 @@ describe('MerchantProductsScreen', () => {
   })
 
   describe('Rendering', () => {
-    it('renders without crashing', () => {
-      const { getByTestId } = renderScreen()
+    it('opens edit mode when a product card is pressed', async () => {
+      const { getByText } = renderScreen()
 
-      expect(getByTestId(TEST_IDS.merchantProducts)).toBeTruthy()
+      fireEvent.press(getByText('Pain artisanal'))
+
+      await waitFor(() => {
+        expect(mockNavigate).toHaveBeenCalledWith('ProductForm', {
+          mode: 'edit',
+          product: expect.objectContaining({ id: 1 }),
+        })
+      })
     })
 
     it('displays products list with testID', () => {
@@ -157,7 +164,9 @@ describe('MerchantProductsScreen', () => {
       fireEvent.press(addButton)
 
       await waitFor(() => {
-        expect(mockNavigate).toHaveBeenCalledWith('ProductForm')
+        expect(mockNavigate).toHaveBeenCalledWith('ProductForm', {
+          mode: 'create',
+        })
       })
     })
   })
@@ -200,7 +209,10 @@ describe('MerchantProductsScreen', () => {
       fireEvent.press(editButtons[0])
 
       await waitFor(() => {
-        expect(mockNavigate).toHaveBeenCalledWith('ProductForm', { productId: 1 })
+        expect(mockNavigate).toHaveBeenCalledWith('ProductForm', {
+          mode: 'edit',
+          product: expect.objectContaining({ id: 1 }),
+        })
       })
     })
 

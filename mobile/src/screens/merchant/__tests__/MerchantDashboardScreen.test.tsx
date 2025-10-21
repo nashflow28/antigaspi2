@@ -7,6 +7,7 @@ import MerchantDashboardScreen from '../MerchantDashboardScreen'
 import authSlice from '../../../store/slices/authSlice'
 import { ThemeProvider } from '../../../theme/ThemeContext'
 import { TEST_IDS } from '../../../utils/testIds'
+import apiService from '../../../services/api'
 
 // Mock navigation
 const mockNavigate = jest.fn()
@@ -112,11 +113,14 @@ describe('MerchantDashboardScreen', () => {
   })
 
   describe('Rendering', () => {
-    it('renders without crashing', () => {
+    it('fetches dashboard data on mount', async () => {
       const store = createTestStore()
-      const { getByTestId } = renderWithProviders(<MerchantDashboardScreen />, store)
+      renderWithProviders(<MerchantDashboardScreen />, store)
 
-      expect(getByTestId(TEST_IDS.merchantDashboard)).toBeTruthy()
+      await waitFor(() => {
+        expect(apiService.get).toHaveBeenCalledWith('/analytics/merchant-stats')
+        expect(apiService.get).toHaveBeenCalledWith('/reservations/merchant/list?limit=5')
+      })
     })
 
     it('displays header with correct titles', () => {
@@ -127,11 +131,16 @@ describe('MerchantDashboardScreen', () => {
       expect(getByText('Tableau de bord')).toBeTruthy()
     })
 
-    it('displays refresh button in header', () => {
+    it('reloads dashboard data when refresh button is pressed', async () => {
       const store = createTestStore()
-      const { getByTestId } = renderWithProviders(<MerchantDashboardScreen />, store)
+      const { getByLabelText } = renderWithProviders(<MerchantDashboardScreen />, store)
 
-      expect(getByTestId(TEST_IDS.merchantDashboard)).toBeTruthy()
+      const refreshButton = getByLabelText('Rafraîchir le tableau de bord')
+      fireEvent.press(refreshButton)
+
+      await waitFor(() => {
+        expect(apiService.get).toHaveBeenCalledTimes(4)
+      })
     })
   })
 

@@ -1,11 +1,12 @@
 // @ts-nocheck
 import React from 'react'
 import { render, fireEvent, waitFor } from '@testing-library/react-native'
+import { Alert } from 'react-native'
 import { Provider } from 'react-redux'
 import { configureStore } from '@reduxjs/toolkit'
 import { ThemeProvider } from '../../../theme/ThemeContext'
 import ReservationDetailsScreen from '../ReservationDetailsScreen'
-import reservationsSlice from '../../../store/slices/reservationsSlice'
+import reservationsSlice, { fetchReservation, cancelReservation } from '../../../store/slices/reservationsSlice'
 import authSlice from '../../../store/slices/authSlice'
 
 // Mock navigation
@@ -24,8 +25,32 @@ const mockRoute = {
   },
 }
 
+jest.mock('../../../store/slices/reservationsSlice', () => {
+  const actual = jest.requireActual('../../../store/slices/reservationsSlice')
+  const mockFetchReservation = jest.fn(() => async () => ({
+    type: 'reservations/fetchReservation/fulfilled',
+    payload: createReservationFixture(),
+  }))
+  mockFetchReservation.fulfilled = {
+    match: (action: { type: string }) => action.type === 'reservations/fetchReservation/fulfilled',
+  }
+
+  const mockCancelReservation = jest.fn(() => async () => ({
+    type: 'reservations/cancelReservation/fulfilled',
+  }))
+  mockCancelReservation.fulfilled = {
+    match: (action: { type: string }) => action.type === 'reservations/cancelReservation/fulfilled',
+  }
+
+  return {
+    ...actual,
+    fetchReservation: mockFetchReservation,
+    cancelReservation: mockCancelReservation,
+  }
+})
+
 // Mock reservation data (matching Reservation type from types/index.ts)
-const mockReservation = {
+const createReservationFixture = () => ({
   id: 1,
   reservation_code: 'ABC123',
   quantity: 2,
@@ -74,7 +99,9 @@ const mockReservation = {
     created_at: '2025-01-01T10:00:00Z',
     updated_at: '2025-01-15T10:00:00Z',
   },
-}
+})
+
+const mockReservation = createReservationFixture()
 
 // Create test store
 const createTestStore = (initialState = {}) => {
@@ -116,11 +143,15 @@ describe('ReservationDetailsScreen', () => {
   })
 
   describe('Rendering', () => {
-    it('renders without crashing', () => {
+    it('loads reservation details using route id', async () => {
       const { getByText } = renderWithProviders(
         <ReservationDetailsScreen navigation={mockNavigation} route={mockRoute} />
       )
-      expect(getByText('Pain complet artisanal')).toBeTruthy()
+
+      await waitFor(() => {
+        expect(fetchReservation).toHaveBeenCalledWith(1)
+        expect(getByText('Pain complet artisanal')).toBeTruthy()
+      })
     })
 
     it('displays product name', () => {
@@ -355,6 +386,31 @@ describe('ReservationDetailsScreen', () => {
 
       // Reservation should still be visible
       expect(getByText('Pain complet artisanal')).toBeTruthy()
+    })
+
+    it('dispatches cancellation when confirmation is accepted', async () => {
+      const pendingReservation = { ...mockReservation, status: 'pending' }
+      const store = createTestStore({ currentReservation: pendingReservation })
+      const alertSpy = jest
+        .spyOn(Alert, 'alert')
+        .mockImplementation((_title, _message, buttons) => {
+          const confirm = buttons?.find(button => button.style === 'destructive')
+          confirm?.onPress?.()
+        })
+
+      const { getByText } = renderWithProviders(
+        <ReservationDetailsScreen navigation={mockNavigation} route={mockRoute} />,
+        store
+      )
+
+      fireEvent.press(getByText(/Annuler/i))
+
+      await waitFor(() => {
+        expect(cancelReservation).toHaveBeenCalledWith(1)
+        expect(mockGoBack).toHaveBeenCalled()
+      })
+
+      alertSpy.mockRestore()
     })
   })
 

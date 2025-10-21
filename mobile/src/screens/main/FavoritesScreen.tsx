@@ -129,6 +129,8 @@ const FavoritesScreen: React.FC = () => {
 
           <TouchableOpacity
             style={styles.removeFavoriteButton}
+            accessibilityRole="button"
+            accessibilityLabel={`Retirer ${product.name} des favoris`}
             onPress={() => handleRemoveFavorite(product.id, product.name)}
           >
             <Ionicons name="heart" size={24} color={theme.colors.primary[600]} />

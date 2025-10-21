@@ -68,41 +68,15 @@ describe('ProfileScreen', () => {
   })
 
   describe('Rendering', () => {
-    it('renders without crashing', () => {
-      const store = createTestStore()
-      const { getByTestId } = renderWithProviders(<ProfileScreen />, store)
-
-      expect(getByTestId(TEST_IDS.profileScreen)).toBeTruthy()
-    })
-
-    it('displays user avatar', () => {
-      const store = createTestStore()
-      const { getByTestId } = renderWithProviders(<ProfileScreen />, store)
-
-      // Avatar is rendered with person icon
-      expect(getByTestId(TEST_IDS.profileScreen)).toBeTruthy()
-    })
-
-    it('displays user full name', () => {
+    it('shows profile summary with identity and role badge', () => {
       const store = createTestStore()
       const { getByTestId, getByText } = renderWithProviders(<ProfileScreen />, store)
 
+      expect(getByTestId(TEST_IDS.profileScreen)).toBeTruthy()
       expect(getByTestId(TEST_IDS.profileName)).toBeTruthy()
       expect(getByText('Jean Dupont')).toBeTruthy()
-    })
-
-    it('displays user email', () => {
-      const store = createTestStore()
-      const { getByTestId, getByText } = renderWithProviders(<ProfileScreen />, store)
-
       expect(getByTestId(TEST_IDS.profileEmail)).toBeTruthy()
       expect(getByText('jean.dupont@email.com')).toBeTruthy()
-    })
-
-    it('displays consumer role badge', () => {
-      const store = createTestStore('consumer')
-      const { getByText } = renderWithProviders(<ProfileScreen />, store)
-
       expect(getByText('Consommateur')).toBeTruthy()
     })
 

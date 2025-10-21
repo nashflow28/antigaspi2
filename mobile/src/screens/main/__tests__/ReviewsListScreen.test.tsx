@@ -5,7 +5,7 @@ import { Provider } from 'react-redux'
 import { configureStore } from '@reduxjs/toolkit'
 import { ThemeProvider } from '../../../theme/ThemeContext'
 import ReviewsListScreen from '../ReviewsListScreen'
-import reviewsSlice from '../../../store/slices/reviewsSlice'
+import reviewsSlice, { fetchReviews, fetchReviewStats } from '../../../store/slices/reviewsSlice'
 import authSlice from '../../../store/slices/authSlice'
 
 // Mock navigation
@@ -97,6 +97,37 @@ const mockStats = {
   ],
 }
 
+jest.mock('../../../store/slices/reviewsSlice', () => {
+  const actual = jest.requireActual('../../../store/slices/reviewsSlice')
+  const mockFetchReviews = jest.fn(() => async () => ({
+    type: 'reviews/fetchReviews/fulfilled',
+    payload: mockReviews,
+  }))
+  mockFetchReviews.fulfilled = {
+    match: (action: { type: string }) => action.type === 'reviews/fetchReviews/fulfilled',
+  }
+  mockFetchReviews.rejected = {
+    match: (action: { type: string }) => action.type === 'reviews/fetchReviews/rejected',
+  }
+
+  const mockFetchReviewStats = jest.fn(() => async () => ({
+    type: 'reviews/fetchReviewStats/fulfilled',
+    payload: mockStats,
+  }))
+  mockFetchReviewStats.fulfilled = {
+    match: (action: { type: string }) => action.type === 'reviews/fetchReviewStats/fulfilled',
+  }
+  mockFetchReviewStats.rejected = {
+    match: (action: { type: string }) => action.type === 'reviews/fetchReviewStats/rejected',
+  }
+
+  return {
+    ...actual,
+    fetchReviews: mockFetchReviews,
+    fetchReviewStats: mockFetchReviewStats,
+  }
+})
+
 // Create test store
 const createTestStore = (initialState = {}) => {
   return configureStore({
@@ -139,11 +170,16 @@ describe('ReviewsListScreen', () => {
   })
 
   describe('Rendering - Header', () => {
-    it('renders without crashing', () => {
+    it('loads reviews and stats on mount', async () => {
       const { getByText } = renderWithProviders(
         <ReviewsListScreen navigation={mockNavigation} route={mockRoute} />
       )
-      expect(getByText('Avis clients')).toBeTruthy()
+
+      await waitFor(() => {
+        expect(fetchReviews).toHaveBeenCalledWith({ merchantId: 1 })
+        expect(fetchReviewStats).toHaveBeenCalledWith(1)
+        expect(getByText('Avis clients')).toBeTruthy()
+      })
     })
 
     it('displays merchant name in header', () => {

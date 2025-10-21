@@ -6,9 +6,12 @@ import {
   fireEvent,
   waitFor,
   createTestUser,
+  makeMerchant,
+  makeProduct,
 } from '@test-utils'
 import MerchantDetailScreen from '../MerchantDetailScreen'
 import type { RootState } from '../../../store'
+import { fetchProducts } from '../../../store/slices/productsSlice'
 
 // Mock navigation
 const mockNavigate = jest.fn()
@@ -27,7 +30,7 @@ const mockRoute = {
 }
 
 // Mock merchant data (matching Merchant type from types/index.ts)
-const mockMerchant = {
+const mockMerchant = makeMerchant({
   id: 1,
   business_name: 'Boulangerie Martin',
   business_type: 'Boulangerie artisanale',
@@ -38,11 +41,11 @@ const mockMerchant = {
   latitude: 6.1319,
   longitude: 1.2228,
   products_count: 8,
-}
+})
 
 // Mock products (matching Product type from types/index.ts)
 const mockProducts = [
-  {
+  makeProduct({
     id: 1,
     name: 'Pain complet',
     description: 'Pain frais du jour',
@@ -58,8 +61,8 @@ const mockProducts = [
     merchant: mockMerchant,
     created_at: '2025-10-20T10:00:00Z',
     is_active: true,
-  },
-  {
+  }),
+  makeProduct({
     id: 2,
     name: 'Croissants',
     description: 'Croissants au beurre artisanaux',
@@ -75,8 +78,24 @@ const mockProducts = [
     merchant: mockMerchant,
     created_at: '2025-10-20T10:00:00Z',
     is_active: true,
-  },
+  }),
 ]
+
+jest.mock('../../../store/slices/productsSlice', () => {
+  const actual = jest.requireActual('../../../store/slices/productsSlice')
+  const mockFetchProducts = jest.fn(() => async () => ({
+    type: 'products/fetchProducts/fulfilled',
+    payload: mockProducts,
+  }))
+  mockFetchProducts.fulfilled = {
+    match: (action: { type: string }) => action.type === 'products/fetchProducts/fulfilled',
+  }
+
+  return {
+    ...actual,
+    fetchProducts: mockFetchProducts,
+  }
+})
 
 // Mock reviews (matching Review type from types/index.ts)
 const mockReviews = [
@@ -188,9 +207,13 @@ describe('MerchantDetailScreen', () => {
   })
 
   describe('Rendering - Header', () => {
-    it('renders without crashing', () => {
-      const { getByText } = renderScreen()
-      expect(getByText('Boulangerie Martin')).toBeTruthy()
+    it('fetches merchant products when cache is empty', async () => {
+      const { getByText } = renderScreen({ products: { products: [] } })
+
+      await waitFor(() => {
+        expect(fetchProducts).toHaveBeenCalledWith({ per_page: 50 })
+        expect(getByText('Boulangerie Martin')).toBeTruthy()
+      })
     })
 
     it('displays merchant name', () => {
