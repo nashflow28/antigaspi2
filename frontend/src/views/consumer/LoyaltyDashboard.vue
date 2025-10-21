@@ -156,8 +156,59 @@
         </div>
 
         <!-- Rewards Section -->
-        <div ref="rewardsSection" class="lg:col-span-3">
-          <Card class="">
+        <div ref="rewardsSection" class="lg:col-span-3 space-y-6">
+          <Card>
+            <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between mt-4">
+              <div>
+                <h3 class="text-xl font-semibold text-gray-900">Échange Manuel</h3>
+                <p class="text-sm text-gray-600">
+                  Saisissez un montant spécifique pour échanger vos points en fonction des offres proposées par
+                  les commerçants.
+                </p>
+              </div>
+              <div class="text-sm text-gray-600 bg-blue-50 border border-blue-100 rounded px-3 py-2 flex items-center gap-2">
+                <Minus class="h-4 w-4 text-blue-500" />
+                <span>Points disponibles : {{ formatPoints(totalPoints) }}</span>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
+              <Input
+                v-model="manualPoints"
+                type="number"
+                min="1"
+                label="Nombre de points à échanger"
+                placeholder="Ex. 25"
+                inputmode="numeric"
+                :error="manualValidationMessage"
+              />
+
+              <Input
+                v-model="manualDescription"
+                label="Description (optionnelle)"
+                placeholder="Ex. Réduction chez Bio Market"
+                maxlength="120"
+              />
+            </div>
+
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mt-4">
+              <p class="text-sm text-gray-600">
+                {{ manualPointsPreview }}
+              </p>
+
+              <Button
+                :disabled="!canSubmitManualRedeem"
+                :loading="manualRedeeming"
+                :full-width="true"
+                class="sm:w-auto"
+                @click="submitManualRedeem"
+              >
+                Échanger ces points
+              </Button>
+            </div>
+          </Card>
+
+          <Card>
             <div class="flex items-center justify-start sm:justify-between mt-4">
               <h3 class="text-xl font-semibold text-gray-900">Récompenses Disponibles</h3>
               <div class="flex items-center gap-2 text-sm text-gray-700">
@@ -171,7 +222,10 @@
                 v-for="reward in availableRewards"
                 :key="reward.id"
                 class="border border-gray-200 rounded p-6 hover:transition-all duration-200"
-                :class="canRedeem(reward.cost) ? 'bg-white hover:border-blue-300' : 'bg-gray-50'"
+                :class="[
+                  canRedeem(reward.cost) ? 'bg-white hover:border-blue-300' : 'bg-gray-50',
+                  reward.highlight ? 'ring-2 ring-primary-300 shadow-glow' : ''
+                ]"
               >
                 <div class="flex items-center gap-4 mt-3">
                   <div class="p-3 bg-gradient-to-r from-blue-600 to-blue-700 rounded">
@@ -185,14 +239,15 @@
 
                 <p class="text-sm text-gray-700 mt-3">{{ reward.description }}</p>
 
-                <button
+                <Button
                   :disabled="!canRedeem(reward.cost)"
-                  class="w-full button-primary-2025"
-                  :class="canRedeem(reward.cost) ? 'button-primary-2025' : 'button-outline-2025 opacity-50 cursor-not-allowed'"
+                  :variant="canRedeem(reward.cost) ? 'primary' : 'outline'"
+                  :full-width="true"
+                  class="mt-4"
                   @click="openRedeemModal(reward)"
                 >
                   {{ canRedeem(reward.cost) ? 'Échanger' : 'Points insuffisants' }}
-                </button>
+                </Button>
               </div>
             </div>
           </Card>
@@ -257,15 +312,17 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
+import type { Component } from 'vue'
 import {
   Star, Clock, Gift, TrendingUp, RefreshCw, X, Loader2,
   ShoppingBag, MessageSquare, Users, Award, Minus
 } from 'lucide-vue-next'
 import { useLoyaltyPoints } from '@/composables/useLoyaltyPoints'
 import DashboardLayout from '@/components/ui/DashboardLayout.vue'
-import Button from '@/components/ui/2025/Button.vue'
 import Card from '@/components/ui/2025/Card.vue'
 import { useDashboardLayout } from '@/composables/useDashboardLayout'
+import Button from '@/components/ui/2025/Button.vue'
+import Input from '@/components/ui/2025/Input.vue'
 
 // Composables
 const {
@@ -283,36 +340,101 @@ const {
 } = useLoyaltyPoints()
 
 // State
-const selectedReward = ref(null)
+interface RewardOption {
+  id: number
+  title: string
+  description: string
+  cost: number
+  icon: Component
+  highlight?: boolean
+}
+
+const selectedReward = ref<RewardOption | null>(null)
 const redeeming = ref(false)
 const rewardsSection = ref(null)
+
+const manualPoints = ref('')
+const manualDescription = ref('')
+const manualRedeeming = ref(false)
 
 const { sidebar, header } = useDashboardLayout('consumer')
 
 // Mock rewards data (this would come from an API in real app)
-const availableRewards = ref([
+const availableRewards = ref<RewardOption[]>([
   {
     id: 1,
     title: 'Réduction 10%',
     description: 'Obtenez 10% de réduction sur votre prochain achat',
     cost: 50,
-    icon: 'ShoppingBag'
+    icon: ShoppingBag,
+    highlight: true
   },
   {
     id: 2,
     title: 'Livraison Gratuite',
     description: 'Livraison gratuite pour votre prochaine commande',
     cost: 30,
-    icon: 'Gift'
+    icon: Gift
   },
   {
     id: 3,
     title: 'Produit Bonus',
     description: 'Recevez un produit gratuit avec votre achat',
     cost: 100,
-    icon: 'Award'
+    icon: Award
   }
 ])
+
+const manualPointsValue = computed(() => {
+  if (!manualPoints.value) {
+    return NaN
+  }
+
+  const parsed = Number.parseInt(manualPoints.value, 10)
+  return Number.isNaN(parsed) ? NaN : parsed
+})
+
+const manualValidationMessage = computed(() => {
+  if (!manualPoints.value) {
+    return ''
+  }
+
+  if (Number.isNaN(manualPointsValue.value)) {
+    return 'Veuillez saisir un nombre de points valide.'
+  }
+
+  if (manualPointsValue.value <= 0) {
+    return 'Le nombre de points doit être supérieur à 0.'
+  }
+
+  if (manualPointsValue.value > totalPoints.value) {
+    return 'Vous n\'avez pas suffisamment de points pour cet échange.'
+  }
+
+  return ''
+})
+
+const canSubmitManualRedeem = computed(() => {
+  return (
+    !manualValidationMessage.value &&
+    !Number.isNaN(manualPointsValue.value) &&
+    manualPointsValue.value > 0 &&
+    !manualRedeeming.value
+  )
+})
+
+const manualPointsPreview = computed(() => {
+  if (!manualPoints.value) {
+    return 'Saisissez le nombre de points à échanger.'
+  }
+
+  if (Number.isNaN(manualPointsValue.value)) {
+    return 'Entrez un nombre entier positif pour lancer un échange.'
+  }
+
+  const remaining = Math.max(totalPoints.value - manualPointsValue.value, 0)
+  return `Après l'échange vous conserverez ${formatPoints(remaining)} point(s).`
+})
 
 // Methods
 const refreshPoints = async () => {
@@ -342,7 +464,7 @@ const scrollToRewards = () => {
   rewardsSection.value?.scrollIntoView({ behavior: 'smooth' })
 }
 
-const openRedeemModal = (reward) => {
+const openRedeemModal = (reward: RewardOption) => {
   selectedReward.value = reward
 }
 
@@ -366,6 +488,26 @@ const confirmRedeem = async () => {
   }
 
   redeeming.value = false
+}
+
+const submitManualRedeem = async () => {
+  if (!canSubmitManualRedeem.value || Number.isNaN(manualPointsValue.value)) {
+    return
+  }
+
+  manualRedeeming.value = true
+
+  const success = await redeemPoints({
+    points: manualPointsValue.value,
+    description: manualDescription.value.trim() || `Échange manuel de ${manualPointsValue.value} points`
+  })
+
+  if (success) {
+    manualPoints.value = ''
+    manualDescription.value = ''
+  }
+
+  manualRedeeming.value = false
 }
 
 // Lifecycle

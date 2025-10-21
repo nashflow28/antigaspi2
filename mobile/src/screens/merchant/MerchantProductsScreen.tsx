@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from 'react'
+import React, { useEffect, useState, useCallback, useMemo } from 'react'
 import {
   View,
   Text,
@@ -19,8 +19,24 @@ import apiService from '../../services/api'
 import { getImageUrl } from '../../utils/imageHelpers'
 import { TEST_IDS } from '../../utils/testIds'
 
+type StatusFilter = 'all' | 'active' | 'inactive' | 'pending'
+
 interface Props {
   navigation: any
+}
+
+const isPendingAdminApproval = (product: Product): boolean => {
+  if (typeof product.needs_approval === 'boolean') {
+    return product.needs_approval
+  }
+
+  const status = typeof product.status === 'string' ? product.status.toLowerCase() : ''
+
+  return [
+    'pending_admin_approval',
+    'pending_approval',
+    'pending'
+  ].some(value => status === value || status.includes(value))
 }
 
 const MerchantProductsScreen: React.FC<Props> = ({ navigation }) => {
@@ -28,6 +44,7 @@ const MerchantProductsScreen: React.FC<Props> = ({ navigation }) => {
   const [products, setProducts] = useState<Product[]>([])
   const [refreshing, setRefreshing] = useState(false)
   const [loading, setLoading] = useState(true)
+  const [statusFilter, setStatusFilter] = useState<StatusFilter>('all')
 
   // Recharger la liste à chaque fois que l'écran devient actif
   useFocusEffect(
@@ -102,81 +119,150 @@ const MerchantProductsScreen: React.FC<Props> = ({ navigation }) => {
     )
   }
 
-  const renderProduct = ({ item }: { item: Product }) => (
-    <View style={[styles.productCard, { backgroundColor: theme.colors.surface.light }]}>
-      <TouchableOpacity
-        style={styles.productContent}
-        onPress={() => handleEditProduct(item)}
-      >
-        {/* Image */}
-        {item.image_url ? (
-          <Image
-            source={{ uri: getImageUrl(item.image_url) }}
-            style={styles.productImage}
-          />
-        ) : (
-          <View style={[styles.productImage, { backgroundColor: '#f0f0f0', alignItems: 'center', justifyContent: 'center' }]}>
-            <Ionicons name="image-outline" size={32} color="#ccc" />
-          </View>
-        )}
+  const pendingCount = useMemo(
+    () => products.filter(product => isPendingAdminApproval(product)).length,
+    [products]
+  )
 
-        {/* Infos */}
-        <View style={styles.productInfo}>
-          <Text style={[styles.productName, { color: theme.colors.text }]}>
-            {item.name}
-          </Text>
-          <Text style={[styles.productCategory, { color: theme.colors.textSecondary }]}>
-            {item.category?.name}
-          </Text>
-          <View style={styles.priceRow}>
-            <Text style={[styles.productPrice, { color: theme.colors.primary[500] }]}>
-              {item.discounted_price} F CFA
+  const activeCount = useMemo(
+    () =>
+      products.filter(product => product.is_active === true && !isPendingAdminApproval(product)).length,
+    [products]
+  )
+
+  const inactiveCount = useMemo(
+    () =>
+      products.filter(product => product.is_active === false && !isPendingAdminApproval(product)).length,
+    [products]
+  )
+
+  const filteredProducts = useMemo(() => {
+    if (statusFilter === 'all') {
+      return products
+    }
+
+    return products.filter(product => {
+      if (statusFilter === 'pending') {
+        return isPendingAdminApproval(product)
+      }
+
+      if (statusFilter === 'active') {
+        return product.is_active === true && !isPendingAdminApproval(product)
+      }
+
+      if (statusFilter === 'inactive') {
+        return product.is_active === false && !isPendingAdminApproval(product)
+      }
+
+      return true
+    })
+  }, [products, statusFilter])
+
+  const statusFilters: Array<{ key: StatusFilter; label: string; count: number }> = [
+    { key: 'all', label: 'Tous', count: products.length },
+    { key: 'active', label: 'Actifs', count: activeCount },
+    { key: 'pending', label: 'En attente', count: pendingCount },
+    { key: 'inactive', label: 'Inactifs', count: inactiveCount },
+  ]
+
+  const renderProduct = ({ item }: { item: Product }) => {
+    const pendingApproval = isPendingAdminApproval(item)
+
+    return (
+      <View style={[styles.productCard, { backgroundColor: theme.colors.surface.light }]}>
+        <TouchableOpacity
+          style={styles.productContent}
+          onPress={() => handleEditProduct(item)}
+        >
+          {/* Image */}
+          {item.image_url ? (
+            <Image
+              source={{ uri: getImageUrl(item.image_url) }}
+              style={styles.productImage}
+            />
+          ) : (
+            <View style={[styles.productImage, { backgroundColor: '#f0f0f0', alignItems: 'center', justifyContent: 'center' }]}>
+              <Ionicons name="image-outline" size={32} color="#ccc" />
+            </View>
+          )}
+
+          {/* Infos */}
+          <View style={styles.productInfo}>
+            {pendingApproval && (
+              <View
+                style={[
+                  styles.statusBadge,
+                  {
+                    backgroundColor: theme.withOpacity(theme.colors.semantic.warning, 0.15),
+                  },
+                ]}
+              >
+                <Text
+                  style={[
+                    styles.statusBadgeText,
+                    { color: theme.colors.semantic.warning },
+                  ]}
+                >
+                  Pending Admin Approval
+                </Text>
+              </View>
+            )}
+            <Text style={[styles.productName, { color: theme.colors.text }]}>
+              {item.name}
             </Text>
-            <Text style={[styles.productOriginalPrice, { color: theme.colors.textSecondary }]}>
-              {item.original_price} F CFA
+            <Text style={[styles.productCategory, { color: theme.colors.textSecondary }]}>
+              {item.category?.name}
             </Text>
-          </View>
-          <View style={styles.stockRow}>
-            <View style={[
-              styles.stockBadge,
-              {
-                backgroundColor: item.quantity_available > 0
-                  ? theme.withOpacity(theme.colors.semantic.success, 0.1)
-                  : theme.withOpacity(theme.colors.semantic.error, 0.1)
-              }
-            ]}>
-              <Text style={[
-                styles.stockText,
-                {
-                  color: item.quantity_available > 0
-                    ? theme.colors.semantic.success
-                    : theme.colors.semantic.error
-                }
-              ]}>
-                {item.quantity_available > 0 ? `Stock: ${item.quantity_available}` : 'Rupture'}
+            <View style={styles.priceRow}>
+              <Text style={[styles.productPrice, { color: theme.colors.primary[500] }]}>
+                {item.discounted_price} F CFA
+              </Text>
+              <Text style={[styles.productOriginalPrice, { color: theme.colors.textSecondary }]}>
+                {item.original_price} F CFA
               </Text>
             </View>
+            <View style={styles.stockRow}>
+              <View style={[
+                styles.stockBadge,
+                {
+                  backgroundColor: item.quantity_available > 0
+                    ? theme.withOpacity(theme.colors.semantic.success, 0.1)
+                    : theme.withOpacity(theme.colors.semantic.error, 0.1)
+                }
+              ]}>
+                <Text style={[
+                  styles.stockText,
+                  {
+                    color: item.quantity_available > 0
+                      ? theme.colors.semantic.success
+                      : theme.colors.semantic.error
+                  }
+                ]}>
+                  {item.quantity_available > 0 ? `Stock: ${item.quantity_available}` : 'Rupture'}
+                </Text>
+              </View>
+            </View>
           </View>
-        </View>
 
-        {/* Actions */}
-        <View style={styles.actionsContainer}>
-          <TouchableOpacity
-            style={[styles.actionButton, { backgroundColor: theme.withOpacity(theme.colors.primary[500], 0.1) }]}
-            onPress={() => handleEditProduct(item)}
-          >
-            <Ionicons name="create" size={20} color={theme.colors.primary[500]} />
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[styles.actionButton, { backgroundColor: theme.withOpacity(theme.colors.semantic.error, 0.1) }]}
-            onPress={() => handleDeleteProduct(item.id)}
-          >
-            <Ionicons name="trash" size={20} color={theme.colors.semantic.error} />
-          </TouchableOpacity>
-        </View>
-      </TouchableOpacity>
-    </View>
-  )
+          {/* Actions */}
+          <View style={styles.actionsContainer}>
+            <TouchableOpacity
+              style={[styles.actionButton, { backgroundColor: theme.withOpacity(theme.colors.primary[500], 0.1) }]}
+              onPress={() => handleEditProduct(item)}
+            >
+              <Ionicons name="create" size={20} color={theme.colors.primary[500]} />
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[styles.actionButton, { backgroundColor: theme.withOpacity(theme.colors.semantic.error, 0.1) }]}
+              onPress={() => handleDeleteProduct(item.id)}
+            >
+              <Ionicons name="trash" size={20} color={theme.colors.semantic.error} />
+            </TouchableOpacity>
+          </View>
+        </TouchableOpacity>
+      </View>
+    )
+  }
 
   return (
     <View style={[styles.container, { backgroundColor: theme.colors.background }]} testID={TEST_IDS.merchantProducts}>
@@ -197,9 +283,56 @@ const MerchantProductsScreen: React.FC<Props> = ({ navigation }) => {
         </View>
       </View>
 
+      <View style={styles.filtersContainer}>
+        {statusFilters.map(filter => {
+          const isActiveFilter = statusFilter === filter.key
+          return (
+            <TouchableOpacity
+              key={filter.key}
+              style={[
+                styles.filterChip,
+                {
+                  backgroundColor: isActiveFilter
+                    ? theme.withOpacity(theme.colors.primary[500], 0.15)
+                    : theme.colors.surface.light,
+                  borderColor: isActiveFilter ? theme.colors.primary[500] : theme.colors.neutral[200],
+                },
+              ]}
+              onPress={() => setStatusFilter(filter.key)}
+              accessibilityRole="button"
+              accessibilityState={{ selected: isActiveFilter }}
+            >
+              <Text
+                style={[
+                  styles.filterChipText,
+                  { color: isActiveFilter ? theme.colors.primary[500] : theme.colors.textSecondary },
+                ]}
+              >
+                {filter.label}
+              </Text>
+              <View
+                style={[
+                  styles.filterChipCount,
+                  { backgroundColor: isActiveFilter ? theme.colors.primary[500] : theme.colors.neutral[200] },
+                ]}
+              >
+                <Text
+                  style={[
+                    styles.filterChipCountText,
+                    { color: isActiveFilter ? 'white' : theme.colors.text },
+                  ]}
+                >
+                  {filter.count}
+                </Text>
+              </View>
+            </TouchableOpacity>
+          )
+        })}
+      </View>
+
       {/* Liste des produits */}
       <FlatList
-        data={products}
+        data={filteredProducts}
         renderItem={renderProduct}
         keyExtractor={(item) => item.id.toString()}
         contentContainerStyle={styles.listContent}
@@ -252,6 +385,36 @@ const styles = StyleSheet.create({
   addButton: {
     padding: 4,
   },
+  filtersContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+  },
+  filterChip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 16,
+    borderWidth: 1,
+    marginRight: 8,
+    marginBottom: 8,
+  },
+  filterChipText: {
+    fontSize: 13,
+    fontWeight: '600',
+  },
+  filterChipCount: {
+    marginLeft: 8,
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 999,
+  },
+  filterChipCountText: {
+    fontSize: 12,
+    fontWeight: '600',
+  },
   listContent: {
     padding: 16,
     flexGrow: 1,
@@ -275,6 +438,19 @@ const styles = StyleSheet.create({
     flex: 1,
     marginLeft: 12,
     justifyContent: 'space-between',
+  },
+  statusBadge: {
+    alignSelf: 'flex-start',
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 8,
+    marginBottom: 6,
+  },
+  statusBadgeText: {
+    fontSize: 11,
+    fontWeight: '700',
+    letterSpacing: 0.4,
+    textTransform: 'uppercase',
   },
   productName: {
     fontSize: 16,

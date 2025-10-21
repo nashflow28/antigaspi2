@@ -167,6 +167,15 @@
             >
             <div class="relative sm:absolute left-3 top-3 flex flex-wrap gap-2">
               <Badge
+                v-if="isPendingAdminApproval(product)"
+                variant="warning"
+                size="xs"
+                rounded
+                class="bg-amber-500 text-white hover:bg-amber-500/90"
+              >
+                Pending Admin Approval
+              </Badge>
+              <Badge
                 v-if="!product.is_active"
                 variant="secondary"
                 size="xs"
@@ -666,12 +675,34 @@ const isExpiringSoon = (product: any): boolean => {
   return diffDays <= 3 && diffDays >= 0
 }
 
+const isPendingAdminApproval = (product: any): boolean => {
+  if (!product) {
+    return false
+  }
+
+  if (typeof product.needs_approval === 'boolean') {
+    return product.needs_approval
+  }
+
+  const status = typeof product.status === 'string' ? product.status.toLowerCase() : ''
+  if (!status) {
+    return false
+  }
+
+  return [
+    'pending_admin_approval',
+    'pending_approval',
+    'pending'
+  ].some(value => status === value || status.includes(value))
+}
+
 
 const formatDate = (date: string): string => {
   return new Date(date).toLocaleDateString('fr-FR')
 }
 
 const getStatusColor = (product: any): string => {
+  if (isPendingAdminApproval(product)) return 'text-amber-600'
   if (!product.is_active) return 'text-gray-500'
   if (isExpiringSoon(product)) return 'text-red-600'
   if (product.quantity_available <= 5) return 'text-orange-500'
@@ -679,6 +710,7 @@ const getStatusColor = (product: any): string => {
 }
 
 const getStatusText = (product: any): string => {
+  if (isPendingAdminApproval(product)) return "En attente d'approbation admin"
   if (!product.is_active) return 'Inactif'
   if (isExpiringSoon(product)) return 'Expire bientôt'
   if (product.quantity_available <= 5) return 'Stock faible'
