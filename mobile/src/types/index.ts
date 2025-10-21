@@ -37,6 +37,12 @@ export interface Merchant {
   longitude?: number | null
 }
 
+export interface MerchantLocation {
+  latitude: number | null
+  longitude: number | null
+  has_location?: boolean
+}
+
 export interface Category {
   id: number
   name: string

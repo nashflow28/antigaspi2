@@ -20,6 +20,7 @@ import {
   MobileMoneyPaymentPayload,
   Review,
   ReviewStats,
+  MerchantLocation,
 } from '../types'
 
 // Configuration dynamique de l'API (web/native) avec overrides propres
@@ -387,6 +388,16 @@ class ApiService {
 
   async deleteReview(reviewId: number): Promise<ApiResponse<any>> {
     return this.request<ApiResponse<any>>('DELETE', `/reviews/${reviewId}`)
+  }
+
+  // === MERCHANTS ===
+
+  async getMerchantLocation(): Promise<ApiResponse<MerchantLocation>> {
+    return this.request<ApiResponse<MerchantLocation>>('GET', '/merchants/location')
+  }
+
+  async updateMerchantLocation(payload: { latitude: number; longitude: number }): Promise<ApiResponse<MerchantLocation>> {
+    return this.request<ApiResponse<MerchantLocation>>('PUT', '/merchants/location', payload)
   }
 
   // === UTILITAIRES ===

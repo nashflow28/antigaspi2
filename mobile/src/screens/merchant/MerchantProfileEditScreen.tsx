@@ -18,6 +18,7 @@ import { RootState } from '../../store'
 import * as ImagePicker from 'expo-image-picker'
 import { useTheme } from '../../theme'
 import apiService from '../../services/api'
+import * as Location from 'expo-location'
 
 interface ProfileFormData {
   business_name: string
@@ -46,9 +47,46 @@ const MerchantProfileEditScreen: React.FC = () => {
     city: '',
     siret: '',
   })
+  const [locationLoading, setLocationLoading] = useState(false)
+  const [latitude, setLatitude] = useState('')
+  const [longitude, setLongitude] = useState('')
+  const [initialLatitudeValue, setInitialLatitudeValue] = useState<number | null>(null)
+  const [initialLongitudeValue, setInitialLongitudeValue] = useState<number | null>(null)
+  const [hasLocation, setHasLocation] = useState(false)
+
+  const formatCoordinate = (value: number | null): string => {
+    if (value === null || Number.isNaN(value)) {
+      return ''
+    }
+    return Number(value).toFixed(6)
+  }
+
+  const parseCoordinateInput = (value: string): number | null => {
+    if (!value || !value.trim()) {
+      return null
+    }
+
+    const normalized = value.trim().replace(',', '.')
+    const numeric = Number(normalized)
+    return Number.isFinite(numeric) ? numeric : null
+  }
+
+  const parseCoordinateFromApi = (value: unknown): number | null => {
+    if (typeof value === 'number') {
+      return Number.isFinite(value) ? value : null
+    }
+
+    if (typeof value === 'string') {
+      const numeric = Number(value)
+      return Number.isFinite(numeric) ? numeric : null
+    }
+
+    return null
+  }
 
   useEffect(() => {
     loadMerchantProfile()
+    loadMerchantLocation()
   }, [])
 
   const loadMerchantProfile = async () => {
@@ -74,6 +112,60 @@ const MerchantProfileEditScreen: React.FC = () => {
       console.error('Erreur chargement profil:', error)
     } finally {
       setLoading(false)
+    }
+  }
+
+  const loadMerchantLocation = async () => {
+    try {
+      setLocationLoading(true)
+      const response = await apiService.getMerchantLocation()
+
+      if (response.data?.success) {
+        const locationData = response.data.data
+        const latValue = parseCoordinateFromApi(locationData?.latitude)
+        const lngValue = parseCoordinateFromApi(locationData?.longitude)
+
+        setInitialLatitudeValue(latValue)
+        setInitialLongitudeValue(lngValue)
+        setLatitude(formatCoordinate(latValue))
+        setLongitude(formatCoordinate(lngValue))
+        setHasLocation(Boolean(locationData?.has_location || (latValue !== null && lngValue !== null)))
+      }
+    } catch (error) {
+      console.error('Erreur chargement localisation:', error)
+    } finally {
+      setLocationLoading(false)
+    }
+  }
+
+  const handleUseCurrentLocation = async () => {
+    try {
+      setLocationLoading(true)
+      const { status } = await Location.requestForegroundPermissionsAsync()
+
+      if (status !== 'granted') {
+        throw new Error('Permission de géolocalisation refusée')
+      }
+
+      const position = await Location.getCurrentPositionAsync({
+        accuracy: Location.Accuracy.Balanced,
+      })
+
+      const newLatitude = Number(position.coords.latitude)
+      const newLongitude = Number(position.coords.longitude)
+
+      setLatitude(formatCoordinate(newLatitude))
+      setLongitude(formatCoordinate(newLongitude))
+    } catch (error) {
+      console.error('Erreur géolocalisation:', error)
+      Alert.alert(
+        'Géolocalisation',
+        error instanceof Error
+          ? error.message
+          : 'Impossible de récupérer votre position actuelle'
+      )
+    } finally {
+      setLocationLoading(false)
     }
   }
 
@@ -136,11 +228,71 @@ const MerchantProfileEditScreen: React.FC = () => {
     }
   }
 
+  const saveLocationIfNeeded = async (): Promise<boolean> => {
+    const hasInput = latitude.trim().length > 0 || longitude.trim().length > 0
+
+    if (!hasInput) {
+      if (initialLatitudeValue !== null || initialLongitudeValue !== null) {
+        setLatitude(formatCoordinate(initialLatitudeValue))
+        setLongitude(formatCoordinate(initialLongitudeValue))
+      }
+      return false
+    }
+
+    const parsedLatitude = parseCoordinateInput(latitude)
+    const parsedLongitude = parseCoordinateInput(longitude)
+
+    if (parsedLatitude === null) {
+      throw new Error('Latitude invalide. Utilisez un nombre entre -90 et 90.')
+    }
+
+    if (parsedLatitude < -90 || parsedLatitude > 90) {
+      throw new Error('La latitude doit être comprise entre -90 et 90.')
+    }
+
+    if (parsedLongitude === null) {
+      throw new Error('Longitude invalide. Utilisez un nombre entre -180 et 180.')
+    }
+
+    if (parsedLongitude < -180 || parsedLongitude > 180) {
+      throw new Error('La longitude doit être comprise entre -180 et 180.')
+    }
+
+    const hasChanged =
+      initialLatitudeValue === null ||
+      initialLongitudeValue === null ||
+      Math.abs(parsedLatitude - initialLatitudeValue) > 0.000001 ||
+      Math.abs(parsedLongitude - initialLongitudeValue) > 0.000001
+
+    if (!hasChanged) {
+      return false
+    }
+
+    const response = await apiService.updateMerchantLocation({
+      latitude: parsedLatitude,
+      longitude: parsedLongitude,
+    })
+
+    if (!response.data?.success) {
+      throw new Error(response.data?.message || 'Impossible de mettre à jour la localisation')
+    }
+
+    const savedLatValue = parseCoordinateFromApi(response.data.data?.latitude) ?? parsedLatitude
+    const savedLngValue = parseCoordinateFromApi(response.data.data?.longitude) ?? parsedLongitude
+
+    setLatitude(formatCoordinate(savedLatValue))
+    setLongitude(formatCoordinate(savedLngValue))
+    setInitialLatitudeValue(savedLatValue)
+    setInitialLongitudeValue(savedLngValue)
+    setHasLocation(true)
+
+    return true
+  }
+
   const handleSave = async () => {
     try {
       setLoading(true)
 
-      // Validation
       if (!formData.business_name.trim()) {
         Alert.alert('Erreur', 'Le nom de l\'entreprise est requis')
         return
@@ -148,17 +300,39 @@ const MerchantProfileEditScreen: React.FC = () => {
 
       const response = await apiService.put('/merchants/profile', formData)
 
-      if (response.data.success) {
-        Alert.alert('Succès', 'Profil mis à jour avec succès', [
-          {
-            text: 'OK',
-            onPress: () => navigation.goBack(),
-          },
-        ])
+      if (!response.data?.success) {
+        throw new Error(response.data?.message || 'Impossible de mettre à jour le profil')
       }
+
+      let locationUpdated = false
+
+      try {
+        locationUpdated = await saveLocationIfNeeded()
+      } catch (locationError) {
+        if (locationError instanceof Error) {
+          throw locationError
+        }
+
+        throw new Error('Impossible de mettre à jour la localisation')
+      }
+
+      const successMessage = locationUpdated
+        ? 'Profil et localisation mis à jour avec succès'
+        : 'Profil mis à jour avec succès'
+
+      Alert.alert('Succès', successMessage, [
+        {
+          text: 'OK',
+          onPress: () => navigation.goBack(),
+        },
+      ])
     } catch (error: any) {
       console.error('Erreur mise à jour profil:', error)
-      Alert.alert('Erreur', error.response?.data?.message || 'Impossible de mettre à jour le profil')
+      const message =
+        error instanceof Error
+          ? error.message
+          : error?.response?.data?.message || 'Impossible de mettre à jour le profil'
+      Alert.alert('Erreur', message)
     } finally {
       setLoading(false)
     }
@@ -167,6 +341,43 @@ const MerchantProfileEditScreen: React.FC = () => {
   const updateField = (field: keyof ProfileFormData, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }))
   }
+
+  const hasDraftCoordinates = latitude.trim().length > 0 && longitude.trim().length > 0
+  const draftCoordinatesAreValid = (() => {
+    if (!hasDraftCoordinates) {
+      return false
+    }
+
+    const parsedLat = parseCoordinateInput(latitude)
+    const parsedLng = parseCoordinateInput(longitude)
+
+    if (parsedLat === null || parsedLng === null) {
+      return false
+    }
+
+    return parsedLat >= -90 && parsedLat <= 90 && parsedLng >= -180 && parsedLng <= 180
+  })()
+  const coordinatesChangedFromInitial = (() => {
+    if (!hasDraftCoordinates) {
+      return false
+    }
+
+    const parsedLat = parseCoordinateInput(latitude)
+    const parsedLng = parseCoordinateInput(longitude)
+
+    if (parsedLat === null || parsedLng === null) {
+      return false
+    }
+
+    if (initialLatitudeValue === null || initialLongitudeValue === null) {
+      return true
+    }
+
+    return (
+      Math.abs(parsedLat - initialLatitudeValue) > 0.000001 ||
+      Math.abs(parsedLng - initialLongitudeValue) > 0.000001
+    )
+  })()
 
   if (loading && !formData.business_name) {
     return (
@@ -300,11 +511,11 @@ const MerchantProfileEditScreen: React.FC = () => {
               placeholder="Lomé"
               placeholderTextColor={theme.colors.textSecondary}
             />
-          </View>
+        </View>
 
-          {/* SIRET */}
-          <View style={styles.fieldGroup}>
-            <Text style={[styles.label, { color: theme.colors.text }]}>Numéro SIRET</Text>
+        {/* SIRET */}
+        <View style={styles.fieldGroup}>
+          <Text style={[styles.label, { color: theme.colors.text }]}>Numéro SIRET</Text>
             <TextInput
               style={[styles.input, { backgroundColor: theme.colors.surface.light, color: theme.colors.text }]}
               value={formData.siret}
@@ -312,16 +523,125 @@ const MerchantProfileEditScreen: React.FC = () => {
               placeholder="12345678901234"
               placeholderTextColor={theme.colors.textSecondary}
               keyboardType="numeric"
-              maxLength={14}
+            maxLength={14}
+          />
+        </View>
+      </View>
+
+      {/* Localisation */}
+      <View
+        style={[
+          styles.locationSection,
+          {
+            backgroundColor: theme.colors.surface.light,
+            borderColor: theme.withOpacity(theme.colors.primary[500], 0.2),
+          },
+        ]}
+      >
+        <View style={styles.locationHeader}>
+          <Text style={[styles.locationTitle, { color: theme.colors.text }]}>Localisation du commerce</Text>
+          <TouchableOpacity
+            style={[
+              styles.locationButton,
+              {
+                borderColor: theme.colors.primary[500],
+                backgroundColor: theme.withOpacity(theme.colors.primary[500], 0.12),
+              },
+            ]}
+            onPress={handleUseCurrentLocation}
+            disabled={locationLoading}
+          >
+            {locationLoading ? (
+              <ActivityIndicator size="small" color={theme.colors.primary[600] || theme.colors.primary[500]} />
+            ) : (
+              <>
+                <Ionicons name="locate" size={18} color={theme.colors.primary[600] || theme.colors.primary[500]} />
+                <Text
+                  style={[
+                    styles.locationButtonText,
+                    { color: theme.colors.primary[600] || theme.colors.primary[500] },
+                  ]}
+                >
+                  Ma position
+                </Text>
+              </>
+            )}
+          </TouchableOpacity>
+        </View>
+
+        <Text style={[styles.locationDescription, { color: theme.colors.textSecondary }]}> 
+          Renseignez les coordonnées GPS pour apparaître sur la carte et permettre la recherche par proximité.
+        </Text>
+
+        <View style={styles.locationInputsRow}>
+          <View style={styles.locationField}>
+            <Text style={[styles.label, { color: theme.colors.text }]}>Latitude</Text>
+            <TextInput
+              style={[
+                styles.input,
+                styles.locationInput,
+                { backgroundColor: theme.colors.surface.light, color: theme.colors.text },
+              ]}
+              value={latitude}
+              onChangeText={setLatitude}
+              placeholder="6.131900"
+              placeholderTextColor={theme.colors.textSecondary}
+              keyboardType="decimal-pad"
+              autoCorrect={false}
+            />
+          </View>
+
+          <View style={{ width: 16 }} />
+
+          <View style={styles.locationField}>
+            <Text style={[styles.label, { color: theme.colors.text }]}>Longitude</Text>
+            <TextInput
+              style={[
+                styles.input,
+                styles.locationInput,
+                { backgroundColor: theme.colors.surface.light, color: theme.colors.text },
+              ]}
+              value={longitude}
+              onChangeText={setLongitude}
+              placeholder="1.222700"
+              placeholderTextColor={theme.colors.textSecondary}
+              keyboardType="decimal-pad"
+              autoCorrect={false}
             />
           </View>
         </View>
 
-        {/* Bouton sauvegarder */}
-        <TouchableOpacity
-          style={[styles.saveButton, { backgroundColor: theme.colors.primary[500] }]}
-          onPress={handleSave}
-          disabled={loading}
+        <Text
+          style={[
+            styles.locationStatus,
+            {
+              color: hasLocation
+                ? theme.colors.semantic.success
+                : hasDraftCoordinates
+                  ? draftCoordinatesAreValid
+                    ? theme.colors.accent.blue
+                    : theme.colors.semantic.error
+                  : theme.colors.textSecondary,
+            },
+          ]}
+        >
+          {hasLocation
+            ? 'Coordonnées enregistrées. Appuyez sur « Enregistrer » après modification pour les mettre à jour.'
+            : draftCoordinatesAreValid
+              ? coordinatesChangedFromInitial
+                ? 'Coordonnées prêtes à être enregistrées. Appuyez sur « Enregistrer » pour les sauvegarder.'
+                : 'Ces coordonnées correspondent déjà à la position enregistrée.'
+              : hasDraftCoordinates
+                ? 'Veuillez saisir une latitude et une longitude valides.'
+                : 'Aucune localisation enregistrée pour le moment.'}
+        </Text>
+      </View>
+
+      {/* Bouton sauvegarder */}
+      <TouchableOpacity
+        style={[styles.saveButton, { backgroundColor: theme.colors.primary[500] }]}
+        onPress={handleSave}
+        disabled={loading}
         >
           {loading ? (
             <ActivityIndicator size="small" color="white" />
@@ -430,6 +750,57 @@ const styles = StyleSheet.create({
   textArea: {
     minHeight: 100,
     paddingTop: 14,
+  },
+  locationSection: {
+    marginHorizontal: 16,
+    marginTop: 24,
+    padding: 16,
+    borderRadius: 16,
+    borderWidth: 1,
+  },
+  locationHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 12,
+  },
+  locationTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  locationDescription: {
+    fontSize: 13,
+    lineHeight: 18,
+    marginBottom: 16,
+  },
+  locationInputsRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-end',
+    marginBottom: 12,
+  },
+  locationField: {
+    flex: 1,
+  },
+  locationInput: {
+    fontVariant: ['tabular-nums'],
+  },
+  locationButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    borderRadius: 12,
+    borderWidth: 1,
+    gap: 6,
+  },
+  locationButtonText: {
+    fontSize: 13,
+    fontWeight: '600',
+  },
+  locationStatus: {
+    fontSize: 12,
+    lineHeight: 18,
   },
   saveButton: {
     flexDirection: 'row',
