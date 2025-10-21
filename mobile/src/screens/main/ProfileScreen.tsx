@@ -7,6 +7,7 @@ import {
   Switch,
   Platform,
   Linking,
+  ActivityIndicator,
 } from 'react-native'
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigation } from '@react-navigation/native'
@@ -24,6 +25,38 @@ const ProfileScreen: React.FC = () => {
   const { mode, setThemeMode } = theme
   const dispatch = useDispatch<AppDispatch>()
   const { user, loading } = useSelector((state: RootState) => state.auth)
+  const isMerchant = user?.role === 'merchant'
+
+  const contactItems: Array<{
+    icon: keyof typeof Ionicons.glyphMap
+    label: string
+    value: string
+    testID?: string
+  }> = [
+    {
+      icon: 'mail-outline',
+      label: 'Email',
+      value: user?.email ?? 'Non renseigné',
+    },
+    {
+      icon: 'call-outline',
+      label: 'Téléphone',
+      value: user?.phone ?? 'Non renseigné',
+      testID: TEST_IDS.profilePhone,
+    },
+    {
+      icon: 'location-outline',
+      label: 'Adresse',
+      value: user?.address ?? 'Non renseignée',
+      testID: TEST_IDS.profileAddress,
+    },
+    {
+      icon: 'business-outline',
+      label: 'Ville',
+      value: user?.city ?? 'Non renseignée',
+      testID: TEST_IDS.profileCity,
+    },
+  ]
 
   const handleLogout = () => {
     console.log('🔴 handleLogout clicked!')
@@ -91,6 +124,14 @@ const ProfileScreen: React.FC = () => {
     }
   }
 
+  if (loading && !user) {
+    return (
+      <View style={[styles.loadingContainer, { backgroundColor: theme.colors.background }]}>
+        <ActivityIndicator size="large" color={theme.colors.primary[500]} testID={TEST_IDS.loadingSpinner} />
+      </View>
+    )
+  }
+
   return (
     <View style={[styles.container, { backgroundColor: theme.colors.background }]} testID={TEST_IDS.profileScreen}>
       <Card variant="elevated" style={{ alignItems: 'center', paddingVertical: theme.spacing['2xl'], paddingTop: theme.spacing['3xl'], marginBottom: theme.spacing.lg }}>
@@ -108,6 +149,42 @@ const ProfileScreen: React.FC = () => {
         </Badge>
       </Card>
 
+      <Card
+        variant="elevated"
+        style={{
+          marginHorizontal: theme.spacing.lg,
+          marginBottom: theme.spacing.lg,
+          paddingHorizontal: theme.spacing.lg,
+          paddingVertical: theme.spacing.lg,
+          gap: theme.spacing.md,
+        }}
+      >
+        {contactItems.map((item, index) => (
+          <View
+            key={item.label}
+            style={[
+              styles.infoRow,
+              {
+                borderBottomWidth: index === contactItems.length - 1 ? 0 : StyleSheet.hairlineWidth,
+                borderBottomColor: theme.colors.border,
+              },
+            ]}
+          >
+            <View style={[styles.infoIcon, { backgroundColor: theme.withOpacity(theme.colors.primary[500], 0.08) }]}>
+              <Ionicons name={item.icon} size={18} color={theme.colors.primary[600]} />
+            </View>
+            <View style={styles.infoContent}>
+              <Typography variant="caption" color="secondary" style={styles.infoLabel}>
+                {item.label}
+              </Typography>
+              <Typography variant="body" testID={item.testID} style={styles.infoValue}>
+                {item.value}
+              </Typography>
+            </View>
+          </View>
+        ))}
+      </Card>
+
       <Card variant="elevated" style={{ marginHorizontal: theme.spacing.lg, overflow: 'hidden' }}>
         <TouchableOpacity
           style={[styles.menuItem, { paddingHorizontal: theme.spacing.lg, paddingVertical: theme.spacing.md, borderBottomWidth: 1, borderBottomColor: theme.colors.border }]}
@@ -122,7 +199,7 @@ const ProfileScreen: React.FC = () => {
           <Ionicons name="chevron-forward" size={20} color={theme.colors.neutral[400]} />
         </TouchableOpacity>
 
-        {user?.role === 'merchant' && (
+        {isMerchant && (
           <TouchableOpacity
             style={[styles.menuItem, { paddingHorizontal: theme.spacing.lg, paddingVertical: theme.spacing.md, borderBottomWidth: 1, borderBottomColor: theme.colors.border }]}
             onPress={() => (navigation as any).navigate('OpeningHours')}
@@ -146,6 +223,7 @@ const ProfileScreen: React.FC = () => {
             },
           ]}
           onPress={() => (navigation as any).navigate('Notifications')}
+          testID={TEST_IDS.notificationSettingsButton}
         >
           <Ionicons name="notifications-outline" size={24} color={theme.colors.text} />
           <Typography variant="body" style={{ flex: 1, marginLeft: theme.spacing.md }}>
@@ -261,6 +339,11 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
   avatar: {
     width: 80,
     height: 80,
@@ -271,6 +354,28 @@ const styles = StyleSheet.create({
   menuItem: {
     flexDirection: 'row',
     alignItems: 'center',
+  },
+  infoRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 12,
+  },
+  infoIcon: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 12,
+  },
+  infoContent: {
+    flex: 1,
+  },
+  infoLabel: {
+    marginBottom: 2,
+  },
+  infoValue: {
+    fontWeight: '600',
   },
   menuItemBlock: {
     flexDirection: 'column',

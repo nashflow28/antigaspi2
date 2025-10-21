@@ -74,7 +74,15 @@ export const refreshProfile = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       const response = await apiService.getProfile()
-      return response.data
+      const user = response.data
+
+      try {
+        await apiService.setStoredUser(user)
+      } catch (storageError) {
+        console.warn('Impossible de persister le profil mis à jour', storageError)
+      }
+
+      return user
     } catch (error: any) {
       return rejectWithValue(error.message)
     }

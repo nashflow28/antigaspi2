@@ -40,6 +40,9 @@ const createTestStore = (userRole: 'consumer' | 'merchant' = 'consumer') => {
           first_name: 'Jean',
           last_name: 'Dupont',
           email: 'jean.dupont@email.com',
+          phone: '+228 12 34 56 78',
+          address: '123 Rue du Commerce',
+          city: 'Lomé',
           role: userRole,
         },
         token: 'test-token',
@@ -76,7 +79,6 @@ describe('ProfileScreen', () => {
       expect(getByTestId(TEST_IDS.profileName)).toBeTruthy()
       expect(getByText('Jean Dupont')).toBeTruthy()
       expect(getByTestId(TEST_IDS.profileEmail)).toBeTruthy()
-      expect(getByText('jean.dupont@email.com')).toBeTruthy()
       expect(getByText('Consommateur')).toBeTruthy()
     })
 
@@ -98,9 +100,10 @@ describe('ProfileScreen', () => {
 
     it('displays notifications option', () => {
       const store = createTestStore()
-      const { getByText } = renderWithProviders(<ProfileScreen />, store)
+      const { getByText, getByTestId } = renderWithProviders(<ProfileScreen />, store)
 
       expect(getByText('Notifications')).toBeTruthy()
+      expect(getByTestId(TEST_IDS.notificationSettingsButton)).toBeTruthy()
     })
 
     it('displays help & support option', () => {
@@ -177,27 +180,29 @@ describe('ProfileScreen', () => {
     })
   })
 
-  describe('Consumer-Specific Features', () => {
-    it('shows coming soon alert for consumer edit profile', () => {
+  describe('Consumer navigation', () => {
+    it('navigates to ProfileEdit when consumer presses edit profile', async () => {
       const store = createTestStore('consumer')
       const { getByTestId } = renderWithProviders(<ProfileScreen />, store)
 
       const editButton = getByTestId(TEST_IDS.editProfileButton)
       fireEvent.press(editButton)
 
-      // Alert is shown (mocked in test environment)
-      expect(editButton).toBeTruthy()
+      await waitFor(() => {
+        expect(mockNavigate).toHaveBeenCalledWith('ProfileEdit')
+      })
     })
 
-    it('shows coming soon alert for consumer notifications', () => {
+    it('navigates to Notifications when consumer presses notifications', async () => {
       const store = createTestStore('consumer')
-      const { getByText } = renderWithProviders(<ProfileScreen />, store)
+      const { getByTestId } = renderWithProviders(<ProfileScreen />, store)
 
-      const notificationsButton = getByText('Notifications')
+      const notificationsButton = getByTestId(TEST_IDS.notificationSettingsButton)
       fireEvent.press(notificationsButton)
 
-      // Alert is shown (mocked in test environment)
-      expect(notificationsButton).toBeTruthy()
+      await waitFor(() => {
+        expect(mockNavigate).toHaveBeenCalledWith('Notifications')
+      })
     })
   })
 
@@ -279,7 +284,6 @@ describe('ProfileScreen', () => {
 
       // Check all info is present
       expect(getByText('Jean Dupont')).toBeTruthy()
-      expect(getByText('jean.dupont@email.com')).toBeTruthy()
       expect(getByText('Consommateur')).toBeTruthy()
     })
 
@@ -289,6 +293,15 @@ describe('ProfileScreen', () => {
 
       const nameElement = getByTestId(TEST_IDS.profileName)
       expect(nameElement).toBeTruthy()
+    })
+
+    it('displays detailed contact information from the profile', () => {
+      const store = createTestStore()
+      const { getByText } = renderWithProviders(<ProfileScreen />, store)
+
+      expect(getByText('+228 12 34 56 78')).toBeTruthy()
+      expect(getByText('123 Rue du Commerce')).toBeTruthy()
+      expect(getByText('Lomé')).toBeTruthy()
     })
   })
 

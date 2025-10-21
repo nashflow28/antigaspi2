@@ -67,7 +67,11 @@ export const TEST_IDS = {
   profileScreen: 'profile-screen',
   profileName: 'profile-name',
   profileEmail: 'profile-email',
+  profilePhone: 'profile-phone',
+  profileAddress: 'profile-address',
+  profileCity: 'profile-city',
   editProfileButton: 'edit-profile-button',
+  notificationSettingsButton: 'notification-settings-button',
   logoutButton: 'logout-button',
 
   // ============ MERCHANT SCREENS ============
