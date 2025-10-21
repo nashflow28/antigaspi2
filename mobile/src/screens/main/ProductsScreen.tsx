@@ -421,6 +421,7 @@ const ProductsScreen: React.FC<Props> = ({ navigation }) => {
         // Mode Marchands
         filteredMerchants.length > 0 ? (
           <FlatList
+            key="merchants-list"
             data={filteredMerchants}
             renderItem={({ item }) => renderMerchantCard(item)}
             keyExtractor={(item) => `merchant-${item.id}`}
@@ -458,6 +459,7 @@ const ProductsScreen: React.FC<Props> = ({ navigation }) => {
         // Mode Produits
         filteredProducts.length > 0 ? (
           <FlatList
+            key="products-list"
             data={filteredProducts}
             renderItem={({ item }) => renderProductCard(item)}
             keyExtractor={(item) => `product-${item.id}`}

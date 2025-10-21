@@ -17,7 +17,22 @@ import {
   resetNavigationMocks,
 } from '../../../test-utils'
 import { RootState } from '../../../store'
+import {
+  makeMerchant,
+  makeProduct,
+  makeCategory,
+  resetFixtures,
+} from '../../../test-utils/fixtures'
 
+
+// Mock API_BASE_URL
+jest.mock('../../../services/api', () => ({
+  API_BASE_URL: 'http://localhost:8000/api',
+  default: {
+    getProducts: jest.fn(),
+    getCategories: jest.fn(),
+  },
+}))
 // Mock navigation
 const mockNavigation = createMockNavigation()
 
@@ -27,6 +42,7 @@ const mockMerchants = [
     id: 1,
     business_name: 'Boulangerie Martin',
     business_type: 'Boulangerie artisanale',
+    city: 'Lomé',
     is_verified: true,
     latitude: 6.1319,
     longitude: 1.2228,
@@ -41,6 +57,7 @@ const mockMerchants = [
     id: 2,
     business_name: 'Fruits Bio Nature',
     business_type: 'Fruits et légumes bio',
+    city: 'Sokodé',
     is_verified: false,
     latitude: 8.9833,
     longitude: 1.1333,
@@ -55,6 +72,7 @@ const mockMerchants = [
     id: 3,
     business_name: 'Boucherie Moderne',
     business_type: 'Viande et charcuterie',
+    city: 'Kara',
     is_verified: true,
     latitude: 9.5511,
     longitude: 1.1861,
@@ -81,7 +99,7 @@ const mockProducts = [
     discount_percentage: 50,
     savings: 250,
     days_until_expiration: 1,
-    category: { id: 1, name: 'Boulangerie' },
+    category: { id: 1, name: 'Boulangerie', description: 'Pains et viennoiseries' },
     merchant: mockMerchants[0],
     created_at: '2025-10-20T10:00:00Z',
     is_active: true,
@@ -98,7 +116,7 @@ const mockProducts = [
     discount_percentage: 50,
     savings: 150,
     days_until_expiration: 2,
-    category: { id: 2, name: 'Fruits et légumes' },
+    category: { id: 2, name: 'Fruits et légumes', description: 'Produits frais' },
     merchant: mockMerchants[1],
     created_at: '2025-10-19T14:30:00Z',
     is_active: true,
@@ -115,7 +133,7 @@ const mockProducts = [
     discount_percentage: 20,
     savings: 800,
     days_until_expiration: 1,
-    category: { id: 3, name: 'Viande' },
+    category: { id: 3, name: 'Viande', description: 'Viandes et volailles' },
     merchant: mockMerchants[2],
     created_at: '2025-10-20T08:00:00Z',
     is_active: true,
@@ -199,6 +217,7 @@ describe('ProductsScreen', () => {
   beforeEach(() => {
     jest.clearAllMocks()
     resetNavigationMocks(mockNavigation)
+    resetFixtures()
   })
 
   describe('Rendering - Mode Toggle', () => {
@@ -581,7 +600,7 @@ describe('ProductsScreen', () => {
           original_price: '100',
           discounted_price: '50',
           quantity_available: 0,
-          category: { id: 1, name: 'Boulangerie' },
+          category: { id: 1, name: 'Boulangerie', description: 'Pains et viennoiseries' },
           merchant: { id: 1, business_name: 'Test', city: 'Test' },
         },
       ]

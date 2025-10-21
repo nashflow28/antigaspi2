@@ -1,5 +1,6 @@
 import { Product, Category } from '../../types'
 import { makeMerchant, MerchantFixture, resetMerchantSequence } from './makeMerchant'
+import { resetCategorySequence } from './makeCategory'
 
 export type ProductFixture = Product
 
@@ -54,4 +55,5 @@ export const makeProduct = (
 export const resetFixtures = () => {
   resetMerchantSequence()
   resetProductSequence()
+  resetCategorySequence()
 }

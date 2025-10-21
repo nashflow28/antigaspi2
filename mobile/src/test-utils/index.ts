@@ -33,7 +33,7 @@ export {
   createTestReservation,
 } from './factories'
 
-export { makeMerchant, makeProduct, resetFixtures } from './fixtures'
+export { makeMerchant, makeProduct, makeCategory, resetFixtures } from './fixtures'
 
 // Navigation mocks
 export {
