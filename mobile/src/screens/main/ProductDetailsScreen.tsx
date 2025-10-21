@@ -16,7 +16,7 @@ import { fetchReviewStats } from '../../store/slices/reviewsSlice'
 import { useToast } from '../../contexts/ToastContext'
 import { Ionicons } from '@expo/vector-icons'
 import { Image } from 'expo-image'
-import { Product } from '../../types'
+import { PaymentMethod, Product } from '../../types'
 import { useTheme } from '../../theme'
 import { getImageUrl } from '../../utils/imageHelpers'
 import { formatCurrency } from '../../utils/currencyHelpers'
@@ -31,6 +31,34 @@ interface Props {
   navigation: any
 }
 
+type PaymentOption = {
+  value: PaymentMethod
+  label: string
+  description: string
+  icon: keyof typeof Ionicons.glyphMap
+}
+
+const PAYMENT_OPTIONS: PaymentOption[] = [
+  {
+    value: 'on_site',
+    label: 'Sur place',
+    description: 'Réglez au moment du retrait en boutique.',
+    icon: 'storefront',
+  },
+  {
+    value: 'flooz',
+    label: 'Mobile Money',
+    description: 'Payez instantanément via Flooz/TMoney.',
+    icon: 'phone-portrait',
+  },
+  {
+    value: 'paystack',
+    label: 'Carte bancaire',
+    description: 'Paiement sécurisé par carte (Paystack).',
+    icon: 'card',
+  },
+]
+
 const ProductDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
   const dispatch = useDispatch<AppDispatch>()
   const theme = useTheme()
@@ -42,6 +70,7 @@ const ProductDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
   const [product, setProduct] = useState<Product | null>(null)
   const [reserving, setReserving] = useState(false)
   const [selectedQuantity, setSelectedQuantity] = useState(1)
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<PaymentMethod>('on_site')
   const navigationTimeoutRef = useRef<NodeJS.Timeout | null>(null)
   const [confirmVisible, setConfirmVisible] = useState(false)
 
@@ -52,6 +81,7 @@ const ProductDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
   useEffect(() => {
     if (product) {
       setSelectedQuantity(1) // Reset quantité quand nouveau produit
+      setSelectedPaymentMethod('on_site')
     }
   }, [product?.id])
 
@@ -109,23 +139,27 @@ const ProductDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
 
   const isTestMode = Boolean((Constants?.expoConfig as any)?.extra?.testMode)
 
+  const selectedPayment = PAYMENT_OPTIONS.find(option => option.value === selectedPaymentMethod)
+  const totalPrice = discountedPrice * selectedQuantity
+
   const performReservation = async () => {
     // Guard contre les appels multiples simultanés
     if (reserving) return
 
     setReserving(true) // Bloquer immédiatement pour éviter double clic
-    const totalPrice = discountedPrice * selectedQuantity
     try {
       const result = await dispatch(createReservation({
         productId: product.id,
         quantity: selectedQuantity,
-        paymentMethod: 'on_site', // Paiement sur place
+        paymentMethod: selectedPaymentMethod,
         notes: null,
       }))
 
       if (createReservation.fulfilled.match(result)) {
         const reservation = result.payload
-        showSuccess(`${selectedQuantity} produit${selectedQuantity > 1 ? 's' : ''} réservé${selectedQuantity > 1 ? 's' : ''} avec succès ! 🎉`)
+        showSuccess(
+          `${selectedQuantity} produit${selectedQuantity > 1 ? 's' : ''} réservé${selectedQuantity > 1 ? 's' : ''} avec succès ! 🎉`
+        )
         // Recharger le produit pour mettre à jour la quantité disponible
         await loadProduct()
         // Navigation automatique vers les détails de la réservation après 1.5 secondes
@@ -151,10 +185,13 @@ const ProductDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
       return
     }
     // Default path with native Alert
-    const totalPrice = discountedPrice * selectedQuantity
     Alert.alert(
       'Confirmer la réservation',
-      `Voulez-vous réserver ${selectedQuantity} ${product.name}${selectedQuantity > 1 ? 's' : ''} pour ${formatCurrency(totalPrice)} ?\n\n(${formatCurrency(discountedPrice)} × ${selectedQuantity})`,
+      `Voulez-vous réserver ${selectedQuantity} ${product.name}${
+        selectedQuantity > 1 ? 's' : ''
+      } pour ${formatCurrency(totalPrice)} ?\n\n(${formatCurrency(discountedPrice)} × ${selectedQuantity})\nPaiement : ${
+        selectedPayment?.label ?? 'Sur place'
+      }`,
       [
         { text: 'Annuler', style: 'cancel' },
         { text: 'Confirmer', onPress: () => performReservation() },
@@ -249,6 +286,81 @@ const ProductDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
 
             <Typography variant="caption" color="secondary" style={{ textAlign: 'center' }}>
               ({product.quantity_available} disponible{product.quantity_available > 1 ? 's' : ''})
+            </Typography>
+          </View>
+
+          {/* Méthode de paiement */}
+          <View style={styles.paymentMethodSection}>
+            <Typography variant="body" weight="semibold" style={{ marginBottom: theme.spacing.sm }}>
+              Méthode de paiement
+            </Typography>
+            <View style={styles.paymentOptions}>
+              {PAYMENT_OPTIONS.map(option => {
+                const isSelected = option.value === selectedPaymentMethod
+                return (
+                  <TouchableOpacity
+                    key={option.value}
+                    onPress={() => setSelectedPaymentMethod(option.value)}
+                    style={[
+                      styles.paymentOption,
+                      {
+                        borderColor: isSelected ? theme.colors.primary[500] : theme.colors.borderLight,
+                        backgroundColor: isSelected ? theme.colors.primary[50] : theme.colors.surface.light,
+                      },
+                    ]}
+                    activeOpacity={0.85}
+                    accessibilityRole="radio"
+                    accessibilityState={{ selected: isSelected }}
+                  >
+                    <View style={styles.paymentOptionHeader}>
+                      <Ionicons
+                        name={option.icon}
+                        size={20}
+                        color={isSelected ? theme.colors.primary[600] : theme.colors.neutral[500]}
+                      />
+                      <Typography
+                        variant="body"
+                        weight={isSelected ? 'semibold' : 'medium'}
+                        style={{ color: isSelected ? theme.colors.primary[700] : theme.colors.text }}
+                      >
+                        {option.label}
+                      </Typography>
+                    </View>
+                    <Typography
+                      variant="caption"
+                      color="secondary"
+                      style={{ marginTop: 6, lineHeight: 16 }}
+                    >
+                      {option.description}
+                    </Typography>
+                  </TouchableOpacity>
+                )
+              })}
+            </View>
+            {selectedPaymentMethod === 'flooz' && (
+              <Typography variant="caption" color="secondary" style={{ marginTop: theme.spacing.xs }}>
+                Vous pourrez préciser votre opérateur mobile et numéro lors du paiement.
+              </Typography>
+            )}
+            {selectedPaymentMethod === 'paystack' && (
+              <Typography variant="caption" color="secondary" style={{ marginTop: theme.spacing.xs }}>
+                Redirection sécurisée pour régler par carte bancaire via Paystack.
+              </Typography>
+            )}
+          </View>
+
+          {/* Récapitulatif prix */}
+          <View style={styles.totalSummary}>
+            <View>
+              <Typography variant="caption" color="secondary">
+                Total à payer
+              </Typography>
+              <Typography variant="body" weight="semibold">
+                {formatCurrency(discountedPrice)} × {selectedQuantity}
+              </Typography>
+            </View>
+            <Typography variant="h3" weight="bold" color="primary">
+              {formatCurrency(totalPrice)}
             </Typography>
           </View>
 
@@ -411,6 +523,7 @@ const ProductDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
           <Typography variant="body">
             Voulez-vous réserver {selectedQuantity} {product.name}
             {selectedQuantity > 1 ? 's' : ''} ?
+            {'\n'}Paiement : {selectedPayment?.label ?? 'Sur place'}
           </Typography>
         </Modal>
       )}
@@ -520,6 +633,35 @@ const createStyles = (theme: ReturnType<typeof useTheme>) => StyleSheet.create({
   quantityButtonDisabled: {
     backgroundColor: theme.colors.neutral[100],
     opacity: 0.5,
+  },
+  paymentMethodSection: {
+    marginBottom: 16,
+  },
+  paymentOptions: {
+    flexDirection: 'column',
+    gap: 12,
+  },
+  paymentOption: {
+    borderWidth: 1,
+    borderRadius: 12,
+    padding: 16,
+    ...theme.shadows.xs,
+  },
+  paymentOptionHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  totalSummary: {
+    marginTop: 16,
+    marginBottom: 16,
+    padding: 16,
+    borderRadius: 12,
+    backgroundColor: theme.colors.surface.light,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    ...theme.shadows.sm,
   },
 })
 

@@ -1,6 +1,6 @@
 // @ts-nocheck
 import React from 'react'
-import { render, waitFor } from '@testing-library/react-native'
+import { render, waitFor, fireEvent } from '@testing-library/react-native'
 import { Provider } from 'react-redux'
 import { configureStore } from '@reduxjs/toolkit'
 import ProductDetailsScreen from '../ProductDetailsScreen'
@@ -207,6 +207,26 @@ describe('ProductDetailsScreen', () => {
 
       // Should show description
       expect(getByText(/Pain complet aux graines/i)).toBeTruthy()
+    })
+
+    it('affiche les options de paiement et permet de changer la sélection', () => {
+      const store = createTestStore(true)
+      const route = { params: { productId: 1 } }
+
+      const { getByText, queryByText } = renderWithProviders(
+        <ProductDetailsScreen navigation={mockNavigation} route={route} />,
+        store
+      )
+
+      expect(getByText('Sur place')).toBeTruthy()
+      expect(getByText(/Total à payer/i)).toBeTruthy()
+
+      fireEvent.press(getByText('Mobile Money'))
+      expect(getByText(/opérateur mobile/i)).toBeTruthy()
+
+      fireEvent.press(getByText('Carte bancaire'))
+      expect(getByText(/Paystack/i)).toBeTruthy()
+      expect(queryByText(/opérateur mobile/i)).toBeNull()
     })
 
     it('displays category information', () => {
