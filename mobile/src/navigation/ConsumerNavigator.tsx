@@ -2,17 +2,20 @@ import React from 'react'
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import { Ionicons } from '@expo/vector-icons'
+
 import { useTheme } from '../theme'
 import ErrorBoundary from '../components/ErrorBoundary'
 
 // Screens
 import HomeScreen from '../screens/main/HomeScreen'
 import ProductsScreen from '../screens/main/ProductsScreen'
+import SurpriseBasketsScreen from '../screens/main/SurpriseBasketsScreen'
 import FavoritesScreen from '../screens/main/FavoritesScreen'
 import ReservationsScreen from '../screens/main/ReservationsScreen'
 import ProfileScreen from '../screens/main/ProfileScreen'
 import ProfileEditScreen from '../screens/main/ProfileEditScreen'
 import ProductDetailsScreen from '../screens/main/ProductDetailsScreen'
+import SurpriseBasketDetailsScreen from '../screens/main/SurpriseBasketDetailsScreen'
 import ReservationDetailsScreen from '../screens/main/ReservationDetailsScreen'
 import MerchantDetailScreen from '../screens/main/MerchantDetailScreen'
 import ReviewsListScreen from '../screens/main/ReviewsListScreen'
@@ -46,6 +49,18 @@ const ProductsStack = () => (
       <Stack.Screen name="AddReview" component={AddReviewScreen} />
     </Stack.Navigator>
   </ErrorBoundary>
+)
+
+const SurpriseStack = () => (
+  <Stack.Navigator screenOptions={{ headerShown: false }}>
+    <Stack.Screen name="SurpriseBasketsMain" component={SurpriseBasketsScreen} />
+    <Stack.Screen name="SurpriseBasketDetails" component={SurpriseBasketDetailsScreen} />
+    <Stack.Screen name="ReservationDetails" component={ReservationDetailsScreen} />
+    <Stack.Screen name="ProductDetails" component={ProductDetailsScreen} />
+    <Stack.Screen name="MerchantDetail" component={MerchantDetailScreen} />
+    <Stack.Screen name="ReviewsList" component={ReviewsListScreen} />
+    <Stack.Screen name="AddReview" component={AddReviewScreen} />
+  </Stack.Navigator>
 )
 
 const FavoritesStack = () => (
@@ -98,6 +113,8 @@ const ConsumerNavigator: React.FC = () => {
             iconName = focused ? 'grid' : 'grid-outline'
           } else if (route.name === 'Discover') {
             iconName = focused ? 'compass' : 'compass-outline'
+          } else if (route.name === 'Surprise') {
+            iconName = focused ? 'gift' : 'gift-outline'
           } else if (route.name === 'Favorites') {
             iconName = focused ? 'heart' : 'heart-outline'
           } else if (route.name === 'Orders') {
@@ -133,6 +150,11 @@ const ConsumerNavigator: React.FC = () => {
         options={{ title: 'Découvrir' }}
       />
       <Tab.Screen
+        name="Surprise"
+        component={SurpriseStack}
+        options={{ title: 'Surprise' }}
+      />
+      <Tab.Screen
         name="Favorites"
         component={FavoritesStack}
         options={{ title: 'Favoris' }}
@@ -152,3 +174,4 @@ const ConsumerNavigator: React.FC = () => {
 }
 
 export default ConsumerNavigator
+

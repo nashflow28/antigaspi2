@@ -154,7 +154,7 @@ const SurpriseBasketsScreen: React.FC<Props> = ({ navigation }) => {
         </Typography>
         <Button
           variant="secondary"
-          onPress={() => navigation.navigate('Discover')}
+          onPress={() => navigation.getParent()?.navigate('Discover')}
           style={styles.discoverButton}
           leftIcon={<Ionicons name="search" size={18} color={theme.colors.primary[500]} />}
         >
@@ -178,7 +178,7 @@ const SurpriseBasketsScreen: React.FC<Props> = ({ navigation }) => {
         <Typography variant="body" color="secondary" style={styles.emptyStateSubtitle}>
           {'Revenez plus tard ou explorez les autres produits disponibles dans l\'application.'}
         </Typography>
-        <Button onPress={() => navigation.navigate('Discover')}>
+        <Button onPress={() => navigation.getParent()?.navigate('Discover')}>
           Parcourir les produits
         </Button>
       </View>

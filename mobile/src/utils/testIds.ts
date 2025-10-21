@@ -55,6 +55,8 @@ export const TEST_IDS = {
   surpriseBasketsScreen: 'surprise-baskets-screen',
   surpriseBasketsList: 'surprise-baskets-list',
   surpriseBasketCard: (id: number) => `surprise-basket-card-${id}`,
+  surpriseBasketDetailsScreen: 'surprise-basket-details-screen',
+  surpriseBasketDetailsFooter: 'surprise-basket-details-footer',
 
   // Reservations
   reservationsScreen: 'reservations-screen',
