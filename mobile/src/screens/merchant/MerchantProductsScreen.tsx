@@ -48,7 +48,7 @@ const MerchantProductsScreen: React.FC<Props> = ({ navigation }) => {
       // donc response.data contient directement l'array de produits
       setProducts(response.data || [])
       console.log('📦 [MerchantProducts] Produits définis dans le state:', response.data?.length)
-    } catch (error) {
+    } catch (error: any) {
       console.error('❌ [MerchantProducts] Erreur chargement produits:', error)
       console.error('❌ [MerchantProducts] Error details:', error.response?.data)
     } finally {
@@ -90,7 +90,7 @@ const MerchantProductsScreen: React.FC<Props> = ({ navigation }) => {
               await loadProducts()
 
               Alert.alert('Succès', 'Le produit a été supprimé')
-            } catch (error) {
+            } catch (error: any) {
               console.error('❌ [MerchantProducts] Erreur suppression:', error)
               Alert.alert('Erreur', 'Impossible de supprimer le produit')
             } finally {

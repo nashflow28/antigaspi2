@@ -1,6 +1,7 @@
-import { configureStore, PreloadedState } from '@reduxjs/toolkit'
+import { configureStore } from '@reduxjs/toolkit'
 
 import { RootState } from '../store'
+
 import { authReducer, authInitialState } from '../store/slices/authSlice'
 import { connectivityReducer, connectivityInitialState } from '../store/slices/connectivitySlice'
 import { productsReducer, productsInitialState } from '../store/slices/productsSlice'
@@ -10,17 +11,22 @@ import { favoritesReducer, favoritesInitialState } from '../store/slices/favorit
 import { reviewsReducer, reviewsInitialState } from '../store/slices/reviewsSlice'
 import { ProductsState } from '../types'
 
-export const setupStore = (preloadedState?: PreloadedState<RootState>) =>
+// PreloadedState type compatibility for older @reduxjs/toolkit versions
+type PreloadedState<S> = Partial<S>
+
+const reducers = {
+  auth: authReducer,
+  connectivity: connectivityReducer,
+  products: productsReducer,
+  reservations: reservationsReducer,
+  merchants: merchantsReducer,
+  favorites: favoritesReducer,
+  reviews: reviewsReducer,
+} as const
+
+export const setupStore = (preloadedState?: any) =>
   configureStore({
-    reducer: {
-      auth: authReducer,
-      connectivity: connectivityReducer,
-      products: productsReducer,
-      reservations: reservationsReducer,
-      merchants: merchantsReducer,
-      favorites: favoritesReducer,
-      reviews: reviewsReducer,
-    },
+    reducer: reducers as any,
     preloadedState,
   })
 

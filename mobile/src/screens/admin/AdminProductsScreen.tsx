@@ -1,26 +1,754 @@
-import React from 'react'
-import { View, Text, StyleSheet, StatusBar } from 'react-native'
+import React, { useEffect, useState, useCallback } from 'react'
+import {
+  View,
+  Text,
+  StyleSheet,
+  FlatList,
+  TouchableOpacity,
+  StatusBar,
+  RefreshControl,
+  Alert,
+  TextInput,
+  Modal,
+  ScrollView,
+  ActivityIndicator,
+} from 'react-native'
 import { Ionicons } from '@expo/vector-icons'
+import { Image } from 'expo-image'
 import { useTheme } from '../../theme'
+import { Product, Category } from '../../types'
+import apiService from '../../services/api'
+import { formatCurrency } from '../../utils/currencyHelpers'
+import { getImageUrl } from '../../utils/imageHelpers'
+import { Button, Badge, Card, Typography } from '../../components/2025'
+
+interface ProductWithModeration extends Product {
+  needs_approval?: boolean
+  merchant_name?: string
+}
+
+type ProductStatus = 'all' | 'active' | 'inactive' | 'pending'
 
 const AdminProductsScreen: React.FC = () => {
   const theme = useTheme()
+  const [products, setProducts] = useState<ProductWithModeration[]>([])
+  const [filteredProducts, setFilteredProducts] = useState<ProductWithModeration[]>([])
+  const [categories, setCategories] = useState<Category[]>([])
+  const [refreshing, setRefreshing] = useState(false)
+  const [loading, setLoading] = useState(true)
+  const [searchQuery, setSearchQuery] = useState('')
+  const [statusFilter, setStatusFilter] = useState<ProductStatus>('all')
+  const [categoryFilter, setCategoryFilter] = useState<number | 'all'>('all')
+  const [selectedProduct, setSelectedProduct] = useState<ProductWithModeration | null>(null)
+  const [showDetailModal, setShowDetailModal] = useState(false)
+  const [actionLoading, setActionLoading] = useState(false)
+
+  useEffect(() => {
+    loadData()
+  }, [])
+
+  useEffect(() => {
+    filterProducts()
+  }, [products, searchQuery, statusFilter, categoryFilter])
+
+  const loadData = async () => {
+    try {
+      setLoading(true)
+
+      // Charger produits et catégories en parallèle
+      const [productsRes, categoriesRes] = await Promise.all([
+        apiService.get('/products?per_page=100'),
+        apiService.get('/categories'),
+      ])
+
+      const allProducts = productsRes.data.data || []
+      setProducts(allProducts)
+      setCategories(categoriesRes.data || [])
+    } catch (error) {
+      console.error('Erreur chargement données:', error)
+      Alert.alert('Erreur', 'Impossible de charger les produits')
+    } finally {
+      setLoading(false)
+      setRefreshing(false)
+    }
+  }
+
+  const filterProducts = useCallback(() => {
+    let filtered = [...products]
+
+    // Filtre par statut
+    if (statusFilter === 'active') {
+      filtered = filtered.filter(p => p.is_active === true)
+    } else if (statusFilter === 'inactive') {
+      filtered = filtered.filter(p => p.is_active === false)
+    } else if (statusFilter === 'pending') {
+      filtered = filtered.filter(p => (p as ProductWithModeration).needs_approval === true)
+    }
+
+    // Filtre par catégorie
+    if (categoryFilter !== 'all') {
+      filtered = filtered.filter(p => p.category.id === categoryFilter)
+    }
+
+    // Filtre par recherche
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase()
+      filtered = filtered.filter(
+        p =>
+          p.name.toLowerCase().includes(query) ||
+          p.description.toLowerCase().includes(query) ||
+          p.merchant.business_name.toLowerCase().includes(query)
+      )
+    }
+
+    setFilteredProducts(filtered)
+  }, [products, searchQuery, statusFilter, categoryFilter])
+
+  const onRefresh = () => {
+    setRefreshing(true)
+    loadData()
+  }
+
+  const handleProductPress = (product: ProductWithModeration) => {
+    setSelectedProduct(product)
+    setShowDetailModal(true)
+  }
+
+  const handleToggleActive = async (product: ProductWithModeration) => {
+    const newStatus = !product.is_active
+    Alert.alert(
+      newStatus ? 'Activer le produit' : 'Désactiver le produit',
+      `Voulez-vous ${newStatus ? 'activer' : 'désactiver'} "${product.name}" ?`,
+      [
+        { text: 'Annuler', style: 'cancel' },
+        {
+          text: newStatus ? 'Activer' : 'Désactiver',
+          onPress: async () => {
+            try {
+              setActionLoading(true)
+              await apiService.put(`/products/${product.id}`, {
+                is_active: newStatus,
+              })
+
+              // Mettre à jour localement
+              setProducts(prev =>
+                prev.map(p => (p.id === product.id ? { ...p, is_active: newStatus } : p))
+              )
+
+              Alert.alert('Succès', `Produit ${newStatus ? 'activé' : 'désactivé'}`)
+            } catch (error) {
+              console.error('Erreur toggle actif:', error)
+              Alert.alert('Erreur', 'Impossible de modifier le statut')
+            } finally {
+              setActionLoading(false)
+            }
+          },
+        },
+      ]
+    )
+  }
+
+  const handleApproveProduct = async (product: ProductWithModeration) => {
+    Alert.alert(
+      'Approuver le produit',
+      `Voulez-vous approuver "${product.name}" ?`,
+      [
+        { text: 'Annuler', style: 'cancel' },
+        {
+          text: 'Approuver',
+          onPress: async () => {
+            try {
+              setActionLoading(true)
+              await apiService.post(`/admin/products/${product.id}/approve`)
+
+              // Mettre à jour localement
+              setProducts(prev =>
+                prev.map(p =>
+                  p.id === product.id
+                    ? { ...p, needs_approval: false, is_active: true }
+                    : p
+                )
+              )
+
+              setShowDetailModal(false)
+              Alert.alert('Succès', 'Produit approuvé avec succès')
+            } catch (error) {
+              console.error('Erreur approbation:', error)
+              Alert.alert('Erreur', 'Impossible d\'approuver le produit')
+            } finally {
+              setActionLoading(false)
+            }
+          },
+        },
+      ]
+    )
+  }
+
+  const handleRejectProduct = async (product: ProductWithModeration) => {
+    Alert.prompt(
+      'Rejeter le produit',
+      'Veuillez indiquer la raison du rejet :',
+      [
+        { text: 'Annuler', style: 'cancel' },
+        {
+          text: 'Rejeter',
+          style: 'destructive',
+          onPress: async (reason: string | undefined) => {
+            if (!reason || reason.trim().length < 10) {
+              Alert.alert('Erreur', 'La raison doit contenir au moins 10 caractères')
+              return
+            }
+
+            try {
+              setActionLoading(true)
+              await apiService.post(`/admin/products/${product.id}/reject`, {
+                reason: reason.trim(),
+              })
+
+              // Mettre à jour localement
+              setProducts(prev =>
+                prev.map(p =>
+                  p.id === product.id
+                    ? { ...p, needs_approval: false, is_active: false }
+                    : p
+                )
+              )
+
+              setShowDetailModal(false)
+              Alert.alert('Succès', 'Produit rejeté')
+            } catch (error) {
+              console.error('Erreur rejet:', error)
+              Alert.alert('Erreur', 'Impossible de rejeter le produit')
+            } finally {
+              setActionLoading(false)
+            }
+          },
+        },
+      ],
+      'plain-text'
+    )
+  }
+
+  const handleDeleteProduct = async (product: ProductWithModeration) => {
+    Alert.alert(
+      'Supprimer le produit',
+      `⚠️ ATTENTION : Cette action est irréversible.\n\nVoulez-vous vraiment supprimer "${product.name}" ?`,
+      [
+        { text: 'Annuler', style: 'cancel' },
+        {
+          text: 'Supprimer',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              setActionLoading(true)
+              await apiService.delete(`/products/${product.id}`)
+
+              // Retirer localement
+              setProducts(prev => prev.filter(p => p.id !== product.id))
+
+              setShowDetailModal(false)
+              Alert.alert('Succès', 'Produit supprimé définitivement')
+            } catch (error) {
+              console.error('Erreur suppression:', error)
+              Alert.alert('Erreur', 'Impossible de supprimer le produit')
+            } finally {
+              setActionLoading(false)
+            }
+          },
+        },
+      ]
+    )
+  }
+
+  const getStatusBadge = (product: ProductWithModeration) => {
+    if ((product as ProductWithModeration).needs_approval) {
+      return (
+        <Badge variant="warning" size="sm">
+          En attente
+        </Badge>
+      )
+    }
+    if (product.is_active) {
+      return (
+        <Badge variant="success" size="sm">
+          Actif
+        </Badge>
+      )
+    }
+    return (
+      <Badge variant="error" size="sm">
+        Inactif
+      </Badge>
+    )
+  }
+
+  const renderProduct = ({ item }: { item: ProductWithModeration }) => {
+    const discountedPrice = parseFloat(item.discounted_price)
+    const originalPrice = parseFloat(item.original_price)
+
+    return (
+      <TouchableOpacity
+        onPress={() => handleProductPress(item)}
+        activeOpacity={0.7}
+      >
+        <Card variant="elevated" style={{ marginBottom: theme.spacing.md }}>
+          <View style={styles.productCard}>
+            {/* Image */}
+            <Image
+              source={{ uri: getImageUrl(item.image_url, item.category.name) }}
+              style={styles.productImage}
+              contentFit="cover"
+            />
+
+            {/* Infos */}
+            <View style={styles.productInfo}>
+              <View style={styles.productHeader}>
+                <Typography variant="body" weight="semibold" numberOfLines={2} style={{ flex: 1 }}>
+                  {item.name}
+                </Typography>
+                {getStatusBadge(item)}
+              </View>
+
+              <Typography variant="caption" color="secondary" numberOfLines={1} style={{ marginBottom: 4 }}>
+                🏪 {item.merchant.business_name}
+              </Typography>
+
+              <Typography variant="caption" color="secondary" numberOfLines={1} style={{ marginBottom: 8 }}>
+                📂 {item.category.name} • 📦 {item.quantity_available} dispo
+              </Typography>
+
+              <View style={styles.priceRow}>
+                <Typography variant="h4" weight="bold" color="primary">
+                  {formatCurrency(discountedPrice)}
+                </Typography>
+                <Typography
+                  variant="caption"
+                  color="tertiary"
+                  style={{ textDecorationLine: 'line-through', marginLeft: 8 }}
+                >
+                  {formatCurrency(originalPrice)}
+                </Typography>
+                <Badge variant="success" size="sm" style={{ marginLeft: 'auto' }}>
+                  -{item.discount_percentage}%
+                </Badge>
+              </View>
+
+              {/* Actions rapides */}
+              <View style={styles.quickActions}>
+                <TouchableOpacity
+                  style={[
+                    styles.quickActionBtn,
+                    { backgroundColor: theme.withOpacity(theme.colors.primary[500], 0.1) },
+                  ]}
+                  onPress={() => handleToggleActive(item)}
+                  disabled={actionLoading}
+                >
+                  <Ionicons
+                    name={item.is_active ? 'eye-off' : 'eye'}
+                    size={16}
+                    color={theme.colors.primary[500]}
+                  />
+                  <Text style={[styles.quickActionText, { color: theme.colors.primary[500] }]}>
+                    {item.is_active ? 'Désactiver' : 'Activer'}
+                  </Text>
+                </TouchableOpacity>
+
+                {(item as ProductWithModeration).needs_approval && (
+                  <>
+                    <TouchableOpacity
+                      style={[
+                        styles.quickActionBtn,
+                        { backgroundColor: theme.withOpacity(theme.colors.success[500], 0.1) },
+                      ]}
+                      onPress={() => handleApproveProduct(item)}
+                      disabled={actionLoading}
+                    >
+                      <Ionicons name="checkmark" size={16} color={theme.colors.success[500]} />
+                      <Text style={[styles.quickActionText, { color: theme.colors.success[500] }]}>
+                        Approuver
+                      </Text>
+                    </TouchableOpacity>
+
+                    <TouchableOpacity
+                      style={[
+                        styles.quickActionBtn,
+                        { backgroundColor: theme.withOpacity(theme.colors.error[500], 0.1) },
+                      ]}
+                      onPress={() => handleRejectProduct(item)}
+                      disabled={actionLoading}
+                    >
+                      <Ionicons name="close" size={16} color={theme.colors.error[500]} />
+                      <Text style={[styles.quickActionText, { color: theme.colors.error[500] }]}>
+                        Rejeter
+                      </Text>
+                    </TouchableOpacity>
+                  </>
+                )}
+              </View>
+            </View>
+          </View>
+        </Card>
+      </TouchableOpacity>
+    )
+  }
+
+  const renderDetailModal = () => {
+    if (!selectedProduct) return null
+
+    const discountedPrice = parseFloat(selectedProduct.discounted_price)
+    const originalPrice = parseFloat(selectedProduct.original_price)
+
+    return (
+      <Modal
+        visible={showDetailModal}
+        animationType="slide"
+        onRequestClose={() => setShowDetailModal(false)}
+      >
+        <View style={[styles.modalContainer, { backgroundColor: theme.colors.background }]}>
+          {/* Header */}
+          <View style={[styles.modalHeader, { backgroundColor: theme.colors.primary[500] }]}>
+            <TouchableOpacity onPress={() => setShowDetailModal(false)}>
+              <Ionicons name="close" size={28} color="white" />
+            </TouchableOpacity>
+            <Text style={styles.modalTitle}>Détails Produit</Text>
+            <View style={{ width: 28 }} />
+          </View>
+
+          <ScrollView style={styles.modalContent}>
+            {/* Image */}
+            <Image
+              source={{ uri: getImageUrl(selectedProduct.image_url, selectedProduct.category.name) }}
+              style={styles.modalImage}
+              contentFit="cover"
+            />
+
+            {/* Statut */}
+            <View style={styles.modalSection}>
+              <Typography variant="caption" color="secondary">
+                STATUT
+              </Typography>
+              {getStatusBadge(selectedProduct)}
+            </View>
+
+            {/* Infos produit */}
+            <View style={styles.modalSection}>
+              <Typography variant="h3" weight="bold" style={{ marginBottom: 8 }}>
+                {selectedProduct.name}
+              </Typography>
+              <Typography variant="body" color="secondary" style={{ marginBottom: 16 }}>
+                {selectedProduct.description}
+              </Typography>
+
+              <View style={styles.infoRow}>
+                <Ionicons name="pricetag" size={20} color={theme.colors.textSecondary} />
+                <Typography variant="body" color="secondary" style={{ marginLeft: 8 }}>
+                  {selectedProduct.category.name}
+                </Typography>
+              </View>
+
+              <View style={styles.infoRow}>
+                <Ionicons name="cube" size={20} color={theme.colors.textSecondary} />
+                <Typography variant="body" color="secondary" style={{ marginLeft: 8 }}>
+                  {selectedProduct.quantity_available} disponibles
+                </Typography>
+              </View>
+
+              <View style={styles.infoRow}>
+                <Ionicons name="calendar" size={20} color={theme.colors.textSecondary} />
+                <Typography variant="body" color="secondary" style={{ marginLeft: 8 }}>
+                  Expire le {new Date(selectedProduct.expiration_date).toLocaleDateString('fr-FR')}
+                </Typography>
+              </View>
+            </View>
+
+            {/* Prix */}
+            <View style={styles.modalSection}>
+              <Typography variant="caption" color="secondary" style={{ marginBottom: 8 }}>
+                PRIX
+              </Typography>
+              <View style={styles.priceRow}>
+                <Typography variant="h2" weight="bold" color="primary">
+                  {formatCurrency(discountedPrice)}
+                </Typography>
+                <Typography
+                  variant="body"
+                  color="tertiary"
+                  style={{ textDecorationLine: 'line-through', marginLeft: 12 }}
+                >
+                  {formatCurrency(originalPrice)}
+                </Typography>
+              </View>
+              <Badge variant="success" size="md" style={{ alignSelf: 'flex-start', marginTop: 8 }}>
+                -{selectedProduct.discount_percentage}% de réduction
+              </Badge>
+            </View>
+
+            {/* Commerçant */}
+            <View style={styles.modalSection}>
+              <Typography variant="caption" color="secondary" style={{ marginBottom: 8 }}>
+                COMMERÇANT
+              </Typography>
+              <Typography variant="h4" weight="semibold">
+                {selectedProduct.merchant.business_name}
+              </Typography>
+              <Typography variant="body" color="secondary">
+                {selectedProduct.merchant.city}
+              </Typography>
+              {selectedProduct.merchant.phone && (
+                <Typography variant="body" color="secondary">
+                  📞 {selectedProduct.merchant.phone}
+                </Typography>
+              )}
+            </View>
+
+            {/* Actions admin */}
+            <View style={styles.modalSection}>
+              <Typography variant="caption" color="secondary" style={{ marginBottom: 12 }}>
+                ACTIONS ADMINISTRATEUR
+              </Typography>
+
+              {(selectedProduct as ProductWithModeration).needs_approval && (
+                <>
+                  <Button
+                    variant="primary"
+                    size="lg"
+                    onPress={() => handleApproveProduct(selectedProduct)}
+                    leftIcon={<Ionicons name="checkmark-circle" size={20} color="white" />}
+                    style={{ marginBottom: 12 }}
+                    disabled={actionLoading}
+                  >
+                    Approuver le produit
+                  </Button>
+
+                  <Button
+                    variant="destructive"
+                    size="lg"
+                    onPress={() => handleRejectProduct(selectedProduct)}
+                    leftIcon={<Ionicons name="close-circle" size={20} color="white" />}
+                    style={{ marginBottom: 12 }}
+                    disabled={actionLoading}
+                  >
+                    Rejeter le produit
+                  </Button>
+                </>
+              )}
+
+              <Button
+                variant={selectedProduct.is_active ? 'secondary' : 'primary'}
+                size="lg"
+                onPress={() => handleToggleActive(selectedProduct)}
+                leftIcon={
+                  <Ionicons
+                    name={selectedProduct.is_active ? 'eye-off' : 'eye'}
+                    size={20}
+                    color={selectedProduct.is_active ? theme.colors.text : 'white'}
+                  />
+                }
+                style={{ marginBottom: 12 }}
+                disabled={actionLoading}
+              >
+                {selectedProduct.is_active ? 'Désactiver' : 'Activer'}
+              </Button>
+
+              <Button
+                variant="destructive"
+                size="lg"
+                onPress={() => handleDeleteProduct(selectedProduct)}
+                leftIcon={<Ionicons name="trash" size={20} color="white" />}
+                disabled={actionLoading}
+              >
+                Supprimer définitivement
+              </Button>
+            </View>
+
+            <View style={{ height: 40 }} />
+          </ScrollView>
+
+          {actionLoading && (
+            <View style={styles.loadingOverlay}>
+              <ActivityIndicator size="large" color={theme.colors.primary[500]} />
+            </View>
+          )}
+        </View>
+      </Modal>
+    )
+  }
+
+  const pendingCount = products.filter(p => (p as ProductWithModeration).needs_approval).length
 
   return (
     <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
-      <StatusBar barStyle="dark-content" />
+      <StatusBar barStyle="dark-content" backgroundColor={theme.colors.background} />
+
+      {/* Header */}
       <View style={[styles.header, { backgroundColor: theme.colors.primary[500] }]}>
-        <Text style={styles.headerTitle}>Gestion Produits</Text>
+        <View style={styles.headerContent}>
+          <View>
+            <Text style={styles.headerTitle}>Gestion Produits</Text>
+            {pendingCount > 0 && (
+              <View style={styles.pendingBadge}>
+                <Ionicons name="alert-circle" size={16} color={theme.colors.warning[500]} />
+                <Text style={styles.pendingText}>
+                  {pendingCount} produit{pendingCount > 1 ? 's' : ''} en attente
+                </Text>
+              </View>
+            )}
+          </View>
+          <TouchableOpacity onPress={loadData}>
+            <Ionicons name="refresh" size={24} color="white" />
+          </TouchableOpacity>
+        </View>
+
+        {/* Search */}
+        <View style={[styles.searchContainer, { backgroundColor: 'rgba(255, 255, 255, 0.2)' }]}>
+          <Ionicons name="search" size={20} color="rgba(255, 255, 255, 0.8)" />
+          <TextInput
+            style={styles.searchInput}
+            placeholder="Rechercher un produit..."
+            placeholderTextColor="rgba(255, 255, 255, 0.6)"
+            value={searchQuery}
+            onChangeText={setSearchQuery}
+          />
+          {searchQuery.length > 0 && (
+            <TouchableOpacity onPress={() => setSearchQuery('')}>
+              <Ionicons name="close-circle" size={20} color="rgba(255, 255, 255, 0.8)" />
+            </TouchableOpacity>
+          )}
+        </View>
+
+        {/* Filtres statut */}
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.filtersScroll}>
+          {[
+            { value: 'all', label: 'Tous', count: products.length },
+            { value: 'pending', label: 'En attente', count: pendingCount },
+            {
+              value: 'active',
+              label: 'Actifs',
+              count: products.filter(p => p.is_active).length,
+            },
+            {
+              value: 'inactive',
+              label: 'Inactifs',
+              count: products.filter(p => !p.is_active).length,
+            },
+          ].map(filter => (
+            <TouchableOpacity
+              key={filter.value}
+              style={[
+                styles.filterChip,
+                {
+                  backgroundColor:
+                    statusFilter === filter.value ? 'white' : 'rgba(255, 255, 255, 0.2)',
+                },
+              ]}
+              onPress={() => setStatusFilter(filter.value as ProductStatus)}
+            >
+              <Text
+                style={[
+                  styles.filterText,
+                  {
+                    color:
+                      statusFilter === filter.value ? theme.colors.primary[500] : 'white',
+                  },
+                ]}
+              >
+                {filter.label} ({filter.count})
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </ScrollView>
+
+        {/* Filtre catégorie */}
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.filtersScroll}>
+          <TouchableOpacity
+            style={[
+              styles.filterChip,
+              {
+                backgroundColor:
+                  categoryFilter === 'all' ? 'white' : 'rgba(255, 255, 255, 0.2)',
+              },
+            ]}
+            onPress={() => setCategoryFilter('all')}
+          >
+            <Text
+              style={[
+                styles.filterText,
+                {
+                  color: categoryFilter === 'all' ? theme.colors.primary[500] : 'white',
+                },
+              ]}
+            >
+              Toutes catégories
+            </Text>
+          </TouchableOpacity>
+
+          {categories.map(cat => {
+            const count = products.filter(p => p.category.id === cat.id).length
+            return (
+              <TouchableOpacity
+                key={cat.id}
+                style={[
+                  styles.filterChip,
+                  {
+                    backgroundColor:
+                      categoryFilter === cat.id ? 'white' : 'rgba(255, 255, 255, 0.2)',
+                  },
+                ]}
+                onPress={() => setCategoryFilter(cat.id)}
+              >
+                <Text
+                  style={[
+                    styles.filterText,
+                    {
+                      color: categoryFilter === cat.id ? theme.colors.primary[500] : 'white',
+                    },
+                  ]}
+                >
+                  {cat.name} ({count})
+                </Text>
+              </TouchableOpacity>
+            )
+          })}
+        </ScrollView>
       </View>
-      <View style={styles.content}>
-        <Ionicons name="cube-outline" size={64} color={theme.colors.neutral[300]} />
-        <Text style={[styles.text, { color: theme.colors.textSecondary }]}>
-          Écran de gestion des produits
-        </Text>
-        <Text style={[styles.subtext, { color: theme.colors.textSecondary }]}>
-          (Modération et activation/désactivation)
-        </Text>
-      </View>
+
+      {/* Liste produits */}
+      {loading ? (
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color={theme.colors.primary[500]} />
+          <Typography variant="body" color="secondary" style={{ marginTop: 16 }}>
+            Chargement des produits...
+          </Typography>
+        </View>
+      ) : (
+        <FlatList
+          data={filteredProducts}
+          renderItem={renderProduct}
+          keyExtractor={item => item.id.toString()}
+          contentContainerStyle={styles.listContent}
+          refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
+          ListEmptyComponent={
+            <View style={[styles.emptyState, { backgroundColor: theme.colors.surface.light }]}>
+              <Ionicons name="cube-outline" size={64} color={theme.colors.neutral[300]} />
+              <Typography variant="h4" weight="semibold" style={{ marginTop: 16 }}>
+                Aucun produit trouvé
+              </Typography>
+              <Typography
+                variant="body"
+                color="secondary"
+                style={{ marginTop: 8, textAlign: 'center' }}
+              >
+                {searchQuery || statusFilter !== 'all' || categoryFilter !== 'all'
+                  ? 'Essayez de modifier vos filtres'
+                  : 'Aucun produit dans la base de données'}
+              </Typography>
+            </View>
+          }
+        />
+      )}
+
+      {/* Modal détail */}
+      {renderDetailModal()}
     </View>
   )
 }
@@ -31,29 +759,155 @@ const styles = StyleSheet.create({
   },
   header: {
     paddingTop: 50,
-    paddingBottom: 20,
+    paddingBottom: 16,
     paddingHorizontal: 20,
+  },
+  headerContent: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    marginBottom: 16,
   },
   headerTitle: {
     color: 'white',
     fontSize: 28,
     fontWeight: 'bold',
+    marginBottom: 4,
   },
-  content: {
+  pendingBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  pendingText: {
+    color: '#FFF3CD',
+    fontSize: 13,
+    fontWeight: '600',
+  },
+  searchContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderRadius: 12,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    marginBottom: 12,
+    gap: 8,
+  },
+  searchInput: {
     flex: 1,
+    color: 'white',
+    fontSize: 16,
+  },
+  filtersScroll: {
+    marginBottom: 8,
+  },
+  filterChip: {
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    borderRadius: 20,
+    marginRight: 8,
+  },
+  filterText: {
+    fontSize: 13,
+    fontWeight: '600',
+  },
+  listContent: {
+    padding: 16,
+    flexGrow: 1,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  emptyState: {
+    flex: 1,
+    padding: 40,
+    borderRadius: 12,
     alignItems: 'center',
     justifyContent: 'center',
+    marginTop: 40,
+  },
+  productCard: {
+    flexDirection: 'row',
+    padding: 12,
+  },
+  productImage: {
+    width: 100,
+    height: 100,
+    borderRadius: 12,
+    marginRight: 12,
+  },
+  productInfo: {
+    flex: 1,
+  },
+  productHeader: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    marginBottom: 4,
+    gap: 8,
+  },
+  priceRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  quickActions: {
+    flexDirection: 'row',
+    gap: 6,
+    flexWrap: 'wrap',
+  },
+  quickActionBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 8,
+    gap: 4,
+  },
+  quickActionText: {
+    fontSize: 12,
+    fontWeight: '600',
+  },
+  modalContainer: {
+    flex: 1,
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    paddingTop: 50,
+    paddingBottom: 16,
+  },
+  modalTitle: {
+    color: 'white',
+    fontSize: 20,
+    fontWeight: 'bold',
+  },
+  modalContent: {
+    flex: 1,
     padding: 20,
   },
-  text: {
-    marginTop: 16,
-    fontSize: 16,
-    textAlign: 'center',
+  modalImage: {
+    width: '100%',
+    height: 250,
+    borderRadius: 16,
+    marginBottom: 24,
   },
-  subtext: {
-    marginTop: 8,
-    fontSize: 14,
-    textAlign: 'center',
+  modalSection: {
+    marginBottom: 24,
+  },
+  infoRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  loadingOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(255, 255, 255, 0.9)',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 })
 

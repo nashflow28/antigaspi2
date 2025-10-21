@@ -6,11 +6,17 @@
 import React from 'react'
 import { render, RenderOptions } from '@testing-library/react-native'
 import { Provider } from 'react-redux'
-import { PreloadedState } from '@reduxjs/toolkit'
 import { ThemeProvider } from '../theme'
 
 import { RootState } from '../store'
 import { createTestStore, TestStore } from './store'
+
+// PreloadedState type compatibility for older @reduxjs/toolkit versions
+type DeepPartial<T> = {
+  [P in keyof T]?: T[P] extends object ? DeepPartial<T[P]> : T[P]
+}
+
+type PreloadedState<S> = DeepPartial<S>
 
 interface ExtendedRenderOptions extends Omit<RenderOptions, 'queries'> {
   preloadedState?: PreloadedState<RootState>

@@ -18,6 +18,12 @@ export const resetMerchantSequence = () => {
 export const makeMerchant = (overrides: Partial<MerchantFixture> = {}): MerchantFixture => {
   const id = overrides.id ?? merchantSequence++
 
+  const baseUser = {
+    city: 'Lomé',
+    address: `Rue ${id}`,
+    phone: '+228 90 00 00 00',
+  }
+
   const base: MerchantFixture = {
     id,
     business_name: `Boutique ${id}`,
@@ -29,19 +35,16 @@ export const makeMerchant = (overrides: Partial<MerchantFixture> = {}): Merchant
     latitude: null,
     longitude: null,
     products_count: 0,
-    user: {
-      city: 'Lomé',
-      address: `Rue ${id}`,
-      phone: '+228 90 00 00 00',
-    },
+    user: baseUser,
   }
 
   return {
     ...base,
     ...overrides,
-    user: {
-      ...base.user,
-      ...overrides.user,
-    },
+    user: overrides.user ? {
+      city: overrides.user.city ?? baseUser.city,
+      address: overrides.user.address ?? baseUser.address,
+      phone: overrides.user.phone ?? baseUser.phone,
+    } : baseUser,
   }
 }

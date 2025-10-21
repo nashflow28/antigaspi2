@@ -1,7 +1,11 @@
 import { configureStore } from '@reduxjs/toolkit'
-import type { DeepPartial } from 'redux'
 
 import { RootState } from '../store'
+
+// DeepPartial type for nested state objects
+type DeepPartial<T> = {
+  [P in keyof T]?: T[P] extends object ? DeepPartial<T[P]> : T[P]
+}
 import { authReducer, authInitialState } from '../store/slices/authSlice'
 import { connectivityReducer, connectivityInitialState } from '../store/slices/connectivitySlice'
 import { productsReducer, productsInitialState } from '../store/slices/productsSlice'
