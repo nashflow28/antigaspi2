@@ -6,12 +6,14 @@ import { reservationsReducer } from './slices/reservationsSlice'
 import { merchantsReducer } from './slices/merchantsSlice'
 import { favoritesReducer } from './slices/favoritesSlice'
 import { reviewsReducer } from './slices/reviewsSlice'
+import { surpriseBasketsReducer } from './slices/surpriseBasketsSlice'
 
 export const store = configureStore({
   reducer: {
     auth: authReducer,
     connectivity: connectivityReducer,
     products: productsReducer,
+    surpriseBaskets: surpriseBasketsReducer,
     reservations: reservationsReducer,
     merchants: merchantsReducer,
     favorites: favoritesReducer,

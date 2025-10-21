@@ -40,6 +40,11 @@ export const TEST_IDS = {
   reserveButton: 'reserve-button',
   favoriteButton: 'favorite-button',
 
+  // Surprise Baskets
+  surpriseBasketsScreen: 'surprise-baskets-screen',
+  surpriseBasketsList: 'surprise-baskets-list',
+  surpriseBasketCard: (id: number) => `surprise-basket-card-${id}`,
+
   // Reservations
   reservationsScreen: 'reservations-screen',
   reservationsList: 'reservations-list',
