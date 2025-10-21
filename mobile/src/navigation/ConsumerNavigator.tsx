@@ -19,6 +19,7 @@ import ReviewsListScreen from '../screens/main/ReviewsListScreen'
 import AddReviewScreen from '../screens/main/AddReviewScreen'
 import NotificationSettingsScreen from '../screens/merchant/NotificationSettingsScreen'
 import CartScreen from '../screens/main/CartScreen'
+import LoyaltyScreen from '../screens/main/LoyaltyScreen'
 
 const Tab = createBottomTabNavigator()
 const Stack = createNativeStackNavigator()
@@ -76,6 +77,7 @@ const AccountStack = () => (
     <Stack.Screen name="AccountMain" component={ProfileScreen} />
     <Stack.Screen name="ProfileEdit" component={ProfileEditScreen} />
     <Stack.Screen name="Notifications" component={NotificationSettingsScreen} />
+    <Stack.Screen name="Loyalty" component={LoyaltyScreen} />
     <Stack.Screen name="ProductDetails" component={ProductDetailsScreen} />
     <Stack.Screen name="ReservationDetails" component={ReservationDetailsScreen} />
     <Stack.Screen name="MerchantDetail" component={MerchantDetailScreen} />

@@ -29,6 +29,9 @@ import {
   SurpriseBasket,
   SurpriseBasketFilters,
   PaginatedSurpriseBaskets,
+  LoyaltyPointsSummary,
+  LoyaltyRedemptionPayload,
+  LoyaltyRedemptionData,
 } from '../types'
 
 // Configuration dynamique de l'API (web/native) avec overrides propres
@@ -398,6 +401,18 @@ class ApiService {
       'GET',
       `/favorites/check/${productId}`
     )
+  }
+
+  // === LOYALTY ===
+
+  async getLoyaltyPoints(): Promise<ApiResponse<LoyaltyPointsSummary>> {
+    return this.request<ApiResponse<LoyaltyPointsSummary>>('GET', '/loyalty/my-points')
+  }
+
+  async redeemLoyaltyPoints(
+    payload: LoyaltyRedemptionPayload
+  ): Promise<ApiResponse<LoyaltyRedemptionData>> {
+    return this.request<ApiResponse<LoyaltyRedemptionData>>('POST', '/loyalty/redeem', payload)
   }
 
   // === REVIEWS (AVIS) ===

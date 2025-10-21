@@ -253,6 +253,42 @@ export interface ApiResponse<T> {
   }
 }
 
+export type LoyaltyPointSource = 'purchase' | 'review' | 'referral' | 'bonus' | 'redemption'
+
+export interface LoyaltyPoint {
+  id: number
+  user_id: number
+  points: number
+  earned_from: LoyaltyPointSource
+  reference_id?: number | null
+  description: string
+  expires_at?: string | null
+  created_at: string
+}
+
+export interface LoyaltyPointsBreakdown {
+  earned_from: string
+  total: string | number
+}
+
+export interface LoyaltyPointsSummary {
+  total_points: number
+  expiring_soon: number
+  breakdown: LoyaltyPointsBreakdown[]
+  recent_history: LoyaltyPoint[]
+}
+
+export interface LoyaltyRedemptionPayload {
+  points: number
+  description: string
+}
+
+export interface LoyaltyRedemptionData {
+  redeemed_points: number
+  remaining_points: number
+  redemption: LoyaltyPoint
+}
+
 export interface ReservationCreationPayload {
   productId: number
   quantity: number
