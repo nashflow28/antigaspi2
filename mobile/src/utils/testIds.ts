@@ -69,6 +69,9 @@ export const TEST_IDS = {
   profileEmail: 'profile-email',
   editProfileButton: 'edit-profile-button',
   logoutButton: 'logout-button',
+  loyaltyAccessButton: 'loyalty-access-button',
+  loyaltyScreen: 'loyalty-screen',
+  loyaltyRedeemButton: 'loyalty-redeem-button',
 
   // ============ MERCHANT SCREENS ============
   // Dashboard

@@ -154,6 +154,29 @@ const ProfileScreen: React.FC = () => {
           <Ionicons name="chevron-forward" size={20} color={theme.colors.neutral[400]} />
         </TouchableOpacity>
 
+        {user?.role === 'consumer' && (
+          <TouchableOpacity
+            style={[
+              styles.menuItem,
+              {
+                paddingHorizontal: theme.spacing.lg,
+                paddingVertical: theme.spacing.md,
+                borderBottomWidth: 1,
+                borderBottomColor: theme.colors.border,
+              },
+            ]}
+            onPress={() => (navigation as any).navigate('Loyalty')}
+            testID={TEST_IDS.loyaltyAccessButton}
+            accessibilityLabel="Accéder à mes points de fidélité"
+          >
+            <Ionicons name="gift-outline" size={24} color={theme.colors.text} />
+            <Typography variant="body" style={{ flex: 1, marginLeft: theme.spacing.md }}>
+              Points de fidélité
+            </Typography>
+            <Ionicons name="chevron-forward" size={20} color={theme.colors.neutral[400]} />
+          </TouchableOpacity>
+        )}
+
         <View
           style={[
             styles.menuItemBlock,
