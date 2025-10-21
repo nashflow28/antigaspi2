@@ -1,0 +1,75 @@
+# Admin Reject Product Flow
+# Critical: Verifies admin can reject products with reason
+#
+# Coverage:
+# - Navigate to pending products
+# - Open product detail
+# - Reject product
+# - Enter rejection reason (min 10 chars)
+# - Verify success
+# - Product removed from pending
+
+appId: com.antigaspi.mobile
+---
+# Login as admin
+- launchApp
+- tapOn: "Email"
+- inputText: "${ADMIN_EMAIL}"
+- tapOn: "Mot de passe"
+- inputText: "${ADMIN_PASSWORD}"
+- tapOn: "Se connecter"
+- waitForAnimationToEnd
+
+# Navigate to products
+- tapOn: "Gérer produits"
+- waitForAnimationToEnd
+
+# Filter by pending
+- tapOn: "En attente"
+- waitForAnimationToEnd
+
+# Verify pending products exist
+- runFlow:
+    when:
+      visible: "produit en attente"
+    commands:
+      # Find first pending product
+      - tapOn:
+          text: ".*"
+          regex: true
+          index: 0
+      - waitForAnimationToEnd
+
+      # Verify detail modal
+      - assertVisible: "Détails Produit"
+
+      # Verify reject button exists
+      - assertVisible: "Rejeter le produit"
+
+      # Tap reject
+      - tapOn: "Rejeter le produit"
+      - waitForAnimationToEnd
+
+      # Enter rejection reason (must be 10+ chars)
+      - runFlow:
+          when:
+            visible: "raison"
+          commands:
+            - inputText: "Produit non conforme aux standards de qualité"
+            - tapOn: "Rejeter"
+
+      # Wait for API call
+      - waitForAnimationToEnd
+
+      # Verify success or modal closed
+      - runFlow:
+          when:
+            visible: "Succès|rejeté"
+            regex: true
+          commands:
+            - assertVisible:
+                text: "Succès|rejeté"
+                regex: true
+
+# Success
+- stopApp

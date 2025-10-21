@@ -1,0 +1,59 @@
+# Admin Dashboard Flow
+# Critical: Verifies dashboard displays correct statistics
+#
+# Coverage:
+# - Stats load correctly
+# - Refresh functionality works
+# - Pending alerts display
+# - Revenue card shows XOF currency
+
+appId: com.antigaspi.mobile
+---
+# Login as admin
+- launchApp
+- tapOn: "Email"
+- inputText: "${ADMIN_EMAIL}"
+- tapOn: "Mot de passe"
+- inputText: "${ADMIN_PASSWORD}"
+- tapOn: "Se connecter"
+- waitForAnimationToEnd
+
+# Verify we're on dashboard
+- assertVisible: "Dashboard"
+
+# Verify all stat cards render
+- assertVisible: "Utilisateurs"
+- assertVisible: "Commerçants"
+- assertVisible: "Produits"
+- assertVisible: "actifs" # Active products count
+- assertVisible: "Réservations"
+
+# Verify revenue card
+- assertVisible: "Revenus totaux"
+- assertVisible: "XOF"
+
+# Check for pending alerts (if any)
+- runFlow:
+    when:
+      visible: "Actions requises"
+    commands:
+      - assertVisible:
+          text: "à valider|à modérer"
+          regex: true
+
+# Test refresh functionality
+- tapOn:
+    id: "refresh-dashboard-button"
+- waitForAnimationToEnd
+- assertVisible: "Dashboard" # Still on dashboard after refresh
+
+# Scroll to bottom to verify all content loads
+- scroll
+
+# Verify quick actions at bottom
+- assertVisible: "Actions rapides"
+- assertVisible: "Gérer utilisateurs"
+- assertVisible: "Gérer produits"
+
+# Success
+- stopApp
