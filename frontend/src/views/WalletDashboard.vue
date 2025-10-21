@@ -19,10 +19,10 @@
             </Button>
             <div>
               <h1 class="text-xl lg:text-3xl font-semibold text-gray-900 mt-2">
-                Portefeuille électronique 💳
+                {{ pageTitle }}
               </h1>
               <p class="text-lg text-gray-700">
-                Gérez votre portefeuille et vos transactions
+                {{ pageSubtitle }}
               </p>
             </div>
           </div>
@@ -52,8 +52,12 @@
             <div class="w-12 h-10 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:transition-colors">
               <Plus class="h-6 w-6 text-green-600" />
             </div>
-            <div class="font-medium text-gray-900">Recharger</div>
-            <div class="text-sm text-gray-500">Ajouter des fonds</div>
+            <div class="font-medium text-gray-900">
+              {{ isMerchant ? 'Encaisser un paiement' : 'Recharger' }}
+            </div>
+            <div class="text-sm text-gray-500">
+              {{ isMerchant ? 'Initier un encaissement Mobile Money ou Paystack' : 'Ajouter des fonds' }}
+            </div>
           </Button>
 
           <Button
@@ -317,8 +321,10 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
+import { useRoute } from 'vue-router'
 import { useWalletStore } from '@/stores/wallet'
+import { useAuthStore } from '@/stores/auth'
 import { notify } from '@/composables/useNotifications'
 import WalletCard from '@/components/wallet/WalletCard.vue'
 import WalletRecharge from '@/components/wallet/WalletRecharge.vue'
@@ -333,8 +339,21 @@ import Card from '@/components/ui/2025/Card.vue'
 import Button from '@/components/ui/2025/Button.vue'
 import { useDashboardLayout } from '@/composables/useDashboardLayout'
 
+const route = useRoute()
+const authStore = useAuthStore()
 const walletStore = useWalletStore()
-const { sidebar, header } = useDashboardLayout('consumer')
+
+const layoutRole: 'consumer' | 'merchant' = ((route.meta.roles as string[] | undefined)?.includes('merchant')
+  || authStore.user?.role === 'merchant')
+  ? 'merchant'
+  : 'consumer'
+
+const { sidebar, header } = useDashboardLayout(layoutRole)
+const isMerchant = computed(() => layoutRole === 'merchant')
+const pageTitle = computed(() => isMerchant.value ? 'Paiements & Portefeuille' : 'Portefeuille électronique 💳')
+const pageSubtitle = computed(() => isMerchant.value
+  ? 'Encaissez vos paiements Mobile Money, Paystack et gérez votre solde commerçant.'
+  : 'Gérez votre portefeuille et vos transactions')
 
 const showRechargeModal = ref(false)
 const showTransferModal = ref(false)

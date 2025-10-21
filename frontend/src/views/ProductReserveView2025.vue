@@ -660,6 +660,22 @@ const paymentOptions = computed<PaymentOption[]>(() => {
       instructions: 'Le numéro Mixx by Yas doit être au format international (+228...).'
     },
     {
+      value: 'orange_money',
+      label: 'Orange Money',
+      description: 'CinetPay - Mobile Money',
+      requiresPhone: true,
+      icon: Smartphone,
+      instructions: 'Utilisez votre numéro Orange Money format international (+225/+229...).'
+    },
+    {
+      value: 'mtn_momo',
+      label: 'MTN MoMo',
+      description: 'CinetPay - Mobile Money',
+      requiresPhone: true,
+      icon: Smartphone,
+      instructions: 'Le numéro MTN MoMo doit être saisi au format international.'
+    },
+    {
       value: 'paystack',
       label: 'Paystack',
       description: 'Cartes bancaires & Mobile Money',
@@ -897,6 +913,9 @@ const confirmReservation = async () => {
     if (response.success) {
       if (response.payment) {
         paymentsStore.recordPayment(response.payment)
+        if (response.payment.checkout_url) {
+          window.open(response.payment.checkout_url, '_blank', 'noopener')
+        }
         if (!isFinalStatus(response.payment.status)) {
           paymentsStore.startPolling(response.payment.id)
           notify.info('Paiement en attente de confirmation.', 'Vous recevrez une notification dès validation du prestataire.')

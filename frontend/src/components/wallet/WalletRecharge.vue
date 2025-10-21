@@ -202,6 +202,18 @@ const paymentMethods = [
     icon: PhoneIcon
   },
   {
+    value: 'orange_money',
+    name: 'Orange Money',
+    description: 'Mobile Money Orange via CinetPay',
+    icon: PhoneIcon
+  },
+  {
+    value: 'mtn_momo',
+    name: 'MTN MoMo',
+    description: 'Mobile Money MTN via CinetPay',
+    icon: PhoneIcon
+  },
+  {
     value: 'paystack',
     name: 'Carte bancaire',
     description: 'Visa, Mastercard via Paystack',
@@ -210,7 +222,7 @@ const paymentMethods = [
 ]
 
 const requiresPhone = computed(() => {
-  return ['flooz', 'tmoney'].includes(form.value.payment_method)
+  return ['flooz', 'tmoney', 'orange_money', 'mtn_momo'].includes(form.value.payment_method)
 })
 
 const isValid = computed(() => {

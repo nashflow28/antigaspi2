@@ -72,7 +72,7 @@ export interface WalletPaymentRequest {
 
 export interface WalletRechargeRequest {
   amount: number
-  payment_method: 'flooz' | 'tmoney' | 'paystack'
+  payment_method: 'flooz' | 'tmoney' | 'orange_money' | 'mtn_momo' | 'paystack'
   phone?: string
 }
 

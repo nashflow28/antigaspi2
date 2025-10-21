@@ -325,6 +325,8 @@ const paymentStatusLabels = {
 const paymentMethodLabels = {
   flooz: 'Flooz (Moov Togo)',
   tmoney: 'Mixx by Yas',
+  orange_money: 'Orange Money',
+  mtn_momo: 'MTN MoMo',
   paystack: 'Paystack',
   on_site: 'Paiement sur place',
   wallet: 'Portefeuille électronique'
