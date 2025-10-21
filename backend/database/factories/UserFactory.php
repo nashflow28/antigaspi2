@@ -45,6 +45,7 @@ class UserFactory extends Factory
             'prefers_email_notifications' => true,
             'prefers_sms_notifications' => false,
             'prefers_push_notifications' => false,
+            'notification_settings' => null,
             'remember_token' => Str::random(10),
         ];
     }

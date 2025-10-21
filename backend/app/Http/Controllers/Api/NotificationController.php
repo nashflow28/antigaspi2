@@ -120,6 +120,18 @@ class NotificationController extends Controller
         ]);
     }
 
+    public function getLegacyPreferences(Request $request): JsonResponse
+    {
+        $user = $request->user();
+
+        return response()->json([
+            'success' => true,
+            'data' => $this->normalizeLegacyPreferences(
+                $user->notification_settings ?? []
+            ),
+        ]);
+    }
+
     public function updatePreferences(Request $request): JsonResponse
     {
         $data = $request->validate([
@@ -144,5 +156,59 @@ class NotificationController extends Controller
                 'prefers_push_notifications',
             ]),
         ]);
+    }
+
+    public function updateLegacyPreferences(Request $request): JsonResponse
+    {
+        $data = $request->validate([
+            'enabled' => ['required', 'boolean'],
+            'new_products' => ['required', 'boolean'],
+            'reservations' => ['required', 'boolean'],
+            'promotions' => ['required', 'boolean'],
+            'expiring_products' => ['required', 'boolean'],
+            'quiet_hours_enabled' => ['required', 'boolean'],
+            'quiet_hours_start' => ['required', 'date_format:H:i'],
+            'quiet_hours_end' => ['required', 'date_format:H:i'],
+        ]);
+
+        $user = $request->user();
+        $user->notification_settings = $data;
+        $user->save();
+
+        return response()->json([
+            'success' => true,
+            'data' => $this->normalizeLegacyPreferences($data),
+        ]);
+    }
+
+    private function normalizeLegacyPreferences(array $settings): array
+    {
+        $defaults = [
+            'enabled' => true,
+            'new_products' => true,
+            'reservations' => true,
+            'promotions' => true,
+            'expiring_products' => true,
+            'quiet_hours_enabled' => false,
+            'quiet_hours_start' => '22:00',
+            'quiet_hours_end' => '08:00',
+        ];
+
+        $normalized = array_merge($defaults, $settings);
+
+        $normalized['enabled'] = (bool) $normalized['enabled'];
+        $normalized['new_products'] = (bool) $normalized['new_products'];
+        $normalized['reservations'] = (bool) $normalized['reservations'];
+        $normalized['promotions'] = (bool) $normalized['promotions'];
+        $normalized['expiring_products'] = (bool) $normalized['expiring_products'];
+        $normalized['quiet_hours_enabled'] = (bool) $normalized['quiet_hours_enabled'];
+
+        foreach (['quiet_hours_start', 'quiet_hours_end'] as $key) {
+            if (!is_string($normalized[$key]) || !preg_match('/^\d{2}:\d{2}$/', $normalized[$key])) {
+                $normalized[$key] = $defaults[$key];
+            }
+        }
+
+        return $normalized;
     }
 }
