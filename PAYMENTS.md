@@ -4,12 +4,14 @@ This document explains how payments are configured and orchestrated inside the A
 
 ## Supported methods
 
-| Method  | Enum value  | Provider | Notes |
-|---------|-------------|----------|-------|
-| Flooz   | `flooz`     | PayGate  | Requires customer phone number. |
-| Tmoney  | `tmoney`    | PayGate  | Requires customer phone number. |
-| Paystack| `paystack`  | Paystack | Requires customer email. |
-| On-site | `on_site`   | Manual   | No remote call, marks reservation for in-person payment. |
+| Method       | Enum value    | Provider | Notes |
+|--------------|---------------|----------|-------|
+| Flooz        | `flooz`       | FedaPay  | Requires customer phone number. |
+| Tmoney       | `tmoney`      | FedaPay  | Requires customer phone number. |
+| Orange Money | `orange_money`| CinetPay | Requires customer phone number. |
+| MTN MoMo     | `mtn_momo`    | CinetPay | Requires customer phone number. |
+| Paystack     | `paystack`    | Paystack | Requires customer email. |
+| On-site      | `on_site`     | Manual   | No remote call, marks reservation for in-person payment. |
 
 Payment types are represented by `App\Enums\PaymentMethod` and payment state by `App\Enums\PaymentStatus`.
 
@@ -32,6 +34,18 @@ PAYSTACK_PUBLIC_KEY=
 PAYSTACK_SECRET_KEY=
 PAYSTACK_WEBHOOK_SECRET=
 PAYSTACK_CALLBACK_URL=https://example.com/api/payments/webhook/paystack
+
+FEDAPAY_BASE_URL=https://api.fedapay.com/v1
+FEDAPAY_API_KEY=
+FEDAPAY_CALLBACK_URL=https://example.com/api/payments/webhook/fedapay
+FEDAPAY_DEFAULT_COUNTRY=TG
+
+CINETPAY_BASE_URL=https://api-checkout.cinetpay.com/v2
+CINETPAY_API_KEY=
+CINETPAY_SITE_ID=
+CINETPAY_NOTIFY_URL=https://example.com/api/payments/webhook/cinetpay
+CINETPAY_RETURN_URL=https://example.com/payments/return
+CINETPAY_CALLBACK_URL=https://example.com/api/payments/webhook/cinetpay
 ```
 
 Update your `.env` file with real credentials in production. The default currency is `XOF` but can be overridden per environment.
@@ -70,7 +84,9 @@ Reservations have two additional fields:
    - Allows retrying a failed payment or cancelling a pending one.
 
 3. **Webhooks**
-   - `POST /payments/webhook/paygate`
+   - `POST /payments/webhook/fedapay`
+   - `POST /payments/webhook/cinetpay`
+   - `POST /payments/webhook/paygate` (legacy)
    - `POST /payments/webhook/paystack`
 
 Webhook endpoints reconcile payment statuses and automatically update reservation state.
