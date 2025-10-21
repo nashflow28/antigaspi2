@@ -219,6 +219,17 @@ const router = createRouter({
       meta: { requiresAuth: true, roles: ['merchant'] }
     },
     {
+      path: '/merchant/payments',
+      name: 'merchant-payments',
+      component: () => import('@/views/WalletDashboard.vue'),
+      meta: {
+        requiresAuth: true,
+        roles: ['merchant'],
+        title: 'Paiements & Portefeuille',
+        breadcrumb: ['Espace commerçant', 'Paiements']
+      }
+    },
+    {
       path: '/merchant/reviews/dashboard',
       name: 'merchant-reviews-dashboard',
       component: () => import('@/views/merchant/ReviewsDashboard.vue'),

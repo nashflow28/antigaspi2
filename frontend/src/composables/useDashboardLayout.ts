@@ -79,6 +79,12 @@ const navigationByRole: Record<Role, NavigationConfig[]> = {
       routes: ['merchant-reservations']
     },
     {
+      label: 'Paiements & Portefeuille',
+      href: '/merchant/payments',
+      icon: BanknotesIcon,
+      routes: ['merchant-payments']
+    },
+    {
       label: 'Avis clients',
       href: '/merchant/reviews/dashboard',
       icon: ChatBubbleLeftRightIcon,

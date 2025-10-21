@@ -194,7 +194,14 @@ export interface AdminSystemHealthService {
   [key: string]: unknown
 }
 
-export type PaymentMethod = 'flooz' | 'tmoney' | 'paystack' | 'on_site' | 'wallet'
+export type PaymentMethod =
+  | 'flooz'
+  | 'tmoney'
+  | 'orange_money'
+  | 'mtn_momo'
+  | 'paystack'
+  | 'on_site'
+  | 'wallet'
 
 export type PaymentStatus = 'pending' | 'success' | 'failed' | 'on_site' | 'refunded'
 

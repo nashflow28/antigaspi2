@@ -220,7 +220,7 @@ const contactName = ref('')
 const contactPhone = ref('')
 const pickupSlot = ref<'asap' | 'lunch' | 'evening'>('asap')
 const notes = ref('')
-const selectedPayment = ref<'wallet' | 'tmoney' | 'flooz' | 'on_site'>('wallet')
+const selectedPayment = ref<'wallet' | 'flooz' | 'tmoney' | 'orange_money' | 'mtn_momo' | 'on_site'>('wallet')
 const termsAccepted = ref(true)
 const subscribeNotifications = ref(true)
 const processing = ref(false)
@@ -240,6 +240,16 @@ const paymentOptions = [
     value: 'flooz' as const,
     label: 'Flooz',
     description: 'Validez via USSD ou notification push Flooz.'
+  },
+  {
+    value: 'orange_money' as const,
+    label: 'Orange Money',
+    description: 'Paiement mobile Orange Money via CinetPay.'
+  },
+  {
+    value: 'mtn_momo' as const,
+    label: 'MTN MoMo',
+    description: 'Paiement mobile MTN MoMo via CinetPay.'
   },
   {
     value: 'on_site' as const,

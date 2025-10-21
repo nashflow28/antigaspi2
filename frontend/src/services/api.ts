@@ -678,6 +678,24 @@ class ApiService {
     notes?: string
     currency?: string
   }): Promise<PaymentApiResponse> {
+    const isMobileMoney = ['flooz', 'tmoney', 'orange_money', 'mtn_momo'].includes(payload.paymentMethod)
+
+    if (isMobileMoney) {
+      const body = {
+        reservation_id: payload.reservationId,
+        provider: payload.paymentMethod,
+        customer_phone: payload.customerPhone ?? undefined,
+        customer_email: payload.customerEmail ?? undefined,
+        notes: payload.notes ?? undefined,
+        currency: payload.currency ?? undefined
+      }
+
+      return this.request<PaymentApiResponse>('/payments/mobile-money', {
+        method: 'POST',
+        body: JSON.stringify(body)
+      }, true)
+    }
+
     const body = {
       reservation_id: payload.reservationId,
       payment_method: payload.paymentMethod,

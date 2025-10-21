@@ -444,6 +444,7 @@ const userMenuLinks = computed<UserMenuLink[]>(() => {
     merchant: [
       { to: '/merchant/products', label: 'Mes produits', icon: Package },
       { to: '/merchant/reservations', label: 'Réservations reçues', icon: ShoppingBag },
+      { to: '/merchant/payments', label: 'Paiements & Portefeuille', icon: Wallet },
       { to: '/merchant/reviews/dashboard', label: 'Mes avis', icon: MessageSquare },
       { to: '/merchant/loyalty', label: 'Points de fidélité', icon: Star }
     ],
