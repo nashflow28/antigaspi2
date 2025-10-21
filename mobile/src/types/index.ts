@@ -12,6 +12,7 @@ export interface User {
   photo_url?: string | null
   created_at: string
   updated_at: string
+  is_suspended?: boolean
   prefers_email_notifications?: boolean
   prefers_sms_notifications?: boolean
   prefers_push_notifications?: boolean
