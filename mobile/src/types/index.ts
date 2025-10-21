@@ -67,6 +67,70 @@ export interface Product {
   is_active?: boolean
 }
 
+export interface SurpriseBasketItem {
+  id: number
+  product_id: number
+  quantity: number
+  unit_price: number
+  total_price: number
+  product: {
+    id: number
+    name: string
+    description?: string
+    original_price?: number
+    discounted_price?: number
+    image_url?: string | null
+    category?: Category | null
+  }
+  created_at: string
+  updated_at: string
+}
+
+export interface SurpriseBasket {
+  id: number
+  merchant_id: number
+  category_id?: number | null
+  name: string
+  description?: string | null
+  surprise_description?: string | null
+  original_price: number
+  discounted_price: number
+  quantity_available: number
+  min_items?: number | null
+  max_items?: number | null
+  total_original_value?: number | null
+  expiration_date?: string | null
+  image_url?: string | null
+  is_active: boolean
+  is_surprise_basket: boolean
+  basket_items_count?: number
+  basket_total_value?: number
+  basket_savings?: number
+  basket_discount_percentage?: number
+  merchant?: Merchant
+  category?: Category | null
+  surprise_basket_items?: SurpriseBasketItem[]
+  created_at: string
+  updated_at: string
+}
+
+export interface SurpriseBasketFilters {
+  merchantId?: number
+  categoryId?: number
+  minPrice?: number
+  maxPrice?: number
+  city?: string
+  sort?: 'latest' | 'price_low_high' | 'price_high_low' | 'discount'
+}
+
+export interface PaginatedSurpriseBaskets {
+  data: SurpriseBasket[]
+  current_page: number
+  last_page: number
+  per_page: number
+  total: number
+}
+
 export type MobileMoneyProvider = 'flooz' | 'tmoney' | 'orange_money' | 'mtn_momo'
 
 export type PaymentMethod =
@@ -270,6 +334,19 @@ export interface ProductsState {
   hasMore: boolean
 }
 
+export interface SurpriseBasketsState {
+  baskets: SurpriseBasket[]
+  selectedBasket: SurpriseBasket | null
+  loading: boolean
+  loadingMore: boolean
+  error: string | null
+  filters: SurpriseBasketFilters
+  currentPage: number
+  lastPage: number
+  hasMore: boolean
+  total: number
+}
+
 export interface ReservationsState {
   reservations: Reservation[]
   loading: boolean
@@ -330,6 +407,7 @@ export interface ReviewsState {
 export interface RootState {
   auth: AuthState
   products: ProductsState
+  surpriseBaskets: SurpriseBasketsState
   reservations: ReservationsState
   favorites: FavoritesState
   reviews: ReviewsState

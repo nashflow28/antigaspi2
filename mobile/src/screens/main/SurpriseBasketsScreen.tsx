@@ -7,60 +7,47 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native'
-import { useDispatch, useSelector } from 'react-redux'
 import { Image } from 'expo-image'
 import { Ionicons } from '@expo/vector-icons'
 
-import { AppDispatch, RootState } from '../../store'
-// TODO: Create surpriseBasketsSlice with fetchMoreSurpriseBaskets, fetchSurpriseBaskets, setSelectedBasket
-// import {
-//   fetchMoreSurpriseBaskets,
-//   fetchSurpriseBaskets,
-//   setSelectedBasket,
-// } from '../../store/slices/surpriseBasketsSlice'
+import { useAppDispatch, useAppSelector } from '../../store/hooks'
+import {
+  fetchMoreSurpriseBaskets,
+  fetchSurpriseBaskets,
+  setSelectedBasket,
+} from '../../store/slices/surpriseBasketsSlice'
 import { useTheme } from '../../theme'
 import { Button, Badge, Card, Typography } from '../../components/2025'
 import { formatCurrency } from '../../utils/currencyHelpers'
 import { getImageUrl } from '../../utils/imageHelpers'
 import { TEST_IDS } from '../../utils/testIds'
-// TODO: Add SurpriseBasket type to types/index.ts
-// import { SurpriseBasket } from '../../types'
-import { Product } from '../../types'
-
-// Temporary type until surpriseBasketsSlice is implemented
-type SurpriseBasket = Product & {
-  basket_discount_percentage?: number
-  total_original_value?: string
-  surprise_description?: string
-}
+import { SurpriseBasket } from '../../types'
 
 interface Props {
   navigation: any
 }
 
 const SurpriseBasketsScreen: React.FC<Props> = ({ navigation }) => {
-  const dispatch = useDispatch<AppDispatch>()
+  const dispatch = useAppDispatch()
   const theme = useTheme()
-  // TODO: Replace with Redux state when surpriseBasketsSlice is implemented
-  // const { baskets, loading, loadingMore, pagination, filters } = useSelector(
-  //   (state: RootState) => state.surpriseBaskets
-  // )
-  const [baskets] = useState<SurpriseBasket[]>([])
-  const [loading] = useState(false)
-  const [loadingMore] = useState(false)
-  const [pagination] = useState({ currentPage: 1, lastPage: 1 })
-  const filters = {}
+  const { baskets, loading, loadingMore, currentPage, lastPage, hasMore, filters } =
+    useAppSelector(state => state.surpriseBaskets)
   const [refreshing, setRefreshing] = useState(false)
 
   useEffect(() => {
     if (!loading && baskets.length === 0) {
-      // TODO: dispatch(fetchSurpriseBaskets({ ...filters, page: 1 }))
+      dispatch(fetchSurpriseBaskets({ ...filters, page: 1 }))
     }
-  }, [])
+  }, [dispatch, filters, loading, baskets.length])
 
   const handleRefresh = useCallback(async () => {
     setRefreshing(true)
-    // TODO: await dispatch(fetchSurpriseBaskets({ ...filters, page: 1 }))
+    try {
+      await dispatch(fetchSurpriseBaskets({ ...filters, page: 1 })).unwrap()
+    } catch (error) {
+      // Les erreurs sont déjà gérées dans le slice via l'état `error`
+      console.error('Error refreshing surprise baskets:', error)
+    }
     setRefreshing(false)
   }, [dispatch, filters])
 
@@ -69,19 +56,21 @@ const SurpriseBasketsScreen: React.FC<Props> = ({ navigation }) => {
       return
     }
 
-    if (pagination.currentPage >= pagination.lastPage) {
+    if (!hasMore || currentPage >= lastPage) {
       return
     }
 
-    // TODO: dispatch(fetchMoreSurpriseBaskets({
-    //   page: pagination.currentPage + 1,
-    //   filters,
-    // }))
-  }, [dispatch, filters, loadingMore, pagination.currentPage, pagination.lastPage])
+    dispatch(
+      fetchMoreSurpriseBaskets({
+        page: currentPage + 1,
+        filters,
+      })
+    )
+  }, [dispatch, filters, loadingMore, currentPage, lastPage, hasMore])
 
   const goToDetails = useCallback(
     (basket: SurpriseBasket) => {
-      // TODO: dispatch(setSelectedBasket(basket))
+      dispatch(setSelectedBasket(basket))
       navigation.navigate('SurpriseBasketDetails', { basketId: basket.id })
     },
     [dispatch, navigation]
@@ -100,8 +89,7 @@ const SurpriseBasketsScreen: React.FC<Props> = ({ navigation }) => {
         <TouchableOpacity
           activeOpacity={0.85}
           onPress={() => goToDetails(item)}
-          // TODO: Add surpriseBasketCard to TEST_IDS
-          // testID={TEST_IDS.surpriseBasketCard(item.id)}
+          testID={TEST_IDS.surpriseBasketCard(item.id)}
         >
           <Card style={styles.card}>
             <View style={styles.cardHeader}>
@@ -200,8 +188,7 @@ const SurpriseBasketsScreen: React.FC<Props> = ({ navigation }) => {
   return (
     <View
       style={[styles.container, { backgroundColor: theme.colors.background }]}
-      // TODO: Add surpriseBasketsScreen to TEST_IDS
-      // testID={TEST_IDS.surpriseBasketsScreen}
+      testID={TEST_IDS.surpriseBasketsScreen}
     >
       <FlatList
         data={baskets}
@@ -209,6 +196,7 @@ const SurpriseBasketsScreen: React.FC<Props> = ({ navigation }) => {
         renderItem={renderBasket}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.listContent}
+        testID={TEST_IDS.surpriseBasketsList}
         refreshControl={
           <RefreshControl
             refreshing={refreshing}
