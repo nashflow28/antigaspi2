@@ -26,6 +26,9 @@ import {
   CartUpdatePayload,
   CartCheckoutPayload,
   CartCheckoutResponse,
+  SurpriseBasket,
+  SurpriseBasketFilters,
+  PaginatedSurpriseBaskets,
 } from '../types'
 
 // Configuration dynamique de l'API (web/native) avec overrides propres
@@ -285,6 +288,29 @@ class ApiService {
 
   async getCategories(): Promise<ApiResponse<Category[]>> {
     return this.request<ApiResponse<Category[]>>('GET', '/categories')
+  }
+
+  async getSurpriseBaskets(
+    filters?: (SurpriseBasketFilters & { page?: number; perPage?: number; per_page?: number }) | undefined
+  ): Promise<ApiResponse<PaginatedSurpriseBaskets>> {
+    const params = new URLSearchParams()
+
+    if (filters) {
+      const normalizedFilters = toSnakeCase(filters) as Record<string, unknown>
+
+      Object.entries(normalizedFilters).forEach(([key, value]) => {
+        if (value !== undefined && value !== null && value !== '') {
+          params.append(key, value.toString())
+        }
+      })
+    }
+
+    const url = `/surprise-baskets${params.toString() ? `?${params.toString()}` : ''}`
+    return this.request<ApiResponse<PaginatedSurpriseBaskets>>('GET', url)
+  }
+
+  async getSurpriseBasket(id: number): Promise<ApiResponse<SurpriseBasket>> {
+    return this.request<ApiResponse<SurpriseBasket>>('GET', `/surprise-baskets/${id}`)
   }
 
   async getMerchants(): Promise<ApiResponse<any[]>> {

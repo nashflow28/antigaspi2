@@ -88,6 +88,8 @@ class NotificationService {
   private initializationPromise: Promise<void> | null = null;
   private listenersRegistered = false;
   private listeners: Map<NotificationEventName, Set<ListenerCallback<any>>> = new Map();
+  private cachedLegacyPreferences: LegacyNotificationPreferences | null = null;
+  private readonly legacyPreferencesEndpoint = '/notifications/settings';
 
   constructor() {
     this.baseURL = getApiBaseUrl();
@@ -344,8 +346,30 @@ class NotificationService {
       return;
     }
 
+    const preferences = this.getLegacyPreferencesSnapshot();
+
+    if (!preferences.enabled) {
+      return;
+    }
+
     // Traiter selon le type de notification
     if (data?.type) {
+      if (data.type === 'new_product' && !preferences.newProducts) {
+        return;
+      }
+
+      if (data.type === 'reservation_status' && !preferences.reservations) {
+        return;
+      }
+
+      if (data.type === 'promotion' && !preferences.promotions) {
+        return;
+      }
+
+      if (data.type === 'expiring_product' && !preferences.expiringProducts) {
+        return;
+      }
+
       switch (data.type) {
         case 'new_product':
           this.handleNewProductNotification(data);
@@ -366,8 +390,8 @@ class NotificationService {
     this.updateBadge();
 
     this.emit('notificationReceived', {
-      title,
-      body,
+      title: typeof title === 'string' ? title : undefined,
+      body: typeof body === 'string' ? body : undefined,
       data,
     });
   }
@@ -486,29 +510,46 @@ class NotificationService {
 
   async loadPreferences(): Promise<LegacyNotificationPreferences> {
     try {
-      const prefs = await AsyncStorage.getItem(this.legacyPreferencesStorageKey);
-      return prefs ? JSON.parse(prefs) : this.getDefaultPreferences();
+      const response = await this.http.get(this.legacyPreferencesEndpoint);
+      const payload = response.data?.data;
+      const normalized = this.normalizeLegacyPreferences(payload);
+      await this.persistLegacyPreferences(normalized);
+      return normalized;
     } catch (error) {
-      return this.getDefaultPreferences();
+      console.warn('Impossible de synchroniser les préférences de notification distantes:', error);
+
+      const cached = await this.getCachedLegacyPreferences();
+      if (cached) {
+        return cached;
+      }
+
+      const defaults = this.getDefaultPreferences();
+      await this.persistLegacyPreferences(defaults);
+      return defaults;
     }
   }
 
   /**
    * Sauvegarder les préférences de notification
    */
-  async savePreferences(preferences: LegacyNotificationPreferences): Promise<void> {
+  async savePreferences(
+    preferences: LegacyNotificationPreferences
+  ): Promise<LegacyNotificationPreferences> {
+    const normalizedInput = this.normalizeLegacyPreferences(preferences);
+
     try {
-      await AsyncStorage.setItem(this.legacyPreferencesStorageKey, JSON.stringify(preferences));
+      const response = await this.http.patch(
+        this.legacyPreferencesEndpoint,
+        this.mapLegacyPreferencesToPayload(normalizedInput)
+      );
 
-      // NOTE: L'API Laravel attend PATCH /users/{id} avec prefers_email_notifications,
-      // prefers_sms_notifications, prefers_push_notifications (booléens)
-      // POST /notifications/preferences n'existe pas
-      // TODO: Implémenter l'appel correct vers /users/{userId} avec PATCH
-
-      // Synchronisation backend désactivée temporairement
-      // await this.http.post('/notifications/preferences', preferences);
+      const payload = response.data?.data ?? normalizedInput;
+      const normalized = this.normalizeLegacyPreferences(payload);
+      await this.persistLegacyPreferences(normalized);
+      return normalized;
     } catch (error) {
       console.error('Erreur lors de la sauvegarde des préférences:', error);
+      throw this.toError(error, "Impossible de sauvegarder vos préférences pour le moment.");
     }
   }
 
@@ -526,6 +567,170 @@ class NotificationService {
       quietHoursStart: '22:00',
       quietHoursEnd: '08:00',
     };
+  }
+
+  private async persistLegacyPreferences(
+    preferences: LegacyNotificationPreferences
+  ): Promise<void> {
+    this.cachedLegacyPreferences = preferences;
+
+    try {
+      await AsyncStorage.setItem(
+        this.legacyPreferencesStorageKey,
+        JSON.stringify(preferences)
+      );
+    } catch (error) {
+      console.warn('Impossible de mettre en cache les préférences de notification:', error);
+    }
+  }
+
+  private async getCachedLegacyPreferences(): Promise<LegacyNotificationPreferences | null> {
+    if (this.cachedLegacyPreferences) {
+      return this.cachedLegacyPreferences;
+    }
+
+    try {
+      const cached = await AsyncStorage.getItem(this.legacyPreferencesStorageKey);
+
+      if (!cached) {
+        return null;
+      }
+
+      const parsed = JSON.parse(cached);
+      const normalized = this.normalizeLegacyPreferences(parsed);
+      this.cachedLegacyPreferences = normalized;
+      return normalized;
+    } catch (error) {
+      console.warn('Impossible de charger les préférences de notification en cache:', error);
+      return null;
+    }
+  }
+
+  private normalizeLegacyPreferences(
+    input: unknown
+  ): LegacyNotificationPreferences {
+    const defaults = this.getDefaultPreferences();
+
+    if (!input || typeof input !== 'object') {
+      return { ...defaults };
+    }
+
+    const source = input as Record<string, unknown>;
+    const getValue = (primary: string, secondary: string): unknown => {
+      if (primary in source) {
+        return source[primary];
+      }
+      if (secondary in source) {
+        return source[secondary];
+      }
+      return undefined;
+    };
+
+    return {
+      enabled: this.normalizeBoolean(
+        getValue('enabled', 'enabled'),
+        defaults.enabled
+      ),
+      newProducts: this.normalizeBoolean(
+        getValue('new_products', 'newProducts'),
+        defaults.newProducts
+      ),
+      reservations: this.normalizeBoolean(
+        getValue('reservations', 'reservations'),
+        defaults.reservations
+      ),
+      promotions: this.normalizeBoolean(
+        getValue('promotions', 'promotions'),
+        defaults.promotions
+      ),
+      expiringProducts: this.normalizeBoolean(
+        getValue('expiring_products', 'expiringProducts'),
+        defaults.expiringProducts
+      ),
+      quietHoursEnabled: this.normalizeBoolean(
+        getValue('quiet_hours_enabled', 'quietHoursEnabled'),
+        defaults.quietHoursEnabled
+      ),
+      quietHoursStart: this.normalizeTimeString(
+        getValue('quiet_hours_start', 'quietHoursStart'),
+        defaults.quietHoursStart
+      ),
+      quietHoursEnd: this.normalizeTimeString(
+        getValue('quiet_hours_end', 'quietHoursEnd'),
+        defaults.quietHoursEnd
+      ),
+    };
+  }
+
+  private mapLegacyPreferencesToPayload(
+    preferences: LegacyNotificationPreferences
+  ): Record<string, boolean | string> {
+    return {
+      enabled: preferences.enabled,
+      new_products: preferences.newProducts,
+      reservations: preferences.reservations,
+      promotions: preferences.promotions,
+      expiring_products: preferences.expiringProducts,
+      quiet_hours_enabled: preferences.quietHoursEnabled,
+      quiet_hours_start: preferences.quietHoursStart,
+      quiet_hours_end: preferences.quietHoursEnd,
+    };
+  }
+
+  private normalizeBoolean(value: unknown, fallback: boolean): boolean {
+    if (typeof value === 'boolean') {
+      return value;
+    }
+
+    if (typeof value === 'number') {
+      return value !== 0;
+    }
+
+    if (typeof value === 'string') {
+      const normalized = value.trim().toLowerCase();
+      return ['true', '1', 'yes', 'on'].includes(normalized);
+    }
+
+    return fallback;
+  }
+
+  private normalizeTimeString(value: unknown, fallback: string): string {
+    if (typeof value !== 'string') {
+      return fallback;
+    }
+
+    const trimmed = value.trim();
+
+    if (/^\d{2}:\d{2}$/.test(trimmed)) {
+      return trimmed;
+    }
+
+    return fallback;
+  }
+
+  private timeStringToMinutes(value: string): number | null {
+    if (!/^\d{2}:\d{2}$/.test(value)) {
+      return null;
+    }
+
+    const [hours, minutes] = value.split(':').map(Number);
+
+    if (
+      Number.isNaN(hours) ||
+      Number.isNaN(minutes) ||
+      hours < 0 ||
+      hours > 23 ||
+      minutes < 0 ||
+      minutes > 59
+    ) {
+      return null;
+    }
+
+    return hours * 60 + minutes;
+  }
+
+  private getLegacyPreferencesSnapshot(): LegacyNotificationPreferences {
+    return this.cachedLegacyPreferences ?? this.getDefaultPreferences();
   }
 
   /**
@@ -637,8 +842,31 @@ class NotificationService {
    * Vérifier si on est dans les heures calmes
    */
   private isInQuietHours(): boolean {
-    // TODO: Implémenter la logique des heures calmes
-    return false;
+    const preferences = this.getLegacyPreferencesSnapshot();
+
+    if (!preferences.quietHoursEnabled) {
+      return false;
+    }
+
+    const startMinutes = this.timeStringToMinutes(preferences.quietHoursStart);
+    const endMinutes = this.timeStringToMinutes(preferences.quietHoursEnd);
+
+    if (startMinutes === null || endMinutes === null) {
+      return false;
+    }
+
+    const now = new Date();
+    const currentMinutes = now.getHours() * 60 + now.getMinutes();
+
+    if (startMinutes === endMinutes) {
+      return true;
+    }
+
+    if (startMinutes < endMinutes) {
+      return currentMinutes >= startMinutes && currentMinutes < endMinutes;
+    }
+
+    return currentMinutes >= startMinutes || currentMinutes < endMinutes;
   }
 
   /**
