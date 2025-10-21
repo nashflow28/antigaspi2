@@ -1,7 +1,6 @@
 import React, { useEffect, useState, useCallback } from 'react'
 import {
   View,
-  Text,
   StyleSheet,
   FlatList,
   TouchableOpacity,
@@ -348,9 +347,9 @@ const AdminProductsScreen: React.FC = () => {
                     size={16}
                     color={theme.colors.primary[500]}
                   />
-                  <Text style={[styles.quickActionText, { color: theme.colors.primary[500] }]}>
+                  <Typography variant="caption" weight="semibold" style={{ color: theme.colors.primary[500] }}>
                     {item.is_active ? 'Désactiver' : 'Activer'}
-                  </Text>
+                  </Typography>
                 </TouchableOpacity>
 
                 {(item as ProductWithModeration).needs_approval && (
@@ -364,9 +363,9 @@ const AdminProductsScreen: React.FC = () => {
                       disabled={actionLoading}
                     >
                       <Ionicons name="checkmark" size={16} color={theme.colors.success[500]} />
-                      <Text style={[styles.quickActionText, { color: theme.colors.success[500] }]}>
+                      <Typography variant="caption" weight="semibold" style={{ color: theme.colors.success[500] }}>
                         Approuver
-                      </Text>
+                      </Typography>
                     </TouchableOpacity>
 
                     <TouchableOpacity
@@ -378,9 +377,9 @@ const AdminProductsScreen: React.FC = () => {
                       disabled={actionLoading}
                     >
                       <Ionicons name="close" size={16} color={theme.colors.error[500]} />
-                      <Text style={[styles.quickActionText, { color: theme.colors.error[500] }]}>
+                      <Typography variant="caption" weight="semibold" style={{ color: theme.colors.error[500] }}>
                         Rejeter
-                      </Text>
+                      </Typography>
                     </TouchableOpacity>
                   </>
                 )}
@@ -410,7 +409,9 @@ const AdminProductsScreen: React.FC = () => {
             <TouchableOpacity onPress={() => setShowDetailModal(false)}>
               <Ionicons name="close" size={28} color="white" />
             </TouchableOpacity>
-            <Text style={styles.modalTitle}>Détails Produit</Text>
+            <Typography variant="h3" weight="bold" style={{ color: 'white' }}>
+              Détails Produit
+            </Typography>
             <View style={{ width: 28 }} />
           </View>
 
@@ -584,17 +585,19 @@ const AdminProductsScreen: React.FC = () => {
       <View style={[styles.header, { backgroundColor: theme.colors.primary[500] }]}>
         <View style={styles.headerContent}>
           <View>
-            <Text style={styles.headerTitle}>Gestion Produits</Text>
+            <Typography variant="h2" weight="bold" style={{ color: 'white', marginBottom: 4 }}>
+              Gestion Produits
+            </Typography>
             {pendingCount > 0 && (
               <View style={styles.pendingBadge}>
                 <Ionicons name="alert-circle" size={16} color={theme.colors.warning[500]} />
-                <Text style={styles.pendingText}>
+                <Typography variant="caption" weight="semibold" style={{ color: '#FFF3CD' }}>
                   {pendingCount} produit{pendingCount > 1 ? 's' : ''} en attente
-                </Text>
+                </Typography>
               </View>
             )}
           </View>
-          <TouchableOpacity onPress={loadData}>
+          <TouchableOpacity onPress={loadData} accessibilityLabel="Rafraîchir les produits">
             <Ionicons name="refresh" size={24} color="white" />
           </TouchableOpacity>
         </View>
@@ -643,17 +646,15 @@ const AdminProductsScreen: React.FC = () => {
               ]}
               onPress={() => setStatusFilter(filter.value as ProductStatus)}
             >
-              <Text
-                style={[
-                  styles.filterText,
-                  {
-                    color:
-                      statusFilter === filter.value ? theme.colors.primary[500] : 'white',
-                  },
-                ]}
+              <Typography
+                variant="caption"
+                weight="semibold"
+                style={{
+                  color: statusFilter === filter.value ? theme.colors.primary[500] : 'white',
+                }}
               >
                 {filter.label} ({filter.count})
-              </Text>
+              </Typography>
             </TouchableOpacity>
           ))}
         </ScrollView>
@@ -670,16 +671,15 @@ const AdminProductsScreen: React.FC = () => {
             ]}
             onPress={() => setCategoryFilter('all')}
           >
-            <Text
-              style={[
-                styles.filterText,
-                {
-                  color: categoryFilter === 'all' ? theme.colors.primary[500] : 'white',
-                },
-              ]}
+            <Typography
+              variant="caption"
+              weight="semibold"
+              style={{
+                color: categoryFilter === 'all' ? theme.colors.primary[500] : 'white',
+              }}
             >
               Toutes catégories
-            </Text>
+            </Typography>
           </TouchableOpacity>
 
           {categories.map(cat => {
@@ -696,16 +696,15 @@ const AdminProductsScreen: React.FC = () => {
                 ]}
                 onPress={() => setCategoryFilter(cat.id)}
               >
-                <Text
-                  style={[
-                    styles.filterText,
-                    {
-                      color: categoryFilter === cat.id ? theme.colors.primary[500] : 'white',
-                    },
-                  ]}
+                <Typography
+                  variant="caption"
+                  weight="semibold"
+                  style={{
+                    color: categoryFilter === cat.id ? theme.colors.primary[500] : 'white',
+                  }}
                 >
                   {cat.name} ({count})
-                </Text>
+                </Typography>
               </TouchableOpacity>
             )
           })}
@@ -768,21 +767,10 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
     marginBottom: 16,
   },
-  headerTitle: {
-    color: 'white',
-    fontSize: 28,
-    fontWeight: 'bold',
-    marginBottom: 4,
-  },
   pendingBadge: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 4,
-  },
-  pendingText: {
-    color: '#FFF3CD',
-    fontSize: 13,
-    fontWeight: '600',
   },
   searchContainer: {
     flexDirection: 'row',
@@ -806,10 +794,6 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     borderRadius: 20,
     marginRight: 8,
-  },
-  filterText: {
-    fontSize: 13,
-    fontWeight: '600',
   },
   listContent: {
     padding: 16,
@@ -865,10 +849,6 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     gap: 4,
   },
-  quickActionText: {
-    fontSize: 12,
-    fontWeight: '600',
-  },
   modalContainer: {
     flex: 1,
   },
@@ -879,11 +859,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingTop: 50,
     paddingBottom: 16,
-  },
-  modalTitle: {
-    color: 'white',
-    fontSize: 20,
-    fontWeight: 'bold',
   },
   modalContent: {
     flex: 1,
