@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\AnalyticsDaily;
 use App\Models\AnalyticsEvent;
+use App\Models\Merchant;
 use App\Models\Product;
 use App\Models\Reservation;
 use Carbon\Carbon;
@@ -311,6 +312,111 @@ class AnalyticsController extends Controller
             'new_users' => (int) $daily->sum('new_users'),
         ];
 
+        $geographicQuery = Reservation::query()
+            ->selectRaw(
+                "COALESCE(NULLIF(TRIM(users.city), ''), 'Non renseigné') as city, " .
+                'COUNT(*) as reservation_count, ' .
+                'SUM(reservations.total_amount) as total_revenue'
+            )
+            ->leftJoin('users', 'reservations.user_id', '=', 'users.id')
+            ->join('products', 'reservations.product_id', '=', 'products.id')
+            ->where('reservations.status', 'completed')
+            ->whereBetween('reservations.created_at', [$startDate, $endDate])
+            ->groupBy('city')
+            ->orderByDesc('reservation_count')
+            ->limit(10);
+
+        if ($merchantId !== null) {
+            $geographicQuery->where('products.merchant_id', $merchantId);
+        }
+
+        $geographicRaw = $geographicQuery->get();
+        $totalGeoReservations = max((int) $geographicRaw->sum('reservation_count'), 0);
+
+        $geographicDistribution = $geographicRaw->map(function ($entry) use ($totalGeoReservations) {
+            $reservationCount = (int) $entry->reservation_count;
+            $revenue = (float) ($entry->total_revenue ?? 0);
+            $percentage = $totalGeoReservations > 0
+                ? round(($reservationCount / $totalGeoReservations) * 100, 2)
+                : 0.0;
+
+            return [
+                'city' => $entry->city,
+                'reservation_count' => $reservationCount,
+                'total_revenue' => $revenue,
+                'percentage' => $percentage,
+            ];
+        })->values();
+
+        $merchantBaseQuery = Reservation::query()
+            ->join('products', 'reservations.product_id', '=', 'products.id')
+            ->join('merchants', 'products.merchant_id', '=', 'merchants.id')
+            ->where('reservations.status', 'completed');
+
+        if ($merchantId !== null) {
+            $merchantBaseQuery->where('products.merchant_id', $merchantId);
+        }
+
+        $merchantPerformanceRaw = (clone $merchantBaseQuery)
+            ->selectRaw(
+                'products.merchant_id as merchant_id, ' .
+                'merchants.business_name as merchant_name, ' .
+                'COUNT(*) as reservation_count, ' .
+                'SUM(reservations.total_amount) as total_revenue, ' .
+                'AVG(reservations.total_amount) as average_order_value'
+            )
+            ->whereBetween('reservations.created_at', [$startDate, $endDate])
+            ->groupBy('products.merchant_id', 'merchants.business_name')
+            ->orderByDesc('total_revenue')
+            ->limit($merchantId !== null ? 5 : 10)
+            ->get();
+
+        $periodLength = max($startDate->diffInDays($endDate) + 1, 1);
+        $previousPeriodEnd = (clone $startDate)->subDay()->endOfDay();
+        $previousPeriodStart = (clone $previousPeriodEnd)->subDays($periodLength - 1)->startOfDay();
+
+        $previousMerchantRevenue = (clone $merchantBaseQuery)
+            ->whereBetween('reservations.created_at', [$previousPeriodStart, $previousPeriodEnd])
+            ->selectRaw('products.merchant_id as merchant_id, SUM(reservations.total_amount) as total_revenue')
+            ->groupBy('products.merchant_id')
+            ->pluck('total_revenue', 'merchant_id');
+
+        $merchantPerformance = $merchantPerformanceRaw->map(function ($entry) use ($previousMerchantRevenue, $merchantId) {
+            $currentRevenue = (float) ($entry->total_revenue ?? 0);
+            $previousRevenue = (float) ($previousMerchantRevenue[$entry->merchant_id] ?? 0);
+            $growthRate = $previousRevenue > 0
+                ? round((($currentRevenue - $previousRevenue) / $previousRevenue) * 100, 2)
+                : null;
+
+            return [
+                'merchant_id' => (int) $entry->merchant_id,
+                'merchant_name' => $entry->merchant_name,
+                'reservation_count' => (int) $entry->reservation_count,
+                'total_revenue' => $currentRevenue,
+                'average_order_value' => (float) ($entry->average_order_value ?? 0),
+                'growth_rate' => $growthRate,
+                'is_selected' => $merchantId !== null && (int) $entry->merchant_id === (int) $merchantId,
+            ];
+        });
+
+        if ($merchantId !== null && $merchantPerformance->isEmpty()) {
+            $merchant = Merchant::find($merchantId);
+
+            if ($merchant) {
+                $merchantPerformance = collect([[
+                    'merchant_id' => (int) $merchant->id,
+                    'merchant_name' => $merchant->business_name ?? 'Commerçant',
+                    'reservation_count' => 0,
+                    'total_revenue' => 0.0,
+                    'average_order_value' => 0.0,
+                    'growth_rate' => null,
+                    'is_selected' => true,
+                ]]);
+            }
+        }
+
+        $merchantPerformance = $merchantPerformance->values();
+
         $eventsQuery = AnalyticsEvent::query()
             ->whereBetween('occurred_at', [$startDate, $endDate])
             ->orderByDesc('occurred_at');
@@ -372,6 +478,8 @@ class AnalyticsController extends Controller
                 'properties' => $event->properties,
                 'occurred_at' => $event->occurred_at?->toIso8601String(),
             ])->values(),
+            'geographic_distribution' => $geographicDistribution,
+            'merchant_performance' => $merchantPerformance,
         ]);
     }
 

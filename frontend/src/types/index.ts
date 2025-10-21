@@ -175,6 +175,25 @@ export interface AnalyticsRecentEvent {
   [key: string]: unknown
 }
 
+export interface AnalyticsGeographicDistributionEntry {
+  city?: string
+  reservation_count?: number
+  total_revenue?: number
+  percentage?: number
+  [key: string]: unknown
+}
+
+export interface AnalyticsMerchantPerformanceEntry {
+  merchant_id?: number | string
+  merchant_name?: string
+  reservation_count?: number
+  total_revenue?: number
+  average_order_value?: number
+  growth_rate?: number | null
+  is_selected?: boolean
+  [key: string]: unknown
+}
+
 export interface AnalyticsStatsResponse {
   success: boolean
   filters?: AnalyticsFilters
@@ -183,6 +202,8 @@ export interface AnalyticsStatsResponse {
   top_events?: AnalyticsEventCount[]
   events_by_category?: AnalyticsEventCount[]
   recent_events?: AnalyticsRecentEvent[]
+  geographic_distribution?: AnalyticsGeographicDistributionEntry[] | Record<string, unknown>
+  merchant_performance?: AnalyticsMerchantPerformanceEntry[] | Record<string, unknown>
   message?: string
   [key: string]: unknown
 }
