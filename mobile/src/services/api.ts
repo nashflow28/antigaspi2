@@ -29,6 +29,15 @@ import {
   SurpriseBasket,
   SurpriseBasketFilters,
   PaginatedSurpriseBaskets,
+  Wallet,
+  WalletTransaction,
+  WalletStats,
+  WalletTransactionsResponse,
+  WalletTransactionFilters,
+  WalletRechargePayload,
+  WalletPinPayload,
+  WalletChangePinPayload,
+  WalletStatusPayload,
 } from '../types'
 
 // Configuration dynamique de l'API (web/native) avec overrides propres
@@ -374,6 +383,80 @@ class ApiService {
   async checkoutCart(payload: CartCheckoutPayload): Promise<CartCheckoutResponse> {
     const snakeCasePayload = toSnakeCase(payload)
     return this.request<CartCheckoutResponse>('POST', '/cart/checkout', snakeCasePayload)
+  }
+
+  // === WALLET ===
+
+  async getWallet(): Promise<ApiResponse<{ wallet: Wallet }>> {
+    return this.request<ApiResponse<{ wallet: Wallet }>>('GET', '/wallet')
+  }
+
+  async getWalletTransactions(
+    filters?: WalletTransactionFilters,
+    page: number = 1
+  ): Promise<ApiResponse<WalletTransactionsResponse>> {
+    const params = new URLSearchParams()
+
+    if (filters) {
+      const normalizedFilters = toSnakeCase(filters) as Record<string, unknown>
+      Object.entries(normalizedFilters).forEach(([key, value]) => {
+        if (value !== undefined && value !== null && value !== '') {
+          params.append(key, value.toString())
+        }
+      })
+    }
+
+    if (page > 1) {
+      params.append('page', page.toString())
+    }
+
+    const query = params.toString()
+    return this.request<ApiResponse<WalletTransactionsResponse>>(
+      'GET',
+      `/wallet/transactions${query ? `?${query}` : ''}`
+    )
+  }
+
+  async getWalletStats(period: string = 'month'): Promise<ApiResponse<WalletStats>> {
+    return this.request<ApiResponse<WalletStats>>('GET', `/wallet/stats?period=${period}`)
+  }
+
+  async rechargeWallet(payload: WalletRechargePayload): Promise<ApiResponse<{ transaction?: WalletTransaction }>> {
+    const normalizedPayload = toSnakeCase(payload)
+    return this.request<ApiResponse<{ transaction?: WalletTransaction }>>(
+      'POST',
+      '/wallet/recharge',
+      normalizedPayload
+    )
+  }
+
+  async setWalletPin(payload: WalletPinPayload): Promise<ApiResponse<any>> {
+    return this.request<ApiResponse<any>>('POST', '/wallet/pin', payload)
+  }
+
+  async changeWalletPin(payload: WalletChangePinPayload): Promise<ApiResponse<any>> {
+    const normalizedPayload = toSnakeCase(payload)
+    return this.request<ApiResponse<any>>('PUT', '/wallet/pin', normalizedPayload)
+  }
+
+  async toggleWalletStatus(payload: WalletStatusPayload): Promise<ApiResponse<{ wallet: { is_active: boolean } }>> {
+    const normalizedPayload = toSnakeCase(payload)
+    return this.request<ApiResponse<{ wallet: { is_active: boolean } }>>(
+      'PUT',
+      '/wallet/status',
+      normalizedPayload
+    )
+  }
+
+  async updateWalletDailyLimit(
+    dailyLimit: number
+  ): Promise<ApiResponse<{ wallet: { daily_limit: number; remaining_daily_limit: number } }>> {
+    const normalizedPayload = toSnakeCase({ dailyLimit })
+    return this.request<ApiResponse<{ wallet: { daily_limit: number; remaining_daily_limit: number } }>>(
+      'PUT',
+      '/wallet/daily-limit',
+      normalizedPayload
+    )
   }
 
   // === FAVORIS ===

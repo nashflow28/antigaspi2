@@ -159,6 +159,97 @@ export interface Payment {
   updated_at: string
 }
 
+export type WalletTransactionType = 'credit' | 'debit'
+
+export interface Wallet {
+  id: number
+  balance: number
+  formatted_balance: string
+  currency: string
+  daily_limit: number
+  remaining_daily_limit: number
+  is_active: boolean
+  has_pin: boolean
+  last_transaction_at: string | null
+}
+
+export interface WalletTransaction {
+  id: number
+  wallet_id: number
+  payment_id: number | null
+  type: WalletTransactionType
+  amount: number
+  formatted_amount: string
+  description: string
+  reference: string
+  metadata: Record<string, unknown> | null
+  created_at: string
+  updated_at: string
+  payment?: {
+    id: number
+    reference: string
+    status: string
+  } | null
+}
+
+export interface WalletStatsPeriod {
+  total_credits: number
+  total_debits: number
+  transaction_count: number
+  credit_count: number
+  debit_count: number
+}
+
+export interface WalletStats {
+  current_balance: number
+  daily_limit: number
+  remaining_daily_limit: number
+  period: string
+  period_stats: WalletStatsPeriod
+}
+
+export interface WalletTransactionsPagination {
+  current_page: number
+  last_page: number
+  per_page: number
+  total: number
+  from: number
+  to: number
+}
+
+export interface WalletTransactionsResponse {
+  transactions: WalletTransaction[]
+  pagination: WalletTransactionsPagination
+}
+
+export interface WalletTransactionFilters {
+  type?: WalletTransactionType
+  dateFrom?: string
+  dateTo?: string
+  amountMin?: number
+  amountMax?: number
+  perPage?: number
+}
+
+export interface WalletRechargePayload {
+  amount: number
+  paymentMethod: MobileMoneyProvider | 'paystack'
+  phone?: string
+}
+
+export interface WalletPinPayload {
+  pin: string
+}
+
+export interface WalletChangePinPayload {
+  currentPin: string
+  newPin: string
+}
+
+export interface WalletStatusPayload {
+  isActive: boolean
+}
+
 export interface ReservationCreationResponse {
   success: boolean
   message?: string
