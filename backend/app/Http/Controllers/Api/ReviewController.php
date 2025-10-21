@@ -25,7 +25,7 @@ class ReviewController extends Controller
             'per_page' => 'nullable|integer|max:50',
         ]);
 
-        $query = Review::with(['user:id,first_name,last_name', 'product:id,name'])
+        $query = Review::with(['user:id,first_name,last_name', 'product:id,name', 'merchant:id,business_name'])
                       ->approved()
                       ->recent();
 
@@ -50,12 +50,17 @@ class ReviewController extends Controller
         $reviews->getCollection()->transform(function ($review) {
             return [
                 'id' => $review->id,
+                'merchant_id' => $review->merchant_id,
                 'rating' => $review->rating,
                 'title' => $review->title,
                 'comment' => $review->comment,
                 'stars' => $review->stars,
                 'time_ago' => $review->time_ago,
                 'is_verified_purchase' => $review->is_verified_purchase,
+                'merchant' => $review->merchant ? [
+                    'id' => $review->merchant->id,
+                    'business_name' => $review->merchant->business_name,
+                ] : null,
                 'user' => [
                     'id' => $review->user->id,
                     'name' => $review->user->first_name . ' ' . substr($review->user->last_name, 0, 1) . '.',

@@ -141,6 +141,7 @@ Route::prefix('favorites')->middleware('jwt.auth')->group(function () {
 // Routes de paiement
 Route::prefix('payments')->group(function () {
     Route::middleware('jwt.auth')->group(function () {
+        Route::get('/methods', [PaymentController::class, 'methods']);
         Route::post('/', [PaymentController::class, 'initiate']);
         Route::post('/mobile-money', [PaymentController::class, 'initiateMobileMoney']);
         Route::get('/{payment}', [PaymentController::class, 'status'])->whereNumber('payment');
@@ -256,6 +257,7 @@ Route::prefix('merchants')->middleware('jwt.auth')->group(function () {
 Route::prefix('merchants')->group(function () {
     Route::get('/nearby', [MerchantController::class, 'nearby']); // Commerçants à proximité
     Route::get('/all-with-location', [MerchantController::class, 'getAllWithLocation']); // Tous les commerçants avec position
+    Route::get('/{merchant}', [MerchantController::class, 'show'])->whereNumber('merchant'); // Détail public d'un commerçant
 });
 
 // Routes des avis

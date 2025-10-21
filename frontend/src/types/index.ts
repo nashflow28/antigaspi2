@@ -290,6 +290,65 @@ export interface ApiResponse<T> {
   }
 }
 
+export interface FavoriteProductSummary {
+  id: number
+  name: string
+  description?: string | null
+  original_price: number
+  discounted_price: number
+  discount_percentage?: number
+  quantity_available: number
+  expiration_date?: string | null
+  image_url?: string | null
+  is_active?: boolean
+  favorited_at?: string
+  category?: Partial<Category> | null
+  merchant?: Partial<Merchant> | null
+}
+
+export interface FavoriteToggleResponse {
+  success: boolean
+  message?: string
+  is_favorite: boolean
+}
+
+export type FavoriteListResponse = ApiResponse<FavoriteProductSummary[]> & {
+  meta?: {
+    total: number
+  }
+}
+
+export interface PaymentMethodOptionResponse {
+  value: PaymentMethod
+  label: string
+  description: string
+  instructions: string
+  provider: string
+  requires_phone: boolean
+  requires_pin: boolean
+  is_wallet: boolean
+  is_instant: boolean
+  is_available: boolean
+  wallet_balance?: number | null
+  wallet_currency?: string | null
+  wallet_has_pin?: boolean | null
+}
+
+export interface PublicReviewEntry {
+  id: number
+  merchant_id?: number | null
+  rating: number
+  title?: string | null
+  comment?: string | null
+  stars?: string
+  time_ago?: string
+  is_verified_purchase?: boolean
+  merchant?: { id: number; business_name?: string | null } | null
+  user?: { id: number; name?: string | null } | null
+  product?: { id: number; name?: string | null } | null
+  created_at?: string | null
+}
+
 export interface MerchantLocation {
   latitude: number | null
   longitude: number | null

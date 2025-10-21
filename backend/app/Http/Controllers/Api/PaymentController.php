@@ -19,6 +19,38 @@ class PaymentController extends Controller
     {
     }
 
+    public function methods(): JsonResponse
+    {
+        $user = JWTAuth::parseToken()->authenticate();
+
+        $wallet = $user->wallet;
+        $methods = collect(PaymentMethod::cases())->map(function (PaymentMethod $method) use ($wallet) {
+            $isWallet = $method->isWallet();
+            $walletAvailable = $isWallet && $wallet ? (bool) $wallet->is_active : false;
+
+            return [
+                'value' => $method->value,
+                'label' => $this->labelForMethod($method),
+                'description' => $this->descriptionForMethod($method),
+                'instructions' => $this->instructionsForMethod($method),
+                'provider' => $method->provider(),
+                'requires_phone' => $method->requiresPhone(),
+                'requires_pin' => $isWallet,
+                'is_wallet' => $isWallet,
+                'is_instant' => $method->isInstantPayment(),
+                'is_available' => $isWallet ? $walletAvailable : true,
+                'wallet_balance' => $isWallet && $wallet ? (float) $wallet->balance : null,
+                'wallet_currency' => $isWallet && $wallet ? $wallet->currency : null,
+                'wallet_has_pin' => $isWallet && $wallet ? $wallet->hasPin() : null,
+            ];
+        });
+
+        return response()->json([
+            'success' => true,
+            'data' => $methods,
+        ]);
+    }
+
     public function initiate(Request $request): JsonResponse
     {
         $user = JWTAuth::parseToken()->authenticate();
@@ -158,6 +190,43 @@ class PaymentController extends Controller
             'success' => (bool) $payment,
             'data' => $payment ? new PaymentResource($payment) : null,
         ]);
+    }
+
+    private function labelForMethod(PaymentMethod $method): string
+    {
+        return match ($method) {
+            PaymentMethod::FLOOZ => 'Flooz (Moov Togo)',
+            PaymentMethod::TMONEY => 'Mixx by Yas (Tmoney)',
+            PaymentMethod::ORANGE_MONEY => 'Orange Money',
+            PaymentMethod::MTN_MOMO => 'MTN MoMo',
+            PaymentMethod::PAYSTACK => 'Paystack',
+            PaymentMethod::ON_SITE => 'Paiement sur place',
+            PaymentMethod::WALLET => 'Portefeuille AntiGaspi',
+        };
+    }
+
+    private function descriptionForMethod(PaymentMethod $method): string
+    {
+        return match ($method) {
+            PaymentMethod::FLOOZ, PaymentMethod::TMONEY => 'PayGate - Mobile Money',
+            PaymentMethod::ORANGE_MONEY, PaymentMethod::MTN_MOMO => 'CinetPay - Mobile Money',
+            PaymentMethod::PAYSTACK => 'Cartes bancaires & Mobile Money',
+            PaymentMethod::ON_SITE => 'Régler lors du retrait',
+            PaymentMethod::WALLET => 'Utilisez votre solde AntiGaspi pour un paiement instantané',
+        };
+    }
+
+    private function instructionsForMethod(PaymentMethod $method): string
+    {
+        return match ($method) {
+            PaymentMethod::FLOOZ => 'Assurez-vous que votre numéro Flooz est actif et dispose des fonds nécessaires.',
+            PaymentMethod::TMONEY => 'Le numéro Mixx by Yas doit être au format international (+228...).',
+            PaymentMethod::ORANGE_MONEY => 'Utilisez votre numéro Orange Money au format international.',
+            PaymentMethod::MTN_MOMO => 'Le numéro MTN MoMo doit être saisi au format international.',
+            PaymentMethod::PAYSTACK => 'Vous serez redirigé vers Paystack pour finaliser le paiement de façon sécurisée.',
+            PaymentMethod::ON_SITE => 'Préparez le montant exact et réglez directement auprès du commerçant.',
+            PaymentMethod::WALLET => 'Paiement instantané depuis votre portefeuille AntiGaspi.',
+        };
     }
 
     private function resolveMobileMoneyMethod(string $provider): PaymentMethod

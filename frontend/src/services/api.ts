@@ -24,7 +24,12 @@ import type {
   AnalyticsStatsResponse,
   Review,
   ReviewStats,
-  MerchantLocation
+  MerchantLocation,
+  FavoriteListResponse,
+  FavoriteToggleResponse,
+  FavoriteProductSummary,
+  PaymentMethodOptionResponse,
+  PublicReviewEntry
 } from '@/types'
 
 type QueryParams = Record<string, string | number | boolean | null | undefined>
@@ -292,6 +297,24 @@ class ApiService {
     }, withAuth)
   }
 
+  // Favorites
+  async getFavoriteProducts(): Promise<FavoriteListResponse> {
+    return this.get<FavoriteListResponse>('/favorites', true)
+  }
+
+  async toggleFavoriteProduct(productId: number): Promise<FavoriteToggleResponse> {
+    return this.post<FavoriteToggleResponse>(`/favorites/${productId}/toggle`, undefined, true)
+  }
+
+  async getFavoriteProductIds(): Promise<ApiResponse<number[]>> {
+    return this.get<ApiResponse<number[]>>('/favorites/batch-check', true)
+  }
+
+  // Payments
+  async getPaymentMethods(): Promise<ApiResponse<PaymentMethodOptionResponse[]>> {
+    return this.get<ApiResponse<PaymentMethodOptionResponse[]>>('/payments/methods', true)
+  }
+
   // Reviews
   async getMerchantReviewProducts(): Promise<ApiResponse<MerchantReviewProductSummary[]>> {
     return this.get<ApiResponse<MerchantReviewProductSummary[]>>('/merchants/reviews/products', true)
@@ -340,6 +363,12 @@ class ApiService {
     }
 
     return this.post<ApiResponse<Review>>(`/merchants/reviews/${reviewId}/respond`, payload, true)
+  }
+
+  async getPublicReviews(params: Record<string, string | number | boolean | null | undefined> = {}): Promise<ApiResponse<PublicReviewEntry[]>> {
+    const queryString = this.buildQueryString(params)
+    const endpoint = `/reviews${queryString}`
+    return this.get<ApiResponse<PublicReviewEntry[]>>(endpoint, false)
   }
 
   async delete<T>(url: string, withAuth = true): Promise<T> {
