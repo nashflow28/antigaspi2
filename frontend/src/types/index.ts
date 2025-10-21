@@ -5,7 +5,9 @@ export interface User {
   email: string
   role: 'consumer' | 'merchant' | 'admin'
   city: string
+  address?: string | null
   phone?: string
+  photo_url?: string | null
   created_at: string
   updated_at: string
   prefers_email_notifications?: boolean
