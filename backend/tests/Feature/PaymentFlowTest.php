@@ -33,6 +33,15 @@ class PaymentFlowTest extends TestCase
         config(['payments.paystack.base_url' => 'https://paystack.test']);
         config(['payments.paystack.secret_key' => 'paystack-secret']);
         config(['payments.paystack.callback_url' => 'https://app.test/paystack/callback']);
+        config(['payments.fedapay.base_url' => 'https://fedapay.test']);
+        config(['payments.fedapay.api_key' => 'fedapay-key']);
+        config(['payments.fedapay.callback_url' => 'https://app.test/fedapay/callback']);
+        config(['payments.cinetpay.base_url' => 'https://cinetpay.test']);
+        config(['payments.cinetpay.api_key' => 'cinetpay-key']);
+        config(['payments.cinetpay.site_id' => 'SITE123']);
+        config(['payments.cinetpay.notify_url' => 'https://app.test/cinetpay/notify']);
+        config(['payments.cinetpay.return_url' => 'https://app.test/cinetpay/return']);
+        config(['payments.cinetpay.callback_url' => 'https://app.test/cinetpay/callback']);
     }
 
     protected function actingAsJwt(User $user): array
@@ -46,11 +55,14 @@ class PaymentFlowTest extends TestCase
     {
         Notification::fake();
         Http::fake([
-            'https://paygate.test/transactions' => Http::response([
-                'reference' => 'PG-123456',
-                'checkout_url' => 'https://paygate.test/checkout/PG-123456',
-                'transaction_id' => 'tx_123',
-            ]),
+            'https://fedapay.test/transactions' => Http::response([
+                'transaction' => [
+                    'id' => 'fd_123',
+                    'status' => 'pending',
+                    'reference' => 'FD-123456',
+                ],
+                'payment_url' => 'https://fedapay.test/checkout/FD-123456',
+            ], 201),
         ]);
 
         $user = User::factory()->create(['role' => 'consumer', 'email' => 'user@example.com']);
@@ -70,13 +82,16 @@ class PaymentFlowTest extends TestCase
 
         $this->assertDatabaseHas('payments', [
             'customer_phone' => '+22891000000',
-            'provider' => 'paygate',
+            'provider' => 'fedapay',
             'status' => PaymentStatus::PENDING->value,
         ]);
 
         $reservation = Reservation::first();
         $this->assertEquals(PaymentStatus::PENDING, $reservation->payment_status);
         $this->assertNotNull($reservation->latest_payment_id);
+
+        Http::assertSent(fn ($request) => $request->url() === 'https://fedapay.test/transactions'
+            && $request['mode'] === 'moov_money');
     }
 
     public function test_user_can_initiate_paystack_payment_via_payment_controller(): void
@@ -121,7 +136,100 @@ class PaymentFlowTest extends TestCase
         ]);
     }
 
-    public function test_paygate_callback_updates_reservation_status(): void
+    public function test_mobile_money_endpoint_initializes_fedapay_payment(): void
+    {
+        Notification::fake();
+        Http::fake([
+            'https://fedapay.test/transactions' => Http::response([
+                'transaction' => [
+                    'id' => 'fd_tx_55',
+                    'status' => 'pending',
+                    'reference' => 'FD-55',
+                ],
+                'payment_url' => 'https://fedapay.test/pay/FD-55',
+            ], 201),
+        ]);
+
+        $user = User::factory()->create(['role' => 'consumer', 'email' => 'user@example.com']);
+        $product = Product::factory()->create(['discounted_price' => 18.00, 'is_active' => true, 'quantity_available' => 4]);
+        $reservation = Reservation::factory()->pending()->create([
+            'user_id' => $user->id,
+            'product_id' => $product->id,
+            'quantity_reserved' => 1,
+            'total_amount' => 18.00,
+            'payment_status' => PaymentStatus::PENDING,
+        ]);
+
+        $headers = $this->actingAsJwt($user);
+
+        $response = $this->postJson('/api/payments/mobile-money', [
+            'reservation_id' => $reservation->id,
+            'provider' => 'flooz',
+            'customer_phone' => '+22892000000',
+        ], $headers);
+
+        $response->assertCreated()
+            ->assertJsonPath('data.provider', 'fedapay')
+            ->assertJsonPath('data.checkout_url', 'https://fedapay.test/pay/FD-55');
+
+        $this->assertDatabaseHas('payments', [
+            'reservation_id' => $reservation->id,
+            'provider' => 'fedapay',
+            'reference' => 'FD-55',
+        ]);
+
+        Http::assertSent(fn ($request) => $request->url() === 'https://fedapay.test/transactions'
+            && ($request->data()['transaction']['reference'] ?? null) === 'FD-55');
+    }
+
+    public function test_mobile_money_endpoint_initializes_cinetpay_payment(): void
+    {
+        Notification::fake();
+        Http::fake([
+            'https://cinetpay.test/payment' => Http::response([
+                'code' => '201',
+                'message' => 'success',
+                'data' => [
+                    'status' => 'PENDING',
+                    'payment_url' => 'https://cinetpay.test/checkout/CP-88',
+                    'transaction_id' => 'CP-88',
+                ],
+            ], 201),
+        ]);
+
+        $user = User::factory()->create(['role' => 'consumer', 'email' => 'user@example.com']);
+        $product = Product::factory()->create(['discounted_price' => 22.00, 'is_active' => true, 'quantity_available' => 5]);
+        $reservation = Reservation::factory()->pending()->create([
+            'user_id' => $user->id,
+            'product_id' => $product->id,
+            'quantity_reserved' => 1,
+            'total_amount' => 22.00,
+            'payment_status' => PaymentStatus::PENDING,
+        ]);
+
+        $headers = $this->actingAsJwt($user);
+
+        $response = $this->postJson('/api/payments/mobile-money', [
+            'reservation_id' => $reservation->id,
+            'provider' => 'mtn_momo',
+            'customer_phone' => '+2250100000000',
+        ], $headers);
+
+        $response->assertCreated()
+            ->assertJsonPath('data.provider', 'cinetpay')
+            ->assertJsonPath('data.checkout_url', 'https://cinetpay.test/checkout/CP-88');
+
+        $this->assertDatabaseHas('payments', [
+            'reservation_id' => $reservation->id,
+            'provider' => 'cinetpay',
+            'reference' => $response->json('data.reference'),
+        ]);
+
+        Http::assertSent(fn ($request) => $request->url() === 'https://cinetpay.test/payment'
+            && ($request->data()['transaction_id'] ?? null) === $response->json('data.reference'));
+    }
+
+    public function test_fedapay_callback_updates_reservation_status(): void
     {
         Notification::fake();
 
@@ -140,17 +248,64 @@ class PaymentFlowTest extends TestCase
             'amount' => 20.00,
             'payment_method' => PaymentMethod::FLOOZ,
             'status' => PaymentStatus::PENDING,
-            'provider' => 'paygate',
-            'reference' => 'PG-CB-42',
+            'provider' => 'fedapay',
+            'reference' => 'FD-CB-42',
+            'transaction_id' => 'fd_tx_42',
         ]);
 
         $reservation->update([
             'latest_payment_id' => $payment->id,
         ]);
 
-        $response = $this->postJson('/api/payments/webhook/paygate', [
-            'reference' => 'PG-CB-42',
-            'status' => 'success',
+        $response = $this->postJson('/api/payments/webhook/fedapay', [
+            'transaction' => [
+                'id' => 'fd_tx_42',
+                'reference' => 'FD-CB-42',
+                'status' => 'approved',
+            ],
+        ]);
+
+        $response->assertOk()->assertJson(['success' => true]);
+
+        $payment->refresh();
+        $reservation->refresh();
+
+        $this->assertEquals(PaymentStatus::SUCCESS, $payment->status);
+        $this->assertEquals('confirmed', $reservation->status);
+        $this->assertEquals(PaymentStatus::SUCCESS, $reservation->payment_status);
+    }
+
+    public function test_cinetpay_callback_updates_reservation_status(): void
+    {
+        Notification::fake();
+
+        $user = User::factory()->create(['role' => 'consumer']);
+        $product = Product::factory()->create(['discounted_price' => 25.00, 'is_active' => true, 'quantity_available' => 3]);
+        $reservation = Reservation::factory()->pending()->create([
+            'user_id' => $user->id,
+            'product_id' => $product->id,
+            'quantity_reserved' => 1,
+            'total_amount' => 25.00,
+            'payment_status' => PaymentStatus::PENDING,
+        ]);
+
+        $payment = Payment::factory()->create([
+            'reservation_id' => $reservation->id,
+            'amount' => 25.00,
+            'payment_method' => PaymentMethod::MTN_MOMO,
+            'status' => PaymentStatus::PENDING,
+            'provider' => 'cinetpay',
+            'reference' => 'CP-CB-77',
+            'transaction_id' => 'cp_tx_77',
+        ]);
+
+        $reservation->update([
+            'latest_payment_id' => $payment->id,
+        ]);
+
+        $response = $this->postJson('/api/payments/webhook/cinetpay', [
+            'transaction_id' => 'cp_tx_77',
+            'status' => 'ACCEPTED',
         ]);
 
         $response->assertOk()->assertJson(['success' => true]);

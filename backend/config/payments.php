@@ -23,4 +23,20 @@ return [
         'webhook_secret' => env('PAYSTACK_WEBHOOK_SECRET'),
         'callback_url' => env('PAYSTACK_CALLBACK_URL'),
     ],
+
+    'fedapay' => [
+        'base_url' => env('FEDAPAY_BASE_URL', 'https://api.fedapay.com/v1'),
+        'api_key' => env('FEDAPAY_API_KEY'),
+        'callback_url' => env('FEDAPAY_CALLBACK_URL'),
+        'default_country' => env('FEDAPAY_DEFAULT_COUNTRY', 'TG'),
+    ],
+
+    'cinetpay' => [
+        'base_url' => env('CINETPAY_BASE_URL', 'https://api-checkout.cinetpay.com/v2'),
+        'api_key' => env('CINETPAY_API_KEY'),
+        'site_id' => env('CINETPAY_SITE_ID'),
+        'notify_url' => env('CINETPAY_NOTIFY_URL'),
+        'return_url' => env('CINETPAY_RETURN_URL'),
+        'callback_url' => env('CINETPAY_CALLBACK_URL'),
+    ],
 ];

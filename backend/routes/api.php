@@ -149,6 +149,8 @@ Route::prefix('payments')->group(function () {
 
     Route::post('/webhook/paygate', [PaymentController::class, 'paygateCallback']);
     Route::post('/webhook/paystack', [PaymentController::class, 'paystackCallback']);
+    Route::post('/webhook/fedapay', [PaymentController::class, 'fedapayCallback']);
+    Route::post('/webhook/cinetpay', [PaymentController::class, 'cinetpayCallback']);
 });
 
 // Routes des portefeuilles électroniques

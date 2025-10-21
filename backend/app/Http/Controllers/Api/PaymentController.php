@@ -140,6 +140,26 @@ class PaymentController extends Controller
         ]);
     }
 
+    public function fedapayCallback(Request $request): JsonResponse
+    {
+        $payment = $this->payments->handleCallback('fedapay', $request->all());
+
+        return response()->json([
+            'success' => (bool) $payment,
+            'data' => $payment ? new PaymentResource($payment) : null,
+        ]);
+    }
+
+    public function cinetpayCallback(Request $request): JsonResponse
+    {
+        $payment = $this->payments->handleCallback('cinetpay', $request->all());
+
+        return response()->json([
+            'success' => (bool) $payment,
+            'data' => $payment ? new PaymentResource($payment) : null,
+        ]);
+    }
+
     private function resolveMobileMoneyMethod(string $provider): PaymentMethod
     {
         return match ($provider) {

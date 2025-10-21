@@ -15,7 +15,8 @@ enum PaymentMethod: string
     public function provider(): string
     {
         return match ($this) {
-            self::FLOOZ, self::TMONEY, self::ORANGE_MONEY, self::MTN_MOMO => 'paygate',
+            self::FLOOZ, self::TMONEY => 'fedapay',
+            self::ORANGE_MONEY, self::MTN_MOMO => 'cinetpay',
             self::PAYSTACK => 'paystack',
             self::ON_SITE => 'manual',
             self::WALLET => 'wallet',
