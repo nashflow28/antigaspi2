@@ -59,6 +59,27 @@ export interface NotificationChannelPreferences {
   push: boolean;
 }
 
+export interface ForegroundNotificationEvent {
+  title?: string;
+  body?: string;
+  data?: Record<string, unknown>;
+}
+
+export interface NotificationNavigationEvent {
+  screen: string;
+  params?: Record<string, unknown>;
+}
+
+type NotificationEventMap = {
+  contactPreferencesChanged: NotificationChannelPreferences;
+  navigate: NotificationNavigationEvent;
+  notificationReceived: ForegroundNotificationEvent;
+};
+
+type NotificationEventName = keyof NotificationEventMap;
+
+type ListenerCallback<T> = (payload: T) => void;
+
 class NotificationService {
   private http: AxiosInstance;
   private baseURL: string;
@@ -66,6 +87,7 @@ class NotificationService {
   private initialized = false;
   private initializationPromise: Promise<void> | null = null;
   private listenersRegistered = false;
+  private listeners: Map<NotificationEventName, Set<ListenerCallback<any>>> = new Map();
 
   constructor() {
     this.baseURL = getApiBaseUrl();
@@ -342,6 +364,12 @@ class NotificationService {
 
     // Mettre à jour le badge
     this.updateBadge();
+
+    this.emit('notificationReceived', {
+      title,
+      body,
+      data,
+    });
   }
 
   /**
@@ -352,9 +380,40 @@ class NotificationService {
 
     // Navigation selon le type
     if (data?.navigateTo) {
-      // Émettre un événement pour la navigation
-      this.emit('navigate', data.navigateTo);
+      const navigationPayload = this.normalizeNavigationTarget(data.navigateTo);
+
+      if (navigationPayload) {
+        // Émettre un événement pour la navigation
+        this.emit('navigate', navigationPayload);
+      }
     }
+  }
+
+  private normalizeNavigationTarget(
+    navigateTo: unknown
+  ): NotificationNavigationEvent | null {
+    if (typeof navigateTo === 'string' && navigateTo.trim().length > 0) {
+      return { screen: navigateTo };
+    }
+
+    if (navigateTo && typeof navigateTo === 'object') {
+      const target = navigateTo as Record<string, unknown>;
+
+      const screen = target.screen ?? target.name;
+
+      if (typeof screen === 'string' && screen.trim().length > 0) {
+        const params = target.params && typeof target.params === 'object'
+          ? (target.params as Record<string, unknown>)
+          : undefined;
+
+        return {
+          screen,
+          params,
+        };
+      }
+    }
+
+    return null;
   }
 
   /**
@@ -617,29 +676,73 @@ class NotificationService {
   /**
    * Émettre un événement (pour la navigation)
    */
-  private listeners: Map<string, Function[]> = new Map();
-
-  on(event: string, callback: Function): void {
+  on<K extends NotificationEventName>(
+    event: K,
+    callback: ListenerCallback<NotificationEventMap[K]>
+  ): void {
     if (!this.listeners.has(event)) {
-      this.listeners.set(event, []);
+      this.listeners.set(event, new Set());
     }
-    this.listeners.get(event)?.push(callback);
+
+    this.listeners.get(event)?.add(callback as ListenerCallback<any>);
   }
 
-  off(event: string, callback: Function): void {
+  off<K extends NotificationEventName>(
+    event: K,
+    callback: ListenerCallback<NotificationEventMap[K]>
+  ): void {
     const callbacks = this.listeners.get(event);
-    if (callbacks) {
-      const index = callbacks.indexOf(callback);
-      if (index > -1) {
-        callbacks.splice(index, 1);
+
+    if (!callbacks) {
+      return;
+    }
+
+    callbacks.delete(callback as ListenerCallback<any>);
+
+    if (callbacks.size === 0) {
+      this.listeners.delete(event);
+    }
+  }
+
+  private emit<K extends NotificationEventName>(
+    event: K,
+    data: NotificationEventMap[K]
+  ): void {
+    const callbacks = this.listeners.get(event);
+
+    if (!callbacks) {
+      return;
+    }
+
+    callbacks.forEach(callback => {
+      try {
+        callback(data);
+      } catch (error) {
+        console.error('Erreur lors du traitement de l\'événement de notification:', error);
       }
-    }
+    });
   }
 
-  private emit(event: string, data: any): void {
-    const callbacks = this.listeners.get(event);
-    if (callbacks) {
-      callbacks.forEach(callback => callback(data));
+  async syncPushTokenOwnership(): Promise<void> {
+    if (!this.initialized) {
+      return;
+    }
+
+    const tokenFromMemory = this.pushToken;
+    let tokenToValidate = tokenFromMemory;
+
+    if (!tokenToValidate) {
+      tokenToValidate = await AsyncStorage.getItem('push_token');
+    }
+
+    if (!tokenToValidate) {
+      return;
+    }
+
+    try {
+      await this.registerTokenIfNeeded(tokenToValidate);
+    } catch (error) {
+      console.error('Erreur lors de la synchronisation du token push:', error);
     }
   }
 }
