@@ -7,10 +7,12 @@ import { ThemeProvider } from './src/theme'
 import { ToastProvider } from './src/contexts/ToastContext'
 import AppNavigator from './src/navigation/AppNavigator'
 import apiService from './src/services/api'
+import usePushNotifications from './src/hooks/usePushNotifications'
 
 // Composant interne qui a accès au dispatch Redux
 const AppContent = () => {
   const dispatch = useDispatch<AppDispatch>()
+  usePushNotifications()
 
   useEffect(() => {
     // Enregistrer le callback pour gérer l'expiration de session (401)
