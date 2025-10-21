@@ -4,13 +4,14 @@ import { render, waitFor } from '@testing-library/react-native'
 import { Provider } from 'react-redux'
 import { configureStore } from '@reduxjs/toolkit'
 import ProductDetailsScreen from '../ProductDetailsScreen'
-import productsReducer from '../../../store/slices/productsSlice'
+import productsReducer, { fetchProduct } from '../../../store/slices/productsSlice'
 import authSlice from '../../../store/slices/authSlice'
 import merchantsSlice from '../../../store/slices/merchantsSlice'
 import favoritesSlice from '../../../store/slices/favoritesSlice'
 import reviewsSlice from '../../../store/slices/reviewsSlice'
 import reservationsSlice from '../../../store/slices/reservationsSlice'
 import { ThemeProvider } from '../../../theme/ThemeContext'
+import { makeProduct } from '@test-utils'
 
 // Mock navigation
 const mockGoBack = jest.fn()
@@ -21,7 +22,7 @@ const mockNavigation = {
 }
 
 // Mock product data
-const mockProduct = {
+const mockProduct = makeProduct({
   id: 1,
   name: 'Pain complet artisanal',
   description: 'Pain complet aux graines, fabriqué le matin même',
@@ -33,11 +34,7 @@ const mockProduct = {
   discount_percentage: 50,
   savings: 250,
   days_until_expiration: 4,
-  category: {
-    id: 1,
-    name: 'Boulangerie',
-    icon: '🥐',
-  },
+  category: { id: 1, name: 'Boulangerie', description: 'Pains et viennoiseries' },
   merchant: {
     id: 1,
     business_name: 'Boulangerie Martin',
@@ -48,7 +45,26 @@ const mockProduct = {
     is_verified: true,
   },
   created_at: '2025-09-25T16:24:53.000000Z',
-}
+})
+
+jest.mock('../../../store/slices/productsSlice', () => {
+  const actual = jest.requireActual('../../../store/slices/productsSlice')
+  const mockFetchProduct = jest.fn(() => async () => ({
+    type: 'products/fetchProduct/fulfilled',
+    payload: mockProduct,
+  }))
+  mockFetchProduct.fulfilled = {
+    match: (action: { type: string }) => action.type === 'products/fetchProduct/fulfilled',
+  }
+  mockFetchProduct.rejected = {
+    match: (action: { type: string }) => action.type === 'products/fetchProduct/rejected',
+  }
+
+  return {
+    ...actual,
+    fetchProduct: mockFetchProduct,
+  }
+})
 
 // Create test store
 const createTestStore = (productInStore = true) => {
@@ -123,8 +139,8 @@ describe('ProductDetailsScreen', () => {
   })
 
   describe('Rendering', () => {
-    it('renders without crashing when product exists in store', () => {
-      const store = createTestStore(true)
+    it('loads product data when not cached locally', async () => {
+      const store = createTestStore(false)
       const route = { params: { productId: 1 } }
 
       const { getByText } = renderWithProviders(
@@ -132,8 +148,10 @@ describe('ProductDetailsScreen', () => {
         store
       )
 
-      // Should display product name
-      expect(getByText('Pain complet artisanal')).toBeTruthy()
+      await waitFor(() => {
+        expect(fetchProduct).toHaveBeenCalledWith(1)
+        expect(getByText('Pain complet artisanal')).toBeTruthy()
+      })
     })
 
     it('displays product details correctly', () => {

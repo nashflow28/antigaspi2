@@ -5,7 +5,7 @@ import { Provider } from 'react-redux'
 import { configureStore } from '@reduxjs/toolkit'
 import { ThemeProvider } from '../../../theme/ThemeContext'
 import AddReviewScreen from '../AddReviewScreen'
-import reviewsSlice from '../../../store/slices/reviewsSlice'
+import reviewsSlice, { createReview, fetchReviews } from '../../../store/slices/reviewsSlice'
 import authSlice from '../../../store/slices/authSlice'
 
 // Mock navigation
@@ -25,6 +25,30 @@ const mockRoute = {
     productId: 10,
   },
 }
+
+jest.mock('../../../store/slices/reviewsSlice', () => {
+  const actual = jest.requireActual('../../../store/slices/reviewsSlice')
+  const mockCreateReview = jest.fn(() => async () => ({
+    type: 'reviews/createReview/fulfilled',
+  }))
+  mockCreateReview.fulfilled = {
+    match: (action: { type: string }) => action.type === 'reviews/createReview/fulfilled',
+  }
+
+  const mockFetchReviews = jest.fn(() => async () => ({
+    type: 'reviews/fetchReviews/fulfilled',
+    payload: [],
+  }))
+  mockFetchReviews.fulfilled = {
+    match: (action: { type: string }) => action.type === 'reviews/fetchReviews/fulfilled',
+  }
+
+  return {
+    ...actual,
+    createReview: mockCreateReview,
+    fetchReviews: mockFetchReviews,
+  }
+})
 
 // Create test store
 const createTestStore = (initialState = {}) => {
@@ -66,11 +90,28 @@ describe('AddReviewScreen', () => {
   })
 
   describe('Rendering', () => {
-    it('renders without crashing', () => {
-      const { getByText } = renderWithProviders(
+    it('dispatches review creation and refresh on submit', async () => {
+      const { getByText, getAllByTestId } = renderWithProviders(
         <AddReviewScreen navigation={mockNavigation} route={mockRoute} />
       )
-      expect(getByText(/Boulangerie Martin/i) || getByText(/Laisser un avis/i)).toBeTruthy()
+
+      const stars = getAllByTestId(/star/i)
+      if (stars[4]) {
+        fireEvent.press(stars[4])
+      }
+
+      const submitButton = getByText(/Publier/i) || getByText(/Envoyer/i)
+      fireEvent.press(submitButton)
+
+      await waitFor(() => {
+        expect(createReview).toHaveBeenCalledWith({
+          merchantId: 1,
+          productId: 10,
+          rating: expect.any(Number),
+        })
+        expect(fetchReviews).toHaveBeenCalledWith({ merchantId: 1 })
+        expect(mockGoBack).toHaveBeenCalled()
+      })
     })
 
     it('displays merchant name', () => {

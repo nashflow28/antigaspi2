@@ -126,7 +126,12 @@ const MerchantDashboardScreen: React.FC = () => {
             <Text style={styles.headerSubtitle}>Commerçant</Text>
             <Text style={styles.headerTitle}>Tableau de bord</Text>
           </View>
-          <TouchableOpacity onPress={loadDashboardData} style={styles.refreshButton}>
+          <TouchableOpacity
+            onPress={loadDashboardData}
+            style={styles.refreshButton}
+            accessibilityRole="button"
+            accessibilityLabel="Rafraîchir le tableau de bord"
+          >
             <Ionicons name="refresh" size={24} color="white" />
           </TouchableOpacity>
         </View>

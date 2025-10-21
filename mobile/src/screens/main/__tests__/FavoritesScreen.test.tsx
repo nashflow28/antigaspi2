@@ -1,14 +1,16 @@
 // @ts-nocheck
 import React from 'react'
 import { render, fireEvent, waitFor } from '@testing-library/react-native'
+import { Alert } from 'react-native'
 import { Provider } from 'react-redux'
 import { configureStore } from '@reduxjs/toolkit'
 import { NavigationContainer } from '@react-navigation/native'
 import { ThemeProvider } from '../../../theme/ThemeContext'
 import FavoritesScreen from '../FavoritesScreen'
 import productsReducer from '../../../store/slices/productsSlice'
-import favoritesSlice from '../../../store/slices/favoritesSlice'
+import favoritesSlice, { fetchFavorites, toggleFavorite } from '../../../store/slices/favoritesSlice'
 import authSlice from '../../../store/slices/authSlice'
+import { makeProduct } from '@test-utils'
 
 // Mock API_BASE_URL
 jest.mock('../../../services/api', () => ({
@@ -29,7 +31,7 @@ const mockNavigation = {
 
 // Mock favorite products (matching Product type from types/index.ts)
 const mockFavoriteProducts = [
-  {
+  makeProduct({
     id: 1,
     name: 'Pain complet artisanal',
     description: 'Pain frais du jour',
@@ -53,8 +55,8 @@ const mockFavoriteProducts = [
     },
     created_at: '2025-10-20T10:00:00Z',
     is_active: true,
-  },
-  {
+  }),
+  makeProduct({
     id: 2,
     name: 'Bananes mûres',
     description: 'Parfaites pour smoothies',
@@ -78,8 +80,32 @@ const mockFavoriteProducts = [
     },
     created_at: '2025-10-19T14:30:00Z',
     is_active: true,
-  },
+  }),
 ]
+
+jest.mock('../../../store/slices/favoritesSlice', () => {
+  const actual = jest.requireActual('../../../store/slices/favoritesSlice')
+  const mockFetchFavorites = jest.fn(() => async () => ({
+    type: 'favorites/fetchFavorites/fulfilled',
+    payload: mockFavoriteProducts,
+  }))
+  mockFetchFavorites.fulfilled = {
+    match: (action: { type: string }) => action.type === 'favorites/fetchFavorites/fulfilled',
+  }
+
+  const mockToggleFavorite = jest.fn(() => async () => ({
+    type: 'favorites/toggleFavorite/fulfilled',
+  }))
+  mockToggleFavorite.fulfilled = {
+    match: (action: { type: string }) => action.type === 'favorites/toggleFavorite/fulfilled',
+  }
+
+  return {
+    ...actual,
+    fetchFavorites: mockFetchFavorites,
+    toggleFavorite: mockToggleFavorite,
+  }
+})
 
 // Create test store
 const createTestStore = (initialState = {}) => {
@@ -130,11 +156,15 @@ describe('FavoritesScreen', () => {
   })
 
   describe('Rendering', () => {
-    it('renders without crashing', () => {
+    it('fetches favorites on mount and renders products', async () => {
       const { getByText } = renderWithProviders(
         <FavoritesScreen navigation={mockNavigation} />
       )
-      expect(getByText('Pain complet artisanal')).toBeTruthy()
+
+      await waitFor(() => {
+        expect(fetchFavorites).toHaveBeenCalled()
+        expect(getByText('Pain complet artisanal')).toBeTruthy()
+      })
     })
 
     it('displays all favorite products', () => {
@@ -190,6 +220,30 @@ describe('FavoritesScreen', () => {
 
       expect(getByText('10')).toBeTruthy()
       expect(getByText('25')).toBeTruthy()
+    })
+  })
+
+  describe('Favorite actions', () => {
+    it('removes a favorite after confirmation', async () => {
+      const alertSpy = jest
+        .spyOn(Alert, 'alert')
+        .mockImplementation((_title, _message, buttons) => {
+          const confirm = buttons?.find(button => button.style === 'destructive')
+          confirm?.onPress?.()
+        })
+
+      const { getByLabelText } = renderWithProviders(
+        <FavoritesScreen navigation={mockNavigation} />
+      )
+
+      fireEvent.press(getByLabelText('Retirer Pain complet artisanal des favoris'))
+
+      await waitFor(() => {
+        expect(toggleFavorite).toHaveBeenCalledWith(1)
+        expect(fetchFavorites).toHaveBeenCalledTimes(2)
+      })
+
+      alertSpy.mockRestore()
     })
   })
 

@@ -204,43 +204,20 @@ describe('ProductsScreen', () => {
   })
 
   describe('Rendering - Mode Toggle', () => {
-    it('renders without crashing', () => {
+    it('renders merchants by default and toggles to products mode', async () => {
       const { getByText } = renderScreen()
+
       expect(getByText('Boutiques')).toBeTruthy()
       expect(getByText('Produits')).toBeTruthy()
-    })
-
-    it('renders in merchants mode by default', () => {
-      const { getByText } = renderScreen()
-      // Merchants should be displayed
       expect(getByText('Boulangerie Martin')).toBeTruthy()
-    })
 
-    it('switches to products mode when products button is pressed', async () => {
-      const { getByText } = renderScreen()
-
-      const productsButton = getByText('Produits')
-      fireEvent.press(productsButton)
-
-      await waitFor(() => {
-        expect(getByText('Pain complet artisanal')).toBeTruthy()
-      })
-    })
-
-    it('switches back to merchants mode when boutiques button is pressed', async () => {
-      const { getByText } = renderScreen()
-
-      // Switch to products
-      const productsButton = getByText('Produits')
-      fireEvent.press(productsButton)
+      fireEvent.press(getByText('Produits'))
 
       await waitFor(() => {
         expect(getByText('Pain complet artisanal')).toBeTruthy()
       })
 
-      // Switch back to merchants
-      const boutiquesButton = getByText('Boutiques')
-      fireEvent.press(boutiquesButton)
+      fireEvent.press(getByText('Boutiques'))
 
       await waitFor(() => {
         expect(getByText('Boulangerie Martin')).toBeTruthy()

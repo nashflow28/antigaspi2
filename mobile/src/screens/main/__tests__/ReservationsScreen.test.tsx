@@ -4,7 +4,7 @@ import { render, fireEvent, waitFor } from '@testing-library/react-native'
 import { Provider } from 'react-redux'
 import { configureStore } from '@reduxjs/toolkit'
 import ReservationsScreen from '../ReservationsScreen'
-import reservationsSlice from '../../../store/slices/reservationsSlice'
+import reservationsSlice, { fetchMyReservations } from '../../../store/slices/reservationsSlice'
 import authSlice from '../../../store/slices/authSlice'
 import connectivitySlice from '../../../store/slices/connectivitySlice'
 import { ThemeProvider } from '../../../theme/ThemeContext'
@@ -97,6 +97,25 @@ const mockReservations = [
   },
 ]
 
+jest.mock('../../../store/slices/reservationsSlice', () => {
+  const actual = jest.requireActual('../../../store/slices/reservationsSlice')
+  const mockFetchMyReservations = jest.fn(() => async () => ({
+    type: 'reservations/fetchMyReservations/fulfilled',
+    payload: mockReservations,
+  }))
+  mockFetchMyReservations.fulfilled = {
+    match: (action: { type: string }) => action.type === 'reservations/fetchMyReservations/fulfilled',
+  }
+  mockFetchMyReservations.rejected = {
+    match: (action: { type: string }) => action.type === 'reservations/fetchMyReservations/rejected',
+  }
+
+  return {
+    ...actual,
+    fetchMyReservations: mockFetchMyReservations,
+  }
+})
+
 // Create test store
 const createTestStore = (initialState = {}) => {
   return configureStore({
@@ -149,7 +168,7 @@ describe('ReservationsScreen', () => {
   })
 
   describe('Rendering', () => {
-    it('renders without crashing', () => {
+    it('fetches reservations on mount and renders list', async () => {
       const store = createTestStore()
       const { getByTestId } = renderWithProviders(
         <ReservationsScreen navigation={mockNavigation} />,
@@ -157,6 +176,9 @@ describe('ReservationsScreen', () => {
       )
 
       expect(getByTestId(TEST_IDS.reservationsScreen)).toBeTruthy()
+      await waitFor(() => {
+        expect(fetchMyReservations).toHaveBeenCalled()
+      })
     })
 
     it('displays header with total count', () => {

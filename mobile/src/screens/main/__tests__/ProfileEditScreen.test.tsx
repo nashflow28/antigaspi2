@@ -105,11 +105,20 @@ describe('ProfileEditScreen', () => {
   })
 
   describe('Rendering', () => {
-    it('renders without crashing', () => {
-      const { getByText } = renderWithProviders(
+    it('prefills form with stored profile data on mount', async () => {
+      const { getByText, getByDisplayValue } = renderWithProviders(
         <ProfileEditScreen navigation={mockNavigation} />
       )
-      expect(getByText('Modifier le profil')).toBeTruthy()
+
+      await waitFor(() => {
+        expect(getByText('Modifier le profil')).toBeTruthy()
+        expect(getByDisplayValue('Jean')).toBeTruthy()
+        expect(getByDisplayValue('Dupont')).toBeTruthy()
+        expect(getByDisplayValue('jean.dupont@test.com')).toBeTruthy()
+        expect(getByDisplayValue('+228 90 12 34 56')).toBeTruthy()
+        expect(getByDisplayValue('15 Rue du Commerce')).toBeTruthy()
+        expect(getByDisplayValue('Lomé')).toBeTruthy()
+      })
     })
 
     it('displays header with back button', () => {
@@ -118,21 +127,6 @@ describe('ProfileEditScreen', () => {
       )
       expect(getByText('Modifier le profil')).toBeTruthy()
       // Back button icon should exist
-    })
-
-    it('loads user profile data in form fields', async () => {
-      const { getByDisplayValue } = renderWithProviders(
-        <ProfileEditScreen navigation={mockNavigation} />
-      )
-
-      await waitFor(() => {
-        expect(getByDisplayValue('Jean')).toBeTruthy()
-        expect(getByDisplayValue('Dupont')).toBeTruthy()
-        expect(getByDisplayValue('jean.dupont@test.com')).toBeTruthy()
-        expect(getByDisplayValue('+228 90 12 34 56')).toBeTruthy()
-        expect(getByDisplayValue('15 Rue du Commerce')).toBeTruthy()
-        expect(getByDisplayValue('Lomé')).toBeTruthy()
-      })
     })
 
     it('displays profile photo section', () => {

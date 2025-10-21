@@ -33,6 +33,8 @@ export {
   createTestReservation,
 } from './factories'
 
+export { makeMerchant, makeProduct, resetFixtures } from './fixtures'
+
 // Re-export des utilitaires de testing-library pour cohérence
 export {
   fireEvent,
