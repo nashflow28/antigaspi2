@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useMemo, useCallback } from 'react'
 import {
   View,
   Text,
@@ -9,76 +9,153 @@ import {
   ActivityIndicator,
   Alert,
   StatusBar,
+  RefreshControl,
 } from 'react-native'
 import { Ionicons } from '@expo/vector-icons'
 import { useNavigation } from '@react-navigation/native'
 import { useTheme } from '../../theme'
-import apiService from '../../services/api'
+import notificationService, {
+  NotificationChannelPreferences,
+} from '../../services/notificationService'
+import { useAppDispatch, useAppSelector } from '../../store/hooks'
+import { refreshProfile } from '../../store/slices/authSlice'
 
-interface NotificationPreferences {
-  email: boolean
-  sms: boolean
-  push: boolean
+const DEFAULT_PREFERENCES: NotificationChannelPreferences = {
+  email: true,
+  sms: false,
+  push: true,
+}
+
+const formatDateTime = (date: Date | null): string => {
+  if (!date) {
+    return 'Jamais synchronisé'
+  }
+
+  try {
+    return new Intl.DateTimeFormat('fr-FR', {
+      dateStyle: 'short',
+      timeStyle: 'short',
+    }).format(date)
+  } catch (error) {
+    return date.toLocaleString()
+  }
 }
 
 const NotificationSettingsScreen: React.FC = () => {
   const theme = useTheme()
   const navigation = useNavigation()
+  const dispatch = useAppDispatch()
+  const user = useAppSelector((state) => state.auth.user)
 
   const [loading, setLoading] = useState(false)
   const [saving, setSaving] = useState(false)
-  const [preferences, setPreferences] = useState<NotificationPreferences>({
-    email: true,
-    sms: true,
-    push: true,
-  })
+  const [preferences, setPreferences] = useState<NotificationChannelPreferences>(
+    DEFAULT_PREFERENCES
+  )
+  const [initialPreferences, setInitialPreferences] =
+    useState<NotificationChannelPreferences>(DEFAULT_PREFERENCES)
+  const [lastSyncedAt, setLastSyncedAt] = useState<Date | null>(null)
+  const [error, setError] = useState<string | null>(null)
 
-  useEffect(() => {
-    loadPreferences()
-  }, [])
-
-  const loadPreferences = async () => {
+  const loadPreferences = useCallback(async () => {
     try {
       setLoading(true)
-      // Les préférences sont dans le profil utilisateur
-      const response = await apiService.get('/auth/me')
-      if (response.data.user) {
-        setPreferences({
-          email: response.data.user.prefers_email_notifications ?? true,
-          sms: response.data.user.prefers_sms_notifications ?? true,
-          push: response.data.user.prefers_push_notifications ?? true,
-        })
-      }
+      setError(null)
+
+      const remotePreferences = await notificationService.loadContactPreferences()
+
+      setPreferences(remotePreferences)
+      setInitialPreferences(remotePreferences)
+      setLastSyncedAt(new Date())
+
+      await dispatch(refreshProfile()).unwrap()
     } catch (error) {
       console.error('Erreur chargement préférences:', error)
+      setError(
+        error instanceof Error
+          ? error.message
+          : "Impossible de récupérer vos préférences pour le moment."
+      )
     } finally {
       setLoading(false)
     }
-  }
+  }, [dispatch])
+
+  useEffect(() => {
+    loadPreferences()
+  }, [loadPreferences])
+
+  useEffect(() => {
+    const handleExternalUpdate = (updated: NotificationChannelPreferences) => {
+      setPreferences(updated)
+      setInitialPreferences(updated)
+      setLastSyncedAt(new Date())
+    }
+
+    notificationService.on('contactPreferencesChanged', handleExternalUpdate)
+
+    return () => {
+      notificationService.off('contactPreferencesChanged', handleExternalUpdate)
+    }
+  }, [])
+
+  useEffect(() => {
+    if (!user) {
+      return
+    }
+
+    const syncedPreferences: NotificationChannelPreferences = {
+      email: user.prefers_email_notifications ?? DEFAULT_PREFERENCES.email,
+      sms: user.prefers_sms_notifications ?? DEFAULT_PREFERENCES.sms,
+      push: user.prefers_push_notifications ?? DEFAULT_PREFERENCES.push,
+    }
+
+    setPreferences(syncedPreferences)
+    setInitialPreferences(syncedPreferences)
+  }, [user])
+
+  const hasChanges = useMemo(() => {
+    return (
+      preferences.email !== initialPreferences.email ||
+      preferences.sms !== initialPreferences.sms ||
+      preferences.push !== initialPreferences.push
+    )
+  }, [preferences, initialPreferences])
 
   const handleSave = async () => {
     try {
       setSaving(true)
+      setError(null)
 
-      const response = await apiService.patch('/notifications/preferences', preferences)
+      const updated = await notificationService.saveContactPreferences(preferences)
 
-      if (response.data.success) {
-        Alert.alert('Succès', 'Préférences mises à jour avec succès', [
-          {
-            text: 'OK',
-            onPress: () => navigation.goBack(),
-          },
-        ])
-      }
+      setPreferences(updated)
+      setInitialPreferences(updated)
+      setLastSyncedAt(new Date())
+
+      await dispatch(refreshProfile()).unwrap()
+
+      Alert.alert('Succès', 'Préférences mises à jour avec succès', [
+        {
+          text: 'OK',
+          onPress: () => navigation.goBack(),
+        },
+      ])
     } catch (error: any) {
       console.error('Erreur sauvegarde préférences:', error)
-      Alert.alert('Erreur', error.response?.data?.message || 'Impossible de sauvegarder les préférences')
+      const message =
+        error instanceof Error
+          ? error.message
+          : error?.response?.data?.message ||
+            'Impossible de sauvegarder les préférences'
+      setError(message)
+      Alert.alert('Erreur', message)
     } finally {
       setSaving(false)
     }
   }
 
-  const togglePreference = (key: keyof NotificationPreferences) => {
+  const togglePreference = (key: keyof NotificationChannelPreferences) => {
     setPreferences((prev) => ({ ...prev, [key]: !prev[key] }))
   }
 
@@ -103,13 +180,63 @@ const NotificationSettingsScreen: React.FC = () => {
         <View style={{ width: 40 }} />
       </View>
 
-      <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+      <ScrollView
+        style={styles.content}
+        showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl
+            refreshing={loading}
+            onRefresh={loadPreferences}
+            tintColor={theme.colors.primary[600]}
+            colors={[theme.colors.primary[500]]}
+          />
+        }
+      >
         {/* Info */}
         <View style={[styles.infoCard, { backgroundColor: theme.withOpacity(theme.colors.primary[500], 0.1) }]}>
           <Ionicons name="information-circle" size={24} color={theme.colors.primary[500]} />
           <Text style={[styles.infoText, { color: theme.colors.primary[700] }]}>
             Choisissez comment vous souhaitez recevoir les notifications importantes de votre commerce.
           </Text>
+        </View>
+
+        {error && (
+          <View style={[styles.errorCard, { backgroundColor: theme.withOpacity(theme.colors.semantic.error, 0.08) }]}>
+            <Ionicons name="warning" size={22} color={theme.colors.semantic.error} />
+            <View style={{ flex: 1 }}>
+              <Text style={[styles.errorTitle, { color: theme.colors.semantic.error }]}>Synchronisation impossible</Text>
+              <Text style={[styles.errorMessage, { color: theme.colors.textSecondary }]}>{error}</Text>
+              <TouchableOpacity onPress={loadPreferences} style={styles.retryButton}>
+                <Text style={[styles.retryText, { color: theme.colors.semantic.error }]}>Réessayer</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        )}
+
+        <View style={styles.statusRow}>
+          <View>
+            <Text style={[styles.statusLabel, { color: theme.colors.textSecondary }]}>Dernière synchronisation</Text>
+            <Text style={[styles.statusValue, { color: theme.colors.text }]}>{formatDateTime(lastSyncedAt)}</Text>
+          </View>
+          <TouchableOpacity
+            style={[styles.refreshButton, { borderColor: theme.colors.primary[500] }]}
+            onPress={loadPreferences}
+            disabled={loading}
+          >
+            <Ionicons
+              name="refresh"
+              size={18}
+              color={loading ? theme.colors.neutral[400] : theme.colors.primary[600]}
+            />
+            <Text
+              style={[
+                styles.refreshButtonText,
+                { color: loading ? theme.colors.neutral[400] : theme.colors.primary[600] },
+              ]}
+            >
+              Actualiser
+            </Text>
+          </TouchableOpacity>
         </View>
 
         {/* Preferences */}
@@ -132,6 +259,7 @@ const NotificationSettingsScreen: React.FC = () => {
             <Switch
               value={preferences.email}
               onValueChange={() => togglePreference('email')}
+              disabled={saving}
               trackColor={{
                 false: theme.colors.neutral[200],
                 true: theme.colors.primary[400],
@@ -160,6 +288,7 @@ const NotificationSettingsScreen: React.FC = () => {
             <Switch
               value={preferences.sms}
               onValueChange={() => togglePreference('sms')}
+              disabled={saving}
               trackColor={{
                 false: theme.colors.neutral[200],
                 true: theme.colors.primary[400],
@@ -188,6 +317,7 @@ const NotificationSettingsScreen: React.FC = () => {
             <Switch
               value={preferences.push}
               onValueChange={() => togglePreference('push')}
+              disabled={saving}
               trackColor={{
                 false: theme.colors.neutral[200],
                 true: theme.colors.primary[400],
@@ -199,9 +329,16 @@ const NotificationSettingsScreen: React.FC = () => {
 
         {/* Save button */}
         <TouchableOpacity
-          style={[styles.saveButton, { backgroundColor: theme.colors.primary[500] }]}
+          style={[
+            styles.saveButton,
+            {
+              backgroundColor: hasChanges
+                ? theme.colors.primary[500]
+                : theme.withOpacity(theme.colors.primary[500], 0.4),
+            },
+          ]}
           onPress={handleSave}
-          disabled={saving}
+          disabled={saving || !hasChanges}
         >
           {saving ? (
             <ActivityIndicator size="small" color="white" />
@@ -252,6 +389,60 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     marginBottom: 20,
     gap: 12,
+  },
+  errorCard: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    padding: 16,
+    borderRadius: 12,
+    marginBottom: 16,
+    gap: 12,
+  },
+  errorTitle: {
+    fontSize: 15,
+    fontWeight: '600',
+    marginBottom: 4,
+  },
+  errorMessage: {
+    fontSize: 13,
+    lineHeight: 18,
+  },
+  retryButton: {
+    alignSelf: 'flex-start',
+    paddingVertical: 6,
+  },
+  retryText: {
+    fontSize: 13,
+    fontWeight: '600',
+  },
+  statusRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  statusLabel: {
+    fontSize: 12,
+    textTransform: 'uppercase',
+    letterSpacing: 0.6,
+    marginBottom: 4,
+  },
+  statusValue: {
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  refreshButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 999,
+    borderWidth: 1,
+    gap: 8,
+  },
+  refreshButtonText: {
+    fontSize: 14,
+    fontWeight: '600',
   },
   infoText: {
     flex: 1,
@@ -306,6 +497,7 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
     borderRadius: 12,
     gap: 8,
+    marginTop: 8,
   },
   saveButtonText: {
     color: 'white',
