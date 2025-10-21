@@ -35,6 +35,15 @@ export {
 
 export { makeMerchant, makeProduct, resetFixtures } from './fixtures'
 
+// Navigation mocks
+export {
+  createMockNavigation,
+  createMockRoute,
+  expectNavigationCalled,
+  resetNavigationMocks,
+} from './navigation'
+export type { MockNavigation, MockRoute } from './navigation'
+
 // Re-export des utilitaires de testing-library pour cohérence
 export {
   fireEvent,

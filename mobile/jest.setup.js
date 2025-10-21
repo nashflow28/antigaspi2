@@ -2,6 +2,10 @@
 // Note: @testing-library/jest-native is deprecated in favor of built-in matchers
 // import '@testing-library/jest-native/extend-expect'
 
+// Mock environment variables
+process.env.API_BASE_URL = 'http://localhost:8000/api'
+process.env.API_TIMEOUT = '30000'
+
 // Mock Expo Winter Runtime Registry (fixes import meta issue)
 global.__ExpoImportMetaRegistry = {
   get: () => undefined,
@@ -58,3 +62,12 @@ jest.mock('./src/contexts/ToastContext', () => ({
   }),
   ToastProvider: ({ children }) => children,
 }))
+
+// Mock API_BASE_URL export to fix imageHelpers.ts errors
+jest.mock('./src/services/api', () => {
+  const actualModule = jest.requireActual('./src/services/api')
+  return {
+    ...actualModule,
+    API_BASE_URL: 'http://localhost:8000/api',
+  }
+})

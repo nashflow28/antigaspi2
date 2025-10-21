@@ -5,8 +5,8 @@ import { Provider } from 'react-redux'
 import { configureStore } from '@reduxjs/toolkit'
 import { ThemeProvider } from '../../../theme/ThemeContext'
 import ReviewsListScreen from '../ReviewsListScreen'
-import reviewsSlice, { fetchReviews, fetchReviewStats } from '../../../store/slices/reviewsSlice'
-import authSlice from '../../../store/slices/authSlice'
+import { reviewsReducer, fetchReviews, fetchReviewStats } from '../../../store/slices/reviewsSlice'
+import { authReducer } from '../../../store/slices/authSlice'
 
 // Mock navigation
 const mockNavigate = jest.fn()
@@ -132,8 +132,8 @@ jest.mock('../../../store/slices/reviewsSlice', () => {
 const createTestStore = (initialState = {}) => {
   return configureStore({
     reducer: {
-      reviews: reviewsSlice,
-      auth: authSlice,
+      reviews: reviewsReducer,
+      auth: authReducer,
     },
     preloadedState: {
       reviews: {

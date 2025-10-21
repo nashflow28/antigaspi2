@@ -13,16 +13,13 @@ import {
   buildFavoritesState,
   buildReservationsState,
   buildReviewsState,
+  createMockNavigation,
+  resetNavigationMocks,
 } from '../../../test-utils'
 import { RootState } from '../../../store'
 
 // Mock navigation
-const mockNavigate = jest.fn()
-const mockNavigation = {
-  navigate: mockNavigate,
-  goBack: jest.fn(),
-  setOptions: jest.fn(),
-}
+const mockNavigation = createMockNavigation()
 
 // Mock data - Merchants (matching merchantsSlice structure with nested user)
 const mockMerchants = [
@@ -201,6 +198,7 @@ const renderScreen = (overrides?: Partial<RootState>) => {
 describe('ProductsScreen', () => {
   beforeEach(() => {
     jest.clearAllMocks()
+    resetNavigationMocks(mockNavigation)
   })
 
   describe('Rendering - Mode Toggle', () => {
@@ -516,7 +514,7 @@ describe('ProductsScreen', () => {
       fireEvent.press(merchantCard)
 
       await waitFor(() => {
-        expect(mockNavigate).toHaveBeenCalledWith('MerchantDetail', { merchantId: 1 })
+        expect(mockNavigation.navigate).toHaveBeenCalledWith('MerchantDetail', { merchantId: 1 })
       })
     })
   })
@@ -533,7 +531,7 @@ describe('ProductsScreen', () => {
       })
 
       await waitFor(() => {
-        expect(mockNavigate).toHaveBeenCalledWith('ProductDetails', { productId: 1 })
+        expect(mockNavigation.navigate).toHaveBeenCalledWith('ProductDetails', { productId: 1 })
       })
     })
   })
