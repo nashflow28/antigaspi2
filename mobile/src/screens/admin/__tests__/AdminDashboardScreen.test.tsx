@@ -1,9 +1,10 @@
 // @ts-nocheck
 import React from 'react'
-import { render, fireEvent, waitFor } from '@testing-library/react-native'
+import { render, fireEvent, waitFor, cleanup } from '@testing-library/react-native'
 import { Provider } from 'react-redux'
 import { configureStore } from '@reduxjs/toolkit'
 import { Alert } from 'react-native'
+import { act } from 'react-test-renderer'
 import AdminDashboardScreen from '../AdminDashboardScreen'
 import authSlice from '../../../store/slices/authSlice'
 import { ThemeProvider } from '../../../theme/ThemeContext'
@@ -100,6 +101,11 @@ describe('AdminDashboardScreen', () => {
     apiService.get.mockResolvedValue({
       data: mockStats,
     })
+  })
+
+  afterEach(() => {
+    cleanup()
+    jest.clearAllMocks()
   })
 
   describe('Data Loading', () => {

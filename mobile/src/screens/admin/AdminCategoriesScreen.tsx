@@ -191,14 +191,15 @@ const AdminCategoriesScreen: React.FC = () => {
           </View>
         </View>
         <View style={styles.actionsRow}>
-          <TouchableOpacity onPress={() => handleEditCategory(item)} style={styles.actionButton}>
-            <Ionicons name="pencil" size={20} color={theme.colors.primary[500]} />
+          <TouchableOpacity onPress={() => handleEditCategory(item)} style={styles.actionButton} testID="edit-category-button">
+            <Ionicons name="pencil" size={20} color={theme.colors.primary[500]} testID="pencil-icon" />
           </TouchableOpacity>
           <TouchableOpacity
             onPress={() => handleDeleteCategory(item)}
             style={styles.actionButton}
+            testID="delete-category-button"
           >
-            <Ionicons name="trash-outline" size={20} color={theme.colors.error[500]} />
+            <Ionicons name="trash-outline" size={20} color={theme.colors.error[500]} testID="trash-icon" />
           </TouchableOpacity>
         </View>
       </View>
@@ -218,8 +219,8 @@ const AdminCategoriesScreen: React.FC = () => {
             <Typography variant="h3" weight="bold">
               {formMode === 'create' ? 'Nouvelle catégorie' : 'Modifier la catégorie'}
             </Typography>
-            <TouchableOpacity onPress={() => setShowFormModal(false)}>
-              <Ionicons name="close" size={28} color={theme.colors.neutral[600]} />
+            <TouchableOpacity onPress={() => setShowFormModal(false)} testID="close-modal-button">
+              <Ionicons name="close" size={28} color={theme.colors.neutral[600]} testID="close-icon" />
             </TouchableOpacity>
           </View>
 
@@ -321,8 +322,8 @@ const AdminCategoriesScreen: React.FC = () => {
         <Typography variant="h2" weight="bold">
           Catégories de produits
         </Typography>
-        <TouchableOpacity onPress={handleCreateCategory} style={styles.createButton}>
-          <Ionicons name="add-circle" size={28} color={theme.colors.primary[500]} />
+        <TouchableOpacity onPress={handleCreateCategory} style={styles.createButton} testID="create-category-button">
+          <Ionicons name="add-circle" size={28} color={theme.colors.primary[500]} testID="add-circle-icon" />
         </TouchableOpacity>
       </View>
       <Typography variant="body" color="secondary" style={{ marginTop: 8 }}>

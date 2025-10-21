@@ -597,8 +597,8 @@ const AdminProductsScreen: React.FC = () => {
               </View>
             )}
           </View>
-          <TouchableOpacity onPress={loadData} accessibilityLabel="Rafraîchir les produits">
-            <Ionicons name="refresh" size={24} color="white" />
+          <TouchableOpacity onPress={loadData} accessibilityLabel="Rafraîchir les produits" testID="refresh-products-button">
+            <Ionicons name="refresh" size={24} color="white" testID="refresh-icon" />
           </TouchableOpacity>
         </View>
 
@@ -613,8 +613,8 @@ const AdminProductsScreen: React.FC = () => {
             onChangeText={setSearchQuery}
           />
           {searchQuery.length > 0 && (
-            <TouchableOpacity onPress={() => setSearchQuery('')}>
-              <Ionicons name="close-circle" size={20} color="rgba(255, 255, 255, 0.8)" />
+            <TouchableOpacity onPress={() => setSearchQuery('')} testID="clear-search-button">
+              <Ionicons name="close-circle" size={20} color="rgba(255, 255, 255, 0.8)" testID="close-circle-icon" />
             </TouchableOpacity>
           )}
         </View>
@@ -721,6 +721,7 @@ const AdminProductsScreen: React.FC = () => {
         </View>
       ) : (
         <FlatList
+          testID="products-flatlist"
           data={filteredProducts}
           renderItem={renderProduct}
           keyExtractor={item => item.id.toString()}

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useRef } from 'react'
 import {
   View,
   StyleSheet,
@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   StatusBar,
   ActivityIndicator,
+  Alert,
 } from 'react-native'
 import { Ionicons } from '@expo/vector-icons'
 import { useTheme } from '../../theme'
@@ -32,6 +33,7 @@ interface AdminStats {
 
 const AdminDashboardScreen: React.FC = () => {
   const theme = useTheme()
+  const isMountedRef = useRef(true)
   const [stats, setStats] = useState<AdminStats>({
     total_users: 0,
     total_merchants: 0,
@@ -46,30 +48,46 @@ const AdminDashboardScreen: React.FC = () => {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
+    isMountedRef.current = true
     loadDashboardData()
+
+    return () => {
+      isMountedRef.current = false
+    }
   }, [])
 
   const loadDashboardData = async () => {
     try {
-      setLoading(true)
+      if (isMountedRef.current) {
+        setLoading(true)
+      }
+
       const response = await apiService.get('/admin/dashboard')
-      setStats(
-        response.data || {
-          total_users: 0,
-          total_merchants: 0,
-          total_products: 0,
-          active_products: 0,
-          total_reservations: 0,
-          total_revenue: 0,
-          pending_merchants: 0,
-          pending_products: 0,
-        }
-      )
+
+      if (isMountedRef.current) {
+        setStats(
+          response.data || {
+            total_users: 0,
+            total_merchants: 0,
+            total_products: 0,
+            active_products: 0,
+            total_reservations: 0,
+            total_revenue: 0,
+            pending_merchants: 0,
+            pending_products: 0,
+          }
+        )
+      }
     } catch (error) {
       console.error('Erreur chargement stats admin:', error)
+      if (isMountedRef.current) {
+        Alert.alert('Erreur', 'Impossible de charger les statistiques')
+      }
     } finally {
-      setLoading(false)
-      setRefreshing(false)
+      if (isMountedRef.current) {
+        setLoading(false)
+        setRefreshing(false)
+      }
     }
   }
 
@@ -110,13 +128,15 @@ const AdminDashboardScreen: React.FC = () => {
             onPress={loadDashboardData}
             style={styles.refreshButton}
             accessibilityLabel="Rafraîchir le dashboard"
+            testID="refresh-dashboard-button"
           >
-            <Ionicons name="refresh" size={24} color="white" />
+            <Ionicons name="refresh" size={24} color="white" testID="refresh-icon" />
           </TouchableOpacity>
         </View>
       </View>
 
       <ScrollView
+        testID="dashboard-scroll"
         style={styles.content}
         contentContainerStyle={styles.scrollContent}
         refreshControl={
