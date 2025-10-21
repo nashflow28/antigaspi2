@@ -36,13 +36,15 @@ jest.mock('../../../services/api', () => ({
 // Mock navigation
 const mockNavigation = createMockNavigation()
 
-// Mock data - Merchants (matching merchantsSlice structure with nested user)
+// Mock data - Merchants (using fixtures for consistency)
 const mockMerchants = [
-  {
+  makeMerchant({
     id: 1,
     business_name: 'Boulangerie Martin',
     business_type: 'Boulangerie artisanale',
     city: 'Lomé',
+    address: '15 Rue du Commerce',
+    phone: '+228 90 12 34 56',
     is_verified: true,
     latitude: 6.1319,
     longitude: 1.2228,
@@ -52,12 +54,14 @@ const mockMerchants = [
       address: '15 Rue du Commerce',
       phone: '+228 90 12 34 56',
     },
-  },
-  {
+  }),
+  makeMerchant({
     id: 2,
     business_name: 'Fruits Bio Nature',
     business_type: 'Fruits et légumes bio',
     city: 'Sokodé',
+    address: '22 Avenue des Fruits',
+    phone: '+228 90 22 33 44',
     is_verified: false,
     latitude: 8.9833,
     longitude: 1.1333,
@@ -67,12 +71,14 @@ const mockMerchants = [
       address: '22 Avenue des Fruits',
       phone: '+228 90 22 33 44',
     },
-  },
-  {
+  }),
+  makeMerchant({
     id: 3,
     business_name: 'Boucherie Moderne',
     business_type: 'Viande et charcuterie',
     city: 'Kara',
+    address: '8 Boulevard Central',
+    phone: '+228 90 33 44 55',
     is_verified: true,
     latitude: 9.5511,
     longitude: 1.1861,
@@ -82,12 +88,20 @@ const mockMerchants = [
       address: '8 Boulevard Central',
       phone: '+228 90 33 44 55',
     },
-  },
+  }),
 ]
 
-// Mock data - Products (matching Product type from types/index.ts)
+// Mock categories (using fixtures for consistency) - MUST be before mockProducts
+const mockCategories = [
+  makeCategory({ id: 1, name: 'Boulangerie', description: 'Pains et viennoiseries' }),
+  makeCategory({ id: 2, name: 'Fruits et légumes', description: 'Produits frais' }),
+  makeCategory({ id: 3, name: 'Viande', description: 'Viandes et volailles' }),
+  makeCategory({ id: 4, name: 'Épicerie', description: 'Produits secs' }),
+]
+
+// Mock data - Products (using fixtures for consistency and complete data)
 const mockProducts = [
-  {
+  makeProduct({
     id: 1,
     name: 'Pain complet artisanal',
     description: 'Pain frais du jour',
@@ -99,12 +113,12 @@ const mockProducts = [
     discount_percentage: 50,
     savings: 250,
     days_until_expiration: 1,
-    category: { id: 1, name: 'Boulangerie', description: 'Pains et viennoiseries' },
+    category: mockCategories[0],
     merchant: mockMerchants[0],
     created_at: '2025-10-20T10:00:00Z',
     is_active: true,
-  },
-  {
+  }),
+  makeProduct({
     id: 2,
     name: 'Bananes mûres',
     description: 'Parfaites pour smoothies',
@@ -116,12 +130,12 @@ const mockProducts = [
     discount_percentage: 50,
     savings: 150,
     days_until_expiration: 2,
-    category: { id: 2, name: 'Fruits et légumes', description: 'Produits frais' },
+    category: mockCategories[1],
     merchant: mockMerchants[1],
     created_at: '2025-10-19T14:30:00Z',
     is_active: true,
-  },
-  {
+  }),
+  makeProduct({
     id: 3,
     name: 'Poulet fermier',
     description: 'Élevage local',
@@ -133,19 +147,11 @@ const mockProducts = [
     discount_percentage: 20,
     savings: 800,
     days_until_expiration: 1,
-    category: { id: 3, name: 'Viande', description: 'Viandes et volailles' },
+    category: mockCategories[2],
     merchant: mockMerchants[2],
     created_at: '2025-10-20T08:00:00Z',
     is_active: true,
-  },
-]
-
-// Mock categories
-const mockCategories = [
-  { id: 1, name: 'Boulangerie', description: 'Pains et viennoiseries' },
-  { id: 2, name: 'Fruits et légumes', description: 'Produits frais' },
-  { id: 3, name: 'Viande', description: 'Viandes et volailles' },
-  { id: 4, name: 'Épicerie', description: 'Produits secs' },
+  }),
 ]
 
 const mockUser = {

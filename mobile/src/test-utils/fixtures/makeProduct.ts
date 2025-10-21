@@ -46,9 +46,9 @@ export const makeProduct = (
 
   return {
     ...base,
-    ...overrides,
     category,
     merchant,
+    ...overrides,
   }
 }
 
