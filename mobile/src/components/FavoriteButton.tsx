@@ -3,6 +3,7 @@ import { TouchableOpacity, StyleSheet, ActivityIndicator, ViewStyle } from 'reac
 import { Ionicons } from '@expo/vector-icons'
 import { useTheme } from '../theme'
 import { useFavorite } from '../hooks/useFavorite'
+import { TEST_IDS } from '../utils/testIds'
 
 interface FavoriteButtonProps {
   productId: number
@@ -35,6 +36,8 @@ const FavoriteButton: React.FC<FavoriteButtonProps> = ({
       onPress={handlePress}
       disabled={loading}
       activeOpacity={0.7}
+      testID={TEST_IDS.favoriteButton}
+      accessibilityLabel={TEST_IDS.favoriteButton}
     >
       {loading ? (
         <ActivityIndicator size="small" color={color} />

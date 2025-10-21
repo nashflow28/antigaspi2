@@ -13,6 +13,7 @@ import { reservationsReducer, reservationsInitialState } from '../store/slices/r
 import { merchantsReducer, merchantsInitialState } from '../store/slices/merchantsSlice'
 import { favoritesReducer, favoritesInitialState } from '../store/slices/favoritesSlice'
 import { reviewsReducer, reviewsInitialState } from '../store/slices/reviewsSlice'
+import { cartReducer, cartInitialState } from '../store/slices/cartSlice'
 
 const reducers = {
   auth: authReducer,
@@ -22,6 +23,7 @@ const reducers = {
   merchants: merchantsReducer,
   favorites: favoritesReducer,
   reviews: reviewsReducer,
+  cart: cartReducer,
 }
 
 type ReducerKey = keyof typeof reducers
@@ -71,6 +73,7 @@ const buildDefaultState = (): StateFromReducers => ({
   merchants: clone(merchantsInitialState),
   favorites: clone(favoritesInitialState),
   reviews: clone(reviewsInitialState),
+  cart: clone(cartInitialState),
 })
 
 export const createTestStore = (partialState: DeepPartial<RootState> = {}) => {

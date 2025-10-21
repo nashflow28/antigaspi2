@@ -2,6 +2,7 @@ import React from 'react';
 import { render, fireEvent, waitFor, mockStore } from '../test-utils';
 import ProductDetailsScreen from '../../screens/main/ProductDetailsScreen';
 import { TEST_IDS } from '../../utils/testIds';
+import { cartInitialState } from '../../store/slices/cartSlice';
 
 describe('Consumer Reservation Flow', () => {
   let store: any;
@@ -71,6 +72,9 @@ describe('Consumer Reservation Flow', () => {
       },
       connectivity: {
         isOnline: true
+      },
+      cart: {
+        ...cartInitialState
       }
     });
   });

@@ -11,7 +11,7 @@ use App\Http\Resources\ReservationResource;
 use App\Models\Product;
 use App\Models\Reservation;
 use App\Notifications\ReservationStatusNotification;
-use App\Services\Payments\PaymentService;
+use App\Services\ReservationService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -19,7 +19,7 @@ use Tymon\JWTAuth\Facades\JWTAuth;
 
 class ReservationController extends Controller
 {
-    public function __construct(private PaymentService $payments)
+    public function __construct(private readonly ReservationService $reservations)
     {
     }
 
@@ -77,42 +77,23 @@ class ReservationController extends Controller
 
             return DB::transaction(function () use ($request, $user) {
                 $product = Product::lockForUpdate()->findOrFail($request->product_id);
-
-                $totalAmount = $product->discounted_price * $request->quantity;
-
-                $reservation = Reservation::create([
-                    'user_id' => $user->id,
-                    'product_id' => $product->id,
-                    'quantity_reserved' => $request->quantity,
-                    'total_amount' => $totalAmount,
-                    'status' => 'pending',
-                    'notes' => $request->notes,
-                ]);
-
-                $product->decrement('quantity_available', $request->quantity);
-
-                // Ne créer un payment que si la table payments existe et que ce n'est pas un paiement sur place
-                $payment = null;
                 $paymentMethod = PaymentMethod::from($request->input('payment_method'));
-                if ($paymentMethod !== PaymentMethod::ON_SITE) {
-                    try {
-                        $payment = $this->payments->initializePayment($reservation, $paymentMethod, [
-                            'customer_phone' => $request->input('customer_phone'),
-                            'customer_email' => $request->input('customer_email'),
-                            'currency' => $request->input('currency', config('payments.currency', 'XOF')),
-                            'notes' => $request->input('notes'),
-                            'wallet_pin' => $request->input('wallet_pin'),
-                        ]);
-                    } catch (\Exception $e) {
-                        // Continuer sans payment si la table n'existe pas
-                        \Log::warning('Payment initialization failed: ' . $e->getMessage());
-                    }
-                }
 
-                $reservation->load(['product.category', 'product.merchant.user']);
-                $reservation->setRelation('user', $user);
-
-                $user->notify(new ReservationStatusNotification($reservation));
+                [$reservation, $payment] = $this->reservations->createReservation(
+                    $user,
+                    $product,
+                    $request->quantity,
+                    $paymentMethod,
+                    [
+                        'notes' => $request->notes,
+                        'pickup_date' => $request->pickup_date,
+                        'pickup_time' => $request->pickup_time,
+                        'customer_phone' => $request->input('customer_phone'),
+                        'customer_email' => $request->input('customer_email'),
+                        'currency' => $request->input('currency', config('payments.currency', 'XOF')),
+                        'wallet_pin' => $request->input('wallet_pin'),
+                    ]
+                );
 
                 $response = [
                     'success' => true,

@@ -39,6 +39,17 @@ export const TEST_IDS = {
   productPrice: 'product-price',
   reserveButton: 'reserve-button',
   favoriteButton: 'favorite-button',
+  addToCartButton: 'add-to-cart-button',
+  increaseQuantityButton: 'increase-quantity-button',
+  decreaseQuantityButton: 'decrease-quantity-button',
+  quantityValue: 'quantity-value',
+
+  // Cart
+  cartScreen: 'cart-screen',
+  cartItem: (id: number) => `cart-item-${id}`,
+  cartCheckoutButton: 'cart-checkout-button',
+  cartClearButton: 'cart-clear-button',
+  cartReservationsButton: 'cart-reservations-button',
 
   // Reservations
   reservationsScreen: 'reservations-screen',

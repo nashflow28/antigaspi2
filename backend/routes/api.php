@@ -15,6 +15,7 @@ use App\Http\Controllers\Api\SurpriseBasketController;
 use App\Http\Controllers\Api\NotificationController;
 use App\Http\Controllers\Api\FavoriteController;
 use App\Http\Controllers\Api\ConsumerController;
+use App\Http\Controllers\Api\CartController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\WalletController;
 
@@ -122,6 +123,19 @@ Route::prefix('reservations')->middleware('jwt.auth')->group(function () {
         Route::post('/{id}/confirm', [ReservationController::class, 'confirm']); // Confirmer une réservation
         Route::post('/{id}/ready', [ReservationController::class, 'markReady']); // Marquer comme prêt
         Route::post('/{id}/complete', [ReservationController::class, 'complete']); // Marquer comme terminée
+    });
+});
+
+// Routes du panier consommateur
+Route::prefix('cart')->middleware('jwt.auth')->group(function () {
+    Route::get('/', [CartController::class, 'show']);
+
+    Route::middleware('throttle:write')->group(function () {
+        Route::post('/items', [CartController::class, 'addItem']);
+        Route::put('/items/{item}', [CartController::class, 'updateItem']);
+        Route::delete('/items/{item}', [CartController::class, 'removeItem']);
+        Route::post('/checkout', [CartController::class, 'checkout']);
+        Route::delete('/', [CartController::class, 'clear']);
     });
 });
 

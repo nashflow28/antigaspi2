@@ -18,6 +18,7 @@ import MerchantDetailScreen from '../screens/main/MerchantDetailScreen'
 import ReviewsListScreen from '../screens/main/ReviewsListScreen'
 import AddReviewScreen from '../screens/main/AddReviewScreen'
 import NotificationSettingsScreen from '../screens/merchant/NotificationSettingsScreen'
+import CartScreen from '../screens/main/CartScreen'
 
 const Tab = createBottomTabNavigator()
 const Stack = createNativeStackNavigator()
@@ -60,7 +61,8 @@ const FavoritesStack = () => (
 
 const OrdersStack = () => (
   <Stack.Navigator screenOptions={{ headerShown: false }}>
-    <Stack.Screen name="OrdersMain" component={ReservationsScreen} />
+    <Stack.Screen name="OrdersMain" component={CartScreen} />
+    <Stack.Screen name="ReservationsList" component={ReservationsScreen} />
     <Stack.Screen name="ReservationDetails" component={ReservationDetailsScreen} />
     <Stack.Screen name="ProductDetails" component={ProductDetailsScreen} />
     <Stack.Screen name="MerchantDetail" component={MerchantDetailScreen} />

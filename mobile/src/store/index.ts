@@ -6,6 +6,7 @@ import { reservationsReducer } from './slices/reservationsSlice'
 import { merchantsReducer } from './slices/merchantsSlice'
 import { favoritesReducer } from './slices/favoritesSlice'
 import { reviewsReducer } from './slices/reviewsSlice'
+import { cartReducer } from './slices/cartSlice'
 
 export const store = configureStore({
   reducer: {
@@ -16,6 +17,7 @@ export const store = configureStore({
     merchants: merchantsReducer,
     favorites: favoritesReducer,
     reviews: reviewsReducer,
+    cart: cartReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

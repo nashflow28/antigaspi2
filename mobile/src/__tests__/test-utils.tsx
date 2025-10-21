@@ -4,6 +4,7 @@ import { Provider } from 'react-redux';
 import { NavigationContainer } from '@react-navigation/native';
 import { ThemeProvider } from '../theme/ThemeContext';
 import configureStore from 'redux-mock-store';
+import { cartInitialState } from '../store/slices/cartSlice';
 
 const mockStore = configureStore([]);
 
@@ -52,6 +53,9 @@ function AllTheProviders({ children, store }: AllTheProvidersProps) {
     },
     connectivity: {
       isOnline: true
+    },
+    cart: {
+      ...cartInitialState
     }
   });
 

@@ -199,6 +199,85 @@ export interface ReservationCreationPayload {
   walletPin?: string
 }
 
+export interface CartItemProduct {
+  id: number
+  name: string
+  image_url?: string | null
+  discounted_price: number
+  available_quantity: number
+}
+
+export interface CartItem {
+  id: number
+  product_id: number
+  quantity: number
+  unit_price: number
+  total_price: number
+  product?: CartItemProduct | null
+}
+
+export interface CartMerchant {
+  id: number
+  name: string
+  business_type: string
+}
+
+export interface Cart {
+  id: number
+  total_amount: number
+  items_count: number
+  merchant?: CartMerchant | null
+  items: CartItem[]
+}
+
+export interface CartResponse {
+  success: boolean
+  message?: string
+  data: Cart | null
+}
+
+export interface CartItemPayload {
+  productId: number
+  quantity: number
+}
+
+export interface CartUpdatePayload {
+  quantity: number
+}
+
+export interface CartCheckoutPayload {
+  paymentMethod: PaymentMethod
+  pickupDate: string
+  pickupTime: string
+  notes?: string | null
+  customerPhone?: string | null
+  customerEmail?: string | null
+  walletPin?: string
+  currency?: string
+}
+
+export interface CartCheckoutResponse {
+  success: boolean
+  message?: string
+  data: Reservation[]
+  payments?: Payment[] | null
+}
+
+export interface CartCheckoutResult {
+  reservations: Reservation[]
+  payments: Payment[]
+}
+
+export interface CartState {
+  cart: Cart | null
+  loading: boolean
+  updating: boolean
+  checkoutLoading: boolean
+  error: string | null
+  checkoutError: string | null
+  lastCheckoutResult: CartCheckoutResult | null
+}
+
 export interface LoginCredentials {
   email: string
   password: string
@@ -333,4 +412,5 @@ export interface RootState {
   reservations: ReservationsState
   favorites: FavoritesState
   reviews: ReviewsState
+  cart: CartState
 }

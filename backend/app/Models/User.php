@@ -101,6 +101,11 @@ class User extends Authenticatable implements JWTSubject
         return $this->hasOne(Wallet::class);
     }
 
+    public function cart(): HasOne
+    {
+        return $this->hasOne(Cart::class);
+    }
+
     public function favorites(): HasMany
     {
         return $this->hasMany(Favorite::class);

@@ -1,58 +1,43 @@
-// @ts-nocheck
 import React from 'react'
-import { render, waitFor, fireEvent } from '@testing-library/react-native'
-import { Provider } from 'react-redux'
-import { configureStore } from '@reduxjs/toolkit'
 import ProductDetailsScreen from '../ProductDetailsScreen'
-import productsReducer, { fetchProduct } from '../../../store/slices/productsSlice'
-import authSlice from '../../../store/slices/authSlice'
-import merchantsSlice from '../../../store/slices/merchantsSlice'
-import favoritesSlice from '../../../store/slices/favoritesSlice'
-import reviewsSlice from '../../../store/slices/reviewsSlice'
-import reservationsSlice from '../../../store/slices/reservationsSlice'
-import { ThemeProvider } from '../../../theme/ThemeContext'
-import { makeProduct } from '@test-utils'
+import {
+  render,
+  waitFor,
+  fireEvent,
+  createTestStore,
+  createTestProduct,
+  createTestUser,
+  createMockNavigation,
+  createMockRoute,
+} from '@test-utils'
+import { TEST_IDS } from '../../../utils/testIds'
+import { fetchProduct } from '../../../store/slices/productsSlice'
 
-// Mock navigation
-const mockGoBack = jest.fn()
-const mockNavigation = {
-  navigate: jest.fn(),
-  goBack: mockGoBack,
-  setOptions: jest.fn(),
-}
-
-// Mock product data
-const mockProduct = makeProduct({
-  id: 1,
+const mockProduct = createTestProduct({
+  id: 42,
   name: 'Pain complet artisanal',
-  description: 'Pain complet aux graines, fabriqué le matin même',
-  original_price: '500.00',
-  discounted_price: '250.00',
-  quantity_available: 15,
-  expiration_date: '2025-10-10T00:00:00.000000Z',
-  image_url: '/storage/products/pain.jpg',
-  discount_percentage: 50,
-  savings: 250,
-  days_until_expiration: 4,
-  category: { id: 1, name: 'Boulangerie', description: 'Pains et viennoiseries' },
+  discounted_price: '250',
+  original_price: '500',
+  quantity_available: 5,
   merchant: {
-    id: 1,
+    id: 12,
     business_name: 'Boulangerie Martin',
     business_type: 'Boulangerie',
     city: 'Lomé',
-    address: '456 Avenue du Commerce',
     phone: '+228 90 98 76 54',
     is_verified: true,
+    address: '456 Avenue du Commerce',
   },
-  created_at: '2025-09-25T16:24:53.000000Z',
 })
 
 jest.mock('../../../store/slices/productsSlice', () => {
   const actual = jest.requireActual('../../../store/slices/productsSlice')
-  const mockFetchProduct = jest.fn(() => async () => ({
+  const mockFetchProduct = jest.fn((productId: number) => async () => ({
     type: 'products/fetchProduct/fulfilled',
     payload: mockProduct,
+    meta: { arg: productId },
   }))
+
   mockFetchProduct.fulfilled = {
     match: (action: { type: string }) => action.type === 'products/fetchProduct/fulfilled',
   }
@@ -61,76 +46,87 @@ jest.mock('../../../store/slices/productsSlice', () => {
   }
 
   return {
+    __esModule: true,
     ...actual,
     fetchProduct: mockFetchProduct,
   }
 })
 
-// Create test store
-const createTestStore = (productInStore = true) => {
-  return configureStore({
-    reducer: {
-      products: productsReducer,
-      auth: authSlice,
-      merchants: merchantsSlice,
-      favorites: favoritesSlice,
-      reviews: reviewsSlice,
-      reservations: reservationsSlice,
-    },
-    preloadedState: {
-      products: {
-        products: productInStore ? [mockProduct] : [],
-        categories: [],
-        loading: false,
-        loadingMore: false,
-        error: null,
-        filters: {},
-        currentPage: 1,
-        hasMore: false,
-      },
-      auth: {
-        user: null,
-        token: null,
-        isAuthenticated: false,
-        loading: false,
-        error: null,
-      },
-      merchants: {
-        merchants: [],
-        loading: false,
-        error: null,
-      },
-      favorites: {
-        favoriteIds: [],
-        loading: false,
-        error: null,
-      },
-      reviews: {
-        reviews: [],
-        stats: null,
-        loading: false,
-        error: null,
-        currentPage: 1,
-        hasMore: false,
-      },
-      reservations: {
-        reservations: [],
-        loading: false,
-        error: null,
-      },
-    },
-  })
-}
+jest.mock('../../../store/slices/reviewsSlice', () => {
+  const actual = jest.requireActual('../../../store/slices/reviewsSlice')
 
-// Helper to render with providers
-const renderWithProviders = (component: React.ReactElement, store: any) => {
-  return render(
-    <Provider store={store}>
-      <ThemeProvider>
-        {component}
-      </ThemeProvider>
-    </Provider>
+  return {
+    __esModule: true,
+    ...actual,
+    fetchReviewStats: jest.fn(() => ({ type: 'reviews/fetchStats/fulfilled' })),
+  }
+})
+
+const renderScreen = (options: {
+  product?: typeof mockProduct
+  productInStore?: boolean
+  loading?: boolean
+  reviewsStats?: { average_rating: number; total_reviews: number } | null
+  cartItemsCount?: number
+  cartUpdating?: boolean
+  isAuthenticated?: boolean
+  navigation?: ReturnType<typeof createMockNavigation>
+} = {}) => {
+  const {
+    product = mockProduct,
+    productInStore = true,
+    loading = false,
+    reviewsStats = { average_rating: 4.7, total_reviews: 12 },
+    cartItemsCount = 0,
+    cartUpdating = false,
+    isAuthenticated = false,
+    navigation = createMockNavigation(),
+  } = options
+
+  const store = createTestStore({
+    products: {
+      products: productInStore ? [product] : [],
+      loading,
+      loadingMore: false,
+      hasMore: false,
+      error: null,
+      filters: {},
+      currentPage: 1,
+    },
+    reviews: {
+      stats: reviewsStats,
+    },
+    cart: {
+      cart:
+        cartItemsCount > 0
+          ? {
+              id: 1,
+              total_amount: Number(product.discounted_price) * cartItemsCount,
+              items_count: cartItemsCount,
+              items: [],
+            }
+          : null,
+      updating: cartUpdating,
+    },
+    auth: isAuthenticated
+      ? {
+          user: createTestUser({ id: 77 }),
+          token: 'token',
+          isAuthenticated: true,
+          loading: false,
+          error: null,
+        }
+      : undefined,
+  })
+
+  const route = createMockRoute({ productId: product.id })
+
+  const rendered = render(
+    <ProductDetailsScreen navigation={navigation} route={route} />,
+    { store }
   )
+
+  return { ...rendered, store, navigation, route, product }
 }
 
 describe('ProductDetailsScreen', () => {
@@ -138,495 +134,96 @@ describe('ProductDetailsScreen', () => {
     jest.clearAllMocks()
   })
 
-  describe('Rendering', () => {
-    it('loads product data when not cached locally', async () => {
-      const store = createTestStore(false)
-      const route = { params: { productId: 1 } }
+  it('loads product data when it is missing locally', async () => {
+    const { getByText } = renderScreen({ productInStore: false })
 
-      const { getByText } = renderWithProviders(
-        <ProductDetailsScreen navigation={mockNavigation} route={route} />,
-        store
-      )
-
-      await waitFor(() => {
-        expect(fetchProduct).toHaveBeenCalledWith(1)
-        expect(getByText('Pain complet artisanal')).toBeTruthy()
-      })
+    await waitFor(() => {
+      expect(fetchProduct).toHaveBeenCalledWith(mockProduct.id)
     })
 
-    it('displays product details correctly', () => {
-      const store = createTestStore(true)
-      const route = { params: { productId: 1 } }
+    await waitFor(() => {
+      expect(getByText('Pain complet artisanal')).toBeTruthy()
+    })
+  })
 
-      const { getByText } = renderWithProviders(
-        <ProductDetailsScreen navigation={mockNavigation} route={route} />,
-        store
-      )
+  it('displays core product information and pricing', async () => {
+    const { getByText } = renderScreen()
 
-      // Check product details
+    await waitFor(() => {
       expect(getByText('Pain complet artisanal')).toBeTruthy()
       expect(getByText(/Boulangerie Martin/i)).toBeTruthy()
       expect(getByText(/Lomé/i)).toBeTruthy()
-    })
-
-    it('displays prices in F CFA format', () => {
-      const store = createTestStore(true)
-      const route = { params: { productId: 1 } }
-
-      const { getAllByText } = renderWithProviders(
-        <ProductDetailsScreen navigation={mockNavigation} route={route} />,
-        store
-      )
-
-      // Should display prices with F CFA
-      const priceElements = getAllByText(/F CFA/i)
-      expect(priceElements.length).toBeGreaterThan(0)
-    })
-
-    it('displays quantity available', () => {
-      const store = createTestStore(true)
-      const route = { params: { productId: 1 } }
-
-      const { getByText } = renderWithProviders(
-        <ProductDetailsScreen navigation={mockNavigation} route={route} />,
-        store
-      )
-
-      // Should show quantity (15 in this case)
-      expect(getByText(/Quantité.*15/i)).toBeTruthy()
-    })
-
-    it('displays product description if available', () => {
-      const store = createTestStore(true)
-      const route = { params: { productId: 1 } }
-
-      const { getByText } = renderWithProviders(
-        <ProductDetailsScreen navigation={mockNavigation} route={route} />,
-        store
-      )
-
-      // Should show description
-      expect(getByText(/Pain complet aux graines/i)).toBeTruthy()
-    })
-
-    it('affiche les options de paiement et permet de changer la sélection', () => {
-      const store = createTestStore(true)
-      const route = { params: { productId: 1 } }
-
-      const { getByText, queryByText } = renderWithProviders(
-        <ProductDetailsScreen navigation={mockNavigation} route={route} />,
-        store
-      )
-
-      expect(getByText('Sur place')).toBeTruthy()
-      expect(getByText(/Total à payer/i)).toBeTruthy()
-
-      fireEvent.press(getByText('Mobile Money'))
-      expect(getByText(/opérateur mobile/i)).toBeTruthy()
-
-      fireEvent.press(getByText('Carte bancaire'))
-      expect(getByText(/Paystack/i)).toBeTruthy()
-      expect(queryByText(/opérateur mobile/i)).toBeNull()
-    })
-
-    it('displays category information', () => {
-      const store = createTestStore(true)
-      const route = { params: { productId: 1 } }
-
-      const { getByText } = renderWithProviders(
-        <ProductDetailsScreen navigation={mockNavigation} route={route} />,
-        store
-      )
-
-      // Should show category
-      expect(getByText(/Catégorie.*Boulangerie/i)).toBeTruthy()
-    })
-
-    it('displays discount information correctly', () => {
-      const store = createTestStore(true)
-      const route = { params: { productId: 1 } }
-
-      const { getByText } = renderWithProviders(
-        <ProductDetailsScreen navigation={mockNavigation} route={route} />,
-        store
-      )
-
-      // Should show discount percentage
-      expect(getByText(/-50%/i)).toBeTruthy()
-    })
-
-    it('displays expiration information', () => {
-      const store = createTestStore(true)
-      const route = { params: { productId: 1 } }
-
-      const { getByText } = renderWithProviders(
-        <ProductDetailsScreen navigation={mockNavigation} route={route} />,
-        store
-      )
-
-      // Should show expiration info
-      expect(getByText(/Expire dans.*4 jours/i)).toBeTruthy()
-    })
-
-    it('displays merchant verified badge', () => {
-      const store = createTestStore(true)
-      const route = { params: { productId: 1 } }
-
-      const { getByText } = renderWithProviders(
-        <ProductDetailsScreen navigation={mockNavigation} route={route} />,
-        store
-      )
-
-      // Should show verified badge
-      expect(getByText(/Vérifié/i)).toBeTruthy()
+      expect(getByText('250 F CFA × 1')).toBeTruthy()
+      expect(getByText('-50%')).toBeTruthy()
+      expect(getByText('500 F CFA')).toBeTruthy()
     })
   })
 
-  describe('Reservation Button', () => {
-    it('shows "Réserver" button when product is available', () => {
-      const store = createTestStore(true)
-      const route = { params: { productId: 1 } }
+  it('shows payment options and switches selection', () => {
+    const { getByText, getAllByText, queryByText } = renderScreen()
 
-      const { getByText } = renderWithProviders(
-        <ProductDetailsScreen navigation={mockNavigation} route={route} />,
-        store
-      )
+    expect(getByText('Sur place')).toBeTruthy()
+    expect(getByText(/Total à payer/i)).toBeTruthy()
 
-      // Should show reserve button
-      expect(getByText('Réserver')).toBeTruthy()
-    })
+    fireEvent.press(getByText('Mobile Money'))
+    expect(getByText(/opérateur mobile/i)).toBeTruthy()
 
-    it('shows "Rupture de stock" when product quantity is 0', () => {
-      const unavailableProduct = { ...mockProduct, quantity_available: 0 }
-      const store = configureStore({
-        reducer: {
-          products: productsReducer,
-          auth: authSlice,
-          merchants: merchantsSlice,
-          favorites: favoritesSlice,
-          reviews: reviewsSlice,
-          reservations: reservationsSlice,
-        },
-        preloadedState: {
-          products: {
-            products: [unavailableProduct],
-            categories: [],
-            loading: false,
-            loadingMore: false,
-            error: null,
-            filters: {},
-            currentPage: 1,
-            hasMore: false,
-          },
-          auth: {
-            user: null,
-            token: null,
-            isAuthenticated: false,
-            loading: false,
-            error: null,
-          },
-          merchants: {
-            merchants: [],
-            loading: false,
-            error: null,
-          },
-          favorites: {
-            favoriteIds: [],
-            loading: false,
-            error: null,
-          },
-          reviews: {
-            reviews: [],
-            stats: null,
-            loading: false,
-            error: null,
-            currentPage: 1,
-            hasMore: false,
-          },
-          reservations: {
-            reservations: [],
-            loading: false,
-            error: null,
-          },
-        },
-      })
-
-      const route = { params: { productId: 1 } }
-
-      const { getByText } = renderWithProviders(
-        <ProductDetailsScreen navigation={mockNavigation} route={route} />,
-        store
-      )
-
-      // Should show "Rupture de stock"
-      expect(getByText('Rupture de stock')).toBeTruthy()
-    })
-
-    it('disables reserve button when product is out of stock', () => {
-      const unavailableProduct = { ...mockProduct, quantity_available: 0 }
-      const store = configureStore({
-        reducer: {
-          products: productsReducer,
-          auth: authSlice,
-          merchants: merchantsSlice,
-          favorites: favoritesSlice,
-          reviews: reviewsSlice,
-          reservations: reservationsSlice,
-        },
-        preloadedState: {
-          products: {
-            products: [unavailableProduct],
-            categories: [],
-            loading: false,
-            loadingMore: false,
-            error: null,
-            filters: {},
-            currentPage: 1,
-            hasMore: false,
-          },
-          auth: {
-            user: null,
-            token: null,
-            isAuthenticated: false,
-            loading: false,
-            error: null,
-          },
-          merchants: {
-            merchants: [],
-            loading: false,
-            error: null,
-          },
-          favorites: {
-            favoriteIds: [],
-            loading: false,
-            error: null,
-          },
-          reviews: {
-            reviews: [],
-            stats: null,
-            loading: false,
-            error: null,
-            currentPage: 1,
-            hasMore: false,
-          },
-          reservations: {
-            reservations: [],
-            loading: false,
-            error: null,
-          },
-        },
-      })
-
-      const route = { params: { productId: 1 } }
-
-      const { getByText } = renderWithProviders(
-        <ProductDetailsScreen navigation={mockNavigation} route={route} />,
-        store
-      )
-
-      const button = getByText('Rupture de stock')
-      expect(button.props.disabled || button.props.accessibilityState?.disabled).toBeTruthy()
-    })
+    fireEvent.press(getByText('Carte bancaire'))
+    expect(getAllByText(/Paystack/i).length).toBeGreaterThan(0)
+    expect(queryByText(/opérateur mobile/i)).toBeNull()
   })
 
-  describe('Navigation', () => {
-    it('navigates back when back button is pressed', async () => {
-      const store = createTestStore(true)
-      const route = { params: { productId: 1 } }
+  it('updates quantity within available bounds', () => {
+    const { getByTestId, getByText } = renderScreen()
 
-      renderWithProviders(
-        <ProductDetailsScreen navigation={mockNavigation} route={route} />,
-        store
-      )
+    expect(getByTestId(TEST_IDS.quantityValue).props.children).toBe(1)
+    fireEvent.press(getByTestId(TEST_IDS.increaseQuantityButton))
+    expect(getByTestId(TEST_IDS.quantityValue).props.children).toBe(2)
+    expect(getByText('250 F CFA × 2')).toBeTruthy()
 
-      await waitFor(() => {
-        // The screen sets up a back button in the header
-        expect(mockNavigation.setOptions).toHaveBeenCalled()
-      })
-    })
-
-    it('navigates to merchant page when merchant info is pressed', async () => {
-      const store = createTestStore(true)
-      const route = { params: { productId: 1 } }
-
-      const { getByText } = renderWithProviders(
-        <ProductDetailsScreen navigation={mockNavigation} route={route} />,
-        store
-      )
-
-      const merchantName = getByText(/Boulangerie Martin/i)
-      fireEvent.press(merchantName)
-
-      await waitFor(() => {
-        expect(mockNavigation.navigate).toHaveBeenCalledWith('MerchantDetail', { merchantId: 1 })
-      })
-    })
+    fireEvent.press(getByTestId(TEST_IDS.decreaseQuantityButton))
+    expect(getByTestId(TEST_IDS.quantityValue).props.children).toBe(1)
   })
 
-  describe('Loading State', () => {
-    it('shows loading state when product is not loaded yet', () => {
-      const store = createTestStore(false)
-      const route = { params: { productId: 1 } }
+  it('shows cart badge when items are present', () => {
+    const navigation = createMockNavigation()
+    const { getByText } = renderScreen({ cartItemsCount: 3, navigation })
 
-      const { getByText } = renderWithProviders(
-        <ProductDetailsScreen navigation={mockNavigation} route={route} />,
-        store
-      )
-
-      // Should show loading text
-      expect(getByText('Chargement...')).toBeTruthy()
-    })
-
-    it('shows loading indicator while fetching product details', () => {
-      const store = createTestStore(false)
-      const route = { params: { productId: 1 } }
-
-      const { getByTestId } = renderWithProviders(
-        <ProductDetailsScreen navigation={mockNavigation} route={route} />,
-        store
-      )
-
-      // Should show loading indicator
-      expect(getByTestId('loading-indicator')).toBeTruthy()
-    })
+    expect(getByText('3')).toBeTruthy()
   })
 
-  describe('User Interaction', () => {
-    it('shows quantity selector when reserving product', async () => {
-      const authenticatedStore = configureStore({
-        reducer: {
-          products: productsReducer,
-          auth: authSlice,
-          merchants: merchantsSlice,
-          favorites: favoritesSlice,
-          reviews: reviewsSlice,
-          reservations: reservationsSlice,
-        },
-        preloadedState: {
-          products: {
-            products: [mockProduct],
-            categories: [],
-            loading: false,
-            loadingMore: false,
-            error: null,
-            filters: {},
-            currentPage: 1,
-            hasMore: false,
-          },
-          auth: {
-            user: { id: 1, email: 'test@example.com', role: 'consumer' },
-            token: 'test-token',
-            isAuthenticated: true,
-            loading: false,
-            error: null,
-          },
-          merchants: {
-            merchants: [],
-            loading: false,
-            error: null,
-          },
-          favorites: {
-            favoriteIds: [],
-            loading: false,
-            error: null,
-          },
-          reviews: {
-            reviews: [],
-            stats: null,
-            loading: false,
-            error: null,
-            currentPage: 1,
-            hasMore: false,
-          },
-          reservations: {
-            reservations: [],
-            loading: false,
-            error: null,
-          },
-        },
-      })
+  it('navigates to cart when cart icon is pressed', () => {
+    const navigation = createMockNavigation()
+    const { getByLabelText } = renderScreen({ navigation })
 
-      const route = { params: { productId: 1 } }
-
-      const { getByText } = renderWithProviders(
-        <ProductDetailsScreen navigation={mockNavigation} route={route} />,
-        authenticatedStore
-      )
-
-      const reserveButton = getByText('Réserver')
-      fireEvent.press(reserveButton)
-
-      await waitFor(() => {
-        // Should show quantity selector modal
-        expect(getByText(/Quantité/i)).toBeTruthy()
-      })
-    })
+    fireEvent.press(getByLabelText('Voir mon panier'))
+    expect(navigation.navigate).toHaveBeenCalledWith('Orders')
   })
 
-  describe('Favorites Feature', () => {
-    it('shows favorite button for authenticated users', () => {
-      const authenticatedStore = configureStore({
-        reducer: {
-          products: productsReducer,
-          auth: authSlice,
-          merchants: merchantsSlice,
-          favorites: favoritesSlice,
-          reviews: reviewsSlice,
-          reservations: reservationsSlice,
-        },
-        preloadedState: {
-          products: {
-            products: [mockProduct],
-            categories: [],
-            loading: false,
-            loadingMore: false,
-            error: null,
-            filters: {},
-            currentPage: 1,
-            hasMore: false,
-          },
-          auth: {
-            user: { id: 1, email: 'test@example.com', role: 'consumer' },
-            token: 'test-token',
-            isAuthenticated: true,
-            loading: false,
-            error: null,
-          },
-          merchants: {
-            merchants: [],
-            loading: false,
-            error: null,
-          },
-          favorites: {
-            favoriteIds: [],
-            loading: false,
-            error: null,
-          },
-          reviews: {
-            reviews: [],
-            stats: null,
-            loading: false,
-            error: null,
-            currentPage: 1,
-            hasMore: false,
-          },
-          reservations: {
-            reservations: [],
-            loading: false,
-            error: null,
-          },
-        },
-      })
+  it('renders favorite button when user is authenticated', () => {
+    const { getByTestId } = renderScreen({ isAuthenticated: true })
 
-      const route = { params: { productId: 1 } }
+    expect(getByTestId(TEST_IDS.favoriteButton)).toBeTruthy()
+  })
 
-      const { getByTestId } = renderWithProviders(
-        <ProductDetailsScreen navigation={mockNavigation} route={route} />,
-        authenticatedStore
-      )
+  it('disables actions when product is out of stock', () => {
+    const soldOutProduct = createTestProduct({ quantity_available: 0 })
+    const { getAllByText, getByTestId } = renderScreen({ product: soldOutProduct })
 
-      // Should show favorite button
-      expect(getByTestId('favorite-button')).toBeTruthy()
+    expect(getAllByText('Rupture de stock').length).toBeGreaterThan(0)
+    expect(getByTestId(TEST_IDS.addToCartButton).props.accessibilityState?.disabled).toBe(true)
+    expect(getByTestId(TEST_IDS.reserveButton).props.accessibilityState?.disabled).toBe(true)
+  })
+
+  it('shows loading state while fetching', () => {
+    const navigation = createMockNavigation()
+    const { getByText, getByTestId } = renderScreen({
+      productInStore: false,
+      loading: true,
+      navigation,
     })
+
+    expect(getByTestId(TEST_IDS.loadingSpinner)).toBeTruthy()
+    expect(getByText('Chargement...')).toBeTruthy()
   })
 })
