@@ -3,11 +3,14 @@ import { View } from 'react-native'
 import { Provider, useDispatch } from 'react-redux'
 import { store, AppDispatch } from './src/store'
 import { clearAuth } from './src/store/slices/authSlice'
+import { hydrateLoyaltyFromCache } from './src/store/slices/loyaltySlice'
 import { ThemeProvider } from './src/theme'
 import { ToastProvider } from './src/contexts/ToastContext'
 import AppNavigator from './src/navigation/AppNavigator'
 import apiService from './src/services/api'
+import offlineService from './src/services/offlineService'
 import usePushNotifications from './src/hooks/usePushNotifications'
+import { LoyaltySummary } from './src/types'
 
 // Composant interne qui a accès au dispatch Redux
 const AppContent = () => {
@@ -20,6 +23,27 @@ const AppContent = () => {
       console.log('🔒 Token expiré détecté - Nettoyage du Redux store')
       dispatch(clearAuth())
     })
+  }, [dispatch])
+
+  useEffect(() => {
+    let isMounted = true
+
+    const bootstrapLoyaltyCache = async () => {
+      try {
+        const cached = await offlineService.getCache<{ summary: LoyaltySummary; syncedAt: string }>('loyalty')
+        if (cached && isMounted) {
+          dispatch(hydrateLoyaltyFromCache(cached))
+        }
+      } catch (error) {
+        console.warn('Impossible de charger le cache fidélité', error)
+      }
+    }
+
+    bootstrapLoyaltyCache()
+
+    return () => {
+      isMounted = false
+    }
   }, [dispatch])
 
   return <AppNavigator />

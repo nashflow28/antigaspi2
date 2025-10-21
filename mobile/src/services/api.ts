@@ -29,6 +29,12 @@ import {
   SurpriseBasket,
   SurpriseBasketFilters,
   PaginatedSurpriseBaskets,
+  ActivityItem,
+  WalletSummary,
+  WalletTransactionSummary,
+  LoyaltySummary,
+  MerchantConversationSummary,
+  MerchantMessageItem,
 } from '../types'
 
 // Configuration dynamique de l'API (web/native) avec overrides propres
@@ -448,6 +454,250 @@ class ApiService {
 
   async deleteReview(reviewId: number): Promise<ApiResponse<any>> {
     return this.request<ApiResponse<any>>('DELETE', `/reviews/${reviewId}`)
+  }
+
+  // === ACTIVITÉ & ENGAGEMENT ===
+
+  async getActivityFeed(params?: {
+    limit?: number
+    types?: string[]
+  }): Promise<{ items: ActivityItem[]; generated_at: string }> {
+    const config: AxiosRequestConfig = {}
+
+    if (params) {
+      config.params = {}
+
+      if (typeof params.limit === 'number') {
+        config.params.limit = params.limit
+      }
+
+      if (params.types && params.types.length > 0) {
+        config.params.types = params.types
+      }
+    }
+
+    const response = await this.request<
+      ApiResponse<{ items: ActivityItem[]; generated_at: string }>
+    >('GET', '/activity/feed', undefined, config)
+
+    return response.data
+  }
+
+  async logCustomActivity(payload: {
+    type: string
+    title: string
+    description?: string
+    metadata?: Record<string, unknown>
+    activity_at?: string
+  }): Promise<ActivityItem> {
+    const response = await this.request<ApiResponse<ActivityItem>>(
+      'POST',
+      '/activity/logs',
+      payload
+    )
+
+    return response.data
+  }
+
+  async markActivityAsRead(activityId: number): Promise<ActivityItem> {
+    const response = await this.request<ApiResponse<ActivityItem>>(
+      'POST',
+      `/activity/logs/${activityId}/read`
+    )
+
+    return response.data
+  }
+
+  // === PORTEFEUILLE NUMÉRIQUE ===
+
+  async getWalletSummary(): Promise<WalletSummary> {
+    const response = await this.request<ApiResponse<{ wallet: WalletSummary }>>(
+      'GET',
+      '/wallet'
+    )
+
+    return response.data.wallet
+  }
+
+  async getWalletTransactions(params?: {
+    perPage?: number
+    type?: 'credit' | 'debit'
+  }): Promise<{
+    transactions: WalletTransactionSummary[]
+    pagination: Record<string, unknown> | null
+  }> {
+    const config: AxiosRequestConfig = {}
+
+    if (params) {
+      config.params = {}
+
+      if (params.perPage) {
+        config.params.per_page = params.perPage
+      }
+
+      if (params.type) {
+        config.params.type = params.type
+      }
+    }
+
+    const response = await this.request<
+      ApiResponse<{ transactions: WalletTransactionSummary[]; pagination?: Record<string, unknown> }>
+    >('GET', '/wallet/transactions', undefined, config)
+
+    return {
+      transactions: response.data.transactions ?? [],
+      pagination: response.data.pagination ?? null,
+    }
+  }
+
+  async updateWalletStatus(isActive: boolean): Promise<boolean> {
+    const response = await this.request<
+      ApiResponse<{ wallet: { is_active: boolean } }>
+    >('PUT', '/wallet/status', { is_active: isActive })
+
+    return response.data.wallet.is_active
+  }
+
+  async updateWalletDailyLimit(dailyLimit: number): Promise<{
+    daily_limit: number
+    remaining_daily_limit: number
+  }> {
+    const response = await this.request<
+      ApiResponse<{ wallet: { daily_limit: number; remaining_daily_limit: number } }>
+    >('PUT', '/wallet/daily-limit', { daily_limit: dailyLimit })
+
+    return {
+      daily_limit: response.data.wallet.daily_limit,
+      remaining_daily_limit: response.data.wallet.remaining_daily_limit,
+    }
+  }
+
+  async setWalletPin(pin: string): Promise<boolean> {
+    const response = await this.request<ApiResponse<{ message?: string }>>(
+      'POST',
+      '/wallet/pin',
+      { pin }
+    )
+
+    return response.success
+  }
+
+  async changeWalletPin(currentPin: string, newPin: string): Promise<boolean> {
+    const response = await this.request<ApiResponse<{ message?: string }>>(
+      'PUT',
+      '/wallet/pin',
+      { current_pin: currentPin, new_pin: newPin }
+    )
+
+    return response.success
+  }
+
+  // === PROGRAMME DE FIDÉLITÉ ===
+
+  async getLoyaltySummary(): Promise<LoyaltySummary> {
+    const response = await this.request<ApiResponse<LoyaltySummary>>(
+      'GET',
+      '/loyalty/my-points'
+    )
+
+    return response.data
+  }
+
+  // === MESSAGERIE COMMERCANT ===
+
+  async getMerchantConversations(params?: {
+    perPage?: number
+  }): Promise<{
+    conversations: MerchantConversationSummary[]
+    meta: Record<string, unknown> | null
+  }> {
+    const config: AxiosRequestConfig = {}
+
+    if (params?.perPage) {
+      config.params = { per_page: params.perPage }
+    }
+
+    const response = await this.request<
+      ApiResponse<MerchantConversationSummary[]> & { meta?: Record<string, unknown> }
+    >('GET', '/messaging/conversations', undefined, config)
+
+    return {
+      conversations: response.data,
+      meta: response.meta ?? null,
+    }
+  }
+
+  async getConversationMessages(
+    conversationId: number,
+    params?: { perPage?: number }
+  ): Promise<{
+    messages: MerchantMessageItem[]
+    meta: Record<string, unknown> | null
+  }> {
+    const config: AxiosRequestConfig = {}
+
+    if (params?.perPage) {
+      config.params = { per_page: params.perPage }
+    }
+
+    const response = await this.request<
+      ApiResponse<MerchantMessageItem[]> & { meta?: Record<string, unknown> }
+    >('GET', `/messaging/conversations/${conversationId}`, undefined, config)
+
+    return {
+      messages: response.data,
+      meta: response.meta ?? null,
+    }
+  }
+
+  async sendMerchantMessage(payload: {
+    merchantId?: number
+    conversationId?: number
+    message: string
+    attachments?: Record<string, unknown>[]
+  }): Promise<MerchantMessageItem> {
+    const apiPayload: Record<string, unknown> = {
+      message: payload.message,
+    }
+
+    if (payload.merchantId) {
+      apiPayload.merchant_id = payload.merchantId
+    }
+
+    if (payload.conversationId) {
+      apiPayload.conversation_id = payload.conversationId
+    }
+
+    if (payload.attachments) {
+      apiPayload.attachments = payload.attachments
+    }
+
+    const response = await this.request<ApiResponse<MerchantMessageItem>>(
+      'POST',
+      '/messaging/messages',
+      apiPayload
+    )
+
+    return response.data
+  }
+
+  async markConversationAsRead(conversationId: number): Promise<boolean> {
+    const response = await this.request<ApiResponse<unknown>>(
+      'POST',
+      `/messaging/conversations/${conversationId}/read`
+    )
+
+    return response.success
+  }
+
+  async archiveConversation(conversationId: number, archived: boolean): Promise<boolean> {
+    const response = await this.request<
+      ApiResponse<{ id: number; is_archived: boolean }>
+    >('PATCH', `/messaging/conversations/${conversationId}/archive`, {
+      is_archived: archived,
+    })
+
+    return response.data.is_archived
   }
 
   // === MERCHANTS ===
