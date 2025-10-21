@@ -177,4 +177,58 @@ class NotificationControllerTest extends TestCase
             'quiet_hours_end' => '06:30',
         ], $user->notification_settings);
     }
+
+    public function test_admin_can_broadcast_notifications_to_active_users(): void
+    {
+        $admin = User::factory()->admin()->create();
+        $consumer = User::factory()->create([
+            'prefers_push_notifications' => true,
+        ]);
+        $merchant = User::factory()->merchant()->create([
+            'prefers_email_notifications' => false,
+            'prefers_push_notifications' => true,
+        ]);
+        $inactive = User::factory()->inactive()->create();
+
+        $payload = [
+            'title' => 'Maintenance planifiée',
+            'message' => 'La plateforme sera indisponible ce soir entre 22h et 23h.',
+            'channels' => ['database'],
+        ];
+
+        $response = $this->actingAsUser($admin)->postJson('/api/notifications/broadcast', $payload);
+
+        $response->assertStatus(202)
+            ->assertJsonPath('success', true)
+            ->assertJsonPath('data.recipient_count', 3)
+            ->assertJsonPath('data.channels', ['database']);
+
+        foreach ([$admin, $consumer, $merchant] as $recipient) {
+            $this->assertDatabaseHas('notifications', [
+                'user_id' => $recipient->id,
+                'type' => 'admin_broadcast',
+                'title' => 'Maintenance planifiée',
+            ]);
+        }
+
+        $this->assertDatabaseMissing('notifications', [
+            'user_id' => $inactive->id,
+            'type' => 'admin_broadcast',
+        ]);
+    }
+
+    public function test_non_admin_users_cannot_broadcast_notifications(): void
+    {
+        $user = User::factory()->create();
+
+        $response = $this->actingAsUser($user)->postJson('/api/notifications/broadcast', [
+            'title' => 'Test',
+            'message' => 'Ceci est un test',
+        ]);
+
+        $response->assertForbidden()
+            ->assertJson(['success' => false]);
+
+        $this->assertDatabaseCount('notifications', 0);
+    }
 }
