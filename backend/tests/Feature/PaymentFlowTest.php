@@ -75,6 +75,8 @@ class PaymentFlowTest extends TestCase
             'quantity' => 2,
             'payment_method' => PaymentMethod::FLOOZ->value,
             'customer_phone' => '+22891000000',
+            'pickup_date' => now()->format('Y-m-d'),
+            'pickup_time' => now()->addHour()->format('H:i'),
         ], $headers);
 
         $response->assertCreated()
@@ -341,6 +343,8 @@ class PaymentFlowTest extends TestCase
             'product_id' => $product->id,
             'quantity' => 1,
             'payment_method' => PaymentMethod::WALLET->value,
+            'pickup_date' => now()->format('Y-m-d'),
+            'pickup_time' => now()->addHour()->format('H:i'),
         ], $headers);
 
         $response->assertStatus(422)->assertJsonValidationErrors(['wallet_pin']);
@@ -370,6 +374,8 @@ class PaymentFlowTest extends TestCase
             'quantity' => 2,
             'payment_method' => PaymentMethod::WALLET->value,
             'wallet_pin' => '5678',
+            'pickup_date' => now()->format('Y-m-d'),
+            'pickup_time' => now()->addHour()->format('H:i'),
         ], $headers);
 
         $response->assertCreated()

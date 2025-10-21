@@ -1,21 +1,16 @@
 <?php
 
-namespace App\Http\Requests;
+namespace App\Http\Requests\Cart;
 
 use App\Enums\PaymentMethod;
-use App\Models\Product;
-use App\Models\Reservation;
 use App\Rules\ValidPickupDate;
 use Carbon\Carbon;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
 
-class StoreReservationRequest extends FormRequest
+class CheckoutCartRequest extends FormRequest
 {
-    private ?Product $resolvedProduct = null;
-    private bool $productLoaded = false;
-
     public function authorize(): bool
     {
         return Auth::check() && Auth::user()->role === 'consumer';
@@ -23,51 +18,19 @@ class StoreReservationRequest extends FormRequest
 
     public function rules(): array
     {
-        $product = $this->getProduct();
-        $businessType = $product?->merchant?->business_type;
-        $latestExpiration = $product?->expiration_date instanceof Carbon
-            ? $product->expiration_date->copy()
-            : ($product?->expiration_date ? Carbon::parse($product->expiration_date) : null);
+        $cart = Auth::user()?->cart?->loadMissing(['merchant', 'items.product']);
+        $businessType = $cart?->merchant?->business_type;
+        $latestExpiration = $cart?->items?->pluck('product')
+            ->filter()
+            ->map(function ($product) {
+                return $product->expiration_date instanceof Carbon
+                    ? $product->expiration_date->copy()
+                    : ($product->expiration_date ? Carbon::parse($product->expiration_date) : null);
+            })
+            ->filter()
+            ->min();
 
         return [
-            'product_id' => [
-                'required',
-                'integer',
-                'exists:products,id',
-                function ($attribute, $value, $fail) {
-                    $product = Product::find($value);
-
-                    if (!$product) {
-                        $fail('Le produit sélectionné n\'existe pas.');
-                        return;
-                    }
-
-                    if (!$product->is_active) {
-                        $fail('Ce produit n\'est plus disponible.');
-                        return;
-                    }
-
-                    if ($product->isExpired()) {
-                        $fail('Ce produit a expiré.');
-                        return;
-                    }
-                }
-            ],
-            'quantity' => [
-                'required',
-                'integer',
-                'min:1',
-                function ($attribute, $value, $fail) {
-                    if (!$this->input('product_id')) {
-                        return;
-                    }
-
-                    $product = Product::find($this->input('product_id'));
-                    if ($product && $product->quantity_available < $value) {
-                        $fail("Stock insuffisant. Disponible: {$product->quantity_available}");
-                    }
-                }
-            ],
             'payment_method' => ['required', Rule::enum(PaymentMethod::class)],
             'customer_phone' => [
                 'nullable',
@@ -109,11 +72,6 @@ class StoreReservationRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'product_id.required' => 'Veuillez sélectionner un produit.',
-            'product_id.exists' => 'Le produit sélectionné n\'existe pas.',
-            'quantity.required' => 'Veuillez indiquer la quantité.',
-            'quantity.integer' => 'La quantité doit être un nombre entier.',
-            'quantity.min' => 'La quantité minimum est 1.',
             'payment_method.required' => 'Veuillez sélectionner un moyen de paiement.',
             'payment_method.enum' => 'Le moyen de paiement choisi est invalide.',
             'customer_phone.required' => 'Le numéro de téléphone est requis pour les paiements Mobile Money.',
@@ -131,8 +89,6 @@ class StoreReservationRequest extends FormRequest
     public function attributes(): array
     {
         return [
-            'product_id' => 'produit',
-            'quantity' => 'quantité',
             'payment_method' => 'moyen de paiement',
             'customer_phone' => 'numéro de téléphone',
             'customer_email' => 'email client',
@@ -150,41 +106,12 @@ class StoreReservationRequest extends FormRequest
                 try {
                     $pickupDateTime = Carbon::createFromFormat('Y-m-d H:i', $this->input('pickup_date') . ' ' . $this->input('pickup_time'), config('app.timezone'));
                     if ($pickupDateTime->lt(now())) {
-                        $validator->errors()->add(
-                            'pickup_time',
-                            'Le créneau de retrait doit être dans le futur.'
-                        );
+                        $validator->errors()->add('pickup_time', 'Le créneau de retrait doit être dans le futur.');
                     }
                 } catch (\Exception $exception) {
                     $validator->errors()->add('pickup_time', 'Le créneau de retrait est invalide.');
                 }
             }
-
-            if ($this->input('product_id')) {
-                $existingReservation = Reservation::where('user_id', Auth::id())
-                    ->where('product_id', $this->input('product_id'))
-                    ->whereIn('status', ['pending', 'confirmed', 'ready'])
-                    ->first();
-
-                if ($existingReservation) {
-                    $validator->errors()->add(
-                        'product_id',
-                        'Vous avez déjà une réservation active pour ce produit.'
-                    );
-                }
-            }
         });
-    }
-
-    private function getProduct(): ?Product
-    {
-        if (!$this->productLoaded) {
-            $this->resolvedProduct = $this->input('product_id')
-                ? Product::with('merchant')->find($this->input('product_id'))
-                : null;
-            $this->productLoaded = true;
-        }
-
-        return $this->resolvedProduct;
     }
 }
