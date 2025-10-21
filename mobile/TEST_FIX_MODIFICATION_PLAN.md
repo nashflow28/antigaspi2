@@ -59,3 +59,5 @@
 ## 6. Vérifications finales
 - **Documentation interne :** consigner le rétablissement du cache dans `MOBILE_TEST_CORRECTION_REPORT.md` pour historiser les changements.
 - **Tests à relancer (après implémentation) :** `npm test`, `npm run test:coverage`, et audit ciblé sur les suites offline (pas exécuté dans le cadre de cette demande, mais à planifier).
+
+> **Rappel global :** une fois toutes les mini-tâches complétées, relancer `npm test` puis `npm run test:coverage` afin de valider la campagne complète.

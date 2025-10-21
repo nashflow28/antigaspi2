@@ -6,7 +6,10 @@ export const authInitialState: AuthState = {
   user: null,
   token: null,
   isAuthenticated: false,
-  loading: true, // ⚠️ TEST 6: Forcer SplashScreen pour identifier si c'est lui qui freeze
+  // Le SplashScreen est désormais piloté par AppNavigator (state `hydrated`).
+  // Garder `loading` à false évite les régressions des tests Jest tout en
+  // conservant l'affichage natif via le hook de navigation.
+  loading: false,
   error: null,
 }
 
@@ -139,13 +142,11 @@ const authSlice = createSlice({
         state.loading = false
         state.error = null
       })
-      // ✅ FIX: Déconnexion locale même si l'appel API échoue (offline/network error)
-      .addCase(logoutUser.rejected, (state) => {
-        state.user = null
-        state.token = null
-        state.isAuthenticated = false
+      // Conserver la session active si la déconnexion réseau échoue pour éviter
+      // les pertes de contexte utilisateur.
+      .addCase(logoutUser.rejected, (state, action) => {
         state.loading = false
-        state.error = null
+        state.error = (action.payload as string) ?? null
       })
 
       // Load stored auth
