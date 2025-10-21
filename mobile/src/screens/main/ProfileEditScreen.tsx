@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import {
   View,
   StyleSheet,
@@ -19,6 +19,8 @@ import * as ImagePicker from 'expo-image-picker'
 import { useTheme } from '../../theme'
 import { Typography } from '../../components/2025'
 import apiService from '../../services/api'
+import { ApiResponse, User } from '../../types'
+import { refreshProfile } from '../../store/slices/authSlice'
 
 interface ProfileFormData {
   first_name: string
@@ -51,7 +53,8 @@ const ProfileEditScreen: React.FC<ProfileEditScreenProps> = ({ navigation: navig
   const dispatch = useDispatch<AppDispatch>()
   const { user } = useSelector((state: RootState) => state.auth)
 
-  const [loading, setLoading] = useState(false)
+  const [isLoadingProfile, setIsLoadingProfile] = useState(true)
+  const [isSaving, setIsSaving] = useState(false)
   const [uploading, setUploading] = useState(false)
   const [photoUri, setPhotoUri] = useState<string | null>(null)
   const [formData, setFormData] = useState<ProfileFormData>({
@@ -64,31 +67,39 @@ const ProfileEditScreen: React.FC<ProfileEditScreenProps> = ({ navigation: navig
   })
 
   useEffect(() => {
-    loadUserProfile()
-  }, [])
-
-  const loadUserProfile = async () => {
-    try {
-      setLoading(true)
-      if (user) {
-        setFormData({
-          first_name: user.first_name || '',
-          last_name: user.last_name || '',
-          email: user.email || '',
-          phone: user.phone || '',
-          address: user.address || '',
-          city: user.city || '',
-        })
-        if (user.photo_url) {
-          setPhotoUri(user.photo_url)
-        }
-      }
-    } catch (error) {
-      console.error('Erreur chargement profil:', error)
-    } finally {
-      setLoading(false)
+    if (user) {
+      setFormData({
+        first_name: user.first_name || '',
+        last_name: user.last_name || '',
+        email: user.email || '',
+        phone: user.phone || '',
+        address: user.address || '',
+        city: user.city || '',
+      })
+      setPhotoUri(user.photo_url ?? null)
+    } else {
+      setFormData({
+        first_name: '',
+        last_name: '',
+        email: '',
+        phone: '',
+        address: '',
+        city: '',
+      })
+      setPhotoUri(null)
     }
-  }
+
+    setIsLoadingProfile(false)
+  }, [user])
+
+  const syncProfileUpdates = useCallback(async () => {
+    try {
+      const updatedUser = await dispatch(refreshProfile()).unwrap()
+      await apiService.setStoredUser(updatedUser)
+    } catch (syncError) {
+      console.error('Erreur synchronisation profil:', syncError)
+    }
+  }, [dispatch])
 
   const pickImage = async () => {
     try {
@@ -131,33 +142,39 @@ const ProfileEditScreen: React.FC<ProfileEditScreenProps> = ({ navigation: navig
       setUploading(true)
 
       // Create FormData
-      const formData = new FormData()
+      const uploadFormData = new FormData()
       const filename = asset.fileName || asset.uri.split('/').pop() || 'photo.jpg'
       const mimeType = asset.mimeType || asset.type || 'image/jpeg'
 
-      formData.append('photo', {
+      uploadFormData.append('photo', {
         uri: asset.uri,
         name: filename,
         type: mimeType,
       } as any)
 
-      const response = await apiService.post('/consumers/profile/photo', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      })
-
-      if (response.data.success) {
-        if (response.data.data?.photo_url) {
-          setPhotoUri(response.data.data.photo_url)
+      const response = await apiService.post<ApiResponse<{ photo_url: string; full_url?: string }>>(
+        '/consumers/profile/photo',
+        uploadFormData,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
         }
-        Alert.alert('Succès', 'Photo mise à jour avec succès')
+      )
+
+      if (response.success) {
+        if (response.data?.full_url || response.data?.photo_url) {
+          setPhotoUri(response.data.full_url || response.data.photo_url)
+        }
+        await syncProfileUpdates()
+
+        Alert.alert('Succès', response.message || 'Photo mise à jour avec succès')
       }
     } catch (error: any) {
       console.error('Erreur upload photo:', error)
       Alert.alert(
         'Erreur',
-        error.response?.data?.message || "Impossible d'uploader la photo"
+        error.response?.data?.message || error.message || "Impossible d'uploader la photo"
       )
     } finally {
       setUploading(false)
@@ -208,12 +225,17 @@ const ProfileEditScreen: React.FC<ProfileEditScreenProps> = ({ navigation: navig
     }
 
     try {
-      setLoading(true)
+      setIsSaving(true)
 
-      const response = await apiService.put('/consumers/profile', sanitizedData)
+      const response = await apiService.put<ApiResponse<User>>(
+        '/consumers/profile',
+        sanitizedData
+      )
 
-      if (response.data.success) {
-        Alert.alert('Succès', 'Profil mis à jour avec succès', [
+      if (response.success) {
+        await syncProfileUpdates()
+
+        Alert.alert('Succès', response.message || 'Profil mis à jour avec succès', [
           {
             text: 'OK',
             onPress: () => navigation.goBack(),
@@ -224,10 +246,10 @@ const ProfileEditScreen: React.FC<ProfileEditScreenProps> = ({ navigation: navig
       console.error('Erreur mise à jour profil:', error)
       Alert.alert(
         'Erreur',
-        error.response?.data?.message || 'Impossible de mettre à jour le profil'
+        error.response?.data?.message || error.message || 'Impossible de mettre à jour le profil'
       )
     } finally {
-      setLoading(false)
+      setIsSaving(false)
     }
   }
 
@@ -235,7 +257,7 @@ const ProfileEditScreen: React.FC<ProfileEditScreenProps> = ({ navigation: navig
     setFormData((prev) => ({ ...prev, [field]: value }))
   }
 
-  if (loading && !formData.first_name) {
+  if (isLoadingProfile && !formData.first_name) {
     return (
       <View style={[styles.loadingContainer, { backgroundColor: theme.colors.background }]}>
         <ActivityIndicator size="large" color={theme.colors.primary[500]} />
@@ -470,9 +492,9 @@ const ProfileEditScreen: React.FC<ProfileEditScreenProps> = ({ navigation: navig
             },
           ]}
           onPress={handleSave}
-          disabled={loading}
+          disabled={isSaving}
         >
-          {loading ? (
+          {isSaving ? (
             <ActivityIndicator size="small" color="white" />
           ) : (
             <>

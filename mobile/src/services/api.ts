@@ -218,10 +218,11 @@ class ApiService {
       try {
         // Sauvegarder le token et les données utilisateur
         await AsyncStorage.setItem('auth_token', response.data.token)
-        await AsyncStorage.setItem('user_data', JSON.stringify(response.data.user))
       } catch (error) {
         // Ne pas échouer si AsyncStorage échoue - juste en continuer
       }
+
+      await this.setStoredUser(response.data.user)
     }
 
     return response
@@ -232,7 +233,7 @@ class ApiService {
 
     if (response.success && response.data.token) {
       await AsyncStorage.setItem('auth_token', response.data.token)
-      await AsyncStorage.setItem('user_data', JSON.stringify(response.data.user))
+      await this.setStoredUser(response.data.user)
     }
 
     return response
@@ -247,6 +248,7 @@ class ApiService {
     } finally {
       // Toujours nettoyer le stockage local
       await AsyncStorage.multiRemove(['auth_token', 'user_data'])
+      await this.setStoredUser(null)
     }
   }
 
@@ -395,6 +397,18 @@ class ApiService {
       return true
     } catch (error) {
       return false
+    }
+  }
+
+  async setStoredUser(user: User | null): Promise<void> {
+    try {
+      if (user) {
+        await AsyncStorage.setItem('user_data', JSON.stringify(user))
+      } else {
+        await AsyncStorage.removeItem('user_data')
+      }
+    } catch (error) {
+      // Ignorer les erreurs de persistance pour éviter de casser le flux utilisateur
     }
   }
 

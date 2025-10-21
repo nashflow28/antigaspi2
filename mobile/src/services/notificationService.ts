@@ -42,7 +42,7 @@ export interface NotificationData {
   categoryId?: string;
 }
 
-export interface NotificationPreferences {
+export interface LegacyNotificationPreferences {
   enabled: boolean;
   newProducts: boolean;
   reservations: boolean;
@@ -51,6 +51,12 @@ export interface NotificationPreferences {
   quietHoursEnabled: boolean;
   quietHoursStart: string;
   quietHoursEnd: string;
+}
+
+export interface NotificationChannelPreferences {
+  email: boolean;
+  sms: boolean;
+  push: boolean;
 }
 
 class NotificationService {
@@ -416,9 +422,12 @@ class NotificationService {
   /**
    * Charger les préférences de notification
    */
-  async loadPreferences(): Promise<NotificationPreferences> {
+  private readonly legacyPreferencesStorageKey = 'notification_preferences';
+  private readonly channelPreferencesStorageKey = 'notification_contact_preferences';
+
+  async loadPreferences(): Promise<LegacyNotificationPreferences> {
     try {
-      const prefs = await AsyncStorage.getItem('notification_preferences');
+      const prefs = await AsyncStorage.getItem(this.legacyPreferencesStorageKey);
       return prefs ? JSON.parse(prefs) : this.getDefaultPreferences();
     } catch (error) {
       return this.getDefaultPreferences();
@@ -428,9 +437,9 @@ class NotificationService {
   /**
    * Sauvegarder les préférences de notification
    */
-  async savePreferences(preferences: NotificationPreferences): Promise<void> {
+  async savePreferences(preferences: LegacyNotificationPreferences): Promise<void> {
     try {
-      await AsyncStorage.setItem('notification_preferences', JSON.stringify(preferences));
+      await AsyncStorage.setItem(this.legacyPreferencesStorageKey, JSON.stringify(preferences));
 
       // NOTE: L'API Laravel attend PATCH /users/{id} avec prefers_email_notifications,
       // prefers_sms_notifications, prefers_push_notifications (booléens)
@@ -447,7 +456,7 @@ class NotificationService {
   /**
    * Obtenir les préférences par défaut
    */
-  private getDefaultPreferences(): NotificationPreferences {
+  private getDefaultPreferences(): LegacyNotificationPreferences {
     return {
       enabled: true,
       newProducts: true,
@@ -458,6 +467,111 @@ class NotificationService {
       quietHoursStart: '22:00',
       quietHoursEnd: '08:00',
     };
+  }
+
+  /**
+   * Charger les préférences de communication (email / SMS / push) depuis l'API
+   */
+  async loadContactPreferences(): Promise<NotificationChannelPreferences> {
+    try {
+      const response = await this.http.get('/auth/me');
+      const payload = response.data?.data ?? {};
+
+      const preferences = this.normalizeChannelPreferences({
+        email: payload.prefers_email_notifications,
+        sms: payload.prefers_sms_notifications,
+        push: payload.prefers_push_notifications,
+      });
+
+      await AsyncStorage.setItem(
+        this.channelPreferencesStorageKey,
+        JSON.stringify(preferences)
+      );
+
+      return preferences;
+    } catch (error) {
+      const cached = await this.getCachedChannelPreferences();
+      if (cached) {
+        return cached;
+      }
+
+      throw this.toError(error, 'Impossible de récupérer vos préférences pour le moment.');
+    }
+  }
+
+  /**
+   * Sauvegarder les préférences de communication côté API
+   */
+  async saveContactPreferences(
+    preferences: NotificationChannelPreferences
+  ): Promise<NotificationChannelPreferences> {
+    try {
+      const response = await this.http.patch('/notifications/preferences', {
+        email: preferences.email,
+        sms: preferences.sms,
+        push: preferences.push,
+      });
+
+      const payload = response.data?.data ?? {};
+
+      const normalized = this.normalizeChannelPreferences({
+        email: payload.prefers_email_notifications ?? preferences.email,
+        sms: payload.prefers_sms_notifications ?? preferences.sms,
+        push: payload.prefers_push_notifications ?? preferences.push,
+      });
+
+      await AsyncStorage.setItem(
+        this.channelPreferencesStorageKey,
+        JSON.stringify(normalized)
+      );
+
+      this.emit('contactPreferencesChanged', normalized);
+
+      return normalized;
+    } catch (error) {
+      throw this.toError(error, 'Impossible de sauvegarder vos préférences pour le moment.');
+    }
+  }
+
+  private async getCachedChannelPreferences(): Promise<NotificationChannelPreferences | null> {
+    try {
+      const cached = await AsyncStorage.getItem(this.channelPreferencesStorageKey);
+      if (!cached) {
+        return null;
+      }
+
+      return this.normalizeChannelPreferences(JSON.parse(cached));
+    } catch (error) {
+      console.warn('Impossible de charger les préférences de notification en cache:', error);
+      return null;
+    }
+  }
+
+  private normalizeChannelPreferences(
+    preferences: Partial<NotificationChannelPreferences>
+  ): NotificationChannelPreferences {
+    return {
+      email: preferences.email ?? true,
+      sms: preferences.sms ?? false,
+      push: preferences.push ?? true,
+    };
+  }
+
+  private toError(error: unknown, fallbackMessage: string): Error {
+    if (
+      error &&
+      typeof error === 'object' &&
+      'response' in error &&
+      (error as any).response?.data?.message
+    ) {
+      return new Error((error as any).response.data.message as string);
+    }
+
+    if (error instanceof Error && error.message) {
+      return error;
+    }
+
+    return new Error(fallbackMessage);
   }
 
   /**

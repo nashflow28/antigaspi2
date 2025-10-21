@@ -3,6 +3,8 @@
 namespace App\Services\Payments;
 
 use App\Enums\PaymentMethod;
+use App\Services\Payments\Gateways\CinetPayGateway;
+use App\Services\Payments\Gateways\FedaPayGateway;
 use App\Services\Payments\Gateways\OnSiteGateway;
 use App\Services\Payments\Gateways\PayGateGateway;
 use App\Services\Payments\Gateways\PaystackGateway;
@@ -20,9 +22,9 @@ class PaymentGatewayManager
     {
         return match ($method) {
             PaymentMethod::FLOOZ,
-            PaymentMethod::TMONEY,
+            PaymentMethod::TMONEY => new FedaPayGateway($this->config['fedapay'] ?? []),
             PaymentMethod::ORANGE_MONEY,
-            PaymentMethod::MTN_MOMO => new PayGateGateway($this->config['paygate'] ?? []),
+            PaymentMethod::MTN_MOMO => new CinetPayGateway($this->config['cinetpay'] ?? []),
             PaymentMethod::PAYSTACK => new PaystackGateway($this->config['paystack'] ?? []),
             PaymentMethod::ON_SITE => new OnSiteGateway(),
             PaymentMethod::WALLET => $this->walletGateway(),
@@ -33,6 +35,8 @@ class PaymentGatewayManager
     {
         return match ($provider) {
             'paygate' => new PayGateGateway($this->config['paygate'] ?? []),
+            'fedapay' => new FedaPayGateway($this->config['fedapay'] ?? []),
+            'cinetpay' => new CinetPayGateway($this->config['cinetpay'] ?? []),
             'paystack' => new PaystackGateway($this->config['paystack'] ?? []),
             'manual' => new OnSiteGateway(),
             'wallet' => $this->walletGateway(),
