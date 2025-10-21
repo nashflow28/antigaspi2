@@ -6,6 +6,7 @@ import {
   Alert,
   Switch,
   Platform,
+  Linking,
 } from 'react-native'
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigation } from '@react-navigation/native'
@@ -66,6 +67,27 @@ const ProfileScreen: React.FC = () => {
       console.log('✅ Déconnexion réussie')
     } catch (error) {
       console.error('❌ Erreur déconnexion:', error)
+    }
+  }
+
+  const handleHelpPress = async () => {
+    const helpUrl = 'https://antigaspi.support/help'
+    try {
+      const supported = await Linking.canOpenURL(helpUrl)
+      if (supported) {
+        await Linking.openURL(helpUrl)
+        return
+      }
+
+      const fallback = 'mailto:support@antigaspi.app'
+      const fallbackSupported = await Linking.canOpenURL(fallback)
+      if (fallbackSupported) {
+        await Linking.openURL(fallback)
+      } else {
+        Alert.alert('Support indisponible', 'Impossible d\'ouvrir le centre d\'aide pour le moment.')
+      }
+    } catch (error) {
+      Alert.alert('Support indisponible', 'Impossible d\'ouvrir le centre d\'aide pour le moment.')
     }
   }
 
@@ -193,7 +215,10 @@ const ProfileScreen: React.FC = () => {
           </View>
         </View>
 
-        <TouchableOpacity style={[styles.menuItem, { paddingHorizontal: theme.spacing.lg, paddingVertical: theme.spacing.md, borderBottomWidth: 1, borderBottomColor: theme.colors.border }]}>
+        <TouchableOpacity
+          style={[styles.menuItem, { paddingHorizontal: theme.spacing.lg, paddingVertical: theme.spacing.md, borderBottomWidth: 1, borderBottomColor: theme.colors.border }]}
+          onPress={handleHelpPress}
+        >
           <Ionicons name="help-circle-outline" size={24} color={theme.colors.text} />
           <Typography variant="body" style={{ flex: 1, marginLeft: theme.spacing.md }}>
             Aide & Support

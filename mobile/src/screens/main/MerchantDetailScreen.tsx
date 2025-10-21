@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import {
   View,
   Text,
@@ -9,6 +9,8 @@ import {
   Dimensions,
   Alert,
   Linking,
+  Share,
+  Platform,
 } from 'react-native'
 import { useDispatch, useSelector } from 'react-redux'
 import { AppDispatch, RootState } from '../../store'
@@ -20,6 +22,8 @@ import { Product, Merchant } from '../../types'
 import { getImageUrl } from '../../utils/imageHelpers'
 import { formatCurrency } from '../../utils/currencyHelpers'
 import { Button, Card, Badge, Typography } from '../../components/2025'
+import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps'
+import locationService, { UserLocation } from '../../services/locationService'
 
 const { width } = Dimensions.get('window')
 
@@ -37,6 +41,10 @@ const MerchantDetailScreen: React.FC<Props> = ({ route, navigation }) => {
   const [merchantProducts, setMerchantProducts] = useState<Product[]>([])
   const [merchant, setMerchant] = useState<Merchant | null>(null)
   const [activeTab, setActiveTab] = useState<'products' | 'info' | 'reviews'>('products')
+  const [userLocation, setUserLocation] = useState<UserLocation | null>(null)
+  const [locationPermissionGranted, setLocationPermissionGranted] = useState(false)
+  const [requestingLocation, setRequestingLocation] = useState(false)
+  const [mapExpanded, setMapExpanded] = useState(false)
 
   // ✅ FIX: Race condition + Memory leak + Undefined access
   useEffect(() => {
@@ -71,6 +79,65 @@ const MerchantDetailScreen: React.FC<Props> = ({ route, navigation }) => {
       isMounted = false
     }
   }, [merchantId, products, dispatch]) // ✅ Dépendances complètes
+
+  useEffect(() => {
+    const initLocation = async () => {
+      try {
+        const hasPermission = await locationService.hasLocationPermission()
+        if (hasPermission) {
+          setLocationPermissionGranted(true)
+          const position = await locationService.getCurrentPosition()
+          if (position) {
+            setUserLocation(position)
+          }
+        }
+      } catch (error) {
+        console.error('Erreur initialisation géolocalisation (merchant detail):', error)
+      }
+    }
+
+    initLocation()
+  }, [])
+
+  const ensureUserLocation = async () => {
+    try {
+      setRequestingLocation(true)
+      const granted = await locationService.requestLocationPermission()
+      setLocationPermissionGranted(granted)
+
+      if (granted) {
+        const position = await locationService.getCurrentPosition()
+        if (position) {
+          setUserLocation(position)
+        }
+      } else {
+        Alert.alert('Permission requise', 'Activez la géolocalisation pour afficher votre position sur la carte.')
+      }
+    } catch (error) {
+      Alert.alert('Erreur', "Impossible de récupérer votre position pour le moment.")
+    } finally {
+      setRequestingLocation(false)
+    }
+  }
+
+  const toggleMapSize = async () => {
+    if (!locationPermissionGranted && !userLocation) {
+      await ensureUserLocation()
+    }
+    setMapExpanded(prev => !prev)
+  }
+
+  const mapRegion = useMemo(() => {
+    if (merchant?.latitude != null && merchant?.longitude != null) {
+      return {
+        latitude: merchant.latitude,
+        longitude: merchant.longitude,
+        latitudeDelta: 0.01,
+        longitudeDelta: 0.01,
+      }
+    }
+    return null
+  }, [merchant?.latitude, merchant?.longitude])
 
   // Emoji dynamique basé sur le nom du marchand
   const getMerchantEmoji = (businessName: string) => {
@@ -169,22 +236,104 @@ const MerchantDetailScreen: React.FC<Props> = ({ route, navigation }) => {
     }
   }
 
+  const handleDirections = async () => {
+    if (!merchant) return
+
+    const { latitude, longitude, address, city } = merchant
+    const destination =
+      latitude != null && longitude != null
+        ? `${latitude},${longitude}`
+        : encodeURIComponent(`${address || ''} ${city}`.trim())
+
+    if (!destination) {
+      Alert.alert('Adresse indisponible', "Ce marchand n'a pas encore renseigné son adresse complète.")
+      return
+    }
+
+    const url = `https://www.google.com/maps/dir/?api=1&destination=${destination}`
+    const supported = await Linking.canOpenURL(url)
+    if (supported) {
+      await Linking.openURL(url)
+    } else {
+      Alert.alert('Erreur', "Impossible d'ouvrir l'application de navigation.")
+    }
+  }
+
+  const handleShare = async () => {
+    if (!merchant) return
+
+    const { business_name, address, city, latitude, longitude } = merchant
+    const mapsLink = latitude != null && longitude != null
+      ? `https://www.google.com/maps/search/?api=1&query=${latitude},${longitude}`
+      : address
+        ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${address} ${city}`)}`
+        : null
+
+    const message = [
+      `Découvrez ${business_name} sur Antigaspi !`,
+      address ? `${address}, ${city}` : city,
+      mapsLink || undefined,
+    ]
+      .filter(Boolean)
+      .join('\n')
+
+    try {
+      await Share.share({
+        title: business_name,
+        message,
+      })
+    } catch (error) {
+      Alert.alert('Erreur', 'Le partage a échoué, veuillez réessayer plus tard.')
+    }
+  }
+
   return (
     <View style={styles.container}>
       <StatusBar barStyle="light-content" />
 
       {/* Map Section */}
-      <View style={styles.mapContainer}>
-        {/* Placeholder for map - can be replaced with actual map component */}
-        <View style={styles.mapPlaceholder}>
-          <Ionicons name="location" size={48} color={theme.colors.error} />
-          <Typography variant="body" weight="semibold" style={{ marginTop: theme.spacing.sm }}>
-            Carte interactive
-          </Typography>
-          <Typography variant="caption" color="secondary" style={{ marginTop: 4, textAlign: 'center', paddingHorizontal: theme.spacing.lg }}>
-            {merchant.address}, {merchant.city}
-          </Typography>
-        </View>
+      <View style={[styles.mapContainer, mapExpanded && styles.mapContainerExpanded]}>
+        {Platform.OS === 'web' || !mapRegion ? (
+          <View style={styles.mapPlaceholder}>
+            <Ionicons name="location" size={48} color={theme.colors.error} />
+            <Typography variant="body" weight="semibold" style={{ marginTop: theme.spacing.sm }}>
+              Carte interactive
+            </Typography>
+            <Typography
+              variant="caption"
+              color="secondary"
+              style={{ marginTop: 4, textAlign: 'center', paddingHorizontal: theme.spacing.lg }}
+            >
+              {merchant.address}, {merchant.city}
+            </Typography>
+            {!mapRegion && (
+              <Typography variant="caption" color="secondary" style={{ marginTop: theme.spacing.md, textAlign: 'center' }}>
+                La localisation précise de ce marchand sera bientôt disponible.
+              </Typography>
+            )}
+          </View>
+        ) : (
+          <MapView
+            provider={PROVIDER_GOOGLE}
+            style={[styles.mapView, mapExpanded && styles.mapViewExpanded]}
+            initialRegion={mapRegion}
+            showsUserLocation={locationPermissionGranted && !!userLocation}
+            showsMyLocationButton={false}
+          >
+            <Marker
+              coordinate={{ latitude: mapRegion.latitude, longitude: mapRegion.longitude }}
+              title={merchant.business_name}
+              description={merchant.address || merchant.city}
+            />
+            {userLocation && (
+              <Marker
+                coordinate={{ latitude: userLocation.latitude, longitude: userLocation.longitude }}
+                title="Vous"
+                pinColor={theme.colors.primary[500]}
+              />
+            )}
+          </MapView>
+        )}
 
         {/* Header buttons */}
         <View style={styles.headerButtons}>
@@ -192,7 +341,7 @@ const MerchantDetailScreen: React.FC<Props> = ({ route, navigation }) => {
             <Ionicons name="arrow-back" size={24} color={theme.colors.textInverse} />
           </TouchableOpacity>
           <View style={styles.headerRight}>
-            <TouchableOpacity style={styles.headerButton}>
+            <TouchableOpacity style={styles.headerButton} onPress={handleShare}>
               <Ionicons name="share-social" size={24} color={theme.colors.textInverse} />
             </TouchableOpacity>
             <TouchableOpacity style={styles.headerButton}>
@@ -200,6 +349,32 @@ const MerchantDetailScreen: React.FC<Props> = ({ route, navigation }) => {
             </TouchableOpacity>
           </View>
         </View>
+
+        {mapRegion && Platform.OS !== 'web' && (
+          <View style={styles.mapActions}>
+            <TouchableOpacity style={styles.mapActionButton} onPress={toggleMapSize}>
+              <Ionicons
+                name={mapExpanded ? 'contract' : 'expand'}
+                size={18}
+                color={theme.colors.textInverse}
+              />
+              <Typography variant="caption" style={{ color: theme.colors.textInverse, marginLeft: 6 }}>
+                {mapExpanded ? 'Réduire' : 'Agrandir'}
+              </Typography>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={styles.mapActionButton}
+              onPress={ensureUserLocation}
+              disabled={requestingLocation}
+            >
+              <Ionicons name="locate" size={18} color={theme.colors.textInverse} />
+              <Typography variant="caption" style={{ color: theme.colors.textInverse, marginLeft: 6 }}>
+                {requestingLocation ? 'Chargement…' : 'Ma position'}
+              </Typography>
+            </TouchableOpacity>
+          </View>
+        )}
       </View>
 
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
@@ -361,7 +536,7 @@ const MerchantDetailScreen: React.FC<Props> = ({ route, navigation }) => {
                 {merchant.city}
               </Typography>
             </View>
-            <TouchableOpacity style={styles.directionButton}>
+            <TouchableOpacity style={styles.directionButton} onPress={handleDirections}>
               <Ionicons name="navigate" size={20} color={theme.colors.primary[500]} />
             </TouchableOpacity>
           </View>
@@ -457,12 +632,22 @@ const createStyles = (theme: ReturnType<typeof useTheme>) => StyleSheet.create({
     width: '100%',
     height: 250,
   },
+  mapContainerExpanded: {
+    height: 360,
+  },
   mapPlaceholder: {
     width: '100%',
     height: '100%',
     backgroundColor: theme.colors.neutral[200],
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  mapView: {
+    width: '100%',
+    height: '100%',
+  },
+  mapViewExpanded: {
+    height: '115%',
   },
   headerButtons: {
     position: 'absolute',
@@ -484,6 +669,21 @@ const createStyles = (theme: ReturnType<typeof useTheme>) => StyleSheet.create({
   headerRight: {
     flexDirection: 'row',
     gap: theme.spacing.sm,
+  },
+  mapActions: {
+    position: 'absolute',
+    bottom: theme.spacing.md,
+    right: theme.spacing.md,
+    flexDirection: 'row',
+    gap: theme.spacing.sm,
+  },
+  mapActionButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: theme.spacing.xs,
+    paddingHorizontal: theme.spacing.sm,
+    backgroundColor: theme.withOpacity(theme.colors.surface.dark, 0.85),
+    borderRadius: theme.radius.lg,
   },
   merchantCard: {
     backgroundColor: theme.colors.surface.light,

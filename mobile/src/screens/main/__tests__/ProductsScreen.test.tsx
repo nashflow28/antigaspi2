@@ -304,7 +304,7 @@ describe('ProductsScreen', () => {
       await waitFor(() => {
         expect(getByText('250 F CFA')).toBeTruthy()
         expect(getByText('150 F CFA')).toBeTruthy()
-        expect(getByText('3,200 F CFA')).toBeTruthy()
+        expect(getByText('3 200 F CFA')).toBeTruthy()
       })
     })
 
@@ -506,7 +506,7 @@ describe('ProductsScreen', () => {
       fireEvent.changeText(searchInput, 'Test')
 
       await waitFor(() => {
-        expect(getByText('Réinitialiser')).toBeTruthy()
+        expect(getByText('Réinitialiser les filtres')).toBeTruthy()
       })
     })
 
