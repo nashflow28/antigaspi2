@@ -1,0 +1,195 @@
+
+> mobile@1.0.0 test
+> jest --passWithNoTests --verbose
+
+  console.log
+    🔴 handleLogout clicked!
+
+      at log (src/screens/main/ProfileScreen.tsx:29:13)
+
+  console.log
+    🔴 handleLogout clicked!
+
+      at log (src/screens/main/ProfileScreen.tsx:29:13)
+
+  console.log
+    🟢 Bouton cliqué !
+
+      at log (src/screens/merchant/ProductFormScreen.tsx:333:21)
+
+  console.log
+    🔴 handleSubmit appelé
+
+      at log (src/screens/merchant/ProductFormScreen.tsx:125:13)
+
+  console.log
+    Form data: {
+      name: 'Pain complet',
+      originalPrice: '1000',
+      discountedPrice: '500',
+      quantity: '10',
+      expirationDate: ''
+    }
+
+      at log (src/screens/merchant/ProductFormScreen.tsx:126:13)
+
+  console.log
+    🔵 validateForm appelé
+
+      at log (src/screens/merchant/ProductFormScreen.tsx:91:13)
+
+  console.log
+    ✅ Validation réussie !
+
+      at log (src/screens/merchant/ProductFormScreen.tsx:120:13)
+
+  console.log
+    📤 Envoi requête API: POST /products
+
+      at log (src/screens/merchant/ProductFormScreen.tsx:156:15)
+
+  console.log
+    📦 Données envoyées: {
+      "name": "Pain complet",
+      "description": "",
+      "original_price": 1000,
+      "discounted_price": 500,
+      "quantity_available": 10,
+      "expiration_date": "2025-10-28",
+      "image_url": null
+    }
+
+      at log (src/screens/merchant/ProductFormScreen.tsx:157:15)
+
+  console.log
+    ✅ Réponse API reçue: { data: {} }
+
+      at log (src/screens/merchant/ProductFormScreen.tsx:161:17)
+
+  console.log
+    🔙 Navigation retour vers liste produits
+
+      at log (src/screens/merchant/ProductFormScreen.tsx:169:15)
+
+  console.log
+    🔴 handleLogout clicked!
+
+      at log (src/screens/main/ProfileScreen.tsx:29:13)
+
+  console.log
+    🔴 Confirmation déconnexion
+
+      at Object.log (src/screens/main/ProfileScreen.tsx:61:13)
+
+  console.log
+    ✅ Déconnexion réussie
+
+      at Object.log (src/screens/main/ProfileScreen.tsx:67:15)
+
+  console.log
+    🔍 [MainNavigator] User role: consumer
+
+      at log (src/navigation/MainNavigator.tsx:12:11)
+
+  console.log
+    🔍 [MainNavigator] User email: test@example.com
+
+      at log (src/navigation/MainNavigator.tsx:13:11)
+
+  console.log
+    🔍 [MainNavigator] Full user: {
+      "id": 1,
+      "first_name": "Test",
+      "last_name": "User",
+      "email": "test@example.com",
+      "role": "consumer",
+      "city": "Lomé",
+      "created_at": "2025-01-01",
+      "updated_at": "2025-01-01"
+    }
+
+      at log (src/navigation/MainNavigator.tsx:14:11)
+
+  console.log
+    ✅ [MainNavigator] Routing to CONSUMER Navigator (default)
+
+      at log (src/navigation/MainNavigator.tsx:28:11)
+
+  console.log
+    🔍 [MainNavigator] User role: merchant
+
+      at log (src/navigation/MainNavigator.tsx:12:11)
+
+  console.log
+    🔍 [MainNavigator] User email: test@example.com
+
+      at log (src/navigation/MainNavigator.tsx:13:11)
+
+  console.log
+    🔍 [MainNavigator] Full user: {
+      "id": 1,
+      "first_name": "Test",
+      "last_name": "User",
+      "email": "test@example.com",
+      "role": "merchant",
+      "city": "Lomé",
+      "created_at": "2025-01-01",
+      "updated_at": "2025-01-01"
+    }
+
+      at log (src/navigation/MainNavigator.tsx:14:11)
+
+  console.log
+    ✅ [MainNavigator] Routing to MERCHANT Navigator
+
+      at log (src/navigation/MainNavigator.tsx:18:13)
+
+  console.log
+    🔍 [MainNavigator] User role: admin
+
+      at log (src/navigation/MainNavigator.tsx:12:11)
+
+  console.log
+    🔍 [MainNavigator] User email: test@example.com
+
+      at log (src/navigation/MainNavigator.tsx:13:11)
+
+  console.log
+    🔍 [MainNavigator] Full user: {
+      "id": 1,
+      "first_name": "Test",
+      "last_name": "User",
+      "email": "test@example.com",
+      "role": "admin",
+      "city": "Lomé",
+      "created_at": "2025-01-01",
+      "updated_at": "2025-01-01"
+    }
+
+      at log (src/navigation/MainNavigator.tsx:14:11)
+
+  console.log
+    ✅ [MainNavigator] Routing to ADMIN Navigator
+
+      at log (src/navigation/MainNavigator.tsx:23:13)
+
+  console.log
+    🔍 [MainNavigator] User role: undefined
+
+      at log (src/navigation/MainNavigator.tsx:12:11)
+
+  console.log
+    🔍 [MainNavigator] User email: undefined
+
+      at log (src/navigation/MainNavigator.tsx:13:11)
+
+  console.log
+    🔍 [MainNavigator] Full user: null
+
+      at log (src/navigation/MainNavigator.tsx:14:11)
+
+  console.log
+    ✅ [MainNavigator] Routing to CONSUMER Navigator (default)
+
+      at log (src/navigation/MainNavigator.tsx:28:11)
+
