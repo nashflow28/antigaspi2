@@ -212,7 +212,7 @@
               </div>
 
               <!-- Actions -->
-              <div class="flex gap-2">
+              <div class="flex flex-wrap gap-2 mt-4">
                 <Button
                   variant="ghost"
                   size="sm"
@@ -230,6 +230,24 @@
                   @click="handleEdit(basket)"
                 >
                   Modifier
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  class="flex-1 text-blue-600"
+                  :left-icon="basket.is_active ? EyeOffIcon : EyeIcon"
+                  @click="handleToggleStatus(basket)"
+                >
+                  {{ basket.is_active ? 'Désactiver' : 'Activer' }}
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  class="flex-1 text-red-600"
+                  :left-icon="Trash2Icon"
+                  @click="handleDelete(basket)"
+                >
+                  Supprimer
                 </Button>
               </div>
             </div>
@@ -268,9 +286,8 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
-import { merchantService } from '@/services/merchantService'
 import { formatPrice } from '@/utils/currency'
-import type { SurpriseBasket } from '@/types'
+import type { SurpriseBasket } from '@/services/surpriseBasketService'
 import DashboardLayout from '@/components/ui/DashboardLayout.vue'
 import { useDashboardLayout } from '@/composables/useDashboardLayout'
 import Button from '@/components/ui/2025/Button.vue'
@@ -285,23 +302,33 @@ import {
   DollarSignIcon,
   LayersIcon,
   EyeIcon,
+  EyeOffIcon,
   PencilIcon,
-  AlertTriangleIcon
+  AlertTriangleIcon,
+  Trash2Icon
 } from 'lucide-vue-next'
 import CreateSurpriseBasket from '@/components/merchant/CreateSurpriseBasket.vue'
 import EditSurpriseBasket from '@/components/merchant/EditSurpriseBasket.vue'
 import SurpriseBasketDetail from '@/components/merchant/SurpriseBasketDetail.vue'
+import { useSurpriseBaskets } from '@/composables/useSurpriseBaskets'
 
 type ViewType = 'list' | 'create' | 'edit' | 'detail'
 
 // État
 const currentView = ref<ViewType>('list')
-const baskets = ref<SurpriseBasket[]>([])
 const editingBasket = ref<SurpriseBasket | null>(null)
 const selectedBasket = ref<SurpriseBasket | null>(null)
-const loading = ref(false)
 const error = ref('')
 const { sidebar, header } = useDashboardLayout('merchant')
+const {
+  merchantBaskets,
+  loading,
+  loadMerchantBaskets,
+  updateBasket,
+  deleteBasket
+} = useSurpriseBaskets()
+
+const baskets = computed(() => merchantBaskets.value)
 
 // Calculés
 const activeBaskets = computed(() => baskets.value.filter(basket => basket.is_active))
@@ -318,23 +345,10 @@ const totalRevenue = computed(() =>
 
 // Méthodes
 const loadBaskets = async () => {
-  try {
-    loading.value = true
-    error.value = ''
-
-    const response = await merchantService.getSurpriseBaskets()
-
-    if (!response.success) {
-      throw new Error(response.message || 'Erreur lors du chargement des paniers surprise')
-    }
-
-    baskets.value = response.data.baskets
-
-  } catch (err: any) {
-    error.value = err.message
-    // console.error('Erreur lors du chargement des paniers surprise:', err)
-  } finally {
-    loading.value = false
+  error.value = ''
+  const success = await loadMerchantBaskets()
+  if (!success) {
+    error.value = 'Impossible de charger vos paniers surprise. Veuillez réessayer.'
   }
 }
 
@@ -364,6 +378,32 @@ const handleBasketUpdated = () => {
   currentView.value = 'list'
   editingBasket.value = null
   loadBaskets() // Recharger la liste
+}
+
+const handleToggleStatus = async (basket: SurpriseBasket) => {
+  const updated = await updateBasket(basket.id, { is_active: !basket.is_active })
+  if (updated && selectedBasket.value?.id === basket.id) {
+    selectedBasket.value = updated
+  }
+}
+
+const handleDelete = async (basket: SurpriseBasket) => {
+  const confirmed = window.confirm(`Êtes-vous sûr de vouloir supprimer le panier "${basket.name}" ?`)
+  if (!confirmed) {
+    return
+  }
+
+  const deleted = await deleteBasket(basket.id)
+  if (deleted) {
+    if (selectedBasket.value?.id === basket.id) {
+      selectedBasket.value = null
+      currentView.value = 'list'
+    }
+
+    if (editingBasket.value?.id === basket.id) {
+      editingBasket.value = null
+    }
+  }
 }
 
 // Initialisation
