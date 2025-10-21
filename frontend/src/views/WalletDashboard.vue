@@ -2,342 +2,368 @@
   <DashboardLayout
     :sidebar="sidebar"
     :header="header"
-    class="bg-gradient-to-br from-gray-50 to-blue-50"
+    class="bg-gradient-to-br from-slate-50 via-sky-50/40 to-blue-50"
   >
-    <!-- Page Header -->
-    <div class="bg-white/60 backdrop-blur-md glass-border border-b backdrop-blur-lg sticky top-20 z-40">
+    <header class="sticky top-20 z-40 border-b border-white/60 bg-white/80 backdrop-blur-xl">
       <div class="container px-3 py-4">
-        <div class="flex items-center justify-start sm:justify-between animate-fade-in-up">
-          <div class="flex items-center gap-3">
-            <Button
-              variant="ghost"
-              size="sm"
-              class="p-2"
-              @click="$router.go(-1)"
-            >
-              <ArrowLeft class="h-6 w-6" />
-            </Button>
-            <div>
-              <h1 class="text-xl lg:text-3xl font-semibold text-gray-900 mt-2">
-                {{ pageTitle }}
-              </h1>
-              <p class="text-lg text-gray-700">
-                {{ pageSubtitle }}
-              </p>
-            </div>
+        <div class="flex items-center gap-3">
+          <Button
+            variant="ghost"
+            size="sm"
+            class="p-2"
+            @click="$router.go(-1)"
+          >
+            <ArrowLeft class="h-6 w-6" />
+          </Button>
+          <div class="space-y-1">
+            <h1 class="text-xl font-semibold text-slate-900 lg:text-3xl">
+              {{ pageTitle }}
+            </h1>
+            <p class="text-base text-slate-600 lg:text-lg">
+              {{ pageSubtitle }}
+            </p>
           </div>
         </div>
       </div>
-    </div>
+    </header>
 
     <div class="container px-3 py-6">
-      <div class="max-w-full sm:max-w-6xl mx-auto space-y-6">
-        <!-- Wallet Card -->
-        <div class="animate-fade-in-up">
-          <WalletCard
-            :wallet="walletStore.wallet"
-            :loading="walletStore.loading"
-            @recharge="showRechargeModal = true"
-            @settings="showSettingsModal = true"
-          />
-        </div>
+      <div class="mx-auto max-w-6xl space-y-6">
+        <WalletCard
+          :wallet="wallet"
+          :loading="loading"
+          @recharge="showRechargeModal = true"
+          @settings="showSettingsModal = true"
+        />
 
-        <!-- Quick Actions -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 animate-fade-in-up" style="animation-delay: 0.1s;">
+        <section class="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
           <Button
             variant="outline"
-            class="p-4 h-auto flex-col justify-start"
+            class="h-auto items-start gap-3 rounded-2xl border-blue-200/60 bg-white/90 p-4 text-left shadow-sm transition hover:border-blue-300 hover:bg-white"
             @click="showRechargeModal = true"
           >
-            <div class="w-12 h-10 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:transition-colors">
-              <Plus class="h-6 w-6 text-green-600" />
-            </div>
-            <div class="font-medium text-gray-900">
-              {{ isMerchant ? 'Encaisser un paiement' : 'Recharger' }}
-            </div>
-            <div class="text-sm text-gray-500">
-              {{ isMerchant ? 'Initier un encaissement Mobile Money ou Paystack' : 'Ajouter des fonds' }}
-            </div>
+            <span class="flex h-12 w-12 items-center justify-center rounded-full bg-emerald-100">
+              <Plus class="h-6 w-6 text-emerald-600" />
+            </span>
+            <span class="flex-1 space-y-1">
+              <span class="block text-base font-semibold text-slate-900">
+                {{ isMerchant ? 'Encaisser un paiement' : 'Recharger' }}
+              </span>
+              <span class="block text-sm text-slate-500">
+                {{ isMerchant ? 'Initier un encaissement Mobile Money ou Paystack' : 'Ajouter des fonds instantanément' }}
+              </span>
+            </span>
           </Button>
 
           <Button
             variant="outline"
-            class="p-4 h-auto flex-col justify-start"
+            class="h-auto items-start gap-3 rounded-2xl border-blue-200/60 bg-white/90 p-4 text-left shadow-sm transition hover:border-blue-300 hover:bg-white"
             @click="showTransferModal = true"
           >
-            <div class="w-12 h-10 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:transition-colors">
-              <ArrowUpRight class="h-6 w-6 text-info" />
-            </div>
-            <div class="font-medium text-gray-900">Transférer</div>
-            <div class="text-sm text-gray-500">Vers un autre utilisateur</div>
+            <span class="flex h-12 w-12 items-center justify-center rounded-full bg-blue-100">
+              <ArrowUpRight class="h-6 w-6 text-blue-600" />
+            </span>
+            <span class="flex-1 space-y-1">
+              <span class="block text-base font-semibold text-slate-900">Transférer</span>
+              <span class="block text-sm text-slate-500">Envoyer des fonds à un autre utilisateur</span>
+            </span>
           </Button>
 
           <Button
             variant="outline"
-            class="p-4 h-auto flex-col justify-start"
+            class="h-auto items-start gap-3 rounded-2xl border-blue-200/60 bg-white/90 p-4 text-left shadow-sm transition hover:border-blue-300 hover:bg-white"
             @click="showSettingsModal = true"
           >
-            <div class="w-12 h-10 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:transition-colors">
-              <Settings class="h-6 w-6 text-purple-600" />
-            </div>
-            <div class="font-medium text-gray-900">Paramètres</div>
-            <div class="text-sm text-gray-500">PIN et limites</div>
+            <span class="flex h-12 w-12 items-center justify-center rounded-full bg-indigo-100">
+              <Settings class="h-6 w-6 text-indigo-600" />
+            </span>
+            <span class="flex-1 space-y-1">
+              <span class="block text-base font-semibold text-slate-900">Paramètres</span>
+              <span class="block text-sm text-slate-500">Gestion du PIN et des limites</span>
+            </span>
           </Button>
 
           <Button
             variant="outline"
-            class="p-4 h-auto flex-col justify-start"
+            class="h-auto items-start gap-3 rounded-2xl border-blue-200/60 bg-white/90 p-4 text-left shadow-sm transition hover:border-blue-300 hover:bg-white"
             @click="showStatsModal = true"
           >
-            <div class="w-12 h-10 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:transition-colors">
-              <BarChart3 class="h-6 w-6 text-blue-600" />
-            </div>
-            <div class="font-medium text-gray-900">Statistiques</div>
-            <div class="text-sm text-gray-500">Analyse des dépenses</div>
+            <span class="flex h-12 w-12 items-center justify-center rounded-full bg-amber-100">
+              <BarChart3 class="h-6 w-6 text-amber-600" />
+            </span>
+            <span class="flex-1 space-y-1">
+              <span class="block text-base font-semibold text-slate-900">Statistiques</span>
+              <span class="block text-sm text-slate-500">Analyse détaillée des mouvements</span>
+            </span>
           </Button>
-        </div>
+        </section>
 
-        <!-- Main Content Grid -->
-        <div class="grid lg:grid-cols-3 gapadding-xl sm:gap-8">
-          <!-- Transactions -->
-          <div class="lg:col-span-2 animate-fade-in-up" style="animation-delay: 0.2s;">
-            <WalletTransactions
-              ref="transactionsComponent"
-              :initial-transactions="transactions"
-              :initial-pagination="transactionsPagination"
-              @load-transactions="handleLoadTransactions"
-            />
-          </div>
+        <section class="grid gap-6 lg:grid-cols-[2fr,1fr]">
+          <WalletTransactions
+            ref="transactionsComponent"
+            :initial-transactions="transactions"
+            :initial-pagination="transactionsPagination"
+            @load-transactions="handleLoadTransactions"
+          />
 
-          <!-- Sidebar -->
-          <div class="space-y-4">
-            <!-- Stats Overview -->
-            <Card class="animate-fade-in-up" style="animation-delay: 0.3s;">
-              <h3 class="text-lg font-semibold text-gray-900 mt-3">Aperçu mensuel</h3>
-              <div v-if="walletStore.stats" class="space-y-4">
-                <div class="flex items-center justify-start sm:justify-between p-3 bg-green-50 rounded">
-                  <div class="flex items-center gap-2">
-                    <ArrowUp class="h-4 w-4 text-green-600" />
-                    <span class="text-sm font-medium text-green-800">Crédits</span>
+          <aside class="space-y-4">
+            <Card class="space-y-4">
+              <header class="flex items-center justify-between">
+                <h3 class="text-lg font-semibold text-slate-900">Aperçu du mois</h3>
+              </header>
+              <div v-if="stats" class="space-y-3">
+                <div class="flex items-center justify-between rounded-xl bg-emerald-50 px-3 py-2">
+                  <div class="flex items-center gap-2 text-emerald-700">
+                    <ArrowUp class="h-4 w-4" />
+                    <span class="text-sm font-medium">Crédits</span>
                   </div>
-                  <span class="font-semibold text-green-600">
-                    {{ formatAmount(walletStore.stats.period_stats.total_credits) }} XOF
+                  <span class="text-sm font-semibold text-emerald-700">
+                    {{ formatAmount(stats.period_stats.total_credits) }} XOF
                   </span>
                 </div>
-                <div class="flex items-center justify-start sm:justify-between p-3 bg-red-50 rounded">
-                  <div class="flex items-center gap-2">
-                    <ArrowDown class="h-4 w-4 text-red-600" />
-                    <span class="text-sm font-medium text-red-800">Débits</span>
+                <div class="flex items-center justify-between rounded-xl bg-rose-50 px-3 py-2">
+                  <div class="flex items-center gap-2 text-rose-700">
+                    <ArrowDown class="h-4 w-4" />
+                    <span class="text-sm font-medium">Débits</span>
                   </div>
-                  <span class="font-semibold text-red-600">
-                    {{ formatAmount(walletStore.stats.period_stats.total_debits) }} XOF
+                  <span class="text-sm font-semibold text-rose-700">
+                    {{ formatAmount(stats.period_stats.total_debits) }} XOF
                   </span>
                 </div>
-                <div class="flex items-center justify-start sm:justify-between p-3 bg-gray-50 rounded">
-                  <div class="flex items-center gap-2">
-                    <Activity class="h-4 w-4 text-gray-700" />
-                    <span class="text-sm font-medium text-gray-800">Transactions</span>
+                <div class="flex items-center justify-between rounded-xl bg-slate-100 px-3 py-2">
+                  <div class="flex items-center gap-2 text-slate-700">
+                    <Activity class="h-4 w-4" />
+                    <span class="text-sm font-medium">Transactions</span>
                   </div>
-                  <span class="font-semibold text-gray-700">
-                    {{ walletStore.stats.period_stats.transaction_count }}
+                  <span class="text-sm font-semibold text-slate-700">
+                    {{ stats.period_stats.transaction_count }}
                   </span>
                 </div>
               </div>
-              <div v-else class="text-left sm:text-center py-4">
-                <div class="animate-pulse">
-                  <div class="h-4 bg-gray-200 rounded w-3/4 mx-auto mt-2" />
-                  <div class="h-4 bg-gray-200 rounded w-1/2 mx-auto" />
-                </div>
+              <div v-else class="space-y-2">
+                <div class="h-3 w-1/2 animate-pulse rounded-full bg-slate-200" />
+                <div class="h-3 w-2/3 animate-pulse rounded-full bg-slate-200" />
+                <div class="h-3 w-1/3 animate-pulse rounded-full bg-slate-200" />
               </div>
             </Card>
 
-            <!-- Daily Limit -->
-            <Card class="animate-fade-in-up" style="animation-delay: 0.4s;">
-              <h3 class="text-lg font-semibold text-gray-900 mt-3">Limite quotidienne</h3>
-              <div v-if="walletStore.wallet" class="space-y-2">
-                <div class="flex justify-start sm:justify-between text-sm">
-                  <span class="text-gray-700">Utilisée aujourd'hui</span>
-                  <span class="font-medium">{{ formatAmount(walletStore.dailySpent) }} XOF</span>
+            <Card class="space-y-4">
+              <header class="flex items-center justify-between">
+                <h3 class="text-lg font-semibold text-slate-900">Limite quotidienne</h3>
+                <span
+                  v-if="wallet"
+                  class="rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-600"
+                >
+                  {{ formatAmount(wallet.daily_limit) }} XOF
+                </span>
+              </header>
+
+              <div v-if="wallet" class="space-y-3">
+                <div class="flex items-center justify-between text-sm text-slate-600">
+                  <span>Utilisé aujourd'hui</span>
+                  <span class="font-semibold text-slate-900">
+                    {{ formatAmount(dailySpent) }} XOF
+                  </span>
                 </div>
-                <div class="w-full bg-gray-200 rounded-full h-3">
+                <div class="h-3 w-full overflow-hidden rounded-full bg-slate-200">
                   <div
-                    class="bg-gradient-to-r from-blue-500 to-blue-600 h-3 rounded-full transition-all duration-300"
-                    :style="{ width: Math.min(walletStore.dailyLimitUsagePercentage, 100) + '%' }"
+                    class="h-full rounded-full bg-gradient-to-r from-blue-500 to-indigo-500 transition-all duration-300"
+                    :style="{ width: Math.min(Math.round(dailyLimitUsagePercentage), 100) + '%' }"
                   />
                 </div>
-                <div class="flex justify-start sm:justify-between text-sm">
-                  <span class="text-gray-700">Limite</span>
-                  <span class="font-medium">{{ formatAmount(walletStore.dailyLimit) }} XOF</span>
+                <div class="flex items-start justify-between text-sm text-slate-500">
+                  <span>Restant</span>
+                  <span class="font-semibold text-slate-900">
+                    {{ formatAmount(remainingDailyLimit) }} XOF
+                  </span>
                 </div>
               </div>
+              <p v-else class="text-sm text-slate-500">
+                Les limites apparaîtront dès que le portefeuille sera initialisé.
+              </p>
             </Card>
 
-            <!-- Security -->
-            <Card class="bg-gradient-to-br from-blue-50 to-indigo-50 border-blue-200 animate-fade-in-up" style="animation-delay: 0.5s;">
-              <div class="flex items-center gapadding-md mt-3">
-                <div class="h-6 w-6 bg-blue-500 rounded-full flex items-center justify-center">
-                  <Shield class="h-4 w-4 text-white" />
-                </div>
-                <h3 class="text-lg font-semibold text-gray-800">Sécurité</h3>
-              </div>
-              <div class="space-y-4 text-sm">
-                <div class="flex items-center justify-start sm:justify-between">
-                  <span class="text-secondary-700">Code PIN</span>
-                  <span class="font-medium text-gray-800">
-                    {{ walletStore.hasPin ? '✓ Configuré' : '⚠ Non configuré' }}
+            <Card class="space-y-4 bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
+              <header class="flex items-center gap-3">
+                <span class="flex h-9 w-9 items-center justify-center rounded-full bg-blue-600 text-white">
+                  <Shield class="h-4 w-4" />
+                </span>
+                <h3 class="text-lg font-semibold text-slate-900">Sécurité</h3>
+              </header>
+              <div class="space-y-3 text-sm">
+                <div class="flex items-center justify-between">
+                  <span class="text-slate-600">Code PIN</span>
+                  <span class="font-medium text-slate-900">
+                    {{ hasPin ? '✓ Configuré' : '⚠ À configurer' }}
                   </span>
                 </div>
-                <div class="flex items-center justify-start sm:justify-between">
-                  <span class="text-secondary-700">Statut</span>
-                  <span class="font-medium text-gray-800">
-                    {{ walletStore.isActive ? '✓ Actif' : '⚠ Inactif' }}
+                <div class="flex items-center justify-between">
+                  <span class="text-slate-600">Statut</span>
+                  <span class="font-medium text-slate-900">
+                    {{ isActive ? '✓ Actif' : '⚠ Inactif' }}
                   </span>
                 </div>
+                <Button
+                  variant="primary"
+                  size="sm"
+                  class="w-full justify-center"
+                  @click="showPinSetupModal = true"
+                >
+                  {{ hasPin ? 'Mettre à jour le PIN' : 'Configurer mon PIN' }}
+                </Button>
               </div>
-              <button
-                v-if="!walletStore.hasPin"
-                class="w-full mt-4 px-3 py-3 bg-blue-600 text-white rounded hover:transition-colors text-sm font-medium"
-                @click="showPinSetupModal = true"
-              >
-                Configurer un PIN
-              </Button>
             </Card>
-          </div>
-        </div>
+          </aside>
+        </section>
       </div>
     </div>
 
-    <!-- Modals -->
     <WalletRecharge
       v-if="showRechargeModal"
-      :loading="walletStore.loading"
+      :loading="loading"
       @close="showRechargeModal = false"
       @recharge="handleRecharge"
     />
 
     <WalletPinSetup
       v-if="showPinSetupModal"
-      :has-pin="walletStore.hasPin"
-      :loading="walletStore.loading"
+      :has-pin="hasPin"
+      :loading="loading"
       @close="showPinSetupModal = false"
       @submit="handlePinSetup"
     />
 
-    <!-- Simplified Transfer Modal (basic implementation) -->
-    <div v-if="showTransferModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-      <div class="bg-white rounded p-6 w-full max-w-xl">
-        <div class="flex items-center justify-start sm:justify-between mt-4">
-          <h3 class="text-xl font-semibold text-gray-900">Transfert (Bientôt disponible)</h3>
-          <button
-            class="text-gray-400 hover:text-gray-700"
-            @click="showTransferModal = false"
-          >
-            <X class="h-6 w-6" />
+    <div
+      v-if="showTransferModal"
+      class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 p-4"
+    >
+      <div class="w-full max-w-xl space-y-4 rounded-2xl bg-white p-6 shadow-2xl">
+        <header class="flex items-center justify-between">
+          <h3 class="text-xl font-semibold text-slate-900">Transfert (bientôt disponible)</h3>
+          <Button variant="ghost" size="icon" @click="showTransferModal = false">
+            <X class="h-5 w-5" />
           </Button>
-        </div>
-        <p class="text-gray-700 mt-3">
-          La fonctionnalité de transfert entre utilisateurs sera disponible dans une prochaine mise à jour.
+        </header>
+        <p class="text-sm text-slate-600">
+          L'envoi de fonds vers un autre portefeuille sera activé très prochainement.
+          Restez connecté pour découvrir la version bêta.
         </p>
-        <button
-          class="w-full px-3 py-3 bg-blue-600 text-white rounded hover:transition-colors"
-          @click="showTransferModal = false"
-        >
+        <Button class="w-full justify-center" @click="showTransferModal = false">
           Compris
-        </button>
+        </Button>
       </div>
     </div>
 
-    <!-- Settings Modal -->
-    <div v-if="showSettingsModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-      <div class="bg-white rounded p-6 w-full max-w-xl">
-        <div class="flex items-center justify-start sm:justify-between mt-4">
-          <h3 class="text-xl font-semibold text-gray-900">Paramètres du portefeuille</h3>
-          <button
-            class="text-gray-400 hover:text-gray-700"
-            @click="showSettingsModal = false"
-          >
-            <X class="h-6 w-6" />
+    <div
+      v-if="showSettingsModal"
+      class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 p-4"
+    >
+      <div class="w-full max-w-xl space-y-5 rounded-2xl bg-white p-6 shadow-2xl">
+        <header class="flex items-center justify-between">
+          <h3 class="text-xl font-semibold text-slate-900">Paramètres du portefeuille</h3>
+          <Button variant="ghost" size="icon" @click="showSettingsModal = false">
+            <X class="h-5 w-5" />
           </Button>
-        </div>
-        <div class="space-y-4">
-          <button
-            class="w-full flex items-center justify-start sm:justify-between p-4 border border-gray-200 rounded hover:transition-colors"
-            @click="() => { showSettingsModal = false; showPinSetupModal = true }"
-          >
-            <div class="flex items-center gapadding-md">
-              <Key class="h-4 w-4 text-gray-700" />
-              <span class="font-medium">{{ walletStore.hasPin ? 'Modifier le PIN' : 'Configurer un PIN' }}</span>
-            </div>
-            <ChevronRight class="h-4 w-4 text-gray-400" />
-          </Button>
+        </header>
 
-          <div class="p-4 border border-gray-200 rounded">
-            <div class="flex items-center justify-start sm:justify-between mt-2">
-              <span class="font-medium">Activer/Désactiver le portefeuille</span>
-              <button
-                :disabled="walletStore.loading"
-                class="relative inline-flex h-10 w-80 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-                :class="walletStore.isActive ? 'bg-blue-600' : 'bg-gray-200'"
-                @click="toggleWalletStatus"
-              >
-                <span
-                  class="inline-block h-4 w-4 transform rounded-full bg-white transition-transform"
-                  :class="walletStore.isActive ? 'translate-x-6' : 'translate-x-1'"
-                />
-              </Button>
-            </div>
-            <p class="text-sm text-gray-500">
-              {{ walletStore.isActive ? 'Portefeuille activé' : 'Portefeuille désactivé' }}
-            </p>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Stats Modal -->
-    <div v-if="showStatsModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-      <div class="bg-white rounded p-6 w-full max-w-xl">
-        <div class="flex items-center justify-start sm:justify-between mt-4">
-          <h3 class="text-xl font-semibold text-gray-900">Statistiques détaillées</h3>
-          <button
-            class="text-gray-400 hover:text-gray-700"
-            @click="showStatsModal = false"
-          >
-            <X class="h-6 w-6" />
-          </Button>
-        </div>
-        <p class="text-gray-700 mt-3">
-          Les statistiques détaillées avec graphiques seront disponibles dans une prochaine version.
-        </p>
-        <button
-          class="w-full px-3 py-3 bg-blue-600 text-white rounded hover:transition-colors"
-          @click="showStatsModal = false"
+        <Button
+          variant="outline"
+          class="h-auto items-center justify-between gap-3 rounded-xl border-slate-200 p-4 text-left"
+          @click="() => { showSettingsModal = false; showPinSetupModal = true }"
         >
+          <span class="flex items-center gap-3 text-slate-800">
+            <span class="flex h-10 w-10 items-center justify-center rounded-full bg-slate-100">
+              <Key class="h-4 w-4" />
+            </span>
+            <span class="text-base font-medium">
+              {{ hasPin ? 'Modifier mon code PIN' : 'Configurer un code PIN' }}
+            </span>
+          </span>
+          <ChevronRight class="h-4 w-4 text-slate-400" />
+        </Button>
+
+        <div class="space-y-2 rounded-xl border border-slate-200 p-4">
+          <div class="flex items-center justify-between text-sm">
+            <span class="font-medium text-slate-700">Activer le portefeuille</span>
+            <button
+              :disabled="loading"
+              class="relative inline-flex h-6 w-12 items-center rounded-full transition-colors"
+              :class="isActive ? 'bg-blue-600' : 'bg-slate-300'"
+              @click="toggleWalletStatus"
+            >
+              <span
+                class="inline-block h-5 w-5 transform rounded-full bg-white shadow transition-transform"
+                :class="isActive ? 'translate-x-6' : 'translate-x-1'"
+              />
+            </button>
+          </div>
+          <p class="text-sm text-slate-500">
+            {{ isActive ? 'Votre portefeuille est actif et prêt à recevoir des paiements.' : 'Activez le portefeuille pour encaisser et payer avec votre solde.' }}
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div
+      v-if="showStatsModal"
+      class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 p-4"
+    >
+      <div class="w-full max-w-xl space-y-4 rounded-2xl bg-white p-6 shadow-2xl">
+        <header class="flex items-center justify-between">
+          <h3 class="text-xl font-semibold text-slate-900">Statistiques détaillées</h3>
+          <Button variant="ghost" size="icon" @click="showStatsModal = false">
+            <X class="h-5 w-5" />
+          </Button>
+        </header>
+        <p class="text-sm text-slate-600">
+          Les graphiques d'analyse arriveront dans une prochaine itération. Vous pourrez suivre vos catégories de dépenses, vos habitudes de recharge et vos encaissements marchands.
+        </p>
+        <Button class="w-full justify-center" @click="showStatsModal = false">
           Fermer
-        </button>
+        </Button>
       </div>
     </div>
   </DashboardLayout>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, computed } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
+import { storeToRefs } from 'pinia'
 import { useRoute } from 'vue-router'
-import { useWalletStore } from '@/stores/wallet'
-import { useAuthStore } from '@/stores/auth'
-import { notify } from '@/composables/useNotifications'
-import WalletCard from '@/components/wallet/WalletCard.vue'
-import WalletRecharge from '@/components/wallet/WalletRecharge.vue'
-import WalletTransactions from '@/components/wallet/WalletTransactions.vue'
-import WalletPinSetup from '@/components/wallet/WalletPinSetup.vue'
 import {
-  ArrowLeft, Plus, ArrowUpRight, Settings, BarChart3, ArrowUp, ArrowDown,
-  Activity, Shield, X, Key, ChevronRight
+  ArrowDown,
+  ArrowLeft,
+  ArrowUp,
+  ArrowUpRight,
+  Activity,
+  BarChart3,
+  ChevronRight,
+  Key,
+  Plus,
+  Settings,
+  Shield,
+  X
 } from 'lucide-vue-next'
 import DashboardLayout from '@/components/ui/DashboardLayout.vue'
-import Card from '@/components/ui/2025/Card.vue'
 import Button from '@/components/ui/2025/Button.vue'
+import Card from '@/components/ui/2025/Card.vue'
+import WalletCard from '@/components/wallet/WalletCard.vue'
+import WalletPinSetup from '@/components/wallet/WalletPinSetup.vue'
+import WalletRecharge from '@/components/wallet/WalletRecharge.vue'
+import WalletTransactions from '@/components/wallet/WalletTransactions.vue'
 import { useDashboardLayout } from '@/composables/useDashboardLayout'
+import { notify } from '@/composables/useNotifications'
+import { useAuthStore } from '@/stores/auth'
+import { useWalletStore } from '@/stores/wallet'
+
+interface Pagination {
+  current_page: number
+  last_page: number
+  per_page: number
+  total: number
+  from: number
+  to: number
+}
 
 const route = useRoute()
 const authStore = useAuthStore()
@@ -350,10 +376,10 @@ const layoutRole: 'consumer' | 'merchant' = ((route.meta.roles as string[] | und
 
 const { sidebar, header } = useDashboardLayout(layoutRole)
 const isMerchant = computed(() => layoutRole === 'merchant')
-const pageTitle = computed(() => isMerchant.value ? 'Paiements & Portefeuille' : 'Portefeuille électronique 💳')
-const pageSubtitle = computed(() => isMerchant.value
+const pageTitle = computed(() => (isMerchant.value ? 'Paiements & Portefeuille' : 'Portefeuille électronique 💳'))
+const pageSubtitle = computed(() => (isMerchant.value
   ? 'Encaissez vos paiements Mobile Money, Paystack et gérez votre solde commerçant.'
-  : 'Gérez votre portefeuille et vos transactions')
+  : 'Gérez votre solde, vos limites et vos transactions quotidiennes.'))
 
 const showRechargeModal = ref(false)
 const showTransferModal = ref(false)
@@ -361,9 +387,23 @@ const showSettingsModal = ref(false)
 const showStatsModal = ref(false)
 const showPinSetupModal = ref(false)
 
-const transactions = ref<any[]>([])
-const transactionsPagination = ref<Pagination | undefined>(undefined)
-const transactionsComponent = ref(null)
+const transactions = ref(storeTransactions.value)
+const transactionsPagination = ref<Pagination | undefined>(storeTransactionsPagination.value || undefined)
+const transactionsComponent = ref<InstanceType<typeof WalletTransactions> | null>(null)
+
+const {
+  wallet,
+  stats,
+  loading,
+  hasPin,
+  isActive,
+  dailyLimitUsagePercentage,
+  remainingDailyLimit,
+  dailySpent,
+  transactions: storeTransactions,
+  transactionsPagination: storeTransactionsPagination,
+  transactionsLoading
+} = storeToRefs(walletStore)
 
 const formatAmount = (amount: number): string => {
   return new Intl.NumberFormat('fr-FR', {
@@ -372,66 +412,78 @@ const formatAmount = (amount: number): string => {
   }).format(amount)
 }
 
-const handleRecharge = async (data: any) => {
+const handleRecharge = async (data: { amount: number; payment_method: string; phone?: string }) => {
   const success = await walletStore.rechargeWallet(data.amount, data.payment_method, data.phone)
 
   if (success) {
-    notify.success('Demande de recharge initiée', 'Vous serez redirigé vers le provider de paiement')
+    notify.success('Demande de recharge initiée', 'Vous serez redirigé vers le provider de paiement.')
     showRechargeModal.value = false
   } else {
-    notify.error(walletStore.error || 'Erreur lors de la recharge')
+    notify.error(walletStore.error || 'Erreur lors de la recharge du portefeuille.')
   }
 }
 
-const handlePinSetup = async (data: any) => {
-  let success = false
-
-  if (data.currentPin) {
-    success = await walletStore.changePin(data.currentPin, data.newPin)
-  } else {
-    success = await walletStore.setPin(data.newPin)
-  }
+const handlePinSetup = async (data: { currentPin?: string; newPin: string }) => {
+  const { currentPin, newPin } = data
+  const success = currentPin
+    ? await walletStore.changePin(currentPin, newPin)
+    : await walletStore.setPin(newPin)
 
   if (success) {
-    notify.success('Code PIN configuré avec succès')
+    notify.success('Code PIN mis à jour avec succès.')
     showPinSetupModal.value = false
   } else {
-    notify.error(walletStore.error || 'Erreur lors de la configuration du PIN')
+    notify.error(walletStore.error || 'Impossible de configurer le code PIN pour le moment.')
   }
 }
 
 const toggleWalletStatus = async () => {
-  const newStatus = !walletStore.isActive
-  const success = await walletStore.toggleWalletStatus(newStatus)
+  const nextStatus = !isActive.value
+  const success = await walletStore.toggleWalletStatus(nextStatus)
 
   if (success) {
-    notify.success(newStatus ? 'Portefeuille activé' : 'Portefeuille désactivé')
+    notify.success(nextStatus ? 'Portefeuille activé' : 'Portefeuille désactivé')
   } else {
-    notify.error(walletStore.error || 'Erreur lors de la modification du statut')
+    notify.error(walletStore.error || 'Erreur lors de la mise à jour du statut du portefeuille.')
   }
 }
 
-const handleLoadTransactions = async (filters: any, page?: number) => {
+const handleLoadTransactions = async (filters: Record<string, unknown>, page?: number) => {
+  transactionsComponent.value?.setLoading(true)
   await walletStore.fetchTransactions(filters, page)
-
-  if (transactionsComponent.value) {
-    (transactionsComponent.value as any).updateTransactions(
-      walletStore.transactions,
-      walletStore.transactionsPagination
-    )
-  }
+  transactionsComponent.value?.updateTransactions(walletStore.transactions, walletStore.transactionsPagination || undefined)
 }
+
+watch(
+  storeTransactions,
+  (newTransactions) => {
+    transactions.value = newTransactions
+    transactionsComponent.value?.updateTransactions(newTransactions, storeTransactionsPagination.value || undefined)
+  },
+  { immediate: true }
+)
+
+watch(
+  storeTransactionsPagination,
+  (newPagination) => {
+    transactionsPagination.value = newPagination || undefined
+  },
+  { immediate: true }
+)
+
+watch(
+  transactionsLoading,
+  (isLoading) => {
+    if (transactionsComponent.value) {
+      transactionsComponent.value.setLoading(isLoading)
+    }
+  },
+  { immediate: true }
+)
 
 onMounted(async () => {
-  // Load wallet data
   await walletStore.fetchWallet()
-
-  // Load initial transactions
   await walletStore.fetchTransactions()
-  transactions.value = walletStore.transactions
-  transactionsPagination.value = walletStore.transactionsPagination
-
-  // Load stats
   await walletStore.fetchStats()
 })
 </script>

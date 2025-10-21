@@ -51,6 +51,13 @@ export const TEST_IDS = {
   cartClearButton: 'cart-clear-button',
   cartReservationsButton: 'cart-reservations-button',
 
+  // Wallet
+  walletScreen: 'wallet-screen',
+  walletBalanceCard: 'wallet-balance-card',
+  walletRechargeButton: 'wallet-recharge-button',
+  walletTransactionsList: 'wallet-transactions-list',
+  walletPinButton: 'wallet-pin-button',
+
   // Surprise Baskets
   surpriseBasketsScreen: 'surprise-baskets-screen',
   surpriseBasketsList: 'surprise-baskets-list',
@@ -120,6 +127,7 @@ export const TEST_IDS = {
   homeTab: 'home-tab',
   reservationsTab: 'reservations-tab',
   profileTab: 'profile-tab',
+  walletTab: 'wallet-tab',
   backButton: 'back-button',
 
   // ============ COMMON ============

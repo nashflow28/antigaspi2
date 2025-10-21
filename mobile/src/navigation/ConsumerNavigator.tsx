@@ -19,6 +19,8 @@ import ReviewsListScreen from '../screens/main/ReviewsListScreen'
 import AddReviewScreen from '../screens/main/AddReviewScreen'
 import NotificationSettingsScreen from '../screens/merchant/NotificationSettingsScreen'
 import CartScreen from '../screens/main/CartScreen'
+import WalletScreen from '../screens/main/WalletScreen'
+import { TEST_IDS } from '../utils/testIds'
 import LoyaltyScreen from '../screens/main/LoyaltyScreen'
 
 const Tab = createBottomTabNavigator()
@@ -72,6 +74,12 @@ const OrdersStack = () => (
   </Stack.Navigator>
 )
 
+const WalletStack = () => (
+  <Stack.Navigator screenOptions={{ headerShown: false }}>
+    <Stack.Screen name="WalletMain" component={WalletScreen} />
+  </Stack.Navigator>
+)
+
 const AccountStack = () => (
   <Stack.Navigator screenOptions={{ headerShown: false }}>
     <Stack.Screen name="AccountMain" component={ProfileScreen} />
@@ -104,6 +112,8 @@ const ConsumerNavigator: React.FC = () => {
             iconName = focused ? 'heart' : 'heart-outline'
           } else if (route.name === 'Orders') {
             iconName = focused ? 'cart' : 'cart-outline'
+          } else if (route.name === 'Wallet') {
+            iconName = focused ? 'wallet' : 'wallet-outline'
           } else if (route.name === 'Account') {
             iconName = focused ? 'person' : 'person-outline'
           } else {
@@ -143,6 +153,11 @@ const ConsumerNavigator: React.FC = () => {
         name="Orders"
         component={OrdersStack}
         options={{ title: 'Commande' }}
+      />
+      <Tab.Screen
+        name="Wallet"
+        component={WalletStack}
+        options={{ title: 'Portefeuille', tabBarTestID: TEST_IDS.walletTab }}
       />
       <Tab.Screen
         name="Account"
