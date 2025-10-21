@@ -73,27 +73,28 @@ jest.mock('./src/services/api', () => {
 })
 
 // Mock react-native-maps to avoid native dependency during tests
-jest.mock('react-native-maps', () => {
-  const React = require('react')
-  const { View } = require('react-native')
+// Temporarily disabled - package not installed
+// jest.mock('react-native-maps', () => {
+//   const React = require('react')
+//   const { View } = require('react-native')
 
-  const MockMapView = ({ children, testID = 'mock-map-view', ...props }) =>
-    React.createElement(View, { testID, ...props }, children)
+//   const MockMapView = ({ children, testID = 'mock-map-view', ...props }) =>
+//     React.createElement(View, { testID, ...props }, children)
 
-  const MockMarker = ({ children, testID = 'mock-map-marker', ...props }) =>
-    React.createElement(View, { testID, ...props }, children)
+//   const MockMarker = ({ children, testID = 'mock-map-marker', ...props }) =>
+//     React.createElement(View, { testID, ...props }, children)
 
-  const MockCallout = ({ children, testID = 'mock-map-callout', ...props }) =>
-    React.createElement(View, { testID, ...props }, children)
+//   const MockCallout = ({ children, testID = 'mock-map-callout', ...props }) =>
+//     React.createElement(View, { testID, ...props }, children)
 
-  return {
-    __esModule: true,
-    default: MockMapView,
-    Marker: MockMarker,
-    Callout: MockCallout,
-    PROVIDER_GOOGLE: 'google',
-  }
-})
+//   return {
+//     __esModule: true,
+//     default: MockMapView,
+//     Marker: MockMarker,
+//     Callout: MockCallout,
+//     PROVIDER_GOOGLE: 'google',
+//   }
+// })
 
 // Mock NetInfo to avoid native module errors during tests
 jest.mock('@react-native-community/netinfo', () => {
