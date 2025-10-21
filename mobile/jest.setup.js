@@ -71,3 +71,67 @@ jest.mock('./src/services/api', () => {
     API_BASE_URL: 'http://localhost:8000/api',
   }
 })
+
+// Mock react-native-maps to avoid native dependency during tests
+jest.mock('react-native-maps', () => {
+  const React = require('react')
+  const { View } = require('react-native')
+
+  const MockMapView = ({ children, testID = 'mock-map-view', ...props }) =>
+    React.createElement(View, { testID, ...props }, children)
+
+  const MockMarker = ({ children, testID = 'mock-map-marker', ...props }) =>
+    React.createElement(View, { testID, ...props }, children)
+
+  const MockCallout = ({ children, testID = 'mock-map-callout', ...props }) =>
+    React.createElement(View, { testID, ...props }, children)
+
+  return {
+    __esModule: true,
+    default: MockMapView,
+    Marker: MockMarker,
+    Callout: MockCallout,
+    PROVIDER_GOOGLE: 'google',
+  }
+})
+
+// Mock NetInfo to avoid native module errors during tests
+jest.mock('@react-native-community/netinfo', () => {
+  const mockState = {
+    type: 'wifi',
+    isConnected: true,
+    isInternetReachable: true,
+    details: null,
+  }
+
+  return {
+    __esModule: true,
+    default: {
+      addEventListener: jest.fn(() => jest.fn()),
+      fetch: jest.fn(() => Promise.resolve(mockState)),
+    },
+    addEventListener: jest.fn(() => jest.fn()),
+    fetch: jest.fn(() => Promise.resolve(mockState)),
+    useNetInfo: jest.fn(() => mockState),
+  }
+})
+
+// Default mock for location service (can be overridden in specific tests)
+jest.mock('./src/services/locationService', () => {
+  const mockService = {
+    hasLocationPermission: jest.fn(() => Promise.resolve(false)),
+    requestLocationPermission: jest.fn(() => Promise.resolve(false)),
+    getCurrentPosition: jest.fn(() => Promise.resolve(null)),
+    calculateDistance: jest.fn(() => ({ distance: 0, formatted: '0 km' })),
+    calculateDistanceFromUser: jest.fn(() => null),
+    isLocationEnabled: jest.fn(() => Promise.resolve(true)),
+    startWatchingPosition: jest.fn(() => Promise.resolve(false)),
+    stopWatchingPosition: jest.fn(),
+  }
+
+  return {
+    __esModule: true,
+    default: mockService,
+    locationService: mockService,
+  }
+})

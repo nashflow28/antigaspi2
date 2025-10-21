@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import {
   View,
   Text,
@@ -8,6 +8,8 @@ import {
   TextInput,
   FlatList,
   RefreshControl,
+  Alert,
+  Platform,
 } from 'react-native'
 import { useDispatch, useSelector } from 'react-redux'
 import { AppDispatch, RootState } from '../../store'
@@ -21,9 +23,17 @@ import { formatCurrency } from '../../utils/currencyHelpers'
 import FavoriteButton from '../../components/FavoriteButton'
 import { Product } from '../../types'
 import { Button, Card, Badge, Typography } from '../../components/2025'
+import MapView, { Callout, Marker, PROVIDER_GOOGLE } from 'react-native-maps'
+import locationService, { UserLocation } from '../../services/locationService'
+import type { Merchant as MerchantEntity } from '../../store/slices/merchantsSlice'
 
 interface Props {
   navigation: any
+}
+
+type MerchantListItem = {
+  merchant: MerchantEntity
+  distanceInfo: ReturnType<typeof locationService.calculateDistanceFromUser>
 }
 
 const ProductsScreen: React.FC<Props> = ({ navigation }) => {
@@ -36,34 +46,85 @@ const ProductsScreen: React.FC<Props> = ({ navigation }) => {
   const [searchQuery, setSearchQuery] = useState('')
   const [refreshing, setRefreshing] = useState(false)
   const [selectedCategory, setSelectedCategory] = useState<string>('all')
+  const [viewMode, setViewMode] = useState<'list' | 'map'>('list')
+  const [distanceEnabled, setDistanceEnabled] = useState(false)
+  const [maxDistance, setMaxDistance] = useState(10)
+  const [userLocation, setUserLocation] = useState<UserLocation | null>(null)
+  const [locationPermissionGranted, setLocationPermissionGranted] = useState(false)
+  const [isRequestingLocation, setIsRequestingLocation] = useState(false)
 
-  // Filtrage des marchands
-  const filteredMerchants = merchants.filter(merchant => {
-    // Filtre par recherche (boutique, ville, type)
-    if (searchQuery.trim()) {
-      const query = searchQuery.toLowerCase()
-      const matchesSearch =
-        merchant.business_name.toLowerCase().includes(query) ||
-        merchant.user.city.toLowerCase().includes(query) ||
-        merchant.business_type.toLowerCase().includes(query)
+  // Filtrage des marchands avec gestion distance
+  const filteredMerchants = useMemo<MerchantListItem[]>(() => {
+    return merchants
+      .map(merchant => {
+        const distanceInfo = locationService.calculateDistanceFromUser(
+          userLocation,
+          merchant.latitude ?? null,
+          merchant.longitude ?? null
+        )
 
-      if (!matchesSearch) return false
-    }
+        return { merchant, distanceInfo }
+      })
+      .filter(({ merchant, distanceInfo }) => {
+        const query = searchQuery.trim().toLowerCase()
 
-    // TODO: Filtre par catégorie basé sur le type de commerce
-    // Pour l'instant on affiche tous les marchands si "all" est sélectionné
-    if (selectedCategory !== 'all') {
-      const matchesCategory =
-        (selectedCategory === '1' && merchant.business_type.toLowerCase().includes('boulang')) ||
-        (selectedCategory === '2' && (merchant.business_type.toLowerCase().includes('fruit') || merchant.business_type.toLowerCase().includes('legume'))) ||
-        (selectedCategory === '3' && (merchant.business_type.toLowerCase().includes('viande') || merchant.business_type.toLowerCase().includes('boucher'))) ||
-        (selectedCategory === '4' && merchant.business_type.toLowerCase().includes('epicerie'))
+        if (query) {
+          const businessName = merchant.business_name?.toLowerCase() ?? ''
+          const city = merchant.user?.city?.toLowerCase() ?? ''
+          const type = merchant.business_type?.toLowerCase() ?? ''
 
-      if (!matchesCategory) return false
-    }
+          const matchesSearch =
+            businessName.includes(query) ||
+            city.includes(query) ||
+            type.includes(query)
 
-    return true
-  })
+          if (!matchesSearch) {
+            return false
+          }
+        }
+
+        if (selectedCategory !== 'all') {
+          const type = merchant.business_type?.toLowerCase() ?? ''
+          const matchesCategory =
+            (selectedCategory === '1' && type.includes('boulang')) ||
+            (selectedCategory === '2' && (type.includes('fruit') || type.includes('legume'))) ||
+            (selectedCategory === '3' && (type.includes('viande') || type.includes('boucher'))) ||
+            (selectedCategory === '4' && type.includes('epicerie'))
+
+          if (!matchesCategory) {
+            return false
+          }
+        }
+
+        if (distanceEnabled) {
+          if (!userLocation || !distanceInfo) {
+            return false
+          }
+
+          if (distanceInfo.distance > maxDistance) {
+            return false
+          }
+        }
+
+        return true
+      })
+      .sort((a, b) => {
+        if (distanceEnabled) {
+          const distanceA = a.distanceInfo?.distance ?? Number.POSITIVE_INFINITY
+          const distanceB = b.distanceInfo?.distance ?? Number.POSITIVE_INFINITY
+          return distanceA - distanceB
+        }
+
+        return a.merchant.business_name.localeCompare(b.merchant.business_name)
+      })
+  }, [
+    merchants,
+    searchQuery,
+    selectedCategory,
+    distanceEnabled,
+    maxDistance,
+    userLocation,
+  ])
 
   // Filtrage des produits
   const filteredProducts = (products || []).filter(product => {
@@ -89,6 +150,43 @@ const ProductsScreen: React.FC<Props> = ({ navigation }) => {
     return true
   })
 
+  const merchantsWithCoordinates = useMemo(
+    () =>
+      filteredMerchants.filter(
+        item => item.merchant.latitude != null && item.merchant.longitude != null
+      ),
+    [filteredMerchants]
+  )
+
+  const merchantsMapRegion = useMemo(() => {
+    if (merchantsWithCoordinates.length === 0) {
+      return {
+        latitude: 6.1319,
+        longitude: 1.2228,
+        latitudeDelta: 0.1,
+        longitudeDelta: 0.1,
+      }
+    }
+
+    const latitudes = merchantsWithCoordinates.map(item => item.merchant.latitude as number)
+    const longitudes = merchantsWithCoordinates.map(item => item.merchant.longitude as number)
+
+    const minLat = Math.min(...latitudes)
+    const maxLat = Math.max(...latitudes)
+    const minLon = Math.min(...longitudes)
+    const maxLon = Math.max(...longitudes)
+
+    const latitudeDelta = Math.max((maxLat - minLat) * 1.5, 0.02)
+    const longitudeDelta = Math.max((maxLon - minLon) * 1.5, 0.02)
+
+    return {
+      latitude: (minLat + maxLat) / 2,
+      longitude: (minLon + maxLon) / 2,
+      latitudeDelta,
+      longitudeDelta,
+    }
+  }, [merchantsWithCoordinates])
+
   useEffect(() => {
     loadData()
   }, [])
@@ -98,9 +196,47 @@ const ProductsScreen: React.FC<Props> = ({ navigation }) => {
     loadData()
   }, [contentMode])
 
-  const loadData = async () => {
+  useEffect(() => {
+    const initLocation = async () => {
+      try {
+        const hasPermission = await locationService.hasLocationPermission()
+        setLocationPermissionGranted(hasPermission)
+
+        if (hasPermission) {
+          const position = await locationService.getCurrentPosition()
+          if (position) {
+            setUserLocation(position)
+          }
+        }
+      } catch (error) {
+        console.error('Erreur initialisation géolocalisation (produits):', error)
+      }
+    }
+
+    initLocation()
+  }, [])
+
+  useEffect(() => {
+    if (contentMode !== 'merchants' && viewMode !== 'list') {
+      setViewMode('list')
+    }
+  }, [contentMode, viewMode])
+
+  const loadData = async (force = false) => {
     try {
-      // Charger les catégories ET les données en parallèle (comme HomeScreen)
+      // Éviter les appels réseaux inutiles si les données sont déjà en mémoire
+      if (!force) {
+        if (contentMode === 'merchants') {
+          if (merchants.length > 0 && categories.length > 0) {
+            return
+          }
+        } else {
+          if (products.length > 0 && categories.length > 0) {
+            return
+          }
+        }
+      }
+
       if (contentMode === 'merchants') {
         await Promise.all([
           dispatch(fetchCategories()),
@@ -113,7 +249,6 @@ const ProductsScreen: React.FC<Props> = ({ navigation }) => {
         ])
       }
 
-      console.log('✅ Data loaded - Categories:', categories.length, 'Products:', products.length, 'Merchants:', merchants.length)
     } catch (error) {
       console.error('❌ Error loading data:', error)
     }
@@ -121,8 +256,99 @@ const ProductsScreen: React.FC<Props> = ({ navigation }) => {
 
   const onRefresh = async () => {
     setRefreshing(true)
-    await loadData()
+    await loadData(true)
     setRefreshing(false)
+  }
+
+  const ensureUserLocation = async (promptUser: boolean = true): Promise<boolean> => {
+    try {
+      if (!locationPermissionGranted) {
+        if (!promptUser) {
+          const hasPermission = await locationService.hasLocationPermission()
+          setLocationPermissionGranted(hasPermission)
+          if (!hasPermission) {
+            return false
+          }
+        } else {
+          setIsRequestingLocation(true)
+          const granted = await locationService.requestLocationPermission()
+          setLocationPermissionGranted(granted)
+          if (!granted) {
+            return false
+          }
+        }
+      }
+
+      const position = await locationService.getCurrentPosition()
+      if (position) {
+        setUserLocation(position)
+      }
+
+      return true
+    } catch (error) {
+      console.error('Erreur récupération localisation:', error)
+      return false
+    } finally {
+      if (promptUser) {
+        setIsRequestingLocation(false)
+      }
+    }
+  }
+
+  const handleDistanceFilterPress = async () => {
+    if (!locationPermissionGranted) {
+      Alert.alert(
+        'Autorisation requise',
+        "Activez la géolocalisation pour afficher les commerces proches de vous.",
+        [
+          { text: 'Annuler', style: 'cancel' },
+          {
+            text: 'Autoriser',
+            onPress: async () => {
+              const granted = await ensureUserLocation(true)
+              if (granted) {
+                setDistanceEnabled(true)
+              } else {
+                Alert.alert('Géolocalisation inactive', "Impossible d'activer le filtre distance sans accès à votre position.")
+              }
+            },
+          },
+        ]
+      )
+      return
+    }
+
+    if (!distanceEnabled) {
+      const ok = await ensureUserLocation(true)
+      if (ok) {
+        setDistanceEnabled(true)
+      } else {
+        Alert.alert('Géolocalisation inactive', "Impossible d'activer le filtre distance sans accès à votre position.")
+      }
+      return
+    }
+
+    Alert.alert('Filtre distance', 'Choisissez une distance maximum', [
+      { text: '< 5 km', onPress: () => setMaxDistance(5) },
+      { text: '< 10 km', onPress: () => setMaxDistance(10) },
+      { text: '< 20 km', onPress: () => setMaxDistance(20) },
+      { text: 'Désactiver', style: 'destructive', onPress: () => setDistanceEnabled(false) },
+      { text: 'Annuler', style: 'cancel' },
+    ])
+  }
+
+  const handleToggleMapView = async () => {
+    if (contentMode !== 'merchants') {
+      return
+    }
+
+    if (viewMode === 'map') {
+      setViewMode('list')
+      return
+    }
+
+    await ensureUserLocation(false)
+    setViewMode('map')
   }
 
   // Mapping emojis pour les catégories
@@ -149,7 +375,7 @@ const ProductsScreen: React.FC<Props> = ({ navigation }) => {
     return '🛍️'
   }
 
-  const renderMerchantCard = (merchant: any) => {
+  const renderMerchantCard = ({ merchant, distanceInfo }: MerchantListItem) => {
     return (
       <TouchableOpacity
         onPress={() => {
@@ -191,10 +417,19 @@ const ProductsScreen: React.FC<Props> = ({ navigation }) => {
               {merchant.business_type}
             </Typography>
 
+            {distanceInfo && (
+              <View style={styles.distanceBadge}>
+                <Ionicons name="navigate" size={14} color={theme.colors.primary[600]} />
+                <Typography variant="caption" weight="semibold" color="primary" style={{ marginLeft: 4 }}>
+                  {distanceInfo.formatted}
+                </Typography>
+              </View>
+            )}
+
             <View style={styles.locationRow}>
               <Ionicons name="location" size={14} color={theme.colors.textSecondary} />
               <Typography variant="caption" color="secondary" numberOfLines={1} style={{ marginLeft: 4, flex: 1 }}>
-                {merchant.user.city}
+                {merchant.user?.city || 'Ville'}
               </Typography>
             </View>
 
@@ -283,6 +518,73 @@ const ProductsScreen: React.FC<Props> = ({ navigation }) => {
     )
   }
 
+  const renderMerchantsMap = () => {
+    if (Platform.OS === 'web') {
+      return (
+        <View style={styles.mapFallback}>
+          <Ionicons name="map" size={28} color={theme.colors.primary[500]} />
+          <Typography variant="body" weight="semibold" style={{ marginTop: theme.spacing.sm, textAlign: 'center' }}>
+            La carte est disponible sur l'application mobile.
+          </Typography>
+        </View>
+      )
+    }
+
+    if (merchantsWithCoordinates.length === 0) {
+      return (
+        <View style={styles.mapFallback}>
+          <Ionicons name="location-outline" size={28} color={theme.colors.neutral[400]} />
+          <Typography variant="body" color="secondary" style={{ marginTop: theme.spacing.sm, textAlign: 'center' }}>
+            Aucun commerçant géolocalisé ne correspond à vos filtres pour le moment.
+          </Typography>
+        </View>
+      )
+    }
+
+    return (
+      <View style={styles.mapWrapper}>
+        <MapView
+          provider={PROVIDER_GOOGLE}
+          style={styles.merchantsMap}
+          region={merchantsMapRegion}
+          showsUserLocation={locationPermissionGranted && !!userLocation}
+          showsMyLocationButton={false}
+        >
+          {merchantsWithCoordinates.map(({ merchant, distanceInfo }) => (
+            <Marker
+              key={`merchant-marker-${merchant.id}`}
+              coordinate={{
+                latitude: merchant.latitude as number,
+                longitude: merchant.longitude as number,
+              }}
+              title={merchant.business_name}
+              description={merchant.business_type}
+            >
+              <Callout onPress={() => navigation.navigate('MerchantDetail', { merchantId: merchant.id })}>
+                <View style={styles.mapCallout}>
+                  <Typography variant="body" weight="semibold" style={styles.mapCalloutTitle}>
+                    {merchant.business_name}
+                  </Typography>
+                  <Typography variant="caption" color="secondary">
+                    {merchant.user?.city}
+                  </Typography>
+                  {distanceInfo && (
+                    <Typography variant="caption" color="primary" style={{ marginTop: 4 }}>
+                      {distanceInfo.formatted}
+                    </Typography>
+                  )}
+                  <Typography variant="caption" weight="semibold" color="primary" style={styles.mapCalloutLink}>
+                    Voir le profil →
+                  </Typography>
+                </View>
+              </Callout>
+            </Marker>
+          ))}
+        </MapView>
+      </View>
+    )
+  }
+
   const styles = createStyles(theme)
 
   return (
@@ -322,8 +624,29 @@ const ProductsScreen: React.FC<Props> = ({ navigation }) => {
           value={searchQuery}
           onChangeText={setSearchQuery}
         />
-        <TouchableOpacity>
-          <Ionicons name="options" size={24} color={theme.colors.text} />
+        <TouchableOpacity
+          onPress={handleToggleMapView}
+          disabled={contentMode !== 'merchants'}
+          style={[
+            styles.searchTrailingButton,
+            contentMode !== 'merchants' && styles.searchTrailingButtonDisabled,
+          ]}
+        >
+          <Ionicons
+            name={
+              contentMode === 'merchants'
+                ? viewMode === 'map'
+                  ? 'list'
+                  : 'map'
+                : 'options'
+            }
+            size={24}
+            color={
+              contentMode === 'merchants'
+                ? theme.colors.primary[500]
+                : theme.colors.textSecondary
+            }
+          />
         </TouchableOpacity>
       </View>
 
@@ -377,6 +700,36 @@ const ProductsScreen: React.FC<Props> = ({ navigation }) => {
         </ScrollView>
       )}
 
+      {contentMode === 'merchants' && (
+        <View style={styles.distanceRow}>
+          <TouchableOpacity
+            style={[styles.filterChip, distanceEnabled && styles.filterChipActive]}
+            onPress={handleDistanceFilterPress}
+            disabled={isRequestingLocation}
+          >
+            <Ionicons
+              name="location"
+              size={16}
+              color={distanceEnabled ? theme.colors.primary[600] : theme.colors.textSecondary}
+            />
+            <Typography
+              variant="caption"
+              weight="medium"
+              style={{
+                color: distanceEnabled ? theme.colors.primary[700] : theme.colors.textSecondary,
+              }}
+            >
+              {distanceEnabled ? `< ${maxDistance} km` : 'Filtrer par distance'}
+            </Typography>
+            <Ionicons
+              name={distanceEnabled ? 'toggle' : 'toggle-outline'}
+              size={24}
+              color={distanceEnabled ? theme.colors.primary[500] : theme.colors.neutral[300]}
+            />
+          </TouchableOpacity>
+        </View>
+      )}
+
       {/* Compteur de résultats */}
       {contentMode === 'merchants' ? (
         filteredMerchants.length > 0 && (
@@ -418,13 +771,14 @@ const ProductsScreen: React.FC<Props> = ({ navigation }) => {
 
       {/* Liste conditionnelle selon mode */}
       {contentMode === 'merchants' ? (
-        // Mode Marchands
-        filteredMerchants.length > 0 ? (
+        viewMode === 'map' ? (
+          renderMerchantsMap()
+        ) : filteredMerchants.length > 0 ? (
           <FlatList
             key="merchants-list"
             data={filteredMerchants}
             renderItem={({ item }) => renderMerchantCard(item)}
-            keyExtractor={(item) => `merchant-${item.id}`}
+            keyExtractor={(item) => `merchant-${item.merchant.id}`}
             contentContainerStyle={styles.listContent}
             refreshControl={
               <RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={[theme.colors.primary[500]]} />
@@ -547,6 +901,13 @@ const createStyles = (theme: ReturnType<typeof useTheme>) => StyleSheet.create({
     color: theme.colors.text,
     paddingVertical: theme.spacing.sm,
   },
+  searchTrailingButton: {
+    padding: theme.spacing.xs,
+    borderRadius: theme.radius.lg,
+  },
+  searchTrailingButtonDisabled: {
+    opacity: 0.4,
+  },
   categoriesScroll: {
     marginTop: theme.spacing.sm,
     marginBottom: theme.spacing.xs,
@@ -579,6 +940,27 @@ const createStyles = (theme: ReturnType<typeof useTheme>) => StyleSheet.create({
   },
   categoryChipActive: {
     backgroundColor: theme.colors.primary[500],
+    borderColor: theme.colors.primary[200],
+  },
+  distanceRow: {
+    paddingHorizontal: theme.spacing.lg,
+    marginTop: theme.spacing.sm,
+    marginBottom: theme.spacing.xs,
+  },
+  filterChip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: theme.spacing.md,
+    paddingVertical: theme.spacing.sm,
+    borderRadius: theme.radius.full,
+    backgroundColor: theme.colors.surface.light,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+    gap: theme.spacing.sm,
+  },
+  filterChipActive: {
+    backgroundColor: theme.colors.primary[50],
     borderColor: theme.colors.primary[200],
   },
   resultsHeader: {
@@ -635,6 +1017,12 @@ const createStyles = (theme: ReturnType<typeof useTheme>) => StyleSheet.create({
     gap: 4,
     marginBottom: theme.spacing.xs,
   },
+  distanceBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    marginBottom: theme.spacing.xs,
+  },
   productsRow: {
     justifyContent: 'space-between',
     paddingHorizontal: theme.spacing.sm,
@@ -676,6 +1064,39 @@ const createStyles = (theme: ReturnType<typeof useTheme>) => StyleSheet.create({
   priceRow: {
     flexDirection: 'column',
     gap: 2,
+  },
+  mapWrapper: {
+    height: 360,
+    marginHorizontal: theme.spacing.lg,
+    borderRadius: theme.radius.xl,
+    overflow: 'hidden',
+    backgroundColor: theme.colors.surface.light,
+    ...theme.shadows.md,
+    marginBottom: theme.spacing.lg,
+  },
+  merchantsMap: {
+    flex: 1,
+  },
+  mapFallback: {
+    height: 200,
+    marginHorizontal: theme.spacing.lg,
+    marginBottom: theme.spacing.lg,
+    borderRadius: theme.radius.xl,
+    backgroundColor: theme.colors.surface.light,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: theme.spacing.lg,
+    ...theme.shadows.sm,
+  },
+  mapCallout: {
+    maxWidth: 220,
+    padding: 6,
+  },
+  mapCalloutTitle: {
+    marginBottom: 4,
+  },
+  mapCalloutLink: {
+    marginTop: 6,
   },
 })
 
