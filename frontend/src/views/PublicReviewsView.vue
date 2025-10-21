@@ -104,6 +104,15 @@
                 </div>
               </div>
               <p class="mt-4 text-sm text-gray-800">{{ review.comment ?? 'Avis non renseigné.' }}</p>
+              <div v-if="review.photos?.length" class="mt-4 flex flex-wrap gap-3">
+                <img
+                  v-for="photo in review.photos"
+                  :key="photo.id"
+                  :src="photo.url"
+                  alt="Photo de l'avis"
+                  class="h-20 w-20 rounded-lg object-cover shadow-sm border border-gray-200"
+                >
+              </div>
               <div class="mt-4 flex flex-wrap items-center gap-3 text-xs text-gray-500">
                 <span v-if="review.is_verified_purchase" class="inline-flex items-center gap-2 rounded-full bg-emerald-50 px-3 py-3 text-blue-600">
                   <ShieldCheck class="icon-xs" /> Achat vérifié

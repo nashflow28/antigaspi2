@@ -204,7 +204,7 @@ class MerchantReviewController extends Controller
         ]);
 
         try {
-            $query = Review::with(['user:id,first_name,last_name', 'product:id,name'])
+            $query = Review::with(['user:id,first_name,last_name', 'product:id,name', 'photos:id,review_id,path'])
                           ->where('merchant_id', $merchant->id)
                           ->approved();
 
@@ -249,6 +249,12 @@ class MerchantReviewController extends Controller
                     'stars' => $review->stars,
                     'time_ago' => $review->time_ago,
                     'is_verified_purchase' => $review->is_verified_purchase,
+                    'photos' => $review->photos->map(function (\App\Models\ReviewPhoto $photo) {
+                        return [
+                            'id' => $photo->id,
+                            'url' => $photo->url,
+                        ];
+                    })->toArray(),
                     'user' => [
                         'id' => $review->user->id,
                         'name' => $review->user->first_name . ' ' . substr($review->user->last_name, 0, 1) . '.',

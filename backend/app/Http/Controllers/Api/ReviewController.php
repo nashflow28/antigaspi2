@@ -6,10 +6,15 @@ use App\Http\Controllers\Controller;
 use App\Models\Review;
 use App\Models\Merchant;
 use App\Models\Product;
+use App\Models\ReviewPhoto;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class ReviewController extends Controller
 {
@@ -25,7 +30,7 @@ class ReviewController extends Controller
             'per_page' => 'nullable|integer|max:50',
         ]);
 
-        $query = Review::with(['user:id,first_name,last_name', 'product:id,name', 'merchant:id,business_name'])
+        $query = Review::with(['user:id,first_name,last_name', 'product:id,name', 'merchant:id,business_name', 'photos:id,review_id,path'])
                       ->approved()
                       ->recent();
 
@@ -57,6 +62,12 @@ class ReviewController extends Controller
                 'stars' => $review->stars,
                 'time_ago' => $review->time_ago,
                 'is_verified_purchase' => $review->is_verified_purchase,
+                'photos' => $review->photos->map(function (ReviewPhoto $photo) {
+                    return [
+                        'id' => $photo->id,
+                        'url' => $photo->url,
+                    ];
+                })->toArray(),
                 'merchant' => $review->merchant ? [
                     'id' => $review->merchant->id,
                     'business_name' => $review->merchant->business_name,
@@ -96,7 +107,7 @@ class ReviewController extends Controller
             $data = json_decode($request->getContent(), true) ?: [];
         }
 
-        $mediaFields = ['media', 'media_urls', 'photos', 'images', 'attachments'];
+        $mediaFields = ['media', 'media_urls', 'images', 'attachments'];
 
         $rules = [
             'merchant_id' => 'required|exists:merchants,id',
@@ -104,32 +115,42 @@ class ReviewController extends Controller
             'rating' => 'required|integer|between:1,5',
             'title' => 'nullable|string|max:255',
             'comment' => 'nullable|string|max:1000',
+            'photos' => 'nullable|array|max:3',
+            'photos.*' => 'image|mimes:jpeg,jpg,png|max:5120',
         ];
 
         foreach ($mediaFields as $field) {
             $rules[$field] = 'prohibited';
         }
 
-        $messages = [];
+        $messages = [
+            'photos.array' => 'Format de photos invalide.',
+            'photos.max' => 'Vous pouvez envoyer jusqu\'à 3 photos.',
+            'photos.*.image' => 'Chaque fichier doit être une image.',
+            'photos.*.mimes' => 'Formats acceptés : JPEG et PNG.',
+            'photos.*.max' => 'Chaque photo ne peut pas dépasser 5MB.',
+        ];
+
         foreach ($mediaFields as $field) {
-            $messages[$field . '.prohibited'] = "L'ajout de médias pour les avis n'est pas encore pris en charge.";
+            $messages[$field . '.prohibited'] = "Ce champ n'est pas pris en charge.";
         }
 
-        $validator = Validator::make($data, $rules, $messages);
+        $validationData = $data;
+        $uploadedPhotosForValidation = $request->file('photos');
+        if ($uploadedPhotosForValidation !== null) {
+            if ($uploadedPhotosForValidation instanceof UploadedFile) {
+                $validationData['photos'] = [$uploadedPhotosForValidation];
+            } elseif (is_array($uploadedPhotosForValidation)) {
+                $validationData['photos'] = $uploadedPhotosForValidation;
+            }
+        }
+
+        $validator = Validator::make($validationData, $rules, $messages);
 
         if ($validator->fails()) {
-            $errorMessage = 'Données invalides';
-
-            foreach ($mediaFields as $field) {
-                if ($validator->errors()->has($field)) {
-                    $errorMessage = "L'ajout de médias pour les avis n'est pas encore pris en charge.";
-                    break;
-                }
-            }
-
             return response()->json([
                 'success' => false,
-                'message' => $errorMessage,
+                'message' => 'Données invalides',
                 'errors' => $validator->errors()
             ], 422);
         }
@@ -162,17 +183,55 @@ class ReviewController extends Controller
                           ->where('status', 'completed')
                           ->exists();
 
-        $review = Review::create([
-            'user_id' => $user->id,
-            'merchant_id' => $data['merchant_id'],
-            'product_id' => $data['product_id'] ?? null,
-            'rating' => $data['rating'],
-            'title' => $data['title'] ?? null,
-            'comment' => $data['comment'] ?? null,
-            'is_verified_purchase' => $isVerified,
-            'is_approved' => true, // Auto-approve for now
-            'approved_at' => now(),
-        ]);
+        $storedPhotoPaths = [];
+
+        try {
+            $review = DB::transaction(function () use ($user, $data, $isVerified, $request, &$storedPhotoPaths) {
+                $review = Review::create([
+                    'user_id' => $user->id,
+                    'merchant_id' => $data['merchant_id'],
+                    'product_id' => $data['product_id'] ?? null,
+                    'rating' => $data['rating'],
+                    'title' => $data['title'] ?? null,
+                    'comment' => $data['comment'] ?? null,
+                    'is_verified_purchase' => $isVerified,
+                    'is_approved' => true, // Auto-approve for now
+                    'approved_at' => now(),
+                ]);
+
+                $uploadedPhotos = $request->file('photos');
+                if ($uploadedPhotos instanceof UploadedFile) {
+                    $uploadedPhotos = [$uploadedPhotos];
+                }
+
+                if (is_array($uploadedPhotos)) {
+                    foreach ($uploadedPhotos as $photo) {
+                        if (!$photo instanceof UploadedFile) {
+                            continue;
+                        }
+
+                        $filename = 'review_' . $review->id . '_' . Str::random(12) . '.' . $photo->getClientOriginalExtension();
+                        $path = $photo->storeAs('reviews', $filename, 'public');
+                        $storedPhotoPaths[] = $path;
+
+                        $review->photos()->create([
+                            'path' => $path,
+                        ]);
+                    }
+                }
+
+                return $review->load('photos');
+            });
+        } catch (\Throwable $e) {
+            foreach ($storedPhotoPaths as $path) {
+                Storage::disk('public')->delete($path);
+            }
+
+            return response()->json([
+                'success' => false,
+                'message' => "Erreur lors de l'enregistrement de l'avis",
+            ], 500);
+        }
 
         return response()->json([
             'success' => true,
@@ -183,6 +242,12 @@ class ReviewController extends Controller
                 'title' => $review->title,
                 'comment' => $review->comment,
                 'is_verified_purchase' => $review->is_verified_purchase,
+                'photos' => $review->photos->map(function (ReviewPhoto $photo) {
+                    return [
+                        'id' => $photo->id,
+                        'url' => $photo->url,
+                    ];
+                })->toArray(),
             ]
         ], 201);
     }
@@ -202,6 +267,8 @@ class ReviewController extends Controller
             ], 403);
         }
 
+        $review->loadMissing('photos');
+
         return response()->json([
             'success' => true,
             'data' => [
@@ -212,6 +279,12 @@ class ReviewController extends Controller
                 'is_verified_purchase' => $review->is_verified_purchase,
                 'created_at' => $review->created_at->format('c'),
                 'updated_at' => $review->updated_at->format('c'),
+                'photos' => $review->photos->map(function (ReviewPhoto $photo) {
+                    return [
+                        'id' => $photo->id,
+                        'url' => $photo->url,
+                    ];
+                })->toArray(),
             ]
         ]);
     }
@@ -262,6 +335,8 @@ class ReviewController extends Controller
             'is_approved' => $review->rating == $request->rating ? $review->is_approved : true,
         ]);
 
+        $review->loadMissing('photos');
+
         return response()->json([
             'success' => true,
             'message' => 'Avis mis à jour avec succès',
@@ -272,6 +347,12 @@ class ReviewController extends Controller
                 'comment' => $review->comment,
                 'is_verified_purchase' => $review->is_verified_purchase,
                 'updated_at' => $review->updated_at->format('c'),
+                'photos' => $review->photos->map(function (ReviewPhoto $photo) {
+                    return [
+                        'id' => $photo->id,
+                        'url' => $photo->url,
+                    ];
+                })->toArray(),
             ]
         ]);
     }
@@ -289,6 +370,12 @@ class ReviewController extends Controller
                 'success' => false,
                 'message' => 'Non autorisé'
             ], 403);
+        }
+
+        $review->loadMissing('photos');
+
+        foreach ($review->photos as $photo) {
+            Storage::disk('public')->delete($photo->getRawOriginal('path'));
         }
 
         $review->delete();

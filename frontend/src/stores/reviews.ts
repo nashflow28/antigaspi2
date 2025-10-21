@@ -33,13 +33,36 @@ export const useReviewsStore = defineStore('reviews', () => {
   const pagination = computed(() => state.value.pagination)
 
   // Actions
-  const fetchReviews = async (params: { merchantId?: number; productId?: number; page?: number }) => {
+  const fetchReviews = async (params: { merchantId?: number; productId?: number; page?: number; rating?: number }) => {
     try {
       state.value.loading = true
-      const response = await apiService.getReviews({
-        ...params,
+      const query: {
+        merchant_id?: number
+        product_id?: number
+        rating?: number
+        page?: number
+        per_page: number
+      } = {
         per_page: 15
-      })
+      }
+
+      if (params.merchantId) {
+        query.merchant_id = params.merchantId
+      }
+
+      if (params.productId) {
+        query.product_id = params.productId
+      }
+
+      if (params.page) {
+        query.page = params.page
+      }
+
+      if (typeof params.rating === 'number') {
+        query.rating = params.rating
+      }
+
+      const response = await apiService.getReviewsList(query)
 
       if (params.page === 1 || !params.page) {
         state.value.reviews = response.data
@@ -63,6 +86,7 @@ export const useReviewsStore = defineStore('reviews', () => {
     rating: number
     title?: string
     comment?: string
+    photos?: File[]
   }) => {
     try {
       state.value.loading = true

@@ -121,6 +121,16 @@
               {{ review.comment }}
             </div>
 
+            <div v-if="review.photos?.length" class="mt-3 flex flex-wrap gap-3">
+              <img
+                v-for="photo in review.photos"
+                :key="photo.id"
+                :src="photo.url"
+                alt="Photo associée à l'avis"
+                class="h-20 w-20 rounded-lg object-cover border border-gray-200"
+              >
+            </div>
+
             <div v-if="review.product" class="inline-flex items-center text-xs text-info bg-blue-50 rounded-full px-3 py-3">
               <Package class="w-xs h-3 mr-1" />
               {{ review.product.name }}

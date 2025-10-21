@@ -45,7 +45,14 @@ onMounted(() => {
   productName.value = String(route.params.productName || '')
 })
 
-const handleSubmit = async (data: any) => {
+interface ReviewFormPayload {
+  rating: number
+  title?: string
+  comment?: string
+  photos?: File[]
+}
+
+const handleSubmit = async (data: ReviewFormPayload) => {
   if (!merchantId.value || !productId.value) {
     notify.error('Données manquantes pour créer l\'avis')
     return

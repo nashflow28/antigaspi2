@@ -350,13 +350,39 @@ class ApiService {
   }
 
   async createReview(data: {
-    merchant_id: number
-    product_id?: number | null
+    merchantId: number
+    productId?: number | null
     rating: number
     title?: string | null
     comment?: string | null
+    photos?: File[]
   }): Promise<ApiResponse<Review>> {
-    return this.post<ApiResponse<Review>>('/reviews', data, true)
+    const payload: Record<string, string | number | null> = {
+      merchant_id: data.merchantId,
+      rating: data.rating,
+      product_id: data.productId ?? null,
+      title: data.title ?? null,
+      comment: data.comment ?? null
+    }
+
+    const sanitizedPayload = Object.fromEntries(
+      Object.entries(payload).filter(([, value]) => value !== null && value !== undefined && value !== '')
+    )
+
+    if (data.photos && data.photos.length > 0) {
+      const formData = new FormData()
+      Object.entries(sanitizedPayload).forEach(([key, value]) => {
+        formData.append(key, String(value))
+      })
+
+      data.photos.forEach((photo, index) => {
+        formData.append(`photos[${index}]`, photo)
+      })
+
+      return this.postFormData<ApiResponse<Review>>('/reviews', formData, true)
+    }
+
+    return this.post<ApiResponse<Review>>('/reviews', sanitizedPayload, true)
   }
 
   async updateReview(reviewId: number, data: {
@@ -662,7 +688,7 @@ class ApiService {
   }
 
   async getReviewsList(params: {
-    merchant_id: number
+    merchant_id?: number
     product_id?: number
     rating?: number | string
     page?: number

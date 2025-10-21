@@ -349,6 +349,7 @@ export interface PublicReviewEntry {
   user?: { id: number; name?: string | null } | null
   product?: { id: number; name?: string | null } | null
   created_at?: string | null
+  photos?: ReviewPhoto[]
 }
 
 export interface MerchantLocation {
@@ -485,6 +486,11 @@ export interface ReviewUserSummary {
   name: string
 }
 
+export interface ReviewPhoto {
+  id: number
+  url: string
+}
+
 export interface ReviewProductSummary {
   id: number
   name: string
@@ -508,6 +514,7 @@ export interface Review {
   user: ReviewUserSummary
   product?: ReviewProductSummary
   reply?: ReviewReplySummary | null
+  photos?: ReviewPhoto[]
   [key: string]: unknown
 }
 

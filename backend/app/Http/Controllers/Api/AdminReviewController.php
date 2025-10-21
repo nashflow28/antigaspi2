@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Review;
+use App\Models\ReviewPhoto;
 use App\Models\ReviewReport;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -11,6 +12,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 
 class AdminReviewController extends Controller
 {
@@ -34,7 +36,7 @@ class AdminReviewController extends Controller
         ]);
 
         try {
-            $query = Review::with(['user:id,first_name,last_name', 'product:id,name', 'merchant.user:id,first_name,last_name'])
+            $query = Review::with(['user:id,first_name,last_name', 'product:id,name', 'merchant.user:id,first_name,last_name', 'photos:id,review_id,path'])
                           ->where('is_approved', false)
                           ->recent();
 
@@ -49,6 +51,12 @@ class AdminReviewController extends Controller
                     'comment' => $review->comment,
                     'time_ago' => $review->time_ago,
                     'is_verified_purchase' => $review->is_verified_purchase,
+                    'photos' => $review->photos->map(function (ReviewPhoto $photo) {
+                        return [
+                            'id' => $photo->id,
+                            'url' => $photo->url,
+                        ];
+                    })->toArray(),
                     'user' => [
                         'id' => $review->user->id,
                         'name' => $review->user->first_name . ' ' . $review->user->last_name,
@@ -157,6 +165,12 @@ class AdminReviewController extends Controller
 
         try {
             // Delete the review (rejected reviews are not kept)
+            $review->loadMissing('photos');
+
+            foreach ($review->photos as $photo) {
+                Storage::disk('public')->delete($photo->getRawOriginal('path'));
+            }
+
             $review->delete();
 
             return response()->json([
@@ -197,7 +211,7 @@ class AdminReviewController extends Controller
         try {
             $query = ReviewReport::with([
                 'review' => function ($query) {
-                    $query->with(['user:id,first_name,last_name', 'product:id,name', 'merchant.user:id,first_name,last_name']);
+                    $query->with(['user:id,first_name,last_name', 'product:id,name', 'merchant.user:id,first_name,last_name', 'photos:id,review_id,path']);
                 },
                 'reporter:id,first_name,last_name,email',
                 'reviewer:id,first_name,last_name'
@@ -231,6 +245,12 @@ class AdminReviewController extends Controller
                         'title' => $report->review->title,
                         'comment' => $report->review->comment,
                         'is_verified_purchase' => $report->review->is_verified_purchase,
+                        'photos' => $report->review->photos->map(function (ReviewPhoto $photo) {
+                            return [
+                                'id' => $photo->id,
+                                'url' => $photo->url,
+                            ];
+                        })->toArray(),
                         'user' => [
                             'id' => $report->review->user->id,
                             'name' => $report->review->user->first_name . ' ' . $report->review->user->last_name,
