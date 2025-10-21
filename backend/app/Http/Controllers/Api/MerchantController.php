@@ -4,6 +4,9 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Merchant;
+use App\Models\Product;
+use App\Models\Review;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -95,6 +98,119 @@ class MerchantController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur lors de la récupération des commerçants',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    /**
+     * Affiche le profil public détaillé d'un commerçant.
+     */
+    public function show(int $merchantId): JsonResponse
+    {
+        try {
+            $merchant = Merchant::with([
+                'user',
+                'products' => function ($query) {
+                    $query->active()
+                        ->orderByDesc('created_at')
+                        ->take(4)
+                        ->with(['category:id,name,icon']);
+                },
+                'reviews' => function ($query) {
+                    $query->approved()
+                        ->recent()
+                        ->take(5)
+                        ->with([
+                            'user:id,first_name,last_name',
+                            'product:id,name',
+                        ]);
+                },
+            ])
+                ->withCount([
+                    'products as active_products_count' => function ($query) {
+                        $query->active();
+                    },
+                    'reviews as approved_reviews_count' => function ($query) {
+                        $query->approved();
+                    },
+                ])
+                ->findOrFail($merchantId);
+
+            $averageRating = Review::where('merchant_id', $merchant->id)
+                ->approved()
+                ->avg('rating');
+
+            $featuredProducts = $merchant->products->map(function (Product $product) {
+                return [
+                    'id' => $product->id,
+                    'name' => $product->name,
+                    'description' => $product->description,
+                    'discounted_price' => (float) $product->discounted_price,
+                    'original_price' => (float) $product->original_price,
+                    'quantity_available' => (int) $product->quantity_available,
+                    'discount_percentage' => $product->discount_percentage,
+                    'image_url' => $product->image_url,
+                    'category' => $product->category ? [
+                        'id' => $product->category->id,
+                        'name' => $product->category->name,
+                        'icon' => $product->category->icon,
+                    ] : null,
+                ];
+            });
+
+            $recentReviews = $merchant->reviews->map(function (Review $review) {
+                return [
+                    'id' => $review->id,
+                    'rating' => $review->rating,
+                    'title' => $review->title,
+                    'comment' => $review->comment,
+                    'is_verified_purchase' => $review->is_verified_purchase,
+                    'created_at' => $review->created_at?->toISOString(),
+                    'time_ago' => $review->time_ago,
+                    'user' => $review->user ? [
+                        'id' => $review->user->id,
+                        'name' => trim($review->user->first_name . ' ' . substr($review->user->last_name, 0, 1) . '.'),
+                    ] : null,
+                    'product' => $review->product ? [
+                        'id' => $review->product->id,
+                        'name' => $review->product->name,
+                    ] : null,
+                ];
+            });
+
+            return response()->json([
+                'success' => true,
+                'data' => [
+                    'id' => $merchant->id,
+                    'business_name' => $merchant->business_name,
+                    'business_type' => $merchant->business_type,
+                    'description' => $merchant->description,
+                    'photo_url' => $merchant->photo_url,
+                    'is_verified' => (bool) $merchant->is_verified,
+                    'latitude' => $merchant->latitude ? (float) $merchant->latitude : null,
+                    'longitude' => $merchant->longitude ? (float) $merchant->longitude : null,
+                    'address' => optional($merchant->user)->address,
+                    'city' => optional($merchant->user)->city,
+                    'phone' => optional($merchant->user)->phone,
+                    'opening_hours' => $this->formatOpeningHours($merchant->opening_hours),
+                    'products_count' => (int) $merchant->active_products_count,
+                    'rating' => $averageRating ? round((float) $averageRating, 1) : null,
+                    'total_reviews' => (int) $merchant->approved_reviews_count,
+                    'saved_weight' => $merchant->total_sales ? (float) $merchant->total_sales : null,
+                    'featured_products' => $featuredProducts,
+                    'recent_reviews' => $recentReviews,
+                ],
+            ]);
+        } catch (ModelNotFoundException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Commerçant introuvable',
+            ], 404);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Erreur lors de la récupération du commerçant',
                 'error' => $e->getMessage(),
             ], 500);
         }
@@ -797,5 +913,85 @@ class MerchantController extends Controller
                 'error' => $e->getMessage()
             ], 500);
         }
+    }
+
+    private function formatOpeningHours($openingHours): array
+    {
+        if (empty($openingHours)) {
+            return [];
+        }
+
+        if (is_array($openingHours)) {
+            $formatted = [];
+
+            foreach ($openingHours as $key => $value) {
+                $dayKey = is_array($value) ? ($value['day'] ?? $key) : $key;
+                $dayLabel = $this->formatDayLabel(is_string($dayKey) ? $dayKey : (string) $dayKey);
+
+                if (is_array($value)) {
+                    if (($value['is_open'] ?? true) === false) {
+                        $hours = 'Fermé';
+                    } else {
+                        $segments = [];
+
+                        if (!empty($value['morning_start']) && !empty($value['morning_end'])) {
+                            $segments[] = $value['morning_start'] . ' - ' . $value['morning_end'];
+                        }
+
+                        if (!empty($value['afternoon_start']) && !empty($value['afternoon_end'])) {
+                            $segments[] = $value['afternoon_start'] . ' - ' . $value['afternoon_end'];
+                        }
+
+                        $hours = $value['hours'] ?? ($segments ? implode(' / ', $segments) : 'Horaires non renseignés');
+                    }
+                } else {
+                    $hours = is_string($value) ? $value : 'Horaires non renseignés';
+                }
+
+                $formatted[] = [
+                    'day' => $dayLabel,
+                    'hours' => $hours ?: 'Horaires non renseignés',
+                ];
+            }
+
+            return $formatted;
+        }
+
+        if (is_string($openingHours)) {
+            return collect(explode("\n", $openingHours))
+                ->map(function ($line, $index) {
+                    $line = trim($line);
+                    if ($line === '') {
+                        return null;
+                    }
+
+                    return [
+                        'day' => 'Jour ' . ($index + 1),
+                        'hours' => $line,
+                    ];
+                })
+                ->filter()
+                ->values()
+                ->toArray();
+        }
+
+        return [];
+    }
+
+    private function formatDayLabel(string $day): string
+    {
+        $daysMap = [
+            'monday' => 'Lundi',
+            'tuesday' => 'Mardi',
+            'wednesday' => 'Mercredi',
+            'thursday' => 'Jeudi',
+            'friday' => 'Vendredi',
+            'saturday' => 'Samedi',
+            'sunday' => 'Dimanche',
+        ];
+
+        $normalized = strtolower(trim($day));
+
+        return $daysMap[$normalized] ?? ucfirst($day);
     }
 }

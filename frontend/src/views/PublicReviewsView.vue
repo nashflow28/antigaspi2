@@ -87,9 +87,9 @@
             >
               <div class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
                 <div>
-                  <p class="text-sm font-semibold text-blue-600">{{ review.merchantName }}</p>
-                  <p class="text-lg font-semibold text-gray-900">{{ review.title }}</p>
-                  <p class="text-sm text-gray-500">{{ review.productName }}</p>
+                  <p class="text-sm font-semibold text-blue-600">{{ review.merchant?.business_name ?? 'Commerçant AntiGaspi' }}</p>
+                  <p class="text-lg font-semibold text-gray-900">{{ review.title ?? 'Avis client' }}</p>
+                  <p class="text-sm text-gray-500">{{ review.product?.name ?? 'Panier AntiGaspi' }}</p>
                 </div>
                 <div class="flex items-center gap-2">
                   <div class="flex items-center gap-2">
@@ -100,15 +100,12 @@
                       :class="star <= review.rating ? 'text-yellow-400 fill-amber-400' : 'text-gray-500'"
                     />
                   </div>
-                  <span class="text-xs text-gray-400">{{ review.timeAgo }}</span>
+                  <span class="text-xs text-gray-400">{{ review.time_ago ?? '' }}</span>
                 </div>
               </div>
-              <p class="mt-4 text-sm text-gray-800">{{ review.comment }}</p>
+              <p class="mt-4 text-sm text-gray-800">{{ review.comment ?? 'Avis non renseigné.' }}</p>
               <div class="mt-4 flex flex-wrap items-center gap-3 text-xs text-gray-500">
-                <span class="inline-flex items-center gap-2 rounded-full bg-blue-50 px-3 py-3 text-blue-600">
-                  <Leaf class="icon-xs" /> {{ review.impact }} kg sauvés
-                </span>
-                <span v-if="review.isVerified" class="inline-flex items-center gap-2 rounded-full bg-emerald-50 px-3 py-3 text-blue-600">
+                <span v-if="review.is_verified_purchase" class="inline-flex items-center gap-2 rounded-full bg-emerald-50 px-3 py-3 text-blue-600">
                   <ShieldCheck class="icon-xs" /> Achat vérifié
                 </span>
               </div>
@@ -158,7 +155,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { storeToRefs } from 'pinia'
 import Button from '@/components/ui/Button.vue'
@@ -166,20 +163,9 @@ import Card from '@/components/ui/Card.vue'
 import Skeleton from '@/components/ui/Skeleton.vue'
 import { useMerchantsStore } from '@/stores/merchants'
 import { notify } from '@/composables/useNotifications'
-import { Star, MessageSquare, Leaf, ShieldCheck } from 'lucide-vue-next'
-
-interface PublicReview {
-  id: number
-  merchantId: number
-  merchantName: string
-  rating: number
-  title: string
-  comment: string
-  productName: string
-  timeAgo: string
-  impact: number
-  isVerified: boolean
-}
+import { apiService } from '@/services/api'
+import type { PublicReviewEntry } from '@/types'
+import { Star, MessageSquare, ShieldCheck } from 'lucide-vue-next'
 
 const router = useRouter()
 const route = useRoute()
@@ -189,72 +175,29 @@ const { merchants } = storeToRefs(merchantsStore)
 const selectedMerchant = ref<string>('')
 const selectedRating = ref<number | ''>('')
 const reviewsLoading = ref(false)
-const reviews = ref<PublicReview[]>([
-  {
-    id: 1,
-    merchantId: 1,
-    merchantName: 'Boulangerie du Soleil',
-    rating: 5,
-    title: 'Viennoiseries incroyables !',
-    comment: 'Le panier surprise était généreux avec des croissants croustillants et un jus frais. À refaire !',
-    productName: 'Panier petit-déjeuner',
-    timeAgo: 'Il y a 2 heures',
-    impact: 3,
-    isVerified: true
-  },
-  {
-    id: 2,
-    merchantId: 2,
-    merchantName: 'Marché des Saveurs',
-    rating: 4,
-    title: 'Fruits de saison au top',
-    comment: 'Très bon panier de fruits locaux, quelques bananes un peu mûres mais parfait pour des smoothies.',
-    productName: 'Panier vitaminé',
-    timeAgo: 'Il y a 1 jour',
-    impact: 5,
-    isVerified: true
-  },
-  {
-    id: 3,
-    merchantId: 3,
-    merchantName: 'Café Green Spirit',
-    rating: 5,
-    title: 'Brunch gourmand',
-    comment: 'Portion très généreuse et découverte de nouvelles boissons locales. Merci !',
-    productName: 'Panier brunch',
-    timeAgo: 'Il y a 3 jours',
-    impact: 2,
-    isVerified: false
-  },
-  {
-    id: 4,
-    merchantId: 2,
-    merchantName: 'Marché des Saveurs',
-    rating: 3,
-    title: 'Panier correct',
-    comment: 'Quelques légumes étaient un peu abîmés mais le commerçant a ajouté des herbes fraîches en compensation.',
-    productName: 'Panier maraîcher',
-    timeAgo: 'Il y a 5 jours',
-    impact: 4,
-    isVerified: true
-  }
-])
+const reviews = ref<PublicReviewEntry[]>([])
+const filtersReady = ref(false)
 
 const merchantOptions = computed(() => {
-  if (merchants.value.length === 0) {
-    return [
-      { id: 1, name: 'Boulangerie du Soleil' },
-      { id: 2, name: 'Marché des Saveurs' },
-      { id: 3, name: 'Café Green Spirit' }
-    ]
+  if (merchants.value.length > 0) {
+    return merchants.value.map(merchant => ({ id: merchant.id, name: merchant.business_name }))
   }
 
-  return merchants.value.map(merchant => ({ id: merchant.id, name: merchant.business_name }))
+  const fromReviews = new Map<number, string>()
+  reviews.value.forEach(review => {
+    const merchantId = review.merchant?.id
+    const name = review.merchant?.business_name
+    if (merchantId && name && !fromReviews.has(merchantId)) {
+      fromReviews.set(merchantId, name)
+    }
+  })
+
+  return Array.from(fromReviews.entries()).map(([id, name]) => ({ id, name }))
 })
 
 const filteredReviews = computed(() => {
   return reviews.value.filter(review => {
-    const merchantFilter = !selectedMerchant.value || review.merchantId === Number(selectedMerchant.value)
+    const merchantFilter = !selectedMerchant.value || review.merchant?.id === Number(selectedMerchant.value)
     const ratingFilter = !selectedRating.value || review.rating >= Number(selectedRating.value)
     return merchantFilter && ratingFilter
   })
@@ -271,36 +214,86 @@ const averageRating = computed(() => {
 const topMerchants = computed(() => {
   const stats = new Map<number, { id: number; name: string; rating: number; reviews: number }>()
   reviews.value.forEach(review => {
-    const entry = stats.get(review.merchantId)
+    const merchantId = review.merchant?.id
+    if (!merchantId) {
+      return
+    }
+
+    const entry = stats.get(merchantId)
     if (!entry) {
-      stats.set(review.merchantId, { id: review.merchantId, name: review.merchantName, rating: review.rating, reviews: 1 })
+      stats.set(merchantId, {
+        id: merchantId,
+        name: review.merchant?.business_name ?? 'Commerçant AntiGaspi',
+        rating: review.rating,
+        reviews: 1
+      })
     } else {
       entry.rating = (entry.rating * entry.reviews + review.rating) / (entry.reviews + 1)
       entry.reviews += 1
     }
   })
+
   return Array.from(stats.values()).sort((a, b) => b.rating - a.rating).slice(0, 4)
 })
 
 const resetFilters = () => {
+  if (!filtersReady.value) {
+    selectedMerchant.value = ''
+    selectedRating.value = ''
+    return
+  }
+
+  filtersReady.value = false
   selectedMerchant.value = ''
   selectedRating.value = ''
+  filtersReady.value = true
+  void fetchReviews()
 }
 
 const fetchMerchants = async () => {
-  reviewsLoading.value = true
-  const result = await merchantsStore.fetchMerchants().catch(() => ({ success: false }))
-  if (!result?.success) {
-    notify.info('Affichage des avis de démonstration.', 'Avis publics')
-  }
-  reviewsLoading.value = false
+  await merchantsStore.fetchMerchants().catch(() => ({ success: false }))
 }
 
-onMounted(() => {
+const fetchReviews = async () => {
+  try {
+    reviewsLoading.value = true
+    const params: Record<string, string | number | undefined> = {}
+    if (selectedMerchant.value) {
+      params.merchant_id = Number(selectedMerchant.value)
+    }
+    if (selectedRating.value) {
+      params.rating = Number(selectedRating.value)
+    }
+
+    const response = await apiService.getPublicReviews(params)
+    if (!response.success) {
+      throw new Error(response.message || 'Erreur lors du chargement des avis')
+    }
+
+    reviews.value = Array.isArray(response.data) ? response.data : []
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Erreur lors du chargement des avis publics'
+    notify.error(message, 'Avis publics')
+  } finally {
+    reviewsLoading.value = false
+  }
+}
+
+onMounted(async () => {
   const merchantFromQuery = route.query.merchant as string | undefined
   if (merchantFromQuery) {
     selectedMerchant.value = merchantFromQuery
   }
-  fetchMerchants()
+
+  await fetchMerchants()
+  await fetchReviews()
+  filtersReady.value = true
+})
+
+watch([selectedMerchant, selectedRating], () => {
+  if (!filtersReady.value) {
+    return
+  }
+  void fetchReviews()
 })
 </script>

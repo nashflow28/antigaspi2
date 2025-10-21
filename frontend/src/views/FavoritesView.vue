@@ -28,6 +28,7 @@
               variant="ghost"
               size="sm"
               class="text-gray-500"
+              :disabled="loading"
               @click="clearAll"
             >
               Effacer tout
@@ -39,6 +40,10 @@
 
     <main class="container px-3 sm:px-4 lg:px-6 mx-auto grid gap-6 sm:gap-8 px-4 py-8 sm:py-12 lg:py-16 lg:grid-cols-[2fr_1fr]">
       <section>
+        <div v-if="loading && !hasFavorites" class="rounded border border-gray-200 bg-white/80 p-6 text-center text-gray-600">
+          Chargement de vos favoris...
+        </div>
+
         <div v-if="!hasFavorites" class="rounded border border-dashed border-gray-300 bg-white/70 p-6 sm:p-12 lg:p-12 text-left sm:text-center shadow-sm">
           <Heart class="mx-auto h-6 w-6 text-gray-500" />
           <h2 class="mt-4 text-xl font-semibold text-gray-800">Ajoutez vos premiers favoris</h2>
@@ -162,7 +167,7 @@ import { Heart, HeartOff, MapPin } from 'lucide-vue-next'
 
 const router = useRouter()
 const favoritesStore = useFavoritesStore()
-const { items, hasFavorites } = storeToRefs(favoritesStore)
+const { items, hasFavorites, loading } = storeToRefs(favoritesStore)
 const filters = [
   { value: 'all', label: 'Tous' },
   { value: 'merchant', label: 'Commerçants' },
@@ -186,12 +191,12 @@ const formatDate = (date: string) => {
   }
 }
 
-const removeFavorite = (favorite: FavoriteItem) => {
-  favoritesStore.removeFavorite(favorite.id, favorite.type)
+const removeFavorite = async (favorite: FavoriteItem) => {
+  await favoritesStore.removeFavorite(favorite.id, favorite.type)
 }
 
-const clearAll = () => {
-  favoritesStore.clearFavorites()
+const clearAll = async () => {
+  await favoritesStore.clearFavorites()
 }
 
 const goToDetail = (favorite: FavoriteItem) => {
@@ -203,6 +208,6 @@ const goToDetail = (favorite: FavoriteItem) => {
 }
 
 onMounted(() => {
-  favoritesStore.hydrateFromStorage()
+  void favoritesStore.initialize()
 })
 </script>

@@ -149,7 +149,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue'
+import { computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { storeToRefs } from 'pinia'
 import Button from '@/components/ui/Button.vue'
@@ -161,15 +161,12 @@ import { notify } from '@/composables/useNotifications'
 import { formatPrice } from '@/utils/currency'
 import { Store, Heart, BadgeInfo, MapPin, Phone, Navigation, Package, Star, Leaf } from 'lucide-vue-next'
 import { sanitizeRouteId, logXssAttempt } from '@/utils/sanitization'
-import type { MerchantDetail } from '@/services/merchantService'
 
 const route = useRoute()
 const router = useRouter()
 const merchantsStore = useMerchantsStore()
 const favoritesStore = useFavoritesStore()
 const { currentMerchant, detailLoading } = storeToRefs(merchantsStore)
-
-const fallbackMerchant = ref<MerchantDetail | null>(null)
 
 // SECURITY FIX: Sanitize route parameters to prevent XSS
 const merchantId = computed(() => {
@@ -178,7 +175,7 @@ const merchantId = computed(() => {
   const sanitizedId = sanitizeRouteId(rawId)
   return sanitizedId || 0
 })
-const activeMerchant = computed<MerchantDetail | null>(() => currentMerchant.value ?? fallbackMerchant.value)
+const activeMerchant = computed(() => currentMerchant.value)
 
 const merchantName = computed(() => activeMerchant.value?.business_name ?? 'Commerçant AntiGaspi')
 const merchantDescription = computed(() => (
@@ -193,7 +190,13 @@ const merchantDistance = computed(() => activeMerchant.value?.distance_km ? acti
 const merchantProductsCount = computed(() => activeMerchant.value?.products_count ?? 0)
 const merchantRating = computed(() => activeMerchant.value?.rating ?? null)
 const merchantReviews = computed(() => activeMerchant.value?.total_reviews ?? 0)
-const merchantImpact = computed(() => (activeMerchant.value as any)?.saved_weight ?? 35)
+const merchantImpact = computed(() => {
+  const impact = (activeMerchant.value as any)?.saved_weight
+  if (typeof impact === 'number' && Number.isFinite(impact)) {
+    return Math.max(0, Math.round(impact))
+  }
+  return 0
+})
 
 const openingHours = computed(() => {
   const hours = activeMerchant.value?.opening_hours
@@ -233,12 +236,12 @@ const productsPreview = computed(() => {
 const loading = computed(() => detailLoading.value && !fallbackMerchant.value)
 const isFavorite = computed(() => favoritesStore.isFavorite(merchantId.value, 'merchant'))
 
-const toggleFavorite = () => {
+const toggleFavorite = async () => {
   if (!activeMerchant.value) {
     return
   }
 
-  favoritesStore.toggleFavorite({
+  await favoritesStore.toggleFavorite({
     id: activeMerchant.value.id,
     type: 'merchant',
     name: activeMerchant.value.business_name,
@@ -255,45 +258,17 @@ const fetchMerchant = async () => {
   }
 
   const result = await merchantsStore.fetchMerchantDetail(merchantId.value)
-  if (!result.success && !activeMerchant.value) {
-    fallbackMerchant.value = {
-      id: merchantId.value,
-      business_name: 'Commerçant engagé',
-      business_type: 'Primeur responsable',
-      city: 'Lomé',
-      address: 'Adresse communiquée après réservation',
-      phone: '+228 90 00 00 00',
-      is_verified: true,
-      latitude: null,
-      longitude: null,
-      distance_km: 2.4,
-      products_count: 3,
-      description: 'Nous sauvons les invendus des maraîchers locaux pour composer des paniers de saison.',
-      rating: 4.7,
-      total_reviews: 54,
-      opening_hours: {
-        Lundi: '08h00 - 18h00',
-        Mardi: '08h00 - 18h00',
-        Mercredi: '08h00 - 18h00',
-        Jeudi: '08h00 - 18h00',
-        Vendredi: '08h00 - 19h00'
-      },
-      surprise_baskets: [],
-      featured_products: [
-        { id: 1, name: 'Panier légumes du jour', description: "Assortiment d'une dizaine de légumes", discounted_price: 3200 },
-        { id: 2, name: 'Panier brunch', description: 'Viennoiseries, fruits, boissons locales', discounted_price: 4500 }
-      ],
-      user: { city: 'Lomé', address: 'Quartier Tokoin', phone: '+228 90 00 00 00' }
-    } as MerchantDetail
-
-    notify.info("Affichage d'une fiche commerçant de démonstration.", 'Commerçants')
-  } else if (!result.success && result.error) {
-    notify.error(result.error, 'Commerçants')
+  if (!result.success) {
+    const errorMessage = result.error || 'Commerçant introuvable.'
+    notify.error(errorMessage, 'Commerçants')
+    if (!activeMerchant.value) {
+      router.push({ name: 'discover' })
+    }
   }
 }
 
 onMounted(() => {
-  favoritesStore.hydrateFromStorage()
+  void favoritesStore.initialize()
   fetchMerchant()
 })
 </script>

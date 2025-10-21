@@ -278,7 +278,20 @@
                   <h3 class="text-xl font-semibold text-neutral-900 dark:text-neutral-100">Choisissez votre moyen de paiement</h3>
                 </template>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mt-4">
+                <div v-if="paymentMethodsLoading" class="grid grid-cols-1 md:grid-cols-2 gap-3 mt-4">
+                  <div
+                    v-for="n in 2"
+                    :key="n"
+                    class="h-24 rounded border border-neutral-200 dark:border-neutral-700 bg-neutral-100/60 dark:bg-neutral-800/60 animate-pulse"
+                  />
+                </div>
+                <div
+                  v-else-if="!paymentOptions.length"
+                  class="mt-4 rounded border border-dashed border-neutral-300 bg-neutral-50 dark:bg-neutral-900/60 p-4 text-sm text-neutral-600 dark:text-neutral-300"
+                >
+                  Aucune méthode de paiement disponible pour le moment. Merci de réessayer plus tard ou de contacter le support.
+                </div>
+                <div v-else class="grid grid-cols-1 md:grid-cols-2 gap-3 mt-4">
                   <Button
                     v-for="option in paymentOptions"
                     :key="option.value"
@@ -573,7 +586,7 @@ import { usePaymentsStore, isFinalStatus } from '@/stores/payments'
 import { useWalletStore } from '@/stores/wallet'
 import { apiService } from '@/services/api'
 import { notify } from '@/composables/useNotifications'
-import type { PaymentMethod } from '@/types'
+import type { PaymentMethodOptionResponse, PaymentMethod } from '@/types'
 import {
   ArrowLeft, ArrowRight, Package, Clock, Minus, Plus, MapPin, Calendar,
   Phone, Store, HelpCircle, Mail, CreditCard, Smartphone, Wallet
@@ -641,75 +654,54 @@ const product = ref<ReserveProduct | null>(null)
 const loadingProduct = ref(true)
 const productError = ref(false)
 
-const paymentOptions = computed<PaymentOption[]>(() => {
-  const options: PaymentOption[] = [
-    {
-      value: 'flooz',
-      label: 'Flooz (Moov Togo)',
-      description: 'PayGate - Mobile Money',
-      requiresPhone: true,
-      icon: Smartphone,
-      instructions: 'Assurez-vous que votre numéro Flooz est actif et dispose des fonds nécessaires.'
-    },
-    {
-      value: 'tmoney',
-      label: 'Mixx by Yas (Tmoney)',
-      description: 'PayGate - Mobile Money',
-      requiresPhone: true,
-      icon: Smartphone,
-      instructions: 'Le numéro Mixx by Yas doit être au format international (+228...).'
-    },
-    {
-      value: 'orange_money',
-      label: 'Orange Money',
-      description: 'CinetPay - Mobile Money',
-      requiresPhone: true,
-      icon: Smartphone,
-      instructions: 'Utilisez votre numéro Orange Money format international (+225/+229...).'
-    },
-    {
-      value: 'mtn_momo',
-      label: 'MTN MoMo',
-      description: 'CinetPay - Mobile Money',
-      requiresPhone: true,
-      icon: Smartphone,
-      instructions: 'Le numéro MTN MoMo doit être saisi au format international.'
-    },
-    {
-      value: 'paystack',
-      label: 'Paystack',
-      description: 'Cartes bancaires & Mobile Money',
-      requiresPhone: false,
-      icon: CreditCard,
-      instructions: 'Vous serez redirigé vers Paystack pour finaliser le paiement de façon sécurisée.'
-    },
-    {
-      value: 'on_site',
-      label: 'Paiement sur place',
-      description: 'Régler lors du retrait',
-      requiresPhone: false,
-      icon: Wallet,
-      instructions: 'Préparez le montant exact et réglez directement auprès du commerçant.'
-    }
-  ]
+const paymentMethods = ref<PaymentMethodOptionResponse[]>([])
+const paymentMethodsLoading = ref(false)
 
-  // Add wallet option if user has wallet and sufficient balance
-  if (walletStore.hasWallet && walletStore.isActive && walletStore.hasPin) {
-    options.unshift({
-      value: 'wallet',
-      label: 'Portefeuille électronique',
-      description: `Solde: ${walletStore.formattedBalance}`,
-      requiresPhone: false,
-      icon: Wallet,
-      instructions: 'Paiement instantané depuis votre portefeuille. Saisissez votre code PIN pour confirmer.'
-    })
+const paymentOptionIcon = (method: PaymentMethodOptionResponse): Component => {
+  switch (method.value) {
+    case 'paystack':
+      return CreditCard
+    case 'wallet':
+    case 'on_site':
+      return Wallet
+    default:
+      return Smartphone
   }
+}
 
-  return options
+const paymentOptions = computed<PaymentOption[]>(() => {
+  return paymentMethods.value
+    .filter(method => method.is_available)
+    .map(method => {
+      const isWallet = method.value === 'wallet'
+      const description = isWallet && walletStore.hasWallet
+        ? `Solde: ${walletStore.formattedBalance}`
+        : method.description
+
+      return {
+        value: method.value,
+        label: method.label,
+        description,
+        requiresPhone: method.requires_phone,
+        icon: paymentOptionIcon(method),
+        instructions: method.instructions
+      }
+    })
 })
 
 const selectedPaymentOption = computed(() => paymentOptions.value.find(option => option.value === paymentMethod.value))
 const methodRequiresPhone = computed(() => selectedPaymentOption.value?.requiresPhone ?? false)
+
+const ensureValidPaymentMethod = () => {
+  const availableMethods = paymentOptions.value.map(option => option.value)
+  if (!availableMethods.length) {
+    return
+  }
+
+  if (!availableMethods.includes(paymentMethod.value)) {
+    paymentMethod.value = availableMethods[0]
+  }
+}
 
 // Wallet-specific refs
 const walletPin = ref('')
@@ -744,6 +736,9 @@ const canProceedToNextStep = computed(() => {
     case 2:
       return Boolean(reservation.value.pickup_date && reservation.value.pickup_time && reservation.value.contact_phone)
     case 3:
+      if (!paymentOptions.value.length) {
+        return false
+      }
       if (!paymentMethod.value) {
         return false
       }
@@ -941,6 +936,26 @@ const confirmReservation = async () => {
   }
 }
 
+const fetchPaymentMethods = async () => {
+  try {
+    paymentMethodsLoading.value = true
+    const response = await apiService.getPaymentMethods()
+
+    if (!response?.success) {
+      throw new Error(response?.message || 'Impossible de récupérer les méthodes de paiement disponibles')
+    }
+
+    paymentMethods.value = Array.isArray(response.data) ? response.data : []
+  } catch (error) {
+    paymentMethods.value = []
+    const message = error instanceof Error ? error.message : 'Impossible de charger les méthodes de paiement pour le moment.'
+    notify.error(message, 'Méthodes de paiement')
+  } finally {
+    paymentMethodsLoading.value = false
+    ensureValidPaymentMethod()
+  }
+}
+
 const fetchProduct = async () => {
   try {
     loadingProduct.value = true
@@ -986,6 +1001,47 @@ const fetchProduct = async () => {
   }
 }
 
+watch(paymentOptions, () => {
+  ensureValidPaymentMethod()
+})
+
+watch(paymentMethod, (method, previousMethod) => {
+  if (method !== 'wallet' && previousMethod === 'wallet') {
+    walletPin.value = ''
+  }
+
+  const option = paymentOptions.value.find(item => item.value === method)
+  if (!option?.requiresPhone) {
+    mobileMoneyPhone.value = reservation.value.contact_phone || ''
+  } else if (!mobileMoneyPhone.value && reservation.value.contact_phone) {
+    mobileMoneyPhone.value = reservation.value.contact_phone
+  }
+})
+
+watch(methodRequiresPhone, requiresPhone => {
+  if (requiresPhone) {
+    if (!mobileMoneyPhone.value && reservation.value.contact_phone) {
+      mobileMoneyPhone.value = reservation.value.contact_phone
+    }
+  } else {
+    mobileMoneyPhone.value = reservation.value.contact_phone || ''
+  }
+})
+
+watch(
+  () => reservation.value.contact_phone,
+  (phone, previousPhone) => {
+    if (!methodRequiresPhone.value) {
+      mobileMoneyPhone.value = phone || ''
+      return
+    }
+
+    if (!mobileMoneyPhone.value || mobileMoneyPhone.value === previousPhone) {
+      mobileMoneyPhone.value = phone || ''
+    }
+  }
+)
+
 onMounted(async () => {
   if (!authStore.isAuthenticated) {
     router.push('/login')
@@ -1003,9 +1059,10 @@ onMounted(async () => {
 
   applyInitialQuantity()
 
-  // Load wallet information for authenticated users
   if (authStore.isAuthenticated) {
-    await walletStore.fetchWallet()
+    await Promise.all([walletStore.fetchWallet(), fetchPaymentMethods()])
+  } else {
+    await fetchPaymentMethods()
   }
 })
 

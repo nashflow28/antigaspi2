@@ -377,8 +377,8 @@ const goToMerchant = (merchantId: number) => {
   router.push({ name: 'merchant-detail', params: { id: merchantId } })
 }
 
-const toggleFavoriteMerchant = (merchant: MerchantWithLocation) => {
-  favoritesStore.toggleFavorite({
+const toggleFavoriteMerchant = async (merchant: MerchantWithLocation) => {
+  await favoritesStore.toggleFavorite({
     id: merchant.id,
     type: 'merchant',
     name: merchant.business_name,
@@ -405,7 +405,7 @@ const fetchData = async () => {
 }
 
 onMounted(() => {
-  favoritesStore.hydrateFromStorage()
+  void favoritesStore.initialize()
   fetchData()
 })
 </script>
