@@ -18,7 +18,7 @@ import { RootState } from '../../store'
 import * as ImagePicker from 'expo-image-picker'
 import { useTheme } from '../../theme'
 import apiService from '../../services/api'
-import * as Location from 'expo-location'
+import useMerchantLocation, { LocationStatusVariant } from '../../hooks/useMerchantLocation'
 
 interface ProfileFormData {
   business_name: string
@@ -47,47 +47,24 @@ const MerchantProfileEditScreen: React.FC = () => {
     city: '',
     siret: '',
   })
-  const [locationLoading, setLocationLoading] = useState(false)
-  const [latitude, setLatitude] = useState('')
-  const [longitude, setLongitude] = useState('')
-  const [initialLatitudeValue, setInitialLatitudeValue] = useState<number | null>(null)
-  const [initialLongitudeValue, setInitialLongitudeValue] = useState<number | null>(null)
-  const [hasLocation, setHasLocation] = useState(false)
-
-  const formatCoordinate = (value: number | null): string => {
-    if (value === null || Number.isNaN(value)) {
-      return ''
-    }
-    return Number(value).toFixed(6)
-  }
-
-  const parseCoordinateInput = (value: string): number | null => {
-    if (!value || !value.trim()) {
-      return null
-    }
-
-    const normalized = value.trim().replace(',', '.')
-    const numeric = Number(normalized)
-    return Number.isFinite(numeric) ? numeric : null
-  }
-
-  const parseCoordinateFromApi = (value: unknown): number | null => {
-    if (typeof value === 'number') {
-      return Number.isFinite(value) ? value : null
-    }
-
-    if (typeof value === 'string') {
-      const numeric = Number(value)
-      return Number.isFinite(numeric) ? numeric : null
-    }
-
-    return null
-  }
+  const {
+    latitude,
+    longitude,
+    setLatitude,
+    setLongitude,
+    locationLoading,
+    status: locationStatus,
+    loadMerchantLocation,
+    requestCurrentLocation,
+    saveLocationIfNeeded,
+  } = useMerchantLocation()
 
   useEffect(() => {
     loadMerchantProfile()
-    loadMerchantLocation()
-  }, [])
+    void loadMerchantLocation().catch((error) => {
+      console.error('Erreur chargement localisation:', error)
+    })
+  }, [loadMerchantLocation])
 
   const loadMerchantProfile = async () => {
     try {
@@ -115,47 +92,9 @@ const MerchantProfileEditScreen: React.FC = () => {
     }
   }
 
-  const loadMerchantLocation = async () => {
-    try {
-      setLocationLoading(true)
-      const response = await apiService.getMerchantLocation()
-
-      if (response.data?.success) {
-        const locationData = response.data.data
-        const latValue = parseCoordinateFromApi(locationData?.latitude)
-        const lngValue = parseCoordinateFromApi(locationData?.longitude)
-
-        setInitialLatitudeValue(latValue)
-        setInitialLongitudeValue(lngValue)
-        setLatitude(formatCoordinate(latValue))
-        setLongitude(formatCoordinate(lngValue))
-        setHasLocation(Boolean(locationData?.has_location || (latValue !== null && lngValue !== null)))
-      }
-    } catch (error) {
-      console.error('Erreur chargement localisation:', error)
-    } finally {
-      setLocationLoading(false)
-    }
-  }
-
   const handleUseCurrentLocation = async () => {
     try {
-      setLocationLoading(true)
-      const { status } = await Location.requestForegroundPermissionsAsync()
-
-      if (status !== 'granted') {
-        throw new Error('Permission de géolocalisation refusée')
-      }
-
-      const position = await Location.getCurrentPositionAsync({
-        accuracy: Location.Accuracy.Balanced,
-      })
-
-      const newLatitude = Number(position.coords.latitude)
-      const newLongitude = Number(position.coords.longitude)
-
-      setLatitude(formatCoordinate(newLatitude))
-      setLongitude(formatCoordinate(newLongitude))
+      await requestCurrentLocation()
     } catch (error) {
       console.error('Erreur géolocalisation:', error)
       Alert.alert(
@@ -164,8 +103,6 @@ const MerchantProfileEditScreen: React.FC = () => {
           ? error.message
           : 'Impossible de récupérer votre position actuelle'
       )
-    } finally {
-      setLocationLoading(false)
     }
   }
 
@@ -228,67 +165,6 @@ const MerchantProfileEditScreen: React.FC = () => {
     }
   }
 
-  const saveLocationIfNeeded = async (): Promise<boolean> => {
-    const hasInput = latitude.trim().length > 0 || longitude.trim().length > 0
-
-    if (!hasInput) {
-      if (initialLatitudeValue !== null || initialLongitudeValue !== null) {
-        setLatitude(formatCoordinate(initialLatitudeValue))
-        setLongitude(formatCoordinate(initialLongitudeValue))
-      }
-      return false
-    }
-
-    const parsedLatitude = parseCoordinateInput(latitude)
-    const parsedLongitude = parseCoordinateInput(longitude)
-
-    if (parsedLatitude === null) {
-      throw new Error('Latitude invalide. Utilisez un nombre entre -90 et 90.')
-    }
-
-    if (parsedLatitude < -90 || parsedLatitude > 90) {
-      throw new Error('La latitude doit être comprise entre -90 et 90.')
-    }
-
-    if (parsedLongitude === null) {
-      throw new Error('Longitude invalide. Utilisez un nombre entre -180 et 180.')
-    }
-
-    if (parsedLongitude < -180 || parsedLongitude > 180) {
-      throw new Error('La longitude doit être comprise entre -180 et 180.')
-    }
-
-    const hasChanged =
-      initialLatitudeValue === null ||
-      initialLongitudeValue === null ||
-      Math.abs(parsedLatitude - initialLatitudeValue) > 0.000001 ||
-      Math.abs(parsedLongitude - initialLongitudeValue) > 0.000001
-
-    if (!hasChanged) {
-      return false
-    }
-
-    const response = await apiService.updateMerchantLocation({
-      latitude: parsedLatitude,
-      longitude: parsedLongitude,
-    })
-
-    if (!response.data?.success) {
-      throw new Error(response.data?.message || 'Impossible de mettre à jour la localisation')
-    }
-
-    const savedLatValue = parseCoordinateFromApi(response.data.data?.latitude) ?? parsedLatitude
-    const savedLngValue = parseCoordinateFromApi(response.data.data?.longitude) ?? parsedLongitude
-
-    setLatitude(formatCoordinate(savedLatValue))
-    setLongitude(formatCoordinate(savedLngValue))
-    setInitialLatitudeValue(savedLatValue)
-    setInitialLongitudeValue(savedLngValue)
-    setHasLocation(true)
-
-    return true
-  }
-
   const handleSave = async () => {
     try {
       setLoading(true)
@@ -342,42 +218,18 @@ const MerchantProfileEditScreen: React.FC = () => {
     setFormData((prev) => ({ ...prev, [field]: value }))
   }
 
-  const hasDraftCoordinates = latitude.trim().length > 0 && longitude.trim().length > 0
-  const draftCoordinatesAreValid = (() => {
-    if (!hasDraftCoordinates) {
-      return false
+  const getLocationStatusColor = (variant: LocationStatusVariant) => {
+    switch (variant) {
+      case 'success':
+        return theme.colors.semantic.success
+      case 'error':
+        return theme.colors.semantic.error
+      case 'info':
+        return theme.colors.accent.blue
+      default:
+        return theme.colors.textSecondary
     }
-
-    const parsedLat = parseCoordinateInput(latitude)
-    const parsedLng = parseCoordinateInput(longitude)
-
-    if (parsedLat === null || parsedLng === null) {
-      return false
-    }
-
-    return parsedLat >= -90 && parsedLat <= 90 && parsedLng >= -180 && parsedLng <= 180
-  })()
-  const coordinatesChangedFromInitial = (() => {
-    if (!hasDraftCoordinates) {
-      return false
-    }
-
-    const parsedLat = parseCoordinateInput(latitude)
-    const parsedLng = parseCoordinateInput(longitude)
-
-    if (parsedLat === null || parsedLng === null) {
-      return false
-    }
-
-    if (initialLatitudeValue === null || initialLongitudeValue === null) {
-      return true
-    }
-
-    return (
-      Math.abs(parsedLat - initialLatitudeValue) > 0.000001 ||
-      Math.abs(parsedLng - initialLongitudeValue) > 0.000001
-    )
-  })()
+  }
 
   if (loading && !formData.business_name) {
     return (
@@ -614,26 +466,10 @@ const MerchantProfileEditScreen: React.FC = () => {
         <Text
           style={[
             styles.locationStatus,
-            {
-              color: hasLocation
-                ? theme.colors.semantic.success
-                : hasDraftCoordinates
-                  ? draftCoordinatesAreValid
-                    ? theme.colors.accent.blue
-                    : theme.colors.semantic.error
-                  : theme.colors.textSecondary,
-            },
+            { color: getLocationStatusColor(locationStatus.variant) },
           ]}
         >
-          {hasLocation
-            ? 'Coordonnées enregistrées. Appuyez sur « Enregistrer » après modification pour les mettre à jour.'
-            : draftCoordinatesAreValid
-              ? coordinatesChangedFromInitial
-                ? 'Coordonnées prêtes à être enregistrées. Appuyez sur « Enregistrer » pour les sauvegarder.'
-                : 'Ces coordonnées correspondent déjà à la position enregistrée.'
-              : hasDraftCoordinates
-                ? 'Veuillez saisir une latitude et une longitude valides.'
-                : 'Aucune localisation enregistrée pour le moment.'}
+          {locationStatus.message}
         </Text>
       </View>
 
