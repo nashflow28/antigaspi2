@@ -26,6 +26,8 @@ jest.mock('../../../services/api', () => ({
   default: {
     put: jest.fn(),
     post: jest.fn(),
+    getProfile: jest.fn(),
+    setStoredUser: jest.fn(),
   },
   API_BASE_URL: 'http://localhost:8000/api',
 }))
@@ -92,6 +94,11 @@ describe('ProfileEditScreen', () => {
     jest.clearAllMocks()
     mockGoBack.mockReset()
     mockNavigate.mockReset()
+    ;(apiService.getProfile as jest.Mock).mockResolvedValue({
+      success: true,
+      data: mockUser,
+    })
+    ;(apiService.setStoredUser as jest.Mock).mockResolvedValue(undefined)
     alertSpy = jest.spyOn(Alert, 'alert').mockImplementation((title, message, buttons) => {
       if (buttons && buttons[0]?.onPress) {
         buttons[0].onPress()
@@ -381,8 +388,18 @@ describe('ProfileEditScreen', () => {
 
   describe('Save Profile', () => {
     it('calls API with updated profile data', async () => {
+      const updatedUser = {
+        ...mockUser,
+        first_name: 'Pierre',
+      }
+
       ;(apiService.put as jest.Mock).mockResolvedValue({
-        data: { success: true },
+        success: true,
+        data: updatedUser,
+      })
+      ;(apiService.getProfile as jest.Mock).mockResolvedValue({
+        success: true,
+        data: updatedUser,
       })
 
       const { getByDisplayValue, getByText } = renderWithProviders(
@@ -409,7 +426,8 @@ describe('ProfileEditScreen', () => {
 
     it('navigates back after successful save', async () => {
       ;(apiService.put as jest.Mock).mockResolvedValue({
-        data: { success: true },
+        success: true,
+        data: mockUser,
       })
 
       const { getByText } = renderWithProviders(
@@ -441,9 +459,7 @@ describe('ProfileEditScreen', () => {
     })
 
     it('handles API error gracefully', async () => {
-      ;(apiService.put as jest.Mock).mockRejectedValue({
-        response: { data: { message: 'Erreur serveur' } },
-      })
+      ;(apiService.put as jest.Mock).mockRejectedValue(new Error('Erreur serveur'))
 
       const { getByText } = renderWithProviders(
         <ProfileEditScreen navigation={mockNavigation} />
@@ -520,7 +536,8 @@ describe('ProfileEditScreen', () => {
         assets: [{ uri: 'file://photo.jpg' }],
       })
       ;(apiService.post as jest.Mock).mockResolvedValue({
-        data: { success: true },
+        success: true,
+        data: { photo_url: 'http://localhost/photo.jpg' },
       })
 
       const { getByText } = renderWithProviders(
