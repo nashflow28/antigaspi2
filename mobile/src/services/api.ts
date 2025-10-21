@@ -21,6 +21,11 @@ import {
   Review,
   ReviewStats,
   MerchantLocation,
+  CartResponse,
+  CartItemPayload,
+  CartUpdatePayload,
+  CartCheckoutPayload,
+  CartCheckoutResponse,
   SurpriseBasket,
   SurpriseBasketFilters,
   PaginatedSurpriseBaskets,
@@ -340,6 +345,35 @@ class ApiService {
 
   async cancelReservation(id: number): Promise<ApiResponse<Reservation>> {
     return this.request<ApiResponse<Reservation>>('POST', `/reservations/${id}/cancel`)
+  }
+
+  // === PANIER ===
+
+  async getCart(): Promise<CartResponse> {
+    return this.request<CartResponse>('GET', '/cart')
+  }
+
+  async addCartItem(payload: CartItemPayload): Promise<CartResponse> {
+    const snakeCasePayload = toSnakeCase(payload)
+    return this.request<CartResponse>('POST', '/cart/items', snakeCasePayload)
+  }
+
+  async updateCartItem(itemId: number, payload: CartUpdatePayload): Promise<CartResponse> {
+    const snakeCasePayload = toSnakeCase(payload)
+    return this.request<CartResponse>('PUT', `/cart/items/${itemId}`, snakeCasePayload)
+  }
+
+  async removeCartItem(itemId: number): Promise<CartResponse> {
+    return this.request<CartResponse>('DELETE', `/cart/items/${itemId}`)
+  }
+
+  async clearCart(): Promise<CartResponse> {
+    return this.request<CartResponse>('DELETE', '/cart')
+  }
+
+  async checkoutCart(payload: CartCheckoutPayload): Promise<CartCheckoutResponse> {
+    const snakeCasePayload = toSnakeCase(payload)
+    return this.request<CartCheckoutResponse>('POST', '/cart/checkout', snakeCasePayload)
   }
 
   // === FAVORIS ===

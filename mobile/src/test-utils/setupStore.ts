@@ -9,6 +9,7 @@ import { reservationsReducer, reservationsInitialState } from '../store/slices/r
 import { merchantsReducer, merchantsInitialState } from '../store/slices/merchantsSlice'
 import { favoritesReducer, favoritesInitialState } from '../store/slices/favoritesSlice'
 import { reviewsReducer, reviewsInitialState } from '../store/slices/reviewsSlice'
+import { cartReducer, cartInitialState } from '../store/slices/cartSlice'
 import { ProductsState } from '../types'
 
 // PreloadedState type compatibility for older @reduxjs/toolkit versions
@@ -22,6 +23,7 @@ const reducers = {
   merchants: merchantsReducer,
   favorites: favoritesReducer,
   reviews: reviewsReducer,
+  cart: cartReducer,
 } as const
 
 export const setupStore = (preloadedState?: any) =>
@@ -50,3 +52,4 @@ export const buildReservationsState = () => ({ ...reservationsInitialState })
 export const buildMerchantsState = () => ({ ...merchantsInitialState })
 export const buildFavoritesState = () => ({ ...favoritesInitialState })
 export const buildReviewsState = () => ({ ...reviewsInitialState })
+export const buildCartState = () => ({ ...cartInitialState })

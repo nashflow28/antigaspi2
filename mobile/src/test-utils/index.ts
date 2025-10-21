@@ -22,6 +22,7 @@ export {
   buildMerchantsState,
   buildFavoritesState,
   buildReviewsState,
+  buildCartState,
 } from './setupStore'
 
 // Factories de données

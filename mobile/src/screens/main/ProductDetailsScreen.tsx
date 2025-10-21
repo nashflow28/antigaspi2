@@ -13,6 +13,7 @@ import { AppDispatch, RootState } from '../../store'
 import { fetchProduct } from '../../store/slices/productsSlice'
 import { createReservation } from '../../store/slices/reservationsSlice'
 import { fetchReviewStats } from '../../store/slices/reviewsSlice'
+import { addCartItem } from '../../store/slices/cartSlice'
 import { useToast } from '../../contexts/ToastContext'
 import { Ionicons } from '@expo/vector-icons'
 import { Image } from 'expo-image'
@@ -25,39 +26,12 @@ import StarRating from '../../components/reviews/StarRating'
 import { Button, Card, Typography, Modal } from '../../components/2025'
 import Constants from 'expo-constants'
 import { TEST_IDS } from '../../utils/testIds'
+import { PAYMENT_OPTIONS, PaymentOption } from '../../constants/paymentOptions'
 
 interface Props {
   route: any
   navigation: any
 }
-
-type PaymentOption = {
-  value: PaymentMethod
-  label: string
-  description: string
-  icon: keyof typeof Ionicons.glyphMap
-}
-
-const PAYMENT_OPTIONS: PaymentOption[] = [
-  {
-    value: 'on_site',
-    label: 'Sur place',
-    description: 'Réglez au moment du retrait en boutique.',
-    icon: 'storefront',
-  },
-  {
-    value: 'flooz',
-    label: 'Mobile Money',
-    description: 'Payez instantanément via Flooz/TMoney.',
-    icon: 'phone-portrait',
-  },
-  {
-    value: 'paystack',
-    label: 'Carte bancaire',
-    description: 'Paiement sécurisé par carte (Paystack).',
-    icon: 'card',
-  },
-]
 
 const ProductDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
   const dispatch = useDispatch<AppDispatch>()
@@ -65,6 +39,7 @@ const ProductDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
   const { productId } = route.params
   const { products, loading } = useSelector((state: RootState) => state.products)
   const { stats: reviewStats } = useSelector((state: RootState) => state.reviews)
+  const { cart, updating } = useSelector((state: RootState) => state.cart)
   const { showSuccess, showError } = useToast()
 
   const [product, setProduct] = useState<Product | null>(null)
@@ -73,6 +48,8 @@ const ProductDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<PaymentMethod>('on_site')
   const navigationTimeoutRef = useRef<NodeJS.Timeout | null>(null)
   const [confirmVisible, setConfirmVisible] = useState(false)
+  const [addingToCart, setAddingToCart] = useState(false)
+  const isTestEnv = process.env.NODE_ENV === 'test'
 
   useEffect(() => {
     loadProduct()
@@ -104,22 +81,32 @@ const ProductDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
     try {
       const existingProduct = products.find(p => p.id === productId)
       if (existingProduct) {
-        console.log('Product found in store:', existingProduct)
+        if (!isTestEnv) {
+          console.log('Product found in store:', existingProduct)
+        }
         setProduct(existingProduct)
       } else {
-        console.log('Fetching product from API:', productId)
+        if (!isTestEnv) {
+          console.log('Fetching product from API:', productId)
+        }
         const result = await dispatch(fetchProduct(productId))
         if (fetchProduct.fulfilled.match(result)) {
-          console.log('Product fetched successfully:', result.payload)
+          if (!isTestEnv) {
+            console.log('Product fetched successfully:', result.payload)
+          }
           setProduct(result.payload as Product)
         } else if (fetchProduct.rejected.match(result)) {
-          console.error('Failed to fetch product:', result.error)
+          if (!isTestEnv) {
+            console.error('Failed to fetch product:', result.error)
+          }
           showError('Impossible de charger le produit')
           navigation.goBack()
         }
       }
     } catch (error: any) {
-      console.error('Error loading product:', error)
+      if (!isTestEnv) {
+        console.error('Error loading product:', error)
+      }
       showError(`Impossible de charger le produit: ${error.message || 'Erreur inconnue'}`)
       navigation.goBack()
     }
@@ -127,7 +114,10 @@ const ProductDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
 
   if (loading || !product) {
     return (
-      <View style={{ flex: 1, backgroundColor: theme.colors.background, alignItems: 'center', justifyContent: 'center' }}>
+      <View
+        style={{ flex: 1, backgroundColor: theme.colors.background, alignItems: 'center', justifyContent: 'center' }}
+        testID={TEST_IDS.loadingSpinner}
+      >
         <Typography variant="body">Chargement...</Typography>
       </View>
     )
@@ -141,6 +131,47 @@ const ProductDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
 
   const selectedPayment = PAYMENT_OPTIONS.find(option => option.value === selectedPaymentMethod)
   const totalPrice = discountedPrice * selectedQuantity
+
+  const cartItemsCount = cart?.items_count ?? 0
+
+  const handleAddToCart = async () => {
+    if (!product || addingToCart || product.quantity_available === 0) {
+      return
+    }
+
+    setAddingToCart(true)
+    try {
+      const response = await dispatch(addCartItem({
+        productId: product.id,
+        quantity: selectedQuantity,
+      })).unwrap()
+
+      const addedQuantity = selectedQuantity
+      showSuccess(
+        `${addedQuantity} produit${addedQuantity > 1 ? 's' : ''} ajouté${addedQuantity > 1 ? 's' : ''} au panier.`
+      )
+
+      if (response?.data?.items_count) {
+        // Optionnel : proposer de consulter le panier
+        Alert.alert(
+          'Produit ajouté',
+          'Souhaitez-vous consulter votre panier maintenant ?',
+          [
+            { text: 'Continuer mes achats', style: 'cancel' },
+            {
+              text: 'Voir le panier',
+              onPress: () => navigation.navigate('Orders'),
+            },
+          ]
+        )
+      }
+    } catch (error: any) {
+      const message = typeof error === 'string' ? error : error?.message
+      showError(message || 'Impossible d\'ajouter le produit au panier')
+    } finally {
+      setAddingToCart(false)
+    }
+  }
 
   const performReservation = async () => {
     // Guard contre les appels multiples simultanés
@@ -216,6 +247,19 @@ const ProductDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
           </Typography>
           <View style={styles.headerActions}>
             <FavoriteButton productId={product.id} size={24} />
+            <TouchableOpacity
+              accessibilityRole="button"
+              accessibilityLabel="Voir mon panier"
+              onPress={() => navigation.navigate('Orders')}
+              style={styles.cartButton}
+            >
+              <Ionicons name="cart" size={24} color={theme.colors.text} />
+              {cartItemsCount > 0 && (
+                <View style={styles.cartBadge}>
+                  <Text style={styles.cartBadgeText}>{cartItemsCount}</Text>
+                </View>
+              )}
+            </TouchableOpacity>
           </View>
         </View>
 
@@ -267,11 +311,17 @@ const ProductDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
                 style={[styles.quantityButton, selectedQuantity <= 1 && styles.quantityButtonDisabled]}
                 disabled={selectedQuantity <= 1}
                 onPress={() => setSelectedQuantity(Math.max(1, selectedQuantity - 1))}
+                testID={TEST_IDS.decreaseQuantityButton}
               >
                 <Ionicons name="remove" size={20} color={selectedQuantity <= 1 ? theme.colors.neutral[400] : theme.colors.primary[600]} />
               </TouchableOpacity>
 
-              <Typography variant="h3" weight="bold" style={{ minWidth: 40, textAlign: 'center' }}>
+              <Typography
+                variant="h3"
+                weight="bold"
+                style={{ minWidth: 40, textAlign: 'center' }}
+                testID={TEST_IDS.quantityValue}
+              >
                 {selectedQuantity}
               </Typography>
 
@@ -279,6 +329,7 @@ const ProductDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
                 style={[styles.quantityButton, selectedQuantity >= product.quantity_available && styles.quantityButtonDisabled]}
                 disabled={selectedQuantity >= product.quantity_available}
                 onPress={() => setSelectedQuantity(Math.min(product.quantity_available, selectedQuantity + 1))}
+                testID={TEST_IDS.increaseQuantityButton}
               >
                 <Ionicons name="add" size={20} color={selectedQuantity >= product.quantity_available ? theme.colors.neutral[400] : theme.colors.primary[600]} />
               </TouchableOpacity>
@@ -475,19 +526,41 @@ const ProductDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
           </>
         )}
 
-        {/* Bouton Réserver */}
-        <Button
-          variant="primary"
-          size="lg"
-          disabled={product.quantity_available === 0 || reserving}
-          onPress={handleReserve}
-          leftIcon={<Ionicons name="cart" size={20} color={theme.colors.textInverse} />}
-          style={{ width: '100%' }}
-          testID={TEST_IDS.reserveButton}
-          accessibilityLabel={TEST_IDS.reserveButton}
-        >
-          {reserving ? 'Réservation en cours...' : product.quantity_available === 0 ? 'Rupture de stock' : 'Réserver'}
-        </Button>
+        <View style={styles.bottomBarActions}>
+          <Button
+            variant="secondary"
+            size="lg"
+            disabled={product.quantity_available === 0 || addingToCart || updating}
+            onPress={handleAddToCart}
+            leftIcon={<Ionicons name="bag-add" size={20} color={theme.colors.textInverse} />}
+            style={{ flex: 1 }}
+            testID={TEST_IDS.addToCartButton}
+            accessibilityLabel={TEST_IDS.addToCartButton}
+          >
+            {product.quantity_available === 0
+              ? 'Rupture de stock'
+              : addingToCart || updating
+                ? 'Ajout en cours...'
+                : 'Ajouter au panier'}
+          </Button>
+
+          <Button
+            variant="primary"
+            size="lg"
+            disabled={product.quantity_available === 0 || reserving}
+            onPress={handleReserve}
+            leftIcon={<Ionicons name="cart" size={20} color={theme.colors.textInverse} />}
+            style={{ flex: 1 }}
+            testID={TEST_IDS.reserveButton}
+            accessibilityLabel={TEST_IDS.reserveButton}
+          >
+            {reserving
+              ? 'Réservation en cours...'
+              : product.quantity_available === 0
+                ? 'Rupture de stock'
+                : 'Réserver maintenant'}
+          </Button>
+        </View>
       </View>
 
       {/* Test-mode confirmation modal for MCP */}
@@ -550,6 +623,29 @@ const createStyles = (theme: ReturnType<typeof useTheme>) => StyleSheet.create({
     flexDirection: 'row',
     gap: 8,
   },
+  cartButton: {
+    padding: 6,
+    borderRadius: 16,
+    backgroundColor: 'transparent',
+    position: 'relative',
+  },
+  cartBadge: {
+    position: 'absolute',
+    top: -4,
+    right: -4,
+    backgroundColor: theme.colors.error[500],
+    borderRadius: 10,
+    minWidth: 20,
+    minHeight: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 4,
+  },
+  cartBadgeText: {
+    color: theme.colors.textInverse,
+    fontSize: 12,
+    fontWeight: '700',
+  },
   productImage: {
     width: '100%',
     height: 300,
@@ -588,6 +684,10 @@ const createStyles = (theme: ReturnType<typeof useTheme>) => StyleSheet.create({
     height: 1,
     backgroundColor: theme.colors.borderLight,
     marginBottom: 12,
+  },
+  bottomBarActions: {
+    flexDirection: 'row',
+    gap: 12,
   },
   reviewsSection: {
     marginTop: 24,
