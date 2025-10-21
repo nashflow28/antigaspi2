@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useCallback } from 'react'
+import React from 'react'
 import {
   View,
   Text,
@@ -14,17 +14,7 @@ import {
 import { Ionicons } from '@expo/vector-icons'
 import { useNavigation } from '@react-navigation/native'
 import { useTheme } from '../../theme'
-import notificationService, {
-  NotificationChannelPreferences,
-} from '../../services/notificationService'
-import { useAppDispatch, useAppSelector } from '../../store/hooks'
-import { refreshProfile } from '../../store/slices/authSlice'
-
-const DEFAULT_PREFERENCES: NotificationChannelPreferences = {
-  email: true,
-  sms: false,
-  push: true,
-}
+import { useNotificationPreferences } from '../../hooks/useNotificationPreferences'
 
 const formatDateTime = (date: Date | null): string => {
   if (!date) {
@@ -44,96 +34,23 @@ const formatDateTime = (date: Date | null): string => {
 const NotificationSettingsScreen: React.FC = () => {
   const theme = useTheme()
   const navigation = useNavigation()
-  const dispatch = useAppDispatch()
-  const user = useAppSelector((state) => state.auth.user)
+  const {
+    preferences,
+    loading,
+    saving,
+    error,
+    lastSyncedAt,
+    hasChanges,
+    togglePreference,
+    refresh,
+    save,
+  } = useNotificationPreferences()
 
-  const [loading, setLoading] = useState(false)
-  const [saving, setSaving] = useState(false)
-  const [preferences, setPreferences] = useState<NotificationChannelPreferences>(
-    DEFAULT_PREFERENCES
-  )
-  const [initialPreferences, setInitialPreferences] =
-    useState<NotificationChannelPreferences>(DEFAULT_PREFERENCES)
-  const [lastSyncedAt, setLastSyncedAt] = useState<Date | null>(null)
-  const [error, setError] = useState<string | null>(null)
-
-  const loadPreferences = useCallback(async () => {
-    try {
-      setLoading(true)
-      setError(null)
-
-      const remotePreferences = await notificationService.loadContactPreferences()
-
-      setPreferences(remotePreferences)
-      setInitialPreferences(remotePreferences)
-      setLastSyncedAt(new Date())
-
-      await dispatch(refreshProfile()).unwrap()
-    } catch (error) {
-      console.error('Erreur chargement préférences:', error)
-      setError(
-        error instanceof Error
-          ? error.message
-          : "Impossible de récupérer vos préférences pour le moment."
-      )
-    } finally {
-      setLoading(false)
-    }
-  }, [dispatch])
-
-  useEffect(() => {
-    loadPreferences()
-  }, [loadPreferences])
-
-  useEffect(() => {
-    const handleExternalUpdate = (updated: NotificationChannelPreferences) => {
-      setPreferences(updated)
-      setInitialPreferences(updated)
-      setLastSyncedAt(new Date())
-    }
-
-    notificationService.on('contactPreferencesChanged', handleExternalUpdate)
-
-    return () => {
-      notificationService.off('contactPreferencesChanged', handleExternalUpdate)
-    }
-  }, [])
-
-  useEffect(() => {
-    if (!user) {
-      return
-    }
-
-    const syncedPreferences: NotificationChannelPreferences = {
-      email: user.prefers_email_notifications ?? DEFAULT_PREFERENCES.email,
-      sms: user.prefers_sms_notifications ?? DEFAULT_PREFERENCES.sms,
-      push: user.prefers_push_notifications ?? DEFAULT_PREFERENCES.push,
-    }
-
-    setPreferences(syncedPreferences)
-    setInitialPreferences(syncedPreferences)
-  }, [user])
-
-  const hasChanges = useMemo(() => {
-    return (
-      preferences.email !== initialPreferences.email ||
-      preferences.sms !== initialPreferences.sms ||
-      preferences.push !== initialPreferences.push
-    )
-  }, [preferences, initialPreferences])
+  const isInitialLoading = loading && lastSyncedAt === null
 
   const handleSave = async () => {
     try {
-      setSaving(true)
-      setError(null)
-
-      const updated = await notificationService.saveContactPreferences(preferences)
-
-      setPreferences(updated)
-      setInitialPreferences(updated)
-      setLastSyncedAt(new Date())
-
-      await dispatch(refreshProfile()).unwrap()
+      await save()
 
       Alert.alert('Succès', 'Préférences mises à jour avec succès', [
         {
@@ -142,24 +59,13 @@ const NotificationSettingsScreen: React.FC = () => {
         },
       ])
     } catch (error: any) {
-      console.error('Erreur sauvegarde préférences:', error)
       const message =
-        error instanceof Error
-          ? error.message
-          : error?.response?.data?.message ||
-            'Impossible de sauvegarder les préférences'
-      setError(message)
+        error instanceof Error ? error.message : 'Impossible de sauvegarder les préférences'
       Alert.alert('Erreur', message)
-    } finally {
-      setSaving(false)
     }
   }
 
-  const togglePreference = (key: keyof NotificationChannelPreferences) => {
-    setPreferences((prev) => ({ ...prev, [key]: !prev[key] }))
-  }
-
-  if (loading) {
+  if (isInitialLoading) {
     return (
       <View style={[styles.loadingContainer, { backgroundColor: theme.colors.background }]}>
         <ActivityIndicator size="large" color={theme.colors.primary[500]} />
@@ -185,8 +91,8 @@ const NotificationSettingsScreen: React.FC = () => {
         showsVerticalScrollIndicator={false}
         refreshControl={
           <RefreshControl
-            refreshing={loading}
-            onRefresh={loadPreferences}
+            refreshing={loading && lastSyncedAt !== null}
+            onRefresh={refresh}
             tintColor={theme.colors.primary[600]}
             colors={[theme.colors.primary[500]]}
           />
@@ -206,7 +112,7 @@ const NotificationSettingsScreen: React.FC = () => {
             <View style={{ flex: 1 }}>
               <Text style={[styles.errorTitle, { color: theme.colors.semantic.error }]}>Synchronisation impossible</Text>
               <Text style={[styles.errorMessage, { color: theme.colors.textSecondary }]}>{error}</Text>
-              <TouchableOpacity onPress={loadPreferences} style={styles.retryButton}>
+              <TouchableOpacity onPress={refresh} style={styles.retryButton}>
                 <Text style={[styles.retryText, { color: theme.colors.semantic.error }]}>Réessayer</Text>
               </TouchableOpacity>
             </View>
@@ -220,7 +126,7 @@ const NotificationSettingsScreen: React.FC = () => {
           </View>
           <TouchableOpacity
             style={[styles.refreshButton, { borderColor: theme.colors.primary[500] }]}
-            onPress={loadPreferences}
+            onPress={refresh}
             disabled={loading}
           >
             <Ionicons
