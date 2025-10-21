@@ -5,7 +5,8 @@
  */
 
 import { configureStore } from '@reduxjs/toolkit'
-import reservationsReducer, {
+import {
+  reservationsReducer,
   createReservation,
   fetchMyReservations,
   fetchReservation,
@@ -42,6 +43,9 @@ jest.mock('../../../services/offlineService', () => ({
   default: {
     getCache: jest.fn(),
     setCache: jest.fn(),
+    removeCache: jest.fn(),
+    queueSyncAction: jest.fn(),
+    checkConnectivity: jest.fn(),
     getConnectivityStatus: jest.fn(),
   },
 }))
@@ -52,6 +56,9 @@ const mockGetReservation = apiService.getReservation as jest.MockedFunction<type
 const mockCancelReservation = apiService.cancelReservation as jest.MockedFunction<typeof apiService.cancelReservation>
 const mockGetCache = offlineService.getCache as jest.MockedFunction<typeof offlineService.getCache>
 const mockSetCache = offlineService.setCache as jest.MockedFunction<typeof offlineService.setCache>
+const mockRemoveCache = offlineService.removeCache as jest.MockedFunction<typeof offlineService.removeCache>
+const mockQueueSyncAction = offlineService.queueSyncAction as jest.MockedFunction<typeof offlineService.queueSyncAction>
+const mockCheckConnectivity = offlineService.checkConnectivity as jest.MockedFunction<typeof offlineService.checkConnectivity>
 const mockGetConnectivityStatus = offlineService.getConnectivityStatus as jest.MockedFunction<typeof offlineService.getConnectivityStatus>
 
 describe('reservationsSlice', () => {
@@ -71,6 +78,16 @@ describe('reservationsSlice', () => {
     // Default mock implementations
     mockGetCache.mockResolvedValue(null)
     mockSetCache.mockResolvedValue(undefined)
+    mockRemoveCache.mockResolvedValue(undefined)
+    mockQueueSyncAction.mockResolvedValue({
+      id: 'sync_test',
+      type: 'create',
+      endpoint: '/reservations',
+      data: {},
+      timestamp: Date.now(),
+      retries: 0,
+    } as any)
+    mockCheckConnectivity.mockResolvedValue(true)
     mockGetConnectivityStatus.mockReturnValue(true) // Online by default
   })
 

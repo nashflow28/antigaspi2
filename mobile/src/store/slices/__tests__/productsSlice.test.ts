@@ -36,6 +36,7 @@ jest.mock('../../../services/offlineService', () => ({
   default: {
     getCache: jest.fn(),
     setCache: jest.fn(),
+    checkConnectivity: jest.fn(),
     getConnectivityStatus: jest.fn(),
   },
 }))
@@ -45,6 +46,7 @@ const mockGetProduct = apiService.getProduct as jest.MockedFunction<typeof apiSe
 const mockGetCategories = apiService.getCategories as jest.MockedFunction<typeof apiService.getCategories>
 const mockGetCache = offlineService.getCache as jest.MockedFunction<typeof offlineService.getCache>
 const mockSetCache = offlineService.setCache as jest.MockedFunction<typeof offlineService.setCache>
+const mockCheckConnectivity = offlineService.checkConnectivity as jest.MockedFunction<typeof offlineService.checkConnectivity>
 const mockGetConnectivityStatus = offlineService.getConnectivityStatus as jest.MockedFunction<typeof offlineService.getConnectivityStatus>
 
 describe('productsSlice', () => {
@@ -64,6 +66,7 @@ describe('productsSlice', () => {
     // Default mock implementations
     mockGetCache.mockResolvedValue(null)
     mockSetCache.mockResolvedValue(undefined)
+    mockCheckConnectivity.mockResolvedValue(true)
     mockGetConnectivityStatus.mockReturnValue(true) // Online by default
   })
 
@@ -290,8 +293,7 @@ describe('productsSlice', () => {
       expect(state.error).toBeNull()
     })
 
-    // SKIPPED: offlineService disabled in production (import commented in productsSlice.ts)
-    it.skip('should handle fetchProducts fulfilled state (online)', async () => {
+    it('should handle fetchProducts fulfilled state (online)', async () => {
       mockGetProducts.mockResolvedValue({
         success: true,
         data: mockProducts,
@@ -306,6 +308,8 @@ describe('productsSlice', () => {
       expect(state.hasMore).toBe(false) // Less than 20 products
       expect(state.error).toBeNull()
       expect(mockSetCache).toHaveBeenCalledWith('products', mockProducts)
+      expect(mockSetCache).toHaveBeenCalledWith('product_1', mockProducts[0])
+      expect(mockSetCache).toHaveBeenCalledWith('product_2', mockProducts[1])
     })
 
     it('should set hasMore to true when fetching 20+ products', async () => {
@@ -326,14 +330,13 @@ describe('productsSlice', () => {
       expect(state.hasMore).toBe(true) // 20 products = more pages possible
     })
 
-    // SKIPPED: offlineService disabled in production (import commented in productsSlice.ts)
-    it.skip('should use cached products when offline', async () => {
+    it('should use cached products when offline', async () => {
       const cachedProducts: Product[] = [
         { id: 1, name: 'Cached Product', price: 50 } as Product,
       ]
 
-      mockGetConnectivityStatus.mockReturnValue(false) // Offline
-      mockGetCache.mockResolvedValue(cachedProducts)
+      mockCheckConnectivity.mockResolvedValueOnce(false)
+      mockGetCache.mockResolvedValueOnce(cachedProducts as any)
 
       await store.dispatch(fetchProducts())
 
@@ -342,8 +345,7 @@ describe('productsSlice', () => {
       expect(mockGetProducts).not.toHaveBeenCalled() // No API call when offline
     })
 
-    // SKIPPED: offlineService disabled in production (import commented in productsSlice.ts)
-    it.skip('should fetch from API and cache when online', async () => {
+    it('should fetch from API and cache when online', async () => {
       mockGetProducts.mockResolvedValue({
         success: true,
         data: mockProducts,
@@ -353,10 +355,10 @@ describe('productsSlice', () => {
 
       expect(mockGetProducts).toHaveBeenCalled()
       expect(mockSetCache).toHaveBeenCalledWith('products', mockProducts)
+      expect(mockSetCache).toHaveBeenCalledWith('product_1', mockProducts[0])
     })
 
-    // SKIPPED: offlineService disabled in production (import commented in productsSlice.ts)
-    it.skip('should use different cache keys for filtered results', async () => {
+    it('should use different cache keys for filtered results', async () => {
       const filters: ProductFilters = { category_id: 1 }
 
       mockGetProducts.mockResolvedValue({
@@ -366,17 +368,17 @@ describe('productsSlice', () => {
 
       await store.dispatch(fetchProducts(filters))
 
-      expect(mockGetCache).toHaveBeenCalledWith(`products_${JSON.stringify(filters)}`)
-      expect(mockSetCache).toHaveBeenCalledWith(`products_${JSON.stringify(filters)}`, mockProducts)
+      const expectedKey = `products_${JSON.stringify({ category_id: 1 })}`
+      expect(mockGetCache).not.toHaveBeenCalledWith('products')
+      expect(mockSetCache).toHaveBeenCalledWith(expectedKey, mockProducts)
     })
 
-    // SKIPPED: offlineService disabled in production (import commented in productsSlice.ts)
-    it.skip('should fallback to cache on network error', async () => {
+    it('should fallback to cache on network error', async () => {
       const cachedProducts: Product[] = [
         { id: 1, name: 'Cached Product', price: 50 } as Product,
       ]
 
-      mockGetCache.mockResolvedValue(cachedProducts)
+      mockGetCache.mockResolvedValueOnce(cachedProducts as any)
       mockGetProducts.mockRejectedValue(new Error('Network error'))
 
       await store.dispatch(fetchProducts())
@@ -559,10 +561,9 @@ describe('productsSlice', () => {
       expect(state.products[0].name).toBe('Single Product')
     })
 
-    // SKIPPED: offlineService disabled in production (import commented in productsSlice.ts)
-    it.skip('should use cached product when offline', async () => {
-      mockGetConnectivityStatus.mockReturnValue(false)
-      mockGetCache.mockResolvedValue(mockProduct)
+    it('should use cached product when offline', async () => {
+      mockCheckConnectivity.mockResolvedValueOnce(false)
+      mockGetCache.mockResolvedValueOnce(mockProduct as any)
 
       await store.dispatch(fetchProduct(1))
 
@@ -571,9 +572,8 @@ describe('productsSlice', () => {
       expect(mockGetProduct).not.toHaveBeenCalled()
     })
 
-    // SKIPPED: offlineService disabled in production (import commented in productsSlice.ts)
-    it.skip('should fallback to cache on network error', async () => {
-      mockGetCache.mockResolvedValue(mockProduct)
+    it('should fallback to cache on network error', async () => {
+      mockGetCache.mockResolvedValueOnce(mockProduct as any)
       mockGetProduct.mockRejectedValue(new Error('Network error'))
 
       await store.dispatch(fetchProduct(1))
@@ -599,8 +599,7 @@ describe('productsSlice', () => {
       expect(state.error).toBeNull()
     })
 
-    // SKIPPED: offlineService disabled in production (import commented in productsSlice.ts)
-    it.skip('should handle fetchCategories fulfilled state', async () => {
+    it('should handle fetchCategories fulfilled state', async () => {
       mockGetCategories.mockResolvedValue({
         success: true,
         data: mockCategories,
@@ -615,10 +614,9 @@ describe('productsSlice', () => {
       expect(mockSetCache).toHaveBeenCalledWith('categories', mockCategories)
     })
 
-    // SKIPPED: offlineService disabled in production (import commented in productsSlice.ts)
-    it.skip('should use cached categories when offline', async () => {
-      mockGetConnectivityStatus.mockReturnValue(false)
-      mockGetCache.mockResolvedValue(mockCategories)
+    it('should use cached categories when offline', async () => {
+      mockCheckConnectivity.mockResolvedValueOnce(false)
+      mockGetCache.mockResolvedValueOnce(mockCategories as any)
 
       await store.dispatch(fetchCategories())
 

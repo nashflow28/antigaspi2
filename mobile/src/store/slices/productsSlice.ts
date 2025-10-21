@@ -1,7 +1,7 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit'
 import { ProductsState, Product, Category, ProductFilters } from '../../types'
 import apiService from '../../services/api'
-// import offlineService from '../../services/offlineService' // Désactivé temporairement pour le web
+import offlineService from '../../services/offlineService'
 
 export const productsInitialState: ProductsState = {
   products: [],
@@ -14,50 +14,195 @@ export const productsInitialState: ProductsState = {
   hasMore: true,
 }
 
+const PRODUCTS_CACHE_KEY = 'products'
+const CATEGORIES_CACHE_KEY = 'categories'
+const productCacheKey = (id: number) => `product_${id}`
+
+const serializeFilters = (filters?: ProductFilters): string => {
+  if (!filters) {
+    return ''
+  }
+
+  const normalizedEntries = Object.entries(filters)
+    .filter(([, value]) => value !== undefined && value !== null && value !== '')
+    .sort(([a], [b]) => a.localeCompare(b))
+
+  if (normalizedEntries.length === 0) {
+    return ''
+  }
+
+  return JSON.stringify(Object.fromEntries(normalizedEntries))
+}
+
+const buildProductsCacheKey = (filters?: ProductFilters): string => {
+  const serialized = serializeFilters(filters)
+  return serialized ? `products_${serialized}` : PRODUCTS_CACHE_KEY
+}
+
+const safeSetCache = async <T>(key: string, value: T): Promise<void> => {
+  try {
+    await offlineService.setCache(key, value)
+  } catch {
+    // Ignorer les erreurs de cache offline
+  }
+}
+
+const safeGetCache = async <T>(key: string): Promise<T | null> => {
+  try {
+    return await offlineService.getCache<T>(key)
+  } catch {
+    return null
+  }
+}
+
+const isOffline = async (): Promise<boolean> => {
+  try {
+    return !(await offlineService.checkConnectivity())
+  } catch {
+    return !offlineService.getConnectivityStatus()
+  }
+}
+
+const mergeProductLists = (existing: Product[] = [], incoming: Product[] = []): Product[] => {
+  const result: Product[] = []
+  const seen = new Map<number, number>()
+
+  existing.forEach(product => {
+    if (!seen.has(product.id)) {
+      seen.set(product.id, result.length)
+      result.push(product)
+    }
+  })
+
+  incoming.forEach(product => {
+    const index = seen.get(product.id)
+    if (index !== undefined) {
+      result[index] = product
+    } else {
+      seen.set(product.id, result.length)
+      result.push(product)
+    }
+  })
+
+  return result
+}
+
+const persistProductsList = async (cacheKey: string, products: Product[]): Promise<void> => {
+  await safeSetCache(cacheKey, products)
+  await Promise.allSettled(
+    products.map(product => offlineService.setCache(productCacheKey(product.id), product))
+  )
+}
+
+const persistProduct = async (product: Product): Promise<void> => {
+  await safeSetCache(productCacheKey(product.id), product)
+}
+
 // Actions asynchrones
-export const fetchProducts = createAsyncThunk(
+export const fetchProducts = createAsyncThunk<
+  Product[],
+  ProductFilters | undefined
+>(
   'products/fetchProducts',
-  async (filters: ProductFilters | undefined, { rejectWithValue }) => {
-    // Version simplifiée sans cache offline pour le web
+  async (filters, { rejectWithValue }) => {
+    const cacheKey = buildProductsCacheKey(filters)
+
+    if (await isOffline()) {
+      const cached = await safeGetCache<Product[]>(cacheKey)
+      if (cached) {
+        return cached
+      }
+    }
+
     try {
       const response = await apiService.getProducts(filters)
-      return response.data
+      const products = response.data
+      await persistProductsList(cacheKey, products)
+      return products
     } catch (error: any) {
+      const fallback = await safeGetCache<Product[]>(cacheKey)
+      if (fallback) {
+        return fallback
+      }
+
       return rejectWithValue(error.message)
     }
   }
 )
 
-export const fetchProduct = createAsyncThunk(
+export const fetchProduct = createAsyncThunk<
+  Product,
+  number
+>(
   'products/fetchProduct',
-  async (id: number, { rejectWithValue }) => {
+  async (id, { rejectWithValue }) => {
+    const cacheKey = productCacheKey(id)
+
+    if (await isOffline()) {
+      const cached = await safeGetCache<Product>(cacheKey)
+      if (cached) {
+        return cached
+      }
+    }
+
     try {
       const response = await apiService.getProduct(id)
-      return response.data
+      const product = response.data
+      await persistProduct(product)
+      return product
     } catch (error: any) {
+      const fallback = await safeGetCache<Product>(cacheKey)
+      if (fallback) {
+        return fallback
+      }
+
       return rejectWithValue(error.message)
     }
   }
 )
 
-export const fetchCategories = createAsyncThunk(
+export const fetchCategories = createAsyncThunk<
+  Category[],
+  void
+>(
   'products/fetchCategories',
   async (_, { rejectWithValue }) => {
+    if (await isOffline()) {
+      const cached = await safeGetCache<Category[]>(CATEGORIES_CACHE_KEY)
+      if (cached) {
+        return cached
+      }
+    }
+
     try {
       const response = await apiService.getCategories()
-      return response.data
+      const categories = response.data
+      await safeSetCache(CATEGORIES_CACHE_KEY, categories)
+      return categories
     } catch (error: any) {
+      const fallback = await safeGetCache<Category[]>(CATEGORIES_CACHE_KEY)
+      if (fallback) {
+        return fallback
+      }
+
       return rejectWithValue(error.message)
     }
   }
 )
 
-export const fetchMoreProducts = createAsyncThunk(
+export const fetchMoreProducts = createAsyncThunk<
+  Product[],
+  { filters?: ProductFilters; page: number }
+>(
   'products/fetchMoreProducts',
-  async ({ filters, page }: { filters?: ProductFilters; page: number }, { rejectWithValue }) => {
+  async ({ filters, page }, { rejectWithValue }) => {
     try {
       const response = await apiService.getProducts({ ...filters, page, per_page: 20 })
-      return response.data
+      const products = response.data
+      const cacheKey = buildProductsCacheKey(filters)
+      const existing = await safeGetCache<Product[]>(cacheKey)
+      await persistProductsList(cacheKey, mergeProductLists(existing ?? [], products))
+      return products
     } catch (error: any) {
       return rejectWithValue(error.message)
     }
@@ -103,6 +248,8 @@ const productsSlice = createSlice({
       .addCase(fetchProducts.fulfilled, (state, action: PayloadAction<Product[]>) => {
         state.loading = false
         state.products = action.payload
+        state.currentPage = 1
+        state.hasMore = action.payload.length >= 20
         state.error = null
       })
       .addCase(fetchProducts.rejected, (state, action) => {
@@ -142,7 +289,7 @@ const productsSlice = createSlice({
       })
       .addCase(fetchMoreProducts.fulfilled, (state, action: PayloadAction<Product[]>) => {
         state.loadingMore = false
-        state.products = [...state.products, ...action.payload]
+        state.products = mergeProductLists(state.products, action.payload)
         state.currentPage += 1
         state.hasMore = action.payload.length >= 20
         state.error = null

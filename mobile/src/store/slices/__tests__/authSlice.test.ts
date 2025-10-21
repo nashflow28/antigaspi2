@@ -60,7 +60,8 @@ describe('authSlice', () => {
         user: null,
         token: null,
         isAuthenticated: false,
-        loading: true, // ⚠️ Initial state has loading=true for SplashScreen
+        // Le SplashScreen est géré par AppNavigator (state `hydrated`).
+        loading: false,
         error: null,
       })
     })
@@ -307,6 +308,43 @@ describe('authSlice', () => {
       await store.dispatch(logoutUser())
 
       expect(mockLogout).toHaveBeenCalledTimes(1)
+    })
+
+    it('should preserve session data when logoutUser is rejected', async () => {
+      const mockUser: User = {
+        id: 2,
+        email: 'failure@example.com',
+        name: 'Failure Case',
+        role: 'consumer',
+      }
+
+      const preloadedState = {
+        auth: {
+          user: mockUser,
+          token: 'persist-token',
+          isAuthenticated: true,
+          loading: false,
+          error: null,
+        },
+      }
+
+      store = configureStore({
+        reducer: {
+          auth: authReducer,
+        },
+        preloadedState,
+      })
+
+      mockLogout.mockRejectedValue(new Error('Network down'))
+
+      await store.dispatch(logoutUser())
+
+      const state = store.getState().auth
+      expect(state.user).toEqual(mockUser)
+      expect(state.token).toBe('persist-token')
+      expect(state.isAuthenticated).toBe(true)
+      expect(state.loading).toBe(false)
+      expect(state.error).toBe('Network down')
     })
   })
 
@@ -558,10 +596,10 @@ describe('authSlice', () => {
       await store.dispatch(logoutUser())
 
       const state = store.getState().auth
-      // ⚠️ FIX: Le logoutUser.rejected déconnecte localement même si l'API échoue (offline)
-      expect(state.isAuthenticated).toBe(false)
-      expect(state.user).toBeNull()
-      expect(state.token).toBeNull()
+      expect(state.isAuthenticated).toBe(true)
+      expect(state.user).toEqual(mockUser)
+      expect(state.token).toBe('test-token-123')
+      expect(state.error).toBe('Network error')
     })
   })
 })
