@@ -13,7 +13,8 @@ module.exports = {
     '/e2e-tests/',
     '/maestro-tests/',
     'App.test.tsx',
-    'debug-web.spec.ts'
+    '\\.(pw|playwright)\\.ts$',
+    '/playwright/'
   ],
   setupFilesAfterEnv: [
     '@testing-library/jest-native/extend-expect',

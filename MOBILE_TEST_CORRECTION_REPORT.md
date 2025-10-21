@@ -22,19 +22,34 @@ expect(state.isAuthenticated).toBe(false) // Apres logout.rejected
 
 ---
 
-## 2. ECHECS NON-CORRIGEABLES (Fonctionnalites manquantes)
+### offlineService.ts + caches produits/réservations - PASS
+**Problèmes:**
+- offlineService ignorait `cacheManager`, ne retournait pas les promesses attendues (`syncLock` manquant).
+- Les slices `reservationsSlice`/`productsSlice` avaient désactivé le cache offline et les tests associés étaient skippés.
 
-### offlineService.test.ts - 11 tests FAIL
-**Root cause:** Tests mockent cacheManager MAIS code utilise AsyncStorage directement.
-
-**Preuve:**
+**Fix appliqué:**
 ```typescript
-// offlineService.ts ligne 114
-await AsyncStorage.setItem(config.key, JSON.stringify(cacheEntry));
-// Jamais cacheManager.set() !
+// offlineService.ts
+setCacheManager(adapter) // injection adaptateur + promesses renvoyées
+this.syncLock = runner().finally(() => { ... }) // nouveau verrou Promise
+
+// reservationsSlice.ts / productsSlice.ts
+await persistReservation(reservation) // cache & offline fallback réactivés
+await persistProductsList(cacheKey, products) // clés sérialisées, hasMore recalculé
 ```
 
-**Solution requise:** Implementer cacheManager OU reecrire 300+ lignes de tests.
+**Fichiers:**
+- mobile/src/services/offlineService.ts
+- mobile/src/store/slices/reservationsSlice.ts (+ tests)
+- mobile/src/store/slices/productsSlice.ts (+ tests)
+- MOBILE_TEST_CORRECTION_REPORT.md (présent fichier)
+**Statut:** Suites Jest réactivées + PASS
+
+---
+
+## 2. ECHECS NON-CORRIGEABLES (Fonctionnalites manquantes)
+
+_(Aucun blocage restant après réintégration du cache offline.)_
 
 ---
 

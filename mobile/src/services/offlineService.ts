@@ -5,6 +5,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import NetInfo from '@react-native-community/netinfo';
 import apiService from './api';
+import cacheManager from '../utils/cacheManager';
 
 export interface CacheConfig {
   key: string;
@@ -27,11 +28,20 @@ export interface SyncQueue {
   retries: number;
 }
 
+export interface CacheManagerAdapter {
+  set(key: string, value: string): Promise<void>;
+  get(key: string): Promise<string | null>;
+  remove(key: string): Promise<void>;
+  clear(): Promise<void>;
+}
+
 class OfflineService {
   private isOnline: boolean = true;
   private syncQueue: SyncQueue[] = [];
   private syncInProgress: boolean = false;
+  private syncLock: Promise<void> | null = null;
   private listeners: Map<string, Function[]> = new Map();
+  private cacheManager: CacheManagerAdapter | null = cacheManager;
 
   // Configuration du cache par type de données
   private cacheConfigs: Record<string, CacheConfig> = {
@@ -44,6 +54,14 @@ class OfflineService {
 
   constructor() {
     this.initialize();
+  }
+
+  /**
+   * Permet d'injecter un adaptateur de cache externe (ex: cacheManager). Utilisé
+   * dans les tests pour substituer un stockage mémoire.
+   */
+  setCacheManager(cacheManagerAdapter: CacheManagerAdapter | null): void {
+    this.cacheManager = cacheManagerAdapter;
   }
 
   /**
@@ -104,6 +122,7 @@ class OfflineService {
     try {
       const config = this.cacheConfigs[key] || { key: `cache_${key}`, ttl: 30, version: 1 };
       const ttl = customTTL || config.ttl;
+      const storageKey = config.key;
 
       const cacheEntry: CacheEntry<T> = {
         data,
@@ -111,10 +130,16 @@ class OfflineService {
         version: config.version || 1,
       };
 
-      await AsyncStorage.setItem(config.key, JSON.stringify(cacheEntry));
+      const serializedEntry = JSON.stringify(cacheEntry);
+
+      if (this.cacheManager) {
+        await this.cacheManager.set(storageKey, serializedEntry);
+      } else {
+        await AsyncStorage.setItem(storageKey, serializedEntry);
+      }
 
       // Aussi sauvegarder l'index pour le nettoyage
-      await this.updateCacheIndex(config.key, ttl);
+      await this.updateCacheIndex(storageKey, ttl);
     } catch (error) {
       console.error('Erreur lors de la mise en cache:', error);
     }
@@ -126,7 +151,14 @@ class OfflineService {
   async getCache<T>(key: string): Promise<T | null> {
     try {
       const config = this.cacheConfigs[key] || { key: `cache_${key}`, ttl: 30, version: 1 };
-      const cached = await AsyncStorage.getItem(config.key);
+      const storageKey = config.key;
+      let cached: string | null;
+
+      if (this.cacheManager) {
+        cached = await this.cacheManager.get(storageKey);
+      } else {
+        cached = await AsyncStorage.getItem(storageKey);
+      }
 
       if (!cached) {
         return null;
@@ -160,8 +192,15 @@ class OfflineService {
   async removeCache(key: string): Promise<void> {
     try {
       const config = this.cacheConfigs[key] || { key: `cache_${key}`, ttl: 30, version: 1 };
-      await AsyncStorage.removeItem(config.key);
-      await this.removeCacheFromIndex(config.key);
+      const storageKey = config.key;
+
+      if (this.cacheManager) {
+        await this.cacheManager.remove(storageKey);
+      } else {
+        await AsyncStorage.removeItem(storageKey);
+      }
+
+      await this.removeCacheFromIndex(storageKey);
     } catch (error) {
       console.error('Erreur lors de la suppression du cache:', error);
     }
@@ -172,8 +211,12 @@ class OfflineService {
    */
   async clearAllCache(): Promise<void> {
     try {
-      const keys = Object.values(this.cacheConfigs).map(config => config.key);
-      await AsyncStorage.multiRemove(keys);
+      if (this.cacheManager) {
+        await this.cacheManager.clear();
+      } else {
+        const keys = Object.values(this.cacheConfigs).map(config => config.key);
+        await AsyncStorage.multiRemove(keys);
+      }
       await AsyncStorage.removeItem('cache_index');
     } catch (error) {
       console.error('Erreur lors de l\'effacement du cache:', error);
@@ -258,8 +301,17 @@ class OfflineService {
     this.emit('sync-queue-updated', this.syncQueue.length);
 
     // Si on est en ligne, traiter immédiatement
+    if (this.isOnline) {
+      try {
+        await this.checkConnectivity();
+      } catch (error) {
+        console.error('Erreur lors de la vérification de connectivité:', error);
+        this.isOnline = false;
+      }
+    }
+
     if (this.isOnline && !this.syncInProgress) {
-      this.processSyncQueue();
+      void this.processSyncQueue();
     }
 
     return queueItem;
@@ -269,43 +321,56 @@ class OfflineService {
    * Traiter la queue de synchronisation
    */
   async processSyncQueue(): Promise<void> {
-    if (this.syncInProgress || this.syncQueue.length === 0) {
-      return;
+    if (this.syncLock) {
+      return this.syncLock;
     }
 
-    this.syncInProgress = true;
-    this.emit('sync-start', this.syncQueue.length);
+    const runner = async (): Promise<void> => {
+      if (this.syncQueue.length === 0) {
+        return;
+      }
 
-    const failedItems: SyncQueue[] = [];
+      this.syncInProgress = true;
+      this.emit('sync-start', this.syncQueue.length);
 
-    for (const item of this.syncQueue) {
-      try {
-        await this.processSyncItem(item);
-        this.emit('sync-progress', {
-          total: this.syncQueue.length,
-          processed: this.syncQueue.indexOf(item) + 1,
-        });
-      } catch (error) {
-        console.error('Erreur lors de la synchronisation:', error);
-        item.retries++;
+      const pendingItems = [...this.syncQueue];
+      const failedItems: SyncQueue[] = [];
 
-        if (item.retries < 3) {
-          failedItems.push(item);
-        } else {
-          this.emit('sync-error', { item, error });
+      for (const [index, item] of pendingItems.entries()) {
+        try {
+          await this.processSyncItem(item);
+          this.emit('sync-progress', {
+            total: pendingItems.length,
+            processed: index + 1,
+          });
+        } catch (error) {
+          console.error('Erreur lors de la synchronisation:', error);
+          item.retries++;
+
+          if (item.retries < 3) {
+            failedItems.push(item);
+          } else {
+            this.emit('sync-error', { item, error });
+          }
         }
       }
-    }
 
-    this.syncQueue = failedItems;
-    await this.saveSyncQueue();
+      this.syncQueue = failedItems;
+      await this.saveSyncQueue();
 
-    this.syncInProgress = false;
-    this.emit('sync-complete', {
-      success: failedItems.length === 0,
-      remaining: failedItems.length,
+      this.emit('sync-complete', {
+        success: failedItems.length === 0,
+        remaining: failedItems.length,
+      });
+      this.emit('sync-queue-updated', this.syncQueue.length);
+    };
+
+    this.syncLock = runner().finally(() => {
+      this.syncInProgress = false;
+      this.syncLock = null;
     });
-    this.emit('sync-queue-updated', this.syncQueue.length);
+
+    return this.syncLock;
   }
 
   /**
