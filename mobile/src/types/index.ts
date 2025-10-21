@@ -65,6 +65,8 @@ export interface Product {
   merchant: Merchant
   created_at: string
   is_active?: boolean
+  status?: string
+  needs_approval?: boolean
 }
 
 export interface SurpriseBasketItem {
