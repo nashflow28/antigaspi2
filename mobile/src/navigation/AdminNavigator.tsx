@@ -9,6 +9,7 @@ import AdminUsersScreen from '../screens/admin/AdminUsersScreen'
 import AdminProductsScreen from '../screens/admin/AdminProductsScreen'
 import AdminMerchantsScreen from '../screens/admin/AdminMerchantsScreen'
 import AdminCategoriesScreen from '../screens/admin/AdminCategoriesScreen'
+import AdminReviewModerationScreen from '../screens/admin/AdminReviewModerationScreen'
 
 const Tab = createBottomTabNavigator()
 
@@ -29,6 +30,8 @@ const AdminNavigator: React.FC = () => {
             iconName = focused ? 'cube' : 'cube-outline'
           } else if (route.name === 'Merchants') {
             iconName = focused ? 'storefront' : 'storefront-outline'
+          } else if (route.name === 'Reviews') {
+            iconName = focused ? 'chatbubbles' : 'chatbubbles-outline'
           } else if (route.name === 'Categories') {
             iconName = focused ? 'grid' : 'grid-outline'
           } else {
@@ -67,6 +70,11 @@ const AdminNavigator: React.FC = () => {
         name="Merchants"
         component={AdminMerchantsScreen}
         options={{ title: 'Commerçants' }}
+      />
+      <Tab.Screen
+        name="Reviews"
+        component={AdminReviewModerationScreen}
+        options={{ title: 'Modération' }}
       />
       <Tab.Screen
         name="Categories"
