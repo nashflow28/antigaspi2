@@ -6,10 +6,13 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Laravel\Scout\Attributes\SearchUsingFullText;
+use Laravel\Scout\Searchable;
 
 class Merchant extends Model
 {
     use HasFactory;
+    use Searchable;
 
     protected $fillable = [
         'user_id',
@@ -37,6 +40,52 @@ class Merchant extends Model
             'verification_date' => 'datetime',
             'total_sales' => 'decimal:2',
         ];
+    }
+
+    #[SearchUsingFullText(['business_name', 'description'])]
+    public function toSearchableArray(): array
+    {
+        $this->loadMissing(['user', 'category']);
+
+        $productsCount = $this->products_count ?? $this->products()->count();
+        $averageRating = $this->reviews_avg_rating ?? $this->reviews()->avg('rating');
+
+        return [
+            'id' => $this->getKey(),
+            'business_name' => $this->business_name,
+            'business_type' => $this->business_type,
+            'description' => $this->description,
+            'category' => $this->category?->name,
+            'city' => $this->user?->city,
+            'address' => $this->user?->address,
+            'is_verified' => (bool) $this->is_verified,
+            'avg_rating' => $averageRating ? round((float) $averageRating, 2) : null,
+            'total_products' => $productsCount,
+            'latitude' => $this->latitude !== null ? (float) $this->latitude : null,
+            'longitude' => $this->longitude !== null ? (float) $this->longitude : null,
+        ];
+    }
+
+    public function searchableAs(): string
+    {
+        return config('scout.prefix').'merchants';
+    }
+
+    public function searchableWith(): array
+    {
+        return ['user', 'category'];
+    }
+
+    public function makeAllSearchableUsing($query)
+    {
+        return $query->with(['user', 'category'])
+            ->withCount('products')
+            ->withAvg('reviews', 'rating');
+    }
+
+    public function shouldBeSearchable(): bool
+    {
+        return (bool) $this->is_verified;
     }
 
     // Relationships
