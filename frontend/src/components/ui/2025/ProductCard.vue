@@ -57,9 +57,24 @@
           <h3 class="product-card__title" data-testid="product-name">
             {{ name }}
           </h3>
-          <p class="product-card__merchant">
-            {{ merchant }}
-          </p>
+          <div class="flex items-center gap-2">
+            <p class="product-card__merchant">
+              {{ merchant }}
+            </p>
+            <Badge
+              v-if="merchantRating && merchantRating > 0"
+              variant="soft"
+              size="sm"
+              class="bg-amber-50 text-amber-700 dark:bg-amber-900/20 dark:text-amber-400"
+            >
+              <span class="flex items-center gap-1">
+                <svg class="h-3 w-3 fill-current" viewBox="0 0 20 20">
+                  <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                </svg>
+                {{ merchantRating.toFixed(1) }}
+              </span>
+            </Badge>
+          </div>
         </div>
 
         <div
@@ -93,6 +108,9 @@
               <span class="product-card__price" data-testid="product-price">{{ price }}</span>
               <span v-if="originalPrice" class="product-card__original-price">{{ originalPrice }}</span>
             </div>
+            <p v-if="savings" class="product-card__savings">
+              {{ savings }}
+            </p>
             <p
               v-if="quantity"
               class="product-card__quantity"
@@ -152,9 +170,11 @@ interface Props {
   image: string
   name: string
   merchant: string
+  merchantRating?: number
   price: string
   originalPrice?: string
   discount?: string
+  savings?: string
   quantity?: string
   imageAlt?: string
   tags?: Array<string | ProductCardTag>
@@ -164,6 +184,7 @@ interface Props {
   reserveDisabled?: boolean
   disabled?: boolean
   promo?: boolean
+  featured?: boolean
   interactive?: boolean
   cardVariant?: CardVariant
   onReserve?: () => void
@@ -330,6 +351,10 @@ const handleReserve = (event?: MouseEvent) => {
 
 .product-card__original-price {
   @apply text-sm text-neutral-400 line-through;
+}
+
+.product-card__savings {
+  @apply text-sm font-medium text-emerald-600 dark:text-emerald-400;
 }
 
 .product-card__quantity {

@@ -1,19 +1,45 @@
 <template>
   <div class="min-h-screen bg-gradient-to-br from-surface-light via-surface-light to-primary-50/15 dark:from-surface-dark dark:via-surface-dark dark:to-surface-darker">
+    <!-- Location Permission Modal -->
+    <LocationPermissionModal
+      v-model="showLocationModal"
+      :loading="locationLoading"
+      @authorize="handleLocationAuthorization"
+      @close="showLocationModal = false"
+    />
+
     <header
       class="sticky top-0 z-40 border-b border-white/50 bg-surface-light/80 dark:bg-surface-dark/70 backdrop-blur-2xl shadow-[0_18px_40px_-24px_rgba(4,120,87,0.35)]"
     >
       <div class="container px-3 sm:px-4 lg:px-6 py-12">
-        <div class="flex flex-col gap-4 sm:gap-8 lg:flex-row lg:items-center lg:justify-between">
-          <div class="space-y-5 max-w-full sm:max-w-80">
-            <Badge
-              variant="primary"
-              size="sm"
-              rounded
-              class="w-max px-3 py-3 shadow-sm shadow-primary-200/40"
-            >
-              Catalogue 2025
-            </Badge>
+        <div class="flex flex-col gap-4 sm:gap-8 lg:flex-row lg:items-start lg:justify-between">
+          <!-- Enhanced Hero Section -->
+          <div class="space-y-5 max-w-full lg:max-w-xl">
+            <div class="flex flex-wrap items-center gap-3">
+              <Badge
+                variant="primary"
+                size="sm"
+                rounded
+                class="w-max px-3 py-3 shadow-sm shadow-primary-200/40"
+              >
+                Catalogue 2025
+              </Badge>
+
+              <!-- Impact Summary Badge -->
+              <Badge
+                v-if="userImpactData"
+                variant="success"
+                size="sm"
+                rounded
+                class="w-max px-3 py-3 shadow-sm"
+              >
+                <span class="flex items-center gap-2">
+                  <TrendingUp class="h-4 w-4" />
+                  {{ userImpactData.baskets_saved }} panier{{ userImpactData.baskets_saved > 1 ? 's sauvés' : ' sauvé' }} ce mois
+                </span>
+              </Badge>
+            </div>
+
             <div class="space-y-2">
               <h1 class="font-display text-3xl lg:text-3xl font-semibold text-neutral-900 dark:text-neutral-100 leading-relaxed">
                 Produits responsables à portée de main
@@ -23,11 +49,43 @@
                   filteredProducts.length > 1 ? 's' : ''
                 }}
               </p>
+
+              <!-- Location badge when active -->
+              <div v-if="userLocation && filters.radius" class="flex items-center gap-2 text-sm text-primary-600 dark:text-primary-400">
+                <MapPinned class="h-4 w-4" />
+                <span>Produits dans un rayon de {{ filters.radius }} km</span>
+              </div>
             </div>
-            <p class="text-sm text-neutral-500 dark:text-neutral-400">
-              Explorez nos paniers anti-gaspi triés par impact, localisation et économies garanties.
-            </p>
+
+            <div class="flex flex-col gap-3">
+              <p class="text-sm text-neutral-500 dark:text-neutral-400">
+                Explorez nos paniers anti-gaspi triés par impact, localisation et économies garanties.
+              </p>
+
+              <!-- Secondary CTAs -->
+              <div class="flex flex-wrap gap-3">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  :left-icon="Map"
+                  tag="router-link"
+                  to="/merchants/map"
+                >
+                  Explorer sur la carte
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  :left-icon="Sparkles"
+                  @click="scrollToFeatured"
+                >
+                  Surprises du jour
+                </Button>
+              </div>
+            </div>
           </div>
+
+          <!-- Search & Filters Card -->
           <Card variant="glass" class="w-full max-w-xl shadow-lg animate-fade-in-up">
             <div class="flex flex-col gap-3 sm:flex-row sm:items-center">
               <Input
@@ -36,7 +94,7 @@
                 size="lg"
                 variant="filled"
                 clearable
-                placeholder="Rechercher des produits responsables..."
+                placeholder="Rechercher un produit ou une boutique..."
                 class="flex-1"
                 @clear="searchQuery = ''"
               />
@@ -60,6 +118,8 @@
                 </span>
               </Button>
             </div>
+
+            <!-- Active Filters -->
             <div v-if="activeFilterLabels.length" class="mt-4 flex flex-wrap gap-2">
               <Badge
                 v-for="label in activeFilterLabels"
@@ -71,13 +131,28 @@
               >
                 {{ label }}
               </Badge>
+
+              <!-- Position badge -->
+              <Badge
+                v-if="userLocation"
+                variant="success"
+                size="sm"
+                rounded
+                class="border-emerald-200/70 bg-emerald-50 dark:bg-emerald-500/10 text-emerald-900 dark:text-emerald-100"
+              >
+                <span class="flex items-center gap-1.5">
+                  <MapPinned class="h-3.5 w-3.5" />
+                  Basé sur votre position
+                </span>
+              </Badge>
             </div>
           </Card>
         </div>
       </div>
     </header>
 
-    <main class="container px-3 sm:px-4 lg:px-6 space-y-20 py-20">
+    <main class="container px-3 sm:px-4 lg:px-6 space-y-12 py-12">
+      <!-- Filters Panel -->
       <Transition name="fade">
         <Card
           v-if="showFilters"
@@ -201,7 +276,97 @@
         </Card>
       </Transition>
 
-      <section>
+      <!-- Editorial Collections -->
+      <section v-if="!loading && collections.length > 0" class="space-y-6">
+        <div class="flex items-center justify-between">
+          <div>
+            <h2 class="text-2xl font-semibold text-neutral-900 dark:text-neutral-50">
+              Collections
+            </h2>
+            <p class="mt-1 text-sm text-neutral-500 dark:text-neutral-400">
+              Des sélections pensées pour vous
+            </p>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
+          <CollectionCard
+            v-for="collection in collections"
+            :key="collection.id"
+            :title="collection.title"
+            :description="collection.description"
+            :icon="collection.icon"
+            :icon-color="collection.iconColor"
+            :gradient="collection.gradient"
+            :badge="collection.badge"
+            @click="applyCollection(collection)"
+          />
+        </div>
+      </section>
+
+      <!-- Featured Products Carousel (À l'affiche) -->
+      <section
+        v-if="!loading && featuredProducts.length > 0"
+        ref="featuredSectionRef"
+        class="space-y-6"
+      >
+        <div class="flex items-center gap-3">
+          <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-amber-500/10 to-amber-600/20">
+            <Sparkles class="h-6 w-6 text-amber-600" />
+          </div>
+          <div>
+            <h2 class="text-2xl font-semibold text-neutral-900 dark:text-neutral-50">
+              À l'affiche
+            </h2>
+            <p class="mt-1 text-sm text-neutral-500 dark:text-neutral-400">
+              Les meilleures réductions du moment
+            </p>
+          </div>
+        </div>
+
+        <div class="relative">
+          <div class="overflow-x-auto pb-4 scrollbar-hide">
+            <div class="flex gap-4" style="width: max-content;">
+              <div
+                v-for="product in featuredProducts"
+                :key="product.id"
+                class="w-[280px] md:w-[320px]"
+              >
+                <ProductCard
+                  :image="product.image_url || defaultProductImage"
+                  :name="product.name"
+                  :merchant="formatMerchant(product)"
+                  :merchant-rating="product.merchant.rating"
+                  :price="formatPrice(product.discounted_price)"
+                  :original-price="formatPrice(product.original_price)"
+                  :discount="formatDiscount(product.discount)"
+                  :savings="formatSavings(product)"
+                  :quantity="formatQuantity(product)"
+                  :tags="getProductTags(product)"
+                  :stock-badges="getStockBadges(product)"
+                  :reserve-loading="quickReserveLoadingId === product.id"
+                  :reserve-disabled="isProductSoldOut(product)"
+                  :disabled="isProductSoldOut(product) || quickReserveLoadingId === product.id"
+                  :featured="true"
+                  class="h-full"
+                  @reserve="() => onReserve(product)"
+                  @click="() => viewProduct(product)"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Products Grid -->
+      <section class="space-y-6">
+        <div v-if="!loading && filteredProducts.length > 0" class="flex items-center justify-between">
+          <h2 class="text-2xl font-semibold text-neutral-900 dark:text-neutral-50">
+            Tous les produits
+          </h2>
+        </div>
+
+        <!-- Loading State -->
         <div v-if="loading" class="grid grid-cols-1 gap-3 sm:gap-4 md:grid-cols-3 xl:grid-cols-4">
           <Card
             v-for="index in 8"
@@ -223,19 +388,22 @@
           </Card>
         </div>
 
+        <!-- Empty State with Enhanced CTAs -->
         <EmptyState
           v-else-if="filteredProducts.length === 0"
           title="Aucun produit trouvé"
-          description="Essayez de modifier votre recherche ou supprimez certains filtres pour découvrir d'autres paniers disponibles."
+          :description="getEmptyStateDescription()"
           :icon="PackageSearch"
           :primary-action="{
-            text: 'Réinitialiser les filtres',
+            text: hasActiveFilters ? 'Réinitialiser les filtres' : 'Activer les alertes',
             variant: 'primary',
-            onClick: clearFilters
+            onClick: hasActiveFilters ? clearFilters : () => router.push('/notifications')
           }"
+          :secondary-action="getEmptyStateSecondaryAction()"
           variant="illustration"
         />
 
+        <!-- Products Grid -->
         <div
           v-else
           data-test="products-grid"
@@ -248,9 +416,11 @@
             :image="product.image_url || defaultProductImage"
             :name="product.name"
             :merchant="formatMerchant(product)"
+            :merchant-rating="product.merchant.rating"
             :price="formatPrice(product.discounted_price)"
             :original-price="formatPrice(product.original_price)"
             :discount="formatDiscount(product.discount)"
+            :savings="formatSavings(product)"
             :quantity="formatQuantity(product)"
             :tags="getProductTags(product)"
             :stock-badges="getStockBadges(product)"
@@ -272,7 +442,10 @@
 <script setup lang="ts">
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
-import { Search, Filter, MapPin, PackageSearch } from 'lucide-vue-next'
+import {
+  Search, Filter, MapPin, MapPinned, PackageSearch, Map, Sparkles,
+  TrendingUp, Coffee, Salad, UtensilsCrossed, ShoppingBag, Leaf
+} from 'lucide-vue-next'
 import Button from '@/components/ui/2025/Button.vue'
 import Card from '@/components/ui/2025/Card.vue'
 import Input from '@/components/ui/2025/Input.vue'
@@ -280,6 +453,8 @@ import Badge from '@/components/ui/2025/Badge.vue'
 import EmptyState from '@/components/ui/2025/EmptyState.vue'
 import Loading from '@/components/ui/2025/Loading.vue'
 import ProductCard from '@/components/ui/2025/ProductCard.vue'
+import LocationPermissionModal from '@/components/ui/2025/LocationPermissionModal.vue'
+import CollectionCard from '@/components/ui/2025/CollectionCard.vue'
 import { notify } from '@/composables/useNotifications'
 import { useAuthStore } from '@/stores/auth'
 import { useReservationsStore } from '@/stores/reservations'
@@ -298,6 +473,55 @@ const loading = ref(true)
 const searchQuery = ref('')
 const showFilters = ref(false)
 const quickReserveLoadingId = ref<number | null>(null)
+const showLocationModal = ref(false)
+const featuredSectionRef = ref<HTMLElement | null>(null)
+
+// User impact data (mock for now, would come from API)
+const userImpactData = ref<{ baskets_saved: number } | null>(null)
+
+// Editorial collections
+const collections = computed(() => [
+  {
+    id: 'breakfast',
+    title: 'Petit-déjeuner',
+    description: '15 produits',
+    icon: Coffee,
+    iconColor: 'text-amber-600',
+    gradient: 'linear-gradient(135deg, #FEF3C7 0%, #FCD34D 100%)',
+    badge: 'Populaire',
+    filter: { category: 'bakery' }
+  },
+  {
+    id: 'fresh',
+    title: 'Fruits & Légumes',
+    description: '23 produits',
+    icon: Salad,
+    iconColor: 'text-emerald-600',
+    gradient: 'linear-gradient(135deg, #D1FAE5 0%, #10B981 100%)',
+    badge: 'Frais',
+    filter: { category: 'produce' }
+  },
+  {
+    id: 'prepared',
+    title: 'Plats préparés',
+    description: '12 produits',
+    icon: UtensilsCrossed,
+    iconColor: 'text-orange-600',
+    gradient: 'linear-gradient(135deg, #FED7AA 0%, #F97316 100%)',
+    badge: 'Prêt à manger',
+    filter: { category: 'prepared' }
+  },
+  {
+    id: 'discount',
+    title: 'Super promos',
+    description: '30+ produits',
+    icon: Sparkles,
+    iconColor: 'text-purple-600',
+    gradient: 'linear-gradient(135deg, #E9D5FF 0%, #A855F7 100%)',
+    badge: '-50%',
+    filter: { minDiscount: '50' }
+  }
+])
 
 const DEFAULT_PER_PAGE = 50
 
@@ -513,6 +737,8 @@ const filters = ref({
 const userLocation = ref<{ latitude: number; longitude: number } | null>(null)
 const locationLoading = ref(false)
 
+const hasActiveFilters = computed(() => activeFiltersCount.value > 0 || !!searchQuery.value)
+
 const activeFiltersCount = computed(() => {
   return Object.values(filters.value).filter(value => value !== '').length
 })
@@ -580,6 +806,13 @@ const filteredProducts = computed(() => {
   return result
 })
 
+// Featured products (top 5 by discount)
+const featuredProducts = computed(() => {
+  return [...products.value]
+    .sort((a, b) => b.discount - a.discount)
+    .slice(0, 5)
+})
+
 const loadCategories = async () => {
   try {
     const response = await apiService.getCategories()
@@ -597,6 +830,15 @@ const loadCategories = async () => {
     mergeCategoryMetadata(metadata)
   } catch (error) {
     console.warn('Impossible de charger les catégories', error)
+  }
+}
+
+const loadUserImpact = async () => {
+  // Mock data - would come from API
+  if (authStore.isAuthenticated) {
+    userImpactData.value = {
+      baskets_saved: 3
+    }
   }
 }
 
@@ -665,7 +907,7 @@ const fetchProducts = async () => {
     const response = await apiService.getProducts(filtersPayload)
 
     if (!response?.success || !Array.isArray(response.data)) {
-      throw new Error(response?.message || 'Réponse inattendue de l’API')
+      throw new Error(response?.message || 'Réponse inattendue de l'API')
     }
 
     const aggregatedProducts: NormalizedProduct[] = response.data.map(normalizeProduct)
@@ -759,10 +1001,16 @@ const formatDiscount = (discount: number) => {
   return `-${Math.round(discount)}%`
 }
 
+const formatSavings = (product: NormalizedProduct) => {
+  const savings = product.original_price - product.discounted_price
+  return `Économisez ${Math.round(savings).toLocaleString('fr-FR')} XOF`
+}
+
 const formatQuantity = (product: NormalizedProduct) => {
   const available = getAvailableQuantity(product)
   if (available === 0) return 'Complet'
   if (available === 1) return '1 restant'
+  if (available <= 3) return `${available} restants • Quasi épuisé`
   return `${available} restants`
 }
 
@@ -795,7 +1043,7 @@ const getStockBadges = (product: NormalizedProduct) => {
   if (available <= 0) {
     badges.push({ label: 'Rupture de stock', variant: 'error' })
   } else if (available <= 3) {
-    badges.push({ label: 'Stock limité', variant: 'warning' })
+    badges.push({ label: 'Quasi épuisé', variant: 'warning' })
   } else {
     badges.push({ label: `${available} en stock`, variant: 'success' })
   }
@@ -805,6 +1053,31 @@ const getStockBadges = (product: NormalizedProduct) => {
   }
 
   return badges
+}
+
+const getEmptyStateDescription = () => {
+  if (filters.value.radius && !userLocation.value) {
+    return 'Activez votre position pour voir les paniers à proximité.'
+  }
+  if (hasActiveFilters.value) {
+    return 'Essayez de modifier votre recherche ou supprimez certains filtres pour découvrir d'autres paniers disponibles.'
+  }
+  return 'Aucun panier disponible pour le moment. Activez les alertes pour être notifié des nouvelles offres.'
+}
+
+const getEmptyStateSecondaryAction = () => {
+  if (authStore.isAuthenticated) {
+    return {
+      text: 'Mes réservations passées',
+      variant: 'outline' as const,
+      onClick: () => router.push('/reservations')
+    }
+  }
+  return {
+    text: 'Comment ça marche ?',
+    variant: 'outline' as const,
+    onClick: () => router.push('/discover')
+  }
 }
 
 const clearFilters = async () => {
@@ -833,6 +1106,26 @@ const applyFilters = () => {
   resetPagination()
   fetchProducts()
   notify.success('Affichage mis à jour selon vos préférences.', 'Filtres appliqués')
+}
+
+const applyCollection = (collection: any) => {
+  // Apply collection filters
+  if (collection.filter.category) {
+    filters.value.category = collection.filter.category
+  }
+  if (collection.filter.minDiscount) {
+    filters.value.minDiscount = collection.filter.minDiscount
+  }
+
+  resetPagination()
+  fetchProducts()
+  notify.success(`Collection "${collection.title}" appliquée`, 'Filtres')
+}
+
+const scrollToFeatured = () => {
+  if (featuredSectionRef.value) {
+    featuredSectionRef.value.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  }
 }
 
 const viewProduct = (product: NormalizedProduct) => {
@@ -891,8 +1184,7 @@ const onReserve = async (product: NormalizedProduct) => {
       'Paiement rapide'
     )
   } catch (error: any) {
-    // console.error('Erreur lors de la réservation rapide:', error)
-    const message = error?.message || 'Impossible d’initier la réservation rapide.'
+    const message = error?.message || 'Impossible d'initier la réservation rapide.'
     notify.error(message, 'Réservation rapide')
   } finally {
     quickReserveLoadingId.value = null
@@ -905,6 +1197,17 @@ const enableLocationFilter = () => {
     return
   }
 
+  if (userLocation.value) {
+    // Already have location, just show success
+    notify.success('Position déjà activée', 'Géolocalisation')
+    return
+  }
+
+  // Show modal instead of direct prompt
+  showLocationModal.value = true
+}
+
+const handleLocationAuthorization = () => {
   locationLoading.value = true
 
   navigator.geolocation.getCurrentPosition(
@@ -914,17 +1217,19 @@ const enableLocationFilter = () => {
         longitude: position.coords.longitude
       }
       locationLoading.value = false
+      showLocationModal.value = false
       notify.success('Nous affinons les paniers en fonction de votre position.', 'Position activée')
       resetPagination()
       fetchProducts()
     },
     (error) => {
       locationLoading.value = false
+      showLocationModal.value = false
       let message = 'Impossible d\'obtenir votre position'
 
       switch (error.code) {
         case error.PERMISSION_DENIED:
-          message = 'Autorisation de géolocalisation refusée'
+          message = 'Autorisation de géolocalisation refusée. Vous pouvez la réactiver dans les paramètres de votre navigateur.'
           break
         case error.POSITION_UNAVAILABLE:
           message = 'Position non disponible'
@@ -946,6 +1251,7 @@ const enableLocationFilter = () => {
 
 onMounted(() => {
   loadCategories()
+  loadUserImpact()
   fetchProducts()
 })
 
@@ -1011,5 +1317,14 @@ onBeforeUnmount(() => {
 
 .product-card-skeleton-lines :deep(.last\:w-sm\/3) {
   @apply w-1/2;
+}
+
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
 }
 </style>
