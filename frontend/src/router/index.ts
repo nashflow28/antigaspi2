@@ -233,7 +233,7 @@ const router = createRouter({
     {
       path: '/merchant/payments',
       name: 'merchant-payments',
-      component: () => import('@/views/WalletDashboard.vue'),
+      component: () => import('@/views/merchant/PaymentsView.vue'),
       meta: {
         requiresAuth: true,
         roles: ['merchant'],

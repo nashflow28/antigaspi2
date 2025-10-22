@@ -29,6 +29,7 @@ import type {
   FavoriteToggleResponse,
   FavoriteProductSummary,
   PaymentMethodOptionResponse,
+  MerchantPaymentsResponse,
   PublicReviewEntry
 } from '@/types'
 
@@ -748,6 +749,53 @@ class ApiService {
       method: 'POST',
       body: JSON.stringify(body)
     }, true)
+  }
+
+  async getMerchantPayments(params: Record<string, unknown> = {}): Promise<MerchantPaymentsResponse> {
+    const searchParams = new URLSearchParams()
+
+    Object.entries(params).forEach(([key, value]) => {
+      if (value === undefined || value === null || value === '') {
+        return
+      }
+
+      if (Array.isArray(value)) {
+        value.forEach(item => searchParams.append(`${key}[]`, String(item)))
+        return
+      }
+
+      searchParams.append(key, String(value))
+    })
+
+    const query = searchParams.toString()
+    const endpoint = query ? `/payments?${query}` : '/payments'
+
+    return this.request<MerchantPaymentsResponse>(endpoint, { method: 'GET' }, true)
+  }
+
+  async exportMerchantPayments(params: Record<string, unknown> = {}): Promise<Blob> {
+    const url = new URL(`${API_BASE_URL}/payments`)
+
+    Object.entries(params).forEach(([key, value]) => {
+      if (value === undefined || value === null || value === '') {
+        return
+      }
+
+      url.searchParams.append(key, String(value))
+    })
+
+    url.searchParams.set('export', 'csv')
+
+    const response = await fetch(url.toString(), {
+      headers: this.getHeaders(true),
+      method: 'GET'
+    })
+
+    if (!response.ok) {
+      throw new Error('Impossible d\'exporter les paiements pour le moment')
+    }
+
+    return response.blob()
   }
 
   async getAdminDashboard(): Promise<ApiResponse<AdminDashboardData>> {

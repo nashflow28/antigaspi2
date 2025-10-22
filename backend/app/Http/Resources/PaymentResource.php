@@ -25,6 +25,35 @@ class PaymentResource extends JsonResource
             'paid_at' => $this->paid_at,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
+            'reservation' => $this->whenLoaded('reservation', function () {
+                $reservation = $this->reservation;
+                if (!$reservation) {
+                    return null;
+                }
+
+                $consumer = $reservation->user;
+                $product = $reservation->product;
+
+                return [
+                    'id' => $reservation->id,
+                    'reservation_code' => $reservation->reservation_code,
+                    'status' => $reservation->status,
+                    'payment_status' => $reservation->payment_status?->value ?? $reservation->payment_status,
+                    'total_amount' => $reservation->total_amount !== null ? (float) $reservation->total_amount : null,
+                    'pickup_date' => $reservation->pickup_date,
+                    'created_at' => $reservation->created_at,
+                    'product' => $product ? [
+                        'id' => $product->id,
+                        'name' => $product->name,
+                    ] : null,
+                    'consumer' => $consumer ? [
+                        'id' => $consumer->id,
+                        'name' => trim(($consumer->first_name ?? '') . ' ' . ($consumer->last_name ?? '')) ?: ($consumer->name ?? ''),
+                        'phone' => $consumer->phone,
+                        'email' => $consumer->email,
+                    ] : null,
+                ];
+            }),
         ];
     }
 }
