@@ -2,12 +2,12 @@ import React from 'react'
 import { render, fireEvent, waitFor } from '@testing-library/react-native'
 import { Alert } from 'react-native'
 import ExportButton from './ExportButton'
-import * as FileSystem from 'expo-file-system'
+import * as FileSystem from 'expo-file-system/legacy'
 import * as Sharing from 'expo-sharing'
 import apiService from '../../services/api'
 
 // Mock dependencies
-jest.mock('expo-file-system')
+jest.mock('expo-file-system/legacy')
 jest.mock('expo-sharing')
 jest.mock('../../services/api', () => ({
   __esModule: true,

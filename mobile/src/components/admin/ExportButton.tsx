@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { Alert } from 'react-native'
-import * as FileSystem from 'expo-file-system'
+import * as FileSystem from 'expo-file-system/legacy'
 import * as Sharing from 'expo-sharing'
 import { Ionicons } from '@expo/vector-icons'
 import { Button } from '../2025'

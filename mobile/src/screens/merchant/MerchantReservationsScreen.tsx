@@ -13,6 +13,8 @@ import {
 import { Ionicons } from '@expo/vector-icons'
 import { useTheme } from '../../theme'
 import apiService from '../../services/api'
+import ExportReservationsButton from '../../components/merchant/ExportReservationsButton'
+import { Reservation as FullReservation } from '../../types'
 
 interface Reservation {
   id: number
@@ -298,10 +300,21 @@ const MerchantReservationsScreen: React.FC = () => {
       <View style={[styles.header, { backgroundColor: theme.colors.primary[500] }]}>
         <View style={styles.headerContent}>
           <Text style={styles.headerTitle}>Réservations</Text>
-          <TouchableOpacity onPress={loadReservations}>
-            <Ionicons name="refresh" size={24} color="white" />
-          </TouchableOpacity>
+          <View style={styles.headerActions}>
+            <TouchableOpacity onPress={loadReservations} style={styles.iconButton}>
+              <Ionicons name="refresh" size={24} color="white" />
+            </TouchableOpacity>
+          </View>
         </View>
+
+        {/* Export Button */}
+        {filteredReservations.length > 0 && (
+          <View style={styles.exportContainer}>
+            <ExportReservationsButton
+              reservations={filteredReservations as unknown as FullReservation[]}
+            />
+          </View>
+        )}
 
         {/* Filters */}
         <ScrollView
@@ -385,6 +398,18 @@ const styles = StyleSheet.create({
     color: 'white',
     fontSize: 28,
     fontWeight: 'bold',
+  },
+  headerActions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  iconButton: {
+    padding: 4,
+  },
+  exportContainer: {
+    marginTop: 12,
+    marginBottom: 8,
   },
   filtersContainer: {
     marginTop: 8,

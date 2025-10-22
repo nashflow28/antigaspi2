@@ -41,6 +41,11 @@ import {
   LoyaltyPointsSummary,
   LoyaltyRedemptionPayload,
   LoyaltyRedemptionData,
+  BroadcastNotification,
+  BroadcastResponse,
+  AdminAnalyticsFilters,
+  AdminAnalyticsData,
+  AnalyticsExportResponse,
 } from '../types'
 
 // Configuration dynamique de l'API (web/native) avec overrides propres
@@ -556,6 +561,49 @@ class ApiService {
 
   async updateMerchantLocation(payload: { latitude: number; longitude: number }): Promise<ApiResponse<MerchantLocation>> {
     return this.request<ApiResponse<MerchantLocation>>('PUT', '/merchants/location', payload)
+  }
+
+  // === ADMIN ANALYTICS ===
+
+  async getAdminAnalytics(filters?: AdminAnalyticsFilters): Promise<AdminAnalyticsData> {
+    const params = new URLSearchParams()
+    if (filters?.period) params.append('period', filters.period)
+    if (filters?.start_date) params.append('start_date', filters.start_date)
+    if (filters?.end_date) params.append('end_date', filters.end_date)
+
+    const response = await this.request<ApiResponse<AdminAnalyticsData>>(
+      'GET',
+      `/admin/analytics/stats?${params.toString()}`
+    )
+    return response.data
+  }
+
+  async exportAnalytics(
+    format: 'csv' | 'pdf',
+    filters?: AdminAnalyticsFilters
+  ): Promise<AnalyticsExportResponse> {
+    const params = new URLSearchParams()
+    params.append('format', format)
+    if (filters?.period) params.append('period', filters.period)
+    if (filters?.start_date) params.append('start_date', filters.start_date)
+    if (filters?.end_date) params.append('end_date', filters.end_date)
+
+    const response = await this.request<ApiResponse<AnalyticsExportResponse>>(
+      'POST',
+      `/admin/analytics/export?${params.toString()}`
+    )
+    return response.data
+  }
+
+  // === BROADCAST NOTIFICATIONS ===
+
+  async sendBroadcastNotification(data: BroadcastNotification): Promise<BroadcastResponse> {
+    const response = await this.request<ApiResponse<BroadcastResponse>>(
+      'POST',
+      '/notifications/broadcast',
+      data
+    )
+    return response.data
   }
 
   // === UTILITAIRES ===
