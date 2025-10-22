@@ -88,6 +88,18 @@ export const mockTheme = {
     fontWeight: '400' as const,
     letterSpacing: 0,
   }),
+  withOpacity: (color: string, opacity: number) => {
+    // Simple mock implementation
+    if (!color) return 'transparent'
+    if (typeof color === 'string' && color.startsWith('#')) {
+      // Convert hex to rgba
+      const r = parseInt(color.slice(1, 3), 16)
+      const g = parseInt(color.slice(3, 5), 16)
+      const b = parseInt(color.slice(5, 7), 16)
+      return `rgba(${r}, ${g}, ${b}, ${opacity})`
+    }
+    return color
+  },
 }
 
 export const mockUseTheme = () => mockTheme
