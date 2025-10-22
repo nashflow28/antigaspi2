@@ -1,17 +1,36 @@
 import React from 'react'
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
+import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import { Ionicons } from '@expo/vector-icons'
 import { useTheme } from '../theme'
 
-// Admin Screens (à créer)
+// Admin Screens
 import AdminDashboardScreen from '../screens/admin/AdminDashboardScreen'
 import AdminUsersScreen from '../screens/admin/AdminUsersScreen'
 import AdminProductsScreen from '../screens/admin/AdminProductsScreen'
 import AdminMerchantsScreen from '../screens/admin/AdminMerchantsScreen'
 import AdminCategoriesScreen from '../screens/admin/AdminCategoriesScreen'
 import AdminReviewModerationScreen from '../screens/admin/AdminReviewModerationScreen'
+import AdminAnalyticsScreen from '../screens/admin/AdminAnalyticsScreen'
+import AdminBroadcastScreen from '../screens/admin/AdminBroadcastScreen'
 
 const Tab = createBottomTabNavigator()
+const Stack = createNativeStackNavigator()
+
+// Stack Navigator pour le dashboard avec analytics
+const DashboardStack = () => (
+  <Stack.Navigator screenOptions={{ headerShown: false }}>
+    <Stack.Screen name="DashboardMain" component={AdminDashboardScreen} />
+    <Stack.Screen name="Analytics" component={AdminAnalyticsScreen} />
+  </Stack.Navigator>
+)
+
+// Stack Navigator pour les notifications broadcast
+const NotificationsStack = () => (
+  <Stack.Navigator screenOptions={{ headerShown: false }}>
+    <Stack.Screen name="NotificationsMain" component={AdminBroadcastScreen} />
+  </Stack.Navigator>
+)
 
 const AdminNavigator: React.FC = () => {
   const theme = useTheme()
@@ -34,6 +53,8 @@ const AdminNavigator: React.FC = () => {
             iconName = focused ? 'chatbubbles' : 'chatbubbles-outline'
           } else if (route.name === 'Categories') {
             iconName = focused ? 'grid' : 'grid-outline'
+          } else if (route.name === 'Notifications') {
+            iconName = focused ? 'notifications' : 'notifications-outline'
           } else {
             iconName = 'help-outline'
           }
@@ -53,7 +74,7 @@ const AdminNavigator: React.FC = () => {
     >
       <Tab.Screen
         name="Dashboard"
-        component={AdminDashboardScreen}
+        component={DashboardStack}
         options={{ title: 'Dashboard' }}
       />
       <Tab.Screen
@@ -80,6 +101,11 @@ const AdminNavigator: React.FC = () => {
         name="Categories"
         component={AdminCategoriesScreen}
         options={{ title: 'Catégories' }}
+      />
+      <Tab.Screen
+        name="Notifications"
+        component={NotificationsStack}
+        options={{ title: 'Notifications' }}
       />
     </Tab.Navigator>
   )

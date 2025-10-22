@@ -1,0 +1,509 @@
+import React, { useState, useEffect } from 'react'
+import {
+  View,
+  StyleSheet,
+  ScrollView,
+  TouchableOpacity,
+  StatusBar,
+  ActivityIndicator,
+  Alert,
+} from 'react-native'
+import { Ionicons } from '@expo/vector-icons'
+import DateTimePicker from '@react-native-community/datetimepicker'
+import { useTheme } from '../../theme'
+import { Typography, Card, Badge } from '../../components/2025'
+import RevenueChart from '../../components/admin/RevenueChart'
+import GeographicChart from '../../components/admin/GeographicChart'
+import ExportButton from '../../components/admin/ExportButton'
+import apiService from '../../services/api'
+import { AdminAnalyticsData, AdminAnalyticsFilters } from '../../types'
+import { formatCurrency } from '../../utils/currencyHelpers'
+
+type Period = '7d' | '30d' | '90d' | 'custom'
+type Tab = 'revenue' | 'geography' | 'merchants'
+
+const AdminAnalyticsScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
+  const theme = useTheme()
+  const [selectedPeriod, setSelectedPeriod] = useState<Period>('30d')
+  const [selectedTab, setSelectedTab] = useState<Tab>('revenue')
+  const [data, setData] = useState<AdminAnalyticsData | null>(null)
+  const [loading, setLoading] = useState(true)
+  const [showStartPicker, setShowStartPicker] = useState(false)
+  const [showEndPicker, setShowEndPicker] = useState(false)
+  const [startDate, setStartDate] = useState(new Date(Date.now() - 30 * 24 * 60 * 60 * 1000))
+  const [endDate, setEndDate] = useState(new Date())
+
+  useEffect(() => {
+    loadAnalytics()
+  }, [selectedPeriod, startDate, endDate])
+
+  const loadAnalytics = async () => {
+    try {
+      setLoading(true)
+
+      const filters: AdminAnalyticsFilters = {
+        period: selectedPeriod,
+      }
+
+      if (selectedPeriod === 'custom') {
+        filters.start_date = startDate.toISOString().split('T')[0]
+        filters.end_date = endDate.toISOString().split('T')[0]
+      }
+
+      const response = await apiService.getAdminAnalytics(filters)
+      setData(response)
+    } catch (error: any) {
+      console.error('❌ Error loading analytics:', error)
+      Alert.alert('Erreur', 'Impossible de charger les analytics')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const PERIODS = [
+    { id: '7d' as const, label: '7 jours' },
+    { id: '30d' as const, label: '30 jours' },
+    { id: '90d' as const, label: '90 jours' },
+    { id: 'custom' as const, label: 'Personnalisé' },
+  ]
+
+  const TABS = [
+    { id: 'revenue' as const, label: 'Revenus', icon: 'trending-up' },
+    { id: 'geography' as const, label: 'Géographie', icon: 'map' },
+    { id: 'merchants' as const, label: 'Commerçants', icon: 'storefront' },
+  ]
+
+  if (loading && !data) {
+    return (
+      <View style={[styles.container, styles.centered, { backgroundColor: theme.colors.background }]}>
+        <ActivityIndicator size="large" color={theme.colors.primary[500]} />
+        <Typography variant="body" color="secondary" style={{ marginTop: 12 }}>
+          Chargement des analytics...
+        </Typography>
+      </View>
+    )
+  }
+
+  return (
+    <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
+      <StatusBar barStyle="light-content" backgroundColor={theme.colors.primary[500]} />
+
+      {/* Header */}
+      <View style={[styles.header, { backgroundColor: theme.colors.primary[500] }]}>
+        <View style={styles.headerContent}>
+          <TouchableOpacity
+            onPress={() => navigation.goBack()}
+            style={styles.backButton}
+            testID="back-button"
+          >
+            <Ionicons name="arrow-back" size={24} color="white" />
+          </TouchableOpacity>
+          <View style={{ flex: 1 }}>
+            <Typography variant="caption" style={{ color: 'rgba(255, 255, 255, 0.8)' }}>
+              Administrateur
+            </Typography>
+            <Typography variant="h2" weight="bold" style={{ color: 'white' }}>
+              Analytics Avancées
+            </Typography>
+          </View>
+          <TouchableOpacity onPress={loadAnalytics} testID="refresh-button">
+            <Ionicons name="refresh" size={24} color="white" />
+          </TouchableOpacity>
+        </View>
+      </View>
+
+      <ScrollView style={styles.content} contentContainerStyle={styles.scrollContent}>
+        {/* Period Selector */}
+        <Card variant="elevated" style={styles.card}>
+          <Typography variant="h4" weight="semibold" style={{ marginBottom: 12 }}>
+            Période
+          </Typography>
+          <View style={styles.periodButtons}>
+            {PERIODS.map((period) => (
+              <TouchableOpacity
+                key={period.id}
+                style={[
+                  styles.periodButton,
+                  {
+                    backgroundColor:
+                      selectedPeriod === period.id
+                        ? theme.colors.primary[100]
+                        : theme.colors.surface.light,
+                    borderColor:
+                      selectedPeriod === period.id
+                        ? theme.colors.primary[500]
+                        : theme.colors.border,
+                  },
+                ]}
+                onPress={() => setSelectedPeriod(period.id)}
+              >
+                <Typography
+                  variant="small"
+                  weight={selectedPeriod === period.id ? 'semibold' : 'regular'}
+                  style={{
+                    color:
+                      selectedPeriod === period.id
+                        ? theme.colors.primary[500]
+                        : theme.colors.neutral[400],
+                  }}
+                >
+                  {period.label}
+                </Typography>
+              </TouchableOpacity>
+            ))}
+          </View>
+
+          {/* Custom Date Range */}
+          {selectedPeriod === 'custom' && (
+            <View style={styles.dateRange}>
+              <TouchableOpacity
+                style={[styles.dateButton, { borderColor: theme.colors.border }]}
+                onPress={() => setShowStartPicker(true)}
+              >
+                <Ionicons name="calendar-outline" size={20} color={theme.colors.neutral[400]} />
+                <Typography variant="small" style={{ marginLeft: 8 }}>
+                  {startDate.toLocaleDateString('fr-FR')}
+                </Typography>
+              </TouchableOpacity>
+              <Typography variant="small" color="secondary">
+                au
+              </Typography>
+              <TouchableOpacity
+                style={[styles.dateButton, { borderColor: theme.colors.border }]}
+                onPress={() => setShowEndPicker(true)}
+              >
+                <Ionicons name="calendar-outline" size={20} color={theme.colors.neutral[400]} />
+                <Typography variant="small" style={{ marginLeft: 8 }}>
+                  {endDate.toLocaleDateString('fr-FR')}
+                </Typography>
+              </TouchableOpacity>
+            </View>
+          )}
+        </Card>
+
+        {/* KPI Cards */}
+        {data && (
+          <>
+            <View style={styles.kpiGrid}>
+              <Card variant="elevated" style={styles.kpiCard}>
+                <Typography variant="caption" color="secondary">
+                  Revenu Total
+                </Typography>
+                <Typography variant="h3" weight="bold" color="primary">
+                  {formatCurrency(data.summary.total_revenue)}
+                </Typography>
+                <View style={styles.kpiChange}>
+                  <Ionicons
+                    name={data.summary.growth_rate >= 0 ? 'trending-up' : 'trending-down'}
+                    size={16}
+                    color={data.summary.growth_rate >= 0 ? theme.colors.semantic.success : theme.colors.semantic.error}
+                  />
+                  <Typography
+                    variant="caption"
+                    style={{
+                      color: data.summary.growth_rate >= 0 ? theme.colors.semantic.success : theme.colors.semantic.error,
+                      marginLeft: 4,
+                    }}
+                  >
+                    {data.summary.growth_rate >= 0 ? '+' : ''}{data.summary.growth_rate.toFixed(1)}%
+                  </Typography>
+                </View>
+              </Card>
+
+              <Card variant="elevated" style={styles.kpiCard}>
+                <Typography variant="caption" color="secondary">
+                  Transactions
+                </Typography>
+                <Typography variant="h3" weight="bold" color="primary">
+                  {data.summary.total_transactions}
+                </Typography>
+                <Typography variant="caption" color="secondary">
+                  transactions
+                </Typography>
+              </Card>
+
+              <Card variant="elevated" style={styles.kpiCard}>
+                <Typography variant="caption" color="secondary">
+                  Panier Moyen
+                </Typography>
+                <Typography variant="h3" weight="bold" color="primary">
+                  {formatCurrency(data.summary.average_order_value)}
+                </Typography>
+                <Typography variant="caption" color="secondary">
+                  par commande
+                </Typography>
+              </Card>
+            </View>
+
+            {/* Export Buttons */}
+            <View style={styles.exportContainer}>
+              <Typography variant="h4" weight="semibold" style={{ marginBottom: 12 }}>
+                Exporter les données
+              </Typography>
+              <View style={styles.exportButtons}>
+                <ExportButton
+                  format="csv"
+                  filters={{
+                    period: selectedPeriod,
+                    start_date: selectedPeriod === 'custom' ? startDate.toISOString().split('T')[0] : undefined,
+                    end_date: selectedPeriod === 'custom' ? endDate.toISOString().split('T')[0] : undefined,
+                  }}
+                />
+                <ExportButton
+                  format="pdf"
+                  filters={{
+                    period: selectedPeriod,
+                    start_date: selectedPeriod === 'custom' ? startDate.toISOString().split('T')[0] : undefined,
+                    end_date: selectedPeriod === 'custom' ? endDate.toISOString().split('T')[0] : undefined,
+                  }}
+                />
+              </View>
+            </View>
+
+            {/* Tabs */}
+            <View style={styles.tabs}>
+              {TABS.map((tab) => (
+                <TouchableOpacity
+                  key={tab.id}
+                  style={[
+                    styles.tab,
+                    {
+                      borderBottomColor:
+                        selectedTab === tab.id ? theme.colors.primary[500] : 'transparent',
+                    },
+                  ]}
+                  onPress={() => setSelectedTab(tab.id)}
+                >
+                  <Ionicons
+                    name={tab.icon as any}
+                    size={20}
+                    color={
+                      selectedTab === tab.id
+                        ? theme.colors.primary[500]
+                        : theme.colors.neutral[400]
+                    }
+                  />
+                  <Typography
+                    variant="small"
+                    weight={selectedTab === tab.id ? 'semibold' : 'regular'}
+                    style={{
+                      color:
+                        selectedTab === tab.id
+                          ? theme.colors.primary[500]
+                          : theme.colors.neutral[400],
+                      marginLeft: 6,
+                    }}
+                  >
+                    {tab.label}
+                  </Typography>
+                </TouchableOpacity>
+              ))}
+            </View>
+
+            {/* Tab Content */}
+            <Card variant="elevated" style={styles.card}>
+              {selectedTab === 'revenue' && (
+                <RevenueChart
+                  labels={data.revenue_chart.labels}
+                  data={data.revenue_chart.datasets[0]?.data || []}
+                  title="Évolution des revenus"
+                />
+              )}
+
+              {selectedTab === 'geography' && (
+                <GeographicChart
+                  data={data.geographic_distribution}
+                  title="Top 5 villes"
+                />
+              )}
+
+              {selectedTab === 'merchants' && (
+                <View>
+                  <Typography variant="h4" weight="semibold" style={{ marginBottom: 16 }}>
+                    Performance des commerçants
+                  </Typography>
+                  {data.merchant_performance.slice(0, 10).map((merchant, index) => (
+                    <View key={merchant.merchant_id} style={styles.merchantRow}>
+                      <View style={styles.merchantInfo}>
+                        <Badge variant="primary" size="sm" style={{ marginRight: 12 }}>
+                          #{index + 1}
+                        </Badge>
+                        <View style={{ flex: 1 }}>
+                          <Typography variant="body" weight="semibold" numberOfLines={1}>
+                            {merchant.merchant_name}
+                          </Typography>
+                          <Typography variant="caption" color="secondary">
+                            {merchant.reservations_count} réservations
+                          </Typography>
+                        </View>
+                      </View>
+                      <View style={{ alignItems: 'flex-end' }}>
+                        <Typography variant="body" weight="semibold">
+                          {formatCurrency(merchant.revenue)}
+                        </Typography>
+                        <View style={styles.growthBadge}>
+                          <Ionicons
+                            name={merchant.growth_rate >= 0 ? 'arrow-up' : 'arrow-down'}
+                            size={12}
+                            color={merchant.growth_rate >= 0 ? theme.colors.semantic.success : theme.colors.semantic.error}
+                          />
+                          <Typography
+                            variant="caption"
+                            style={{
+                              color: merchant.growth_rate >= 0 ? theme.colors.semantic.success : theme.colors.semantic.error,
+                              marginLeft: 2,
+                            }}
+                          >
+                            {merchant.growth_rate >= 0 ? '+' : ''}{merchant.growth_rate.toFixed(1)}%
+                          </Typography>
+                        </View>
+                      </View>
+                    </View>
+                  ))}
+                </View>
+              )}
+            </Card>
+          </>
+        )}
+
+        <View style={{ height: 40 }} />
+      </ScrollView>
+
+      {/* Date Pickers */}
+      {showStartPicker && (
+        <DateTimePicker
+          value={startDate}
+          mode="date"
+          display="default"
+          onChange={(event, date) => {
+            setShowStartPicker(false)
+            if (date) setStartDate(date)
+          }}
+        />
+      )}
+      {showEndPicker && (
+        <DateTimePicker
+          value={endDate}
+          mode="date"
+          display="default"
+          onChange={(event, date) => {
+            setShowEndPicker(false)
+            if (date) setEndDate(date)
+          }}
+        />
+      )}
+    </View>
+  )
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+  centered: {
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  header: {
+    paddingTop: 50,
+    paddingBottom: 20,
+    paddingHorizontal: 20,
+  },
+  headerContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  backButton: {
+    marginRight: 16,
+  },
+  content: {
+    flex: 1,
+  },
+  scrollContent: {
+    padding: 16,
+  },
+  card: {
+    marginBottom: 16,
+    padding: 16,
+  },
+  periodButtons: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+  },
+  periodButton: {
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 20,
+    borderWidth: 2,
+  },
+  dateRange: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 16,
+    gap: 8,
+  },
+  dateButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderWidth: 1,
+    borderRadius: 8,
+    flex: 1,
+  },
+  kpiGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 12,
+    marginBottom: 16,
+  },
+  kpiCard: {
+    flex: 1,
+    minWidth: '30%',
+    padding: 16,
+  },
+  kpiChange: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 4,
+  },
+  exportContainer: {
+    marginBottom: 16,
+  },
+  exportButtons: {
+    flexDirection: 'row',
+    gap: 12,
+  },
+  tabs: {
+    flexDirection: 'row',
+    marginBottom: 16,
+    gap: 16,
+  },
+  tab: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingBottom: 12,
+    borderBottomWidth: 2,
+  },
+  merchantRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(0,0,0,0.05)',
+  },
+  merchantInfo: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
+  },
+  growthBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 2,
+  },
+})
+
+export default AdminAnalyticsScreen

@@ -4,13 +4,14 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import { Ionicons } from '@expo/vector-icons'
 import { useTheme } from '../theme'
 
-// Merchant Screens (à créer)
+// Merchant Screens
 import MerchantDashboardScreen from '../screens/merchant/MerchantDashboardScreen'
 import MerchantAnalyticsScreen from '../screens/merchant/MerchantAnalyticsScreen'
 import MerchantProductsScreen from '../screens/merchant/MerchantProductsScreen'
 import MerchantReservationsScreen from '../screens/merchant/MerchantReservationsScreen'
 import MerchantReviewsScreen from '../screens/merchant/MerchantReviewsScreen'
 import MerchantLoyaltyScreen from '../screens/merchant/MerchantLoyaltyScreen'
+import MerchantSurpriseBasketsScreen from '../screens/merchant/MerchantSurpriseBasketsScreen'
 import MerchantProfileEditScreen from '../screens/merchant/MerchantProfileEditScreen'
 import MerchantOpeningHoursScreen from '../screens/merchant/MerchantOpeningHoursScreen'
 import MerchantNotificationsScreen from '../screens/merchant/MerchantNotificationsScreen'
@@ -58,6 +59,13 @@ const LoyaltyStack = () => (
   </Stack.Navigator>
 )
 
+// Stack Navigator pour les paniers surprise
+const SurpriseBasketsStack = () => (
+  <Stack.Navigator screenOptions={{ headerShown: false }}>
+    <Stack.Screen name="SurpriseBasketsMain" component={MerchantSurpriseBasketsScreen} />
+  </Stack.Navigator>
+)
+
 // Stack Navigator pour le compte
 const AccountStack = () => (
   <Stack.Navigator screenOptions={{ headerShown: false }}>
@@ -89,6 +97,8 @@ const MerchantNavigator: React.FC = () => {
             iconName = focused ? 'star' : 'star-outline'
           } else if (route.name === 'Loyalty') {
             iconName = focused ? 'gift' : 'gift-outline'
+          } else if (route.name === 'SurpriseBaskets') {
+            iconName = focused ? 'basket' : 'basket-outline'
           } else if (route.name === 'Account') {
             iconName = focused ? 'person' : 'person-outline'
           } else {
@@ -133,6 +143,11 @@ const MerchantNavigator: React.FC = () => {
         name="Loyalty"
         component={LoyaltyStack}
         options={{ title: 'Fidélité' }}
+      />
+      <Tab.Screen
+        name="SurpriseBaskets"
+        component={SurpriseBasketsStack}
+        options={{ title: 'Paniers Surprise' }}
       />
       <Tab.Screen
         name="Account"
