@@ -18,6 +18,7 @@ use App\Http\Controllers\Api\ConsumerController;
 use App\Http\Controllers\Api\CartController;
 use App\Http\Controllers\Api\MessageController;
 use App\Http\Controllers\Api\InventoryController;
+use App\Http\Controllers\Api\SearchController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\WalletController;
 
@@ -50,6 +51,9 @@ Route::prefix('auth')->middleware('throttle:auth')->group(function () {
         Route::post('revoke-all-sessions', [AuthController::class, 'revokeAllOtherSessions']);
     });
 });
+
+// Route de recherche globale
+Route::get('/search', [SearchController::class, 'index'])->middleware('throttle:search');
 
 // Routes analytics
 Route::prefix('analytics')->middleware('jwt.auth')->group(function () {

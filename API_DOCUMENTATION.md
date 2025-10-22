@@ -18,6 +18,83 @@ Content-Type: application/json
 
 ## 🚀 Endpoints Disponibles
 
+### 0. **Recherche**
+
+#### 🔎 GET `/search`
+Recherche temps réel sur les produits et commerçants indexés via Laravel Scout / Meilisearch.
+
+**Query Parameters :**
+- `q` *(string, optionnel)* — Terme de recherche plein texte.
+- `page` *(integer, optionnel)* — Page courante (par défaut `1`).
+- `per_page` *(integer, optionnel)* — Nombre de résultats par page (max `50`, par défaut `15`).
+- `sort` *(string, optionnel)* — Tri : `relevance`, `price_asc`, `price_desc`, `rating_desc`, `popularity_desc`.
+- `filters[type]` *(string, optionnel)* — Restreint la recherche à `products` (par défaut) ou `merchants`.
+- `filters[city]` *(string, optionnel)* — Filtre sur la ville (`merchant_city` pour les produits, `city` pour les commerçants).
+- `filters[category]` *(string, optionnel)* — Filtre catégorie produit.
+- `filters[business_type]` *(string, optionnel)* — Filtre type de commerce.
+- `filters[is_surprise_basket]` *(boolean, optionnel)* — Restreindre aux paniers surprises.
+- `filters[is_verified]` *(boolean, optionnel)* — Restreindre aux commerçants vérifiés.
+
+**Réponse :**
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "type": "product",
+      "id": 42,
+      "score": 12.7,
+      "highlights": {
+        "name": "<em>Pain</em> complet artisanal"
+      },
+      "attributes": {
+        "name": "Pain complet artisanal",
+        "description": "Pain complet fait maison, cuit ce matin",
+        "discounted_price": "250.00",
+        "original_price": "500.00",
+        "is_surprise_basket": false,
+        "rating": 4.8,
+        "popularity": 27,
+        "merchant": {
+          "id": 7,
+          "business_name": "Boulangerie Martin",
+          "business_type": "Boulangerie",
+          "city": "Abidjan"
+        }
+      }
+    }
+  ],
+  "meta": {
+    "type": "products",
+    "query": "pain",
+    "pagination": {
+      "current_page": 1,
+      "per_page": 15,
+      "total": 123,
+      "last_page": 9
+    },
+    "applied_filters": {
+      "city": "Abidjan",
+      "type": "products"
+    },
+    "facets": {
+      "merchant_city": {
+        "Abidjan": 87,
+        "Lomé": 25
+      },
+      "category": {
+        "Boulangerie": 32,
+        "Epicerie": 18
+      },
+      "is_surprise_basket": {
+        "true": 12,
+        "false": 111
+      }
+    }
+  }
+}
+```
+
 ### 1. **Authentication**
 
 #### 📝 POST `/auth/register`
