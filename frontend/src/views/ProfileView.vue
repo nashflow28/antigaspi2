@@ -115,7 +115,7 @@
                     :right-icon="ArrowRight"
                     class="text-blue-700"
                     tag="router-link"
-                    to="/notifications"
+                    to="/notifications/inbox"
                   >
                     Gérer mes notifications
                   </Button>
