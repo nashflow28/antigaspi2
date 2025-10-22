@@ -201,6 +201,12 @@ const router = createRouter({
       meta: { requiresAuth: true, roles: ['merchant'] }
     },
     {
+      path: '/merchant/analytics',
+      name: 'merchant-analytics',
+      component: () => import('@/views/merchant/AnalyticsView.vue'),
+      meta: { requiresAuth: true, roles: ['merchant'] }
+    },
+    {
       path: '/merchant/products',
       name: 'merchant-products',
       component: () => import('@/views/merchant/ProductsView.vue'),
