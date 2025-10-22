@@ -234,4 +234,279 @@ class AdminController extends Controller
             return false;
         }
     }
+
+    /**
+     * Export analytics data in CSV or PDF format
+     */
+    public function exportAnalytics(Request $request): mixed
+    {
+        try {
+            $user = JWTAuth::parseToken()->authenticate();
+
+            if (!$user->isAdmin()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Accès réservé aux administrateurs'
+                ], 403);
+            }
+
+            $validated = $request->validate([
+                'format' => ['required', 'in:csv,pdf'],
+                'period' => ['nullable', 'in:week,month,year'],
+                'start_date' => ['nullable', 'date'],
+                'end_date' => ['nullable', 'date', 'after_or_equal:start_date'],
+            ]);
+
+            $format = $validated['format'];
+            $period = $validated['period'] ?? 'month';
+
+            // Get date range based on period or custom dates
+            if (isset($validated['start_date']) && isset($validated['end_date'])) {
+                $startDate = \Carbon\Carbon::parse($validated['start_date']);
+                $endDate = \Carbon\Carbon::parse($validated['end_date']);
+            } else {
+                $endDate = now();
+                $startDate = match($period) {
+                    'week' => now()->subWeek(),
+                    'year' => now()->subYear(),
+                    default => now()->subMonth(),
+                };
+            }
+
+            // Collect analytics data
+            $data = $this->collectAnalyticsData($startDate, $endDate);
+
+            if ($format === 'csv') {
+                return $this->generateCSV($data, $startDate, $endDate);
+            } else {
+                return $this->generatePDFHTML($data, $startDate, $endDate);
+            }
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Erreur lors de l\'export des données',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Collect analytics data for export
+     */
+    private function collectAnalyticsData($startDate, $endDate): array
+    {
+        // Users statistics
+        $totalUsers = User::whereBetween('created_at', [$startDate, $endDate])->count();
+        $consumerCount = User::where('role', 'consumer')
+            ->whereBetween('created_at', [$startDate, $endDate])->count();
+        $merchantCount = User::where('role', 'merchant')
+            ->whereBetween('created_at', [$startDate, $endDate])->count();
+
+        // Merchants statistics
+        $verifiedMerchants = Merchant::where('is_verified', true)
+            ->whereBetween('created_at', [$startDate, $endDate])->count();
+        $pendingMerchants = Merchant::where('is_verified', false)
+            ->whereBetween('created_at', [$startDate, $endDate])->count();
+
+        // Products statistics
+        $totalProducts = Product::whereBetween('created_at', [$startDate, $endDate])->count();
+        $activeProducts = Product::where('is_active', true)
+            ->whereBetween('created_at', [$startDate, $endDate])->count();
+
+        // Reservations statistics
+        $reservations = Reservation::whereBetween('created_at', [$startDate, $endDate]);
+        $totalReservations = $reservations->count();
+        $completedReservations = (clone $reservations)->where('status', 'completed')->count();
+        $pendingReservations = (clone $reservations)->where('status', 'pending')->count();
+        $cancelledReservations = (clone $reservations)->where('status', 'cancelled')->count();
+
+        // Financial statistics
+        $totalRevenue = Reservation::where('status', 'completed')
+            ->whereBetween('created_at', [$startDate, $endDate])
+            ->sum('total_amount');
+        $averageOrderValue = $completedReservations > 0
+            ? $totalRevenue / $completedReservations
+            : 0;
+
+        // Products saved from waste
+        $productsSaved = Reservation::where('status', 'completed')
+            ->whereBetween('created_at', [$startDate, $endDate])
+            ->sum('quantity_reserved');
+
+        // Top merchants by completed orders in period
+        $topMerchantsData = DB::table('merchants')
+            ->join('users', 'merchants.user_id', '=', 'users.id')
+            ->join('products', 'merchants.id', '=', 'products.merchant_id')
+            ->join('reservations', 'products.id', '=', 'reservations.product_id')
+            ->where('reservations.status', 'completed')
+            ->whereBetween('reservations.created_at', [$startDate, $endDate])
+            ->select(
+                'merchants.id',
+                'merchants.business_name',
+                'merchants.business_type',
+                'merchants.is_verified',
+                'users.email',
+                DB::raw('COUNT(reservations.id) as orders_count')
+            )
+            ->groupBy('merchants.id', 'merchants.business_name', 'merchants.business_type', 'merchants.is_verified', 'users.email')
+            ->orderByDesc('orders_count')
+            ->limit(10)
+            ->get();
+
+        $topMerchants = $topMerchantsData->map(function ($merchant) {
+            return [
+                'name' => $merchant->business_name,
+                'type' => $merchant->business_type ?? 'Non spécifié',
+                'email' => $merchant->email,
+                'orders' => $merchant->orders_count,
+                'verified' => $merchant->is_verified ? 'Oui' : 'Non',
+            ];
+        });
+
+        // Popular categories
+        $popularCategories = Category::withCount(['products' => function($q) use ($startDate, $endDate) {
+                $q->whereBetween('created_at', [$startDate, $endDate]);
+            }])
+            ->whereHas('products', function($q) use ($startDate, $endDate) {
+                $q->whereBetween('created_at', [$startDate, $endDate]);
+            })
+            ->orderBy('products_count', 'desc')
+            ->take(10)
+            ->get()
+            ->map(function ($category) {
+                return [
+                    'name' => $category->name,
+                    'products_count' => $category->products_count,
+                    'icon' => $category->icon ?? 'N/A',
+                ];
+            });
+
+        return [
+            'period' => [
+                'start' => $startDate->format('Y-m-d'),
+                'end' => $endDate->format('Y-m-d'),
+            ],
+            'summary' => [
+                'total_users' => $totalUsers,
+                'consumers' => $consumerCount,
+                'merchants' => $merchantCount,
+                'verified_merchants' => $verifiedMerchants,
+                'pending_merchants' => $pendingMerchants,
+                'total_products' => $totalProducts,
+                'active_products' => $activeProducts,
+                'total_reservations' => $totalReservations,
+                'completed_reservations' => $completedReservations,
+                'pending_reservations' => $pendingReservations,
+                'cancelled_reservations' => $cancelledReservations,
+                'total_revenue' => number_format($totalRevenue, 0, ',', ' ') . ' XOF',
+                'average_order_value' => number_format($averageOrderValue, 0, ',', ' ') . ' XOF',
+                'products_saved' => $productsSaved,
+                'environmental_impact' => [
+                    'co2_saved' => number_format($productsSaved * 2.5, 1) . ' kg',
+                    'water_saved' => number_format($productsSaved * 1000, 0) . ' L',
+                ],
+            ],
+            'top_merchants' => $topMerchants,
+            'popular_categories' => $popularCategories,
+        ];
+    }
+
+    /**
+     * Generate CSV file from analytics data
+     */
+    private function generateCSV(array $data, $startDate, $endDate)
+    {
+        $filename = 'analytics-export-' . $startDate->format('Y-m-d') . '-to-' . $endDate->format('Y-m-d') . '.csv';
+
+        $callback = function() use ($data) {
+            $file = fopen('php://output', 'w');
+
+            // UTF-8 BOM for Excel compatibility
+            fprintf($file, chr(0xEF).chr(0xBB).chr(0xBF));
+
+            // Header
+            fputcsv($file, ['RAPPORT ANALYTICS ANTIGASPI']);
+            fputcsv($file, ['Période', $data['period']['start'] . ' au ' . $data['period']['end']]);
+            fputcsv($file, ['Généré le', now()->format('Y-m-d H:i:s')]);
+            fputcsv($file, []); // Empty row
+
+            // Summary statistics
+            fputcsv($file, ['STATISTIQUES GÉNÉRALES']);
+            fputcsv($file, ['Métrique', 'Valeur']);
+
+            foreach ($data['summary'] as $key => $value) {
+                if (!is_array($value)) {
+                    $label = ucfirst(str_replace('_', ' ', $key));
+                    fputcsv($file, [$label, $value]);
+                }
+            }
+            fputcsv($file, []); // Empty row
+
+            // Environmental impact
+            fputcsv($file, ['IMPACT ENVIRONNEMENTAL']);
+            fputcsv($file, ['Métrique', 'Valeur']);
+            foreach ($data['summary']['environmental_impact'] as $key => $value) {
+                $label = ucfirst(str_replace('_', ' ', $key));
+                fputcsv($file, [$label, $value]);
+            }
+            fputcsv($file, []); // Empty row
+
+            // Top merchants
+            fputcsv($file, ['TOP COMMERÇANTS']);
+            fputcsv($file, ['Nom', 'Type', 'Email', 'Commandes', 'Vérifié']);
+
+            foreach ($data['top_merchants'] as $merchant) {
+                fputcsv($file, [
+                    $merchant['name'],
+                    $merchant['type'],
+                    $merchant['email'],
+                    $merchant['orders'],
+                    $merchant['verified'],
+                ]);
+            }
+            fputcsv($file, []); // Empty row
+
+            // Popular categories
+            fputcsv($file, ['CATÉGORIES POPULAIRES']);
+            fputcsv($file, ['Nom', 'Nombre de produits', 'Icône']);
+
+            foreach ($data['popular_categories'] as $category) {
+                fputcsv($file, [
+                    $category['name'],
+                    $category['products_count'],
+                    $category['icon'],
+                ]);
+            }
+
+            fclose($file);
+        };
+
+        return response()->stream($callback, 200, [
+            'Content-Type' => 'text/csv; charset=UTF-8',
+            'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+            'Cache-Control' => 'no-cache, no-store, must-revalidate',
+            'Pragma' => 'no-cache',
+            'Expires' => '0',
+        ]);
+    }
+
+    /**
+     * Generate PDF-ready HTML from analytics data
+     */
+    private function generatePDFHTML(array $data, $startDate, $endDate)
+    {
+        $filename = 'analytics-export-' . $startDate->format('Y-m-d') . '-to-' . $endDate->format('Y-m-d') . '.html';
+
+        $html = view('exports.analytics-pdf', [
+            'data' => $data,
+            'generated_at' => now()->format('d/m/Y H:i:s'),
+        ])->render();
+
+        return response($html, 200, [
+            'Content-Type' => 'text/html; charset=UTF-8',
+            'Content-Disposition' => 'inline; filename="' . $filename . '"',
+            'Cache-Control' => 'no-cache, no-store, must-revalidate',
+        ]);
+    }
 }

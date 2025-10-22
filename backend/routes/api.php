@@ -297,6 +297,7 @@ Route::prefix('reviews')->group(function () {
 Route::prefix('admin')->middleware(['jwt.auth', 'can:admin', 'throttle:admin'])->group(function () {
     Route::get('/dashboard', [AdminController::class, 'dashboard']); // Dashboard admin
     Route::get('/system-health', [AdminController::class, 'systemHealth']); // Santé du système
+    Route::post('/analytics/export', [AdminController::class, 'exportAnalytics']); // Export analytics CSV/PDF
 
     // Gestion des catégories (admin uniquement)
     Route::prefix('categories')->group(function () {
