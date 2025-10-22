@@ -292,6 +292,7 @@ import {
   ClockIcon,
   BanknotesIcon,
   CheckCircleIcon,
+  ChartBarIcon,
   ArrowRightIcon,
   UserIcon,
   CogIcon,
@@ -390,6 +391,14 @@ const quickActions = [
     to: '/merchant/reservations',
     icon: ClockIcon,
     tone: 'warning' as const
+  },
+  {
+    id: 'analytics',
+    label: 'Analytics avancées',
+    description: 'Analysez vos performances détaillées',
+    to: '/merchant/analytics',
+    icon: ChartBarIcon,
+    tone: 'primary' as const
   },
   {
     id: 'settings',
