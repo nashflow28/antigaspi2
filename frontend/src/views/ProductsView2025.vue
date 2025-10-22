@@ -343,7 +343,7 @@
                   :savings="formatSavings(product)"
                   :quantity="formatQuantity(product)"
                   :tags="getProductTags(product)"
-                  :stock-badges="getStockBadges(product)"
+                  :low-stock="isLowStock(product)"
                   :reserve-loading="quickReserveLoadingId === product.id"
                   :reserve-disabled="isProductSoldOut(product)"
                   :disabled="isProductSoldOut(product) || quickReserveLoadingId === product.id"
@@ -423,7 +423,7 @@
             :savings="formatSavings(product)"
             :quantity="formatQuantity(product)"
             :tags="getProductTags(product)"
-            :stock-badges="getStockBadges(product)"
+            :low-stock="isLowStock(product)"
             :reserve-loading="quickReserveLoadingId === product.id"
             :reserve-disabled="isProductSoldOut(product)"
             :disabled="isProductSoldOut(product) || quickReserveLoadingId === product.id"
@@ -907,7 +907,7 @@ const fetchProducts = async () => {
     const response = await apiService.getProducts(filtersPayload)
 
     if (!response?.success || !Array.isArray(response.data)) {
-      throw new Error(response?.message || 'Réponse inattendue de l'API')
+      throw new Error(response?.message || 'Réponse inattendue de l\'API')
     }
 
     const aggregatedProducts: NormalizedProduct[] = response.data.map(normalizeProduct)
@@ -1010,8 +1010,12 @@ const formatQuantity = (product: NormalizedProduct) => {
   const available = getAvailableQuantity(product)
   if (available === 0) return 'Complet'
   if (available === 1) return '1 restant'
-  if (available <= 3) return `${available} restants • Quasi épuisé`
   return `${available} restants`
+}
+
+const isLowStock = (product: NormalizedProduct) => {
+  const available = getAvailableQuantity(product)
+  return available > 0 && available <= 3
 }
 
 const formatMerchant = (product: NormalizedProduct) => {
@@ -1036,31 +1040,12 @@ const getProductTags = (product: NormalizedProduct) => {
   return tags
 }
 
-const getStockBadges = (product: NormalizedProduct) => {
-  const badges: { label: string; variant?: string }[] = []
-  const available = getAvailableQuantity(product)
-
-  if (available <= 0) {
-    badges.push({ label: 'Rupture de stock', variant: 'error' })
-  } else if (available <= 3) {
-    badges.push({ label: 'Quasi épuisé', variant: 'warning' })
-  } else {
-    badges.push({ label: `${available} en stock`, variant: 'success' })
-  }
-
-  if (product.reserved_quantity > 0) {
-    badges.push({ label: `${product.reserved_quantity} réservés`, variant: 'info' })
-  }
-
-  return badges
-}
-
 const getEmptyStateDescription = () => {
   if (filters.value.radius && !userLocation.value) {
     return 'Activez votre position pour voir les paniers à proximité.'
   }
   if (hasActiveFilters.value) {
-    return 'Essayez de modifier votre recherche ou supprimez certains filtres pour découvrir d'autres paniers disponibles.'
+    return 'Essayez de modifier votre recherche ou supprimez certains filtres pour découvrir d\'autres paniers disponibles.'
   }
   return 'Aucun panier disponible pour le moment. Activez les alertes pour être notifié des nouvelles offres.'
 }
@@ -1184,7 +1169,7 @@ const onReserve = async (product: NormalizedProduct) => {
       'Paiement rapide'
     )
   } catch (error: any) {
-    const message = error?.message || 'Impossible d'initier la réservation rapide.'
+    const message = error?.message || 'Impossible d\'initier la réservation rapide.'
     notify.error(message, 'Réservation rapide')
   } finally {
     quickReserveLoadingId.value = null

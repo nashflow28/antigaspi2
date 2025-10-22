@@ -19,37 +19,27 @@
           class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.05]"
         >
 
+        <!-- Badge discount (top-left) -->
         <Badge
           v-if="discount"
           data-testid="product-card-discount"
           variant="promo"
-          size="sm"
+          size="xs"
           class="product-card__discount"
         >
           {{ discount }}
         </Badge>
 
-        <div
-          v-if="hasStockBadges"
-          class="product-card__stock"
+        <!-- Badge urgency (top-right) - only if low stock -->
+        <Badge
+          v-if="isLowStock"
+          data-testid="product-card-urgency"
+          variant="warning"
+          size="xs"
+          class="product-card__urgency"
         >
-          <Badge
-            v-for="badge in normalizedStockBadges"
-            :key="badge.label"
-            data-testid="product-card-stock-badge"
-            :variant="badge.variant || 'secondary'"
-            size="sm"
-            class="product-card__stock-badge"
-          >
-            <component
-              :is="badge.icon"
-              v-if="badge.icon"
-              :size="14"
-              class="mr-1"
-            />
-            {{ badge.label }}
-          </Badge>
-        </div>
+          Quasi épuisé
+        </Badge>
       </div>
 
       <div class="product-card__body">
@@ -77,6 +67,18 @@
           </div>
         </div>
 
+        <!-- Meta info section (replaces multiple badges) -->
+        <div v-if="hasMetaInfo" class="product-card__meta">
+          <p v-if="quantity" class="product-card__meta-item">
+            <span class="product-card__meta-icon">✨</span>
+            {{ quantity }}
+          </p>
+          <p v-if="pickupTime" class="product-card__meta-item">
+            <span class="product-card__meta-icon">🕐</span>
+            {{ pickupTime }}
+          </p>
+        </div>
+
         <div
           v-if="hasTags"
           class="product-card__tags"
@@ -86,13 +88,13 @@
             :key="tag.label"
             data-testid="product-card-tag"
             :variant="tag.variant || 'outline'"
-            size="sm"
+            size="xs"
             class="product-card__tag"
           >
             <component
               :is="tag.icon"
               v-if="tag.icon"
-              :size="14"
+              :size="12"
               class="mr-1"
             />
             {{ tag.label }}
@@ -110,12 +112,6 @@
             </div>
             <p v-if="savings" class="product-card__savings">
               {{ savings }}
-            </p>
-            <p
-              v-if="quantity"
-              class="product-card__quantity"
-            >
-              {{ quantity }}
             </p>
           </div>
 
@@ -176,6 +172,8 @@ interface Props {
   discount?: string
   savings?: string
   quantity?: string
+  pickupTime?: string
+  lowStock?: boolean
   imageAlt?: string
   tags?: Array<string | ProductCardTag>
   stockBadges?: ProductCardBadge[]
@@ -275,6 +273,8 @@ const normalizedStockBadges = computed(() => {
 
 const hasTags = computed(() => normalizedTags.value.length > 0)
 const hasStockBadges = computed(() => normalizedStockBadges.value.length > 0)
+const isLowStock = computed(() => props.lowStock ?? false)
+const hasMetaInfo = computed(() => Boolean(props.quantity || props.pickupTime))
 
 const interactive = computed(() => props.interactive)
 
@@ -305,6 +305,10 @@ const handleReserve = (event?: MouseEvent) => {
   @apply absolute left-4 top-4 shadow-glow;
 }
 
+.product-card__urgency {
+  @apply absolute right-4 top-4 shadow-glow bg-amber-500 text-white;
+}
+
 .product-card__stock {
   @apply absolute inset-x-4 bottom-4 flex flex-wrap justify-center gap-2;
 }
@@ -323,6 +327,18 @@ const handleReserve = (event?: MouseEvent) => {
 
 .product-card__merchant {
   @apply text-sm text-neutral-500 dark:text-neutral-300;
+}
+
+.product-card__meta {
+  @apply flex flex-col gap-1.5 text-sm text-neutral-600 dark:text-neutral-400;
+}
+
+.product-card__meta-item {
+  @apply flex items-center gap-2;
+}
+
+.product-card__meta-icon {
+  @apply text-base;
 }
 
 .product-card__tags {
