@@ -155,9 +155,27 @@ const router = createRouter({
       meta: { requiresAuth: true }
     },
     {
+      path: '/profile/edit',
+      name: 'profile-edit',
+      component: () => import('@/views/ProfileEditView.vue'),
+      meta: { requiresAuth: true }
+    },
+    {
       path: '/notifications',
       name: 'notifications',
       component: () => import('@/views/NotificationsCenterView.vue'),
+      meta: { requiresAuth: true }
+    },
+    {
+      path: '/notifications/inbox',
+      name: 'notifications-inbox',
+      component: () => import('@/views/NotificationsView.vue'),
+      meta: { requiresAuth: true }
+    },
+    {
+      path: '/notifications/settings',
+      name: 'notifications-settings',
+      component: () => import('@/views/NotificationSettingsView.vue'),
       meta: { requiresAuth: true }
     },
     {
@@ -232,6 +250,12 @@ const router = createRouter({
       path: '/merchant/products',
       name: 'merchant-products',
       component: () => import('@/views/merchant/ProductsView.vue'),
+      meta: { requiresAuth: true, roles: ['merchant'] }
+    },
+    {
+      path: '/merchant/opening-hours',
+      name: 'merchant-opening-hours',
+      component: () => import('@/views/OpeningHoursView.vue'),
       meta: { requiresAuth: true, roles: ['merchant'] }
     },
     {
