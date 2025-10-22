@@ -329,6 +329,12 @@ const router = createRouter({
       meta: { requiresAuth: true, roles: ['admin'] }
     },
     {
+      path: '/admin/payments',
+      name: 'admin-payments',
+      component: () => import('@/views/admin/PaymentDashboardView.vue'),
+      meta: { requiresAuth: true, roles: ['admin'] }
+    },
+    {
       path: '/gaspiz-demo',
       name: 'gaspiz-demo',
       component: () => import('@/views/GaspizInspiredHome.vue'),
