@@ -335,6 +335,12 @@ const router = createRouter({
       meta: { requiresAuth: true, roles: ['admin'] }
     },
     {
+      path: '/admin/settings',
+      name: 'admin-settings',
+      component: () => import('@/views/admin/SystemSettingsView.vue'),
+      meta: { requiresAuth: true, roles: ['admin'] }
+    },
+    {
       path: '/gaspiz-demo',
       name: 'gaspiz-demo',
       component: () => import('@/views/GaspizInspiredHome.vue'),

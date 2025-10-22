@@ -9,6 +9,7 @@ use App\Models\Reservation;
 use App\Models\Merchant;
 use App\Models\Category;
 use App\Models\Payment;
+use App\Models\Setting;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -704,5 +705,134 @@ class AdminController extends Controller
         }
 
         return $query;
+    }
+
+    /**
+     * Get all system settings grouped by category
+     *
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function getSettings(Request $request): JsonResponse
+    {
+        try {
+            $user = JWTAuth::parseToken()->authenticate();
+
+            if (!$user->isAdmin()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Accès réservé aux administrateurs'
+                ], 403);
+            }
+
+            // Audit log
+            \Log::info('Admin accessed system settings', [
+                'admin_id' => $user->id,
+                'admin_email' => $user->email,
+                'ip_address' => $request->ip(),
+                'user_agent' => $request->userAgent(),
+                'timestamp' => now()->toDateTimeString(),
+            ]);
+
+            $settings = Setting::getAllGrouped();
+
+            return response()->json([
+                'success' => true,
+                'data' => $settings,
+            ], 200);
+
+        } catch (\Exception $e) {
+            \Log::error('Admin settings fetch failed', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+                'user_id' => $user->id ?? null,
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Erreur lors de la récupération des paramètres',
+                'error' => config('app.debug') ? $e->getMessage() : 'Erreur serveur interne',
+            ], 500);
+        }
+    }
+
+    /**
+     * Update system settings
+     *
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function updateSettings(Request $request): JsonResponse
+    {
+        try {
+            $user = JWTAuth::parseToken()->authenticate();
+
+            if (!$user->isAdmin()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Accès réservé aux administrateurs'
+                ], 403);
+            }
+
+            // Validate that settings is an array
+            $validated = $request->validate([
+                'settings' => ['required', 'array'],
+                'settings.*' => ['required'],
+            ]);
+
+            $updated = [];
+            $failed = [];
+
+            foreach ($validated['settings'] as $key => $value) {
+                $success = Setting::set($key, $value);
+
+                if ($success) {
+                    $updated[] = $key;
+                } else {
+                    $failed[] = $key;
+                }
+            }
+
+            // Audit log
+            \Log::info('Admin updated system settings', [
+                'admin_id' => $user->id,
+                'admin_email' => $user->email,
+                'ip_address' => $request->ip(),
+                'user_agent' => $request->userAgent(),
+                'changes' => $validated['settings'],
+                'updated_count' => count($updated),
+                'failed_count' => count($failed),
+                'timestamp' => now()->toDateTimeString(),
+            ]);
+
+            // Clear settings cache
+            Setting::clearCache();
+
+            return response()->json([
+                'success' => true,
+                'message' => count($updated) > 0 ? 'Paramètres mis à jour avec succès' : 'Aucun paramètre valide à mettre à jour',
+                'updated' => $updated,
+                'failed' => $failed,
+            ], 200);
+
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Erreur de validation',
+                'errors' => $e->errors(),
+            ], 422);
+        } catch (\Exception $e) {
+            \Log::error('Admin settings update failed', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+                'user_id' => $user->id ?? null,
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Erreur lors de la mise à jour des paramètres',
+                'error' => config('app.debug') ? $e->getMessage() : 'Erreur serveur interne',
+            ], 500);
+        }
     }
 }

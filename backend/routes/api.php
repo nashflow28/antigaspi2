@@ -309,6 +309,8 @@ Route::prefix('admin')->middleware(['jwt.auth', 'can:admin', 'throttle:admin'])-
     Route::get('/system-health', [AdminController::class, 'systemHealth']); // Santé du système
     Route::post('/analytics/export', [AdminController::class, 'exportAnalytics']); // Export analytics CSV/PDF
     Route::get('/payments', [AdminController::class, 'payments']); // Payments dashboard with filters
+    Route::get('/settings', [AdminController::class, 'getSettings']); // Get all system settings
+    Route::put('/settings', [AdminController::class, 'updateSettings']); // Update system settings
 
     // Gestion des catégories (admin uniquement)
     Route::prefix('categories')->group(function () {
