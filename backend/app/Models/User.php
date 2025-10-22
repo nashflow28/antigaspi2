@@ -113,6 +113,21 @@ class User extends Authenticatable implements JWTSubject
         return $this->hasMany(Favorite::class);
     }
 
+    public function conversationsAsConsumer(): HasMany
+    {
+        return $this->hasMany(Conversation::class, 'consumer_id');
+    }
+
+    public function conversationsAsMerchant(): HasMany
+    {
+        return $this->hasMany(Conversation::class, 'merchant_id');
+    }
+
+    public function messages(): HasMany
+    {
+        return $this->hasMany(Message::class, 'sender_id');
+    }
+
     // Scopes
     public function scopeConsumers($query)
     {

@@ -21,6 +21,7 @@ import NotificationSettingsScreen from '../screens/merchant/NotificationSettings
 import CartScreen from '../screens/main/CartScreen'
 import WalletScreen from '../screens/main/WalletScreen'
 import MerchantMapScreen from '../screens/main/MerchantMapScreen'
+import MerchantMessagingScreen from '../screens/main/MerchantMessagingScreen'
 import { TEST_IDS } from '../utils/testIds'
 import LoyaltyScreen from '../screens/main/LoyaltyScreen'
 
@@ -36,6 +37,7 @@ const HomeStack = () => (
     <Stack.Screen name="MerchantDetail" component={MerchantDetailScreen} />
     <Stack.Screen name="ReviewsList" component={ReviewsListScreen} />
     <Stack.Screen name="AddReview" component={AddReviewScreen} />
+    <Stack.Screen name="MerchantMessaging" component={MerchantMessagingScreen} />
   </Stack.Navigator>
 )
 
@@ -48,6 +50,7 @@ const ProductsStack = () => (
       <Stack.Screen name="MerchantDetail" component={MerchantDetailScreen} />
       <Stack.Screen name="ReviewsList" component={ReviewsListScreen} />
       <Stack.Screen name="AddReview" component={AddReviewScreen} />
+      <Stack.Screen name="MerchantMessaging" component={MerchantMessagingScreen} />
     </Stack.Navigator>
   </ErrorBoundary>
 )
@@ -60,6 +63,7 @@ const FavoritesStack = () => (
     <Stack.Screen name="MerchantDetail" component={MerchantDetailScreen} />
     <Stack.Screen name="ReviewsList" component={ReviewsListScreen} />
     <Stack.Screen name="AddReview" component={AddReviewScreen} />
+    <Stack.Screen name="MerchantMessaging" component={MerchantMessagingScreen} />
   </Stack.Navigator>
 )
 
@@ -72,6 +76,7 @@ const OrdersStack = () => (
     <Stack.Screen name="MerchantDetail" component={MerchantDetailScreen} />
     <Stack.Screen name="ReviewsList" component={ReviewsListScreen} />
     <Stack.Screen name="AddReview" component={AddReviewScreen} />
+    <Stack.Screen name="MerchantMessaging" component={MerchantMessagingScreen} />
   </Stack.Navigator>
 )
 
@@ -92,6 +97,7 @@ const AccountStack = () => (
     <Stack.Screen name="MerchantDetail" component={MerchantDetailScreen} />
     <Stack.Screen name="ReviewsList" component={ReviewsListScreen} />
     <Stack.Screen name="AddReview" component={AddReviewScreen} />
+    <Stack.Screen name="MerchantMessaging" component={MerchantMessagingScreen} />
   </Stack.Navigator>
 )
 
@@ -103,6 +109,7 @@ const MapStack = () => (
     <Stack.Screen name="ReservationDetails" component={ReservationDetailsScreen} />
     <Stack.Screen name="ReviewsList" component={ReviewsListScreen} />
     <Stack.Screen name="AddReview" component={AddReviewScreen} />
+    <Stack.Screen name="MerchantMessaging" component={MerchantMessagingScreen} />
   </Stack.Navigator>
 )
 

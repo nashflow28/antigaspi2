@@ -3,7 +3,15 @@
  * Crée des objets de test complets avec tous les champs requis
  */
 
-import { User, Product, Category, Merchant, Reservation } from '../types'
+import {
+  User,
+  Product,
+  Category,
+  Merchant,
+  Reservation,
+  Conversation,
+  ConversationMessage,
+} from '../types'
 
 export const createTestUser = (overrides?: Partial<User>): User => ({
   id: 1,
@@ -91,3 +99,76 @@ export const createTestReservation = (overrides?: Partial<Reservation>): Reserva
   latest_payment: undefined,
   ...overrides,
 })
+
+export const createTestConversationMessage = (
+  overrides?: Partial<ConversationMessage>
+): ConversationMessage => {
+  const senderId = overrides?.sender_id ?? 1
+  const sender = overrides?.sender ?? {
+    id: senderId,
+    first_name: senderId === 1 ? 'Test' : 'Jean',
+    last_name: senderId === 1 ? 'User' : 'Dupont',
+    photo_url: null,
+    role: senderId === 1 ? 'consumer' : 'merchant',
+  }
+
+  return {
+    id: 1,
+    conversation_id: overrides?.conversation_id ?? 1,
+    sender_id: senderId,
+    content: 'Bonjour !',
+    read_at: null,
+    created_at: '2025-01-01T08:00:00Z',
+    updated_at: '2025-01-01T08:00:00Z',
+    sender,
+    ...overrides,
+  }
+}
+
+export const createTestConversation = (overrides?: Partial<Conversation>): Conversation => {
+  const consumerUser = createTestUser({ id: 1, role: 'consumer', phone: '+22890000000' })
+  const merchantUser = createTestUser({
+    id: 2,
+    role: 'merchant',
+    first_name: 'Jean',
+    last_name: 'Dupont',
+    phone: '+22891000000',
+  })
+
+  const baseMessage = createTestConversationMessage({
+    sender_id: overrides?.consumer_id ?? consumerUser.id,
+    conversation_id: overrides?.id ?? 1,
+  })
+
+  return {
+    id: 1,
+    consumer_id: overrides?.consumer_id ?? consumerUser.id,
+    merchant_id: overrides?.merchant_id ?? merchantUser.id,
+    archived_by_consumer: overrides?.archived_by_consumer ?? false,
+    archived_by_merchant: overrides?.archived_by_merchant ?? false,
+    last_message_at: overrides?.last_message_at ?? '2025-01-01T08:00:00Z',
+    last_message_preview: overrides?.last_message_preview ?? baseMessage.content,
+    created_at: overrides?.created_at ?? '2025-01-01T07:50:00Z',
+    updated_at: overrides?.updated_at ?? '2025-01-01T08:00:00Z',
+    consumer:
+      overrides?.consumer ?? {
+        id: consumerUser.id,
+        first_name: consumerUser.first_name,
+        last_name: consumerUser.last_name,
+        photo_url: consumerUser.photo_url ?? null,
+        phone: consumerUser.phone ?? '+22890000000',
+        role: 'consumer',
+      },
+    merchant:
+      overrides?.merchant ?? {
+        id: merchantUser.id,
+        first_name: merchantUser.first_name,
+        last_name: merchantUser.last_name,
+        photo_url: merchantUser.photo_url ?? null,
+        phone: merchantUser.phone ?? '+22891000000',
+        role: 'merchant',
+      },
+    latestMessage: overrides?.latestMessage ?? baseMessage,
+    messages_count: overrides?.messages_count ?? 1,
+  }
+}

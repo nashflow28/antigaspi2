@@ -346,6 +346,53 @@ export interface Reservation {
   latest_payment?: Payment | null
 }
 
+export interface ConversationMessage {
+  id: number
+  conversation_id: number
+  sender_id: number
+  content: string
+  read_at: string | null
+  created_at: string
+  updated_at: string
+  sender?: Pick<User, 'id' | 'first_name' | 'last_name' | 'photo_url' | 'role'>
+}
+
+export interface Conversation {
+  id: number
+  consumer_id: number
+  merchant_id: number
+  archived_by_consumer: boolean
+  archived_by_merchant: boolean
+  last_message_at: string | null
+  last_message_preview: string | null
+  created_at: string
+  updated_at: string
+  consumer?: Pick<User, 'id' | 'first_name' | 'last_name' | 'photo_url' | 'phone' | 'role'>
+  merchant?: Pick<User, 'id' | 'first_name' | 'last_name' | 'photo_url' | 'phone' | 'role'> & {
+    merchant?: {
+      business_name?: string | null
+      business_type?: string | null
+      photo_url?: string | null
+    } | null
+  }
+  latestMessage?: ConversationMessage | null
+  messages_count?: number
+}
+
+export interface ConversationListPayload {
+  conversations: Conversation[]
+}
+
+export interface ConversationDetailPayload {
+  conversation: Conversation
+  messages: ConversationMessage[]
+}
+
+export interface ConversationMessagePayload {
+  conversation: Conversation
+  message: ConversationMessage
+}
+
 export interface AuthResponse {
   success: boolean
   data: {

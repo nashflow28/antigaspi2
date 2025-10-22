@@ -46,6 +46,11 @@ import {
   AdminAnalyticsFilters,
   AdminAnalyticsData,
   AnalyticsExportResponse,
+  Conversation,
+  ConversationDetailResponse,
+  ConversationListResponse,
+  ConversationMessage,
+  ConversationMessageResponse,
 } from '../types'
 
 // Configuration dynamique de l'API (web/native) avec overrides propres
@@ -604,6 +609,87 @@ class ApiService {
       data
     )
     return response.data
+  }
+
+  // === MESSAGERIE ===
+
+  async getConversations(includeArchived = false): Promise<ApiResponse<ConversationListResponse>> {
+    const query = includeArchived ? '?include_archived=1' : ''
+    return this.request<ApiResponse<ConversationListResponse>>(
+      'GET',
+      `/messaging/conversations${query}`
+    )
+  }
+
+  async createConversation(payload: { merchantId?: number; consumerId?: number }): Promise<ApiResponse<{ conversation: Conversation }>> {
+    const normalized = toSnakeCase(payload)
+    return this.request<ApiResponse<{ conversation: Conversation }>>(
+      'POST',
+      '/messaging/conversations',
+      normalized
+    )
+  }
+
+  async getConversation(
+    conversationId: number,
+    options: { perPage?: number; page?: number } = {}
+  ): Promise<ApiResponse<ConversationDetailResponse>> {
+    const params = new URLSearchParams()
+
+    if (options.perPage) {
+      params.append('per_page', options.perPage.toString())
+    }
+
+    if (options.page && options.page > 1) {
+      params.append('page', options.page.toString())
+    }
+
+    const query = params.toString()
+
+    return this.request<ApiResponse<ConversationDetailResponse>>(
+      'GET',
+      `/messaging/conversations/${conversationId}${query ? `?${query}` : ''}`
+    )
+  }
+
+  async updateConversation(
+    conversationId: number,
+    payload: { archived?: boolean }
+  ): Promise<ApiResponse<{ conversation: Conversation }>> {
+    return this.request<ApiResponse<{ conversation: Conversation }>>(
+      'PUT',
+      `/messaging/conversations/${conversationId}`,
+      payload
+    )
+  }
+
+  async sendMessage(
+    conversationId: number,
+    content: string
+  ): Promise<ApiResponse<ConversationMessageResponse>> {
+    return this.request<ApiResponse<ConversationMessageResponse>>(
+      'POST',
+      `/messaging/conversations/${conversationId}/messages`,
+      { content }
+    )
+  }
+
+  async updateMessage(
+    messageId: number,
+    content: string
+  ): Promise<ApiResponse<{ message: ConversationMessage }>> {
+    return this.request<ApiResponse<{ message: ConversationMessage }>>(
+      'PUT',
+      `/messaging/messages/${messageId}`,
+      { content }
+    )
+  }
+
+  async deleteMessage(messageId: number): Promise<ApiResponse<{ message_id: number }>> {
+    return this.request<ApiResponse<{ message_id: number }>>(
+      'DELETE',
+      `/messaging/messages/${messageId}`
+    )
   }
 
   // === UTILITAIRES ===
