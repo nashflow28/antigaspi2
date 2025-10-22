@@ -621,3 +621,152 @@ export interface RootState {
   reviews: ReviewsState
   cart: CartState
 }
+
+// Broadcast Notifications types
+export interface BroadcastNotification {
+  title: string
+  message: string
+  channels: ('database' | 'mail' | 'sms' | 'push')[]
+  roles?: ('consumer' | 'merchant' | 'admin')[]
+  action_url?: string
+  payload?: Record<string, any>
+}
+
+export interface BroadcastResponse {
+  success: boolean
+  sent_count: number
+  message: string
+}
+
+// Admin Analytics types
+export interface AdminAnalyticsFilters {
+  start_date?: string
+  end_date?: string
+  period?: '7d' | '30d' | '90d' | 'custom'
+}
+
+export interface AdminAnalyticsData {
+  summary: {
+    total_revenue: number
+    growth_rate: number
+    total_transactions: number
+    average_order_value: number
+  }
+  revenue_chart: {
+    labels: string[]
+    datasets: Array<{
+      data: number[]
+      color?: (opacity: number) => string
+    }>
+  }
+  geographic_distribution: Array<{
+    city: string
+    reservations_count: number
+    revenue: number
+    percentage: number
+  }>
+  merchant_performance: Array<{
+    merchant_id: number
+    merchant_name: string
+    reservations_count: number
+    revenue: number
+    average_order_value: number
+    growth_rate: number
+  }>
+  daily_breakdown: Array<{
+    date: string
+    reservations: number
+    revenue: number
+    products_saved: number
+    new_users: number
+  }>
+}
+
+export interface AnalyticsExportResponse {
+  success: boolean
+  file_url?: string
+  file_content?: string
+  message: string
+}
+
+// ============ FEATURE 1: MERCHANT MAP TYPES ============
+
+/**
+ * Marker data for displaying merchants on the interactive map
+ * Extends Merchant with additional fields for map display
+ */
+export interface MerchantMapMarker {
+  id: number
+  business_name: string
+  business_type: string
+  address?: string
+  city: string
+  latitude: number // Required for map display
+  longitude: number // Required for map display
+  is_verified: boolean
+  phone: string
+  active_products_count?: number
+  distance?: number // Distance from user in km
+}
+
+/**
+ * Map region for initial positioning and camera control
+ * Used by react-native-maps for viewport management
+ */
+export interface MerchantMapRegion {
+  latitude: number
+  longitude: number
+  latitudeDelta: number // Zoom level (vertical)
+  longitudeDelta: number // Zoom level (horizontal)
+}
+
+/**
+ * Response from getMerchantsLocations API endpoint
+ */
+export interface MerchantsMapResponse {
+  success: boolean
+  data: MerchantMapMarker[]
+  user_location?: {
+    latitude: number
+    longitude: number
+  }
+  message?: string
+}
+
+// ============ FEATURE 2: CSV EXPORT TYPES ============
+
+/**
+ * Reservation data formatted for CSV export
+ * Flattened structure for easy CSV generation
+ */
+export interface ReservationCSVData {
+  id: number
+  reservation_code: string
+  client_name: string // Consumer's full name
+  client_phone?: string
+  product_name: string
+  quantity: number
+  original_price: number
+  discounted_price: number
+  total_amount: number
+  status: string
+  payment_status: string
+  pickup_date?: string
+  pickup_time?: string
+  reserved_at: string
+  confirmed_at?: string
+  completed_at?: string
+  cancelled_at?: string
+  notes?: string
+}
+
+/**
+ * Response from CSV export operation
+ */
+export interface CSVExportResponse {
+  success: boolean
+  file_uri: string // Local file path
+  filename: string
+  rows_exported: number
+  message?: string
+}

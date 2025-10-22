@@ -20,6 +20,7 @@ import AddReviewScreen from '../screens/main/AddReviewScreen'
 import NotificationSettingsScreen from '../screens/merchant/NotificationSettingsScreen'
 import CartScreen from '../screens/main/CartScreen'
 import WalletScreen from '../screens/main/WalletScreen'
+import MerchantMapScreen from '../screens/main/MerchantMapScreen'
 import { TEST_IDS } from '../utils/testIds'
 import LoyaltyScreen from '../screens/main/LoyaltyScreen'
 
@@ -94,6 +95,17 @@ const AccountStack = () => (
   </Stack.Navigator>
 )
 
+const MapStack = () => (
+  <Stack.Navigator screenOptions={{ headerShown: false }}>
+    <Stack.Screen name="MapMain" component={MerchantMapScreen} />
+    <Stack.Screen name="MerchantDetail" component={MerchantDetailScreen} />
+    <Stack.Screen name="ProductDetails" component={ProductDetailsScreen} />
+    <Stack.Screen name="ReservationDetails" component={ReservationDetailsScreen} />
+    <Stack.Screen name="ReviewsList" component={ReviewsListScreen} />
+    <Stack.Screen name="AddReview" component={AddReviewScreen} />
+  </Stack.Navigator>
+)
+
 const ConsumerNavigator: React.FC = () => {
   const theme = useTheme()
 
@@ -108,6 +120,8 @@ const ConsumerNavigator: React.FC = () => {
             iconName = focused ? 'grid' : 'grid-outline'
           } else if (route.name === 'Discover') {
             iconName = focused ? 'compass' : 'compass-outline'
+          } else if (route.name === 'Map') {
+            iconName = focused ? 'map' : 'map-outline'
           } else if (route.name === 'Favorites') {
             iconName = focused ? 'heart' : 'heart-outline'
           } else if (route.name === 'Orders') {
@@ -143,6 +157,11 @@ const ConsumerNavigator: React.FC = () => {
         name="Discover"
         component={ProductsStack}
         options={{ title: 'Découvrir' }}
+      />
+      <Tab.Screen
+        name="Map"
+        component={MapStack}
+        options={{ title: 'Carte' }}
       />
       <Tab.Screen
         name="Favorites"

@@ -80,6 +80,21 @@ export const TEST_IDS = {
   loyaltyScreen: 'loyalty-screen',
   loyaltyRedeemButton: 'loyalty-redeem-button',
 
+  // Merchant Map (Consumer)
+  merchantMapScreen: 'merchant-map-screen',
+  merchantMapView: 'merchant-map-view',
+  merchantMapLoading: 'merchant-map-loading',
+  merchantMapError: 'merchant-map-error',
+  merchantMapEmpty: 'merchant-map-empty',
+  merchantMapRetryButton: 'merchant-map-retry-button',
+  merchantMapRefreshButton: 'merchant-map-refresh-button',
+  merchantMapMarker: 'merchant-map-marker',
+  merchantMapMarkerCallout: 'merchant-map-marker-callout',
+  merchantMapVerifiedBadge: 'merchant-map-verified-badge',
+  merchantMapCallButton: 'merchant-map-call-button',
+  merchantMapDirectionsButton: 'merchant-map-directions-button',
+  merchantMapCountBadge: 'merchant-map-count-badge',
+
   // ============ MERCHANT SCREENS ============
   // Dashboard
   merchantDashboard: 'merchant-dashboard-screen',
@@ -111,6 +126,8 @@ export const TEST_IDS = {
   merchantReservationCard: (index: number) => `merchant-reservation-card-${index}`,
   acceptReservationButton: (id: number) => `accept-reservation-${id}`,
   rejectReservationButton: (id: number) => `reject-reservation-${id}`,
+  exportReservationsCsvButton: 'export-reservations-csv-button',
+  exportReservationsLoading: 'export-reservations-loading',
 
   // Merchant Surprise Baskets
   merchantSurpriseBaskets: 'merchant-surprise-baskets-screen',
