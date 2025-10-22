@@ -113,6 +113,11 @@ class User extends Authenticatable implements JWTSubject
         return $this->hasMany(Favorite::class);
     }
 
+    public function searchQueries(): HasMany
+    {
+        return $this->hasMany(SearchQuery::class);
+    }
+
     public function conversationsAsConsumer(): HasMany
     {
         return $this->hasMany(Conversation::class, 'consumer_id');

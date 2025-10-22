@@ -100,6 +100,44 @@ export interface SearchOptions<T extends SearchResult = SearchResult> {
   fallbackMeta?: Partial<SearchMeta>
 }
 
+export interface SearchSuggestionHistoryEntry {
+  id: number
+  query: string
+  search_count: number
+  last_searched_at: string | null
+  last_results_count?: number | null
+}
+
+export interface SearchSuggestionPopularEntry {
+  query: string
+  total_count: number
+  last_searched_at?: string | null
+}
+
+export interface SearchSuggestionsData {
+  history: SearchSuggestionHistoryEntry[]
+  popular: SearchSuggestionPopularEntry[]
+  suggestions: string[]
+  query?: string | null
+}
+
+export interface SearchSuggestionsResponse {
+  success: boolean
+  data: SearchSuggestionsData
+  message?: string
+}
+
+export interface SearchSuggestionsParams {
+  query?: string
+  historyLimit?: number
+  popularLimit?: number
+}
+
+export interface SearchSuggestionDeletionResponse {
+  success: boolean
+  message?: string
+}
+
 const buildQueryParams = (params: SearchParams): string => {
   const searchParams = new URLSearchParams()
 
@@ -186,8 +224,39 @@ export const search = async <T extends SearchResult = SearchResult>(
   }
 }
 
+export const getSuggestions = async (
+  params: SearchSuggestionsParams = {},
+): Promise<SearchSuggestionsResponse> => {
+  const searchParams = new URLSearchParams()
+
+  if (params.query) {
+    searchParams.append('q', params.query)
+  }
+
+  if (params.historyLimit) {
+    searchParams.append('history_limit', String(params.historyLimit))
+  }
+
+  if (params.popularLimit) {
+    searchParams.append('popular_limit', String(params.popularLimit))
+  }
+
+  const query = searchParams.toString()
+  const endpoint = `/search/suggestions${query ? `?${query}` : ''}`
+
+  return apiService.get<SearchSuggestionsResponse>(endpoint, true)
+}
+
+export const deleteHistoryEntry = async (
+  id: number,
+): Promise<SearchSuggestionDeletionResponse> => {
+  return apiService.delete<SearchSuggestionDeletionResponse>(`/search/history/${id}`, true)
+}
+
 export const searchService = {
   search,
+  getSuggestions,
+  deleteHistoryEntry,
 }
 
 export default searchService
