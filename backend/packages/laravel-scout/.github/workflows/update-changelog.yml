@@ -1,0 +1,12 @@
+name: update changelog
+
+on:
+  release:
+    types: [released]
+
+permissions:
+  contents: write
+
+jobs:
+  update:
+    uses: laravel/.github/.github/workflows/update-changelog.yml@main
