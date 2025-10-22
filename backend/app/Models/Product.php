@@ -19,6 +19,8 @@ class Product extends Model
         'original_price',
         'discounted_price',
         'quantity_available',
+        'low_stock_threshold',
+        'last_low_stock_alert_at',
         'expiration_date',
         'image_url',
         'is_active',
@@ -35,6 +37,8 @@ class Product extends Model
             'original_price' => 'decimal:2',
             'discounted_price' => 'decimal:2',
             'quantity_available' => 'integer',
+            'low_stock_threshold' => 'integer',
+            'last_low_stock_alert_at' => 'datetime',
             'expiration_date' => 'date',
             'is_active' => 'boolean',
             'is_surprise_basket' => 'boolean',
@@ -78,6 +82,11 @@ class Product extends Model
     public function favorites(): HasMany
     {
         return $this->hasMany(Favorite::class);
+    }
+
+    public function inventoryMovements(): HasMany
+    {
+        return $this->hasMany(InventoryMovement::class);
     }
 
     // Scopes
@@ -166,6 +175,23 @@ class Product extends Model
             return true;
         }
         return false;
+    }
+
+    public function isLowStock(): bool
+    {
+        $threshold = $this->low_stock_threshold ?? 0;
+
+        if ($threshold <= 0) {
+            return false;
+        }
+
+        return $this->quantity_available <= $threshold;
+    }
+
+    public function scopeLowStock($query)
+    {
+        return $query->where('low_stock_threshold', '>', 0)
+            ->whereColumn('quantity_available', '<=', 'low_stock_threshold');
     }
 
     // Surprise Basket helper methods

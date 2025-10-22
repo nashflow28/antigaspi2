@@ -67,6 +67,12 @@ const navigationByRole: Record<Role, NavigationConfig[]> = {
       routes: ['merchant-dashboard']
     },
     {
+      label: 'Analytics avancées',
+      href: '/merchant/analytics',
+      icon: SparklesIcon,
+      routes: ['merchant-analytics']
+    },
+    {
       label: 'Produits',
       href: '/merchant/products',
       icon: Squares2X2Icon,

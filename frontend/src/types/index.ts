@@ -248,6 +248,60 @@ export interface Payment {
   updated_at: string
 }
 
+export interface PaymentConsumerSummary {
+  id: number
+  name: string
+  phone?: string | null
+  email?: string | null
+}
+
+export interface PaymentReservationSummary {
+  id: number
+  reservation_code: string
+  status: string
+  payment_status?: PaymentStatus | string | null
+  total_amount?: number | null
+  pickup_date?: string | null
+  created_at?: string | null
+  product?: {
+    id: number
+    name: string
+  } | null
+  consumer?: PaymentConsumerSummary | null
+}
+
+export type PaymentWithRelations = Payment & {
+  reservation?: PaymentReservationSummary | null
+}
+
+export interface PaymentSummaryBreakdown {
+  count: number
+  total_amount: number
+}
+
+export interface PaymentSummaryMeta {
+  total_amount: number
+  total_count: number
+  status_breakdown: Record<string, PaymentSummaryBreakdown>
+  method_breakdown: Record<string, PaymentSummaryBreakdown>
+}
+
+export interface MerchantPaymentsResponse {
+  success: boolean
+  data: PaymentWithRelations[]
+  pagination?: {
+    current_page: number
+    last_page: number
+    per_page: number
+    total: number
+  }
+  meta?: {
+    summary?: PaymentSummaryMeta | null
+    applied_filters?: Record<string, string | number>
+  }
+  message?: string
+}
+
 export interface Reservation {
   id: number
   reservation_code: string

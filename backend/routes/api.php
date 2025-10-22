@@ -17,6 +17,7 @@ use App\Http\Controllers\Api\FavoriteController;
 use App\Http\Controllers\Api\ConsumerController;
 use App\Http\Controllers\Api\CartController;
 use App\Http\Controllers\Api\MessageController;
+use App\Http\Controllers\Api\InventoryController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\WalletController;
 
@@ -88,6 +89,13 @@ Route::prefix('products')->group(function () {
     Route::get('/{id}', [ProductController::class, 'show']); // Détail d'un produit
 });
 
+// Routes de gestion d'inventaire pour les commerçants
+Route::prefix('inventory')->middleware('jwt.auth')->group(function () {
+    Route::get('/summary', [InventoryController::class, 'summary']);
+    Route::get('/movements', [InventoryController::class, 'movements']);
+    Route::post('/movements', [InventoryController::class, 'store']);
+});
+
 // Routes des paniers surprise
 Route::prefix('surprise-baskets')->middleware('throttle:search')->group(function () {
     // Routes publiques (consultation)
@@ -156,6 +164,7 @@ Route::prefix('favorites')->middleware('jwt.auth')->group(function () {
 // Routes de paiement
 Route::prefix('payments')->group(function () {
     Route::middleware('jwt.auth')->group(function () {
+        Route::get('/', [PaymentController::class, 'index']);
         Route::get('/methods', [PaymentController::class, 'methods']);
         Route::post('/', [PaymentController::class, 'initiate']);
         Route::post('/mobile-money', [PaymentController::class, 'initiateMobileMoney']);
@@ -298,6 +307,7 @@ Route::prefix('reviews')->group(function () {
 Route::prefix('admin')->middleware(['jwt.auth', 'can:admin', 'throttle:admin'])->group(function () {
     Route::get('/dashboard', [AdminController::class, 'dashboard']); // Dashboard admin
     Route::get('/system-health', [AdminController::class, 'systemHealth']); // Santé du système
+    Route::post('/analytics/export', [AdminController::class, 'exportAnalytics']); // Export analytics CSV/PDF
 
     // Gestion des catégories (admin uniquement)
     Route::prefix('categories')->group(function () {
