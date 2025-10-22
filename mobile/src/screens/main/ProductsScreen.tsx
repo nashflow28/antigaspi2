@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import {
   View,
   Text,
@@ -10,6 +10,7 @@ import {
   RefreshControl,
   Alert,
   Platform,
+  ActivityIndicator,
 } from 'react-native'
 import { useDispatch, useSelector } from 'react-redux'
 import { AppDispatch, RootState } from '../../store'
@@ -26,6 +27,10 @@ import { Button, Card, Badge, Typography } from '../../components/2025'
 import MapView, { Callout, Marker, PROVIDER_GOOGLE } from 'react-native-maps'
 import locationService, { UserLocation } from '../../services/locationService'
 import type { Merchant as MerchantEntity } from '../../store/slices/merchantsSlice'
+import searchService, {
+  type MerchantSearchResult,
+  type ProductSearchResult,
+} from '../../services/searchService'
 
 interface Props {
   navigation: any
@@ -52,10 +57,124 @@ const ProductsScreen: React.FC<Props> = ({ navigation }) => {
   const [userLocation, setUserLocation] = useState<UserLocation | null>(null)
   const [locationPermissionGranted, setLocationPermissionGranted] = useState(false)
   const [isRequestingLocation, setIsRequestingLocation] = useState(false)
+  const [remoteProductResults, setRemoteProductResults] = useState<Product[] | null>(null)
+  const [remoteMerchantResults, setRemoteMerchantResults] = useState<MerchantEntity[] | null>(null)
+  const [searchLoading, setSearchLoading] = useState(false)
+  const [searchError, setSearchError] = useState<string | null>(null)
+  const searchDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const searchRequestIdRef = useRef(0)
+
+  const mapProductResult = useCallback((result: ProductSearchResult): Product => {
+    const existingProduct = products.find(product => product.id === result.id)
+    if (existingProduct) {
+      return existingProduct
+    }
+
+    const attributes = result.attributes
+    const discountedRaw = attributes.discounted_price ?? attributes.original_price ?? 0
+    const originalRaw = attributes.original_price ?? discountedRaw
+
+    const discountedPrice = Number(discountedRaw)
+    const originalPrice = Number(originalRaw)
+
+    const safeDiscounted = Number.isFinite(discountedPrice) ? discountedPrice : 0
+    const safeOriginal = Number.isFinite(originalPrice) ? originalPrice : safeDiscounted
+
+    const merchantAttributes = attributes.merchant ?? {}
+    const discountPercentage = safeOriginal > 0
+      ? Math.max(0, Math.round(((safeOriginal - safeDiscounted) / safeOriginal) * 100))
+      : 0
+
+    const rawQuantity = attributes.quantity_available ?? null
+    const normalizedQuantity = Number(rawQuantity)
+    const safeQuantity = Number.isFinite(normalizedQuantity) && normalizedQuantity > 0
+      ? normalizedQuantity
+      : 1
+
+    return {
+      id: result.id,
+      name: attributes.name ?? 'Produit',
+      description: attributes.description ?? '',
+      original_price: String(safeOriginal),
+      discounted_price: String(safeDiscounted),
+      quantity_available: safeQuantity,
+      expiration_date: new Date().toISOString(),
+      image_url: typeof attributes.image_url === 'string' ? attributes.image_url : undefined,
+      discount_percentage: discountPercentage,
+      savings: Math.max(0, safeOriginal - safeDiscounted),
+      days_until_expiration: 0,
+      category: { id: 0, name: 'Autres', description: '' },
+      merchant: {
+        id: merchantAttributes.id ?? 0,
+        business_name: merchantAttributes.business_name ?? 'Commerçant',
+        business_type: merchantAttributes.business_type ?? '',
+        city: merchantAttributes.city ?? '',
+        address: merchantAttributes.address ?? '',
+        phone: '',
+        is_verified: false,
+        latitude: null,
+        longitude: null,
+      },
+      created_at: new Date().toISOString(),
+      is_active: true,
+      status: undefined,
+      needs_approval: undefined,
+    }
+  }, [products])
+
+  const mapMerchantResult = useCallback((result: MerchantSearchResult): MerchantEntity => {
+    const existingMerchant = merchants.find(merchant => merchant.id === result.id)
+    if (existingMerchant) {
+      return existingMerchant
+    }
+
+    const attributes = result.attributes
+    const productsCountRaw = attributes.total_products ?? 0
+    const productsCount = Number(productsCountRaw)
+
+    return {
+      id: result.id,
+      business_name: attributes.business_name ?? 'Commerçant',
+      business_type: attributes.business_type ?? '',
+      is_verified: Boolean(attributes.is_verified),
+      latitude: attributes.latitude ?? null,
+      longitude: attributes.longitude ?? null,
+      products_count: Number.isFinite(productsCount) ? productsCount : 0,
+      user: {
+        city: attributes.city ?? '',
+        address: attributes.address ?? null,
+        phone: '',
+      },
+    }
+  }, [merchants])
+
+  const hasActiveSearch = Boolean(searchQuery.trim())
+  const isLoadingMerchants =
+    contentMode === 'merchants' && (
+      (hasActiveSearch && searchLoading) || (!hasActiveSearch && merchantsLoading)
+    )
+  const isLoadingProducts =
+    contentMode === 'products' && (
+      (hasActiveSearch && searchLoading) || (!hasActiveSearch && productsLoading)
+    )
 
   // Filtrage des marchands avec gestion distance
+  const shouldUseRemoteMerchants = useMemo(
+    () => Boolean(
+      searchQuery.trim() &&
+      remoteMerchantResults &&
+      remoteMerchantResults.length > 0 &&
+      !distanceEnabled
+    ),
+    [searchQuery, remoteMerchantResults, distanceEnabled]
+  )
+
   const filteredMerchants = useMemo<MerchantListItem[]>(() => {
-    return merchants
+    const source = shouldUseRemoteMerchants && remoteMerchantResults
+      ? remoteMerchantResults
+      : merchants
+
+    return source
       .map(merchant => {
         const distanceInfo = locationService.calculateDistanceFromUser(
           userLocation,
@@ -68,7 +187,7 @@ const ProductsScreen: React.FC<Props> = ({ navigation }) => {
       .filter(({ merchant, distanceInfo }) => {
         const query = searchQuery.trim().toLowerCase()
 
-        if (query) {
+        if (!shouldUseRemoteMerchants && query) {
           const businessName = merchant.business_name?.toLowerCase() ?? ''
           const city = merchant.user?.city?.toLowerCase() ?? ''
           const type = merchant.business_type?.toLowerCase() ?? ''
@@ -119,6 +238,8 @@ const ProductsScreen: React.FC<Props> = ({ navigation }) => {
       })
   }, [
     merchants,
+    remoteMerchantResults,
+    shouldUseRemoteMerchants,
     searchQuery,
     selectedCategory,
     distanceEnabled,
@@ -127,28 +248,55 @@ const ProductsScreen: React.FC<Props> = ({ navigation }) => {
   ])
 
   // Filtrage des produits
-  const filteredProducts = (products || []).filter(product => {
-    // Filtre par recherche (nom produit, marchand, ville)
-    if (searchQuery.trim()) {
-      const query = searchQuery.toLowerCase()
-      const matchesSearch =
-        product.name.toLowerCase().includes(query) ||
-        product.merchant?.business_name.toLowerCase().includes(query) ||
-        product.merchant?.city.toLowerCase().includes(query)
+  const filteredProducts = useMemo(() => {
+    const trimmedQuery = searchQuery.trim()
+    const useRemoteProducts = Boolean(
+      trimmedQuery &&
+      remoteProductResults &&
+      remoteProductResults.length > 0
+    )
 
-      if (!matchesSearch) return false
-    }
+    const source = useRemoteProducts && remoteProductResults
+      ? remoteProductResults
+      : products || []
 
-    // Filtre par catégorie
-    if (selectedCategory !== 'all') {
-      if (product.category.id !== parseInt(selectedCategory)) return false
-    }
+    return source.filter(product => {
+      if (!useRemoteProducts && trimmedQuery) {
+        const query = trimmedQuery.toLowerCase()
+        const merchantName = product.merchant?.business_name?.toLowerCase?.() ?? ''
+        const merchantCity = product.merchant?.city?.toLowerCase?.() ?? ''
+        const matchesSearch =
+          product.name?.toLowerCase?.().includes(query) ||
+          merchantName.includes(query) ||
+          merchantCity.includes(query)
 
-    // Filtre disponibilité (produits avec stock uniquement)
-    if (product.quantity_available <= 0) return false
+        if (!matchesSearch) {
+          return false
+        }
+      }
 
-    return true
-  })
+      if (selectedCategory !== 'all') {
+        const productCategoryId = product.category?.id
+        if (productCategoryId === undefined || productCategoryId === null) {
+          return false
+        }
+
+        if (productCategoryId !== parseInt(selectedCategory, 10)) {
+          return false
+        }
+      }
+
+      const availableQuantity = typeof product.quantity_available === 'number'
+        ? product.quantity_available
+        : Number((product as any).quantity_available ?? 0)
+
+      if (!Number.isFinite(availableQuantity)) {
+        return true
+      }
+
+      return availableQuantity > 0
+    })
+  }, [products, remoteProductResults, searchQuery, selectedCategory])
 
   const merchantsWithCoordinates = useMemo(
     () =>
@@ -351,6 +499,93 @@ const ProductsScreen: React.FC<Props> = ({ navigation }) => {
     setViewMode('map')
   }
 
+  useEffect(() => {
+    const query = searchQuery.trim()
+
+    if (searchDebounceRef.current) {
+      clearTimeout(searchDebounceRef.current)
+    }
+
+    if (!query) {
+      if (remoteProductResults) {
+        setRemoteProductResults(null)
+      }
+      if (remoteMerchantResults) {
+        setRemoteMerchantResults(null)
+      }
+      setSearchError(null)
+      setSearchLoading(false)
+      searchRequestIdRef.current += 1
+      return
+    }
+
+    if (contentMode === 'merchants' && remoteProductResults) {
+      setRemoteProductResults(null)
+    }
+
+    if (contentMode === 'products' && remoteMerchantResults) {
+      setRemoteMerchantResults(null)
+    }
+
+    const requestId = searchRequestIdRef.current + 1
+    searchRequestIdRef.current = requestId
+
+    searchDebounceRef.current = setTimeout(async () => {
+      setSearchLoading(true)
+      setSearchError(null)
+
+      try {
+        const response = await searchService.search({
+          query,
+          perPage: 20,
+          type: contentMode === 'merchants' ? 'merchants' : 'products',
+        })
+
+        if (searchRequestIdRef.current !== requestId) {
+          return
+        }
+
+        if (response.meta.type === 'merchants') {
+          const merchantsResults = response.data
+            .filter((item): item is MerchantSearchResult => item.type === 'merchants')
+            .map(mapMerchantResult)
+          setRemoteMerchantResults(merchantsResults)
+        } else {
+          const productsResults = response.data
+            .filter((item): item is ProductSearchResult => item.type === 'products')
+            .map(mapProductResult)
+          setRemoteProductResults(productsResults)
+        }
+      } catch (error) {
+        if (searchRequestIdRef.current !== requestId) {
+          return
+        }
+
+        console.error('Erreur lors de la recherche distante:', error)
+        setRemoteProductResults(null)
+        setRemoteMerchantResults(null)
+        setSearchError(error instanceof Error ? error.message : 'Recherche indisponible pour le moment.')
+      } finally {
+        if (searchRequestIdRef.current === requestId) {
+          setSearchLoading(false)
+        }
+      }
+    }, Platform.OS === 'web' ? 200 : 350)
+
+    return () => {
+      if (searchDebounceRef.current) {
+        clearTimeout(searchDebounceRef.current)
+      }
+    }
+  }, [
+    searchQuery,
+    contentMode,
+    mapMerchantResult,
+    mapProductResult,
+    remoteMerchantResults,
+    remoteProductResults,
+  ])
+
   // Mapping emojis pour les catégories
   const getCategoryEmoji = (categoryName: string) => {
     const name = categoryName.toLowerCase()
@@ -374,6 +609,15 @@ const ProductsScreen: React.FC<Props> = ({ navigation }) => {
     if (type.includes('supermarche') || type.includes('epicerie')) return '🏪'
     return '🛍️'
   }
+
+  const renderLoadingState = (label: string) => (
+    <View style={styles.loadingContainer}>
+      <ActivityIndicator size="large" color={theme.colors.primary[500]} />
+      <Typography variant="body" color="secondary" style={styles.loadingMessage}>
+        {label}
+      </Typography>
+    </View>
+  )
 
   const renderMerchantCard = ({ merchant, distanceInfo }: MerchantListItem) => {
     return (
@@ -650,6 +894,21 @@ const ProductsScreen: React.FC<Props> = ({ navigation }) => {
         </TouchableOpacity>
       </View>
 
+      {hasActiveSearch && searchLoading && !searchError && (
+        <Typography variant="caption" color="secondary" style={styles.searchStatus}>
+          Recherche en cours...
+        </Typography>
+      )}
+
+      {searchError && (
+        <Typography
+          variant="caption"
+          style={[styles.searchStatus, { color: theme.colors.error[500] }]}
+        >
+          {searchError}
+        </Typography>
+      )}
+
       {/* Categories - Barre compacte scrollable */}
       {categories && categories.length > 0 && (
         <ScrollView
@@ -771,7 +1030,9 @@ const ProductsScreen: React.FC<Props> = ({ navigation }) => {
 
       {/* Liste conditionnelle selon mode */}
       {contentMode === 'merchants' ? (
-        viewMode === 'map' ? (
+        isLoadingMerchants ? (
+          renderLoadingState(hasActiveSearch ? 'Recherche des boutiques…' : 'Chargement des boutiques…')
+        ) : viewMode === 'map' ? (
           renderMerchantsMap()
         ) : filteredMerchants.length > 0 ? (
           <FlatList
@@ -791,11 +1052,13 @@ const ProductsScreen: React.FC<Props> = ({ navigation }) => {
               Aucune boutique trouvée
             </Typography>
             <Typography variant="body" color="secondary" style={{ textAlign: 'center', lineHeight: 20, marginBottom: theme.spacing.lg }}>
-              {searchQuery.trim()
-                ? `Aucun résultat pour "${searchQuery}"`
-                : 'Essayez de changer les filtres ou revenez plus tard'}
+              {searchError
+                ? searchError
+                : hasActiveSearch
+                  ? `Aucun résultat pour "${searchQuery}"`
+                  : 'Essayez de changer les filtres ou revenez plus tard'}
             </Typography>
-            {(selectedCategory !== 'all' || searchQuery.trim()) && (
+            {(selectedCategory !== 'all' || hasActiveSearch) && (
               <Button
                 variant="primary"
                 size="md"
@@ -810,8 +1073,9 @@ const ProductsScreen: React.FC<Props> = ({ navigation }) => {
           </View>
         )
       ) : (
-        // Mode Produits
-        filteredProducts.length > 0 ? (
+        isLoadingProducts ? (
+          renderLoadingState(hasActiveSearch ? 'Recherche des produits…' : 'Chargement des produits…')
+        ) : filteredProducts.length > 0 ? (
           <FlatList
             key="products-list"
             data={filteredProducts}
@@ -831,11 +1095,13 @@ const ProductsScreen: React.FC<Props> = ({ navigation }) => {
               Aucun produit trouvé
             </Typography>
             <Typography variant="body" color="secondary" style={{ textAlign: 'center', lineHeight: 20, marginBottom: theme.spacing.lg }}>
-              {searchQuery.trim()
-                ? `Aucun résultat pour "${searchQuery}"`
-                : 'Essayez de changer les filtres ou revenez plus tard'}
+              {searchError
+                ? searchError
+                : hasActiveSearch
+                  ? `Aucun résultat pour "${searchQuery}"`
+                  : 'Essayez de changer les filtres ou revenez plus tard'}
             </Typography>
-            {(selectedCategory !== 'all' || searchQuery.trim()) && (
+            {(selectedCategory !== 'all' || hasActiveSearch) && (
               <Button
                 variant="primary"
                 size="md"
@@ -907,6 +1173,20 @@ const createStyles = (theme: ReturnType<typeof useTheme>) => StyleSheet.create({
   },
   searchTrailingButtonDisabled: {
     opacity: 0.4,
+  },
+  searchStatus: {
+    marginHorizontal: theme.spacing.lg,
+    marginTop: theme.spacing.xs,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: theme.spacing.xl,
+  },
+  loadingMessage: {
+    marginTop: theme.spacing.md,
+    textAlign: 'center',
   },
   categoriesScroll: {
     marginTop: theme.spacing.sm,
