@@ -155,6 +155,7 @@ Route::prefix('favorites')->middleware('jwt.auth')->group(function () {
 // Routes de paiement
 Route::prefix('payments')->group(function () {
     Route::middleware('jwt.auth')->group(function () {
+        Route::get('/', [PaymentController::class, 'index']);
         Route::get('/methods', [PaymentController::class, 'methods']);
         Route::post('/', [PaymentController::class, 'initiate']);
         Route::post('/mobile-money', [PaymentController::class, 'initiateMobileMoney']);
