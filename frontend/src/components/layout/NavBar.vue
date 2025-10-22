@@ -324,6 +324,7 @@ import {
   ChevronDown,
   Package,
   ShoppingBag,
+  MessageCircle,
   MessageSquare,
   Star,
   Gift,
@@ -332,7 +333,6 @@ import {
   Bell
 } from 'lucide-vue-next'
 import { useAuthStore } from '@/stores/auth'
-import { LogIn, UserPlus, User, Settings, LogOut, ChevronDown, Package, ShoppingBag, MessageSquare, Star, Gift, Wallet, Bell } from 'lucide-vue-next'
 import MobileNav from '@/components/layout/MobileNav.vue'
 import { useAccessibility } from '@/composables/useAccessibility'
 import { Button, Badge, Card, ThemeToggle } from '@/components/ui/2025'
@@ -358,40 +358,55 @@ const brand = computed<NavigationBrand>(() => ({
   to: '/'
 }))
 
-const mainNavigation = computed<NavigationLink[]>(() => [
-  {
-    id: 'products',
-    label: 'Produits',
-    to: '/products',
-    icon: Package,
-    active: route.path === '/products',
-    ariaLabel: 'Parcourir les produits disponibles'
-  },
-  {
-    id: 'surprise-baskets',
-    label: 'Paniers surprise',
-    to: '/surprise-baskets',
-    icon: Gift,
-    active: route.path.startsWith('/surprise-baskets'),
-    ariaLabel: 'Explorer les paniers surprise disponibles'
-  },
-  {
-    id: 'map',
-    label: 'Carte',
-    to: '/merchants/map',
-    icon: MapPin,
-    active: route.path === '/merchants/map',
-    ariaLabel: 'Voir la carte des commerçants'
-  },
-  {
-    id: 'reviews',
-    label: 'Avis',
-    to: '/reviews',
-    icon: MessageSquare,
-    active: route.path === '/reviews',
-    ariaLabel: 'Consulter les avis clients'
+const mainNavigation = computed<NavigationLink[]>(() => {
+  const links: NavigationLink[] = [
+    {
+      id: 'products',
+      label: 'Produits',
+      to: '/products',
+      icon: Package,
+      active: route.path === '/products',
+      ariaLabel: 'Parcourir les produits disponibles'
+    },
+    {
+      id: 'surprise-baskets',
+      label: 'Paniers surprise',
+      to: '/surprise-baskets',
+      icon: Gift,
+      active: route.path.startsWith('/surprise-baskets'),
+      ariaLabel: 'Explorer les paniers surprise disponibles'
+    },
+    {
+      id: 'map',
+      label: 'Carte',
+      to: '/merchants/map',
+      icon: MapPin,
+      active: route.path === '/merchants/map',
+      ariaLabel: 'Voir la carte des commerçants'
+    },
+    {
+      id: 'reviews',
+      label: 'Avis',
+      to: '/reviews',
+      icon: MessageSquare,
+      active: route.path === '/reviews',
+      ariaLabel: 'Consulter les avis clients'
+    }
+  ]
+
+  if (authStore.user?.role === 'consumer') {
+    links.push({
+      id: 'messaging',
+      label: 'Messagerie',
+      to: '/messaging',
+      icon: MessageCircle,
+      active: route.path.startsWith('/messaging'),
+      ariaLabel: 'Accéder à la messagerie commerçant'
+    })
   }
-])
+
+  return links
+})
 
 const authCta = computed(() => {
   if (authStore.isAuthenticated) {
@@ -442,6 +457,7 @@ const userMenuLinks = computed<UserMenuLink[]>(() => {
 
   const roleLinks: Record<string, UserMenuLink[]> = {
     consumer: [
+      { to: '/messaging', label: 'Messagerie commerçant', icon: MessageCircle },
       { to: '/surprise-baskets', label: 'Paniers surprise', icon: Gift },
       { to: '/reservations', label: 'Mes réservations', icon: ShoppingBag },
       { to: '/wallet', label: 'Mon portefeuille', icon: Wallet },

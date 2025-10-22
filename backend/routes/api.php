@@ -16,6 +16,7 @@ use App\Http\Controllers\Api\NotificationController;
 use App\Http\Controllers\Api\FavoriteController;
 use App\Http\Controllers\Api\ConsumerController;
 use App\Http\Controllers\Api\CartController;
+use App\Http\Controllers\Api\MessageController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\WalletController;
 
@@ -343,6 +344,19 @@ Route::prefix('admin')->middleware(['jwt.auth', 'can:admin', 'throttle:admin'])-
 Route::prefix('loyalty')->middleware('jwt.auth')->group(function () {
     Route::get('/my-points', [\App\Http\Controllers\Api\LoyaltyPointController::class, 'getUserPoints']); // Mes points
     Route::post('/redeem', [\App\Http\Controllers\Api\LoyaltyPointController::class, 'redeemPoints']); // Échanger des points
+});
+
+// Routes de messagerie (protégées)
+Route::prefix('messaging')->middleware('jwt.auth')->group(function () {
+    Route::get('/conversations', [MessageController::class, 'index']);
+    Route::post('/conversations', [MessageController::class, 'store']);
+    Route::get('/conversations/{conversation}', [MessageController::class, 'show']);
+    Route::put('/conversations/{conversation}', [MessageController::class, 'update']);
+    Route::delete('/conversations/{conversation}', [MessageController::class, 'destroy']);
+
+    Route::post('/conversations/{conversation}/messages', [MessageController::class, 'storeMessage']);
+    Route::put('/messages/{message}', [MessageController::class, 'updateMessage']);
+    Route::delete('/messages/{message}', [MessageController::class, 'destroyMessage']);
 });
 
 // Routes de test et informations

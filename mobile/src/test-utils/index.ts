@@ -32,6 +32,8 @@ export {
   createTestCategory,
   createTestMerchant,
   createTestReservation,
+  createTestConversation,
+  createTestConversationMessage,
 } from './factories'
 
 export { makeMerchant, makeProduct, makeCategory, resetFixtures } from './fixtures'

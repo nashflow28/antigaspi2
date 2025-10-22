@@ -217,23 +217,16 @@ const MerchantDetailScreen: React.FC<Props> = ({ route, navigation }) => {
     }
   }
 
-  const handleMessage = async () => {
-    if (!merchant?.phone) {
-      Alert.alert('Téléphone non disponible', 'Ce marchand n\'a pas renseigné de numéro de téléphone.')
+  const handleMessage = () => {
+    if (!merchant) {
+      Alert.alert('Marchand introuvable', 'Impossible de démarrer la conversation pour le moment.')
       return
     }
 
-    try {
-      const url = `sms:${merchant.phone}`
-      const canOpen = await Linking.canOpenURL(url)
-      if (canOpen) {
-        await Linking.openURL(url)
-      } else {
-        Alert.alert('Erreur', 'Impossible d\'envoyer un SMS depuis cet appareil.')
-      }
-    } catch (error) {
-      Alert.alert('Erreur', 'Une erreur est survenue lors de l\'envoi du message.')
-    }
+    navigation.navigate('MerchantMessaging', {
+      merchantId,
+      merchantName: merchant.business_name,
+    })
   }
 
   const handleDirections = async () => {

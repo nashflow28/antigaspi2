@@ -190,6 +190,28 @@ const router = createRouter({
       }
     },
     {
+      path: '/messaging',
+      name: 'messaging',
+      component: () => import('@/views/consumer/MessagingView.vue'),
+      meta: {
+        requiresAuth: true,
+        roles: ['consumer'],
+        title: 'Messagerie commerçant',
+        breadcrumb: ['Accueil', 'Messagerie']
+      }
+    },
+    {
+      path: '/messaging/conversations/:id',
+      name: 'conversation-detail',
+      component: () => import('@/views/consumer/MessagingView.vue'),
+      meta: {
+        requiresAuth: true,
+        roles: ['consumer'],
+        title: 'Conversation commerçant',
+        breadcrumb: ['Accueil', 'Messagerie', 'Conversation']
+      }
+    },
+    {
       path: '/merchant',
       name: 'merchant',
       redirect: '/merchant/dashboard'
