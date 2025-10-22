@@ -8,6 +8,7 @@ use App\Models\Product;
 use App\Models\Reservation;
 use App\Models\Merchant;
 use App\Models\Category;
+use App\Models\Payment;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -508,5 +509,199 @@ class AdminController extends Controller
             'Content-Disposition' => 'inline; filename="' . $filename . '"',
             'Cache-Control' => 'no-cache, no-store, must-revalidate',
         ]);
+    }
+
+    /**
+     * Get all payments dashboard with filters
+     *
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function payments(Request $request): JsonResponse
+    {
+        try {
+            $user = JWTAuth::parseToken()->authenticate();
+
+            if (!$user->isAdmin()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Accès réservé aux administrateurs'
+                ], 403);
+            }
+
+            // Validate filters
+            $validated = $request->validate([
+                'status' => ['nullable', 'in:pending,success,failed,on_site,refunded'],
+                'payment_method' => ['nullable', 'in:flooz,tmoney,orange_money,mtn_momo,paystack,on_site,wallet'],
+                'start_date' => ['nullable', 'date'],
+                'end_date' => ['nullable', 'date', 'after_or_equal:start_date'],
+                'merchant_id' => ['nullable', 'integer', 'exists:merchants,id'],
+                'min_amount' => ['nullable', 'numeric', 'min:0'],
+                'max_amount' => ['nullable', 'numeric', 'min:0', 'gte:min_amount'],
+                'search' => ['nullable', 'string', 'max:255'],
+                'per_page' => ['nullable', 'integer', 'min:1', 'max:100'],
+                'page' => ['nullable', 'integer', 'min:1'],
+            ]);
+
+            // Build query with eager loading to avoid N+1
+            $query = Payment::with([
+                'reservation.user:id,first_name,last_name,email,phone',
+                'reservation.product.merchant.user:id,email',
+                'reservation.product.merchant:id,user_id,business_name,business_type',
+            ]);
+
+            // Filter by status
+            if (!empty($validated['status'])) {
+                $query->where('status', $validated['status']);
+            }
+
+            // Filter by payment method
+            if (!empty($validated['payment_method'])) {
+                $query->where('payment_method', $validated['payment_method']);
+            }
+
+            // Filter by date range
+            if (!empty($validated['start_date'])) {
+                $query->whereDate('created_at', '>=', $validated['start_date']);
+            }
+
+            if (!empty($validated['end_date'])) {
+                $query->whereDate('created_at', '<=', $validated['end_date']);
+            }
+
+            // Filter by merchant
+            if (!empty($validated['merchant_id'])) {
+                $query->whereHas('reservation.product', function($q) use ($validated) {
+                    $q->where('merchant_id', $validated['merchant_id']);
+                });
+            }
+
+            // Filter by amount range
+            if (!empty($validated['min_amount'])) {
+                $query->where('amount', '>=', $validated['min_amount']);
+            }
+
+            if (!empty($validated['max_amount'])) {
+                $query->where('amount', '<=', $validated['max_amount']);
+            }
+
+            // Search by transaction_id, reference, or customer_phone
+            if (!empty($validated['search'])) {
+                $searchTerm = $validated['search'];
+                $query->where(function($q) use ($searchTerm) {
+                    $q->where('transaction_id', 'like', "%{$searchTerm}%")
+                      ->orWhere('reference', 'like', "%{$searchTerm}%")
+                      ->orWhere('customer_phone', 'like', "%{$searchTerm}%");
+                });
+            }
+
+            // Pagination
+            $perPage = $validated['per_page'] ?? 20;
+            $payments = $query->orderBy('created_at', 'desc')->paginate($perPage);
+
+            // Calculate summary statistics for current filters
+            $summaryQuery = Payment::query();
+
+            // Apply same filters to summary
+            if (!empty($validated['status'])) {
+                $summaryQuery->where('status', $validated['status']);
+            }
+            if (!empty($validated['payment_method'])) {
+                $summaryQuery->where('payment_method', $validated['payment_method']);
+            }
+            if (!empty($validated['start_date'])) {
+                $summaryQuery->whereDate('created_at', '>=', $validated['start_date']);
+            }
+            if (!empty($validated['end_date'])) {
+                $summaryQuery->whereDate('created_at', '<=', $validated['end_date']);
+            }
+            if (!empty($validated['merchant_id'])) {
+                $summaryQuery->whereHas('reservation.product', function($q) use ($validated) {
+                    $q->where('merchant_id', $validated['merchant_id']);
+                });
+            }
+            if (!empty($validated['min_amount'])) {
+                $summaryQuery->where('amount', '>=', $validated['min_amount']);
+            }
+            if (!empty($validated['max_amount'])) {
+                $summaryQuery->where('amount', '<=', $validated['max_amount']);
+            }
+            if (!empty($validated['search'])) {
+                $searchTerm = $validated['search'];
+                $summaryQuery->where(function($q) use ($searchTerm) {
+                    $q->where('transaction_id', 'like', "%{$searchTerm}%")
+                      ->orWhere('reference', 'like', "%{$searchTerm}%")
+                      ->orWhere('customer_phone', 'like', "%{$searchTerm}%");
+                });
+            }
+
+            $summary = [
+                'total_payments' => $summaryQuery->count(),
+                'total_amount' => $summaryQuery->sum('amount'),
+                'successful_payments' => $summaryQuery->where('status', 'success')->count(),
+                'failed_payments' => $summaryQuery->where('status', 'failed')->count(),
+                'pending_payments' => $summaryQuery->where('status', 'pending')->count(),
+            ];
+
+            // Transform payment data
+            $paymentsData = $payments->map(function($payment) {
+                return [
+                    'id' => $payment->id,
+                    'amount' => $payment->amount,
+                    'currency' => $payment->currency,
+                    'payment_method' => $payment->payment_method,
+                    'status' => $payment->status,
+                    'transaction_id' => $payment->transaction_id,
+                    'reference' => $payment->reference,
+                    'provider' => $payment->provider,
+                    'customer_phone' => $payment->customer_phone,
+                    'paid_at' => $payment->paid_at?->format('Y-m-d H:i:s'),
+                    'created_at' => $payment->created_at->format('Y-m-d H:i:s'),
+                    'customer' => $payment->reservation?->user ? [
+                        'id' => $payment->reservation->user->id,
+                        'name' => $payment->reservation->user->first_name . ' ' . $payment->reservation->user->last_name,
+                        'email' => $payment->reservation->user->email,
+                        'phone' => $payment->reservation->user->phone,
+                    ] : null,
+                    'merchant' => $payment->reservation?->product?->merchant ? [
+                        'id' => $payment->reservation->product->merchant->id,
+                        'business_name' => $payment->reservation->product->merchant->business_name,
+                        'business_type' => $payment->reservation->product->merchant->business_type,
+                        'email' => $payment->reservation->product->merchant->user->email,
+                    ] : null,
+                    'reservation_id' => $payment->reservation_id,
+                ];
+            });
+
+            return response()->json([
+                'success' => true,
+                'data' => $paymentsData,
+                'summary' => $summary,
+                'pagination' => [
+                    'current_page' => $payments->currentPage(),
+                    'total_pages' => $payments->lastPage(),
+                    'per_page' => $payments->perPage(),
+                    'total' => $payments->total(),
+                    'from' => $payments->firstItem(),
+                    'to' => $payments->lastItem(),
+                ],
+                'filters_applied' => array_filter($validated, function($value) {
+                    return !is_null($value) && $value !== '';
+                }),
+            ], 200);
+
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Erreur de validation',
+                'errors' => $e->errors(),
+            ], 422);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Erreur lors de la récupération des paiements',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
     }
 }

@@ -42,19 +42,12 @@ return new class extends Migration
             $table->index('transaction_id');
         });
 
-        Schema::table('reservations', function (Blueprint $table) {
-            $table->enum('payment_status', PaymentStatus::values())->default(PaymentStatus::PENDING->value)->after('status');
-            $table->foreignId('latest_payment_id')->nullable()->after('payment_status')->constrained('payments')->nullOnDelete();
-        });
+        // Note: payment_status and latest_payment_id are already added to reservations
+        // in migration 2025_10_16_091500_add_core_fields_to_reservations_table.php
     }
 
     public function down(): void
     {
-        Schema::table('reservations', function (Blueprint $table) {
-            $table->dropConstrainedForeignId('latest_payment_id');
-            $table->dropColumn('payment_status');
-        });
-
         Schema::table('payments', function (Blueprint $table) {
             $table->dropIndex('payments_reservation_id_status_index');
             $table->dropIndex('payments_reference_index');
