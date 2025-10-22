@@ -16,6 +16,7 @@ use App\Http\Controllers\Api\NotificationController;
 use App\Http\Controllers\Api\FavoriteController;
 use App\Http\Controllers\Api\ConsumerController;
 use App\Http\Controllers\Api\CartController;
+use App\Http\Controllers\Api\InventoryController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\WalletController;
 
@@ -85,6 +86,13 @@ Route::prefix('products')->group(function () {
 
     // Route avec paramètre ID doit être en dernier
     Route::get('/{id}', [ProductController::class, 'show']); // Détail d'un produit
+});
+
+// Routes de gestion d'inventaire pour les commerçants
+Route::prefix('inventory')->middleware('jwt.auth')->group(function () {
+    Route::get('/summary', [InventoryController::class, 'summary']);
+    Route::get('/movements', [InventoryController::class, 'movements']);
+    Route::post('/movements', [InventoryController::class, 'store']);
 });
 
 // Routes des paniers surprise

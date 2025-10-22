@@ -27,6 +27,8 @@ class ProductFactory extends Factory
             'original_price' => round($originalPrice, 2),
             'discounted_price' => round($discountedPrice, 2),
             'quantity_available' => $this->faker->numberBetween(1, 20),
+            'low_stock_threshold' => $this->faker->numberBetween(1, 5),
+            'last_low_stock_alert_at' => null,
             'expiration_date' => now()->addDays($this->faker->numberBetween(1, 7)),
             'image_url' => $this->faker->imageUrl(),
             'is_active' => $this->faker->boolean(85),

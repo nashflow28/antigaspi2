@@ -65,6 +65,16 @@ class Merchant extends Model
         return $this->hasMany(AnalyticsDaily::class);
     }
 
+    public function inventoryMovements(): HasMany
+    {
+        return $this->hasMany(InventoryMovement::class);
+    }
+
+    public function lowStockProducts(): HasMany
+    {
+        return $this->products()->lowStock();
+    }
+
     // Scopes
     public function scopeVerified($query)
     {
