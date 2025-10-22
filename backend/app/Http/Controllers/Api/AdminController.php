@@ -529,6 +529,16 @@ class AdminController extends Controller
                 ], 403);
             }
 
+            // Audit log: Admin accessing sensitive payment data
+            \Log::info('Admin accessed payment dashboard', [
+                'admin_id' => $user->id,
+                'admin_email' => $user->email,
+                'ip_address' => $request->ip(),
+                'user_agent' => $request->userAgent(),
+                'filters' => $request->except(['page', 'per_page']),
+                'timestamp' => now()->toDateTimeString(),
+            ]);
+
             // Validate filters
             $validated = $request->validate([
                 'status' => ['nullable', 'in:pending,success,failed,on_site,refunded'],
@@ -550,50 +560,8 @@ class AdminController extends Controller
                 'reservation.product.merchant:id,user_id,business_name,business_type',
             ]);
 
-            // Filter by status
-            if (!empty($validated['status'])) {
-                $query->where('status', $validated['status']);
-            }
-
-            // Filter by payment method
-            if (!empty($validated['payment_method'])) {
-                $query->where('payment_method', $validated['payment_method']);
-            }
-
-            // Filter by date range
-            if (!empty($validated['start_date'])) {
-                $query->whereDate('created_at', '>=', $validated['start_date']);
-            }
-
-            if (!empty($validated['end_date'])) {
-                $query->whereDate('created_at', '<=', $validated['end_date']);
-            }
-
-            // Filter by merchant
-            if (!empty($validated['merchant_id'])) {
-                $query->whereHas('reservation.product', function($q) use ($validated) {
-                    $q->where('merchant_id', $validated['merchant_id']);
-                });
-            }
-
-            // Filter by amount range
-            if (!empty($validated['min_amount'])) {
-                $query->where('amount', '>=', $validated['min_amount']);
-            }
-
-            if (!empty($validated['max_amount'])) {
-                $query->where('amount', '<=', $validated['max_amount']);
-            }
-
-            // Search by transaction_id, reference, or customer_phone
-            if (!empty($validated['search'])) {
-                $searchTerm = $validated['search'];
-                $query->where(function($q) use ($searchTerm) {
-                    $q->where('transaction_id', 'like', "%{$searchTerm}%")
-                      ->orWhere('reference', 'like', "%{$searchTerm}%")
-                      ->orWhere('customer_phone', 'like', "%{$searchTerm}%");
-                });
-            }
+            // Apply filters using helper method
+            $this->applyPaymentFilters($query, $validated);
 
             // Pagination
             $perPage = $validated['per_page'] ?? 20;
@@ -602,38 +570,8 @@ class AdminController extends Controller
             // Calculate summary statistics for current filters
             $summaryQuery = Payment::query();
 
-            // Apply same filters to summary
-            if (!empty($validated['status'])) {
-                $summaryQuery->where('status', $validated['status']);
-            }
-            if (!empty($validated['payment_method'])) {
-                $summaryQuery->where('payment_method', $validated['payment_method']);
-            }
-            if (!empty($validated['start_date'])) {
-                $summaryQuery->whereDate('created_at', '>=', $validated['start_date']);
-            }
-            if (!empty($validated['end_date'])) {
-                $summaryQuery->whereDate('created_at', '<=', $validated['end_date']);
-            }
-            if (!empty($validated['merchant_id'])) {
-                $summaryQuery->whereHas('reservation.product', function($q) use ($validated) {
-                    $q->where('merchant_id', $validated['merchant_id']);
-                });
-            }
-            if (!empty($validated['min_amount'])) {
-                $summaryQuery->where('amount', '>=', $validated['min_amount']);
-            }
-            if (!empty($validated['max_amount'])) {
-                $summaryQuery->where('amount', '<=', $validated['max_amount']);
-            }
-            if (!empty($validated['search'])) {
-                $searchTerm = $validated['search'];
-                $summaryQuery->where(function($q) use ($searchTerm) {
-                    $q->where('transaction_id', 'like', "%{$searchTerm}%")
-                      ->orWhere('reference', 'like', "%{$searchTerm}%")
-                      ->orWhere('customer_phone', 'like', "%{$searchTerm}%");
-                });
-            }
+            // Apply same filters to summary using helper method
+            $this->applyPaymentFilters($summaryQuery, $validated);
 
             $summary = [
                 'total_payments' => $summaryQuery->count(),
@@ -697,11 +635,74 @@ class AdminController extends Controller
                 'errors' => $e->errors(),
             ], 422);
         } catch (\Exception $e) {
+            \Log::error('Admin payments fetch failed', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+                'user_id' => $user->id ?? null,
+            ]);
+
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur lors de la récupération des paiements',
-                'error' => $e->getMessage(),
+                'error' => config('app.debug') ? $e->getMessage() : 'Erreur serveur interne',
             ], 500);
         }
+    }
+
+    /**
+     * Apply common payment filters to a query builder
+     *
+     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @param array $filters
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    private function applyPaymentFilters($query, array $filters)
+    {
+        // Filter by status
+        if (!empty($filters['status'])) {
+            $query->where('status', $filters['status']);
+        }
+
+        // Filter by payment method
+        if (!empty($filters['payment_method'])) {
+            $query->where('payment_method', $filters['payment_method']);
+        }
+
+        // Filter by date range
+        if (!empty($filters['start_date'])) {
+            $query->whereDate('created_at', '>=', $filters['start_date']);
+        }
+
+        if (!empty($filters['end_date'])) {
+            $query->whereDate('created_at', '<=', $filters['end_date']);
+        }
+
+        // Filter by merchant
+        if (!empty($filters['merchant_id'])) {
+            $query->whereHas('reservation.product', function($q) use ($filters) {
+                $q->where('merchant_id', $filters['merchant_id']);
+            });
+        }
+
+        // Filter by amount range
+        if (!empty($filters['min_amount'])) {
+            $query->where('amount', '>=', $filters['min_amount']);
+        }
+
+        if (!empty($filters['max_amount'])) {
+            $query->where('amount', '<=', $filters['max_amount']);
+        }
+
+        // Search by transaction_id, reference, or customer_phone
+        if (!empty($filters['search'])) {
+            $searchTerm = $filters['search'];
+            $query->where(function($q) use ($searchTerm) {
+                $q->where('transaction_id', 'like', "%{$searchTerm}%")
+                  ->orWhere('reference', 'like', "%{$searchTerm}%")
+                  ->orWhere('customer_phone', 'like', "%{$searchTerm}%");
+            });
+        }
+
+        return $query;
     }
 }
