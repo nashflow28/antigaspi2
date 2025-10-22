@@ -54,6 +54,8 @@ Route::prefix('auth')->middleware('throttle:auth')->group(function () {
 
 // Route de recherche globale
 Route::get('/search', [SearchController::class, 'index'])->middleware('throttle:search');
+Route::get('/search/suggestions', [SearchController::class, 'suggestions'])->middleware('throttle:search');
+Route::delete('/search/history/{searchQuery}', [SearchController::class, 'destroy'])->middleware(['jwt.auth', 'throttle:write']);
 
 // Routes analytics
 Route::prefix('analytics')->middleware('jwt.auth')->group(function () {
