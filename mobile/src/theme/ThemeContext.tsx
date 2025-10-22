@@ -51,6 +51,21 @@ export interface ThemeColors {
   inputBackground: string
   inputBorder: string
   inputBorderFocus: string
+  interactiveSurface: string
+  interactiveSurfaceActive: string
+  interactiveBorder: string
+  interactiveBorderActive: string
+  interactiveText: string
+  interactiveTextActive: string
+  badgeBackground: string
+  badgeBackgroundStrong: string
+  badgeText: string
+  controlSurface: string
+  controlSurfaceActive: string
+  controlIcon: string
+  disabledSurface: string
+  disabledBorder: string
+  disabledText: string
 
   // Status colors
   success: string
@@ -146,6 +161,21 @@ export const ThemeProvider: React.FC<{ children: ReactNode }> = ({ children }) =
         inputBackground: base.neutral[900],
         inputBorder: base.neutral[700],
         inputBorderFocus: base.primary[500],
+        interactiveSurface: withOpacity(base.neutral[50], 0.08),
+        interactiveSurfaceActive: withOpacity(base.primary[500], 0.22),
+        interactiveBorder: withOpacity(base.neutral[50], 0.18),
+        interactiveBorderActive: withOpacity(base.primary[500], 0.45),
+        interactiveText: base.neutral[200],
+        interactiveTextActive: base.primary[100],
+        badgeBackground: withOpacity(base.primary[500], 0.18),
+        badgeBackgroundStrong: withOpacity(base.primary[500], 0.28),
+        badgeText: base.primary[100],
+        controlSurface: withOpacity(base.neutral[50], 0.08),
+        controlSurfaceActive: withOpacity(base.primary[500], 0.24),
+        controlIcon: base.primary[200],
+        disabledSurface: withOpacity(base.neutral[50], 0.08),
+        disabledBorder: withOpacity(base.neutral[50], 0.2),
+        disabledText: withOpacity(base.neutral[50], 0.4),
 
         // Status
         success: base.semantic.success,
@@ -187,6 +217,21 @@ export const ThemeProvider: React.FC<{ children: ReactNode }> = ({ children }) =
       inputBackground: base.surface.light,
       inputBorder: base.neutral[300],
       inputBorderFocus: base.primary[500],
+      interactiveSurface: base.surface.light,
+      interactiveSurfaceActive: base.primary[50],
+      interactiveBorder: base.neutral[200],
+      interactiveBorderActive: base.primary[200],
+      interactiveText: base.neutral[700],
+      interactiveTextActive: base.primary[700],
+      badgeBackground: base.primary[50],
+      badgeBackgroundStrong: base.primary[100],
+      badgeText: base.primary[700],
+      controlSurface: base.primary[50],
+      controlSurfaceActive: base.primary[100],
+      controlIcon: base.primary[600],
+      disabledSurface: base.neutral[200],
+      disabledBorder: base.neutral[300],
+      disabledText: base.neutral[500],
 
       // Status
       success: base.semantic.success,

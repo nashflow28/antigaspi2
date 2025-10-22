@@ -163,18 +163,25 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
         key={id}
         style={[
           styles.categoryItem,
-          isActive && { backgroundColor: theme.colors.primary[500] }
+          isActive && styles.categoryItemActive,
         ]}
         onPress={() => setSelectedCategory(id)}
       >
-        <Text style={styles.categoryEmoji}>{emoji}</Text>
+        <Text
+          style={[
+            styles.categoryEmoji,
+            isActive && styles.categoryEmojiActive,
+          ]}
+        >
+          {emoji}
+        </Text>
         <Typography
           variant="caption"
           weight="medium"
-          style={{
-            maxWidth: 120,
-            ...(isActive && { color: theme.colors.textInverse })
-          }}
+          style={[
+            styles.categoryLabel,
+            isActive && styles.categoryLabelActive,
+          ]}
           numberOfLines={1}
           ellipsizeMode="tail"
         >
@@ -275,8 +282,12 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
 
             {/* Badge panier (quantity) */}
             <View style={styles.cartBadge}>
-              <Ionicons name="cart" size={16} color={theme.colors.text} />
-              <Typography variant="caption" weight="semibold" style={{ marginLeft: 4 }}>
+              <Ionicons name="cart" size={16} color={theme.colors.badgeText} />
+              <Typography
+                variant="caption"
+                weight="semibold"
+                style={{ marginLeft: 4, color: theme.colors.badgeText }}
+              >
                 {product.quantity_available}
               </Typography>
             </View>
@@ -308,8 +319,12 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
             {/* Location info */}
             {distanceInfo ? (
               <View style={[styles.distanceBadge, { marginBottom: theme.spacing.sm }]}>
-                <Ionicons name="location" size={12} color={theme.colors.primary[600]} />
-                <Typography variant="caption" weight="semibold" color="primary" style={{ marginLeft: 4 }}>
+                <Ionicons name="location" size={12} color={theme.colors.badgeText} />
+                <Typography
+                  variant="caption"
+                  weight="semibold"
+                  style={{ marginLeft: 4, color: theme.colors.badgeText }}
+                >
                   {distanceInfo.formatted}
                 </Typography>
               </View>
@@ -344,7 +359,10 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
 
   return (
     <View style={styles.container} testID={TEST_IDS.homeScreen}>
-      <StatusBar backgroundColor={theme.colors.background} barStyle="dark-content" />
+      <StatusBar
+        backgroundColor={theme.colors.background}
+        barStyle={theme.isDark ? 'light-content' : 'dark-content'}
+      />
 
       <ScrollView
         style={styles.scrollView}
@@ -365,7 +383,7 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
             </View>
           </View>
           <TouchableOpacity style={styles.refreshButton} onPress={onRefresh}>
-            <Ionicons name="refresh" size={24} color={theme.colors.primary[500]} />
+            <Ionicons name="refresh" size={24} color={theme.colors.controlIcon} />
           </TouchableOpacity>
         </View>
 
@@ -400,14 +418,21 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
           >
             <Typography
               variant="caption"
-              style={{ color: showAvailable ? theme.colors.primary[700] : theme.colors.textSecondary, fontWeight: showAvailable ? '500' : '400' }}
+              style={{
+                color: showAvailable
+                  ? theme.colors.interactiveTextActive
+                  : theme.colors.interactiveText,
+                fontWeight: showAvailable ? '500' : '400',
+              }}
             >
               🏷️ Produits disponibles
             </Typography>
             <Ionicons
               name={showAvailable ? "toggle" : "toggle-outline"}
               size={24}
-              color={showAvailable ? theme.colors.primary[500] : theme.colors.neutral[400]}
+              color={showAvailable
+                ? theme.colors.interactiveTextActive
+                : theme.colors.textSecondary}
             />
           </TouchableOpacity>
 
@@ -421,19 +446,28 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
             <Ionicons
               name="location"
               size={16}
-              color={distanceEnabled ? theme.colors.primary[600] : theme.colors.textSecondary}
+              color={distanceEnabled
+                ? theme.colors.interactiveTextActive
+                : theme.colors.textSecondary}
             />
             <Typography
               variant="caption"
               weight="medium"
-              style={{ color: distanceEnabled ? theme.colors.primary[700] : theme.colors.textSecondary, fontWeight: distanceEnabled ? '600' : '500' }}
+              style={{
+                color: distanceEnabled
+                  ? theme.colors.interactiveTextActive
+                  : theme.colors.interactiveText,
+                fontWeight: distanceEnabled ? '600' : '500',
+              }}
             >
               {`< ${maxDistance} km`}
             </Typography>
             <Ionicons
               name={distanceEnabled ? "toggle" : "toggle-outline"}
               size={24}
-              color={distanceEnabled ? theme.colors.primary[500] : theme.colors.neutral[300]}
+              color={distanceEnabled
+                ? theme.colors.interactiveTextActive
+                : theme.colors.textSecondary}
             />
           </TouchableOpacity>
         </View>
@@ -528,7 +562,7 @@ const createStyles = (theme: ReturnType<typeof useTheme>) => StyleSheet.create({
     width: 48,
     height: 48,
     borderRadius: 24,
-    backgroundColor: theme.colors.primary[50],
+    backgroundColor: theme.colors.controlSurface,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -550,17 +584,32 @@ const createStyles = (theme: ReturnType<typeof useTheme>) => StyleSheet.create({
     paddingVertical: 10,
     marginRight: theme.spacing.md,
     borderRadius: theme.radius.full,
-    backgroundColor: theme.colors.surface.light,
+    backgroundColor: theme.colors.interactiveSurface,
     borderWidth: 1,
-    borderColor: theme.colors.border,
+    borderColor: theme.colors.interactiveBorder,
     // Prevent size jumps and overflow in horizontal scroll
     minHeight: 40,
     maxWidth: 200,
     flexShrink: 0,
   },
+  categoryItemActive: {
+    backgroundColor: theme.colors.interactiveSurfaceActive,
+    borderColor: theme.colors.interactiveBorderActive,
+  },
   categoryEmoji: {
     fontSize: 20,
     marginRight: 6,
+    color: theme.colors.interactiveText,
+  },
+  categoryEmojiActive: {
+    color: theme.colors.interactiveTextActive,
+  },
+  categoryLabel: {
+    maxWidth: 120,
+    color: theme.colors.interactiveText,
+  },
+  categoryLabelActive: {
+    color: theme.colors.interactiveTextActive,
   },
   filtersRow: {
     flexDirection: 'row',
@@ -576,13 +625,13 @@ const createStyles = (theme: ReturnType<typeof useTheme>) => StyleSheet.create({
     paddingHorizontal: theme.spacing.md,
     paddingVertical: theme.spacing.sm,
     borderRadius: theme.radius.lg,
-    backgroundColor: theme.colors.surface.light,
+    backgroundColor: theme.colors.interactiveSurface,
     borderWidth: 1,
-    borderColor: theme.colors.border,
+    borderColor: theme.colors.interactiveBorder,
   },
   filterChipActive: {
-    backgroundColor: theme.colors.primary[50],
-    borderColor: theme.colors.primary[200],
+    backgroundColor: theme.colors.interactiveSurfaceActive,
+    borderColor: theme.colors.interactiveBorderActive,
   },
   distanceFilter: {
     flexDirection: 'row',
@@ -590,19 +639,19 @@ const createStyles = (theme: ReturnType<typeof useTheme>) => StyleSheet.create({
     paddingHorizontal: theme.spacing.md,
     paddingVertical: theme.spacing.sm,
     borderRadius: theme.radius.lg,
-    backgroundColor: theme.colors.surface.light,
+    backgroundColor: theme.colors.interactiveSurface,
     borderWidth: 1,
-    borderColor: theme.colors.border,
+    borderColor: theme.colors.interactiveBorder,
     gap: 4,
   },
   distanceFilterActive: {
-    backgroundColor: theme.colors.primary[50],
-    borderColor: theme.colors.primary[200],
+    backgroundColor: theme.colors.interactiveSurfaceActive,
+    borderColor: theme.colors.interactiveBorderActive,
   },
   distanceBadge: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: theme.colors.primary[50],
+    backgroundColor: theme.colors.badgeBackground,
     paddingHorizontal: 8,
     paddingVertical: 3,
     borderRadius: theme.radius.md,
@@ -648,7 +697,7 @@ const createStyles = (theme: ReturnType<typeof useTheme>) => StyleSheet.create({
     left: theme.spacing.md,
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: theme.colors.surface.light,
+    backgroundColor: theme.colors.badgeBackgroundStrong,
     paddingHorizontal: theme.spacing.sm,
     paddingVertical: 6,
     borderRadius: theme.radius.md,

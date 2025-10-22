@@ -102,12 +102,12 @@ export const Button: React.FC<ButtonProps> = ({
         return {
           container: {
             backgroundColor: disabled
-              ? theme.colors.neutral[300]
+              ? theme.colors.disabledSurface
               : theme.colors.primary[500],
             ...theme.shadows.md,
           },
           text: {
-            color: theme.colors.textInverse,
+            color: disabled ? theme.colors.disabledText : theme.colors.textInverse,
             fontWeight: '600',
           },
         }
@@ -116,12 +116,12 @@ export const Button: React.FC<ButtonProps> = ({
         return {
           container: {
             backgroundColor: disabled
-              ? theme.colors.neutral[200]
+              ? theme.colors.disabledSurface
               : theme.colors.accent.orange,
             ...theme.shadows.sm,
           },
           text: {
-            color: theme.colors.textInverse,
+            color: disabled ? theme.colors.disabledText : theme.colors.textInverse,
             fontWeight: '600',
           },
         }
@@ -130,12 +130,12 @@ export const Button: React.FC<ButtonProps> = ({
         return {
           container: {
             backgroundColor: disabled
-              ? theme.colors.neutral[200]
+              ? theme.colors.disabledSurface
               : theme.colors.accent.red,
             ...theme.shadows.glow,
           },
           text: {
-            color: theme.colors.textInverse,
+            color: disabled ? theme.colors.disabledText : theme.colors.textInverse,
             fontWeight: '700',
           },
         }
@@ -146,12 +146,12 @@ export const Button: React.FC<ButtonProps> = ({
             backgroundColor: 'transparent',
             borderWidth: 1,
             borderColor: disabled
-              ? theme.colors.neutral[300]
+              ? theme.colors.disabledBorder
               : theme.colors.border,
           },
           text: {
             color: disabled
-              ? theme.colors.textTertiary
+              ? theme.colors.disabledText
               : theme.colors.text,
             fontWeight: '500',
           },
@@ -161,12 +161,12 @@ export const Button: React.FC<ButtonProps> = ({
         return {
           container: {
             backgroundColor: disabled
-              ? theme.colors.neutral[200]
+              ? theme.colors.disabledSurface
               : theme.colors.error,
             ...theme.shadows.sm,
           },
           text: {
-            color: theme.colors.textInverse,
+            color: disabled ? theme.colors.disabledText : theme.colors.textInverse,
             fontWeight: '600',
           },
         }
