@@ -7,12 +7,13 @@ import Constants from 'expo-constants';
 import * as Device from 'expo-device';
 import { Platform } from 'react-native';
 import axios, { AxiosInstance } from 'axios';
+import { getExpoExtraValue } from '../utils/expoConfig';
 
 // Configuration dynamique de l'API via app.json
 const getApiBaseUrl = (): string => {
-  const configUrl = Constants.expoConfig?.extra?.apiUrl
-  if (configUrl && typeof configUrl === 'string') {
-    return configUrl
+  const configUrl = getExpoExtraValue<string>('apiUrl')?.trim();
+  if (configUrl) {
+    return configUrl;
   }
   // Fallback pour développement local
   // 10.0.2.2 est l'adresse spéciale pour localhost sur émulateur Android

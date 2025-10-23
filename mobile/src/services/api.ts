@@ -1,6 +1,5 @@
 import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios'
 import AsyncStorage from '@react-native-async-storage/async-storage'
-import Constants from 'expo-constants'
 import { Alert } from 'react-native'
 import * as NavigationRef from '../navigation/NavigationRef'
 import {
@@ -52,6 +51,7 @@ import {
   ConversationMessage,
   ConversationMessageResponse,
 } from '../types'
+import { getExpoExtraValue } from '../utils/expoConfig'
 
 // Configuration dynamique de l'API (web/native) avec overrides propres
 const getApiBaseUrl = (): string => {
@@ -93,9 +93,9 @@ const getApiBaseUrl = (): string => {
   }
 
   // 2) NATIVE (Android/iOS): priorité à app.json -> extra.apiUrl
-  const configUrl = Constants.expoConfig?.extra?.apiUrl
-  if (configUrl && typeof configUrl === 'string') {
-    console.log('🔗 API URL (from app.json extra):', configUrl)
+  const configUrl = getExpoExtraValue<string>('apiUrl')?.trim()
+  if (configUrl) {
+    console.log('🔗 API URL (from Expo extra):', configUrl)
     return configUrl
   }
 
