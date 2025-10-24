@@ -36,13 +36,20 @@ class AdminController extends Controller
 
             // Statistiques de base
             $totalUsers = User::count();
-            $newUsersThisMonth = User::whereMonth('created_at', now()->month)->count();
+            // 🐛 BUG FIX #23: Add whereYear() to prevent aggregating all years
+            $newUsersThisMonth = User::whereMonth('created_at', now()->month)
+                ->whereYear('created_at', now()->year)
+                ->count();
             $activeMerchants = Merchant::whereHas('user', function($q) {
                 $q->where('role', 'merchant');
             })->count();
 
             // Croissance des commerçants (mois précédent vs mois actuel)
-            $lastMonthMerchants = Merchant::whereMonth('created_at', now()->subMonth()->month)->count();
+            // 🐛 BUG FIX #23: Add whereYear() to prevent aggregating all years
+            $lastMonthDate = now()->subMonth();
+            $lastMonthMerchants = Merchant::whereMonth('created_at', $lastMonthDate->month)
+                ->whereYear('created_at', $lastMonthDate->year)
+                ->count();
             $merchantGrowthRate = $lastMonthMerchants > 0
                 ? round((($activeMerchants - $lastMonthMerchants) / $lastMonthMerchants) * 100, 1)
                 : 0;
@@ -53,8 +60,10 @@ class AdminController extends Controller
             $totalRevenue = Reservation::where('status', 'completed')->sum('total_amount');
 
             // Croissance des revenus
+            // 🐛 BUG FIX #23: Add whereYear() to prevent aggregating all years
             $lastMonthRevenue = Reservation::where('status', 'completed')
-                ->whereMonth('created_at', now()->subMonth()->month)
+                ->whereMonth('created_at', $lastMonthDate->month)
+                ->whereYear('created_at', $lastMonthDate->year)
                 ->sum('total_amount');
             $revenueGrowth = $lastMonthRevenue > 0
                 ? round((($totalRevenue - $lastMonthRevenue) / $lastMonthRevenue) * 100, 1)
@@ -568,18 +577,18 @@ class AdminController extends Controller
             $perPage = $validated['per_page'] ?? 20;
             $payments = $query->orderBy('created_at', 'desc')->paginate($perPage);
 
-            // Calculate summary statistics for current filters
+            // 🐛 BUG FIX #21: Clone query for each status count to avoid cumulative where() clauses
+            // Previous bug: $summaryQuery->where('status', 'success')->count() then ->where('status', 'failed')
+            // resulted in WHERE status = 'success' AND status = 'failed' (always 0)
             $summaryQuery = Payment::query();
-
-            // Apply same filters to summary using helper method
             $this->applyPaymentFilters($summaryQuery, $validated);
 
             $summary = [
-                'total_payments' => $summaryQuery->count(),
-                'total_amount' => $summaryQuery->sum('amount'),
-                'successful_payments' => $summaryQuery->where('status', 'success')->count(),
-                'failed_payments' => $summaryQuery->where('status', 'failed')->count(),
-                'pending_payments' => $summaryQuery->where('status', 'pending')->count(),
+                'total_payments' => (clone $summaryQuery)->count(),
+                'total_amount' => (clone $summaryQuery)->sum('amount'),
+                'successful_payments' => (clone $summaryQuery)->where('status', 'success')->count(),
+                'failed_payments' => (clone $summaryQuery)->where('status', 'failed')->count(),
+                'pending_payments' => (clone $summaryQuery)->where('status', 'pending')->count(),
             ];
 
             // Transform payment data

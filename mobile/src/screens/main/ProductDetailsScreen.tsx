@@ -179,10 +179,18 @@ const ProductDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
 
     setReserving(true) // Bloquer immédiatement pour éviter double clic
     try {
+      // Préparer la date et l'heure de récupération par défaut (demain à 10h)
+      const tomorrow = new Date()
+      tomorrow.setDate(tomorrow.getDate() + 1)
+      const pickupDate = tomorrow.toISOString().split('T')[0] // Format YYYY-MM-DD
+      const pickupTime = '10:00' // Heure par défaut
+
       const result = await dispatch(createReservation({
         productId: product.id,
         quantity: selectedQuantity,
         paymentMethod: selectedPaymentMethod,
+        pickupDate,
+        pickupTime,
         notes: null,
       }))
 

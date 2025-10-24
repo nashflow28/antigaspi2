@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Facades\DB;
 
 class Favorite extends Model
 {
@@ -50,20 +51,24 @@ class Favorite extends Model
     // Helper methods
     public static function toggle($userId, $productId): bool
     {
-        $favorite = self::where('user_id', $userId)
-            ->where('product_id', $productId)
-            ->first();
+        return DB::transaction(function () use ($userId, $productId) {
+            // Utilise lockForUpdate() pour éviter les race conditions
+            $favorite = self::where('user_id', $userId)
+                ->where('product_id', $productId)
+                ->lockForUpdate()
+                ->first();
 
-        if ($favorite) {
-            $favorite->delete();
-            return false; // Removed from favorites
-        } else {
-            self::create([
-                'user_id' => $userId,
-                'product_id' => $productId,
-            ]);
-            return true; // Added to favorites
-        }
+            if ($favorite) {
+                $favorite->delete();
+                return false; // Removed from favorites
+            } else {
+                self::create([
+                    'user_id' => $userId,
+                    'product_id' => $productId,
+                ]);
+                return true; // Added to favorites
+            }
+        });
     }
 
     public static function isFavorite($userId, $productId): bool

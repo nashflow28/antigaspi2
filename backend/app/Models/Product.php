@@ -6,13 +6,11 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Laravel\Scout\Attributes\SearchUsingPrefix;
 use Laravel\Scout\Searchable;
 
 class Product extends Model
 {
-    use HasFactory;
-    use Searchable;
+    use HasFactory, Searchable;
 
     protected $fillable = [
         'merchant_id',
@@ -49,53 +47,6 @@ class Product extends Model
             'max_items' => 'integer',
             'total_original_value' => 'decimal:2',
         ];
-    }
-
-    #[SearchUsingPrefix(['name', 'merchant_name'])]
-    public function toSearchableArray(): array
-    {
-        $this->loadMissing(['merchant.user', 'category']);
-
-        $reservationsCount = $this->reservations_count ?? $this->reservations()->count();
-        $favoritesCount = $this->favorites_count ?? $this->favorites()->count();
-        $averageRating = $this->reviews_avg_rating ?? $this->reviews()->avg('rating');
-
-        return [
-            'id' => $this->getKey(),
-            'name' => $this->name,
-            'description' => $this->description,
-            'merchant_name' => $this->merchant?->business_name,
-            'merchant_city' => $this->merchant?->user?->city,
-            'category' => $this->category?->name,
-            'price' => (float) $this->discounted_price,
-            'is_surprise_basket' => (bool) $this->is_surprise_basket,
-            'is_active' => (bool) $this->is_active,
-            'expiration_date' => optional($this->expiration_date)->format('Y-m-d'),
-            'popularity' => (int) ($reservationsCount + $favoritesCount),
-            'rating' => $averageRating ? round((float) $averageRating, 2) : null,
-        ];
-    }
-
-    public function searchableAs(): string
-    {
-        return config('scout.prefix').'products';
-    }
-
-    public function searchableWith(): array
-    {
-        return ['merchant.user', 'category'];
-    }
-
-    public function makeAllSearchableUsing($query)
-    {
-        return $query->with(['merchant.user', 'category'])
-            ->withCount(['reservations', 'favorites'])
-            ->withAvg('reviews', 'rating');
-    }
-
-    public function shouldBeSearchable(): bool
-    {
-        return (bool) $this->is_active && ($this->quantity_available ?? 0) > 0;
     }
 
     // Relationships
@@ -148,7 +99,10 @@ class Product extends Model
     public function scopeAvailable($query)
     {
         return $query->where('quantity_available', '>', 0)
-                    ->where('expiration_date', '>=', now()->toDateString());
+                    ->where(function ($q) {
+                        $q->where('expiration_date', '>=', now()->toDateString())
+                          ->orWhereNull('expiration_date');
+                    });
     }
 
     public function scopeExpiringSoon($query, $days = 2)
@@ -311,5 +265,31 @@ class Product extends Model
             });
 
         $this->update(['total_original_value' => $totalValue]);
+    }
+
+    // Scout Search Methods
+    public function toSearchableArray(): array
+    {
+        return [
+            'id' => $this->id,
+            'name' => $this->name,
+            'description' => $this->description,
+            'merchant_name' => $this->merchant->business_name ?? '',
+            'category' => $this->category->name ?? '',
+            'merchant_city' => $this->merchant->user->city ?? '',
+            'price' => (float) $this->discounted_price,
+            'is_active' => $this->is_active,
+            'is_surprise_basket' => $this->is_surprise_basket,
+        ];
+    }
+
+    public function searchableAs(): string
+    {
+        return 'products_index';
+    }
+
+    public function shouldBeSearchable(): bool
+    {
+        return $this->is_active && $this->quantity_available > 0 && !$this->isExpired();
     }
 }

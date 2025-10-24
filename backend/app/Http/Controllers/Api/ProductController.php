@@ -449,6 +449,20 @@ class ProductController extends Controller
                 ], 422);
             }
 
+            // 🐛 BUG FIX #19: Validate price consistency (discounted_price < original_price)
+            $newDiscountedPrice = $request->filled('discounted_price') ? $request->discounted_price : $product->discounted_price;
+            $newOriginalPrice = $request->filled('original_price') ? $request->original_price : $product->original_price;
+
+            if ($newDiscountedPrice >= $newOriginalPrice) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Le prix remisé doit être inférieur au prix d\'origine',
+                    'errors' => [
+                        'discounted_price' => ['Le prix remisé doit être inférieur au prix d\'origine']
+                    ]
+                ], 422);
+            }
+
             // 🐛 BUG FIX #14: Validate image_url path to prevent traversal attacks
             if ($request->filled('image_url')) {
                 $imagePath = $request->image_url;
@@ -710,9 +724,16 @@ class ProductController extends Controller
                 });
             }
 
-            // Tri
-            $sortBy = $request->get('sort_by', 'created_at');
-            $sortOrder = $request->get('sort_order', 'desc');
+            // 🐛 BUG FIX #18: Validate sort parameters to prevent SQL injection (same whitelist as index())
+            $allowedSortFields = ['created_at', 'discounted_price', 'expiration_date', 'name'];
+            $sortBy = in_array($request->get('sort_by'), $allowedSortFields)
+                ? $request->get('sort_by')
+                : 'created_at';
+
+            $sortOrder = in_array(strtolower($request->get('sort_order', 'desc')), ['asc', 'desc'])
+                ? strtolower($request->get('sort_order', 'desc'))
+                : 'desc';
+
             $query->orderBy($sortBy, $sortOrder);
 
             // Pagination

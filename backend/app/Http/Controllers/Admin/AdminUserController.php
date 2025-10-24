@@ -42,7 +42,9 @@ class AdminUserController extends Controller
                 $query->where('role', $request->role);
             }
 
-            if ($request->has('status') && $request->status) {
+            // 🐛 BUG FIX #22: Handle "all" status explicitly to avoid filtering
+            // Previous bug: $request->status === 'active' returns false for "all" → forces where('is_active', false)
+            if ($request->has('status') && $request->status && $request->status !== 'all') {
                 $isActive = $request->status === 'active';
                 $query->where('is_active', $isActive);
             }
