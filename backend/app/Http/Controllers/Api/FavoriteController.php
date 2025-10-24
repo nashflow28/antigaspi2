@@ -12,17 +12,22 @@ use Tymon\JWTAuth\Facades\JWTAuth;
 class FavoriteController extends Controller
 {
     /**
-     * Get all user's favorites
+     * Get all user's favorites with pagination
+     * 🐛 BUG FIX #27: Added pagination to prevent performance issues with large datasets
      */
     public function index(Request $request): JsonResponse
     {
         try {
             $user = JWTAuth::parseToken()->authenticate();
 
+            // 🐛 BUG FIX #27: Add pagination with safe limits
+            $perPage = $request->get('per_page', 20);
+            $perPage = max(1, min((int) $perPage, 100)); // Between 1 and 100
+
             $favorites = Favorite::with(['product.category', 'product.merchant.user'])
                 ->where('user_id', $user->id)
                 ->orderBy('created_at', 'desc')
-                ->get();
+                ->paginate($perPage);
 
             $products = $favorites->map(function ($favorite) {
                 return [
@@ -53,8 +58,13 @@ class FavoriteController extends Controller
             return response()->json([
                 'success' => true,
                 'data' => $products,
-                'meta' => [
-                    'total' => $favorites->count(),
+                'pagination' => [
+                    'total' => $favorites->total(),
+                    'per_page' => $favorites->perPage(),
+                    'current_page' => $favorites->currentPage(),
+                    'last_page' => $favorites->lastPage(),
+                    'from' => $favorites->firstItem(),
+                    'to' => $favorites->lastItem(),
                 ],
             ]);
         } catch (\Exception $e) {

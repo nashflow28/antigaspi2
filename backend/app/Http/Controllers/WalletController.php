@@ -396,6 +396,7 @@ class WalletController extends Controller
             'amount' => 'required|numeric|min:100|max:1000000',
             'payment_method' => 'required|in:flooz,tmoney,orange_money,mtn_momo,paystack',
             'phone' => 'required_if:payment_method,flooz,tmoney,orange_money,mtn_momo|string',
+            'currency' => 'nullable|string|in:XOF', // 🐛 BUG FIX #35: Only accept XOF
         ], [
             'amount.required' => 'Le montant est requis',
             'amount.min' => 'Le montant minimum de recharge est de 100 XOF',
@@ -403,6 +404,7 @@ class WalletController extends Controller
             'payment_method.required' => 'La méthode de paiement est requise',
             'payment_method.in' => 'Méthode de paiement non supportée',
             'phone.required_if' => 'Le numéro de téléphone est requis pour les recharges Mobile Money',
+            'currency.in' => 'Seule la devise XOF est acceptée', // 🐛 BUG FIX #35
         ]);
 
         if ($validator->fails()) {
@@ -413,6 +415,16 @@ class WalletController extends Controller
             ], 422);
         }
 
+        // 🐛 BUG FIX #35: Ensure currency is XOF if provided, default to XOF if not
+        $currency = $request->input('currency', 'XOF');
+        if ($currency !== 'XOF') {
+            return response()->json([
+                'success' => false,
+                'message' => 'Seule la devise XOF est acceptée pour les recharges',
+                'errors' => ['currency' => ['Seule la devise XOF est acceptée']],
+            ], 422);
+        }
+
         try {
             return response()->json([
                 'success' => false,
@@ -420,6 +432,7 @@ class WalletController extends Controller
                 'data' => [
                     'amount' => $request->amount,
                     'payment_method' => $request->payment_method,
+                    'currency' => 'XOF', // 🐛 BUG FIX #35: Always XOF
                     'status' => 'coming_soon',
                 ],
             ], 501);

@@ -94,19 +94,32 @@ export interface SearchResponse<T extends SearchResult = SearchResult> {
 const buildQueryParams = (params: SearchParams): string => {
   const searchParams = new URLSearchParams()
 
+  // 🐛 BUG FIX #38: Sanitize query parameter to prevent SQL injection attempts
   if (params.query) {
-    searchParams.append('q', params.query)
+    // Remove SQL keywords and dangerous characters (defense in depth)
+    const sanitizedQuery = params.query
+      .replace(/[;<>\"'`]/g, '') // Remove dangerous characters
+      .trim()
+      .slice(0, 100) // Limit query length
+
+    if (sanitizedQuery) {
+      searchParams.append('q', sanitizedQuery)
+    }
   }
 
   if (params.page) {
-    searchParams.append('page', String(params.page))
+    const safePage = Math.max(1, Math.min(Number(params.page) || 1, 1000))
+    searchParams.append('page', String(safePage))
   }
 
   if (params.perPage) {
-    searchParams.append('per_page', String(params.perPage))
+    const safePerPage = Math.max(1, Math.min(Number(params.perPage) || 20, 100))
+    searchParams.append('per_page', String(safePerPage))
   }
 
-  if (params.sort) {
+  // 🐛 BUG FIX #38: Whitelist validation for sort parameter
+  const allowedSortValues: SearchSort[] = ['relevance', 'price_asc', 'price_desc', 'rating_desc', 'popularity_desc']
+  if (params.sort && allowedSortValues.includes(params.sort)) {
     searchParams.append('sort', params.sort)
   }
 
@@ -118,13 +131,35 @@ const buildQueryParams = (params: SearchParams): string => {
     filters.type = params.type
   }
 
+  // 🐛 BUG FIX #38: Whitelist and sanitize filter values
+  const allowedFilterKeys = ['city', 'category', 'business_type', 'is_surprise_basket', 'is_verified', 'type']
+  const allowedTypes: SearchType[] = ['products', 'merchants']
+
   Object.entries(filters).forEach(([key, value]) => {
     if (value === undefined || value === null || value === '') {
       return
     }
 
+    // 🐛 BUG FIX #38: Only allow whitelisted filter keys
+    if (!allowedFilterKeys.includes(key)) {
+      return
+    }
+
+    // 🐛 BUG FIX #38: Validate type filter specifically
+    if (key === 'type' && typeof value === 'string' && !allowedTypes.includes(value as SearchType)) {
+      return
+    }
+
     const normalizedValue = typeof value === 'boolean' ? Number(value).toString() : String(value)
-    searchParams.append(`filters[${key}]`, normalizedValue)
+
+    // 🐛 BUG FIX #38: Sanitize string filter values (max 50 chars, remove dangerous characters)
+    const sanitizedValue = typeof value === 'string'
+      ? normalizedValue.replace(/[;<>\"'`]/g, '').slice(0, 50)
+      : normalizedValue
+
+    if (sanitizedValue) {
+      searchParams.append(`filters[${key}]`, sanitizedValue)
+    }
   })
 
   return searchParams.toString()

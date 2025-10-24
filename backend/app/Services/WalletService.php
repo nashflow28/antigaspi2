@@ -15,8 +15,13 @@ class WalletService
 {
     public function createWallet(User $user, array $data = []): Wallet
     {
+        // 🐛 BUG FIX #35: Enforce XOF currency only
+        if (isset($data['currency']) && $data['currency'] !== 'XOF') {
+            throw new \InvalidArgumentException('Seule la devise XOF est acceptée pour les portefeuilles');
+        }
+
         return $user->wallet()->create([
-            'currency' => $data['currency'] ?? 'XOF',
+            'currency' => 'XOF', // Always XOF
             'daily_limit' => $data['daily_limit'] ?? 50000.00,
             'is_active' => $data['is_active'] ?? true,
         ]);
@@ -33,10 +38,29 @@ class WalletService
             throw new \InvalidArgumentException('Le montant de recharge doit être supérieur à zéro');
         }
 
+        // 🐛 BUG FIX #35: Validate amount is reasonable (min 100 XOF, max 1,000,000 XOF)
+        if ($amount < 100) {
+            throw new \InvalidArgumentException('Le montant minimum de recharge est de 100 XOF');
+        }
+
+        if ($amount > 1000000) {
+            throw new \InvalidArgumentException('Le montant maximum de recharge est de 1,000,000 XOF');
+        }
+
         $wallet = $this->getOrCreateWallet($user);
+
+        // 🐛 BUG FIX #35: Verify wallet uses XOF currency only
+        if ($wallet->currency !== 'XOF') {
+            throw new \Exception('Ce portefeuille n\'utilise pas la devise XOF');
+        }
 
         if (!$wallet->is_active) {
             throw new \Exception('Le portefeuille est désactivé');
+        }
+
+        // 🐛 BUG FIX #35: Validate payment currency if payment is provided
+        if ($payment && isset($payment->currency) && $payment->currency !== 'XOF') {
+            throw new \InvalidArgumentException('Seule la devise XOF est acceptée pour les recharges');
         }
 
         return DB::transaction(function () use ($wallet, $amount, $description, $payment) {
