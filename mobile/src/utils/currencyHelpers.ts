@@ -12,6 +12,7 @@ export interface FormatCurrencyOptions {
 }
 
 /**
+ * BUG FIX #20: Use Intl.NumberFormat for proper XOF formatting (no decimal places)
  * Format a number as XOF currency (F CFA)
  * @param value - The amount to format (number or string). Negative values are converted to 0.
  * @param options - Formatting options
@@ -28,11 +29,7 @@ export const formatCurrency = (
   value: number | string | null | undefined,
   options: FormatCurrencyOptions = {}
 ): string => {
-  const {
-    showSymbol = true,
-    decimals = 0,
-    thousandSeparator = ' ',
-  } = options
+  const { showSymbol = true, decimals = 0 } = options
 
   // Handle null/undefined
   if (value == null) {
@@ -50,40 +47,19 @@ export const formatCurrency = (
     numericValue = value
   }
 
-  // Handle NaN (from number inputs like 0/0)
-  if (isNaN(numericValue)) {
+  // Handle NaN, Infinity, and negatives
+  if (isNaN(numericValue) || !isFinite(numericValue) || numericValue < 0) {
     return showSymbol ? '0 F CFA' : '0'
   }
 
-  // Handle Infinity and -Infinity
-  if (!isFinite(numericValue)) {
-    return showSymbol ? '0 F CFA' : '0'
-  }
+  // Use Intl.NumberFormat with explicit fraction digits settings for XOF
+  const formatted = new Intl.NumberFormat('fr-FR', {
+    style: 'decimal',
+    minimumFractionDigits: decimals,
+    maxFractionDigits: decimals,
+  }).format(Math.round(numericValue))
 
-  // Handle negative numbers (convert to 0)
-  if (numericValue < 0) {
-    return showSymbol ? '0 F CFA' : '0'
-  }
-
-  // Round to specified decimal places
-  const roundedValue = Math.round(numericValue * Math.pow(10, decimals)) / Math.pow(10, decimals)
-
-  // Format with thousand separators
-  const parts = roundedValue.toFixed(decimals).split('.')
-  const integerPart = parts[0]
-  const decimalPart = parts[1]
-
-  // Add thousand separators
-  const formattedInteger = integerPart.replace(/\B(?=(\d{3})+(?!\d))/g, thousandSeparator)
-
-  // Combine integer and decimal parts
-  let formattedValue = formattedInteger
-  if (decimals > 0 && decimalPart) {
-    formattedValue += '.' + decimalPart
-  }
-
-  // Add currency symbol
-  return showSymbol ? `${formattedValue} F CFA` : formattedValue
+  return showSymbol ? `${formatted} F CFA` : formatted
 }
 
 /**

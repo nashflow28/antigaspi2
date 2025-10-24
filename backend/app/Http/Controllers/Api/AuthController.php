@@ -32,7 +32,13 @@ class AuthController extends Controller
             'password' => 'required|min:6',
             'first_name' => 'required|string|max:100',
             'last_name' => 'required|string|max:100',
-            'phone' => 'nullable|string|max:20',
+            // 🐛 BUG FIX #18: Add phone format validation for Togo (West Africa)
+            'phone' => [
+                'nullable',
+                'string',
+                'regex:/^\+228\s?\d{2}\s?\d{2}\s?\d{2}\s?\d{2}$/',
+                'max:20'
+            ],
             'role' => 'required|in:consumer,merchant',
             'city' => 'required|string|max:100',
             'address' => 'nullable|string',
@@ -163,7 +169,15 @@ class AuthController extends Controller
             }
 
             // Tenter la connexion
+            // 🐛 BUG FIX #26: Log failed login attempts for security monitoring and audit trail
             if (!$token = JWTAuth::attempt($credentials)) {
+                Log::warning('Failed login attempt', [
+                    'email' => $request->email,
+                    'ip' => $request->ip(),
+                    'user_agent' => $request->userAgent(),
+                    'timestamp' => now()->toIso8601String(),
+                ]);
+
                 return response()->json([
                     'success' => false,
                     'message' => 'Email ou mot de passe incorrect'

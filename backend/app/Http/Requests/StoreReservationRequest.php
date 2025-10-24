@@ -57,6 +57,7 @@ class StoreReservationRequest extends FormRequest
                 'required',
                 'integer',
                 'min:1',
+                'max:100', // BUG FIX #29: Limit maximum reservation quantity to prevent abuse
                 function ($attribute, $value, $fail) {
                     if (!$this->input('product_id')) {
                         return;

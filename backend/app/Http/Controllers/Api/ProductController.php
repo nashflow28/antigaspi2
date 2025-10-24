@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Storage;
 use Tymon\JWTAuth\Facades\JWTAuth;
+use IlluminateSupportFacadesCache;
 
 class ProductController extends Controller
 {
@@ -793,8 +794,11 @@ class ProductController extends Controller
 
     public function categories(): JsonResponse
     {
+        // 🐛 BUG FIX #30: Cache categories with TTL (1 hour) to reduce database queries
         try {
-            $categories = Category::active()->get(['id', 'name', 'description']);
+            $categories = Cache::remember('categories.active', 3600, function () {
+                return Category::active()->get(['id', 'name', 'description']);
+            });
 
             return response()->json([
                 'success' => true,

@@ -378,7 +378,10 @@ class SearchController extends Controller
             'query' => $normalizedQuery,
         ]);
 
-        $searchQuery->search_count = (int) ($searchQuery->search_count ?? 0) + 1;
+        // BUG FIX #19: Prevent integer overflow on search_count increment
+        // Cap to PHP integer max (2147483647) to avoid database overflow
+        $currentCount = (int) ($searchQuery->search_count ?? 0);
+        $searchQuery->search_count = min($currentCount + 1, 2147483647);
         $searchQuery->last_results_count = max($resultsCount, 0);
         $searchQuery->last_searched_at = Carbon::now();
 

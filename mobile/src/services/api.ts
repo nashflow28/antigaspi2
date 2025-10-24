@@ -434,8 +434,9 @@ class ApiService {
     return this.request<ApiResponse<WalletStats>>('GET', `/wallet/stats?period=${period}`)
   }
 
+  // BUG FIX #22: Force currency: 'XOF' in wallet recharge to prevent currency mismatch errors
   async rechargeWallet(payload: WalletRechargePayload): Promise<ApiResponse<{ transaction?: WalletTransaction }>> {
-    const normalizedPayload = toSnakeCase(payload)
+    const normalizedPayload = { ...toSnakeCase(payload), currency: 'XOF' }
     return this.request<ApiResponse<{ transaction?: WalletTransaction }>>(
       'POST',
       '/wallet/recharge',
@@ -472,11 +473,6 @@ class ApiService {
     )
   }
 
-  // === FAVORIS ===
-
-  async getFavorites(): Promise<ApiResponse<Product[]>> {
-    return this.request<ApiResponse<Product[]>>('GET', '/favorites')
-  }
 
   async getFavoriteIds(): Promise<ApiResponse<number[]>> {
     return this.request<ApiResponse<number[]>>('GET', '/favorites/batch-check')

@@ -267,6 +267,7 @@ class Product extends Model
         $this->update(['total_original_value' => $totalValue]);
     }
 
+    // BUG FIX #28: Use null-safe operator to prevent errors if merchant relation not loaded
     // Scout Search Methods
     public function toSearchableArray(): array
     {
@@ -274,9 +275,9 @@ class Product extends Model
             'id' => $this->id,
             'name' => $this->name,
             'description' => $this->description,
-            'merchant_name' => $this->merchant->business_name ?? '',
+            'merchant_name' => $this->merchant?->business_name ?? '',
             'category' => $this->category->name ?? '',
-            'merchant_city' => $this->merchant->user->city ?? '',
+            'merchant_city' => $this->merchant?->user?->city ?? '',
             'price' => (float) $this->discounted_price,
             'is_active' => $this->is_active,
             'is_surprise_basket' => $this->is_surprise_basket,

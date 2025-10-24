@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { TouchableOpacity, StyleSheet, ActivityIndicator, ViewStyle } from 'react-native'
 import { Ionicons } from '@expo/vector-icons'
 import { useTheme } from '../theme'
@@ -22,24 +22,40 @@ const FavoriteButton: React.FC<FavoriteButtonProps> = ({
 }) => {
   const theme = useTheme()
   const { isFavorite, toggleFavorite, loading } = useFavorite(productId)
+  // BUG FIX #24: Add debounce state to prevent spam/double-tap issues
+  const [isToggling, setIsToggling] = useState(false)
 
   const handlePress = async () => {
-    await toggleFavorite()
-    onToggle?.(isFavorite)
+    // Prevent multiple simultaneous toggle requests
+    if (isToggling || loading) {
+      return
+    }
+
+    setIsToggling(true)
+    try {
+      await toggleFavorite()
+      onToggle?.(isFavorite)
+    } finally {
+      // Minimum 300ms delay to prevent accidental double-taps
+      setTimeout(() => {
+        setIsToggling(false)
+      }, 300)
+    }
   }
 
   const color = iconColor || theme.colors.primary[600]
+  const isDisabled = loading || isToggling
 
   return (
     <TouchableOpacity
       style={[styles.button, style]}
       onPress={handlePress}
-      disabled={loading}
+      disabled={isDisabled}
       activeOpacity={0.7}
       testID={TEST_IDS.favoriteButton}
       accessibilityLabel={TEST_IDS.favoriteButton}
     >
-      {loading ? (
+      {(loading || isToggling) ? (
         <ActivityIndicator size="small" color={color} />
       ) : (
         <Ionicons

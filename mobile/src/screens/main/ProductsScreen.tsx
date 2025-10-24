@@ -24,7 +24,8 @@ import { formatCurrency } from '../../utils/currencyHelpers'
 import FavoriteButton from '../../components/FavoriteButton'
 import { Product } from '../../types'
 import { Button, Card, Badge, Typography } from '../../components/2025'
-import MapView, { Callout, Marker, PROVIDER_GOOGLE } from 'react-native-maps'
+// TEMPORARY: Disabled react-native-maps - needs native configuration
+// import MapView, { Callout, Marker, PROVIDER_GOOGLE } from 'react-native-maps'
 import locationService, { UserLocation } from '../../services/locationService'
 import type { Merchant as MerchantEntity } from '../../store/slices/merchantsSlice'
 import searchService, {
@@ -43,6 +44,7 @@ type MerchantListItem = {
 
 const ProductsScreen: React.FC<Props> = ({ navigation }) => {
   const dispatch = useDispatch<AppDispatch>()
+  const { isAuthenticated } = useSelector((state: RootState) => state.auth)
   const { products, categories, loading: productsLoading } = useSelector((state: RootState) => state.products)
   const { merchants, loading: merchantsLoading } = useSelector((state: RootState) => state.merchants)
   const theme = useTheme()
@@ -368,6 +370,15 @@ const ProductsScreen: React.FC<Props> = ({ navigation }) => {
     if (contentMode !== 'merchants' && viewMode !== 'list') {
       setViewMode('list')
     }
+  // BUG FIX #23: Reset user location after logout to prevent stale location data
+  useEffect(() => {
+    if (!isAuthenticated && userLocation !== null) {
+      setUserLocation(null)
+      setLocationPermissionGranted(false)
+      setDistanceEnabled(false)
+    }
+  }, [isAuthenticated, userLocation])
+
   }, [contentMode, viewMode])
 
   const loadData = async (force = false) => {
@@ -789,46 +800,18 @@ const ProductsScreen: React.FC<Props> = ({ navigation }) => {
       )
     }
 
+    // TEMPORARY: MapView disabled - needs react-native-maps native configuration
     return (
       <View style={styles.mapWrapper}>
-        <MapView
-          provider={PROVIDER_GOOGLE}
-          style={styles.merchantsMap}
-          region={merchantsMapRegion}
-          showsUserLocation={locationPermissionGranted && !!userLocation}
-          showsMyLocationButton={false}
-        >
-          {merchantsWithCoordinates.map(({ merchant, distanceInfo }) => (
-            <Marker
-              key={`merchant-marker-${merchant.id}`}
-              coordinate={{
-                latitude: merchant.latitude as number,
-                longitude: merchant.longitude as number,
-              }}
-              title={merchant.business_name}
-              description={merchant.business_type}
-            >
-              <Callout onPress={() => navigation.navigate('MerchantDetail', { merchantId: merchant.id })}>
-                <View style={styles.mapCallout}>
-                  <Typography variant="body" weight="semibold" style={styles.mapCalloutTitle}>
-                    {merchant.business_name}
-                  </Typography>
-                  <Typography variant="caption" color="secondary">
-                    {merchant.user?.city}
-                  </Typography>
-                  {distanceInfo && (
-                    <Typography variant="caption" color="primary" style={{ marginTop: 4 }}>
-                      {distanceInfo.formatted}
-                    </Typography>
-                  )}
-                  <Typography variant="caption" weight="semibold" color="primary" style={styles.mapCalloutLink}>
-                    Voir le profil →
-                  </Typography>
-                </View>
-              </Callout>
-            </Marker>
-          ))}
-        </MapView>
+        <View style={[styles.merchantsMap, { justifyContent: 'center', alignItems: 'center', backgroundColor: theme.colors.neutral[100] }]}>
+          <Ionicons name="map-outline" size={64} color={theme.colors.neutral[400]} />
+          <Typography variant="body" color="secondary" style={{ marginTop: 16, textAlign: 'center', paddingHorizontal: 24 }}>
+            Vue carte temporairement désactivée
+          </Typography>
+          <Typography variant="caption" color="secondary" style={{ marginTop: 8, textAlign: 'center', paddingHorizontal: 24 }}>
+            Configuration Google Maps en cours
+          </Typography>
+        </View>
       </View>
     )
   }
