@@ -52,7 +52,8 @@ class AuthController extends Controller
         }
 
         try {
-            // Créer l'utilisateur
+            // 🐛 BUG FIX #13: Catch unique constraint violation for email
+            // Prevents race condition between validation and insertion
             $user = User::create([
                 'email' => $request->email,
                 'password' => Hash::make($request->password),
@@ -100,6 +101,23 @@ class AuthController extends Controller
                 ]
             ], 201);
 
+        } catch (\Illuminate\Database\QueryException $e) {
+            // 🐛 BUG FIX #13 (continued): Handle duplicate email error specifically
+            if ($e->errorInfo[1] == 1062) { // MySQL duplicate entry error code
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Cette adresse email est déjà utilisée',
+                    'errors' => [
+                        'email' => ['Cette adresse email est déjà utilisée.']
+                    ]
+                ], 422);
+            }
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Erreur lors de l\'inscription',
+                'error' => $e->getMessage()
+            ], 500);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
@@ -237,7 +255,22 @@ class AuthController extends Controller
     public function logout(): JsonResponse
     {
         try {
-            JWTAuth::invalidate(JWTAuth::getToken());
+            // 🐛 BUG FIX #14: Handle expired token gracefully during logout
+            $token = JWTAuth::getToken();
+            if ($token) {
+                JWTAuth::invalidate($token);
+            }
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Déconnexion réussie'
+            ]);
+
+        } catch (\Tymon\JWTAuth\Exceptions\TokenExpiredException $e) {
+            // Token already expired, no need to invalidate it
+            Log::info('Logout called with expired token', [
+                'ip' => request()->ip()
+            ]);
 
             return response()->json([
                 'success' => true,
@@ -245,6 +278,8 @@ class AuthController extends Controller
             ]);
 
         } catch (\Exception $e) {
+            Log::error('Logout error: ' . $e->getMessage());
+
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur lors de la déconnexion',

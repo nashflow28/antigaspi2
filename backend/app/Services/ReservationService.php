@@ -29,9 +29,27 @@ class ReservationService
         PaymentMethod $paymentMethod,
         array $options = []
     ): array {
+        // 🐛 BUG FIX #10: Reload product from database AFTER lock to get fresh stock value
+        // This prevents race conditions where stock was checked before lock but changed during lock acquisition
+        $product->refresh();
+
         if ($product->quantity_available < $quantity) {
             throw ValidationException::withMessages([
                 'quantity' => ["Stock insuffisant. Disponible: {$product->quantity_available}"],
+            ]);
+        }
+
+        // 🐛 BUG FIX #11: Verify product is still active (additional safety check)
+        if (!$product->is_active) {
+            throw ValidationException::withMessages([
+                'product' => ['Ce produit n\'est plus disponible.'],
+            ]);
+        }
+
+        // 🐛 BUG FIX #12: Verify product is not expired (additional safety check)
+        if ($product->isExpired()) {
+            throw ValidationException::withMessages([
+                'product' => ['Ce produit est expiré et n\'est plus disponible.'],
             ]);
         }
 

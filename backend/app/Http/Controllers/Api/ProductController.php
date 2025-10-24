@@ -191,6 +191,15 @@ class ProductController extends Controller
                 ->active()
                 ->findOrFail($id);
 
+            // 🐛 BUG FIX #17: Verify merchant exists to prevent null pointer errors
+            if (!$product->merchant) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Produit orphelin - Commerçant introuvable',
+                    'error' => 'Ce produit n\'est plus disponible (merchant manquant)'
+                ], 404);
+            }
+
             $productData = [
                 'id' => $product->id,
                 'name' => $product->name,

@@ -44,11 +44,20 @@ class ReservationController extends Controller
                 $query->where('created_at', '<=', $request->to_date);
             }
 
-            $sortBy = $request->get('sort_by', 'created_at');
-            $sortOrder = $request->get('sort_order', 'desc');
+            // 🐛 BUG FIX #15: Whitelist sort parameters to prevent SQL injection
+            $allowedSortFields = ['created_at', 'pickup_date', 'total_amount', 'status'];
+            $sortBy = in_array($request->get('sort_by'), $allowedSortFields, true)
+                ? $request->get('sort_by')
+                : 'created_at';
+
+            $sortOrder = in_array(strtolower($request->get('sort_order', 'desc')), ['asc', 'desc'], true)
+                ? strtolower($request->get('sort_order', 'desc'))
+                : 'desc';
+
             $query->orderBy($sortBy, $sortOrder);
 
-            $perPage = min($request->get('per_page', 15), 50);
+            // 🐛 BUG FIX #16: Add minimum limit to pagination to prevent per_page=0
+            $perPage = max(1, min($request->get('per_page', 15), 50));
             $reservations = $query->paginate($perPage);
 
             return response()->json([
