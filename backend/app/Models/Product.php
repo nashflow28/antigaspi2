@@ -164,6 +164,12 @@ class Product extends Model
 
     public function isExpired(): bool
     {
+        // 🐛 BUG FIX #66: Products without expiration_date (surprise baskets) never expire
+        // Without this check, PHP treats null < 'YYYY-MM-DD' as true, incorrectly marking them as expired
+        if ($this->expiration_date === null) {
+            return false;
+        }
+
         return $this->expiration_date < now()->toDateString();
     }
 

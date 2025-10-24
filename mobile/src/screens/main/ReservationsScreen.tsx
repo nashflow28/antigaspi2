@@ -385,7 +385,8 @@ const ReservationsScreen: React.FC<Props> = ({ navigation }) => {
           Mes réservations
         </Typography>
         <Typography variant="caption" style={{ color: theme.colors.textInverse, opacity: 0.9 }}>
-          {reservations.length} réservation(s) au total
+          {/* 🐛 BUG FIX #67: Show filtered count instead of total unfiltered count */}
+          {filteredReservations.length} réservation(s){filteredReservations.length !== reservations.length && ` (${reservations.length} au total)`}
         </Typography>
       </View>
 
