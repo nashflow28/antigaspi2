@@ -175,9 +175,10 @@ const LoginScreen: React.FC<Props> = ({ navigation }) => {
             size="md"
             fullWidth
             onPress={() => {
+              // 🐛 BUG FIX #39: Use correct merchant password (merchant123)
               const merchantCreds = {
                 email: 'merchant@antigaspi.com',
-                password: 'password'
+                password: 'merchant123'
               }
               setCredentials(merchantCreds)
               handleLogin(merchantCreds)

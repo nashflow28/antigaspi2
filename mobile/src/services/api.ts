@@ -168,6 +168,18 @@ class ApiService {
       (response) => response,
       async (error) => {
         if (error.response?.status === 401) {
+          // 🐛 BUG FIX #40: Distinguish between login failures and expired sessions
+          const requestUrl = error.config?.url || ''
+          const isLoginRequest = requestUrl.includes('/auth/login') || requestUrl.includes('/login')
+          const isRegisterRequest = requestUrl.includes('/auth/register') || requestUrl.includes('/register')
+
+          // If it's a login/register request, let the component handle the error
+          // (incorrect credentials, not an expired session)
+          if (isLoginRequest || isRegisterRequest) {
+            console.log('Login/Register failed - Invalid credentials')
+            return Promise.reject(error)
+          }
+
           // ✅ Token expiré, déconnecter l'utilisateur
           await AsyncStorage.multiRemove(['auth_token', 'user_data'])
 
