@@ -145,12 +145,16 @@ const MerchantSurpriseBasketsScreen: React.FC<Props> = ({ navigation }) => {
       Alert.alert('Erreur', 'Le nom est requis')
       return
     }
-    if (!formData.discounted_price || parseFloat(formData.discounted_price) <= 0) {
-      Alert.alert('Erreur', 'Le prix doit être supérieur à 0')
+
+    const price = parseFloat(formData.discounted_price)
+    if (!formData.discounted_price || isNaN(price) || price <= 0) {
+      Alert.alert('Erreur', 'Le prix doit être un nombre valide supérieur à 0')
       return
     }
-    if (!formData.quantity_available || parseInt(formData.quantity_available) <= 0) {
-      Alert.alert('Erreur', 'La quantité doit être supérieure à 0')
+
+    const quantity = parseInt(formData.quantity_available)
+    if (!formData.quantity_available || isNaN(quantity) || quantity <= 0) {
+      Alert.alert('Erreur', 'La quantité doit être un nombre valide supérieur à 0')
       return
     }
 
@@ -160,8 +164,8 @@ const MerchantSurpriseBasketsScreen: React.FC<Props> = ({ navigation }) => {
       const payload = {
         name: formData.name.trim(),
         description: formData.description.trim(),
-        discounted_price: parseFloat(formData.discounted_price),
-        quantity_available: parseInt(formData.quantity_available),
+        discounted_price: price,
+        quantity_available: quantity,
       }
 
       if (editingBasket) {
@@ -188,7 +192,7 @@ const MerchantSurpriseBasketsScreen: React.FC<Props> = ({ navigation }) => {
   const activeCount = useMemo(() => baskets.filter((b) => b.is_active).length, [baskets])
   const inactiveCount = useMemo(() => baskets.filter((b) => !b.is_active).length, [baskets])
   const totalRevenue = useMemo(
-    () => baskets.reduce((sum, b) => sum + b.discounted_price * b.quantity_available, 0),
+    () => baskets.reduce((sum, b) => sum + (b.discounted_price ?? 0) * (b.quantity_available ?? 0), 0),
     [baskets]
   )
 

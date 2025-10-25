@@ -297,9 +297,9 @@ const MerchantReviewsScreen: React.FC = () => {
         {stats && (
           <View style={styles.statsContainer}>
             <View style={styles.mainStat}>
-              <Text style={styles.mainStatValue}>{stats.average_rating.toFixed(1)}</Text>
+              <Text style={styles.mainStatValue}>{(stats.average_rating ?? 0).toFixed(1)}</Text>
               <View style={styles.starsRow}>
-                {renderStars(Math.round(stats.average_rating))}
+                {renderStars(Math.round(stats.average_rating ?? 0))}
               </View>
               <Text style={styles.mainStatLabel}>{stats.total_reviews} avis</Text>
             </View>

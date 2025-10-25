@@ -98,13 +98,13 @@ const ProductFormScreen: React.FC<Props> = ({ route, navigation }) => {
     const originalPriceNum = parseFloat(originalPrice)
     if (!originalPrice || isNaN(originalPriceNum) || originalPriceNum <= 0) {
       console.error('❌ Prix original invalide:', originalPrice)
-      Alert.alert('Erreur', 'Le prix original doit être supérieur à 0')
+      Alert.alert('Erreur', 'Le prix original doit être un nombre valide supérieur à 0')
       return false
     }
     const discountedPriceNum = parseFloat(discountedPrice)
     if (!discountedPrice || isNaN(discountedPriceNum) || discountedPriceNum <= 0) {
       console.error('❌ Prix réduit invalide:', discountedPrice)
-      Alert.alert('Erreur', 'Le prix réduit doit être supérieur à 0')
+      Alert.alert('Erreur', 'Le prix réduit doit être un nombre valide supérieur à 0')
       return false
     }
     if (discountedPriceNum >= originalPriceNum) {
@@ -112,9 +112,10 @@ const ProductFormScreen: React.FC<Props> = ({ route, navigation }) => {
       Alert.alert('Erreur', 'Le prix réduit doit être inférieur au prix original')
       return false
     }
-    if (!quantity || parseInt(quantity) < 0) {
+    const quantityNum = parseInt(quantity)
+    if (!quantity || isNaN(quantityNum) || quantityNum < 0) {
       console.error('❌ Quantité invalide:', quantity)
-      Alert.alert('Erreur', 'La quantité doit être supérieure ou égale à 0')
+      Alert.alert('Erreur', 'La quantité doit être un nombre valide supérieur ou égal à 0')
       return false
     }
     console.log('✅ Validation réussie !')
@@ -167,7 +168,11 @@ const ProductFormScreen: React.FC<Props> = ({ route, navigation }) => {
       }
 
       console.log('🔙 Navigation retour vers liste produits')
-      navigation.goBack()
+      if (navigation.canGoBack()) {
+        navigation.goBack()
+      } else {
+        navigation.navigate('ProductsList')
+      }
     } catch (error: any) {
       console.error('❌ ERREUR COMPLÈTE:', error)
       console.error('❌ Error response:', error.response)
@@ -205,7 +210,13 @@ const ProductFormScreen: React.FC<Props> = ({ route, navigation }) => {
       {/* Header */}
       <View style={[styles.header, { backgroundColor: theme.colors.primary[500] }]}>
         <View style={styles.headerContent}>
-          <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+          <TouchableOpacity onPress={() => {
+            if (navigation.canGoBack()) {
+              navigation.goBack()
+            } else {
+              navigation.navigate('ProductsList')
+            }
+          }} style={styles.backButton}>
             <Ionicons name="arrow-back" size={24} color="white" />
           </TouchableOpacity>
           <Text style={styles.headerTitle}>
@@ -265,7 +276,16 @@ const ProductFormScreen: React.FC<Props> = ({ route, navigation }) => {
           />
         </View>
 
-        {/* Catégorie - Removed: automatically uses merchant's category */}
+        {/* Catégorie - Automatique */}
+        <View style={styles.section}>
+          <Text style={[styles.label, { color: theme.colors.text }]}>Catégorie</Text>
+          <View style={[styles.categoryInfoBox, { backgroundColor: theme.withOpacity(theme.colors.primary[500], 0.1), borderColor: theme.withOpacity(theme.colors.primary[500], 0.3) }]}>
+            <Ionicons name="information-circle" size={20} color={theme.colors.primary[500]} />
+            <Text style={[styles.categoryInfoText, { color: theme.colors.text }]}>
+              La catégorie est définie automatiquement selon votre type de commerce
+            </Text>
+          </View>
+        </View>
 
         {/* Prix */}
         <View style={styles.row}>
@@ -418,7 +438,19 @@ const styles = StyleSheet.create({
     marginTop: 12,
     fontSize: 14,
   },
-  // categoryContainer, categoryChip, categoryText removed - category is automatic
+  categoryInfoBox: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 12,
+    borderRadius: 8,
+    borderWidth: 1,
+    gap: 10,
+  },
+  categoryInfoText: {
+    flex: 1,
+    fontSize: 14,
+    lineHeight: 20,
+  },
   row: {
     flexDirection: 'row',
     gap: 12,

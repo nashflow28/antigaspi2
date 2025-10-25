@@ -1,7 +1,7 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit'
 import { ReservationsState, Reservation, ReservationCreationPayload, ReservationCreationResponse } from '../../types'
 import apiService from '../../services/api'
-// import offlineService from '../../services/offlineService' // Désactivé temporairement pour le web
+// NOTE: offlineService retiré - Service offline désactivé pour compatibilité web
 
 export const reservationsInitialState: ReservationsState = {
   reservations: [],
@@ -65,22 +65,8 @@ const reservationsSlice = createSlice({
     clearError: (state) => {
       state.error = null
     },
-    addOfflineReservation: (state, action: PayloadAction<Reservation>) => {
-      state.reservations.unshift(action.payload)
-    },
-    markReservationSyncPending: (
-      state,
-      action: PayloadAction<{ id: number; pendingAction: 'create' | 'update' | 'delete' }>
-    ) => {
-      const reservation = state.reservations.find(r => r.id === action.payload.id)
-      if (reservation) {
-        reservation.pendingSync = true
-        reservation.pendingAction = action.payload.pendingAction
-      }
-    },
-    clearPendingReservations: (state) => {
-      state.reservations = state.reservations.filter(reservation => !reservation.pendingSync)
-    },
+    // NOTE: Reducers offline retirés car offlineService désactivé pour compatibilité web
+    // Si mode offline réimplémenté, ajouter: addOfflineReservation, markReservationSyncPending, clearPendingReservations
     updateReservation: (state, action: PayloadAction<Reservation>) => {
       const index = state.reservations.findIndex(r => r.id === action.payload.id)
       if (index !== -1) {
@@ -97,7 +83,14 @@ const reservationsSlice = createSlice({
       })
       .addCase(createReservation.fulfilled, (state, action: PayloadAction<ReservationCreationResponse>) => {
         state.loading = false
-        state.reservations.unshift(action.payload.data)
+        const newReservation = action.payload.data
+        // Éviter les doublons
+        const existingIndex = state.reservations.findIndex(r => r.id === newReservation.id)
+        if (existingIndex === -1) {
+          state.reservations.unshift(newReservation)
+        } else {
+          state.reservations[existingIndex] = newReservation
+        }
         state.error = null
       })
       .addCase(createReservation.rejected, (state, action) => {
@@ -112,11 +105,9 @@ const reservationsSlice = createSlice({
       })
       .addCase(fetchMyReservations.fulfilled, (state, action: PayloadAction<Reservation[]>) => {
         state.loading = false
-        const pendingReservations = state.reservations.filter(reservation => reservation.pendingSync)
-        const remoteReservations = action.payload.filter(reservation =>
-          !pendingReservations.some(pending => pending.id === reservation.id)
-        )
-        state.reservations = [...pendingReservations, ...remoteReservations]
+        // Utiliser les données du serveur comme source de vérité
+        // (pas de logique offline complexe puisque offlineService désactivé)
+        state.reservations = action.payload
         state.error = null
       })
       .addCase(fetchMyReservations.rejected, (state, action) => {
@@ -125,32 +116,52 @@ const reservationsSlice = createSlice({
       })
 
       // Fetch single reservation
+      .addCase(fetchReservation.pending, (state) => {
+        state.loading = true
+        state.error = null
+      })
       .addCase(fetchReservation.fulfilled, (state, action: PayloadAction<Reservation>) => {
+        state.loading = false
         const existingIndex = state.reservations.findIndex(r => r.id === action.payload.id)
         if (existingIndex !== -1) {
           state.reservations[existingIndex] = action.payload
         } else {
           state.reservations.push(action.payload)
         }
+        state.error = null
+      })
+      .addCase(fetchReservation.rejected, (state, action) => {
+        state.loading = false
+        state.error = action.payload as string
       })
 
       // Cancel reservation
+      .addCase(cancelReservation.pending, (state) => {
+        state.loading = true
+        state.error = null
+      })
       .addCase(cancelReservation.fulfilled, (state, action: PayloadAction<Reservation>) => {
+        state.loading = false
         const index = state.reservations.findIndex(r => r.id === action.payload.id)
         if (index !== -1) {
-          state.reservations[index] = action.payload
-          state.reservations[index].pendingSync = false
-          delete state.reservations[index].pendingAction
+          // Utiliser spread operator au lieu de delete pour l'immutabilité Redux
+          state.reservations[index] = {
+            ...action.payload,
+            pendingSync: false,
+            pendingAction: undefined
+          }
         }
+        state.error = null
+      })
+      .addCase(cancelReservation.rejected, (state, action) => {
+        state.loading = false
+        state.error = action.payload as string
       })
   },
 })
 
 export const {
   clearError,
-  addOfflineReservation,
-  markReservationSyncPending,
-  clearPendingReservations,
   updateReservation,
 } = reservationsSlice.actions
 export const reservationsReducer = reservationsSlice.reducer

@@ -31,8 +31,17 @@ interface ProfileFormData {
   city: string
 }
 
+// Type pour FormData React Native (upload fichiers)
+interface FormDataFile {
+  uri: string
+  name: string
+  type: string
+}
+
 const MAX_PHOTO_SIZE_BYTES = 5 * 1024 * 1024
-const PHONE_REGEX = /^\+228 \d{2} \d{2} \d{2} \d{2}$/
+// Support pour tous les pays d'Afrique de l'Ouest: Togo (+228), Bénin (+229), Burkina Faso (+226),
+// Côte d'Ivoire (+225), Mali (+223), Niger (+227), Sénégal (+221)
+const PHONE_REGEX = /^\+(228|229|226|225|223|227|221) \d{2} \d{2} \d{2} \d{2}$/
 
 /**
  * ProfileEditScreen - Consumer profile editing screen
@@ -150,7 +159,7 @@ const ProfileEditScreen: React.FC<ProfileEditScreenProps> = ({ navigation: navig
         uri: asset.uri,
         name: filename,
         type: mimeType,
-      } as any)
+      } as FormDataFile)
 
       const response = await apiService.post<ApiResponse<{ photo_url: string; full_url?: string }>>(
         '/consumers/profile/photo',
@@ -220,7 +229,11 @@ const ProfileEditScreen: React.FC<ProfileEditScreenProps> = ({ navigation: navig
     }
 
     if (sanitizedData.phone && !PHONE_REGEX.test(sanitizedData.phone)) {
-      Alert.alert('Erreur', 'Format de téléphone invalide (+228 12 34 56 78)')
+      Alert.alert(
+        'Erreur',
+        'Format de téléphone invalide. Utilisez le format: +XXX XX XX XX XX\n' +
+        'Indicatifs acceptés: +221 (Sénégal), +223 (Mali), +225 (Côte d\'Ivoire), +226 (Burkina Faso), +227 (Niger), +228 (Togo), +229 (Bénin)'
+      )
       return
     }
 
@@ -424,7 +437,7 @@ const ProfileEditScreen: React.FC<ProfileEditScreenProps> = ({ navigation: navig
               ]}
               value={formData.phone}
               onChangeText={(value) => updateField('phone', value)}
-              placeholder="+228 XX XX XX XX"
+              placeholder="+XXX XX XX XX XX (Afrique de l'Ouest)"
               placeholderTextColor={theme.colors.textSecondary}
               keyboardType="phone-pad"
             />
