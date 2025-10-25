@@ -60,8 +60,8 @@ const ProfileScreen: React.FC = () => {
   const confirmLogout = async () => {
     console.log('🔴 Confirmation déconnexion')
     try {
-      // Nettoyer complètement le cache
-      await AsyncStorage.clear()
+      // Supprimer seulement les données d'authentification (pas les préférences utilisateur)
+      await AsyncStorage.multiRemove(['auth_token', 'user_data', 'cart_data'])
       // Déconnexion
       await dispatch(logoutUser())
       console.log('✅ Déconnexion réussie')

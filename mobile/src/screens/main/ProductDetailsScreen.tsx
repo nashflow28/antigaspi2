@@ -177,6 +177,12 @@ const ProductDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
     // Guard contre les appels multiples simultanés
     if (reserving) return
 
+    // Nettoyer tout timeout de navigation précédent
+    if (navigationTimeoutRef.current) {
+      clearTimeout(navigationTimeoutRef.current)
+      navigationTimeoutRef.current = null
+    }
+
     setReserving(true) // Bloquer immédiatement pour éviter double clic
     try {
       // Préparer la date et l'heure de récupération par défaut (demain à 10h)

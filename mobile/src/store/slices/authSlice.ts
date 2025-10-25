@@ -142,9 +142,12 @@ const authSlice = createSlice({
         state.loading = false
         state.error = null
       })
-      // Conserver la session active si la déconnexion réseau échoue pour éviter
-      // les pertes de contexte utilisateur.
+      // Forcer la déconnexion locale même en cas d'échec API pour la sécurité
       .addCase(logoutUser.rejected, (state, action) => {
+        // Déconnexion locale forcée pour sécurité
+        state.user = null
+        state.token = null
+        state.isAuthenticated = false
         state.loading = false
         state.error = (action.payload as string) ?? null
       })
