@@ -250,7 +250,8 @@ const ProductsScreen: React.FC<Props> = ({ navigation }) => {
           return distanceA - distanceB
         }
 
-        return a.merchant.business_name.localeCompare(b.merchant.business_name)
+        // Protection null/undefined pour éviter les crashes
+        return (a.merchant.business_name ?? '').localeCompare(b.merchant.business_name ?? '')
       })
   }, [
     merchants,
@@ -279,10 +280,10 @@ const ProductsScreen: React.FC<Props> = ({ navigation }) => {
     return source.filter(product => {
       if (!useRemoteProducts && trimmedQuery) {
         const query = trimmedQuery.toLowerCase()
-        const merchantName = product.merchant?.business_name?.toLowerCase?.() ?? ''
-        const merchantCity = product.merchant?.city?.toLowerCase?.() ?? ''
+        const merchantName = product.merchant?.business_name?.toLowerCase() ?? ''
+        const merchantCity = product.merchant?.city?.toLowerCase() ?? ''
         const matchesSearch =
-          product.name?.toLowerCase?.().includes(query) ||
+          product.name?.toLowerCase().includes(query) ||
           merchantName.includes(query) ||
           merchantCity.includes(query)
 
@@ -302,9 +303,8 @@ const ProductsScreen: React.FC<Props> = ({ navigation }) => {
         }
       }
 
-      const availableQuantity = typeof product.quantity_available === 'number'
-        ? product.quantity_available
-        : Number((product as any).quantity_available ?? 0)
+      // Validation simplifiée de la quantité disponible
+      const availableQuantity = Number(product.quantity_available)
 
       if (!Number.isFinite(availableQuantity)) {
         return true
