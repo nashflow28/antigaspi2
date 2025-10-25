@@ -58,6 +58,8 @@ const isPendingAdminApproval = (product: Product): boolean => {
 
 const MerchantProductsScreen: React.FC<Props> = ({ navigation }) => {
   const theme = useTheme()
+  // 🐛 BUG FIX #MOB-L-001: Prevent console logs in production
+  const isDev = __DEV__
   const [products, setProducts] = useState<Product[]>([])
   const [refreshing, setRefreshing] = useState(false)
   const [loading, setLoading] = useState(true)
@@ -73,18 +75,18 @@ const MerchantProductsScreen: React.FC<Props> = ({ navigation }) => {
   const loadProducts = async () => {
     try {
       setLoading(true)
-      console.log('📦 [MerchantProducts] Chargement des produits...')
+      if (isDev) console.log('📦 [MerchantProducts] Chargement des produits...')
       const response = await apiService.get('/products/merchant')
-      console.log('📦 [MerchantProducts] Réponse API complète:', response)
-      console.log('📦 [MerchantProducts] response.data:', response.data)
-      console.log('📦 [MerchantProducts] Nombre de produits:', response.data?.length)
+      if (isDev) console.log('📦 [MerchantProducts] Réponse API complète:', response)
+      if (isDev) console.log('📦 [MerchantProducts] response.data:', response.data)
+      if (isDev) console.log('📦 [MerchantProducts] Nombre de produits:', response.data?.length)
       // ✅ FIX: apiService.get retourne déjà {data: [...], pagination: {...}}
       // donc response.data contient directement l'array de produits
       setProducts(response.data || [])
-      console.log('📦 [MerchantProducts] Produits définis dans le state:', response.data?.length)
+      if (isDev) console.log('📦 [MerchantProducts] Produits définis dans le state:', response.data?.length)
     } catch (error: any) {
-      console.error('❌ [MerchantProducts] Erreur chargement produits:', error)
-      console.error('❌ [MerchantProducts] Error details:', error.response?.data)
+      if (isDev) console.error('❌ [MerchantProducts] Erreur chargement produits:', error)
+      if (isDev) console.error('❌ [MerchantProducts] Error details:', error.response?.data)
     } finally {
       setLoading(false)
       setRefreshing(false)
@@ -115,17 +117,17 @@ const MerchantProductsScreen: React.FC<Props> = ({ navigation }) => {
           style: 'destructive',
           onPress: async () => {
             try {
-              console.log('🗑️ [MerchantProducts] Suppression du produit:', productId)
+              if (isDev) console.log('🗑️ [MerchantProducts] Suppression du produit:', productId)
               setLoading(true)
               await apiService.delete(`/products/${productId}`)
-              console.log('✅ [MerchantProducts] Produit supprimé avec succès')
+              if (isDev) console.log('✅ [MerchantProducts] Produit supprimé avec succès')
 
               // Recharger la liste
               await loadProducts()
 
               Alert.alert('Succès', 'Le produit a été supprimé')
             } catch (error: any) {
-              console.error('❌ [MerchantProducts] Erreur suppression:', error)
+              if (isDev) console.error('❌ [MerchantProducts] Erreur suppression:', error)
               Alert.alert('Erreur', 'Impossible de supprimer le produit')
             } finally {
               setLoading(false)

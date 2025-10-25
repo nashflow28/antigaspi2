@@ -275,6 +275,27 @@ const CartScreen: React.FC<Props> = ({ navigation }) => {
       return
     }
 
+    // 🐛 BUG FIX #MOB-C-003: Validate stock availability before checkout
+    try {
+      // Reload cart to get latest stock information
+      await dispatch(fetchCart()).unwrap()
+    } catch (error) {
+      showError('Impossible de vérifier le stock disponible. Veuillez réessayer.')
+      return
+    }
+
+    // Check all items have sufficient stock
+    const insufficientStockItems = cart.items.filter(item => {
+      const available = item.product?.quantity_available ?? 0
+      return item.quantity > available
+    })
+
+    if (insufficientStockItems.length > 0) {
+      const itemNames = insufficientStockItems.map(i => i.product?.name).join(', ')
+      showError(`Stock insuffisant pour: ${itemNames}. Veuillez mettre à jour votre panier.`)
+      return
+    }
+
     try {
       const response = await dispatch(
         checkoutCart({

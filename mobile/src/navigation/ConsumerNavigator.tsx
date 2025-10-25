@@ -67,6 +67,9 @@ const FavoritesStack = () => (
   </Stack.Navigator>
 )
 
+// 📝 NOTE #MOB-M-001: Tab name is "Orders", first screen is "OrdersMain"
+// When navigating from other stacks, use navigation.navigate('Orders') to switch to this tab
+// This is intentional - tab navigation uses tab names, not screen names
 const OrdersStack = () => (
   <Stack.Navigator screenOptions={{ headerShown: false }}>
     <Stack.Screen name="OrdersMain" component={CartScreen} />

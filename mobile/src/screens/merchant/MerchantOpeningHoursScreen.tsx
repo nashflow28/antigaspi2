@@ -9,6 +9,8 @@ import {
   ActivityIndicator,
   Alert,
   StatusBar,
+  Platform,
+  TextInput,
 } from 'react-native'
 import { Ionicons } from '@expo/vector-icons'
 import { useNavigation } from '@react-navigation/native'
@@ -130,7 +132,18 @@ const MerchantOpeningHoursScreen: React.FC = () => {
     setSchedule(newSchedule)
   }
 
+  // 🐛 BUG FIX #MOB-M-003: Validate HH:MM format for manual time input (web)
+  const validateTimeFormat = (time: string): boolean => {
+    const timeRegex = /^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/
+    return timeRegex.test(time)
+  }
+
   const updateTime = (index: number, field: keyof DaySchedule, value: string) => {
+    // Validate time format before updating
+    if (!validateTimeFormat(value)) {
+      Alert.alert('Format invalide', 'Veuillez entrer l\'heure au format HH:MM (ex: 08:00)')
+      return
+    }
     const newSchedule = [...schedule]
     ;(newSchedule[index] as any)[field] = value
     setSchedule(newSchedule)

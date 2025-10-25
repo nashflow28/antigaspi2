@@ -504,6 +504,11 @@ class ApiService {
     )
   }
 
+  // 🐛 BUG FIX #MOB-C-001: Add missing getFavorites() method called by favoritesSlice
+  async getFavorites(): Promise<ApiResponse<Product[]>> {
+    return this.request<ApiResponse<Product[]>>('GET', '/favorites')
+  }
+
   // === LOYALTY ===
 
   async getLoyaltyPoints(): Promise<ApiResponse<LoyaltyPointsSummary>> {

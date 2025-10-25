@@ -30,6 +30,7 @@ const MerchantReservationsScreen: React.FC = () => {
   const loadReservations = async () => {
     try {
       setLoading(true)
+      // ✅ VERIFIED: Endpoint matches backend route (api.php:132)
       const response = await apiService.get('/reservations/merchant/list')
       setReservations(response.data.data || [])
     } catch (error) {
@@ -193,9 +194,16 @@ const MerchantReservationsScreen: React.FC = () => {
       ? `${item.consumer.first_name} ${item.consumer.last_name}`
       : 'Client inconnu'
     const customerPhone = item.consumer?.phone || ''
-    const totalAmount = (typeof item.total_amount === 'number' && !isNaN(item.total_amount))
-      ? item.total_amount
-      : ((item.quantity ?? 0) * (item.discounted_price ?? 0))
+
+    // 🐛 BUG FIX #MOB-H-002: Protect against NaN in total_amount calculation
+    const totalAmount = (() => {
+      if (typeof item.total_amount === 'number' && !isNaN(item.total_amount)) {
+        return item.total_amount
+      }
+      const price = parseFloat(String(item.discounted_price || 0))
+      const quantity = item.quantity ?? 0
+      return (Number.isFinite(price) && Number.isFinite(quantity)) ? price * quantity : 0
+    })()
 
     return (
       <View style={[styles.reservationCard, { backgroundColor: theme.colors.surface.light }]}>

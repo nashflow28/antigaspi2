@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useCallback, useState } from 'react'
 import {
   View,
   Text,
@@ -15,7 +15,7 @@ import { useTheme } from '../../theme'
 import { useAppDispatch, useAppSelector } from '../../store/hooks'
 import { fetchFavorites, toggleFavorite } from '../../store/slices/favoritesSlice'
 import { Product } from '../../types'
-import { useNavigation } from '@react-navigation/native'
+import { useNavigation, useFocusEffect } from '@react-navigation/native'
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import type { RootStackParamList } from '../../types'
 import { API_BASE_URL } from '../../services/api'
@@ -33,9 +33,13 @@ const FavoritesScreen: React.FC = () => {
   const { favorites, loading, error } = useAppSelector((state) => state.favorites)
   const [refreshing, setRefreshing] = useState(false)
 
-  useEffect(() => {
-    dispatch(fetchFavorites())
-  }, [dispatch])
+  // 🐛 BUG FIX #MOB-M-004: Use useFocusEffect to reload only when screen gains focus
+  // This prevents duplicate calls and ensures fresh data when navigating back
+  useFocusEffect(
+    useCallback(() => {
+      dispatch(fetchFavorites())
+    }, [dispatch])
+  )
 
   const onRefresh = async () => {
     setRefreshing(true)

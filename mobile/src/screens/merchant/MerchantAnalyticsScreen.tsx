@@ -202,7 +202,18 @@ const MerchantAnalyticsScreen: React.FC = () => {
   }
 
   const totalRevenue = revenueData.reduce((sum, d) => sum + (d.revenue || 0), 0)
+  // 🐛 BUG FIX #MOB-M-002: Sum of chart data, not total reservations count
   const totalReservations = reservationsData.reduce((sum, d) => sum + (d.count || 0), 0)
+
+  // Helper to get period label for display
+  const getPeriodLabel = () => {
+    switch (period) {
+      case 'week': return '7 jours'
+      case 'month': return '30 jours'
+      case 'quarter': return '90 jours'
+      default: return ''
+    }
+  }
 
   return (
     <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
@@ -275,7 +286,7 @@ const MerchantAnalyticsScreen: React.FC = () => {
               {totalReservations}
             </Text>
             <Text style={[styles.summaryLabel, { color: theme.colors.textSecondary }]}>
-              Réservations
+              Réservations ({getPeriodLabel()})
             </Text>
           </View>
         </View>

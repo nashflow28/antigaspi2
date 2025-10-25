@@ -24,7 +24,8 @@ import { formatCurrency } from '../../utils/currencyHelpers'
 import FavoriteButton from '../../components/FavoriteButton'
 import StarRating from '../../components/reviews/StarRating'
 import { Button, Card, Typography, Modal } from '../../components/2025'
-import Constants from 'expo-constants'
+// 🐛 BUG FIX #MOB-L-002: Use centralized environment detection
+import { isTestEnv as checkIsTestEnv, isTestMode as checkIsTestMode } from '../../utils/envHelpers'
 import { TEST_IDS } from '../../utils/testIds'
 import { PAYMENT_OPTIONS, PaymentOption } from '../../constants/paymentOptions'
 
@@ -49,10 +50,15 @@ const ProductDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
   const navigationTimeoutRef = useRef<NodeJS.Timeout | null>(null)
   const [confirmVisible, setConfirmVisible] = useState(false)
   const [addingToCart, setAddingToCart] = useState(false)
-  const isTestEnv = process.env.NODE_ENV === 'test'
+  const isTestEnv = checkIsTestEnv()
 
   useEffect(() => {
-    loadProduct()
+    // 🐛 BUG FIX #MOB-H-003: Handle loadProduct errors on mount
+    loadProduct().catch(() => {
+      // Error already shown to user via showError in loadProduct
+      // Navigate back since product couldn't be loaded
+      navigation.goBack()
+    })
   }, [productId])
 
   useEffect(() => {
@@ -77,38 +83,32 @@ const ProductDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
     }
   }, [product?.merchant?.id])
 
+  // 🐛 BUG FIX #MOB-H-003: Throw errors instead of navigation.goBack() to allow proper error handling by callers
   const loadProduct = async () => {
-    try {
-      const existingProduct = products.find(p => p.id === productId)
-      if (existingProduct) {
-        if (!isTestEnv) {
-          console.log('Product found in store:', existingProduct)
-        }
-        setProduct(existingProduct)
-      } else {
-        if (!isTestEnv) {
-          console.log('Fetching product from API:', productId)
-        }
-        const result = await dispatch(fetchProduct(productId))
-        if (fetchProduct.fulfilled.match(result)) {
-          if (!isTestEnv) {
-            console.log('Product fetched successfully:', result.payload)
-          }
-          setProduct(result.payload as Product)
-        } else if (fetchProduct.rejected.match(result)) {
-          if (!isTestEnv) {
-            console.error('Failed to fetch product:', result.error)
-          }
-          showError('Impossible de charger le produit')
-          navigation.goBack()
-        }
-      }
-    } catch (error: any) {
+    const existingProduct = products.find(p => p.id === productId)
+    if (existingProduct) {
       if (!isTestEnv) {
-        console.error('Error loading product:', error)
+        console.log('Product found in store:', existingProduct)
       }
-      showError(`Impossible de charger le produit: ${error.message || 'Erreur inconnue'}`)
-      navigation.goBack()
+      setProduct(existingProduct)
+    } else {
+      if (!isTestEnv) {
+        console.log('Fetching product from API:', productId)
+      }
+      const result = await dispatch(fetchProduct(productId))
+      if (fetchProduct.fulfilled.match(result)) {
+        if (!isTestEnv) {
+          console.log('Product fetched successfully:', result.payload)
+        }
+        setProduct(result.payload as Product)
+      } else if (fetchProduct.rejected.match(result)) {
+        if (!isTestEnv) {
+          console.error('Failed to fetch product:', result.error)
+        }
+        const errorMessage = 'Impossible de charger le produit'
+        showError(errorMessage)
+        throw new Error(errorMessage)
+      }
     }
   }
 
@@ -130,9 +130,7 @@ const ProductDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
     ? Math.round(((originalPrice - discountedPrice) / originalPrice) * 100)
     : 0
 
-  // Type safe access to Expo config
-  const expoConfig = Constants?.expoConfig as { extra?: { testMode?: boolean } } | undefined
-  const isTestMode = Boolean(expoConfig?.extra?.testMode)
+  const isTestMode = checkIsTestMode()
 
   const selectedPayment = PAYMENT_OPTIONS.find(option => option.value === selectedPaymentMethod)
   const totalPrice = discountedPrice * selectedQuantity
@@ -186,16 +184,16 @@ const ProductDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
   }
 
   const performReservation = async () => {
+    // 🐛 BUG FIX #MOB-C-002: Block IMMEDIATELY to prevent race condition
     // Guard contre les appels multiples simultanés
     if (reserving) return
+    setReserving(true) // MOVED HERE - block immediately before any async logic
 
     // Nettoyer tout timeout de navigation précédent
     if (navigationTimeoutRef.current) {
       clearTimeout(navigationTimeoutRef.current)
       navigationTimeoutRef.current = null
     }
-
-    setReserving(true) // Bloquer immédiatement pour éviter double clic
     try {
       // Recharger le produit pour avoir le stock à jour (protection race condition)
       await loadProduct()
