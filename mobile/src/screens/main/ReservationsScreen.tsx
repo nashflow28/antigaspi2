@@ -14,7 +14,7 @@ import { AppDispatch, RootState } from '../../store'
 import {
   fetchMyReservations,
   cancelReservation,
-  markReservationSyncPending,
+  // markReservationSyncPending retiré - reducer offline désactivé (Bug #24)
 } from '../../store/slices/reservationsSlice'
 import { Ionicons } from '@expo/vector-icons'
 import { Image } from 'expo-image'
