@@ -106,7 +106,13 @@ const MerchantOpeningHoursScreen: React.FC = () => {
         Alert.alert('Succès', 'Heures d\'ouverture mises à jour avec succès', [
           {
             text: 'OK',
-            onPress: () => navigation.goBack(),
+            onPress: () => {
+              if (navigation.canGoBack()) {
+                navigation.goBack()
+              } else {
+                (navigation as any).navigate('Dashboard')
+              }
+            },
           },
         ])
       }
@@ -197,7 +203,13 @@ const MerchantOpeningHoursScreen: React.FC = () => {
 
       {/* Header */}
       <View style={[styles.header, { backgroundColor: theme.colors.primary[500] }]}>
-        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+        <TouchableOpacity onPress={() => {
+          if (navigation.canGoBack()) {
+            navigation.goBack()
+          } else {
+            (navigation as any).navigate('Dashboard')
+          }
+        }} style={styles.backButton}>
           <Ionicons name="arrow-back" size={24} color="white" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Heures d'ouverture</Text>

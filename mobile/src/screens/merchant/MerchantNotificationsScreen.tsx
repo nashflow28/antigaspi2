@@ -61,8 +61,11 @@ const MerchantNotificationsScreen: React.FC = () => {
         } else {
           setNotifications((prev) => [...prev, ...newNotifications])
         }
-        setCurrentPage(response.data.meta.current_page)
-        setLastPage(response.data.meta.last_page)
+        const meta = response.data.meta
+        if (meta) {
+          setCurrentPage(meta.current_page ?? 1)
+          setLastPage(meta.last_page ?? 1)
+        }
       }
     } catch (error) {
       console.error('Erreur chargement notifications:', error)
@@ -197,7 +200,13 @@ const MerchantNotificationsScreen: React.FC = () => {
 
       {/* Header */}
       <View style={[styles.header, { backgroundColor: theme.colors.primary[500] }]}>
-        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+        <TouchableOpacity onPress={() => {
+          if (navigation.canGoBack()) {
+            navigation.goBack()
+          } else {
+            (navigation as any).navigate('Dashboard')
+          }
+        }} style={styles.backButton}>
           <Ionicons name="arrow-back" size={24} color="white" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Notifications</Text>

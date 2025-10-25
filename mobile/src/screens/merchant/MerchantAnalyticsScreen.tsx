@@ -108,7 +108,10 @@ const MerchantAnalyticsScreen: React.FC = () => {
             {valueKey === 'revenue' ? formatCurrency(maxValue) : maxValue}
           </Text>
           <Text style={[styles.axisLabel, { color: theme.colors.textSecondary }]}>
-            {valueKey === 'revenue' ? formatCurrency(maxValue / 2) : Math.floor(maxValue / 2)}
+            {maxValue > 0
+              ? (valueKey === 'revenue' ? formatCurrency(maxValue / 2) : Math.floor(maxValue / 2))
+              : (valueKey === 'revenue' ? formatCurrency(0) : 0)
+            }
           </Text>
           <Text style={[styles.axisLabel, { color: theme.colors.textSecondary }]}>0</Text>
         </View>
@@ -135,7 +138,7 @@ const MerchantAnalyticsScreen: React.FC = () => {
                     />
                   </View>
                   <Text style={[styles.xAxisLabel, { color: theme.colors.textSecondary }]}>
-                    {formatDate(point.date)}
+                    {point.date ? formatDate(point.date) : '--'}
                   </Text>
                 </View>
               )
@@ -157,7 +160,7 @@ const MerchantAnalyticsScreen: React.FC = () => {
       )
     }
 
-    const maxValue = Math.max(...data.map(d => d.total_sold))
+    const maxValue = data.length > 0 ? Math.max(...data.map(d => d.total_sold)) : 0
 
     return (
       <View style={styles.barChartContainer}>

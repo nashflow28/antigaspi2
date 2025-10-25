@@ -210,7 +210,13 @@ const ProductFormScreen: React.FC<Props> = ({ route, navigation }) => {
       {/* Header */}
       <View style={[styles.header, { backgroundColor: theme.colors.primary[500] }]}>
         <View style={styles.headerContent}>
-          <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+          <TouchableOpacity onPress={() => {
+            if (navigation.canGoBack()) {
+              navigation.goBack()
+            } else {
+              navigation.navigate('ProductsList')
+            }
+          }} style={styles.backButton}>
             <Ionicons name="arrow-back" size={24} color="white" />
           </TouchableOpacity>
           <Text style={styles.headerTitle}>
