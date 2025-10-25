@@ -170,7 +170,9 @@ class Product extends Model
             return false;
         }
 
-        return $this->expiration_date < now()->toDateString();
+        // Compare Carbon dates properly instead of comparing object with string
+        // Use startOfDay() to ignore time component and only compare dates
+        return $this->expiration_date->startOfDay()->lt(now()->startOfDay());
     }
 
     public function isExpiringSoon($days = 2): bool

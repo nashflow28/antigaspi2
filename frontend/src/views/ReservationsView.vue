@@ -270,7 +270,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, reactive, ref } from 'vue'
+import { computed, onMounted, reactive, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import Button from '@/components/ui/Button.vue'
 import Card from '@/components/ui/Card.vue'
@@ -350,7 +350,9 @@ const monthlyImpact = computed(() => {
   return { food, co2: Math.round(co2), savings }
 })
 
-const filteredReservations = computed(() => {
+// 🐛 BUG FIX #67-WEB: Split filtering and pagination to calculate totalPages correctly
+// First compute the filtered (but not paginated) list
+const filteredReservationsAll = computed(() => {
   let filtered = [...reservations.value]
 
   if (filters.status) {
@@ -391,11 +393,23 @@ const filteredReservations = computed(() => {
     }
   })
 
-  const start = (currentPage.value - 1) * itemsPerPage
-  return filtered.slice(start, start + itemsPerPage)
+  return filtered
 })
 
-const totalPages = computed(() => Math.ceil(reservations.value.length / itemsPerPage))
+// Then apply pagination to the filtered list
+const filteredReservations = computed(() => {
+  const start = (currentPage.value - 1) * itemsPerPage
+  return filteredReservationsAll.value.slice(start, start + itemsPerPage)
+})
+
+// Calculate total pages based on FILTERED count, not total count
+const totalPages = computed(() => Math.ceil(filteredReservationsAll.value.length / itemsPerPage))
+
+// 🐛 BUG FIX #67-WEB: Reset currentPage to 1 when filters or sort changes
+// This prevents being stuck on an empty page after filtering
+watch([() => filters.status, () => filters.period, sortBy], () => {
+  currentPage.value = 1
+})
 
 const visiblePages = computed(() => {
   const pages: number[] = []

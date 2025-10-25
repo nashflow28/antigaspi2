@@ -459,10 +459,19 @@ const reserveBasket = async () => {
 
   submitting.value = true
   try {
+    // 🐛 BUG FIX #65-WEB: Add required pickupDate and pickupTime fields for surprise basket reservations
+    // Default to tomorrow at 10:00 AM to comply with backend validation
+    const tomorrow = new Date()
+    tomorrow.setDate(tomorrow.getDate() + 1)
+    const pickupDate = tomorrow.toISOString().split('T')[0] // Format YYYY-MM-DD
+    const pickupTime = '10:00' // Default time
+
     const response = await reservationsStore.createReservation({
       productId: basket.value.id,
       quantity: quantity.value,
       paymentMethod: paymentMethod.value,
+      pickupDate,
+      pickupTime,
       customerPhone: methodRequiresPhone.value
         ? mobileMoneyPhone.value
         : authStore.user?.phone || undefined,
