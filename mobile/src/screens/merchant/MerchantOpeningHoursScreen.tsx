@@ -142,10 +142,18 @@ const MerchantOpeningHoursScreen: React.FC = () => {
   }
 
   const parseTimeToDate = (timeString: string): Date => {
+    if (!timeString || !/^\d{1,2}:\d{2}$/.test(timeString)) {
+      return new Date()
+    }
     const [hours, minutes] = timeString.split(':')
+    const h = parseInt(hours, 10)
+    const m = parseInt(minutes, 10)
+    if (isNaN(h) || isNaN(m) || h < 0 || h > 23 || m < 0 || m > 59) {
+      return new Date()
+    }
     const date = new Date()
-    date.setHours(parseInt(hours, 10))
-    date.setMinutes(parseInt(minutes, 10))
+    date.setHours(h)
+    date.setMinutes(m)
     return date
   }
 

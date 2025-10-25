@@ -106,7 +106,9 @@ const MerchantDashboardScreen: React.FC = () => {
   }
 
   const formatDate = (dateString: string) => {
+    if (!dateString) return '--'
     const date = new Date(dateString)
+    if (isNaN(date.getTime())) return '--'
     return date.toLocaleDateString('fr-FR', {
       day: '2-digit',
       month: 'short',

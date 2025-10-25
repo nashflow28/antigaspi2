@@ -160,7 +160,7 @@ const MerchantAnalyticsScreen: React.FC = () => {
       )
     }
 
-    const maxValue = data.length > 0 ? Math.max(...data.map(d => d.total_sold)) : 0
+    const maxValue = data.length > 0 ? Math.max(...data.map(d => d.total_sold || 0)) : 0
 
     return (
       <View style={styles.barChartContainer}>

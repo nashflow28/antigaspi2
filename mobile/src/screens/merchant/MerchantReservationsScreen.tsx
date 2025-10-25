@@ -173,7 +173,9 @@ const MerchantReservationsScreen: React.FC = () => {
   }
 
   const formatDate = (dateString: string) => {
+    if (!dateString) return '--'
     const date = new Date(dateString)
+    if (isNaN(date.getTime())) return '--'
     return date.toLocaleDateString('fr-FR', {
       day: '2-digit',
       month: 'long',
@@ -191,7 +193,7 @@ const MerchantReservationsScreen: React.FC = () => {
       ? `${item.consumer.first_name} ${item.consumer.last_name}`
       : 'Client inconnu'
     const customerPhone = item.consumer?.phone || ''
-    const totalAmount = item.total_amount || (item.quantity * item.discounted_price)
+    const totalAmount = item.total_amount ?? ((item.quantity ?? 0) * (item.discounted_price ?? 0))
 
     return (
       <View style={[styles.reservationCard, { backgroundColor: theme.colors.surface.light }]}>

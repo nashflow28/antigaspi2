@@ -117,7 +117,10 @@ const MerchantNotificationsScreen: React.FC = () => {
   }
 
   const formatDate = (dateString: string) => {
+    if (!dateString) return '--'
     const date = new Date(dateString)
+    if (isNaN(date.getTime())) return '--'
+
     const now = new Date()
     const diff = now.getTime() - date.getTime()
     const days = Math.floor(diff / (1000 * 60 * 60 * 24))
