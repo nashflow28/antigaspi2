@@ -1,0 +1,174 @@
+name: Merchant Reservation Management Flow
+tags:
+  - reservations
+  - merchant
+  - critical
+
+---
+# Prerequisites: Login as merchant first
+- runFlow: 01-merchant-auth.yaml
+
+---
+# Test 1: View merchant reservations
+- tapOn:
+    text: "Réservations|Reservations"
+
+- waitForAnimationToEnd
+
+# Should see reservations list or empty state
+- assertVisible:
+    text: "Réservations|En attente|Confirmées|Aucune réservation|No reservations"
+
+---
+# Test 2: Filter reservations by status
+# View pending reservations
+- tapOn:
+    text: "En attente|Pending"
+
+- waitForAnimationToEnd
+
+# Should show only pending reservations
+- assertVisible:
+    text: "En attente|Pending|Aucune|None"
+    timeout: 5000
+
+---
+# Test 3: View reservation details
+- runFlow:
+    when:
+      visible:
+        text: "Pain|Croissant|Banane"
+    commands:
+      # Click on first reservation
+      - tapOn:
+          text: "Pain|Croissant|Banane"
+          index: 0
+
+      - waitForAnimationToEnd
+
+      # Should see reservation details
+      - assertVisible: "Client|Customer"
+      - assertVisible: "Quantité|Quantity"
+      - assertVisible: "Prix total|Total price"
+      - assertVisible: "XOF"
+
+---
+# Test 4: Confirm reservation
+- runFlow:
+    when:
+      visible:
+        text: "Confirmer|Confirm"
+        enabled: true
+    commands:
+      - tapOn:
+          text: "Confirmer|Confirm"
+
+      - waitForAnimationToEnd:
+          timeout: 5000
+
+      # Should see confirmation modal or direct update
+      - tapOn:
+          text: "Oui|Yes|Confirmer"
+          optional: true
+
+      - waitForAnimationToEnd:
+          timeout: 10000
+
+      # Should see success notification
+      - assertVisible:
+          text: "Réservation confirmée|Reservation confirmed|Succès"
+          timeout: 10000
+
+---
+# Test 5: Mark reservation as ready for pickup
+- runFlow:
+    when:
+      visible:
+        text: "Prête|Ready|Prêt à retirer"
+    commands:
+      - tapOn:
+          text: "Prête|Ready|Prêt à retirer"
+
+      - waitForAnimationToEnd:
+          timeout: 5000
+
+      # Should see success notification
+      - assertVisible:
+          text: "Statut mis à jour|Status updated|Prête"
+          timeout: 10000
+          optional: true
+
+---
+# Test 6: Complete reservation (mark as picked up)
+- runFlow:
+    when:
+      visible:
+        text: "Terminée|Complete|Marquer comme retirée"
+    commands:
+      - tapOn:
+          text: "Terminée|Complete|Marquer comme retirée"
+
+      - waitForAnimationToEnd
+
+      # Confirm if needed
+      - tapOn:
+          text: "Confirmer|Oui|Yes"
+          optional: true
+
+      - waitForAnimationToEnd:
+          timeout: 10000
+
+      # Should see success notification
+      - assertVisible:
+          text: "Réservation terminée|Reservation completed|Succès"
+          timeout: 10000
+          optional: true
+
+---
+# Test 7: View completed reservations
+- tapOn:
+    point: "5%,10%"  # Back to list
+    optional: true
+
+- waitForAnimationToEnd
+
+- tapOn:
+    text: "Terminées|Completed"
+
+- waitForAnimationToEnd
+
+# Should show completed reservations
+- assertVisible:
+    text: "Terminée|Completed|Aucune"
+
+---
+# Test 8: Search reservations by customer name
+- tapOn:
+    id: "search-reservations"
+    optional: true
+
+- inputText: "Jean"
+
+- waitForAnimationToEnd
+
+# Should filter results
+- assertVisible:
+    text: "Jean|Aucun résultat|No results"
+
+---
+# Test 9: View reservation statistics
+- tapOn:
+    text: "Statistiques|Stats"
+    optional: true
+
+- waitForAnimationToEnd
+
+# Should see stats
+- runFlow:
+    when:
+      visible: "Statistiques|Stats"
+    commands:
+      - assertVisible:
+          text: "Total|Aujourd'hui|Ce mois"
+          optional: true
+      - assertVisible: "XOF"

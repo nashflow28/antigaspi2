@@ -1,4 +1,3 @@
-appId: host.exp.exponent
 name: Profile and Settings Flow
 tags:
   - profile
@@ -16,8 +15,8 @@ tags:
 - waitForAnimationToEnd
 
 # Should display user info
-- assertVisible: "Jean Dupont"
-- assertVisible: "jean.dupont@email.com"
+- assertVisible: ${CONSUMER_NAME}
+- assertVisible: ${CONSUMER_EMAIL}
 - assertVisible: "Consommateur|Consumer"
 
 ---

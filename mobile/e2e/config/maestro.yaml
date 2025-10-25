@@ -1,20 +1,45 @@
 # Maestro Global Configuration
-appId: com.antigaspi.mobile
+# Use host.exp.exponent for Expo Go (development)
+# Use com.antigaspi.mobile for production builds
+appId: ${APP_ID:-host.exp.exponent}
 
 env:
-  # Test credentials
+  # ===== Test Credentials =====
+  # Admin
   ADMIN_EMAIL: admin@antigaspi.com
   ADMIN_PASSWORD: password
-  TEST_USER_EMAIL: jean.dupont@email.com
-  TEST_USER_PASSWORD: password
+
+  # Consumer
+  CONSUMER_EMAIL: jean.dupont@email.com
+  CONSUMER_PASSWORD: password
+  CONSUMER_NAME: "Jean Dupont"
+
+  # Merchant
   MERCHANT_EMAIL: boulangerie.martin@email.com
   MERCHANT_PASSWORD: password
+  MERCHANT_NAME: "Marie Martin"
+  MERCHANT_BUSINESS: "Boulangerie Martin"
 
-  # API Configuration
+  # ===== API Configuration =====
   API_BASE_URL: http://localhost:8000
+  API_TIMEOUT: 10000
 
-  # Test data
-  TEST_PRODUCT_NAME: "Pain complet artisanal"
+  # ===== Test Data =====
+  # Products
+  TEST_PRODUCT_BREAD: "Pain complet artisanal"
+  TEST_PRODUCT_CROISSANT: "Croissants artisanaux"
+  TEST_PRODUCT_BANANA: "Bananes mûres"
   TEST_PENDING_PRODUCT: "Bananes mûres"
+
+  # Prices (XOF)
+  BREAD_PRICE_ORIGINAL: "500 XOF"
+  BREAD_PRICE_DISCOUNTED: "250 XOF"
+  CROISSANT_PRICE: "100 XOF"
+  BANANA_PRICE: "150 XOF"
+
+  # Categories
+  TEST_CATEGORY_BAKERY: "Boulangerie"
+  TEST_CATEGORY_FRUITS: "Fruits et légumes"
+
+  # Merchants
   TEST_MERCHANT_NAME: "Boulangerie Martin"
-  TEST_CATEGORY_NAME: "Boulangerie"
