@@ -193,7 +193,9 @@ const MerchantReservationsScreen: React.FC = () => {
       ? `${item.consumer.first_name} ${item.consumer.last_name}`
       : 'Client inconnu'
     const customerPhone = item.consumer?.phone || ''
-    const totalAmount = item.total_amount ?? ((item.quantity ?? 0) * (item.discounted_price ?? 0))
+    const totalAmount = (typeof item.total_amount === 'number' && !isNaN(item.total_amount))
+      ? item.total_amount
+      : ((item.quantity ?? 0) * (item.discounted_price ?? 0))
 
     return (
       <View style={[styles.reservationCard, { backgroundColor: theme.colors.surface.light }]}>
