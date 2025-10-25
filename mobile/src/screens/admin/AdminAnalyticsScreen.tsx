@@ -50,8 +50,9 @@ const AdminAnalyticsScreen: React.FC<{ navigation: any }> = ({ navigation }) => 
         filters.end_date = endDate.toISOString().split('T')[0]
       }
 
-      const response = await apiService.getAdminAnalytics(filters)
-      setData(response)
+      // Utiliser .get() au lieu de getAdminAnalytics() qui n'existe peut-être pas
+      const response = await apiService.get('/admin/analytics', { params: filters })
+      setData(response.data)
     } catch (error: any) {
       console.error('❌ Error loading analytics:', error)
       Alert.alert('Erreur', 'Impossible de charger les analytics')

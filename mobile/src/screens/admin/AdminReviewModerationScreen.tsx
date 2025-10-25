@@ -224,7 +224,7 @@ const AdminReviewModerationScreen: React.FC = () => {
               setActionLoadingId(review.id)
               await apiService.post(`/admin/reviews/${review.id}/approve`)
               setPendingReviews(prev => prev.filter(item => item.id !== review.id))
-              loadStats()
+              await loadStats()
               Alert.alert('Succès', 'Avis approuvé')
             } catch (error) {
               console.error('Erreur approbation avis:', error)
@@ -253,7 +253,7 @@ const AdminReviewModerationScreen: React.FC = () => {
               setActionLoadingId(review.id)
               await apiService.post(`/admin/reviews/${review.id}/reject`)
               setPendingReviews(prev => prev.filter(item => item.id !== review.id))
-              loadStats()
+              await loadStats()
               Alert.alert('Succès', 'Avis rejeté et supprimé')
             } catch (error) {
               console.error('Erreur rejet avis:', error)
@@ -280,7 +280,7 @@ const AdminReviewModerationScreen: React.FC = () => {
         setPendingReviews(prev =>
           action === 'remove_review' ? prev.filter(item => item.id !== report.review.id) : prev
         )
-        loadStats()
+        await loadStats()
 
         let message = 'Signalement mis à jour'
         if (action === 'dismiss') {

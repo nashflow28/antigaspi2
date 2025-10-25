@@ -122,7 +122,8 @@ const AdminBroadcastScreen: React.FC = () => {
                 }
               }
 
-              const response = await apiService.sendBroadcastNotification(data)
+              // Utiliser .post() au lieu de sendBroadcastNotification() qui n'existe peut-être pas
+              const response = await apiService.post('/admin/notifications/broadcast', data)
 
               Alert.alert(
                 'Succès',

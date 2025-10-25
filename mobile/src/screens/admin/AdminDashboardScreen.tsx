@@ -13,6 +13,7 @@ import { Ionicons } from '@expo/vector-icons'
 import { useTheme } from '../../theme'
 import apiService from '../../services/api'
 import { Typography, Card } from '../../components/2025'
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack'
 
 interface AdminStats {
   total_users: number
@@ -31,19 +32,14 @@ interface AdminStats {
   }>
 }
 
-const AdminDashboardScreen: React.FC = () => {
+type AdminDashboardScreenProps = {
+  navigation: NativeStackNavigationProp<any>
+}
+
+const AdminDashboardScreen: React.FC<AdminDashboardScreenProps> = ({ navigation }) => {
   const theme = useTheme()
   const isMountedRef = useRef(true)
-  const [stats, setStats] = useState<AdminStats>({
-    total_users: 0,
-    total_merchants: 0,
-    total_products: 0,
-    active_products: 0,
-    total_reservations: 0,
-    total_revenue: 0,
-    pending_merchants: 0,
-    pending_products: 0,
-  })
+  const [stats, setStats] = useState<AdminStats | null>(null)
   const [refreshing, setRefreshing] = useState(false)
   const [loading, setLoading] = useState(true)
 
@@ -62,24 +58,33 @@ const AdminDashboardScreen: React.FC = () => {
         setLoading(true)
       }
 
+      // API endpoint: GET /admin/dashboard
+      // Expected response: { data: AdminStats }
       const response = await apiService.get('/admin/dashboard')
 
-      if (isMountedRef.current) {
-        setStats(
-          response.data || {
-            total_users: 0,
-            total_merchants: 0,
-            total_products: 0,
-            active_products: 0,
-            total_reservations: 0,
-            total_revenue: 0,
-            pending_merchants: 0,
-            pending_products: 0,
-          }
-        )
+      if (isMountedRef.current && response.data) {
+        setStats(response.data)
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Erreur chargement stats admin:', error)
+
+      // Gestion des erreurs d'autorisation
+      if (error.response?.status === 401 || error.response?.status === 403) {
+        if (isMountedRef.current) {
+          Alert.alert(
+            'Session expirée',
+            'Votre session a expiré. Veuillez vous reconnecter.',
+            [
+              {
+                text: 'OK',
+                onPress: () => navigation.replace('Login'),
+              },
+            ]
+          )
+        }
+        return
+      }
+
       if (isMountedRef.current) {
         Alert.alert('Erreur', 'Impossible de charger les statistiques')
       }
@@ -148,7 +153,7 @@ const AdminDashboardScreen: React.FC = () => {
         }
       >
         {/* Alertes */}
-        {((stats.pending_merchants ?? 0) > 0 || (stats.pending_products ?? 0) > 0) && (
+        {stats && ((stats.pending_merchants ?? 0) > 0 || (stats.pending_products ?? 0) > 0) && (
           <View style={styles.section}>
             <Card
               variant="elevated"
@@ -162,12 +167,12 @@ const AdminDashboardScreen: React.FC = () => {
                   </Typography>
                   {(stats.pending_merchants ?? 0) > 0 && (
                     <Typography variant="body" color="secondary">
-                      • {stats.pending_merchants} commerçant{stats.pending_merchants! > 1 ? 's' : ''} à valider
+                      • {stats.pending_merchants} commerçant{(stats.pending_merchants ?? 0) > 1 ? 's' : ''} à valider
                     </Typography>
                   )}
                   {(stats.pending_products ?? 0) > 0 && (
                     <Typography variant="body" color="secondary">
-                      • {stats.pending_products} produit{stats.pending_products! > 1 ? 's' : ''} à modérer
+                      • {stats.pending_products} produit{(stats.pending_products ?? 0) > 1 ? 's' : ''} à modérer
                     </Typography>
                   )}
                 </View>
@@ -194,7 +199,7 @@ const AdminDashboardScreen: React.FC = () => {
                 <Ionicons name="people" size={28} color={theme.colors.primary[500]} />
               </View>
               <Typography variant="h2" weight="bold" style={{ marginTop: 12 }}>
-                {stats.total_users.toLocaleString()}
+                {(stats?.total_users ?? 0).toLocaleString()}
               </Typography>
               <Typography variant="caption" color="secondary">
                 Utilisateurs
@@ -212,7 +217,7 @@ const AdminDashboardScreen: React.FC = () => {
                 <Ionicons name="storefront" size={28} color={theme.colors.success[500]} />
               </View>
               <Typography variant="h2" weight="bold" style={{ marginTop: 12 }}>
-                {stats.total_merchants.toLocaleString()}
+                {(stats?.total_merchants ?? 0).toLocaleString()}
               </Typography>
               <Typography variant="caption" color="secondary">
                 Commerçants
@@ -230,7 +235,7 @@ const AdminDashboardScreen: React.FC = () => {
                 <Ionicons name="cube" size={28} color={theme.colors.warning[500]} />
               </View>
               <Typography variant="h2" weight="bold" style={{ marginTop: 12 }}>
-                {stats.total_products.toLocaleString()}
+                {(stats?.total_products ?? 0).toLocaleString()}
               </Typography>
               <Typography variant="caption" color="secondary">
                 Produits
@@ -239,7 +244,7 @@ const AdminDashboardScreen: React.FC = () => {
                 variant="caption"
                 style={{ color: theme.colors.success[500], marginTop: 4 }}
               >
-                {stats.active_products} actifs
+                {stats?.active_products ?? 0} actifs
               </Typography>
             </Card>
 
@@ -254,7 +259,7 @@ const AdminDashboardScreen: React.FC = () => {
                 <Ionicons name="receipt" size={28} color={theme.colors.error[500]} />
               </View>
               <Typography variant="h2" weight="bold" style={{ marginTop: 12 }}>
-                {stats.total_reservations.toLocaleString()}
+                {(stats?.total_reservations ?? 0).toLocaleString()}
               </Typography>
               <Typography variant="caption" color="secondary">
                 Réservations
@@ -276,7 +281,7 @@ const AdminDashboardScreen: React.FC = () => {
               </Typography>
             </View>
             <Typography variant="h1" weight="bold" style={{ color: 'white' }}>
-              {stats.total_revenue.toLocaleString()} XOF
+              {(stats?.total_revenue ?? 0).toLocaleString()} XOF
             </Typography>
           </Card>
         </View>
@@ -288,7 +293,11 @@ const AdminDashboardScreen: React.FC = () => {
           </Typography>
 
           <View style={styles.actionsGrid}>
-            <TouchableOpacity activeOpacity={0.7}>
+            <TouchableOpacity
+              activeOpacity={0.7}
+              onPress={() => navigation.navigate('Users')}
+              testID="action-users-button"
+            >
               <Card variant="elevated" style={styles.actionCard}>
                 <Ionicons name="people-outline" size={32} color={theme.colors.primary[500]} />
                 <Typography
@@ -301,7 +310,11 @@ const AdminDashboardScreen: React.FC = () => {
               </Card>
             </TouchableOpacity>
 
-            <TouchableOpacity activeOpacity={0.7}>
+            <TouchableOpacity
+              activeOpacity={0.7}
+              onPress={() => navigation.navigate('Products')}
+              testID="action-products-button"
+            >
               <Card variant="elevated" style={styles.actionCard}>
                 <Ionicons name="cube-outline" size={32} color={theme.colors.primary[500]} />
                 <Typography
@@ -314,7 +327,11 @@ const AdminDashboardScreen: React.FC = () => {
               </Card>
             </TouchableOpacity>
 
-            <TouchableOpacity activeOpacity={0.7}>
+            <TouchableOpacity
+              activeOpacity={0.7}
+              onPress={() => navigation.navigate('Merchants')}
+              testID="action-merchants-button"
+            >
               <Card variant="elevated" style={styles.actionCard}>
                 <Ionicons name="storefront-outline" size={32} color={theme.colors.primary[500]} />
                 <Typography
@@ -327,7 +344,11 @@ const AdminDashboardScreen: React.FC = () => {
               </Card>
             </TouchableOpacity>
 
-            <TouchableOpacity activeOpacity={0.7}>
+            <TouchableOpacity
+              activeOpacity={0.7}
+              onPress={() => navigation.navigate('Categories')}
+              testID="action-categories-button"
+            >
               <Card variant="elevated" style={styles.actionCard}>
                 <Ionicons name="grid-outline" size={32} color={theme.colors.primary[500]} />
                 <Typography
