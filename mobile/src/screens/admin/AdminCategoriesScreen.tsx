@@ -117,8 +117,6 @@ const AdminCategoriesScreen: React.FC = () => {
                 'Erreur',
                 error.response?.data?.message || 'Impossible de supprimer la catégorie'
               )
-            } finally {
-              setLoading(false)
             }
           },
         },

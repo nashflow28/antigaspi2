@@ -127,7 +127,7 @@ const AdminBroadcastScreen: React.FC = () => {
 
               Alert.alert(
                 'Succès',
-                `Notification envoyée à ${response.sent_count} utilisateur(s)`,
+                `Notification envoyée à ${response.data?.sent_count || 0} utilisateur(s)`,
                 [
                   {
                     text: 'OK',

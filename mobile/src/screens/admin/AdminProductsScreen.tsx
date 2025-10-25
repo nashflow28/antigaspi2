@@ -288,19 +288,26 @@ const AdminProductsScreen: React.FC = () => {
           text: 'Supprimer',
           style: 'destructive',
           onPress: async () => {
+            // Backup de l'état précédent pour rollback en cas d'erreur
+            const previousProducts = [...products]
+
             try {
               // Ajouter l'ID au Set de loading
               setActionLoadingIds(prev => new Set(prev).add(product.id))
 
-              await apiService.delete(`/products/${product.id}`)
-
-              // Retirer localement
+              // Mise à jour optimiste (retirer localement AVANT l'appel API)
               setProducts(prev => prev.filter(p => p.id !== product.id))
+
+              await apiService.delete(`/products/${product.id}`)
 
               setShowDetailModal(false)
               Alert.alert('Succès', 'Produit supprimé définitivement')
             } catch (error) {
               console.error('Erreur suppression:', error)
+
+              // Rollback en cas d'erreur
+              setProducts(previousProducts)
+
               Alert.alert('Erreur', 'Impossible de supprimer le produit')
             } finally {
               // Retirer l'ID du Set

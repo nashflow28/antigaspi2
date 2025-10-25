@@ -153,8 +153,18 @@ const AdminReviewModerationScreen: React.FC = () => {
         setStats(data.stats)
         setReportReasons(data.report_reasons || {})
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Erreur chargement statistiques avis:', error)
+
+      // Gestion des erreurs d'autorisation
+      if (error.response?.status === 401 || error.response?.status === 403) {
+        Alert.alert(
+          'Session expirée',
+          'Votre session a expiré. Veuillez vous reconnecter.'
+        )
+        return
+      }
+
       Alert.alert('Erreur', 'Impossible de charger les statistiques de modération')
     }
   }, [])
@@ -166,8 +176,18 @@ const AdminReviewModerationScreen: React.FC = () => {
       })
       const reviews = response.data?.data || []
       setPendingReviews(reviews)
-    } catch (error) {
+    } catch (error: any) {
       console.error('Erreur chargement avis en attente:', error)
+
+      // Gestion des erreurs d'autorisation
+      if (error.response?.status === 401 || error.response?.status === 403) {
+        Alert.alert(
+          'Session expirée',
+          'Votre session a expiré. Veuillez vous reconnecter.'
+        )
+        return
+      }
+
       Alert.alert('Erreur', 'Impossible de charger les avis en attente')
     }
   }, [])
@@ -191,8 +211,18 @@ const AdminReviewModerationScreen: React.FC = () => {
       const reports = response.data?.data || []
       setReportedReviews(reports)
       setHasLoadedReports(true)
-    } catch (error) {
+    } catch (error: any) {
       console.error('Erreur chargement signalements:', error)
+
+      // Gestion des erreurs d'autorisation
+      if (error.response?.status === 401 || error.response?.status === 403) {
+        Alert.alert(
+          'Session expirée',
+          'Votre session a expiré. Veuillez vous reconnecter.'
+        )
+        return
+      }
+
       Alert.alert('Erreur', 'Impossible de charger les signalements')
     } finally {
       setListLoading(false)

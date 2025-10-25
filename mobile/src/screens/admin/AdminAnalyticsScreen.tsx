@@ -55,6 +55,16 @@ const AdminAnalyticsScreen: React.FC<{ navigation: any }> = ({ navigation }) => 
       setData(response.data)
     } catch (error: any) {
       console.error('❌ Error loading analytics:', error)
+
+      // Gestion des erreurs d'autorisation
+      if (error.response?.status === 401 || error.response?.status === 403) {
+        Alert.alert(
+          'Session expirée',
+          'Votre session a expiré. Veuillez vous reconnecter.'
+        )
+        return
+      }
+
       Alert.alert('Erreur', 'Impossible de charger les analytics')
     } finally {
       setLoading(false)
