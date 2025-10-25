@@ -93,6 +93,20 @@ const ProductsScreen: React.FC<Props> = ({ navigation }) => {
       ? normalizedQuantity
       : 1
 
+    // Mapper expiration_date et calculer days_until_expiration
+    const expirationDate = attributes.expiration_date ?? new Date().toISOString()
+    const daysUntilExpiration = attributes.expiration_date
+      ? Math.ceil((new Date(attributes.expiration_date).getTime() - Date.now()) / (1000 * 60 * 60 * 24))
+      : 0
+
+    // Mapper la catégorie depuis les attributs
+    const categoryAttributes = attributes.category ?? {}
+    const category = {
+      id: categoryAttributes.id ?? 0,
+      name: categoryAttributes.name ?? 'Autres',
+      description: categoryAttributes.description ?? '',
+    }
+
     return {
       id: result.id,
       name: attributes.name ?? 'Produit',
@@ -100,27 +114,27 @@ const ProductsScreen: React.FC<Props> = ({ navigation }) => {
       original_price: String(safeOriginal),
       discounted_price: String(safeDiscounted),
       quantity_available: safeQuantity,
-      expiration_date: new Date().toISOString(),
+      expiration_date: expirationDate,
       image_url: typeof attributes.image_url === 'string' ? attributes.image_url : undefined,
       discount_percentage: discountPercentage,
       savings: Math.max(0, safeOriginal - safeDiscounted),
-      days_until_expiration: 0,
-      category: { id: 0, name: 'Autres', description: '' },
+      days_until_expiration: Math.max(0, daysUntilExpiration),
+      category,
       merchant: {
         id: merchantAttributes.id ?? 0,
         business_name: merchantAttributes.business_name ?? 'Commerçant',
         business_type: merchantAttributes.business_type ?? '',
         city: merchantAttributes.city ?? '',
         address: merchantAttributes.address ?? '',
-        phone: '',
-        is_verified: false,
-        latitude: null,
-        longitude: null,
+        phone: merchantAttributes.phone ?? '',
+        is_verified: merchantAttributes.is_verified ?? false,
+        latitude: merchantAttributes.latitude ?? null,
+        longitude: merchantAttributes.longitude ?? null,
       },
-      created_at: new Date().toISOString(),
-      is_active: true,
-      status: undefined,
-      needs_approval: undefined,
+      created_at: attributes.created_at ?? new Date().toISOString(),
+      is_active: attributes.is_active ?? true,
+      status: attributes.status ?? undefined,
+      needs_approval: attributes.needs_approval ?? undefined,
     }
   }, [products])
 
@@ -236,7 +250,8 @@ const ProductsScreen: React.FC<Props> = ({ navigation }) => {
           return distanceA - distanceB
         }
 
-        return a.merchant.business_name.localeCompare(b.merchant.business_name)
+        // Protection null/undefined pour éviter les crashes
+        return (a.merchant.business_name ?? '').localeCompare(b.merchant.business_name ?? '')
       })
   }, [
     merchants,
@@ -265,10 +280,10 @@ const ProductsScreen: React.FC<Props> = ({ navigation }) => {
     return source.filter(product => {
       if (!useRemoteProducts && trimmedQuery) {
         const query = trimmedQuery.toLowerCase()
-        const merchantName = product.merchant?.business_name?.toLowerCase?.() ?? ''
-        const merchantCity = product.merchant?.city?.toLowerCase?.() ?? ''
+        const merchantName = product.merchant?.business_name?.toLowerCase() ?? ''
+        const merchantCity = product.merchant?.city?.toLowerCase() ?? ''
         const matchesSearch =
-          product.name?.toLowerCase?.().includes(query) ||
+          product.name?.toLowerCase().includes(query) ||
           merchantName.includes(query) ||
           merchantCity.includes(query)
 
@@ -288,9 +303,8 @@ const ProductsScreen: React.FC<Props> = ({ navigation }) => {
         }
       }
 
-      const availableQuantity = typeof product.quantity_available === 'number'
-        ? product.quantity_available
-        : Number((product as any).quantity_available ?? 0)
+      // Validation simplifiée de la quantité disponible
+      const availableQuantity = Number(product.quantity_available)
 
       if (!Number.isFinite(availableQuantity)) {
         return true
@@ -370,6 +384,8 @@ const ProductsScreen: React.FC<Props> = ({ navigation }) => {
     if (contentMode !== 'merchants' && viewMode !== 'list') {
       setViewMode('list')
     }
+  }, [contentMode, viewMode])
+
   // BUG FIX #23: Reset user location after logout to prevent stale location data
   useEffect(() => {
     if (!isAuthenticated && userLocation !== null) {
@@ -378,8 +394,6 @@ const ProductsScreen: React.FC<Props> = ({ navigation }) => {
       setDistanceEnabled(false)
     }
   }, [isAuthenticated, userLocation])
-
-  }, [contentMode, viewMode])
 
   const loadData = async (force = false) => {
     try {
@@ -878,7 +892,11 @@ const ProductsScreen: React.FC<Props> = ({ navigation }) => {
         <Ionicons name="search" size={20} color={theme.colors.textSecondary} />
         <TextInput
           style={styles.searchInput}
-          placeholder="Boutique, ville, type"
+          placeholder={
+            contentMode === 'merchants'
+              ? "Boutique, ville, type"
+              : "Produit, boutique, ville"
+          }
           placeholderTextColor={theme.colors.textTertiary}
           value={searchQuery}
           onChangeText={setSearchQuery}
