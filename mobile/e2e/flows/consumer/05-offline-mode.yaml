@@ -1,4 +1,3 @@
-appId: host.exp.exponent
 name: Offline Mode and Sync Flow
 tags:
   - offline
@@ -20,7 +19,7 @@ tags:
 - waitForAnimationToEnd
 
 # Create a reservation
-- tapOn: "Pain complet artisanal"
+- tapOn: ${TEST_PRODUCT_BREAD}
 
 - waitForAnimationToEnd
 
@@ -48,7 +47,7 @@ tags:
 - waitForAnimationToEnd
 
 # Should see reservation with sync pending indicator
-- assertVisible: "Pain complet artisanal"
+- assertVisible: ${TEST_PRODUCT_BREAD}
 - assertVisible:
     text: "En attente de synchronisation|Pending sync|⏳"
     optional: true
