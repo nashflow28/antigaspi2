@@ -289,7 +289,9 @@ const AdminProductsScreen: React.FC = () => {
           style: 'destructive',
           onPress: async () => {
             try {
-              setActionLoading(true)
+              // Ajouter l'ID au Set de loading
+              setActionLoadingIds(prev => new Set(prev).add(product.id))
+
               await apiService.delete(`/products/${product.id}`)
 
               // Retirer localement
@@ -301,7 +303,12 @@ const AdminProductsScreen: React.FC = () => {
               console.error('Erreur suppression:', error)
               Alert.alert('Erreur', 'Impossible de supprimer le produit')
             } finally {
-              setActionLoading(false)
+              // Retirer l'ID du Set
+              setActionLoadingIds(prev => {
+                const newSet = new Set(prev)
+                newSet.delete(product.id)
+                return newSet
+              })
             }
           },
         },
@@ -582,7 +589,7 @@ const AdminProductsScreen: React.FC = () => {
                     onPress={() => handleApproveProduct(selectedProduct)}
                     leftIcon={<Ionicons name="checkmark-circle" size={20} color="white" />}
                     style={{ marginBottom: 12 }}
-                    disabled={actionLoading}
+                    disabled={actionLoadingIds.has(selectedProduct.id)}
                   >
                     Approuver le produit
                   </Button>
@@ -593,7 +600,7 @@ const AdminProductsScreen: React.FC = () => {
                     onPress={() => handleRejectProduct(selectedProduct)}
                     leftIcon={<Ionicons name="close-circle" size={20} color="white" />}
                     style={{ marginBottom: 12 }}
-                    disabled={actionLoading}
+                    disabled={actionLoadingIds.has(selectedProduct.id)}
                   >
                     Rejeter le produit
                   </Button>
@@ -612,7 +619,7 @@ const AdminProductsScreen: React.FC = () => {
                   />
                 }
                 style={{ marginBottom: 12 }}
-                disabled={actionLoading}
+                disabled={actionLoadingIds.has(selectedProduct.id)}
               >
                 {selectedProduct.is_active ? 'Désactiver' : 'Activer'}
               </Button>
@@ -622,7 +629,7 @@ const AdminProductsScreen: React.FC = () => {
                 size="lg"
                 onPress={() => handleDeleteProduct(selectedProduct)}
                 leftIcon={<Ionicons name="trash" size={20} color="white" />}
-                disabled={actionLoading}
+                disabled={actionLoadingIds.has(selectedProduct.id)}
               >
                 Supprimer définitivement
               </Button>
@@ -631,7 +638,7 @@ const AdminProductsScreen: React.FC = () => {
             <View style={{ height: 40 }} />
           </ScrollView>
 
-          {actionLoading && (
+          {actionLoadingIds.size > 0 && (
             <View style={styles.loadingOverlay}>
               <ActivityIndicator size="large" color={theme.colors.primary[500]} />
             </View>

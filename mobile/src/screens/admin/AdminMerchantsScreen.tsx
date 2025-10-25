@@ -53,7 +53,8 @@ const AdminMerchantsScreen: React.FC = () => {
   const [statusFilter, setStatusFilter] = useState<MerchantStatus>('all')
   const [selectedMerchant, setSelectedMerchant] = useState<MerchantWithStats | null>(null)
   const [showDetailModal, setShowDetailModal] = useState(false)
-  const [actionLoading, setActionLoading] = useState(false)
+  // Utiliser un Set d'IDs au lieu d'un boolean pour éviter les race conditions
+  const [actionLoadingIds, setActionLoadingIds] = useState<Set<number>>(new Set())
   // Modal de rejet (remplacement de Alert.prompt qui n'existe pas sur Android)
   const [showRejectModal, setShowRejectModal] = useState(false)
   const [rejectReason, setRejectReason] = useState('')
@@ -145,7 +146,8 @@ const AdminMerchantsScreen: React.FC = () => {
             const previousMerchants = [...merchants]
 
             try {
-              setActionLoading(true)
+              // Ajouter l'ID au Set de loading
+              setActionLoadingIds(prev => new Set(prev).add(merchant.id))
 
               // Mise à jour optimiste
               setMerchants(prev =>
@@ -164,7 +166,12 @@ const AdminMerchantsScreen: React.FC = () => {
 
               Alert.alert('Erreur', "Impossible d'approuver le commerçant")
             } finally {
-              setActionLoading(false)
+              // Retirer l'ID du Set
+              setActionLoadingIds(prev => {
+                const newSet = new Set(prev)
+                newSet.delete(merchant.id)
+                return newSet
+              })
             }
           },
         },
@@ -191,7 +198,8 @@ const AdminMerchantsScreen: React.FC = () => {
     const previousMerchants = [...merchants]
 
     try {
-      setActionLoading(true)
+      // Ajouter l'ID au Set de loading
+      setActionLoadingIds(prev => new Set(prev).add(selectedMerchant.id))
 
       // Mise à jour optimiste
       setMerchants(prev =>
@@ -214,7 +222,12 @@ const AdminMerchantsScreen: React.FC = () => {
 
       Alert.alert('Erreur', 'Impossible de rejeter le commerçant')
     } finally {
-      setActionLoading(false)
+      // Retirer l'ID du Set
+      setActionLoadingIds(prev => {
+        const newSet = new Set(prev)
+        newSet.delete(selectedMerchant.id)
+        return newSet
+      })
     }
   }
 
@@ -377,19 +390,19 @@ const AdminMerchantsScreen: React.FC = () => {
                   <Button
                     variant="primary"
                     onPress={() => handleApproveMerchant(selectedMerchant)}
-                    disabled={actionLoading}
+                    disabled={actionLoadingIds.has(selectedMerchant.id)}
                     style={{ marginBottom: 12 }}
                     leftIcon={
                       <Ionicons name="checkmark-circle" size={20} color="#FFFFFF" />
                     }
                   >
-                    {actionLoading ? 'Chargement...' : 'Approuver le commerçant'}
+                    {actionLoadingIds.has(selectedMerchant.id) ? 'Chargement...' : 'Approuver le commerçant'}
                   </Button>
                 )}
                 <Button
                   variant="destructive"
                   onPress={() => handleRejectMerchant(selectedMerchant)}
-                  disabled={actionLoading}
+                  disabled={actionLoadingIds.has(selectedMerchant.id)}
                   leftIcon={<Ionicons name="close-circle" size={20} color="#FFFFFF" />}
                 >
                   Rejeter / Suspendre
@@ -463,7 +476,7 @@ const AdminMerchantsScreen: React.FC = () => {
                     setShowRejectModal(false)
                     setRejectReason('')
                   }}
-                  disabled={actionLoading}
+                  disabled={selectedMerchant ? actionLoadingIds.has(selectedMerchant.id) : false}
                   style={{ flex: 1 }}
                 >
                   Annuler
@@ -472,17 +485,17 @@ const AdminMerchantsScreen: React.FC = () => {
                 <Button
                   variant="destructive"
                   onPress={confirmRejectMerchant}
-                  disabled={actionLoading || rejectReason.trim().length < 10}
+                  disabled={(selectedMerchant ? actionLoadingIds.has(selectedMerchant.id) : false) || rejectReason.trim().length < 10}
                   style={{ flex: 1 }}
                   leftIcon={
-                    actionLoading ? (
+                    (selectedMerchant && actionLoadingIds.has(selectedMerchant.id)) ? (
                       <ActivityIndicator size="small" color="#FFFFFF" />
                     ) : (
                       <Ionicons name="close-circle" size={20} color="#FFFFFF" />
                     )
                   }
                 >
-                  {actionLoading ? 'Rejet...' : 'Rejeter'}
+                  {(selectedMerchant && actionLoadingIds.has(selectedMerchant.id)) ? 'Rejet...' : 'Rejeter'}
                 </Button>
               </View>
             </View>
