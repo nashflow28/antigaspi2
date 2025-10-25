@@ -42,15 +42,17 @@ const buildProductsCacheKey = (filters?: ProductFilters): string => {
 const safeSetCache = async <T>(key: string, value: T): Promise<void> => {
   try {
     await offlineService.setCache(key, value)
-  } catch {
-    // Ignorer les erreurs de cache offline
+  } catch (error) {
+    console.warn('[Cache] Failed to set cache:', key, error)
+    // Continuer malgré l'erreur de cache
   }
 }
 
 const safeGetCache = async <T>(key: string): Promise<T | null> => {
   try {
     return await offlineService.getCache<T>(key)
-  } catch {
+  } catch (error) {
+    console.warn('[Cache] Failed to get cache:', key, error)
     return null
   }
 }
@@ -89,9 +91,13 @@ const mergeProductLists = (existing: Product[] = [], incoming: Product[] = []): 
 
 const persistProductsList = async (cacheKey: string, products: Product[]): Promise<void> => {
   await safeSetCache(cacheKey, products)
-  await Promise.allSettled(
+  const results = await Promise.allSettled(
     products.map(product => offlineService.setCache(productCacheKey(product.id), product))
   )
+  const failures = results.filter(r => r.status === 'rejected')
+  if (failures.length > 0) {
+    console.warn(`[Cache] Failed to cache ${failures.length}/${products.length} products`)
+  }
 }
 
 const persistProduct = async (product: Product): Promise<void> => {

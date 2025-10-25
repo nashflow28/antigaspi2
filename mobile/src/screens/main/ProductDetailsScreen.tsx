@@ -125,7 +125,10 @@ const ProductDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
 
   const discountedPrice = Math.round(parseFloat(product.discounted_price) || 0)
   const originalPrice = Math.round(parseFloat(product.original_price) || 0)
-  const discountPercent = Math.round(((originalPrice - discountedPrice) / originalPrice) * 100)
+  // Protection contre division par zéro
+  const discountPercent = originalPrice > 0
+    ? Math.round(((originalPrice - discountedPrice) / originalPrice) * 100)
+    : 0
 
   const isTestMode = Boolean((Constants?.expoConfig as any)?.extra?.testMode)
 
@@ -136,6 +139,13 @@ const ProductDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
 
   const handleAddToCart = async () => {
     if (!product || addingToCart || product.quantity_available === 0) {
+      return
+    }
+
+    // Validation: Vérifier que la quantité sélectionnée est disponible
+    if (selectedQuantity > product.quantity_available) {
+      showError(`Seulement ${product.quantity_available} unité(s) disponible(s)`)
+      setSelectedQuantity(Math.min(selectedQuantity, product.quantity_available))
       return
     }
 
@@ -185,6 +195,17 @@ const ProductDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
 
     setReserving(true) // Bloquer immédiatement pour éviter double clic
     try {
+      // Recharger le produit pour avoir le stock à jour (protection race condition)
+      await loadProduct()
+
+      // Re-vérifier que la quantité est toujours disponible
+      if (selectedQuantity > product.quantity_available) {
+        showError(`Stock insuffisant. Seulement ${product.quantity_available} unité(s) disponible(s)`)
+        setSelectedQuantity(Math.min(selectedQuantity, product.quantity_available))
+        setReserving(false)
+        return
+      }
+
       // Préparer la date et l'heure de récupération par défaut (demain à 10h)
       const tomorrow = new Date()
       tomorrow.setDate(tomorrow.getDate() + 1)

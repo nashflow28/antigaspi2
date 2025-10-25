@@ -65,22 +65,8 @@ const reservationsSlice = createSlice({
     clearError: (state) => {
       state.error = null
     },
-    addOfflineReservation: (state, action: PayloadAction<Reservation>) => {
-      state.reservations.unshift(action.payload)
-    },
-    markReservationSyncPending: (
-      state,
-      action: PayloadAction<{ id: number; pendingAction: 'create' | 'update' | 'delete' }>
-    ) => {
-      const reservation = state.reservations.find(r => r.id === action.payload.id)
-      if (reservation) {
-        reservation.pendingSync = true
-        reservation.pendingAction = action.payload.pendingAction
-      }
-    },
-    clearPendingReservations: (state) => {
-      state.reservations = state.reservations.filter(reservation => !reservation.pendingSync)
-    },
+    // NOTE: Reducers offline retirés car offlineService désactivé pour compatibilité web
+    // Si mode offline réimplémenté, ajouter: addOfflineReservation, markReservationSyncPending, clearPendingReservations
     updateReservation: (state, action: PayloadAction<Reservation>) => {
       const index = state.reservations.findIndex(r => r.id === action.payload.id)
       if (index !== -1) {
@@ -97,7 +83,14 @@ const reservationsSlice = createSlice({
       })
       .addCase(createReservation.fulfilled, (state, action: PayloadAction<ReservationCreationResponse>) => {
         state.loading = false
-        state.reservations.unshift(action.payload.data)
+        const newReservation = action.payload.data
+        // Éviter les doublons
+        const existingIndex = state.reservations.findIndex(r => r.id === newReservation.id)
+        if (existingIndex === -1) {
+          state.reservations.unshift(newReservation)
+        } else {
+          state.reservations[existingIndex] = newReservation
+        }
         state.error = null
       })
       .addCase(createReservation.rejected, (state, action) => {
@@ -138,9 +131,12 @@ const reservationsSlice = createSlice({
       .addCase(cancelReservation.fulfilled, (state, action: PayloadAction<Reservation>) => {
         const index = state.reservations.findIndex(r => r.id === action.payload.id)
         if (index !== -1) {
-          state.reservations[index] = action.payload
-          state.reservations[index].pendingSync = false
-          delete state.reservations[index].pendingAction
+          // Utiliser spread operator au lieu de delete pour l'immutabilité Redux
+          state.reservations[index] = {
+            ...action.payload,
+            pendingSync: false,
+            pendingAction: undefined
+          }
         }
       })
   },
@@ -148,9 +144,6 @@ const reservationsSlice = createSlice({
 
 export const {
   clearError,
-  addOfflineReservation,
-  markReservationSyncPending,
-  clearPendingReservations,
   updateReservation,
 } = reservationsSlice.actions
 export const reservationsReducer = reservationsSlice.reducer
