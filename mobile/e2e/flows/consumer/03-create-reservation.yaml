@@ -1,4 +1,3 @@
-appId: host.exp.exponent
 name: Create Reservation Flow
 tags:
   - reservation
@@ -16,7 +15,7 @@ tags:
 - waitForAnimationToEnd
 
 # Click on a product
-- tapOn: "Croissants artisanaux"
+- tapOn: ${TEST_PRODUCT_CROISSANT}
 
 - waitForAnimationToEnd
 
@@ -53,8 +52,8 @@ tags:
 - waitForAnimationToEnd
 
 # Should see the reservation
-- assertVisible: "Croissants artisanaux"
-- assertVisible: "100 XOF"  # Price
+- assertVisible: ${TEST_PRODUCT_CROISSANT}
+- assertVisible: ${CROISSANT_PRICE}
 - assertVisible: "En attente|Pending"  # Status
 
 ---
@@ -64,7 +63,7 @@ tags:
 - waitForAnimationToEnd
 
 # Click on a different product
-- tapOn: "Bananes mûres"
+- tapOn: ${TEST_PRODUCT_BANANA}
 
 - waitForAnimationToEnd
 
@@ -98,7 +97,7 @@ tags:
 - waitForAnimationToEnd
 
 # Click on the banana reservation
-- tapOn: "Bananes mûres"
+- tapOn: ${TEST_PRODUCT_BANANA}
 
 - waitForAnimationToEnd
 
@@ -139,5 +138,5 @@ tags:
 - waitForAnimationToEnd
 
 # Should see cancelled reservation
-- assertVisible: "Bananes mûres"
+- assertVisible: ${TEST_PRODUCT_BANANA}
 - assertVisible: "Annulée|Cancelled"

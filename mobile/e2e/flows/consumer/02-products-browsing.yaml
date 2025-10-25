@@ -1,4 +1,3 @@
-appId: host.exp.exponent
 name: Products Browsing Flow
 tags:
   - products
@@ -25,18 +24,18 @@ tags:
 
 ---
 # Test: View product details
-- tapOn: "Pain complet artisanal"
+- tapOn: ${TEST_PRODUCT_BREAD}
 
 - waitForAnimationToEnd
 
 # Should see product detail page
-- assertVisible: "Pain complet artisanal"
-- assertVisible: "500 XOF"  # Original price
-- assertVisible: "250 XOF"  # Discounted price
+- assertVisible: ${TEST_PRODUCT_BREAD}
+- assertVisible: ${BREAD_PRICE_ORIGINAL}
+- assertVisible: ${BREAD_PRICE_DISCOUNTED}
 - assertVisible: "-50%"  # Discount badge
 
 # Should see merchant info
-- assertVisible: "Boulangerie|Marie Martin"
+- assertVisible: "Boulangerie|${MERCHANT_NAME}"
 
 # Should see quantity selector
 - assertVisible: "Quantité|Quantity"
