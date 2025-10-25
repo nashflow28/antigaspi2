@@ -60,7 +60,7 @@ const ProductDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
       setSelectedQuantity(1) // Reset quantité quand nouveau produit
       setSelectedPaymentMethod('on_site')
     }
-  }, [product?.id])
+  }, [product])
 
   // Cleanup timeout on unmount to prevent memory leak
   useEffect(() => {
@@ -539,6 +539,14 @@ const ProductDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
             <View style={styles.bottomBarDivider} />
           </>
         )}
+
+        {/* Guidance texte pour clarifier la différence */}
+        <View style={{ paddingHorizontal: theme.spacing.md, paddingBottom: theme.spacing.xs }}>
+          <Typography variant="caption" color="secondary" style={{ textAlign: 'center', lineHeight: 16 }}>
+            💡 <Typography variant="caption" weight="semibold">Panier :</Typography> Ajoutez plusieurs produits pour une réservation groupée.{'\n'}
+            <Typography variant="caption" weight="semibold">Réserver :</Typography> Réservation immédiate de ce produit uniquement.
+          </Typography>
+        </View>
 
         <View style={styles.bottomBarActions}>
           <Button

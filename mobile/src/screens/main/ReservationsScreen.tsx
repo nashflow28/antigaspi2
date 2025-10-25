@@ -37,7 +37,6 @@ const ReservationsScreen: React.FC<Props> = ({ navigation }) => {
   const dispatch = useDispatch<AppDispatch>()
   const { reservations, loading } = useSelector((state: RootState) => state.reservations)
   const { user } = useSelector((state: RootState) => state.auth)
-  const { isOnline } = useSelector((state: RootState) => state.connectivity)
 
   const [refreshing, setRefreshing] = useState(false)
   const [selectedReservation, setSelectedReservation] = useState<Reservation | null>(null)
@@ -91,20 +90,6 @@ const ReservationsScreen: React.FC<Props> = ({ navigation }) => {
           text: 'Oui, annuler',
           style: 'destructive',
           onPress: async () => {
-            if (!isOnline) {
-              // NOTE: offlineService désactivé pour compatibilité web
-              // TODO: Réimplémenter la gestion offline proprement
-              Alert.alert(
-                'Connexion requise',
-                'Vous devez être connecté à Internet pour annuler une réservation.'
-              )
-              void analyticsService.track('Reservation Cancel Failed', 'Reservation', {
-                reservationCode: reservation.reservation_code,
-                reason: 'offline',
-              })
-              return
-            }
-
             try {
               await dispatch(cancelReservation(reservation.id))
               Alert.alert('Succès', 'Réservation annulée avec succès')
@@ -177,6 +162,7 @@ const ReservationsScreen: React.FC<Props> = ({ navigation }) => {
     }
   })
 
+  // Format de date standardisé pour l'Afrique francophone
   const formatDate = (dateString: string) => {
     const date = new Date(dateString)
     return date.toLocaleDateString('fr-FR', {
@@ -185,6 +171,15 @@ const ReservationsScreen: React.FC<Props> = ({ navigation }) => {
       year: 'numeric',
       hour: '2-digit',
       minute: '2-digit'
+    })
+  }
+
+  const formatPickupDate = (dateString: string) => {
+    const date = new Date(dateString)
+    return date.toLocaleDateString('fr-FR', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric'
     })
   }
 
@@ -292,7 +287,7 @@ const ReservationsScreen: React.FC<Props> = ({ navigation }) => {
         <View style={[styles.pickupSection, { paddingTop: theme.spacing.sm, borderTopWidth: 1, borderTopColor: theme.colors.border, marginBottom: theme.spacing.sm }]}>
           <Ionicons name="calendar-outline" size={16} color={theme.colors.neutral[500]} />
           <Typography variant="caption" color="secondary" style={{ marginLeft: theme.spacing.sm }}>
-            Retrait: {item.pickup_date && new Date(item.pickup_date).toLocaleDateString('fr-FR')}
+            Retrait: {item.pickup_date && formatPickupDate(item.pickup_date)}
             {item.pickup_time && ` à ${item.pickup_time}`}
           </Typography>
         </View>
