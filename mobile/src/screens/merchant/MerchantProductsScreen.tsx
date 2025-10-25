@@ -25,18 +25,35 @@ interface Props {
   navigation: any
 }
 
+/**
+ * Détermine si un produit est en attente d'approbation admin
+ *
+ * Priorité de vérification:
+ * 1. Champ needs_approval (boolean) si disponible
+ * 2. Status string exact match (évite les faux positifs)
+ *
+ * @param product - Produit à vérifier
+ * @returns true si en attente d'approbation
+ */
 const isPendingAdminApproval = (product: Product): boolean => {
+  // Priorité 1: Utiliser le champ needs_approval si disponible
   if (typeof product.needs_approval === 'boolean') {
     return product.needs_approval
   }
 
-  const status = typeof product.status === 'string' ? product.status.toLowerCase() : ''
+  // Priorité 2: Vérifier le status avec exact match (évite faux positifs)
+  if (typeof product.status === 'string') {
+    const status = product.status.toLowerCase().trim()
+    const pendingStatuses = [
+      'pending_admin_approval',
+      'pending_approval',
+      'pending',
+    ]
+    return pendingStatuses.includes(status)
+  }
 
-  return [
-    'pending_admin_approval',
-    'pending_approval',
-    'pending'
-  ].some(value => status === value || status.includes(value))
+  // Par défaut: pas en attente
+  return false
 }
 
 const MerchantProductsScreen: React.FC<Props> = ({ navigation }) => {

@@ -184,7 +184,7 @@ const MerchantDashboardScreen: React.FC = () => {
               <Ionicons name="cash" size={24} color={theme.colors.semantic.success} />
             </View>
             <Text style={[styles.statValue, { color: theme.colors.text }]}>
-              {stats.todays_revenue.toLocaleString()} F
+              {(stats.todays_revenue || 0).toLocaleString()} F
             </Text>
             <Text style={[styles.statLabel, { color: theme.colors.textSecondary }]}>
               Revenus aujourd'hui
@@ -198,7 +198,7 @@ const MerchantDashboardScreen: React.FC = () => {
             <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>
               Réservations récentes
             </Text>
-            <TouchableOpacity>
+            <TouchableOpacity onPress={() => (navigation as any).navigate('Reservations')}>
               <Text style={[styles.sectionLink, { color: theme.colors.primary[500] }]}>
                 Voir tout
               </Text>

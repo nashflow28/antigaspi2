@@ -14,20 +14,7 @@ import { Ionicons } from '@expo/vector-icons'
 import { useTheme } from '../../theme'
 import apiService from '../../services/api'
 import ExportReservationsButton from '../../components/merchant/ExportReservationsButton'
-import { Reservation as FullReservation } from '../../types'
-
-interface Reservation {
-  id: number
-  customer_name: string
-  customer_email: string
-  customer_phone: string
-  product_name: string
-  quantity: number
-  status: string
-  total_amount: number
-  created_at: string
-  updated_at: string
-}
+import { Reservation } from '../../types'
 
 const MerchantReservationsScreen: React.FC = () => {
   const theme = useTheme()
@@ -59,9 +46,13 @@ const MerchantReservationsScreen: React.FC = () => {
   }
 
   const handleConfirm = (reservation: Reservation) => {
+    const customerName = reservation.consumer
+      ? `${reservation.consumer.first_name} ${reservation.consumer.last_name}`
+      : 'Client'
+
     Alert.alert(
       'Confirmer la réservation',
-      `Confirmer la réservation de ${reservation.customer_name} ?`,
+      `Confirmer la réservation de ${customerName} ?`,
       [
         { text: 'Annuler', style: 'cancel' },
         {
@@ -195,42 +186,49 @@ const MerchantReservationsScreen: React.FC = () => {
     ? reservations
     : reservations.filter(r => r.status === filter)
 
-  const renderReservation = ({ item }: { item: Reservation }) => (
-    <View style={[styles.reservationCard, { backgroundColor: theme.colors.surface.light }]}>
-      {/* Header */}
-      <View style={styles.cardHeader}>
-        <View style={styles.customerInfo}>
-          <Ionicons name="person-circle" size={48} color={theme.colors.primary[500]} />
-          <View style={styles.customerDetails}>
-            <Text style={[styles.customerName, { color: theme.colors.text }]}>
-              {item.customer_name}
-            </Text>
-            <Text style={[styles.customerContact, { color: theme.colors.textSecondary }]}>
-              {item.customer_phone}
+  const renderReservation = ({ item }: { item: Reservation }) => {
+    const customerName = item.consumer
+      ? `${item.consumer.first_name} ${item.consumer.last_name}`
+      : 'Client inconnu'
+    const customerPhone = item.consumer?.phone || ''
+    const totalAmount = item.total_amount || (item.quantity * item.discounted_price)
+
+    return (
+      <View style={[styles.reservationCard, { backgroundColor: theme.colors.surface.light }]}>
+        {/* Header */}
+        <View style={styles.cardHeader}>
+          <View style={styles.customerInfo}>
+            <Ionicons name="person-circle" size={48} color={theme.colors.primary[500]} />
+            <View style={styles.customerDetails}>
+              <Text style={[styles.customerName, { color: theme.colors.text }]}>
+                {customerName}
+              </Text>
+              <Text style={[styles.customerContact, { color: theme.colors.textSecondary }]}>
+                {customerPhone}
+              </Text>
+            </View>
+          </View>
+          <View style={[styles.statusBadge, { backgroundColor: theme.withOpacity(getStatusColor(item.status), 0.1) }]}>
+            <Text style={[styles.statusText, { color: getStatusColor(item.status) }]}>
+              {getStatusText(item.status)}
             </Text>
           </View>
         </View>
-        <View style={[styles.statusBadge, { backgroundColor: theme.withOpacity(getStatusColor(item.status), 0.1) }]}>
-          <Text style={[styles.statusText, { color: getStatusColor(item.status) }]}>
-            {getStatusText(item.status)}
-          </Text>
-        </View>
-      </View>
 
-      {/* Product Info */}
-      <View style={styles.productInfo}>
-        <Text style={[styles.productName, { color: theme.colors.text }]}>
-          {item.product_name}
-        </Text>
-        <View style={styles.detailsRow}>
-          <Text style={[styles.detailText, { color: theme.colors.textSecondary }]}>
-            Quantité: {item.quantity}
+        {/* Product Info */}
+        <View style={styles.productInfo}>
+          <Text style={[styles.productName, { color: theme.colors.text }]}>
+            {item.product.name}
           </Text>
-          <Text style={[styles.amount, { color: theme.colors.primary[500] }]}>
-            {item.total_amount.toLocaleString()} F CFA
-          </Text>
+          <View style={styles.detailsRow}>
+            <Text style={[styles.detailText, { color: theme.colors.textSecondary }]}>
+              Quantité: {item.quantity}
+            </Text>
+            <Text style={[styles.amount, { color: theme.colors.primary[500] }]}>
+              {totalAmount.toLocaleString()} F CFA
+            </Text>
+          </View>
         </View>
-      </View>
 
       {/* Actions */}
       {item.status === 'pending' && (
@@ -283,14 +281,15 @@ const MerchantReservationsScreen: React.FC = () => {
         </View>
       )}
 
-      {/* Date */}
-      <View style={styles.footer}>
-        <Text style={[styles.dateText, { color: theme.colors.textSecondary }]}>
-          {formatDate(item.created_at)}
-        </Text>
+        {/* Date */}
+        <View style={styles.footer}>
+          <Text style={[styles.dateText, { color: theme.colors.textSecondary }]}>
+            {formatDate(item.created_at || '')}
+          </Text>
+        </View>
       </View>
-    </View>
-  )
+    )
+  }
 
   return (
     <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
@@ -311,7 +310,7 @@ const MerchantReservationsScreen: React.FC = () => {
         {filteredReservations.length > 0 && (
           <View style={styles.exportContainer}>
             <ExportReservationsButton
-              reservations={filteredReservations as unknown as FullReservation[]}
+              reservations={filteredReservations}
             />
           </View>
         )}
