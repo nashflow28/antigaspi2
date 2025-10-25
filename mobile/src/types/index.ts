@@ -31,7 +31,7 @@ export interface Merchant {
   business_type: string
   city: string
   address?: string
-  phone: string
+  phone?: string  // Optional pour harmoniser avec User.phone
   is_verified: boolean
   latitude?: number | null
   longitude?: number | null
@@ -61,7 +61,7 @@ export interface Product {
   discount_percentage: number
   savings: number
   days_until_expiration: number
-  category: Category
+  category?: Category  // Optional pour harmoniser avec SurpriseBasketItem
   merchant: Merchant
   created_at: string
   is_active?: boolean

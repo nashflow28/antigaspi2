@@ -130,7 +130,9 @@ const ProductDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
     ? Math.round(((originalPrice - discountedPrice) / originalPrice) * 100)
     : 0
 
-  const isTestMode = Boolean((Constants?.expoConfig as any)?.extra?.testMode)
+  // Type safe access to Expo config
+  const expoConfig = Constants?.expoConfig as { extra?: { testMode?: boolean } } | undefined
+  const isTestMode = Boolean(expoConfig?.extra?.testMode)
 
   const selectedPayment = PAYMENT_OPTIONS.find(option => option.value === selectedPaymentMethod)
   const totalPrice = discountedPrice * selectedQuantity
