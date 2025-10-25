@@ -89,9 +89,10 @@ const ProductsScreen: React.FC<Props> = ({ navigation }) => {
 
     const rawQuantity = attributes.quantity_available ?? null
     const normalizedQuantity = Number(rawQuantity)
+    // Fallback à 0 pour quantités invalides (sera filtré par availableQuantity > 0)
     const safeQuantity = Number.isFinite(normalizedQuantity) && normalizedQuantity > 0
       ? normalizedQuantity
-      : 1
+      : 0
 
     // Mapper expiration_date et calculer days_until_expiration
     const expirationDate = attributes.expiration_date ?? new Date().toISOString()
@@ -306,8 +307,9 @@ const ProductsScreen: React.FC<Props> = ({ navigation }) => {
       // Validation simplifiée de la quantité disponible
       const availableQuantity = Number(product.quantity_available)
 
+      // Filtrer les produits avec quantité invalide (NaN, Infinity, etc.)
       if (!Number.isFinite(availableQuantity)) {
-        return true
+        return false
       }
 
       return availableQuantity > 0
@@ -597,6 +599,7 @@ const ProductsScreen: React.FC<Props> = ({ navigation }) => {
       }
     }, Platform.OS === 'web' ? 200 : 350)
 
+    // Cleanup function: annuler le debounce timeout si le composant unmount ou si searchQuery change
     return () => {
       if (searchDebounceRef.current) {
         clearTimeout(searchDebounceRef.current)
@@ -720,7 +723,10 @@ const ProductsScreen: React.FC<Props> = ({ navigation }) => {
   const renderProductCard = (product: Product) => {
     const discountedPrice = Math.round(parseFloat(product.discounted_price) || 0)
     const originalPrice = Math.round(parseFloat(product.original_price) || 0)
-    const discountPercent = Math.round(((originalPrice - discountedPrice) / originalPrice) * 100)
+    // Protection contre division par zéro pour produits gratuits/invalides
+    const discountPercent = originalPrice > 0
+      ? Math.round(((originalPrice - discountedPrice) / originalPrice) * 100)
+      : 0
 
     return (
       <TouchableOpacity

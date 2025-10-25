@@ -1,7 +1,7 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit'
 import { ReservationsState, Reservation, ReservationCreationPayload, ReservationCreationResponse } from '../../types'
 import apiService from '../../services/api'
-// import offlineService from '../../services/offlineService' // Désactivé temporairement pour le web
+// NOTE: offlineService retiré - Service offline désactivé pour compatibilité web
 
 export const reservationsInitialState: ReservationsState = {
   reservations: [],

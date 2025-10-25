@@ -31,6 +31,13 @@ interface ProfileFormData {
   city: string
 }
 
+// Type pour FormData React Native (upload fichiers)
+interface FormDataFile {
+  uri: string
+  name: string
+  type: string
+}
+
 const MAX_PHOTO_SIZE_BYTES = 5 * 1024 * 1024
 // Support pour tous les pays d'Afrique de l'Ouest: Togo (+228), Bénin (+229), Burkina Faso (+226),
 // Côte d'Ivoire (+225), Mali (+223), Niger (+227), Sénégal (+221)
@@ -152,7 +159,7 @@ const ProfileEditScreen: React.FC<ProfileEditScreenProps> = ({ navigation: navig
         uri: asset.uri,
         name: filename,
         type: mimeType,
-      } as any)
+      } as FormDataFile)
 
       const response = await apiService.post<ApiResponse<{ photo_url: string; full_url?: string }>>(
         '/consumers/profile/photo',
