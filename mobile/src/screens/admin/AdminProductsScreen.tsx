@@ -40,7 +40,8 @@ const AdminProductsScreen: React.FC = () => {
   const [categoryFilter, setCategoryFilter] = useState<number | 'all'>('all')
   const [selectedProduct, setSelectedProduct] = useState<ProductWithModeration | null>(null)
   const [showDetailModal, setShowDetailModal] = useState(false)
-  const [actionLoading, setActionLoading] = useState(false)
+  // Utiliser un Set d'IDs au lieu d'un boolean pour éviter les race conditions
+  const [actionLoadingIds, setActionLoadingIds] = useState<Set<number>>(new Set())
 
   useEffect(() => {
     loadData()
@@ -55,16 +56,27 @@ const AdminProductsScreen: React.FC = () => {
       setLoading(true)
 
       // Charger produits et catégories en parallèle
+      // TODO: Implémenter pagination infinie si produits > 200
       const [productsRes, categoriesRes] = await Promise.all([
-        apiService.get('/products?per_page=100'),
+        apiService.get('/products?per_page=200'), // Augmenté de 100 à 200
         apiService.get('/categories'),
       ])
 
       const allProducts = productsRes.data.data || []
       setProducts(allProducts)
       setCategories(categoriesRes.data || [])
-    } catch (error) {
+    } catch (error: any) {
       console.error('Erreur chargement données:', error)
+
+      // Gestion des erreurs d'autorisation
+      if (error.response?.status === 401 || error.response?.status === 403) {
+        Alert.alert(
+          'Session expirée',
+          'Votre session a expiré. Veuillez vous reconnecter.'
+        )
+        return
+      }
+
       Alert.alert('Erreur', 'Impossible de charger les produits')
     } finally {
       setLoading(false)
@@ -123,23 +135,37 @@ const AdminProductsScreen: React.FC = () => {
         {
           text: newStatus ? 'Activer' : 'Désactiver',
           onPress: async () => {
-            try {
-              setActionLoading(true)
-              await apiService.put(`/products/${product.id}`, {
-                is_active: newStatus,
-              })
+            // Backup pour rollback
+            const previousProducts = [...products]
 
-              // Mettre à jour localement
+            try {
+              // Ajouter l'ID au Set de loading
+              setActionLoadingIds(prev => new Set(prev).add(product.id))
+
+              // Mise à jour optimiste
               setProducts(prev =>
                 prev.map(p => (p.id === product.id ? { ...p, is_active: newStatus } : p))
               )
 
+              await apiService.put(`/products/${product.id}`, {
+                is_active: newStatus,
+              })
+
               Alert.alert('Succès', `Produit ${newStatus ? 'activé' : 'désactivé'}`)
             } catch (error) {
               console.error('Erreur toggle actif:', error)
+
+              // Rollback
+              setProducts(previousProducts)
+
               Alert.alert('Erreur', 'Impossible de modifier le statut')
             } finally {
-              setActionLoading(false)
+              // Retirer l'ID du Set
+              setActionLoadingIds(prev => {
+                const newSet = new Set(prev)
+                newSet.delete(product.id)
+                return newSet
+              })
             }
           },
         },
@@ -156,11 +182,14 @@ const AdminProductsScreen: React.FC = () => {
         {
           text: 'Approuver',
           onPress: async () => {
-            try {
-              setActionLoading(true)
-              await apiService.post(`/admin/products/${product.id}/approve`)
+            // Backup pour rollback
+            const previousProducts = [...products]
 
-              // Mettre à jour localement
+            try {
+              // Ajouter l'ID au Set de loading
+              setActionLoadingIds(prev => new Set(prev).add(product.id))
+
+              // Mise à jour optimiste
               setProducts(prev =>
                 prev.map(p =>
                   p.id === product.id
@@ -169,13 +198,24 @@ const AdminProductsScreen: React.FC = () => {
                 )
               )
 
+              await apiService.post(`/admin/products/${product.id}/approve`)
+
               setShowDetailModal(false)
               Alert.alert('Succès', 'Produit approuvé avec succès')
             } catch (error) {
               console.error('Erreur approbation:', error)
+
+              // Rollback
+              setProducts(previousProducts)
+
               Alert.alert('Erreur', 'Impossible d\'approuver le produit')
             } finally {
-              setActionLoading(false)
+              // Retirer l'ID du Set
+              setActionLoadingIds(prev => {
+                const newSet = new Set(prev)
+                newSet.delete(product.id)
+                return newSet
+              })
             }
           },
         },
@@ -184,27 +224,25 @@ const AdminProductsScreen: React.FC = () => {
   }
 
   const handleRejectProduct = async (product: ProductWithModeration) => {
-    Alert.prompt(
+    // Ouvrir un simple dialogue de confirmation (Alert.prompt n'existe pas sur Android)
+    // TODO: Créer un modal personnalisé si besoin de saisir une raison
+    Alert.alert(
       'Rejeter le produit',
-      'Veuillez indiquer la raison du rejet :',
+      `Voulez-vous vraiment rejeter "${product.name}" ?`,
       [
         { text: 'Annuler', style: 'cancel' },
         {
           text: 'Rejeter',
           style: 'destructive',
-          onPress: async (reason: string | undefined) => {
-            if (!reason || reason.trim().length < 10) {
-              Alert.alert('Erreur', 'La raison doit contenir au moins 10 caractères')
-              return
-            }
+          onPress: async () => {
+            // Backup pour rollback
+            const previousProducts = [...products]
 
             try {
-              setActionLoading(true)
-              await apiService.post(`/admin/products/${product.id}/reject`, {
-                reason: reason.trim(),
-              })
+              // Ajouter l'ID au Set de loading
+              setActionLoadingIds(prev => new Set(prev).add(product.id))
 
-              // Mettre à jour localement
+              // Mise à jour optimiste
               setProducts(prev =>
                 prev.map(p =>
                   p.id === product.id
@@ -213,18 +251,30 @@ const AdminProductsScreen: React.FC = () => {
                 )
               )
 
+              await apiService.post(`/admin/products/${product.id}/reject`, {
+                reason: 'Rejeté par l\'administrateur',
+              })
+
               setShowDetailModal(false)
               Alert.alert('Succès', 'Produit rejeté')
             } catch (error) {
               console.error('Erreur rejet:', error)
+
+              // Rollback
+              setProducts(previousProducts)
+
               Alert.alert('Erreur', 'Impossible de rejeter le produit')
             } finally {
-              setActionLoading(false)
+              // Retirer l'ID du Set
+              setActionLoadingIds(prev => {
+                const newSet = new Set(prev)
+                newSet.delete(product.id)
+                return newSet
+              })
             }
           },
         },
-      ],
-      'plain-text'
+      ]
     )
   }
 
@@ -238,20 +288,34 @@ const AdminProductsScreen: React.FC = () => {
           text: 'Supprimer',
           style: 'destructive',
           onPress: async () => {
-            try {
-              setActionLoading(true)
-              await apiService.delete(`/products/${product.id}`)
+            // Backup de l'état précédent pour rollback en cas d'erreur
+            const previousProducts = [...products]
 
-              // Retirer localement
+            try {
+              // Ajouter l'ID au Set de loading
+              setActionLoadingIds(prev => new Set(prev).add(product.id))
+
+              // Mise à jour optimiste (retirer localement AVANT l'appel API)
               setProducts(prev => prev.filter(p => p.id !== product.id))
+
+              await apiService.delete(`/products/${product.id}`)
 
               setShowDetailModal(false)
               Alert.alert('Succès', 'Produit supprimé définitivement')
             } catch (error) {
               console.error('Erreur suppression:', error)
+
+              // Rollback en cas d'erreur
+              setProducts(previousProducts)
+
               Alert.alert('Erreur', 'Impossible de supprimer le produit')
             } finally {
-              setActionLoading(false)
+              // Retirer l'ID du Set
+              setActionLoadingIds(prev => {
+                const newSet = new Set(prev)
+                newSet.delete(product.id)
+                return newSet
+              })
             }
           },
         },
@@ -282,8 +346,10 @@ const AdminProductsScreen: React.FC = () => {
   }
 
   const renderProduct = ({ item }: { item: ProductWithModeration }) => {
-    const discountedPrice = parseFloat(item.discounted_price)
-    const originalPrice = parseFloat(item.original_price)
+    // Conversion robuste des prix (supporte string et number)
+    const discountedPrice = Number(item.discounted_price) || 0
+    const originalPrice = Number(item.original_price) || 0
+    const isActionLoading = actionLoadingIds.has(item.id)
 
     return (
       <TouchableOpacity
@@ -308,13 +374,26 @@ const AdminProductsScreen: React.FC = () => {
                 {getStatusBadge(item)}
               </View>
 
-              <Typography variant="caption" color="secondary" numberOfLines={1} style={{ marginBottom: 4 }}>
-                🏪 {item.merchant.business_name}
-              </Typography>
+              <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 4 }}>
+                <Ionicons name="storefront-outline" size={12} color={theme.colors.neutral[500]} />
+                <Typography variant="caption" color="secondary" numberOfLines={1} style={{ marginLeft: 4 }}>
+                  {item.merchant.business_name}
+                </Typography>
+              </View>
 
-              <Typography variant="caption" color="secondary" numberOfLines={1} style={{ marginBottom: 8 }}>
-                📂 {item.category.name} • 📦 {item.quantity_available} dispo
-              </Typography>
+              <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 8 }}>
+                <Ionicons name="folder-outline" size={12} color={theme.colors.neutral[500]} />
+                <Typography variant="caption" color="secondary" style={{ marginLeft: 4 }}>
+                  {item.category.name}
+                </Typography>
+                <Typography variant="caption" color="secondary" style={{ marginHorizontal: 6 }}>
+                  •
+                </Typography>
+                <Ionicons name="cube-outline" size={12} color={theme.colors.neutral[500]} />
+                <Typography variant="caption" color="secondary" style={{ marginLeft: 4 }}>
+                  {item.quantity_available} dispo
+                </Typography>
+              </View>
 
               <View style={styles.priceRow}>
                 <Typography variant="h4" weight="bold" color="primary">
@@ -340,7 +419,7 @@ const AdminProductsScreen: React.FC = () => {
                     { backgroundColor: theme.withOpacity(theme.colors.primary[500], 0.1) },
                   ]}
                   onPress={() => handleToggleActive(item)}
-                  disabled={actionLoading}
+                  disabled={isActionLoading}
                 >
                   <Ionicons
                     name={item.is_active ? 'eye-off' : 'eye'}
@@ -352,7 +431,7 @@ const AdminProductsScreen: React.FC = () => {
                   </Typography>
                 </TouchableOpacity>
 
-                {(item as ProductWithModeration).needs_approval && (
+                {item.needs_approval && (
                   <>
                     <TouchableOpacity
                       style={[
@@ -360,7 +439,7 @@ const AdminProductsScreen: React.FC = () => {
                         { backgroundColor: theme.withOpacity(theme.colors.success[500], 0.1) },
                       ]}
                       onPress={() => handleApproveProduct(item)}
-                      disabled={actionLoading}
+                      disabled={isActionLoading}
                     >
                       <Ionicons name="checkmark" size={16} color={theme.colors.success[500]} />
                       <Typography variant="caption" weight="semibold" style={{ color: theme.colors.success[500] }}>
@@ -374,7 +453,7 @@ const AdminProductsScreen: React.FC = () => {
                         { backgroundColor: theme.withOpacity(theme.colors.error[500], 0.1) },
                       ]}
                       onPress={() => handleRejectProduct(item)}
-                      disabled={actionLoading}
+                      disabled={isActionLoading}
                     >
                       <Ionicons name="close" size={16} color={theme.colors.error[500]} />
                       <Typography variant="caption" weight="semibold" style={{ color: theme.colors.error[500] }}>
@@ -394,8 +473,9 @@ const AdminProductsScreen: React.FC = () => {
   const renderDetailModal = () => {
     if (!selectedProduct) return null
 
-    const discountedPrice = parseFloat(selectedProduct.discounted_price)
-    const originalPrice = parseFloat(selectedProduct.original_price)
+    // Conversion robuste des prix (supporte string et number)
+    const discountedPrice = Number(selectedProduct.discounted_price) || 0
+    const originalPrice = Number(selectedProduct.original_price) || 0
 
     return (
       <Modal
@@ -516,7 +596,7 @@ const AdminProductsScreen: React.FC = () => {
                     onPress={() => handleApproveProduct(selectedProduct)}
                     leftIcon={<Ionicons name="checkmark-circle" size={20} color="white" />}
                     style={{ marginBottom: 12 }}
-                    disabled={actionLoading}
+                    disabled={actionLoadingIds.has(selectedProduct.id)}
                   >
                     Approuver le produit
                   </Button>
@@ -527,7 +607,7 @@ const AdminProductsScreen: React.FC = () => {
                     onPress={() => handleRejectProduct(selectedProduct)}
                     leftIcon={<Ionicons name="close-circle" size={20} color="white" />}
                     style={{ marginBottom: 12 }}
-                    disabled={actionLoading}
+                    disabled={actionLoadingIds.has(selectedProduct.id)}
                   >
                     Rejeter le produit
                   </Button>
@@ -546,7 +626,7 @@ const AdminProductsScreen: React.FC = () => {
                   />
                 }
                 style={{ marginBottom: 12 }}
-                disabled={actionLoading}
+                disabled={actionLoadingIds.has(selectedProduct.id)}
               >
                 {selectedProduct.is_active ? 'Désactiver' : 'Activer'}
               </Button>
@@ -556,7 +636,7 @@ const AdminProductsScreen: React.FC = () => {
                 size="lg"
                 onPress={() => handleDeleteProduct(selectedProduct)}
                 leftIcon={<Ionicons name="trash" size={20} color="white" />}
-                disabled={actionLoading}
+                disabled={actionLoadingIds.has(selectedProduct.id)}
               >
                 Supprimer définitivement
               </Button>
@@ -565,7 +645,7 @@ const AdminProductsScreen: React.FC = () => {
             <View style={{ height: 40 }} />
           </ScrollView>
 
-          {actionLoading && (
+          {actionLoadingIds.size > 0 && (
             <View style={styles.loadingOverlay}>
               <ActivityIndicator size="large" color={theme.colors.primary[500]} />
             </View>

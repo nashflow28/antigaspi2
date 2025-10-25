@@ -53,7 +53,11 @@ const AdminMerchantsScreen: React.FC = () => {
   const [statusFilter, setStatusFilter] = useState<MerchantStatus>('all')
   const [selectedMerchant, setSelectedMerchant] = useState<MerchantWithStats | null>(null)
   const [showDetailModal, setShowDetailModal] = useState(false)
-  const [actionLoading, setActionLoading] = useState(false)
+  // Utiliser un Set d'IDs au lieu d'un boolean pour éviter les race conditions
+  const [actionLoadingIds, setActionLoadingIds] = useState<Set<number>>(new Set())
+  // Modal de rejet (remplacement de Alert.prompt qui n'existe pas sur Android)
+  const [showRejectModal, setShowRejectModal] = useState(false)
+  const [rejectReason, setRejectReason] = useState('')
 
   useEffect(() => {
     loadMerchants()
@@ -66,13 +70,25 @@ const AdminMerchantsScreen: React.FC = () => {
   const loadMerchants = async () => {
     try {
       setLoading(true)
-      // Utiliser endpoint admin/moderation pour avoir les statistiques
+      // API endpoint: GET /admin/moderation
+      // NOTE: Utilise endpoint admin/moderation pour avoir les statistiques étendues
+      // L'endpoint retourne { merchants: MerchantWithStats[], pending_products: Product[] }
+      // TODO: Implémenter pagination si le nombre de merchants dépasse 100
       const response = await apiService.get('/admin/moderation')
-      // L'endpoint retourne { merchants: [...], pending_products: [...] }
       const allMerchants = response.data?.merchants || response.data || []
       setMerchants(allMerchants)
     } catch (error: any) {
       console.error('Erreur chargement merchants:', error)
+
+      // Gestion des erreurs d'autorisation
+      if (error.response?.status === 401 || error.response?.status === 403) {
+        Alert.alert(
+          'Session expirée',
+          'Votre session a expiré. Veuillez vous reconnecter.'
+        )
+        return
+      }
+
       Alert.alert('Erreur', 'Impossible de charger les commerçants')
     } finally {
       setLoading(false)
@@ -126,22 +142,36 @@ const AdminMerchantsScreen: React.FC = () => {
           text: 'Approuver',
           style: 'default',
           onPress: async () => {
-            try {
-              setActionLoading(true)
-              await apiService.post(`/admin/merchants/${merchant.id}/approve`)
+            // Backup pour rollback en cas d'erreur
+            const previousMerchants = [...merchants]
 
-              // Mise à jour locale optimiste
+            try {
+              // Ajouter l'ID au Set de loading
+              setActionLoadingIds(prev => new Set(prev).add(merchant.id))
+
+              // Mise à jour optimiste
               setMerchants(prev =>
                 prev.map(m => (m.id === merchant.id ? { ...m, is_verified: true } : m))
               )
+
+              await apiService.post(`/admin/merchants/${merchant.id}/approve`)
 
               Alert.alert('Succès', `${merchant.business_name} a été approuvé`)
               setShowDetailModal(false)
             } catch (error: any) {
               console.error('Erreur approbation:', error)
+
+              // Rollback en cas d'erreur
+              setMerchants(previousMerchants)
+
               Alert.alert('Erreur', "Impossible d'approuver le commerçant")
             } finally {
-              setActionLoading(false)
+              // Retirer l'ID du Set
+              setActionLoadingIds(prev => {
+                const newSet = new Set(prev)
+                newSet.delete(merchant.id)
+                return newSet
+              })
             }
           },
         },
@@ -149,52 +179,63 @@ const AdminMerchantsScreen: React.FC = () => {
     )
   }
 
-  const handleRejectMerchant = async (merchant: MerchantWithStats) => {
-    Alert.prompt(
-      'Rejeter le commerçant',
-      'Veuillez indiquer la raison du rejet :',
-      [
-        { text: 'Annuler', style: 'cancel' },
-        {
-          text: 'Rejeter',
-          style: 'destructive',
-          onPress: async (reason: string | undefined) => {
-            if (!reason || reason.trim().length < 10) {
-              Alert.alert('Erreur', 'La raison doit contenir au moins 10 caractères')
-              return
-            }
+  const handleRejectMerchant = (merchant: MerchantWithStats) => {
+    // Ouvrir le modal de rejet personnalisé (Alert.prompt n'existe pas sur Android)
+    setSelectedMerchant(merchant)
+    setRejectReason('')
+    setShowRejectModal(true)
+  }
 
-            try {
-              setActionLoading(true)
-              await apiService.post(`/admin/merchants/${merchant.id}/reject`, {
-                reason: reason.trim(),
-              })
+  const confirmRejectMerchant = async () => {
+    if (!selectedMerchant) return
 
-              // Mise à jour locale
-              setMerchants(prev =>
-                prev.map(m => (m.id === merchant.id ? { ...m, is_verified: false } : m))
-              )
+    if (!rejectReason || rejectReason.trim().length < 10) {
+      Alert.alert('Erreur', 'La raison doit contenir au moins 10 caractères')
+      return
+    }
 
-              Alert.alert('Succès', `${merchant.business_name} a été rejeté`)
-              setShowDetailModal(false)
-            } catch (error: any) {
-              console.error('Erreur rejet:', error)
-              Alert.alert('Erreur', 'Impossible de rejeter le commerçant')
-            } finally {
-              setActionLoading(false)
-            }
-          },
-        },
-      ],
-      'plain-text'
-    )
+    // Backup pour rollback en cas d'erreur
+    const previousMerchants = [...merchants]
+
+    try {
+      // Ajouter l'ID au Set de loading
+      setActionLoadingIds(prev => new Set(prev).add(selectedMerchant.id))
+
+      // Mise à jour optimiste
+      setMerchants(prev =>
+        prev.map(m => (m.id === selectedMerchant.id ? { ...m, is_verified: false } : m))
+      )
+
+      await apiService.post(`/admin/merchants/${selectedMerchant.id}/reject`, {
+        reason: rejectReason.trim(),
+      })
+
+      Alert.alert('Succès', `${selectedMerchant.business_name} a été rejeté`)
+      setShowRejectModal(false)
+      setShowDetailModal(false)
+      setRejectReason('')
+    } catch (error: any) {
+      console.error('Erreur rejet:', error)
+
+      // Rollback en cas d'erreur
+      setMerchants(previousMerchants)
+
+      Alert.alert('Erreur', 'Impossible de rejeter le commerçant')
+    } finally {
+      // Retirer l'ID du Set
+      setActionLoadingIds(prev => {
+        const newSet = new Set(prev)
+        newSet.delete(selectedMerchant.id)
+        return newSet
+      })
+    }
   }
 
   const renderMerchantCard = ({ item }: { item: MerchantWithStats }) => (
     <TouchableOpacity onPress={() => handleViewDetails(item)} activeOpacity={0.7}>
       <Card style={styles.merchantCard}>
         <View style={styles.cardHeader}>
-          <View style={styles.iconContainer}>
+          <View style={[styles.iconContainer, { backgroundColor: theme.colors.primary[50] }]}>
             <Ionicons name="storefront" size={24} color={theme.colors.primary[500]} />
           </View>
           <View style={styles.cardContent}>
@@ -207,7 +248,7 @@ const AdminMerchantsScreen: React.FC = () => {
               </Badge>
             </View>
             <Typography variant="caption" color="secondary">
-              {item.business_type} • {item.user.city}
+              {item.business_type} • {item.user?.city || 'Non renseigné'}
             </Typography>
             <View style={styles.statsRow}>
               <View style={styles.statItem}>
@@ -349,25 +390,115 @@ const AdminMerchantsScreen: React.FC = () => {
                   <Button
                     variant="primary"
                     onPress={() => handleApproveMerchant(selectedMerchant)}
-                    disabled={actionLoading}
+                    disabled={actionLoadingIds.has(selectedMerchant.id)}
                     style={{ marginBottom: 12 }}
                     leftIcon={
                       <Ionicons name="checkmark-circle" size={20} color="#FFFFFF" />
                     }
                   >
-                    {actionLoading ? 'Chargement...' : 'Approuver le commerçant'}
+                    {actionLoadingIds.has(selectedMerchant.id) ? 'Chargement...' : 'Approuver le commerçant'}
                   </Button>
                 )}
                 <Button
                   variant="destructive"
                   onPress={() => handleRejectMerchant(selectedMerchant)}
-                  disabled={actionLoading}
+                  disabled={actionLoadingIds.has(selectedMerchant.id)}
                   leftIcon={<Ionicons name="close-circle" size={20} color="#FFFFFF" />}
                 >
                   Rejeter / Suspendre
                 </Button>
               </View>
             </ScrollView>
+          </View>
+        </View>
+      </Modal>
+    )
+  }
+
+  // Modal de rejet personnalisé (remplacement de Alert.prompt qui n'existe pas sur Android)
+  const renderRejectModal = () => {
+    if (!selectedMerchant) return null
+
+    return (
+      <Modal
+        visible={showRejectModal}
+        animationType="slide"
+        transparent
+        onRequestClose={() => setShowRejectModal(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={[styles.modalContent, { backgroundColor: theme.colors.background }]}>
+            <View style={styles.modalHeader}>
+              <Typography variant="h3" weight="bold">
+                Rejeter le commerçant
+              </Typography>
+              <TouchableOpacity onPress={() => setShowRejectModal(false)}>
+                <Ionicons name="close" size={28} color={theme.colors.neutral[600]} />
+              </TouchableOpacity>
+            </View>
+
+            <View style={styles.modalBody}>
+              <Typography variant="body" color="secondary" style={{ marginBottom: 16 }}>
+                Commerçant : {selectedMerchant.business_name}
+              </Typography>
+
+              <Typography variant="body" weight="medium" style={{ marginBottom: 8 }}>
+                Raison du rejet (minimum 10 caractères) :
+              </Typography>
+
+              <TextInput
+                style={[
+                  styles.rejectInput,
+                  {
+                    backgroundColor: theme.colors.surface.light,
+                    color: theme.colors.text,
+                    borderColor: theme.colors.neutral[300],
+                  },
+                ]}
+                placeholder="Indiquez la raison du rejet..."
+                placeholderTextColor={theme.colors.neutral[400]}
+                value={rejectReason}
+                onChangeText={setRejectReason}
+                multiline
+                numberOfLines={4}
+                textAlignVertical="top"
+                maxLength={500}
+              />
+
+              <Typography variant="caption" color="secondary" style={{ marginTop: 4, marginBottom: 24 }}>
+                {rejectReason.length}/500 caractères
+              </Typography>
+
+              <View style={styles.modalActions}>
+                <Button
+                  variant="secondary"
+                  onPress={() => {
+                    setShowRejectModal(false)
+                    setRejectReason('')
+                  }}
+                  disabled={selectedMerchant ? actionLoadingIds.has(selectedMerchant.id) : false}
+                  style={{ flex: 1 }}
+                >
+                  Annuler
+                </Button>
+
+                <Button
+                  variant="destructive"
+                  onPress={confirmRejectMerchant}
+                  disabled={(selectedMerchant ? actionLoadingIds.has(selectedMerchant.id) : false) || rejectReason.trim().length < 10}
+                  style={{ flex: 1 }}
+                  leftIcon={
+                    (selectedMerchant && actionLoadingIds.has(selectedMerchant.id)) ? (
+                      <ActivityIndicator size="small" color="#FFFFFF" />
+                    ) : (
+                      <Ionicons name="close-circle" size={20} color="#FFFFFF" />
+                    )
+                  }
+                >
+                  {(selectedMerchant && actionLoadingIds.has(selectedMerchant.id)) ? 'Rejet...' : 'Rejeter'}
+                </Button>
+              </View>
+            </View>
           </View>
         </View>
       </Modal>
@@ -508,6 +639,7 @@ const AdminMerchantsScreen: React.FC = () => {
       />
 
       {renderDetailModal()}
+      {renderRejectModal()}
     </View>
   )
 }
@@ -560,7 +692,6 @@ const styles = StyleSheet.create({
     width: 48,
     height: 48,
     borderRadius: 12,
-    backgroundColor: '#EEF2FF',
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 12,
@@ -617,6 +748,17 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingVertical: 8,
+  },
+  rejectInput: {
+    borderWidth: 1,
+    borderRadius: 12,
+    padding: 12,
+    fontSize: 15,
+    minHeight: 100,
+  },
+  modalActions: {
+    flexDirection: 'row',
+    gap: 12,
   },
 })
 

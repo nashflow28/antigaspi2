@@ -48,6 +48,13 @@ const AdminCategoriesScreen: React.FC = () => {
       setCategories(allCategories)
     } catch (error: any) {
       console.error('Erreur chargement categories:', error)
+
+      // Gestion des erreurs d'autorisation
+      if (error.response?.status === 401 || error.response?.status === 403) {
+        Alert.alert('Session expirée', 'Votre session a expiré. Veuillez vous reconnecter.')
+        return
+      }
+
       Alert.alert('Erreur', 'Impossible de charger les catégories')
     } finally {
       setLoading(false)
@@ -91,19 +98,25 @@ const AdminCategoriesScreen: React.FC = () => {
           text: 'Supprimer',
           style: 'destructive',
           onPress: async () => {
+            // Backup pour rollback
+            const previousCategories = [...categories]
+
             try {
-              setLoading(true)
-              await apiService.delete(`/admin/categories/${category.id}`)
+              // Mise à jour optimiste (pas de setLoading pour ne pas bloquer l'UI)
               setCategories(prev => prev.filter(c => c.id !== category.id))
+
+              await apiService.delete(`/admin/categories/${category.id}`)
+
               Alert.alert('Succès', 'Catégorie supprimée avec succès')
             } catch (error: any) {
               console.error('Erreur suppression:', error)
+
+              // Rollback en cas d'erreur
+              setCategories(previousCategories)
               Alert.alert(
                 'Erreur',
                 error.response?.data?.message || 'Impossible de supprimer la catégorie'
               )
-            } finally {
-              setLoading(false)
             }
           },
         },
@@ -127,13 +140,14 @@ const AdminCategoriesScreen: React.FC = () => {
           description: formData.description.trim() || null,
         })
 
-        // Ajouter la nouvelle catégorie localement uniquement si response.data existe
-        if (response.data) {
-          setCategories(prev => [response.data, ...prev])
-          Alert.alert('Succès', 'Catégorie créée avec succès')
-        } else {
+        // Vérifier AVANT d'utiliser response.data
+        const newCategory = response.data
+        if (!newCategory) {
           throw new Error('Réponse invalide du serveur')
         }
+
+        setCategories(prev => [newCategory, ...prev])
+        Alert.alert('Succès', 'Catégorie créée avec succès')
       } else if (selectedCategory) {
         await apiService.put(`/admin/categories/${selectedCategory.id}`, {
           name: formData.name.trim(),

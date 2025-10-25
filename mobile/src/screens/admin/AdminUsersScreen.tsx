@@ -38,10 +38,22 @@ const AdminUsersScreen: React.FC = () => {
   const loadUsers = async () => {
     try {
       setLoading(true)
+      // API endpoint: GET /admin/users
+      // Expected response: { data: { data: User[] } }
       const response = await apiService.get('/admin/users')
       setUsers(response.data.data || [])
     } catch (error: any) {
       console.error('Erreur chargement utilisateurs:', error)
+
+      // Gestion des erreurs d'autorisation
+      if (error.response?.status === 401 || error.response?.status === 403) {
+        Alert.alert(
+          'Session expirée',
+          'Votre session a expiré. Veuillez vous reconnecter.'
+        )
+        return
+      }
+
       Alert.alert('Erreur', 'Impossible de charger les utilisateurs')
     } finally {
       setLoading(false)
@@ -58,11 +70,12 @@ const AdminUsersScreen: React.FC = () => {
 
     if (searchQuery.trim()) {
       const query = searchQuery.toLowerCase()
+      // Safe access avec optional chaining pour éviter les crashes si null/undefined
       filtered = filtered.filter(
         u =>
-          u.first_name.toLowerCase().includes(query) ||
-          u.last_name.toLowerCase().includes(query) ||
-          u.email.toLowerCase().includes(query)
+          (u.first_name?.toLowerCase() || '').includes(query) ||
+          (u.last_name?.toLowerCase() || '').includes(query) ||
+          (u.email?.toLowerCase() || '').includes(query)
       )
     }
 
@@ -88,13 +101,10 @@ const AdminUsersScreen: React.FC = () => {
           text: isSuspended ? 'Débloquer' : 'Bloquer',
           style: isSuspended ? 'default' : 'destructive',
           onPress: async () => {
+            // Backup de l'état précédent pour rollback en cas d'erreur
+            const previousUsers = [...users]
+
             try {
-              const endpoint = isSuspended
-                ? `/admin/users/${user.id}/unsuspend`
-                : `/admin/users/${user.id}/suspend`
-
-              await apiService.patch(endpoint)
-
               // Mise à jour optimiste
               setUsers(prev =>
                 prev.map(u =>
@@ -102,9 +112,19 @@ const AdminUsersScreen: React.FC = () => {
                 )
               )
 
+              const endpoint = isSuspended
+                ? `/admin/users/${user.id}/unsuspend`
+                : `/admin/users/${user.id}/suspend`
+
+              await apiService.patch(endpoint)
+
               Alert.alert('Succès', isSuspended ? 'Utilisateur débloqué' : 'Utilisateur bloqué')
             } catch (error: any) {
               console.error('Erreur mise à jour statut:', error)
+
+              // Rollback en cas d'erreur
+              setUsers(previousUsers)
+
               Alert.alert('Erreur', 'Impossible de mettre à jour le statut')
             }
           },
@@ -142,7 +162,7 @@ const AdminUsersScreen: React.FC = () => {
   const renderUserCard = ({ item }: { item: User }) => (
     <Card style={styles.userCard}>
       <View style={styles.cardHeader}>
-        <View style={styles.iconContainer}>
+        <View style={[styles.iconContainer, { backgroundColor: theme.colors.primary[50] }]}>
           <Ionicons name="person" size={24} color={theme.colors.primary[500]} />
         </View>
         <View style={styles.cardContent}>
@@ -161,7 +181,7 @@ const AdminUsersScreen: React.FC = () => {
             <View style={styles.statItem}>
               <Ionicons name="location-outline" size={14} color={theme.colors.neutral[500]} />
               <Typography variant="caption" color="secondary" style={{ marginLeft: 4 }}>
-                {item.city}
+                {item.city || 'Non renseigné'}
               </Typography>
             </View>
             {item.is_suspended && (
@@ -401,7 +421,6 @@ const styles = StyleSheet.create({
     width: 48,
     height: 48,
     borderRadius: 12,
-    backgroundColor: '#EEF2FF',
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 12,
