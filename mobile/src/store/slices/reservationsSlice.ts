@@ -105,11 +105,9 @@ const reservationsSlice = createSlice({
       })
       .addCase(fetchMyReservations.fulfilled, (state, action: PayloadAction<Reservation[]>) => {
         state.loading = false
-        const pendingReservations = state.reservations.filter(reservation => reservation.pendingSync)
-        const remoteReservations = action.payload.filter(reservation =>
-          !pendingReservations.some(pending => pending.id === reservation.id)
-        )
-        state.reservations = [...pendingReservations, ...remoteReservations]
+        // Utiliser les données du serveur comme source de vérité
+        // (pas de logique offline complexe puisque offlineService désactivé)
+        state.reservations = action.payload
         state.error = null
       })
       .addCase(fetchMyReservations.rejected, (state, action) => {
@@ -118,17 +116,32 @@ const reservationsSlice = createSlice({
       })
 
       // Fetch single reservation
+      .addCase(fetchReservation.pending, (state) => {
+        state.loading = true
+        state.error = null
+      })
       .addCase(fetchReservation.fulfilled, (state, action: PayloadAction<Reservation>) => {
+        state.loading = false
         const existingIndex = state.reservations.findIndex(r => r.id === action.payload.id)
         if (existingIndex !== -1) {
           state.reservations[existingIndex] = action.payload
         } else {
           state.reservations.push(action.payload)
         }
+        state.error = null
+      })
+      .addCase(fetchReservation.rejected, (state, action) => {
+        state.loading = false
+        state.error = action.payload as string
       })
 
       // Cancel reservation
+      .addCase(cancelReservation.pending, (state) => {
+        state.loading = true
+        state.error = null
+      })
       .addCase(cancelReservation.fulfilled, (state, action: PayloadAction<Reservation>) => {
+        state.loading = false
         const index = state.reservations.findIndex(r => r.id === action.payload.id)
         if (index !== -1) {
           // Utiliser spread operator au lieu de delete pour l'immutabilité Redux
@@ -138,6 +151,11 @@ const reservationsSlice = createSlice({
             pendingAction: undefined
           }
         }
+        state.error = null
+      })
+      .addCase(cancelReservation.rejected, (state, action) => {
+        state.loading = false
+        state.error = action.payload as string
       })
   },
 })
