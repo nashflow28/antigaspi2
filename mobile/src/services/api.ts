@@ -157,8 +157,10 @@ class ApiService {
         const token = await AsyncStorage.getItem('auth_token')
         if (token) {
           config.headers.Authorization = `Bearer ${token}`
-          console.log('🔑 [API] Token présent pour:', config.method?.toUpperCase(), config.url)
-        } else {
+          if (__DEV__) {
+            console.log('🔑 [API] Token présent pour:', config.method?.toUpperCase(), config.url)
+          }
+        } else if (__DEV__) {
           console.warn('⚠️ [API] Pas de token pour:', config.method?.toUpperCase(), config.url)
         }
         return config
@@ -218,21 +220,27 @@ class ApiService {
     config?: AxiosRequestConfig
   ): Promise<T> {
     try {
-      console.log(`📤 [API] ${method} ${url}`, data ? `(avec données)` : '')
+      if (__DEV__) {
+        console.log(`📤 [API] ${method} ${url}`, data ? `(avec données)` : '')
+      }
       const response: AxiosResponse<T> = await this.api.request({
         method,
         url,
         data,
         ...config,
       })
-      console.log(`📥 [API] ${method} ${url} - Status:`, response.status)
-      console.log(`📥 [API] Response.data type:`, typeof response.data)
-      console.log(`📥 [API] Response.data keys:`, Object.keys(response.data || {}))
+      if (__DEV__) {
+        console.log(`📥 [API] ${method} ${url} - Status:`, response.status)
+        console.log(`📥 [API] Response.data type:`, typeof response.data)
+        console.log(`📥 [API] Response.data keys:`, Object.keys(response.data || {}))
+      }
       return response.data
     } catch (error: any) {
-      console.error(`❌ [API] ${method} ${url} - Erreur:`, error?.message)
-      console.error(`❌ [API] Status:`, error.response?.status)
-      console.error(`❌ [API] Response data:`, error.response?.data)
+      console.error(`❌ [API] ${method} ${url} - Erreur:`, error?.message || error)
+      if (__DEV__) {
+        console.error(`❌ [API] Status:`, error.response?.status)
+        console.error(`❌ [API] Response data:`, error.response?.data)
+      }
 
       // 🐛 BUG FIX #24: Preserve validation errors for better error handling
       if (error.response?.status === 422 && error.response?.data?.errors) {

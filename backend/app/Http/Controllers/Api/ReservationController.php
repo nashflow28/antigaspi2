@@ -135,15 +135,21 @@ class ReservationController extends Controller
                 'trace' => $e->getTraceAsString()
             ]);
 
-            return response()->json([
+            $response = [
                 'success' => false,
                 'message' => 'Erreur lors de la création de la réservation',
-                'error' => $e->getMessage(),
-                'debug' => [
+            ];
+
+            // Only expose debug info in development environment
+            if (config('app.debug')) {
+                $response['error'] = $e->getMessage();
+                $response['debug'] = [
                     'file' => $e->getFile(),
                     'line' => $e->getLine()
-                ]
-            ], 500);
+                ];
+            }
+
+            return response()->json($response, 500);
         }
     }
 

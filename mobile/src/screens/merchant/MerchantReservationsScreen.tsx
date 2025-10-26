@@ -30,42 +30,53 @@ const MerchantReservationsScreen: React.FC = () => {
   const loadReservations = async () => {
     try {
       setLoading(true)
-      console.log('📥 [MerchantReservations] Chargement réservations merchant...')
+      if (__DEV__) {
+        console.log('📥 [MerchantReservations] Chargement réservations merchant...')
+      }
 
       // ✅ VERIFIED: Endpoint matches backend route (api.php:132)
       const response = await apiService.get('/reservations/merchant/list')
 
-      // 🐛 BUG FIX #36: Log full response to debug structure
-      console.log('✅ [MerchantReservations] Réponse complète:', JSON.stringify(response).substring(0, 500))
-      console.log('✅ [MerchantReservations] Type de réponse:', typeof response)
-      console.log('✅ [MerchantReservations] Clés de réponse:', Object.keys(response || {}))
-      console.log('✅ [MerchantReservations] Réponse reçue:', {
-        success: response?.success,
-        dataExists: !!response?.data,
-        dataLength: response?.data?.length,
-        metaExists: !!response?.meta,
-        isArray: Array.isArray(response)
-      })
+      // 🐛 BUG FIX #36: Log full response to debug structure (DEV only)
+      if (__DEV__) {
+        console.log('✅ [MerchantReservations] Réponse complète:', JSON.stringify(response).substring(0, 500))
+        console.log('✅ [MerchantReservations] Type de réponse:', typeof response)
+        console.log('✅ [MerchantReservations] Clés de réponse:', Object.keys(response || {}))
+        console.log('✅ [MerchantReservations] Réponse reçue:', {
+          success: response?.success,
+          dataExists: !!response?.data,
+          dataLength: response?.data?.length,
+          metaExists: !!response?.meta,
+          isArray: Array.isArray(response)
+        })
+      }
 
       // 🐛 BUG FIX #34: apiService.get() returns response.data directly, not wrapped
       // So we access response.data, not response.data.data
       // 🐛 BUG FIX #35: Only update state if we have valid data to prevent clearing on error
       if (response?.success && response?.data) {
-        console.log('✅ [MerchantReservations] Mise à jour avec', response.data.length, 'réservations')
+        if (__DEV__) {
+          console.log('✅ [MerchantReservations] Mise à jour avec', response.data.length, 'réservations')
+        }
         setReservations(response.data)
       } else if (Array.isArray(response)) {
         // 🐛 BUG FIX #36: Sometimes API returns array directly
-        console.log('⚠️ [MerchantReservations] Réponse est un tableau direct, utilisation directe')
+        if (__DEV__) {
+          console.log('⚠️ [MerchantReservations] Réponse est un tableau direct, utilisation directe')
+        }
         setReservations(response)
       } else {
-        console.warn('⚠️ [MerchantReservations] Réponse invalide, conservation des données actuelles')
-        console.warn('⚠️ [MerchantReservations] Réponse reçue:', response)
+        if (__DEV__) {
+          console.warn('⚠️ [MerchantReservations] Réponse invalide, conservation des données actuelles')
+          console.warn('⚠️ [MerchantReservations] Réponse reçue:', response)
+        }
       }
     } catch (error: any) {
-      console.error('❌ [MerchantReservations] Erreur chargement réservations:', error)
-      console.error('❌ [MerchantReservations] Message erreur:', error?.message)
-      console.error('❌ [MerchantReservations] Stack:', error?.stack)
-      console.error('❌ [MerchantReservations] Status code:', error?.statusCode)
+      console.error('❌ [MerchantReservations] Erreur chargement réservations:', error?.message || error)
+      if (__DEV__) {
+        console.error('❌ [MerchantReservations] Stack:', error?.stack)
+        console.error('❌ [MerchantReservations] Status code:', error?.statusCode)
+      }
       // 🐛 BUG FIX #35: Don't clear existing reservations on error
       Alert.alert(
         'Erreur',
@@ -97,13 +108,17 @@ const MerchantReservationsScreen: React.FC = () => {
           text: 'Confirmer',
           onPress: async () => {
             try {
-              console.log('📤 [MerchantReservations] Confirmation réservation:', reservation.id)
+              if (__DEV__) {
+                console.log('📤 [MerchantReservations] Confirmation réservation:', reservation.id)
+              }
               await apiService.post(`/reservations/${reservation.id}/confirm`)
-              console.log('✅ [MerchantReservations] Réservation confirmée, rechargement...')
+              if (__DEV__) {
+                console.log('✅ [MerchantReservations] Réservation confirmée, rechargement...')
+              }
               // 🐛 BUG FIX #35: Add await to ensure errors are caught
               await loadReservations()
-            } catch (error) {
-              console.error('❌ [MerchantReservations] Erreur confirmation:', error)
+            } catch (error: any) {
+              console.error('❌ [MerchantReservations] Erreur confirmation:', error?.message || error)
               Alert.alert('Erreur', 'Impossible de confirmer la réservation')
             }
           },
@@ -122,13 +137,17 @@ const MerchantReservationsScreen: React.FC = () => {
           text: 'Oui, prête',
           onPress: async () => {
             try {
-              console.log('📤 [MerchantReservations] Marquage prêt réservation:', reservation.id)
+              if (__DEV__) {
+                console.log('📤 [MerchantReservations] Marquage prêt réservation:', reservation.id)
+              }
               await apiService.post(`/reservations/${reservation.id}/ready`)
-              console.log('✅ [MerchantReservations] Réservation marquée prête, rechargement...')
+              if (__DEV__) {
+                console.log('✅ [MerchantReservations] Réservation marquée prête, rechargement...')
+              }
               // 🐛 BUG FIX #35: Add await to ensure errors are caught
               await loadReservations()
-            } catch (error) {
-              console.error('❌ [MerchantReservations] Erreur marquage prêt:', error)
+            } catch (error: any) {
+              console.error('❌ [MerchantReservations] Erreur marquage prêt:', error?.message || error)
               Alert.alert('Erreur', 'Impossible de marquer la réservation comme prête')
             }
           },
@@ -147,13 +166,17 @@ const MerchantReservationsScreen: React.FC = () => {
           text: 'Oui, terminée',
           onPress: async () => {
             try {
-              console.log('📤 [MerchantReservations] Finalisation réservation:', reservation.id)
+              if (__DEV__) {
+                console.log('📤 [MerchantReservations] Finalisation réservation:', reservation.id)
+              }
               await apiService.post(`/reservations/${reservation.id}/complete`)
-              console.log('✅ [MerchantReservations] Réservation finalisée, rechargement...')
+              if (__DEV__) {
+                console.log('✅ [MerchantReservations] Réservation finalisée, rechargement...')
+              }
               // 🐛 BUG FIX #35: Add await to ensure errors are caught
               await loadReservations()
-            } catch (error) {
-              console.error('❌ [MerchantReservations] Erreur finalisation:', error)
+            } catch (error: any) {
+              console.error('❌ [MerchantReservations] Erreur finalisation:', error?.message || error)
               Alert.alert('Erreur', 'Impossible de marquer la réservation comme terminée')
             }
           },
@@ -173,13 +196,17 @@ const MerchantReservationsScreen: React.FC = () => {
           style: 'destructive',
           onPress: async () => {
             try {
-              console.log('📤 [MerchantReservations] Annulation réservation:', reservation.id)
+              if (__DEV__) {
+                console.log('📤 [MerchantReservations] Annulation réservation:', reservation.id)
+              }
               await apiService.post(`/reservations/${reservation.id}/cancel`)
-              console.log('✅ [MerchantReservations] Réservation annulée, rechargement...')
+              if (__DEV__) {
+                console.log('✅ [MerchantReservations] Réservation annulée, rechargement...')
+              }
               // 🐛 BUG FIX #35: Add await to ensure errors are caught
               await loadReservations()
-            } catch (error) {
-              console.error('❌ [MerchantReservations] Erreur annulation:', error)
+            } catch (error: any) {
+              console.error('❌ [MerchantReservations] Erreur annulation:', error?.message || error)
               Alert.alert('Erreur', 'Impossible d\'annuler la réservation')
             }
           },
