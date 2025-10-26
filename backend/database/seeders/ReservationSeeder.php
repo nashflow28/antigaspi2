@@ -16,10 +16,10 @@ class ReservationSeeder extends Seeder
     public function run(): void
     {
         // Récupérer le consumer de test
-        $consumer = User::where('email', 'consumer@antigaspi.com')->first();
+        $consumer = User::where('email', 'jean.dupont@email.com')->first();
 
         if (!$consumer) {
-            $this->command->warn('Consumer consumer@antigaspi.com not found. Skipping reservation seeding.');
+            $this->command->warn('Consumer jean.dupont@email.com not found. Skipping reservation seeding.');
             return;
         }
 

@@ -26,9 +26,9 @@ class DatabaseSeeder extends Seeder
         echo "   - Products: Test products for Boulangerie du Centre\n";
         echo "   - Reservations: 8 test reservations created\n";
         echo "   - Reviews: 10 test reviews created\n\n";
-        echo "📝 Test credentials:\n";
-        echo "   Admin: admin@antigaspi.com / admin123\n";
-        echo "   Merchant: merchant@antigaspi.com / merchant123\n";
-        echo "   Consumer: consumer@antigaspi.com / consumer123\n\n";
+        echo "📝 Test credentials (matching CLAUDE.md):\n";
+        echo "   Admin: admin@antigaspi.com / password\n";
+        echo "   Merchant: boulangerie.martin@email.com / password\n";
+        echo "   Consumer: jean.dupont@email.com / password\n\n";
     }
 }
