@@ -101,7 +101,7 @@ class SurpriseBasketController extends Controller
             'max_items' => 'nullable|integer|min:1',
             'expiration_date' => 'nullable|date|after:today',
             'image_url' => 'nullable|string|max:500',
-            'products' => 'required|array|min:1',
+            'products' => 'nullable|array|min:1', // 🐛 BUG FIX: Made optional to allow creation without products
             'products.*.id' => 'required|exists:products,id',
             'products.*.quantity' => 'required|integer|min:1',
         ]);
@@ -115,37 +115,45 @@ class SurpriseBasketController extends Controller
         }
 
         // 🐛 BUG FIX #20: Validate that ALL products belong to the merchant BEFORE creating basket
-        $productIds = collect($request->products)->pluck('id')->unique();
-        $products = Product::whereIn('id', $productIds)
-            ->where('merchant_id', $user->merchant->id)
-            ->where('is_surprise_basket', false) // Cannot add surprise baskets to surprise baskets
-            ->get()
-            ->keyBy('id');
-
-        // Verify ALL requested products were found and belong to this merchant
-        if ($products->count() !== $productIds->count()) {
-            $missingIds = $productIds->diff($products->keys());
-            return response()->json([
-                'success' => false,
-                'message' => 'Certains produits ne vous appartiennent pas ou n\'existent pas',
-                'errors' => [
-                    'products' => ["Product IDs invalides: " . $missingIds->implode(', ')]
-                ]
-            ], 422);
-        }
-
-        // Calculate total original value
+        // Only validate if products are provided
         $totalOriginalValue = 0;
-        foreach ($request->products as $productData) {
-            $product = $products->get($productData['id']);
-            // No need for null check anymore - we verified all products exist above
-            $totalOriginalValue += $product->original_price * $productData['quantity'];
+        $products = collect();
+
+        if ($request->has('products') && is_array($request->products) && count($request->products) > 0) {
+            $productIds = collect($request->products)->pluck('id')->unique();
+            $products = Product::whereIn('id', $productIds)
+                ->where('merchant_id', $user->merchant->id)
+                ->where('is_surprise_basket', false) // Cannot add surprise baskets to surprise baskets
+                ->get()
+                ->keyBy('id');
+
+            // Verify ALL requested products were found and belong to this merchant
+            if ($products->count() !== $productIds->count()) {
+                $missingIds = $productIds->diff($products->keys());
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Certains produits ne vous appartiennent pas ou n\'existent pas',
+                    'errors' => [
+                        'products' => ["Product IDs invalides: " . $missingIds->implode(', ')]
+                    ]
+                ], 422);
+            }
+
+            // Calculate total original value
+            foreach ($request->products as $productData) {
+                $product = $products->get($productData['id']);
+                // No need for null check anymore - we verified all products exist above
+                $totalOriginalValue += $product->original_price * $productData['quantity'];
+            }
         }
+
+        // Use merchant's category or fallback to "Autre" (id 9)
+        $categoryId = $request->category_id ?? $user->merchant->category_id ?? 9;
 
         // Create surprise basket
         $surpriseBasket = Product::create([
             'merchant_id' => $user->merchant->id,
-            'category_id' => $request->category_id,
+            'category_id' => $categoryId,
             'name' => $request->name,
             'description' => $request->description,
             'surprise_description' => $request->surprise_description,
@@ -161,15 +169,17 @@ class SurpriseBasketController extends Controller
             'is_active' => true,
         ]);
 
-        // Add products to basket (no null check needed - all products validated above)
-        foreach ($request->products as $productData) {
-            $product = $products->get($productData['id']);
-            SurpriseBasketItem::create([
-                'surprise_basket_id' => $surpriseBasket->id,
-                'product_id' => $product->id,
-                'quantity' => $productData['quantity'],
-                'unit_price' => $product->discounted_price,
-            ]);
+        // Add products to basket (only if products were provided)
+        if ($request->has('products') && is_array($request->products) && count($request->products) > 0) {
+            foreach ($request->products as $productData) {
+                $product = $products->get($productData['id']);
+                SurpriseBasketItem::create([
+                    'surprise_basket_id' => $surpriseBasket->id,
+                    'product_id' => $product->id,
+                    'quantity' => $productData['quantity'],
+                    'unit_price' => $product->discounted_price,
+                ]);
+            }
         }
 
         // Load relationships for response

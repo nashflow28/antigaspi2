@@ -157,10 +157,10 @@ const AdminDashboardScreen: React.FC<AdminDashboardScreenProps> = ({ navigation 
           <View style={styles.section}>
             <Card
               variant="elevated"
-              style={[styles.alertCard, { backgroundColor: theme.colors.warning[50] }]}
+              style={[styles.alertCard, { backgroundColor: theme.colors.warning }]}
             >
               <View style={styles.alertContent}>
-                <Ionicons name="alert-circle" size={32} color={theme.colors.warning[500]} />
+                <Ionicons name="alert-circle" size={32} color={theme.colors.warning} />
                 <View style={{ flex: 1 }}>
                   <Typography variant="h4" weight="semibold" style={{ marginBottom: 4 }}>
                     Actions requises
@@ -211,10 +211,10 @@ const AdminDashboardScreen: React.FC<AdminDashboardScreenProps> = ({ navigation 
               <View
                 style={[
                   styles.statIcon,
-                  { backgroundColor: theme.withOpacity(theme.colors.success[500], 0.1) },
+                  { backgroundColor: theme.withOpacity(theme.colors.success, 0.1) },
                 ]}
               >
-                <Ionicons name="storefront" size={28} color={theme.colors.success[500]} />
+                <Ionicons name="storefront" size={28} color={theme.colors.success} />
               </View>
               <Typography variant="h2" weight="bold" style={{ marginTop: 12 }}>
                 {(stats?.total_merchants ?? 0).toLocaleString()}
@@ -229,10 +229,10 @@ const AdminDashboardScreen: React.FC<AdminDashboardScreenProps> = ({ navigation 
               <View
                 style={[
                   styles.statIcon,
-                  { backgroundColor: theme.withOpacity(theme.colors.warning[500], 0.1) },
+                  { backgroundColor: theme.withOpacity(theme.colors.warning, 0.1) },
                 ]}
               >
-                <Ionicons name="cube" size={28} color={theme.colors.warning[500]} />
+                <Ionicons name="cube" size={28} color={theme.colors.warning} />
               </View>
               <Typography variant="h2" weight="bold" style={{ marginTop: 12 }}>
                 {(stats?.total_products ?? 0).toLocaleString()}
@@ -242,7 +242,7 @@ const AdminDashboardScreen: React.FC<AdminDashboardScreenProps> = ({ navigation 
               </Typography>
               <Typography
                 variant="caption"
-                style={{ color: theme.colors.success[500], marginTop: 4 }}
+                style={{ color: theme.colors.success, marginTop: 4 }}
               >
                 {stats?.active_products ?? 0} actifs
               </Typography>
@@ -253,10 +253,10 @@ const AdminDashboardScreen: React.FC<AdminDashboardScreenProps> = ({ navigation 
               <View
                 style={[
                   styles.statIcon,
-                  { backgroundColor: theme.withOpacity(theme.colors.error[500], 0.1) },
+                  { backgroundColor: theme.withOpacity(theme.colors.error, 0.1) },
                 ]}
               >
-                <Ionicons name="receipt" size={28} color={theme.colors.error[500]} />
+                <Ionicons name="receipt" size={28} color={theme.colors.error} />
               </View>
               <Typography variant="h2" weight="bold" style={{ marginTop: 12 }}>
                 {(stats?.total_reservations ?? 0).toLocaleString()}

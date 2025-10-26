@@ -157,6 +157,9 @@ class ApiService {
         const token = await AsyncStorage.getItem('auth_token')
         if (token) {
           config.headers.Authorization = `Bearer ${token}`
+          console.log('🔑 [API] Token présent pour:', config.method?.toUpperCase(), config.url)
+        } else {
+          console.warn('⚠️ [API] Pas de token pour:', config.method?.toUpperCase(), config.url)
         }
         return config
       },
@@ -215,16 +218,34 @@ class ApiService {
     config?: AxiosRequestConfig
   ): Promise<T> {
     try {
+      console.log(`📤 [API] ${method} ${url}`, data ? `(avec données)` : '')
       const response: AxiosResponse<T> = await this.api.request({
         method,
         url,
         data,
         ...config,
       })
+      console.log(`📥 [API] ${method} ${url} - Status:`, response.status)
+      console.log(`📥 [API] Response.data type:`, typeof response.data)
+      console.log(`📥 [API] Response.data keys:`, Object.keys(response.data || {}))
       return response.data
     } catch (error: any) {
+      console.error(`❌ [API] ${method} ${url} - Erreur:`, error?.message)
+      console.error(`❌ [API] Status:`, error.response?.status)
+      console.error(`❌ [API] Response data:`, error.response?.data)
+
+      // 🐛 BUG FIX #24: Preserve validation errors for better error handling
+      if (error.response?.status === 422 && error.response?.data?.errors) {
+        // Validation error with detailed field errors
+        const validationError: any = new Error(error.response.data.message || 'Erreurs de validation')
+        validationError.validationErrors = error.response.data.errors
+        validationError.statusCode = 422
+        throw validationError
+      }
       if (error.response?.data?.message) {
-        throw new Error(error.response.data.message)
+        const apiError: any = new Error(error.response.data.message)
+        apiError.statusCode = error.response.status
+        throw apiError
       }
       throw new Error(error.message || 'Une erreur est survenue')
     }
@@ -356,7 +377,18 @@ class ApiService {
   async createReservation(payload: ReservationCreationPayload): Promise<ReservationCreationResponse> {
     // Transformer camelCase → snake_case pour Laravel
     const snakeCasePayload = toSnakeCase(payload)
-    return this.request<ReservationCreationResponse>('POST', '/reservations', snakeCasePayload)
+    console.log('📤 [API] createReservation payload:', JSON.stringify(snakeCasePayload, null, 2))
+    try {
+      const response = await this.request<ReservationCreationResponse>('POST', '/reservations', snakeCasePayload)
+      console.log('✅ [API] createReservation response:', JSON.stringify(response, null, 2))
+      return response
+    } catch (error: any) {
+      console.error('❌ [API] createReservation error:', error)
+      console.error('❌ [API] Error message:', error.message)
+      console.error('❌ [API] Error statusCode:', error.statusCode)
+      console.error('❌ [API] Error validationErrors:', error.validationErrors)
+      throw error
+    }
   }
 
   async initiateMobileMoneyPayment(payload: MobileMoneyPaymentPayload): Promise<PaymentInitiationResponse> {
@@ -370,7 +402,14 @@ class ApiService {
   }
 
   async getMyReservations(): Promise<ApiResponse<Reservation[]>> {
-    return this.request<ApiResponse<Reservation[]>>('GET', '/reservations')
+    console.log('📥 [API] Fetching my reservations...')
+    const response = await this.request<ApiResponse<Reservation[]>>('GET', '/reservations')
+    console.log('✅ [API] Reservations received:', {
+      success: response.success,
+      count: response.data?.length || 0,
+      reservations: response.data?.map(r => ({ id: r.id, code: r.reservation_code, status: r.status }))
+    })
+    return response
   }
 
   async getReservation(id: number): Promise<ApiResponse<Reservation>> {

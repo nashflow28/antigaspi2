@@ -115,8 +115,8 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
           {renderInput('Confirmer le mot de passe *', formData.password_confirmation, 'password_confirmation', 'Confirmer le mot de passe', { secureTextEntry: true })}
 
           {error && (
-            <View style={{ backgroundColor: theme.colors.error[50], padding: theme.spacing.sm, borderRadius: theme.radius.md, marginBottom: theme.spacing.lg }}>
-              <Typography variant="caption" style={{ color: theme.colors.error[600], textAlign: 'center' }}>
+            <View style={{ backgroundColor: theme.colors.error, padding: theme.spacing.sm, borderRadius: theme.radius.md, marginBottom: theme.spacing.lg }}>
+              <Typography variant="caption" style={{ color: theme.colors.error, textAlign: 'center' }}>
                 {error}
               </Typography>
             </View>

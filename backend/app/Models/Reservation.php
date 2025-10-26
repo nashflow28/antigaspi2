@@ -56,10 +56,30 @@ class Reservation extends Model
         parent::boot();
 
         static::creating(function ($reservation) {
+            // 🐛 BUG FIX #30: Auto-generate reservation_code if not set
+            if (empty($reservation->reservation_code)) {
+                $reservation->reservation_code = self::generateReservationCode();
+            }
+
             if (empty($reservation->payment_status)) {
                 $reservation->payment_status = PaymentStatus::PENDING;
             }
         });
+    }
+
+    /**
+     * Generate a unique reservation code
+     * Format: RES-YYYYMMDD-XXXXX
+     */
+    private static function generateReservationCode(): string
+    {
+        do {
+            $date = now()->format('Ymd');
+            $random = strtoupper(substr(md5(uniqid(mt_rand(), true)), 0, 5));
+            $code = "RES-{$date}-{$random}";
+        } while (self::where('reservation_code', $code)->exists());
+
+        return $code;
     }
 
     public function user(): BelongsTo

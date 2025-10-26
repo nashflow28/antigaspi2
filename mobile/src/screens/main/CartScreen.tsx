@@ -286,7 +286,7 @@ const CartScreen: React.FC<Props> = ({ navigation }) => {
 
     // Check all items have sufficient stock
     const insufficientStockItems = cart.items.filter(item => {
-      const available = item.product?.quantity_available ?? 0
+      const available = item.product?.available_quantity ?? 0
       return item.quantity > available
     })
 
@@ -380,8 +380,8 @@ const CartScreen: React.FC<Props> = ({ navigation }) => {
             keyboardShouldPersistTaps="handled"
           >
             {activeError && (
-              <Card style={[styles.errorCard, { borderColor: theme.colors.error[500] }]}> 
-                <Typography variant="body" style={{ color: theme.colors.error[600] }}>
+              <Card style={[styles.errorCard, { borderColor: theme.colors.error }]}> 
+                <Typography variant="body" style={{ color: theme.colors.error }}>
                   {activeError}
                 </Typography>
               </Card>
@@ -429,7 +429,7 @@ const CartScreen: React.FC<Props> = ({ navigation }) => {
                         accessibilityRole="button"
                         disabled={updating}
                       >
-                        <Ionicons name="trash-outline" size={20} color={theme.colors.error[500]} />
+                        <Ionicons name="trash-outline" size={20} color={theme.colors.error} />
                       </TouchableOpacity>
                     </View>
 

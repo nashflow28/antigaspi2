@@ -213,7 +213,7 @@ const AdminCategoriesScreen: React.FC = () => {
             style={styles.actionButton}
             testID="delete-category-button"
           >
-            <Ionicons name="trash-outline" size={20} color={theme.colors.error[500]} testID="trash-icon" />
+            <Ionicons name="trash-outline" size={20} color={theme.colors.error} testID="trash-icon" />
           </TouchableOpacity>
         </View>
       </View>

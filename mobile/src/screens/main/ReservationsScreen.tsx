@@ -38,26 +38,47 @@ const ReservationsScreen: React.FC<Props> = ({ navigation }) => {
   const { reservations, loading } = useSelector((state: RootState) => state.reservations)
   const { user } = useSelector((state: RootState) => state.auth)
 
+  console.log('🔍 [ReservationsScreen] Current state:', {
+    reservationsCount: reservations.length,
+    loading,
+    userId: user?.id,
+    userEmail: user?.email,
+    reservationIds: reservations.map(r => r.id)
+  })
+
   const [refreshing, setRefreshing] = useState(false)
   const [selectedReservation, setSelectedReservation] = useState<Reservation | null>(null)
   const [showQRModal, setShowQRModal] = useState(false)
   const [activeTab, setActiveTab] = useState<'active' | 'completed' | 'cancelled'>('active')
 
   useEffect(() => {
+    console.log('🔵 [ReservationsScreen] Component mounted - loading reservations...')
     void loadReservations('initial')
   }, [])
 
   const loadReservations = async (
     source: 'initial' | 'refresh' | 'reload' = 'initial'
   ) => {
+    console.log(`📤 [ReservationsScreen] Loading reservations (source: ${source})...`)
     const result = await dispatch(fetchMyReservations())
 
+    console.log('📥 [ReservationsScreen] Dispatch result:', {
+      type: result.type,
+      isFullfilled: fetchMyReservations.fulfilled.match(result),
+      isRejected: fetchMyReservations.rejected.match(result),
+    })
+
     if (fetchMyReservations.fulfilled.match(result)) {
+      console.log('✅ [ReservationsScreen] Reservations loaded successfully:', {
+        total: result.payload.length,
+        items: result.payload.map(r => ({ id: r.id, code: r.reservation_code, status: r.status }))
+      })
       void analyticsService.track('Reservations Loaded', 'Reservation', {
         total: result.payload.length,
         source,
       })
     } else if (fetchMyReservations.rejected.match(result)) {
+      console.error('❌ [ReservationsScreen] Failed to load reservations:', result.payload ?? result.error?.message)
       Alert.alert('Erreur', 'Impossible de charger les réservations')
       void analyticsService.track('Reservations Load Failed', 'Reservation', {
         source,
@@ -247,7 +268,7 @@ const ReservationsScreen: React.FC<Props> = ({ navigation }) => {
       {item.pendingSync && (
         <Typography
           variant="caption"
-          style={{ color: item.pendingAction === 'delete' ? theme.colors.warning[500] : theme.colors.info[500], marginBottom: theme.spacing.sm }}
+          style={{ color: item.pendingAction === 'delete' ? theme.colors.warning : theme.colors.info, marginBottom: theme.spacing.sm }}
         >
           {item.pendingAction === 'delete'
             ? 'Annulation en attente de synchronisation'

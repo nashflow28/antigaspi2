@@ -81,7 +81,7 @@ const MerchantReviewsScreen: React.FC = () => {
       // Charger la liste des avis
       const listResponse = await apiService.get('/merchants/reviews/list', {
         params: {
-          per_page: 100,
+          per_page: 50, // 🐛 BUG FIX: Backend validation max is 50
           sort: 'recent',
         }
       })

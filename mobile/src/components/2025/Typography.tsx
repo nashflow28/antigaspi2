@@ -9,6 +9,7 @@ import {
   Text,
   TextProps as RNTextProps,
   TextStyle,
+  StyleProp,
 } from 'react-native'
 import { useTheme } from '../../theme'
 
@@ -49,7 +50,7 @@ export interface TypographyProps extends RNTextProps {
   numberOfLines?: number
 
   // Style override
-  style?: TextStyle
+  style?: StyleProp<TextStyle>
 }
 
 export const Typography: React.FC<TypographyProps> = ({

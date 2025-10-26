@@ -10,7 +10,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Storage;
 use Tymon\JWTAuth\Facades\JWTAuth;
-use IlluminateSupportFacadesCache;
+use Illuminate\Support\Facades\Cache;
 
 class ProductController extends Controller
 {
@@ -439,7 +439,7 @@ class ProductController extends Controller
                 'discounted_price' => 'sometimes|numeric|min:0',
                 'quantity_available' => 'sometimes|integer|min:0',
                 'expiration_date' => 'sometimes|date',
-                'image_url' => 'sometimes|string|max:255',
+                'image_url' => 'sometimes|nullable|string|max:255', // 🐛 BUG FIX #26: Allow null for products without images
                 'is_active' => 'sometimes|boolean',
             ]);
 
@@ -474,18 +474,23 @@ class ProductController extends Controller
             }
 
             // 🐛 BUG FIX #14: Validate image_url path to prevent traversal attacks
+            // Updated: Allow valid HTTP/HTTPS URLs, only block path traversal in file paths
             if ($request->filled('image_url')) {
                 $imagePath = $request->image_url;
-                if (str_contains($imagePath, '..') || str_contains($imagePath, '//')) {
-                    \Log::error('Path traversal attempt detected in product update', [
-                        'product_id' => $id,
-                        'user_id' => $user->id,
-                        'suspicious_path' => $imagePath
-                    ]);
-                    return response()->json([
-                        'success' => false,
-                        'message' => 'Invalid image path detected'
-                    ], 400);
+                // Only validate if it's NOT a valid HTTP/HTTPS URL
+                if (!filter_var($imagePath, FILTER_VALIDATE_URL)) {
+                    // For file paths, check for path traversal attempts
+                    if (str_contains($imagePath, '..') || str_contains($imagePath, '//')) {
+                        \Log::error('Path traversal attempt detected in product update', [
+                            'product_id' => $id,
+                            'user_id' => $user->id,
+                            'suspicious_path' => $imagePath
+                        ]);
+                        return response()->json([
+                            'success' => false,
+                            'message' => 'Invalid image path detected'
+                        ], 400);
+                    }
                 }
             }
 

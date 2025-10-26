@@ -10,6 +10,7 @@ import {
   TouchableOpacity,
   StyleSheet,
   ViewStyle,
+  StyleProp,
 } from 'react-native'
 import { useTheme } from '../../theme'
 
@@ -35,10 +36,10 @@ export interface CardProps {
   testID?: string
 
   // Style overrides
-  style?: ViewStyle
-  contentStyle?: ViewStyle
-  headerStyle?: ViewStyle
-  footerStyle?: ViewStyle
+  style?: StyleProp<ViewStyle>
+  contentStyle?: StyleProp<ViewStyle>
+  headerStyle?: StyleProp<ViewStyle>
+  footerStyle?: StyleProp<ViewStyle>
 }
 
 export const Card: React.FC<CardProps> = ({
@@ -108,26 +109,26 @@ export const Card: React.FC<CardProps> = ({
     borderRadius,
     overflow: 'hidden',
     ...getVariantStyles,
-    ...style,
+    ...(style ? StyleSheet.flatten(style) : {}),
   }), [borderRadius, getVariantStyles, style])
 
   const contentPadding: ViewStyle = useMemo(() => ({
     padding: theme.spacing.md,
-    ...contentStyle,
+    ...(contentStyle ? StyleSheet.flatten(contentStyle) : {}),
   }), [theme.spacing.md, contentStyle])
 
   const headerContainerStyle: ViewStyle = useMemo(() => ({
     padding: theme.spacing.md,
     borderBottomWidth: 1,
     borderBottomColor: theme.colors.divider,
-    ...headerStyle,
+    ...(headerStyle ? StyleSheet.flatten(headerStyle) : {}),
   }), [theme.spacing.md, theme.colors.divider, headerStyle])
 
   const footerContainerStyle: ViewStyle = useMemo(() => ({
     padding: theme.spacing.md,
     borderTopWidth: 1,
     borderTopColor: theme.colors.divider,
-    ...footerStyle,
+    ...(footerStyle ? StyleSheet.flatten(footerStyle) : {}),
   }), [theme.spacing.md, theme.colors.divider, footerStyle])
 
   const renderCard = () => (

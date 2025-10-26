@@ -12,6 +12,7 @@ class ReservationResource extends JsonResource
     {
         return [
             'id' => $this->id,
+            'reservation_code' => $this->reservation_code,  // 🐛 BUG FIX #31: Add missing reservation_code field
             'quantity' => $this->quantity_reserved,
             'original_price' => (float) $this->product->original_price,
             'discounted_price' => (float) $this->product->discounted_price,

@@ -10,6 +10,11 @@ return new class extends Migration
 {
     public function up(): void
     {
+        // Drop foreign key constraint first (needed before dropping indexes)
+        Schema::table('payments', function (Blueprint $table) {
+            $table->dropForeign('payments_reservation_id_foreign');
+        });
+
         Schema::table('payments', function (Blueprint $table) {
             if (Schema::hasColumn('payments', 'reservation_id') && Schema::hasColumn('payments', 'status')) {
                 $table->dropIndex('payments_reservation_id_status_index');
@@ -42,12 +47,22 @@ return new class extends Migration
             $table->index('transaction_id');
         });
 
+        // Re-create foreign key constraint
+        Schema::table('payments', function (Blueprint $table) {
+            $table->foreign('reservation_id')->references('id')->on('reservations')->onDelete('cascade');
+        });
+
         // Note: payment_status and latest_payment_id are already added to reservations
         // in migration 2025_10_16_091500_add_core_fields_to_reservations_table.php
     }
 
     public function down(): void
     {
+        // Drop foreign key constraint first
+        Schema::table('payments', function (Blueprint $table) {
+            $table->dropForeign('payments_reservation_id_foreign');
+        });
+
         Schema::table('payments', function (Blueprint $table) {
             $table->dropIndex('payments_reservation_id_status_index');
             $table->dropIndex('payments_reference_index');
@@ -64,6 +79,11 @@ return new class extends Migration
         Schema::table('payments', function (Blueprint $table) {
             $table->index(['reservation_id', 'status']);
             $table->index('transaction_id');
+        });
+
+        // Re-create foreign key constraint
+        Schema::table('payments', function (Blueprint $table) {
+            $table->foreign('reservation_id')->references('id')->on('reservations')->onDelete('cascade');
         });
     }
 };

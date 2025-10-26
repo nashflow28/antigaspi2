@@ -57,6 +57,9 @@ Route::get('/search', [SearchController::class, 'index'])->middleware('throttle:
 Route::get('/search/suggestions', [SearchController::class, 'suggestions'])->middleware('throttle:search');
 Route::delete('/search/history/{searchQuery}', [SearchController::class, 'destroy'])->middleware(['jwt.auth', 'throttle:write']);
 
+// Route catégories (publique) - Pour compatibilité app mobile
+Route::get('/categories', [ProductController::class, 'categories']);
+
 // Routes analytics
 Route::prefix('analytics')->middleware('jwt.auth')->group(function () {
     Route::post('/events', [AnalyticsController::class, 'storeEvents']);

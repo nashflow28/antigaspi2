@@ -42,27 +42,41 @@ const ProductFormScreen: React.FC<Props> = ({ route, navigation }) => {
 
 
   const pickImage = async () => {
-    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync()
+    try {
+      console.log('📸 [ProductForm] Demande permission galerie...')
+      const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync()
+      console.log('📸 [ProductForm] Permission status:', status)
 
-    if (status !== 'granted') {
-      Alert.alert('Permission refusée', 'Nous avons besoin de votre permission pour accéder à la galerie.')
-      return
-    }
+      if (status !== 'granted') {
+        console.warn('⚠️ [ProductForm] Permission refusée')
+        Alert.alert('Permission refusée', 'Nous avons besoin de votre permission pour accéder à la galerie.')
+        return
+      }
 
-    const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: true,
-      aspect: [4, 3],
-      quality: 0.8,
-    })
+      console.log('📸 [ProductForm] Ouverture galerie...')
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images, // ⚠️ Deprecated but still required in expo-image-picker v17
+        allowsEditing: true,
+        aspect: [4, 3],
+        quality: 0.8,
+      })
 
-    if (!result.canceled && result.assets[0]) {
-      setImageUri(result.assets[0].uri)
+      console.log('📸 [ProductForm] Résultat sélection:', result.canceled ? 'Annulé' : 'Image sélectionnée')
+
+      if (!result.canceled && result.assets[0]) {
+        const selectedUri = result.assets[0].uri
+        console.log('✅ [ProductForm] Image URI:', selectedUri)
+        setImageUri(selectedUri)
+      }
+    } catch (error) {
+      console.error('❌ [ProductForm] Erreur sélection image:', error)
+      Alert.alert('Erreur', 'Impossible de sélectionner une image. Veuillez réessayer.')
     }
   }
 
   const uploadImage = async (imageUri: string): Promise<string | null> => {
     try {
+      console.log('📤 [ProductForm] Upload image démarré...')
       const formData = new FormData()
       const filename = imageUri.split('/').pop() || 'image.jpg'
       const match = /\.(\w+)$/.exec(filename)
@@ -80,9 +94,21 @@ const ProductFormScreen: React.FC<Props> = ({ route, navigation }) => {
         },
       })
 
-      return response.data.image_url || null
+      // 🐛 BUG FIX #27: Backend returns { success: true, data: { url, path, filename } }
+      // apiService.post() returns response.data directly, so response = { success, data: {...} }
+      console.log('✅ [ProductForm] Upload image réussi:', JSON.stringify(response, null, 2))
+
+      if (response.success && response.data?.url) {
+        console.log('✅ [ProductForm] Image URL récupérée:', response.data.url)
+        return response.data.url
+      }
+
+      console.warn('⚠️ [ProductForm] Aucune URL dans la réponse')
+      return null
     } catch (error) {
-      console.error('Erreur upload image:', error)
+      console.error('❌ [ProductForm] Erreur upload image:', error)
+      // 🐛 BUG FIX #25: Don't throw - return null to allow product creation without image
+      Alert.alert('Attention', 'L\'upload de l\'image a échoué. Le produit sera créé sans image.')
       return null
     }
   }
@@ -141,6 +167,11 @@ const ProductFormScreen: React.FC<Props> = ({ route, navigation }) => {
         console.log('📤 Upload image en cours...')
         uploadedImageUrl = await uploadImage(imageUri)
         console.log('✅ Image uploadée:', uploadedImageUrl)
+
+        // 🐛 BUG FIX #27: Update imageUri with server URL for display
+        if (uploadedImageUrl) {
+          setImageUri(uploadedImageUrl)
+        }
       }
 
       const productData = {
@@ -159,11 +190,13 @@ const ProductFormScreen: React.FC<Props> = ({ route, navigation }) => {
 
       if (mode === 'create') {
         const response = await apiService.post('/products', productData)
-        console.log('✅ Réponse API reçue:', response.data)
+        // 🐛 BUG FIX #24: apiService.post() returns response.data directly
+        console.log('✅ Réponse API reçue:', response)
         Alert.alert('Succès', 'Produit créé avec succès')
       } else {
         const response = await apiService.put(`/products/${product.id}`, productData)
-        console.log('✅ Réponse API reçue:', response.data)
+        // 🐛 BUG FIX #24: apiService.put() returns response.data directly
+        console.log('✅ Réponse API reçue:', response)
         Alert.alert('Succès', 'Produit modifié avec succès')
       }
 
@@ -175,23 +208,22 @@ const ProductFormScreen: React.FC<Props> = ({ route, navigation }) => {
       }
     } catch (error: any) {
       console.error('❌ ERREUR COMPLÈTE:', error)
-      console.error('❌ Error response:', error.response)
-      console.error('❌ Error data:', error.response?.data)
-      console.error('❌ Error status:', error.response?.status)
+      console.error('❌ Error message:', error.message)
+      console.error('❌ Error statusCode:', error.statusCode)
+      console.error('❌ Error validationErrors:', error.validationErrors)
 
       let errorMessage = 'Impossible de sauvegarder le produit'
 
-      if (error.response?.status === 401) {
-        errorMessage = 'Session expirée. Veuillez vous reconnecter.'
-      } else if (error.response?.status === 422) {
-        const errors = error.response?.data?.errors
-        if (errors) {
-          errorMessage = Object.values(errors).flat().join('\n')
-        } else {
-          errorMessage = error.response?.data?.message || 'Erreurs de validation'
-        }
-      } else if (error.response?.data?.message) {
-        errorMessage = error.response.data.message
+      // 🐛 BUG FIX #24: Handle validation errors from improved apiService
+      if (error.statusCode === 422 && error.validationErrors) {
+        // Format validation errors from backend
+        const errorMessages = Object.entries(error.validationErrors)
+          .map(([field, messages]: [string, any]) => {
+            const fieldName = field.replace(/_/g, ' ')
+            return `• ${fieldName}: ${Array.isArray(messages) ? messages.join(', ') : messages}`
+          })
+          .join('\n')
+        errorMessage = `Erreurs de validation:\n${errorMessages}`
       } else if (error.message) {
         errorMessage = error.message
       }
@@ -232,11 +264,33 @@ const ProductFormScreen: React.FC<Props> = ({ route, navigation }) => {
           <Text style={[styles.label, { color: theme.colors.text }]}>Photo du produit</Text>
           <TouchableOpacity
             style={[styles.imagePicker, { backgroundColor: theme.colors.surface.light, borderColor: theme.colors.border }]}
-            onPress={pickImage}
+            onPress={() => {
+              console.log('🖱️ [ProductForm] Bouton image cliqué !')
+              pickImage()
+            }}
             testID={TEST_IDS.imagePickerButton}
           >
             {imageUri ? (
-              <Image source={{ uri: imageUri }} style={styles.imagePreview} />
+              (() => {
+                const displayUri = imageUri.startsWith('file://') ? imageUri : getImageUrl(imageUri)
+                console.log('🖼️ [ProductForm] Affichage image:', {
+                  imageUri,
+                  isLocalFile: imageUri.startsWith('file://'),
+                  displayUri
+                })
+                return (
+                  <Image
+                    source={{ uri: displayUri }}
+                    style={styles.imagePreview}
+                    onError={(error) => {
+                      console.error('❌ [ProductForm] Erreur chargement image:', error.nativeEvent.error)
+                    }}
+                    onLoad={() => {
+                      console.log('✅ [ProductForm] Image chargée avec succès:', displayUri)
+                    }}
+                  />
+                )
+              })()
             ) : (
               <View style={styles.imagePlaceholder}>
                 <Ionicons name="camera" size={48} color={theme.colors.neutral[300]} />

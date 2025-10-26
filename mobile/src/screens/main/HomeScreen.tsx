@@ -91,7 +91,7 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
     if (diffDays === 0) {
       return { text: "Aujourd'hui entre 18h30 et 21h", color: theme.colors.primary[500] }
     } else if (diffDays === 1) {
-      return { text: "Demain entre 16h et 19h", color: theme.colors.success[500] }
+      return { text: "Demain entre 16h et 19h", color: theme.colors.success }
     } else {
       return { text: `Dans ${diffDays} jours`, color: theme.colors.neutral[500] }
     }
@@ -100,7 +100,7 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
   // Filtrage des produits selon catégorie, disponibilité et distance
   const filteredProducts = (products || []).filter(product => {
     // Filtre par catégorie
-    if (selectedCategory !== 'all' && product.category.id !== parseInt(selectedCategory)) {
+    if (selectedCategory !== 'all' && product.category?.id !== parseInt(selectedCategory)) {
       return false
     }
 
@@ -340,7 +340,7 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
                   {formatCurrency(discountedPrice)}
                 </Typography>
                 {discountPercent > 0 && (
-                  <Typography variant="caption" weight="bold" style={{ color: theme.colors.error[500], fontSize: 13 }}>
+                  <Typography variant="caption" weight="bold" style={{ color: theme.colors.error, fontSize: 13 }}>
                     -{discountPercent}%
                   </Typography>
                 )}
@@ -398,7 +398,7 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
           {categories && Array.isArray(categories) && categories.map(category => {
             // Compter produits par catégorie (avec filtre disponibilité)
             const categoryProductCount = (products || []).filter(
-              p => p.category.id === category.id &&
+              p => p.category?.id === category.id &&
               (showAvailable ? p.quantity_available > 0 : true)
             ).length
 

@@ -82,7 +82,7 @@ const ProductsScreen: React.FC<Props> = ({ navigation }) => {
     const safeDiscounted = Number.isFinite(discountedPrice) ? discountedPrice : 0
     const safeOriginal = Number.isFinite(originalPrice) ? originalPrice : safeDiscounted
 
-    const merchantAttributes = attributes.merchant ?? {}
+    const merchantAttributes = (attributes.merchant ?? {}) as any
     const discountPercentage = safeOriginal > 0
       ? Math.max(0, Math.round(((safeOriginal - safeDiscounted) / safeOriginal) * 100))
       : 0
@@ -95,13 +95,13 @@ const ProductsScreen: React.FC<Props> = ({ navigation }) => {
       : 0
 
     // Mapper expiration_date et calculer days_until_expiration
-    const expirationDate = attributes.expiration_date ?? new Date().toISOString()
+    const expirationDate = (attributes.expiration_date as any as string) ?? new Date().toISOString()
     const daysUntilExpiration = attributes.expiration_date
-      ? Math.ceil((new Date(attributes.expiration_date).getTime() - Date.now()) / (1000 * 60 * 60 * 24))
+      ? Math.ceil((new Date(attributes.expiration_date as any as string).getTime() - Date.now()) / (1000 * 60 * 60 * 24))
       : 0
 
     // Mapper la catégorie depuis les attributs
-    const categoryAttributes = attributes.category ?? {}
+    const categoryAttributes = (attributes.category ?? {}) as any
     const category = {
       id: categoryAttributes.id ?? 0,
       name: categoryAttributes.name ?? 'Autres',
@@ -116,7 +116,7 @@ const ProductsScreen: React.FC<Props> = ({ navigation }) => {
       discounted_price: String(safeDiscounted),
       quantity_available: safeQuantity,
       expiration_date: expirationDate,
-      image_url: typeof attributes.image_url === 'string' ? attributes.image_url : undefined,
+      image_url: typeof attributes.image_url === 'string' ? attributes.image_url : (attributes.image_url as any as string | undefined),
       discount_percentage: discountPercentage,
       savings: Math.max(0, safeOriginal - safeDiscounted),
       days_until_expiration: Math.max(0, daysUntilExpiration),
@@ -132,10 +132,10 @@ const ProductsScreen: React.FC<Props> = ({ navigation }) => {
         latitude: merchantAttributes.latitude ?? null,
         longitude: merchantAttributes.longitude ?? null,
       },
-      created_at: attributes.created_at ?? new Date().toISOString(),
-      is_active: attributes.is_active ?? true,
-      status: attributes.status ?? undefined,
-      needs_approval: attributes.needs_approval ?? undefined,
+      created_at: (attributes.created_at as any as string) ?? new Date().toISOString(),
+      is_active: (attributes.is_active as any as boolean) ?? true,
+      status: (attributes.status as any as string | undefined) ?? undefined,
+      needs_approval: (attributes.needs_approval as any as boolean | undefined) ?? undefined,
     }
   }, [products])
 
@@ -676,7 +676,7 @@ const ProductsScreen: React.FC<Props> = ({ navigation }) => {
           {/* Badge vérifié */}
           {merchant.is_verified && (
             <View style={styles.verifiedBadge}>
-              <Ionicons name="checkmark-circle" size={16} color={theme.colors.success[500]} />
+              <Ionicons name="checkmark-circle" size={16} color={theme.colors.success} />
             </View>
           )}
 
@@ -782,7 +782,7 @@ const ProductsScreen: React.FC<Props> = ({ navigation }) => {
                   {formatCurrency(discountedPrice)}
                 </Typography>
                 {discountPercent > 0 && (
-                  <Typography variant="caption" weight="bold" style={{ color: theme.colors.error[500], fontSize: 11 }}>
+                  <Typography variant="caption" weight="bold" style={{ color: theme.colors.error, fontSize: 11 }}>
                     -{discountPercent}%
                   </Typography>
                 )}
@@ -942,7 +942,7 @@ const ProductsScreen: React.FC<Props> = ({ navigation }) => {
       {searchError && (
         <Typography
           variant="caption"
-          style={[styles.searchStatus, { color: theme.colors.error[500] }]}
+          style={[styles.searchStatus, { color: theme.colors.error }]}
         >
           {searchError}
         </Typography>
