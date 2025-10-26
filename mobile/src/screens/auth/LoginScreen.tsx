@@ -124,8 +124,8 @@ const LoginScreen: React.FC<Props> = ({ navigation }) => {
           </View>
 
           {error && (
-            <View style={{ backgroundColor: theme.colors.error[50], padding: theme.spacing.sm, borderRadius: theme.radius.md, marginBottom: theme.spacing.lg }}>
-              <Typography variant="caption" style={{ color: theme.colors.error[600], textAlign: 'center' }}>
+            <View style={{ backgroundColor: theme.colors.error, padding: theme.spacing.sm, borderRadius: theme.radius.md, marginBottom: theme.spacing.lg }}>
+              <Typography variant="caption" style={{ color: theme.colors.error, textAlign: 'center' }}>
                 {error}
               </Typography>
             </View>
@@ -146,7 +146,7 @@ const LoginScreen: React.FC<Props> = ({ navigation }) => {
         </Card>
 
         {/* Comptes de test */}
-        <Card variant="flat" style={{ backgroundColor: theme.colors.info[50], padding: theme.spacing.md, marginBottom: theme.spacing.lg }}>
+        <Card variant="flat" style={{ backgroundColor: theme.colors.info, padding: theme.spacing.md, marginBottom: theme.spacing.lg }}>
           <Typography variant="caption" weight="semibold" style={{ marginBottom: theme.spacing.sm, textAlign: 'center' }}>
             Comptes de test :
           </Typography>
@@ -157,9 +157,10 @@ const LoginScreen: React.FC<Props> = ({ navigation }) => {
             fullWidth
             style={{ marginBottom: theme.spacing.sm }}
             onPress={() => {
+              // 🐛 BUG FIX: Updated to match CLAUDE.md seeder credentials
               const consumerCreds = {
-                email: 'consumer@antigaspi.com',
-                password: 'consumer123'
+                email: 'jean.dupont@email.com',
+                password: 'password'
               }
               setCredentials(consumerCreds)
               handleLogin(consumerCreds)
@@ -175,10 +176,10 @@ const LoginScreen: React.FC<Props> = ({ navigation }) => {
             size="md"
             fullWidth
             onPress={() => {
-              // 🐛 BUG FIX #39: Use correct merchant password (merchant123)
+              // 🐛 BUG FIX: Updated to match CLAUDE.md seeder credentials
               const merchantCreds = {
-                email: 'merchant@antigaspi.com',
-                password: 'merchant123'
+                email: 'boulangerie.martin@email.com',
+                password: 'password'
               }
               setCredentials(merchantCreds)
               handleLogin(merchantCreds)

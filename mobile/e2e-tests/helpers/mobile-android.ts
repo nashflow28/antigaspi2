@@ -271,13 +271,13 @@ export async function loginAsConsumer(): Promise<boolean> {
     // Fill email (tap on email input field - coordinates may vary)
     await tap(540, 800); // Email input center (adjust based on your layout)
     await wait(500);
-    await typeText('consumer@antigaspi.com');
+    await typeText('jean.dupont@email.com'); // 🐛 BUG FIX: Updated to match CLAUDE.md credentials
     await takeScreenshot('02-email-filled');
 
     // Fill password
     await tap(540, 950); // Password input center
     await wait(500);
-    await typeText('consumer123');
+    await typeText('password'); // 🐛 BUG FIX: Updated to match CLAUDE.md credentials
     await takeScreenshot('03-password-filled');
 
     // Tap login button
@@ -308,11 +308,11 @@ export async function loginAsMerchant(): Promise<boolean> {
 
     await tap(540, 800);
     await wait(500);
-    await typeText('merchant@antigaspi.com');
+    await typeText('boulangerie.martin@email.com'); // 🐛 BUG FIX: Updated to match CLAUDE.md credentials
 
     await tap(540, 950);
     await wait(500);
-    await typeText('merchant123');
+    await typeText('password'); // 🐛 BUG FIX: Updated to match CLAUDE.md credentials
 
     await tap(540, 1200);
     await wait(3000);

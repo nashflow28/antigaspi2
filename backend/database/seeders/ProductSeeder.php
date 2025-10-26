@@ -15,7 +15,7 @@ class ProductSeeder extends Seeder
     public function run(): void
     {
         // Get the test merchant (Boulangerie du Centre)
-        $merchantUser = User::where('email', 'merchant@antigaspi.com')->first();
+        $merchantUser = User::where('email', 'boulangerie.martin@email.com')->first();
         $merchant = $merchantUser?->merchant;
 
         if (!$merchant) {

@@ -20,7 +20,7 @@ class AdminUserSeeder extends Seeder
                 'first_name' => 'Admin',
                 'last_name' => 'System',
                 'name' => 'Admin System',
-                'password' => Hash::make('admin123'),
+                'password' => Hash::make('password'),
                 'phone' => '+33100000001',
                 'role' => 'admin',
                 'city' => 'Paris',
@@ -31,16 +31,16 @@ class AdminUserSeeder extends Seeder
         );
 
         $merchantUser = User::updateOrCreate(
-            ['email' => 'merchant@antigaspi.com'],
+            ['email' => 'boulangerie.martin@email.com'],
             [
-                'first_name' => 'Marc',
-                'last_name' => 'Commerçant',
-                'name' => 'Marc Commerçant',
-                'password' => Hash::make('merchant123'),
-                'phone' => '+33100000002',
+                'first_name' => 'Martin',
+                'last_name' => 'Boulanger',
+                'name' => 'Martin Boulanger',
+                'password' => Hash::make('password'),
+                'phone' => '+22890123456',
                 'role' => 'merchant',
-                'city' => 'Lyon',
-                'address' => '12 Rue des Commerçants, Lyon',
+                'city' => 'Lomé',
+                'address' => '15 Boulevard du 13 Janvier, Lomé',
                 'is_active' => true,
                 'email_verified_at' => now(),
             ]
@@ -69,16 +69,16 @@ class AdminUserSeeder extends Seeder
         );
 
         User::updateOrCreate(
-            ['email' => 'consumer@antigaspi.com'],
+            ['email' => 'jean.dupont@email.com'],
             [
-                'first_name' => 'Claire',
-                'last_name' => 'Consommatrice',
-                'name' => 'Claire Consommatrice',
-                'password' => Hash::make('consumer123'),
-                'phone' => '+33100000003',
+                'first_name' => 'Jean',
+                'last_name' => 'Dupont',
+                'name' => 'Jean Dupont',
+                'password' => Hash::make('password'),
+                'phone' => '+22890654321',
                 'role' => 'consumer',
-                'city' => 'Marseille',
-                'address' => '5 Rue des Consommateurs, Marseille',
+                'city' => 'Lomé',
+                'address' => '25 Rue de la Paix, Lomé',
                 'is_active' => true,
                 'email_verified_at' => now(),
             ]

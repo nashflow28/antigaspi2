@@ -37,7 +37,11 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->throttleApi();
     })
     ->withExceptions(function (Exceptions $exceptions): void {
-        //
+        // 🐛 BUG FIX: Force JSON responses for all API routes (mobile app compatibility)
+        // Without this, Laravel returns HTML redirects instead of JSON errors when Accept header is missing
+        $exceptions->shouldRenderJsonWhen(function (Request $request) {
+            return $request->is('api/*') || $request->expectsJson();
+        });
     })
     ->booting(function () {
         // Configuration du rate limiting

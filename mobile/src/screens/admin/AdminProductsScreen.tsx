@@ -98,7 +98,7 @@ const AdminProductsScreen: React.FC = () => {
 
     // Filtre par catégorie
     if (categoryFilter !== 'all') {
-      filtered = filtered.filter(p => p.category.id === categoryFilter)
+      filtered = filtered.filter(p => p.category?.id === categoryFilter)
     }
 
     // Filtre par recherche
@@ -360,7 +360,7 @@ const AdminProductsScreen: React.FC = () => {
           <View style={styles.productCard}>
             {/* Image */}
             <Image
-              source={{ uri: getImageUrl(item.image_url, item.category.name) }}
+              source={{ uri: getImageUrl(item.image_url, item.category?.name) }}
               style={styles.productImage}
               contentFit="cover"
             />
@@ -384,7 +384,7 @@ const AdminProductsScreen: React.FC = () => {
               <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 8 }}>
                 <Ionicons name="folder-outline" size={12} color={theme.colors.neutral[500]} />
                 <Typography variant="caption" color="secondary" style={{ marginLeft: 4 }}>
-                  {item.category.name}
+                  {item.category?.name || 'Non catégorisé'}
                 </Typography>
                 <Typography variant="caption" color="secondary" style={{ marginHorizontal: 6 }}>
                   •
@@ -436,13 +436,13 @@ const AdminProductsScreen: React.FC = () => {
                     <TouchableOpacity
                       style={[
                         styles.quickActionBtn,
-                        { backgroundColor: theme.withOpacity(theme.colors.success[500], 0.1) },
+                        { backgroundColor: theme.withOpacity(theme.colors.success, 0.1) },
                       ]}
                       onPress={() => handleApproveProduct(item)}
                       disabled={isActionLoading}
                     >
-                      <Ionicons name="checkmark" size={16} color={theme.colors.success[500]} />
-                      <Typography variant="caption" weight="semibold" style={{ color: theme.colors.success[500] }}>
+                      <Ionicons name="checkmark" size={16} color={theme.colors.success} />
+                      <Typography variant="caption" weight="semibold" style={{ color: theme.colors.success }}>
                         Approuver
                       </Typography>
                     </TouchableOpacity>
@@ -450,13 +450,13 @@ const AdminProductsScreen: React.FC = () => {
                     <TouchableOpacity
                       style={[
                         styles.quickActionBtn,
-                        { backgroundColor: theme.withOpacity(theme.colors.error[500], 0.1) },
+                        { backgroundColor: theme.withOpacity(theme.colors.error, 0.1) },
                       ]}
                       onPress={() => handleRejectProduct(item)}
                       disabled={isActionLoading}
                     >
-                      <Ionicons name="close" size={16} color={theme.colors.error[500]} />
-                      <Typography variant="caption" weight="semibold" style={{ color: theme.colors.error[500] }}>
+                      <Ionicons name="close" size={16} color={theme.colors.error} />
+                      <Typography variant="caption" weight="semibold" style={{ color: theme.colors.error }}>
                         Rejeter
                       </Typography>
                     </TouchableOpacity>
@@ -498,7 +498,7 @@ const AdminProductsScreen: React.FC = () => {
           <ScrollView style={styles.modalContent}>
             {/* Image */}
             <Image
-              source={{ uri: getImageUrl(selectedProduct.image_url, selectedProduct.category.name) }}
+              source={{ uri: getImageUrl(selectedProduct.image_url, selectedProduct.category?.name) }}
               style={styles.modalImage}
               contentFit="cover"
             />
@@ -523,7 +523,7 @@ const AdminProductsScreen: React.FC = () => {
               <View style={styles.infoRow}>
                 <Ionicons name="pricetag" size={20} color={theme.colors.textSecondary} />
                 <Typography variant="body" color="secondary" style={{ marginLeft: 8 }}>
-                  {selectedProduct.category.name}
+                  {selectedProduct.category?.name}
                 </Typography>
               </View>
 
@@ -670,7 +670,7 @@ const AdminProductsScreen: React.FC = () => {
             </Typography>
             {pendingCount > 0 && (
               <View style={styles.pendingBadge}>
-                <Ionicons name="alert-circle" size={16} color={theme.colors.warning[500]} />
+                <Ionicons name="alert-circle" size={16} color={theme.colors.warning} />
                 <Typography variant="caption" weight="semibold" style={{ color: '#FFF3CD' }}>
                   {pendingCount} produit{pendingCount > 1 ? 's' : ''} en attente
                 </Typography>
@@ -763,7 +763,7 @@ const AdminProductsScreen: React.FC = () => {
           </TouchableOpacity>
 
           {categories.map(cat => {
-            const count = products.filter(p => p.category.id === cat.id).length
+            const count = products.filter(p => p.category?.id === cat.id).length
             return (
               <TouchableOpacity
                 key={cat.id}

@@ -57,7 +57,7 @@ const getTransactionIcon = (type: WalletTransactionType): keyof typeof Ionicons.
   type === 'credit' ? 'arrow-down-circle' : 'arrow-up-circle'
 
 const getTransactionColor = (type: WalletTransactionType, theme: ReturnType<typeof useTheme>) =>
-  type === 'credit' ? theme.colors.success[500] : theme.colors.error[500]
+  type === 'credit' ? theme.colors.success : theme.colors.error
 
 const WalletScreen: React.FC = () => {
   const theme = useTheme()
@@ -107,7 +107,7 @@ const WalletScreen: React.FC = () => {
   useEffect(() => {
     void (async () => {
       await dispatch(fetchWallet())
-      await dispatch(fetchWalletTransactions())
+      await dispatch(fetchWalletTransactions({}))
       await dispatch(fetchWalletStats(statsPeriod))
     })()
   }, [dispatch, statsPeriod])
@@ -277,7 +277,7 @@ const WalletScreen: React.FC = () => {
         <Typography variant="caption" color="secondary">
           Solde disponible
         </Typography>
-        <Typography variant="heading3" weight="bold" style={styles.balanceValue}>
+        <Typography variant="h3" weight="bold" style={styles.balanceValue}>
           {formatCurrency(wallet?.balance ?? 0)}
         </Typography>
         <Typography variant="caption" color="secondary" style={styles.balanceSubtext}>
@@ -342,7 +342,7 @@ const WalletScreen: React.FC = () => {
             <Typography variant="caption" color="secondary">
               Crédits
             </Typography>
-            <Typography variant="body" weight="semibold" style={{ color: theme.colors.success[600] }}>
+            <Typography variant="body" weight="semibold" style={{ color: theme.colors.success }}>
               {stats ? formatCurrency(stats.period_stats.total_credits) : '—'}
             </Typography>
           </View>
@@ -350,7 +350,7 @@ const WalletScreen: React.FC = () => {
             <Typography variant="caption" color="secondary">
               Débits
             </Typography>
-            <Typography variant="body" weight="semibold" style={{ color: theme.colors.error[600] }}>
+            <Typography variant="body" weight="semibold" style={{ color: theme.colors.error }}>
               {stats ? formatCurrency(stats.period_stats.total_debits) : '—'}
             </Typography>
           </View>

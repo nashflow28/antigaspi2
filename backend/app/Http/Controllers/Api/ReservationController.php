@@ -28,6 +28,11 @@ class ReservationController extends Controller
         try {
             $user = JWTAuth::parseToken()->authenticate();
 
+            \Log::info('Fetching reservations for user', [
+                'user_id' => $user->id,
+                'user_email' => $user->email
+            ]);
+
             $query = Reservation::with(['product.category', 'product.merchant.user'])
                 ->where('user_id', $user->id);
 
@@ -59,6 +64,12 @@ class ReservationController extends Controller
             // 🐛 BUG FIX #16: Add minimum limit to pagination to prevent per_page=0
             $perPage = max(1, min($request->get('per_page', 15), 50));
             $reservations = $query->paginate($perPage);
+
+            \Log::info('Reservations found', [
+                'count' => $reservations->total(),
+                'current_page' => $reservations->currentPage(),
+                'items' => collect($reservations->items())->pluck('id', 'reservation_code')->toArray()
+            ]);
 
             return response()->json([
                 'success' => true,
@@ -117,11 +128,28 @@ class ReservationController extends Controller
                 return response()->json($response, 201);
             });
         } catch (\Exception $e) {
-            return response()->json([
+            \Log::error('Reservation creation error:', [
+                'message' => $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+                'trace' => $e->getTraceAsString()
+            ]);
+
+            $response = [
                 'success' => false,
                 'message' => 'Erreur lors de la création de la réservation',
-                'error' => $e->getMessage()
-            ], 500);
+            ];
+
+            // Only expose debug info in development environment
+            if (config('app.debug')) {
+                $response['error'] = $e->getMessage();
+                $response['debug'] = [
+                    'file' => $e->getFile(),
+                    'line' => $e->getLine()
+                ];
+            }
+
+            return response()->json($response, 500);
         }
     }
 

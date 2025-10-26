@@ -18,7 +18,19 @@ class StoreReservationRequest extends FormRequest
 
     public function authorize(): bool
     {
-        return Auth::check() && Auth::user()->role === 'consumer';
+        // 🐛 BUG FIX: JWT authentication is already handled by 'jwt.auth' middleware on the route
+        // Auth::check() only works with session-based auth, not JWT tokens
+        // The middleware ensures the user is authenticated via JWT before this request is processed
+
+        // Verify user is authenticated (middleware guarantees this, but double-check)
+        $user = auth()->user();
+
+        if (!$user) {
+            return false;
+        }
+
+        // Only consumers can create reservations
+        return $user->role === 'consumer';
     }
 
     public function rules(): array

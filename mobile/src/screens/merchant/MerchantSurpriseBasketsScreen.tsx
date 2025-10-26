@@ -57,7 +57,8 @@ const MerchantSurpriseBasketsScreen: React.FC<Props> = ({ navigation }) => {
       console.log('📦 [MerchantSurpriseBaskets] Chargement des paniers...')
       const response = await apiService.get('/surprise-baskets/merchant/list')
       console.log('📦 [MerchantSurpriseBaskets] Réponse:', response)
-      setBaskets(response.data || [])
+      // 🐛 BUG FIX: API returns paginated data, baskets are in response.data.data
+      setBaskets(response.data?.data || [])
     } catch (error: any) {
       console.error('❌ [MerchantSurpriseBaskets] Erreur:', error)
       Alert.alert('Erreur', 'Impossible de charger les paniers surprise')

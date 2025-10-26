@@ -20,9 +20,15 @@ export const getImageUrl = (
     return imageUrl
   }
 
-  // Build full URL from API base
-  const baseUrl = API_BASE_URL.replace('/api', '')
-  return `${baseUrl}/${imageUrl}`
+  // Build full URL from API base. Only strip a trailing /api segment so that
+  // API hosts like https://api.antigaspi.com/api keep the subdomain intact.
+  const baseUrl = API_BASE_URL.replace(/\/api\/?$/, '')
+
+  // Ensure we don't end up with double slashes when the relative path already
+  // starts with one (e.g. `/storage/products/foo.jpg`).
+  const normalizedPath = imageUrl.replace(/^\/+/, '')
+
+  return `${baseUrl}/${normalizedPath}`
 }
 
 /**

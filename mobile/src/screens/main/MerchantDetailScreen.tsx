@@ -52,22 +52,35 @@ const MerchantDetailScreen: React.FC<Props> = ({ route, navigation }) => {
 
     const loadMerchantData = async () => {
       try {
-        if (products.length === 0) {
-          await dispatch(fetchProducts({ per_page: 50 }))
-        }
-        const merchantProds = products.filter(p => p.merchant?.id === merchantId)
+        // 🐛 BUG FIX: unwrap() retourne directement les produits
+        const allProducts = await dispatch(fetchProducts({ per_page: 100 })).unwrap()
 
-        // ✅ Validation robuste avant setState
-        if (isMounted && merchantProds.length > 0) {
+        if (!isMounted) return
+
+        // Filtrer les produits retournés par le dispatch
+        const merchantProds = allProducts.filter((p: any) => p.merchant?.id === merchantId)
+
+        if (merchantProds.length > 0) {
           const firstProduct = merchantProds[0]
           if (firstProduct && firstProduct.merchant) {
             setMerchantProducts(merchantProds)
             setMerchant(firstProduct.merchant)
           }
+        } else {
+          // 🐛 BUG FIX: Si aucun produit, afficher un message
+          if (isMounted) {
+            Alert.alert(
+              'Aucun produit',
+              'Ce marchand n\'a aucun produit disponible pour le moment.',
+              [{ text: 'OK', onPress: () => navigation.goBack() }]
+            )
+          }
         }
       } catch (error) {
+        console.error('❌ Error loading merchant data:', error)
         if (isMounted) {
           Alert.alert('Erreur', 'Impossible de charger les données du marchand')
+          navigation.goBack()
         }
       }
     }
@@ -78,7 +91,7 @@ const MerchantDetailScreen: React.FC<Props> = ({ route, navigation }) => {
     return () => {
       isMounted = false
     }
-  }, [merchantId, products, dispatch]) // ✅ Dépendances complètes
+  }, [merchantId, dispatch]) // ✅ Retirer products des dépendances pour éviter boucle infinie
 
   useEffect(() => {
     const initLocation = async () => {
@@ -548,7 +561,7 @@ const MerchantDetailScreen: React.FC<Props> = ({ route, navigation }) => {
               </Typography>
             </View>
             <View style={styles.paymentCard}>
-              <Ionicons name="cash" size={24} color={theme.colors.success[500]} />
+              <Ionicons name="cash" size={24} color={theme.colors.success} />
               <Typography variant="caption" weight="medium" style={{ fontSize: 11, textAlign: 'center' }}>
                 Espèces
               </Typography>

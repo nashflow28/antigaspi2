@@ -56,7 +56,7 @@ export const formatCurrency = (
   const formatted = new Intl.NumberFormat('fr-FR', {
     style: 'decimal',
     minimumFractionDigits: decimals,
-    maxFractionDigits: decimals,
+    maximumFractionDigits: decimals,
   }).format(Math.round(numericValue))
 
   return showSymbol ? `${formatted} F CFA` : formatted

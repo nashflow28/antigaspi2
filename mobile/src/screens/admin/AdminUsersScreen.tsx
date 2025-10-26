@@ -262,7 +262,7 @@ const AdminUsersScreen: React.FC = () => {
             styles.filterChip,
             {
               backgroundColor:
-                roleFilter === 'consumer' ? theme.colors.success[500] : theme.colors.surface.light,
+                roleFilter === 'consumer' ? theme.colors.success : theme.colors.surface.light,
             },
           ]}
         >
@@ -283,7 +283,7 @@ const AdminUsersScreen: React.FC = () => {
             styles.filterChip,
             {
               backgroundColor:
-                roleFilter === 'merchant' ? theme.colors.warning[500] : theme.colors.surface.light,
+                roleFilter === 'merchant' ? theme.colors.warning : theme.colors.surface.light,
             },
           ]}
         >
@@ -304,7 +304,7 @@ const AdminUsersScreen: React.FC = () => {
             styles.filterChip,
             {
               backgroundColor:
-                roleFilter === 'admin' ? theme.colors.error[500] : theme.colors.surface.light,
+                roleFilter === 'admin' ? theme.colors.error : theme.colors.surface.light,
             },
           ]}
         >

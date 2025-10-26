@@ -13,8 +13,9 @@ import {
 } from 'react-native'
 import { Ionicons } from '@expo/vector-icons'
 import { useNavigation } from '@react-navigation/native'
-import { useSelector } from 'react-redux'
+import { useSelector, useDispatch } from 'react-redux'
 import { RootState } from '../../store'
+import { refreshProfile } from '../../store/slices/authSlice'
 import * as ImagePicker from 'expo-image-picker'
 import { useTheme } from '../../theme'
 import apiService from '../../services/api'
@@ -33,6 +34,7 @@ interface ProfileFormData {
 const MerchantProfileEditScreen: React.FC = () => {
   const theme = useTheme()
   const navigation = useNavigation()
+  const dispatch = useDispatch()
   const { user } = useSelector((state: RootState) => state.auth)
 
   const [loading, setLoading] = useState(false)
@@ -120,8 +122,9 @@ const MerchantProfileEditScreen: React.FC = () => {
       setLocationLoading(true)
       const response = await apiService.getMerchantLocation()
 
-      if (response.data?.success) {
-        const locationData = response.data.data
+      // 🐛 BUG FIX #22: apiService methods return response.data directly
+      if (response.success) {
+        const locationData = response.data
         const latValue = parseCoordinateFromApi(locationData?.latitude)
         const lngValue = parseCoordinateFromApi(locationData?.longitude)
 
@@ -229,9 +232,12 @@ const MerchantProfileEditScreen: React.FC = () => {
   }
 
   const saveLocationIfNeeded = async (): Promise<boolean> => {
-    const hasInput = latitude.trim().length > 0 || longitude.trim().length > 0
+    const hasLatInput = latitude.trim().length > 0
+    const hasLngInput = longitude.trim().length > 0
 
-    if (!hasInput) {
+    // 🐛 BUG FIX #21: Improved coordinate validation to require BOTH coordinates
+    if (!hasLatInput && !hasLngInput) {
+      // No coordinates entered - restore initial values if they exist
       if (initialLatitudeValue !== null || initialLongitudeValue !== null) {
         setLatitude(formatCoordinate(initialLatitudeValue))
         setLongitude(formatCoordinate(initialLongitudeValue))
@@ -239,6 +245,16 @@ const MerchantProfileEditScreen: React.FC = () => {
       return false
     }
 
+    // If only ONE coordinate is entered, require BOTH
+    if (hasLatInput && !hasLngInput) {
+      throw new Error('Veuillez entrer également la longitude (ou laissez les deux champs vides).')
+    }
+
+    if (!hasLatInput && hasLngInput) {
+      throw new Error('Veuillez entrer également la latitude (ou laissez les deux champs vides).')
+    }
+
+    // Both coordinates entered - parse and validate
     const parsedLatitude = parseCoordinateInput(latitude)
     const parsedLongitude = parseCoordinateInput(longitude)
 
@@ -273,12 +289,13 @@ const MerchantProfileEditScreen: React.FC = () => {
       longitude: parsedLongitude,
     })
 
-    if (!response.data?.success) {
-      throw new Error(response.data?.message || 'Impossible de mettre à jour la localisation')
+    // 🐛 BUG FIX #22: apiService methods return response.data directly
+    if (!response.success) {
+      throw new Error(response.message || 'Impossible de mettre à jour la localisation')
     }
 
-    const savedLatValue = parseCoordinateFromApi(response.data.data?.latitude) ?? parsedLatitude
-    const savedLngValue = parseCoordinateFromApi(response.data.data?.longitude) ?? parsedLongitude
+    const savedLatValue = parseCoordinateFromApi(response.data?.latitude) ?? parsedLatitude
+    const savedLngValue = parseCoordinateFromApi(response.data?.longitude) ?? parsedLongitude
 
     setLatitude(formatCoordinate(savedLatValue))
     setLongitude(formatCoordinate(savedLngValue))
@@ -298,10 +315,19 @@ const MerchantProfileEditScreen: React.FC = () => {
         return
       }
 
+      // 🐛 DEBUG: Log request data
+      console.log('📤 [MerchantProfileEdit] Envoi données:', JSON.stringify(formData, null, 2))
+
       const response = await apiService.put('/merchants/profile', formData)
 
-      if (!response.data?.success) {
-        throw new Error(response.data?.message || 'Impossible de mettre à jour le profil')
+      // 🐛 DEBUG: Log response - apiService.put() returns response.data directly
+      console.log('📥 [MerchantProfileEdit] Réponse complète:', JSON.stringify(response, null, 2))
+
+      // 🐛 BUG FIX #22: apiService.put() returns response.data directly, not the full response
+      // So we access response.success, NOT response.data.success
+      if (!response.success) {
+        console.error('❌ [MerchantProfileEdit] API returned success=false:', response)
+        throw new Error(response.message || 'Impossible de mettre à jour le profil')
       }
 
       let locationUpdated = false
@@ -315,6 +341,11 @@ const MerchantProfileEditScreen: React.FC = () => {
 
         throw new Error('Impossible de mettre à jour la localisation')
       }
+
+      // 🐛 BUG FIX #23: Refresh user data from backend to update Redux store
+      console.log('🔄 [MerchantProfileEdit] Rafraîchissement des données user...')
+      await dispatch(refreshProfile() as any)
+      console.log('✅ [MerchantProfileEdit] Données user rafraîchies')
 
       const successMessage = locationUpdated
         ? 'Profil et localisation mis à jour avec succès'

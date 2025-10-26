@@ -67,13 +67,13 @@ const FavoritesStack = () => (
   </Stack.Navigator>
 )
 
-// 📝 NOTE #MOB-M-001: Tab name is "Orders", first screen is "OrdersMain"
-// When navigating from other stacks, use navigation.navigate('Orders') to switch to this tab
-// This is intentional - tab navigation uses tab names, not screen names
+// 🐛 BUG FIX #32: Reservations first, Cart second in Orders tab
+// The "Orders" tab should show reservations (confirmed orders) as the main screen
+// Cart is for items being prepared before checkout
 const OrdersStack = () => (
   <Stack.Navigator screenOptions={{ headerShown: false }}>
-    <Stack.Screen name="OrdersMain" component={CartScreen} />
-    <Stack.Screen name="ReservationsList" component={ReservationsScreen} />
+    <Stack.Screen name="OrdersMain" component={ReservationsScreen} />
+    <Stack.Screen name="Cart" component={CartScreen} />
     <Stack.Screen name="ReservationDetails" component={ReservationDetailsScreen} />
     <Stack.Screen name="ProductDetails" component={ProductDetailsScreen} />
     <Stack.Screen name="MerchantDetail" component={MerchantDetailScreen} />

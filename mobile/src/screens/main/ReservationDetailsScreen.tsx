@@ -190,7 +190,7 @@ const ReservationDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
 
           {/* Étape 1: Réservation créée */}
           <View style={styles.timelineStep}>
-            <View style={[styles.timelineDot, { backgroundColor: theme.colors.success[500] }]}>
+            <View style={[styles.timelineDot, { backgroundColor: theme.colors.success }]}>
               <Ionicons name="checkmark" size={16} color={theme.colors.textInverse} />
             </View>
             <View style={styles.timelineContent}>
@@ -208,7 +208,7 @@ const ReservationDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
 
           {/* Ligne de connexion */}
           {['confirmed', 'ready', 'completed'].includes(reservation.status) && (
-            <View style={[styles.timelineLine, { backgroundColor: theme.colors.success[500] }]} />
+            <View style={[styles.timelineLine, { backgroundColor: theme.colors.success }]} />
           )}
           {reservation.status === 'pending' && (
             <View style={[styles.timelineLine, { backgroundColor: theme.colors.neutral[200] }]} />
@@ -218,7 +218,7 @@ const ReservationDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
           <View style={styles.timelineStep}>
             <View style={[
               styles.timelineDot,
-              { backgroundColor: ['confirmed', 'ready', 'completed'].includes(reservation.status) ? theme.colors.success[500] : reservation.status === 'pending' ? theme.colors.warning[500] : theme.colors.neutral[300] }
+              { backgroundColor: ['confirmed', 'ready', 'completed'].includes(reservation.status) ? theme.colors.success : reservation.status === 'pending' ? theme.colors.warning : theme.colors.neutral[300] }
             ]}>
               {['confirmed', 'ready', 'completed'].includes(reservation.status) ? (
                 <Ionicons name="checkmark" size={16} color={theme.colors.textInverse} />
@@ -243,7 +243,7 @@ const ReservationDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
                 </Typography>
               )}
               {!reservation.confirmed_at && reservation.status === 'pending' && (
-                <Typography variant="caption" style={{ color: theme.colors.warning[600] }}>
+                <Typography variant="caption" style={{ color: theme.colors.warning }}>
                   Le commerçant va confirmer votre réservation sous peu
                 </Typography>
               )}
@@ -252,7 +252,7 @@ const ReservationDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
 
           {/* Ligne de connexion */}
           {['ready', 'completed'].includes(reservation.status) && (
-            <View style={[styles.timelineLine, { backgroundColor: theme.colors.success[500] }]} />
+            <View style={[styles.timelineLine, { backgroundColor: theme.colors.success }]} />
           )}
           {['pending', 'confirmed'].includes(reservation.status) && (
             <View style={[styles.timelineLine, { backgroundColor: theme.colors.neutral[200] }]} />
@@ -262,7 +262,7 @@ const ReservationDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
           <View style={styles.timelineStep}>
             <View style={[
               styles.timelineDot,
-              { backgroundColor: reservation.status === 'completed' ? theme.colors.success[500] : ['ready'].includes(reservation.status) ? theme.colors.primary[500] : theme.colors.neutral[300] }
+              { backgroundColor: reservation.status === 'completed' ? theme.colors.success : ['ready'].includes(reservation.status) ? theme.colors.primary[500] : theme.colors.neutral[300] }
             ]}>
               {reservation.status === 'completed' ? (
                 <Ionicons name="checkmark" size={16} color={theme.colors.textInverse} />

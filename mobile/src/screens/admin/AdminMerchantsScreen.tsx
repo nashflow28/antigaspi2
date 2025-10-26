@@ -555,7 +555,7 @@ const AdminMerchantsScreen: React.FC = () => {
             styles.filterChip,
             {
               backgroundColor:
-                statusFilter === 'verified' ? theme.colors.success[500] : theme.colors.surface.light,
+                statusFilter === 'verified' ? theme.colors.success : theme.colors.surface.light,
             },
           ]}
         >
@@ -576,7 +576,7 @@ const AdminMerchantsScreen: React.FC = () => {
             styles.filterChip,
             {
               backgroundColor:
-                statusFilter === 'pending' ? theme.colors.warning[500] : theme.colors.surface.light,
+                statusFilter === 'pending' ? theme.colors.warning : theme.colors.surface.light,
             },
           ]}
         >

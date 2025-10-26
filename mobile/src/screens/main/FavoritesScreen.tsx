@@ -118,7 +118,7 @@ const FavoritesScreen: React.FC = () => {
                 <View style={styles.metaItem}>
                   <Ionicons name="pricetag" size={14} color={theme.colors.neutral[500]} />
                   <Typography variant="caption" color="secondary" style={{ fontSize: 11, marginLeft: 4 }}>
-                    {product.category.name}
+                    {product.category?.name}
                   </Typography>
                 </View>
                 <View style={styles.metaItem}>
