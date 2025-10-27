@@ -81,12 +81,9 @@ const MerchantMapScreen: React.FC<Props> = ({ testID = TEST_IDS.merchantMapScree
 
       setUserLocation(userCoords)
 
-      // Center map on user location if available
-      setRegion({
-        ...userCoords,
-        latitudeDelta: 0.15,
-        longitudeDelta: 0.15,
-      })
+      // 🐛 BUG FIX: Ne PAS centrer automatiquement sur la position utilisateur
+      // Garder la carte centrée sur Lomé (zone géographique cible)
+      // La position de l'utilisateur sera affichée comme point bleu sur la carte
     } catch (err) {
       console.error('Error getting location:', err)
     }

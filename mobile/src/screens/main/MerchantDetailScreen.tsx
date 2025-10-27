@@ -15,6 +15,7 @@ import {
 import { useDispatch, useSelector } from 'react-redux'
 import { AppDispatch, RootState } from '../../store'
 import { fetchProducts } from '../../store/slices/productsSlice'
+import { fetchMerchants } from '../../store/slices/merchantsSlice'
 import { Ionicons } from '@expo/vector-icons'
 import { Image } from 'expo-image'
 import { useTheme } from '../../theme'
@@ -37,6 +38,7 @@ const MerchantDetailScreen: React.FC<Props> = ({ route, navigation }) => {
   const dispatch = useDispatch<AppDispatch>()
   const { merchantId } = route.params
   const { products } = useSelector((state: RootState) => state.products)
+  const { merchants } = useSelector((state: RootState) => state.merchants)
 
   const [merchantProducts, setMerchantProducts] = useState<Product[]>([])
   const [merchant, setMerchant] = useState<Merchant | null>(null)
@@ -67,20 +69,51 @@ const MerchantDetailScreen: React.FC<Props> = ({ route, navigation }) => {
             setMerchant(firstProduct.merchant)
           }
         } else {
-          // 🐛 BUG FIX: Si aucun produit, afficher un message
+          // 🐛 BUG FIX: Si aucun produit, essayer de récupérer le marchand depuis le store merchants
           if (isMounted) {
-            Alert.alert(
-              'Aucun produit',
-              'Ce marchand n\'a aucun produit disponible pour le moment.',
-              [{ text: 'OK', onPress: () => navigation.goBack() }]
-            )
+            console.log('⚠️ No products found for merchant', merchantId, '- Trying to load from merchants store')
+
+            // Essayer de charger les marchands si pas déjà en mémoire
+            if (merchants.length === 0) {
+              await dispatch(fetchMerchants()).unwrap()
+            }
+
+            // Chercher le marchand dans le store
+            const foundMerchant = merchants.find(m => m.id === merchantId)
+
+            if (foundMerchant && isMounted) {
+              // Mapper le type Merchant du store vers le type attendu
+              setMerchant({
+                id: foundMerchant.id,
+                business_name: foundMerchant.business_name,
+                business_type: foundMerchant.business_type,
+                city: foundMerchant.user?.city || '',
+                address: foundMerchant.user?.address || '',
+                phone: foundMerchant.user?.phone || '',
+                is_verified: foundMerchant.is_verified,
+                latitude: foundMerchant.latitude,
+                longitude: foundMerchant.longitude,
+              })
+              setMerchantProducts([]) // Pas de produits disponibles
+            } else if (isMounted) {
+              // Marchand vraiment introuvable
+              Alert.alert(
+                'Marchand introuvable',
+                'Ce marchand n\'existe pas ou a été supprimé.',
+                [{ text: 'Retour', onPress: () => navigation.goBack() }]
+              )
+            }
           }
         }
       } catch (error) {
         console.error('❌ Error loading merchant data:', error)
         if (isMounted) {
-          Alert.alert('Erreur', 'Impossible de charger les données du marchand')
-          navigation.goBack()
+          // Ne pas faire goBack() directement, laisser l'utilisateur voir l'erreur et décider
+          Alert.alert(
+            'Erreur',
+            'Impossible de charger les données du marchand. Veuillez réessayer.',
+            [{ text: 'Retour', onPress: () => navigation.goBack() }]
+          )
         }
       }
     }
@@ -91,7 +124,7 @@ const MerchantDetailScreen: React.FC<Props> = ({ route, navigation }) => {
     return () => {
       isMounted = false
     }
-  }, [merchantId, dispatch]) // ✅ Retirer products des dépendances pour éviter boucle infinie
+  }, [merchantId, dispatch, navigation, merchants]) // Include merchants to access the store
 
   useEffect(() => {
     const initLocation = async () => {
