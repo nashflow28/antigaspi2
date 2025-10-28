@@ -22,19 +22,21 @@ import ProductFormScreen from '../screens/merchant/ProductFormScreen'
 const Tab = createBottomTabNavigator()
 const Stack = createNativeStackNavigator()
 
-// Stack Navigator pour les produits avec création/édition
+// Stack Navigator pour les produits avec création/édition et paniers surprise
 const ProductsStack = () => (
   <Stack.Navigator screenOptions={{ headerShown: false }}>
     <Stack.Screen name="ProductsList" component={MerchantProductsScreen} />
     <Stack.Screen name="ProductForm" component={ProductFormScreen} />
+    <Stack.Screen name="SurpriseBaskets" component={MerchantSurpriseBasketsScreen} />
   </Stack.Navigator>
 )
 
-// Stack Navigator pour le dashboard
+// Stack Navigator pour le dashboard avec avis et analytics
 const DashboardStack = () => (
   <Stack.Navigator screenOptions={{ headerShown: false }}>
     <Stack.Screen name="DashboardMain" component={MerchantDashboardScreen} />
     <Stack.Screen name="Analytics" component={MerchantAnalyticsScreen} />
+    <Stack.Screen name="Reviews" component={MerchantReviewsScreen} />
   </Stack.Navigator>
 )
 
@@ -45,24 +47,10 @@ const ReservationsStack = () => (
   </Stack.Navigator>
 )
 
-// Stack Navigator pour les avis clients
-const ReviewsStack = () => (
-  <Stack.Navigator screenOptions={{ headerShown: false }}>
-    <Stack.Screen name="ReviewsMain" component={MerchantReviewsScreen} />
-  </Stack.Navigator>
-)
-
 // Stack Navigator pour le programme fidélité
 const LoyaltyStack = () => (
   <Stack.Navigator screenOptions={{ headerShown: false }}>
     <Stack.Screen name="LoyaltyMain" component={MerchantLoyaltyScreen} />
-  </Stack.Navigator>
-)
-
-// Stack Navigator pour les paniers surprise
-const SurpriseBasketsStack = () => (
-  <Stack.Navigator screenOptions={{ headerShown: false }}>
-    <Stack.Screen name="SurpriseBasketsMain" component={MerchantSurpriseBasketsScreen} />
   </Stack.Navigator>
 )
 
@@ -93,12 +81,8 @@ const MerchantNavigator: React.FC = () => {
             iconName = focused ? 'cube' : 'cube-outline'
           } else if (route.name === 'Reservations') {
             iconName = focused ? 'receipt' : 'receipt-outline'
-          } else if (route.name === 'Reviews') {
-            iconName = focused ? 'star' : 'star-outline'
           } else if (route.name === 'Loyalty') {
             iconName = focused ? 'gift' : 'gift-outline'
-          } else if (route.name === 'SurpriseBaskets') {
-            iconName = focused ? 'basket' : 'basket-outline'
           } else if (route.name === 'Account') {
             iconName = focused ? 'person' : 'person-outline'
           } else {
@@ -135,19 +119,9 @@ const MerchantNavigator: React.FC = () => {
         options={{ title: 'Réservations' }}
       />
       <Tab.Screen
-        name="Reviews"
-        component={ReviewsStack}
-        options={{ title: 'Avis' }}
-      />
-      <Tab.Screen
         name="Loyalty"
         component={LoyaltyStack}
         options={{ title: 'Fidélité' }}
-      />
-      <Tab.Screen
-        name="SurpriseBaskets"
-        component={SurpriseBasketsStack}
-        options={{ title: 'Paniers Surprise' }}
       />
       <Tab.Screen
         name="Account"

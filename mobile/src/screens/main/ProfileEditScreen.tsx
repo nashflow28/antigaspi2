@@ -159,7 +159,7 @@ const ProfileEditScreen: React.FC<ProfileEditScreenProps> = ({ navigation: navig
         uri: asset.uri,
         name: filename,
         type: mimeType,
-      } as FormDataFile)
+      } as any)
 
       const response = await apiService.post<ApiResponse<{ photo_url: string; full_url?: string }>>(
         '/consumers/profile/photo',

@@ -30,6 +30,15 @@ interface Reservation {
   created_at: string
 }
 
+interface Review {
+  id: number
+  customer_name: string
+  product_name: string
+  rating: number
+  comment: string
+  created_at: string
+}
+
 const MerchantDashboardScreen: React.FC = () => {
   const theme = useTheme()
   const navigation = useNavigation()
@@ -40,6 +49,7 @@ const MerchantDashboardScreen: React.FC = () => {
     total_products: 0,
   })
   const [recentReservations, setRecentReservations] = useState<Reservation[]>([])
+  const [recentReviews, setRecentReviews] = useState<Review[]>([])
   const [refreshing, setRefreshing] = useState(false)
   const [loading, setLoading] = useState(true)
 
@@ -62,6 +72,15 @@ const MerchantDashboardScreen: React.FC = () => {
       // Charger les réservations récentes
       const reservationsResponse = await apiService.get('/reservations/merchant/list?limit=5')
       setRecentReservations(reservationsResponse.data.data || [])
+
+      // Charger les avis récents
+      try {
+        const reviewsResponse = await apiService.get('/reviews/merchant?limit=3')
+        setRecentReviews(reviewsResponse.data?.data || [])
+      } catch (reviewError) {
+        console.error('Erreur chargement avis:', reviewError)
+        setRecentReviews([])
+      }
     } catch (error) {
       console.error('Erreur chargement dashboard:', error)
     } finally {
@@ -250,6 +269,72 @@ const MerchantDashboardScreen: React.FC = () => {
             ))
           )}
         </View>
+
+        {/* Avis récents */}
+        <View style={styles.section}>
+          <View style={styles.sectionHeader}>
+            <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>
+              Avis récents
+            </Text>
+            <TouchableOpacity onPress={() => (navigation as any).navigate('Reviews')}>
+              <Text style={[styles.sectionLink, { color: theme.colors.primary[500] }]}>
+                Voir tout
+              </Text>
+            </TouchableOpacity>
+          </View>
+
+          {recentReviews.length === 0 ? (
+            <View style={[styles.emptyState, { backgroundColor: theme.colors.surface.light }]}>
+              <Ionicons name="star-outline" size={48} color={theme.colors.neutral[300]} />
+              <Text style={[styles.emptyText, { color: theme.colors.textSecondary }]}>
+                Aucun avis récent
+              </Text>
+            </View>
+          ) : (
+            recentReviews.map((review) => (
+              <View
+                key={review.id}
+                style={[styles.reviewCard, { backgroundColor: theme.colors.surface.light }]}
+              >
+                <View style={styles.reviewHeader}>
+                  <View style={styles.reviewCustomerInfo}>
+                    <Ionicons name="person-circle" size={40} color={theme.colors.primary[500]} />
+                    <View style={styles.reviewCustomerDetails}>
+                      <Text style={[styles.reviewCustomerName, { color: theme.colors.text }]}>
+                        {review.customer_name}
+                      </Text>
+                      <View style={styles.ratingContainer}>
+                        {[1, 2, 3, 4, 5].map((star) => (
+                          <Ionicons
+                            key={star}
+                            name={star <= review.rating ? 'star' : 'star-outline'}
+                            size={14}
+                            color={star <= review.rating ? theme.colors.semantic.warning : theme.colors.neutral[300]}
+                          />
+                        ))}
+                      </View>
+                    </View>
+                  </View>
+                  <Text style={[styles.reviewDate, { color: theme.colors.textSecondary }]}>
+                    {formatDate(review.created_at)}
+                  </Text>
+                </View>
+                <Text style={[styles.reviewProduct, { color: theme.colors.textSecondary }]}>
+                  {review.product_name}
+                </Text>
+                {review.comment && (
+                  <Text
+                    style={[styles.reviewComment, { color: theme.colors.text }]}
+                    numberOfLines={2}
+                    ellipsizeMode="tail"
+                  >
+                    {review.comment}
+                  </Text>
+                )}
+              </View>
+            ))
+          )}
+        </View>
       </ScrollView>
     </View>
   )
@@ -406,6 +491,46 @@ const styles = StyleSheet.create({
   },
   quantity: {
     fontSize: 12,
+  },
+  reviewCard: {
+    padding: 16,
+    borderRadius: 12,
+    marginBottom: 12,
+  },
+  reviewHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    marginBottom: 8,
+  },
+  reviewCustomerInfo: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
+  },
+  reviewCustomerDetails: {
+    marginLeft: 12,
+    flex: 1,
+  },
+  reviewCustomerName: {
+    fontSize: 15,
+    fontWeight: '600',
+    marginBottom: 4,
+  },
+  ratingContainer: {
+    flexDirection: 'row',
+    gap: 2,
+  },
+  reviewDate: {
+    fontSize: 11,
+  },
+  reviewProduct: {
+    fontSize: 13,
+    marginBottom: 8,
+  },
+  reviewComment: {
+    fontSize: 14,
+    lineHeight: 20,
   },
 })
 

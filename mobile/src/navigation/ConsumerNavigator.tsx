@@ -20,7 +20,6 @@ import AddReviewScreen from '../screens/main/AddReviewScreen'
 import NotificationSettingsScreen from '../screens/merchant/NotificationSettingsScreen'
 import CartScreen from '../screens/main/CartScreen'
 import WalletScreen from '../screens/main/WalletScreen'
-import MerchantMapScreen from '../screens/main/MerchantMapScreen'
 import MerchantMessagingScreen from '../screens/main/MerchantMessagingScreen'
 import { TEST_IDS } from '../utils/testIds'
 import LoyaltyScreen from '../screens/main/LoyaltyScreen'
@@ -83,33 +82,16 @@ const OrdersStack = () => (
   </Stack.Navigator>
 )
 
-const WalletStack = () => (
-  <Stack.Navigator screenOptions={{ headerShown: false }}>
-    <Stack.Screen name="WalletMain" component={WalletScreen} />
-  </Stack.Navigator>
-)
-
 const AccountStack = () => (
   <Stack.Navigator screenOptions={{ headerShown: false }}>
     <Stack.Screen name="AccountMain" component={ProfileScreen} />
     <Stack.Screen name="ProfileEdit" component={ProfileEditScreen} />
+    <Stack.Screen name="Wallet" component={WalletScreen} />
     <Stack.Screen name="Notifications" component={NotificationSettingsScreen} />
     <Stack.Screen name="Loyalty" component={LoyaltyScreen} />
     <Stack.Screen name="ProductDetails" component={ProductDetailsScreen} />
     <Stack.Screen name="ReservationDetails" component={ReservationDetailsScreen} />
     <Stack.Screen name="MerchantDetail" component={MerchantDetailScreen} />
-    <Stack.Screen name="ReviewsList" component={ReviewsListScreen} />
-    <Stack.Screen name="AddReview" component={AddReviewScreen} />
-    <Stack.Screen name="MerchantMessaging" component={MerchantMessagingScreen} />
-  </Stack.Navigator>
-)
-
-const MapStack = () => (
-  <Stack.Navigator screenOptions={{ headerShown: false }}>
-    <Stack.Screen name="MapMain" component={MerchantMapScreen} />
-    <Stack.Screen name="MerchantDetail" component={MerchantDetailScreen} />
-    <Stack.Screen name="ProductDetails" component={ProductDetailsScreen} />
-    <Stack.Screen name="ReservationDetails" component={ReservationDetailsScreen} />
     <Stack.Screen name="ReviewsList" component={ReviewsListScreen} />
     <Stack.Screen name="AddReview" component={AddReviewScreen} />
     <Stack.Screen name="MerchantMessaging" component={MerchantMessagingScreen} />
@@ -130,14 +112,10 @@ const ConsumerNavigator: React.FC = () => {
             iconName = focused ? 'grid' : 'grid-outline'
           } else if (route.name === 'Discover') {
             iconName = focused ? 'compass' : 'compass-outline'
-          } else if (route.name === 'Map') {
-            iconName = focused ? 'map' : 'map-outline'
           } else if (route.name === 'Favorites') {
             iconName = focused ? 'heart' : 'heart-outline'
           } else if (route.name === 'Orders') {
             iconName = focused ? 'cart' : 'cart-outline'
-          } else if (route.name === 'Wallet') {
-            iconName = focused ? 'wallet' : 'wallet-outline'
           } else if (route.name === 'Account') {
             iconName = focused ? 'person' : 'person-outline'
           } else {
@@ -169,11 +147,6 @@ const ConsumerNavigator: React.FC = () => {
         options={{ title: 'Découvrir' }}
       />
       <Tab.Screen
-        name="Map"
-        component={MapStack}
-        options={{ title: 'Carte' }}
-      />
-      <Tab.Screen
         name="Favorites"
         component={FavoritesStack}
         options={{ title: 'Favoris' }}
@@ -182,11 +155,6 @@ const ConsumerNavigator: React.FC = () => {
         name="Orders"
         component={OrdersStack}
         options={{ title: 'Commande' }}
-      />
-      <Tab.Screen
-        name="Wallet"
-        component={WalletStack}
-        options={{ title: 'Portefeuille', tabBarTestID: TEST_IDS.walletTab }}
       />
       <Tab.Screen
         name="Account"

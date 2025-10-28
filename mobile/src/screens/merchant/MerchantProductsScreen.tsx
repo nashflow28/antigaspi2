@@ -98,6 +98,28 @@ const MerchantProductsScreen: React.FC<Props> = ({ navigation }) => {
     loadProducts()
   }
 
+  const handleAddButtonPress = () => {
+    Alert.alert(
+      'Ajouter',
+      'Que souhaitez-vous créer ?',
+      [
+        {
+          text: 'Produit',
+          onPress: () => navigation.navigate('ProductForm', { mode: 'create' }),
+        },
+        {
+          text: 'Panier Surprise',
+          onPress: () => navigation.navigate('SurpriseBaskets'),
+        },
+        {
+          text: 'Annuler',
+          style: 'cancel',
+        },
+      ],
+      { cancelable: true }
+    )
+  }
+
   const handleCreateProduct = () => {
     navigation.navigate('ProductForm', { mode: 'create' })
   }
@@ -293,9 +315,9 @@ const MerchantProductsScreen: React.FC<Props> = ({ navigation }) => {
           <Text style={styles.headerTitle}>Mes Produits</Text>
           <TouchableOpacity
             style={styles.addButton}
-            onPress={handleCreateProduct}
+            onPress={handleAddButtonPress}
             testID={TEST_IDS.addProductButton}
-            accessibilityLabel="Ajouter un nouveau produit"
+            accessibilityLabel="Ajouter un produit ou un panier surprise"
           >
             <Ionicons name="add-circle" size={32} color="white" />
           </TouchableOpacity>

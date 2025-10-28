@@ -32,7 +32,7 @@ const mockProduct = createTestProduct({
 
 jest.mock('../../../store/slices/productsSlice', () => {
   const actual = jest.requireActual('../../../store/slices/productsSlice')
-  const mockFetchProduct = jest.fn((productId: number) => async () => ({
+  const mockFetchProduct: any = jest.fn((productId: number) => async () => ({
     type: 'products/fetchProduct/fulfilled',
     payload: mockProduct,
     meta: { arg: productId },
@@ -66,7 +66,7 @@ const renderScreen = (options: {
   product?: typeof mockProduct
   productInStore?: boolean
   loading?: boolean
-  reviewsStats?: { average_rating: number; total_reviews: number } | null
+  reviewsStats?: { average_rating: number; total_reviews: number; verified_reviews: number; rating_distribution: Array<{ rating: number; count: number; percentage: number }> } | null
   cartItemsCount?: number
   cartUpdating?: boolean
   isAuthenticated?: boolean
@@ -76,7 +76,7 @@ const renderScreen = (options: {
     product = mockProduct,
     productInStore = true,
     loading = false,
-    reviewsStats = { average_rating: 4.7, total_reviews: 12 },
+    reviewsStats = { average_rating: 4.7, total_reviews: 12, verified_reviews: 8, rating_distribution: [] },
     cartItemsCount = 0,
     cartUpdating = false,
     isAuthenticated = false,

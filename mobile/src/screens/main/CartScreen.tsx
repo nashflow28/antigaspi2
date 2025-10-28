@@ -315,7 +315,7 @@ const CartScreen: React.FC<Props> = ({ navigation }) => {
       if (firstReservation) {
         navigation.navigate('ReservationDetails', { reservationId: firstReservation.id })
       } else {
-        navigation.navigate('ReservationsList')
+        navigation.getParent()?.navigate('Orders')
       }
     } catch (err: any) {
       const message = typeof err === 'string' ? err : err?.message
@@ -328,7 +328,7 @@ const CartScreen: React.FC<Props> = ({ navigation }) => {
   }
 
   const goToReservations = () => {
-    navigation.navigate('ReservationsList')
+    navigation.getParent()?.navigate('Orders')
   }
 
   return (

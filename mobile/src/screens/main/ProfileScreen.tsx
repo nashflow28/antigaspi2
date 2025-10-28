@@ -135,6 +135,20 @@ const ProfileScreen: React.FC = () => {
           </TouchableOpacity>
         )}
 
+        {user?.role === 'merchant' && (
+          <TouchableOpacity
+            style={[styles.menuItem, { paddingHorizontal: theme.spacing.lg, paddingVertical: theme.spacing.md, borderBottomWidth: 1, borderBottomColor: theme.colors.border }]}
+            onPress={() => (navigation as any).navigate('Reviews')}
+            accessibilityLabel="Voir les avis clients"
+          >
+            <Ionicons name="star-outline" size={24} color={theme.colors.text} />
+            <Typography variant="body" style={{ flex: 1, marginLeft: theme.spacing.md }}>
+              Avis clients
+            </Typography>
+            <Ionicons name="chevron-forward" size={20} color={theme.colors.neutral[400]} />
+          </TouchableOpacity>
+        )}
+
         <TouchableOpacity
           style={[
             styles.menuItem,
@@ -153,6 +167,29 @@ const ProfileScreen: React.FC = () => {
           </Typography>
           <Ionicons name="chevron-forward" size={20} color={theme.colors.neutral[400]} />
         </TouchableOpacity>
+
+        {user?.role === 'consumer' && (
+          <TouchableOpacity
+            style={[
+              styles.menuItem,
+              {
+                paddingHorizontal: theme.spacing.lg,
+                paddingVertical: theme.spacing.md,
+                borderBottomWidth: 1,
+                borderBottomColor: theme.colors.border,
+              },
+            ]}
+            onPress={() => (navigation as any).navigate('Wallet')}
+            testID={TEST_IDS.walletAccessButton}
+            accessibilityLabel="Accéder à mon portefeuille"
+          >
+            <Ionicons name="wallet-outline" size={24} color={theme.colors.text} />
+            <Typography variant="body" style={{ flex: 1, marginLeft: theme.spacing.md }}>
+              Portefeuille
+            </Typography>
+            <Ionicons name="chevron-forward" size={20} color={theme.colors.neutral[400]} />
+          </TouchableOpacity>
+        )}
 
         {user?.role === 'consumer' && (
           <TouchableOpacity
