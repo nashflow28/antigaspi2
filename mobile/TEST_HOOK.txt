@@ -1,6 +1,0 @@
-Test file to verify git hooks are working.
-This commit should trigger:
-1. Typography unit tests (73 tests)
-2. E2E critical tests (3 tests) if Expo server is running
-
-If you see this file, the hooks executed successfully!

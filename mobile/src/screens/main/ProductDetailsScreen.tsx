@@ -19,7 +19,7 @@ import { Ionicons } from '@expo/vector-icons'
 import { Image } from 'expo-image'
 import { PaymentMethod, Product } from '../../types'
 import { useTheme } from '../../theme'
-import { getImageUrl } from '../../utils/imageHelpers'
+import { getImageUrl, getCategoryPlaceholder } from '../../utils/imageHelpers'
 import { formatCurrency } from '../../utils/currencyHelpers'
 import FavoriteButton from '../../components/FavoriteButton'
 import StarRating from '../../components/reviews/StarRating'
@@ -316,6 +316,7 @@ const ProductDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
         {/* Image */}
         <Image
           source={{ uri: getImageUrl(product.image_url, product.category?.name) }}
+          placeholder={{ uri: getCategoryPlaceholder(product.category?.name) }}
           style={styles.productImage}
           contentFit="cover"
           transition={200}

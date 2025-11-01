@@ -73,18 +73,18 @@ const getApiBaseUrl = (): string => {
         const host = window.location.hostname
         // Si localhost/127 -> forcer 127 (évite IPv6 ::1 et soucis DNS)
         if (host === 'localhost' || host === '127.0.0.1' || host === '::1') {
-          const url = 'http://127.0.0.1:8000/api'
+          const url = 'http://127.0.0.1:3000/api'
           console.log('🔗 API URL (web localhost):', url)
           return url
         }
-        // Sinon, utiliser l’IP/host courant (accès LAN)
-        const url = `http://${host}:8000/api`
+        // Sinon, utiliser l'IP/host courant (accès LAN)
+        const url = `http://${host}:3000/api`
         console.log('🔗 API URL (web from current host):', url)
         return url
       }
 
       // c) Fallback ultime web
-      const url = 'http://127.0.0.1:8000/api'
+      const url = 'http://127.0.0.1:3000/api'
       console.log('🔗 API URL (web fallback):', url)
       return url
     }
@@ -100,7 +100,7 @@ const getApiBaseUrl = (): string => {
   }
 
   // 3) Émulateur Android (localhost côté hôte)
-  const url = 'http://10.0.2.2:8000/api'
+  const url = 'http://10.0.2.2:3000/api'
   console.log('🔗 API URL (android emulator fallback):', url)
   return url
 }

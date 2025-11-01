@@ -19,7 +19,7 @@ import { fetchMerchants } from '../../store/slices/merchantsSlice'
 import { Ionicons } from '@expo/vector-icons'
 import { Image } from 'expo-image'
 import { useTheme } from '../../theme'
-import { getImageUrl } from '../../utils/imageHelpers'
+import { getImageUrl, getCategoryPlaceholder } from '../../utils/imageHelpers'
 import { formatCurrency } from '../../utils/currencyHelpers'
 import FavoriteButton from '../../components/FavoriteButton'
 import { Product } from '../../types'
@@ -651,6 +651,7 @@ const ProductsScreen: React.FC<Props> = ({ navigation }) => {
           <View style={styles.productImageContainer}>
             <Image
               source={{ uri: getImageUrl(product.image_url, product.category?.name) }}
+              placeholder={{ uri: getCategoryPlaceholder(product.category?.name) }}
               style={styles.productImage}
               contentFit="cover"
               transition={200}
