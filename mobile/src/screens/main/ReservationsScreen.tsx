@@ -380,7 +380,7 @@ const ReservationsScreen: React.FC<Props> = ({ navigation }) => {
       <Button
         variant="primary"
         size="lg"
-        onPress={() => navigation.navigate('Products')}
+        onPress={() => navigation.getParent()?.navigate('Discover')}
         testID="browse-products-button"
       >
         Parcourir les produits

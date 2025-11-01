@@ -6,7 +6,7 @@
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
-    "newArchEnabled": true,
+    "newArchEnabled": false,
     "splash": {
       "image": "./assets/splash-icon.png",
       "resizeMode": "contain",
@@ -61,12 +61,10 @@
         {
           "locationAlwaysAndWhenInUsePermission": "Permettre à Antigaspi d'accéder à votre position pour trouver les commerces proches."
         }
-      ],
-      "expo-updates",
-      "expo-font"
+      ]
     ],
     "extra": {
-      "apiUrl": "http://10.0.2.2:8000/api",
+      "apiUrl": "http://10.0.2.2:3000/api",
       "testMode": true
     },
     "scheme": "antigaspi"

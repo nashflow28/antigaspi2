@@ -32,7 +32,7 @@ interface MerchantMessagingScreenProps {
 
 const MESSAGE_PAGE_SIZE = 50
 
-const MerchantMessagingScreen: React.FC<MerchantMessagingScreenProps> = ({ route, navigation }) => {
+const MerchantMessagingScreen = ({ route, navigation }: any) => {
   const { merchantId, merchantName, conversationId } = route?.params ?? {}
   const theme = useTheme()
   const user = useSelector((state: RootState) => state.auth.user)

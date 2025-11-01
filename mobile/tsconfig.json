@@ -1,23 +1,6 @@
 {
   "extends": "expo/tsconfig.base",
   "compilerOptions": {
-    "strict": true,
-    "baseUrl": ".",
-    "paths": {
-      "@test-utils": ["src/test-utils"],
-      "@test-utils/*": ["src/test-utils/*"]
-    }
-  },
-  "exclude": [
-    "node_modules",
-    "App.backup-*.tsx",
-    "App.*.tsx",
-    "**/*.backup.tsx",
-    "**/*.backup-*.tsx"
-  ],
-  "include": [
-    "src",
-    "index.ts",
-    "App.tsx"
-  ]
+    "strict": true
+  }
 }

@@ -19,7 +19,7 @@ const getApiBaseUrl = (): string => {
   }
   // Fallback pour développement local
   // 10.0.2.2 est l'adresse spéciale pour localhost sur émulateur Android
-  return 'http://10.0.2.2:8000/api'
+  return 'http://10.0.2.2:3000/api'
 }
 
 // Configuration des notifications

@@ -7,6 +7,7 @@ import {
   Switch,
   Platform,
   Linking,
+  ScrollView,
 } from 'react-native'
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigation } from '@react-navigation/native'
@@ -92,7 +93,12 @@ const ProfileScreen: React.FC = () => {
   }
 
   return (
-    <View style={[styles.container, { backgroundColor: theme.colors.background }]} testID={TEST_IDS.profileScreen}>
+    <ScrollView
+      style={[styles.container, { backgroundColor: theme.colors.background }]}
+      contentContainerStyle={styles.scrollContent}
+      testID={TEST_IDS.profileScreen}
+      showsVerticalScrollIndicator={true}
+    >
       <Card variant="elevated" style={{ alignItems: 'center', paddingVertical: theme.spacing['2xl'], paddingTop: theme.spacing['3xl'], marginBottom: theme.spacing.lg }}>
         <View style={[styles.avatar, { backgroundColor: theme.colors.neutral[100], marginBottom: theme.spacing.md }]}>
           <Ionicons name="person" size={40} color={theme.colors.primary[500]} />
@@ -135,6 +141,20 @@ const ProfileScreen: React.FC = () => {
           </TouchableOpacity>
         )}
 
+        {user?.role === 'merchant' && (
+          <TouchableOpacity
+            style={[styles.menuItem, { paddingHorizontal: theme.spacing.lg, paddingVertical: theme.spacing.md, borderBottomWidth: 1, borderBottomColor: theme.colors.border }]}
+            onPress={() => (navigation as any).navigate('Reviews')}
+            accessibilityLabel="Voir les avis clients"
+          >
+            <Ionicons name="star-outline" size={24} color={theme.colors.text} />
+            <Typography variant="body" style={{ flex: 1, marginLeft: theme.spacing.md }}>
+              Avis clients
+            </Typography>
+            <Ionicons name="chevron-forward" size={20} color={theme.colors.neutral[400]} />
+          </TouchableOpacity>
+        )}
+
         <TouchableOpacity
           style={[
             styles.menuItem,
@@ -153,6 +173,29 @@ const ProfileScreen: React.FC = () => {
           </Typography>
           <Ionicons name="chevron-forward" size={20} color={theme.colors.neutral[400]} />
         </TouchableOpacity>
+
+        {user?.role === 'consumer' && (
+          <TouchableOpacity
+            style={[
+              styles.menuItem,
+              {
+                paddingHorizontal: theme.spacing.lg,
+                paddingVertical: theme.spacing.md,
+                borderBottomWidth: 1,
+                borderBottomColor: theme.colors.border,
+              },
+            ]}
+            onPress={() => (navigation as any).navigate('Wallet')}
+            testID={TEST_IDS.walletAccessButton}
+            accessibilityLabel="Accéder à mon portefeuille"
+          >
+            <Ionicons name="wallet-outline" size={24} color={theme.colors.text} />
+            <Typography variant="body" style={{ flex: 1, marginLeft: theme.spacing.md }}>
+              Portefeuille
+            </Typography>
+            <Ionicons name="chevron-forward" size={20} color={theme.colors.neutral[400]} />
+          </TouchableOpacity>
+        )}
 
         {user?.role === 'consumer' && (
           <TouchableOpacity
@@ -276,13 +319,16 @@ const ProfileScreen: React.FC = () => {
         </Typography>
         <Ionicons name="exit-outline" size={20} color={theme.colors.semantic.error} />
       </TouchableOpacity>
-    </View>
+    </ScrollView>
   )
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+  scrollContent: {
+    paddingBottom: 32,
   },
   avatar: {
     width: 80,

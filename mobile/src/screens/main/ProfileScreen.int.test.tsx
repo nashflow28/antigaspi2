@@ -34,10 +34,19 @@ import AsyncStorage from '@react-native-async-storage/async-storage'
 
 const makeStore = () =>
   configureStore({
-    reducer: { auth: authReducer },
+    reducer: { auth: authReducer } as any,
     preloadedState: {
       auth: {
-        user: { id: 10, email: 'user@test.com', role: 'consumer', first_name: 'User', last_name: 'Test' },
+        user: {
+          id: 10,
+          email: 'user@test.com',
+          role: 'consumer',
+          first_name: 'User',
+          last_name: 'Test',
+          city: 'Test City',
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+        },
         token: 'token-xyz',
         isAuthenticated: true,
         loading: false,

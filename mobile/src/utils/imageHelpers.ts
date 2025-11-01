@@ -15,6 +15,12 @@ export const getImageUrl = (
     return getCategoryPlaceholder(categoryName)
   }
 
+  // 🔧 FIX: If it's an Unsplash URL (external), replace with placeholder
+  // because emulator has no internet connectivity
+  if (imageUrl.includes('unsplash.com') || imageUrl.includes('picsum.photos')) {
+    return getCategoryPlaceholder(categoryName)
+  }
+
   // If already a full URL, return as is
   if (imageUrl.startsWith('http://') || imageUrl.startsWith('https://')) {
     return imageUrl
@@ -32,19 +38,26 @@ export const getImageUrl = (
 }
 
 /**
- * Get placeholder image for a category
+ * Get placeholder image for a category (using data URI for offline support)
  * @param categoryName - Category name
- * @returns Placeholder URL for the category
+ * @returns Placeholder data URI with category emoji
  */
 export const getCategoryPlaceholder = (categoryName?: string): string => {
-  const placeholders: Record<string, string> = {
-    boulangerie: 'https://images.unsplash.com/photo-1509440159596-0249088772ff?w=400',
-    'fruits & légumes': 'https://images.unsplash.com/photo-1610832958506-aa56368176cf?w=400',
-    viandes: 'https://images.unsplash.com/photo-1607623814075-e51df1bdc82f?w=400',
-    laitier: 'https://images.unsplash.com/photo-1628088062854-d1870b4553da?w=400',
-    épicerie: 'https://images.unsplash.com/photo-1534483509719-3feaee7c30da?w=400',
+  // Map category to emoji
+  const categoryEmojis: Record<string, string> = {
+    boulangerie: '🥐',
+    'fruits & légumes': '🥕',
+    viandes: '🥩',
+    laitier: '🥛',
+    épicerie: '🥫',
   }
 
   const key = categoryName?.toLowerCase() || ''
-  return placeholders[key] || 'https://via.placeholder.com/400'
+  const emoji = categoryEmojis[key] || '🛍️'
+
+  // Create a simple SVG with the emoji (works offline)
+  const svg = `<svg width="400" height="400" xmlns="http://www.w3.org/2000/svg"><rect width="400" height="400" fill="#10B981" opacity="0.1"/><text x="50%" y="50%" font-size="120" text-anchor="middle" dy=".3em">${emoji}</text></svg>`
+
+  // Return as data URI using encodeURIComponent (React Native compatible, no btoa needed)
+  return `data:image/svg+xml,${encodeURIComponent(svg)}`
 }

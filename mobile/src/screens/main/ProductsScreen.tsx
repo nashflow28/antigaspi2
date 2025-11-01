@@ -19,7 +19,7 @@ import { fetchMerchants } from '../../store/slices/merchantsSlice'
 import { Ionicons } from '@expo/vector-icons'
 import { Image } from 'expo-image'
 import { useTheme } from '../../theme'
-import { getImageUrl } from '../../utils/imageHelpers'
+import { getImageUrl, getCategoryPlaceholder } from '../../utils/imageHelpers'
 import { formatCurrency } from '../../utils/currencyHelpers'
 import FavoriteButton from '../../components/FavoriteButton'
 import { Product } from '../../types'
@@ -49,18 +49,17 @@ const ProductsScreen: React.FC<Props> = ({ navigation }) => {
   const { merchants, loading: merchantsLoading } = useSelector((state: RootState) => state.merchants)
   const theme = useTheme()
 
-  const [contentMode, setContentMode] = useState<'merchants' | 'products'>('merchants')
+  const [contentMode, setContentMode] = useState<'merchants' | 'map'>('merchants')
   const [searchQuery, setSearchQuery] = useState('')
   const [refreshing, setRefreshing] = useState(false)
   const [selectedCategory, setSelectedCategory] = useState<string>('all')
-  const [viewMode, setViewMode] = useState<'list' | 'map'>('list')
   const [distanceEnabled, setDistanceEnabled] = useState(false)
   const [maxDistance, setMaxDistance] = useState(10)
   const [userLocation, setUserLocation] = useState<UserLocation | null>(null)
   const [locationPermissionGranted, setLocationPermissionGranted] = useState(false)
   const [isRequestingLocation, setIsRequestingLocation] = useState(false)
-  const [remoteProductResults, setRemoteProductResults] = useState<Product[] | null>(null)
   const [remoteMerchantResults, setRemoteMerchantResults] = useState<MerchantEntity[] | null>(null)
+  const [remoteProductResults, setRemoteProductResults] = useState<Product[] | null>(null)
   const [searchLoading, setSearchLoading] = useState(false)
   const [searchError, setSearchError] = useState<string | null>(null)
   const searchDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
@@ -170,10 +169,6 @@ const ProductsScreen: React.FC<Props> = ({ navigation }) => {
     contentMode === 'merchants' && (
       (hasActiveSearch && searchLoading) || (!hasActiveSearch && merchantsLoading)
     )
-  const isLoadingProducts =
-    contentMode === 'products' && (
-      (hasActiveSearch && searchLoading) || (!hasActiveSearch && productsLoading)
-    )
 
   // Filtrage des marchands avec gestion distance
   const shouldUseRemoteMerchants = useMemo(
@@ -265,57 +260,6 @@ const ProductsScreen: React.FC<Props> = ({ navigation }) => {
     userLocation,
   ])
 
-  // Filtrage des produits
-  const filteredProducts = useMemo(() => {
-    const trimmedQuery = searchQuery.trim()
-    const useRemoteProducts = Boolean(
-      trimmedQuery &&
-      remoteProductResults &&
-      remoteProductResults.length > 0
-    )
-
-    const source = useRemoteProducts && remoteProductResults
-      ? remoteProductResults
-      : products || []
-
-    return source.filter(product => {
-      if (!useRemoteProducts && trimmedQuery) {
-        const query = trimmedQuery.toLowerCase()
-        const merchantName = product.merchant?.business_name?.toLowerCase() ?? ''
-        const merchantCity = product.merchant?.city?.toLowerCase() ?? ''
-        const matchesSearch =
-          product.name?.toLowerCase().includes(query) ||
-          merchantName.includes(query) ||
-          merchantCity.includes(query)
-
-        if (!matchesSearch) {
-          return false
-        }
-      }
-
-      if (selectedCategory !== 'all') {
-        const productCategoryId = product.category?.id
-        if (productCategoryId === undefined || productCategoryId === null) {
-          return false
-        }
-
-        if (productCategoryId !== parseInt(selectedCategory, 10)) {
-          return false
-        }
-      }
-
-      // Validation simplifiée de la quantité disponible
-      const availableQuantity = Number(product.quantity_available)
-
-      // Filtrer les produits avec quantité invalide (NaN, Infinity, etc.)
-      if (!Number.isFinite(availableQuantity)) {
-        return false
-      }
-
-      return availableQuantity > 0
-    })
-  }, [products, remoteProductResults, searchQuery, selectedCategory])
-
   const merchantsWithCoordinates = useMemo(
     () =>
       filteredMerchants.filter(
@@ -381,12 +325,6 @@ const ProductsScreen: React.FC<Props> = ({ navigation }) => {
 
     initLocation()
   }, [])
-
-  useEffect(() => {
-    if (contentMode !== 'merchants' && viewMode !== 'list') {
-      setViewMode('list')
-    }
-  }, [contentMode, viewMode])
 
   // BUG FIX #23: Reset user location after logout to prevent stale location data
   useEffect(() => {
@@ -512,20 +450,6 @@ const ProductsScreen: React.FC<Props> = ({ navigation }) => {
     ])
   }
 
-  const handleToggleMapView = async () => {
-    if (contentMode !== 'merchants') {
-      return
-    }
-
-    if (viewMode === 'map') {
-      setViewMode('list')
-      return
-    }
-
-    await ensureUserLocation(false)
-    setViewMode('map')
-  }
-
   useEffect(() => {
     const query = searchQuery.trim()
 
@@ -534,9 +458,6 @@ const ProductsScreen: React.FC<Props> = ({ navigation }) => {
     }
 
     if (!query) {
-      if (remoteProductResults) {
-        setRemoteProductResults(null)
-      }
       if (remoteMerchantResults) {
         setRemoteMerchantResults(null)
       }
@@ -544,14 +465,6 @@ const ProductsScreen: React.FC<Props> = ({ navigation }) => {
       setSearchLoading(false)
       searchRequestIdRef.current += 1
       return
-    }
-
-    if (contentMode === 'merchants' && remoteProductResults) {
-      setRemoteProductResults(null)
-    }
-
-    if (contentMode === 'products' && remoteMerchantResults) {
-      setRemoteMerchantResults(null)
     }
 
     const requestId = searchRequestIdRef.current + 1
@@ -565,7 +478,7 @@ const ProductsScreen: React.FC<Props> = ({ navigation }) => {
         const response = await searchService.search({
           query,
           perPage: 20,
-          type: contentMode === 'merchants' ? 'merchants' : 'products',
+          type: 'merchants',
         })
 
         if (searchRequestIdRef.current !== requestId) {
@@ -738,6 +651,7 @@ const ProductsScreen: React.FC<Props> = ({ navigation }) => {
           <View style={styles.productImageContainer}>
             <Image
               source={{ uri: getImageUrl(product.image_url, product.category?.name) }}
+              placeholder={{ uri: getCategoryPlaceholder(product.category?.name) }}
               style={styles.productImage}
               contentFit="cover"
               transition={200}
@@ -868,26 +782,26 @@ const ProductsScreen: React.FC<Props> = ({ navigation }) => {
           </TouchableOpacity>
 
           <TouchableOpacity
-            style={[styles.toggleButton, contentMode === 'products' && styles.toggleButtonActive]}
-            onPress={() => setContentMode('products')}
+            style={[styles.toggleButton, contentMode === 'map' && styles.toggleButtonActive]}
+            onPress={() => setContentMode('map')}
           >
             <Ionicons
-              name="basket"
+              name="map"
               size={20}
-              color={contentMode === 'products'
+              color={contentMode === 'map'
                 ? theme.colors.interactiveTextActive
                 : theme.colors.interactiveText}
             />
             <Typography
               variant="caption"
-              weight={contentMode === 'products' ? 'semibold' : 'regular'}
+              weight={contentMode === 'map' ? 'semibold' : 'regular'}
               style={{
-                color: contentMode === 'products'
+                color: contentMode === 'map'
                   ? theme.colors.interactiveTextActive
                   : theme.colors.interactiveText,
               }}
             >
-              Produits
+              Carte
             </Typography>
           </TouchableOpacity>
         </View>
@@ -907,30 +821,6 @@ const ProductsScreen: React.FC<Props> = ({ navigation }) => {
           value={searchQuery}
           onChangeText={setSearchQuery}
         />
-        <TouchableOpacity
-          onPress={handleToggleMapView}
-          disabled={contentMode !== 'merchants'}
-          style={[
-            styles.searchTrailingButton,
-            contentMode !== 'merchants' && styles.searchTrailingButtonDisabled,
-          ]}
-        >
-          <Ionicons
-            name={
-              contentMode === 'merchants'
-                ? viewMode === 'map'
-                  ? 'list'
-                  : 'map'
-                : 'options'
-            }
-            size={24}
-            color={
-              contentMode === 'merchants'
-                ? theme.colors.primary[500]
-                : theme.colors.textSecondary
-            }
-          />
-        </TouchableOpacity>
       </View>
 
       {hasActiveSearch && searchLoading && !searchError && (
@@ -1049,50 +939,34 @@ const ProductsScreen: React.FC<Props> = ({ navigation }) => {
       )}
 
       {/* Compteur de résultats */}
-      {contentMode === 'merchants' ? (
-        filteredMerchants.length > 0 && (
-          <View style={styles.resultsHeader}>
-            <Typography variant="body" weight="semibold">
-              {filteredMerchants.length} boutique{filteredMerchants.length > 1 ? 's' : ''} trouvée{filteredMerchants.length > 1 ? 's' : ''}
-            </Typography>
-            {(selectedCategory !== 'all' || searchQuery.trim()) && (
-              <TouchableOpacity onPress={() => {
-                setSelectedCategory('all')
-                setSearchQuery('')
-              }}>
-                <Typography variant="caption" weight="medium" color="primary">
-                  Réinitialiser
-                </Typography>
-              </TouchableOpacity>
-            )}
-          </View>
-        )
-      ) : (
-        filteredProducts.length > 0 && (
-          <View style={styles.resultsHeader}>
-            <Typography variant="body" weight="semibold">
-              {filteredProducts.length} produit{filteredProducts.length > 1 ? 's' : ''} trouvé{filteredProducts.length > 1 ? 's' : ''}
-            </Typography>
-            {(selectedCategory !== 'all' || searchQuery.trim()) && (
-              <TouchableOpacity onPress={() => {
-                setSelectedCategory('all')
-                setSearchQuery('')
-              }}>
-                <Typography variant="caption" weight="medium" color="primary">
-                  Réinitialiser
-                </Typography>
-              </TouchableOpacity>
-            )}
-          </View>
-        )
+      {filteredMerchants.length > 0 && (
+        <View style={styles.resultsHeader}>
+          <Typography variant="body" weight="semibold">
+            {filteredMerchants.length} boutique{filteredMerchants.length > 1 ? 's' : ''} trouvée{filteredMerchants.length > 1 ? 's' : ''}
+          </Typography>
+          {(selectedCategory !== 'all' || searchQuery.trim()) && (
+            <TouchableOpacity onPress={() => {
+              setSelectedCategory('all')
+              setSearchQuery('')
+            }}>
+              <Typography variant="caption" weight="medium" color="primary">
+                Réinitialiser
+              </Typography>
+            </TouchableOpacity>
+          )}
+        </View>
       )}
 
       {/* Liste conditionnelle selon mode */}
-      {contentMode === 'merchants' ? (
+      {contentMode === 'map' ? (
+        isLoadingMerchants ? (
+          renderLoadingState('Chargement de la carte…')
+        ) : (
+          renderMerchantsMap()
+        )
+      ) : (
         isLoadingMerchants ? (
           renderLoadingState(hasActiveSearch ? 'Recherche des boutiques…' : 'Chargement des boutiques…')
-        ) : viewMode === 'map' ? (
-          renderMerchantsMap()
         ) : filteredMerchants.length > 0 ? (
           <FlatList
             key="merchants-list"
@@ -1109,49 +983,6 @@ const ProductsScreen: React.FC<Props> = ({ navigation }) => {
             <Ionicons name="storefront-outline" size={64} color={theme.colors.neutral[300]} />
             <Typography variant="h3" weight="bold" style={{ marginTop: theme.spacing.lg, marginBottom: theme.spacing.sm }}>
               Aucune boutique trouvée
-            </Typography>
-            <Typography variant="body" color="secondary" style={{ textAlign: 'center', lineHeight: 20, marginBottom: theme.spacing.lg }}>
-              {searchError
-                ? searchError
-                : hasActiveSearch
-                  ? `Aucun résultat pour "${searchQuery}"`
-                  : 'Essayez de changer les filtres ou revenez plus tard'}
-            </Typography>
-            {(selectedCategory !== 'all' || hasActiveSearch) && (
-              <Button
-                variant="primary"
-                size="md"
-                onPress={() => {
-                  setSelectedCategory('all')
-                  setSearchQuery('')
-                }}
-              >
-                Réinitialiser les filtres
-              </Button>
-            )}
-          </View>
-        )
-      ) : (
-        isLoadingProducts ? (
-          renderLoadingState(hasActiveSearch ? 'Recherche des produits…' : 'Chargement des produits…')
-        ) : filteredProducts.length > 0 ? (
-          <FlatList
-            key="products-list"
-            data={filteredProducts}
-            renderItem={({ item }) => renderProductCard(item)}
-            keyExtractor={(item) => `product-${item.id}`}
-            numColumns={2}
-            columnWrapperStyle={styles.productsRow}
-            contentContainerStyle={styles.listContent}
-            refreshControl={
-              <RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={[theme.colors.primary[500]]} />
-            }
-          />
-        ) : (
-          <View style={styles.emptyState}>
-            <Ionicons name="basket-outline" size={64} color={theme.colors.neutral[300]} />
-            <Typography variant="h3" weight="bold" style={{ marginTop: theme.spacing.lg, marginBottom: theme.spacing.sm }}>
-              Aucun produit trouvé
             </Typography>
             <Typography variant="body" color="secondary" style={{ textAlign: 'center', lineHeight: 20, marginBottom: theme.spacing.lg }}>
               {searchError

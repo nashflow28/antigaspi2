@@ -210,7 +210,7 @@ const walletSlice = createSlice({
         state.transactionsLoading = true
         state.error = null
       })
-      .addCase(fetchWalletTransactions.fulfilled, (state, action: PayloadAction<WalletTransactionsResponse>) => {
+      .addCase(fetchWalletTransactions.fulfilled, (state, action) => {
         state.transactionsLoading = false
         state.transactions = action.payload.transactions
         state.pagination = action.payload.pagination

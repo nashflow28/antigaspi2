@@ -76,6 +76,7 @@ export const TEST_IDS = {
   profileEmail: 'profile-email',
   editProfileButton: 'edit-profile-button',
   logoutButton: 'logout-button',
+  walletAccessButton: 'wallet-access-button',
   loyaltyAccessButton: 'loyalty-access-button',
   loyaltyScreen: 'loyalty-screen',
   loyaltyRedeemButton: 'loyalty-redeem-button',
