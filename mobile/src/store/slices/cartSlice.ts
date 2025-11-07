@@ -88,11 +88,45 @@ export const clearCart = createAsyncThunk(
 
 export const checkoutCart = createAsyncThunk(
   'cart/checkout',
-  async (payload: CartCheckoutPayload, { rejectWithValue }) => {
+  async (payload: CartCheckoutPayload, { rejectWithValue, getState }) => {
     try {
-      const response = await apiService.checkoutCart(payload)
+      // Récupérer le cart du state pour extraire les items
+      const state = getState() as any
+      const cart = state.cart.cart
+
+      if (!cart || !cart.items || cart.items.length === 0) {
+        throw new Error('Panier vide')
+      }
+
+      // Transformer les items du cart en format pour l'API orders
+      const orderPayload = {
+        items: cart.items.map((item: any) => ({
+          product_id: item.product_id,
+          quantity: item.quantity
+        })),
+        notes: payload.notes
+      }
+
+      console.log('📦 [Cart] Creating order from cart with items:', orderPayload.items)
+
+      // Appeler la nouvelle API createOrder au lieu de checkoutCart
+      const orderResponse = await apiService.createOrder(orderPayload)
+
+      console.log('✅ [Cart] Order created:', orderResponse.data.order_number)
+
+      // Adapter la réponse pour correspondre à CartCheckoutResponse
+      // L'API orders retourne { order, order_id, order_number, ... }
+      // Le reducer s'attend à { data: Reservation[], payments: Payment[] }
+      const response: CartCheckoutResponse = {
+        success: orderResponse.success,
+        message: orderResponse.message,
+        data: orderResponse.data.order.reservations || [],
+        payments: null
+      }
+
       return response
     } catch (error: any) {
+      console.error('❌ [Cart] Checkout failed:', error.message)
       return rejectWithValue(error.message)
     }
   }

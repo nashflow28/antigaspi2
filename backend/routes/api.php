@@ -381,11 +381,17 @@ Route::prefix('messaging')->middleware('jwt.auth')->group(function () {
     Route::delete('/messages/{message}', [MessageController::class, 'destroyMessage']);
 });
 
+// Routes des commandes (protégées)
+Route::prefix('orders')->middleware('jwt.auth')->group(function () {
+    Route::get('/', [\App\Http\Controllers\Api\OrderController::class, 'index']);
+    Route::post('/', [\App\Http\Controllers\Api\OrderController::class, 'store']);
+    Route::get('/{id}', [\App\Http\Controllers\Api\OrderController::class, 'show']);
+    Route::post('/{id}/cancel', [\App\Http\Controllers\Api\OrderController::class, 'cancel']);
+});
+
 // Routes de test et informations
 Route::get('health', function () {
     return response()->json([
-        'status' => 'ok',
-        'message' => 'API is working',
         'timestamp' => now(),
         'version' => '1.0.0'
     ]);

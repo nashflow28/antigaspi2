@@ -14,6 +14,7 @@ class Reservation extends Model
 
     protected $fillable = [
         'user_id',
+        'order_id',
         'product_id',
         'quantity_reserved',
         'total_amount',
@@ -100,6 +101,12 @@ class Reservation extends Model
     public function latestPayment(): BelongsTo
     {
         return $this->belongsTo(Payment::class, 'latest_payment_id');
+    }
+
+
+    public function order(): BelongsTo
+    {
+        return $this->belongsTo(Order::class);
     }
 
     public function scopePending($query)

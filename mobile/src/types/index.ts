@@ -817,3 +817,38 @@ export interface CSVExportResponse {
   rows_exported: number
   message?: string
 }
+
+// === ORDERS (COMMANDES) ===
+
+export interface Order {
+  id: number
+  user_id: number
+  order_number: string
+  total_amount: number
+  status: 'pending' | 'confirmed' | 'ready' | 'completed' | 'cancelled'
+  payment_status: 'pending' | 'success' | 'failed' | 'on_site' | 'refunded'
+  confirmed_at: string | null
+  completed_at: string | null
+  cancelled_at: string | null
+  notes: string | null
+  reservations?: Reservation[]
+  created_at: string
+  updated_at: string
+}
+
+export interface OrderCreationPayload {
+  items: Array<{ product_id: number; quantity: number }>
+  notes?: string
+}
+
+export interface OrderCreationResponse {
+  success: boolean
+  message: string
+  data: {
+    order: Order
+    order_id: number
+    order_number: string
+    total_amount: number
+    items_count: number
+  }
+}

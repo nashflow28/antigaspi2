@@ -50,6 +50,9 @@ import {
   ConversationListResponse,
   ConversationMessage,
   ConversationMessageResponse,
+  Order,
+  OrderCreationPayload,
+  OrderCreationResponse,
 } from '../types'
 import { getExpoExtraValue } from '../utils/expoConfig'
 
@@ -73,18 +76,18 @@ const getApiBaseUrl = (): string => {
         const host = window.location.hostname
         // Si localhost/127 -> forcer 127 (évite IPv6 ::1 et soucis DNS)
         if (host === 'localhost' || host === '127.0.0.1' || host === '::1') {
-          const url = 'http://127.0.0.1:3000/api'
+          const url = 'http://127.0.0.1:8000/api'
           console.log('🔗 API URL (web localhost):', url)
           return url
         }
         // Sinon, utiliser l'IP/host courant (accès LAN)
-        const url = `http://${host}:3000/api`
+        const url = `http://${host}:8000/api`
         console.log('🔗 API URL (web from current host):', url)
         return url
       }
 
       // c) Fallback ultime web
-      const url = 'http://127.0.0.1:3000/api'
+      const url = 'http://127.0.0.1:8000/api'
       console.log('🔗 API URL (web fallback):', url)
       return url
     }
@@ -100,7 +103,7 @@ const getApiBaseUrl = (): string => {
   }
 
   // 3) Émulateur Android (localhost côté hôte)
-  const url = 'http://10.0.2.2:3000/api'
+  const url = 'http://10.0.2.2:8000/api'
   console.log('🔗 API URL (android emulator fallback):', url)
   return url
 }
@@ -426,6 +429,35 @@ class ApiService {
 
   async cancelReservation(id: number): Promise<ApiResponse<Reservation>> {
     return this.request<ApiResponse<Reservation>>('POST', `/reservations/${id}/cancel`)
+  }
+
+  // === ORDERS (COMMANDES) ===
+
+  async createOrder(payload: OrderCreationPayload): Promise<OrderCreationResponse> {
+    const snakeCasePayload = toSnakeCase(payload)
+    console.log('📤 [API] createOrder payload:', JSON.stringify(snakeCasePayload, null, 2))
+    try {
+      const response = await this.request<OrderCreationResponse>('POST', '/orders', snakeCasePayload)
+      console.log('✅ [API] createOrder response:', JSON.stringify(response, null, 2))
+      return response
+    } catch (error: any) {
+      console.error('❌ [API] createOrder error:', error)
+      console.error('❌ [API] Error message:', error.message)
+      console.error('❌ [API] Error statusCode:', error.statusCode)
+      throw error
+    }
+  }
+
+  async getOrders(): Promise<ApiResponse<Order[]>> {
+    return this.request<ApiResponse<Order[]>>('GET', '/orders')
+  }
+
+  async getOrder(id: number): Promise<ApiResponse<Order>> {
+    return this.request<ApiResponse<Order>>('GET', `/orders/${id}`)
+  }
+
+  async cancelOrder(id: number): Promise<ApiResponse<Order>> {
+    return this.request<ApiResponse<Order>>('POST', `/orders/${id}/cancel`)
   }
 
   // === PANIER ===
