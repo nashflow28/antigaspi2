@@ -1,0 +1,56 @@
+---
+# Configuration de déploiement cPanel pour Antigaspi
+# Repository: /home/c2621486c/repositories/antigaspi2
+# Documentation: https://docs.cpanel.net/knowledge-base/web-services/guide-to-git-deployment/
+
+deployment:
+  tasks:
+    # 1. Définir les chemins (À ADAPTER selon votre structure VPS)
+    - export REPO_PATH=/home/c2621486c/repositories/antigaspi2
+    - export BACKEND_PATH=/home/c2621486c/antigaspi-backend
+    - export PUBLIC_PATH=/home/c2621486c/public_html
+
+    # 2. Déployer le backend Laravel
+    - echo "📦 Déploiement du backend Laravel..."
+    - /bin/mkdir -p $BACKEND_PATH
+    - /bin/cp -R $REPO_PATH/backend/* $BACKEND_PATH/
+
+    # 3. Installer les dépendances Composer (production)
+    - echo "📚 Installation des dépendances Composer..."
+    - cd $BACKEND_PATH
+    - /usr/local/bin/ea-php82 /opt/cpanel/composer/bin/composer install --no-dev --optimize-autoloader --no-interaction
+
+    # 4. Configuration de l'environnement
+    - echo "⚙️ Configuration de l'environnement..."
+    - test -f $BACKEND_PATH/.env || /bin/cp $BACKEND_PATH/.env.example $BACKEND_PATH/.env
+    - /usr/local/bin/ea-php82 artisan key:generate --force --no-interaction || echo "Key already exists"
+
+    # 5. Optimisations Laravel pour production
+    - echo "🚀 Optimisations Laravel..."
+    - /usr/local/bin/ea-php82 artisan config:cache
+    - /usr/local/bin/ea-php82 artisan route:cache
+    - /usr/local/bin/ea-php82 artisan view:cache
+
+    # 6. Migrations de la base de données (inclut les nouvelles tables orders)
+    - echo "🗄️ Exécution des migrations..."
+    - /usr/local/bin/ea-php82 artisan migrate --force --no-interaction
+
+    # 7. Permissions correctes pour Laravel
+    - echo "🔐 Configuration des permissions..."
+    - /bin/chmod -R 755 $BACKEND_PATH/storage
+    - /bin/chmod -R 755 $BACKEND_PATH/bootstrap/cache
+
+    # 8. Créer le lien symbolique vers public_html (si nécessaire)
+    - echo "🔗 Configuration du public directory..."
+    - /bin/rm -rf $PUBLIC_PATH/api 2>/dev/null || true
+    - /bin/ln -sf $BACKEND_PATH/public $PUBLIC_PATH/api
+
+    # 9. Nettoyage des caches
+    - echo "🧹 Nettoyage des caches..."
+    - /usr/local/bin/ea-php82 artisan cache:clear
+    - /usr/local/bin/ea-php82 artisan view:clear
+
+    # 10. Log de succès avec timestamp
+    - echo "✅ Déploiement terminé avec succès - $(date '+%Y-%m-%d %H:%M:%S')"
+    - echo "📊 Nouveau système Orders déployé"
+    - echo "🔢 Version: feat(orders) - Système de commandes groupées"
