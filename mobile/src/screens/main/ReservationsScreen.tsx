@@ -25,6 +25,7 @@ import analyticsService from '../../services/analyticsService'
 import { Button, Card, Badge, Typography, Modal as Modal2025 } from '../../components/2025'
 import { useTheme } from '../../theme'
 import { TEST_IDS } from '../../utils/testIds'
+import { getImageUrl } from '../../utils/imageHelpers'
 
 interface Props {
   navigation: any
@@ -280,7 +281,7 @@ const ReservationsScreen: React.FC<Props> = ({ navigation }) => {
       <View style={[styles.productSection, { marginBottom: theme.spacing.sm }]}>
         <View style={[styles.productImage, { marginRight: theme.spacing.sm }]}>
           <Image
-            source={{ uri: item.product.image_url || '' }}
+            source={{ uri: getImageUrl(item.product.image_url) }}
             style={styles.image}
             contentFit="cover"
           />

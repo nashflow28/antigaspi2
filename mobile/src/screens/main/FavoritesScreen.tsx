@@ -20,6 +20,7 @@ import type { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import type { RootStackParamList } from '../../types'
 import { API_BASE_URL } from '../../services/api'
 import { formatCurrency } from '../../utils/currencyHelpers'
+import { getImageUrl } from '../../utils/imageHelpers'
 import { Button, Card, Badge, Typography } from '../../components/2025'
 
 type NavigationProp = NativeStackNavigationProp<RootStackParamList, 'ProductDetails'>
@@ -71,11 +72,7 @@ const FavoritesScreen: React.FC = () => {
   }
 
   const renderProduct = (product: Product) => {
-    const imageUrl = product.image_url
-      ? product.image_url.startsWith('http')
-        ? product.image_url
-        : `${API_BASE_URL.replace('/api', '')}/${product.image_url}`
-      : null
+    const imageUrl = getImageUrl(product.image_url, product.category?.name)
 
     return (
       <TouchableOpacity
