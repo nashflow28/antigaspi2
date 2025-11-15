@@ -45,7 +45,9 @@
         "ACCESS_COARSE_LOCATION",
         "CAMERA",
         "VIBRATE",
-        "RECEIVE_BOOT_COMPLETED"
+        "RECEIVE_BOOT_COMPLETED",
+        "android.permission.ACCESS_COARSE_LOCATION",
+        "android.permission.ACCESS_FINE_LOCATION"
       ],
       "usesCleartextTraffic": true,
       "edgeToEdgeEnabled": true,
@@ -64,8 +66,11 @@
       ]
     ],
     "extra": {
-      "apiUrl": "http://10.0.2.2:3000/api",
-      "testMode": true
+      "apiUrl": "https://antigaspi.jubtek.com/api",
+      "testMode": false,
+      "eas": {
+        "projectId": "3b3263bb-77cd-4547-a421-1bf2fa8530c6"
+      }
     },
     "scheme": "antigaspi"
   }
