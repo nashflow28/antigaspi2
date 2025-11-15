@@ -273,6 +273,14 @@ class ReservationController extends Controller
             $reservation = Reservation::with(['product.merchant'])
                 ->findOrFail($id);
 
+            // 🐛 BUG FIX #5: Check product and merchant exist before accessing
+            if (!$reservation->product || !$reservation->product->merchant) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Produit ou commerçant associé introuvable'
+                ], 404);
+            }
+
             if ($reservation->product->merchant->user_id !== $user->id) {
                 return response()->json([
                     'success' => false,
@@ -317,6 +325,14 @@ class ReservationController extends Controller
 
             $reservation = Reservation::with(['product.merchant'])
                 ->findOrFail($id);
+
+            // 🐛 BUG FIX #5: Check product and merchant exist before accessing
+            if (!$reservation->product || !$reservation->product->merchant) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Produit ou commerçant associé introuvable'
+                ], 404);
+            }
 
             if ($reservation->product->merchant->user_id !== $user->id) {
                 return response()->json([
@@ -363,6 +379,14 @@ class ReservationController extends Controller
 
             $reservation = Reservation::with(['product.merchant'])
                 ->findOrFail($id);
+
+            // 🐛 BUG FIX #5: Check product and merchant exist before accessing
+            if (!$reservation->product || !$reservation->product->merchant) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Produit ou commerçant associé introuvable'
+                ], 404);
+            }
 
             if ($reservation->product->merchant->user_id !== $user->id) {
                 return response()->json([

@@ -245,8 +245,12 @@ class AuthController extends Controller
             // Ajouter les infos commerçant si applicable
             if ($user->role === 'merchant' && $user->merchant) {
                 $userData['merchant'] = [
+                    'id' => $user->merchant->id,
                     'business_name' => $user->merchant->business_name,
                     'business_type' => $user->merchant->business_type,
+                    'description' => $user->merchant->description,
+                    'siret' => $user->merchant->siret,
+                    'photo_url' => $user->merchant->photo_url,
                     'is_verified' => $user->merchant->is_verified,
                     'total_sales' => $user->merchant->total_sales,
                 ];

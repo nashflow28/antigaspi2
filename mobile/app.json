@@ -51,7 +51,12 @@
       ],
       "usesCleartextTraffic": true,
       "edgeToEdgeEnabled": true,
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "config": {
+        "googleMaps": {
+          "apiKey": "AIzaSyDxDOy-8UVhDj_U6XehBj4Os2VCyYKdQ9E"
+        }
+      }
     },
     "web": {
       "favicon": "./assets/favicon.png",

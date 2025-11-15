@@ -488,16 +488,16 @@ class MerchantController extends Controller
 
             // Mise à jour du merchant
             $merchantData = [];
-            if ($request->filled('business_name')) {
+            if ($request->has('business_name')) {
                 $merchantData['business_name'] = $request->business_name;
             }
-            if ($request->filled('business_type')) {
+            if ($request->has('business_type')) {
                 $merchantData['business_type'] = $request->business_type;
             }
-            if ($request->filled('description')) {
+            if ($request->has('description')) {
                 $merchantData['description'] = $request->description;
             }
-            if ($request->filled('siret')) {
+            if ($request->has('siret')) {
                 $merchantData['siret'] = $request->siret;
             }
 
@@ -507,13 +507,13 @@ class MerchantController extends Controller
 
             // Mise à jour de l'utilisateur
             $userData = [];
-            if ($request->filled('phone')) {
+            if ($request->has('phone')) {
                 $userData['phone'] = $request->phone;
             }
-            if ($request->filled('address')) {
+            if ($request->has('address')) {
                 $userData['address'] = $request->address;
             }
-            if ($request->filled('city')) {
+            if ($request->has('city')) {
                 $userData['city'] = $request->city;
             }
 

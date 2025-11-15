@@ -21,6 +21,7 @@ import { AppDispatch, RootState } from '../../store'
 import { useTheme } from '../../theme'
 import { Button, Card, Typography } from '../../components/2025'
 import { formatCurrency } from '../../utils/currencyHelpers'
+import { getImageUrl } from '../../utils/imageHelpers'
 import { TEST_IDS } from '../../utils/testIds'
 import { PAYMENT_OPTIONS } from '../../constants/paymentOptions'
 import { PaymentMethod, CartItem as CartItemType } from '../../types'
@@ -410,7 +411,7 @@ const CartScreen: React.FC<Props> = ({ navigation }) => {
                     <View style={styles.cartItemHeader}>
                       <View style={styles.cartItemInfo}>
                         <Image
-                          source={{ uri: item.product?.image_url || undefined }}
+                          source={{ uri: getImageUrl(item.product?.image_url, item.product?.category?.name) }}
                           style={styles.cartItemImage}
                           contentFit="cover"
                         />

@@ -24,12 +24,22 @@ class FavoriteController extends Controller
             $perPage = $request->get('per_page', 20);
             $perPage = max(1, min((int) $perPage, 100)); // Between 1 and 100
 
+            // 🐛 BUG FIX #3: Filter out favorites with invalid products (null category or merchant)
             $favorites = Favorite::with(['product.category', 'product.merchant.user'])
                 ->where('user_id', $user->id)
+                ->whereHas('product', function ($query) {
+                    $query->whereNotNull('category_id')
+                          ->whereNotNull('merchant_id');
+                })
                 ->orderBy('created_at', 'desc')
                 ->paginate($perPage);
 
             $products = $favorites->map(function ($favorite) {
+                // Additional safety check
+                if (!$favorite->product || !$favorite->product->category || !$favorite->product->merchant) {
+                    return null;
+                }
+
                 return [
                     'id' => $favorite->product->id,
                     'name' => $favorite->product->name,
@@ -53,7 +63,7 @@ class FavoriteController extends Controller
                     ],
                     'favorited_at' => $favorite->created_at,
                 ];
-            });
+            })->filter(); // Remove null entries
 
             return response()->json([
                 'success' => true,
