@@ -288,10 +288,10 @@ const ReservationsScreen: React.FC<Props> = ({ navigation }) => {
         </View>
         <View style={styles.productInfo}>
           <Typography variant="body" weight="semibold" style={{ marginBottom: theme.spacing.xs }}>
-            {item.product.name}
+            {item.product?.name || 'Produit inconnu'}
           </Typography>
           <Typography variant="caption" color="secondary" style={{ marginBottom: theme.spacing.sm }}>
-            {item.product.merchant.name}
+            {item.product?.merchant?.name || 'Commerçant'}
           </Typography>
           <View style={styles.quantityPriceContainer}>
             <Typography variant="caption" color="secondary">
@@ -494,10 +494,10 @@ const ReservationsScreen: React.FC<Props> = ({ navigation }) => {
 
               <View style={{ backgroundColor: theme.colors.neutral[50], padding: theme.spacing.md, borderRadius: theme.radius.md, gap: theme.spacing.sm }}>
                 <Typography variant="caption">
-                  📦 {selectedReservation.product.name}
+                  📦 {selectedReservation.product?.name || 'Produit inconnu'}
                 </Typography>
                 <Typography variant="caption">
-                  🏪 {selectedReservation.product.merchant.name}
+                  🏪 {selectedReservation.product?.merchant?.name || 'Commerçant'}
                 </Typography>
                 <Typography variant="caption">
                   📊 Quantité: {selectedReservation.quantity}

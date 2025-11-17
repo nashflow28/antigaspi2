@@ -94,9 +94,25 @@ const MerchantProfileEditScreen: React.FC = () => {
   const loadMerchantProfile = async () => {
     try {
       setLoading(true)
-      // Charger le profil merchant depuis l'endpoint (à implémenter ou utiliser les données user)
-      // Pour l'instant on utilise les données du user
-      if (user) {
+      // Rafraîchir le profil depuis l'API pour avoir les données merchant à jour
+      const resultAction = await dispatch(refreshProfile() as any)
+
+      if (refreshProfile.fulfilled.match(resultAction)) {
+        const freshUser = resultAction.payload
+        setFormData({
+          business_name: freshUser.merchant?.business_name || '',
+          business_type: freshUser.merchant?.business_type || '',
+          description: freshUser.merchant?.description || '',
+          phone: freshUser.phone || '',
+          address: freshUser.address || '',
+          city: freshUser.city || '',
+          siret: freshUser.merchant?.siret || '',
+        })
+        if (freshUser.merchant?.photo_url) {
+          setPhotoUri(freshUser.merchant.photo_url)
+        }
+      } else if (user) {
+        // Fallback sur les données existantes si le refresh échoue
         setFormData({
           business_name: user.merchant?.business_name || '',
           business_type: user.merchant?.business_type || '',
@@ -112,6 +128,18 @@ const MerchantProfileEditScreen: React.FC = () => {
       }
     } catch (error) {
       console.error('Erreur chargement profil:', error)
+      // Fallback sur les données existantes en cas d'erreur
+      if (user) {
+        setFormData({
+          business_name: user.merchant?.business_name || '',
+          business_type: user.merchant?.business_type || '',
+          description: user.merchant?.description || '',
+          phone: user.phone || '',
+          address: user.address || '',
+          city: user.city || '',
+          siret: user.merchant?.siret || '',
+        })
+      }
     } finally {
       setLoading(false)
     }

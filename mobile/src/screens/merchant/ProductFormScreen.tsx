@@ -180,8 +180,16 @@ const ProductFormScreen: React.FC<Props> = ({ route, navigation }) => {
         // category_id removed - automatically uses merchant's category
         original_price: parseFloat(originalPrice),
         discounted_price: parseFloat(discountedPrice),
-        quantity_available: parseInt(quantity),
-        expiration_date: expirationDate || new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+        quantity_available: parseInt(quantity, 10),
+        expiration_date: (() => {
+          if (expirationDate && /^\d{4}-\d{2}-\d{2}$/.test(expirationDate)) {
+            const date = new Date(expirationDate);
+            if (!isNaN(date.getTime())) {
+              return expirationDate;
+            }
+          }
+          return new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+        })(),
         image_url: uploadedImageUrl,
       }
 

@@ -306,7 +306,7 @@ const MerchantReservationsScreen: React.FC = () => {
         {/* Product Info */}
         <View style={styles.productInfo}>
           <Text style={[styles.productName, { color: theme.colors.text }]}>
-            {item.product.name}
+            {item.product?.name || 'Produit inconnu'}
           </Text>
           <View style={styles.detailsRow}>
             <Text style={[styles.detailText, { color: theme.colors.textSecondary }]}>

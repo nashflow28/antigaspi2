@@ -313,7 +313,7 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
               {product.name}
             </Typography>
             <Typography variant="caption" color="secondary" numberOfLines={1} style={{ marginBottom: theme.spacing.xs }}>
-              {product.merchant.business_name}
+              {product.merchant?.business_name || 'Commerçant'}
             </Typography>
 
             {/* Location info */}
@@ -330,7 +330,7 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
               </View>
             ) : (
               <Typography variant="caption" color="secondary" numberOfLines={1} style={{ marginBottom: theme.spacing.sm }}>
-                📍 {product.merchant.city}
+                📍 {product.merchant?.city || 'Ville non disponible'}
               </Typography>
             )}
 

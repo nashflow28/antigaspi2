@@ -62,16 +62,16 @@ const MerchantDashboardScreen: React.FC = () => {
       setLoading(true)
       // Charger les stats
       const statsResponse = await apiService.get('/analytics/merchant-stats')
-      setStats(statsResponse.data || {
-        active_products: 0,
-        pending_reservations: 0,
-        todays_revenue: 0,
-        total_products: 0,
+      setStats({
+        active_products: statsResponse.data?.active_products ?? 0,
+        pending_reservations: statsResponse.data?.pending_reservations ?? 0,
+        todays_revenue: statsResponse.data?.todays_revenue ?? 0,
+        total_products: statsResponse.data?.total_products ?? 0,
       })
 
       // Charger les réservations récentes
       const reservationsResponse = await apiService.get('/reservations/merchant/list?limit=5')
-      setRecentReservations(reservationsResponse.data.data || [])
+      setRecentReservations(reservationsResponse.data?.data || reservationsResponse.data || [])
 
       // Charger les avis récents
       try {

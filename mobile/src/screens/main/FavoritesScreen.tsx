@@ -96,7 +96,7 @@ const FavoritesScreen: React.FC = () => {
                 {product.name}
               </Typography>
               <Typography variant="caption" color="secondary" numberOfLines={1} style={{ marginBottom: theme.spacing.sm }}>
-                {product.merchant.business_name}
+                {product.merchant?.business_name || 'Commerce partenaire'}
               </Typography>
 
               <View style={styles.priceRow}>
@@ -107,7 +107,7 @@ const FavoritesScreen: React.FC = () => {
                   {formatCurrency(product.original_price)}
                 </Typography>
                 <Badge variant="success" size="sm">
-                  -{product.discount_percentage}%
+                  -{product.discount_percentage ?? 0}%
                 </Badge>
               </View>
 
@@ -115,13 +115,16 @@ const FavoritesScreen: React.FC = () => {
                 <View style={styles.metaItem}>
                   <Ionicons name="pricetag" size={14} color={theme.colors.neutral[500]} />
                   <Typography variant="caption" color="secondary" style={{ fontSize: 11, marginLeft: 4 }}>
-                    {product.category?.name}
+                    {product.category?.name || 'Catégorie'}
                   </Typography>
                 </View>
                 <View style={styles.metaItem}>
                   <Ionicons name="time" size={14} color={theme.colors.neutral[500]} />
                   <Typography variant="caption" color="secondary" style={{ fontSize: 11, marginLeft: 4 }}>
-                    Exp. {new Date(product.expiration_date).toLocaleDateString('fr-FR')}
+                    Exp. {(() => {
+                      const date = new Date(product.expiration_date);
+                      return isNaN(date.getTime()) ? 'Date inconnue' : date.toLocaleDateString('fr-FR');
+                    })()}
                   </Typography>
                 </View>
               </View>

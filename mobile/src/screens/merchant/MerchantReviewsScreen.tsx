@@ -184,7 +184,7 @@ const MerchantReviewsScreen: React.FC = () => {
 
   const filteredReviews = filter === 'all'
     ? reviews
-    : reviews.filter(r => r.rating === parseInt(filter))
+    : reviews.filter(r => r.rating === parseInt(filter, 10))
 
   const renderReview = ({ item }: { item: Review }) => (
     <View style={[styles.reviewCard, { backgroundColor: theme.colors.surface.light }]}>
