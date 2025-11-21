@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Favorite;
 use App\Models\Product;
+use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Tymon\JWTAuth\Facades\JWTAuth;
@@ -34,36 +35,60 @@ class FavoriteController extends Controller
                 ->orderBy('created_at', 'desc')
                 ->paginate($perPage);
 
-            $products = $favorites->map(function ($favorite) {
+            $products = $favorites->getCollection()->map(function ($favorite) {
                 // Additional safety check
                 if (!$favorite->product || !$favorite->product->category || !$favorite->product->merchant) {
                     return null;
                 }
 
+                $product = $favorite->product;
+                try {
+                    $expirationDate = $product->expiration_date
+                        ? Carbon::parse($product->expiration_date)
+                        : null;
+                } catch (\Exception $exception) {
+                    // Ignore malformed dates while keeping favorites list usable
+                    $expirationDate = null;
+                }
+                $daysUntilExpiration = $expirationDate
+                    ? now()->diffInDays($expirationDate, false)
+                    : null;
+
+                $originalPrice = (float) $product->original_price;
+                $discountedPrice = (float) $product->discounted_price;
+
                 return [
-                    'id' => $favorite->product->id,
-                    'name' => $favorite->product->name,
-                    'description' => $favorite->product->description,
-                    'original_price' => (float) $favorite->product->original_price,
-                    'discounted_price' => (float) $favorite->product->discounted_price,
-                    'discount_percentage' => $favorite->product->discount_percentage,
-                    'quantity_available' => $favorite->product->quantity_available,
-                    'expiration_date' => $favorite->product->expiration_date,
-                    'image_url' => $favorite->product->image_url,
-                    'is_active' => $favorite->product->is_active,
+                    'id' => $product->id,
+                    'name' => $product->name,
+                    'description' => $product->description,
+                    'original_price' => $originalPrice,
+                    'discounted_price' => $discountedPrice,
+                    'discount_percentage' => $product->discount_percentage,
+                    'quantity_available' => $product->quantity_available,
+                    'expiration_date' => $product->expiration_date,
+                    'days_until_expiration' => $daysUntilExpiration,
+                    'savings' => max($originalPrice - $discountedPrice, 0),
+                    'image_url' => $product->image_url,
+                    'is_active' => $product->is_active,
+                    'status' => $product->status,
+                    'needs_approval' => $product->needs_approval,
+                    'created_at' => $product->created_at,
                     'category' => [
-                        'id' => $favorite->product->category->id,
-                        'name' => $favorite->product->category->name,
-                        'icon' => $favorite->product->category->icon,
+                        'id' => $product->category->id,
+                        'name' => $product->category->name,
+                        'icon' => $product->category->icon,
                     ],
                     'merchant' => [
-                        'id' => $favorite->product->merchant->id,
-                        'business_name' => $favorite->product->merchant->business_name,
-                        'business_type' => $favorite->product->merchant->business_type,
+                        'id' => $product->merchant->id,
+                        'business_name' => $product->merchant->business_name,
+                        'business_type' => $product->merchant->business_type,
+                        'city' => $product->merchant->user->city ?? null,
+                        'address' => $product->merchant->user->address ?? null,
+                        'phone' => $product->merchant->user->phone ?? null,
                     ],
                     'favorited_at' => $favorite->created_at,
                 ];
-            })->filter(); // Remove null entries
+            })->filter()->values(); // Remove null entries and reset indexes
 
             return response()->json([
                 'success' => true,
