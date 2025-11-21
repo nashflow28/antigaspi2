@@ -12,6 +12,7 @@ use App\Models\Product;
 use App\Models\Reservation;
 use App\Notifications\ReservationStatusNotification;
 use App\Services\ReservationService;
+use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -99,6 +100,9 @@ class ReservationController extends Controller
                 $product = Product::lockForUpdate()->findOrFail($request->product_id);
                 $paymentMethod = PaymentMethod::from($request->input('payment_method'));
 
+                $pickupDate = $request->input('pickup_date') ?? Carbon::now()->toDateString();
+                $pickupTime = $request->input('pickup_time') ?? Carbon::now()->addHour()->format('H:i');
+
                 [$reservation, $payment] = $this->reservations->createReservation(
                     $user,
                     $product,
@@ -106,8 +110,8 @@ class ReservationController extends Controller
                     $paymentMethod,
                     [
                         'notes' => $request->notes,
-                        'pickup_date' => $request->pickup_date,
-                        'pickup_time' => $request->pickup_time,
+                        'pickup_date' => $pickupDate,
+                        'pickup_time' => $pickupTime,
                         'customer_phone' => $request->input('customer_phone'),
                         'customer_email' => $request->input('customer_email'),
                         'currency' => $request->input('currency', config('payments.currency', 'XOF')),

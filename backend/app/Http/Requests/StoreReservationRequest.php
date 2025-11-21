@@ -99,12 +99,12 @@ class StoreReservationRequest extends FormRequest
             'customer_email' => ['nullable', 'email'],
             'notes' => 'nullable|string|max:500',
             'pickup_date' => array_filter([
-                'required',
+                'nullable',
                 'date',
                 $businessType ? new ValidPickupDate($businessType, $latestExpiration) : null,
             ]),
             'pickup_time' => [
-                'required',
+                'nullable',
                 'date_format:H:i',
             ],
             'wallet_pin' => [
