@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use Carbon\Carbon;
 use App\Enums\PaymentMethod;
 use App\Models\Payment;
 use App\Models\Product;
@@ -45,8 +46,10 @@ class ReservationService
         // Validate pickup_date if provided
         if (!empty($options['pickup_date'])) {
             try {
-                $pickupDate = \Carbon\Carbon::parse($options['pickup_date']);
-                if ($pickupDate->isPast()) {
+                $pickupDate = Carbon::parse($options['pickup_date']);
+
+                // Autoriser les retraits le jour même tout en empêchant les dates passées
+                if ($pickupDate->isBefore(Carbon::today())) {
                     throw ValidationException::withMessages([
                         'pickup_date' => ['La date de récupération doit être dans le futur.'],
                     ]);
