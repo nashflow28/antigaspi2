@@ -82,6 +82,7 @@ class ConsumerController extends Controller
                 'message' => 'Profil mis à jour avec succès',
                 'data' => [
                     'id' => $user->id,
+                    'role' => $user->role,
                     'first_name' => $user->first_name,
                     'last_name' => $user->last_name,
                     'email' => $user->email,
@@ -89,6 +90,10 @@ class ConsumerController extends Controller
                     'address' => $user->address,
                     'city' => $user->city,
                     'photo_url' => $user->photo_url,
+                    'prefers_email_notifications' => $user->prefers_email_notifications,
+                    'prefers_sms_notifications' => $user->prefers_sms_notifications,
+                    'prefers_push_notifications' => $user->prefers_push_notifications,
+                    'created_at' => $user->created_at,
                     'updated_at' => $user->updated_at,
                 ],
             ]);
