@@ -50,6 +50,7 @@ class FavoriteController extends Controller
                     // Ignore malformed dates while keeping favorites list usable
                     $expirationDate = null;
                 }
+
                 $daysUntilExpiration = $expirationDate
                     ? now()->diffInDays($expirationDate, false)
                     : null;
