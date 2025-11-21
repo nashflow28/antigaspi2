@@ -18,6 +18,48 @@ use Tymon\JWTAuth\Facades\JWTAuth;
 
 class AuthController extends Controller
 {
+    /**
+     * Construire la représentation complète de l'utilisateur pour toutes les réponses Auth
+     */
+    private function formatUser(User $user): array
+    {
+        // Charger la relation merchant si nécessaire pour éviter les appels supplémentaires
+        $user->loadMissing('merchant');
+
+        $userData = [
+            'id' => $user->id,
+            'email' => $user->email,
+            'first_name' => $user->first_name,
+            'last_name' => $user->last_name,
+            'phone' => $user->phone,
+            'role' => $user->role,
+            'city' => $user->city,
+            'address' => $user->address,
+            'photo_url' => $user->photo_url,
+            'is_active' => $user->is_active,
+            'created_at' => $user->created_at,
+            'updated_at' => $user->updated_at,
+            'prefers_email_notifications' => $user->prefers_email_notifications,
+            'prefers_sms_notifications' => $user->prefers_sms_notifications,
+            'prefers_push_notifications' => $user->prefers_push_notifications,
+        ];
+
+        if ($user->role === 'merchant' && $user->merchant) {
+            $userData['merchant'] = [
+                'id' => $user->merchant->id,
+                'business_name' => $user->merchant->business_name,
+                'business_type' => $user->merchant->business_type,
+                'description' => $user->merchant->description,
+                'siret' => $user->merchant->siret,
+                'photo_url' => $user->merchant->photo_url,
+                'is_verified' => $user->merchant->is_verified,
+                'total_sales' => $user->merchant->total_sales,
+            ];
+        }
+
+        return $userData;
+    }
+
     private JwtSecurityService $jwtService;
 
     public function __construct(JwtSecurityService $jwtService)
@@ -86,21 +128,13 @@ class AuthController extends Controller
             // Générer le token JWT
             $token = JWTAuth::fromUser($user);
 
+            $user->refresh();
+
             return response()->json([
                 'success' => true,
                 'message' => 'Inscription réussie',
                 'data' => [
-                    'user' => [
-                        'id' => $user->id,
-                        'email' => $user->email,
-                        'first_name' => $user->first_name,
-                        'last_name' => $user->last_name,
-                        'role' => $user->role,
-                        'city' => $user->city,
-                        'prefers_email_notifications' => $user->prefers_email_notifications,
-                        'prefers_sms_notifications' => $user->prefers_sms_notifications,
-                        'prefers_push_notifications' => $user->prefers_push_notifications,
-                    ],
+                    'user' => $this->formatUser($user),
                     'token' => $token,
                     'token_type' => 'Bearer',
                     'expires_in' => JWTAuth::factory()->getTTL() * 60
@@ -184,21 +218,13 @@ class AuthController extends Controller
                 ], 401);
             }
 
+            $user->refresh();
+
             return response()->json([
                 'success' => true,
                 'message' => 'Connexion réussie',
                 'data' => [
-                    'user' => [
-                        'id' => $user->id,
-                        'email' => $user->email,
-                        'first_name' => $user->first_name,
-                        'last_name' => $user->last_name,
-                        'role' => $user->role,
-                        'city' => $user->city,
-                        'prefers_email_notifications' => $user->prefers_email_notifications,
-                        'prefers_sms_notifications' => $user->prefers_sms_notifications,
-                        'prefers_push_notifications' => $user->prefers_push_notifications,
-                    ],
+                    'user' => $this->formatUser($user),
                     'token' => $token,
                     'token_type' => 'Bearer',
                     'expires_in' => JWTAuth::factory()->getTTL() * 60
@@ -226,39 +252,9 @@ class AuthController extends Controller
                 ], 404);
             }
 
-            $userData = [
-                'id' => $user->id,
-                'email' => $user->email,
-                'first_name' => $user->first_name,
-                'last_name' => $user->last_name,
-                'phone' => $user->phone,
-                'role' => $user->role,
-                'city' => $user->city,
-                'address' => $user->address,
-                'is_active' => $user->is_active,
-                'created_at' => $user->created_at,
-                'prefers_email_notifications' => $user->prefers_email_notifications,
-                'prefers_sms_notifications' => $user->prefers_sms_notifications,
-                'prefers_push_notifications' => $user->prefers_push_notifications,
-            ];
-
-            // Ajouter les infos commerçant si applicable
-            if ($user->role === 'merchant' && $user->merchant) {
-                $userData['merchant'] = [
-                    'id' => $user->merchant->id,
-                    'business_name' => $user->merchant->business_name,
-                    'business_type' => $user->merchant->business_type,
-                    'description' => $user->merchant->description,
-                    'siret' => $user->merchant->siret,
-                    'photo_url' => $user->merchant->photo_url,
-                    'is_verified' => $user->merchant->is_verified,
-                    'total_sales' => $user->merchant->total_sales,
-                ];
-            }
-
             return response()->json([
                 'success' => true,
-                'data' => $userData
+                'data' => $this->formatUser($user)
             ]);
 
         } catch (\Exception $e) {

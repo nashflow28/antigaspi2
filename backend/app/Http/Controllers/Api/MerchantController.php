@@ -537,6 +537,18 @@ class MerchantController extends Controller
                     'phone' => $merchant->user->phone,
                     'address' => $merchant->user->address,
                     'city' => $merchant->user->city,
+                    'user' => [
+                        'id' => $merchant->user->id,
+                        'role' => $merchant->user->role,
+                        'email' => $merchant->user->email,
+                        'first_name' => $merchant->user->first_name,
+                        'last_name' => $merchant->user->last_name,
+                        'prefers_email_notifications' => $merchant->user->prefers_email_notifications,
+                        'prefers_sms_notifications' => $merchant->user->prefers_sms_notifications,
+                        'prefers_push_notifications' => $merchant->user->prefers_push_notifications,
+                        'created_at' => $merchant->user->created_at,
+                        'updated_at' => $merchant->user->updated_at,
+                    ],
                 ]
             ]);
 
