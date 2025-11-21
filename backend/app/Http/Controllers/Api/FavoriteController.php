@@ -42,9 +42,15 @@ class FavoriteController extends Controller
                 }
 
                 $product = $favorite->product;
-                $expirationDate = $product->expiration_date
-                    ? Carbon::parse($product->expiration_date)
-                    : null;
+                try {
+                    $expirationDate = $product->expiration_date
+                        ? Carbon::parse($product->expiration_date)
+                        : null;
+                } catch (\Exception $exception) {
+                    // Ignore malformed dates while keeping favorites list usable
+                    $expirationDate = null;
+                }
+
                 $daysUntilExpiration = $expirationDate
                     ? now()->diffInDays($expirationDate, false)
                     : null;
