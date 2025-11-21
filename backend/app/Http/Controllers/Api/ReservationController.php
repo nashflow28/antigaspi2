@@ -197,12 +197,13 @@ class ReservationController extends Controller
                 }
 
                 if ($reservation->cancel()) {
-                    $reservation->refresh()->load('user');
+                    $reservation->refresh()->load(['product.category', 'product.merchant.user', 'user']);
                     $reservation->user->notify(new ReservationStatusNotification($reservation));
 
                     return response()->json([
                         'success' => true,
-                        'message' => 'Réservation annulée avec succès'
+                        'message' => 'Réservation annulée avec succès',
+                        'data' => new ReservationResource($reservation),
                     ]);
                 }
 
@@ -293,12 +294,13 @@ class ReservationController extends Controller
             }
 
             if ($reservation->confirm()) {
-                $reservation->refresh()->load('user');
+                $reservation->refresh()->load(['product.category', 'product.merchant.user', 'user']);
                 $reservation->user->notify(new ReservationStatusNotification($reservation));
 
                 return response()->json([
                     'success' => true,
-                    'message' => 'Réservation confirmée avec succès'
+                    'message' => 'Réservation confirmée avec succès',
+                    'data' => new ReservationResource($reservation),
                 ]);
             }
 
@@ -353,12 +355,13 @@ class ReservationController extends Controller
             }
 
             $reservation->update(['status' => 'ready']);
-            $reservation->refresh()->load('user');
+            $reservation->refresh()->load(['product.category', 'product.merchant.user', 'user']);
             $reservation->user->notify(new ReservationStatusNotification($reservation));
 
             return response()->json([
                 'success' => true,
-                'message' => 'Réservation marquée comme prête pour le retrait'
+                'message' => 'Réservation marquée comme prête pour le retrait',
+                'data' => new ReservationResource($reservation),
             ]);
         } catch (\Exception $e) {
             return response()->json([
@@ -403,12 +406,13 @@ class ReservationController extends Controller
                 $reservation->markPaymentStatus(PaymentStatus::SUCCESS);
                 $reservation->product->merchant->increment('total_sales', $reservation->total_amount);
 
-                $reservation->refresh()->load('user');
+                $reservation->refresh()->load(['product.category', 'product.merchant.user', 'user']);
                 $reservation->user->notify(new ReservationStatusNotification($reservation));
 
                 return response()->json([
                     'success' => true,
-                    'message' => 'Réservation finalisée avec succès'
+                    'message' => 'Réservation finalisée avec succès',
+                    'data' => new ReservationResource($reservation),
                 ]);
             }
 
