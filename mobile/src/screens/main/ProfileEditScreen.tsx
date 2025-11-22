@@ -228,14 +228,16 @@ const ProfileEditScreen: React.FC<ProfileEditScreenProps> = ({ navigation: navig
       return
     }
 
-    if (sanitizedData.phone && !PHONE_REGEX.test(sanitizedData.phone)) {
-      Alert.alert(
-        'Erreur',
-        'Format de téléphone invalide. Utilisez le format: +XXX XX XX XX XX\n' +
-        'Indicatifs acceptés: +221 (Sénégal), +223 (Mali), +225 (Côte d\'Ivoire), +226 (Burkina Faso), +227 (Niger), +228 (Togo), +229 (Bénin)'
-      )
-      return
-    }
+    // Validation téléphone désactivée temporairement
+    // Le backend accepte maintenant tout format (max 20 caractères)
+    // if (sanitizedData.phone && !PHONE_REGEX.test(sanitizedData.phone)) {
+    //   Alert.alert(
+    //     'Erreur',
+    //     'Format de téléphone invalide. Utilisez le format: +XXX XX XX XX XX\n' +
+    //     'Indicatifs acceptés: +221 (Sénégal), +223 (Mali), +225 (Côte d\'Ivoire), +226 (Burkina Faso), +227 (Niger), +228 (Togo), +229 (Bénin)'
+    //   )
+    //   return
+    // }
 
     try {
       setIsSaving(true)
