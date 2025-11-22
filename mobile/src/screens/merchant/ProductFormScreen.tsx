@@ -245,10 +245,10 @@ const ProductFormScreen: React.FC<Props> = ({ route, navigation }) => {
 
   return (
     <View style={[styles.container, { backgroundColor: theme.colors.background }]} testID={TEST_IDS.productFormScreen}>
-      <StatusBar barStyle="dark-content" backgroundColor={theme.colors.background} />
+      <StatusBar barStyle={theme.isDark ? "light-content" : "dark-content"} backgroundColor={theme.colors.background} />
 
       {/* Header */}
-      <View style={[styles.header, { backgroundColor: theme.colors.primary[500] }]}>
+      <View style={[styles.header, { backgroundColor: theme.isDark ? '#0F1622' : theme.colors.primary[500] }]}>
         <View style={styles.headerContent}>
           <TouchableOpacity onPress={() => {
             if (navigation.canGoBack()) {
@@ -271,7 +271,7 @@ const ProductFormScreen: React.FC<Props> = ({ route, navigation }) => {
         <View style={styles.section}>
           <Text style={[styles.label, { color: theme.colors.text }]}>Photo du produit</Text>
           <TouchableOpacity
-            style={[styles.imagePicker, { backgroundColor: theme.colors.surface.light, borderColor: theme.colors.border }]}
+            style={[styles.imagePicker, { backgroundColor: theme.colors.inputBackground, borderColor: theme.colors.border }]}
             onPress={() => {
               console.log('🖱️ [ProductForm] Bouton image cliqué !')
               pickImage()
@@ -314,7 +314,7 @@ const ProductFormScreen: React.FC<Props> = ({ route, navigation }) => {
         <View style={styles.section}>
           <Text style={[styles.label, { color: theme.colors.text }]}>Nom du produit *</Text>
           <TextInput
-            style={[styles.input, { backgroundColor: theme.colors.surface.light, color: theme.colors.text, borderColor: theme.colors.border }]}
+            style={[styles.input, { backgroundColor: theme.colors.inputBackground, color: theme.colors.text, borderColor: theme.colors.border }]}
             value={name}
             onChangeText={setName}
             placeholder="Ex: Pain complet artisanal"
@@ -327,7 +327,7 @@ const ProductFormScreen: React.FC<Props> = ({ route, navigation }) => {
         <View style={styles.section}>
           <Text style={[styles.label, { color: theme.colors.text }]}>Description</Text>
           <TextInput
-            style={[styles.input, styles.textArea, { backgroundColor: theme.colors.surface.light, color: theme.colors.text, borderColor: theme.colors.border }]}
+            style={[styles.input, styles.textArea, { backgroundColor: theme.colors.inputBackground, color: theme.colors.text, borderColor: theme.colors.border }]}
             value={description}
             onChangeText={setDescription}
             placeholder="Décrivez votre produit..."
@@ -354,7 +354,7 @@ const ProductFormScreen: React.FC<Props> = ({ route, navigation }) => {
           <View style={[styles.section, styles.halfWidth]}>
             <Text style={[styles.label, { color: theme.colors.text }]}>Prix original *</Text>
             <TextInput
-              style={[styles.input, { backgroundColor: theme.colors.surface.light, color: theme.colors.text, borderColor: theme.colors.border }]}
+              style={[styles.input, { backgroundColor: theme.colors.inputBackground, color: theme.colors.text, borderColor: theme.colors.border }]}
               value={originalPrice}
               onChangeText={setOriginalPrice}
               placeholder="500"
@@ -367,7 +367,7 @@ const ProductFormScreen: React.FC<Props> = ({ route, navigation }) => {
           <View style={[styles.section, styles.halfWidth]}>
             <Text style={[styles.label, { color: theme.colors.text }]}>Prix réduit *</Text>
             <TextInput
-              style={[styles.input, { backgroundColor: theme.colors.surface.light, color: theme.colors.text, borderColor: theme.colors.border }]}
+              style={[styles.input, { backgroundColor: theme.colors.inputBackground, color: theme.colors.text, borderColor: theme.colors.border }]}
               value={discountedPrice}
               onChangeText={setDiscountedPrice}
               placeholder="250"
@@ -382,7 +382,7 @@ const ProductFormScreen: React.FC<Props> = ({ route, navigation }) => {
         <View style={styles.section}>
           <Text style={[styles.label, { color: theme.colors.text }]}>Quantité disponible *</Text>
           <TextInput
-            style={[styles.input, { backgroundColor: theme.colors.surface.light, color: theme.colors.text, borderColor: theme.colors.border }]}
+            style={[styles.input, { backgroundColor: theme.colors.inputBackground, color: theme.colors.text, borderColor: theme.colors.border }]}
             value={quantity}
             onChangeText={setQuantity}
             placeholder="10"
@@ -396,7 +396,7 @@ const ProductFormScreen: React.FC<Props> = ({ route, navigation }) => {
         <View style={styles.section}>
           <Text style={[styles.label, { color: theme.colors.text }]}>Date d'expiration</Text>
           <TextInput
-            style={[styles.input, { backgroundColor: theme.colors.surface.light, color: theme.colors.text, borderColor: theme.colors.border }]}
+            style={[styles.input, { backgroundColor: theme.colors.inputBackground, color: theme.colors.text, borderColor: theme.colors.border }]}
             value={expirationDate}
             onChangeText={setExpirationDate}
             placeholder="AAAA-MM-JJ"
@@ -410,7 +410,7 @@ const ProductFormScreen: React.FC<Props> = ({ route, navigation }) => {
 
         {/* Bouton de soumission */}
         <TouchableOpacity
-          style={[styles.submitButton, { backgroundColor: theme.colors.primary[500] }]}
+          style={[styles.submitButton, { backgroundColor: theme.isDark ? '#10B981' : theme.colors.primary[500] }]}
           onPress={() => {
             console.log('🟢 Bouton cliqué !')
             handleSubmit()
