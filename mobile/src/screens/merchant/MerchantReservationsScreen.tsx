@@ -216,19 +216,41 @@ const MerchantReservationsScreen: React.FC = () => {
   }
 
   const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'pending':
-        return theme.colors.semantic.warning
-      case 'confirmed':
-        return theme.colors.semantic.success
-      case 'ready':
-        return theme.colors.semantic.info || '#3B82F6'
-      case 'completed':
-        return theme.colors.primary[500]
-      case 'cancelled':
-        return theme.colors.semantic.error
-      default:
-        return theme.colors.neutral[400]
+    if (theme.isDark) {
+      // Mode sombre : badges pleins avec texte contrasté
+      switch (status) {
+        case 'pending':
+          return { bg: '#F59E0B', text: '#1f1404' }
+        case 'confirmed':
+          return { bg: '#10B981', text: '#0B140F' }
+        case 'ready':
+          return { bg: '#2563EB', text: '#0A1A33' }
+        case 'completed':
+          return { bg: '#F59E0B', text: '#0B0A06' }
+        case 'cancelled':
+          return { bg: '#DC2626', text: '#FCA5A5' }
+        default:
+          return { bg: '#4B5563', text: '#E9EDF5' }
+      }
+    } else {
+      // Mode clair : badges avec fond transparent
+      const color = (() => {
+        switch (status) {
+          case 'pending':
+            return theme.colors.semantic.warning
+          case 'confirmed':
+            return theme.colors.semantic.success
+          case 'ready':
+            return theme.colors.semantic.info || '#3B82F6'
+          case 'completed':
+            return theme.colors.primary[500]
+          case 'cancelled':
+            return theme.colors.semantic.error
+          default:
+            return theme.colors.neutral[400]
+        }
+      })()
+      return { bg: theme.withOpacity(color, 0.1), text: color }
     }
   }
 
@@ -282,11 +304,11 @@ const MerchantReservationsScreen: React.FC = () => {
     })()
 
     return (
-      <View style={[styles.reservationCard, { backgroundColor: theme.colors.surface.light }]}>
+      <View style={[styles.reservationCard, { backgroundColor: theme.colors.cardBackground, borderColor: theme.colors.cardBorder, borderWidth: 1 }]}>
         {/* Header */}
         <View style={styles.cardHeader}>
           <View style={styles.customerInfo}>
-            <Ionicons name="person-circle" size={48} color={theme.colors.primary[500]} />
+            <Ionicons name="person-circle" size={48} color={theme.isDark ? '#10B981' : theme.colors.primary[500]} />
             <View style={styles.customerDetails}>
               <Text style={[styles.customerName, { color: theme.colors.text }]}>
                 {customerName}
@@ -296,8 +318,8 @@ const MerchantReservationsScreen: React.FC = () => {
               </Text>
             </View>
           </View>
-          <View style={[styles.statusBadge, { backgroundColor: theme.withOpacity(getStatusColor(item.status), 0.1) }]}>
-            <Text style={[styles.statusText, { color: getStatusColor(item.status) }]}>
+          <View style={[styles.statusBadge, { backgroundColor: getStatusColor(item.status).bg }]}>
+            <Text style={[styles.statusText, { color: getStatusColor(item.status).text }]}>
               {getStatusText(item.status)}
             </Text>
           </View>
@@ -322,14 +344,14 @@ const MerchantReservationsScreen: React.FC = () => {
       {item.status === 'pending' && (
         <View style={styles.actions}>
           <TouchableOpacity
-            style={[styles.actionButton, styles.confirmButton, { backgroundColor: theme.colors.semantic.success }]}
+            style={[styles.actionButton, styles.confirmButton, { backgroundColor: '#10B981' }]}
             onPress={() => handleConfirm(item)}
           >
-            <Ionicons name="checkmark-circle" size={20} color="white" />
-            <Text style={styles.actionButtonText}>Confirmer</Text>
+            <Ionicons name="checkmark-circle" size={20} color={theme.isDark ? '#0B140F' : 'white'} />
+            <Text style={[styles.actionButtonText, { color: theme.isDark ? '#0B140F' : 'white' }]}>Confirmer</Text>
           </TouchableOpacity>
           <TouchableOpacity
-            style={[styles.actionButton, styles.cancelButton, { backgroundColor: theme.colors.semantic.error }]}
+            style={[styles.actionButton, styles.cancelButton, { backgroundColor: '#DC2626' }]}
             onPress={() => handleCancel(item)}
           >
             <Ionicons name="close-circle" size={20} color="white" />
@@ -341,18 +363,18 @@ const MerchantReservationsScreen: React.FC = () => {
       {item.status === 'confirmed' && (
         <View style={styles.actions}>
           <TouchableOpacity
-            style={[styles.actionButton, { backgroundColor: theme.colors.semantic.info || '#3B82F6' }]}
+            style={[styles.actionButton, { backgroundColor: '#2563EB' }]}
             onPress={() => handleMarkReady(item)}
           >
-            <Ionicons name="cube" size={20} color="white" />
-            <Text style={styles.actionButtonText}>Prête</Text>
+            <Ionicons name="cube" size={20} color={theme.isDark ? '#0A1A33' : 'white'} />
+            <Text style={[styles.actionButtonText, { color: theme.isDark ? '#0A1A33' : 'white' }]}>Prête</Text>
           </TouchableOpacity>
           <TouchableOpacity
-            style={[styles.actionButton, styles.completeButton, { backgroundColor: theme.colors.primary[500] }]}
+            style={[styles.actionButton, styles.completeButton, { backgroundColor: '#10B981' }]}
             onPress={() => handleComplete(item)}
           >
-            <Ionicons name="checkmark-done-circle" size={20} color="white" />
-            <Text style={styles.actionButtonText}>Terminée</Text>
+            <Ionicons name="checkmark-done-circle" size={20} color={theme.isDark ? '#0B140F' : 'white'} />
+            <Text style={[styles.actionButtonText, { color: theme.isDark ? '#0B140F' : 'white' }]}>Terminée</Text>
           </TouchableOpacity>
         </View>
       )}
@@ -360,11 +382,11 @@ const MerchantReservationsScreen: React.FC = () => {
       {item.status === 'ready' && (
         <View style={styles.actions}>
           <TouchableOpacity
-            style={[styles.actionButton, styles.completeButton, { backgroundColor: theme.colors.primary[500] }]}
+            style={[styles.actionButton, styles.completeButton, { backgroundColor: '#10B981' }]}
             onPress={() => handleComplete(item)}
           >
-            <Ionicons name="checkmark-done-circle" size={20} color="white" />
-            <Text style={styles.actionButtonText}>Marquer terminée</Text>
+            <Ionicons name="checkmark-done-circle" size={20} color={theme.isDark ? '#0B140F' : 'white'} />
+            <Text style={[styles.actionButtonText, { color: theme.isDark ? '#0B140F' : 'white' }]}>Marquer terminée</Text>
           </TouchableOpacity>
         </View>
       )}
@@ -381,15 +403,15 @@ const MerchantReservationsScreen: React.FC = () => {
 
   return (
     <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
-      <StatusBar barStyle="dark-content" backgroundColor={theme.colors.background} />
+      <StatusBar barStyle={theme.isDark ? "light-content" : "dark-content"} backgroundColor={theme.colors.background} />
 
       {/* Header */}
-      <View style={[styles.header, { backgroundColor: theme.colors.primary[500] }]}>
+      <View style={[styles.header, { backgroundColor: theme.isDark ? '#0F1622' : theme.colors.primary[500] }]}>
         <View style={styles.headerContent}>
-          <Text style={styles.headerTitle}>Réservations</Text>
+          <Text style={[styles.headerTitle, { color: theme.isDark ? '#F8FAFF' : 'white' }]}>Réservations</Text>
           <View style={styles.headerActions}>
             <TouchableOpacity onPress={loadReservations} style={styles.iconButton}>
-              <Ionicons name="refresh" size={24} color="white" />
+              <Ionicons name="refresh" size={24} color={theme.isDark ? '#E9EDF5' : 'white'} />
             </TouchableOpacity>
           </View>
         </View>
@@ -422,9 +444,9 @@ const MerchantReservationsScreen: React.FC = () => {
               style={[
                 styles.filterChip,
                 {
-                  backgroundColor: filter === filterOption.value
-                    ? 'white'
-                    : 'rgba(255, 255, 255, 0.2)',
+                  backgroundColor: theme.isDark
+                    ? (filter === filterOption.value ? '#10B981' : '#1B2433')
+                    : (filter === filterOption.value ? 'white' : 'rgba(255, 255, 255, 0.2)')
                 }
               ]}
               onPress={() => setFilter(filterOption.value as any)}
@@ -432,9 +454,9 @@ const MerchantReservationsScreen: React.FC = () => {
               <Text style={[
                 styles.filterText,
                 {
-                  color: filter === filterOption.value
-                    ? theme.colors.primary[500]
-                    : 'white'
+                  color: theme.isDark
+                    ? (filter === filterOption.value ? '#0B140F' : '#E9EDF5')
+                    : (filter === filterOption.value ? theme.colors.primary[500] : 'white')
                 }
               ]}>
                 {filterOption.label}
@@ -454,8 +476,8 @@ const MerchantReservationsScreen: React.FC = () => {
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
         ListEmptyComponent={
-          <View style={[styles.emptyState, { backgroundColor: theme.colors.surface.light }]}>
-            <Ionicons name="receipt-outline" size={64} color={theme.colors.neutral[300]} />
+          <View style={[styles.emptyState, { backgroundColor: theme.colors.cardBackground, borderColor: theme.colors.cardBorder, borderWidth: 1 }]}>
+            <Ionicons name="receipt-outline" size={64} color={theme.colors.textTertiary} />
             <Text style={[styles.emptyText, { color: theme.colors.textSecondary }]}>
               Aucune réservation {filter !== 'all' && getStatusText(filter).toLowerCase()}
             </Text>

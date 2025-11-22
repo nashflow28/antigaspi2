@@ -210,7 +210,7 @@ const MerchantProductsScreen: React.FC<Props> = ({ navigation }) => {
     const pendingApproval = isPendingAdminApproval(item)
 
     return (
-      <View style={[styles.productCard, { backgroundColor: theme.colors.surface.light }]}>
+      <View style={[styles.productCard, { backgroundColor: theme.colors.cardBackground, borderColor: theme.colors.cardBorder, borderWidth: 1 }]}>
         <TouchableOpacity
           style={styles.productContent}
           onPress={() => handleEditProduct(item)}
@@ -307,19 +307,19 @@ const MerchantProductsScreen: React.FC<Props> = ({ navigation }) => {
 
   return (
     <View style={[styles.container, { backgroundColor: theme.colors.background }]} testID={TEST_IDS.merchantProducts}>
-      <StatusBar barStyle="dark-content" backgroundColor={theme.colors.background} />
+      <StatusBar barStyle={theme.isDark ? "light-content" : "dark-content"} backgroundColor={theme.colors.background} />
 
       {/* Header */}
-      <View style={[styles.header, { backgroundColor: theme.colors.primary[500] }]}>
+      <View style={[styles.header, { backgroundColor: theme.isDark ? '#0F1622' : theme.colors.primary[500] }]}>
         <View style={styles.headerContent}>
-          <Text style={styles.headerTitle}>Mes Produits</Text>
+          <Text style={[styles.headerTitle, { color: theme.isDark ? '#F8FAFF' : 'white' }]}>Mes Produits</Text>
           <TouchableOpacity
             style={styles.addButton}
             onPress={handleAddButtonPress}
             testID={TEST_IDS.addProductButton}
             accessibilityLabel="Ajouter un produit ou un panier surprise"
           >
-            <Ionicons name="add-circle" size={32} color="white" />
+            <Ionicons name="add-circle" size={32} color={theme.isDark ? '#E9EDF5' : 'white'} />
           </TouchableOpacity>
         </View>
       </View>
@@ -382,8 +382,8 @@ const MerchantProductsScreen: React.FC<Props> = ({ navigation }) => {
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
         ListEmptyComponent={
-          <View style={[styles.emptyState, { backgroundColor: theme.colors.surface.light }]}>
-            <Ionicons name="cube-outline" size={64} color={theme.colors.neutral[300]} />
+          <View style={[styles.emptyState, { backgroundColor: theme.colors.cardBackground, borderColor: theme.colors.cardBorder, borderWidth: 1 }]}>
+            <Ionicons name="cube-outline" size={64} color={theme.colors.textTertiary} />
             <Text style={[styles.emptyText, { color: theme.colors.textSecondary }]}>
               Aucun produit
             </Text>

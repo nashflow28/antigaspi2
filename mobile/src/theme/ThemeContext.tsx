@@ -134,54 +134,63 @@ export const ThemeProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     const neutralPalette = base.neutral
 
     if (isDark) {
+      // 🎨 DARK MODE 2025 - Palette optimisée pour contraste
       return {
         // Keep base colors
         primary: base.primary,
         neutral: neutralPalette,
         gray: neutralPalette,
-        accent: base.accent,
-        semantic: base.semantic,
+        accent: {
+          ...base.accent,
+          blue: '#2563EB', // Info color avec meilleur contraste
+        },
+        semantic: {
+          success: '#10B981', // Vert optimisé pour dark
+          warning: '#F59E0B', // Orange vif
+          error: '#DC2626', // Rouge vif
+          info: '#2563EB', // Bleu optimisé
+        },
         surface: base.surface,
 
-        // Dark mode specific
-        background: base.surface.darker,
-        backgroundSecondary: base.surface.dark,
-        backgroundTertiary: base.neutral[800],
-        text: base.neutral[50],
-        textSecondary: base.neutral[300],
-        textTertiary: base.neutral[400],
+        // Dark mode specific - Palette 2025
+        background: '#0A0F1A', // Fond page (plus sombre)
+        backgroundSecondary: '#121823', // Surface 1
+        backgroundTertiary: '#161E2C', // Surface 2
+        text: '#E9EDF5', // Texte principal (meilleur contraste)
+        textSecondary: '#A9B4C6', // Texte secondaire (moins pâle)
+        textTertiary: '#6B7284', // Texte tertiaire/désactivé
         textInverse: base.neutral[900],
-        border: base.neutral[700],
-        borderLight: base.neutral[800],
-        divider: withOpacity(base.neutral[700], 0.5),
+        border: '#1F2A3A', // Bordures/dividers
+        borderLight: '#161E2C',
+        divider: '#1F2A3A',
 
-        // Components
-        cardBackground: base.neutral[800],
-        cardBorder: base.neutral[700],
-        inputBackground: base.neutral[900],
-        inputBorder: base.neutral[700],
-        inputBorderFocus: base.primary[500],
-        interactiveSurface: withOpacity(base.neutral[50], 0.08),
-        interactiveSurfaceActive: withOpacity(base.primary[500], 0.22),
-        interactiveBorder: withOpacity(base.neutral[50], 0.18),
-        interactiveBorderActive: withOpacity(base.primary[500], 0.45),
-        interactiveText: base.neutral[200],
-        interactiveTextActive: base.primary[100],
-        badgeBackground: withOpacity(base.primary[500], 0.18),
-        badgeBackgroundStrong: withOpacity(base.primary[500], 0.28),
-        badgeText: base.primary[100],
-        controlSurface: withOpacity(base.neutral[50], 0.08),
-        controlSurfaceActive: withOpacity(base.primary[500], 0.24),
-        controlIcon: base.primary[200],
-        disabledSurface: withOpacity(base.neutral[50], 0.08),
-        disabledBorder: withOpacity(base.neutral[50], 0.2),
-        disabledText: withOpacity(base.neutral[50], 0.4),
+        // Components - Surfaces renforcées
+        cardBackground: '#161E2C', // Cards opaques foncées
+        cardBorder: '#1F2A3A',
+        inputBackground: '#121823',
+        inputBorder: '#1F2937',
+        inputBorderFocus: '#10B981',
+        interactiveSurface: '#1B2433', // Pills/filtres
+        interactiveSurfaceActive: '#10B981',
+        interactiveBorder: '#2E3A4D',
+        interactiveBorderActive: '#10B981',
+        interactiveText: '#E9EDF5',
+        interactiveTextActive: '#0B140F', // Texte sur fond vert
+        badgeBackground: '#1B2433',
+        badgeBackgroundStrong: '#10B981', // Badges pleins
+        badgeText: '#E9EDF5',
+        controlSurface: '#1F2937', // Toggle track off
+        controlSurfaceActive: '#10B981', // Toggle track on
+        controlIcon: '#F8FAFF', // Thumb
+        disabledSurface: '#1F2937',
+        disabledBorder: '#2B3547',
+        disabledText: '#4B5565', // Plus sombre que texte secondaire
 
-        // Status
-        success: base.semantic.success,
-        warning: base.semantic.warning,
-        error: base.semantic.error,
-        info: base.semantic.info,
+        // Status colors - Renforcés
+        success: '#10B981',
+        warning: '#F59E0B',
+        error: '#DC2626',
+        info: '#2563EB',
 
         // Overlay
         overlay: 'rgba(0, 0, 0, 0.8)',

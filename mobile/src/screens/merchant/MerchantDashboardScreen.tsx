@@ -95,17 +95,39 @@ const MerchantDashboardScreen: React.FC = () => {
   }
 
   const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'pending':
-        return theme.colors.semantic.warning
-      case 'confirmed':
-        return theme.colors.semantic.success
-      case 'completed':
-        return theme.colors.primary[500]
-      case 'cancelled':
-        return theme.colors.semantic.error
-      default:
-        return theme.colors.neutral[400]
+    if (theme.isDark) {
+      // Mode sombre : badges pleins avec texte contrasté
+      switch (status) {
+        case 'pending':
+          return { bg: '#F59E0B', text: '#1f1404' }
+        case 'confirmed':
+          return { bg: '#10B981', text: '#0B140F' }
+        case 'ready':
+          return { bg: '#2563EB', text: '#0A1A33' }
+        case 'completed':
+          return { bg: '#F59E0B', text: '#0B0A06' }
+        case 'cancelled':
+          return { bg: '#DC2626', text: '#FCA5A5' }
+        default:
+          return { bg: '#4B5563', text: '#E9EDF5' }
+      }
+    } else {
+      // Mode clair : badges avec fond transparent
+      const color = (() => {
+        switch (status) {
+          case 'pending':
+            return theme.colors.semantic.warning
+          case 'confirmed':
+            return theme.colors.semantic.success
+          case 'completed':
+            return theme.colors.primary[500]
+          case 'cancelled':
+            return theme.colors.semantic.error
+          default:
+            return theme.colors.neutral[400]
+        }
+      })()
+      return { bg: theme.withOpacity(color, 0.1), text: color }
     }
   }
 
@@ -138,14 +160,14 @@ const MerchantDashboardScreen: React.FC = () => {
 
   return (
     <View style={[styles.container, { backgroundColor: theme.colors.background }]} testID={TEST_IDS.merchantDashboard}>
-      <StatusBar barStyle="dark-content" backgroundColor={theme.colors.background} />
+      <StatusBar barStyle={theme.isDark ? "light-content" : "dark-content"} backgroundColor={theme.colors.background} />
 
       {/* Header */}
-      <View style={[styles.header, { backgroundColor: theme.colors.primary[500] }]}>
+      <View style={[styles.header, { backgroundColor: theme.isDark ? '#0F1622' : theme.colors.primary[500] }]}>
         <View style={styles.headerContent}>
           <View>
-            <Text style={styles.headerSubtitle}>Commerçant</Text>
-            <Text style={styles.headerTitle}>Tableau de bord</Text>
+            <Text style={[styles.headerSubtitle, { color: theme.isDark ? 'rgba(248, 250, 255, 0.7)' : 'rgba(255, 255, 255, 0.8)' }]}>Commerçant</Text>
+            <Text style={[styles.headerTitle, { color: theme.isDark ? '#F8FAFF' : 'white' }]}>Tableau de bord</Text>
           </View>
           <TouchableOpacity
             onPress={loadDashboardData}
@@ -153,7 +175,7 @@ const MerchantDashboardScreen: React.FC = () => {
             accessibilityRole="button"
             accessibilityLabel="Rafraîchir le tableau de bord"
           >
-            <Ionicons name="refresh" size={24} color="white" />
+            <Ionicons name="refresh" size={24} color={theme.isDark ? '#E9EDF5' : 'white'} />
           </TouchableOpacity>
         </View>
       </View>
@@ -166,17 +188,17 @@ const MerchantDashboardScreen: React.FC = () => {
       >
         {/* Button to Analytics */}
         <TouchableOpacity
-          style={[styles.analyticsButton, { backgroundColor: theme.colors.primary[500] }]}
+          style={[styles.analyticsButton, { backgroundColor: theme.isDark ? '#10B981' : theme.colors.primary[500] }]}
           onPress={() => (navigation as any).navigate('Analytics')}
         >
-          <Ionicons name="stats-chart" size={20} color="white" />
-          <Text style={styles.analyticsButtonText}>Voir statistiques détaillées</Text>
-          <Ionicons name="chevron-forward" size={20} color="white" />
+          <Ionicons name="stats-chart" size={20} color={theme.isDark ? '#0B140F' : 'white'} />
+          <Text style={[styles.analyticsButtonText, { color: theme.isDark ? '#0B140F' : 'white' }]}>Voir statistiques détaillées</Text>
+          <Ionicons name="chevron-forward" size={20} color={theme.isDark ? '#0B140F' : 'white'} />
         </TouchableOpacity>
 
         {/* Stats Cards */}
         <View style={styles.statsContainer}>
-          <View style={[styles.statCard, { backgroundColor: theme.colors.surface.light }]} testID={TEST_IDS.activeProductsCard}>
+          <View style={[styles.statCard, { backgroundColor: theme.colors.cardBackground, borderColor: theme.colors.cardBorder, borderWidth: 1 }]} testID={TEST_IDS.activeProductsCard}>
             <View style={[styles.statIcon, { backgroundColor: theme.withOpacity(theme.colors.primary[500], 0.1) }]}>
               <Ionicons name="cube" size={24} color={theme.colors.primary[500]} />
             </View>
@@ -188,7 +210,7 @@ const MerchantDashboardScreen: React.FC = () => {
             </Text>
           </View>
 
-          <View style={[styles.statCard, { backgroundColor: theme.colors.surface.light }]}>
+          <View style={[styles.statCard, { backgroundColor: theme.colors.cardBackground, borderColor: theme.colors.cardBorder, borderWidth: 1 }]}>
             <View style={[styles.statIcon, { backgroundColor: theme.withOpacity(theme.colors.semantic.warning, 0.1) }]}>
               <Ionicons name="hourglass" size={24} color={theme.colors.semantic.warning} />
             </View>
@@ -200,7 +222,7 @@ const MerchantDashboardScreen: React.FC = () => {
             </Text>
           </View>
 
-          <View style={[styles.statCard, { backgroundColor: theme.colors.surface.light }]} testID={TEST_IDS.totalSalesCard}>
+          <View style={[styles.statCard, { backgroundColor: theme.colors.cardBackground, borderColor: theme.colors.cardBorder, borderWidth: 1 }]} testID={TEST_IDS.totalSalesCard}>
             <View style={[styles.statIcon, { backgroundColor: theme.withOpacity(theme.colors.semantic.success, 0.1) }]}>
               <Ionicons name="cash" size={24} color={theme.colors.semantic.success} />
             </View>
@@ -227,8 +249,8 @@ const MerchantDashboardScreen: React.FC = () => {
           </View>
 
           {recentReservations.length === 0 ? (
-            <View style={[styles.emptyState, { backgroundColor: theme.colors.surface.light }]}>
-              <Ionicons name="receipt-outline" size={48} color={theme.colors.neutral[300]} />
+            <View style={[styles.emptyState, { backgroundColor: theme.colors.cardBackground, borderColor: theme.colors.cardBorder, borderWidth: 1 }]}>
+              <Ionicons name="receipt-outline" size={48} color={theme.colors.textTertiary} />
               <Text style={[styles.emptyText, { color: theme.colors.textSecondary }]}>
                 Aucune réservation récente
               </Text>
@@ -237,7 +259,7 @@ const MerchantDashboardScreen: React.FC = () => {
             recentReservations.map((reservation) => (
               <View
                 key={reservation.id}
-                style={[styles.reservationCard, { backgroundColor: theme.colors.surface.light }]}
+                style={[styles.reservationCard, { backgroundColor: theme.colors.cardBackground, borderColor: theme.colors.cardBorder, borderWidth: 1 }]}
               >
                 <View style={styles.reservationHeader}>
                   <View style={styles.customerInfo}>
@@ -251,8 +273,8 @@ const MerchantDashboardScreen: React.FC = () => {
                       </Text>
                     </View>
                   </View>
-                  <View style={[styles.statusBadge, { backgroundColor: theme.withOpacity(getStatusColor(reservation.status), 0.1) }]}>
-                    <Text style={[styles.statusText, { color: getStatusColor(reservation.status) }]}>
+                  <View style={[styles.statusBadge, { backgroundColor: getStatusColor(reservation.status).bg }]}>
+                    <Text style={[styles.statusText, { color: getStatusColor(reservation.status).text }]}>
                       {getStatusText(reservation.status)}
                     </Text>
                   </View>
@@ -284,8 +306,8 @@ const MerchantDashboardScreen: React.FC = () => {
           </View>
 
           {recentReviews.length === 0 ? (
-            <View style={[styles.emptyState, { backgroundColor: theme.colors.surface.light }]}>
-              <Ionicons name="star-outline" size={48} color={theme.colors.neutral[300]} />
+            <View style={[styles.emptyState, { backgroundColor: theme.colors.cardBackground, borderColor: theme.colors.cardBorder, borderWidth: 1 }]}>
+              <Ionicons name="star-outline" size={48} color={theme.colors.textTertiary} />
               <Text style={[styles.emptyText, { color: theme.colors.textSecondary }]}>
                 Aucun avis récent
               </Text>
@@ -294,7 +316,7 @@ const MerchantDashboardScreen: React.FC = () => {
             recentReviews.map((review) => (
               <View
                 key={review.id}
-                style={[styles.reviewCard, { backgroundColor: theme.colors.surface.light }]}
+                style={[styles.reviewCard, { backgroundColor: theme.colors.cardBackground, borderColor: theme.colors.cardBorder, borderWidth: 1 }]}
               >
                 <View style={styles.reviewHeader}>
                   <View style={styles.reviewCustomerInfo}>
