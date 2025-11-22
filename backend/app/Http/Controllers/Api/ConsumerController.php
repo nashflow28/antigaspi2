@@ -41,7 +41,7 @@ class ConsumerController extends Controller
                     'max:255',
                     Rule::unique('users', 'email')->ignore($user->id),
                 ],
-                'phone' => ['nullable', 'string', 'regex:/^\+228 \d{2} \d{2} \d{2} \d{2}$/'],
+                'phone' => ['nullable', 'string', 'max:20'],
                 'address' => ['nullable', 'string', 'max:255'],
                 'city' => ['nullable', 'string', 'max:255'],
             ], [

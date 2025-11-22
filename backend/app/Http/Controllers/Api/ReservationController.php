@@ -203,24 +203,24 @@ class ReservationController extends Controller
                     ], 400);
                 }
 
-               if ($reservation->cancel()) {
-      $reservation->refresh()->load(['product.category', 'product.merchant.user', 'user']);
+                if ($reservation->cancel()) {
+                    $reservation->refresh()->load(['product.category', 'product.merchant.user', 'user']);
 
-      // Notification non-bloquante
-      try {
-          $reservation->user->notify(new ReservationStatusNotification($reservation));
-      } catch (\Exception $e) {
-          \Log::warning('Notification failed but cancellation succeeded', [
-              'reservation_id' => $reservation->id,
-              'error' => $e->getMessage()
-          ]);
-      }
+                    // Notification non-bloquante
+                    try {
+                        $reservation->user->notify(new ReservationStatusNotification($reservation));
+                    } catch (\Exception $e) {
+                        \Log::warning('Notification failed but cancellation succeeded', [
+                            'reservation_id' => $reservation->id,
+                            'error' => $e->getMessage()
+                        ]);
+                    }
 
-      return response()->json([
-          'success' => true,
-          'message' => 'Réservation annulée avec succès',
-          'data' => new ReservationResource($reservation),
-      ]);
+                    return response()->json([
+                        'success' => true,
+                        'message' => 'Réservation annulée avec succès',
+                        'data' => new ReservationResource($reservation),
+                    ]);
                 }
 
                 return response()->json([
@@ -249,6 +249,14 @@ class ReservationController extends Controller
                 ], 403);
             }
 
+            // 🐛 BUG FIX: Verify merchant exists before accessing
+            if (!$user->merchant) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Profil commerçant introuvable'
+                ], 404);
+            }
+
             $query = Reservation::with(['user', 'product.category'])
                 ->whereHas('product', function ($q) use ($user) {
                     $q->where('merchant_id', $user->merchant->id);
@@ -258,7 +266,9 @@ class ReservationController extends Controller
                 $query->whereIn('status', explode(',', $request->status));
             }
 
-            $reservations = $query->paginate(min($request->get('per_page', 15), 50));
+            // 🐛 BUG FIX: Add max(1, ...) to prevent per_page=0 crash
+            $perPage = max(1, min($request->get('per_page', 15), 50));
+            $reservations = $query->paginate($perPage);
 
             return response()->json([
                 'success' => true,
@@ -302,6 +312,7 @@ class ReservationController extends Controller
                 ], 404);
             }
 
+            // 🔒 SECURITY FIX: Verify merchant ownership
             if ($reservation->product->merchant->user_id !== $user->id) {
                 return response()->json([
                     'success' => false,
@@ -380,19 +391,19 @@ class ReservationController extends Controller
             }
 
             $reservation->update(['status' => 'ready']);
-  $reservation->refresh()->load(['product.category', 'product.merchant.user', 'user']);
+            $reservation->refresh()->load(['product.category', 'product.merchant.user', 'user']);
 
-  // Notification non-bloquante
-  try {
-      $reservation->user->notify(new ReservationStatusNotification($reservation));
-  } catch (\Exception $e) {
-      \Log::warning('Notification failed but ready status set', [
-          'reservation_id' => $reservation->id,
-          'error' => $e->getMessage()
-      ]);
-  }
+            // Notification non-bloquante
+            try {
+                $reservation->user->notify(new ReservationStatusNotification($reservation));
+            } catch (\Exception $e) {
+                \Log::warning('Notification failed but ready status set', [
+                    'reservation_id' => $reservation->id,
+                    'error' => $e->getMessage()
+                ]);
+            }
 
-  return response()->json([
+            return response()->json([
                 'success' => true,
                 'message' => 'Réservation marquée comme prête pour le retrait',
                 'data' => new ReservationResource($reservation),
@@ -442,17 +453,17 @@ class ReservationController extends Controller
 
                 $reservation->refresh()->load(['product.category', 'product.merchant.user', 'user']);
 
-  // Notification non-bloquante
-  try {
-      $reservation->user->notify(new ReservationStatusNotification($reservation));
-  } catch (\Exception $e) {
-      \Log::warning('Notification failed but completion succeeded', [
-          'reservation_id' => $reservation->id,
-          'error' => $e->getMessage()
-      ]);
-  }
+                // Notification non-bloquante
+                try {
+                    $reservation->user->notify(new ReservationStatusNotification($reservation));
+                } catch (\Exception $e) {
+                    \Log::warning('Notification failed but completion succeeded', [
+                        'reservation_id' => $reservation->id,
+                        'error' => $e->getMessage()
+                    ]);
+                }
 
-  return response()->json([
+                return response()->json([
                     'success' => true,
                     'message' => 'Réservation finalisée avec succès',
                     'data' => new ReservationResource($reservation),
@@ -477,12 +488,19 @@ class ReservationController extends Controller
         try {
             $user = JWTAuth::parseToken()->authenticate();
 
+            // 🐛 PERFORMANCE FIX: Use single query instead of 5 separate queries
+            $statusCounts = Reservation::where('user_id', $user->id)
+                ->selectRaw('status, COUNT(*) as count')
+                ->groupBy('status')
+                ->pluck('count', 'status');
+
             $stats = [
-                'total_reservations' => Reservation::where('user_id', $user->id)->count(),
-                'pending_reservations' => Reservation::where('user_id', $user->id)->where('status', 'pending')->count(),
-                'confirmed_reservations' => Reservation::where('user_id', $user->id)->where('status', 'confirmed')->count(),
-                'completed_reservations' => Reservation::where('user_id', $user->id)->where('status', 'completed')->count(),
-                'cancelled_reservations' => Reservation::where('user_id', $user->id)->where('status', 'cancelled')->count(),
+                'total_reservations' => $statusCounts->sum(),
+                'pending_reservations' => $statusCounts->get('pending', 0),
+                'confirmed_reservations' => $statusCounts->get('confirmed', 0),
+                'completed_reservations' => $statusCounts->get('completed', 0),
+                'cancelled_reservations' => $statusCounts->get('cancelled', 0),
+                'ready_reservations' => $statusCounts->get('ready', 0),
             ];
 
             return response()->json([
