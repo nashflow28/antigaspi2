@@ -454,10 +454,10 @@ const MerchantProfileEditScreen: React.FC = () => {
 
   return (
     <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
-      <StatusBar barStyle="dark-content" backgroundColor={theme.colors.background} />
+      <StatusBar barStyle={theme.isDark ? "light-content" : "dark-content"} backgroundColor={theme.colors.background} />
 
       {/* Header */}
-      <View style={[styles.header, { backgroundColor: theme.colors.primary[500] }]}>
+      <View style={[styles.header, { backgroundColor: theme.isDark ? '#0F1622' : theme.colors.primary[500] }]}>
         <TouchableOpacity onPress={() => {
           if (navigation.canGoBack()) {
             navigation.goBack()
@@ -473,7 +473,7 @@ const MerchantProfileEditScreen: React.FC = () => {
 
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         {/* Photo de profil */}
-        <View style={[styles.photoSection, { backgroundColor: theme.colors.surface.light }]}>
+        <View style={[styles.photoSection, { backgroundColor: theme.colors.cardBackground, borderColor: theme.colors.cardBorder, borderWidth: 1 }]}>
           <View style={styles.photoContainer}>
             {photoUri ? (
               <Image source={{ uri: photoUri }} style={styles.photo} />
@@ -489,7 +489,7 @@ const MerchantProfileEditScreen: React.FC = () => {
             )}
           </View>
           <TouchableOpacity
-            style={[styles.changePhotoButton, { backgroundColor: theme.colors.primary[500] }]}
+            style={[styles.changePhotoButton, { backgroundColor: theme.isDark ? '#10B981' : theme.colors.primary[500] }]}
             onPress={pickImage}
             disabled={uploading}
           >
@@ -506,7 +506,7 @@ const MerchantProfileEditScreen: React.FC = () => {
               Nom de l'entreprise *
             </Text>
             <TextInput
-              style={[styles.input, { backgroundColor: theme.colors.surface.light, color: theme.colors.text }]}
+              style={[styles.input, { backgroundColor: theme.colors.inputBackground, borderColor: theme.colors.inputBorder, borderWidth: 1, color: theme.colors.text }]}
               value={formData.business_name}
               onChangeText={(value) => updateField('business_name', value)}
               placeholder="Ex: Boulangerie Martin"
@@ -520,7 +520,7 @@ const MerchantProfileEditScreen: React.FC = () => {
               Type d'entreprise
             </Text>
             <TextInput
-              style={[styles.input, { backgroundColor: theme.colors.surface.light, color: theme.colors.text }]}
+              style={[styles.input, { backgroundColor: theme.colors.inputBackground, borderColor: theme.colors.inputBorder, borderWidth: 1, color: theme.colors.text }]}
               value={formData.business_type}
               onChangeText={(value) => updateField('business_type', value)}
               placeholder="Ex: Boulangerie, Restaurant, Épicerie"
@@ -551,7 +551,7 @@ const MerchantProfileEditScreen: React.FC = () => {
           <View style={styles.fieldGroup}>
             <Text style={[styles.label, { color: theme.colors.text }]}>Téléphone</Text>
             <TextInput
-              style={[styles.input, { backgroundColor: theme.colors.surface.light, color: theme.colors.text }]}
+              style={[styles.input, { backgroundColor: theme.colors.inputBackground, borderColor: theme.colors.inputBorder, borderWidth: 1, color: theme.colors.text }]}
               value={formData.phone}
               onChangeText={(value) => updateField('phone', value)}
               placeholder="+228 XX XX XX XX"
@@ -564,7 +564,7 @@ const MerchantProfileEditScreen: React.FC = () => {
           <View style={styles.fieldGroup}>
             <Text style={[styles.label, { color: theme.colors.text }]}>Adresse</Text>
             <TextInput
-              style={[styles.input, { backgroundColor: theme.colors.surface.light, color: theme.colors.text }]}
+              style={[styles.input, { backgroundColor: theme.colors.inputBackground, borderColor: theme.colors.inputBorder, borderWidth: 1, color: theme.colors.text }]}
               value={formData.address}
               onChangeText={(value) => updateField('address', value)}
               placeholder="123 Rue du Commerce"
@@ -576,7 +576,7 @@ const MerchantProfileEditScreen: React.FC = () => {
           <View style={styles.fieldGroup}>
             <Text style={[styles.label, { color: theme.colors.text }]}>Ville</Text>
             <TextInput
-              style={[styles.input, { backgroundColor: theme.colors.surface.light, color: theme.colors.text }]}
+              style={[styles.input, { backgroundColor: theme.colors.inputBackground, borderColor: theme.colors.inputBorder, borderWidth: 1, color: theme.colors.text }]}
               value={formData.city}
               onChangeText={(value) => updateField('city', value)}
               placeholder="Lomé"
@@ -588,7 +588,7 @@ const MerchantProfileEditScreen: React.FC = () => {
         <View style={styles.fieldGroup}>
           <Text style={[styles.label, { color: theme.colors.text }]}>Numéro SIRET</Text>
             <TextInput
-              style={[styles.input, { backgroundColor: theme.colors.surface.light, color: theme.colors.text }]}
+              style={[styles.input, { backgroundColor: theme.colors.inputBackground, borderColor: theme.colors.inputBorder, borderWidth: 1, color: theme.colors.text }]}
               value={formData.siret}
               onChangeText={(value) => updateField('siret', value)}
               placeholder="12345678901234"
@@ -604,8 +604,8 @@ const MerchantProfileEditScreen: React.FC = () => {
         style={[
           styles.locationSection,
           {
-            backgroundColor: theme.colors.surface.light,
-            borderColor: theme.withOpacity(theme.colors.primary[500], 0.2),
+            backgroundColor: theme.colors.cardBackground,
+            borderColor: theme.colors.cardBorder,
           },
         ]}
       >
@@ -615,22 +615,22 @@ const MerchantProfileEditScreen: React.FC = () => {
             style={[
               styles.locationButton,
               {
-                borderColor: theme.colors.primary[500],
-                backgroundColor: theme.withOpacity(theme.colors.primary[500], 0.12),
+                borderColor: theme.isDark ? '#10B981' : theme.colors.primary[500],
+                backgroundColor: theme.isDark ? theme.withOpacity('#10B981', 0.15) : theme.withOpacity(theme.colors.primary[500], 0.12),
               },
             ]}
             onPress={handleUseCurrentLocation}
             disabled={locationLoading}
           >
             {locationLoading ? (
-              <ActivityIndicator size="small" color={theme.colors.primary[600] || theme.colors.primary[500]} />
+              <ActivityIndicator size="small" color={theme.isDark ? '#10B981' : (theme.colors.primary[600] || theme.colors.primary[500])} />
             ) : (
               <>
-                <Ionicons name="locate" size={18} color={theme.colors.primary[600] || theme.colors.primary[500]} />
+                <Ionicons name="locate" size={18} color={theme.isDark ? '#10B981' : (theme.colors.primary[600] || theme.colors.primary[500])} />
                 <Text
                   style={[
                     styles.locationButtonText,
-                    { color: theme.colors.primary[600] || theme.colors.primary[500] },
+                    { color: theme.isDark ? '#10B981' : (theme.colors.primary[600] || theme.colors.primary[500]) },
                   ]}
                 >
                   Ma position
@@ -710,7 +710,7 @@ const MerchantProfileEditScreen: React.FC = () => {
 
       {/* Bouton sauvegarder */}
       <TouchableOpacity
-        style={[styles.saveButton, { backgroundColor: theme.colors.primary[500] }]}
+        style={[styles.saveButton, { backgroundColor: theme.isDark ? '#10B981' : theme.colors.primary[500] }]}
         onPress={handleSave}
         disabled={loading}
         >

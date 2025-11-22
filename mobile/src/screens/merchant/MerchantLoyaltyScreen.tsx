@@ -120,7 +120,7 @@ const MerchantLoyaltyScreen: React.FC = () => {
   }
 
   const renderCustomer = ({ item }: { item: Customer }) => (
-    <View style={[styles.customerCard, { backgroundColor: theme.colors.surface.light }]}>
+    <View style={[styles.customerCard, { backgroundColor: theme.colors.cardBackground, borderColor: theme.colors.cardBorder, borderWidth: 1 }]}>
       <View style={styles.customerHeader}>
         <View style={styles.customerInfo}>
           <Ionicons name="person-circle" size={48} color={theme.colors.primary[500]} />
@@ -145,7 +145,7 @@ const MerchantLoyaltyScreen: React.FC = () => {
       </View>
 
       <TouchableOpacity
-        style={[styles.awardButton, { backgroundColor: theme.colors.primary[500] }]}
+        style={[styles.awardButton, { backgroundColor: theme.isDark ? '#10B981' : theme.colors.primary[500] }]}
         onPress={() => handleAwardPress(item)}
       >
         <Ionicons name="gift-outline" size={18} color="white" />
@@ -156,14 +156,14 @@ const MerchantLoyaltyScreen: React.FC = () => {
 
   return (
     <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
-      <StatusBar barStyle="dark-content" backgroundColor={theme.colors.background} />
+      <StatusBar barStyle={theme.isDark ? "light-content" : "dark-content"} backgroundColor={theme.colors.background} />
 
       {/* Header */}
-      <View style={[styles.header, { backgroundColor: theme.colors.primary[500] }]}>
+      <View style={[styles.header, { backgroundColor: theme.isDark ? '#0F1622' : theme.colors.primary[500] }]}>
         <View style={styles.headerContent}>
-          <Text style={styles.headerTitle}>Programme Fidélité</Text>
+          <Text style={[styles.headerTitle, { color: theme.isDark ? '#F8FAFF' : 'white' }]}>Programme Fidélité</Text>
           <TouchableOpacity onPress={loadLoyaltyData}>
-            <Ionicons name="refresh" size={24} color="white" />
+            <Ionicons name="refresh" size={24} color={theme.isDark ? '#E9EDF5' : 'white'} />
           </TouchableOpacity>
         </View>
 
@@ -219,7 +219,7 @@ const MerchantLoyaltyScreen: React.FC = () => {
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
         ListEmptyComponent={
-          <View style={[styles.emptyState, { backgroundColor: theme.colors.surface.light }]}>
+          <View style={[styles.emptyState, { backgroundColor: theme.colors.cardBackground, borderColor: theme.colors.cardBorder, borderWidth: 1 }]}>
             <Ionicons name="people-outline" size={64} color={theme.colors.neutral[300]} />
             <Text style={[styles.emptyText, { color: theme.colors.textSecondary }]}>
               Aucun client fidèle pour le moment
@@ -239,7 +239,7 @@ const MerchantLoyaltyScreen: React.FC = () => {
         onRequestClose={() => setAwardModalVisible(false)}
       >
         <View style={styles.modalOverlay}>
-          <View style={[styles.modalContent, { backgroundColor: theme.colors.surface.light }]}>
+          <View style={[styles.modalContent, { backgroundColor: theme.colors.cardBackground, borderColor: theme.colors.cardBorder, borderWidth: 1 }]}>
             <View style={styles.modalHeader}>
               <Text style={[styles.modalTitle, { color: theme.colors.text }]}>
                 Attribuer des points
@@ -305,7 +305,7 @@ const MerchantLoyaltyScreen: React.FC = () => {
                 </Text>
               </TouchableOpacity>
               <TouchableOpacity
-                style={[styles.modalButton, styles.submitButton, { backgroundColor: theme.colors.primary[500] }]}
+                style={[styles.modalButton, styles.submitButton, { backgroundColor: theme.isDark ? '#10B981' : theme.colors.primary[500] }]}
                 onPress={handleAwardSubmit}
                 disabled={submitting || !pointsToAward || !description.trim()}
               >
