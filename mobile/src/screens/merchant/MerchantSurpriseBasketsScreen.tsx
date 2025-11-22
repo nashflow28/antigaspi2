@@ -283,16 +283,16 @@ const MerchantSurpriseBasketsScreen: React.FC<Props> = ({ navigation }) => {
 
   return (
     <View style={[styles.container, { backgroundColor: theme.colors.background }]} testID={TEST_IDS.merchantSurpriseBaskets}>
-      <StatusBar barStyle="light-content" backgroundColor={theme.colors.primary[500]} />
+      <StatusBar barStyle={theme.isDark ? "light-content" : "dark-content"} backgroundColor={theme.colors.background} />
 
       {/* Header */}
-      <View style={[styles.header, { backgroundColor: theme.colors.primary[500] }]}>
+      <View style={[styles.header, { backgroundColor: theme.isDark ? '#0F1622' : theme.colors.primary[500] }]}>
         <View style={styles.headerContent}>
           <View>
-            <Typography variant="caption" style={{ color: 'rgba(255, 255, 255, 0.8)' }}>
+            <Typography variant="caption" style={{ color: theme.isDark ? 'rgba(248, 250, 255, 0.7)' : 'rgba(255, 255, 255, 0.8)' }}>
               Mes Paniers
             </Typography>
-            <Typography variant="h2" weight="bold" style={{ color: 'white' }}>
+            <Typography variant="h2" weight="bold" style={{ color: theme.isDark ? '#F8FAFF' : 'white' }}>
               Paniers Surprise
             </Typography>
           </View>
@@ -342,10 +342,11 @@ const MerchantSurpriseBasketsScreen: React.FC<Props> = ({ navigation }) => {
             style={[
               styles.filterButton,
               {
-                backgroundColor:
-                  statusFilter === filter ? theme.colors.primary[100] : theme.colors.surface.light,
+                backgroundColor: theme.isDark
+                  ? (statusFilter === filter ? '#10B981' : '#1B2433')
+                  : (statusFilter === filter ? theme.colors.primary[100] : theme.colors.cardBackground),
                 borderColor:
-                  statusFilter === filter ? theme.colors.primary[500] : theme.colors.border,
+                  statusFilter === filter ? (theme.isDark ? '#10B981' : theme.colors.primary[500]) : theme.colors.border,
               },
             ]}
             onPress={() => setStatusFilter(filter)}
@@ -354,8 +355,9 @@ const MerchantSurpriseBasketsScreen: React.FC<Props> = ({ navigation }) => {
               variant="small"
               weight={statusFilter === filter ? 'semibold' : 'regular'}
               style={{
-                color:
-                  statusFilter === filter ? theme.colors.primary[500] : theme.colors.neutral[400],
+                color: theme.isDark
+                  ? (statusFilter === filter ? '#0B140F' : '#E9EDF5')
+                  : (statusFilter === filter ? theme.colors.primary[500] : theme.colors.neutral[400]),
               }}
             >
               {filter === 'all' ? 'Tous' : filter === 'active' ? 'Actifs' : 'Inactifs'}
@@ -413,13 +415,14 @@ const MerchantSurpriseBasketsScreen: React.FC<Props> = ({ navigation }) => {
                   style={[
                     styles.input,
                     {
-                      backgroundColor: theme.colors.surface.light,
-                      borderColor: theme.colors.border,
-                      color: theme.colors.neutral[900],
+                      backgroundColor: theme.colors.inputBackground,
+                      borderColor: theme.colors.inputBorder,
+                      borderWidth: 1,
+                      color: theme.colors.text,
                     },
                   ]}
                   placeholder="Ex: Panier Mystère du Jour"
-                  placeholderTextColor={theme.colors.neutral[400]}
+                  placeholderTextColor={theme.colors.textTertiary}
                   value={formData.name}
                   onChangeText={(text) => setFormData({ ...formData, name: text })}
                   testID={TEST_IDS.basketNameInput}
@@ -434,13 +437,14 @@ const MerchantSurpriseBasketsScreen: React.FC<Props> = ({ navigation }) => {
                   style={[
                     styles.textArea,
                     {
-                      backgroundColor: theme.colors.surface.light,
-                      borderColor: theme.colors.border,
-                      color: theme.colors.neutral[900],
+                      backgroundColor: theme.colors.inputBackground,
+                      borderColor: theme.colors.inputBorder,
+                      borderWidth: 1,
+                      color: theme.colors.text,
                     },
                   ]}
                   placeholder="Décrivez le contenu du panier"
-                  placeholderTextColor={theme.colors.neutral[400]}
+                  placeholderTextColor={theme.colors.textTertiary}
                   value={formData.description}
                   onChangeText={(text) => setFormData({ ...formData, description: text })}
                   multiline
@@ -457,13 +461,14 @@ const MerchantSurpriseBasketsScreen: React.FC<Props> = ({ navigation }) => {
                   style={[
                     styles.input,
                     {
-                      backgroundColor: theme.colors.surface.light,
-                      borderColor: theme.colors.border,
-                      color: theme.colors.neutral[900],
+                      backgroundColor: theme.colors.inputBackground,
+                      borderColor: theme.colors.inputBorder,
+                      borderWidth: 1,
+                      color: theme.colors.text,
                     },
                   ]}
                   placeholder="Ex: 2000"
-                  placeholderTextColor={theme.colors.neutral[400]}
+                  placeholderTextColor={theme.colors.textTertiary}
                   value={formData.discounted_price}
                   onChangeText={(text) => setFormData({ ...formData, discounted_price: text })}
                   keyboardType="numeric"
@@ -479,13 +484,14 @@ const MerchantSurpriseBasketsScreen: React.FC<Props> = ({ navigation }) => {
                   style={[
                     styles.input,
                     {
-                      backgroundColor: theme.colors.surface.light,
-                      borderColor: theme.colors.border,
-                      color: theme.colors.neutral[900],
+                      backgroundColor: theme.colors.inputBackground,
+                      borderColor: theme.colors.inputBorder,
+                      borderWidth: 1,
+                      color: theme.colors.text,
                     },
                   ]}
                   placeholder="Ex: 10"
-                  placeholderTextColor={theme.colors.neutral[400]}
+                  placeholderTextColor={theme.colors.textTertiary}
                   value={formData.quantity_available}
                   onChangeText={(text) => setFormData({ ...formData, quantity_available: text })}
                   keyboardType="numeric"

@@ -146,7 +146,9 @@ const MerchantNotificationsScreen: React.FC = () => {
       style={[
         styles.notificationCard,
         {
-          backgroundColor: item.is_read ? theme.colors.surface.light : theme.withOpacity(theme.colors.primary[500], 0.1),
+          backgroundColor: item.is_read ? theme.colors.cardBackground : (theme.isDark ? theme.withOpacity('#10B981', 0.15) : theme.withOpacity(theme.colors.primary[500], 0.1)),
+          borderColor: theme.colors.cardBorder,
+          borderWidth: 1,
         },
       ]}
       onPress={() => !item.is_read && markAsRead(item.id)}
@@ -199,10 +201,10 @@ const MerchantNotificationsScreen: React.FC = () => {
 
   return (
     <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
-      <StatusBar barStyle="dark-content" backgroundColor={theme.colors.background} />
+      <StatusBar barStyle={theme.isDark ? "light-content" : "dark-content"} backgroundColor={theme.colors.background} />
 
       {/* Header */}
-      <View style={[styles.header, { backgroundColor: theme.colors.primary[500] }]}>
+      <View style={[styles.header, { backgroundColor: theme.isDark ? '#0F1622' : theme.colors.primary[500] }]}>
         <TouchableOpacity onPress={() => {
           if (navigation.canGoBack()) {
             navigation.goBack()

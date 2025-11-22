@@ -81,10 +81,10 @@ const NotificationSettingsScreen: React.FC = () => {
 
   return (
     <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
-      <StatusBar barStyle="dark-content" backgroundColor={theme.colors.background} />
+      <StatusBar barStyle={theme.isDark ? "light-content" : "dark-content"} backgroundColor={theme.colors.background} />
 
       {/* Header */}
-      <View style={[styles.header, { backgroundColor: theme.colors.primary[500] }]}>
+      <View style={[styles.header, { backgroundColor: theme.isDark ? '#0F1622' : theme.colors.primary[500] }]}>
         <TouchableOpacity onPress={() => {
           if (navigation.canGoBack()) {
             navigation.goBack()
@@ -92,9 +92,9 @@ const NotificationSettingsScreen: React.FC = () => {
             (navigation as any).navigate('Dashboard')
           }
         }} style={styles.backButton}>
-          <Ionicons name="arrow-back" size={24} color="white" />
+          <Ionicons name="arrow-back" size={24} color={theme.isDark ? '#E9EDF5' : 'white'} />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Paramètres notifications</Text>
+        <Text style={[styles.headerTitle, { color: theme.isDark ? '#F8FAFF' : 'white' }]}>Paramètres notifications</Text>
         <View style={{ width: 40 }} />
       </View>
 
@@ -158,7 +158,7 @@ const NotificationSettingsScreen: React.FC = () => {
         </View>
 
         {/* Preferences */}
-        <View style={[styles.preferenceCard, { backgroundColor: theme.colors.surface.light }]}>
+        <View style={[styles.preferenceCard, { backgroundColor: theme.colors.cardBackground, borderColor: theme.colors.cardBorder, borderWidth: 1 }]}>
           {/* Email */}
           <View style={styles.preferenceRow}>
             <View style={styles.preferenceLeft}>
@@ -251,8 +251,8 @@ const NotificationSettingsScreen: React.FC = () => {
             styles.saveButton,
             {
               backgroundColor: hasChanges
-                ? theme.colors.primary[500]
-                : theme.withOpacity(theme.colors.primary[500], 0.4),
+                ? (theme.isDark ? '#10B981' : theme.colors.primary[500])
+                : (theme.isDark ? theme.withOpacity('#10B981', 0.4) : theme.withOpacity(theme.colors.primary[500], 0.4)),
             },
           ]}
           onPress={handleSave}

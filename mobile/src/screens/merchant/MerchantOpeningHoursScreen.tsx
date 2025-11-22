@@ -220,10 +220,10 @@ const MerchantOpeningHoursScreen: React.FC = () => {
 
   return (
     <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
-      <StatusBar barStyle="dark-content" backgroundColor={theme.colors.background} />
+      <StatusBar barStyle={theme.isDark ? "light-content" : "dark-content"} backgroundColor={theme.colors.background} />
 
       {/* Header */}
-      <View style={[styles.header, { backgroundColor: theme.colors.primary[500] }]}>
+      <View style={[styles.header, { backgroundColor: theme.isDark ? '#0F1622' : theme.colors.primary[500] }]}>
         <TouchableOpacity onPress={() => {
           if (navigation.canGoBack()) {
             navigation.goBack()
@@ -252,7 +252,7 @@ const MerchantOpeningHoursScreen: React.FC = () => {
           const dayLabel = DAYS_FR.find((d) => d.key === day.day)?.label || day.day
 
           return (
-            <View key={day.day} style={[styles.dayCard, { backgroundColor: theme.colors.surface.light }]}>
+            <View key={day.day} style={[styles.dayCard, { backgroundColor: theme.colors.cardBackground, borderColor: theme.colors.cardBorder, borderWidth: 1 }]}>
               {/* Day header */}
               <View style={styles.dayHeader}>
                 <View style={styles.dayTitleRow}>

@@ -217,10 +217,10 @@ const MerchantAnalyticsScreen: React.FC = () => {
 
   return (
     <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
-      <StatusBar barStyle="dark-content" backgroundColor={theme.colors.background} />
+      <StatusBar barStyle={theme.isDark ? "light-content" : "dark-content"} backgroundColor={theme.colors.background} />
 
       {/* Header */}
-      <View style={[styles.header, { backgroundColor: theme.colors.primary[500] }]}>
+      <View style={[styles.header, { backgroundColor: theme.isDark ? '#0F1622' : theme.colors.primary[500] }]}>
         <View style={styles.headerContent}>
           <Text style={styles.headerTitle}>Statistiques</Text>
           <TouchableOpacity onPress={loadAnalyticsData}>
@@ -270,7 +270,7 @@ const MerchantAnalyticsScreen: React.FC = () => {
       >
         {/* Summary Cards */}
         <View style={styles.summaryCards}>
-          <View style={[styles.summaryCard, { backgroundColor: theme.colors.surface.light }]}>
+          <View style={[styles.summaryCard, { backgroundColor: theme.colors.cardBackground, borderColor: theme.colors.cardBorder, borderWidth: 1 }]}>
             <Ionicons name="cash-outline" size={32} color={theme.colors.semantic.success} />
             <Text style={[styles.summaryValue, { color: theme.colors.text }]}>
               {formatCurrency(totalRevenue)}
@@ -280,7 +280,7 @@ const MerchantAnalyticsScreen: React.FC = () => {
             </Text>
           </View>
 
-          <View style={[styles.summaryCard, { backgroundColor: theme.colors.surface.light }]}>
+          <View style={[styles.summaryCard, { backgroundColor: theme.colors.cardBackground, borderColor: theme.colors.cardBorder, borderWidth: 1 }]}>
             <Ionicons name="receipt-outline" size={32} color={theme.colors.primary[500]} />
             <Text style={[styles.summaryValue, { color: theme.colors.text }]}>
               {totalReservations}
@@ -292,7 +292,7 @@ const MerchantAnalyticsScreen: React.FC = () => {
         </View>
 
         {/* Revenue Chart */}
-        <View style={[styles.chartCard, { backgroundColor: theme.colors.surface.light }]}>
+        <View style={[styles.chartCard, { backgroundColor: theme.colors.cardBackground, borderColor: theme.colors.cardBorder, borderWidth: 1 }]}>
           <View style={styles.chartHeader}>
             <Ionicons name="trending-up" size={20} color={theme.colors.primary[500]} />
             <Text style={[styles.chartTitle, { color: theme.colors.text }]}>
@@ -303,7 +303,7 @@ const MerchantAnalyticsScreen: React.FC = () => {
         </View>
 
         {/* Reservations Chart */}
-        <View style={[styles.chartCard, { backgroundColor: theme.colors.surface.light }]}>
+        <View style={[styles.chartCard, { backgroundColor: theme.colors.cardBackground, borderColor: theme.colors.cardBorder, borderWidth: 1 }]}>
           <View style={styles.chartHeader}>
             <Ionicons name="calendar-outline" size={20} color={theme.colors.primary[500]} />
             <Text style={[styles.chartTitle, { color: theme.colors.text }]}>
@@ -314,7 +314,7 @@ const MerchantAnalyticsScreen: React.FC = () => {
         </View>
 
         {/* Top Products Chart */}
-        <View style={[styles.chartCard, { backgroundColor: theme.colors.surface.light }]}>
+        <View style={[styles.chartCard, { backgroundColor: theme.colors.cardBackground, borderColor: theme.colors.cardBorder, borderWidth: 1 }]}>
           <View style={styles.chartHeader}>
             <Ionicons name="trophy" size={20} color="#F59E0B" />
             <Text style={[styles.chartTitle, { color: theme.colors.text }]}>

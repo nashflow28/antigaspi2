@@ -187,7 +187,7 @@ const MerchantReviewsScreen: React.FC = () => {
     : reviews.filter(r => r.rating === parseInt(filter, 10))
 
   const renderReview = ({ item }: { item: Review }) => (
-    <View style={[styles.reviewCard, { backgroundColor: theme.colors.surface.light }]}>
+    <View style={[styles.reviewCard, { backgroundColor: theme.colors.cardBackground, borderColor: theme.colors.cardBorder, borderWidth: 1 }]}>
       {/* Header */}
       <View style={styles.reviewHeader}>
         <View style={styles.userInfo}>
@@ -282,10 +282,10 @@ const MerchantReviewsScreen: React.FC = () => {
 
   return (
     <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
-      <StatusBar barStyle="dark-content" backgroundColor={theme.colors.background} />
+      <StatusBar barStyle={theme.isDark ? "light-content" : "dark-content"} backgroundColor={theme.colors.background} />
 
       {/* Header */}
-      <View style={[styles.header, { backgroundColor: theme.colors.primary[500] }]}>
+      <View style={[styles.header, { backgroundColor: theme.isDark ? '#0F1622' : theme.colors.primary[500] }]}>
         <View style={styles.headerContent}>
           <Text style={styles.headerTitle}>Avis Clients</Text>
           <TouchableOpacity onPress={loadReviewsData}>
@@ -373,7 +373,7 @@ const MerchantReviewsScreen: React.FC = () => {
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
         ListEmptyComponent={
-          <View style={[styles.emptyState, { backgroundColor: theme.colors.surface.light }]}>
+          <View style={[styles.emptyState, { backgroundColor: theme.colors.cardBackground, borderColor: theme.colors.cardBorder, borderWidth: 1 }]}>
             <Ionicons name="star-outline" size={64} color={theme.colors.neutral[300]} />
             <Text style={[styles.emptyText, { color: theme.colors.textSecondary }]}>
               {filter === 'all'
@@ -393,7 +393,7 @@ const MerchantReviewsScreen: React.FC = () => {
         onRequestClose={() => setRespondModalVisible(false)}
       >
         <View style={styles.modalOverlay}>
-          <View style={[styles.modalContent, { backgroundColor: theme.colors.surface.light }]}>
+          <View style={[styles.modalContent, { backgroundColor: theme.colors.cardBackground, borderColor: theme.colors.cardBorder, borderWidth: 1 }]}>
             <View style={styles.modalHeader}>
               <Text style={[styles.modalTitle, { color: theme.colors.text }]}>
                 {selectedReview?.merchant_response ? 'Modifier la réponse' : 'Répondre à l\'avis'}
