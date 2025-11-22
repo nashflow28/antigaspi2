@@ -203,15 +203,24 @@ class ReservationController extends Controller
                     ], 400);
                 }
 
-                if ($reservation->cancel()) {
-                    $reservation->refresh()->load(['product.category', 'product.merchant.user', 'user']);
-                    $reservation->user->notify(new ReservationStatusNotification($reservation));
+               if ($reservation->cancel()) {
+      $reservation->refresh()->load(['product.category', 'product.merchant.user', 'user']);
 
-                    return response()->json([
-                        'success' => true,
-                        'message' => 'Réservation annulée avec succès',
-                        'data' => new ReservationResource($reservation),
-                    ]);
+      // Notification non-bloquante
+      try {
+          $reservation->user->notify(new ReservationStatusNotification($reservation));
+      } catch (\Exception $e) {
+          \Log::warning('Notification failed but cancellation succeeded', [
+              'reservation_id' => $reservation->id,
+              'error' => $e->getMessage()
+          ]);
+      }
+
+      return response()->json([
+          'success' => true,
+          'message' => 'Réservation annulée avec succès',
+          'data' => new ReservationResource($reservation),
+      ]);
                 }
 
                 return response()->json([
@@ -302,7 +311,16 @@ class ReservationController extends Controller
 
             if ($reservation->confirm()) {
                 $reservation->refresh()->load(['product.category', 'product.merchant.user', 'user']);
-                $reservation->user->notify(new ReservationStatusNotification($reservation));
+
+                // Notification non-bloquante
+                try {
+                    $reservation->user->notify(new ReservationStatusNotification($reservation));
+                } catch (\Exception $e) {
+                    \Log::warning('Notification failed but confirmation succeeded', [
+                        'reservation_id' => $reservation->id,
+                        'error' => $e->getMessage()
+                    ]);
+                }
 
                 return response()->json([
                     'success' => true,
@@ -362,10 +380,19 @@ class ReservationController extends Controller
             }
 
             $reservation->update(['status' => 'ready']);
-            $reservation->refresh()->load(['product.category', 'product.merchant.user', 'user']);
-            $reservation->user->notify(new ReservationStatusNotification($reservation));
+  $reservation->refresh()->load(['product.category', 'product.merchant.user', 'user']);
 
-            return response()->json([
+  // Notification non-bloquante
+  try {
+      $reservation->user->notify(new ReservationStatusNotification($reservation));
+  } catch (\Exception $e) {
+      \Log::warning('Notification failed but ready status set', [
+          'reservation_id' => $reservation->id,
+          'error' => $e->getMessage()
+      ]);
+  }
+
+  return response()->json([
                 'success' => true,
                 'message' => 'Réservation marquée comme prête pour le retrait',
                 'data' => new ReservationResource($reservation),
@@ -414,9 +441,18 @@ class ReservationController extends Controller
                 $reservation->product->merchant->increment('total_sales', $reservation->total_amount);
 
                 $reservation->refresh()->load(['product.category', 'product.merchant.user', 'user']);
-                $reservation->user->notify(new ReservationStatusNotification($reservation));
 
-                return response()->json([
+  // Notification non-bloquante
+  try {
+      $reservation->user->notify(new ReservationStatusNotification($reservation));
+  } catch (\Exception $e) {
+      \Log::warning('Notification failed but completion succeeded', [
+          'reservation_id' => $reservation->id,
+          'error' => $e->getMessage()
+      ]);
+  }
+
+  return response()->json([
                     'success' => true,
                     'message' => 'Réservation finalisée avec succès',
                     'data' => new ReservationResource($reservation),

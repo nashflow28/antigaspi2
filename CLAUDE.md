@@ -185,20 +185,21 @@ https://github.com/nashflow28/antigaspi2
 
 ## 🏗️ **Architecture Technique**
 
-### **Backend (✅ Terminé)**
+### **Backend (✅ Déployé en Production)**
 - **Framework :** Laravel 11 + PHP 8.2+
 - **Base de données :** MySQL 8.0 avec 10 tables relationnelles
 - **Authentification :** JWT multi-rôles (Consumer/Merchant/Admin)
 - **API :** REST complète avec validation et gestion d'erreurs
-- **Status :** 100% fonctionnel et testé
+- **Déploiement :** VPS en ligne (antigaspi.jubtek.com)
+- **Status :** Production - fonctionnel
 
-### **Frontend (🔄 En cours)**
-- **Framework :** Vue.js 3 + Composition API + TypeScript
-- **CSS :** Tailwind CSS + Headless UI
-- **État :** Pinia (successor de Vuex)
-- **Routing :** Vue Router avec guards d'authentification
+### **Mobile App (🔄 En cours de test)**
+- **Framework :** React Native + Expo
+- **État :** Redux Toolkit avec slices (auth, reservations, products, favorites)
+- **Navigation :** React Navigation (Stack + Bottom Tabs)
 - **HTTP :** Axios avec intercepteurs JWT
-- **Tests :** Playwright MCP pour tests E2E
+- **Build :** EAS Build pour génération APK Android
+- **Tests :** Tests manuels avec APK installé sur appareil physique
 
 ### **Database Schema**
 ```sql
@@ -248,50 +249,100 @@ https://github.com/nashflow28/antigaspi2
 ## 📊 **État d'Avancement Actuel**
 
 ### **✅ Complété (100%)**
-- [x] Schema de base de données MySQL
+- [x] Schema de base de données MySQL (10 tables)
 - [x] Models Eloquent avec relations
-- [x] Contrôleurs API (Auth, Products, Reservations)
-- [x] Routes API avec middleware de sécurité
-- [x] Documentation API complète
-- [x] Données de test et comptes démo
+- [x] Contrôleurs API (Auth, Products, Reservations, Favorites)
+- [x] Routes API avec middleware de sécurité JWT
+- [x] Backend déployé en production sur VPS
+- [x] Application mobile React Native (build APK)
+- [x] Authentification multi-rôles fonctionnelle
+- [x] Système de réservations (création, annulation, confirmation)
+- [x] Système de favoris
+- [x] Gestion des produits par les commerçants
 - [x] Repository Git configuré
 
-### **🔄 En Cours (Phase Frontend)**
-- [ ] **Étape 1 :** Configuration tests Playwright MCP
-- [ ] **Étape 2 :** Architecture Vue.js + Tailwind
-- [ ] **Étape 3 :** Interface d'authentification
-- [ ] **Étape 4 :** Interface Consumer (Niveau 1)
-- [ ] **Étape 5 :** Interface Merchant (Niveau 1)
-- [ ] **Étape 6 :** Profils & Historiques (Niveau 2)
-- [ ] **Étape 7 :** Interface Admin (Niveau 2)
-- [ ] **Étape 8 :** Optimisation & Déploiement
+### **✅ Bugs Critiques Corrigés (Session Nov 2024)**
+- [x] Table `favorites` manquante → Créée avec foreign keys
+- [x] 17 colonnes manquantes dans users, merchants, products, reservations
+- [x] Produits expirés (18/20) → Dates mises à jour 2025-12-31
+- [x] Colonne `is_approved` manquante (reviews)
+- [x] Contrainte `expires_at NOT NULL` bloquant réservations
+- [x] Notifications bloquant transactions (cancel, confirm, create)
+- [x] Colonne `cancelled_at` manquante
+- [x] ENUM `notifications.type` incomplet
+- [x] `notifications.sent_via` type ENUM au lieu de SET
+- [x] Bug logique dans `confirm()` method (success = false)
+- [x] Validation téléphone trop stricte (frontend + backend)
+
+### **🔄 En Cours (Phase Tests & Débogage)**
+- [x] Tests création de réservation → **SUCCESS ✅**
+- [x] Tests annulation réservation (backend) → **SUCCESS ✅**
+- [x] Tests favoris (toggle + affichage) → **SUCCESS ✅**
+- [ ] Tests confirmation commerçant (en cours de test)
+- [ ] Tests markReady() et complete() (à tester)
+- [ ] Tests création de produits par commerçants
+- [ ] Reconstruction APK avec tous les correctifs frontend
+- [ ] Tests profil utilisateur (validation téléphone désactivée)
+
+### **⏳ À Faire**
+- [ ] Tests complets de toutes les fonctionnalités merchant
+- [ ] Refactorisation mobile : .unwrap() sur dispatch async
+- [ ] Système de paiements (Mobile Money intégration)
+- [ ] Notifications push temps réel
+- [ ] Interface admin web
+- [ ] Analytics et tableaux de bord
 
 ---
 
-## 🔧 **Configuration de Développement**
+## 🔧 **Configuration de Développement & Production**
 
-### **Environnement Local**
+### **Environnement de Production**
+- **Serveur :** VPS (web58.hosting-systems.io)
+- **Backend URL :** https://antigaspi.jubtek.com
+- **Base de données :**
+  - Host: localhost (depuis le serveur)
+  - Database: `c2621486c_antigaspi_db`
+  - User: `c2621486c_apiuser`
+  - Password: [voir credentials sécurisés]
+- **Déploiement Backend :**
+  1. Commit et push sur GitHub (branche `main`)
+  2. SSH vers le serveur VPS
+  3. `git pull origin main` dans le dossier backend
+  4. `php artisan migrate` si changements de DB
+  5. Vérifier les logs Laravel pour erreurs
+
+### **Environnement Local (Développement)**
 - **XAMPP :** Apache + MySQL + PHP 8.2+
-- **Node.js :** v18+ pour Vue.js
+- **Node.js :** v18+ pour React Native
 - **Composer :** Gestion dépendances PHP
+- **Expo CLI :** Pour le développement mobile
 - **Git :** Workflow avec branches par étape
 
 ### **Structure des Dossiers**
 ```
-antigaspi-2/
+antigaspi2/
 ├── 📊 database/           # Scripts MySQL + docs
-├── 🚀 backend/            # Laravel API (terminé)
-├── 📱 frontend/           # Vue.js (à créer)
+├── 🚀 backend/            # Laravel API (déployé)
+├── 📱 mobile/             # React Native + Expo
+│   ├── src/              # Code source TypeScript
+│   ├── eas.json          # Configuration EAS Build
+│   └── app.json          # Configuration Expo
 ├── 🧪 tests/             # Tests E2E Playwright
 ├── 📋 docs/              # Documentation
 └── 🔧 config/            # Configurations diverses
 ```
 
-### **URLs de Développement**
-- **Backend API :** http://localhost:8000/api
-- **Frontend Web :** http://localhost:3000 (à configurer)
-- **Database Admin :** http://localhost/phpmyadmin
-- **API Health Check :** http://localhost:8000/api/health
+### **URLs**
+- **Backend Production :** https://antigaspi.jubtek.com/api
+- **API Health Check :** https://antigaspi.jubtek.com/api/health
+- **Backend Local :** http://localhost:8000/api (si XAMPP actif)
+- **Database Admin Local :** http://localhost/phpmyadmin
+
+### **Mobile App Build**
+- **Platform :** Android (APK via EAS Build)
+- **Build Command :** `eas build --platform android --profile preview`
+- **Distribution :** APK téléchargé et installé manuellement
+- **Test :** Installation sur appareil physique Android
 
 ---
 
@@ -374,26 +425,350 @@ antigaspi-2/
 
 ---
 
-## 🔄 **Workflow de Développement**
+## 🔄 **Workflow de Développement & Déploiement**
 
 ### **Branches Git**
-- `main` - Code de production
+- `main` - Code de production (déployé sur VPS)
 - `feature/etape-X-description` - Développement par étapes
 - `hotfix/*` - Corrections urgentes
 
-### **Process de Validation**
-1. Développement sur branche feature
-2. Tests Playwright MCP automatiques
-3. Build et vérification intégrité
-4. Push vers GitHub
-5. Merge vers main après validation
+### **Process de Développement Backend**
+1. **Développement local** - Modifications dans `C:\xampp\htdocs\antigaspi2\backend`
+2. **Test local** - Vérifier les changements avec XAMPP (si disponible)
+3. **Commit Git** - `git add` + `git commit -m "description"`
+4. **Push vers GitHub** - `git push origin main`
+5. **Déploiement Production** :
+   ```bash
+   ssh user@web58.hosting-systems.io
+   cd /path/to/antigaspi-backend
+   git pull origin main
+   php artisan migrate --force   # Si changements DB
+   php artisan config:cache
+   php artisan route:cache
+   tail -f storage/logs/laravel.log  # Vérifier erreurs
+   ```
+
+### **Process de Développement Mobile**
+1. **Développement local** - Modifications dans `mobile/src/`
+2. **Test avec Expo Go** - `npx expo start` (optionnel)
+3. **Commit Git** - Commit des changements frontend
+4. **Build APK Production** :
+   ```bash
+   cd mobile
+   eas build --platform android --profile preview
+   ```
+5. **Installation** - Télécharger APK et installer sur appareil
+6. **Test manuel** - Vérifier toutes les fonctionnalités
+
+### **Workflow de Test**
+- **Backend** : Tests manuels via curl/Postman + vérification logs Laravel
+- **Mobile** : Installation APK sur appareil physique + tests manuels
+- **Base de données** : Accès direct via MySQL CLI pour vérifications
 
 ### **Conventions de Code**
 - **Laravel :** PSR-12 + conventions Laravel
-- **Vue.js :** Composition API + TypeScript strict
-- **CSS :** Tailwind utility-first + composants réutilisables
+- **React Native :** TypeScript strict + Functional Components + Hooks
+- **Redux :** Slices avec async thunks pour API calls
 
 ---
 
-**📝 Dernière mise à jour :** ${new Date().toLocaleDateString('fr-FR')}
+## 🐛 **Problèmes Connus & En Investigation**
+
+### **Frontend Mobile (React Native)**
+- **Annulation réservation** : Backend fonctionne mais UI ne rafraîchit pas automatiquement
+  - Cause : `dispatch(cancelReservation()).unwrap()` manquant dans ReservationDetailsScreen
+  - Workaround : Retour arrière puis réouvrir la liste des réservations
+  - Fix : Nécessite rebuild APK avec `.unwrap()` ajouté
+
+- **Édition profil** : Validation téléphone désactivée dans le code mais APK ancien
+  - Cause : APK actuel contient ancienne validation stricte
+  - Fix : Rebuild APK avec commit 308476b3
+
+### **Backend (Laravel)**
+- **Notifications** : Système de notifications cause rollback si erreur
+  - Status : Corrigé avec try-catch non-bloquant dans tous les controllers
+  - Méthodes corrigées : cancel(), confirm(), markReady(), complete(), createReservation()
+
+### **Tests Non Complétés**
+- [ ] Merchant : Confirmation de réservation (fix appliqué, en attente test)
+- [ ] Merchant : markReady() et complete() methods
+- [ ] Merchant : Création de nouveaux produits
+- [ ] Consumer : Édition profil avec nouveau format téléphone
+
+---
+
+## ⚡ **Commandes Rapides**
+
+### **Backend - Production**
+```bash
+# SSH vers serveur production
+ssh user@web58.hosting-systems.io
+
+# Naviguer vers le backend
+cd /path/to/antigaspi-backend
+
+# Pull dernières modifications
+git pull origin main
+
+# Migrations si nécessaire
+php artisan migrate --force
+
+# Vérifier logs en temps réel
+tail -f storage/logs/laravel.log
+
+# Vider les caches
+php artisan config:cache
+php artisan route:cache
+php artisan view:clear
+```
+
+### **Backend - Tests API**
+```bash
+# Login consumer
+curl -X POST https://antigaspi.jubtek.com/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"email":"jean.dupont@email.com","password":"password"}'
+
+# Login merchant
+curl -X POST https://antigaspi.jubtek.com/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"email":"boulangerie.martin@email.com","password":"password"}'
+
+# Tester endpoint avec token
+curl -H "Authorization: Bearer YOUR_TOKEN" \
+  https://antigaspi.jubtek.com/api/reservations
+
+# Créer une réservation
+curl -X POST https://antigaspi.jubtek.com/api/reservations \
+  -H "Authorization: Bearer YOUR_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"product_id":1,"quantity":1,"payment_method":"on_site"}'
+```
+
+### **Database - Production**
+```bash
+# Connexion MySQL production (depuis serveur)
+mysql -u c2621486c_apiuser -p c2621486c_antigaspi_db
+
+# Vérifier réservations récentes
+mysql -u c2621486c_apiuser -p c2621486c_antigaspi_db -e \
+  "SELECT id, reservation_code, status, created_at FROM reservations ORDER BY id DESC LIMIT 10;"
+
+# Vérifier produits actifs
+mysql -u c2621486c_apiuser -p c2621486c_antigaspi_db -e \
+  "SELECT id, name, quantity_available, expiration_date FROM products WHERE is_active = 1;"
+
+# Compter favoris par utilisateur
+mysql -u c2621486c_apiuser -p c2621486c_antigaspi_db -e \
+  "SELECT user_id, COUNT(*) as nb_favoris FROM favorites GROUP BY user_id;"
+```
+
+### **Mobile - Build & Deploy**
+```bash
+# Build APK production
+cd mobile
+eas build --platform android --profile preview
+
+# Build APK développement (plus rapide)
+eas build --platform android --profile development
+
+# Vérifier status du build
+eas build:list
+
+# Installer APK sur appareil
+# 1. Télécharger APK depuis lien EAS
+# 2. Transférer vers appareil Android
+# 3. Installer manuellement (autoriser sources inconnues)
+```
+
+### **Git - Workflow**
+```bash
+# Status et fichiers modifiés
+git status
+git diff
+
+# Commit changements backend
+git add backend/app/Http/Controllers/Api/ReservationController.php
+git commit -m "fix(backend): Fix confirm() method logic error"
+
+# Commit changements mobile
+git add mobile/src/screens/main/ProfileEditScreen.tsx
+git commit -m "fix(mobile): Disable strict phone validation"
+
+# Push vers GitHub
+git push origin main
+
+# Vérifier historique
+git log --oneline -10
+```
+
+---
+
+## 🔐 **Accès & Credentials**
+
+### **Comptes de Test Production**
+| Rôle | Email | Password | Usage |
+|------|-------|----------|-------|
+| Admin | admin@antigaspi.com | password | Gestion plateforme |
+| Consumer | jean.dupont@email.com | password | Tests réservations |
+| Merchant | boulangerie.martin@email.com | password | Tests gestion produits |
+
+### **Serveurs & Base de Données**
+- **Serveur VPS** : web58.hosting-systems.io
+- **Backend URL** : https://antigaspi.jubtek.com
+- **Database Host** : localhost (depuis serveur)
+- **Database Name** : c2621486c_antigaspi_db
+- **Database User** : c2621486c_apiuser
+- **Database Password** : [voir fichier .env sur serveur]
+
+### **GitHub & Repositories**
+- **Repository** : https://github.com/nashflow28/antigaspi2
+- **Branche principale** : main
+- **Commits récents** : Voir git log pour historique complet
+
+### **EAS Build (Expo)**
+- **Project ID** : Voir app.json
+- **Profils disponibles** : development, preview, production
+- **Plateforme** : Android uniquement (pour le moment)
+
+---
+
+## 🔧 **Troubleshooting - Guide de Dépannage**
+
+### **Problème : Réservation ne se crée pas**
+**Symptômes** : Erreur "Erreur lors de la création de la réservation"
+
+**Solutions à vérifier** :
+1. ✅ Produit existe et est actif (`is_active = 1`)
+2. ✅ Produit pas expiré (`expiration_date > NOW()`)
+3. ✅ Stock disponible (`quantity_available >= quantity demandée`)
+4. ✅ Colonne `expires_at` nullable (sinon : `ALTER TABLE reservations MODIFY expires_at DATETIME NULL`)
+5. ✅ Notifications ne bloquent pas (try-catch dans ReservationService.php ligne 164)
+6. ✅ Pas de réservation active existante pour ce produit/utilisateur
+
+**Commandes de diagnostic** :
+```bash
+# Vérifier le produit
+mysql -u c2621486c_apiuser -p -e \
+  "SELECT id, name, is_active, quantity_available, expiration_date FROM products WHERE id = PRODUCT_ID;" \
+  c2621486c_antigaspi_db
+
+# Vérifier les logs
+tail -100 storage/logs/laravel.log | grep ERROR
+```
+
+---
+
+### **Problème : Token JWT expiré**
+**Symptômes** : "Token has expired" ou "Unauthenticated"
+
+**Solution** :
+```bash
+# Se réauthentifier
+curl -X POST https://antigaspi.jubtek.com/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"email":"USER_EMAIL","password":"password"}'
+
+# Extraire le nouveau token
+# Copier le token depuis la réponse JSON
+```
+
+**Dans l'app mobile** :
+- Se déconnecter et se reconnecter
+- Le token sera automatiquement rafraîchi
+
+---
+
+### **Problème : APK crash au démarrage**
+**Symptômes** : Application se ferme immédiatement après ouverture
+
+**Solutions** :
+1. Vérifier compatibilité Android (`compileSdkVersion = 35`)
+2. Vérifier que toutes les dépendances sont installées
+3. Rebuild avec cache nettoyé :
+```bash
+cd mobile
+rm -rf node_modules
+npm install
+eas build --platform android --profile preview --clear-cache
+```
+
+---
+
+### **Problème : Favoris vides ou erreur**
+**Symptômes** : "Erreur lors de la récupération des favoris"
+
+**Solution** :
+1. ✅ Table `favorites` existe
+2. ✅ Produits associés ont `category_id` et `merchant_id` non NULL
+
+**Commandes de diagnostic** :
+```bash
+# Vérifier si table existe
+mysql -u c2621486c_apiuser -p -e "SHOW TABLES LIKE 'favorites';" c2621486c_antigaspi_db
+
+# Vérifier favoris d'un utilisateur
+mysql -u c2621486c_apiuser -p -e \
+  "SELECT f.*, p.name FROM favorites f JOIN products p ON f.product_id = p.id WHERE f.user_id = USER_ID;" \
+  c2621486c_antigaspi_db
+```
+
+---
+
+### **Problème : Modifications backend ne se reflètent pas**
+**Symptômes** : Code modifié mais API retourne ancien comportement
+
+**Solution** :
+```bash
+# Vérifier que les fichiers sont bien sur le serveur
+ssh user@server "cat /path/to/ReservationController.php | grep 'confirm()' -A 20"
+
+# Vider tous les caches Laravel
+php artisan config:clear
+php artisan route:clear
+php artisan view:clear
+php artisan cache:clear
+
+# Redémarrer PHP-FPM (si applicable)
+sudo systemctl restart php-fpm
+```
+
+---
+
+### **Problème : "Column not found" dans base de données**
+**Symptômes** : SQLSTATE[42S22]: Column not found
+
+**Solution** :
+1. Identifier la colonne manquante depuis le message d'erreur
+2. Vérifier la structure actuelle :
+```bash
+mysql -u c2621486c_apiuser -p -e "DESCRIBE table_name;" c2621486c_antigaspi_db
+```
+3. Ajouter la colonne si nécessaire (voir migrations créées)
+4. Exécuter les migrations :
+```bash
+php artisan migrate --force
+```
+
+---
+
+### **Problème : Merchant ne peut pas confirmer réservation**
+**Symptômes** : "Cette réservation ne peut pas être confirmée"
+
+**Cause** : La méthode `confirm()` ne fonctionne que sur les réservations avec `status = 'pending'`
+
+**Solution** :
+```bash
+# Vérifier le statut de la réservation
+mysql -u c2621486c_apiuser -p -e \
+  "SELECT id, reservation_code, status FROM reservations WHERE id = RESERVATION_ID;" \
+  c2621486c_antigaspi_db
+
+# Si status = 'confirmed', la réservation est déjà confirmée
+# Il faut tester avec une réservation en 'pending'
+```
+
+---
+
+**📝 Dernière mise à jour :** 22 Novembre 2024
 **🤖 Maintenu automatiquement par Claude Code**
