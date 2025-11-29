@@ -7,7 +7,7 @@
         </div>
         <h3 class="text-lg font-semibold text-gray-800 mt-2">Carte des commerçants</h3>
         <p class="text-gray-500 mt-4 max-w-xl">
-          Configuration Google Maps en cours. En attendant, voici la liste des commerçants à proximité.
+          Chargement de la carte en cours. En attendant, voici la liste des commerçants à proximité.
         </p>
 
         <!-- Liste des marchands -->

@@ -67,7 +67,7 @@ export default defineConfig({
 
           // Heavy libraries - separate chunks
           'vendor-charts': ['chart.js', 'vue-chart-3'],
-          'vendor-maps': ['@googlemaps/js-api-loader', 'leaflet'],
+          'vendor-maps': ['leaflet'],
           'vendor-utils': ['@vueuse/core', '@vueuse/motion'],
 
           // Icon libraries
@@ -123,8 +123,7 @@ export default defineConfig({
     ],
     exclude: [
       'chart.js',
-      'leaflet',
-      '@googlemaps/js-api-loader'
+      'leaflet'
     ]
   },
 
