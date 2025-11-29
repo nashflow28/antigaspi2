@@ -5,6 +5,7 @@ import { store, AppDispatch } from './src/store'
 import { clearAuth } from './src/store/slices/authSlice'
 import { ThemeProvider } from './src/theme'
 import { ToastProvider } from './src/contexts/ToastContext'
+import { AlertProvider } from './src/contexts/AlertContext'
 import AppNavigator from './src/navigation/AppNavigator'
 import apiService from './src/services/api'
 import usePushNotifications from './src/hooks/usePushNotifications'
@@ -35,9 +36,11 @@ export default function App() {
     <Provider store={store}>
       <ThemeProvider>
         <ToastProvider>
-          <View style={{ flex: 1 }}>
-            <AppContent />
-          </View>
+          <AlertProvider>
+            <View style={{ flex: 1 }}>
+              <AppContent />
+            </View>
+          </AlertProvider>
         </ToastProvider>
       </ThemeProvider>
     </Provider>

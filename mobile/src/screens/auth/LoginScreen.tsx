@@ -4,7 +4,6 @@ import {
   TextInput,
   TouchableOpacity,
   StyleSheet,
-  Alert,
   KeyboardAvoidingView,
   Platform,
   StatusBar,
@@ -18,6 +17,7 @@ import { Button, Card, Typography } from '../../components/2025'
 import BrandLogo from '../../components/BrandLogo'
 import { useTheme } from '../../theme'
 import { TEST_IDS } from '../../utils/testIds'
+import { useAlert } from '../../contexts/AlertContext'
 
 interface Props {
   navigation: any
@@ -27,6 +27,7 @@ const LoginScreen: React.FC<Props> = ({ navigation }) => {
   const theme = useTheme()
   const dispatch = useDispatch<AppDispatch>()
   const { loading, error } = useSelector((state: RootState) => state.auth)
+  const { showSuccess, showError } = useAlert()
 
   const [credentials, setCredentials] = useState<LoginCredentials>({
     email: '',
@@ -37,7 +38,7 @@ const LoginScreen: React.FC<Props> = ({ navigation }) => {
     const loginCreds = creds || credentials
 
     if (!loginCreds.email || !loginCreds.password) {
-      Alert.alert('Erreur', 'Veuillez remplir tous les champs')
+      showError('Erreur', 'Veuillez remplir tous les champs')
       return
     }
 
@@ -46,12 +47,12 @@ const LoginScreen: React.FC<Props> = ({ navigation }) => {
 
       if (loginUser.fulfilled.match(result)) {
         // La navigation sera gérée automatiquement par AppNavigator
-        Alert.alert('Succès', 'Connexion réussie!')
+        showSuccess('Succès', 'Connexion réussie!')
       } else {
-        Alert.alert('Erreur', result.payload as string || 'Erreur de connexion')
+        showError('Erreur', result.payload as string || 'Erreur de connexion')
       }
     } catch (error) {
-      Alert.alert('Erreur', 'Une erreur est survenue')
+      showError('Erreur', 'Une erreur est survenue')
     }
   }
 

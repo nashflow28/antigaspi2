@@ -32,8 +32,11 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
   const dispatch = useDispatch<AppDispatch>()
   const { user } = useSelector((state: RootState) => state.auth)
   const { products, categories, loading } = useSelector((state: RootState) => state.products)
+  const { cart } = useSelector((state: RootState) => state.cart)
   const { showError } = useToast()
   const theme = useTheme()
+
+  const cartItemsCount = cart?.items_count ?? 0
 
   const [refreshing, setRefreshing] = useState(false)
   const [selectedCategory, setSelectedCategory] = useState<string>('all')
@@ -68,10 +71,17 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
 
   const loadData = async () => {
     try {
-      await Promise.all([
+      const results = await Promise.all([
         dispatch(fetchProducts({ per_page: 100 })),
         dispatch(fetchCategories()),
       ])
+      // Check if any thunk was rejected
+      const hasError = results.some(
+        (result) => result.meta?.requestStatus === 'rejected'
+      )
+      if (hasError) {
+        showError('Impossible de charger certaines données')
+      }
     } catch (error) {
       showError('Impossible de charger les données')
     }
@@ -154,9 +164,11 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
     const name = categoryName.toLowerCase()
     if (name.includes('boulang') || name.includes('pain')) return '🥐'
     if (name.includes('fruit') || name.includes('légume') || name.includes('legume')) return '🥕'
-    if (name.includes('viande') || name.includes('plat')) return '🥩'
+    if (name.includes('plat') || name.includes('préparé') || name.includes('prepare')) return '🍲'
+    if (name.includes('viande') || name.includes('boucher')) return '🥩'
     if (name.includes('épice') || name.includes('epicerie')) return '🥫'
-    if (name.includes('laitage') || name.includes('produit laitier')) return '🥛'
+    if (name.includes('lait') || name.includes('fromage') || name.includes('yaourt')) return '🧀'
+    if (name.includes('poisson') || name.includes('mer')) return '🐟'
     return '🛍️'
   }
 
@@ -379,7 +391,7 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
       >
         {/* Header */}
         <View style={styles.header}>
-          <View>
+          <View style={{ flex: 1 }}>
             <Typography variant="h2" weight="bold" color="primary" style={{ marginBottom: theme.spacing.xs }}>
               Bonjour {user?.first_name || 'Invité'}
             </Typography>
@@ -389,9 +401,24 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
               <Typography variant="body" color="secondary"> ?</Typography>
             </View>
           </View>
-          <TouchableOpacity style={styles.refreshButton} onPress={onRefresh}>
-            <Ionicons name="refresh" size={24} color={theme.colors.controlIcon} />
-          </TouchableOpacity>
+          <View style={styles.headerActions}>
+            <TouchableOpacity style={styles.headerButton} onPress={onRefresh}>
+              <Ionicons name="refresh" size={22} color={theme.colors.controlIcon} />
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.headerButton}
+              onPress={() => navigation.getParent()?.navigate('Orders', { screen: 'Cart' })}
+              accessibilityRole="button"
+              accessibilityLabel="Voir mon panier"
+            >
+              <Ionicons name="cart" size={22} color={theme.colors.controlIcon} />
+              {cartItemsCount > 0 && (
+                <View style={styles.headerCartBadge}>
+                  <Text style={styles.headerCartBadgeText}>{cartItemsCount > 99 ? '99+' : cartItemsCount}</Text>
+                </View>
+              )}
+            </TouchableOpacity>
+          </View>
         </View>
 
         {/* Catégories */}
@@ -565,13 +592,36 @@ const createStyles = (theme: ReturnType<typeof useTheme>) => StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
   },
-  refreshButton: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
+  headerActions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  headerButton: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
     backgroundColor: theme.colors.controlSurface,
     justifyContent: 'center',
     alignItems: 'center',
+    position: 'relative',
+  },
+  headerCartBadge: {
+    position: 'absolute',
+    top: -4,
+    right: -4,
+    backgroundColor: theme.colors.error,
+    borderRadius: 10,
+    minWidth: 20,
+    height: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 4,
+  },
+  headerCartBadgeText: {
+    color: 'white',
+    fontSize: 11,
+    fontWeight: 'bold',
   },
   categoriesScroll: {
     marginTop: theme.spacing.md,

@@ -1,9 +1,12 @@
 import React from 'react'
+import { View, Text, StyleSheet } from 'react-native'
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import { Ionicons } from '@expo/vector-icons'
+import { useSelector } from 'react-redux'
 import { useTheme } from '../theme'
 import ErrorBoundary from '../components/ErrorBoundary'
+import { RootState } from '../store'
 
 // Screens
 import HomeScreen from '../screens/main/HomeScreen'
@@ -100,6 +103,8 @@ const AccountStack = () => (
 
 const ConsumerNavigator: React.FC = () => {
   const theme = useTheme()
+  const { cart } = useSelector((state: RootState) => state.cart)
+  const cartItemsCount = cart?.items_count ?? 0
 
   return (
     <Tab.Navigator
@@ -116,6 +121,19 @@ const ConsumerNavigator: React.FC = () => {
             iconName = focused ? 'heart' : 'heart-outline'
           } else if (route.name === 'Orders') {
             iconName = focused ? 'cart' : 'cart-outline'
+            // Afficher badge avec compteur d'articles dans le panier
+            return (
+              <View style={styles.tabIconContainer}>
+                <Ionicons name={iconName} size={size} color={color} />
+                {cartItemsCount > 0 && (
+                  <View style={[styles.tabBadge, { backgroundColor: theme.colors.error }]}>
+                    <Text style={styles.tabBadgeText}>
+                      {cartItemsCount > 99 ? '99+' : cartItemsCount}
+                    </Text>
+                  </View>
+                )}
+              </View>
+            )
           } else if (route.name === 'Account') {
             iconName = focused ? 'person' : 'person-outline'
           } else {
@@ -164,5 +182,29 @@ const ConsumerNavigator: React.FC = () => {
     </Tab.Navigator>
   )
 }
+
+const styles = StyleSheet.create({
+  tabIconContainer: {
+    position: 'relative',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  tabBadge: {
+    position: 'absolute',
+    top: -6,
+    right: -10,
+    borderRadius: 10,
+    minWidth: 18,
+    height: 18,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 4,
+  },
+  tabBadgeText: {
+    color: 'white',
+    fontSize: 10,
+    fontWeight: 'bold',
+  },
+})
 
 export default ConsumerNavigator

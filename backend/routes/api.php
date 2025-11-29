@@ -137,6 +137,7 @@ Route::prefix('reservations')->middleware('jwt.auth')->group(function () {
     // Routes d'écriture avec rate limiting strict
     Route::middleware('throttle:write')->group(function () {
         Route::post('/', [ReservationController::class, 'store']); // Créer une réservation
+        Route::patch('/{id}', [ReservationController::class, 'updateQuantity']); // Modifier quantité (pending only)
         Route::post('/{id}/cancel', [ReservationController::class, 'cancel']); // Annuler ma réservation
         Route::post('/{id}/confirm', [ReservationController::class, 'confirm']); // Confirmer une réservation
         Route::post('/{id}/ready', [ReservationController::class, 'markReady']); // Marquer comme prêt

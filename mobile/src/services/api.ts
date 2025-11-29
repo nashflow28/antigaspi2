@@ -2,6 +2,7 @@ import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { Alert } from 'react-native'
 import * as NavigationRef from '../navigation/NavigationRef'
+import { getGlobalAlert } from '../contexts/AlertContext'
 import {
   ApiResponse,
   AuthResponse,
@@ -196,20 +197,39 @@ class ApiService {
             this.onUnauthorizedCallback()
           }
 
-          // ✅ Afficher message de session expirée
-          Alert.alert(
-            'Session expirée',
-            'Votre session a expiré. Veuillez vous reconnecter.',
-            [
-              {
-                text: 'OK',
-                onPress: () => {
-                  console.log('Session expirée - Redirection automatique vers login')
-                  NavigationRef.navigate('Login')
+          // ✅ Afficher message de session expirée avec popup stylisée
+          const globalAlert = getGlobalAlert()
+          if (globalAlert) {
+            globalAlert({
+              title: 'Session expirée',
+              message: 'Votre session a expiré. Veuillez vous reconnecter.',
+              type: 'warning',
+              buttons: [
+                {
+                  text: 'OK',
+                  onPress: () => {
+                    console.log('Session expirée - Redirection automatique vers login')
+                    NavigationRef.navigate('Login')
+                  }
                 }
-              }
-            ]
-          )
+              ],
+            })
+          } else {
+            // Fallback to native Alert if styled alert not available
+            Alert.alert(
+              'Session expirée',
+              'Votre session a expiré. Veuillez vous reconnecter.',
+              [
+                {
+                  text: 'OK',
+                  onPress: () => {
+                    console.log('Session expirée - Redirection automatique vers login')
+                    NavigationRef.navigate('Login')
+                  }
+                }
+              ]
+            )
+          }
         }
         return Promise.reject(error)
       }
@@ -429,6 +449,10 @@ class ApiService {
 
   async cancelReservation(id: number): Promise<ApiResponse<Reservation>> {
     return this.request<ApiResponse<Reservation>>('POST', `/reservations/${id}/cancel`)
+  }
+
+  async updateReservationQuantity(id: number, quantity: number): Promise<ApiResponse<Reservation>> {
+    return this.request<ApiResponse<Reservation>>('PATCH', `/reservations/${id}`, { quantity })
   }
 
   // === ORDERS (COMMANDES) ===

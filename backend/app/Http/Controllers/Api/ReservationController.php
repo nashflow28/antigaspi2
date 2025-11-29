@@ -483,6 +483,89 @@ class ReservationController extends Controller
         }
     }
 
+    /**
+     * Modifier la quantité d'une réservation (uniquement si status = pending)
+     */
+    public function updateQuantity(Request $request, $id): JsonResponse
+    {
+        try {
+            $user = JWTAuth::parseToken()->authenticate();
+
+            $request->validate([
+                'quantity' => 'required|integer|min:1|max:100',
+            ], [
+                'quantity.required' => 'La quantité est requise',
+                'quantity.integer' => 'La quantité doit être un nombre entier',
+                'quantity.min' => 'La quantité minimum est 1',
+                'quantity.max' => 'La quantité maximum est 100',
+            ]);
+
+            return DB::transaction(function () use ($request, $id, $user) {
+                $reservation = Reservation::lockForUpdate()
+                    ->with(['product'])
+                    ->where('user_id', $user->id)
+                    ->findOrFail($id);
+
+                // 🔒 BUSINESS RULE: Only pending reservations can be modified
+                if ($reservation->status !== 'pending') {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Seules les réservations en attente peuvent être modifiées',
+                        'error' => 'La réservation a le statut: ' . $reservation->status
+                    ], 400);
+                }
+
+                $newQuantity = $request->quantity;
+                $oldQuantity = $reservation->quantity;
+                $quantityDiff = $newQuantity - $oldQuantity;
+
+                // Check stock availability if increasing quantity
+                if ($quantityDiff > 0) {
+                    $product = $reservation->product;
+                    if ($product->quantity_available < $quantityDiff) {
+                        return response()->json([
+                            'success' => false,
+                            'message' => 'Stock insuffisant',
+                            'error' => "Seulement {$product->quantity_available} unités disponibles"
+                        ], 400);
+                    }
+                    // Decrease available stock
+                    $product->decrement('quantity_available', $quantityDiff);
+                } elseif ($quantityDiff < 0) {
+                    // Restore stock when decreasing quantity
+                    $reservation->product->increment('quantity_available', abs($quantityDiff));
+                }
+
+                // Update reservation
+                $unitPrice = $reservation->total_amount / $oldQuantity;
+                $reservation->update([
+                    'quantity' => $newQuantity,
+                    'total_amount' => $unitPrice * $newQuantity,
+                ]);
+
+                $reservation->refresh()->load(['product.category', 'product.merchant.user']);
+
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Quantité mise à jour avec succès',
+                    'data' => new ReservationResource($reservation),
+                ]);
+            });
+        } catch (ValidationException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Erreur de validation',
+                'errors' => $e->errors(),
+            ], 422);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Erreur lors de la modification de la quantité',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
     public function statistics(): JsonResponse
     {
         try {

@@ -18,7 +18,7 @@ import { RootState } from '../../store'
 import { refreshProfile } from '../../store/slices/authSlice'
 import * as ImagePicker from 'expo-image-picker'
 import { useTheme } from '../../theme'
-import apiService from '../../services/api'
+import apiService, { API_BASE_URL } from '../../services/api'
 import * as Location from 'expo-location'
 import MapLocationPicker from '../../components/MapLocationPicker'
 
@@ -30,6 +30,16 @@ interface ProfileFormData {
   address: string
   city: string
   siret: string
+}
+
+// Helper pour construire l'URL complète de la photo
+const buildPhotoUrl = (photoUrl: string | null | undefined): string | null => {
+  if (!photoUrl) return null
+  if (photoUrl.startsWith('http')) return photoUrl
+  if (photoUrl.startsWith('file://')) return photoUrl // Local file URI
+  // Construct full URL (remove /api from base URL)
+  const serverBaseUrl = API_BASE_URL.replace(/\/api\/?$/, '')
+  return `${serverBaseUrl}${photoUrl}`
 }
 
 const MerchantProfileEditScreen: React.FC = () => {
@@ -110,8 +120,10 @@ const MerchantProfileEditScreen: React.FC = () => {
           city: freshUser.city || '',
           siret: freshUser.merchant?.siret || '',
         })
-        if (freshUser.merchant?.photo_url) {
-          setPhotoUri(freshUser.merchant.photo_url)
+        // 🐛 BUG FIX: Build full URL for photo
+        const photoFullUrl = buildPhotoUrl(freshUser.merchant?.photo_url)
+        if (photoFullUrl) {
+          setPhotoUri(photoFullUrl)
         }
       } else if (user) {
         // Fallback sur les données existantes si le refresh échoue
@@ -124,8 +136,10 @@ const MerchantProfileEditScreen: React.FC = () => {
           city: user.city || '',
           siret: user.merchant?.siret || '',
         })
-        if (user.merchant?.photo_url) {
-          setPhotoUri(user.merchant.photo_url)
+        // 🐛 BUG FIX: Build full URL for photo
+        const photoFullUrl = buildPhotoUrl(user.merchant?.photo_url)
+        if (photoFullUrl) {
+          setPhotoUri(photoFullUrl)
         }
       }
     } catch (error) {
@@ -238,29 +252,45 @@ const MerchantProfileEditScreen: React.FC = () => {
       setUploading(true)
 
       // Créer FormData
-      const formData = new FormData()
+      const formDataObj = new FormData()
       const filename = uri.split('/').pop() || 'photo.jpg'
       const match = /\.(\w+)$/.exec(filename)
       const type = match ? `image/${match[1]}` : 'image/jpeg'
 
-      formData.append('photo', {
+      formDataObj.append('photo', {
         uri,
         name: filename,
         type,
       } as any)
 
-      const response = await apiService.post('/merchants/profile/photo', formData, {
+      const response = await apiService.post('/merchants/profile/photo', formDataObj, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
       })
 
-      if (response.data.success) {
+      // 🐛 BUG FIX: apiService.post returns response.data directly
+      if (response.success) {
+        // 🐛 BUG FIX: Update photoUri with server URL (not local file URI)
+        const fullPhotoUrl = buildPhotoUrl(response.data?.photo_url)
+        if (fullPhotoUrl) {
+          setPhotoUri(fullPhotoUrl)
+          console.log('📸 [MerchantProfileEdit] Photo URL mise à jour:', fullPhotoUrl)
+        }
+
+        // 🐛 BUG FIX: Refresh Redux store to sync photo_url
+        await dispatch(refreshProfile() as any)
+
         Alert.alert('Succès', 'Photo mise à jour avec succès')
+      } else {
+        throw new Error(response.message || 'Échec de l\'upload')
       }
     } catch (error: any) {
       console.error('Erreur upload photo:', error)
-      Alert.alert('Erreur', error.response?.data?.message || 'Impossible d\'uploader la photo')
+      // Revert to previous photo if upload failed
+      const previousPhotoUrl = buildPhotoUrl(user?.merchant?.photo_url)
+      setPhotoUri(previousPhotoUrl)
+      Alert.alert('Erreur', error.response?.data?.message || error.message || 'Impossible d\'uploader la photo')
     } finally {
       setUploading(false)
     }
