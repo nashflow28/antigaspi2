@@ -220,25 +220,35 @@ const MerchantProfileEditScreen: React.FC = () => {
     // Update local state
     setLatitude(formatCoordinate(lat))
     setLongitude(formatCoordinate(lng))
+    setInitialLatitudeValue(lat)
+    setInitialLongitudeValue(lng)
+    setHasLocation(true)
 
-    // 🐛 BUG FIX: Auto-save location to backend when selected from map
+    // BUG FIX: Auto-save location to backend when selected from map
     try {
       setLoading(true)
-      const response = await apiService.put('/merchants/location', {
+      const response = await apiService.updateMerchantLocation({
         latitude: lat,
         longitude: lng,
       })
 
       if (response.success) {
+        const savedLat = parseCoordinateFromApi(response.data?.latitude) ?? lat
+        const savedLng = parseCoordinateFromApi(response.data?.longitude) ?? lng
+        setLatitude(formatCoordinate(savedLat))
+        setLongitude(formatCoordinate(savedLng))
+        setInitialLatitudeValue(savedLat)
+        setInitialLongitudeValue(savedLng)
+        setHasLocation(true)
         // Refresh Redux store
         await dispatch(refreshProfile() as any)
         Alert.alert('Succès', 'Position mise à jour avec succès')
-        console.log('📍 [MerchantProfileEdit] Location saved:', { lat, lng })
+        console.log('[MerchantProfileEdit] Location saved:', { lat: savedLat, lng: savedLng })
       } else {
         throw new Error(response.message || 'Erreur lors de la sauvegarde')
       }
     } catch (error: any) {
-      console.error('❌ [MerchantProfileEdit] Location save error:', error)
+      console.error('[MerchantProfileEdit] Location save error:', error)
       Alert.alert(
         'Erreur',
         error.response?.data?.message || error.message || 'Impossible de sauvegarder la position'
@@ -816,8 +826,8 @@ const MerchantProfileEditScreen: React.FC = () => {
         visible={mapPickerVisible}
         onClose={() => setMapPickerVisible(false)}
         onSelectLocation={handleMapLocationSelect}
-        initialLatitude={parseCoordinateInput(latitude)}
-        initialLongitude={parseCoordinateInput(longitude)}
+        initialLatitude={initialLatitudeValue ?? parseCoordinateInput(latitude)}
+        initialLongitude={initialLongitudeValue ?? parseCoordinateInput(longitude)}
       />
     </View>
   )

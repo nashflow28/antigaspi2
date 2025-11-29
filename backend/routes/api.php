@@ -351,6 +351,7 @@ Route::prefix('admin')->middleware(['jwt.auth', 'can:admin', 'throttle:admin'])-
 
     // Gestion des utilisateurs (admin uniquement)
     Route::get('/users', [\App\Http\Controllers\Admin\AdminUserController::class, 'index']);
+    Route::get('/users/{id}', [\App\Http\Controllers\Admin\AdminUserController::class, 'show'])->whereNumber('id');
     Route::patch('/users/{id}/suspend', [\App\Http\Controllers\Admin\AdminUserController::class, 'suspend']);
     Route::patch('/users/{id}/unsuspend', [\App\Http\Controllers\Admin\AdminUserController::class, 'unsuspend']);
 
@@ -361,6 +362,14 @@ Route::prefix('admin')->middleware(['jwt.auth', 'can:admin', 'throttle:admin'])-
     Route::post('/products/{id}/approve', [\App\Http\Controllers\Admin\AdminMerchantController::class, 'approveProduct']);
     Route::post('/products/{id}/reject', [\App\Http\Controllers\Admin\AdminMerchantController::class, 'rejectProduct']);
     Route::post('/reservations/{id}/resolve', [\App\Http\Controllers\Admin\AdminMerchantController::class, 'resolveReservation']);
+
+    // Historique des actions admin (audit trail)
+    Route::prefix('audit')->group(function () {
+        Route::get('/', [\App\Http\Controllers\Api\AdminAuditController::class, 'index']); // Historique des actions
+        Route::get('/stats', [\App\Http\Controllers\Api\AdminAuditController::class, 'stats']); // Statistiques d'audit
+        Route::get('/actions', [\App\Http\Controllers\Api\AdminAuditController::class, 'getAvailableActions']); // Actions disponibles
+        Route::get('/{id}', [\App\Http\Controllers\Api\AdminAuditController::class, 'show'])->whereNumber('id'); // Détail d'une action
+    });
 });
 
 // Routes des points de fidélité (protégées)

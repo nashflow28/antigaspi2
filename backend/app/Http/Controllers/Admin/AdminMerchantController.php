@@ -7,11 +7,18 @@ use App\Models\Merchant;
 use App\Models\Product;
 use App\Models\Reservation;
 use App\Models\User;
+use App\Services\AdminAuditService;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class AdminMerchantController extends Controller
 {
+    public function __construct(private readonly AdminAuditService $auditService)
+    {
+    }
+
     /**
      * Get moderation dashboard data
      */
@@ -47,7 +54,8 @@ class AdminMerchantController extends Controller
                     'phone' => $merchant->user->phone ?? 'Non renseigné',
                     'address' => $merchant->user->address ?? 'Non renseignée',
                     'business_type' => $merchant->business_type ?? 'Non spécifié',
-                    'description' => 'Commerçant en attente de vérification',
+                    'description' => $merchant->description ?? 'Commerçant en attente de vérification',
+                    'rejection_reason' => $merchant->rejection_reason,
                     'created_at' => $merchant->created_at ? $merchant->created_at->toISOString() : now()->toISOString()
                 ];
             })->values();
@@ -68,7 +76,9 @@ class AdminMerchantController extends Controller
                     'quantity_available' => (int) $product->quantity_available,
                     'image_url' => $product->image_url ?: 'https://images.unsplash.com/photo-1546549032-9571cd6b27df?w=400',
                     'description' => $product->description ?? '',
-                    'category' => $product->category?->name ?? 'Non catégorisé'
+                    'category' => $product->category?->name ?? 'Non catégorisé',
+                    'moderation_status' => $product->moderation_status ?? 'pending',
+                    'rejection_reason' => $product->rejection_reason
                 ];
             })->values();
 
@@ -113,19 +123,47 @@ class AdminMerchantController extends Controller
     public function approve(Request $request, $id): JsonResponse
     {
         try {
+            DB::beginTransaction();
+
             $merchant = Merchant::findOrFail($id);
+            $adminId = Auth::id();
+
+            // Mettre à jour le commerçant
             $merchant->is_verified = true;
             $merchant->verification_date = now();
+            $merchant->rejection_reason = null; // Effacer toute raison de rejet précédente
+
+            // Ajouter les champs d'audit si ils existent
+            if ($merchant->getConnection()->getSchemaBuilder()->hasColumn('merchants', 'verified_at')) {
+                $merchant->verified_at = now();
+            }
+            if ($merchant->getConnection()->getSchemaBuilder()->hasColumn('merchants', 'verified_by')) {
+                $merchant->verified_by = $adminId;
+            }
+
             $merchant->save();
+
+            // Logger l'action dans l'audit trail
+            $this->auditService->logMerchantApproval($merchant);
+
+            DB::commit();
 
             return response()->json([
                 'success' => true,
-                'message' => 'Commerçant approuvé avec succès'
+                'message' => 'Commerçant approuvé avec succès',
+                'data' => [
+                    'id' => $merchant->id,
+                    'business_name' => $merchant->business_name,
+                    'is_verified' => true,
+                    'verified_at' => now()->toISOString()
+                ]
             ]);
         } catch (\Exception $e) {
+            DB::rollBack();
             return response()->json([
                 'success' => false,
-                'message' => 'Erreur lors de l\'approbation du commerçant'
+                'message' => 'Erreur lors de l\'approbation du commerçant',
+                'error' => $e->getMessage()
             ], 500);
         }
     }
@@ -135,21 +173,45 @@ class AdminMerchantController extends Controller
      */
     public function reject(Request $request, $id): JsonResponse
     {
+        $data = $request->validate([
+            'reason' => 'required|string|min:10|max:1000'
+        ], [
+            'reason.required' => 'La raison du rejet est obligatoire',
+            'reason.min' => 'La raison doit contenir au moins 10 caractères',
+            'reason.max' => 'La raison ne peut pas dépasser 1000 caractères'
+        ]);
+
         try {
+            DB::beginTransaction();
+
             $merchant = Merchant::findOrFail($id);
-            // For now, we'll just mark as not verified
-            // In a real implementation, you might want to delete or flag the merchant
+
+            // Mettre à jour le commerçant avec la raison du rejet
             $merchant->is_verified = false;
+            $merchant->rejection_reason = $data['reason'];
             $merchant->save();
+
+            // Logger l'action dans l'audit trail
+            $this->auditService->logMerchantRejection($merchant, $data['reason']);
+
+            DB::commit();
 
             return response()->json([
                 'success' => true,
-                'message' => 'Commerçant rejeté avec succès'
+                'message' => 'Commerçant rejeté avec succès',
+                'data' => [
+                    'id' => $merchant->id,
+                    'business_name' => $merchant->business_name,
+                    'is_verified' => false,
+                    'rejection_reason' => $data['reason']
+                ]
             ]);
         } catch (\Exception $e) {
+            DB::rollBack();
             return response()->json([
                 'success' => false,
-                'message' => 'Erreur lors du rejet du commerçant'
+                'message' => 'Erreur lors du rejet du commerçant',
+                'error' => $e->getMessage()
             ], 500);
         }
     }
@@ -160,19 +222,49 @@ class AdminMerchantController extends Controller
     public function approveProduct(Request $request, $id): JsonResponse
     {
         try {
+            DB::beginTransaction();
+
             $product = Product::findOrFail($id);
-            // For demo purposes, we'll just update the product
-            $product->updated_at = now();
+            $adminId = Auth::id();
+
+            // Mettre à jour le produit
+            $product->is_active = true;
+            $product->rejection_reason = null;
+
+            // Mettre à jour le statut de modération si le champ existe
+            if ($product->getConnection()->getSchemaBuilder()->hasColumn('products', 'moderation_status')) {
+                $product->moderation_status = 'approved';
+            }
+            if ($product->getConnection()->getSchemaBuilder()->hasColumn('products', 'approved_at')) {
+                $product->approved_at = now();
+            }
+            if ($product->getConnection()->getSchemaBuilder()->hasColumn('products', 'approved_by')) {
+                $product->approved_by = $adminId;
+            }
+
             $product->save();
+
+            // Logger l'action
+            $this->auditService->logProductApproval($product);
+
+            DB::commit();
 
             return response()->json([
                 'success' => true,
-                'message' => 'Produit approuvé avec succès'
+                'message' => 'Produit approuvé avec succès',
+                'data' => [
+                    'id' => $product->id,
+                    'name' => $product->name,
+                    'is_active' => true,
+                    'moderation_status' => 'approved'
+                ]
             ]);
         } catch (\Exception $e) {
+            DB::rollBack();
             return response()->json([
                 'success' => false,
-                'message' => 'Erreur lors de l\'approbation du produit'
+                'message' => 'Erreur lors de l\'approbation du produit',
+                'error' => $e->getMessage()
             ], 500);
         }
     }
@@ -182,20 +274,52 @@ class AdminMerchantController extends Controller
      */
     public function rejectProduct(Request $request, $id): JsonResponse
     {
+        $data = $request->validate([
+            'reason' => 'required|string|min:10|max:1000'
+        ], [
+            'reason.required' => 'La raison du rejet est obligatoire',
+            'reason.min' => 'La raison doit contenir au moins 10 caractères',
+            'reason.max' => 'La raison ne peut pas dépasser 1000 caractères'
+        ]);
+
         try {
+            DB::beginTransaction();
+
             $product = Product::findOrFail($id);
-            // For demo purposes, we'll just mark it as out of stock
-            $product->quantity_available = 0;
+
+            // Mettre à jour le produit avec la raison du rejet
+            $product->is_active = false;
+            $product->rejection_reason = $data['reason'];
+
+            // Mettre à jour le statut de modération si le champ existe
+            if ($product->getConnection()->getSchemaBuilder()->hasColumn('products', 'moderation_status')) {
+                $product->moderation_status = 'rejected';
+            }
+
             $product->save();
+
+            // Logger l'action
+            $this->auditService->logProductRejection($product, $data['reason']);
+
+            DB::commit();
 
             return response()->json([
                 'success' => true,
-                'message' => 'Produit rejeté avec succès'
+                'message' => 'Produit rejeté avec succès',
+                'data' => [
+                    'id' => $product->id,
+                    'name' => $product->name,
+                    'is_active' => false,
+                    'rejection_reason' => $data['reason'],
+                    'moderation_status' => 'rejected'
+                ]
             ]);
         } catch (\Exception $e) {
+            DB::rollBack();
             return response()->json([
                 'success' => false,
-                'message' => 'Erreur lors du rejet du produit'
+                'message' => 'Erreur lors du rejet du produit',
+                'error' => $e->getMessage()
             ], 500);
         }
     }
@@ -205,20 +329,55 @@ class AdminMerchantController extends Controller
      */
     public function resolveReservation(Request $request, $id): JsonResponse
     {
+        $data = $request->validate([
+            'resolution' => 'required|string|in:approved,refunded,cancelled',
+            'reason' => 'nullable|string|max:1000'
+        ]);
+
         try {
+            DB::beginTransaction();
+
             $reservation = Reservation::findOrFail($id);
-            // Mark as resolved by updating the status or a flag
-            $reservation->updated_at = now();
+
+            // Mettre à jour selon la résolution
+            switch ($data['resolution']) {
+                case 'approved':
+                    $reservation->status = 'completed';
+                    break;
+                case 'refunded':
+                    $reservation->status = 'refunded';
+                    break;
+                case 'cancelled':
+                    $reservation->status = 'cancelled';
+                    break;
+            }
+
             $reservation->save();
+
+            // Logger l'action
+            $this->auditService->logReservationResolution(
+                $reservation,
+                $data['resolution'],
+                $data['reason'] ?? null
+            );
+
+            DB::commit();
 
             return response()->json([
                 'success' => true,
-                'message' => 'Signalement résolu avec succès'
+                'message' => 'Signalement résolu avec succès',
+                'data' => [
+                    'id' => $reservation->id,
+                    'status' => $reservation->status,
+                    'resolution' => $data['resolution']
+                ]
             ]);
         } catch (\Exception $e) {
+            DB::rollBack();
             return response()->json([
                 'success' => false,
-                'message' => 'Erreur lors de la résolution du signalement'
+                'message' => 'Erreur lors de la résolution du signalement',
+                'error' => $e->getMessage()
             ], 500);
         }
     }

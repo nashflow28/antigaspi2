@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, useCallback } from 'react'
+import React, { useState, useRef, useEffect, useCallback, useMemo } from 'react'
 import {
   View,
   Text,
@@ -7,7 +7,13 @@ import {
   TouchableOpacity,
   Platform,
 } from 'react-native'
-import MapView, { Marker, UrlTile, Region, MapPressEvent, MarkerDragStartEndEvent } from 'react-native-maps'
+import MapView, {
+  Marker,
+  UrlTile,
+  Region,
+  MapPressEvent,
+  MarkerDragStartEndEvent,
+} from 'react-native-maps'
 import { Ionicons } from '@expo/vector-icons'
 import { useTheme } from '../theme'
 
@@ -26,6 +32,9 @@ const DEFAULT_REGION = {
   longitudeDelta: 0.05,
 }
 
+const withFallback = (value: number | null | undefined, fallback: number) =>
+  typeof value === 'number' && Number.isFinite(value) ? value : fallback
+
 const MapLocationPicker: React.FC<MapLocationPickerProps> = ({
   visible,
   onClose,
@@ -36,67 +45,80 @@ const MapLocationPicker: React.FC<MapLocationPickerProps> = ({
   const theme = useTheme()
   const mapRef = useRef<MapView>(null)
 
-  const [selectedLocation, setSelectedLocation] = useState<{
-    latitude: number
-    longitude: number
-  } | null>(
-    initialLatitude != null && initialLongitude != null
-      ? { latitude: initialLatitude, longitude: initialLongitude }
-      : null
+  const initialLocation = useMemo(
+    () => ({
+      latitude: withFallback(initialLatitude, DEFAULT_REGION.latitude),
+      longitude: withFallback(initialLongitude, DEFAULT_REGION.longitude),
+    }),
+    [initialLatitude, initialLongitude]
   )
 
+  const [selectedLocation, setSelectedLocation] = useState<{ latitude: number; longitude: number }>(initialLocation)
   const [region, setRegion] = useState<Region>({
-    latitude: initialLatitude ?? DEFAULT_REGION.latitude,
-    longitude: initialLongitude ?? DEFAULT_REGION.longitude,
+    latitude: initialLocation.latitude,
+    longitude: initialLocation.longitude,
     latitudeDelta: DEFAULT_REGION.latitudeDelta,
     longitudeDelta: DEFAULT_REGION.longitudeDelta,
   })
 
   // Reset state when modal opens or initial coordinates change
   useEffect(() => {
-    if (visible) {
-      const newLat = initialLatitude ?? DEFAULT_REGION.latitude
-      const newLng = initialLongitude ?? DEFAULT_REGION.longitude
+    if (!visible) return
 
-      // Update selected location
-      if (initialLatitude != null && initialLongitude != null) {
-        setSelectedLocation({ latitude: initialLatitude, longitude: initialLongitude })
-      } else {
-        // Si pas de position sauvegardée, placer le marqueur au centre par défaut
-        setSelectedLocation({ latitude: newLat, longitude: newLng })
-      }
-
-      // Update region and animate map to the position
-      const newRegion = {
-        latitude: newLat,
-        longitude: newLng,
-        latitudeDelta: 0.01,
-        longitudeDelta: 0.01,
-      }
-      setRegion(newRegion)
-
-      // Animate map to the saved position
-      setTimeout(() => {
-        mapRef.current?.animateToRegion(newRegion, 500)
-      }, 100)
-
-      console.log('📍 [MapLocationPicker] Initialized with:', { lat: newLat, lng: newLng })
+    const baseLocation = {
+      latitude: withFallback(initialLatitude, DEFAULT_REGION.latitude),
+      longitude: withFallback(initialLongitude, DEFAULT_REGION.longitude),
     }
+
+    const nextRegion = {
+      ...baseLocation,
+      latitudeDelta: 0.01,
+      longitudeDelta: 0.01,
+    }
+
+    setSelectedLocation(baseLocation)
+    setRegion(nextRegion)
+
+    requestAnimationFrame(() => {
+      mapRef.current?.animateToRegion(nextRegion, 500)
+    })
+
+    console.log('[MapLocationPicker] Initialized with:', nextRegion)
   }, [visible, initialLatitude, initialLongitude])
 
-  // Handle tap on map to place marker
-  const handleMapPress = useCallback((event: MapPressEvent) => {
-    const { latitude, longitude } = event.nativeEvent.coordinate
-    console.log('📍 [MapLocationPicker] Map pressed at:', { latitude, longitude })
-    setSelectedLocation({ latitude, longitude })
+  const centerOnLocation = useCallback((latitude: number, longitude: number) => {
+    setRegion((prev) => {
+      const nextRegion = {
+        ...prev,
+        latitude,
+        longitude,
+      }
+      mapRef.current?.animateToRegion(nextRegion, 250)
+      return nextRegion
+    })
   }, [])
 
+  // Handle tap on map to place marker
+  const handleMapPress = useCallback(
+    (event: MapPressEvent) => {
+      const { latitude, longitude } = event.nativeEvent.coordinate
+      setSelectedLocation({ latitude, longitude })
+      centerOnLocation(latitude, longitude)
+      console.log('[MapLocationPicker] Map pressed at:', { latitude, longitude })
+    },
+    [centerOnLocation]
+  )
+
   // Handle marker drag end
-  const handleMarkerDragEnd = useCallback((event: MarkerDragStartEndEvent) => {
-    const { latitude, longitude } = event.nativeEvent.coordinate
-    console.log('📍 [MapLocationPicker] Marker dragged to:', { latitude, longitude })
-    setSelectedLocation({ latitude, longitude })
-  }, [])
+  const handleMarkerDragEnd = useCallback(
+    (event: MarkerDragStartEndEvent) => {
+      const { latitude, longitude } = event.nativeEvent.coordinate
+      setSelectedLocation({ latitude, longitude })
+      centerOnLocation(latitude, longitude)
+      console.log('[MapLocationPicker] Marker dragged to:', { latitude, longitude })
+    },
+    [centerOnLocation]
+  )
 
   // Handle marker drag (real-time updates)
   const handleMarkerDrag = useCallback((event: MarkerDragStartEndEvent) => {
@@ -105,39 +127,36 @@ const MapLocationPicker: React.FC<MapLocationPickerProps> = ({
   }, [])
 
   const handleConfirm = () => {
-    if (selectedLocation) {
-      console.log('📍 [MapLocationPicker] Confirming location:', selectedLocation)
-      onSelectLocation(selectedLocation.latitude, selectedLocation.longitude)
-      onClose()
-    }
+    if (!selectedLocation) return
+
+    console.log('[MapLocationPicker] Confirming location:', selectedLocation)
+    onSelectLocation(selectedLocation.latitude, selectedLocation.longitude)
+    onClose()
   }
 
-  const handleReset = () => {
-    if (initialLatitude != null && initialLongitude != null) {
-      setSelectedLocation({ latitude: initialLatitude, longitude: initialLongitude })
-      mapRef.current?.animateToRegion({
-        latitude: initialLatitude,
-        longitude: initialLongitude,
-        latitudeDelta: 0.01,
-        longitudeDelta: 0.01,
-      })
-    } else {
-      // Reset to default location
-      setSelectedLocation({ latitude: DEFAULT_REGION.latitude, longitude: DEFAULT_REGION.longitude })
-      mapRef.current?.animateToRegion(DEFAULT_REGION)
-    }
-  }
+  const handleReset = useCallback(() => {
+    const baseLocation =
+      initialLatitude != null && initialLongitude != null
+        ? { latitude: initialLatitude, longitude: initialLongitude }
+        : { latitude: DEFAULT_REGION.latitude, longitude: DEFAULT_REGION.longitude }
+
+    setSelectedLocation(baseLocation)
+    centerOnLocation(baseLocation.latitude, baseLocation.longitude)
+  }, [centerOnLocation, initialLatitude, initialLongitude])
 
   // Center map on marker
   const handleCenterOnMarker = () => {
-    if (selectedLocation) {
-      mapRef.current?.animateToRegion({
-        latitude: selectedLocation.latitude,
-        longitude: selectedLocation.longitude,
-        latitudeDelta: 0.01,
-        longitudeDelta: 0.01,
-      }, 500)
+    if (!selectedLocation) return
+
+    const nextRegion = {
+      latitude: selectedLocation.latitude,
+      longitude: selectedLocation.longitude,
+      latitudeDelta: region.latitudeDelta,
+      longitudeDelta: region.longitudeDelta,
     }
+
+    mapRef.current?.animateToRegion(nextRegion, 500)
+    setRegion(nextRegion)
   }
 
   if (Platform.OS === 'web') {
@@ -188,7 +207,8 @@ const MapLocationPicker: React.FC<MapLocationPickerProps> = ({
           <MapView
             ref={mapRef}
             style={styles.map}
-            initialRegion={region}
+            region={region}
+            onRegionChangeComplete={setRegion}
             onPress={handleMapPress}
             showsUserLocation={true}
             showsMyLocationButton={true}
@@ -225,7 +245,7 @@ const MapLocationPicker: React.FC<MapLocationPickerProps> = ({
 
           {/* OpenStreetMap Attribution */}
           <View style={styles.osmAttribution}>
-            <Text style={styles.osmAttributionText}>© OpenStreetMap</Text>
+            <Text style={styles.osmAttributionText}>(c) OpenStreetMap</Text>
           </View>
 
           {/* Center on marker button */}
@@ -241,32 +261,28 @@ const MapLocationPicker: React.FC<MapLocationPickerProps> = ({
 
         {/* Selected coordinates display */}
         {selectedLocation && (
-          <View style={[styles.coordinatesDisplay, { backgroundColor: theme.colors.cardBackground, borderColor: theme.colors.cardBorder }]}>
+          <View
+            style={[
+              styles.coordinatesDisplay,
+              { backgroundColor: theme.colors.cardBackground, borderColor: theme.colors.cardBorder },
+            ]}
+          >
             <View style={styles.coordinateRow}>
               <Text style={[styles.coordinateLabel, { color: theme.colors.textSecondary }]}>Latitude:</Text>
-              <Text style={[styles.coordinateValue, { color: theme.colors.text }]}>
-                {selectedLocation.latitude.toFixed(6)}
-              </Text>
+              <Text style={[styles.coordinateValue, { color: theme.colors.text }]}>{selectedLocation.latitude.toFixed(6)}</Text>
             </View>
             <View style={styles.coordinateRow}>
               <Text style={[styles.coordinateLabel, { color: theme.colors.textSecondary }]}>Longitude:</Text>
-              <Text style={[styles.coordinateValue, { color: theme.colors.text }]}>
-                {selectedLocation.longitude.toFixed(6)}
-              </Text>
+              <Text style={[styles.coordinateValue, { color: theme.colors.text }]}>{selectedLocation.longitude.toFixed(6)}</Text>
             </View>
           </View>
         )}
 
         {/* Action buttons */}
         <View style={styles.actions}>
-          <TouchableOpacity
-            style={[styles.resetButton, { borderColor: theme.colors.neutral[300] }]}
-            onPress={handleReset}
-          >
+          <TouchableOpacity style={[styles.resetButton, { borderColor: theme.colors.neutral[300] }]} onPress={handleReset}>
             <Ionicons name="refresh" size={20} color={theme.colors.textSecondary} />
-            <Text style={[styles.resetButtonText, { color: theme.colors.textSecondary }]}>
-              Réinitialiser
-            </Text>
+            <Text style={[styles.resetButtonText, { color: theme.colors.textSecondary }]}>Réinitialiser</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
@@ -274,7 +290,9 @@ const MapLocationPicker: React.FC<MapLocationPickerProps> = ({
               styles.confirmButton,
               {
                 backgroundColor: selectedLocation
-                  ? (theme.isDark ? '#10B981' : theme.colors.primary[500])
+                  ? theme.isDark
+                    ? '#10B981'
+                    : theme.colors.primary[500]
                   : theme.colors.neutral[300],
               },
             ]}
