@@ -66,9 +66,10 @@ const ReservationDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
           onPress: async () => {
             setCancelling(true)
             try {
-              await dispatch(cancelReservation(reservationId))
+              // 🐛 FIX: Added .unwrap() to properly catch errors and update UI
+              await dispatch(cancelReservation(reservationId)).unwrap()
               showSuccess('Réservation annulée avec succès')
-              navigation.goBack() // Retour à l'écran précédent au lieu de navigate
+              navigation.goBack()
             } catch (error) {
               showError('Impossible d\'annuler la réservation')
             } finally {

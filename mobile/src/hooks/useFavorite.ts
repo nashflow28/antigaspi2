@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 import { useAppDispatch, useAppSelector } from '../store/hooks'
 import { toggleFavorite, fetchFavoriteIds } from '../store/slices/favoritesSlice'
 
@@ -11,9 +11,13 @@ export const useFavorite = (productId: number) => {
   const dispatch = useAppDispatch()
   const { favoriteIds, loading } = useAppSelector((state) => state.favorites)
 
+  // 🐛 FIX: Use ref to prevent infinite loop when favoriteIds changes
+  const hasFetchedRef = useRef(false)
+
   // Charger les IDs favoris au premier rendu si vide
   useEffect(() => {
-    if (favoriteIds.length === 0) {
+    if (!hasFetchedRef.current && favoriteIds.length === 0) {
+      hasFetchedRef.current = true
       dispatch(fetchFavoriteIds())
     }
   }, [dispatch, favoriteIds.length])

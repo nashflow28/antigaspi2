@@ -145,51 +145,51 @@ const LoginScreen: React.FC<Props> = ({ navigation }) => {
           </Button>
         </Card>
 
-        {/* Comptes de test */}
-        <Card variant="flat" style={{ backgroundColor: theme.colors.info, padding: theme.spacing.md, marginBottom: theme.spacing.lg }}>
-          <Typography variant="caption" weight="semibold" style={{ marginBottom: theme.spacing.sm, textAlign: 'center' }}>
-            Comptes de test :
-          </Typography>
+        {/* 🔒 SECURITY FIX: Test accounts only visible in development mode */}
+        {__DEV__ && (
+          <Card variant="flat" style={{ backgroundColor: theme.colors.info, padding: theme.spacing.md, marginBottom: theme.spacing.lg }}>
+            <Typography variant="caption" weight="semibold" style={{ marginBottom: theme.spacing.sm, textAlign: 'center' }}>
+              Comptes de test (DEV uniquement) :
+            </Typography>
 
-          <Button
-            variant="secondary"
-            size="md"
-            fullWidth
-            style={{ marginBottom: theme.spacing.sm }}
-            onPress={() => {
-              // 🐛 BUG FIX: Updated to match CLAUDE.md seeder credentials
-              const consumerCreds = {
-                email: 'jean.dupont@email.com',
-                password: 'password'
-              }
-              setCredentials(consumerCreds)
-              handleLogin(consumerCreds)
-            }}
-            testID={TEST_IDS.loginConsumerQuick}
-            accessibilityLabel={TEST_IDS.loginConsumerQuick}
-          >
-            👤 Consumer
-          </Button>
+            <Button
+              variant="secondary"
+              size="md"
+              fullWidth
+              style={{ marginBottom: theme.spacing.sm }}
+              onPress={() => {
+                const consumerCreds = {
+                  email: 'jean.dupont@email.com',
+                  password: 'password'
+                }
+                setCredentials(consumerCreds)
+                handleLogin(consumerCreds)
+              }}
+              testID={TEST_IDS.loginConsumerQuick}
+              accessibilityLabel={TEST_IDS.loginConsumerQuick}
+            >
+              👤 Consumer
+            </Button>
 
-          <Button
-            variant="secondary"
-            size="md"
-            fullWidth
-            onPress={() => {
-              // 🐛 BUG FIX: Updated to match CLAUDE.md seeder credentials
-              const merchantCreds = {
-                email: 'boulangerie.martin@email.com',
-                password: 'password'
-              }
-              setCredentials(merchantCreds)
-              handleLogin(merchantCreds)
-            }}
-            testID={TEST_IDS.loginMerchantQuick}
-            accessibilityLabel={TEST_IDS.loginMerchantQuick}
-          >
-            🏪 Merchant
-          </Button>
-        </Card>
+            <Button
+              variant="secondary"
+              size="md"
+              fullWidth
+              onPress={() => {
+                const merchantCreds = {
+                  email: 'boulangerie.martin@email.com',
+                  password: 'password'
+                }
+                setCredentials(merchantCreds)
+                handleLogin(merchantCreds)
+              }}
+              testID={TEST_IDS.loginMerchantQuick}
+              accessibilityLabel={TEST_IDS.loginMerchantQuick}
+            >
+              🏪 Merchant
+            </Button>
+          </Card>
+        )}
 
         {/* Footer */}
         <View style={[styles.footer, { flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }]}>

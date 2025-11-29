@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useMemo, useCallback } from 'react'
 import {
   View,
   Text,
@@ -97,53 +97,57 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
     }
   }
 
-  // Filtrage des produits selon catégorie, disponibilité et distance
-  const filteredProducts = (products || []).filter(product => {
-    // Filtre par catégorie
-    if (selectedCategory !== 'all' && product.category?.id !== parseInt(selectedCategory)) {
-      return false
-    }
+  // ⚡ PERFORMANCE FIX: Memoize filtered products to avoid recalculation on every render
+  const filteredProducts = useMemo(() => {
+    return (products || []).filter(product => {
+      // Filtre par catégorie
+      if (selectedCategory !== 'all' && product.category?.id !== parseInt(selectedCategory)) {
+        return false
+      }
 
-    // Filtre par disponibilité
-    if (showAvailable && product.quantity_available <= 0) {
-      return false
-    }
+      // Filtre par disponibilité
+      if (showAvailable && product.quantity_available <= 0) {
+        return false
+      }
 
-    // Filtre par distance (si activé et position utilisateur disponible)
-    if (distanceEnabled && userLocation && product.merchant) {
-      const { latitude, longitude } = product.merchant
-      if (latitude != null && longitude != null) {
-        const distanceResult = locationService.calculateDistance(
-          userLocation.latitude,
-          userLocation.longitude,
-          latitude,
-          longitude
-        )
-        if (distanceResult.distance > maxDistance) {
-          return false
+      // Filtre par distance (si activé et position utilisateur disponible)
+      if (distanceEnabled && userLocation && product.merchant) {
+        const { latitude, longitude } = product.merchant
+        if (latitude != null && longitude != null) {
+          const distanceResult = locationService.calculateDistance(
+            userLocation.latitude,
+            userLocation.longitude,
+            latitude,
+            longitude
+          )
+          if (distanceResult.distance > maxDistance) {
+            return false
+          }
         }
       }
-    }
 
-    return true
-  })
+      return true
+    })
+  }, [products, selectedCategory, showAvailable, distanceEnabled, userLocation, maxDistance])
 
-  // Tri des produits par distance si filtre distance actif
-  const sortedProducts = distanceEnabled && userLocation
-    ? [...filteredProducts].sort((a, b) => {
-        const distA = locationService.calculateDistanceFromUser(
-          userLocation,
-          a.merchant?.latitude || null,
-          a.merchant?.longitude || null
-        )
-        const distB = locationService.calculateDistanceFromUser(
-          userLocation,
-          b.merchant?.latitude || null,
-          b.merchant?.longitude || null
-        )
-        return (distA?.distance || Infinity) - (distB?.distance || Infinity)
-      })
-    : filteredProducts
+  // ⚡ PERFORMANCE FIX: Memoize sorted products
+  const sortedProducts = useMemo(() => {
+    if (!distanceEnabled || !userLocation) return filteredProducts
+
+    return [...filteredProducts].sort((a, b) => {
+      const distA = locationService.calculateDistanceFromUser(
+        userLocation,
+        a.merchant?.latitude || null,
+        a.merchant?.longitude || null
+      )
+      const distB = locationService.calculateDistanceFromUser(
+        userLocation,
+        b.merchant?.latitude || null,
+        b.merchant?.longitude || null
+      )
+      return (distA?.distance || Infinity) - (distB?.distance || Infinity)
+    })
+  }, [filteredProducts, distanceEnabled, userLocation])
 
   // Mapping des emojis par catégorie
   const getCategoryEmoji = (categoryName: string) => {
@@ -246,8 +250,10 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
     const discountedPrice = Math.round(parseFloat(product.discounted_price) || 0)
     const originalPrice = Math.round(parseFloat(product.original_price) || 0)
 
-    // Calcul du discount en pourcentage
-    const discountPercent = Math.round(((originalPrice - discountedPrice) / originalPrice) * 100)
+    // 🐛 FIX: Prevent division by zero
+    const discountPercent = originalPrice > 0
+      ? Math.round(((originalPrice - discountedPrice) / originalPrice) * 100)
+      : 0
 
     // Calcul de la distance si position utilisateur disponible
     const distanceInfo = locationService.calculateDistanceFromUser(
@@ -355,7 +361,8 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
     )
   }
 
-  const styles = createStyles(theme)
+  // ⚡ PERFORMANCE FIX: Memoize styles to avoid recreation on every render
+  const styles = useMemo(() => createStyles(theme), [theme])
 
   return (
     <View style={styles.container} testID={TEST_IDS.homeScreen}>
