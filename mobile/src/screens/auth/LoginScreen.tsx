@@ -135,7 +135,7 @@ const LoginScreen: React.FC<Props> = ({ navigation }) => {
             variant="primary"
             size="lg"
             fullWidth
-            onPress={handleLogin}
+            onPress={() => handleLogin()}
             disabled={loading}
             loading={loading}
             testID={TEST_IDS.loginSubmit}
