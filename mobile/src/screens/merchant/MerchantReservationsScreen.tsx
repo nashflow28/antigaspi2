@@ -21,7 +21,7 @@ const MerchantReservationsScreen: React.FC = () => {
   const [reservations, setReservations] = useState<Reservation[]>([])
   const [refreshing, setRefreshing] = useState(false)
   const [loading, setLoading] = useState(true)
-  const [filter, setFilter] = useState<'all' | 'pending' | 'confirmed' | 'completed' | 'cancelled'>('all')
+  const [filter, setFilter] = useState<'all' | 'pending' | 'confirmed' | 'ready' | 'completed' | 'cancelled'>('all')
 
   useEffect(() => {
     loadReservations()
@@ -436,6 +436,7 @@ const MerchantReservationsScreen: React.FC = () => {
             { value: 'all', label: 'Toutes' },
             { value: 'pending', label: 'En attente' },
             { value: 'confirmed', label: 'Confirmées' },
+            { value: 'ready', label: 'Prêtes' },
             { value: 'completed', label: 'Terminées' },
             { value: 'cancelled', label: 'Annulées' },
           ].map((filterOption) => (

@@ -20,6 +20,7 @@ import * as ImagePicker from 'expo-image-picker'
 import { useTheme } from '../../theme'
 import apiService from '../../services/api'
 import * as Location from 'expo-location'
+import MapLocationPicker from '../../components/MapLocationPicker'
 
 interface ProfileFormData {
   business_name: string
@@ -55,6 +56,7 @@ const MerchantProfileEditScreen: React.FC = () => {
   const [initialLatitudeValue, setInitialLatitudeValue] = useState<number | null>(null)
   const [initialLongitudeValue, setInitialLongitudeValue] = useState<number | null>(null)
   const [hasLocation, setHasLocation] = useState(false)
+  const [mapPickerVisible, setMapPickerVisible] = useState(false)
 
   const formatCoordinate = (value: number | null): string => {
     if (value === null || Number.isNaN(value)) {
@@ -198,6 +200,11 @@ const MerchantProfileEditScreen: React.FC = () => {
     } finally {
       setLocationLoading(false)
     }
+  }
+
+  const handleMapLocationSelect = (lat: number, lng: number) => {
+    setLatitude(formatCoordinate(lat))
+    setLongitude(formatCoordinate(lng))
   }
 
   const pickImage = async () => {
@@ -611,33 +618,55 @@ const MerchantProfileEditScreen: React.FC = () => {
       >
         <View style={styles.locationHeader}>
           <Text style={[styles.locationTitle, { color: theme.colors.text }]}>Localisation du commerce</Text>
-          <TouchableOpacity
-            style={[
-              styles.locationButton,
-              {
-                borderColor: theme.isDark ? '#10B981' : theme.colors.primary[500],
-                backgroundColor: theme.isDark ? theme.withOpacity('#10B981', 0.15) : theme.withOpacity(theme.colors.primary[500], 0.12),
-              },
-            ]}
-            onPress={handleUseCurrentLocation}
-            disabled={locationLoading}
-          >
-            {locationLoading ? (
-              <ActivityIndicator size="small" color={theme.isDark ? '#10B981' : (theme.colors.primary[600] || theme.colors.primary[500])} />
-            ) : (
-              <>
-                <Ionicons name="locate" size={18} color={theme.isDark ? '#10B981' : (theme.colors.primary[600] || theme.colors.primary[500])} />
-                <Text
-                  style={[
-                    styles.locationButtonText,
-                    { color: theme.isDark ? '#10B981' : (theme.colors.primary[600] || theme.colors.primary[500]) },
-                  ]}
-                >
-                  Ma position
-                </Text>
-              </>
-            )}
-          </TouchableOpacity>
+          <View style={styles.locationButtonsRow}>
+            <TouchableOpacity
+              style={[
+                styles.locationButton,
+                {
+                  borderColor: theme.isDark ? '#10B981' : theme.colors.primary[500],
+                  backgroundColor: theme.isDark ? theme.withOpacity('#10B981', 0.15) : theme.withOpacity(theme.colors.primary[500], 0.12),
+                },
+              ]}
+              onPress={handleUseCurrentLocation}
+              disabled={locationLoading}
+            >
+              {locationLoading ? (
+                <ActivityIndicator size="small" color={theme.isDark ? '#10B981' : (theme.colors.primary[600] || theme.colors.primary[500])} />
+              ) : (
+                <>
+                  <Ionicons name="locate" size={18} color={theme.isDark ? '#10B981' : (theme.colors.primary[600] || theme.colors.primary[500])} />
+                  <Text
+                    style={[
+                      styles.locationButtonText,
+                      { color: theme.isDark ? '#10B981' : (theme.colors.primary[600] || theme.colors.primary[500]) },
+                    ]}
+                  >
+                    GPS
+                  </Text>
+                </>
+              )}
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[
+                styles.locationButton,
+                {
+                  borderColor: theme.isDark ? '#3B82F6' : '#2563EB',
+                  backgroundColor: theme.isDark ? theme.withOpacity('#3B82F6', 0.15) : theme.withOpacity('#2563EB', 0.12),
+                },
+              ]}
+              onPress={() => setMapPickerVisible(true)}
+            >
+              <Ionicons name="map" size={18} color={theme.isDark ? '#3B82F6' : '#2563EB'} />
+              <Text
+                style={[
+                  styles.locationButtonText,
+                  { color: theme.isDark ? '#3B82F6' : '#2563EB' },
+                ]}
+              >
+                Carte
+              </Text>
+            </TouchableOpacity>
+          </View>
         </View>
 
         <Text style={[styles.locationDescription, { color: theme.colors.textSecondary }]}> 
@@ -724,6 +753,15 @@ const MerchantProfileEditScreen: React.FC = () => {
           )}
         </TouchableOpacity>
       </ScrollView>
+
+      {/* Map Location Picker Modal */}
+      <MapLocationPicker
+        visible={mapPickerVisible}
+        onClose={() => setMapPickerVisible(false)}
+        onSelectLocation={handleMapLocationSelect}
+        initialLatitude={parseCoordinateInput(latitude)}
+        initialLongitude={parseCoordinateInput(longitude)}
+      />
     </View>
   )
 }
@@ -834,6 +872,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     marginBottom: 12,
+    flexWrap: 'wrap',
+    gap: 8,
+  },
+  locationButtonsRow: {
+    flexDirection: 'row',
+    gap: 8,
   },
   locationTitle: {
     fontSize: 16,
