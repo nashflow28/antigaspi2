@@ -3,9 +3,7 @@ import {
   View,
   StyleSheet,
   TouchableOpacity,
-  Alert,
   Switch,
-  Platform,
   Linking,
   ScrollView,
 } from 'react-native'
@@ -16,6 +14,7 @@ import { AppDispatch, RootState } from '../../store'
 import { Ionicons } from '@expo/vector-icons'
 import { Card, Badge, Typography } from '../../components/2025'
 import { useTheme } from '../../theme'
+import { useAlert } from '../../contexts/AlertContext'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { TEST_IDS } from '../../utils/testIds'
 
@@ -25,37 +24,28 @@ const ProfileScreen: React.FC = () => {
   const { mode, setThemeMode } = theme
   const dispatch = useDispatch<AppDispatch>()
   const { user, loading } = useSelector((state: RootState) => state.auth)
+  const { showAlert } = useAlert()
 
   const handleLogout = () => {
     console.log('🔴 handleLogout clicked!')
-    // Sur le web, Alert peut ne pas afficher correctement les boutons => bypass
-    if (Platform.OS === 'web') {
-      confirmLogout()
-      return
-    }
-
-    try {
-      Alert.alert(
-        'Déconnexion',
-        'Êtes-vous sûr de vouloir vous déconnecter ?',
-        [
-          {
-            text: 'Annuler',
-            style: 'cancel',
-            onPress: () => console.log('🟢 Déconnexion annulée')
-          },
-          {
-            text: 'Déconnexion',
-            style: 'destructive',
-            onPress: confirmLogout
-          }
-        ],
-        { cancelable: true }
-      )
-    } catch (_) {
-      // Fallback ultime si Alert échoue
-      confirmLogout()
-    }
+    // Utiliser l'alerte stylisée pour la confirmation de déconnexion
+    showAlert({
+      title: 'Déconnexion',
+      message: 'Êtes-vous sûr de vouloir vous déconnecter ?',
+      type: 'warning',
+      buttons: [
+        {
+          text: 'Annuler',
+          style: 'cancel',
+          onPress: () => console.log('🟢 Déconnexion annulée')
+        },
+        {
+          text: 'Déconnexion',
+          style: 'destructive',
+          onPress: confirmLogout
+        }
+      ]
+    })
   }
 
   const confirmLogout = async () => {
@@ -85,10 +75,18 @@ const ProfileScreen: React.FC = () => {
       if (fallbackSupported) {
         await Linking.openURL(fallback)
       } else {
-        Alert.alert('Support indisponible', 'Impossible d\'ouvrir le centre d\'aide pour le moment.')
+        showAlert({
+          title: 'Support indisponible',
+          message: 'Impossible d\'ouvrir le centre d\'aide pour le moment.',
+          type: 'info'
+        })
       }
     } catch (error) {
-      Alert.alert('Support indisponible', 'Impossible d\'ouvrir le centre d\'aide pour le moment.')
+      showAlert({
+        title: 'Support indisponible',
+        message: 'Impossible d\'ouvrir le centre d\'aide pour le moment.',
+        type: 'info'
+      })
     }
   }
 
