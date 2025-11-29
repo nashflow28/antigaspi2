@@ -13,7 +13,7 @@ jest.mock('react-native-maps', () => {
     default: View,
     Marker: View,
     Callout: View,
-    PROVIDER_GOOGLE: 'google',
+    UrlTile: View,
   }
 })
 

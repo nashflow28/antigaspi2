@@ -23,7 +23,7 @@ import { Product, Merchant } from '../../types'
 import { getImageUrl } from '../../utils/imageHelpers'
 import { formatCurrency } from '../../utils/currencyHelpers'
 import { Button, Card, Badge, Typography } from '../../components/2025'
-import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps'
+import MapView, { Marker, UrlTile } from 'react-native-maps'
 import locationService, { UserLocation } from '../../services/locationService'
 
 const { width } = Dimensions.get('window')
@@ -353,12 +353,19 @@ const MerchantDetailScreen: React.FC<Props> = ({ route, navigation }) => {
           </View>
         ) : (
           <MapView
-            provider={PROVIDER_GOOGLE}
             style={[styles.mapView, mapExpanded && styles.mapViewExpanded]}
             initialRegion={mapRegion}
             showsUserLocation={locationPermissionGranted && !!userLocation}
             showsMyLocationButton={false}
+            mapType={Platform.OS === 'android' ? 'none' : 'standard'}
           >
+            {/* OpenStreetMap Tiles */}
+            <UrlTile
+              urlTemplate="https://tile.openstreetmap.org/{z}/{x}/{y}.png"
+              maximumZ={19}
+              flipY={false}
+              tileSize={256}
+            />
             <Marker
               coordinate={{ latitude: mapRegion.latitude, longitude: mapRegion.longitude }}
               title={merchant.business_name}

@@ -9,7 +9,7 @@ import {
   Linking,
   TouchableOpacity,
 } from 'react-native'
-import MapView, { Marker, Callout, PROVIDER_GOOGLE, Region } from 'react-native-maps'
+import MapView, { Marker, Callout, UrlTile, Region } from 'react-native-maps'
 import { Ionicons } from '@expo/vector-icons'
 import * as Location from 'expo-location'
 import { useNavigation, NavigationProp } from '@react-navigation/native'
@@ -329,18 +329,25 @@ const MerchantMapScreen: React.FC<Props> = ({ testID = TEST_IDS.merchantMapScree
     )
   }
 
-  // Main map view
+  // Main map view - Using OpenStreetMap (free, no API key required)
   return (
     <View style={styles.container} testID={testID}>
       <MapView
-        provider={PROVIDER_GOOGLE}
         style={styles.map}
         initialRegion={region}
         showsUserLocation={userLocation !== null}
         showsMyLocationButton={true}
         showsCompass={true}
+        mapType={Platform.OS === 'android' ? 'none' : 'standard'}
         testID={TEST_IDS.merchantMapView}
       >
+        {/* OpenStreetMap Tiles - 100% gratuit, pas de clé API */}
+        <UrlTile
+          urlTemplate="https://tile.openstreetmap.org/{z}/{x}/{y}.png"
+          maximumZ={19}
+          flipY={false}
+          tileSize={256}
+        />
         {merchants.map((merchant) => (
           <Marker
             key={merchant.id}
@@ -371,6 +378,11 @@ const MerchantMapScreen: React.FC<Props> = ({ testID = TEST_IDS.merchantMapScree
         <Text style={styles.badgeText}>
           {merchants.length} commerçant{merchants.length > 1 ? 's' : ''}
         </Text>
+      </View>
+
+      {/* OpenStreetMap Attribution (required by license) */}
+      <View style={styles.osmAttribution}>
+        <Text style={styles.osmAttributionText}>© OpenStreetMap</Text>
       </View>
     </View>
   )
@@ -528,6 +540,19 @@ const styles = StyleSheet.create({
     color: 'white',
     fontSize: 14,
     fontWeight: '600',
+  },
+  osmAttribution: {
+    position: 'absolute',
+    bottom: 8,
+    right: 8,
+    backgroundColor: 'rgba(255, 255, 255, 0.85)',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 4,
+  },
+  osmAttributionText: {
+    fontSize: 10,
+    color: '#666',
   },
 })
 
