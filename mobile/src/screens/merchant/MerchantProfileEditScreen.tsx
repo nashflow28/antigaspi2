@@ -216,9 +216,36 @@ const MerchantProfileEditScreen: React.FC = () => {
     }
   }
 
-  const handleMapLocationSelect = (lat: number, lng: number) => {
+  const handleMapLocationSelect = async (lat: number, lng: number) => {
+    // Update local state
     setLatitude(formatCoordinate(lat))
     setLongitude(formatCoordinate(lng))
+
+    // 🐛 BUG FIX: Auto-save location to backend when selected from map
+    try {
+      setLoading(true)
+      const response = await apiService.put('/merchants/location', {
+        latitude: lat,
+        longitude: lng,
+      })
+
+      if (response.success) {
+        // Refresh Redux store
+        await dispatch(refreshProfile() as any)
+        Alert.alert('Succès', 'Position mise à jour avec succès')
+        console.log('📍 [MerchantProfileEdit] Location saved:', { lat, lng })
+      } else {
+        throw new Error(response.message || 'Erreur lors de la sauvegarde')
+      }
+    } catch (error: any) {
+      console.error('❌ [MerchantProfileEdit] Location save error:', error)
+      Alert.alert(
+        'Erreur',
+        error.response?.data?.message || error.message || 'Impossible de sauvegarder la position'
+      )
+    } finally {
+      setLoading(false)
+    }
   }
 
   const pickImage = async () => {
