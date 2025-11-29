@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react'
+import React, { useState, useRef, useEffect, useCallback } from 'react'
 import {
   View,
   Text,
@@ -6,9 +6,8 @@ import {
   Modal,
   TouchableOpacity,
   Platform,
-  ActivityIndicator,
 } from 'react-native'
-import MapView, { Marker, UrlTile, Region, MapPressEvent } from 'react-native-maps'
+import MapView, { Marker, UrlTile, Region, MapPressEvent, MarkerDragStartEndEvent } from 'react-native-maps'
 import { Ionicons } from '@expo/vector-icons'
 import { useTheme } from '../theme'
 
@@ -53,7 +52,7 @@ const MapLocationPicker: React.FC<MapLocationPickerProps> = ({
     longitudeDelta: DEFAULT_REGION.longitudeDelta,
   })
 
-  // 🐛 BUG FIX: Reset state when modal opens or initial coordinates change
+  // Reset state when modal opens or initial coordinates change
   useEffect(() => {
     if (visible) {
       const newLat = initialLatitude ?? DEFAULT_REGION.latitude
@@ -63,7 +62,8 @@ const MapLocationPicker: React.FC<MapLocationPickerProps> = ({
       if (initialLatitude != null && initialLongitude != null) {
         setSelectedLocation({ latitude: initialLatitude, longitude: initialLongitude })
       } else {
-        setSelectedLocation(null)
+        // Si pas de position sauvegardée, placer le marqueur au centre par défaut
+        setSelectedLocation({ latitude: newLat, longitude: newLng })
       }
 
       // Update region and animate map to the position
@@ -84,13 +84,29 @@ const MapLocationPicker: React.FC<MapLocationPickerProps> = ({
     }
   }, [visible, initialLatitude, initialLongitude])
 
-  const handleMapPress = (event: MapPressEvent) => {
+  // Handle tap on map to place marker
+  const handleMapPress = useCallback((event: MapPressEvent) => {
+    const { latitude, longitude } = event.nativeEvent.coordinate
+    console.log('📍 [MapLocationPicker] Map pressed at:', { latitude, longitude })
+    setSelectedLocation({ latitude, longitude })
+  }, [])
+
+  // Handle marker drag end
+  const handleMarkerDragEnd = useCallback((event: MarkerDragStartEndEvent) => {
+    const { latitude, longitude } = event.nativeEvent.coordinate
+    console.log('📍 [MapLocationPicker] Marker dragged to:', { latitude, longitude })
+    setSelectedLocation({ latitude, longitude })
+  }, [])
+
+  // Handle marker drag (real-time updates)
+  const handleMarkerDrag = useCallback((event: MarkerDragStartEndEvent) => {
     const { latitude, longitude } = event.nativeEvent.coordinate
     setSelectedLocation({ latitude, longitude })
-  }
+  }, [])
 
   const handleConfirm = () => {
     if (selectedLocation) {
+      console.log('📍 [MapLocationPicker] Confirming location:', selectedLocation)
       onSelectLocation(selectedLocation.latitude, selectedLocation.longitude)
       onClose()
     }
@@ -106,7 +122,21 @@ const MapLocationPicker: React.FC<MapLocationPickerProps> = ({
         longitudeDelta: 0.01,
       })
     } else {
-      setSelectedLocation(null)
+      // Reset to default location
+      setSelectedLocation({ latitude: DEFAULT_REGION.latitude, longitude: DEFAULT_REGION.longitude })
+      mapRef.current?.animateToRegion(DEFAULT_REGION)
+    }
+  }
+
+  // Center map on marker
+  const handleCenterOnMarker = () => {
+    if (selectedLocation) {
+      mapRef.current?.animateToRegion({
+        latitude: selectedLocation.latitude,
+        longitude: selectedLocation.longitude,
+        latitudeDelta: 0.01,
+        longitudeDelta: 0.01,
+      }, 500)
     }
   }
 
@@ -149,7 +179,7 @@ const MapLocationPicker: React.FC<MapLocationPickerProps> = ({
         <View style={[styles.instructions, { backgroundColor: theme.colors.info }]}>
           <Ionicons name="information-circle" size={20} color={theme.colors.primary[500]} />
           <Text style={[styles.instructionsText, { color: theme.colors.text }]}>
-            Déplacez la carte pour positionner le marqueur sur votre commerce
+            Déplacez le marqueur ou appuyez sur la carte pour choisir la position
           </Text>
         </View>
 
@@ -159,14 +189,7 @@ const MapLocationPicker: React.FC<MapLocationPickerProps> = ({
             ref={mapRef}
             style={styles.map}
             initialRegion={region}
-            onRegionChangeComplete={(newRegion) => {
-              setRegion(newRegion)
-              // Update selected location to center of map when panning
-              setSelectedLocation({
-                latitude: newRegion.latitude,
-                longitude: newRegion.longitude,
-              })
-            }}
+            onPress={handleMapPress}
             showsUserLocation={true}
             showsMyLocationButton={true}
             showsCompass={true}
@@ -179,20 +202,41 @@ const MapLocationPicker: React.FC<MapLocationPickerProps> = ({
               flipY={false}
               tileSize={256}
             />
-          </MapView>
 
-          {/* Fixed center marker - always visible */}
-          <View style={styles.centerMarkerContainer} pointerEvents="none">
-            <View style={[styles.centerMarker, { backgroundColor: theme.colors.primary[500] }]}>
-              <Ionicons name="storefront" size={24} color="white" />
-            </View>
-            <View style={[styles.centerMarkerTail, { borderTopColor: theme.colors.primary[500] }]} />
-          </View>
+            {/* Draggable Marker */}
+            {selectedLocation && (
+              <Marker
+                coordinate={selectedLocation}
+                draggable={true}
+                onDrag={handleMarkerDrag}
+                onDragEnd={handleMarkerDragEnd}
+                anchor={{ x: 0.5, y: 1 }}
+                centerOffset={{ x: 0, y: -24 }}
+              >
+                <View style={styles.customMarkerContainer}>
+                  <View style={[styles.customMarker, { backgroundColor: theme.colors.primary[500] }]}>
+                    <Ionicons name="storefront" size={24} color="white" />
+                  </View>
+                  <View style={[styles.customMarkerTail, { borderTopColor: theme.colors.primary[500] }]} />
+                </View>
+              </Marker>
+            )}
+          </MapView>
 
           {/* OpenStreetMap Attribution */}
           <View style={styles.osmAttribution}>
             <Text style={styles.osmAttributionText}>© OpenStreetMap</Text>
           </View>
+
+          {/* Center on marker button */}
+          {selectedLocation && (
+            <TouchableOpacity
+              style={[styles.centerButton, { backgroundColor: theme.colors.background }]}
+              onPress={handleCenterOnMarker}
+            >
+              <Ionicons name="locate" size={24} color={theme.colors.primary[500]} />
+            </TouchableOpacity>
+          )}
         </View>
 
         {/* Selected coordinates display */}
@@ -297,15 +341,25 @@ const styles = StyleSheet.create({
     fontSize: 10,
     color: '#666',
   },
-  centerMarkerContainer: {
+  centerButton: {
     position: 'absolute',
-    top: '50%',
-    left: '50%',
-    marginLeft: -24,
-    marginTop: -48,
+    bottom: 16,
+    left: 16,
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+  customMarkerContainer: {
     alignItems: 'center',
   },
-  centerMarker: {
+  customMarker: {
     width: 48,
     height: 48,
     borderRadius: 24,
@@ -319,7 +373,7 @@ const styles = StyleSheet.create({
     shadowRadius: 6,
     elevation: 8,
   },
-  centerMarkerTail: {
+  customMarkerTail: {
     width: 0,
     height: 0,
     borderLeftWidth: 10,
