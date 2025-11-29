@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react'
+import React, { useState, useRef, useEffect } from 'react'
 import {
   View,
   Text,
@@ -52,6 +52,37 @@ const MapLocationPicker: React.FC<MapLocationPickerProps> = ({
     latitudeDelta: DEFAULT_REGION.latitudeDelta,
     longitudeDelta: DEFAULT_REGION.longitudeDelta,
   })
+
+  // 🐛 BUG FIX: Reset state when modal opens or initial coordinates change
+  useEffect(() => {
+    if (visible) {
+      const newLat = initialLatitude ?? DEFAULT_REGION.latitude
+      const newLng = initialLongitude ?? DEFAULT_REGION.longitude
+
+      // Update selected location
+      if (initialLatitude != null && initialLongitude != null) {
+        setSelectedLocation({ latitude: initialLatitude, longitude: initialLongitude })
+      } else {
+        setSelectedLocation(null)
+      }
+
+      // Update region and animate map to the position
+      const newRegion = {
+        latitude: newLat,
+        longitude: newLng,
+        latitudeDelta: 0.01,
+        longitudeDelta: 0.01,
+      }
+      setRegion(newRegion)
+
+      // Animate map to the saved position
+      setTimeout(() => {
+        mapRef.current?.animateToRegion(newRegion, 500)
+      }, 100)
+
+      console.log('📍 [MapLocationPicker] Initialized with:', { lat: newLat, lng: newLng })
+    }
+  }, [visible, initialLatitude, initialLongitude])
 
   const handleMapPress = (event: MapPressEvent) => {
     const { latitude, longitude } = event.nativeEvent.coordinate
@@ -118,7 +149,7 @@ const MapLocationPicker: React.FC<MapLocationPickerProps> = ({
         <View style={[styles.instructions, { backgroundColor: theme.colors.info }]}>
           <Ionicons name="information-circle" size={20} color={theme.colors.primary[500]} />
           <Text style={[styles.instructionsText, { color: theme.colors.text }]}>
-            Appuyez sur la carte pour placer votre commerce
+            Déplacez la carte pour positionner le marqueur sur votre commerce
           </Text>
         </View>
 
@@ -128,8 +159,14 @@ const MapLocationPicker: React.FC<MapLocationPickerProps> = ({
             ref={mapRef}
             style={styles.map}
             initialRegion={region}
-            onRegionChangeComplete={setRegion}
-            onPress={handleMapPress}
+            onRegionChangeComplete={(newRegion) => {
+              setRegion(newRegion)
+              // Update selected location to center of map when panning
+              setSelectedLocation({
+                latitude: newRegion.latitude,
+                longitude: newRegion.longitude,
+              })
+            }}
             showsUserLocation={true}
             showsMyLocationButton={true}
             showsCompass={true}
@@ -142,23 +179,15 @@ const MapLocationPicker: React.FC<MapLocationPickerProps> = ({
               flipY={false}
               tileSize={256}
             />
-
-            {/* Selected location marker */}
-            {selectedLocation && (
-              <Marker
-                coordinate={selectedLocation}
-                draggable
-                onDragEnd={(e) => setSelectedLocation(e.nativeEvent.coordinate)}
-              >
-                <View style={styles.markerContainer}>
-                  <View style={[styles.marker, { backgroundColor: theme.colors.primary[500] }]}>
-                    <Ionicons name="storefront" size={20} color="white" />
-                  </View>
-                  <View style={[styles.markerTail, { borderTopColor: theme.colors.primary[500] }]} />
-                </View>
-              </Marker>
-            )}
           </MapView>
+
+          {/* Fixed center marker - always visible */}
+          <View style={styles.centerMarkerContainer} pointerEvents="none">
+            <View style={[styles.centerMarker, { backgroundColor: theme.colors.primary[500] }]}>
+              <Ionicons name="storefront" size={24} color="white" />
+            </View>
+            <View style={[styles.centerMarkerTail, { borderTopColor: theme.colors.primary[500] }]} />
+          </View>
 
           {/* OpenStreetMap Attribution */}
           <View style={styles.osmAttribution}>
@@ -268,32 +297,37 @@ const styles = StyleSheet.create({
     fontSize: 10,
     color: '#666',
   },
-  markerContainer: {
+  centerMarkerContainer: {
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    marginLeft: -24,
+    marginTop: -48,
     alignItems: 'center',
   },
-  marker: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+  centerMarker: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 3,
     borderColor: 'white',
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
-    elevation: 5,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 6,
+    elevation: 8,
   },
-  markerTail: {
+  centerMarkerTail: {
     width: 0,
     height: 0,
-    borderLeftWidth: 8,
-    borderRightWidth: 8,
-    borderTopWidth: 10,
+    borderLeftWidth: 10,
+    borderRightWidth: 10,
+    borderTopWidth: 14,
     borderLeftColor: 'transparent',
     borderRightColor: 'transparent',
-    marginTop: -2,
+    marginTop: -3,
   },
   coordinatesDisplay: {
     marginHorizontal: 16,
