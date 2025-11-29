@@ -223,23 +223,19 @@ const MapLocationPicker: React.FC<MapLocationPickerProps> = ({
               tileSize={256}
             />
 
-            {/* Draggable Marker */}
+            {/* Draggable Marker - Using default pin for Android compatibility */}
             {selectedLocation && (
               <Marker
                 coordinate={selectedLocation}
                 draggable={true}
                 onDrag={handleMarkerDrag}
                 onDragEnd={handleMarkerDragEnd}
-                anchor={{ x: 0.5, y: 1 }}
-                centerOffset={{ x: 0, y: -24 }}
-              >
-                <View style={styles.customMarkerContainer}>
-                  <View style={[styles.customMarker, { backgroundColor: theme.colors.primary[500] }]}>
-                    <Ionicons name="storefront" size={24} color="white" />
-                  </View>
-                  <View style={[styles.customMarkerTail, { borderTopColor: theme.colors.primary[500] }]} />
-                </View>
-              </Marker>
+                pinColor={theme.colors.primary[500]}
+                title="Position du commerce"
+                description="Déplacez-moi pour changer la position"
+                tracksViewChanges={Platform.OS === 'ios'}
+                zIndex={1000}
+              />
             )}
           </MapView>
 
@@ -373,33 +369,6 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.25,
     shadowRadius: 4,
     elevation: 5,
-  },
-  customMarkerContainer: {
-    alignItems: 'center',
-  },
-  customMarker: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderWidth: 3,
-    borderColor: 'white',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 6,
-    elevation: 8,
-  },
-  customMarkerTail: {
-    width: 0,
-    height: 0,
-    borderLeftWidth: 10,
-    borderRightWidth: 10,
-    borderTopWidth: 14,
-    borderLeftColor: 'transparent',
-    borderRightColor: 'transparent',
-    marginTop: -3,
   },
   coordinatesDisplay: {
     marginHorizontal: 16,

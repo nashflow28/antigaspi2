@@ -69,15 +69,17 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
       </Typography>
       <TextInput
         style={{
-          backgroundColor: theme.colors.surface.light,
+          backgroundColor: theme.colors.inputBackground,
           paddingHorizontal: theme.spacing.md,
           paddingVertical: theme.spacing.sm,
           borderRadius: theme.radius.md,
           borderWidth: 1,
-          borderColor: theme.colors.border,
-          fontSize: 16
+          borderColor: theme.colors.inputBorder,
+          fontSize: 16,
+          color: theme.colors.text,
         }}
         placeholder={placeholder}
+        placeholderTextColor={theme.colors.textSecondary}
         value={value}
         onChangeText={(text) => setFormData({ ...formData, [field]: text })}
         keyboardType={options?.keyboardType}

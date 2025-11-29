@@ -81,15 +81,17 @@ const LoginScreen: React.FC<Props> = ({ navigation }) => {
             </Typography>
             <TextInput
               style={[styles.input, {
-                backgroundColor: theme.colors.surface.light,
+                backgroundColor: theme.colors.inputBackground,
                 paddingHorizontal: theme.spacing.md,
                 paddingVertical: theme.spacing.sm,
                 borderRadius: theme.radius.md,
                 borderWidth: 1,
-                borderColor: theme.colors.border,
-                fontSize: 16
+                borderColor: theme.colors.inputBorder,
+                fontSize: 16,
+                color: theme.colors.text,
               }]}
               placeholder="votre@email.com"
+              placeholderTextColor={theme.colors.textSecondary}
               value={credentials.email}
               onChangeText={(text) => setCredentials({ ...credentials, email: text })}
               keyboardType="email-address"
@@ -106,15 +108,17 @@ const LoginScreen: React.FC<Props> = ({ navigation }) => {
             </Typography>
             <TextInput
               style={[styles.input, {
-                backgroundColor: theme.colors.surface.light,
+                backgroundColor: theme.colors.inputBackground,
                 paddingHorizontal: theme.spacing.md,
                 paddingVertical: theme.spacing.sm,
                 borderRadius: theme.radius.md,
                 borderWidth: 1,
-                borderColor: theme.colors.border,
-                fontSize: 16
+                borderColor: theme.colors.inputBorder,
+                fontSize: 16,
+                color: theme.colors.text,
               }]}
               placeholder="Votre mot de passe"
+              placeholderTextColor={theme.colors.textSecondary}
               value={credentials.password}
               onChangeText={(text) => setCredentials({ ...credentials, password: text })}
               secureTextEntry
