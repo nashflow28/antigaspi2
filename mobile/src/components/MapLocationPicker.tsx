@@ -9,7 +9,6 @@ import {
 } from 'react-native'
 import MapView, {
   Marker,
-  UrlTile,
   Region,
   MapPressEvent,
   MarkerDragStartEndEvent,
@@ -213,35 +212,25 @@ const MapLocationPicker: React.FC<MapLocationPickerProps> = ({
             showsUserLocation={true}
             showsMyLocationButton={true}
             showsCompass={true}
-            mapType={Platform.OS === 'android' ? 'none' : 'standard'}
+            mapType="standard"
           >
-            {/* OpenStreetMap Tiles */}
-            <UrlTile
-              urlTemplate="https://tile.openstreetmap.org/{z}/{x}/{y}.png"
-              maximumZ={19}
-              flipY={false}
-              tileSize={256}
-            />
-
-            {/* Draggable Marker - Using default pin for Android compatibility */}
+            {/* Draggable Marker - Native Google Maps marker */}
             {selectedLocation && (
               <Marker
                 coordinate={selectedLocation}
                 draggable={true}
                 onDrag={handleMarkerDrag}
                 onDragEnd={handleMarkerDragEnd}
-                pinColor={theme.colors.primary[500]}
+                pinColor="#10B981"
                 title="Position du commerce"
                 description="Déplacez-moi pour changer la position"
-                tracksViewChanges={Platform.OS === 'ios'}
-                zIndex={1000}
               />
             )}
           </MapView>
 
-          {/* OpenStreetMap Attribution */}
+          {/* Google Maps Attribution */}
           <View style={styles.osmAttribution}>
-            <Text style={styles.osmAttributionText}>(c) OpenStreetMap</Text>
+            <Text style={styles.osmAttributionText}>Google Maps</Text>
           </View>
 
           {/* Center on marker button */}
