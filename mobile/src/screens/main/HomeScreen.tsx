@@ -21,7 +21,7 @@ import { getImageUrl } from '../../utils/imageHelpers'
 import { formatCurrency } from '../../utils/currencyHelpers'
 import FavoriteButton from '../../components/FavoriteButton'
 import locationService, { UserLocation } from '../../services/locationService'
-import { Button, Card, Badge, Typography } from '../../components/2025'
+import { Button, Card, Badge, Typography, Modal } from '../../components/2025'
 import { TEST_IDS } from '../../utils/testIds'
 
 interface Props {
@@ -45,6 +45,7 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
   const [userLocation, setUserLocation] = useState<UserLocation | null>(null)
   const [distanceEnabled, setDistanceEnabled] = useState(false)
   const [locationPermissionGranted, setLocationPermissionGranted] = useState(false)
+  const [showDistanceModal, setShowDistanceModal] = useState(false)
 
   useEffect(() => {
     loadData()
@@ -242,19 +243,19 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
       // Activer le filtre distance avec la distance actuelle
       setDistanceEnabled(true)
     } else {
-      // Changer la distance ou désactiver
-      Alert.alert(
-        'Filtre distance',
-        'Choisissez une distance maximum',
-        [
-          { text: '< 5 km', onPress: () => setMaxDistance(5) },
-          { text: '< 10 km', onPress: () => setMaxDistance(10) },
-          { text: '< 20 km', onPress: () => setMaxDistance(20) },
-          { text: 'Désactiver', style: 'destructive', onPress: () => setDistanceEnabled(false) },
-          { text: 'Annuler', style: 'cancel' },
-        ]
-      )
+      // Afficher le modal pour changer la distance ou désactiver
+      setShowDistanceModal(true)
     }
+  }
+
+  const handleDistanceSelect = (distance: number) => {
+    setMaxDistance(distance)
+    setShowDistanceModal(false)
+  }
+
+  const handleDistanceDisable = () => {
+    setDistanceEnabled(false)
+    setShowDistanceModal(false)
   }
 
   const renderProductCard = (product: Product, index?: number) => {
@@ -568,6 +569,50 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
           )}
         </View>
       </ScrollView>
+
+      {/* Modal filtre distance */}
+      <Modal
+        visible={showDistanceModal}
+        onClose={() => setShowDistanceModal(false)}
+        title="Filtre distance"
+        variant="bottom"
+      >
+        <Typography variant="body" color="secondary" style={{ marginBottom: theme.spacing.lg }}>
+          Choisissez une distance maximum
+        </Typography>
+
+        {[5, 10, 20].map((distance) => (
+          <TouchableOpacity
+            key={distance}
+            style={[
+              styles.distanceOption,
+              maxDistance === distance && styles.distanceOptionActive,
+            ]}
+            onPress={() => handleDistanceSelect(distance)}
+          >
+            <Typography
+              variant="body"
+              weight={maxDistance === distance ? 'semibold' : 'regular'}
+              style={{ color: maxDistance === distance ? theme.colors.primary[500] : theme.colors.text }}
+            >
+              {'< '}{distance} KM
+            </Typography>
+            {maxDistance === distance && (
+              <Ionicons name="checkmark-circle" size={24} color={theme.colors.primary[500]} />
+            )}
+          </TouchableOpacity>
+        ))}
+
+        <TouchableOpacity
+          style={styles.disableButton}
+          onPress={handleDistanceDisable}
+        >
+          <Ionicons name="close-circle" size={20} color={theme.colors.error} />
+          <Typography variant="body" weight="medium" style={{ color: theme.colors.error }}>
+            Désactiver le filtre
+          </Typography>
+        </TouchableOpacity>
+      </Modal>
     </View>
   )
 }
@@ -779,6 +824,32 @@ const createStyles = (theme: ReturnType<typeof useTheme>) => StyleSheet.create({
     justifyContent: 'center',
     paddingVertical: theme.spacing['3xl'],
     paddingHorizontal: theme.spacing.xl,
+  },
+  distanceOption: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingVertical: theme.spacing.md,
+    paddingHorizontal: theme.spacing.lg,
+    marginBottom: theme.spacing.sm,
+    borderRadius: theme.radius.lg,
+    backgroundColor: theme.colors.surface.light,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+  },
+  distanceOptionActive: {
+    backgroundColor: theme.colors.primary[50],
+    borderColor: theme.colors.primary[500],
+  },
+  disableButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: theme.spacing.md,
+    marginTop: theme.spacing.lg,
+    gap: theme.spacing.sm,
+    borderRadius: theme.radius.lg,
+    backgroundColor: theme.colors.error + '10',
   },
 })
 
