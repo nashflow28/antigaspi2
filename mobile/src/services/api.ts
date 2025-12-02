@@ -845,6 +845,16 @@ class ApiService {
   async getStoredToken(): Promise<string | null> {
     return await AsyncStorage.getItem('auth_token')
   }
+
+  // Nettoyer les données d'authentification stockées
+  async clearStoredAuth(): Promise<void> {
+    try {
+      await AsyncStorage.multiRemove(['auth_token', 'user_data'])
+      console.log('🧹 [API] Données d\'authentification nettoyées')
+    } catch (error) {
+      console.error('❌ [API] Erreur lors du nettoyage des données d\'auth:', error)
+    }
+  }
 }
 
 export const apiService = new ApiService()

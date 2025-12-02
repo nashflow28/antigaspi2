@@ -53,12 +53,24 @@ export const loadStoredAuth = createAsyncThunk(
   'auth/loadStored',
   async (_, { rejectWithValue }) => {
     try {
+      // Importer dynamiquement pour éviter les dépendances circulaires
+      const { isTokenExpired } = await import('../../utils/jwtHelpers')
+
       const [token, user] = await Promise.all([
         apiService.getStoredToken(),
         apiService.getStoredUser(),
       ])
 
       if (token && user) {
+        // Vérifier si le token est expiré AVANT de restaurer la session
+        if (isTokenExpired(token)) {
+          console.log('🔒 [Auth] Token expiré détecté au démarrage - nettoyage de la session')
+          // Nettoyer le stockage local
+          await apiService.clearStoredAuth()
+          return null
+        }
+
+        console.log('✅ [Auth] Session restaurée avec succès')
         return { token, user }
       }
 
