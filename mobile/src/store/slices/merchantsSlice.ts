@@ -9,10 +9,13 @@ export interface Merchant {
   latitude: number | null
   longitude: number | null
   products_count: number
+  photo_url?: string | null
+  logo_url?: string | null
   user: {
     city: string
     address: string | null
     phone: string
+    photo_url?: string | null
   }
 }
 

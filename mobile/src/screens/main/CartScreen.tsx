@@ -11,6 +11,7 @@ import {
   Alert,
   KeyboardAvoidingView,
 } from 'react-native'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import DateTimePicker from '@react-native-community/datetimepicker'
 import { useDispatch, useSelector } from 'react-redux'
 import { useFocusEffect } from '@react-navigation/native'
@@ -43,6 +44,7 @@ const MOBILE_MONEY_METHODS: PaymentMethod[] = ['flooz', 'tmoney', 'orange_money'
 const CartScreen: React.FC<Props> = ({ navigation }) => {
   const dispatch = useDispatch<AppDispatch>()
   const theme = useTheme()
+  const insets = useSafeAreaInsets()
   const { showSuccess, showError } = useToast()
   const {
     cart,
@@ -332,6 +334,14 @@ const CartScreen: React.FC<Props> = ({ navigation }) => {
     navigation.getParent()?.navigate('Orders')
   }
 
+  const goToMerchantProducts = () => {
+    if (cart?.merchant?.id) {
+      navigation.navigate('MerchantDetail', {
+        merchantId: cart.merchant.id,
+      })
+    }
+  }
+
   return (
     <View
       style={[styles.container, { backgroundColor: theme.colors.background }]}
@@ -339,7 +349,7 @@ const CartScreen: React.FC<Props> = ({ navigation }) => {
     >
       <StatusBar barStyle={theme.isDark ? 'light-content' : 'dark-content'} />
 
-      <View style={styles.header}>
+      <View style={[styles.header, { paddingTop: insets.top + 8 }]}>
         <Typography variant="h2" weight="bold">
           Mon panier
         </Typography>
@@ -404,6 +414,20 @@ const CartScreen: React.FC<Props> = ({ navigation }) => {
                   >
                     {pickupWindowMessage}
                   </Typography>
+
+                  {/* Continue Shopping Button */}
+                  <TouchableOpacity
+                    style={[styles.continueShoppingButton, { backgroundColor: theme.colors.primary[50], borderColor: theme.colors.primary[200] }]}
+                    onPress={goToMerchantProducts}
+                    accessibilityRole="button"
+                    accessibilityLabel={`Continuer mes achats chez ${cart.merchant?.name || 'ce commerce'}`}
+                  >
+                    <Ionicons name="add-circle-outline" size={20} color={theme.colors.primary[600]} />
+                    <Typography variant="body" weight="semibold" style={{ color: theme.colors.primary[700], flex: 1 }}>
+                      Ajouter d'autres produits
+                    </Typography>
+                    <Ionicons name="chevron-forward" size={20} color={theme.colors.primary[600]} />
+                  </TouchableOpacity>
                 </Card>
 
                 {cart.items.map(item => (
@@ -753,6 +777,16 @@ const styles = StyleSheet.create({
     padding: 16,
     borderRadius: 16,
     gap: 4,
+  },
+  continueShoppingButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderRadius: 12,
+    borderWidth: 1,
+    marginTop: 16,
   },
   cartItemCard: {
     padding: 16,

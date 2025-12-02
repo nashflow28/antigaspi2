@@ -9,6 +9,7 @@ import {
   Alert,
   Dimensions,
 } from 'react-native'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useDispatch, useSelector } from 'react-redux'
 import { AppDispatch, RootState } from '../../store'
 import {
@@ -35,6 +36,7 @@ const { width } = Dimensions.get('window')
 
 const ReservationsScreen: React.FC<Props> = ({ navigation }) => {
   const theme = useTheme()
+  const insets = useSafeAreaInsets()
   const dispatch = useDispatch<AppDispatch>()
   const { reservations, loading } = useSelector((state: RootState) => state.reservations)
   const { user } = useSelector((state: RootState) => state.auth)
@@ -397,7 +399,7 @@ const ReservationsScreen: React.FC<Props> = ({ navigation }) => {
       <StatusBar backgroundColor={theme.colors.primary[500]} barStyle="light-content" />
 
       {/* Header */}
-      <View style={[styles.header, { backgroundColor: theme.colors.primary[500], paddingHorizontal: theme.spacing.lg, paddingTop: theme.spacing['2xl'], paddingBottom: theme.spacing.lg }]}>
+      <View style={[styles.header, { backgroundColor: theme.colors.primary[500], paddingHorizontal: theme.spacing.lg, paddingTop: insets.top + 16, paddingBottom: theme.spacing.lg }]}>
         <Typography variant="h2" weight="bold" style={{ color: theme.colors.textInverse, marginBottom: theme.spacing.xs }}>
           Mes réservations
         </Typography>

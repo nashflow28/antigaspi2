@@ -9,6 +9,7 @@ import {
   RefreshControl,
   Alert,
 } from 'react-native'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { Image } from 'expo-image'
 import { Ionicons } from '@expo/vector-icons'
 import { useTheme } from '../../theme'
@@ -27,6 +28,7 @@ type NavigationProp = NativeStackNavigationProp<RootStackParamList, 'ProductDeta
 
 const FavoritesScreen: React.FC = () => {
   const theme = useTheme()
+  const insets = useSafeAreaInsets()
   const styles = createStyles(theme)
   const dispatch = useAppDispatch()
   const navigation = useNavigation<NavigationProp>()
@@ -147,7 +149,7 @@ const FavoritesScreen: React.FC = () => {
   if (loading && favorites.length === 0) {
     return (
       <View style={styles.container}>
-        <View style={styles.header}>
+        <View style={[styles.header, { paddingTop: insets.top + 8 }]}>
           <Typography variant="h2" weight="bold">
             Favoris
           </Typography>
@@ -165,7 +167,7 @@ const FavoritesScreen: React.FC = () => {
   if (error) {
     return (
       <View style={styles.container}>
-        <View style={styles.header}>
+        <View style={[styles.header, { paddingTop: insets.top + 8 }]}>
           <Typography variant="h2" weight="bold">
             Favoris
           </Typography>
@@ -192,7 +194,7 @@ const FavoritesScreen: React.FC = () => {
 
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
+      <View style={[styles.header, { paddingTop: insets.top + 8 }]}>
         <Typography variant="h2" weight="bold">
           Favoris
         </Typography>

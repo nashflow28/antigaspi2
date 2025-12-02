@@ -70,7 +70,6 @@ class ConsumerController extends Controller
                 'phone' => $request->filled('phone') ? trim($request->input('phone')) : null,
                 'address' => $request->filled('address') ? trim($request->input('address')) : null,
                 'city' => $request->filled('city') ? trim($request->input('city')) : null,
-                'name' => trim($request->input('first_name')) . ' ' . trim($request->input('last_name')),
             ];
 
             $user->update($payload);

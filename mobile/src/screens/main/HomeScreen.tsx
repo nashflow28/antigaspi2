@@ -8,7 +8,9 @@ import {
   StatusBar,
   RefreshControl,
   Alert,
+  Modal,
 } from 'react-native'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useDispatch, useSelector } from 'react-redux'
 import { AppDispatch, RootState } from '../../store'
 import { fetchProducts, fetchCategories } from '../../store/slices/productsSlice'
@@ -35,6 +37,7 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
   const { cart } = useSelector((state: RootState) => state.cart)
   const { showError } = useToast()
   const theme = useTheme()
+  const insets = useSafeAreaInsets()
 
   const cartItemsCount = cart?.items_count ?? 0
 
@@ -44,6 +47,7 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
   const [maxDistance, setMaxDistance] = useState(10)
   const [userLocation, setUserLocation] = useState<UserLocation | null>(null)
   const [distanceEnabled, setDistanceEnabled] = useState(false)
+  const [showDistanceModal, setShowDistanceModal] = useState(false)
   const [locationPermissionGranted, setLocationPermissionGranted] = useState(false)
 
   useEffect(() => {
@@ -207,7 +211,15 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
     )
   }
 
-  const handleDistanceFilterPress = async () => {
+  // Toggle distance filter on/off directly
+  const handleDistanceToggle = async () => {
+    if (distanceEnabled) {
+      // Désactiver directement
+      setDistanceEnabled(false)
+      return
+    }
+
+    // Activer le filtre
     if (!locationPermissionGranted) {
       // Demander permission
       Alert.alert(
@@ -238,23 +250,21 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
       return
     }
 
-    if (!distanceEnabled) {
-      // Activer le filtre distance avec la distance actuelle
-      setDistanceEnabled(true)
-    } else {
-      // Changer la distance ou désactiver
-      Alert.alert(
-        'Filtre distance',
-        'Choisissez une distance maximum',
-        [
-          { text: '< 5 km', onPress: () => setMaxDistance(5) },
-          { text: '< 10 km', onPress: () => setMaxDistance(10) },
-          { text: '< 20 km', onPress: () => setMaxDistance(20) },
-          { text: 'Désactiver', style: 'destructive', onPress: () => setDistanceEnabled(false) },
-          { text: 'Annuler', style: 'cancel' },
-        ]
-      )
+    // Activer le filtre distance avec la distance actuelle
+    setDistanceEnabled(true)
+  }
+
+  // Show distance options modal
+  const handleDistanceOptionsPress = () => {
+    if (distanceEnabled) {
+      setShowDistanceModal(true)
     }
+  }
+
+  // Select a distance option
+  const handleDistanceSelect = (distance: number) => {
+    setMaxDistance(distance)
+    setShowDistanceModal(false)
   }
 
   const renderProductCard = (product: Product, index?: number) => {
@@ -390,7 +400,7 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
         }
       >
         {/* Header */}
-        <View style={styles.header}>
+        <View style={[styles.header, { paddingTop: insets.top + 8 }]}>
           <View style={{ flex: 1 }}>
             <Typography variant="h2" weight="bold" color="primary" style={{ marginBottom: theme.spacing.xs }}>
               Bonjour {user?.first_name || 'Invité'}
@@ -470,12 +480,11 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
             />
           </TouchableOpacity>
 
-          <TouchableOpacity
+          <View
             style={[
               styles.distanceFilter,
               distanceEnabled && styles.distanceFilterActive
             ]}
-            onPress={handleDistanceFilterPress}
           >
             <Ionicons
               name="location"
@@ -484,26 +493,37 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
                 ? theme.colors.interactiveTextActive
                 : theme.colors.textSecondary}
             />
-            <Typography
-              variant="caption"
-              weight="medium"
-              style={{
-                color: distanceEnabled
-                  ? theme.colors.interactiveTextActive
-                  : theme.colors.interactiveText,
-                fontWeight: distanceEnabled ? '600' : '500',
-              }}
+            {/* Tap on text to change distance (when enabled) */}
+            <TouchableOpacity
+              onPress={distanceEnabled ? handleDistanceOptionsPress : handleDistanceToggle}
             >
-              {`< ${maxDistance} km`}
-            </Typography>
-            <Ionicons
-              name={distanceEnabled ? "toggle" : "toggle-outline"}
-              size={24}
-              color={distanceEnabled
-                ? theme.colors.interactiveTextActive
-                : theme.colors.textSecondary}
-            />
-          </TouchableOpacity>
+              <Typography
+                variant="caption"
+                weight="medium"
+                style={{
+                  color: distanceEnabled
+                    ? theme.colors.interactiveTextActive
+                    : theme.colors.interactiveText,
+                  fontWeight: distanceEnabled ? '600' : '500',
+                }}
+              >
+                {`< ${maxDistance} km`}
+              </Typography>
+            </TouchableOpacity>
+            {/* Tap on toggle to enable/disable directly */}
+            <TouchableOpacity
+              onPress={handleDistanceToggle}
+              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+            >
+              <Ionicons
+                name={distanceEnabled ? "toggle" : "toggle-outline"}
+                size={24}
+                color={distanceEnabled
+                  ? theme.colors.interactiveTextActive
+                  : theme.colors.textSecondary}
+              />
+            </TouchableOpacity>
+          </View>
         </View>
 
         {/* Compteur de résultats */}
@@ -568,6 +588,79 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
           )}
         </View>
       </ScrollView>
+
+      {/* Distance Options Modal */}
+      <Modal
+        visible={showDistanceModal}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setShowDistanceModal(false)}
+      >
+        <TouchableOpacity
+          style={styles.modalOverlay}
+          activeOpacity={1}
+          onPress={() => setShowDistanceModal(false)}
+        >
+          <View style={styles.modalContent}>
+            <Typography variant="h3" weight="bold" style={{ marginBottom: theme.spacing.xs }}>
+              Filtre distance
+            </Typography>
+            <Typography variant="body" color="secondary" style={{ marginBottom: theme.spacing.md }}>
+              Choisissez une distance maximum
+            </Typography>
+
+            <View style={styles.distanceOptions}>
+              <TouchableOpacity
+                style={[
+                  styles.distanceOption,
+                  maxDistance === 5 && styles.distanceOptionActive,
+                ]}
+                onPress={() => handleDistanceSelect(5)}
+              >
+                <Typography
+                  variant="body"
+                  weight={maxDistance === 5 ? 'bold' : 'medium'}
+                  color="primary"
+                >
+                  {'< 5 KM'}
+                </Typography>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={[
+                  styles.distanceOption,
+                  maxDistance === 10 && styles.distanceOptionActive,
+                ]}
+                onPress={() => handleDistanceSelect(10)}
+              >
+                <Typography
+                  variant="body"
+                  weight={maxDistance === 10 ? 'bold' : 'medium'}
+                  color="primary"
+                >
+                  {'< 10 KM'}
+                </Typography>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={[
+                  styles.distanceOption,
+                  maxDistance === 20 && styles.distanceOptionActive,
+                ]}
+                onPress={() => handleDistanceSelect(20)}
+              >
+                <Typography
+                  variant="body"
+                  weight={maxDistance === 20 ? 'bold' : 'medium'}
+                  color="primary"
+                >
+                  {'< 20 KM'}
+                </Typography>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </TouchableOpacity>
+      </Modal>
     </View>
   )
 }
@@ -779,6 +872,41 @@ const createStyles = (theme: ReturnType<typeof useTheme>) => StyleSheet.create({
     justifyContent: 'center',
     paddingVertical: theme.spacing['3xl'],
     paddingHorizontal: theme.spacing.xl,
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: theme.spacing.lg,
+  },
+  modalContent: {
+    backgroundColor: theme.colors.background,
+    borderRadius: theme.radius.xl,
+    padding: theme.spacing.lg,
+    width: '100%',
+    maxWidth: 320,
+    ...theme.shadows.lg,
+  },
+  distanceOptions: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    gap: theme.spacing.sm,
+  },
+  distanceOption: {
+    flex: 1,
+    paddingVertical: theme.spacing.md,
+    paddingHorizontal: theme.spacing.sm,
+    borderRadius: theme.radius.lg,
+    backgroundColor: theme.colors.interactiveSurface,
+    borderWidth: 1,
+    borderColor: theme.colors.interactiveBorder,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  distanceOptionActive: {
+    backgroundColor: theme.colors.interactiveSurfaceActive,
+    borderColor: theme.colors.interactiveBorderActive,
   },
 })
 

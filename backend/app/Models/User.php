@@ -14,7 +14,6 @@ class User extends Authenticatable implements JWTSubject
     use HasFactory, Notifiable;
 
     protected $fillable = [
-        'name',
         'email',
         'password',
         'first_name',
@@ -50,6 +49,15 @@ class User extends Authenticatable implements JWTSubject
             'prefers_push_notifications' => 'boolean',
             'notification_settings' => 'array',
         ];
+    }
+
+    /**
+     * Accesseur pour le nom complet (lecture seule).
+     * Combine first_name et last_name sans stocker en base.
+     */
+    public function getNameAttribute(): string
+    {
+        return trim(($this->first_name ?? '') . ' ' . ($this->last_name ?? ''));
     }
 
     // JWT Methods

@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react'
 import { View } from 'react-native'
+import { SafeAreaProvider } from 'react-native-safe-area-context'
 import { Provider, useDispatch } from 'react-redux'
 import { store, AppDispatch } from './src/store'
 import { clearAuth } from './src/store/slices/authSlice'
@@ -33,16 +34,18 @@ export default function App() {
   console.log('✅ APP FINALE: Redux + Theme + Toast + Navigation')
 
   return (
-    <Provider store={store}>
-      <ThemeProvider>
-        <ToastProvider>
-          <AlertProvider>
-            <View style={{ flex: 1 }}>
-              <AppContent />
-            </View>
-          </AlertProvider>
-        </ToastProvider>
-      </ThemeProvider>
-    </Provider>
+    <SafeAreaProvider>
+      <Provider store={store}>
+        <ThemeProvider>
+          <ToastProvider>
+            <AlertProvider>
+              <View style={{ flex: 1 }}>
+                <AppContent />
+              </View>
+            </AlertProvider>
+          </ToastProvider>
+        </ThemeProvider>
+      </Provider>
+    </SafeAreaProvider>
   )
 }

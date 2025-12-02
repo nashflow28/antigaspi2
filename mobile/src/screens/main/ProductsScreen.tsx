@@ -11,7 +11,9 @@ import {
   Alert,
   Platform,
   ActivityIndicator,
+  Modal,
 } from 'react-native'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useDispatch, useSelector } from 'react-redux'
 import { AppDispatch, RootState } from '../../store'
 import { fetchProducts, fetchCategories } from '../../store/slices/productsSlice'
@@ -48,6 +50,7 @@ const ProductsScreen: React.FC<Props> = ({ navigation }) => {
   const { products, categories, loading: productsLoading } = useSelector((state: RootState) => state.products)
   const { merchants, loading: merchantsLoading } = useSelector((state: RootState) => state.merchants)
   const theme = useTheme()
+  const insets = useSafeAreaInsets()
 
   const [contentMode, setContentMode] = useState<'merchants' | 'map'>('merchants')
   const [searchQuery, setSearchQuery] = useState('')
@@ -58,6 +61,7 @@ const ProductsScreen: React.FC<Props> = ({ navigation }) => {
   const [userLocation, setUserLocation] = useState<UserLocation | null>(null)
   const [locationPermissionGranted, setLocationPermissionGranted] = useState(false)
   const [isRequestingLocation, setIsRequestingLocation] = useState(false)
+  const [showDistanceModal, setShowDistanceModal] = useState(false)
   const [remoteMerchantResults, setRemoteMerchantResults] = useState<MerchantEntity[] | null>(null)
   const [remoteProductResults, setRemoteProductResults] = useState<Product[] | null>(null)
   const [searchLoading, setSearchLoading] = useState(false)
@@ -408,7 +412,15 @@ const ProductsScreen: React.FC<Props> = ({ navigation }) => {
     }
   }
 
-  const handleDistanceFilterPress = async () => {
+  // Toggle distance filter on/off directly
+  const handleDistanceToggle = async () => {
+    if (distanceEnabled) {
+      // Désactiver directement
+      setDistanceEnabled(false)
+      return
+    }
+
+    // Activer le filtre
     if (!locationPermissionGranted) {
       Alert.alert(
         'Autorisation requise',
@@ -431,23 +443,25 @@ const ProductsScreen: React.FC<Props> = ({ navigation }) => {
       return
     }
 
-    if (!distanceEnabled) {
-      const ok = await ensureUserLocation(true)
-      if (ok) {
-        setDistanceEnabled(true)
-      } else {
-        Alert.alert('Géolocalisation inactive', "Impossible d'activer le filtre distance sans accès à votre position.")
-      }
-      return
+    const ok = await ensureUserLocation(true)
+    if (ok) {
+      setDistanceEnabled(true)
+    } else {
+      Alert.alert('Géolocalisation inactive', "Impossible d'activer le filtre distance sans accès à votre position.")
     }
+  }
 
-    Alert.alert('Filtre distance', 'Choisissez une distance maximum', [
-      { text: '< 5 km', onPress: () => setMaxDistance(5) },
-      { text: '< 10 km', onPress: () => setMaxDistance(10) },
-      { text: '< 20 km', onPress: () => setMaxDistance(20) },
-      { text: 'Désactiver', style: 'destructive', onPress: () => setDistanceEnabled(false) },
-      { text: 'Annuler', style: 'cancel' },
-    ])
+  // Show distance options modal
+  const handleDistanceOptionsPress = () => {
+    if (distanceEnabled) {
+      setShowDistanceModal(true)
+    }
+  }
+
+  // Select a distance option
+  const handleDistanceSelect = (distance: number) => {
+    setMaxDistance(distance)
+    setShowDistanceModal(false)
   }
 
   useEffect(() => {
@@ -561,6 +575,9 @@ const ProductsScreen: React.FC<Props> = ({ navigation }) => {
   )
 
   const renderMerchantCard = ({ merchant, distanceInfo }: MerchantListItem) => {
+    // Priorité: photo_url du merchant > logo_url > user.photo_url > emoji fallback
+    const merchantImageUrl = merchant.photo_url || merchant.logo_url || merchant.user?.photo_url
+
     return (
       <TouchableOpacity
         onPress={() => {
@@ -569,10 +586,19 @@ const ProductsScreen: React.FC<Props> = ({ navigation }) => {
         }}
       >
         <Card variant="elevated" style={{ marginBottom: theme.spacing.md, flexDirection: 'row', overflow: 'hidden' }}>
-          {/* Image emoji du commerce */}
-          <View style={styles.merchantImagePlaceholder}>
-            <Text style={styles.merchantEmoji}>{getMerchantEmoji(merchant.business_type)}</Text>
-          </View>
+          {/* Image de la boutique ou emoji fallback */}
+          {merchantImageUrl ? (
+            <Image
+              source={{ uri: getImageUrl(merchantImageUrl) }}
+              style={styles.merchantImage}
+              contentFit="cover"
+              transition={200}
+            />
+          ) : (
+            <View style={styles.merchantImagePlaceholder}>
+              <Text style={styles.merchantEmoji}>{getMerchantEmoji(merchant.business_type)}</Text>
+            </View>
+          )}
 
           {/* Badge nombre de produits */}
           {merchant.products_count > 0 && (
@@ -755,7 +781,7 @@ const ProductsScreen: React.FC<Props> = ({ navigation }) => {
   return (
     <View style={styles.container}>
       {/* Header */}
-      <View style={styles.header}>
+      <View style={[styles.header, { paddingTop: insets.top + 8 }]}>
         <View style={styles.viewToggle}>
           <TouchableOpacity
             style={[styles.toggleButton, contentMode === 'merchants' && styles.toggleButtonActive]}
@@ -904,11 +930,7 @@ const ProductsScreen: React.FC<Props> = ({ navigation }) => {
 
       {contentMode === 'merchants' && (
         <View style={styles.distanceRow}>
-          <TouchableOpacity
-            style={[styles.filterChip, distanceEnabled && styles.filterChipActive]}
-            onPress={handleDistanceFilterPress}
-            disabled={isRequestingLocation}
-          >
+          <View style={[styles.filterChip, distanceEnabled && styles.filterChipActive]}>
             <Ionicons
               name="location"
               size={16}
@@ -916,27 +938,114 @@ const ProductsScreen: React.FC<Props> = ({ navigation }) => {
                 ? theme.colors.interactiveTextActive
                 : theme.colors.textSecondary}
             />
-            <Typography
-              variant="caption"
-              weight="medium"
-              style={{
-                color: distanceEnabled
-                  ? theme.colors.interactiveTextActive
-                  : theme.colors.interactiveText,
-              }}
+            {/* Tap on text to change distance (when enabled) */}
+            <TouchableOpacity
+              onPress={distanceEnabled ? handleDistanceOptionsPress : handleDistanceToggle}
+              disabled={isRequestingLocation}
+              style={{ flex: 1 }}
             >
-              {distanceEnabled ? `< ${maxDistance} km` : 'Filtrer par distance'}
-            </Typography>
-            <Ionicons
-              name={distanceEnabled ? 'toggle' : 'toggle-outline'}
-              size={24}
-              color={distanceEnabled
-                ? theme.colors.interactiveTextActive
-                : theme.colors.textSecondary}
-            />
-          </TouchableOpacity>
+              <Typography
+                variant="caption"
+                weight="medium"
+                style={{
+                  color: distanceEnabled
+                    ? theme.colors.interactiveTextActive
+                    : theme.colors.interactiveText,
+                }}
+              >
+                {distanceEnabled ? `< ${maxDistance} km` : 'Filtrer par distance'}
+              </Typography>
+            </TouchableOpacity>
+            {/* Tap on toggle to enable/disable directly */}
+            <TouchableOpacity
+              onPress={handleDistanceToggle}
+              disabled={isRequestingLocation}
+              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+            >
+              <Ionicons
+                name={distanceEnabled ? 'toggle' : 'toggle-outline'}
+                size={24}
+                color={distanceEnabled
+                  ? theme.colors.interactiveTextActive
+                  : theme.colors.textSecondary}
+              />
+            </TouchableOpacity>
+          </View>
         </View>
       )}
+
+      {/* Distance Options Modal */}
+      <Modal
+        visible={showDistanceModal}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setShowDistanceModal(false)}
+      >
+        <TouchableOpacity
+          style={styles.modalOverlay}
+          activeOpacity={1}
+          onPress={() => setShowDistanceModal(false)}
+        >
+          <View style={styles.modalContent}>
+            <Typography variant="h3" weight="bold" style={{ marginBottom: theme.spacing.xs }}>
+              Filtre distance
+            </Typography>
+            <Typography variant="body" color="secondary" style={{ marginBottom: theme.spacing.md }}>
+              Choisissez une distance maximum
+            </Typography>
+
+            <View style={styles.distanceOptions}>
+              <TouchableOpacity
+                style={[
+                  styles.distanceOption,
+                  maxDistance === 5 && styles.distanceOptionActive,
+                ]}
+                onPress={() => handleDistanceSelect(5)}
+              >
+                <Typography
+                  variant="body"
+                  weight={maxDistance === 5 ? 'bold' : 'medium'}
+                  color={maxDistance === 5 ? 'primary' : 'primary'}
+                >
+                  {'< 5 KM'}
+                </Typography>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={[
+                  styles.distanceOption,
+                  maxDistance === 10 && styles.distanceOptionActive,
+                ]}
+                onPress={() => handleDistanceSelect(10)}
+              >
+                <Typography
+                  variant="body"
+                  weight={maxDistance === 10 ? 'bold' : 'medium'}
+                  color={maxDistance === 10 ? 'primary' : 'primary'}
+                >
+                  {'< 10 KM'}
+                </Typography>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={[
+                  styles.distanceOption,
+                  maxDistance === 20 && styles.distanceOptionActive,
+                ]}
+                onPress={() => handleDistanceSelect(20)}
+              >
+                <Typography
+                  variant="body"
+                  weight={maxDistance === 20 ? 'bold' : 'medium'}
+                  color={maxDistance === 20 ? 'primary' : 'primary'}
+                >
+                  {'< 20 KM'}
+                </Typography>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </TouchableOpacity>
+      </Modal>
 
       {/* Compteur de résultats */}
       {filteredMerchants.length > 0 && (
@@ -1169,6 +1278,10 @@ const createStyles = (theme: ReturnType<typeof useTheme>) => StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
+  merchantImage: {
+    width: 120,
+    height: 120,
+  },
   merchantEmoji: {
     fontSize: 48,
   },
@@ -1282,6 +1395,41 @@ const createStyles = (theme: ReturnType<typeof useTheme>) => StyleSheet.create({
   },
   mapCalloutLink: {
     marginTop: 6,
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: theme.spacing.lg,
+  },
+  modalContent: {
+    backgroundColor: theme.colors.background,
+    borderRadius: theme.radius.xl,
+    padding: theme.spacing.lg,
+    width: '100%',
+    maxWidth: 320,
+    ...theme.shadows.lg,
+  },
+  distanceOptions: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    gap: theme.spacing.sm,
+  },
+  distanceOption: {
+    flex: 1,
+    paddingVertical: theme.spacing.md,
+    paddingHorizontal: theme.spacing.sm,
+    borderRadius: theme.radius.lg,
+    backgroundColor: theme.colors.interactiveSurface,
+    borderWidth: 1,
+    borderColor: theme.colors.interactiveBorder,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  distanceOptionActive: {
+    backgroundColor: theme.colors.interactiveSurfaceActive,
+    borderColor: theme.colors.interactiveBorderActive,
   },
 })
 

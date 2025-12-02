@@ -8,6 +8,7 @@ import {
   StatusBar,
   Alert,
 } from 'react-native'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useDispatch, useSelector } from 'react-redux'
 import { AppDispatch, RootState } from '../../store'
 import { fetchProduct } from '../../store/slices/productsSlice'
@@ -37,6 +38,7 @@ interface Props {
 const ProductDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
   const dispatch = useDispatch<AppDispatch>()
   const theme = useTheme()
+  const insets = useSafeAreaInsets()
   const { productId } = route.params
   const { products, loading } = useSelector((state: RootState) => state.products)
   const { stats: reviewStats } = useSelector((state: RootState) => state.reviews)
@@ -49,7 +51,9 @@ const ProductDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<PaymentMethod>('on_site')
   const navigationTimeoutRef = useRef<NodeJS.Timeout | null>(null)
   const [confirmVisible, setConfirmVisible] = useState(false)
+  const [cartAddedVisible, setCartAddedVisible] = useState(false)
   const [addingToCart, setAddingToCart] = useState(false)
+  const [modalQuantity, setModalQuantity] = useState(1)
   const isTestEnv = checkIsTestEnv()
 
   useEffect(() => {
@@ -162,18 +166,8 @@ const ProductDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
       )
 
       if (response?.data?.items_count) {
-        // Optionnel : proposer de consulter le panier
-        Alert.alert(
-          'Produit ajouté',
-          'Souhaitez-vous consulter votre panier maintenant ?',
-          [
-            { text: 'Continuer mes achats', style: 'cancel' },
-            {
-              text: 'Voir le panier',
-              onPress: () => navigation.navigate('Orders'),
-            },
-          ]
-        )
+        // Afficher le popup stylisé
+        setCartAddedVisible(true)
       }
     } catch (error: any) {
       const message = typeof error === 'string' ? error : error?.message
@@ -261,23 +255,9 @@ const ProductDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
   }
 
   const handleReserve = async () => {
-    if (isTestMode) {
-      setConfirmVisible(true)
-      return
-    }
-    // Default path with native Alert
-    Alert.alert(
-      'Confirmer la réservation',
-      `Voulez-vous réserver ${selectedQuantity} ${product.name}${
-        selectedQuantity > 1 ? 's' : ''
-      } pour ${formatCurrency(totalPrice)} ?\n\n(${formatCurrency(discountedPrice)} × ${selectedQuantity})\nPaiement : ${
-        selectedPayment?.label ?? 'Sur place'
-      }`,
-      [
-        { text: 'Annuler', style: 'cancel' },
-        { text: 'Confirmer', onPress: () => performReservation() },
-      ],
-    )
+    // Synchronize modal quantity with selected quantity
+    setModalQuantity(selectedQuantity)
+    setConfirmVisible(true)
   }
 
   const styles = createStyles(theme)
@@ -288,7 +268,7 @@ const ProductDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
 
       <ScrollView style={styles.scrollView}>
         {/* Header */}
-        <View style={styles.header}>
+        <View style={[styles.header, { paddingTop: insets.top + 8 }]}>
           <TouchableOpacity onPress={() => navigation.goBack()}>
             <Ionicons name="arrow-back" size={24} color={theme.colors.text} />
           </TouchableOpacity>
@@ -300,7 +280,7 @@ const ProductDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
             <TouchableOpacity
               accessibilityRole="button"
               accessibilityLabel="Voir mon panier"
-              onPress={() => navigation.navigate('Orders')}
+              onPress={() => navigation.navigate('Orders', { screen: 'Cart' })}
               style={styles.cartButton}
             >
               <Ionicons name="cart" size={24} color={theme.colors.text} />
@@ -622,43 +602,164 @@ const ProductDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
         </View>
       </View>
 
-      {/* Test-mode confirmation modal for MCP */}
-      {isTestMode && (
-        <Modal
-          visible={confirmVisible}
-          onClose={() => setConfirmVisible(false)}
-          title="Confirmer la réservation"
-          variant="center"
-          testID={TEST_IDS.reservationModal}
-          footer={
-            <View style={{ flexDirection: 'row', gap: 12 }}>
-              <Button
-                variant="ghost"
-                onPress={() => setConfirmVisible(false)}
-                testID={TEST_IDS.cancelButton}
-              >
-                Annuler
-              </Button>
-              <Button
-                variant="primary"
-                onPress={async () => {
-                  setConfirmVisible(false)
-                  await performReservation()
-                }}
-                testID={TEST_IDS.confirmButton}
-              >
-                Confirmer
-              </Button>
+      {/* Styled Reservation Confirmation Modal */}
+      <Modal
+        visible={confirmVisible}
+        onClose={() => setConfirmVisible(false)}
+        title="Confirmer la réservation"
+        variant="center"
+        testID={TEST_IDS.reservationModal}
+      >
+        {/* Product Preview */}
+        <View style={styles.modalProductPreview}>
+          <Image
+            source={{ uri: getImageUrl(product.image_url, product.category?.name) }}
+            style={styles.modalProductImage}
+            contentFit="cover"
+          />
+          <View style={styles.modalProductInfo}>
+            <Typography variant="body" weight="semibold" numberOfLines={2}>
+              {product.name}
+            </Typography>
+            <Typography variant="caption" color="secondary">
+              {product.merchant?.business_name}
+            </Typography>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 4 }}>
+              <Typography variant="body" weight="bold" color="primary">
+                {formatCurrency(discountedPrice)}
+              </Typography>
+              {discountPercent > 0 && (
+                <Typography variant="caption" style={{ textDecorationLine: 'line-through', color: theme.colors.neutral[400] }}>
+                  {formatCurrency(originalPrice)}
+                </Typography>
+              )}
             </View>
-          }
-        >
-          <Typography variant="body">
-            Voulez-vous réserver {selectedQuantity} {product.name}
-            {selectedQuantity > 1 ? 's' : ''} ?
-            {'\n'}Paiement : {selectedPayment?.label ?? 'Sur place'}
+          </View>
+        </View>
+
+        {/* Quantity Selector in Modal */}
+        <View style={styles.modalQuantitySection}>
+          <Typography variant="body" weight="semibold" style={{ marginBottom: 12 }}>
+            Quantité à réserver
           </Typography>
-        </Modal>
-      )}
+          <View style={styles.modalQuantityControls}>
+            <TouchableOpacity
+              style={[styles.modalQuantityButton, modalQuantity <= 1 && styles.modalQuantityButtonDisabled]}
+              disabled={modalQuantity <= 1}
+              onPress={() => setModalQuantity(Math.max(1, modalQuantity - 1))}
+            >
+              <Ionicons name="remove" size={24} color={modalQuantity <= 1 ? theme.colors.neutral[400] : theme.colors.primary[600]} />
+            </TouchableOpacity>
+
+            <View style={styles.modalQuantityValue}>
+              <Typography variant="h2" weight="bold">
+                {modalQuantity}
+              </Typography>
+            </View>
+
+            <TouchableOpacity
+              style={[styles.modalQuantityButton, modalQuantity >= product.quantity_available && styles.modalQuantityButtonDisabled]}
+              disabled={modalQuantity >= product.quantity_available}
+              onPress={() => setModalQuantity(Math.min(product.quantity_available, modalQuantity + 1))}
+            >
+              <Ionicons name="add" size={24} color={modalQuantity >= product.quantity_available ? theme.colors.neutral[400] : theme.colors.primary[600]} />
+            </TouchableOpacity>
+          </View>
+          <Typography variant="caption" color="secondary" style={{ textAlign: 'center', marginTop: 8 }}>
+            {product.quantity_available} disponible{product.quantity_available > 1 ? 's' : ''}
+          </Typography>
+        </View>
+
+        {/* Payment Method Display */}
+        <View style={styles.modalPaymentInfo}>
+          <Ionicons name={selectedPayment?.icon || 'card-outline'} size={20} color={theme.colors.primary[600]} />
+          <Typography variant="body" color="secondary">
+            Paiement : {selectedPayment?.label ?? 'Sur place'}
+          </Typography>
+        </View>
+
+        {/* Total Summary */}
+        <View style={styles.modalTotalSection}>
+          <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+            <Typography variant="body" color="secondary">
+              {formatCurrency(discountedPrice)} × {modalQuantity}
+            </Typography>
+            <Typography variant="h3" weight="bold" color="primary">
+              {formatCurrency(discountedPrice * modalQuantity)}
+            </Typography>
+          </View>
+        </View>
+
+        {/* Action Buttons - Fixed alignment */}
+        <View style={styles.modalActions}>
+          <Button
+            variant="ghost"
+            size="lg"
+            onPress={() => setConfirmVisible(false)}
+            style={styles.modalButtonCancel}
+            testID={TEST_IDS.cancelButton}
+          >
+            Annuler
+          </Button>
+          <Button
+            variant="primary"
+            size="lg"
+            onPress={async () => {
+              // Update the selected quantity with modal quantity before reservation
+              setSelectedQuantity(modalQuantity)
+              setConfirmVisible(false)
+              // Small delay to ensure state is updated
+              setTimeout(() => performReservation(), 100)
+            }}
+            style={styles.modalButtonConfirm}
+            leftIcon={<Ionicons name="checkmark-circle" size={20} color={theme.colors.textInverse} />}
+            testID={TEST_IDS.confirmButton}
+          >
+            Confirmer ({formatCurrency(discountedPrice * modalQuantity)})
+          </Button>
+        </View>
+      </Modal>
+
+      {/* Styled "Produit ajouté" Modal */}
+      <Modal
+        visible={cartAddedVisible}
+        onClose={() => setCartAddedVisible(false)}
+        title=""
+        variant="center"
+      >
+        <View style={styles.cartAddedContent}>
+          <View style={styles.cartAddedIconContainer}>
+            <Ionicons name="checkmark-circle" size={56} color={theme.colors.success} />
+          </View>
+          <Typography variant="h3" weight="bold" style={{ textAlign: 'center', marginBottom: 8 }}>
+            Produit ajouté
+          </Typography>
+          <Typography variant="body" color="secondary" style={{ textAlign: 'center', marginBottom: 24 }}>
+            Souhaitez-vous consulter votre panier maintenant ?
+          </Typography>
+          <View style={styles.cartAddedActions}>
+            <Button
+              variant="primary"
+              size="lg"
+              onPress={() => {
+                setCartAddedVisible(false)
+                navigation.navigate('Orders', { screen: 'Cart' })
+              }}
+              style={{ flex: 1 }}
+            >
+              Voir le panier
+            </Button>
+          </View>
+          <TouchableOpacity
+            onPress={() => setCartAddedVisible(false)}
+            style={{ marginTop: 16, alignSelf: 'center' }}
+          >
+            <Typography variant="body" weight="semibold" color="primary">
+              Continuer mes achats
+            </Typography>
+          </TouchableOpacity>
+        </View>
+      </Modal>
     </View>
   )
 }
@@ -821,6 +922,101 @@ const createStyles = (theme: ReturnType<typeof useTheme>) => StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     ...theme.shadows.sm,
+  },
+  // Modal styles
+  modalProductPreview: {
+    flexDirection: 'row',
+    padding: 12,
+    backgroundColor: theme.colors.surface.light,
+    borderRadius: 12,
+    marginBottom: 16,
+    gap: 12,
+  },
+  modalProductImage: {
+    width: 80,
+    height: 80,
+    borderRadius: 8,
+  },
+  modalProductInfo: {
+    flex: 1,
+    justifyContent: 'center',
+  },
+  modalQuantitySection: {
+    padding: 16,
+    backgroundColor: theme.colors.surface.light,
+    borderRadius: 12,
+    marginBottom: 16,
+  },
+  modalQuantityControls: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 24,
+  },
+  modalQuantityButton: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: theme.colors.primary[50],
+    alignItems: 'center',
+    justifyContent: 'center',
+    ...theme.shadows.sm,
+  },
+  modalQuantityButtonDisabled: {
+    backgroundColor: theme.colors.neutral[100],
+    opacity: 0.5,
+  },
+  modalQuantityValue: {
+    minWidth: 60,
+    alignItems: 'center',
+  },
+  modalPaymentInfo: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    backgroundColor: theme.colors.primary[50],
+    borderRadius: 8,
+    marginBottom: 16,
+  },
+  modalTotalSection: {
+    padding: 16,
+    backgroundColor: theme.colors.surface.light,
+    borderRadius: 12,
+    marginBottom: 16,
+  },
+  modalActions: {
+    flexDirection: 'row',
+    gap: 12,
+    marginTop: 8,
+  },
+  modalButtonCancel: {
+    flex: 1,
+    minWidth: 100,
+  },
+  modalButtonConfirm: {
+    flex: 1.5,
+    minWidth: 140,
+  },
+  // Styles pour le popup "Produit ajouté"
+  cartAddedContent: {
+    alignItems: 'center',
+    paddingVertical: 8,
+  },
+  cartAddedIconContainer: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    backgroundColor: theme.colors.success + '15',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  cartAddedActions: {
+    flexDirection: 'row',
+    width: '100%',
+    gap: 12,
   },
 })
 
