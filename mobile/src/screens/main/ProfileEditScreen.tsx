@@ -10,6 +10,7 @@ import {
   ActivityIndicator,
   StatusBar,
   Platform,
+  KeyboardAvoidingView,
 } from 'react-native'
 import { Ionicons } from '@expo/vector-icons'
 import { useNavigation } from '@react-navigation/native'
@@ -298,7 +299,17 @@ const ProfileEditScreen: React.FC<ProfileEditScreenProps> = ({ navigation: navig
         <View style={{ width: 40 }} />
       </View>
 
-      <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        style={{ flex: 1 }}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 0}
+      >
+        <ScrollView
+          style={styles.content}
+          showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
+          contentContainerStyle={{ paddingBottom: 40 }}
+        >
         {/* Photo de profil */}
         <View
           style={[
@@ -520,7 +531,8 @@ const ProfileEditScreen: React.FC<ProfileEditScreenProps> = ({ navigation: navig
             </>
           )}
         </TouchableOpacity>
-      </ScrollView>
+        </ScrollView>
+      </KeyboardAvoidingView>
     </View>
   )
 }
