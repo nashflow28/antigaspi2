@@ -22,6 +22,7 @@ import { Typography } from '../../components/2025'
 import apiService from '../../services/api'
 import { ApiResponse, User } from '../../types'
 import { refreshProfile } from '../../store/slices/authSlice'
+import { getImageUrl } from '../../utils/imageHelpers'
 
 interface ProfileFormData {
   first_name: string
@@ -86,7 +87,7 @@ const ProfileEditScreen: React.FC<ProfileEditScreenProps> = ({ navigation: navig
         address: user.address || '',
         city: user.city || '',
       })
-      setPhotoUri(user.photo_url ?? null)
+      setPhotoUri(user.photo_url ? getImageUrl(user.photo_url) : null)
     } else {
       setFormData({
         first_name: '',

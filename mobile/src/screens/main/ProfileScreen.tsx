@@ -6,6 +6,7 @@ import {
   Switch,
   Linking,
   ScrollView,
+  Image,
 } from 'react-native'
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigation } from '@react-navigation/native'
@@ -17,6 +18,7 @@ import { useTheme } from '../../theme'
 import { useAlert } from '../../contexts/AlertContext'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { TEST_IDS } from '../../utils/testIds'
+import { getImageUrl } from '../../utils/imageHelpers'
 
 const ProfileScreen: React.FC = () => {
   const theme = useTheme()
@@ -98,9 +100,16 @@ const ProfileScreen: React.FC = () => {
       showsVerticalScrollIndicator={true}
     >
       <Card variant="elevated" style={{ alignItems: 'center', paddingVertical: theme.spacing['2xl'], paddingTop: theme.spacing['3xl'], marginBottom: theme.spacing.lg }}>
-        <View style={[styles.avatar, { backgroundColor: theme.colors.neutral[100], marginBottom: theme.spacing.md }]}>
-          <Ionicons name="person" size={40} color={theme.colors.primary[500]} />
-        </View>
+        {user?.photo_url ? (
+          <Image
+            source={{ uri: getImageUrl(user.photo_url) }}
+            style={[styles.avatar, { marginBottom: theme.spacing.md }]}
+          />
+        ) : (
+          <View style={[styles.avatar, { backgroundColor: theme.colors.neutral[100], marginBottom: theme.spacing.md }]}>
+            <Ionicons name="person" size={40} color={theme.colors.primary[500]} />
+          </View>
+        )}
         <Typography variant="h2" weight="bold" style={{ marginBottom: theme.spacing.xs }} testID={TEST_IDS.profileName}>
           {user?.first_name} {user?.last_name}
         </Typography>
