@@ -1,11 +1,13 @@
 import React from 'react'
-import { View, Text, StyleSheet, ScrollView } from 'react-native'
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native'
+import { Ionicons } from '@expo/vector-icons'
 import { useTheme } from '../../theme'
 import { useAppDispatch } from '../../store/hooks'
-import { createReview, fetchReviews } from '../../store/slices/reviewsSlice'
+import { createReview, updateReview, fetchReviews } from '../../store/slices/reviewsSlice'
 import { useToast } from '../../contexts/ToastContext'
 import ReviewForm from '../../components/reviews/ReviewForm'
 import { Typography } from '../../components/2025'
+import { Review } from '../../types'
 
 interface AddReviewScreenProps {
   route: any
@@ -18,36 +20,70 @@ const AddReviewScreen: React.FC<AddReviewScreenProps> = ({ route, navigation }) 
   const dispatch = useAppDispatch()
   const { showSuccess, showError } = useToast()
 
-  const { merchantId, productId, merchantName } = route.params
+  // Params: mode création OU édition
+  const { merchantId, productId, merchantName, editReview } = route.params as {
+    merchantId: number
+    productId?: number
+    merchantName?: string
+    editReview?: Review  // Si présent = mode édition
+  }
+
+  const isEditMode = !!editReview
 
   const handleSubmit = async (data: { rating: number; title?: string; comment?: string }) => {
     try {
-      await dispatch(createReview({ merchantId, productId, ...data })).unwrap()
-      showSuccess('Avis publié avec succès! 🎉')
-      
+      if (isEditMode && editReview) {
+        // Mode édition
+        await dispatch(updateReview({
+          reviewId: editReview.id,
+          rating: data.rating,
+          title: data.title,
+          comment: data.comment,
+        })).unwrap()
+        showSuccess('Avis modifié avec succès! ✏️')
+      } else {
+        // Mode création
+        await dispatch(createReview({ merchantId, productId, ...data })).unwrap()
+        showSuccess('Avis publié avec succès! 🎉')
+      }
+
       // Refresh reviews list
       dispatch(fetchReviews({ merchantId }))
-      
+
       // Navigate back
       navigation.goBack()
     } catch (error: any) {
-      showError(error.message || 'Erreur lors de la publication')
+      showError(error.message || (isEditMode ? 'Erreur lors de la modification' : 'Erreur lors de la publication'))
     }
   }
 
   return (
     <View style={styles.container}>
-      <ScrollView contentContainerStyle={styles.content}>
-        <Typography variant="h2" weight="bold" style={{ marginBottom: theme.spacing.xs }}>
-          Donner votre avis
+      {/* Header */}
+      <View style={styles.header}>
+        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+          <Ionicons name="arrow-back" size={24} color={theme.colors.text} />
+        </TouchableOpacity>
+        <Typography variant="h3" weight="bold" style={{ flex: 1 }}>
+          {isEditMode ? 'Modifier mon avis' : 'Donner votre avis'}
         </Typography>
+        <View style={{ width: 40 }} />
+      </View>
+
+      <ScrollView contentContainerStyle={styles.content}>
         {merchantName && (
           <Typography variant="body" color="secondary" style={{ marginBottom: theme.spacing.xl }}>
-            sur {merchantName}
+            {isEditMode ? 'Modification de votre avis sur' : 'sur'} {merchantName}
           </Typography>
         )}
 
-        <ReviewForm onSubmit={handleSubmit} />
+        <ReviewForm
+          onSubmit={handleSubmit}
+          initialRating={editReview?.rating}
+          initialTitle={editReview?.title ?? undefined}
+          initialComment={editReview?.comment ?? undefined}
+          submitButtonText={isEditMode ? 'Enregistrer les modifications' : 'Publier l\'avis'}
+        />
       </ScrollView>
     </View>
   )
@@ -58,6 +94,17 @@ const createStyles = (theme: ReturnType<typeof useTheme>) =>
     container: {
       flex: 1,
       backgroundColor: theme.colors.background,
+    },
+    header: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      padding: theme.spacing.md,
+      borderBottomWidth: 1,
+      borderBottomColor: theme.colors.border,
+    },
+    backButton: {
+      padding: 8,
+      marginRight: theme.spacing.sm,
     },
     content: {
       padding: theme.spacing.lg,

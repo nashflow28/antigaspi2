@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo } from 'react'
+import React, { useEffect, useState, useMemo, useCallback } from 'react'
 import {
   View,
   Text,
@@ -8,15 +8,18 @@ import {
   ActivityIndicator,
   StatusBar,
   RefreshControl,
+  Alert,
 } from 'react-native'
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
 import { Ionicons } from '@expo/vector-icons'
 import { useTheme } from '../../theme'
 import { useAppDispatch, useAppSelector } from '../../store/hooks'
-import { fetchReviews, fetchReviewStats } from '../../store/slices/reviewsSlice'
+import { fetchReviews, fetchReviewStats, deleteReview } from '../../store/slices/reviewsSlice'
 import ReviewCard from '../../components/reviews/ReviewCard'
 import StarRating from '../../components/reviews/StarRating'
 import { Button, Card, Typography } from '../../components/2025'
+import { Review } from '../../types'
+import { useToast } from '../../contexts/ToastContext'
 
 type Props = NativeStackScreenProps<any, 'ReviewsList'>
 
@@ -24,9 +27,11 @@ const ReviewsListScreen = ({ route, navigation }: Props) => {
   const theme = useTheme()
   const styles = createStyles(theme)
   const dispatch = useAppDispatch()
+  const { showSuccess, showError } = useToast()
 
   const { merchantId, merchantName } = route.params as { merchantId: number; merchantName: string }
   const { reviews, stats, loading, currentPage, hasMore } = useAppSelector((state) => state.reviews)
+  const { user } = useAppSelector((state) => state.auth)
 
   // États locaux
   const [refreshing, setRefreshing] = useState(false)
@@ -34,6 +39,28 @@ const ReviewsListScreen = ({ route, navigation }: Props) => {
   const [loadingMore, setLoadingMore] = useState(false)
   const [sortBy, setSortBy] = useState<'recent' | 'rating'>('recent')
   const [filterVerified, setFilterVerified] = useState(false)
+
+  // Handler pour éditer un avis
+  const handleEditReview = useCallback((review: Review) => {
+    navigation.navigate('AddReview', {
+      merchantId,
+      merchantName,
+      editReview: review,
+    })
+  }, [navigation, merchantId, merchantName])
+
+  // Handler pour supprimer un avis
+  const handleDeleteReview = useCallback(async (reviewId: number) => {
+    try {
+      await dispatch(deleteReview(reviewId)).unwrap()
+      showSuccess('Avis supprimé avec succès')
+      // Refresh the list
+      dispatch(fetchReviews({ merchantId }))
+      dispatch(fetchReviewStats(merchantId))
+    } catch (err: any) {
+      showError(err.message || 'Erreur lors de la suppression')
+    }
+  }, [dispatch, merchantId, showSuccess, showError])
 
   // Chargement initial
   useEffect(() => {
@@ -234,7 +261,14 @@ const ReviewsListScreen = ({ route, navigation }: Props) => {
       <FlatList
         data={filteredReviews}
         keyExtractor={(item) => item.id.toString()}
-        renderItem={({ item }) => <ReviewCard review={item} />}
+        renderItem={({ item }) => (
+            <ReviewCard
+              review={item}
+              isOwn={user?.id === item.user.id}
+              onEdit={handleEditReview}
+              onDelete={handleDeleteReview}
+            />
+          )}
         contentContainerStyle={styles.listContent}
         refreshControl={
           <RefreshControl
