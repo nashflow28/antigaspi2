@@ -60,6 +60,7 @@ const AccountStack = () => (
     <Stack.Screen name="AccountMain" component={ProfileScreen} />
     <Stack.Screen name="ProfileEdit" component={MerchantProfileEditScreen} />
     <Stack.Screen name="OpeningHours" component={MerchantOpeningHoursScreen} />
+    <Stack.Screen name="Reviews" component={MerchantReviewsScreen} />
     <Stack.Screen name="Notifications" component={MerchantNotificationsScreen} />
     <Stack.Screen name="NotificationSettings" component={NotificationSettingsScreen} />
   </Stack.Navigator>

@@ -41,9 +41,18 @@ const MerchantOpeningHoursScreen: React.FC = () => {
   const theme = useTheme()
   const navigation = useNavigation()
 
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
-  const [schedule, setSchedule] = useState<DaySchedule[]>([])
+  // Initialiser avec les valeurs par défaut
+  const defaultSchedule: DaySchedule[] = DAYS_FR.map((day) => ({
+    day: day.key,
+    is_open: day.key !== 'sunday', // Fermé le dimanche par défaut
+    morning_start: '08:00',
+    morning_end: '12:00',
+    afternoon_start: '14:00',
+    afternoon_end: '18:00',
+  }))
+  const [schedule, setSchedule] = useState<DaySchedule[]>(defaultSchedule)
   const [showTimePicker, setShowTimePicker] = useState<{
     dayIndex: number
     field: 'morning_start' | 'morning_end' | 'afternoon_start' | 'afternoon_end'
@@ -58,27 +67,19 @@ const MerchantOpeningHoursScreen: React.FC = () => {
       setLoading(true)
       const response = await apiService.get('/merchants/opening-hours')
 
-      if (response.data.success) {
-        const existingHours = response.data.data.opening_hours
+      console.log('📅 [OpeningHours] API response:', response.data)
 
-        // Si pas d'heures définies, créer une structure par défaut
-        if (!existingHours || existingHours.length === 0) {
-          const defaultSchedule: DaySchedule[] = DAYS_FR.map((day) => ({
-            day: day.key,
-            is_open: true,
-            morning_start: '08:00',
-            morning_end: '12:00',
-            afternoon_start: '14:00',
-            afternoon_end: '18:00',
-          }))
-          setSchedule(defaultSchedule)
-        } else {
+      if (response.data?.success) {
+        const existingHours = response.data.data?.opening_hours
+
+        // Si des heures existent, les utiliser
+        if (existingHours && Array.isArray(existingHours) && existingHours.length > 0) {
           // Assurer que tous les jours sont présents
           const fullSchedule: DaySchedule[] = DAYS_FR.map((day) => {
             const existingDay = existingHours.find((h: DaySchedule) => h.day === day.key)
             return existingDay || {
               day: day.key,
-              is_open: true,
+              is_open: day.key !== 'sunday',
               morning_start: '08:00',
               morning_end: '12:00',
               afternoon_start: '14:00',
@@ -86,11 +87,18 @@ const MerchantOpeningHoursScreen: React.FC = () => {
             }
           })
           setSchedule(fullSchedule)
+          console.log('📅 [OpeningHours] Loaded existing hours')
+        } else {
+          // Garder les valeurs par défaut (déjà initialisées dans useState)
+          console.log('📅 [OpeningHours] No existing hours, using defaults')
         }
+      } else {
+        console.warn('📅 [OpeningHours] API returned success: false')
       }
-    } catch (error) {
-      console.error('Erreur chargement heures:', error)
-      Alert.alert('Erreur', 'Impossible de charger les heures d\'ouverture')
+    } catch (error: any) {
+      console.error('📅 [OpeningHours] Error:', error?.message || error)
+      // Ne pas afficher d'alerte, garder les valeurs par défaut
+      // L'utilisateur peut quand même définir ses horaires
     } finally {
       setLoading(false)
     }
