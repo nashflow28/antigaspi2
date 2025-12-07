@@ -10,6 +10,9 @@ import {
   Alert,
   Image,
   ActivityIndicator,
+  Modal,
+  KeyboardAvoidingView,
+  Platform,
 } from 'react-native'
 import { Ionicons } from '@expo/vector-icons'
 import * as ImagePicker from 'expo-image-picker'
@@ -30,6 +33,12 @@ const ProductFormScreen: React.FC<Props> = ({ route, navigation }) => {
 
   const [loading, setLoading] = useState(false)
 
+  // Error modal state
+  const [errorModalVisible, setErrorModalVisible] = useState(false)
+  const [errorTitle, setErrorTitle] = useState('')
+  const [errorMessages, setErrorMessages] = useState<string[]>([])
+  const [errorType, setErrorType] = useState<'error' | 'warning'>('error')
+
   // Form state
   const [name, setName] = useState(product?.name || '')
   const [description, setDescription] = useState(product?.description || '')
@@ -40,6 +49,24 @@ const ProductFormScreen: React.FC<Props> = ({ route, navigation }) => {
   const [expirationDate, setExpirationDate] = useState(product?.expiration_date || '')
   const [imageUri, setImageUri] = useState<string | null>(product?.image_url ? getImageUrl(product.image_url) : null)
 
+  // Helper function to show styled error modal
+  const showErrorModal = (title: string, messages: string[], type: 'error' | 'warning' = 'error') => {
+    setErrorTitle(title)
+    setErrorMessages(messages)
+    setErrorType(type)
+    setErrorModalVisible(true)
+  }
+
+  // Success modal state
+  const [successModalVisible, setSuccessModalVisible] = useState(false)
+  const [successMessage, setSuccessMessage] = useState('')
+
+  // Helper function to show styled success modal
+  const showSuccessModal = (message: string) => {
+    setSuccessMessage(message)
+    setSuccessModalVisible(true)
+  }
+
 
   const pickImage = async () => {
     try {
@@ -49,7 +76,7 @@ const ProductFormScreen: React.FC<Props> = ({ route, navigation }) => {
 
       if (status !== 'granted') {
         console.warn('⚠️ [ProductForm] Permission refusée')
-        Alert.alert('Permission refusée', 'Nous avons besoin de votre permission pour accéder à la galerie.')
+        showErrorModal('Permission refusée', ['Nous avons besoin de votre permission pour accéder à la galerie.'], 'warning')
         return
       }
 
@@ -70,7 +97,7 @@ const ProductFormScreen: React.FC<Props> = ({ route, navigation }) => {
       }
     } catch (error) {
       console.error('❌ [ProductForm] Erreur sélection image:', error)
-      Alert.alert('Erreur', 'Impossible de sélectionner une image. Veuillez réessayer.')
+      showErrorModal('Erreur de sélection', ['Impossible de sélectionner une image.', 'Veuillez réessayer.'], 'error')
     }
   }
 
@@ -88,11 +115,10 @@ const ProductFormScreen: React.FC<Props> = ({ route, navigation }) => {
         type,
       } as any)
 
-      const response = await apiService.post('/products/upload-image', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      })
+      // 🐛 BUG FIX #28: Do NOT set Content-Type header manually for FormData
+      // Axios automatically sets the correct Content-Type with boundary parameter
+      // Setting it manually breaks multipart/form-data uploads
+      const response = await apiService.post('/products/upload-image', formData)
 
       // 🐛 BUG FIX #27: Backend returns { success: true, data: { url, path, filename } }
       // apiService.post() returns response.data directly, so response = { success, data: {...} }
@@ -105,10 +131,20 @@ const ProductFormScreen: React.FC<Props> = ({ route, navigation }) => {
 
       console.warn('⚠️ [ProductForm] Aucune URL dans la réponse')
       return null
-    } catch (error) {
+    } catch (error: any) {
       console.error('❌ [ProductForm] Erreur upload image:', error)
+      console.error('❌ [ProductForm] Error details:', {
+        message: error?.message,
+        statusCode: error?.statusCode,
+        validationErrors: error?.validationErrors,
+      })
       // 🐛 BUG FIX #25: Don't throw - return null to allow product creation without image
-      Alert.alert('Attention', 'L\'upload de l\'image a échoué. Le produit sera créé sans image.')
+      // Use styled modal instead of basic Alert
+      showErrorModal(
+        'Upload d\'image',
+        ['L\'upload de l\'image a échoué.', 'Le produit sera créé sans image.', error?.message || ''],
+        'warning'
+      )
       return null
     }
   }
@@ -117,31 +153,32 @@ const ProductFormScreen: React.FC<Props> = ({ route, navigation }) => {
     console.log('🔵 validateForm appelé')
     if (!name.trim()) {
       console.error('❌ Nom du produit requis')
-      Alert.alert('Erreur', 'Le nom du produit est requis')
+      showErrorModal('Erreur de validation', ['Le nom du produit est requis'], 'error')
       return false
     }
     // categoryId validation removed - automatically uses merchant's category
     const originalPriceNum = parseFloat(originalPrice)
     if (!originalPrice || isNaN(originalPriceNum) || originalPriceNum <= 0) {
       console.error('❌ Prix original invalide:', originalPrice)
-      Alert.alert('Erreur', 'Le prix original doit être un nombre valide supérieur à 0')
+      showErrorModal('Erreur de validation', ['Le prix original doit être un nombre valide supérieur à 0'], 'error')
       return false
     }
     const discountedPriceNum = parseFloat(discountedPrice)
     if (!discountedPrice || isNaN(discountedPriceNum) || discountedPriceNum <= 0) {
       console.error('❌ Prix réduit invalide:', discountedPrice)
-      Alert.alert('Erreur', 'Le prix réduit doit être un nombre valide supérieur à 0')
+      showErrorModal('Erreur de validation', ['Le prix réduit doit être un nombre valide supérieur à 0'], 'error')
       return false
     }
     if (discountedPriceNum >= originalPriceNum) {
       console.error('❌ Prix réduit >= Prix original:', { discountedPriceNum, originalPriceNum })
-      Alert.alert('Erreur', 'Le prix réduit doit être inférieur au prix original')
+      showErrorModal('Erreur de validation', ['Le prix réduit doit être inférieur au prix original'], 'error')
       return false
     }
     const quantityNum = parseInt(quantity)
-    if (!quantity || isNaN(quantityNum) || quantityNum < 0) {
+    // 🐛 BUG FIX #29: Backend requires quantity >= 1, not 0
+    if (!quantity || isNaN(quantityNum) || quantityNum < 1) {
       console.error('❌ Quantité invalide:', quantity)
-      Alert.alert('Erreur', 'La quantité doit être un nombre valide supérieur ou égal à 0')
+      showErrorModal('Erreur de validation', ['La quantité doit être au minimum 1'], 'error')
       return false
     }
     console.log('✅ Validation réussie !')
@@ -200,44 +237,39 @@ const ProductFormScreen: React.FC<Props> = ({ route, navigation }) => {
         const response = await apiService.post('/products', productData)
         // 🐛 BUG FIX #24: apiService.post() returns response.data directly
         console.log('✅ Réponse API reçue:', response)
-        Alert.alert('Succès', 'Produit créé avec succès')
+        showSuccessModal('Le produit a été créé avec succès.')
       } else {
         const response = await apiService.put(`/products/${product.id}`, productData)
         // 🐛 BUG FIX #24: apiService.put() returns response.data directly
         console.log('✅ Réponse API reçue:', response)
-        Alert.alert('Succès', 'Produit modifié avec succès')
+        showSuccessModal('Le produit a été modifié avec succès.')
       }
 
-      console.log('🔙 Navigation retour vers liste produits')
-      if (navigation.canGoBack()) {
-        navigation.goBack()
-      } else {
-        navigation.navigate('ProductsList')
-      }
+      // Navigation will happen when success modal is closed
+      console.log('🔙 Navigation après fermeture du modal')
     } catch (error: any) {
       console.error('❌ ERREUR COMPLÈTE:', error)
       console.error('❌ Error message:', error.message)
       console.error('❌ Error statusCode:', error.statusCode)
       console.error('❌ Error validationErrors:', error.validationErrors)
 
-      let errorMessage = 'Impossible de sauvegarder le produit'
+      let errorMessages: string[] = ['Impossible de sauvegarder le produit']
 
       // 🐛 BUG FIX #24: Handle validation errors from improved apiService
       if (error.statusCode === 422 && error.validationErrors) {
         // Format validation errors from backend
-        const errorMessages = Object.entries(error.validationErrors)
-          .map(([field, messages]: [string, any]) => {
+        errorMessages = Object.entries(error.validationErrors)
+          .flatMap(([field, messages]: [string, any]) => {
             const fieldName = field.replace(/_/g, ' ')
-            return `• ${fieldName}: ${Array.isArray(messages) ? messages.join(', ') : messages}`
+            const msgArray = Array.isArray(messages) ? messages : [messages]
+            return msgArray.map((msg: string) => `${fieldName}: ${msg}`)
           })
-          .join('\n')
-        errorMessage = `Erreurs de validation:\n${errorMessages}`
       } else if (error.message) {
-        errorMessage = error.message
+        errorMessages = [error.message]
       }
 
-      console.error('❌ Message erreur affiché:', errorMessage)
-      Alert.alert('Erreur', errorMessage)
+      console.error('❌ Message erreur affiché:', errorMessages)
+      showErrorModal('Erreur de création', errorMessages, 'error')
     } finally {
       setLoading(false)
     }
@@ -246,6 +278,112 @@ const ProductFormScreen: React.FC<Props> = ({ route, navigation }) => {
   return (
     <View style={[styles.container, { backgroundColor: theme.colors.background }]} testID={TEST_IDS.productFormScreen}>
       <StatusBar barStyle={theme.isDark ? "light-content" : "dark-content"} backgroundColor={theme.colors.background} />
+
+      {/* Styled Error Modal */}
+      <Modal
+        animationType="fade"
+        transparent={true}
+        visible={errorModalVisible}
+        onRequestClose={() => setErrorModalVisible(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={[styles.errorModalContainer, { backgroundColor: theme.colors.background }]}>
+            {/* Error Icon */}
+            <View style={[
+              styles.errorIconContainer,
+              { backgroundColor: errorType === 'error' ? '#FEE2E2' : '#FEF3C7' }
+            ]}>
+              <Ionicons
+                name={errorType === 'error' ? 'alert-circle' : 'warning'}
+                size={48}
+                color={errorType === 'error' ? '#DC2626' : '#D97706'}
+              />
+            </View>
+
+            {/* Error Title */}
+            <Text style={[
+              styles.errorModalTitle,
+              { color: errorType === 'error' ? '#DC2626' : '#D97706' }
+            ]}>
+              {errorTitle}
+            </Text>
+
+            {/* Error Messages */}
+            <View style={styles.errorMessagesContainer}>
+              {errorMessages.filter(msg => msg).map((message, index) => (
+                <View key={index} style={styles.errorMessageRow}>
+                  <Ionicons
+                    name="chevron-forward"
+                    size={16}
+                    color={theme.colors.textSecondary}
+                  />
+                  <Text style={[styles.errorMessageText, { color: theme.colors.text }]}>
+                    {message}
+                  </Text>
+                </View>
+              ))}
+            </View>
+
+            {/* Close Button */}
+            <TouchableOpacity
+              style={[
+                styles.errorModalButton,
+                { backgroundColor: errorType === 'error' ? '#DC2626' : '#D97706' }
+              ]}
+              onPress={() => setErrorModalVisible(false)}
+            >
+              <Text style={styles.errorModalButtonText}>Compris</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+
+      {/* Styled Success Modal */}
+      <Modal
+        animationType="fade"
+        transparent={true}
+        visible={successModalVisible}
+        onRequestClose={() => {
+          setSuccessModalVisible(false)
+          if (navigation.canGoBack()) {
+            navigation.goBack()
+          } else {
+            navigation.navigate('ProductsList')
+          }
+        }}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={[styles.errorModalContainer, { backgroundColor: theme.colors.background }]}>
+            {/* Success Icon */}
+            <View style={styles.successIconContainer}>
+              <Ionicons name="checkmark-circle" size={48} color="#10B981" />
+            </View>
+
+            {/* Success Title */}
+            <Text style={styles.successModalTitle}>Succès</Text>
+
+            {/* Success Message */}
+            <Text style={[styles.successModalMessage, { color: theme.colors.text }]}>
+              {successMessage}
+            </Text>
+
+            {/* Close Button */}
+            <TouchableOpacity
+              style={styles.successModalButton}
+              onPress={() => {
+                setSuccessModalVisible(false)
+                if (navigation.canGoBack()) {
+                  navigation.goBack()
+                } else {
+                  navigation.navigate('ProductsList')
+                }
+              }}
+            >
+              <Text style={styles.errorModalButtonText}>OK</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
 
       {/* Header */}
       <View style={[styles.header, { backgroundColor: theme.isDark ? '#0F1622' : theme.colors.primary[500] }]}>
@@ -266,8 +404,18 @@ const ProductFormScreen: React.FC<Props> = ({ route, navigation }) => {
         </View>
       </View>
 
-      <ScrollView style={styles.content} contentContainerStyle={styles.scrollContent}>
-        {/* Image */}
+      <KeyboardAvoidingView
+        style={styles.keyboardAvoid}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 0}
+      >
+        <ScrollView
+          style={styles.content}
+          contentContainerStyle={styles.scrollContent}
+          keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={false}
+        >
+          {/* Image */}
         <View style={styles.section}>
           <Text style={[styles.label, { color: theme.colors.text }]}>Photo du produit</Text>
           <TouchableOpacity
@@ -429,13 +577,17 @@ const ProductFormScreen: React.FC<Props> = ({ route, navigation }) => {
             </>
           )}
         </TouchableOpacity>
-      </ScrollView>
+        </ScrollView>
+      </KeyboardAvoidingView>
     </View>
   )
 }
 
 const styles = StyleSheet.create({
   container: {
+    flex: 1,
+  },
+  keyboardAvoid: {
     flex: 1,
   },
   header: {
@@ -538,6 +690,96 @@ const styles = StyleSheet.create({
     color: 'white',
     fontSize: 16,
     fontWeight: '600',
+  },
+  // Error Modal Styles
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  errorModalContainer: {
+    width: '100%',
+    maxWidth: 340,
+    borderRadius: 16,
+    padding: 24,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.25,
+    shadowRadius: 12,
+    elevation: 8,
+  },
+  errorIconContainer: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  errorModalTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    marginBottom: 16,
+  },
+  errorMessagesContainer: {
+    width: '100%',
+    marginBottom: 20,
+  },
+  errorMessageRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    marginBottom: 8,
+    gap: 8,
+  },
+  errorMessageText: {
+    flex: 1,
+    fontSize: 14,
+    lineHeight: 20,
+  },
+  errorModalButton: {
+    width: '100%',
+    padding: 14,
+    borderRadius: 10,
+    alignItems: 'center',
+  },
+  errorModalButtonText: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  // Success Modal Styles
+  successIconContainer: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    backgroundColor: '#D1FAE5',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  successModalTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#10B981',
+    textAlign: 'center',
+    marginBottom: 12,
+  },
+  successModalMessage: {
+    fontSize: 14,
+    textAlign: 'center',
+    lineHeight: 20,
+    marginBottom: 20,
+  },
+  successModalButton: {
+    width: '100%',
+    backgroundColor: '#10B981',
+    padding: 14,
+    borderRadius: 10,
+    alignItems: 'center',
   },
 })
 

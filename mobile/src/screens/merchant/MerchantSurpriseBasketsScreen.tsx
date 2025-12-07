@@ -13,6 +13,8 @@ import {
   Modal,
   TextInput,
   ScrollView,
+  KeyboardAvoidingView,
+  Platform,
 } from 'react-native'
 import { Ionicons } from '@expo/vector-icons'
 import { useFocusEffect } from '@react-navigation/native'
@@ -45,6 +47,30 @@ const MerchantSurpriseBasketsScreen: React.FC<Props> = ({ navigation }) => {
     quantity_available: '',
   })
 
+  // Error modal state
+  const [errorModalVisible, setErrorModalVisible] = useState(false)
+  const [errorTitle, setErrorTitle] = useState('')
+  const [errorMessage, setErrorMessage] = useState('')
+
+  // Success modal state
+  const [successModalVisible, setSuccessModalVisible] = useState(false)
+  const [successTitle, setSuccessTitle] = useState('')
+  const [successMessage, setSuccessMessage] = useState('')
+
+  // Helper function to show styled error modal
+  const showErrorModal = (title: string, message: string) => {
+    setErrorTitle(title)
+    setErrorMessage(message)
+    setErrorModalVisible(true)
+  }
+
+  // Helper function to show styled success modal
+  const showSuccessModal = (title: string, message: string) => {
+    setSuccessTitle(title)
+    setSuccessMessage(message)
+    setSuccessModalVisible(true)
+  }
+
   useFocusEffect(
     useCallback(() => {
       loadBaskets()
@@ -61,7 +87,7 @@ const MerchantSurpriseBasketsScreen: React.FC<Props> = ({ navigation }) => {
       setBaskets(response.data?.data || [])
     } catch (error: any) {
       console.error('❌ [MerchantSurpriseBaskets] Erreur:', error)
-      Alert.alert('Erreur', 'Impossible de charger les paniers surprise')
+      showErrorModal('Erreur de chargement', 'Impossible de charger les paniers surprise. Veuillez réessayer.')
     } finally {
       setLoading(false)
       setRefreshing(false)
@@ -109,10 +135,10 @@ const MerchantSurpriseBasketsScreen: React.FC<Props> = ({ navigation }) => {
               setLoading(true)
               await apiService.delete(`/surprise-baskets/${basketId}`)
               await loadBaskets()
-              Alert.alert('Succès', 'Le panier a été supprimé')
+              showSuccessModal('Suppression réussie', 'Le panier a été supprimé avec succès.')
             } catch (error: any) {
               console.error('❌ Erreur suppression:', error)
-              Alert.alert('Erreur', 'Impossible de supprimer le panier')
+              showErrorModal('Erreur de suppression', 'Impossible de supprimer le panier. Veuillez réessayer.')
             } finally {
               setLoading(false)
             }
@@ -129,13 +155,13 @@ const MerchantSurpriseBasketsScreen: React.FC<Props> = ({ navigation }) => {
         is_active: !basket.is_active,
       })
       await loadBaskets()
-      Alert.alert(
-        'Succès',
-        basket.is_active ? 'Panier désactivé' : 'Panier activé'
+      showSuccessModal(
+        'Statut modifié',
+        basket.is_active ? 'Le panier a été désactivé.' : 'Le panier a été activé.'
       )
     } catch (error: any) {
       console.error('❌ Erreur toggle:', error)
-      Alert.alert('Erreur', 'Impossible de modifier le statut')
+      showErrorModal('Erreur de modification', 'Impossible de modifier le statut du panier.')
     } finally {
       setLoading(false)
     }
@@ -143,19 +169,19 @@ const MerchantSurpriseBasketsScreen: React.FC<Props> = ({ navigation }) => {
 
   const handleSubmit = async () => {
     if (!formData.name.trim()) {
-      Alert.alert('Erreur', 'Le nom est requis')
+      showErrorModal('Validation', 'Le nom est requis')
       return
     }
 
     const price = parseFloat(formData.discounted_price)
     if (!formData.discounted_price || isNaN(price) || price <= 0) {
-      Alert.alert('Erreur', 'Le prix doit être un nombre valide supérieur à 0')
+      showErrorModal('Validation', 'Le prix doit être un nombre valide supérieur à 0')
       return
     }
 
     const quantity = parseInt(formData.quantity_available)
     if (!formData.quantity_available || isNaN(quantity) || quantity <= 0) {
-      Alert.alert('Erreur', 'La quantité doit être un nombre valide supérieur à 0')
+      showErrorModal('Validation', 'La quantité doit être un nombre valide supérieur à 0')
       return
     }
 
@@ -171,19 +197,20 @@ const MerchantSurpriseBasketsScreen: React.FC<Props> = ({ navigation }) => {
 
       if (editingBasket) {
         await apiService.put(`/surprise-baskets/${editingBasket.id}`, payload)
-        Alert.alert('Succès', 'Panier modifié avec succès')
+        setShowModal(false)
+        await loadBaskets()
+        showSuccessModal('Modification réussie', 'Le panier a été modifié avec succès.')
       } else {
         await apiService.post('/surprise-baskets', payload)
-        Alert.alert('Succès', 'Panier créé avec succès')
+        setShowModal(false)
+        await loadBaskets()
+        showSuccessModal('Création réussie', 'Le panier surprise a été créé avec succès.')
       }
-
-      setShowModal(false)
-      await loadBaskets()
     } catch (error: any) {
       console.error('❌ Erreur soumission:', error)
-      Alert.alert(
-        'Erreur',
-        error?.response?.data?.message || 'Impossible de sauvegarder le panier'
+      showErrorModal(
+        'Erreur de sauvegarde',
+        error?.message || 'Impossible de sauvegarder le panier. Veuillez réessayer.'
       )
     } finally {
       setLoading(false)
@@ -395,7 +422,10 @@ const MerchantSurpriseBasketsScreen: React.FC<Props> = ({ navigation }) => {
 
       {/* Modal Création/Édition */}
       <Modal visible={showModal} animationType="slide" transparent={true} testID={TEST_IDS.basketFormModal}>
-        <View style={styles.modalOverlay}>
+        <KeyboardAvoidingView
+          style={styles.modalOverlay}
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        >
           <View style={[styles.modalContent, { backgroundColor: theme.colors.background }]}>
             <View style={[styles.modalHeader, { borderBottomColor: theme.colors.border }]}>
               <Typography variant="h3" weight="semibold">
@@ -406,7 +436,11 @@ const MerchantSurpriseBasketsScreen: React.FC<Props> = ({ navigation }) => {
               </TouchableOpacity>
             </View>
 
-            <ScrollView style={styles.modalBody}>
+            <ScrollView
+              style={styles.modalBody}
+              keyboardShouldPersistTaps="handled"
+              showsVerticalScrollIndicator={false}
+            >
               <View style={styles.formGroup}>
                 <Typography variant="body" weight="semibold" style={{ marginBottom: 8 }}>
                   Nom du panier *
@@ -520,6 +554,72 @@ const MerchantSurpriseBasketsScreen: React.FC<Props> = ({ navigation }) => {
                 {editingBasket ? 'Modifier' : 'Créer'}
               </Button>
             </View>
+          </View>
+        </KeyboardAvoidingView>
+      </Modal>
+
+      {/* Styled Error Modal */}
+      <Modal
+        animationType="fade"
+        transparent={true}
+        visible={errorModalVisible}
+        onRequestClose={() => setErrorModalVisible(false)}
+      >
+        <View style={styles.errorModalOverlay}>
+          <View style={[styles.errorModalContainer, { backgroundColor: theme.colors.background }]}>
+            {/* Error Icon */}
+            <View style={styles.errorIconContainer}>
+              <Ionicons name="alert-circle" size={48} color="#DC2626" />
+            </View>
+
+            {/* Error Title */}
+            <Text style={styles.errorModalTitle}>{errorTitle}</Text>
+
+            {/* Error Message */}
+            <Text style={[styles.errorModalMessage, { color: theme.colors.text }]}>
+              {errorMessage}
+            </Text>
+
+            {/* Close Button */}
+            <TouchableOpacity
+              style={styles.errorModalButton}
+              onPress={() => setErrorModalVisible(false)}
+            >
+              <Text style={styles.errorModalButtonText}>Compris</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+
+      {/* Styled Success Modal */}
+      <Modal
+        animationType="fade"
+        transparent={true}
+        visible={successModalVisible}
+        onRequestClose={() => setSuccessModalVisible(false)}
+      >
+        <View style={styles.errorModalOverlay}>
+          <View style={[styles.errorModalContainer, { backgroundColor: theme.colors.background }]}>
+            {/* Success Icon */}
+            <View style={styles.successIconContainer}>
+              <Ionicons name="checkmark-circle" size={48} color="#10B981" />
+            </View>
+
+            {/* Success Title */}
+            <Text style={styles.successModalTitle}>{successTitle}</Text>
+
+            {/* Success Message */}
+            <Text style={[styles.errorModalMessage, { color: theme.colors.text }]}>
+              {successMessage}
+            </Text>
+
+            {/* Close Button */}
+            <TouchableOpacity
+              style={styles.successModalButton}
+              onPress={() => setSuccessModalVisible(false)}
+            >
+              <Text style={styles.errorModalButtonText}>OK</Text>
+            </TouchableOpacity>
           </View>
         </View>
       </Modal>
@@ -646,6 +746,84 @@ const styles = StyleSheet.create({
     fontSize: 16,
     minHeight: 100,
     textAlignVertical: 'top',
+  },
+  // Error Modal Styles
+  errorModalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  errorModalContainer: {
+    width: '100%',
+    maxWidth: 340,
+    borderRadius: 16,
+    padding: 24,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.25,
+    shadowRadius: 12,
+    elevation: 8,
+  },
+  errorIconContainer: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    backgroundColor: '#FEE2E2',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  errorModalTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#DC2626',
+    textAlign: 'center',
+    marginBottom: 12,
+  },
+  errorModalMessage: {
+    fontSize: 14,
+    textAlign: 'center',
+    lineHeight: 20,
+    marginBottom: 20,
+  },
+  errorModalButton: {
+    width: '100%',
+    backgroundColor: '#DC2626',
+    padding: 14,
+    borderRadius: 10,
+    alignItems: 'center',
+  },
+  errorModalButtonText: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  // Success Modal Styles
+  successIconContainer: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    backgroundColor: '#D1FAE5',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  successModalTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#10B981',
+    textAlign: 'center',
+    marginBottom: 12,
+  },
+  successModalButton: {
+    width: '100%',
+    backgroundColor: '#10B981',
+    padding: 14,
+    borderRadius: 10,
+    alignItems: 'center',
   },
 })
 

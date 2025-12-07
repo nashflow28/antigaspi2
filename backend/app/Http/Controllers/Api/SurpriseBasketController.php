@@ -150,6 +150,10 @@ class SurpriseBasketController extends Controller
         // Use merchant's category or fallback to "Autre" (id 9)
         $categoryId = $request->category_id ?? $user->merchant->category_id ?? 9;
 
+        // 🐛 BUG FIX #31: Set default expiration_date if not provided (end of today)
+        // Surprise baskets typically expire at end of business day
+        $expirationDate = $request->expiration_date ?? now()->endOfDay()->toDateString();
+
         // Create surprise basket
         $surpriseBasket = Product::create([
             'merchant_id' => $user->merchant->id,
@@ -163,7 +167,7 @@ class SurpriseBasketController extends Controller
             'min_items' => $request->min_items,
             'max_items' => $request->max_items,
             'total_original_value' => $totalOriginalValue,
-            'expiration_date' => $request->expiration_date,
+            'expiration_date' => $expirationDate,
             'image_url' => $request->image_url,
             'is_surprise_basket' => true,
             'is_active' => true,
