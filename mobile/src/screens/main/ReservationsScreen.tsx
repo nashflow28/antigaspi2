@@ -345,10 +345,10 @@ const ReservationsScreen: React.FC<Props> = ({ navigation }) => {
         <Button
           variant="secondary"
           size="sm"
-          onPress={() => navigation.navigate('ProductDetails', { productId: item.product.id })}
+          onPress={() => navigation.navigate('ReservationDetails', { reservationId: item.id })}
           leftIcon={<Ionicons name="eye-outline" size={16} color={theme.colors.primary[500]} />}
-          testID={`view-product-${item.product.id}`}
-          accessibilityLabel={`Voir produit ${item.product.name}`}
+          testID={`view-reservation-${item.id}`}
+          accessibilityLabel={`Voir détails réservation ${item.reservation_code}`}
         >
           Voir
         </Button>

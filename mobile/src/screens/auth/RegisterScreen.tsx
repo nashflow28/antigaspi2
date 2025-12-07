@@ -4,18 +4,19 @@ import {
   TextInput,
   TouchableOpacity,
   StyleSheet,
-  Alert,
   KeyboardAvoidingView,
   Platform,
   StatusBar,
   ScrollView,
 } from 'react-native'
 import { useDispatch, useSelector } from 'react-redux'
-import { registerUser } from '../../store/slices/authSlice'
+import { registerUser, clearError } from '../../store/slices/authSlice'
 import { AppDispatch, RootState } from '../../store'
 import { RegisterData } from '../../types'
-import { Button, Card, Typography } from '../../components/2025'
+import { Button, Card, Typography, Modal } from '../../components/2025'
 import { useTheme } from '../../theme'
+import { Ionicons } from '@expo/vector-icons'
+import { useToast } from '../../contexts/ToastContext'
 
 interface Props {
   navigation: any
@@ -24,7 +25,8 @@ interface Props {
 const RegisterScreen: React.FC<Props> = ({ navigation }) => {
   const theme = useTheme()
   const dispatch = useDispatch<AppDispatch>()
-  const { loading, error } = useSelector((state: RootState) => state.auth)
+  const { loading } = useSelector((state: RootState) => state.auth)
+  const { showSuccess } = useToast()
 
   const [formData, setFormData] = useState<RegisterData>({
     first_name: '',
@@ -39,26 +41,78 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
     business_type: '',
   })
 
+  // Error modal state
+  const [errorModalVisible, setErrorModalVisible] = useState(false)
+  const [errorTitle, setErrorTitle] = useState('')
+  const [errorMessages, setErrorMessages] = useState<string[]>([])
+
+  const showErrorModal = (title: string, messages: string[]) => {
+    setErrorTitle(title)
+    setErrorMessages(messages)
+    setErrorModalVisible(true)
+  }
+
   const handleRegister = async () => {
-    if (!formData.first_name || !formData.last_name || !formData.email || !formData.password) {
-      Alert.alert('Erreur', 'Veuillez remplir tous les champs obligatoires')
-      return
+    // Clear previous errors
+    dispatch(clearError())
+
+    // Frontend validation
+    const validationErrors: string[] = []
+
+    if (!formData.first_name.trim()) {
+      validationErrors.push('Le prénom est requis')
+    }
+    if (!formData.last_name.trim()) {
+      validationErrors.push('Le nom est requis')
+    }
+    if (!formData.email.trim()) {
+      validationErrors.push('L\'email est requis')
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+      validationErrors.push('L\'email n\'est pas valide')
+    }
+    if (!formData.city.trim()) {
+      validationErrors.push('La ville est requise')
+    }
+    if (!formData.password) {
+      validationErrors.push('Le mot de passe est requis')
+    } else if (formData.password.length < 8) {
+      validationErrors.push('Le mot de passe doit contenir au moins 8 caractères')
+    }
+    if (formData.password !== formData.password_confirmation) {
+      validationErrors.push('Les mots de passe ne correspondent pas')
     }
 
-    if (formData.password !== formData.password_confirmation) {
-      Alert.alert('Erreur', 'Les mots de passe ne correspondent pas')
+    if (validationErrors.length > 0) {
+      showErrorModal('Champs manquants', validationErrors)
       return
     }
 
     try {
       const result = await dispatch(registerUser(formData))
       if (registerUser.fulfilled.match(result)) {
-        Alert.alert('Succès', 'Compte créé avec succès!')
+        showSuccess('Compte créé avec succès ! 🎉')
       } else {
-        Alert.alert('Erreur', result.payload as string || 'Erreur lors de la création du compte')
+        // Parse validation errors from backend
+        const payload = result.payload as any
+        if (typeof payload === 'object' && payload.errors) {
+          // Detailed validation errors from backend
+          const backendErrors: string[] = []
+          Object.values(payload.errors).forEach((fieldErrors: any) => {
+            if (Array.isArray(fieldErrors)) {
+              fieldErrors.forEach(err => backendErrors.push(err))
+            } else {
+              backendErrors.push(String(fieldErrors))
+            }
+          })
+          showErrorModal('Erreurs de validation', backendErrors)
+        } else {
+          // Simple error message
+          const errorMsg = typeof payload === 'string' ? payload : 'Erreur lors de la création du compte'
+          showErrorModal('Erreur', [errorMsg])
+        }
       }
-    } catch (error) {
-      Alert.alert('Erreur', 'Une erreur est survenue')
+    } catch (error: any) {
+      showErrorModal('Erreur', [error?.message || 'Une erreur est survenue'])
     }
   }
 
@@ -116,14 +170,6 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
           {renderInput('Mot de passe *', formData.password, 'password', 'Mot de passe sécurisé', { secureTextEntry: true })}
           {renderInput('Confirmer le mot de passe *', formData.password_confirmation, 'password_confirmation', 'Confirmer le mot de passe', { secureTextEntry: true })}
 
-          {error && (
-            <View style={{ backgroundColor: theme.colors.error, padding: theme.spacing.sm, borderRadius: theme.radius.md, marginBottom: theme.spacing.lg }}>
-              <Typography variant="caption" style={{ color: theme.colors.error, textAlign: 'center' }}>
-                {error}
-              </Typography>
-            </View>
-          )}
-
           <Button
             variant="primary"
             size="lg"
@@ -147,6 +193,49 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
           </TouchableOpacity>
         </View>
       </ScrollView>
+
+      {/* Error Modal */}
+      <Modal
+        visible={errorModalVisible}
+        onClose={() => setErrorModalVisible(false)}
+        variant="center"
+        showCloseButton={false}
+      >
+        <View style={styles.errorModalContent}>
+          {/* Error Icon */}
+          <View style={[styles.errorIconContainer, { backgroundColor: `${theme.colors.error}15` }]}>
+            <Ionicons name="alert-circle" size={48} color={theme.colors.error} />
+          </View>
+
+          {/* Title */}
+          <Typography variant="h3" weight="bold" style={styles.errorModalTitle}>
+            {errorTitle}
+          </Typography>
+
+          {/* Error Messages */}
+          <View style={[styles.errorMessagesContainer, { backgroundColor: theme.colors.surface.muted }]}>
+            {errorMessages.map((message, index) => (
+              <View key={index} style={styles.errorMessageRow}>
+                <Ionicons name="close-circle" size={16} color={theme.colors.error} style={{ marginRight: 8, marginTop: 2 }} />
+                <Typography variant="body" style={{ flex: 1, color: theme.colors.text }}>
+                  {message}
+                </Typography>
+              </View>
+            ))}
+          </View>
+
+          {/* Close Button */}
+          <Button
+            variant="primary"
+            size="lg"
+            fullWidth
+            onPress={() => setErrorModalVisible(false)}
+            leftIcon={<Ionicons name="checkmark-circle" size={20} color="#fff" />}
+          >
+            Compris
+          </Button>
+        </View>
+      </Modal>
     </KeyboardAvoidingView>
   )
 }
@@ -154,6 +243,33 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+  errorModalContent: {
+    alignItems: 'center',
+    paddingVertical: 8,
+  },
+  errorIconContainer: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 16,
+  },
+  errorModalTitle: {
+    textAlign: 'center',
+    marginBottom: 16,
+  },
+  errorMessagesContainer: {
+    width: '100%',
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 24,
+    gap: 12,
+  },
+  errorMessageRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
   },
 })
 

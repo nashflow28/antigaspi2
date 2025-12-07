@@ -329,6 +329,8 @@ class SearchController extends Controller
                     'city' => optional($merchant->user)->city,
                     'address' => optional($merchant->user)->address,
                     'is_verified' => (bool) $merchant->is_verified,
+                    'photo_url' => $merchant->photo_url,
+                    'logo_url' => $merchant->logo_url,
                     'avg_rating' => $hit['avg_rating'] ?? null,
                     'total_products' => $hit['total_products'] ?? null,
                 ],

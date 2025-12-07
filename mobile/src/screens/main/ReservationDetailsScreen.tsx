@@ -6,11 +6,11 @@ import {
   ScrollView,
   TouchableOpacity,
   StatusBar,
-  Alert,
+  ImageStyle,
 } from 'react-native'
 import { useDispatch, useSelector } from 'react-redux'
 import { AppDispatch, RootState } from '../../store'
-import { fetchReservation, cancelReservation } from '../../store/slices/reservationsSlice'
+import { fetchReservation, cancelReservation, updateReservationQuantity } from '../../store/slices/reservationsSlice'
 import { useToast } from '../../contexts/ToastContext'
 import { Ionicons } from '@expo/vector-icons'
 import { Image } from 'expo-image'
@@ -18,7 +18,7 @@ import { Reservation } from '../../types'
 import { useTheme } from '../../theme'
 import { getImageUrl } from '../../utils/imageHelpers'
 import { formatCurrency } from '../../utils/currencyHelpers'
-import { Button, Card, Badge, Typography } from '../../components/2025'
+import { Button, Card, Badge, Typography, Modal } from '../../components/2025'
 
 interface Props {
   route: any
@@ -34,6 +34,10 @@ const ReservationDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
   const [reservation, setReservation] = useState<Reservation | null>(null)
   const [loading, setLoading] = useState(true)
   const [cancelling, setCancelling] = useState(false)
+  const [modifyModalVisible, setModifyModalVisible] = useState(false)
+  const [cancelModalVisible, setCancelModalVisible] = useState(false)
+  const [newQuantity, setNewQuantity] = useState(1)
+  const [updating, setUpdating] = useState(false)
 
   useEffect(() => {
     loadReservation()
@@ -54,32 +58,58 @@ const ReservationDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
     }
   }
 
-  const handleCancel = () => {
-    Alert.alert(
-      'Annuler la réservation',
-      'Êtes-vous sûr de vouloir annuler cette réservation ?',
-      [
-        { text: 'Non', style: 'cancel' },
-        {
-          text: 'Oui, annuler',
-          style: 'destructive',
-          onPress: async () => {
-            setCancelling(true)
-            try {
-              // 🐛 FIX: Added .unwrap() to properly catch errors and update UI
-              await dispatch(cancelReservation(reservationId)).unwrap()
-              showSuccess('Réservation annulée avec succès')
-              navigation.goBack()
-            } catch (error) {
-              showError('Impossible d\'annuler la réservation')
-            } finally {
-              setCancelling(false)
-            }
-          },
-        },
-      ],
-    )
+  const handleCancelPress = () => {
+    setCancelModalVisible(true)
   }
+
+  const handleConfirmCancel = async () => {
+    setCancelling(true)
+    try {
+      await dispatch(cancelReservation(reservationId)).unwrap()
+      setCancelModalVisible(false)
+      showSuccess('Réservation annulée avec succès ✓')
+      navigation.goBack()
+    } catch (error) {
+      setCancelModalVisible(false)
+      showError('Impossible d\'annuler la réservation')
+    } finally {
+      setCancelling(false)
+    }
+  }
+
+  const handleOpenModifyModal = () => {
+    if (reservation) {
+      setNewQuantity(reservation.quantity)
+      setModifyModalVisible(true)
+    }
+  }
+
+  const handleUpdateQuantity = async () => {
+    if (!reservation || newQuantity === reservation.quantity) {
+      setModifyModalVisible(false)
+      return
+    }
+
+    setUpdating(true)
+    try {
+      const result = await dispatch(updateReservationQuantity({
+        id: reservationId,
+        quantity: newQuantity
+      })).unwrap()
+
+      setReservation(result)
+      showSuccess('Quantité mise à jour avec succès')
+      setModifyModalVisible(false)
+    } catch (error: any) {
+      showError(error || 'Impossible de modifier la quantité')
+    } finally {
+      setUpdating(false)
+    }
+  }
+
+  const maxQuantity = reservation?.product?.quantity_available
+    ? reservation.product.quantity_available + reservation.quantity
+    : 10
 
   if (loading || !reservation) {
     return (
@@ -119,7 +149,7 @@ const ReservationDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
           <View style={styles.productCard}>
             <Image
               source={{ uri: getImageUrl(reservation.product.image_url) }}
-              style={styles.productImage}
+              style={styles.productImage as ImageStyle}
               contentFit="cover"
             />
             <View style={styles.productInfo}>
@@ -321,20 +351,195 @@ const ReservationDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
 
         {/* Actions */}
         {(reservation.status === 'pending' || reservation.status === 'confirmed') && (
-          <View style={{ margin: 16 }}>
+          <View style={{ margin: 16, gap: 12 }}>
+            {/* Modify button - only for pending reservations */}
+            {reservation.status === 'pending' && (
+              <Button
+                variant="secondary"
+                size="md"
+                onPress={handleOpenModifyModal}
+                disabled={updating}
+                leftIcon={<Ionicons name="create-outline" size={20} color={theme.colors.primary[600]} />}
+                style={{ width: '100%' }}
+              >
+                Modifier la quantité
+              </Button>
+            )}
+
             <Button
               variant="destructive"
               size="md"
-              onPress={handleCancel}
+              onPress={handleCancelPress}
               disabled={cancelling}
               leftIcon={<Ionicons name="close-circle-outline" size={20} color={theme.colors.error} />}
               style={{ width: '100%' }}
             >
-              {cancelling ? 'Annulation...' : 'Annuler la réservation'}
+              Annuler la réservation
             </Button>
           </View>
         )}
       </ScrollView>
+
+      {/* Cancel Confirmation Modal */}
+      <Modal
+        visible={cancelModalVisible}
+        onClose={() => !cancelling && setCancelModalVisible(false)}
+        variant="center"
+        showCloseButton={false}
+        dismissable={!cancelling}
+      >
+        <View style={styles.cancelModalContent}>
+          {/* Warning Icon */}
+          <View style={styles.cancelIconContainer}>
+            <Ionicons name="warning" size={48} color={theme.colors.error} />
+          </View>
+
+          {/* Title */}
+          <Typography variant="h3" weight="bold" style={styles.cancelModalTitle}>
+            Annuler la réservation ?
+          </Typography>
+
+          {/* Message */}
+          <Typography variant="body" color="secondary" style={styles.cancelModalMessage}>
+            Cette action est irréversible. Le produit sera remis en vente et vous ne pourrez plus récupérer cette réservation.
+          </Typography>
+
+          {/* Reservation Info Summary */}
+          {reservation && (
+            <View style={styles.cancelModalSummary}>
+              <View style={styles.cancelModalSummaryRow}>
+                <Typography variant="caption" color="secondary">Produit</Typography>
+                <Typography variant="caption" weight="semibold" numberOfLines={1} style={{ flex: 1, textAlign: 'right' }}>
+                  {reservation.product?.name}
+                </Typography>
+              </View>
+              <View style={styles.cancelModalSummaryRow}>
+                <Typography variant="caption" color="secondary">Quantité</Typography>
+                <Typography variant="caption" weight="semibold">{reservation.quantity}</Typography>
+              </View>
+              <View style={styles.cancelModalSummaryRow}>
+                <Typography variant="caption" color="secondary">Total</Typography>
+                <Typography variant="caption" weight="bold" color="primary">
+                  {formatCurrency(unitPrice * reservation.quantity)}
+                </Typography>
+              </View>
+            </View>
+          )}
+
+          {/* Action Buttons */}
+          <View style={styles.cancelModalActions}>
+            <Button
+              variant="secondary"
+              size="lg"
+              onPress={() => setCancelModalVisible(false)}
+              disabled={cancelling}
+              style={{ flex: 1 }}
+            >
+              Non, garder
+            </Button>
+            <Button
+              variant="destructive"
+              size="lg"
+              onPress={handleConfirmCancel}
+              disabled={cancelling}
+              style={{ flex: 1 }}
+              leftIcon={cancelling ? undefined : <Ionicons name="trash-outline" size={18} color="#fff" />}
+            >
+              {cancelling ? 'Annulation...' : 'Oui, annuler'}
+            </Button>
+          </View>
+        </View>
+      </Modal>
+
+      {/* Modify Quantity Modal */}
+      <Modal
+        visible={modifyModalVisible}
+        onClose={() => setModifyModalVisible(false)}
+        title="Modifier la quantité"
+        variant="center"
+      >
+        {/* Product Info */}
+        <View style={styles.modifyModalProduct}>
+          <Image
+            source={{ uri: getImageUrl(reservation.product?.image_url) }}
+            style={styles.modifyModalImage as ImageStyle}
+            contentFit="cover"
+          />
+          <View style={{ flex: 1 }}>
+            <Typography variant="body" weight="semibold" numberOfLines={2}>
+              {reservation.product?.name}
+            </Typography>
+            <Typography variant="caption" color="secondary">
+              Prix unitaire: {formatCurrency(unitPrice)}
+            </Typography>
+          </View>
+        </View>
+
+        {/* Quantity Selector */}
+        <View style={styles.modifyQuantitySection}>
+          <Typography variant="body" weight="semibold" style={{ marginBottom: 12, textAlign: 'center' }}>
+            Nouvelle quantité
+          </Typography>
+          <View style={styles.modifyQuantityControls}>
+            <TouchableOpacity
+              style={[styles.modifyQuantityButton, newQuantity <= 1 && styles.modifyQuantityButtonDisabled]}
+              disabled={newQuantity <= 1}
+              onPress={() => setNewQuantity(Math.max(1, newQuantity - 1))}
+            >
+              <Ionicons name="remove" size={24} color={newQuantity <= 1 ? theme.colors.neutral[400] : theme.colors.primary[600]} />
+            </TouchableOpacity>
+
+            <View style={styles.modifyQuantityValue}>
+              <Typography variant="h2" weight="bold">
+                {newQuantity}
+              </Typography>
+            </View>
+
+            <TouchableOpacity
+              style={[styles.modifyQuantityButton, newQuantity >= maxQuantity && styles.modifyQuantityButtonDisabled]}
+              disabled={newQuantity >= maxQuantity}
+              onPress={() => setNewQuantity(Math.min(maxQuantity, newQuantity + 1))}
+            >
+              <Ionicons name="add" size={24} color={newQuantity >= maxQuantity ? theme.colors.neutral[400] : theme.colors.primary[600]} />
+            </TouchableOpacity>
+          </View>
+          <Typography variant="caption" color="secondary" style={{ textAlign: 'center', marginTop: 8 }}>
+            Quantité actuelle: {reservation.quantity} | Max disponible: {maxQuantity}
+          </Typography>
+        </View>
+
+        {/* New Total */}
+        <View style={styles.modifyTotalSection}>
+          <Typography variant="body" color="secondary">
+            Nouveau total:
+          </Typography>
+          <Typography variant="h3" weight="bold" color="primary">
+            {formatCurrency(unitPrice * newQuantity)}
+          </Typography>
+        </View>
+
+        {/* Actions */}
+        <View style={styles.modifyActions}>
+          <Button
+            variant="ghost"
+            size="lg"
+            onPress={() => setModifyModalVisible(false)}
+            style={{ flex: 1 }}
+          >
+            Annuler
+          </Button>
+          <Button
+            variant="primary"
+            size="lg"
+            onPress={handleUpdateQuantity}
+            disabled={updating || newQuantity === reservation.quantity}
+            style={{ flex: 2 }}
+            leftIcon={<Ionicons name="checkmark-circle" size={20} color={theme.colors.textInverse} />}
+          >
+            {updating ? 'Mise à jour...' : 'Confirmer'}
+          </Button>
+        </View>
+      </Modal>
     </View>
   )
 }
@@ -396,6 +601,107 @@ const createStyles = (theme: ReturnType<typeof useTheme>) => StyleSheet.create({
   timelineContent: {
     flex: 1,
     paddingBottom: 4,
+  },
+  // Modify modal styles
+  modifyModalProduct: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 16,
+    backgroundColor: theme.colors.surface.muted,
+    borderRadius: 12,
+    marginBottom: 20,
+    gap: 12,
+  },
+  modifyModalImage: {
+    width: 60,
+    height: 60,
+    borderRadius: 8,
+  },
+  modifyQuantitySection: {
+    backgroundColor: theme.colors.surface.muted,
+    borderRadius: 12,
+    padding: 20,
+    marginBottom: 16,
+  },
+  modifyQuantityControls: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 24,
+  },
+  modifyQuantityButton: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: theme.colors.primary[50],
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 2,
+    borderColor: theme.colors.primary[200],
+  },
+  modifyQuantityButtonDisabled: {
+    backgroundColor: theme.colors.neutral[100],
+    borderColor: theme.colors.neutral[200],
+  },
+  modifyQuantityValue: {
+    minWidth: 60,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  modifyTotalSection: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: 16,
+    paddingHorizontal: 20,
+    backgroundColor: theme.colors.primary[50],
+    borderRadius: 12,
+    marginBottom: 20,
+  },
+  modifyActions: {
+    flexDirection: 'row',
+    gap: 12,
+  },
+  // Cancel modal styles
+  cancelModalContent: {
+    alignItems: 'center',
+    paddingVertical: 8,
+  },
+  cancelIconContainer: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    backgroundColor: `${theme.colors.error}15`,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 16,
+  },
+  cancelModalTitle: {
+    textAlign: 'center',
+    marginBottom: 8,
+  },
+  cancelModalMessage: {
+    textAlign: 'center',
+    marginBottom: 20,
+    lineHeight: 22,
+  },
+  cancelModalSummary: {
+    width: '100%',
+    backgroundColor: theme.colors.surface.muted,
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 24,
+    gap: 12,
+  },
+  cancelModalSummaryRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  cancelModalActions: {
+    flexDirection: 'row',
+    gap: 12,
+    width: '100%',
   },
 })
 

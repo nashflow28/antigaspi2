@@ -16,6 +16,8 @@ import { useDispatch, useSelector } from 'react-redux'
 import { AppDispatch, RootState } from '../../store'
 import { fetchProducts } from '../../store/slices/productsSlice'
 import { fetchMerchants } from '../../store/slices/merchantsSlice'
+import { fetchReviews, fetchReviewStats } from '../../store/slices/reviewsSlice'
+import StarRating from '../../components/reviews/StarRating'
 import { Ionicons } from '@expo/vector-icons'
 import { Image } from 'expo-image'
 import { useTheme } from '../../theme'
@@ -39,6 +41,7 @@ const MerchantDetailScreen: React.FC<Props> = ({ route, navigation }) => {
   const { merchantId } = route.params
   const { products } = useSelector((state: RootState) => state.products)
   const { merchants } = useSelector((state: RootState) => state.merchants)
+  const { reviews, stats: reviewStats, loading: reviewsLoading } = useSelector((state: RootState) => state.reviews)
 
   const [merchantProducts, setMerchantProducts] = useState<Product[]>([])
   const [merchant, setMerchant] = useState<Merchant | null>(null)
@@ -47,6 +50,14 @@ const MerchantDetailScreen: React.FC<Props> = ({ route, navigation }) => {
   const [locationPermissionGranted, setLocationPermissionGranted] = useState(false)
   const [requestingLocation, setRequestingLocation] = useState(false)
   const [mapExpanded, setMapExpanded] = useState(false)
+
+  // Load reviews when tab changes to reviews
+  useEffect(() => {
+    if (activeTab === 'reviews' && merchantId) {
+      dispatch(fetchReviews({ merchantId }))
+      dispatch(fetchReviewStats(merchantId))
+    }
+  }, [activeTab, merchantId, dispatch])
 
   // ✅ FIX: Race condition + Memory leak + Undefined access
   useEffect(() => {
@@ -620,19 +631,88 @@ const MerchantDetailScreen: React.FC<Props> = ({ route, navigation }) => {
         {/* Tab Content - Reviews */}
         {activeTab === 'reviews' && (
           <View style={styles.reviewsContainer}>
-            <Typography variant="h4" weight="bold" style={{ paddingHorizontal: theme.spacing.lg, marginBottom: theme.spacing.md }}>
-              Avis clients
-            </Typography>
-            <View style={{ paddingHorizontal: theme.spacing.lg }}>
-              <View style={[styles.emptyProducts, { marginTop: theme.spacing.xl }]}>
-                <Ionicons name="star-outline" size={64} color={theme.colors.neutral[300]} />
-                <Typography variant="h4" weight="bold" style={{ marginTop: theme.spacing.lg, marginBottom: theme.spacing.sm }}>
-                  Aucun avis pour le moment
+            {/* Header with stats */}
+            <View style={{ paddingHorizontal: theme.spacing.lg, marginBottom: theme.spacing.md }}>
+              <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+                <Typography variant="h4" weight="bold">
+                  Avis clients
                 </Typography>
-                <Typography variant="body" color="secondary" style={{ textAlign: 'center', lineHeight: 20 }}>
-                  Les avis clients seront bientôt disponibles.{'\n'}Consultez les informations et produits du marchand !
-                </Typography>
+                <Button
+                  variant="primary"
+                  size="sm"
+                  onPress={() => navigation.navigate('AddReview', {
+                    merchantId,
+                    merchantName: merchant?.business_name || 'Commerçant',
+                  })}
+                  leftIcon={<Ionicons name="create-outline" size={16} color={theme.colors.textInverse} />}
+                >
+                  Donner un avis
+                </Button>
               </View>
+
+              {/* Stats summary */}
+              {reviewStats && reviewStats.total_reviews > 0 && (
+                <View style={[styles.reviewsStats, { marginTop: theme.spacing.md }]}>
+                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+                    <StarRating rating={reviewStats.average_rating} size={20} />
+                    <Typography variant="h3" weight="bold">
+                      {reviewStats.average_rating.toFixed(1)}
+                    </Typography>
+                  </View>
+                  <Typography variant="caption" color="secondary">
+                    {reviewStats.total_reviews} avis
+                  </Typography>
+                </View>
+              )}
+            </View>
+
+            {/* Reviews list */}
+            <View style={{ paddingHorizontal: theme.spacing.lg }}>
+              {reviewsLoading ? (
+                <View style={{ padding: theme.spacing.xl, alignItems: 'center' }}>
+                  <Typography variant="body" color="secondary">Chargement des avis...</Typography>
+                </View>
+              ) : reviews.length === 0 ? (
+                <View style={[styles.emptyProducts, { marginTop: theme.spacing.lg }]}>
+                  <Ionicons name="star-outline" size={64} color={theme.colors.neutral[300]} />
+                  <Typography variant="h4" weight="bold" style={{ marginTop: theme.spacing.lg, marginBottom: theme.spacing.sm }}>
+                    Aucun avis pour le moment
+                  </Typography>
+                  <Typography variant="body" color="secondary" style={{ textAlign: 'center', lineHeight: 20 }}>
+                    Soyez le premier à donner votre avis sur ce commerçant !
+                  </Typography>
+                </View>
+              ) : (
+                <View style={{ gap: theme.spacing.md }}>
+                  {reviews.map((review) => (
+                    <Card key={review.id} variant="outline" style={{ padding: theme.spacing.md }}>
+                      <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: theme.spacing.sm }}>
+                        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+                          <View style={[styles.reviewAvatar, { backgroundColor: theme.colors.primary[100] }]}>
+                            <Typography variant="body" weight="bold" color="primary">
+                              {review.user?.name?.charAt(0) || 'U'}
+                            </Typography>
+                          </View>
+                          <View>
+                            <Typography variant="body" weight="semibold">
+                              {review.user?.name || 'Utilisateur'}
+                            </Typography>
+                            <Typography variant="caption" color="secondary">
+                              {new Date(review.created_at).toLocaleDateString('fr-FR')}
+                            </Typography>
+                          </View>
+                        </View>
+                        <StarRating rating={review.rating} size={14} />
+                      </View>
+                      {review.comment && (
+                        <Typography variant="body" color="secondary" style={{ lineHeight: 20 }}>
+                          {review.comment}
+                        </Typography>
+                      )}
+                    </Card>
+                  ))}
+                </View>
+              )}
             </View>
           </View>
         )}
@@ -874,6 +954,21 @@ const createStyles = (theme: ReturnType<typeof useTheme>) => StyleSheet.create({
   },
   reviewsContainer: {
     marginTop: theme.spacing.lg,
+  },
+  reviewsStats: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    padding: theme.spacing.md,
+    backgroundColor: theme.colors.surface.light,
+    borderRadius: theme.radius.lg,
+  },
+  reviewAvatar: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 })
 

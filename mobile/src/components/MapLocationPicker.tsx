@@ -12,6 +12,7 @@ import MapView, {
   Region,
   MapPressEvent,
   MarkerDragStartEndEvent,
+  UrlTile,
 } from 'react-native-maps'
 import { Ionicons } from '@expo/vector-icons'
 import { useTheme } from '../theme'
@@ -212,9 +213,17 @@ const MapLocationPicker: React.FC<MapLocationPickerProps> = ({
             showsUserLocation={true}
             showsMyLocationButton={true}
             showsCompass={true}
-            mapType="standard"
+            mapType={Platform.OS === 'android' ? 'none' : 'standard'}
           >
-            {/* Draggable Marker - Native Google Maps marker */}
+            {/* OpenStreetMap Tiles - 100% gratuit, pas de clé API */}
+            <UrlTile
+              urlTemplate="https://tile.openstreetmap.org/{z}/{x}/{y}.png"
+              maximumZ={19}
+              flipY={false}
+              tileSize={256}
+            />
+
+            {/* Draggable Marker */}
             {selectedLocation && (
               <Marker
                 coordinate={selectedLocation}
@@ -228,9 +237,9 @@ const MapLocationPicker: React.FC<MapLocationPickerProps> = ({
             )}
           </MapView>
 
-          {/* Google Maps Attribution */}
+          {/* OpenStreetMap Attribution */}
           <View style={styles.osmAttribution}>
-            <Text style={styles.osmAttributionText}>Google Maps</Text>
+            <Text style={styles.osmAttributionText}>© OpenStreetMap</Text>
           </View>
 
           {/* Center on marker button */}

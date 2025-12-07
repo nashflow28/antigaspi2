@@ -26,8 +26,7 @@ import { formatCurrency } from '../../utils/currencyHelpers'
 import FavoriteButton from '../../components/FavoriteButton'
 import { Product } from '../../types'
 import { Button, Card, Badge, Typography } from '../../components/2025'
-// TEMPORARY: Disabled react-native-maps - needs native configuration
-// import MapView, { Callout, Marker, PROVIDER_GOOGLE } from 'react-native-maps'
+import OpenStreetMap, { MapMarker } from '../../components/OpenStreetMap'
 import locationService, { UserLocation } from '../../services/locationService'
 import type { Merchant as MerchantEntity } from '../../store/slices/merchantsSlice'
 import searchService, {
@@ -414,6 +413,11 @@ const ProductsScreen: React.FC<Props> = ({ navigation }) => {
 
   // Toggle distance filter on/off directly
   const handleDistanceToggle = async () => {
+    // Protection contre les taps multiples pendant le chargement
+    if (isRequestingLocation) {
+      return
+    }
+
     if (distanceEnabled) {
       // Désactiver directement
       setDistanceEnabled(false)
@@ -443,11 +447,17 @@ const ProductsScreen: React.FC<Props> = ({ navigation }) => {
       return
     }
 
-    const ok = await ensureUserLocation(true)
-    if (ok) {
-      setDistanceEnabled(true)
-    } else {
-      Alert.alert('Géolocalisation inactive', "Impossible d'activer le filtre distance sans accès à votre position.")
+    // Bloquer les taps multiples pendant la récupération de position
+    setIsRequestingLocation(true)
+    try {
+      const ok = await ensureUserLocation(false) // false pour éviter double setIsRequestingLocation
+      if (ok) {
+        setDistanceEnabled(true)
+      } else {
+        Alert.alert('Géolocalisation inactive', "Impossible d'activer le filtre distance sans accès à votre position.")
+      }
+    } finally {
+      setIsRequestingLocation(false)
     }
   }
 
@@ -537,8 +547,8 @@ const ProductsScreen: React.FC<Props> = ({ navigation }) => {
     contentMode,
     mapMerchantResult,
     mapProductResult,
-    remoteMerchantResults,
-    remoteProductResults,
+    // NOTE: remoteMerchantResults et remoteProductResults retirés car ils sont
+    // des OUTPUTS de ce useEffect, pas des inputs. Les inclure causait une boucle infinie.
   ])
 
   // Mapping emojis pour les catégories
@@ -737,6 +747,22 @@ const ProductsScreen: React.FC<Props> = ({ navigation }) => {
     )
   }
 
+  // Prepare map markers from merchants with coordinates
+  const mapMarkers: MapMarker[] = useMemo(() => {
+    return merchantsWithCoordinates.map(({ merchant }) => ({
+      id: merchant.id,
+      latitude: merchant.latitude as number,
+      longitude: merchant.longitude as number,
+      title: merchant.business_name,
+      subtitle: merchant.business_type || merchant.user?.city,
+      emoji: getMerchantEmoji(merchant.business_type || ''),
+    }))
+  }, [merchantsWithCoordinates])
+
+  const handleMapMarkerPress = (merchantId: number) => {
+    navigation.navigate('MerchantDetail', { merchantId })
+  }
+
   const renderMerchantsMap = () => {
     if (Platform.OS === 'web') {
       return (
@@ -760,18 +786,19 @@ const ProductsScreen: React.FC<Props> = ({ navigation }) => {
       )
     }
 
-    // TEMPORARY: MapView disabled - needs react-native-maps native configuration
+    // OpenStreetMap with Leaflet.js
     return (
       <View style={styles.mapWrapper}>
-        <View style={[styles.merchantsMap, { justifyContent: 'center', alignItems: 'center', backgroundColor: theme.colors.neutral[100] }]}>
-          <Ionicons name="map-outline" size={64} color={theme.colors.neutral[400]} />
-          <Typography variant="body" color="secondary" style={{ marginTop: 16, textAlign: 'center', paddingHorizontal: 24 }}>
-            Vue carte temporairement désactivée
-          </Typography>
-          <Typography variant="caption" color="secondary" style={{ marginTop: 8, textAlign: 'center', paddingHorizontal: 24 }}>
-            Configuration Google Maps en cours
-          </Typography>
-        </View>
+        <OpenStreetMap
+          markers={mapMarkers}
+          height={360}
+          onMarkerPress={handleMapMarkerPress}
+          initialRegion={
+            userLocation
+              ? { latitude: userLocation.latitude, longitude: userLocation.longitude, zoom: 13 }
+              : undefined
+          }
+        />
       </View>
     )
   }
@@ -930,47 +957,66 @@ const ProductsScreen: React.FC<Props> = ({ navigation }) => {
 
       {contentMode === 'merchants' && (
         <View style={styles.distanceRow}>
-          <View style={[styles.filterChip, distanceEnabled && styles.filterChipActive]}>
-            <Ionicons
-              name="location"
-              size={16}
-              color={distanceEnabled
-                ? theme.colors.interactiveTextActive
-                : theme.colors.textSecondary}
-            />
-            {/* Tap on text to change distance (when enabled) */}
+          {/* Quand désactivé: toute la barre est cliquable pour activer */}
+          {!distanceEnabled ? (
             <TouchableOpacity
-              onPress={distanceEnabled ? handleDistanceOptionsPress : handleDistanceToggle}
+              style={[styles.filterChip, isRequestingLocation && { opacity: 0.6 }]}
+              onPress={handleDistanceToggle}
               disabled={isRequestingLocation}
-              style={{ flex: 1 }}
+              activeOpacity={0.7}
             >
+              <Ionicons
+                name="location"
+                size={16}
+                color={theme.colors.textSecondary}
+              />
               <Typography
                 variant="caption"
                 weight="medium"
-                style={{
-                  color: distanceEnabled
-                    ? theme.colors.interactiveTextActive
-                    : theme.colors.interactiveText,
-                }}
+                style={{ flex: 1, color: theme.colors.interactiveText }}
               >
-                {distanceEnabled ? `< ${maxDistance} km` : 'Filtrer par distance'}
+                {isRequestingLocation ? 'Localisation...' : 'Filtrer par distance'}
               </Typography>
-            </TouchableOpacity>
-            {/* Tap on toggle to enable/disable directly */}
-            <TouchableOpacity
-              onPress={handleDistanceToggle}
-              disabled={isRequestingLocation}
-              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-            >
               <Ionicons
-                name={distanceEnabled ? 'toggle' : 'toggle-outline'}
+                name="toggle-outline"
                 size={24}
-                color={distanceEnabled
-                  ? theme.colors.interactiveTextActive
-                  : theme.colors.textSecondary}
+                color={theme.colors.textSecondary}
               />
             </TouchableOpacity>
-          </View>
+          ) : (
+            /* Quand activé: texte pour options, toggle pour désactiver */
+            <View style={[styles.filterChip, styles.filterChipActive]}>
+              <Ionicons
+                name="location"
+                size={16}
+                color={theme.colors.interactiveTextActive}
+              />
+              {/* Tap sur le texte pour changer la distance */}
+              <TouchableOpacity
+                onPress={handleDistanceOptionsPress}
+                style={{ flex: 1 }}
+              >
+                <Typography
+                  variant="caption"
+                  weight="semibold"
+                  style={{ color: theme.colors.interactiveTextActive }}
+                >
+                  {`< ${maxDistance} km`}
+                </Typography>
+              </TouchableOpacity>
+              {/* Tap sur le toggle pour désactiver */}
+              <TouchableOpacity
+                onPress={handleDistanceToggle}
+                hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
+              >
+                <Ionicons
+                  name="toggle"
+                  size={24}
+                  color={theme.colors.interactiveTextActive}
+                />
+              </TouchableOpacity>
+            </View>
+          )}
         </View>
       )}
 

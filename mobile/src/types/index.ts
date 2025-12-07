@@ -264,6 +264,7 @@ export interface MobileMoneyPaymentPayload {
   provider: MobileMoneyProvider
   customerPhone: string
   customerEmail?: string
+  amount: number
   currency?: string
   notes?: string | null
   reference?: string | null
@@ -304,6 +305,7 @@ export interface Reservation {
     discounted_price?: number
     discount_percentage?: number
     expiration_date?: string
+    quantity_available?: number
     merchant: {
       id?: number
       name: string
@@ -445,6 +447,7 @@ export interface CartItemProduct {
   image_url?: string | null
   discounted_price: number
   available_quantity: number
+  category?: { id: number; name: string } | null
 }
 
 export interface CartItem {

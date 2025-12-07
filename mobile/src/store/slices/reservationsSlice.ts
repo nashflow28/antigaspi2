@@ -58,6 +58,18 @@ export const cancelReservation = createAsyncThunk(
   }
 )
 
+export const updateReservationQuantity = createAsyncThunk(
+  'reservations/updateQuantity',
+  async ({ id, quantity }: { id: number; quantity: number }, { rejectWithValue }) => {
+    try {
+      const response = await apiService.updateReservationQuantity(id, quantity)
+      return response.data
+    } catch (error: any) {
+      return rejectWithValue(error.message)
+    }
+  }
+)
+
 const reservationsSlice = createSlice({
   name: 'reservations',
   initialState: reservationsInitialState,
@@ -154,6 +166,24 @@ const reservationsSlice = createSlice({
         state.error = null
       })
       .addCase(cancelReservation.rejected, (state, action) => {
+        state.loading = false
+        state.error = action.payload as string
+      })
+
+      // Update reservation quantity
+      .addCase(updateReservationQuantity.pending, (state) => {
+        state.loading = true
+        state.error = null
+      })
+      .addCase(updateReservationQuantity.fulfilled, (state, action: PayloadAction<Reservation>) => {
+        state.loading = false
+        const index = state.reservations.findIndex(r => r.id === action.payload.id)
+        if (index !== -1) {
+          state.reservations[index] = action.payload
+        }
+        state.error = null
+      })
+      .addCase(updateReservationQuantity.rejected, (state, action) => {
         state.loading = false
         state.error = action.payload as string
       })

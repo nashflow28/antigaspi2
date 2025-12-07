@@ -15,9 +15,9 @@ const getApiBaseUrl = (): string => {
   if (configUrl) {
     return configUrl;
   }
-  // Fallback pour développement local
+  // 🐛 FIX: Changed port from 3000 to 8000 to match Laravel backend
   // 10.0.2.2 est l'adresse spéciale pour localhost sur émulateur Android
-  return 'http://10.0.2.2:3000/api'
+  return 'http://10.0.2.2:8000/api'
 }
 
 export interface AnalyticsEvent {

@@ -76,10 +76,13 @@ class MerchantController extends Controller
                     'latitude' => $merchant->latitude ? (float) $merchant->latitude : null,
                     'longitude' => $merchant->longitude ? (float) $merchant->longitude : null,
                     'products_count' => (int) ($merchant->products_count ?? 0),
+                    'photo_url' => $merchant->photo_url,
+                    'logo_url' => $merchant->logo_url,
                     'user' => [
                         'city' => optional($merchant->user)->city,
                         'address' => optional($merchant->user)->address,
                         'phone' => optional($merchant->user)->phone,
+                        'photo_url' => optional($merchant->user)->photo_url,
                     ],
                 ];
             });

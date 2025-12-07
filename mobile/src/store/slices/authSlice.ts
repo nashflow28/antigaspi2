@@ -33,6 +33,13 @@ export const registerUser = createAsyncThunk(
       const response = await apiService.register(data)
       return response
     } catch (error: any) {
+      // Preserve validation errors for detailed error display
+      if (error.validationErrors) {
+        return rejectWithValue({
+          message: error.message,
+          errors: error.validationErrors
+        })
+      }
       return rejectWithValue(error.message)
     }
   }

@@ -53,7 +53,17 @@ const AddReviewScreen: React.FC<AddReviewScreenProps> = ({ route, navigation }) 
       // Navigate back
       navigation.goBack()
     } catch (error: any) {
-      showError(error.message || (isEditMode ? 'Erreur lors de la modification' : 'Erreur lors de la publication'))
+      // L'erreur peut être une string (rejectWithValue) ou un objet Error
+      const errorMessage = typeof error === 'string'
+        ? error
+        : error?.message || (isEditMode ? 'Erreur lors de la modification' : 'Erreur lors de la publication')
+
+      // Message personnalisé si avis déjà existant (status 409)
+      if (errorMessage.includes('déjà') || errorMessage.includes('already')) {
+        showError('Vous avez déjà donné un avis sur ce produit. Vous pouvez le modifier depuis la liste des avis.')
+      } else {
+        showError(errorMessage)
+      }
     }
   }
 

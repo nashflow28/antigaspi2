@@ -104,7 +104,7 @@ export const checkoutCart = createAsyncThunk(
           product_id: item.product_id,
           quantity: item.quantity
         })),
-        notes: payload.notes
+        notes: payload.notes ?? undefined
       }
 
       console.log('📦 [Cart] Creating order from cart with items:', orderPayload.items)

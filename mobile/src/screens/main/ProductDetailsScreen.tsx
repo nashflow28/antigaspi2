@@ -24,7 +24,8 @@ import { getImageUrl, getCategoryPlaceholder } from '../../utils/imageHelpers'
 import { formatCurrency } from '../../utils/currencyHelpers'
 import FavoriteButton from '../../components/FavoriteButton'
 import StarRating from '../../components/reviews/StarRating'
-import { Button, Card, Typography, Modal } from '../../components/2025'
+import { Button, Card, Badge, Typography, Modal } from '../../components/2025'
+import locationService from '../../services/locationService'
 // 🐛 BUG FIX #MOB-L-002: Use centralized environment detection
 import { isTestEnv as checkIsTestEnv, isTestMode as checkIsTestMode } from '../../utils/envHelpers'
 import { TEST_IDS } from '../../utils/testIds'
@@ -54,7 +55,26 @@ const ProductDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
   const [cartAddedVisible, setCartAddedVisible] = useState(false)
   const [addingToCart, setAddingToCart] = useState(false)
   const [modalQuantity, setModalQuantity] = useState(1)
+  const [userLocation, setUserLocation] = useState<{ latitude: number; longitude: number; timestamp: number } | null>(null)
   const isTestEnv = checkIsTestEnv()
+
+  // Load user location for distance calculation
+  useEffect(() => {
+    const loadLocation = async () => {
+      try {
+        const hasPermission = await locationService.hasLocationPermission()
+        if (hasPermission) {
+          const position = await locationService.getCurrentPosition()
+          if (position) {
+            setUserLocation(position)
+          }
+        }
+      } catch (error) {
+        // Silently fail - distance just won't be shown
+      }
+    }
+    loadLocation()
+  }, [])
 
   useEffect(() => {
     // 🐛 BUG FIX #MOB-H-003: Handle loadProduct errors on mount
@@ -135,6 +155,32 @@ const ProductDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
     : 0
 
   const isTestMode = checkIsTestMode()
+
+  // Calculate expiration info
+  const daysUntilExpiration = product.days_until_expiration ?? (
+    product.expiration_date
+      ? Math.ceil((new Date(product.expiration_date).getTime() - Date.now()) / (1000 * 60 * 60 * 24))
+      : null
+  )
+
+  const getExpirationBadge = () => {
+    if (daysUntilExpiration === null) return null
+    if (daysUntilExpiration <= 0) return { variant: 'error' as const, text: 'Expiré', icon: 'alert-circle' }
+    if (daysUntilExpiration === 1) return { variant: 'warning' as const, text: 'Expire demain', icon: 'time' }
+    if (daysUntilExpiration <= 3) return { variant: 'warning' as const, text: `${daysUntilExpiration} jours`, icon: 'time' }
+    return { variant: 'success' as const, text: `${daysUntilExpiration} jours`, icon: 'checkmark-circle' }
+  }
+
+  const expirationBadge = getExpirationBadge()
+
+  // Calculate distance to merchant
+  const distanceInfo = userLocation && product.merchant?.latitude && product.merchant?.longitude
+    ? locationService.calculateDistanceFromUser(
+        userLocation,
+        product.merchant.latitude,
+        product.merchant.longitude
+      )
+    : null
 
   const selectedPayment = PAYMENT_OPTIONS.find(option => option.value === selectedPaymentMethod)
   const totalPrice = discountedPrice * selectedQuantity
@@ -308,9 +354,106 @@ const ProductDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
             {product.name}
           </Typography>
 
-          <Typography variant="body" color="secondary" style={{ marginBottom: theme.spacing.md }}>
-            {product.merchant?.business_name || 'Marchand'} | {product.merchant?.city || 'Ville'}
-          </Typography>
+          {/* Merchant Info with Verified Badge */}
+          <View style={styles.merchantRow}>
+            <View style={{ flex: 1 }}>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+                <Typography variant="body" color="secondary">
+                  {product.merchant?.business_name || 'Marchand'}
+                </Typography>
+                {product.merchant?.is_verified && (
+                  <View style={styles.verifiedBadge}>
+                    <Ionicons name="checkmark-circle" size={16} color={theme.colors.success} />
+                    <Typography variant="caption" weight="semibold" style={{ color: theme.colors.success, marginLeft: 2 }}>
+                      Vérifié
+                    </Typography>
+                  </View>
+                )}
+              </View>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4, marginTop: 4 }}>
+                <Ionicons name="location-outline" size={14} color={theme.colors.textTertiary} />
+                <Typography variant="caption" color="tertiary">
+                  {product.merchant?.city || 'Ville'}
+                </Typography>
+                {distanceInfo && (
+                  <>
+                    <Typography variant="caption" color="tertiary"> • </Typography>
+                    <Ionicons name="navigate-outline" size={14} color={theme.colors.primary[500]} />
+                    <Typography variant="caption" weight="semibold" color="primary">
+                      {distanceInfo.formatted}
+                    </Typography>
+                  </>
+                )}
+              </View>
+            </View>
+          </View>
+
+          {/* Important Info Cards: Expiration + Savings */}
+          <View style={styles.infoCardsRow}>
+            {/* Expiration Card */}
+            {expirationBadge && (
+              <View style={[
+                styles.infoCard,
+                {
+                  backgroundColor: expirationBadge.variant === 'error'
+                    ? `${theme.colors.error}15`
+                    : expirationBadge.variant === 'warning'
+                      ? `${theme.colors.warning}15`
+                      : `${theme.colors.success}15`,
+                  borderColor: expirationBadge.variant === 'error'
+                    ? theme.colors.error
+                    : expirationBadge.variant === 'warning'
+                      ? theme.colors.warning
+                      : theme.colors.success,
+                }
+              ]}>
+                <Ionicons
+                  name={expirationBadge.icon as any}
+                  size={20}
+                  color={
+                    expirationBadge.variant === 'error'
+                      ? theme.colors.error
+                      : expirationBadge.variant === 'warning'
+                        ? theme.colors.warning
+                        : theme.colors.success
+                  }
+                />
+                <View>
+                  <Typography variant="caption" color="secondary">
+                    À consommer
+                  </Typography>
+                  <Typography
+                    variant="body"
+                    weight="bold"
+                    style={{
+                      color: expirationBadge.variant === 'error'
+                        ? theme.colors.error
+                        : expirationBadge.variant === 'warning'
+                          ? theme.colors.warning
+                          : theme.colors.success
+                    }}
+                  >
+                    {expirationBadge.text}
+                  </Typography>
+                </View>
+              </View>
+            )}
+
+            {/* Savings Card */}
+            {discountPercent > 0 && (
+              <View style={[styles.infoCard, { backgroundColor: `${theme.colors.primary[500]}15`, borderColor: theme.colors.primary[500] }]}>
+                <Ionicons name="pricetag" size={20} color={theme.colors.primary[500]} />
+                <View>
+                  <Typography variant="caption" color="secondary">
+                    Économie
+                  </Typography>
+                  <Typography variant="body" weight="bold" color="primary">
+                    {formatCurrency(originalPrice - discountedPrice)}
+                  </Typography>
+                </View>
+              </View>
+            )}
+          </View>
 
           <View style={{ marginBottom: theme.spacing.md }}>
             <View style={{ flexDirection: 'row', alignItems: 'baseline', gap: 8, marginBottom: 4 }}>
@@ -812,6 +955,33 @@ const createStyles = (theme: ReturnType<typeof useTheme>) => StyleSheet.create({
   },
   content: {
     padding: 16,
+  },
+  merchantRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    marginBottom: theme.spacing.md,
+  },
+  verifiedBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: `${theme.colors.success}15`,
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: theme.radius.full,
+  },
+  infoCardsRow: {
+    flexDirection: 'row',
+    gap: 12,
+    marginBottom: theme.spacing.md,
+  },
+  infoCard: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    padding: 12,
+    borderRadius: 12,
+    borderWidth: 1,
   },
   bottomBar: {
     padding: 16,

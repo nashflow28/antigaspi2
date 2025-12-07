@@ -67,10 +67,12 @@ const MerchantOpeningHoursScreen: React.FC = () => {
       setLoading(true)
       const response = await apiService.get('/merchants/opening-hours')
 
-      console.log('📅 [OpeningHours] API response:', response.data)
+      // 🐛 BUG FIX #30: apiService.get() returns response.data directly
+      // So response IS the data object, not response.data
+      console.log('📅 [OpeningHours] API response:', response)
 
-      if (response.data?.success) {
-        const existingHours = response.data.data?.opening_hours
+      if (response?.success) {
+        const existingHours = response.data?.opening_hours
 
         // Si des heures existent, les utiliser
         if (existingHours && Array.isArray(existingHours) && existingHours.length > 0) {
@@ -108,11 +110,16 @@ const MerchantOpeningHoursScreen: React.FC = () => {
     try {
       setSaving(true)
 
+      console.log('📅 [OpeningHours] Saving schedule:', JSON.stringify(schedule, null, 2))
+
       const response = await apiService.put('/merchants/opening-hours', {
         opening_hours: schedule,
       })
 
-      if (response.data.success) {
+      console.log('📅 [OpeningHours] Save response:', response)
+
+      // 🐛 BUG FIX #30: apiService.put() returns response.data directly
+      if (response?.success) {
         Alert.alert('Succès', 'Heures d\'ouverture mises à jour avec succès', [
           {
             text: 'OK',
@@ -125,10 +132,28 @@ const MerchantOpeningHoursScreen: React.FC = () => {
             },
           },
         ])
+      } else {
+        // Handle case where response exists but success is false
+        console.error('📅 [OpeningHours] Save failed:', response)
+        Alert.alert('Erreur', response?.message || 'La sauvegarde a échoué')
       }
     } catch (error: any) {
-      console.error('Erreur sauvegarde heures:', error)
-      Alert.alert('Erreur', error.response?.data?.message || 'Impossible de sauvegarder les heures')
+      console.error('📅 [OpeningHours] Save error:', error)
+      console.error('📅 [OpeningHours] Error details:', {
+        message: error?.message,
+        statusCode: error?.statusCode,
+        validationErrors: error?.validationErrors,
+      })
+
+      let errorMessage = 'Impossible de sauvegarder les heures'
+      if (error?.validationErrors) {
+        const errors = Object.values(error.validationErrors).flat()
+        errorMessage = errors.join('\n')
+      } else if (error?.message) {
+        errorMessage = error.message
+      }
+
+      Alert.alert('Erreur', errorMessage)
     } finally {
       setSaving(false)
     }

@@ -122,12 +122,14 @@ class PaymentService {
         throw new Error('Le montant minimum est de 100 XOF');
       }
 
+      // 🐛 FIX: Include amount and enforce XOF currency in payload
       const response = await apiService.initiateMobileMoneyPayment({
         reservationId: request.reservationId,
         provider: request.provider,
         customerPhone: request.customerPhone,
         customerEmail: request.customerEmail,
-        currency: request.currency,
+        amount: request.amount,
+        currency: request.currency || 'XOF',
         notes: request.notes,
         reference: request.reference
       });
