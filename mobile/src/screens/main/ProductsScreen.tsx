@@ -603,7 +603,7 @@ const ProductsScreen: React.FC<Props> = ({ navigation }) => {
         }}
         activeOpacity={0.7}
       >
-        <Card variant="elevated" style={styles.merchantCard}>
+        <Card variant="elevated" style={styles.merchantCard} contentStyle={styles.merchantCardContent}>
           {/* Image Container */}
           <View style={styles.merchantImageContainer}>
             {merchantImageUrl ? (
@@ -1349,9 +1349,12 @@ const createStyles = (theme: ReturnType<typeof useTheme>) => StyleSheet.create({
   },
   merchantCard: {
     marginBottom: theme.spacing.sm,
-    flexDirection: 'row',
     overflow: 'hidden',
     borderRadius: theme.radius.lg,
+  },
+  merchantCardContent: {
+    flexDirection: 'row',
+    padding: 0,
   },
   merchantImageContainer: {
     position: 'relative',
