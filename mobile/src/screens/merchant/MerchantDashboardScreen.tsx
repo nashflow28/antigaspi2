@@ -217,7 +217,10 @@ const MerchantDashboardScreen: React.FC = () => {
 
           <TouchableOpacity
             style={[styles.statCard, { backgroundColor: theme.colors.cardBackground, borderColor: theme.colors.cardBorder, borderWidth: 1 }]}
-            onPress={() => (navigation as any).navigate('Reservations')}
+            onPress={() => (navigation as any).navigate('Reservations', {
+              screen: 'ReservationsMain',
+              params: { initialFilter: 'pending' }
+            })}
             activeOpacity={0.7}
           >
             <View style={[styles.statIcon, { backgroundColor: theme.withOpacity(theme.colors.semantic.warning, 0.1) }]}>
@@ -227,7 +230,7 @@ const MerchantDashboardScreen: React.FC = () => {
               {stats.pending_reservations}
             </Text>
             <Text style={[styles.statLabel, { color: theme.colors.textSecondary }]}>
-              En attente
+              Réserv. en attente
             </Text>
           </TouchableOpacity>
         </View>

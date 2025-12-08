@@ -16,12 +16,21 @@ import apiService from '../../services/api'
 import ExportReservationsButton from '../../components/merchant/ExportReservationsButton'
 import { Reservation } from '../../types'
 
-const MerchantReservationsScreen: React.FC = () => {
+interface Props {
+  route?: {
+    params?: {
+      initialFilter?: 'all' | 'pending' | 'confirmed' | 'ready' | 'completed' | 'cancelled'
+    }
+  }
+}
+
+const MerchantReservationsScreen: React.FC<Props> = ({ route }) => {
   const theme = useTheme()
+  const initialFilter = route?.params?.initialFilter || 'all'
   const [reservations, setReservations] = useState<Reservation[]>([])
   const [refreshing, setRefreshing] = useState(false)
   const [loading, setLoading] = useState(true)
-  const [filter, setFilter] = useState<'all' | 'pending' | 'confirmed' | 'ready' | 'completed' | 'cancelled'>('all')
+  const [filter, setFilter] = useState<'all' | 'pending' | 'confirmed' | 'ready' | 'completed' | 'cancelled'>(initialFilter)
 
   useEffect(() => {
     loadReservations()
