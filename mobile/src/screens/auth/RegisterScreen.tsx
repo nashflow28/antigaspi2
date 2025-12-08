@@ -544,6 +544,7 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
         onClose={() => setErrorModalVisible(false)}
         variant="center"
         showCloseButton={false}
+        scrollable={false}
       >
         <View style={styles.errorModalContent}>
           <View style={[styles.errorIconContainer, { backgroundColor: `${theme.colors.error}15` }]}>

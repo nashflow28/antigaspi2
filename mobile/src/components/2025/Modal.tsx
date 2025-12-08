@@ -138,11 +138,16 @@ export const Modal: React.FC<ModalProps> = ({
 
     switch (variant) {
       case 'center':
+        // Pour les modals center, ne pas forcer maxHeight si scrollable=false
+        // Cela permet au contenu de déterminer la taille du modal
+        const centerMaxHeight = scrollable
+          ? (typeof maxHeight === 'number' ? maxHeight : SCREEN_HEIGHT * 0.8)
+          : (typeof maxHeight === 'number' ? maxHeight : undefined)
         return {
           ...baseStyle,
           borderRadius: theme.radius['2xl'],
           maxWidth: '90%',
-          maxHeight: typeof maxHeight === 'number' ? maxHeight : SCREEN_HEIGHT * 0.8,
+          ...(centerMaxHeight !== undefined && { maxHeight: centerMaxHeight }),
           ...theme.shadows.xl,
         }
 
@@ -165,7 +170,7 @@ export const Modal: React.FC<ModalProps> = ({
       default:
         return baseStyle
     }
-  }, [variant, theme, maxHeight])
+  }, [variant, theme, maxHeight, scrollable])
 
   const overlayStyle: ViewStyle = useMemo(() => ({
     flex: 1,
