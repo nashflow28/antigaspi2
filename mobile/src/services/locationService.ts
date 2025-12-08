@@ -64,16 +64,59 @@ class LocationService {
   }
 
   /**
+   * Récupère la dernière position connue (instantané, sans attente GPS)
+   * @returns {Promise<UserLocation | null>} Dernière position connue ou null
+   */
+  async getLastKnownPosition(): Promise<UserLocation | null> {
+    try {
+      const hasPermission = await this.hasLocationPermission()
+
+      if (!hasPermission) {
+        return null
+      }
+
+      const location = await Location.getLastKnownPositionAsync()
+
+      if (!location) {
+        return null
+      }
+
+      return {
+        latitude: location.coords.latitude,
+        longitude: location.coords.longitude,
+        accuracy: location.coords.accuracy,
+        timestamp: location.timestamp,
+      }
+    } catch (error) {
+      console.error('Erreur lors de la récupération de la dernière position:', error)
+      return null
+    }
+  }
+
+  /**
    * Récupère la position actuelle de l'utilisateur
+   * @param useLastKnownFirst Si true, essaie d'abord la dernière position connue (plus rapide)
    * @returns {Promise<UserLocation | null>} Position actuelle ou null en cas d'erreur
    */
-  async getCurrentPosition(): Promise<UserLocation | null> {
+  async getCurrentPosition(useLastKnownFirst: boolean = false): Promise<UserLocation | null> {
     try {
       const hasPermission = await this.hasLocationPermission()
 
       if (!hasPermission) {
         console.warn('Permission de localisation non accordée')
         return null
+      }
+
+      // Essayer d'abord la dernière position connue si demandé
+      if (useLastKnownFirst) {
+        const lastKnown = await this.getLastKnownPosition()
+        if (lastKnown) {
+          // Vérifier que la position n'est pas trop ancienne (< 5 minutes)
+          const fiveMinutesAgo = Date.now() - 5 * 60 * 1000
+          if (lastKnown.timestamp > fiveMinutesAgo) {
+            return lastKnown
+          }
+        }
       }
 
       const location = await Location.getCurrentPositionAsync({

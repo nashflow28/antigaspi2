@@ -376,7 +376,7 @@ const ProductsScreen: React.FC<Props> = ({ navigation }) => {
     setRefreshing(false)
   }
 
-  const ensureUserLocation = async (promptUser: boolean = true): Promise<boolean> => {
+  const ensureUserLocation = async (promptUser: boolean = true, useFastLocation: boolean = false): Promise<boolean> => {
     try {
       if (!locationPermissionGranted) {
         if (!promptUser) {
@@ -395,7 +395,8 @@ const ProductsScreen: React.FC<Props> = ({ navigation }) => {
         }
       }
 
-      const position = await locationService.getCurrentPosition()
+      // Utiliser la dernière position connue si disponible (instantané)
+      const position = await locationService.getCurrentPosition(useFastLocation)
       if (position) {
         setUserLocation(position)
       }
@@ -434,7 +435,7 @@ const ProductsScreen: React.FC<Props> = ({ navigation }) => {
           {
             text: 'Autoriser',
             onPress: async () => {
-              const granted = await ensureUserLocation(true)
+              const granted = await ensureUserLocation(true, true) // useFastLocation = true
               if (granted) {
                 setDistanceEnabled(true)
               } else {
@@ -447,10 +448,16 @@ const ProductsScreen: React.FC<Props> = ({ navigation }) => {
       return
     }
 
-    // Bloquer les taps multiples pendant la récupération de position
+    // Utiliser la dernière position connue si on l'a déjà
+    if (userLocation) {
+      setDistanceEnabled(true)
+      return
+    }
+
+    // Sinon, récupérer la position (avec priorité à la dernière connue)
     setIsRequestingLocation(true)
     try {
-      const ok = await ensureUserLocation(false) // false pour éviter double setIsRequestingLocation
+      const ok = await ensureUserLocation(false, true) // useFastLocation = true pour être rapide
       if (ok) {
         setDistanceEnabled(true)
       } else {
