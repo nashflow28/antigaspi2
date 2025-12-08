@@ -10,6 +10,7 @@ import {
   Alert,
   Image,
   ActivityIndicator,
+  Modal,
 } from 'react-native'
 import { Ionicons } from '@expo/vector-icons'
 import { useFocusEffect } from '@react-navigation/native'
@@ -64,6 +65,7 @@ const MerchantProductsScreen: React.FC<Props> = ({ navigation }) => {
   const [refreshing, setRefreshing] = useState(false)
   const [loading, setLoading] = useState(true)
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('all')
+  const [addModalVisible, setAddModalVisible] = useState(false)
 
   // Recharger la liste à chaque fois que l'écran devient actif
   useFocusEffect(
@@ -99,25 +101,17 @@ const MerchantProductsScreen: React.FC<Props> = ({ navigation }) => {
   }
 
   const handleAddButtonPress = () => {
-    Alert.alert(
-      'Ajouter',
-      'Que souhaitez-vous créer ?',
-      [
-        {
-          text: 'Produit',
-          onPress: () => navigation.navigate('ProductForm', { mode: 'create' }),
-        },
-        {
-          text: 'Panier Surprise',
-          onPress: () => navigation.navigate('SurpriseBaskets'),
-        },
-        {
-          text: 'Annuler',
-          style: 'cancel',
-        },
-      ],
-      { cancelable: true }
-    )
+    setAddModalVisible(true)
+  }
+
+  const handleAddProduct = () => {
+    setAddModalVisible(false)
+    navigation.navigate('ProductForm', { mode: 'create' })
+  }
+
+  const handleAddSurpriseBasket = () => {
+    setAddModalVisible(false)
+    navigation.navigate('SurpriseBaskets')
   }
 
   const handleCreateProduct = () => {
@@ -308,6 +302,75 @@ const MerchantProductsScreen: React.FC<Props> = ({ navigation }) => {
   return (
     <View style={[styles.container, { backgroundColor: theme.colors.background }]} testID={TEST_IDS.merchantProducts}>
       <StatusBar barStyle={theme.isDark ? "light-content" : "dark-content"} backgroundColor={theme.colors.background} />
+
+      {/* Add Product/Basket Modal */}
+      <Modal
+        animationType="fade"
+        transparent={true}
+        visible={addModalVisible}
+        onRequestClose={() => setAddModalVisible(false)}
+      >
+        <TouchableOpacity
+          style={styles.modalOverlay}
+          activeOpacity={1}
+          onPress={() => setAddModalVisible(false)}
+        >
+          <View style={[styles.addModalContainer, { backgroundColor: theme.colors.background }]}>
+            {/* Header */}
+            <View style={styles.addModalHeader}>
+              <View style={[styles.addModalIcon, { backgroundColor: theme.colors.primary[50] }]}>
+                <Ionicons name="add-circle" size={32} color={theme.colors.primary[500]} />
+              </View>
+              <Text style={[styles.addModalTitle, { color: theme.colors.text }]}>
+                Que souhaitez-vous créer ?
+              </Text>
+            </View>
+
+            {/* Options */}
+            <View style={styles.addModalOptions}>
+              <TouchableOpacity
+                style={[styles.addModalOption, { backgroundColor: theme.colors.primary[50], borderColor: theme.colors.primary[200] }]}
+                onPress={handleAddProduct}
+              >
+                <View style={[styles.addModalOptionIcon, { backgroundColor: theme.colors.primary[500] }]}>
+                  <Ionicons name="cube" size={24} color="white" />
+                </View>
+                <View style={styles.addModalOptionText}>
+                  <Text style={[styles.addModalOptionTitle, { color: theme.colors.text }]}>Produit</Text>
+                  <Text style={[styles.addModalOptionDesc, { color: theme.colors.textSecondary }]}>
+                    Ajouter un produit individuel
+                  </Text>
+                </View>
+                <Ionicons name="chevron-forward" size={20} color={theme.colors.primary[500]} />
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={[styles.addModalOption, { backgroundColor: theme.colors.accent.orange + '10', borderColor: theme.colors.accent.orange + '30' }]}
+                onPress={handleAddSurpriseBasket}
+              >
+                <View style={[styles.addModalOptionIcon, { backgroundColor: theme.colors.accent.orange }]}>
+                  <Ionicons name="gift" size={24} color="white" />
+                </View>
+                <View style={styles.addModalOptionText}>
+                  <Text style={[styles.addModalOptionTitle, { color: theme.colors.text }]}>Panier Surprise</Text>
+                  <Text style={[styles.addModalOptionDesc, { color: theme.colors.textSecondary }]}>
+                    Créer un panier mystère à prix réduit
+                  </Text>
+                </View>
+                <Ionicons name="chevron-forward" size={20} color={theme.colors.accent.orange} />
+              </TouchableOpacity>
+            </View>
+
+            {/* Cancel Button */}
+            <TouchableOpacity
+              style={[styles.addModalCancelButton, { borderColor: theme.colors.neutral[200] }]}
+              onPress={() => setAddModalVisible(false)}
+            >
+              <Text style={[styles.addModalCancelText, { color: theme.colors.textSecondary }]}>Annuler</Text>
+            </TouchableOpacity>
+          </View>
+        </TouchableOpacity>
+      </Modal>
 
       {/* Header */}
       <View style={[styles.header, { backgroundColor: theme.isDark ? '#0F1622' : theme.colors.primary[500] }]}>
@@ -568,6 +631,82 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     zIndex: 1000,
+  },
+  // Add Modal Styles
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  addModalContainer: {
+    width: '100%',
+    maxWidth: 340,
+    borderRadius: 20,
+    padding: 24,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 12,
+    elevation: 8,
+  },
+  addModalHeader: {
+    alignItems: 'center',
+    marginBottom: 24,
+  },
+  addModalIcon: {
+    width: 64,
+    height: 64,
+    borderRadius: 32,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 16,
+  },
+  addModalTitle: {
+    fontSize: 20,
+    fontWeight: '700',
+    textAlign: 'center',
+  },
+  addModalOptions: {
+    gap: 12,
+    marginBottom: 20,
+  },
+  addModalOption: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 16,
+    borderRadius: 16,
+    borderWidth: 1,
+  },
+  addModalOptionIcon: {
+    width: 48,
+    height: 48,
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 14,
+  },
+  addModalOptionText: {
+    flex: 1,
+  },
+  addModalOptionTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    marginBottom: 2,
+  },
+  addModalOptionDesc: {
+    fontSize: 13,
+  },
+  addModalCancelButton: {
+    paddingVertical: 14,
+    borderRadius: 12,
+    borderWidth: 1,
+    alignItems: 'center',
+  },
+  addModalCancelText: {
+    fontSize: 16,
+    fontWeight: '600',
   },
 })
 

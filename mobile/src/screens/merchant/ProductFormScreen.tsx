@@ -213,7 +213,7 @@ const ProductFormScreen: React.FC<Props> = ({ route, navigation }) => {
 
       const productData = {
         name: name.trim(),
-        description: description.trim(),
+        description: description?.trim() || null,
         // category_id removed - automatically uses merchant's category
         original_price: parseFloat(originalPrice),
         discounted_price: parseFloat(discountedPrice),

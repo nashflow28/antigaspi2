@@ -435,7 +435,7 @@ class ProductController extends Controller
             $validator = Validator::make($request->all(), [
                 // category_id removed - cannot be changed (always uses merchant's category)
                 'name' => 'sometimes|string|max:255',
-                'description' => 'sometimes|string',
+                'description' => 'sometimes|nullable|string',
                 'original_price' => 'sometimes|numeric|min:0',
                 'discounted_price' => 'sometimes|numeric|min:0',
                 'quantity_available' => 'sometimes|integer|min:0',

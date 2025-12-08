@@ -11,6 +11,7 @@
 6. **TOUJOURS exécuter la suite complète de tests (backend & frontend)** après les modifications et corriger immédiatement toute erreur ou tout test en échec.
 7. **Vérifier le lint et le build** du projet (TypeScript, ESLint, compilation frontend, etc.) afin de détecter toute régression ou erreur de syntaxe.
 8. **Ne déclarer la tâche "terminée" qu'après validation** par l'agent de revue (Phase 2) **ET** par un agent de validation finale (Phase 3) **ET** Phase 4 (reality-checker) avec confirmation explicite de chacun.
+9. **🚨 TOUJOURS DEMANDER CONFIRMATION avant de lancer un build APK mobile (eas build)**. Ne JAMAIS lancer de build automatiquement sans l'accord explicite de l'utilisateur.
 
 ## 🚨 GARDE-FOUS ANTI-BIAIS OBLIGATOIRES
 **Protection contre auto-validation, optimisme systémique et métriques biaisées**

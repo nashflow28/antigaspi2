@@ -2,6 +2,7 @@ import React from 'react'
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import { Ionicons } from '@expo/vector-icons'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useTheme } from '../theme'
 
 // Admin Screens
@@ -34,6 +35,7 @@ const NotificationsStack = () => (
 
 const AdminNavigator: React.FC = () => {
   const theme = useTheme()
+  const insets = useSafeAreaInsets()
 
   return (
     <Tab.Navigator
@@ -65,8 +67,8 @@ const AdminNavigator: React.FC = () => {
         tabBarInactiveTintColor: theme.colors.neutral[400],
         headerShown: false,
         tabBarStyle: {
-          paddingBottom: 5,
-          height: 60,
+          paddingBottom: insets.bottom > 0 ? insets.bottom : 8,
+          height: 60 + (insets.bottom > 0 ? insets.bottom : 8),
           backgroundColor: theme.colors.surface.light,
           borderTopColor: theme.colors.border,
         },

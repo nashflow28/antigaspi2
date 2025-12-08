@@ -196,9 +196,14 @@ const MerchantDashboardScreen: React.FC = () => {
           <Ionicons name="chevron-forward" size={20} color={theme.isDark ? '#0B140F' : 'white'} />
         </TouchableOpacity>
 
-        {/* Stats Cards */}
+        {/* Stats Cards - Clickable */}
         <View style={styles.statsContainer}>
-          <View style={[styles.statCard, { backgroundColor: theme.colors.cardBackground, borderColor: theme.colors.cardBorder, borderWidth: 1 }]} testID={TEST_IDS.activeProductsCard}>
+          <TouchableOpacity
+            style={[styles.statCard, { backgroundColor: theme.colors.cardBackground, borderColor: theme.colors.cardBorder, borderWidth: 1 }]}
+            testID={TEST_IDS.activeProductsCard}
+            onPress={() => (navigation as any).navigate('Products')}
+            activeOpacity={0.7}
+          >
             <View style={[styles.statIcon, { backgroundColor: theme.withOpacity(theme.colors.primary[500], 0.1) }]}>
               <Ionicons name="cube" size={24} color={theme.colors.primary[500]} />
             </View>
@@ -208,9 +213,13 @@ const MerchantDashboardScreen: React.FC = () => {
             <Text style={[styles.statLabel, { color: theme.colors.textSecondary }]}>
               Produits actifs
             </Text>
-          </View>
+          </TouchableOpacity>
 
-          <View style={[styles.statCard, { backgroundColor: theme.colors.cardBackground, borderColor: theme.colors.cardBorder, borderWidth: 1 }]}>
+          <TouchableOpacity
+            style={[styles.statCard, { backgroundColor: theme.colors.cardBackground, borderColor: theme.colors.cardBorder, borderWidth: 1 }]}
+            onPress={() => (navigation as any).navigate('Reservations')}
+            activeOpacity={0.7}
+          >
             <View style={[styles.statIcon, { backgroundColor: theme.withOpacity(theme.colors.semantic.warning, 0.1) }]}>
               <Ionicons name="hourglass" size={24} color={theme.colors.semantic.warning} />
             </View>
@@ -220,20 +229,26 @@ const MerchantDashboardScreen: React.FC = () => {
             <Text style={[styles.statLabel, { color: theme.colors.textSecondary }]}>
               En attente
             </Text>
-          </View>
-
-          <View style={[styles.statCard, { backgroundColor: theme.colors.cardBackground, borderColor: theme.colors.cardBorder, borderWidth: 1 }]} testID={TEST_IDS.totalSalesCard}>
-            <View style={[styles.statIcon, { backgroundColor: theme.withOpacity(theme.colors.semantic.success, 0.1) }]}>
-              <Ionicons name="cash" size={24} color={theme.colors.semantic.success} />
-            </View>
-            <Text style={[styles.statValue, { color: theme.colors.text }]}>
-              {(stats.todays_revenue || 0).toLocaleString()} F
-            </Text>
-            <Text style={[styles.statLabel, { color: theme.colors.textSecondary }]}>
-              Revenus aujourd'hui
-            </Text>
-          </View>
+          </TouchableOpacity>
         </View>
+
+        {/* Revenue Card - Full width */}
+        <TouchableOpacity
+          style={[styles.revenueCard, { backgroundColor: theme.colors.cardBackground, borderColor: theme.colors.cardBorder, borderWidth: 1 }]}
+          testID={TEST_IDS.totalSalesCard}
+          onPress={() => (navigation as any).navigate('Analytics')}
+          activeOpacity={0.7}
+        >
+          <View style={[styles.statIcon, { backgroundColor: theme.withOpacity(theme.colors.semantic.success, 0.1) }]}>
+            <Ionicons name="cash" size={24} color={theme.colors.semantic.success} />
+          </View>
+          <Text style={[styles.statValue, { color: theme.colors.text }]}>
+            {(stats.todays_revenue || 0).toLocaleString()} F
+          </Text>
+          <Text style={[styles.statLabel, { color: theme.colors.textSecondary }]}>
+            Revenus aujourd'hui
+          </Text>
+        </TouchableOpacity>
 
         {/* Réservations récentes */}
         <View style={styles.section}>
@@ -418,6 +433,13 @@ const styles = StyleSheet.create({
     flex: 1,
     minWidth: '30%',
     padding: 16,
+    borderRadius: 12,
+    alignItems: 'center',
+  },
+  revenueCard: {
+    marginHorizontal: 16,
+    marginTop: 12,
+    padding: 20,
     borderRadius: 12,
     alignItems: 'center',
   },

@@ -4,6 +4,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import { Ionicons } from '@expo/vector-icons'
 import { useSelector } from 'react-redux'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useTheme } from '../theme'
 import ErrorBoundary from '../components/ErrorBoundary'
 import { RootState } from '../store'
@@ -103,6 +104,7 @@ const AccountStack = () => (
 
 const ConsumerNavigator: React.FC = () => {
   const theme = useTheme()
+  const insets = useSafeAreaInsets()
   const { cart } = useSelector((state: RootState) => state.cart)
   const cartItemsCount = cart?.items_count ?? 0
 
@@ -146,8 +148,8 @@ const ConsumerNavigator: React.FC = () => {
         tabBarInactiveTintColor: theme.colors.neutral[400],
         headerShown: false,
         tabBarStyle: {
-          paddingBottom: 5,
-          height: 60,
+          paddingBottom: insets.bottom > 0 ? insets.bottom : 8,
+          height: 60 + (insets.bottom > 0 ? insets.bottom : 8),
           backgroundColor: theme.colors.surface.light,
           borderTopColor: theme.colors.border,
           pointerEvents: 'auto',
