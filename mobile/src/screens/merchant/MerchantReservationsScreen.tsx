@@ -15,6 +15,7 @@ import { useTheme } from '../../theme'
 import apiService from '../../services/api'
 import ExportReservationsButton from '../../components/merchant/ExportReservationsButton'
 import { Reservation } from '../../types'
+import { Modal as Modal2025 } from '../../components/2025'
 
 interface Props {
   route?: {
@@ -31,6 +32,14 @@ const MerchantReservationsScreen: React.FC<Props> = ({ route }) => {
   const [refreshing, setRefreshing] = useState(false)
   const [loading, setLoading] = useState(true)
   const [filter, setFilter] = useState<'all' | 'pending' | 'confirmed' | 'ready' | 'completed' | 'cancelled'>(initialFilter)
+
+  // Modal states pour actions stylisées
+  const [selectedReservation, setSelectedReservation] = useState<Reservation | null>(null)
+  const [showConfirmModal, setShowConfirmModal] = useState(false)
+  const [showReadyModal, setShowReadyModal] = useState(false)
+  const [showCompleteModal, setShowCompleteModal] = useState(false)
+  const [showCancelModal, setShowCancelModal] = useState(false)
+  const [actionLoading, setActionLoading] = useState(false)
 
   useEffect(() => {
     loadReservations()
@@ -103,125 +112,122 @@ const MerchantReservationsScreen: React.FC<Props> = ({ route }) => {
     loadReservations()
   }
 
+  // Ouvre le modal de confirmation
   const handleConfirm = (reservation: Reservation) => {
-    const customerName = reservation.consumer
-      ? `${reservation.consumer.first_name} ${reservation.consumer.last_name}`
-      : 'Client'
-
-    Alert.alert(
-      'Confirmer la réservation',
-      `Confirmer la réservation de ${customerName} ?`,
-      [
-        { text: 'Annuler', style: 'cancel' },
-        {
-          text: 'Confirmer',
-          onPress: async () => {
-            try {
-              if (__DEV__) {
-                console.log('📤 [MerchantReservations] Confirmation réservation:', reservation.id)
-              }
-              await apiService.post(`/reservations/${reservation.id}/confirm`)
-              if (__DEV__) {
-                console.log('✅ [MerchantReservations] Réservation confirmée, rechargement...')
-              }
-              // 🐛 BUG FIX #35: Add await to ensure errors are caught
-              await loadReservations()
-            } catch (error: any) {
-              console.error('❌ [MerchantReservations] Erreur confirmation:', error?.message || error)
-              Alert.alert('Erreur', 'Impossible de confirmer la réservation')
-            }
-          },
-        },
-      ]
-    )
+    setSelectedReservation(reservation)
+    setShowConfirmModal(true)
   }
 
+  // Exécute la confirmation
+  const executeConfirm = async () => {
+    if (!selectedReservation) return
+    setActionLoading(true)
+    try {
+      if (__DEV__) {
+        console.log('📤 [MerchantReservations] Confirmation réservation:', selectedReservation.id)
+      }
+      await apiService.post(`/reservations/${selectedReservation.id}/confirm`)
+      if (__DEV__) {
+        console.log('✅ [MerchantReservations] Réservation confirmée, rechargement...')
+      }
+      setShowConfirmModal(false)
+      await loadReservations()
+    } catch (error: any) {
+      console.error('❌ [MerchantReservations] Erreur confirmation:', error?.message || error)
+      Alert.alert('Erreur', 'Impossible de confirmer la réservation')
+    } finally {
+      setActionLoading(false)
+    }
+  }
+
+  // Ouvre le modal "prête"
   const handleMarkReady = (reservation: Reservation) => {
-    Alert.alert(
-      'Marquer comme prête',
-      `La commande est-elle prête à être récupérée ?`,
-      [
-        { text: 'Non', style: 'cancel' },
-        {
-          text: 'Oui, prête',
-          onPress: async () => {
-            try {
-              if (__DEV__) {
-                console.log('📤 [MerchantReservations] Marquage prêt réservation:', reservation.id)
-              }
-              await apiService.post(`/reservations/${reservation.id}/ready`)
-              if (__DEV__) {
-                console.log('✅ [MerchantReservations] Réservation marquée prête, rechargement...')
-              }
-              // 🐛 BUG FIX #35: Add await to ensure errors are caught
-              await loadReservations()
-            } catch (error: any) {
-              console.error('❌ [MerchantReservations] Erreur marquage prêt:', error?.message || error)
-              Alert.alert('Erreur', 'Impossible de marquer la réservation comme prête')
-            }
-          },
-        },
-      ]
-    )
+    setSelectedReservation(reservation)
+    setShowReadyModal(true)
   }
 
+  // Exécute le marquage "prête"
+  const executeMarkReady = async () => {
+    if (!selectedReservation) return
+    setActionLoading(true)
+    try {
+      if (__DEV__) {
+        console.log('📤 [MerchantReservations] Marquage prêt réservation:', selectedReservation.id)
+      }
+      await apiService.post(`/reservations/${selectedReservation.id}/ready`)
+      if (__DEV__) {
+        console.log('✅ [MerchantReservations] Réservation marquée prête, rechargement...')
+      }
+      setShowReadyModal(false)
+      await loadReservations()
+    } catch (error: any) {
+      console.error('❌ [MerchantReservations] Erreur marquage prêt:', error?.message || error)
+      Alert.alert('Erreur', 'Impossible de marquer la réservation comme prête')
+    } finally {
+      setActionLoading(false)
+    }
+  }
+
+  // Ouvre le modal "terminée"
   const handleComplete = (reservation: Reservation) => {
-    Alert.alert(
-      'Marquer comme terminée',
-      `Le client a-t-il récupéré sa commande ?`,
-      [
-        { text: 'Non', style: 'cancel' },
-        {
-          text: 'Oui, terminée',
-          onPress: async () => {
-            try {
-              if (__DEV__) {
-                console.log('📤 [MerchantReservations] Finalisation réservation:', reservation.id)
-              }
-              await apiService.post(`/reservations/${reservation.id}/complete`)
-              if (__DEV__) {
-                console.log('✅ [MerchantReservations] Réservation finalisée, rechargement...')
-              }
-              // 🐛 BUG FIX #35: Add await to ensure errors are caught
-              await loadReservations()
-            } catch (error: any) {
-              console.error('❌ [MerchantReservations] Erreur finalisation:', error?.message || error)
-              Alert.alert('Erreur', 'Impossible de marquer la réservation comme terminée')
-            }
-          },
-        },
-      ]
-    )
+    setSelectedReservation(reservation)
+    setShowCompleteModal(true)
   }
 
+  // Exécute le marquage "terminée"
+  const executeComplete = async () => {
+    if (!selectedReservation) return
+    setActionLoading(true)
+    try {
+      if (__DEV__) {
+        console.log('📤 [MerchantReservations] Finalisation réservation:', selectedReservation.id)
+      }
+      await apiService.post(`/reservations/${selectedReservation.id}/complete`)
+      if (__DEV__) {
+        console.log('✅ [MerchantReservations] Réservation finalisée, rechargement...')
+      }
+      setShowCompleteModal(false)
+      await loadReservations()
+    } catch (error: any) {
+      console.error('❌ [MerchantReservations] Erreur finalisation:', error?.message || error)
+      Alert.alert('Erreur', 'Impossible de marquer la réservation comme terminée')
+    } finally {
+      setActionLoading(false)
+    }
+  }
+
+  // Ouvre le modal d'annulation
   const handleCancel = (reservation: Reservation) => {
-    Alert.alert(
-      'Annuler la réservation',
-      `Êtes-vous sûr de vouloir annuler cette réservation ?`,
-      [
-        { text: 'Non', style: 'cancel' },
-        {
-          text: 'Annuler',
-          style: 'destructive',
-          onPress: async () => {
-            try {
-              if (__DEV__) {
-                console.log('📤 [MerchantReservations] Annulation réservation:', reservation.id)
-              }
-              await apiService.post(`/reservations/${reservation.id}/cancel`)
-              if (__DEV__) {
-                console.log('✅ [MerchantReservations] Réservation annulée, rechargement...')
-              }
-              // 🐛 BUG FIX #35: Add await to ensure errors are caught
-              await loadReservations()
-            } catch (error: any) {
-              console.error('❌ [MerchantReservations] Erreur annulation:', error?.message || error)
-              Alert.alert('Erreur', 'Impossible d\'annuler la réservation')
-            }
-          },
-        },
-      ]
-    )
+    setSelectedReservation(reservation)
+    setShowCancelModal(true)
+  }
+
+  // Exécute l'annulation
+  const executeCancel = async () => {
+    if (!selectedReservation) return
+    setActionLoading(true)
+    try {
+      if (__DEV__) {
+        console.log('📤 [MerchantReservations] Annulation réservation:', selectedReservation.id)
+      }
+      await apiService.post(`/reservations/${selectedReservation.id}/cancel`)
+      if (__DEV__) {
+        console.log('✅ [MerchantReservations] Réservation annulée, rechargement...')
+      }
+      setShowCancelModal(false)
+      await loadReservations()
+    } catch (error: any) {
+      console.error('❌ [MerchantReservations] Erreur annulation:', error?.message || error)
+      Alert.alert('Erreur', 'Impossible d\'annuler la réservation')
+    } finally {
+      setActionLoading(false)
+    }
+  }
+
+  // Helper pour obtenir le nom du client
+  const getCustomerName = (reservation: Reservation | null) => {
+    if (!reservation?.consumer) return 'Client'
+    return `${reservation.consumer.first_name} ${reservation.consumer.last_name}`
   }
 
   const getStatusColor = (status: string) => {
@@ -494,6 +500,174 @@ const MerchantReservationsScreen: React.FC<Props> = ({ route }) => {
           </View>
         }
       />
+
+      {/* Modal Confirmer la réservation */}
+      <Modal2025
+        visible={showConfirmModal}
+        variant="center"
+        onClose={() => setShowConfirmModal(false)}
+        showCloseButton={false}
+        dismissable={!actionLoading}
+        scrollable={false}
+      >
+        <View style={styles.modalContent}>
+          <View style={[styles.modalIconContainer, { backgroundColor: theme.colors.semantic.success + '20' }]}>
+            <Ionicons name="checkmark-circle" size={48} color={theme.colors.semantic.success} />
+          </View>
+          <Text style={[styles.modalTitle, { color: theme.colors.text }]}>
+            Confirmer la réservation
+          </Text>
+          <Text style={[styles.modalDescription, { color: theme.colors.textSecondary }]}>
+            Confirmer la réservation de {getCustomerName(selectedReservation)} ?
+          </Text>
+          <View style={styles.modalActions}>
+            <TouchableOpacity
+              style={[styles.modalButton, styles.modalButtonSecondary, { borderColor: theme.colors.border }]}
+              onPress={() => setShowConfirmModal(false)}
+              disabled={actionLoading}
+            >
+              <Text style={[styles.modalButtonText, { color: theme.colors.textSecondary }]}>
+                ANNULER
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[styles.modalButton, styles.modalButtonPrimary, { backgroundColor: theme.colors.semantic.success }]}
+              onPress={executeConfirm}
+              disabled={actionLoading}
+            >
+              <Text style={[styles.modalButtonText, { color: 'white' }]}>
+                {actionLoading ? 'CONFIRMATION...' : 'CONFIRMER'}
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal2025>
+
+      {/* Modal Marquer comme prête */}
+      <Modal2025
+        visible={showReadyModal}
+        variant="center"
+        onClose={() => setShowReadyModal(false)}
+        showCloseButton={false}
+        dismissable={!actionLoading}
+        scrollable={false}
+      >
+        <View style={styles.modalContent}>
+          <View style={[styles.modalIconContainer, { backgroundColor: '#3B82F620' }]}>
+            <Ionicons name="cube" size={48} color="#3B82F6" />
+          </View>
+          <Text style={[styles.modalTitle, { color: theme.colors.text }]}>
+            Marquer comme prête
+          </Text>
+          <Text style={[styles.modalDescription, { color: theme.colors.textSecondary }]}>
+            La commande est-elle prête à être récupérée ?
+          </Text>
+          <View style={styles.modalActions}>
+            <TouchableOpacity
+              style={[styles.modalButton, styles.modalButtonSecondary, { borderColor: theme.colors.border }]}
+              onPress={() => setShowReadyModal(false)}
+              disabled={actionLoading}
+            >
+              <Text style={[styles.modalButtonText, { color: theme.colors.textSecondary }]}>
+                NON
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[styles.modalButton, styles.modalButtonPrimary, { backgroundColor: '#3B82F6' }]}
+              onPress={executeMarkReady}
+              disabled={actionLoading}
+            >
+              <Text style={[styles.modalButtonText, { color: 'white' }]}>
+                {actionLoading ? 'EN COURS...' : 'OUI, PRÊTE'}
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal2025>
+
+      {/* Modal Marquer comme terminée */}
+      <Modal2025
+        visible={showCompleteModal}
+        variant="center"
+        onClose={() => setShowCompleteModal(false)}
+        showCloseButton={false}
+        dismissable={!actionLoading}
+        scrollable={false}
+      >
+        <View style={styles.modalContent}>
+          <View style={[styles.modalIconContainer, { backgroundColor: theme.colors.semantic.success + '20' }]}>
+            <Ionicons name="checkmark-done-circle" size={48} color={theme.colors.semantic.success} />
+          </View>
+          <Text style={[styles.modalTitle, { color: theme.colors.text }]}>
+            Marquer comme terminée
+          </Text>
+          <Text style={[styles.modalDescription, { color: theme.colors.textSecondary }]}>
+            Le client a-t-il récupéré sa commande ?
+          </Text>
+          <View style={styles.modalActions}>
+            <TouchableOpacity
+              style={[styles.modalButton, styles.modalButtonSecondary, { borderColor: theme.colors.border }]}
+              onPress={() => setShowCompleteModal(false)}
+              disabled={actionLoading}
+            >
+              <Text style={[styles.modalButtonText, { color: theme.colors.textSecondary }]}>
+                NON
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[styles.modalButton, styles.modalButtonPrimary, { backgroundColor: theme.colors.semantic.success }]}
+              onPress={executeComplete}
+              disabled={actionLoading}
+            >
+              <Text style={[styles.modalButtonText, { color: 'white' }]}>
+                {actionLoading ? 'EN COURS...' : 'OUI, TERMINÉE'}
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal2025>
+
+      {/* Modal Annuler la réservation */}
+      <Modal2025
+        visible={showCancelModal}
+        variant="center"
+        onClose={() => setShowCancelModal(false)}
+        showCloseButton={false}
+        dismissable={!actionLoading}
+        scrollable={false}
+      >
+        <View style={styles.modalContent}>
+          <View style={[styles.modalIconContainer, { backgroundColor: theme.colors.semantic.error + '20' }]}>
+            <Ionicons name="close-circle" size={48} color={theme.colors.semantic.error} />
+          </View>
+          <Text style={[styles.modalTitle, { color: theme.colors.text }]}>
+            Annuler la réservation
+          </Text>
+          <Text style={[styles.modalDescription, { color: theme.colors.textSecondary }]}>
+            Êtes-vous sûr de vouloir annuler cette réservation ?
+          </Text>
+          <View style={styles.modalActions}>
+            <TouchableOpacity
+              style={[styles.modalButton, styles.modalButtonSecondary, { borderColor: theme.colors.border }]}
+              onPress={() => setShowCancelModal(false)}
+              disabled={actionLoading}
+            >
+              <Text style={[styles.modalButtonText, { color: theme.colors.textSecondary }]}>
+                NON
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[styles.modalButton, styles.modalButtonPrimary, { backgroundColor: theme.colors.semantic.error }]}
+              onPress={executeCancel}
+              disabled={actionLoading}
+            >
+              <Text style={[styles.modalButtonText, { color: 'white' }]}>
+                {actionLoading ? 'ANNULATION...' : 'ANNULER'}
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal2025>
     </View>
   )
 }
@@ -648,6 +822,62 @@ const styles = StyleSheet.create({
     marginTop: 16,
     fontSize: 16,
     textAlign: 'center',
+  },
+  // Styles pour les modals stylisés
+  modalContent: {
+    alignItems: 'center',
+    paddingVertical: 8,
+  },
+  modalIconContainer: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: '700',
+    marginBottom: 12,
+    textAlign: 'center',
+  },
+  modalDescription: {
+    fontSize: 15,
+    textAlign: 'center',
+    marginBottom: 24,
+    lineHeight: 22,
+    paddingHorizontal: 8,
+  },
+  modalActions: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    gap: 12,
+    width: '100%',
+  },
+  modalButton: {
+    flex: 1,
+    paddingVertical: 14,
+    paddingHorizontal: 20,
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  modalButtonSecondary: {
+    backgroundColor: 'transparent',
+    borderWidth: 1.5,
+  },
+  modalButtonPrimary: {
+    elevation: 2,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.15,
+    shadowRadius: 4,
+  },
+  modalButtonText: {
+    fontSize: 14,
+    fontWeight: '700',
+    letterSpacing: 0.5,
   },
 })
 
