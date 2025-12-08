@@ -25,7 +25,7 @@ import { Product, Merchant } from '../../types'
 import { getImageUrl } from '../../utils/imageHelpers'
 import { formatCurrency } from '../../utils/currencyHelpers'
 import { Button, Card, Badge, Typography } from '../../components/2025'
-import MapViewWrapper, { Marker, UrlTile, isExpoGo } from '../../components/MapViewWrapper'
+import MapLibreWrapper, { getMapLibreGL, isExpoGo } from '../../components/MapLibreWrapper'
 import locationService, { UserLocation } from '../../services/locationService'
 
 const { width } = Dimensions.get('window')
@@ -50,6 +50,9 @@ const MerchantDetailScreen: React.FC<Props> = ({ route, navigation }) => {
   const [locationPermissionGranted, setLocationPermissionGranted] = useState(false)
   const [requestingLocation, setRequestingLocation] = useState(false)
   const [mapExpanded, setMapExpanded] = useState(false)
+
+  // Get MapLibreGL reference for markers
+  const MapLibreGL = getMapLibreGL()
 
   // Load reviews when tab changes to reviews
   useEffect(() => {
@@ -363,37 +366,35 @@ const MerchantDetailScreen: React.FC<Props> = ({ route, navigation }) => {
             )}
           </View>
         ) : (
-          <MapViewWrapper
+          <MapLibreWrapper
             style={[styles.mapView, mapExpanded && styles.mapViewExpanded]}
-            initialRegion={mapRegion}
+            center={[mapRegion.longitude, mapRegion.latitude]}
+            zoom={14}
             showsUserLocation={locationPermissionGranted && !!userLocation}
-            showsMyLocationButton={false}
-            mapType={Platform.OS === 'android' ? 'none' : 'standard'}
           >
-            {/* OpenStreetMap Tiles */}
-            {!isExpoGo && UrlTile && (
-              <UrlTile
-                urlTemplate="https://tile.openstreetmap.org/{z}/{x}/{y}.png"
-                maximumZ={19}
-                flipY={false}
-                tileSize={256}
-              />
+            {/* Merchant Marker */}
+            {!isExpoGo && MapLibreGL && (
+              <MapLibreGL.PointAnnotation
+                id="merchant-location"
+                coordinate={[mapRegion.longitude, mapRegion.latitude]}
+              >
+                <View style={{ alignItems: 'center' }}>
+                  <Ionicons name="location" size={36} color="#10B981" />
+                </View>
+              </MapLibreGL.PointAnnotation>
             )}
-            {!isExpoGo && Marker && (
-              <Marker
-                coordinate={{ latitude: mapRegion.latitude, longitude: mapRegion.longitude }}
-                title={merchant.business_name}
-                description={merchant.address || merchant.city}
-              />
+            {/* User Location Marker */}
+            {!isExpoGo && MapLibreGL && userLocation && (
+              <MapLibreGL.PointAnnotation
+                id="user-location"
+                coordinate={[userLocation.longitude, userLocation.latitude]}
+              >
+                <View style={{ alignItems: 'center' }}>
+                  <Ionicons name="person-circle" size={28} color={theme.colors.primary[500]} />
+                </View>
+              </MapLibreGL.PointAnnotation>
             )}
-            {!isExpoGo && Marker && userLocation && (
-              <Marker
-                coordinate={{ latitude: userLocation.latitude, longitude: userLocation.longitude }}
-                title="Vous"
-                pinColor={theme.colors.primary[500]}
-              />
-            )}
-          </MapViewWrapper>
+          </MapLibreWrapper>
         )}
 
         {/* Header buttons */}
