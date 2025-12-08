@@ -54,6 +54,8 @@ const MerchantMapScreen: React.FC<Props> = ({ testID = TEST_IDS.merchantMapScree
   const [refreshing, setRefreshing] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [userLocation, setUserLocation] = useState<{ latitude: number; longitude: number } | null>(null)
+  // 🔐 State pour gérer la permission AVANT d'activer showsUserLocation
+  const [locationPermissionGranted, setLocationPermissionGranted] = useState(false)
   const [region, setRegion] = useState<MerchantMapRegion>({
     latitude: 6.1256, // Lomé, Togo (default)
     longitude: 1.2225,
@@ -62,14 +64,19 @@ const MerchantMapScreen: React.FC<Props> = ({ testID = TEST_IDS.merchantMapScree
   })
 
   // Request location permission and get user location
+  // 🔐 IMPORTANT: Vérifier la permission AVANT d'activer showsUserLocation pour éviter crash Android
   const requestLocationPermission = useCallback(async () => {
     try {
       const { status } = await Location.requestForegroundPermissionsAsync()
 
       if (status !== 'granted') {
         console.log('Location permission denied')
+        setLocationPermissionGranted(false)
         return
       }
+
+      // Permission accordée - on peut maintenant activer showsUserLocation
+      setLocationPermissionGranted(true)
 
       const location = await Location.getCurrentPositionAsync({
         accuracy: Location.Accuracy.Balanced,
@@ -87,6 +94,7 @@ const MerchantMapScreen: React.FC<Props> = ({ testID = TEST_IDS.merchantMapScree
       // La position de l'utilisateur sera affichée comme point bleu sur la carte
     } catch (err) {
       console.error('Error getting location:', err)
+      setLocationPermissionGranted(false)
     }
   }, [])
 
@@ -336,8 +344,8 @@ const MerchantMapScreen: React.FC<Props> = ({ testID = TEST_IDS.merchantMapScree
       <MapViewWrapper
         style={styles.map}
         initialRegion={region}
-        showsUserLocation={userLocation !== null}
-        showsMyLocationButton={true}
+        showsUserLocation={locationPermissionGranted}
+        showsMyLocationButton={locationPermissionGranted}
         showsCompass={true}
         mapType={Platform.OS === 'android' ? 'none' : 'standard'}
         testID={TEST_IDS.merchantMapView}
