@@ -103,11 +103,13 @@ const ProductFormScreen: React.FC<Props> = ({ route, navigation }) => {
 
   const uploadImage = async (imageUri: string): Promise<string | null> => {
     try {
-      console.log('📤 [ProductForm] Upload image démarré...')
+      console.log('📤 [ProductForm] Upload image démarré...', imageUri)
       const formData = new FormData()
       const filename = imageUri.split('/').pop() || 'image.jpg'
       const match = /\.(\w+)$/.exec(filename)
       const type = match ? `image/${match[1]}` : 'image/jpeg'
+
+      console.log('📤 [ProductForm] Fichier:', { filename, type, uri: imageUri.substring(0, 50) + '...' })
 
       formData.append('image', {
         uri: imageUri,
@@ -115,10 +117,9 @@ const ProductFormScreen: React.FC<Props> = ({ route, navigation }) => {
         type,
       } as any)
 
-      // 🐛 BUG FIX #28: Do NOT set Content-Type header manually for FormData
-      // Axios automatically sets the correct Content-Type with boundary parameter
-      // Setting it manually breaks multipart/form-data uploads
-      const response = await apiService.post('/products/upload-image', formData)
+      // 🐛 BUG FIX #28: Use dedicated uploadFile method with native fetch
+      // Axios has issues with FormData on React Native
+      const response = await apiService.uploadFile('/products/upload-image', formData)
 
       // 🐛 BUG FIX #27: Backend returns { success: true, data: { url, path, filename } }
       // apiService.post() returns response.data directly, so response = { success, data: {...} }

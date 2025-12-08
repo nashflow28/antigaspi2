@@ -243,15 +243,31 @@ class ApiService {
     config?: AxiosRequestConfig
   ): Promise<T> {
     try {
+      // 🐛 BUG FIX: Detect FormData and remove Content-Type header
+      // Let axios set the correct multipart/form-data boundary automatically
+      const isFormData = data instanceof FormData
       if (__DEV__) {
-        console.log(`📤 [API] ${method} ${url}`, data ? `(avec données)` : '')
+        console.log(`📤 [API] ${method} ${url}`, data ? `(avec données${isFormData ? ' FormData' : ''})` : '')
       }
-      const response: AxiosResponse<T> = await this.api.request({
+
+      const requestConfig: AxiosRequestConfig = {
         method,
         url,
         data,
         ...config,
-      })
+      }
+
+      // For FormData, remove Content-Type to let axios/fetch set it with correct boundary
+      if (isFormData) {
+        requestConfig.headers = {
+          ...requestConfig.headers,
+          'Content-Type': undefined, // Let axios handle it
+        }
+        // Also increase timeout for file uploads
+        requestConfig.timeout = 60000
+      }
+
+      const response: AxiosResponse<T> = await this.api.request(requestConfig)
       if (__DEV__) {
         console.log(`📥 [API] ${method} ${url} - Status:`, response.status)
         console.log(`📥 [API] Response.data type:`, typeof response.data)
@@ -302,6 +318,49 @@ class ApiService {
 
   async patch<T = any>(url: string, data?: any, config?: AxiosRequestConfig): Promise<T> {
     return this.request<T>('PATCH', url, data, config)
+  }
+
+  /**
+   * Upload file using native fetch (more reliable than axios for FormData on React Native)
+   */
+  async uploadFile<T = any>(url: string, formData: FormData): Promise<T> {
+    try {
+      const token = await AsyncStorage.getItem('auth_token')
+      const fullUrl = `${this.baseURL}${url}`
+
+      if (__DEV__) {
+        console.log(`📤 [API] UPLOAD ${url} (FormData avec fetch natif)`)
+      }
+
+      const response = await fetch(fullUrl, {
+        method: 'POST',
+        headers: {
+          'Accept': 'application/json',
+          ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
+          // Note: Do NOT set Content-Type for FormData - fetch will set it with boundary
+        },
+        body: formData,
+      })
+
+      const data = await response.json()
+
+      if (__DEV__) {
+        console.log(`📥 [API] UPLOAD ${url} - Status:`, response.status)
+        console.log(`📥 [API] Response:`, JSON.stringify(data).substring(0, 200))
+      }
+
+      if (!response.ok) {
+        const error: any = new Error(data.message || 'Upload failed')
+        error.statusCode = response.status
+        error.validationErrors = data.errors
+        throw error
+      }
+
+      return data as T
+    } catch (error: any) {
+      console.error(`❌ [API] UPLOAD ${url} - Erreur:`, error?.message || error)
+      throw error
+    }
   }
 
   // === AUTHENTIFICATION ===
