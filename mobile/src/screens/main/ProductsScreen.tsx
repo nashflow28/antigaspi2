@@ -587,79 +587,102 @@ const ProductsScreen: React.FC<Props> = ({ navigation }) => {
   const renderMerchantCard = ({ merchant, distanceInfo }: MerchantListItem) => {
     // Priorité: photo_url du merchant > logo_url > user.photo_url > emoji fallback
     const merchantImageUrl = merchant.photo_url || merchant.logo_url || merchant.user?.photo_url
+    const hasRating = merchant.average_rating != null && merchant.average_rating > 0
 
     return (
       <TouchableOpacity
         onPress={() => {
-          // Navigate to merchant detail
           navigation.navigate('MerchantDetail', { merchantId: merchant.id })
         }}
+        activeOpacity={0.7}
       >
-        <Card variant="elevated" style={{ marginBottom: theme.spacing.md, flexDirection: 'row', overflow: 'hidden' }}>
-          {/* Image de la boutique ou emoji fallback */}
-          {merchantImageUrl ? (
-            <Image
-              source={{ uri: getImageUrl(merchantImageUrl) }}
-              style={styles.merchantImage}
-              contentFit="cover"
-              transition={200}
-            />
-          ) : (
-            <View style={styles.merchantImagePlaceholder}>
-              <Text style={styles.merchantEmoji}>{getMerchantEmoji(merchant.business_type)}</Text>
-            </View>
-          )}
+        <Card variant="elevated" style={styles.merchantCard}>
+          {/* Image Container */}
+          <View style={styles.merchantImageContainer}>
+            {merchantImageUrl ? (
+              <Image
+                source={{ uri: getImageUrl(merchantImageUrl) }}
+                style={styles.merchantImage}
+                contentFit="cover"
+                transition={200}
+              />
+            ) : (
+              <View style={styles.merchantImagePlaceholder}>
+                <Text style={styles.merchantEmoji}>{getMerchantEmoji(merchant.business_type)}</Text>
+              </View>
+            )}
 
-          {/* Badge nombre de produits */}
-          {merchant.products_count > 0 && (
-            <View style={styles.productCountBadge}>
-              <Badge variant="primary" size="sm" style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
-                <Ionicons name="basket" size={14} color={theme.colors.textInverse} />
-                <Typography variant="caption" weight="bold" style={{ color: theme.colors.textInverse }}>
-                  {merchant.products_count}
-                </Typography>
-              </Badge>
-            </View>
-          )}
+            {/* Badge nombre de produits */}
+            {merchant.products_count > 0 && (
+              <View style={styles.productCountBadge}>
+                <Badge variant="primary" size="sm" style={{ flexDirection: 'row', alignItems: 'center', gap: 2 }}>
+                  <Ionicons name="basket" size={12} color={theme.colors.textInverse} />
+                  <Typography variant="caption" weight="bold" style={{ color: theme.colors.textInverse, fontSize: 11 }}>
+                    {merchant.products_count}
+                  </Typography>
+                </Badge>
+              </View>
+            )}
+          </View>
 
-          {/* Badge vérifié */}
-          {merchant.is_verified && (
-            <View style={styles.verifiedBadge}>
-              <Ionicons name="checkmark-circle" size={16} color={theme.colors.success} />
-            </View>
-          )}
-
+          {/* Info Container */}
           <View style={styles.merchantInfo}>
-            <Typography variant="body" weight="semibold" numberOfLines={1} style={{ marginBottom: theme.spacing.xs }}>
-              {merchant.business_name}
-            </Typography>
+            {/* Header: Nom + Badge vérifié */}
+            <View style={styles.merchantHeader}>
+              <Typography variant="body" weight="bold" numberOfLines={1} style={styles.merchantName}>
+                {merchant.business_name}
+              </Typography>
+              {merchant.is_verified && (
+                <Ionicons name="checkmark-circle" size={16} color={theme.colors.success} />
+              )}
+            </View>
 
-            <Typography variant="caption" color="secondary" style={{ marginBottom: theme.spacing.xs }}>
+            {/* Type de commerce */}
+            <Typography variant="caption" color="secondary" numberOfLines={1} style={{ marginBottom: 2 }}>
               {merchant.business_type}
             </Typography>
 
-            {distanceInfo && (
-              <View style={styles.distanceBadge}>
-                <Ionicons name="navigate" size={14} color={theme.colors.badgeText} />
-                <Typography
-                  variant="caption"
-                  weight="semibold"
-                  style={{ marginLeft: 4, color: theme.colors.badgeText }}
-                >
-                  {distanceInfo.formatted}
+            {/* Note et avis */}
+            {hasRating ? (
+              <View style={styles.ratingRow}>
+                <Ionicons name="star" size={14} color="#F59E0B" />
+                <Typography variant="caption" weight="semibold" style={{ marginLeft: 4 }}>
+                  {merchant.average_rating?.toFixed(1)}
+                </Typography>
+                {merchant.reviews_count != null && merchant.reviews_count > 0 && (
+                  <Typography variant="caption" color="secondary" style={{ marginLeft: 4 }}>
+                    | {merchant.reviews_count} avis
+                  </Typography>
+                )}
+              </View>
+            ) : (
+              <View style={styles.ratingRow}>
+                <Ionicons name="star-outline" size={14} color={theme.colors.textTertiary} />
+                <Typography variant="caption" color="tertiary" style={{ marginLeft: 4 }}>
+                  Pas encore d'avis
                 </Typography>
               </View>
             )}
 
+            {/* Location + Distance */}
             <View style={styles.locationRow}>
               <Ionicons name="location" size={14} color={theme.colors.textSecondary} />
               <Typography variant="caption" color="secondary" numberOfLines={1} style={{ marginLeft: 4, flex: 1 }}>
                 {merchant.user?.city || 'Ville'}
               </Typography>
+              {distanceInfo && (
+                <View style={styles.distanceInline}>
+                  <Ionicons name="navigate" size={12} color={theme.colors.primary[500]} />
+                  <Typography variant="caption" weight="medium" color="primary" style={{ marginLeft: 2 }}>
+                    {distanceInfo.formatted}
+                  </Typography>
+                </View>
+              )}
             </View>
 
+            {/* Produits disponibles */}
             {merchant.products_count > 0 && (
-              <Typography variant="caption" weight="medium" color="primary" style={{ marginTop: theme.spacing.xs }}>
+              <Typography variant="caption" weight="semibold" color="primary" style={{ marginTop: 4 }}>
                 {merchant.products_count} produit{merchant.products_count > 1 ? 's' : ''} disponible{merchant.products_count > 1 ? 's' : ''}
               </Typography>
             )}
@@ -1317,55 +1340,66 @@ const createStyles = (theme: ReturnType<typeof useTheme>) => StyleSheet.create({
     justifyContent: 'center',
     paddingHorizontal: theme.spacing.xl,
   },
+  merchantCard: {
+    marginBottom: theme.spacing.sm,
+    flexDirection: 'row',
+    overflow: 'hidden',
+    borderRadius: theme.radius.lg,
+  },
+  merchantImageContainer: {
+    position: 'relative',
+    width: 100,
+    height: 90,
+  },
   merchantImagePlaceholder: {
-    width: 120,
-    height: 120,
+    width: 100,
+    height: 90,
     backgroundColor: theme.colors.primary[100],
     justifyContent: 'center',
     alignItems: 'center',
   },
   merchantImage: {
-    width: 120,
-    height: 120,
+    width: 100,
+    height: 90,
   },
   merchantEmoji: {
-    fontSize: 48,
+    fontSize: 36,
   },
   productCountBadge: {
     position: 'absolute',
-    top: theme.spacing.sm,
-    left: theme.spacing.sm,
-    zIndex: 1,
-  },
-  verifiedBadge: {
-    position: 'absolute',
-    top: theme.spacing.sm,
-    right: theme.spacing.sm,
-    backgroundColor: theme.colors.surface.light,
-    borderRadius: theme.radius.full,
-    padding: 4,
+    top: 6,
+    left: 6,
     zIndex: 1,
   },
   merchantInfo: {
     flex: 1,
-    padding: theme.spacing.md,
+    paddingVertical: theme.spacing.sm,
+    paddingHorizontal: theme.spacing.md,
     justifyContent: 'center',
+  },
+  merchantHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    marginBottom: 2,
+  },
+  merchantName: {
+    flex: 1,
+  },
+  ratingRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 2,
   },
   locationRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 4,
-    marginBottom: theme.spacing.xs,
+    marginTop: 2,
   },
-  distanceBadge: {
+  distanceInline: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 4,
-    marginBottom: theme.spacing.xs,
-    backgroundColor: theme.colors.badgeBackground,
-    paddingHorizontal: theme.spacing.xs,
-    paddingVertical: 2,
-    borderRadius: theme.radius.md,
+    marginLeft: 8,
   },
   productsRow: {
     justifyContent: 'space-between',

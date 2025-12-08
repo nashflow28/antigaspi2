@@ -23,9 +23,17 @@ class MerchantController extends Controller
     {
         try {
             $query = Merchant::with(['user'])
-                ->withCount(['products as products_count' => function ($productQuery) {
-                    $productQuery->active()->available();
-                }])
+                ->withCount([
+                    'products as products_count' => function ($productQuery) {
+                        $productQuery->active()->available();
+                    },
+                    'reviews as reviews_count' => function ($reviewQuery) {
+                        $reviewQuery->approved();
+                    }
+                ])
+                ->withAvg(['reviews as average_rating' => function ($reviewQuery) {
+                    $reviewQuery->approved();
+                }], 'rating')
                 ->verified();
 
             if ($request->filled('search')) {
@@ -59,6 +67,9 @@ class MerchantController extends Controller
                 case 'name':
                     $query->orderBy('business_name');
                     break;
+                case 'rating':
+                    $query->orderByDesc('average_rating');
+                    break;
                 default:
                     $query->orderByDesc('created_at');
                     break;
@@ -76,6 +87,8 @@ class MerchantController extends Controller
                     'latitude' => $merchant->latitude ? (float) $merchant->latitude : null,
                     'longitude' => $merchant->longitude ? (float) $merchant->longitude : null,
                     'products_count' => (int) ($merchant->products_count ?? 0),
+                    'average_rating' => $merchant->average_rating ? round((float) $merchant->average_rating, 1) : null,
+                    'reviews_count' => (int) ($merchant->reviews_count ?? 0),
                     'photo_url' => $merchant->photo_url,
                     'logo_url' => $merchant->logo_url,
                     'user' => [

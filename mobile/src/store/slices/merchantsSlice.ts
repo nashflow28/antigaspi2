@@ -11,6 +11,8 @@ export interface Merchant {
   products_count: number
   photo_url?: string | null
   logo_url?: string | null
+  average_rating?: number | null
+  reviews_count?: number
   user: {
     city: string
     address: string | null
