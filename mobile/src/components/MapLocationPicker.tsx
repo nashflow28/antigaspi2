@@ -6,11 +6,13 @@ import {
   Modal,
   TouchableOpacity,
   Platform,
+  ActivityIndicator,
 } from 'react-native'
 import MapViewWrapper, { Marker, UrlTile, isExpoGo } from './MapViewWrapper'
 import type { Region, MapPressEvent, MarkerDragStartEndEvent } from 'react-native-maps'
 import { Ionicons } from '@expo/vector-icons'
 import { useTheme } from '../theme'
+import * as Location from 'expo-location'
 
 interface MapLocationPickerProps {
   visible: boolean
@@ -55,6 +57,48 @@ const MapLocationPicker: React.FC<MapLocationPickerProps> = ({
     latitudeDelta: DEFAULT_REGION.latitudeDelta,
     longitudeDelta: DEFAULT_REGION.longitudeDelta,
   })
+
+  // 🔐 State pour gérer la permission de localisation AVANT d'activer showsUserLocation
+  const [locationPermissionGranted, setLocationPermissionGranted] = useState(false)
+  const [permissionChecked, setPermissionChecked] = useState(false)
+
+  // 🔐 Vérifier la permission de localisation au montage du modal
+  // CRITIQUE: showsUserLocation={true} sans permission cause un crash natif sur Android
+  useEffect(() => {
+    if (!visible) {
+      // Reset permission state when modal closes
+      setPermissionChecked(false)
+      setLocationPermissionGranted(false)
+      return
+    }
+
+    const checkAndRequestPermission = async () => {
+      try {
+        // D'abord vérifier si la permission est déjà accordée
+        const { status: existingStatus } = await Location.getForegroundPermissionsAsync()
+
+        if (existingStatus === 'granted') {
+          setLocationPermissionGranted(true)
+          setPermissionChecked(true)
+          console.log('[MapLocationPicker] Permission déjà accordée')
+          return
+        }
+
+        // Demander la permission si pas encore accordée
+        const { status } = await Location.requestForegroundPermissionsAsync()
+        setLocationPermissionGranted(status === 'granted')
+        setPermissionChecked(true)
+        console.log('[MapLocationPicker] Permission demandée, résultat:', status)
+      } catch (error) {
+        console.error('[MapLocationPicker] Erreur vérification permission:', error)
+        // En cas d'erreur, on désactive showsUserLocation par sécurité
+        setLocationPermissionGranted(false)
+        setPermissionChecked(true)
+      }
+    }
+
+    checkAndRequestPermission()
+  }, [visible])
 
   // Reset state when modal opens or initial coordinates change
   useEffect(() => {
@@ -199,14 +243,26 @@ const MapLocationPicker: React.FC<MapLocationPickerProps> = ({
 
         {/* Map */}
         <View style={styles.mapContainer}>
+          {/* Afficher un loader pendant la vérification des permissions */}
+          {!permissionChecked && (
+            <View style={styles.permissionLoader}>
+              <ActivityIndicator size="large" color={theme.colors.primary[500]} />
+              <Text style={[styles.permissionLoaderText, { color: theme.colors.text }]}>
+                Vérification des permissions...
+              </Text>
+            </View>
+          )}
+
+          {/* Afficher la carte SEULEMENT après vérification de la permission */}
+          {permissionChecked && (
           <MapViewWrapper
             ref={mapRef}
             style={styles.map}
             region={region}
             onRegionChangeComplete={setRegion}
             onPress={handleMapPress}
-            showsUserLocation={true}
-            showsMyLocationButton={true}
+            showsUserLocation={locationPermissionGranted}
+            showsMyLocationButton={locationPermissionGranted}
             showsCompass={true}
             mapType={Platform.OS === 'android' ? 'none' : 'standard'}
           >
@@ -233,14 +289,17 @@ const MapLocationPicker: React.FC<MapLocationPickerProps> = ({
               />
             )}
           </MapViewWrapper>
+          )}
 
           {/* OpenStreetMap Attribution */}
-          <View style={styles.osmAttribution}>
-            <Text style={styles.osmAttributionText}>© OpenStreetMap</Text>
-          </View>
+          {permissionChecked && (
+            <View style={styles.osmAttribution}>
+              <Text style={styles.osmAttributionText}>© OpenStreetMap</Text>
+            </View>
+          )}
 
           {/* Center on marker button */}
-          {selectedLocation && (
+          {permissionChecked && selectedLocation && (
             <TouchableOpacity
               style={[styles.centerButton, { backgroundColor: theme.colors.background }]}
               onPress={handleCenterOnMarker}
@@ -336,6 +395,16 @@ const styles = StyleSheet.create({
   },
   map: {
     flex: 1,
+  },
+  permissionLoader: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#F3F4F6',
+  },
+  permissionLoaderText: {
+    marginTop: 12,
+    fontSize: 14,
   },
   osmAttribution: {
     position: 'absolute',
