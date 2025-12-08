@@ -26,27 +26,29 @@ if (!isExpoGo) {
   }
 }
 
-// Style OpenStreetMap gratuit (Protomaps ou autre)
-const OSM_STYLE_URL = 'https://tiles.openfreemap.org/styles/liberty'
-
-// Alternative: Style OSM basique
-const OSM_RASTER_STYLE = {
+// Style Carto Voyager - tuiles fiables et gratuites (basées sur OSM)
+const CARTO_RASTER_STYLE = {
   version: 8,
   sources: {
-    osm: {
+    carto: {
       type: 'raster',
-      tiles: ['https://tile.openstreetmap.org/{z}/{x}/{y}.png'],
+      tiles: [
+        'https://a.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}@2x.png',
+        'https://b.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}@2x.png',
+        'https://c.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}@2x.png',
+        'https://d.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}@2x.png',
+      ],
       tileSize: 256,
-      attribution: '© OpenStreetMap contributors',
+      attribution: '© CARTO © OpenStreetMap contributors',
     },
   },
   layers: [
     {
-      id: 'osm',
+      id: 'carto-tiles',
       type: 'raster',
-      source: 'osm',
+      source: 'carto',
       minzoom: 0,
-      maxzoom: 19,
+      maxzoom: 22,
     },
   ],
 }
@@ -120,9 +122,37 @@ const MapLibreWrapper = forwardRef<MapLibreRef, MapLibreWrapperProps>((props, re
   }
 
   const handlePress = (event: any) => {
-    if (onPress && event.geometry?.coordinates) {
-      const [longitude, latitude] = event.geometry.coordinates
+    console.log('[MapLibreWrapper] onPress event:', JSON.stringify(event, null, 2))
+
+    if (!onPress) return
+
+    // MapLibre React Native peut envoyer les coordonnées de différentes manières
+    let longitude: number | undefined
+    let latitude: number | undefined
+
+    // Format 1: event.geometry.coordinates [lng, lat]
+    if (event?.geometry?.coordinates) {
+      [longitude, latitude] = event.geometry.coordinates
+    }
+    // Format 2: event.coordinates [lng, lat]
+    else if (event?.coordinates) {
+      [longitude, latitude] = event.coordinates
+    }
+    // Format 3: Direct nativeEvent with coordinates
+    else if (event?.nativeEvent?.coordinate) {
+      longitude = event.nativeEvent.coordinate.longitude
+      latitude = event.nativeEvent.coordinate.latitude
+    }
+    // Format 4: Features array
+    else if (event?.features?.[0]?.geometry?.coordinates) {
+      [longitude, latitude] = event.features[0].geometry.coordinates
+    }
+
+    if (typeof longitude === 'number' && typeof latitude === 'number') {
+      console.log('[MapLibreWrapper] Parsed coordinates:', { latitude, longitude })
       onPress({ latitude, longitude })
+    } else {
+      console.warn('[MapLibreWrapper] Could not parse coordinates from event')
     }
   }
 
@@ -137,7 +167,7 @@ const MapLibreWrapper = forwardRef<MapLibreRef, MapLibreWrapperProps>((props, re
       <MapLibreGL.MapView
         ref={mapRef}
         style={styles.map}
-        styleJSON={JSON.stringify(OSM_RASTER_STYLE)}
+        styleJSON={JSON.stringify(CARTO_RASTER_STYLE)}
         onPress={handlePress}
         logoEnabled={false}
         attributionEnabled={true}
@@ -160,9 +190,9 @@ const MapLibreWrapper = forwardRef<MapLibreRef, MapLibreWrapperProps>((props, re
         {children}
       </MapLibreGL.MapView>
 
-      {/* Attribution OSM */}
+      {/* Attribution */}
       <View style={styles.osmAttribution}>
-        <Text style={styles.osmAttributionText}>© OpenStreetMap</Text>
+        <Text style={styles.osmAttributionText}>© CARTO © OSM</Text>
       </View>
     </View>
   )
