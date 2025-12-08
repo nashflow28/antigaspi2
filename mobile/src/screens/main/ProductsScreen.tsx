@@ -1355,22 +1355,22 @@ const createStyles = (theme: ReturnType<typeof useTheme>) => StyleSheet.create({
   merchantCardContent: {
     flexDirection: 'row',
     padding: 0,
+    minHeight: 120,
   },
   merchantImageContainer: {
     position: 'relative',
-    width: 100,
-    height: 90,
+    width: 110,
   },
   merchantImagePlaceholder: {
-    width: 100,
-    height: 90,
+    width: 110,
+    height: '100%',
     backgroundColor: theme.colors.primary[100],
     justifyContent: 'center',
     alignItems: 'center',
   },
   merchantImage: {
-    width: 100,
-    height: 90,
+    width: 110,
+    height: '100%',
   },
   merchantEmoji: {
     fontSize: 36,
