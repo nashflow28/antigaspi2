@@ -149,7 +149,15 @@ const authSlice = createSlice({
       })
       .addCase(registerUser.rejected, (state, action) => {
         state.loading = false
-        state.error = action.payload as string
+        // Ensure error is always a string to avoid React rendering issues
+        const payload = action.payload
+        if (typeof payload === 'string') {
+          state.error = payload
+        } else if (payload && typeof payload === 'object' && 'message' in payload) {
+          state.error = (payload as any).message
+        } else {
+          state.error = 'Erreur lors de l\'inscription'
+        }
         state.isAuthenticated = false
       })
 

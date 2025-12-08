@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useRef } from 'react'
 import {
   View,
   TextInput,
@@ -8,6 +8,7 @@ import {
   Platform,
   StatusBar,
   ScrollView,
+  Animated,
 } from 'react-native'
 import { useDispatch, useSelector } from 'react-redux'
 import { registerUser, clearError } from '../../store/slices/authSlice'
@@ -22,24 +23,48 @@ interface Props {
   navigation: any
 }
 
+type UserRole = 'consumer' | 'merchant'
+
+// Types de commerce disponibles
+const BUSINESS_TYPES = [
+  { value: 'boulangerie', label: 'Boulangerie / Pâtisserie', icon: 'nutrition' },
+  { value: 'restaurant', label: 'Restaurant', icon: 'restaurant' },
+  { value: 'supermarche', label: 'Supermarché / Épicerie', icon: 'cart' },
+  { value: 'traiteur', label: 'Traiteur', icon: 'fast-food' },
+  { value: 'primeur', label: 'Primeur / Fruits & Légumes', icon: 'leaf' },
+  { value: 'boucherie', label: 'Boucherie / Charcuterie', icon: 'fitness' },
+  { value: 'poissonnerie', label: 'Poissonnerie', icon: 'fish' },
+  { value: 'cafe', label: 'Café / Salon de thé', icon: 'cafe' },
+  { value: 'hotel', label: 'Hôtel', icon: 'bed' },
+  { value: 'autre', label: 'Autre', icon: 'storefront' },
+] as const
+
 const RegisterScreen: React.FC<Props> = ({ navigation }) => {
   const theme = useTheme()
   const dispatch = useDispatch<AppDispatch>()
   const { loading } = useSelector((state: RootState) => state.auth)
   const { showSuccess } = useToast()
+  const scrollViewRef = useRef<ScrollView>(null)
 
-  const [formData, setFormData] = useState<RegisterData>({
-    first_name: '',
-    last_name: '',
-    email: '',
-    password: '',
-    password_confirmation: '',
-    phone: '',
-    city: '',
-    role: 'consumer',
-    business_name: '',
-    business_type: '',
-  })
+  // État du formulaire
+  const [role, setRole] = useState<UserRole>('consumer')
+  const [firstName, setFirstName] = useState('')
+  const [lastName, setLastName] = useState('')
+  const [email, setEmail] = useState('')
+  const [phone, setPhone] = useState('')
+  const [city, setCity] = useState('')
+  const [password, setPassword] = useState('')
+  const [passwordConfirmation, setPasswordConfirmation] = useState('')
+
+  // Champs spécifiques merchant
+  const [businessName, setBusinessName] = useState('')
+  const [businessType, setBusinessType] = useState('')
+  const [showBusinessTypePicker, setShowBusinessTypePicker] = useState(false)
+
+  // UI state
+  const [showPassword, setShowPassword] = useState(false)
+  const [showPasswordConfirm, setShowPasswordConfirm] = useState(false)
+  const roleAnimation = useRef(new Animated.Value(0)).current
 
   // Error modal state
   const [errorModalVisible, setErrorModalVisible] = useState(false)
@@ -52,34 +77,61 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
     setErrorModalVisible(true)
   }
 
+  // Animation lors du changement de rôle
+  const handleRoleChange = (newRole: UserRole) => {
+    setRole(newRole)
+    Animated.spring(roleAnimation, {
+      toValue: newRole === 'merchant' ? 1 : 0,
+      useNativeDriver: false,
+      tension: 50,
+      friction: 7,
+    }).start()
+
+    // Scroll vers le bas pour montrer les nouveaux champs merchant
+    if (newRole === 'merchant') {
+      setTimeout(() => {
+        scrollViewRef.current?.scrollToEnd({ animated: true })
+      }, 300)
+    }
+  }
+
   const handleRegister = async () => {
-    // Clear previous errors
     dispatch(clearError())
 
-    // Frontend validation
+    // Validation frontend
     const validationErrors: string[] = []
 
-    if (!formData.first_name.trim()) {
+    if (!firstName.trim()) {
       validationErrors.push('Le prénom est requis')
     }
-    if (!formData.last_name.trim()) {
+    if (!lastName.trim()) {
       validationErrors.push('Le nom est requis')
     }
-    if (!formData.email.trim()) {
+    if (!email.trim()) {
       validationErrors.push('L\'email est requis')
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       validationErrors.push('L\'email n\'est pas valide')
     }
-    if (!formData.city.trim()) {
+    if (!city.trim()) {
       validationErrors.push('La ville est requise')
     }
-    if (!formData.password) {
+    if (!password) {
       validationErrors.push('Le mot de passe est requis')
-    } else if (formData.password.length < 8) {
+    } else if (password.length < 8) {
       validationErrors.push('Le mot de passe doit contenir au moins 8 caractères')
     }
-    if (formData.password !== formData.password_confirmation) {
+    if (password !== passwordConfirmation) {
       validationErrors.push('Les mots de passe ne correspondent pas')
+    }
+
+    // Validation spécifique merchant
+    if (role === 'merchant') {
+      if (!businessName.trim()) {
+        validationErrors.push('Le nom de votre commerce est requis')
+      }
+      if (!businessType) {
+        validationErrors.push('Le type de commerce est requis')
+      }
     }
 
     if (validationErrors.length > 0) {
@@ -87,28 +139,47 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
       return
     }
 
+    // Préparer les données d'inscription
+    const registerData: RegisterData = {
+      first_name: firstName.trim(),
+      last_name: lastName.trim(),
+      email: email.trim().toLowerCase(),
+      password: password,
+      password_confirmation: passwordConfirmation,
+      phone: phone.trim() || undefined,
+      city: city.trim(),
+      role: role,
+    }
+
+    // Ajouter les champs merchant seulement si role = merchant
+    if (role === 'merchant') {
+      registerData.business_name = businessName.trim()
+      registerData.business_type = businessType
+    }
+
     try {
-      const result = await dispatch(registerUser(formData))
+      const result = await dispatch(registerUser(registerData))
       if (registerUser.fulfilled.match(result)) {
         showSuccess('Compte créé avec succès ! 🎉')
       } else {
         // Parse validation errors from backend
         const payload = result.payload as any
-        if (typeof payload === 'object' && payload.errors) {
-          // Detailed validation errors from backend
+        if (payload && typeof payload === 'object' && payload.errors) {
           const backendErrors: string[] = []
           Object.values(payload.errors).forEach((fieldErrors: any) => {
             if (Array.isArray(fieldErrors)) {
-              fieldErrors.forEach(err => backendErrors.push(err))
-            } else {
-              backendErrors.push(String(fieldErrors))
+              fieldErrors.forEach(err => backendErrors.push(String(err)))
+            } else if (typeof fieldErrors === 'string') {
+              backendErrors.push(fieldErrors)
             }
           })
           showErrorModal('Erreurs de validation', backendErrors)
+        } else if (payload && typeof payload === 'object' && payload.message) {
+          showErrorModal('Erreur', [payload.message])
+        } else if (typeof payload === 'string') {
+          showErrorModal('Erreur', [payload])
         } else {
-          // Simple error message
-          const errorMsg = typeof payload === 'string' ? payload : 'Erreur lors de la création du compte'
-          showErrorModal('Erreur', [errorMsg])
+          showErrorModal('Erreur', ['Erreur lors de la création du compte'])
         }
       }
     } catch (error: any) {
@@ -116,31 +187,69 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
     }
   }
 
-  const renderInput = (label: string, value: string, field: keyof RegisterData, placeholder: string, options?: { keyboardType?: any, secureTextEntry?: boolean }) => (
-    <View style={{ marginBottom: theme.spacing.lg }}>
-      <Typography variant="body" weight="semibold" style={{ marginBottom: theme.spacing.sm }}>
+  const getSelectedBusinessTypeLabel = () => {
+    const selected = BUSINESS_TYPES.find(bt => bt.value === businessType)
+    return selected ? selected.label : 'Sélectionner le type'
+  }
+
+  const renderInput = (
+    label: string,
+    value: string,
+    onChangeText: (text: string) => void,
+    placeholder: string,
+    options?: {
+      keyboardType?: any
+      secureTextEntry?: boolean
+      showToggle?: boolean
+      toggleValue?: boolean
+      onToggle?: () => void
+      icon?: keyof typeof Ionicons.glyphMap
+      autoCapitalize?: 'none' | 'sentences' | 'words' | 'characters'
+    }
+  ) => (
+    <View style={{ marginBottom: theme.spacing.md }}>
+      <Typography variant="caption" weight="semibold" style={{ marginBottom: theme.spacing.xs, color: theme.colors.textSecondary }}>
         {label}
       </Typography>
-      <TextInput
-        style={{
-          backgroundColor: theme.colors.inputBackground,
-          paddingHorizontal: theme.spacing.md,
-          paddingVertical: theme.spacing.sm,
-          borderRadius: theme.radius.md,
-          borderWidth: 1,
-          borderColor: theme.colors.inputBorder,
-          fontSize: 16,
-          color: theme.colors.text,
-        }}
-        placeholder={placeholder}
-        placeholderTextColor={theme.colors.textSecondary}
-        value={value}
-        onChangeText={(text) => setFormData({ ...formData, [field]: text })}
-        keyboardType={options?.keyboardType}
-        secureTextEntry={options?.secureTextEntry}
-        autoCapitalize={options?.secureTextEntry ? 'none' : undefined}
-        autoCorrect={false}
-      />
+      <View style={styles.inputContainer}>
+        {options?.icon && (
+          <View style={[styles.inputIconContainer, { backgroundColor: `${theme.colors.primary[500]}15` }]}>
+            <Ionicons name={options.icon} size={18} color={theme.colors.primary[500]} />
+          </View>
+        )}
+        <TextInput
+          style={[
+            styles.input,
+            {
+              backgroundColor: theme.colors.inputBackground,
+              borderColor: theme.colors.inputBorder,
+              color: theme.colors.text,
+              paddingLeft: options?.icon ? 48 : theme.spacing.md,
+              paddingRight: options?.showToggle ? 48 : theme.spacing.md,
+            },
+          ]}
+          placeholder={placeholder}
+          placeholderTextColor={theme.colors.textSecondary}
+          value={value}
+          onChangeText={onChangeText}
+          keyboardType={options?.keyboardType}
+          secureTextEntry={options?.secureTextEntry && !options?.toggleValue}
+          autoCapitalize={options?.autoCapitalize ?? (options?.secureTextEntry ? 'none' : undefined)}
+          autoCorrect={false}
+        />
+        {options?.showToggle && (
+          <TouchableOpacity
+            style={styles.inputToggle}
+            onPress={options.onToggle}
+          >
+            <Ionicons
+              name={options.toggleValue ? 'eye-off' : 'eye'}
+              size={20}
+              color={theme.colors.textSecondary}
+            />
+          </TouchableOpacity>
+        )}
+      </View>
     </View>
   )
 
@@ -151,9 +260,18 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
     >
       <StatusBar backgroundColor={theme.colors.primary[500]} barStyle="light-content" />
 
-      <ScrollView contentContainerStyle={{ flexGrow: 1, paddingHorizontal: theme.spacing.lg, paddingVertical: theme.spacing.xl }} keyboardShouldPersistTaps="handled">
+      <ScrollView
+        ref={scrollViewRef}
+        contentContainerStyle={{ flexGrow: 1, paddingHorizontal: theme.spacing.lg, paddingVertical: theme.spacing.xl }}
+        keyboardShouldPersistTaps="handled"
+        showsVerticalScrollIndicator={false}
+      >
+        {/* Header */}
         <View style={{ alignItems: 'center', marginBottom: theme.spacing.xl }}>
-          <Typography variant="displayMd" weight="bold" style={{ color: theme.colors.primary[500], marginBottom: theme.spacing.sm }}>
+          <View style={[styles.logoContainer, { backgroundColor: `${theme.colors.primary[500]}15` }]}>
+            <Ionicons name="leaf" size={40} color={theme.colors.primary[500]} />
+          </View>
+          <Typography variant="displayMd" weight="bold" style={{ color: theme.colors.primary[500], marginTop: theme.spacing.md, marginBottom: theme.spacing.xs }}>
             Créer un compte
           </Typography>
           <Typography variant="body" color="secondary" style={{ textAlign: 'center' }}>
@@ -161,40 +279,266 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
           </Typography>
         </View>
 
-        <Card variant="elevated" style={{ padding: theme.spacing.lg, marginBottom: theme.spacing.lg }}>
-          {renderInput('Prénom *', formData.first_name, 'first_name', 'Votre prénom')}
-          {renderInput('Nom *', formData.last_name, 'last_name', 'Votre nom')}
-          {renderInput('Email *', formData.email, 'email', 'votre@email.com', { keyboardType: 'email-address' })}
-          {renderInput('Téléphone', formData.phone || '', 'phone', '+228 XX XX XX XX', { keyboardType: 'phone-pad' })}
-          {renderInput('Ville *', formData.city, 'city', 'Lomé')}
-          {renderInput('Mot de passe *', formData.password, 'password', 'Mot de passe sécurisé', { secureTextEntry: true })}
-          {renderInput('Confirmer le mot de passe *', formData.password_confirmation, 'password_confirmation', 'Confirmer le mot de passe', { secureTextEntry: true })}
+        {/* Sélection du rôle */}
+        <Card variant="elevated" style={{ padding: theme.spacing.md, marginBottom: theme.spacing.lg }}>
+          <Typography variant="body" weight="semibold" style={{ marginBottom: theme.spacing.md, textAlign: 'center' }}>
+            Je suis...
+          </Typography>
+          <View style={styles.roleSelector}>
+            <TouchableOpacity
+              style={[
+                styles.roleButton,
+                {
+                  backgroundColor: role === 'consumer' ? theme.colors.primary[500] : theme.colors.surface.muted,
+                  borderColor: role === 'consumer' ? theme.colors.primary[500] : theme.colors.inputBorder,
+                },
+              ]}
+              onPress={() => handleRoleChange('consumer')}
+            >
+              <Ionicons
+                name="person"
+                size={24}
+                color={role === 'consumer' ? '#fff' : theme.colors.textSecondary}
+              />
+              <Typography
+                variant="body"
+                weight="semibold"
+                style={{ color: role === 'consumer' ? '#fff' : theme.colors.text, marginTop: 4 }}
+              >
+                Consommateur
+              </Typography>
+              <Typography
+                variant="caption"
+                style={{ color: role === 'consumer' ? 'rgba(255,255,255,0.8)' : theme.colors.textSecondary, textAlign: 'center', marginTop: 2 }}
+              >
+                Je cherche des bons plans
+              </Typography>
+            </TouchableOpacity>
 
-          <Button
-            variant="primary"
-            size="lg"
-            fullWidth
-            onPress={handleRegister}
-            disabled={loading}
-            loading={loading}
-          >
-            {loading ? 'Création...' : 'Créer mon compte'}
-          </Button>
+            <TouchableOpacity
+              style={[
+                styles.roleButton,
+                {
+                  backgroundColor: role === 'merchant' ? theme.colors.primary[500] : theme.colors.surface.muted,
+                  borderColor: role === 'merchant' ? theme.colors.primary[500] : theme.colors.inputBorder,
+                },
+              ]}
+              onPress={() => handleRoleChange('merchant')}
+            >
+              <Ionicons
+                name="storefront"
+                size={24}
+                color={role === 'merchant' ? '#fff' : theme.colors.textSecondary}
+              />
+              <Typography
+                variant="body"
+                weight="semibold"
+                style={{ color: role === 'merchant' ? '#fff' : theme.colors.text, marginTop: 4 }}
+              >
+                Commerçant
+              </Typography>
+              <Typography
+                variant="caption"
+                style={{ color: role === 'merchant' ? 'rgba(255,255,255,0.8)' : theme.colors.textSecondary, textAlign: 'center', marginTop: 2 }}
+              >
+                Je vends mes invendus
+              </Typography>
+            </TouchableOpacity>
+          </View>
         </Card>
 
-        <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
-          <Typography variant="caption" color="secondary" style={{ marginRight: theme.spacing.xs }}>
+        {/* Informations personnelles */}
+        <Card variant="elevated" style={{ padding: theme.spacing.lg, marginBottom: theme.spacing.lg }}>
+          <View style={styles.sectionHeader}>
+            <View style={[styles.sectionIcon, { backgroundColor: `${theme.colors.primary[500]}15` }]}>
+              <Ionicons name="person-circle" size={20} color={theme.colors.primary[500]} />
+            </View>
+            <Typography variant="body" weight="bold">Informations personnelles</Typography>
+          </View>
+
+          <View style={styles.row}>
+            <View style={{ flex: 1, marginRight: theme.spacing.sm }}>
+              {renderInput('Prénom *', firstName, setFirstName, 'Jean', { icon: 'person-outline' })}
+            </View>
+            <View style={{ flex: 1, marginLeft: theme.spacing.sm }}>
+              {renderInput('Nom *', lastName, setLastName, 'Dupont', { icon: 'person-outline' })}
+            </View>
+          </View>
+
+          {renderInput('Email *', email, setEmail, 'jean@exemple.com', {
+            keyboardType: 'email-address',
+            icon: 'mail-outline',
+            autoCapitalize: 'none',
+          })}
+
+          {renderInput('Téléphone', phone, setPhone, '+228 90 12 34 56', {
+            keyboardType: 'phone-pad',
+            icon: 'call-outline',
+          })}
+
+          {renderInput('Ville *', city, setCity, 'Lomé', { icon: 'location-outline' })}
+        </Card>
+
+        {/* Champs spécifiques Merchant */}
+        {role === 'merchant' && (
+          <Animated.View style={{ opacity: roleAnimation }}>
+            <Card variant="elevated" style={{ padding: theme.spacing.lg, marginBottom: theme.spacing.lg, borderColor: theme.colors.primary[500], borderWidth: 1 }}>
+              <View style={styles.sectionHeader}>
+                <View style={[styles.sectionIcon, { backgroundColor: `${theme.colors.secondary[500]}15` }]}>
+                  <Ionicons name="storefront" size={20} color={theme.colors.secondary[500]} />
+                </View>
+                <Typography variant="body" weight="bold">Informations commerce</Typography>
+              </View>
+
+              {renderInput('Nom du commerce *', businessName, setBusinessName, 'Boulangerie Martin', {
+                icon: 'business-outline',
+              })}
+
+              {/* Type de commerce - Picker personnalisé */}
+              <View style={{ marginBottom: theme.spacing.md }}>
+                <Typography variant="caption" weight="semibold" style={{ marginBottom: theme.spacing.xs, color: theme.colors.textSecondary }}>
+                  Type de commerce *
+                </Typography>
+                <TouchableOpacity
+                  style={[
+                    styles.pickerButton,
+                    {
+                      backgroundColor: theme.colors.inputBackground,
+                      borderColor: theme.colors.inputBorder,
+                    },
+                  ]}
+                  onPress={() => setShowBusinessTypePicker(true)}
+                >
+                  <View style={[styles.inputIconContainer, { backgroundColor: `${theme.colors.primary[500]}15` }]}>
+                    <Ionicons
+                      name={BUSINESS_TYPES.find(bt => bt.value === businessType)?.icon as any || 'grid-outline'}
+                      size={18}
+                      color={theme.colors.primary[500]}
+                    />
+                  </View>
+                  <Typography
+                    variant="body"
+                    style={{
+                      flex: 1,
+                      marginLeft: 48,
+                      color: businessType ? theme.colors.text : theme.colors.textSecondary,
+                    }}
+                  >
+                    {getSelectedBusinessTypeLabel()}
+                  </Typography>
+                  <Ionicons name="chevron-down" size={20} color={theme.colors.textSecondary} />
+                </TouchableOpacity>
+              </View>
+
+              <View style={[styles.infoBox, { backgroundColor: `${theme.colors.info}10`, borderColor: theme.colors.info }]}>
+                <Ionicons name="information-circle" size={20} color={theme.colors.info} />
+                <Typography variant="caption" style={{ flex: 1, marginLeft: theme.spacing.sm, color: theme.colors.info }}>
+                  Votre compte sera vérifié par notre équipe avant activation complète.
+                </Typography>
+              </View>
+            </Card>
+          </Animated.View>
+        )}
+
+        {/* Sécurité */}
+        <Card variant="elevated" style={{ padding: theme.spacing.lg, marginBottom: theme.spacing.lg }}>
+          <View style={styles.sectionHeader}>
+            <View style={[styles.sectionIcon, { backgroundColor: `${theme.colors.error}15` }]}>
+              <Ionicons name="lock-closed" size={20} color={theme.colors.error} />
+            </View>
+            <Typography variant="body" weight="bold">Sécurité</Typography>
+          </View>
+
+          {renderInput('Mot de passe *', password, setPassword, 'Min. 8 caractères', {
+            secureTextEntry: true,
+            icon: 'key-outline',
+            showToggle: true,
+            toggleValue: showPassword,
+            onToggle: () => setShowPassword(!showPassword),
+          })}
+
+          {renderInput('Confirmer le mot de passe *', passwordConfirmation, setPasswordConfirmation, 'Répétez le mot de passe', {
+            secureTextEntry: true,
+            icon: 'key-outline',
+            showToggle: true,
+            toggleValue: showPasswordConfirm,
+            onToggle: () => setShowPasswordConfirm(!showPasswordConfirm),
+          })}
+        </Card>
+
+        {/* Bouton d'inscription */}
+        <Button
+          variant="primary"
+          size="lg"
+          fullWidth
+          onPress={handleRegister}
+          disabled={loading}
+          loading={loading}
+          leftIcon={<Ionicons name="person-add" size={20} color="#fff" />}
+        >
+          {loading ? 'Création en cours...' : `Créer mon compte ${role === 'merchant' ? 'commerçant' : ''}`}
+        </Button>
+
+        {/* Lien connexion */}
+        <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center', marginTop: theme.spacing.lg, marginBottom: theme.spacing.xl }}>
+          <Typography variant="body" color="secondary" style={{ marginRight: theme.spacing.xs }}>
             Déjà un compte ?
           </Typography>
           <TouchableOpacity onPress={() => navigation.navigate('Login')}>
-            <Typography variant="caption" weight="semibold" style={{ color: theme.colors.primary[500] }}>
+            <Typography variant="body" weight="bold" style={{ color: theme.colors.primary[500] }}>
               Se connecter
             </Typography>
           </TouchableOpacity>
         </View>
       </ScrollView>
 
-      {/* Error Modal */}
+      {/* Modal de sélection du type de commerce */}
+      <Modal
+        visible={showBusinessTypePicker}
+        onClose={() => setShowBusinessTypePicker(false)}
+        variant="bottom"
+        showCloseButton
+      >
+        <View style={styles.businessTypeModalContent}>
+          <Typography variant="h3" weight="bold" style={{ marginBottom: theme.spacing.lg, textAlign: 'center' }}>
+            Type de commerce
+          </Typography>
+          <ScrollView style={{ maxHeight: 400 }} showsVerticalScrollIndicator={false}>
+            {BUSINESS_TYPES.map((type) => (
+              <TouchableOpacity
+                key={type.value}
+                style={[
+                  styles.businessTypeOption,
+                  {
+                    backgroundColor: businessType === type.value ? `${theme.colors.primary[500]}15` : 'transparent',
+                    borderColor: businessType === type.value ? theme.colors.primary[500] : theme.colors.inputBorder,
+                  },
+                ]}
+                onPress={() => {
+                  setBusinessType(type.value)
+                  setShowBusinessTypePicker(false)
+                }}
+              >
+                <View style={[styles.businessTypeIcon, { backgroundColor: `${theme.colors.primary[500]}15` }]}>
+                  <Ionicons name={type.icon as any} size={24} color={theme.colors.primary[500]} />
+                </View>
+                <Typography
+                  variant="body"
+                  weight={businessType === type.value ? 'bold' : 'regular'}
+                  style={{ flex: 1, marginLeft: theme.spacing.md }}
+                >
+                  {type.label}
+                </Typography>
+                {businessType === type.value && (
+                  <Ionicons name="checkmark-circle" size={24} color={theme.colors.primary[500]} />
+                )}
+              </TouchableOpacity>
+            ))}
+          </ScrollView>
+        </View>
+      </Modal>
+
+      {/* Modal d'erreur */}
       <Modal
         visible={errorModalVisible}
         onClose={() => setErrorModalVisible(false)}
@@ -202,17 +546,14 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
         showCloseButton={false}
       >
         <View style={styles.errorModalContent}>
-          {/* Error Icon */}
           <View style={[styles.errorIconContainer, { backgroundColor: `${theme.colors.error}15` }]}>
             <Ionicons name="alert-circle" size={48} color={theme.colors.error} />
           </View>
 
-          {/* Title */}
           <Typography variant="h3" weight="bold" style={styles.errorModalTitle}>
             {errorTitle}
           </Typography>
 
-          {/* Error Messages */}
           <View style={[styles.errorMessagesContainer, { backgroundColor: theme.colors.surface.muted }]}>
             {errorMessages.map((message, index) => (
               <View key={index} style={styles.errorMessageRow}>
@@ -224,7 +565,6 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
             ))}
           </View>
 
-          {/* Close Button */}
           <Button
             variant="primary"
             size="lg"
@@ -243,6 +583,100 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+  logoContainer: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  roleSelector: {
+    flexDirection: 'row',
+    gap: 12,
+  },
+  roleButton: {
+    flex: 1,
+    paddingVertical: 16,
+    paddingHorizontal: 12,
+    borderRadius: 12,
+    borderWidth: 2,
+    alignItems: 'center',
+  },
+  sectionHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  sectionIcon: {
+    width: 32,
+    height: 32,
+    borderRadius: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 10,
+  },
+  row: {
+    flexDirection: 'row',
+  },
+  inputContainer: {
+    position: 'relative',
+  },
+  inputIconContainer: {
+    position: 'absolute',
+    left: 10,
+    top: 10,
+    width: 28,
+    height: 28,
+    borderRadius: 6,
+    alignItems: 'center',
+    justifyContent: 'center',
+    zIndex: 1,
+  },
+  input: {
+    paddingVertical: 12,
+    borderRadius: 10,
+    borderWidth: 1,
+    fontSize: 15,
+  },
+  inputToggle: {
+    position: 'absolute',
+    right: 12,
+    top: 12,
+  },
+  pickerButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 12,
+    paddingRight: 12,
+    borderRadius: 10,
+    borderWidth: 1,
+  },
+  infoBox: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    padding: 12,
+    borderRadius: 8,
+    borderWidth: 1,
+    marginTop: 8,
+  },
+  businessTypeModalContent: {
+    paddingVertical: 8,
+  },
+  businessTypeOption: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 12,
+    borderRadius: 10,
+    borderWidth: 1,
+    marginBottom: 8,
+  },
+  businessTypeIcon: {
+    width: 44,
+    height: 44,
+    borderRadius: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   errorModalContent: {
     alignItems: 'center',
