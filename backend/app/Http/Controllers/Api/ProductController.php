@@ -363,9 +363,10 @@ class ProductController extends Controller
             // Always use merchant's category - no choice allowed
             $categoryId = $user->merchant->category_id;
 
-            // Fallback to "Autre" (id 9) if merchant doesn't have a category
+            // Fallback to first available category if merchant doesn't have a category
             if (!$categoryId) {
-                $categoryId = 9;
+                $firstCategory = Category::first();
+                $categoryId = $firstCategory ? $firstCategory->id : 1;
             }
 
             $product = Product::create([

@@ -9,7 +9,8 @@ import {
   Linking,
   TouchableOpacity,
 } from 'react-native'
-import MapView, { Marker, Callout, UrlTile, Region } from 'react-native-maps'
+import MapViewWrapper, { Marker, Callout, UrlTile, isExpoGo } from '../../components/MapViewWrapper'
+import type { Region } from 'react-native-maps'
 import { Ionicons } from '@expo/vector-icons'
 import * as Location from 'expo-location'
 import { useNavigation, NavigationProp } from '@react-navigation/native'
@@ -332,7 +333,7 @@ const MerchantMapScreen: React.FC<Props> = ({ testID = TEST_IDS.merchantMapScree
   // Main map view - Using OpenStreetMap (free, no API key required)
   return (
     <View style={styles.container} testID={testID}>
-      <MapView
+      <MapViewWrapper
         style={styles.map}
         initialRegion={region}
         showsUserLocation={userLocation !== null}
@@ -342,13 +343,15 @@ const MerchantMapScreen: React.FC<Props> = ({ testID = TEST_IDS.merchantMapScree
         testID={TEST_IDS.merchantMapView}
       >
         {/* OpenStreetMap Tiles - 100% gratuit, pas de clé API */}
-        <UrlTile
-          urlTemplate="https://tile.openstreetmap.org/{z}/{x}/{y}.png"
-          maximumZ={19}
-          flipY={false}
-          tileSize={256}
-        />
-        {merchants.map((merchant) => (
+        {!isExpoGo && UrlTile && (
+          <UrlTile
+            urlTemplate="https://tile.openstreetmap.org/{z}/{x}/{y}.png"
+            maximumZ={19}
+            flipY={false}
+            tileSize={256}
+          />
+        )}
+        {!isExpoGo && Marker && merchants.map((merchant) => (
           <Marker
             key={merchant.id}
             coordinate={{
@@ -370,7 +373,7 @@ const MerchantMapScreen: React.FC<Props> = ({ testID = TEST_IDS.merchantMapScree
             {renderCallout(merchant)}
           </Marker>
         ))}
-      </MapView>
+      </MapViewWrapper>
 
       {/* Merchant count badge */}
       <View style={[styles.badge, { backgroundColor: theme.colors.primary[500] }]} testID={TEST_IDS.merchantMapCountBadge}>

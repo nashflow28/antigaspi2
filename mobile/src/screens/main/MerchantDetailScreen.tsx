@@ -25,7 +25,7 @@ import { Product, Merchant } from '../../types'
 import { getImageUrl } from '../../utils/imageHelpers'
 import { formatCurrency } from '../../utils/currencyHelpers'
 import { Button, Card, Badge, Typography } from '../../components/2025'
-import MapView, { Marker, UrlTile } from 'react-native-maps'
+import MapViewWrapper, { Marker, UrlTile, isExpoGo } from '../../components/MapViewWrapper'
 import locationService, { UserLocation } from '../../services/locationService'
 
 const { width } = Dimensions.get('window')
@@ -363,7 +363,7 @@ const MerchantDetailScreen: React.FC<Props> = ({ route, navigation }) => {
             )}
           </View>
         ) : (
-          <MapView
+          <MapViewWrapper
             style={[styles.mapView, mapExpanded && styles.mapViewExpanded]}
             initialRegion={mapRegion}
             showsUserLocation={locationPermissionGranted && !!userLocation}
@@ -371,25 +371,29 @@ const MerchantDetailScreen: React.FC<Props> = ({ route, navigation }) => {
             mapType={Platform.OS === 'android' ? 'none' : 'standard'}
           >
             {/* OpenStreetMap Tiles */}
-            <UrlTile
-              urlTemplate="https://tile.openstreetmap.org/{z}/{x}/{y}.png"
-              maximumZ={19}
-              flipY={false}
-              tileSize={256}
-            />
-            <Marker
-              coordinate={{ latitude: mapRegion.latitude, longitude: mapRegion.longitude }}
-              title={merchant.business_name}
-              description={merchant.address || merchant.city}
-            />
-            {userLocation && (
+            {!isExpoGo && UrlTile && (
+              <UrlTile
+                urlTemplate="https://tile.openstreetmap.org/{z}/{x}/{y}.png"
+                maximumZ={19}
+                flipY={false}
+                tileSize={256}
+              />
+            )}
+            {!isExpoGo && Marker && (
+              <Marker
+                coordinate={{ latitude: mapRegion.latitude, longitude: mapRegion.longitude }}
+                title={merchant.business_name}
+                description={merchant.address || merchant.city}
+              />
+            )}
+            {!isExpoGo && Marker && userLocation && (
               <Marker
                 coordinate={{ latitude: userLocation.latitude, longitude: userLocation.longitude }}
                 title="Vous"
                 pinColor={theme.colors.primary[500]}
               />
             )}
-          </MapView>
+          </MapViewWrapper>
         )}
 
         {/* Header buttons */}

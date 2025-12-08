@@ -7,13 +7,8 @@ import {
   TouchableOpacity,
   Platform,
 } from 'react-native'
-import MapView, {
-  Marker,
-  Region,
-  MapPressEvent,
-  MarkerDragStartEndEvent,
-  UrlTile,
-} from 'react-native-maps'
+import MapViewWrapper, { Marker, UrlTile, isExpoGo } from './MapViewWrapper'
+import type { Region, MapPressEvent, MarkerDragStartEndEvent } from 'react-native-maps'
 import { Ionicons } from '@expo/vector-icons'
 import { useTheme } from '../theme'
 
@@ -43,7 +38,7 @@ const MapLocationPicker: React.FC<MapLocationPickerProps> = ({
   initialLongitude,
 }) => {
   const theme = useTheme()
-  const mapRef = useRef<MapView>(null)
+  const mapRef = useRef<any>(null)
 
   const initialLocation = useMemo(
     () => ({
@@ -204,7 +199,7 @@ const MapLocationPicker: React.FC<MapLocationPickerProps> = ({
 
         {/* Map */}
         <View style={styles.mapContainer}>
-          <MapView
+          <MapViewWrapper
             ref={mapRef}
             style={styles.map}
             region={region}
@@ -216,15 +211,17 @@ const MapLocationPicker: React.FC<MapLocationPickerProps> = ({
             mapType={Platform.OS === 'android' ? 'none' : 'standard'}
           >
             {/* OpenStreetMap Tiles - 100% gratuit, pas de clé API */}
-            <UrlTile
-              urlTemplate="https://tile.openstreetmap.org/{z}/{x}/{y}.png"
-              maximumZ={19}
-              flipY={false}
-              tileSize={256}
-            />
+            {!isExpoGo && UrlTile && (
+              <UrlTile
+                urlTemplate="https://tile.openstreetmap.org/{z}/{x}/{y}.png"
+                maximumZ={19}
+                flipY={false}
+                tileSize={256}
+              />
+            )}
 
             {/* Draggable Marker */}
-            {selectedLocation && (
+            {!isExpoGo && selectedLocation && Marker && (
               <Marker
                 coordinate={selectedLocation}
                 draggable={true}
@@ -235,7 +232,7 @@ const MapLocationPicker: React.FC<MapLocationPickerProps> = ({
                 description="Déplacez-moi pour changer la position"
               />
             )}
-          </MapView>
+          </MapViewWrapper>
 
           {/* OpenStreetMap Attribution */}
           <View style={styles.osmAttribution}>
