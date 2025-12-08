@@ -266,6 +266,9 @@ class ReservationController extends Controller
                 $query->whereIn('status', explode(',', $request->status));
             }
 
+            // Toujours trier par date de création décroissante (plus récent en premier)
+            $query->orderBy('created_at', 'desc');
+
             // 🐛 BUG FIX: Add max(1, ...) to prevent per_page=0 crash
             $perPage = max(1, min($request->get('per_page', 15), 50));
             $reservations = $query->paginate($perPage);
