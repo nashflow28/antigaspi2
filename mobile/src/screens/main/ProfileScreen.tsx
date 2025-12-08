@@ -235,7 +235,7 @@ const ProfileScreen: React.FC = () => {
               paddingVertical: theme.spacing.md,
               borderBottomWidth: 1,
               borderBottomColor: theme.colors.border,
-              backgroundColor: theme.colors.surface.light,
+              backgroundColor: theme.isDark ? theme.colors.cardBackground : theme.colors.surface.light,
               gap: theme.spacing.md,
             },
           ]}

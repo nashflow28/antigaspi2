@@ -107,8 +107,10 @@ const AlertModal: React.FC<AlertModalProps> = ({
         }
       case 'cancel':
         return {
-          backgroundColor: theme.colors.neutral[200],
-          textColor: theme.colors.text,
+          // En mode sombre, utiliser un fond plus foncé avec texte clair
+          // En mode clair, utiliser un fond gris clair avec texte foncé
+          backgroundColor: theme.isDark ? theme.colors.neutral[700] : theme.colors.neutral[200],
+          textColor: theme.isDark ? theme.colors.neutral[100] : theme.colors.neutral[700],
         }
       default:
         return {
@@ -222,6 +224,9 @@ const AlertModal: React.FC<AlertModalProps> = ({
                         fontWeight: '600',
                       },
                     ]}
+                    numberOfLines={1}
+                    adjustsFontSizeToFit
+                    minimumFontScale={0.8}
                   >
                     {button.text}
                   </Text>
