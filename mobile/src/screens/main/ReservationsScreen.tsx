@@ -191,7 +191,7 @@ const ReservationsScreen: React.FC<Props> = ({ navigation }) => {
     const date = new Date(dateString)
     return date.toLocaleDateString('fr-FR', {
       day: '2-digit',
-      month: '2-digit',
+      month: 'long',
       year: 'numeric',
       hour: '2-digit',
       minute: '2-digit'
@@ -202,9 +202,26 @@ const ReservationsScreen: React.FC<Props> = ({ navigation }) => {
     const date = new Date(dateString)
     return date.toLocaleDateString('fr-FR', {
       day: '2-digit',
-      month: '2-digit',
+      month: 'long',
       year: 'numeric'
     })
+  }
+
+  const formatPickupTime = (timeString: string) => {
+    // Gère les formats ISO (2025-12-08T10:00:00.000000Z) ou simples (10:00)
+    if (timeString.includes('T')) {
+      const date = new Date(timeString)
+      const hours = date.getHours().toString().padStart(2, '0')
+      const minutes = date.getMinutes().toString().padStart(2, '0')
+      return `${hours}h${minutes}`
+    }
+    // Format simple HH:MM
+    const [hours, minutes] = timeString.split(':')
+    return `${hours}h${minutes || '00'}`
+  }
+
+  const isPickupCompleted = (reservation: Reservation) => {
+    return reservation.status === 'completed'
   }
 
   const canCancel = (reservation: Reservation) => {
@@ -311,8 +328,8 @@ const ReservationsScreen: React.FC<Props> = ({ navigation }) => {
         <View style={[styles.pickupSection, { paddingTop: theme.spacing.sm, borderTopWidth: 1, borderTopColor: theme.colors.border, marginBottom: theme.spacing.sm }]}>
           <Ionicons name="calendar-outline" size={16} color={theme.colors.neutral[500]} />
           <Typography variant="caption" color="secondary" style={{ marginLeft: theme.spacing.sm }}>
-            Retrait: {item.pickup_date && formatPickupDate(item.pickup_date)}
-            {item.pickup_time && ` à ${item.pickup_time}`}
+            {isPickupCompleted(item) ? 'Retrait:' : 'Retrait prévu:'} {item.pickup_date && formatPickupDate(item.pickup_date)}
+            {item.pickup_time && ` à ${formatPickupTime(item.pickup_time)}`}
           </Typography>
         </View>
       )}
