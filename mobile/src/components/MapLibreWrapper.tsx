@@ -26,32 +26,37 @@ if (!isExpoGo) {
   }
 }
 
-// Style Carto Voyager - tuiles fiables et gratuites (basées sur OSM)
+// Style OpenStreetMap avec tuiles vectorielles pour afficher les rues clairement
+// Utilise OpenFreeMap qui est 100% gratuit et affiche bien les rues/labels
+const OSM_VECTOR_STYLE_URL = 'https://tiles.openfreemap.org/styles/liberty'
+
+// Style Carto Voyager - fallback si le style vectoriel ne fonctionne pas
 const CARTO_RASTER_STYLE = {
   version: 8,
   sources: {
-    carto: {
+    osm: {
       type: 'raster',
       tiles: [
-        'https://a.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}@2x.png',
-        'https://b.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}@2x.png',
-        'https://c.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}@2x.png',
-        'https://d.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}@2x.png',
+        'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
       ],
       tileSize: 256,
-      attribution: '© CARTO © OpenStreetMap contributors',
+      attribution: '© OpenStreetMap contributors',
+      maxzoom: 19,
     },
   },
   layers: [
     {
-      id: 'carto-tiles',
+      id: 'osm-tiles',
       type: 'raster',
-      source: 'carto',
+      source: 'osm',
       minzoom: 0,
-      maxzoom: 22,
+      maxzoom: 19,
     },
   ],
 }
+
+// Flag pour utiliser le style vectoriel (meilleure qualité avec rues)
+const USE_VECTOR_STYLE = true
 
 interface MapLibreWrapperProps {
   style?: any
@@ -122,37 +127,71 @@ const MapLibreWrapper = forwardRef<MapLibreRef, MapLibreWrapperProps>((props, re
   }
 
   const handlePress = (event: any) => {
-    console.log('[MapLibreWrapper] onPress event:', JSON.stringify(event, null, 2))
+    console.log('[MapLibreWrapper] onPress raw event:', event)
+    console.log('[MapLibreWrapper] onPress event stringified:', JSON.stringify(event, null, 2))
 
     if (!onPress) return
 
-    // MapLibre React Native peut envoyer les coordonnées de différentes manières
+    // MapLibre React Native v10+ - Le format de l'événement a changé
+    // Il faut extraire les coordonnées correctement selon la version
     let longitude: number | undefined
     let latitude: number | undefined
 
-    // Format 1: event.geometry.coordinates [lng, lat]
-    if (event?.geometry?.coordinates) {
-      [longitude, latitude] = event.geometry.coordinates
-    }
-    // Format 2: event.coordinates [lng, lat]
-    else if (event?.coordinates) {
-      [longitude, latitude] = event.coordinates
-    }
-    // Format 3: Direct nativeEvent with coordinates
-    else if (event?.nativeEvent?.coordinate) {
-      longitude = event.nativeEvent.coordinate.longitude
-      latitude = event.nativeEvent.coordinate.latitude
-    }
-    // Format 4: Features array
-    else if (event?.features?.[0]?.geometry?.coordinates) {
-      [longitude, latitude] = event.features[0].geometry.coordinates
-    }
+    try {
+      // Format MapLibre v10+ : L'événement a une propriété geometry directe
+      // Structure: { type: 'Feature', geometry: { type: 'Point', coordinates: [lng, lat] }, properties: {} }
 
-    if (typeof longitude === 'number' && typeof latitude === 'number') {
-      console.log('[MapLibreWrapper] Parsed coordinates:', { latitude, longitude })
-      onPress({ latitude, longitude })
-    } else {
-      console.warn('[MapLibreWrapper] Could not parse coordinates from event')
+      // Format 1: Accès direct geometry.coordinates (MapLibre v10+)
+      if (event?.geometry?.coordinates && Array.isArray(event.geometry.coordinates)) {
+        const coords = event.geometry.coordinates
+        if (coords.length >= 2) {
+          [longitude, latitude] = coords
+          console.log('[MapLibreWrapper] Format 1 - geometry.coordinates:', { longitude, latitude })
+        }
+      }
+      // Format 2: features[0].geometry.coordinates (MapLibre standard GeoJSON)
+      else if (event?.features?.[0]?.geometry?.coordinates) {
+        const coords = event.features[0].geometry.coordinates
+        if (Array.isArray(coords) && coords.length >= 2) {
+          [longitude, latitude] = coords
+          console.log('[MapLibreWrapper] Format 2 - features[0]:', { longitude, latitude })
+        }
+      }
+      // Format 3: coordinates direct (ancien format)
+      else if (event?.coordinates && Array.isArray(event.coordinates)) {
+        const coords = event.coordinates
+        if (coords.length >= 2) {
+          [longitude, latitude] = coords
+          console.log('[MapLibreWrapper] Format 3 - coordinates:', { longitude, latitude })
+        }
+      }
+      // Format 4: nativeEvent.coordinate (React Native Maps style)
+      else if (event?.nativeEvent?.coordinate) {
+        longitude = event.nativeEvent.coordinate.longitude
+        latitude = event.nativeEvent.coordinate.latitude
+        console.log('[MapLibreWrapper] Format 4 - nativeEvent:', { longitude, latitude })
+      }
+      // Format 5: point pour convertir en coordonnées via la carte (workaround)
+      else if (event?.properties?.screenPointX !== undefined && mapRef.current) {
+        console.log('[MapLibreWrapper] Format 5 - screenPoint detected, needs conversion')
+        // Ce format nécessite une conversion screen -> geo, non supporté ici
+      }
+
+      if (typeof longitude === 'number' && typeof latitude === 'number' &&
+          Number.isFinite(longitude) && Number.isFinite(latitude)) {
+        console.log('[MapLibreWrapper] ✅ Parsed coordinates successfully:', { latitude, longitude })
+        onPress({ latitude, longitude })
+      } else {
+        console.warn('[MapLibreWrapper] ⚠️ Could not parse coordinates from event')
+        console.warn('[MapLibreWrapper] Event keys:', Object.keys(event || {}))
+
+        // Log de debug supplémentaire pour comprendre la structure
+        if (event?.geometry) console.log('[MapLibreWrapper] geometry:', event.geometry)
+        if (event?.features) console.log('[MapLibreWrapper] features:', event.features)
+        if (event?.coordinates) console.log('[MapLibreWrapper] coordinates:', event.coordinates)
+      }
+    } catch (error) {
+      console.error('[MapLibreWrapper] Error parsing press event:', error)
     }
   }
 
@@ -160,14 +199,21 @@ const MapLibreWrapper = forwardRef<MapLibreRef, MapLibreWrapperProps>((props, re
     // MapLibre doesn't have a direct equivalent, we'll use onRegionDidChange
   }
 
-  console.log('[MapLibreWrapper] Rendering MapLibre map...')
+  console.log('[MapLibreWrapper] Rendering MapLibre map with vector style:', USE_VECTOR_STYLE)
+
+  // Choisir le style de la carte
+  // Style vectoriel = meilleure qualité avec rues et labels
+  // Style raster = fallback plus simple mais moins détaillé
+  const mapStyleConfig = USE_VECTOR_STYLE
+    ? { styleURL: OSM_VECTOR_STYLE_URL }
+    : { styleJSON: JSON.stringify(CARTO_RASTER_STYLE) }
 
   return (
     <View style={[styles.container, style]}>
       <MapLibreGL.MapView
         ref={mapRef}
         style={styles.map}
-        styleJSON={JSON.stringify(CARTO_RASTER_STYLE)}
+        {...mapStyleConfig}
         onPress={handlePress}
         logoEnabled={false}
         attributionEnabled={true}
@@ -192,7 +238,7 @@ const MapLibreWrapper = forwardRef<MapLibreRef, MapLibreWrapperProps>((props, re
 
       {/* Attribution */}
       <View style={styles.osmAttribution}>
-        <Text style={styles.osmAttributionText}>© CARTO © OSM</Text>
+        <Text style={styles.osmAttributionText}>© OpenStreetMap</Text>
       </View>
     </View>
   )

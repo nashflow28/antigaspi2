@@ -52,7 +52,7 @@ const MapLocationPicker: React.FC<MapLocationPickerProps> = ({
     initialLocation.longitude,
     initialLocation.latitude,
   ])
-  const [zoom, setZoom] = useState(15)
+  const [zoom, setZoom] = useState(17) // Zoom plus élevé pour mieux voir les rues
   const [locationPermissionGranted, setLocationPermissionGranted] = useState(false)
   const [permissionChecked, setPermissionChecked] = useState(false)
   const [mapReady, setMapReady] = useState(false)
