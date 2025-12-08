@@ -8,11 +8,10 @@ import {
   Platform,
   ActivityIndicator,
 } from 'react-native'
-import MapViewWrapper, { Marker, UrlTile, isExpoGo } from './MapViewWrapper'
-import type { Region, MapPressEvent, MarkerDragStartEndEvent } from 'react-native-maps'
 import { Ionicons } from '@expo/vector-icons'
 import { useTheme } from '../theme'
 import * as Location from 'expo-location'
+import MapLibreWrapper, { getMapLibreGL, isExpoGo, MapLibreRef } from './MapLibreWrapper'
 
 interface MapLocationPickerProps {
   visible: boolean
@@ -22,11 +21,9 @@ interface MapLocationPickerProps {
   initialLongitude?: number | null
 }
 
-const DEFAULT_REGION = {
+const DEFAULT_LOCATION = {
   latitude: 6.1319,
-  longitude: 1.2228,
-  latitudeDelta: 0.05,
-  longitudeDelta: 0.05,
+  longitude: 1.2228, // Lomé, Togo
 }
 
 const withFallback = (value: number | null | undefined, fallback: number) =>
@@ -40,164 +37,99 @@ const MapLocationPicker: React.FC<MapLocationPickerProps> = ({
   initialLongitude,
 }) => {
   const theme = useTheme()
-  const mapRef = useRef<any>(null)
+  const mapRef = useRef<MapLibreRef>(null)
 
   const initialLocation = useMemo(
     () => ({
-      latitude: withFallback(initialLatitude, DEFAULT_REGION.latitude),
-      longitude: withFallback(initialLongitude, DEFAULT_REGION.longitude),
+      latitude: withFallback(initialLatitude, DEFAULT_LOCATION.latitude),
+      longitude: withFallback(initialLongitude, DEFAULT_LOCATION.longitude),
     }),
     [initialLatitude, initialLongitude]
   )
 
-  const [selectedLocation, setSelectedLocation] = useState<{ latitude: number; longitude: number }>(initialLocation)
-  const [region, setRegion] = useState<Region>({
-    latitude: initialLocation.latitude,
-    longitude: initialLocation.longitude,
-    latitudeDelta: DEFAULT_REGION.latitudeDelta,
-    longitudeDelta: DEFAULT_REGION.longitudeDelta,
-  })
-
-  // 🔐 State pour gérer la permission de localisation AVANT d'activer showsUserLocation
+  const [selectedLocation, setSelectedLocation] = useState(initialLocation)
+  const [mapCenter, setMapCenter] = useState<[number, number]>([
+    initialLocation.longitude,
+    initialLocation.latitude,
+  ])
+  const [zoom, setZoom] = useState(15)
   const [locationPermissionGranted, setLocationPermissionGranted] = useState(false)
   const [permissionChecked, setPermissionChecked] = useState(false)
+  const [mapReady, setMapReady] = useState(false)
 
-  // 🔐 Vérifier la permission de localisation au montage du modal
-  // CRITIQUE: showsUserLocation={true} sans permission cause un crash natif sur Android
+  // Vérifier la permission de localisation
   useEffect(() => {
     if (!visible) {
-      // Reset permission state when modal closes
       setPermissionChecked(false)
       setLocationPermissionGranted(false)
+      setMapReady(false)
       return
     }
 
-    const checkAndRequestPermission = async () => {
+    const checkPermission = async () => {
       try {
-        // D'abord vérifier si la permission est déjà accordée
-        const { status: existingStatus } = await Location.getForegroundPermissionsAsync()
-
-        if (existingStatus === 'granted') {
+        const { status } = await Location.getForegroundPermissionsAsync()
+        if (status === 'granted') {
           setLocationPermissionGranted(true)
-          setPermissionChecked(true)
           console.log('[MapLocationPicker] Permission déjà accordée')
-          return
+        } else {
+          const { status: newStatus } = await Location.requestForegroundPermissionsAsync()
+          setLocationPermissionGranted(newStatus === 'granted')
+          console.log('[MapLocationPicker] Permission demandée:', newStatus)
         }
-
-        // Demander la permission si pas encore accordée
-        const { status } = await Location.requestForegroundPermissionsAsync()
-        setLocationPermissionGranted(status === 'granted')
-        setPermissionChecked(true)
-        console.log('[MapLocationPicker] Permission demandée, résultat:', status)
       } catch (error) {
-        console.error('[MapLocationPicker] Erreur vérification permission:', error)
-        // En cas d'erreur, on désactive showsUserLocation par sécurité
+        console.error('[MapLocationPicker] Erreur permission:', error)
         setLocationPermissionGranted(false)
-        setPermissionChecked(true)
       }
+      setPermissionChecked(true)
     }
 
-    checkAndRequestPermission()
+    checkPermission()
   }, [visible])
 
-  // Reset state when modal opens or initial coordinates change
+  // Reset quand le modal s'ouvre
   useEffect(() => {
     if (!visible) return
 
-    const baseLocation = {
-      latitude: withFallback(initialLatitude, DEFAULT_REGION.latitude),
-      longitude: withFallback(initialLongitude, DEFAULT_REGION.longitude),
+    const newLocation = {
+      latitude: withFallback(initialLatitude, DEFAULT_LOCATION.latitude),
+      longitude: withFallback(initialLongitude, DEFAULT_LOCATION.longitude),
     }
 
-    const nextRegion = {
-      ...baseLocation,
-      latitudeDelta: 0.01,
-      longitudeDelta: 0.01,
-    }
+    setSelectedLocation(newLocation)
+    setMapCenter([newLocation.longitude, newLocation.latitude])
+    setMapReady(true)
 
-    setSelectedLocation(baseLocation)
-    setRegion(nextRegion)
-
-    requestAnimationFrame(() => {
-      mapRef.current?.animateToRegion(nextRegion, 500)
-    })
-
-    console.log('[MapLocationPicker] Initialized with:', nextRegion)
+    console.log('[MapLocationPicker] Initialized with:', newLocation)
   }, [visible, initialLatitude, initialLongitude])
 
-  const centerOnLocation = useCallback((latitude: number, longitude: number) => {
-    setRegion((prev) => {
-      const nextRegion = {
-        ...prev,
-        latitude,
-        longitude,
-      }
-      mapRef.current?.animateToRegion(nextRegion, 250)
-      return nextRegion
-    })
-  }, [])
-
-  // Handle tap on map to place marker
-  const handleMapPress = useCallback(
-    (event: MapPressEvent) => {
-      const { latitude, longitude } = event.nativeEvent.coordinate
-      setSelectedLocation({ latitude, longitude })
-      centerOnLocation(latitude, longitude)
-      console.log('[MapLocationPicker] Map pressed at:', { latitude, longitude })
-    },
-    [centerOnLocation]
-  )
-
-  // Handle marker drag end
-  const handleMarkerDragEnd = useCallback(
-    (event: MarkerDragStartEndEvent) => {
-      const { latitude, longitude } = event.nativeEvent.coordinate
-      setSelectedLocation({ latitude, longitude })
-      centerOnLocation(latitude, longitude)
-      console.log('[MapLocationPicker] Marker dragged to:', { latitude, longitude })
-    },
-    [centerOnLocation]
-  )
-
-  // Handle marker drag (real-time updates)
-  const handleMarkerDrag = useCallback((event: MarkerDragStartEndEvent) => {
-    const { latitude, longitude } = event.nativeEvent.coordinate
-    setSelectedLocation({ latitude, longitude })
+  // Gérer le tap sur la carte
+  const handleMapPress = useCallback((event: { latitude: number; longitude: number }) => {
+    console.log('[MapLocationPicker] Map pressed:', event)
+    setSelectedLocation({ latitude: event.latitude, longitude: event.longitude })
+    setMapCenter([event.longitude, event.latitude])
   }, [])
 
   const handleConfirm = () => {
-    if (!selectedLocation) return
-
-    console.log('[MapLocationPicker] Confirming location:', selectedLocation)
+    console.log('[MapLocationPicker] Confirming:', selectedLocation)
     onSelectLocation(selectedLocation.latitude, selectedLocation.longitude)
     onClose()
   }
 
   const handleReset = useCallback(() => {
-    const baseLocation =
-      initialLatitude != null && initialLongitude != null
-        ? { latitude: initialLatitude, longitude: initialLongitude }
-        : { latitude: DEFAULT_REGION.latitude, longitude: DEFAULT_REGION.longitude }
-
-    setSelectedLocation(baseLocation)
-    centerOnLocation(baseLocation.latitude, baseLocation.longitude)
-  }, [centerOnLocation, initialLatitude, initialLongitude])
-
-  // Center map on marker
-  const handleCenterOnMarker = () => {
-    if (!selectedLocation) return
-
-    const nextRegion = {
-      latitude: selectedLocation.latitude,
-      longitude: selectedLocation.longitude,
-      latitudeDelta: region.latitudeDelta,
-      longitudeDelta: region.longitudeDelta,
+    const baseLocation = {
+      latitude: withFallback(initialLatitude, DEFAULT_LOCATION.latitude),
+      longitude: withFallback(initialLongitude, DEFAULT_LOCATION.longitude),
     }
+    setSelectedLocation(baseLocation)
+    setMapCenter([baseLocation.longitude, baseLocation.latitude])
+  }, [initialLatitude, initialLongitude])
 
-    mapRef.current?.animateToRegion(nextRegion, 500)
-    setRegion(nextRegion)
+  const handleCenterOnMarker = () => {
+    setMapCenter([selectedLocation.longitude, selectedLocation.latitude])
   }
 
+  // Web fallback
   if (Platform.OS === 'web') {
     return (
       <Modal visible={visible} animationType="slide" onRequestClose={onClose}>
@@ -212,14 +144,15 @@ const MapLocationPicker: React.FC<MapLocationPickerProps> = ({
           <View style={styles.webFallback}>
             <Ionicons name="map-outline" size={64} color={theme.colors.neutral[400]} />
             <Text style={[styles.webFallbackText, { color: theme.colors.textSecondary }]}>
-              La carte n'est pas disponible sur le web.{'\n'}
-              Utilisez le bouton "Ma position" ou entrez les coordonnées manuellement.
+              La carte n'est pas disponible sur le web.
             </Text>
           </View>
         </View>
       </Modal>
     )
   }
+
+  const MapLibreGL = getMapLibreGL()
 
   return (
     <Modal visible={visible} animationType="slide" onRequestClose={onClose}>
@@ -237,117 +170,96 @@ const MapLocationPicker: React.FC<MapLocationPickerProps> = ({
         <View style={[styles.instructions, { backgroundColor: theme.colors.info }]}>
           <Ionicons name="information-circle" size={20} color={theme.colors.primary[500]} />
           <Text style={[styles.instructionsText, { color: theme.colors.text }]}>
-            Déplacez le marqueur ou appuyez sur la carte pour choisir la position
+            Appuyez sur la carte pour choisir la position
           </Text>
         </View>
 
         {/* Map */}
         <View style={styles.mapContainer}>
-          {/* Afficher un loader pendant la vérification des permissions */}
           {!permissionChecked && (
             <View style={styles.permissionLoader}>
               <ActivityIndicator size="large" color={theme.colors.primary[500]} />
               <Text style={[styles.permissionLoaderText, { color: theme.colors.text }]}>
-                Vérification des permissions...
+                Chargement...
               </Text>
             </View>
           )}
 
-          {/* Afficher la carte SEULEMENT après vérification de la permission */}
-          {permissionChecked && (
-          <MapViewWrapper
-            ref={mapRef}
-            style={styles.map}
-            region={region}
-            onRegionChangeComplete={setRegion}
-            onPress={handleMapPress}
-            showsUserLocation={locationPermissionGranted}
-            showsMyLocationButton={locationPermissionGranted}
-            showsCompass={true}
-            mapType={Platform.OS === 'android' ? 'none' : 'standard'}
-          >
-            {/* OpenStreetMap Tiles - 100% gratuit, pas de clé API */}
-            {!isExpoGo && UrlTile && (
-              <UrlTile
-                urlTemplate="https://tile.openstreetmap.org/{z}/{x}/{y}.png"
-                maximumZ={19}
-                flipY={false}
-                tileSize={256}
-              />
-            )}
+          {permissionChecked && mapReady && (
+            <>
+              <MapLibreWrapper
+                ref={mapRef}
+                style={styles.map}
+                center={mapCenter}
+                zoom={zoom}
+                onPress={handleMapPress}
+                showsUserLocation={locationPermissionGranted}
+              >
+                {/* Marker pour la position sélectionnée */}
+                {!isExpoGo && MapLibreGL && selectedLocation && (
+                  <MapLibreGL.PointAnnotation
+                    id="selected-location"
+                    coordinate={[selectedLocation.longitude, selectedLocation.latitude]}
+                  >
+                    <View style={styles.markerContainer}>
+                      <Ionicons name="location" size={40} color="#10B981" />
+                    </View>
+                  </MapLibreGL.PointAnnotation>
+                )}
+              </MapLibreWrapper>
 
-            {/* Draggable Marker */}
-            {!isExpoGo && selectedLocation && Marker && (
-              <Marker
-                coordinate={selectedLocation}
-                draggable={true}
-                onDrag={handleMarkerDrag}
-                onDragEnd={handleMarkerDragEnd}
-                pinColor="#10B981"
-                title="Position du commerce"
-                description="Déplacez-moi pour changer la position"
-              />
-            )}
-          </MapViewWrapper>
-          )}
-
-          {/* OpenStreetMap Attribution */}
-          {permissionChecked && (
-            <View style={styles.osmAttribution}>
-              <Text style={styles.osmAttributionText}>© OpenStreetMap</Text>
-            </View>
-          )}
-
-          {/* Center on marker button */}
-          {permissionChecked && selectedLocation && (
-            <TouchableOpacity
-              style={[styles.centerButton, { backgroundColor: theme.colors.background }]}
-              onPress={handleCenterOnMarker}
-            >
-              <Ionicons name="locate" size={24} color={theme.colors.primary[500]} />
-            </TouchableOpacity>
+              {/* Center button */}
+              <TouchableOpacity
+                style={[styles.centerButton, { backgroundColor: theme.colors.background }]}
+                onPress={handleCenterOnMarker}
+              >
+                <Ionicons name="locate" size={24} color={theme.colors.primary[500]} />
+              </TouchableOpacity>
+            </>
           )}
         </View>
 
-        {/* Selected coordinates display */}
-        {selectedLocation && (
-          <View
-            style={[
-              styles.coordinatesDisplay,
-              { backgroundColor: theme.colors.cardBackground, borderColor: theme.colors.cardBorder },
-            ]}
-          >
-            <View style={styles.coordinateRow}>
-              <Text style={[styles.coordinateLabel, { color: theme.colors.textSecondary }]}>Latitude:</Text>
-              <Text style={[styles.coordinateValue, { color: theme.colors.text }]}>{selectedLocation.latitude.toFixed(6)}</Text>
-            </View>
-            <View style={styles.coordinateRow}>
-              <Text style={[styles.coordinateLabel, { color: theme.colors.textSecondary }]}>Longitude:</Text>
-              <Text style={[styles.coordinateValue, { color: theme.colors.text }]}>{selectedLocation.longitude.toFixed(6)}</Text>
-            </View>
+        {/* Coordinates display */}
+        <View
+          style={[
+            styles.coordinatesDisplay,
+            { backgroundColor: theme.colors.cardBackground, borderColor: theme.colors.cardBorder },
+          ]}
+        >
+          <View style={styles.coordinateRow}>
+            <Text style={[styles.coordinateLabel, { color: theme.colors.textSecondary }]}>Latitude:</Text>
+            <Text style={[styles.coordinateValue, { color: theme.colors.text }]}>
+              {selectedLocation.latitude.toFixed(6)}
+            </Text>
           </View>
-        )}
+          <View style={styles.coordinateRow}>
+            <Text style={[styles.coordinateLabel, { color: theme.colors.textSecondary }]}>Longitude:</Text>
+            <Text style={[styles.coordinateValue, { color: theme.colors.text }]}>
+              {selectedLocation.longitude.toFixed(6)}
+            </Text>
+          </View>
+        </View>
 
         {/* Action buttons */}
         <View style={styles.actions}>
-          <TouchableOpacity style={[styles.resetButton, { borderColor: theme.colors.neutral[300] }]} onPress={handleReset}>
+          <TouchableOpacity
+            style={[styles.resetButton, { borderColor: theme.colors.neutral[300] }]}
+            onPress={handleReset}
+          >
             <Ionicons name="refresh" size={20} color={theme.colors.textSecondary} />
-            <Text style={[styles.resetButtonText, { color: theme.colors.textSecondary }]}>Réinitialiser</Text>
+            <Text style={[styles.resetButtonText, { color: theme.colors.textSecondary }]}>
+              Réinitialiser
+            </Text>
           </TouchableOpacity>
 
           <TouchableOpacity
             style={[
               styles.confirmButton,
               {
-                backgroundColor: selectedLocation
-                  ? theme.isDark
-                    ? '#10B981'
-                    : theme.colors.primary[500]
-                  : theme.colors.neutral[300],
+                backgroundColor: theme.isDark ? '#10B981' : theme.colors.primary[500],
               },
             ]}
             onPress={handleConfirm}
-            disabled={!selectedLocation}
           >
             <Ionicons name="checkmark-circle" size={20} color="white" />
             <Text style={styles.confirmButtonText}>Confirmer</Text>
@@ -406,18 +318,9 @@ const styles = StyleSheet.create({
     marginTop: 12,
     fontSize: 14,
   },
-  osmAttribution: {
-    position: 'absolute',
-    bottom: 8,
-    right: 8,
-    backgroundColor: 'rgba(255, 255, 255, 0.85)',
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 4,
-  },
-  osmAttributionText: {
-    fontSize: 10,
-    color: '#666',
+  markerContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   centerButton: {
     position: 'absolute',

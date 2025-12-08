@@ -137,17 +137,28 @@ class ReviewController extends Controller
         $user = Auth::user();
 
         // Check if user already reviewed this merchant/product combination
-        $existingReview = Review::where('user_id', $user->id)
-                               ->where('merchant_id', $data['merchant_id'])
-                               ->when($data['product_id'] ?? null, function ($query) use ($data) {
-                                   return $query->where('product_id', $data['product_id']);
-                               })
-                               ->first();
+        // Un utilisateur ne peut avoir qu'UN SEUL avis par produit (ou par commerçant si pas de produit)
+        $existingReviewQuery = Review::where('user_id', $user->id)
+                                     ->where('merchant_id', $data['merchant_id']);
+
+        $productId = $data['product_id'] ?? null;
+
+        if ($productId !== null) {
+            // Si product_id fourni, vérifier si avis existe pour CE produit spécifique
+            $existingReviewQuery->where('product_id', $productId);
+        } else {
+            // Si pas de product_id, vérifier si avis existe sans product_id
+            $existingReviewQuery->whereNull('product_id');
+        }
+
+        $existingReview = $existingReviewQuery->first();
 
         if ($existingReview) {
             return response()->json([
                 'success' => false,
-                'message' => 'Vous avez déjà donné un avis pour ce commerçant/produit'
+                'message' => $productId
+                    ? 'Vous avez déjà donné un avis pour ce produit'
+                    : 'Vous avez déjà donné un avis pour ce commerçant'
             ], 409);
         }
 

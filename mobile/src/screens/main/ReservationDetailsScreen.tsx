@@ -7,7 +7,9 @@ import {
   TouchableOpacity,
   StatusBar,
   ImageStyle,
+  Platform,
 } from 'react-native'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useDispatch, useSelector } from 'react-redux'
 import { AppDispatch, RootState } from '../../store'
 import { fetchReservation, cancelReservation, updateReservationQuantity } from '../../store/slices/reservationsSlice'
@@ -28,6 +30,7 @@ interface Props {
 const ReservationDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
   const dispatch = useDispatch<AppDispatch>()
   const theme = useTheme()
+  const insets = useSafeAreaInsets()
   const { reservationId } = route.params
   const { showSuccess, showError } = useToast()
 
@@ -133,15 +136,15 @@ const ReservationDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
       <StatusBar barStyle={theme.isDark ? 'light-content' : 'dark-content'} />
 
       <ScrollView style={styles.scrollView}>
-        {/* Header */}
-        <View style={styles.header}>
-          <TouchableOpacity onPress={() => navigation.goBack()}>
+        {/* Header with safe area padding */}
+        <View style={[styles.header, { paddingTop: Math.max(insets.top, 16) + 8 }]}>
+          <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
             <Ionicons name="arrow-back" size={24} color={theme.colors.text} />
           </TouchableOpacity>
           <Typography variant="h3" weight="semibold" style={{ flex: 1, textAlign: 'center' }}>
             Détails de la réservation
           </Typography>
-          <View style={{ width: 24 }} />
+          <View style={{ width: 40 }} />
         </View>
 
         {/* Product Info */}
@@ -556,7 +559,12 @@ const createStyles = (theme: ReturnType<typeof useTheme>) => StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    padding: 16,
+    paddingHorizontal: 16,
+    paddingBottom: 12,
+  },
+  backButton: {
+    padding: 8,
+    marginLeft: -8,
   },
   productCard: {
     flexDirection: 'row',

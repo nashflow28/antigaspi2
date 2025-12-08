@@ -163,30 +163,37 @@ const ProfileEditScreen: React.FC<ProfileEditScreenProps> = ({ navigation: navig
         type: mimeType,
       } as any)
 
-      const response = await apiService.post<ApiResponse<{ photo_url: string; full_url?: string }>>(
+      console.log('[ProfileEdit] Uploading photo:', { uri: asset.uri, filename, mimeType })
+
+      // Use uploadFile method which uses native fetch (more reliable for FormData)
+      const response = await apiService.uploadFile<ApiResponse<{ photo_url: string; full_url?: string }>>(
         '/consumers/profile/photo',
-        uploadFormData,
-        {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-          },
-        }
+        uploadFormData
       )
+
+      console.log('[ProfileEdit] Upload response:', response)
 
       if (response.success) {
         if (response.data?.full_url || response.data?.photo_url) {
-          setPhotoUri(response.data.full_url || response.data.photo_url)
+          setPhotoUri(response.data.full_url || getImageUrl(response.data.photo_url))
         }
         await syncProfileUpdates()
 
         Alert.alert('Succès', response.message || 'Photo mise à jour avec succès')
+      } else {
+        // Handle unsuccessful response
+        Alert.alert('Erreur', response.message || "Impossible d'uploader la photo")
+        // Revert to previous photo
+        setPhotoUri(user?.photo_url ? getImageUrl(user.photo_url) : null)
       }
     } catch (error: any) {
-      console.error('Erreur upload photo:', error)
+      console.error('[ProfileEdit] Erreur upload photo:', error)
       Alert.alert(
         'Erreur',
         error.response?.data?.message || error.message || "Impossible d'uploader la photo"
       )
+      // Revert to previous photo on error
+      setPhotoUri(user?.photo_url ? getImageUrl(user.photo_url) : null)
     } finally {
       setUploading(false)
     }

@@ -9,8 +9,6 @@ import {
   Linking,
   TouchableOpacity,
 } from 'react-native'
-import MapViewWrapper, { Marker, Callout, UrlTile, isExpoGo } from '../../components/MapViewWrapper'
-import type { Region } from 'react-native-maps'
 import { Ionicons } from '@expo/vector-icons'
 import * as Location from 'expo-location'
 import { useNavigation, NavigationProp } from '@react-navigation/native'
@@ -18,6 +16,7 @@ import { useTheme } from '../../theme'
 import { MerchantMapMarker, MerchantMapRegion } from '../../types'
 import apiService from '../../services/api'
 import { TEST_IDS } from '../../utils/testIds'
+import MapLibreWrapper, { getMapLibreGL, isExpoGo } from '../../components/MapLibreWrapper'
 
 // BUG-004 FIX: Define navigation types for MapStack
 type MapStackParamList = {
@@ -34,15 +33,8 @@ interface Props {
 }
 
 /**
- * MerchantMapScreen - Carte interactive des commerçants
- *
- * Features:
- * - Affichage des commerçants avec latitude/longitude sur une carte
- * - Markers cliquables avec callout d'informations
- * - Centrage automatique sur localisation utilisateur (avec permission)
- * - Pull-to-refresh pour recharger les données
- * - Navigation vers la liste des produits du commerçant
- * - Gestion des états: loading, error, empty
+ * MerchantMapScreen - Carte interactive des commerçants avec MapLibre
+ * 100% gratuit, utilise OpenStreetMap
  */
 const MerchantMapScreen: React.FC<Props> = ({ testID = TEST_IDS.merchantMapScreen }) => {
   const theme = useTheme()
@@ -54,17 +46,11 @@ const MerchantMapScreen: React.FC<Props> = ({ testID = TEST_IDS.merchantMapScree
   const [refreshing, setRefreshing] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [userLocation, setUserLocation] = useState<{ latitude: number; longitude: number } | null>(null)
-  // 🔐 State pour gérer la permission AVANT d'activer showsUserLocation
   const [locationPermissionGranted, setLocationPermissionGranted] = useState(false)
-  const [region, setRegion] = useState<MerchantMapRegion>({
-    latitude: 6.1256, // Lomé, Togo (default)
-    longitude: 1.2225,
-    latitudeDelta: 0.15,
-    longitudeDelta: 0.15,
-  })
+  const [selectedMerchant, setSelectedMerchant] = useState<MerchantMapMarker | null>(null)
+  const [mapCenter] = useState<[number, number]>([1.2225, 6.1256]) // Lomé [lon, lat]
 
   // Request location permission and get user location
-  // 🔐 IMPORTANT: Vérifier la permission AVANT d'activer showsUserLocation pour éviter crash Android
   const requestLocationPermission = useCallback(async () => {
     try {
       const { status } = await Location.requestForegroundPermissionsAsync()
@@ -75,23 +61,16 @@ const MerchantMapScreen: React.FC<Props> = ({ testID = TEST_IDS.merchantMapScree
         return
       }
 
-      // Permission accordée - on peut maintenant activer showsUserLocation
       setLocationPermissionGranted(true)
 
       const location = await Location.getCurrentPositionAsync({
         accuracy: Location.Accuracy.Balanced,
       })
 
-      const userCoords = {
+      setUserLocation({
         latitude: location.coords.latitude,
         longitude: location.coords.longitude,
-      }
-
-      setUserLocation(userCoords)
-
-      // 🐛 BUG FIX: Ne PAS centrer automatiquement sur la position utilisateur
-      // Garder la carte centrée sur Lomé (zone géographique cible)
-      // La position de l'utilisateur sera affichée comme point bleu sur la carte
+      })
     } catch (err) {
       console.error('Error getting location:', err)
       setLocationPermissionGranted(false)
@@ -102,12 +81,8 @@ const MerchantMapScreen: React.FC<Props> = ({ testID = TEST_IDS.merchantMapScree
   const fetchMerchants = useCallback(async () => {
     try {
       setError(null)
-
-      // TODO: Replace with actual API endpoint when backend implements it
-      // For now, using getMerchants and filtering those with location
       const response = await apiService.getMerchants()
 
-      // Filter merchants that have valid latitude/longitude
       const merchantsWithLocation = response.data
         .filter((merchant) =>
           merchant.latitude != null &&
@@ -125,7 +100,7 @@ const MerchantMapScreen: React.FC<Props> = ({ testID = TEST_IDS.merchantMapScree
           longitude: merchant.longitude as number,
           is_verified: merchant.is_verified,
           phone: merchant.phone,
-          active_products_count: 0, // TODO: Get from API when available
+          active_products_count: 0,
         }))
 
       setMerchants(merchantsWithLocation)
@@ -138,7 +113,7 @@ const MerchantMapScreen: React.FC<Props> = ({ testID = TEST_IDS.merchantMapScree
     }
   }, [])
 
-  // Initial load with cleanup
+  // Initial load
   useEffect(() => {
     let isMounted = true
 
@@ -150,13 +125,10 @@ const MerchantMapScreen: React.FC<Props> = ({ testID = TEST_IDS.merchantMapScree
     }
 
     loadData()
-
-    return () => {
-      isMounted = false
-    }
+    return () => { isMounted = false }
   }, [requestLocationPermission, fetchMerchants])
 
-  // Pull to refresh handler
+  // Pull to refresh
   const onRefresh = useCallback(() => {
     setRefreshing(true)
     fetchMerchants()
@@ -165,16 +137,16 @@ const MerchantMapScreen: React.FC<Props> = ({ testID = TEST_IDS.merchantMapScree
   // Handle marker press
   const handleMarkerPress = useCallback((merchant: MerchantMapMarker) => {
     console.log('Marker pressed:', merchant.business_name)
+    setSelectedMerchant(merchant)
   }, [])
 
-  // Handle callout press - navigate to merchant products
-  const handleCalloutPress = useCallback((merchant: MerchantMapMarker) => {
+  // Navigate to merchant detail
+  const handleViewMerchant = useCallback((merchant: MerchantMapMarker) => {
     navigation.navigate('MerchantDetail', { merchantId: merchant.id })
   }, [navigation])
 
-  // Open phone dialer
+  // Call merchant
   const handleCallMerchant = useCallback((phone: string | undefined) => {
-    // BUG-003 FIX: Validate phone before attempting to call
     if (!phone || phone.trim() === '') {
       Alert.alert('Erreur', 'Numéro de téléphone non disponible')
       return
@@ -192,7 +164,7 @@ const MerchantMapScreen: React.FC<Props> = ({ testID = TEST_IDS.merchantMapScree
       .catch((err) => console.error('Error opening phone:', err))
   }, [])
 
-  // Open maps app with directions
+  // Get directions
   const handleGetDirections = useCallback((merchant: MerchantMapMarker) => {
     const scheme = Platform.select({
       ios: 'maps:0,0?q=',
@@ -213,72 +185,6 @@ const MerchantMapScreen: React.FC<Props> = ({ testID = TEST_IDS.merchantMapScree
     }
   }, [])
 
-  // Render marker callout content
-  const renderCallout = (merchant: MerchantMapMarker) => (
-    <Callout
-      onPress={() => handleCalloutPress(merchant)}
-      testID={`${TEST_IDS.merchantMapMarkerCallout}-${merchant.id}`}
-      style={styles.callout}
-    >
-      <View style={styles.calloutContainer}>
-        <View style={styles.calloutHeader}>
-          <Text style={[styles.calloutTitle, { color: theme.colors.text }]}>
-            {merchant.business_name}
-          </Text>
-          {merchant.is_verified && (
-            <Ionicons
-              name="checkmark-circle"
-              size={16}
-              color={theme.colors.semantic.success}
-              testID={`${TEST_IDS.merchantMapVerifiedBadge}-${merchant.id}`}
-            />
-          )}
-        </View>
-
-        <Text style={[styles.calloutType, { color: theme.colors.neutral[600] }]}>
-          {merchant.business_type}
-        </Text>
-
-        {merchant.address && (
-          <View style={styles.calloutRow}>
-            <Ionicons name="location-outline" size={14} color={theme.colors.neutral[500]} />
-            <Text style={[styles.calloutAddress, { color: theme.colors.neutral[600] }]}>
-              {merchant.address}
-            </Text>
-          </View>
-        )}
-
-        <View style={styles.calloutActions}>
-          <TouchableOpacity
-            onPress={() => handleCallMerchant(merchant.phone)}
-            style={[styles.actionButton, { backgroundColor: theme.colors.primary[50] }]}
-            testID={`${TEST_IDS.merchantMapCallButton}-${merchant.id}`}
-          >
-            <Ionicons name="call" size={16} color={theme.colors.primary[600]} />
-            <Text style={[styles.actionText, { color: theme.colors.primary[600] }]}>
-              Appeler
-            </Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            onPress={() => handleGetDirections(merchant)}
-            style={[styles.actionButton, { backgroundColor: theme.colors.accent.orange + '15' }]}
-            testID={`${TEST_IDS.merchantMapDirectionsButton}-${merchant.id}`}
-          >
-            <Ionicons name="navigate" size={16} color={theme.colors.accent.orange} />
-            <Text style={[styles.actionText, { color: theme.colors.accent.orange }]}>
-              Itinéraire
-            </Text>
-          </TouchableOpacity>
-        </View>
-
-        <Text style={[styles.calloutTap, { color: theme.colors.neutral[400] }]}>
-          Appuyez pour voir les produits
-        </Text>
-      </View>
-    </Callout>
-  )
-
   // Loading state
   if (loading) {
     return (
@@ -296,12 +202,8 @@ const MerchantMapScreen: React.FC<Props> = ({ testID = TEST_IDS.merchantMapScree
     return (
       <View style={[styles.centerContainer, { backgroundColor: theme.colors.background }]} testID={TEST_IDS.merchantMapError}>
         <Ionicons name="alert-circle-outline" size={48} color={theme.colors.semantic.error} />
-        <Text style={[styles.errorTitle, { color: theme.colors.text }]}>
-          Erreur de chargement
-        </Text>
-        <Text style={[styles.errorMessage, { color: theme.colors.neutral[600] }]}>
-          {error}
-        </Text>
+        <Text style={[styles.errorTitle, { color: theme.colors.text }]}>Erreur de chargement</Text>
+        <Text style={[styles.errorMessage, { color: theme.colors.neutral[600] }]}>{error}</Text>
         <TouchableOpacity
           onPress={fetchMerchants}
           style={[styles.retryButton, { backgroundColor: theme.colors.primary[500] }]}
@@ -318,9 +220,7 @@ const MerchantMapScreen: React.FC<Props> = ({ testID = TEST_IDS.merchantMapScree
     return (
       <View style={[styles.centerContainer, { backgroundColor: theme.colors.background }]} testID={TEST_IDS.merchantMapEmpty}>
         <Ionicons name="map-outline" size={64} color={theme.colors.neutral[300]} />
-        <Text style={[styles.emptyTitle, { color: theme.colors.text }]}>
-          Aucun commerçant à proximité
-        </Text>
+        <Text style={[styles.emptyTitle, { color: theme.colors.text }]}>Aucun commerçant à proximité</Text>
         <Text style={[styles.emptyMessage, { color: theme.colors.neutral[600] }]}>
           Les commerçants avec une localisation s'afficheront ici
         </Text>
@@ -330,46 +230,30 @@ const MerchantMapScreen: React.FC<Props> = ({ testID = TEST_IDS.merchantMapScree
           testID={TEST_IDS.merchantMapRefreshButton}
         >
           <Ionicons name="refresh" size={20} color={theme.colors.primary[500]} />
-          <Text style={[styles.refreshButtonText, { color: theme.colors.primary[500] }]}>
-            Actualiser
-          </Text>
+          <Text style={[styles.refreshButtonText, { color: theme.colors.primary[500] }]}>Actualiser</Text>
         </TouchableOpacity>
       </View>
     )
   }
 
-  // Main map view - Using OpenStreetMap (free, no API key required)
+  const MapLibreGL = getMapLibreGL()
+
+  // Main map view with MapLibre
   return (
     <View style={styles.container} testID={testID}>
-      <MapViewWrapper
+      <MapLibreWrapper
         style={styles.map}
-        initialRegion={region}
+        center={mapCenter}
+        zoom={12}
         showsUserLocation={locationPermissionGranted}
-        showsMyLocationButton={locationPermissionGranted}
-        showsCompass={true}
-        mapType={Platform.OS === 'android' ? 'none' : 'standard'}
-        testID={TEST_IDS.merchantMapView}
       >
-        {/* OpenStreetMap Tiles - 100% gratuit, pas de clé API */}
-        {!isExpoGo && UrlTile && (
-          <UrlTile
-            urlTemplate="https://tile.openstreetmap.org/{z}/{x}/{y}.png"
-            maximumZ={19}
-            flipY={false}
-            tileSize={256}
-          />
-        )}
-        {!isExpoGo && Marker && merchants.map((merchant) => (
-          <Marker
-            key={merchant.id}
-            coordinate={{
-              latitude: merchant.latitude,
-              longitude: merchant.longitude,
-            }}
-            title={merchant.business_name}
-            description={merchant.business_type}
-            onPress={() => handleMarkerPress(merchant)}
-            testID={`${TEST_IDS.merchantMapMarker}-${merchant.id}`}
+        {/* Merchant markers */}
+        {!isExpoGo && MapLibreGL && merchants.map((merchant) => (
+          <MapLibreGL.PointAnnotation
+            key={`merchant-${merchant.id}`}
+            id={`merchant-${merchant.id}`}
+            coordinate={[merchant.longitude, merchant.latitude]}
+            onSelected={() => handleMarkerPress(merchant)}
           >
             <View style={[styles.markerContainer, { backgroundColor: theme.colors.primary[500] }]}>
               <Ionicons
@@ -378,10 +262,9 @@ const MerchantMapScreen: React.FC<Props> = ({ testID = TEST_IDS.merchantMapScree
                 color="white"
               />
             </View>
-            {renderCallout(merchant)}
-          </Marker>
+          </MapLibreGL.PointAnnotation>
         ))}
-      </MapViewWrapper>
+      </MapLibreWrapper>
 
       {/* Merchant count badge */}
       <View style={[styles.badge, { backgroundColor: theme.colors.primary[500] }]} testID={TEST_IDS.merchantMapCountBadge}>
@@ -391,10 +274,65 @@ const MerchantMapScreen: React.FC<Props> = ({ testID = TEST_IDS.merchantMapScree
         </Text>
       </View>
 
-      {/* OpenStreetMap Attribution (required by license) */}
-      <View style={styles.osmAttribution}>
-        <Text style={styles.osmAttributionText}>© OpenStreetMap</Text>
-      </View>
+      {/* Selected merchant callout */}
+      {selectedMerchant && (
+        <View style={[styles.calloutOverlay, { backgroundColor: theme.colors.cardBackground }]}>
+          <TouchableOpacity
+            style={styles.closeCallout}
+            onPress={() => setSelectedMerchant(null)}
+          >
+            <Ionicons name="close" size={24} color={theme.colors.neutral[500]} />
+          </TouchableOpacity>
+
+          <View style={styles.calloutHeader}>
+            <Text style={[styles.calloutTitle, { color: theme.colors.text }]}>
+              {selectedMerchant.business_name}
+            </Text>
+            {selectedMerchant.is_verified && (
+              <Ionicons name="checkmark-circle" size={18} color={theme.colors.semantic.success} />
+            )}
+          </View>
+
+          <Text style={[styles.calloutType, { color: theme.colors.neutral[600] }]}>
+            {selectedMerchant.business_type}
+          </Text>
+
+          {selectedMerchant.address && (
+            <View style={styles.calloutRow}>
+              <Ionicons name="location-outline" size={16} color={theme.colors.neutral[500]} />
+              <Text style={[styles.calloutAddress, { color: theme.colors.neutral[600] }]}>
+                {selectedMerchant.address}
+              </Text>
+            </View>
+          )}
+
+          <View style={styles.calloutActions}>
+            <TouchableOpacity
+              onPress={() => handleCallMerchant(selectedMerchant.phone)}
+              style={[styles.actionButton, { backgroundColor: theme.colors.primary[50] }]}
+            >
+              <Ionicons name="call" size={18} color={theme.colors.primary[600]} />
+              <Text style={[styles.actionText, { color: theme.colors.primary[600] }]}>Appeler</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              onPress={() => handleGetDirections(selectedMerchant)}
+              style={[styles.actionButton, { backgroundColor: theme.colors.accent.orange + '15' }]}
+            >
+              <Ionicons name="navigate" size={18} color={theme.colors.accent.orange} />
+              <Text style={[styles.actionText, { color: theme.colors.accent.orange }]}>Itinéraire</Text>
+            </TouchableOpacity>
+          </View>
+
+          <TouchableOpacity
+            onPress={() => handleViewMerchant(selectedMerchant)}
+            style={[styles.viewButton, { backgroundColor: theme.colors.primary[500] }]}
+          >
+            <Text style={styles.viewButtonText}>Voir la boutique</Text>
+            <Ionicons name="arrow-forward" size={18} color="white" />
+          </TouchableOpacity>
+        </View>
+      )}
     </View>
   )
 }
@@ -475,62 +413,6 @@ const styles = StyleSheet.create({
     shadowRadius: 3,
     elevation: 5,
   },
-  callout: {
-    width: 280,
-  },
-  calloutContainer: {
-    padding: 12,
-    width: 280,
-  },
-  calloutHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-    marginBottom: 4,
-  },
-  calloutTitle: {
-    fontSize: 16,
-    fontWeight: '700',
-    flex: 1,
-  },
-  calloutType: {
-    fontSize: 13,
-    marginBottom: 8,
-  },
-  calloutRow: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    gap: 4,
-    marginBottom: 12,
-  },
-  calloutAddress: {
-    fontSize: 12,
-    flex: 1,
-  },
-  calloutActions: {
-    flexDirection: 'row',
-    gap: 8,
-    marginBottom: 8,
-  },
-  actionButton: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 4,
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-    borderRadius: 6,
-  },
-  actionText: {
-    fontSize: 13,
-    fontWeight: '600',
-  },
-  calloutTap: {
-    fontSize: 11,
-    textAlign: 'center',
-    fontStyle: 'italic',
-  },
   badge: {
     position: 'absolute',
     top: 16,
@@ -552,18 +434,83 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '600',
   },
-  osmAttribution: {
+  calloutOverlay: {
     position: 'absolute',
-    bottom: 8,
-    right: 8,
-    backgroundColor: 'rgba(255, 255, 255, 0.85)',
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 4,
+    bottom: 0,
+    left: 0,
+    right: 0,
+    padding: 16,
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: -2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 10,
   },
-  osmAttributionText: {
-    fontSize: 10,
-    color: '#666',
+  closeCallout: {
+    position: 'absolute',
+    top: 12,
+    right: 12,
+    padding: 4,
+  },
+  calloutHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginBottom: 4,
+    paddingRight: 32,
+  },
+  calloutTitle: {
+    fontSize: 18,
+    fontWeight: '700',
+    flex: 1,
+  },
+  calloutType: {
+    fontSize: 14,
+    marginBottom: 8,
+  },
+  calloutRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: 6,
+    marginBottom: 12,
+  },
+  calloutAddress: {
+    fontSize: 13,
+    flex: 1,
+  },
+  calloutActions: {
+    flexDirection: 'row',
+    gap: 10,
+    marginBottom: 12,
+  },
+  actionButton: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 6,
+    paddingVertical: 10,
+    paddingHorizontal: 14,
+    borderRadius: 8,
+  },
+  actionText: {
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  viewButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    paddingVertical: 14,
+    borderRadius: 10,
+  },
+  viewButtonText: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: '600',
   },
 })
 
