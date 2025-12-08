@@ -384,8 +384,8 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
           <Animated.View style={{ opacity: roleAnimation }}>
             <Card variant="elevated" style={{ padding: theme.spacing.lg, marginBottom: theme.spacing.lg, borderColor: theme.colors.primary[500], borderWidth: 1 }}>
               <View style={styles.sectionHeader}>
-                <View style={[styles.sectionIcon, { backgroundColor: `${theme.colors.secondary[500]}15` }]}>
-                  <Ionicons name="storefront" size={20} color={theme.colors.secondary[500]} />
+                <View style={[styles.sectionIcon, { backgroundColor: `${theme.colors.accent.orange}15` }]}>
+                  <Ionicons name="storefront" size={20} color={theme.colors.accent.orange} />
                 </View>
                 <Typography variant="body" weight="bold">Informations commerce</Typography>
               </View>
