@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, useCallback, useMemo } from 'react'
+import React, { useState, useEffect, useCallback, useMemo } from 'react'
 import {
   View,
   Text,
@@ -11,7 +11,7 @@ import {
 import { Ionicons } from '@expo/vector-icons'
 import { useTheme } from '../theme'
 import * as Location from 'expo-location'
-import MapLibreWrapper, { getMapLibreGL, isExpoGo, MapLibreRef } from './MapLibreWrapper'
+import LeafletMapPicker from './LeafletMapPicker'
 
 interface MapLocationPickerProps {
   visible: boolean
@@ -37,7 +37,6 @@ const MapLocationPicker: React.FC<MapLocationPickerProps> = ({
   initialLongitude,
 }) => {
   const theme = useTheme()
-  const mapRef = useRef<MapLibreRef>(null)
 
   const initialLocation = useMemo(
     () => ({
@@ -48,14 +47,10 @@ const MapLocationPicker: React.FC<MapLocationPickerProps> = ({
   )
 
   const [selectedLocation, setSelectedLocation] = useState(initialLocation)
-  const [mapCenter, setMapCenter] = useState<[number, number]>([
-    initialLocation.longitude,
-    initialLocation.latitude,
-  ])
-  const [zoom, setZoom] = useState(15)
   const [locationPermissionGranted, setLocationPermissionGranted] = useState(false)
   const [permissionChecked, setPermissionChecked] = useState(false)
   const [mapReady, setMapReady] = useState(false)
+  const [isLoadingGPS, setIsLoadingGPS] = useState(false)
 
   // Vérifier la permission de localisation
   useEffect(() => {
@@ -97,17 +92,15 @@ const MapLocationPicker: React.FC<MapLocationPickerProps> = ({
     }
 
     setSelectedLocation(newLocation)
-    setMapCenter([newLocation.longitude, newLocation.latitude])
     setMapReady(true)
 
     console.log('[MapLocationPicker] Initialized with:', newLocation)
   }, [visible, initialLatitude, initialLongitude])
 
-  // Gérer le tap sur la carte
-  const handleMapPress = useCallback((event: { latitude: number; longitude: number }) => {
-    console.log('[MapLocationPicker] Map pressed:', event)
-    setSelectedLocation({ latitude: event.latitude, longitude: event.longitude })
-    setMapCenter([event.longitude, event.latitude])
+  // Gérer la sélection sur la carte (depuis Leaflet WebView)
+  const handleLocationSelect = useCallback((latitude: number, longitude: number) => {
+    console.log('[MapLocationPicker] Location selected:', { latitude, longitude })
+    setSelectedLocation({ latitude, longitude })
   }, [])
 
   const handleConfirm = () => {
@@ -122,12 +115,35 @@ const MapLocationPicker: React.FC<MapLocationPickerProps> = ({
       longitude: withFallback(initialLongitude, DEFAULT_LOCATION.longitude),
     }
     setSelectedLocation(baseLocation)
-    setMapCenter([baseLocation.longitude, baseLocation.latitude])
+    // Note: Le composant Leaflet sera recréé avec les nouvelles coordonnées
+    setMapReady(false)
+    setTimeout(() => setMapReady(true), 100)
   }, [initialLatitude, initialLongitude])
 
-  const handleCenterOnMarker = () => {
-    setMapCenter([selectedLocation.longitude, selectedLocation.latitude])
-  }
+  // Utiliser la position GPS actuelle
+  const handleUseCurrentLocation = useCallback(async () => {
+    if (!locationPermissionGranted) {
+      console.log('[MapLocationPicker] Permission not granted')
+      return
+    }
+
+    setIsLoadingGPS(true)
+    try {
+      const location = await Location.getCurrentPositionAsync({
+        accuracy: Location.Accuracy.High,
+      })
+      const { latitude, longitude } = location.coords
+      console.log('[MapLocationPicker] GPS location:', { latitude, longitude })
+      setSelectedLocation({ latitude, longitude })
+      // Recréer la carte avec la nouvelle position
+      setMapReady(false)
+      setTimeout(() => setMapReady(true), 100)
+    } catch (error) {
+      console.error('[MapLocationPicker] Erreur GPS:', error)
+    } finally {
+      setIsLoadingGPS(false)
+    }
+  }, [locationPermissionGranted])
 
   // Web fallback
   if (Platform.OS === 'web') {
@@ -152,8 +168,6 @@ const MapLocationPicker: React.FC<MapLocationPickerProps> = ({
     )
   }
 
-  const MapLibreGL = getMapLibreGL()
-
   return (
     <Modal visible={visible} animationType="slide" onRequestClose={onClose}>
       <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
@@ -170,7 +184,7 @@ const MapLocationPicker: React.FC<MapLocationPickerProps> = ({
         <View style={[styles.instructions, { backgroundColor: theme.colors.info }]}>
           <Ionicons name="information-circle" size={20} color={theme.colors.primary[500]} />
           <Text style={[styles.instructionsText, { color: theme.colors.text }]}>
-            Appuyez sur la carte pour choisir la position
+            Appuyez sur la carte ou glissez le marqueur
           </Text>
         </View>
 
@@ -187,34 +201,28 @@ const MapLocationPicker: React.FC<MapLocationPickerProps> = ({
 
           {permissionChecked && mapReady && (
             <>
-              <MapLibreWrapper
-                ref={mapRef}
+              <LeafletMapPicker
+                initialLatitude={selectedLocation.latitude}
+                initialLongitude={selectedLocation.longitude}
+                zoom={15}
+                onLocationSelect={handleLocationSelect}
                 style={styles.map}
-                center={mapCenter}
-                zoom={zoom}
-                onPress={handleMapPress}
-                showsUserLocation={locationPermissionGranted}
-              >
-                {/* Marker pour la position sélectionnée */}
-                {!isExpoGo && MapLibreGL && selectedLocation && (
-                  <MapLibreGL.PointAnnotation
-                    id="selected-location"
-                    coordinate={[selectedLocation.longitude, selectedLocation.latitude]}
-                  >
-                    <View style={styles.markerContainer}>
-                      <Ionicons name="location" size={40} color="#10B981" />
-                    </View>
-                  </MapLibreGL.PointAnnotation>
-                )}
-              </MapLibreWrapper>
+              />
 
-              {/* Center button */}
-              <TouchableOpacity
-                style={[styles.centerButton, { backgroundColor: theme.colors.background }]}
-                onPress={handleCenterOnMarker}
-              >
-                <Ionicons name="locate" size={24} color={theme.colors.primary[500]} />
-              </TouchableOpacity>
+              {/* Bouton GPS */}
+              {locationPermissionGranted && (
+                <TouchableOpacity
+                  style={[styles.gpsButton, { backgroundColor: theme.colors.background }]}
+                  onPress={handleUseCurrentLocation}
+                  disabled={isLoadingGPS}
+                >
+                  {isLoadingGPS ? (
+                    <ActivityIndicator size="small" color={theme.colors.primary[500]} />
+                  ) : (
+                    <Ionicons name="locate" size={24} color={theme.colors.primary[500]} />
+                  )}
+                </TouchableOpacity>
+              )}
             </>
           )}
         </View>
@@ -318,11 +326,7 @@ const styles = StyleSheet.create({
     marginTop: 12,
     fontSize: 14,
   },
-  markerContainer: {
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  centerButton: {
+  gpsButton: {
     position: 'absolute',
     bottom: 16,
     left: 16,
