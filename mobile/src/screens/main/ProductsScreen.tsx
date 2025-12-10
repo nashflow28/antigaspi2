@@ -301,12 +301,13 @@ const ProductsScreen: React.FC<Props> = ({ navigation }) => {
   }, [merchantsWithCoordinates])
 
   useEffect(() => {
-    loadData()
+    // Forcer le rechargement des données au montage pour avoir les dernières positions
+    loadData(true)
   }, [])
 
   useEffect(() => {
-    // Recharger les données quand on change de mode
-    loadData()
+    // Forcer le rechargement des données quand on change de mode
+    loadData(true)
   }, [contentMode])
 
   useEffect(() => {

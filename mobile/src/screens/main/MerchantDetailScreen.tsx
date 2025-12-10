@@ -25,7 +25,7 @@ import { Product, Merchant } from '../../types'
 import { getImageUrl } from '../../utils/imageHelpers'
 import { formatCurrency } from '../../utils/currencyHelpers'
 import { Button, Card, Badge, Typography } from '../../components/2025'
-import MapLibreWrapper, { getMapLibreGL, isExpoGo } from '../../components/MapLibreWrapper'
+import OpenStreetMap, { MapMarker } from '../../components/OpenStreetMap'
 import locationService, { UserLocation } from '../../services/locationService'
 
 const { width } = Dimensions.get('window')
@@ -50,9 +50,6 @@ const MerchantDetailScreen: React.FC<Props> = ({ route, navigation }) => {
   const [locationPermissionGranted, setLocationPermissionGranted] = useState(false)
   const [requestingLocation, setRequestingLocation] = useState(false)
   const [mapExpanded, setMapExpanded] = useState(false)
-
-  // Get MapLibreGL reference for markers
-  const MapLibreGL = getMapLibreGL()
 
   // Load reviews when tab changes to reviews
   useEffect(() => {
@@ -192,12 +189,26 @@ const MerchantDetailScreen: React.FC<Props> = ({ route, navigation }) => {
       return {
         latitude: merchant.latitude,
         longitude: merchant.longitude,
-        latitudeDelta: 0.01,
-        longitudeDelta: 0.01,
+        zoom: 15,
       }
     }
     return null
   }, [merchant?.latitude, merchant?.longitude])
+
+  // Create marker for the merchant
+  const merchantMapMarker: MapMarker[] = useMemo(() => {
+    if (!merchant || merchant.latitude == null || merchant.longitude == null) {
+      return []
+    }
+    return [{
+      id: merchant.id,
+      latitude: merchant.latitude,
+      longitude: merchant.longitude,
+      title: merchant.business_name,
+      subtitle: merchant.city,
+      emoji: getMerchantEmoji(merchant.business_name),
+    }]
+  }, [merchant])
 
   // Emoji dynamique basé sur le nom du marchand
   const getMerchantEmoji = (businessName: string) => {
@@ -366,35 +377,11 @@ const MerchantDetailScreen: React.FC<Props> = ({ route, navigation }) => {
             )}
           </View>
         ) : (
-          <MapLibreWrapper
-            style={[styles.mapView, mapExpanded && styles.mapViewExpanded]}
-            center={[mapRegion.longitude, mapRegion.latitude]}
-            zoom={14}
-            showsUserLocation={locationPermissionGranted && !!userLocation}
-          >
-            {/* Merchant Marker */}
-            {!isExpoGo && MapLibreGL && (
-              <MapLibreGL.PointAnnotation
-                id="merchant-location"
-                coordinate={[mapRegion.longitude, mapRegion.latitude]}
-              >
-                <View style={{ alignItems: 'center' }}>
-                  <Ionicons name="location" size={36} color="#10B981" />
-                </View>
-              </MapLibreGL.PointAnnotation>
-            )}
-            {/* User Location Marker */}
-            {!isExpoGo && MapLibreGL && userLocation && (
-              <MapLibreGL.PointAnnotation
-                id="user-location"
-                coordinate={[userLocation.longitude, userLocation.latitude]}
-              >
-                <View style={{ alignItems: 'center' }}>
-                  <Ionicons name="person-circle" size={28} color={theme.colors.primary[500]} />
-                </View>
-              </MapLibreGL.PointAnnotation>
-            )}
-          </MapLibreWrapper>
+          <OpenStreetMap
+            markers={merchantMapMarker}
+            initialRegion={mapRegion}
+            height={mapExpanded ? 360 : 250}
+          />
         )}
 
         {/* Header buttons */}
