@@ -10,9 +10,11 @@ import {
 } from 'react-native'
 import { Ionicons } from '@expo/vector-icons'
 import { useNavigation } from '@react-navigation/native'
+import { useSelector } from 'react-redux'
 import { useTheme } from '../../theme'
 import apiService from '../../services/api'
 import { TEST_IDS } from '../../utils/testIds'
+import { RootState } from '../../store'
 
 interface Stats {
   active_products: number
@@ -42,6 +44,7 @@ interface Review {
 const MerchantDashboardScreen: React.FC = () => {
   const theme = useTheme()
   const navigation = useNavigation()
+  const { user } = useSelector((state: RootState) => state.auth)
   const [stats, setStats] = useState<Stats>({
     active_products: 0,
     pending_reservations: 0,
@@ -166,7 +169,7 @@ const MerchantDashboardScreen: React.FC = () => {
       <View style={[styles.header, { backgroundColor: theme.isDark ? '#0F1622' : theme.colors.primary[500] }]}>
         <View style={styles.headerContent}>
           <View>
-            <Text style={[styles.headerSubtitle, { color: theme.isDark ? 'rgba(248, 250, 255, 0.7)' : 'rgba(255, 255, 255, 0.8)' }]}>Commerçant</Text>
+            <Text style={[styles.headerSubtitle, { color: theme.isDark ? 'rgba(248, 250, 255, 0.7)' : 'rgba(255, 255, 255, 0.8)' }]}>{user?.merchant?.business_name || `${user?.first_name || ''} ${user?.last_name || ''}`.trim() || 'Commerçant'}</Text>
             <Text style={[styles.headerTitle, { color: theme.isDark ? '#F8FAFF' : 'white' }]}>Tableau de bord</Text>
           </View>
           <TouchableOpacity
