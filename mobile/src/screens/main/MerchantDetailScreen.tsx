@@ -184,6 +184,17 @@ const MerchantDetailScreen: React.FC<Props> = ({ route, navigation }) => {
     setMapExpanded(prev => !prev)
   }
 
+  // Emoji dynamique basé sur le nom du marchand (défini avant useMemo qui l'utilise)
+  const getMerchantEmoji = (businessName: string) => {
+    const name = businessName.toLowerCase()
+    if (name.includes('boulang')) return '🥐'
+    if (name.includes('fruit') || name.includes('bio')) return '🥕'
+    if (name.includes('viande') || name.includes('boucher')) return '🥩'
+    if (name.includes('poisson')) return '🐟'
+    if (name.includes('fromage')) return '🧀'
+    return '🛍️'
+  }
+
   const mapRegion = useMemo(() => {
     if (merchant?.latitude != null && merchant?.longitude != null) {
       return {
@@ -209,17 +220,6 @@ const MerchantDetailScreen: React.FC<Props> = ({ route, navigation }) => {
       emoji: getMerchantEmoji(merchant.business_name),
     }]
   }, [merchant])
-
-  // Emoji dynamique basé sur le nom du marchand
-  const getMerchantEmoji = (businessName: string) => {
-    const name = businessName.toLowerCase()
-    if (name.includes('boulang')) return '🥐'
-    if (name.includes('fruit') || name.includes('bio')) return '🥕'
-    if (name.includes('viande') || name.includes('boucher')) return '🥩'
-    if (name.includes('poisson')) return '🐟'
-    if (name.includes('fromage')) return '🧀'
-    return '🛍️'
-  }
 
   // ✅ FIX: Create styles BEFORE using them
   const styles = createStyles(theme)
