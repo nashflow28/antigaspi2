@@ -16,7 +16,7 @@ import { useTheme } from '../../theme'
 import { MerchantMapMarker, MerchantMapRegion } from '../../types'
 import apiService from '../../services/api'
 import { TEST_IDS } from '../../utils/testIds'
-import MapLibreWrapper, { getMapLibreGL, isExpoGo } from '../../components/MapLibreWrapper'
+import OpenStreetMap, { MapMarker } from '../../components/OpenStreetMap'
 
 // BUG-004 FIX: Define navigation types for MapStack
 type MapStackParamList = {
@@ -236,35 +236,37 @@ const MerchantMapScreen: React.FC<Props> = ({ testID = TEST_IDS.merchantMapScree
     )
   }
 
-  const MapLibreGL = getMapLibreGL()
+  // Convert merchants to MapMarker format for OpenStreetMap component
+  const mapMarkers: MapMarker[] = merchants.map((merchant) => ({
+    id: merchant.id,
+    latitude: merchant.latitude,
+    longitude: merchant.longitude,
+    title: merchant.business_name,
+    subtitle: merchant.business_type || merchant.city,
+    emoji: merchant.is_verified ? '🏪' : '🛍️',
+  }))
 
-  // Main map view with MapLibre
+  // Handle marker press from OpenStreetMap
+  const handleMapMarkerPress = (merchantId: number) => {
+    const merchant = merchants.find(m => m.id === merchantId)
+    if (merchant) {
+      handleMarkerPress(merchant)
+    }
+  }
+
+  // Main map view with Leaflet/OpenStreetMap
   return (
     <View style={styles.container} testID={testID}>
-      <MapLibreWrapper
-        style={styles.map}
-        center={mapCenter}
-        zoom={12}
-        showsUserLocation={locationPermissionGranted}
-      >
-        {/* Merchant markers */}
-        {!isExpoGo && MapLibreGL && merchants.map((merchant) => (
-          <MapLibreGL.PointAnnotation
-            key={`merchant-${merchant.id}`}
-            id={`merchant-${merchant.id}`}
-            coordinate={[merchant.longitude, merchant.latitude]}
-            onSelected={() => handleMarkerPress(merchant)}
-          >
-            <View style={[styles.markerContainer, { backgroundColor: theme.colors.primary[500] }]}>
-              <Ionicons
-                name={merchant.is_verified ? 'storefront' : 'storefront-outline'}
-                size={20}
-                color="white"
-              />
-            </View>
-          </MapLibreGL.PointAnnotation>
-        ))}
-      </MapLibreWrapper>
+      <OpenStreetMap
+        markers={mapMarkers}
+        initialRegion={
+          userLocation
+            ? { latitude: userLocation.latitude, longitude: userLocation.longitude, zoom: 13 }
+            : { latitude: 6.1256, longitude: 1.2225, zoom: 12 } // Lomé default
+        }
+        height={undefined} // Full height
+        onMarkerPress={handleMapMarkerPress}
+      />
 
       {/* Merchant count badge */}
       <View style={[styles.badge, { backgroundColor: theme.colors.primary[500] }]} testID={TEST_IDS.merchantMapCountBadge}>
