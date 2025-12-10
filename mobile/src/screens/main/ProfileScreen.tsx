@@ -100,14 +100,15 @@ const ProfileScreen: React.FC = () => {
       showsVerticalScrollIndicator={true}
     >
       <Card variant="elevated" style={{ alignItems: 'center', paddingVertical: theme.spacing['2xl'], paddingTop: theme.spacing['3xl'], marginBottom: theme.spacing.lg }}>
-        {user?.photo_url ? (
+        {/* Afficher la photo du consumer (photo_url) ou du merchant (merchant.photo_url) */}
+        {(user?.photo_url || user?.merchant?.photo_url) ? (
           <Image
-            source={{ uri: getImageUrl(user.photo_url) }}
+            source={{ uri: getImageUrl(user.photo_url || user.merchant?.photo_url || '') }}
             style={[styles.avatar, { marginBottom: theme.spacing.md }]}
           />
         ) : (
           <View style={[styles.avatar, { backgroundColor: theme.colors.neutral[100], marginBottom: theme.spacing.md }]}>
-            <Ionicons name="person" size={40} color={theme.colors.primary[500]} />
+            <Ionicons name={user?.role === 'merchant' ? 'storefront' : 'person'} size={40} color={theme.colors.primary[500]} />
           </View>
         )}
         <Typography variant="h2" weight="bold" style={{ marginBottom: theme.spacing.xs }} testID={TEST_IDS.profileName}>
