@@ -302,11 +302,9 @@ const MerchantProfileEditScreen: React.FC = () => {
         type,
       } as any)
 
-      const response = await apiService.post('/merchants/profile/photo', formDataObj, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      })
+      // 🐛 BUG FIX: Use uploadFile() with native fetch instead of post() with axios
+      // axios has known issues with FormData on React Native
+      const response = await apiService.uploadFile('/merchants/profile/photo', formDataObj)
 
       // 🐛 BUG FIX: apiService.post returns response.data directly
       if (response.success) {
