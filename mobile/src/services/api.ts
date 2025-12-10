@@ -304,7 +304,20 @@ class ApiService {
     return this.request<T>('GET', url, undefined, config)
   }
 
+  /**
+   * POST request - automatically redirects FormData to uploadFile() for reliability
+   * ⚠️ IMPORTANT: axios has known issues with FormData on React Native
+   * This method auto-detects FormData and uses native fetch instead
+   */
   async post<T = any>(url: string, data?: any, config?: AxiosRequestConfig): Promise<T> {
+    // 🐛 SAFEGUARD: Auto-redirect FormData to uploadFile() which uses native fetch
+    // This prevents the "Network Error" bug with axios + FormData on React Native
+    if (data instanceof FormData) {
+      if (__DEV__) {
+        console.warn('⚠️ [API] FormData detected in post() - auto-redirecting to uploadFile() for reliability')
+      }
+      return this.uploadFile<T>(url, data)
+    }
     return this.request<T>('POST', url, data, config)
   }
 
