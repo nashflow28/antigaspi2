@@ -118,11 +118,21 @@ const SurpriseBasketsScreen: React.FC<Props> = ({ navigation }) => {
                     {badgeLabel}
                   </Badge>
                 </View>
-                <Typography variant="caption" color="secondary">
-                  {item.quantity_available > 1
-                    ? `${item.quantity_available} paniers disponibles`
-                    : 'Dernier panier disponible'}
-                </Typography>
+                <View style={styles.metaRow}>
+                  <Typography variant="caption" color="secondary">
+                    {item.quantity_available > 1
+                      ? `${item.quantity_available} paniers disponibles`
+                      : 'Dernier panier disponible'}
+                  </Typography>
+                  {item.min_items && item.min_items > 0 && (
+                    <View style={styles.itemsCountBadge}>
+                      <Ionicons name="basket-outline" size={12} color={theme.colors.primary[500]} />
+                      <Typography variant="caption" style={{ color: theme.colors.primary[500], marginLeft: 4 }}>
+                        {item.min_items} articles
+                      </Typography>
+                    </View>
+                  )}
+                </View>
               </View>
             <Ionicons
               name="chevron-forward"
@@ -269,6 +279,17 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginTop: 8,
     marginBottom: 4,
+  },
+  metaRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    flexWrap: 'wrap',
+    gap: 8,
+  },
+  itemsCountBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   description: {
     marginTop: 12,

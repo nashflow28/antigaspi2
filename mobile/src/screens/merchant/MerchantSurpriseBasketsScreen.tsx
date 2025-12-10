@@ -45,6 +45,7 @@ const MerchantSurpriseBasketsScreen: React.FC<Props> = ({ navigation }) => {
     description: '',
     discounted_price: '',
     quantity_available: '',
+    min_items: '',
   })
 
   // Error modal state
@@ -106,6 +107,7 @@ const MerchantSurpriseBasketsScreen: React.FC<Props> = ({ navigation }) => {
       description: '',
       discounted_price: '',
       quantity_available: '',
+      min_items: '',
     })
     setShowModal(true)
   }
@@ -117,6 +119,7 @@ const MerchantSurpriseBasketsScreen: React.FC<Props> = ({ navigation }) => {
       description: basket.description || '',
       discounted_price: basket.discounted_price.toString(),
       quantity_available: basket.quantity_available.toString(),
+      min_items: basket.min_items?.toString() || '',
     })
     setShowModal(true)
   }
@@ -188,11 +191,13 @@ const MerchantSurpriseBasketsScreen: React.FC<Props> = ({ navigation }) => {
     try {
       setLoading(true)
 
+      const minItems = formData.min_items ? parseInt(formData.min_items) : null
       const payload = {
         name: formData.name.trim(),
         description: formData.description.trim(),
         discounted_price: price,
         quantity_available: quantity,
+        min_items: minItems && !isNaN(minItems) && minItems > 0 ? minItems : null,
       }
 
       if (editingBasket) {
@@ -262,6 +267,14 @@ const MerchantSurpriseBasketsScreen: React.FC<Props> = ({ navigation }) => {
             {item.quantity_available} disponibles
           </Typography>
         </View>
+        {item.min_items && item.min_items > 0 && (
+          <View style={styles.infoRow}>
+            <Ionicons name="basket" size={16} color={theme.colors.primary[500]} />
+            <Typography variant="body" style={{ marginLeft: 6, color: theme.colors.primary[500] }}>
+              {item.min_items} articles
+            </Typography>
+          </View>
+        )}
       </View>
 
       <View style={styles.basketActions}>
@@ -530,6 +543,32 @@ const MerchantSurpriseBasketsScreen: React.FC<Props> = ({ navigation }) => {
                   onChangeText={(text) => setFormData({ ...formData, quantity_available: text })}
                   keyboardType="numeric"
                   testID={TEST_IDS.basketQuantityInput}
+                />
+              </View>
+
+              <View style={styles.formGroup}>
+                <Typography variant="body" weight="semibold" style={{ marginBottom: 8 }}>
+                  Nombre d'articles dans le panier
+                </Typography>
+                <Typography variant="caption" color="secondary" style={{ marginBottom: 8 }}>
+                  Indiquez combien d'articles seront inclus dans ce panier surprise
+                </Typography>
+                <TextInput
+                  style={[
+                    styles.input,
+                    {
+                      backgroundColor: theme.colors.inputBackground,
+                      borderColor: theme.colors.inputBorder,
+                      borderWidth: 1,
+                      color: theme.colors.text,
+                    },
+                  ]}
+                  placeholder="Ex: 5"
+                  placeholderTextColor={theme.colors.textTertiary}
+                  value={formData.min_items}
+                  onChangeText={(text) => setFormData({ ...formData, min_items: text })}
+                  keyboardType="numeric"
+                  testID="basket-items-count-input"
                 />
               </View>
             </ScrollView>
