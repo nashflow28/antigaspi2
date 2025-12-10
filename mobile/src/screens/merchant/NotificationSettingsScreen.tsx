@@ -10,9 +10,11 @@ import {
   Alert,
   StatusBar,
   RefreshControl,
+  Platform,
 } from 'react-native'
 import { Ionicons } from '@expo/vector-icons'
 import { useNavigation } from '@react-navigation/native'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useTheme } from '../../theme'
 import { useNotificationPreferences } from '../../hooks/useNotificationPreferences'
 
@@ -34,6 +36,7 @@ const formatDateTime = (date: Date | null): string => {
 const NotificationSettingsScreen: React.FC = () => {
   const theme = useTheme()
   const navigation = useNavigation()
+  const insets = useSafeAreaInsets()
   const {
     preferences,
     loading,
@@ -84,7 +87,7 @@ const NotificationSettingsScreen: React.FC = () => {
       <StatusBar barStyle={theme.isDark ? "light-content" : "dark-content"} backgroundColor={theme.colors.background} />
 
       {/* Header */}
-      <View style={[styles.header, { backgroundColor: theme.isDark ? '#0F1622' : theme.colors.primary[500] }]}>
+      <View style={[styles.header, { backgroundColor: theme.isDark ? '#0F1622' : theme.colors.primary[500], paddingTop: insets.top + 12 }]}>
         <TouchableOpacity onPress={() => {
           if (navigation.canGoBack()) {
             navigation.goBack()
@@ -100,6 +103,7 @@ const NotificationSettingsScreen: React.FC = () => {
 
       <ScrollView
         style={styles.content}
+        contentContainerStyle={{ paddingBottom: insets.bottom + 100 }}
         showsVerticalScrollIndicator={false}
         refreshControl={
           <RefreshControl
@@ -285,7 +289,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingTop: 50,
     paddingBottom: 20,
     paddingHorizontal: 20,
   },

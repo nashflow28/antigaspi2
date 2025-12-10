@@ -2,13 +2,17 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import {
   ActivityIndicator,
   Alert,
+  Platform,
   RefreshControl,
   ScrollView,
+  StatusBar,
   StyleSheet,
   TextInput,
+  TouchableOpacity,
   View
 } from 'react-native'
 import { Ionicons } from '@expo/vector-icons'
+import { useNavigation } from '@react-navigation/native'
 import { useTheme } from '../../theme'
 import { Card, Typography, Badge, Button } from '../../components/2025'
 import { apiService } from '../../services/api'
@@ -36,6 +40,17 @@ const pointIcons: Record<string, keyof typeof Ionicons.glyphMap> = {
 
 const createStyles = (theme: ReturnType<typeof useTheme>) =>
   StyleSheet.create({
+    screenHeader: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      paddingTop: Platform.OS === 'ios' ? 50 : 20,
+      paddingBottom: 20,
+      paddingHorizontal: 20,
+    },
+    backButton: {
+      padding: 8,
+    },
     container: {
       flexGrow: 1,
       padding: theme.spacing.lg,
@@ -110,6 +125,7 @@ const formatDate = (date: string): string =>
 
 const LoyaltyScreen: React.FC = () => {
   const theme = useTheme()
+  const navigation = useNavigation()
   const styles = useMemo(() => createStyles(theme), [theme])
   const [summary, setSummary] = useState<LoyaltyPointsSummary | null>(null)
   const [loading, setLoading] = useState(true)
@@ -255,18 +271,32 @@ const LoyaltyScreen: React.FC = () => {
   }
 
   return (
-    <ScrollView
-      style={{ backgroundColor: theme.colors.background }}
-      contentContainerStyle={styles.container}
-      refreshControl={
-        <RefreshControl
-          refreshing={refreshing}
-          onRefresh={onRefresh}
-          tintColor={theme.colors.primary[500]}
-        />
-      }
-      testID={TEST_IDS.loyaltyScreen}
-    >
+    <View style={{ flex: 1, backgroundColor: theme.colors.background }}>
+      <StatusBar barStyle="light-content" />
+
+      {/* Header avec bouton retour */}
+      <View style={[styles.screenHeader, { backgroundColor: theme.colors.primary[500] }]}>
+        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+          <Ionicons name="arrow-back" size={24} color="white" />
+        </TouchableOpacity>
+        <Typography variant="h3" style={{ color: 'white', fontWeight: 'bold', flex: 1, textAlign: 'center' }}>
+          Points de fidélité
+        </Typography>
+        <View style={{ width: 40 }} />
+      </View>
+
+      <ScrollView
+        style={{ backgroundColor: theme.colors.background }}
+        contentContainerStyle={styles.container}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            tintColor={theme.colors.primary[500]}
+          />
+        }
+        testID={TEST_IDS.loyaltyScreen}
+      >
       {loading ? (
         <View style={styles.loader}>
           <ActivityIndicator size="large" color={theme.colors.primary[500]} />
@@ -406,7 +436,8 @@ const LoyaltyScreen: React.FC = () => {
           </Card>
         </>
       )}
-    </ScrollView>
+      </ScrollView>
+    </View>
   )
 }
 

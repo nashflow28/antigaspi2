@@ -350,30 +350,32 @@ const CartScreen: React.FC<Props> = ({ navigation }) => {
       <StatusBar barStyle={theme.isDark ? 'light-content' : 'dark-content'} />
 
       <View style={[styles.header, { paddingTop: insets.top + 8 }]}>
-        <Typography variant="h2" weight="bold">
+        <Typography variant="h2" weight="bold" style={{ flexShrink: 1 }}>
           Mon panier
         </Typography>
         <View style={styles.headerActions}>
           {hasItems && (
-            <Button
-              variant="ghost"
-              size="sm"
+            <TouchableOpacity
               onPress={handleClearCart}
               disabled={updating}
+              style={[styles.headerButton, { borderColor: theme.colors.border }]}
               testID={TEST_IDS.cartClearButton}
             >
-              Vider
-            </Button>
+              <Typography variant="caption" weight="semibold" color="secondary">
+                Vider
+              </Typography>
+            </TouchableOpacity>
           )}
-          <Button
-            variant="secondary"
-            size="sm"
+          <TouchableOpacity
             onPress={goToReservations}
-            leftIcon={<Ionicons name="receipt-outline" size={18} color={theme.colors.textInverse} />}
+            style={[styles.headerButton, styles.headerButtonPrimary, { backgroundColor: theme.colors.primary[500] }]}
             testID={TEST_IDS.cartReservationsButton}
           >
-            Mes réservations
-          </Button>
+            <Ionicons name="receipt-outline" size={16} color="white" />
+            <Typography variant="caption" weight="semibold" style={{ color: 'white' }}>
+              Réservations
+            </Typography>
+          </TouchableOpacity>
         </View>
       </View>
 
@@ -756,7 +758,20 @@ const styles = StyleSheet.create({
   },
   headerActions: {
     flexDirection: 'row',
-    gap: 12,
+    gap: 8,
+    flexShrink: 0,
+  },
+  headerButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    paddingHorizontal: 10,
+    paddingVertical: 8,
+    borderRadius: 8,
+    borderWidth: 1,
+  },
+  headerButtonPrimary: {
+    borderWidth: 0,
   },
   loadingContainer: {
     flex: 1,

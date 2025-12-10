@@ -3,6 +3,7 @@ import {
   ActivityIndicator,
   Alert,
   FlatList,
+  Platform,
   RefreshControl,
   StatusBar,
   StyleSheet,
@@ -13,6 +14,7 @@ import {
 } from 'react-native'
 import { Ionicons } from '@expo/vector-icons'
 import { useDispatch, useSelector } from 'react-redux'
+import { useNavigation } from '@react-navigation/native'
 
 import { Button, Card, Typography, Modal as Modal2025, Badge } from '../../components/2025'
 import { useTheme } from '../../theme'
@@ -61,6 +63,7 @@ const getTransactionColor = (type: WalletTransactionType, theme: ReturnType<type
 
 const WalletScreen: React.FC = () => {
   const theme = useTheme()
+  const navigation = useNavigation()
   const dispatch = useDispatch<AppDispatch>()
   const {
     wallet,
@@ -422,7 +425,19 @@ const WalletScreen: React.FC = () => {
 
   return (
     <View style={[styles.container, { backgroundColor: theme.colors.background }]} testID={TEST_IDS.walletScreen}>
-      <StatusBar barStyle={theme.isDark ? 'light-content' : 'dark-content'} />
+      <StatusBar barStyle="light-content" />
+
+      {/* Header avec bouton retour */}
+      <View style={[styles.screenHeader, { backgroundColor: theme.colors.primary[500] }]}>
+        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+          <Ionicons name="arrow-back" size={24} color="white" />
+        </TouchableOpacity>
+        <Typography variant="h3" style={{ color: 'white', fontWeight: 'bold', flex: 1, textAlign: 'center' }}>
+          Portefeuille
+        </Typography>
+        <View style={{ width: 40 }} />
+      </View>
+
       <FlatList
         data={filteredTransactions}
         keyExtractor={(item) => item.id.toString()}
@@ -563,6 +578,17 @@ const WalletScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+  screenHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingTop: Platform.OS === 'ios' ? 50 : 20,
+    paddingBottom: 20,
+    paddingHorizontal: 20,
+  },
+  backButton: {
+    padding: 8,
   },
   listContent: {
     paddingHorizontal: 16,

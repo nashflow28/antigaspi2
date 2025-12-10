@@ -102,10 +102,10 @@ const FavoritesScreen: React.FC = () => {
               </Typography>
 
               <View style={styles.priceRow}>
-                <Typography variant="h3" weight="bold" color="primary" style={{ marginRight: theme.spacing.sm }}>
+                <Typography variant="body" weight="bold" color="primary" style={{ marginRight: theme.spacing.xs }}>
                   {formatCurrency(product.discounted_price)}
                 </Typography>
-                <Typography variant="caption" color="tertiary" style={{ textDecorationLine: 'line-through', marginRight: theme.spacing.sm }}>
+                <Typography variant="caption" color="tertiary" style={{ textDecorationLine: 'line-through', marginRight: theme.spacing.xs, fontSize: 11 }}>
                   {formatCurrency(product.original_price)}
                 </Typography>
                 <Badge variant="success" size="sm">
@@ -116,16 +116,16 @@ const FavoritesScreen: React.FC = () => {
               <View style={styles.metaRow}>
                 <View style={styles.metaItem}>
                   <Ionicons name="pricetag" size={14} color={theme.colors.neutral[500]} />
-                  <Typography variant="caption" color="secondary" style={{ fontSize: 11, marginLeft: 4 }}>
+                  <Typography variant="caption" color="secondary" style={{ fontSize: 11, marginLeft: 4 }} numberOfLines={1}>
                     {product.category?.name || 'Catégorie'}
                   </Typography>
                 </View>
-                <View style={styles.metaItem}>
+                <View style={[styles.metaItem, { flexShrink: 0 }]}>
                   <Ionicons name="time" size={14} color={theme.colors.neutral[500]} />
-                  <Typography variant="caption" color="secondary" style={{ fontSize: 11, marginLeft: 4 }}>
-                    Exp. {(() => {
+                  <Typography variant="caption" color="secondary" style={{ fontSize: 11, marginLeft: 4 }} numberOfLines={1}>
+                    {(() => {
                       const date = new Date(product.expiration_date);
-                      return isNaN(date.getTime()) ? 'Date inconnue' : date.toLocaleDateString('fr-FR');
+                      return isNaN(date.getTime()) ? 'Date inconnue' : date.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: '2-digit' });
                     })()}
                   </Typography>
                 </View>
@@ -293,11 +293,13 @@ const createStyles = (theme: ReturnType<typeof useTheme>) =>
     priceRow: {
       flexDirection: 'row',
       alignItems: 'center',
+      flexWrap: 'wrap',
       marginBottom: theme.spacing.sm,
     },
     metaRow: {
       flexDirection: 'row',
-      gap: theme.spacing.md,
+      flexWrap: 'wrap',
+      gap: theme.spacing.sm,
     },
     metaItem: {
       flexDirection: 'row',
