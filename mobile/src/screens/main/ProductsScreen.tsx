@@ -218,12 +218,29 @@ const ProductsScreen: React.FC<Props> = ({ navigation }) => {
         }
 
         if (selectedCategory !== 'all') {
+          // Trouver le nom de la catégorie sélectionnée
+          const selectedCat = categories.find(c => c.id.toString() === selectedCategory)
+          const categoryName = selectedCat?.name?.toLowerCase() ?? ''
           const type = merchant.business_type?.toLowerCase() ?? ''
-          const matchesCategory =
-            (selectedCategory === '1' && type.includes('boulang')) ||
-            (selectedCategory === '2' && (type.includes('fruit') || type.includes('legume'))) ||
-            (selectedCategory === '3' && (type.includes('viande') || type.includes('boucher'))) ||
-            (selectedCategory === '4' && type.includes('epicerie'))
+          const businessName = merchant.business_name?.toLowerCase() ?? ''
+
+          // Mapping intelligent entre catégories de produits et types de commerces
+          let matchesCategory = false
+
+          if (categoryName.includes('boulang') || categoryName.includes('pain') || categoryName.includes('pâtisserie') || categoryName.includes('patisserie')) {
+            matchesCategory = type.includes('boulang') || type.includes('pain') || type.includes('pâtisserie') || type.includes('patisserie') || businessName.includes('boulang')
+          } else if (categoryName.includes('fruit') || categoryName.includes('légume') || categoryName.includes('legume')) {
+            matchesCategory = type.includes('fruit') || type.includes('légume') || type.includes('legume') || type.includes('bio') || type.includes('marché') || type.includes('marche') || businessName.includes('fruit') || businessName.includes('bio')
+          } else if (categoryName.includes('viande') || categoryName.includes('plat') || categoryName.includes('boucher')) {
+            matchesCategory = type.includes('viande') || type.includes('boucher') || type.includes('charcuterie') || type.includes('traiteur') || type.includes('restaurant') || businessName.includes('boucher')
+          } else if (categoryName.includes('épicerie') || categoryName.includes('epicerie') || categoryName.includes('supermarché') || categoryName.includes('supermarche')) {
+            matchesCategory = type.includes('épicerie') || type.includes('epicerie') || type.includes('supermarché') || type.includes('supermarche') || type.includes('alimentation') || businessName.includes('épicerie') || businessName.includes('epicerie')
+          } else if (categoryName.includes('laitage') || categoryName.includes('laitier') || categoryName.includes('fromage')) {
+            matchesCategory = type.includes('laitage') || type.includes('laitier') || type.includes('fromage') || type.includes('crèmerie') || type.includes('cremerie') || businessName.includes('fromage')
+          } else {
+            // Pour les autres catégories, vérifier si le type ou nom contient le nom de la catégorie
+            matchesCategory = type.includes(categoryName) || businessName.includes(categoryName)
+          }
 
           if (!matchesCategory) {
             return false
@@ -258,6 +275,7 @@ const ProductsScreen: React.FC<Props> = ({ navigation }) => {
     shouldUseRemoteMerchants,
     searchQuery,
     selectedCategory,
+    categories,
     distanceEnabled,
     maxDistance,
     userLocation,
