@@ -127,7 +127,8 @@ describe('MerchantDashboardScreen', () => {
       const store = createTestStore()
       const { getByText } = renderWithProviders(<MerchantDashboardScreen />, store)
 
-      expect(getByText('Commerçant')).toBeTruthy()
+      // Header shows merchant business_name from Redux state
+      expect(getByText('Boulangerie Martin')).toBeTruthy()
       expect(getByText('Tableau de bord')).toBeTruthy()
     })
 
@@ -138,8 +139,9 @@ describe('MerchantDashboardScreen', () => {
       const refreshButton = getByLabelText('Rafraîchir le tableau de bord')
       fireEvent.press(refreshButton)
 
+      // Initial load: 3 calls (stats, reservations, reviews) + Refresh: 3 more = 6 total
       await waitFor(() => {
-        expect(apiService.get).toHaveBeenCalledTimes(4)
+        expect(apiService.get).toHaveBeenCalledTimes(6)
       })
     })
   })
@@ -170,7 +172,7 @@ describe('MerchantDashboardScreen', () => {
       const store = createTestStore()
       const { getByText } = renderWithProviders(<MerchantDashboardScreen />, store)
 
-      expect(getByText('En attente')).toBeTruthy()
+      expect(getByText('Réserv. en attente')).toBeTruthy()
     })
 
     it('displays todays revenue label', () => {
@@ -230,11 +232,13 @@ describe('MerchantDashboardScreen', () => {
       expect(getByText('Réservations récentes')).toBeTruthy()
     })
 
-    it('displays see all link', () => {
+    it('displays see all links', () => {
       const store = createTestStore()
-      const { getByText } = renderWithProviders(<MerchantDashboardScreen />, store)
+      const { getAllByText } = renderWithProviders(<MerchantDashboardScreen />, store)
 
-      expect(getByText('Voir tout')).toBeTruthy()
+      // Multiple "Voir tout" links (reservations + reviews sections)
+      const seeAllLinks = getAllByText('Voir tout')
+      expect(seeAllLinks.length).toBeGreaterThanOrEqual(1)
     })
 
     it('loads and displays recent reservations from API', async () => {
@@ -343,7 +347,7 @@ describe('MerchantDashboardScreen', () => {
       const { getByText } = renderWithProviders(<MerchantDashboardScreen />, store)
 
       expect(getByText('Produits actifs')).toBeTruthy()
-      expect(getByText('En attente')).toBeTruthy()
+      expect(getByText('Réserv. en attente')).toBeTruthy()
       expect(getByText("Revenus aujourd'hui")).toBeTruthy()
     })
 

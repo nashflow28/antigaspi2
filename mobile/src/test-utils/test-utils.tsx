@@ -6,7 +6,9 @@
 import React from 'react'
 import { render, RenderOptions } from '@testing-library/react-native'
 import { Provider } from 'react-redux'
+import { SafeAreaProvider } from 'react-native-safe-area-context'
 import { ThemeProvider } from '../theme'
+import { ToastProvider } from '../contexts/ToastContext'
 
 import { RootState } from '../store'
 import { createTestStore, TestStore } from './store'
@@ -35,9 +37,13 @@ export const renderWithProviders = (
   }: ExtendedRenderOptions = {}
 ) => {
   const Wrapper = ({ children }: { children: React.ReactNode }) => (
-    <Provider store={store}>
-      <ThemeProvider>{children}</ThemeProvider>
-    </Provider>
+    <SafeAreaProvider>
+      <Provider store={store}>
+        <ThemeProvider>
+          <ToastProvider>{children}</ToastProvider>
+        </ThemeProvider>
+      </Provider>
+    </SafeAreaProvider>
   )
 
   return {
