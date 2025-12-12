@@ -118,8 +118,17 @@ const DatePicker: React.FC<DatePickerProps> = ({
 
   const isDateDisabled = useCallback((day: number): boolean => {
     const date = new Date(viewDate.getFullYear(), viewDate.getMonth(), day)
-    if (minDate && date < new Date(minDate.setHours(0, 0, 0, 0))) return true
-    if (maxDate && date > new Date(maxDate.setHours(23, 59, 59, 999))) return true
+    // FIX CRITICAL: Create copies before setHours to avoid mutating props
+    if (minDate) {
+      const minCopy = new Date(minDate)
+      minCopy.setHours(0, 0, 0, 0)
+      if (date < minCopy) return true
+    }
+    if (maxDate) {
+      const maxCopy = new Date(maxDate)
+      maxCopy.setHours(23, 59, 59, 999)
+      if (date > maxCopy) return true
+    }
     return false
   }, [viewDate, minDate, maxDate])
 
@@ -303,31 +312,63 @@ const DatePicker: React.FC<DatePickerProps> = ({
 
             {/* Quick actions */}
             <View style={styles.quickActions}>
-              <TouchableOpacity
-                style={[styles.quickButton, { borderColor: theme.colors.border }]}
-                onPress={() => {
-                  onChange(new Date())
-                  setVisible(false)
-                }}
-              >
-                <Text style={[styles.quickButtonText, { color: theme.colors.primary[600] }]}>
-                  Aujourd'hui
-                </Text>
-              </TouchableOpacity>
+              {(() => {
+                // FIX MEDIUM: Check if Today is within bounds
+                const todayDate = new Date()
+                const isTodayDisabled = isDateDisabled(todayDate.getDate()) &&
+                  todayDate.getMonth() === viewDate.getMonth() &&
+                  todayDate.getFullYear() === viewDate.getFullYear()
 
-              <TouchableOpacity
-                style={[styles.quickButton, { borderColor: theme.colors.border }]}
-                onPress={() => {
-                  const tomorrow = new Date()
-                  tomorrow.setDate(tomorrow.getDate() + 1)
-                  onChange(tomorrow)
-                  setVisible(false)
-                }}
-              >
-                <Text style={[styles.quickButtonText, { color: theme.colors.primary[600] }]}>
-                  Demain
-                </Text>
-              </TouchableOpacity>
+                return (
+                  <TouchableOpacity
+                    style={[
+                      styles.quickButton,
+                      { borderColor: theme.colors.border },
+                      isTodayDisabled && { opacity: 0.5 }
+                    ]}
+                    onPress={() => {
+                      if (!isTodayDisabled) {
+                        onChange(new Date())
+                        setVisible(false)
+                      }
+                    }}
+                    disabled={isTodayDisabled}
+                  >
+                    <Text style={[styles.quickButtonText, { color: theme.colors.primary[600] }]}>
+                      Aujourd'hui
+                    </Text>
+                  </TouchableOpacity>
+                )
+              })()}
+
+              {(() => {
+                // FIX MEDIUM: Check if Tomorrow is within bounds
+                const tomorrowDate = new Date()
+                tomorrowDate.setDate(tomorrowDate.getDate() + 1)
+                const isTomorrowDisabled = (minDate && tomorrowDate < minDate) ||
+                  (maxDate && tomorrowDate > maxDate)
+
+                return (
+                  <TouchableOpacity
+                    style={[
+                      styles.quickButton,
+                      { borderColor: theme.colors.border },
+                      isTomorrowDisabled && { opacity: 0.5 }
+                    ]}
+                    onPress={() => {
+                      if (!isTomorrowDisabled) {
+                        onChange(tomorrowDate)
+                        setVisible(false)
+                      }
+                    }}
+                    disabled={isTomorrowDisabled}
+                  >
+                    <Text style={[styles.quickButtonText, { color: theme.colors.primary[600] }]}>
+                      Demain
+                    </Text>
+                  </TouchableOpacity>
+                )
+              })()}
 
               <TouchableOpacity
                 style={[styles.quickButton, { backgroundColor: theme.colors.neutral[100] }]}

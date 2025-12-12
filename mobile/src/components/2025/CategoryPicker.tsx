@@ -302,7 +302,9 @@ const CategoryPicker: React.FC<CategoryPickerProps> = ({
                       style={[
                         styles.categoryCard,
                         {
-                          width: `${100 / columns - 4}%`,
+                          // FIX HIGH: Use flexBasis instead of percentage string for better compatibility
+                          flexBasis: `${Math.floor(100 / columns) - 2}%`,
+                          maxWidth: `${Math.floor(100 / columns) - 2}%`,
                           backgroundColor: isSelected
                             ? `${color}20`
                             : theme.colors.surface.light,

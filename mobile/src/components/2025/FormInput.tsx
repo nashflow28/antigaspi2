@@ -179,18 +179,36 @@ const FormInput: React.FC<FormInputProps> = ({
     }
   }, [externalError])
 
+  // FIX HIGH: Add debounce ref for validation
+  const validateDebounceRef = useRef<NodeJS.Timeout | null>(null)
+
   const handleChangeText = (text: string) => {
     onChangeText(text)
 
     if (validateOnChange && hasBeenTouched) {
-      const state = validate(text)
-      setValidationState(state)
-
-      if (state === 'invalid') {
-        triggerHaptic('error')
+      // FIX HIGH: Debounce validation to avoid UX issues while typing
+      if (validateDebounceRef.current) {
+        clearTimeout(validateDebounceRef.current)
       }
+      validateDebounceRef.current = setTimeout(() => {
+        const state = validate(text)
+        setValidationState(state)
+
+        if (state === 'invalid') {
+          triggerHaptic('error')
+        }
+      }, 300) // 300ms debounce
     }
   }
+
+  // Cleanup debounce timer on unmount
+  useEffect(() => {
+    return () => {
+      if (validateDebounceRef.current) {
+        clearTimeout(validateDebounceRef.current)
+      }
+    }
+  }, [])
 
   const handleFocus = () => {
     setIsFocused(true)

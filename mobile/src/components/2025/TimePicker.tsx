@@ -51,11 +51,20 @@ const generateTimeSlots = (
   maxTime?: string
 ): TimeSection[] => {
   const slots: string[] = []
-  const minHour = minTime ? parseInt(minTime.split(':')[0]) : 6
-  const maxHour = maxTime ? parseInt(maxTime.split(':')[0]) : 22
+  // FIX HIGH: Parse both hours AND minutes from minTime/maxTime
+  const minParts = minTime ? minTime.split(':') : ['6', '0']
+  const maxParts = maxTime ? maxTime.split(':') : ['22', '0']
+  const minHour = parseInt(minParts[0])
+  const minMinute = parseInt(minParts[1] || '0')
+  const maxHour = parseInt(maxParts[0])
+  const maxMinute = parseInt(maxParts[1] || '0')
 
   for (let hour = minHour; hour <= maxHour; hour++) {
     for (let min = 0; min < 60; min += interval) {
+      // FIX HIGH: Skip slots before minTime or after maxTime
+      if (hour === minHour && min < minMinute) continue
+      if (hour === maxHour && min > maxMinute) continue
+
       const timeStr = `${hour.toString().padStart(2, '0')}:${min.toString().padStart(2, '0')}`
       slots.push(timeStr)
     }

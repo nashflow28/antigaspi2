@@ -9,7 +9,7 @@
  * - Haptic feedback on quick actions
  */
 
-import React, { useState, useCallback, useEffect } from 'react'
+import React, { useState, useCallback, useEffect, useRef } from 'react'
 import {
   View,
   Text,
@@ -72,12 +72,18 @@ const PricePicker: React.FC<PricePickerProps> = ({
   const theme = useTheme()
   const [inputValue, setInputValue] = useState(value > 0 ? formatXOF(value) : '')
   const [isFocused, setIsFocused] = useState(false)
+  // FIX CRITICAL: Track internal changes to avoid race condition
+  const isInternalChange = useRef(false)
+  const lastValueRef = useRef(value)
 
   // Sync input when value changes externally
   useEffect(() => {
-    if (!isFocused) {
+    // Only sync if value changed externally and input is not focused
+    if (!isFocused && !isInternalChange.current && value !== lastValueRef.current) {
       setInputValue(value > 0 ? formatXOF(value) : '')
     }
+    lastValueRef.current = value
+    isInternalChange.current = false
   }, [value, isFocused])
 
   const triggerHaptic = useCallback(() => {
@@ -95,6 +101,7 @@ const PricePicker: React.FC<PricePickerProps> = ({
     const boundedValue = max ? Math.min(numericValue, max) : numericValue
 
     setInputValue(boundedValue > 0 ? formatXOF(boundedValue) : '')
+    isInternalChange.current = true // FIX: Mark as internal change
     onChange(boundedValue)
   }
 
@@ -115,12 +122,14 @@ const PricePicker: React.FC<PricePickerProps> = ({
     triggerHaptic()
     const newValue = value + amount
     const boundedValue = max ? Math.min(newValue, max) : newValue
+    isInternalChange.current = true // FIX: Mark as internal change
     onChange(boundedValue)
     setInputValue(formatXOF(boundedValue))
   }
 
   const handleClear = () => {
     triggerHaptic()
+    isInternalChange.current = true // FIX: Mark as internal change
     onChange(0)
     setInputValue('')
   }
