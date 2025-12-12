@@ -34,12 +34,13 @@ const FavoriteButton: React.FC<FavoriteButtonProps> = ({
     setIsToggling(true)
     try {
       await toggleFavorite()
-      onToggle?.(isFavorite)
+      // BUG FIX #H-007: Use inverted value since toggle happened
+      onToggle?.(!isFavorite)
+    } catch (error) {
+      console.error('[FavoriteButton] Toggle error:', error)
     } finally {
-      // Minimum 300ms delay to prevent accidental double-taps
-      setTimeout(() => {
-        setIsToggling(false)
-      }, 300)
+      // BUG FIX #H-007: Remove setTimeout - wait for operation to complete naturally
+      setIsToggling(false)
     }
   }
 

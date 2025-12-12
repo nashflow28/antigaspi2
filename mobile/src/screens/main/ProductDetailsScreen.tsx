@@ -81,7 +81,13 @@ const ProductDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
     loadProduct().catch(() => {
       // Error already shown to user via showError in loadProduct
       // Navigate back since product couldn't be loaded
-      navigation.goBack()
+      // BUG FIX #H-003: Check if we can go back before calling goBack
+      if (navigation.canGoBack()) {
+        navigation.goBack()
+      } else {
+        // Fallback to Home if this is the first screen (e.g., deep link)
+        navigation.navigate('Home')
+      }
     })
   }, [productId])
 

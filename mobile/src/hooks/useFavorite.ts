@@ -14,13 +14,14 @@ export const useFavorite = (productId: number) => {
   // 🐛 FIX: Use ref to prevent infinite loop when favoriteIds changes
   const hasFetchedRef = useRef(false)
 
-  // Charger les IDs favoris au premier rendu si vide
+  // Charger les IDs favoris au premier rendu si non chargés
+  // BUG FIX #C-007: Remove favoriteIds.length from dependencies to prevent re-fetch on changes
   useEffect(() => {
-    if (!hasFetchedRef.current && favoriteIds.length === 0) {
+    if (!hasFetchedRef.current) {
       hasFetchedRef.current = true
       dispatch(fetchFavoriteIds())
     }
-  }, [dispatch, favoriteIds.length])
+  }, [dispatch])
 
   const isFavorite = favoriteIds.includes(productId)
 

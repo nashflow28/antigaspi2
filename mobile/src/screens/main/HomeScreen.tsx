@@ -128,14 +128,21 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
       if (distanceEnabled && userLocation && product.merchant) {
         const { latitude, longitude } = product.merchant
         if (latitude != null && longitude != null) {
-          const distanceResult = locationService.calculateDistance(
-            userLocation.latitude,
-            userLocation.longitude,
-            latitude,
-            longitude
-          )
-          if (distanceResult.distance > maxDistance) {
-            return false
+          // BUG FIX #H-008: Wrap in try-catch to handle calculation errors gracefully
+          try {
+            const distanceResult = locationService.calculateDistance(
+              userLocation.latitude,
+              userLocation.longitude,
+              latitude,
+              longitude
+            )
+            // Check if result is valid before accessing distance
+            if (distanceResult && distanceResult.distance > maxDistance) {
+              return false
+            }
+          } catch (error) {
+            // Include product by default if distance calculation fails
+            console.warn('[HomeScreen] Distance calculation error:', error)
           }
         }
       }
