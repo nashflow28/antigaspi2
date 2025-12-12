@@ -23,7 +23,7 @@ import QRCode from 'react-native-qrcode-svg'
 import { Reservation } from '../../types'
 // import offlineService from '../../services/offlineService'
 import analyticsService from '../../services/analyticsService'
-import { Button, Card, Badge, Typography, Modal as Modal2025, ReservationListSkeleton } from '../../components/2025'
+import { Button, Card, Badge, Typography, Modal as Modal2025, ReservationListSkeleton, EmptyState } from '../../components/2025'
 import { useTheme } from '../../theme'
 import { TEST_IDS } from '../../utils/testIds'
 import { getImageUrl } from '../../utils/imageHelpers'
@@ -386,27 +386,33 @@ const ReservationsScreen: React.FC<Props> = ({ navigation }) => {
     </Card>
   )
 
-  const renderEmpty = () => (
-    <View style={[styles.emptyContainer, { paddingVertical: theme.spacing['4xl'] }]} testID={TEST_IDS.emptyState}>
-      <Ionicons name="bookmark-outline" size={64} color={theme.colors.neutral[300]} />
-      <Typography variant="h3" weight="semibold" style={{ marginTop: theme.spacing.md, marginBottom: theme.spacing.sm }}>
-        Aucune réservation
-      </Typography>
-      <Typography variant="body" color="secondary" style={{ textAlign: 'center', marginBottom: theme.spacing.lg, paddingHorizontal: theme.spacing['2xl'] }}>
-        {activeTab === 'active' && 'Vous n\'avez aucune réservation active'}
-        {activeTab === 'completed' && 'Vous n\'avez aucune réservation terminée'}
-        {activeTab === 'cancelled' && 'Vous n\'avez aucune réservation annulée'}
-      </Typography>
-      <Button
-        variant="primary"
-        size="lg"
-        onPress={() => navigation.getParent()?.navigate('Discover')}
-        testID="browse-products-button"
-      >
-        Parcourir les produits
-      </Button>
-    </View>
-  )
+  const renderEmpty = () => {
+    const getEmptyDescription = () => {
+      switch (activeTab) {
+        case 'active': return 'Vous n\'avez aucune réservation active. Découvrez les offres disponibles !'
+        case 'completed': return 'Vous n\'avez aucune réservation terminée pour le moment.'
+        case 'cancelled': return 'Vous n\'avez aucune réservation annulée.'
+        default: return 'Aucune réservation trouvée.'
+      }
+    }
+
+    return (
+      <View testID={TEST_IDS.emptyState}>
+        <EmptyState
+          variant="no-reservations"
+          description={getEmptyDescription()}
+          compact
+          actions={activeTab === 'active' ? [
+            {
+              label: 'Parcourir les produits',
+              icon: 'basket-outline',
+              onPress: () => navigation.getParent()?.navigate('Discover'),
+            },
+          ] : []}
+        />
+      </View>
+    )
+  }
 
   return (
     <View

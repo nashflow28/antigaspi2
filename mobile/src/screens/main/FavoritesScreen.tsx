@@ -22,7 +22,7 @@ import type { RootStackParamList } from '../../types'
 import { API_BASE_URL } from '../../services/api'
 import { formatCurrency } from '../../utils/currencyHelpers'
 import { getImageUrl } from '../../utils/imageHelpers'
-import { Button, Card, Badge, Typography } from '../../components/2025'
+import { Button, Card, Badge, Typography, EmptyState } from '../../components/2025'
 
 type NavigationProp = NativeStackNavigationProp<RootStackParamList, 'ProductDetails'>
 
@@ -172,22 +172,17 @@ const FavoritesScreen: React.FC = () => {
             Favoris
           </Typography>
         </View>
-        <View style={styles.errorContainer}>
-          <Ionicons name="alert-circle" size={64} color={theme.colors.semantic.error} />
-          <Typography variant="h3" weight="bold" style={{ marginTop: theme.spacing.lg, marginBottom: theme.spacing.sm }}>
-            Erreur
-          </Typography>
-          <Typography variant="body" color="secondary" style={{ textAlign: 'center', marginBottom: theme.spacing.lg }}>
-            {error}
-          </Typography>
-          <Button
-            variant="primary"
-            size="md"
-            onPress={() => dispatch(fetchFavorites())}
-          >
-            Réessayer
-          </Button>
-        </View>
+        <EmptyState
+          variant="error"
+          description={error}
+          actions={[
+            {
+              label: 'Réessayer',
+              icon: 'refresh-outline',
+              onPress: () => dispatch(fetchFavorites()),
+            },
+          ]}
+        />
       </View>
     )
   }
@@ -216,16 +211,16 @@ const FavoritesScreen: React.FC = () => {
         }
       >
         {favorites.length === 0 ? (
-          <View style={styles.emptyState}>
-            <Ionicons name="heart-outline" size={64} color={theme.colors.neutral[300]} />
-            <Typography variant="h3" weight="bold" style={{ marginTop: theme.spacing.lg, marginBottom: theme.spacing.sm }}>
-              Aucun favori
-            </Typography>
-            <Typography variant="body" color="secondary" style={{ textAlign: 'center' }}>
-              Ajoutez des produits à vos favoris en appuyant sur le{' '}
-              <Ionicons name="heart" size={16} /> dans la liste des produits
-            </Typography>
-          </View>
+          <EmptyState
+            variant="no-favorites"
+            actions={[
+              {
+                label: 'Explorer les produits',
+                icon: 'search-outline',
+                onPress: () => navigation.getParent()?.navigate('Home'),
+              },
+            ]}
+          />
         ) : (
           favorites.map(renderProduct)
         )}

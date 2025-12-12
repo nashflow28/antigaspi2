@@ -23,7 +23,7 @@ import { getImageUrl } from '../../utils/imageHelpers'
 import { formatCurrency } from '../../utils/currencyHelpers'
 import FavoriteButton from '../../components/FavoriteButton'
 import locationService, { UserLocation } from '../../services/locationService'
-import { Button, Card, Badge, Typography, ProductCardSkeleton } from '../../components/2025'
+import { Button, Card, Badge, Typography, ProductCardSkeleton, EmptyState } from '../../components/2025'
 import { TEST_IDS } from '../../utils/testIds'
 
 interface Props {
@@ -552,41 +552,26 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
           ) : sortedProducts.length > 0 ? (
             sortedProducts.map((product, index) => renderProductCard(product, index))
           ) : (
-            <View style={styles.emptyState}>
-              <Ionicons name="basket-outline" size={64} color={theme.colors.neutral[300]} />
-              {selectedCategory === 'all' ? (
-                <>
-                  <Typography variant="h3" weight="bold" style={{ marginTop: theme.spacing.lg, marginBottom: theme.spacing.sm }}>
-                    Aucun produit disponible
-                  </Typography>
-                  <Typography variant="body" color="secondary" style={{ textAlign: 'center', lineHeight: 20 }}>
-                    {showAvailable
-                      ? "Aucun produit disponible actuellement.\nRevenez plus tard ou désactivez le filtre 'Produits disponibles'."
-                      : "Aucun produit dans la base de données.\nRevenez plus tard."}
-                  </Typography>
-                </>
-              ) : (
-                <>
-                  <Typography variant="h3" weight="bold" style={{ marginTop: theme.spacing.lg, marginBottom: theme.spacing.sm }}>
-                    Aucun produit dans cette catégorie
-                  </Typography>
-                  <Typography variant="body" color="secondary" style={{ textAlign: 'center', lineHeight: 20 }}>
-                    {showAvailable
-                      ? `Aucun produit disponible dans "${(categories || []).find(c => c.id.toString() === selectedCategory)?.name || 'cette catégorie'}".\nEssayez une autre catégorie ou désactivez le filtre disponibilité.`
-                      : `Aucun produit dans "${(categories || []).find(c => c.id.toString() === selectedCategory)?.name || 'cette catégorie'}".\nEssayez une autre catégorie.`}
-                  </Typography>
-                  <Button
-                    variant="primary"
-                    size="md"
-                    onPress={() => setSelectedCategory('all')}
-                    leftIcon={<Ionicons name="refresh" size={20} color={theme.colors.textInverse} />}
-                    style={{ marginTop: theme.spacing.lg }}
-                  >
-                    Voir tous les produits
-                  </Button>
-                </>
-              )}
-            </View>
+            <EmptyState
+              variant={selectedCategory === 'all' ? 'no-products' : 'no-results'}
+              description={
+                selectedCategory === 'all'
+                  ? (showAvailable
+                      ? "Aucun produit disponible actuellement. Revenez plus tard ou désactivez le filtre 'Produits disponibles'."
+                      : "Aucun produit dans la base de données. Revenez plus tard.")
+                  : (showAvailable
+                      ? `Aucun produit disponible dans "${(categories || []).find(c => c.id.toString() === selectedCategory)?.name || 'cette catégorie'}". Essayez une autre catégorie.`
+                      : `Aucun produit dans "${(categories || []).find(c => c.id.toString() === selectedCategory)?.name || 'cette catégorie'}".`)
+              }
+              compact
+              actions={selectedCategory !== 'all' ? [
+                {
+                  label: 'Voir tous les produits',
+                  icon: 'grid-outline',
+                  onPress: () => setSelectedCategory('all'),
+                },
+              ] : []}
+            />
           )}
         </View>
       </ScrollView>
