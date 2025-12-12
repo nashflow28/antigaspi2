@@ -27,6 +27,7 @@ import { formatCurrency } from '../../utils/currencyHelpers'
 import { Button, Card, Badge, Typography } from '../../components/2025'
 import OpenStreetMap, { MapMarker } from '../../components/OpenStreetMap'
 import locationService, { UserLocation } from '../../services/locationService'
+import { getCategoryIcon, IoniconName } from '../../constants/categoryIcons'
 
 const { width } = Dimensions.get('window')
 
@@ -184,8 +185,19 @@ const MerchantDetailScreen: React.FC<Props> = ({ route, navigation }) => {
     setMapExpanded(prev => !prev)
   }
 
-  // Emoji dynamique basé sur le nom du marchand (défini avant useMemo qui l'utilise)
-  const getMerchantEmoji = (businessName: string) => {
+  /**
+   * Get the Ionicon name for a merchant based on business type
+   * BUG FIX #L-001: Use vector icons from categoryIcons.ts for UI components
+   */
+  const getMerchantIcon = (businessName: string): IoniconName => {
+    return getCategoryIcon(businessName)
+  }
+
+  /**
+   * Get emoji for map markers (HTML/WebView context requires text emojis)
+   * Note: Map markers are rendered in HTML where Ionicons don't work
+   */
+  const getMerchantMapEmoji = (businessName: string): string => {
     const name = businessName.toLowerCase()
     if (name.includes('boulang')) return '🥐'
     if (name.includes('fruit') || name.includes('bio')) return '🥕'
@@ -217,7 +229,7 @@ const MerchantDetailScreen: React.FC<Props> = ({ route, navigation }) => {
       longitude: merchant.longitude,
       title: merchant.business_name,
       subtitle: merchant.city,
-      emoji: getMerchantEmoji(merchant.business_name),
+      emoji: getMerchantMapEmoji(merchant.business_name),
     }]
   }, [merchant])
 
@@ -233,8 +245,8 @@ const MerchantDetailScreen: React.FC<Props> = ({ route, navigation }) => {
   }
 
   const renderProductCard = (product: Product) => {
-    // ✅ FIX: Fallback pour éviter NaN si discounted_price invalide
-    const discountedPrice = Math.round(parseFloat(product.discounted_price) || 0)
+    // BUG FIX #M-004: Prices are now normalized as numbers in productsSlice
+    const discountedPrice = Math.round(product.discounted_price || 0)
     const isOutOfStock = product.quantity_available === 0
 
     return (
@@ -431,7 +443,11 @@ const MerchantDetailScreen: React.FC<Props> = ({ route, navigation }) => {
         <View style={styles.merchantCard}>
           <View style={styles.merchantHeader}>
             <View style={styles.merchantLogo}>
-              <Text style={styles.logoEmoji}>{getMerchantEmoji(merchant.business_name)}</Text>
+              <Ionicons
+                name={getMerchantIcon(merchant.business_name)}
+                size={32}
+                color={theme.colors.primary[600]}
+              />
             </View>
             <View style={styles.merchantInfo}>
               <Typography variant="h3" weight="bold" style={{ marginBottom: 4 }}>

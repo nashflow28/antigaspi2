@@ -54,7 +54,11 @@ const FavoriteButton: React.FC<FavoriteButtonProps> = ({
       disabled={isDisabled}
       activeOpacity={0.7}
       testID={TEST_IDS.favoriteButton}
-      accessibilityLabel={TEST_IDS.favoriteButton}
+      // BUG FIX #H-010: Proper accessibility labels
+      accessibilityRole="button"
+      accessibilityLabel={isFavorite ? 'Retirer des favoris' : 'Ajouter aux favoris'}
+      accessibilityHint={isFavorite ? 'Retire ce produit de vos favoris' : 'Ajoute ce produit à vos favoris'}
+      accessibilityState={{ disabled: isDisabled, selected: isFavorite }}
     >
       {(loading || isToggling) ? (
         <ActivityIndicator size="small" color={color} />

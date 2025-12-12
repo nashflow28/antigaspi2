@@ -25,6 +25,7 @@ import {
 import { Ionicons } from '@expo/vector-icons'
 import * as Haptics from 'expo-haptics'
 import { useTheme } from '../../theme'
+import { getCategoryIconConfig, IoniconName } from '../../constants/categoryIcons'
 
 interface Category {
   id: number | string
@@ -47,32 +48,13 @@ interface CategoryPickerProps {
   showSearch?: boolean
 }
 
-const DEFAULT_CATEGORY_ICONS: Record<string, { emoji: string; color: string }> = {
-  'boulangerie': { emoji: '🥐', color: '#F59E0B' },
-  'fruits': { emoji: '🍎', color: '#EF4444' },
-  'legumes': { emoji: '🥕', color: '#22C55E' },
-  'viande': { emoji: '🥩', color: '#DC2626' },
-  'poisson': { emoji: '🐟', color: '#3B82F6' },
-  'laitier': { emoji: '🧀', color: '#FCD34D' },
-  'epicerie': { emoji: '🥫', color: '#A855F7' },
-  'plat': { emoji: '🍲', color: '#F97316' },
-  'boisson': { emoji: '🥤', color: '#06B6D4' },
-  'default': { emoji: '🛍️', color: '#6B7280' },
-}
-
-const getCategoryIcon = (category: Category): { emoji: string; color: string } => {
-  if (category.emoji && category.color) {
-    return { emoji: category.emoji, color: category.color }
-  }
-
-  const nameLower = category.name.toLowerCase()
-  for (const [key, value] of Object.entries(DEFAULT_CATEGORY_ICONS)) {
-    if (nameLower.includes(key)) {
-      return value
-    }
-  }
-
-  return DEFAULT_CATEGORY_ICONS.default
+/**
+ * Get icon configuration for a category
+ * BUG FIX #L-001: Use vector icons from categoryIcons.ts
+ */
+const getCategoryIcon = (category: Category): { iconName: IoniconName; color: string } => {
+  const config = getCategoryIconConfig(category.name)
+  return { iconName: config.name, color: config.color }
 }
 
 const CategoryPicker: React.FC<CategoryPickerProps> = ({
@@ -180,11 +162,9 @@ const CategoryPicker: React.FC<CategoryPickerProps> = ({
         {selectedCategories.length > 0 ? (
           <View style={styles.selectedPreview}>
             {selectedCategories.slice(0, 3).map((cat) => {
-              const { emoji } = getCategoryIcon(cat)
+              const { iconName, color } = getCategoryIcon(cat)
               return (
-                <Text key={cat.id} style={styles.previewEmoji}>
-                  {emoji}
-                </Text>
+                <Ionicons key={cat.id} name={iconName} size={18} color={color} style={styles.previewIcon} />
               )
             })}
             {selectedCategories.length > 3 && (
@@ -293,7 +273,7 @@ const CategoryPicker: React.FC<CategoryPickerProps> = ({
             <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
               <View style={[styles.grid, { gap: 12 }]}>
                 {filteredCategories.map((category) => {
-                  const { emoji, color } = getCategoryIcon(category)
+                  const { iconName, color } = getCategoryIcon(category)
                   const isSelected = selectedIds.includes(category.id)
 
                   return (
@@ -321,7 +301,7 @@ const CategoryPicker: React.FC<CategoryPickerProps> = ({
                           <Ionicons name="checkmark" size={12} color="#FFFFFF" />
                         </View>
                       )}
-                      <Text style={styles.categoryEmoji}>{emoji}</Text>
+                      <Ionicons name={iconName} size={32} color={color} style={styles.categoryIcon} />
                       <Text
                         style={[
                           styles.categoryName,
@@ -388,8 +368,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 4,
   },
-  previewEmoji: {
-    fontSize: 18,
+  previewIcon: {
+    marginRight: 2,
   },
   moreText: {
     fontSize: 12,
@@ -489,8 +469,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  categoryEmoji: {
-    fontSize: 32,
+  categoryIcon: {
     marginBottom: 8,
   },
   categoryName: {

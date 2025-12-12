@@ -3,6 +3,10 @@ import AsyncStorage from '@react-native-async-storage/async-storage'
 import { Alert } from 'react-native'
 import * as NavigationRef from '../navigation/NavigationRef'
 import { getGlobalAlert } from '../contexts/AlertContext'
+import { API_CONFIG } from '../config/api.config'
+import { apiLogger } from '../utils/logger'
+// BUG FIX #C-006: Use SecureStore for sensitive authentication data
+import { secureStorage } from './secureStorage'
 import {
   ApiResponse,
   AuthResponse,
@@ -68,7 +72,7 @@ const getApiBaseUrl = (): string => {
       // a) Variable d'env publique Expo si fournie
       const envUrl = (process.env.EXPO_PUBLIC_API_URL as string | undefined)?.trim()
       if (envUrl) {
-        console.log('🔗 API URL (EXPO_PUBLIC_API_URL):', envUrl)
+        apiLogger.log('URL (EXPO_PUBLIC_API_URL):', envUrl)
         return envUrl
       }
 
@@ -78,18 +82,18 @@ const getApiBaseUrl = (): string => {
         // Si localhost/127 -> forcer 127 (évite IPv6 ::1 et soucis DNS)
         if (host === 'localhost' || host === '127.0.0.1' || host === '::1') {
           const url = 'http://127.0.0.1:8000/api'
-          console.log('🔗 API URL (web localhost):', url)
+          apiLogger.log('URL (web localhost):', url)
           return url
         }
         // Sinon, utiliser l'IP/host courant (accès LAN)
         const url = `http://${host}:8000/api`
-        console.log('🔗 API URL (web from current host):', url)
+        apiLogger.log('URL (web from current host):', url)
         return url
       }
 
       // c) Fallback ultime web
       const url = 'http://127.0.0.1:8000/api'
-      console.log('🔗 API URL (web fallback):', url)
+      apiLogger.log('URL (web fallback):', url)
       return url
     }
   } catch (_) {
@@ -99,13 +103,13 @@ const getApiBaseUrl = (): string => {
   // 2) NATIVE (Android/iOS): priorité à app.json -> extra.apiUrl
   const configUrl = getExpoExtraValue<string>('apiUrl')?.trim()
   if (configUrl) {
-    console.log('🔗 API URL (from Expo extra):', configUrl)
+    apiLogger.log('URL (from Expo extra):', configUrl)
     return configUrl
   }
 
   // 3) Émulateur Android (localhost côté hôte)
   const url = 'http://10.0.2.2:8000/api'
-  console.log('🔗 API URL (android emulator fallback):', url)
+  apiLogger.log('URL (android emulator fallback):', url)
   return url
 }
 
@@ -139,7 +143,7 @@ class ApiService {
 
     this.api = axios.create({
       baseURL: this.baseURL,
-      timeout: 10000,
+      timeout: API_CONFIG.TIMEOUT.DEFAULT,
       headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
@@ -156,16 +160,15 @@ class ApiService {
 
   private setupInterceptors() {
     // Request interceptor pour ajouter le token JWT
+    // BUG FIX #C-006: Use SecureStore for token retrieval
     this.api.interceptors.request.use(
       async (config) => {
-        const token = await AsyncStorage.getItem('auth_token')
+        const token = await secureStorage.getToken()
         if (token) {
           config.headers.Authorization = `Bearer ${token}`
-          if (__DEV__) {
-            console.log('🔑 [API] Token présent pour:', config.method?.toUpperCase(), config.url)
-          }
-        } else if (__DEV__) {
-          console.warn('⚠️ [API] Pas de token pour:', config.method?.toUpperCase(), config.url)
+          apiLogger.debug('Token présent pour:', config.method?.toUpperCase(), config.url)
+        } else {
+          apiLogger.warn('Pas de token pour:', config.method?.toUpperCase(), config.url)
         }
         return config
       },
@@ -185,12 +188,13 @@ class ApiService {
           // If it's a login/register request, let the component handle the error
           // (incorrect credentials, not an expired session)
           if (isLoginRequest || isRegisterRequest) {
-            console.log('Login/Register failed - Invalid credentials')
+            apiLogger.log('Login/Register failed - Invalid credentials')
             return Promise.reject(error)
           }
 
           // ✅ Token expiré, déconnecter l'utilisateur
-          await AsyncStorage.multiRemove(['auth_token', 'user_data'])
+          // BUG FIX #C-006: Use SecureStore for clearing auth data
+          await secureStorage.clearAll()
 
           // ✅ Notifier le Redux store pour mettre à jour l'état d'authentification
           if (this.onUnauthorizedCallback) {
@@ -208,7 +212,7 @@ class ApiService {
                 {
                   text: 'OK',
                   onPress: () => {
-                    console.log('Session expirée - Redirection automatique vers login')
+                    apiLogger.log('Session expirée - Redirection automatique vers login')
                     NavigationRef.navigate('Login')
                   }
                 }
@@ -223,7 +227,7 @@ class ApiService {
                 {
                   text: 'OK',
                   onPress: () => {
-                    console.log('Session expirée - Redirection automatique vers login')
+                    apiLogger.log('Session expirée - Redirection automatique vers login')
                     NavigationRef.navigate('Login')
                   }
                 }
@@ -246,9 +250,7 @@ class ApiService {
       // 🐛 BUG FIX: Detect FormData and remove Content-Type header
       // Let axios set the correct multipart/form-data boundary automatically
       const isFormData = data instanceof FormData
-      if (__DEV__) {
-        console.log(`📤 [API] ${method} ${url}`, data ? `(avec données${isFormData ? ' FormData' : ''})` : '')
-      }
+      apiLogger.log(`${method} ${url}`, data ? `(avec données${isFormData ? ' FormData' : ''})` : '')
 
       const requestConfig: AxiosRequestConfig = {
         method,
@@ -264,22 +266,18 @@ class ApiService {
           'Content-Type': undefined, // Let axios handle it
         }
         // Also increase timeout for file uploads
-        requestConfig.timeout = 60000
+        requestConfig.timeout = API_CONFIG.TIMEOUT.UPLOAD
       }
 
       const response: AxiosResponse<T> = await this.api.request(requestConfig)
-      if (__DEV__) {
-        console.log(`📥 [API] ${method} ${url} - Status:`, response.status)
-        console.log(`📥 [API] Response.data type:`, typeof response.data)
-        console.log(`📥 [API] Response.data keys:`, Object.keys(response.data || {}))
-      }
+      apiLogger.debug(`${method} ${url} - Status:`, response.status)
+      apiLogger.debug('Response.data type:', typeof response.data)
+      apiLogger.debug('Response.data keys:', Object.keys(response.data || {}))
       return response.data
     } catch (error: any) {
-      console.error(`❌ [API] ${method} ${url} - Erreur:`, error?.message || error)
-      if (__DEV__) {
-        console.error(`❌ [API] Status:`, error.response?.status)
-        console.error(`❌ [API] Response data:`, error.response?.data)
-      }
+      apiLogger.error(`${method} ${url} - Erreur:`, error?.message || error)
+      apiLogger.debug('Status:', error.response?.status)
+      apiLogger.debug('Response data:', error.response?.data)
 
       // 🐛 BUG FIX #24: Preserve validation errors for better error handling
       if (error.response?.status === 422 && error.response?.data?.errors) {
@@ -313,9 +311,7 @@ class ApiService {
     // 🐛 SAFEGUARD: Auto-redirect FormData to uploadFile() which uses native fetch
     // This prevents the "Network Error" bug with axios + FormData on React Native
     if (data instanceof FormData) {
-      if (__DEV__) {
-        console.warn('⚠️ [API] FormData detected in post() - auto-redirecting to uploadFile() for reliability')
-      }
+      apiLogger.warn('FormData detected in post() - auto-redirecting to uploadFile() for reliability')
       return this.uploadFile<T>(url, data)
     }
     return this.request<T>('POST', url, data, config)
@@ -338,12 +334,11 @@ class ApiService {
    */
   async uploadFile<T = any>(url: string, formData: FormData): Promise<T> {
     try {
-      const token = await AsyncStorage.getItem('auth_token')
+      // BUG FIX #C-006: Use SecureStore for token retrieval
+      const token = await secureStorage.getToken()
       const fullUrl = `${this.baseURL}${url}`
 
-      if (__DEV__) {
-        console.log(`📤 [API] UPLOAD ${url} (FormData avec fetch natif)`)
-      }
+      apiLogger.log(`UPLOAD ${url} (FormData avec fetch natif)`)
 
       const response = await fetch(fullUrl, {
         method: 'POST',
@@ -357,10 +352,8 @@ class ApiService {
 
       const data = await response.json()
 
-      if (__DEV__) {
-        console.log(`📥 [API] UPLOAD ${url} - Status:`, response.status)
-        console.log(`📥 [API] Response:`, JSON.stringify(data).substring(0, 200))
-      }
+      apiLogger.debug(`UPLOAD ${url} - Status:`, response.status)
+      apiLogger.debug('Response:', JSON.stringify(data).substring(0, 200))
 
       if (!response.ok) {
         const error: any = new Error(data.message || 'Upload failed')
@@ -371,7 +364,7 @@ class ApiService {
 
       return data as T
     } catch (error: any) {
-      console.error(`❌ [API] UPLOAD ${url} - Erreur:`, error?.message || error)
+      apiLogger.error(`UPLOAD ${url} - Erreur:`, error?.message || error)
       throw error
     }
   }
@@ -383,10 +376,11 @@ class ApiService {
 
     if (response.success && response.data.token) {
       try {
-        // Sauvegarder le token et les données utilisateur
-        await AsyncStorage.setItem('auth_token', response.data.token)
+        // BUG FIX #C-006: Use SecureStore for token storage
+        await secureStorage.setToken(response.data.token)
       } catch (error) {
-        // Ne pas échouer si AsyncStorage échoue - juste en continuer
+        // Ne pas échouer si le stockage échoue - juste continuer
+        apiLogger.error('Failed to store token:', error)
       }
 
       await this.setStoredUser(response.data.user)
@@ -399,7 +393,8 @@ class ApiService {
     const response = await this.request<AuthResponse>('POST', '/auth/register', data)
 
     if (response.success && response.data.token) {
-      await AsyncStorage.setItem('auth_token', response.data.token)
+      // BUG FIX #C-006: Use SecureStore for token storage
+      await secureStorage.setToken(response.data.token)
       await this.setStoredUser(response.data.user)
     }
 
@@ -411,10 +406,10 @@ class ApiService {
       await this.request('POST', '/auth/logout')
     } catch (error) {
       // Continuer même si l'API échoue (log silencieux)
-      console.log('Info: Logout API call failed, proceeding with local cleanup')
+      apiLogger.info('Logout API call failed, proceeding with local cleanup')
     } finally {
-      // Toujours nettoyer le stockage local
-      await AsyncStorage.multiRemove(['auth_token', 'user_data'])
+      // BUG FIX #C-006: Use SecureStore for clearing auth data
+      await secureStorage.clearAll()
       await this.setStoredUser(null)
     }
   }
@@ -480,16 +475,16 @@ class ApiService {
   async createReservation(payload: ReservationCreationPayload): Promise<ReservationCreationResponse> {
     // Transformer camelCase → snake_case pour Laravel
     const snakeCasePayload = toSnakeCase(payload)
-    console.log('📤 [API] createReservation payload:', JSON.stringify(snakeCasePayload, null, 2))
+    apiLogger.debug('createReservation payload:', JSON.stringify(snakeCasePayload, null, 2))
     try {
       const response = await this.request<ReservationCreationResponse>('POST', '/reservations', snakeCasePayload)
-      console.log('✅ [API] createReservation response:', JSON.stringify(response, null, 2))
+      apiLogger.debug('createReservation response:', JSON.stringify(response, null, 2))
       return response
     } catch (error: any) {
-      console.error('❌ [API] createReservation error:', error)
-      console.error('❌ [API] Error message:', error.message)
-      console.error('❌ [API] Error statusCode:', error.statusCode)
-      console.error('❌ [API] Error validationErrors:', error.validationErrors)
+      apiLogger.error('createReservation error:', error)
+      apiLogger.debug('Error message:', error.message)
+      apiLogger.debug('Error statusCode:', error.statusCode)
+      apiLogger.debug('Error validationErrors:', error.validationErrors)
       throw error
     }
   }
@@ -505,9 +500,9 @@ class ApiService {
   }
 
   async getMyReservations(): Promise<ApiResponse<Reservation[]>> {
-    console.log('📥 [API] Fetching my reservations...')
+    apiLogger.debug('Fetching my reservations...')
     const response = await this.request<ApiResponse<Reservation[]>>('GET', '/reservations')
-    console.log('✅ [API] Reservations received:', {
+    apiLogger.debug('Reservations received:', {
       success: response.success,
       count: response.data?.length || 0,
       reservations: response.data?.map(r => ({ id: r.id, code: r.reservation_code, status: r.status }))
@@ -531,15 +526,15 @@ class ApiService {
 
   async createOrder(payload: OrderCreationPayload): Promise<OrderCreationResponse> {
     const snakeCasePayload = toSnakeCase(payload)
-    console.log('📤 [API] createOrder payload:', JSON.stringify(snakeCasePayload, null, 2))
+    apiLogger.debug('createOrder payload:', JSON.stringify(snakeCasePayload, null, 2))
     try {
       const response = await this.request<OrderCreationResponse>('POST', '/orders', snakeCasePayload)
-      console.log('✅ [API] createOrder response:', JSON.stringify(response, null, 2))
+      apiLogger.debug('createOrder response:', JSON.stringify(response, null, 2))
       return response
     } catch (error: any) {
-      console.error('❌ [API] createOrder error:', error)
-      console.error('❌ [API] Error message:', error.message)
-      console.error('❌ [API] Error statusCode:', error.statusCode)
+      apiLogger.error('createOrder error:', error)
+      apiLogger.debug('Error message:', error.message)
+      apiLogger.debug('Error statusCode:', error.statusCode)
       throw error
     }
   }
@@ -891,40 +886,41 @@ class ApiService {
     }
   }
 
+  // BUG FIX #C-006: Use SecureStore for user data
   async setStoredUser(user: User | null): Promise<void> {
     try {
       if (user) {
-        await AsyncStorage.setItem('user_data', JSON.stringify(user))
+        await secureStorage.setUserData(user)
       } else {
-        await AsyncStorage.removeItem('user_data')
+        await secureStorage.removeUserData()
       }
     } catch (error) {
       // Ignorer les erreurs de persistance pour éviter de casser le flux utilisateur
+      apiLogger.error('Failed to store user data:', error)
     }
   }
 
-  // Récupérer les données utilisateur depuis le stockage local
+  // Récupérer les données utilisateur depuis le stockage sécurisé
   async getStoredUser(): Promise<User | null> {
     try {
-      const userData = await AsyncStorage.getItem('user_data')
-      return userData ? JSON.parse(userData) : null
+      return await secureStorage.getUserData<User>()
     } catch (error) {
       return null
     }
   }
 
-  // Récupérer le token depuis le stockage local
+  // Récupérer le token depuis le stockage sécurisé
   async getStoredToken(): Promise<string | null> {
-    return await AsyncStorage.getItem('auth_token')
+    return await secureStorage.getToken()
   }
 
   // Nettoyer les données d'authentification stockées
   async clearStoredAuth(): Promise<void> {
     try {
-      await AsyncStorage.multiRemove(['auth_token', 'user_data'])
-      console.log('🧹 [API] Données d\'authentification nettoyées')
+      await secureStorage.clearAll()
+      apiLogger.log('Données d\'authentification nettoyées')
     } catch (error) {
-      console.error('❌ [API] Erreur lors du nettoyage des données d\'auth:', error)
+      apiLogger.error('Erreur lors du nettoyage des données d\'auth:', error)
     }
   }
 }

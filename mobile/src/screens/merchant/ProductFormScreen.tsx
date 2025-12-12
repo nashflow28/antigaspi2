@@ -22,15 +22,40 @@ import { Product } from '../../types'
 import apiService from '../../services/api'
 import { getImageUrl } from '../../utils/imageHelpers'
 import { TEST_IDS } from '../../utils/testIds'
+import { usePersistedForm } from '../../hooks/usePersistedForm'
 
 interface Props {
   route: any
   navigation: any
 }
 
+// Type pour les données de formulaire persistées
+interface ProductFormData {
+  name: string
+  description: string
+  originalPrice: string
+  discountedPrice: string
+  quantity: string
+  // expirationDate is stored as ISO string for JSON serialization
+  expirationDateISO: string
+}
+
+const getDefaultExpirationDate = () => new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
+
+const INITIAL_FORM_DATA: ProductFormData = {
+  name: '',
+  description: '',
+  originalPrice: '',
+  discountedPrice: '',
+  quantity: '',
+  expirationDateISO: getDefaultExpirationDate().toISOString(),
+}
+
 const ProductFormScreen: React.FC<Props> = ({ route, navigation }) => {
   const theme = useTheme()
   const { mode, product } = route.params || { mode: 'create', product: null }
+
+  const isCreateMode = mode === 'create'
 
   const [loading, setLoading] = useState(false)
 
@@ -40,24 +65,73 @@ const ProductFormScreen: React.FC<Props> = ({ route, navigation }) => {
   const [errorMessages, setErrorMessages] = useState<string[]>([])
   const [errorType, setErrorType] = useState<'error' | 'warning'>('error')
 
-  // Form state
-  const [name, setName] = useState(product?.name || '')
-  const [description, setDescription] = useState(product?.description || '')
-  // categoryId removed - automatically uses merchant's category
-  const [originalPrice, setOriginalPrice] = useState(product?.original_price || '')
-  const [discountedPrice, setDiscountedPrice] = useState(product?.discounted_price || '')
-  const [quantity, setQuantity] = useState(product?.quantity_available?.toString() || '')
-  // Date d'expiration avec DateTimePicker
-  const [expirationDate, setExpirationDate] = useState<Date>(() => {
-    if (product?.expiration_date) {
-      const parsed = new Date(product.expiration_date)
-      return isNaN(parsed.getTime()) ? new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) : parsed
+  // Formulaire persisté (seulement en mode création)
+  const getInitialFormData = (): ProductFormData => {
+    if (product) {
+      // Mode édition - charger les données du produit
+      const expDate = product.expiration_date
+        ? new Date(product.expiration_date)
+        : getDefaultExpirationDate()
+      return {
+        name: product.name || '',
+        description: product.description || '',
+        originalPrice: product.original_price?.toString() || '',
+        discountedPrice: product.discounted_price?.toString() || '',
+        quantity: product.quantity_available?.toString() || '',
+        expirationDateISO: isNaN(expDate.getTime()) ? getDefaultExpirationDate().toISOString() : expDate.toISOString(),
+      }
     }
-    // Par défaut: 7 jours dans le futur
-    return new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
+    return INITIAL_FORM_DATA
+  }
+
+  const {
+    formData,
+    setFormData,
+    setField,
+    clearCache: clearFormCache,
+    hasUnsavedChanges,
+    isRestored,
+  } = usePersistedForm<ProductFormData>({
+    formKey: isCreateMode ? 'merchant_product_create_form' : `merchant_product_edit_${product?.id}`,
+    initialValues: getInitialFormData(),
+    expiresIn: 2 * 60 * 60 * 1000, // 2 heures
   })
+
+  // Convert expirationDateISO to Date object for DateTimePicker
+  const expirationDate = new Date(formData.expirationDateISO)
+  const setExpirationDate = (date: Date) => {
+    setField('expirationDateISO', date.toISOString())
+  }
+
   const [showDatePicker, setShowDatePicker] = useState(false)
   const [imageUri, setImageUri] = useState<string | null>(product?.image_url ? getImageUrl(product.image_url) : null)
+
+  // Show draft restoration alert in create mode
+  useEffect(() => {
+    if (isCreateMode && isRestored && hasUnsavedChanges) {
+      const hasMeaningfulData = formData.name || formData.description || formData.originalPrice
+      if (hasMeaningfulData) {
+        Alert.alert(
+          'Brouillon récupéré',
+          'Nous avons retrouvé un produit en cours de création. Voulez-vous le reprendre ?',
+          [
+            {
+              text: 'Recommencer',
+              style: 'destructive',
+              onPress: () => {
+                setFormData(INITIAL_FORM_DATA)
+                clearFormCache()
+              },
+            },
+            {
+              text: 'Reprendre',
+              style: 'default',
+            },
+          ]
+        )
+      }
+    }
+  }, [isRestored])
 
   // Formater la date en JJ/MM/AAAA pour l'affichage
   const formatDateDisplay = (date: Date): string => {
@@ -190,21 +264,21 @@ const ProductFormScreen: React.FC<Props> = ({ route, navigation }) => {
 
   const validateForm = (): boolean => {
     console.log('🔵 validateForm appelé')
-    if (!name.trim()) {
+    if (!formData.name.trim()) {
       console.error('❌ Nom du produit requis')
       showErrorModal('Erreur de validation', ['Le nom du produit est requis'], 'error')
       return false
     }
     // categoryId validation removed - automatically uses merchant's category
-    const originalPriceNum = parseFloat(originalPrice)
-    if (!originalPrice || isNaN(originalPriceNum) || originalPriceNum <= 0) {
-      console.error('❌ Prix original invalide:', originalPrice)
+    const originalPriceNum = parseFloat(formData.originalPrice)
+    if (!formData.originalPrice || isNaN(originalPriceNum) || originalPriceNum <= 0) {
+      console.error('❌ Prix original invalide:', formData.originalPrice)
       showErrorModal('Erreur de validation', ['Le prix original doit être un nombre valide supérieur à 0'], 'error')
       return false
     }
-    const discountedPriceNum = parseFloat(discountedPrice)
-    if (!discountedPrice || isNaN(discountedPriceNum) || discountedPriceNum <= 0) {
-      console.error('❌ Prix réduit invalide:', discountedPrice)
+    const discountedPriceNum = parseFloat(formData.discountedPrice)
+    if (!formData.discountedPrice || isNaN(discountedPriceNum) || discountedPriceNum <= 0) {
+      console.error('❌ Prix réduit invalide:', formData.discountedPrice)
       showErrorModal('Erreur de validation', ['Le prix réduit doit être un nombre valide supérieur à 0'], 'error')
       return false
     }
@@ -213,10 +287,10 @@ const ProductFormScreen: React.FC<Props> = ({ route, navigation }) => {
       showErrorModal('Erreur de validation', ['Le prix réduit doit être inférieur au prix original'], 'error')
       return false
     }
-    const quantityNum = parseInt(quantity)
+    const quantityNum = parseInt(formData.quantity)
     // 🐛 BUG FIX #29: Backend requires quantity >= 1, not 0
-    if (!quantity || isNaN(quantityNum) || quantityNum < 1) {
-      console.error('❌ Quantité invalide:', quantity)
+    if (!formData.quantity || isNaN(quantityNum) || quantityNum < 1) {
+      console.error('❌ Quantité invalide:', formData.quantity)
       showErrorModal('Erreur de validation', ['La quantité doit être au minimum 1'], 'error')
       return false
     }
@@ -226,7 +300,7 @@ const ProductFormScreen: React.FC<Props> = ({ route, navigation }) => {
 
   const handleSubmit = async () => {
     console.log('🔴 handleSubmit appelé')
-    console.log('Form data:', { name, originalPrice, discountedPrice, quantity, expirationDate })
+    console.log('Form data:', { name: formData.name, originalPrice: formData.originalPrice, discountedPrice: formData.discountedPrice, quantity: formData.quantity, expirationDate })
 
     if (!validateForm()) {
       console.log('❌ Validation échouée')
@@ -251,12 +325,12 @@ const ProductFormScreen: React.FC<Props> = ({ route, navigation }) => {
       }
 
       const productData = {
-        name: name.trim(),
-        description: description?.trim() || null,
+        name: formData.name.trim(),
+        description: formData.description?.trim() || null,
         // category_id removed - automatically uses merchant's category
-        original_price: parseFloat(originalPrice),
-        discounted_price: parseFloat(discountedPrice),
-        quantity_available: parseInt(quantity, 10),
+        original_price: parseFloat(formData.originalPrice),
+        discounted_price: parseFloat(formData.discountedPrice),
+        quantity_available: parseInt(formData.quantity, 10),
         expiration_date: formatDateForAPI(expirationDate),
         image_url: uploadedImageUrl,
       }
@@ -268,11 +342,15 @@ const ProductFormScreen: React.FC<Props> = ({ route, navigation }) => {
         const response = await apiService.post('/products', productData)
         // 🐛 BUG FIX #24: apiService.post() returns response.data directly
         console.log('✅ Réponse API reçue:', response)
+        // Clear form cache on successful creation
+        await clearFormCache()
         showSuccessModal('Le produit a été créé avec succès.')
       } else {
         const response = await apiService.put(`/products/${product.id}`, productData)
         // 🐛 BUG FIX #24: apiService.put() returns response.data directly
         console.log('✅ Réponse API reçue:', response)
+        // Clear form cache on successful edit
+        await clearFormCache()
         showSuccessModal('Le produit a été modifié avec succès.')
       }
 
@@ -494,8 +572,8 @@ const ProductFormScreen: React.FC<Props> = ({ route, navigation }) => {
           <Text style={[styles.label, { color: theme.colors.text }]}>Nom du produit *</Text>
           <TextInput
             style={[styles.input, { backgroundColor: theme.colors.inputBackground, color: theme.colors.text, borderColor: theme.colors.border }]}
-            value={name}
-            onChangeText={setName}
+            value={formData.name}
+            onChangeText={(v) => setField('name', v)}
             placeholder="Ex: Pain complet artisanal"
             placeholderTextColor={theme.colors.textSecondary}
             testID={TEST_IDS.productNameInput}
@@ -507,8 +585,8 @@ const ProductFormScreen: React.FC<Props> = ({ route, navigation }) => {
           <Text style={[styles.label, { color: theme.colors.text }]}>Description</Text>
           <TextInput
             style={[styles.input, styles.textArea, { backgroundColor: theme.colors.inputBackground, color: theme.colors.text, borderColor: theme.colors.border }]}
-            value={description}
-            onChangeText={setDescription}
+            value={formData.description}
+            onChangeText={(v) => setField('description', v)}
             placeholder="Décrivez votre produit..."
             placeholderTextColor={theme.colors.textSecondary}
             multiline
@@ -534,8 +612,8 @@ const ProductFormScreen: React.FC<Props> = ({ route, navigation }) => {
             <Text style={[styles.label, { color: theme.colors.text }]}>Prix original *</Text>
             <TextInput
               style={[styles.input, { backgroundColor: theme.colors.inputBackground, color: theme.colors.text, borderColor: theme.colors.border }]}
-              value={originalPrice}
-              onChangeText={setOriginalPrice}
+              value={formData.originalPrice}
+              onChangeText={(v) => setField('originalPrice', v)}
               placeholder="500"
               placeholderTextColor={theme.colors.textSecondary}
               keyboardType="numeric"
@@ -547,8 +625,8 @@ const ProductFormScreen: React.FC<Props> = ({ route, navigation }) => {
             <Text style={[styles.label, { color: theme.colors.text }]}>Prix réduit *</Text>
             <TextInput
               style={[styles.input, { backgroundColor: theme.colors.inputBackground, color: theme.colors.text, borderColor: theme.colors.border }]}
-              value={discountedPrice}
-              onChangeText={setDiscountedPrice}
+              value={formData.discountedPrice}
+              onChangeText={(v) => setField('discountedPrice', v)}
               placeholder="250"
               placeholderTextColor={theme.colors.textSecondary}
               keyboardType="numeric"
@@ -562,8 +640,8 @@ const ProductFormScreen: React.FC<Props> = ({ route, navigation }) => {
           <Text style={[styles.label, { color: theme.colors.text }]}>Quantité disponible *</Text>
           <TextInput
             style={[styles.input, { backgroundColor: theme.colors.inputBackground, color: theme.colors.text, borderColor: theme.colors.border }]}
-            value={quantity}
-            onChangeText={setQuantity}
+            value={formData.quantity}
+            onChangeText={(v) => setField('quantity', v)}
             placeholder="10"
             placeholderTextColor={theme.colors.textSecondary}
             keyboardType="numeric"

@@ -33,6 +33,7 @@ import searchService, {
   type MerchantSearchResult,
   type ProductSearchResult,
 } from '../../services/searchService'
+import { getCategoryIcon, getCategoryIconConfig, IoniconName } from '../../constants/categoryIcons'
 
 interface Props {
   navigation: any
@@ -114,8 +115,9 @@ const ProductsScreen: React.FC<Props> = ({ navigation }) => {
       id: result.id,
       name: attributes.name ?? 'Produit',
       description: attributes.description ?? '',
-      original_price: String(safeOriginal),
-      discounted_price: String(safeDiscounted),
+      // BUG FIX #M-004: Prices are now numbers in Product type
+      original_price: safeOriginal,
+      discounted_price: safeDiscounted,
       quantity_available: safeQuantity,
       expiration_date: expirationDate,
       image_url: typeof attributes.image_url === 'string' ? attributes.image_url : (attributes.image_url as any as string | undefined),
@@ -577,19 +579,33 @@ const ProductsScreen: React.FC<Props> = ({ navigation }) => {
     // des OUTPUTS de ce useEffect, pas des inputs. Les inclure causait une boucle infinie.
   ])
 
-  // Mapping emojis pour les catégories
-  const getCategoryEmoji = (categoryName: string) => {
-    const name = categoryName.toLowerCase()
-    if (name.includes('boulang') || name.includes('pain')) return '🥐'
-    if (name.includes('fruit') || name.includes('légume') || name.includes('legume')) return '🥕'
-    if (name.includes('viande') || name.includes('plat')) return '🥩'
-    if (name.includes('épice') || name.includes('epicerie')) return '🥫'
-    if (name.includes('laitage') || name.includes('produit laitier')) return '🥛'
-    return '🛍️'
+  /**
+   * BUG FIX #L-001: Use vector icons from categoryIcons.ts for UI components
+   */
+  const getCategoryIconName = (categoryName: string): IoniconName => {
+    return getCategoryIcon(categoryName)
   }
 
-  // Emoji dynamique basé sur le type de commerce
-  const getMerchantEmoji = (businessType: string) => {
+  /**
+   * Get icon configuration for a category (includes color)
+   */
+  const getCategoryIconWithColor = (categoryName: string) => {
+    return getCategoryIconConfig(categoryName)
+  }
+
+  /**
+   * Get Ionicon name for merchant UI components
+   * BUG FIX #L-001: Use vector icons instead of emojis
+   */
+  const getMerchantIcon = (businessType: string): IoniconName => {
+    return getCategoryIcon(businessType)
+  }
+
+  /**
+   * Get emoji for map markers (HTML/WebView context requires text emojis)
+   * Note: Map markers are rendered in HTML where Ionicons don't work
+   */
+  const getMerchantMapEmoji = (businessType: string): string => {
     const type = businessType.toLowerCase()
     if (type.includes('boulang')) return '🥐'
     if (type.includes('fruit') || type.includes('legume') || type.includes('bio')) return '🥕'
@@ -634,7 +650,11 @@ const ProductsScreen: React.FC<Props> = ({ navigation }) => {
               />
             ) : (
               <View style={styles.merchantImagePlaceholder}>
-                <Text style={styles.merchantEmoji}>{getMerchantEmoji(merchant.business_type)}</Text>
+                <Ionicons
+                  name={getMerchantIcon(merchant.business_type)}
+                  size={40}
+                  color={theme.colors.primary[500]}
+                />
               </View>
             )}
 
@@ -719,8 +739,9 @@ const ProductsScreen: React.FC<Props> = ({ navigation }) => {
   }
 
   const renderProductCard = (product: Product) => {
-    const discountedPrice = Math.round(parseFloat(product.discounted_price) || 0)
-    const originalPrice = Math.round(parseFloat(product.original_price) || 0)
+    // BUG FIX #M-004: Prices are now normalized as numbers in productsSlice
+    const discountedPrice = Math.round(product.discounted_price || 0)
+    const originalPrice = Math.round(product.original_price || 0)
     // Protection contre division par zéro pour produits gratuits/invalides
     const discountPercent = originalPrice > 0
       ? Math.round(((originalPrice - discountedPrice) / originalPrice) * 100)
@@ -797,6 +818,7 @@ const ProductsScreen: React.FC<Props> = ({ navigation }) => {
   }
 
   // Prepare map markers from merchants with coordinates
+  // Note: Map markers use emojis (HTML context) not Ionicons
   const mapMarkers: MapMarker[] = useMemo(() => {
     return merchantsWithCoordinates.map(({ merchant }) => ({
       id: merchant.id,
@@ -804,7 +826,7 @@ const ProductsScreen: React.FC<Props> = ({ navigation }) => {
       longitude: merchant.longitude as number,
       title: merchant.business_name,
       subtitle: merchant.business_type || merchant.user?.city,
-      emoji: getMerchantEmoji(merchant.business_type || ''),
+      emoji: getMerchantMapEmoji(merchant.business_type || ''),
     }))
   }, [merchantsWithCoordinates])
 
@@ -952,14 +974,12 @@ const ProductsScreen: React.FC<Props> = ({ navigation }) => {
             style={[styles.categoryChip, selectedCategory === 'all' && styles.categoryChipActive]}
             onPress={() => setSelectedCategory('all')}
           >
-            <Text
-              style={[
-                styles.categoryEmoji,
-                selectedCategory === 'all' && styles.categoryEmojiActive,
-              ]}
-            >
-              🛍️
-            </Text>
+            <Ionicons
+              name="pricetag-outline"
+              size={18}
+              color={selectedCategory === 'all' ? theme.colors.primary[600] : theme.colors.neutral[500]}
+              style={styles.categoryIcon}
+            />
             <Typography
               variant="caption"
               weight="medium"
@@ -973,34 +993,36 @@ const ProductsScreen: React.FC<Props> = ({ navigation }) => {
               Tous
             </Typography>
           </TouchableOpacity>
-          {categories.map(category => (
-            <TouchableOpacity
-              key={category.id}
-              style={[styles.categoryChip, selectedCategory === category.id.toString() && styles.categoryChipActive]}
-              onPress={() => setSelectedCategory(category.id.toString())}
-            >
-              <Text
-                style={[
-                  styles.categoryEmoji,
-                  selectedCategory === category.id.toString() && styles.categoryEmojiActive,
-                ]}
+          {categories.map(category => {
+            const iconConfig = getCategoryIconWithColor(category.name)
+            const isSelected = selectedCategory === category.id.toString()
+            return (
+              <TouchableOpacity
+                key={category.id}
+                style={[styles.categoryChip, isSelected && styles.categoryChipActive]}
+                onPress={() => setSelectedCategory(category.id.toString())}
               >
-                {getCategoryEmoji(category.name)}
-              </Text>
-              <Typography
-                variant="caption"
-                weight="medium"
-                style={[
-                  styles.categoryChipLabel,
-                  selectedCategory === category.id.toString() && styles.categoryChipLabelActive,
-                ]}
-                numberOfLines={1}
-                ellipsizeMode="tail"
-              >
-                {category.name}
-              </Typography>
-            </TouchableOpacity>
-          ))}
+                <Ionicons
+                  name={iconConfig.name}
+                  size={18}
+                  color={isSelected ? iconConfig.color : theme.colors.neutral[500]}
+                  style={styles.categoryIcon}
+                />
+                <Typography
+                  variant="caption"
+                  weight="medium"
+                  style={[
+                    styles.categoryChipLabel,
+                    isSelected && styles.categoryChipLabelActive,
+                  ]}
+                  numberOfLines={1}
+                  ellipsizeMode="tail"
+                >
+                  {category.name}
+                </Typography>
+              </TouchableOpacity>
+            )
+          })}
         </ScrollView>
       )}
 
@@ -1308,13 +1330,8 @@ const createStyles = (theme: ReturnType<typeof useTheme>) => StyleSheet.create({
     height: 32, // FIX: Hauteur fixe pour éviter la déformation
     maxHeight: 32, // FIX: Hauteur maximale pour empêcher l'expansion
   },
-  categoryEmoji: {
-    fontSize: 14,
+  categoryIcon: {
     marginRight: 4,
-    color: theme.colors.interactiveText,
-  },
-  categoryEmojiActive: {
-    color: theme.colors.interactiveTextActive,
   },
   categoryChipLabel: {
     maxWidth: 120,
@@ -1390,9 +1407,6 @@ const createStyles = (theme: ReturnType<typeof useTheme>) => StyleSheet.create({
   },
   merchantImage: {
     ...StyleSheet.absoluteFillObject, // Remplit tout le container
-  },
-  merchantEmoji: {
-    fontSize: 36,
   },
   productCountBadge: {
     position: 'absolute',

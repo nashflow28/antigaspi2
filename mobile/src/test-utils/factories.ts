@@ -49,8 +49,9 @@ export const createTestProduct = (overrides?: Partial<Product>): Product => ({
   id: 1,
   name: 'Pain complet artisanal',
   description: 'Pain bio fait maison',
-  original_price: '500',
-  discounted_price: '250',
+  // BUG FIX #M-004: Prices are now numbers
+  original_price: 500,
+  discounted_price: 250,
   quantity_available: 10,
   expiration_date: '2025-10-21',
   image_url: 'https://images.unsplash.com/photo-1509440159596-0249088772ff',

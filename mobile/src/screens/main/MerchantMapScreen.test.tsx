@@ -11,9 +11,12 @@ jest.mock('react-native-maps', () => {
   const { View } = require('react-native')
 
   // Create components that render their children properly
-  const MockMapView = (props) => React.createElement(View, { testID: props.testID }, props.children)
-  const MockMarker = (props) => React.createElement(View, { testID: props.testID }, props.children)
-  const MockCallout = (props) => React.createElement(View, { testID: props.testID }, props.children)
+  const MockMapView = (props: { testID?: string; children?: React.ReactNode }) =>
+    React.createElement(View, { testID: props.testID }, props.children)
+  const MockMarker = (props: { testID?: string; children?: React.ReactNode }) =>
+    React.createElement(View, { testID: props.testID }, props.children)
+  const MockCallout = (props: { testID?: string; children?: React.ReactNode }) =>
+    React.createElement(View, { testID: props.testID }, props.children)
   const MockUrlTile = () => null
 
   return {

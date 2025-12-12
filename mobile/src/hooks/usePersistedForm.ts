@@ -1,6 +1,9 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
 import AsyncStorage from '@react-native-async-storage/async-storage'
+import isEqual from 'lodash/isEqual'
+import { createLogger } from '../utils/logger'
 
+const formLogger = createLogger('FormCache')
 const FORM_CACHE_PREFIX = '@form_cache_'
 const DEBOUNCE_DELAY = 500 // ms
 
@@ -50,15 +53,15 @@ export function usePersistedForm<T extends Record<string, any>>({
             setFormData(parsedCache.data)
             setHasUnsavedChanges(true)
             onRestore?.(parsedCache.data)
-            console.log(`📦 [FormCache] Restored form data for: ${formKey}`)
+            formLogger.log(`Restored form data for: ${formKey}`)
           } else {
             // Cache expired, remove it
             await AsyncStorage.removeItem(storageKey)
-            console.log(`🗑️ [FormCache] Expired cache removed for: ${formKey}`)
+            formLogger.log(`Expired cache removed for: ${formKey}`)
           }
         }
       } catch (error) {
-        console.error(`❌ [FormCache] Error loading cache for ${formKey}:`, error)
+        formLogger.error(`Error loading cache for ${formKey}:`, error)
       } finally {
         setIsRestored(true)
       }
@@ -76,9 +79,9 @@ export function usePersistedForm<T extends Record<string, any>>({
         expiresAt: Date.now() + expiresIn,
       }
       await AsyncStorage.setItem(storageKey, JSON.stringify(cacheData))
-      console.log(`💾 [FormCache] Saved form data for: ${formKey}`)
+      formLogger.debug(`Saved form data for: ${formKey}`)
     } catch (error) {
-      console.error(`❌ [FormCache] Error saving cache for ${formKey}:`, error)
+      formLogger.error(`Error saving cache for ${formKey}:`, error)
     }
   }, [formKey, storageKey, expiresIn])
 
@@ -113,9 +116,9 @@ export function usePersistedForm<T extends Record<string, any>>({
       }
       await AsyncStorage.removeItem(storageKey)
       setHasUnsavedChanges(false)
-      console.log(`🧹 [FormCache] Cleared cache for: ${formKey}`)
+      formLogger.debug(`Cleared cache for: ${formKey}`)
     } catch (error) {
-      console.error(`❌ [FormCache] Error clearing cache for ${formKey}:`, error)
+      formLogger.error(`Error clearing cache for ${formKey}:`, error)
     }
   }, [formKey, storageKey])
 
@@ -126,8 +129,9 @@ export function usePersistedForm<T extends Record<string, any>>({
   }, [initialValues, clearCache])
 
   // Check if form has been modified from initial values
+  // BUG FIX #M-003: Use lodash isEqual instead of JSON.stringify for efficient deep comparison
   const isDirty = useCallback(() => {
-    return JSON.stringify(formData) !== JSON.stringify(initialValues)
+    return !isEqual(formData, initialValues)
   }, [formData, initialValues])
 
   // Cleanup on unmount
@@ -160,10 +164,10 @@ export async function clearAllFormCaches(): Promise<void> {
     const formCacheKeys = allKeys.filter(key => key.startsWith(FORM_CACHE_PREFIX))
     if (formCacheKeys.length > 0) {
       await AsyncStorage.multiRemove(formCacheKeys)
-      console.log(`🧹 [FormCache] Cleared ${formCacheKeys.length} form caches`)
+      formLogger.log(`Cleared ${formCacheKeys.length} form caches`)
     }
   } catch (error) {
-    console.error('❌ [FormCache] Error clearing all caches:', error)
+    formLogger.error('Error clearing all caches:', error)
   }
 }
 

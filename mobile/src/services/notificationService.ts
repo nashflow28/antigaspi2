@@ -10,6 +10,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios, { AxiosInstance } from 'axios';
 import { designSystem2025 } from '../theme/designSystem2025';
 import { getExpoExtraValue } from '../utils/expoConfig';
+// BUG FIX #C-006: Use SecureStore for sensitive authentication data
+import { secureStorage } from './secureStorage';
 
 // Configuration dynamique de l'API via app.json
 const getApiBaseUrl = (): string => {
@@ -105,7 +107,8 @@ class NotificationService {
 
     this.http.interceptors.request.use(
       async (config) => {
-        const token = await AsyncStorage.getItem('auth_token');
+        // BUG FIX #C-006: Use SecureStore for token retrieval
+        const token = await secureStorage.getToken();
 
         if (token && config.headers) {
           config.headers.Authorization = `Bearer ${token}`;

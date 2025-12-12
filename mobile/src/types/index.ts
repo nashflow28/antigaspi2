@@ -53,8 +53,9 @@ export interface Product {
   id: number
   name: string
   description: string
-  original_price: string
-  discounted_price: string
+  // BUG FIX #M-004: Prices are now numbers (normalized from API which may return strings)
+  original_price: number
+  discounted_price: number
   quantity_available: number
   expiration_date: string
   image_url?: string

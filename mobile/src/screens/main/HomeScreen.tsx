@@ -25,6 +25,7 @@ import FavoriteButton from '../../components/FavoriteButton'
 import locationService, { UserLocation } from '../../services/locationService'
 import { Button, Card, Badge, Typography, ProductCardSkeleton, EmptyState } from '../../components/2025'
 import { TEST_IDS } from '../../utils/testIds'
+import { getCategoryIconConfig, IoniconName } from '../../constants/categoryIcons'
 
 interface Props {
   navigation: any
@@ -170,21 +171,12 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
     })
   }, [filteredProducts, distanceEnabled, userLocation])
 
-  // Mapping des emojis par catégorie
-  const getCategoryEmoji = (categoryName: string) => {
-    const name = categoryName.toLowerCase()
-    if (name.includes('boulang') || name.includes('pain')) return '🥐'
-    if (name.includes('fruit') || name.includes('légume') || name.includes('legume')) return '🥕'
-    if (name.includes('plat') || name.includes('préparé') || name.includes('prepare')) return '🍲'
-    if (name.includes('viande') || name.includes('boucher')) return '🥩'
-    if (name.includes('épice') || name.includes('epicerie')) return '🥫'
-    if (name.includes('lait') || name.includes('fromage') || name.includes('yaourt')) return '🧀'
-    if (name.includes('poisson') || name.includes('mer')) return '🐟'
-    return '🛍️'
-  }
-
-  const renderCategoryItem = (id: string, name: string, emoji: string) => {
+  /**
+   * BUG FIX #L-001: Use vector icons from categoryIcons.ts instead of emojis
+   */
+  const renderCategoryItem = (id: string, name: string, categoryName: string) => {
     const isActive = selectedCategory === id
+    const iconConfig = getCategoryIconConfig(categoryName)
     return (
       <TouchableOpacity
         key={id}
@@ -194,14 +186,12 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
         ]}
         onPress={() => setSelectedCategory(id)}
       >
-        <Text
-          style={[
-            styles.categoryEmoji,
-            isActive && styles.categoryEmojiActive,
-          ]}
-        >
-          {emoji}
-        </Text>
+        <Ionicons
+          name={iconConfig.name}
+          size={20}
+          color={isActive ? iconConfig.color : '#6B7280'}
+          style={styles.categoryIcon}
+        />
         <Typography
           variant="caption"
           weight="medium"
@@ -276,8 +266,9 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
 
   const renderProductCard = (product: Product, index?: number) => {
     const timeSlot = getTimeSlot(product)
-    const discountedPrice = Math.round(parseFloat(product.discounted_price) || 0)
-    const originalPrice = Math.round(parseFloat(product.original_price) || 0)
+    // BUG FIX #M-004: Prices are now normalized as numbers in productsSlice
+    const discountedPrice = Math.round(product.discounted_price || 0)
+    const originalPrice = Math.round(product.original_price || 0)
 
     // 🐛 FIX: Prevent division by zero
     const discountPercent = originalPrice > 0
@@ -445,7 +436,7 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
           style={styles.categoriesScroll}
           contentContainerStyle={styles.categoriesContent}
         >
-          {renderCategoryItem('all', `Tous (${products?.length || 0})`, '🛍️')}
+          {renderCategoryItem('all', `Tous (${products?.length || 0})`, 'default')}
           {categories && Array.isArray(categories) && categories.map(category => {
             // Compter produits par catégorie (avec filtre disponibilité)
             const categoryProductCount = (products || []).filter(
@@ -456,7 +447,7 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
             return renderCategoryItem(
               category.id.toString(),
               `${category.name} (${categoryProductCount})`,
-              getCategoryEmoji(category.name)
+              category.name
             )
           })}
         </ScrollView>
@@ -740,13 +731,8 @@ const createStyles = (theme: ReturnType<typeof useTheme>) => StyleSheet.create({
     backgroundColor: theme.colors.interactiveSurfaceActive,
     borderColor: theme.colors.interactiveBorderActive,
   },
-  categoryEmoji: {
-    fontSize: 20,
+  categoryIcon: {
     marginRight: 6,
-    color: theme.colors.interactiveText,
-  },
-  categoryEmojiActive: {
-    color: theme.colors.interactiveTextActive,
   },
   categoryLabel: {
     maxWidth: 120,

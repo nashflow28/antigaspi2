@@ -30,8 +30,9 @@ export const makeProduct = (
     id,
     name: `Produit ${id}`,
     description: 'Produit de test',
-    original_price: '1000',
-    discounted_price: '800',
+    // BUG FIX #M-004: Prices are now numbers
+    original_price: 1000,
+    discounted_price: 800,
     quantity_available: 5,
     expiration_date: new Date().toISOString(),
     image_url: `https://example.com/product-${id}.jpg`,

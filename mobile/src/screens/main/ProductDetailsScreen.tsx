@@ -153,8 +153,9 @@ const ProductDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
     )
   }
 
-  const discountedPrice = Math.round(parseFloat(product.discounted_price) || 0)
-  const originalPrice = Math.round(parseFloat(product.original_price) || 0)
+  // BUG FIX #M-004: Prices are now normalized as numbers in productsSlice
+  const discountedPrice = Math.round(product.discounted_price || 0)
+  const originalPrice = Math.round(product.original_price || 0)
   // Protection contre division par zéro
   const discountPercent = originalPrice > 0
     ? Math.round(((originalPrice - discountedPrice) / originalPrice) * 100)

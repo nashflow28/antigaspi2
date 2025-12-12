@@ -2,6 +2,20 @@ import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit'
 import { ProductsState, Product, Category, ProductFilters } from '../../types'
 import apiService from '../../services/api'
 import offlineService from '../../services/offlineService'
+import { storeLogger } from '../../utils/logger'
+
+/**
+ * BUG FIX #M-004: Normalize product prices to ensure they are always numbers
+ * The API may return prices as strings in some cases
+ */
+const normalizeProduct = (product: Product): Product => ({
+  ...product,
+  original_price: Number(product.original_price) || 0,
+  discounted_price: Number(product.discounted_price) || 0,
+})
+
+const normalizeProducts = (products: Product[]): Product[] =>
+  products.map(normalizeProduct)
 
 export const productsInitialState: ProductsState = {
   products: [],
@@ -43,7 +57,7 @@ const safeSetCache = async <T>(key: string, value: T): Promise<void> => {
   try {
     await offlineService.setCache(key, value)
   } catch (error) {
-    console.warn('[Cache] Failed to set cache:', key, error)
+    storeLogger.warn('Failed to set cache:', key, error)
     // Continuer malgré l'erreur de cache
   }
 }
@@ -52,7 +66,7 @@ const safeGetCache = async <T>(key: string): Promise<T | null> => {
   try {
     return await offlineService.getCache<T>(key)
   } catch (error) {
-    console.warn('[Cache] Failed to get cache:', key, error)
+    storeLogger.warn('Failed to get cache:', key, error)
     return null
   }
 }
@@ -96,7 +110,7 @@ const persistProductsList = async (cacheKey: string, products: Product[]): Promi
   )
   const failures = results.filter(r => r.status === 'rejected')
   if (failures.length > 0) {
-    console.warn(`[Cache] Failed to cache ${failures.length}/${products.length} products`)
+    storeLogger.warn(`Failed to cache ${failures.length}/${products.length} products`)
   }
 }
 
@@ -253,7 +267,8 @@ const productsSlice = createSlice({
       })
       .addCase(fetchProducts.fulfilled, (state, action: PayloadAction<Product[]>) => {
         state.loading = false
-        state.products = action.payload
+        // BUG FIX #M-004: Normalize prices to ensure they are numbers
+        state.products = normalizeProducts(action.payload)
         state.currentPage = 1
         state.hasMore = action.payload.length >= 20
         state.error = null
@@ -265,11 +280,13 @@ const productsSlice = createSlice({
 
       // Fetch single product
       .addCase(fetchProduct.fulfilled, (state, action: PayloadAction<Product>) => {
-        const existingIndex = state.products.findIndex(p => p.id === action.payload.id)
+        // BUG FIX #M-004: Normalize prices
+        const normalizedProduct = normalizeProduct(action.payload)
+        const existingIndex = state.products.findIndex(p => p.id === normalizedProduct.id)
         if (existingIndex !== -1) {
-          state.products[existingIndex] = action.payload
+          state.products[existingIndex] = normalizedProduct
         } else {
-          state.products.push(action.payload)
+          state.products.push(normalizedProduct)
         }
       })
 
@@ -295,7 +312,8 @@ const productsSlice = createSlice({
       })
       .addCase(fetchMoreProducts.fulfilled, (state, action: PayloadAction<Product[]>) => {
         state.loadingMore = false
-        state.products = mergeProductLists(state.products, action.payload)
+        // BUG FIX #M-004: Normalize prices
+        state.products = mergeProductLists(state.products, normalizeProducts(action.payload))
         state.currentPage += 1
         state.hasMore = action.payload.length >= 20
         state.error = null

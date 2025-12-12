@@ -16,8 +16,8 @@ import { fetchProduct } from '../../../store/slices/productsSlice'
 const mockProduct = createTestProduct({
   id: 42,
   name: 'Pain complet artisanal',
-  discounted_price: '250',
-  original_price: '500',
+  discounted_price: 250,
+  original_price: 500,
   quantity_available: 5,
   merchant: {
     id: 12,
