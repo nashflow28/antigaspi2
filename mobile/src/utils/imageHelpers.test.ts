@@ -10,9 +10,12 @@ jest.mock('../services/api', () => ({
 import { getImageUrl, getCategoryPlaceholder } from './imageHelpers'
 
 describe('imageHelpers', () => {
-  it('retourne placeholder si image manquante', () => {
+  it('retourne SVG data URI placeholder si image manquante', () => {
     const url = getImageUrl(null, 'Boulangerie')
-    expect(url).toContain('unsplash.com')
+    // New implementation returns SVG data URI with emoji (URL-encoded)
+    expect(url).toMatch(/^data:image\/svg\+xml,/)
+    // Check for croissant emoji (URL-encoded: %F0%9F%A5%90)
+    expect(url).toContain('%F0%9F%A5%90')
   })
 
   it('retourne URL inchangée si absolue', () => {
@@ -27,7 +30,18 @@ describe('imageHelpers', () => {
 
   it('placeholder générique si catégorie inconnue', () => {
     const ph = getCategoryPlaceholder('inconnue')
-    expect(ph).toContain('placeholder')
+    // Returns SVG data URI with shopping bag emoji (URL-encoded)
+    expect(ph).toMatch(/^data:image\/svg\+xml,/)
+    // Check for shopping bag emoji (URL-encoded: %F0%9F%9B%8D)
+    expect(ph).toContain('%F0%9F%9B%8D')
+  })
+
+  it('remplace URLs Unsplash par placeholder local', () => {
+    const unsplashUrl = 'https://images.unsplash.com/photo-123'
+    const result = getImageUrl(unsplashUrl, 'Boulangerie')
+    // Should NOT return Unsplash URL, should return local SVG placeholder
+    expect(result).not.toContain('unsplash.com')
+    expect(result).toMatch(/^data:image\/svg\+xml,/)
   })
 })
 

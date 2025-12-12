@@ -15,13 +15,20 @@ jest.mock('../../services/api', () => ({
     delete: jest.fn(),
   },
 }))
-jest.mock('@react-navigation/native', () => ({
-  useFocusEffect: (callback: () => void) => {
-    React.useEffect(() => {
-      callback()
-    }, [])
-  },
-}))
+jest.mock('@react-navigation/native', () => {
+  const React = require('react')
+  return {
+    useFocusEffect: (callback: () => void) => {
+      React.useEffect(() => {
+        callback()
+      }, [])
+    },
+    useNavigation: () => ({
+      navigate: jest.fn(),
+      goBack: jest.fn(),
+    }),
+  }
+})
 jest.mock('../../theme', () => {
   const { mockUseTheme } = require('../../__mocks__/themeMock')
   return {
