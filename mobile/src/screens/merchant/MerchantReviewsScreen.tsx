@@ -74,8 +74,9 @@ const MerchantReviewsScreen: React.FC = () => {
 
       // Charger les stats
       const dashboardResponse = await apiService.get('/merchants/reviews/dashboard')
-      if (dashboardResponse.data.success) {
-        setStats(dashboardResponse.data.data.stats)
+      // apiService retourne response.data directement
+      if (dashboardResponse.success) {
+        setStats(dashboardResponse.data.stats)
       }
 
       // Charger la liste des avis
@@ -86,8 +87,9 @@ const MerchantReviewsScreen: React.FC = () => {
         }
       })
 
-      if (listResponse.data.success) {
-        setReviews(listResponse.data.data || [])
+      // apiService retourne response.data directement
+      if (listResponse.success) {
+        setReviews(listResponse.data || [])
       }
     } catch (error) {
       console.error('Erreur chargement avis:', error)
@@ -120,12 +122,12 @@ const MerchantReviewsScreen: React.FC = () => {
 
       if (selectedReview.merchant_response) {
         // Mettre à jour une réponse existante
-        await apiService.put(`/reviews/${selectedReview.id}/response`, {
+        await apiService.put(`/merchants/reviews/${selectedReview.id}/response`, {
           response: responseText.trim()
         })
       } else {
         // Créer une nouvelle réponse
-        await apiService.post(`/reviews/${selectedReview.id}/respond`, {
+        await apiService.post(`/merchants/reviews/${selectedReview.id}/respond`, {
           response: responseText.trim()
         })
       }
@@ -154,7 +156,7 @@ const MerchantReviewsScreen: React.FC = () => {
           style: 'destructive',
           onPress: async () => {
             try {
-              await apiService.delete(`/reviews/${review.id}/response`)
+              await apiService.delete(`/merchants/reviews/${review.id}/response`)
               Alert.alert('Succès', 'Réponse supprimée')
               loadReviewsData()
             } catch (error) {
