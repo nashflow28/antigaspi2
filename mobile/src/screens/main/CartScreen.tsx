@@ -20,7 +20,7 @@ import { Ionicons } from '@expo/vector-icons'
 
 import { AppDispatch, RootState } from '../../store'
 import { useTheme } from '../../theme'
-import { Button, Card, Typography } from '../../components/2025'
+import { Button, Card, Typography, QuantityStepperInline } from '../../components/2025'
 import { formatCurrency } from '../../utils/currencyHelpers'
 import { getImageUrl } from '../../utils/imageHelpers'
 import { TEST_IDS } from '../../utils/testIds'
@@ -461,25 +461,13 @@ const CartScreen: React.FC<Props> = ({ navigation }) => {
                     </View>
 
                     <View style={styles.cartItemFooter}>
-                      <View style={styles.quantityControls}>
-                        <TouchableOpacity
-                          style={[styles.quantityButton, (updating || item.quantity <= 1) && styles.quantityButtonDisabled]}
-                          disabled={updating || item.quantity <= 1}
-                          onPress={() => updateQuantity(item, item.quantity - 1)}
-                        >
-                          <Ionicons name="remove" size={18} color={theme.colors.text} />
-                        </TouchableOpacity>
-                        <Typography variant="h3" weight="bold" style={{ minWidth: 40, textAlign: 'center' }}>
-                          {item.quantity}
-                        </Typography>
-                        <TouchableOpacity
-                          style={[styles.quantityButton, updating && styles.quantityButtonDisabled]}
-                          disabled={updating}
-                          onPress={() => updateQuantity(item, item.quantity + 1)}
-                        >
-                          <Ionicons name="add" size={18} color={theme.colors.text} />
-                        </TouchableOpacity>
-                      </View>
+                      <QuantityStepperInline
+                        value={item.quantity}
+                        onChange={(newQuantity) => updateQuantity(item, newQuantity)}
+                        min={1}
+                        max={item.product?.available_quantity ?? 99}
+                        disabled={updating}
+                      />
 
                       <Typography variant="body" weight="semibold">
                         {formatCurrency(item.total_price)}
@@ -830,22 +818,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-  },
-  quantityControls: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-  },
-  quantityButton: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: 'rgba(0,0,0,0.05)',
-  },
-  quantityButtonDisabled: {
-    opacity: 0.5,
   },
   summaryCard: {
     padding: 16,

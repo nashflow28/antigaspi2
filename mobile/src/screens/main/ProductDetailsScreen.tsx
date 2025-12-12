@@ -24,7 +24,7 @@ import { getImageUrl, getCategoryPlaceholder } from '../../utils/imageHelpers'
 import { formatCurrency } from '../../utils/currencyHelpers'
 import FavoriteButton from '../../components/FavoriteButton'
 import StarRating from '../../components/reviews/StarRating'
-import { Button, Card, Badge, Typography, Modal } from '../../components/2025'
+import { Button, Card, Badge, Typography, Modal, ProductDetailsSkeleton } from '../../components/2025'
 import locationService from '../../services/locationService'
 // 🐛 BUG FIX #MOB-L-002: Use centralized environment detection
 import { isTestEnv as checkIsTestEnv, isTestMode as checkIsTestMode } from '../../utils/envHelpers'
@@ -139,10 +139,10 @@ const ProductDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
   if (loading || !product) {
     return (
       <View
-        style={{ flex: 1, backgroundColor: theme.colors.background, alignItems: 'center', justifyContent: 'center' }}
+        style={{ flex: 1, backgroundColor: theme.colors.background }}
         testID={TEST_IDS.loadingSpinner}
       >
-        <Typography variant="body">Chargement...</Typography>
+        <ProductDetailsSkeleton />
       </View>
     )
   }
