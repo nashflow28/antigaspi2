@@ -34,3 +34,10 @@ export type { TypographyProps, TypographyVariant, TypographyColor } from './Typo
 
 export { default as Toast } from './Toast'
 export type { ToastProps, ToastVariant } from './Toast'
+
+// UX-enhanced components
+export { default as SkeletonLoader, ProductCardSkeleton, ReservationListSkeleton, ProductDetailsSkeleton } from './SkeletonLoader'
+
+export { default as QuantityStepper, QuantityStepperInline } from './QuantityStepper'
+
+export { default as PriceDisplay, PriceInline, PriceTag } from './PriceDisplay'

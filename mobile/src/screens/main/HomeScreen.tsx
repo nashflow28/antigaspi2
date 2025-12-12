@@ -23,7 +23,7 @@ import { getImageUrl } from '../../utils/imageHelpers'
 import { formatCurrency } from '../../utils/currencyHelpers'
 import FavoriteButton from '../../components/FavoriteButton'
 import locationService, { UserLocation } from '../../services/locationService'
-import { Button, Card, Badge, Typography } from '../../components/2025'
+import { Button, Card, Badge, Typography, ProductCardSkeleton } from '../../components/2025'
 import { TEST_IDS } from '../../utils/testIds'
 
 interface Props {
@@ -547,7 +547,9 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
 
         {/* Produits */}
         <View style={styles.productsGrid} testID={TEST_IDS.productList}>
-          {sortedProducts.length > 0 ? (
+          {loading && sortedProducts.length === 0 ? (
+            <ProductCardSkeleton count={4} />
+          ) : sortedProducts.length > 0 ? (
             sortedProducts.map((product, index) => renderProductCard(product, index))
           ) : (
             <View style={styles.emptyState}>
