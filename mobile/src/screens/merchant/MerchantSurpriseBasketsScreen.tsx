@@ -25,11 +25,20 @@ import { getImageUrl } from '../../utils/imageHelpers'
 import { Typography, Card, Button, Badge } from '../../components/2025'
 import { formatCurrency } from '../../utils/currencyHelpers'
 import { TEST_IDS } from '../../utils/testIds'
+import { usePersistedForm } from '../../hooks/usePersistedForm'
 
 type StatusFilter = 'all' | 'active' | 'inactive'
 
 interface Props {
   navigation: any
+}
+
+const INITIAL_FORM_DATA = {
+  name: '',
+  description: '',
+  discounted_price: '',
+  quantity_available: '',
+  min_items: '',
 }
 
 const MerchantSurpriseBasketsScreen: React.FC<Props> = ({ navigation }) => {
@@ -40,12 +49,24 @@ const MerchantSurpriseBasketsScreen: React.FC<Props> = ({ navigation }) => {
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('all')
   const [showModal, setShowModal] = useState(false)
   const [editingBasket, setEditingBasket] = useState<SurpriseBasket | null>(null)
-  const [formData, setFormData] = useState({
-    name: '',
-    description: '',
-    discounted_price: '',
-    quantity_available: '',
-    min_items: '',
+
+  // Persisted form data - survives app restart/session interruption
+  const {
+    formData,
+    setFormData,
+    clearCache: clearFormCache,
+    hasUnsavedChanges,
+    isRestored,
+  } = usePersistedForm({
+    formKey: 'merchant_surprise_basket_form',
+    initialValues: INITIAL_FORM_DATA,
+    expiresIn: 24 * 60 * 60 * 1000, // 24 hours
+    onRestore: (data) => {
+      // If we have restored data and we're not editing, show the modal
+      if (data.name || data.description || data.discounted_price) {
+        console.log('📦 [SurpriseBasket] Form data restored from cache')
+      }
+    },
   })
 
   // Error modal state
@@ -103,18 +124,36 @@ const MerchantSurpriseBasketsScreen: React.FC<Props> = ({ navigation }) => {
 
   const handleCreate = () => {
     setEditingBasket(null)
-    setFormData({
-      name: '',
-      description: '',
-      discounted_price: '',
-      quantity_available: '',
-      min_items: '',
-    })
-    setShowModal(true)
+    // Check if we have cached data to restore
+    if (hasUnsavedChanges && (formData.name || formData.description || formData.discounted_price)) {
+      Alert.alert(
+        'Données récupérées',
+        'Nous avons retrouvé un brouillon non sauvegardé. Voulez-vous le reprendre ?',
+        [
+          {
+            text: 'Nouveau',
+            style: 'destructive',
+            onPress: async () => {
+              await clearFormCache()
+              setFormData(INITIAL_FORM_DATA)
+              setShowModal(true)
+            },
+          },
+          {
+            text: 'Reprendre',
+            onPress: () => setShowModal(true),
+          },
+        ]
+      )
+    } else {
+      setFormData(INITIAL_FORM_DATA)
+      setShowModal(true)
+    }
   }
 
   const handleEdit = (basket: SurpriseBasket) => {
     setEditingBasket(basket)
+    // For editing, bypass cache and use basket data directly
     setFormData({
       name: basket.name,
       description: basket.description || '',
@@ -208,6 +247,8 @@ const MerchantSurpriseBasketsScreen: React.FC<Props> = ({ navigation }) => {
         showSuccessModal('Modification réussie', 'Le panier a été modifié avec succès.')
       } else {
         await apiService.post('/surprise-baskets', payload)
+        // Clear the form cache on successful creation
+        await clearFormCache()
         setShowModal(false)
         await loadBaskets()
         showSuccessModal('Création réussie', 'Le panier surprise a été créé avec succès.')
