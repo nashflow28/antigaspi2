@@ -19,6 +19,7 @@ import ExportButton from '../../components/admin/ExportButton'
 import apiService from '../../services/api'
 import { AdminAnalyticsData, AdminAnalyticsFilters } from '../../types'
 import { formatCurrency } from '../../utils/currencyHelpers'
+import { TEST_IDS } from '../../utils/testIds'
 
 type Period = '7d' | '30d' | '90d' | 'custom'
 type Tab = 'revenue' | 'geography' | 'merchants'
@@ -275,7 +276,15 @@ const AdminAnalyticsScreen: React.FC<{ navigation: any }> = ({ navigation }) => 
 
             {/* Tabs */}
             <View style={styles.tabs}>
-              {TABS.map((tab) => (
+              {TABS.map((tab) => {
+                const getTabTestId = () => {
+                  switch (tab.id) {
+                    case 'revenue': return TEST_IDS.revenueTab
+                    case 'geography': return TEST_IDS.geographyTab
+                    case 'merchants': return TEST_IDS.merchantsTab
+                  }
+                }
+                return (
                 <TouchableOpacity
                   key={tab.id}
                   style={[
@@ -286,6 +295,7 @@ const AdminAnalyticsScreen: React.FC<{ navigation: any }> = ({ navigation }) => 
                     },
                   ]}
                   onPress={() => setSelectedTab(tab.id)}
+                  testID={getTabTestId()}
                 >
                   <Ionicons
                     name={tab.icon as any}
@@ -310,7 +320,7 @@ const AdminAnalyticsScreen: React.FC<{ navigation: any }> = ({ navigation }) => 
                     {tab.label}
                   </Typography>
                 </TouchableOpacity>
-              ))}
+              )})}
             </View>
 
             {/* Tab Content */}
