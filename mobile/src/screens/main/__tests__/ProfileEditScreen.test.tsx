@@ -2,9 +2,12 @@
 import React from 'react'
 import { render, fireEvent, waitFor } from '@testing-library/react-native'
 import { Provider } from 'react-redux'
+import { SafeAreaProvider } from 'react-native-safe-area-context'
 import { configureStore } from '@reduxjs/toolkit'
 import { NavigationContainer } from '@react-navigation/native'
 import { ThemeProvider } from '../../../theme/ThemeContext'
+import { ToastProvider } from '../../../contexts/ToastContext'
+import { AlertProvider } from '../../../contexts/AlertContext'
 import ProfileEditScreen from '../ProfileEditScreen'
 import authSlice from '../../../store/slices/authSlice'
 import * as ImagePicker from 'expo-image-picker'
@@ -28,8 +31,20 @@ jest.mock('../../../services/api', () => ({
     post: jest.fn(),
     getProfile: jest.fn(),
     setStoredUser: jest.fn(),
+    uploadFile: jest.fn(),
   },
   API_BASE_URL: 'http://localhost:8000/api',
+}))
+
+// Mock AsyncStorage for ThemeContext
+jest.mock('@react-native-async-storage/async-storage', () => ({
+  setItem: jest.fn(() => Promise.resolve()),
+  getItem: jest.fn(() => Promise.resolve(null)),
+  removeItem: jest.fn(() => Promise.resolve()),
+  clear: jest.fn(() => Promise.resolve()),
+  getAllKeys: jest.fn(() => Promise.resolve([])),
+  multiGet: jest.fn(() => Promise.resolve([])),
+  multiSet: jest.fn(() => Promise.resolve()),
 }))
 
 // Mock navigation
@@ -76,14 +91,24 @@ const createTestStore = (initialState = {}) => {
 
 // Helper to render with providers
 const renderWithProviders = (component: React.ReactElement, store = createTestStore()) => {
+  const initialMetrics = {
+    frame: { x: 0, y: 0, width: 390, height: 844 },
+    insets: { top: 0, left: 0, right: 0, bottom: 0 },
+  }
   return render(
-    <Provider store={store}>
-      <NavigationContainer>
-        <ThemeProvider>
-          {component}
-        </ThemeProvider>
-      </NavigationContainer>
-    </Provider>
+    <SafeAreaProvider initialMetrics={initialMetrics}>
+      <Provider store={store}>
+        <NavigationContainer>
+          <ThemeProvider>
+            <ToastProvider>
+              <AlertProvider>
+                {component}
+              </AlertProvider>
+            </ToastProvider>
+          </ThemeProvider>
+        </NavigationContainer>
+      </Provider>
+    </SafeAreaProvider>
   )
 }
 
@@ -99,6 +124,9 @@ describe('ProfileEditScreen', () => {
       data: mockUser,
     })
     ;(apiService.setStoredUser as jest.Mock).mockResolvedValue(undefined)
+    ;(apiService.uploadFile as jest.Mock).mockResolvedValue({
+      data: { success: true, photo_url: 'http://localhost/photo.jpg' },
+    })
     alertSpy = jest.spyOn(Alert, 'alert').mockImplementation((title, message, buttons) => {
       if (buttons && buttons[0]?.onPress) {
         buttons[0].onPress()
@@ -365,7 +393,13 @@ describe('ProfileEditScreen', () => {
       })
     })
 
-    it('shows error when phone format is invalid', async () => {
+    // Note: Phone validation has been relaxed (see CLAUDE.md bug fixes)
+    // The test now verifies that any phone format is accepted
+    it('accepts any phone format after validation relaxation', async () => {
+      ;(apiService.put as jest.Mock).mockResolvedValue({
+        data: { success: true, data: mockUser },
+      })
+
       const { getByDisplayValue, getByText } = renderWithProviders(
         <ProfileEditScreen navigation={mockNavigation} />
       )
@@ -377,11 +411,10 @@ describe('ProfileEditScreen', () => {
       fireEvent.press(saveButton)
 
       await waitFor(() => {
-        expect(apiService.put).not.toHaveBeenCalled()
-        expect(alertSpy).toHaveBeenCalled()
-        const lastCall = alertSpy.mock.calls[alertSpy.mock.calls.length - 1] as [string, string]
-        const [, message] = lastCall
-        expect(message).toBe('Format de téléphone invalide (+228 12 34 56 78)')
+        // Phone validation is relaxed, API should be called
+        expect(apiService.put).toHaveBeenCalledWith('/consumers/profile', expect.objectContaining({
+          phone: '90000000',
+        }))
       })
     })
   })
@@ -535,9 +568,8 @@ describe('ProfileEditScreen', () => {
         canceled: false,
         assets: [{ uri: 'file://photo.jpg' }],
       })
-      ;(apiService.post as jest.Mock).mockResolvedValue({
-        success: true,
-        data: { photo_url: 'http://localhost/photo.jpg' },
+      ;(apiService.uploadFile as jest.Mock).mockResolvedValue({
+        data: { success: true, photo_url: 'http://localhost/photo.jpg' },
       })
 
       const { getByText } = renderWithProviders(
@@ -548,14 +580,10 @@ describe('ProfileEditScreen', () => {
       fireEvent.press(changePhotoButton)
 
       await waitFor(() => {
-        expect(apiService.post).toHaveBeenCalledWith(
+        // uploadFile is called with endpoint and FormData
+        expect(apiService.uploadFile).toHaveBeenCalledWith(
           '/consumers/profile/photo',
-          expect.any(FormData),
-          expect.objectContaining({
-            headers: {
-              'Content-Type': 'multipart/form-data',
-            },
-          })
+          expect.anything() // FormData object
         )
       })
     })
@@ -568,7 +596,7 @@ describe('ProfileEditScreen', () => {
         canceled: false,
         assets: [{ uri: 'file://photo.jpg' }],
       })
-      ;(apiService.post as jest.Mock).mockRejectedValue({
+      ;(apiService.uploadFile as jest.Mock).mockRejectedValue({
         response: { data: { message: 'Erreur upload' } },
       })
 
@@ -581,7 +609,7 @@ describe('ProfileEditScreen', () => {
 
       await waitFor(() => {
         // Alert should be shown with error
-        expect(apiService.post).toHaveBeenCalled()
+        expect(apiService.uploadFile).toHaveBeenCalled()
       })
     })
 

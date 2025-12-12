@@ -45,10 +45,17 @@ jest.mock('expo-sharing', () => ({
 // Mock expo-location
 jest.mock('expo-location', () => ({
   requestForegroundPermissionsAsync: jest.fn().mockResolvedValue({ status: 'granted' }),
+  getForegroundPermissionsAsync: jest.fn().mockResolvedValue({ status: 'granted' }),
   getCurrentPositionAsync: jest.fn().mockResolvedValue({
     coords: { latitude: 6.1319, longitude: 1.2228, accuracy: 10 },
   }),
   watchPositionAsync: jest.fn().mockResolvedValue({ remove: jest.fn() }),
+  reverseGeocodeAsync: jest.fn().mockResolvedValue([{
+    city: 'Lomé',
+    country: 'Togo',
+    street: 'Rue Test',
+    region: 'Maritime',
+  }]),
   Accuracy: { High: 4, Balanced: 3, Low: 2 },
 }))
 

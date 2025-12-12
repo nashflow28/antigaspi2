@@ -197,7 +197,7 @@ describe('ProductDetailsScreen', () => {
     const { getByLabelText } = renderScreen({ navigation })
 
     fireEvent.press(getByLabelText('Voir mon panier'))
-    expect(navigation.navigate).toHaveBeenCalledWith('Orders')
+    expect(navigation.navigate).toHaveBeenCalledWith('Orders', { screen: 'Cart' })
   })
 
   it('renders favorite button when user is authenticated', () => {

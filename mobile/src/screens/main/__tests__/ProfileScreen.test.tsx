@@ -2,10 +2,13 @@
 import React from 'react'
 import { render, fireEvent, waitFor } from '@testing-library/react-native'
 import { Provider } from 'react-redux'
+import { SafeAreaProvider } from 'react-native-safe-area-context'
 import { configureStore } from '@reduxjs/toolkit'
 import ProfileScreen from '../ProfileScreen'
 import authSlice from '../../../store/slices/authSlice'
 import { ThemeProvider } from '../../../theme/ThemeContext'
+import { ToastProvider } from '../../../contexts/ToastContext'
+import { AlertProvider } from '../../../contexts/AlertContext'
 import { TEST_IDS } from '../../../utils/testIds'
 
 // Mock navigation
@@ -22,9 +25,15 @@ jest.mock('@react-navigation/native', () => ({
   useNavigation: () => mockNavigation,
 }))
 
-// Mock AsyncStorage
+// Mock AsyncStorage - use full mock, not partial
 jest.mock('@react-native-async-storage/async-storage', () => ({
+  setItem: jest.fn(() => Promise.resolve()),
+  getItem: jest.fn(() => Promise.resolve(null)),
+  removeItem: jest.fn(() => Promise.resolve()),
   clear: jest.fn(() => Promise.resolve()),
+  getAllKeys: jest.fn(() => Promise.resolve([])),
+  multiGet: jest.fn(() => Promise.resolve([])),
+  multiSet: jest.fn(() => Promise.resolve()),
 }))
 
 // Create test store
@@ -53,12 +62,22 @@ const createTestStore = (userRole: 'consumer' | 'merchant' = 'consumer') => {
 
 // Helper to render with providers
 const renderWithProviders = (component: React.ReactElement, store: any) => {
+  const initialMetrics = {
+    frame: { x: 0, y: 0, width: 390, height: 844 },
+    insets: { top: 0, left: 0, right: 0, bottom: 0 },
+  }
   return render(
-    <Provider store={store}>
-      <ThemeProvider>
-        {component}
-      </ThemeProvider>
-    </Provider>
+    <SafeAreaProvider initialMetrics={initialMetrics}>
+      <Provider store={store}>
+        <ThemeProvider>
+          <ToastProvider>
+            <AlertProvider>
+              {component}
+            </AlertProvider>
+          </ToastProvider>
+        </ThemeProvider>
+      </Provider>
+    </SafeAreaProvider>
   )
 }
 

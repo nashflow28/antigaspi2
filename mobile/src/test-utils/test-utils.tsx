@@ -9,6 +9,7 @@ import { Provider } from 'react-redux'
 import { SafeAreaProvider } from 'react-native-safe-area-context'
 import { ThemeProvider } from '../theme'
 import { ToastProvider } from '../contexts/ToastContext'
+import { AlertProvider } from '../contexts/AlertContext'
 
 import { RootState } from '../store'
 import { createTestStore, TestStore } from './store'
@@ -36,11 +37,19 @@ export const renderWithProviders = (
     ...renderOptions
   }: ExtendedRenderOptions = {}
 ) => {
+  // Initial safe area insets for testing (mock device with no notch)
+  const initialMetrics = {
+    frame: { x: 0, y: 0, width: 390, height: 844 },
+    insets: { top: 0, left: 0, right: 0, bottom: 0 },
+  }
+
   const Wrapper = ({ children }: { children: React.ReactNode }) => (
-    <SafeAreaProvider>
+    <SafeAreaProvider initialMetrics={initialMetrics}>
       <Provider store={store}>
         <ThemeProvider>
-          <ToastProvider>{children}</ToastProvider>
+          <ToastProvider>
+            <AlertProvider>{children}</AlertProvider>
+          </ToastProvider>
         </ThemeProvider>
       </Provider>
     </SafeAreaProvider>
