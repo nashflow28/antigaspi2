@@ -23,7 +23,7 @@ import QRCode from 'react-native-qrcode-svg'
 import { Reservation } from '../../types'
 // import offlineService from '../../services/offlineService'
 import analyticsService from '../../services/analyticsService'
-import { Button, Card, Badge, Typography, Modal as Modal2025 } from '../../components/2025'
+import { Button, Card, Badge, Typography, Modal as Modal2025, ReservationListSkeleton } from '../../components/2025'
 import { useTheme } from '../../theme'
 import { TEST_IDS } from '../../utils/testIds'
 import { getImageUrl } from '../../utils/imageHelpers'
@@ -457,23 +457,29 @@ const ReservationsScreen: React.FC<Props> = ({ navigation }) => {
       </Card>
 
       {/* Liste des réservations */}
-      <FlatList
-        data={filteredReservations}
-        renderItem={renderReservation}
-        keyExtractor={(item) => item.id.toString()}
-        contentContainerStyle={styles.listContent}
-        testID={TEST_IDS.reservationsList}
-        showsVerticalScrollIndicator={false}
-        refreshControl={
-          <RefreshControl
-            refreshing={refreshing}
-            onRefresh={onRefresh}
-            colors={[theme.colors.primary[500]]}
-            tintColor={theme.colors.primary[500]}
-          />
-        }
-        ListEmptyComponent={renderEmpty}
-      />
+      {loading && reservations.length === 0 ? (
+        <View style={styles.listContent}>
+          <ReservationListSkeleton count={4} />
+        </View>
+      ) : (
+        <FlatList
+          data={filteredReservations}
+          renderItem={renderReservation}
+          keyExtractor={(item) => item.id.toString()}
+          contentContainerStyle={styles.listContent}
+          testID={TEST_IDS.reservationsList}
+          showsVerticalScrollIndicator={false}
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={onRefresh}
+              colors={[theme.colors.primary[500]]}
+              tintColor={theme.colors.primary[500]}
+            />
+          }
+          ListEmptyComponent={renderEmpty}
+        />
+      )}
 
       {/* Modal QR Code */}
       <Modal2025
