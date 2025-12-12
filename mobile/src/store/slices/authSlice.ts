@@ -1,6 +1,7 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit'
 import { AuthState, User, LoginCredentials, RegisterData, AuthResponse } from '../../types'
 import apiService from '../../services/api'
+import { clearAllFormCaches } from '../../hooks/usePersistedForm'
 
 export const authInitialState: AuthState = {
   user: null,
@@ -50,7 +51,11 @@ export const logoutUser = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       await apiService.logout()
+      // Clear all cached form data on logout for security
+      await clearAllFormCaches()
     } catch (error: any) {
+      // Still clear caches even if API logout fails
+      await clearAllFormCaches()
       return rejectWithValue(error.message)
     }
   }
