@@ -61,8 +61,11 @@ const mockCacheManagerClear = cacheManager.clear as jest.Mock
 const mockCacheManagerGetStats = cacheManager.getStats as jest.Mock
 
 describe('OfflineService', () => {
+  let consoleErrorSpy: jest.SpyInstance | undefined
+
   beforeEach(() => {
     jest.clearAllMocks()
+    consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {})
 
     // Clear internal sync queue (singleton state cleanup)
     ;(offlineService as any).syncQueue = []
@@ -83,12 +86,16 @@ describe('OfflineService', () => {
       newestEntry: null,
     })
 
-    // Reset apiService mocks
-    mockCreateReservation.mockResolvedValue({ id: 1, success: true } as any)
-    mockCancelReservation.mockResolvedValue({ success: true } as any)
-  })
+	    // Reset apiService mocks
+	    mockCreateReservation.mockResolvedValue({ id: 1, success: true } as any)
+	    mockCancelReservation.mockResolvedValue({ success: true } as any)
+	  })
 
-  describe('Connectivity Management', () => {
+	  afterEach(() => {
+	    consoleErrorSpy?.mockRestore()
+	  })
+
+	  describe('Connectivity Management', () => {
     it('should check connectivity status', async () => {
       ;(NetInfo.fetch as jest.Mock).mockResolvedValue({
         isConnected: true,

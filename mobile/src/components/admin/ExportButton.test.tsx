@@ -30,8 +30,13 @@ describe('ExportButton', () => {
     period: '30d' as const,
   }
 
+  let consoleLogSpy: jest.SpyInstance | undefined
+  let consoleErrorSpy: jest.SpyInstance | undefined
+
   beforeEach(() => {
     jest.clearAllMocks()
+    consoleLogSpy = jest.spyOn(console, 'log').mockImplementation(() => {})
+    consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {})
 
     // Mock FileSystem.documentDirectory
     Object.defineProperty(FileSystem, 'documentDirectory', {
@@ -51,6 +56,11 @@ describe('ExportButton', () => {
     ;(apiService.exportAnalytics as jest.Mock).mockResolvedValue({
       file_content: 'base64content',
     })
+  })
+
+  afterEach(() => {
+    consoleLogSpy?.mockRestore()
+    consoleErrorSpy?.mockRestore()
   })
 
   // ============ RENDERING TESTS ============

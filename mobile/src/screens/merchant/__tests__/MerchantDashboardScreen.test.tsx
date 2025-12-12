@@ -108,6 +108,16 @@ const renderWithProviders = (component: React.ReactElement, store: any) => {
 }
 
 describe('MerchantDashboardScreen', () => {
+  let consoleErrorSpy: jest.SpyInstance | undefined
+
+  beforeEach(() => {
+    consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {})
+  })
+
+  afterEach(() => {
+    consoleErrorSpy?.mockRestore()
+  })
+
   beforeEach(() => {
     jest.clearAllMocks()
   })

@@ -19,6 +19,16 @@ const TestComponent: React.FC<{ user?: any }> = ({ user }) => (
 )
 
 describe('Test Utils Infrastructure', () => {
+  let consoleLogSpy: jest.SpyInstance | undefined
+
+  beforeEach(() => {
+    consoleLogSpy = jest.spyOn(console, 'log').mockImplementation(() => {})
+  })
+
+  afterEach(() => {
+    consoleLogSpy?.mockRestore()
+  })
+
   describe('createTestUser', () => {
     it('crée un User complet avec tous les champs requis', () => {
       const user = createTestUser()

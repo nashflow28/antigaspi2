@@ -1,5 +1,6 @@
 import React from 'react'
-import { render, fireEvent, waitFor, screen } from '@testing-library/react-native'
+import { act } from 'react-test-renderer'
+import { render, fireEvent, waitFor, screen } from '@test-utils'
 import { Alert } from 'react-native'
 import MerchantSurpriseBasketsScreen from './MerchantSurpriseBasketsScreen'
 import apiService from '../../services/api'
@@ -30,8 +31,10 @@ jest.mock('@react-navigation/native', () => {
   }
 })
 jest.mock('../../theme', () => {
+  const actualTheme = jest.requireActual('../../theme')
   const { mockUseTheme } = require('../../__mocks__/themeMock')
   return {
+    ...actualTheme,
     useTheme: mockUseTheme,
   }
 })
@@ -76,9 +79,16 @@ const mockBaskets = [
 ]
 
 describe('MerchantSurpriseBasketsScreen', () => {
+  let consoleLogSpy: jest.SpyInstance | undefined
+
   beforeEach(() => {
     jest.clearAllMocks()
-    ;(apiService.get as jest.Mock).mockResolvedValue({ data: mockBaskets })
+    consoleLogSpy = jest.spyOn(console, 'log').mockImplementation(() => {})
+    ;(apiService.get as jest.Mock).mockResolvedValue({ data: { data: mockBaskets } })
+  })
+
+  afterEach(() => {
+    consoleLogSpy?.mockRestore()
   })
 
   // ============ RENDERING TESTS ============
@@ -93,13 +103,21 @@ describe('MerchantSurpriseBasketsScreen', () => {
   })
 
   test('should render loading spinner on initial load', () => {
+    jest.useFakeTimers()
     ;(apiService.get as jest.Mock).mockImplementation(
-      () => new Promise((resolve) => setTimeout(() => resolve({ data: mockBaskets }), 100))
+      () =>
+        new Promise((resolve) =>
+          setTimeout(() => resolve({ data: { data: mockBaskets } }), 100)
+        )
     )
     const { getByText } = render(
       <MerchantSurpriseBasketsScreen navigation={mockNavigation} />
     )
     expect(getByText('Chargement des paniers...')).toBeTruthy()
+    act(() => {
+      jest.runOnlyPendingTimers()
+    })
+    jest.useRealTimers()
   })
 
   test('should render header with title', async () => {
@@ -140,7 +158,19 @@ describe('MerchantSurpriseBasketsScreen', () => {
     })
   })
 
-  test('should show error alert when loading fails', async () => {
+  test('should show error modal when loading fails', async () => {
+    const consoleSpyNew = jest.spyOn(console, 'error').mockImplementation(() => {})
+    ;(apiService.get as jest.Mock).mockRejectedValueOnce(new Error('Network error'))
+
+    render(<MerchantSurpriseBasketsScreen navigation={mockNavigation} />)
+
+    await waitFor(() => {
+      expect(screen.getByText('Erreur de chargement')).toBeTruthy()
+      expect(screen.getByText(/Impossible de charger les paniers surprise/i)).toBeTruthy()
+    })
+
+    consoleSpyNew.mockRestore()
+    return
     ;(apiService.get as jest.Mock).mockRejectedValue(new Error('Network error'))
     render(<MerchantSurpriseBasketsScreen navigation={mockNavigation} />)
     await waitFor(() => {
@@ -181,15 +211,15 @@ describe('MerchantSurpriseBasketsScreen', () => {
   // ============ FILTER TESTS ============
 
   test('should filter baskets by active status', async () => {
-    const { getByText, queryByText } = render(
+    const { getByText, getAllByText, queryByText } = render(
       <MerchantSurpriseBasketsScreen navigation={mockNavigation} />
     )
     await waitFor(() => {
       expect(getByText('Panier Matin')).toBeTruthy()
     })
 
-    // Click "Actifs" filter button
-    const activeFilterButton = getByText('Actifs')
+    // Click "Actifs" filter button (last occurrence is the filter)
+    const activeFilterButton = getAllByText('Actifs')[getAllByText('Actifs').length - 1]
     fireEvent.press(activeFilterButton)
 
     await waitFor(() => {
@@ -199,15 +229,15 @@ describe('MerchantSurpriseBasketsScreen', () => {
   })
 
   test('should filter baskets by inactive status', async () => {
-    const { getByText, queryByText } = render(
+    const { getByText, getAllByText, queryByText } = render(
       <MerchantSurpriseBasketsScreen navigation={mockNavigation} />
     )
     await waitFor(() => {
       expect(getByText('Panier Soir')).toBeTruthy()
     })
 
-    // Click "Inactifs" filter button
-    const inactiveFilterButton = getByText('Inactifs')
+    // Click "Inactifs" filter button (last occurrence is the filter)
+    const inactiveFilterButton = getAllByText('Inactifs')[getAllByText('Inactifs').length - 1]
     fireEvent.press(inactiveFilterButton)
 
     await waitFor(() => {
@@ -252,6 +282,16 @@ describe('MerchantSurpriseBasketsScreen', () => {
   // ============ CREATE BASKET TESTS ============
 
   test('should open modal when create button is pressed', async () => {
+    render(<MerchantSurpriseBasketsScreen navigation={mockNavigation} />)
+    const createButtonNew = await screen.findByTestId(TEST_IDS.createBasketButton)
+    fireEvent.press(createButtonNew)
+
+    await waitFor(() => {
+      expect(screen.getByText('Nouveau panier surprise')).toBeTruthy()
+      expect(screen.getByTestId(TEST_IDS.basketFormModal)).toBeTruthy()
+    })
+
+    return
     const { getByTestId, getByText } = render(
       <MerchantSurpriseBasketsScreen navigation={mockNavigation} />
     )
@@ -266,6 +306,16 @@ describe('MerchantSurpriseBasketsScreen', () => {
   })
 
   test('should show validation error when name is empty', async () => {
+    render(<MerchantSurpriseBasketsScreen navigation={mockNavigation} />)
+    fireEvent.press(await screen.findByTestId(TEST_IDS.createBasketButton))
+    fireEvent.press(await screen.findByTestId(TEST_IDS.submitBasketButton))
+
+    await waitFor(() => {
+      expect(screen.getByText('Validation')).toBeTruthy()
+      expect(screen.getByText(/Le nom est requis/i)).toBeTruthy()
+    })
+
+    return
     const { getByTestId, getByText } = render(
       <MerchantSurpriseBasketsScreen navigation={mockNavigation} />
     )
@@ -284,6 +334,21 @@ describe('MerchantSurpriseBasketsScreen', () => {
   })
 
   test('should show validation error when price is invalid', async () => {
+    render(<MerchantSurpriseBasketsScreen navigation={mockNavigation} />)
+    fireEvent.press(await screen.findByTestId(TEST_IDS.createBasketButton))
+
+    fireEvent.changeText(screen.getByTestId(TEST_IDS.basketNameInput), 'Test Panier')
+    fireEvent.changeText(screen.getByTestId(TEST_IDS.basketPriceInput), '0')
+    fireEvent.changeText(screen.getByTestId(TEST_IDS.basketQuantityInput), '1')
+
+    fireEvent.press(await screen.findByTestId(TEST_IDS.submitBasketButton))
+
+    await waitFor(() => {
+      expect(screen.getByText('Validation')).toBeTruthy()
+      expect(screen.getByText(/Le prix doit/i)).toBeTruthy()
+    })
+
+    return
     const { getByTestId, getByText, getByPlaceholderText } = render(
       <MerchantSurpriseBasketsScreen navigation={mockNavigation} />
     )
@@ -308,6 +373,21 @@ describe('MerchantSurpriseBasketsScreen', () => {
   })
 
   test('should show validation error when quantity is invalid', async () => {
+    render(<MerchantSurpriseBasketsScreen navigation={mockNavigation} />)
+    fireEvent.press(await screen.findByTestId(TEST_IDS.createBasketButton))
+
+    fireEvent.changeText(screen.getByTestId(TEST_IDS.basketNameInput), 'Test Panier')
+    fireEvent.changeText(screen.getByTestId(TEST_IDS.basketPriceInput), '2000')
+    fireEvent.changeText(screen.getByTestId(TEST_IDS.basketQuantityInput), '0')
+
+    fireEvent.press(await screen.findByTestId(TEST_IDS.submitBasketButton))
+
+    await waitFor(() => {
+      expect(screen.getByText('Validation')).toBeTruthy()
+      expect(screen.getByText(/La quantit/i)).toBeTruthy()
+    })
+
+    return
     const { getByTestId, getByText, getByPlaceholderText } = render(
       <MerchantSurpriseBasketsScreen navigation={mockNavigation} />
     )
@@ -335,6 +415,33 @@ describe('MerchantSurpriseBasketsScreen', () => {
   })
 
   test('should create basket successfully', async () => {
+    ;(apiService.post as jest.Mock).mockResolvedValue({ data: { id: 3 } })
+    render(<MerchantSurpriseBasketsScreen navigation={mockNavigation} />)
+
+    fireEvent.press(await screen.findByTestId(TEST_IDS.createBasketButton))
+    fireEvent.changeText(screen.getByTestId(TEST_IDS.basketNameInput), 'Nouveau Panier')
+    fireEvent.changeText(screen.getByTestId(TEST_IDS.basketDescriptionInput), 'Description test')
+    fireEvent.changeText(screen.getByTestId(TEST_IDS.basketPriceInput), '2500')
+    fireEvent.changeText(screen.getByTestId(TEST_IDS.basketQuantityInput), '10')
+
+    fireEvent.press(await screen.findByTestId(TEST_IDS.submitBasketButton))
+
+    await waitFor(() => {
+      expect(apiService.post).toHaveBeenCalledWith(
+        '/surprise-baskets',
+        expect.objectContaining({
+          name: 'Nouveau Panier',
+          description: 'Description test',
+          discounted_price: 2500,
+          quantity_available: 10,
+          min_items: null,
+        })
+      )
+      expect(screen.getByText(/Cr.*ation/i)).toBeTruthy()
+      expect(screen.getByText(/panier surprise/i)).toBeTruthy()
+    })
+
+    return
     ;(apiService.post as jest.Mock).mockResolvedValue({ data: { id: 3 } })
     const { getByTestId, getByText, getByPlaceholderText } = render(
       <MerchantSurpriseBasketsScreen navigation={mockNavigation} />
@@ -366,6 +473,17 @@ describe('MerchantSurpriseBasketsScreen', () => {
   // ============ EDIT BASKET TESTS ============
 
   test('should open modal with basket data when edit is pressed', async () => {
+    render(<MerchantSurpriseBasketsScreen navigation={mockNavigation} />)
+
+    await screen.findByText('Panier Matin')
+    fireEvent.press((await screen.findAllByText('Modifier'))[0])
+
+    await waitFor(() => {
+      expect(screen.getByText('Modifier le panier')).toBeTruthy()
+      expect(screen.getByDisplayValue('Panier Matin')).toBeTruthy()
+    })
+
+    return
     const { getByText } = render(
       <MerchantSurpriseBasketsScreen navigation={mockNavigation} />
     )
@@ -382,6 +500,33 @@ describe('MerchantSurpriseBasketsScreen', () => {
   })
 
   test('should update basket successfully', async () => {
+    ;(apiService.put as jest.Mock).mockResolvedValue({ data: { success: true } })
+    render(<MerchantSurpriseBasketsScreen navigation={mockNavigation} />)
+
+    await screen.findByText('Panier Matin')
+    fireEvent.press((await screen.findAllByText('Modifier'))[0])
+
+    const nameInputNew = await screen.findByTestId(TEST_IDS.basketNameInput)
+    fireEvent.changeText(nameInputNew, 'Panier Matin Modifie')
+
+    fireEvent.press(await screen.findByTestId(TEST_IDS.submitBasketButton))
+
+    await waitFor(() => {
+      expect(apiService.put).toHaveBeenCalledWith(
+        '/surprise-baskets/1',
+        expect.objectContaining({
+          name: 'Panier Matin Modifie',
+          description: 'Viennoiseries du matin',
+          discounted_price: 2000,
+          quantity_available: 5,
+          min_items: null,
+        })
+      )
+      expect(screen.getByText(/Modification/i)).toBeTruthy()
+      expect(screen.getByText(/panier.*modifi/i)).toBeTruthy()
+    })
+
+    return
     ;(apiService.put as jest.Mock).mockResolvedValue({ data: { success: true } })
     const { getByText, getByDisplayValue } = render(
       <MerchantSurpriseBasketsScreen navigation={mockNavigation} />
@@ -435,6 +580,26 @@ describe('MerchantSurpriseBasketsScreen', () => {
 
   test('should delete basket successfully after confirmation', async () => {
     ;(apiService.delete as jest.Mock).mockResolvedValue({ data: { success: true } })
+    ;(Alert.alert as jest.Mock).mockImplementation(() => {})
+
+    render(<MerchantSurpriseBasketsScreen navigation={mockNavigation} />)
+    await screen.findByText('Panier Matin')
+
+    fireEvent.press((await screen.findAllByText('Supprimer'))[0])
+
+    const alertButtonsNew = (Alert.alert as jest.Mock).mock.calls[0][2] as any[]
+    await act(async () => {
+      alertButtonsNew[1].onPress()
+    })
+
+    await waitFor(() => {
+      expect(apiService.delete).toHaveBeenCalledWith('/surprise-baskets/1')
+      expect(screen.getByText(/Suppression/i)).toBeTruthy()
+      expect(screen.getByText(/panier.*supprim/i)).toBeTruthy()
+    })
+
+    return
+    ;(apiService.delete as jest.Mock).mockResolvedValue({ data: { success: true } })
 
     // Mock Alert.alert to auto-confirm
     ;(Alert.alert as jest.Mock).mockImplementation((title, message, buttons) => {
@@ -463,6 +628,19 @@ describe('MerchantSurpriseBasketsScreen', () => {
 
   test('should toggle basket status from active to inactive', async () => {
     ;(apiService.put as jest.Mock).mockResolvedValue({ data: { success: true } })
+    render(<MerchantSurpriseBasketsScreen navigation={mockNavigation} />)
+
+    await screen.findByText('Panier Matin')
+    fireEvent.press(screen.getByText(/D.sactiver/i))
+
+    await waitFor(() => {
+      expect(apiService.put).toHaveBeenCalledWith('/surprise-baskets/1', { is_active: false })
+      expect(screen.getByText(/Statut/i)).toBeTruthy()
+      expect(screen.getByText(/panier.*d.sactiv/i)).toBeTruthy()
+    })
+
+    return
+    ;(apiService.put as jest.Mock).mockResolvedValue({ data: { success: true } })
     const { getByText } = render(
       <MerchantSurpriseBasketsScreen navigation={mockNavigation} />
     )
@@ -482,6 +660,19 @@ describe('MerchantSurpriseBasketsScreen', () => {
   })
 
   test('should toggle basket status from inactive to active', async () => {
+    ;(apiService.put as jest.Mock).mockResolvedValue({ data: { success: true } })
+    render(<MerchantSurpriseBasketsScreen navigation={mockNavigation} />)
+
+    await screen.findByText('Panier Soir')
+    fireEvent.press((await screen.findAllByText('Activer'))[0])
+
+    await waitFor(() => {
+      expect(apiService.put).toHaveBeenCalledWith('/surprise-baskets/2', { is_active: true })
+      expect(screen.getByText(/Statut/i)).toBeTruthy()
+      expect(screen.getByText(/panier.*activ/i)).toBeTruthy()
+    })
+
+    return
     ;(apiService.put as jest.Mock).mockResolvedValue({ data: { success: true } })
     const { getByText } = render(
       <MerchantSurpriseBasketsScreen navigation={mockNavigation} />
@@ -504,13 +695,13 @@ describe('MerchantSurpriseBasketsScreen', () => {
   // ============ EMPTY STATE TESTS ============
 
   test('should display empty state when no baskets exist', async () => {
-    ;(apiService.get as jest.Mock).mockResolvedValue({ data: [] })
+    ;(apiService.get as jest.Mock).mockResolvedValue({ data: { data: [] } })
     const { getByText } = render(
       <MerchantSurpriseBasketsScreen navigation={mockNavigation} />
     )
     await waitFor(() => {
       expect(getByText('Aucun panier surprise')).toBeTruthy()
-      expect(getByText('Commencez par créer votre premier panier surprise')).toBeTruthy()
+      expect(getByText('Créez votre premier panier surprise')).toBeTruthy()
     })
   })
 
