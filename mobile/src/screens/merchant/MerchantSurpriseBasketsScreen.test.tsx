@@ -170,12 +170,6 @@ describe('MerchantSurpriseBasketsScreen', () => {
     })
 
     consoleSpyNew.mockRestore()
-    return
-    ;(apiService.get as jest.Mock).mockRejectedValue(new Error('Network error'))
-    render(<MerchantSurpriseBasketsScreen navigation={mockNavigation} />)
-    await waitFor(() => {
-      expect(Alert.alert).toHaveBeenCalledWith('Erreur', 'Impossible de charger les paniers surprise')
-    })
   })
 
   // ============ STATS DISPLAY TESTS ============
@@ -290,19 +284,6 @@ describe('MerchantSurpriseBasketsScreen', () => {
       expect(screen.getByText('Nouveau panier surprise')).toBeTruthy()
       expect(screen.getByTestId(TEST_IDS.basketFormModal)).toBeTruthy()
     })
-
-    return
-    const { getByTestId, getByText } = render(
-      <MerchantSurpriseBasketsScreen navigation={mockNavigation} />
-    )
-    await waitFor(() => {
-      const createButton = getByTestId('create-basket-button')
-      fireEvent.press(createButton)
-    })
-
-    await waitFor(() => {
-      expect(getByText('Nouveau Panier Surprise')).toBeTruthy()
-    })
   })
 
   test('should show validation error when name is empty', async () => {
@@ -313,23 +294,6 @@ describe('MerchantSurpriseBasketsScreen', () => {
     await waitFor(() => {
       expect(screen.getByText('Validation')).toBeTruthy()
       expect(screen.getByText(/Le nom est requis/i)).toBeTruthy()
-    })
-
-    return
-    const { getByTestId, getByText } = render(
-      <MerchantSurpriseBasketsScreen navigation={mockNavigation} />
-    )
-    await waitFor(() => {
-      fireEvent.press(getByTestId('create-basket-button'))
-    })
-
-    await waitFor(() => {
-      const submitButton = getByText('Créer')
-      fireEvent.press(submitButton)
-    })
-
-    await waitFor(() => {
-      expect(Alert.alert).toHaveBeenCalledWith('Erreur', 'Le nom est requis')
     })
   })
 
@@ -347,29 +311,6 @@ describe('MerchantSurpriseBasketsScreen', () => {
       expect(screen.getByText('Validation')).toBeTruthy()
       expect(screen.getByText(/Le prix doit/i)).toBeTruthy()
     })
-
-    return
-    const { getByTestId, getByText, getByPlaceholderText } = render(
-      <MerchantSurpriseBasketsScreen navigation={mockNavigation} />
-    )
-    await waitFor(() => {
-      fireEvent.press(getByTestId('create-basket-button'))
-    })
-
-    await waitFor(() => {
-      const nameInput = getByPlaceholderText('Ex: Panier du Matin')
-      fireEvent.changeText(nameInput, 'Test Panier')
-
-      const priceInput = getByPlaceholderText('Ex: 2000')
-      fireEvent.changeText(priceInput, '0')
-
-      const submitButton = getByText('Créer')
-      fireEvent.press(submitButton)
-    })
-
-    await waitFor(() => {
-      expect(Alert.alert).toHaveBeenCalledWith('Erreur', 'Le prix doit être supérieur à 0')
-    })
   })
 
   test('should show validation error when quantity is invalid', async () => {
@@ -385,32 +326,6 @@ describe('MerchantSurpriseBasketsScreen', () => {
     await waitFor(() => {
       expect(screen.getByText('Validation')).toBeTruthy()
       expect(screen.getByText(/La quantit/i)).toBeTruthy()
-    })
-
-    return
-    const { getByTestId, getByText, getByPlaceholderText } = render(
-      <MerchantSurpriseBasketsScreen navigation={mockNavigation} />
-    )
-    await waitFor(() => {
-      fireEvent.press(getByTestId('create-basket-button'))
-    })
-
-    await waitFor(() => {
-      const nameInput = getByPlaceholderText('Ex: Panier du Matin')
-      fireEvent.changeText(nameInput, 'Test Panier')
-
-      const priceInput = getByPlaceholderText('Ex: 2000')
-      fireEvent.changeText(priceInput, '2000')
-
-      const quantityInput = getByPlaceholderText('Ex: 5')
-      fireEvent.changeText(quantityInput, '0')
-
-      const submitButton = getByText('Créer')
-      fireEvent.press(submitButton)
-    })
-
-    await waitFor(() => {
-      expect(Alert.alert).toHaveBeenCalledWith('Erreur', 'La quantité doit être supérieure à 0')
     })
   })
 
@@ -440,34 +355,6 @@ describe('MerchantSurpriseBasketsScreen', () => {
       expect(screen.getByText(/Cr.*ation/i)).toBeTruthy()
       expect(screen.getByText(/panier surprise/i)).toBeTruthy()
     })
-
-    return
-    ;(apiService.post as jest.Mock).mockResolvedValue({ data: { id: 3 } })
-    const { getByTestId, getByText, getByPlaceholderText } = render(
-      <MerchantSurpriseBasketsScreen navigation={mockNavigation} />
-    )
-    await waitFor(() => {
-      fireEvent.press(getByTestId('create-basket-button'))
-    })
-
-    await waitFor(() => {
-      fireEvent.changeText(getByPlaceholderText('Ex: Panier du Matin'), 'Nouveau Panier')
-      fireEvent.changeText(getByPlaceholderText('Ex: Viennoiseries, fruits...'), 'Description test')
-      fireEvent.changeText(getByPlaceholderText('Ex: 2000'), '2500')
-      fireEvent.changeText(getByPlaceholderText('Ex: 5'), '10')
-
-      fireEvent.press(getByText('Créer'))
-    })
-
-    await waitFor(() => {
-      expect(apiService.post).toHaveBeenCalledWith('/surprise-baskets', {
-        name: 'Nouveau Panier',
-        description: 'Description test',
-        discounted_price: 2500,
-        quantity_available: 10,
-      })
-      expect(Alert.alert).toHaveBeenCalledWith('Succès', 'Panier créé avec succès')
-    })
   })
 
   // ============ EDIT BASKET TESTS ============
@@ -481,21 +368,6 @@ describe('MerchantSurpriseBasketsScreen', () => {
     await waitFor(() => {
       expect(screen.getByText('Modifier le panier')).toBeTruthy()
       expect(screen.getByDisplayValue('Panier Matin')).toBeTruthy()
-    })
-
-    return
-    const { getByText } = render(
-      <MerchantSurpriseBasketsScreen navigation={mockNavigation} />
-    )
-    await waitFor(() => {
-      expect(getByText('Panier Matin')).toBeTruthy()
-    })
-
-    const modifierButtons = await screen.findAllByText('Modifier')
-    fireEvent.press(modifierButtons[0])
-
-    await waitFor(() => {
-      expect(getByText('Modifier le Panier')).toBeTruthy()
     })
   })
 
@@ -524,35 +396,6 @@ describe('MerchantSurpriseBasketsScreen', () => {
       )
       expect(screen.getByText(/Modification/i)).toBeTruthy()
       expect(screen.getByText(/panier.*modifi/i)).toBeTruthy()
-    })
-
-    return
-    ;(apiService.put as jest.Mock).mockResolvedValue({ data: { success: true } })
-    const { getByText, getByDisplayValue } = render(
-      <MerchantSurpriseBasketsScreen navigation={mockNavigation} />
-    )
-    await waitFor(() => {
-      expect(getByText('Panier Matin')).toBeTruthy()
-    })
-
-    const modifierButtons = await screen.findAllByText('Modifier')
-    fireEvent.press(modifierButtons[0])
-
-    await waitFor(() => {
-      const nameInput = getByDisplayValue('Panier Matin')
-      fireEvent.changeText(nameInput, 'Panier Matin Modifié')
-
-      fireEvent.press(getByText('Enregistrer'))
-    })
-
-    await waitFor(() => {
-      expect(apiService.put).toHaveBeenCalledWith('/surprise-baskets/1', {
-        name: 'Panier Matin Modifié',
-        description: 'Viennoiseries du matin',
-        discounted_price: 2000,
-        quantity_available: 5,
-      })
-      expect(Alert.alert).toHaveBeenCalledWith('Succès', 'Panier modifié avec succès')
     })
   })
 
@@ -597,31 +440,6 @@ describe('MerchantSurpriseBasketsScreen', () => {
       expect(screen.getByText(/Suppression/i)).toBeTruthy()
       expect(screen.getByText(/panier.*supprim/i)).toBeTruthy()
     })
-
-    return
-    ;(apiService.delete as jest.Mock).mockResolvedValue({ data: { success: true } })
-
-    // Mock Alert.alert to auto-confirm
-    ;(Alert.alert as jest.Mock).mockImplementation((title, message, buttons) => {
-      if (buttons && buttons[1]) {
-        buttons[1].onPress()
-      }
-    })
-
-    const { getByText } = render(
-      <MerchantSurpriseBasketsScreen navigation={mockNavigation} />
-    )
-    await waitFor(() => {
-      expect(getByText('Panier Matin')).toBeTruthy()
-    })
-
-    const supprimerButtons = await screen.findAllByText('Supprimer')
-    fireEvent.press(supprimerButtons[0])
-
-    await waitFor(() => {
-      expect(apiService.delete).toHaveBeenCalledWith('/surprise-baskets/1')
-      expect(Alert.alert).toHaveBeenCalledWith('Succès', 'Le panier a été supprimé')
-    })
   })
 
   // ============ TOGGLE STATUS TESTS ============
@@ -638,25 +456,6 @@ describe('MerchantSurpriseBasketsScreen', () => {
       expect(screen.getByText(/Statut/i)).toBeTruthy()
       expect(screen.getByText(/panier.*d.sactiv/i)).toBeTruthy()
     })
-
-    return
-    ;(apiService.put as jest.Mock).mockResolvedValue({ data: { success: true } })
-    const { getByText } = render(
-      <MerchantSurpriseBasketsScreen navigation={mockNavigation} />
-    )
-    await waitFor(() => {
-      expect(getByText('Panier Matin')).toBeTruthy()
-    })
-
-    const desactiverButton = getByText('Désactiver')
-    fireEvent.press(desactiverButton)
-
-    await waitFor(() => {
-      expect(apiService.put).toHaveBeenCalledWith('/surprise-baskets/1', {
-        is_active: false,
-      })
-      expect(Alert.alert).toHaveBeenCalledWith('Succès', 'Panier désactivé')
-    })
   })
 
   test('should toggle basket status from inactive to active', async () => {
@@ -670,25 +469,6 @@ describe('MerchantSurpriseBasketsScreen', () => {
       expect(apiService.put).toHaveBeenCalledWith('/surprise-baskets/2', { is_active: true })
       expect(screen.getByText(/Statut/i)).toBeTruthy()
       expect(screen.getByText(/panier.*activ/i)).toBeTruthy()
-    })
-
-    return
-    ;(apiService.put as jest.Mock).mockResolvedValue({ data: { success: true } })
-    const { getByText } = render(
-      <MerchantSurpriseBasketsScreen navigation={mockNavigation} />
-    )
-    await waitFor(() => {
-      expect(getByText('Panier Soir')).toBeTruthy()
-    })
-
-    const activerButtons = await screen.findAllByText('Activer')
-    fireEvent.press(activerButtons[0])
-
-    await waitFor(() => {
-      expect(apiService.put).toHaveBeenCalledWith('/surprise-baskets/2', {
-        is_active: true,
-      })
-      expect(Alert.alert).toHaveBeenCalledWith('Succès', 'Panier activé')
     })
   })
 
