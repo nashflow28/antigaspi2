@@ -20,7 +20,7 @@ import { Product, Category } from '../../types'
 import apiService from '../../services/api'
 import { formatCurrency } from '../../utils/currencyHelpers'
 import { getImageUrl } from '../../utils/imageHelpers'
-import { Button, Badge, Card, Typography } from '../../components/2025'
+import { Button, Badge, Card, Typography, ConfirmModal } from '../../components/2025'
 
 interface ProductWithModeration extends Product {
   needs_approval?: boolean
@@ -28,6 +28,7 @@ interface ProductWithModeration extends Product {
 }
 
 type ProductStatus = 'all' | 'active' | 'inactive' | 'pending'
+type ConfirmAction = 'activate' | 'deactivate' | 'approve' | 'reject' | 'delete' | null
 
 const AdminProductsScreen: React.FC = () => {
   const theme = useTheme()
@@ -44,6 +45,11 @@ const AdminProductsScreen: React.FC = () => {
   const [showDetailModal, setShowDetailModal] = useState(false)
   // Utiliser un Set d'IDs au lieu d'un boolean pour éviter les race conditions
   const [actionLoadingIds, setActionLoadingIds] = useState<Set<number>>(new Set())
+
+  // Confirm modal state
+  const [showConfirmModal, setShowConfirmModal] = useState(false)
+  const [confirmAction, setConfirmAction] = useState<ConfirmAction>(null)
+  const [productToConfirm, setProductToConfirm] = useState<ProductWithModeration | null>(null)
 
   useEffect(() => {
     loadData()
@@ -64,10 +70,12 @@ const AdminProductsScreen: React.FC = () => {
         apiService.get('/categories'),
       ])
 
-      const allProducts = productsRes.data.data || []
+      // apiService peut retourner le tableau directement ou {data: [...]}
+      const allProducts = Array.isArray(productsRes.data) ? productsRes.data : (productsRes.data?.data || [])
+      const allCategories = Array.isArray(categoriesRes.data) ? categoriesRes.data : (categoriesRes.data?.data || [])
+      console.log('🟢 [AdminProducts] Products:', allProducts.length, 'Categories:', allCategories.length)
       setProducts(allProducts)
-      // Extract data from {success: true, data: [...]} response format
-      setCategories(categoriesRes.data?.data || categoriesRes.data || [])
+      setCategories(allCategories)
     } catch (error: any) {
       console.error('Erreur chargement données:', error)
 
@@ -128,202 +136,174 @@ const AdminProductsScreen: React.FC = () => {
     setShowDetailModal(true)
   }
 
-  const handleToggleActive = async (product: ProductWithModeration) => {
-    const newStatus = !product.is_active
-    Alert.alert(
-      newStatus ? 'Activer le produit' : 'Désactiver le produit',
-      `Voulez-vous ${newStatus ? 'activer' : 'désactiver'} "${product.name}" ?`,
-      [
-        { text: 'Annuler', style: 'cancel' },
-        {
-          text: newStatus ? 'Activer' : 'Désactiver',
-          onPress: async () => {
-            // Backup pour rollback
-            const previousProducts = [...products]
-
-            try {
-              // Ajouter l'ID au Set de loading
-              setActionLoadingIds(prev => new Set(prev).add(product.id))
-
-              // Mise à jour optimiste
-              setProducts(prev =>
-                prev.map(p => (p.id === product.id ? { ...p, is_active: newStatus } : p))
-              )
-
-              await apiService.put(`/products/${product.id}`, {
-                is_active: newStatus,
-              })
-
-              Alert.alert('Succès', `Produit ${newStatus ? 'activé' : 'désactivé'}`)
-            } catch (error) {
-              console.error('Erreur toggle actif:', error)
-
-              // Rollback
-              setProducts(previousProducts)
-
-              Alert.alert('Erreur', 'Impossible de modifier le statut')
-            } finally {
-              // Retirer l'ID du Set
-              setActionLoadingIds(prev => {
-                const newSet = new Set(prev)
-                newSet.delete(product.id)
-                return newSet
-              })
-            }
-          },
-        },
-      ]
-    )
+  const handleToggleActive = (product: ProductWithModeration) => {
+    setProductToConfirm(product)
+    setConfirmAction(product.is_active ? 'deactivate' : 'activate')
+    setShowConfirmModal(true)
   }
 
-  const handleApproveProduct = async (product: ProductWithModeration) => {
-    Alert.alert(
-      'Approuver le produit',
-      `Voulez-vous approuver "${product.name}" ?`,
-      [
-        { text: 'Annuler', style: 'cancel' },
-        {
-          text: 'Approuver',
-          onPress: async () => {
-            // Backup pour rollback
-            const previousProducts = [...products]
-
-            try {
-              // Ajouter l'ID au Set de loading
-              setActionLoadingIds(prev => new Set(prev).add(product.id))
-
-              // Mise à jour optimiste
-              setProducts(prev =>
-                prev.map(p =>
-                  p.id === product.id
-                    ? { ...p, needs_approval: false, is_active: true }
-                    : p
-                )
-              )
-
-              await apiService.post(`/admin/products/${product.id}/approve`)
-
-              setShowDetailModal(false)
-              Alert.alert('Succès', 'Produit approuvé avec succès')
-            } catch (error) {
-              console.error('Erreur approbation:', error)
-
-              // Rollback
-              setProducts(previousProducts)
-
-              Alert.alert('Erreur', 'Impossible d\'approuver le produit')
-            } finally {
-              // Retirer l'ID du Set
-              setActionLoadingIds(prev => {
-                const newSet = new Set(prev)
-                newSet.delete(product.id)
-                return newSet
-              })
-            }
-          },
-        },
-      ]
-    )
+  const handleApproveProduct = (product: ProductWithModeration) => {
+    setProductToConfirm(product)
+    setConfirmAction('approve')
+    setShowConfirmModal(true)
   }
 
-  const handleRejectProduct = async (product: ProductWithModeration) => {
-    // Ouvrir un simple dialogue de confirmation (Alert.prompt n'existe pas sur Android)
-    // TODO: Créer un modal personnalisé si besoin de saisir une raison
-    Alert.alert(
-      'Rejeter le produit',
-      `Voulez-vous vraiment rejeter "${product.name}" ?`,
-      [
-        { text: 'Annuler', style: 'cancel' },
-        {
-          text: 'Rejeter',
-          style: 'destructive',
-          onPress: async () => {
-            // Backup pour rollback
-            const previousProducts = [...products]
-
-            try {
-              // Ajouter l'ID au Set de loading
-              setActionLoadingIds(prev => new Set(prev).add(product.id))
-
-              // Mise à jour optimiste
-              setProducts(prev =>
-                prev.map(p =>
-                  p.id === product.id
-                    ? { ...p, needs_approval: false, is_active: false }
-                    : p
-                )
-              )
-
-              await apiService.post(`/admin/products/${product.id}/reject`, {
-                reason: 'Rejeté par l\'administrateur',
-              })
-
-              setShowDetailModal(false)
-              Alert.alert('Succès', 'Produit rejeté')
-            } catch (error) {
-              console.error('Erreur rejet:', error)
-
-              // Rollback
-              setProducts(previousProducts)
-
-              Alert.alert('Erreur', 'Impossible de rejeter le produit')
-            } finally {
-              // Retirer l'ID du Set
-              setActionLoadingIds(prev => {
-                const newSet = new Set(prev)
-                newSet.delete(product.id)
-                return newSet
-              })
-            }
-          },
-        },
-      ]
-    )
+  const handleRejectProduct = (product: ProductWithModeration) => {
+    setProductToConfirm(product)
+    setConfirmAction('reject')
+    setShowConfirmModal(true)
   }
 
-  const handleDeleteProduct = async (product: ProductWithModeration) => {
-    Alert.alert(
-      'Supprimer le produit',
-      `⚠️ ATTENTION : Cette action est irréversible.\n\nVoulez-vous vraiment supprimer "${product.name}" ?`,
-      [
-        { text: 'Annuler', style: 'cancel' },
-        {
-          text: 'Supprimer',
-          style: 'destructive',
-          onPress: async () => {
-            // Backup de l'état précédent pour rollback en cas d'erreur
-            const previousProducts = [...products]
+  const handleDeleteProduct = (product: ProductWithModeration) => {
+    setProductToConfirm(product)
+    setConfirmAction('delete')
+    setShowConfirmModal(true)
+  }
 
-            try {
-              // Ajouter l'ID au Set de loading
-              setActionLoadingIds(prev => new Set(prev).add(product.id))
+  const executeConfirmAction = async () => {
+    if (!productToConfirm || !confirmAction) return
 
-              // Mise à jour optimiste (retirer localement AVANT l'appel API)
-              setProducts(prev => prev.filter(p => p.id !== product.id))
+    const previousProducts = [...products]
 
-              await apiService.delete(`/products/${product.id}`)
+    try {
+      setActionLoadingIds(prev => new Set(prev).add(productToConfirm.id))
 
-              setShowDetailModal(false)
-              Alert.alert('Succès', 'Produit supprimé définitivement')
-            } catch (error) {
-              console.error('Erreur suppression:', error)
+      switch (confirmAction) {
+        case 'activate':
+          setProducts(prev =>
+            prev.map(p => (p.id === productToConfirm.id ? { ...p, is_active: true } : p))
+          )
+          await apiService.put(`/products/${productToConfirm.id}`, { is_active: true })
+          break
 
-              // Rollback en cas d'erreur
-              setProducts(previousProducts)
+        case 'deactivate':
+          setProducts(prev =>
+            prev.map(p => (p.id === productToConfirm.id ? { ...p, is_active: false } : p))
+          )
+          await apiService.put(`/products/${productToConfirm.id}`, { is_active: false })
+          break
 
-              Alert.alert('Erreur', 'Impossible de supprimer le produit')
-            } finally {
-              // Retirer l'ID du Set
-              setActionLoadingIds(prev => {
-                const newSet = new Set(prev)
-                newSet.delete(product.id)
-                return newSet
-              })
-            }
-          },
-        },
-      ]
-    )
+        case 'approve':
+          setProducts(prev =>
+            prev.map(p =>
+              p.id === productToConfirm.id
+                ? { ...p, needs_approval: false, is_active: true }
+                : p
+            )
+          )
+          await apiService.post(`/admin/products/${productToConfirm.id}/approve`)
+          setShowDetailModal(false)
+          break
+
+        case 'reject':
+          setProducts(prev =>
+            prev.map(p =>
+              p.id === productToConfirm.id
+                ? { ...p, needs_approval: false, is_active: false }
+                : p
+            )
+          )
+          await apiService.post(`/admin/products/${productToConfirm.id}/reject`, {
+            reason: 'Rejeté par l\'administrateur',
+          })
+          setShowDetailModal(false)
+          break
+
+        case 'delete':
+          setProducts(prev => prev.filter(p => p.id !== productToConfirm.id))
+          await apiService.delete(`/products/${productToConfirm.id}`)
+          setShowDetailModal(false)
+          break
+      }
+
+      setShowConfirmModal(false)
+      Alert.alert('Succès', getSuccessMessage())
+    } catch (error) {
+      console.error('Erreur action:', error)
+      setProducts(previousProducts)
+      Alert.alert('Erreur', getErrorMessage())
+    } finally {
+      setActionLoadingIds(prev => {
+        const newSet = new Set(prev)
+        newSet.delete(productToConfirm.id)
+        return newSet
+      })
+    }
+  }
+
+  const getSuccessMessage = () => {
+    switch (confirmAction) {
+      case 'activate': return 'Produit activé avec succès'
+      case 'deactivate': return 'Produit désactivé avec succès'
+      case 'approve': return 'Produit approuvé avec succès'
+      case 'reject': return 'Produit rejeté'
+      case 'delete': return 'Produit supprimé définitivement'
+      default: return 'Action effectuée'
+    }
+  }
+
+  const getErrorMessage = () => {
+    switch (confirmAction) {
+      case 'activate': return 'Impossible d\'activer le produit'
+      case 'deactivate': return 'Impossible de désactiver le produit'
+      case 'approve': return 'Impossible d\'approuver le produit'
+      case 'reject': return 'Impossible de rejeter le produit'
+      case 'delete': return 'Impossible de supprimer le produit'
+      default: return 'Erreur lors de l\'action'
+    }
+  }
+
+  const getConfirmModalConfig = () => {
+    switch (confirmAction) {
+      case 'activate':
+        return {
+          title: 'Activer le produit',
+          message: `Voulez-vous activer "${productToConfirm?.name}" ? Il sera visible par les clients.`,
+          confirmText: 'Activer',
+          variant: 'success' as const,
+          icon: 'eye' as const,
+        }
+      case 'deactivate':
+        return {
+          title: 'Désactiver le produit',
+          message: `Voulez-vous désactiver "${productToConfirm?.name}" ? Il ne sera plus visible par les clients.`,
+          confirmText: 'Désactiver',
+          variant: 'warning' as const,
+          icon: 'eye-off' as const,
+        }
+      case 'approve':
+        return {
+          title: 'Approuver le produit',
+          message: `Voulez-vous approuver "${productToConfirm?.name}" ? Il sera visible par les clients.`,
+          confirmText: 'Approuver',
+          variant: 'success' as const,
+          icon: 'checkmark-circle' as const,
+        }
+      case 'reject':
+        return {
+          title: 'Rejeter le produit',
+          message: `Voulez-vous rejeter "${productToConfirm?.name}" ? Le commerçant sera notifié.`,
+          confirmText: 'Rejeter',
+          variant: 'danger' as const,
+          icon: 'close-circle' as const,
+        }
+      case 'delete':
+        return {
+          title: 'Supprimer le produit',
+          message: `⚠️ ATTENTION : Cette action est irréversible.\n\nVoulez-vous vraiment supprimer "${productToConfirm?.name}" ?`,
+          confirmText: 'Supprimer',
+          variant: 'danger' as const,
+          icon: 'trash' as const,
+        }
+      default:
+        return {
+          title: 'Confirmer',
+          message: 'Confirmer cette action ?',
+          confirmText: 'Confirmer',
+          variant: 'info' as const,
+          icon: 'information-circle' as const,
+        }
+    }
   }
 
   const getStatusBadge = (product: ProductWithModeration) => {
@@ -832,6 +812,22 @@ const AdminProductsScreen: React.FC = () => {
 
       {/* Modal détail */}
       {renderDetailModal()}
+
+      {/* Confirm Modal */}
+      {confirmAction && (
+        <ConfirmModal
+          visible={showConfirmModal}
+          onClose={() => setShowConfirmModal(false)}
+          onConfirm={executeConfirmAction}
+          title={getConfirmModalConfig().title}
+          message={getConfirmModalConfig().message}
+          confirmText={getConfirmModalConfig().confirmText}
+          cancelText="Annuler"
+          variant={getConfirmModalConfig().variant}
+          loading={productToConfirm ? actionLoadingIds.has(productToConfirm.id) : false}
+          icon={getConfirmModalConfig().icon}
+        />
+      )}
     </View>
   )
 }

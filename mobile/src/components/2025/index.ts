@@ -16,6 +16,9 @@ export type { BadgeProps, BadgeVariant, BadgeSize } from './Badge'
 export { Modal } from './Modal'
 export type { ModalProps, ModalVariant } from './Modal'
 
+export { default as ConfirmModal } from './ConfirmModal'
+export type { ConfirmModalVariant } from './ConfirmModal'
+
 export {
   Typography,
   Heading1,

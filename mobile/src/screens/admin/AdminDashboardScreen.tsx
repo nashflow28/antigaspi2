@@ -15,7 +15,7 @@ import { useTheme } from '../../theme'
 import { useAppDispatch } from '../../store/hooks'
 import { logoutUser } from '../../store/slices/authSlice'
 import apiService from '../../services/api'
-import { Typography, Card } from '../../components/2025'
+import { Typography, Card, Badge } from '../../components/2025'
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack'
 
 interface AdminStats {
@@ -37,6 +37,72 @@ interface AdminStats {
 
 type AdminDashboardScreenProps = {
   navigation: NativeStackNavigationProp<any>
+}
+
+// Helper functions pour l'activité récente
+const getActivityIcon = (type: string): any => {
+  switch (type) {
+    case 'reservation':
+    case 'new_reservation':
+      return 'receipt-outline'
+    case 'user':
+    case 'new_user':
+      return 'person-add-outline'
+    case 'product':
+    case 'new_product':
+      return 'cube-outline'
+    case 'merchant':
+    case 'new_merchant':
+      return 'storefront-outline'
+    case 'review':
+      return 'star-outline'
+    case 'payment':
+      return 'cash-outline'
+    default:
+      return 'information-circle-outline'
+  }
+}
+
+const getActivityColor = (type: string, theme: any): string => {
+  switch (type) {
+    case 'reservation':
+    case 'new_reservation':
+      return theme.colors.primary[500]
+    case 'user':
+    case 'new_user':
+      return '#06B6D4'
+    case 'product':
+    case 'new_product':
+      return theme.colors.warning
+    case 'merchant':
+    case 'new_merchant':
+      return theme.colors.success
+    case 'review':
+      return '#F59E0B'
+    case 'payment':
+      return '#10B981'
+    default:
+      return theme.colors.neutral[400]
+  }
+}
+
+const formatActivityDate = (dateString: string): string => {
+  if (!dateString) return '--'
+  const date = new Date(dateString)
+  if (isNaN(date.getTime())) return '--'
+
+  const now = new Date()
+  const diff = now.getTime() - date.getTime()
+  const minutes = Math.floor(diff / (1000 * 60))
+  const hours = Math.floor(diff / (1000 * 60 * 60))
+  const days = Math.floor(diff / (1000 * 60 * 60 * 24))
+
+  if (minutes < 1) return "À l'instant"
+  if (minutes < 60) return `Il y a ${minutes} min`
+  if (hours < 24) return `Il y a ${hours}h`
+  if (days === 1) return 'Hier'
+  if (days < 7) return `Il y a ${days} jours`
+  return date.toLocaleDateString('fr-FR')
 }
 
 const AdminDashboardScreen: React.FC<AdminDashboardScreenProps> = ({ navigation }) => {
@@ -86,26 +152,36 @@ const AdminDashboardScreen: React.FC<AdminDashboardScreenProps> = ({ navigation 
       }
 
       // API endpoint: GET /admin/dashboard
-      // Expected response: { success: true, data: { stats: {...}, topMerchants: [...], ... } }
+      // apiService retourne directement response.data d'axios
+      // Backend retourne: { success, stats: {...}, topMerchants, popularCategories, recentActivities, environmentalImpact }
       const response = await apiService.get('/admin/dashboard')
+      console.log('🟢 [AdminDashboard] Response keys:', Object.keys(response || {}))
 
-      if (isMountedRef.current && response.data?.data) {
+      // response EST directement l'objet {success, stats, ...}
+      const backendData = response.stats ? response : response.data
+      if (isMountedRef.current && backendData?.stats) {
+        console.log('🟢 [AdminDashboard] Stats:', backendData.stats)
+
+        // Calculer le total des produits depuis les catégories
+        const totalProducts = backendData.popularCategories?.reduce(
+          (acc: number, cat: any) => acc + (cat.productCount || 0), 0
+        ) ?? 0
+
         // Transform backend camelCase to expected snake_case format
-        const backendData = response.data.data
         const transformedStats: AdminStats = {
           total_users: backendData.stats?.totalUsers ?? 0,
           total_merchants: backendData.stats?.activeMerchants ?? 0,
-          total_products: backendData.popularCategories?.reduce((acc: number, cat: any) => acc + (cat.productCount || 0), 0) ?? 0,
-          active_products: backendData.stats?.productsSaved ?? 0,
-          total_reservations: backendData.stats?.productsSaved ?? 0,
+          total_products: totalProducts,
+          active_products: totalProducts, // Tous les produits listés sont actifs
+          total_reservations: backendData.stats?.totalReservations ?? backendData.stats?.productsSaved ?? 0,
           total_revenue: backendData.stats?.totalRevenue ?? 0,
-          pending_merchants: 0, // Not provided by backend currently
-          pending_products: 0, // Not provided by backend currently
+          pending_merchants: backendData.stats?.pendingMerchants ?? 0, // Maintenant récupéré du backend
+          pending_products: backendData.stats?.pendingProducts ?? 0,
           recent_activity: backendData.recentActivities?.map((activity: any) => ({
             id: activity.id,
             type: activity.type,
             description: activity.description,
-            created_at: activity.timestamp,
+            created_at: activity.timestamp || activity.created_at,
           })) ?? [],
         }
         setStats(transformedStats)
@@ -207,32 +283,48 @@ const AdminDashboardScreen: React.FC<AdminDashboardScreenProps> = ({ navigation 
           />
         }
       >
-        {/* Alertes */}
+        {/* Alertes - Améliorées avec meilleur contraste */}
         {stats && ((stats.pending_merchants ?? 0) > 0 || (stats.pending_products ?? 0) > 0) && (
           <View style={styles.section}>
-            <Card
-              variant="elevated"
-              style={[styles.alertCard, { backgroundColor: theme.colors.warning }]}
+            <TouchableOpacity
+              activeOpacity={0.8}
+              onPress={() => navigation.navigate('Merchants')}
             >
-              <View style={styles.alertContent}>
-                <Ionicons name="alert-circle" size={32} color={theme.colors.warning} />
-                <View style={{ flex: 1 }}>
-                  <Typography variant="h4" weight="semibold" style={{ marginBottom: 4 }}>
-                    Actions requises
-                  </Typography>
-                  {(stats.pending_merchants ?? 0) > 0 && (
-                    <Typography variant="body" color="secondary">
-                      • {stats.pending_merchants} commerçant{(stats.pending_merchants ?? 0) > 1 ? 's' : ''} à valider
+              <Card
+                variant="elevated"
+                style={[styles.alertCard, { backgroundColor: '#FEF3C7', borderLeftWidth: 4, borderLeftColor: '#F59E0B' }]}
+              >
+                <View style={styles.alertContent}>
+                  <View style={[styles.alertIconContainer, { backgroundColor: '#F59E0B' }]}>
+                    <Ionicons name="alert-circle" size={24} color="white" />
+                  </View>
+                  <View style={{ flex: 1 }}>
+                    <Typography variant="h4" weight="bold" style={{ marginBottom: 8, color: '#92400E' }}>
+                      ⚠️ Actions requises
                     </Typography>
-                  )}
-                  {(stats.pending_products ?? 0) > 0 && (
-                    <Typography variant="body" color="secondary">
-                      • {stats.pending_products} produit{(stats.pending_products ?? 0) > 1 ? 's' : ''} à modérer
+                    {(stats.pending_merchants ?? 0) > 0 && (
+                      <View style={styles.alertItem}>
+                        <View style={[styles.alertDot, { backgroundColor: '#F59E0B' }]} />
+                        <Typography variant="body" style={{ color: '#92400E' }}>
+                          {stats.pending_merchants} commerçant{(stats.pending_merchants ?? 0) > 1 ? 's' : ''} en attente de validation
+                        </Typography>
+                      </View>
+                    )}
+                    {(stats.pending_products ?? 0) > 0 && (
+                      <View style={styles.alertItem}>
+                        <View style={[styles.alertDot, { backgroundColor: '#F59E0B' }]} />
+                        <Typography variant="body" style={{ color: '#92400E' }}>
+                          {stats.pending_products} produit{(stats.pending_products ?? 0) > 1 ? 's' : ''} à modérer
+                        </Typography>
+                      </View>
+                    )}
+                    <Typography variant="caption" style={{ color: '#B45309', marginTop: 8 }}>
+                      Appuyez pour voir les détails →
                     </Typography>
-                  )}
+                  </View>
                 </View>
-              </View>
-            </Card>
+              </Card>
+            </TouchableOpacity>
           </View>
         )}
 
@@ -341,7 +433,7 @@ const AdminDashboardScreen: React.FC<AdminDashboardScreenProps> = ({ navigation 
           </Card>
         </View>
 
-        {/* Actions rapides */}
+        {/* Actions rapides - Grille améliorée */}
         <View style={styles.section}>
           <Typography variant="h3" weight="bold" style={{ marginBottom: 16 }}>
             Actions rapides
@@ -352,15 +444,14 @@ const AdminDashboardScreen: React.FC<AdminDashboardScreenProps> = ({ navigation 
               activeOpacity={0.7}
               onPress={() => navigation.navigate('Users')}
               testID="action-users-button"
+              style={styles.actionButton}
             >
               <Card variant="elevated" style={styles.actionCard}>
-                <Ionicons name="people-outline" size={32} color={theme.colors.primary[500]} />
-                <Typography
-                  variant="body"
-                  weight="semibold"
-                  style={{ marginTop: 12, textAlign: 'center' }}
-                >
-                  Gérer utilisateurs
+                <View style={[styles.actionIconContainer, { backgroundColor: theme.withOpacity(theme.colors.primary[500], 0.1) }]}>
+                  <Ionicons name="people-outline" size={28} color={theme.colors.primary[500]} />
+                </View>
+                <Typography variant="small" weight="semibold" style={{ marginTop: 8, textAlign: 'center' }}>
+                  Utilisateurs
                 </Typography>
               </Card>
             </TouchableOpacity>
@@ -369,15 +460,14 @@ const AdminDashboardScreen: React.FC<AdminDashboardScreenProps> = ({ navigation 
               activeOpacity={0.7}
               onPress={() => navigation.navigate('Products')}
               testID="action-products-button"
+              style={styles.actionButton}
             >
               <Card variant="elevated" style={styles.actionCard}>
-                <Ionicons name="cube-outline" size={32} color={theme.colors.primary[500]} />
-                <Typography
-                  variant="body"
-                  weight="semibold"
-                  style={{ marginTop: 12, textAlign: 'center' }}
-                >
-                  Gérer produits
+                <View style={[styles.actionIconContainer, { backgroundColor: theme.withOpacity(theme.colors.warning, 0.1) }]}>
+                  <Ionicons name="cube-outline" size={28} color={theme.colors.warning} />
+                </View>
+                <Typography variant="small" weight="semibold" style={{ marginTop: 8, textAlign: 'center' }}>
+                  Produits
                 </Typography>
               </Card>
             </TouchableOpacity>
@@ -386,16 +476,20 @@ const AdminDashboardScreen: React.FC<AdminDashboardScreenProps> = ({ navigation 
               activeOpacity={0.7}
               onPress={() => navigation.navigate('Merchants')}
               testID="action-merchants-button"
+              style={styles.actionButton}
             >
               <Card variant="elevated" style={styles.actionCard}>
-                <Ionicons name="storefront-outline" size={32} color={theme.colors.primary[500]} />
-                <Typography
-                  variant="body"
-                  weight="semibold"
-                  style={{ marginTop: 12, textAlign: 'center' }}
-                >
-                  Gérer commerçants
+                <View style={[styles.actionIconContainer, { backgroundColor: theme.withOpacity(theme.colors.success, 0.1) }]}>
+                  <Ionicons name="storefront-outline" size={28} color={theme.colors.success} />
+                </View>
+                <Typography variant="small" weight="semibold" style={{ marginTop: 8, textAlign: 'center' }}>
+                  Commerçants
                 </Typography>
+                {(stats?.pending_merchants ?? 0) > 0 && (
+                  <Badge variant="error" size="sm" style={{ position: 'absolute', top: 8, right: 8 }}>
+                    {stats?.pending_merchants}
+                  </Badge>
+                )}
               </Card>
             </TouchableOpacity>
 
@@ -403,20 +497,142 @@ const AdminDashboardScreen: React.FC<AdminDashboardScreenProps> = ({ navigation 
               activeOpacity={0.7}
               onPress={() => navigation.navigate('Categories')}
               testID="action-categories-button"
+              style={styles.actionButton}
             >
               <Card variant="elevated" style={styles.actionCard}>
-                <Ionicons name="grid-outline" size={32} color={theme.colors.primary[500]} />
-                <Typography
-                  variant="body"
-                  weight="semibold"
-                  style={{ marginTop: 12, textAlign: 'center' }}
-                >
-                  Gérer catégories
+                <View style={[styles.actionIconContainer, { backgroundColor: theme.withOpacity('#8B5CF6', 0.1) }]}>
+                  <Ionicons name="grid-outline" size={28} color="#8B5CF6" />
+                </View>
+                <Typography variant="small" weight="semibold" style={{ marginTop: 8, textAlign: 'center' }}>
+                  Catégories
+                </Typography>
+              </Card>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              activeOpacity={0.7}
+              onPress={() => navigation.navigate('Analytics')}
+              testID="action-analytics-button"
+              style={styles.actionButton}
+            >
+              <Card variant="elevated" style={styles.actionCard}>
+                <View style={[styles.actionIconContainer, { backgroundColor: theme.withOpacity('#06B6D4', 0.1) }]}>
+                  <Ionicons name="analytics-outline" size={28} color="#06B6D4" />
+                </View>
+                <Typography variant="small" weight="semibold" style={{ marginTop: 8, textAlign: 'center' }}>
+                  Analytics
+                </Typography>
+              </Card>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              activeOpacity={0.7}
+              onPress={() => navigation.navigate('Moderation')}
+              testID="action-moderation-button"
+              style={styles.actionButton}
+            >
+              <Card variant="elevated" style={styles.actionCard}>
+                <View style={[styles.actionIconContainer, { backgroundColor: theme.withOpacity(theme.colors.error, 0.1) }]}>
+                  <Ionicons name="shield-checkmark-outline" size={28} color={theme.colors.error} />
+                </View>
+                <Typography variant="small" weight="semibold" style={{ marginTop: 8, textAlign: 'center' }}>
+                  Modération
+                </Typography>
+              </Card>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              activeOpacity={0.7}
+              onPress={() => navigation.navigate('Broadcast')}
+              testID="action-broadcast-button"
+              style={styles.actionButton}
+            >
+              <Card variant="elevated" style={styles.actionCard}>
+                <View style={[styles.actionIconContainer, { backgroundColor: theme.withOpacity('#EC4899', 0.1) }]}>
+                  <Ionicons name="megaphone-outline" size={28} color="#EC4899" />
+                </View>
+                <Typography variant="small" weight="semibold" style={{ marginTop: 8, textAlign: 'center' }}>
+                  Diffusion
+                </Typography>
+              </Card>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              activeOpacity={0.7}
+              onPress={() => navigation.navigate('Settings')}
+              testID="action-settings-button"
+              style={styles.actionButton}
+            >
+              <Card variant="elevated" style={styles.actionCard}>
+                <View style={[styles.actionIconContainer, { backgroundColor: theme.withOpacity('#6B7280', 0.1) }]}>
+                  <Ionicons name="settings-outline" size={28} color="#6B7280" />
+                </View>
+                <Typography variant="small" weight="semibold" style={{ marginTop: 8, textAlign: 'center' }}>
+                  Paramètres
                 </Typography>
               </Card>
             </TouchableOpacity>
           </View>
         </View>
+
+        {/* Activité récente */}
+        {stats?.recent_activity && stats.recent_activity.length > 0 && (
+          <View style={styles.section}>
+            <View style={styles.sectionHeader}>
+              <Typography variant="h3" weight="bold">
+                Activité récente
+              </Typography>
+              <TouchableOpacity onPress={() => navigation.navigate('Analytics')}>
+                <Typography variant="small" color="primary">
+                  Voir tout →
+                </Typography>
+              </TouchableOpacity>
+            </View>
+
+            <Card variant="elevated" style={{ padding: 0, overflow: 'hidden' }}>
+              {stats.recent_activity.slice(0, 5).map((activity, index) => (
+                <View
+                  key={activity.id}
+                  style={[
+                    styles.activityItem,
+                    index !== stats.recent_activity!.length - 1 && index < 4 && styles.activityItemBorder,
+                  ]}
+                >
+                  <View style={[styles.activityIcon, { backgroundColor: getActivityColor(activity.type, theme) }]}>
+                    <Ionicons
+                      name={getActivityIcon(activity.type)}
+                      size={18}
+                      color="white"
+                    />
+                  </View>
+                  <View style={{ flex: 1 }}>
+                    <Typography variant="body" weight="medium" numberOfLines={1}>
+                      {activity.description}
+                    </Typography>
+                    <Typography variant="caption" color="secondary">
+                      {formatActivityDate(activity.created_at)}
+                    </Typography>
+                  </View>
+                </View>
+              ))}
+            </Card>
+          </View>
+        )}
+
+        {/* Message si pas d'activité récente */}
+        {(!stats?.recent_activity || stats.recent_activity.length === 0) && (
+          <View style={styles.section}>
+            <Typography variant="h3" weight="bold" style={{ marginBottom: 16 }}>
+              Activité récente
+            </Typography>
+            <Card variant="elevated" style={styles.emptyActivityCard}>
+              <Ionicons name="time-outline" size={48} color={theme.colors.neutral[300]} />
+              <Typography variant="body" color="secondary" style={{ marginTop: 12, textAlign: 'center' }}>
+                Aucune activité récente à afficher
+              </Typography>
+            </Card>
+          </View>
+        )}
       </ScrollView>
     </View>
   )
@@ -457,13 +673,37 @@ const styles = StyleSheet.create({
   section: {
     marginBottom: 24,
   },
+  sectionHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
   alertCard: {
     padding: 16,
   },
   alertContent: {
     flexDirection: 'row',
     alignItems: 'flex-start',
-    gap: 16,
+    gap: 12,
+  },
+  alertIconContainer: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  alertItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 4,
+  },
+  alertDot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    marginRight: 8,
   },
   statsGrid: {
     flexDirection: 'row',
@@ -496,10 +736,43 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
     gap: 12,
+    justifyContent: 'space-between',
+  },
+  actionButton: {
+    width: '23%',
+    minWidth: 75,
   },
   actionCard: {
-    minWidth: 160,
-    padding: 20,
+    padding: 12,
+    alignItems: 'center',
+    position: 'relative',
+  },
+  actionIconContainer: {
+    width: 48,
+    height: 48,
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  activityItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 16,
+    gap: 12,
+  },
+  activityItemBorder: {
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(0,0,0,0.05)',
+  },
+  activityIcon: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  emptyActivityCard: {
+    padding: 32,
     alignItems: 'center',
   },
 })

@@ -17,7 +17,7 @@ import { Ionicons } from '@expo/vector-icons'
 import { useTheme } from '../../theme'
 import { Category } from '../../types'
 import apiService from '../../services/api'
-import { Button, Badge, Card, Typography } from '../../components/2025'
+import { Button, Badge, Card, Typography, ConfirmModal } from '../../components/2025'
 
 interface CategoryWithStats extends Category {
   products_count?: number
@@ -38,6 +38,11 @@ const AdminCategoriesScreen: React.FC = () => {
   const [formData, setFormData] = useState({ name: '', description: '' })
   const [formLoading, setFormLoading] = useState(false)
 
+  // Delete confirmation modal
+  const [showDeleteModal, setShowDeleteModal] = useState(false)
+  const [categoryToDelete, setCategoryToDelete] = useState<CategoryWithStats | null>(null)
+  const [deleteLoading, setDeleteLoading] = useState(false)
+
   useEffect(() => {
     loadCategories()
   }, [])
@@ -46,8 +51,9 @@ const AdminCategoriesScreen: React.FC = () => {
     try {
       setLoading(true)
       const response = await apiService.get('/admin/categories')
-      // Extract data from {success: true, data: [...]} response format
-      const allCategories = response.data?.data || response.data || []
+      // apiService peut retourner le tableau directement ou {data: [...]}
+      const allCategories = Array.isArray(response.data) ? response.data : (response.data?.data || [])
+      console.log('🟢 [AdminCategories] Nombre catégories:', allCategories.length)
       setCategories(allCategories)
     } catch (error: any) {
       console.error('Erreur chargement categories:', error)
@@ -88,43 +94,33 @@ const AdminCategoriesScreen: React.FC = () => {
   }
 
   const handleDeleteCategory = (category: CategoryWithStats) => {
-    Alert.alert(
-      'Supprimer la catégorie',
-      `Voulez-vous vraiment supprimer "${category.name}" ?\n\n${
-        (category.products_count || 0) > 0
-          ? `⚠️ Attention: ${category.products_count} produit(s) sont associés à cette catégorie.`
-          : ''
-      }`,
-      [
-        { text: 'Annuler', style: 'cancel' },
-        {
-          text: 'Supprimer',
-          style: 'destructive',
-          onPress: async () => {
-            // Backup pour rollback
-            const previousCategories = [...categories]
+    setCategoryToDelete(category)
+    setShowDeleteModal(true)
+  }
 
-            try {
-              // Mise à jour optimiste (pas de setLoading pour ne pas bloquer l'UI)
-              setCategories(prev => prev.filter(c => c.id !== category.id))
+  const confirmDeleteCategory = async () => {
+    if (!categoryToDelete) return
 
-              await apiService.delete(`/admin/categories/${category.id}`)
+    const previousCategories = [...categories]
 
-              Alert.alert('Succès', 'Catégorie supprimée avec succès')
-            } catch (error: any) {
-              console.error('Erreur suppression:', error)
+    try {
+      setDeleteLoading(true)
+      setCategories(prev => prev.filter(c => c.id !== categoryToDelete.id))
 
-              // Rollback en cas d'erreur
-              setCategories(previousCategories)
-              Alert.alert(
-                'Erreur',
-                error.response?.data?.message || 'Impossible de supprimer la catégorie'
-              )
-            }
-          },
-        },
-      ]
-    )
+      await apiService.delete(`/admin/categories/${categoryToDelete.id}`)
+
+      setShowDeleteModal(false)
+      Alert.alert('Succès', 'Catégorie supprimée avec succès')
+    } catch (error: any) {
+      console.error('Erreur suppression:', error)
+      setCategories(previousCategories)
+      Alert.alert(
+        'Erreur',
+        error.response?.data?.message || 'Impossible de supprimer la catégorie'
+      )
+    } finally {
+      setDeleteLoading(false)
+    }
   }
 
   const handleSubmitForm = async () => {
@@ -399,6 +395,20 @@ const AdminCategoriesScreen: React.FC = () => {
       />
 
       {renderFormModal()}
+
+      {/* Delete Confirmation Modal */}
+      <ConfirmModal
+        visible={showDeleteModal}
+        onClose={() => setShowDeleteModal(false)}
+        onConfirm={confirmDeleteCategory}
+        title="Supprimer la catégorie"
+        message={`Êtes-vous sûr de vouloir supprimer la catégorie "${categoryToDelete?.name}" ? Cette action est irréversible.`}
+        confirmText="Supprimer"
+        cancelText="Annuler"
+        variant="danger"
+        loading={deleteLoading}
+        icon="trash"
+      />
     </View>
   )
 }

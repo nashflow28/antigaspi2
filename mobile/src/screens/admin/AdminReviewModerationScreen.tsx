@@ -150,7 +150,9 @@ const AdminReviewModerationScreen: React.FC = () => {
   const loadStats = useCallback(async () => {
     try {
       const response = await apiService.get('/admin/reviews/stats')
-      const data: ModerationDashboardResponse = response.data?.data || response.data
+      // apiService peut retourner directement l'objet ou {data: {...}}
+      const data: ModerationDashboardResponse = response.data?.stats ? response.data : (response.data?.data || response.data)
+      console.log('🟢 [Moderation] Stats loaded:', data?.stats ? 'OK' : 'null')
       if (data) {
         setStats(data.stats)
         setReportReasons(data.report_reasons || {})
@@ -176,7 +178,9 @@ const AdminReviewModerationScreen: React.FC = () => {
       const response = await apiService.get('/admin/reviews/pending', {
         params: { per_page: 50 },
       })
-      const reviews = response.data?.data || []
+      // apiService peut retourner le tableau directement ou {data: [...]}
+      const reviews = Array.isArray(response.data) ? response.data : (response.data?.data || [])
+      console.log('🟢 [Moderation] Pending reviews:', reviews.length)
       setPendingReviews(reviews)
     } catch (error: any) {
       console.error('Erreur chargement avis en attente:', error)
@@ -210,7 +214,9 @@ const AdminReviewModerationScreen: React.FC = () => {
       }
 
       const response = await apiService.get('/admin/reviews/reported', { params })
-      const reports = response.data?.data || []
+      // apiService peut retourner le tableau directement ou {data: [...]}
+      const reports = Array.isArray(response.data) ? response.data : (response.data?.data || [])
+      console.log('🟢 [Moderation] Reported reviews:', reports.length)
       setReportedReviews(reports)
       setHasLoadedReports(true)
     } catch (error: any) {

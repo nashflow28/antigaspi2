@@ -77,7 +77,15 @@ const AdminMerchantsScreen: React.FC = () => {
       // L'endpoint retourne { merchants: MerchantWithStats[], pending_products: Product[] }
       // TODO: Implémenter pagination si le nombre de merchants dépasse 100
       const response = await apiService.get('/admin/moderation')
-      const allMerchants = response.data?.merchants || response.data || []
+      // apiService retourne directement response.data d'axios
+      // Backend retourne {success, merchants, pendingMerchants, ...}
+      console.log('🟢 [AdminMerchants] Response keys:', Object.keys(response || {}))
+      console.log('🟢 [AdminMerchants] response.merchants:', response.merchants?.length)
+      console.log('🟢 [AdminMerchants] response.data:', response.data)
+
+      // Essayer plusieurs chemins possibles
+      const allMerchants = response.merchants || response.data?.merchants || response.data || []
+      console.log('🟢 [AdminMerchants] Nombre merchants:', allMerchants.length)
       setMerchants(allMerchants)
     } catch (error: any) {
       console.error('Erreur chargement merchants:', error)
@@ -259,12 +267,14 @@ const AdminMerchantsScreen: React.FC = () => {
                   {item.products_count || 0} produits
                 </Typography>
               </View>
-              <View style={styles.statItem}>
-                <Ionicons name="person-outline" size={14} color={theme.colors.neutral[500]} />
-                <Typography variant="caption" color="secondary" style={{ marginLeft: 4 }}>
-                  {item.user.email}
-                </Typography>
-              </View>
+              {item.user?.email && (
+                <View style={styles.statItem}>
+                  <Ionicons name="person-outline" size={14} color={theme.colors.neutral[500]} />
+                  <Typography variant="caption" color="secondary" style={{ marginLeft: 4 }}>
+                    {item.user.email}
+                  </Typography>
+                </View>
+              )}
             </View>
           </View>
           <Ionicons name="chevron-forward" size={20} color={theme.colors.neutral[400]} />
@@ -335,53 +345,64 @@ const AdminMerchantsScreen: React.FC = () => {
               </View>
 
               {/* Informations utilisateur */}
-              <View style={styles.section}>
-                <Typography variant="h4" weight="semibold" style={{ marginBottom: 12 }}>
-                  Contact
-                </Typography>
-                <View style={styles.infoRow}>
-                  <Typography variant="body" color="secondary">
-                    Nom complet:
+              {selectedMerchant.user ? (
+                <View style={styles.section}>
+                  <Typography variant="h4" weight="semibold" style={{ marginBottom: 12 }}>
+                    Contact
                   </Typography>
-                  <Typography variant="body" weight="medium">
-                    {selectedMerchant.user.first_name} {selectedMerchant.user.last_name}
-                  </Typography>
-                </View>
-                <View style={styles.infoRow}>
-                  <Typography variant="body" color="secondary">
-                    Email:
-                  </Typography>
-                  <Typography variant="body" weight="medium">
-                    {selectedMerchant.user.email}
-                  </Typography>
-                </View>
-                <View style={styles.infoRow}>
-                  <Typography variant="body" color="secondary">
-                    Téléphone:
-                  </Typography>
-                  <Typography variant="body" weight="medium">
-                    {selectedMerchant.user.phone}
-                  </Typography>
-                </View>
-                <View style={styles.infoRow}>
-                  <Typography variant="body" color="secondary">
-                    Ville:
-                  </Typography>
-                  <Typography variant="body" weight="medium">
-                    {selectedMerchant.user.city}
-                  </Typography>
-                </View>
-                {selectedMerchant.user.address && (
                   <View style={styles.infoRow}>
                     <Typography variant="body" color="secondary">
-                      Adresse:
+                      Nom complet:
                     </Typography>
-                    <Typography variant="body" weight="medium" style={{ flex: 1, textAlign: 'right' }}>
-                      {selectedMerchant.user.address}
+                    <Typography variant="body" weight="medium">
+                      {selectedMerchant.user.first_name || ''} {selectedMerchant.user.last_name || ''}
                     </Typography>
                   </View>
-                )}
-              </View>
+                  <View style={styles.infoRow}>
+                    <Typography variant="body" color="secondary">
+                      Email:
+                    </Typography>
+                    <Typography variant="body" weight="medium">
+                      {selectedMerchant.user.email || 'Non renseigné'}
+                    </Typography>
+                  </View>
+                  <View style={styles.infoRow}>
+                    <Typography variant="body" color="secondary">
+                      Téléphone:
+                    </Typography>
+                    <Typography variant="body" weight="medium">
+                      {selectedMerchant.user.phone || 'Non renseigné'}
+                    </Typography>
+                  </View>
+                  <View style={styles.infoRow}>
+                    <Typography variant="body" color="secondary">
+                      Ville:
+                    </Typography>
+                    <Typography variant="body" weight="medium">
+                      {selectedMerchant.user.city || 'Non renseigné'}
+                    </Typography>
+                  </View>
+                  {selectedMerchant.user.address && (
+                    <View style={styles.infoRow}>
+                      <Typography variant="body" color="secondary">
+                        Adresse:
+                      </Typography>
+                      <Typography variant="body" weight="medium" style={{ flex: 1, textAlign: 'right' }}>
+                        {selectedMerchant.user.address}
+                      </Typography>
+                    </View>
+                  )}
+                </View>
+              ) : (
+                <View style={styles.section}>
+                  <Typography variant="h4" weight="semibold" style={{ marginBottom: 12 }}>
+                    Contact
+                  </Typography>
+                  <Typography variant="body" color="secondary">
+                    Informations de contact non disponibles
+                  </Typography>
+                </View>
+              )}
 
               {/* Actions admin */}
               <View style={styles.section}>

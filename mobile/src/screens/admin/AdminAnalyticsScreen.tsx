@@ -55,8 +55,17 @@ const AdminAnalyticsScreen: React.FC<{ navigation: any }> = ({ navigation }) => 
 
       // Utiliser .get() au lieu de getAdminAnalytics() qui n'existe peut-être pas
       const response = await apiService.get('/admin/analytics', { params: filters })
-      // Extract data from {success: true, data: {...}} response format
-      setData(response.data.data || response.data)
+      // apiService retourne response.data d'axios directement
+      // Backend peut retourner {summary, ...} ou {data: {summary, ...}}
+      console.log('🟢 [AdminAnalytics] Response keys:', Object.keys(response || {}))
+
+      // Essayer plusieurs chemins possibles
+      const analyticsData = response.summary
+        ? response
+        : (response.data?.summary ? response.data : response)
+
+      console.log('🟢 [AdminAnalytics] Data summary:', analyticsData?.summary ? 'OK' : 'null')
+      setData(analyticsData)
     } catch (error: any) {
       console.error('❌ Error loading analytics:', error)
 

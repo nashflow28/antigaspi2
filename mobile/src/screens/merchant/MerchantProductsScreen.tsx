@@ -80,11 +80,10 @@ const MerchantProductsScreen: React.FC<Props> = ({ navigation }) => {
       if (isDev) console.log('📦 [MerchantProducts] Chargement des produits...')
       const response = await apiService.get('/products/merchant')
       if (isDev) console.log('📦 [MerchantProducts] Réponse API complète:', response)
-      if (isDev) console.log('📦 [MerchantProducts] response.data:', response.data)
-      if (isDev) console.log('📦 [MerchantProducts] Nombre de produits:', response.data?.length)
-      // ✅ FIX: apiService.get retourne déjà {data: [...], pagination: {...}}
-      // donc response.data contient directement l'array de produits
-      setProducts(response.data || [])
+      // apiService peut retourner le tableau directement ou {data: [...]}
+      const allProducts = Array.isArray(response.data) ? response.data : (response.data?.data || [])
+      console.log('🟢 [MerchantProducts] Nombre de produits:', allProducts.length)
+      setProducts(allProducts)
       if (isDev) console.log('📦 [MerchantProducts] Produits définis dans le state:', response.data?.length)
     } catch (error: any) {
       if (isDev) console.error('❌ [MerchantProducts] Erreur chargement produits:', error)

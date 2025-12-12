@@ -9,13 +9,15 @@ import {
   Alert,
   TextInput,
   ActivityIndicator,
+  Modal,
+  ScrollView,
 } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { Ionicons } from '@expo/vector-icons'
 import { useTheme } from '../../theme'
 import { User } from '../../types'
 import apiService from '../../services/api'
-import { Button, Badge, Card, Typography } from '../../components/2025'
+import { Button, Badge, Card, Typography, ConfirmModal } from '../../components/2025'
 
 type RoleFilter = 'all' | 'consumer' | 'merchant' | 'admin'
 
@@ -29,6 +31,13 @@ const AdminUsersScreen: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('')
   const [roleFilter, setRoleFilter] = useState<RoleFilter>('all')
 
+  // Modal states
+  const [selectedUser, setSelectedUser] = useState<User | null>(null)
+  const [showDetailModal, setShowDetailModal] = useState(false)
+  const [showConfirmModal, setShowConfirmModal] = useState(false)
+  const [confirmAction, setConfirmAction] = useState<'block' | 'unblock'>('block')
+  const [actionLoading, setActionLoading] = useState(false)
+
   useEffect(() => {
     loadUsers()
   }, [])
@@ -41,9 +50,13 @@ const AdminUsersScreen: React.FC = () => {
     try {
       setLoading(true)
       // API endpoint: GET /admin/users
-      // Expected response: { data: { data: User[] } }
+      // Expected response: { success: true, data: User[] }
+      console.log('🔵 [AdminUsers] Chargement des utilisateurs...')
       const response = await apiService.get('/admin/users')
-      setUsers(response.data.data || [])
+      // apiService retourne déjà response.data, donc response.data = tableau d'users
+      const users = Array.isArray(response.data) ? response.data : (response.data?.data || [])
+      console.log('🟢 [AdminUsers] Nombre users:', users.length)
+      setUsers(users)
     } catch (error: any) {
       console.error('Erreur chargement utilisateurs:', error)
 
@@ -89,50 +102,49 @@ const AdminUsersScreen: React.FC = () => {
     loadUsers()
   }
 
-  const toggleUserStatus = async (user: User) => {
-    const isSuspended = user.is_suspended || false
+  const handleOpenBlockModal = (user: User) => {
+    setSelectedUser(user)
+    setConfirmAction(user.is_suspended ? 'unblock' : 'block')
+    setShowConfirmModal(true)
+  }
 
-    Alert.alert(
-      isSuspended ? 'Débloquer l\'utilisateur' : 'Bloquer l\'utilisateur',
-      isSuspended
-        ? `Voulez-vous vraiment débloquer ${user.first_name} ${user.last_name} ?`
-        : `Voulez-vous vraiment bloquer ${user.first_name} ${user.last_name} ?`,
-      [
-        { text: 'Annuler', style: 'cancel' },
-        {
-          text: isSuspended ? 'Débloquer' : 'Bloquer',
-          style: isSuspended ? 'default' : 'destructive',
-          onPress: async () => {
-            // Backup de l'état précédent pour rollback en cas d'erreur
-            const previousUsers = [...users]
+  const handleConfirmToggleStatus = async () => {
+    if (!selectedUser) return
 
-            try {
-              // Mise à jour optimiste
-              setUsers(prev =>
-                prev.map(u =>
-                  u.id === user.id ? { ...u, is_suspended: !isSuspended } : u
-                )
-              )
+    const isSuspended = selectedUser.is_suspended || false
+    const previousUsers = [...users]
 
-              const endpoint = isSuspended
-                ? `/admin/users/${user.id}/unsuspend`
-                : `/admin/users/${user.id}/suspend`
+    try {
+      setActionLoading(true)
 
-              await apiService.patch(endpoint)
+      // Mise à jour optimiste
+      setUsers(prev =>
+        prev.map(u =>
+          u.id === selectedUser.id ? { ...u, is_suspended: !isSuspended } : u
+        )
+      )
 
-              Alert.alert('Succès', isSuspended ? 'Utilisateur débloqué' : 'Utilisateur bloqué')
-            } catch (error: any) {
-              console.error('Erreur mise à jour statut:', error)
+      const endpoint = isSuspended
+        ? `/admin/users/${selectedUser.id}/unsuspend`
+        : `/admin/users/${selectedUser.id}/suspend`
 
-              // Rollback en cas d'erreur
-              setUsers(previousUsers)
+      await apiService.patch(endpoint)
 
-              Alert.alert('Erreur', 'Impossible de mettre à jour le statut')
-            }
-          },
-        },
-      ]
-    )
+      setShowConfirmModal(false)
+      setShowDetailModal(false)
+      Alert.alert('Succès', isSuspended ? 'Utilisateur débloqué' : 'Utilisateur bloqué')
+    } catch (error: any) {
+      console.error('Erreur mise à jour statut:', error)
+      setUsers(previousUsers)
+      Alert.alert('Erreur', 'Impossible de mettre à jour le statut')
+    } finally {
+      setActionLoading(false)
+    }
+  }
+
+  const handleViewDetails = (user: User) => {
+    setSelectedUser(user)
+    setShowDetailModal(true)
   }
 
   const getRoleBadgeVariant = (role: string): 'primary' | 'success' | 'warning' | 'error' => {
@@ -162,57 +174,179 @@ const AdminUsersScreen: React.FC = () => {
   }
 
   const renderUserCard = ({ item }: { item: User }) => (
-    <Card style={styles.userCard}>
-      <View style={styles.cardHeader}>
-        <View style={[styles.iconContainer, { backgroundColor: theme.colors.primary[50] }]}>
-          <Ionicons name="person" size={24} color={theme.colors.primary[500]} />
-        </View>
-        <View style={styles.cardContent}>
-          <View style={styles.titleRow}>
-            <Typography variant="h4" weight="semibold" style={{ flex: 1 }}>
-              {item.first_name} {item.last_name}
+    <TouchableOpacity onPress={() => handleViewDetails(item)} activeOpacity={0.7}>
+      <Card style={styles.userCard}>
+        <View style={styles.cardHeader}>
+          <View style={[styles.avatarContainer, { backgroundColor: getRoleColor(item.role) }]}>
+            <Typography variant="h4" weight="bold" style={{ color: 'white' }}>
+              {(item.first_name?.[0] || '').toUpperCase()}{(item.last_name?.[0] || '').toUpperCase()}
             </Typography>
-            <Badge variant={getRoleBadgeVariant(item.role)}>
-              {getRoleLabel(item.role)}
-            </Badge>
           </View>
-          <Typography variant="caption" color="secondary">
-            {item.email}
-          </Typography>
-          <View style={styles.statsRow}>
-            <View style={styles.statItem}>
-              <Ionicons name="location-outline" size={14} color={theme.colors.neutral[500]} />
-              <Typography variant="caption" color="secondary" style={{ marginLeft: 4 }}>
-                {item.city || 'Non renseigné'}
+          <View style={styles.cardContent}>
+            <View style={styles.titleRow}>
+              <Typography variant="h4" weight="semibold" style={{ flex: 1 }} numberOfLines={1}>
+                {item.first_name} {item.last_name}
               </Typography>
-            </View>
-            {item.is_suspended && (
-              <Badge variant="error" size="sm">
-                Bloqué
+              <Badge variant={getRoleBadgeVariant(item.role)} size="sm">
+                {getRoleLabel(item.role)}
               </Badge>
-            )}
+            </View>
+            <Typography variant="caption" color="secondary" numberOfLines={1}>
+              {item.email}
+            </Typography>
+            <View style={styles.statsRow}>
+              <View style={styles.statItem}>
+                <Ionicons name="location-outline" size={14} color={theme.colors.neutral[500]} />
+                <Typography variant="caption" color="secondary" style={{ marginLeft: 4 }}>
+                  {item.city || 'Non renseigné'}
+                </Typography>
+              </View>
+              {item.is_suspended && (
+                <Badge variant="error" size="sm">
+                  Bloqué
+                </Badge>
+              )}
+            </View>
+          </View>
+          <Ionicons name="chevron-forward" size={20} color={theme.colors.neutral[400]} />
+        </View>
+      </Card>
+    </TouchableOpacity>
+  )
+
+  const getRoleColor = (role: string): string => {
+    switch (role) {
+      case 'admin':
+        return '#EF4444'
+      case 'merchant':
+        return '#F59E0B'
+      case 'consumer':
+        return '#10B981'
+      default:
+        return theme.colors.primary[500]
+    }
+  }
+
+  const formatDate = (dateString?: string) => {
+    if (!dateString) return 'Non renseigné'
+    const date = new Date(dateString)
+    return date.toLocaleDateString('fr-FR', { day: '2-digit', month: 'long', year: 'numeric' })
+  }
+
+  const renderDetailModal = () => {
+    if (!selectedUser) return null
+
+    return (
+      <Modal
+        visible={showDetailModal}
+        animationType="slide"
+        transparent
+        onRequestClose={() => setShowDetailModal(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={[styles.modalContent, { backgroundColor: theme.colors.background }]}>
+            <View style={styles.modalHeader}>
+              <Typography variant="h3" weight="bold">
+                Détails utilisateur
+              </Typography>
+              <TouchableOpacity onPress={() => setShowDetailModal(false)}>
+                <Ionicons name="close" size={28} color={theme.colors.neutral[600]} />
+              </TouchableOpacity>
+            </View>
+
+            <ScrollView style={styles.modalBody} showsVerticalScrollIndicator={false}>
+              {/* Avatar & Nom */}
+              <View style={styles.userHeader}>
+                <View style={[styles.largeAvatar, { backgroundColor: getRoleColor(selectedUser.role) }]}>
+                  <Typography variant="h1" weight="bold" style={{ color: 'white' }}>
+                    {(selectedUser.first_name?.[0] || '').toUpperCase()}{(selectedUser.last_name?.[0] || '').toUpperCase()}
+                  </Typography>
+                </View>
+                <Typography variant="h2" weight="bold" style={{ marginTop: 16 }}>
+                  {selectedUser.first_name} {selectedUser.last_name}
+                </Typography>
+                <View style={{ flexDirection: 'row', gap: 8, marginTop: 8 }}>
+                  <Badge variant={getRoleBadgeVariant(selectedUser.role)}>
+                    {getRoleLabel(selectedUser.role)}
+                  </Badge>
+                  {selectedUser.is_suspended && (
+                    <Badge variant="error">Bloqué</Badge>
+                  )}
+                </View>
+              </View>
+
+              {/* Informations */}
+              <View style={styles.section}>
+                <Typography variant="h4" weight="semibold" style={{ marginBottom: 16 }}>
+                  Informations
+                </Typography>
+
+                <View style={styles.infoRow}>
+                  <View style={styles.infoIcon}>
+                    <Ionicons name="mail-outline" size={20} color={theme.colors.primary[500]} />
+                  </View>
+                  <View style={{ flex: 1 }}>
+                    <Typography variant="caption" color="secondary">Email</Typography>
+                    <Typography variant="body" weight="medium">{selectedUser.email}</Typography>
+                  </View>
+                </View>
+
+                <View style={styles.infoRow}>
+                  <View style={styles.infoIcon}>
+                    <Ionicons name="call-outline" size={20} color={theme.colors.primary[500]} />
+                  </View>
+                  <View style={{ flex: 1 }}>
+                    <Typography variant="caption" color="secondary">Téléphone</Typography>
+                    <Typography variant="body" weight="medium">{selectedUser.phone || 'Non renseigné'}</Typography>
+                  </View>
+                </View>
+
+                <View style={styles.infoRow}>
+                  <View style={styles.infoIcon}>
+                    <Ionicons name="location-outline" size={20} color={theme.colors.primary[500]} />
+                  </View>
+                  <View style={{ flex: 1 }}>
+                    <Typography variant="caption" color="secondary">Ville</Typography>
+                    <Typography variant="body" weight="medium">{selectedUser.city || 'Non renseigné'}</Typography>
+                  </View>
+                </View>
+
+                <View style={styles.infoRow}>
+                  <View style={styles.infoIcon}>
+                    <Ionicons name="calendar-outline" size={20} color={theme.colors.primary[500]} />
+                  </View>
+                  <View style={{ flex: 1 }}>
+                    <Typography variant="caption" color="secondary">Inscrit le</Typography>
+                    <Typography variant="body" weight="medium">{formatDate(selectedUser.created_at)}</Typography>
+                  </View>
+                </View>
+              </View>
+
+              {/* Actions */}
+              <View style={styles.section}>
+                <Typography variant="h4" weight="semibold" style={{ marginBottom: 16 }}>
+                  Actions
+                </Typography>
+                <Button
+                  variant={selectedUser.is_suspended ? 'primary' : 'destructive'}
+                  onPress={() => handleOpenBlockModal(selectedUser)}
+                  leftIcon={
+                    <Ionicons
+                      name={selectedUser.is_suspended ? 'checkmark-circle' : 'ban'}
+                      size={20}
+                      color="#FFFFFF"
+                    />
+                  }
+                >
+                  {selectedUser.is_suspended ? 'Débloquer l\'utilisateur' : 'Bloquer l\'utilisateur'}
+                </Button>
+              </View>
+            </ScrollView>
           </View>
         </View>
-      </View>
-      <View style={styles.actions}>
-        <Button
-          variant={item.is_suspended ? 'primary' : 'destructive'}
-          size="sm"
-          onPress={() => toggleUserStatus(item)}
-          style={{ flex: 1 }}
-          leftIcon={
-            <Ionicons
-              name={item.is_suspended ? 'checkmark-circle' : 'ban'}
-              size={16}
-              color="#FFFFFF"
-            />
-          }
-        >
-          {item.is_suspended ? 'Débloquer' : 'Bloquer'}
-        </Button>
-      </View>
-    </Card>
-  )
+      </Modal>
+    )
+  }
 
   const renderHeader = () => (
     <View style={styles.header}>
@@ -369,6 +503,26 @@ const AdminUsersScreen: React.FC = () => {
         contentContainerStyle={[styles.listContent, { paddingTop: insets.top + 16 }]}
         showsVerticalScrollIndicator={false}
       />
+
+      {/* Modal détails utilisateur */}
+      {renderDetailModal()}
+
+      {/* Modal confirmation blocage */}
+      <ConfirmModal
+        visible={showConfirmModal}
+        onClose={() => setShowConfirmModal(false)}
+        onConfirm={handleConfirmToggleStatus}
+        title={confirmAction === 'block' ? 'Bloquer l\'utilisateur' : 'Débloquer l\'utilisateur'}
+        message={
+          confirmAction === 'block'
+            ? `Êtes-vous sûr de vouloir bloquer ${selectedUser?.first_name} ${selectedUser?.last_name} ?\n\nL'utilisateur ne pourra plus accéder à son compte.`
+            : `Êtes-vous sûr de vouloir débloquer ${selectedUser?.first_name} ${selectedUser?.last_name} ?\n\nL'utilisateur pourra à nouveau accéder à son compte.`
+        }
+        confirmText={confirmAction === 'block' ? 'Bloquer' : 'Débloquer'}
+        variant={confirmAction === 'block' ? 'danger' : 'success'}
+        loading={actionLoading}
+        icon={confirmAction === 'block' ? 'ban' : 'checkmark-circle'}
+      />
     </View>
   )
 }
@@ -417,12 +571,11 @@ const styles = StyleSheet.create({
   cardHeader: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 12,
   },
-  iconContainer: {
+  avatarContainer: {
     width: 48,
     height: 48,
-    borderRadius: 12,
+    borderRadius: 24,
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 12,
@@ -446,14 +599,65 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
   },
-  actions: {
-    flexDirection: 'row',
-    gap: 8,
-  },
   emptyState: {
     alignItems: 'center',
     paddingVertical: 60,
     paddingHorizontal: 32,
+  },
+  // Modal styles
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    justifyContent: 'flex-end',
+  },
+  modalContent: {
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+    maxHeight: '90%',
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: 20,
+    borderBottomWidth: 1,
+    borderBottomColor: '#E5E7EB',
+  },
+  modalBody: {
+    padding: 20,
+  },
+  userHeader: {
+    alignItems: 'center',
+    paddingVertical: 24,
+    borderBottomWidth: 1,
+    borderBottomColor: '#E5E7EB',
+    marginBottom: 24,
+  },
+  largeAvatar: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  section: {
+    marginBottom: 24,
+  },
+  infoRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: '#F3F4F6',
+  },
+  infoIcon: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: '#EEF2FF',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 12,
   },
 })
 

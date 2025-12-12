@@ -54,18 +54,22 @@ const MerchantNotificationsScreen: React.FC = () => {
 
       const response = await apiService.get(`/notifications?page=${page}`)
 
-      if (response.data.success) {
-        const newNotifications = response.data.data
-        if (page === 1) {
-          setNotifications(newNotifications)
-        } else {
-          setNotifications((prev) => [...prev, ...newNotifications])
-        }
-        const meta = response.data.meta
-        if (meta) {
-          setCurrentPage(meta.current_page ?? 1)
-          setLastPage(meta.last_page ?? 1)
-        }
+      // apiService retourne response.data d'axios, donc response = {success, data, meta}
+      // ou directement le tableau selon l'API
+      const newNotifications = Array.isArray(response.data) ? response.data : (response.data || [])
+      console.log('🟢 [MerchantNotifications] Nombre notifications:', newNotifications.length)
+
+      if (page === 1) {
+        setNotifications(newNotifications)
+      } else {
+        setNotifications((prev) => [...prev, ...newNotifications])
+      }
+
+      // Gérer la pagination si disponible
+      const meta = response.meta || response.data?.meta
+      if (meta) {
+        setCurrentPage(meta.current_page ?? 1)
+        setLastPage(meta.last_page ?? 1)
       }
     } catch (error) {
       console.error('Erreur chargement notifications:', error)

@@ -147,8 +147,17 @@ class SurpriseBasketController extends Controller
             }
         }
 
-        // Use merchant's category or fallback to "Autre" (id 9)
-        $categoryId = $request->category_id ?? $user->merchant->category_id ?? 9;
+        // Use provided category, merchant's category, merchant's first product category, or create default
+        $categoryId = $request->category_id
+            ?? $user->merchant->category_id
+            ?? Product::where('merchant_id', $user->merchant->id)
+                ->where('is_surprise_basket', false)
+                ->whereNotNull('category_id')
+                ->value('category_id')
+            ?? \App\Models\Category::firstOrCreate(
+                ['name' => 'Paniers Surprise'],
+                ['description' => 'Paniers surprise et offres spéciales']
+            )->id;
 
         // 🐛 BUG FIX #31: Set default expiration_date if not provided (end of today)
         // Surprise baskets typically expire at end of business day

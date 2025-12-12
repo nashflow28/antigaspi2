@@ -69,25 +69,12 @@ const MerchantReservationsScreen: React.FC<Props> = ({ route }) => {
         })
       }
 
-      // 🐛 BUG FIX #34: apiService.get() returns response.data directly, not wrapped
-      // So we access response.data, not response.data.data
-      // 🐛 BUG FIX #35: Only update state if we have valid data to prevent clearing on error
-      if (response?.success && response?.data) {
-        if (__DEV__) {
-          console.log('✅ [MerchantReservations] Mise à jour avec', response.data.length, 'réservations')
-        }
-        setReservations(response.data)
-      } else if (Array.isArray(response)) {
-        // 🐛 BUG FIX #36: Sometimes API returns array directly
-        if (__DEV__) {
-          console.log('⚠️ [MerchantReservations] Réponse est un tableau direct, utilisation directe')
-        }
-        setReservations(response)
-      } else {
-        if (__DEV__) {
-          console.warn('⚠️ [MerchantReservations] Réponse invalide, conservation des données actuelles')
-          console.warn('⚠️ [MerchantReservations] Réponse reçue:', response)
-        }
+      // apiService.get() retourne response.data d'axios
+      // Backend retourne {success: true, data: [...]} donc response.data = le tableau
+      const allReservations = Array.isArray(response.data) ? response.data : (response.data?.data || response || [])
+      console.log('🟢 [MerchantReservations] Nombre réservations:', Array.isArray(allReservations) ? allReservations.length : 0)
+      if (Array.isArray(allReservations)) {
+        setReservations(allReservations)
       }
     } catch (error: any) {
       console.error('❌ [MerchantReservations] Erreur chargement réservations:', error?.message || error)
