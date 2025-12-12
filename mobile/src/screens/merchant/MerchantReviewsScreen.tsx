@@ -12,6 +12,7 @@ import {
   TextInput,
   Modal,
 } from 'react-native'
+import { useNavigation } from '@react-navigation/native'
 import { Ionicons } from '@expo/vector-icons'
 import { useTheme } from '../../theme'
 import apiService from '../../services/api'
@@ -52,6 +53,7 @@ interface Stats {
 
 const MerchantReviewsScreen: React.FC = () => {
   const theme = useTheme()
+  const navigation = useNavigation()
   const [stats, setStats] = useState<Stats | null>(null)
   const [reviews, setReviews] = useState<Review[]>([])
   const [refreshing, setRefreshing] = useState(false)
@@ -289,7 +291,12 @@ const MerchantReviewsScreen: React.FC = () => {
       {/* Header */}
       <View style={[styles.header, { backgroundColor: theme.isDark ? '#0F1622' : theme.colors.primary[500] }]}>
         <View style={styles.headerContent}>
-          <Text style={styles.headerTitle}>Avis Clients</Text>
+          <View style={styles.headerLeft}>
+            <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+              <Ionicons name="arrow-back" size={24} color="white" />
+            </TouchableOpacity>
+            <Text style={styles.headerTitle}>Avis Clients</Text>
+          </View>
           <TouchableOpacity onPress={loadReviewsData}>
             <Ionicons name="refresh" size={24} color="white" />
           </TouchableOpacity>
@@ -479,6 +486,14 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: 16,
+  },
+  headerLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  backButton: {
+    marginRight: 12,
+    padding: 4,
   },
   headerTitle: {
     color: 'white',
