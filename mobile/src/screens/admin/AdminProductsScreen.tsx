@@ -12,6 +12,7 @@ import {
   ScrollView,
   ActivityIndicator,
 } from 'react-native'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { Ionicons } from '@expo/vector-icons'
 import { Image } from 'expo-image'
 import { useTheme } from '../../theme'
@@ -30,6 +31,7 @@ type ProductStatus = 'all' | 'active' | 'inactive' | 'pending'
 
 const AdminProductsScreen: React.FC = () => {
   const theme = useTheme()
+  const insets = useSafeAreaInsets()
   const [products, setProducts] = useState<ProductWithModeration[]>([])
   const [filteredProducts, setFilteredProducts] = useState<ProductWithModeration[]>([])
   const [categories, setCategories] = useState<Category[]>([])
@@ -805,7 +807,7 @@ const AdminProductsScreen: React.FC = () => {
           data={filteredProducts}
           renderItem={renderProduct}
           keyExtractor={item => item.id.toString()}
-          contentContainerStyle={styles.listContent}
+          contentContainerStyle={[styles.listContent, { paddingTop: insets.top + 16 }]}
           refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
           ListEmptyComponent={
             <View style={[styles.emptyState, { backgroundColor: theme.colors.surface.light }]}>

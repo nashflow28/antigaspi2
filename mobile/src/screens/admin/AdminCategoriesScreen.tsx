@@ -12,6 +12,7 @@ import {
   ScrollView,
   ActivityIndicator,
 } from 'react-native'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { Ionicons } from '@expo/vector-icons'
 import { useTheme } from '../../theme'
 import { Category } from '../../types'
@@ -27,6 +28,7 @@ type FormMode = 'create' | 'edit'
 
 const AdminCategoriesScreen: React.FC = () => {
   const theme = useTheme()
+  const insets = useSafeAreaInsets()
   const [categories, setCategories] = useState<CategoryWithStats[]>([])
   const [refreshing, setRefreshing] = useState(false)
   const [loading, setLoading] = useState(true)
@@ -140,9 +142,9 @@ const AdminCategoriesScreen: React.FC = () => {
           description: formData.description.trim() || null,
         })
 
-        // Vérifier AVANT d'utiliser response.data
-        const newCategory = response.data
-        if (!newCategory) {
+        // Vérifier AVANT d'utiliser response.data (API peut retourner { data: {...} } ou directement l'objet)
+        const newCategory = response.data?.data || response.data
+        if (!newCategory || !newCategory.id) {
           throw new Error('Réponse invalide du serveur')
         }
 
@@ -391,7 +393,7 @@ const AdminCategoriesScreen: React.FC = () => {
             colors={[theme.colors.primary[500]]}
           />
         }
-        contentContainerStyle={styles.listContent}
+        contentContainerStyle={[styles.listContent, { paddingTop: insets.top + 16 }]}
         showsVerticalScrollIndicator={false}
       />
 

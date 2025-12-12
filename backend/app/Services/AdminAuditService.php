@@ -292,11 +292,12 @@ class AdminAuditService
      */
     public function logReservationResolution(Model $reservation, string $resolution, ?string $reason = null): AdminAuditLog
     {
+        $reservationCode = $reservation->reservation_code ?? $reservation->id;
         return $this->log(
             AdminAuditLog::ACTION_RESOLVE_RESERVATION,
             AdminAuditLog::ENTITY_RESERVATION,
             $reservation->id,
-            "Reservation #{$reservation->reservation_code ?? $reservation->id}",
+            "Reservation #{$reservationCode}",
             $reason,
             ['status' => $reservation->status],
             ['status' => 'resolved', 'resolution' => $resolution]

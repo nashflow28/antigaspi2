@@ -8,6 +8,7 @@ import {
   ActivityIndicator,
   Alert,
 } from 'react-native'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { Ionicons } from '@expo/vector-icons'
 import DateTimePicker from '@react-native-community/datetimepicker'
 import { useTheme } from '../../theme'
@@ -24,6 +25,7 @@ type Tab = 'revenue' | 'geography' | 'merchants'
 
 const AdminAnalyticsScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
   const theme = useTheme()
+  const insets = useSafeAreaInsets()
   const [selectedPeriod, setSelectedPeriod] = useState<Period>('30d')
   const [selectedTab, setSelectedTab] = useState<Tab>('revenue')
   const [data, setData] = useState<AdminAnalyticsData | null>(null)
@@ -123,7 +125,7 @@ const AdminAnalyticsScreen: React.FC<{ navigation: any }> = ({ navigation }) => 
         </View>
       </View>
 
-      <ScrollView style={styles.content} contentContainerStyle={styles.scrollContent}>
+      <ScrollView style={styles.content} contentContainerStyle={[styles.scrollContent, { paddingTop: insets.top + 16 }]}>
         {/* Period Selector */}
         <Card variant="elevated" style={styles.card}>
           <Typography variant="h4" weight="semibold" style={{ marginBottom: 12 }}>
@@ -431,7 +433,8 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   scrollContent: {
-    padding: 16,
+    paddingHorizontal: 16,
+    paddingBottom: 16,
   },
   card: {
     marginBottom: 16,

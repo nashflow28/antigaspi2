@@ -9,8 +9,11 @@ import {
   ActivityIndicator,
   Alert,
 } from 'react-native'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { Ionicons } from '@expo/vector-icons'
 import { useTheme } from '../../theme'
+import { useAppDispatch } from '../../store/hooks'
+import { logoutUser } from '../../store/slices/authSlice'
 import apiService from '../../services/api'
 import { Typography, Card } from '../../components/2025'
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack'
@@ -38,10 +41,34 @@ type AdminDashboardScreenProps = {
 
 const AdminDashboardScreen: React.FC<AdminDashboardScreenProps> = ({ navigation }) => {
   const theme = useTheme()
+  const insets = useSafeAreaInsets()
+  const dispatch = useAppDispatch()
   const isMountedRef = useRef(true)
   const [stats, setStats] = useState<AdminStats | null>(null)
   const [refreshing, setRefreshing] = useState(false)
   const [loading, setLoading] = useState(true)
+
+  // Logout handlers
+  const handleLogout = () => {
+    Alert.alert(
+      'Déconnexion',
+      'Êtes-vous sûr de vouloir vous déconnecter ?',
+      [
+        { text: 'Annuler', style: 'cancel' },
+        { text: 'Déconnexion', style: 'destructive', onPress: confirmLogout },
+      ]
+    )
+  }
+
+  const confirmLogout = async () => {
+    try {
+      await dispatch(logoutUser())
+      // Navigation will be handled by MainNavigator when auth state changes
+    } catch (error) {
+      console.error('Erreur lors de la déconnexion:', error)
+      Alert.alert('Erreur', 'Une erreur est survenue lors de la déconnexion')
+    }
+  }
 
   useEffect(() => {
     isMountedRef.current = true
@@ -119,7 +146,7 @@ const AdminDashboardScreen: React.FC<AdminDashboardScreenProps> = ({ navigation 
       <StatusBar barStyle="light-content" backgroundColor={theme.colors.primary[500]} />
 
       {/* Header */}
-      <View style={[styles.header, { backgroundColor: theme.colors.primary[500] }]}>
+      <View style={[styles.header, { backgroundColor: theme.colors.primary[500], paddingTop: insets.top + 10 }]}>
         <View style={styles.headerContent}>
           <View>
             <Typography variant="caption" style={{ color: 'rgba(255, 255, 255, 0.8)' }}>
@@ -129,14 +156,24 @@ const AdminDashboardScreen: React.FC<AdminDashboardScreenProps> = ({ navigation 
               Dashboard
             </Typography>
           </View>
-          <TouchableOpacity
-            onPress={loadDashboardData}
-            style={styles.refreshButton}
-            accessibilityLabel="Rafraîchir le dashboard"
-            testID="refresh-dashboard-button"
-          >
-            <Ionicons name="refresh" size={24} color="white" testID="refresh-icon" />
-          </TouchableOpacity>
+          <View style={styles.headerActions}>
+            <TouchableOpacity
+              onPress={loadDashboardData}
+              style={styles.headerButton}
+              accessibilityLabel="Rafraîchir le dashboard"
+              testID="refresh-dashboard-button"
+            >
+              <Ionicons name="refresh" size={24} color="white" testID="refresh-icon" />
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={handleLogout}
+              style={styles.headerButton}
+              accessibilityLabel="Se déconnecter"
+              testID="logout-button"
+            >
+              <Ionicons name="log-out-outline" size={24} color="white" />
+            </TouchableOpacity>
+          </View>
         </View>
       </View>
 
@@ -376,7 +413,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   header: {
-    paddingTop: 50,
     paddingBottom: 20,
     paddingHorizontal: 20,
   },
@@ -385,7 +421,12 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'flex-start',
   },
-  refreshButton: {
+  headerActions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  headerButton: {
     padding: 8,
   },
   content: {
@@ -393,6 +434,7 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     padding: 16,
+    paddingBottom: 32,
   },
   section: {
     marginBottom: 24,

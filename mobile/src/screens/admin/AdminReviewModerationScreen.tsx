@@ -10,6 +10,7 @@ import {
   Alert,
   ActivityIndicator,
 } from 'react-native'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { Ionicons } from '@expo/vector-icons'
 import { useTheme } from '../../theme'
 import apiService from '../../services/api'
@@ -112,6 +113,7 @@ type ResolveAction = 'dismiss' | 'remove_review' | 'warn_user'
 
 const AdminReviewModerationScreen: React.FC = () => {
   const theme = useTheme()
+  const insets = useSafeAreaInsets()
   const [stats, setStats] = useState<ModerationStats | null>(null)
   const [reportReasons, setReportReasons] = useState<Record<string, number>>({})
   const [pendingReviews, setPendingReviews] = useState<PendingReview[]>([])
@@ -828,7 +830,7 @@ const AdminReviewModerationScreen: React.FC = () => {
           data={pendingReviews}
           keyExtractor={item => `pending-${item.id}`}
           renderItem={renderPendingReview}
-          contentContainerStyle={styles.listContent}
+          contentContainerStyle={[styles.listContent, { paddingTop: insets.top + 16 }]}
           ListEmptyComponent={emptyPendingComponent}
           refreshControl={<RefreshControl refreshing={refreshing} onRefresh={handleRefresh} tintColor={theme.colors.primary[500]} />}
           ListHeaderComponent={headerComponent}
@@ -838,7 +840,7 @@ const AdminReviewModerationScreen: React.FC = () => {
           data={reportedReviews}
           keyExtractor={item => `reported-${item.id}`}
           renderItem={renderReportedReview}
-          contentContainerStyle={styles.listContent}
+          contentContainerStyle={[styles.listContent, { paddingTop: insets.top + 16 }]}
           ListEmptyComponent={emptyReportedComponent}
           refreshControl={<RefreshControl refreshing={refreshing} onRefresh={handleRefresh} tintColor={theme.colors.primary[500]} />}
           ListHeaderComponent={headerComponent}

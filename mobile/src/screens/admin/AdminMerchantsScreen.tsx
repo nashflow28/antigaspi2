@@ -13,6 +13,7 @@ import {
   ScrollView,
   ActivityIndicator,
 } from 'react-native'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { Ionicons } from '@expo/vector-icons'
 import { useTheme } from '../../theme'
 import apiService from '../../services/api'
@@ -45,6 +46,7 @@ type MerchantStatus = 'all' | 'verified' | 'pending'
 
 const AdminMerchantsScreen: React.FC = () => {
   const theme = useTheme()
+  const insets = useSafeAreaInsets()
   const [merchants, setMerchants] = useState<MerchantWithStats[]>([])
   const [filteredMerchants, setFilteredMerchants] = useState<MerchantWithStats[]>([])
   const [refreshing, setRefreshing] = useState(false)
@@ -634,7 +636,7 @@ const AdminMerchantsScreen: React.FC = () => {
             colors={[theme.colors.primary[500]]}
           />
         }
-        contentContainerStyle={styles.listContent}
+        contentContainerStyle={[styles.listContent, { paddingTop: insets.top + 16 }]}
         showsVerticalScrollIndicator={false}
       />
 

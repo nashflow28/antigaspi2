@@ -10,6 +10,7 @@ import {
   TextInput,
   ActivityIndicator,
 } from 'react-native'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { Ionicons } from '@expo/vector-icons'
 import { useTheme } from '../../theme'
 import { User } from '../../types'
@@ -20,6 +21,7 @@ type RoleFilter = 'all' | 'consumer' | 'merchant' | 'admin'
 
 const AdminUsersScreen: React.FC = () => {
   const theme = useTheme()
+  const insets = useSafeAreaInsets()
   const [users, setUsers] = useState<User[]>([])
   const [filteredUsers, setFilteredUsers] = useState<User[]>([])
   const [refreshing, setRefreshing] = useState(false)
@@ -364,7 +366,7 @@ const AdminUsersScreen: React.FC = () => {
             colors={[theme.colors.primary[500]]}
           />
         }
-        contentContainerStyle={styles.listContent}
+        contentContainerStyle={[styles.listContent, { paddingTop: insets.top + 16 }]}
         showsVerticalScrollIndicator={false}
       />
     </View>

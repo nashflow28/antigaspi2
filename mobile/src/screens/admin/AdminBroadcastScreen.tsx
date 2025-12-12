@@ -10,6 +10,7 @@ import {
   ActivityIndicator,
   StatusBar,
 } from 'react-native'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { Ionicons } from '@expo/vector-icons'
 import { useTheme } from '../../theme'
 import { Typography, Card, Button, Badge } from '../../components/2025'
@@ -19,6 +20,7 @@ import { TEST_IDS } from '../../utils/testIds'
 
 const AdminBroadcastScreen: React.FC = () => {
   const theme = useTheme()
+  const insets = useSafeAreaInsets()
   const [title, setTitle] = useState('')
   const [message, setMessage] = useState('')
   const [selectedChannels, setSelectedChannels] = useState<
@@ -179,7 +181,7 @@ const AdminBroadcastScreen: React.FC = () => {
 
       <ScrollView
         style={styles.content}
-        contentContainerStyle={styles.scrollContent}
+        contentContainerStyle={[styles.scrollContent, { paddingTop: insets.top + 16 }]}
       >
         {/* Titre */}
         <Card variant="elevated" style={styles.card}>
@@ -497,7 +499,8 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   scrollContent: {
-    padding: 16,
+    paddingHorizontal: 16,
+    paddingBottom: 16,
   },
   card: {
     marginBottom: 16,
