@@ -316,6 +316,7 @@ Route::prefix('reviews')->group(function () {
 // Routes administrateur (protégées)
 Route::prefix('admin')->middleware(['jwt.auth', 'can:admin', 'throttle:admin'])->group(function () {
     Route::get('/dashboard', [AdminController::class, 'dashboard']); // Dashboard admin
+    Route::get('/analytics', [AdminController::class, 'analytics']); // Advanced analytics for mobile
     Route::get('/system-health', [AdminController::class, 'systemHealth']); // Santé du système
     Route::post('/analytics/export', [AdminController::class, 'exportAnalytics']); // Export analytics CSV/PDF
     Route::get('/payments', [AdminController::class, 'payments']); // Payments dashboard with filters

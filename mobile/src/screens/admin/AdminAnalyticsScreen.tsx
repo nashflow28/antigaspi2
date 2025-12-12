@@ -55,7 +55,8 @@ const AdminAnalyticsScreen: React.FC<{ navigation: any }> = ({ navigation }) => 
 
       // Utiliser .get() au lieu de getAdminAnalytics() qui n'existe peut-être pas
       const response = await apiService.get('/admin/analytics', { params: filters })
-      setData(response.data)
+      // Extract data from {success: true, data: {...}} response format
+      setData(response.data.data || response.data)
     } catch (error: any) {
       console.error('❌ Error loading analytics:', error)
 

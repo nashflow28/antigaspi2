@@ -46,7 +46,8 @@ const AdminCategoriesScreen: React.FC = () => {
     try {
       setLoading(true)
       const response = await apiService.get('/admin/categories')
-      const allCategories = response.data || []
+      // Extract data from {success: true, data: [...]} response format
+      const allCategories = response.data?.data || response.data || []
       setCategories(allCategories)
     } catch (error: any) {
       console.error('Erreur chargement categories:', error)

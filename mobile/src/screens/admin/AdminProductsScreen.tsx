@@ -66,7 +66,8 @@ const AdminProductsScreen: React.FC = () => {
 
       const allProducts = productsRes.data.data || []
       setProducts(allProducts)
-      setCategories(categoriesRes.data || [])
+      // Extract data from {success: true, data: [...]} response format
+      setCategories(categoriesRes.data?.data || categoriesRes.data || [])
     } catch (error: any) {
       console.error('Erreur chargement données:', error)
 

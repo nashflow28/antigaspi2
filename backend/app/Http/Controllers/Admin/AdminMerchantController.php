@@ -100,9 +100,29 @@ class AdminMerchantController extends Controller
                     ];
                 })->values();
 
+            // Transform all merchants for frontend (AdminMerchantsScreen)
+            $allMerchantsData = $merchants->map(function ($merchant) {
+                return [
+                    'id' => $merchant->id,
+                    'business_name' => $merchant->business_name,
+                    'owner_name' => trim($merchant->user->first_name . ' ' . $merchant->user->last_name),
+                    'email' => $merchant->user->email,
+                    'phone' => $merchant->user->phone ?? 'Non renseigné',
+                    'address' => $merchant->user->address ?? 'Non renseignée',
+                    'business_type' => $merchant->business_type ?? 'Non spécifié',
+                    'description' => $merchant->description ?? '',
+                    'is_verified' => $merchant->is_verified,
+                    'verification_date' => $merchant->verification_date,
+                    'rejection_reason' => $merchant->rejection_reason,
+                    'products_count' => $merchant->products->count(),
+                    'created_at' => $merchant->created_at ? $merchant->created_at->toISOString() : now()->toISOString()
+                ];
+            })->values();
+
             return response()->json([
                 'success' => true,
                 'stats' => $stats,
+                'merchants' => $allMerchantsData,
                 'pendingMerchants' => $pendingMerchantsData,
                 'productsToModerate' => $productsToModerate,
                 'flaggedReservations' => $flaggedReservations

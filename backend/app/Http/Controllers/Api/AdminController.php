@@ -185,6 +185,194 @@ class AdminController extends Controller
         }
     }
 
+    /**
+     * Get advanced analytics data for mobile admin screen
+     */
+    public function analytics(Request $request): JsonResponse
+    {
+        try {
+            $user = JWTAuth::parseToken()->authenticate();
+
+            if (!$user->isAdmin()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Accès réservé aux administrateurs'
+                ], 403);
+            }
+
+            // Parse period filter
+            $period = $request->input('period', '30d');
+            $startDate = $request->input('start_date');
+            $endDate = $request->input('end_date');
+
+            // Calculate date range
+            if ($period === 'custom' && $startDate && $endDate) {
+                $start = \Carbon\Carbon::parse($startDate)->startOfDay();
+                $end = \Carbon\Carbon::parse($endDate)->endOfDay();
+            } else {
+                $end = now();
+                $start = match($period) {
+                    '7d' => now()->subDays(7),
+                    '90d' => now()->subDays(90),
+                    default => now()->subDays(30),
+                };
+            }
+
+            // Previous period for growth calculation
+            $periodLength = $start->diffInDays($end);
+            $previousStart = (clone $start)->subDays($periodLength);
+            $previousEnd = (clone $start)->subDay();
+
+            // Current period stats
+            $currentRevenue = Reservation::where('status', 'completed')
+                ->whereBetween('created_at', [$start, $end])
+                ->sum('total_amount');
+
+            $currentTransactions = Reservation::where('status', 'completed')
+                ->whereBetween('created_at', [$start, $end])
+                ->count();
+
+            // Previous period stats for growth rate
+            $previousRevenue = Reservation::where('status', 'completed')
+                ->whereBetween('created_at', [$previousStart, $previousEnd])
+                ->sum('total_amount');
+
+            $growthRate = $previousRevenue > 0
+                ? round((($currentRevenue - $previousRevenue) / $previousRevenue) * 100, 1)
+                : ($currentRevenue > 0 ? 100 : 0);
+
+            $averageOrderValue = $currentTransactions > 0
+                ? round($currentRevenue / $currentTransactions, 0)
+                : 0;
+
+            // Revenue chart - daily data points
+            $revenueData = [];
+            $labels = [];
+            $chartStart = clone $start;
+
+            // Determine granularity based on period
+            $daysDiff = $start->diffInDays($end);
+            if ($daysDiff <= 7) {
+                // Daily for 7 days or less
+                $groupBy = 'day';
+                $dateFormat = 'd/m';
+            } elseif ($daysDiff <= 30) {
+                // Daily for up to 30 days
+                $groupBy = 'day';
+                $dateFormat = 'd/m';
+            } else {
+                // Weekly for longer periods
+                $groupBy = 'week';
+                $dateFormat = 'W';
+            }
+
+            $revenueByDate = Reservation::where('status', 'completed')
+                ->whereBetween('created_at', [$start, $end])
+                ->selectRaw("DATE(created_at) as date, SUM(total_amount) as revenue")
+                ->groupBy('date')
+                ->orderBy('date')
+                ->pluck('revenue', 'date')
+                ->toArray();
+
+            // Fill in all dates
+            $currentDate = clone $start;
+            while ($currentDate <= $end) {
+                $dateKey = $currentDate->format('Y-m-d');
+                $labels[] = $currentDate->format($dateFormat);
+                $revenueData[] = (int) ($revenueByDate[$dateKey] ?? 0);
+                $currentDate->addDay();
+            }
+
+            // Geographic distribution (by city)
+            $geographicDistribution = Reservation::where('status', 'completed')
+                ->whereBetween('reservations.created_at', [$start, $end])
+                ->join('users', 'reservations.user_id', '=', 'users.id')
+                ->selectRaw("COALESCE(users.city, 'Non spécifié') as city, SUM(reservations.total_amount) as revenue, COUNT(*) as count")
+                ->groupBy('users.city')
+                ->orderByDesc('revenue')
+                ->limit(5)
+                ->get()
+                ->map(function ($item) use ($currentRevenue) {
+                    return [
+                        'city' => $item->city,
+                        'revenue' => (int) $item->revenue,
+                        'count' => $item->count,
+                        'percentage' => $currentRevenue > 0 ? round(($item->revenue / $currentRevenue) * 100, 1) : 0,
+                    ];
+                });
+
+            // Merchant performance
+            $merchantPerformance = DB::table('merchants')
+                ->join('products', 'merchants.id', '=', 'products.merchant_id')
+                ->join('reservations', 'products.id', '=', 'reservations.product_id')
+                ->where('reservations.status', 'completed')
+                ->whereBetween('reservations.created_at', [$start, $end])
+                ->select(
+                    'merchants.id as merchant_id',
+                    'merchants.business_name as merchant_name',
+                    DB::raw('COUNT(reservations.id) as reservations_count'),
+                    DB::raw('SUM(reservations.total_amount) as revenue')
+                )
+                ->groupBy('merchants.id', 'merchants.business_name')
+                ->orderByDesc('revenue')
+                ->limit(10)
+                ->get()
+                ->map(function ($merchant) use ($previousStart, $previousEnd) {
+                    // Calculate growth rate for this merchant
+                    $previousMerchantRevenue = DB::table('reservations')
+                        ->join('products', 'reservations.product_id', '=', 'products.id')
+                        ->where('products.merchant_id', $merchant->merchant_id)
+                        ->where('reservations.status', 'completed')
+                        ->whereBetween('reservations.created_at', [$previousStart, $previousEnd])
+                        ->sum('reservations.total_amount');
+
+                    $growthRate = $previousMerchantRevenue > 0
+                        ? round((($merchant->revenue - $previousMerchantRevenue) / $previousMerchantRevenue) * 100, 1)
+                        : ($merchant->revenue > 0 ? 100 : 0);
+
+                    return [
+                        'merchant_id' => $merchant->merchant_id,
+                        'merchant_name' => $merchant->merchant_name,
+                        'reservations_count' => $merchant->reservations_count,
+                        'revenue' => (int) $merchant->revenue,
+                        'growth_rate' => $growthRate,
+                    ];
+                });
+
+            return response()->json([
+                'success' => true,
+                'data' => [
+                    'summary' => [
+                        'total_revenue' => (int) $currentRevenue,
+                        'growth_rate' => $growthRate,
+                        'total_transactions' => $currentTransactions,
+                        'average_order_value' => $averageOrderValue,
+                    ],
+                    'revenue_chart' => [
+                        'labels' => $labels,
+                        'datasets' => [
+                            ['data' => $revenueData]
+                        ],
+                    ],
+                    'geographic_distribution' => $geographicDistribution,
+                    'merchant_performance' => $merchantPerformance,
+                ],
+            ]);
+
+        } catch (\Exception $e) {
+            \Log::error('Admin analytics failed', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Erreur lors de la récupération des analytics',
+                'error' => config('app.debug') ? $e->getMessage() : 'Erreur serveur interne',
+            ], 500);
+        }
+    }
+
     public function systemHealth(): JsonResponse
     {
         try {

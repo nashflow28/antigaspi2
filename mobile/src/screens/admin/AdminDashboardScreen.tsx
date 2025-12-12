@@ -86,11 +86,29 @@ const AdminDashboardScreen: React.FC<AdminDashboardScreenProps> = ({ navigation 
       }
 
       // API endpoint: GET /admin/dashboard
-      // Expected response: { data: AdminStats }
+      // Expected response: { success: true, data: { stats: {...}, topMerchants: [...], ... } }
       const response = await apiService.get('/admin/dashboard')
 
-      if (isMountedRef.current && response.data) {
-        setStats(response.data)
+      if (isMountedRef.current && response.data?.data) {
+        // Transform backend camelCase to expected snake_case format
+        const backendData = response.data.data
+        const transformedStats: AdminStats = {
+          total_users: backendData.stats?.totalUsers ?? 0,
+          total_merchants: backendData.stats?.activeMerchants ?? 0,
+          total_products: backendData.popularCategories?.reduce((acc: number, cat: any) => acc + (cat.productCount || 0), 0) ?? 0,
+          active_products: backendData.stats?.productsSaved ?? 0,
+          total_reservations: backendData.stats?.productsSaved ?? 0,
+          total_revenue: backendData.stats?.totalRevenue ?? 0,
+          pending_merchants: 0, // Not provided by backend currently
+          pending_products: 0, // Not provided by backend currently
+          recent_activity: backendData.recentActivities?.map((activity: any) => ({
+            id: activity.id,
+            type: activity.type,
+            description: activity.description,
+            created_at: activity.timestamp,
+          })) ?? [],
+        }
+        setStats(transformedStats)
       }
     } catch (error: any) {
       console.error('Erreur chargement stats admin:', error)
