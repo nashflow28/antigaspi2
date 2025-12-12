@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react'
+import React, { useState, useRef, useEffect } from 'react'
 import {
   View,
   TextInput,
@@ -9,6 +9,7 @@ import {
   StatusBar,
   ScrollView,
   Animated,
+  Alert,
 } from 'react-native'
 import { useDispatch, useSelector } from 'react-redux'
 import { registerUser, clearError } from '../../store/slices/authSlice'
@@ -18,6 +19,8 @@ import { Button, Card, Typography, Modal } from '../../components/2025'
 import { useTheme } from '../../theme'
 import { Ionicons } from '@expo/vector-icons'
 import { useToast } from '../../contexts/ToastContext'
+import { usePersistedForm } from '../../hooks/usePersistedForm'
+import PhoneInput from '../../components/PhoneInput'
 
 interface Props {
   navigation: any
@@ -39,6 +42,29 @@ const BUSINESS_TYPES = [
   { value: 'autre', label: 'Autre', icon: 'storefront' },
 ] as const
 
+// Type pour les données de formulaire persistées (sans mots de passe)
+interface RegisterFormData {
+  role: UserRole
+  firstName: string
+  lastName: string
+  email: string
+  phone: string
+  city: string
+  businessName: string
+  businessType: string
+}
+
+const INITIAL_FORM_DATA: RegisterFormData = {
+  role: 'consumer',
+  firstName: '',
+  lastName: '',
+  email: '',
+  phone: '',
+  city: '',
+  businessName: '',
+  businessType: '',
+}
+
 const RegisterScreen: React.FC<Props> = ({ navigation }) => {
   const theme = useTheme()
   const dispatch = useDispatch<AppDispatch>()
@@ -46,22 +72,26 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
   const { showSuccess } = useToast()
   const scrollViewRef = useRef<ScrollView>(null)
 
-  // État du formulaire
-  const [role, setRole] = useState<UserRole>('consumer')
-  const [firstName, setFirstName] = useState('')
-  const [lastName, setLastName] = useState('')
-  const [email, setEmail] = useState('')
-  const [phone, setPhone] = useState('')
-  const [city, setCity] = useState('')
+  // Formulaire persisté (sans mots de passe pour la sécurité)
+  const {
+    formData,
+    setFormData,
+    setField,
+    clearCache: clearFormCache,
+    hasUnsavedChanges,
+    isRestored,
+  } = usePersistedForm<RegisterFormData>({
+    formKey: 'register_form',
+    initialValues: INITIAL_FORM_DATA,
+    expiresIn: 24 * 60 * 60 * 1000, // 24 heures
+  })
+
+  // Mots de passe NON persistés pour la sécurité
   const [password, setPassword] = useState('')
   const [passwordConfirmation, setPasswordConfirmation] = useState('')
 
-  // Champs spécifiques merchant
-  const [businessName, setBusinessName] = useState('')
-  const [businessType, setBusinessType] = useState('')
-  const [showBusinessTypePicker, setShowBusinessTypePicker] = useState(false)
-
   // UI state
+  const [showBusinessTypePicker, setShowBusinessTypePicker] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
   const [showPasswordConfirm, setShowPasswordConfirm] = useState(false)
   const roleAnimation = useRef(new Animated.Value(0)).current
@@ -71,6 +101,33 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
   const [errorTitle, setErrorTitle] = useState('')
   const [errorMessages, setErrorMessages] = useState<string[]>([])
 
+  // Show draft restoration alert if meaningful data was restored
+  useEffect(() => {
+    if (isRestored && hasUnsavedChanges) {
+      const hasMeaningfulData = formData.firstName || formData.lastName || formData.email
+      if (hasMeaningfulData) {
+        Alert.alert(
+          'Brouillon récupéré',
+          'Nous avons retrouvé vos données d\'inscription précédentes. Voulez-vous les conserver ?',
+          [
+            {
+              text: 'Recommencer',
+              style: 'destructive',
+              onPress: () => {
+                setFormData(INITIAL_FORM_DATA)
+                clearFormCache()
+              },
+            },
+            {
+              text: 'Conserver',
+              style: 'default',
+            },
+          ]
+        )
+      }
+    }
+  }, [isRestored])
+
   const showErrorModal = (title: string, messages: string[]) => {
     setErrorTitle(title)
     setErrorMessages(messages)
@@ -79,7 +136,7 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
 
   // Animation lors du changement de rôle
   const handleRoleChange = (newRole: UserRole) => {
-    setRole(newRole)
+    setField('role', newRole)
     Animated.spring(roleAnimation, {
       toValue: newRole === 'merchant' ? 1 : 0,
       useNativeDriver: false,
@@ -101,18 +158,18 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
     // Validation frontend
     const validationErrors: string[] = []
 
-    if (!firstName.trim()) {
+    if (!formData.firstName.trim()) {
       validationErrors.push('Le prénom est requis')
     }
-    if (!lastName.trim()) {
+    if (!formData.lastName.trim()) {
       validationErrors.push('Le nom est requis')
     }
-    if (!email.trim()) {
+    if (!formData.email.trim()) {
       validationErrors.push('L\'email est requis')
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
       validationErrors.push('L\'email n\'est pas valide')
     }
-    if (!city.trim()) {
+    if (!formData.city.trim()) {
       validationErrors.push('La ville est requise')
     }
     if (!password) {
@@ -125,11 +182,11 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
     }
 
     // Validation spécifique merchant
-    if (role === 'merchant') {
-      if (!businessName.trim()) {
+    if (formData.role === 'merchant') {
+      if (!formData.businessName.trim()) {
         validationErrors.push('Le nom de votre commerce est requis')
       }
-      if (!businessType) {
+      if (!formData.businessType) {
         validationErrors.push('Le type de commerce est requis')
       }
     }
@@ -141,25 +198,27 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
 
     // Préparer les données d'inscription
     const registerData: RegisterData = {
-      first_name: firstName.trim(),
-      last_name: lastName.trim(),
-      email: email.trim().toLowerCase(),
+      first_name: formData.firstName.trim(),
+      last_name: formData.lastName.trim(),
+      email: formData.email.trim().toLowerCase(),
       password: password,
       password_confirmation: passwordConfirmation,
-      phone: phone.trim() || undefined,
-      city: city.trim(),
-      role: role,
+      phone: formData.phone.trim() || undefined,
+      city: formData.city.trim(),
+      role: formData.role,
     }
 
     // Ajouter les champs merchant seulement si role = merchant
-    if (role === 'merchant') {
-      registerData.business_name = businessName.trim()
-      registerData.business_type = businessType
+    if (formData.role === 'merchant') {
+      registerData.business_name = formData.businessName.trim()
+      registerData.business_type = formData.businessType
     }
 
     try {
       const result = await dispatch(registerUser(registerData))
       if (registerUser.fulfilled.match(result)) {
+        // Clear form cache on successful registration
+        await clearFormCache()
         showSuccess('Compte créé avec succès ! 🎉')
       } else {
         // Parse validation errors from backend
@@ -188,7 +247,7 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
   }
 
   const getSelectedBusinessTypeLabel = () => {
-    const selected = BUSINESS_TYPES.find(bt => bt.value === businessType)
+    const selected = BUSINESS_TYPES.find(bt => bt.value === formData.businessType)
     return selected ? selected.label : 'Sélectionner le type'
   }
 
@@ -289,8 +348,8 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
               style={[
                 styles.roleButton,
                 {
-                  backgroundColor: role === 'consumer' ? theme.colors.primary[500] : theme.colors.surface.muted,
-                  borderColor: role === 'consumer' ? theme.colors.primary[500] : theme.colors.inputBorder,
+                  backgroundColor: formData.role === 'consumer' ? theme.colors.primary[500] : theme.colors.surface.muted,
+                  borderColor: formData.role === 'consumer' ? theme.colors.primary[500] : theme.colors.inputBorder,
                 },
               ]}
               onPress={() => handleRoleChange('consumer')}
@@ -298,18 +357,18 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
               <Ionicons
                 name="person"
                 size={24}
-                color={role === 'consumer' ? '#fff' : theme.colors.textSecondary}
+                color={formData.role === 'consumer' ? '#fff' : theme.colors.textSecondary}
               />
               <Typography
                 variant="body"
                 weight="semibold"
-                style={{ color: role === 'consumer' ? '#fff' : theme.colors.text, marginTop: 4 }}
+                style={{ color: formData.role === 'consumer' ? '#fff' : theme.colors.text, marginTop: 4 }}
               >
                 Consommateur
               </Typography>
               <Typography
                 variant="caption"
-                style={{ color: role === 'consumer' ? 'rgba(255,255,255,0.8)' : theme.colors.textSecondary, textAlign: 'center', marginTop: 2 }}
+                style={{ color: formData.role === 'consumer' ? 'rgba(255,255,255,0.8)' : theme.colors.textSecondary, textAlign: 'center', marginTop: 2 }}
               >
                 Je cherche des bons plans
               </Typography>
@@ -319,8 +378,8 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
               style={[
                 styles.roleButton,
                 {
-                  backgroundColor: role === 'merchant' ? theme.colors.primary[500] : theme.colors.surface.muted,
-                  borderColor: role === 'merchant' ? theme.colors.primary[500] : theme.colors.inputBorder,
+                  backgroundColor: formData.role === 'merchant' ? theme.colors.primary[500] : theme.colors.surface.muted,
+                  borderColor: formData.role === 'merchant' ? theme.colors.primary[500] : theme.colors.inputBorder,
                 },
               ]}
               onPress={() => handleRoleChange('merchant')}
@@ -328,18 +387,18 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
               <Ionicons
                 name="storefront"
                 size={24}
-                color={role === 'merchant' ? '#fff' : theme.colors.textSecondary}
+                color={formData.role === 'merchant' ? '#fff' : theme.colors.textSecondary}
               />
               <Typography
                 variant="body"
                 weight="semibold"
-                style={{ color: role === 'merchant' ? '#fff' : theme.colors.text, marginTop: 4 }}
+                style={{ color: formData.role === 'merchant' ? '#fff' : theme.colors.text, marginTop: 4 }}
               >
                 Commerçant
               </Typography>
               <Typography
                 variant="caption"
-                style={{ color: role === 'merchant' ? 'rgba(255,255,255,0.8)' : theme.colors.textSecondary, textAlign: 'center', marginTop: 2 }}
+                style={{ color: formData.role === 'merchant' ? 'rgba(255,255,255,0.8)' : theme.colors.textSecondary, textAlign: 'center', marginTop: 2 }}
               >
                 Je vends mes invendus
               </Typography>
@@ -358,29 +417,31 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
 
           <View style={styles.row}>
             <View style={{ flex: 1, marginRight: theme.spacing.sm }}>
-              {renderInput('Prénom *', firstName, setFirstName, 'Jean', { icon: 'person-outline' })}
+              {renderInput('Prénom *', formData.firstName, (v) => setField('firstName', v), 'Jean', { icon: 'person-outline' })}
             </View>
             <View style={{ flex: 1, marginLeft: theme.spacing.sm }}>
-              {renderInput('Nom *', lastName, setLastName, 'Dupont', { icon: 'person-outline' })}
+              {renderInput('Nom *', formData.lastName, (v) => setField('lastName', v), 'Dupont', { icon: 'person-outline' })}
             </View>
           </View>
 
-          {renderInput('Email *', email, setEmail, 'jean@exemple.com', {
+          {renderInput('Email *', formData.email, (v) => setField('email', v), 'jean@exemple.com', {
             keyboardType: 'email-address',
             icon: 'mail-outline',
             autoCapitalize: 'none',
           })}
 
-          {renderInput('Téléphone', phone, setPhone, '+228 90 12 34 56', {
-            keyboardType: 'phone-pad',
-            icon: 'call-outline',
-          })}
+          <PhoneInput
+            label="Téléphone"
+            value={formData.phone}
+            onChangeText={(v) => setField('phone', v)}
+            placeholder="90 12 34 56"
+          />
 
-          {renderInput('Ville *', city, setCity, 'Lomé', { icon: 'location-outline' })}
+          {renderInput('Ville *', formData.city, (v) => setField('city', v), 'Lomé', { icon: 'location-outline' })}
         </Card>
 
         {/* Champs spécifiques Merchant */}
-        {role === 'merchant' && (
+        {formData.role === 'merchant' && (
           <Animated.View style={{ opacity: roleAnimation }}>
             <Card variant="elevated" style={{ padding: theme.spacing.lg, marginBottom: theme.spacing.lg, borderColor: theme.colors.primary[500], borderWidth: 1 }}>
               <View style={styles.sectionHeader}>
@@ -390,7 +451,7 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
                 <Typography variant="body" weight="bold">Informations commerce</Typography>
               </View>
 
-              {renderInput('Nom du commerce *', businessName, setBusinessName, 'Boulangerie Martin', {
+              {renderInput('Nom du commerce *', formData.businessName, (v) => setField('businessName', v), 'Boulangerie Martin', {
                 icon: 'business-outline',
               })}
 
@@ -411,7 +472,7 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
                 >
                   <View style={[styles.inputIconContainer, { backgroundColor: `${theme.colors.primary[500]}15` }]}>
                     <Ionicons
-                      name={BUSINESS_TYPES.find(bt => bt.value === businessType)?.icon as any || 'grid-outline'}
+                      name={BUSINESS_TYPES.find(bt => bt.value === formData.businessType)?.icon as any || 'grid-outline'}
                       size={18}
                       color={theme.colors.primary[500]}
                     />
@@ -421,7 +482,7 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
                     style={{
                       flex: 1,
                       marginLeft: 48,
-                      color: businessType ? theme.colors.text : theme.colors.textSecondary,
+                      color: formData.businessType ? theme.colors.text : theme.colors.textSecondary,
                     }}
                   >
                     {getSelectedBusinessTypeLabel()}
@@ -476,7 +537,7 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
           loading={loading}
           leftIcon={<Ionicons name="person-add" size={20} color="#fff" />}
         >
-          {loading ? 'Création en cours...' : `Créer mon compte ${role === 'merchant' ? 'commerçant' : ''}`}
+          {loading ? 'Création en cours...' : `Créer mon compte ${formData.role === 'merchant' ? 'commerçant' : ''}`}
         </Button>
 
         {/* Lien connexion */}
@@ -510,12 +571,12 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
                 style={[
                   styles.businessTypeOption,
                   {
-                    backgroundColor: businessType === type.value ? `${theme.colors.primary[500]}15` : 'transparent',
-                    borderColor: businessType === type.value ? theme.colors.primary[500] : theme.colors.inputBorder,
+                    backgroundColor: formData.businessType === type.value ? `${theme.colors.primary[500]}15` : 'transparent',
+                    borderColor: formData.businessType === type.value ? theme.colors.primary[500] : theme.colors.inputBorder,
                   },
                 ]}
                 onPress={() => {
-                  setBusinessType(type.value)
+                  setField('businessType', type.value)
                   setShowBusinessTypePicker(false)
                 }}
               >
@@ -524,12 +585,12 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
                 </View>
                 <Typography
                   variant="body"
-                  weight={businessType === type.value ? 'bold' : 'regular'}
+                  weight={formData.businessType === type.value ? 'bold' : 'regular'}
                   style={{ flex: 1, marginLeft: theme.spacing.md }}
                 >
                   {type.label}
                 </Typography>
-                {businessType === type.value && (
+                {formData.businessType === type.value && (
                   <Ionicons name="checkmark-circle" size={24} color={theme.colors.primary[500]} />
                 )}
               </TouchableOpacity>

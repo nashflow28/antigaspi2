@@ -23,6 +23,8 @@ import apiService from '../../services/api'
 import { ApiResponse, User } from '../../types'
 import { refreshProfile } from '../../store/slices/authSlice'
 import { getImageUrl } from '../../utils/imageHelpers'
+import { usePersistedForm } from '../../hooks/usePersistedForm'
+import PhoneInput from '../../components/PhoneInput'
 
 interface ProfileFormData {
   first_name: string
@@ -57,6 +59,15 @@ interface ProfileEditScreenProps {
   }
 }
 
+const INITIAL_FORM_DATA: ProfileFormData = {
+  first_name: '',
+  last_name: '',
+  email: '',
+  phone: '',
+  address: '',
+  city: '',
+}
+
 const ProfileEditScreen: React.FC<ProfileEditScreenProps> = ({ navigation: navigationOverride }) => {
   const theme = useTheme()
   const defaultNavigation = useNavigation<any>()
@@ -68,40 +79,93 @@ const ProfileEditScreen: React.FC<ProfileEditScreenProps> = ({ navigation: navig
   const [isSaving, setIsSaving] = useState(false)
   const [uploading, setUploading] = useState(false)
   const [photoUri, setPhotoUri] = useState<string | null>(null)
-  const [formData, setFormData] = useState<ProfileFormData>({
-    first_name: '',
-    last_name: '',
-    email: '',
-    phone: '',
-    address: '',
-    city: '',
+  const [userDataLoaded, setUserDataLoaded] = useState(false)
+
+  // Formulaire persisté pour conserver les modifications en cas d'interruption
+  const {
+    formData,
+    setFormData,
+    setField,
+    clearCache: clearFormCache,
+    hasUnsavedChanges,
+    isRestored,
+  } = usePersistedForm<ProfileFormData>({
+    formKey: 'consumer_profile_edit_form',
+    initialValues: INITIAL_FORM_DATA,
+    expiresIn: 1 * 60 * 60 * 1000, // 1 heure (plus court car c'est de l'édition)
   })
 
+  // Charger les données utilisateur au premier rendu
   useEffect(() => {
-    if (user) {
-      setFormData({
-        first_name: user.first_name || '',
-        last_name: user.last_name || '',
-        email: user.email || '',
-        phone: user.phone || '',
-        address: user.address || '',
-        city: user.city || '',
-      })
-      setPhotoUri(user.photo_url ? getImageUrl(user.photo_url) : null)
-    } else {
-      setFormData({
-        first_name: '',
-        last_name: '',
-        email: '',
-        phone: '',
-        address: '',
-        city: '',
-      })
-      setPhotoUri(null)
-    }
+    if (user && !userDataLoaded) {
+      // Si pas de données persistées significatives, charger depuis user
+      const hasPersistedChanges = isRestored && hasUnsavedChanges && (
+        formData.first_name !== INITIAL_FORM_DATA.first_name ||
+        formData.last_name !== INITIAL_FORM_DATA.last_name ||
+        formData.email !== INITIAL_FORM_DATA.email
+      )
 
-    setIsLoadingProfile(false)
-  }, [user])
+      if (!hasPersistedChanges) {
+        setFormData({
+          first_name: user.first_name || '',
+          last_name: user.last_name || '',
+          email: user.email || '',
+          phone: user.phone || '',
+          address: user.address || '',
+          city: user.city || '',
+        })
+      }
+      setPhotoUri(user.photo_url ? getImageUrl(user.photo_url) : null)
+      setUserDataLoaded(true)
+      setIsLoadingProfile(false)
+    } else if (!user) {
+      setFormData(INITIAL_FORM_DATA)
+      setPhotoUri(null)
+      setIsLoadingProfile(false)
+    }
+  }, [user, isRestored])
+
+  // Montrer une alerte si des modifications ont été récupérées
+  useEffect(() => {
+    if (isRestored && hasUnsavedChanges && userDataLoaded && user) {
+      // Vérifier si les données persistées diffèrent des données utilisateur actuelles
+      const isDifferent =
+        formData.first_name !== (user.first_name || '') ||
+        formData.last_name !== (user.last_name || '') ||
+        formData.email !== (user.email || '') ||
+        formData.phone !== (user.phone || '') ||
+        formData.address !== (user.address || '') ||
+        formData.city !== (user.city || '')
+
+      if (isDifferent) {
+        Alert.alert(
+          'Modifications récupérées',
+          'Nous avons retrouvé des modifications non enregistrées. Voulez-vous les conserver ?',
+          [
+            {
+              text: 'Annuler les modifications',
+              style: 'destructive',
+              onPress: () => {
+                setFormData({
+                  first_name: user.first_name || '',
+                  last_name: user.last_name || '',
+                  email: user.email || '',
+                  phone: user.phone || '',
+                  address: user.address || '',
+                  city: user.city || '',
+                })
+                clearFormCache()
+              },
+            },
+            {
+              text: 'Conserver',
+              style: 'default',
+            },
+          ]
+        )
+      }
+    }
+  }, [isRestored, userDataLoaded])
 
   const syncProfileUpdates = useCallback(async () => {
     try {
@@ -258,6 +322,8 @@ const ProfileEditScreen: React.FC<ProfileEditScreenProps> = ({ navigation: navig
 
       if (response.success) {
         await syncProfileUpdates()
+        // Clear form cache on successful save
+        await clearFormCache()
 
         Alert.alert('Succès', response.message || 'Profil mis à jour avec succès', [
           {
@@ -278,7 +344,7 @@ const ProfileEditScreen: React.FC<ProfileEditScreenProps> = ({ navigation: navig
   }
 
   const updateField = (field: keyof ProfileFormData, value: string) => {
-    setFormData((prev) => ({ ...prev, [field]: value }))
+    setField(field, value)
   }
 
   if (isLoadingProfile && !formData.first_name) {
@@ -439,30 +505,12 @@ const ProfileEditScreen: React.FC<ProfileEditScreenProps> = ({ navigation: navig
           </View>
 
           {/* Téléphone */}
-          <View style={{ marginBottom: theme.spacing.lg }}>
-            <Typography
-              variant="body"
-              weight="semibold"
-              style={{ marginBottom: theme.spacing.sm }}
-            >
-              Téléphone
-            </Typography>
-            <TextInput
-              style={[
-                styles.input,
-                {
-                  backgroundColor: theme.colors.surface.light,
-                  color: theme.colors.text,
-                  borderColor: theme.colors.border,
-                },
-              ]}
-              value={formData.phone}
-              onChangeText={(value) => updateField('phone', value)}
-              placeholder="+XXX XX XX XX XX (Afrique de l'Ouest)"
-              placeholderTextColor={theme.colors.textSecondary}
-              keyboardType="phone-pad"
-            />
-          </View>
+          <PhoneInput
+            label="Téléphone"
+            value={formData.phone}
+            onChangeText={(value) => updateField('phone', value)}
+            placeholder="90 12 34 56"
+          />
 
           {/* Adresse */}
           <View style={{ marginBottom: theme.spacing.lg }}>

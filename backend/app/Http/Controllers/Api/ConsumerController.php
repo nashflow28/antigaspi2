@@ -52,7 +52,6 @@ class ConsumerController extends Controller
                 'email.required' => "L'adresse email est requise.",
                 'email.email' => 'Adresse email invalide.',
                 'email.unique' => 'Cette adresse email est déjà utilisée.',
-                'phone.regex' => 'Le numéro de téléphone doit respecter le format +228 12 34 56 78.',
             ]);
 
             if ($validator->fails()) {

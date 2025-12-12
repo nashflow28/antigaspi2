@@ -73,7 +73,8 @@
             "buildToolsVersion": "35.0.0"
           }
         }
-      ]
+      ],
+      "expo-localization"
     ],
     "extra": {
       "apiUrl": "https://antigaspi.jubtek.com/api",

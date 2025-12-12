@@ -23,6 +23,8 @@ import { useTheme } from '../../theme'
 import apiService, { API_BASE_URL } from '../../services/api'
 import * as Location from 'expo-location'
 import MapLocationPicker from '../../components/MapLocationPicker'
+import { usePersistedForm } from '../../hooks/usePersistedForm'
+import PhoneInput from '../../components/PhoneInput'
 
 interface ProfileFormData {
   business_name: string
@@ -44,6 +46,16 @@ const buildPhotoUrl = (photoUrl: string | null | undefined): string | null => {
   return `${serverBaseUrl}${photoUrl}`
 }
 
+const INITIAL_FORM_DATA: ProfileFormData = {
+  business_name: '',
+  business_type: '',
+  description: '',
+  phone: '',
+  address: '',
+  city: '',
+  siret: '',
+}
+
 const MerchantProfileEditScreen: React.FC = () => {
   const theme = useTheme()
   const navigation = useNavigation()
@@ -53,14 +65,20 @@ const MerchantProfileEditScreen: React.FC = () => {
   const [loading, setLoading] = useState(false)
   const [uploading, setUploading] = useState(false)
   const [photoUri, setPhotoUri] = useState<string | null>(null)
-  const [formData, setFormData] = useState<ProfileFormData>({
-    business_name: '',
-    business_type: '',
-    description: '',
-    phone: '',
-    address: '',
-    city: '',
-    siret: '',
+  const [userDataLoaded, setUserDataLoaded] = useState(false)
+
+  // Formulaire persisté pour conserver les modifications en cas d'interruption
+  const {
+    formData,
+    setFormData,
+    setField,
+    clearCache: clearFormCache,
+    hasUnsavedChanges,
+    isRestored,
+  } = usePersistedForm<ProfileFormData>({
+    formKey: 'merchant_profile_edit_form',
+    initialValues: INITIAL_FORM_DATA,
+    expiresIn: 1 * 60 * 60 * 1000, // 1 heure
   })
   const [locationLoading, setLocationLoading] = useState(false)
   const [latitude, setLatitude] = useState('')
@@ -105,23 +123,79 @@ const MerchantProfileEditScreen: React.FC = () => {
     loadMerchantLocation()
   }, [])
 
+  // Montrer une alerte si des modifications ont été récupérées
+  useEffect(() => {
+    if (isRestored && hasUnsavedChanges && userDataLoaded && user) {
+      // Vérifier si les données persistées diffèrent des données utilisateur actuelles
+      const isDifferent =
+        formData.business_name !== (user.merchant?.business_name || '') ||
+        formData.business_type !== (user.merchant?.business_type || '') ||
+        formData.description !== (user.merchant?.description || '') ||
+        formData.phone !== (user.phone || '') ||
+        formData.address !== (user.address || '') ||
+        formData.city !== (user.city || '') ||
+        formData.siret !== (user.merchant?.siret || '')
+
+      if (isDifferent) {
+        Alert.alert(
+          'Modifications récupérées',
+          'Nous avons retrouvé des modifications non enregistrées. Voulez-vous les conserver ?',
+          [
+            {
+              text: 'Annuler',
+              style: 'destructive',
+              onPress: () => {
+                setFormData({
+                  business_name: user.merchant?.business_name || '',
+                  business_type: user.merchant?.business_type || '',
+                  description: user.merchant?.description || '',
+                  phone: user.phone || '',
+                  address: user.address || '',
+                  city: user.city || '',
+                  siret: user.merchant?.siret || '',
+                })
+                clearFormCache()
+              },
+            },
+            {
+              text: 'Conserver',
+              style: 'default',
+            },
+          ]
+        )
+      }
+    }
+  }, [isRestored, userDataLoaded])
+
   const loadMerchantProfile = async () => {
     try {
       setLoading(true)
       // Rafraîchir le profil depuis l'API pour avoir les données merchant à jour
       const resultAction = await dispatch(refreshProfile() as any)
 
+      const loadFormDataFromUser = (userData: typeof user) => {
+        // Si pas de données persistées significatives, charger depuis user
+        const hasPersistedChanges = isRestored && hasUnsavedChanges && (
+          formData.business_name !== INITIAL_FORM_DATA.business_name ||
+          formData.description !== INITIAL_FORM_DATA.description
+        )
+
+        if (!hasPersistedChanges) {
+          setFormData({
+            business_name: userData?.merchant?.business_name || '',
+            business_type: userData?.merchant?.business_type || '',
+            description: userData?.merchant?.description || '',
+            phone: userData?.phone || '',
+            address: userData?.address || '',
+            city: userData?.city || '',
+            siret: userData?.merchant?.siret || '',
+          })
+        }
+      }
+
       if (refreshProfile.fulfilled.match(resultAction)) {
         const freshUser = resultAction.payload
-        setFormData({
-          business_name: freshUser.merchant?.business_name || '',
-          business_type: freshUser.merchant?.business_type || '',
-          description: freshUser.merchant?.description || '',
-          phone: freshUser.phone || '',
-          address: freshUser.address || '',
-          city: freshUser.city || '',
-          siret: freshUser.merchant?.siret || '',
-        })
+        loadFormDataFromUser(freshUser)
         // 🐛 BUG FIX: Build full URL for photo
         const photoFullUrl = buildPhotoUrl(freshUser.merchant?.photo_url)
         if (photoFullUrl) {
@@ -129,35 +203,32 @@ const MerchantProfileEditScreen: React.FC = () => {
         }
       } else if (user) {
         // Fallback sur les données existantes si le refresh échoue
-        setFormData({
-          business_name: user.merchant?.business_name || '',
-          business_type: user.merchant?.business_type || '',
-          description: user.merchant?.description || '',
-          phone: user.phone || '',
-          address: user.address || '',
-          city: user.city || '',
-          siret: user.merchant?.siret || '',
-        })
+        loadFormDataFromUser(user)
         // 🐛 BUG FIX: Build full URL for photo
         const photoFullUrl = buildPhotoUrl(user.merchant?.photo_url)
         if (photoFullUrl) {
           setPhotoUri(photoFullUrl)
         }
       }
+      setUserDataLoaded(true)
     } catch (error) {
       console.error('Erreur chargement profil:', error)
       // Fallback sur les données existantes en cas d'erreur
       if (user) {
-        setFormData({
-          business_name: user.merchant?.business_name || '',
-          business_type: user.merchant?.business_type || '',
-          description: user.merchant?.description || '',
-          phone: user.phone || '',
-          address: user.address || '',
-          city: user.city || '',
-          siret: user.merchant?.siret || '',
-        })
+        const hasPersistedChanges = isRestored && hasUnsavedChanges
+        if (!hasPersistedChanges) {
+          setFormData({
+            business_name: user.merchant?.business_name || '',
+            business_type: user.merchant?.business_type || '',
+            description: user.merchant?.description || '',
+            phone: user.phone || '',
+            address: user.address || '',
+            city: user.city || '',
+            siret: user.merchant?.siret || '',
+          })
+        }
       }
+      setUserDataLoaded(true)
     } finally {
       setLoading(false)
     }
@@ -449,6 +520,9 @@ const MerchantProfileEditScreen: React.FC = () => {
       await dispatch(refreshProfile() as any)
       console.log('✅ [MerchantProfileEdit] Données user rafraîchies')
 
+      // Clear form cache on successful save
+      await clearFormCache()
+
       const successMessage = locationUpdated
         ? 'Profil et localisation mis à jour avec succès'
         : 'Profil mis à jour avec succès'
@@ -478,7 +552,7 @@ const MerchantProfileEditScreen: React.FC = () => {
   }
 
   const updateField = (field: keyof ProfileFormData, value: string) => {
-    setFormData((prev) => ({ ...prev, [field]: value }))
+    setField(field, value)
   }
 
   const hasDraftCoordinates = latitude.trim().length > 0 && longitude.trim().length > 0
@@ -631,17 +705,12 @@ const MerchantProfileEditScreen: React.FC = () => {
           </View>
 
           {/* Téléphone */}
-          <View style={styles.fieldGroup}>
-            <Text style={[styles.label, { color: theme.colors.text }]}>Téléphone</Text>
-            <TextInput
-              style={[styles.input, { backgroundColor: theme.colors.inputBackground, borderColor: theme.colors.inputBorder, borderWidth: 1, color: theme.colors.text }]}
-              value={formData.phone}
-              onChangeText={(value) => updateField('phone', value)}
-              placeholder="+228 XX XX XX XX"
-              placeholderTextColor={theme.colors.textSecondary}
-              keyboardType="phone-pad"
-            />
-          </View>
+          <PhoneInput
+            label="Téléphone"
+            value={formData.phone}
+            onChangeText={(value) => updateField('phone', value)}
+            placeholder="90 12 34 56"
+          />
 
           {/* Adresse */}
           <View style={styles.fieldGroup}>

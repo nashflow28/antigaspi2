@@ -74,12 +74,13 @@ class AuthController extends Controller
             'password' => 'required|min:6',
             'first_name' => 'required|string|max:100',
             'last_name' => 'required|string|max:100',
-            // 🐛 BUG FIX #18: Add phone format validation for Togo (West Africa)
+            // 🐛 BUG FIX #18: Phone format validation for international numbers (West Africa priority)
+            // Accepts: +228 90 12 34 56, +229 97 12 34 56, +225 07 12 34 56 78, etc.
             'phone' => [
                 'nullable',
                 'string',
-                'regex:/^\+228\s?\d{2}\s?\d{2}\s?\d{2}\s?\d{2}$/',
-                'max:20'
+                'regex:/^\+\d{1,4}[\s]?[\d\s]{6,15}$/',
+                'max:25'
             ],
             'role' => 'required|in:consumer,merchant',
             'city' => 'required|string|max:100',
