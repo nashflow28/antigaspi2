@@ -103,9 +103,10 @@ describe('GeographicChart', () => {
     const dataWithDecimals = [
       { city: 'Test City', revenue: 1000, percentage: 12.3456789 },
     ]
-    const { getByText } = render(<GeographicChart data={dataWithDecimals} />)
-    expect(getByText(/12.3%/)).toBeTruthy()
-    expect(getByText(/12.3456789%/)).toBeFalsy()
+    const { getByText, queryByText } = render(<GeographicChart data={dataWithDecimals} />)
+    expect(getByText(/12\.3%/)).toBeTruthy()
+    // Full decimal should NOT appear (use queryByText for non-existence check)
+    expect(queryByText(/12\.3456789%/)).toBeNull()
   })
 
   // ============ CHART CONFIGURATION TESTS ============
