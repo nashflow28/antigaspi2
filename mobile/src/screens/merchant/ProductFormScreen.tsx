@@ -16,6 +16,7 @@ import {
 } from 'react-native'
 import { Ionicons } from '@expo/vector-icons'
 import * as ImagePicker from 'expo-image-picker'
+import DateTimePicker from '@react-native-community/datetimepicker'
 import { useTheme } from '../../theme'
 import { Product } from '../../types'
 import apiService from '../../services/api'
@@ -46,8 +47,45 @@ const ProductFormScreen: React.FC<Props> = ({ route, navigation }) => {
   const [originalPrice, setOriginalPrice] = useState(product?.original_price || '')
   const [discountedPrice, setDiscountedPrice] = useState(product?.discounted_price || '')
   const [quantity, setQuantity] = useState(product?.quantity_available?.toString() || '')
-  const [expirationDate, setExpirationDate] = useState(product?.expiration_date || '')
+  // Date d'expiration avec DateTimePicker
+  const [expirationDate, setExpirationDate] = useState<Date>(() => {
+    if (product?.expiration_date) {
+      const parsed = new Date(product.expiration_date)
+      return isNaN(parsed.getTime()) ? new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) : parsed
+    }
+    // Par défaut: 7 jours dans le futur
+    return new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
+  })
+  const [showDatePicker, setShowDatePicker] = useState(false)
   const [imageUri, setImageUri] = useState<string | null>(product?.image_url ? getImageUrl(product.image_url) : null)
+
+  // Formater la date en JJ/MM/AAAA pour l'affichage
+  const formatDateDisplay = (date: Date): string => {
+    const day = date.getDate().toString().padStart(2, '0')
+    const month = (date.getMonth() + 1).toString().padStart(2, '0')
+    const year = date.getFullYear()
+    return `${day}/${month}/${year}`
+  }
+
+  // Formater la date en AAAA-MM-JJ pour l'API backend
+  const formatDateForAPI = (date: Date): string => {
+    return date.toISOString().split('T')[0]
+  }
+
+  // Gérer le changement de date
+  const handleDateChange = (event: any, selectedDate?: Date) => {
+    setShowDatePicker(Platform.OS === 'ios') // Sur iOS, on garde le picker ouvert
+    if (selectedDate) {
+      // Validation: la date doit être dans le futur
+      const today = new Date()
+      today.setHours(0, 0, 0, 0)
+      if (selectedDate < today) {
+        showErrorModal('Date invalide', ['La date d\'expiration doit être dans le futur'], 'warning')
+        return
+      }
+      setExpirationDate(selectedDate)
+    }
+  }
 
   // Helper function to show styled error modal
   const showErrorModal = (title: string, messages: string[], type: 'error' | 'warning' = 'error') => {
@@ -219,15 +257,7 @@ const ProductFormScreen: React.FC<Props> = ({ route, navigation }) => {
         original_price: parseFloat(originalPrice),
         discounted_price: parseFloat(discountedPrice),
         quantity_available: parseInt(quantity, 10),
-        expiration_date: (() => {
-          if (expirationDate && /^\d{4}-\d{2}-\d{2}$/.test(expirationDate)) {
-            const date = new Date(expirationDate);
-            if (!isNaN(date.getTime())) {
-              return expirationDate;
-            }
-          }
-          return new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
-        })(),
+        expiration_date: formatDateForAPI(expirationDate),
         image_url: uploadedImageUrl,
       }
 
@@ -541,21 +571,37 @@ const ProductFormScreen: React.FC<Props> = ({ route, navigation }) => {
           />
         </View>
 
-        {/* Date d'expiration */}
+        {/* Date d'expiration avec DateTimePicker */}
         <View style={styles.section}>
-          <Text style={[styles.label, { color: theme.colors.text }]}>Date d'expiration</Text>
-          <TextInput
-            style={[styles.input, { backgroundColor: theme.colors.inputBackground, color: theme.colors.text, borderColor: theme.colors.border }]}
-            value={expirationDate}
-            onChangeText={setExpirationDate}
-            placeholder="AAAA-MM-JJ"
-            placeholderTextColor={theme.colors.textSecondary}
+          <Text style={[styles.label, { color: theme.colors.text }]}>Date d'expiration *</Text>
+          <TouchableOpacity
+            style={[styles.datePickerButton, { backgroundColor: theme.colors.inputBackground, borderColor: theme.colors.border }]}
+            onPress={() => setShowDatePicker(true)}
             testID={TEST_IDS.expirationDateInput}
-          />
+          >
+            <Ionicons name="calendar" size={24} color={theme.colors.primary[500]} />
+            <Text style={[styles.datePickerText, { color: theme.colors.text }]}>
+              {formatDateDisplay(expirationDate)}
+            </Text>
+            <Ionicons name="chevron-down" size={20} color={theme.colors.textSecondary} />
+          </TouchableOpacity>
           <Text style={[styles.helperText, { color: theme.colors.textSecondary }]}>
-            Format: 2025-12-31
+            Format: JJ/MM/AAAA (ex: 31/12/2025)
           </Text>
         </View>
+
+        {/* DateTimePicker Modal */}
+        {showDatePicker && (
+          <DateTimePicker
+            testID="dateTimePicker"
+            value={expirationDate}
+            mode="date"
+            display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+            onChange={handleDateChange}
+            minimumDate={new Date()} // Empêche de sélectionner une date passée
+            locale="fr-FR"
+          />
+        )}
 
         {/* Bouton de soumission */}
         <TouchableOpacity
@@ -676,6 +722,18 @@ const styles = StyleSheet.create({
   helperText: {
     fontSize: 12,
     marginTop: 4,
+  },
+  datePickerButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderRadius: 8,
+    padding: 12,
+    gap: 12,
+  },
+  datePickerText: {
+    flex: 1,
+    fontSize: 16,
   },
   submitButton: {
     flexDirection: 'row',
