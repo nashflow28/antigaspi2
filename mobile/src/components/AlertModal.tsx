@@ -224,9 +224,6 @@ const AlertModal: React.FC<AlertModalProps> = ({
                         fontWeight: '600',
                       },
                     ]}
-                    numberOfLines={1}
-                    adjustsFontSizeToFit
-                    minimumFontScale={0.8}
                   >
                     {button.text}
                   </Text>
