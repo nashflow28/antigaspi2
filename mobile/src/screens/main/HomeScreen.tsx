@@ -7,7 +7,6 @@ import {
   TouchableOpacity,
   StatusBar,
   RefreshControl,
-  Alert,
   Modal,
 } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
@@ -26,6 +25,8 @@ import locationService, { UserLocation } from '../../services/locationService'
 import { Button, Card, Badge, Typography, ProductCardSkeleton, EmptyState } from '../../components/2025'
 import { TEST_IDS } from '../../utils/testIds'
 import { getCategoryIconConfig, IoniconName } from '../../constants/categoryIcons'
+import AlertModal from '../../components/AlertModal'
+import { useAlert } from '../../hooks/useAlert'
 
 interface Props {
   navigation: any
@@ -37,6 +38,7 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
   const { products, categories, loading } = useSelector((state: RootState) => state.products)
   const { cart } = useSelector((state: RootState) => state.cart)
   const { showError } = useToast()
+  const { alertProps, showWarning, hideAlert } = useAlert()
   const theme = useTheme()
   const insets = useSafeAreaInsets()
 
@@ -222,14 +224,15 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
     // Activer le filtre
     if (!locationPermissionGranted) {
       // Demander permission
-      Alert.alert(
+      showWarning(
         'Autorisation requise',
         'Antigaspi a besoin d\'accéder à votre position pour afficher les produits proches de vous.',
         [
-          { text: 'Annuler', style: 'cancel' },
+          { text: 'Annuler', onPress: hideAlert },
           {
             text: 'Autoriser',
             onPress: async () => {
+              hideAlert()
               const granted = await locationService.requestLocationPermission()
               if (granted) {
                 setLocationPermissionGranted(true)
@@ -650,6 +653,8 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
           </View>
         </TouchableOpacity>
       </Modal>
+
+      <AlertModal {...alertProps} />
     </View>
   )
 }

@@ -9,7 +9,6 @@ import {
   StatusBar,
   ScrollView,
   Animated,
-  Alert,
 } from 'react-native'
 import { useDispatch, useSelector } from 'react-redux'
 import { registerUser, clearError } from '../../store/slices/authSlice'
@@ -21,6 +20,8 @@ import { Ionicons } from '@expo/vector-icons'
 import { useToast } from '../../contexts/ToastContext'
 import { usePersistedForm } from '../../hooks/usePersistedForm'
 import PhoneInput from '../../components/PhoneInput'
+import AlertModal from '../../components/AlertModal'
+import { useAlert } from '../../hooks/useAlert'
 
 interface Props {
   navigation: any
@@ -71,6 +72,7 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
   const { loading } = useSelector((state: RootState) => state.auth)
   const { showSuccess } = useToast()
   const scrollViewRef = useRef<ScrollView>(null)
+  const { alertProps, showWarning, hideAlert } = useAlert()
 
   // Formulaire persisté (sans mots de passe pour la sécurité)
   const {
@@ -106,7 +108,7 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
     if (isRestored && hasUnsavedChanges) {
       const hasMeaningfulData = formData.firstName || formData.lastName || formData.email
       if (hasMeaningfulData) {
-        Alert.alert(
+        showWarning(
           'Brouillon récupéré',
           'Nous avons retrouvé vos données d\'inscription précédentes. Voulez-vous les conserver ?',
           [
@@ -114,6 +116,7 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
               text: 'Recommencer',
               style: 'destructive',
               onPress: () => {
+                hideAlert()
                 setFormData(INITIAL_FORM_DATA)
                 clearFormCache()
               },
@@ -121,6 +124,7 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
             {
               text: 'Conserver',
               style: 'default',
+              onPress: hideAlert,
             },
           ]
         )
@@ -638,6 +642,8 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
           </Button>
         </View>
       </Modal>
+
+      <AlertModal {...alertProps} />
     </KeyboardAvoidingView>
   )
 }

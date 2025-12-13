@@ -4,7 +4,6 @@ import {
   Text,
   StyleSheet,
   ActivityIndicator,
-  Alert,
   Platform,
   Linking,
   TouchableOpacity,
@@ -17,6 +16,8 @@ import { MerchantMapMarker, MerchantMapRegion } from '../../types'
 import apiService from '../../services/api'
 import { TEST_IDS } from '../../utils/testIds'
 import OpenStreetMap, { MapMarker } from '../../components/OpenStreetMap'
+import AlertModal from '../../components/AlertModal'
+import { useAlert } from '../../hooks/useAlert'
 
 // BUG-004 FIX: Define navigation types for MapStack
 type MapStackParamList = {
@@ -39,6 +40,7 @@ interface Props {
 const MerchantMapScreen: React.FC<Props> = ({ testID = TEST_IDS.merchantMapScreen }) => {
   const theme = useTheme()
   const navigation = useNavigation<NavigationProp<MapStackParamList>>()
+  const { alertProps, showError, hideAlert } = useAlert()
 
   // State
   const [merchants, setMerchants] = useState<MerchantMapMarker[]>([])
@@ -148,7 +150,7 @@ const MerchantMapScreen: React.FC<Props> = ({ testID = TEST_IDS.merchantMapScree
   // Call merchant
   const handleCallMerchant = useCallback((phone: string | undefined) => {
     if (!phone || phone.trim() === '') {
-      Alert.alert('Erreur', 'Numéro de téléphone non disponible')
+      showError('Erreur', 'Numéro de téléphone non disponible')
       return
     }
 
@@ -159,10 +161,10 @@ const MerchantMapScreen: React.FC<Props> = ({ testID = TEST_IDS.merchantMapScree
         if (supported) {
           return Linking.openURL(phoneUrl)
         }
-        Alert.alert('Erreur', 'Impossible d\'ouvrir le composeur téléphonique')
+        showError('Erreur', 'Impossible d\'ouvrir le composeur téléphonique')
       })
       .catch((err) => console.error('Error opening phone:', err))
-  }, [])
+  }, [showError])
 
   // Get directions
   const handleGetDirections = useCallback((merchant: MerchantMapMarker) => {
@@ -180,10 +182,10 @@ const MerchantMapScreen: React.FC<Props> = ({ testID = TEST_IDS.merchantMapScree
     if (url) {
       Linking.openURL(url).catch((err) => {
         console.error('Error opening maps:', err)
-        Alert.alert('Erreur', 'Impossible d\'ouvrir l\'application de navigation')
+        showError('Erreur', 'Impossible d\'ouvrir l\'application de navigation')
       })
     }
-  }, [])
+  }, [showError])
 
   // Loading state
   if (loading) {
@@ -335,6 +337,8 @@ const MerchantMapScreen: React.FC<Props> = ({ testID = TEST_IDS.merchantMapScree
           </TouchableOpacity>
         </View>
       )}
+
+      <AlertModal {...alertProps} />
     </View>
   )
 }

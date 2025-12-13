@@ -1,7 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import {
   ActivityIndicator,
-  Alert,
   Platform,
   RefreshControl,
   ScrollView,
@@ -16,6 +15,8 @@ import { useNavigation } from '@react-navigation/native'
 import { useTheme } from '../../theme'
 import { Card, Typography, Badge, Button } from '../../components/2025'
 import { apiService } from '../../services/api'
+import AlertModal from '../../components/AlertModal'
+import { useAlert } from '../../hooks/useAlert'
 import type {
   LoyaltyPoint,
   LoyaltyPointsSummary
@@ -126,6 +127,7 @@ const formatDate = (date: string): string =>
 const LoyaltyScreen: React.FC = () => {
   const theme = useTheme()
   const navigation = useNavigation()
+  const { alertProps, showError, showSuccess, showWarning, hideAlert } = useAlert()
   const styles = useMemo(() => createStyles(theme), [theme])
   const [summary, setSummary] = useState<LoyaltyPointsSummary | null>(null)
   const [loading, setLoading] = useState(true)
@@ -190,7 +192,7 @@ const LoyaltyScreen: React.FC = () => {
       const message =
         error instanceof Error ? error.message : "Impossible de récupérer vos points de fidélité pour le moment."
       setErrorMessage(message)
-      Alert.alert('Erreur', message)
+      showError('Erreur', message)
     } finally {
       setLoading(false)
     }
@@ -208,12 +210,12 @@ const LoyaltyScreen: React.FC = () => {
 
   const handleRedeem = useCallback(async () => {
     if (manualValidationMessage) {
-      Alert.alert('Échange impossible', manualValidationMessage)
+      showWarning('Échange impossible', manualValidationMessage)
       return
     }
 
     if (Number.isNaN(manualPointsValue) || manualPointsValue <= 0) {
-      Alert.alert('Échange impossible', 'Veuillez saisir un nombre de points valide.')
+      showWarning('Échange impossible', 'Veuillez saisir un nombre de points valide.')
       return
     }
 
@@ -228,17 +230,17 @@ const LoyaltyScreen: React.FC = () => {
       setDescription('')
       setManualPoints('')
       await fetchPoints()
-      Alert.alert('Succès', 'Vos points ont bien été échangés !')
+      showSuccess('Succès', 'Vos points ont bien été échangés !')
     } catch (error) {
       const message =
         error instanceof Error
           ? error.message
           : "Impossible d'échanger vos points pour le moment. Réessayez plus tard."
-      Alert.alert('Erreur', message)
+      showError('Erreur', message)
     } finally {
       setRedeemLoading(false)
     }
-  }, [description, fetchPoints, manualPointsValue, manualValidationMessage])
+  }, [description, fetchPoints, manualPointsValue, manualValidationMessage, showWarning, showSuccess, showError])
 
   const renderHistoryItem = (entry: LoyaltyPoint) => {
     const iconName = pointIcons[entry.earned_from] || 'star'
@@ -437,6 +439,8 @@ const LoyaltyScreen: React.FC = () => {
         </>
       )}
       </ScrollView>
+
+      <AlertModal {...alertProps} />
     </View>
   )
 }

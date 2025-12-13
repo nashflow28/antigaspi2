@@ -7,7 +7,6 @@ import {
   TextInput,
   TouchableOpacity,
   Image,
-  Alert,
   ActivityIndicator,
   StatusBar,
   KeyboardAvoidingView,
@@ -25,6 +24,8 @@ import * as Location from 'expo-location'
 import MapLocationPicker from '../../components/MapLocationPicker'
 import { usePersistedForm } from '../../hooks/usePersistedForm'
 import PhoneInput from '../../components/PhoneInput'
+import AlertModal from '../../components/AlertModal'
+import { useAlert } from '../../hooks/useAlert'
 
 interface ProfileFormData {
   business_name: string
@@ -61,6 +62,7 @@ const MerchantProfileEditScreen: React.FC = () => {
   const navigation = useNavigation()
   const dispatch = useDispatch()
   const { user } = useSelector((state: RootState) => state.auth)
+  const { alertProps, showError, showSuccess, showWarning, hideAlert } = useAlert()
 
   const [loading, setLoading] = useState(false)
   const [uploading, setUploading] = useState(false)
@@ -137,7 +139,7 @@ const MerchantProfileEditScreen: React.FC = () => {
         formData.siret !== (user.merchant?.siret || '')
 
       if (isDifferent) {
-        Alert.alert(
+        showWarning(
           'Modifications récupérées',
           'Nous avons retrouvé des modifications non enregistrées. Voulez-vous les conserver ?',
           [
@@ -145,6 +147,7 @@ const MerchantProfileEditScreen: React.FC = () => {
               text: 'Annuler',
               style: 'destructive',
               onPress: () => {
+                hideAlert()
                 setFormData({
                   business_name: user.merchant?.business_name || '',
                   business_type: user.merchant?.business_type || '',
@@ -160,6 +163,7 @@ const MerchantProfileEditScreen: React.FC = () => {
             {
               text: 'Conserver',
               style: 'default',
+              onPress: hideAlert,
             },
           ]
         )
@@ -278,7 +282,7 @@ const MerchantProfileEditScreen: React.FC = () => {
       setLongitude(formatCoordinate(newLongitude))
     } catch (error) {
       console.error('Erreur géolocalisation:', error)
-      Alert.alert(
+      showError(
         'Géolocalisation',
         error instanceof Error
           ? error.message
@@ -315,14 +319,14 @@ const MerchantProfileEditScreen: React.FC = () => {
         setHasLocation(true)
         // Refresh Redux store
         await dispatch(refreshProfile() as any)
-        Alert.alert('Succès', 'Position mise à jour avec succès')
+        showSuccess('Succès', 'Position mise à jour avec succès')
         console.log('[MerchantProfileEdit] Location saved:', { lat: savedLat, lng: savedLng })
       } else {
         throw new Error(response.message || 'Erreur lors de la sauvegarde')
       }
     } catch (error: any) {
       console.error('[MerchantProfileEdit] Location save error:', error)
-      Alert.alert(
+      showError(
         'Erreur',
         error.response?.data?.message || error.message || 'Impossible de sauvegarder la position'
       )
@@ -336,7 +340,7 @@ const MerchantProfileEditScreen: React.FC = () => {
       const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync()
 
       if (permissionResult.status !== 'granted') {
-        Alert.alert('Permission refusée', 'Vous devez autoriser l\'accès à la galerie pour changer votre photo.')
+        showError('Permission refusée', 'Vous devez autoriser l\'accès à la galerie pour changer votre photo.')
         return
       }
 
@@ -353,7 +357,7 @@ const MerchantProfileEditScreen: React.FC = () => {
       }
     } catch (error) {
       console.error('Erreur sélection image:', error)
-      Alert.alert('Erreur', 'Impossible de sélectionner l\'image')
+      showError('Erreur', 'Impossible de sélectionner l\'image')
     }
   }
 
@@ -389,7 +393,7 @@ const MerchantProfileEditScreen: React.FC = () => {
         // 🐛 BUG FIX: Refresh Redux store to sync photo_url
         await dispatch(refreshProfile() as any)
 
-        Alert.alert('Succès', 'Photo mise à jour avec succès')
+        showSuccess('Succès', 'Photo mise à jour avec succès')
       } else {
         throw new Error(response.message || 'Échec de l\'upload')
       }
@@ -398,7 +402,7 @@ const MerchantProfileEditScreen: React.FC = () => {
       // Revert to previous photo if upload failed
       const previousPhotoUrl = buildPhotoUrl(user?.merchant?.photo_url)
       setPhotoUri(previousPhotoUrl)
-      Alert.alert('Erreur', error.response?.data?.message || error.message || 'Impossible d\'uploader la photo')
+      showError('Erreur', error.response?.data?.message || error.message || 'Impossible d\'uploader la photo')
     } finally {
       setUploading(false)
     }
@@ -484,7 +488,7 @@ const MerchantProfileEditScreen: React.FC = () => {
       setLoading(true)
 
       if (!formData.business_name.trim()) {
-        Alert.alert('Erreur', 'Le nom de l\'entreprise est requis')
+        showError('Erreur', 'Le nom de l\'entreprise est requis')
         return
       }
 
@@ -527,10 +531,11 @@ const MerchantProfileEditScreen: React.FC = () => {
         ? 'Profil et localisation mis à jour avec succès'
         : 'Profil mis à jour avec succès'
 
-      Alert.alert('Succès', successMessage, [
+      showSuccess('Succès', successMessage, [
         {
           text: 'OK',
           onPress: () => {
+            hideAlert()
             if (navigation.canGoBack()) {
               navigation.goBack()
             } else {
@@ -545,7 +550,7 @@ const MerchantProfileEditScreen: React.FC = () => {
         error instanceof Error
           ? error.message
           : error?.response?.data?.message || 'Impossible de mettre à jour le profil'
-      Alert.alert('Erreur', message)
+      showError('Erreur', message)
     } finally {
       setLoading(false)
     }
@@ -908,6 +913,8 @@ const MerchantProfileEditScreen: React.FC = () => {
         initialLatitude={initialLatitudeValue ?? parseCoordinateInput(latitude)}
         initialLongitude={initialLongitudeValue ?? parseCoordinateInput(longitude)}
       />
+
+      <AlertModal {...alertProps} />
     </View>
   )
 }

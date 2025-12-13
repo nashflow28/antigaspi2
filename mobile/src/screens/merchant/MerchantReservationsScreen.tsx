@@ -61,6 +61,13 @@ const MerchantReservationsScreen: React.FC<Props> = ({ route }) => {
     setAlertVisible(true)
   }
 
+  // ✅ FIX: Mettre à jour le filtre quand initialFilter change (navigation depuis dashboard)
+  useEffect(() => {
+    if (route?.params?.initialFilter) {
+      setFilter(route.params.initialFilter)
+    }
+  }, [route?.params?.initialFilter])
+
   useEffect(() => {
     loadReservations()
   }, [])
@@ -209,23 +216,25 @@ const MerchantReservationsScreen: React.FC<Props> = ({ route }) => {
     setShowCancelModal(true)
   }
 
-  // Exécute l'annulation
+  // Exécute le refus de la réservation (endpoint marchand)
   const executeCancel = async () => {
     if (!selectedReservation) return
     setActionLoading(true)
     try {
       if (__DEV__) {
-        console.log('📤 [MerchantReservations] Annulation réservation:', selectedReservation.id)
+        console.log('📤 [MerchantReservations] Refus réservation:', selectedReservation.id)
       }
-      await apiService.post(`/reservations/${selectedReservation.id}/cancel`)
+      // ✅ FIX: Utiliser /reject pour les marchands (pas /cancel qui est réservé aux consommateurs)
+      await apiService.post(`/reservations/${selectedReservation.id}/reject`)
       if (__DEV__) {
-        console.log('✅ [MerchantReservations] Réservation annulée, rechargement...')
+        console.log('✅ [MerchantReservations] Réservation refusée, rechargement...')
       }
       setShowCancelModal(false)
+      showAlert('success', 'Succès', 'Réservation refusée avec succès')
       await loadReservations()
     } catch (error: any) {
-      console.error('❌ [MerchantReservations] Erreur annulation:', error?.message || error)
-      showAlert('error', 'Erreur', 'Impossible d\'annuler la réservation')
+      console.error('❌ [MerchantReservations] Erreur refus:', error?.message || error)
+      showAlert('error', 'Erreur', 'Impossible de refuser la réservation')
     } finally {
       setActionLoading(false)
     }

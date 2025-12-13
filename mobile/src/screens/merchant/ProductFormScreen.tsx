@@ -7,7 +7,6 @@ import {
   TextInput,
   TouchableOpacity,
   StatusBar,
-  Alert,
   Image,
   ActivityIndicator,
   Modal,
@@ -23,6 +22,8 @@ import apiService from '../../services/api'
 import { getImageUrl } from '../../utils/imageHelpers'
 import { TEST_IDS } from '../../utils/testIds'
 import { usePersistedForm } from '../../hooks/usePersistedForm'
+import AlertModal from '../../components/AlertModal'
+import { useAlert } from '../../hooks/useAlert'
 
 interface Props {
   route: any
@@ -54,6 +55,7 @@ const INITIAL_FORM_DATA: ProductFormData = {
 const ProductFormScreen: React.FC<Props> = ({ route, navigation }) => {
   const theme = useTheme()
   const { mode, product } = route.params || { mode: 'create', product: null }
+  const { alertProps, showWarning, hideAlert } = useAlert()
 
   const isCreateMode = mode === 'create'
 
@@ -111,7 +113,7 @@ const ProductFormScreen: React.FC<Props> = ({ route, navigation }) => {
     if (isCreateMode && isRestored && hasUnsavedChanges) {
       const hasMeaningfulData = formData.name || formData.description || formData.originalPrice
       if (hasMeaningfulData) {
-        Alert.alert(
+        showWarning(
           'Brouillon récupéré',
           'Nous avons retrouvé un produit en cours de création. Voulez-vous le reprendre ?',
           [
@@ -119,6 +121,7 @@ const ProductFormScreen: React.FC<Props> = ({ route, navigation }) => {
               text: 'Recommencer',
               style: 'destructive',
               onPress: () => {
+                hideAlert()
                 setFormData(INITIAL_FORM_DATA)
                 clearFormCache()
               },
@@ -126,6 +129,7 @@ const ProductFormScreen: React.FC<Props> = ({ route, navigation }) => {
             {
               text: 'Reprendre',
               style: 'default',
+              onPress: hideAlert,
             },
           ]
         )
@@ -704,6 +708,8 @@ const ProductFormScreen: React.FC<Props> = ({ route, navigation }) => {
         </TouchableOpacity>
         </ScrollView>
       </KeyboardAvoidingView>
+
+      <AlertModal {...alertProps} />
     </View>
   )
 }

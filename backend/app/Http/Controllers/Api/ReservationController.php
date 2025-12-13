@@ -237,6 +237,85 @@ class ReservationController extends Controller
         }
     }
 
+    /**
+     * Refuser une réservation (pour les commerçants)
+     * POST /api/reservations/{id}/reject
+     */
+    public function reject($id): JsonResponse
+    {
+        try {
+            $user = JWTAuth::parseToken()->authenticate();
+
+            if (!$user->isMerchant()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Seuls les commerçants peuvent refuser les réservations'
+                ], 403);
+            }
+
+            return DB::transaction(function () use ($id, $user) {
+                $reservation = Reservation::with(['product.merchant'])
+                    ->lockForUpdate()
+                    ->findOrFail($id);
+
+                // Vérifier que le produit appartient au marchand
+                if (!$reservation->product || !$reservation->product->merchant) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Produit ou commerçant associé introuvable'
+                    ], 404);
+                }
+
+                if ($reservation->product->merchant->user_id !== $user->id) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Vous ne pouvez refuser que les réservations de vos propres produits'
+                    ], 403);
+                }
+
+                // Vérifier que la réservation peut être refusée (pending ou confirmed)
+                if (!in_array($reservation->status, ['pending', 'confirmed'])) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Cette réservation ne peut plus être refusée (statut: ' . $reservation->status . ')'
+                    ], 400);
+                }
+
+                // Annuler la réservation
+                if ($reservation->cancel()) {
+                    $reservation->refresh()->load(['product.category', 'product.merchant.user', 'user']);
+
+                    // Notification non-bloquante au client
+                    try {
+                        $reservation->user->notify(new ReservationStatusNotification($reservation));
+                    } catch (\Exception $e) {
+                        \Log::warning('Notification failed but rejection succeeded', [
+                            'reservation_id' => $reservation->id,
+                            'error' => $e->getMessage()
+                        ]);
+                    }
+
+                    return response()->json([
+                        'success' => true,
+                        'message' => 'Réservation refusée avec succès',
+                        'data' => new ReservationResource($reservation),
+                    ]);
+                }
+
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Erreur lors du refus de la réservation'
+                ], 500);
+            });
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Erreur lors du refus',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
     public function merchantReservations(Request $request): JsonResponse
     {
         try {

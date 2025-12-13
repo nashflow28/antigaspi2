@@ -7,7 +7,6 @@ import {
   TouchableOpacity,
   StatusBar,
   Dimensions,
-  Alert,
   Linking,
   Share,
   Platform,
@@ -28,6 +27,8 @@ import { Button, Card, Badge, Typography } from '../../components/2025'
 import OpenStreetMap, { MapMarker } from '../../components/OpenStreetMap'
 import locationService, { UserLocation } from '../../services/locationService'
 import { getCategoryIcon, IoniconName } from '../../constants/categoryIcons'
+import AlertModal from '../../components/AlertModal'
+import { useAlert } from '../../hooks/useAlert'
 
 const { width } = Dimensions.get('window')
 
@@ -39,6 +40,7 @@ interface Props {
 const MerchantDetailScreen: React.FC<Props> = ({ route, navigation }) => {
   const theme = useTheme()
   const dispatch = useDispatch<AppDispatch>()
+  const { alertProps, showError, showWarning, hideAlert } = useAlert()
   const { merchantId } = route.params
   const { products } = useSelector((state: RootState) => state.products)
   const { merchants } = useSelector((state: RootState) => state.merchants)
@@ -109,10 +111,10 @@ const MerchantDetailScreen: React.FC<Props> = ({ route, navigation }) => {
               setMerchantProducts([]) // Pas de produits disponibles
             } else if (isMounted) {
               // Marchand vraiment introuvable
-              Alert.alert(
+              showWarning(
                 'Marchand introuvable',
                 'Ce marchand n\'existe pas ou a été supprimé.',
-                [{ text: 'Retour', onPress: () => navigation.goBack() }]
+                [{ text: 'Retour', onPress: () => { hideAlert(); navigation.goBack() } }]
               )
             }
           }
@@ -121,10 +123,10 @@ const MerchantDetailScreen: React.FC<Props> = ({ route, navigation }) => {
         console.error('❌ Error loading merchant data:', error)
         if (isMounted) {
           // Ne pas faire goBack() directement, laisser l'utilisateur voir l'erreur et décider
-          Alert.alert(
+          showError(
             'Erreur',
             'Impossible de charger les données du marchand. Veuillez réessayer.',
-            [{ text: 'Retour', onPress: () => navigation.goBack() }]
+            [{ text: 'Retour', onPress: () => { hideAlert(); navigation.goBack() } }]
           )
         }
       }
@@ -169,10 +171,10 @@ const MerchantDetailScreen: React.FC<Props> = ({ route, navigation }) => {
           setUserLocation(position)
         }
       } else {
-        Alert.alert('Permission requise', 'Activez la géolocalisation pour afficher votre position sur la carte.')
+        showWarning('Permission requise', 'Activez la géolocalisation pour afficher votre position sur la carte.')
       }
     } catch (error) {
-      Alert.alert('Erreur', "Impossible de récupérer votre position pour le moment.")
+      showError('Erreur', "Impossible de récupérer votre position pour le moment.")
     } finally {
       setRequestingLocation(false)
     }
@@ -283,7 +285,7 @@ const MerchantDetailScreen: React.FC<Props> = ({ route, navigation }) => {
   // ✅ ÉTAPE 3: Contact Handlers (Fixed with error handling)
   const handleCall = async () => {
     if (!merchant?.phone) {
-      Alert.alert('Téléphone non disponible', 'Ce marchand n\'a pas renseigné de numéro de téléphone.')
+      showWarning('Téléphone non disponible', 'Ce marchand n\'a pas renseigné de numéro de téléphone.')
       return
     }
 
@@ -293,16 +295,16 @@ const MerchantDetailScreen: React.FC<Props> = ({ route, navigation }) => {
       if (canOpen) {
         await Linking.openURL(url)
       } else {
-        Alert.alert('Erreur', 'Impossible d\'appeler depuis cet appareil.')
+        showError('Erreur', 'Impossible d\'appeler depuis cet appareil.')
       }
     } catch (error) {
-      Alert.alert('Erreur', 'Une erreur est survenue lors de l\'appel.')
+      showError('Erreur', 'Une erreur est survenue lors de l\'appel.')
     }
   }
 
   const handleMessage = () => {
     if (!merchant) {
-      Alert.alert('Marchand introuvable', 'Impossible de démarrer la conversation pour le moment.')
+      showWarning('Marchand introuvable', 'Impossible de démarrer la conversation pour le moment.')
       return
     }
 
@@ -322,7 +324,7 @@ const MerchantDetailScreen: React.FC<Props> = ({ route, navigation }) => {
         : encodeURIComponent(`${address || ''} ${city}`.trim())
 
     if (!destination) {
-      Alert.alert('Adresse indisponible', "Ce marchand n'a pas encore renseigné son adresse complète.")
+      showWarning('Adresse indisponible', "Ce marchand n'a pas encore renseigné son adresse complète.")
       return
     }
 
@@ -331,7 +333,7 @@ const MerchantDetailScreen: React.FC<Props> = ({ route, navigation }) => {
     if (supported) {
       await Linking.openURL(url)
     } else {
-      Alert.alert('Erreur', "Impossible d'ouvrir l'application de navigation.")
+      showError('Erreur', "Impossible d'ouvrir l'application de navigation.")
     }
   }
 
@@ -359,7 +361,7 @@ const MerchantDetailScreen: React.FC<Props> = ({ route, navigation }) => {
         message,
       })
     } catch (error) {
-      Alert.alert('Erreur', 'Le partage a échoué, veuillez réessayer plus tard.')
+      showError('Erreur', 'Le partage a échoué, veuillez réessayer plus tard.')
     }
   }
 
@@ -749,6 +751,8 @@ const MerchantDetailScreen: React.FC<Props> = ({ route, navigation }) => {
           Message
         </Button>
       </View>
+
+      <AlertModal {...alertProps} />
     </View>
   )
 }

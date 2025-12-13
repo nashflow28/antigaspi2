@@ -8,7 +8,6 @@ import {
   Platform,
   StatusBar,
   ActivityIndicator,
-  Alert,
   KeyboardAvoidingView,
 } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
@@ -34,6 +33,8 @@ import {
   checkoutCart,
 } from '../../store/slices/cartSlice'
 import { useToast } from '../../contexts/ToastContext'
+import AlertModal from '../../components/AlertModal'
+import { useAlert } from '../../hooks/useAlert'
 
 type Props = {
   navigation: any
@@ -46,6 +47,7 @@ const CartScreen: React.FC<Props> = ({ navigation }) => {
   const theme = useTheme()
   const insets = useSafeAreaInsets()
   const { showSuccess, showError } = useToast()
+  const { alertProps, showWarning, hideAlert } = useAlert()
   const {
     cart,
     loading,
@@ -230,15 +232,16 @@ const CartScreen: React.FC<Props> = ({ navigation }) => {
       return
     }
 
-    Alert.alert(
+    showWarning(
       'Vider le panier',
       'Voulez-vous supprimer tous les articles de votre panier ?',
       [
-        { text: 'Annuler', style: 'cancel' },
+        { text: 'Annuler', onPress: hideAlert },
         {
           text: 'Vider',
           style: 'destructive',
           onPress: async () => {
+            hideAlert()
             try {
               await dispatch(clearCart()).unwrap()
               showSuccess('Panier vidé')
@@ -728,6 +731,8 @@ const CartScreen: React.FC<Props> = ({ navigation }) => {
           </ScrollView>
         </KeyboardAvoidingView>
       )}
+
+      <AlertModal {...alertProps} />
     </View>
   )
 }

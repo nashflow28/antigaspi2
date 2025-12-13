@@ -6,7 +6,6 @@ import {
   StatusBar,
   FlatList,
   RefreshControl,
-  Alert,
   Dimensions,
 } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
@@ -27,6 +26,8 @@ import { Button, Card, Badge, Typography, Modal as Modal2025, ReservationListSke
 import { useTheme } from '../../theme'
 import { TEST_IDS } from '../../utils/testIds'
 import { getImageUrl } from '../../utils/imageHelpers'
+import AlertModal from '../../components/AlertModal'
+import { useAlert } from '../../hooks/useAlert'
 
 interface Props {
   navigation: any
@@ -40,6 +41,7 @@ const ReservationsScreen: React.FC<Props> = ({ navigation }) => {
   const dispatch = useDispatch<AppDispatch>()
   const { reservations, loading } = useSelector((state: RootState) => state.reservations)
   const { user } = useSelector((state: RootState) => state.auth)
+  const { alertProps, showError, showSuccess, showWarning, hideAlert } = useAlert()
 
   console.log('🔍 [ReservationsScreen] Current state:', {
     reservationsCount: reservations.length,
@@ -82,7 +84,7 @@ const ReservationsScreen: React.FC<Props> = ({ navigation }) => {
       })
     } else if (fetchMyReservations.rejected.match(result)) {
       console.error('❌ [ReservationsScreen] Failed to load reservations:', result.payload ?? result.error?.message)
-      Alert.alert('Erreur', 'Impossible de charger les réservations')
+      showError('Erreur', 'Impossible de charger les réservations')
       void analyticsService.track('Reservations Load Failed', 'Reservation', {
         source,
         reason: result.payload ?? result.error?.message ?? 'unknown',
@@ -105,25 +107,26 @@ const ReservationsScreen: React.FC<Props> = ({ navigation }) => {
   }
 
   const handleCancelReservation = (reservation: Reservation) => {
-    Alert.alert(
+    showWarning(
       'Annuler la réservation',
       `Êtes-vous sûr de vouloir annuler la réservation ${reservation.reservation_code} ?`,
       [
-        { text: 'Non', style: 'cancel' },
+        { text: 'Non', style: 'cancel', onPress: hideAlert },
         {
           text: 'Oui, annuler',
           style: 'destructive',
           onPress: async () => {
+            hideAlert()
             try {
               await dispatch(cancelReservation(reservation.id))
-              Alert.alert('Succès', 'Réservation annulée avec succès')
+              showSuccess('Succès', 'Réservation annulée avec succès')
               void analyticsService.track('Reservation Cancelled', 'Reservation', {
                 reservationCode: reservation.reservation_code,
                 status: 'success',
               })
               await loadReservations('reload')
             } catch (error) {
-              Alert.alert('Erreur', 'Impossible d\'annuler la réservation')
+              showError('Erreur', 'Impossible d\'annuler la réservation')
               if (error instanceof Error) {
                 void analyticsService.trackError(error, 'cancelReservation')
               }
@@ -541,6 +544,8 @@ const ReservationsScreen: React.FC<Props> = ({ navigation }) => {
           </View>
         )}
       </Modal2025>
+
+      <AlertModal {...alertProps} />
     </View>
   )
 }

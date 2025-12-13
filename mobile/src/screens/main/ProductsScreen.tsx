@@ -8,7 +8,6 @@ import {
   TextInput,
   FlatList,
   RefreshControl,
-  Alert,
   Platform,
   ActivityIndicator,
   Modal,
@@ -34,6 +33,8 @@ import searchService, {
   type ProductSearchResult,
 } from '../../services/searchService'
 import { getCategoryIcon, getCategoryIconConfig, IoniconName } from '../../constants/categoryIcons'
+import AlertModal from '../../components/AlertModal'
+import { useAlert } from '../../hooks/useAlert'
 
 interface Props {
   navigation: any
@@ -51,6 +52,7 @@ const ProductsScreen: React.FC<Props> = ({ navigation }) => {
   const { merchants, loading: merchantsLoading } = useSelector((state: RootState) => state.merchants)
   const theme = useTheme()
   const insets = useSafeAreaInsets()
+  const { alertProps, showWarning } = useAlert()
 
   const [contentMode, setContentMode] = useState<'merchants' | 'map'>('merchants')
   const [searchQuery, setSearchQuery] = useState('')
@@ -448,7 +450,7 @@ const ProductsScreen: React.FC<Props> = ({ navigation }) => {
 
     // Activer le filtre
     if (!locationPermissionGranted) {
-      Alert.alert(
+      showWarning(
         'Autorisation requise',
         "Activez la géolocalisation pour afficher les commerces proches de vous.",
         [
@@ -460,7 +462,7 @@ const ProductsScreen: React.FC<Props> = ({ navigation }) => {
               if (granted) {
                 setDistanceEnabled(true)
               } else {
-                Alert.alert('Géolocalisation inactive', "Impossible d'activer le filtre distance sans accès à votre position.")
+                showWarning('Géolocalisation inactive', "Impossible d'activer le filtre distance sans accès à votre position.")
               }
             },
           },
@@ -482,7 +484,7 @@ const ProductsScreen: React.FC<Props> = ({ navigation }) => {
       if (ok) {
         setDistanceEnabled(true)
       } else {
-        Alert.alert('Géolocalisation inactive', "Impossible d'activer le filtre distance sans accès à votre position.")
+        showWarning('Géolocalisation inactive', "Impossible d'activer le filtre distance sans accès à votre position.")
       }
     } finally {
       setIsRequestingLocation(false)
@@ -1232,6 +1234,8 @@ const ProductsScreen: React.FC<Props> = ({ navigation }) => {
           </View>
         )
       )}
+
+      <AlertModal {...alertProps} />
     </View>
   )
 }

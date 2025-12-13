@@ -1,7 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useState, useRef } from 'react'
 import {
   ActivityIndicator,
-  Alert,
   FlatList,
   KeyboardAvoidingView,
   Platform,
@@ -31,6 +30,8 @@ import {
   clearError,
 } from '../../store/slices/messagingSlice'
 import { sanitizeMessage, sanitizeUsername } from '../../utils/textSanitizer'
+import AlertModal from '../../components/AlertModal'
+import { useAlert } from '../../hooks/useAlert'
 
 interface MerchantMessagingParams {
   merchantId?: number
@@ -46,6 +47,7 @@ const MerchantMessagingScreen = ({ route, navigation }: any) => {
   const theme = useTheme()
   const dispatch = useDispatch<AppDispatch>()
   const themedStyles = useMemo(() => styles(theme), [theme])
+  const { alertProps, showError } = useAlert()
 
   // Redux state
   const user = useSelector((state: RootState) => state.auth.user)
@@ -196,9 +198,9 @@ const MerchantMessagingScreen = ({ route, navigation }: any) => {
       setMessageDraft('')
     } catch (err) {
       const message = err instanceof Error ? err.message : "Impossible d'envoyer votre message."
-      Alert.alert('Erreur', message)
+      showError('Erreur', message)
     }
-  }, [dispatch, activeConversationId, messageDraft, sendTypingIndicator])
+  }, [dispatch, activeConversationId, messageDraft, sendTypingIndicator, showError])
 
   const handleTextChange = useCallback(
     (text: string) => {
@@ -381,6 +383,8 @@ const MerchantMessagingScreen = ({ route, navigation }: any) => {
           {sendingMessage ? '' : 'Envoyer'}
         </Button>
       </View>
+
+      <AlertModal {...alertProps} />
     </KeyboardAvoidingView>
   )
 }

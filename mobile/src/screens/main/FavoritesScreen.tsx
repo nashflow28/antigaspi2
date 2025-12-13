@@ -7,7 +7,6 @@ import {
   TouchableOpacity,
   ActivityIndicator,
   RefreshControl,
-  Alert,
 } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { Image } from 'expo-image'
@@ -23,6 +22,8 @@ import { API_BASE_URL } from '../../services/api'
 import { formatCurrency } from '../../utils/currencyHelpers'
 import { getImageUrl } from '../../utils/imageHelpers'
 import { Button, Card, Badge, Typography, EmptyState } from '../../components/2025'
+import AlertModal from '../../components/AlertModal'
+import { useAlert } from '../../hooks/useAlert'
 
 type NavigationProp = NativeStackNavigationProp<RootStackParamList, 'ProductDetails'>
 
@@ -32,6 +33,7 @@ const FavoritesScreen: React.FC = () => {
   const styles = createStyles(theme)
   const dispatch = useAppDispatch()
   const navigation = useNavigation<NavigationProp>()
+  const { alertProps, showWarning, hideAlert } = useAlert()
 
   const { favorites, loading, error } = useAppSelector((state) => state.favorites)
   const [refreshing, setRefreshing] = useState(false)
@@ -51,15 +53,16 @@ const FavoritesScreen: React.FC = () => {
   }
 
   const handleRemoveFavorite = async (productId: number, productName: string) => {
-    Alert.alert(
+    showWarning(
       'Retirer des favoris',
       `Voulez-vous retirer "${productName}" de vos favoris ?`,
       [
-        { text: 'Annuler', style: 'cancel' },
+        { text: 'Annuler', onPress: hideAlert },
         {
           text: 'Retirer',
           style: 'destructive',
           onPress: async () => {
+            hideAlert()
             await dispatch(toggleFavorite(productId))
             // Rafraîchir la liste après le retrait
             dispatch(fetchFavorites())
@@ -225,6 +228,8 @@ const FavoritesScreen: React.FC = () => {
           favorites.map(renderProduct)
         )}
       </ScrollView>
+
+      <AlertModal {...alertProps} />
     </View>
   )
 }
