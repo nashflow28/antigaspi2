@@ -220,10 +220,11 @@ const AlertModal: React.FC<AlertModalProps> = ({
                       styles.buttonText,
                       {
                         color: btnStyle.textColor,
-                        ...theme.getTypography('body'),
+                        fontSize: 14,
                         fontWeight: '600',
                       },
                     ]}
+                    numberOfLines={1}
                   >
                     {button.text}
                   </Text>
@@ -246,7 +247,7 @@ const styles = StyleSheet.create({
   },
   container: {
     width: '100%',
-    maxWidth: 340,
+    maxWidth: 360,
     borderRadius: 20,
     padding: 24,
     alignItems: 'center',
@@ -275,10 +276,11 @@ const styles = StyleSheet.create({
   },
   button: {
     paddingVertical: 14,
-    paddingHorizontal: 24,
+    paddingHorizontal: 16,
     borderRadius: 12,
-    minWidth: 100,
+    minWidth: 110,
     alignItems: 'center',
+    justifyContent: 'center',
   },
   buttonText: {
     fontWeight: '600',
