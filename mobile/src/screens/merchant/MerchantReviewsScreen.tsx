@@ -8,7 +8,6 @@ import {
   TouchableOpacity,
   StatusBar,
   RefreshControl,
-  Alert,
   TextInput,
   Modal,
 } from 'react-native'
@@ -16,6 +15,7 @@ import { useNavigation } from '@react-navigation/native'
 import { Ionicons } from '@expo/vector-icons'
 import { useTheme } from '../../theme'
 import apiService from '../../services/api'
+import AlertModal, { AlertType, AlertButton } from '../../components/AlertModal'
 
 interface Review {
   id: number
@@ -66,6 +66,27 @@ const MerchantReviewsScreen: React.FC = () => {
   const [responseText, setResponseText] = useState('')
   const [submittingResponse, setSubmittingResponse] = useState(false)
 
+  // AlertModal state
+  const [alertVisible, setAlertVisible] = useState(false)
+  const [alertType, setAlertType] = useState<AlertType>('info')
+  const [alertTitle, setAlertTitle] = useState('')
+  const [alertMessage, setAlertMessage] = useState('')
+  const [alertButtons, setAlertButtons] = useState<AlertButton[]>([])
+
+  // Helper function to show alert
+  const showAlert = (
+    type: AlertType,
+    title: string,
+    message?: string,
+    buttons?: AlertButton[]
+  ) => {
+    setAlertType(type)
+    setAlertTitle(title)
+    setAlertMessage(message || '')
+    setAlertButtons(buttons || [{ text: 'OK', onPress: () => setAlertVisible(false) }])
+    setAlertVisible(true)
+  }
+
   useEffect(() => {
     loadReviewsData()
   }, [])
@@ -95,7 +116,7 @@ const MerchantReviewsScreen: React.FC = () => {
       }
     } catch (error) {
       console.error('Erreur chargement avis:', error)
-      Alert.alert('Erreur', 'Impossible de charger les avis')
+      showAlert('error', 'Erreur', 'Impossible de charger les avis')
     } finally {
       setLoading(false)
       setRefreshing(false)
@@ -115,7 +136,7 @@ const MerchantReviewsScreen: React.FC = () => {
 
   const handleSubmitResponse = async () => {
     if (!selectedReview || !responseText.trim()) {
-      Alert.alert('Erreur', 'Veuillez saisir une réponse')
+      showAlert('warning', 'Attention', 'Veuillez saisir une réponse')
       return
     }
 
@@ -134,36 +155,38 @@ const MerchantReviewsScreen: React.FC = () => {
         })
       }
 
-      Alert.alert('Succès', 'Réponse ajoutée avec succès')
+      showAlert('success', 'Succès', 'Réponse ajoutée avec succès')
       setRespondModalVisible(false)
       setResponseText('')
       setSelectedReview(null)
       loadReviewsData()
     } catch (error: any) {
       console.error('Erreur soumission réponse:', error)
-      Alert.alert('Erreur', error.response?.data?.message || 'Impossible d\'ajouter la réponse')
+      showAlert('error', 'Erreur', error.response?.data?.message || 'Impossible d\'ajouter la réponse')
     } finally {
       setSubmittingResponse(false)
     }
   }
 
   const handleDeleteResponse = async (review: Review) => {
-    Alert.alert(
+    showAlert(
+      'warning',
       'Supprimer la réponse',
       'Êtes-vous sûr de vouloir supprimer votre réponse ?',
       [
-        { text: 'Annuler', style: 'cancel' },
+        { text: 'Annuler', style: 'cancel', onPress: () => setAlertVisible(false) },
         {
           text: 'Supprimer',
           style: 'destructive',
           onPress: async () => {
+            setAlertVisible(false)
             try {
               await apiService.delete(`/merchants/reviews/${review.id}/response`)
-              Alert.alert('Succès', 'Réponse supprimée')
+              showAlert('success', 'Succès', 'Réponse supprimée')
               loadReviewsData()
             } catch (error) {
               console.error('Erreur suppression:', error)
-              Alert.alert('Erreur', 'Impossible de supprimer la réponse')
+              showAlert('error', 'Erreur', 'Impossible de supprimer la réponse')
             }
           },
         },
@@ -468,6 +491,16 @@ const MerchantReviewsScreen: React.FC = () => {
           </View>
         </View>
       </Modal>
+
+      {/* AlertModal personnalisé */}
+      <AlertModal
+        visible={alertVisible}
+        type={alertType}
+        title={alertTitle}
+        message={alertMessage}
+        buttons={alertButtons}
+        onClose={() => setAlertVisible(false)}
+      />
     </View>
   )
 }
