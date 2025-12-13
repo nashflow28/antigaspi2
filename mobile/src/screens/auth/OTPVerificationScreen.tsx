@@ -9,17 +9,17 @@ import {
   TextInput,
   TouchableOpacity,
   StyleSheet,
-  KeyboardAvoidingView,
-  Platform,
   StatusBar,
-  ScrollView,
 } from 'react-native'
+import { Ionicons } from '@expo/vector-icons'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useDispatch } from 'react-redux'
 import { AppDispatch } from '../../store'
 import { loginWithFirebase } from '../../store/slices/authSlice'
 import { firebaseService } from '../../services/firebaseService'
 import { Card, Typography, Button } from '../../components/2025'
 import BrandLogo from '../../components/BrandLogo'
+import KeyboardAwareContainer from '../../components/KeyboardAwareContainer'
 import { useTheme } from '../../theme'
 import { TEST_IDS } from '../../utils/testIds'
 import { useAlert } from '../../contexts/AlertContext'
@@ -30,6 +30,7 @@ const RESEND_COOLDOWN = 60 // seconds
 const OTPVerificationScreen = ({ navigation, route }: any) => {
   const { phoneNumber } = route.params as { phoneNumber: string }
   const theme = useTheme()
+  const insets = useSafeAreaInsets()
   const dispatch = useDispatch<AppDispatch>()
   const { showSuccess, showError } = useAlert()
 
@@ -152,15 +153,24 @@ const OTPVerificationScreen = ({ navigation, route }: any) => {
   }
 
   return (
-    <KeyboardAvoidingView
-      style={[styles.container, { backgroundColor: theme.colors.background }]}
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-    >
-      <StatusBar backgroundColor={theme.colors.primary[500]} barStyle="light-content" />
+    <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
+      <StatusBar backgroundColor={theme.colors.background} barStyle={theme.isDark ? 'light-content' : 'dark-content'} />
 
-      <ScrollView
+      {/* Back Button */}
+      <View style={[styles.backButtonContainer, { paddingTop: insets.top + 8, paddingHorizontal: theme.spacing.md }]}>
+        <TouchableOpacity
+          onPress={() => navigation.goBack()}
+          style={[styles.backButton, { padding: theme.spacing.sm }]}
+          accessibilityLabel="Retour"
+          accessibilityRole="button"
+        >
+          <Ionicons name="arrow-back" size={24} color={theme.colors.text} />
+        </TouchableOpacity>
+      </View>
+
+      <KeyboardAwareContainer
         contentContainerStyle={[styles.scrollContent, { paddingHorizontal: theme.spacing.lg }]}
-        keyboardShouldPersistTaps="handled"
+        extraScrollHeight={60}
       >
         {/* Header */}
         <View style={[styles.header, { alignItems: 'center', marginBottom: theme.spacing['2xl'] }]}>
@@ -238,7 +248,7 @@ const OTPVerificationScreen = ({ navigation, route }: any) => {
           </View>
         </Card>
 
-        {/* Back Button */}
+        {/* Change number link */}
         <View style={[styles.footer, { alignItems: 'center' }]}>
           <TouchableOpacity onPress={() => navigation.goBack()}>
             <Typography variant="caption" weight="semibold" style={{ color: theme.colors.primary[500] }}>
@@ -246,14 +256,21 @@ const OTPVerificationScreen = ({ navigation, route }: any) => {
             </Typography>
           </TouchableOpacity>
         </View>
-      </ScrollView>
-    </KeyboardAvoidingView>
+      </KeyboardAwareContainer>
+    </View>
   )
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+  backButtonContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  backButton: {
+    borderRadius: 20,
   },
   scrollContent: {
     flexGrow: 1,

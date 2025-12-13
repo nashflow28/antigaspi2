@@ -1,14 +1,12 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import {
   View,
-  ScrollView,
   StyleSheet,
   TouchableOpacity,
   TextInput,
   Platform,
   StatusBar,
   ActivityIndicator,
-  KeyboardAvoidingView,
 } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import DateTimePicker from '@react-native-community/datetimepicker'
@@ -35,6 +33,7 @@ import {
 import { useToast } from '../../contexts/ToastContext'
 import AlertModal from '../../components/AlertModal'
 import { useAlert } from '../../hooks/useAlert'
+import KeyboardAwareContainer from '../../components/KeyboardAwareContainer'
 
 type Props = {
   navigation: any
@@ -387,14 +386,10 @@ const CartScreen: React.FC<Props> = ({ navigation }) => {
           <ActivityIndicator size="large" color={theme.colors.primary[500]} />
         </View>
       ) : (
-        <KeyboardAvoidingView
-          behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-          style={{ flex: 1 }}
+        <KeyboardAwareContainer
+          contentContainerStyle={styles.scrollContent}
+          extraScrollHeight={60}
         >
-          <ScrollView
-            contentContainerStyle={styles.scrollContent}
-            keyboardShouldPersistTaps="handled"
-          >
             {activeError && (
               <Card style={[styles.errorCard, { borderColor: theme.colors.error }]}> 
                 <Typography variant="body" style={{ color: theme.colors.error }}>
@@ -728,8 +723,7 @@ const CartScreen: React.FC<Props> = ({ navigation }) => {
                 </Button>
               </View>
             )}
-          </ScrollView>
-        </KeyboardAvoidingView>
+        </KeyboardAwareContainer>
       )}
 
       <AlertModal {...alertProps} />

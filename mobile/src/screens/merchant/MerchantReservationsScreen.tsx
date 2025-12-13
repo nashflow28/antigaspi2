@@ -545,8 +545,8 @@ const MerchantReservationsScreen: React.FC<Props> = ({ route }) => {
               onPress={() => setShowConfirmModal(false)}
               disabled={actionLoading}
             >
-              <Text style={[styles.modalButtonText, { color: theme.colors.textSecondary }]}>
-                ANNULER
+              <Text style={[styles.modalButtonText, { color: theme.colors.textSecondary }]} numberOfLines={1}>
+                Non
               </Text>
             </TouchableOpacity>
             <TouchableOpacity
@@ -554,8 +554,8 @@ const MerchantReservationsScreen: React.FC<Props> = ({ route }) => {
               onPress={executeConfirm}
               disabled={actionLoading}
             >
-              <Text style={[styles.modalButtonText, { color: 'white' }]}>
-                {actionLoading ? 'CONFIRMATION...' : 'CONFIRMER'}
+              <Text style={[styles.modalButtonText, { color: 'white' }]} numberOfLines={1}>
+                {actionLoading ? 'En cours...' : 'Oui'}
               </Text>
             </TouchableOpacity>
           </View>
@@ -587,8 +587,8 @@ const MerchantReservationsScreen: React.FC<Props> = ({ route }) => {
               onPress={() => setShowReadyModal(false)}
               disabled={actionLoading}
             >
-              <Text style={[styles.modalButtonText, { color: theme.colors.textSecondary }]}>
-                NON
+              <Text style={[styles.modalButtonText, { color: theme.colors.textSecondary }]} numberOfLines={1}>
+                Non
               </Text>
             </TouchableOpacity>
             <TouchableOpacity
@@ -596,8 +596,8 @@ const MerchantReservationsScreen: React.FC<Props> = ({ route }) => {
               onPress={executeMarkReady}
               disabled={actionLoading}
             >
-              <Text style={[styles.modalButtonText, { color: 'white' }]}>
-                {actionLoading ? 'EN COURS...' : 'OUI, PRÊTE'}
+              <Text style={[styles.modalButtonText, { color: 'white' }]} numberOfLines={1}>
+                {actionLoading ? 'En cours...' : 'Oui, prête'}
               </Text>
             </TouchableOpacity>
           </View>
@@ -629,8 +629,8 @@ const MerchantReservationsScreen: React.FC<Props> = ({ route }) => {
               onPress={() => setShowCompleteModal(false)}
               disabled={actionLoading}
             >
-              <Text style={[styles.modalButtonText, { color: theme.colors.textSecondary }]}>
-                NON
+              <Text style={[styles.modalButtonText, { color: theme.colors.textSecondary }]} numberOfLines={1}>
+                Non
               </Text>
             </TouchableOpacity>
             <TouchableOpacity
@@ -638,8 +638,8 @@ const MerchantReservationsScreen: React.FC<Props> = ({ route }) => {
               onPress={executeComplete}
               disabled={actionLoading}
             >
-              <Text style={[styles.modalButtonText, { color: 'white' }]}>
-                {actionLoading ? 'EN COURS...' : 'OUI, TERMINÉE'}
+              <Text style={[styles.modalButtonText, { color: 'white' }]} numberOfLines={1}>
+                {actionLoading ? 'En cours...' : 'Oui, terminée'}
               </Text>
             </TouchableOpacity>
           </View>
@@ -671,8 +671,8 @@ const MerchantReservationsScreen: React.FC<Props> = ({ route }) => {
               onPress={() => setShowCancelModal(false)}
               disabled={actionLoading}
             >
-              <Text style={[styles.modalButtonText, { color: theme.colors.textSecondary }]}>
-                NON
+              <Text style={[styles.modalButtonText, { color: theme.colors.textSecondary }]} numberOfLines={1}>
+                Non
               </Text>
             </TouchableOpacity>
             <TouchableOpacity
@@ -680,8 +680,8 @@ const MerchantReservationsScreen: React.FC<Props> = ({ route }) => {
               onPress={executeCancel}
               disabled={actionLoading}
             >
-              <Text style={[styles.modalButtonText, { color: 'white' }]}>
-                {actionLoading ? 'ANNULATION...' : 'ANNULER'}
+              <Text style={[styles.modalButtonText, { color: 'white' }]} numberOfLines={1}>
+                {actionLoading ? 'Annulation...' : 'Oui, annuler'}
               </Text>
             </TouchableOpacity>
           </View>

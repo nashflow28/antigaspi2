@@ -4,12 +4,11 @@ import {
   TextInput,
   TouchableOpacity,
   StyleSheet,
-  KeyboardAvoidingView,
-  Platform,
   StatusBar,
   ScrollView,
   Animated,
 } from 'react-native'
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 import { useDispatch, useSelector } from 'react-redux'
 import { registerUser, clearError } from '../../store/slices/authSlice'
 import { AppDispatch, RootState } from '../../store'
@@ -22,6 +21,7 @@ import { usePersistedForm } from '../../hooks/usePersistedForm'
 import PhoneInput from '../../components/PhoneInput'
 import AlertModal from '../../components/AlertModal'
 import { useAlert } from '../../hooks/useAlert'
+import KeyboardAwareContainer from '../../components/KeyboardAwareContainer'
 
 interface Props {
   navigation: any
@@ -71,7 +71,7 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
   const dispatch = useDispatch<AppDispatch>()
   const { loading } = useSelector((state: RootState) => state.auth)
   const { showSuccess } = useToast()
-  const scrollViewRef = useRef<ScrollView>(null)
+  const scrollViewRef = useRef<KeyboardAwareScrollView>(null)
   const { alertProps, showWarning, hideAlert } = useAlert()
 
   // Formulaire persisté (sans mots de passe pour la sécurité)
@@ -151,7 +151,7 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
     // Scroll vers le bas pour montrer les nouveaux champs merchant
     if (newRole === 'merchant') {
       setTimeout(() => {
-        scrollViewRef.current?.scrollToEnd({ animated: true })
+        scrollViewRef.current?.scrollToEnd(true)
       }, 300)
     }
   }
@@ -317,17 +317,13 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
   )
 
   return (
-    <KeyboardAvoidingView
-      style={[styles.container, { backgroundColor: theme.colors.background }]}
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-    >
-      <StatusBar backgroundColor={theme.colors.primary[500]} barStyle="light-content" />
+    <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
+      <StatusBar backgroundColor={theme.colors.background} barStyle={theme.isDark ? 'light-content' : 'dark-content'} />
 
-      <ScrollView
+      <KeyboardAwareContainer
         ref={scrollViewRef}
         contentContainerStyle={{ flexGrow: 1, paddingHorizontal: theme.spacing.lg, paddingVertical: theme.spacing.xl }}
-        keyboardShouldPersistTaps="handled"
-        showsVerticalScrollIndicator={false}
+        extraScrollHeight={60}
       >
         {/* Header */}
         <View style={{ alignItems: 'center', marginBottom: theme.spacing.xl }}>
@@ -555,7 +551,7 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
             </Typography>
           </TouchableOpacity>
         </View>
-      </ScrollView>
+      </KeyboardAwareContainer>
 
       {/* Modal de sélection du type de commerce */}
       <Modal
@@ -644,7 +640,7 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
       </Modal>
 
       <AlertModal {...alertProps} />
-    </KeyboardAvoidingView>
+    </View>
   )
 }
 

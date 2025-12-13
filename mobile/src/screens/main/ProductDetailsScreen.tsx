@@ -776,12 +776,12 @@ const ProductDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
             <Typography variant="caption" color="secondary">
               {product.merchant?.business_name}
             </Typography>
-            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 4 }}>
-              <Typography variant="body" weight="bold" color="primary">
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 4, flexWrap: 'wrap' }}>
+              <Typography variant="body" weight="bold" color="primary" style={{ flexShrink: 0 }}>
                 {formatCurrency(discountedPrice)}
               </Typography>
               {discountPercent > 0 && (
-                <Typography variant="caption" style={{ textDecorationLine: 'line-through', color: theme.colors.neutral[400] }}>
+                <Typography variant="caption" style={{ textDecorationLine: 'line-through', color: theme.colors.neutral[400], flexShrink: 0 }}>
                   {formatCurrency(originalPrice)}
                 </Typography>
               )}
@@ -851,7 +851,7 @@ const ProductDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
             style={styles.modalButtonCancel}
             testID={TEST_IDS.cancelButton}
           >
-            Annuler
+            Non
           </Button>
           <Button
             variant="primary"
@@ -867,9 +867,11 @@ const ProductDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
             leftIcon={<Ionicons name="checkmark-circle" size={20} color={theme.colors.textInverse} />}
             testID={TEST_IDS.confirmButton}
           >
-            Confirmer ({formatCurrency(discountedPrice * modalQuantity)})
+            Oui
           </Button>
         </View>
+        {/* Spacer pour éviter que les boutons touchent le bord */}
+        <View style={{ height: 8 }} />
       </Modal>
 
       {/* Styled "Produit ajouté" Modal */}
@@ -1169,6 +1171,7 @@ const createStyles = (theme: ReturnType<typeof useTheme>) => StyleSheet.create({
     flexDirection: 'row',
     gap: 12,
     marginTop: 8,
+    paddingBottom: 16,
   },
   modalButtonCancel: {
     flex: 1,

@@ -3,13 +3,11 @@ import {
   View,
   Text,
   StyleSheet,
-  ScrollView,
   TextInput,
   TouchableOpacity,
   Image,
   ActivityIndicator,
   StatusBar,
-  KeyboardAvoidingView,
   Platform,
 } from 'react-native'
 import { Ionicons } from '@expo/vector-icons'
@@ -26,6 +24,7 @@ import { usePersistedForm } from '../../hooks/usePersistedForm'
 import PhoneInput from '../../components/PhoneInput'
 import AlertModal from '../../components/AlertModal'
 import { useAlert } from '../../hooks/useAlert'
+import KeyboardAwareContainer from '../../components/KeyboardAwareContainer'
 
 interface ProfileFormData {
   business_name: string
@@ -624,16 +623,10 @@ const MerchantProfileEditScreen: React.FC = () => {
         <View style={{ width: 40 }} />
       </View>
 
-      <KeyboardAvoidingView
-        style={styles.keyboardAvoid}
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 0}
+      <KeyboardAwareContainer
+        style={styles.content}
+        extraScrollHeight={60}
       >
-        <ScrollView
-          style={styles.content}
-          showsVerticalScrollIndicator={false}
-          keyboardShouldPersistTaps="handled"
-        >
           {/* Photo de profil */}
         <View style={[styles.photoSection, { backgroundColor: theme.colors.cardBackground, borderColor: theme.colors.cardBorder, borderWidth: 1 }]}>
           <View style={styles.photoContainer}>
@@ -902,8 +895,7 @@ const MerchantProfileEditScreen: React.FC = () => {
             </>
           )}
         </TouchableOpacity>
-        </ScrollView>
-      </KeyboardAvoidingView>
+      </KeyboardAwareContainer>
 
       {/* Map Location Picker Modal */}
       <MapLocationPicker

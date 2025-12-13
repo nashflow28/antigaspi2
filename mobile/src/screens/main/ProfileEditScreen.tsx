@@ -2,14 +2,12 @@ import React, { useState, useEffect, useCallback } from 'react'
 import {
   View,
   StyleSheet,
-  ScrollView,
   TextInput,
   TouchableOpacity,
   Image,
   ActivityIndicator,
   StatusBar,
   Platform,
-  KeyboardAvoidingView,
 } from 'react-native'
 import { Ionicons } from '@expo/vector-icons'
 import { useNavigation } from '@react-navigation/native'
@@ -28,6 +26,7 @@ import { parsePhoneNumber, validatePhoneNumber } from '../../data/countries'
 import AlertModal from '../../components/AlertModal'
 import { useAlert } from '../../hooks/useAlert'
 import { createLogger } from '../../utils/logger'
+import KeyboardAwareContainer from '../../components/KeyboardAwareContainer'
 
 const profileEditLogger = createLogger('ProfileEdit')
 
@@ -389,17 +388,11 @@ const ProfileEditScreen: React.FC<ProfileEditScreenProps> = ({ navigation: navig
         <View style={{ width: 40 }} />
       </View>
 
-      <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        style={{ flex: 1 }}
-        keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 0}
+      <KeyboardAwareContainer
+        style={styles.content}
+        contentContainerStyle={{ paddingBottom: 40 }}
+        extraScrollHeight={60}
       >
-        <ScrollView
-          style={styles.content}
-          showsVerticalScrollIndicator={false}
-          keyboardShouldPersistTaps="handled"
-          contentContainerStyle={{ paddingBottom: 40 }}
-        >
         {/* Photo de profil */}
         <View
           style={[
@@ -603,8 +596,7 @@ const ProfileEditScreen: React.FC<ProfileEditScreenProps> = ({ navigation: navig
             </>
           )}
         </TouchableOpacity>
-        </ScrollView>
-      </KeyboardAvoidingView>
+      </KeyboardAwareContainer>
 
       <AlertModal {...alertProps} />
     </View>

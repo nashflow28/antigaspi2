@@ -538,7 +538,7 @@ const MerchantReviewsScreen: React.FC = () => {
                   style={[styles.modalButton, styles.cancelButton]}
                   onPress={() => setRespondModalVisible(false)}
                 >
-                  <Text style={[styles.modalButtonText, { color: theme.colors.text }]}>
+                  <Text style={[styles.modalButtonText, { color: theme.colors.text }]} numberOfLines={1}>
                     Annuler
                   </Text>
                 </TouchableOpacity>
@@ -547,7 +547,7 @@ const MerchantReviewsScreen: React.FC = () => {
                   onPress={handleSubmitResponse}
                   disabled={submittingResponse || !responseText.trim()}
                 >
-                  <Text style={[styles.modalButtonText, { color: 'white' }]}>
+                  <Text style={[styles.modalButtonText, { color: 'white' }]} numberOfLines={1}>
                     {submittingResponse ? 'Envoi...' : 'Envoyer'}
                   </Text>
                 </TouchableOpacity>

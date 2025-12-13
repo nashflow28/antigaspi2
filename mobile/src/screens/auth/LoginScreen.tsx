@@ -4,10 +4,7 @@ import {
   TextInput,
   TouchableOpacity,
   StyleSheet,
-  KeyboardAvoidingView,
-  Platform,
   StatusBar,
-  ScrollView,
 } from 'react-native'
 import { useDispatch, useSelector } from 'react-redux'
 import { loginUser } from '../../store/slices/authSlice'
@@ -15,6 +12,7 @@ import { AppDispatch, RootState } from '../../store'
 import { LoginCredentials } from '../../types'
 import { Button, Card, Typography } from '../../components/2025'
 import BrandLogo from '../../components/BrandLogo'
+import KeyboardAwareContainer from '../../components/KeyboardAwareContainer'
 import { useTheme } from '../../theme'
 import { TEST_IDS } from '../../utils/testIds'
 import { useAlert } from '../../contexts/AlertContext'
@@ -57,14 +55,13 @@ const LoginScreen: React.FC<Props> = ({ navigation }) => {
   }
 
   return (
-    <KeyboardAvoidingView
+    <View
       style={[styles.container, { backgroundColor: theme.colors.background }]}
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       testID={TEST_IDS.loginScreen}
     >
-      <StatusBar backgroundColor={theme.colors.primary[500]} barStyle="light-content" />
+      <StatusBar backgroundColor={theme.colors.background} barStyle={theme.isDark ? 'light-content' : 'dark-content'} />
 
-      <ScrollView contentContainerStyle={[styles.scrollContent, { paddingHorizontal: theme.spacing.lg }]} keyboardShouldPersistTaps="handled">
+      <KeyboardAwareContainer contentContainerStyle={[styles.scrollContent, { paddingHorizontal: theme.spacing.lg }]}>
         {/* Header */}
         <View style={[styles.header, { alignItems: 'center', marginBottom: theme.spacing['2xl'] }]}>
           <BrandLogo color={theme.colors.primary[500]} style={{ marginBottom: theme.spacing.sm }} />
@@ -227,8 +224,8 @@ const LoginScreen: React.FC<Props> = ({ navigation }) => {
             </Typography>
           </TouchableOpacity>
         </View>
-      </ScrollView>
-    </KeyboardAvoidingView>
+      </KeyboardAwareContainer>
+    </View>
   )
 }
 

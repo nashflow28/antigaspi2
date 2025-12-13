@@ -320,7 +320,7 @@ const MerchantLoyaltyScreen: React.FC = () => {
                 style={[styles.modalButton, styles.cancelButton]}
                 onPress={() => setAwardModalVisible(false)}
               >
-                <Text style={[styles.modalButtonText, { color: theme.colors.text }]}>
+                <Text style={[styles.modalButtonText, { color: theme.colors.text }]} numberOfLines={1}>
                   Annuler
                 </Text>
               </TouchableOpacity>
@@ -329,7 +329,7 @@ const MerchantLoyaltyScreen: React.FC = () => {
                 onPress={handleAwardSubmit}
                 disabled={submitting || !pointsToAward || !description.trim()}
               >
-                <Text style={[styles.modalButtonText, { color: 'white' }]}>
+                <Text style={[styles.modalButtonText, { color: 'white' }]} numberOfLines={1}>
                   {submitting ? 'Envoi...' : 'Attribuer'}
                 </Text>
               </TouchableOpacity>

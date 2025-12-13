@@ -3,14 +3,12 @@ import {
   View,
   Text,
   StyleSheet,
-  ScrollView,
   TextInput,
   TouchableOpacity,
   StatusBar,
   Image,
   ActivityIndicator,
   Modal,
-  KeyboardAvoidingView,
   Platform,
 } from 'react-native'
 import { Ionicons } from '@expo/vector-icons'
@@ -25,6 +23,7 @@ import { usePersistedForm } from '../../hooks/usePersistedForm'
 import AlertModal from '../../components/AlertModal'
 import { useAlert } from '../../hooks/useAlert'
 import { createLogger } from '../../utils/logger'
+import KeyboardAwareContainer from '../../components/KeyboardAwareContainer'
 
 interface Props {
   route: any
@@ -520,17 +519,11 @@ const ProductFormScreen: React.FC<Props> = ({ route, navigation }) => {
         </View>
       </View>
 
-      <KeyboardAvoidingView
-        style={styles.keyboardAvoid}
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 0}
+      <KeyboardAwareContainer
+        style={styles.content}
+        contentContainerStyle={styles.scrollContent}
+        extraScrollHeight={60}
       >
-        <ScrollView
-          style={styles.content}
-          contentContainerStyle={styles.scrollContent}
-          keyboardShouldPersistTaps="handled"
-          showsVerticalScrollIndicator={false}
-        >
           {/* Image */}
         <View style={styles.section}>
           <Text style={[styles.label, { color: theme.colors.text }]}>Photo du produit</Text>
@@ -709,8 +702,7 @@ const ProductFormScreen: React.FC<Props> = ({ route, navigation }) => {
             </>
           )}
         </TouchableOpacity>
-        </ScrollView>
-      </KeyboardAvoidingView>
+      </KeyboardAwareContainer>
 
       <AlertModal {...alertProps} />
     </View>
