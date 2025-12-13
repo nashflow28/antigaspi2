@@ -7,13 +7,13 @@ import {
   TouchableOpacity,
   StatusBar,
   RefreshControl,
-  Alert,
   TextInput,
   Modal,
 } from 'react-native'
 import { Ionicons } from '@expo/vector-icons'
 import { useTheme } from '../../theme'
 import apiService from '../../services/api'
+import AlertModal, { AlertType, AlertButton } from '../../components/AlertModal'
 
 interface Customer {
   id: number
@@ -43,6 +43,26 @@ const MerchantLoyaltyScreen: React.FC = () => {
   const [description, setDescription] = useState('')
   const [submitting, setSubmitting] = useState(false)
 
+  // AlertModal state
+  const [alertVisible, setAlertVisible] = useState(false)
+  const [alertType, setAlertType] = useState<AlertType>('info')
+  const [alertTitle, setAlertTitle] = useState('')
+  const [alertMessage, setAlertMessage] = useState('')
+  const [alertButtons, setAlertButtons] = useState<AlertButton[]>([])
+
+  const showAlert = (
+    type: AlertType,
+    title: string,
+    message?: string,
+    buttons?: AlertButton[]
+  ) => {
+    setAlertType(type)
+    setAlertTitle(title)
+    setAlertMessage(message || '')
+    setAlertButtons(buttons || [{ text: 'OK', onPress: () => setAlertVisible(false) }])
+    setAlertVisible(true)
+  }
+
   useEffect(() => {
     loadLoyaltyData()
   }, [])
@@ -64,7 +84,7 @@ const MerchantLoyaltyScreen: React.FC = () => {
       }
     } catch (error) {
       console.error('Erreur chargement fidélité:', error)
-      Alert.alert('Erreur', 'Impossible de charger les données de fidélité')
+      showAlert('error', 'Erreur', 'Impossible de charger les données de fidélité')
     } finally {
       setLoading(false)
       setRefreshing(false)
@@ -85,13 +105,13 @@ const MerchantLoyaltyScreen: React.FC = () => {
 
   const handleAwardSubmit = async () => {
     if (!selectedCustomer || !pointsToAward || !description.trim()) {
-      Alert.alert('Erreur', 'Veuillez remplir tous les champs')
+      showAlert('warning', 'Erreur', 'Veuillez remplir tous les champs')
       return
     }
 
     const points = parseInt(pointsToAward)
     if (isNaN(points) || points <= 0 || points > 1000) {
-      Alert.alert('Erreur', 'Veuillez saisir un nombre de points valide (1-1000)')
+      showAlert('warning', 'Erreur', 'Veuillez saisir un nombre de points valide (1-1000)')
       return
     }
 
@@ -105,7 +125,7 @@ const MerchantLoyaltyScreen: React.FC = () => {
         description: description.trim(),
       })
 
-      Alert.alert('Succès', `${points} points attribués à ${selectedCustomer.name}`)
+      showAlert('success', 'Succès', `${points} points attribués à ${selectedCustomer.name}`)
       setAwardModalVisible(false)
       setPointsToAward('')
       setDescription('')
@@ -113,7 +133,7 @@ const MerchantLoyaltyScreen: React.FC = () => {
       loadLoyaltyData()
     } catch (error: any) {
       console.error('Erreur attribution points:', error)
-      Alert.alert('Erreur', error.response?.data?.message || 'Impossible d\'attribuer les points')
+      showAlert('error', 'Erreur', error.response?.data?.message || 'Impossible d\'attribuer les points')
     } finally {
       setSubmitting(false)
     }
@@ -317,6 +337,15 @@ const MerchantLoyaltyScreen: React.FC = () => {
           </View>
         </View>
       </Modal>
+
+      <AlertModal
+        visible={alertVisible}
+        type={alertType}
+        title={alertTitle}
+        message={alertMessage}
+        buttons={alertButtons}
+        onClose={() => setAlertVisible(false)}
+      />
     </View>
   )
 }

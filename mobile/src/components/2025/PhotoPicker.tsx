@@ -19,13 +19,13 @@ import {
   Modal,
   Image,
   Platform,
-  Alert,
   ScrollView,
 } from 'react-native'
 import { Ionicons } from '@expo/vector-icons'
 import * as Haptics from 'expo-haptics'
 import * as ImagePicker from 'expo-image-picker'
 import { useTheme } from '../../theme'
+import AlertModal, { AlertType, AlertButton } from '../AlertModal'
 
 interface PhotoPickerProps {
   value: string[]
@@ -55,6 +55,26 @@ const PhotoPicker: React.FC<PhotoPickerProps> = ({
   const theme = useTheme()
   const [modalVisible, setModalVisible] = useState(false)
 
+  // AlertModal state
+  const [alertVisible, setAlertVisible] = useState(false)
+  const [alertType, setAlertType] = useState<AlertType>('info')
+  const [alertTitle, setAlertTitle] = useState('')
+  const [alertMessage, setAlertMessage] = useState('')
+  const [alertButtons, setAlertButtons] = useState<AlertButton[]>([])
+
+  const showAlert = (
+    type: AlertType,
+    title: string,
+    message?: string,
+    buttons?: AlertButton[]
+  ) => {
+    setAlertType(type)
+    setAlertTitle(title)
+    setAlertMessage(message || '')
+    setAlertButtons(buttons || [{ text: 'OK', onPress: () => setAlertVisible(false) }])
+    setAlertVisible(true)
+  }
+
   const triggerHaptic = useCallback(() => {
     if (Platform.OS !== 'web') {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light)
@@ -65,20 +85,20 @@ const PhotoPicker: React.FC<PhotoPickerProps> = ({
     if (type === 'camera') {
       const { status } = await ImagePicker.requestCameraPermissionsAsync()
       if (status !== 'granted') {
-        Alert.alert(
+        showAlert(
+          'warning',
           'Permission requise',
-          'L\'accès à la caméra est nécessaire pour prendre des photos.',
-          [{ text: 'OK' }]
+          'L\'accès à la caméra est nécessaire pour prendre des photos.'
         )
         return false
       }
     } else {
       const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync()
       if (status !== 'granted') {
-        Alert.alert(
+        showAlert(
+          'warning',
           'Permission requise',
-          'L\'accès à la galerie est nécessaire pour sélectionner des photos.',
-          [{ text: 'OK' }]
+          'L\'accès à la galerie est nécessaire pour sélectionner des photos.'
         )
         return false
       }
@@ -106,12 +126,12 @@ const PhotoPicker: React.FC<PhotoPickerProps> = ({
         if (value.length < maxPhotos) {
           onChange([...value, newUri])
         } else {
-          Alert.alert('Limite atteinte', `Vous ne pouvez pas ajouter plus de ${maxPhotos} photos.`)
+          showAlert('warning', 'Limite atteinte', `Vous ne pouvez pas ajouter plus de ${maxPhotos} photos.`)
         }
       }
     } catch (error) {
       console.error('Error taking photo:', error)
-      Alert.alert('Erreur', 'Impossible de prendre la photo.')
+      showAlert('error', 'Erreur', 'Impossible de prendre la photo.')
     }
   }
 
@@ -141,7 +161,8 @@ const PhotoPicker: React.FC<PhotoPickerProps> = ({
         }
 
         if (newUris.length > availableSlots) {
-          Alert.alert(
+          showAlert(
+            'info',
             'Photos limitées',
             `Seulement ${availableSlots} photo(s) ajoutée(s). Limite de ${maxPhotos} atteinte.`
           )
@@ -149,21 +170,23 @@ const PhotoPicker: React.FC<PhotoPickerProps> = ({
       }
     } catch (error) {
       console.error('Error picking images:', error)
-      Alert.alert('Erreur', 'Impossible de sélectionner les photos.')
+      showAlert('error', 'Erreur', 'Impossible de sélectionner les photos.')
     }
   }
 
   const removePhoto = (index: number) => {
     triggerHaptic()
-    Alert.alert(
+    showAlert(
+      'warning',
       'Supprimer la photo',
       'Voulez-vous supprimer cette photo ?',
       [
-        { text: 'Annuler', style: 'cancel' },
+        { text: 'Annuler', onPress: () => setAlertVisible(false) },
         {
           text: 'Supprimer',
           style: 'destructive',
           onPress: () => {
+            setAlertVisible(false)
             const newValue = [...value]
             newValue.splice(index, 1)
             onChange(newValue)
@@ -361,6 +384,15 @@ const PhotoPicker: React.FC<PhotoPickerProps> = ({
           </View>
         </TouchableOpacity>
       </Modal>
+
+      <AlertModal
+        visible={alertVisible}
+        type={alertType}
+        title={alertTitle}
+        message={alertMessage}
+        buttons={alertButtons}
+        onClose={() => setAlertVisible(false)}
+      />
     </View>
   )
 }

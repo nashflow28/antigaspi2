@@ -1,11 +1,12 @@
 import React, { useState } from 'react'
-import { Alert } from 'react-native'
+import { View } from 'react-native'
 import * as FileSystem from 'expo-file-system/legacy'
 import * as Sharing from 'expo-sharing'
 import { Ionicons } from '@expo/vector-icons'
 import { Button } from '../2025'
 import apiService from '../../services/api'
 import { AdminAnalyticsFilters } from '../../types'
+import AlertModal, { AlertType, AlertButton } from '../AlertModal'
 
 interface ExportButtonProps {
   format: 'csv' | 'pdf'
@@ -23,6 +24,26 @@ const ExportButton: React.FC<ExportButtonProps> = ({
   onExportError,
 }) => {
   const [loading, setLoading] = useState(false)
+
+  // AlertModal state
+  const [alertVisible, setAlertVisible] = useState(false)
+  const [alertType, setAlertType] = useState<AlertType>('info')
+  const [alertTitle, setAlertTitle] = useState('')
+  const [alertMessage, setAlertMessage] = useState('')
+  const [alertButtons, setAlertButtons] = useState<AlertButton[]>([])
+
+  const showAlert = (
+    type: AlertType,
+    title: string,
+    message?: string,
+    buttons?: AlertButton[]
+  ) => {
+    setAlertType(type)
+    setAlertTitle(title)
+    setAlertMessage(message || '')
+    setAlertButtons(buttons || [{ text: 'OK', onPress: () => setAlertVisible(false) }])
+    setAlertVisible(true)
+  }
 
   const handleExport = async () => {
     try {
@@ -67,7 +88,7 @@ const ExportButton: React.FC<ExportButtonProps> = ({
       // Check if sharing is available
       const isAvailable = await Sharing.isAvailableAsync()
       if (!isAvailable) {
-        Alert.alert('Erreur', 'Le partage de fichiers n\'est pas disponible sur cet appareil')
+        showAlert('error', 'Erreur', 'Le partage de fichiers n\'est pas disponible sur cet appareil')
         return
       }
 
@@ -81,29 +102,39 @@ const ExportButton: React.FC<ExportButtonProps> = ({
       console.log('✅ Export completed successfully')
       onExportComplete?.()
 
-      Alert.alert('Succès', `Rapport ${format.toUpperCase()} exporté avec succès`)
+      showAlert('success', 'Succès', `Rapport ${format.toUpperCase()} exporté avec succès`)
     } catch (error: any) {
       console.error(`❌ Export error:`, error)
       const errorMessage = error?.response?.data?.message || error?.message || `Impossible d'exporter en ${format.toUpperCase()}`
       onExportError?.(errorMessage)
-      Alert.alert('Erreur d\'export', errorMessage)
+      showAlert('error', 'Erreur d\'export', errorMessage)
     } finally {
       setLoading(false)
     }
   }
 
   return (
-    <Button
-      variant="secondary"
-      size="sm"
-      onPress={handleExport}
-      loading={loading}
-      disabled={loading}
-      leftIcon={<Ionicons name="download-outline" size={18} />}
-      testID={`export-${format}-button`}
-    >
-      {format.toUpperCase()}
-    </Button>
+    <View>
+      <Button
+        variant="secondary"
+        size="sm"
+        onPress={handleExport}
+        loading={loading}
+        disabled={loading}
+        leftIcon={<Ionicons name="download-outline" size={18} />}
+        testID={`export-${format}-button`}
+      >
+        {format.toUpperCase()}
+      </Button>
+      <AlertModal
+        visible={alertVisible}
+        type={alertType}
+        title={alertTitle}
+        message={alertMessage}
+        buttons={alertButtons}
+        onClose={() => setAlertVisible(false)}
+      />
+    </View>
   )
 }
 

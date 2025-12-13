@@ -8,7 +8,6 @@ import {
   TouchableOpacity,
   StatusBar,
   RefreshControl,
-  Alert,
 } from 'react-native'
 import { Ionicons } from '@expo/vector-icons'
 import { useTheme } from '../../theme'
@@ -16,6 +15,7 @@ import apiService from '../../services/api'
 import ExportReservationsButton from '../../components/merchant/ExportReservationsButton'
 import { Reservation } from '../../types'
 import { Modal as Modal2025 } from '../../components/2025'
+import AlertModal, { AlertType, AlertButton } from '../../components/AlertModal'
 
 interface Props {
   route?: {
@@ -40,6 +40,26 @@ const MerchantReservationsScreen: React.FC<Props> = ({ route }) => {
   const [showCompleteModal, setShowCompleteModal] = useState(false)
   const [showCancelModal, setShowCancelModal] = useState(false)
   const [actionLoading, setActionLoading] = useState(false)
+
+  // AlertModal state
+  const [alertVisible, setAlertVisible] = useState(false)
+  const [alertType, setAlertType] = useState<AlertType>('info')
+  const [alertTitle, setAlertTitle] = useState('')
+  const [alertMessage, setAlertMessage] = useState('')
+  const [alertButtons, setAlertButtons] = useState<AlertButton[]>([])
+
+  const showAlert = (
+    type: AlertType,
+    title: string,
+    message?: string,
+    buttons?: AlertButton[]
+  ) => {
+    setAlertType(type)
+    setAlertTitle(title)
+    setAlertMessage(message || '')
+    setAlertButtons(buttons || [{ text: 'OK', onPress: () => setAlertVisible(false) }])
+    setAlertVisible(true)
+  }
 
   useEffect(() => {
     loadReservations()
@@ -83,10 +103,10 @@ const MerchantReservationsScreen: React.FC<Props> = ({ route }) => {
         console.error('❌ [MerchantReservations] Status code:', error?.statusCode)
       }
       // 🐛 BUG FIX #35: Don't clear existing reservations on error
-      Alert.alert(
+      showAlert(
+        'error',
         'Erreur',
-        `Impossible de charger les réservations: ${error?.message || 'Erreur inconnue'}`,
-        [{ text: 'OK' }]
+        `Impossible de charger les réservations: ${error?.message || 'Erreur inconnue'}`
       )
     } finally {
       setLoading(false)
@@ -121,7 +141,7 @@ const MerchantReservationsScreen: React.FC<Props> = ({ route }) => {
       await loadReservations()
     } catch (error: any) {
       console.error('❌ [MerchantReservations] Erreur confirmation:', error?.message || error)
-      Alert.alert('Erreur', 'Impossible de confirmer la réservation')
+      showAlert('error', 'Erreur', 'Impossible de confirmer la réservation')
     } finally {
       setActionLoading(false)
     }
@@ -149,7 +169,7 @@ const MerchantReservationsScreen: React.FC<Props> = ({ route }) => {
       await loadReservations()
     } catch (error: any) {
       console.error('❌ [MerchantReservations] Erreur marquage prêt:', error?.message || error)
-      Alert.alert('Erreur', 'Impossible de marquer la réservation comme prête')
+      showAlert('error', 'Erreur', 'Impossible de marquer la réservation comme prête')
     } finally {
       setActionLoading(false)
     }
@@ -177,7 +197,7 @@ const MerchantReservationsScreen: React.FC<Props> = ({ route }) => {
       await loadReservations()
     } catch (error: any) {
       console.error('❌ [MerchantReservations] Erreur finalisation:', error?.message || error)
-      Alert.alert('Erreur', 'Impossible de marquer la réservation comme terminée')
+      showAlert('error', 'Erreur', 'Impossible de marquer la réservation comme terminée')
     } finally {
       setActionLoading(false)
     }
@@ -205,7 +225,7 @@ const MerchantReservationsScreen: React.FC<Props> = ({ route }) => {
       await loadReservations()
     } catch (error: any) {
       console.error('❌ [MerchantReservations] Erreur annulation:', error?.message || error)
-      Alert.alert('Erreur', 'Impossible d\'annuler la réservation')
+      showAlert('error', 'Erreur', 'Impossible d\'annuler la réservation')
     } finally {
       setActionLoading(false)
     }
@@ -655,6 +675,15 @@ const MerchantReservationsScreen: React.FC<Props> = ({ route }) => {
           </View>
         </View>
       </Modal2025>
+
+      <AlertModal
+        visible={alertVisible}
+        type={alertType}
+        title={alertTitle}
+        message={alertMessage}
+        buttons={alertButtons}
+        onClose={() => setAlertVisible(false)}
+      />
     </View>
   )
 }

@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import {
   View,
   Text,
@@ -7,7 +7,6 @@ import {
   Switch,
   TouchableOpacity,
   ActivityIndicator,
-  Alert,
   StatusBar,
   RefreshControl,
   Platform,
@@ -17,6 +16,7 @@ import { useNavigation } from '@react-navigation/native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useTheme } from '../../theme'
 import { useNotificationPreferences } from '../../hooks/useNotificationPreferences'
+import AlertModal, { AlertType, AlertButton } from '../../components/AlertModal'
 
 const formatDateTime = (date: Date | null): string => {
   if (!date) {
@@ -49,16 +49,37 @@ const NotificationSettingsScreen: React.FC = () => {
     save,
   } = useNotificationPreferences()
 
+  // AlertModal state
+  const [alertVisible, setAlertVisible] = useState(false)
+  const [alertType, setAlertType] = useState<AlertType>('info')
+  const [alertTitle, setAlertTitle] = useState('')
+  const [alertMessage, setAlertMessage] = useState('')
+  const [alertButtons, setAlertButtons] = useState<AlertButton[]>([])
+
+  const showAlert = (
+    type: AlertType,
+    title: string,
+    message?: string,
+    buttons?: AlertButton[]
+  ) => {
+    setAlertType(type)
+    setAlertTitle(title)
+    setAlertMessage(message || '')
+    setAlertButtons(buttons || [{ text: 'OK', onPress: () => setAlertVisible(false) }])
+    setAlertVisible(true)
+  }
+
   const isInitialLoading = loading && lastSyncedAt === null
 
   const handleSave = async () => {
     try {
       await save()
 
-      Alert.alert('Succès', 'Préférences mises à jour avec succès', [
+      showAlert('success', 'Succès', 'Préférences mises à jour avec succès', [
         {
           text: 'OK',
           onPress: () => {
+            setAlertVisible(false)
             if (navigation.canGoBack()) {
               navigation.goBack()
             } else {
@@ -70,7 +91,7 @@ const NotificationSettingsScreen: React.FC = () => {
     } catch (error: any) {
       const message =
         error instanceof Error ? error.message : 'Impossible de sauvegarder les préférences'
-      Alert.alert('Erreur', message)
+      showAlert('error', 'Erreur', message)
     }
   }
 
@@ -272,6 +293,15 @@ const NotificationSettingsScreen: React.FC = () => {
           )}
         </TouchableOpacity>
       </ScrollView>
+
+      <AlertModal
+        visible={alertVisible}
+        type={alertType}
+        title={alertTitle}
+        message={alertMessage}
+        buttons={alertButtons}
+        onClose={() => setAlertVisible(false)}
+      />
     </View>
   )
 }

@@ -1,11 +1,12 @@
 import React, { useState } from 'react'
-import { TouchableOpacity, Text, ActivityIndicator, Alert, StyleSheet, View } from 'react-native'
+import { TouchableOpacity, Text, ActivityIndicator, StyleSheet, View } from 'react-native'
 import { Ionicons } from '@expo/vector-icons'
 import * as FileSystem from 'expo-file-system/legacy'
 import * as Sharing from 'expo-sharing'
 import { useTheme } from '../../theme'
 import { Reservation } from '../../types'
 import { TEST_IDS } from '../../utils/testIds'
+import AlertModal, { AlertType, AlertButton } from '../AlertModal'
 
 interface Props {
   reservations: Reservation[]
@@ -35,6 +36,26 @@ const ExportReservationsButton: React.FC<Props> = ({
 }) => {
   const theme = useTheme()
   const [loading, setLoading] = useState(false)
+
+  // AlertModal state
+  const [alertVisible, setAlertVisible] = useState(false)
+  const [alertType, setAlertType] = useState<AlertType>('info')
+  const [alertTitle, setAlertTitle] = useState('')
+  const [alertMessage, setAlertMessage] = useState('')
+  const [alertButtons, setAlertButtons] = useState<AlertButton[]>([])
+
+  const showAlert = (
+    type: AlertType,
+    title: string,
+    message?: string,
+    buttons?: AlertButton[]
+  ) => {
+    setAlertType(type)
+    setAlertTitle(title)
+    setAlertMessage(message || '')
+    setAlertButtons(buttons || [{ text: 'OK', onPress: () => setAlertVisible(false) }])
+    setAlertVisible(true)
+  }
 
   /**
    * Escape CSV field to prevent injection and ensure proper formatting
@@ -136,7 +157,7 @@ const ExportReservationsButton: React.FC<Props> = ({
 
       // Validate reservations data
       if (!reservations || reservations.length === 0) {
-        Alert.alert('Aucune donnée', 'Il n\'y a aucune réservation à exporter')
+        showAlert('warning', 'Aucune donnée', 'Il n\'y a aucune réservation à exporter')
         setLoading(false)
         return
       }
@@ -163,7 +184,7 @@ const ExportReservationsButton: React.FC<Props> = ({
       const isAvailable = await Sharing.isAvailableAsync()
 
       if (!isAvailable) {
-        Alert.alert('Erreur', 'Le partage de fichiers n\'est pas disponible sur cet appareil')
+        showAlert('error', 'Erreur', 'Le partage de fichiers n\'est pas disponible sur cet appareil')
         setLoading(false)
         return
       }
@@ -176,7 +197,8 @@ const ExportReservationsButton: React.FC<Props> = ({
       })
 
       // Success feedback
-      Alert.alert(
+      showAlert(
+        'success',
         'Export réussi',
         `${reservations.length} réservation${reservations.length > 1 ? 's' : ''} exportée${reservations.length > 1 ? 's' : ''} avec succès`
       )
@@ -189,7 +211,7 @@ const ExportReservationsButton: React.FC<Props> = ({
                           error.message ||
                           'Impossible d\'exporter les réservations'
 
-      Alert.alert('Erreur d\'export', errorMessage)
+      showAlert('error', 'Erreur d\'export', errorMessage)
 
       onExportError?.(errorMessage)
     } finally {
@@ -198,40 +220,50 @@ const ExportReservationsButton: React.FC<Props> = ({
   }
 
   return (
-    <TouchableOpacity
-      onPress={handleExport}
-      disabled={loading || reservations.length === 0}
-      style={[
-        styles.button,
-        {
-          backgroundColor: loading || reservations.length === 0
-            ? theme.colors.neutral[200]
-            : theme.colors.primary[500],
-        },
-      ]}
-      testID={testID}
-    >
-      {loading ? (
-        <>
-          <ActivityIndicator
-            size="small"
-            color="white"
-            testID={TEST_IDS.exportReservationsLoading}
-          />
-          <Text style={styles.buttonText}>Export en cours...</Text>
-        </>
-      ) : (
-        <>
-          <Ionicons name="download-outline" size={20} color="white" />
-          <Text style={styles.buttonText}>Exporter CSV</Text>
-          {reservations.length > 0 && (
-            <View style={[styles.badge, { backgroundColor: theme.colors.accent.orange }]}>
-              <Text style={styles.badgeText}>{reservations.length}</Text>
-            </View>
-          )}
-        </>
-      )}
-    </TouchableOpacity>
+    <View>
+      <TouchableOpacity
+        onPress={handleExport}
+        disabled={loading || reservations.length === 0}
+        style={[
+          styles.button,
+          {
+            backgroundColor: loading || reservations.length === 0
+              ? theme.colors.neutral[200]
+              : theme.colors.primary[500],
+          },
+        ]}
+        testID={testID}
+      >
+        {loading ? (
+          <>
+            <ActivityIndicator
+              size="small"
+              color="white"
+              testID={TEST_IDS.exportReservationsLoading}
+            />
+            <Text style={styles.buttonText}>Export en cours...</Text>
+          </>
+        ) : (
+          <>
+            <Ionicons name="download-outline" size={20} color="white" />
+            <Text style={styles.buttonText}>Exporter CSV</Text>
+            {reservations.length > 0 && (
+              <View style={[styles.badge, { backgroundColor: theme.colors.accent.orange }]}>
+                <Text style={styles.badgeText}>{reservations.length}</Text>
+              </View>
+            )}
+          </>
+        )}
+      </TouchableOpacity>
+      <AlertModal
+        visible={alertVisible}
+        type={alertType}
+        title={alertTitle}
+        message={alertMessage}
+        buttons={alertButtons}
+        onClose={() => setAlertVisible(false)}
+      />
+    </View>
   )
 }
 

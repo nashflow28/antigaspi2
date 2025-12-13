@@ -1,9 +1,10 @@
-import React from 'react'
-import { View, Text, StyleSheet, TouchableOpacity, Alert } from 'react-native'
+import React, { useState } from 'react'
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native'
 import { Ionicons } from '@expo/vector-icons'
 import { useTheme } from '../../theme'
 import { Review } from '../../types'
 import StarRating from './StarRating'
+import AlertModal, { AlertType, AlertButton } from '../AlertModal'
 
 interface ReviewCardProps {
   review: Review
@@ -16,16 +17,40 @@ const ReviewCard: React.FC<ReviewCardProps> = ({ review, onEdit, onDelete, isOwn
   const theme = useTheme()
   const styles = createStyles(theme)
 
+  // AlertModal state
+  const [alertVisible, setAlertVisible] = useState(false)
+  const [alertType, setAlertType] = useState<AlertType>('info')
+  const [alertTitle, setAlertTitle] = useState('')
+  const [alertMessage, setAlertMessage] = useState('')
+  const [alertButtons, setAlertButtons] = useState<AlertButton[]>([])
+
+  const showAlert = (
+    type: AlertType,
+    title: string,
+    message?: string,
+    buttons?: AlertButton[]
+  ) => {
+    setAlertType(type)
+    setAlertTitle(title)
+    setAlertMessage(message || '')
+    setAlertButtons(buttons || [{ text: 'OK', onPress: () => setAlertVisible(false) }])
+    setAlertVisible(true)
+  }
+
   const handleDelete = () => {
-    Alert.alert(
+    showAlert(
+      'warning',
       'Supprimer l\'avis',
       'Voulez-vous vraiment supprimer cet avis ?',
       [
-        { text: 'Annuler', style: 'cancel' },
+        { text: 'Annuler', onPress: () => setAlertVisible(false) },
         {
           text: 'Supprimer',
           style: 'destructive',
-          onPress: () => onDelete && onDelete(review.id),
+          onPress: () => {
+            setAlertVisible(false)
+            onDelete && onDelete(review.id)
+          },
         },
       ]
     )
@@ -96,6 +121,15 @@ const ReviewCard: React.FC<ReviewCardProps> = ({ review, onEdit, onDelete, isOwn
           <Text style={styles.responseText}>{review.merchant_response}</Text>
         </View>
       )}
+
+      <AlertModal
+        visible={alertVisible}
+        type={alertType}
+        title={alertTitle}
+        message={alertMessage}
+        buttons={alertButtons}
+        onClose={() => setAlertVisible(false)}
+      />
     </View>
   )
 }
