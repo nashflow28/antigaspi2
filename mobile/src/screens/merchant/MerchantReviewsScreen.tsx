@@ -43,6 +43,8 @@ interface Stats {
   total_reviews: number
   average_rating: number
   verified_reviews: number
+  responded_reviews: number
+  pending_responses: number
   reviews_today: number
   reviews_this_week: number
   reviews_this_month: number
@@ -61,6 +63,7 @@ const MerchantReviewsScreen: React.FC = () => {
   const [refreshing, setRefreshing] = useState(false)
   const [loading, setLoading] = useState(true)
   const [filter, setFilter] = useState<'all' | '5' | '4' | '3' | '2' | '1'>('all')
+  const [responseFilter, setResponseFilter] = useState<'all' | 'pending' | 'responded'>('all')
 
   // Modal state
   const [respondModalVisible, setRespondModalVisible] = useState(false)
@@ -211,9 +214,21 @@ const MerchantReviewsScreen: React.FC = () => {
     )
   }
 
-  const filteredReviews = filter === 'all'
-    ? reviews
-    : reviews.filter(r => r.rating === parseInt(filter, 10))
+  // Apply both rating and response filters
+  const filteredReviews = reviews.filter(r => {
+    // Rating filter
+    if (filter !== 'all' && r.rating !== parseInt(filter, 10)) {
+      return false
+    }
+    // Response filter
+    if (responseFilter === 'pending' && r.merchant_response) {
+      return false
+    }
+    if (responseFilter === 'responded' && !r.merchant_response) {
+      return false
+    }
+    return true
+  })
 
   const renderReview = ({ item }: { item: Review }) => (
     <View style={[styles.reviewCard, { backgroundColor: theme.colors.cardBackground, borderColor: theme.colors.cardBorder, borderWidth: 1 }]}>
@@ -344,18 +359,20 @@ const MerchantReviewsScreen: React.FC = () => {
                 <Text style={styles.statLabel}>Vérifiés</Text>
               </View>
               <View style={styles.statItem}>
-                <Text style={styles.statValue}>{stats.reviews_this_week}</Text>
-                <Text style={styles.statLabel}>Cette semaine</Text>
+                <Text style={[styles.statValue, stats.pending_responses > 0 && { color: '#F59E0B' }]}>
+                  {stats.pending_responses}
+                </Text>
+                <Text style={styles.statLabel}>À répondre</Text>
               </View>
               <View style={styles.statItem}>
-                <Text style={styles.statValue}>{stats.reviews_this_month}</Text>
-                <Text style={styles.statLabel}>Ce mois</Text>
+                <Text style={styles.statValue}>{stats.responded_reviews}</Text>
+                <Text style={styles.statLabel}>Répondus</Text>
               </View>
             </View>
           </View>
         )}
 
-        {/* Filters */}
+        {/* Rating Filters */}
         <ScrollView
           horizontal
           showsHorizontalScrollIndicator={false}
@@ -387,6 +404,44 @@ const MerchantReviewsScreen: React.FC = () => {
                 {
                   color: filter === filterOption.value
                     ? theme.colors.primary[500]
+                    : 'white'
+                }
+              ]}>
+                {filterOption.label}
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </ScrollView>
+
+        {/* Response Status Filters */}
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          style={[styles.filtersContainer, { marginTop: 8 }]}
+          contentContainerStyle={styles.filtersContent}
+        >
+          {[
+            { value: 'all', label: '📋 Tous', icon: 'list' },
+            { value: 'pending', label: '⏳ À répondre', icon: 'time' },
+            { value: 'responded', label: '✅ Répondus', icon: 'checkmark-circle' },
+          ].map((filterOption) => (
+            <TouchableOpacity
+              key={filterOption.value}
+              style={[
+                styles.filterChip,
+                {
+                  backgroundColor: responseFilter === filterOption.value
+                    ? (filterOption.value === 'pending' ? '#F59E0B' : 'white')
+                    : 'rgba(255, 255, 255, 0.2)',
+                }
+              ]}
+              onPress={() => setResponseFilter(filterOption.value as any)}
+            >
+              <Text style={[
+                styles.filterText,
+                {
+                  color: responseFilter === filterOption.value
+                    ? (filterOption.value === 'pending' ? 'white' : theme.colors.primary[500])
                     : 'white'
                 }
               ]}>

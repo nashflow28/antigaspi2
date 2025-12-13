@@ -48,6 +48,8 @@ class MerchantReviewController extends Controller
                 SUM(CASE WHEN rating = 2 THEN 1 ELSE 0 END) as two_stars,
                 SUM(CASE WHEN rating = 1 THEN 1 ELSE 0 END) as one_star,
                 SUM(CASE WHEN is_verified_purchase = 1 THEN 1 ELSE 0 END) as verified_reviews,
+                SUM(CASE WHEN merchant_response IS NOT NULL THEN 1 ELSE 0 END) as responded_reviews,
+                SUM(CASE WHEN merchant_response IS NULL THEN 1 ELSE 0 END) as pending_responses,
                 SUM(CASE WHEN DATE(created_at) = CURDATE() THEN 1 ELSE 0 END) as reviews_today,
                 SUM(CASE WHEN created_at >= DATE_SUB(NOW(), INTERVAL 7 DAY) THEN 1 ELSE 0 END) as reviews_this_week,
                 SUM(CASE WHEN created_at >= DATE_SUB(NOW(), INTERVAL 30 DAY) THEN 1 ELSE 0 END) as reviews_this_month
@@ -71,6 +73,8 @@ class MerchantReviewController extends Controller
                                           'comment' => $review->comment,
                                           'time_ago' => $review->time_ago,
                                           'is_verified_purchase' => $review->is_verified_purchase,
+                                          'merchant_response' => $review->merchant_response,
+                                          'merchant_response_at' => $review->merchant_response_at?->toISOString(),
                                           'user' => [
                                               'id' => $review->user->id,
                                               'name' => $review->user->first_name . ' ' . substr($review->user->last_name, 0, 1) . '.',
@@ -152,6 +156,8 @@ class MerchantReviewController extends Controller
                         'total_reviews' => (int) $stats->total_reviews,
                         'average_rating' => $stats->average_rating ? round($stats->average_rating, 1) : 0,
                         'verified_reviews' => (int) $stats->verified_reviews,
+                        'responded_reviews' => (int) $stats->responded_reviews,
+                        'pending_responses' => (int) $stats->pending_responses,
                         'reviews_today' => (int) $stats->reviews_today,
                         'reviews_this_week' => (int) $stats->reviews_this_week,
                         'reviews_this_month' => (int) $stats->reviews_this_month,
@@ -198,6 +204,7 @@ class MerchantReviewController extends Controller
         $request->validate([
             'rating' => 'nullable|integer|between:1,5',
             'verified_only' => 'nullable|boolean',
+            'responded' => 'nullable|in:all,yes,no', // Filter by response status
             'product_id' => 'nullable|exists:products,id',
             'sort' => 'nullable|in:recent,oldest,rating_high,rating_low',
             'per_page' => 'nullable|integer|max:50',
@@ -215,6 +222,13 @@ class MerchantReviewController extends Controller
 
             if ($request->verified_only) {
                 $query->verified();
+            }
+
+            // Filter by response status
+            if ($request->responded === 'yes') {
+                $query->whereNotNull('merchant_response');
+            } elseif ($request->responded === 'no') {
+                $query->whereNull('merchant_response');
             }
 
             if ($request->product_id) {
@@ -249,6 +263,8 @@ class MerchantReviewController extends Controller
                     'stars' => $review->stars,
                     'time_ago' => $review->time_ago,
                     'is_verified_purchase' => $review->is_verified_purchase,
+                    'merchant_response' => $review->merchant_response,
+                    'merchant_response_at' => $review->merchant_response_at?->toISOString(),
                     'user' => [
                         'id' => $review->user->id,
                         'name' => $review->user->first_name . ' ' . substr($review->user->last_name, 0, 1) . '.',
@@ -273,6 +289,7 @@ class MerchantReviewController extends Controller
                 'filters' => [
                     'rating' => $request->rating,
                     'verified_only' => $request->verified_only,
+                    'responded' => $request->responded ?? 'all',
                     'product_id' => $request->product_id,
                     'sort' => $request->sort ?? 'recent',
                 ]
