@@ -3,16 +3,32 @@ import { ProductsState, Product, Category, ProductFilters } from '../../types'
 import apiService from '../../services/api'
 import offlineService from '../../services/offlineService'
 import { storeLogger } from '../../utils/logger'
+import { validateSchema, ProductSchema } from '../../utils/schemaValidator'
 
 /**
  * BUG FIX #M-004: Normalize product prices to ensure they are always numbers
  * The API may return prices as strings in some cases
+ *
+ * BUG FIX #16: Added schema validation to catch malformed backend data early
  */
-const normalizeProduct = (product: Product): Product => ({
-  ...product,
-  original_price: Number(product.original_price) || 0,
-  discounted_price: Number(product.discounted_price) || 0,
-})
+const normalizeProduct = (product: Product): Product => {
+  // BUG FIX #16: Validate product schema before processing
+  if (__DEV__) {
+    const validation = validateSchema(product, ProductSchema)
+    if (!validation.valid) {
+      storeLogger.warn(
+        `[Schema] Invalid product data (id: ${product?.id}):`,
+        validation.errors.map((e) => `${e.field}: ${e.message}`).join(', ')
+      )
+    }
+  }
+
+  return {
+    ...product,
+    original_price: Number(product.original_price) || 0,
+    discounted_price: Number(product.discounted_price) || 0,
+  }
+}
 
 const normalizeProducts = (products: Product[]): Product[] =>
   products.map(normalizeProduct)

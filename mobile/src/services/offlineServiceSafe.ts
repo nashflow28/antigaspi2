@@ -3,6 +3,9 @@
  */
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { createLogger } from '../utils/logger';
+
+const offlineSafeLogger = createLogger('OfflineSafe');
 
 export interface CacheConfig {
   key: string;
@@ -30,7 +33,7 @@ class OfflineServiceSafe {
   };
 
   constructor() {
-    console.log('🔌 OfflineService (Safe Mode) initialisé');
+    offlineSafeLogger.log('OfflineService (Safe Mode) initialisé');
     this.initialize();
   }
 
@@ -44,12 +47,12 @@ class OfflineServiceSafe {
 
       // Écouter les changements de connectivité
       window.addEventListener('online', () => {
-        console.log('📡 Connexion rétablie');
+        offlineSafeLogger.log('Connexion rétablie');
         this.handleConnectivityChange(true);
       });
 
       window.addEventListener('offline', () => {
-        console.log('📵 Connexion perdue');
+        offlineSafeLogger.log('Connexion perdue');
         this.handleConnectivityChange(false);
       });
     }
@@ -63,7 +66,7 @@ class OfflineServiceSafe {
    */
   private handleConnectivityChange(isConnected: boolean): void {
     this.isOnline = isConnected;
-    console.log(`Connectivité: ${isConnected ? 'En ligne' : 'Hors ligne'}`);
+    offlineSafeLogger.log(`Connectivité: ${isConnected ? 'En ligne' : 'Hors ligne'}`);
     this.emit('connectivity-change', isConnected);
   }
 
@@ -97,9 +100,9 @@ class OfflineServiceSafe {
 
     try {
       await AsyncStorage.setItem(config.key, JSON.stringify(cacheEntry));
-      console.log(`✅ Cache saved: ${config.key}`);
+      offlineSafeLogger.log(`Cache saved: ${config.key}`);
     } catch (error) {
-      console.error(`❌ Error saving cache: ${config.key}`, error);
+      offlineSafeLogger.error(`Error saving cache: ${config.key}`, error);
     }
   }
 
@@ -120,15 +123,15 @@ class OfflineServiceSafe {
       const isExpired = Date.now() - entry.timestamp > ttlMs;
 
       if (isExpired) {
-        console.log(`⏰ Cache expired: ${config.key}`);
+        offlineSafeLogger.log(`Cache expired: ${config.key}`);
         await AsyncStorage.removeItem(config.key);
         return null;
       }
 
-      console.log(`✅ Cache hit: ${config.key}`);
+      offlineSafeLogger.log(`Cache hit: ${config.key}`);
       return entry.data;
     } catch (error) {
-      console.error(`❌ Error reading cache: ${config.key}`, error);
+      offlineSafeLogger.error(`Error reading cache: ${config.key}`, error);
       return null;
     }
   }
@@ -140,9 +143,9 @@ class OfflineServiceSafe {
     const keys = Object.values(this.cacheConfigs).map(config => config.key);
     try {
       await AsyncStorage.multiRemove(keys);
-      console.log('🧹 All cache cleared');
+      offlineSafeLogger.log('All cache cleared');
     } catch (error) {
-      console.error('❌ Error clearing cache', error);
+      offlineSafeLogger.error('Error clearing cache', error);
     }
   }
 
@@ -161,10 +164,10 @@ class OfflineServiceSafe {
 
         if (isExpired) {
           await AsyncStorage.removeItem(config.key);
-          console.log(`🧹 Expired cache cleaned: ${config.key}`);
+          offlineSafeLogger.log(`Expired cache cleaned: ${config.key}`);
         }
       } catch (error) {
-        console.error(`❌ Error cleaning cache: ${config.key}`, error);
+        offlineSafeLogger.error(`Error cleaning cache: ${config.key}`, error);
       }
     }
   }

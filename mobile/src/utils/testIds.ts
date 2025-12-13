@@ -166,6 +166,7 @@ export const TEST_IDS = {
   revenueChart: 'revenue-chart',
   geographicChart: 'geographic-chart',
   merchantPerformanceList: 'merchant-performance-list',
+  adminMerchantsPagination: 'admin-merchants-pagination',
   refreshButton: 'refresh-button',
 
   // Admin Broadcast Notifications

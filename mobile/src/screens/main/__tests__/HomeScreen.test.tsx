@@ -170,18 +170,28 @@ describe('HomeScreen', () => {
 
     it('shows empty category guidance when a category has no products', async () => {
       const extraCategory = { id: 3, name: 'Poissons', description: 'Produits de la mer' }
-      const { getByText } = renderScreen({
+      const { getByTestId, queryByText, debug } = renderScreen({
         productsState: {
           categories: [...mockCategories, extraCategory],
         },
       })
 
-      fireEvent.press(getByText(/Poissons \(0\)/i))
+      // Use testID to target category tab reliably (fixes ScrollView rendering issues)
+      fireEvent.press(getByTestId('category-tab-3'))
 
-      await waitFor(() => {
-        expect(getByText('Aucun produit dans cette catégorie')).toBeTruthy()
-        expect(getByText('Voir tous les produits')).toBeTruthy()
-      })
+      // Wait for re-render after state change
+      await waitFor(
+        () => {
+          // Look for the empty state message when category is selected
+          const emptyText = queryByText(/Aucun produit/i, { includeHiddenElements: true })
+          const actionButton = queryByText('Voir tous les produits', { includeHiddenElements: true })
+
+          // HomeScreen shows category-specific empty state when filtered products is empty
+          expect(emptyText).toBeTruthy()
+          expect(actionButton).toBeTruthy()
+        },
+        { timeout: 3000 }
+      )
     })
 
     it('surfaces API errors through the toast handler', async () => {

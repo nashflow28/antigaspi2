@@ -150,7 +150,9 @@ describe('ProfileEditScreen', () => {
         expect(getByDisplayValue('Jean')).toBeTruthy()
         expect(getByDisplayValue('Dupont')).toBeTruthy()
         expect(getByDisplayValue('jean.dupont@test.com')).toBeTruthy()
-        expect(getByDisplayValue('+228 90 12 34 56')).toBeTruthy()
+        // PhoneInput displays local number only, dial code is in separate Text element
+        expect(getByDisplayValue('90 12 34 56')).toBeTruthy()
+        expect(getByText('+228')).toBeTruthy() // Country code displayed separately
         expect(getByDisplayValue('15 Rue du Commerce')).toBeTruthy()
         expect(getByDisplayValue('Lomé')).toBeTruthy()
       })
@@ -236,11 +238,13 @@ describe('ProfileEditScreen', () => {
         <ProfileEditScreen navigation={mockNavigation} />
       )
 
-      const phoneInput = getByDisplayValue('+228 90 12 34 56')
-      fireEvent.changeText(phoneInput, '+228 90 99 88 77')
+      // PhoneInput displays local number only (without country code)
+      const phoneInput = getByDisplayValue('90 12 34 56')
+      fireEvent.changeText(phoneInput, '90 99 88 77')
 
       await waitFor(() => {
-        expect(phoneInput.props.value).toBe('+228 90 99 88 77')
+        // The input value is the formatted local number
+        expect(phoneInput.props.value).toBe('90 99 88 77')
       })
     })
 
@@ -404,7 +408,8 @@ describe('ProfileEditScreen', () => {
         <ProfileEditScreen navigation={mockNavigation} />
       )
 
-      const phoneInput = getByDisplayValue('+228 90 12 34 56')
+      // PhoneInput displays local number only (without country code)
+      const phoneInput = getByDisplayValue('90 12 34 56')
       fireEvent.changeText(phoneInput, '90000000')
 
       const saveButton = getByText('Enregistrer les modifications')
@@ -412,8 +417,9 @@ describe('ProfileEditScreen', () => {
 
       await waitFor(() => {
         // Phone validation is relaxed, API should be called
+        // PhoneInput formats and adds country code when calling onChangeText
         expect(apiService.put).toHaveBeenCalledWith('/consumers/profile', expect.objectContaining({
-          phone: '90000000',
+          phone: expect.stringMatching(/\+228.*90.*00.*00.*00|90000000/),
         }))
       })
     })

@@ -150,7 +150,7 @@ const mockAnalyticsResponseDataSafe = {
     },
     {
       merchant_id: 2,
-      merchant_name: 'EEpicerie Durand',
+      merchant_name: 'Epicerie Durand',
       reservations_count: 15,
       revenue: 40000,
       average_order_value: 2666.67,
@@ -426,7 +426,7 @@ test('should display merchant list in merchants tab', async () => {
 
     await waitFor(() => {
       expect(getByText('Boulangerie Martin')).toBeTruthy()
-      expect(getByText('EEpicerie Durand')).toBeTruthy()
+      expect(getByText('Epicerie Durand')).toBeTruthy()
       expect(getByText('Marche Bio')).toBeTruthy()
     })
   })

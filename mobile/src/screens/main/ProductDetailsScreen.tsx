@@ -70,7 +70,10 @@ const ProductDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
           }
         }
       } catch (error) {
-        // Silently fail - distance just won't be shown
+        // BUG FIX #10: Log location errors in dev mode instead of silent swallowing
+        if (__DEV__) {
+          console.debug('[ProductDetailsScreen] Location load error:', error)
+        }
       }
     }
     loadLocation()

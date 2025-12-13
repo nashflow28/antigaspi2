@@ -3,6 +3,9 @@
  * Évite la saturation d'AsyncStorage en supprimant les entrées les plus anciennes
  */
 import AsyncStorage from '@react-native-async-storage/async-storage'
+import { createLogger } from './logger'
+
+const cacheLogger = createLogger('Cache')
 
 /**
  * Configuration du cache manager
@@ -44,7 +47,7 @@ class CacheManager {
       const metadataStr = await AsyncStorage.getItem(METADATA_KEY)
       return metadataStr ? JSON.parse(metadataStr) : {}
     } catch (error) {
-      console.error('Error reading cache metadata:', error)
+      cacheLogger.error('Error reading cache metadata:', error)
       return {}
     }
   }
@@ -56,7 +59,7 @@ class CacheManager {
     try {
       await AsyncStorage.setItem(METADATA_KEY, JSON.stringify(metadata))
     } catch (error) {
-      console.error('Error saving cache metadata:', error)
+      cacheLogger.error('Error saving cache metadata:', error)
     }
   }
 
@@ -99,14 +102,14 @@ class CacheManager {
       try {
         await AsyncStorage.removeItem(key)
         delete metadata[key]
-        console.log(`[CacheManager] Evicted LRU entry: ${key} (freed ${metadata[key]?.size || 0} bytes)`)
+        cacheLogger.log(`Evicted LRU entry: ${key} (freed ${metadata[key]?.size || 0} bytes)`)
       } catch (error) {
-        console.error(`Error removing cache entry ${key}:`, error)
+        cacheLogger.error(`Error removing cache entry ${key}:`, error)
       }
     }
 
     await this.saveMetadata(metadata)
-    console.log(`[CacheManager] LRU eviction complete. Freed ${freedSpace} bytes (${keysToRemove.length} entries)`)
+    cacheLogger.log(`LRU eviction complete. Freed ${freedSpace} bytes (${keysToRemove.length} entries)`)
   }
 
   /**
@@ -119,8 +122,8 @@ class CacheManager {
 
     if (totalAfterAdd > this.config.maxSizeBytes) {
       const requiredSpace = totalAfterAdd - this.config.maxSizeBytes
-      console.warn(
-        `[CacheManager] Cache size limit exceeded. Current: ${this.formatSize(currentSize)}, ` +
+      cacheLogger.warn(
+        `Cache size limit exceeded. Current: ${this.formatSize(currentSize)}, ` +
           `After add: ${this.formatSize(totalAfterAdd)}, ` +
           `Max: ${this.formatSize(this.config.maxSizeBytes)}. ` +
           `Evicting ${this.formatSize(requiredSpace)}...`
@@ -129,8 +132,8 @@ class CacheManager {
     } else {
       const usagePercent = (totalAfterAdd / this.config.maxSizeBytes) * 100
       if (usagePercent >= this.config.warningThresholdPercent) {
-        console.warn(
-          `[CacheManager] Cache usage at ${usagePercent.toFixed(1)}% ` +
+        cacheLogger.warn(
+          `Cache usage at ${usagePercent.toFixed(1)}% ` +
             `(${this.formatSize(totalAfterAdd)} / ${this.formatSize(this.config.maxSizeBytes)})`
         )
       }
@@ -244,7 +247,7 @@ class CacheManager {
     }
 
     await AsyncStorage.removeItem(METADATA_KEY)
-    console.log(`[CacheManager] Cleared ${keys.length} cache entries`)
+    cacheLogger.log(`Cleared ${keys.length} cache entries`)
   }
 
   /**

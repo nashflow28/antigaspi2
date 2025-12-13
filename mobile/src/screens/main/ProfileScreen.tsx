@@ -17,6 +17,7 @@ import { Card, Badge, Typography } from '../../components/2025'
 import { useTheme } from '../../theme'
 import { useAlert } from '../../contexts/AlertContext'
 import AsyncStorage from '@react-native-async-storage/async-storage'
+import { secureStorage } from '../../services/secureStorage'
 import { TEST_IDS } from '../../utils/testIds'
 import { getImageUrl } from '../../utils/imageHelpers'
 
@@ -53,8 +54,14 @@ const ProfileScreen: React.FC = () => {
   const confirmLogout = async () => {
     console.log('🔴 Confirmation déconnexion')
     try {
-      // Supprimer seulement les données d'authentification (pas les préférences utilisateur)
-      await AsyncStorage.multiRemove(['auth_token', 'user_data', 'cart_data'])
+      // BUG FIX #12: Use secureStorage for sensitive data removal
+      // Remove sensitive auth data securely
+      await Promise.all([
+        secureStorage.removeToken(),
+        secureStorage.removeUserData(),
+      ])
+      // Remove non-sensitive cart data from AsyncStorage
+      await AsyncStorage.removeItem('cart_data')
       // Déconnexion
       await dispatch(logoutUser())
       console.log('✅ Déconnexion réussie')

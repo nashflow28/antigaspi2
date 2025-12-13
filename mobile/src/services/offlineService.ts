@@ -6,6 +6,10 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import NetInfo from '@react-native-community/netinfo';
 import apiService from './api';
 import cacheManager from '../utils/cacheManager';
+import { captureException, addBreadcrumb } from '../utils/sentryInit';
+import { createLogger } from '../utils/logger';
+
+const offlineLogger = createLogger('Offline');
 
 export interface CacheConfig {
   key: string;
@@ -88,7 +92,13 @@ class OfflineService {
     const wasOffline = !this.isOnline;
     this.isOnline = isConnected;
 
-    console.log(`Connectivité: ${isConnected ? 'En ligne' : 'Hors ligne'}`);
+    // Track connectivity changes for debugging
+    addBreadcrumb({
+      category: 'connectivity',
+      message: `Network ${isConnected ? 'connected' : 'disconnected'}`,
+      level: isConnected ? 'info' : 'warning',
+      data: { wasOffline, queueLength: this.syncQueue.length },
+    });
 
     // Émettre un événement de changement
     this.emit('connectivity-change', isConnected);
@@ -141,7 +151,7 @@ class OfflineService {
       // Aussi sauvegarder l'index pour le nettoyage
       await this.updateCacheIndex(storageKey, ttl);
     } catch (error) {
-      console.error('Erreur lors de la mise en cache:', error);
+      offlineLogger.error('Erreur lors de la mise en cache:', error);
     }
   }
 
@@ -181,7 +191,7 @@ class OfflineService {
 
       return cacheEntry.data;
     } catch (error) {
-      console.error('Erreur lors de la récupération du cache:', error);
+      offlineLogger.error('Erreur lors de la récupération du cache:', error);
       return null;
     }
   }
@@ -202,7 +212,7 @@ class OfflineService {
 
       await this.removeCacheFromIndex(storageKey);
     } catch (error) {
-      console.error('Erreur lors de la suppression du cache:', error);
+      offlineLogger.error('Erreur lors de la suppression du cache:', error);
     }
   }
 
@@ -219,7 +229,7 @@ class OfflineService {
       }
       await AsyncStorage.removeItem('cache_index');
     } catch (error) {
-      console.error('Erreur lors de l\'effacement du cache:', error);
+      offlineLogger.error('Erreur lors de l\'effacement du cache:', error);
     }
   }
 
@@ -245,7 +255,7 @@ class OfflineService {
 
       await AsyncStorage.setItem('cache_index', JSON.stringify(updatedIndex));
     } catch (error) {
-      console.error('Erreur lors du nettoyage du cache:', error);
+      offlineLogger.error('Erreur lors du nettoyage du cache:', error);
     }
   }
 
@@ -259,7 +269,7 @@ class OfflineService {
       index[key] = Date.now() + (ttlMinutes * 60 * 1000);
       await AsyncStorage.setItem('cache_index', JSON.stringify(index));
     } catch (error) {
-      console.error('Erreur lors de la mise à jour de l\'index:', error);
+      offlineLogger.error('Erreur lors de la mise à jour de l\'index:', error);
     }
   }
 
@@ -275,7 +285,7 @@ class OfflineService {
       delete index[key];
       await AsyncStorage.setItem('cache_index', JSON.stringify(index));
     } catch (error) {
-      console.error('Erreur lors de la suppression de l\'index:', error);
+      offlineLogger.error('Erreur lors de la suppression de l\'index:', error);
     }
   }
 
@@ -305,7 +315,7 @@ class OfflineService {
       try {
         await this.checkConnectivity();
       } catch (error) {
-        console.error('Erreur lors de la vérification de connectivité:', error);
+        offlineLogger.error('Erreur lors de la vérification de connectivité:', error);
         this.isOnline = false;
       }
     }
@@ -344,7 +354,7 @@ class OfflineService {
             processed: index + 1,
           });
         } catch (error) {
-          console.error('Erreur lors de la synchronisation:', error);
+          captureException(error, { context: 'offline_sync', item: item.id, endpoint: item.endpoint });
           item.retries++;
 
           if (item.retries < 3) {
@@ -387,7 +397,7 @@ class OfflineService {
         await apiService.cancelReservation(item.data.reservationId);
         break;
       default:
-        console.warn('Action de synchronisation inconnue:', action);
+        offlineLogger.warn('Action de synchronisation inconnue:', action);
         break;
     }
   }
@@ -400,7 +410,7 @@ class OfflineService {
       const queueStr = await AsyncStorage.getItem('sync_queue');
       this.syncQueue = queueStr ? JSON.parse(queueStr) : [];
     } catch (error) {
-      console.error('Erreur lors du chargement de la queue:', error);
+      offlineLogger.error('Erreur lors du chargement de la queue:', error);
       this.syncQueue = [];
     }
   }
@@ -419,7 +429,7 @@ class OfflineService {
     try {
       await AsyncStorage.setItem('sync_queue', JSON.stringify(this.syncQueue));
     } catch (error) {
-      console.error('Erreur lors de la sauvegarde de la queue:', error);
+      offlineLogger.error('Erreur lors de la sauvegarde de la queue:', error);
     }
   }
 
@@ -447,7 +457,10 @@ class OfflineService {
               oldestTimestamp = entry.timestamp;
             }
           } catch (e) {
-            // Ignorer les erreurs de parsing
+            // BUG FIX #10: Log parsing errors in dev mode instead of silent swallowing
+            if (__DEV__) {
+              offlineLogger.debug('Cache entry parsing error:', e)
+            }
           }
         }
       }
@@ -458,7 +471,7 @@ class OfflineService {
         oldestItem: oldestTimestamp,
       };
     } catch (error) {
-      console.error('Erreur lors de l\'obtention des stats:', error);
+      offlineLogger.error('Erreur lors de l\'obtention des stats:', error);
       return {
         itemCount: 0,
         totalSize: 0,

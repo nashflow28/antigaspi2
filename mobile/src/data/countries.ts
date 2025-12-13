@@ -170,9 +170,74 @@ export function parsePhoneNumber(fullPhone: string): { country: Country | undefi
 
 /**
  * Validate phone number length for country
+ * BUG FIX #11: Improved validation with stricter rules
  */
 export function isValidPhoneLength(phone: string, country: Country): boolean {
   const digits = getRawPhoneNumber(phone)
   const expectedLength = country.format.split('#').length - 1
-  return digits.length >= expectedLength - 2 && digits.length <= expectedLength + 2
+
+  // BUG FIX #11: Stricter validation - only allow ±1 digit tolerance
+  // This prevents accepting clearly invalid numbers
+  return digits.length >= expectedLength - 1 && digits.length <= expectedLength + 1
+}
+
+/**
+ * BUG FIX #11: Comprehensive phone number validation
+ * Returns { valid: boolean, error?: string }
+ */
+export interface PhoneValidationResult {
+  valid: boolean
+  error?: string
+}
+
+export function validatePhoneNumber(phone: string, country: Country): PhoneValidationResult {
+  // Check for empty input
+  if (!phone || phone.trim() === '') {
+    return { valid: false, error: 'Le numéro de téléphone est requis' }
+  }
+
+  const digits = getRawPhoneNumber(phone)
+
+  // Check minimum length (at least 6 digits for any phone number)
+  if (digits.length < 6) {
+    return { valid: false, error: 'Le numéro doit contenir au moins 6 chiffres' }
+  }
+
+  // Check maximum length (no phone number should exceed 15 digits per ITU-T E.164)
+  if (digits.length > 15) {
+    return { valid: false, error: 'Le numéro ne peut pas dépasser 15 chiffres' }
+  }
+
+  // Check for invalid characters (only digits, spaces, dashes, parentheses allowed)
+  const cleanedForFormat = phone.replace(/[\d\s\-\(\)+]/g, '')
+  if (cleanedForFormat.length > 0) {
+    return { valid: false, error: 'Le numéro contient des caractères invalides' }
+  }
+
+  // Check expected length for the country
+  const expectedLength = country.format.split('#').length - 1
+
+  if (digits.length < expectedLength - 1) {
+    return {
+      valid: false,
+      error: `Le numéro est trop court pour ${country.name} (${expectedLength} chiffres attendus)`
+    }
+  }
+
+  if (digits.length > expectedLength + 1) {
+    return {
+      valid: false,
+      error: `Le numéro est trop long pour ${country.name} (${expectedLength} chiffres attendus)`
+    }
+  }
+
+  // All checks passed
+  return { valid: true }
+}
+
+/**
+ * BUG FIX #11: Quick validation check (boolean only)
+ */
+export function isValidPhoneNumber(phone: string, country: Country): boolean {
+  return validatePhoneNumber(phone, country).valid
 }

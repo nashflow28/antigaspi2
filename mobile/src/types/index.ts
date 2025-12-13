@@ -364,6 +364,14 @@ export interface ConversationListResponse {
 export interface ConversationDetailResponse {
   conversation: Conversation
   messages: ConversationMessage[]
+  // BUG FIX #13: Pagination metadata
+  pagination?: {
+    current_page: number
+    per_page: number
+    total: number
+    last_page: number
+    has_more_pages: boolean
+  }
 }
 
 export interface ConversationMessageResponse {

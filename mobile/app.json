@@ -74,12 +74,20 @@
           }
         }
       ],
+      [
+        "@sentry/react-native/expo",
+        {
+          "organization": "antigaspi",
+          "project": "antigaspi-mobile"
+        }
+      ],
       "expo-localization",
       "expo-secure-store"
     ],
     "extra": {
       "apiUrl": "https://antigaspi.jubtek.com/api",
       "testMode": false,
+      "sentryDsn": "",
       "eas": {
         "projectId": "3b3263bb-77cd-4547-a421-1bf2fa8530c6"
       }

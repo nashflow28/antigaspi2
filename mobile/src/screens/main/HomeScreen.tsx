@@ -98,7 +98,8 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
     setRefreshing(false)
   }
 
-  const getTimeSlot = (product: Product) => {
+  // ⚡ BUG FIX #8: Memoize getTimeSlot to prevent recreation on every render
+  const getTimeSlot = useCallback((product: Product) => {
     const today = new Date()
     const expiryDate = new Date(product.expiration_date)
     const diffDays = Math.ceil((expiryDate.getTime() - today.getTime()) / (1000 * 3600 * 24))
@@ -110,7 +111,7 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
     } else {
       return { text: `Dans ${diffDays} jours`, color: theme.colors.neutral[500] }
     }
-  }
+  }, [theme.colors.primary, theme.colors.success, theme.colors.neutral])
 
   // ⚡ PERFORMANCE FIX: Memoize filtered products to avoid recalculation on every render
   const filteredProducts = useMemo(() => {
@@ -180,6 +181,8 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
     return (
       <TouchableOpacity
         key={id}
+        testID={`category-tab-${id}`}
+        accessibilityLabel={name}
         style={[
           styles.categoryItem,
           isActive && styles.categoryItemActive,
@@ -264,7 +267,11 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
     setShowDistanceModal(false)
   }
 
-  const renderProductCard = (product: Product, index?: number) => {
+  // ⚡ PERFORMANCE FIX: Memoize styles to avoid recreation on every render
+  const styles = useMemo(() => createStyles(theme), [theme])
+
+  // ⚡ BUG FIX #8: Memoize renderProductCard to prevent memory leak from recreation on every render
+  const renderProductCard = useCallback((product: Product, index?: number) => {
     const timeSlot = getTimeSlot(product)
     // BUG FIX #M-004: Prices are now normalized as numbers in productsSlice
     const discountedPrice = Math.round(product.discounted_price || 0)
@@ -379,10 +386,7 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
         </Card>
       </TouchableOpacity>
     )
-  }
-
-  // ⚡ PERFORMANCE FIX: Memoize styles to avoid recreation on every render
-  const styles = useMemo(() => createStyles(theme), [theme])
+  }, [getTimeSlot, userLocation, navigation, theme, styles])
 
   return (
     <View style={styles.container} testID={TEST_IDS.homeScreen}>

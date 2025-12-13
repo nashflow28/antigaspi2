@@ -13,6 +13,19 @@ import {
 
 import messagingService from '../../../services/messagingService'
 
+// Mock the WebSocket hook to avoid connection attempts in tests
+jest.mock('../../../hooks/useWebSocket', () => ({
+  __esModule: true,
+  default: () => ({
+    isConnected: false,
+    connect: jest.fn(),
+    disconnect: jest.fn(),
+    joinConversation: jest.fn(),
+    leaveConversation: jest.fn(),
+    sendTypingIndicator: jest.fn(),
+  }),
+}))
+
 jest.mock('../../../services/messagingService', () => ({
   ensureConversation: jest.fn(),
   sendMessage: jest.fn(),
@@ -47,6 +60,19 @@ describe('MerchantMessagingScreen', () => {
         user: createTestUser({ id: 1, role: 'consumer' }),
         token: 'token',
         isAuthenticated: true,
+      },
+      messaging: {
+        conversations: [],
+        activeConversationId: null,
+        messages: {},
+        typingUsers: {},
+        onlineUserIds: [],
+        unreadCount: 0,
+        loading: false,
+        conversationsLoading: false,
+        messagesLoading: false,
+        sendingMessage: false,
+        error: null,
       },
     })
 
@@ -137,7 +163,12 @@ describe('MerchantMessagingScreen', () => {
       { store: buildStore() }
     )
 
-    const input = await waitFor(() => getByPlaceholderText('Écrivez votre message…'))
+    // Wait for initial load
+    await waitFor(() => {
+      expect(getByPlaceholderText('Écrivez votre message...')).toBeTruthy()
+    })
+
+    const input = getByPlaceholderText('Écrivez votre message...')
     fireEvent.changeText(input, 'Pouvez-vous confirmer ma réservation ?')
 
     const sendButton = getByText('Envoyer')
@@ -151,5 +182,67 @@ describe('MerchantMessagingScreen', () => {
     })
 
     expect(await findByText('Pouvez-vous confirmer ma réservation ?')).toBeTruthy()
+  })
+
+  it('affiche l\'état vide quand pas de messages', async () => {
+    const conversation = createTestConversation({ id: 30, messages_count: 0 })
+
+    messagingService.ensureConversation.mockResolvedValue({
+      success: true,
+      data: {
+        conversation,
+        messages: [],
+      },
+    })
+
+    const { findByText } = renderWithProviders(
+      <MerchantMessagingScreen route={defaultRoute} navigation={navigation} />,
+      { store: buildStore() }
+    )
+
+    expect(await findByText('Démarrez la conversation')).toBeTruthy()
+  })
+
+  it('affiche le titre du commerçant depuis les params de route', async () => {
+    const conversation = createTestConversation({ id: 40 })
+
+    messagingService.ensureConversation.mockResolvedValue({
+      success: true,
+      data: {
+        conversation,
+        messages: [],
+      },
+    })
+
+    const { findByText } = renderWithProviders(
+      <MerchantMessagingScreen route={defaultRoute} navigation={navigation} />,
+      { store: buildStore() }
+    )
+
+    expect(await findByText('Boulangerie Martin')).toBeTruthy()
+  })
+
+  it('navigue en arrière quand on appuie sur le bouton retour', async () => {
+    const conversation = createTestConversation({ id: 50 })
+
+    messagingService.ensureConversation.mockResolvedValue({
+      success: true,
+      data: {
+        conversation,
+        messages: [],
+      },
+    })
+
+    const { findAllByRole } = renderWithProviders(
+      <MerchantMessagingScreen route={defaultRoute} navigation={navigation} />,
+      { store: buildStore() }
+    )
+
+    // First button is the back button in the header
+    const buttons = await findAllByRole('button')
+    const backButton = buttons[0]
+    fireEvent.press(backButton)
+
+    expect(navigation.goBack).toHaveBeenCalled()
   })
 })

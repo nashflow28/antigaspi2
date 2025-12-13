@@ -9,6 +9,7 @@ import { reviewsReducer } from './slices/reviewsSlice'
 import { cartReducer } from './slices/cartSlice'
 import { surpriseBasketsReducer } from './slices/surpriseBasketsSlice'
 import { walletReducer } from './slices/walletSlice'
+import { messagingReducer } from './slices/messagingSlice'
 
 export const store = configureStore({
   reducer: {
@@ -22,6 +23,7 @@ export const store = configureStore({
     reviews: reviewsReducer,
     cart: cartReducer,
     wallet: walletReducer,
+    messaging: messagingReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

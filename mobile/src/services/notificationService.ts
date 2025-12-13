@@ -12,6 +12,10 @@ import { designSystem2025 } from '../theme/designSystem2025';
 import { getExpoExtraValue } from '../utils/expoConfig';
 // BUG FIX #C-006: Use SecureStore for sensitive authentication data
 import { secureStorage } from './secureStorage';
+import { captureException, addBreadcrumb } from '../utils/sentryInit';
+import { createLogger } from '../utils/logger';
+
+const notificationLogger = createLogger('Notification');
 
 // Configuration dynamique de l'API via app.json
 const getApiBaseUrl = (): string => {
@@ -135,7 +139,7 @@ class NotificationService {
     this.initializationPromise = (async () => {
       try {
         if (!Device.isDevice) {
-          console.log('Les notifications push ne fonctionnent que sur un appareil physique');
+          notificationLogger.log('Les notifications push ne fonctionnent que sur un appareil physique');
           this.initialized = true;
           return;
         }
@@ -143,7 +147,7 @@ class NotificationService {
         const permissionGranted = await this.requestPermissions();
 
         if (!permissionGranted) {
-          console.log('Permissions de notification refusées');
+          notificationLogger.log('Permissions de notification refusées');
           this.initialized = true;
           return;
         }
@@ -159,9 +163,14 @@ class NotificationService {
         await this.loadPreferences();
 
         this.initialized = true;
-        console.log('Service de notifications initialisé avec succès');
+        addBreadcrumb({
+          category: 'notifications',
+          message: 'Push notifications initialized',
+          level: 'info',
+          data: { hasToken: !!this.pushToken },
+        });
       } catch (error) {
-        console.error('Erreur lors de l\'initialisation des notifications:', error);
+        captureException(error, { context: 'notification_init' });
         throw error;
       } finally {
         this.initializationPromise = null;
@@ -247,7 +256,7 @@ class NotificationService {
                        Constants.easConfig?.projectId;
 
       if (!projectId) {
-        console.log('Project ID non trouvé');
+        notificationLogger.log('Project ID non trouvé');
         return null;
       }
 
@@ -257,30 +266,23 @@ class NotificationService {
 
       return token.data;
     } catch (error) {
-      console.error('Erreur lors de l\'obtention du token:', error);
+      notificationLogger.error('Erreur lors de l\'obtention du token:', error);
       return null;
     }
   }
 
   private async registerTokenIfNeeded(token: string): Promise<void> {
-    const [storedToken, storedOwner, userDataRaw] = await Promise.all([
+    // BUG FIX #12: Use secureStorage for user_data instead of AsyncStorage
+    const [storedToken, storedOwner, userData] = await Promise.all([
       AsyncStorage.getItem('push_token'),
       AsyncStorage.getItem('push_token_user'),
-      AsyncStorage.getItem('user_data'),
+      secureStorage.getUserData<{ id?: number | string }>(),
     ]);
 
     let currentUserId: string | undefined;
 
-    if (userDataRaw) {
-      try {
-        const parsed = JSON.parse(userDataRaw);
-
-        if (parsed?.id !== undefined && parsed?.id !== null) {
-          currentUserId = String(parsed.id);
-        }
-      } catch (error) {
-        console.error('Impossible de lire les données utilisateur pour les notifications push:', error);
-      }
+    if (userData?.id !== undefined && userData?.id !== null) {
+      currentUserId = String(userData.id);
     }
 
     if (storedToken === token && storedOwner && currentUserId && storedOwner === currentUserId) {
@@ -310,8 +312,14 @@ class NotificationService {
       } else {
         await AsyncStorage.removeItem('push_token_user');
       }
+
+      addBreadcrumb({
+        category: 'notifications',
+        message: 'Push token registered with backend',
+        level: 'info',
+      });
     } catch (error) {
-      console.error('Erreur lors de l\'enregistrement du token:', error);
+      captureException(error, { context: 'push_token_registration' });
       throw error;
     }
   }
@@ -328,13 +336,13 @@ class NotificationService {
 
     // Listener pour les notifications reçues quand l'app est ouverte
     Notifications.addNotificationReceivedListener(notification => {
-      console.log('Notification reçue:', notification);
+      notificationLogger.log('Notification reçue:', notification);
       this.handleNotificationReceived(notification);
     });
 
     // Listener pour les interactions avec les notifications
     Notifications.addNotificationResponseReceivedListener(response => {
-      console.log('Interaction avec notification:', response);
+      notificationLogger.log('Interaction avec notification:', response);
       this.handleNotificationResponse(response);
     });
   }
@@ -520,7 +528,7 @@ class NotificationService {
       await this.persistLegacyPreferences(normalized);
       return normalized;
     } catch (error) {
-      console.warn('Impossible de synchroniser les préférences de notification distantes:', error);
+      notificationLogger.warn('Impossible de synchroniser les préférences de notification distantes:', error);
 
       const cached = await this.getCachedLegacyPreferences();
       if (cached) {
@@ -552,7 +560,7 @@ class NotificationService {
       await this.persistLegacyPreferences(normalized);
       return normalized;
     } catch (error) {
-      console.error('Erreur lors de la sauvegarde des préférences:', error);
+      notificationLogger.error('Erreur lors de la sauvegarde des préférences:', error);
       throw this.toError(error, "Impossible de sauvegarder vos préférences pour le moment.");
     }
   }
@@ -584,7 +592,7 @@ class NotificationService {
         JSON.stringify(preferences)
       );
     } catch (error) {
-      console.warn('Impossible de mettre en cache les préférences de notification:', error);
+      notificationLogger.warn('Impossible de mettre en cache les préférences de notification:', error);
     }
   }
 
@@ -605,7 +613,7 @@ class NotificationService {
       this.cachedLegacyPreferences = normalized;
       return normalized;
     } catch (error) {
-      console.warn('Impossible de charger les préférences de notification en cache:', error);
+      notificationLogger.warn('Impossible de charger les préférences de notification en cache:', error);
       return null;
     }
   }
@@ -810,7 +818,7 @@ class NotificationService {
 
       return this.normalizeChannelPreferences(JSON.parse(cached));
     } catch (error) {
-      console.warn('Impossible de charger les préférences de notification en cache:', error);
+      notificationLogger.warn('Impossible de charger les préférences de notification en cache:', error);
       return null;
     }
   }
@@ -878,7 +886,7 @@ class NotificationService {
    */
   private handleNewProductNotification(data: any): void {
     // Logique spécifique pour les nouveaux produits
-    console.log('Nouveau produit:', data);
+    notificationLogger.log('Nouveau produit:', data);
   }
 
   /**
@@ -886,7 +894,7 @@ class NotificationService {
    */
   private handleReservationNotification(data: any): void {
     // Logique spécifique pour les réservations
-    console.log('Mise à jour réservation:', data);
+    notificationLogger.log('Mise à jour réservation:', data);
   }
 
   /**
@@ -894,7 +902,7 @@ class NotificationService {
    */
   private handlePromotionNotification(data: any): void {
     // Logique spécifique pour les promotions
-    console.log('Nouvelle promotion:', data);
+    notificationLogger.log('Nouvelle promotion:', data);
   }
 
   /**
@@ -902,7 +910,7 @@ class NotificationService {
    */
   private handleExpiringProductNotification(data: any): void {
     // Logique spécifique pour les produits expirant
-    console.log('Produit expirant:', data);
+    notificationLogger.log('Produit expirant:', data);
   }
 
   /**
@@ -950,7 +958,7 @@ class NotificationService {
       try {
         callback(data);
       } catch (error) {
-        console.error('Erreur lors du traitement de l\'événement de notification:', error);
+        notificationLogger.error('Erreur lors du traitement de l\'événement de notification:', error);
       }
     });
   }
@@ -974,7 +982,7 @@ class NotificationService {
     try {
       await this.registerTokenIfNeeded(tokenToValidate);
     } catch (error) {
-      console.error('Erreur lors de la synchronisation du token push:', error);
+      notificationLogger.error('Erreur lors de la synchronisation du token push:', error);
     }
   }
 }

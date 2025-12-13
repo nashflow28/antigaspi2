@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useMemo, useRef } from 'react'
 import {
   View,
   StyleSheet,
@@ -13,6 +13,7 @@ import { Ionicons } from '@expo/vector-icons'
 import DateTimePicker from '@react-native-community/datetimepicker'
 import { useTheme } from '../../theme'
 import { Typography, Card, Badge } from '../../components/2025'
+import { Pagination } from '../../components/admin'
 import RevenueChart from '../../components/admin/RevenueChart'
 import GeographicChart from '../../components/admin/GeographicChart'
 import ExportButton from '../../components/admin/ExportButton'
@@ -20,9 +21,12 @@ import apiService from '../../services/api'
 import { AdminAnalyticsData, AdminAnalyticsFilters } from '../../types'
 import { formatCurrency } from '../../utils/currencyHelpers'
 import { TEST_IDS } from '../../utils/testIds'
+import { useDebouncedEffect } from '../../hooks/useDebounce'
 
 type Period = '7d' | '30d' | '90d' | 'custom'
 type Tab = 'revenue' | 'geography' | 'merchants'
+
+const MERCHANTS_PER_PAGE = 10
 
 const AdminAnalyticsScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
   const theme = useTheme()
@@ -35,10 +39,29 @@ const AdminAnalyticsScreen: React.FC<{ navigation: any }> = ({ navigation }) => 
   const [showEndPicker, setShowEndPicker] = useState(false)
   const [startDate, setStartDate] = useState(new Date(Date.now() - 30 * 24 * 60 * 60 * 1000))
   const [endDate, setEndDate] = useState(new Date())
+  const [merchantPage, setMerchantPage] = useState(1)
 
-  useEffect(() => {
-    loadAnalytics()
-  }, [selectedPeriod, startDate, endDate])
+  // Paginated merchants data
+  const paginatedMerchants = useMemo(() => {
+    if (!data?.merchant_performance) return { items: [], totalPages: 0, total: 0 }
+
+    const total = data.merchant_performance.length
+    const totalPages = Math.ceil(total / MERCHANTS_PER_PAGE)
+    const startIndex = (merchantPage - 1) * MERCHANTS_PER_PAGE
+    const items = data.merchant_performance.slice(startIndex, startIndex + MERCHANTS_PER_PAGE)
+
+    return { items, totalPages, total }
+  }, [data?.merchant_performance, merchantPage])
+
+  // BUG FIX #15: Debounce API calls when dates change to prevent excessive requests
+  // When user changes both start and end dates quickly, this prevents multiple API calls
+  useDebouncedEffect(
+    () => {
+      loadAnalytics()
+    },
+    [selectedPeriod, startDate, endDate],
+    selectedPeriod === 'custom' ? 800 : 0 // Only debounce for custom date ranges
+  )
 
   const loadAnalytics = async () => {
     try {
@@ -355,44 +378,58 @@ const AdminAnalyticsScreen: React.FC<{ navigation: any }> = ({ navigation }) => 
                   <Typography variant="h4" weight="semibold" style={{ marginBottom: 16 }}>
                     Performance des commerçants
                   </Typography>
-                  {data.merchant_performance.slice(0, 10).map((merchant, index) => (
-                    <View key={merchant.merchant_id} style={styles.merchantRow}>
-                      <View style={styles.merchantInfo}>
-                        <Badge variant="primary" size="sm" style={{ marginRight: 12 }}>
-                          #{index + 1}
-                        </Badge>
-                        <View style={{ flex: 1 }}>
-                          <Typography variant="body" weight="semibold" numberOfLines={1}>
-                            {merchant.merchant_name}
+                  {paginatedMerchants.items.map((merchant, index) => {
+                    const globalIndex = (merchantPage - 1) * MERCHANTS_PER_PAGE + index
+                    return (
+                      <View key={merchant.merchant_id} style={styles.merchantRow}>
+                        <View style={styles.merchantInfo}>
+                          <Badge variant="primary" size="sm" style={{ marginRight: 12 }}>
+                            #{globalIndex + 1}
+                          </Badge>
+                          <View style={{ flex: 1 }}>
+                            <Typography variant="body" weight="semibold" numberOfLines={1}>
+                              {merchant.merchant_name}
+                            </Typography>
+                            <Typography variant="caption" color="secondary">
+                              {merchant.reservations_count} réservations
+                            </Typography>
+                          </View>
+                        </View>
+                        <View style={{ alignItems: 'flex-end' }}>
+                          <Typography variant="body" weight="semibold">
+                            {formatCurrency(merchant.revenue)}
                           </Typography>
-                          <Typography variant="caption" color="secondary">
-                            {merchant.reservations_count} réservations
-                          </Typography>
+                          <View style={styles.growthBadge}>
+                            <Ionicons
+                              name={merchant.growth_rate >= 0 ? 'arrow-up' : 'arrow-down'}
+                              size={12}
+                              color={merchant.growth_rate >= 0 ? theme.colors.semantic.success : theme.colors.semantic.error}
+                            />
+                            <Typography
+                              variant="caption"
+                              style={{
+                                color: merchant.growth_rate >= 0 ? theme.colors.semantic.success : theme.colors.semantic.error,
+                                marginLeft: 2,
+                              }}
+                            >
+                              {merchant.growth_rate >= 0 ? '+' : ''}{merchant.growth_rate.toFixed(1)}%
+                            </Typography>
+                          </View>
                         </View>
                       </View>
-                      <View style={{ alignItems: 'flex-end' }}>
-                        <Typography variant="body" weight="semibold">
-                          {formatCurrency(merchant.revenue)}
-                        </Typography>
-                        <View style={styles.growthBadge}>
-                          <Ionicons
-                            name={merchant.growth_rate >= 0 ? 'arrow-up' : 'arrow-down'}
-                            size={12}
-                            color={merchant.growth_rate >= 0 ? theme.colors.semantic.success : theme.colors.semantic.error}
-                          />
-                          <Typography
-                            variant="caption"
-                            style={{
-                              color: merchant.growth_rate >= 0 ? theme.colors.semantic.success : theme.colors.semantic.error,
-                              marginLeft: 2,
-                            }}
-                          >
-                            {merchant.growth_rate >= 0 ? '+' : ''}{merchant.growth_rate.toFixed(1)}%
-                          </Typography>
-                        </View>
-                      </View>
-                    </View>
-                  ))}
+                    )
+                  })}
+
+                  {/* Pagination */}
+                  <Pagination
+                    currentPage={merchantPage}
+                    totalPages={paginatedMerchants.totalPages}
+                    totalItems={paginatedMerchants.total}
+                    itemsPerPage={MERCHANTS_PER_PAGE}
+                    onPageChange={setMerchantPage}
+                    loading={loading}
+                    testID={TEST_IDS.adminMerchantsPagination}
+                  />
                 </View>
               )}
             </Card>

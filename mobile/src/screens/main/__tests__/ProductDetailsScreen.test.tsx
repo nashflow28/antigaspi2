@@ -217,13 +217,13 @@ describe('ProductDetailsScreen', () => {
 
   it('shows loading state while fetching', () => {
     const navigation = createMockNavigation()
-    const { getByText, getByTestId } = renderScreen({
+    const { getByTestId } = renderScreen({
       productInStore: false,
       loading: true,
       navigation,
     })
 
+    // ProductDetailsScreen uses a skeleton loader, not text
     expect(getByTestId(TEST_IDS.loadingSpinner)).toBeTruthy()
-    expect(getByText('Chargement...')).toBeTruthy()
   })
 })

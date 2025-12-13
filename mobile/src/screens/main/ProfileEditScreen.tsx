@@ -25,6 +25,7 @@ import { refreshProfile } from '../../store/slices/authSlice'
 import { getImageUrl } from '../../utils/imageHelpers'
 import { usePersistedForm } from '../../hooks/usePersistedForm'
 import PhoneInput from '../../components/PhoneInput'
+import { parsePhoneNumber, validatePhoneNumber } from '../../data/countries'
 
 interface ProfileFormData {
   first_name: string
@@ -301,16 +302,21 @@ const ProfileEditScreen: React.FC<ProfileEditScreenProps> = ({ navigation: navig
       return
     }
 
-    // Validation téléphone désactivée temporairement
-    // Le backend accepte maintenant tout format (max 20 caractères)
-    // if (sanitizedData.phone && !PHONE_REGEX.test(sanitizedData.phone)) {
-    //   Alert.alert(
-    //     'Erreur',
-    //     'Format de téléphone invalide. Utilisez le format: +XXX XX XX XX XX\n' +
-    //     'Indicatifs acceptés: +221 (Sénégal), +223 (Mali), +225 (Côte d\'Ivoire), +226 (Burkina Faso), +227 (Niger), +228 (Togo), +229 (Bénin)'
-    //   )
-    //   return
-    // }
+    // BUG FIX #11: Re-enabled phone validation with improved comprehensive validator
+    if (sanitizedData.phone) {
+      const parsed = parsePhoneNumber(sanitizedData.phone)
+      if (parsed.country) {
+        const validationResult = validatePhoneNumber(parsed.localNumber, parsed.country)
+        if (!validationResult.valid) {
+          Alert.alert(
+            'Erreur',
+            validationResult.error || 'Numéro de téléphone invalide'
+          )
+          return
+        }
+      }
+      // Note: If country not detected, we allow it through (backend will validate)
+    }
 
     try {
       setIsSaving(true)

@@ -16,6 +16,7 @@ import { reviewsReducer, reviewsInitialState } from '../store/slices/reviewsSlic
 import { cartReducer, cartInitialState } from '../store/slices/cartSlice'
 import { surpriseBasketsReducer, surpriseBasketsInitialState } from '../store/slices/surpriseBasketsSlice'
 import { walletReducer, walletInitialState } from '../store/slices/walletSlice'
+import { messagingReducer, messagingInitialState } from '../store/slices/messagingSlice'
 
 const reducers = {
   auth: authReducer,
@@ -28,6 +29,7 @@ const reducers = {
   reviews: reviewsReducer,
   cart: cartReducer,
   wallet: walletReducer,
+  messaging: messagingReducer,
 }
 
 type ReducerKey = keyof typeof reducers
@@ -80,6 +82,7 @@ const buildDefaultState = (): StateFromReducers => ({
   reviews: clone(reviewsInitialState),
   cart: clone(cartInitialState),
   wallet: clone(walletInitialState),
+  messaging: clone(messagingInitialState),
 })
 
 export const createTestStore = (partialState: DeepPartial<RootState> = {}) => {

@@ -1,7 +1,27 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit'
 import { ReservationsState, Reservation, ReservationCreationPayload, ReservationCreationResponse } from '../../types'
 import apiService from '../../services/api'
+import { validateSchema, ReservationSchema } from '../../utils/schemaValidator'
 // NOTE: offlineService retiré - Service offline désactivé pour compatibilité web
+
+/**
+ * BUG FIX #16: Validate and normalize reservation data from backend
+ */
+const validateReservation = (reservation: Reservation): Reservation => {
+  if (__DEV__) {
+    const validation = validateSchema(reservation, ReservationSchema)
+    if (!validation.valid) {
+      console.warn(
+        `[Schema] Invalid reservation data (id: ${reservation?.id}):`,
+        validation.errors.map((e) => `${e.field}: ${e.message}`).join(', ')
+      )
+    }
+  }
+  return reservation
+}
+
+const validateReservations = (reservations: Reservation[]): Reservation[] =>
+  reservations.map(validateReservation)
 
 export const reservationsInitialState: ReservationsState = {
   reservations: [],
@@ -27,7 +47,8 @@ export const fetchMyReservations = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       const response = await apiService.getMyReservations()
-      return response.data
+      // BUG FIX #16: Validate backend data before processing
+      return validateReservations(response.data)
     } catch (error: any) {
       return rejectWithValue(error.message)
     }
@@ -39,7 +60,8 @@ export const fetchReservation = createAsyncThunk(
   async (id: number, { rejectWithValue }) => {
     try {
       const response = await apiService.getReservation(id)
-      return response.data
+      // BUG FIX #16: Validate backend data before processing
+      return validateReservation(response.data)
     } catch (error: any) {
       return rejectWithValue(error.message)
     }

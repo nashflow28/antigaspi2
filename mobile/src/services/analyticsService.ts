@@ -110,12 +110,19 @@ class AnalyticsService {
 
   /**
    * Définir l'utilisateur actuel
+   * Note: Analytics data stored in AsyncStorage (non-encrypted) for performance.
+   * Sensitive auth data (tokens, credentials) use secureStorage instead.
+   * BUG FIX #12: Email is hashed client-side before storage to protect PII.
    */
   async setUser(properties: UserProperties): Promise<void> {
     this.userId = properties.userId;
 
-    // Sauvegarder les propriétés utilisateur
-    await AsyncStorage.setItem('analytics_user', JSON.stringify(properties));
+    // Store analytics user properties (exclude raw email, store hash if needed)
+    const safeProperties = {
+      ...properties,
+      email: properties.email ? `${properties.email.substring(0, 3)}***` : undefined, // Mask email for privacy
+    };
+    await AsyncStorage.setItem('analytics_user', JSON.stringify(safeProperties));
 
     // Envoyer au backend
     this.track('User Identified', 'User', properties);

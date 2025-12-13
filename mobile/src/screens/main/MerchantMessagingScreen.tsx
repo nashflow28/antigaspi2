@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useState, useRef } from 'react'
 import {
   ActivityIndicator,
   Alert,
@@ -12,12 +12,25 @@ import {
   View,
 } from 'react-native'
 import { Ionicons } from '@expo/vector-icons'
-import { useSelector } from 'react-redux'
+import { useSelector, useDispatch } from 'react-redux'
 import { useTheme } from '../../theme'
-import messagingService from '../../services/messagingService'
-import type { Conversation, ConversationMessage } from '../../types'
-import type { RootState } from '../../store'
+import type { ConversationMessage } from '../../types'
+import type { RootState, AppDispatch } from '../../store'
 import { Button, Typography } from '../../components/2025'
+import useWebSocket from '../../hooks/useWebSocket'
+import {
+  ensureConversation,
+  sendMessage as sendMessageAction,
+  selectMessages,
+  selectTypingUsers,
+  selectIsUserOnline,
+  selectMessagingLoading,
+  selectSendingMessage,
+  selectMessagingError,
+  setActiveConversation,
+  clearError,
+} from '../../store/slices/messagingSlice'
+import { sanitizeMessage, sanitizeUsername } from '../../utils/textSanitizer'
 
 interface MerchantMessagingParams {
   merchantId?: number
@@ -25,27 +38,54 @@ interface MerchantMessagingParams {
   conversationId?: number
 }
 
-interface MerchantMessagingScreenProps {
-  route: { params: MerchantMessagingParams }
-  navigation: any
-}
-
 const MESSAGE_PAGE_SIZE = 50
+const TYPING_DEBOUNCE_MS = 1000
 
 const MerchantMessagingScreen = ({ route, navigation }: any) => {
   const { merchantId, merchantName, conversationId } = route?.params ?? {}
   const theme = useTheme()
-  const user = useSelector((state: RootState) => state.auth.user)
+  const dispatch = useDispatch<AppDispatch>()
   const themedStyles = useMemo(() => styles(theme), [theme])
 
-  const [activeConversationId, setActiveConversationId] = useState<number | null>(conversationId ?? null)
-  const [conversation, setConversation] = useState<Conversation | null>(null)
-  const [messages, setMessages] = useState<ConversationMessage[]>([])
-  const [loading, setLoading] = useState(true)
-  const [refreshing, setRefreshing] = useState(false)
-  const [sending, setSending] = useState(false)
+  // Redux state
+  const user = useSelector((state: RootState) => state.auth.user)
+  const conversation = useSelector((state: RootState) => {
+    const activeId = state.messaging.activeConversationId
+    return state.messaging.conversations.find(c => c.id === activeId) || null
+  })
+  const activeConversationId = useSelector((state: RootState) => state.messaging.activeConversationId)
+  const messages = useSelector((state: RootState) => selectMessages(activeConversationId || 0)(state))
+  const typingUserIds = useSelector((state: RootState) => selectTypingUsers(activeConversationId || 0)(state))
+  const loading = useSelector(selectMessagingLoading)
+  const sendingMessage = useSelector(selectSendingMessage)
+  const error = useSelector(selectMessagingError)
+
+  // Local state
   const [messageDraft, setMessageDraft] = useState('')
-  const [error, setError] = useState<string | null>(null)
+  const [refreshing, setRefreshing] = useState(false)
+  const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null)
+  const flatListRef = useRef<FlatList>(null)
+
+  // WebSocket hook
+  const { joinConversation, leaveConversation, sendTypingIndicator, isConnected } = useWebSocket()
+
+  // Check if merchant is online
+  const merchantUserId = conversation?.merchant?.id
+  const isMerchantOnline = useSelector((state: RootState) =>
+    merchantUserId ? selectIsUserOnline(merchantUserId)(state) : false
+  )
+
+  // Get typing user name
+  const typingUserName = useMemo(() => {
+    if (typingUserIds.length === 0) return null
+    if (conversation?.merchant && typingUserIds.includes(conversation.merchant.id)) {
+      return conversation.merchant.first_name || 'Le commerçant'
+    }
+    if (conversation?.consumer && typingUserIds.includes(conversation.consumer.id)) {
+      return conversation.consumer.first_name || "L'utilisateur"
+    }
+    return 'Quelqu\'un'
+  }, [typingUserIds, conversation])
 
   const resolvedTitle = useMemo(() => {
     if (merchantName) {
@@ -60,50 +100,77 @@ const MerchantMessagingScreen = ({ route, navigation }: any) => {
     return 'Discussion'
   }, [conversation?.merchant, merchantName])
 
-  const loadConversation = useCallback(
-    async (showLoader: boolean = true) => {
-      if (!merchantId && !conversationId && !activeConversationId) {
-        setError("Impossible de charger la conversation. Merci de réessayer depuis la fiche du commerçant.")
-        setLoading(false)
-        setRefreshing(false)
+  // Load conversation on mount
+  useEffect(() => {
+    const loadConversation = async () => {
+      if (!merchantId && !conversationId) {
         return
       }
 
       try {
-        setError(null)
-        if (showLoader) {
-          setLoading(true)
-        } else {
-          setRefreshing(true)
-        }
-
-        const response = await messagingService.ensureConversation({
-          conversationId: activeConversationId ?? conversationId ?? undefined,
-          merchantId,
-          perPage: MESSAGE_PAGE_SIZE,
-        })
-
-        setConversation(response.data.conversation)
-        setMessages(response.data.messages)
-        setActiveConversationId(response.data.conversation.id)
+        await dispatch(
+          ensureConversation({
+            conversationId: conversationId ?? undefined,
+            merchantId,
+            perPage: MESSAGE_PAGE_SIZE,
+          })
+        ).unwrap()
       } catch (err) {
-        const message = err instanceof Error ? err.message : 'Une erreur est survenue lors du chargement de la messagerie.'
-        setError(message)
-      } finally {
-        setLoading(false)
-        setRefreshing(false)
+        // Error is handled in Redux state
       }
-    },
-    [activeConversationId, conversationId, merchantId]
-  )
+    }
 
+    loadConversation()
+
+    // Cleanup on unmount
+    return () => {
+      dispatch(setActiveConversation(null))
+      dispatch(clearError())
+      // BUG FIX #14: Cleanup typing timeout on unmount to prevent memory leak
+      if (typingTimeoutRef.current) {
+        clearTimeout(typingTimeoutRef.current)
+        typingTimeoutRef.current = null
+      }
+    }
+  }, [dispatch, merchantId, conversationId])
+
+  // Join/leave conversation room for WebSocket updates
   useEffect(() => {
-    loadConversation(true)
-  }, [loadConversation])
+    if (activeConversationId && isConnected) {
+      joinConversation(activeConversationId)
+
+      return () => {
+        leaveConversation(activeConversationId)
+      }
+    }
+  }, [activeConversationId, isConnected, joinConversation, leaveConversation])
+
+  // Scroll to bottom when new messages arrive
+  useEffect(() => {
+    if (messages.length > 0 && flatListRef.current) {
+      setTimeout(() => {
+        flatListRef.current?.scrollToEnd({ animated: true })
+      }, 100)
+    }
+  }, [messages.length])
 
   const handleRefresh = useCallback(async () => {
-    await loadConversation(false)
-  }, [loadConversation])
+    if (!activeConversationId) return
+
+    setRefreshing(true)
+    try {
+      await dispatch(
+        ensureConversation({
+          conversationId: activeConversationId,
+          perPage: MESSAGE_PAGE_SIZE,
+        })
+      ).unwrap()
+    } catch {
+      // Error handled in Redux
+    } finally {
+      setRefreshing(false)
+    }
+  }, [dispatch, activeConversationId])
 
   const handleSendMessage = useCallback(async () => {
     const trimmedMessage = messageDraft.trim()
@@ -112,20 +179,47 @@ const MerchantMessagingScreen = ({ route, navigation }: any) => {
       return
     }
 
+    // Stop typing indicator
+    if (typingTimeoutRef.current) {
+      clearTimeout(typingTimeoutRef.current)
+      typingTimeoutRef.current = null
+    }
+    sendTypingIndicator(activeConversationId, false)
+
     try {
-      setSending(true)
-      const response = await messagingService.sendMessage(activeConversationId, trimmedMessage)
-      setConversation(response.data.conversation)
-      setMessages(prev => [...prev, response.data.message])
+      await dispatch(
+        sendMessageAction({
+          conversationId: activeConversationId,
+          content: trimmedMessage,
+        })
+      ).unwrap()
       setMessageDraft('')
     } catch (err) {
       const message = err instanceof Error ? err.message : "Impossible d'envoyer votre message."
-      setError(message)
       Alert.alert('Erreur', message)
-    } finally {
-      setSending(false)
     }
-  }, [activeConversationId, messageDraft])
+  }, [dispatch, activeConversationId, messageDraft, sendTypingIndicator])
+
+  const handleTextChange = useCallback(
+    (text: string) => {
+      setMessageDraft(text)
+
+      if (!activeConversationId) return
+
+      // Send typing indicator with debounce
+      sendTypingIndicator(activeConversationId, true)
+
+      if (typingTimeoutRef.current) {
+        clearTimeout(typingTimeoutRef.current)
+      }
+
+      typingTimeoutRef.current = setTimeout(() => {
+        sendTypingIndicator(activeConversationId, false)
+        typingTimeoutRef.current = null
+      }, TYPING_DEBOUNCE_MS)
+    },
+    [activeConversationId, sendTypingIndicator]
+  )
 
   const renderMessage = useCallback(
     ({ item }: { item: ConversationMessage }) => {
@@ -141,21 +235,32 @@ const MerchantMessagingScreen = ({ route, navigation }: any) => {
       return (
         <View style={containerStyle}>
           <View style={bubbleStyle}>
+            {/* BUG FIX #7: Sanitize user-generated content for defense-in-depth */}
             <Typography variant="body" color={isMine ? 'inverse' : 'default'}>
-              {item.content}
+              {sanitizeMessage(item.content)}
             </Typography>
-            <Typography
-              variant="caption"
-              color={isMine ? 'inverse' : 'secondary'}
-              style={{ marginTop: theme.spacing.xs, opacity: isMine ? 0.8 : 1 }}
-            >
-              {timeLabel}
-            </Typography>
+            <View style={themedStyles.messageFooter}>
+              <Typography
+                variant="caption"
+                color={isMine ? 'inverse' : 'secondary'}
+                style={{ opacity: isMine ? 0.8 : 1 }}
+              >
+                {timeLabel}
+              </Typography>
+              {isMine && item.read_at && (
+                <Ionicons
+                  name="checkmark-done"
+                  size={14}
+                  color={theme.colors.primary[200]}
+                  style={{ marginLeft: 4 }}
+                />
+              )}
+            </View>
           </View>
         </View>
       )
     },
-    [themedStyles, theme.spacing.xs, user?.id]
+    [themedStyles, theme.colors.primary, user?.id]
   )
 
   const keyExtractor = useCallback((item: ConversationMessage) => `message-${item.id}`, [])
@@ -170,24 +275,39 @@ const MerchantMessagingScreen = ({ route, navigation }: any) => {
         <Ionicons name="chevron-back" size={20} color={theme.colors.text} />
       </TouchableOpacity>
       <View style={{ flex: 1 }}>
-        <Typography variant="h3" weight="bold">
-          {resolvedTitle}
-        </Typography>
+        <View style={themedStyles.titleRow}>
+          <Typography variant="h3" weight="bold">
+            {resolvedTitle}
+          </Typography>
+          {isMerchantOnline && (
+            <View style={themedStyles.onlineBadge}>
+              <View style={themedStyles.onlineDot} />
+              <Typography variant="caption" color="success">
+                En ligne
+              </Typography>
+            </View>
+          )}
+        </View>
         {conversation?.merchant?.phone && (
           <Typography variant="caption" color="secondary">
             {conversation.merchant.phone}
+          </Typography>
+        )}
+        {typingUserName && (
+          <Typography variant="caption" color="primary" style={themedStyles.typingIndicator}>
+            {typingUserName} est en train d'écrire...
           </Typography>
         )}
       </View>
     </View>
   )
 
-  if (loading) {
+  if (loading && !conversation) {
     return (
       <View style={themedStyles.loadingContainer}>
         <ActivityIndicator size="large" color={theme.colors.primary[500]} />
         <Typography variant="body" color="secondary" style={{ marginTop: theme.spacing.md }}>
-          Chargement de la messagerie…
+          Chargement de la messagerie...
         </Typography>
       </View>
     )
@@ -210,6 +330,7 @@ const MerchantMessagingScreen = ({ route, navigation }: any) => {
       )}
 
       <FlatList
+        ref={flatListRef}
         data={messages}
         keyExtractor={keyExtractor}
         renderItem={renderMessage}
@@ -227,13 +348,18 @@ const MerchantMessagingScreen = ({ route, navigation }: any) => {
             </Typography>
           </View>
         }
+        onContentSizeChange={() => {
+          if (messages.length > 0) {
+            flatListRef.current?.scrollToEnd({ animated: false })
+          }
+        }}
       />
 
       <View style={themedStyles.composerContainer}>
         <TextInput
           value={messageDraft}
-          onChangeText={setMessageDraft}
-          placeholder="Écrivez votre message…"
+          onChangeText={handleTextChange}
+          placeholder="Écrivez votre message..."
           placeholderTextColor={theme.colors.neutral[400]}
           multiline
           style={themedStyles.input}
@@ -242,11 +368,17 @@ const MerchantMessagingScreen = ({ route, navigation }: any) => {
           variant="primary"
           size="sm"
           onPress={handleSendMessage}
-          disabled={sending || !messageDraft.trim() || !activeConversationId}
-          leftIcon={<Ionicons name="send" size={18} color={theme.colors.textInverse} />}
+          disabled={sendingMessage || !messageDraft.trim() || !activeConversationId}
+          leftIcon={
+            sendingMessage ? (
+              <ActivityIndicator size="small" color={theme.colors.textInverse} />
+            ) : (
+              <Ionicons name="send" size={18} color={theme.colors.textInverse} />
+            )
+          }
           style={themedStyles.sendButton}
         >
-          Envoyer
+          {sendingMessage ? '' : 'Envoyer'}
         </Button>
       </View>
     </KeyboardAvoidingView>
@@ -280,6 +412,30 @@ const styles = (theme: ReturnType<typeof useTheme>) =>
       justifyContent: 'center',
       backgroundColor: theme.colors.surface.light,
       marginRight: theme.spacing.md,
+    },
+    titleRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: theme.spacing.sm,
+    },
+    onlineBadge: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 4,
+      backgroundColor: theme.colors.success[50],
+      paddingHorizontal: 8,
+      paddingVertical: 2,
+      borderRadius: 12,
+    },
+    onlineDot: {
+      width: 8,
+      height: 8,
+      borderRadius: 4,
+      backgroundColor: theme.colors.success[500],
+    },
+    typingIndicator: {
+      marginTop: 2,
+      fontStyle: 'italic',
     },
     errorContainer: {
       paddingHorizontal: theme.spacing.lg,
@@ -315,6 +471,11 @@ const styles = (theme: ReturnType<typeof useTheme>) =>
       backgroundColor: theme.colors.surface.light,
       borderWidth: 1,
       borderColor: theme.colors.border,
+    },
+    messageFooter: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      marginTop: theme.spacing.xs,
     },
     emptyState: {
       alignItems: 'center',

@@ -3,7 +3,10 @@
  *
  * Centralizes all logging to prevent console.log in production builds.
  * Only errors are always logged, other levels are dev-only.
+ * Integrates with Sentry for production error tracking.
  */
+
+import { captureException, addBreadcrumb } from './sentryInit'
 
 const isDev = __DEV__
 
@@ -72,11 +75,23 @@ class Logger {
 
   /**
    * Error level - ALWAYS logged (even in production)
-   * Errors need to be visible for debugging production issues
+   * Errors are sent to Sentry in production for tracking
    */
   error(...args: any[]): void {
     if (this.enabled) {
       console.error(...this.formatMessage('error', ...args))
+
+      // In production, send errors to Sentry
+      if (!isDev) {
+        const errorArg = args.find(arg => arg instanceof Error)
+        if (errorArg) {
+          captureException(errorArg, { logger: this.prefix, args: args.filter(a => !(a instanceof Error)) })
+        } else {
+          // If no Error object, create one with the message
+          const message = args.map(a => typeof a === 'string' ? a : JSON.stringify(a)).join(' ')
+          captureException(new Error(message), { logger: this.prefix })
+        }
+      }
     }
   }
 

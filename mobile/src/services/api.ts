@@ -96,8 +96,11 @@ const getApiBaseUrl = (): string => {
       apiLogger.log('URL (web fallback):', url)
       return url
     }
-  } catch (_) {
-    // Non-critique: on continue vers les branches natives
+  } catch (error) {
+    // BUG FIX #10: Non-critique: on continue vers les branches natives, mais log en dev
+    if (__DEV__) {
+      apiLogger.debug('Web platform check error (expected on native):', error)
+    }
   }
 
   // 2) NATIVE (Android/iOS): priorité à app.json -> extra.apiUrl
@@ -138,6 +141,10 @@ class ApiService {
   private baseURL: string
   private onUnauthorizedCallback?: () => void
 
+  // BUG FIX #5: Token refresh queue to prevent race conditions
+  private isRefreshing: boolean = false
+  private refreshSubscribers: Array<(token: string | null) => void> = []
+
   constructor() {
     this.baseURL = getApiBaseUrl()
 
@@ -158,6 +165,16 @@ class ApiService {
     this.onUnauthorizedCallback = callback
   }
 
+  // BUG FIX #5: Helper methods for token refresh queue
+  private subscribeToTokenRefresh(callback: (token: string | null) => void) {
+    this.refreshSubscribers.push(callback)
+  }
+
+  private onTokenRefreshed(token: string | null) {
+    this.refreshSubscribers.forEach(callback => callback(token))
+    this.refreshSubscribers = []
+  }
+
   private setupInterceptors() {
     // Request interceptor pour ajouter le token JWT
     // BUG FIX #C-006: Use SecureStore for token retrieval
@@ -176,9 +193,12 @@ class ApiService {
     )
 
     // Response interceptor pour gérer les erreurs globalement
+    // BUG FIX #5: Use queue to prevent race conditions on concurrent 401 responses
     this.api.interceptors.response.use(
       (response) => response,
       async (error) => {
+        const originalRequest = error.config
+
         if (error.response?.status === 401) {
           // 🐛 BUG FIX #40: Distinguish between login failures and expired sessions
           const requestUrl = error.config?.url || ''
@@ -192,6 +212,26 @@ class ApiService {
             return Promise.reject(error)
           }
 
+          // BUG FIX #5: Prevent multiple logout dialogs from concurrent 401 responses
+          // If already handling session expiry, queue this request
+          if (this.isRefreshing) {
+            return new Promise((resolve, reject) => {
+              this.subscribeToTokenRefresh((token) => {
+                if (token) {
+                  // Token was somehow refreshed, retry the request
+                  originalRequest.headers.Authorization = `Bearer ${token}`
+                  resolve(this.api(originalRequest))
+                } else {
+                  // No token, reject the request
+                  reject(error)
+                }
+              })
+            })
+          }
+
+          // Mark as refreshing to prevent duplicate dialogs
+          this.isRefreshing = true
+
           // ✅ Token expiré, déconnecter l'utilisateur
           // BUG FIX #C-006: Use SecureStore for clearing auth data
           await secureStorage.clearAll()
@@ -200,6 +240,10 @@ class ApiService {
           if (this.onUnauthorizedCallback) {
             this.onUnauthorizedCallback()
           }
+
+          // Notify all queued requests that there's no token
+          this.onTokenRefreshed(null)
+          this.isRefreshing = false
 
           // ✅ Afficher message de session expirée avec popup stylisée
           const globalAlert = getGlobalAlert()

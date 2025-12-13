@@ -10,6 +10,14 @@ import { AlertProvider } from './src/contexts/AlertContext'
 import AppNavigator from './src/navigation/AppNavigator'
 import apiService from './src/services/api'
 import usePushNotifications from './src/hooks/usePushNotifications'
+import { initSentry, wrapWithSentry, setUser } from './src/utils/sentryInit'
+import { initI18n } from './src/i18n'
+
+// Initialize Sentry as early as possible
+initSentry()
+
+// BUG FIX #18: Initialize i18n with device/persisted locale
+initI18n()
 
 // Composant interne qui a accès au dispatch Redux
 const AppContent = () => {
@@ -27,11 +35,14 @@ const AppContent = () => {
   return <AppNavigator />
 }
 
-// ✅ APP FINALE: Tous les providers + AppNavigator
+// ✅ APP FINALE: Tous les providers + AppNavigator + Sentry
 // ThemeProvider AsyncStorage désactivé (fix freeze)
 // loadStoredAuth() actif dans AppNavigator
-export default function App() {
-  console.log('✅ APP FINALE: Redux + Theme + Toast + Navigation')
+// Sentry wrap pour capture automatique des erreurs React
+function App() {
+  if (__DEV__) {
+    console.log('✅ APP FINALE: Redux + Theme + Toast + Navigation + Sentry')
+  }
 
   return (
     <SafeAreaProvider>
@@ -49,3 +60,6 @@ export default function App() {
     </SafeAreaProvider>
   )
 }
+
+// Wrap with Sentry for automatic error boundary
+export default wrapWithSentry(App)

@@ -1,5 +1,6 @@
 import * as Location from 'expo-location'
 import { Platform } from 'react-native'
+import { locationLogger } from '../utils/logger'
 
 /**
  * Types pour le service de géolocalisation
@@ -38,13 +39,13 @@ class LocationService {
       const { status } = await Location.requestForegroundPermissionsAsync()
 
       if (status !== 'granted') {
-        console.warn('Permission de localisation refusée par l\'utilisateur')
+        locationLogger.warn('Permission de localisation refusée par l\'utilisateur')
         return false
       }
 
       return true
     } catch (error) {
-      console.error('Erreur lors de la demande de permission de localisation:', error)
+      locationLogger.error('Erreur lors de la demande de permission de localisation:', error)
       return false
     }
   }
@@ -58,7 +59,7 @@ class LocationService {
       const { status } = await Location.getForegroundPermissionsAsync()
       return status === 'granted'
     } catch (error) {
-      console.error('Erreur lors de la vérification des permissions:', error)
+      locationLogger.error('Erreur lors de la vérification des permissions:', error)
       return false
     }
   }
@@ -88,7 +89,7 @@ class LocationService {
         timestamp: location.timestamp,
       }
     } catch (error) {
-      console.error('Erreur lors de la récupération de la dernière position:', error)
+      locationLogger.error('Erreur lors de la récupération de la dernière position:', error)
       return null
     }
   }
@@ -103,7 +104,7 @@ class LocationService {
       const hasPermission = await this.hasLocationPermission()
 
       if (!hasPermission) {
-        console.warn('Permission de localisation non accordée')
+        locationLogger.warn('Permission de localisation non accordée')
         return null
       }
 
@@ -130,7 +131,7 @@ class LocationService {
         timestamp: location.timestamp,
       }
     } catch (error) {
-      console.error('Erreur lors de la récupération de la position:', error)
+      locationLogger.error('Erreur lors de la récupération de la position:', error)
       return null
     }
   }
@@ -147,7 +148,7 @@ class LocationService {
       const hasPermission = await this.hasLocationPermission()
 
       if (!hasPermission) {
-        console.warn('Permission de localisation non accordée')
+        locationLogger.warn('Permission de localisation non accordée')
         return false
       }
 
@@ -174,7 +175,7 @@ class LocationService {
 
       return true
     } catch (error) {
-      console.error('Erreur lors du démarrage de la surveillance:', error)
+      locationLogger.error('Erreur lors du démarrage de la surveillance:', error)
       return false
     }
   }
@@ -256,7 +257,7 @@ class LocationService {
     try {
       return await Location.hasServicesEnabledAsync()
     } catch (error) {
-      console.error('Erreur lors de la vérification des services de localisation:', error)
+      locationLogger.error('Erreur lors de la vérification des services de localisation:', error)
       return false
     }
   }
