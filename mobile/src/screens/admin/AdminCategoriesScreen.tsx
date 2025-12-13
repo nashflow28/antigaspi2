@@ -6,7 +6,6 @@ import {
   TouchableOpacity,
   StatusBar,
   RefreshControl,
-  Alert,
   TextInput,
   Modal,
   ScrollView,
@@ -18,6 +17,8 @@ import { useTheme } from '../../theme'
 import { Category } from '../../types'
 import apiService from '../../services/api'
 import { Button, Badge, Card, Typography, ConfirmModal } from '../../components/2025'
+import AlertModal from '../../components/AlertModal'
+import { useAlert } from '../../hooks/useAlert'
 
 interface CategoryWithStats extends Category {
   products_count?: number
@@ -29,6 +30,7 @@ type FormMode = 'create' | 'edit'
 const AdminCategoriesScreen: React.FC = () => {
   const theme = useTheme()
   const insets = useSafeAreaInsets()
+  const { alertProps, showError, showSuccess, showWarning } = useAlert()
   const [categories, setCategories] = useState<CategoryWithStats[]>([])
   const [refreshing, setRefreshing] = useState(false)
   const [loading, setLoading] = useState(true)
@@ -60,11 +62,11 @@ const AdminCategoriesScreen: React.FC = () => {
 
       // Gestion des erreurs d'autorisation
       if (error.response?.status === 401 || error.response?.status === 403) {
-        Alert.alert('Session expirée', 'Votre session a expiré. Veuillez vous reconnecter.')
+        showWarning('Session expirée', 'Votre session a expiré. Veuillez vous reconnecter.')
         return
       }
 
-      Alert.alert('Erreur', 'Impossible de charger les catégories')
+      showError('Erreur', 'Impossible de charger les catégories')
     } finally {
       setLoading(false)
       setRefreshing(false)
@@ -110,11 +112,11 @@ const AdminCategoriesScreen: React.FC = () => {
       await apiService.delete(`/admin/categories/${categoryToDelete.id}`)
 
       setShowDeleteModal(false)
-      Alert.alert('Succès', 'Catégorie supprimée avec succès')
+      showSuccess('Succès', 'Catégorie supprimée avec succès')
     } catch (error: any) {
       console.error('Erreur suppression:', error)
       setCategories(previousCategories)
-      Alert.alert(
+      showError(
         'Erreur',
         error.response?.data?.message || 'Impossible de supprimer la catégorie'
       )
@@ -126,7 +128,7 @@ const AdminCategoriesScreen: React.FC = () => {
   const handleSubmitForm = async () => {
     // Validation
     if (formData.name.trim().length < 3) {
-      Alert.alert('Erreur', 'Le nom doit contenir au moins 3 caractères')
+      showError('Erreur', 'Le nom doit contenir au moins 3 caractères')
       return
     }
 
@@ -146,7 +148,7 @@ const AdminCategoriesScreen: React.FC = () => {
         }
 
         setCategories(prev => [newCategory, ...prev])
-        Alert.alert('Succès', 'Catégorie créée avec succès')
+        showSuccess('Succès', 'Catégorie créée avec succès')
       } else if (selectedCategory) {
         await apiService.put(`/admin/categories/${selectedCategory.id}`, {
           name: formData.name.trim(),
@@ -161,14 +163,14 @@ const AdminCategoriesScreen: React.FC = () => {
               : c
           )
         )
-        Alert.alert('Succès', 'Catégorie mise à jour avec succès')
+        showSuccess('Succès', 'Catégorie mise à jour avec succès')
       }
 
       setShowFormModal(false)
       setFormData({ name: '', description: '' })
     } catch (error: any) {
       console.error('Erreur soumission:', error)
-      Alert.alert('Erreur', error.response?.data?.message || 'Impossible de sauvegarder la catégorie')
+      showError('Erreur', error.response?.data?.message || 'Impossible de sauvegarder la catégorie')
     } finally {
       setFormLoading(false)
     }
@@ -409,6 +411,8 @@ const AdminCategoriesScreen: React.FC = () => {
         loading={deleteLoading}
         icon="trash"
       />
+
+      <AlertModal {...alertProps} />
     </View>
   )
 }

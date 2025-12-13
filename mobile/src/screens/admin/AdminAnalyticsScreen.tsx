@@ -6,7 +6,6 @@ import {
   TouchableOpacity,
   StatusBar,
   ActivityIndicator,
-  Alert,
 } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { Ionicons } from '@expo/vector-icons'
@@ -17,11 +16,13 @@ import { Pagination } from '../../components/admin'
 import RevenueChart from '../../components/admin/RevenueChart'
 import GeographicChart from '../../components/admin/GeographicChart'
 import ExportButton from '../../components/admin/ExportButton'
+import AlertModal from '../../components/AlertModal'
 import apiService from '../../services/api'
 import { AdminAnalyticsData, AdminAnalyticsFilters } from '../../types'
 import { formatCurrency } from '../../utils/currencyHelpers'
 import { TEST_IDS } from '../../utils/testIds'
 import { useDebouncedEffect } from '../../hooks/useDebounce'
+import { useAlert } from '../../hooks/useAlert'
 
 type Period = '7d' | '30d' | '90d' | 'custom'
 type Tab = 'revenue' | 'geography' | 'merchants'
@@ -31,6 +32,7 @@ const MERCHANTS_PER_PAGE = 10
 const AdminAnalyticsScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
   const theme = useTheme()
   const insets = useSafeAreaInsets()
+  const { alertProps, showError, showWarning } = useAlert()
   const [selectedPeriod, setSelectedPeriod] = useState<Period>('30d')
   const [selectedTab, setSelectedTab] = useState<Tab>('revenue')
   const [data, setData] = useState<AdminAnalyticsData | null>(null)
@@ -80,28 +82,26 @@ const AdminAnalyticsScreen: React.FC<{ navigation: any }> = ({ navigation }) => 
       const response = await apiService.get('/admin/analytics', { params: filters })
       // apiService retourne response.data d'axios directement
       // Backend peut retourner {summary, ...} ou {data: {summary, ...}}
-      console.log('🟢 [AdminAnalytics] Response keys:', Object.keys(response || {}))
 
       // Essayer plusieurs chemins possibles
       const analyticsData = response.summary
         ? response
         : (response.data?.summary ? response.data : response)
 
-      console.log('🟢 [AdminAnalytics] Data summary:', analyticsData?.summary ? 'OK' : 'null')
       setData(analyticsData)
     } catch (error: any) {
       console.error('❌ Error loading analytics:', error)
 
       // Gestion des erreurs d'autorisation
       if (error.response?.status === 401 || error.response?.status === 403) {
-        Alert.alert(
+        showWarning(
           'Session expirée',
           'Votre session a expiré. Veuillez vous reconnecter.'
         )
         return
       }
 
-      Alert.alert('Erreur', 'Impossible de charger les analytics')
+      showError('Erreur', 'Impossible de charger les analytics')
     } finally {
       setLoading(false)
     }
@@ -462,6 +462,8 @@ const AdminAnalyticsScreen: React.FC<{ navigation: any }> = ({ navigation }) => 
           }}
         />
       )}
+
+      <AlertModal {...alertProps} />
     </View>
   )
 }

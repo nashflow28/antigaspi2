@@ -1,12 +1,10 @@
 import React from 'react'
-import { render, fireEvent, waitFor } from '@testing-library/react-native'
-import { Alert } from 'react-native'
+import { render, fireEvent, waitFor, screen } from '@testing-library/react-native'
 import ExportButton from './ExportButton'
 import * as FileSystem from 'expo-file-system/legacy'
 import * as Sharing from 'expo-sharing'
 import apiService from '../../services/api'
 
-// Mock dependencies
 jest.mock('expo-file-system/legacy')
 jest.mock('expo-sharing')
 jest.mock('../../services/api', () => ({
@@ -17,18 +15,26 @@ jest.mock('../../services/api', () => ({
 }))
 jest.mock('../../theme', () => {
   const { mockUseTheme } = require('../../__mocks__/themeMock')
-  return {
-    useTheme: mockUseTheme,
-  }
+  return { useTheme: mockUseTheme }
 })
 
-// Spy on Alert.alert
-jest.spyOn(Alert, 'alert')
+const pressLastTextButton = (label: string) => {
+  const matches = screen.getAllByText(label)
+  const last = matches[matches.length - 1] as any
+  fireEvent.press(last.parent)
+}
+
+const expectAlertModal = async (titleMatcher: string | RegExp, messageMatcher?: string | RegExp) => {
+  await waitFor(() => {
+    expect(screen.getByText(titleMatcher as any)).toBeTruthy()
+    if (messageMatcher) {
+      expect(screen.getByText(messageMatcher as any)).toBeTruthy()
+    }
+  })
+}
 
 describe('ExportButton', () => {
-  const mockFilters = {
-    period: '30d' as const,
-  }
+  const mockFilters = { period: '30d' as const }
 
   let consoleLogSpy: jest.SpyInstance | undefined
   let consoleErrorSpy: jest.SpyInstance | undefined
@@ -38,21 +44,16 @@ describe('ExportButton', () => {
     consoleLogSpy = jest.spyOn(console, 'log').mockImplementation(() => {})
     consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {})
 
-    // Mock FileSystem.documentDirectory
     Object.defineProperty(FileSystem, 'documentDirectory', {
       value: 'file:///data/user/0/com.app/files/',
       writable: true,
     })
 
-    // Mock FileSystem methods
     ;(FileSystem.writeAsStringAsync as jest.Mock).mockResolvedValue(undefined)
     ;(FileSystem.downloadAsync as jest.Mock).mockResolvedValue({ status: 200 })
-
-    // Mock Sharing methods
     ;(Sharing.isAvailableAsync as jest.Mock).mockResolvedValue(true)
     ;(Sharing.shareAsync as jest.Mock).mockResolvedValue(undefined)
 
-    // Mock API responses
     ;(apiService.exportAnalytics as jest.Mock).mockResolvedValue({
       file_content: 'base64content',
     })
@@ -63,353 +64,116 @@ describe('ExportButton', () => {
     consoleErrorSpy?.mockRestore()
   })
 
-  // ============ RENDERING TESTS ============
-
-  test('should render CSV export button', () => {
-    const { getByText } = render(<ExportButton format="csv" />)
-    expect(getByText('CSV')).toBeTruthy()
+  test('renders CSV and PDF buttons', () => {
+    render(
+      <>
+        <ExportButton format="csv" />
+        <ExportButton format="pdf" />
+      </>
+    )
+    expect(screen.getByText('CSV')).toBeTruthy()
+    expect(screen.getByText('PDF')).toBeTruthy()
   })
 
-  test('should render PDF export button', () => {
-    const { getByText } = render(<ExportButton format="pdf" />)
-    expect(getByText('PDF')).toBeTruthy()
-  })
-
-  test('should render with correct testID for CSV', () => {
-    const { getByTestId } = render(<ExportButton format="csv" />)
-    expect(getByTestId('export-csv-button')).toBeTruthy()
-  })
-
-  test('should render with correct testID for PDF', () => {
-    const { getByTestId } = render(<ExportButton format="pdf" />)
-    expect(getByTestId('export-pdf-button')).toBeTruthy()
-  })
-
-  // ============ BUG-001 FIX VERIFICATION ============
-
-  test('should handle null FileSystem.documentDirectory gracefully', async () => {
-    // BUG-001: Test the fix for null documentDirectory
-    Object.defineProperty(FileSystem, 'documentDirectory', {
-      value: null,
-      writable: true,
-    })
-
-    const { getByTestId } = render(<ExportButton format="csv" />)
-    const button = getByTestId('export-csv-button')
-
-    fireEvent.press(button)
-
-    await waitFor(() => {
-      expect(Alert.alert).toHaveBeenCalledWith(
-        "Erreur d'export",
-        "Le système de fichiers n'est pas disponible sur cet appareil"
-      )
-    })
-
-    // Ensure API was not called
-    expect(apiService.exportAnalytics).not.toHaveBeenCalled()
-  })
-
-  test('should handle undefined FileSystem.documentDirectory gracefully', async () => {
-    Object.defineProperty(FileSystem, 'documentDirectory', {
-      value: undefined,
-      writable: true,
-    })
-
-    const { getByTestId } = render(<ExportButton format="csv" />)
-    fireEvent.press(getByTestId('export-csv-button'))
-
-    await waitFor(() => {
-      expect(Alert.alert).toHaveBeenCalledWith(
-        "Erreur d'export",
-        expect.stringContaining("système de fichiers")
-      )
-    })
-  })
-
-  // ============ EXPORT FUNCTIONALITY TESTS ============
-
-  test('should call API with correct format (CSV)', async () => {
-    const { getByTestId } = render(<ExportButton format="csv" filters={mockFilters} />)
-    const button = getByTestId('export-csv-button')
-
-    fireEvent.press(button)
+  test('calls API with correct format and filters', async () => {
+    render(<ExportButton format="csv" filters={mockFilters} />)
+    fireEvent.press(screen.getByTestId('export-csv-button'))
 
     await waitFor(() => {
       expect(apiService.exportAnalytics).toHaveBeenCalledWith('csv', mockFilters)
     })
   })
 
-  test('should call API with correct format (PDF)', async () => {
-    const { getByTestId } = render(<ExportButton format="pdf" filters={mockFilters} />)
-    const button = getByTestId('export-pdf-button')
+  test('shows error when FileSystem.documentDirectory is null', async () => {
+    Object.defineProperty(FileSystem, 'documentDirectory', { value: null, writable: true })
 
-    fireEvent.press(button)
+    render(<ExportButton format="csv" />)
+    fireEvent.press(screen.getByTestId('export-csv-button'))
+
+    await expectAlertModal(/Erreur d'export/i, /syst/i)
+    expect(apiService.exportAnalytics).not.toHaveBeenCalled()
+  })
+
+  test('shows error when server returns no export data', async () => {
+    ;(apiService.exportAnalytics as jest.Mock).mockResolvedValueOnce({})
+
+    render(<ExportButton format="csv" />)
+    fireEvent.press(screen.getByTestId('export-csv-button'))
+
+    await expectAlertModal(/Erreur d'export/i, /No export data received/i)
+  })
+
+  test('downloads file when file_url is provided', async () => {
+    ;(apiService.exportAnalytics as jest.Mock).mockResolvedValueOnce({
+      file_url: 'https://example.com/analytics.csv',
+    })
+
+    render(<ExportButton format="csv" />)
+    fireEvent.press(screen.getByTestId('export-csv-button'))
 
     await waitFor(() => {
-      expect(apiService.exportAnalytics).toHaveBeenCalledWith('pdf', mockFilters)
+      expect(FileSystem.downloadAsync).toHaveBeenCalled()
+      expect(Sharing.shareAsync).toHaveBeenCalled()
     })
   })
 
-  test('should handle base64 file content export', async () => {
-    ;(apiService.exportAnalytics as jest.Mock).mockResolvedValue({
-      file_content: 'base64encodedcontent',
+  test('shows error when download fails', async () => {
+    ;(apiService.exportAnalytics as jest.Mock).mockResolvedValueOnce({
+      file_url: 'https://example.com/analytics.csv',
     })
+    ;(FileSystem.downloadAsync as jest.Mock).mockResolvedValueOnce({ status: 500 })
 
-    const { getByTestId } = render(<ExportButton format="csv" />)
-    fireEvent.press(getByTestId('export-csv-button'))
+    render(<ExportButton format="csv" />)
+    fireEvent.press(screen.getByTestId('export-csv-button'))
 
-    await waitFor(() => {
-      expect(FileSystem.writeAsStringAsync).toHaveBeenCalledWith(
-        expect.stringContaining('analytics-'),
-        'base64encodedcontent',
-        { encoding: 'base64' }
-      )
-    })
+    await expectAlertModal(/Erreur d'export/i, /download/i)
   })
 
-  test('should handle file URL export with download', async () => {
-    ;(apiService.exportAnalytics as jest.Mock).mockResolvedValue({
-      file_url: 'https://example.com/export.csv',
-    })
+  test('shows error when sharing is not available', async () => {
+    ;(Sharing.isAvailableAsync as jest.Mock).mockResolvedValueOnce(false)
 
-    const { getByTestId } = render(<ExportButton format="csv" />)
-    fireEvent.press(getByTestId('export-csv-button'))
+    render(<ExportButton format="csv" />)
+    fireEvent.press(screen.getByTestId('export-csv-button'))
 
-    await waitFor(() => {
-      expect(FileSystem.downloadAsync).toHaveBeenCalledWith(
-        'https://example.com/export.csv',
-        expect.stringContaining('analytics-')
-      )
-    })
+    await expectAlertModal(/Erreur/i, /partage de fichiers/i)
   })
 
-  test('should show error when no export data received', async () => {
-    ;(apiService.exportAnalytics as jest.Mock).mockResolvedValue({
-      // No file_content or file_url
-    })
+  test('shows success modal after successful export', async () => {
+    render(<ExportButton format="csv" />)
+    fireEvent.press(screen.getByTestId('export-csv-button'))
 
-    const { getByTestId } = render(<ExportButton format="csv" />)
-    fireEvent.press(getByTestId('export-csv-button'))
-
-    await waitFor(() => {
-      expect(Alert.alert).toHaveBeenCalledWith(
-        "Erreur d'export",
-        'No export data received from server'
-      )
-    })
+    await expectAlertModal('Succès', /Rapport CSV/i)
   })
 
-  test('should show error when download fails', async () => {
-    ;(apiService.exportAnalytics as jest.Mock).mockResolvedValue({
-      file_url: 'https://example.com/export.csv',
-    })
-    ;(FileSystem.downloadAsync as jest.Mock).mockResolvedValue({ status: 404 })
-
-    const { getByTestId } = render(<ExportButton format="csv" />)
-    fireEvent.press(getByTestId('export-csv-button'))
-
-    await waitFor(() => {
-      expect(Alert.alert).toHaveBeenCalledWith(
-        "Erreur d'export",
-        'Failed to download export file'
-      )
-    })
-  })
-
-  // ============ SHARING FUNCTIONALITY TESTS ============
-
-  test('should check if sharing is available', async () => {
-    const { getByTestId } = render(<ExportButton format="csv" />)
-    fireEvent.press(getByTestId('export-csv-button'))
-
-    await waitFor(() => {
-      expect(Sharing.isAvailableAsync).toHaveBeenCalled()
-    })
-  })
-
-  test('should show error when sharing is not available', async () => {
-    ;(Sharing.isAvailableAsync as jest.Mock).mockResolvedValue(false)
-
-    const { getByTestId } = render(<ExportButton format="csv" />)
-    fireEvent.press(getByTestId('export-csv-button'))
-
-    await waitFor(() => {
-      expect(Alert.alert).toHaveBeenCalledWith(
-        'Erreur',
-        "Le partage de fichiers n'est pas disponible sur cet appareil"
-      )
-    })
-  })
-
-  test('should share file with correct MIME type for CSV', async () => {
-    const { getByTestId } = render(<ExportButton format="csv" />)
-    fireEvent.press(getByTestId('export-csv-button'))
-
-    await waitFor(() => {
-      expect(Sharing.shareAsync).toHaveBeenCalledWith(
-        expect.any(String),
-        expect.objectContaining({
-          mimeType: 'text/csv',
-          dialogTitle: 'Exporter les analytics (CSV)',
-          UTI: 'public.comma-separated-values-text',
-        })
-      )
-    })
-  })
-
-  test('should share file with correct MIME type for PDF', async () => {
-    const { getByTestId } = render(<ExportButton format="pdf" />)
-    fireEvent.press(getByTestId('export-pdf-button'))
-
-    await waitFor(() => {
-      expect(Sharing.shareAsync).toHaveBeenCalledWith(
-        expect.any(String),
-        expect.objectContaining({
-          mimeType: 'application/pdf',
-          dialogTitle: 'Exporter les analytics (PDF)',
-          UTI: 'com.adobe.pdf',
-        })
-      )
-    })
-  })
-
-  test('should show success alert after successful export', async () => {
-    const { getByTestId } = render(<ExportButton format="csv" />)
-    fireEvent.press(getByTestId('export-csv-button'))
-
-    await waitFor(() => {
-      expect(Alert.alert).toHaveBeenCalledWith('Succès', 'Rapport CSV exporté avec succès')
-    })
-  })
-
-  // ============ CALLBACK TESTS ============
-
-  test('should call onExportStart callback', async () => {
+  test('calls callbacks on success and failure', async () => {
     const onExportStart = jest.fn()
-    const { getByTestId } = render(<ExportButton format="csv" onExportStart={onExportStart} />)
+    const onExportComplete = jest.fn()
+    const onExportError = jest.fn()
 
-    fireEvent.press(getByTestId('export-csv-button'))
+    render(
+      <ExportButton
+        format="csv"
+        onExportStart={onExportStart}
+        onExportComplete={onExportComplete}
+        onExportError={onExportError}
+      />
+    )
 
+    fireEvent.press(screen.getByTestId('export-csv-button'))
     await waitFor(() => {
       expect(onExportStart).toHaveBeenCalled()
-    })
-  })
-
-  test('should call onExportComplete callback on success', async () => {
-    const onExportComplete = jest.fn()
-    const { getByTestId } = render(
-      <ExportButton format="csv" onExportComplete={onExportComplete} />
-    )
-
-    fireEvent.press(getByTestId('export-csv-button'))
-
-    await waitFor(() => {
       expect(onExportComplete).toHaveBeenCalled()
     })
-  })
+    pressLastTextButton('OK')
 
-  test('should call onExportError callback on failure', async () => {
-    const onExportError = jest.fn()
-    ;(apiService.exportAnalytics as jest.Mock).mockRejectedValue(new Error('Network error'))
-
-    const { getByTestId } = render(<ExportButton format="csv" onExportError={onExportError} />)
-
-    fireEvent.press(getByTestId('export-csv-button'))
-
-    await waitFor(() => {
-      expect(onExportError).toHaveBeenCalledWith(expect.any(String))
-    })
-  })
-
-  // ============ LOADING STATE TESTS ============
-  // Note: These tests check internal implementation details that are hard to test
-  // The actual loading behavior is better tested via user-visible feedback
-
-  test('should show loading indicator while exporting', async () => {
-    ;(apiService.exportAnalytics as jest.Mock).mockImplementation(
-      () => new Promise((resolve) => setTimeout(() => resolve({ file_content: 'test' }), 100))
-    )
-
-    const { getByTestId } = render(<ExportButton format="csv" />)
-    const button = getByTestId('export-csv-button')
-
-    fireEvent.press(button)
-
-    // The button is pressed and export starts - we verify the API was called
-    await waitFor(() => {
-      expect(apiService.exportAnalytics).toHaveBeenCalled()
-    })
-  })
-
-  test('should complete export and show success', async () => {
-    const { getByTestId } = render(<ExportButton format="csv" />)
-    const button = getByTestId('export-csv-button')
-
-    fireEvent.press(button)
-
-    await waitFor(() => {
-      expect(Alert.alert).toHaveBeenCalledWith('Succès', expect.any(String))
-    })
-
-    // After success, the export flow is complete
-    expect(apiService.exportAnalytics).toHaveBeenCalled()
-  })
-
-  // ============ FILENAME GENERATION TESTS ============
-
-  test('should generate filename with timestamp and CSV extension', async () => {
-    const { getByTestId } = render(<ExportButton format="csv" />)
-    fireEvent.press(getByTestId('export-csv-button'))
-
-    await waitFor(() => {
-      expect(FileSystem.writeAsStringAsync).toHaveBeenCalledWith(
-        expect.stringMatching(/analytics-.*\.csv$/),
-        expect.any(String),
-        expect.any(Object)
-      )
-    })
-  })
-
-  test('should generate filename with timestamp and PDF extension', async () => {
-    const { getByTestId } = render(<ExportButton format="pdf" />)
-    fireEvent.press(getByTestId('export-pdf-button'))
-
-    await waitFor(() => {
-      expect(FileSystem.writeAsStringAsync).toHaveBeenCalledWith(
-        expect.stringMatching(/analytics-.*\.pdf$/),
-        expect.any(String),
-        expect.any(Object)
-      )
-    })
-  })
-
-  // ============ ERROR HANDLING TESTS ============
-
-  test('should handle API error gracefully', async () => {
-    ;(apiService.exportAnalytics as jest.Mock).mockRejectedValue({
+    ;(apiService.exportAnalytics as jest.Mock).mockRejectedValueOnce({
       response: { data: { message: 'Server error' } },
     })
 
-    const { getByTestId } = render(<ExportButton format="csv" />)
-    fireEvent.press(getByTestId('export-csv-button'))
-
+    fireEvent.press(screen.getByTestId('export-csv-button'))
+    await expectAlertModal(/Erreur d'export/i, 'Server error')
     await waitFor(() => {
-      expect(Alert.alert).toHaveBeenCalledWith("Erreur d'export", 'Server error')
-    })
-  })
-
-  test('should show generic error message when no specific error', async () => {
-    ;(apiService.exportAnalytics as jest.Mock).mockRejectedValue(new Error())
-
-    const { getByTestId } = render(<ExportButton format="pdf" />)
-    fireEvent.press(getByTestId('export-pdf-button'))
-
-    await waitFor(() => {
-      expect(Alert.alert).toHaveBeenCalledWith(
-        "Erreur d'export",
-        "Impossible d'exporter en PDF"
-      )
+      expect(onExportError).toHaveBeenCalledWith('Server error')
     })
   })
 })

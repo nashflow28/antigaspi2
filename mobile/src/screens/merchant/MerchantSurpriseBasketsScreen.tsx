@@ -7,7 +7,6 @@ import {
   TouchableOpacity,
   StatusBar,
   RefreshControl,
-  Alert,
   Image,
   ActivityIndicator,
   Modal,
@@ -23,9 +22,11 @@ import { SurpriseBasket } from '../../types'
 import apiService from '../../services/api'
 import { getImageUrl } from '../../utils/imageHelpers'
 import { Typography, Card, Button, Badge } from '../../components/2025'
+import AlertModal from '../../components/AlertModal'
 import { formatCurrency } from '../../utils/currencyHelpers'
 import { TEST_IDS } from '../../utils/testIds'
 import { usePersistedForm } from '../../hooks/usePersistedForm'
+import { useAlert } from '../../hooks/useAlert'
 
 type StatusFilter = 'all' | 'active' | 'inactive'
 
@@ -43,6 +44,7 @@ const INITIAL_FORM_DATA = {
 
 const MerchantSurpriseBasketsScreen: React.FC<Props> = ({ navigation }) => {
   const theme = useTheme()
+  const { alertProps, showWarning, hideAlert } = useAlert()
   const [baskets, setBaskets] = useState<SurpriseBasket[]>([])
   const [refreshing, setRefreshing] = useState(false)
   const [loading, setLoading] = useState(true)
@@ -126,23 +128,27 @@ const MerchantSurpriseBasketsScreen: React.FC<Props> = ({ navigation }) => {
     setEditingBasket(null)
     // Check if we have cached data to restore
     if (hasUnsavedChanges && (formData.name || formData.description || formData.discounted_price)) {
-      Alert.alert(
+      showWarning(
         'Données récupérées',
         'Nous avons retrouvé un brouillon non sauvegardé. Voulez-vous le reprendre ?',
         [
-          {
-            text: 'Nouveau',
-            style: 'destructive',
-            onPress: async () => {
-              await clearFormCache()
-              setFormData(INITIAL_FORM_DATA)
-              setShowModal(true)
-            },
-          },
-          {
-            text: 'Reprendre',
-            onPress: () => setShowModal(true),
-          },
+	          {
+	            text: 'Nouveau',
+	            style: 'destructive',
+	            onPress: async () => {
+	              hideAlert()
+	              await clearFormCache()
+	              setFormData(INITIAL_FORM_DATA)
+	              setShowModal(true)
+	            },
+	          },
+	          {
+	            text: 'Reprendre',
+	            onPress: () => {
+	              hideAlert()
+	              setShowModal(true)
+	            },
+	          },
         ]
       )
     } else {
@@ -165,15 +171,16 @@ const MerchantSurpriseBasketsScreen: React.FC<Props> = ({ navigation }) => {
   }
 
   const handleDelete = (basketId: number) => {
-    Alert.alert(
+    showWarning(
       'Supprimer le panier',
       'Êtes-vous sûr de vouloir supprimer ce panier surprise ?',
       [
-        { text: 'Annuler', style: 'cancel' },
+        { text: 'Annuler', style: 'cancel', onPress: hideAlert },
         {
           text: 'Supprimer',
           style: 'destructive',
           onPress: async () => {
+            hideAlert()
             try {
               setLoading(true)
               await apiService.delete(`/surprise-baskets/${basketId}`)
@@ -704,6 +711,8 @@ const MerchantSurpriseBasketsScreen: React.FC<Props> = ({ navigation }) => {
           </View>
         </View>
       </Modal>
+
+      <AlertModal {...alertProps} />
     </View>
   )
 }

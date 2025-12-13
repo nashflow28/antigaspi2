@@ -6,7 +6,6 @@ import {
   ScrollView,
   TouchableOpacity,
   StatusBar,
-  Alert,
 } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useDispatch, useSelector } from 'react-redux'

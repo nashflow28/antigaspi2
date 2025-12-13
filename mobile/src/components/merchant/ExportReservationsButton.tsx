@@ -7,6 +7,9 @@ import { useTheme } from '../../theme'
 import { Reservation } from '../../types'
 import { TEST_IDS } from '../../utils/testIds'
 import AlertModal, { AlertType, AlertButton } from '../AlertModal'
+import { createLogger } from '../../utils/logger'
+
+const exportReservationsLogger = createLogger('ExportReservationsButton')
 
 interface Props {
   reservations: Reservation[]
@@ -205,7 +208,7 @@ const ExportReservationsButton: React.FC<Props> = ({
 
       onExportComplete?.()
     } catch (error: any) {
-      console.error('CSV export error:', error)
+      exportReservationsLogger.error('CSV export error:', error)
 
       const errorMessage = error.response?.data?.message ||
                           error.message ||

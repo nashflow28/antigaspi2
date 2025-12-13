@@ -1,5 +1,15 @@
 // Setup for Jest tests
 
+// Silence noisy React "act(...)" warnings (tests still assert behavior)
+const originalConsoleError = console.error
+console.error = (...args) => {
+  const firstArg = args[0]
+  if (typeof firstArg === 'string' && firstArg.includes('not wrapped in act')) {
+    return
+  }
+  originalConsoleError(...args)
+}
+
 // Polyfill atob/btoa for Node.js (used by JWT decoding)
 if (typeof global.atob === 'undefined') {
   global.atob = (str) => Buffer.from(str, 'base64').toString('binary')
@@ -13,6 +23,19 @@ jest.mock('@react-native-async-storage/async-storage', () =>
   require('@react-native-async-storage/async-storage/jest/async-storage-mock')
 )
 
+// Mock Sentry to avoid background timers/intervals in Jest
+jest.mock('@sentry/react-native', () => ({
+  __esModule: true,
+  init: jest.fn(),
+  captureException: jest.fn(),
+  captureMessage: jest.fn(),
+  addBreadcrumb: jest.fn(),
+  setUser: jest.fn(),
+  setTag: jest.fn(),
+  withScope: (callback) => callback({ setExtras: jest.fn() }),
+  wrap: (App) => App,
+}))
+
 // Mock expo-font
 jest.mock('expo-font')
 
@@ -22,6 +45,7 @@ jest.mock('expo-file-system', () => ({
   cacheDirectory: 'file:///data/user/0/com.app/cache/',
   makeDirectoryAsync: jest.fn().mockResolvedValue(undefined),
   getInfoAsync: jest.fn().mockResolvedValue({ exists: true, isDirectory: true }),
+  downloadAsync: jest.fn().mockResolvedValue({ status: 200 }),
   writeAsStringAsync: jest.fn().mockResolvedValue(undefined),
   readAsStringAsync: jest.fn().mockResolvedValue(''),
   deleteAsync: jest.fn().mockResolvedValue(undefined),
@@ -32,6 +56,7 @@ jest.mock('expo-file-system', () => ({
     Base64: 'base64',
   },
 }))
+
 
 // Mock expo-asset
 jest.mock('expo-asset')
@@ -111,6 +136,11 @@ jest.mock('@expo/vector-icons', () => {
     MaterialIcons: View,
     FontAwesome: View,
   }
+})
+
+// Silence Animated warnings / timers in tests (virtual mock for RN/Expo compatibility)
+jest.mock('react-native/Libraries/Animated/NativeAnimatedHelper', () => ({}), {
+  virtual: true,
 })
 
 // Mock react-native-webview

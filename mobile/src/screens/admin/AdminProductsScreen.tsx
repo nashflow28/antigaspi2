@@ -6,7 +6,6 @@ import {
   TouchableOpacity,
   StatusBar,
   RefreshControl,
-  Alert,
   TextInput,
   Modal,
   ScrollView,
@@ -21,6 +20,8 @@ import apiService from '../../services/api'
 import { formatCurrency } from '../../utils/currencyHelpers'
 import { getImageUrl } from '../../utils/imageHelpers'
 import { Button, Badge, Card, Typography, ConfirmModal } from '../../components/2025'
+import AlertModal from '../../components/AlertModal'
+import { useAlert } from '../../hooks/useAlert'
 
 interface ProductWithModeration extends Product {
   needs_approval?: boolean
@@ -33,6 +34,7 @@ type ConfirmAction = 'activate' | 'deactivate' | 'approve' | 'reject' | 'delete'
 const AdminProductsScreen: React.FC = () => {
   const theme = useTheme()
   const insets = useSafeAreaInsets()
+  const { alertProps, showError, showSuccess, showWarning } = useAlert()
   const [products, setProducts] = useState<ProductWithModeration[]>([])
   const [filteredProducts, setFilteredProducts] = useState<ProductWithModeration[]>([])
   const [categories, setCategories] = useState<Category[]>([])
@@ -81,14 +83,14 @@ const AdminProductsScreen: React.FC = () => {
 
       // Gestion des erreurs d'autorisation
       if (error.response?.status === 401 || error.response?.status === 403) {
-        Alert.alert(
+        showWarning(
           'Session expirée',
           'Votre session a expiré. Veuillez vous reconnecter.'
         )
         return
       }
 
-      Alert.alert('Erreur', 'Impossible de charger les produits')
+      showError('Erreur', 'Impossible de charger les produits')
     } finally {
       setLoading(false)
       setRefreshing(false)
@@ -217,11 +219,11 @@ const AdminProductsScreen: React.FC = () => {
       }
 
       setShowConfirmModal(false)
-      Alert.alert('Succès', getSuccessMessage())
+      showSuccess('Succès', getSuccessMessage())
     } catch (error) {
       console.error('Erreur action:', error)
       setProducts(previousProducts)
-      Alert.alert('Erreur', getErrorMessage())
+      showError('Erreur', getErrorMessage())
     } finally {
       setActionLoadingIds(prev => {
         const newSet = new Set(prev)
@@ -828,6 +830,8 @@ const AdminProductsScreen: React.FC = () => {
           icon={getConfirmModalConfig().icon}
         />
       )}
+
+      <AlertModal {...alertProps} />
     </View>
   )
 }

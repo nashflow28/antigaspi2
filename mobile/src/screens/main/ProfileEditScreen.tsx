@@ -6,7 +6,6 @@ import {
   TextInput,
   TouchableOpacity,
   Image,
-  Alert,
   ActivityIndicator,
   StatusBar,
   Platform,
@@ -26,6 +25,11 @@ import { getImageUrl } from '../../utils/imageHelpers'
 import { usePersistedForm } from '../../hooks/usePersistedForm'
 import PhoneInput from '../../components/PhoneInput'
 import { parsePhoneNumber, validatePhoneNumber } from '../../data/countries'
+import AlertModal from '../../components/AlertModal'
+import { useAlert } from '../../hooks/useAlert'
+import { createLogger } from '../../utils/logger'
+
+const profileEditLogger = createLogger('ProfileEdit')
 
 interface ProfileFormData {
   first_name: string
@@ -71,6 +75,7 @@ const INITIAL_FORM_DATA: ProfileFormData = {
 
 const ProfileEditScreen: React.FC<ProfileEditScreenProps> = ({ navigation: navigationOverride }) => {
   const theme = useTheme()
+  const { alertProps, showError, showSuccess, showWarning, hideAlert } = useAlert()
   const defaultNavigation = useNavigation<any>()
   const navigation = navigationOverride ?? defaultNavigation
   const dispatch = useDispatch<AppDispatch>()
@@ -139,7 +144,7 @@ const ProfileEditScreen: React.FC<ProfileEditScreenProps> = ({ navigation: navig
         formData.city !== (user.city || '')
 
       if (isDifferent) {
-        Alert.alert(
+        showWarning(
           'Modifications récupérées',
           'Nous avons retrouvé des modifications non enregistrées. Voulez-vous les conserver ?',
           [
@@ -147,6 +152,7 @@ const ProfileEditScreen: React.FC<ProfileEditScreenProps> = ({ navigation: navig
               text: 'Annuler les modifications',
               style: 'destructive',
               onPress: () => {
+                hideAlert()
                 setFormData({
                   first_name: user.first_name || '',
                   last_name: user.last_name || '',
@@ -161,6 +167,7 @@ const ProfileEditScreen: React.FC<ProfileEditScreenProps> = ({ navigation: navig
             {
               text: 'Conserver',
               style: 'default',
+              onPress: hideAlert,
             },
           ]
         )
@@ -173,7 +180,7 @@ const ProfileEditScreen: React.FC<ProfileEditScreenProps> = ({ navigation: navig
       const updatedUser = await dispatch(refreshProfile()).unwrap()
       await apiService.setStoredUser(updatedUser)
     } catch (syncError) {
-      console.error('Erreur synchronisation profil:', syncError)
+      profileEditLogger.warn('Erreur synchronisation profil:', syncError)
     }
   }, [dispatch])
 
@@ -182,7 +189,7 @@ const ProfileEditScreen: React.FC<ProfileEditScreenProps> = ({ navigation: navig
       const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync()
 
       if (permissionResult.status !== 'granted') {
-        Alert.alert(
+        showError(
           'Permission refusée',
           "Vous devez autoriser l'accès à la galerie pour changer votre photo."
         )
@@ -200,7 +207,7 @@ const ProfileEditScreen: React.FC<ProfileEditScreenProps> = ({ navigation: navig
         const asset = result.assets[0]
 
         if (asset.fileSize && asset.fileSize > MAX_PHOTO_SIZE_BYTES) {
-          Alert.alert('Photo trop lourde', 'La photo ne doit pas dépasser 5 MB')
+          showError('Photo trop lourde', 'La photo ne doit pas dépasser 5 MB')
           return
         }
 
@@ -208,8 +215,8 @@ const ProfileEditScreen: React.FC<ProfileEditScreenProps> = ({ navigation: navig
         await uploadPhoto(asset)
       }
     } catch (error) {
-      console.error('Erreur sélection image:', error)
-      Alert.alert('Erreur', "Impossible de sélectionner l'image")
+      profileEditLogger.warn('Erreur sélection image:', error)
+      showError('Erreur', "Impossible de sélectionner l'image")
     }
   }
 
@@ -228,7 +235,7 @@ const ProfileEditScreen: React.FC<ProfileEditScreenProps> = ({ navigation: navig
         type: mimeType,
       } as any)
 
-      console.log('[ProfileEdit] Uploading photo:', { uri: asset.uri, filename, mimeType })
+      profileEditLogger.log('[ProfileEdit] Uploading photo:', { uri: asset.uri, filename, mimeType })
 
       // Use uploadFile method which uses native fetch (more reliable for FormData)
       const response = await apiService.uploadFile<ApiResponse<{ photo_url: string; full_url?: string }>>(
@@ -236,7 +243,7 @@ const ProfileEditScreen: React.FC<ProfileEditScreenProps> = ({ navigation: navig
         uploadFormData
       )
 
-      console.log('[ProfileEdit] Upload response:', response)
+      profileEditLogger.log('[ProfileEdit] Upload response:', response)
 
       if (response.success) {
         if (response.data?.full_url || response.data?.photo_url) {
@@ -244,16 +251,16 @@ const ProfileEditScreen: React.FC<ProfileEditScreenProps> = ({ navigation: navig
         }
         await syncProfileUpdates()
 
-        Alert.alert('Succès', response.message || 'Photo mise à jour avec succès')
+        showSuccess('Succès', response.message || 'Photo mise à jour avec succès')
       } else {
         // Handle unsuccessful response
-        Alert.alert('Erreur', response.message || "Impossible d'uploader la photo")
+        showError('Erreur', response.message || "Impossible d'uploader la photo")
         // Revert to previous photo
         setPhotoUri(user?.photo_url ? getImageUrl(user.photo_url) : null)
       }
     } catch (error: any) {
-      console.error('[ProfileEdit] Erreur upload photo:', error)
-      Alert.alert(
+      profileEditLogger.warn('[ProfileEdit] Erreur upload photo:', error)
+      showError(
         'Erreur',
         error.response?.data?.message || error.message || "Impossible d'uploader la photo"
       )
@@ -277,28 +284,28 @@ const ProfileEditScreen: React.FC<ProfileEditScreenProps> = ({ navigation: navig
     setFormData(sanitizedData)
 
     if (!sanitizedData.first_name || !sanitizedData.last_name) {
-      Alert.alert('Erreur', 'Le prénom et le nom sont requis')
+      showError('Erreur', 'Le prénom et le nom sont requis')
       return
     }
 
     if (sanitizedData.first_name.length < 2) {
-      Alert.alert('Erreur', 'Le prénom doit contenir au moins 2 caractères')
+      showError('Erreur', 'Le prénom doit contenir au moins 2 caractères')
       return
     }
 
     if (sanitizedData.last_name.length < 2) {
-      Alert.alert('Erreur', 'Le nom doit contenir au moins 2 caractères')
+      showError('Erreur', 'Le nom doit contenir au moins 2 caractères')
       return
     }
 
     if (!sanitizedData.email) {
-      Alert.alert('Erreur', "L'email est requis")
+      showError('Erreur', "L'email est requis")
       return
     }
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
     if (!emailRegex.test(sanitizedData.email)) {
-      Alert.alert('Erreur', 'Adresse email invalide')
+      showError('Erreur', 'Adresse email invalide')
       return
     }
 
@@ -308,7 +315,7 @@ const ProfileEditScreen: React.FC<ProfileEditScreenProps> = ({ navigation: navig
       if (parsed.country) {
         const validationResult = validatePhoneNumber(parsed.localNumber, parsed.country)
         if (!validationResult.valid) {
-          Alert.alert(
+          showError(
             'Erreur',
             validationResult.error || 'Numéro de téléphone invalide'
           )
@@ -331,16 +338,19 @@ const ProfileEditScreen: React.FC<ProfileEditScreenProps> = ({ navigation: navig
         // Clear form cache on successful save
         await clearFormCache()
 
-        Alert.alert('Succès', response.message || 'Profil mis à jour avec succès', [
+        showSuccess('Succès', response.message || 'Profil mis à jour avec succès', [
           {
             text: 'OK',
-            onPress: () => navigation.goBack(),
+            onPress: () => {
+              hideAlert()
+              navigation.goBack()
+            },
           },
         ])
       }
     } catch (error: any) {
-      console.error('Erreur mise à jour profil:', error)
-      Alert.alert(
+      profileEditLogger.warn('Erreur mise à jour profil:', error)
+      showError(
         'Erreur',
         error.response?.data?.message || error.message || 'Impossible de mettre à jour le profil'
       )
@@ -595,6 +605,8 @@ const ProfileEditScreen: React.FC<ProfileEditScreenProps> = ({ navigation: navig
         </TouchableOpacity>
         </ScrollView>
       </KeyboardAvoidingView>
+
+      <AlertModal {...alertProps} />
     </View>
   )
 }

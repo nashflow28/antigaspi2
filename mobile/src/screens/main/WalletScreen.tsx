@@ -1,7 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import {
   ActivityIndicator,
-  Alert,
   FlatList,
   Platform,
   RefreshControl,
@@ -17,7 +16,9 @@ import { useDispatch, useSelector } from 'react-redux'
 import { useNavigation } from '@react-navigation/native'
 
 import { Button, Card, Typography, Modal as Modal2025, Badge } from '../../components/2025'
+import AlertModal from '../../components/AlertModal'
 import { useTheme } from '../../theme'
+import { useAlert } from '../../hooks/useAlert'
 import { formatCurrency } from '../../utils/currencyHelpers'
 import { TEST_IDS } from '../../utils/testIds'
 import type { AppDispatch, RootState } from '../../store'
@@ -63,6 +64,7 @@ const getTransactionColor = (type: WalletTransactionType, theme: ReturnType<type
 
 const WalletScreen: React.FC = () => {
   const theme = useTheme()
+  const { alertProps, showError, showSuccess } = useAlert()
   const navigation = useNavigation()
   const dispatch = useDispatch<AppDispatch>()
   const {
@@ -138,7 +140,7 @@ const WalletScreen: React.FC = () => {
   const handleRechargeSubmit = async () => {
     const amount = Number.parseFloat(rechargeAmount.replace(/\s/g, ''))
     if (!Number.isFinite(amount) || amount <= 0) {
-      Alert.alert('Montant invalide', 'Veuillez saisir un montant supérieur à zéro.')
+      showError('Montant invalide', 'Veuillez saisir un montant supérieur à zéro.')
       return
     }
 
@@ -148,41 +150,41 @@ const WalletScreen: React.FC = () => {
       setRechargePhone('')
       setSelectedMethod('flooz')
       setShowRechargeModal(false)
-      Alert.alert('Succès', 'Recharge initiée avec succès. Finalisez l\'opération depuis votre mobile money.')
+      showSuccess('Succès', 'Recharge initiée avec succès. Finalisez l\'opération depuis votre mobile money.')
     } catch (error: any) {
-      Alert.alert('Recharge impossible', error?.message ?? 'Une erreur est survenue lors de la recharge.')
+      showError('Recharge impossible', error?.message ?? 'Une erreur est survenue lors de la recharge.')
     }
   }
 
   const handlePinSubmit = async () => {
     if (newPin.trim().length < 4) {
-      Alert.alert('PIN invalide', 'Le PIN doit contenir au moins 4 chiffres.')
+      showError('PIN invalide', 'Le PIN doit contenir au moins 4 chiffres.')
       return
     }
 
     if (newPin !== confirmPin) {
-      Alert.alert('PIN différent', 'Les codes PIN saisis ne correspondent pas.')
+      showError('PIN différent', 'Les codes PIN saisis ne correspondent pas.')
       return
     }
 
     try {
       if (pinMode === 'update') {
         if (currentPin.trim().length < 4) {
-          Alert.alert('PIN actuel requis', 'Veuillez saisir votre PIN actuel pour le modifier.')
+          showError('PIN actuel requis', 'Veuillez saisir votre PIN actuel pour le modifier.')
           return
         }
         await dispatch(changeWalletPin({ currentPin: currentPin.trim(), newPin: newPin.trim() })).unwrap()
-        Alert.alert('Succès', 'Votre code PIN a été mis à jour.')
+        showSuccess('Succès', 'Votre code PIN a été mis à jour.')
       } else {
         await dispatch(setWalletPin({ pin: newPin.trim() })).unwrap()
-        Alert.alert('Succès', 'Votre code PIN a été configuré.')
+        showSuccess('Succès', 'Votre code PIN a été configuré.')
       }
       setShowPinModal(false)
       setCurrentPin('')
       setNewPin('')
       setConfirmPin('')
     } catch (error: any) {
-      Alert.alert('Erreur PIN', error?.message ?? 'Impossible de mettre à jour le code PIN.')
+      showError('Erreur PIN', error?.message ?? 'Impossible de mettre à jour le code PIN.')
     }
   }
 
@@ -190,22 +192,22 @@ const WalletScreen: React.FC = () => {
     try {
       await dispatch(toggleWalletStatus(next)).unwrap()
     } catch (error: any) {
-      Alert.alert('Action impossible', error?.message ?? 'Impossible de mettre à jour le statut du portefeuille.')
+      showError('Action impossible', error?.message ?? 'Impossible de mettre à jour le statut du portefeuille.')
     }
   }
 
   const handleUpdateDailyLimit = async () => {
     const parsed = Number.parseInt(customDailyLimit, 10)
     if (!Number.isFinite(parsed) || parsed <= 0) {
-      Alert.alert('Valeur invalide', 'Veuillez saisir une limite quotidienne valide (minimum 1).')
+      showError('Valeur invalide', 'Veuillez saisir une limite quotidienne valide (minimum 1).')
       return
     }
 
     try {
       await dispatch(updateWalletDailyLimit(parsed)).unwrap()
-      Alert.alert('Limite mise à jour', 'Votre limite quotidienne a été enregistrée.')
+      showSuccess('Limite mise à jour', 'Votre limite quotidienne a été enregistrée.')
     } catch (error: any) {
-      Alert.alert('Erreur', error?.message ?? 'Impossible de mettre à jour la limite quotidienne.')
+      showError('Erreur', error?.message ?? 'Impossible de mettre à jour la limite quotidienne.')
     }
   }
 
@@ -571,6 +573,8 @@ const WalletScreen: React.FC = () => {
           </Button>
         </View>
       </Modal2025>
+
+      <AlertModal {...alertProps} />
     </View>
   )
 }

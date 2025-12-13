@@ -16,6 +16,9 @@ import ExportReservationsButton from '../../components/merchant/ExportReservatio
 import { Reservation } from '../../types'
 import { Modal as Modal2025 } from '../../components/2025'
 import AlertModal, { AlertType, AlertButton } from '../../components/AlertModal'
+import { createLogger } from '../../utils/logger'
+
+const merchantReservationsLogger = createLogger('MerchantReservations')
 
 interface Props {
   route?: {
@@ -76,7 +79,7 @@ const MerchantReservationsScreen: React.FC<Props> = ({ route }) => {
     try {
       setLoading(true)
       if (__DEV__) {
-        console.log('📥 [MerchantReservations] Chargement réservations merchant...')
+        merchantReservationsLogger.log('📥 [MerchantReservations] Chargement réservations merchant...')
       }
 
       // ✅ VERIFIED: Endpoint matches backend route (api.php:132)
@@ -84,10 +87,10 @@ const MerchantReservationsScreen: React.FC<Props> = ({ route }) => {
 
       // 🐛 BUG FIX #36: Log full response to debug structure (DEV only)
       if (__DEV__) {
-        console.log('✅ [MerchantReservations] Réponse complète:', JSON.stringify(response).substring(0, 500))
-        console.log('✅ [MerchantReservations] Type de réponse:', typeof response)
-        console.log('✅ [MerchantReservations] Clés de réponse:', Object.keys(response || {}))
-        console.log('✅ [MerchantReservations] Réponse reçue:', {
+        merchantReservationsLogger.log('✅ [MerchantReservations] Réponse complète:', JSON.stringify(response).substring(0, 500))
+        merchantReservationsLogger.log('✅ [MerchantReservations] Type de réponse:', typeof response)
+        merchantReservationsLogger.log('✅ [MerchantReservations] Clés de réponse:', Object.keys(response || {}))
+        merchantReservationsLogger.log('✅ [MerchantReservations] Réponse reçue:', {
           success: response?.success,
           dataExists: !!response?.data,
           dataLength: response?.data?.length,
@@ -99,15 +102,15 @@ const MerchantReservationsScreen: React.FC<Props> = ({ route }) => {
       // apiService.get() retourne response.data d'axios
       // Backend retourne {success: true, data: [...]} donc response.data = le tableau
       const allReservations = Array.isArray(response.data) ? response.data : (response.data?.data || response || [])
-      console.log('🟢 [MerchantReservations] Nombre réservations:', Array.isArray(allReservations) ? allReservations.length : 0)
+      merchantReservationsLogger.log('🟢 [MerchantReservations] Nombre réservations:', Array.isArray(allReservations) ? allReservations.length : 0)
       if (Array.isArray(allReservations)) {
         setReservations(allReservations)
       }
     } catch (error: any) {
-      console.error('❌ [MerchantReservations] Erreur chargement réservations:', error?.message || error)
+      merchantReservationsLogger.error('❌ [MerchantReservations] Erreur chargement réservations:', error?.message || error)
       if (__DEV__) {
-        console.error('❌ [MerchantReservations] Stack:', error?.stack)
-        console.error('❌ [MerchantReservations] Status code:', error?.statusCode)
+        merchantReservationsLogger.error('❌ [MerchantReservations] Stack:', error?.stack)
+        merchantReservationsLogger.error('❌ [MerchantReservations] Status code:', error?.statusCode)
       }
       // 🐛 BUG FIX #35: Don't clear existing reservations on error
       showAlert(
@@ -138,16 +141,16 @@ const MerchantReservationsScreen: React.FC<Props> = ({ route }) => {
     setActionLoading(true)
     try {
       if (__DEV__) {
-        console.log('📤 [MerchantReservations] Confirmation réservation:', selectedReservation.id)
+        merchantReservationsLogger.log('📤 [MerchantReservations] Confirmation réservation:', selectedReservation.id)
       }
       await apiService.post(`/reservations/${selectedReservation.id}/confirm`)
       if (__DEV__) {
-        console.log('✅ [MerchantReservations] Réservation confirmée, rechargement...')
+        merchantReservationsLogger.log('✅ [MerchantReservations] Réservation confirmée, rechargement...')
       }
       setShowConfirmModal(false)
       await loadReservations()
     } catch (error: any) {
-      console.error('❌ [MerchantReservations] Erreur confirmation:', error?.message || error)
+      merchantReservationsLogger.error('❌ [MerchantReservations] Erreur confirmation:', error?.message || error)
       showAlert('error', 'Erreur', 'Impossible de confirmer la réservation')
     } finally {
       setActionLoading(false)
@@ -166,16 +169,16 @@ const MerchantReservationsScreen: React.FC<Props> = ({ route }) => {
     setActionLoading(true)
     try {
       if (__DEV__) {
-        console.log('📤 [MerchantReservations] Marquage prêt réservation:', selectedReservation.id)
+        merchantReservationsLogger.log('📤 [MerchantReservations] Marquage prêt réservation:', selectedReservation.id)
       }
       await apiService.post(`/reservations/${selectedReservation.id}/ready`)
       if (__DEV__) {
-        console.log('✅ [MerchantReservations] Réservation marquée prête, rechargement...')
+        merchantReservationsLogger.log('✅ [MerchantReservations] Réservation marquée prête, rechargement...')
       }
       setShowReadyModal(false)
       await loadReservations()
     } catch (error: any) {
-      console.error('❌ [MerchantReservations] Erreur marquage prêt:', error?.message || error)
+      merchantReservationsLogger.error('❌ [MerchantReservations] Erreur marquage prêt:', error?.message || error)
       showAlert('error', 'Erreur', 'Impossible de marquer la réservation comme prête')
     } finally {
       setActionLoading(false)
@@ -194,16 +197,16 @@ const MerchantReservationsScreen: React.FC<Props> = ({ route }) => {
     setActionLoading(true)
     try {
       if (__DEV__) {
-        console.log('📤 [MerchantReservations] Finalisation réservation:', selectedReservation.id)
+        merchantReservationsLogger.log('📤 [MerchantReservations] Finalisation réservation:', selectedReservation.id)
       }
       await apiService.post(`/reservations/${selectedReservation.id}/complete`)
       if (__DEV__) {
-        console.log('✅ [MerchantReservations] Réservation finalisée, rechargement...')
+        merchantReservationsLogger.log('✅ [MerchantReservations] Réservation finalisée, rechargement...')
       }
       setShowCompleteModal(false)
       await loadReservations()
     } catch (error: any) {
-      console.error('❌ [MerchantReservations] Erreur finalisation:', error?.message || error)
+      merchantReservationsLogger.error('❌ [MerchantReservations] Erreur finalisation:', error?.message || error)
       showAlert('error', 'Erreur', 'Impossible de marquer la réservation comme terminée')
     } finally {
       setActionLoading(false)
@@ -222,18 +225,18 @@ const MerchantReservationsScreen: React.FC<Props> = ({ route }) => {
     setActionLoading(true)
     try {
       if (__DEV__) {
-        console.log('📤 [MerchantReservations] Refus réservation:', selectedReservation.id)
+        merchantReservationsLogger.log('📤 [MerchantReservations] Refus réservation:', selectedReservation.id)
       }
       // ✅ FIX: Utiliser /reject pour les marchands (pas /cancel qui est réservé aux consommateurs)
       await apiService.post(`/reservations/${selectedReservation.id}/reject`)
       if (__DEV__) {
-        console.log('✅ [MerchantReservations] Réservation refusée, rechargement...')
+        merchantReservationsLogger.log('✅ [MerchantReservations] Réservation refusée, rechargement...')
       }
       setShowCancelModal(false)
       showAlert('success', 'Succès', 'Réservation refusée avec succès')
       await loadReservations()
     } catch (error: any) {
-      console.error('❌ [MerchantReservations] Erreur refus:', error?.message || error)
+      merchantReservationsLogger.error('❌ [MerchantReservations] Erreur refus:', error?.message || error)
       showAlert('error', 'Erreur', 'Impossible de refuser la réservation')
     } finally {
       setActionLoading(false)

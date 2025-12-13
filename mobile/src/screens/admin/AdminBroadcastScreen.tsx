@@ -6,7 +6,6 @@ import {
   ScrollView,
   TextInput,
   TouchableOpacity,
-  Alert,
   ActivityIndicator,
   StatusBar,
 } from 'react-native'
@@ -14,13 +13,16 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { Ionicons } from '@expo/vector-icons'
 import { useTheme } from '../../theme'
 import { Typography, Card, Button, Badge } from '../../components/2025'
+import AlertModal from '../../components/AlertModal'
 import apiService from '../../services/api'
 import { BroadcastNotification } from '../../types'
 import { TEST_IDS } from '../../utils/testIds'
+import { useAlert } from '../../hooks/useAlert'
 
 const AdminBroadcastScreen: React.FC = () => {
   const theme = useTheme()
   const insets = useSafeAreaInsets()
+  const { alertProps, showError, showSuccess, showWarning, hideAlert } = useAlert()
   const [title, setTitle] = useState('')
   const [message, setMessage] = useState('')
   const [selectedChannels, setSelectedChannels] = useState<
@@ -86,19 +88,20 @@ const AdminBroadcastScreen: React.FC = () => {
   const handleSend = async () => {
     const validationError = validateForm()
     if (validationError) {
-      Alert.alert('Erreur de validation', validationError)
+      showError('Erreur de validation', validationError)
       return
     }
 
-    Alert.alert(
+    showWarning(
       'Confirmer l\'envoi',
       `Envoyer cette notification ${selectedRoles.length > 0 ? `aux ${selectedRoles.join(', ')}` : 'à tous les utilisateurs'} via ${selectedChannels.join(', ')} ?`,
       [
-        { text: 'Annuler', style: 'cancel' },
+        { text: 'Annuler', style: 'cancel', onPress: hideAlert },
         {
           text: 'Envoyer',
           style: 'default',
           onPress: async () => {
+            hideAlert()
             try {
               setLoading(true)
 
@@ -127,17 +130,18 @@ const AdminBroadcastScreen: React.FC = () => {
               // Utiliser .post() au lieu de sendBroadcastNotification() qui n'existe peut-être pas
               const response = await apiService.post('/admin/notifications/broadcast', data)
 
-              Alert.alert(
+              showSuccess(
                 'Succès',
                 `Notification envoyée à ${response.data?.sent_count || 0} utilisateur(s)`,
                 [
-                  {
-                    text: 'OK',
-                    onPress: () => {
-                      // Reset form
-                      setTitle('')
-                      setMessage('')
-                      setActionUrl('')
+	                  {
+	                    text: 'OK',
+	                    onPress: () => {
+	                      hideAlert()
+	                      // Reset form
+	                      setTitle('')
+	                      setMessage('')
+	                      setActionUrl('')
                       setPayloadJson('')
                       setSelectedRoles([])
                       setSelectedChannels(['database'])
@@ -147,7 +151,7 @@ const AdminBroadcastScreen: React.FC = () => {
               )
             } catch (error: any) {
               console.error('Erreur envoi notification:', error)
-              Alert.alert(
+              showError(
                 'Erreur',
                 error?.response?.data?.message || 'Impossible d\'envoyer la notification'
               )
@@ -477,6 +481,8 @@ const AdminBroadcastScreen: React.FC = () => {
 
         <View style={{ height: 40 }} />
       </ScrollView>
+
+      <AlertModal {...alertProps} />
     </View>
   )
 }

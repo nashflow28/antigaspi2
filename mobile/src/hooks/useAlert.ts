@@ -26,10 +26,10 @@ export interface UseAlertReturn {
   hideAlert: () => void
 
   // Shortcut methods
-  showError: (title: string, message?: string) => void
-  showSuccess: (title: string, message?: string) => void
+  showError: (title: string, message?: string, buttons?: AlertButton[]) => void
+  showSuccess: (title: string, message?: string, buttons?: AlertButton[]) => void
   showWarning: (title: string, message?: string, buttons?: AlertButton[]) => void
-  showInfo: (title: string, message?: string) => void
+  showInfo: (title: string, message?: string, buttons?: AlertButton[]) => void
 
   // For AlertModal props spread
   alertProps: {
@@ -67,20 +67,20 @@ export const useAlert = (): UseAlertReturn => {
   }, [])
 
   // Shortcut methods
-  const showError = useCallback((title: string, message?: string) => {
-    showAlert('error', title, message)
+  const showError = useCallback((title: string, message?: string, buttons?: AlertButton[]) => {
+    showAlert('error', title, message, buttons)
   }, [showAlert])
 
-  const showSuccess = useCallback((title: string, message?: string) => {
-    showAlert('success', title, message)
+  const showSuccess = useCallback((title: string, message?: string, buttons?: AlertButton[]) => {
+    showAlert('success', title, message, buttons)
   }, [showAlert])
 
   const showWarning = useCallback((title: string, message?: string, buttons?: AlertButton[]) => {
     showAlert('warning', title, message, buttons)
   }, [showAlert])
 
-  const showInfo = useCallback((title: string, message?: string) => {
-    showAlert('info', title, message)
+  const showInfo = useCallback((title: string, message?: string, buttons?: AlertButton[]) => {
+    showAlert('info', title, message, buttons)
   }, [showAlert])
 
   // Props to spread directly on AlertModal

@@ -6,7 +6,6 @@ import {
   TouchableOpacity,
   StatusBar,
   RefreshControl,
-  Alert,
   TextInput,
   ActivityIndicator,
   Modal,
@@ -18,12 +17,15 @@ import { useTheme } from '../../theme'
 import { User } from '../../types'
 import apiService from '../../services/api'
 import { Button, Badge, Card, Typography, ConfirmModal } from '../../components/2025'
+import AlertModal from '../../components/AlertModal'
+import { useAlert } from '../../hooks/useAlert'
 
 type RoleFilter = 'all' | 'consumer' | 'merchant' | 'admin'
 
 const AdminUsersScreen: React.FC = () => {
   const theme = useTheme()
   const insets = useSafeAreaInsets()
+  const { alertProps, showError, showSuccess, showWarning, hideAlert } = useAlert()
   const [users, setUsers] = useState<User[]>([])
   const [filteredUsers, setFilteredUsers] = useState<User[]>([])
   const [refreshing, setRefreshing] = useState(false)
@@ -62,14 +64,14 @@ const AdminUsersScreen: React.FC = () => {
 
       // Gestion des erreurs d'autorisation
       if (error.response?.status === 401 || error.response?.status === 403) {
-        Alert.alert(
+        showWarning(
           'Session expirée',
           'Votre session a expiré. Veuillez vous reconnecter.'
         )
         return
       }
 
-      Alert.alert('Erreur', 'Impossible de charger les utilisateurs')
+      showError('Erreur', 'Impossible de charger les utilisateurs')
     } finally {
       setLoading(false)
       setRefreshing(false)
@@ -132,11 +134,11 @@ const AdminUsersScreen: React.FC = () => {
 
       setShowConfirmModal(false)
       setShowDetailModal(false)
-      Alert.alert('Succès', isSuspended ? 'Utilisateur débloqué' : 'Utilisateur bloqué')
+      showSuccess('Succès', isSuspended ? 'Utilisateur débloqué' : 'Utilisateur bloqué')
     } catch (error: any) {
       console.error('Erreur mise à jour statut:', error)
       setUsers(previousUsers)
-      Alert.alert('Erreur', 'Impossible de mettre à jour le statut')
+      showError('Erreur', 'Impossible de mettre à jour le statut')
     } finally {
       setActionLoading(false)
     }
@@ -523,6 +525,8 @@ const AdminUsersScreen: React.FC = () => {
         loading={actionLoading}
         icon={confirmAction === 'block' ? 'ban' : 'checkmark-circle'}
       />
+
+      <AlertModal {...alertProps} />
     </View>
   )
 }

@@ -7,7 +7,6 @@ import {
   TouchableOpacity,
   FlatList,
   RefreshControl,
-  Alert,
   ActivityIndicator,
 } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
@@ -15,6 +14,8 @@ import { Ionicons } from '@expo/vector-icons'
 import { useTheme } from '../../theme'
 import apiService from '../../services/api'
 import { Badge, Button, Card, Typography } from '../../components/2025'
+import AlertModal from '../../components/AlertModal'
+import { useAlert } from '../../hooks/useAlert'
 
 interface PendingReview {
   id: number
@@ -114,6 +115,7 @@ type ResolveAction = 'dismiss' | 'remove_review' | 'warn_user'
 const AdminReviewModerationScreen: React.FC = () => {
   const theme = useTheme()
   const insets = useSafeAreaInsets()
+  const { alertProps, showError, showSuccess, showWarning, hideAlert } = useAlert()
   const [stats, setStats] = useState<ModerationStats | null>(null)
   const [reportReasons, setReportReasons] = useState<Record<string, number>>({})
   const [pendingReviews, setPendingReviews] = useState<PendingReview[]>([])
@@ -162,14 +164,14 @@ const AdminReviewModerationScreen: React.FC = () => {
 
       // Gestion des erreurs d'autorisation
       if (error.response?.status === 401 || error.response?.status === 403) {
-        Alert.alert(
+        showWarning(
           'Session expirée',
           'Votre session a expiré. Veuillez vous reconnecter.'
         )
         return
       }
 
-      Alert.alert('Erreur', 'Impossible de charger les statistiques de modération')
+      showError('Erreur', 'Impossible de charger les statistiques de modération')
     }
   }, [])
 
@@ -187,14 +189,14 @@ const AdminReviewModerationScreen: React.FC = () => {
 
       // Gestion des erreurs d'autorisation
       if (error.response?.status === 401 || error.response?.status === 403) {
-        Alert.alert(
+        showWarning(
           'Session expirée',
           'Votre session a expiré. Veuillez vous reconnecter.'
         )
         return
       }
 
-      Alert.alert('Erreur', 'Impossible de charger les avis en attente')
+      showError('Erreur', 'Impossible de charger les avis en attente')
     }
   }, [])
 
@@ -224,14 +226,14 @@ const AdminReviewModerationScreen: React.FC = () => {
 
       // Gestion des erreurs d'autorisation
       if (error.response?.status === 401 || error.response?.status === 403) {
-        Alert.alert(
+        showWarning(
           'Session expirée',
           'Votre session a expiré. Veuillez vous reconnecter.'
         )
         return
       }
 
-      Alert.alert('Erreur', 'Impossible de charger les signalements')
+      showError('Erreur', 'Impossible de charger les signalements')
     } finally {
       setListLoading(false)
     }
@@ -253,20 +255,21 @@ const AdminReviewModerationScreen: React.FC = () => {
 
   const handleApproveReview = useCallback(
     (review: PendingReview) => {
-      Alert.alert('Approuver l\'avis', 'Confirmez-vous l\'approbation de cet avis ?', [
-        { text: 'Annuler', style: 'cancel' },
+      showWarning('Approuver l\'avis', 'Confirmez-vous l\'approbation de cet avis ?', [
+        { text: 'Annuler', style: 'cancel', onPress: hideAlert },
         {
           text: 'Approuver',
           onPress: async () => {
+            hideAlert()
             try {
               setActionLoadingId(review.id)
               await apiService.post(`/admin/reviews/${review.id}/approve`)
               setPendingReviews(prev => prev.filter(item => item.id !== review.id))
               await loadStats()
-              Alert.alert('Succès', 'Avis approuvé')
+              showSuccess('Succès', 'Avis approuvé')
             } catch (error) {
               console.error('Erreur approbation avis:', error)
-              Alert.alert('Erreur', 'Impossible d\'approuver cet avis')
+              showError('Erreur', 'Impossible d\'approuver cet avis')
             } finally {
               setActionLoadingId(null)
             }
@@ -278,24 +281,25 @@ const AdminReviewModerationScreen: React.FC = () => {
   )
 
   const handleRejectReview = useCallback((review: PendingReview) => {
-    Alert.alert(
+    showWarning(
       'Rejeter l\'avis',
       'Voulez-vous rejeter et supprimer cet avis ? Cette action est irréversible.',
       [
-        { text: 'Annuler', style: 'cancel' },
+        { text: 'Annuler', style: 'cancel', onPress: hideAlert },
         {
           text: 'Rejeter',
           style: 'destructive',
           onPress: async () => {
+            hideAlert()
             try {
               setActionLoadingId(review.id)
               await apiService.post(`/admin/reviews/${review.id}/reject`)
               setPendingReviews(prev => prev.filter(item => item.id !== review.id))
               await loadStats()
-              Alert.alert('Succès', 'Avis rejeté et supprimé')
+              showSuccess('Succès', 'Avis rejeté et supprimé')
             } catch (error) {
               console.error('Erreur rejet avis:', error)
-              Alert.alert('Erreur', 'Impossible de rejeter cet avis')
+              showError('Erreur', 'Impossible de rejeter cet avis')
             } finally {
               setActionLoadingId(null)
             }
@@ -328,10 +332,10 @@ const AdminReviewModerationScreen: React.FC = () => {
         } else if (action === 'warn_user') {
           message = 'Utilisateur averti et signalement résolu'
         }
-        Alert.alert('Succès', message)
+        showSuccess('Succès', message)
       } catch (error) {
         console.error('Erreur résolution signalement:', error)
-        Alert.alert('Erreur', 'Impossible de mettre à jour le signalement')
+        showError('Erreur', 'Impossible de mettre à jour le signalement')
       } finally {
         setResolvingReportId(null)
       }
@@ -341,21 +345,30 @@ const AdminReviewModerationScreen: React.FC = () => {
 
   const handleResolveOptions = useCallback(
     (report: ReportedReview) => {
-      Alert.alert('Résoudre le signalement', 'Quelle action souhaitez-vous appliquer ?', [
-        { text: 'Annuler', style: 'cancel' },
-        {
-          text: 'Ignorer',
-          onPress: () => resolveReport(report, 'dismiss'),
-        },
-        {
-          text: 'Supprimer l\'avis',
-          style: 'destructive',
-          onPress: () => resolveReport(report, 'remove_review'),
-        },
-        {
-          text: 'Avertir le client',
-          onPress: () => resolveReport(report, 'warn_user'),
-        },
+      showWarning('Résoudre le signalement', 'Quelle action souhaitez-vous appliquer ?', [
+        { text: 'Annuler', style: 'cancel', onPress: hideAlert },
+	        {
+	          text: 'Ignorer',
+	          onPress: () => {
+	            hideAlert()
+	            resolveReport(report, 'dismiss')
+	          },
+	        },
+	        {
+	          text: 'Supprimer l\'avis',
+	          style: 'destructive',
+	          onPress: () => {
+	            hideAlert()
+	            resolveReport(report, 'remove_review')
+	          },
+	        },
+	        {
+	          text: 'Avertir le client',
+	          onPress: () => {
+	            hideAlert()
+	            resolveReport(report, 'warn_user')
+	          },
+	        },
       ])
     },
     [resolveReport]
@@ -841,8 +854,8 @@ const AdminReviewModerationScreen: React.FC = () => {
           refreshControl={<RefreshControl refreshing={refreshing} onRefresh={handleRefresh} tintColor={theme.colors.primary[500]} />}
           ListHeaderComponent={headerComponent}
         />
-      ) : (
-        <FlatList
+	      ) : (
+	        <FlatList
           data={reportedReviews}
           keyExtractor={item => `reported-${item.id}`}
           renderItem={renderReportedReview}
@@ -856,9 +869,11 @@ const AdminReviewModerationScreen: React.FC = () => {
             </View>
           ) : null}
         />
-      )}
-    </View>
-  )
+	      )}
+
+      <AlertModal {...alertProps} />
+	    </View>
+	  )
 }
 
 const styles = StyleSheet.create({

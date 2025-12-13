@@ -30,7 +30,6 @@ const ProfileScreen: React.FC = () => {
   const { showAlert } = useAlert()
 
   const handleLogout = () => {
-    console.log('🔴 handleLogout clicked!')
     // Utiliser l'alerte stylisée pour la confirmation de déconnexion
     showAlert({
       title: 'Déconnexion',
@@ -40,7 +39,6 @@ const ProfileScreen: React.FC = () => {
         {
           text: 'Annuler',
           style: 'cancel',
-          onPress: () => console.log('🟢 Déconnexion annulée')
         },
         {
           text: 'Déconnexion',
@@ -52,7 +50,6 @@ const ProfileScreen: React.FC = () => {
   }
 
   const confirmLogout = async () => {
-    console.log('🔴 Confirmation déconnexion')
     try {
       // BUG FIX #12: Use secureStorage for sensitive data removal
       // Remove sensitive auth data securely
@@ -64,7 +61,6 @@ const ProfileScreen: React.FC = () => {
       await AsyncStorage.removeItem('cart_data')
       // Déconnexion
       await dispatch(logoutUser())
-      console.log('✅ Déconnexion réussie')
     } catch (error) {
       console.error('❌ Erreur déconnexion:', error)
     }

@@ -12,6 +12,9 @@ import {
   Payment
 } from '../types';
 import { formatCurrency as formatCurrencyUtil } from '../utils/currencyHelpers';
+import { createLogger } from '../utils/logger'
+
+const paymentLogger = createLogger('PaymentService')
 
 export interface PaymentProvider {
   id: string;
@@ -159,7 +162,7 @@ class PaymentService {
         ussdString
       };
     } catch (error: any) {
-      console.error('Payment initiation error:', error);
+      paymentLogger.error('Payment initiation error:', error);
       return {
         success: false,
         message: error?.message || 'Erreur lors du paiement',
@@ -273,7 +276,7 @@ class PaymentService {
       const history = await AsyncStorage.getItem('payment_history');
       return history ? JSON.parse(history) : [];
     } catch (error) {
-      console.error('Error getting transaction history:', error);
+      paymentLogger.error('Error getting transaction history:', error);
       return [];
     }
   }
@@ -291,7 +294,7 @@ class PaymentService {
         description,
       });
     } catch (error) {
-      console.error('Error recording payment history:', error);
+      paymentLogger.error('Error recording payment history:', error);
     }
   }
 
@@ -306,7 +309,7 @@ class PaymentService {
       const limited = history.slice(0, 50);
       await AsyncStorage.setItem('payment_history', JSON.stringify(limited));
     } catch (error) {
-      console.error('Error saving to history:', error);
+      paymentLogger.error('Error saving to history:', error);
     }
   }
 
@@ -317,7 +320,7 @@ class PaymentService {
     try {
       await AsyncStorage.removeItem('payment_history');
     } catch (error) {
-      console.error('Error clearing history:', error);
+      paymentLogger.error('Error clearing history:', error);
     }
   }
 

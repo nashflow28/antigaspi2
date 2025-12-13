@@ -7,7 +7,6 @@ import {
   TouchableOpacity,
   StatusBar,
   RefreshControl,
-  Alert,
   TextInput,
   Modal,
   ScrollView,
@@ -18,6 +17,8 @@ import { Ionicons } from '@expo/vector-icons'
 import { useTheme } from '../../theme'
 import apiService from '../../services/api'
 import { Button, Badge, Card, Typography } from '../../components/2025'
+import AlertModal from '../../components/AlertModal'
+import { useAlert } from '../../hooks/useAlert'
 
 interface MerchantWithStats {
   id: number
@@ -47,6 +48,7 @@ type MerchantStatus = 'all' | 'verified' | 'pending'
 const AdminMerchantsScreen: React.FC = () => {
   const theme = useTheme()
   const insets = useSafeAreaInsets()
+  const { alertProps, showError, showSuccess, showWarning, hideAlert } = useAlert()
   const [merchants, setMerchants] = useState<MerchantWithStats[]>([])
   const [filteredMerchants, setFilteredMerchants] = useState<MerchantWithStats[]>([])
   const [refreshing, setRefreshing] = useState(false)
@@ -92,14 +94,14 @@ const AdminMerchantsScreen: React.FC = () => {
 
       // Gestion des erreurs d'autorisation
       if (error.response?.status === 401 || error.response?.status === 403) {
-        Alert.alert(
+        showWarning(
           'Session expirée',
           'Votre session a expiré. Veuillez vous reconnecter.'
         )
         return
       }
 
-      Alert.alert('Erreur', 'Impossible de charger les commerçants')
+      showError('Erreur', 'Impossible de charger les commerçants')
     } finally {
       setLoading(false)
       setRefreshing(false)
@@ -143,15 +145,16 @@ const AdminMerchantsScreen: React.FC = () => {
   }
 
   const handleApproveMerchant = async (merchant: MerchantWithStats) => {
-    Alert.alert(
+    showWarning(
       'Approuver le commerçant',
       `Voulez-vous approuver ${merchant.business_name} ?`,
       [
-        { text: 'Annuler', style: 'cancel' },
+        { text: 'Annuler', style: 'cancel', onPress: hideAlert },
         {
           text: 'Approuver',
           style: 'default',
           onPress: async () => {
+            hideAlert()
             // Backup pour rollback en cas d'erreur
             const previousMerchants = [...merchants]
 
@@ -166,7 +169,7 @@ const AdminMerchantsScreen: React.FC = () => {
 
               await apiService.post(`/admin/merchants/${merchant.id}/approve`)
 
-              Alert.alert('Succès', `${merchant.business_name} a été approuvé`)
+              showSuccess('Succès', `${merchant.business_name} a été approuvé`)
               setShowDetailModal(false)
             } catch (error: any) {
               console.error('Erreur approbation:', error)
@@ -174,7 +177,7 @@ const AdminMerchantsScreen: React.FC = () => {
               // Rollback en cas d'erreur
               setMerchants(previousMerchants)
 
-              Alert.alert('Erreur', "Impossible d'approuver le commerçant")
+              showError('Erreur', "Impossible d'approuver le commerçant")
             } finally {
               // Retirer l'ID du Set
               setActionLoadingIds(prev => {
@@ -200,7 +203,7 @@ const AdminMerchantsScreen: React.FC = () => {
     if (!selectedMerchant) return
 
     if (!rejectReason || rejectReason.trim().length < 10) {
-      Alert.alert('Erreur', 'La raison doit contenir au moins 10 caractères')
+      showError('Erreur', 'La raison doit contenir au moins 10 caractères')
       return
     }
 
@@ -220,7 +223,7 @@ const AdminMerchantsScreen: React.FC = () => {
         reason: rejectReason.trim(),
       })
 
-      Alert.alert('Succès', `${selectedMerchant.business_name} a été rejeté`)
+      showSuccess('Succès', `${selectedMerchant.business_name} a été rejeté`)
       setShowRejectModal(false)
       setShowDetailModal(false)
       setRejectReason('')
@@ -230,7 +233,7 @@ const AdminMerchantsScreen: React.FC = () => {
       // Rollback en cas d'erreur
       setMerchants(previousMerchants)
 
-      Alert.alert('Erreur', 'Impossible de rejeter le commerçant')
+      showError('Erreur', 'Impossible de rejeter le commerçant')
     } finally {
       // Retirer l'ID du Set
       setActionLoadingIds(prev => {
@@ -663,6 +666,8 @@ const AdminMerchantsScreen: React.FC = () => {
 
       {renderDetailModal()}
       {renderRejectModal()}
+
+      <AlertModal {...alertProps} />
     </View>
   )
 }

@@ -30,6 +30,8 @@ class User extends Authenticatable implements JWTSubject
         'prefers_sms_notifications',
         'prefers_push_notifications',
         'notification_settings',
+        'firebase_uid',
+        'phone_verified_at',
     ];
 
     protected $hidden = [
@@ -41,6 +43,7 @@ class User extends Authenticatable implements JWTSubject
     {
         return [
             'email_verified_at' => 'datetime',
+            'phone_verified_at' => 'datetime',
             'password' => 'hashed',
             'is_active' => 'boolean',
             'last_login_at' => 'datetime',

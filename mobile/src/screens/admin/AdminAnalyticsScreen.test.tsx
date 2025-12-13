@@ -1,6 +1,5 @@
 import React from 'react'
 import { render, fireEvent, waitFor, screen } from '@test-utils'
-import { Alert } from 'react-native'
 import AdminAnalyticsScreen from './AdminAnalyticsScreen'
 import apiService from '../../services/api'
 import { TEST_IDS } from '../../utils/testIds'
@@ -43,9 +42,6 @@ jest.mock('../../components/admin/ExportButton', () => {
 jest.mock('../../utils/currencyHelpers', () => ({
   formatCurrency: (amount: number) => `${amount} XOF`,
 }))
-
-// Spy on Alert.alert
-jest.spyOn(Alert, 'alert')
 
 const mockNavigation = {
   navigate: jest.fn(),
@@ -168,9 +164,16 @@ const mockAnalyticsResponseDataSafe = {
 }
 
 describe('AdminAnalyticsScreen', () => {
+  let consoleLogSpy: jest.SpyInstance | undefined
+
   beforeEach(() => {
     jest.clearAllMocks()
+    consoleLogSpy = jest.spyOn(console, 'log').mockImplementation(() => {})
     ;(apiService.get as jest.Mock).mockResolvedValue({ data: mockAnalyticsResponseDataSafe })
+  })
+
+  afterEach(() => {
+    consoleLogSpy?.mockRestore()
   })
 
   // ============ RENDERING TESTS ============
@@ -223,12 +226,12 @@ describe('AdminAnalyticsScreen', () => {
     })
   })
 
-  test('should show error alert when loading fails', async () => {
+  test('should show error modal when loading fails', async () => {
     const consoleSpyNew = jest.spyOn(console, 'error').mockImplementation(() => {})
     ;(apiService.get as jest.Mock).mockRejectedValue(new Error('Network error'))
     render(<AdminAnalyticsScreen navigation={mockNavigation} />)
     await waitFor(() => {
-      expect(Alert.alert).toHaveBeenCalledWith('Erreur', 'Impossible de charger les analytics')
+      expect(screen.getByText('Impossible de charger les analytics')).toBeTruthy()
     })
     consoleSpyNew.mockRestore()
   })
@@ -612,7 +615,7 @@ test('should render PDF export button text', async () => {
 
   // ============ TAB PERSISTENCE TESTS ============
 
-test('should maintain selected tab after data refresh', async () => {
+  test('should maintain selected tab after data refresh', async () => {
     const { getByText, getByTestId } = render(<AdminAnalyticsScreen navigation={mockNavigation} />)
     await waitFor(() => {
       fireEvent.press(getByText('Géographie'))
@@ -633,7 +636,7 @@ test('should maintain selected tab after data refresh', async () => {
 
   // ============ PERIOD PERSISTENCE TESTS ============
 
-test('should maintain selected period after tab change', async () => {
+  test('should maintain selected period after tab change', async () => {
     const { getByText } = render(<AdminAnalyticsScreen navigation={mockNavigation} />)
     await waitFor(() => {
       fireEvent.press(getByText('7 jours'))

@@ -58,6 +58,8 @@ import {
   Order,
   OrderCreationPayload,
   OrderCreationResponse,
+  FirebaseLoginResponse,
+  FirebaseRegisterData,
 } from '../types'
 import { getExpoExtraValue } from '../utils/expoConfig'
 
@@ -460,6 +462,34 @@ class ApiService {
 
   async getProfile(): Promise<ApiResponse<User>> {
     return this.request<ApiResponse<User>>('GET', '/auth/me')
+  }
+
+  // === FIREBASE PHONE AUTHENTICATION ===
+
+  async firebaseLogin(firebaseToken: string): Promise<FirebaseLoginResponse> {
+    const response = await this.request<FirebaseLoginResponse>('POST', '/auth/firebase-login', {
+      firebase_token: firebaseToken
+    })
+
+    // If login successful, store token
+    if (response.status === 'success' && response.token && response.user) {
+      await secureStorage.setToken(response.token)
+      await this.setStoredUser(response.user)
+    }
+
+    return response
+  }
+
+  async firebaseRegister(data: FirebaseRegisterData): Promise<FirebaseLoginResponse> {
+    const response = await this.request<FirebaseLoginResponse>('POST', '/auth/firebase-register', data)
+
+    // If registration successful, store token
+    if (response.status === 'success' && response.token && response.user) {
+      await secureStorage.setToken(response.token)
+      await this.setStoredUser(response.user)
+    }
+
+    return response
   }
 
   // === PRODUITS ===

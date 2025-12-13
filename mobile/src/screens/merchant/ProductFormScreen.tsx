@@ -24,6 +24,7 @@ import { TEST_IDS } from '../../utils/testIds'
 import { usePersistedForm } from '../../hooks/usePersistedForm'
 import AlertModal from '../../components/AlertModal'
 import { useAlert } from '../../hooks/useAlert'
+import { createLogger } from '../../utils/logger'
 
 interface Props {
   route: any
@@ -51,6 +52,8 @@ const INITIAL_FORM_DATA: ProductFormData = {
   quantity: '',
   expirationDateISO: getDefaultExpirationDate().toISOString(),
 }
+
+const productFormLogger = createLogger('ProductForm')
 
 const ProductFormScreen: React.FC<Props> = ({ route, navigation }) => {
   const theme = useTheme()
@@ -186,17 +189,17 @@ const ProductFormScreen: React.FC<Props> = ({ route, navigation }) => {
 
   const pickImage = async () => {
     try {
-      console.log('📸 [ProductForm] Demande permission galerie...')
+      productFormLogger.log('📸 [ProductForm] Demande permission galerie...')
       const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync()
-      console.log('📸 [ProductForm] Permission status:', status)
+      productFormLogger.log('📸 [ProductForm] Permission status:', status)
 
       if (status !== 'granted') {
-        console.warn('⚠️ [ProductForm] Permission refusée')
+        productFormLogger.warn('⚠️ [ProductForm] Permission refusée')
         showErrorModal('Permission refusée', ['Nous avons besoin de votre permission pour accéder à la galerie.'], 'warning')
         return
       }
 
-      console.log('📸 [ProductForm] Ouverture galerie...')
+      productFormLogger.log('📸 [ProductForm] Ouverture galerie...')
       const result = await ImagePicker.launchImageLibraryAsync({
         mediaTypes: ImagePicker.MediaTypeOptions.Images, // ⚠️ Deprecated but still required in expo-image-picker v17
         allowsEditing: true,
@@ -204,28 +207,28 @@ const ProductFormScreen: React.FC<Props> = ({ route, navigation }) => {
         quality: 0.8,
       })
 
-      console.log('📸 [ProductForm] Résultat sélection:', result.canceled ? 'Annulé' : 'Image sélectionnée')
+      productFormLogger.log('📸 [ProductForm] Résultat sélection:', result.canceled ? 'Annulé' : 'Image sélectionnée')
 
       if (!result.canceled && result.assets[0]) {
         const selectedUri = result.assets[0].uri
-        console.log('✅ [ProductForm] Image URI:', selectedUri)
+        productFormLogger.log('✅ [ProductForm] Image URI:', selectedUri)
         setImageUri(selectedUri)
       }
     } catch (error) {
-      console.error('❌ [ProductForm] Erreur sélection image:', error)
+      productFormLogger.error('❌ [ProductForm] Erreur sélection image:', error)
       showErrorModal('Erreur de sélection', ['Impossible de sélectionner une image.', 'Veuillez réessayer.'], 'error')
     }
   }
 
   const uploadImage = async (imageUri: string): Promise<string | null> => {
     try {
-      console.log('📤 [ProductForm] Upload image démarré...', imageUri)
+      productFormLogger.log('📤 [ProductForm] Upload image démarré...', imageUri)
       const formData = new FormData()
       const filename = imageUri.split('/').pop() || 'image.jpg'
       const match = /\.(\w+)$/.exec(filename)
       const type = match ? `image/${match[1]}` : 'image/jpeg'
 
-      console.log('📤 [ProductForm] Fichier:', { filename, type, uri: imageUri.substring(0, 50) + '...' })
+      productFormLogger.log('📤 [ProductForm] Fichier:', { filename, type, uri: imageUri.substring(0, 50) + '...' })
 
       formData.append('image', {
         uri: imageUri,
@@ -239,18 +242,18 @@ const ProductFormScreen: React.FC<Props> = ({ route, navigation }) => {
 
       // 🐛 BUG FIX #27: Backend returns { success: true, data: { url, path, filename } }
       // apiService.post() returns response.data directly, so response = { success, data: {...} }
-      console.log('✅ [ProductForm] Upload image réussi:', JSON.stringify(response, null, 2))
+      productFormLogger.log('✅ [ProductForm] Upload image réussi:', JSON.stringify(response, null, 2))
 
       if (response.success && response.data?.url) {
-        console.log('✅ [ProductForm] Image URL récupérée:', response.data.url)
+        productFormLogger.log('✅ [ProductForm] Image URL récupérée:', response.data.url)
         return response.data.url
       }
 
-      console.warn('⚠️ [ProductForm] Aucune URL dans la réponse')
+      productFormLogger.warn('⚠️ [ProductForm] Aucune URL dans la réponse')
       return null
     } catch (error: any) {
-      console.error('❌ [ProductForm] Erreur upload image:', error)
-      console.error('❌ [ProductForm] Error details:', {
+      productFormLogger.error('❌ [ProductForm] Erreur upload image:', error)
+      productFormLogger.error('❌ [ProductForm] Error details:', {
         message: error?.message,
         statusCode: error?.statusCode,
         validationErrors: error?.validationErrors,
@@ -267,47 +270,47 @@ const ProductFormScreen: React.FC<Props> = ({ route, navigation }) => {
   }
 
   const validateForm = (): boolean => {
-    console.log('🔵 validateForm appelé')
+    productFormLogger.log('🔵 validateForm appelé')
     if (!formData.name.trim()) {
-      console.error('❌ Nom du produit requis')
+      productFormLogger.error('❌ Nom du produit requis')
       showErrorModal('Erreur de validation', ['Le nom du produit est requis'], 'error')
       return false
     }
     // categoryId validation removed - automatically uses merchant's category
     const originalPriceNum = parseFloat(formData.originalPrice)
     if (!formData.originalPrice || isNaN(originalPriceNum) || originalPriceNum <= 0) {
-      console.error('❌ Prix original invalide:', formData.originalPrice)
+      productFormLogger.error('❌ Prix original invalide:', formData.originalPrice)
       showErrorModal('Erreur de validation', ['Le prix original doit être un nombre valide supérieur à 0'], 'error')
       return false
     }
     const discountedPriceNum = parseFloat(formData.discountedPrice)
     if (!formData.discountedPrice || isNaN(discountedPriceNum) || discountedPriceNum <= 0) {
-      console.error('❌ Prix réduit invalide:', formData.discountedPrice)
+      productFormLogger.error('❌ Prix réduit invalide:', formData.discountedPrice)
       showErrorModal('Erreur de validation', ['Le prix réduit doit être un nombre valide supérieur à 0'], 'error')
       return false
     }
     if (discountedPriceNum >= originalPriceNum) {
-      console.error('❌ Prix réduit >= Prix original:', { discountedPriceNum, originalPriceNum })
+      productFormLogger.error('❌ Prix réduit >= Prix original:', { discountedPriceNum, originalPriceNum })
       showErrorModal('Erreur de validation', ['Le prix réduit doit être inférieur au prix original'], 'error')
       return false
     }
     const quantityNum = parseInt(formData.quantity)
     // 🐛 BUG FIX #29: Backend requires quantity >= 1, not 0
     if (!formData.quantity || isNaN(quantityNum) || quantityNum < 1) {
-      console.error('❌ Quantité invalide:', formData.quantity)
+      productFormLogger.error('❌ Quantité invalide:', formData.quantity)
       showErrorModal('Erreur de validation', ['La quantité doit être au minimum 1'], 'error')
       return false
     }
-    console.log('✅ Validation réussie !')
+    productFormLogger.log('✅ Validation réussie !')
     return true
   }
 
   const handleSubmit = async () => {
-    console.log('🔴 handleSubmit appelé')
-    console.log('Form data:', { name: formData.name, originalPrice: formData.originalPrice, discountedPrice: formData.discountedPrice, quantity: formData.quantity, expirationDate })
+    productFormLogger.log('🔴 handleSubmit appelé')
+    productFormLogger.log('Form data:', { name: formData.name, originalPrice: formData.originalPrice, discountedPrice: formData.discountedPrice, quantity: formData.quantity, expirationDate })
 
     if (!validateForm()) {
-      console.log('❌ Validation échouée')
+      productFormLogger.log('❌ Validation échouée')
       return
     }
 
@@ -318,9 +321,9 @@ const ProductFormScreen: React.FC<Props> = ({ route, navigation }) => {
 
       // Upload image si une nouvelle image a été sélectionnée
       if (imageUri && !imageUri.startsWith('http')) {
-        console.log('📤 Upload image en cours...')
+        productFormLogger.log('📤 Upload image en cours...')
         uploadedImageUrl = await uploadImage(imageUri)
-        console.log('✅ Image uploadée:', uploadedImageUrl)
+        productFormLogger.log('✅ Image uploadée:', uploadedImageUrl)
 
         // 🐛 BUG FIX #27: Update imageUri with server URL for display
         if (uploadedImageUrl) {
@@ -339,32 +342,32 @@ const ProductFormScreen: React.FC<Props> = ({ route, navigation }) => {
         image_url: uploadedImageUrl,
       }
 
-      console.log('📤 Envoi requête API:', mode === 'create' ? 'POST /products' : `PUT /products/${product.id}`)
-      console.log('📦 Données envoyées:', JSON.stringify(productData, null, 2))
+      productFormLogger.log('📤 Envoi requête API:', mode === 'create' ? 'POST /products' : `PUT /products/${product.id}`)
+      productFormLogger.log('📦 Données envoyées:', JSON.stringify(productData, null, 2))
 
       if (mode === 'create') {
         const response = await apiService.post('/products', productData)
         // 🐛 BUG FIX #24: apiService.post() returns response.data directly
-        console.log('✅ Réponse API reçue:', response)
+        productFormLogger.log('✅ Réponse API reçue:', response)
         // Clear form cache on successful creation
         await clearFormCache()
         showSuccessModal('Le produit a été créé avec succès.')
       } else {
         const response = await apiService.put(`/products/${product.id}`, productData)
         // 🐛 BUG FIX #24: apiService.put() returns response.data directly
-        console.log('✅ Réponse API reçue:', response)
+        productFormLogger.log('✅ Réponse API reçue:', response)
         // Clear form cache on successful edit
         await clearFormCache()
         showSuccessModal('Le produit a été modifié avec succès.')
       }
 
       // Navigation will happen when success modal is closed
-      console.log('🔙 Navigation après fermeture du modal')
+      productFormLogger.log('🔙 Navigation après fermeture du modal')
     } catch (error: any) {
-      console.error('❌ ERREUR COMPLÈTE:', error)
-      console.error('❌ Error message:', error.message)
-      console.error('❌ Error statusCode:', error.statusCode)
-      console.error('❌ Error validationErrors:', error.validationErrors)
+      productFormLogger.error('❌ ERREUR COMPLÈTE:', error)
+      productFormLogger.error('❌ Error message:', error.message)
+      productFormLogger.error('❌ Error statusCode:', error.statusCode)
+      productFormLogger.error('❌ Error validationErrors:', error.validationErrors)
 
       let errorMessages: string[] = ['Impossible de sauvegarder le produit']
 
@@ -381,7 +384,7 @@ const ProductFormScreen: React.FC<Props> = ({ route, navigation }) => {
         errorMessages = [error.message]
       }
 
-      console.error('❌ Message erreur affiché:', errorMessages)
+      productFormLogger.error('❌ Message erreur affiché:', errorMessages)
       showErrorModal('Erreur de création', errorMessages, 'error')
     } finally {
       setLoading(false)
@@ -534,7 +537,7 @@ const ProductFormScreen: React.FC<Props> = ({ route, navigation }) => {
           <TouchableOpacity
             style={[styles.imagePicker, { backgroundColor: theme.colors.inputBackground, borderColor: theme.colors.border }]}
             onPress={() => {
-              console.log('🖱️ [ProductForm] Bouton image cliqué !')
+              productFormLogger.log('🖱️ [ProductForm] Bouton image cliqué !')
               pickImage()
             }}
             testID={TEST_IDS.imagePickerButton}
@@ -542,7 +545,7 @@ const ProductFormScreen: React.FC<Props> = ({ route, navigation }) => {
             {imageUri ? (
               (() => {
                 const displayUri = imageUri.startsWith('file://') ? imageUri : getImageUrl(imageUri)
-                console.log('🖼️ [ProductForm] Affichage image:', {
+                productFormLogger.log('🖼️ [ProductForm] Affichage image:', {
                   imageUri,
                   isLocalFile: imageUri.startsWith('file://'),
                   displayUri
@@ -552,10 +555,10 @@ const ProductFormScreen: React.FC<Props> = ({ route, navigation }) => {
                     source={{ uri: displayUri }}
                     style={styles.imagePreview}
                     onError={(error) => {
-                      console.error('❌ [ProductForm] Erreur chargement image:', error.nativeEvent.error)
+                      productFormLogger.error('❌ [ProductForm] Erreur chargement image:', error.nativeEvent.error)
                     }}
                     onLoad={() => {
-                      console.log('✅ [ProductForm] Image chargée avec succès:', displayUri)
+                      productFormLogger.log('✅ [ProductForm] Image chargée avec succès:', displayUri)
                     }}
                   />
                 )
@@ -689,7 +692,7 @@ const ProductFormScreen: React.FC<Props> = ({ route, navigation }) => {
         <TouchableOpacity
           style={[styles.submitButton, { backgroundColor: theme.isDark ? '#10B981' : theme.colors.primary[500] }]}
           onPress={() => {
-            console.log('🟢 Bouton cliqué !')
+            productFormLogger.log('🟢 Bouton cliqué !')
             handleSubmit()
           }}
           disabled={loading}

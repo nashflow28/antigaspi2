@@ -370,16 +370,16 @@ describe('authSlice', () => {
     const mockPayload = Buffer.from(payload).toString('base64').replace(/=/g, '').replace(/\+/g, '-').replace(/\//g, '_')
     const mockToken = `eyJhbGciOiJIUzI1NiJ9.${mockPayload}.mock-signature`
 
-    // Skip: Jest's static jest.mock doesn't intercept dynamic imports (await import())
-    // The authSlice uses dynamic import for jwtHelpers to avoid circular dependencies
-    // This pattern is correct at runtime but cannot be easily mocked in Jest
-    it.skip('should load stored auth when token and user exist', async () => {
+    it('should load stored auth when token and user exist', async () => {
       mockGetStoredToken.mockResolvedValue(mockToken)
       mockGetStoredUser.mockResolvedValue(mockUser)
 
-      await store.dispatch(loadStoredAuth())
+      const result = await store.dispatch(loadStoredAuth())
 
       const state = store.getState().auth
+      expect(mockGetStoredToken).toHaveBeenCalledTimes(1)
+      expect(mockGetStoredUser).toHaveBeenCalledTimes(1)
+      expect(result.type).toBe('auth/loadStored/fulfilled')
       expect(state.user).toEqual(mockUser)
       expect(state.token).toBe(mockToken)
       expect(state.isAuthenticated).toBe(true)

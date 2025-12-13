@@ -56,8 +56,7 @@ describe('currencyHelpers', () => {
       expect(formatCurrency(1500, { decimals: 2 })).toBe(`${fmtNum('1 500')},00 F CFA`)
     })
 
-    // Note: thousandSeparator option is defined but not implemented - Intl.NumberFormat always uses locale
-    it.skip('should support custom thousand separator', () => {
+    it('should support custom thousand separator', () => {
       expect(formatCurrency(1500, { thousandSeparator: ',' })).toBe('1,500 F CFA')
       expect(formatCurrency(1000000, { thousandSeparator: '.' })).toBe('1.000.000 F CFA')
     })

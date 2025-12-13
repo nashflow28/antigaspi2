@@ -7,7 +7,6 @@ import {
   TouchableOpacity,
   StatusBar,
   RefreshControl,
-  Alert,
   Image,
   ActivityIndicator,
   Modal,
@@ -19,6 +18,8 @@ import { Product } from '../../types'
 import apiService from '../../services/api'
 import { getImageUrl } from '../../utils/imageHelpers'
 import { TEST_IDS } from '../../utils/testIds'
+import AlertModal from '../../components/AlertModal'
+import { useAlert } from '../../hooks/useAlert'
 
 type StatusFilter = 'all' | 'active' | 'inactive' | 'pending'
 
@@ -59,6 +60,7 @@ const isPendingAdminApproval = (product: Product): boolean => {
 
 const MerchantProductsScreen: React.FC<Props> = ({ navigation }) => {
   const theme = useTheme()
+  const { alertProps, showError, showSuccess, showWarning, hideAlert } = useAlert()
   // 🐛 BUG FIX #MOB-L-001: Prevent console logs in production
   const isDev = __DEV__
   const [products, setProducts] = useState<Product[]>([])
@@ -122,15 +124,16 @@ const MerchantProductsScreen: React.FC<Props> = ({ navigation }) => {
   }
 
   const handleDeleteProduct = (productId: number) => {
-    Alert.alert(
+    showWarning(
       'Supprimer le produit',
       'Êtes-vous sûr de vouloir supprimer ce produit ?',
       [
-        { text: 'Annuler', style: 'cancel' },
+        { text: 'Annuler', style: 'cancel', onPress: hideAlert },
         {
           text: 'Supprimer',
           style: 'destructive',
           onPress: async () => {
+            hideAlert()
             try {
               if (isDev) console.log('🗑️ [MerchantProducts] Suppression du produit:', productId)
               setLoading(true)
@@ -140,10 +143,10 @@ const MerchantProductsScreen: React.FC<Props> = ({ navigation }) => {
               // Recharger la liste
               await loadProducts()
 
-              Alert.alert('Succès', 'Le produit a été supprimé')
+              showSuccess('Succès', 'Le produit a été supprimé')
             } catch (error: any) {
               if (isDev) console.error('❌ [MerchantProducts] Erreur suppression:', error)
-              Alert.alert('Erreur', 'Impossible de supprimer le produit')
+              showError('Erreur', 'Impossible de supprimer le produit')
             } finally {
               setLoading(false)
             }
@@ -462,6 +465,8 @@ const MerchantProductsScreen: React.FC<Props> = ({ navigation }) => {
           <ActivityIndicator size="large" color={theme.colors.primary[500]} />
         </View>
       )}
+
+      <AlertModal {...alertProps} />
     </View>
   )
 }

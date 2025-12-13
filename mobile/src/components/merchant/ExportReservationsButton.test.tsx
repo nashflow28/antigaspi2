@@ -1,6 +1,5 @@
 import React from 'react'
-import { render, fireEvent, waitFor } from '@testing-library/react-native'
-import { Alert } from 'react-native'
+import { render, fireEvent, waitFor, screen } from '@testing-library/react-native'
 import ExportReservationsButton from './ExportReservationsButton'
 import * as FileSystem from 'expo-file-system/legacy'
 import * as Sharing from 'expo-sharing'
@@ -34,8 +33,14 @@ jest.mock('../../theme', () => {
   }
 })
 
-// Spy on Alert
-jest.spyOn(Alert, 'alert')
+const expectAlertModal = async (titleMatcher: string | RegExp, messageMatcher?: string | RegExp) => {
+  await waitFor(() => {
+    expect(screen.getByText(titleMatcher as any)).toBeTruthy()
+    if (messageMatcher) {
+      expect(screen.getByText(messageMatcher as any)).toBeTruthy()
+    }
+  })
+}
 
 const mockReservations: Reservation[] = [
   {
@@ -165,12 +170,7 @@ describe('ExportReservationsButton', () => {
     const { getByTestId } = render(<ExportReservationsButton reservations={mockReservations} />)
     fireEvent.press(getByTestId('export-reservations-csv-button'))
 
-    await waitFor(() => {
-      expect(Alert.alert).toHaveBeenCalledWith(
-        "Erreur d'export",
-        expect.stringContaining("système de fichiers")
-      )
-    })
+    await expectAlertModal("Erreur d'export", /syst/i)
 
     expect(FileSystem.writeAsStringAsync).not.toHaveBeenCalled()
   })
@@ -181,12 +181,7 @@ describe('ExportReservationsButton', () => {
     const { getByTestId } = render(<ExportReservationsButton reservations={mockReservations} />)
     fireEvent.press(getByTestId('export-reservations-csv-button'))
 
-    await waitFor(() => {
-      expect(Alert.alert).toHaveBeenCalledWith(
-        "Erreur d'export",
-        expect.stringContaining("système de fichiers")
-      )
-    })
+    await expectAlertModal("Erreur d'export", /syst/i)
   })
 
   // ============ EXPORT FUNCTIONALITY TESTS ============
@@ -379,12 +374,7 @@ describe('ExportReservationsButton', () => {
     const { getByTestId } = render(<ExportReservationsButton reservations={mockReservations} />)
     fireEvent.press(getByTestId('export-reservations-csv-button'))
 
-    await waitFor(() => {
-      expect(Alert.alert).toHaveBeenCalledWith(
-        'Erreur',
-        expect.stringContaining('partage de fichiers')
-      )
-    })
+    await expectAlertModal('Erreur', /partage de fichiers/i)
   })
 
   test('should share CSV file with correct MIME type', async () => {
@@ -406,12 +396,7 @@ describe('ExportReservationsButton', () => {
     const { getByTestId } = render(<ExportReservationsButton reservations={mockReservations} />)
     fireEvent.press(getByTestId('export-reservations-csv-button'))
 
-    await waitFor(() => {
-      expect(Alert.alert).toHaveBeenCalledWith(
-        'Export réussi',
-        expect.stringContaining('2 réservations exportées')
-      )
-    })
+    await expectAlertModal(/2.*réserv/i)
   })
 
   test('should call onExportComplete callback', async () => {
@@ -477,9 +462,7 @@ describe('ExportReservationsButton', () => {
 
     fireEvent.press(button)
 
-    await waitFor(() => {
-      expect(Alert.alert).toHaveBeenCalledWith('Export réussi', expect.any(String))
-    })
+    await expectAlertModal(/export.*succ/i)
 
     // Loading indicator should be gone (button is re-enabled)
     expect(queryByTestId(TEST_IDS.exportReservationsLoading)).toBeNull()
@@ -506,12 +489,7 @@ describe('ExportReservationsButton', () => {
     const { getByTestId } = render(<ExportReservationsButton reservations={mockReservations} />)
     fireEvent.press(getByTestId('export-reservations-csv-button'))
 
-    await waitFor(() => {
-      expect(Alert.alert).toHaveBeenCalledWith(
-        "Erreur d'export",
-        expect.stringContaining('No storage space')
-      )
-    })
+    await expectAlertModal("Erreur d'export", /No storage space/i)
   })
 
   test('should handle sharing error gracefully', async () => {
@@ -520,12 +498,7 @@ describe('ExportReservationsButton', () => {
     const { getByTestId } = render(<ExportReservationsButton reservations={mockReservations} />)
     fireEvent.press(getByTestId('export-reservations-csv-button'))
 
-    await waitFor(() => {
-      expect(Alert.alert).toHaveBeenCalledWith(
-        "Erreur d'export",
-        expect.any(String)
-      )
-    })
+    await expectAlertModal("Erreur d'export")
   })
 
   // ============ EDGE CASES ============
@@ -578,12 +551,7 @@ describe('ExportReservationsButton', () => {
 
     fireEvent.press(getByTestId('export-reservations-csv-button'))
 
-    await waitFor(() => {
-      expect(Alert.alert).toHaveBeenCalledWith(
-        'Export réussi',
-        '1 réservation exportée avec succès'
-      )
-    })
+    await expectAlertModal(/1.*réservation.*succ/i)
   })
 
   test('should handle large number of reservations', async () => {

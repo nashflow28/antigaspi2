@@ -528,12 +528,16 @@ export const {
 } = messagingSlice.actions
 
 // Selectors
+const EMPTY_MESSAGES: ConversationMessage[] = []
+const EMPTY_TYPING_USERS: number[] = []
+const DEFAULT_MESSAGE_PAGINATION: MessagePagination = { currentPage: 1, hasMore: true, totalMessages: 0 }
+
 export const selectConversations = (state: { messaging: MessagingState }) => state.messaging.conversations
 export const selectActiveConversationId = (state: { messaging: MessagingState }) => state.messaging.activeConversationId
 export const selectMessages = (conversationId: number) => (state: { messaging: MessagingState }) =>
-  state.messaging.messages[conversationId] || []
+  state.messaging.messages[conversationId] || EMPTY_MESSAGES
 export const selectTypingUsers = (conversationId: number) => (state: { messaging: MessagingState }) =>
-  state.messaging.typingUsers[conversationId] || []
+  state.messaging.typingUsers[conversationId] || EMPTY_TYPING_USERS
 export const selectIsUserOnline = (userId: number) => (state: { messaging: MessagingState }) =>
   state.messaging.onlineUserIds.includes(userId)
 export const selectUnreadCount = (state: { messaging: MessagingState }) => state.messaging.unreadCount
@@ -543,7 +547,7 @@ export const selectMessagingError = (state: { messaging: MessagingState }) => st
 // BUG FIX #13: Pagination selectors
 export const selectLoadingMoreMessages = (state: { messaging: MessagingState }) => state.messaging.loadingMoreMessages
 export const selectMessagePagination = (conversationId: number) => (state: { messaging: MessagingState }) =>
-  state.messaging.messagePagination[conversationId] || { currentPage: 1, hasMore: true, totalMessages: 0 }
+  state.messaging.messagePagination[conversationId] || DEFAULT_MESSAGE_PAGINATION
 export const selectHasMoreMessages = (conversationId: number) => (state: { messaging: MessagingState }) =>
   state.messaging.messagePagination[conversationId]?.hasMore ?? true
 

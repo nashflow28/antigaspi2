@@ -8,7 +8,8 @@
 
 import { captureException, addBreadcrumb } from './sentryInit'
 
-const isDev = __DEV__
+const isDev = __DEV__ && process.env.NODE_ENV !== 'test'
+const isTest = process.env.NODE_ENV === 'test'
 
 type LogLevel = 'debug' | 'log' | 'info' | 'warn' | 'error'
 
@@ -79,6 +80,10 @@ class Logger {
    */
   error(...args: any[]): void {
     if (this.enabled) {
+      if (isTest) {
+        return
+      }
+
       console.error(...this.formatMessage('error', ...args))
 
       // In production, send errors to Sentry

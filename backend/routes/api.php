@@ -19,6 +19,7 @@ use App\Http\Controllers\Api\CartController;
 use App\Http\Controllers\Api\MessageController;
 use App\Http\Controllers\Api\InventoryController;
 use App\Http\Controllers\Api\SearchController;
+use App\Http\Controllers\Api\FirebaseAuthController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\WalletController;
 
@@ -33,6 +34,10 @@ use App\Http\Controllers\WalletController;
 Route::prefix('auth')->middleware('throttle:auth')->group(function () {
     Route::post('register', [AuthController::class, 'register']);
     Route::post('login', [AuthController::class, 'login']); // Legacy
+
+    // Firebase Phone Authentication
+    Route::post('firebase-login', [FirebaseAuthController::class, 'login']);
+    Route::post('firebase-register', [FirebaseAuthController::class, 'register']);
 
     // Routes sécurisées (nouvelles)
     Route::post('secure-login', [AuthController::class, 'secureLogin']);

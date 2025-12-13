@@ -196,6 +196,26 @@ const LoginScreen: React.FC<Props> = ({ navigation }) => {
           </Card>
         )}
 
+        {/* Phone Auth Button */}
+        <TouchableOpacity
+          style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'center',
+            backgroundColor: theme.colors.surface.light,
+            padding: theme.spacing.md,
+            borderRadius: theme.radius.md,
+            marginBottom: theme.spacing.lg,
+            borderWidth: 1,
+            borderColor: theme.colors.inputBorder,
+          }}
+          onPress={() => navigation.navigate('PhoneAuth')}
+        >
+          <Typography variant="body" weight="semibold" style={{ color: theme.colors.primary[500] }}>
+            Se connecter avec telephone
+          </Typography>
+        </TouchableOpacity>
+
         {/* Footer */}
         <View style={[styles.footer, { flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }]}>
           <Typography variant="caption" color="secondary" style={{ marginRight: theme.spacing.xs }}>

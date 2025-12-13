@@ -7,7 +7,6 @@ import {
   TouchableOpacity,
   StatusBar,
   ActivityIndicator,
-  Alert,
 } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { Ionicons } from '@expo/vector-icons'
@@ -16,6 +15,8 @@ import { useAppDispatch } from '../../store/hooks'
 import { logoutUser } from '../../store/slices/authSlice'
 import apiService from '../../services/api'
 import { Typography, Card, Badge } from '../../components/2025'
+import AlertModal from '../../components/AlertModal'
+import { useAlert } from '../../hooks/useAlert'
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack'
 
 interface AdminStats {
@@ -109,6 +110,7 @@ const AdminDashboardScreen: React.FC<AdminDashboardScreenProps> = ({ navigation 
   const theme = useTheme()
   const insets = useSafeAreaInsets()
   const dispatch = useAppDispatch()
+  const { alertProps, showError, showWarning, hideAlert } = useAlert()
   const isMountedRef = useRef(true)
   const [stats, setStats] = useState<AdminStats | null>(null)
   const [refreshing, setRefreshing] = useState(false)
@@ -116,12 +118,19 @@ const AdminDashboardScreen: React.FC<AdminDashboardScreenProps> = ({ navigation 
 
   // Logout handlers
   const handleLogout = () => {
-    Alert.alert(
+    showWarning(
       'Déconnexion',
       'Êtes-vous sûr de vouloir vous déconnecter ?',
       [
-        { text: 'Annuler', style: 'cancel' },
-        { text: 'Déconnexion', style: 'destructive', onPress: confirmLogout },
+        { text: 'Annuler', style: 'cancel', onPress: hideAlert },
+        {
+          text: 'Déconnexion',
+          style: 'destructive',
+          onPress: () => {
+            hideAlert()
+            void confirmLogout()
+          },
+        },
       ]
     )
   }
@@ -132,7 +141,7 @@ const AdminDashboardScreen: React.FC<AdminDashboardScreenProps> = ({ navigation 
       // Navigation will be handled by MainNavigator when auth state changes
     } catch (error) {
       console.error('Erreur lors de la déconnexion:', error)
-      Alert.alert('Erreur', 'Une erreur est survenue lors de la déconnexion')
+      showError('Erreur', 'Une erreur est survenue lors de la déconnexion')
     }
   }
 
@@ -192,22 +201,25 @@ const AdminDashboardScreen: React.FC<AdminDashboardScreenProps> = ({ navigation 
       // Gestion des erreurs d'autorisation
       if (error.response?.status === 401 || error.response?.status === 403) {
         if (isMountedRef.current) {
-          Alert.alert(
+          showWarning(
             'Session expirée',
             'Votre session a expiré. Veuillez vous reconnecter.',
-            [
-              {
-                text: 'OK',
-                onPress: () => navigation.replace('Login'),
-              },
-            ]
-          )
+	            [
+	              {
+	                text: 'OK',
+	                onPress: () => {
+	                  hideAlert()
+	                  navigation.replace('Login')
+	                },
+	              },
+	            ]
+	          )
         }
         return
       }
 
       if (isMountedRef.current) {
-        Alert.alert('Erreur', 'Impossible de charger les statistiques')
+        showError('Erreur', 'Impossible de charger les statistiques')
       }
     } finally {
       if (isMountedRef.current) {
@@ -634,6 +646,8 @@ const AdminDashboardScreen: React.FC<AdminDashboardScreenProps> = ({ navigation 
           </View>
         )}
       </ScrollView>
+
+      <AlertModal {...alertProps} />
     </View>
   )
 }

@@ -864,3 +864,25 @@ export interface OrderCreationResponse {
     items_count: number
   }
 }
+
+// === FIREBASE PHONE AUTHENTICATION ===
+
+export interface FirebaseLoginResponse {
+  status: 'success' | 'new_user'
+  token?: string
+  refresh_token?: string
+  user?: User
+  // For new users
+  phone?: string
+  firebase_uid?: string
+  message?: string
+}
+
+export interface FirebaseRegisterData {
+  firebase_uid: string
+  phone: string
+  first_name: string
+  last_name: string
+  email?: string
+  role: 'consumer' | 'merchant'
+}

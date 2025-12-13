@@ -1,6 +1,6 @@
 // @ts-nocheck
 import React from 'react'
-import { render, fireEvent, waitFor } from '@testing-library/react-native'
+import { render, fireEvent, waitFor, screen } from '@testing-library/react-native'
 import { Provider } from 'react-redux'
 import { SafeAreaProvider } from 'react-native-safe-area-context'
 import { configureStore } from '@reduxjs/toolkit'
@@ -12,7 +12,6 @@ import ProfileEditScreen from '../ProfileEditScreen'
 import authSlice from '../../../store/slices/authSlice'
 import * as ImagePicker from 'expo-image-picker'
 import apiService from '../../../services/api'
-import { Alert } from 'react-native'
 
 // Mock ImagePicker
 jest.mock('expo-image-picker', () => ({
@@ -113,7 +112,11 @@ const renderWithProviders = (component: React.ReactElement, store = createTestSt
 }
 
 describe('ProfileEditScreen', () => {
-  let alertSpy: jest.SpyInstance
+  const pressLastTextButton = (label: string) => {
+    const matches = screen.getAllByText(label)
+    const last = matches[matches.length - 1] as any
+    fireEvent.press(last.parent)
+  }
 
   beforeEach(() => {
     jest.clearAllMocks()
@@ -127,16 +130,6 @@ describe('ProfileEditScreen', () => {
     ;(apiService.uploadFile as jest.Mock).mockResolvedValue({
       data: { success: true, photo_url: 'http://localhost/photo.jpg' },
     })
-    alertSpy = jest.spyOn(Alert, 'alert').mockImplementation((title, message, buttons) => {
-      if (buttons && buttons[0]?.onPress) {
-        buttons[0].onPress()
-      }
-      return 0
-    })
-  })
-
-  afterEach(() => {
-    alertSpy.mockRestore()
   })
 
   describe('Rendering', () => {
@@ -290,10 +283,8 @@ describe('ProfileEditScreen', () => {
       // Alert should be shown (mocked in jest)
       await waitFor(() => {
         expect(apiService.put).not.toHaveBeenCalled()
-        expect(alertSpy).toHaveBeenCalled()
-        const [title, message] = alertSpy.mock.calls[0]
-        expect(title).toBe('Erreur')
-        expect(message).toBe('Le prénom et le nom sont requis')
+        expect(screen.getByText('Erreur')).toBeTruthy()
+        expect(screen.getByText(/Le prénom et le nom sont requis/i)).toBeTruthy()
       })
     })
 
@@ -310,10 +301,8 @@ describe('ProfileEditScreen', () => {
 
       await waitFor(() => {
         expect(apiService.put).not.toHaveBeenCalled()
-        expect(alertSpy).toHaveBeenCalled()
-        const lastCall = alertSpy.mock.calls[alertSpy.mock.calls.length - 1] as [string, string]
-        const [, message] = lastCall
-        expect(message).toBe('Le prénom et le nom sont requis')
+        expect(screen.getByText('Erreur')).toBeTruthy()
+        expect(screen.getByText(/Le prénom et le nom sont requis/i)).toBeTruthy()
       })
     })
 
@@ -330,10 +319,8 @@ describe('ProfileEditScreen', () => {
 
       await waitFor(() => {
         expect(apiService.put).not.toHaveBeenCalled()
-        expect(alertSpy).toHaveBeenCalled()
-        const lastCall = alertSpy.mock.calls[alertSpy.mock.calls.length - 1] as [string, string]
-        const [, message] = lastCall
-        expect(message).toBe('Le prénom doit contenir au moins 2 caractères')
+        expect(screen.getByText('Erreur')).toBeTruthy()
+        expect(screen.getByText(/Le prénom doit contenir au moins 2 caractères/i)).toBeTruthy()
       })
     })
 
@@ -350,10 +337,8 @@ describe('ProfileEditScreen', () => {
 
       await waitFor(() => {
         expect(apiService.put).not.toHaveBeenCalled()
-        expect(alertSpy).toHaveBeenCalled()
-        const lastCall = alertSpy.mock.calls[alertSpy.mock.calls.length - 1] as [string, string]
-        const [, message] = lastCall
-        expect(message).toBe('Le nom doit contenir au moins 2 caractères')
+        expect(screen.getByText('Erreur')).toBeTruthy()
+        expect(screen.getByText(/Le nom doit contenir au moins 2 caractères/i)).toBeTruthy()
       })
     })
 
@@ -370,10 +355,8 @@ describe('ProfileEditScreen', () => {
 
       await waitFor(() => {
         expect(apiService.put).not.toHaveBeenCalled()
-        expect(alertSpy).toHaveBeenCalled()
-        const lastCall = alertSpy.mock.calls[alertSpy.mock.calls.length - 1] as [string, string]
-        const [, message] = lastCall
-        expect(message).toBe("L'email est requis")
+        expect(screen.getByText('Erreur')).toBeTruthy()
+        expect(screen.getByText(/L'email est requis/i)).toBeTruthy()
       })
     })
 
@@ -390,10 +373,8 @@ describe('ProfileEditScreen', () => {
 
       await waitFor(() => {
         expect(apiService.put).not.toHaveBeenCalled()
-        expect(alertSpy).toHaveBeenCalled()
-        const lastCall = alertSpy.mock.calls[alertSpy.mock.calls.length - 1] as [string, string]
-        const [, message] = lastCall
-        expect(message).toBe('Adresse email invalide')
+        expect(screen.getByText('Erreur')).toBeTruthy()
+        expect(screen.getByText(/Adresse email invalide/i)).toBeTruthy()
       })
     })
 
@@ -475,6 +456,12 @@ describe('ProfileEditScreen', () => {
 
       const saveButton = getByText('Enregistrer les modifications')
       fireEvent.press(saveButton)
+
+      await waitFor(() => {
+        expect(screen.getByText('OK')).toBeTruthy()
+      })
+
+      pressLastTextButton('OK')
 
       await waitFor(() => {
         expect(mockGoBack).toHaveBeenCalled()
@@ -560,9 +547,7 @@ describe('ProfileEditScreen', () => {
 
       await waitFor(() => {
         expect(apiService.post).not.toHaveBeenCalled()
-        expect(alertSpy).toHaveBeenCalled()
-        const lastCall = alertSpy.mock.calls[alertSpy.mock.calls.length - 1] as [string, string]
-        expect(lastCall[0]).toBe('Photo trop lourde')
+        expect(screen.getByText('Photo trop lourde')).toBeTruthy()
       })
     })
 

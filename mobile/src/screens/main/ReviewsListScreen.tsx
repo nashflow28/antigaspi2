@@ -8,7 +8,6 @@ import {
   ActivityIndicator,
   StatusBar,
   RefreshControl,
-  Alert,
 } from 'react-native'
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
 import { Ionicons } from '@expo/vector-icons'

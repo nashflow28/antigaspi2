@@ -1,7 +1,8 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit'
-import { AuthState, User, LoginCredentials, RegisterData, AuthResponse } from '../../types'
+import { AuthState, User, LoginCredentials, RegisterData, AuthResponse, FirebaseLoginResponse, FirebaseRegisterData } from '../../types'
 import apiService from '../../services/api'
 import { clearAllFormCaches } from '../../hooks/usePersistedForm'
+import { authLogger } from '../../utils/logger'
 
 export const authInitialState: AuthState = {
   user: null,
@@ -65,8 +66,13 @@ export const loadStoredAuth = createAsyncThunk(
   'auth/loadStored',
   async (_, { rejectWithValue }) => {
     try {
-      // Importer dynamiquement pour éviter les dépendances circulaires
-      const { isTokenExpired } = await import('../../utils/jwtHelpers')
+      // Importer au runtime pour éviter les dépendances circulaires
+      const jwtModule: any = require('../../utils/jwtHelpers')
+      const isTokenExpired = jwtModule?.isTokenExpired
+
+      if (typeof isTokenExpired !== 'function') {
+        throw new Error('jwtHelpers.isTokenExpired is not available')
+      }
 
       const [token, user] = await Promise.all([
         apiService.getStoredToken(),
@@ -76,13 +82,12 @@ export const loadStoredAuth = createAsyncThunk(
       if (token && user) {
         // Vérifier si le token est expiré AVANT de restaurer la session
         if (isTokenExpired(token)) {
-          console.log('🔒 [Auth] Token expiré détecté au démarrage - nettoyage de la session')
-          // Nettoyer le stockage local
+          authLogger.warn('🔒 [Auth] Token expiré détecté au démarrage - nettoyage de la session')
           await apiService.clearStoredAuth()
           return null
         }
 
-        console.log('✅ [Auth] Session restaurée avec succès')
+        authLogger.log('✅ [Auth] Session restaurée avec succès')
         return { token, user }
       }
 
@@ -100,6 +105,38 @@ export const refreshProfile = createAsyncThunk(
       const response = await apiService.getProfile()
       return response.data
     } catch (error: any) {
+      return rejectWithValue(error.message)
+    }
+  }
+)
+
+// Firebase Phone Authentication - Login with Firebase ID token
+export const loginWithFirebase = createAsyncThunk(
+  'auth/loginWithFirebase',
+  async (firebaseIdToken: string, { rejectWithValue }) => {
+    try {
+      const response = await apiService.firebaseLogin(firebaseIdToken)
+      return response
+    } catch (error: any) {
+      return rejectWithValue(error.message)
+    }
+  }
+)
+
+// Firebase Phone Authentication - Register new user after phone verification
+export const registerWithFirebase = createAsyncThunk(
+  'auth/registerWithFirebase',
+  async (data: FirebaseRegisterData, { rejectWithValue }) => {
+    try {
+      const response = await apiService.firebaseRegister(data)
+      return response
+    } catch (error: any) {
+      if (error.validationErrors) {
+        return rejectWithValue({
+          message: error.message,
+          errors: error.validationErrors
+        })
+      }
       return rejectWithValue(error.message)
     }
   }
@@ -206,6 +243,56 @@ const authSlice = createSlice({
       // Refresh profile
       .addCase(refreshProfile.fulfilled, (state, action: PayloadAction<User>) => {
         state.user = action.payload
+      })
+
+      // Firebase Login
+      .addCase(loginWithFirebase.pending, (state) => {
+        state.loading = true
+        state.error = null
+      })
+      .addCase(loginWithFirebase.fulfilled, (state, action) => {
+        state.loading = false
+        const payload = action.payload as FirebaseLoginResponse
+        if (payload.status === 'success' && payload.user) {
+          state.user = payload.user
+          state.token = payload.token || null
+          state.isAuthenticated = true
+        }
+        // If status is 'new_user', don't authenticate yet - let the screen handle navigation
+        state.error = null
+      })
+      .addCase(loginWithFirebase.rejected, (state, action) => {
+        state.loading = false
+        state.error = action.payload as string
+        state.isAuthenticated = false
+      })
+
+      // Firebase Register
+      .addCase(registerWithFirebase.pending, (state) => {
+        state.loading = true
+        state.error = null
+      })
+      .addCase(registerWithFirebase.fulfilled, (state, action) => {
+        state.loading = false
+        const payload = action.payload as FirebaseLoginResponse
+        if (payload.status === 'success' && payload.user) {
+          state.user = payload.user
+          state.token = payload.token || null
+          state.isAuthenticated = true
+        }
+        state.error = null
+      })
+      .addCase(registerWithFirebase.rejected, (state, action) => {
+        state.loading = false
+        const payload = action.payload
+        if (typeof payload === 'string') {
+          state.error = payload
+        } else if (payload && typeof payload === 'object' && 'message' in payload) {
+          state.error = (payload as any).message
+        } else {
+          state.error = 'Erreur lors de l\'inscription'
+        }
+        state.isAuthenticated = false
       })
   },
 })

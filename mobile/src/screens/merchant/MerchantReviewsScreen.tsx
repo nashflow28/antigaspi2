@@ -10,6 +10,8 @@ import {
   RefreshControl,
   TextInput,
   Modal,
+  KeyboardAvoidingView,
+  Platform,
 } from 'react-native'
 import { useNavigation } from '@react-navigation/native'
 import { Ionicons } from '@expo/vector-icons'
@@ -424,7 +426,10 @@ const MerchantReviewsScreen: React.FC = () => {
         transparent={true}
         onRequestClose={() => setRespondModalVisible(false)}
       >
-        <View style={styles.modalOverlay}>
+        <KeyboardAvoidingView
+          style={styles.modalOverlay}
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        >
           <View style={[styles.modalContent, { backgroundColor: theme.colors.cardBackground, borderColor: theme.colors.cardBorder, borderWidth: 1 }]}>
             <View style={styles.modalHeader}>
               <Text style={[styles.modalTitle, { color: theme.colors.text }]}>
@@ -435,61 +440,66 @@ const MerchantReviewsScreen: React.FC = () => {
               </TouchableOpacity>
             </View>
 
-            {selectedReview && (
-              <View style={styles.reviewPreview}>
-                <View style={styles.ratingRow}>
-                  {renderStars(selectedReview.rating)}
-                  <Text style={[styles.userName, { color: theme.colors.text, marginLeft: 8 }]}>
-                    {selectedReview.user.name}
+            <ScrollView
+              showsVerticalScrollIndicator={false}
+              keyboardShouldPersistTaps="handled"
+            >
+              {selectedReview && (
+                <View style={styles.reviewPreview}>
+                  <View style={styles.ratingRow}>
+                    {renderStars(selectedReview.rating)}
+                    <Text style={[styles.userName, { color: theme.colors.text, marginLeft: 8 }]}>
+                      {selectedReview.user.name}
+                    </Text>
+                  </View>
+                  <Text style={[styles.reviewComment, { color: theme.colors.textSecondary }]}>
+                    {selectedReview.comment}
                   </Text>
                 </View>
-                <Text style={[styles.reviewComment, { color: theme.colors.textSecondary }]}>
-                  {selectedReview.comment}
-                </Text>
+              )}
+
+              <TextInput
+                style={[styles.responseInput, {
+                  backgroundColor: theme.colors.background,
+                  color: theme.colors.text,
+                  borderColor: theme.colors.neutral[200]
+                }]}
+                placeholder="Votre réponse (max 1000 caractères)..."
+                placeholderTextColor={theme.colors.textSecondary}
+                value={responseText}
+                onChangeText={setResponseText}
+                multiline
+                numberOfLines={6}
+                maxLength={1000}
+                textAlignVertical="top"
+              />
+
+              <Text style={[styles.charCount, { color: theme.colors.textSecondary }]}>
+                {responseText.length}/1000 caractères
+              </Text>
+
+              <View style={styles.modalActions}>
+                <TouchableOpacity
+                  style={[styles.modalButton, styles.cancelButton]}
+                  onPress={() => setRespondModalVisible(false)}
+                >
+                  <Text style={[styles.modalButtonText, { color: theme.colors.text }]}>
+                    Annuler
+                  </Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={[styles.modalButton, styles.submitButton, { backgroundColor: theme.colors.primary[500] }]}
+                  onPress={handleSubmitResponse}
+                  disabled={submittingResponse || !responseText.trim()}
+                >
+                  <Text style={[styles.modalButtonText, { color: 'white' }]}>
+                    {submittingResponse ? 'Envoi...' : 'Envoyer'}
+                  </Text>
+                </TouchableOpacity>
               </View>
-            )}
-
-            <TextInput
-              style={[styles.responseInput, {
-                backgroundColor: theme.colors.background,
-                color: theme.colors.text,
-                borderColor: theme.colors.neutral[200]
-              }]}
-              placeholder="Votre réponse (max 1000 caractères)..."
-              placeholderTextColor={theme.colors.textSecondary}
-              value={responseText}
-              onChangeText={setResponseText}
-              multiline
-              numberOfLines={6}
-              maxLength={1000}
-              textAlignVertical="top"
-            />
-
-            <Text style={[styles.charCount, { color: theme.colors.textSecondary }]}>
-              {responseText.length}/1000 caractères
-            </Text>
-
-            <View style={styles.modalActions}>
-              <TouchableOpacity
-                style={[styles.modalButton, styles.cancelButton]}
-                onPress={() => setRespondModalVisible(false)}
-              >
-                <Text style={[styles.modalButtonText, { color: theme.colors.text }]}>
-                  Annuler
-                </Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={[styles.modalButton, styles.submitButton, { backgroundColor: theme.colors.primary[500] }]}
-                onPress={handleSubmitResponse}
-                disabled={submittingResponse || !responseText.trim()}
-              >
-                <Text style={[styles.modalButtonText, { color: 'white' }]}>
-                  {submittingResponse ? 'Envoi...' : 'Envoyer'}
-                </Text>
-              </TouchableOpacity>
-            </View>
+            </ScrollView>
           </View>
-        </View>
+        </KeyboardAvoidingView>
       </Modal>
 
       {/* AlertModal personnalisé */}

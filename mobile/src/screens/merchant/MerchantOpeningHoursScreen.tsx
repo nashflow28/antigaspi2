@@ -7,7 +7,6 @@ import {
   TouchableOpacity,
   Switch,
   ActivityIndicator,
-  Alert,
   StatusBar,
   Platform,
   TextInput,
@@ -17,6 +16,8 @@ import { useNavigation } from '@react-navigation/native'
 import DateTimePicker from '@react-native-community/datetimepicker'
 import { useTheme } from '../../theme'
 import apiService from '../../services/api'
+import AlertModal from '../../components/AlertModal'
+import { useAlert } from '../../hooks/useAlert'
 
 interface DaySchedule {
   day: string
@@ -40,6 +41,7 @@ const DAYS_FR = [
 const MerchantOpeningHoursScreen: React.FC = () => {
   const theme = useTheme()
   const navigation = useNavigation()
+  const { alertProps, showError, showSuccess, showWarning, hideAlert } = useAlert()
 
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
@@ -120,14 +122,15 @@ const MerchantOpeningHoursScreen: React.FC = () => {
 
       // 🐛 BUG FIX #30: apiService.put() returns response.data directly
       if (response?.success) {
-        Alert.alert('Succès', 'Heures d\'ouverture mises à jour avec succès', [
-          {
-            text: 'OK',
-            onPress: () => {
-              if (navigation.canGoBack()) {
-                navigation.goBack()
-              } else {
-                (navigation as any).navigate('Dashboard')
+        showSuccess('Succès', 'Heures d\'ouverture mises à jour avec succès', [
+	          {
+	            text: 'OK',
+	            onPress: () => {
+	              hideAlert()
+	              if (navigation.canGoBack()) {
+	                navigation.goBack()
+	              } else {
+	                (navigation as any).navigate('Dashboard')
               }
             },
           },
@@ -135,7 +138,7 @@ const MerchantOpeningHoursScreen: React.FC = () => {
       } else {
         // Handle case where response exists but success is false
         console.error('📅 [OpeningHours] Save failed:', response)
-        Alert.alert('Erreur', response?.message || 'La sauvegarde a échoué')
+        showError('Erreur', response?.message || 'La sauvegarde a échoué')
       }
     } catch (error: any) {
       console.error('📅 [OpeningHours] Save error:', error)
@@ -153,7 +156,7 @@ const MerchantOpeningHoursScreen: React.FC = () => {
         errorMessage = error.message
       }
 
-      Alert.alert('Erreur', errorMessage)
+      showError('Erreur', errorMessage)
     } finally {
       setSaving(false)
     }
@@ -174,7 +177,7 @@ const MerchantOpeningHoursScreen: React.FC = () => {
   const updateTime = (index: number, field: keyof DaySchedule, value: string) => {
     // Validate time format before updating
     if (!validateTimeFormat(value)) {
-      Alert.alert('Format invalide', 'Veuillez entrer l\'heure au format HH:MM (ex: 08:00)')
+      showError('Format invalide', 'Veuillez entrer l\'heure au format HH:MM (ex: 08:00)')
       return
     }
     const newSchedule = [...schedule]
@@ -219,14 +222,15 @@ const MerchantOpeningHoursScreen: React.FC = () => {
   }
 
   const copyToAllDays = (index: number) => {
-    Alert.alert(
+    showWarning(
       'Copier aux autres jours',
       'Voulez-vous appliquer ces horaires à tous les jours ?',
       [
-        { text: 'Annuler', style: 'cancel' },
+        { text: 'Annuler', style: 'cancel', onPress: hideAlert },
         {
           text: 'Copier',
           onPress: () => {
+            hideAlert()
             const sourceDay = schedule[index]
             const newSchedule = schedule.map((day) => ({
               ...day,
@@ -408,6 +412,8 @@ const MerchantOpeningHoursScreen: React.FC = () => {
           onChange={handleTimeChange}
         />
       )}
+
+      <AlertModal {...alertProps} />
     </View>
   )
 }

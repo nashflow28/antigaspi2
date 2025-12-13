@@ -7,6 +7,9 @@ import notificationService, {
 import { useAppSelector } from '../store/hooks'
 import { useToast } from '../contexts/ToastContext'
 import * as NavigationRef from '../navigation/NavigationRef'
+import { createLogger } from '../utils/logger'
+
+const pushNotificationsLogger = createLogger('PushNotifications')
 
 const formatMessage = (event: ForegroundNotificationEvent): string => {
   if (typeof event.body === 'string' && event.body.trim().length > 0) {
@@ -45,7 +48,7 @@ const usePushNotifications = (): void => {
 
         await notificationService.syncPushTokenOwnership()
       } catch (error) {
-        console.warn(
+        pushNotificationsLogger.warn(
           "Impossible d'initialiser les notifications push:",
           error
         )

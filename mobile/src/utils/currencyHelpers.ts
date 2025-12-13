@@ -29,7 +29,7 @@ export const formatCurrency = (
   value: number | string | null | undefined,
   options: FormatCurrencyOptions = {}
 ): string => {
-  const { showSymbol = true, decimals = 0 } = options
+  const { showSymbol = true, decimals = 0, thousandSeparator } = options
 
   // Handle null/undefined
   if (value == null) {
@@ -59,7 +59,13 @@ export const formatCurrency = (
     maximumFractionDigits: decimals,
   }).format(Math.round(numericValue))
 
-  return showSymbol ? `${formatted} F CFA` : formatted
+  // Optional custom thousand separator (Intl uses locale grouping by default)
+  const formattedWithSeparator =
+    thousandSeparator == null
+      ? formatted
+      : formatted.replace(/[\u202F\u00A0 ]/g, thousandSeparator)
+
+  return showSymbol ? `${formattedWithSeparator} F CFA` : formattedWithSeparator
 }
 
 /**
