@@ -74,13 +74,6 @@
           }
         }
       ],
-      [
-        "@sentry/react-native/expo",
-        {
-          "organization": "antigaspi",
-          "project": "antigaspi-mobile"
-        }
-      ],
       "expo-localization",
       "expo-secure-store"
     ],
