@@ -38,6 +38,7 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#10B981"
       },
+      "googleServicesFile": "./google-services.json",
       "package": "com.antigaspi.app",
       "versionCode": 1,
       "permissions": [
