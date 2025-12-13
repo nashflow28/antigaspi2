@@ -12,7 +12,16 @@
           "package_name": "com.antigaspi.app"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "829708734355-4gf8tib0269e2kaiocfhpffvi1div2r1.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.antigaspi.app",
+            "certificate_hash": "be3c417d7871847ea33470071ba319cc49f5b9d6"
+          }
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyCGr2v6T5L0utIBgUfIMDUUy4clv5PoRdo"
