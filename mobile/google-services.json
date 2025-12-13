@@ -1,13 +1,13 @@
 {
   "project_info": {
-    "project_number": "530053763686",
+    "project_number": "829708734355",
     "project_id": "antigaspi-6d8e2",
     "storage_bucket": "antigaspi-6d8e2.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:530053763686:android:7f3a19a5b21a2de04920d6",
+        "mobilesdk_app_id": "1:829708734355:android:9d7437c2b6410880796266",
         "android_client_info": {
           "package_name": "com.antigaspi.app"
         }
@@ -15,7 +15,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyAWWrCXCvhrrB_KH0DPVFlG4RJGEY-A05Q"
+          "current_key": "AIzaSyCGr2v6T5L0utIBgUfIMDUUy4clv5PoRdo"
         }
       ],
       "services": {
