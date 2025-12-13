@@ -385,9 +385,9 @@ export const ReservationSchema: Schema = {
   },
   quantity: { type: 'number', required: true, min: 1 },
   total_amount: { type: 'number', required: true, min: 0 },
-  payment_method: { type: 'string', required: true },
-  product_id: { type: 'number', required: true },
-  user_id: { type: 'number', required: true },
+  payment_method: { type: 'string', required: false },
+  product_id: { type: 'number', required: false },
+  user_id: { type: 'number', required: false },
   created_at: { type: 'date', required: true },
 }
 

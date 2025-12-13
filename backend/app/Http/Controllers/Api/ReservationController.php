@@ -519,7 +519,8 @@ class ReservationController extends Controller
                 }
 
                 $newQuantity = $request->quantity;
-                $oldQuantity = $reservation->quantity;
+                // 🐛 BUG FIX: Use quantity_reserved (the actual DB field)
+                $oldQuantity = $reservation->quantity_reserved;
                 $quantityDiff = $newQuantity - $oldQuantity;
 
                 // Check stock availability if increasing quantity
@@ -540,9 +541,10 @@ class ReservationController extends Controller
                 }
 
                 // Update reservation
+                // 🐛 BUG FIX: Use quantity_reserved (the actual DB field)
                 $unitPrice = $reservation->total_amount / $oldQuantity;
                 $reservation->update([
-                    'quantity' => $newQuantity,
+                    'quantity_reserved' => $newQuantity,
                     'total_amount' => $unitPrice * $newQuantity,
                 ]);
 
