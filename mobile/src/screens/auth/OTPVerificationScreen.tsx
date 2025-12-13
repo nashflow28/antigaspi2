@@ -1,5 +1,6 @@
 /**
  * OTPVerificationScreen - 6-digit OTP verification for Firebase Phone Auth
+ * Uses React Native Firebase for native phone auth
  */
 
 import React, { useState, useRef, useEffect } from 'react'
@@ -23,21 +24,11 @@ import { useTheme } from '../../theme'
 import { TEST_IDS } from '../../utils/testIds'
 import { useAlert } from '../../contexts/AlertContext'
 
-interface Props {
-  navigation: any
-  route: {
-    params: {
-      verificationId: string
-      phoneNumber: string
-    }
-  }
-}
-
 const OTP_LENGTH = 6
 const RESEND_COOLDOWN = 60 // seconds
 
-const OTPVerificationScreen: React.FC<Props> = ({ navigation, route }) => {
-  const { verificationId, phoneNumber } = route.params
+const OTPVerificationScreen = ({ navigation, route }: any) => {
+  const { phoneNumber } = route.params as { phoneNumber: string }
   const theme = useTheme()
   const dispatch = useDispatch<AppDispatch>()
   const { showSuccess, showError } = useAlert()
@@ -45,7 +36,6 @@ const OTPVerificationScreen: React.FC<Props> = ({ navigation, route }) => {
   const [otp, setOtp] = useState<string[]>(Array(OTP_LENGTH).fill(''))
   const [loading, setLoading] = useState(false)
   const [resendTimer, setResendTimer] = useState(RESEND_COOLDOWN)
-  const [currentVerificationId, setCurrentVerificationId] = useState(verificationId)
 
   const inputRefs = useRef<(TextInput | null)[]>([])
 
@@ -95,8 +85,8 @@ const OTPVerificationScreen: React.FC<Props> = ({ navigation, route }) => {
 
     setLoading(true)
     try {
-      // Verify OTP with Firebase
-      const idToken = await firebaseService.verifyOTP(currentVerificationId, code)
+      // Verify OTP with Firebase (React Native Firebase stores confirmation internally)
+      const idToken = await firebaseService.verifyOTP(code)
 
       // Send token to backend
       const result = await dispatch(loginWithFirebase(idToken))
@@ -106,8 +96,9 @@ const OTPVerificationScreen: React.FC<Props> = ({ navigation, route }) => {
 
         if (payload.status === 'new_user') {
           // New user - navigate to complete profile
+          // SECURITY: Pass the Firebase ID token for re-verification in register
           navigation.replace('CompleteProfile', {
-            firebaseUid: payload.firebase_uid,
+            firebaseIdToken: idToken, // Required for secure registration
             phoneNumber: payload.phone,
           })
         } else {
@@ -133,10 +124,16 @@ const OTPVerificationScreen: React.FC<Props> = ({ navigation, route }) => {
 
     setLoading(true)
     try {
-      // This would require the recaptcha verifier again
-      // For now, navigate back to phone auth screen
-      showError('Info', 'Veuillez redemander un code depuis l\'ecran precedent')
-      navigation.goBack()
+      // Clear the previous session and request a new OTP
+      firebaseService.clearOTPSession()
+      await firebaseService.sendOTP(phoneNumber)
+
+      // Reset timer
+      setResendTimer(RESEND_COOLDOWN)
+      setOtp(Array(OTP_LENGTH).fill(''))
+      inputRefs.current[0]?.focus()
+
+      showSuccess('Code envoye', 'Un nouveau code a ete envoye')
     } catch (error: any) {
       showError('Erreur', error.message || 'Impossible de renvoyer le code')
     } finally {

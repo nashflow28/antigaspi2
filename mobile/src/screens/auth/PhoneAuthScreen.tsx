@@ -1,8 +1,9 @@
 /**
  * PhoneAuthScreen - Phone number input for Firebase Phone Authentication
+ * Uses React Native Firebase for native phone auth
  */
 
-import React, { useState, useRef } from 'react'
+import React, { useState } from 'react'
 import {
   View,
   TextInput,
@@ -12,10 +13,7 @@ import {
   Platform,
   StatusBar,
   ScrollView,
-  ActivityIndicator,
 } from 'react-native'
-import { FirebaseRecaptchaVerifierModal } from 'expo-firebase-recaptcha'
-import { app } from '../../config/firebase'
 import { firebaseService } from '../../services/firebaseService'
 import { Card, Typography, Button } from '../../components/2025'
 import BrandLogo from '../../components/BrandLogo'
@@ -40,7 +38,6 @@ const COUNTRY_CODES = [
 const PhoneAuthScreen: React.FC<Props> = ({ navigation }) => {
   const theme = useTheme()
   const { showError } = useAlert()
-  const recaptchaVerifier = useRef<FirebaseRecaptchaVerifierModal>(null)
 
   const [phoneNumber, setPhoneNumber] = useState('')
   const [selectedCountryCode, setSelectedCountryCode] = useState('+228')
@@ -76,14 +73,12 @@ const PhoneAuthScreen: React.FC<Props> = ({ navigation }) => {
     setLoading(true)
     try {
       const fullPhoneNumber = getFullPhoneNumber()
-      const confirmation = await firebaseService.sendOTP(
-        fullPhoneNumber,
-        recaptchaVerifier.current!
-      )
+
+      // React Native Firebase handles reCAPTCHA automatically
+      await firebaseService.sendOTP(fullPhoneNumber)
 
       // Navigate to OTP verification screen
       navigation.navigate('OTPVerification', {
-        verificationId: confirmation.verificationId,
         phoneNumber: fullPhoneNumber,
       })
     } catch (error: any) {
@@ -99,13 +94,6 @@ const PhoneAuthScreen: React.FC<Props> = ({ navigation }) => {
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
       <StatusBar backgroundColor={theme.colors.primary[500]} barStyle="light-content" />
-
-      {/* Firebase reCAPTCHA verifier (invisible) */}
-      <FirebaseRecaptchaVerifierModal
-        ref={recaptchaVerifier}
-        firebaseConfig={app.options}
-        attemptInvisibleVerification={true}
-      />
 
       <ScrollView
         contentContainerStyle={[styles.scrollContent, { paddingHorizontal: theme.spacing.lg }]}

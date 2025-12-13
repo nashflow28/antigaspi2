@@ -1,47 +1,25 @@
 /**
  * Firebase Authentication Service
  * Handles phone number authentication with SMS OTP
+ * Uses React Native Firebase for native phone authentication
  */
 
-import {
-  PhoneAuthProvider,
-  signInWithCredential,
-  signOut as firebaseSignOut,
-  ConfirmationResult,
-  ApplicationVerifier,
-} from 'firebase/auth'
-import { auth } from '../config/firebase'
+import auth, { FirebaseAuthTypes } from '@react-native-firebase/auth'
 
-export interface FirebaseOTPResult {
-  verificationId: string
-}
+// Store the confirmation result for OTP verification
+let confirmationResult: FirebaseAuthTypes.ConfirmationResult | null = null
 
 export const firebaseService = {
   /**
    * Send OTP to phone number
    * @param phoneNumber - Phone number in E.164 format (e.g., +22890123456)
-   * @param recaptchaVerifier - reCAPTCHA verifier instance
-   * @returns ConfirmationResult for verifying the code
+   * @returns void - Confirmation is stored internally
    */
-  sendOTP: async (
-    phoneNumber: string,
-    recaptchaVerifier: ApplicationVerifier
-  ): Promise<ConfirmationResult> => {
+  sendOTP: async (phoneNumber: string): Promise<void> => {
     try {
-      const provider = new PhoneAuthProvider(auth)
-      const verificationId = await provider.verifyPhoneNumber(
-        phoneNumber,
-        recaptchaVerifier
-      )
-
-      // Return a confirmation result-like object
-      return {
-        verificationId,
-        confirm: async (code: string) => {
-          const credential = PhoneAuthProvider.credential(verificationId, code)
-          return signInWithCredential(auth, credential)
-        },
-      } as ConfirmationResult
+      console.log('[FirebaseService] Sending OTP to:', phoneNumber)
+      confirmationResult = await auth().signInWithPhoneNumber(phoneNumber)
+      console.log('[FirebaseService] OTP sent successfully')
     } catch (error: any) {
       console.error('[FirebaseService] sendOTP error:', error)
       throw new Error(getFirebaseErrorMessage(error.code))
@@ -50,17 +28,29 @@ export const firebaseService = {
 
   /**
    * Verify OTP code and get Firebase ID token
-   * @param verificationId - Verification ID from sendOTP
    * @param code - 6-digit OTP code
    * @returns Firebase ID token
    */
-  verifyOTP: async (verificationId: string, code: string): Promise<string> => {
+  verifyOTP: async (code: string): Promise<string> => {
     try {
-      const credential = PhoneAuthProvider.credential(verificationId, code)
-      const userCredential = await signInWithCredential(auth, credential)
+      if (!confirmationResult) {
+        throw new Error('Session expirée. Veuillez redemander un code.')
+      }
+
+      console.log('[FirebaseService] Verifying OTP code')
+      const userCredential = await confirmationResult.confirm(code)
+
+      if (!userCredential || !userCredential.user) {
+        throw new Error('Échec de la vérification.')
+      }
 
       // Get the ID token to send to backend
       const idToken = await userCredential.user.getIdToken()
+      console.log('[FirebaseService] OTP verified, got ID token')
+
+      // Clear the confirmation result after successful verification
+      confirmationResult = null
+
       return idToken
     } catch (error: any) {
       console.error('[FirebaseService] verifyOTP error:', error)
@@ -72,7 +62,7 @@ export const firebaseService = {
    * Get current user's ID token (for authenticated requests)
    */
   getCurrentIdToken: async (): Promise<string | null> => {
-    const user = auth.currentUser
+    const user = auth().currentUser
     if (!user) return null
     return user.getIdToken()
   },
@@ -82,7 +72,8 @@ export const firebaseService = {
    */
   signOut: async (): Promise<void> => {
     try {
-      await firebaseSignOut(auth)
+      await auth().signOut()
+      confirmationResult = null
     } catch (error: any) {
       console.error('[FirebaseService] signOut error:', error)
       throw error
@@ -92,7 +83,19 @@ export const firebaseService = {
   /**
    * Get current Firebase user
    */
-  getCurrentUser: () => auth.currentUser,
+  getCurrentUser: () => auth().currentUser,
+
+  /**
+   * Check if OTP session is active
+   */
+  hasActiveOTPSession: () => confirmationResult !== null,
+
+  /**
+   * Clear OTP session (for retry)
+   */
+  clearOTPSession: () => {
+    confirmationResult = null
+  },
 }
 
 /**
@@ -120,6 +123,8 @@ function getFirebaseErrorMessage(errorCode: string): string {
       return 'Vérification de sécurité échouée. Réessayez.'
     case 'auth/network-request-failed':
       return 'Erreur réseau. Vérifiez votre connexion internet.'
+    case 'auth/session-expired':
+      return 'Session expirée. Veuillez redemander un code.'
     default:
       return 'Une erreur est survenue. Veuillez réessayer.'
   }

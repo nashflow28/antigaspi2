@@ -23,6 +23,24 @@ export const TEST_IDS = {
   registerCity: 'city-input',
   registerSubmit: 'register-button',
 
+  // Phone Auth
+  phoneAuthScreen: 'phone-auth-screen',
+  phoneInput: 'phone-input',
+  sendOtpButton: 'send-otp-button',
+  otpVerificationScreen: 'otp-verification-screen',
+  otpInput: 'otp-input',
+  verifyOtpButton: 'verify-otp-button',
+  resendOtpButton: 'resend-otp-button',
+
+  // Complete Profile (Firebase Phone Auth)
+  completeProfileScreen: 'complete-profile-screen',
+  firstNameInput: 'first-name-input',
+  lastNameInput: 'last-name-input',
+  emailInput: 'email-input',
+  roleConsumerOption: 'role-consumer-option',
+  roleMerchantOption: 'role-merchant-option',
+  completeProfileButton: 'complete-profile-button',
+
   // ============ CONSUMER SCREENS ============
   // Home
   homeScreen: 'home-screen',

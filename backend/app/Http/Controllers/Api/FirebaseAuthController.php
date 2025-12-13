@@ -4,10 +4,11 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Models\Merchant;
 use App\Services\FirebaseAuthService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Str;
 use Tymon\JWTAuth\Facades\JWTAuth;
 use Exception;
 
@@ -84,7 +85,7 @@ class FirebaseAuthController extends Controller
                 'status' => 'success',
                 'token' => $token,
                 'token_type' => 'Bearer',
-                'expires_in' => auth()->factory()->getTTL() * 60,
+                'expires_in' => JWTAuth::factory()->getTTL() * 60,
                 'user' => $user->load(['merchant']),
             ]);
 
@@ -103,56 +104,94 @@ class FirebaseAuthController extends Controller
     /**
      * Complete registration for new phone-authenticated users
      *
+     * SECURITY: Requires firebase_token to be re-verified to prevent
+     * attackers from forging firebase_uid/phone fields
+     *
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
      */
     public function register(Request $request)
     {
         $request->validate([
-            'firebase_uid' => 'required|string|unique:users,firebase_uid',
-            'phone' => 'required|string|unique:users,phone',
+            'firebase_token' => 'required|string', // SECURITY: Token required for verification
             'first_name' => 'required|string|max:255',
             'last_name' => 'required|string|max:255',
             'email' => 'nullable|email|unique:users,email',
             'role' => 'required|in:consumer,merchant',
+            // Optional merchant fields
+            'business_name' => 'required_if:role,merchant|string|max:255',
+            'business_type' => 'nullable|string|max:100',
         ]);
 
         try {
-            // Create new user
-            $user = User::create([
-                'first_name' => $request->first_name,
-                'last_name' => $request->last_name,
-                'email' => $request->email,
-                'phone' => $request->phone,
-                'firebase_uid' => $request->firebase_uid,
-                'phone_verified_at' => now(),
-                'role' => $request->role,
-                'city' => 'Lome', // Default city for Togo
-                'password' => bcrypt(Str::random(32)), // Random password (not used for phone auth)
-            ]);
+            // SECURITY: Verify Firebase token to get authenticated uid and phone
+            // This prevents attackers from forging the firebase_uid/phone fields
+            $firebaseUser = $this->firebaseAuth->verifyIdToken($request->firebase_token);
+            $firebaseUid = $firebaseUser['uid'];
+            $phone = $firebaseUser['phone'];
+
+            // Check if user already exists (race condition protection)
+            $existingUser = User::where('firebase_uid', $firebaseUid)
+                ->orWhere('phone', $phone)
+                ->first();
+
+            if ($existingUser) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Un compte existe deja avec ce numero de telephone',
+                ], 409);
+            }
+
+            // Use transaction to ensure atomicity
+            $result = DB::transaction(function () use ($request, $firebaseUid, $phone) {
+                // Create new user (email and password are nullable for Firebase users)
+                $user = User::create([
+                    'first_name' => $request->first_name,
+                    'last_name' => $request->last_name,
+                    'email' => $request->email, // Can be null
+                    'phone' => $phone, // From verified Firebase token
+                    'firebase_uid' => $firebaseUid, // From verified Firebase token
+                    'phone_verified_at' => now(),
+                    'role' => $request->role,
+                    'city' => 'Lome', // Default city for Togo
+                    'password' => null, // No password for Firebase users
+                    'is_active' => true,
+                ]);
+
+                // If merchant role, create merchant profile
+                if ($request->role === 'merchant') {
+                    Merchant::create([
+                        'user_id' => $user->id,
+                        'business_name' => $request->business_name,
+                        'business_type' => $request->business_type ?? 'general',
+                        'is_verified' => false,
+                    ]);
+                }
+
+                return $user;
+            });
 
             // Generate JWT token
-            $token = JWTAuth::fromUser($user);
+            $token = JWTAuth::fromUser($result);
 
             Log::info('Firebase registration successful', [
-                'user_id' => $user->id,
-                'role' => $user->role,
-                'phone' => $user->phone,
+                'user_id' => $result->id,
+                'role' => $result->role,
+                'phone' => $result->phone,
             ]);
 
             return response()->json([
                 'status' => 'success',
                 'token' => $token,
                 'token_type' => 'Bearer',
-                'expires_in' => auth()->factory()->getTTL() * 60,
-                'user' => $user,
+                'expires_in' => JWTAuth::factory()->getTTL() * 60,
+                'user' => $result->load(['merchant']),
                 'message' => 'Compte cree avec succes',
             ]);
 
         } catch (Exception $e) {
             Log::error('Firebase registration failed', [
                 'error' => $e->getMessage(),
-                'phone' => $request->phone,
             ]);
 
             return response()->json([

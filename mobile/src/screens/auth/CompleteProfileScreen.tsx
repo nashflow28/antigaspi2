@@ -22,20 +22,10 @@ import { useTheme } from '../../theme'
 import { TEST_IDS } from '../../utils/testIds'
 import { useAlert } from '../../contexts/AlertContext'
 
-interface Props {
-  navigation: any
-  route: {
-    params: {
-      firebaseUid: string
-      phoneNumber: string
-    }
-  }
-}
-
 type UserRole = 'consumer' | 'merchant'
 
-const CompleteProfileScreen: React.FC<Props> = ({ navigation, route }) => {
-  const { firebaseUid, phoneNumber } = route.params
+const CompleteProfileScreen = ({ navigation, route }: any) => {
+  const { firebaseIdToken, phoneNumber } = route.params as { firebaseIdToken: string; phoneNumber: string }
   const theme = useTheme()
   const dispatch = useDispatch<AppDispatch>()
   const { showSuccess, showError } = useAlert()
@@ -44,6 +34,9 @@ const CompleteProfileScreen: React.FC<Props> = ({ navigation, route }) => {
     firstName: '',
     lastName: '',
     email: '',
+    // Merchant fields
+    businessName: '',
+    businessType: '',
   })
   const [selectedRole, setSelectedRole] = useState<UserRole>('consumer')
   const [loading, setLoading] = useState(false)
@@ -61,6 +54,11 @@ const CompleteProfileScreen: React.FC<Props> = ({ navigation, route }) => {
       showError('Erreur', 'Adresse email invalide')
       return false
     }
+    // Merchant validation
+    if (selectedRole === 'merchant' && !formData.businessName.trim()) {
+      showError('Erreur', 'Le nom de commerce est requis pour les commercants')
+      return false
+    }
     return true
   }
 
@@ -71,12 +69,16 @@ const CompleteProfileScreen: React.FC<Props> = ({ navigation, route }) => {
     try {
       const result = await dispatch(
         registerWithFirebase({
-          firebase_uid: firebaseUid,
-          phone: phoneNumber,
+          firebase_token: firebaseIdToken, // SECURITY: Token re-verified by backend
           first_name: formData.firstName.trim(),
           last_name: formData.lastName.trim(),
           email: formData.email.trim() || undefined,
           role: selectedRole,
+          // Merchant fields (only sent if merchant)
+          ...(selectedRole === 'merchant' && {
+            business_name: formData.businessName.trim(),
+            business_type: formData.businessType.trim() || 'general',
+          }),
         })
       )
 
@@ -244,6 +246,63 @@ const CompleteProfileScreen: React.FC<Props> = ({ navigation, route }) => {
               <RoleButton role="merchant" label="Commercant" icon="🏪" />
             </View>
           </View>
+
+          {/* Merchant Fields (conditional) */}
+          {selectedRole === 'merchant' && (
+            <>
+              <View style={{ marginBottom: theme.spacing.md }}>
+                <Typography variant="body" weight="semibold" style={{ marginBottom: theme.spacing.sm }}>
+                  Nom du commerce *
+                </Typography>
+                <TextInput
+                  style={[
+                    styles.input,
+                    {
+                      backgroundColor: theme.colors.inputBackground,
+                      paddingHorizontal: theme.spacing.md,
+                      paddingVertical: theme.spacing.sm,
+                      borderRadius: theme.radius.md,
+                      borderWidth: 1,
+                      borderColor: theme.colors.inputBorder,
+                      fontSize: 16,
+                      color: theme.colors.text,
+                    },
+                  ]}
+                  placeholder="Ex: Boulangerie Chez Marie"
+                  placeholderTextColor={theme.colors.textSecondary}
+                  value={formData.businessName}
+                  onChangeText={(text) => setFormData({ ...formData, businessName: text })}
+                  autoCapitalize="words"
+                />
+              </View>
+
+              <View style={{ marginBottom: theme.spacing.lg }}>
+                <Typography variant="body" weight="semibold" style={{ marginBottom: theme.spacing.sm }}>
+                  Type de commerce
+                </Typography>
+                <TextInput
+                  style={[
+                    styles.input,
+                    {
+                      backgroundColor: theme.colors.inputBackground,
+                      paddingHorizontal: theme.spacing.md,
+                      paddingVertical: theme.spacing.sm,
+                      borderRadius: theme.radius.md,
+                      borderWidth: 1,
+                      borderColor: theme.colors.inputBorder,
+                      fontSize: 16,
+                      color: theme.colors.text,
+                    },
+                  ]}
+                  placeholder="Ex: Boulangerie, Restaurant, Epicerie..."
+                  placeholderTextColor={theme.colors.textSecondary}
+                  value={formData.businessType}
+                  onChangeText={(text) => setFormData({ ...formData, businessType: text })}
+                  autoCapitalize="words"
+                />
+              </View>
+            </>
+          )}
 
           {/* Submit Button */}
           <Button

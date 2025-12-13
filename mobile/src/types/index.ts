@@ -4,7 +4,7 @@ export interface User {
   id: number
   first_name: string
   last_name: string
-  email: string
+  email?: string | null // Optional for phone-only auth
   role: 'consumer' | 'merchant' | 'admin'
   city: string
   phone?: string
@@ -879,10 +879,12 @@ export interface FirebaseLoginResponse {
 }
 
 export interface FirebaseRegisterData {
-  firebase_uid: string
-  phone: string
+  firebase_token: string // SECURITY: Token re-verified by backend
   first_name: string
   last_name: string
   email?: string
   role: 'consumer' | 'merchant'
+  // Merchant-only fields
+  business_name?: string
+  business_type?: string
 }
