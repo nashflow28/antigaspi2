@@ -1,6 +1,8 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit'
 import { FavoritesState, Product } from '../../types'
 import apiService from '../../services/api'
+import offlineService from '../../services/offlineService'
+import { storeLogger } from '../../utils/logger'
 
 export const favoritesInitialState: FavoritesState = {
   favoriteIds: [], // Cache local des IDs favoris pour accès rapide
@@ -9,14 +11,54 @@ export const favoritesInitialState: FavoritesState = {
   error: null,
 }
 
+const FAVORITES_CACHE_KEY = 'favorites_list'
+const FAVORITE_IDS_CACHE_KEY = 'favorite_ids'
+
+const safeSetCache = async <T>(key: string, value: T): Promise<void> => {
+  try {
+    await offlineService.setCache(key, value)
+  } catch (error) {
+    storeLogger.warn('Failed to set cache:', key, error)
+  }
+}
+
+const safeGetCache = async <T>(key: string): Promise<T | null> => {
+  try {
+    return await offlineService.getCache<T>(key)
+  } catch (error) {
+    storeLogger.warn('Failed to get cache:', key, error)
+    return null
+  }
+}
+
+const isOffline = async (): Promise<boolean> => {
+  try {
+    return !(await offlineService.checkConnectivity())
+  } catch {
+    return !offlineService.getConnectivityStatus()
+  }
+}
+
 // Actions asynchrones
 export const fetchFavorites = createAsyncThunk(
   'favorites/fetchFavorites',
   async (_, { rejectWithValue }) => {
+    if (await isOffline()) {
+      const cached = await safeGetCache<Product[]>(FAVORITES_CACHE_KEY)
+      if (cached) {
+        return cached
+      }
+    }
+
     try {
       const response = await apiService.getFavorites()
+      await safeSetCache(FAVORITES_CACHE_KEY, response.data)
       return response.data
     } catch (error: any) {
+      const fallback = await safeGetCache<Product[]>(FAVORITES_CACHE_KEY)
+      if (fallback) {
+        return fallback
+      }
       return rejectWithValue(error.message || 'Erreur lors de la récupération des favoris')
     }
   }
@@ -25,10 +67,22 @@ export const fetchFavorites = createAsyncThunk(
 export const fetchFavoriteIds = createAsyncThunk(
   'favorites/fetchFavoriteIds',
   async (_, { rejectWithValue }) => {
+    if (await isOffline()) {
+      const cached = await safeGetCache<number[]>(FAVORITE_IDS_CACHE_KEY)
+      if (cached) {
+        return cached
+      }
+    }
+
     try {
       const response = await apiService.getFavoriteIds()
+      await safeSetCache(FAVORITE_IDS_CACHE_KEY, response.data)
       return response.data // Array of product IDs
     } catch (error: any) {
+      const fallback = await safeGetCache<number[]>(FAVORITE_IDS_CACHE_KEY)
+      if (fallback) {
+        return fallback
+      }
       return rejectWithValue(error.message || 'Erreur lors de la récupération des IDs favoris')
     }
   }

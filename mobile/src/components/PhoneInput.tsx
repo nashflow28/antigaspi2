@@ -208,7 +208,7 @@ const PhoneInput: React.FC<PhoneInputProps> = ({
 
   // Section header
   const renderSectionHeader = useCallback((title: string) => (
-    <View style={[styles.sectionHeader, { backgroundColor: theme.colors.surface.muted }]}>
+    <View style={[styles.sectionHeader, { backgroundColor: theme.isDark ? theme.colors.neutral[800] : theme.colors.surface.muted }]}>
       <Typography variant="caption" weight="bold" color="secondary">
         {title}
       </Typography>
@@ -292,7 +292,7 @@ const PhoneInput: React.FC<PhoneInputProps> = ({
           </View>
 
           {/* Search Input */}
-          <View style={[styles.searchContainer, { backgroundColor: theme.colors.surface.muted }]}>
+          <View style={[styles.searchContainer, { backgroundColor: theme.isDark ? theme.colors.neutral[800] : theme.colors.surface.muted }]}>
             <Ionicons name="search" size={20} color={theme.colors.textSecondary} />
             <TextInput
               style={[styles.searchInput, { color: theme.colors.text }]}

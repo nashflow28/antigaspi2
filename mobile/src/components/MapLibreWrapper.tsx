@@ -26,29 +26,28 @@ if (!isExpoGo) {
   }
 }
 
-// Style Carto Voyager - tuiles fiables et gratuites (basées sur OSM)
-const CARTO_RASTER_STYLE = {
+// Style OpenStreetMap - tuiles standard OSM
+const OSM_RASTER_STYLE = {
   version: 8,
   sources: {
-    carto: {
+    osm: {
       type: 'raster',
       tiles: [
-        'https://a.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}@2x.png',
-        'https://b.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}@2x.png',
-        'https://c.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}@2x.png',
-        'https://d.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}@2x.png',
+        'https://a.tile.openstreetmap.org/{z}/{x}/{y}.png',
+        'https://b.tile.openstreetmap.org/{z}/{x}/{y}.png',
+        'https://c.tile.openstreetmap.org/{z}/{x}/{y}.png',
       ],
       tileSize: 256,
-      attribution: '© CARTO © OpenStreetMap contributors',
+      attribution: '© OpenStreetMap contributors',
     },
   },
   layers: [
     {
-      id: 'carto-tiles',
+      id: 'osm-tiles',
       type: 'raster',
-      source: 'carto',
+      source: 'osm',
       minzoom: 0,
-      maxzoom: 22,
+      maxzoom: 19,
     },
   ],
 }
@@ -167,7 +166,7 @@ const MapLibreWrapper = forwardRef<MapLibreRef, MapLibreWrapperProps>((props, re
       <MapLibreGL.MapView
         ref={mapRef}
         style={styles.map}
-        styleJSON={JSON.stringify(CARTO_RASTER_STYLE)}
+        styleJSON={JSON.stringify(OSM_RASTER_STYLE)}
         onPress={handlePress}
         logoEnabled={false}
         attributionEnabled={true}
@@ -192,7 +191,7 @@ const MapLibreWrapper = forwardRef<MapLibreRef, MapLibreWrapperProps>((props, re
 
       {/* Attribution */}
       <View style={styles.osmAttribution}>
-        <Text style={styles.osmAttributionText}>© CARTO © OSM</Text>
+        <Text style={styles.osmAttributionText}>© OpenStreetMap</Text>
       </View>
     </View>
   )

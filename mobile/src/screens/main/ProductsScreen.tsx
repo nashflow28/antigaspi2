@@ -6,15 +6,24 @@ import {
   ScrollView,
   TouchableOpacity,
   TextInput,
-  FlatList,
   RefreshControl,
   Platform,
   ActivityIndicator,
   Modal,
 } from 'react-native'
+import { FlashList } from '@shopify/flash-list'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useDispatch, useSelector } from 'react-redux'
-import { AppDispatch, RootState } from '../../store'
+import {
+  AppDispatch,
+  RootState,
+  selectAllProducts,
+  selectAllCategories,
+  selectProductsLoading,
+  selectAllMerchants,
+  selectMerchantsLoading,
+  selectIsAuthenticated,
+} from '../../store'
 import { fetchProducts, fetchCategories } from '../../store/slices/productsSlice'
 import { fetchMerchants } from '../../store/slices/merchantsSlice'
 import { Ionicons } from '@expo/vector-icons'
@@ -47,9 +56,13 @@ type MerchantListItem = {
 
 const ProductsScreen: React.FC<Props> = ({ navigation }) => {
   const dispatch = useDispatch<AppDispatch>()
-  const { isAuthenticated } = useSelector((state: RootState) => state.auth)
-  const { products, categories, loading: productsLoading } = useSelector((state: RootState) => state.products)
-  const { merchants, loading: merchantsLoading } = useSelector((state: RootState) => state.merchants)
+  // Performance: Use memoized selectors to prevent unnecessary re-renders
+  const isAuthenticated = useSelector(selectIsAuthenticated)
+  const products = useSelector(selectAllProducts)
+  const categories = useSelector(selectAllCategories)
+  const productsLoading = useSelector(selectProductsLoading)
+  const merchants = useSelector(selectAllMerchants)
+  const merchantsLoading = useSelector(selectMerchantsLoading)
   const theme = useTheme()
   const insets = useSafeAreaInsets()
   const { alertProps, showWarning } = useAlert()
@@ -1196,7 +1209,7 @@ const ProductsScreen: React.FC<Props> = ({ navigation }) => {
         isLoadingMerchants ? (
           renderLoadingState(hasActiveSearch ? 'Recherche des boutiques…' : 'Chargement des boutiques…')
         ) : filteredMerchants.length > 0 ? (
-          <FlatList
+          <FlashList
             key="merchants-list"
             data={filteredMerchants}
             renderItem={({ item }) => renderMerchantCard(item)}

@@ -378,7 +378,7 @@ const ProfileEditScreen: React.FC<ProfileEditScreenProps> = ({ navigation: navig
       />
 
       {/* Header */}
-      <View style={[styles.header, { backgroundColor: theme.colors.primary[500] }]}>
+      <View style={[styles.header, { backgroundColor: theme.isDark ? '#0F1622' : theme.colors.primary[500] }]}>
         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
           <Ionicons name="arrow-back" size={24} color="white" />
         </TouchableOpacity>
@@ -397,7 +397,7 @@ const ProfileEditScreen: React.FC<ProfileEditScreenProps> = ({ navigation: navig
         <View
           style={[
             styles.photoSection,
-            { backgroundColor: theme.colors.surface.light, marginBottom: theme.spacing.xl },
+            { backgroundColor: theme.colors.cardBackground, marginBottom: theme.spacing.xl },
           ]}
         >
           <View style={styles.photoContainer}>
@@ -407,7 +407,7 @@ const ProfileEditScreen: React.FC<ProfileEditScreenProps> = ({ navigation: navig
               <View
                 style={[
                   styles.photoPlaceholder,
-                  { backgroundColor: theme.colors.neutral[100] },
+                  { backgroundColor: theme.isDark ? theme.colors.neutral[700] : theme.colors.neutral[100] },
                 ]}
               >
                 <Ionicons name="person" size={48} color={theme.colors.neutral[400]} />
@@ -422,7 +422,7 @@ const ProfileEditScreen: React.FC<ProfileEditScreenProps> = ({ navigation: navig
           <TouchableOpacity
             style={[
               styles.changePhotoButton,
-              { backgroundColor: theme.colors.primary[500] },
+              { backgroundColor: theme.isDark ? '#10B981' : theme.colors.primary[500] },
             ]}
             onPress={pickImage}
             disabled={uploading}
@@ -449,9 +449,9 @@ const ProfileEditScreen: React.FC<ProfileEditScreenProps> = ({ navigation: navig
               style={[
                 styles.input,
                 {
-                  backgroundColor: theme.colors.surface.light,
+                  backgroundColor: theme.colors.inputBackground,
                   color: theme.colors.text,
-                  borderColor: theme.colors.border,
+                  borderColor: theme.colors.inputBorder,
                 },
               ]}
               value={formData.first_name}
@@ -474,9 +474,9 @@ const ProfileEditScreen: React.FC<ProfileEditScreenProps> = ({ navigation: navig
               style={[
                 styles.input,
                 {
-                  backgroundColor: theme.colors.surface.light,
+                  backgroundColor: theme.colors.inputBackground,
                   color: theme.colors.text,
-                  borderColor: theme.colors.border,
+                  borderColor: theme.colors.inputBorder,
                 },
               ]}
               value={formData.last_name}
@@ -499,9 +499,9 @@ const ProfileEditScreen: React.FC<ProfileEditScreenProps> = ({ navigation: navig
               style={[
                 styles.input,
                 {
-                  backgroundColor: theme.colors.surface.light,
+                  backgroundColor: theme.colors.inputBackground,
                   color: theme.colors.text,
-                  borderColor: theme.colors.border,
+                  borderColor: theme.colors.inputBorder,
                 },
               ]}
               value={formData.email}
@@ -534,9 +534,9 @@ const ProfileEditScreen: React.FC<ProfileEditScreenProps> = ({ navigation: navig
               style={[
                 styles.input,
                 {
-                  backgroundColor: theme.colors.surface.light,
+                  backgroundColor: theme.colors.inputBackground,
                   color: theme.colors.text,
-                  borderColor: theme.colors.border,
+                  borderColor: theme.colors.inputBorder,
                 },
               ]}
               value={formData.address}
@@ -559,9 +559,9 @@ const ProfileEditScreen: React.FC<ProfileEditScreenProps> = ({ navigation: navig
               style={[
                 styles.input,
                 {
-                  backgroundColor: theme.colors.surface.light,
+                  backgroundColor: theme.colors.inputBackground,
                   color: theme.colors.text,
-                  borderColor: theme.colors.border,
+                  borderColor: theme.colors.inputBorder,
                 },
               ]}
               value={formData.city}
@@ -577,7 +577,7 @@ const ProfileEditScreen: React.FC<ProfileEditScreenProps> = ({ navigation: navig
           style={[
             styles.saveButton,
             {
-              backgroundColor: theme.colors.primary[500],
+              backgroundColor: theme.isDark ? '#10B981' : theme.colors.primary[500],
               marginHorizontal: theme.spacing.lg,
               marginBottom: theme.spacing['2xl'],
             },

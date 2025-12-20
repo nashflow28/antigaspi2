@@ -1,17 +1,24 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit'
 import { ReservationsState, Reservation, ReservationCreationPayload, ReservationCreationResponse } from '../../types'
 import apiService from '../../services/api'
+import offlineService from '../../services/offlineService'
+import { storeLogger } from '../../utils/logger'
 import { validateSchema, ReservationSchema } from '../../utils/schemaValidator'
-// NOTE: offlineService retiré - Service offline désactivé pour compatibilité web
 
 /**
  * BUG FIX #16: Validate and normalize reservation data from backend
  */
 const validateReservation = (reservation: Reservation): Reservation => {
+  // BUG FIX: Map quantity_reserved to quantity if missing (DB vs Model mismatch)
+  const res: any = reservation
+  if (res.quantity === undefined && res.quantity_reserved !== undefined) {
+    res.quantity = res.quantity_reserved
+  }
+
   if (__DEV__) {
     const validation = validateSchema(reservation, ReservationSchema)
     if (!validation.valid) {
-      console.warn(
+      storeLogger.warn(
         `[Schema] Invalid reservation data (id: ${reservation?.id}):`,
         validation.errors.map((e) => `${e.field}: ${e.message}`).join(', ')
       )
@@ -29,10 +36,41 @@ export const reservationsInitialState: ReservationsState = {
   error: null,
 }
 
+const RESERVATIONS_CACHE_KEY = 'reservations_list'
+const reservationCacheKey = (id: number) => `reservation_${id}`
+
+const safeSetCache = async <T>(key: string, value: T): Promise<void> => {
+  try {
+    await offlineService.setCache(key, value)
+  } catch (error) {
+    storeLogger.warn('Failed to set cache:', key, error)
+  }
+}
+
+const safeGetCache = async <T>(key: string): Promise<T | null> => {
+  try {
+    return await offlineService.getCache<T>(key)
+  } catch (error) {
+    storeLogger.warn('Failed to get cache:', key, error)
+    return null
+  }
+}
+
+const isOffline = async (): Promise<boolean> => {
+  try {
+    return !(await offlineService.checkConnectivity())
+  } catch {
+    return !offlineService.getConnectivityStatus()
+  }
+}
+
 // Actions asynchrones
 export const createReservation = createAsyncThunk(
   'reservations/create',
   async (payload: ReservationCreationPayload, { rejectWithValue }) => {
+    // Si offline, on pourrait queue l'action ici via offlineService
+    // Pour l'instant on garde le comportement online-first par défaut
+    // sauf si on veut supporter la création offline explicitement
     try {
       const response = await apiService.createReservation(payload)
       return response
@@ -45,11 +83,30 @@ export const createReservation = createAsyncThunk(
 export const fetchMyReservations = createAsyncThunk(
   'reservations/fetchMy',
   async (_, { rejectWithValue }) => {
+    if (await isOffline()) {
+      const cached = await safeGetCache<Reservation[]>(RESERVATIONS_CACHE_KEY)
+      if (cached) {
+        return cached
+      }
+    }
+
     try {
       const response = await apiService.getMyReservations()
       // BUG FIX #16: Validate backend data before processing
-      return validateReservations(response.data)
+      const validated = validateReservations(response.data)
+      await safeSetCache(RESERVATIONS_CACHE_KEY, validated)
+      
+      // Cache individual reservations too
+      validated.forEach(res => {
+        safeSetCache(reservationCacheKey(res.id), res)
+      })
+      
+      return validated
     } catch (error: any) {
+      const fallback = await safeGetCache<Reservation[]>(RESERVATIONS_CACHE_KEY)
+      if (fallback) {
+        return fallback
+      }
       return rejectWithValue(error.message)
     }
   }
@@ -58,11 +115,26 @@ export const fetchMyReservations = createAsyncThunk(
 export const fetchReservation = createAsyncThunk(
   'reservations/fetch',
   async (id: number, { rejectWithValue }) => {
+    const cacheKey = reservationCacheKey(id)
+
+    if (await isOffline()) {
+      const cached = await safeGetCache<Reservation>(cacheKey)
+      if (cached) {
+        return cached
+      }
+    }
+
     try {
       const response = await apiService.getReservation(id)
       // BUG FIX #16: Validate backend data before processing
-      return validateReservation(response.data)
+      const validated = validateReservation(response.data)
+      await safeSetCache(cacheKey, validated)
+      return validated
     } catch (error: any) {
+      const fallback = await safeGetCache<Reservation>(cacheKey)
+      if (fallback) {
+        return fallback
+      }
       return rejectWithValue(error.message)
     }
   }

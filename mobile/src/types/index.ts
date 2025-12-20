@@ -66,6 +66,7 @@ export interface Product {
   merchant: Merchant
   created_at: string
   is_active?: boolean
+  is_surprise_basket?: boolean  // true = panier surprise, false/undefined = produit individuel
   status?: string
   needs_approval?: boolean
 }

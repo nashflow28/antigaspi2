@@ -1,5 +1,7 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit'
 import apiService from '../../services/api'
+import offlineService from '../../services/offlineService'
+import { storeLogger } from '../../utils/logger'
 
 export interface Merchant {
   id: number
@@ -33,17 +35,56 @@ export const merchantsInitialState: MerchantsState = {
   error: null,
 }
 
+const MERCHANTS_CACHE_KEY = 'merchants_list'
+
+const safeSetCache = async <T>(key: string, value: T): Promise<void> => {
+  try {
+    await offlineService.setCache(key, value)
+  } catch (error) {
+    storeLogger.warn('Failed to set cache:', key, error)
+  }
+}
+
+const safeGetCache = async <T>(key: string): Promise<T | null> => {
+  try {
+    return await offlineService.getCache<T>(key)
+  } catch (error) {
+    storeLogger.warn('Failed to get cache:', key, error)
+    return null
+  }
+}
+
+const isOffline = async (): Promise<boolean> => {
+  try {
+    return !(await offlineService.checkConnectivity())
+  } catch {
+    return !offlineService.getConnectivityStatus()
+  }
+}
+
 // Thunk pour récupérer la liste des marchands
 export const fetchMerchants = createAsyncThunk(
   'merchants/fetchMerchants',
   async (_, { rejectWithValue }) => {
+    if (await isOffline()) {
+      const cached = await safeGetCache<Merchant[]>(MERCHANTS_CACHE_KEY)
+      if (cached) {
+        return cached
+      }
+    }
+
     try {
       const response = await apiService.getMerchants()
       if (response.success && response.data) {
+        await safeSetCache(MERCHANTS_CACHE_KEY, response.data)
         return response.data
       }
       throw new Error('Erreur lors de la récupération des marchands')
     } catch (error: any) {
+      const fallback = await safeGetCache<Merchant[]>(MERCHANTS_CACHE_KEY)
+      if (fallback) {
+        return fallback
+      }
       return rejectWithValue(error.message || 'Une erreur est survenue')
     }
   }

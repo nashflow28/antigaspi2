@@ -307,7 +307,7 @@ const MerchantOpeningHoursScreen: React.FC = () => {
                 {day.is_open && (
                   <TouchableOpacity
                     onPress={() => copyToAllDays(index)}
-                    style={[styles.copyButton, { backgroundColor: theme.colors.neutral[100] }]}
+                    style={[styles.copyButton, { backgroundColor: theme.isDark ? theme.colors.neutral[700] : theme.colors.neutral[100] }]}
                   >
                     <Ionicons name="copy-outline" size={16} color={theme.colors.primary[500]} />
                     <Text style={[styles.copyButtonText, { color: theme.colors.primary[500] }]}>
@@ -325,7 +325,7 @@ const MerchantOpeningHoursScreen: React.FC = () => {
                     <Text style={[styles.timeSlotLabel, { color: theme.colors.textSecondary }]}>Matin</Text>
                     <View style={styles.timeInputs}>
                       <TouchableOpacity
-                        style={[styles.timeButton, { backgroundColor: theme.colors.neutral[100] }]}
+                        style={[styles.timeButton, { backgroundColor: theme.isDark ? theme.colors.neutral[700] : theme.colors.neutral[100] }]}
                         onPress={() => setShowTimePicker({ dayIndex: index, field: 'morning_start' })}
                       >
                         <Ionicons name="time-outline" size={18} color={theme.colors.primary[500]} />
@@ -335,7 +335,7 @@ const MerchantOpeningHoursScreen: React.FC = () => {
                       </TouchableOpacity>
                       <Text style={[styles.timeSeparator, { color: theme.colors.textSecondary }]}>-</Text>
                       <TouchableOpacity
-                        style={[styles.timeButton, { backgroundColor: theme.colors.neutral[100] }]}
+                        style={[styles.timeButton, { backgroundColor: theme.isDark ? theme.colors.neutral[700] : theme.colors.neutral[100] }]}
                         onPress={() => setShowTimePicker({ dayIndex: index, field: 'morning_end' })}
                       >
                         <Ionicons name="time-outline" size={18} color={theme.colors.primary[500]} />
@@ -353,7 +353,7 @@ const MerchantOpeningHoursScreen: React.FC = () => {
                     </Text>
                     <View style={styles.timeInputs}>
                       <TouchableOpacity
-                        style={[styles.timeButton, { backgroundColor: theme.colors.neutral[100] }]}
+                        style={[styles.timeButton, { backgroundColor: theme.isDark ? theme.colors.neutral[700] : theme.colors.neutral[100] }]}
                         onPress={() => setShowTimePicker({ dayIndex: index, field: 'afternoon_start' })}
                       >
                         <Ionicons name="time-outline" size={18} color={theme.colors.primary[500]} />
@@ -363,7 +363,7 @@ const MerchantOpeningHoursScreen: React.FC = () => {
                       </TouchableOpacity>
                       <Text style={[styles.timeSeparator, { color: theme.colors.textSecondary }]}>-</Text>
                       <TouchableOpacity
-                        style={[styles.timeButton, { backgroundColor: theme.colors.neutral[100] }]}
+                        style={[styles.timeButton, { backgroundColor: theme.isDark ? theme.colors.neutral[700] : theme.colors.neutral[100] }]}
                         onPress={() => setShowTimePicker({ dayIndex: index, field: 'afternoon_end' })}
                       >
                         <Ionicons name="time-outline" size={18} color={theme.colors.primary[500]} />

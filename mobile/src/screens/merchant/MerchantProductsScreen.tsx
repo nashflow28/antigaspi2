@@ -3,7 +3,6 @@ import {
   View,
   Text,
   StyleSheet,
-  FlatList,
   TouchableOpacity,
   StatusBar,
   RefreshControl,
@@ -11,6 +10,7 @@ import {
   ActivityIndicator,
   Modal,
 } from 'react-native'
+import { FlashList } from '@shopify/flash-list'
 import { Ionicons } from '@expo/vector-icons'
 import { useFocusEffect } from '@react-navigation/native'
 import { useTheme } from '../../theme'
@@ -400,8 +400,8 @@ const MerchantProductsScreen: React.FC<Props> = ({ navigation }) => {
                 {
                   backgroundColor: isActiveFilter
                     ? theme.withOpacity(theme.colors.primary[500], 0.15)
-                    : theme.colors.surface.light,
-                  borderColor: isActiveFilter ? theme.colors.primary[500] : theme.colors.neutral[200],
+                    : theme.isDark ? theme.colors.neutral[800] : theme.colors.surface.light,
+                  borderColor: isActiveFilter ? theme.colors.primary[500] : theme.isDark ? theme.colors.neutral[600] : theme.colors.neutral[200],
                 },
               ]}
               onPress={() => setStatusFilter(filter.key)}
@@ -436,8 +436,8 @@ const MerchantProductsScreen: React.FC<Props> = ({ navigation }) => {
         })}
       </View>
 
-      {/* Liste des produits */}
-      <FlatList
+      {/* Liste des produits - FlashList pour performance optimale */}
+      <FlashList
         data={filteredProducts}
         renderItem={renderProduct}
         keyExtractor={(item) => item.id.toString()}

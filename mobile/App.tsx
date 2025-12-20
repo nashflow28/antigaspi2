@@ -7,6 +7,7 @@ import { clearAuth } from './src/store/slices/authSlice'
 import { ThemeProvider } from './src/theme'
 import { ToastProvider } from './src/contexts/ToastContext'
 import { AlertProvider } from './src/contexts/AlertContext'
+import { AuthPromptProvider } from './src/contexts/AuthPromptContext'
 import AppNavigator from './src/navigation/AppNavigator'
 import apiService from './src/services/api'
 import usePushNotifications from './src/hooks/usePushNotifications'
@@ -50,9 +51,11 @@ function App() {
         <ThemeProvider>
           <ToastProvider>
             <AlertProvider>
-              <View style={{ flex: 1 }}>
-                <AppContent />
-              </View>
+              <AuthPromptProvider>
+                <View style={{ flex: 1 }}>
+                  <AppContent />
+                </View>
+              </AuthPromptProvider>
             </AlertProvider>
           </ToastProvider>
         </ThemeProvider>

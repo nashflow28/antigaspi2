@@ -11,10 +11,10 @@ export type PaymentOption = {
 
 export const PAYMENT_OPTIONS: PaymentOption[] = [
   {
-    value: 'on_site',
-    label: 'Sur place',
-    description: 'Réglez au moment du retrait en boutique.',
-    icon: 'storefront',
+    value: 'wallet',
+    label: 'Portefeuille Antigaspi',
+    description: 'Payez avec votre solde Antigaspi. Rapide et sécurisé.',
+    icon: 'wallet',
   },
   {
     value: 'flooz',
@@ -25,13 +25,7 @@ export const PAYMENT_OPTIONS: PaymentOption[] = [
   {
     value: 'paystack',
     label: 'Carte bancaire',
-    description: 'Paiement sécurisé par carte (Paystack).',
+    description: 'Paiement sécurisé par carte (Visa, Mastercard).',
     icon: 'card',
-  },
-  {
-    value: 'wallet',
-    label: 'Portefeuille',
-    description: 'Utilisez votre portefeuille Antigaspi.',
-    icon: 'wallet',
   },
 ]

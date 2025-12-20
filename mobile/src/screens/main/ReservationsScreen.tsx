@@ -4,23 +4,27 @@ import {
   StyleSheet,
   TouchableOpacity,
   StatusBar,
-  FlatList,
   RefreshControl,
   Dimensions,
 } from 'react-native'
+import { FlashList } from '@shopify/flash-list'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useDispatch, useSelector } from 'react-redux'
-import { AppDispatch, RootState } from '../../store'
+import {
+  AppDispatch,
+  RootState,
+  selectAllReservations,
+  selectReservationsLoading,
+  selectCurrentUser,
+} from '../../store'
 import {
   fetchMyReservations,
   cancelReservation,
-  // markReservationSyncPending retiré - reducer offline désactivé (Bug #24)
 } from '../../store/slices/reservationsSlice'
 import { Ionicons } from '@expo/vector-icons'
 import { Image } from 'expo-image'
 import QRCode from 'react-native-qrcode-svg'
 import { Reservation } from '../../types'
-// import offlineService from '../../services/offlineService'
 import analyticsService from '../../services/analyticsService'
 import { Button, Card, Badge, Typography, Modal as Modal2025, ReservationListSkeleton, EmptyState } from '../../components/2025'
 import { useTheme } from '../../theme'
@@ -28,6 +32,7 @@ import { TEST_IDS } from '../../utils/testIds'
 import { getImageUrl } from '../../utils/imageHelpers'
 import AlertModal from '../../components/AlertModal'
 import { useAlert } from '../../hooks/useAlert'
+import { navigationRef } from '../../navigation/NavigationRef'
 
 interface Props {
   navigation: any
@@ -39,8 +44,11 @@ const ReservationsScreen: React.FC<Props> = ({ navigation }) => {
   const theme = useTheme()
   const insets = useSafeAreaInsets()
   const dispatch = useDispatch<AppDispatch>()
-  const { reservations, loading } = useSelector((state: RootState) => state.reservations)
-  const { user } = useSelector((state: RootState) => state.auth)
+  // Performance: Use memoized selectors to prevent unnecessary re-renders
+  const reservations = useSelector(selectAllReservations)
+  const loading = useSelector(selectReservationsLoading)
+  const user = useSelector(selectCurrentUser)
+  const { isAuthenticated } = useSelector((state: RootState) => state.auth)
   const { alertProps, showError, showSuccess, showWarning, hideAlert } = useAlert()
 
   console.log('🔍 [ReservationsScreen] Current state:', {
@@ -57,9 +65,11 @@ const ReservationsScreen: React.FC<Props> = ({ navigation }) => {
   const [activeTab, setActiveTab] = useState<'active' | 'completed' | 'cancelled'>('active')
 
   useEffect(() => {
-    console.log('🔵 [ReservationsScreen] Component mounted - loading reservations...')
-    void loadReservations('initial')
-  }, [])
+    if (isAuthenticated) {
+      console.log('[ReservationsScreen] Component mounted - loading reservations...')
+      void loadReservations('initial')
+    }
+  }, [isAuthenticated])
 
   const loadReservations = async (
     source: 'initial' | 'refresh' | 'reload' = 'initial'
@@ -417,6 +427,47 @@ const ReservationsScreen: React.FC<Props> = ({ navigation }) => {
     )
   }
 
+  // Vue pour les utilisateurs non connectes
+  if (!isAuthenticated) {
+    return (
+      <View
+        style={[styles.container, { backgroundColor: theme.colors.background }]}
+        testID={TEST_IDS.reservationsScreen}
+      >
+        <StatusBar backgroundColor={theme.colors.primary[500]} barStyle="light-content" />
+
+        {/* Header */}
+        <View style={[styles.header, { backgroundColor: theme.colors.primary[500], paddingHorizontal: theme.spacing.lg, paddingTop: insets.top + 16, paddingBottom: theme.spacing.lg }]}>
+          <Typography variant="h2" weight="bold" style={{ color: theme.colors.textInverse }}>
+            Mes reservations
+          </Typography>
+        </View>
+
+        {/* Empty State - Login Required */}
+        <View style={{ flex: 1, justifyContent: 'center', paddingHorizontal: theme.spacing.lg }}>
+          <EmptyState
+            variant="no-reservations"
+            title="Connectez-vous"
+            description="Connectez-vous pour voir vos reservations et en creer de nouvelles"
+            actions={[
+              {
+                label: 'Se connecter',
+                icon: 'log-in-outline',
+                onPress: () => navigationRef.navigate('Auth', { screen: 'Login' }),
+              },
+              {
+                label: 'Creer un compte',
+                icon: 'person-add-outline',
+                variant: 'secondary',
+                onPress: () => navigationRef.navigate('Auth', { screen: 'Register' }),
+              },
+            ]}
+          />
+        </View>
+      </View>
+    )
+  }
+
   return (
     <View
       style={[styles.container, { backgroundColor: theme.colors.background }]}
@@ -471,7 +522,7 @@ const ReservationsScreen: React.FC<Props> = ({ navigation }) => {
           <ReservationListSkeleton count={4} />
         </View>
       ) : (
-        <FlatList
+        <FlashList
           data={filteredReservations}
           renderItem={renderReservation}
           keyExtractor={(item) => item.id.toString()}

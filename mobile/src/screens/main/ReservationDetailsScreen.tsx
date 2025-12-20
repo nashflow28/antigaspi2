@@ -208,9 +208,14 @@ const ReservationDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
               Paiement :
             </Typography>
             <Typography variant="body" weight="semibold">
-              {reservation.latest_payment?.payment_method === 'on_site' || !reservation.latest_payment
-                ? 'Sur place'
-                : 'En ligne'}
+              {(() => {
+                const method = reservation.latest_payment?.payment_method
+                if (!method || method === 'on_site') return 'Sur place'
+                if (method === 'wallet') return 'Portefeuille'
+                if (method === 'flooz' || method === 'tmoney' || method === 'orange_money' || method === 'mtn_momo') return 'Mobile Money'
+                if (method === 'paystack') return 'Carte bancaire'
+                return 'En ligne'
+              })()}
             </Typography>
           </View>
 

@@ -690,7 +690,7 @@ const MerchantProfileEditScreen: React.FC = () => {
               style={[
                 styles.input,
                 styles.textArea,
-                { backgroundColor: theme.colors.surface.light, color: theme.colors.text },
+                { backgroundColor: theme.colors.inputBackground, borderColor: theme.colors.inputBorder, borderWidth: 1, color: theme.colors.text },
               ]}
               value={formData.description}
               onChangeText={(value) => updateField('description', value)}
@@ -823,7 +823,7 @@ const MerchantProfileEditScreen: React.FC = () => {
               style={[
                 styles.input,
                 styles.locationInput,
-                { backgroundColor: theme.colors.surface.light, color: theme.colors.text },
+                { backgroundColor: theme.colors.inputBackground, borderColor: theme.colors.inputBorder, borderWidth: 1, color: theme.colors.text },
               ]}
               value={latitude}
               onChangeText={setLatitude}
@@ -842,7 +842,7 @@ const MerchantProfileEditScreen: React.FC = () => {
               style={[
                 styles.input,
                 styles.locationInput,
-                { backgroundColor: theme.colors.surface.light, color: theme.colors.text },
+                { backgroundColor: theme.colors.inputBackground, borderColor: theme.colors.inputBorder, borderWidth: 1, color: theme.colors.text },
               ]}
               value={longitude}
               onChangeText={setLongitude}

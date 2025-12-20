@@ -56,7 +56,7 @@ const CartScreen: React.FC<Props> = ({ navigation }) => {
     checkoutError,
   } = useSelector((state: RootState) => state.cart)
 
-  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<PaymentMethod>('on_site')
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<PaymentMethod>('wallet')
   const [selectedPickupDate, setSelectedPickupDate] = useState<string | null>(null)
   const [selectedPickupTime, setSelectedPickupTime] = useState('12:00')
   const [notes, setNotes] = useState('')
@@ -79,7 +79,7 @@ const CartScreen: React.FC<Props> = ({ navigation }) => {
       setCustomerPhone('')
       setCustomerEmail('')
       setWalletPin('')
-      setSelectedPaymentMethod('on_site')
+      setSelectedPaymentMethod('wallet')
     }
   }, [cart])
 

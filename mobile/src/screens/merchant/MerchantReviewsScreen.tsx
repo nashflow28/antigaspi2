@@ -12,6 +12,8 @@ import {
   Modal,
   KeyboardAvoidingView,
   Platform,
+  Keyboard,
+  TouchableWithoutFeedback,
 } from 'react-native'
 import { useNavigation } from '@react-navigation/native'
 import { Ionicons } from '@expo/vector-icons'
@@ -484,7 +486,11 @@ const MerchantReviewsScreen: React.FC = () => {
         <KeyboardAvoidingView
           style={styles.modalOverlay}
           behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+          keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}
         >
+          <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+            <View style={styles.modalBackdrop} />
+          </TouchableWithoutFeedback>
           <View style={[styles.modalContent, { backgroundColor: theme.colors.cardBackground, borderColor: theme.colors.cardBorder, borderWidth: 1 }]}>
             <View style={styles.modalHeader}>
               <Text style={[styles.modalTitle, { color: theme.colors.text }]}>
@@ -498,6 +504,8 @@ const MerchantReviewsScreen: React.FC = () => {
             <ScrollView
               showsVerticalScrollIndicator={false}
               keyboardShouldPersistTaps="handled"
+              bounces={false}
+              contentContainerStyle={styles.modalScrollContent}
             >
               {selectedReview && (
                 <View style={styles.reviewPreview}>
@@ -507,9 +515,11 @@ const MerchantReviewsScreen: React.FC = () => {
                       {selectedReview.user.name}
                     </Text>
                   </View>
-                  <Text style={[styles.reviewComment, { color: theme.colors.textSecondary }]}>
-                    {selectedReview.comment}
-                  </Text>
+                  {selectedReview.comment && (
+                    <Text style={[styles.reviewComment, { color: theme.colors.textSecondary }]}>
+                      {selectedReview.comment}
+                    </Text>
+                  )}
                 </View>
               )}
 
@@ -524,7 +534,7 @@ const MerchantReviewsScreen: React.FC = () => {
                 value={responseText}
                 onChangeText={setResponseText}
                 multiline
-                numberOfLines={6}
+                numberOfLines={4}
                 maxLength={1000}
                 textAlignVertical="top"
               />
@@ -786,14 +796,21 @@ const styles = StyleSheet.create({
   },
   modalOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
     justifyContent: 'flex-end',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  modalBackdrop: {
+    flex: 1,
   },
   modalContent: {
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
     padding: 20,
+    paddingBottom: 30,
     maxHeight: '80%',
+  },
+  modalScrollContent: {
+    flexGrow: 1,
   },
   modalHeader: {
     flexDirection: 'row',

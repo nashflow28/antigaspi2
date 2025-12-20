@@ -27,6 +27,10 @@ import { TEST_IDS } from '../../utils/testIds'
 import { getCategoryIconConfig, IoniconName } from '../../constants/categoryIcons'
 import AlertModal from '../../components/AlertModal'
 import { useAlert } from '../../hooks/useAlert'
+import ProductTypeFilter, { ProductFilterType } from '../../components/ProductTypeFilter'
+import PromoBanner, { PromoBannerItem } from '../../components/PromoBanner'
+import NativeAdCard from '../../components/NativeAdCard'
+import { usePromos } from '../../hooks/usePromos'
 
 interface Props {
   navigation: any
@@ -41,10 +45,12 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
   const { alertProps, showWarning, hideAlert } = useAlert()
   const theme = useTheme()
   const insets = useSafeAreaInsets()
+  const { promoBanners, getNativeAdForIndex } = usePromos()
 
   const cartItemsCount = cart?.items_count ?? 0
 
   const [refreshing, setRefreshing] = useState(false)
+  const [selectedProductType, setSelectedProductType] = useState<ProductFilterType>('all')
   const [selectedCategory, setSelectedCategory] = useState<string>('all')
   const [showAvailable, setShowAvailable] = useState(true)
   const [maxDistance, setMaxDistance] = useState(10)
@@ -115,9 +121,31 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
     }
   }, [theme.colors.primary, theme.colors.success, theme.colors.neutral])
 
+  // ⚡ PERFORMANCE FIX: Memoize product type counts
+  const productTypeCounts = useMemo(() => {
+    const allProducts = products || []
+    const availableProducts = showAvailable
+      ? allProducts.filter(p => p.quantity_available > 0)
+      : allProducts
+
+    return {
+      all: availableProducts.length,
+      products: availableProducts.filter(p => !p.is_surprise_basket).length,
+      baskets: availableProducts.filter(p => p.is_surprise_basket === true).length,
+    }
+  }, [products, showAvailable])
+
   // ⚡ PERFORMANCE FIX: Memoize filtered products to avoid recalculation on every render
   const filteredProducts = useMemo(() => {
     return (products || []).filter(product => {
+      // Filtre par type de produit (produits vs paniers surprises)
+      if (selectedProductType === 'products' && product.is_surprise_basket === true) {
+        return false
+      }
+      if (selectedProductType === 'baskets' && product.is_surprise_basket !== true) {
+        return false
+      }
+
       // Filtre par catégorie
       if (selectedCategory !== 'all' && product.category?.id !== parseInt(selectedCategory)) {
         return false
@@ -153,7 +181,7 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
 
       return true
     })
-  }, [products, selectedCategory, showAvailable, distanceEnabled, userLocation, maxDistance])
+  }, [products, selectedProductType, selectedCategory, showAvailable, distanceEnabled, userLocation, maxDistance])
 
   // ⚡ PERFORMANCE FIX: Memoize sorted products
   const sortedProducts = useMemo(() => {
@@ -436,6 +464,26 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
           </View>
         </View>
 
+        {/* Bannière Promotionnelle */}
+        {promoBanners.length > 0 && (
+          <PromoBanner
+            items={promoBanners}
+            autoPlayInterval={5000}
+            onItemPress={(item) => {
+              if (item.merchantId) {
+                navigation.navigate('MerchantDetail', { merchantId: item.merchantId })
+              }
+            }}
+          />
+        )}
+
+        {/* Filtre Type: Tous | Produits | Paniers */}
+        <ProductTypeFilter
+          selectedType={selectedProductType}
+          onTypeChange={setSelectedProductType}
+          counts={productTypeCounts}
+        />
+
         {/* Catégories */}
         <ScrollView
           horizontal
@@ -537,8 +585,9 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
             <Typography variant="body" weight="semibold">
               {sortedProducts.length} produit{sortedProducts.length > 1 ? 's' : ''} trouvé{sortedProducts.length > 1 ? 's' : ''}
             </Typography>
-            {(selectedCategory !== 'all' || distanceEnabled) && (
+            {(selectedCategory !== 'all' || selectedProductType !== 'all' || distanceEnabled) && (
               <TouchableOpacity onPress={() => {
+                setSelectedProductType('all')
                 setSelectedCategory('all')
                 setDistanceEnabled(false)
               }}>
@@ -555,27 +604,102 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
           {loading && sortedProducts.length === 0 ? (
             <ProductCardSkeleton count={4} />
           ) : sortedProducts.length > 0 ? (
-            sortedProducts.map((product, index) => renderProductCard(product, index))
+            sortedProducts.map((product, index) => {
+              const nativeAd = getNativeAdForIndex(index, 6) // Pub tous les 6 produits
+              return (
+                <React.Fragment key={product.id}>
+                  {renderProductCard(product, index)}
+                  {nativeAd && (
+                    <NativeAdCard
+                      ad={nativeAd}
+                      variant="compact"
+                      onPress={(ad) => {
+                        if (ad.merchantId) {
+                          navigation.navigate('MerchantDetail', { merchantId: ad.merchantId })
+                        } else if (ad.id === 'wallet-promo') {
+                          navigation.getParent()?.navigate('Profile', { screen: 'Wallet' })
+                        }
+                      }}
+                    />
+                  )}
+                </React.Fragment>
+              )
+            })
           ) : (
             <EmptyState
-              variant={selectedCategory === 'all' ? 'no-products' : 'no-results'}
-              description={
-                selectedCategory === 'all'
-                  ? (showAvailable
-                      ? "Aucun produit disponible actuellement. Revenez plus tard ou désactivez le filtre 'Produits disponibles'."
-                      : "Aucun produit dans la base de données. Revenez plus tard.")
-                  : (showAvailable
-                      ? `Aucun produit disponible dans "${(categories || []).find(c => c.id.toString() === selectedCategory)?.name || 'cette catégorie'}". Essayez une autre catégorie.`
-                      : `Aucun produit dans "${(categories || []).find(c => c.id.toString() === selectedCategory)?.name || 'cette catégorie'}".`)
-              }
+              variant={selectedCategory === 'all' && selectedProductType === 'all' ? 'no-products' : 'no-results'}
+              description={(() => {
+                // Determiner le type d'item pour le message
+                const itemType = selectedProductType === 'baskets'
+                  ? 'panier surprise'
+                  : selectedProductType === 'products'
+                    ? 'produit'
+                    : 'produit'
+                const itemTypePlural = selectedProductType === 'baskets'
+                  ? 'paniers surprises'
+                  : 'produits'
+
+                const categoryName = selectedCategory !== 'all'
+                  ? (categories || []).find(c => c.id.toString() === selectedCategory)?.name || 'cette catégorie'
+                  : null
+
+                // Message contextuel selon les filtres actifs
+                if (selectedProductType === 'baskets') {
+                  if (categoryName) {
+                    return showAvailable
+                      ? `Aucun panier surprise disponible dans "${categoryName}" pour le moment.`
+                      : `Aucun panier surprise dans "${categoryName}" pour le moment.`
+                  }
+                  return showAvailable
+                    ? "Aucun panier surprise disponible pour le moment. Revenez plus tard !"
+                    : "Aucun panier surprise pour le moment. Revenez plus tard !"
+                }
+
+                if (selectedProductType === 'products') {
+                  if (categoryName) {
+                    return showAvailable
+                      ? `Aucun produit disponible dans "${categoryName}" pour le moment.`
+                      : `Aucun produit dans "${categoryName}" pour le moment.`
+                  }
+                  return showAvailable
+                    ? "Aucun produit disponible pour le moment. Revenez plus tard !"
+                    : "Aucun produit pour le moment. Revenez plus tard !"
+                }
+
+                // Type 'all'
+                if (categoryName) {
+                  return showAvailable
+                    ? `Aucun produit disponible dans "${categoryName}". Essayez une autre catégorie.`
+                    : `Aucun produit dans "${categoryName}".`
+                }
+                return showAvailable
+                  ? "Aucun produit disponible actuellement. Revenez plus tard ou désactivez le filtre 'Produits disponibles'."
+                  : "Aucun produit dans la base de données. Revenez plus tard."
+              })()}
               compact
-              actions={selectedCategory !== 'all' ? [
-                {
-                  label: 'Voir tous les produits',
-                  icon: 'grid-outline',
-                  onPress: () => setSelectedCategory('all'),
-                },
-              ] : []}
+              actions={(() => {
+                const actions = []
+
+                // Action pour réinitialiser le type de produit
+                if (selectedProductType !== 'all') {
+                  actions.push({
+                    label: 'Voir tout',
+                    icon: 'apps-outline',
+                    onPress: () => setSelectedProductType('all'),
+                  })
+                }
+
+                // Action pour réinitialiser la catégorie
+                if (selectedCategory !== 'all') {
+                  actions.push({
+                    label: 'Toutes catégories',
+                    icon: 'grid-outline',
+                    onPress: () => setSelectedCategory('all'),
+                  })
+                }
+
+                return actions
+              })()}
             />
           )}
         </View>

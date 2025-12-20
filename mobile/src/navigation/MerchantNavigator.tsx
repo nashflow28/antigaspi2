@@ -100,7 +100,7 @@ const MerchantNavigator: React.FC = () => {
         tabBarStyle: {
           paddingBottom: insets.bottom > 0 ? insets.bottom : 8,
           height: 60 + (insets.bottom > 0 ? insets.bottom : 8),
-          backgroundColor: theme.colors.surface.light,
+          backgroundColor: theme.isDark ? theme.colors.cardBackground : theme.colors.surface.light,
           borderTopColor: theme.colors.border,
           pointerEvents: 'auto',
         },

@@ -13,20 +13,21 @@ import { useNavigation } from '@react-navigation/native'
 import { logoutUser } from '../../store/slices/authSlice'
 import { AppDispatch, RootState } from '../../store'
 import { Ionicons } from '@expo/vector-icons'
-import { Card, Badge, Typography } from '../../components/2025'
+import { Card, Badge, Typography, Button } from '../../components/2025'
 import { useTheme } from '../../theme'
 import { useAlert } from '../../contexts/AlertContext'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { secureStorage } from '../../services/secureStorage'
 import { TEST_IDS } from '../../utils/testIds'
 import { getImageUrl } from '../../utils/imageHelpers'
+import { navigationRef } from '../../navigation/NavigationRef'
 
 const ProfileScreen: React.FC = () => {
   const theme = useTheme()
   const navigation = useNavigation()
   const { mode, setThemeMode } = theme
   const dispatch = useDispatch<AppDispatch>()
-  const { user, loading } = useSelector((state: RootState) => state.auth)
+  const { user, isAuthenticated } = useSelector((state: RootState) => state.auth)
   const { showAlert } = useAlert()
 
   const handleLogout = () => {
@@ -95,6 +96,141 @@ const ProfileScreen: React.FC = () => {
     }
   }
 
+  const handleLogin = () => {
+    navigationRef.navigate('Auth', { screen: 'Login' })
+  }
+
+  const handleRegister = () => {
+    navigationRef.navigate('Auth', { screen: 'Register' })
+  }
+
+  // Vue non connectee
+  if (!isAuthenticated) {
+    return (
+      <ScrollView
+        style={[styles.container, { backgroundColor: theme.colors.background }]}
+        contentContainerStyle={[styles.scrollContent, styles.guestContent]}
+        testID={TEST_IDS.profileScreen}
+        showsVerticalScrollIndicator={true}
+      >
+        {/* Hero Card */}
+        <Card variant="elevated" style={{ alignItems: 'center', paddingVertical: theme.spacing['3xl'], marginBottom: theme.spacing.lg }}>
+          <View style={[styles.guestAvatar, { backgroundColor: theme.withOpacity(theme.colors.primary[500], 0.15), marginBottom: theme.spacing.lg }]}>
+            <Ionicons name="person-outline" size={48} color={theme.colors.primary[500]} />
+          </View>
+          <Typography variant="h2" weight="bold" style={{ marginBottom: theme.spacing.sm, textAlign: 'center' }}>
+            Bienvenue sur Antigaspi
+          </Typography>
+          <Typography variant="body" color="secondary" style={{ textAlign: 'center', paddingHorizontal: theme.spacing.lg, marginBottom: theme.spacing['2xl'] }}>
+            Connectez-vous pour acceder a toutes les fonctionnalites et sauvegarder vos favoris
+          </Typography>
+
+          <View style={{ width: '100%', paddingHorizontal: theme.spacing.lg, gap: theme.spacing.md }}>
+            <Button
+              variant="primary"
+              size="lg"
+              fullWidth
+              onPress={handleLogin}
+              leftIcon={<Ionicons name="log-in-outline" size={20} color="#FFFFFF" />}
+            >
+              Se connecter
+            </Button>
+            <Button
+              variant="secondary"
+              size="lg"
+              fullWidth
+              onPress={handleRegister}
+              leftIcon={<Ionicons name="person-add-outline" size={20} color={theme.colors.primary[500]} />}
+            >
+              Creer un compte
+            </Button>
+          </View>
+        </Card>
+
+        {/* Benefits Card */}
+        <Card variant="elevated" style={{ marginHorizontal: theme.spacing.lg, marginBottom: theme.spacing.lg }}>
+          <Typography variant="h4" weight="semibold" style={{ marginBottom: theme.spacing.md, paddingHorizontal: theme.spacing.lg, paddingTop: theme.spacing.lg }}>
+            Pourquoi creer un compte ?
+          </Typography>
+
+          <View style={[styles.benefitItem, { paddingHorizontal: theme.spacing.lg, paddingVertical: theme.spacing.sm }]}>
+            <View style={[styles.benefitIcon, { backgroundColor: theme.withOpacity(theme.colors.semantic.success, 0.15) }]}>
+              <Ionicons name="heart" size={20} color={theme.colors.semantic.success} />
+            </View>
+            <View style={{ flex: 1 }}>
+              <Typography variant="body" weight="medium">Sauvegardez vos favoris</Typography>
+              <Typography variant="caption" color="secondary">Retrouvez facilement vos commerces preferes</Typography>
+            </View>
+          </View>
+
+          <View style={[styles.benefitItem, { paddingHorizontal: theme.spacing.lg, paddingVertical: theme.spacing.sm }]}>
+            <View style={[styles.benefitIcon, { backgroundColor: theme.withOpacity(theme.colors.primary[500], 0.15) }]}>
+              <Ionicons name="bag-check" size={20} color={theme.colors.primary[500]} />
+            </View>
+            <View style={{ flex: 1 }}>
+              <Typography variant="body" weight="medium">Reservez des paniers</Typography>
+              <Typography variant="caption" color="secondary">Recuperez des produits a prix reduit</Typography>
+            </View>
+          </View>
+
+          <View style={[styles.benefitItem, { paddingHorizontal: theme.spacing.lg, paddingVertical: theme.spacing.sm, paddingBottom: theme.spacing.lg }]}>
+            <View style={[styles.benefitIcon, { backgroundColor: theme.withOpacity(theme.colors.semantic.warning, 0.15) }]}>
+              <Ionicons name="gift" size={20} color={theme.colors.semantic.warning} />
+            </View>
+            <View style={{ flex: 1 }}>
+              <Typography variant="body" weight="medium">Gagnez des points</Typography>
+              <Typography variant="caption" color="secondary">Programme de fidelite avec recompenses</Typography>
+            </View>
+          </View>
+        </Card>
+
+        {/* Settings Card (available without auth) */}
+        <Card variant="elevated" style={{ marginHorizontal: theme.spacing.lg, overflow: 'hidden' }}>
+          <View
+            style={[
+              styles.menuItemBlock,
+              {
+                paddingHorizontal: theme.spacing.lg,
+                paddingVertical: theme.spacing.md,
+                borderBottomWidth: 1,
+                borderBottomColor: theme.colors.border,
+                backgroundColor: theme.isDark ? theme.colors.cardBackground : theme.colors.surface.light,
+                gap: theme.spacing.md,
+              },
+            ]}
+          >
+            <View style={styles.menuItemHeader}>
+              <Ionicons name="moon-outline" size={24} color={theme.colors.text} />
+              <View style={{ flex: 1, marginLeft: theme.spacing.md }}>
+                <Typography variant="body" weight="medium">
+                  Theme sombre
+                </Typography>
+              </View>
+              <Switch
+                value={mode === 'dark'}
+                onValueChange={(value) => setThemeMode(value ? 'dark' : 'light')}
+                trackColor={{ false: theme.colors.neutral[200], true: theme.colors.primary[400] }}
+                thumbColor={mode === 'dark' ? theme.colors.primary[600] : theme.colors.neutral[50]}
+              />
+            </View>
+          </View>
+
+          <TouchableOpacity
+            style={[styles.menuItem, { paddingHorizontal: theme.spacing.lg, paddingVertical: theme.spacing.md }]}
+            onPress={handleHelpPress}
+          >
+            <Ionicons name="help-circle-outline" size={24} color={theme.colors.text} />
+            <Typography variant="body" style={{ flex: 1, marginLeft: theme.spacing.md }}>
+              Aide & Support
+            </Typography>
+            <Ionicons name="chevron-forward" size={20} color={theme.colors.neutral[400]} />
+          </TouchableOpacity>
+        </Card>
+      </ScrollView>
+    )
+  }
+
+  // Vue connectee
   return (
     <ScrollView
       style={[styles.container, { backgroundColor: theme.colors.background }]}
@@ -341,6 +477,28 @@ const styles = StyleSheet.create({
   scrollContent: {
     paddingBottom: 32,
   },
+  guestContent: {
+    paddingTop: 24,
+  },
+  guestAvatar: {
+    width: 96,
+    height: 96,
+    borderRadius: 48,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  benefitItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  benefitIcon: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
   avatar: {
     width: 80,
     height: 80,
@@ -362,7 +520,8 @@ const styles = StyleSheet.create({
   menuItemFooter: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
+    flexWrap: 'wrap',
+    gap: 8,
   },
   logoutButton: {
     flexDirection: 'row',

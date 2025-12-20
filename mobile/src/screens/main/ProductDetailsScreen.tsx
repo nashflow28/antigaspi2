@@ -15,6 +15,7 @@ import { createReservation } from '../../store/slices/reservationsSlice'
 import { fetchReviewStats } from '../../store/slices/reviewsSlice'
 import { addCartItem } from '../../store/slices/cartSlice'
 import { useToast } from '../../contexts/ToastContext'
+import { useRequireAuth } from '../../hooks'
 import { Ionicons } from '@expo/vector-icons'
 import { Image } from 'expo-image'
 import { PaymentMethod, Product } from '../../types'
@@ -25,7 +26,7 @@ import FavoriteButton from '../../components/FavoriteButton'
 import StarRating from '../../components/reviews/StarRating'
 import { Button, Card, Badge, Typography, Modal, ProductDetailsSkeleton } from '../../components/2025'
 import locationService from '../../services/locationService'
-// 🐛 BUG FIX #MOB-L-002: Use centralized environment detection
+// Use centralized environment detection
 import { isTestEnv as checkIsTestEnv, isTestMode as checkIsTestMode } from '../../utils/envHelpers'
 import { TEST_IDS } from '../../utils/testIds'
 import { PAYMENT_OPTIONS, PaymentOption } from '../../constants/paymentOptions'
@@ -44,11 +45,12 @@ const ProductDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
   const { stats: reviewStats } = useSelector((state: RootState) => state.reviews)
   const { cart, updating } = useSelector((state: RootState) => state.cart)
   const { showSuccess, showError } = useToast()
+  const { requireAuth } = useRequireAuth()
 
   const [product, setProduct] = useState<Product | null>(null)
   const [reserving, setReserving] = useState(false)
   const [selectedQuantity, setSelectedQuantity] = useState(1)
-  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<PaymentMethod>('on_site')
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<PaymentMethod>('wallet')
   const navigationTimeoutRef = useRef<NodeJS.Timeout | null>(null)
   const [confirmVisible, setConfirmVisible] = useState(false)
   const [cartAddedVisible, setCartAddedVisible] = useState(false)
@@ -96,7 +98,7 @@ const ProductDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
   useEffect(() => {
     if (product) {
       setSelectedQuantity(1) // Reset quantité quand nouveau produit
-      setSelectedPaymentMethod('on_site')
+      setSelectedPaymentMethod('wallet')
     }
   }, [product])
 
@@ -201,9 +203,14 @@ const ProductDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
       return
     }
 
-    // Validation: Vérifier que la quantité sélectionnée est disponible
+    // Verifier l'authentification avant d'ajouter au panier
+    if (!requireAuth({ actionDescription: 'ajouter au panier' })) {
+      return
+    }
+
+    // Validation: Verifier que la quantite selectionnee est disponible
     if (selectedQuantity > product.quantity_available) {
-      showError(`Seulement ${product.quantity_available} unité(s) disponible(s)`)
+      showError(`Seulement ${product.quantity_available} unite(s) disponible(s)`)
       setSelectedQuantity(Math.min(selectedQuantity, product.quantity_available))
       return
     }
@@ -310,6 +317,11 @@ const ProductDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
   }
 
   const handleReserve = async () => {
+    // Verifier l'authentification avant de reserver
+    if (!requireAuth({ actionDescription: 'faire une reservation' })) {
+      return
+    }
+
     // Synchronize modal quantity with selected quantity
     setModalQuantity(selectedQuantity)
     setConfirmVisible(true)

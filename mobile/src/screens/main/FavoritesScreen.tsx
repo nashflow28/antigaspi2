@@ -7,12 +7,14 @@ import {
   TouchableOpacity,
   ActivityIndicator,
   RefreshControl,
+  StatusBar,
 } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { Image } from 'expo-image'
 import { Ionicons } from '@expo/vector-icons'
 import { useTheme } from '../../theme'
 import { useAppDispatch, useAppSelector } from '../../store/hooks'
+import { RootState } from '../../store'
 import { fetchFavorites, toggleFavorite } from '../../store/slices/favoritesSlice'
 import { Product } from '../../types'
 import { useNavigation, useFocusEffect } from '@react-navigation/native'
@@ -24,6 +26,7 @@ import { getImageUrl } from '../../utils/imageHelpers'
 import { Button, Card, Badge, Typography, EmptyState } from '../../components/2025'
 import AlertModal from '../../components/AlertModal'
 import { useAlert } from '../../hooks/useAlert'
+import { navigationRef } from '../../navigation/NavigationRef'
 
 type NavigationProp = NativeStackNavigationProp<RootStackParamList, 'ProductDetails'>
 
@@ -36,14 +39,16 @@ const FavoritesScreen: React.FC = () => {
   const { alertProps, showWarning, hideAlert } = useAlert()
 
   const { favorites, loading, error } = useAppSelector((state) => state.favorites)
+  const { isAuthenticated } = useAppSelector((state: RootState) => state.auth)
   const [refreshing, setRefreshing] = useState(false)
 
-  // 🐛 BUG FIX #MOB-M-004: Use useFocusEffect to reload only when screen gains focus
-  // This prevents duplicate calls and ensures fresh data when navigating back
+  // Reload favorites when screen gains focus (only if authenticated)
   useFocusEffect(
     useCallback(() => {
-      dispatch(fetchFavorites())
-    }, [dispatch])
+      if (isAuthenticated) {
+        dispatch(fetchFavorites())
+      }
+    }, [dispatch, isAuthenticated])
   )
 
   const onRefresh = async () => {
@@ -146,6 +151,40 @@ const FavoritesScreen: React.FC = () => {
           </TouchableOpacity>
         </Card>
       </TouchableOpacity>
+    )
+  }
+
+  // Vue pour les utilisateurs non connectes
+  if (!isAuthenticated) {
+    return (
+      <View style={styles.container}>
+        <StatusBar barStyle={theme.isDark ? 'light-content' : 'dark-content'} />
+        <View style={[styles.header, { paddingTop: insets.top + 8 }]}>
+          <Typography variant="h2" weight="bold">
+            Favoris
+          </Typography>
+        </View>
+        <View style={{ flex: 1, justifyContent: 'center', paddingHorizontal: theme.spacing.lg }}>
+          <EmptyState
+            variant="no-favorites"
+            title="Connectez-vous"
+            description="Connectez-vous pour sauvegarder vos produits favoris et les retrouver facilement"
+            actions={[
+              {
+                label: 'Se connecter',
+                icon: 'log-in-outline',
+                onPress: () => navigationRef.navigate('Auth', { screen: 'Login' }),
+              },
+              {
+                label: 'Creer un compte',
+                icon: 'person-add-outline',
+                variant: 'secondary',
+                onPress: () => navigationRef.navigate('Auth', { screen: 'Register' }),
+              },
+            ]}
+          />
+        </View>
+      </View>
     )
   }
 

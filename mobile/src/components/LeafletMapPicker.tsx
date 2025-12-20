@@ -98,11 +98,11 @@ const LeafletMapPicker: React.FC<LeafletMapPickerProps> = ({
       attributionControl: true
     }).setView([initialLat, initialLng], initialZoom);
 
-    // Ajouter les tuiles CARTO (même style que MapLibre)
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
-      attribution: '© CARTO © OSM',
-      subdomains: 'abcd',
-      maxZoom: 20
+    // Ajouter les tuiles OpenStreetMap
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '© OpenStreetMap',
+      subdomains: 'abc',
+      maxZoom: 19
     }).addTo(map);
 
     // Icône personnalisée
