@@ -85,7 +85,8 @@ const CompleteProfileScreen = ({ navigation, route }: any) => {
 
       if (registerWithFirebase.fulfilled.match(result)) {
         showSuccess('Succes', 'Compte cree avec succes!')
-        // Navigation handled by AppNavigator
+        // Fermer le modal Auth et retourner à l'écran précédent
+        navigation.getParent()?.getParent()?.goBack()
       } else {
         showError('Erreur', (result.payload as string) || 'Erreur lors de la creation du compte')
       }

@@ -56,4 +56,14 @@ return [
         'project_id' => env('FIREBASE_PROJECT_ID'),
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | SMS.TG (smsvas.fr) - SMS Service for Togo
+    |--------------------------------------------------------------------------
+    */
+    'sms' => [
+        'token' => env('SMS_TG_TOKEN'),
+        'sender' => env('SMS_TG_SENDER', 'Antigaspi'),
+    ],
+
 ];

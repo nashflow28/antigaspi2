@@ -105,7 +105,8 @@ const OTPVerificationScreen = ({ navigation, route }: any) => {
         } else {
           // Existing user - logged in successfully
           showSuccess('Succes', 'Connexion reussie!')
-          // Navigation handled by AppNavigator
+          // Fermer le modal Auth et retourner à l'écran précédent
+          navigation.getParent()?.getParent()?.goBack()
         }
       } else {
         showError('Erreur', (result.payload as string) || 'Erreur de connexion')

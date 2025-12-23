@@ -20,6 +20,7 @@ use App\Http\Controllers\Api\MessageController;
 use App\Http\Controllers\Api\InventoryController;
 use App\Http\Controllers\Api\SearchController;
 use App\Http\Controllers\Api\FirebaseAuthController;
+use App\Http\Controllers\Api\OtpController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\WalletController;
 
@@ -38,6 +39,12 @@ Route::prefix('auth')->middleware('throttle:auth')->group(function () {
     // Firebase Phone Authentication
     Route::post('firebase-login', [FirebaseAuthController::class, 'login']);
     Route::post('firebase-register', [FirebaseAuthController::class, 'register']);
+
+    // SMS OTP Verification (SMS.TG)
+    Route::post('otp/send', [OtpController::class, 'send']);
+    Route::post('otp/verify', [OtpController::class, 'verify']);
+    Route::post('otp/resend', [OtpController::class, 'resend']);
+    Route::get('otp/status', [OtpController::class, 'checkStatus']);
 
     // Routes sécurisées (nouvelles)
     Route::post('secure-login', [AuthController::class, 'secureLogin']);

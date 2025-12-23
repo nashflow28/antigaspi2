@@ -44,8 +44,9 @@ const LoginScreen: React.FC<Props> = ({ navigation }) => {
       const result = await dispatch(loginUser(loginCreds))
 
       if (loginUser.fulfilled.match(result)) {
-        // La navigation sera gérée automatiquement par AppNavigator
         showSuccess('Succès', 'Connexion réussie!')
+        // Fermer le modal Auth et retourner à l'écran précédent
+        navigation.getParent()?.goBack()
       } else {
         showError('Erreur', result.payload as string || 'Erreur de connexion')
       }

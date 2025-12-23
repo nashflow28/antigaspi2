@@ -152,56 +152,61 @@ fi
 
 # ---- context window calculation ----
 context_pct=""
-context_color() { if [ "$use_color" -eq 1 ]; then printf '\033[1;37m'; fi; }  # default white
+context_remaining_pct=100
+context_used_pct=0
+total_tokens_used=0
+context_size=200000
+context_color() { if [ "$use_color" -eq 1 ]; then printf '\033[38;5;158m'; fi; }  # default mint green
 
-# Determine max context based on model
-get_max_context() {
-  local model_name="$1"
-  case "$model_name" in
-    *"Opus 4"*|*"opus 4"*|*"Opus"*|*"opus"*)
-      echo "200000"  # 200K for all Opus versions
-      ;;
-    *"Sonnet 4"*|*"sonnet 4"*|*"Sonnet 3.5"*|*"sonnet 3.5"*|*"Sonnet"*|*"sonnet"*)
-      echo "200000"  # 200K for Sonnet 3.5+ and 4.x
-      ;;
-    *"Haiku 3.5"*|*"haiku 3.5"*|*"Haiku 4"*|*"haiku 4"*|*"Haiku"*|*"haiku"*)
-      echo "200000"  # 200K for modern Haiku
-      ;;
-    *"Claude 3 Haiku"*|*"claude 3 haiku"*)
-      echo "100000"  # 100K for original Claude 3 Haiku
-      ;;
-    *)
-      echo "200000"  # Default to 200K
-      ;;
-  esac
-}
+# Extract context window data from Claude Code JSON input (most reliable method)
+if [ "$HAS_JQ" -eq 1 ]; then
+  input_tokens=$(echo "$input" | jq -r '.context_window.total_input_tokens // 0' 2>/dev/null)
+  output_tokens=$(echo "$input" | jq -r '.context_window.total_output_tokens // 0' 2>/dev/null)
+  context_size=$(echo "$input" | jq -r '.context_window.context_window_size // 200000' 2>/dev/null)
 
-if [ -n "$session_id" ] && [ "$HAS_JQ" -eq 1 ]; then
-  MAX_CONTEXT=$(get_max_context "$model_name")
-  
-  # Convert current dir to session file path
-  project_dir=$(echo "$current_dir" | sed "s|~|$HOME|g" | sed 's|/|-|g' | sed 's|^-||')
-  session_file="$HOME/.claude/projects/-${project_dir}/${session_id}.jsonl"
-  
-  if [ -f "$session_file" ]; then
-    # Get the latest input token count from the session file
-    latest_tokens=$(tail -20 "$session_file" | jq -r 'select(.message.usage) | .message.usage | ((.input_tokens // 0) + (.cache_read_input_tokens // 0))' 2>/dev/null | tail -1)
-    
-    if [ -n "$latest_tokens" ] && [ "$latest_tokens" -gt 0 ]; then
-      context_used_pct=$(( latest_tokens * 100 / MAX_CONTEXT ))
-      context_remaining_pct=$(( 100 - context_used_pct ))
-      
-      # Set color based on remaining percentage
-      if [ "$context_remaining_pct" -le 20 ]; then
-        context_color() { if [ "$use_color" -eq 1 ]; then printf '\033[38;5;203m'; fi; }  # coral red
-      elif [ "$context_remaining_pct" -le 40 ]; then
-        context_color() { if [ "$use_color" -eq 1 ]; then printf '\033[38;5;215m'; fi; }  # peach
-      else
-        context_color() { if [ "$use_color" -eq 1 ]; then printf '\033[38;5;158m'; fi; }  # mint green
-      fi
-      
-      context_pct="${context_remaining_pct}%"
+  # Ensure numeric values
+  [[ "$input_tokens" =~ ^[0-9]+$ ]] || input_tokens=0
+  [[ "$output_tokens" =~ ^[0-9]+$ ]] || output_tokens=0
+  [[ "$context_size" =~ ^[0-9]+$ ]] || context_size=200000
+
+  total_tokens_used=$((input_tokens + output_tokens))
+
+  if [ "$total_tokens_used" -gt 0 ] && [ "$context_size" -gt 0 ]; then
+    context_used_pct=$((total_tokens_used * 100 / context_size))
+    context_remaining_pct=$((100 - context_used_pct))
+
+    # Clamp values
+    ((context_remaining_pct < 0)) && context_remaining_pct=0
+    ((context_remaining_pct > 100)) && context_remaining_pct=100
+
+    # Set color based on remaining percentage
+    if [ "$context_remaining_pct" -le 10 ]; then
+      context_color() { if [ "$use_color" -eq 1 ]; then printf '\033[38;5;196m'; fi; }  # bright red (critical)
+    elif [ "$context_remaining_pct" -le 25 ]; then
+      context_color() { if [ "$use_color" -eq 1 ]; then printf '\033[38;5;203m'; fi; }  # coral red
+    elif [ "$context_remaining_pct" -le 40 ]; then
+      context_color() { if [ "$use_color" -eq 1 ]; then printf '\033[38;5;215m'; fi; }  # peach/orange
+    else
+      context_color() { if [ "$use_color" -eq 1 ]; then printf '\033[38;5;158m'; fi; }  # mint green
     fi
+
+    context_pct="${context_remaining_pct}%"
+  fi
+else
+  # Bash fallback - try to extract from JSON without jq
+  input_tokens=$(echo "$input" | grep -o '"total_input_tokens"[[:space:]]*:[[:space:]]*[0-9]*' | sed 's/.*:[[:space:]]*\([0-9]*\).*/\1/')
+  output_tokens=$(echo "$input" | grep -o '"total_output_tokens"[[:space:]]*:[[:space:]]*[0-9]*' | sed 's/.*:[[:space:]]*\([0-9]*\).*/\1/')
+
+  [[ "$input_tokens" =~ ^[0-9]+$ ]] || input_tokens=0
+  [[ "$output_tokens" =~ ^[0-9]+$ ]] || output_tokens=0
+
+  total_tokens_used=$((input_tokens + output_tokens))
+
+  if [ "$total_tokens_used" -gt 0 ]; then
+    context_used_pct=$((total_tokens_used * 100 / 200000))
+    context_remaining_pct=$((100 - context_used_pct))
+    ((context_remaining_pct < 0)) && context_remaining_pct=0
+    context_pct="${context_remaining_pct}%"
   fi
 fi
 
@@ -313,8 +318,19 @@ fi
 # Line 2: Context and session time
 line2=""
 if [ -n "$context_pct" ]; then
-  context_bar=$(progress_bar "$context_remaining_pct" 10)
-  line2="🧠 $(context_color)Context Remaining: ${context_pct} [${context_bar}]$(rst)"
+  context_bar=$(progress_bar "$context_remaining_pct" 20)
+  # Format token counts for readability (e.g., 150K instead of 150000)
+  if [ "$total_tokens_used" -ge 1000 ]; then
+    tokens_display="$((total_tokens_used / 1000))K"
+  else
+    tokens_display="$total_tokens_used"
+  fi
+  if [ "$context_size" -ge 1000 ]; then
+    context_size_display="$((context_size / 1000))K"
+  else
+    context_size_display="$context_size"
+  fi
+  line2="🧠 $(context_color)Context: ${context_pct} [${context_bar}] (${tokens_display}/${context_size_display})$(rst)"
 fi
 if [ -n "$session_txt" ]; then
   if [ -n "$line2" ]; then
@@ -324,7 +340,9 @@ if [ -n "$session_txt" ]; then
   fi
 fi
 if [ -z "$line2" ] && [ -z "$context_pct" ]; then
-  line2="🧠 $(context_color)Context Remaining: TBD$(rst)"
+  # Show a default progress bar at 100% when no data available yet
+  default_bar=$(progress_bar 100 20)
+  line2="🧠 $(context_color)Context: 100% [${default_bar}] (0K/200K)$(rst)"
 fi
 
 # Line 3: Cost and usage analytics

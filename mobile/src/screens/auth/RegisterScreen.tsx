@@ -224,6 +224,8 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
         // Clear form cache on successful registration
         await clearFormCache()
         showSuccess('Compte créé avec succès ! 🎉')
+        // Fermer le modal Auth et retourner à l'écran précédent
+        navigation.getParent()?.goBack()
       } else {
         // Parse validation errors from backend
         const payload = result.payload as any
