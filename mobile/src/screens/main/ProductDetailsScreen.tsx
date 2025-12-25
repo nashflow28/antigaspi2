@@ -6,6 +6,7 @@ import {
   ScrollView,
   TouchableOpacity,
   StatusBar,
+  TextInput,
 } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useDispatch, useSelector } from 'react-redux'
@@ -51,6 +52,7 @@ const ProductDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
   const [reserving, setReserving] = useState(false)
   const [selectedQuantity, setSelectedQuantity] = useState(1)
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<PaymentMethod>('wallet')
+  const [walletPin, setWalletPin] = useState('')
   const navigationTimeoutRef = useRef<NodeJS.Timeout | null>(null)
   const [confirmVisible, setConfirmVisible] = useState(false)
   const [cartAddedVisible, setCartAddedVisible] = useState(false)
@@ -275,7 +277,8 @@ const ProductDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
         quantity: selectedQuantity,
         paymentMethod: selectedPaymentMethod,
         pickupDate,
-        pickupTime
+        pickupTime,
+        walletPin: selectedPaymentMethod === 'wallet' ? '****' : undefined
       })
 
       const result = await dispatch(createReservation({
@@ -285,6 +288,7 @@ const ProductDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
         pickupDate,
         pickupTime,
         notes: null,
+        ...(selectedPaymentMethod === 'wallet' && walletPin ? { walletPin } : {}),
       }))
 
       console.log('📥 [ProductDetails] Résultat réservation:', result)
@@ -595,6 +599,32 @@ const ProductDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
                 Redirection sécurisée pour régler par carte bancaire via Paystack.
               </Typography>
             )}
+            {selectedPaymentMethod === 'wallet' && (
+              <View style={{ marginTop: theme.spacing.md }}>
+                <Typography variant="caption" color="secondary" style={{ marginBottom: theme.spacing.xs }}>
+                  Code PIN du portefeuille
+                </Typography>
+                <TextInput
+                  value={walletPin}
+                  onChangeText={setWalletPin}
+                  secureTextEntry
+                  keyboardType="numeric"
+                  maxLength={6}
+                  placeholder="Entrez votre code PIN"
+                  placeholderTextColor={theme.colors.textTertiary}
+                  style={{
+                    borderWidth: 1,
+                    borderColor: theme.colors.border,
+                    borderRadius: theme.radius.md,
+                    paddingHorizontal: theme.spacing.md,
+                    paddingVertical: theme.spacing.sm,
+                    backgroundColor: theme.isDark ? theme.colors.neutral[800] : theme.colors.surface.light,
+                    color: theme.colors.text,
+                    fontSize: 16,
+                  }}
+                />
+              </View>
+            )}
           </View>
 
           {/* Récapitulatif prix */}
@@ -774,6 +804,7 @@ const ProductDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
         onClose={() => setConfirmVisible(false)}
         title="Confirmer la réservation"
         variant="center"
+        avoidKeyboard={true}
         testID={TEST_IDS.reservationModal}
       >
         {/* Product Preview */}

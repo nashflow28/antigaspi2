@@ -326,8 +326,9 @@ export const Modal: React.FC<ModalProps> = ({
       <Animated.View style={[overlayStyle, { opacity: fadeAnim }]}>
         {avoidKeyboard ? (
           <KeyboardAvoidingView
-            behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+            behavior="padding"
             style={{ flex: 1, justifyContent: variant === 'bottom' ? 'flex-end' : 'center' }}
+            keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}
           >
             {modalContent}
           </KeyboardAvoidingView>
