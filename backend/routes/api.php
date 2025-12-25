@@ -223,6 +223,7 @@ Route::prefix('wallet')->middleware('jwt.auth')->group(function () {
         Route::post('/payment', [WalletController::class, 'processPayment']); // Effectuer paiement
         Route::post('/transfer', [WalletController::class, 'transfer']); // Transfert entre portefeuilles
         Route::post('/recharge', [WalletController::class, 'recharge']); // Recharger portefeuille
+        Route::post('/test-recharge', [WalletController::class, 'testRecharge']); // Recharge de test (dev only)
     });
 });
 

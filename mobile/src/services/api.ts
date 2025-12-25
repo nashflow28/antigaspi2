@@ -729,6 +729,19 @@ class ApiService {
     )
   }
 
+  /**
+   * Test recharge - Development only
+   * Allows testing wallet functionality without real payment APIs
+   */
+  async testRechargeWallet(
+    amount: number
+  ): Promise<ApiResponse<{ transaction: any; wallet: { balance: number } }>> {
+    return this.request<ApiResponse<{ transaction: any; wallet: { balance: number } }>>(
+      'POST',
+      '/wallet/test-recharge',
+      { amount }
+    )
+  }
 
   async getFavoriteIds(): Promise<ApiResponse<number[]>> {
     return this.request<ApiResponse<number[]>>('GET', '/favorites/batch-check')

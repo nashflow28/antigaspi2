@@ -443,4 +443,72 @@ class WalletController extends Controller
             ], 500);
         }
     }
+
+    /**
+     * Test recharge - ONLY FOR DEVELOPMENT/TESTING
+     * Directly credits the wallet without payment processing
+     */
+    public function testRecharge(Request $request): JsonResponse
+    {
+        // Only allow in non-production environments
+        if (app()->environment('production') && !config('app.debug')) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Cette fonctionnalité n\'est disponible qu\'en mode test',
+            ], 403);
+        }
+
+        $validator = Validator::make($request->all(), [
+            'amount' => 'required|numeric|min:100|max:100000',
+        ], [
+            'amount.required' => 'Le montant est requis',
+            'amount.min' => 'Le montant minimum est de 100 XOF',
+            'amount.max' => 'Le montant maximum de test est de 100 000 XOF',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Données invalides',
+                'errors' => $validator->errors(),
+            ], 422);
+        }
+
+        try {
+            $user = Auth::user();
+            $description = 'Recharge de test - Mode développement';
+
+            $transaction = $this->walletService->rechargeWallet(
+                $user,
+                $request->amount,
+                $description
+            );
+
+            $wallet = $this->walletService->getOrCreateWallet($user);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Recharge de test effectuée avec succès',
+                'data' => [
+                    'transaction' => [
+                        'id' => $transaction->id,
+                        'amount' => $transaction->amount,
+                        'formatted_amount' => $transaction->formatted_amount,
+                        'description' => $transaction->description,
+                        'reference' => $transaction->reference,
+                        'created_at' => $transaction->created_at,
+                    ],
+                    'wallet' => [
+                        'balance' => $wallet->balance,
+                        'formatted_balance' => $wallet->formatted_balance,
+                    ],
+                ],
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage(),
+            ], 500);
+        }
+    }
 }

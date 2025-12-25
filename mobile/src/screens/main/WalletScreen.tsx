@@ -32,6 +32,7 @@ import {
   toggleWalletStatus,
   updateWalletDailyLimit,
 } from '../../store/slices/walletSlice'
+import apiService from '../../services/api'
 import type { WalletTransaction, WalletTransactionType, WalletRechargePayload } from '../../types'
 
 const paymentMethods: { id: WalletRechargePayload['paymentMethod']; label: string; icon: keyof typeof Ionicons.glyphMap }[] = [
@@ -93,6 +94,9 @@ const WalletScreen: React.FC = () => {
   const [newPin, setNewPin] = useState('')
   const [confirmPin, setConfirmPin] = useState('')
   const [customDailyLimit, setCustomDailyLimit] = useState(wallet?.daily_limit ? String(wallet.daily_limit) : '')
+  const [showTestRechargeModal, setShowTestRechargeModal] = useState(false)
+  const [testRechargeAmount, setTestRechargeAmount] = useState('5000')
+  const [testRechargeLoading, setTestRechargeLoading] = useState(false)
 
   const dailySpent = useMemo(
     () => Math.max(0, (wallet?.daily_limit ?? 0) - (wallet?.remaining_daily_limit ?? 0)),
@@ -211,6 +215,37 @@ const WalletScreen: React.FC = () => {
     }
   }
 
+  const handleTestRecharge = async () => {
+    const amount = Number.parseInt(testRechargeAmount, 10)
+    if (!Number.isFinite(amount) || amount < 100 || amount > 100000) {
+      showError('Montant invalide', 'Le montant doit être entre 100 et 100 000 F CFA.')
+      return
+    }
+
+    setTestRechargeLoading(true)
+    try {
+      const response = await apiService.testRechargeWallet(amount)
+      if (response.success) {
+        showSuccess(
+          'Recharge test réussie',
+          `Votre portefeuille a été crédité de ${formatCurrency(amount)}. Nouveau solde: ${formatCurrency(response.data.wallet.balance)}`
+        )
+        setShowTestRechargeModal(false)
+        setTestRechargeAmount('5000')
+        // Refresh wallet data
+        await dispatch(fetchWallet())
+        await dispatch(fetchWalletTransactions({}))
+        await dispatch(fetchWalletStats(statsPeriod))
+      } else {
+        showError('Erreur', response.message || 'La recharge test a échoué.')
+      }
+    } catch (error: any) {
+      showError('Erreur', error?.message ?? 'Impossible d\'effectuer la recharge test.')
+    } finally {
+      setTestRechargeLoading(false)
+    }
+  }
+
   const renderTransactionItem = ({ item }: { item: WalletTransaction }) => (
     <Card style={[styles.transactionCard, { borderColor: theme.withOpacity(getTransactionColor(item.type, theme), 0.15) }]}> 
       <View style={styles.transactionHeader}>
@@ -300,6 +335,15 @@ const WalletScreen: React.FC = () => {
             Recharger
           </Button>
           <Button
+            variant="outline"
+            size="sm"
+            onPress={() => setShowTestRechargeModal(true)}
+            disabled={testRechargeLoading}
+          >
+            <Ionicons name="flask" size={18} color={theme.colors.warning} style={styles.buttonIcon} />
+            Test
+          </Button>
+          <Button
             variant="secondary"
             size="sm"
             onPress={() => {
@@ -310,7 +354,7 @@ const WalletScreen: React.FC = () => {
             disabled={pinLoading}
           >
             <Ionicons name="lock-closed" size={18} color={theme.colors.primary[600]} style={styles.buttonIcon} />
-            Gestion PIN
+            PIN
           </Button>
         </View>
       </Card>
@@ -582,6 +626,69 @@ const WalletScreen: React.FC = () => {
         </View>
       </Modal2025>
 
+      <Modal2025
+        visible={showTestRechargeModal}
+        onClose={() => setShowTestRechargeModal(false)}
+        title="Recharge Test"
+        variant="bottom"
+        avoidKeyboard={true}
+        testID="wallet-test-recharge-modal"
+      >
+        <View style={styles.modalContent}>
+          <View style={[styles.testWarningBanner, { backgroundColor: theme.withOpacity(theme.colors.warning, 0.15) }]}>
+            <Ionicons name="flask" size={24} color={theme.colors.warning} />
+            <View style={{ flex: 1 }}>
+              <Typography variant="body" weight="semibold" style={{ color: theme.colors.warning }}>
+                Mode Test
+              </Typography>
+              <Typography variant="caption" color="secondary">
+                Cette fonctionnalité permet de recharger virtuellement votre portefeuille pour tester l'application.
+              </Typography>
+            </View>
+          </View>
+          <Typography variant="caption">Montant (100 - 100 000 F CFA)</Typography>
+          <TextInput
+            value={testRechargeAmount}
+            onChangeText={setTestRechargeAmount}
+            placeholder="Ex: 5000"
+            keyboardType="numeric"
+            style={[styles.input, { borderColor: theme.colors.border, backgroundColor: theme.isDark ? theme.colors.neutral[800] : theme.colors.surface.light, color: theme.colors.text }]}
+          />
+          <View style={styles.testAmountPresets}>
+            {[1000, 5000, 10000, 25000].map((preset) => (
+              <TouchableOpacity
+                key={preset}
+                style={[
+                  styles.testAmountChip,
+                  {
+                    borderColor: testRechargeAmount === String(preset) ? theme.colors.primary[500] : theme.colors.border,
+                    backgroundColor: testRechargeAmount === String(preset)
+                      ? (theme.isDark ? theme.colors.primary[900] : theme.colors.primary[50])
+                      : (theme.isDark ? theme.colors.neutral[800] : theme.colors.surface.light),
+                  },
+                ]}
+                onPress={() => setTestRechargeAmount(String(preset))}
+              >
+                <Typography
+                  variant="caption"
+                  weight="semibold"
+                  style={{ color: testRechargeAmount === String(preset) ? theme.colors.primary[600] : theme.colors.text }}
+                >
+                  {formatCurrency(preset)}
+                </Typography>
+              </TouchableOpacity>
+            ))}
+          </View>
+          <Button
+            variant="primary"
+            onPress={handleTestRecharge}
+            disabled={testRechargeLoading}
+          >
+            {testRechargeLoading ? 'Chargement...' : `Créditer ${formatCurrency(Number.parseInt(testRechargeAmount, 10) || 0)}`}
+          </Button>
+        </View>
+      </Modal2025>
+
       <AlertModal {...alertProps} />
     </View>
   )
@@ -740,6 +847,24 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     borderWidth: 1,
     gap: 6,
+  },
+  testWarningBanner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    padding: 12,
+    borderRadius: 12,
+  },
+  testAmountPresets: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+  },
+  testAmountChip: {
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    borderRadius: 20,
+    borderWidth: 1,
   },
 })
 
