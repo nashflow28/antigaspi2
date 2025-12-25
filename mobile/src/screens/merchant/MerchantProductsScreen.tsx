@@ -320,7 +320,9 @@ const MerchantProductsScreen: React.FC<Props> = ({ navigation }) => {
           <View style={[styles.addModalContainer, { backgroundColor: theme.colors.background }]}>
             {/* Header */}
             <View style={styles.addModalHeader}>
-              <View style={[styles.addModalIcon, { backgroundColor: theme.colors.primary[50] }]}>
+              <View style={[styles.addModalIcon, {
+                backgroundColor: theme.isDark ? theme.colors.primary[900] : theme.colors.primary[50]
+              }]}>
                 <Ionicons name="add-circle" size={32} color={theme.colors.primary[500]} />
               </View>
               <Text style={[styles.addModalTitle, { color: theme.colors.text }]}>
@@ -331,7 +333,10 @@ const MerchantProductsScreen: React.FC<Props> = ({ navigation }) => {
             {/* Options */}
             <View style={styles.addModalOptions}>
               <TouchableOpacity
-                style={[styles.addModalOption, { backgroundColor: theme.colors.primary[50], borderColor: theme.colors.primary[200] }]}
+                style={[styles.addModalOption, {
+                  backgroundColor: theme.isDark ? theme.colors.neutral[800] : theme.colors.primary[50],
+                  borderColor: theme.isDark ? theme.colors.neutral[600] : theme.colors.primary[200]
+                }]}
                 onPress={handleAddProduct}
               >
                 <View style={[styles.addModalOptionIcon, { backgroundColor: theme.colors.primary[500] }]}>
@@ -347,7 +352,10 @@ const MerchantProductsScreen: React.FC<Props> = ({ navigation }) => {
               </TouchableOpacity>
 
               <TouchableOpacity
-                style={[styles.addModalOption, { backgroundColor: theme.colors.accent.orange + '10', borderColor: theme.colors.accent.orange + '30' }]}
+                style={[styles.addModalOption, {
+                  backgroundColor: theme.isDark ? theme.colors.neutral[800] : theme.colors.accent.orange + '10',
+                  borderColor: theme.isDark ? theme.colors.neutral[600] : theme.colors.accent.orange + '30'
+                }]}
                 onPress={handleAddSurpriseBasket}
               >
                 <View style={[styles.addModalOptionIcon, { backgroundColor: theme.colors.accent.orange }]}>
@@ -365,7 +373,10 @@ const MerchantProductsScreen: React.FC<Props> = ({ navigation }) => {
 
             {/* Cancel Button */}
             <TouchableOpacity
-              style={[styles.addModalCancelButton, { borderColor: theme.colors.neutral[200] }]}
+              style={[styles.addModalCancelButton, {
+                borderColor: theme.isDark ? theme.colors.neutral[600] : theme.colors.neutral[200],
+                backgroundColor: theme.isDark ? theme.colors.neutral[800] : 'transparent'
+              }]}
               onPress={() => setAddModalVisible(false)}
             >
               <Text style={[styles.addModalCancelText, { color: theme.colors.textSecondary }]}>Annuler</Text>
