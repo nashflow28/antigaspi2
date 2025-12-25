@@ -875,6 +875,34 @@ const ProductDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
           </Typography>
         </View>
 
+        {/* Wallet PIN Input */}
+        {selectedPaymentMethod === 'wallet' && (
+          <View style={{ marginTop: theme.spacing.md }}>
+            <Typography variant="caption" color="secondary" style={{ marginBottom: theme.spacing.xs }}>
+              Code PIN du portefeuille
+            </Typography>
+            <TextInput
+              value={walletPin}
+              onChangeText={setWalletPin}
+              secureTextEntry
+              keyboardType="numeric"
+              maxLength={6}
+              placeholder="Entrez votre code PIN"
+              placeholderTextColor={theme.colors.textTertiary}
+              style={{
+                borderWidth: 1,
+                borderColor: theme.colors.border,
+                borderRadius: theme.radius.md,
+                paddingHorizontal: theme.spacing.md,
+                paddingVertical: theme.spacing.sm,
+                backgroundColor: theme.isDark ? theme.colors.neutral[800] : theme.colors.surface.light,
+                color: theme.colors.text,
+                fontSize: 16,
+              }}
+            />
+          </View>
+        )}
+
         {/* Total Summary */}
         <View style={styles.modalTotalSection}>
           <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
