@@ -450,8 +450,15 @@ class WalletController extends Controller
      */
     public function testRecharge(Request $request): JsonResponse
     {
-        // Only allow in non-production environments
-        if (app()->environment('production') && !config('app.debug')) {
+        // Allow test recharge if:
+        // 1. Not in production, OR
+        // 2. APP_DEBUG is true, OR
+        // 3. ALLOW_TEST_RECHARGE env variable is set to true
+        $allowTestRecharge = !app()->environment('production')
+            || config('app.debug')
+            || env('ALLOW_TEST_RECHARGE', false);
+
+        if (!$allowTestRecharge) {
             return response()->json([
                 'success' => false,
                 'message' => 'Cette fonctionnalité n\'est disponible qu\'en mode test',
