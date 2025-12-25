@@ -75,6 +75,14 @@ export const createReservation = createAsyncThunk(
       const response = await apiService.createReservation(payload)
       return response
     } catch (error: any) {
+      // Extract specific validation error message if available
+      if (error.validationErrors) {
+        // Get the first validation error message
+        const firstFieldErrors = Object.values(error.validationErrors)[0] as string[]
+        if (firstFieldErrors && firstFieldErrors.length > 0) {
+          return rejectWithValue(firstFieldErrors[0])
+        }
+      }
       return rejectWithValue(error.message)
     }
   }
