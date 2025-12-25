@@ -298,7 +298,7 @@ const AdminMerchantsScreen: React.FC = () => {
       >
         <View style={styles.modalOverlay}>
           <View style={[styles.modalContent, { backgroundColor: theme.colors.background }]}>
-            <View style={styles.modalHeader}>
+            <View style={[styles.modalHeader, { borderBottomColor: theme.colors.border }]}>
               <Typography variant="h3" weight="bold">
                 Détails du commerçant
               </Typography>
@@ -454,7 +454,7 @@ const AdminMerchantsScreen: React.FC = () => {
       >
         <View style={styles.modalOverlay}>
           <View style={[styles.modalContent, { backgroundColor: theme.colors.background }]}>
-            <View style={styles.modalHeader}>
+            <View style={[styles.modalHeader, { borderBottomColor: theme.colors.border }]}>
               <Typography variant="h3" weight="bold">
                 Rejeter le commerçant
               </Typography>
@@ -633,7 +633,7 @@ const AdminMerchantsScreen: React.FC = () => {
 
   return (
     <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
-      <StatusBar barStyle="dark-content" backgroundColor={theme.colors.background} />
+      <StatusBar barStyle={theme.isDark ? 'light-content' : 'dark-content'} backgroundColor={theme.colors.background} />
 
       <FlatList
         data={filteredMerchants}
@@ -763,7 +763,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: 20,
     borderBottomWidth: 1,
-    borderBottomColor: '#E5E7EB',
   },
   modalBody: {
     padding: 20,

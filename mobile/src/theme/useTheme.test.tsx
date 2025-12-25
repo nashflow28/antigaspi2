@@ -40,7 +40,7 @@ describe('useTheme Hook', () => {
         return <Text>{theme.colors.primary[500]}</Text>
       }
       const { getByText } = renderWithTheme(<Component />)
-      expect(getByText('#DCB253')).toBeTruthy() // Primary color - gold
+      expect(getByText('#F5C518')).toBeTruthy() // Primary color - gold
     })
 
     it('provides theme spacing', () => {
@@ -119,7 +119,7 @@ describe('useTheme Hook', () => {
         return <Text>{buttonStyle.backgroundColor}</Text>
       }
       const { getByText } = renderWithTheme(<Component />)
-      expect(getByText('#DCB253')).toBeTruthy() // Primary color - gold
+      expect(getByText('#F5C518')).toBeTruthy() // Primary color - gold
     })
 
     it('provides inputStyle helper', () => {
@@ -166,9 +166,9 @@ describe('useTheme Hook', () => {
         )
       }
       const { getByText } = renderWithTheme(<Component />)
-      expect(getByText('#FBF8F0')).toBeTruthy() // Gold 50
-      expect(getByText('#DCB253')).toBeTruthy() // Gold 500
-      expect(getByText('#6B4E15')).toBeTruthy() // Gold 900
+      expect(getByText('#FFFEF5')).toBeTruthy() // Gold 50
+      expect(getByText('#F5C518')).toBeTruthy() // Gold 500
+      expect(getByText('#755405')).toBeTruthy() // Gold 900
     })
 
     it('provides neutral colors', () => {
@@ -384,14 +384,14 @@ describe('useTheme Hook', () => {
       }
 
       const { getByText, rerender } = renderWithTheme(<Component />)
-      expect(getByText('#DCB253')).toBeTruthy() // Gold color
+      expect(getByText('#F5C518')).toBeTruthy() // Gold color
 
       rerender(
         <ThemeProvider>
           <Component />
         </ThemeProvider>
       )
-      expect(getByText('#DCB253')).toBeTruthy() // Still gold
+      expect(getByText('#F5C518')).toBeTruthy() // Still gold
     })
   })
 })

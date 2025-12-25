@@ -381,7 +381,7 @@ const AdminAnalyticsScreen: React.FC<{ navigation: any }> = ({ navigation }) => 
                   {paginatedMerchants.items.map((merchant, index) => {
                     const globalIndex = (merchantPage - 1) * MERCHANTS_PER_PAGE + index
                     return (
-                      <View key={merchant.merchant_id} style={styles.merchantRow}>
+                      <View key={merchant.merchant_id} style={[styles.merchantRow, { borderBottomColor: theme.colors.border }]}>
                         <View style={styles.merchantInfo}>
                           <Badge variant="primary" size="sm" style={{ marginRight: 12 }}>
                             #{globalIndex + 1}
@@ -565,7 +565,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 12,
     borderBottomWidth: 1,
-    borderBottomColor: 'rgba(0,0,0,0.05)',
   },
   merchantInfo: {
     flexDirection: 'row',

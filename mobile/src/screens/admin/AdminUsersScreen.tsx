@@ -247,7 +247,7 @@ const AdminUsersScreen: React.FC = () => {
       >
         <View style={styles.modalOverlay}>
           <View style={[styles.modalContent, { backgroundColor: theme.colors.background }]}>
-            <View style={styles.modalHeader}>
+            <View style={[styles.modalHeader, { borderBottomColor: theme.colors.border }]}>
               <Typography variant="h3" weight="bold">
                 Détails utilisateur
               </Typography>
@@ -258,7 +258,7 @@ const AdminUsersScreen: React.FC = () => {
 
             <ScrollView style={styles.modalBody} showsVerticalScrollIndicator={false}>
               {/* Avatar & Nom */}
-              <View style={styles.userHeader}>
+              <View style={[styles.userHeader, { borderBottomColor: theme.colors.border }]}>
                 <View style={[styles.largeAvatar, { backgroundColor: getRoleColor(selectedUser.role) }]}>
                   <Typography variant="h1" weight="bold" style={{ color: 'white' }}>
                     {(selectedUser.first_name?.[0] || '').toUpperCase()}{(selectedUser.last_name?.[0] || '').toUpperCase()}
@@ -283,8 +283,8 @@ const AdminUsersScreen: React.FC = () => {
                   Informations
                 </Typography>
 
-                <View style={styles.infoRow}>
-                  <View style={styles.infoIcon}>
+                <View style={[styles.infoRow, { borderBottomColor: theme.colors.border }]}>
+                  <View style={[styles.infoIcon, { backgroundColor: theme.withOpacity(theme.colors.primary[500], 0.1) }]}>
                     <Ionicons name="mail-outline" size={20} color={theme.colors.primary[500]} />
                   </View>
                   <View style={{ flex: 1 }}>
@@ -293,8 +293,8 @@ const AdminUsersScreen: React.FC = () => {
                   </View>
                 </View>
 
-                <View style={styles.infoRow}>
-                  <View style={styles.infoIcon}>
+                <View style={[styles.infoRow, { borderBottomColor: theme.colors.border }]}>
+                  <View style={[styles.infoIcon, { backgroundColor: theme.withOpacity(theme.colors.primary[500], 0.1) }]}>
                     <Ionicons name="call-outline" size={20} color={theme.colors.primary[500]} />
                   </View>
                   <View style={{ flex: 1 }}>
@@ -303,8 +303,8 @@ const AdminUsersScreen: React.FC = () => {
                   </View>
                 </View>
 
-                <View style={styles.infoRow}>
-                  <View style={styles.infoIcon}>
+                <View style={[styles.infoRow, { borderBottomColor: theme.colors.border }]}>
+                  <View style={[styles.infoIcon, { backgroundColor: theme.withOpacity(theme.colors.primary[500], 0.1) }]}>
                     <Ionicons name="location-outline" size={20} color={theme.colors.primary[500]} />
                   </View>
                   <View style={{ flex: 1 }}>
@@ -313,8 +313,8 @@ const AdminUsersScreen: React.FC = () => {
                   </View>
                 </View>
 
-                <View style={styles.infoRow}>
-                  <View style={styles.infoIcon}>
+                <View style={[styles.infoRow, { borderBottomColor: theme.colors.border }]}>
+                  <View style={[styles.infoIcon, { backgroundColor: theme.withOpacity(theme.colors.primary[500], 0.1) }]}>
                     <Ionicons name="calendar-outline" size={20} color={theme.colors.primary[500]} />
                   </View>
                   <View style={{ flex: 1 }}>
@@ -475,7 +475,7 @@ const AdminUsersScreen: React.FC = () => {
 
   return (
     <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
-      <StatusBar barStyle="dark-content" backgroundColor={theme.colors.background} />
+      <StatusBar barStyle={theme.isDark ? 'light-content' : 'dark-content'} backgroundColor={theme.colors.background} />
 
       <FlatList
         data={filteredUsers}
@@ -625,7 +625,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: 20,
     borderBottomWidth: 1,
-    borderBottomColor: '#E5E7EB',
   },
   modalBody: {
     padding: 20,
@@ -634,7 +633,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 24,
     borderBottomWidth: 1,
-    borderBottomColor: '#E5E7EB',
     marginBottom: 24,
   },
   largeAvatar: {
@@ -652,13 +650,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 12,
     borderBottomWidth: 1,
-    borderBottomColor: '#F3F4F6',
   },
   infoIcon: {
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: '#EEF2FF',
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 12,

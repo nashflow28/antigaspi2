@@ -31,12 +31,76 @@
             </button>
           </div>
         </div>
+
+        <!-- Search and Filters -->
+        <div class="mt-4 flex flex-col lg:flex-row gap-4">
+          <!-- Search -->
+          <div class="relative flex-1">
+            <Search class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+            <input
+              v-model="searchQuery"
+              type="text"
+              placeholder="Rechercher un commerçant..."
+              class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              @input="handleSearch"
+            />
+          </div>
+
+          <!-- Category Filter -->
+          <select
+            v-model="selectedCategory"
+            class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            @change="filterMerchants"
+          >
+            <option value="">Toutes les catégories</option>
+            <option v-for="cat in categories" :key="cat" :value="cat">{{ cat }}</option>
+          </select>
+
+          <!-- Distance Filter -->
+          <select
+            v-model="maxDistance"
+            class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            :disabled="!position"
+            @change="filterMerchants"
+          >
+            <option :value="null">Distance illimitée</option>
+            <option :value="1">Moins de 1 km</option>
+            <option :value="2">Moins de 2 km</option>
+            <option :value="5">Moins de 5 km</option>
+            <option :value="10">Moins de 10 km</option>
+          </select>
+
+          <!-- View Toggle -->
+          <div class="flex rounded-lg border border-gray-300 overflow-hidden">
+            <button
+              :class="[
+                'px-4 py-2 text-sm font-medium',
+                viewMode === 'map' ? 'bg-blue-600 text-white' : 'bg-white text-gray-700 hover:bg-gray-50'
+              ]"
+              @click="viewMode = 'map'"
+            >
+              <Map class="w-4 h-4 inline mr-1" />
+              Carte
+            </button>
+            <button
+              :class="[
+                'px-4 py-2 text-sm font-medium',
+                viewMode === 'list' ? 'bg-blue-600 text-white' : 'bg-white text-gray-700 hover:bg-gray-50'
+              ]"
+              @click="viewMode = 'list'"
+            >
+              <List class="w-4 h-4 inline mr-1" />
+              Liste
+            </button>
+          </div>
+        </div>
       </div>
     </div>
 
     <!-- Map Container -->
     <div class="container px-3 sm:px-4 lg:px-6 mx-auto px-3 py-6 sm:py-8">
-      <div class="bg-white rounded shadow-lg p-6">
+      <!-- Map View -->
+      <div v-if="viewMode === 'map'" class="bg-white rounded shadow-lg p-6">
         <div
           ref="mapContainer"
           class="w-full rounded border border-gray-300 map-container px-3 sm:px-4 lg:px-6"
@@ -50,6 +114,62 @@
           <div class="text-left sm:text-center">
             <div class="animate-spin rounded-full w-5 h-5 border-b-2 border-blue-600 mx-auto mt-3" />
             <p class="text-gray-700">Chargement des commerçants...</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- List View -->
+      <div v-else class="space-y-4">
+        <div v-if="merchantsLoading" class="flex justify-center py-12">
+          <div class="animate-spin rounded-full w-8 h-8 border-b-2 border-blue-600" />
+        </div>
+
+        <div v-else-if="filteredMerchants.length === 0" class="text-center py-12 bg-white rounded shadow-lg">
+          <MapPin class="w-16 h-16 mx-auto text-gray-300 mb-4" />
+          <h3 class="text-lg font-medium text-gray-900">Aucun commerçant trouvé</h3>
+          <p class="text-gray-600 mt-2">Essayez de modifier vos critères de recherche</p>
+        </div>
+
+        <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div
+            v-for="merchant in filteredMerchants"
+            :key="merchant.id"
+            class="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow cursor-pointer"
+            @click="selectedMerchant = merchant"
+          >
+            <!-- Merchant Image/Avatar -->
+            <div class="h-32 bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center">
+              <Building class="w-16 h-16 text-white/80" />
+            </div>
+
+            <!-- Merchant Info -->
+            <div class="p-4">
+              <h3 class="font-semibold text-gray-900 text-lg">{{ merchant.business_name }}</h3>
+              <p class="text-sm text-gray-600 mt-1">{{ merchant.business_type }}</p>
+
+              <div class="flex items-center gap-2 mt-3 text-sm text-gray-500">
+                <MapPin class="w-4 h-4" />
+                <span>{{ merchant.user?.city || merchant.city || 'Lomé' }}</span>
+              </div>
+
+              <div v-if="merchant.distance_km && position" class="flex items-center gap-2 mt-2 text-sm text-blue-600">
+                <Navigation class="w-4 h-4" />
+                <span>{{ merchant.distance_km.toFixed(1) }} km</span>
+              </div>
+
+              <div class="flex items-center justify-between mt-4 pt-4 border-t border-gray-100">
+                <div class="flex items-center gap-2 text-sm text-green-600">
+                  <Package class="w-4 h-4" />
+                  <span>{{ merchant.products_count ?? 0 }} produits</span>
+                </div>
+                <button
+                  class="text-sm font-medium text-blue-600 hover:text-blue-700"
+                  @click.stop="viewMerchantDetail(merchant)"
+                >
+                  Voir →
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -133,7 +253,7 @@
 <script setup lang="ts">
 import { computed, ref, onMounted, nextTick, onUnmounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
-import { MapPin, RefreshCw, X, Building, Navigation, Phone, Package } from 'lucide-vue-next'
+import { MapPin, RefreshCw, X, Building, Navigation, Phone, Package, Search, Map, List } from 'lucide-vue-next'
 import { notify } from '@/composables/useNotifications'
 import useGeolocation from '@/composables/useGeolocation'
 import { storeToRefs } from 'pinia'
@@ -147,9 +267,99 @@ const { position, getCurrentPosition, isLoading: geoLoading } = useGeolocation()
 const merchantsStore = useMerchantsStore()
 const { merchants, loading: merchantsLoading } = storeToRefs(merchantsStore)
 
+// View mode and filters
+const viewMode = ref<'map' | 'list'>('map')
+const searchQuery = ref('')
+const selectedCategory = ref('')
+const maxDistance = ref<number | null>(null)
+let searchTimeout: ReturnType<typeof setTimeout> | null = null
+
+// Categories derived from merchants
+const categories = computed(() => {
+  const types = new Set(merchants.value.map(m => m.business_type).filter(Boolean))
+  return Array.from(types).sort()
+})
+
 // State
 const merchantsWithLocation = computed(() => merchants.value.filter(merchant => merchant.latitude !== null && merchant.longitude !== null))
 const selectedMerchant = ref<MerchantWithLocation | null>(null)
+
+// Filtered merchants based on search and filters
+const filteredMerchants = computed(() => {
+  let result = merchantsWithLocation.value
+
+  // Search filter
+  if (searchQuery.value.trim()) {
+    const query = searchQuery.value.toLowerCase()
+    result = result.filter(m =>
+      m.business_name?.toLowerCase().includes(query) ||
+      m.business_type?.toLowerCase().includes(query) ||
+      m.user?.city?.toLowerCase().includes(query)
+    )
+  }
+
+  // Category filter
+  if (selectedCategory.value) {
+    result = result.filter(m => m.business_type === selectedCategory.value)
+  }
+
+  // Distance filter (requires user location)
+  if (maxDistance.value && position.value) {
+    result = result.filter(m => {
+      if (!m.distance_km && m.latitude && m.longitude) {
+        // Calculate distance if not already done
+        m.distance_km = calculateDistance(
+          position.value!.latitude,
+          position.value!.longitude,
+          m.latitude,
+          m.longitude
+        )
+      }
+      return m.distance_km !== undefined && m.distance_km <= maxDistance.value!
+    })
+  }
+
+  // Sort by distance if user location is available
+  if (position.value) {
+    result = [...result].sort((a, b) => {
+      const distA = a.distance_km ?? Infinity
+      const distB = b.distance_km ?? Infinity
+      return distA - distB
+    })
+  }
+
+  return result
+})
+
+// Haversine formula to calculate distance
+const calculateDistance = (lat1: number, lon1: number, lat2: number, lon2: number): number => {
+  const R = 6371 // Earth's radius in km
+  const dLat = (lat2 - lat1) * Math.PI / 180
+  const dLon = (lon2 - lon1) * Math.PI / 180
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+    Math.sin(dLon / 2) * Math.sin(dLon / 2)
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
+  return R * c
+}
+
+// Debounced search handler
+const handleSearch = () => {
+  if (searchTimeout) {
+    clearTimeout(searchTimeout)
+  }
+  searchTimeout = setTimeout(() => {
+    filterMerchants()
+  }, 300)
+}
+
+// Filter merchants and update map markers
+const filterMerchants = () => {
+  if (viewMode.value === 'map') {
+    addMerchantMarkers()
+  }
+}
 
 // Map references
 const mapContainer = ref<HTMLElement | null>(null)
@@ -181,7 +391,7 @@ const initializeMap = async () => {
 }
 
 const addMerchantMarkers = async () => {
-  if (!map || merchantsWithLocation.value.length === 0) return
+  if (!map || filteredMerchants.value.length === 0) return
 
   try {
     const L = await import('leaflet')
@@ -197,8 +407,8 @@ const addMerchantMarkers = async () => {
       iconAnchor: [15, 15]
     })
 
-    // Add markers for each merchant
-    merchantsWithLocation.value.forEach(merchant => {
+    // Add markers for each filtered merchant
+    filteredMerchants.value.forEach(merchant => {
       const marker = L.marker([merchant.latitude, merchant.longitude], {
         icon: merchantIcon
       }).addTo(map)
@@ -325,11 +535,14 @@ const refreshMerchants = async () => {
 
 const viewMerchantProducts = () => {
   if (selectedMerchant.value) {
-    // For now, redirect to products view with merchant filter
-    // This could be enhanced with a merchant-specific route
-    router.push('/products')
+    // Redirect to merchant detail page
+    router.push(`/merchants/${selectedMerchant.value.id}`)
     selectedMerchant.value = null
   }
+}
+
+const viewMerchantDetail = (merchant: MerchantWithLocation) => {
+  router.push(`/merchants/${merchant.id}`)
 }
 
 

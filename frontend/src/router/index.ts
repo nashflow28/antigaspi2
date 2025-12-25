@@ -34,6 +34,31 @@ const router = createRouter({
       component: () => import('@/views/auth/RegisterView.vue'),
       meta: { requiresAuth: false, hideForAuth: true }
     },
+    // Phone Authentication Routes
+    {
+      path: '/auth/phone-login',
+      name: 'phone-login',
+      component: () => import('@/views/auth/PhoneAuthView.vue'),
+      meta: { requiresAuth: false, hideForAuth: true }
+    },
+    {
+      path: '/auth/phone-register',
+      name: 'phone-register',
+      component: () => import('@/views/auth/PhoneAuthView.vue'),
+      meta: { requiresAuth: false, hideForAuth: true }
+    },
+    {
+      path: '/auth/otp-verify',
+      name: 'otp-verify',
+      component: () => import('@/views/auth/OTPVerificationView.vue'),
+      meta: { requiresAuth: false }
+    },
+    {
+      path: '/auth/complete-profile',
+      name: 'complete-profile',
+      component: () => import('@/views/auth/CompleteProfileView.vue'),
+      meta: { requiresAuth: true }
+    },
     {
       path: '/products',
       name: 'products',
@@ -205,6 +230,17 @@ const router = createRouter({
         roles: ['consumer'],
         title: 'Portefeuille électronique',
         breadcrumb: ['Accueil', 'Portefeuille']
+      }
+    },
+    {
+      path: '/wallet/topup',
+      name: 'wallet-topup',
+      component: () => import('@/views/wallet/TopUpView.vue'),
+      meta: {
+        requiresAuth: true,
+        roles: ['consumer'],
+        title: 'Recharger le portefeuille',
+        breadcrumb: ['Portefeuille', 'Recharge']
       }
     },
     {

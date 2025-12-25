@@ -304,33 +304,37 @@ const AdminDashboardScreen: React.FC<AdminDashboardScreenProps> = ({ navigation 
             >
               <Card
                 variant="elevated"
-                style={[styles.alertCard, { backgroundColor: '#FEF3C7', borderLeftWidth: 4, borderLeftColor: '#F59E0B' }]}
+                style={[styles.alertCard, {
+                  backgroundColor: theme.isDark ? '#78350F' : '#FEF3C7',
+                  borderLeftWidth: 4,
+                  borderLeftColor: theme.colors.warning
+                }]}
               >
                 <View style={styles.alertContent}>
-                  <View style={[styles.alertIconContainer, { backgroundColor: '#F59E0B' }]}>
+                  <View style={[styles.alertIconContainer, { backgroundColor: theme.colors.warning }]}>
                     <Ionicons name="alert-circle" size={24} color="white" />
                   </View>
                   <View style={{ flex: 1 }}>
-                    <Typography variant="h4" weight="bold" style={{ marginBottom: 8, color: '#92400E' }}>
-                      ⚠️ Actions requises
+                    <Typography variant="h4" weight="bold" style={{ marginBottom: 8, color: theme.isDark ? '#FEF3C7' : '#92400E' }}>
+                      Actions requises
                     </Typography>
                     {(stats.pending_merchants ?? 0) > 0 && (
                       <View style={styles.alertItem}>
-                        <View style={[styles.alertDot, { backgroundColor: '#F59E0B' }]} />
-                        <Typography variant="body" style={{ color: '#92400E' }}>
+                        <View style={[styles.alertDot, { backgroundColor: theme.colors.warning }]} />
+                        <Typography variant="body" style={{ color: theme.isDark ? '#FDE68A' : '#92400E' }}>
                           {stats.pending_merchants} commerçant{(stats.pending_merchants ?? 0) > 1 ? 's' : ''} en attente de validation
                         </Typography>
                       </View>
                     )}
                     {(stats.pending_products ?? 0) > 0 && (
                       <View style={styles.alertItem}>
-                        <View style={[styles.alertDot, { backgroundColor: '#F59E0B' }]} />
-                        <Typography variant="body" style={{ color: '#92400E' }}>
+                        <View style={[styles.alertDot, { backgroundColor: theme.colors.warning }]} />
+                        <Typography variant="body" style={{ color: theme.isDark ? '#FDE68A' : '#92400E' }}>
                           {stats.pending_products} produit{(stats.pending_products ?? 0) > 1 ? 's' : ''} à modérer
                         </Typography>
                       </View>
                     )}
-                    <Typography variant="caption" style={{ color: '#B45309', marginTop: 8 }}>
+                    <Typography variant="caption" style={{ color: theme.isDark ? '#FBBF24' : '#B45309', marginTop: 8 }}>
                       Appuyez pour voir les détails →
                     </Typography>
                   </View>
@@ -539,7 +543,7 @@ const AdminDashboardScreen: React.FC<AdminDashboardScreenProps> = ({ navigation 
 
             <TouchableOpacity
               activeOpacity={0.7}
-              onPress={() => navigation.navigate('Moderation')}
+              onPress={() => navigation.navigate('Reviews')}
               testID="action-moderation-button"
               style={styles.actionButton}
             >
@@ -555,7 +559,7 @@ const AdminDashboardScreen: React.FC<AdminDashboardScreenProps> = ({ navigation 
 
             <TouchableOpacity
               activeOpacity={0.7}
-              onPress={() => navigation.navigate('Broadcast')}
+              onPress={() => navigation.navigate('Notifications')}
               testID="action-broadcast-button"
               style={styles.actionButton}
             >
@@ -565,6 +569,22 @@ const AdminDashboardScreen: React.FC<AdminDashboardScreenProps> = ({ navigation 
                 </View>
                 <Typography variant="small" weight="semibold" style={{ marginTop: 8, textAlign: 'center' }}>
                   Diffusion
+                </Typography>
+              </Card>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              activeOpacity={0.7}
+              onPress={() => navigation.navigate('Payments')}
+              testID="action-payments-button"
+              style={styles.actionButton}
+            >
+              <Card variant="elevated" style={styles.actionCard}>
+                <View style={[styles.actionIconContainer, { backgroundColor: theme.withOpacity('#10B981', 0.1) }]}>
+                  <Ionicons name="card-outline" size={28} color="#10B981" />
+                </View>
+                <Typography variant="small" weight="semibold" style={{ marginTop: 8, textAlign: 'center' }}>
+                  Paiements
                 </Typography>
               </Card>
             </TouchableOpacity>
@@ -607,7 +627,10 @@ const AdminDashboardScreen: React.FC<AdminDashboardScreenProps> = ({ navigation 
                   key={activity.id}
                   style={[
                     styles.activityItem,
-                    index !== stats.recent_activity!.length - 1 && index < 4 && styles.activityItemBorder,
+                    index !== stats.recent_activity!.length - 1 && index < 4 && {
+                      borderBottomWidth: 1,
+                      borderBottomColor: theme.colors.border,
+                    },
                   ]}
                 >
                   <View style={[styles.activityIcon, { backgroundColor: getActivityColor(activity.type, theme) }]}>
@@ -773,10 +796,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: 16,
     gap: 12,
-  },
-  activityItemBorder: {
-    borderBottomWidth: 1,
-    borderBottomColor: 'rgba(0,0,0,0.05)',
   },
   activityIcon: {
     width: 36,

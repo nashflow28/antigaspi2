@@ -631,7 +631,7 @@ const AdminProductsScreen: React.FC = () => {
           </ScrollView>
 
           {actionLoadingIds.size > 0 && (
-            <View style={styles.loadingOverlay}>
+            <View style={[styles.loadingOverlay, { backgroundColor: theme.withOpacity(theme.colors.background, 0.9) }]}>
               <ActivityIndicator size="large" color={theme.colors.primary[500]} />
             </View>
           )}
@@ -644,7 +644,7 @@ const AdminProductsScreen: React.FC = () => {
 
   return (
     <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
-      <StatusBar barStyle="dark-content" backgroundColor={theme.colors.background} />
+      <StatusBar barStyle={theme.isDark ? 'light-content' : 'dark-content'} backgroundColor={theme.colors.background} />
 
       {/* Header */}
       <View style={[styles.header, { backgroundColor: theme.colors.primary[500] }]}>
@@ -964,7 +964,6 @@ const styles = StyleSheet.create({
   },
   loadingOverlay: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(255, 255, 255, 0.9)',
     alignItems: 'center',
     justifyContent: 'center',
   },

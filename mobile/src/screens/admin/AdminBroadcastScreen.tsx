@@ -198,7 +198,7 @@ const AdminBroadcastScreen: React.FC = () => {
               {
                 backgroundColor: theme.colors.surface.light,
                 borderColor: theme.colors.border,
-                color: theme.colors.neutral[900],
+                color: theme.colors.text,
               },
             ]}
             placeholder="Maximum 120 caractères"
@@ -228,7 +228,7 @@ const AdminBroadcastScreen: React.FC = () => {
               {
                 backgroundColor: theme.colors.surface.light,
                 borderColor: theme.colors.border,
-                color: theme.colors.neutral[900],
+                color: theme.colors.text,
               },
             ]}
             placeholder="Maximum 1000 caractères"
@@ -381,7 +381,7 @@ const AdminBroadcastScreen: React.FC = () => {
               {
                 backgroundColor: theme.colors.surface.light,
                 borderColor: theme.colors.border,
-                color: theme.colors.neutral[900],
+                color: theme.colors.text,
               },
             ]}
             placeholder="https://example.com/action"
@@ -416,7 +416,7 @@ const AdminBroadcastScreen: React.FC = () => {
                 {
                   backgroundColor: theme.colors.surface.light,
                   borderColor: theme.colors.border,
-                  color: theme.colors.neutral[900],
+                  color: theme.colors.text,
                   fontFamily: 'monospace',
                 },
               ]}

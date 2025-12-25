@@ -287,22 +287,42 @@ const MerchantSurpriseBasketsScreen: React.FC<Props> = ({ navigation }) => {
 
   const renderBasket = ({ item }: { item: SurpriseBasket }) => (
     <Card variant="elevated" style={styles.basketCard} pressable={false}>
-      <View style={styles.basketHeader}>
-        <View style={{ flex: 1 }}>
-          <Typography variant="h4" weight="semibold" numberOfLines={1}>
-            {item.name}
-          </Typography>
+      {/* Image et Header */}
+      <View style={styles.basketTopSection}>
+        {/* Image du panier */}
+        <View style={styles.basketImageContainer}>
+          {item.image_url ? (
+            <Image
+              source={{ uri: getImageUrl(item.image_url) }}
+              style={styles.basketImage}
+              resizeMode="cover"
+            />
+          ) : (
+            <View style={[styles.basketImagePlaceholder, { backgroundColor: theme.colors.primary[100] }]}>
+              <Ionicons name="gift" size={32} color={theme.colors.primary[500]} />
+            </View>
+          )}
+        </View>
+
+        {/* Infos du panier */}
+        <View style={styles.basketHeaderContent}>
+          <View style={styles.basketTitleRow}>
+            <Typography variant="h4" weight="semibold" numberOfLines={1} style={{ flex: 1 }}>
+              {item.name}
+            </Typography>
+            <Badge variant={item.is_active ? 'success' : 'secondary'} size="sm">
+              {item.is_active ? 'Actif' : 'Inactif'}
+            </Badge>
+          </View>
           {item.description && (
             <Typography variant="small" color="secondary" numberOfLines={2} style={{ marginTop: 4 }}>
               {item.description}
             </Typography>
           )}
         </View>
-        <Badge variant={item.is_active ? 'success' : 'secondary'} size="sm">
-          {item.is_active ? 'Actif' : 'Inactif'}
-        </Badge>
       </View>
 
+      {/* Infos (prix, quantité, articles) */}
       <View style={styles.basketInfo}>
         <View style={styles.infoRow}>
           <Ionicons name="pricetag" size={16} color={theme.colors.neutral[400]} />
@@ -313,48 +333,54 @@ const MerchantSurpriseBasketsScreen: React.FC<Props> = ({ navigation }) => {
         <View style={styles.infoRow}>
           <Ionicons name="cube" size={16} color={theme.colors.neutral[400]} />
           <Typography variant="body" style={{ marginLeft: 6 }}>
-            {item.quantity_available} disponibles
+            {item.quantity_available} dispo.
           </Typography>
         </View>
         {item.min_items && item.min_items > 0 && (
           <View style={styles.infoRow}>
             <Ionicons name="basket" size={16} color={theme.colors.primary[500]} />
             <Typography variant="body" style={{ marginLeft: 6, color: theme.colors.primary[500] }}>
-              {item.min_items} articles
+              {item.min_items} art.
             </Typography>
           </View>
         )}
       </View>
 
-      <View style={styles.basketActions}>
-        <Button
-          variant="ghost"
-          size="sm"
-          onPress={() => handleEdit(item)}
-          leftIcon={<Ionicons name="create-outline" size={18} />}
-        >
-          Modifier
-        </Button>
-        <Button
-          variant="ghost"
-          size="sm"
-          onPress={() => handleToggleStatus(item)}
-          leftIcon={
-            <Ionicons name={item.is_active ? 'close-circle-outline' : 'checkmark-circle-outline'} size={18} />
-          }
-        >
-          {item.is_active ? 'Désactiver' : 'Activer'}
-        </Button>
-        <Button
-          variant="ghost"
-          size="sm"
+      {/* Actions - 2 lignes pour éviter la troncature */}
+      <View style={styles.basketActionsContainer}>
+        <View style={styles.basketActionsRow}>
+          <TouchableOpacity
+            style={[styles.actionButton, { backgroundColor: theme.colors.primary[50] }]}
+            onPress={() => handleEdit(item)}
+          >
+            <Ionicons name="create-outline" size={18} color={theme.colors.primary[500]} />
+            <Typography variant="small" style={{ marginLeft: 6, color: theme.colors.primary[500] }}>
+              Modifier
+            </Typography>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.actionButton, { backgroundColor: theme.isDark ? '#374151' : '#F3F4F6' }]}
+            onPress={() => handleToggleStatus(item)}
+          >
+            <Ionicons
+              name={item.is_active ? 'close-circle-outline' : 'checkmark-circle-outline'}
+              size={18}
+              color={theme.isDark ? '#D1D5DB' : '#6B7280'}
+            />
+            <Typography variant="small" style={{ marginLeft: 6, color: theme.isDark ? '#D1D5DB' : '#6B7280' }}>
+              {item.is_active ? 'Désactiver' : 'Activer'}
+            </Typography>
+          </TouchableOpacity>
+        </View>
+        <TouchableOpacity
+          style={[styles.actionButton, styles.deleteButton, { backgroundColor: '#FEE2E2' }]}
           onPress={() => handleDelete(item.id)}
-          leftIcon={<Ionicons name="trash-outline" size={18} color={theme.colors.semantic.error} />}
         >
-          <Typography variant="small" style={{ color: theme.colors.semantic.error }}>
+          <Ionicons name="trash-outline" size={18} color="#DC2626" />
+          <Typography variant="small" style={{ marginLeft: 6, color: '#DC2626' }}>
             Supprimer
           </Typography>
-        </Button>
+        </TouchableOpacity>
       </View>
     </Card>
   )
@@ -817,25 +843,65 @@ const styles = StyleSheet.create({
     marginBottom: 12,
     padding: 16,
   },
-  basketHeader: {
+  basketTopSection: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
     marginBottom: 12,
+  },
+  basketImageContainer: {
+    width: 70,
+    height: 70,
+    borderRadius: 10,
+    overflow: 'hidden',
+    marginRight: 12,
+  },
+  basketImage: {
+    width: '100%',
+    height: '100%',
+  },
+  basketImagePlaceholder: {
+    width: '100%',
+    height: '100%',
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 10,
+  },
+  basketHeaderContent: {
+    flex: 1,
+    justifyContent: 'center',
+  },
+  basketTitleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
   },
   basketInfo: {
     flexDirection: 'row',
-    gap: 16,
+    flexWrap: 'wrap',
+    gap: 12,
     marginBottom: 12,
   },
   infoRow: {
     flexDirection: 'row',
     alignItems: 'center',
   },
-  basketActions: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+  basketActionsContainer: {
     gap: 8,
+  },
+  basketActionsRow: {
+    flexDirection: 'row',
+    gap: 8,
+  },
+  actionButton: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 10,
+    paddingHorizontal: 12,
+    borderRadius: 8,
+  },
+  deleteButton: {
+    flex: 0,
   },
   emptyState: {
     alignItems: 'center',

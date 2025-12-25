@@ -34,6 +34,18 @@ export default {
           orange: '#FB923C',
           red: '#EF4444'
         },
+        gold: {
+          50: '#FFFEF5',
+          100: '#FFF9D6',
+          200: '#FFF2AD',
+          300: '#FFEA7A',
+          400: '#F9D84A',
+          500: '#F5C518',
+          600: '#D9A80E',
+          700: '#B88A0A',
+          800: '#966D07',
+          900: '#755405'
+        },
         surface: {
           light: '#FFFFFF',
           muted: '#F3F4F6',

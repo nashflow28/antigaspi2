@@ -14,15 +14,19 @@ import AdminCategoriesScreen from '../screens/admin/AdminCategoriesScreen'
 import AdminReviewModerationScreen from '../screens/admin/AdminReviewModerationScreen'
 import AdminAnalyticsScreen from '../screens/admin/AdminAnalyticsScreen'
 import AdminBroadcastScreen from '../screens/admin/AdminBroadcastScreen'
+import AdminSettingsScreen from '../screens/admin/AdminSettingsScreen'
+import AdminPaymentDashboardScreen from '../screens/admin/AdminPaymentDashboardScreen'
 
 const Tab = createBottomTabNavigator()
 const Stack = createNativeStackNavigator()
 
-// Stack Navigator pour le dashboard avec analytics
+// Stack Navigator pour le dashboard avec analytics, settings, et payments
 const DashboardStack = () => (
   <Stack.Navigator screenOptions={{ headerShown: false }}>
     <Stack.Screen name="DashboardMain" component={AdminDashboardScreen} />
     <Stack.Screen name="Analytics" component={AdminAnalyticsScreen} />
+    <Stack.Screen name="Settings" component={AdminSettingsScreen} />
+    <Stack.Screen name="Payments" component={AdminPaymentDashboardScreen} />
   </Stack.Navigator>
 )
 

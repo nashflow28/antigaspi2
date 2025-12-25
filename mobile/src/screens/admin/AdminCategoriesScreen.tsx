@@ -179,7 +179,7 @@ const AdminCategoriesScreen: React.FC = () => {
   const renderCategoryCard = ({ item }: { item: CategoryWithStats }) => (
     <Card style={styles.categoryCard}>
       <View style={styles.cardHeader}>
-        <View style={styles.iconContainer}>
+        <View style={[styles.iconContainer, { backgroundColor: theme.withOpacity(theme.colors.primary[500], 0.1) }]}>
           <Ionicons name="grid" size={24} color={theme.colors.primary[500]} />
         </View>
         <View style={styles.cardContent}>
@@ -206,12 +206,12 @@ const AdminCategoriesScreen: React.FC = () => {
           </View>
         </View>
         <View style={styles.actionsRow}>
-          <TouchableOpacity onPress={() => handleEditCategory(item)} style={styles.actionButton} testID="edit-category-button">
+          <TouchableOpacity onPress={() => handleEditCategory(item)} style={[styles.actionButton, { backgroundColor: theme.colors.surface.light }]} testID="edit-category-button">
             <Ionicons name="pencil" size={20} color={theme.colors.primary[500]} testID="pencil-icon" />
           </TouchableOpacity>
           <TouchableOpacity
             onPress={() => handleDeleteCategory(item)}
-            style={styles.actionButton}
+            style={[styles.actionButton, { backgroundColor: theme.colors.surface.light }]}
             testID="delete-category-button"
           >
             <Ionicons name="trash-outline" size={20} color={theme.colors.error} testID="trash-icon" />
@@ -230,7 +230,7 @@ const AdminCategoriesScreen: React.FC = () => {
     >
       <View style={styles.modalOverlay}>
         <View style={[styles.modalContent, { backgroundColor: theme.colors.background }]}>
-          <View style={styles.modalHeader}>
+          <View style={[styles.modalHeader, { borderBottomColor: theme.colors.border }]}>
             <Typography variant="h3" weight="bold">
               {formMode === 'create' ? 'Nouvelle catégorie' : 'Modifier la catégorie'}
             </Typography>
@@ -363,7 +363,7 @@ const AdminCategoriesScreen: React.FC = () => {
 
   return (
     <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
-      <StatusBar barStyle="dark-content" backgroundColor={theme.colors.background} />
+      <StatusBar barStyle={theme.isDark ? 'light-content' : 'dark-content'} backgroundColor={theme.colors.background} />
 
       <FlatList
         data={categories}
@@ -452,7 +452,6 @@ const styles = StyleSheet.create({
     width: 48,
     height: 48,
     borderRadius: 12,
-    backgroundColor: '#EEF2FF',
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 12,
@@ -477,7 +476,6 @@ const styles = StyleSheet.create({
   actionButton: {
     padding: 8,
     borderRadius: 8,
-    backgroundColor: '#F3F4F6',
   },
   emptyState: {
     alignItems: 'center',
@@ -500,7 +498,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: 20,
     borderBottomWidth: 1,
-    borderBottomColor: '#E5E7EB',
   },
   modalBody: {
     padding: 20,

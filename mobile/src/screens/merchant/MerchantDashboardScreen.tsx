@@ -19,6 +19,7 @@ import { RootState } from '../../store'
 interface Stats {
   active_products: number
   pending_reservations: number
+  confirmed_reservations: number
   todays_revenue: number
   total_products: number
 }
@@ -48,6 +49,7 @@ const MerchantDashboardScreen: React.FC = () => {
   const [stats, setStats] = useState<Stats>({
     active_products: 0,
     pending_reservations: 0,
+    confirmed_reservations: 0,
     todays_revenue: 0,
     total_products: 0,
   })
@@ -68,6 +70,7 @@ const MerchantDashboardScreen: React.FC = () => {
       setStats({
         active_products: statsResponse.data?.active_products ?? 0,
         pending_reservations: statsResponse.data?.pending_reservations ?? 0,
+        confirmed_reservations: statsResponse.data?.confirmed_reservations ?? 0,
         todays_revenue: statsResponse.data?.todays_revenue ?? 0,
         total_products: statsResponse.data?.total_products ?? 0,
       })
@@ -222,18 +225,18 @@ const MerchantDashboardScreen: React.FC = () => {
             style={[styles.statCard, { backgroundColor: theme.colors.cardBackground, borderColor: theme.colors.cardBorder, borderWidth: 1 }]}
             onPress={() => (navigation as any).navigate('Reservations', {
               screen: 'ReservationsMain',
-              params: { initialFilter: 'pending' }
+              params: { initialFilter: 'confirmed' }
             })}
             activeOpacity={0.7}
           >
-            <View style={[styles.statIcon, { backgroundColor: theme.withOpacity(theme.colors.semantic.warning, 0.1) }]}>
-              <Ionicons name="hourglass" size={24} color={theme.colors.semantic.warning} />
+            <View style={[styles.statIcon, { backgroundColor: theme.withOpacity(theme.colors.semantic.success, 0.1) }]}>
+              <Ionicons name="receipt" size={24} color={theme.colors.semantic.success} />
             </View>
             <Text style={[styles.statValue, { color: theme.colors.text }]}>
-              {stats.pending_reservations}
+              {stats.pending_reservations + stats.confirmed_reservations}
             </Text>
             <Text style={[styles.statLabel, { color: theme.colors.textSecondary }]}>
-              Réserv. en attente
+              Réserv. à traiter
             </Text>
           </TouchableOpacity>
         </View>

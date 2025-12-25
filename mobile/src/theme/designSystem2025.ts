@@ -7,18 +7,18 @@ import { Platform } from 'react-native'
 
 // Palette de couleurs principale
 export const colors = {
-  // Primary - Vieil or (élégant, vintage)
+  // Primary - Or lumineux (moderne, dynamique)
   primary: {
-    50: '#FBF8F0',
-    100: '#F7F0E0',
-    200: '#F0E3C2',
-    300: '#E8D49A',
-    400: '#E0C374',
-    500: '#DCB253', // Main brand color - Vieil or
-    600: '#C4963A',
-    700: '#A67B28',
-    800: '#88631C',
-    900: '#6B4E15',
+    50: '#FFFEF5',
+    100: '#FFF9D6',
+    200: '#FFF2AD',
+    300: '#FFEA7A',
+    400: '#F9D84A',
+    500: '#F5C518', // Main brand color - Or lumineux
+    600: '#D9A80E',
+    700: '#B88A0A',
+    800: '#966D07',
+    900: '#755405',
   },
 
   // Neutral - Gray scale
@@ -70,9 +70,9 @@ export const colors = {
 
 // Gradients
 export const gradients = {
-  navGradient: ['#DCB253', '#A67B28'], // 120deg equivalent
-  emeraldGlass: ['rgba(220, 178, 83, 0.1)', 'rgba(220, 178, 83, 0.04)'],
-  cardGradient: ['#DCB253', '#C4963A'],
+  navGradient: ['#F5C518', '#B88A0A'], // 120deg equivalent
+  emeraldGlass: ['rgba(245, 197, 24, 0.1)', 'rgba(245, 197, 24, 0.04)'],
+  cardGradient: ['#F5C518', '#D9A80E'],
   promoGradient: ['#F59E0B', '#DC2626'],
   glassMorphism: ['rgba(255, 255, 255, 0.15)', 'rgba(255, 255, 255, 0.05)'],
 }
