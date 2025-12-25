@@ -267,9 +267,11 @@ const ProductDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
       }
 
       // Préparer la date et l'heure de récupération
-      // Si le produit expire aujourd'hui ou a une fenêtre de retrait aujourd'hui, utiliser aujourd'hui
       const now = new Date()
       const today = now.toISOString().split('T')[0]
+      const currentHour = now.getHours()
+      const currentMinutes = now.getMinutes()
+      const currentTimeStr = `${currentHour.toString().padStart(2, '0')}:${currentMinutes.toString().padStart(2, '0')}`
 
       let pickupDate = today
       let pickupTime = '10:00'
@@ -289,10 +291,36 @@ const ProductDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
         }
       }
 
-      // Pour les paniers surprise, utiliser la fenêtre de retrait si disponible
-      if (product.is_surprise_basket && product.pickup_start) {
+      // Utiliser la fenêtre de retrait si disponible (paniers surprise ou produits avec pickup window)
+      if (product.pickup_start) {
         pickupTime = product.pickup_start.substring(0, 5) // Format HH:MM
       }
+
+      // Si c'est aujourd'hui et l'heure de retrait est passée, ajuster
+      if (pickupDate === today && pickupTime <= currentTimeStr) {
+        // Si le produit a une fenêtre de retrait qui n'est pas encore passée, l'utiliser
+        if (product.pickup_start && product.pickup_start.substring(0, 5) > currentTimeStr) {
+          pickupTime = product.pickup_start.substring(0, 5)
+        } else if (product.pickup_end && product.pickup_end.substring(0, 5) > currentTimeStr) {
+          // Utiliser l'heure actuelle + 30 min si dans la fenêtre
+          const futureTime = new Date(now.getTime() + 30 * 60000)
+          pickupTime = `${futureTime.getHours().toString().padStart(2, '0')}:${futureTime.getMinutes().toString().padStart(2, '0')}`
+        } else {
+          // Sinon, utiliser 1h dans le futur
+          const futureTime = new Date(now.getTime() + 60 * 60000)
+          pickupTime = `${futureTime.getHours().toString().padStart(2, '0')}:${futureTime.getMinutes().toString().padStart(2, '0')}`
+        }
+      }
+
+      console.log('🕐 [ProductDetails] Pickup calculation:', {
+        today,
+        currentTimeStr,
+        productPickupStart: product.pickup_start,
+        productPickupEnd: product.pickup_end,
+        expirationDate: product.expiration_date,
+        calculatedPickupDate: pickupDate,
+        calculatedPickupTime: pickupTime,
+      })
 
       console.log('📤 [ProductDetails] Envoi réservation:', {
         productId: product.id,
