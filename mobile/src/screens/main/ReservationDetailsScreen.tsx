@@ -443,7 +443,7 @@ const ReservationDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
               disabled={cancelling}
               style={{ flex: 1 }}
             >
-              Non, garder
+              Non
             </Button>
             <Button
               variant="destructive"
@@ -453,7 +453,7 @@ const ReservationDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
               style={{ flex: 1 }}
               leftIcon={cancelling ? undefined : <Ionicons name="trash-outline" size={18} color="#fff" />}
             >
-              {cancelling ? 'Annulation...' : 'Oui, annuler'}
+              {cancelling ? 'Annulation...' : 'Oui'}
             </Button>
           </View>
         </View>
