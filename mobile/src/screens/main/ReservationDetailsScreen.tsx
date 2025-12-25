@@ -702,7 +702,7 @@ const createStyles = (theme: ReturnType<typeof useTheme>) => StyleSheet.create({
   },
   cancelModalSummary: {
     width: '100%',
-    backgroundColor: theme.colors.surface.muted,
+    backgroundColor: theme.isDark ? theme.colors.neutral[800] : theme.colors.surface.muted,
     borderRadius: 12,
     padding: 16,
     marginBottom: 24,
