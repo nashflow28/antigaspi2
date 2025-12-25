@@ -81,6 +81,7 @@ class CheckoutCartRequest extends FormRequest
             'pickup_date.date' => 'La date de récupération est invalide.',
             'pickup_time.required' => 'L\'heure de récupération est obligatoire.',
             'pickup_time.date_format' => 'Le format de l\'heure doit être HH:MM.',
+            'wallet_pin.required' => 'Le code PIN du portefeuille est requis pour un paiement wallet.',
             'wallet_pin.required_if' => 'Le code PIN du portefeuille est requis pour un paiement wallet.',
             'wallet_pin.digits_between' => 'Le code PIN du portefeuille doit contenir entre 4 et 6 chiffres.',
         ];
