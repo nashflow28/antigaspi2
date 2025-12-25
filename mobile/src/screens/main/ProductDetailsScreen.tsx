@@ -266,11 +266,33 @@ const ProductDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
         return
       }
 
-      // Préparer la date et l'heure de récupération par défaut (demain à 10h)
-      const tomorrow = new Date()
-      tomorrow.setDate(tomorrow.getDate() + 1)
-      const pickupDate = tomorrow.toISOString().split('T')[0] // Format YYYY-MM-DD
-      const pickupTime = '10:00' // Heure par défaut
+      // Préparer la date et l'heure de récupération
+      // Si le produit expire aujourd'hui ou a une fenêtre de retrait aujourd'hui, utiliser aujourd'hui
+      const now = new Date()
+      const today = now.toISOString().split('T')[0]
+
+      let pickupDate = today
+      let pickupTime = '10:00'
+
+      // Si le produit a une date d'expiration
+      if (product.expiration_date) {
+        const expirationDate = product.expiration_date.split('T')[0]
+        // Si expire aujourd'hui ou avant, utiliser aujourd'hui
+        if (expirationDate <= today) {
+          pickupDate = today
+        } else {
+          // Sinon utiliser demain (si c'est avant l'expiration)
+          const tomorrow = new Date(now)
+          tomorrow.setDate(tomorrow.getDate() + 1)
+          const tomorrowStr = tomorrow.toISOString().split('T')[0]
+          pickupDate = tomorrowStr <= expirationDate ? tomorrowStr : expirationDate
+        }
+      }
+
+      // Pour les paniers surprise, utiliser la fenêtre de retrait si disponible
+      if (product.is_surprise_basket && product.pickup_start) {
+        pickupTime = product.pickup_start.substring(0, 5) // Format HH:MM
+      }
 
       console.log('📤 [ProductDetails] Envoi réservation:', {
         productId: product.id,
