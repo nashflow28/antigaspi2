@@ -534,7 +534,7 @@ const ReservationDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
             onPress={() => setModifyModalVisible(false)}
             style={{ flex: 1 }}
           >
-            Annuler
+            Non
           </Button>
           <Button
             variant="primary"
@@ -544,7 +544,7 @@ const ReservationDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
             style={{ flex: 2 }}
             leftIcon={<Ionicons name="checkmark-circle" size={20} color={theme.colors.textInverse} />}
           >
-            {updating ? 'Mise à jour...' : 'Confirmer'}
+            {updating ? 'Mise à jour...' : 'Oui'}
           </Button>
         </View>
       </Modal>
@@ -620,7 +620,7 @@ const createStyles = (theme: ReturnType<typeof useTheme>) => StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     padding: 16,
-    backgroundColor: theme.colors.surface.muted,
+    backgroundColor: theme.isDark ? theme.colors.neutral[800] : theme.colors.surface.muted,
     borderRadius: 12,
     marginBottom: 20,
     gap: 12,
@@ -631,7 +631,7 @@ const createStyles = (theme: ReturnType<typeof useTheme>) => StyleSheet.create({
     borderRadius: 8,
   },
   modifyQuantitySection: {
-    backgroundColor: theme.colors.surface.muted,
+    backgroundColor: theme.isDark ? theme.colors.neutral[800] : theme.colors.surface.muted,
     borderRadius: 12,
     padding: 20,
     marginBottom: 16,
@@ -646,15 +646,15 @@ const createStyles = (theme: ReturnType<typeof useTheme>) => StyleSheet.create({
     width: 48,
     height: 48,
     borderRadius: 24,
-    backgroundColor: theme.colors.primary[50],
+    backgroundColor: theme.isDark ? theme.colors.neutral[700] : theme.colors.primary[50],
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 2,
-    borderColor: theme.colors.primary[200],
+    borderColor: theme.isDark ? theme.colors.primary[400] : theme.colors.primary[200],
   },
   modifyQuantityButtonDisabled: {
-    backgroundColor: theme.colors.neutral[100],
-    borderColor: theme.colors.neutral[200],
+    backgroundColor: theme.isDark ? theme.colors.neutral[800] : theme.colors.neutral[100],
+    borderColor: theme.isDark ? theme.colors.neutral[600] : theme.colors.neutral[200],
   },
   modifyQuantityValue: {
     minWidth: 60,
@@ -667,9 +667,11 @@ const createStyles = (theme: ReturnType<typeof useTheme>) => StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 16,
     paddingHorizontal: 20,
-    backgroundColor: theme.colors.primary[50],
+    backgroundColor: theme.isDark ? theme.colors.neutral[800] : theme.colors.primary[50],
     borderRadius: 12,
     marginBottom: 20,
+    borderWidth: theme.isDark ? 1 : 0,
+    borderColor: theme.colors.primary[500],
   },
   modifyActions: {
     flexDirection: 'row',

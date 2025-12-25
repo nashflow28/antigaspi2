@@ -8,6 +8,7 @@ use App\Models\Payment;
 use App\Models\Product;
 use App\Models\Reservation;
 use App\Models\User;
+use App\Models\Wallet;
 use App\Notifications\ReservationStatusNotification;
 use App\Services\Payments\PaymentService;
 use Illuminate\Support\Facades\Log;
@@ -127,6 +128,38 @@ class ReservationService
             throw ValidationException::withMessages([
                 'quantity' => ['Le montant total dépasse la limite autorisée de 1,000,000 XOF.'],
             ]);
+        }
+
+        // 🐛 BUG FIX: Validate wallet balance BEFORE creating reservation
+        if ($paymentMethod === PaymentMethod::WALLET) {
+            $wallet = Wallet::where('user_id', $user->id)->first();
+
+            if (!$wallet) {
+                throw ValidationException::withMessages([
+                    'payment_method' => ['Vous n\'avez pas encore de portefeuille. Veuillez d\'abord en créer un.'],
+                ]);
+            }
+
+            if (!$wallet->is_active) {
+                throw ValidationException::withMessages([
+                    'payment_method' => ['Votre portefeuille est désactivé.'],
+                ]);
+            }
+
+            if (!$wallet->pin_hash) {
+                throw ValidationException::withMessages([
+                    'payment_method' => ['Veuillez d\'abord configurer votre code PIN.'],
+                ]);
+            }
+
+            if ($wallet->balance < $totalAmount) {
+                throw ValidationException::withMessages([
+                    'payment_method' => [
+                        "Solde insuffisant. Votre solde: " . number_format($wallet->balance, 0, ',', ' ') .
+                        " F CFA. Montant requis: " . number_format($totalAmount, 0, ',', ' ') . " F CFA."
+                    ],
+                ]);
+            }
         }
 
         /** @var Reservation $reservation */
