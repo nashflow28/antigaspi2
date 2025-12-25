@@ -130,7 +130,7 @@ class ReservationService
             ]);
         }
 
-        // 🐛 BUG FIX: Validate wallet balance BEFORE creating reservation
+        // 🐛 BUG FIX: Validate wallet balance and PIN BEFORE creating reservation
         if ($paymentMethod === PaymentMethod::WALLET) {
             $wallet = Wallet::where('user_id', $user->id)->first();
 
@@ -152,12 +152,34 @@ class ReservationService
                 ]);
             }
 
+            // 🐛 BUG FIX: Require PIN for wallet payments
+            $walletPin = $options['wallet_pin'] ?? null;
+            if (empty($walletPin)) {
+                throw ValidationException::withMessages([
+                    'wallet_pin' => ['Le code PIN est requis pour les paiements par portefeuille.'],
+                ]);
+            }
+
+            // 🐛 BUG FIX: Verify PIN before creating reservation
+            if (!$wallet->verifyPin($walletPin)) {
+                throw ValidationException::withMessages([
+                    'wallet_pin' => ['Code PIN incorrect.'],
+                ]);
+            }
+
             if ($wallet->balance < $totalAmount) {
                 throw ValidationException::withMessages([
                     'payment_method' => [
                         "Solde insuffisant. Votre solde: " . number_format($wallet->balance, 0, ',', ' ') .
                         " F CFA. Montant requis: " . number_format($totalAmount, 0, ',', ' ') . " F CFA."
                     ],
+                ]);
+            }
+
+            // Check daily spending limit
+            if (!$wallet->canSpend($totalAmount)) {
+                throw ValidationException::withMessages([
+                    'payment_method' => ['Limite de dépense quotidienne dépassée.'],
                 ]);
             }
         }
@@ -186,7 +208,32 @@ class ReservationService
                     'notes' => $options['notes'] ?? null,
                     'wallet_pin' => $options['wallet_pin'] ?? null,
                 ]);
+
+                // 🐛 BUG FIX: For wallet payments, verify payment was successful
+                if ($paymentMethod === PaymentMethod::WALLET && $payment && !$payment->isSuccessful()) {
+                    // Rollback: restore product stock and cancel reservation
+                    $product->increment('quantity_available', $quantity);
+                    $reservation->update(['status' => 'cancelled']);
+
+                    throw ValidationException::withMessages([
+                        'payment_method' => ['Le paiement par portefeuille a échoué. Veuillez réessayer.'],
+                    ]);
+                }
+            } catch (ValidationException $e) {
+                // Re-throw validation exceptions (including our wallet payment failure)
+                throw $e;
             } catch (\Throwable $exception) {
+                // For wallet payments, rollback and throw error
+                if ($paymentMethod === PaymentMethod::WALLET) {
+                    $product->increment('quantity_available', $quantity);
+                    $reservation->update(['status' => 'cancelled']);
+
+                    Log::error('Wallet payment failed: ' . $exception->getMessage());
+                    throw ValidationException::withMessages([
+                        'payment_method' => ['Erreur lors du paiement: ' . $exception->getMessage()],
+                    ]);
+                }
+                // For other payment methods, just log the warning (they may complete async)
                 Log::warning('Payment initialization failed: ' . $exception->getMessage());
             }
         }
