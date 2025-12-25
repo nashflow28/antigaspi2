@@ -155,6 +155,7 @@ class ProductController extends Controller
                     'discount_percentage' => $product->discount_percentage,
                     'savings' => $product->savings,
                     'days_until_expiration' => $product->days_until_expiration,
+                    'is_surprise_basket' => (bool) $product->is_surprise_basket,
                     'category' => [
                         'id' => $product->category->id,
                         'name' => $product->category->name,
@@ -769,6 +770,7 @@ class ProductController extends Controller
                     'image_url' => $product->image_url,
                     'discount_percentage' => $product->discount_percentage,
                     'is_active' => $product->is_active,
+                    'is_surprise_basket' => (bool) $product->is_surprise_basket,
                     'category' => [
                         'id' => $product->category->id,
                         'name' => $product->category->name,

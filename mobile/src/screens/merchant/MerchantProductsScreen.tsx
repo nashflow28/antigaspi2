@@ -388,7 +388,7 @@ const MerchantProductsScreen: React.FC<Props> = ({ navigation }) => {
       {/* Header */}
       <View style={[styles.header, { backgroundColor: theme.isDark ? '#0F1622' : theme.colors.primary[500] }]}>
         <View style={styles.headerContent}>
-          <Text style={[styles.headerTitle, { color: theme.isDark ? '#F8FAFF' : 'white' }]}>Mes Produits</Text>
+          <Text style={[styles.headerTitle, { color: theme.isDark ? '#F8FAFF' : 'white' }]}>Mon Inventaire</Text>
           <TouchableOpacity
             style={styles.addButton}
             onPress={handleAddButtonPress}
@@ -396,6 +396,31 @@ const MerchantProductsScreen: React.FC<Props> = ({ navigation }) => {
             accessibilityLabel="Ajouter un produit ou un panier surprise"
           >
             <Ionicons name="add-circle" size={32} color={theme.isDark ? '#E9EDF5' : 'white'} />
+          </TouchableOpacity>
+        </View>
+
+        {/* Navigation Tabs */}
+        <View style={[styles.navTabs, { backgroundColor: theme.isDark ? '#1A2332' : theme.colors.primary[600] }]}>
+          <TouchableOpacity
+            style={[
+              styles.navTab,
+              styles.navTabActive,
+              { backgroundColor: theme.isDark ? theme.colors.primary[500] : 'white' }
+            ]}
+          >
+            <Ionicons name="cube" size={18} color={theme.isDark ? 'white' : theme.colors.primary[600]} />
+            <Text style={[styles.navTabText, { color: theme.isDark ? 'white' : theme.colors.primary[600] }]}>
+              Produits
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.navTab, { backgroundColor: 'transparent' }]}
+            onPress={() => navigation.navigate('SurpriseBaskets')}
+          >
+            <Ionicons name="gift" size={18} color={theme.isDark ? '#9CA3AF' : 'rgba(255,255,255,0.7)'} />
+            <Text style={[styles.navTabText, { color: theme.isDark ? '#9CA3AF' : 'rgba(255,255,255,0.7)' }]}>
+              Paniers
+            </Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -509,6 +534,33 @@ const styles = StyleSheet.create({
   },
   addButton: {
     padding: 4,
+  },
+  navTabs: {
+    flexDirection: 'row',
+    marginTop: 16,
+    borderRadius: 12,
+    padding: 4,
+  },
+  navTab: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 10,
+    paddingHorizontal: 16,
+    borderRadius: 8,
+    gap: 6,
+  },
+  navTabActive: {
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  navTabText: {
+    fontSize: 14,
+    fontWeight: '600',
   },
   filtersContainer: {
     flexDirection: 'row',

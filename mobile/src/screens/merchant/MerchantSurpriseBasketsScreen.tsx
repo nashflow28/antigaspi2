@@ -377,20 +377,40 @@ const MerchantSurpriseBasketsScreen: React.FC<Props> = ({ navigation }) => {
       {/* Header */}
       <View style={[styles.header, { backgroundColor: theme.isDark ? '#0F1622' : theme.colors.primary[500] }]}>
         <View style={styles.headerContent}>
-          <View>
-            <Typography variant="caption" style={{ color: theme.isDark ? 'rgba(248, 250, 255, 0.7)' : 'rgba(255, 255, 255, 0.8)' }}>
-              Mes Paniers
-            </Typography>
-            <Typography variant="h2" weight="bold" style={{ color: theme.isDark ? '#F8FAFF' : 'white' }}>
-              Paniers Surprise
-            </Typography>
-          </View>
+          <Typography variant="h2" weight="bold" style={{ color: theme.isDark ? '#F8FAFF' : 'white' }}>
+            Mon Inventaire
+          </Typography>
           <TouchableOpacity
             onPress={handleCreate}
             style={styles.createButton}
             testID="create-basket-button"
           >
             <Ionicons name="add-circle" size={32} color="white" />
+          </TouchableOpacity>
+        </View>
+
+        {/* Navigation Tabs */}
+        <View style={[styles.navTabs, { backgroundColor: theme.isDark ? '#1A2332' : theme.colors.primary[600] }]}>
+          <TouchableOpacity
+            style={[styles.navTab, { backgroundColor: 'transparent' }]}
+            onPress={() => navigation.navigate('MerchantProducts')}
+          >
+            <Ionicons name="cube" size={18} color={theme.isDark ? '#9CA3AF' : 'rgba(255,255,255,0.7)'} />
+            <Text style={[styles.navTabText, { color: theme.isDark ? '#9CA3AF' : 'rgba(255,255,255,0.7)' }]}>
+              Produits
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[
+              styles.navTab,
+              styles.navTabActive,
+              { backgroundColor: theme.isDark ? theme.colors.primary[500] : 'white' }
+            ]}
+          >
+            <Ionicons name="gift" size={18} color={theme.isDark ? 'white' : theme.colors.primary[600]} />
+            <Text style={[styles.navTabText, { color: theme.isDark ? 'white' : theme.colors.primary[600] }]}>
+              Paniers
+            </Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -737,6 +757,33 @@ const styles = StyleSheet.create({
   },
   createButton: {
     padding: 4,
+  },
+  navTabs: {
+    flexDirection: 'row',
+    marginTop: 16,
+    borderRadius: 12,
+    padding: 4,
+  },
+  navTab: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 10,
+    paddingHorizontal: 16,
+    borderRadius: 8,
+    gap: 6,
+  },
+  navTabActive: {
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  navTabText: {
+    fontSize: 14,
+    fontWeight: '600',
   },
   statsContainer: {
     flexDirection: 'row',
