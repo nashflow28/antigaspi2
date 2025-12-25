@@ -78,7 +78,7 @@ const MerchantDashboardScreen: React.FC = () => {
 
       // Charger les avis récents
       try {
-        const reviewsResponse = await apiService.get('/merchant/reviews/list?limit=3')
+        const reviewsResponse = await apiService.get('/merchants/reviews/list?limit=3')
         setRecentReviews(reviewsResponse.data?.data || reviewsResponse.data || [])
       } catch (reviewError) {
         console.error('Erreur chargement avis:', reviewError)
