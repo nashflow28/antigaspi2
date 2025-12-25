@@ -259,7 +259,7 @@ class ApiService {
                   text: 'OK',
                   onPress: () => {
                     apiLogger.log('Session expirée - Redirection automatique vers login')
-                    NavigationRef.navigate('Login')
+                    NavigationRef.navigate('Auth', { screen: 'Login' })
                   }
                 }
               ],
@@ -274,7 +274,7 @@ class ApiService {
                   text: 'OK',
                   onPress: () => {
                     apiLogger.log('Session expirée - Redirection automatique vers login')
-                    NavigationRef.navigate('Login')
+                    NavigationRef.navigate('Auth', { screen: 'Login' })
                   }
                 }
               ]
