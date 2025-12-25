@@ -35,8 +35,10 @@ class Product extends Model
     protected function casts(): array
     {
         return [
-            'original_price' => 'decimal:2',
-            'discounted_price' => 'decimal:2',
+            'merchant_id' => 'integer',
+            'category_id' => 'integer',
+            'original_price' => 'float',
+            'discounted_price' => 'float',
             'quantity_available' => 'integer',
             'low_stock_threshold' => 'integer',
             'last_low_stock_alert_at' => 'datetime',
@@ -45,7 +47,7 @@ class Product extends Model
             'is_surprise_basket' => 'boolean',
             'min_items' => 'integer',
             'max_items' => 'integer',
-            'total_original_value' => 'decimal:2',
+            'total_original_value' => 'float',
         ];
     }
 
