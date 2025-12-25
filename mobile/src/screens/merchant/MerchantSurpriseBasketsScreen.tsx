@@ -393,7 +393,7 @@ const MerchantSurpriseBasketsScreen: React.FC<Props> = ({ navigation }) => {
         <View style={[styles.navTabs, { backgroundColor: theme.isDark ? '#1A2332' : theme.colors.primary[600] }]}>
           <TouchableOpacity
             style={[styles.navTab, { backgroundColor: 'transparent' }]}
-            onPress={() => navigation.navigate('MerchantProducts')}
+            onPress={() => navigation.navigate('ProductsList')}
           >
             <Ionicons name="cube" size={18} color={theme.isDark ? '#9CA3AF' : 'rgba(255,255,255,0.7)'} />
             <Text style={[styles.navTabText, { color: theme.isDark ? '#9CA3AF' : 'rgba(255,255,255,0.7)' }]}>
