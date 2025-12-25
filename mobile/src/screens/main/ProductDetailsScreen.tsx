@@ -877,27 +877,41 @@ const ProductDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
 
         {/* Wallet PIN Input */}
         {selectedPaymentMethod === 'wallet' && (
-          <View style={{ marginTop: theme.spacing.md }}>
-            <Typography variant="caption" color="secondary" style={{ marginBottom: theme.spacing.xs }}>
-              Code PIN du portefeuille
-            </Typography>
+          <View style={{
+            marginTop: theme.spacing.lg,
+            marginBottom: theme.spacing.md,
+            padding: theme.spacing.md,
+            backgroundColor: theme.isDark ? theme.colors.neutral[800] : theme.colors.neutral[50],
+            borderRadius: theme.radius.lg,
+            borderWidth: 1,
+            borderColor: theme.isDark ? theme.colors.neutral[700] : theme.colors.neutral[200],
+          }}>
+            <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: theme.spacing.sm }}>
+              <Ionicons name="lock-closed" size={16} color={theme.colors.primary[500]} />
+              <Typography variant="caption" weight="medium" style={{ marginLeft: theme.spacing.xs, color: theme.colors.text }}>
+                Code PIN du portefeuille
+              </Typography>
+            </View>
             <TextInput
               value={walletPin}
               onChangeText={setWalletPin}
               secureTextEntry
               keyboardType="numeric"
               maxLength={6}
-              placeholder="Entrez votre code PIN"
+              placeholder="••••••"
               placeholderTextColor={theme.colors.textTertiary}
+              textAlign="center"
               style={{
                 borderWidth: 1,
-                borderColor: theme.colors.border,
+                borderColor: theme.isDark ? theme.colors.neutral[600] : theme.colors.neutral[300],
                 borderRadius: theme.radius.md,
-                paddingHorizontal: theme.spacing.md,
-                paddingVertical: theme.spacing.sm,
-                backgroundColor: theme.isDark ? theme.colors.neutral[800] : theme.colors.surface.light,
+                paddingHorizontal: theme.spacing.lg,
+                paddingVertical: theme.spacing.md,
+                backgroundColor: theme.isDark ? theme.colors.neutral[900] : theme.colors.surface.light,
                 color: theme.colors.text,
-                fontSize: 16,
+                fontSize: 20,
+                fontWeight: '600',
+                letterSpacing: 8,
               }}
             />
           </View>
