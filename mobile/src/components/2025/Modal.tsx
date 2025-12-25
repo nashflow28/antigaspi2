@@ -15,6 +15,8 @@ import {
   ViewStyle,
   Dimensions,
   ScrollView,
+  KeyboardAvoidingView,
+  Platform,
 } from 'react-native'
 import { Ionicons } from '@expo/vector-icons'
 import { useTheme } from '../../theme'
@@ -40,6 +42,7 @@ export interface ModalProps {
   // Behavior
   dismissable?: boolean
   showCloseButton?: boolean
+  avoidKeyboard?: boolean // Pour les modals avec champs de saisie
 
   // Testing
   testID?: string
@@ -65,6 +68,7 @@ export const Modal: React.FC<ModalProps> = ({
   scrollable = true,
   dismissable = true,
   showCloseButton = true,
+  avoidKeyboard = false,
   testID,
   style,
   contentStyle,
@@ -292,6 +296,24 @@ export const Modal: React.FC<ModalProps> = ({
     return <View style={contentPadding}>{children}</View>
   }
 
+  const modalContent = (
+    <>
+      <TouchableOpacity
+        style={StyleSheet.absoluteFill}
+        activeOpacity={1}
+        onPress={dismissable ? onClose : undefined}
+      />
+      <Animated.View
+        style={[contentContainerStyle, getAnimationTransform()]}
+        testID={testID}
+      >
+        {renderHeader()}
+        {renderContent()}
+        {footer && <View style={footerContainerStyle}>{footer}</View>}
+      </Animated.View>
+    </>
+  )
+
   return (
     <RNModal
       visible={visible}
@@ -302,19 +324,16 @@ export const Modal: React.FC<ModalProps> = ({
       accessible={true}
     >
       <Animated.View style={[overlayStyle, { opacity: fadeAnim }]}>
-        <TouchableOpacity
-          style={StyleSheet.absoluteFill}
-          activeOpacity={1}
-          onPress={dismissable ? onClose : undefined}
-        />
-        <Animated.View
-          style={[contentContainerStyle, getAnimationTransform()]}
-          testID={testID}
-        >
-          {renderHeader()}
-          {renderContent()}
-          {footer && <View style={footerContainerStyle}>{footer}</View>}
-        </Animated.View>
+        {avoidKeyboard ? (
+          <KeyboardAvoidingView
+            behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+            style={{ flex: 1, justifyContent: variant === 'bottom' ? 'flex-end' : 'center' }}
+          >
+            {modalContent}
+          </KeyboardAvoidingView>
+        ) : (
+          modalContent
+        )}
       </Animated.View>
     </RNModal>
   )

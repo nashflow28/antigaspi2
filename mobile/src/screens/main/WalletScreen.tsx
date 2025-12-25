@@ -468,6 +468,7 @@ const WalletScreen: React.FC = () => {
         onClose={() => setShowRechargeModal(false)}
         title="Recharger mon portefeuille"
         variant="bottom"
+        avoidKeyboard={true}
         testID="wallet-recharge-modal"
       >
         <View style={styles.modalContent}>
@@ -539,6 +540,7 @@ const WalletScreen: React.FC = () => {
         onClose={() => setShowPinModal(false)}
         title={pinMode === 'update' ? 'Modifier mon code PIN' : 'Configurer un code PIN'}
         variant="bottom"
+        avoidKeyboard={true}
         testID="wallet-pin-modal"
       >
         <View style={styles.modalContent}>
