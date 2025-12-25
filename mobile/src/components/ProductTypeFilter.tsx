@@ -96,7 +96,7 @@ const createStyles = (theme: ReturnType<typeof useTheme>) =>
     },
     segmentedControl: {
       flexDirection: 'row',
-      backgroundColor: theme.colors.neutral[100],
+      backgroundColor: theme.isDark ? theme.colors.neutral[800] : theme.colors.neutral[100],
       borderRadius: theme.radius.lg,
       padding: 4,
     },
@@ -129,10 +129,10 @@ const createStyles = (theme: ReturnType<typeof useTheme>) =>
       color: theme.colors.primary[600],
     },
     segmentTextUnselected: {
-      color: theme.colors.neutral[600],
+      color: theme.isDark ? theme.colors.neutral[400] : theme.colors.neutral[600],
     },
     countBadge: {
-      backgroundColor: theme.colors.neutral[200],
+      backgroundColor: theme.isDark ? theme.colors.neutral[700] : theme.colors.neutral[200],
       borderRadius: 10,
       minWidth: 20,
       height: 20,
@@ -141,14 +141,14 @@ const createStyles = (theme: ReturnType<typeof useTheme>) =>
       paddingHorizontal: 6,
     },
     countBadgeSelected: {
-      backgroundColor: theme.colors.primary[100],
+      backgroundColor: theme.isDark ? theme.colors.primary[900] : theme.colors.primary[100],
     },
     countText: {
       fontSize: 11,
-      color: theme.colors.neutral[600],
+      color: theme.isDark ? theme.colors.neutral[400] : theme.colors.neutral[600],
     },
     countTextSelected: {
-      color: theme.colors.primary[700],
+      color: theme.isDark ? theme.colors.primary[300] : theme.colors.primary[700],
     },
   })
 

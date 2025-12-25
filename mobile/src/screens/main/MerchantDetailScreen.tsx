@@ -776,7 +776,7 @@ const createStyles = (theme: ReturnType<typeof useTheme>) => StyleSheet.create({
   mapPlaceholder: {
     width: '100%',
     height: '100%',
-    backgroundColor: theme.colors.neutral[200],
+    backgroundColor: theme.isDark ? theme.colors.neutral[800] : theme.colors.neutral[200],
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -820,11 +820,13 @@ const createStyles = (theme: ReturnType<typeof useTheme>) => StyleSheet.create({
     alignItems: 'center',
     paddingVertical: theme.spacing.xs,
     paddingHorizontal: theme.spacing.sm,
-    backgroundColor: theme.withOpacity(theme.colors.surface.dark, 0.85),
+    backgroundColor: theme.isDark
+      ? theme.withOpacity(theme.colors.neutral[700], 0.95)
+      : theme.withOpacity(theme.colors.surface.dark, 0.85),
     borderRadius: theme.radius.lg,
   },
   merchantCard: {
-    backgroundColor: theme.colors.surface.light,
+    backgroundColor: theme.isDark ? theme.colors.neutral[800] : theme.colors.surface.light,
     marginHorizontal: theme.spacing.lg,
     marginTop: -30,
     borderRadius: theme.radius.xl,
@@ -840,7 +842,7 @@ const createStyles = (theme: ReturnType<typeof useTheme>) => StyleSheet.create({
     width: 64,
     height: 64,
     borderRadius: 32,
-    backgroundColor: theme.colors.primary[100],
+    backgroundColor: theme.isDark ? theme.colors.primary[900] : theme.colors.primary[100],
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: theme.spacing.md,
@@ -859,7 +861,7 @@ const createStyles = (theme: ReturnType<typeof useTheme>) => StyleSheet.create({
   pill: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: theme.colors.neutral[100],
+    backgroundColor: theme.isDark ? theme.colors.neutral[700] : theme.colors.neutral[100],
     paddingHorizontal: theme.spacing.md,
     paddingVertical: theme.spacing.sm,
     borderRadius: theme.radius.full,
@@ -903,7 +905,7 @@ const createStyles = (theme: ReturnType<typeof useTheme>) => StyleSheet.create({
   addressCard: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: theme.colors.surface.light,
+    backgroundColor: theme.isDark ? theme.colors.neutral[800] : theme.colors.surface.light,
     padding: theme.spacing.md,
     borderRadius: theme.radius.xl,
     gap: theme.spacing.md,
@@ -915,7 +917,7 @@ const createStyles = (theme: ReturnType<typeof useTheme>) => StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: theme.colors.primary[100],
+    backgroundColor: theme.isDark ? theme.colors.primary[900] : theme.colors.primary[100],
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -928,7 +930,7 @@ const createStyles = (theme: ReturnType<typeof useTheme>) => StyleSheet.create({
   },
   paymentCard: {
     flex: 1,
-    backgroundColor: theme.colors.surface.light,
+    backgroundColor: theme.isDark ? theme.colors.neutral[800] : theme.colors.surface.light,
     padding: theme.spacing.md,
     borderRadius: theme.radius.xl,
     alignItems: 'center',
@@ -940,11 +942,11 @@ const createStyles = (theme: ReturnType<typeof useTheme>) => StyleSheet.create({
     gap: theme.spacing.sm,
     borderTopWidth: 1,
     borderTopColor: theme.colors.border,
-    backgroundColor: theme.colors.surface.light,
+    backgroundColor: theme.isDark ? theme.colors.neutral[900] : theme.colors.surface.light,
   },
   tabsContainer: {
     flexDirection: 'row',
-    backgroundColor: theme.colors.surface.light,
+    backgroundColor: theme.isDark ? theme.colors.neutral[800] : theme.colors.surface.light,
     marginHorizontal: theme.spacing.lg,
     marginTop: theme.spacing.lg,
     borderRadius: theme.radius.xl,
@@ -972,7 +974,7 @@ const createStyles = (theme: ReturnType<typeof useTheme>) => StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     padding: theme.spacing.md,
-    backgroundColor: theme.colors.surface.light,
+    backgroundColor: theme.isDark ? theme.colors.neutral[800] : theme.colors.surface.light,
     borderRadius: theme.radius.lg,
   },
   reviewAvatar: {

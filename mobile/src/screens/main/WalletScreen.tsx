@@ -383,7 +383,7 @@ const WalletScreen: React.FC = () => {
             onChangeText={setCustomDailyLimit}
             keyboardType="numeric"
             placeholder="Ex: 10000"
-            style={[styles.input, { borderColor: theme.colors.border }]}
+            style={[styles.input, { borderColor: theme.colors.border, backgroundColor: theme.isDark ? theme.colors.neutral[800] : theme.colors.surface.light, color: theme.colors.text }]}
           />
           <Button
             size="sm"
@@ -405,8 +405,12 @@ const WalletScreen: React.FC = () => {
             key={value}
             style={[
               styles.filterChip,
+              {
+                backgroundColor: theme.isDark ? theme.colors.neutral[800] : theme.colors.surface.light,
+                borderColor: theme.colors.border,
+              },
               value === filter && {
-                backgroundColor: theme.colors.primary[50],
+                backgroundColor: theme.isDark ? theme.colors.primary[900] : theme.colors.primary[50],
                 borderColor: theme.colors.primary[400],
               },
             ]}
@@ -476,7 +480,7 @@ const WalletScreen: React.FC = () => {
             onChangeText={setRechargeAmount}
             placeholder="Ex: 5000"
             keyboardType="numeric"
-            style={[styles.input, { borderColor: theme.colors.border }]}
+            style={[styles.input, { borderColor: theme.colors.border, backgroundColor: theme.isDark ? theme.colors.neutral[800] : theme.colors.surface.light, color: theme.colors.text }]}
           />
           <Typography variant="caption" style={styles.modalSectionTitle}>
             Moyen de paiement
@@ -491,7 +495,9 @@ const WalletScreen: React.FC = () => {
                     styles.methodItem,
                     {
                       borderColor: isSelected ? theme.colors.primary[500] : theme.colors.border,
-                      backgroundColor: isSelected ? theme.colors.primary[50] : theme.colors.surface.light,
+                      backgroundColor: isSelected
+                        ? (theme.isDark ? theme.colors.primary[900] : theme.colors.primary[50])
+                        : (theme.isDark ? theme.colors.neutral[800] : theme.colors.surface.light),
                     },
                   ]}
                   onPress={() => setSelectedMethod(method.id)}
@@ -516,7 +522,7 @@ const WalletScreen: React.FC = () => {
             onChangeText={setRechargePhone}
             placeholder="Ex: 90 12 34 56"
             keyboardType="phone-pad"
-            style={[styles.input, { borderColor: theme.colors.border }]}
+            style={[styles.input, { borderColor: theme.colors.border, backgroundColor: theme.isDark ? theme.colors.neutral[800] : theme.colors.surface.light, color: theme.colors.text }]}
           />
           <Button
             variant="primary"
@@ -544,7 +550,7 @@ const WalletScreen: React.FC = () => {
                 onChangeText={setCurrentPin}
                 secureTextEntry
                 keyboardType="numeric"
-                style={[styles.input, { borderColor: theme.colors.border }]}
+                style={[styles.input, { borderColor: theme.colors.border, backgroundColor: theme.isDark ? theme.colors.neutral[800] : theme.colors.surface.light, color: theme.colors.text }]}
               />
             </>
           )}
@@ -554,7 +560,7 @@ const WalletScreen: React.FC = () => {
             onChangeText={setNewPin}
             secureTextEntry
             keyboardType="numeric"
-            style={[styles.input, { borderColor: theme.colors.border }]}
+            style={[styles.input, { borderColor: theme.colors.border, backgroundColor: theme.isDark ? theme.colors.neutral[800] : theme.colors.surface.light, color: theme.colors.text }]}
           />
           <Typography variant="caption">Confirmation</Typography>
           <TextInput
@@ -562,7 +568,7 @@ const WalletScreen: React.FC = () => {
             onChangeText={setConfirmPin}
             secureTextEntry
             keyboardType="numeric"
-            style={[styles.input, { borderColor: theme.colors.border }]}
+            style={[styles.input, { borderColor: theme.colors.border, backgroundColor: theme.isDark ? theme.colors.neutral[800] : theme.colors.surface.light, color: theme.colors.text }]}
           />
           <Button
             variant="primary"

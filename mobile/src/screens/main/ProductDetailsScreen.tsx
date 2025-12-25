@@ -551,7 +551,9 @@ const ProductDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
                       styles.paymentOption,
                       {
                         borderColor: isSelected ? theme.colors.primary[500] : theme.colors.borderLight,
-                        backgroundColor: isSelected ? theme.colors.primary[50] : theme.colors.surface.light,
+                        backgroundColor: isSelected
+                          ? (theme.isDark ? theme.colors.primary[900] : theme.colors.primary[50])
+                          : (theme.isDark ? theme.colors.neutral[800] : theme.colors.surface.light),
                       },
                     ]}
                     activeOpacity={0.85}
@@ -1063,7 +1065,7 @@ const createStyles = (theme: ReturnType<typeof useTheme>) => StyleSheet.create({
     marginTop: 16,
     marginBottom: 16,
     padding: 16,
-    backgroundColor: theme.colors.surface.light,
+    backgroundColor: theme.isDark ? theme.colors.neutral[800] : theme.colors.surface.light,
     borderRadius: 12,
     ...theme.shadows.sm,
   },
@@ -1078,13 +1080,13 @@ const createStyles = (theme: ReturnType<typeof useTheme>) => StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: theme.colors.primary[50],
+    backgroundColor: theme.isDark ? theme.colors.neutral[700] : theme.colors.primary[50],
     alignItems: 'center',
     justifyContent: 'center',
     ...theme.shadows.sm,
   },
   quantityButtonDisabled: {
-    backgroundColor: theme.colors.neutral[100],
+    backgroundColor: theme.isDark ? theme.colors.neutral[800] : theme.colors.neutral[100],
     opacity: 0.5,
   },
   paymentMethodSection: {
@@ -1110,7 +1112,7 @@ const createStyles = (theme: ReturnType<typeof useTheme>) => StyleSheet.create({
     marginBottom: 16,
     padding: 16,
     borderRadius: 12,
-    backgroundColor: theme.colors.surface.light,
+    backgroundColor: theme.isDark ? theme.colors.neutral[800] : theme.colors.surface.light,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
@@ -1120,7 +1122,7 @@ const createStyles = (theme: ReturnType<typeof useTheme>) => StyleSheet.create({
   modalProductPreview: {
     flexDirection: 'row',
     padding: 12,
-    backgroundColor: theme.colors.surface.light,
+    backgroundColor: theme.isDark ? theme.colors.neutral[800] : theme.colors.surface.light,
     borderRadius: 12,
     marginBottom: 16,
     gap: 12,
@@ -1136,7 +1138,7 @@ const createStyles = (theme: ReturnType<typeof useTheme>) => StyleSheet.create({
   },
   modalQuantitySection: {
     padding: 16,
-    backgroundColor: theme.colors.surface.light,
+    backgroundColor: theme.isDark ? theme.colors.neutral[800] : theme.colors.surface.light,
     borderRadius: 12,
     marginBottom: 16,
   },
@@ -1150,13 +1152,13 @@ const createStyles = (theme: ReturnType<typeof useTheme>) => StyleSheet.create({
     width: 48,
     height: 48,
     borderRadius: 24,
-    backgroundColor: theme.colors.primary[50],
+    backgroundColor: theme.isDark ? theme.colors.neutral[700] : theme.colors.primary[50],
     alignItems: 'center',
     justifyContent: 'center',
     ...theme.shadows.sm,
   },
   modalQuantityButtonDisabled: {
-    backgroundColor: theme.colors.neutral[100],
+    backgroundColor: theme.isDark ? theme.colors.neutral[800] : theme.colors.neutral[100],
     opacity: 0.5,
   },
   modalQuantityValue: {
@@ -1169,13 +1171,13 @@ const createStyles = (theme: ReturnType<typeof useTheme>) => StyleSheet.create({
     gap: 8,
     paddingVertical: 12,
     paddingHorizontal: 16,
-    backgroundColor: theme.colors.primary[50],
+    backgroundColor: theme.isDark ? theme.colors.primary[900] : theme.colors.primary[50],
     borderRadius: 8,
     marginBottom: 16,
   },
   modalTotalSection: {
     padding: 16,
-    backgroundColor: theme.colors.surface.light,
+    backgroundColor: theme.isDark ? theme.colors.neutral[800] : theme.colors.surface.light,
     borderRadius: 12,
     marginBottom: 16,
   },
