@@ -199,6 +199,9 @@ class Reservation extends Model
     public function cancel(): bool
     {
         if ($this->canBeCancelled()) {
+            // 🐛 BUG FIX: Refund wallet payment if applicable
+            $this->refundWalletPaymentIfApplicable();
+
             $this->update([
                 'status' => 'cancelled',
                 'cancelled_at' => now(),
@@ -208,6 +211,51 @@ class Reservation extends Model
             return true;
         }
         return false;
+    }
+
+    /**
+     * Refund wallet payment if the reservation was paid via wallet
+     */
+    protected function refundWalletPaymentIfApplicable(): void
+    {
+        try {
+            // Get the latest successful wallet payment for this reservation
+            $walletPayment = $this->payments()
+                ->where('payment_method', 'wallet')
+                ->where('status', PaymentStatus::SUCCESS)
+                ->latest()
+                ->first();
+
+            if (!$walletPayment) {
+                return; // No wallet payment to refund
+            }
+
+            $user = $this->user;
+            if (!$user) {
+                \Log::warning('Cannot refund wallet: user not found', ['reservation_id' => $this->id]);
+                return;
+            }
+
+            // Use WalletService to refund
+            $walletService = app(\App\Services\WalletService::class);
+            $refundAmount = (float) $walletPayment->amount;
+            $description = "Remboursement réservation #{$this->reservation_code}";
+
+            $walletService->rechargeWallet($user, $refundAmount, $description);
+
+            \Log::info('Wallet refund processed', [
+                'reservation_id' => $this->id,
+                'user_id' => $user->id,
+                'amount' => $refundAmount,
+                'payment_id' => $walletPayment->id,
+            ]);
+        } catch (\Exception $e) {
+            // Log error but don't block cancellation
+            \Log::error('Wallet refund failed', [
+                'reservation_id' => $this->id,
+                'error' => $e->getMessage(),
+            ]);
+        }
     }
 
     public function markPaymentStatus(PaymentStatus $status): void
