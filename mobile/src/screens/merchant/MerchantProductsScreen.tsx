@@ -419,13 +419,19 @@ const MerchantProductsScreen: React.FC<Props> = ({ navigation }) => {
               <View
                 style={[
                   styles.filterChipCount,
-                  { backgroundColor: isActiveFilter ? theme.colors.primary[500] : theme.colors.neutral[200] },
+                  { backgroundColor: isActiveFilter
+                      ? theme.colors.primary[500]
+                      : (theme.isDark ? theme.colors.neutral[600] : theme.colors.neutral[200])
+                  },
                 ]}
               >
                 <Text
                   style={[
                     styles.filterChipCountText,
-                    { color: isActiveFilter ? 'white' : theme.colors.text },
+                    { color: isActiveFilter
+                        ? 'white'
+                        : (theme.isDark ? theme.colors.neutral[200] : theme.colors.neutral[700])
+                    },
                   ]}
                 >
                   {filter.count}
