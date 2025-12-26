@@ -323,7 +323,13 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
     return (
       <TouchableOpacity
         key={product.id}
-        onPress={() => navigation.navigate('ProductDetails', { productId: product.id })}
+        onPress={() => {
+          if (product.is_surprise_basket) {
+            navigation.navigate('SurpriseBasketDetails', { basketId: product.id })
+          } else {
+            navigation.navigate('ProductDetails', { productId: product.id })
+          }
+        }}
         testID={typeof index === 'number' ? TEST_IDS.productCard(index) : undefined}
         accessibilityLabel={typeof index === 'number' ? TEST_IDS.productCard(index) : undefined}
       >

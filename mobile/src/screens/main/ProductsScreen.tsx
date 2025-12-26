@@ -765,7 +765,13 @@ const ProductsScreen: React.FC<Props> = ({ navigation }) => {
     return (
       <TouchableOpacity
         style={styles.productCard}
-        onPress={() => navigation.navigate('ProductDetails', { productId: product.id })}
+        onPress={() => {
+          if (product.is_surprise_basket) {
+            navigation.navigate('SurpriseBasketDetails', { basketId: product.id })
+          } else {
+            navigation.navigate('ProductDetails', { productId: product.id })
+          }
+        }}
       >
         <Card variant="elevated" style={{ overflow: 'hidden' }}>
           {/* Image Container */}

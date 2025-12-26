@@ -71,8 +71,8 @@ const SurpriseBasketsScreen: React.FC<Props> = ({ navigation }) => {
   const goToDetails = useCallback(
     (basket: SurpriseBasket) => {
       dispatch(setSelectedBasket(basket))
-      // 🐛 BUG FIX #65: Navigate to ProductDetails instead of non-existent SurpriseBasketDetails
-      navigation.navigate('ProductDetails', { productId: basket.id })
+      // Navigate to dedicated SurpriseBasketDetails screen
+      navigation.navigate('SurpriseBasketDetails', { basketId: basket.id })
     },
     [dispatch, navigation]
   )

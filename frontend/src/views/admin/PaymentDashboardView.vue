@@ -227,7 +227,7 @@ import {
   StatCardGrid,
   DashboardFilterBar,
   DataTableCard
-} from '@/components/ui/dashboard'
+} from '@/components/dashboard/2025'
 import type { DataTableColumn } from '@/types'
 
 // Types

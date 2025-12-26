@@ -28,6 +28,7 @@ import WalletScreen from '../screens/main/WalletScreen'
 import MerchantMessagingScreen from '../screens/main/MerchantMessagingScreen'
 import { TEST_IDS } from '../utils/testIds'
 import LoyaltyScreen from '../screens/main/LoyaltyScreen'
+import SurpriseBasketDetailsScreen from '../screens/main/SurpriseBasketDetailsScreen'
 
 const Tab = createBottomTabNavigator()
 const Stack = createNativeStackNavigator()
@@ -37,6 +38,7 @@ const HomeStack = () => (
   <Stack.Navigator screenOptions={{ headerShown: false }}>
     <Stack.Screen name="HomeMain" component={HomeScreen} />
     <Stack.Screen name="ProductDetails" component={ProductDetailsScreen} />
+    <Stack.Screen name="SurpriseBasketDetails" component={SurpriseBasketDetailsScreen} />
     <Stack.Screen name="ReservationDetails" component={ReservationDetailsScreen} />
     <Stack.Screen name="MerchantDetail" component={MerchantDetailScreen} />
     <Stack.Screen name="ReviewsList" component={ReviewsListScreen} />
@@ -50,6 +52,7 @@ const ProductsStack = () => (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
       <Stack.Screen name="ProductsMain" component={ProductsScreen} />
       <Stack.Screen name="ProductDetails" component={ProductDetailsScreen} />
+      <Stack.Screen name="SurpriseBasketDetails" component={SurpriseBasketDetailsScreen} />
       <Stack.Screen name="ReservationDetails" component={ReservationDetailsScreen} />
       <Stack.Screen name="MerchantDetail" component={MerchantDetailScreen} />
       <Stack.Screen name="ReviewsList" component={ReviewsListScreen} />
@@ -63,6 +66,7 @@ const FavoritesStack = () => (
   <Stack.Navigator screenOptions={{ headerShown: false }}>
     <Stack.Screen name="FavoritesMain" component={FavoritesScreen} />
     <Stack.Screen name="ProductDetails" component={ProductDetailsScreen} />
+    <Stack.Screen name="SurpriseBasketDetails" component={SurpriseBasketDetailsScreen} />
     <Stack.Screen name="ReservationDetails" component={ReservationDetailsScreen} />
     <Stack.Screen name="MerchantDetail" component={MerchantDetailScreen} />
     <Stack.Screen name="ReviewsList" component={ReviewsListScreen} />

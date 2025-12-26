@@ -388,17 +388,22 @@ const router = createRouter({
       component: () => import('@/views/admin/ProductsView.vue'),
       meta: { requiresAuth: true, roles: ['admin'] }
     },
-    // TODO: Fix PaymentDashboardView - missing dashboard components
-    // {
-    //   path: '/admin/payments',
-    //   name: 'admin-payments',
-    //   component: () => import('@/views/admin/PaymentDashboardView.vue'),
-    //   meta: { requiresAuth: true, roles: ['admin'] }
-    // },
+    {
+      path: '/admin/payments',
+      name: 'admin-payments',
+      component: () => import('@/views/admin/PaymentDashboardView.vue'),
+      meta: { requiresAuth: true, roles: ['admin'] }
+    },
     {
       path: '/admin/settings',
       name: 'admin-settings',
       component: () => import('@/views/admin/SystemSettingsView.vue'),
+      meta: { requiresAuth: true, roles: ['admin'] }
+    },
+    {
+      path: '/admin/audit',
+      name: 'admin-audit',
+      component: () => import('@/views/admin/AuditLogView.vue'),
       meta: { requiresAuth: true, roles: ['admin'] }
     },
     {
