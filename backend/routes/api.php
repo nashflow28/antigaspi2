@@ -21,6 +21,8 @@ use App\Http\Controllers\Api\InventoryController;
 use App\Http\Controllers\Api\SearchController;
 use App\Http\Controllers\Api\FirebaseAuthController;
 use App\Http\Controllers\Api\OtpController;
+use App\Http\Controllers\Api\RewardController;
+use App\Http\Controllers\Api\GeocodingController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\WalletController;
 
@@ -391,12 +393,29 @@ Route::prefix('admin')->middleware(['jwt.auth', 'can:admin', 'throttle:admin'])-
 // Routes des points de fidélité (protégées)
 Route::prefix('loyalty')->middleware('jwt.auth')->group(function () {
     Route::get('/my-points', [\App\Http\Controllers\Api\LoyaltyPointController::class, 'getUserPoints']); // Mes points
+    Route::get('/tier', [\App\Http\Controllers\Api\LoyaltyPointController::class, 'getTierInfo']); // Mon niveau de fidélité
     Route::post('/redeem', [\App\Http\Controllers\Api\LoyaltyPointController::class, 'redeemPoints']); // Échanger des points
     Route::get('/referral', [\App\Http\Controllers\Api\LoyaltyPointController::class, 'getReferralInfo']); // Code parrainage
 });
 
 // Route publique pour valider un code de parrainage (avant inscription)
 Route::post('/referral/validate', [\App\Http\Controllers\Api\LoyaltyPointController::class, 'validateReferralCode']);
+
+// Routes des récompenses (protégées)
+Route::prefix('rewards')->middleware('jwt.auth')->group(function () {
+    Route::get('/', [RewardController::class, 'index']); // Catalogue des récompenses
+    Route::get('/featured', [RewardController::class, 'featured']); // Récompenses en vedette
+    Route::get('/my-redemptions', [RewardController::class, 'myRedemptions']); // Mes échanges
+    Route::get('/redemptions/{redemption}', [RewardController::class, 'showRedemption']); // Détail d'un échange
+    Route::get('/{reward}', [RewardController::class, 'show']); // Détail d'une récompense
+    Route::post('/{reward}/redeem', [RewardController::class, 'redeem']); // Échanger une récompense
+
+    // Routes commerçant/admin
+    Route::post('/', [RewardController::class, 'store']); // Créer une récompense
+    Route::put('/{reward}', [RewardController::class, 'update']); // Modifier une récompense
+    Route::delete('/{reward}', [RewardController::class, 'destroy']); // Supprimer une récompense
+    Route::post('/use-code/{code}', [RewardController::class, 'useRedemption']); // Valider un code de récompense
+});
 
 // Routes de messagerie (protégées)
 Route::prefix('messaging')->middleware('jwt.auth')->group(function () {
@@ -417,6 +436,13 @@ Route::prefix('orders')->middleware('jwt.auth')->group(function () {
     Route::post('/', [\App\Http\Controllers\Api\OrderController::class, 'store']);
     Route::get('/{id}', [\App\Http\Controllers\Api\OrderController::class, 'show']);
     Route::post('/{id}/cancel', [\App\Http\Controllers\Api\OrderController::class, 'cancel']);
+});
+
+// Routes de géocodage
+Route::prefix('geocoding')->middleware('throttle:30,1')->group(function () {
+    Route::get('/search', [GeocodingController::class, 'searchAddresses']); // Recherche d'adresses
+    Route::post('/geocode', [GeocodingController::class, 'geocode']); // Adresse vers coordonnées
+    Route::post('/reverse', [GeocodingController::class, 'reverseGeocode']); // Coordonnées vers adresse
 });
 
 // Routes de test et informations

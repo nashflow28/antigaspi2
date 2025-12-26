@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\LoyaltyPoint;
 use App\Models\User;
+use App\Services\LoyaltyTierService;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Validator;
@@ -12,6 +13,13 @@ use Illuminate\Support\Facades\DB;
 
 class LoyaltyPointController extends Controller
 {
+    protected LoyaltyTierService $tierService;
+
+    public function __construct(LoyaltyTierService $tierService)
+    {
+        $this->tierService = $tierService;
+    }
+
     /**
      * Get user's loyalty points summary
      */
@@ -45,13 +53,17 @@ class LoyaltyPointController extends Controller
                 ->where('expires_at', '<=', now()->addDays(30))
                 ->sum('points');
 
+            // Get tier info
+            $tierInfo = $this->tierService->getTierInfo($user);
+
             return response()->json([
                 'success' => true,
                 'data' => [
                     'total_points' => $totalPoints,
                     'expiring_soon' => $expiringPoints,
                     'breakdown' => $pointsBreakdown,
-                    'recent_history' => $recentHistory
+                    'recent_history' => $recentHistory,
+                    'tier' => $tierInfo,
                 ]
             ]);
 
@@ -59,6 +71,27 @@ class LoyaltyPointController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur lors de la récupération des points'
+            ], 500);
+        }
+    }
+
+    /**
+     * Get user's loyalty tier information
+     */
+    public function getTierInfo(Request $request): JsonResponse
+    {
+        try {
+            $user = $request->user();
+            $tierInfo = $this->tierService->getTierInfo($user);
+
+            return response()->json([
+                'success' => true,
+                'data' => $tierInfo,
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Erreur lors de la récupération des informations de niveau'
             ], 500);
         }
     }
@@ -349,18 +382,33 @@ class LoyaltyPointController extends Controller
      */
     public function awardPurchasePoints($userId, $reservationId, $amount): void
     {
-        // Award 1 point per 100 XOF spent (configurable)
-        $points = intval($amount / 100);
+        $user = User::find($userId);
+        if (!$user) return;
 
-        if ($points > 0) {
+        // Award 1 point per 100 XOF spent (configurable)
+        $basePoints = intval($amount / 100);
+
+        if ($basePoints > 0) {
+            // Apply tier bonus multiplier
+            $finalPoints = $this->tierService->calculatePointsWithBonus($user, $basePoints);
+            $multiplier = $this->tierService->getPointsMultiplier($user);
+
+            $description = "Points gagnés pour achat de {$amount} XOF";
+            if ($multiplier > 1) {
+                $description .= " (x{$multiplier} bonus niveau)";
+            }
+
             LoyaltyPoint::create([
                 'user_id' => $userId,
-                'points' => $points,
+                'points' => $finalPoints,
                 'earned_from' => 'purchase',
                 'reference_id' => $reservationId,
-                'description' => "Points gagnés pour achat de {$amount} XOF",
+                'description' => $description,
                 'expires_at' => now()->addYear(),
             ]);
+
+            // Update lifetime points and check tier progression
+            $this->tierService->addLifetimePoints($user, $finalPoints);
         }
     }
 

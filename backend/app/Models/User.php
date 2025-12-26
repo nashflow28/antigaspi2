@@ -35,6 +35,9 @@ class User extends Authenticatable implements JWTSubject
         'referral_code',
         'referred_by',
         'referral_bonus_awarded',
+        'loyalty_tier',
+        'lifetime_points',
+        'tier_updated_at',
     ];
 
     protected $hidden = [
@@ -55,6 +58,8 @@ class User extends Authenticatable implements JWTSubject
             'prefers_push_notifications' => 'boolean',
             'notification_settings' => 'array',
             'referral_bonus_awarded' => 'boolean',
+            'lifetime_points' => 'integer',
+            'tier_updated_at' => 'datetime',
         ];
     }
 
@@ -144,6 +149,11 @@ class User extends Authenticatable implements JWTSubject
     public function loyaltyPoints(): HasMany
     {
         return $this->hasMany(LoyaltyPoint::class);
+    }
+
+    public function rewardRedemptions(): HasMany
+    {
+        return $this->hasMany(RewardRedemption::class);
     }
 
     public function notifications(): HasMany
