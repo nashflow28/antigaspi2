@@ -378,4 +378,136 @@ class LoyaltyPointController extends Controller
             'expires_at' => now()->addYear(),
         ]);
     }
+
+    /**
+     * Get user's referral code and stats
+     */
+    public function getReferralInfo(Request $request): JsonResponse
+    {
+        try {
+            $user = $request->user();
+
+            // Count successful referrals (users who completed at least one purchase)
+            $successfulReferrals = User::where('referred_by', $user->id)
+                ->whereHas('reservations', function ($query) {
+                    $query->where('status', 'completed');
+                })
+                ->count();
+
+            // Total referrals (all users who signed up with this code)
+            $totalReferrals = User::where('referred_by', $user->id)->count();
+
+            // Total points earned from referrals
+            $referralPoints = LoyaltyPoint::where('user_id', $user->id)
+                ->where('earned_from', 'referral')
+                ->sum('points');
+
+            return response()->json([
+                'success' => true,
+                'data' => [
+                    'referral_code' => $user->referral_code,
+                    'referral_link' => config('app.frontend_url', 'https://antigaspi.jubtek.com') . '/register?ref=' . $user->referral_code,
+                    'total_referrals' => $totalReferrals,
+                    'successful_referrals' => $successfulReferrals,
+                    'points_earned' => (int) $referralPoints,
+                    'points_per_referral' => 50, // Display bonus amount
+                ],
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Erreur lors de la récupération des informations de parrainage',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Validate a referral code (used during registration)
+     */
+    public function validateReferralCode(Request $request): JsonResponse
+    {
+        $validator = Validator::make($request->all(), [
+            'code' => 'required|string|size:8',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Code de parrainage invalide',
+                'errors' => $validator->errors()
+            ], 422);
+        }
+
+        $referrer = User::where('referral_code', strtoupper($request->code))
+            ->where('is_active', true)
+            ->first();
+
+        if (!$referrer) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Code de parrainage introuvable ou inactif',
+                'valid' => false
+            ]);
+        }
+
+        return response()->json([
+            'success' => true,
+            'valid' => true,
+            'data' => [
+                'referrer_name' => $referrer->first_name,
+                'bonus_points' => 50, // Bonus for new user
+            ],
+        ]);
+    }
+
+    /**
+     * Award referral bonus when referred user completes first purchase
+     * Called automatically when a reservation is completed
+     */
+    public function awardReferralBonus($userId): void
+    {
+        $user = User::find($userId);
+
+        if (!$user || !$user->referred_by || $user->referral_bonus_awarded) {
+            return; // No referrer or bonus already awarded
+        }
+
+        // Check if this is the user's first completed reservation
+        $completedReservationsCount = $user->reservations()
+            ->where('status', 'completed')
+            ->count();
+
+        if ($completedReservationsCount !== 1) {
+            return; // Not the first purchase
+        }
+
+        // Award bonus to referrer
+        LoyaltyPoint::create([
+            'user_id' => $user->referred_by,
+            'points' => 50, // Referrer gets 50 points
+            'earned_from' => 'referral',
+            'reference_id' => $user->id,
+            'description' => "Bonus parrainage - {$user->first_name} a effectué son premier achat",
+            'expires_at' => now()->addYear(),
+        ]);
+
+        // Award welcome bonus to new user
+        LoyaltyPoint::create([
+            'user_id' => $user->id,
+            'points' => 25, // New user gets 25 points welcome bonus
+            'earned_from' => 'referral',
+            'reference_id' => $user->referred_by,
+            'description' => 'Bonus de bienvenue pour premier achat (parrainage)',
+            'expires_at' => now()->addYear(),
+        ]);
+
+        // Mark bonus as awarded
+        $user->update(['referral_bonus_awarded' => true]);
+
+        \Log::info('Referral bonus awarded', [
+            'new_user_id' => $user->id,
+            'referrer_id' => $user->referred_by,
+        ]);
+    }
 }

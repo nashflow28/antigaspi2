@@ -32,6 +32,9 @@ class User extends Authenticatable implements JWTSubject
         'notification_settings',
         'firebase_uid',
         'phone_verified_at',
+        'referral_code',
+        'referred_by',
+        'referral_bonus_awarded',
     ];
 
     protected $hidden = [
@@ -51,7 +54,51 @@ class User extends Authenticatable implements JWTSubject
             'prefers_sms_notifications' => 'boolean',
             'prefers_push_notifications' => 'boolean',
             'notification_settings' => 'array',
+            'referral_bonus_awarded' => 'boolean',
         ];
+    }
+
+    /**
+     * Boot method to generate referral code on user creation
+     */
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($user) {
+            if (empty($user->referral_code)) {
+                $user->referral_code = self::generateUniqueReferralCode();
+            }
+        });
+    }
+
+    /**
+     * Generate a unique referral code
+     */
+    public static function generateUniqueReferralCode(): string
+    {
+        do {
+            // Generate 8-character alphanumeric code
+            $code = strtoupper(substr(md5(uniqid()), 0, 8));
+        } while (self::where('referral_code', $code)->exists());
+
+        return $code;
+    }
+
+    /**
+     * Get the user who referred this user
+     */
+    public function referrer(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(User::class, 'referred_by');
+    }
+
+    /**
+     * Get users referred by this user
+     */
+    public function referrals(): HasMany
+    {
+        return $this->hasMany(User::class, 'referred_by');
     }
 
     /**

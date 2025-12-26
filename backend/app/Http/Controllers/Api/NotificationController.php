@@ -75,6 +75,25 @@ class NotificationController extends Controller
         ]);
     }
 
+    /**
+     * Get unread notification count for badge
+     */
+    public function getBadgeCount(Request $request): JsonResponse
+    {
+        $user = $request->user();
+
+        $count = NotificationModel::where('user_id', $user->id)
+            ->where('is_read', false)
+            ->count();
+
+        return response()->json([
+            'success' => true,
+            'data' => [
+                'count' => $count,
+            ],
+        ]);
+    }
+
     public function subscribe(Request $request): JsonResponse
     {
         $data = $request->validate([

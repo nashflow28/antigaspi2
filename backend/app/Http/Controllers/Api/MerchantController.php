@@ -59,6 +59,30 @@ class MerchantController extends Controller
                 $query->having('products_count', '>', 0);
             }
 
+            // Distance-based filtering and sorting
+            $userLat = $request->filled('latitude') ? (float) $request->input('latitude') : null;
+            $userLng = $request->filled('longitude') ? (float) $request->input('longitude') : null;
+            $radius = $request->filled('radius') ? (float) $request->input('radius') : null;
+
+            if ($userLat !== null && $userLng !== null) {
+                // Add distance calculation using Haversine formula
+                $query->selectRaw("
+                    merchants.*,
+                    (6371 * acos(cos(radians(?))
+                        * cos(radians(latitude))
+                        * cos(radians(longitude) - radians(?))
+                        + sin(radians(?))
+                        * sin(radians(latitude)))) AS distance_km
+                ", [$userLat, $userLng, $userLat])
+                ->whereNotNull('latitude')
+                ->whereNotNull('longitude');
+
+                // Filter by radius if provided
+                if ($radius !== null && $radius > 0) {
+                    $query->having('distance_km', '<=', $radius);
+                }
+            }
+
             $sortBy = $request->get('sort_by', 'recent');
             switch ($sortBy) {
                 case 'products':
@@ -70,6 +94,13 @@ class MerchantController extends Controller
                 case 'rating':
                     $query->orderByDesc('average_rating');
                     break;
+                case 'distance':
+                    if ($userLat !== null && $userLng !== null) {
+                        $query->orderBy('distance_km');
+                    } else {
+                        $query->orderByDesc('created_at');
+                    }
+                    break;
                 default:
                     $query->orderByDesc('created_at');
                     break;
@@ -79,7 +110,7 @@ class MerchantController extends Controller
             $merchants = $query->paginate($perPage);
 
             $data = $merchants->getCollection()->transform(function ($merchant) {
-                return [
+                $result = [
                     'id' => $merchant->id,
                     'business_name' => $merchant->business_name,
                     'business_type' => $merchant->business_type,
@@ -98,6 +129,13 @@ class MerchantController extends Controller
                         'photo_url' => optional($merchant->user)->photo_url,
                     ],
                 ];
+
+                // Add distance if calculated
+                if (isset($merchant->distance_km)) {
+                    $result['distance_km'] = round((float) $merchant->distance_km, 2);
+                }
+
+                return $result;
             });
 
             return response()->json([

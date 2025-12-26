@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Enums\PaymentMethod;
 use App\Enums\PaymentStatus;
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\Api\LoyaltyPointController;
 use App\Http\Requests\StoreReservationRequest;
 use App\Http\Resources\PaymentResource;
 use App\Http\Resources\ReservationResource;
@@ -532,6 +533,30 @@ class ReservationController extends Controller
             if ($reservation->complete()) {
                 $reservation->markPaymentStatus(PaymentStatus::SUCCESS);
                 $reservation->product->merchant->increment('total_sales', $reservation->total_amount);
+
+                // Auto-award loyalty points for purchase (non-blocking)
+                try {
+                    $loyaltyController = app(LoyaltyPointController::class);
+                    $loyaltyController->awardPurchasePoints(
+                        $reservation->user_id,
+                        $reservation->id,
+                        $reservation->total_amount
+                    );
+
+                    // Award referral bonus if applicable (first purchase by referred user)
+                    $loyaltyController->awardReferralBonus($reservation->user_id);
+
+                    \Log::info('Loyalty points awarded for reservation', [
+                        'reservation_id' => $reservation->id,
+                        'user_id' => $reservation->user_id,
+                        'amount' => $reservation->total_amount
+                    ]);
+                } catch (\Exception $e) {
+                    \Log::warning('Loyalty points award failed but completion succeeded', [
+                        'reservation_id' => $reservation->id,
+                        'error' => $e->getMessage()
+                    ]);
+                }
 
                 $reservation->refresh()->load(['product.category', 'product.merchant.user', 'user']);
 

@@ -230,6 +230,7 @@ Route::prefix('wallet')->middleware('jwt.auth')->group(function () {
 // Routes des notifications
 Route::prefix('notifications')->middleware('jwt.auth')->group(function () {
     Route::get('/', [NotificationController::class, 'index']);
+    Route::get('/badge', [NotificationController::class, 'getBadgeCount']);
     Route::post('/{notification}/read', [NotificationController::class, 'markAsRead'])->whereNumber('notification');
     Route::post('/read-all', [NotificationController::class, 'markAllAsRead']);
     Route::post('/register', [NotificationController::class, 'register']);
@@ -391,7 +392,11 @@ Route::prefix('admin')->middleware(['jwt.auth', 'can:admin', 'throttle:admin'])-
 Route::prefix('loyalty')->middleware('jwt.auth')->group(function () {
     Route::get('/my-points', [\App\Http\Controllers\Api\LoyaltyPointController::class, 'getUserPoints']); // Mes points
     Route::post('/redeem', [\App\Http\Controllers\Api\LoyaltyPointController::class, 'redeemPoints']); // Échanger des points
+    Route::get('/referral', [\App\Http\Controllers\Api\LoyaltyPointController::class, 'getReferralInfo']); // Code parrainage
 });
+
+// Route publique pour valider un code de parrainage (avant inscription)
+Route::post('/referral/validate', [\App\Http\Controllers\Api\LoyaltyPointController::class, 'validateReferralCode']);
 
 // Routes de messagerie (protégées)
 Route::prefix('messaging')->middleware('jwt.auth')->group(function () {

@@ -13,3 +13,4 @@ export { useDebounce, useDebouncedCallback, useDebouncedEffect } from './useDebo
 export { useAlert } from './useAlert'
 export { useRequireAuth } from './useRequireAuth'
 export { usePromos } from './usePromos'
+export { useNearbyMerchants } from './useNearbyMerchants'
