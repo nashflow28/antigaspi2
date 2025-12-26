@@ -60,7 +60,7 @@ class OTPService {
     try {
       const response = await apiService.post(`${this.baseUrl}/verify`, {
         phone: this.formatPhone(phone),
-        code
+        otp: code
       })
 
       if (response.success) {
@@ -126,9 +126,10 @@ class OTPService {
    */
   async loginWithOTP(phone: string, code: string): Promise<OTPVerifyResult> {
     try {
-      const response = await apiService.post('/auth/login/otp', {
+      const response = await apiService.post('/auth/otp/verify', {
         phone: this.formatPhone(phone),
-        code
+        otp: code,
+        purpose: 'login'
       })
 
       if (response.success) {
@@ -163,9 +164,27 @@ class OTPService {
     password?: string
   }): Promise<OTPVerifyResult> {
     try {
-      const response = await apiService.post('/auth/register/otp', {
-        ...data,
-        phone: this.formatPhone(data.phone)
+      // First verify OTP
+      const verifyResponse = await apiService.post('/auth/otp/verify', {
+        phone: this.formatPhone(data.phone),
+        otp: data.code,
+        purpose: 'registration'
+      })
+
+      if (!verifyResponse.success) {
+        return {
+          success: false,
+          error: verifyResponse.message || 'Code incorrect'
+        }
+      }
+
+      // Then register the user
+      const response = await apiService.post('/auth/register', {
+        name: data.name,
+        email: data.email,
+        phone: this.formatPhone(data.phone),
+        password: data.password || Math.random().toString(36).slice(-8), // Generate random password if not provided
+        phone_verified: true
       })
 
       if (response.success) {

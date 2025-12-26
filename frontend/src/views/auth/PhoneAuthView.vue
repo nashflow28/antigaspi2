@@ -139,7 +139,7 @@ const route = useRoute()
 const isLogin = ref(route.name === 'phone-login')
 const loading = ref(false)
 const error = ref('')
-const useFirebase = ref(true) // Toggle between Firebase and custom OTP
+const useFirebase = ref(false) // Use backend OTP service (more reliable for mobile)
 
 const form = ref({
   name: '',
