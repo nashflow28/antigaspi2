@@ -2,6 +2,8 @@
  * Utilitaires pour la gestion des tokens JWT
  */
 
+import { authLogger } from './logger'
+
 /**
  * Décode un token JWT sans vérifier la signature
  * (la vérification de signature se fait côté serveur)
@@ -21,7 +23,7 @@ export function decodeJWT(token: string): { exp?: number; iat?: number; [key: st
     const jsonPayload = atob(base64)
     return JSON.parse(jsonPayload)
   } catch (error) {
-    console.warn('❌ [JWT] Erreur de décodage du token:', error)
+    authLogger.warn('JWT decode error')
     return null
   }
 }
@@ -37,7 +39,7 @@ export function isTokenExpired(token: string, bufferSeconds: number = 60): boole
 
   if (!decoded || !decoded.exp) {
     // Token invalide ou sans expiration = considéré comme expiré
-    console.warn('⚠️ [JWT] Token sans expiration ou invalide')
+    authLogger.warn('Token without expiration or invalid')
     return true
   }
 
@@ -49,10 +51,10 @@ export function isTokenExpired(token: string, bufferSeconds: number = 60): boole
 
   if (isExpired) {
     const expiredAgo = currentTime - expirationTime
-    console.log(`⏰ [JWT] Token expiré depuis ${expiredAgo > 0 ? expiredAgo : 0} secondes`)
+    authLogger.log(`Token expired ${expiredAgo > 0 ? expiredAgo : 0}s ago`)
   } else {
     const expiresIn = expirationTime - currentTime
-    console.log(`✅ [JWT] Token valide, expire dans ${Math.floor(expiresIn / 60)} minutes`)
+    authLogger.log(`Token valid, expires in ${Math.floor(expiresIn / 60)}min`)
   }
 
   return isExpired

@@ -20,9 +20,9 @@ if (!isExpoGo) {
   try {
     MapLibreGL = require('@maplibre/maplibre-react-native')
     MapLibreGL.setAccessToken(null) // Pas besoin de token pour OSM
-    console.log('[MapLibreWrapper] MapLibre loaded successfully')
+    if (__DEV__) console.log('[MapLibreWrapper] MapLibre loaded successfully')
   } catch (error) {
-    console.error('[MapLibreWrapper] Failed to load MapLibre:', error)
+    if (__DEV__) console.error('[MapLibreWrapper] Failed to load MapLibre:', error)
   }
 }
 
@@ -103,7 +103,7 @@ const MapLibreWrapper = forwardRef<MapLibreRef, MapLibreWrapperProps>((props, re
   const cameraRef = useRef<any>(null)
   const mapRef = useRef<any>(null)
 
-  console.log('[MapLibreWrapper] Render, isExpoGo:', isExpoGo, 'hasMapLibre:', !!MapLibreGL)
+  if (__DEV__) console.log('[MapLibreWrapper] Render')
 
   useImperativeHandle(ref, () => ({
     flyTo: (newCenter: [number, number], newZoom?: number) => {
@@ -116,12 +116,12 @@ const MapLibreWrapper = forwardRef<MapLibreRef, MapLibreWrapperProps>((props, re
 
   // En mode Expo Go ou si MapLibre n'est pas disponible
   if (isExpoGo || !MapLibreGL) {
-    console.log('[MapLibreWrapper] Using fallback')
+    if (__DEV__) console.log('[MapLibreWrapper] Using fallback')
     return <MapFallback style={style} />
   }
 
   const handlePress = (event: any) => {
-    console.log('[MapLibreWrapper] onPress event:', JSON.stringify(event, null, 2))
+    // Only log in dev mode and without sensitive data
 
     if (!onPress) return
 
@@ -148,18 +148,15 @@ const MapLibreWrapper = forwardRef<MapLibreRef, MapLibreWrapperProps>((props, re
     }
 
     if (typeof longitude === 'number' && typeof latitude === 'number') {
-      console.log('[MapLibreWrapper] Parsed coordinates:', { latitude, longitude })
       onPress({ latitude, longitude })
     } else {
-      console.warn('[MapLibreWrapper] Could not parse coordinates from event')
+      if (__DEV__) console.warn('[MapLibreWrapper] Could not parse coordinates')
     }
   }
 
   const handleRegionChange = () => {
     // MapLibre doesn't have a direct equivalent, we'll use onRegionDidChange
   }
-
-  console.log('[MapLibreWrapper] Rendering MapLibre map...')
 
   return (
     <View style={[styles.container, style]}>

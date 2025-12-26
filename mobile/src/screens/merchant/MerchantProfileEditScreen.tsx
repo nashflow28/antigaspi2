@@ -25,6 +25,9 @@ import PhoneInput from '../../components/PhoneInput'
 import AlertModal from '../../components/AlertModal'
 import { useAlert } from '../../hooks/useAlert'
 import KeyboardAwareContainer from '../../components/KeyboardAwareContainer'
+import { createLogger } from '../../utils/logger'
+
+const merchantLogger = createLogger('MerchantProfile')
 
 interface ProfileFormData {
   business_name: string
@@ -215,7 +218,7 @@ const MerchantProfileEditScreen: React.FC = () => {
       }
       setUserDataLoaded(true)
     } catch (error) {
-      console.error('Erreur chargement profil:', error)
+      merchantLogger.error('Profile load failed')
       // Fallback sur les données existantes en cas d'erreur
       if (user) {
         const hasPersistedChanges = isRestored && hasUnsavedChanges
@@ -255,7 +258,7 @@ const MerchantProfileEditScreen: React.FC = () => {
         setHasLocation(Boolean(locationData?.has_location || (latValue !== null && lngValue !== null)))
       }
     } catch (error) {
-      console.error('Erreur chargement localisation:', error)
+      merchantLogger.error('Location load failed')
     } finally {
       setLocationLoading(false)
     }
@@ -280,7 +283,7 @@ const MerchantProfileEditScreen: React.FC = () => {
       setLatitude(formatCoordinate(newLatitude))
       setLongitude(formatCoordinate(newLongitude))
     } catch (error) {
-      console.error('Erreur géolocalisation:', error)
+      merchantLogger.error('Geolocation failed')
       showError(
         'Géolocalisation',
         error instanceof Error
@@ -319,12 +322,12 @@ const MerchantProfileEditScreen: React.FC = () => {
         // Refresh Redux store
         await dispatch(refreshProfile() as any)
         showSuccess('Succès', 'Position mise à jour avec succès')
-        console.log('[MerchantProfileEdit] Location saved:', { lat: savedLat, lng: savedLng })
+        merchantLogger.log('Location saved successfully')
       } else {
         throw new Error(response.message || 'Erreur lors de la sauvegarde')
       }
     } catch (error: any) {
-      console.error('[MerchantProfileEdit] Location save error:', error)
+      merchantLogger.error('Location save failed')
       showError(
         'Erreur',
         error.response?.data?.message || error.message || 'Impossible de sauvegarder la position'
@@ -355,7 +358,7 @@ const MerchantProfileEditScreen: React.FC = () => {
         await uploadPhoto(result.assets[0].uri)
       }
     } catch (error) {
-      console.error('Erreur sélection image:', error)
+      merchantLogger.error('Image selection failed')
       showError('Erreur', 'Impossible de sélectionner l\'image')
     }
   }
@@ -386,7 +389,7 @@ const MerchantProfileEditScreen: React.FC = () => {
         const fullPhotoUrl = buildPhotoUrl(response.data?.photo_url)
         if (fullPhotoUrl) {
           setPhotoUri(fullPhotoUrl)
-          console.log('📸 [MerchantProfileEdit] Photo URL mise à jour:', fullPhotoUrl)
+          merchantLogger.log('Photo updated')
         }
 
         // 🐛 BUG FIX: Refresh Redux store to sync photo_url
@@ -397,7 +400,7 @@ const MerchantProfileEditScreen: React.FC = () => {
         throw new Error(response.message || 'Échec de l\'upload')
       }
     } catch (error: any) {
-      console.error('Erreur upload photo:', error)
+      merchantLogger.error('Photo upload failed')
       // Revert to previous photo if upload failed
       const previousPhotoUrl = buildPhotoUrl(user?.merchant?.photo_url)
       setPhotoUri(previousPhotoUrl)
@@ -491,18 +494,14 @@ const MerchantProfileEditScreen: React.FC = () => {
         return
       }
 
-      // 🐛 DEBUG: Log request data
-      console.log('📤 [MerchantProfileEdit] Envoi données:', JSON.stringify(formData, null, 2))
+      merchantLogger.log('Saving profile...')
 
       const response = await apiService.put('/merchants/profile', formData)
-
-      // 🐛 DEBUG: Log response - apiService.put() returns response.data directly
-      console.log('📥 [MerchantProfileEdit] Réponse complète:', JSON.stringify(response, null, 2))
 
       // 🐛 BUG FIX #22: apiService.put() returns response.data directly, not the full response
       // So we access response.success, NOT response.data.success
       if (!response.success) {
-        console.error('❌ [MerchantProfileEdit] API returned success=false:', response)
+        merchantLogger.error('Profile update failed - API returned success=false')
         throw new Error(response.message || 'Impossible de mettre à jour le profil')
       }
 
@@ -519,9 +518,9 @@ const MerchantProfileEditScreen: React.FC = () => {
       }
 
       // 🐛 BUG FIX #23: Refresh user data from backend to update Redux store
-      console.log('🔄 [MerchantProfileEdit] Rafraîchissement des données user...')
+      merchantLogger.log('Refreshing profile...')
       await dispatch(refreshProfile() as any)
-      console.log('✅ [MerchantProfileEdit] Données user rafraîchies')
+      merchantLogger.log('Profile refreshed')
 
       // Clear form cache on successful save
       await clearFormCache()
@@ -544,7 +543,7 @@ const MerchantProfileEditScreen: React.FC = () => {
         },
       ])
     } catch (error: any) {
-      console.error('Erreur mise à jour profil:', error)
+      merchantLogger.error('Profile update failed')
       const message =
         error instanceof Error
           ? error.message

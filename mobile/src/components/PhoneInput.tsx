@@ -24,6 +24,7 @@ import { Ionicons } from '@expo/vector-icons'
 import { getLocales } from 'expo-localization'
 import { useTheme } from '../theme'
 import { Typography } from './2025'
+import { createLogger } from '../utils/logger'
 import {
   Country,
   ALL_COUNTRIES,
@@ -37,6 +38,8 @@ import {
   getFullPhoneNumber,
   parsePhoneNumber,
 } from '../data/countries'
+
+const phoneLogger = createLogger('PhoneInput')
 
 interface PhoneInputProps {
   value: string                           // Full phone number with country code
@@ -111,7 +114,7 @@ const PhoneInput: React.FC<PhoneInputProps> = ({
         // Default to Togo (target market)
         setSelectedCountry(DEFAULT_COUNTRY)
       } catch (e) {
-        console.log('[PhoneInput] Error detecting country:', e)
+        phoneLogger.warn('Country detection failed, using default')
         setSelectedCountry(DEFAULT_COUNTRY)
       }
     }

@@ -19,6 +19,9 @@ import apiService from '../../services/api'
 import { Button, Badge, Card, Typography, ConfirmModal } from '../../components/2025'
 import AlertModal from '../../components/AlertModal'
 import { useAlert } from '../../hooks/useAlert'
+import { createLogger } from '../../utils/logger'
+
+const adminLogger = createLogger('AdminUsers')
 
 type RoleFilter = 'all' | 'consumer' | 'merchant' | 'admin'
 
@@ -53,14 +56,14 @@ const AdminUsersScreen: React.FC = () => {
       setLoading(true)
       // API endpoint: GET /admin/users
       // Expected response: { success: true, data: User[] }
-      console.log('🔵 [AdminUsers] Chargement des utilisateurs...')
+      adminLogger.log('Loading users...')
       const response = await apiService.get('/admin/users')
       // apiService retourne déjà response.data, donc response.data = tableau d'users
       const users = Array.isArray(response.data) ? response.data : (response.data?.data || [])
-      console.log('🟢 [AdminUsers] Nombre users:', users.length)
+      adminLogger.log('Users loaded:', users.length)
       setUsers(users)
     } catch (error: any) {
-      console.error('Erreur chargement utilisateurs:', error)
+      adminLogger.error('Load users error')
 
       // Gestion des erreurs d'autorisation
       if (error.response?.status === 401 || error.response?.status === 403) {

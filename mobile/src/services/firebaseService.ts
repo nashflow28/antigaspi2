@@ -5,9 +5,13 @@
  */
 
 import auth, { FirebaseAuthTypes } from '@react-native-firebase/auth'
+import { authLogger } from '../utils/logger'
 
 // Store the confirmation result for OTP verification
 let confirmationResult: FirebaseAuthTypes.ConfirmationResult | null = null
+
+// Sanitize phone for logging (only show last 4 digits)
+const sanitizePhone = (phone: string): string => `***${phone.slice(-4)}`
 
 export const firebaseService = {
   /**
@@ -17,11 +21,11 @@ export const firebaseService = {
    */
   sendOTP: async (phoneNumber: string): Promise<void> => {
     try {
-      console.log('[FirebaseService] Sending OTP to:', phoneNumber)
+      authLogger.log('Sending OTP to:', sanitizePhone(phoneNumber))
       confirmationResult = await auth().signInWithPhoneNumber(phoneNumber)
-      console.log('[FirebaseService] OTP sent successfully')
+      authLogger.log('OTP sent successfully')
     } catch (error: any) {
-      console.error('[FirebaseService] sendOTP error:', error)
+      authLogger.error('sendOTP error:', error)
       throw new Error(getFirebaseErrorMessage(error.code))
     }
   },
@@ -37,7 +41,7 @@ export const firebaseService = {
         throw new Error('Session expirée. Veuillez redemander un code.')
       }
 
-      console.log('[FirebaseService] Verifying OTP code')
+      authLogger.log('Verifying OTP code')
       const userCredential = await confirmationResult.confirm(code)
 
       if (!userCredential || !userCredential.user) {
@@ -46,14 +50,14 @@ export const firebaseService = {
 
       // Get the ID token to send to backend
       const idToken = await userCredential.user.getIdToken()
-      console.log('[FirebaseService] OTP verified, got ID token')
+      authLogger.log('OTP verified successfully')
 
       // Clear the confirmation result after successful verification
       confirmationResult = null
 
       return idToken
     } catch (error: any) {
-      console.error('[FirebaseService] verifyOTP error:', error)
+      authLogger.error('verifyOTP error:', error.code || 'unknown')
       throw new Error(getFirebaseErrorMessage(error.code))
     }
   },
@@ -75,7 +79,7 @@ export const firebaseService = {
       await auth().signOut()
       confirmationResult = null
     } catch (error: any) {
-      console.error('[FirebaseService] signOut error:', error)
+      authLogger.error('signOut error:', error.code || 'unknown')
       throw error
     }
   },

@@ -18,6 +18,9 @@ import { useTheme } from '../../theme'
 import apiService from '../../services/api'
 import AlertModal from '../../components/AlertModal'
 import { useAlert } from '../../hooks/useAlert'
+import { createLogger } from '../../utils/logger'
+
+const hoursLogger = createLogger('OpeningHours')
 
 interface DaySchedule {
   day: string
@@ -71,7 +74,7 @@ const MerchantOpeningHoursScreen: React.FC = () => {
 
       // 🐛 BUG FIX #30: apiService.get() returns response.data directly
       // So response IS the data object, not response.data
-      console.log('📅 [OpeningHours] API response:', response)
+      hoursLogger.log('API response received')
 
       if (response?.success) {
         const existingHours = response.data?.opening_hours
@@ -91,16 +94,16 @@ const MerchantOpeningHoursScreen: React.FC = () => {
             }
           })
           setSchedule(fullSchedule)
-          console.log('📅 [OpeningHours] Loaded existing hours')
+          hoursLogger.log('Loaded existing hours')
         } else {
           // Garder les valeurs par défaut (déjà initialisées dans useState)
-          console.log('📅 [OpeningHours] No existing hours, using defaults')
+          hoursLogger.log('No existing hours, using defaults')
         }
       } else {
-        console.warn('📅 [OpeningHours] API returned success: false')
+        hoursLogger.warn('API returned success: false')
       }
     } catch (error: any) {
-      console.error('📅 [OpeningHours] Error:', error?.message || error)
+      hoursLogger.error('Load error')
       // Ne pas afficher d'alerte, garder les valeurs par défaut
       // L'utilisateur peut quand même définir ses horaires
     } finally {
@@ -112,13 +115,13 @@ const MerchantOpeningHoursScreen: React.FC = () => {
     try {
       setSaving(true)
 
-      console.log('📅 [OpeningHours] Saving schedule:', JSON.stringify(schedule, null, 2))
+      hoursLogger.log('Saving schedule...')
 
       const response = await apiService.put('/merchants/opening-hours', {
         opening_hours: schedule,
       })
 
-      console.log('📅 [OpeningHours] Save response:', response)
+      hoursLogger.log('Save response received')
 
       // 🐛 BUG FIX #30: apiService.put() returns response.data directly
       if (response?.success) {
@@ -137,16 +140,11 @@ const MerchantOpeningHoursScreen: React.FC = () => {
         ])
       } else {
         // Handle case where response exists but success is false
-        console.error('📅 [OpeningHours] Save failed:', response)
+        hoursLogger.error('Save failed')
         showError('Erreur', response?.message || 'La sauvegarde a échoué')
       }
     } catch (error: any) {
-      console.error('📅 [OpeningHours] Save error:', error)
-      console.error('📅 [OpeningHours] Error details:', {
-        message: error?.message,
-        statusCode: error?.statusCode,
-        validationErrors: error?.validationErrors,
-      })
+      hoursLogger.error('Save error:', error?.message || 'unknown')
 
       let errorMessage = 'Impossible de sauvegarder les heures'
       if (error?.validationErrors) {
