@@ -1,6 +1,6 @@
 /**
- * OTPVerificationScreen - 6-digit OTP verification for Firebase Phone Auth
- * Uses React Native Firebase for native phone auth
+ * OTPVerificationScreen - 6-digit OTP verification
+ * Uses backend OTP service for phone authentication
  */
 
 import React, { useState, useRef, useEffect } from 'react'
@@ -15,8 +15,8 @@ import { Ionicons } from '@expo/vector-icons'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useDispatch } from 'react-redux'
 import { AppDispatch } from '../../store'
-import { loginWithFirebase } from '../../store/slices/authSlice'
-import { firebaseService } from '../../services/firebaseService'
+import { loginWithOtp, OtpLoginResponse } from '../../store/slices/authSlice'
+import { otpService } from '../../services/otpService'
 import { Card, Typography, Button } from '../../components/2025'
 import BrandLogo from '../../components/BrandLogo'
 import KeyboardAwareContainer from '../../components/KeyboardAwareContainer'
@@ -86,21 +86,17 @@ const OTPVerificationScreen = ({ navigation, route }: any) => {
 
     setLoading(true)
     try {
-      // Verify OTP with Firebase (React Native Firebase stores confirmation internally)
-      const idToken = await firebaseService.verifyOTP(code)
+      // Verify OTP via backend service
+      const result = await dispatch(loginWithOtp({ phone: phoneNumber, otp: code }))
 
-      // Send token to backend
-      const result = await dispatch(loginWithFirebase(idToken))
-
-      if (loginWithFirebase.fulfilled.match(result)) {
-        const payload = result.payload as any
+      if (loginWithOtp.fulfilled.match(result)) {
+        const payload = result.payload as OtpLoginResponse
 
         if (payload.status === 'new_user') {
           // New user - navigate to complete profile
-          // SECURITY: Pass the Firebase ID token for re-verification in register
           navigation.replace('CompleteProfile', {
-            firebaseIdToken: idToken, // Required for secure registration
-            phoneNumber: payload.phone,
+            phoneNumber: payload.phone || phoneNumber,
+            phoneVerified: true,
           })
         } else {
           // Existing user - logged in successfully
@@ -110,6 +106,9 @@ const OTPVerificationScreen = ({ navigation, route }: any) => {
         }
       } else {
         showError('Erreur', (result.payload as string) || 'Erreur de connexion')
+        // Clear OTP on error
+        setOtp(Array(OTP_LENGTH).fill(''))
+        inputRefs.current[0]?.focus()
       }
     } catch (error: any) {
       showError('Erreur', error.message || 'Code de verification incorrect')
@@ -126,9 +125,13 @@ const OTPVerificationScreen = ({ navigation, route }: any) => {
 
     setLoading(true)
     try {
-      // Clear the previous session and request a new OTP
-      firebaseService.clearOTPSession()
-      await firebaseService.sendOTP(phoneNumber)
+      // Request a new OTP via backend service
+      const result = await otpService.resendOtp(phoneNumber, 'login')
+
+      if (!result.success) {
+        showError('Erreur', result.message || 'Impossible de renvoyer le code')
+        return
+      }
 
       // Reset timer
       setResendTimer(RESEND_COOLDOWN)

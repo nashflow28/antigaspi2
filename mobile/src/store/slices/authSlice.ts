@@ -1,8 +1,19 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit'
 import { AuthState, User, LoginCredentials, RegisterData, AuthResponse, FirebaseLoginResponse, FirebaseRegisterData } from '../../types'
 import apiService from '../../services/api'
+import { secureStorage } from '../../services/secureStorage'
 import { clearAllFormCaches } from '../../hooks/usePersistedForm'
 import { authLogger } from '../../utils/logger'
+import { otpService } from '../../services/otpService'
+
+// OTP Login response type
+export interface OtpLoginResponse {
+  status: 'success' | 'new_user'
+  user?: User
+  token?: string
+  phone?: string
+  message?: string
+}
 
 export const authInitialState: AuthState = {
   user: null,
@@ -129,6 +140,71 @@ export const registerWithFirebase = createAsyncThunk(
   async (data: FirebaseRegisterData, { rejectWithValue }) => {
     try {
       const response = await apiService.firebaseRegister(data)
+      return response
+    } catch (error: any) {
+      if (error.validationErrors) {
+        return rejectWithValue({
+          message: error.message,
+          errors: error.validationErrors
+        })
+      }
+      return rejectWithValue(error.message)
+    }
+  }
+)
+
+// Backend OTP Authentication - Login with phone + OTP code
+export const loginWithOtp = createAsyncThunk(
+  'auth/loginWithOtp',
+  async ({ phone, otp }: { phone: string; otp: string }, { rejectWithValue }) => {
+    try {
+      const response = await otpService.verifyOtp(phone, otp, 'login')
+
+      if (!response.success) {
+        return rejectWithValue(response.message || 'Code de vérification incorrect')
+      }
+
+      // Check if response contains user data (existing user)
+      const data = response.data as any
+      if (data?.user && data?.token) {
+        // Store token for future API calls
+        await secureStorage.setToken(data.token)
+        await secureStorage.setUserData(data.user)
+
+        return {
+          status: 'success' as const,
+          user: data.user,
+          token: data.token,
+        }
+      }
+
+      // User doesn't exist - need to register
+      if (data?.user_exists === false) {
+        return {
+          status: 'new_user' as const,
+          phone: data.phone || phone,
+        }
+      }
+
+      // Fallback for unexpected response
+      return rejectWithValue('Réponse inattendue du serveur')
+    } catch (error: any) {
+      authLogger.error('OTP Login error:', error)
+      return rejectWithValue(error.message || 'Erreur de connexion')
+    }
+  }
+)
+
+// Backend OTP Authentication - Register new user after OTP verification
+export const registerWithOtp = createAsyncThunk(
+  'auth/registerWithOtp',
+  async (data: { phone: string; first_name: string; last_name: string; email: string; role: string; city: string; password: string }, { rejectWithValue }) => {
+    try {
+      // Register the user with verified phone
+      const response = await apiService.register({
+        ...data,
+        phone_verified: true,
+      } as any)
       return response
     } catch (error: any) {
       if (error.validationErrors) {
@@ -283,6 +359,53 @@ const authSlice = createSlice({
         state.error = null
       })
       .addCase(registerWithFirebase.rejected, (state, action) => {
+        state.loading = false
+        const payload = action.payload
+        if (typeof payload === 'string') {
+          state.error = payload
+        } else if (payload && typeof payload === 'object' && 'message' in payload) {
+          state.error = (payload as any).message
+        } else {
+          state.error = 'Erreur lors de l\'inscription'
+        }
+        state.isAuthenticated = false
+      })
+
+      // OTP Login
+      .addCase(loginWithOtp.pending, (state) => {
+        state.loading = true
+        state.error = null
+      })
+      .addCase(loginWithOtp.fulfilled, (state, action) => {
+        state.loading = false
+        const payload = action.payload as OtpLoginResponse
+        if (payload.status === 'success' && payload.user) {
+          state.user = payload.user
+          state.token = payload.token || null
+          state.isAuthenticated = true
+        }
+        // If status is 'new_user', don't authenticate yet - let the screen handle navigation
+        state.error = null
+      })
+      .addCase(loginWithOtp.rejected, (state, action) => {
+        state.loading = false
+        state.error = action.payload as string
+        state.isAuthenticated = false
+      })
+
+      // OTP Register
+      .addCase(registerWithOtp.pending, (state) => {
+        state.loading = true
+        state.error = null
+      })
+      .addCase(registerWithOtp.fulfilled, (state, action: PayloadAction<AuthResponse>) => {
+        state.loading = false
+        state.user = action.payload.data.user
+        state.token = action.payload.data.token
+        state.isAuthenticated = true
+        state.error = null
+      })
+      .addCase(registerWithOtp.rejected, (state, action) => {
         state.loading = false
         const payload = action.payload
         if (typeof payload === 'string') {

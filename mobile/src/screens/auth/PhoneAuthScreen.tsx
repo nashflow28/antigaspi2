@@ -1,6 +1,6 @@
 /**
- * PhoneAuthScreen - Phone number input for Firebase Phone Authentication
- * Uses React Native Firebase for native phone auth
+ * PhoneAuthScreen - Phone number input for OTP Authentication
+ * Uses backend OTP service for SMS verification
  */
 
 import React, { useState } from 'react'
@@ -13,7 +13,7 @@ import {
 } from 'react-native'
 import { Ionicons } from '@expo/vector-icons'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
-import { firebaseService } from '../../services/firebaseService'
+import { otpService } from '../../services/otpService'
 import { Card, Typography, Button } from '../../components/2025'
 import BrandLogo from '../../components/BrandLogo'
 import KeyboardAwareContainer from '../../components/KeyboardAwareContainer'
@@ -75,8 +75,13 @@ const PhoneAuthScreen: React.FC<Props> = ({ navigation }) => {
     try {
       const fullPhoneNumber = getFullPhoneNumber()
 
-      // React Native Firebase handles reCAPTCHA automatically
-      await firebaseService.sendOTP(fullPhoneNumber)
+      // Send OTP via backend service
+      const result = await otpService.sendOtp(fullPhoneNumber, 'login')
+
+      if (!result.success) {
+        showError('Erreur', result.message || "Impossible d'envoyer le code SMS")
+        return
+      }
 
       // Navigate to OTP verification screen
       navigation.navigate('OTPVerification', {
