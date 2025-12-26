@@ -61,6 +61,15 @@
       "@react-native-firebase/app",
       "@react-native-firebase/auth",
       [
+        "expo-notifications",
+        {
+          "icon": "./assets/notification-icon.png",
+          "color": "#10B981",
+          "sounds": [],
+          "defaultChannel": "default"
+        }
+      ],
+      [
         "expo-location",
         {
           "locationAlwaysAndWhenInUsePermission": "Permettre à Antigaspi d'accéder à votre position pour trouver les commerces proches."

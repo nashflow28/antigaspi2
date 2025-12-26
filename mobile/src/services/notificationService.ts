@@ -366,35 +366,23 @@ class NotificationService {
 
     // Traiter selon le type de notification
     if (data?.type) {
-      if (data.type === 'new_product' && !preferences.newProducts) {
-        return;
-      }
+      // Vérifier les préférences par type
+      const typePreferenceMap: Record<string, boolean> = {
+        'new_product': preferences.newProducts,
+        'surprise_basket': preferences.newProducts,
+        'reservation_status': preferences.reservations,
+        'reservation_confirmed': preferences.reservations,
+        'reservation_ready': preferences.reservations,
+        'reservation_completed': preferences.reservations,
+        'reservation_cancelled': preferences.reservations,
+        'promotion': preferences.promotions,
+        'discount': preferences.promotions,
+        'expiring_product': preferences.expiringProducts,
+      };
 
-      if (data.type === 'reservation_status' && !preferences.reservations) {
+      // Si le type a une préférence définie et qu'elle est désactivée, ignorer
+      if (typePreferenceMap[data.type] === false) {
         return;
-      }
-
-      if (data.type === 'promotion' && !preferences.promotions) {
-        return;
-      }
-
-      if (data.type === 'expiring_product' && !preferences.expiringProducts) {
-        return;
-      }
-
-      switch (data.type) {
-        case 'new_product':
-          this.handleNewProductNotification(data);
-          break;
-        case 'reservation_status':
-          this.handleReservationNotification(data);
-          break;
-        case 'promotion':
-          this.handlePromotionNotification(data);
-          break;
-        case 'expiring_product':
-          this.handleExpiringProductNotification(data);
-          break;
       }
     }
 
@@ -409,19 +397,24 @@ class NotificationService {
   }
 
   /**
-   * Gérer l'interaction avec une notification
+   * Gérer l'interaction avec une notification (tap)
    */
   private handleNotificationResponse(response: Notifications.NotificationResponse): void {
     const { data } = response.notification.request.content;
 
-    // Navigation selon le type
+    // Priorité 1: Navigation explicite définie dans la notification
     if (data?.navigateTo) {
       const navigationPayload = this.normalizeNavigationTarget(data.navigateTo);
 
       if (navigationPayload) {
-        // Émettre un événement pour la navigation
         this.emit('navigate', navigationPayload);
+        return;
       }
+    }
+
+    // Priorité 2: Navigation basée sur le type de notification
+    if (data?.type) {
+      this.handleNotificationByType(data.type, data);
     }
   }
 
@@ -498,12 +491,32 @@ class NotificationService {
    * Mettre à jour le badge de l'application
    */
   async updateBadge(count?: number): Promise<void> {
-    if (count !== undefined) {
-      await Notifications.setBadgeCountAsync(count);
-    } else {
-      // NOTE: Endpoint /notifications/badge n'existe pas dans l'API Laravel
-      // Utiliser le badge local uniquement ou implémenter l'endpoint backend
-      await Notifications.setBadgeCountAsync(0);
+    try {
+      if (count !== undefined) {
+        await Notifications.setBadgeCountAsync(count);
+      } else {
+        // Récupérer le nombre de notifications non lues depuis l'API
+        const response = await this.http.get('/notifications/badge');
+        const unreadCount = response.data?.data?.unread_count ?? 0;
+        await Notifications.setBadgeCountAsync(unreadCount);
+        notificationLogger.log('Badge mis à jour:', unreadCount);
+      }
+    } catch (error) {
+      notificationLogger.warn('Erreur mise à jour badge:', error);
+      // En cas d'erreur, on ne change pas le badge
+    }
+  }
+
+  /**
+   * Récupérer le nombre de notifications non lues
+   */
+  async getUnreadCount(): Promise<number> {
+    try {
+      const response = await this.http.get('/notifications/badge');
+      return response.data?.data?.unread_count ?? 0;
+    } catch (error) {
+      notificationLogger.warn('Erreur récupération badge:', error);
+      return 0;
     }
   }
 
@@ -885,32 +898,155 @@ class NotificationService {
    * Gérer les notifications de nouveaux produits
    */
   private handleNewProductNotification(data: any): void {
-    // Logique spécifique pour les nouveaux produits
     notificationLogger.log('Nouveau produit:', data);
+
+    // Navigation vers le produit si ID fourni
+    if (data?.product_id) {
+      this.emit('navigate', {
+        screen: 'ProductDetails',
+        params: { productId: data.product_id },
+      });
+    } else if (data?.merchant_id) {
+      // Sinon vers le commerçant
+      this.emit('navigate', {
+        screen: 'MerchantDetails',
+        params: { merchantId: data.merchant_id },
+      });
+    }
   }
 
   /**
    * Gérer les notifications de réservation
    */
   private handleReservationNotification(data: any): void {
-    // Logique spécifique pour les réservations
     notificationLogger.log('Mise à jour réservation:', data);
+
+    // Navigation vers les détails de la réservation
+    if (data?.reservation_id) {
+      this.emit('navigate', {
+        screen: 'ReservationDetails',
+        params: { reservationId: data.reservation_id },
+      });
+    } else {
+      // Fallback vers la liste des réservations
+      this.emit('navigate', {
+        screen: 'Reservations',
+      });
+    }
   }
 
   /**
    * Gérer les notifications de promotion
    */
   private handlePromotionNotification(data: any): void {
-    // Logique spécifique pour les promotions
     notificationLogger.log('Nouvelle promotion:', data);
+
+    // Navigation vers le produit en promotion ou la liste
+    if (data?.product_id) {
+      this.emit('navigate', {
+        screen: 'ProductDetails',
+        params: { productId: data.product_id },
+      });
+    } else if (data?.merchant_id) {
+      this.emit('navigate', {
+        screen: 'MerchantDetails',
+        params: { merchantId: data.merchant_id },
+      });
+    } else {
+      // Vers l'accueil pour voir les promos
+      this.emit('navigate', {
+        screen: 'Home',
+      });
+    }
   }
 
   /**
    * Gérer les notifications de produits expirant
    */
   private handleExpiringProductNotification(data: any): void {
-    // Logique spécifique pour les produits expirant
     notificationLogger.log('Produit expirant:', data);
+
+    // Navigation vers le produit
+    if (data?.product_id) {
+      this.emit('navigate', {
+        screen: 'ProductDetails',
+        params: { productId: data.product_id },
+      });
+    } else {
+      // Vers l'accueil pour voir les produits
+      this.emit('navigate', {
+        screen: 'Home',
+      });
+    }
+  }
+
+  /**
+   * Gérer les notifications de fidélité (tier upgrade, points)
+   */
+  private handleLoyaltyNotification(data: any): void {
+    notificationLogger.log('Notification fidélité:', data);
+
+    // Navigation vers la page récompenses/fidélité
+    if (data?.type === 'loyalty_tier_upgrade') {
+      this.emit('navigate', {
+        screen: 'Rewards',
+      });
+    } else {
+      this.emit('navigate', {
+        screen: 'LoyaltyPoints',
+      });
+    }
+  }
+
+  /**
+   * Gérer les notifications admin broadcast
+   */
+  private handleAdminBroadcastNotification(data: any): void {
+    notificationLogger.log('Admin broadcast:', data);
+
+    // Navigation personnalisée si spécifiée
+    if (data?.navigateTo) {
+      const navTarget = this.normalizeNavigationTarget(data.navigateTo);
+      if (navTarget) {
+        this.emit('navigate', navTarget);
+      }
+    }
+  }
+
+  /**
+   * Router vers le bon handler selon le type de notification
+   */
+  public handleNotificationByType(type: string, data: any): void {
+    switch (type) {
+      case 'new_product':
+      case 'surprise_basket':
+        this.handleNewProductNotification(data);
+        break;
+      case 'reservation_status':
+      case 'reservation_confirmed':
+      case 'reservation_ready':
+      case 'reservation_completed':
+      case 'reservation_cancelled':
+        this.handleReservationNotification(data);
+        break;
+      case 'promotion':
+      case 'discount':
+        this.handlePromotionNotification(data);
+        break;
+      case 'expiring_product':
+        this.handleExpiringProductNotification(data);
+        break;
+      case 'loyalty_tier_upgrade':
+      case 'loyalty_points':
+      case 'referral_bonus':
+        this.handleLoyaltyNotification(data);
+        break;
+      case 'admin_broadcast':
+        this.handleAdminBroadcastNotification(data);
+        break;
+      default:
+        notificationLogger.log('Type de notification non géré:', type, data);
+    }
   }
 
   /**
