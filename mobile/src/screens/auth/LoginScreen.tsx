@@ -6,6 +6,8 @@ import {
   StyleSheet,
   StatusBar,
 } from 'react-native'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
+import { Ionicons } from '@expo/vector-icons'
 import { useDispatch, useSelector } from 'react-redux'
 import { loginUser } from '../../store/slices/authSlice'
 import { AppDispatch, RootState } from '../../store'
@@ -23,9 +25,15 @@ interface Props {
 
 const LoginScreen: React.FC<Props> = ({ navigation }) => {
   const theme = useTheme()
+  const insets = useSafeAreaInsets()
   const dispatch = useDispatch<AppDispatch>()
   const { loading, error } = useSelector((state: RootState) => state.auth)
   const { showSuccess, showError } = useAlert()
+
+  // Fermer le modal Auth et retourner à l'exploration
+  const handleDismiss = () => {
+    navigation.getParent()?.goBack()
+  }
 
   const [credentials, setCredentials] = useState<LoginCredentials>({
     email: '',
@@ -61,6 +69,18 @@ const LoginScreen: React.FC<Props> = ({ navigation }) => {
       testID={TEST_IDS.loginScreen}
     >
       <StatusBar backgroundColor={theme.colors.background} barStyle={theme.isDark ? 'light-content' : 'dark-content'} />
+
+      {/* Close Button - pour fermer le modal et retourner à l'exploration */}
+      <View style={[styles.closeButtonContainer, { paddingTop: insets.top + 8, paddingHorizontal: theme.spacing.md }]}>
+        <TouchableOpacity
+          onPress={handleDismiss}
+          style={[styles.closeButton, { padding: theme.spacing.sm }]}
+          accessibilityLabel="Fermer"
+          accessibilityHint="Retourner à l'exploration sans se connecter"
+        >
+          <Ionicons name="close" size={28} color={theme.colors.text} />
+        </TouchableOpacity>
+      </View>
 
       <KeyboardAwareContainer contentContainerStyle={[styles.scrollContent, { paddingHorizontal: theme.spacing.lg }]}>
         {/* Header */}
@@ -214,8 +234,8 @@ const LoginScreen: React.FC<Props> = ({ navigation }) => {
           </Typography>
         </TouchableOpacity>
 
-        {/* Footer */}
-        <View style={[styles.footer, { flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }]}>
+        {/* Footer - Register */}
+        <View style={[styles.footer, { flexDirection: 'row', justifyContent: 'center', alignItems: 'center', marginBottom: theme.spacing.lg }]}>
           <Typography variant="caption" color="secondary" style={{ marginRight: theme.spacing.xs }}>
             Pas encore de compte ?
           </Typography>
@@ -225,6 +245,17 @@ const LoginScreen: React.FC<Props> = ({ navigation }) => {
             </Typography>
           </TouchableOpacity>
         </View>
+
+        {/* Continue without account */}
+        <TouchableOpacity
+          onPress={handleDismiss}
+          style={{ alignItems: 'center', paddingVertical: theme.spacing.md }}
+          accessibilityLabel="Continuer sans compte"
+        >
+          <Typography variant="body" color="secondary">
+            Continuer sans compte
+          </Typography>
+        </TouchableOpacity>
       </KeyboardAwareContainer>
     </View>
   )
@@ -233,6 +264,15 @@ const LoginScreen: React.FC<Props> = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+  closeButtonContainer: {
+    position: 'absolute',
+    top: 0,
+    right: 0,
+    zIndex: 10,
+  },
+  closeButton: {
+    borderRadius: 20,
   },
   scrollContent: {
     flexGrow: 1,

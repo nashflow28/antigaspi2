@@ -9,6 +9,7 @@ import {
   Animated,
 } from 'react-native'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useDispatch, useSelector } from 'react-redux'
 import { registerUser, clearError } from '../../store/slices/authSlice'
 import { AppDispatch, RootState } from '../../store'
@@ -68,11 +69,17 @@ const INITIAL_FORM_DATA: RegisterFormData = {
 
 const RegisterScreen: React.FC<Props> = ({ navigation }) => {
   const theme = useTheme()
+  const insets = useSafeAreaInsets()
   const dispatch = useDispatch<AppDispatch>()
   const { loading } = useSelector((state: RootState) => state.auth)
   const { showSuccess } = useToast()
   const scrollViewRef = useRef<KeyboardAwareScrollView>(null)
   const { alertProps, showWarning, hideAlert } = useAlert()
+
+  // Fermer le modal Auth et retourner à l'exploration
+  const handleDismiss = () => {
+    navigation.getParent()?.goBack()
+  }
 
   // Formulaire persisté (sans mots de passe pour la sécurité)
   const {
@@ -321,6 +328,18 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
   return (
     <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
       <StatusBar backgroundColor={theme.colors.background} barStyle={theme.isDark ? 'light-content' : 'dark-content'} />
+
+      {/* Close Button - pour fermer le modal et retourner à l'exploration */}
+      <View style={[styles.closeButtonContainer, { paddingTop: insets.top + 8, paddingHorizontal: theme.spacing.md }]}>
+        <TouchableOpacity
+          onPress={handleDismiss}
+          style={[styles.closeButton, { padding: theme.spacing.sm }]}
+          accessibilityLabel="Fermer"
+          accessibilityHint="Retourner à l'exploration sans créer de compte"
+        >
+          <Ionicons name="close" size={28} color={theme.colors.text} />
+        </TouchableOpacity>
+      </View>
 
       <KeyboardAwareContainer
         ref={scrollViewRef}
@@ -649,6 +668,15 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+  closeButtonContainer: {
+    position: 'absolute',
+    top: 0,
+    right: 0,
+    zIndex: 10,
+  },
+  closeButton: {
+    borderRadius: 20,
   },
   logoContainer: {
     width: 80,
