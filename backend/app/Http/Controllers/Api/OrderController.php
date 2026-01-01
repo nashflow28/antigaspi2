@@ -260,7 +260,7 @@ class OrderController extends Controller
                             if ($payment && $payment->isSuccessful()) {
                                 $reservation->update([
                                     'status' => 'confirmed',
-                                    'payment_status' => 'completed',
+                                    'payment_status' => 'success',
                                 ]);
                             } else {
                                 throw new \Exception('Le paiement par portefeuille a échoué pour ' . $reservation->product->name);
@@ -272,7 +272,7 @@ class OrderController extends Controller
                     if ($paymentMethod === PaymentMethod::WALLET) {
                         $order->update([
                             'status' => 'confirmed',
-                            'payment_status' => 'completed',
+                            'payment_status' => 'success',
                         ]);
 
                         Log::info('Wallet payments successful for order', [
