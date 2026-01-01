@@ -21,6 +21,15 @@ class WalletGateway implements PaymentGateway
     {
         $user = $reservation->user()->first();
 
+        \Illuminate\Support\Facades\Log::info('WalletGateway::initialize called', [
+            'reservation_id' => $reservation->id,
+            'payment_id' => $payment->id,
+            'user_id' => $user?->id,
+            'amount' => $payment->amount,
+            'pin_present' => isset($data['pin']) && !empty($data['pin']),
+            'data_keys' => array_keys($data),
+        ]);
+
         if (!$user) {
             throw new InvalidArgumentException('Wallet payments require a reservation attached to a user.');
         }
@@ -30,12 +39,24 @@ class WalletGateway implements PaymentGateway
         $payload = $payment->payload ?? [];
 
         try {
+            \Illuminate\Support\Facades\Log::info('WalletGateway: calling processWalletPayment', [
+                'user_id' => $user->id,
+                'amount' => $payment->amount,
+                'description' => $description,
+            ]);
+
             $transaction = $this->wallets->processWalletPayment(
                 $user,
                 (float) $payment->amount,
                 $description,
                 $pin
             );
+
+            \Illuminate\Support\Facades\Log::info('WalletGateway: payment SUCCESS', [
+                'transaction_id' => $transaction->id,
+                'previous_balance' => Arr::get($transaction->metadata, 'previous_balance'),
+                'new_balance' => Arr::get($transaction->metadata, 'new_balance'),
+            ]);
 
             $payment->status = PaymentStatus::SUCCESS;
             $payment->transaction_id = (string) $transaction->id;
@@ -49,6 +70,11 @@ class WalletGateway implements PaymentGateway
                 ],
             ]);
         } catch (Throwable $exception) {
+            \Illuminate\Support\Facades\Log::error('WalletGateway: payment FAILED', [
+                'error' => $exception->getMessage(),
+                'trace' => $exception->getTraceAsString(),
+            ]);
+
             $payment->status = PaymentStatus::FAILED;
             $payload = $this->mergePayload($payload, [
                 'wallet' => [

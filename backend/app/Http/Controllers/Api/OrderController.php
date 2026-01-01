@@ -2,16 +2,28 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Enums\PaymentMethod;
+use App\Enums\PaymentStatus;
 use App\Http\Controllers\Controller;
+use App\Models\Cart;
 use App\Models\Order;
+use App\Models\Payment;
 use App\Models\Product;
 use App\Models\Reservation;
+use App\Models\Wallet;
+use App\Services\Payments\PaymentService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
 
 class OrderController extends Controller
 {
+    public function __construct(private readonly PaymentService $paymentService)
+    {
+    }
+
     /**
      * Lister les commandes de l'utilisateur connecté
      * GET /api/orders
@@ -40,20 +52,33 @@ class OrderController extends Controller
      *     { "product_id": 1, "quantity": 2 },
      *     { "product_id": 2, "quantity": 1 }
      *   ],
+     *   "payment_method": "wallet|on_site|flooz|tmoney|orange_money|mtn_momo",
+     *   "wallet_pin": "1234" (requis si payment_method=wallet),
      *   "notes": "Optionnel"
      * }
      */
     public function store(Request $request)
     {
+        // DEBUG: Log the entire request body
+        Log::info('OrderController::store - Raw request data', [
+            'all' => $request->all(),
+            'payment_method_raw' => $request->input('payment_method'),
+            'wallet_pin_raw' => $request->has('wallet_pin') ? '[PRESENT]' : '[ABSENT]',
+            'content_type' => $request->header('Content-Type'),
+        ]);
+
         $validator = Validator::make($request->all(), [
             'items' => 'required|array|min:1',
             'items.*.product_id' => 'required|exists:products,id',
             'items.*.quantity' => 'required|integer|min:1',
+            'payment_method' => 'nullable|string|in:wallet,on_site,flooz,tmoney,orange_money,mtn_momo',
+            'wallet_pin' => 'nullable|string|digits_between:4,6',
             'notes' => 'nullable|string|max:1000',
         ], [
             'items.required' => 'Vous devez ajouter au moins un produit',
             'items.*.product_id.exists' => 'Un des produits n\'existe pas',
             'items.*.quantity.min' => 'La quantité doit être au moins 1',
+            'wallet_pin.digits_between' => 'Le code PIN doit contenir entre 4 et 6 chiffres',
         ]);
 
         if ($validator->fails()) {
@@ -66,9 +91,92 @@ class OrderController extends Controller
 
         $user = $request->user();
         $items = $request->input('items');
+        $paymentMethodStr = $request->input('payment_method', 'on_site');
+        $walletPin = $request->input('wallet_pin');
+
+        // DEBUG: Log received payment data
+        Log::info('Order creation - payment data received', [
+            'user_id' => $user->id,
+            'payment_method_received' => $request->input('payment_method'),
+            'payment_method_used' => $paymentMethodStr,
+            'wallet_pin_present' => !empty($walletPin),
+            'items_count' => count($items),
+            'all_input_keys' => array_keys($request->all()),
+        ]);
+
+        // Parse payment method
+        try {
+            $paymentMethod = PaymentMethod::from($paymentMethodStr);
+        } catch (\ValueError $e) {
+            $paymentMethod = PaymentMethod::ON_SITE;
+        }
 
         try {
             DB::beginTransaction();
+
+            // Calculate total amount first to validate wallet
+            $totalAmount = 0;
+            foreach ($items as $item) {
+                $product = Product::find($item['product_id']);
+                if ($product) {
+                    $totalAmount += $product->discounted_price * $item['quantity'];
+                }
+            }
+
+            // Validate wallet balance and PIN BEFORE creating order
+            if ($paymentMethod === PaymentMethod::WALLET) {
+                $wallet = Wallet::where('user_id', $user->id)->first();
+
+                if (!$wallet) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Vous n\'avez pas encore de portefeuille. Veuillez d\'abord en créer un.',
+                    ], 400);
+                }
+
+                if (!$wallet->is_active) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Votre portefeuille est désactivé.',
+                    ], 400);
+                }
+
+                if (!$wallet->pin_hash) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Veuillez d\'abord configurer votre code PIN.',
+                    ], 400);
+                }
+
+                if (empty($walletPin)) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Le code PIN est requis pour les paiements par portefeuille.',
+                    ], 400);
+                }
+
+                if (!$wallet->verifyPin($walletPin)) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Code PIN incorrect.',
+                    ], 400);
+                }
+
+                if ($wallet->balance < $totalAmount) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => "Solde insuffisant. Votre solde: " . number_format($wallet->balance, 0, ',', ' ') .
+                            " F CFA. Montant requis: " . number_format($totalAmount, 0, ',', ' ') . " F CFA.",
+                    ], 400);
+                }
+
+                if (!$wallet->canSpend($totalAmount)) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Limite de dépense quotidienne dépassée.',
+                    ], 400);
+                }
+            }
 
             // 1. Créer la commande
             $order = Order::create([
@@ -77,6 +185,7 @@ class OrderController extends Controller
                 'total_amount' => 0, // Sera calculé après
                 'status' => 'pending',
                 'payment_status' => 'pending',
+                'payment_method' => $paymentMethodStr,
                 'notes' => $request->input('notes'),
             ]);
 
@@ -127,25 +236,120 @@ class OrderController extends Controller
             // 3. Mettre à jour le total de la commande
             $order->update(['total_amount' => $totalAmount]);
 
+            // 4. Traiter le paiement pour CHAQUE réservation (comme CartController)
+            $payments = [];
+            if ($paymentMethod !== PaymentMethod::ON_SITE && count($createdReservations) > 0) {
+                try {
+                    foreach ($createdReservations as $reservation) {
+                        $payment = $this->paymentService->initializePayment(
+                            $reservation,
+                            $paymentMethod,
+                            [
+                                'wallet_pin' => $walletPin,
+                                'currency' => 'XOF',
+                                'notes' => $request->input('notes'),
+                            ]
+                        );
+
+                        if ($payment) {
+                            $payments[] = $payment;
+                        }
+
+                        // Vérifier si le paiement wallet a réussi
+                        if ($paymentMethod === PaymentMethod::WALLET) {
+                            if ($payment && $payment->isSuccessful()) {
+                                $reservation->update([
+                                    'status' => 'confirmed',
+                                    'payment_status' => 'completed',
+                                ]);
+                            } else {
+                                throw new \Exception('Le paiement par portefeuille a échoué pour ' . $reservation->product->name);
+                            }
+                        }
+                    }
+
+                    // Si tous les paiements wallet ont réussi, confirmer la commande
+                    if ($paymentMethod === PaymentMethod::WALLET) {
+                        $order->update([
+                            'status' => 'confirmed',
+                            'payment_status' => 'completed',
+                        ]);
+
+                        Log::info('Wallet payments successful for order', [
+                            'order_id' => $order->id,
+                            'total_amount' => $totalAmount,
+                            'payments_count' => count($payments),
+                            'user_id' => $user->id,
+                        ]);
+                    }
+                } catch (\Exception $paymentError) {
+                    // Rollback: restore stock and cancel reservations
+                    foreach ($createdReservations as $reservation) {
+                        $product = Product::find($reservation->product_id);
+                        if ($product) {
+                            $product->increment('quantity_available', $reservation->quantity_reserved);
+                        }
+                        $reservation->update(['status' => 'cancelled']);
+                    }
+                    $order->update(['status' => 'cancelled']);
+
+                    throw new \Exception('Erreur de paiement: ' . $paymentError->getMessage());
+                }
+            }
+
             DB::commit();
+
+            // 5. Vider le panier après succès (utiliser la relation comme CartController)
+            // Re-fetch user to get fresh relationship data
+            $freshUser = \App\Models\User::find($user->id);
+            $userCart = $freshUser?->cart;
+
+            Log::info('Attempting to clear cart after order', [
+                'user_id' => $user->id,
+                'cart_found' => $userCart !== null,
+                'cart_id' => $userCart?->id,
+                'order_id' => $order->id,
+            ]);
+
+            if ($userCart) {
+                $itemCount = $userCart->items()->count();
+                $userCart->items()->delete();
+                $userCart->delete();
+                Log::info('Cart cleared after successful order', [
+                    'user_id' => $user->id,
+                    'order_id' => $order->id,
+                    'items_deleted' => $itemCount,
+                ]);
+            } else {
+                Log::warning('No cart found to clear after order', ['user_id' => $user->id]);
+            }
 
             // Charger les relations pour la réponse
             $order->load(['reservations.product.category', 'reservations.product.merchant']);
 
             return response()->json([
                 'success' => true,
-                'message' => 'Commande créée avec succès',
+                'message' => $paymentMethod === PaymentMethod::WALLET
+                    ? 'Commande créée et payée avec succès'
+                    : 'Commande créée avec succès',
                 'data' => [
                     'order' => $order,
                     'order_id' => $order->id,
                     'order_number' => $order->order_number,
                     'total_amount' => $order->total_amount,
                     'items_count' => count($createdReservations),
+                    'payment_status' => $order->payment_status,
                 ],
             ], 201);
 
         } catch (\Exception $e) {
             DB::rollBack();
+
+            Log::error('Order creation failed', [
+                'error' => $e->getMessage(),
+                'user_id' => $user->id,
+                'items' => $items,
+            ]);
 
             return response()->json([
                 'success' => false,
