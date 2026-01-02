@@ -13,6 +13,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { Ionicons } from '@expo/vector-icons'
 import { useTheme } from '../../theme'
 import { Typography, Card, Button } from '../../components/2025'
+import { AdminHeader } from '../../components/admin'
 import AlertModal from '../../components/AlertModal'
 import { useAlert } from '../../hooks/useAlert'
 import apiService from '../../services/api'
@@ -38,6 +39,10 @@ const AdminSettingsScreen: React.FC = () => {
   const insets = useSafeAreaInsets()
   const { alertProps, showError, showSuccess, showWarning, hideAlert } = useAlert()
   const isMountedRef = useRef(true)
+
+  // Dark mode adaptive surface color
+  const surfaceColor = theme.isDark ? theme.colors.neutral[800] : theme.colors.surface.light
+  const borderColor = theme.isDark ? theme.colors.neutral[600] : theme.colors.border
 
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
@@ -213,8 +218,8 @@ const AdminSettingsScreen: React.FC = () => {
           style={[
             styles.input,
             {
-              backgroundColor: theme.colors.surface.light,
-              borderColor: theme.colors.border,
+              backgroundColor: surfaceColor,
+              borderColor: borderColor,
               color: theme.colors.text,
             }
           ]}
@@ -291,20 +296,11 @@ const AdminSettingsScreen: React.FC = () => {
     <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
       <StatusBar barStyle="light-content" backgroundColor={theme.colors.primary[500]} />
 
-      {/* Header */}
-      <View style={[styles.header, { backgroundColor: theme.colors.primary[500], paddingTop: insets.top + 10 }]}>
-        <View style={styles.headerContent}>
-          <View>
-            <Typography variant="caption" style={{ color: 'rgba(255, 255, 255, 0.8)' }}>
-              Administrateur
-            </Typography>
-            <Typography variant="h2" weight="bold" style={{ color: 'white' }}>
-              Paramètres Système
-            </Typography>
-          </View>
-          <Ionicons name="settings" size={32} color="white" />
-        </View>
-      </View>
+      <AdminHeader
+        title="Parametres"
+        showBack
+        rightIcon="settings"
+      />
 
       <ScrollView
         style={styles.content}

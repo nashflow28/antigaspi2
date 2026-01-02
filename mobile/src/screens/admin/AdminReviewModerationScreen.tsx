@@ -116,6 +116,10 @@ const AdminReviewModerationScreen: React.FC = () => {
   const theme = useTheme()
   const insets = useSafeAreaInsets()
   const { alertProps, showError, showSuccess, showWarning, hideAlert } = useAlert()
+
+  // Dark mode adaptive surface color
+  const surfaceColor = theme.isDark ? theme.colors.neutral[800] : theme.colors.surface.light
+  const borderColor = theme.isDark ? theme.colors.neutral[600] : theme.colors.border
   const [stats, setStats] = useState<ModerationStats | null>(null)
   const [reportReasons, setReportReasons] = useState<Record<string, number>>({})
   const [pendingReviews, setPendingReviews] = useState<PendingReview[]>([])
@@ -629,7 +633,7 @@ const AdminReviewModerationScreen: React.FC = () => {
             <Card
               style={StyleSheet.flatten([
                 styles.statCard,
-                { backgroundColor: theme.colors.surface.light },
+                { backgroundColor: surfaceColor },
               ])}
             >
               <Typography variant="caption" color="secondary">
@@ -642,7 +646,7 @@ const AdminReviewModerationScreen: React.FC = () => {
             <Card
               style={StyleSheet.flatten([
                 styles.statCard,
-                { backgroundColor: theme.colors.surface.light },
+                { backgroundColor: surfaceColor },
               ])}
             >
               <Typography variant="caption" color="secondary">
@@ -655,7 +659,7 @@ const AdminReviewModerationScreen: React.FC = () => {
             <Card
               style={StyleSheet.flatten([
                 styles.statCard,
-                { backgroundColor: theme.colors.surface.light },
+                { backgroundColor: surfaceColor },
               ])}
             >
               <Typography variant="caption" color="secondary">
@@ -668,7 +672,7 @@ const AdminReviewModerationScreen: React.FC = () => {
             <Card
               style={StyleSheet.flatten([
                 styles.statCard,
-                { backgroundColor: theme.colors.surface.light },
+                { backgroundColor: surfaceColor },
               ])}
             >
               <Typography variant="caption" color="secondary">
@@ -681,7 +685,7 @@ const AdminReviewModerationScreen: React.FC = () => {
             <Card
               style={StyleSheet.flatten([
                 styles.statCard,
-                { backgroundColor: theme.colors.surface.light },
+                { backgroundColor: surfaceColor },
               ])}
             >
               <Typography variant="caption" color="secondary">
@@ -699,7 +703,7 @@ const AdminReviewModerationScreen: React.FC = () => {
         <Card
           style={StyleSheet.flatten([
             styles.reasonsCard,
-            { backgroundColor: theme.colors.surface.light },
+            { backgroundColor: surfaceColor },
           ])}
         >
           <Typography variant="h4" weight="semibold" style={styles.sectionTitle}>
@@ -728,7 +732,7 @@ const AdminReviewModerationScreen: React.FC = () => {
               backgroundColor:
                 activeTab === 'pending'
                   ? theme.colors.primary[500]
-                  : theme.colors.surface.light,
+                  : surfaceColor,
             },
           ]}
           onPress={() => setActiveTab('pending')}
@@ -752,7 +756,7 @@ const AdminReviewModerationScreen: React.FC = () => {
               backgroundColor:
                 activeTab === 'reported'
                   ? theme.colors.primary[500]
-                  : theme.colors.surface.light,
+                  : surfaceColor,
             },
           ]}
           onPress={() => setActiveTab('reported')}
@@ -783,11 +787,11 @@ const AdminReviewModerationScreen: React.FC = () => {
                       backgroundColor:
                         reportStatusFilter === option.value
                           ? theme.colors.primary[500]
-                          : theme.colors.surface.light,
+                          : surfaceColor,
                       borderColor:
                         reportStatusFilter === option.value
                           ? theme.colors.primary[500]
-                          : theme.colors.border,
+                          : borderColor,
                     },
                   ]}
                   onPress={() => setReportStatusFilter(option.value as ReportStatusFilter)}
@@ -815,11 +819,11 @@ const AdminReviewModerationScreen: React.FC = () => {
                       backgroundColor:
                         reportReasonFilter === option.value
                           ? theme.colors.primary[100]
-                          : theme.colors.surface.light,
+                          : surfaceColor,
                       borderColor:
                         reportReasonFilter === option.value
                           ? theme.colors.primary[300]
-                          : theme.colors.border,
+                          : borderColor,
                     },
                   ]}
                   onPress={() => setReportReasonFilter(option.value as ReportReasonFilter)}

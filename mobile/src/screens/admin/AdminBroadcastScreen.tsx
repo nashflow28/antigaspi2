@@ -13,6 +13,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { Ionicons } from '@expo/vector-icons'
 import { useTheme } from '../../theme'
 import { Typography, Card, Button, Badge } from '../../components/2025'
+import { AdminHeader } from '../../components/admin'
 import AlertModal from '../../components/AlertModal'
 import apiService from '../../services/api'
 import { BroadcastNotification } from '../../types'
@@ -23,6 +24,10 @@ const AdminBroadcastScreen: React.FC = () => {
   const theme = useTheme()
   const insets = useSafeAreaInsets()
   const { alertProps, showError, showSuccess, showWarning, hideAlert } = useAlert()
+
+  // Dark mode adaptive surface color
+  const surfaceColor = theme.isDark ? theme.colors.neutral[800] : theme.colors.surface.light
+  const borderColor = theme.isDark ? theme.colors.neutral[600] : theme.colors.border
   const [title, setTitle] = useState('')
   const [message, setMessage] = useState('')
   const [selectedChannels, setSelectedChannels] = useState<
@@ -168,20 +173,11 @@ const AdminBroadcastScreen: React.FC = () => {
     <View style={[styles.container, { backgroundColor: theme.colors.background }]} testID={TEST_IDS.adminBroadcast}>
       <StatusBar barStyle="light-content" backgroundColor={theme.colors.primary[500]} />
 
-      {/* Header */}
-      <View style={[styles.header, { backgroundColor: theme.colors.primary[500] }]}>
-        <View style={styles.headerContent}>
-          <View>
-            <Typography variant="caption" style={{ color: 'rgba(255, 255, 255, 0.8)' }}>
-              Administrateur
-            </Typography>
-            <Typography variant="h2" weight="bold" style={{ color: 'white' }}>
-              Envoyer une notification
-            </Typography>
-          </View>
-          <Ionicons name="megaphone" size={32} color="white" />
-        </View>
-      </View>
+      <AdminHeader
+        title="Notifications"
+        showBack
+        rightIcon="megaphone"
+      />
 
       <ScrollView
         style={styles.content}
@@ -196,8 +192,8 @@ const AdminBroadcastScreen: React.FC = () => {
             style={[
               styles.input,
               {
-                backgroundColor: theme.colors.surface.light,
-                borderColor: theme.colors.border,
+                backgroundColor: surfaceColor,
+                borderColor: borderColor,
                 color: theme.colors.text,
               },
             ]}
@@ -226,8 +222,8 @@ const AdminBroadcastScreen: React.FC = () => {
             style={[
               styles.textArea,
               {
-                backgroundColor: theme.colors.surface.light,
-                borderColor: theme.colors.border,
+                backgroundColor: surfaceColor,
+                borderColor: borderColor,
                 color: theme.colors.text,
               },
             ]}
@@ -379,8 +375,8 @@ const AdminBroadcastScreen: React.FC = () => {
             style={[
               styles.input,
               {
-                backgroundColor: theme.colors.surface.light,
-                borderColor: theme.colors.border,
+                backgroundColor: surfaceColor,
+                borderColor: borderColor,
                 color: theme.colors.text,
               },
             ]}
@@ -414,8 +410,8 @@ const AdminBroadcastScreen: React.FC = () => {
               style={[
                 styles.textArea,
                 {
-                  backgroundColor: theme.colors.surface.light,
-                  borderColor: theme.colors.border,
+                  backgroundColor: surfaceColor,
+                  borderColor: borderColor,
                   color: theme.colors.text,
                   fontFamily: 'monospace',
                 },
