@@ -76,8 +76,8 @@ const AdminNavigator: React.FC = () => {
         tabBarStyle: {
           paddingBottom: insets.bottom > 0 ? insets.bottom : 8,
           height: 60 + (insets.bottom > 0 ? insets.bottom : 8),
-          backgroundColor: theme.colors.surface.light,
-          borderTopColor: theme.colors.border,
+          backgroundColor: theme.isDark ? theme.colors.neutral[900] : theme.colors.surface.light,
+          borderTopColor: theme.isDark ? theme.colors.neutral[700] : theme.colors.border,
         },
       })}
     >
