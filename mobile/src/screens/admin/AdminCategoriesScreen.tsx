@@ -31,6 +31,10 @@ const AdminCategoriesScreen: React.FC = () => {
   const theme = useTheme()
   const insets = useSafeAreaInsets()
   const { alertProps, showError, showSuccess, showWarning } = useAlert()
+
+  // Dark mode adaptive colors
+  const surfaceColor = theme.isDark ? theme.colors.neutral[800] : theme.colors.surface.light
+  const borderColor = theme.isDark ? theme.colors.neutral[600] : theme.colors.neutral[300]
   const [categories, setCategories] = useState<CategoryWithStats[]>([])
   const [refreshing, setRefreshing] = useState(false)
   const [loading, setLoading] = useState(true)
@@ -206,12 +210,12 @@ const AdminCategoriesScreen: React.FC = () => {
           </View>
         </View>
         <View style={styles.actionsRow}>
-          <TouchableOpacity onPress={() => handleEditCategory(item)} style={[styles.actionButton, { backgroundColor: theme.colors.surface.light }]} testID="edit-category-button">
+          <TouchableOpacity onPress={() => handleEditCategory(item)} style={[styles.actionButton, { backgroundColor: surfaceColor }]} testID="edit-category-button">
             <Ionicons name="pencil" size={20} color={theme.colors.primary[500]} testID="pencil-icon" />
           </TouchableOpacity>
           <TouchableOpacity
             onPress={() => handleDeleteCategory(item)}
-            style={[styles.actionButton, { backgroundColor: theme.colors.surface.light }]}
+            style={[styles.actionButton, { backgroundColor: surfaceColor }]}
             testID="delete-category-button"
           >
             <Ionicons name="trash-outline" size={20} color={theme.colors.error} testID="trash-icon" />
@@ -248,9 +252,9 @@ const AdminCategoriesScreen: React.FC = () => {
                 style={[
                   styles.input,
                   {
-                    backgroundColor: theme.colors.surface.light,
+                    backgroundColor: surfaceColor,
                     color: theme.colors.text,
-                    borderColor: theme.colors.neutral[300],
+                    borderColor: borderColor,
                   },
                 ]}
                 placeholder="Ex: Boulangerie, Fruits & Légumes"
@@ -274,9 +278,9 @@ const AdminCategoriesScreen: React.FC = () => {
                   styles.input,
                   styles.textArea,
                   {
-                    backgroundColor: theme.colors.surface.light,
+                    backgroundColor: surfaceColor,
                     color: theme.colors.text,
-                    borderColor: theme.colors.neutral[300],
+                    borderColor: borderColor,
                   },
                 ]}
                 placeholder="Description de la catégorie..."
