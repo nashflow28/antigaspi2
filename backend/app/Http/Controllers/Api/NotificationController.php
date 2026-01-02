@@ -50,7 +50,6 @@ class NotificationController extends Controller
 
         $notification->update([
             'is_read' => true,
-            'updated_at' => now(),
         ]);
 
         return response()->json([
@@ -67,7 +66,6 @@ class NotificationController extends Controller
             ->where('is_read', false)
             ->update([
                 'is_read' => true,
-                'updated_at' => now(),
             ]);
 
         return response()->json([
