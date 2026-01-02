@@ -59,16 +59,18 @@ const MerchantAnalyticsScreen: React.FC = () => {
         apiService.get('/analytics/merchant-products-chart?limit=5'),
       ])
 
-      if (revenueRes.data.success) {
-        setRevenueData(revenueRes.data.data.chart_data || [])
+      // BUG FIX #1: Correct API response parsing
+      // API returns { success: true, data: { chart_data: [...] } }
+      if (revenueRes.success) {
+        setRevenueData(revenueRes.data?.chart_data || [])
       }
 
-      if (reservationsRes.data.success) {
-        setReservationsData(reservationsRes.data.data.chart_data || [])
+      if (reservationsRes.success) {
+        setReservationsData(reservationsRes.data?.chart_data || [])
       }
 
-      if (productsRes.data.success) {
-        setProductsData(productsRes.data.data.chart_data || [])
+      if (productsRes.success) {
+        setProductsData(productsRes.data?.chart_data || [])
       }
     } catch (error) {
       console.error('Erreur chargement analytics:', error)

@@ -90,10 +90,21 @@ class AnalyticsController extends Controller
             $confirmedReservations = (clone $reservations)->where('status', 'confirmed')->count();
             $completedReservations = (clone $reservations)->where('status', 'completed')->count();
 
-            // Revenus du jour
+            // Revenus du jour - BUG FIX #2 & #5: Inclure completed + confirmed payés
+            // Compte les réservations complétées aujourd'hui OU confirmées et payées aujourd'hui
             $todaysRevenue = (clone $reservations)
-                ->where('status', 'completed')
-                ->whereDate('updated_at', now()->toDateString())
+                ->where(function ($query) {
+                    $query->where(function ($q) {
+                        // Réservations complétées aujourd'hui
+                        $q->where('status', 'completed')
+                          ->whereDate('completed_at', now()->toDateString());
+                    })->orWhere(function ($q) {
+                        // Réservations confirmées et payées (wallet) aujourd'hui
+                        $q->where('status', 'confirmed')
+                          ->where('payment_status', 'success')
+                          ->whereDate('confirmed_at', now()->toDateString());
+                    });
+                })
                 ->sum('total_amount');
 
             // Total des ventes (depuis merchant.total_sales)
@@ -147,13 +158,29 @@ class AnalyticsController extends Controller
                 default => 7,
             };
 
-            // Récupérer les revenus par jour
+            // Récupérer les revenus par jour - BUG FIX #2 & #5: Completed + confirmed payés
+            // On utilise COALESCE pour prendre completed_at ou confirmed_at selon le cas
             $revenues = Reservation::whereHas('product', function ($query) use ($merchantId) {
                     $query->where('merchant_id', $merchantId);
                 })
-                ->where('status', 'completed')
-                ->where('updated_at', '>=', now()->subDays($days))
-                ->selectRaw('DATE(updated_at) as date, SUM(total_amount) as revenue')
+                ->where(function ($query) {
+                    $query->where('status', 'completed')
+                          ->orWhere(function ($q) {
+                              $q->where('status', 'confirmed')
+                                ->where('payment_status', 'success');
+                          });
+                })
+                ->where(function ($query) use ($days) {
+                    $query->where(function ($q) use ($days) {
+                        $q->whereNotNull('completed_at')
+                          ->where('completed_at', '>=', now()->subDays($days));
+                    })->orWhere(function ($q) use ($days) {
+                        $q->whereNull('completed_at')
+                          ->whereNotNull('confirmed_at')
+                          ->where('confirmed_at', '>=', now()->subDays($days));
+                    });
+                })
+                ->selectRaw('DATE(COALESCE(completed_at, confirmed_at)) as date, SUM(total_amount) as revenue')
                 ->groupBy('date')
                 ->orderBy('date')
                 ->get();
@@ -197,10 +224,16 @@ class AnalyticsController extends Controller
             $merchantId = $user->merchant->id;
             $limit = $request->query('limit', 10);
 
-            // Top produits les plus réservés
+            // Top produits les plus réservés - BUG FIX #5: Inclure confirmed payés
             $topProducts = Reservation::join('products', 'reservations.product_id', '=', 'products.id')
                 ->where('products.merchant_id', $merchantId)
-                ->where('reservations.status', 'completed')
+                ->where(function ($query) {
+                    $query->where('reservations.status', 'completed')
+                          ->orWhere(function ($q) {
+                              $q->where('reservations.status', 'confirmed')
+                                ->where('reservations.payment_status', 'success');
+                          });
+                })
                 ->selectRaw('products.id, products.name, SUM(reservations.quantity_reserved) as total_sold')
                 ->groupBy('products.id', 'products.name')
                 ->orderByDesc('total_sold')
@@ -252,10 +285,11 @@ class AnalyticsController extends Controller
                 default => 7,
             };
 
-            // Tendance des réservations
+            // Tendance des réservations - BUG FIX #3: Exclure les réservations annulées
             $reservations = Reservation::whereHas('product', function ($query) use ($merchantId) {
                     $query->where('merchant_id', $merchantId);
                 })
+                ->whereNotIn('status', ['cancelled'])
                 ->where('created_at', '>=', now()->subDays($days))
                 ->selectRaw('DATE(created_at) as date, COUNT(*) as count')
                 ->groupBy('date')

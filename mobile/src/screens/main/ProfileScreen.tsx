@@ -312,7 +312,7 @@ const ProfileScreen: React.FC = () => {
               borderBottomColor: theme.colors.border,
             },
           ]}
-          onPress={() => (navigation as any).navigate('NotificationsInbox')}
+          onPress={() => (navigation as any).navigate(user?.role === 'merchant' ? 'Notifications' : 'NotificationsInbox')}
         >
           <Ionicons name="notifications-outline" size={24} color={theme.colors.text} />
           <Typography variant="body" style={{ flex: 1, marginLeft: theme.spacing.md }}>

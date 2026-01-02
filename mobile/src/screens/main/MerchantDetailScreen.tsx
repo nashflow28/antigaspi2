@@ -407,9 +407,6 @@ const MerchantDetailScreen: React.FC<Props> = ({ route, navigation }) => {
             <TouchableOpacity style={styles.headerButton} onPress={handleShare}>
               <Ionicons name="share-social" size={24} color={theme.colors.textInverse} />
             </TouchableOpacity>
-            <TouchableOpacity style={styles.headerButton}>
-              <Ionicons name="heart-outline" size={24} color={theme.colors.textInverse} />
-            </TouchableOpacity>
           </View>
         </View>
 

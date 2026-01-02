@@ -7,7 +7,6 @@ import {
   TouchableOpacity,
   RefreshControl,
   ActivityIndicator,
-  Alert,
 } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { Ionicons } from '@expo/vector-icons'
@@ -15,6 +14,7 @@ import { useNavigation } from '@react-navigation/native'
 
 import apiService from '../../services/api'
 import notificationService from '../../services/notificationService'
+import { useAlert } from '../../contexts/AlertContext'
 import theme from '../../styles/theme'
 
 interface Notification {
@@ -69,6 +69,7 @@ const NOTIFICATION_COLORS: Record<string, string> = {
 
 export default function NotificationsScreen() {
   const navigation = useNavigation<any>()
+  const { showAlert } = useAlert()
   const [notifications, setNotifications] = useState<Notification[]>([])
   const [loading, setLoading] = useState(true)
   const [refreshing, setRefreshing] = useState(false)
@@ -164,10 +165,18 @@ export default function NotificationsScreen() {
       await apiService.post('/notifications/read-all')
       setNotifications(prev => prev.map(n => ({ ...n, is_read: true })))
       await notificationService.updateBadge()
-      Alert.alert('Succès', 'Toutes les notifications ont été marquées comme lues')
+      showAlert({
+        title: 'Succès',
+        message: 'Toutes les notifications ont été marquées comme lues',
+        type: 'success',
+      })
     } catch (error) {
       console.error('Error marking all as read:', error)
-      Alert.alert('Erreur', 'Impossible de marquer les notifications comme lues')
+      showAlert({
+        title: 'Erreur',
+        message: 'Impossible de marquer les notifications comme lues',
+        type: 'error',
+      })
     }
   }
 
