@@ -850,6 +850,9 @@ const AdminReviewModerationScreen: React.FC = () => {
         rightIconTestId="refresh-reviews-button"
       />
 
+      {/* Stats et tabs sticky - restent fixes au scroll */}
+      {headerComponent}
+
       {activeTab === 'pending' ? (
         <FlatList
           data={pendingReviews}
@@ -858,7 +861,6 @@ const AdminReviewModerationScreen: React.FC = () => {
           contentContainerStyle={styles.listContent}
           ListEmptyComponent={emptyPendingComponent}
           refreshControl={<RefreshControl refreshing={refreshing} onRefresh={handleRefresh} tintColor={theme.colors.primary[500]} />}
-          ListHeaderComponent={headerComponent}
         />
       ) : (
         <FlatList
@@ -868,7 +870,6 @@ const AdminReviewModerationScreen: React.FC = () => {
           contentContainerStyle={styles.listContent}
           ListEmptyComponent={emptyReportedComponent}
           refreshControl={<RefreshControl refreshing={refreshing} onRefresh={handleRefresh} tintColor={theme.colors.primary[500]} />}
-          ListHeaderComponent={headerComponent}
           ListFooterComponent={listLoading ? (
             <View style={styles.footerLoader}>
               <ActivityIndicator size="small" color={theme.colors.primary[500]} />

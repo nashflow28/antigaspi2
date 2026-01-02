@@ -481,11 +481,13 @@ const AdminUsersScreen: React.FC = () => {
         rightIconTestId="refresh-users-button"
       />
 
+      {/* Filtres sticky - restent fixes au scroll */}
+      {renderHeader()}
+
       <FlatList
         data={filteredUsers}
         keyExtractor={item => `user-${item.id}`}
         renderItem={renderUserCard}
-        ListHeaderComponent={renderHeader}
         ListEmptyComponent={
           <View style={styles.emptyState}>
             <Ionicons name="people-outline" size={64} color={theme.colors.neutral[400]} />

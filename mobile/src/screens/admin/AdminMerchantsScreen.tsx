@@ -636,11 +636,13 @@ const AdminMerchantsScreen: React.FC = () => {
         rightIconTestId="refresh-merchants-button"
       />
 
+      {/* Filtres sticky - restent fixes au scroll */}
+      {renderHeader()}
+
       <FlatList
         data={filteredMerchants}
         keyExtractor={item => `merchant-${item.id}`}
         renderItem={renderMerchantCard}
-        ListHeaderComponent={renderHeader}
         ListEmptyComponent={
           <View style={styles.emptyState}>
             <Ionicons name="storefront-outline" size={64} color={theme.colors.neutral[400]} />
