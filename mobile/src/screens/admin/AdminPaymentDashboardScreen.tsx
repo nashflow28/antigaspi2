@@ -13,6 +13,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { Ionicons } from '@expo/vector-icons'
 import { useTheme } from '../../theme'
 import { Typography, Card, Badge, Button } from '../../components/2025'
+import { AdminHeader } from '../../components/admin'
 import AlertModal from '../../components/AlertModal'
 import { useAlert } from '../../hooks/useAlert'
 import apiService from '../../services/api'
@@ -393,22 +394,12 @@ const AdminPaymentDashboardScreen: React.FC = () => {
     <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
       <StatusBar barStyle="light-content" backgroundColor={theme.colors.primary[500]} />
 
-      {/* Header */}
-      <View style={[styles.header, { backgroundColor: theme.colors.primary[500], paddingTop: insets.top + 10 }]}>
-        <View style={styles.headerContent}>
-          <View>
-            <Typography variant="caption" style={{ color: 'rgba(255, 255, 255, 0.8)' }}>
-              Administrateur
-            </Typography>
-            <Typography variant="h2" weight="bold" style={{ color: 'white' }}>
-              Dashboard Paiements
-            </Typography>
-          </View>
-          <TouchableOpacity onPress={onRefresh} style={styles.refreshButton}>
-            <Ionicons name="refresh" size={24} color="white" />
-          </TouchableOpacity>
-        </View>
-      </View>
+      <AdminHeader
+        title="Paiements"
+        showBack
+        rightIcon="refresh"
+        onRightPress={onRefresh}
+      />
 
       <FlatList
         data={payments}
