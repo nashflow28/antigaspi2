@@ -269,10 +269,10 @@ const AdminBroadcastScreen: React.FC = () => {
                   {
                     backgroundColor: selectedChannels.includes(channel.id)
                       ? theme.colors.primary[100]
-                      : theme.colors.surface.light,
+                      : surfaceColor,
                     borderColor: selectedChannels.includes(channel.id)
                       ? theme.colors.primary[500]
-                      : theme.colors.border,
+                      : borderColor,
                   },
                 ]}
                 onPress={() => toggleChannel(channel.id)}
@@ -330,10 +330,10 @@ const AdminBroadcastScreen: React.FC = () => {
                   {
                     backgroundColor: selectedRoles.includes(role.id)
                       ? theme.colors.primary[100]
-                      : theme.colors.surface.light,
+                      : surfaceColor,
                     borderColor: selectedRoles.includes(role.id)
                       ? theme.colors.primary[500]
-                      : theme.colors.border,
+                      : borderColor,
                   },
                 ]}
                 onPress={() => toggleRole(role.id)}
