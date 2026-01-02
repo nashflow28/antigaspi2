@@ -32,6 +32,9 @@ const AdminAnalyticsScreen: React.FC<{ navigation: any }> = ({ navigation }) => 
   const theme = useTheme()
   const insets = useSafeAreaInsets()
   const { alertProps, showError, showWarning } = useAlert()
+
+  // Dark mode adaptive surface color
+  const surfaceColor = theme.isDark ? theme.colors.neutral[800] : theme.colors.surface.light
   const [selectedPeriod, setSelectedPeriod] = useState<Period>('30d')
   const [selectedTab, setSelectedTab] = useState<Tab>('revenue')
   const [data, setData] = useState<AdminAnalyticsData | null>(null)
@@ -172,11 +175,11 @@ const AdminAnalyticsScreen: React.FC<{ navigation: any }> = ({ navigation }) => 
                     backgroundColor:
                       selectedPeriod === period.id
                         ? theme.colors.primary[100]
-                        : theme.colors.surface.light,
+                        : surfaceColor,
                     borderColor:
                       selectedPeriod === period.id
                         ? theme.colors.primary[500]
-                        : theme.colors.border,
+                        : theme.isDark ? theme.colors.neutral[600] : theme.colors.border,
                   },
                 ]}
                 onPress={() => setSelectedPeriod(period.id)}

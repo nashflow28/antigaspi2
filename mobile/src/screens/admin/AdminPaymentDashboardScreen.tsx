@@ -62,6 +62,9 @@ interface Pagination {
 const AdminPaymentDashboardScreen: React.FC = () => {
   const theme = useTheme()
   const insets = useSafeAreaInsets()
+
+  // Dark mode adaptive surface color
+  const surfaceColor = theme.isDark ? theme.colors.neutral[800] : theme.colors.surface.light
   const { alertProps, showError, showInfo, hideAlert } = useAlert()
   const isMountedRef = useRef(true)
 
@@ -252,7 +255,7 @@ const AdminPaymentDashboardScreen: React.FC = () => {
     <TouchableOpacity
       activeOpacity={0.7}
       onPress={() => viewPaymentDetails(item)}
-      style={[styles.paymentCard, { backgroundColor: theme.colors.surface.light, borderColor: theme.colors.border }]}
+      style={[styles.paymentCard, { backgroundColor: surfaceColor, borderColor: theme.isDark ? theme.colors.neutral[700] : theme.colors.border }]}
     >
       <View style={styles.paymentHeader}>
         <View style={{ flex: 1 }}>
@@ -325,10 +328,10 @@ const AdminPaymentDashboardScreen: React.FC = () => {
               {
                 backgroundColor: selectedStatus === filter.value
                   ? theme.colors.primary[500]
-                  : theme.colors.surface.light,
+                  : surfaceColor,
                 borderColor: selectedStatus === filter.value
                   ? theme.colors.primary[500]
-                  : theme.colors.border,
+                  : theme.isDark ? theme.colors.neutral[600] : theme.colors.border,
               },
             ]}
             onPress={() => setSelectedStatus(filter.value)}
