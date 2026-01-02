@@ -476,9 +476,9 @@ const AdminMerchantsScreen: React.FC = () => {
                 style={[
                   styles.rejectInput,
                   {
-                    backgroundColor: theme.colors.surface.light,
+                    backgroundColor: theme.isDark ? theme.colors.neutral[800] : theme.colors.surface.light,
                     color: theme.colors.text,
-                    borderColor: theme.colors.neutral[300],
+                    borderColor: theme.isDark ? theme.colors.neutral[600] : theme.colors.neutral[300],
                   },
                 ]}
                 placeholder="Indiquez la raison du rejet..."
@@ -531,14 +531,17 @@ const AdminMerchantsScreen: React.FC = () => {
     )
   }
 
+  // Couleur de surface adaptee au mode sombre
+  const surfaceColor = theme.isDark ? theme.colors.neutral[800] : theme.colors.surface.light
+
   const renderHeader = () => (
     <View style={styles.header}>
       {/* Barre de recherche */}
-      <View style={[styles.searchBar, { backgroundColor: theme.colors.surface.light }]}>
+      <View style={[styles.searchBar, { backgroundColor: surfaceColor }]}>
         <Ionicons name="search" size={20} color={theme.colors.neutral[500]} />
         <TextInput
           style={[styles.searchInput, { color: theme.colors.text }]}
-          placeholder="Rechercher un commerçant..."
+          placeholder="Rechercher un commercant..."
           placeholderTextColor={theme.colors.neutral[400]}
           value={searchQuery}
           onChangeText={setSearchQuery}
@@ -558,7 +561,7 @@ const AdminMerchantsScreen: React.FC = () => {
             styles.filterChip,
             {
               backgroundColor:
-                statusFilter === 'all' ? theme.colors.primary[500] : theme.colors.surface.light,
+                statusFilter === 'all' ? theme.colors.primary[500] : surfaceColor,
             },
           ]}
         >
@@ -577,7 +580,7 @@ const AdminMerchantsScreen: React.FC = () => {
             styles.filterChip,
             {
               backgroundColor:
-                statusFilter === 'verified' ? theme.colors.success : theme.colors.surface.light,
+                statusFilter === 'verified' ? theme.colors.success : surfaceColor,
             },
           ]}
         >
@@ -588,7 +591,7 @@ const AdminMerchantsScreen: React.FC = () => {
               color: statusFilter === 'verified' ? '#FFFFFF' : theme.colors.text,
             }}
           >
-            Vérifiés ({merchants.filter(m => m.is_verified).length})
+            Verifies ({merchants.filter(m => m.is_verified).length})
           </Typography>
         </TouchableOpacity>
 
@@ -598,7 +601,7 @@ const AdminMerchantsScreen: React.FC = () => {
             styles.filterChip,
             {
               backgroundColor:
-                statusFilter === 'pending' ? theme.colors.warning : theme.colors.surface.light,
+                statusFilter === 'pending' ? theme.colors.warning : surfaceColor,
             },
           ]}
         >

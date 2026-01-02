@@ -353,10 +353,13 @@ const AdminUsersScreen: React.FC = () => {
     )
   }
 
+  // Couleur de surface adaptee au mode sombre
+  const surfaceColor = theme.isDark ? theme.colors.neutral[800] : theme.colors.surface.light
+
   const renderHeader = () => (
     <View style={styles.header}>
       {/* Barre de recherche */}
-      <View style={[styles.searchBar, { backgroundColor: theme.colors.surface.light }]}>
+      <View style={[styles.searchBar, { backgroundColor: surfaceColor }]}>
         <Ionicons name="search" size={20} color={theme.colors.neutral[500]} />
         <TextInput
           style={[styles.searchInput, { color: theme.colors.text }]}
@@ -372,7 +375,7 @@ const AdminUsersScreen: React.FC = () => {
         )}
       </View>
 
-      {/* Filtres par rôle */}
+      {/* Filtres par role */}
       <View style={styles.filtersRow}>
         <TouchableOpacity
           onPress={() => setRoleFilter('all')}
@@ -380,7 +383,7 @@ const AdminUsersScreen: React.FC = () => {
             styles.filterChip,
             {
               backgroundColor:
-                roleFilter === 'all' ? theme.colors.primary[500] : theme.colors.surface.light,
+                roleFilter === 'all' ? theme.colors.primary[500] : surfaceColor,
             },
           ]}
         >
@@ -399,7 +402,7 @@ const AdminUsersScreen: React.FC = () => {
             styles.filterChip,
             {
               backgroundColor:
-                roleFilter === 'consumer' ? theme.colors.success : theme.colors.surface.light,
+                roleFilter === 'consumer' ? theme.colors.success : surfaceColor,
             },
           ]}
         >
@@ -420,7 +423,7 @@ const AdminUsersScreen: React.FC = () => {
             styles.filterChip,
             {
               backgroundColor:
-                roleFilter === 'merchant' ? theme.colors.warning : theme.colors.surface.light,
+                roleFilter === 'merchant' ? theme.colors.warning : surfaceColor,
             },
           ]}
         >
@@ -431,7 +434,7 @@ const AdminUsersScreen: React.FC = () => {
               color: roleFilter === 'merchant' ? '#FFFFFF' : theme.colors.text,
             }}
           >
-            Commerçants ({users.filter(u => u.role === 'merchant').length})
+            Commercants ({users.filter(u => u.role === 'merchant').length})
           </Typography>
         </TouchableOpacity>
 
@@ -441,7 +444,7 @@ const AdminUsersScreen: React.FC = () => {
             styles.filterChip,
             {
               backgroundColor:
-                roleFilter === 'admin' ? theme.colors.error : theme.colors.surface.light,
+                roleFilter === 'admin' ? theme.colors.error : surfaceColor,
             },
           ]}
         >
