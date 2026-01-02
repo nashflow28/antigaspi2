@@ -334,15 +334,18 @@ const WalletScreen: React.FC = () => {
             <Ionicons name="add-circle" size={18} color="#fff" style={styles.buttonIcon} />
             Recharger
           </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onPress={() => setShowTestRechargeModal(true)}
-            disabled={testRechargeLoading}
-          >
-            <Ionicons name="flask" size={18} color={theme.colors.warning} style={styles.buttonIcon} />
-            Test
-          </Button>
+          {/* Test button only visible in development mode */}
+          {__DEV__ && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onPress={() => setShowTestRechargeModal(true)}
+              disabled={testRechargeLoading}
+            >
+              <Ionicons name="flask" size={18} color={theme.colors.warning} style={styles.buttonIcon} />
+              Test
+            </Button>
+          )}
           <Button
             variant="secondary"
             size="sm"
@@ -626,68 +629,71 @@ const WalletScreen: React.FC = () => {
         </View>
       </Modal2025>
 
-      <Modal2025
-        visible={showTestRechargeModal}
-        onClose={() => setShowTestRechargeModal(false)}
-        title="Recharge Test"
-        variant="bottom"
-        avoidKeyboard={true}
-        testID="wallet-test-recharge-modal"
-      >
-        <View style={styles.modalContent}>
-          <View style={[styles.testWarningBanner, { backgroundColor: theme.withOpacity(theme.colors.warning, 0.15) }]}>
-            <Ionicons name="flask" size={24} color={theme.colors.warning} />
-            <View style={{ flex: 1 }}>
-              <Typography variant="body" weight="semibold" style={{ color: theme.colors.warning }}>
-                Mode Test
-              </Typography>
-              <Typography variant="caption" color="secondary">
-                Cette fonctionnalité permet de recharger virtuellement votre portefeuille pour tester l'application.
-              </Typography>
-            </View>
-          </View>
-          <Typography variant="caption">Montant (100 - 100 000 F CFA)</Typography>
-          <TextInput
-            value={testRechargeAmount}
-            onChangeText={setTestRechargeAmount}
-            placeholder="Ex: 5000"
-            keyboardType="numeric"
-            style={[styles.input, { borderColor: theme.colors.border, backgroundColor: theme.isDark ? theme.colors.neutral[800] : theme.colors.surface.light, color: theme.colors.text }]}
-          />
-          <View style={styles.testAmountPresets}>
-            {[1000, 5000, 10000, 25000].map((preset) => (
-              <TouchableOpacity
-                key={preset}
-                style={[
-                  styles.testAmountChip,
-                  {
-                    borderColor: testRechargeAmount === String(preset) ? theme.colors.primary[500] : theme.colors.border,
-                    backgroundColor: testRechargeAmount === String(preset)
-                      ? (theme.isDark ? theme.colors.primary[900] : theme.colors.primary[50])
-                      : (theme.isDark ? theme.colors.neutral[800] : theme.colors.surface.light),
-                  },
-                ]}
-                onPress={() => setTestRechargeAmount(String(preset))}
-              >
-                <Typography
-                  variant="caption"
-                  weight="semibold"
-                  style={{ color: testRechargeAmount === String(preset) ? theme.colors.primary[600] : theme.colors.text }}
-                >
-                  {formatCurrency(preset)}
+      {/* Test recharge modal only visible in development mode */}
+      {__DEV__ && (
+        <Modal2025
+          visible={showTestRechargeModal}
+          onClose={() => setShowTestRechargeModal(false)}
+          title="Recharge Test"
+          variant="bottom"
+          avoidKeyboard={true}
+          testID="wallet-test-recharge-modal"
+        >
+          <View style={styles.modalContent}>
+            <View style={[styles.testWarningBanner, { backgroundColor: theme.withOpacity(theme.colors.warning, 0.15) }]}>
+              <Ionicons name="flask" size={24} color={theme.colors.warning} />
+              <View style={{ flex: 1 }}>
+                <Typography variant="body" weight="semibold" style={{ color: theme.colors.warning }}>
+                  Mode Test
                 </Typography>
-              </TouchableOpacity>
-            ))}
+                <Typography variant="caption" color="secondary">
+                  Cette fonctionnalité permet de recharger virtuellement votre portefeuille pour tester l'application.
+                </Typography>
+              </View>
+            </View>
+            <Typography variant="caption">Montant (100 - 100 000 F CFA)</Typography>
+            <TextInput
+              value={testRechargeAmount}
+              onChangeText={setTestRechargeAmount}
+              placeholder="Ex: 5000"
+              keyboardType="numeric"
+              style={[styles.input, { borderColor: theme.colors.border, backgroundColor: theme.isDark ? theme.colors.neutral[800] : theme.colors.surface.light, color: theme.colors.text }]}
+            />
+            <View style={styles.testAmountPresets}>
+              {[1000, 5000, 10000, 25000].map((preset) => (
+                <TouchableOpacity
+                  key={preset}
+                  style={[
+                    styles.testAmountChip,
+                    {
+                      borderColor: testRechargeAmount === String(preset) ? theme.colors.primary[500] : theme.colors.border,
+                      backgroundColor: testRechargeAmount === String(preset)
+                        ? (theme.isDark ? theme.colors.primary[900] : theme.colors.primary[50])
+                        : (theme.isDark ? theme.colors.neutral[800] : theme.colors.surface.light),
+                    },
+                  ]}
+                  onPress={() => setTestRechargeAmount(String(preset))}
+                >
+                  <Typography
+                    variant="caption"
+                    weight="semibold"
+                    style={{ color: testRechargeAmount === String(preset) ? theme.colors.primary[600] : theme.colors.text }}
+                  >
+                    {formatCurrency(preset)}
+                  </Typography>
+                </TouchableOpacity>
+              ))}
+            </View>
+            <Button
+              variant="primary"
+              onPress={handleTestRecharge}
+              disabled={testRechargeLoading}
+            >
+              {testRechargeLoading ? 'Chargement...' : `Créditer ${formatCurrency(Number.parseInt(testRechargeAmount, 10) || 0)}`}
+            </Button>
           </View>
-          <Button
-            variant="primary"
-            onPress={handleTestRecharge}
-            disabled={testRechargeLoading}
-          >
-            {testRechargeLoading ? 'Chargement...' : `Créditer ${formatCurrency(Number.parseInt(testRechargeAmount, 10) || 0)}`}
-          </Button>
-        </View>
-      </Modal2025>
+        </Modal2025>
+      )}
 
       <AlertModal {...alertProps} />
     </View>

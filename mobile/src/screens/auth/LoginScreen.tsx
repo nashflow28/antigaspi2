@@ -147,7 +147,7 @@ const LoginScreen: React.FC<Props> = ({ navigation }) => {
           </View>
 
           {error && (
-            <View style={{ backgroundColor: theme.colors.error, padding: theme.spacing.sm, borderRadius: theme.radius.md, marginBottom: theme.spacing.lg }}>
+            <View style={{ backgroundColor: `${theme.colors.error}15`, padding: theme.spacing.sm, borderRadius: theme.radius.md, marginBottom: theme.spacing.lg, borderWidth: 1, borderColor: theme.colors.error }}>
               <Typography variant="caption" style={{ color: theme.colors.error, textAlign: 'center' }}>
                 {error}
               </Typography>
