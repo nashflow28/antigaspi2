@@ -4,7 +4,6 @@ import {
   StyleSheet,
   FlatList,
   TouchableOpacity,
-  StatusBar,
   RefreshControl,
   TextInput,
   Modal,
@@ -17,6 +16,7 @@ import { useTheme } from '../../theme'
 import { Category } from '../../types'
 import apiService from '../../services/api'
 import { Button, Badge, Card, Typography, ConfirmModal } from '../../components/2025'
+import { AdminHeader } from '../../components/admin'
 import AlertModal from '../../components/AlertModal'
 import { useAlert } from '../../hooks/useAlert'
 
@@ -333,16 +333,8 @@ const AdminCategoriesScreen: React.FC = () => {
 
   const renderHeader = () => (
     <View style={styles.header}>
-      <View style={styles.titleRow}>
-        <Typography variant="h2" weight="bold">
-          Catégories de produits
-        </Typography>
-        <TouchableOpacity onPress={handleCreateCategory} style={styles.createButton} testID="create-category-button">
-          <Ionicons name="add-circle" size={28} color={theme.colors.primary[500]} testID="add-circle-icon" />
-        </TouchableOpacity>
-      </View>
-      <Typography variant="body" color="secondary" style={{ marginTop: 8 }}>
-        {categories.length} catégorie{categories.length > 1 ? 's' : ''} enregistrée
+      <Typography variant="body" color="secondary">
+        {categories.length} categorie{categories.length > 1 ? 's' : ''} enregistree
         {categories.length > 1 ? 's' : ''}
       </Typography>
     </View>
@@ -363,7 +355,13 @@ const AdminCategoriesScreen: React.FC = () => {
 
   return (
     <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
-      <StatusBar barStyle={theme.isDark ? 'light-content' : 'dark-content'} backgroundColor={theme.colors.background} />
+      <AdminHeader
+        title="Categories"
+        showBack
+        rightIcon="add-circle"
+        onRightPress={handleCreateCategory}
+        rightIconTestId="create-category-button"
+      />
 
       <FlatList
         data={categories}
@@ -374,14 +372,14 @@ const AdminCategoriesScreen: React.FC = () => {
           <View style={styles.emptyState}>
             <Ionicons name="grid-outline" size={64} color={theme.colors.neutral[400]} />
             <Typography variant="h4" weight="semibold" style={{ marginTop: 16 }}>
-              Aucune catégorie
+              Aucune categorie
             </Typography>
             <Typography variant="body" color="secondary" style={{ marginTop: 8, marginBottom: 24 }}>
-              Créez votre première catégorie pour commencer
+              Creez votre premiere categorie pour commencer
             </Typography>
             <Button variant="primary" onPress={handleCreateCategory}>
               <Ionicons name="add-circle-outline" size={20} color="#FFFFFF" />
-              {'  '}Créer une catégorie
+              {'  '}Creer une categorie
             </Button>
           </View>
         }
@@ -392,7 +390,7 @@ const AdminCategoriesScreen: React.FC = () => {
             colors={[theme.colors.primary[500]]}
           />
         }
-        contentContainerStyle={[styles.listContent, { paddingTop: insets.top + 16 }]}
+        contentContainerStyle={styles.listContent}
         showsVerticalScrollIndicator={false}
       />
 

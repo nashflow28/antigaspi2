@@ -4,7 +4,6 @@ import {
   StyleSheet,
   FlatList,
   TouchableOpacity,
-  StatusBar,
   RefreshControl,
   TextInput,
   ActivityIndicator,
@@ -17,6 +16,7 @@ import { useTheme } from '../../theme'
 import { User } from '../../types'
 import apiService from '../../services/api'
 import { Button, Badge, Card, Typography, ConfirmModal } from '../../components/2025'
+import { AdminHeader } from '../../components/admin'
 import AlertModal from '../../components/AlertModal'
 import { useAlert } from '../../hooks/useAlert'
 import { createLogger } from '../../utils/logger'
@@ -355,10 +355,6 @@ const AdminUsersScreen: React.FC = () => {
 
   const renderHeader = () => (
     <View style={styles.header}>
-      <Typography variant="h2" weight="bold" style={{ marginBottom: 16 }}>
-        Gestion des utilisateurs
-      </Typography>
-
       {/* Barre de recherche */}
       <View style={[styles.searchBar, { backgroundColor: theme.colors.surface.light }]}>
         <Ionicons name="search" size={20} color={theme.colors.neutral[500]} />
@@ -478,7 +474,12 @@ const AdminUsersScreen: React.FC = () => {
 
   return (
     <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
-      <StatusBar barStyle={theme.isDark ? 'light-content' : 'dark-content'} backgroundColor={theme.colors.background} />
+      <AdminHeader
+        title="Utilisateurs"
+        rightIcon="refresh"
+        onRightPress={handleRefresh}
+        rightIconTestId="refresh-users-button"
+      />
 
       <FlatList
         data={filteredUsers}
@@ -489,12 +490,12 @@ const AdminUsersScreen: React.FC = () => {
           <View style={styles.emptyState}>
             <Ionicons name="people-outline" size={64} color={theme.colors.neutral[400]} />
             <Typography variant="h4" weight="semibold" style={{ marginTop: 16 }}>
-              Aucun utilisateur trouvé
+              Aucun utilisateur trouve
             </Typography>
             <Typography variant="body" color="secondary" style={{ marginTop: 8 }}>
               {searchQuery
                 ? 'Essayez de modifier votre recherche'
-                : 'Aucun utilisateur enregistré pour le moment'}
+                : 'Aucun utilisateur enregistre pour le moment'}
             </Typography>
           </View>
         }
@@ -505,7 +506,7 @@ const AdminUsersScreen: React.FC = () => {
             colors={[theme.colors.primary[500]]}
           />
         }
-        contentContainerStyle={[styles.listContent, { paddingTop: insets.top + 16 }]}
+        contentContainerStyle={styles.listContent}
         showsVerticalScrollIndicator={false}
       />
 

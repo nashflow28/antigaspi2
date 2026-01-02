@@ -2,7 +2,6 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import {
   View,
   StyleSheet,
-  StatusBar,
   ScrollView,
   TouchableOpacity,
   FlatList,
@@ -14,6 +13,7 @@ import { Ionicons } from '@expo/vector-icons'
 import { useTheme } from '../../theme'
 import apiService from '../../services/api'
 import { Badge, Button, Card, Typography } from '../../components/2025'
+import { AdminHeader } from '../../components/admin'
 import AlertModal from '../../components/AlertModal'
 import { useAlert } from '../../hooks/useAlert'
 
@@ -841,25 +841,31 @@ const AdminReviewModerationScreen: React.FC = () => {
   )
 
   return (
-    <View style={[styles.container, { backgroundColor: theme.colors.background }]}> 
-      <StatusBar barStyle={theme.isDark ? 'light-content' : 'dark-content'} backgroundColor={theme.colors.background} />
+    <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
+      <AdminHeader
+        title="Moderation"
+        showBack
+        rightIcon="refresh"
+        onRightPress={handleRefresh}
+        rightIconTestId="refresh-reviews-button"
+      />
 
       {activeTab === 'pending' ? (
         <FlatList
           data={pendingReviews}
           keyExtractor={item => `pending-${item.id}`}
           renderItem={renderPendingReview}
-          contentContainerStyle={[styles.listContent, { paddingTop: insets.top + 16 }]}
+          contentContainerStyle={styles.listContent}
           ListEmptyComponent={emptyPendingComponent}
           refreshControl={<RefreshControl refreshing={refreshing} onRefresh={handleRefresh} tintColor={theme.colors.primary[500]} />}
           ListHeaderComponent={headerComponent}
         />
-	      ) : (
-	        <FlatList
+      ) : (
+        <FlatList
           data={reportedReviews}
           keyExtractor={item => `reported-${item.id}`}
           renderItem={renderReportedReview}
-          contentContainerStyle={[styles.listContent, { paddingTop: insets.top + 16 }]}
+          contentContainerStyle={styles.listContent}
           ListEmptyComponent={emptyReportedComponent}
           refreshControl={<RefreshControl refreshing={refreshing} onRefresh={handleRefresh} tintColor={theme.colors.primary[500]} />}
           ListHeaderComponent={headerComponent}
@@ -869,7 +875,7 @@ const AdminReviewModerationScreen: React.FC = () => {
             </View>
           ) : null}
         />
-	      )}
+      )}
 
       <AlertModal {...alertProps} />
 	    </View>

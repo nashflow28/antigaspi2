@@ -5,7 +5,6 @@ import {
   StyleSheet,
   FlatList,
   TouchableOpacity,
-  StatusBar,
   RefreshControl,
   TextInput,
   Modal,
@@ -17,6 +16,7 @@ import { Ionicons } from '@expo/vector-icons'
 import { useTheme } from '../../theme'
 import apiService from '../../services/api'
 import { Button, Badge, Card, Typography } from '../../components/2025'
+import { AdminHeader } from '../../components/admin'
 import AlertModal from '../../components/AlertModal'
 import { useAlert } from '../../hooks/useAlert'
 
@@ -533,10 +533,6 @@ const AdminMerchantsScreen: React.FC = () => {
 
   const renderHeader = () => (
     <View style={styles.header}>
-      <Typography variant="h2" weight="bold" style={{ marginBottom: 16 }}>
-        Gestion des commerçants
-      </Typography>
-
       {/* Barre de recherche */}
       <View style={[styles.searchBar, { backgroundColor: theme.colors.surface.light }]}>
         <Ionicons name="search" size={20} color={theme.colors.neutral[500]} />
@@ -633,7 +629,12 @@ const AdminMerchantsScreen: React.FC = () => {
 
   return (
     <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
-      <StatusBar barStyle={theme.isDark ? 'light-content' : 'dark-content'} backgroundColor={theme.colors.background} />
+      <AdminHeader
+        title="Commercants"
+        rightIcon="refresh"
+        onRightPress={handleRefresh}
+        rightIconTestId="refresh-merchants-button"
+      />
 
       <FlatList
         data={filteredMerchants}
@@ -644,12 +645,12 @@ const AdminMerchantsScreen: React.FC = () => {
           <View style={styles.emptyState}>
             <Ionicons name="storefront-outline" size={64} color={theme.colors.neutral[400]} />
             <Typography variant="h4" weight="semibold" style={{ marginTop: 16 }}>
-              Aucun commerçant trouvé
+              Aucun commercant trouve
             </Typography>
             <Typography variant="body" color="secondary" style={{ marginTop: 8 }}>
               {searchQuery
                 ? 'Essayez de modifier votre recherche'
-                : 'Aucun commerçant enregistré pour le moment'}
+                : 'Aucun commercant enregistre pour le moment'}
             </Typography>
           </View>
         }
@@ -660,7 +661,7 @@ const AdminMerchantsScreen: React.FC = () => {
             colors={[theme.colors.primary[500]]}
           />
         }
-        contentContainerStyle={[styles.listContent, { paddingTop: insets.top + 16 }]}
+        contentContainerStyle={styles.listContent}
         showsVerticalScrollIndicator={false}
       />
 
