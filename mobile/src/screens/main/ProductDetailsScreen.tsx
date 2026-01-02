@@ -803,17 +803,16 @@ const ProductDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
           </>
         )}
 
-        {/* Guidance texte pour clarifier la différence */}
+        {/* Guidance texte pour le panier */}
         <View style={{ paddingHorizontal: theme.spacing.md, paddingBottom: theme.spacing.xs }}>
           <Typography variant="caption" color="secondary" style={{ textAlign: 'center', lineHeight: 16 }}>
-            💡 <Typography variant="caption" weight="semibold">Panier :</Typography> Ajoutez plusieurs produits pour une réservation groupée.{'\n'}
-            <Typography variant="caption" weight="semibold">Réserver :</Typography> Réservation immédiate de ce produit uniquement.
+            💡 Ajoutez au panier et finalisez votre commande avec le mode de paiement de votre choix.
           </Typography>
         </View>
 
         <View style={styles.bottomBarActions}>
           <Button
-            variant="secondary"
+            variant="primary"
             size="lg"
             disabled={product.quantity_available === 0 || addingToCart || updating}
             onPress={handleAddToCart}
@@ -827,23 +826,6 @@ const ProductDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
               : addingToCart || updating
                 ? 'Ajout en cours...'
                 : 'Ajouter au panier'}
-          </Button>
-
-          <Button
-            variant="primary"
-            size="lg"
-            disabled={product.quantity_available === 0 || reserving}
-            onPress={handleReserve}
-            leftIcon={<Ionicons name="cart" size={20} color={theme.colors.textInverse} />}
-            style={{ flex: 1 }}
-            testID={TEST_IDS.reserveButton}
-            accessibilityLabel={TEST_IDS.reserveButton}
-          >
-            {reserving
-              ? 'Réservation en cours...'
-              : product.quantity_available === 0
-                ? 'Rupture de stock'
-                : 'Réserver maintenant'}
           </Button>
         </View>
       </View>

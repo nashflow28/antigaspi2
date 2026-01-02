@@ -1,18 +1,18 @@
 import React, { useState } from 'react'
 import { TouchableOpacity, Text, ActivityIndicator, StyleSheet, View } from 'react-native'
 import { Ionicons } from '@expo/vector-icons'
-import * as FileSystem from 'expo-file-system/legacy'
-import * as Sharing from 'expo-sharing'
 import { useTheme } from '../../theme'
 import { Reservation } from '../../types'
 import { TEST_IDS } from '../../utils/testIds'
 import AlertModal, { AlertType, AlertButton } from '../AlertModal'
 import { createLogger } from '../../utils/logger'
+import { exportReservationsToExcel, shareExcelFile } from '../../services/excelExportService'
 
 const exportReservationsLogger = createLogger('ExportReservationsButton')
 
 interface Props {
   reservations: Reservation[]
+  merchantName?: string
   onExportStart?: () => void
   onExportComplete?: () => void
   onExportError?: (error: string) => void
@@ -20,18 +20,19 @@ interface Props {
 }
 
 /**
- * ExportReservationsButton - Bouton d'export CSV pour les réservations
+ * ExportReservationsButton - Bouton d'export Excel pour les réservations
  *
  * Features:
- * - Génération CSV avec échappement sécurisé (injection prevention)
- * - UTF-8 BOM pour compatibilité Excel
+ * - Génération Excel (XLSX) avec mise en forme élégante
+ * - Multi-feuilles: Réservations + Résumé
+ * - Colonnes auto-dimensionnées
+ * - Totaux calculés automatiquement
+ * - Répartition par statut
  * - Utilisation expo-file-system + expo-sharing
- * - BUG-001 fix: Vérification FileSystem.documentDirectory
- * - Gestion des états: loading, success, error
- * - Callbacks pour tracking externe
  */
 const ExportReservationsButton: React.FC<Props> = ({
   reservations,
+  merchantName,
   onExportStart,
   onExportComplete,
   onExportError,
@@ -61,97 +62,7 @@ const ExportReservationsButton: React.FC<Props> = ({
   }
 
   /**
-   * Escape CSV field to prevent injection and ensure proper formatting
-   * - Wraps fields containing quotes, commas, or newlines in double quotes
-   * - Escapes existing double quotes by doubling them
-   * - Prevents CSV injection attacks (=, +, -, @)
-   */
-  const escapeCSVField = (value: any): string => {
-    if (value == null) return ''
-
-    const stringValue = String(value).trim()
-
-    // Prevent CSV injection by prefixing dangerous characters with single quote
-    if (stringValue.startsWith('=') || stringValue.startsWith('+') ||
-        stringValue.startsWith('-') || stringValue.startsWith('@')) {
-      return `"'${stringValue.replace(/"/g, '""')}"`
-    }
-
-    // Check if field needs quoting (contains comma, quote, or newline)
-    if (stringValue.includes(',') || stringValue.includes('"') ||
-        stringValue.includes('\n') || stringValue.includes('\r')) {
-      // Escape existing quotes by doubling them
-      return `"${stringValue.replace(/"/g, '""')}"`
-    }
-
-    return stringValue
-  }
-
-  /**
-   * Generate CSV content from reservations data
-   * Includes UTF-8 BOM for Excel compatibility
-   */
-  const generateCSV = (): string => {
-    // CSV Header row
-    const headers = [
-      'ID',
-      'Code Réservation',
-      'Client',
-      'Téléphone',
-      'Produit',
-      'Quantité',
-      'Prix Original (XOF)',
-      'Prix Réduit (XOF)',
-      'Total (XOF)',
-      'Statut',
-      'Paiement',
-      'Date Retrait',
-      'Heure Retrait',
-      'Réservé le',
-      'Confirmé le',
-      'Complété le',
-      'Annulé le',
-      'Notes',
-    ].map(escapeCSVField).join(',')
-
-    // Data rows
-    const rows = reservations.map((reservation) => {
-      const clientName = reservation.consumer
-        ? `${reservation.consumer.first_name} ${reservation.consumer.last_name}`
-        : 'Client inconnu'
-
-      const clientPhone = reservation.consumer?.phone || ''
-
-      return [
-        reservation.id,
-        reservation.reservation_code,
-        clientName,
-        clientPhone,
-        reservation.product.name,
-        reservation.quantity,
-        reservation.original_price,
-        reservation.discounted_price,
-        reservation.total_amount || (reservation.quantity * reservation.discounted_price),
-        reservation.status,
-        reservation.payment_status || 'N/A',
-        reservation.pickup_date || '',
-        reservation.pickup_time || '',
-        reservation.reserved_at || reservation.created_at || '',
-        reservation.confirmed_at || '',
-        reservation.completed_at || '',
-        reservation.cancelled_at || '',
-        reservation.notes || '',
-      ].map(escapeCSVField).join(',')
-    })
-
-    // UTF-8 BOM for Excel compatibility
-    const BOM = '\uFEFF'
-
-    return BOM + [headers, ...rows].join('\n')
-  }
-
-  /**
-   * Handle CSV export process
+   * Handle Excel export process
    */
   const handleExport = async () => {
     try {
@@ -165,50 +76,27 @@ const ExportReservationsButton: React.FC<Props> = ({
         return
       }
 
-      // BUG-001 FIX: Verify file system availability before proceeding
-      if (!FileSystem.documentDirectory) {
-        throw new Error('Le système de fichiers n\'est pas disponible sur cet appareil')
-      }
-
-      // Generate CSV content
-      const csvContent = generateCSV()
-
-      // Create filename with timestamp
-      const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, -5)
-      const filename = `reservations-export-${timestamp}.csv`
-      const fileUri = `${FileSystem.documentDirectory}${filename}`
-
-      // Write CSV file
-      await FileSystem.writeAsStringAsync(fileUri, csvContent, {
-        encoding: FileSystem.EncodingType.UTF8,
+      // Generate Excel file
+      const fileUri = await exportReservationsToExcel(reservations, {
+        merchantName,
       })
-
-      // Check if sharing is available
-      const isAvailable = await Sharing.isAvailableAsync()
-
-      if (!isAvailable) {
-        showAlert('error', 'Erreur', 'Le partage de fichiers n\'est pas disponible sur cet appareil')
-        setLoading(false)
-        return
-      }
 
       // Share the file
-      await Sharing.shareAsync(fileUri, {
-        mimeType: 'text/csv',
-        dialogTitle: `Exporter ${reservations.length} réservation${reservations.length > 1 ? 's' : ''}`,
-        UTI: 'public.comma-separated-values-text',
-      })
+      await shareExcelFile(
+        fileUri,
+        `Exporter ${reservations.length} réservation${reservations.length > 1 ? 's' : ''}`
+      )
 
       // Success feedback
       showAlert(
         'success',
-        'Export réussi',
-        `${reservations.length} réservation${reservations.length > 1 ? 's' : ''} exportée${reservations.length > 1 ? 's' : ''} avec succès`
+        'Export Excel réussi',
+        `${reservations.length} réservation${reservations.length > 1 ? 's' : ''} exportée${reservations.length > 1 ? 's' : ''} dans un fichier Excel`
       )
 
       onExportComplete?.()
     } catch (error: any) {
-      exportReservationsLogger.error('CSV export error:', error)
+      exportReservationsLogger.error('Excel export error:', error)
 
       const errorMessage = error.response?.data?.message ||
                           error.message ||
@@ -248,8 +136,8 @@ const ExportReservationsButton: React.FC<Props> = ({
           </>
         ) : (
           <>
-            <Ionicons name="download-outline" size={20} color="white" />
-            <Text style={styles.buttonText}>Exporter CSV</Text>
+            <Ionicons name="document-text-outline" size={20} color="white" />
+            <Text style={styles.buttonText}>Exporter Excel</Text>
             {reservations.length > 0 && (
               <View style={[styles.badge, { backgroundColor: theme.colors.accent.orange }]}>
                 <Text style={styles.badgeText}>{reservations.length}</Text>

@@ -194,13 +194,16 @@ https://github.com/nashflow28/antigaspi2
 - **Déploiement :** VPS en ligne (antigaspi.jubtek.com)
 - **Status :** Production - fonctionnel
 
-### **Mobile App (🔄 En cours de test)**
-- **Framework :** React Native + Expo
-- **État :** Redux Toolkit avec slices (auth, reservations, products, favorites)
-- **Navigation :** React Navigation (Stack + Bottom Tabs)
-- **HTTP :** Axios avec intercepteurs JWT
+### **Mobile App (✅ Production-Ready)**
+- **Framework :** React Native 0.76+ + Expo SDK 52
+- **État :** Redux Toolkit avec slices (auth, reservations, products, favorites, cart, loyalty, wallet)
+- **Navigation :** React Navigation 6 (Stack + Bottom Tabs) - Role-based
+- **HTTP :** Axios avec intercepteurs JWT + refresh automatique
 - **Build :** EAS Build pour génération APK Android
 - **Tests :** Tests manuels avec APK installé sur appareil physique
+- **Design System :** DS2025 avec `useTheme()` hook + Dark Mode complet
+- **Push Notifications :** Firebase FCM avec expo-notifications
+- **UX :** Haptic feedback via expo-haptics
 
 ### **Database Schema**
 ```sql
@@ -227,71 +230,93 @@ https://github.com/nashflow28/antigaspi2
 - Système de réservation avec gestion des stocks
 - API REST complète avec documentation
 
-### **🔄 Niveau 2 - Frontend Web (En cours)**
-- Interface Consumer (consultation + réservation)
-- Interface Merchant (gestion produits + réservations)
-- Interface Admin (modération + analytics)
+### **✅ Niveau 2 - Application Mobile (Terminé)**
+- Interface Consumer complète (5 onglets : Accueil, Découvrir, Favoris, Commande, Compte)
+- Interface Merchant (Dashboard, Produits, Réservations, Fidélité, Compte)
+- Interface Admin (Dashboard, Analytics, Paramètres)
 - Profils utilisateurs et historiques
+- Système de panier avec checkout
 
-### **⏳ Niveau 3 - Fonctionnalités Avancées (Prévu)**
-- Paiements en ligne (Mobile Money, Paystack)
+### **✅ Niveau 3 - Fonctionnalités Avancées (Terminé)**
 - Système d'avis et notations
-- Géolocalisation des commerçants
-- Programme de fidélité avec points
+- Programme de fidélité avec points et tiers (Bronze/Silver/Gold/Platinum)
+- Paniers Surprise (Surprise Baskets) pour invendus groupés
+- Wallet virtuel avec historique transactions
+- Dark Mode complet avec Design System 2025
 
-### **🚀 Niveau 4 - Extensions (Futur)**
-- Application mobile (React Native/Flutter)
-- Notifications push temps réel
-- Analytics avancées avec graphiques
+### **✅ Niveau 4 - Extensions (Terminé)**
+- Application mobile React Native + Expo (APK Android)
+- Notifications push temps réel (Firebase FCM)
+- Analytics avancées avec graphiques (Admin + Merchant)
+- Export Excel des données (réservations, analytics)
+- Haptic feedback pour UX tactile
+
+### **⏳ Niveau 5 - Intégrations (En cours)**
+- Paiements en ligne (Mobile Money, Paystack)
+- Géolocalisation des commerçants avec carte
 - Support multilingue (FR/EN)
 
 ---
 
 ## 📊 **État d'Avancement Actuel**
 
-### **✅ Complété (100%)**
-- [x] Schema de base de données MySQL (10 tables)
+### **✅ Backend Complété (100%)**
+- [x] Schema de base de données MySQL (10+ tables)
 - [x] Models Eloquent avec relations
-- [x] Contrôleurs API (Auth, Products, Reservations, Favorites)
+- [x] Contrôleurs API (Auth, Products, Reservations, Favorites, Cart, Loyalty, Wallet, Reviews)
 - [x] Routes API avec middleware de sécurité JWT
 - [x] Backend déployé en production sur VPS
-- [x] Application mobile React Native (build APK)
-- [x] Authentification multi-rôles fonctionnelle
-- [x] Système de réservations (création, annulation, confirmation)
-- [x] Système de favoris
-- [x] Gestion des produits par les commerçants
-- [x] Repository Git configuré
+- [x] Système de notifications (in-app + push)
+- [x] Analytics API pour dashboard
 
-### **✅ Bugs Critiques Corrigés (Session Nov 2024)**
-- [x] Table `favorites` manquante → Créée avec foreign keys
-- [x] 17 colonnes manquantes dans users, merchants, products, reservations
-- [x] Produits expirés (18/20) → Dates mises à jour 2025-12-31
-- [x] Colonne `is_approved` manquante (reviews)
-- [x] Contrainte `expires_at NOT NULL` bloquant réservations
-- [x] Notifications bloquant transactions (cancel, confirm, create)
-- [x] Colonne `cancelled_at` manquante
-- [x] ENUM `notifications.type` incomplet
-- [x] `notifications.sent_via` type ENUM au lieu de SET
-- [x] Bug logique dans `confirm()` method (success = false)
-- [x] Validation téléphone trop stricte (frontend + backend)
+### **✅ Mobile App Complété (100%)**
+- [x] Application React Native + Expo SDK 52
+- [x] Build APK Android fonctionnel
+- [x] Authentification multi-rôles (Consumer/Merchant/Admin)
+- [x] Navigation role-based (5 onglets Consumer, 5 onglets Merchant)
+- [x] Design System 2025 avec `useTheme()` hook
+- [x] Dark Mode complet
+- [x] Haptic feedback sur actions critiques
+- [x] Push Notifications via Firebase FCM
 
-### **🔄 En Cours (Phase Tests & Débogage)**
-- [x] Tests création de réservation → **SUCCESS ✅**
-- [x] Tests annulation réservation (backend) → **SUCCESS ✅**
-- [x] Tests favoris (toggle + affichage) → **SUCCESS ✅**
-- [ ] Tests confirmation commerçant (en cours de test)
-- [ ] Tests markReady() et complete() (à tester)
-- [ ] Tests création de produits par commerçants
-- [ ] Reconstruction APK avec tous les correctifs frontend
-- [ ] Tests profil utilisateur (validation téléphone désactivée)
+### **✅ Fonctionnalités Consumer**
+- [x] Catalogue produits avec filtres et recherche
+- [x] Détails produit avec info commerçant
+- [x] Système de favoris (toggle + liste)
+- [x] Panier avec gestion quantités
+- [x] Réservations (création, annulation, historique)
+- [x] Paniers Surprise (découverte et réservation)
+- [x] Programme fidélité (points, tiers, récompenses)
+- [x] Wallet virtuel (solde, transactions)
+- [x] Notifications inbox avec filtres
+
+### **✅ Fonctionnalités Merchant**
+- [x] Dashboard avec statistiques (revenus, réservations, produits)
+- [x] Gestion produits (CRUD avec upload images)
+- [x] Gestion paniers surprise
+- [x] Réservations reçues (confirmation, ready, complete)
+- [x] Programme fidélité pour clients
+- [x] Export Excel des réservations
+- [x] Avis clients
+
+### **✅ Fonctionnalités Admin**
+- [x] Dashboard global avec analytics
+- [x] Gestion utilisateurs
+- [x] Modération produits
+- [x] Export données
+- [x] Paramètres système
+
+### **🔄 En Cours (Améliorations UX)**
+- [x] Migration DS2025 (~85% complète)
+- [x] Corrections contraste dark mode
+- [x] Haptic feedback sur navigation
+- [ ] Derniers écrans à migrer vers useTheme()
 
 ### **⏳ À Faire**
-- [ ] Tests complets de toutes les fonctionnalités merchant
-- [ ] Refactorisation mobile : .unwrap() sur dispatch async
-- [ ] Système de paiements (Mobile Money intégration)
-- [ ] Notifications push temps réel
-- [ ] Interface admin web
-- [ ] Analytics et tableaux de bord
+- [ ] Intégration paiements Mobile Money
+- [ ] Géolocalisation commerçants avec carte
+- [ ] Tests automatisés complets
+- [ ] Support multilingue (FR/EN)
 
 ---
 
@@ -324,8 +349,27 @@ https://github.com/nashflow28/antigaspi2
 antigaspi2/
 ├── 📊 database/           # Scripts MySQL + docs
 ├── 🚀 backend/            # Laravel API (déployé)
+│   ├── app/Http/Controllers/Api/
+│   ├── app/Models/
+│   ├── app/Services/
+│   └── routes/api.php
 ├── 📱 mobile/             # React Native + Expo
-│   ├── src/              # Code source TypeScript
+│   ├── src/
+│   │   ├── components/       # Composants réutilisables (DS2025)
+│   │   ├── screens/
+│   │   │   ├── main/         # Écrans Consumer (Home, Products, Cart, etc.)
+│   │   │   ├── merchant/     # Écrans Merchant (Dashboard, Products, etc.)
+│   │   │   ├── admin/        # Écrans Admin (Dashboard, Analytics, etc.)
+│   │   │   └── auth/         # Écrans Auth (Login, Register)
+│   │   ├── navigation/       # Navigateurs role-based
+│   │   │   ├── ConsumerNavigator.tsx   # 5 onglets
+│   │   │   ├── MerchantNavigator.tsx   # 5 onglets
+│   │   │   └── AdminNavigator.tsx      # 3 onglets
+│   │   ├── store/            # Redux Toolkit slices
+│   │   ├── services/         # API, notifications, export
+│   │   ├── hooks/            # useTheme, useHaptics, useFavorite
+│   │   ├── theme/            # Design System 2025
+│   │   └── types/            # TypeScript interfaces
 │   ├── eas.json          # Configuration EAS Build
 │   └── app.json          # Configuration Expo
 ├── 🧪 tests/             # Tests E2E Playwright
@@ -374,17 +418,44 @@ antigaspi2/
 
 ## 🎨 **Décisions de Design**
 
+### **Design System 2025 (DS2025)**
+Le mobile utilise un système de design unifié accessible via le hook `useTheme()`:
+
+```typescript
+import { useTheme } from '../theme'
+
+const MyComponent = () => {
+  const theme = useTheme()
+
+  return (
+    <View style={{ backgroundColor: theme.colors.background }}>
+      <Text style={{ color: theme.colors.text }}>
+        {theme.isDark ? 'Mode sombre' : 'Mode clair'}
+      </Text>
+    </View>
+  )
+}
+```
+
 ### **Couleurs & Branding**
-- **Primaire :** Vert (écologie, fraîcheur) #10B981
-- **Secondaire :** Orange (économies, chaleur) #F59E0B
-- **Neutre :** Gris/Blanc pour la lisibilité
+- **Primaire :** Vert écologie `theme.colors.primary[500]` (#10B981)
+- **Secondaire :** Orange économies `theme.colors.secondary` (#F59E0B)
+- **Success/Error/Warning :** Via `theme.colors.success/error/warning`
+- **Surfaces :** `theme.colors.surface.light` / `theme.colors.neutral[800]` (dark)
 - **Monnaie :** Franc CFA (XOF) pour l'Afrique de l'Ouest
+
+### **Dark Mode**
+Support complet avec détection automatique des préférences système:
+- Backgrounds adaptatifs via `theme.isDark`
+- Cartes: `theme.colors.surface.light` (light) / `theme.colors.neutral[800]` (dark)
+- Textes: `theme.colors.text`, `theme.colors.textSecondary`, `theme.colors.textTertiary`
 
 ### **UX/UI Principles**
 - **Mobile-first :** Interface pensée pour smartphone
-- **Accessibility :** Contraste, tailles de texte, navigation
-- **Performance :** Lazy loading, optimisation images
-- **Offline :** PWA avec cache pour la consultation
+- **Accessibility :** Contraste WCAG AA, tailles de texte adaptatives
+- **Haptic Feedback :** Retour tactile sur actions (via `useHaptics()` hook)
+- **Performance :** Lazy loading, optimisation images, FlatList virtualisées
+- **Offline :** AsyncStorage pour cache local
 
 ---
 
@@ -771,5 +842,39 @@ mysql -u c2621486c_apiuser -p -e \
 
 ---
 
-**📝 Dernière mise à jour :** 22 Novembre 2024
+**📝 Dernière mise à jour :** 02 Janvier 2026
 **🤖 Maintenu automatiquement par Claude Code**
+
+---
+
+## 📱 **Hooks Mobile Disponibles**
+
+### **useTheme()**
+Hook principal pour accéder au Design System 2025:
+```typescript
+const theme = useTheme()
+// theme.colors.primary[500], theme.isDark, etc.
+```
+
+### **useHaptics()**
+Hook pour feedback tactile:
+```typescript
+const haptics = useHaptics()
+await haptics.lightTap()   // Navigation tabs
+await haptics.mediumTap()  // Boutons action
+await haptics.success()    // Confirmation réussie
+await haptics.error()      // Erreur
+```
+
+### **useFavorite(productId)**
+Hook pour gérer les favoris d'un produit:
+```typescript
+const { isFavorite, toggleFavorite, loading } = useFavorite(productId)
+```
+
+### **useAlert()**
+Hook pour afficher des alertes stylisées:
+```typescript
+const { showAlert } = useAlert()
+showAlert({ title: 'Succès', message: '...', type: 'success' })
+```

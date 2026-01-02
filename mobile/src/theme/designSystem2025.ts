@@ -42,6 +42,7 @@ export const colors = {
     red: '#EF4444',
     yellow: '#FCD34D',
     purple: '#A78BFA',
+    gold: '#F5C518',    // Premium/highlight color
   },
 
   // Surface colors

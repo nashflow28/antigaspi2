@@ -7,18 +7,49 @@ import { Button } from '../2025'
 import apiService from '../../services/api'
 import { AdminAnalyticsFilters } from '../../types'
 import AlertModal, { AlertType, AlertButton } from '../AlertModal'
+import { exportAnalyticsToExcel, shareExcelFile } from '../../services/excelExportService'
 
 interface ExportButtonProps {
-  format: 'csv' | 'pdf'
+  format: 'csv' | 'pdf' | 'xlsx'
   filters?: AdminAnalyticsFilters
+  analyticsData?: {
+    summary?: any
+    dailyStats?: any[]
+    topProducts?: any[]
+    topMerchants?: any[]
+  }
+  dateRange?: { start: Date; end: Date }
   onExportStart?: () => void
   onExportComplete?: () => void
   onExportError?: (error: string) => void
 }
 
+const FORMAT_CONFIG = {
+  csv: {
+    label: 'CSV',
+    icon: 'document-text-outline' as const,
+    mimeType: 'text/csv',
+    uti: 'public.comma-separated-values-text',
+  },
+  pdf: {
+    label: 'PDF',
+    icon: 'document-outline' as const,
+    mimeType: 'application/pdf',
+    uti: 'com.adobe.pdf',
+  },
+  xlsx: {
+    label: 'Excel',
+    icon: 'grid-outline' as const,
+    mimeType: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    uti: 'org.openxmlformats.spreadsheetml.sheet',
+  },
+}
+
 const ExportButton: React.FC<ExportButtonProps> = ({
   format,
   filters,
+  analyticsData,
+  dateRange,
   onExportStart,
   onExportComplete,
   onExportError,
@@ -50,68 +81,80 @@ const ExportButton: React.FC<ExportButtonProps> = ({
       setLoading(true)
       onExportStart?.()
 
-      console.log(`📊 Exporting analytics as ${format.toUpperCase()}...`)
+      const config = FORMAT_CONFIG[format]
+      console.log(`📊 Exporting analytics as ${config.label}...`)
 
       // BUG-001 FIX: Verify file system availability before proceeding
       if (!FileSystem.documentDirectory) {
         throw new Error('Le système de fichiers n\'est pas disponible sur cet appareil')
       }
 
-      // Call API to get export data
-      const response = await apiService.exportAnalytics(format, filters)
+      let fileUri: string
 
-      if (!response.file_content && !response.file_url) {
-        throw new Error('No export data received from server')
-      }
+      // Handle Excel export locally
+      if (format === 'xlsx' && analyticsData) {
+        fileUri = await exportAnalyticsToExcel(analyticsData, dateRange)
+        await shareExcelFile(fileUri, `Exporter les analytics (${config.label})`)
+      } else {
+        // Call API to get export data for CSV/PDF
+        const response = await apiService.exportAnalytics(format === 'xlsx' ? 'csv' : format, filters)
 
-      // Generate filename
-      const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, -5)
-      const filename = `analytics-${timestamp}.${format}`
-      const fileUri = `${FileSystem.documentDirectory}${filename}`
-
-      // Write file to cache
-      if (response.file_content) {
-        // Base64 content
-        await FileSystem.writeAsStringAsync(fileUri, response.file_content, {
-          encoding: 'base64' as any,
-        })
-      } else if (response.file_url) {
-        // Download from URL
-        const downloadResult = await FileSystem.downloadAsync(response.file_url, fileUri)
-        if (downloadResult.status !== 200) {
-          throw new Error('Failed to download export file')
+        if (!response.file_content && !response.file_url) {
+          throw new Error('No export data received from server')
         }
+
+        // Generate filename
+        const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, -5)
+        const filename = `analytics-${timestamp}.${format}`
+        fileUri = `${FileSystem.documentDirectory}${filename}`
+
+        // Write file to cache
+        if (response.file_content) {
+          // Base64 content
+          await FileSystem.writeAsStringAsync(fileUri, response.file_content, {
+            encoding: 'base64' as any,
+          })
+        } else if (response.file_url) {
+          // Download from URL
+          const downloadResult = await FileSystem.downloadAsync(response.file_url, fileUri)
+          if (downloadResult.status !== 200) {
+            throw new Error('Failed to download export file')
+          }
+        }
+
+        console.log(`✅ File saved to: ${fileUri}`)
+
+        // Check if sharing is available
+        const isAvailable = await Sharing.isAvailableAsync()
+        if (!isAvailable) {
+          showAlert('error', 'Erreur', 'Le partage de fichiers n\'est pas disponible sur cet appareil')
+          return
+        }
+
+        // Share the file
+        await Sharing.shareAsync(fileUri, {
+          mimeType: config.mimeType,
+          dialogTitle: `Exporter les analytics (${config.label})`,
+          UTI: config.uti,
+        })
       }
-
-      console.log(`✅ File saved to: ${fileUri}`)
-
-      // Check if sharing is available
-      const isAvailable = await Sharing.isAvailableAsync()
-      if (!isAvailable) {
-        showAlert('error', 'Erreur', 'Le partage de fichiers n\'est pas disponible sur cet appareil')
-        return
-      }
-
-      // Share the file
-      await Sharing.shareAsync(fileUri, {
-        mimeType: format === 'csv' ? 'text/csv' : 'application/pdf',
-        dialogTitle: `Exporter les analytics (${format.toUpperCase()})`,
-        UTI: format === 'csv' ? 'public.comma-separated-values-text' : 'com.adobe.pdf',
-      })
 
       console.log('✅ Export completed successfully')
       onExportComplete?.()
 
-      showAlert('success', 'Succès', `Rapport ${format.toUpperCase()} exporté avec succès`)
+      showAlert('success', 'Succès', `Rapport ${config.label} exporté avec succès`)
     } catch (error: any) {
       console.error(`❌ Export error:`, error)
-      const errorMessage = error?.response?.data?.message || error?.message || `Impossible d'exporter en ${format.toUpperCase()}`
+      const config = FORMAT_CONFIG[format]
+      const errorMessage = error?.response?.data?.message || error?.message || `Impossible d'exporter en ${config.label}`
       onExportError?.(errorMessage)
       showAlert('error', 'Erreur d\'export', errorMessage)
     } finally {
       setLoading(false)
     }
   }
+
+  const config = FORMAT_CONFIG[format]
 
   return (
     <View>
@@ -121,10 +164,10 @@ const ExportButton: React.FC<ExportButtonProps> = ({
         onPress={handleExport}
         loading={loading}
         disabled={loading}
-        leftIcon={<Ionicons name="download-outline" size={18} />}
+        leftIcon={<Ionicons name={config.icon} size={18} />}
         testID={`export-${format}-button`}
       >
-        {format.toUpperCase()}
+        {config.label}
       </Button>
       <AlertModal
         visible={alertVisible}

@@ -381,7 +381,8 @@ class NotificationService {
       };
 
       // Si le type a une préférence définie et qu'elle est désactivée, ignorer
-      if (typePreferenceMap[data.type] === false) {
+      const notificationType = typeof data.type === 'string' ? data.type : '';
+      if (notificationType && typePreferenceMap[notificationType] === false) {
         return;
       }
     }
@@ -413,7 +414,7 @@ class NotificationService {
     }
 
     // Priorité 2: Navigation basée sur le type de notification
-    if (data?.type) {
+    if (data?.type && typeof data.type === 'string') {
       this.handleNotificationByType(data.type, data);
     }
   }

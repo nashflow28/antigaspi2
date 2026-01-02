@@ -311,7 +311,7 @@ const DatePicker: React.FC<DatePickerProps> = ({
             </View>
 
             {/* Quick actions */}
-            <View style={styles.quickActions}>
+            <View style={[styles.quickActions, { borderTopColor: theme.colors.border }]}>
               {(() => {
                 // FIX MEDIUM: Check if Today is within bounds
                 const todayDate = new Date()
@@ -334,7 +334,11 @@ const DatePicker: React.FC<DatePickerProps> = ({
                     }}
                     disabled={isTodayDisabled}
                   >
-                    <Text style={[styles.quickButtonText, { color: theme.colors.primary[600] }]}>
+                    <Text
+                      style={[styles.quickButtonText, { color: theme.colors.primary[600] }]}
+                      numberOfLines={1}
+                      adjustsFontSizeToFit
+                    >
                       Aujourd'hui
                     </Text>
                   </TouchableOpacity>
@@ -475,14 +479,17 @@ const styles = StyleSheet.create({
   quickButton: {
     flex: 1,
     paddingVertical: 10,
-    paddingHorizontal: 12,
+    paddingHorizontal: 8,
     borderRadius: 8,
     borderWidth: 1,
     alignItems: 'center',
+    justifyContent: 'center',
+    minHeight: 40,
   },
   quickButtonText: {
-    fontSize: 13,
+    fontSize: 12,
     fontWeight: '600',
+    textAlign: 'center',
   },
 })
 

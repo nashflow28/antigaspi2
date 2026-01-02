@@ -16,7 +16,7 @@ import { useNavigation, useRoute } from '@react-navigation/native'
 
 import { useAppDispatch, useAppSelector } from '../../store/hooks'
 import { fetchSurpriseBasketById, setSelectedBasket } from '../../store/slices/surpriseBasketsSlice'
-import { addToCart } from '../../store/slices/cartSlice'
+import { addCartItem } from '../../store/slices/cartSlice'
 import { useTheme } from '../../theme'
 import { Typography, Button, Badge, Card } from '../../components/2025'
 import { formatCurrency } from '../../utils/currencyHelpers'
@@ -72,7 +72,7 @@ export default function SurpriseBasketDetailsScreen() {
     }
 
     try {
-      await dispatch(addToCart({
+      await dispatch(addCartItem({
         productId: selectedBasket.id,
         quantity,
       })).unwrap()
@@ -257,7 +257,7 @@ export default function SurpriseBasketDetailsScreen() {
             <Card style={[styles.descriptionCard, { backgroundColor: theme.colors.primary[50] }]}>
               <View style={styles.descriptionHeader}>
                 <Ionicons name="sparkles" size={20} color={theme.colors.primary[500]} />
-                <Typography variant="subtitle" weight="semibold" style={{ marginLeft: 8, color: theme.colors.primary[700] }}>
+                <Typography variant="h4" weight="semibold" style={{ marginLeft: 8, color: theme.colors.primary[700] }}>
                   Ce qui vous attend
                 </Typography>
               </View>
@@ -270,7 +270,7 @@ export default function SurpriseBasketDetailsScreen() {
           {/* Description générale */}
           {basket.description && (
             <View style={styles.section}>
-              <Typography variant="subtitle" weight="semibold">
+              <Typography variant="h4" weight="semibold">
                 Description
               </Typography>
               <Typography variant="body" color="secondary" style={{ marginTop: 8 }}>
@@ -284,7 +284,7 @@ export default function SurpriseBasketDetailsScreen() {
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
             <Ionicons name="basket-outline" size={20} color={theme.colors.primary[500]} />
-            <Typography variant="subtitle" weight="semibold" style={{ marginLeft: 8 }}>
+            <Typography variant="h4" weight="semibold" style={{ marginLeft: 8 }}>
               Contenu du panier
             </Typography>
           </View>
@@ -354,7 +354,7 @@ export default function SurpriseBasketDetailsScreen() {
               <Ionicons name="storefront" size={24} color={theme.colors.primary[500]} />
             </View>
             <View style={styles.merchantInfo}>
-              <Typography variant="subtitle" weight="semibold">
+              <Typography variant="h4" weight="semibold">
                 {basket.merchant.business_name}
               </Typography>
               {basket.merchant.address && (
@@ -402,7 +402,7 @@ export default function SurpriseBasketDetailsScreen() {
           onPress={handleAddToCart}
           disabled={!isAvailable}
           style={styles.addToCartButton}
-          size="large"
+          size="lg"
         >
           {isAvailable
             ? `Ajouter au panier • ${formatCurrency(discountedPrice * quantity)}`
@@ -418,7 +418,7 @@ export default function SurpriseBasketDetailsScreen() {
         onClose={() => setAlertVisible(false)}
         buttons={[
           alertConfig.type === 'success'
-            ? { text: 'Voir le panier', onPress: () => { setAlertVisible(false); navigation.navigate('Cart') } }
+            ? { text: 'Voir le panier', onPress: () => { setAlertVisible(false); navigation.navigate('Orders' as never, { screen: 'Cart' } as never) } }
             : undefined,
           { text: 'OK', onPress: () => setAlertVisible(false) },
         ].filter(Boolean) as any}

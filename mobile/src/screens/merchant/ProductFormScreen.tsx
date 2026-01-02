@@ -13,7 +13,7 @@ import {
 } from 'react-native'
 import { Ionicons } from '@expo/vector-icons'
 import * as ImagePicker from 'expo-image-picker'
-import DateTimePicker from '@react-native-community/datetimepicker'
+import { DatePicker } from '../../components/2025'
 import { useTheme } from '../../theme'
 import { Product } from '../../types'
 import apiService from '../../services/api'
@@ -107,7 +107,6 @@ const ProductFormScreen: React.FC<Props> = ({ route, navigation }) => {
     setField('expirationDateISO', date.toISOString())
   }
 
-  const [showDatePicker, setShowDatePicker] = useState(false)
   const [imageUri, setImageUri] = useState<string | null>(product?.image_url ? getImageUrl(product.image_url) : null)
 
   // Show draft restoration alert in create mode
@@ -152,20 +151,6 @@ const ProductFormScreen: React.FC<Props> = ({ route, navigation }) => {
     return date.toISOString().split('T')[0]
   }
 
-  // Gérer le changement de date
-  const handleDateChange = (event: any, selectedDate?: Date) => {
-    setShowDatePicker(Platform.OS === 'ios') // Sur iOS, on garde le picker ouvert
-    if (selectedDate) {
-      // Validation: la date doit être dans le futur
-      const today = new Date()
-      today.setHours(0, 0, 0, 0)
-      if (selectedDate < today) {
-        showErrorModal('Date invalide', ['La date d\'expiration doit être dans le futur'], 'warning')
-        return
-      }
-      setExpirationDate(selectedDate)
-    }
-  }
 
   // Helper function to show styled error modal
   const showErrorModal = (title: string, messages: string[], type: 'error' | 'warning' = 'error') => {
@@ -649,37 +634,16 @@ const ProductFormScreen: React.FC<Props> = ({ route, navigation }) => {
           />
         </View>
 
-        {/* Date d'expiration avec DateTimePicker */}
+        {/* Date d'expiration avec DatePicker custom */}
         <View style={styles.section}>
-          <Text style={[styles.label, { color: theme.colors.text }]}>Date d'expiration *</Text>
-          <TouchableOpacity
-            style={[styles.datePickerButton, { backgroundColor: theme.colors.inputBackground, borderColor: theme.colors.border }]}
-            onPress={() => setShowDatePicker(true)}
-            testID={TEST_IDS.expirationDateInput}
-          >
-            <Ionicons name="calendar" size={24} color={theme.colors.primary[500]} />
-            <Text style={[styles.datePickerText, { color: theme.colors.text }]}>
-              {formatDateDisplay(expirationDate)}
-            </Text>
-            <Ionicons name="chevron-down" size={20} color={theme.colors.textSecondary} />
-          </TouchableOpacity>
-          <Text style={[styles.helperText, { color: theme.colors.textSecondary }]}>
-            Format: JJ/MM/AAAA (ex: 31/12/2025)
-          </Text>
-        </View>
-
-        {/* DateTimePicker Modal */}
-        {showDatePicker && (
-          <DateTimePicker
-            testID="dateTimePicker"
+          <DatePicker
+            label="Date d'expiration *"
+            placeholder="Sélectionner une date"
             value={expirationDate}
-            mode="date"
-            display={Platform.OS === 'ios' ? 'spinner' : 'default'}
-            onChange={handleDateChange}
-            minimumDate={new Date()} // Empêche de sélectionner une date passée
-            locale="fr-FR"
+            onChange={setExpirationDate}
+            minDate={new Date()}
           />
-        )}
+        </View>
 
         {/* Bouton de soumission */}
         <TouchableOpacity

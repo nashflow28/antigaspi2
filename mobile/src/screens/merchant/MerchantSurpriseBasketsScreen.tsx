@@ -21,7 +21,7 @@ import { useTheme } from '../../theme'
 import { SurpriseBasket } from '../../types'
 import apiService from '../../services/api'
 import { getImageUrl } from '../../utils/imageHelpers'
-import { Typography, Card, Button, Badge } from '../../components/2025'
+import { Typography, Card, Button, Badge, DatePicker } from '../../components/2025'
 import AlertModal from '../../components/AlertModal'
 import { formatCurrency } from '../../utils/currencyHelpers'
 import { TEST_IDS } from '../../utils/testIds'
@@ -37,9 +37,11 @@ interface Props {
 const INITIAL_FORM_DATA = {
   name: '',
   description: '',
+  original_price: '',
   discounted_price: '',
   quantity_available: '',
   min_items: '',
+  expiration_date: '',
 }
 
 const MerchantSurpriseBasketsScreen: React.FC<Props> = ({ navigation }) => {
@@ -163,9 +165,11 @@ const MerchantSurpriseBasketsScreen: React.FC<Props> = ({ navigation }) => {
     setFormData({
       name: basket.name,
       description: basket.description || '',
+      original_price: basket.original_price?.toString() || '',
       discounted_price: basket.discounted_price.toString(),
       quantity_available: basket.quantity_available.toString(),
       min_items: basket.min_items?.toString() || '',
+      expiration_date: basket.expiration_date || '',
     })
     setShowModal(true)
   }
@@ -235,16 +239,38 @@ const MerchantSurpriseBasketsScreen: React.FC<Props> = ({ navigation }) => {
       return
     }
 
+    // Validate expiration date if provided
+    if (formData.expiration_date) {
+      const expDate = new Date(formData.expiration_date)
+      const today = new Date()
+      today.setHours(0, 0, 0, 0)
+      if (expDate < today) {
+        showErrorModal('Validation', 'La date d\'expiration doit être dans le futur')
+        return
+      }
+    }
+
     try {
       setLoading(true)
 
       const minItems = formData.min_items ? parseInt(formData.min_items) : null
-      const payload = {
+      const originalPrice = formData.original_price ? parseFloat(formData.original_price) : null
+      const payload: Record<string, any> = {
         name: formData.name.trim(),
         description: formData.description.trim(),
         discounted_price: price,
         quantity_available: quantity,
         min_items: minItems && !isNaN(minItems) && minItems > 0 ? minItems : null,
+      }
+
+      // Add original_price if provided
+      if (originalPrice && !isNaN(originalPrice) && originalPrice > 0) {
+        payload.original_price = originalPrice
+      }
+
+      // Add expiration_date if provided
+      if (formData.expiration_date) {
+        payload.expiration_date = formData.expiration_date
       }
 
       if (editingBasket) {
@@ -597,7 +623,36 @@ const MerchantSurpriseBasketsScreen: React.FC<Props> = ({ navigation }) => {
 
               <View style={styles.formGroup}>
                 <Typography variant="body" weight="semibold" style={{ marginBottom: 8 }}>
-                  Prix (XOF) *
+                  Prix original (XOF)
+                </Typography>
+                <Typography variant="caption" color="secondary" style={{ marginBottom: 8 }}>
+                  Valeur réelle du contenu du panier (pour afficher la réduction)
+                </Typography>
+                <TextInput
+                  style={[
+                    styles.input,
+                    {
+                      backgroundColor: theme.colors.inputBackground,
+                      borderColor: theme.colors.inputBorder,
+                      borderWidth: 1,
+                      color: theme.colors.text,
+                    },
+                  ]}
+                  placeholder="Ex: 5000"
+                  placeholderTextColor={theme.colors.textTertiary}
+                  value={formData.original_price}
+                  onChangeText={(text) => setFormData({ ...formData, original_price: text })}
+                  keyboardType="numeric"
+                  testID="basket-original-price-input"
+                />
+              </View>
+
+              <View style={styles.formGroup}>
+                <Typography variant="body" weight="semibold" style={{ marginBottom: 8 }}>
+                  Prix réduit (XOF) *
+                </Typography>
+                <Typography variant="caption" color="secondary" style={{ marginBottom: 8 }}>
+                  Prix de vente du panier surprise
                 </Typography>
                 <TextInput
                   style={[
@@ -615,6 +670,22 @@ const MerchantSurpriseBasketsScreen: React.FC<Props> = ({ navigation }) => {
                   onChangeText={(text) => setFormData({ ...formData, discounted_price: text })}
                   keyboardType="numeric"
                   testID={TEST_IDS.basketPriceInput}
+                />
+              </View>
+
+              <View style={styles.formGroup}>
+                <DatePicker
+                  label="Date d'expiration *"
+                  placeholder="Sélectionner une date"
+                  value={formData.expiration_date ? new Date(formData.expiration_date) : null}
+                  onChange={(date) => {
+                    // Format: YYYY-MM-DD for API
+                    const year = date.getFullYear()
+                    const month = String(date.getMonth() + 1).padStart(2, '0')
+                    const day = String(date.getDate()).padStart(2, '0')
+                    setFormData({ ...formData, expiration_date: `${year}-${month}-${day}` })
+                  }}
+                  minDate={new Date()} // Minimum = aujourd'hui
                 />
               </View>
 

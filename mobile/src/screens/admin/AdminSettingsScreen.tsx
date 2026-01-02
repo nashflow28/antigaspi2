@@ -243,7 +243,7 @@ const AdminSettingsScreen: React.FC = () => {
     return (
       <Card key={key} variant="elevated" style={styles.sectionCard}>
         <Button
-          variant="text"
+          variant="ghost"
           onPress={() => toggleSection(key)}
           style={styles.sectionHeader}
         >

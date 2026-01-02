@@ -540,8 +540,19 @@ class ApiService {
     return this.request<ApiResponse<SurpriseBasket>>('GET', `/surprise-baskets/${id}`)
   }
 
-  async getMerchants(): Promise<ApiResponse<any[]>> {
-    return this.request<ApiResponse<any[]>>('GET', '/merchants')
+  async getMerchants(params?: {
+    latitude?: number
+    longitude?: number
+    radius?: number
+    sort_by?: string
+    per_page?: number
+  }): Promise<ApiResponse<any[]>> {
+    const queryString = params ? '?' + new URLSearchParams(
+      Object.entries(params)
+        .filter(([_, v]) => v !== undefined)
+        .map(([k, v]) => [k, String(v)])
+    ).toString() : ''
+    return this.request<ApiResponse<any[]>>('GET', `/merchants${queryString}`)
   }
 
   // === RÉSERVATIONS ===

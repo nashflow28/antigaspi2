@@ -10,6 +10,7 @@ const theme = {
   colors: {
     primary: colors.primary[500],
     primaryLight: colors.primary[100],
+    primaryDark: colors.primary[700],
     secondary: colors.accent.gold,
     background: colors.surface.light,
     surface: colors.surface.light,

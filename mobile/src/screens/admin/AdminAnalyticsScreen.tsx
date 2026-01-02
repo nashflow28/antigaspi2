@@ -9,9 +9,8 @@ import {
 } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { Ionicons } from '@expo/vector-icons'
-import DateTimePicker from '@react-native-community/datetimepicker'
 import { useTheme } from '../../theme'
-import { Typography, Card, Badge } from '../../components/2025'
+import { Typography, Card, Badge, DatePicker } from '../../components/2025'
 import { Pagination } from '../../components/admin'
 import RevenueChart from '../../components/admin/RevenueChart'
 import GeographicChart from '../../components/admin/GeographicChart'
@@ -37,8 +36,6 @@ const AdminAnalyticsScreen: React.FC<{ navigation: any }> = ({ navigation }) => 
   const [selectedTab, setSelectedTab] = useState<Tab>('revenue')
   const [data, setData] = useState<AdminAnalyticsData | null>(null)
   const [loading, setLoading] = useState(true)
-  const [showStartPicker, setShowStartPicker] = useState(false)
-  const [showEndPicker, setShowEndPicker] = useState(false)
   const [startDate, setStartDate] = useState(new Date(Date.now() - 30 * 24 * 60 * 60 * 1000))
   const [endDate, setEndDate] = useState(new Date())
   const [merchantPage, setMerchantPage] = useState(1)
@@ -203,27 +200,25 @@ const AdminAnalyticsScreen: React.FC<{ navigation: any }> = ({ navigation }) => 
           {/* Custom Date Range */}
           {selectedPeriod === 'custom' && (
             <View style={styles.dateRange}>
-              <TouchableOpacity
-                style={[styles.dateButton, { borderColor: theme.colors.border }]}
-                onPress={() => setShowStartPicker(true)}
-              >
-                <Ionicons name="calendar-outline" size={20} color={theme.colors.neutral[400]} />
-                <Typography variant="small" style={{ marginLeft: 8 }}>
-                  {startDate.toLocaleDateString('fr-FR')}
-                </Typography>
-              </TouchableOpacity>
-              <Typography variant="small" color="secondary">
-                au
-              </Typography>
-              <TouchableOpacity
-                style={[styles.dateButton, { borderColor: theme.colors.border }]}
-                onPress={() => setShowEndPicker(true)}
-              >
-                <Ionicons name="calendar-outline" size={20} color={theme.colors.neutral[400]} />
-                <Typography variant="small" style={{ marginLeft: 8 }}>
-                  {endDate.toLocaleDateString('fr-FR')}
-                </Typography>
-              </TouchableOpacity>
+              <View style={{ flex: 1 }}>
+                <DatePicker
+                  label="Du"
+                  placeholder="Date de début"
+                  value={startDate}
+                  onChange={setStartDate}
+                  maxDate={endDate}
+                />
+              </View>
+              <View style={{ flex: 1 }}>
+                <DatePicker
+                  label="Au"
+                  placeholder="Date de fin"
+                  value={endDate}
+                  onChange={setEndDate}
+                  minDate={startDate}
+                  maxDate={new Date()}
+                />
+              </View>
             </View>
           )}
         </Card>
@@ -438,30 +433,6 @@ const AdminAnalyticsScreen: React.FC<{ navigation: any }> = ({ navigation }) => 
 
         <View style={{ height: 40 }} />
       </ScrollView>
-
-      {/* Date Pickers */}
-      {showStartPicker && (
-        <DateTimePicker
-          value={startDate}
-          mode="date"
-          display="default"
-          onChange={(event, date) => {
-            setShowStartPicker(false)
-            if (date) setStartDate(date)
-          }}
-        />
-      )}
-      {showEndPicker && (
-        <DateTimePicker
-          value={endDate}
-          mode="date"
-          display="default"
-          onChange={(event, date) => {
-            setShowEndPicker(false)
-            if (date) setEndDate(date)
-          }}
-        />
-      )}
 
       <AlertModal {...alertProps} />
     </View>

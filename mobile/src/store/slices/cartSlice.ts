@@ -11,6 +11,7 @@ import {
   CartUpdatePayload,
 } from '../../types'
 import { logoutUser } from './authSlice'
+import { fetchWallet } from './walletSlice'
 
 export const cartInitialState: CartState = {
   cart: null,
@@ -88,7 +89,7 @@ export const clearCart = createAsyncThunk(
 
 export const checkoutCart = createAsyncThunk(
   'cart/checkout',
-  async (payload: CartCheckoutPayload, { rejectWithValue, getState }) => {
+  async (payload: CartCheckoutPayload, { rejectWithValue, getState, dispatch }) => {
     try {
       // Récupérer le cart du state pour extraire les items
       const state = getState() as any
@@ -99,20 +100,33 @@ export const checkoutCart = createAsyncThunk(
       }
 
       // Transformer les items du cart en format pour l'API orders
+      // Inclure payment_method et wallet_pin pour le paiement
       const orderPayload = {
         items: cart.items.map((item: any) => ({
           product_id: item.product_id,
           quantity: item.quantity
         })),
+        payment_method: payload.paymentMethod,
+        wallet_pin: payload.walletPin,
         notes: payload.notes ?? undefined
       }
 
       console.log('📦 [Cart] Creating order from cart with items:', orderPayload.items)
+      console.log('💳 [Cart] Payment method:', payload.paymentMethod)
+      console.log('🔑 [Cart] Wallet PIN present:', !!payload.walletPin)
+      console.log('📋 [Cart] Full orderPayload:', JSON.stringify(orderPayload, null, 2))
 
       // Appeler la nouvelle API createOrder au lieu de checkoutCart
       const orderResponse = await apiService.createOrder(orderPayload)
 
       console.log('✅ [Cart] Order created:', orderResponse.data.order_number)
+      console.log('💰 [Cart] Payment status:', orderResponse.data.order?.payment_status)
+
+      // Si paiement wallet, rafraîchir le solde du portefeuille
+      if (payload.paymentMethod === 'wallet') {
+        console.log('🔄 [Cart] Refreshing wallet balance after wallet payment...')
+        dispatch(fetchWallet())
+      }
 
       // Adapter la réponse pour correspondre à CartCheckoutResponse
       // L'API orders retourne { order, order_id, order_number, ... }

@@ -74,3 +74,58 @@ storybook-static
 /frontend/tests/visual/product-detail-2025.spec.ts-snapshots/
 /frontend/tests/visual/reservation-detail-2025.spec.ts-snapshots/
 .venv/
+
+# Mobile (React Native + Expo)
+/mobile/node_modules
+/mobile/.expo
+/mobile/dist
+/mobile/web-build
+/mobile/.env.local
+/mobile/android/app/build
+/mobile/android/.gradle
+/mobile/ios/Pods
+/mobile/ios/build
+
+# Debug and test scripts at root (keep tests/ folder)
+/debug-*.js
+/test-*.js
+/sequential-*.js
+/json-*.js
+/*-debug.js
+/*-fix.js
+/proxy-*.js
+
+# Crash dumps
+*.stackdump
+
+# Lighthouse and performance reports
+lighthouse-*.json
+/playwright-report/
+
+# Screenshots and images at root
+/*.png
+/*.jpg
+/*.jpeg
+/Screenshot_*.jpg
+
+# Backup archives at root
+/*.tar.gz
+
+# Temporary SQL files at root (database/ folder is ok)
+/*.sql
+
+# Old summary/report files
+/*_SUMMARY.txt
+/VERDICT_*.txt
+/GAP_*.txt
+/CONFORMITY_*.txt
+
+# Temporary and cache files
+*.tmp
+*.temp
+*.cache
+nul
+
+# Editor backup files
+*.bak
+*.orig

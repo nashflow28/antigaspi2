@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import {
   View,
   StyleSheet,
@@ -10,6 +10,7 @@ import {
 import { FlashList } from '@shopify/flash-list'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useDispatch, useSelector } from 'react-redux'
+import { useFocusEffect } from '@react-navigation/native'
 import {
   AppDispatch,
   RootState,
@@ -21,6 +22,7 @@ import {
   fetchMyReservations,
   cancelReservation,
 } from '../../store/slices/reservationsSlice'
+import { fetchCart } from '../../store/slices/cartSlice'
 import { Ionicons } from '@expo/vector-icons'
 import { Image } from 'expo-image'
 import QRCode from 'react-native-qrcode-svg'
@@ -30,6 +32,7 @@ import { Button, Card, Badge, Typography, Modal as Modal2025, ReservationListSke
 import { useTheme } from '../../theme'
 import { TEST_IDS } from '../../utils/testIds'
 import { getImageUrl } from '../../utils/imageHelpers'
+import { formatCurrency } from '../../utils/currencyHelpers'
 import AlertModal from '../../components/AlertModal'
 import { useAlert } from '../../hooks/useAlert'
 import { navigationRef } from '../../navigation/NavigationRef'
@@ -49,7 +52,12 @@ const ReservationsScreen: React.FC<Props> = ({ navigation }) => {
   const loading = useSelector(selectReservationsLoading)
   const user = useSelector(selectCurrentUser)
   const { isAuthenticated } = useSelector((state: RootState) => state.auth)
+  const { cart } = useSelector((state: RootState) => state.cart)
   const { alertProps, showError, showSuccess, showWarning, hideAlert } = useAlert()
+
+  // Cart info for banner
+  const cartItemsCount = cart?.items_count ?? 0
+  const cartTotal = cart?.total_amount ?? 0
 
   console.log('🔍 [ReservationsScreen] Current state:', {
     reservationsCount: reservations.length,
@@ -70,6 +78,23 @@ const ReservationsScreen: React.FC<Props> = ({ navigation }) => {
       void loadReservations('initial')
     }
   }, [isAuthenticated])
+
+  // 🐛 BUG FIX: Refresh reservations AND cart when screen focuses
+  useFocusEffect(
+    useCallback(() => {
+      if (isAuthenticated) {
+        // Rafraîchir les réservations pour voir les nouvelles après checkout
+        void loadReservations('refresh')
+        // Rafraîchir le panier pour sync badge
+        dispatch(fetchCart())
+      }
+    }, [dispatch, isAuthenticated])
+  )
+
+  // Navigate to cart screen
+  const goToCart = () => {
+    navigation.navigate('Cart')
+  }
 
   const loadReservations = async (
     source: 'initial' | 'refresh' | 'reload' = 'initial'
@@ -486,6 +511,49 @@ const ReservationsScreen: React.FC<Props> = ({ navigation }) => {
         </Typography>
       </View>
 
+      {/* 🐛 BUG FIX: Cart Banner - Shows when there are items in cart */}
+      {cartItemsCount > 0 && (
+        <TouchableOpacity
+          onPress={goToCart}
+          style={[
+            styles.cartBanner,
+            {
+              backgroundColor: theme.colors.accent.gold,
+              marginHorizontal: theme.spacing.md,
+              marginTop: theme.spacing.md,
+            }
+          ]}
+          testID="cart-banner"
+          accessibilityLabel={`Panier: ${cartItemsCount} article${cartItemsCount > 1 ? 's' : ''}, ${formatCurrency(cartTotal)}`}
+          accessibilityRole="button"
+        >
+          <View style={styles.cartBannerLeft}>
+            <View style={[styles.cartBannerIcon, { backgroundColor: theme.colors.primary[600] }]}>
+              <Ionicons name="cart" size={20} color="white" />
+              <View style={[styles.cartBannerBadge, { backgroundColor: theme.colors.error }]}>
+                <Typography variant="caption" weight="bold" style={{ color: 'white', fontSize: 10 }}>
+                  {cartItemsCount > 99 ? '99+' : cartItemsCount}
+                </Typography>
+              </View>
+            </View>
+            <View style={{ marginLeft: theme.spacing.md }}>
+              <Typography variant="body" weight="bold" style={{ color: theme.colors.text }}>
+                Panier en cours
+              </Typography>
+              <Typography variant="caption" style={{ color: theme.colors.neutral[600] }}>
+                {cartItemsCount} article{cartItemsCount > 1 ? 's' : ''} • {formatCurrency(cartTotal)}
+              </Typography>
+            </View>
+          </View>
+          <View style={styles.cartBannerRight}>
+            <Typography variant="body" weight="semibold" style={{ color: theme.colors.primary[600] }}>
+              Voir
+            </Typography>
+            <Ionicons name="chevron-forward" size={18} color={theme.colors.primary[600]} />
+          </View>
+        </TouchableOpacity>
+      )}
+
       {/* Tabs */}
       <Card variant="elevated" style={{ marginHorizontal: theme.spacing.md, marginTop: theme.spacing.md, padding: theme.spacing.xs }}>
         <View style={styles.tabsContainer}>
@@ -661,6 +729,48 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   qrCodeContainer: {},
+  // Cart banner styles
+  cartBanner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    padding: 12,
+    borderRadius: 12,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  cartBannerLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
+  },
+  cartBannerIcon: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+    position: 'relative',
+  },
+  cartBannerBadge: {
+    position: 'absolute',
+    top: -4,
+    right: -4,
+    minWidth: 18,
+    height: 18,
+    borderRadius: 9,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 4,
+  },
+  cartBannerRight: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
 })
 
 export default ReservationsScreen

@@ -69,6 +69,8 @@ export interface Product {
   is_surprise_basket?: boolean  // true = panier surprise, false/undefined = produit individuel
   status?: string
   needs_approval?: boolean
+  pickup_start?: string  // Heure de début de récupération (format HH:MM)
+  pickup_end?: string    // Heure de fin de récupération (format HH:MM)
 }
 
 export interface SurpriseBasketItem {
@@ -851,6 +853,8 @@ export interface Order {
 
 export interface OrderCreationPayload {
   items: Array<{ product_id: number; quantity: number }>
+  payment_method?: PaymentMethod
+  wallet_pin?: string
   notes?: string
 }
 
