@@ -213,13 +213,17 @@ export default function NotificationsScreen() {
     const iconName = getIcon(item.type)
     const iconColor = getColor(item.type)
 
+    // Dark mode aware card background
+    const cardBg = theme.isDark ? theme.colors.neutral[800] : theme.colors.surface.light
+    const unreadBg = theme.isDark ? theme.colors.primary[900] : theme.colors.primary[50]
+
     return (
       <TouchableOpacity
         style={[
           styles.notificationItem,
-          { backgroundColor: theme.colors.surface.light },
+          { backgroundColor: cardBg },
           !item.is_read && {
-            backgroundColor: theme.colors.primary[50],
+            backgroundColor: unreadBg,
             borderLeftWidth: 3,
             borderLeftColor: theme.colors.primary[500],
           },
@@ -266,9 +270,12 @@ export default function NotificationsScreen() {
     )
   }
 
+  // Dark mode aware filter background
+  const filterBg = theme.isDark ? theme.colors.neutral[800] : theme.colors.surface.light
+
   const renderHeader = () => (
     <View style={styles.header}>
-      <View style={[styles.filterContainer, { backgroundColor: theme.colors.surface.light }]}>
+      <View style={[styles.filterContainer, { backgroundColor: filterBg }]}>
         <TouchableOpacity
           style={[
             styles.filterButton,
@@ -378,7 +385,7 @@ export default function NotificationsScreen() {
       <View style={[
         styles.navHeader,
         {
-          backgroundColor: theme.colors.surface.light,
+          backgroundColor: theme.isDark ? theme.colors.neutral[900] : theme.colors.surface.light,
           borderBottomColor: theme.colors.border,
         }
       ]}>
