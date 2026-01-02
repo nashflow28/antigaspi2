@@ -494,10 +494,11 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 16,
-    paddingVertical: 10,
+    paddingVertical: 12,
     borderRadius: 20,
     borderWidth: 1,
     marginRight: 8,
+    minHeight: 44,
   },
   resultsHeader: {
     flexDirection: 'row',

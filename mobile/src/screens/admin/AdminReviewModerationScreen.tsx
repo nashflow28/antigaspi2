@@ -961,9 +961,10 @@ const styles = StyleSheet.create({
   },
   filterChip: {
     paddingHorizontal: 16,
-    paddingVertical: 8,
+    paddingVertical: 12,
     borderRadius: 999,
     borderWidth: 1,
+    minHeight: 44,
   },
   reviewCard: {
     marginHorizontal: 16,

@@ -707,8 +707,9 @@ const styles = StyleSheet.create({
   },
   filterChip: {
     paddingHorizontal: 16,
-    paddingVertical: 8,
+    paddingVertical: 12,
     borderRadius: 20,
+    minHeight: 44,
   },
   merchantCard: {
     marginBottom: 12,

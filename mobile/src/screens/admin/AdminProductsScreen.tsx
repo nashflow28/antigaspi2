@@ -874,10 +874,11 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   filterChip: {
-    paddingHorizontal: 14,
-    paddingVertical: 8,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
     borderRadius: 20,
     marginRight: 8,
+    minHeight: 44,
   },
   listContent: {
     padding: 16,
