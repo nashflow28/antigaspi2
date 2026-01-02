@@ -1,9 +1,10 @@
-import React from 'react'
+import React, { useCallback } from 'react'
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import { Ionicons } from '@expo/vector-icons'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useTheme } from '../theme'
+import { useHaptics } from '../hooks/useHaptics'
 
 // Merchant Screens
 import MerchantDashboardScreen from '../screens/merchant/MerchantDashboardScreen'
@@ -70,10 +71,19 @@ const AccountStack = () => (
 const MerchantNavigator: React.FC = () => {
   const theme = useTheme()
   const insets = useSafeAreaInsets()
+  const haptics = useHaptics()
+
+  // Haptic feedback on tab press
+  const handleTabPress = useCallback(() => {
+    haptics.lightTap()
+  }, [haptics])
 
   return (
     <Tab.Navigator
       initialRouteName="Dashboard"
+      screenListeners={{
+        tabPress: handleTabPress,
+      }}
       screenOptions={({ route }) => ({
         tabBarIcon: ({ focused, color, size }) => {
           let iconName: keyof typeof Ionicons.glyphMap

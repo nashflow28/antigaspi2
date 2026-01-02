@@ -4,6 +4,7 @@ import { Ionicons } from '@expo/vector-icons'
 import { useTheme } from '../theme'
 import { useFavorite } from '../hooks/useFavorite'
 import { TEST_IDS } from '../utils/testIds'
+import { useHaptics } from '../hooks/useHaptics'
 
 interface FavoriteButtonProps {
   productId: number
@@ -22,6 +23,7 @@ const FavoriteButton: React.FC<FavoriteButtonProps> = ({
 }) => {
   const theme = useTheme()
   const { isFavorite, toggleFavorite, loading } = useFavorite(productId)
+  const haptics = useHaptics()
   // BUG FIX #24: Add debounce state to prevent spam/double-tap issues
   const [isToggling, setIsToggling] = useState(false)
 
@@ -30,6 +32,9 @@ const FavoriteButton: React.FC<FavoriteButtonProps> = ({
     if (isToggling || loading) {
       return
     }
+
+    // Haptic feedback on toggle
+    await haptics.mediumTap()
 
     setIsToggling(true)
     try {

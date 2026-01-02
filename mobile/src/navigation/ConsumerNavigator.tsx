@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useCallback } from 'react'
 import { View, Text, StyleSheet } from 'react-native'
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
@@ -8,6 +8,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useTheme } from '../theme'
 import ErrorBoundary from '../components/ErrorBoundary'
 import { RootState } from '../store'
+import { useHaptics } from '../hooks/useHaptics'
 
 // Screens
 import HomeScreen from '../screens/main/HomeScreen'
@@ -111,12 +112,21 @@ const AccountStack = () => (
 const ConsumerNavigator: React.FC = () => {
   const theme = useTheme()
   const insets = useSafeAreaInsets()
+  const haptics = useHaptics()
   const { cart } = useSelector((state: RootState) => state.cart)
   const cartItemsCount = cart?.items_count ?? 0
+
+  // Haptic feedback on tab press
+  const handleTabPress = useCallback(() => {
+    haptics.lightTap()
+  }, [haptics])
 
   return (
     <Tab.Navigator
       initialRouteName="Home"
+      screenListeners={{
+        tabPress: handleTabPress,
+      }}
       screenOptions={({ route }) => ({
         tabBarIcon: ({ focused, color, size }) => {
           let iconName: keyof typeof Ionicons.glyphMap

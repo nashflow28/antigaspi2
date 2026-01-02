@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react'
+import React, { useState, useEffect, useCallback, useMemo } from 'react'
 import {
   View,
   Text,
@@ -8,7 +8,6 @@ import {
   Image,
   RefreshControl,
   ActivityIndicator,
-  Alert,
   Modal,
 } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
@@ -18,7 +17,8 @@ import { LinearGradient } from 'expo-linear-gradient'
 
 import rewardsService, { Reward, RewardRedemption } from '../../services/rewardsService'
 import { useAppSelector } from '../../store/hooks'
-import theme from '../../styles/theme'
+import { useTheme } from '../../theme'
+import { useAlert } from '../../contexts/AlertContext'
 
 const REWARD_TYPES = [
   { key: 'all', label: 'Tout', icon: 'grid-outline' },
@@ -43,7 +43,9 @@ const TIER_LABELS: Record<string, string> = {
 }
 
 export default function RewardsScreen() {
+  const theme = useTheme()
   const navigation = useNavigation<any>()
+  const { showAlert } = useAlert()
   const user = useAppSelector((state) => state.auth.user)
 
   const [rewards, setRewards] = useState<Reward[]>([])
@@ -57,6 +59,20 @@ export default function RewardsScreen() {
   const [activeTab, setActiveTab] = useState<'catalog' | 'myRewards'>('catalog')
   const [selectedReward, setSelectedReward] = useState<Reward | null>(null)
   const [redeeming, setRedeeming] = useState(false)
+
+  // Dynamic styles based on theme
+  const dynamicStyles = useMemo(() => ({
+    container: { backgroundColor: theme.colors.background },
+    surface: { backgroundColor: theme.colors.surface.light },
+    text: { color: theme.colors.text },
+    textSecondary: { color: theme.colors.textSecondary },
+    textTertiary: { color: theme.colors.textTertiary },
+    primary: { backgroundColor: theme.colors.primary[500] },
+    primaryText: { color: theme.colors.primary[500] },
+    border: { borderColor: theme.colors.border },
+    error: { color: theme.colors.error },
+    warning: { color: theme.colors.warning },
+  }), [theme])
 
   const fetchRewards = useCallback(async () => {
     try {
@@ -109,51 +125,56 @@ export default function RewardsScreen() {
 
   const handleRedeem = async (reward: Reward) => {
     if (currentPoints < reward.points_required) {
-      Alert.alert(
-        'Points insuffisants',
-        `Vous avez ${currentPoints} points, mais cette récompense en nécessite ${reward.points_required}.`
-      )
+      showAlert({
+        title: 'Points insuffisants',
+        message: `Vous avez ${currentPoints} points, mais cette récompense en nécessite ${reward.points_required}.`,
+        type: 'warning',
+      })
       return
     }
 
-    Alert.alert(
-      'Confirmer l\'échange',
-      `Voulez-vous échanger ${reward.points_required} points contre "${reward.name}" ?`,
-      [
-        { text: 'Annuler', style: 'cancel' },
-        {
-          text: 'Confirmer',
-          onPress: async () => {
-            setRedeeming(true)
-            try {
-              const response = await rewardsService.redeemReward(reward.id)
-              if (response.success) {
-                Alert.alert(
-                  'Succès !',
-                  `Votre code de récompense : ${response.data?.redemption.redemption_code}\n\nPrésentez ce code au commerçant pour l'utiliser.`
-                )
-                setCurrentPoints(response.data?.remaining_points || 0)
-                setSelectedReward(null)
-                fetchRedemptions()
-                fetchRewards()
-              } else {
-                Alert.alert('Erreur', response.message || 'Échec de l\'échange')
-              }
-            } catch (error: any) {
-              Alert.alert('Erreur', error.message || 'Erreur lors de l\'échange')
-            } finally {
-              setRedeeming(false)
-            }
-          },
-        },
-      ]
-    )
+    showAlert({
+      title: 'Confirmer l\'échange',
+      message: `Voulez-vous échanger ${reward.points_required} points contre "${reward.name}" ?`,
+      type: 'confirm',
+      onConfirm: async () => {
+        setRedeeming(true)
+        try {
+          const response = await rewardsService.redeemReward(reward.id)
+          if (response.success) {
+            showAlert({
+              title: 'Succès !',
+              message: `Votre code de récompense : ${response.data?.redemption.redemption_code}\n\nPrésentez ce code au commerçant pour l'utiliser.`,
+              type: 'success',
+            })
+            setCurrentPoints(response.data?.remaining_points || 0)
+            setSelectedReward(null)
+            fetchRedemptions()
+            fetchRewards()
+          } else {
+            showAlert({
+              title: 'Erreur',
+              message: response.message || 'Échec de l\'échange',
+              type: 'error',
+            })
+          }
+        } catch (error: any) {
+          showAlert({
+            title: 'Erreur',
+            message: error.message || 'Erreur lors de l\'échange',
+            type: 'error',
+          })
+        } finally {
+          setRedeeming(false)
+        }
+      },
+    })
   }
 
   const renderHeader = () => (
     <View style={styles.header}>
       <LinearGradient
-        colors={[theme.colors.primary, theme.colors.primaryDark || '#0D9668']}
+        colors={[theme.colors.primary[500], theme.colors.primary[700]]}
         style={styles.pointsCard}
       >
         <View style={styles.pointsRow}>
@@ -169,24 +190,24 @@ export default function RewardsScreen() {
       </LinearGradient>
 
       {/* Tabs */}
-      <View style={styles.tabs}>
+      <View style={[styles.tabs, dynamicStyles.surface]}>
         <TouchableOpacity
-          style={[styles.tab, activeTab === 'catalog' && styles.activeTab]}
+          style={[styles.tab, activeTab === 'catalog' && dynamicStyles.primary]}
           onPress={() => setActiveTab('catalog')}
         >
-          <Text style={[styles.tabText, activeTab === 'catalog' && styles.activeTabText]}>
+          <Text style={[styles.tabText, dynamicStyles.textSecondary, activeTab === 'catalog' && styles.activeTabText]}>
             Catalogue
           </Text>
         </TouchableOpacity>
         <TouchableOpacity
-          style={[styles.tab, activeTab === 'myRewards' && styles.activeTab]}
+          style={[styles.tab, activeTab === 'myRewards' && dynamicStyles.primary]}
           onPress={() => setActiveTab('myRewards')}
         >
-          <Text style={[styles.tabText, activeTab === 'myRewards' && styles.activeTabText]}>
+          <Text style={[styles.tabText, dynamicStyles.textSecondary, activeTab === 'myRewards' && styles.activeTabText]}>
             Mes Récompenses
           </Text>
           {redemptions.filter(r => r.status === 'pending').length > 0 && (
-            <View style={styles.badge}>
+            <View style={[styles.badge, { backgroundColor: theme.colors.error }]}>
               <Text style={styles.badgeText}>
                 {redemptions.filter(r => r.status === 'pending').length}
               </Text>
@@ -208,7 +229,8 @@ export default function RewardsScreen() {
               <TouchableOpacity
                 style={[
                   styles.filterChip,
-                  selectedType === item.key && styles.filterChipActive,
+                  dynamicStyles.surface,
+                  selectedType === item.key && dynamicStyles.primary,
                 ]}
                 onPress={() => setSelectedType(item.key)}
               >
@@ -220,6 +242,7 @@ export default function RewardsScreen() {
                 <Text
                   style={[
                     styles.filterChipText,
+                    dynamicStyles.textSecondary,
                     selectedType === item.key && styles.filterChipTextActive,
                   ]}
                 >
@@ -236,9 +259,9 @@ export default function RewardsScreen() {
             <Ionicons
               name={showAffordableOnly ? 'checkbox' : 'square-outline'}
               size={20}
-              color={theme.colors.primary}
+              color={theme.colors.primary[500]}
             />
-            <Text style={styles.affordableFilterText}>
+            <Text style={[styles.affordableFilterText, dynamicStyles.text]}>
               Uniquement les récompenses accessibles
             </Text>
           </TouchableOpacity>
@@ -252,21 +275,25 @@ export default function RewardsScreen() {
 
     return (
       <TouchableOpacity
-        style={[styles.rewardCard, !canAfford && styles.rewardCardDisabled]}
+        style={[
+          styles.rewardCard,
+          dynamicStyles.surface,
+          !canAfford && styles.rewardCardDisabled
+        ]}
         onPress={() => setSelectedReward(item)}
         activeOpacity={0.7}
       >
         {item.image_url ? (
           <Image source={{ uri: item.image_url }} style={styles.rewardImage} />
         ) : (
-          <View style={[styles.rewardImage, styles.rewardImagePlaceholder]}>
-            <Ionicons name="gift" size={40} color={theme.colors.textLight} />
+          <View style={[styles.rewardImage, styles.rewardImagePlaceholder, dynamicStyles.container]}>
+            <Ionicons name="gift" size={40} color={theme.colors.textTertiary} />
           </View>
         )}
 
         <View style={styles.rewardContent}>
           <View style={styles.rewardHeader}>
-            <Text style={styles.rewardName} numberOfLines={1}>
+            <Text style={[styles.rewardName, dynamicStyles.text]} numberOfLines={1}>
               {item.name}
             </Text>
             {item.is_featured && (
@@ -276,14 +303,14 @@ export default function RewardsScreen() {
             )}
           </View>
 
-          <Text style={styles.rewardDescription} numberOfLines={2}>
+          <Text style={[styles.rewardDescription, dynamicStyles.textSecondary]} numberOfLines={2}>
             {item.description}
           </Text>
 
           <View style={styles.rewardFooter}>
             <View style={styles.pointsRequired}>
-              <Ionicons name="diamond" size={16} color={theme.colors.primary} />
-              <Text style={[styles.pointsText, !canAfford && styles.pointsTextDisabled]}>
+              <Ionicons name="diamond" size={16} color={theme.colors.primary[500]} />
+              <Text style={[styles.pointsText, dynamicStyles.primaryText, !canAfford && dynamicStyles.error]}>
                 {item.points_required.toLocaleString()} pts
               </Text>
             </View>
@@ -305,7 +332,7 @@ export default function RewardsScreen() {
           </View>
 
           {item.remaining_quantity !== null && item.remaining_quantity < 10 && (
-            <Text style={styles.stockWarning}>
+            <Text style={[styles.stockWarning, dynamicStyles.warning]}>
               Plus que {item.remaining_quantity} disponible(s) !
             </Text>
           )}
@@ -332,9 +359,11 @@ export default function RewardsScreen() {
     const colors = statusColors[item.status] || statusColors.pending
 
     return (
-      <View style={styles.redemptionCard}>
+      <View style={[styles.redemptionCard, dynamicStyles.surface]}>
         <View style={styles.redemptionHeader}>
-          <Text style={styles.redemptionName}>{item.reward?.name || 'Récompense'}</Text>
+          <Text style={[styles.redemptionName, dynamicStyles.text]}>
+            {item.reward?.name || 'Récompense'}
+          </Text>
           <View style={[styles.statusBadge, { backgroundColor: colors.bg }]}>
             <Text style={[styles.statusText, { color: colors.text }]}>
               {statusLabels[item.status]}
@@ -342,17 +371,17 @@ export default function RewardsScreen() {
           </View>
         </View>
 
-        <View style={styles.redemptionCode}>
-          <Text style={styles.codeLabel}>Code:</Text>
-          <Text style={styles.codeValue}>{item.redemption_code}</Text>
+        <View style={[styles.redemptionCode, dynamicStyles.container]}>
+          <Text style={[styles.codeLabel, dynamicStyles.textSecondary]}>Code:</Text>
+          <Text style={[styles.codeValue, dynamicStyles.text]}>{item.redemption_code}</Text>
         </View>
 
         <View style={styles.redemptionInfo}>
-          <Text style={styles.redemptionInfoText}>
-            {item.points_spent} points • {new Date(item.created_at).toLocaleDateString('fr-FR')}
+          <Text style={[styles.redemptionInfoText, dynamicStyles.textSecondary]}>
+            {item.points_spent} points - {new Date(item.created_at).toLocaleDateString('fr-FR')}
           </Text>
           {item.expires_at && item.status === 'pending' && (
-            <Text style={styles.expiresText}>
+            <Text style={[styles.expiresText, dynamicStyles.warning]}>
               Expire le {new Date(item.expires_at).toLocaleDateString('fr-FR')}
             </Text>
           )}
@@ -374,7 +403,7 @@ export default function RewardsScreen() {
         onRequestClose={() => setSelectedReward(null)}
       >
         <View style={styles.modalOverlay}>
-          <View style={styles.modalContent}>
+          <View style={[styles.modalContent, dynamicStyles.surface]}>
             <TouchableOpacity
               style={styles.modalClose}
               onPress={() => setSelectedReward(null)}
@@ -389,40 +418,44 @@ export default function RewardsScreen() {
                 resizeMode="cover"
               />
             ) : (
-              <View style={[styles.modalImage, styles.modalImagePlaceholder]}>
-                <Ionicons name="gift" size={60} color={theme.colors.textLight} />
+              <View style={[styles.modalImage, styles.modalImagePlaceholder, dynamicStyles.container]}>
+                <Ionicons name="gift" size={60} color={theme.colors.textTertiary} />
               </View>
             )}
 
-            <Text style={styles.modalTitle}>{selectedReward.name}</Text>
-            <Text style={styles.modalDescription}>{selectedReward.description}</Text>
+            <Text style={[styles.modalTitle, dynamicStyles.text]}>{selectedReward.name}</Text>
+            <Text style={[styles.modalDescription, dynamicStyles.textSecondary]}>
+              {selectedReward.description}
+            </Text>
 
             {selectedReward.merchant && (
               <View style={styles.merchantInfo}>
                 <Ionicons name="storefront-outline" size={16} color={theme.colors.textSecondary} />
-                <Text style={styles.merchantName}>
+                <Text style={[styles.merchantName, dynamicStyles.textSecondary]}>
                   {selectedReward.merchant.business_name}
                 </Text>
               </View>
             )}
 
-            <View style={styles.modalDetails}>
-              <View style={styles.detailRow}>
-                <Text style={styles.detailLabel}>Points requis</Text>
-                <Text style={styles.detailValue}>
+            <View style={[styles.modalDetails, dynamicStyles.container]}>
+              <View style={[styles.detailRow, dynamicStyles.border]}>
+                <Text style={[styles.detailLabel, dynamicStyles.textSecondary]}>Points requis</Text>
+                <Text style={[styles.detailValue, dynamicStyles.text]}>
                   {selectedReward.points_required.toLocaleString()}
                 </Text>
               </View>
               {selectedReward.value && (
-                <View style={styles.detailRow}>
-                  <Text style={styles.detailLabel}>Valeur</Text>
-                  <Text style={styles.detailValue}>{selectedReward.formatted_value}</Text>
+                <View style={[styles.detailRow, dynamicStyles.border]}>
+                  <Text style={[styles.detailLabel, dynamicStyles.textSecondary]}>Valeur</Text>
+                  <Text style={[styles.detailValue, dynamicStyles.text]}>
+                    {selectedReward.formatted_value}
+                  </Text>
                 </View>
               )}
               {selectedReward.valid_until && (
-                <View style={styles.detailRow}>
-                  <Text style={styles.detailLabel}>Valide jusqu'au</Text>
-                  <Text style={styles.detailValue}>
+                <View style={[styles.detailRow, dynamicStyles.border]}>
+                  <Text style={[styles.detailLabel, dynamicStyles.textSecondary]}>Valide jusqu'au</Text>
+                  <Text style={[styles.detailValue, dynamicStyles.text]}>
                     {new Date(selectedReward.valid_until).toLocaleDateString('fr-FR')}
                   </Text>
                 </View>
@@ -432,7 +465,8 @@ export default function RewardsScreen() {
             <TouchableOpacity
               style={[
                 styles.redeemButton,
-                (!canAfford || redeeming) && styles.redeemButtonDisabled,
+                dynamicStyles.primary,
+                (!canAfford || redeeming) && { backgroundColor: theme.colors.textTertiary },
               ]}
               onPress={() => handleRedeem(selectedReward)}
               disabled={!canAfford || redeeming}
@@ -458,41 +492,68 @@ export default function RewardsScreen() {
 
   if (loading) {
     return (
-      <SafeAreaView style={styles.container}>
+      <SafeAreaView style={[styles.container, dynamicStyles.container]}>
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color={theme.colors.primary} />
-          <Text style={styles.loadingText}>Chargement des récompenses...</Text>
+          <ActivityIndicator size="large" color={theme.colors.primary[500]} />
+          <Text style={[styles.loadingText, dynamicStyles.textSecondary]}>
+            Chargement des récompenses...
+          </Text>
         </View>
       </SafeAreaView>
     )
   }
 
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
-      <FlatList
-        data={activeTab === 'catalog' ? rewards : redemptions}
-        keyExtractor={(item) => String(item.id)}
-        renderItem={activeTab === 'catalog' ? renderRewardItem : renderRedemptionItem}
-        ListHeaderComponent={renderHeader}
-        contentContainerStyle={styles.listContent}
-        refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
-        }
-        ListEmptyComponent={
-          <View style={styles.emptyContainer}>
-            <Ionicons
-              name={activeTab === 'catalog' ? 'gift-outline' : 'receipt-outline'}
-              size={60}
-              color={theme.colors.textLight}
+    <SafeAreaView style={[styles.container, dynamicStyles.container]} edges={['top']}>
+      {activeTab === 'catalog' ? (
+        <FlatList<Reward>
+          data={rewards}
+          keyExtractor={(item) => String(item.id)}
+          renderItem={renderRewardItem}
+          ListHeaderComponent={renderHeader}
+          contentContainerStyle={styles.listContent}
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={handleRefresh}
+              tintColor={theme.colors.primary[500]}
+              colors={[theme.colors.primary[500]]}
             />
-            <Text style={styles.emptyText}>
-              {activeTab === 'catalog'
-                ? 'Aucune récompense disponible'
-                : 'Vous n\'avez pas encore échangé de récompenses'}
-            </Text>
-          </View>
-        }
-      />
+          }
+          ListEmptyComponent={
+            <View style={styles.emptyContainer}>
+              <Ionicons name="gift-outline" size={60} color={theme.colors.textTertiary} />
+              <Text style={[styles.emptyText, dynamicStyles.textSecondary]}>
+                Aucune récompense disponible
+              </Text>
+            </View>
+          }
+        />
+      ) : (
+        <FlatList<RewardRedemption>
+          data={redemptions}
+          keyExtractor={(item) => String(item.id)}
+          renderItem={renderRedemptionItem}
+          ListHeaderComponent={renderHeader}
+          contentContainerStyle={styles.listContent}
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={handleRefresh}
+              tintColor={theme.colors.primary[500]}
+              colors={[theme.colors.primary[500]]}
+            />
+          }
+          ListEmptyComponent={
+            <View style={styles.emptyContainer}>
+              <Ionicons name="receipt-outline" size={60} color={theme.colors.textTertiary} />
+              <Text style={[styles.emptyText, dynamicStyles.textSecondary]}>
+                Vous n'avez pas encore échangé de récompenses
+              </Text>
+            </View>
+          }
+        />
+      )}
 
       {renderRewardModal()}
     </SafeAreaView>
@@ -502,7 +563,6 @@ export default function RewardsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: theme.colors.background,
   },
   loadingContainer: {
     flex: 1,
@@ -512,7 +572,6 @@ const styles = StyleSheet.create({
   loadingText: {
     marginTop: 12,
     fontSize: 14,
-    color: theme.colors.textSecondary,
   },
   header: {
     paddingBottom: 8,
@@ -552,7 +611,6 @@ const styles = StyleSheet.create({
   tabs: {
     flexDirection: 'row',
     marginHorizontal: 16,
-    backgroundColor: theme.colors.surface,
     borderRadius: 12,
     padding: 4,
   },
@@ -564,19 +622,14 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     borderRadius: 8,
   },
-  activeTab: {
-    backgroundColor: theme.colors.primary,
-  },
   tabText: {
     fontSize: 14,
     fontWeight: '500',
-    color: theme.colors.textSecondary,
   },
   activeTabText: {
     color: '#fff',
   },
   badge: {
-    backgroundColor: theme.colors.error,
     borderRadius: 10,
     minWidth: 20,
     height: 20,
@@ -599,17 +652,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 14,
     paddingVertical: 8,
-    backgroundColor: theme.colors.surface,
     borderRadius: 20,
     marginRight: 8,
     gap: 6,
   },
-  filterChipActive: {
-    backgroundColor: theme.colors.primary,
-  },
   filterChipText: {
     fontSize: 13,
-    color: theme.colors.textSecondary,
   },
   filterChipTextActive: {
     color: '#fff',
@@ -623,19 +671,16 @@ const styles = StyleSheet.create({
   },
   affordableFilterText: {
     fontSize: 14,
-    color: theme.colors.text,
   },
   listContent: {
     paddingBottom: 100,
   },
   rewardCard: {
     flexDirection: 'row',
-    backgroundColor: theme.colors.surface,
     marginHorizontal: 16,
     marginBottom: 12,
     borderRadius: 12,
     overflow: 'hidden',
-    ...theme.shadows.sm,
   },
   rewardCardDisabled: {
     opacity: 0.6,
@@ -645,7 +690,6 @@ const styles = StyleSheet.create({
     height: 100,
   },
   rewardImagePlaceholder: {
-    backgroundColor: theme.colors.background,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -662,14 +706,12 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 16,
     fontWeight: '600',
-    color: theme.colors.text,
   },
   featuredBadge: {
     padding: 4,
   },
   rewardDescription: {
     fontSize: 13,
-    color: theme.colors.textSecondary,
     marginTop: 4,
   },
   rewardFooter: {
@@ -686,10 +728,6 @@ const styles = StyleSheet.create({
   pointsText: {
     fontSize: 14,
     fontWeight: '600',
-    color: theme.colors.primary,
-  },
-  pointsTextDisabled: {
-    color: theme.colors.error,
   },
   tierRequired: {
     paddingHorizontal: 8,
@@ -702,16 +740,13 @@ const styles = StyleSheet.create({
   },
   stockWarning: {
     fontSize: 11,
-    color: theme.colors.warning,
     marginTop: 4,
   },
   redemptionCard: {
-    backgroundColor: theme.colors.surface,
     marginHorizontal: 16,
     marginBottom: 12,
     padding: 16,
     borderRadius: 12,
-    ...theme.shadows.sm,
   },
   redemptionHeader: {
     flexDirection: 'row',
@@ -723,7 +758,6 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 16,
     fontWeight: '600',
-    color: theme.colors.text,
   },
   statusBadge: {
     paddingHorizontal: 10,
@@ -737,21 +771,18 @@ const styles = StyleSheet.create({
   redemptionCode: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: theme.colors.background,
     padding: 12,
     borderRadius: 8,
     marginBottom: 12,
   },
   codeLabel: {
     fontSize: 13,
-    color: theme.colors.textSecondary,
     marginRight: 8,
   },
   codeValue: {
     fontSize: 16,
     fontWeight: 'bold',
     fontFamily: 'monospace',
-    color: theme.colors.text,
     letterSpacing: 1,
   },
   redemptionInfo: {
@@ -761,11 +792,9 @@ const styles = StyleSheet.create({
   },
   redemptionInfoText: {
     fontSize: 13,
-    color: theme.colors.textSecondary,
   },
   expiresText: {
     fontSize: 12,
-    color: theme.colors.warning,
   },
   emptyContainer: {
     flex: 1,
@@ -776,7 +805,6 @@ const styles = StyleSheet.create({
   emptyText: {
     marginTop: 12,
     fontSize: 14,
-    color: theme.colors.textSecondary,
     textAlign: 'center',
   },
   modalOverlay: {
@@ -785,7 +813,6 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-end',
   },
   modalContent: {
-    backgroundColor: theme.colors.surface,
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
     padding: 20,
@@ -805,19 +832,16 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   modalImagePlaceholder: {
-    backgroundColor: theme.colors.background,
     justifyContent: 'center',
     alignItems: 'center',
   },
   modalTitle: {
     fontSize: 22,
     fontWeight: 'bold',
-    color: theme.colors.text,
     marginBottom: 8,
   },
   modalDescription: {
     fontSize: 14,
-    color: theme.colors.textSecondary,
     lineHeight: 20,
     marginBottom: 16,
   },
@@ -829,10 +853,8 @@ const styles = StyleSheet.create({
   },
   merchantName: {
     fontSize: 14,
-    color: theme.colors.textSecondary,
   },
   modalDetails: {
-    backgroundColor: theme.colors.background,
     borderRadius: 12,
     padding: 16,
     marginBottom: 20,
@@ -842,28 +864,21 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingVertical: 8,
     borderBottomWidth: 1,
-    borderBottomColor: theme.colors.border,
   },
   detailLabel: {
     fontSize: 14,
-    color: theme.colors.textSecondary,
   },
   detailValue: {
     fontSize: 14,
     fontWeight: '600',
-    color: theme.colors.text,
   },
   redeemButton: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: theme.colors.primary,
     paddingVertical: 16,
     borderRadius: 12,
     gap: 8,
-  },
-  redeemButtonDisabled: {
-    backgroundColor: theme.colors.textLight,
   },
   redeemButtonText: {
     fontSize: 16,

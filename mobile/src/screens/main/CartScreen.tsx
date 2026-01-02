@@ -29,11 +29,13 @@ import {
   removeCartItem,
   clearCart,
   checkoutCart,
+  resetCartState,
 } from '../../store/slices/cartSlice'
 import { useToast } from '../../contexts/ToastContext'
 import AlertModal from '../../components/AlertModal'
 import { useAlert } from '../../hooks/useAlert'
 import KeyboardAwareContainer from '../../components/KeyboardAwareContainer'
+import { useHaptics } from '../../hooks/useHaptics'
 
 type Props = {
   navigation: any
@@ -47,6 +49,7 @@ const CartScreen: React.FC<Props> = ({ navigation }) => {
   const insets = useSafeAreaInsets()
   const { showSuccess, showError } = useToast()
   const { alertProps, showWarning, hideAlert } = useAlert()
+  const haptics = useHaptics()
   const {
     cart,
     loading,
@@ -302,6 +305,9 @@ const CartScreen: React.FC<Props> = ({ navigation }) => {
     }
 
     try {
+      // Haptic feedback on checkout initiation
+      await haptics.mediumTap()
+
       const response = await dispatch(
         checkoutCart({
           paymentMethod: selectedPaymentMethod,
@@ -314,15 +320,35 @@ const CartScreen: React.FC<Props> = ({ navigation }) => {
         })
       ).unwrap()
 
+      // Success haptic feedback
+      await haptics.success()
+
+      // Safety measure: immediately reset cart state (synchronous)
+      // This ensures UI shows empty cart instantly without waiting for API
+      dispatch(resetCartState())
+
+      // Also call API to clear cart from backend (belt and suspenders)
+      // Wait for this to complete before navigating to avoid race condition
+      // where ReservationsScreen's fetchCart() might return old cart data
+      try {
+        await dispatch(clearCart()).unwrap()
+      } catch {
+        // Ignore errors as checkout already succeeded
+      }
+
       showSuccess(response.message || 'Réservations confirmées !')
 
       const firstReservation = response.data?.[0]
       if (firstReservation) {
-        navigation.navigate('ReservationDetails', { reservationId: firstReservation.id })
+        // Naviguer vers les détails de la réservation (remplace Cart dans la pile)
+        navigation.replace('ReservationDetails', { reservationId: firstReservation.id })
       } else {
-        navigation.getParent()?.navigate('Orders')
+        // Retourner à la liste des réservations
+        navigation.navigate('OrdersMain')
       }
     } catch (err: any) {
+      // Error haptic feedback
+      await haptics.error()
       const message = typeof err === 'string' ? err : err?.message
       showError(message || 'Impossible de finaliser votre panier')
     }
@@ -333,7 +359,13 @@ const CartScreen: React.FC<Props> = ({ navigation }) => {
   }
 
   const goToReservations = () => {
-    navigation.getParent()?.navigate('Orders')
+    // Utiliser goBack() pour retourner à ReservationsScreen (OrdersMain)
+    if (navigation.canGoBack()) {
+      navigation.goBack()
+    } else {
+      // Fallback: naviguer explicitement vers OrdersMain
+      navigation.navigate('OrdersMain')
+    }
   }
 
   const goToMerchantProducts = () => {
@@ -352,7 +384,18 @@ const CartScreen: React.FC<Props> = ({ navigation }) => {
       <StatusBar barStyle={theme.isDark ? 'light-content' : 'dark-content'} />
 
       <View style={[styles.header, { paddingTop: insets.top + 8 }]}>
-        <Typography variant="h2" weight="bold" style={{ flexShrink: 1 }}>
+        {/* Back button */}
+        <TouchableOpacity
+          onPress={goToReservations}
+          style={styles.backButton}
+          hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+          accessibilityLabel="Retour aux réservations"
+          accessibilityRole="button"
+        >
+          <Ionicons name="arrow-back" size={24} color={theme.colors.text} />
+        </TouchableOpacity>
+
+        <Typography variant="h2" weight="bold" style={{ flexShrink: 1, marginLeft: 12 }}>
           Mon panier
         </Typography>
         <View style={styles.headerActions}>
@@ -368,16 +411,6 @@ const CartScreen: React.FC<Props> = ({ navigation }) => {
               </Typography>
             </TouchableOpacity>
           )}
-          <TouchableOpacity
-            onPress={goToReservations}
-            style={[styles.headerButton, styles.headerButtonPrimary, { backgroundColor: theme.colors.primary[500] }]}
-            testID={TEST_IDS.cartReservationsButton}
-          >
-            <Ionicons name="receipt-outline" size={16} color="white" />
-            <Typography variant="caption" weight="semibold" style={{ color: 'white' }}>
-              Réservations
-            </Typography>
-          </TouchableOpacity>
         </View>
       </View>
 
@@ -743,6 +776,9 @@ const styles = StyleSheet.create({
     paddingTop: 16,
     paddingBottom: 12,
   },
+  backButton: {
+    padding: 4,
+  },
   headerActions: {
     flexDirection: 'row',
     gap: 8,
@@ -866,6 +902,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14,
     paddingVertical: 12,
     fontSize: 16,
+    color: '#1f2937', // Fix: text color for visibility (dark gray)
+    backgroundColor: '#ffffff',
   },
   textArea: {
     borderWidth: 1,
@@ -875,6 +913,8 @@ const styles = StyleSheet.create({
     minHeight: 100,
     textAlignVertical: 'top',
     fontSize: 16,
+    color: '#1f2937', // Fix: text color for visibility
+    backgroundColor: '#ffffff',
   },
   emptyState: {
     alignItems: 'center',

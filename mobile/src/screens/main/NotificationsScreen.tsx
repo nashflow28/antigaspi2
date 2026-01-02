@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react'
+import React, { useState, useEffect, useCallback, useMemo } from 'react'
 import {
   View,
   Text,
@@ -15,7 +15,7 @@ import { useNavigation } from '@react-navigation/native'
 import apiService from '../../services/api'
 import notificationService from '../../services/notificationService'
 import { useAlert } from '../../contexts/AlertContext'
-import theme from '../../styles/theme'
+import { useTheme } from '../../theme'
 
 interface Notification {
   id: number
@@ -55,19 +55,8 @@ const NOTIFICATION_ICONS: Record<string, string> = {
   'default': 'notifications-outline',
 }
 
-const NOTIFICATION_COLORS: Record<string, string> = {
-  'reservation_confirmed': theme.colors.success,
-  'reservation_ready': theme.colors.warning,
-  'reservation_completed': theme.colors.success,
-  'reservation_cancelled': theme.colors.error,
-  'promotion': theme.colors.secondary,
-  'discount': theme.colors.secondary,
-  'loyalty_tier_upgrade': '#F5C518',
-  'expiring_product': theme.colors.warning,
-  'default': theme.colors.primary,
-}
-
 export default function NotificationsScreen() {
+  const theme = useTheme()
   const navigation = useNavigation<any>()
   const { showAlert } = useAlert()
   const [notifications, setNotifications] = useState<Notification[]>([])
@@ -77,6 +66,19 @@ export default function NotificationsScreen() {
   const [hasMore, setHasMore] = useState(true)
   const [loadingMore, setLoadingMore] = useState(false)
   const [filter, setFilter] = useState<'all' | 'unread'>('all')
+
+  // Dynamic notification colors based on theme
+  const notificationColors = useMemo(() => ({
+    'reservation_confirmed': theme.colors.success,
+    'reservation_ready': theme.colors.warning,
+    'reservation_completed': theme.colors.success,
+    'reservation_cancelled': theme.colors.error,
+    'promotion': theme.colors.secondary,
+    'discount': theme.colors.secondary,
+    'loyalty_tier_upgrade': '#F5C518',
+    'expiring_product': theme.colors.warning,
+    'default': theme.colors.primary[500],
+  }), [theme])
 
   const fetchNotifications = useCallback(async (pageNum: number = 1, append: boolean = false) => {
     try {
@@ -204,7 +206,7 @@ export default function NotificationsScreen() {
   }
 
   const getColor = (type: string): string => {
-    return NOTIFICATION_COLORS[type] || NOTIFICATION_COLORS.default
+    return notificationColors[type as keyof typeof notificationColors] || notificationColors.default
   }
 
   const renderNotificationItem = ({ item }: { item: Notification }) => {
@@ -215,7 +217,12 @@ export default function NotificationsScreen() {
       <TouchableOpacity
         style={[
           styles.notificationItem,
-          !item.is_read && styles.notificationUnread,
+          { backgroundColor: theme.colors.surface.light },
+          !item.is_read && {
+            backgroundColor: theme.colors.primary[50],
+            borderLeftWidth: 3,
+            borderLeftColor: theme.colors.primary[500],
+          },
         ]}
         onPress={() => handleNotificationPress(item)}
         activeOpacity={0.7}
@@ -229,20 +236,23 @@ export default function NotificationsScreen() {
             <Text
               style={[
                 styles.notificationTitle,
+                { color: theme.colors.text },
                 !item.is_read && styles.notificationTitleUnread,
               ]}
               numberOfLines={1}
             >
               {item.title}
             </Text>
-            {!item.is_read && <View style={styles.unreadDot} />}
+            {!item.is_read && (
+              <View style={[styles.unreadDot, { backgroundColor: theme.colors.primary[500] }]} />
+            )}
           </View>
 
-          <Text style={styles.notificationMessage} numberOfLines={2}>
+          <Text style={[styles.notificationMessage, { color: theme.colors.textSecondary }]} numberOfLines={2}>
             {item.message}
           </Text>
 
-          <Text style={styles.notificationTime}>
+          <Text style={[styles.notificationTime, { color: theme.colors.textTertiary }]}>
             {formatDate(item.created_at)}
           </Text>
         </View>
@@ -250,7 +260,7 @@ export default function NotificationsScreen() {
         <Ionicons
           name="chevron-forward"
           size={20}
-          color={theme.colors.textLight}
+          color={theme.colors.textTertiary}
         />
       </TouchableOpacity>
     )
@@ -258,9 +268,12 @@ export default function NotificationsScreen() {
 
   const renderHeader = () => (
     <View style={styles.header}>
-      <View style={styles.filterContainer}>
+      <View style={[styles.filterContainer, { backgroundColor: theme.colors.surface.light }]}>
         <TouchableOpacity
-          style={[styles.filterButton, filter === 'all' && styles.filterButtonActive]}
+          style={[
+            styles.filterButton,
+            filter === 'all' && { backgroundColor: theme.colors.primary[500] }
+          ]}
           onPress={() => {
             setFilter('all')
             setNotifications([])
@@ -270,6 +283,7 @@ export default function NotificationsScreen() {
           <Text
             style={[
               styles.filterButtonText,
+              { color: theme.colors.textSecondary },
               filter === 'all' && styles.filterButtonTextActive,
             ]}
           >
@@ -278,7 +292,10 @@ export default function NotificationsScreen() {
         </TouchableOpacity>
 
         <TouchableOpacity
-          style={[styles.filterButton, filter === 'unread' && styles.filterButtonActive]}
+          style={[
+            styles.filterButton,
+            filter === 'unread' && { backgroundColor: theme.colors.primary[500] }
+          ]}
           onPress={() => {
             setFilter('unread')
             setNotifications([])
@@ -288,6 +305,7 @@ export default function NotificationsScreen() {
           <Text
             style={[
               styles.filterButtonText,
+              { color: theme.colors.textSecondary },
               filter === 'unread' && styles.filterButtonTextActive,
             ]}
           >
@@ -301,8 +319,10 @@ export default function NotificationsScreen() {
           style={styles.markAllButton}
           onPress={handleMarkAllAsRead}
         >
-          <Ionicons name="checkmark-done" size={18} color={theme.colors.primary} />
-          <Text style={styles.markAllButtonText}>Tout marquer lu</Text>
+          <Ionicons name="checkmark-done" size={18} color={theme.colors.primary[500]} />
+          <Text style={[styles.markAllButtonText, { color: theme.colors.primary[500] }]}>
+            Tout marquer lu
+          </Text>
         </TouchableOpacity>
       )}
     </View>
@@ -313,7 +333,7 @@ export default function NotificationsScreen() {
 
     return (
       <View style={styles.loadingMore}>
-        <ActivityIndicator size="small" color={theme.colors.primary} />
+        <ActivityIndicator size="small" color={theme.colors.primary[500]} />
       </View>
     )
   }
@@ -323,10 +343,12 @@ export default function NotificationsScreen() {
       <Ionicons
         name="notifications-off-outline"
         size={60}
-        color={theme.colors.textLight}
+        color={theme.colors.textTertiary}
       />
-      <Text style={styles.emptyTitle}>Aucune notification</Text>
-      <Text style={styles.emptyText}>
+      <Text style={[styles.emptyTitle, { color: theme.colors.text }]}>
+        Aucune notification
+      </Text>
+      <Text style={[styles.emptyText, { color: theme.colors.textSecondary }]}>
         {filter === 'unread'
           ? 'Vous avez lu toutes vos notifications'
           : "Vous n'avez pas encore reçu de notifications"}
@@ -336,26 +358,39 @@ export default function NotificationsScreen() {
 
   if (loading) {
     return (
-      <SafeAreaView style={styles.container}>
+      <SafeAreaView style={[styles.container, { backgroundColor: theme.colors.background }]}>
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color={theme.colors.primary} />
-          <Text style={styles.loadingText}>Chargement...</Text>
+          <ActivityIndicator size="large" color={theme.colors.primary[500]} />
+          <Text style={[styles.loadingText, { color: theme.colors.textSecondary }]}>
+            Chargement...
+          </Text>
         </View>
       </SafeAreaView>
     )
   }
 
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
+    <SafeAreaView
+      style={[styles.container, { backgroundColor: theme.colors.background }]}
+      edges={['top']}
+    >
       {/* Navigation Header */}
-      <View style={styles.navHeader}>
+      <View style={[
+        styles.navHeader,
+        {
+          backgroundColor: theme.colors.surface.light,
+          borderBottomColor: theme.colors.border,
+        }
+      ]}>
         <TouchableOpacity
           style={styles.backButton}
           onPress={() => navigation.goBack()}
         >
           <Ionicons name="arrow-back" size={24} color={theme.colors.text} />
         </TouchableOpacity>
-        <Text style={styles.navTitle}>Notifications</Text>
+        <Text style={[styles.navTitle, { color: theme.colors.text }]}>
+          Notifications
+        </Text>
         <TouchableOpacity
           style={styles.settingsButton}
           onPress={() => navigation.navigate('NotificationSettings')}
@@ -376,7 +411,8 @@ export default function NotificationsScreen() {
           <RefreshControl
             refreshing={refreshing}
             onRefresh={handleRefresh}
-            colors={[theme.colors.primary]}
+            colors={[theme.colors.primary[500]]}
+            tintColor={theme.colors.primary[500]}
           />
         }
         onEndReached={handleLoadMore}
@@ -390,7 +426,6 @@ export default function NotificationsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: theme.colors.background,
   },
   navHeader: {
     flexDirection: 'row',
@@ -398,9 +433,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingHorizontal: 16,
     paddingVertical: 12,
-    backgroundColor: theme.colors.surface,
     borderBottomWidth: 1,
-    borderBottomColor: theme.colors.border,
   },
   backButton: {
     padding: 4,
@@ -408,7 +441,6 @@ const styles = StyleSheet.create({
   navTitle: {
     fontSize: 18,
     fontWeight: '600',
-    color: theme.colors.text,
   },
   settingsButton: {
     padding: 4,
@@ -421,7 +453,6 @@ const styles = StyleSheet.create({
   loadingText: {
     marginTop: 12,
     fontSize: 14,
-    color: theme.colors.textSecondary,
   },
   header: {
     padding: 16,
@@ -429,7 +460,6 @@ const styles = StyleSheet.create({
   },
   filterContainer: {
     flexDirection: 'row',
-    backgroundColor: theme.colors.surface,
     borderRadius: 10,
     padding: 4,
     marginBottom: 12,
@@ -440,13 +470,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderRadius: 8,
   },
-  filterButtonActive: {
-    backgroundColor: theme.colors.primary,
-  },
   filterButtonText: {
     fontSize: 14,
     fontWeight: '500',
-    color: theme.colors.textSecondary,
   },
   filterButtonTextActive: {
     color: '#fff',
@@ -461,7 +487,6 @@ const styles = StyleSheet.create({
   },
   markAllButtonText: {
     fontSize: 13,
-    color: theme.colors.primary,
     fontWeight: '500',
   },
   list: {
@@ -473,17 +498,10 @@ const styles = StyleSheet.create({
   notificationItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: theme.colors.surface,
     marginHorizontal: 16,
     marginBottom: 8,
     padding: 14,
     borderRadius: 12,
-    ...theme.shadows.sm,
-  },
-  notificationUnread: {
-    backgroundColor: theme.colors.primaryLight || '#E6F7F2',
-    borderLeftWidth: 3,
-    borderLeftColor: theme.colors.primary,
   },
   iconContainer: {
     width: 44,
@@ -506,7 +524,6 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 15,
     fontWeight: '500',
-    color: theme.colors.text,
   },
   notificationTitleUnread: {
     fontWeight: '600',
@@ -515,18 +532,15 @@ const styles = StyleSheet.create({
     width: 8,
     height: 8,
     borderRadius: 4,
-    backgroundColor: theme.colors.primary,
     marginLeft: 8,
   },
   notificationMessage: {
     fontSize: 13,
-    color: theme.colors.textSecondary,
     lineHeight: 18,
     marginBottom: 4,
   },
   notificationTime: {
     fontSize: 12,
-    color: theme.colors.textLight,
   },
   loadingMore: {
     paddingVertical: 20,
@@ -541,13 +555,11 @@ const styles = StyleSheet.create({
   emptyTitle: {
     fontSize: 18,
     fontWeight: '600',
-    color: theme.colors.text,
     marginTop: 16,
     marginBottom: 8,
   },
   emptyText: {
     fontSize: 14,
-    color: theme.colors.textSecondary,
     textAlign: 'center',
     lineHeight: 20,
   },
