@@ -16,11 +16,12 @@ import AdminAnalyticsScreen from '../screens/admin/AdminAnalyticsScreen'
 import AdminBroadcastScreen from '../screens/admin/AdminBroadcastScreen'
 import AdminSettingsScreen from '../screens/admin/AdminSettingsScreen'
 import AdminPaymentDashboardScreen from '../screens/admin/AdminPaymentDashboardScreen'
+import AdminPlusScreen from '../screens/admin/AdminPlusScreen'
 
 const Tab = createBottomTabNavigator()
 const Stack = createNativeStackNavigator()
 
-// Stack Navigator pour le dashboard avec analytics, settings, et payments
+// Stack Navigator pour le dashboard
 const DashboardStack = () => (
   <Stack.Navigator screenOptions={{ headerShown: false }}>
     <Stack.Screen name="DashboardMain" component={AdminDashboardScreen} />
@@ -30,10 +31,16 @@ const DashboardStack = () => (
   </Stack.Navigator>
 )
 
-// Stack Navigator pour les notifications broadcast
-const NotificationsStack = () => (
+// Stack Navigator pour le hub "Plus" avec les fonctions secondaires
+const PlusStack = () => (
   <Stack.Navigator screenOptions={{ headerShown: false }}>
-    <Stack.Screen name="NotificationsMain" component={AdminBroadcastScreen} />
+    <Stack.Screen name="PlusMain" component={AdminPlusScreen} />
+    <Stack.Screen name="ReviewModeration" component={AdminReviewModerationScreen} />
+    <Stack.Screen name="Categories" component={AdminCategoriesScreen} />
+    <Stack.Screen name="Broadcast" component={AdminBroadcastScreen} />
+    <Stack.Screen name="Analytics" component={AdminAnalyticsScreen} />
+    <Stack.Screen name="Payments" component={AdminPaymentDashboardScreen} />
+    <Stack.Screen name="Settings" component={AdminSettingsScreen} />
   </Stack.Navigator>
 )
 
@@ -55,12 +62,8 @@ const AdminNavigator: React.FC = () => {
             iconName = focused ? 'cube' : 'cube-outline'
           } else if (route.name === 'Merchants') {
             iconName = focused ? 'storefront' : 'storefront-outline'
-          } else if (route.name === 'Reviews') {
-            iconName = focused ? 'chatbubbles' : 'chatbubbles-outline'
-          } else if (route.name === 'Categories') {
-            iconName = focused ? 'grid' : 'grid-outline'
-          } else if (route.name === 'Notifications') {
-            iconName = focused ? 'notifications' : 'notifications-outline'
+          } else if (route.name === 'Plus') {
+            iconName = focused ? 'apps' : 'apps-outline'
           } else {
             iconName = 'help-outline'
           }
@@ -96,22 +99,12 @@ const AdminNavigator: React.FC = () => {
       <Tab.Screen
         name="Merchants"
         component={AdminMerchantsScreen}
-        options={{ title: 'Commerçants' }}
+        options={{ title: 'Commercants' }}
       />
       <Tab.Screen
-        name="Reviews"
-        component={AdminReviewModerationScreen}
-        options={{ title: 'Modération' }}
-      />
-      <Tab.Screen
-        name="Categories"
-        component={AdminCategoriesScreen}
-        options={{ title: 'Catégories' }}
-      />
-      <Tab.Screen
-        name="Notifications"
-        component={NotificationsStack}
-        options={{ title: 'Notifications' }}
+        name="Plus"
+        component={PlusStack}
+        options={{ title: 'Plus' }}
       />
     </Tab.Navigator>
   )
