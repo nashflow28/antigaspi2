@@ -11,6 +11,9 @@ import React from 'react'
 import { View, Text, StyleSheet, Platform } from 'react-native'
 import Constants from 'expo-constants'
 import { Ionicons } from '@expo/vector-icons'
+import { createLogger } from '../utils/logger'
+
+const log = createLogger('MapViewWrapper')
 
 // Détecte si on est dans Expo Go (pas de support pour modules natifs custom)
 const isExpoGo = Constants.appOwnership === 'expo'
@@ -21,26 +24,26 @@ let Marker: any = null
 let Callout: any = null
 let UrlTile: any = null
 
-console.log('[MapViewWrapper] isExpoGo:', isExpoGo, 'appOwnership:', Constants.appOwnership)
+log.debug(' isExpoGo:', isExpoGo, 'appOwnership:', Constants.appOwnership)
 
 if (!isExpoGo) {
   try {
-    console.log('[MapViewWrapper] Attempting to load react-native-maps...')
+    log.debug(' Attempting to load react-native-maps...')
     const Maps = require('react-native-maps')
     MapView = Maps.default
     Marker = Maps.Marker
     Callout = Maps.Callout
     UrlTile = Maps.UrlTile
-    console.log('[MapViewWrapper] react-native-maps loaded successfully:', {
+    log.debug(' react-native-maps loaded successfully:', {
       hasMapView: !!MapView,
       hasMarker: !!Marker,
       hasUrlTile: !!UrlTile,
     })
   } catch (error) {
-    console.error('[MapViewWrapper] Failed to load react-native-maps:', error)
+    log.error(' Failed to load react-native-maps:', error)
   }
 } else {
-  console.log('[MapViewWrapper] Skipping react-native-maps (Expo Go mode)')
+  log.debug(' Skipping react-native-maps (Expo Go mode)')
 }
 
 // Props types (reprend les props de react-native-maps)
@@ -94,15 +97,15 @@ const MapFallback: React.FC<FallbackProps> = ({
 const MapViewWrapper = React.forwardRef<any, MapViewWrapperProps>((props, ref) => {
   const { style, children, ...restProps } = props
 
-  console.log('[MapViewWrapper] Render called, isExpoGo:', isExpoGo, 'hasMapView:', !!MapView)
+  log.debug(' Render called, isExpoGo:', isExpoGo, 'hasMapView:', !!MapView)
 
   // En mode Expo Go, afficher le fallback
   if (isExpoGo || !MapView) {
-    console.log('[MapViewWrapper] Using fallback (no MapView available)')
+    log.debug(' Using fallback (no MapView available)')
     return <MapFallback style={style} />
   }
 
-  console.log('[MapViewWrapper] Rendering native MapView...')
+  log.debug(' Rendering native MapView...')
 
   // Sinon, utiliser react-native-maps normalement
   try {
@@ -112,7 +115,7 @@ const MapViewWrapper = React.forwardRef<any, MapViewWrapperProps>((props, ref) =
       </MapView>
     )
   } catch (error) {
-    console.error('[MapViewWrapper] Error rendering MapView:', error)
+    log.error(' Error rendering MapView:', error)
     return <MapFallback style={style} message={`Erreur carte: ${error}`} />
   }
 })

@@ -12,6 +12,9 @@ import { Ionicons } from '@expo/vector-icons'
 import { useTheme } from '../theme'
 import * as Location from 'expo-location'
 import LeafletMapPicker from './LeafletMapPicker'
+import { createLogger } from '../utils/logger'
+
+const log = createLogger('MapLocationPicker')
 
 interface MapLocationPickerProps {
   visible: boolean
@@ -66,14 +69,14 @@ const MapLocationPicker: React.FC<MapLocationPickerProps> = ({
         const { status } = await Location.getForegroundPermissionsAsync()
         if (status === 'granted') {
           setLocationPermissionGranted(true)
-          console.log('[MapLocationPicker] Permission déjà accordée')
+          log.debug(' Permission déjà accordée')
         } else {
           const { status: newStatus } = await Location.requestForegroundPermissionsAsync()
           setLocationPermissionGranted(newStatus === 'granted')
-          console.log('[MapLocationPicker] Permission demandée:', newStatus)
+          log.debug(' Permission demandée:', newStatus)
         }
       } catch (error) {
-        console.error('[MapLocationPicker] Erreur permission:', error)
+        log.error(' Erreur permission:', error)
         setLocationPermissionGranted(false)
       }
       setPermissionChecked(true)
@@ -94,17 +97,17 @@ const MapLocationPicker: React.FC<MapLocationPickerProps> = ({
     setSelectedLocation(newLocation)
     setMapReady(true)
 
-    console.log('[MapLocationPicker] Initialized with:', newLocation)
+    log.debug(' Initialized with:', newLocation)
   }, [visible, initialLatitude, initialLongitude])
 
   // Gérer la sélection sur la carte (depuis Leaflet WebView)
   const handleLocationSelect = useCallback((latitude: number, longitude: number) => {
-    console.log('[MapLocationPicker] Location selected:', { latitude, longitude })
+    log.debug(' Location selected:', { latitude, longitude })
     setSelectedLocation({ latitude, longitude })
   }, [])
 
   const handleConfirm = () => {
-    console.log('[MapLocationPicker] Confirming:', selectedLocation)
+    log.debug(' Confirming:', selectedLocation)
     onSelectLocation(selectedLocation.latitude, selectedLocation.longitude)
     onClose()
   }
@@ -123,7 +126,7 @@ const MapLocationPicker: React.FC<MapLocationPickerProps> = ({
   // Utiliser la position GPS actuelle
   const handleUseCurrentLocation = useCallback(async () => {
     if (!locationPermissionGranted) {
-      console.log('[MapLocationPicker] Permission not granted')
+      log.debug(' Permission not granted')
       return
     }
 
@@ -133,13 +136,13 @@ const MapLocationPicker: React.FC<MapLocationPickerProps> = ({
         accuracy: Location.Accuracy.High,
       })
       const { latitude, longitude } = location.coords
-      console.log('[MapLocationPicker] GPS location:', { latitude, longitude })
+      log.debug(' GPS location:', { latitude, longitude })
       setSelectedLocation({ latitude, longitude })
       // Recréer la carte avec la nouvelle position
       setMapReady(false)
       setTimeout(() => setMapReady(true), 100)
     } catch (error) {
-      console.error('[MapLocationPicker] Erreur GPS:', error)
+      log.error(' Erreur GPS:', error)
     } finally {
       setIsLoadingGPS(false)
     }

@@ -36,6 +36,9 @@ import { formatCurrency } from '../../utils/currencyHelpers'
 import AlertModal from '../../components/AlertModal'
 import { useAlert } from '../../hooks/useAlert'
 import { navigationRef } from '../../navigation/NavigationRef'
+import { createLogger } from '../../utils/logger'
+
+const log = createLogger('Reservations')
 
 interface Props {
   navigation: any
@@ -59,12 +62,10 @@ const ReservationsScreen: React.FC<Props> = ({ navigation }) => {
   const cartItemsCount = cart?.items_count ?? 0
   const cartTotal = cart?.total_amount ?? 0
 
-  console.log('🔍 [ReservationsScreen] Current state:', {
+  log.debug('Current state:', {
     reservationsCount: reservations.length,
     loading,
     userId: user?.id,
-    userEmail: user?.email,
-    reservationIds: reservations.map(r => r.id)
   })
 
   const [refreshing, setRefreshing] = useState(false)
@@ -74,7 +75,7 @@ const ReservationsScreen: React.FC<Props> = ({ navigation }) => {
 
   useEffect(() => {
     if (isAuthenticated) {
-      console.log('[ReservationsScreen] Component mounted - loading reservations...')
+      log.debug('Component mounted - loading reservations...')
       void loadReservations('initial')
     }
   }, [isAuthenticated])
@@ -99,26 +100,17 @@ const ReservationsScreen: React.FC<Props> = ({ navigation }) => {
   const loadReservations = async (
     source: 'initial' | 'refresh' | 'reload' = 'initial'
   ) => {
-    console.log(`📤 [ReservationsScreen] Loading reservations (source: ${source})...`)
+    log.debug(`Loading reservations (source: ${source})...`)
     const result = await dispatch(fetchMyReservations())
 
-    console.log('📥 [ReservationsScreen] Dispatch result:', {
-      type: result.type,
-      isFullfilled: fetchMyReservations.fulfilled.match(result),
-      isRejected: fetchMyReservations.rejected.match(result),
-    })
-
     if (fetchMyReservations.fulfilled.match(result)) {
-      console.log('✅ [ReservationsScreen] Reservations loaded successfully:', {
-        total: result.payload.length,
-        items: result.payload.map(r => ({ id: r.id, code: r.reservation_code, status: r.status }))
-      })
+      log.info(`Reservations loaded: ${result.payload.length} items`)
       void analyticsService.track('Reservations Loaded', 'Reservation', {
         total: result.payload.length,
         source,
       })
     } else if (fetchMyReservations.rejected.match(result)) {
-      console.error('❌ [ReservationsScreen] Failed to load reservations:', result.payload ?? result.error?.message)
+      log.error('Failed to load reservations:', result.payload ?? result.error?.message)
       showError('Erreur', 'Impossible de charger les réservations')
       void analyticsService.track('Reservations Load Failed', 'Reservation', {
         source,

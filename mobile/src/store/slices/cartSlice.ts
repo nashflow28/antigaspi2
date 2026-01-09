@@ -1,6 +1,7 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit'
 
 import apiService from '../../services/api'
+import { storeLogger } from '../../utils/logger'
 import {
   Cart,
   CartCheckoutPayload,
@@ -126,21 +127,19 @@ export const checkoutCart = createAsyncThunk(
         notes: payload.notes ?? undefined
       }
 
-      console.log('📦 [Cart] Creating order from cart with items:', orderPayload.items)
-      console.log('💳 [Cart] Payment method:', payload.paymentMethod)
-      console.log('🔑 [Cart] Wallet PIN present:', !!payload.walletPin)
-      console.log('📋 [Cart] Full orderPayload:', JSON.stringify(orderPayload, null, 2))
+      storeLogger.debug('Creating order from cart with items:', orderPayload.items)
+      storeLogger.debug('Payment method:', payload.paymentMethod)
+      storeLogger.debug('Wallet PIN present:', !!payload.walletPin)
 
       // Appeler la nouvelle API createOrder au lieu de checkoutCart
       const orderResponse = await apiService.createOrder(orderPayload)
 
-      console.log('✅ [Cart] Order created:', orderResponse.data.order_number)
-      console.log('💰 [Cart] Payment status:', orderResponse.data.order?.payment_status)
-      console.log('💳 [Cart] Payment info:', orderResponse.data.payment)
+      storeLogger.info('Order created:', orderResponse.data.order_number)
+      storeLogger.debug('Payment status:', orderResponse.data.order?.payment_status)
 
       // Si paiement wallet, rafraîchir le solde du portefeuille
       if (payload.paymentMethod === 'wallet') {
-        console.log('🔄 [Cart] Refreshing wallet balance after wallet payment...')
+        storeLogger.debug('Refreshing wallet balance after wallet payment...')
         dispatch(fetchWallet())
       }
 
@@ -161,7 +160,7 @@ export const checkoutCart = createAsyncThunk(
 
       return response
     } catch (error: any) {
-      console.error('❌ [Cart] Checkout failed:', error.message)
+      storeLogger.error('Checkout failed:', error.message)
       return rejectWithValue(error.message)
     }
   }

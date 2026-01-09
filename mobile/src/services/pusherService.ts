@@ -6,6 +6,9 @@
 import Pusher from 'pusher-js/react-native'
 import { secureStorage } from './secureStorage'
 import { API_BASE_URL } from './api'
+import { createLogger } from '../utils/logger'
+
+const log = createLogger('Pusher')
 
 // Types d'événements
 export interface NotificationEvent {
@@ -49,7 +52,7 @@ class PusherService {
     const pusherCluster = process.env.EXPO_PUBLIC_PUSHER_CLUSTER || 'eu'
 
     if (!pusherKey) {
-      console.log('[Pusher] No Pusher key configured, skipping initialization')
+      log.info(' No Pusher key configured, skipping initialization')
       return
     }
 
@@ -66,24 +69,24 @@ class PusherService {
       })
 
       this.pusher.connection.bind('connected', () => {
-        console.log('[Pusher] Connected')
+        log.info(' Connected')
         this.isConnected = true
         this.notifyConnectionListeners(true)
       })
 
       this.pusher.connection.bind('disconnected', () => {
-        console.log('[Pusher] Disconnected')
+        log.info(' Disconnected')
         this.isConnected = false
         this.notifyConnectionListeners(false)
       })
 
       this.pusher.connection.bind('error', (error: any) => {
-        console.error('[Pusher] Connection error:', error)
+        log.error(' Connection error:', error)
         this.isConnected = false
         this.notifyConnectionListeners(false)
       })
     } catch (error) {
-      console.error('[Pusher] Failed to initialize:', error)
+      log.error(' Failed to initialize:', error)
     }
   }
 
@@ -92,7 +95,7 @@ class PusherService {
    */
   async subscribeToUserChannel(userId: number): Promise<void> {
     if (!this.pusher) {
-      console.warn('[Pusher] Not initialized, cannot subscribe')
+      log.warn(' Not initialized, cannot subscribe')
       return
     }
 
@@ -117,7 +120,7 @@ class PusherService {
 
       // Bind to notification events
       this.userChannel.bind('notification.new', (data: NotificationEvent) => {
-        console.log('[Pusher] New notification:', data)
+        log.info(' New notification:', data)
         this.notifyNotificationListeners(data)
       })
 
@@ -125,12 +128,12 @@ class PusherService {
       this.userChannel.bind(
         'reservation.status_changed',
         (data: ReservationStatusEvent) => {
-          console.log('[Pusher] Reservation status changed:', data)
+          log.info(' Reservation status changed:', data)
           this.notifyReservationListeners(data)
         }
       )
     } catch (error) {
-      console.error('[Pusher] Error subscribing to channel:', error)
+      log.error(' Error subscribing to channel:', error)
     }
   }
 
@@ -156,7 +159,7 @@ class PusherService {
       this.pusher.disconnect()
       this.pusher = null
       this.isConnected = false
-      console.log('[Pusher] Disconnected')
+      log.info(' Disconnected')
     }
   }
 

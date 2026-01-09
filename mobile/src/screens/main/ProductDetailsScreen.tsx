@@ -30,6 +30,9 @@ import locationService from '../../services/locationService'
 // Use centralized environment detection
 import { isTestEnv as checkIsTestEnv, isTestMode as checkIsTestMode } from '../../utils/envHelpers'
 import { TEST_IDS } from '../../utils/testIds'
+import { createLogger } from '../../utils/logger'
+
+const log = createLogger('ProductDetails')
 import { PAYMENT_OPTIONS, PaymentOption } from '../../constants/paymentOptions'
 
 interface Props {
@@ -74,9 +77,7 @@ const ProductDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
         }
       } catch (error) {
         // BUG FIX #10: Log location errors in dev mode instead of silent swallowing
-        if (__DEV__) {
-          console.debug('[ProductDetailsScreen] Location load error:', error)
-        }
+        log.debug('Location load error:', error)
       }
     }
     loadLocation()
@@ -123,24 +124,16 @@ const ProductDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
   const loadProduct = async () => {
     const existingProduct = products.find(p => p.id === productId)
     if (existingProduct) {
-      if (!isTestEnv) {
-        console.log('Product found in store:', existingProduct)
-      }
+      log.debug('Product found in store:', existingProduct.id)
       setProduct(existingProduct)
     } else {
-      if (!isTestEnv) {
-        console.log('Fetching product from API:', productId)
-      }
+      log.debug('Fetching product from API:', productId)
       const result = await dispatch(fetchProduct(productId))
       if (fetchProduct.fulfilled.match(result)) {
-        if (!isTestEnv) {
-          console.log('Product fetched successfully:', result.payload)
-        }
+        log.debug('Product fetched successfully')
         setProduct(result.payload as Product)
       } else if (fetchProduct.rejected.match(result)) {
-        if (!isTestEnv) {
-          console.error('Failed to fetch product:', result.error)
-        }
+        log.error('Failed to fetch product:', result.error)
         const errorMessage = 'Impossible de charger le produit'
         showError(errorMessage)
         throw new Error(errorMessage)
