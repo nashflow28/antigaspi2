@@ -256,7 +256,20 @@ class WalletService
         ];
     }
 
-    public function transferBetweenWallets(User $sender, User $receiver, float $amount, string $description = 'Transfert entre portefeuilles'): array
+    /**
+     * Transfer between wallets with proper locking and PIN verification
+     * BUG-010 FIX: Added lockForUpdate() to prevent race conditions
+     * BUG-011 FIX: PIN verification now happens inside the transaction (atomic)
+     *
+     * @param User $sender The user sending the money
+     * @param User $receiver The user receiving the money
+     * @param float $amount The amount to transfer
+     * @param string $description Optional description
+     * @param string|null $pin The sender's PIN (required if wallet has PIN)
+     * @return array The debit and credit transactions
+     * @throws \Exception If transfer fails
+     */
+    public function transferBetweenWallets(User $sender, User $receiver, float $amount, string $description = 'Transfert entre portefeuilles', ?string $pin = null): array
     {
         if ($sender->id === $receiver->id) {
             throw new \InvalidArgumentException('Impossible de transférer vers son propre portefeuille');
@@ -266,14 +279,49 @@ class WalletService
             throw new \InvalidArgumentException('Le montant de transfert doit être supérieur à zéro');
         }
 
-        $senderWallet = $this->getOrCreateWallet($sender);
-        $receiverWallet = $this->getOrCreateWallet($receiver);
+        // BUG-010 & BUG-011 FIX: All operations must be in atomic transaction with locks
+        return DB::transaction(function () use ($sender, $receiver, $amount, $description, $pin) {
+            // BUG-010 FIX: Lock both wallets to prevent concurrent transfers
+            $senderWallet = Wallet::where('user_id', $sender->id)->lockForUpdate()->first();
+            $receiverWallet = Wallet::where('user_id', $receiver->id)->lockForUpdate()->first();
 
-        if (!$senderWallet->is_active || !$receiverWallet->is_active) {
-            throw new \Exception('L\'un des portefeuilles est désactivé');
-        }
+            // Create wallets if they don't exist (rare case)
+            if (!$senderWallet) {
+                $senderWallet = $this->createWallet($sender);
+                $senderWallet = Wallet::where('user_id', $sender->id)->lockForUpdate()->first();
+            }
+            if (!$receiverWallet) {
+                $receiverWallet = $this->createWallet($receiver);
+                $receiverWallet = Wallet::where('user_id', $receiver->id)->lockForUpdate()->first();
+            }
 
-        return DB::transaction(function () use ($senderWallet, $receiverWallet, $amount, $description, $sender, $receiver) {
+            if (!$senderWallet->is_active) {
+                throw new \Exception('Votre portefeuille est désactivé');
+            }
+
+            if (!$receiverWallet->is_active) {
+                throw new \Exception('Le portefeuille du destinataire est désactivé');
+            }
+
+            // BUG-011 FIX: Verify PIN inside transaction (atomic with transfer)
+            if ($senderWallet->hasPin()) {
+                if (empty($pin)) {
+                    throw new \Exception('Le code PIN est requis pour ce transfert');
+                }
+                if (!$senderWallet->verifyPin($pin)) {
+                    throw new \Exception('Code PIN incorrect');
+                }
+            }
+
+            // Verify balance
+            if (!$senderWallet->hasBalance($amount)) {
+                throw new \Exception('Solde insuffisant dans le portefeuille');
+            }
+
+            if (!$senderWallet->canSpend($amount)) {
+                throw new \Exception('Limite de dépense quotidienne dépassée');
+            }
+
             $debitTransaction = $senderWallet->debit($amount, "Transfert vers {$receiver->full_name}: {$description}");
             $creditTransaction = $receiverWallet->credit($amount, "Transfert de {$sender->full_name}: {$description}");
 

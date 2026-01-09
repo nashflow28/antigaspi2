@@ -300,18 +300,21 @@ class WalletController extends Controller
 
         try {
             $sender = Auth::user();
-            $receiver = \App\Models\User::findOrFail($request->receiver_id);
 
-            $senderWallet = $this->walletService->getOrCreateWallet($sender);
-            if (!$senderWallet->verifyPin($request->pin)) {
+            // BUG-012 FIX: Wrap findOrFail in try-catch for user-friendly error
+            try {
+                $receiver = \App\Models\User::findOrFail($request->receiver_id);
+            } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Code PIN incorrect',
-                ], 401);
+                    'message' => 'Utilisateur destinataire non trouvé',
+                ], 404);
             }
 
+            // BUG-011 FIX: PIN verification moved inside transferBetweenWallets() for atomic operation
+            // The PIN is now passed to the service method and verified inside the transaction
             $description = $request->input('description', 'Transfert entre portefeuilles');
-            $result = $this->walletService->transferBetweenWallets($sender, $receiver, $request->amount, $description);
+            $result = $this->walletService->transferBetweenWallets($sender, $receiver, $request->amount, $description, $request->pin);
 
             return response()->json([
                 'success' => true,
