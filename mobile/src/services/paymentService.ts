@@ -1,6 +1,10 @@
 /**
  * Service de Paiement Mobile Money pour l'Afrique de l'Ouest
- * Supporte Flooz (Moov) et T-Money (Togocom)
+ * Supporte Flooz (Moov) et TMoney (Togocom) via PayGate Global
+ *
+ * PayGate API Documentation: https://paygateglobal.com/guide
+ * - Flooz (Moov Togo)
+ * - TMoney (Togocom)
  */
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -15,6 +19,23 @@ import { formatCurrency as formatCurrencyUtil } from '../utils/currencyHelpers';
 import { createLogger } from '../utils/logger'
 
 const paymentLogger = createLogger('PaymentService')
+
+// PayGate status codes (for reference)
+const PAYGATE_STATUS = {
+  PENDING: 'pending',
+  SUCCESS: 'success',
+  FAILED: 'failed',
+  EXPIRED: 'expired',
+  CANCELLED: 'cancelled',
+} as const
+
+// Polling configuration
+const POLLING_CONFIG = {
+  INITIAL_DELAY: 5000,     // Wait 5s before first poll (give user time to validate on phone)
+  INTERVAL: 4000,          // Poll every 4 seconds
+  MAX_DURATION: 180000,    // Max 3 minutes of polling
+  MAX_ATTEMPTS: 45,        // Max 45 attempts (3 min / 4s)
+}
 
 export interface PaymentProvider {
   id: string;
@@ -172,7 +193,7 @@ class PaymentService {
   }
 
   /**
-   * Vérifier le statut d'un paiement
+   * Vérifier le statut d'un paiement (single check)
    */
   async checkPaymentStatus(paymentId: number): Promise<{ success: boolean; payment?: Payment; message?: string }> {
     try {
@@ -188,6 +209,133 @@ class PaymentService {
         message: error?.message || 'Erreur lors de la vérification'
       };
     }
+  }
+
+  /**
+   * Poll payment status until completion or timeout
+   * Used for PayGate payments where status is updated via webhook
+   *
+   * @param paymentId The payment ID to monitor
+   * @param onStatusChange Callback when status changes
+   * @param onTimeout Callback when polling times out
+   * @returns Cleanup function to stop polling
+   */
+  pollPaymentStatus(
+    paymentId: number,
+    onStatusChange: (payment: Payment, isComplete: boolean) => void,
+    onTimeout?: () => void,
+    onError?: (error: string) => void
+  ): () => void {
+    let isPolling = true
+    let attemptCount = 0
+    let timeoutId: NodeJS.Timeout | null = null
+    let lastStatus: string | null = null
+
+    const poll = async () => {
+      if (!isPolling) return
+
+      attemptCount++
+      paymentLogger.debug(`Polling payment ${paymentId}, attempt ${attemptCount}`)
+
+      try {
+        const result = await this.checkPaymentStatus(paymentId)
+
+        if (!isPolling) return // Check again after async call
+
+        if (result.success && result.payment) {
+          const payment = result.payment
+          const currentStatus = payment.status
+
+          // Notify on status change
+          if (currentStatus !== lastStatus) {
+            lastStatus = currentStatus
+            const isComplete = currentStatus === PAYGATE_STATUS.SUCCESS ||
+                               currentStatus === PAYGATE_STATUS.FAILED ||
+                               currentStatus === PAYGATE_STATUS.EXPIRED ||
+                               currentStatus === PAYGATE_STATUS.CANCELLED
+
+            onStatusChange(payment, isComplete)
+
+            // Stop polling if payment is complete
+            if (isComplete) {
+              paymentLogger.info(`Payment ${paymentId} completed with status: ${currentStatus}`)
+              isPolling = false
+              return
+            }
+          }
+        }
+
+        // Continue polling if not complete and under limits
+        if (attemptCount < POLLING_CONFIG.MAX_ATTEMPTS && isPolling) {
+          timeoutId = setTimeout(poll, POLLING_CONFIG.INTERVAL)
+        } else if (attemptCount >= POLLING_CONFIG.MAX_ATTEMPTS && isPolling) {
+          paymentLogger.warn(`Payment ${paymentId} polling timeout after ${attemptCount} attempts`)
+          isPolling = false
+          onTimeout?.()
+        }
+      } catch (error: any) {
+        paymentLogger.error(`Error polling payment ${paymentId}:`, error)
+        if (isPolling) {
+          onError?.(error?.message || 'Erreur de vérification')
+          // Continue polling despite error
+          if (attemptCount < POLLING_CONFIG.MAX_ATTEMPTS) {
+            timeoutId = setTimeout(poll, POLLING_CONFIG.INTERVAL)
+          }
+        }
+      }
+    }
+
+    // Start polling after initial delay
+    paymentLogger.info(`Starting payment polling for ${paymentId}`)
+    timeoutId = setTimeout(poll, POLLING_CONFIG.INITIAL_DELAY)
+
+    // Return cleanup function
+    return () => {
+      paymentLogger.debug(`Stopping payment polling for ${paymentId}`)
+      isPolling = false
+      if (timeoutId) {
+        clearTimeout(timeoutId)
+        timeoutId = null
+      }
+    }
+  }
+
+  /**
+   * Check if a payment method uses PayGate (requires polling)
+   */
+  isPayGateMethod(provider: MobileMoneyProvider): boolean {
+    return provider === 'flooz' || provider === 'tmoney'
+  }
+
+  /**
+   * Get user-friendly instructions for PayGate payment
+   */
+  getPaymentInstructions(provider: MobileMoneyProvider, amount: number): string[] {
+    const formattedAmount = this.formatCurrency(amount)
+
+    if (provider === 'flooz') {
+      return [
+        `Un prompt USSD va s'afficher sur votre téléphone`,
+        `Entrez votre code PIN Flooz pour valider le paiement de ${formattedAmount}`,
+        `Gardez votre téléphone à portée de main`,
+        `Le paiement sera confirmé automatiquement`,
+      ]
+    }
+
+    if (provider === 'tmoney') {
+      return [
+        `Une demande de paiement arrive sur votre téléphone`,
+        `Validez avec votre code PIN TMoney pour payer ${formattedAmount}`,
+        `Ne fermez pas cette fenêtre`,
+        `La confirmation sera automatique`,
+      ]
+    }
+
+    return [
+      `Suivez les instructions sur votre téléphone`,
+      `Validez le paiement de ${formattedAmount}`,
+      `La confirmation sera automatique`,
+    ]
   }
 
   /**

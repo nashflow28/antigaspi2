@@ -22,7 +22,8 @@ import { formatCurrency } from '../../utils/currencyHelpers'
 import { getImageUrl } from '../../utils/imageHelpers'
 import { TEST_IDS } from '../../utils/testIds'
 import { PAYMENT_OPTIONS } from '../../constants/paymentOptions'
-import { PaymentMethod, CartItem as CartItemType } from '../../types'
+import { PaymentMethod, CartItem as CartItemType, MobileMoneyProvider } from '../../types'
+import paymentService from '../../services/paymentService'
 import {
   fetchCart,
   updateCartItem,
@@ -30,6 +31,7 @@ import {
   clearCart,
   checkoutCart,
   resetCartState,
+  CheckoutResultWithPayment,
 } from '../../store/slices/cartSlice'
 import { useToast } from '../../contexts/ToastContext'
 import AlertModal from '../../components/AlertModal'
@@ -318,24 +320,35 @@ const CartScreen: React.FC<Props> = ({ navigation }) => {
           customerEmail: customerEmail.trim() ? customerEmail.trim() : undefined,
           walletPin: requiresWalletPin ? walletPin.trim() : undefined,
         })
-      ).unwrap()
-
-      // Success haptic feedback
-      await haptics.success()
+      ).unwrap() as CheckoutResultWithPayment
 
       // Safety measure: immediately reset cart state (synchronous)
       // This ensures UI shows empty cart instantly without waiting for API
       dispatch(resetCartState())
 
       // Also call API to clear cart from backend (belt and suspenders)
-      // Wait for this to complete before navigating to avoid race condition
-      // where ReservationsScreen's fetchCart() might return old cart data
       try {
         await dispatch(clearCart()).unwrap()
       } catch {
         // Ignore errors as checkout already succeeded
       }
 
+      // Check if this is a Mobile Money payment that requires confirmation
+      if (response.requiresPaymentConfirmation && response.payment) {
+        // Navigate to PaymentStatusScreen for polling
+        const firstReservation = response.data?.[0]
+        navigation.replace('PaymentStatus', {
+          paymentId: response.payment.id,
+          reservationId: firstReservation?.id ?? 0,
+          provider: selectedPaymentMethod as MobileMoneyProvider,
+          amount: response.totalAmount ?? cartTotal,
+          reservationCode: firstReservation?.reservation_code ?? response.orderNumber ?? '',
+        })
+        return
+      }
+
+      // Success haptic feedback for instant payments
+      await haptics.success()
       showSuccess(response.message || 'Réservations confirmées !')
 
       const firstReservation = response.data?.[0]

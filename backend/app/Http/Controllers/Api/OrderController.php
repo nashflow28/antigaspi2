@@ -327,19 +327,39 @@ class OrderController extends Controller
             // Charger les relations pour la réponse
             $order->load(['reservations.product.category', 'reservations.product.merchant']);
 
+            // Build response data
+            $responseData = [
+                'order' => $order,
+                'order_id' => $order->id,
+                'order_number' => $order->order_number,
+                'total_amount' => $order->total_amount,
+                'items_count' => count($createdReservations),
+                'payment_status' => $order->payment_status,
+            ];
+
+            // For Mobile Money payments, include payment info for status polling
+            if ($paymentMethod->requiresExternalProvider() && !empty($payments)) {
+                $firstPayment = $payments[0] ?? null;
+                if ($firstPayment) {
+                    $responseData['payment'] = [
+                        'id' => $firstPayment->id,
+                        'status' => $firstPayment->status instanceof PaymentStatus
+                            ? $firstPayment->status->value
+                            : $firstPayment->status,
+                        'reference' => $firstPayment->reference,
+                        'provider' => $firstPayment->provider,
+                        'amount' => $firstPayment->amount,
+                    ];
+                    $responseData['requires_payment_confirmation'] = true;
+                }
+            }
+
             return response()->json([
                 'success' => true,
                 'message' => $paymentMethod === PaymentMethod::WALLET
                     ? 'Commande créée et payée avec succès'
                     : 'Commande créée avec succès',
-                'data' => [
-                    'order' => $order,
-                    'order_id' => $order->id,
-                    'order_number' => $order->order_number,
-                    'total_amount' => $order->total_amount,
-                    'items_count' => count($createdReservations),
-                    'payment_status' => $order->payment_status,
-                ],
+                'data' => $responseData,
             ], 201);
 
         } catch (\Exception $e) {

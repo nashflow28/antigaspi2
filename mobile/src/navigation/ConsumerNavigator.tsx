@@ -27,6 +27,7 @@ import NotificationsScreen from '../screens/main/NotificationsScreen'
 import CartScreen from '../screens/main/CartScreen'
 import WalletScreen from '../screens/main/WalletScreen'
 import MerchantMessagingScreen from '../screens/main/MerchantMessagingScreen'
+import PaymentStatusScreen from '../screens/main/PaymentStatusScreen'
 import { TEST_IDS } from '../utils/testIds'
 import LoyaltyScreen from '../screens/main/LoyaltyScreen'
 import SurpriseBasketDetailsScreen from '../screens/main/SurpriseBasketDetailsScreen'
@@ -83,6 +84,7 @@ const OrdersStack = () => (
   <Stack.Navigator screenOptions={{ headerShown: false }}>
     <Stack.Screen name="OrdersMain" component={ReservationsScreen} />
     <Stack.Screen name="Cart" component={CartScreen} />
+    <Stack.Screen name="PaymentStatus" component={PaymentStatusScreen} />
     <Stack.Screen name="ReservationDetails" component={ReservationDetailsScreen} />
     <Stack.Screen name="ProductDetails" component={ProductDetailsScreen} />
     <Stack.Screen name="MerchantDetail" component={MerchantDetailScreen} />

@@ -87,6 +87,21 @@ export const clearCart = createAsyncThunk(
   }
 )
 
+// Extended checkout result with payment info for Mobile Money
+export interface CheckoutResultWithPayment extends CartCheckoutResponse {
+  orderNumber?: string
+  orderId?: number
+  totalAmount?: number
+  payment?: {
+    id: number
+    status: string
+    reference: string
+    provider: string
+    amount: number
+  }
+  requiresPaymentConfirmation?: boolean
+}
+
 export const checkoutCart = createAsyncThunk(
   'cart/checkout',
   async (payload: CartCheckoutPayload, { rejectWithValue, getState, dispatch }) => {
@@ -121,6 +136,7 @@ export const checkoutCart = createAsyncThunk(
 
       console.log('✅ [Cart] Order created:', orderResponse.data.order_number)
       console.log('💰 [Cart] Payment status:', orderResponse.data.order?.payment_status)
+      console.log('💳 [Cart] Payment info:', orderResponse.data.payment)
 
       // Si paiement wallet, rafraîchir le solde du portefeuille
       if (payload.paymentMethod === 'wallet') {
@@ -129,13 +145,18 @@ export const checkoutCart = createAsyncThunk(
       }
 
       // Adapter la réponse pour correspondre à CartCheckoutResponse
-      // L'API orders retourne { order, order_id, order_number, ... }
-      // Le reducer s'attend à { data: Reservation[], payments: Payment[] }
-      const response: CartCheckoutResponse = {
+      // L'API orders retourne { order, order_id, order_number, payment?, requires_payment_confirmation? }
+      const response: CheckoutResultWithPayment = {
         success: orderResponse.success,
         message: orderResponse.message,
-        data: orderResponse.data.order.reservations || [],
-        payments: null
+        data: orderResponse.data.order?.reservations || [],
+        payments: null,
+        // Include additional order and payment info for Mobile Money flow
+        orderNumber: orderResponse.data.order_number,
+        orderId: orderResponse.data.order_id,
+        totalAmount: orderResponse.data.total_amount,
+        payment: orderResponse.data.payment,
+        requiresPaymentConfirmation: orderResponse.data.requires_payment_confirmation,
       }
 
       return response

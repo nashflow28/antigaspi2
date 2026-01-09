@@ -145,7 +145,7 @@ export type PaymentMethod =
   | 'on_site'
   | 'wallet'
 
-export type PaymentStatus = 'pending' | 'success' | 'failed' | 'on_site' | 'refunded'
+export type PaymentStatus = 'pending' | 'success' | 'failed' | 'on_site' | 'refunded' | 'cancelled' | 'expired'
 
 export interface Payment {
   id: number
@@ -867,6 +867,16 @@ export interface OrderCreationResponse {
     order_number: string
     total_amount: number
     items_count: number
+    payment_status: PaymentStatus
+    // For Mobile Money payments
+    payment?: {
+      id: number
+      status: string
+      reference: string
+      provider: string
+      amount: number
+    }
+    requires_payment_confirmation?: boolean
   }
 }
 

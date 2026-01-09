@@ -3,16 +3,35 @@
 return [
     'currency' => env('PAYMENTS_CURRENCY', 'XOF'),
 
+    /*
+    |--------------------------------------------------------------------------
+    | PayGate Global Configuration (Togo Mobile Money)
+    |--------------------------------------------------------------------------
+    |
+    | PayGate Global is the primary payment gateway for Flooz and TMoney
+    | in Togo. It provides a simple API for mobile money payments.
+    |
+    | API Documentation: https://paygateglobal.com/guide
+    |
+    */
     'paygate' => [
         'base_url' => env('PAYGATE_BASE_URL', 'https://paygateglobal.com/api/v1'),
-        'merchant_id' => env('PAYGATE_MERCHANT_ID'),
-        'merchant_password' => env('PAYGATE_MERCHANT_PASSWORD'),
+        'auth_token' => env('PAYGATE_AUTH_TOKEN'),
         'callback_url' => env('PAYGATE_CALLBACK_URL'),
-        'services' => [
-            'flooz' => env('PAYGATE_SERVICE_FLOOZ', 'FLOOZ'),
-            'tmoney' => env('PAYGATE_SERVICE_TMONEY', 'TMONEY'),
-            'orange_money' => env('PAYGATE_SERVICE_ORANGE_MONEY', 'ORANGE_MONEY'),
-            'mtn_momo' => env('PAYGATE_SERVICE_MTN_MOMO', 'MTN_MOMO'),
+        'networks' => [
+            'flooz' => 'FLOOZ',
+            'tmoney' => 'TMONEY',
+        ],
+        // Status codes from PayGate API
+        'status_codes' => [
+            'init_success' => 0,
+            'init_invalid_token' => 2,
+            'init_invalid_params' => 4,
+            'init_duplicate' => 6,
+            'payment_success' => 0,
+            'payment_pending' => 2,
+            'payment_expired' => 4,
+            'payment_cancelled' => 6,
         ],
     ],
 
