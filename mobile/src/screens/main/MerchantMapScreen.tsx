@@ -52,6 +52,37 @@ const MerchantMapScreen: React.FC<Props> = ({ testID = TEST_IDS.merchantMapScree
   const [selectedMerchant, setSelectedMerchant] = useState<MerchantMapMarker | null>(null)
   const [mapCenter] = useState<[number, number]>([1.2225, 6.1256]) // Lomé [lon, lat]
 
+  // Radius filter state
+  const [selectedRadius, setSelectedRadius] = useState<number>(20) // Default 20 km
+  const [showRadiusFilter, setShowRadiusFilter] = useState(false)
+  const radiusOptions = [5, 10, 20, 50] // km options
+
+  // Calculate distance between two coordinates using Haversine formula
+  const calculateDistance = useCallback((lat1: number, lon1: number, lat2: number, lon2: number): number => {
+    const R = 6371 // Earth's radius in km
+    const dLat = (lat2 - lat1) * Math.PI / 180
+    const dLon = (lon2 - lon1) * Math.PI / 180
+    const a =
+      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+      Math.sin(dLon / 2) * Math.sin(dLon / 2)
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
+    return R * c
+  }, [])
+
+  // Filter merchants by radius
+  const filteredMerchants = userLocation
+    ? merchants.filter(merchant => {
+        const distance = calculateDistance(
+          userLocation.latitude,
+          userLocation.longitude,
+          merchant.latitude,
+          merchant.longitude
+        )
+        return distance <= selectedRadius
+      })
+    : merchants
+
   // Request location permission and get user location
   const requestLocationPermission = useCallback(async () => {
     try {
@@ -238,8 +269,8 @@ const MerchantMapScreen: React.FC<Props> = ({ testID = TEST_IDS.merchantMapScree
     )
   }
 
-  // Convert merchants to MapMarker format for OpenStreetMap component
-  const mapMarkers: MapMarker[] = merchants.map((merchant) => ({
+  // Convert filtered merchants to MapMarker format for OpenStreetMap component
+  const mapMarkers: MapMarker[] = filteredMerchants.map((merchant) => ({
     id: merchant.id,
     latitude: merchant.latitude,
     longitude: merchant.longitude,
@@ -270,13 +301,89 @@ const MerchantMapScreen: React.FC<Props> = ({ testID = TEST_IDS.merchantMapScree
         onMarkerPress={handleMapMarkerPress}
       />
 
-      {/* Merchant count badge */}
-      <View style={[styles.badge, { backgroundColor: theme.colors.primary[500] }]} testID={TEST_IDS.merchantMapCountBadge}>
-        <Ionicons name="business" size={16} color="white" />
-        <Text style={styles.badgeText}>
-          {merchants.length} commerçant{merchants.length > 1 ? 's' : ''}
-        </Text>
+      {/* Top controls row */}
+      <View style={styles.topControls}>
+        {/* Radius filter button */}
+        <TouchableOpacity
+          style={[styles.radiusFilterButton, { backgroundColor: theme.colors.cardBackground }]}
+          onPress={() => setShowRadiusFilter(!showRadiusFilter)}
+        >
+          <Ionicons name="locate" size={18} color={theme.colors.primary[500]} />
+          <Text style={[styles.radiusText, { color: theme.colors.text }]}>
+            {userLocation ? `${selectedRadius} km` : 'Rayon'}
+          </Text>
+          <Ionicons
+            name={showRadiusFilter ? 'chevron-up' : 'chevron-down'}
+            size={16}
+            color={theme.colors.neutral[500]}
+          />
+        </TouchableOpacity>
+
+        {/* Merchant count badge */}
+        <View style={[styles.badge, { backgroundColor: theme.colors.primary[500] }]} testID={TEST_IDS.merchantMapCountBadge}>
+          <Ionicons name="business" size={16} color="white" />
+          <Text style={styles.badgeText}>
+            {filteredMerchants.length} commerçant{filteredMerchants.length > 1 ? 's' : ''}
+          </Text>
+        </View>
       </View>
+
+      {/* Radius filter dropdown */}
+      {showRadiusFilter && (
+        <View style={[styles.radiusDropdown, { backgroundColor: theme.colors.cardBackground }]}>
+          {!userLocation && (
+            <View style={styles.noLocationWarning}>
+              <Ionicons name="warning" size={16} color={theme.colors.semantic.warning} />
+              <Text style={[styles.noLocationText, { color: theme.colors.textSecondary }]}>
+                Activez la localisation pour filtrer par distance
+              </Text>
+            </View>
+          )}
+          <View style={styles.radiusOptionsRow}>
+            {radiusOptions.map((radius) => (
+              <TouchableOpacity
+                key={radius}
+                style={[
+                  styles.radiusOption,
+                  {
+                    backgroundColor: selectedRadius === radius
+                      ? theme.colors.primary[500]
+                      : theme.colors.interactiveSurface,
+                    borderColor: selectedRadius === radius
+                      ? theme.colors.primary[500]
+                      : theme.colors.interactiveBorder,
+                  },
+                ]}
+                onPress={() => {
+                  setSelectedRadius(radius)
+                  setShowRadiusFilter(false)
+                }}
+                disabled={!userLocation}
+              >
+                <Text
+                  style={[
+                    styles.radiusOptionText,
+                    {
+                      color: selectedRadius === radius
+                        ? 'white'
+                        : userLocation
+                          ? theme.colors.text
+                          : theme.colors.textTertiary,
+                    },
+                  ]}
+                >
+                  {radius} km
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+          {userLocation && filteredMerchants.length !== merchants.length && (
+            <Text style={[styles.filterInfo, { color: theme.colors.textSecondary }]}>
+              {filteredMerchants.length} sur {merchants.length} dans un rayon de {selectedRadius} km
+            </Text>
+          )}
+        </View>
+      )}
 
       {/* Selected merchant callout */}
       {selectedMerchant && (
@@ -419,10 +526,35 @@ const styles = StyleSheet.create({
     shadowRadius: 3,
     elevation: 5,
   },
-  badge: {
+  // Top controls container
+  topControls: {
     position: 'absolute',
     top: 16,
+    left: 16,
     right: 16,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    zIndex: 10,
+  },
+  radiusFilterButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.15,
+    shadowRadius: 3,
+    elevation: 4,
+  },
+  radiusText: {
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  badge: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
@@ -434,6 +566,55 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.25,
     shadowRadius: 3,
     elevation: 5,
+  },
+  // Radius dropdown
+  radiusDropdown: {
+    position: 'absolute',
+    top: 64,
+    left: 16,
+    right: 16,
+    padding: 12,
+    borderRadius: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 8,
+    elevation: 8,
+    zIndex: 20,
+  },
+  noLocationWarning: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginBottom: 12,
+    paddingHorizontal: 8,
+  },
+  noLocationText: {
+    fontSize: 12,
+    flex: 1,
+  },
+  radiusOptionsRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    gap: 8,
+  },
+  radiusOption: {
+    flex: 1,
+    paddingVertical: 10,
+    paddingHorizontal: 8,
+    borderRadius: 10,
+    borderWidth: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  radiusOptionText: {
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  filterInfo: {
+    fontSize: 12,
+    textAlign: 'center',
+    marginTop: 10,
   },
   badgeText: {
     color: 'white',

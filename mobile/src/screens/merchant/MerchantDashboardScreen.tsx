@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useCallback } from 'react'
 import {
   View,
   Text,
@@ -7,6 +7,7 @@ import {
   RefreshControl,
   TouchableOpacity,
   StatusBar,
+  ActivityIndicator,
 } from 'react-native'
 import { Ionicons } from '@expo/vector-icons'
 import { useNavigation } from '@react-navigation/native'
@@ -15,6 +16,9 @@ import { useTheme } from '../../theme'
 import apiService from '../../services/api'
 import { TEST_IDS } from '../../utils/testIds'
 import { RootState } from '../../store'
+import locationService from '../../services/locationService'
+import { MerchantLocation } from '../../types'
+import { useToast } from '../../contexts/ToastContext'
 
 interface Stats {
   active_products: number
@@ -46,6 +50,7 @@ const MerchantDashboardScreen: React.FC = () => {
   const theme = useTheme()
   const navigation = useNavigation()
   const { user } = useSelector((state: RootState) => state.auth)
+  const { showSuccess, showError } = useToast()
   const [stats, setStats] = useState<Stats>({
     active_products: 0,
     pending_reservations: 0,
@@ -58,9 +63,77 @@ const MerchantDashboardScreen: React.FC = () => {
   const [refreshing, setRefreshing] = useState(false)
   const [loading, setLoading] = useState(true)
 
+  // Location state
+  const [merchantLocation, setMerchantLocation] = useState<MerchantLocation | null>(null)
+  const [locationLoading, setLocationLoading] = useState(false)
+  const [settingLocation, setSettingLocation] = useState(false)
+
   useEffect(() => {
     loadDashboardData()
+    loadMerchantLocation()
   }, [])
+
+  // Load merchant location
+  const loadMerchantLocation = useCallback(async () => {
+    setLocationLoading(true)
+    try {
+      const response = await apiService.getMerchantLocation()
+      if (response.success && response.data) {
+        setMerchantLocation(response.data)
+      }
+    } catch (error) {
+      console.error('Erreur chargement localisation:', error)
+    } finally {
+      setLocationLoading(false)
+    }
+  }, [])
+
+  // Set merchant location from GPS
+  const setMerchantLocationFromGPS = useCallback(async () => {
+    setSettingLocation(true)
+    try {
+      // Request permission if needed
+      const hasPermission = await locationService.hasLocationPermission()
+      if (!hasPermission) {
+        const granted = await locationService.requestLocationPermission()
+        if (!granted) {
+          showError('Permission de localisation refusée')
+          setSettingLocation(false)
+          return
+        }
+      }
+
+      // Get current position
+      const position = await locationService.getCurrentPosition(true)
+      if (!position) {
+        showError('Impossible d\'obtenir votre position')
+        setSettingLocation(false)
+        return
+      }
+
+      // Update merchant location via API
+      const response = await apiService.updateMerchantLocation({
+        latitude: position.latitude,
+        longitude: position.longitude,
+      })
+
+      if (response.success) {
+        setMerchantLocation({
+          latitude: position.latitude,
+          longitude: position.longitude,
+          has_location: true,
+        })
+        showSuccess('Localisation enregistrée avec succès!')
+      } else {
+        showError(response.message || 'Erreur lors de la mise à jour')
+      }
+    } catch (error: any) {
+      console.error('Erreur mise à jour localisation:', error)
+      showError(error.message || 'Erreur lors de la mise à jour')
+    } finally {
+      setSettingLocation(false)
+    }
+  }, [showSuccess, showError])
 
   const loadDashboardData = async () => {
     try {
@@ -201,6 +274,74 @@ const MerchantDashboardScreen: React.FC = () => {
           <Text style={[styles.analyticsButtonText, { color: theme.isDark ? '#0B140F' : 'white' }]}>Voir statistiques détaillées</Text>
           <Ionicons name="chevron-forward" size={20} color={theme.isDark ? '#0B140F' : 'white'} />
         </TouchableOpacity>
+
+        {/* Location Prompt Card - Show if merchant hasn't set location */}
+        {!locationLoading && (!merchantLocation || !merchantLocation.latitude || !merchantLocation.longitude) && (
+          <TouchableOpacity
+            style={[
+              styles.locationPromptCard,
+              {
+                backgroundColor: theme.isDark ? theme.colors.primary[900] : theme.colors.primary[50],
+                borderColor: theme.colors.primary[200],
+              }
+            ]}
+            onPress={setMerchantLocationFromGPS}
+            disabled={settingLocation}
+            activeOpacity={0.8}
+          >
+            <View style={[styles.locationIconContainer, { backgroundColor: theme.colors.primary[500] }]}>
+              {settingLocation ? (
+                <ActivityIndicator size="small" color="white" />
+              ) : (
+                <Ionicons name="location" size={24} color="white" />
+              )}
+            </View>
+            <View style={styles.locationTextContainer}>
+              <Text style={[styles.locationTitle, { color: theme.colors.text }]}>
+                Configurez votre localisation
+              </Text>
+              <Text style={[styles.locationSubtitle, { color: theme.colors.textSecondary }]}>
+                {settingLocation
+                  ? 'Enregistrement en cours...'
+                  : 'Soyez visible pour les clients proches de vous'}
+              </Text>
+            </View>
+            {!settingLocation && (
+              <Ionicons name="chevron-forward" size={20} color={theme.colors.primary[500]} />
+            )}
+          </TouchableOpacity>
+        )}
+
+        {/* Location Configured Badge */}
+        {!locationLoading && merchantLocation?.latitude && merchantLocation?.longitude && (
+          <View
+            style={[
+              styles.locationConfiguredCard,
+              {
+                backgroundColor: theme.isDark ? theme.colors.semantic.success + '20' : theme.colors.semantic.success + '10',
+                borderColor: theme.colors.semantic.success + '40',
+              }
+            ]}
+          >
+            <Ionicons name="checkmark-circle" size={20} color={theme.colors.semantic.success} />
+            <Text style={[styles.locationConfiguredText, { color: theme.colors.semantic.success }]}>
+              Localisation configurée
+            </Text>
+            <TouchableOpacity
+              onPress={setMerchantLocationFromGPS}
+              disabled={settingLocation}
+              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+            >
+              {settingLocation ? (
+                <ActivityIndicator size="small" color={theme.colors.primary[500]} />
+              ) : (
+                <Text style={[styles.updateLocationText, { color: theme.colors.primary[500] }]}>
+                  Mettre à jour
+                </Text>
+              )}
+            </TouchableOpacity>
+          </View>
+        )}
 
         {/* Stats Cards - Clickable */}
         <View style={styles.statsContainer}>
@@ -584,6 +725,55 @@ const styles = StyleSheet.create({
   reviewComment: {
     fontSize: 14,
     lineHeight: 20,
+  },
+  // Location prompt styles
+  locationPromptCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginHorizontal: 16,
+    marginTop: 12,
+    padding: 16,
+    borderRadius: 12,
+    borderWidth: 1,
+    gap: 12,
+  },
+  locationIconContainer: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  locationTextContainer: {
+    flex: 1,
+  },
+  locationTitle: {
+    fontSize: 15,
+    fontWeight: '600',
+    marginBottom: 2,
+  },
+  locationSubtitle: {
+    fontSize: 13,
+  },
+  locationConfiguredCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginHorizontal: 16,
+    marginTop: 12,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderRadius: 12,
+    borderWidth: 1,
+    gap: 8,
+  },
+  locationConfiguredText: {
+    flex: 1,
+    fontSize: 14,
+    fontWeight: '500',
+  },
+  updateLocationText: {
+    fontSize: 13,
+    fontWeight: '600',
   },
 })
 

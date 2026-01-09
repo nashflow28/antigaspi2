@@ -31,6 +31,7 @@ import ProductTypeFilter, { ProductFilterType } from '../../components/ProductTy
 import PromoBanner, { PromoBannerItem } from '../../components/PromoBanner'
 import NativeAdCard from '../../components/NativeAdCard'
 import { usePromos } from '../../hooks/usePromos'
+import NearbyMerchantsSection from '../../components/NearbyMerchantsSection'
 
 interface Props {
   navigation: any
@@ -482,6 +483,14 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
             }}
           />
         )}
+
+        {/* Section Commerces Proches */}
+        <NearbyMerchantsSection
+          onMerchantPress={(merchantId) => navigation.navigate('MerchantDetail', { merchantId })}
+          onSeeAllPress={() => navigation.navigate('MerchantMap')}
+          maxMerchants={5}
+          radiusKm={10}
+        />
 
         {/* Filtre Type: Tous | Produits | Paniers */}
         <ProductTypeFilter
