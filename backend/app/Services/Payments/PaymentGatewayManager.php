@@ -21,8 +21,10 @@ class PaymentGatewayManager
     public function forMethod(PaymentMethod $method): PaymentGateway
     {
         return match ($method) {
+            // Togo Mobile Money via PayGate Global
             PaymentMethod::FLOOZ,
-            PaymentMethod::TMONEY => new FedaPayGateway($this->config['fedapay'] ?? []),
+            PaymentMethod::TMONEY => new PayGateGateway($this->config['paygate'] ?? []),
+            // West Africa Mobile Money via CinetPay
             PaymentMethod::ORANGE_MONEY,
             PaymentMethod::MTN_MOMO => new CinetPayGateway($this->config['cinetpay'] ?? []),
             PaymentMethod::PAYSTACK => new PaystackGateway($this->config['paystack'] ?? []),

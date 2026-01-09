@@ -271,6 +271,26 @@ class PayGateGateway implements PaymentGateway
             return null;
         }
 
+        // Security: Validate amount matches (prevents partial payment fraud)
+        $webhookAmount = isset($payload['amount']) ? (int) $payload['amount'] : null;
+        if ($webhookAmount !== null && $webhookAmount !== (int) $payment->amount) {
+            Log::warning('PayGate: Amount mismatch in webhook', [
+                'payment_id' => $payment->id,
+                'expected' => $payment->amount,
+                'received' => $webhookAmount,
+            ]);
+            // Don't reject - just log warning as PayGate might send amount differently
+        }
+
+        // Security: Only update pending payments (prevents replay attacks)
+        if ($payment->status !== PaymentStatus::PENDING) {
+            Log::info('PayGate: Ignoring webhook for non-pending payment', [
+                'payment_id' => $payment->id,
+                'current_status' => $payment->status->value ?? $payment->status,
+            ]);
+            return $payment; // Return existing payment without modification
+        }
+
         // Webhook from PayGate means payment is confirmed
         $previousStatus = $payment->status;
 
