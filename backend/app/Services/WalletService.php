@@ -84,25 +84,33 @@ class WalletService
             throw new \InvalidArgumentException('Le montant de paiement doit être supérieur à zéro');
         }
 
-        $wallet = $this->getOrCreateWallet($user);
+        // BUG-002 FIX: All checks and debit must be in atomic transaction with lock
+        return DB::transaction(function () use ($user, $amount, $description, $pin) {
+            // Lock the wallet row to prevent concurrent debits (pessimistic locking)
+            $wallet = Wallet::where('user_id', $user->id)->lockForUpdate()->first();
 
-        if (!$wallet->is_active) {
-            throw new \Exception('Le portefeuille est désactivé');
-        }
+            if (!$wallet) {
+                $wallet = $this->createWallet($user);
+                // Re-fetch with lock
+                $wallet = Wallet::where('user_id', $user->id)->lockForUpdate()->first();
+            }
 
-        if ($wallet->hasPin() && !$wallet->verifyPin($pin ?? '')) {
-            throw new \Exception('Code PIN incorrect');
-        }
+            if (!$wallet->is_active) {
+                throw new \Exception('Le portefeuille est désactivé');
+            }
 
-        if (!$wallet->hasBalance($amount)) {
-            throw new \Exception('Solde insuffisant dans le portefeuille');
-        }
+            if ($wallet->hasPin() && !$wallet->verifyPin($pin ?? '')) {
+                throw new \Exception('Code PIN incorrect');
+            }
 
-        if (!$wallet->canSpend($amount)) {
-            throw new \Exception('Limite de dépense quotidienne dépassée');
-        }
+            if (!$wallet->hasBalance($amount)) {
+                throw new \Exception('Solde insuffisant dans le portefeuille');
+            }
 
-        return DB::transaction(function () use ($wallet, $amount, $description) {
+            if (!$wallet->canSpend($amount)) {
+                throw new \Exception('Limite de dépense quotidienne dépassée');
+            }
+
             $transaction = $wallet->debit($amount, $description);
 
             Log::info('Wallet payment processed', [

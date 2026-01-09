@@ -283,6 +283,38 @@ class OrderController extends Controller
                         ]);
                     }
                 } catch (\Exception $paymentError) {
+                    // BUG-003 FIX: Refund successful wallet payments before rolling back
+                    if ($paymentMethod === PaymentMethod::WALLET && !empty($payments)) {
+                        foreach ($payments as $payment) {
+                            if ($payment && $payment->isSuccessful()) {
+                                try {
+                                    // Refund this wallet payment
+                                    $reservation = $payment->reservation;
+                                    if ($reservation && $reservation->user) {
+                                        $wallet = $reservation->user->wallet;
+                                        if ($wallet) {
+                                            $wallet->credit(
+                                                (float) $payment->amount,
+                                                "Remboursement auto - échec commande #{$order->order_number}",
+                                                $payment
+                                            );
+                                            Log::info('Auto-refund wallet payment on order failure', [
+                                                'payment_id' => $payment->id,
+                                                'amount' => $payment->amount,
+                                                'order_id' => $order->id,
+                                            ]);
+                                        }
+                                    }
+                                } catch (\Exception $refundError) {
+                                    Log::error('Failed to auto-refund wallet payment', [
+                                        'payment_id' => $payment->id,
+                                        'error' => $refundError->getMessage(),
+                                    ]);
+                                }
+                            }
+                        }
+                    }
+
                     // Rollback: restore stock and cancel reservations
                     foreach ($createdReservations as $reservation) {
                         $product = Product::find($reservation->product_id);

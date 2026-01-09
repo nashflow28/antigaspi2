@@ -23,7 +23,12 @@ class Wallet extends Model
         'daily_spent',
         'daily_spent_date',
         'last_transaction_at',
+        'pin_attempts',
+        'pin_locked_until',
     ];
+
+    const MAX_PIN_ATTEMPTS = 5;
+    const PIN_LOCK_MINUTES = 30;
 
     protected function casts(): array
     {
@@ -34,6 +39,8 @@ class Wallet extends Model
             'daily_spent_date' => 'date',
             'last_transaction_at' => 'datetime',
             'is_active' => 'boolean',
+            'pin_attempts' => 'integer',
+            'pin_locked_until' => 'datetime',
         ];
     }
 
@@ -126,7 +133,44 @@ class Wallet extends Model
 
     public function verifyPin(string $pin): bool
     {
-        return $this->pin_hash && Hash::check($pin, $this->pin_hash);
+        // SEC-002 FIX: Rate limiting on PIN attempts
+        if ($this->isPinLocked()) {
+            throw new \Exception('Wallet PIN is locked. Try again later.');
+        }
+
+        if (!$this->pin_hash) {
+            return false;
+        }
+
+        if (Hash::check($pin, $this->pin_hash)) {
+            // Reset attempts on success
+            $this->update(['pin_attempts' => 0, 'pin_locked_until' => null]);
+            return true;
+        }
+
+        // Increment failed attempts
+        $attempts = ($this->pin_attempts ?? 0) + 1;
+        $updateData = ['pin_attempts' => $attempts];
+
+        if ($attempts >= self::MAX_PIN_ATTEMPTS) {
+            $updateData['pin_locked_until'] = now()->addMinutes(self::PIN_LOCK_MINUTES);
+        }
+
+        $this->update($updateData);
+        return false;
+    }
+
+    public function isPinLocked(): bool
+    {
+        return $this->pin_locked_until && $this->pin_locked_until->isFuture();
+    }
+
+    public function getRemainingLockMinutes(): ?int
+    {
+        if (!$this->isPinLocked()) {
+            return null;
+        }
+        return (int) now()->diffInMinutes($this->pin_locked_until, false);
     }
 
     public function hasPin(): bool
@@ -144,7 +188,8 @@ class Wallet extends Model
 
     private function resetDailySpentIfNeeded(): void
     {
-        if (!$this->daily_spent_date || $this->daily_spent_date->isYesterday()) {
+        // BUG-001 FIX: Reset if date is any day before today (not just yesterday)
+        if (!$this->daily_spent_date || $this->daily_spent_date->lt(now()->startOfDay())) {
             $this->update([
                 'daily_spent' => 0,
                 'daily_spent_date' => now()->toDateString(),

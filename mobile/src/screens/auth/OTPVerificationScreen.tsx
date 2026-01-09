@@ -3,7 +3,7 @@
  * Uses backend OTP service for phone authentication
  */
 
-import React, { useState, useRef, useEffect } from 'react'
+import React, { useState, useRef, useEffect, useCallback } from 'react'
 import {
   View,
   TextInput,
@@ -48,13 +48,17 @@ const OTPVerificationScreen = ({ navigation, route }: any) => {
     }
   }, [resendTimer])
 
-  // Auto-verify when all digits entered
+  // BUG-006 FIX: Auto-verify when all digits entered with proper dependencies
   useEffect(() => {
     const code = otp.join('')
     if (code.length === OTP_LENGTH && !loading) {
-      handleVerifyOTP()
+      // Delay slightly to allow state to settle
+      const timer = setTimeout(() => {
+        handleVerifyOTP()
+      }, 100)
+      return () => clearTimeout(timer)
     }
-  }, [otp])
+  }, [otp, loading]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleOtpChange = (text: string, index: number) => {
     // Only allow digits

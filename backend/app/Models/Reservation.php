@@ -196,10 +196,16 @@ class Reservation extends Model
         return false;
     }
 
+    /**
+     * Cancel the reservation and refund wallet if applicable
+     * BUG-008 FIX: Throws exception if wallet refund fails (instead of silent failure)
+     *
+     * @throws \Exception If wallet refund fails
+     */
     public function cancel(): bool
     {
         if ($this->canBeCancelled()) {
-            // 🐛 BUG FIX: Refund wallet payment if applicable
+            // BUG-008 FIX: Refund wallet payment - now throws exception on failure
             $this->refundWalletPaymentIfApplicable();
 
             $this->update([
@@ -215,27 +221,30 @@ class Reservation extends Model
 
     /**
      * Refund wallet payment if the reservation was paid via wallet
+     * BUG-008 FIX: Now throws exception on refund failure instead of silent logging
+     *
+     * @throws \Exception If refund fails for any reason
      */
     protected function refundWalletPaymentIfApplicable(): void
     {
+        // Get the latest successful wallet payment for this reservation
+        $walletPayment = $this->payments()
+            ->where('payment_method', 'wallet')
+            ->where('status', PaymentStatus::SUCCESS)
+            ->latest()
+            ->first();
+
+        if (!$walletPayment) {
+            return; // No wallet payment to refund - OK to proceed
+        }
+
+        $user = $this->user;
+        if (!$user) {
+            \Log::error('BUG-008: Cannot refund wallet - user not found', ['reservation_id' => $this->id]);
+            throw new \Exception('Impossible de rembourser: utilisateur non trouvé. Contactez le support.');
+        }
+
         try {
-            // Get the latest successful wallet payment for this reservation
-            $walletPayment = $this->payments()
-                ->where('payment_method', 'wallet')
-                ->where('status', PaymentStatus::SUCCESS)
-                ->latest()
-                ->first();
-
-            if (!$walletPayment) {
-                return; // No wallet payment to refund
-            }
-
-            $user = $this->user;
-            if (!$user) {
-                \Log::warning('Cannot refund wallet: user not found', ['reservation_id' => $this->id]);
-                return;
-            }
-
             // Use WalletService to refund
             $walletService = app(\App\Services\WalletService::class);
             $refundAmount = (float) $walletPayment->amount;
@@ -243,18 +252,24 @@ class Reservation extends Model
 
             $walletService->rechargeWallet($user, $refundAmount, $description);
 
-            \Log::info('Wallet refund processed', [
+            \Log::info('Wallet refund processed successfully', [
                 'reservation_id' => $this->id,
                 'user_id' => $user->id,
                 'amount' => $refundAmount,
                 'payment_id' => $walletPayment->id,
             ]);
         } catch (\Exception $e) {
-            // Log error but don't block cancellation
-            \Log::error('Wallet refund failed', [
+            // BUG-008 FIX: Now we throw instead of silently logging
+            \Log::error('BUG-008: Wallet refund failed - blocking cancellation', [
                 'reservation_id' => $this->id,
+                'user_id' => $user->id,
+                'amount' => $walletPayment->amount,
                 'error' => $e->getMessage(),
             ]);
+            throw new \Exception(
+                'Échec du remboursement portefeuille: ' . $e->getMessage() .
+                '. L\'annulation a été bloquée. Contactez le support.'
+            );
         }
     }
 

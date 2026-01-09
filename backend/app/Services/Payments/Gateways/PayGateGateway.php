@@ -271,17 +271,6 @@ class PayGateGateway implements PaymentGateway
             return null;
         }
 
-        // Security: Validate amount matches (prevents partial payment fraud)
-        $webhookAmount = isset($payload['amount']) ? (int) $payload['amount'] : null;
-        if ($webhookAmount !== null && $webhookAmount !== (int) $payment->amount) {
-            Log::warning('PayGate: Amount mismatch in webhook', [
-                'payment_id' => $payment->id,
-                'expected' => $payment->amount,
-                'received' => $webhookAmount,
-            ]);
-            // Don't reject - just log warning as PayGate might send amount differently
-        }
-
         // Security: Only update pending payments (prevents replay attacks)
         if ($payment->status !== PaymentStatus::PENDING) {
             Log::info('PayGate: Ignoring webhook for non-pending payment', [
@@ -289,6 +278,35 @@ class PayGateGateway implements PaymentGateway
                 'current_status' => $payment->status->value ?? $payment->status,
             ]);
             return $payment; // Return existing payment without modification
+        }
+
+        // BUG-009 FIX: Validate amount matches (prevents partial payment fraud)
+        // MUST check BEFORE marking as SUCCESS
+        $webhookAmount = isset($payload['amount']) ? (int) $payload['amount'] : null;
+        if ($webhookAmount !== null && $webhookAmount !== (int) $payment->amount) {
+            Log::critical('BUG-009: PayGate amount mismatch - REJECTING payment', [
+                'payment_id' => $payment->id,
+                'expected_amount' => (int) $payment->amount,
+                'received_amount' => $webhookAmount,
+                'difference' => $webhookAmount - (int) $payment->amount,
+                'identifier' => $identifier,
+            ]);
+
+            // Mark payment as failed due to amount mismatch
+            $payment->fill([
+                'status' => PaymentStatus::FAILED,
+                'payload' => array_merge($payment->payload ?? [], [
+                    'webhook_rejected' => [
+                        'received_at' => now()->toIso8601String(),
+                        'reason' => 'amount_mismatch',
+                        'expected_amount' => (int) $payment->amount,
+                        'received_amount' => $webhookAmount,
+                        'original_payload' => $payload,
+                    ],
+                ]),
+            ])->save();
+
+            return $payment->refresh();
         }
 
         // Webhook from PayGate means payment is confirmed
