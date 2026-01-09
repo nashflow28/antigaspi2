@@ -13,6 +13,7 @@ use App\Models\Product;
 use App\Models\Reservation;
 use App\Notifications\ReservationStatusNotification;
 use App\Services\ReservationService;
+use App\Services\SmsService;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -22,8 +23,10 @@ use Tymon\JWTAuth\Facades\JWTAuth;
 
 class ReservationController extends Controller
 {
-    public function __construct(private readonly ReservationService $reservations)
-    {
+    public function __construct(
+        private readonly ReservationService $reservations,
+        private readonly SmsService $sms
+    ) {
     }
 
     public function index(Request $request): JsonResponse
@@ -476,7 +479,7 @@ class ReservationController extends Controller
             $reservation->update(['status' => 'ready']);
             $reservation->refresh()->load(['product.category', 'product.merchant.user', 'user']);
 
-            // Notification non-bloquante
+            // Notification push non-bloquante
             try {
                 $reservation->user->notify(new ReservationStatusNotification($reservation));
             } catch (\Exception $e) {
@@ -485,6 +488,9 @@ class ReservationController extends Controller
                     'error' => $e->getMessage()
                 ]);
             }
+
+            // SMS de rappel non-bloquant (commande prête)
+            $this->sendReadySms($reservation);
 
             return response()->json([
                 'success' => true,
@@ -705,6 +711,54 @@ class ReservationController extends Controller
                 'message' => 'Erreur lors du calcul des statistiques',
                 'error' => $e->getMessage()
             ], 500);
+        }
+    }
+
+    /**
+     * Send SMS notification when reservation is ready for pickup (non-blocking)
+     */
+    private function sendReadySms(Reservation $reservation): void
+    {
+        try {
+            // Skip if SMS service is not configured
+            if (!$this->sms->isConfigured()) {
+                \Log::debug('SMS Service: Skipping ready SMS (not configured)');
+                return;
+            }
+
+            // Get user phone number
+            $phone = $reservation->user->phone ?? null;
+            if (empty($phone)) {
+                \Log::debug('SMS Service: Skipping ready SMS (no phone number)', [
+                    'user_id' => $reservation->user_id,
+                ]);
+                return;
+            }
+
+            // Get merchant name and pickup time
+            $merchantName = $reservation->product->merchant->business_name ?? 'le commerçant';
+            $pickupTime = $reservation->pickup_time ?? '19:00';
+
+            // Send pickup reminder SMS
+            $result = $this->sms->sendPickupReminder(
+                $phone,
+                $reservation->reservation_code,
+                $merchantName,
+                $pickupTime
+            );
+
+            if (!$result['success']) {
+                \Log::warning('SMS Service: Failed to send ready notification', [
+                    'reservation_id' => $reservation->id,
+                    'error' => $result['message'] ?? 'Unknown error',
+                ]);
+            }
+        } catch (\Throwable $e) {
+            // Log but don't fail the operation
+            \Log::error('SMS Service: Exception sending ready SMS', [
+                'reservation_id' => $reservation->id,
+                'error' => $e->getMessage(),
+            ]);
         }
     }
 }

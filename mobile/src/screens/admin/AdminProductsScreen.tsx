@@ -48,6 +48,12 @@ const AdminProductsScreen: React.FC = () => {
   // Utiliser un Set d'IDs au lieu d'un boolean pour éviter les race conditions
   const [actionLoadingIds, setActionLoadingIds] = useState<Set<number>>(new Set())
 
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1)
+  const [hasMorePages, setHasMorePages] = useState(true)
+  const [loadingMore, setLoadingMore] = useState(false)
+  const PER_PAGE = 50
+
   // Confirm modal state
   const [showConfirmModal, setShowConfirmModal] = useState(false)
   const [confirmAction, setConfirmAction] = useState<ConfirmAction>(null)
@@ -61,26 +67,48 @@ const AdminProductsScreen: React.FC = () => {
     filterProducts()
   }, [products, searchQuery, statusFilter, categoryFilter])
 
-  const loadData = async () => {
+  const loadData = async (page: number = 1, append: boolean = false) => {
     try {
-      setLoading(true)
+      if (page === 1) {
+        setLoading(true)
+      } else {
+        setLoadingMore(true)
+      }
 
-      // Charger produits et catégories en parallèle
-      // TODO: Implémenter pagination infinie si produits > 200
-      const [productsRes, categoriesRes] = await Promise.all([
-        apiService.get('/products?per_page=200'), // Augmenté de 100 à 200
-        apiService.get('/categories'),
-      ])
+      // Charger produits avec pagination et catégories en parallèle
+      const requests: Promise<any>[] = [
+        apiService.get(`/products?per_page=${PER_PAGE}&page=${page}`),
+      ]
 
-      // apiService peut retourner le tableau directement ou {data: [...]}
-      const allProducts = Array.isArray(productsRes.data) ? productsRes.data : (productsRes.data?.data || [])
-      const allCategories = Array.isArray(categoriesRes.data) ? categoriesRes.data : (categoriesRes.data?.data || [])
-      console.log('🟢 [AdminProducts] Products:', allProducts.length, 'Categories:', allCategories.length)
-      setProducts(allProducts)
-      setCategories(allCategories)
+      // Ne charger les catégories que la première fois
+      if (page === 1) {
+        requests.push(apiService.get('/categories'))
+      }
+
+      const responses = await Promise.all(requests)
+      const productsRes = responses[0]
+
+      // Extraire les produits
+      const newProducts = Array.isArray(productsRes.data) ? productsRes.data : (productsRes.data?.data || [])
+
+      // Vérifier s'il y a plus de pages
+      const totalPages = productsRes.data?.last_page || productsRes.meta?.last_page || 1
+      setHasMorePages(page < totalPages)
+      setCurrentPage(page)
+
+      if (append && page > 1) {
+        setProducts(prev => [...prev, ...newProducts])
+      } else {
+        setProducts(newProducts)
+      }
+
+      // Catégories (seulement sur la première page)
+      if (page === 1 && responses[1]) {
+        const categoriesRes = responses[1]
+        const allCategories = Array.isArray(categoriesRes.data) ? categoriesRes.data : (categoriesRes.data?.data || [])
+        setCategories(allCategories)
+      }
     } catch (error: any) {
-      console.error('Erreur chargement données:', error)
-
       // Gestion des erreurs d'autorisation
       if (error.response?.status === 401 || error.response?.status === 403) {
         showWarning(
@@ -94,8 +122,15 @@ const AdminProductsScreen: React.FC = () => {
     } finally {
       setLoading(false)
       setRefreshing(false)
+      setLoadingMore(false)
     }
   }
+
+  const loadMoreProducts = useCallback(() => {
+    if (!loadingMore && hasMorePages && !loading) {
+      loadData(currentPage + 1, true)
+    }
+  }, [loadingMore, hasMorePages, loading, currentPage])
 
   const filterProducts = useCallback(() => {
     let filtered = [...products]
@@ -130,7 +165,21 @@ const AdminProductsScreen: React.FC = () => {
 
   const onRefresh = () => {
     setRefreshing(true)
-    loadData()
+    setCurrentPage(1)
+    setHasMorePages(true)
+    loadData(1, false)
+  }
+
+  const renderFooter = () => {
+    if (!loadingMore) return null
+    return (
+      <View style={styles.footerLoader}>
+        <ActivityIndicator size="small" color={theme.colors.primary[500]} />
+        <Typography variant="caption" color="secondary" style={{ marginLeft: 8 }}>
+          Chargement...
+        </Typography>
+      </View>
+    )
   }
 
   const handleProductPress = (product: ProductWithModeration) => {
@@ -792,6 +841,9 @@ const AdminProductsScreen: React.FC = () => {
           keyExtractor={item => item.id.toString()}
           contentContainerStyle={[styles.listContent, { paddingTop: insets.top + 16 }]}
           refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
+          onEndReached={loadMoreProducts}
+          onEndReachedThreshold={0.5}
+          ListFooterComponent={renderFooter}
           ListEmptyComponent={
             <View style={[styles.emptyState, { backgroundColor: theme.colors.surface.light }]}>
               <Ionicons name="cube-outline" size={64} color={theme.colors.neutral[300]} />
@@ -967,6 +1019,12 @@ const styles = StyleSheet.create({
     ...StyleSheet.absoluteFillObject,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  footerLoader: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingVertical: 16,
   },
 })
 

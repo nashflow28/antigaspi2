@@ -11,13 +11,16 @@ use App\Models\User;
 use App\Models\Wallet;
 use App\Notifications\ReservationStatusNotification;
 use App\Services\Payments\PaymentService;
+use App\Services\SmsService;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\ValidationException;
 
 class ReservationService
 {
-    public function __construct(private readonly PaymentService $payments)
-    {
+    public function __construct(
+        private readonly PaymentService $payments,
+        private readonly SmsService $sms
+    ) {
     }
 
     /**
@@ -241,8 +244,58 @@ class ReservationService
         $reservation->load(['product.category', 'product.merchant.user']);
         $reservation->setRelation('user', $user);
 
+        // Send push notification
         $user->notify(new ReservationStatusNotification($reservation));
 
+        // Send SMS confirmation (non-blocking - won't fail the reservation if SMS fails)
+        $this->sendSmsConfirmation($user, $reservation);
+
         return [$reservation, $payment];
+    }
+
+    /**
+     * Send SMS confirmation for a reservation (non-blocking)
+     */
+    private function sendSmsConfirmation(User $user, Reservation $reservation): void
+    {
+        try {
+            // Skip if SMS service is not configured
+            if (!$this->sms->isConfigured()) {
+                Log::debug('SMS Service: Skipping SMS (not configured)');
+                return;
+            }
+
+            // Get user phone number
+            $phone = $user->phone;
+            if (empty($phone)) {
+                Log::debug('SMS Service: Skipping SMS (no phone number)', [
+                    'user_id' => $user->id,
+                ]);
+                return;
+            }
+
+            // Get merchant name
+            $merchantName = $reservation->product->merchant->business_name ?? 'le commerçant';
+
+            // Send confirmation SMS
+            $result = $this->sms->sendReservationConfirmation(
+                $phone,
+                $reservation->reservation_code,
+                $merchantName
+            );
+
+            if (!$result['success']) {
+                Log::warning('SMS Service: Failed to send reservation confirmation', [
+                    'reservation_id' => $reservation->id,
+                    'error' => $result['message'] ?? 'Unknown error',
+                ]);
+            }
+        } catch (\Throwable $e) {
+            // Log but don't fail the reservation
+            Log::error('SMS Service: Exception sending confirmation', [
+                'reservation_id' => $reservation->id,
+                'error' => $e->getMessage(),
+            ]);
+        }
     }
 }
