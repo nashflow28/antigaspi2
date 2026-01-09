@@ -1,5 +1,4 @@
 import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios'
-import AsyncStorage from '@react-native-async-storage/async-storage'
 import { Alert } from 'react-native'
 import * as NavigationRef from '../navigation/NavigationRef'
 import { getGlobalAlert } from '../contexts/AlertContext'
