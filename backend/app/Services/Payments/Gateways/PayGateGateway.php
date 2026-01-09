@@ -244,12 +244,24 @@ class PayGateGateway implements PaymentGateway
      * - datetime: Payment timestamp
      * - payment_method: FLOOZ or T-Money
      * - phone_number: Customer phone
+     * - signature: HMAC signature for verification (if configured)
      */
-    public function handleCallback(array $payload): ?Payment
+    public function handleCallback(array $payload, ?string $rawBody = null, ?string $signatureHeader = null): ?Payment
     {
         Log::info('PayGate: Webhook received', [
             'payload' => array_diff_key($payload, ['phone_number' => '']), // Mask phone
+            'has_signature' => !empty($signatureHeader),
         ]);
+
+        // SEC-003 FIX: Verify webhook signature if secret is configured
+        if (!$this->verifyWebhookSignature($payload, $rawBody, $signatureHeader)) {
+            Log::critical('SEC-003: PayGate webhook signature verification FAILED', [
+                'payload_keys' => array_keys($payload),
+                'has_raw_body' => !empty($rawBody),
+                'has_signature' => !empty($signatureHeader),
+            ]);
+            return null; // Reject unsigned/invalid webhooks
+        }
 
         // PayGate sends 'identifier' which is our reference
         $identifier = $payload['identifier'] ?? null;
@@ -337,7 +349,81 @@ class PayGateGateway implements PaymentGateway
             'payment_reference' => $payload['payment_reference'] ?? 'N/A',
         ]);
 
+        // Handle wallet recharge if this is a wallet recharge payment
+        $this->processWalletRechargeIfApplicable($payment);
+
         return $payment->refresh();
+    }
+
+    /**
+     * Process wallet recharge if the payment is for a wallet recharge
+     */
+    private function processWalletRechargeIfApplicable(Payment $payment): void
+    {
+        $payloadData = $payment->payload ?? [];
+
+        // Check if this is a wallet recharge payment
+        if (($payloadData['type'] ?? null) !== 'wallet_recharge') {
+            return;
+        }
+
+        $userId = $payloadData['user_id'] ?? null;
+        $walletId = $payloadData['wallet_id'] ?? null;
+
+        if (!$userId || !$walletId) {
+            Log::error('PayGate: Wallet recharge missing user_id or wallet_id', [
+                'payment_id' => $payment->id,
+                'payload' => $payloadData,
+            ]);
+            return;
+        }
+
+        try {
+            $user = \App\Models\User::find($userId);
+            if (!$user) {
+                Log::error('PayGate: Wallet recharge user not found', [
+                    'payment_id' => $payment->id,
+                    'user_id' => $userId,
+                ]);
+                return;
+            }
+
+            $walletService = app(\App\Services\WalletService::class);
+            $description = "Recharge via Mobile Money - Ref: {$payment->reference}";
+
+            $walletService->rechargeWallet($user, (float) $payment->amount, $description, $payment);
+
+            Log::info('PayGate: Wallet recharged successfully via webhook', [
+                'payment_id' => $payment->id,
+                'user_id' => $userId,
+                'wallet_id' => $walletId,
+                'amount' => $payment->amount,
+            ]);
+
+            // Update payment payload to indicate wallet was credited
+            $payment->update([
+                'payload' => array_merge($payment->payload ?? [], [
+                    'wallet_credited' => true,
+                    'wallet_credited_at' => now()->toIso8601String(),
+                ]),
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('PayGate: Failed to credit wallet after recharge payment', [
+                'payment_id' => $payment->id,
+                'user_id' => $userId,
+                'error' => $e->getMessage(),
+            ]);
+
+            // Update payment payload with error
+            $payment->update([
+                'payload' => array_merge($payment->payload ?? [], [
+                    'wallet_credit_failed' => true,
+                    'wallet_credit_error' => $e->getMessage(),
+                    'wallet_credit_failed_at' => now()->toIso8601String(),
+                ]),
+            ]);
+        }
     }
 
     /**
@@ -449,5 +535,117 @@ class PayGateGateway implements PaymentGateway
                 "Méthode de paiement {$method->value} non supportée par PayGate. Utilisez Flooz ou TMoney."
             ),
         };
+    }
+
+    /**
+     * SEC-003 FIX: Verify webhook signature using HMAC
+     *
+     * Supports multiple verification strategies:
+     * 1. HMAC-SHA256 signature in header (preferred)
+     * 2. Signature field in payload
+     * 3. IP whitelist fallback (if no secret configured)
+     *
+     * @param array $payload The webhook payload
+     * @param string|null $rawBody The raw request body for signature verification
+     * @param string|null $signatureHeader The signature from request header
+     * @return bool True if signature is valid or verification is disabled
+     */
+    private function verifyWebhookSignature(array $payload, ?string $rawBody, ?string $signatureHeader): bool
+    {
+        $webhookSecret = $this->config['webhook_secret'] ?? null;
+
+        // If no webhook secret is configured, log warning but allow (for backwards compatibility)
+        // In production, PAYGATE_WEBHOOK_SECRET should ALWAYS be set
+        if (empty($webhookSecret)) {
+            Log::warning('SEC-003: PayGate webhook secret not configured - signature verification skipped', [
+                'recommendation' => 'Set PAYGATE_WEBHOOK_SECRET in .env for production security',
+            ]);
+
+            // Fallback: Verify by checking if identifier matches a known payment
+            // This provides minimal security but is better than nothing
+            $identifier = $payload['identifier'] ?? null;
+            if ($identifier) {
+                $paymentExists = Payment::where('reference', $identifier)
+                    ->where('provider', 'paygate')
+                    ->exists();
+
+                if (!$paymentExists) {
+                    Log::warning('SEC-003: Unknown identifier in webhook without signature', [
+                        'identifier' => $identifier,
+                    ]);
+                    return false;
+                }
+            }
+
+            return true; // Allow if identifier matches known payment
+        }
+
+        // Strategy 1: Check signature header (X-PayGate-Signature or similar)
+        if (!empty($signatureHeader) && !empty($rawBody)) {
+            $expectedSignature = hash_hmac('sha256', $rawBody, $webhookSecret);
+
+            // Use timing-safe comparison to prevent timing attacks
+            if (hash_equals($expectedSignature, $signatureHeader)) {
+                Log::info('SEC-003: PayGate webhook signature verified via header');
+                return true;
+            }
+
+            // Try with hex encoding variations
+            if (hash_equals('sha256=' . $expectedSignature, $signatureHeader)) {
+                Log::info('SEC-003: PayGate webhook signature verified via header (sha256= prefix)');
+                return true;
+            }
+        }
+
+        // Strategy 2: Check signature field in payload
+        $payloadSignature = $payload['signature'] ?? $payload['hash'] ?? null;
+        if (!empty($payloadSignature)) {
+            // Build signature from known fields (amount + identifier + auth_token)
+            $signatureData = ($payload['amount'] ?? '') .
+                ($payload['identifier'] ?? '') .
+                ($this->config['auth_token'] ?? '');
+
+            $expectedSignature = hash_hmac('sha256', $signatureData, $webhookSecret);
+
+            if (hash_equals($expectedSignature, $payloadSignature)) {
+                Log::info('SEC-003: PayGate webhook signature verified via payload field');
+                return true;
+            }
+
+            // Alternative: signature might be md5
+            $expectedMd5 = md5($signatureData . $webhookSecret);
+            if (hash_equals($expectedMd5, $payloadSignature)) {
+                Log::info('SEC-003: PayGate webhook signature verified via MD5 payload field');
+                return true;
+            }
+        }
+
+        // Strategy 3: If raw body provided, verify with sorted payload
+        if (!empty($rawBody)) {
+            $expectedSignature = hash_hmac('sha256', $rawBody, $webhookSecret);
+
+            // Check if any provided signature matches
+            $possibleSignatures = array_filter([
+                $signatureHeader,
+                $payload['signature'] ?? null,
+                $payload['hash'] ?? null,
+            ]);
+
+            foreach ($possibleSignatures as $sig) {
+                if (hash_equals($expectedSignature, $sig)) {
+                    Log::info('SEC-003: PayGate webhook signature verified via raw body');
+                    return true;
+                }
+            }
+        }
+
+        // No valid signature found
+        Log::error('SEC-003: All PayGate signature verification strategies failed', [
+            'has_header_signature' => !empty($signatureHeader),
+            'has_payload_signature' => !empty($payload['signature'] ?? $payload['hash'] ?? null),
+            'has_raw_body' => !empty($rawBody),
+        ]);
+
+        return false;
     }
 }

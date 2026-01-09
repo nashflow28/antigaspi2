@@ -429,39 +429,183 @@ class WalletController extends Controller
         }
 
         try {
-            return response()->json([
-                'success' => false,
-                'message' => 'La recharge de portefeuille sera implémentée dans la prochaine phase',
-                'data' => [
-                    'amount' => $request->amount,
-                    'payment_method' => $request->payment_method,
-                    'currency' => 'XOF', // 🐛 BUG FIX #35: Always XOF
-                    'status' => 'coming_soon',
+            $user = Auth::user();
+            $wallet = $this->walletService->getOrCreateWallet($user);
+
+            // Map payment method to PaymentMethod enum
+            $paymentMethodMap = [
+                'flooz' => \App\Enums\PaymentMethod::FLOOZ,
+                'tmoney' => \App\Enums\PaymentMethod::TMONEY,
+                'orange_money' => \App\Enums\PaymentMethod::ORANGE_MONEY,
+                'mtn_momo' => \App\Enums\PaymentMethod::MTN_MOMO,
+            ];
+
+            $paymentMethod = $paymentMethodMap[$request->payment_method] ?? null;
+
+            if (!$paymentMethod) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Méthode de paiement non supportée pour la recharge',
+                ], 400);
+            }
+
+            // Create a wallet recharge payment record
+            $payment = \App\Models\Payment::create([
+                'reservation_id' => null, // No reservation for wallet recharge
+                'payment_method' => $paymentMethod,
+                'amount' => $request->amount,
+                'currency' => 'XOF',
+                'status' => \App\Enums\PaymentStatus::PENDING,
+                'provider' => 'paygate',
+                'reference' => 'WLT-' . $user->id . '-' . time() . '-' . random_int(100, 999),
+                'customer_phone' => $request->phone,
+                'customer_email' => $user->email,
+                'payload' => [
+                    'type' => 'wallet_recharge',
+                    'user_id' => $user->id,
+                    'wallet_id' => $wallet->id,
                 ],
-            ], 501);
+            ]);
+
+            // Initialize PayGate payment
+            $paymentService = app(\App\Services\Payments\PaymentService::class);
+            $gateway = app(\App\Services\Payments\GatewayRegistry::class)->forProvider('paygate');
+
+            // Build PayGate API payload manually since we don't have a reservation
+            $paygateConfig = config('payments.paygate');
+
+            $paygatePayload = [
+                'auth_token' => $paygateConfig['auth_token'],
+                'phone_number' => $this->formatPhoneForPayGate($request->phone),
+                'amount' => (int) $request->amount,
+                'identifier' => $payment->reference,
+                'network' => $paymentMethod === \App\Enums\PaymentMethod::FLOOZ ? 'FLOOZ' : 'TMONEY',
+                'description' => "Recharge portefeuille #{$wallet->id}",
+            ];
+
+            $response = \Illuminate\Support\Facades\Http::timeout(30)
+                ->acceptJson()
+                ->post($paygateConfig['base_url'] . '/pay', $paygatePayload);
+
+            $body = $response->json() ?? [];
+
+            if (($body['status'] ?? -1) !== 0) {
+                $payment->update(['status' => \App\Enums\PaymentStatus::FAILED]);
+
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Erreur lors de l\'initialisation du paiement: ' . ($body['message'] ?? 'Erreur inconnue'),
+                ], 400);
+            }
+
+            // Update payment with PayGate reference
+            $payment->update([
+                'transaction_id' => $body['tx_reference'] ?? null,
+                'payload' => array_merge($payment->payload ?? [], [
+                    'paygate_response' => $body,
+                    'initialized_at' => now()->toIso8601String(),
+                ]),
+            ]);
+
+            \Log::info('Wallet recharge initiated', [
+                'user_id' => $user->id,
+                'wallet_id' => $wallet->id,
+                'amount' => $request->amount,
+                'payment_id' => $payment->id,
+                'reference' => $payment->reference,
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Recharge initiée. Veuillez confirmer le paiement sur votre téléphone.',
+                'data' => [
+                    'payment_id' => $payment->id,
+                    'reference' => $payment->reference,
+                    'amount' => $request->amount,
+                    'currency' => 'XOF',
+                    'payment_method' => $request->payment_method,
+                    'status' => 'pending',
+                    'instructions' => 'Confirmez le paiement Mobile Money sur votre téléphone pour finaliser la recharge.',
+                ],
+            ]);
         } catch (\Exception $e) {
+            \Log::error('Wallet recharge failed', [
+                'error' => $e->getMessage(),
+                'user_id' => Auth::id(),
+            ]);
+
             return response()->json([
                 'success' => false,
-                'message' => $e->getMessage(),
+                'message' => 'Erreur lors de la recharge: ' . $e->getMessage(),
             ], 500);
         }
     }
 
     /**
+     * Format phone number for PayGate (Togo format: 228XXXXXXXX)
+     */
+    private function formatPhoneForPayGate(?string $phone): string
+    {
+        if (empty($phone)) {
+            return '';
+        }
+
+        $phone = preg_replace('/[^0-9]/', '', $phone);
+
+        if (str_starts_with($phone, '228')) {
+            return $phone;
+        }
+
+        if (str_starts_with($phone, '0')) {
+            return '228' . substr($phone, 1);
+        }
+
+        return '228' . $phone;
+    }
+
+    /**
      * Test recharge - ONLY FOR DEVELOPMENT/TESTING
      * Directly credits the wallet without payment processing
+     *
+     * SEC-004 FIX: Stricter conditions - NEVER allow in production unless explicitly enabled
      */
     public function testRecharge(Request $request): JsonResponse
     {
-        // Allow test recharge if:
-        // 1. Not in production, OR
-        // 2. APP_DEBUG is true, OR
-        // 3. ALLOW_TEST_RECHARGE env variable is set to true
-        $allowTestRecharge = !app()->environment('production')
-            || config('app.debug')
-            || env('ALLOW_TEST_RECHARGE', false);
+        // SEC-004 FIX: Stricter security check for test recharge
+        // Only allow if ALL conditions are met:
+        // 1. NOT in production environment
+        // 2. OR explicitly enabled via ALLOW_TEST_RECHARGE=true (for staging/QA)
+        //
+        // IMPORTANT: APP_DEBUG is NO LONGER a valid condition (it could be true by mistake in prod)
 
-        if (!$allowTestRecharge) {
+        $isProduction = app()->environment('production');
+        $explicitlyAllowed = filter_var(env('ALLOW_TEST_RECHARGE', false), FILTER_VALIDATE_BOOLEAN);
+
+        // In production: ONLY allow if explicitly enabled AND log the action
+        if ($isProduction) {
+            if (!$explicitlyAllowed) {
+                \Log::warning('SEC-004: Test recharge attempt blocked in production', [
+                    'user_id' => Auth::id(),
+                    'ip' => request()->ip(),
+                ]);
+
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Cette fonctionnalité est désactivée en production',
+                ], 403);
+            }
+
+            // Log that test recharge is being used in production (should be investigated)
+            \Log::critical('SEC-004: Test recharge used in PRODUCTION - investigate immediately', [
+                'user_id' => Auth::id(),
+                'amount' => $request->input('amount'),
+                'ip' => request()->ip(),
+                'user_agent' => request()->userAgent(),
+            ]);
+        }
+
+        // In non-production: always allow (local, staging, testing)
+        if ($isProduction && !$explicitlyAllowed) {
             return response()->json([
                 'success' => false,
                 'message' => 'Cette fonctionnalité n\'est disponible qu\'en mode test',

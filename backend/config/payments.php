@@ -18,6 +18,7 @@ return [
         'base_url' => env('PAYGATE_BASE_URL', 'https://paygateglobal.com/api/v1'),
         'auth_token' => env('PAYGATE_AUTH_TOKEN'),
         'callback_url' => env('PAYGATE_CALLBACK_URL'),
+        'webhook_secret' => env('PAYGATE_WEBHOOK_SECRET'), // SEC-003: For HMAC signature verification
         'networks' => [
             'flooz' => 'FLOOZ',
             'tmoney' => 'TMONEY',

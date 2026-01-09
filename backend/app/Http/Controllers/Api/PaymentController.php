@@ -404,7 +404,17 @@ class PaymentController extends Controller
 
     public function paygateCallback(Request $request): JsonResponse
     {
-        $payment = $this->payments->handleCallback('paygate', $request->all());
+        // SEC-003 FIX: Pass raw body and signature header for verification
+        $rawBody = $request->getContent();
+        $signatureHeader = $request->header('X-PayGate-Signature')
+            ?? $request->header('X-Signature')
+            ?? $request->header('Signature')
+            ?? null;
+
+        $payment = $this->payments->handleCallback('paygate', $request->all(), [
+            'raw_body' => $rawBody,
+            'signature_header' => $signatureHeader,
+        ]);
 
         return response()->json([
             'success' => (bool) $payment,

@@ -61,10 +61,20 @@ class PaymentService
         return $payment->refresh();
     }
 
-    public function handleCallback(string $provider, array $payload): ?Payment
+    public function handleCallback(string $provider, array $payload, array $context = []): ?Payment
     {
         $gateway = $this->gateways->forProvider($provider);
-        $payment = $gateway->handleCallback($payload);
+
+        // SEC-003 FIX: Pass signature context to PayGate for verification
+        if ($provider === 'paygate' && method_exists($gateway, 'handleCallback')) {
+            $payment = $gateway->handleCallback(
+                $payload,
+                $context['raw_body'] ?? null,
+                $context['signature_header'] ?? null
+            );
+        } else {
+            $payment = $gateway->handleCallback($payload);
+        }
 
         if (!$payment) {
             return null;
