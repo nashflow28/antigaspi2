@@ -262,17 +262,7 @@ const normalizedTags = computed(() => {
     .filter((tag): tag is ProductCardTag => Boolean(tag?.label))
 })
 
-const normalizedStockBadges = computed(() => {
-  return (props.stockBadges ?? [])
-    .map(badge => ({
-      variant: badge.variant ?? 'secondary',
-      ...badge
-    }))
-    .filter((badge): badge is ProductCardBadge => Boolean(badge?.label))
-})
-
 const hasTags = computed(() => normalizedTags.value.length > 0)
-const hasStockBadges = computed(() => normalizedStockBadges.value.length > 0)
 const isLowStock = computed(() => props.lowStock ?? false)
 const hasMetaInfo = computed(() => Boolean(props.quantity || props.pickupTime))
 

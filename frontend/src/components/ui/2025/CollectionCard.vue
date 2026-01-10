@@ -57,7 +57,6 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
 import { ArrowRight } from 'lucide-vue-next'
 import Badge from './Badge.vue'
 import type { Component } from 'vue'
@@ -73,7 +72,7 @@ interface Props {
   disabled?: boolean
 }
 
-const props = withDefaults(defineProps<Props>(), {
+withDefaults(defineProps<Props>(), {
   iconColor: 'text-primary-600',
   gradient: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
   aspectRatio: 'landscape',

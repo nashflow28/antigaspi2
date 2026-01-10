@@ -1,5 +1,5 @@
 <template>
-  <div :class="container px-3 sm:px-4 lg:padding-x-xxlClass" class="lazy-image-container px-3 sm:px-4 lg:px-6">
+  <div :class="containerClass" class="lazy-image-container">
     <img
       ref="imageRef"
       :data-src="optimizedSrc"

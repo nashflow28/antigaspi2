@@ -40,6 +40,7 @@ export type BadgeVariant =
   | 'info'
   | 'outline'
   | 'promo'
+  | 'soft'
 
 export type BadgeSize = 'xs' | 'sm' | 'md' | 'lg'
 
@@ -152,6 +153,11 @@ const variantClasses = computed(() => {
       'bg-gradient-to-r from-accent-orange via-primary-500 to-accent-blue text-white',
       'hover:from-accent-orange/90 hover:via-primary-600 hover:to-accent-blue/90',
       'ring-1 ring-white/20 dark:ring-white/10 shadow-sm'
+    ].join(' '),
+
+    soft: [
+      'bg-neutral-50 text-neutral-600 dark:bg-neutral-800/50 dark:text-neutral-300',
+      'hover:bg-neutral-100 dark:hover:bg-neutral-700/50'
     ].join(' ')
   }
 

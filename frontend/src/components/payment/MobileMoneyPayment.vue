@@ -237,7 +237,7 @@
 import { ref, computed, onMounted, watch } from 'vue'
 import {
   ArrowLeft, Smartphone, Loader2, CheckCircle, XCircle, Info,
-  Phone, Wallet, CreditCard
+  Phone, Wallet
 } from 'lucide-vue-next'
 import Button from '@/components/ui/2025/Button.vue'
 import Input from '@/components/ui/2025/Input.vue'

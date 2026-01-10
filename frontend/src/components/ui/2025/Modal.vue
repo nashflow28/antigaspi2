@@ -213,7 +213,7 @@ const contentClasses = computed(() => [
   props.scrollable ? 'flex-1 overflow-y-auto' : '',
   'px-4',
   !props.title ? 'pt-2xl' : '',
-  !props.$slots.footer ? 'pb-2xl' : 'pb-lg'
+  !slots.footer ? 'pb-2xl' : 'pb-lg'
 ].filter(Boolean).join(' '))
 
 const footerClasses = computed(() => [

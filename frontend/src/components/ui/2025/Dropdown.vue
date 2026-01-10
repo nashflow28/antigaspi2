@@ -85,8 +85,8 @@ interface Props {
   size?: DropdownSize
   variant?: DropdownVariant
   triggerText?: string
-  triggerVariant?: string
-  triggerSize?: string
+  triggerVariant?: ButtonVariant
+  triggerSize?: ButtonSize
   closeOnClick?: boolean
   disabled?: boolean
   offset?: number

@@ -27,11 +27,11 @@
     </template>
 
     <template #utilities>
-      <DarkModeToggle aria-label="Basculer le thème" />
+      <ThemeToggle aria-label="Basculer le thème" />
     </template>
 
-    <template #secondary="{ closeMobile }">
-      <DarkModeToggle aria-label="Basculer le thème" />
+    <template #secondary>
+      <ThemeToggle aria-label="Basculer le thème" />
 
       <template v-if="!authStore.isAuthenticated">
         <RouterLink
@@ -239,7 +239,7 @@
     <template #mobile-secondary="{ closeMobile }">
       <div class="flex items-center justify-between rounded-3xl border border-white/60 bg-white/60 px-4 py-3 text-sm font-medium text-neutral-700 shadow-sm dark:border-dark-600/60 dark:bg-dark-800/70 dark:text-dark-100">
         <span>Thème</span>
-        <DarkModeToggle aria-label="Basculer le thème" />
+        <ThemeToggle aria-label="Basculer le thème" />
       </div>
 
       <template v-if="!authStore.isAuthenticated">
@@ -333,14 +333,9 @@ import {
   Bell
 } from 'lucide-vue-next'
 import { useAuthStore } from '@/stores/auth'
-import MobileNav from '@/components/layout/MobileNav.vue'
 import { useAccessibility } from '@/composables/useAccessibility'
-import { Button, Badge, Card, ThemeToggle } from '@/components/ui/2025'
-import DarkModeToggle from '@/components/ui/DarkModeToggle.vue'
-import Button from '@/components/ui/2025/Button.vue'
-import Badge from '@/components/ui/2025/Badge.vue'
+import { Button, Badge, ThemeToggle } from '@/components/ui/2025'
 import Navigation2025, { type NavigationBrand, type NavigationCta, type NavigationLink } from '@/components/ui/2025/Navigation.vue'
-import { useAccessibility } from '@/composables/useAccessibility'
 
 interface UserMenuLink {
   to: string

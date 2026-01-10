@@ -64,7 +64,7 @@
                 <button
                   type="button"
                   class="rounded-lg p-1 text-blue-400 transition hover:bg-blue-100 hover:text-blue-700"
-                  :aria-label="`Supprimer la recherche \"${entry.query}\"`"
+                  :aria-label="`Supprimer la recherche '${entry.query}'`"
                   :disabled="deletingId === entry.id"
                   @click="handleDelete(entry)"
                 >

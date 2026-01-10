@@ -59,7 +59,7 @@ interface QuickAction {
   handler?: () => void
 }
 
-const props = withDefaults(
+withDefaults(
   defineProps<{
     title: string
     actions: QuickAction[]
