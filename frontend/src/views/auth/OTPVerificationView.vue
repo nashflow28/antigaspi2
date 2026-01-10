@@ -13,7 +13,7 @@
         </p>
       </div>
 
-      <form @submit.prevent="handleVerify" class="space-y-6">
+      <form class="space-y-6" @submit.prevent="handleVerify">
         <!-- OTP Input -->
         <div>
           <Label for="otp" class="sr-only">Code de vérification</Label>
@@ -35,7 +35,7 @@
               @input="handleOtpInput($event, index)"
               @keydown="handleKeydown($event, index)"
               @paste="handlePaste"
-            />
+            >
           </div>
           <p v-if="error" class="mt-3 text-sm text-red-600 dark:text-red-400 text-center">
             {{ error }}

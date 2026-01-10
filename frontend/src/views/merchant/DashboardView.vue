@@ -299,9 +299,8 @@ import {
   StarIcon,
   BellIcon
 } from '@heroicons/vue/24/outline'
-import { Card, Button, Badge } from '@/components/ui/2025'
+import { Card, Button, Badge, type BadgeVariant } from '@/components/ui/2025'
 import { DashboardHeader, QuickActionsCard, StatCard, StatCardGrid } from '@/components/dashboard/2025'
-import type { BadgeVariant } from '@/components/ui/2025'
 import { notify } from '@/composables/useNotifications'
 import { apiService } from '@/services/api'
 import type { ApiResponse, Product, Reservation } from '@/types'

@@ -268,7 +268,7 @@ class OTPService {
    */
   private formatPhone(phone: string): string {
     // Remove spaces and special characters
-    let cleaned = phone.replace(/[\s\-\(\)]/g, '')
+    let cleaned = phone.replace(/[\s\-()]/g, '')
 
     // Ensure it starts with country code
     if (!cleaned.startsWith('+')) {
@@ -306,7 +306,7 @@ class OTPService {
    * Validate phone number format
    */
   validatePhone(phone: string): { valid: boolean; error?: string } {
-    const cleaned = phone.replace(/[\s\-\(\)]/g, '')
+    const cleaned = phone.replace(/[\s\-()]/g, '')
 
     if (!cleaned) {
       return { valid: false, error: 'Le numéro de téléphone est requis' }

@@ -108,7 +108,7 @@
             </Button>
           </div>
 
-          <div class="flex-1 overflow-y-auto px-5 py-6" ref="messagesContainer">
+          <div ref="messagesContainer" class="flex-1 overflow-y-auto px-5 py-6">
             <div v-if="messagingError" class="mb-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
               {{ messagingError }}
             </div>
@@ -240,7 +240,7 @@ const formatTimestamp = (value: string | null | undefined) => {
   const date = new Date(value)
   return new Intl.DateTimeFormat('fr-FR', {
     dateStyle: 'short',
-    timeStyle: 'short',
+    timeStyle: 'short'
   }).format(date)
 }
 

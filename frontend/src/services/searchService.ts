@@ -158,7 +158,7 @@ const buildQueryParams = (params: SearchParams): string => {
   }
 
   const filters: SearchFilters = {
-    ...params.filters,
+    ...params.filters
   }
 
   if (params.type) {
@@ -187,7 +187,7 @@ const buildFallbackMeta = (params: SearchParams, options?: SearchOptions): Searc
       (options?.fallbackData ? options.fallbackData.length : params.perPage ?? 0),
     total:
       options?.fallbackMeta?.pagination?.total ??
-      (options?.fallbackData ? options.fallbackData.length : params.perPage ?? 0),
+      (options?.fallbackData ? options.fallbackData.length : params.perPage ?? 0)
   }
 
   return {
@@ -195,13 +195,13 @@ const buildFallbackMeta = (params: SearchParams, options?: SearchOptions): Searc
     query: params.query ?? options?.fallbackMeta?.query,
     pagination,
     applied_filters: options?.fallbackMeta?.applied_filters ?? {},
-    facets: options?.fallbackMeta?.facets ?? {},
+    facets: options?.fallbackMeta?.facets ?? {}
   }
 }
 
 export const search = async <T extends SearchResult = SearchResult>(
   params: SearchParams,
-  options?: SearchOptions<T>,
+  options?: SearchOptions<T>
 ): Promise<SearchResponse<T>> => {
   const queryString = buildQueryParams(params)
   const endpoint = `/search${queryString ? `?${queryString}` : ''}`
@@ -216,7 +216,7 @@ export const search = async <T extends SearchResult = SearchResult>(
         meta: buildFallbackMeta(params, options),
         message: options?.fallbackMeta?.query
           ? `Résultats locaux pour "${options.fallbackMeta.query}"`
-          : 'Résultats locaux temporaires',
+          : 'Résultats locaux temporaires'
       }
     }
 
@@ -225,7 +225,7 @@ export const search = async <T extends SearchResult = SearchResult>(
 }
 
 export const getSuggestions = async (
-  params: SearchSuggestionsParams = {},
+  params: SearchSuggestionsParams = {}
 ): Promise<SearchSuggestionsResponse> => {
   const searchParams = new URLSearchParams()
 
@@ -248,7 +248,7 @@ export const getSuggestions = async (
 }
 
 export const deleteHistoryEntry = async (
-  id: number,
+  id: number
 ): Promise<SearchSuggestionDeletionResponse> => {
   return apiService.delete<SearchSuggestionDeletionResponse>(`/search/history/${id}`, true)
 }
@@ -256,7 +256,7 @@ export const deleteHistoryEntry = async (
 export const searchService = {
   search,
   getSuggestions,
-  deleteHistoryEntry,
+  deleteHistoryEntry
 }
 
 export default searchService

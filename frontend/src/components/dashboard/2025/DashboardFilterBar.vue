@@ -47,8 +47,7 @@
 </template>
 
 <script setup lang="ts">
-import type { Component } from 'vue'
-import { computed } from 'vue'
+import { computed, type Component } from 'vue'
 import { MagnifyingGlassIcon } from '@heroicons/vue/24/outline'
 import { Input, Select, Label } from '@/components/ui/2025'
 

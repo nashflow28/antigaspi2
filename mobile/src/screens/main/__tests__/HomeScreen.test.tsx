@@ -95,7 +95,7 @@ describe('HomeScreen', () => {
       const dispatchSpy = jest.spyOn(store, 'dispatch')
       const { getByText } = renderScreen({ store })
 
-      expect(getByText(/Tous/i)).toBeTruthy()
+      expect(getByText(/Tous \(\d+\)/i)).toBeTruthy()
 
       await waitFor(() => {
         expect(fetchProducts).toHaveBeenCalledWith({ per_page: 100 })
@@ -170,7 +170,7 @@ describe('HomeScreen', () => {
 
     it('shows empty category guidance when a category has no products', async () => {
       const extraCategory = { id: 3, name: 'Poissons', description: 'Produits de la mer' }
-      const { getByTestId, queryByText, debug } = renderScreen({
+      const { getByTestId, getByLabelText, getByText } = renderScreen({
         productsState: {
           categories: [...mockCategories, extraCategory],
         },
@@ -182,13 +182,8 @@ describe('HomeScreen', () => {
       // Wait for re-render after state change
       await waitFor(
         () => {
-          // Look for the empty state message when category is selected
-          const emptyText = queryByText(/Aucun produit/i, { includeHiddenElements: true })
-          const actionButton = queryByText('Voir tous les produits', { includeHiddenElements: true })
-
-          // HomeScreen shows category-specific empty state when filtered products is empty
-          expect(emptyText).toBeTruthy()
-          expect(actionButton).toBeTruthy()
+          expect(getByLabelText(/Aucun r.sultat.*Poissons/i)).toBeTruthy()
+          expect(getByText(/Toutes cat.*gories/i)).toBeTruthy()
         },
         { timeout: 3000 }
       )

@@ -14,17 +14,17 @@
           <Button
             variant="ghost"
             size="md"
-            @click="handleCancel"
             :disabled="isSaving"
+            @click="handleCancel"
           >
             Annuler
           </Button>
           <Button
             variant="primary"
             size="md"
-            @click="handleSubmit"
             :loading="isSaving"
             :disabled="isSaving"
+            @click="handleSubmit"
           >
             Enregistrer les modifications
           </Button>
@@ -87,7 +87,7 @@
               placeholder="Décrivez votre commerce, vos spécialités, votre engagement contre le gaspillage..."
               :class="{ 'border-red-500': formErrors.description }"
               data-testid="description-textarea"
-            ></textarea>
+            />
             <p v-if="formErrors.description" class="mt-1 text-sm text-red-600">
               {{ formErrors.description }}
             </p>

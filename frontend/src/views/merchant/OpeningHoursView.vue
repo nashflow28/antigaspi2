@@ -14,17 +14,17 @@
           <Button
             variant="ghost"
             size="md"
-            @click="handleCancel"
             :disabled="isSaving"
+            @click="handleCancel"
           >
             Annuler
           </Button>
           <Button
             variant="primary"
             size="md"
-            @click="handleSubmit"
             :loading="isSaving"
             :disabled="isSaving"
+            @click="handleSubmit"
           >
             Enregistrer les horaires
           </Button>
@@ -75,12 +75,12 @@
             <div class="flex items-center gap-3">
               <label class="relative inline-flex cursor-pointer items-center">
                 <input
-                  type="checkbox"
                   v-model="openingHours[day.key].is_open"
+                  type="checkbox"
                   class="peer sr-only"
                   :data-testid="`toggle-${day.key}`"
-                />
-                <div class="peer h-6 w-11 rounded-full bg-neutral-200 after:absolute after:left-[2px] after:top-[2px] after:h-5 after:w-5 after:rounded-full after:border after:border-neutral-300 after:bg-white after:transition-all after:content-[''] peer-checked:bg-primary-600 peer-checked:after:translate-x-full peer-checked:after:border-white peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary-300 dark:border-neutral-600 dark:bg-neutral-700 dark:peer-focus:ring-primary-800"></div>
+                >
+                <div class="peer h-6 w-11 rounded-full bg-neutral-200 after:absolute after:left-[2px] after:top-[2px] after:h-5 after:w-5 after:rounded-full after:border after:border-neutral-300 after:bg-white after:transition-all after:content-[''] peer-checked:bg-primary-600 peer-checked:after:translate-x-full peer-checked:after:border-white peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary-300 dark:border-neutral-600 dark:bg-neutral-700 dark:peer-focus:ring-primary-800" />
                 <span class="ml-3 text-sm font-medium text-neutral-700 dark:text-neutral-300">
                   {{ openingHours[day.key].is_open ? 'Ouvert' : 'Fermé' }}
                 </span>
@@ -98,11 +98,11 @@
                 Heure d'ouverture
               </label>
               <input
-                type="time"
                 v-model="openingHours[day.key].open_time"
+                type="time"
                 class="w-full rounded-xl border border-neutral-200 px-4 py-2.5 text-neutral-900 focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20 dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-50"
                 :data-testid="`open-time-${day.key}`"
-              />
+              >
             </div>
 
             <div>
@@ -110,11 +110,11 @@
                 Heure de fermeture
               </label>
               <input
-                type="time"
                 v-model="openingHours[day.key].close_time"
+                type="time"
                 class="w-full rounded-xl border border-neutral-200 px-4 py-2.5 text-neutral-900 focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20 dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-50"
                 :data-testid="`close-time-${day.key}`"
-              />
+              >
             </div>
           </div>
         </Card>
@@ -134,24 +134,24 @@
               <Button
                 variant="outline"
                 size="sm"
-                @click="applyToAllWeekdays"
                 :disabled="isSaving"
+                @click="applyToAllWeekdays"
               >
                 Appliquer aux jours ouvrables
               </Button>
               <Button
                 variant="outline"
                 size="sm"
-                @click="closeAllDays"
                 :disabled="isSaving"
+                @click="closeAllDays"
               >
                 Tout fermer
               </Button>
               <Button
                 variant="outline"
                 size="sm"
-                @click="setDefaultHours"
                 :disabled="isSaving"
+                @click="setDefaultHours"
               >
                 Horaires par défaut
               </Button>

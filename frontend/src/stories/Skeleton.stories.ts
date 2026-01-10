@@ -2,7 +2,6 @@ import type { Meta, StoryObj } from '@storybook/vue3'
 import Skeleton from '@/components/ui/Skeleton.vue'
 
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const meta: Meta<any> = {
   title: 'UI/Skeleton',
   component: Skeleton,
@@ -43,7 +42,7 @@ const meta: Meta<any> = {
 
 export default meta
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+
 type Story = StoryObj<any>;
 
 export const Playground: Story = {}
@@ -55,7 +54,7 @@ export const ListPlaceholder: Story = {
     rounded: 'lg'
   },
   decorators: [
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
     ((story: any, context: any) => ({
       components: { Story: story() },
       setup() {
@@ -102,7 +101,7 @@ export const ResponsiveBanner: Story = {
     layout: 'fullscreen'
   },
   decorators: [
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
     ((story: any) => ({
       components: { Story: story() },
       template: `

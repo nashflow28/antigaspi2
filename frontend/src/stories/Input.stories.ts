@@ -16,7 +16,6 @@ const iconOptions = {
 type IconOption = keyof typeof iconOptions;
 
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const meta: Meta<any> = {
   title: 'UI/Input',
   component: Input,
@@ -112,7 +111,7 @@ const meta: Meta<any> = {
 
 export default meta
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+
 type Story = StoryObj<any>;
 
 export const Playground: Story = {}
@@ -177,7 +176,7 @@ export const MobileFullWidth: Story = {
     viewport: { defaultViewport: 'mobile' }
   },
   decorators: [
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
     ((story: any) => ({
       components: { Story: story() },
       template: `

@@ -233,8 +233,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, ref, watch } from 'vue'
-import type { Component } from 'vue'
+import { computed, onMounted, ref, watch, type Component } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { ArrowLeft, Clock, Loader2, Package, ShieldCheck, Store, Tag, Smartphone, CreditCard, Wallet } from 'lucide-vue-next'
 import { useSurpriseBaskets } from '@/composables/useSurpriseBaskets'

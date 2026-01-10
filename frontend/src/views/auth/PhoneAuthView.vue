@@ -13,7 +13,7 @@
         </p>
       </div>
 
-      <form @submit.prevent="handleSubmit" class="space-y-6">
+      <form class="space-y-6" @submit.prevent="handleSubmit">
         <!-- Name (register only) -->
         <div v-if="!isLogin">
           <Label for="name">Nom complet</Label>
@@ -98,7 +98,7 @@
         <!-- Or Divider -->
         <div class="relative">
           <div class="absolute inset-0 flex items-center">
-            <div class="w-full border-t border-slate-200 dark:border-slate-700"></div>
+            <div class="w-full border-t border-slate-200 dark:border-slate-700" />
           </div>
           <div class="relative flex justify-center text-sm">
             <span class="px-2 bg-white dark:bg-slate-800 text-slate-500 dark:text-slate-400">ou</span>

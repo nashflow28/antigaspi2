@@ -424,7 +424,7 @@ class MobileMoneyService {
    * Validate phone number for a specific provider
    */
   validatePhone(phone: string, provider: MobileMoneyProvider): { valid: boolean; error?: string } {
-    const cleaned = phone.replace(/[\s\-\(\)]/g, '')
+    const cleaned = phone.replace(/[\s\-()]/g, '')
 
     // Remove country code if present
     let localNumber = cleaned
@@ -489,7 +489,7 @@ class MobileMoneyService {
    * Format phone number to standard format
    */
   formatPhone(phone: string): string {
-    let cleaned = phone.replace(/[\s\-\(\)]/g, '')
+    let cleaned = phone.replace(/[\s\-()]/g, '')
 
     // Ensure it starts with country code
     if (!cleaned.startsWith('+')) {
@@ -511,7 +511,7 @@ class MobileMoneyService {
    * Detect provider from phone number
    */
   detectProvider(phone: string): MobileMoneyProvider | null {
-    const cleaned = phone.replace(/[\s\-\(\)]/g, '')
+    const cleaned = phone.replace(/[\s\-()]/g, '')
 
     let localNumber = cleaned
     if (cleaned.startsWith('+228')) {

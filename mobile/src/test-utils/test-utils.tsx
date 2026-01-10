@@ -10,6 +10,7 @@ import { SafeAreaProvider } from 'react-native-safe-area-context'
 import { ThemeProvider } from '../theme'
 import { ToastProvider } from '../contexts/ToastContext'
 import { AlertProvider } from '../contexts/AlertContext'
+import { AuthPromptProvider } from '../contexts/AuthPromptContext'
 
 import { RootState } from '../store'
 import { createTestStore, TestStore } from './store'
@@ -48,7 +49,9 @@ export const renderWithProviders = (
       <Provider store={store}>
         <ThemeProvider>
           <ToastProvider>
-            <AlertProvider>{children}</AlertProvider>
+            <AlertProvider>
+              <AuthPromptProvider>{children}</AuthPromptProvider>
+            </AlertProvider>
           </ToastProvider>
         </ThemeProvider>
       </Provider>

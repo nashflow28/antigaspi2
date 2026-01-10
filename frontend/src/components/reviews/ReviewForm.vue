@@ -1,5 +1,5 @@
 <template>
-  <form @submit.prevent="handleSubmit" class="space-y-6">
+  <form class="space-y-6" @submit.prevent="handleSubmit">
     <!-- Rating -->
     <div>
       <label class="block text-sm font-semibold text-gray-900 dark:text-white mb-2">
@@ -11,9 +11,9 @@
             v-for="star in 5"
             :key="star"
             type="button"
-            @click="formData.rating = star"
             class="text-3xl transition-colors cursor-pointer"
             :class="star <= formData.rating ? 'text-yellow-400' : 'text-gray-300'"
+            @click="formData.rating = star"
           >
             ★
           </button>
@@ -36,7 +36,7 @@
         maxlength="255"
         placeholder="Résumez votre expérience..."
         class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 dark:bg-gray-700 dark:text-white"
-      />
+      >
     </div>
 
     <!-- Comment -->

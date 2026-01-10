@@ -143,7 +143,13 @@
               </RouterLink>
             </p>
             <div class="flex flex-col gap-3 sm:flex-row">
-              <Button type="button" variant="ghost" size="sm" :disabled="isSaving" @click="resetForm">
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                :disabled="isSaving"
+                @click="resetForm"
+              >
                 Réinitialiser
               </Button>
               <Button type="submit" size="md" :loading="isSaving">
@@ -155,7 +161,13 @@
       </Card>
     </div>
 
-    <input ref="fileInputRef" type="file" class="hidden" accept="image/png,image/jpeg" @change="handleAvatarChange">
+    <input
+      ref="fileInputRef"
+      type="file"
+      class="hidden"
+      accept="image/png,image/jpeg"
+      @change="handleAvatarChange"
+    >
   </div>
 </template>
 

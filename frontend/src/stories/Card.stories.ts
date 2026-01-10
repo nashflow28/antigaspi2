@@ -3,7 +3,6 @@ import Card from '@/components/ui/2025/Card.vue'
 import Button from '@/components/ui/2025/Button.vue'
 
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const meta: Meta<any> = {
   title: 'UI/Card',
   component: Card,
@@ -100,7 +99,7 @@ const meta: Meta<any> = {
 
 export default meta
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+
 type Story = StoryObj<any>;
 
 export const Playground: Story = {}
@@ -154,7 +153,7 @@ export const ResponsiveGrid: Story = {
     viewport: { defaultViewport: 'tablet' }
   },
   decorators: [
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
     ((story: any, context: any) => ({
       components: { Story: story() },
       setup() {

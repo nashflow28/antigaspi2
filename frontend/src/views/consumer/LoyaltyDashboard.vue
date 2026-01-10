@@ -311,8 +311,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
-import type { Component } from 'vue'
+import { computed, onMounted, ref, type Component } from 'vue'
 import {
   Star, Clock, Gift, TrendingUp, RefreshCw, X, Loader2,
   ShoppingBag, MessageSquare, Users, Award, Minus

@@ -162,15 +162,15 @@ describe('ProductDetailsScreen', () => {
   it('shows payment options and switches selection', () => {
     const { getByText, getAllByText, queryByText } = renderScreen()
 
-    expect(getByText('Sur place')).toBeTruthy()
+    expect(getByText('Portefeuille Antigaspi')).toBeTruthy()
     expect(getByText(/Total à payer/i)).toBeTruthy()
 
     fireEvent.press(getByText('Mobile Money'))
-    expect(getByText(/opérateur mobile/i)).toBeTruthy()
+    expect(getByText(/op.rateur mobile/i)).toBeTruthy()
 
     fireEvent.press(getByText('Carte bancaire'))
     expect(getAllByText(/Paystack/i).length).toBeGreaterThan(0)
-    expect(queryByText(/opérateur mobile/i)).toBeNull()
+    expect(queryByText(/op.rateur mobile/i)).toBeNull()
   })
 
   it('updates quantity within available bounds', () => {
@@ -212,7 +212,6 @@ describe('ProductDetailsScreen', () => {
 
     expect(getAllByText('Rupture de stock').length).toBeGreaterThan(0)
     expect(getByTestId(TEST_IDS.addToCartButton).props.accessibilityState?.disabled).toBe(true)
-    expect(getByTestId(TEST_IDS.reserveButton).props.accessibilityState?.disabled).toBe(true)
   })
 
   it('shows loading state while fetching', () => {

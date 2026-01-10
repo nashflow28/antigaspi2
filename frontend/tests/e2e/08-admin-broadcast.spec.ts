@@ -177,13 +177,13 @@ test.describe('Admin Broadcast Notifications', () => {
   test('should display title character count', async () => {
     await page.fill('[data-testid="broadcast-title-input"]', 'Test')
 
-    await expect(page.locator('text=/4\/120 caractères/')).toBeVisible()
+    await expect(page.locator('text=/4\\/120 caractères/')).toBeVisible()
   })
 
   test('should display message character count', async () => {
     await page.fill('[data-testid="broadcast-message-input"]', 'Test message')
 
-    await expect(page.locator('text=/12\/1000 caractères/')).toBeVisible()
+    await expect(page.locator('text=/12\\/1000 caractères/')).toBeVisible()
   })
 
   // ============ BROADCAST SEND TESTS ============

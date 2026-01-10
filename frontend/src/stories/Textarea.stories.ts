@@ -3,7 +3,6 @@ import type { Meta, StoryObj } from '@storybook/vue3'
 import Textarea from '@/components/ui/Textarea.vue'
 
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const meta: Meta<any> = {
   title: 'UI/Textarea',
   component: Textarea,
@@ -84,7 +83,7 @@ const meta: Meta<any> = {
 
 export default meta
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+
 type Story = StoryObj<any>;
 
 export const Playground: Story = {}
@@ -132,7 +131,7 @@ export const ResponsiveColumns: Story = {
     viewport: { defaultViewport: 'desktop' }
   },
   decorators: [
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
     ((story: any, context: any) => ({
       components: { Story: story() },
       setup() {

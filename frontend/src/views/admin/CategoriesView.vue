@@ -90,7 +90,7 @@
             <span class="text-2xl">{{ row.icon || '📦' }}</span>
             <div class="space-y-1">
               <p class="text-sm font-semibold text-neutral-900 dark:text-neutral-50">{{ row.name }}</p>
-              <p class="text-xs text-neutral-500 dark:text-neutral-400">ID : {{ row.id }}</p>
+              <p class="text-xs text-neutral-500 dark:text-neutral-400">ID : {{ row.id }}</p>
             </div>
           </div>
         </template>

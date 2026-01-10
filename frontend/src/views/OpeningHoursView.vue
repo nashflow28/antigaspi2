@@ -163,10 +163,20 @@
               <div class="rounded-3xl border border-neutral-200 bg-white p-5 text-sm text-neutral-600">
                 <p class="font-semibold text-neutral-900">Raccourcis</p>
                 <div class="mt-3 flex flex-col gap-2">
-                  <Button variant="ghost" size="sm" :left-icon="RefreshCw" @click="resetSchedule">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    :left-icon="RefreshCw"
+                    @click="resetSchedule"
+                  >
                     Annuler les modifications
                   </Button>
-                  <Button variant="ghost" size="sm" :left-icon="Wand" @click="applyDefaultSchedule">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    :left-icon="Wand"
+                    @click="applyDefaultSchedule"
+                  >
                     Appliquer les horaires recommandés
                   </Button>
                 </div>

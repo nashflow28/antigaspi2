@@ -391,9 +391,8 @@ import {
   BanknotesIcon,
   ArrowTrendingUpIcon
 } from '@heroicons/vue/24/outline'
-import { Card, Button, Select, Badge } from '@/components/ui/2025'
+import { Card, Button, Select, Badge, type BadgeVariant } from '@/components/ui/2025'
 import { QuickActionsCard, StatCard, StatCardGrid } from '@/components/dashboard/2025'
-import type { BadgeVariant } from '@/components/ui/2025'
 import {
   Chart as ChartJS,
   CategoryScale,

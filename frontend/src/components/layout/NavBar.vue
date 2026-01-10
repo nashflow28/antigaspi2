@@ -82,8 +82,6 @@
             </span>
           </button>
         </div>
-        </router-link>
-        </div>
 
         <!-- Desktop Navigation - Design moderne -->
         <div class="hidden sm:block md:flex items-center space-y-8 sm:space-x-8 animate-fade-in">
@@ -156,79 +154,98 @@
                   to="/login"
                   data-testid="nav-login"
                   class="nav-link relative group"
-                  <
-                  span
                 >
+                  <span>Connexion</span>
+                </RouterLink>
+              </li>
+              <li role="none">
+                <RouterLink
+                  to="/register"
+                  data-testid="nav-register"
+                  class="nav-link relative group"
+                >
+                  <span>Inscription</span>
+                </RouterLink>
+              </li>
+            </template>
+
+            <template v-else>
+              <!-- User menu with dropdown -->
+              <li role="none">
+                <button
+                  class="nav-link relative group flex items-center gap-2"
+                  @click="toggleUserMenu"
+                >
+                  <span>{{ authStore.user?.first_name }}</span>
                   <ChevronDown
                     class="h-4 w-4 text-neutral-500 transition-transform duration-300 group-hover:text-primary-600"
                     :class="{ 'rotate-180': showUserMenu }"
                     aria-hidden="true"
                   />
-                  </button>
+                </button>
 
-                  <transition
-                    enter-active-class="transition duration-200 ease-spring-out"
-                    enter-from-class="translate-y-1 opacity-0"
-                    enter-to-class="translate-y-0 opacity-100"
-                    leave-active-class="transition duration-150 ease-in"
-                    leave-from-class="translate-y-0 opacity-100"
-                    leave-to-class="translate-y-1 opacity-0"
+                <transition
+                  enter-active-class="transition duration-200 ease-spring-out"
+                  enter-from-class="translate-y-1 opacity-0"
+                  enter-to-class="translate-y-0 opacity-100"
+                  leave-active-class="transition duration-150 ease-in"
+                  leave-from-class="translate-y-0 opacity-100"
+                  leave-to-class="translate-y-1 opacity-0"
+                >
+                  <div
+                    v-show="showUserMenu"
+                    ref="dropdownMenuRef"
+                    class="absolute right-0 z-[140] mt-4 w-80 overflow-hidden rounded-2xl border border-white/40 bg-white/95 shadow-xl shadow-primary-500/10 backdrop-blur-2xl dark:border-dark-700/60 dark:bg-dark-900/95"
+                    role="menu"
+                    :aria-labelledby="userMenuButtonId"
+                    @keydown="handleDropdownKeydown"
                   >
-                    <div
-                      v-show="showUserMenu"
-                      ref="dropdownMenuRef"
-                      class="absolute right-0 z-[140] mt-4 w-80 overflow-hidden rounded-2xl border border-white/40 bg-white/95 shadow-xl shadow-primary-500/10 backdrop-blur-2xl dark:border-dark-700/60 dark:bg-dark-900/95"
-                      role="menu"
-                      :aria-labelledby="userMenuButtonId"
-                      @keydown="handleDropdownKeydown"
-                    >
-                      <div class="border-b border-white/40 bg-white/60 px-4 py-4 dark:border-dark-700/60 dark:bg-dark-800/60">
-                        <div class="flex items-center gap-3">
-                          <span class="grid h-10 w-10 place-items-center rounded-2xl bg-gradient-to-br from-primary-500 via-accent-blue/70 to-accent-blue text-white shadow-lg shadow-primary-500/30">
-                            {{ userInitials }}
+                    <div class="border-b border-white/40 bg-white/60 px-4 py-4 dark:border-dark-700/60 dark:bg-dark-800/60">
+                      <div class="flex items-center gap-3">
+                        <span class="grid h-10 w-10 place-items-center rounded-2xl bg-gradient-to-br from-primary-500 via-accent-blue/70 to-accent-blue text-white shadow-lg shadow-primary-500/30">
+                          {{ userInitials }}
+                        </span>
+                        <div class="flex flex-col">
+                          <span class="text-sm font-semibold text-neutral-900 dark:text-dark-50">
+                            {{ authStore.user?.first_name }} {{ authStore.user?.last_name }}
                           </span>
-                          <div class="flex flex-col">
-                            <span class="text-sm font-semibold text-neutral-900 dark:text-dark-50">
-                              {{ authStore.user?.first_name }} {{ authStore.user?.last_name }}
-                            </span>
-                            <span class="text-xs text-neutral-500 dark:text-dark-300">
-                              {{ authStore.user?.email }}
-                            </span>
-                            <Badge variant="primary" size="sm" class="mt-2 w-fit">
-                              {{ getRoleLabel(authStore.user?.role) }}
-                            </Badge>
-                          </div>
+                          <span class="text-xs text-neutral-500 dark:text-dark-300">
+                            {{ authStore.user?.email }}
+                          </span>
+                          <Badge variant="primary" size="sm" class="mt-2 w-fit">
+                            {{ getRoleLabel(authStore.user?.role) }}
+                          </Badge>
                         </div>
                       </div>
-
-                      <nav class="max-h-80 space-y-1 overflow-y-auto px-2 py-3" aria-label="Navigation utilisateur">
-                        <RouterLink
-                          v-for="item in userMenuLinks"
-                          :key="item.to"
-                          :to="item.to"
-                          class="flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-medium text-neutral-700 transition-all duration-300 ease-spring-out hover:bg-primary-500/10 hover:text-primary-700 focus-2025 dark:text-dark-100 dark:hover:bg-dark-700/60"
-                          role="menuitem"
-                          @click="closeUserMenu"
-                          @keydown="handleMenuItemKeydown"
-                        >
-                          <component :is="item.icon" class="h-4 w-4" aria-hidden="true" />
-                          <span>{{ item.label }}</span>
-                        </RouterLink>
-                      </nav>
-
-                      <div class="border-t border-white/30 bg-white/50 px-3 py-3 dark:border-dark-700/60 dark:bg-dark-800/40">
-                        <Button
-                          variant="ghost"
-                          class="w-full justify-start gap-3 text-accent-red hover:bg-accent-red/10 hover:text-accent-red"
-                          @click="handleLogout()"
-                        >
-                          <LogOut class="h-4 w-4" aria-hidden="true" />
-                          Se déconnecter
-                        </Button>
-                      </div>
                     </div>
-                  </transition>
-                </routerlink>
+
+                    <nav class="max-h-80 space-y-1 overflow-y-auto px-2 py-3" aria-label="Navigation utilisateur">
+                      <RouterLink
+                        v-for="item in userMenuLinks"
+                        :key="item.to"
+                        :to="item.to"
+                        class="flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-medium text-neutral-700 transition-all duration-300 ease-spring-out hover:bg-primary-500/10 hover:text-primary-700 focus-2025 dark:text-dark-100 dark:hover:bg-dark-700/60"
+                        role="menuitem"
+                        @click="closeUserMenu"
+                        @keydown="handleMenuItemKeydown"
+                      >
+                        <component :is="item.icon" class="h-4 w-4" aria-hidden="true" />
+                        <span>{{ item.label }}</span>
+                      </RouterLink>
+                    </nav>
+
+                    <div class="border-t border-white/30 bg-white/50 px-3 py-3 dark:border-dark-700/60 dark:bg-dark-800/40">
+                      <Button
+                        variant="ghost"
+                        class="w-full justify-start gap-3 text-accent-red hover:bg-accent-red/10 hover:text-accent-red"
+                        @click="handleLogout()"
+                      >
+                        <LogOut class="h-4 w-4" aria-hidden="true" />
+                        Se déconnecter
+                      </Button>
+                    </div>
+                  </div>
+                </transition>
               </li>
             </template>
           </ul>

@@ -167,7 +167,7 @@ const contentSections = computed(() => {
     if (firstLine.includes('📊') || firstLine.includes('🔧') || firstLine.includes('🚀') ||
         firstLine.includes('Statistiques:') || firstLine.includes('Configuration:')) {
       // Sanitize title and remove emojis
-      section.title = sanitizeText(firstLine.replace(/[📊🔧🚀]/g, '').trim().replace(':', ''))
+      section.title = sanitizeText(firstLine.replace(/[📊🔧🚀]/gu, '').trim().replace(':', ''))
       section.items = lines.slice(1).map(formatLineSecure)
     } else {
       section.items = lines.map(formatLineSecure)

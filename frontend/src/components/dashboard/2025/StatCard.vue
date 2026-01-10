@@ -40,10 +40,8 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
-import type { Component } from 'vue'
-import { Card } from '@/components/ui/2025'
-import type { CardVariant } from '@/components/ui/2025'
+import { computed, type Component } from 'vue'
+import { Card, type CardVariant } from '@/components/ui/2025'
 
 type TrendTone = 'positive' | 'neutral' | 'negative'
 

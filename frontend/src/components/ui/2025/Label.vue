@@ -1,6 +1,6 @@
 <template>
   <label
-    :for="for"
+    :for="htmlFor"
     :class="computedClasses"
   >
     <slot />
@@ -16,7 +16,7 @@ export type LabelVariant = 'default' | 'muted' | 'success' | 'warning' | 'error'
 
 // Props
 interface Props {
-  for?: string
+  htmlFor?: string
   size?: LabelSize
   variant?: LabelVariant
   required?: boolean

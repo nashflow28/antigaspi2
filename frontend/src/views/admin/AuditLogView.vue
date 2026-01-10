@@ -388,7 +388,7 @@ const pagination = ref<PaginationData>({
 })
 // Available actions could be used for dynamic filtering in future
 const _availableActions = ref<string[]>([])
-void _availableActions // Suppress unused warning
+void _availableActions.value // Suppress unused warning
 const showDetailsModal = ref(false)
 const selectedLog = ref<AuditLog | null>(null)
 const notifications = ref<Notification[]>([])

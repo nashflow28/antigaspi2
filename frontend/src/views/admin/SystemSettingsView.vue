@@ -32,7 +32,7 @@
         class="p-8"
       >
         <div class="flex items-center justify-center">
-          <div class="h-8 w-8 animate-spin rounded-full border-4 border-primary-200 border-t-primary-600"></div>
+          <div class="h-8 w-8 animate-spin rounded-full border-4 border-primary-200 border-t-primary-600" />
           <span class="ml-3 text-neutral-600 dark:text-neutral-300">Chargement des paramètres...</span>
         </div>
       </Card>
@@ -75,7 +75,7 @@
                     type="text"
                     class="input-2025"
                     :placeholder="setting.description"
-                  />
+                  >
                 </div>
               </div>
             </div>
@@ -118,7 +118,7 @@
                     :step="setting.type === 'decimal' ? '0.1' : undefined"
                     class="input-2025"
                     :placeholder="setting.description"
-                  />
+                  >
                 </div>
               </div>
             </div>
@@ -160,7 +160,7 @@
                     type="number"
                     class="input-2025"
                     :placeholder="setting.description"
-                  />
+                  >
                 </div>
               </div>
             </div>
@@ -202,8 +202,8 @@
                       v-model="formData[setting.key]"
                       type="checkbox"
                       class="peer sr-only"
-                    />
-                    <div class="peer h-6 w-11 rounded-full bg-neutral-200 after:absolute after:left-[2px] after:top-[2px] after:h-5 after:w-5 after:rounded-full after:border after:border-neutral-300 after:bg-white after:transition-all after:content-[''] peer-checked:bg-primary-600 peer-checked:after:translate-x-full peer-checked:after:border-white peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary-300 dark:border-neutral-600 dark:bg-neutral-700 dark:peer-focus:ring-primary-800"></div>
+                    >
+                    <div class="peer h-6 w-11 rounded-full bg-neutral-200 after:absolute after:left-[2px] after:top-[2px] after:h-5 after:w-5 after:rounded-full after:border after:border-neutral-300 after:bg-white after:transition-all after:content-[''] peer-checked:bg-primary-600 peer-checked:after:translate-x-full peer-checked:after:border-white peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary-300 dark:border-neutral-600 dark:bg-neutral-700 dark:peer-focus:ring-primary-800" />
                   </label>
                 </div>
               </div>
@@ -247,8 +247,8 @@
                           v-model="formData[setting.key]"
                           type="checkbox"
                           class="peer sr-only"
-                        />
-                        <div class="peer h-6 w-11 rounded-full bg-neutral-200 after:absolute after:left-[2px] after:top-[2px] after:h-5 after:w-5 after:rounded-full after:border after:border-neutral-300 after:bg-white after:transition-all after:content-[''] peer-checked:bg-primary-600 peer-checked:after:translate-x-full peer-checked:after:border-white peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary-300 dark:border-neutral-600 dark:bg-neutral-700 dark:peer-focus:ring-primary-800"></div>
+                        >
+                        <div class="peer h-6 w-11 rounded-full bg-neutral-200 after:absolute after:left-[2px] after:top-[2px] after:h-5 after:w-5 after:rounded-full after:border after:border-neutral-300 after:bg-white after:transition-all after:content-[''] peer-checked:bg-primary-600 peer-checked:after:translate-x-full peer-checked:after:border-white peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary-300 dark:border-neutral-600 dark:bg-neutral-700 dark:peer-focus:ring-primary-800" />
                       </label>
                     </div>
                   </div>
@@ -270,7 +270,7 @@
                         rows="3"
                         class="input-2025"
                         :placeholder="setting.description"
-                      ></textarea>
+                      />
                     </div>
                   </div>
                 </template>
@@ -314,7 +314,7 @@
                     type="number"
                     class="input-2025"
                     :placeholder="setting.description"
-                  />
+                  >
                 </div>
               </div>
             </div>

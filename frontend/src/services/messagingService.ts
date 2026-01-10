@@ -4,7 +4,7 @@ import type {
   Conversation,
   ConversationListPayload,
   ConversationDetailPayload,
-  ConversationMessagePayload,
+  ConversationMessagePayload
 } from '@/types'
 
 class MessagingService {

@@ -270,7 +270,7 @@ interface Summary {
   pending_payments: number
 }
 
-interface Pagination {
+interface PaginationState {
   current_page: number
   total_pages: number
   per_page: number
@@ -296,7 +296,7 @@ const summary = ref<Summary>({
   failed_payments: 0,
   pending_payments: 0
 })
-const pagination = ref<Pagination>({
+const pagination = ref<PaginationState>({
   current_page: 1,
   total_pages: 1,
   per_page: 20,
@@ -403,7 +403,7 @@ const fetchPayments = async () => {
       success: boolean
       data: Payment[]
       summary: Summary
-      pagination: Pagination
+      pagination: PaginationState
     }>(`/admin/payments?${queryParams.toString()}`)
 
     if (response.success) {

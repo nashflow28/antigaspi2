@@ -50,8 +50,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, markRaw, toRaw, useAttrs } from 'vue'
-import type { Component, VNode } from 'vue'
+import { computed, markRaw, toRaw, useAttrs, type Component, type VNode } from 'vue'
 
 defineOptions({ inheritAttrs: false })
 

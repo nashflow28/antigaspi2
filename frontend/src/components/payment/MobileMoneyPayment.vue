@@ -153,7 +153,7 @@
           :value="otp[index] || ''"
           @input="handleOtpInput($event, index)"
           @keydown="handleOtpKeydown($event, index)"
-        />
+        >
       </div>
 
       <p v-if="otpError" class="text-sm text-red-600 dark:text-red-400 text-center">

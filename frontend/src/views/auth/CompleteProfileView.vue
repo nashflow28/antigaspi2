@@ -13,7 +13,7 @@
         </p>
       </div>
 
-      <form @submit.prevent="handleSubmit" class="space-y-6">
+      <form class="space-y-6" @submit.prevent="handleSubmit">
         <!-- Name -->
         <div>
           <Label for="name">Nom complet *</Label>

@@ -1,5 +1,4 @@
-import { computed } from 'vue'
-import type { Component } from 'vue'
+import { computed, type Component } from 'vue'
 import { useRoute } from 'vue-router'
 import {
   ChartBarIcon,

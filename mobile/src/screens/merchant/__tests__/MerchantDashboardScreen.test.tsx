@@ -1,11 +1,7 @@
 // @ts-nocheck
 import React from 'react'
-import { render, fireEvent, waitFor } from '@testing-library/react-native'
-import { Provider } from 'react-redux'
-import { configureStore } from '@reduxjs/toolkit'
+import { render, fireEvent, waitFor, createTestStore as createStore } from '@test-utils'
 import MerchantDashboardScreen from '../MerchantDashboardScreen'
-import authSlice from '../../../store/slices/authSlice'
-import { ThemeProvider } from '../../../theme/ThemeContext'
 import { TEST_IDS } from '../../../utils/testIds'
 import apiService from '../../../services/api'
 
@@ -62,62 +58,55 @@ jest.mock('../../../services/api', () => ({
           },
         })
       }
+      if (url.includes('merchants/reviews/list')) {
+        return Promise.resolve({ data: { data: [] } })
+      }
       return Promise.resolve({ data: {} })
     }),
+    getMerchantLocation: jest.fn(() => Promise.resolve({
+      success: true,
+      data: null,
+    })),
+    updateMerchantLocation: jest.fn(() => Promise.resolve({
+      success: true,
+      data: {
+        latitude: 6.1319,
+        longitude: 1.2228,
+        has_location: true,
+      },
+    })),
   },
 }))
 
-// Create test store
 const createTestStore = () => {
-  return configureStore({
-    reducer: {
-      auth: authSlice,
-    },
-    preloadedState: {
-      auth: {
-        user: {
-          id: 2,
-          first_name: 'Marie',
-          last_name: 'Martin',
-          email: 'boulangerie.martin@email.com',
-          role: 'merchant',
-          merchant: {
-            id: 1,
-            business_name: 'Boulangerie Martin',
-            business_type: 'Boulangerie',
-          },
+  return createStore({
+    auth: {
+      user: {
+        id: 2,
+        first_name: 'Marie',
+        last_name: 'Martin',
+        email: 'boulangerie.martin@email.com',
+        role: 'merchant',
+        merchant: {
+          id: 1,
+          business_name: 'Boulangerie Martin',
+          business_type: 'Boulangerie',
         },
-        token: 'test-token',
-        isAuthenticated: true,
-        loading: false,
-        error: null,
       },
+      token: 'test-token',
+      isAuthenticated: true,
+      loading: false,
+      error: null,
     },
   })
 }
 
 // Helper to render with providers
 const renderWithProviders = (component: React.ReactElement, store: any) => {
-  return render(
-    <Provider store={store}>
-      <ThemeProvider>
-        {component}
-      </ThemeProvider>
-    </Provider>
-  )
+  return render(component, { store })
 }
 
 describe('MerchantDashboardScreen', () => {
-  let consoleErrorSpy: jest.SpyInstance | undefined
-
-  beforeEach(() => {
-    consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {})
-  })
-
-  afterEach(() => {
-    consoleErrorSpy?.mockRestore()
-  })
-
   beforeEach(() => {
     jest.clearAllMocks()
   })
@@ -128,8 +117,8 @@ describe('MerchantDashboardScreen', () => {
       renderWithProviders(<MerchantDashboardScreen />, store)
 
       await waitFor(() => {
-        expect(apiService.get).toHaveBeenCalledWith('/analytics/merchant-stats')
-        expect(apiService.get).toHaveBeenCalledWith('/reservations/merchant/list?limit=5')
+      expect(apiService.get).toHaveBeenCalledWith('/analytics/merchant-stats')
+      expect(apiService.get).toHaveBeenCalledWith('/reservations/merchant/list?limit=5')
       })
     })
 
@@ -151,7 +140,7 @@ describe('MerchantDashboardScreen', () => {
 
       // Initial load: 3 calls (stats, reservations, reviews) + Refresh: 3 more = 6 total
       await waitFor(() => {
-        expect(apiService.get).toHaveBeenCalledTimes(6)
+      expect(apiService.get).toHaveBeenCalledTimes(6)
       })
     })
   })
@@ -182,7 +171,7 @@ describe('MerchantDashboardScreen', () => {
       const store = createTestStore()
       const { getByText } = renderWithProviders(<MerchantDashboardScreen />, store)
 
-      expect(getByText('Réserv. en attente')).toBeTruthy()
+      expect(getByText('Réserv. à traiter')).toBeTruthy()
     })
 
     it('displays todays revenue label', () => {
@@ -197,19 +186,15 @@ describe('MerchantDashboardScreen', () => {
       const { findByText } = renderWithProviders(<MerchantDashboardScreen />, store)
 
       // Wait for API data to load
-      await waitFor(async () => {
-        expect(await findByText('8')).toBeTruthy() // active_products
-        expect(await findByText('5')).toBeTruthy() // pending_reservations
-      })
+      expect(await findByText('8')).toBeTruthy() // active_products
+      expect(await findByText('5')).toBeTruthy() // pending_reservations
     })
 
     it('formats revenue with F currency symbol', async () => {
       const store = createTestStore()
       const { findByText } = renderWithProviders(<MerchantDashboardScreen />, store)
 
-      await waitFor(async () => {
-        expect(await findByText(/12[,\s]?500 F/i)).toBeTruthy()
-      })
+      expect(await findByText(/12[,\s]?500 F/i)).toBeTruthy()
     })
   })
 
@@ -229,7 +214,7 @@ describe('MerchantDashboardScreen', () => {
       fireEvent.press(analyticsButton)
 
       await waitFor(() => {
-        expect(mockNavigate).toHaveBeenCalledWith('Analytics')
+      expect(mockNavigate).toHaveBeenCalledWith('Analytics')
       })
     })
   })
@@ -255,40 +240,32 @@ describe('MerchantDashboardScreen', () => {
       const store = createTestStore()
       const { findByText } = renderWithProviders(<MerchantDashboardScreen />, store)
 
-      await waitFor(async () => {
-        expect(await findByText('Jean Dupont')).toBeTruthy()
-        expect(await findByText('Marie Leblanc')).toBeTruthy()
-      })
+      expect(await findByText('Jean Dupont')).toBeTruthy()
+      expect(await findByText('Marie Leblanc')).toBeTruthy()
     })
 
     it('displays product names for reservations', async () => {
       const store = createTestStore()
       const { findByText } = renderWithProviders(<MerchantDashboardScreen />, store)
 
-      await waitFor(async () => {
-        expect(await findByText('Pain artisanal')).toBeTruthy()
-        expect(await findByText('Croissants')).toBeTruthy()
-      })
+      expect(await findByText('Pain artisanal')).toBeTruthy()
+      expect(await findByText('Croissants')).toBeTruthy()
     })
 
     it('displays reservation status badges', async () => {
       const store = createTestStore()
       const { findByText } = renderWithProviders(<MerchantDashboardScreen />, store)
 
-      await waitFor(async () => {
-        expect(await findByText('En attente')).toBeTruthy() // pending status
-        expect(await findByText('Confirmée')).toBeTruthy() // confirmed status
-      })
+      expect(await findByText('En attente')).toBeTruthy() // pending status
+      expect(await findByText('Confirmée')).toBeTruthy() // confirmed status
     })
 
     it('displays reservation quantities', async () => {
       const store = createTestStore()
       const { findByText } = renderWithProviders(<MerchantDashboardScreen />, store)
 
-      await waitFor(async () => {
-        expect(await findByText(/Qté.*2/i)).toBeTruthy()
-        expect(await findByText(/Qté.*5/i)).toBeTruthy()
-      })
+      expect(await findByText(/Qté.*2/i)).toBeTruthy()
+      expect(await findByText(/Qté.*5/i)).toBeTruthy()
     })
   })
 
@@ -313,9 +290,7 @@ describe('MerchantDashboardScreen', () => {
       const store = createTestStore()
       const { findByText } = renderWithProviders(<MerchantDashboardScreen />, store)
 
-      await waitFor(async () => {
-        expect(await findByText('Aucune réservation récente')).toBeTruthy()
-      })
+      expect(await findByText('Aucune réservation récente')).toBeTruthy()
     })
   })
 
@@ -326,7 +301,7 @@ describe('MerchantDashboardScreen', () => {
 
       // Component should load initially
       await waitFor(() => {
-        expect(getByTestId(TEST_IDS.merchantDashboard)).toBeTruthy()
+      expect(getByTestId(TEST_IDS.merchantDashboard)).toBeTruthy()
       })
     })
   })
@@ -336,18 +311,14 @@ describe('MerchantDashboardScreen', () => {
       const store = createTestStore()
       const { findByText } = renderWithProviders(<MerchantDashboardScreen />, store)
 
-      await waitFor(async () => {
-        expect(await findByText('En attente')).toBeTruthy()
-      })
+      expect(await findByText('En attente')).toBeTruthy()
     })
 
     it('displays correct text for confirmed status', async () => {
       const store = createTestStore()
       const { findByText } = renderWithProviders(<MerchantDashboardScreen />, store)
 
-      await waitFor(async () => {
-        expect(await findByText('Confirmée')).toBeTruthy()
-      })
+      expect(await findByText('Confirmée')).toBeTruthy()
     })
   })
 
@@ -357,7 +328,7 @@ describe('MerchantDashboardScreen', () => {
       const { getByText } = renderWithProviders(<MerchantDashboardScreen />, store)
 
       expect(getByText('Produits actifs')).toBeTruthy()
-      expect(getByText('Réserv. en attente')).toBeTruthy()
+      expect(getByText('Réserv. à traiter')).toBeTruthy()
       expect(getByText("Revenus aujourd'hui")).toBeTruthy()
     })
 
@@ -366,10 +337,8 @@ describe('MerchantDashboardScreen', () => {
       const { findByText } = renderWithProviders(<MerchantDashboardScreen />, store)
 
       // Stats should be numbers
-      await waitFor(async () => {
-        expect(await findByText('8')).toBeTruthy()
-        expect(await findByText('5')).toBeTruthy()
-      })
+      expect(await findByText('8')).toBeTruthy()
+      expect(await findByText('5')).toBeTruthy()
     })
   })
 })

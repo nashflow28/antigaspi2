@@ -24,8 +24,8 @@
       <Alert
         v-if="showSuccess"
         variant="success"
-        @dismiss="showSuccess = false"
         data-testid="broadcast-success-alert"
+        @dismiss="showSuccess = false"
       >
         <template #title>Notification envoyée</template>
         <template #description>
@@ -35,7 +35,7 @@
 
       <!-- Form Card -->
       <Card class="p-6">
-        <form @submit.prevent="handleSubmit" class="space-y-6">
+        <form class="space-y-6" @submit.prevent="handleSubmit">
           <!-- Title Input -->
           <div>
             <Label for="title" required>Titre de la notification</Label>
@@ -80,7 +80,6 @@
               <div
                 v-for="channel in channelOptions"
                 :key="channel.value"
-                @click="toggleChannel(channel.value)"
                 class="cursor-pointer rounded-lg border-2 p-4 transition-all hover:shadow-md"
                 :class="[
                   form.channels.includes(channel.value)
@@ -88,6 +87,7 @@
                     : 'border-neutral-200 bg-white dark:border-neutral-700 dark:bg-neutral-800',
                 ]"
                 :data-testid="`channel-${channel.value}`"
+                @click="toggleChannel(channel.value)"
               >
                 <component
                   :is="channel.icon"
@@ -125,7 +125,6 @@
               <div
                 v-for="role in roleOptions"
                 :key="role.value"
-                @click="toggleRole(role.value)"
                 class="cursor-pointer rounded-lg border-2 p-4 transition-all hover:shadow-md"
                 :class="[
                   form.roles.includes(role.value)
@@ -133,6 +132,7 @@
                     : 'border-neutral-200 bg-white dark:border-neutral-700 dark:bg-neutral-800',
                 ]"
                 :data-testid="`role-${role.value}`"
+                @click="toggleRole(role.value)"
               >
                 <component
                   :is="role.icon"
@@ -192,8 +192,8 @@
               variant="secondary"
               size="lg"
               :disabled="isLoading"
-              @click="resetForm"
               data-testid="broadcast-reset-button"
+              @click="resetForm"
             >
               <XMarkIcon class="h-5 w-5" />
               <span>Réinitialiser</span>
@@ -243,7 +243,7 @@ import {
   ShieldCheckIcon,
   PaperAirplaneIcon,
   XMarkIcon,
-  InformationCircleIcon,
+  InformationCircleIcon
 } from '@heroicons/vue/24/outline'
 import api from '@/services/api'
 import { notify } from '@/composables/useNotifications'
@@ -273,7 +273,7 @@ const form = ref<BroadcastForm>({
   message: '',
   channels: ['database', 'push'],
   roles: [],
-  action_url: '',
+  action_url: ''
 })
 
 const errors = ref<Partial<Record<keyof BroadcastForm, string>>>({})
@@ -286,14 +286,14 @@ const channelOptions = [
   { value: 'database', label: 'Base de données', icon: ServerStackIcon },
   { value: 'push', label: 'Push', icon: BellIcon },
   { value: 'mail', label: 'Email', icon: EnvelopeIcon },
-  { value: 'sms', label: 'SMS', icon: ChatBubbleLeftRightIcon },
+  { value: 'sms', label: 'SMS', icon: ChatBubbleLeftRightIcon }
 ]
 
 // Role options
 const roleOptions = [
   { value: 'consumer', label: 'Consommateurs', icon: UserIcon },
   { value: 'merchant', label: 'Commerçants', icon: BuildingStorefrontIcon },
-  { value: 'admin', label: 'Administrateurs', icon: ShieldCheckIcon },
+  { value: 'admin', label: 'Administrateurs', icon: ShieldCheckIcon }
 ]
 
 // Toggle channel selection
@@ -374,10 +374,10 @@ const handleSubmit = async () => {
     .join(', ')
 
   const confirmed = confirm(
-    `Vous allez envoyer cette notification à:\n\n` +
+    'Vous allez envoyer cette notification à:\n\n' +
     `Cibles: ${targetRoles}\n` +
     `Canaux: ${channelsDisplay}\n\n` +
-    `Cette action ne peut pas être annulée.`
+    'Cette action ne peut pas être annulée.'
   )
 
   if (!confirmed) {
@@ -390,7 +390,7 @@ const handleSubmit = async () => {
     const payload: any = {
       title: form.value.title.trim(),
       message: form.value.message.trim(),
-      channels: form.value.channels,
+      channels: form.value.channels
     }
 
     if (form.value.roles.length > 0) {
@@ -430,7 +430,7 @@ const resetForm = () => {
     message: '',
     channels: ['database', 'push'],
     roles: [],
-    action_url: '',
+    action_url: ''
   }
   errors.value = {}
 }

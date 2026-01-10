@@ -44,7 +44,7 @@
       leave-to-class="opacity-0"
     >
       <div
-        v-if="showSuccessOverlay"
+        v-if="isSuccessOverlayVisible"
         class="relative sm:absolute inset-0 flex items-center justify-center bg-green-50/80 backdrop-blur-sm"
       >
         <div class="flex items-center space-y-4 sm:space-x-2 text-green-600">
@@ -95,7 +95,7 @@ const { imageRef, isLoaded, isLoading, hasError } = useLazyImage({
   errorClass: 'lazy-error opacity-25'
 })
 
-const showSuccessOverlay = ref(false)
+const isSuccessOverlayVisible = ref(false)
 
 // Image optimisée
 const optimizedSrc = computed(() => {
@@ -122,9 +122,9 @@ const placeholder = computed(() => {
 // Watcher pour afficher brièvement le succès
 watch(isLoaded, (loaded) => {
   if (loaded && props.showSuccessOverlay) {
-    showSuccessOverlay.value = true
+    isSuccessOverlayVisible.value = true
     setTimeout(() => {
-      showSuccessOverlay.value = false
+      isSuccessOverlayVisible.value = false
     }, 1000)
   }
 })

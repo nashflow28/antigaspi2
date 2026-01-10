@@ -136,8 +136,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, useSlots, watch } from 'vue'
-import type { Component } from 'vue'
+import { computed, ref, useSlots, watch, type Component } from 'vue'
 import { MotionComponent as Motion } from '@vueuse/motion'
 import { breakpointsTailwind, useBreakpoints } from '@vueuse/core'
 

@@ -133,8 +133,8 @@
                   type="button"
                   variant="ghost"
                   size="sm"
-                  @click="resetForm"
                   :disabled="isSaving"
+                  @click="resetForm"
                 >
                   Réinitialiser
                 </Button>

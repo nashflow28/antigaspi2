@@ -81,7 +81,7 @@
               variant="filled"
               :max="analyticsRange.end || todayIso"
               :disabled="loadingStates.analytics"
-              @update:modelValue="markCustomRange"
+              @update:model-value="markCustomRange"
             />
           </div>
           <div class="lg:col-span-4">
@@ -93,7 +93,7 @@
               :min="analyticsRange.start"
               :max="todayIso"
               :disabled="loadingStates.analytics"
-              @update:modelValue="markCustomRange"
+              @update:model-value="markCustomRange"
             />
           </div>
           <div class="flex flex-col justify-end gap-3 lg:col-span-4">
@@ -291,7 +291,7 @@
                 Suivi jour par jour des indicateurs clés : chiffre d'affaires, réservations et impact.
               </p>
             </div>
-            <Badge variant="primary" size="sm" v-if="analyticsDailyBreakdown.length > 0">
+            <Badge v-if="analyticsDailyBreakdown.length > 0" variant="primary" size="sm">
               {{ analyticsDailyBreakdown.length }} jours analysés
             </Badge>
           </div>

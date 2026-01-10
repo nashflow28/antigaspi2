@@ -229,12 +229,12 @@
               <Label>Nombre de points</Label>
               <Input
                 :model-value="awardForm.points ?? undefined"
-                @update:model-value="(v: number | string | undefined) => awardForm.points = typeof v === 'number' ? v : null"
                 type="number"
                 min="1"
                 max="1000"
                 required
                 placeholder="Ex: 50"
+                @update:model-value="(v: number | string | undefined) => awardForm.points = typeof v === 'number' ? v : null"
               />
             </div>
 

@@ -44,8 +44,7 @@
 
 <script setup lang="ts">
 import type { Component } from 'vue'
-import { Card, Button } from '@/components/ui/2025'
-import type { CardVariant, ButtonVariant } from '@/components/ui/2025'
+import { Card, Button, type CardVariant, type ButtonVariant } from '@/components/ui/2025'
 import { ArrowRight } from 'lucide-vue-next'
 
 interface QuickAction {

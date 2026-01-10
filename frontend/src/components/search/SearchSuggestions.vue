@@ -132,7 +132,7 @@ import {
   getSuggestions,
   type SearchSuggestionHistoryEntry,
   type SearchSuggestionPopularEntry,
-  type SearchSuggestionsData,
+  type SearchSuggestionsData
 } from '@/services/searchService'
 
 const props = withDefaults(
@@ -148,8 +148,8 @@ const props = withDefaults(
     historyLimit: 6,
     popularLimit: 6,
     autoFetch: true,
-    showRefresh: true,
-  },
+    showRefresh: true
+  }
 )
 
 const emit = defineEmits<{
@@ -233,7 +233,7 @@ const rebuildSuggestionSnapshot = () => {
 const setSuggestions = (data: SearchSuggestionsData) => {
   suggestions.value = {
     ...data,
-    suggestions: [...data.suggestions],
+    suggestions: [...data.suggestions]
   }
 
   rebuildSuggestionSnapshot()
@@ -252,7 +252,7 @@ const fetchSuggestions = async () => {
     const response = await getSuggestions({
       query: props.query,
       historyLimit: props.historyLimit,
-      popularLimit: props.popularLimit,
+      popularLimit: props.popularLimit
     })
 
     if (response?.data) {
@@ -282,7 +282,7 @@ watch(
     if (props.autoFetch) {
       debouncedFetch()
     }
-  },
+  }
 )
 
 const emitSelect = (query: string) => {
@@ -336,7 +336,7 @@ watch(
     if (!hasMatches) {
       debouncedFetch()
     }
-  },
+  }
 )
 
 watch(
@@ -345,16 +345,16 @@ watch(
     if (autoFetch && !suggestions.value) {
       debouncedFetch()
     }
-  },
+  }
 )
 
 watch(
   () => [suggestions.value?.history.length, suggestions.value?.popular.length],
-  rebuildSuggestionSnapshot,
+  rebuildSuggestionSnapshot
 )
 
 const exposed = {
-  refresh,
+  refresh
 }
 
 defineExpose(exposed)

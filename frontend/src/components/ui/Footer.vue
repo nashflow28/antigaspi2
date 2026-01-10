@@ -40,8 +40,7 @@
 </template>
 
 <script setup lang="ts">
-import type { Component } from 'vue'
-import { computed, h } from 'vue'
+import { computed, h, type Component } from 'vue'
 import { MotionComponent as Motion } from '@vueuse/motion'
 
 interface SocialNetwork {

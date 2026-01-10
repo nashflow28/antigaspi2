@@ -3,7 +3,6 @@ import type { Meta, StoryObj } from '@storybook/vue3'
 import ThemeToggle, { type ThemeMode } from '@/components/ui/2025/ThemeToggle.vue'
 
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const meta: Meta<any> = {
   title: 'Design System 2025/Theme Toggle',
   component: ThemeToggle,
@@ -55,7 +54,7 @@ const meta: Meta<any> = {
 
 export default meta
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+
 type Story = StoryObj<any>;
 
 export const Playground: Story = {

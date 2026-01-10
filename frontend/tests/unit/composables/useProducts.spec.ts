@@ -57,7 +57,7 @@ describe('useProducts Composable', () => {
   })
 
   it('should set loading state correctly during API call', async () => {
-    // eslint-disable-next-line no-unused-vars
+
     let resolvePromise: (value: unknown) => void
     const apiPromise = new Promise(resolve => {
       resolvePromise = resolve

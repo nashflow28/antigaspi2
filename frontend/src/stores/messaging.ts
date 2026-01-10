@@ -23,7 +23,7 @@ export const useMessagingStore = defineStore('messaging', {
     sending: false,
     error: null,
     wsConnected: false,
-    unsubscribe: null,
+    unsubscribe: null
   }),
   actions: {
     // WebSocket integration
@@ -180,7 +180,7 @@ export const useMessagingStore = defineStore('messaging', {
 
         const creation = await messagingService.createConversation({
           merchantId: params.merchantId,
-          consumerId: params.consumerId,
+          consumerId: params.consumerId
         })
 
         const conversationId = creation.data.conversation.id
@@ -231,6 +231,6 @@ export const useMessagingStore = defineStore('messaging', {
     clearActiveConversation() {
       this.activeConversation = null
       this.messages = []
-    },
-  },
+    }
+  }
 })

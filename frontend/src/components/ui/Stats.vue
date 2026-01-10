@@ -27,8 +27,7 @@
 </template>
 
 <script setup lang="ts">
-import type { Component } from 'vue'
-import { defineComponent, onMounted, ref, watch, computed } from 'vue'
+import { computed, defineComponent, onMounted, ref, watch, type Component } from 'vue'
 import { MotionComponent as Motion } from '@vueuse/motion'
 import { useTransition } from '@vueuse/core'
 
