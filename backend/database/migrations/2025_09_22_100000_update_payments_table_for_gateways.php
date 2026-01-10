@@ -12,7 +12,7 @@ return new class extends Migration
     {
         // Drop foreign key constraint first (needed before dropping indexes)
         Schema::table('payments', function (Blueprint $table) {
-            $table->dropForeign('payments_reservation_id_foreign');
+            $table->dropForeign(['reservation_id']);
         });
 
         Schema::table('payments', function (Blueprint $table) {
@@ -60,7 +60,7 @@ return new class extends Migration
     {
         // Drop foreign key constraint first
         Schema::table('payments', function (Blueprint $table) {
-            $table->dropForeign('payments_reservation_id_foreign');
+            $table->dropForeign(['reservation_id']);
         });
 
         Schema::table('payments', function (Blueprint $table) {
