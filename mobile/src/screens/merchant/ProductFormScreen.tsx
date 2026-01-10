@@ -642,6 +642,7 @@ const ProductFormScreen: React.FC<Props> = ({ route, navigation }) => {
             value={expirationDate}
             onChange={setExpirationDate}
             minDate={new Date()}
+            testID={TEST_IDS.expirationDateInput}
           />
         </View>
 

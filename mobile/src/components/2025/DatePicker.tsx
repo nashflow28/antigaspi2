@@ -34,6 +34,7 @@ interface DatePickerProps {
   placeholder?: string
   disabled?: boolean
   error?: string
+  testID?: string
 }
 
 const DAYS_FR = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim']
@@ -76,6 +77,7 @@ const DatePicker: React.FC<DatePickerProps> = ({
   placeholder = 'Sélectionner une date',
   disabled = false,
   error,
+  testID,
 }) => {
   const theme = useTheme()
   const [visible, setVisible] = useState(false)
@@ -176,6 +178,7 @@ const DatePicker: React.FC<DatePickerProps> = ({
         accessibilityRole="button"
         accessibilityLabel={label || 'Sélecteur de date'}
         accessibilityHint="Appuyez pour ouvrir le calendrier"
+        testID={testID}
       >
         <Ionicons
           name="calendar-outline"

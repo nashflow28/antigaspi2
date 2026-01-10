@@ -38,5 +38,5 @@ jobs:
       - name: Run Jest tests
         env:
           CI: true
-        run: npm test -- --maxWorkers=50%
+        run: npm run test:coverage -- --passWithNoTests
 
