@@ -1,6 +1,6 @@
 /**
  * OTP Service
- * Handles SMS OTP verification (non-Firebase fallback)
+ * Handles SMS OTP verification via backend API
  */
 
 import { apiService } from '@/services/api'

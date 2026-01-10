@@ -95,7 +95,6 @@ import { ShieldCheck, Loader2, ArrowLeft } from 'lucide-vue-next'
 import Card from '@/components/ui/2025/Card.vue'
 import Button from '@/components/ui/2025/Button.vue'
 import Label from '@/components/ui/2025/Label.vue'
-import { firebaseService } from '@/services/firebaseService'
 import { otpService } from '@/services/otpService'
 import { useAuthStore } from '@/stores/auth'
 import { notify } from '@/composables/useNotifications'
@@ -117,7 +116,6 @@ let countdownInterval: ReturnType<typeof setInterval> | null = null
 
 const phone = computed(() => route.query.phone as string || '')
 const mode = computed(() => route.query.mode as 'login' | 'register' || 'login')
-const provider = computed(() => route.query.provider as string || 'firebase')
 
 const maskedPhone = computed(() => {
   if (!phone.value) return ''
@@ -206,22 +204,18 @@ const handleVerify = async () => {
   try {
     let result
 
-    if (provider.value === 'firebase') {
-      result = await firebaseService.verifyOTP(otp.value)
+    if (mode.value === 'login') {
+      result = await otpService.loginWithOTP(phone.value, otp.value)
     } else {
-      if (mode.value === 'login') {
-        result = await otpService.loginWithOTP(phone.value, otp.value)
+      const pendingData = sessionStorage.getItem('pendingRegistration')
+      if (pendingData) {
+        const userData = JSON.parse(pendingData)
+        result = await otpService.registerWithOTP({
+          ...userData,
+          code: otp.value
+        })
       } else {
-        const pendingData = sessionStorage.getItem('pendingRegistration')
-        if (pendingData) {
-          const userData = JSON.parse(pendingData)
-          result = await otpService.registerWithOTP({
-            ...userData,
-            code: otp.value
-          })
-        } else {
-          result = await otpService.verifyOTP(phone.value, otp.value)
-        }
+        result = await otpService.verifyOTP(phone.value, otp.value)
       }
     }
 
@@ -260,13 +254,7 @@ const handleResend = async () => {
   error.value = ''
 
   try {
-    let result
-
-    if (provider.value === 'firebase') {
-      result = await firebaseService.sendOTP(phone.value)
-    } else {
-      result = await otpService.resendOTP(phone.value)
-    }
+    const result = await otpService.resendOTP(phone.value)
 
     if (result.success) {
       notify.success('Code envoyé', 'Un nouveau code a été envoyé')
@@ -284,7 +272,6 @@ const handleResend = async () => {
 }
 
 const goBack = () => {
-  firebaseService.cleanup()
   router.push({
     name: mode.value === 'login' ? 'phone-login' : 'phone-register'
   })

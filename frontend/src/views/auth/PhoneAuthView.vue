@@ -69,9 +69,6 @@
           </p>
         </div>
 
-        <!-- reCAPTCHA container (invisible) -->
-        <div id="recaptcha-container"></div>
-
         <!-- Submit Button -->
         <Button
           type="submit"
@@ -123,14 +120,13 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { ref, computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { Phone, AlertCircle, Loader2 } from 'lucide-vue-next'
 import Card from '@/components/ui/2025/Card.vue'
 import Button from '@/components/ui/2025/Button.vue'
 import Input from '@/components/ui/2025/Input.vue'
 import Label from '@/components/ui/2025/Label.vue'
-import { firebaseService } from '@/services/firebaseService'
 import { otpService } from '@/services/otpService'
 
 const router = useRouter()
@@ -139,7 +135,6 @@ const route = useRoute()
 const isLogin = ref(route.name === 'phone-login')
 const loading = ref(false)
 const error = ref('')
-const useFirebase = ref(false) // Use backend OTP service (more reliable for mobile)
 
 const form = ref({
   name: '',
@@ -205,59 +200,31 @@ const handleSubmit = async () => {
   try {
     const fullPhone = formatPhoneNumber(form.value.phone)
 
-    if (useFirebase.value) {
-      // Firebase authentication
-      let result
+    // Send OTP via backend SMS service
+    const result = await otpService.sendOTP(
+      fullPhone,
+      isLogin.value ? 'login' : 'register'
+    )
 
-      if (isLogin.value) {
-        result = await firebaseService.loginWithPhone(fullPhone)
-      } else {
-        result = await firebaseService.registerWithPhone(fullPhone, {
+    if (result.success) {
+      // Store registration data if needed
+      if (!isLogin.value) {
+        sessionStorage.setItem('pendingRegistration', JSON.stringify({
           name: form.value.name,
-          email: form.value.email
-        })
+          email: form.value.email,
+          phone: fullPhone
+        }))
       }
 
-      if (result.success) {
-        // Navigate to OTP verification
-        router.push({
-          name: 'otp-verify',
-          query: {
-            phone: fullPhone,
-            mode: isLogin.value ? 'login' : 'register'
-          }
-        })
-      } else {
-        error.value = result.error || 'Erreur lors de l\'envoi du code'
-      }
-    } else {
-      // Custom OTP service
-      const result = await otpService.sendOTP(
-        fullPhone,
-        isLogin.value ? 'login' : 'register'
-      )
-
-      if (result.success) {
-        // Store registration data if needed
-        if (!isLogin.value) {
-          sessionStorage.setItem('pendingRegistration', JSON.stringify({
-            name: form.value.name,
-            email: form.value.email,
-            phone: fullPhone
-          }))
+      router.push({
+        name: 'otp-verify',
+        query: {
+          phone: fullPhone,
+          mode: isLogin.value ? 'login' : 'register'
         }
-
-        router.push({
-          name: 'otp-verify',
-          query: {
-            phone: fullPhone,
-            mode: isLogin.value ? 'login' : 'register',
-            provider: 'sms'
-          }
-        })
-      } else {
-        error.value = result.error || 'Erreur lors de l\'envoi du code'
-      }
+      })
+    } else {
+      error.value = result.error || 'Erreur lors de l\'envoi du code'
     }
   } catch (err: any) {
     error.value = err.message || 'Une erreur est survenue'
@@ -266,14 +233,4 @@ const handleSubmit = async () => {
   }
 }
 
-onMounted(async () => {
-  // Setup Firebase reCAPTCHA if using Firebase
-  if (useFirebase.value) {
-    await firebaseService.setupRecaptcha('recaptcha-container')
-  }
-})
-
-onUnmounted(() => {
-  firebaseService.cleanup()
-})
 </script>
