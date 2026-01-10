@@ -16,8 +16,7 @@ vi.mock('@/composables/useNotifications', () => {
 })
 
 import { nextTick } from 'vue'
-import { useCartStore } from '@/stores/cart'
-import type { CartItem } from '@/stores/cart'
+import { useCartStore, type CartItem } from '@/stores/cart'
 
 const notifyMock = () => import('@/composables/useNotifications').then(module => module.notify)
 
@@ -70,11 +69,6 @@ describe('Cart store smoke tests', () => {
     await notifyMock()
     vi.clearAllMocks()
     window.localStorage.clear()
-
-    const originalSetItem = Storage.prototype.setItem
-    if (localStorage.setItem !== originalSetItem) {
-      localStorage.setItem = originalSetItem
-    }
   })
 
   it('exposes empty state and derived helpers by default', () => {
