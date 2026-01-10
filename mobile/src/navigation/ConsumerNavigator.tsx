@@ -28,6 +28,7 @@ import CartScreen from '../screens/main/CartScreen'
 import WalletScreen from '../screens/main/WalletScreen'
 import MerchantMessagingScreen from '../screens/main/MerchantMessagingScreen'
 import PaymentStatusScreen from '../screens/main/PaymentStatusScreen'
+import MerchantMapScreen from '../screens/main/MerchantMapScreen'
 import { TEST_IDS } from '../utils/testIds'
 import LoyaltyScreen from '../screens/main/LoyaltyScreen'
 import SurpriseBasketDetailsScreen from '../screens/main/SurpriseBasketDetailsScreen'
@@ -43,6 +44,7 @@ const HomeStack = () => (
     <Stack.Screen name="SurpriseBasketDetails" component={SurpriseBasketDetailsScreen} />
     <Stack.Screen name="ReservationDetails" component={ReservationDetailsScreen} />
     <Stack.Screen name="MerchantDetail" component={MerchantDetailScreen} />
+    <Stack.Screen name="MerchantMap" component={MerchantMapScreen} />
     <Stack.Screen name="ReviewsList" component={ReviewsListScreen} />
     <Stack.Screen name="AddReview" component={AddReviewScreen} />
     <Stack.Screen name="MerchantMessaging" component={MerchantMessagingScreen} />
@@ -57,6 +59,7 @@ const ProductsStack = () => (
       <Stack.Screen name="SurpriseBasketDetails" component={SurpriseBasketDetailsScreen} />
       <Stack.Screen name="ReservationDetails" component={ReservationDetailsScreen} />
       <Stack.Screen name="MerchantDetail" component={MerchantDetailScreen} />
+      <Stack.Screen name="MerchantMap" component={MerchantMapScreen} />
       <Stack.Screen name="ReviewsList" component={ReviewsListScreen} />
       <Stack.Screen name="AddReview" component={AddReviewScreen} />
       <Stack.Screen name="MerchantMessaging" component={MerchantMessagingScreen} />
