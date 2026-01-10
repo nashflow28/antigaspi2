@@ -74,7 +74,7 @@ const CheckoutConfirmationModal: React.FC<CheckoutConfirmationModalProps> = ({
 
   const paymentOption = PAYMENT_OPTIONS.find(opt => opt.value === paymentMethod)
   const totalItems = cart?.items?.reduce((sum, item) => sum + item.quantity, 0) ?? 0
-  const cartTotal = cart?.total ?? 0
+  const cartTotal = cart?.total_amount ?? 0
 
   const formatPickupDate = (dateStr: string | null) => {
     if (!dateStr) return 'Non définie'

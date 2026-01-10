@@ -123,6 +123,38 @@ export default function RewardsScreen() {
     fetchRewards()
   }, [selectedType, showAffordableOnly])
 
+  const executeRedeem = async (reward: Reward) => {
+    setRedeeming(true)
+    try {
+      const response = await rewardsService.redeemReward(reward.id)
+      if (response.success) {
+        showAlert({
+          title: 'Succès !',
+          message: `Votre code de récompense : ${response.data?.redemption.redemption_code}\n\nPrésentez ce code au commerçant pour l'utiliser.`,
+          type: 'success',
+        })
+        setCurrentPoints(response.data?.remaining_points || 0)
+        setSelectedReward(null)
+        fetchRedemptions()
+        fetchRewards()
+      } else {
+        showAlert({
+          title: 'Erreur',
+          message: response.message || 'Échec de l\'échange',
+          type: 'error',
+        })
+      }
+    } catch (error: any) {
+      showAlert({
+        title: 'Erreur',
+        message: error.message || 'Erreur lors de l\'échange',
+        type: 'error',
+      })
+    } finally {
+      setRedeeming(false)
+    }
+  }
+
   const handleRedeem = async (reward: Reward) => {
     if (currentPoints < reward.points_required) {
       showAlert({
@@ -136,38 +168,11 @@ export default function RewardsScreen() {
     showAlert({
       title: 'Confirmer l\'échange',
       message: `Voulez-vous échanger ${reward.points_required} points contre "${reward.name}" ?`,
-      type: 'confirm',
-      onConfirm: async () => {
-        setRedeeming(true)
-        try {
-          const response = await rewardsService.redeemReward(reward.id)
-          if (response.success) {
-            showAlert({
-              title: 'Succès !',
-              message: `Votre code de récompense : ${response.data?.redemption.redemption_code}\n\nPrésentez ce code au commerçant pour l'utiliser.`,
-              type: 'success',
-            })
-            setCurrentPoints(response.data?.remaining_points || 0)
-            setSelectedReward(null)
-            fetchRedemptions()
-            fetchRewards()
-          } else {
-            showAlert({
-              title: 'Erreur',
-              message: response.message || 'Échec de l\'échange',
-              type: 'error',
-            })
-          }
-        } catch (error: any) {
-          showAlert({
-            title: 'Erreur',
-            message: error.message || 'Erreur lors de l\'échange',
-            type: 'error',
-          })
-        } finally {
-          setRedeeming(false)
-        }
-      },
+      type: 'info',
+      buttons: [
+        { text: 'Annuler', style: 'cancel' },
+        { text: 'Confirmer', onPress: () => executeRedeem(reward) },
+      ],
     })
   }
 

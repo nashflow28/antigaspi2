@@ -1,37 +1,26 @@
 import React from 'react'
 import { render, fireEvent, waitFor, screen } from '@testing-library/react-native'
 import ExportReservationsButton from './ExportReservationsButton'
-import * as FileSystem from 'expo-file-system/legacy'
-import * as Sharing from 'expo-sharing'
 import { Reservation } from '../../types'
 import { TEST_IDS } from '../../utils/testIds'
+import * as excelExportService from '../../services/excelExportService'
 
-// Create a mutable mock for FileSystem
-let mockDocumentDirectory: string | null | undefined = 'file:///data/user/0/com.app/files/'
+// Mock the excelExportService
+jest.mock('../../services/excelExportService', () => ({
+  exportReservationsToExcel: jest.fn(() => Promise.resolve('file:///mock/path/reservations.xlsx')),
+  shareExcelFile: jest.fn(() => Promise.resolve()),
+}))
 
-// Mock dependencies
-jest.mock('expo-file-system/legacy', () => ({
-  get documentDirectory() {
-    return mockDocumentDirectory
-  },
-  set documentDirectory(value) {
-    mockDocumentDirectory = value
-  },
-  writeAsStringAsync: jest.fn(() => Promise.resolve()),
-  EncodingType: {
-    UTF8: 'utf8',
-  },
-}))
-jest.mock('expo-sharing', () => ({
-  isAvailableAsync: jest.fn(() => Promise.resolve(true)),
-  shareAsync: jest.fn(() => Promise.resolve()),
-}))
+// Mock theme
 jest.mock('../../theme', () => {
   const { mockUseTheme } = require('../../__mocks__/themeMock')
   return {
     useTheme: mockUseTheme,
   }
 })
+
+const mockExportReservationsToExcel = excelExportService.exportReservationsToExcel as jest.MockedFunction<typeof excelExportService.exportReservationsToExcel>
+const mockShareExcelFile = excelExportService.shareExcelFile as jest.MockedFunction<typeof excelExportService.shareExcelFile>
 
 const expectAlertModal = async (titleMatcher: string | RegExp, messageMatcher?: string | RegExp) => {
   await waitFor(() => {
@@ -114,13 +103,9 @@ describe('ExportReservationsButton', () => {
   beforeEach(() => {
     jest.clearAllMocks()
 
-    // Reset documentDirectory to default value
-    mockDocumentDirectory = 'file:///data/user/0/com.app/files/'
-
     // Reset mock implementations to defaults
-    ;(FileSystem.writeAsStringAsync as jest.Mock).mockResolvedValue(undefined)
-    ;(Sharing.isAvailableAsync as jest.Mock).mockResolvedValue(true)
-    ;(Sharing.shareAsync as jest.Mock).mockResolvedValue(undefined)
+    mockExportReservationsToExcel.mockResolvedValue('file:///mock/path/reservations.xlsx')
+    mockShareExcelFile.mockResolvedValue(undefined)
   })
 
   // ============ RENDERING TESTS ============
@@ -132,7 +117,7 @@ describe('ExportReservationsButton', () => {
 
   test('should display export text', () => {
     const { getByText } = render(<ExportReservationsButton reservations={mockReservations} />)
-    expect(getByText('Exporter CSV')).toBeTruthy()
+    expect(getByText('Exporter Excel')).toBeTruthy()
   })
 
   test('should display reservation count badge', () => {
@@ -145,7 +130,7 @@ describe('ExportReservationsButton', () => {
     const button = getByTestId('export-reservations-csv-button')
 
     // When disabled, button should still render with text
-    expect(getByText('Exporter CSV')).toBeTruthy()
+    expect(getByText('Exporter Excel')).toBeTruthy()
 
     // But should not show a badge (no count)
     expect(queryByText('0')).toBeNull()
@@ -156,32 +141,10 @@ describe('ExportReservationsButton', () => {
     const button = getByTestId('export-reservations-csv-button')
 
     // Should render button text
-    expect(getByText('Exporter CSV')).toBeTruthy()
+    expect(getByText('Exporter Excel')).toBeTruthy()
 
     // Should show badge with count
     expect(getByText('2')).toBeTruthy()
-  })
-
-  // ============ BUG-001 FIX VERIFICATION ============
-
-  test('should handle null FileSystem.documentDirectory gracefully', async () => {
-    mockDocumentDirectory = null
-
-    const { getByTestId } = render(<ExportReservationsButton reservations={mockReservations} />)
-    fireEvent.press(getByTestId('export-reservations-csv-button'))
-
-    await expectAlertModal("Erreur d'export", /syst/i)
-
-    expect(FileSystem.writeAsStringAsync).not.toHaveBeenCalled()
-  })
-
-  test('should handle undefined FileSystem.documentDirectory gracefully', async () => {
-    mockDocumentDirectory = undefined
-
-    const { getByTestId } = render(<ExportReservationsButton reservations={mockReservations} />)
-    fireEvent.press(getByTestId('export-reservations-csv-button'))
-
-    await expectAlertModal("Erreur d'export", /syst/i)
   })
 
   // ============ EXPORT FUNCTIONALITY TESTS ============
@@ -199,195 +162,26 @@ describe('ExportReservationsButton', () => {
     })
   })
 
-  test('should generate CSV file with UTF-8 BOM', async () => {
+  test('should call exportReservationsToExcel with reservations', async () => {
     const { getByTestId } = render(<ExportReservationsButton reservations={mockReservations} />)
     fireEvent.press(getByTestId('export-reservations-csv-button'))
 
     await waitFor(() => {
-      expect(FileSystem.writeAsStringAsync).toHaveBeenCalledWith(
-        expect.any(String),
-        expect.stringContaining('\uFEFF'), // UTF-8 BOM
-        { encoding: FileSystem.EncodingType.UTF8 }
+      expect(mockExportReservationsToExcel).toHaveBeenCalledWith(
+        mockReservations,
+        expect.objectContaining({})
       )
     })
   })
 
-  test('should create file with timestamp in filename', async () => {
+  test('should call shareExcelFile after export', async () => {
     const { getByTestId } = render(<ExportReservationsButton reservations={mockReservations} />)
     fireEvent.press(getByTestId('export-reservations-csv-button'))
 
     await waitFor(() => {
-      expect(FileSystem.writeAsStringAsync).toHaveBeenCalledWith(
-        expect.stringMatching(/reservations-export-.*\.csv$/),
-        expect.any(String),
-        expect.any(Object)
-      )
-    })
-  })
-
-  test('should include CSV headers', async () => {
-    const { getByTestId } = render(<ExportReservationsButton reservations={mockReservations} />)
-    fireEvent.press(getByTestId('export-reservations-csv-button'))
-
-    await waitFor(() => {
-      const [[, csvContent]] = (FileSystem.writeAsStringAsync as jest.Mock).mock.calls
-      expect(csvContent).toContain('ID,Code Réservation,Client')
-    })
-  })
-
-  test('should include all reservation data', async () => {
-    const { getByTestId } = render(<ExportReservationsButton reservations={mockReservations} />)
-    fireEvent.press(getByTestId('export-reservations-csv-button'))
-
-    await waitFor(() => {
-      const [[, csvContent]] = (FileSystem.writeAsStringAsync as jest.Mock).mock.calls
-      expect(csvContent).toContain('RES001')
-      expect(csvContent).toContain('Jean Dupont')
-      expect(csvContent).toContain('Pain complet')
-    })
-  })
-
-  // ============ CSV ESCAPING TESTS ============
-
-  test('should escape commas in CSV fields', async () => {
-    const reservationWithComma = {
-      ...mockReservations[0],
-      notes: 'Apporter sac, emballage, carte',
-    }
-
-    const { getByTestId } = render(
-      <ExportReservationsButton reservations={[reservationWithComma]} />
-    )
-    fireEvent.press(getByTestId('export-reservations-csv-button'))
-
-    await waitFor(() => {
-      const [[, csvContent]] = (FileSystem.writeAsStringAsync as jest.Mock).mock.calls
-      // Field with commas should be quoted
-      expect(csvContent).toContain('"Apporter sac, emballage, carte"')
-    })
-  })
-
-  test('should escape quotes in CSV fields', async () => {
-    const reservationWithQuotes = {
-      ...mockReservations[0],
-      product: {
-        ...mockReservations[0].product,
-        name: 'Pain "spécial"',
-      },
-    }
-
-    const { getByTestId } = render(
-      <ExportReservationsButton reservations={[reservationWithQuotes]} />
-    )
-    fireEvent.press(getByTestId('export-reservations-csv-button'))
-
-    await waitFor(() => {
-      const [[, csvContent]] = (FileSystem.writeAsStringAsync as jest.Mock).mock.calls
-      // Quotes should be doubled and field quoted
-      expect(csvContent).toContain('"Pain ""spécial"""')
-    })
-  })
-
-  test('should prevent CSV injection with = prefix', async () => {
-    const maliciousReservation = {
-      ...mockReservations[0],
-      notes: '=CMD|"/C calc"!A1',
-    }
-
-    const { getByTestId } = render(
-      <ExportReservationsButton reservations={[maliciousReservation]} />
-    )
-    fireEvent.press(getByTestId('export-reservations-csv-button'))
-
-    await waitFor(() => {
-      const [[, csvContent]] = (FileSystem.writeAsStringAsync as jest.Mock).mock.calls
-      // Should prefix with single quote to prevent injection
-      expect(csvContent).toContain("\"'=CMD")
-    })
-  })
-
-  test('should prevent CSV injection with + prefix', async () => {
-    const maliciousReservation = {
-      ...mockReservations[0],
-      notes: '+CMD',
-    }
-
-    const { getByTestId } = render(
-      <ExportReservationsButton reservations={[maliciousReservation]} />
-    )
-    fireEvent.press(getByTestId('export-reservations-csv-button'))
-
-    await waitFor(() => {
-      const [[, csvContent]] = (FileSystem.writeAsStringAsync as jest.Mock).mock.calls
-      expect(csvContent).toContain("\"'+CMD\"")
-    })
-  })
-
-  test('should prevent CSV injection with - prefix', async () => {
-    const maliciousReservation = {
-      ...mockReservations[0],
-      notes: '-2+3+cmd|"/C calc"!A1',
-    }
-
-    const { getByTestId } = render(
-      <ExportReservationsButton reservations={[maliciousReservation]} />
-    )
-    fireEvent.press(getByTestId('export-reservations-csv-button'))
-
-    await waitFor(() => {
-      const [[, csvContent]] = (FileSystem.writeAsStringAsync as jest.Mock).mock.calls
-      expect(csvContent).toContain("\"'-2+3+cmd")
-    })
-  })
-
-  test('should prevent CSV injection with @ prefix', async () => {
-    const maliciousReservation = {
-      ...mockReservations[0],
-      notes: '@SUM(1+1)',
-    }
-
-    const { getByTestId } = render(
-      <ExportReservationsButton reservations={[maliciousReservation]} />
-    )
-    fireEvent.press(getByTestId('export-reservations-csv-button'))
-
-    await waitFor(() => {
-      const [[, csvContent]] = (FileSystem.writeAsStringAsync as jest.Mock).mock.calls
-      expect(csvContent).toContain("\"'@SUM")
-    })
-  })
-
-  // ============ SHARING TESTS ============
-
-  test('should check if sharing is available', async () => {
-    const { getByTestId } = render(<ExportReservationsButton reservations={mockReservations} />)
-    fireEvent.press(getByTestId('export-reservations-csv-button'))
-
-    await waitFor(() => {
-      expect(Sharing.isAvailableAsync).toHaveBeenCalled()
-    })
-  })
-
-  test('should show error when sharing not available', async () => {
-    ;(Sharing.isAvailableAsync as jest.Mock).mockResolvedValue(false)
-
-    const { getByTestId } = render(<ExportReservationsButton reservations={mockReservations} />)
-    fireEvent.press(getByTestId('export-reservations-csv-button'))
-
-    await expectAlertModal('Erreur', /partage de fichiers/i)
-  })
-
-  test('should share CSV file with correct MIME type', async () => {
-    const { getByTestId } = render(<ExportReservationsButton reservations={mockReservations} />)
-    fireEvent.press(getByTestId('export-reservations-csv-button'))
-
-    await waitFor(() => {
-      expect(Sharing.shareAsync).toHaveBeenCalledWith(
-        expect.any(String),
-        expect.objectContaining({
-          mimeType: 'text/csv',
-          UTI: 'public.comma-separated-values-text',
-        })
+      expect(mockShareExcelFile).toHaveBeenCalledWith(
+        'file:///mock/path/reservations.xlsx',
+        expect.any(String)
       )
     })
   })
@@ -396,7 +190,7 @@ describe('ExportReservationsButton', () => {
     const { getByTestId } = render(<ExportReservationsButton reservations={mockReservations} />)
     fireEvent.press(getByTestId('export-reservations-csv-button'))
 
-    await expectAlertModal(/2.*réserv/i)
+    await expectAlertModal(/Excel.*réussi/i)
   })
 
   test('should call onExportComplete callback', async () => {
@@ -414,7 +208,7 @@ describe('ExportReservationsButton', () => {
 
   test('should call onExportError callback on failure', async () => {
     const onExportError = jest.fn()
-    ;(FileSystem.writeAsStringAsync as jest.Mock).mockRejectedValue(new Error('Write error'))
+    mockExportReservationsToExcel.mockRejectedValue(new Error('Write error'))
 
     const { getByTestId } = render(
       <ExportReservationsButton reservations={mockReservations} onExportError={onExportError} />
@@ -430,8 +224,8 @@ describe('ExportReservationsButton', () => {
   // ============ LOADING STATE TESTS ============
 
   test('should disable button while loading', async () => {
-    ;(FileSystem.writeAsStringAsync as jest.Mock).mockImplementation(
-      () => new Promise((resolve) => setTimeout(resolve, 100))
+    mockExportReservationsToExcel.mockImplementation(
+      () => new Promise((resolve) => setTimeout(() => resolve('file:///path.xlsx'), 100))
     )
 
     const { getByTestId, queryByTestId } = render(<ExportReservationsButton reservations={mockReservations} />)
@@ -446,8 +240,8 @@ describe('ExportReservationsButton', () => {
   })
 
   test('should show loading indicator while exporting', async () => {
-    ;(FileSystem.writeAsStringAsync as jest.Mock).mockImplementation(
-      () => new Promise((resolve) => setTimeout(resolve, 100))
+    mockExportReservationsToExcel.mockImplementation(
+      () => new Promise((resolve) => setTimeout(() => resolve('file:///path.xlsx'), 100))
     )
 
     const { getByTestId } = render(<ExportReservationsButton reservations={mockReservations} />)
@@ -462,7 +256,7 @@ describe('ExportReservationsButton', () => {
 
     fireEvent.press(button)
 
-    await expectAlertModal(/export.*succ/i)
+    await expectAlertModal(/export.*réussi/i)
 
     // Loading indicator should be gone (button is re-enabled)
     expect(queryByTestId(TEST_IDS.exportReservationsLoading)).toBeNull()
@@ -478,11 +272,11 @@ describe('ExportReservationsButton', () => {
     expect(() => getByText('0')).toThrow()
 
     // And the button text should still be visible
-    expect(getByText('Exporter CSV')).toBeTruthy()
+    expect(getByText('Exporter Excel')).toBeTruthy()
   })
 
-  test('should handle file write error gracefully', async () => {
-    ;(FileSystem.writeAsStringAsync as jest.Mock).mockRejectedValue(
+  test('should handle export error gracefully', async () => {
+    mockExportReservationsToExcel.mockRejectedValue(
       new Error('No storage space')
     )
 
@@ -493,7 +287,7 @@ describe('ExportReservationsButton', () => {
   })
 
   test('should handle sharing error gracefully', async () => {
-    ;(Sharing.shareAsync as jest.Mock).mockRejectedValue(new Error('Share cancelled'))
+    mockShareExcelFile.mockRejectedValue(new Error('Share cancelled'))
 
     const { getByTestId } = render(<ExportReservationsButton reservations={mockReservations} />)
     fireEvent.press(getByTestId('export-reservations-csv-button'))
@@ -502,44 +296,6 @@ describe('ExportReservationsButton', () => {
   })
 
   // ============ EDGE CASES ============
-
-  test('should handle reservation with missing consumer data', async () => {
-    const reservationNoConsumer = {
-      ...mockReservations[0],
-      consumer: undefined,
-    }
-
-    const { getByTestId } = render(
-      <ExportReservationsButton reservations={[reservationNoConsumer as any]} />
-    )
-    fireEvent.press(getByTestId('export-reservations-csv-button'))
-
-    await waitFor(() => {
-      const [[, csvContent]] = (FileSystem.writeAsStringAsync as jest.Mock).mock.calls
-      expect(csvContent).toContain('Client inconnu')
-    })
-  })
-
-  test('should handle reservation with null values', async () => {
-    const reservationWithNulls = {
-      ...mockReservations[0],
-      pickup_date: null,
-      pickup_time: null,
-      notes: null,
-      confirmed_at: null,
-      completed_at: null,
-      cancelled_at: null,
-    }
-
-    const { getByTestId } = render(
-      <ExportReservationsButton reservations={[reservationWithNulls as any]} />
-    )
-    fireEvent.press(getByTestId('export-reservations-csv-button'))
-
-    await waitFor(() => {
-      expect(FileSystem.writeAsStringAsync).toHaveBeenCalled()
-    })
-  })
 
   test('should handle single reservation export', async () => {
     const { getByTestId, getByText } = render(
@@ -551,7 +307,7 @@ describe('ExportReservationsButton', () => {
 
     fireEvent.press(getByTestId('export-reservations-csv-button'))
 
-    await expectAlertModal(/1.*réservation.*succ/i)
+    await expectAlertModal(/1.*réservation/i)
   })
 
   test('should handle large number of reservations', async () => {
@@ -570,7 +326,22 @@ describe('ExportReservationsButton', () => {
     fireEvent.press(getByTestId('export-reservations-csv-button'))
 
     await waitFor(() => {
-      expect(FileSystem.writeAsStringAsync).toHaveBeenCalled()
+      expect(mockExportReservationsToExcel).toHaveBeenCalled()
+    })
+  })
+
+  test('should pass merchantName to export service', async () => {
+    const { getByTestId } = render(
+      <ExportReservationsButton reservations={mockReservations} merchantName="Boulangerie Martin" />
+    )
+
+    fireEvent.press(getByTestId('export-reservations-csv-button'))
+
+    await waitFor(() => {
+      expect(mockExportReservationsToExcel).toHaveBeenCalledWith(
+        mockReservations,
+        expect.objectContaining({ merchantName: 'Boulangerie Martin' })
+      )
     })
   })
 })

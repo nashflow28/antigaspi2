@@ -710,7 +710,7 @@ const AdminProductsScreen: React.FC = () => {
               </View>
             )}
           </View>
-          <TouchableOpacity onPress={loadData} accessibilityLabel="Rafraîchir les produits" testID="refresh-products-button">
+          <TouchableOpacity onPress={() => loadData()} accessibilityLabel="Rafraîchir les produits" testID="refresh-products-button">
             <Ionicons name="refresh" size={24} color="white" testID="refresh-icon" />
           </TouchableOpacity>
         </View>

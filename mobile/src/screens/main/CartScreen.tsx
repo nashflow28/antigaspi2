@@ -322,7 +322,7 @@ const CartScreen: React.FC<Props> = ({ navigation }) => {
       const response = await dispatch(
         checkoutCart({
           paymentMethod: selectedPaymentMethod,
-          pickupDate: selectedPickupDate,
+          pickupDate: selectedPickupDate ?? new Date().toISOString().split('T')[0],
           pickupTime: selectedPickupTime,
           notes: notes.trim() ? notes.trim() : undefined,
           customerPhone: customerPhone.trim() ? customerPhone.trim() : undefined,
