@@ -110,7 +110,6 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
 import { apiService } from '@/services/api'
 import { notify } from '@/composables/useNotifications'
 import { useDashboardLayout } from '@/composables/useDashboardLayout'
@@ -142,7 +141,6 @@ import {
 const { sidebar, header } = useDashboardLayout('admin')
 
 // State
-const router = useRouter()
 const loading = ref(false)
 const products = ref<Product[]>([])
 const searchQuery = ref('')
@@ -224,7 +222,7 @@ const filteredProducts = computed(() => {
 
   // Category filter
   if (activeFilters.value.category && activeFilters.value.category !== 'all') {
-    filtered = filtered.filter(p => p.category_id === parseInt(activeFilters.value.category))
+    filtered = filtered.filter(p => p.category?.id === parseInt(activeFilters.value.category))
   }
 
   return filtered
@@ -234,8 +232,8 @@ const paginatedProducts = computed(() => {
   return filteredProducts.value.map(product => ({
     id: product.id,
     name: product.name,
-    merchant: `Commerçant #${product.merchant_id}`,
-    category: product.category_name || `Cat. ${product.category_id}`,
+    merchant: product.merchant?.business_name || `Commerçant #${product.merchant?.id}`,
+    category: product.category?.name || `Cat. ${product.category?.id}`,
     price: `${product.discounted_price || product.original_price} XOF`,
     quantity: product.quantity_available || 0,
     status: product.is_active ? 'Actif' : 'Inactif',
@@ -278,20 +276,6 @@ const applyFilters = () => {
 const resetFilters = () => {
   searchQuery.value = ''
   activeFilters.value = {}
-}
-
-const viewProduct = (productId: number) => {
-  router.push(`/products/${productId}`)
-}
-
-const toggleProductStatus = async (productId: number, currentStatus: boolean) => {
-  try {
-    await apiService.updateProductStatus(productId, !currentStatus)
-    notify.success(`Produit ${currentStatus ? 'désactivé' : 'activé'}`, 'Succès')
-    await fetchProducts()
-  } catch (error: any) {
-    notify.error(error.message || 'Erreur lors de la mise à jour', 'Erreur')
-  }
 }
 
 // Lifecycle

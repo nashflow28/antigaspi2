@@ -1,14 +1,9 @@
 import type { Meta, StoryObj } from '@storybook/vue3'
 import Skeleton from '@/components/ui/Skeleton.vue'
 
-type SkeletonComponent = typeof Skeleton;
 
-type StoryProps = {
-  widthClass: string;
-  heightClass: string;
-};
-
-const meta: Meta<SkeletonComponent & StoryProps> = {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const meta: Meta<any> = {
   title: 'UI/Skeleton',
   component: Skeleton,
   tags: ['autodocs'],
@@ -48,7 +43,8 @@ const meta: Meta<SkeletonComponent & StoryProps> = {
 
 export default meta
 
-type Story = StoryObj<typeof meta>;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type Story = StoryObj<any>;
 
 export const Playground: Story = {}
 
@@ -59,7 +55,8 @@ export const ListPlaceholder: Story = {
     rounded: 'lg'
   },
   decorators: [
-    (story, context) => ({
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    ((story: any, context: any) => ({
       components: { Story: story() },
       setup() {
         return { args: context.args }
@@ -71,7 +68,7 @@ export const ListPlaceholder: Story = {
           <Story :args="{ ...args, widthClass: 'w-2/3' }" />
         </div>
       `
-    })
+    })) as any
   ]
 }
 
@@ -105,13 +102,14 @@ export const ResponsiveBanner: Story = {
     layout: 'fullscreen'
   },
   decorators: [
-    (story) => ({
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    ((story: any) => ({
       components: { Story: story() },
       template: `
         <div class="mx-auto w-full max-w-5xl px-6 py-10">
           <Story />
         </div>
       `
-    })
+    })) as any
   ]
 }

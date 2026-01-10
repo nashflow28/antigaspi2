@@ -282,7 +282,7 @@ const confirmCheckout = async () => {
   cartStore.clearCart({ silent: true })
 
   if (subscribeNotifications.value) {
-    favoritesStore.hydrateFromStorage()
+    void favoritesStore.initialize()
     notify.info('Nous vous préviendrons lors des prochaines disponibilités similaires.', 'Notifications activées')
   }
 

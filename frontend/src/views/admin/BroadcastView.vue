@@ -203,7 +203,7 @@
       </Card>
 
       <!-- Info Card -->
-      <Card variant="info" class="p-5">
+      <Card variant="bordered" class="p-5">
         <div class="flex gap-3">
           <InformationCircleIcon class="h-6 w-6 flex-shrink-0 text-primary-600 dark:text-primary-400" />
           <div class="space-y-2 text-sm text-neutral-700 dark:text-neutral-300">
@@ -224,8 +224,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
-import { useRouter } from 'vue-router'
+import { ref } from 'vue'
 import DashboardLayout from '@/layouts/DashboardLayout.vue'
 import { Card } from '@/components/2025/Card'
 import { Button } from '@/components/2025/Button'
@@ -247,12 +246,16 @@ import {
   InformationCircleIcon,
 } from '@heroicons/vue/24/outline'
 import api from '@/services/api'
-import { useNotificationStore } from '@/stores/notification'
+import { notify } from '@/composables/useNotifications'
 import { useSidebarAdmin } from '@/composables/useSidebarAdmin'
 import { useHeader } from '@/composables/useHeader'
 
-const router = useRouter()
-const notificationStore = useNotificationStore()
+interface BroadcastResponse {
+  data: {
+    recipient_count: number
+    channels: string[]
+  }
+}
 const { sidebar } = useSidebarAdmin()
 const { header } = useHeader('Broadcast Notifications')
 
@@ -398,9 +401,9 @@ const handleSubmit = async () => {
       payload.action_url = form.value.action_url.trim()
     }
 
-    const response = await api.post('/admin/notifications/broadcast', payload)
+    const response = await api.post<BroadcastResponse>('/admin/notifications/broadcast', payload)
 
-    successMessage.value = `${response.data.data.recipient_count} utilisateur(s) ont été notifiés via ${response.data.data.channels.length} canal(aux).`
+    successMessage.value = `${response.data.recipient_count} utilisateur(s) ont été notifiés via ${response.data.channels.length} canal(aux).`
     showSuccess.value = true
 
     // Reset form
@@ -408,10 +411,12 @@ const handleSubmit = async () => {
 
     // Scroll to top
     window.scrollTo({ top: 0, behavior: 'smooth' })
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Error sending broadcast:', error)
-    notificationStore.error(
-      error.response?.data?.message || 'Impossible d\'envoyer la notification'
+    const err = error as { response?: { data?: { message?: string } } }
+    notify.error(
+      err.response?.data?.message || 'Impossible d\'envoyer la notification',
+      'Erreur'
     )
   } finally {
     isLoading.value = false

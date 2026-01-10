@@ -181,7 +181,7 @@ const handleSubmit = async () => {
   error.value = ''
 
   try {
-    const response = await apiService.put('/profile/complete', {
+    const response = await apiService.put<{ success: boolean; message?: string; data?: { user?: Record<string, unknown> } }>('/profile/complete', {
       name: form.value.name,
       email: form.value.email || undefined,
       location: form.value.location || undefined,
@@ -191,7 +191,7 @@ const handleSubmit = async () => {
     if (response.success) {
       // Update user in store
       if (response.data?.user) {
-        authStore.updateUser(response.data.user)
+        authStore.setUser(response.data.user as any)
       }
 
       notify.success('Profil complété', 'Bienvenue sur Antigaspi !')
@@ -220,10 +220,10 @@ onMounted(() => {
   // Pre-fill with existing user data if available
   const user = authStore.user
   if (user) {
-    form.value.name = user.name || ''
+    form.value.name = `${user.first_name || ''} ${user.last_name || ''}`.trim() || ''
     form.value.email = user.email || ''
-    form.value.location = user.location || ''
-    form.value.preferences = user.preferences || []
+    form.value.location = user.city || ''
+    form.value.preferences = (user as any).preferences || []
   }
 })
 </script>

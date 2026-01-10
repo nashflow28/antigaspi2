@@ -30,7 +30,7 @@ export interface MerchantUserProfile {
   address?: string | null
 }
 
-export interface MerchantWithLocation extends Merchant {
+export interface MerchantWithLocation extends Omit<Merchant, 'latitude' | 'longitude'> {
   latitude: number | null
   longitude: number | null
   distance_km?: number | null

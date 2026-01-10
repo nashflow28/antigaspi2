@@ -133,18 +133,18 @@
               :key="activity.id"
               class="flex items-center gap-4 rounded-2xl border border-neutral-200/60 bg-surface-light/70 p-4 transition-colors duration-200 hover:border-primary-400/40 hover:bg-primary-500/5 dark:border-neutral-700/60 dark:bg-surface-dark/70"
             >
-              <div class="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-xl" :class="getActivityIconClass(activity.type)">
-                <component :is="getActivityIcon(activity.type)" class="h-5 w-5" />
+              <div class="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-xl" :class="getActivityIconClass(activity.type ?? 'info')">
+                <component :is="getActivityIcon(activity.type ?? 'info')" class="h-5 w-5" />
               </div>
 
               <div class="flex-grow space-y-1">
                 <p class="text-sm font-semibold text-neutral-900 dark:text-neutral-50">{{ activity.title }}</p>
                 <p class="text-sm text-neutral-500 dark:text-neutral-400">{{ activity.description }}</p>
-                <p class="text-xs text-neutral-400">{{ formatTimeAgo(activity.timestamp) }}</p>
+                <p class="text-xs text-neutral-400">{{ formatTimeAgo(activity.timestamp ?? '') }}</p>
               </div>
 
               <div class="flex-shrink-0">
-                <Badge :variant="getActivityStatusVariant(activity.status)" size="sm">
+                <Badge :variant="getActivityStatusVariant(activity.status ?? 'info')" size="sm">
                   {{ activity.status }}
                 </Badge>
               </div>
@@ -246,15 +246,15 @@
           <div class="mt-6 space-y-4">
             <div class="flex items-center justify-between">
               <span class="text-sm text-neutral-600 dark:text-neutral-300">CO₂ économisé</span>
-              <span class="text-sm font-semibold text-primary-600 dark:text-primary-300">{{ formatNumber(environmentalImpact.co2Saved) }} kg</span>
+              <span class="text-sm font-semibold text-primary-600 dark:text-primary-300">{{ formatNumber(environmentalImpact.co2Saved ?? 0) }} kg</span>
             </div>
             <div class="flex items-center justify-between">
               <span class="text-sm text-neutral-600 dark:text-neutral-300">Eau économisée</span>
-              <span class="text-sm font-semibold text-accent-blue">{{ formatNumber(environmentalImpact.waterSaved) }} L</span>
+              <span class="text-sm font-semibold text-accent-blue">{{ formatNumber(environmentalImpact.waterSaved ?? 0) }} L</span>
             </div>
             <div class="flex items-center justify-between">
               <span class="text-sm text-neutral-600 dark:text-neutral-300">Déchets évités</span>
-              <span class="text-sm font-semibold text-primary-600 dark:text-primary-300">{{ formatNumber(environmentalImpact.wasteSaved) }} kg</span>
+              <span class="text-sm font-semibold text-primary-600 dark:text-primary-300">{{ formatNumber(environmentalImpact.wasteSaved ?? 0) }} kg</span>
             </div>
           </div>
 
@@ -283,7 +283,7 @@
                 <p class="text-xs text-neutral-500 dark:text-neutral-400">{{ merchant.productsSold }} produits vendus</p>
               </div>
               <div class="text-right text-sm font-semibold text-neutral-900 dark:text-neutral-100">
-                {{ formatCurrency(merchant.revenue) }}
+                {{ formatCurrency(merchant.revenue ?? 0) }}
               </div>
             </div>
           </div>
@@ -1531,12 +1531,12 @@ const loadAdvancedAnalytics = async () => {
       ? response.daily_breakdown
       : []
     geographicDistribution.value = normalizeGeographicDistribution(
-      (response as Record<string, unknown>).geographic_distribution ??
-        (response as Record<string, unknown>).geographicDistribution
+      ((response as Record<string, unknown>).geographic_distribution ??
+        (response as Record<string, unknown>).geographicDistribution) as AnalyticsGeographicDistributionEntry[] | Record<string, unknown> | undefined
     )
     merchantPerformance.value = normalizeMerchantPerformance(
-      (response as Record<string, unknown>).merchant_performance ??
-        (response as Record<string, unknown>).merchantPerformance
+      ((response as Record<string, unknown>).merchant_performance ??
+        (response as Record<string, unknown>).merchantPerformance) as AnalyticsMerchantPerformanceEntry[] | Record<string, unknown> | undefined
     )
     analyticsLastUpdated.value = new Date().toISOString()
   } catch (error) {
@@ -1770,7 +1770,7 @@ const handleModalAction = () => {
 // Navigation and actions
 const viewAllActivities = () => {
   const content = `Activités récentes détaillées:\n\n${recentActivities.value.map(activity =>
-    `• ${activity.description}: ${activity.user}\n  ${formatTimeAgo(activity.timestamp)}`
+    `• ${activity.description}: ${activity.user}\n  ${formatTimeAgo(activity.timestamp ?? '')}`
   ).join('\n\n')}`
 
   showModal('🔍 Voir toutes les activités', content, 'info', DocumentTextIcon, 'Gérer les activités')

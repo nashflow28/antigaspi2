@@ -2,16 +2,9 @@ import { ref, watch } from 'vue'
 import type { Meta, StoryObj } from '@storybook/vue3'
 import Textarea from '@/components/ui/Textarea.vue'
 
-type TextareaComponent = typeof Textarea;
 
-type StoryProps = {
-  label: string;
-  helperText: string;
-  error: string;
-  modelValue: string;
-};
-
-const meta: Meta<TextareaComponent & StoryProps> = {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const meta: Meta<any> = {
   title: 'UI/Textarea',
   component: Textarea,
   tags: ['autodocs'],
@@ -91,7 +84,8 @@ const meta: Meta<TextareaComponent & StoryProps> = {
 
 export default meta
 
-type Story = StoryObj<typeof meta>;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type Story = StoryObj<any>;
 
 export const Playground: Story = {}
 
@@ -138,17 +132,18 @@ export const ResponsiveColumns: Story = {
     viewport: { defaultViewport: 'desktop' }
   },
   decorators: [
-    (story, context) => ({
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    ((story: any, context: any) => ({
       components: { Story: story() },
       setup() {
         return { args: context.args }
       },
       template: `
         <div class="mx-auto grid w-full max-w-6xl gap-6 px-6 py-12 lg:grid-cols-2">
-          <Story :args="{ ...args, label: 'Brief marketing', modelValue: 'Mettez en avant l’impact écologique de votre offre.' }" />
-          <Story :args="{ ...args, label: 'Consignes de retrait', modelValue: 'Retrait entre 18h et 19h. Merci d’apporter votre sac.' }" />
+          <Story :args="{ ...args, label: 'Brief marketing', modelValue: 'Mettez en avant l'impact écologique de votre offre.' }" />
+          <Story :args="{ ...args, label: 'Consignes de retrait', modelValue: 'Retrait entre 18h et 19h. Merci d'apporter votre sac.' }" />
         </div>
       `
-    })
+    })) as any
   ]
 }

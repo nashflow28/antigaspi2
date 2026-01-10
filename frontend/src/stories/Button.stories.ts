@@ -3,7 +3,6 @@ import type { Meta, StoryObj } from '@storybook/vue3'
 import Button from '@/components/ui/2025/Button.vue'
 import { ArrowRight, Check, Loader2, ShoppingBag, Star } from 'lucide-vue-next'
 
-type ButtonComponent = typeof Button;
 
 const iconOptions = {
   none: null,
@@ -44,7 +43,8 @@ const renderButton = (args: any) => {
   }
 }
 
-const meta: Meta<ButtonComponent & { label: string; leftIcon: IconOption; rightIcon: IconOption }> = {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const meta: Meta<any> = {
   title: 'UI/Button',
   component: Button,
   tags: ['autodocs'],
@@ -92,7 +92,8 @@ const meta: Meta<ButtonComponent & { label: string; leftIcon: IconOption; rightI
 
 export default meta
 
-type Story = StoryObj<typeof meta>;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type Story = StoryObj<any>;
 
 export const Playground: Story = {}
 
@@ -150,13 +151,14 @@ export const FullWidthMobile: Story = {
     viewport: { defaultViewport: 'mobile' }
   },
   decorators: [
-    (story) => ({
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    ((story: any) => ({
       components: { Story: story() },
       template: `
         <div class="mx-auto w-full max-w-xs px-4 py-8">
           <Story />
         </div>
       `
-    })
+    })) as any
   ]
 }

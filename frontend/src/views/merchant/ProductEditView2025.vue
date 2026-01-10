@@ -362,7 +362,7 @@ type EditableProduct = {
   original_price: number
   discounted_price: number
   quantity_available: number
-  expires_at?: string | null
+  expires_at?: string | undefined
   expiration_date?: string | null
   image_url?: string | null
   status?: string | null
@@ -399,7 +399,7 @@ const transformProductData = (apiProduct: any): EditableProduct => {
     original_price: Number.isNaN(originalPrice) ? 0 : originalPrice,
     discounted_price: Number.isNaN(discountedPrice) ? 0 : discountedPrice,
     quantity_available: Number.isNaN(quantity) ? 0 : quantity,
-    expires_at: apiProduct.expires_at ?? apiProduct.expiration_date ?? null,
+    expires_at: apiProduct.expires_at ?? apiProduct.expiration_date ?? undefined,
     expiration_date: apiProduct.expiration_date ?? apiProduct.expires_at ?? null,
     image_url: apiProduct.image_url ?? null,
     status: apiProduct.status ?? (apiProduct.is_active === false ? 'inactive' : 'active'),
@@ -570,7 +570,7 @@ const handleImageUpload = async (event: Event) => {
     notify.success('Image ajoutée avec succès')
   } catch (err) {
     console.error('[ProductEditView2025] Upload error:', err)
-    const message = err?.response?.data?.message
+    const message = (err as any)?.response?.data?.message
       || (err instanceof Error ? err.message : 'Erreur lors du téléchargement de l\'image')
     notify.error(message)
   }
@@ -591,7 +591,7 @@ const removeImage = () => {
   notify.success('Image supprimée')
 }
 
-const formatDate = (dateString) => {
+const formatDate = (dateString: string | null | undefined) => {
   if (!dateString) return 'N/A'
   return new Intl.DateTimeFormat('fr-FR', {
     day: '2-digit',

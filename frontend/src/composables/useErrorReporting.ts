@@ -18,14 +18,58 @@ interface ErrorMetrics {
   averageResolutionTime: number
 }
 
+interface Breadcrumb {
+  id: string
+  type: 'navigation' | 'click' | 'input' | 'error'
+  message: string
+  timestamp: number
+  data?: Record<string, unknown>
+  level?: 'info' | 'warning' | 'error'
+  category?: string
+}
+
+interface UserAction {
+  id: string
+  type: string
+  target: string
+  timestamp: number
+  metadata?: Record<string, unknown>
+  action?: string
+  data?: Record<string, unknown>
+}
+
+// Extended error queue item for ErrorDashboard compatibility
+interface ErrorQueueItem {
+  error: Error
+  context: ErrorReport
+  metadata?: {
+    severity?: 'low' | 'medium' | 'high' | 'critical'
+    category?: string
+  }
+}
+
 const errorReports = ref<ErrorReport[]>([])
+const errorQueue = ref<ErrorQueueItem[]>([])
+const breadcrumbs = ref<Breadcrumb[]>([])
+const userActions = ref<UserAction[]>([])
 const isReporting = ref(false)
 
 export function useErrorReporting() {
   const reportError = async (error: Error, context: ErrorReport) => {
-    errorReports.value.push({
+    const report: ErrorReport = {
       ...context,
       errorId: context.errorId || generateReportId()
+    }
+    errorReports.value.push(report)
+
+    // Also add to error queue for ErrorDashboard
+    errorQueue.value.push({
+      error,
+      context: report,
+      metadata: {
+        severity: 'low',
+        category: 'runtime'
+      }
     })
 
     if (import.meta.env.PROD) {
@@ -58,12 +102,38 @@ export function useErrorReporting() {
     errorReports.value = []
   }
 
+  const clearErrorQueue = () => {
+    errorQueue.value = []
+  }
+
+  const clearBreadcrumbs = () => {
+    breadcrumbs.value = []
+  }
+
+  const clearUserActions = () => {
+    userActions.value = []
+  }
+
+  const clearAll = () => {
+    errorReports.value = []
+    errorQueue.value = []
+    breadcrumbs.value = []
+    userActions.value = []
+  }
+
   return {
     errorReports: readonly(errorReports),
+    errorQueue: readonly(errorQueue),
+    breadcrumbs: readonly(breadcrumbs),
+    userActions: readonly(userActions),
     isReporting: readonly(isReporting),
     reportError,
     getErrorMetrics,
-    clearReports
+    clearReports,
+    clearErrorQueue,
+    clearBreadcrumbs,
+    clearUserActions,
+    clearAll
   }
 }
 

@@ -268,7 +268,7 @@ const notificationsCount = ref(3)
 const totalProducts = ref(156)
 const toast = reactive({
   open: false,
-  tone: 'success' as const,
+  tone: 'success' as 'success' | 'info' | 'warning',
   title: '',
   description: ''
 })

@@ -498,7 +498,11 @@ const loadStats = async ({ notifyOnError = false }: { notifyOnError?: boolean } 
         total_categories: response.data.total_categories ?? 0,
         active_categories: response.data.active_categories ?? 0,
         categories_with_products: response.data.categories_with_products ?? 0,
-        top_categories: response.data.top_categories ?? []
+        top_categories: (response.data.top_categories ?? []).map(cat => ({
+          id: cat.id,
+          name: cat.name ?? 'Sans nom',
+          products_count: cat.products_count
+        }))
       }
     }
   } catch (error) {
@@ -536,7 +540,8 @@ const openCreateModal = () => {
   }
 }
 
-const editCategory = (category: Category) => {
+const editCategory = (row: Record<string, unknown>) => {
+  const category = row as unknown as Category
   editingCategory.value = category
   form.value = {
     name: category.name,
@@ -578,7 +583,8 @@ const saveCategory = async () => {
   }
 }
 
-const deleteCategory = async (category: Category) => {
+const deleteCategory = async (row: Record<string, unknown>) => {
+  const category = row as unknown as Category
   if ((category.products_count ?? 0) > 0) {
     notify.warning('Impossible de supprimer une catégorie qui contient des produits', 'Attention')
     return
@@ -611,7 +617,8 @@ const deleteCategory = async (category: Category) => {
   }
 }
 
-const toggleCategoryStatus = async (category: Category) => {
+const toggleCategoryStatus = async (row: Record<string, unknown>) => {
+  const category = row as unknown as Category
   try {
     const response = await apiService.toggleCategory(category.id)
 
@@ -637,7 +644,8 @@ const toggleCategoryStatus = async (category: Category) => {
   }
 }
 
-const viewCategory = (category: Category) => {
+const viewCategory = (row: Record<string, unknown>) => {
+  const category = row as unknown as Category
   modal.value = {
     show: true,
     title: `Détails - ${category.name}`,

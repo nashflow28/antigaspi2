@@ -336,7 +336,7 @@
                   :image="product.image_url || defaultProductImage"
                   :name="product.name"
                   :merchant="formatMerchant(product)"
-                  :merchant-rating="product.merchant.rating"
+                  :merchant-rating="(product.merchant as any).rating"
                   :price="formatPrice(product.discounted_price)"
                   :original-price="formatPrice(product.original_price)"
                   :discount="formatDiscount(product.discount)"
@@ -416,7 +416,7 @@
             :image="product.image_url || defaultProductImage"
             :name="product.name"
             :merchant="formatMerchant(product)"
-            :merchant-rating="product.merchant.rating"
+            :merchant-rating="(product.merchant as any).rating"
             :price="formatPrice(product.discounted_price)"
             :original-price="formatPrice(product.original_price)"
             :discount="formatDiscount(product.discount)"
@@ -444,7 +444,7 @@ import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import {
   Search, Filter, MapPin, MapPinned, PackageSearch, Map, Sparkles,
-  TrendingUp, Coffee, Salad, UtensilsCrossed, ShoppingBag, Leaf
+  TrendingUp, Coffee, Salad, UtensilsCrossed
 } from 'lucide-vue-next'
 import Button from '@/components/ui/2025/Button.vue'
 import Card from '@/components/ui/2025/Card.vue'
@@ -577,7 +577,7 @@ const DEFAULT_NORMALIZED_LABEL_TO_SLUG: Record<string, string> = Object.entries(
 )
 
 const CATEGORY_DISPLAY_ORDER = ['bakery', 'dairy', 'meat', 'produce', 'prepared', 'other'] as const
-const CATEGORY_ORDER_MAP = new Map(CATEGORY_DISPLAY_ORDER.map((slug, index) => [slug, index]))
+const CATEGORY_ORDER_MAP = new globalThis.Map<string, number>(CATEGORY_DISPLAY_ORDER.map((slug, index) => [slug, index]))
 
 const categoryLabels = ref<Record<string, string>>({ ...DEFAULT_CATEGORY_LABELS })
 const categorySlugToId = ref<Record<string, number>>({})

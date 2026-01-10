@@ -87,7 +87,7 @@ export function getPerformanceMetrics() {
 /**
  * Performance optimization for route changes
  */
-export function optimizeRouteChange(to: string, from: string) {
+export function optimizeRouteChange(to: string, _from: string) {
   // Preload likely next routes based on current route
   const routePreloadMap: Record<string, string[]> = {
     '/': ['/products', '/about'],

@@ -206,7 +206,7 @@ import Button from '@/components/ui/2025/Button.vue'
 import Card from '@/components/ui/2025/Card.vue'
 import Badge from '@/components/ui/2025/Badge.vue'
 
-const { errorQueue, breadcrumbs, userActions } = useErrorReporting()
+const { errorQueue, breadcrumbs, userActions, clearAll } = useErrorReporting()
 
 const showDashboard = ref(false)
 const activeTab = ref('errors')
@@ -229,9 +229,7 @@ const formatTime = (timestamp: number): string => {
 }
 
 const clearAllErrors = () => {
-  errorQueue.value.splice(0, errorQueue.value.length)
-  breadcrumbs.value.splice(0, breadcrumbs.value.length)
-  userActions.value.splice(0, userActions.value.length)
+  clearAll()
 }
 
 // Keyboard shortcuts

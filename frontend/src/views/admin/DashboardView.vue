@@ -366,7 +366,6 @@
 
 <script setup lang="ts">
 import { computed, nextTick, onMounted, ref, watch } from 'vue'
-import { useAuthStore } from '@/stores/auth'
 import { formatPrice } from '@/utils/currency'
 import apiService from '@/services/api'
 import AdminModal from '@/components/ui/AdminModal.vue'
@@ -424,7 +423,6 @@ ChartJS.register(
   LineController
 )
 
-const authStore = useAuthStore()
 const { sidebar, header } = useDashboardLayout('admin')
 
 const selectedPeriod = ref('month')
@@ -610,15 +608,26 @@ const getAlertIconClass = (type: string): string => {
   return classes[type] || 'text-neutral-500 dark:text-neutral-300'
 }
 
+interface DashboardApiResponse {
+  success: boolean
+  data: {
+    stats: typeof stats.value
+    topMerchants: typeof topMerchants.value
+    popularCategories: typeof popularCategories.value
+    recentActivities: typeof recentActivities.value
+    environmentalImpact: typeof environmentalImpact.value
+  }
+}
+
 const loadDashboardData = async () => {
   try {
-    const data = await apiService.get('/admin/dashboard')
-    if (data.success) {
-      stats.value = data.data.stats
-      topMerchants.value = data.data.topMerchants
-      popularCategories.value = data.data.popularCategories
-      recentActivities.value = data.data.recentActivities
-      environmentalImpact.value = data.data.environmentalImpact
+    const response = await apiService.get<DashboardApiResponse>('/admin/dashboard')
+    if (response.success && response.data) {
+      stats.value = response.data.stats
+      topMerchants.value = response.data.topMerchants
+      popularCategories.value = response.data.popularCategories
+      recentActivities.value = response.data.recentActivities
+      environmentalImpact.value = response.data.environmentalImpact
     }
   } catch (error) {
     loadDemoData()
@@ -687,11 +696,16 @@ const loadDemoData = () => {
   }
 }
 
+interface SystemHealthApiResponse {
+  success: boolean
+  data: typeof systemHealth.value
+}
+
 const loadSystemHealth = async () => {
   try {
-    const data = await apiService.get('/admin/system-health')
-    if (data.success) {
-      systemHealth.value = data.data
+    const response = await apiService.get<SystemHealthApiResponse>('/admin/system-health')
+    if (response.success && response.data) {
+      systemHealth.value = response.data
     }
   } catch (error) {
     systemHealth.value = [
@@ -865,7 +879,7 @@ const quickActions = computed(() => [
   }
 ])
 
-const handleQuickAction = (action: (typeof quickActions.value)[number]) => {
+const handleQuickAction = (action: { handler?: () => void }) => {
   action.handler?.()
 }
 

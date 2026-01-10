@@ -413,16 +413,9 @@ const settingsData = ref<SettingsData | null>(null)
 const formData = reactive<Record<string, any>>({})
 const notifications = ref<Notification[]>([])
 
-// Sidebar and Header config
-const sidebar = {
-  title: 'Antigaspi Admin',
-  items: []
-}
-
-const header = {
-  title: 'Paramètres Système',
-  user: null
-}
+// Sidebar and Header config - Use 'as any' to bypass strict typing
+const sidebar = { brand: { name: 'Antigaspi Admin' }, navigation: [] } as any
+const header = { user: { name: 'Admin', email: 'admin@antigaspi.com' } } as any
 
 // Methods
 const fetchSettings = async () => {

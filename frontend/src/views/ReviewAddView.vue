@@ -28,12 +28,11 @@ import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import ReviewForm from '@/components/reviews/ReviewForm.vue'
 import { useReviewsStore } from '@/stores/reviews'
-import { useNotifications } from '@/composables/useNotifications'
+import { notify } from '@/composables/useNotifications'
 
 const route = useRoute()
 const router = useRouter()
 const reviewsStore = useReviewsStore()
-const { notify } = useNotifications()
 
 const productId = ref<number | null>(null)
 const merchantId = ref<number | null>(null)

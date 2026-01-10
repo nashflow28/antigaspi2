@@ -211,7 +211,7 @@
             </div>
           </Card>
 
-          <Card variant="soft" class="p-6">
+          <Card variant="bordered" class="p-6">
             <div class="flex items-start gap-3">
               <BellRing class="h-5 w-5 text-blue-600" aria-hidden="true" />
               <div>

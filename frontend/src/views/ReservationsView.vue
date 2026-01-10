@@ -271,6 +271,7 @@
 
 <script setup lang="ts">
 import { computed, onMounted, reactive, ref, watch } from 'vue'
+import { storeToRefs } from 'pinia'
 import { useRouter } from 'vue-router'
 import Button from '@/components/ui/Button.vue'
 import Card from '@/components/ui/Card.vue'
@@ -311,14 +312,13 @@ const filters = reactive({
 
 const toast = reactive({
   open: false,
-  tone: 'success' as const,
+  tone: 'success' as 'success' | 'info' | 'warning',
   title: '',
   description: ''
 })
 let toastTimer: number | undefined
 
-const reservations = reservationsStore.reservations
-const loading = reservationsStore.loading
+const { reservations, loading } = storeToRefs(reservationsStore)
 
 const stats = computed(() => ({
   total: reservations.value.length,
@@ -336,6 +336,7 @@ const statCards = computed(() => [
 
 const monthlyImpact = computed(() => {
   const thisMonth = reservations.value.filter(r => {
+    if (!r.created_at) return false
     const reservationDate = new Date(r.created_at)
     const now = new Date()
     return reservationDate.getMonth() === now.getMonth() &&
@@ -362,6 +363,7 @@ const filteredReservationsAll = computed(() => {
   if (filters.period) {
     const now = new Date()
     filtered = filtered.filter(r => {
+      if (!r.created_at) return false
       const date = new Date(r.created_at)
       switch (filters.period) {
         case 'today':
@@ -381,11 +383,11 @@ const filteredReservationsAll = computed(() => {
   filtered.sort((a, b) => {
     switch (sortBy.value) {
       case 'created_at_desc':
-        return new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+        return new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime()
       case 'created_at_asc':
-        return new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
+        return new Date(a.created_at || 0).getTime() - new Date(b.created_at || 0).getTime()
       case 'pickup_date_asc':
-        return new Date(a.pickup_date).getTime() - new Date(b.pickup_date).getTime()
+        return new Date(a.pickup_date || 0).getTime() - new Date(b.pickup_date || 0).getTime()
       case 'status':
         return a.status.localeCompare(b.status)
       default:

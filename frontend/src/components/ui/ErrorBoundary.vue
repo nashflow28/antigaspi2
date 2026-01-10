@@ -204,7 +204,7 @@ const handleError = (error: Error, details: ErrorDetails) => {
     component: details.componentName,
     userAgent: navigator.userAgent,
     url: window.location.href,
-    timestamp: details.timestamp,
+    timestamp: details.timestamp ?? Date.now(),
     retryCount: retryCount.value
   })
 }

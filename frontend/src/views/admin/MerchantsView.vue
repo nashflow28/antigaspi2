@@ -105,8 +105,8 @@
             <Grid
               v-else
               data-testid="pending-merchants-list"
-              cols="1"
-              cols-md="2"
+              :cols="1"
+              :cols-md="2"
               gap="lg"
             >
               <Card
@@ -207,8 +207,8 @@
             <Grid
               v-else
               data-testid="products-list"
-              cols="1"
-              cols-md="2"
+              :cols="1"
+              :cols-md="2"
               gap="lg"
             >
               <Card
@@ -363,13 +363,13 @@
     </div>
 
     <ConfirmModal
-      :is-open="confirmModal.value.isOpen"
-      :type="confirmModal.value.type"
-      :title="confirmModal.value.title"
-      :message="confirmModal.value.message"
-      :confirm-text="confirmModal.value.confirmText"
-      :cancel-text="confirmModal.value.cancelText"
-      @confirm="confirmModal.value.onConfirm"
+      :is-open="confirmModal.isOpen"
+      :type="confirmModal.type"
+      :title="confirmModal.title"
+      :message="confirmModal.message"
+      :confirm-text="confirmModal.confirmText"
+      :cancel-text="confirmModal.cancelText"
+      @confirm="confirmModal.onConfirm"
       @cancel="closeConfirmModal"
     />
 

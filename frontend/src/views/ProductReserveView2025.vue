@@ -102,7 +102,7 @@
             <!-- Formulaire principal -->
             <div class="lg:col-span-2 space-y-6">
               <!-- Étape 1: Détails du produit -->
-              <Card v-if="currentStep === 1" class="animate-fade-in-up">
+              <Card v-if="currentStep === 1 && product" class="animate-fade-in-up">
                 <template #header>
                   <h3 class="text-xl font-semibold text-neutral-900 dark:text-neutral-100">Détails du produit</h3>
                 </template>
@@ -353,7 +353,7 @@
                     placeholder="••••••"
                     class="text-left sm:text-center text-lg tracking-widest"
                     required
-                    @input="(e) => e.target.value = e.target.value.replace(/\D/g, '')"
+                    @input="(e: Event) => { const target = e.target as HTMLInputElement; target.value = target.value.replace(/\D/g, '') }"
                   />
                   <div class="flex items-center justify-start sm:justify-between text-xs text-neutral-500 dark:text-neutral-400">
                     <span>Solde disponible: {{ walletStore.formattedBalance }}</span>
@@ -380,7 +380,7 @@
               </Card>
 
               <!-- Étape 4: Confirmation -->
-              <Card v-if="currentStep === 4" class="animate-fade-in-up">
+              <Card v-if="currentStep === 4 && product" class="animate-fade-in-up">
                 <template #header>
                   <h3 class="text-xl font-semibold text-neutral-900 dark:text-neutral-100">Confirmation de réservation</h3>
                 </template>
@@ -507,7 +507,7 @@
             <!-- Sidebar informations -->
             <div class="space-y-6">
               <!-- Informations marchand -->
-              <Card class="animate-fade-in-up" style="animation-delay: 0.2s;">
+              <Card v-if="product" class="animate-fade-in-up" style="animation-delay: 0.2s;">
                 <template #header>
                   <h3 class="text-lg font-semibold text-neutral-900 dark:text-neutral-100">Marchand</h3>
                 </template>
@@ -517,13 +517,13 @@
                       <Store class="h-6 w-6 text-white" />
                     </div>
                     <div>
-                      <p class="font-semibold text-neutral-900 dark:text-neutral-100">{{ product.merchant.name }}</p>
-                      <p class="text-sm text-neutral-600 dark:text-neutral-300">{{ product.merchant.address }}</p>
+                      <p class="font-semibold text-neutral-900 dark:text-neutral-100">{{ product.merchant?.name }}</p>
+                      <p class="text-sm text-neutral-600 dark:text-neutral-300">{{ product.merchant?.address }}</p>
                     </div>
                   </div>
                   <div class="flex items-center gap-2 text-sm text-neutral-600 dark:text-neutral-300">
                     <MapPin class="h-4 w-4" />
-                    <span>À {{ product.merchant.distance }}km de vous</span>
+                    <span>À {{ product.merchant?.distance }}km de vous</span>
                   </div>
                 </div>
               </Card>
@@ -561,7 +561,7 @@
                   </p>
                   <div class="space-y-4">
                     <div class="text-xl font-semibold text-accent-orange">
-                      {{ Math.round((product.original_price - product.discounted_price) * reservation.quantity).toLocaleString('fr-FR') }} F CFA
+                      {{ Math.round((Number(product?.original_price ?? 0) - Number(product?.discounted_price ?? 0)) * reservation.quantity).toLocaleString('fr-FR') }} F CFA
                     </div>
                     <div class="text-sm text-accent-orange/90">
                       ~{{ Math.round(reservation.quantity * 0.5 * 100) / 100 }}kg CO₂ évités

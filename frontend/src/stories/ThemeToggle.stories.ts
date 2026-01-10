@@ -2,13 +2,9 @@ import { onMounted } from 'vue'
 import type { Meta, StoryObj } from '@storybook/vue3'
 import ThemeToggle, { type ThemeMode } from '@/components/ui/2025/ThemeToggle.vue'
 
-type ThemeToggleComponent = typeof ThemeToggle;
 
-type StoryProps = {
-  initialTheme: ThemeMode;
-};
-
-const meta: Meta<ThemeToggleComponent & StoryProps> = {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const meta: Meta<any> = {
   title: 'Design System 2025/Theme Toggle',
   component: ThemeToggle,
   tags: ['autodocs'],
@@ -59,7 +55,8 @@ const meta: Meta<ThemeToggleComponent & StoryProps> = {
 
 export default meta
 
-type Story = StoryObj<typeof meta>;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type Story = StoryObj<any>;
 
 export const Playground: Story = {
   parameters: {

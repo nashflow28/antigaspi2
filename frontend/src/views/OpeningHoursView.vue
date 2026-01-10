@@ -80,7 +80,7 @@
                           class="w-full rounded-xl border border-neutral-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200 disabled:cursor-not-allowed disabled:bg-neutral-100"
                           :value="day.morning_start || '08:00'"
                           :disabled="!day.is_open"
-                          @input="updateTime(index, 'morning_start', $event.target?.value || '')"
+                          @input="updateTime(index, 'morning_start', ($event.target as HTMLInputElement).value || '')"
                         >
                       </label>
                       <label class="space-y-1 text-xs font-medium text-neutral-600">
@@ -90,7 +90,7 @@
                           class="w-full rounded-xl border border-neutral-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200 disabled:cursor-not-allowed disabled:bg-neutral-100"
                           :value="day.morning_end || '12:00'"
                           :disabled="!day.is_open"
-                          @input="updateTime(index, 'morning_end', $event.target?.value || '')"
+                          @input="updateTime(index, 'morning_end', ($event.target as HTMLInputElement).value || '')"
                         >
                       </label>
                     </div>
@@ -106,7 +106,7 @@
                           class="w-full rounded-xl border border-neutral-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200 disabled:cursor-not-allowed disabled:bg-neutral-100"
                           :value="day.afternoon_start || '14:00'"
                           :disabled="!day.is_open"
-                          @input="updateTime(index, 'afternoon_start', $event.target?.value || '')"
+                          @input="updateTime(index, 'afternoon_start', ($event.target as HTMLInputElement).value || '')"
                         >
                       </label>
                       <label class="space-y-1 text-xs font-medium text-neutral-600">
@@ -116,7 +116,7 @@
                           class="w-full rounded-xl border border-neutral-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200 disabled:cursor-not-allowed disabled:bg-neutral-100"
                           :value="day.afternoon_end || '18:00'"
                           :disabled="!day.is_open"
-                          @input="updateTime(index, 'afternoon_end', $event.target?.value || '')"
+                          @input="updateTime(index, 'afternoon_end', ($event.target as HTMLInputElement).value || '')"
                         >
                       </label>
                     </div>

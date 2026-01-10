@@ -1,5 +1,5 @@
 import { ref, onMounted, onUnmounted, computed } from 'vue'
-import { performanceMonitor, memoryManager, type MemoryManager } from '@/utils/performance'
+import { performanceMonitor, memoryManager } from '@/utils/performance'
 
 export function usePerformance() {
   const metrics = ref({
@@ -30,7 +30,7 @@ export function usePerformance() {
     updateMetrics()
 
     // Update metrics every 5 seconds
-    const interval = memoryManager.addInterval(updateMetrics, 5000)
+    memoryManager.addInterval(updateMetrics, 5000)
 
     // Update on key performance events
     window.addEventListener('load', updateMetrics)

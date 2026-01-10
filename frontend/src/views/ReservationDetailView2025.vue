@@ -145,7 +145,7 @@
               <div>
                 <label class="text-sm font-medium text-neutral-800 dark:text-neutral-200">Montant total</label>
                 <p class="text-xl font-semibold text-primary-600 dark:text-primary-400">
-                  {{ formatPrice(reservation.total_amount) }}
+                  {{ formatPrice(reservation.total_amount ?? 0) }}
                 </p>
               </div>
               <div>
@@ -246,13 +246,13 @@
               </div>
               <div class="flex justify-between items-center">
                 <span class="text-sm">Prix payé</span>
-                <span>{{ formatPrice(reservation.total_amount) }}</span>
+                <span>{{ formatPrice(reservation.total_amount ?? 0) }}</span>
               </div>
               <div class="border-t border-neutral-200/20 dark:border-neutral-700/20 padding-t-sm">
                 <div class="flex justify-between items-center">
                   <span class="font-semibold">Économisé</span>
                   <span class="font-semibold text-lg">
-                    {{ formatPrice((reservation.original_price * reservation.quantity) - reservation.total_amount) }}
+                    {{ formatPrice((reservation.original_price * reservation.quantity) - (reservation.total_amount ?? 0)) }}
                   </span>
                 </div>
               </div>
@@ -376,7 +376,7 @@ const loadReservation = async () => {
         discounted_price: discountedPrice,
         merchant: {
           id: res.product?.merchant?.id,
-          name: res.product?.merchant?.name || res.product?.merchant?.business_name || 'Commerçant inconnu',
+          name: res.product?.merchant?.name || (res.product?.merchant as any)?.business_name || 'Commerçant inconnu',
           address: res.product?.merchant?.address || res.product?.merchant?.city || 'Adresse non renseignée',
           phone: res.product?.merchant?.phone || 'N/A'
         }
@@ -386,7 +386,7 @@ const loadReservation = async () => {
       original_price: originalPrice,
       discounted_price: discountedPrice,
       total_amount: totalAmount,
-      pickup_date: res.pickup_date ?? null,
+      pickup_date: res.pickup_date ?? undefined,
       pickup_notes: res.pickup_notes ?? res.notes ?? '',
       reservation_code: res.reservation_code || `ANT-${res.id.toString().padStart(3, '0')}`
     }

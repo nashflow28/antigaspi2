@@ -248,7 +248,6 @@ import type { PaymentMethod } from '@/types'
 import Badge from '@/components/ui/2025/Badge.vue'
 import Button from '@/components/ui/2025/Button.vue'
 import Card from '@/components/ui/2025/Card.vue'
-import Input from '@/components/ui/2025/Input.vue'
 import Label from '@/components/ui/2025/Label.vue'
 
 const route = useRoute()

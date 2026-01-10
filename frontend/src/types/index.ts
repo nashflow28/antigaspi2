@@ -23,6 +23,12 @@ export interface Merchant {
   address?: string
   phone: string
   is_verified: boolean
+  // Optional properties used in some contexts
+  name?: string
+  distance?: number
+  owner_name?: string
+  latitude?: number
+  longitude?: number
 }
 
 export interface Category {
@@ -715,3 +721,4 @@ export interface ReservationFilters {
   to_date?: string
   product_id?: number
 }
+

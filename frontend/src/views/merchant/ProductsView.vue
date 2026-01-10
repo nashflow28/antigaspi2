@@ -823,7 +823,7 @@ const saveProduct = async () => {
       discounted_price: parseFloat(calculatedDiscountedPrice.value).toString(),
       quantity_available: productForm.value.quantity_available,
       expiration_date: productForm.value.expiration_date,
-      image_url: productForm.value.image_url || null
+      image_url: productForm.value.image_url || undefined
     }
 
     if (showAddProductModal.value) {

@@ -3,7 +3,6 @@ import type { Meta, StoryObj } from '@storybook/vue3'
 import Input from '@/components/ui/2025/Input.vue'
 import { Calendar, Lock, Mail, Search, User } from 'lucide-vue-next'
 
-type InputComponent = typeof Input;
 
 const iconOptions = {
   none: null,
@@ -16,16 +15,9 @@ const iconOptions = {
 
 type IconOption = keyof typeof iconOptions;
 
-type StoryProps = {
-  label: string;
-  helpText: string;
-  error: string;
-  leftIcon: IconOption;
-  rightIcon: IconOption;
-  modelValue: string;
-};
 
-const meta: Meta<InputComponent & StoryProps> = {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const meta: Meta<any> = {
   title: 'UI/Input',
   component: Input,
   tags: ['autodocs'],
@@ -120,7 +112,8 @@ const meta: Meta<InputComponent & StoryProps> = {
 
 export default meta
 
-type Story = StoryObj<typeof meta>;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type Story = StoryObj<any>;
 
 export const Playground: Story = {}
 
@@ -184,13 +177,14 @@ export const MobileFullWidth: Story = {
     viewport: { defaultViewport: 'mobile' }
   },
   decorators: [
-    (story) => ({
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    ((story: any) => ({
       components: { Story: story() },
       template: `
         <div class="mx-auto w-full max-w-sm px-4 py-8">
           <Story />
         </div>
       `
-    })
+    })) as any
   ]
 }

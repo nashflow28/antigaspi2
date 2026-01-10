@@ -111,7 +111,7 @@ export const useProductsStore = defineStore('products', () => {
       notify.error(err.message || 'Erreur lors du chargement des produits', 'Catalogue', {
         action: {
           label: 'Réessayer',
-          callback: () => fetchProducts(customFilters)
+          callback: () => { fetchProducts(customFilters) }
         }
       })
       return { success: false, error: err.message }
@@ -136,7 +136,7 @@ export const useProductsStore = defineStore('products', () => {
       notify.error(err.message || 'Erreur lors du chargement du produit', 'Produit', {
         action: {
           label: 'Réessayer',
-          callback: () => fetchProduct(id)
+          callback: () => { fetchProduct(id) }
         }
       })
       return { success: false, error: err.message }
@@ -160,7 +160,7 @@ export const useProductsStore = defineStore('products', () => {
       notify.error(err.message || 'Erreur lors de la création du produit', 'Catalogue', {
         action: {
           label: 'Réessayer',
-          callback: () => createProduct(productData)
+          callback: () => { createProduct(productData) }
         }
       })
       return { success: false, error: err.message }
@@ -191,7 +191,7 @@ export const useProductsStore = defineStore('products', () => {
       notify.error(err.message || 'Erreur lors de la mise à jour du produit', 'Catalogue', {
         action: {
           label: 'Réessayer',
-          callback: () => updateProduct(id, productData)
+          callback: () => { updateProduct(id, productData) }
         }
       })
       return { success: false, error: err.message }
@@ -219,7 +219,7 @@ export const useProductsStore = defineStore('products', () => {
       notify.error(err.message || 'Erreur lors de la suppression du produit', 'Catalogue', {
         action: {
           label: 'Réessayer',
-          callback: () => deleteProduct(id)
+          callback: () => { deleteProduct(id) }
         }
       })
       return { success: false, error: err.message }

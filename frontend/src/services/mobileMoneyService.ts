@@ -5,6 +5,59 @@
 
 import { apiService } from '@/services/api'
 
+// API Response types
+interface ApiResponse<T = unknown> {
+  success: boolean
+  data?: T
+  message?: string
+  error?: string
+}
+
+interface ProvidersResponse {
+  providers: MobileMoneyConfig[]
+}
+
+interface PaymentInitResponse {
+  transaction_id: string
+  status: 'pending' | 'processing' | 'completed' | 'failed'
+  requires_otp?: boolean
+  external_ref?: string
+}
+
+interface PaymentStatusResponse {
+  status: 'pending' | 'processing' | 'completed' | 'failed' | 'cancelled'
+  amount?: number
+  provider?: MobileMoneyProvider
+  completed_at?: string
+}
+
+interface WithdrawalResponse {
+  transaction_id: string
+  status: 'pending' | 'processing' | 'completed' | 'failed'
+  estimated_time?: string
+}
+
+interface FeesResponse {
+  fees: number
+  total: number
+  breakdown: { fixed: number; percentage: number }
+}
+
+interface TransactionHistoryResponse {
+  transactions: TransactionRecord[]
+  total: number
+  page: number
+  pages: number
+}
+
+interface TransactionRecord {
+  id: string
+  amount: number
+  provider: MobileMoneyProvider
+  status: string
+  created_at: string
+}
+
 export type MobileMoneyProvider = 'flooz' | 'tmoney' | 'orange_money' | 'mtn_momo'
 
 export interface MobileMoneyConfig {
@@ -75,7 +128,7 @@ class MobileMoneyService {
    */
   async getProviders(): Promise<MobileMoneyConfig[]> {
     try {
-      const response = await apiService.get(`${this.baseUrl}/providers`)
+      const response = await apiService.get<ApiResponse<ProvidersResponse>>(`${this.baseUrl}/providers`)
       return response.data?.providers || this.getDefaultProviders()
     } catch (error) {
       console.error('Failed to fetch providers:', error)
@@ -152,7 +205,7 @@ class MobileMoneyService {
         return { success: false, error: amountValidation.error }
       }
 
-      const response = await apiService.post(`${this.baseUrl}/initiate`, {
+      const response = await apiService.post<ApiResponse<PaymentInitResponse>>(`${this.baseUrl}/initiate`, {
         amount: request.amount,
         provider: request.provider,
         phone: this.formatPhone(request.phone),
@@ -161,14 +214,14 @@ class MobileMoneyService {
         metadata: request.metadata
       })
 
-      if (response.success) {
+      if (response.success && response.data) {
         return {
           success: true,
-          transactionId: response.data?.transaction_id,
-          status: response.data?.status || 'pending',
+          transactionId: response.data.transaction_id,
+          status: response.data.status || 'pending',
           message: response.message || 'Paiement initié avec succès',
-          requiresOTP: response.data?.requires_otp,
-          externalRef: response.data?.external_ref
+          requiresOTP: response.data.requires_otp,
+          externalRef: response.data.external_ref
         }
       }
 
@@ -189,16 +242,16 @@ class MobileMoneyService {
    */
   async confirmPayment(transactionId: string, otp: string): Promise<PaymentResult> {
     try {
-      const response = await apiService.post(`${this.baseUrl}/confirm`, {
+      const response = await apiService.post<ApiResponse<PaymentInitResponse>>(`${this.baseUrl}/confirm`, {
         transaction_id: transactionId,
         otp
       })
 
-      if (response.success) {
+      if (response.success && response.data) {
         return {
           success: true,
-          transactionId: response.data?.transaction_id,
-          status: response.data?.status || 'completed',
+          transactionId: response.data.transaction_id,
+          status: response.data.status || 'completed',
           message: response.message || 'Paiement confirmé'
         }
       }
@@ -220,15 +273,15 @@ class MobileMoneyService {
    */
   async checkStatus(transactionId: string): Promise<PaymentStatusResult> {
     try {
-      const response = await apiService.get(`${this.baseUrl}/status/${transactionId}`)
+      const response = await apiService.get<ApiResponse<PaymentStatusResponse>>(`${this.baseUrl}/status/${transactionId}`)
 
-      if (response.success) {
+      if (response.success && response.data) {
         return {
           success: true,
-          status: response.data?.status,
-          amount: response.data?.amount,
-          provider: response.data?.provider,
-          completedAt: response.data?.completed_at,
+          status: response.data.status,
+          amount: response.data.amount,
+          provider: response.data.provider,
+          completedAt: response.data.completed_at,
           message: response.message
         }
       }
@@ -252,7 +305,7 @@ class MobileMoneyService {
    */
   async cancelPayment(transactionId: string): Promise<PaymentResult> {
     try {
-      const response = await apiService.post(`${this.baseUrl}/cancel`, {
+      const response = await apiService.post<ApiResponse<void>>(`${this.baseUrl}/cancel`, {
         transaction_id: transactionId
       })
 
@@ -288,20 +341,20 @@ class MobileMoneyService {
         return { success: false, error: phoneValidation.error }
       }
 
-      const response = await apiService.post(`${this.baseUrl}/withdraw`, {
+      const response = await apiService.post<ApiResponse<WithdrawalResponse>>(`${this.baseUrl}/withdraw`, {
         amount: request.amount,
         provider: request.provider,
         phone: this.formatPhone(request.phone),
         pin: request.pin
       })
 
-      if (response.success) {
+      if (response.success && response.data) {
         return {
           success: true,
-          transactionId: response.data?.transaction_id,
-          status: response.data?.status || 'pending',
+          transactionId: response.data.transaction_id,
+          status: response.data.status || 'pending',
           message: response.message || 'Retrait initié avec succès',
-          estimatedTime: response.data?.estimated_time
+          estimatedTime: response.data.estimated_time
         }
       }
 
@@ -334,12 +387,12 @@ class MobileMoneyService {
     breakdown: { fixed: number; percentage: number }
   }> {
     try {
-      const response = await apiService.post(`${this.baseUrl}/calculate-fees`, {
+      const response = await apiService.post<ApiResponse<FeesResponse>>(`${this.baseUrl}/calculate-fees`, {
         amount,
         provider
       })
 
-      if (response.success) {
+      if (response.success && response.data) {
         return response.data
       }
     } catch {
@@ -492,22 +545,35 @@ class MobileMoneyService {
     limit?: number
     page?: number
   }): Promise<{
-    transactions: any[]
+    transactions: TransactionRecord[]
     total: number
     page: number
     pages: number
   }> {
     try {
-      const response = await apiService.get(`${this.baseUrl}/transactions`, {
-        params: filters
-      })
+      // Build query string from filters
+      let queryString = ''
+      if (filters) {
+        const params = new URLSearchParams()
+        Object.entries(filters).forEach(([key, value]) => {
+          if (value !== undefined && value !== null && value !== '') {
+            params.append(key, String(value))
+          }
+        })
+        const serialized = params.toString()
+        if (serialized) {
+          queryString = `?${serialized}`
+        }
+      }
 
-      if (response.success) {
+      const response = await apiService.get<ApiResponse<TransactionHistoryResponse>>(`${this.baseUrl}/transactions${queryString}`)
+
+      if (response.success && response.data) {
         return {
-          transactions: response.data?.transactions || [],
-          total: response.data?.total || 0,
-          page: response.data?.page || 1,
-          pages: response.data?.pages || 1
+          transactions: response.data.transactions || [],
+          total: response.data.total || 0,
+          page: response.data.page || 1,
+          pages: response.data.pages || 1
         }
       }
     } catch (error) {

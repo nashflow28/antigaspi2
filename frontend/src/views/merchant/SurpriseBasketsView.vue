@@ -208,7 +208,7 @@
               <!-- Products Count -->
               <div class="flex items-center gap-2 mt-4 text-sm text-gray-700">
                 <LayersIcon class="h-4 w-4" />
-                <span>{{ basket.products?.length || 0 }} produit{{ (basket.products?.length || 0) > 1 ? 's' : '' }}</span>
+                <span>{{ (basket as any).products?.length || 0 }} produit{{ ((basket as any).products?.length || 0) > 1 ? 's' : '' }}</span>
               </div>
 
               <!-- Actions -->

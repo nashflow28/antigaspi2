@@ -169,9 +169,9 @@ const router = useRouter()
 const favoritesStore = useFavoritesStore()
 const { items, hasFavorites, loading } = storeToRefs(favoritesStore)
 const filters = [
-  { value: 'all', label: 'Tous' },
-  { value: 'merchant', label: 'Commerçants' },
-  { value: 'product', label: 'Paniers' }
+  { value: 'all' as const, label: 'Tous' },
+  { value: 'merchant' as const, label: 'Commerçants' },
+  { value: 'product' as const, label: 'Paniers' }
 ]
 const filter = ref<'all' | 'merchant' | 'product'>('all')
 

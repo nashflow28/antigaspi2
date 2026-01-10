@@ -13,8 +13,9 @@ import DOMPurify from 'dompurify'
 const SANITIZATION_CONFIGS = {
   // Strictest - text only, no HTML
   TEXT_ONLY: {
-    ALLOWED_TAGS: [],
-    ALLOWED_ATTR: [],
+    ALLOWED_TAGS: [] as string[],
+    ALLOWED_ATTR: [] as string[],
+    ALLOWED_CLASSES: undefined as Record<string, string[]> | undefined,
     KEEP_CONTENT: true
   },
 
@@ -24,7 +25,8 @@ const SANITIZATION_CONFIGS = {
     ALLOWED_ATTR: ['class'],
     ALLOWED_CLASSES: {
       'span': ['text-success', 'text-warning', 'text-info', 'text-error', 'inline-block', 'w-2', 'h-2', 'bg-blue-600', 'rounded-full', 'mr-2', 'mt-1.5', 'flex-shrink-0']
-    }
+    } as Record<string, string[]> | undefined,
+    KEEP_CONTENT: false
   },
 
   // For admin modal content (very restricted)
@@ -33,7 +35,8 @@ const SANITIZATION_CONFIGS = {
     ALLOWED_ATTR: ['class'],
     ALLOWED_CLASSES: {
       'span': ['inline-block', 'w-2', 'h-2', 'bg-blue-600', 'rounded-full', 'mr-2', 'mt-1.5', 'flex-shrink-0', 'text-success', 'text-warning', 'text-info', 'text-error']
-    }
+    } as Record<string, string[]> | undefined,
+    KEEP_CONTENT: false
   }
 }
 
@@ -50,10 +53,10 @@ export function sanitizeHtml(content: string, level: keyof typeof SANITIZATION_C
 
   const config = SANITIZATION_CONFIGS[level]
 
-  return DOMPurify.sanitize(content, {
+  // Build config object, omitting ALLOWED_CLASSES if undefined (not a standard DOMPurify option)
+  const sanitizeConfig: Record<string, unknown> = {
     ALLOWED_TAGS: config.ALLOWED_TAGS,
     ALLOWED_ATTR: config.ALLOWED_ATTR,
-    ALLOWED_CLASSES: config.ALLOWED_CLASSES,
     KEEP_CONTENT: config.KEEP_CONTENT || false,
     // Security options
     FORBID_TAGS: ['script', 'object', 'embed', 'form', 'input', 'textarea', 'select', 'button'],
@@ -62,7 +65,9 @@ export function sanitizeHtml(content: string, level: keyof typeof SANITIZATION_C
     ALLOW_UNKNOWN_PROTOCOLS: false,
     SANITIZE_DOM: true,
     WHOLE_DOCUMENT: false
-  })
+  }
+
+  return DOMPurify.sanitize(content, sanitizeConfig as Parameters<typeof DOMPurify.sanitize>[1])
 }
 
 /**

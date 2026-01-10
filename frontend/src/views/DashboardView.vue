@@ -426,7 +426,7 @@ const currentTip = computed(() => ecoTips.value[currentTipIndex.value])
 // Load recent reservations
 const loadRecentReservations = async () => {
   try {
-    const data = await apiService.get('/reservations?per_page=3')
+    const data = await apiService.get<{ success: boolean; data?: any[] }>('/reservations?per_page=3')
     if (data.success && data.data) {
       // Transform API data to match dashboard interface
       recentReservations.value = data.data.map((res: any) => ({
@@ -438,7 +438,7 @@ const loadRecentReservations = async () => {
           name: res.product?.merchant?.name || res.product?.merchant?.business_name || 'Commerçant inconnu'
         },
         price: parseFloat(res.total_amount || 0),
-        pickup_date: res.pickup_date ? new Date(res.pickup_date) : new Date(res.created_at),
+        pickup_date: res.pickup_date || res.created_at || new Date().toISOString(),
         status: res.status
       }))
     }
@@ -460,14 +460,16 @@ const formatDate = (date: string | Date) => {
   }).format(dateObj)
 }
 
-const getStatusVariant = (status: string) => {
-  const variants = {
+type BadgeVariant = 'default' | 'primary' | 'secondary' | 'success' | 'warning' | 'error' | 'info' | 'outline' | 'promo' | 'soft'
+
+const getStatusVariant = (status: string): BadgeVariant => {
+  const variants: Record<string, BadgeVariant> = {
     confirmed: 'warning',
     completed: 'success',
     cancelled: 'error',
     pending: 'secondary'
   }
-  return variants[status as keyof typeof variants] || 'secondary'
+  return variants[status] || 'secondary'
 }
 
 const getStatusLabel = (status: string) => {

@@ -315,7 +315,7 @@ const filteredMerchants = computed(() => {
           m.longitude
         )
       }
-      return m.distance_km !== undefined && m.distance_km <= maxDistance.value!
+      return m.distance_km !== undefined && m.distance_km !== null && m.distance_km <= maxDistance.value!
     })
   }
 
@@ -377,7 +377,7 @@ const initializeMap = async () => {
     const L = await import('leaflet')
 
     // Initialize map centered on Lomé, Togo
-    const defaultCenter = [6.1319, 1.2228]
+    const defaultCenter: [number, number] = [6.1319, 1.2228]
     map = L.map(mapContainer.value).setView(defaultCenter, 12)
 
     // Add tile layer
@@ -409,6 +409,9 @@ const addMerchantMarkers = async () => {
 
     // Add markers for each filtered merchant
     filteredMerchants.value.forEach(merchant => {
+      // Skip merchants without coordinates
+      if (merchant.latitude === null || merchant.longitude === null) return
+
       const marker = L.marker([merchant.latitude, merchant.longitude], {
         icon: merchantIcon
       }).addTo(map)
@@ -522,7 +525,8 @@ const getCurrentLocation = async () => {
       await addUserLocationMarker()
     }
   } catch (error) {
-    notify.error(error.message, 'Erreur de géolocalisation')
+    const message = error instanceof Error ? error.message : 'Erreur inconnue'
+    notify.error(message, 'Erreur de géolocalisation')
   }
 }
 

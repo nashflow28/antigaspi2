@@ -105,7 +105,7 @@
                   </div>
                   <div>
                     <p class="font-medium text-gray-900">{{ getPointTypeLabel(breakdown.earned_from) }}</p>
-                    <p class="text-sm text-gray-700">{{ formatPoints(parseInt(breakdown.total)) }} points</p>
+                    <p class="text-sm text-gray-700">{{ formatPoints(parseInt(String(breakdown.total))) }} points</p>
                   </div>
                 </div>
                 <div class="text-right">
@@ -351,7 +351,7 @@ interface RewardOption {
 
 const selectedReward = ref<RewardOption | null>(null)
 const redeeming = ref(false)
-const rewardsSection = ref(null)
+const rewardsSection = ref<HTMLElement | null>(null)
 
 const manualPoints = ref('')
 const manualDescription = ref('')
@@ -442,7 +442,7 @@ const refreshPoints = async () => {
 }
 
 const getPointTypeIcon = (type: string) => {
-  const icons = {
+  const icons: Record<string, typeof Star> = {
     'purchase': ShoppingBag,
     'review': MessageSquare,
     'referral': Users,

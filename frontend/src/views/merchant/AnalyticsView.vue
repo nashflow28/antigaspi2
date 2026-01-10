@@ -257,7 +257,7 @@
                 Nombre de réservations reçues par jour.
               </p>
             </div>
-            <Badge variant="neutral" size="sm">
+            <Badge variant="secondary" size="sm">
               {{ formatNumber(summaryMetrics.totalReservations) }} réservations sur la période
             </Badge>
           </div>
@@ -456,7 +456,8 @@ const merchantId = computed<number | null>(() => {
     (user.profile as Record<string, unknown> | undefined)?.merchant
 
   if (nested) {
-    const nestedId = nested.id ?? nested.merchant_id ?? nested.merchantId
+    const typedNested = nested as Record<string, unknown>
+    const nestedId = typedNested['id'] ?? typedNested['merchant_id'] ?? typedNested['merchantId']
     if (typeof nestedId === 'number') {
       return nestedId
     }
@@ -893,9 +894,9 @@ const exportAnalytics = async (format: 'csv' | 'pdf') => {
 
       const addLine = (text: string, options: { bold?: boolean } = {}) => {
         if (options.bold) {
-          doc.setFont(undefined, 'bold')
+          doc.setFont('helvetica', 'bold')
         } else {
-          doc.setFont(undefined, 'normal')
+          doc.setFont('helvetica', 'normal')
         }
         doc.text(text, marginX, cursorY)
         cursorY += 18

@@ -14,6 +14,29 @@ import type {
   ApiResponse
 } from '@/types/wallet'
 
+// Error type for API errors
+interface ApiError {
+  response?: {
+    data?: ApiResponse<unknown>
+  }
+  message?: string
+}
+
+// Pagination type
+interface Pagination {
+  current_page: number
+  last_page: number
+  per_page: number
+  total: number
+}
+
+// Transfer result type
+interface TransferResult {
+  id: string
+  amount: number
+  status: string
+}
+
 class WalletService {
   private readonly baseUrl = '/wallet'
 
@@ -22,10 +45,9 @@ class WalletService {
    */
   async getWallet(): Promise<ApiResponse<{ wallet: Wallet }>> {
     try {
-      const response = await apiService.get(this.baseUrl)
-      return response as any
-    } catch (error: any) {
-      return this.handleError(error) as any
+      return await apiService.get<ApiResponse<{ wallet: Wallet }>>(this.baseUrl)
+    } catch (error: unknown) {
+      return this.handleError(error as ApiError)
     }
   }
 
@@ -34,46 +56,42 @@ class WalletService {
    */
   async processPayment(data: WalletPaymentRequest): Promise<ApiResponse<{ transaction: WalletTransaction }>> {
     try {
-      const response = await apiService.post(`${this.baseUrl}/payment`, data)
-      return response as any
-    } catch (error: any) {
-      return this.handleError(error) as any
+      return await apiService.post<ApiResponse<{ transaction: WalletTransaction }>>(`${this.baseUrl}/payment`, data)
+    } catch (error: unknown) {
+      return this.handleError(error as ApiError)
     }
   }
 
   /**
    * Recharge wallet
    */
-  async rechargeWallet(data: WalletRechargeRequest): Promise<ApiResponse<any>> {
+  async rechargeWallet(data: WalletRechargeRequest): Promise<ApiResponse<{ wallet: Wallet }>> {
     try {
-      const response = await apiService.post(`${this.baseUrl}/recharge`, data)
-      return response as any
-    } catch (error: any) {
-      return this.handleError(error) as any
+      return await apiService.post<ApiResponse<{ wallet: Wallet }>>(`${this.baseUrl}/recharge`, data)
+    } catch (error: unknown) {
+      return this.handleError(error as ApiError)
     }
   }
 
   /**
    * Set wallet PIN
    */
-  async setPin(data: WalletPinRequest): Promise<ApiResponse<any>> {
+  async setPin(data: WalletPinRequest): Promise<ApiResponse<{ wallet: Wallet }>> {
     try {
-      const response = await apiService.post(`${this.baseUrl}/pin`, data)
-      return response as any
-    } catch (error: any) {
-      return this.handleError(error) as any
+      return await apiService.post<ApiResponse<{ wallet: Wallet }>>(`${this.baseUrl}/pin`, data)
+    } catch (error: unknown) {
+      return this.handleError(error as ApiError)
     }
   }
 
   /**
    * Change wallet PIN
    */
-  async changePin(data: WalletChangePinRequest): Promise<ApiResponse<any>> {
+  async changePin(data: WalletChangePinRequest): Promise<ApiResponse<{ success: boolean }>> {
     try {
-      const response = await apiService.put(`${this.baseUrl}/pin`, data)
-      return response as any
-    } catch (error: any) {
-      return this.handleError(error) as any
+      return await apiService.put<ApiResponse<{ success: boolean }>>(`${this.baseUrl}/pin`, data)
+    } catch (error: unknown) {
+      return this.handleError(error as ApiError)
     }
   }
 
@@ -82,10 +100,9 @@ class WalletService {
    */
   async toggleStatus(data: WalletStatusRequest): Promise<ApiResponse<{ wallet: { is_active: boolean } }>> {
     try {
-      const response = await apiService.put(`${this.baseUrl}/status`, data)
-      return response as any
-    } catch (error: any) {
-      return this.handleError(error) as any
+      return await apiService.put<ApiResponse<{ wallet: { is_active: boolean } }>>(`${this.baseUrl}/status`, data)
+    } catch (error: unknown) {
+      return this.handleError(error as ApiError)
     }
   }
 
@@ -94,23 +111,22 @@ class WalletService {
    */
   async updateDailyLimit(data: WalletDailyLimitRequest): Promise<ApiResponse<{ wallet: { daily_limit: number; remaining_daily_limit: number } }>> {
     try {
-      const response = await apiService.put(`${this.baseUrl}/daily-limit`, data)
-      return response as any
-    } catch (error: any) {
-      return this.handleError(error) as any
+      return await apiService.put<ApiResponse<{ wallet: { daily_limit: number; remaining_daily_limit: number } }>>(`${this.baseUrl}/daily-limit`, data)
+    } catch (error: unknown) {
+      return this.handleError(error as ApiError)
     }
   }
 
   /**
    * Get wallet transactions with filters and pagination
    */
-  async getTransactions(filters: TransactionFilters = {}, page: number = 1): Promise<ApiResponse<{ transactions: WalletTransaction[]; pagination: any }>> {
+  async getTransactions(filters: TransactionFilters = {}, page: number = 1): Promise<ApiResponse<{ transactions: WalletTransaction[]; pagination: Pagination }>> {
     try {
       const params = new URLSearchParams()
 
       Object.entries(filters).forEach(([key, value]) => {
         if (value !== undefined && value !== null && value !== '') {
-          params.append(key, value.toString())
+          params.append(key, String(value))
         }
       })
 
@@ -121,10 +137,9 @@ class WalletService {
       const queryString = params.toString()
       const url = queryString ? `${this.baseUrl}/transactions?${queryString}` : `${this.baseUrl}/transactions`
 
-      const response = await apiService.get(url)
-      return response as any
-    } catch (error: any) {
-      return this.handleError(error) as any
+      return await apiService.get<ApiResponse<{ transactions: WalletTransaction[]; pagination: Pagination }>>(url)
+    } catch (error: unknown) {
+      return this.handleError(error as ApiError)
     }
   }
 
@@ -133,38 +148,36 @@ class WalletService {
    */
   async getStats(period: string = 'month'): Promise<ApiResponse<WalletStats>> {
     try {
-      const response = await apiService.get(`${this.baseUrl}/stats?period=${period}`)
-      return response as any
-    } catch (error: any) {
-      return this.handleError(error) as any
+      return await apiService.get<ApiResponse<WalletStats>>(`${this.baseUrl}/stats?period=${period}`)
+    } catch (error: unknown) {
+      return this.handleError(error as ApiError)
     }
   }
 
   /**
    * Transfer money to another user
    */
-  async transferToUser(data: WalletTransferRequest): Promise<ApiResponse<{ transfer: any }>> {
+  async transferToUser(data: WalletTransferRequest): Promise<ApiResponse<{ transfer: TransferResult }>> {
     try {
-      const response = await apiService.post(`${this.baseUrl}/transfer`, data)
-      return response as any
-    } catch (error: any) {
-      return this.handleError(error) as any
+      return await apiService.post<ApiResponse<{ transfer: TransferResult }>>(`${this.baseUrl}/transfer`, data)
+    } catch (error: unknown) {
+      return this.handleError(error as ApiError)
     }
   }
 
   /**
    * Handle API errors consistently
    */
-  private handleError(error: any): ApiResponse<any> {
+  private handleError<T>(error: ApiError): ApiResponse<T> {
     if (error.response?.data) {
-      return error.response.data
+      return error.response.data as ApiResponse<T>
     }
 
     // Network or other errors
     return {
       success: false,
       message: error.message || 'Une erreur inattendue s\'est produite',
-      data: null
+      data: null as unknown as T
     }
   }
 
@@ -261,7 +274,7 @@ class WalletService {
    * Get payment method display info
    */
   getPaymentMethodInfo(method: string): { name: string; description: string; requiresPhone: boolean } {
-    const methods: Record<string, any> = {
+    const methods: Record<string, { name: string; description: string; requiresPhone: boolean }> = {
       flooz: {
         name: 'Flooz',
         description: 'Paiement mobile Flooz',

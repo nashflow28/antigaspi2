@@ -5,9 +5,13 @@ import type {
   Wallet,
   WalletTransaction,
   WalletStats,
-  TransactionFilters,
-  PaginatedResponse
+  TransactionFilters
 } from '@/types/wallet'
+
+// Error type for typed error handling
+interface StoreError {
+  message?: string
+}
 
 export const useWalletStore = defineStore('wallet', () => {
   // State
@@ -52,13 +56,14 @@ export const useWalletStore = defineStore('wallet', () => {
 
     try {
       const response = await walletService.getWallet()
-      if (response.success) {
+      if (response.success && response.data) {
         wallet.value = response.data.wallet
       } else {
         throw new Error(response.message || 'Erreur lors de la récupération du portefeuille')
       }
-    } catch (err: any) {
-      error.value = err.message || 'Erreur lors de la récupération du portefeuille'
+    } catch (err: unknown) {
+      const e = err as StoreError
+      error.value = e.message || 'Erreur lors de la récupération du portefeuille'
       console.error('Fetch wallet error:', err)
     } finally {
       loading.value = false
@@ -83,8 +88,9 @@ export const useWalletStore = defineStore('wallet', () => {
       } else {
         throw new Error(response.message || 'Erreur lors du paiement')
       }
-    } catch (err: any) {
-      error.value = err.message || 'Erreur lors du paiement'
+    } catch (err: unknown) {
+      const e = err as StoreError
+      error.value = e.message || 'Erreur lors du paiement'
       console.error('Payment error:', err)
       return false
     } finally {
@@ -92,7 +98,11 @@ export const useWalletStore = defineStore('wallet', () => {
     }
   }
 
-  const rechargeWallet = async (amount: number, paymentMethod: string, phone?: string): Promise<boolean> => {
+  const rechargeWallet = async (
+    amount: number,
+    paymentMethod: 'flooz' | 'tmoney' | 'orange_money' | 'mtn_momo' | 'paystack',
+    phone?: string
+  ): Promise<boolean> => {
     loading.value = true
     error.value = null
 
@@ -110,8 +120,9 @@ export const useWalletStore = defineStore('wallet', () => {
       } else {
         throw new Error(response.message || 'Erreur lors de la recharge')
       }
-    } catch (err: any) {
-      error.value = err.message || 'Erreur lors de la recharge'
+    } catch (err: unknown) {
+      const e = err as StoreError
+      error.value = e.message || 'Erreur lors de la recharge'
       console.error('Recharge error:', err)
       return false
     } finally {
@@ -133,8 +144,9 @@ export const useWalletStore = defineStore('wallet', () => {
       } else {
         throw new Error(response.message || 'Erreur lors de la configuration du PIN')
       }
-    } catch (err: any) {
-      error.value = err.message || 'Erreur lors de la configuration du PIN'
+    } catch (err: unknown) {
+      const e = err as StoreError
+      error.value = e.message || 'Erreur lors de la configuration du PIN'
       console.error('Set PIN error:', err)
       return false
     } finally {
@@ -157,8 +169,9 @@ export const useWalletStore = defineStore('wallet', () => {
       } else {
         throw new Error(response.message || 'Erreur lors de la modification du PIN')
       }
-    } catch (err: any) {
-      error.value = err.message || 'Erreur lors de la modification du PIN'
+    } catch (err: unknown) {
+      const e = err as StoreError
+      error.value = e.message || 'Erreur lors de la modification du PIN'
       console.error('Change PIN error:', err)
       return false
     } finally {
@@ -182,8 +195,9 @@ export const useWalletStore = defineStore('wallet', () => {
       } else {
         throw new Error(response.message || 'Erreur lors de la modification du statut')
       }
-    } catch (err: any) {
-      error.value = err.message || 'Erreur lors de la modification du statut'
+    } catch (err: unknown) {
+      const e = err as StoreError
+      error.value = e.message || 'Erreur lors de la modification du statut'
       console.error('Toggle status error:', err)
       return false
     } finally {
@@ -198,7 +212,7 @@ export const useWalletStore = defineStore('wallet', () => {
     try {
       const response = await walletService.updateDailyLimit({ daily_limit: dailyLimit })
 
-      if (response.success) {
+      if (response.success && response.data) {
         // Update wallet daily limit immediately
         if (wallet.value) {
           wallet.value.daily_limit = dailyLimit
@@ -208,8 +222,9 @@ export const useWalletStore = defineStore('wallet', () => {
       } else {
         throw new Error(response.message || 'Erreur lors de la modification de la limite')
       }
-    } catch (err: any) {
-      error.value = err.message || 'Erreur lors de la modification de la limite'
+    } catch (err: unknown) {
+      const e = err as StoreError
+      error.value = e.message || 'Erreur lors de la modification de la limite'
       console.error('Update daily limit error:', err)
       return false
     } finally {
@@ -224,14 +239,15 @@ export const useWalletStore = defineStore('wallet', () => {
     try {
       const response = await walletService.getTransactions(filters, page)
 
-      if (response.success) {
+      if (response.success && response.data) {
         transactions.value = response.data.transactions
         transactionsPagination.value = response.data.pagination
       } else {
         throw new Error(response.message || 'Erreur lors de la récupération des transactions')
       }
-    } catch (err: any) {
-      error.value = err.message || 'Erreur lors de la récupération des transactions'
+    } catch (err: unknown) {
+      const e = err as StoreError
+      error.value = e.message || 'Erreur lors de la récupération des transactions'
       console.error('Fetch transactions error:', err)
     } finally {
       transactionsLoading.value = false
@@ -245,13 +261,14 @@ export const useWalletStore = defineStore('wallet', () => {
     try {
       const response = await walletService.getStats(period)
 
-      if (response.success) {
+      if (response.success && response.data) {
         stats.value = response.data
       } else {
         throw new Error(response.message || 'Erreur lors de la récupération des statistiques')
       }
-    } catch (err: any) {
-      error.value = err.message || 'Erreur lors de la récupération des statistiques'
+    } catch (err: unknown) {
+      const e = err as StoreError
+      error.value = e.message || 'Erreur lors de la récupération des statistiques'
       console.error('Fetch stats error:', err)
     } finally {
       loading.value = false
@@ -277,8 +294,9 @@ export const useWalletStore = defineStore('wallet', () => {
       } else {
         throw new Error(response.message || 'Erreur lors du transfert')
       }
-    } catch (err: any) {
-      error.value = err.message || 'Erreur lors du transfert'
+    } catch (err: unknown) {
+      const e = err as StoreError
+      error.value = e.message || 'Erreur lors du transfert'
       console.error('Transfer error:', err)
       return false
     } finally {

@@ -455,7 +455,11 @@ const getStatusText = (status: string) => {
   }
 }
 
-const handleQuickAction = (action: (typeof quickActions)[number]) => {
+const handleQuickAction = (action: { id?: string | number; label?: string; to?: string | Record<string, unknown>; handler?: () => void }) => {
+  if (action.handler) {
+    action.handler()
+    return
+  }
   if (!action.to) {
     return
   }

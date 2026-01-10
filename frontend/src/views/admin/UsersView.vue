@@ -495,8 +495,8 @@ const loadUsers = async ({ notifyOnError = true }: { notifyOnError?: boolean } =
       throw new Error(response.message || 'Erreur lors du chargement des utilisateurs')
     }
 
-    const payload = response.data ?? { users: [] as User[] }
-    const fetchedUsers = Array.isArray(payload.users) ? (payload.users as User[]) : []
+    const payload = response.data ?? { users: [] as unknown as User[] }
+    const fetchedUsers = Array.isArray(payload.users) ? (payload.users as unknown as User[]) : []
 
     users.value = fetchedUsers
 
@@ -589,7 +589,8 @@ const refreshData = async () => {
   }
 }
 
-const viewUser = (user: User) => {
+const viewUser = (row: Record<string, unknown>) => {
+  const user = row as unknown as User
   const userDetails = `Email: ${user.email}\nTéléphone: ${user.phone}\nRôle: ${getRoleLabel(user.role)}\nStatut: ${getStatusLabel(user.status)}\nInscription: ${formatDate(user.created_at)}\nDernière activité: ${formatDate(user.last_activity)}`
 
   showConfirmModal(
@@ -602,7 +603,8 @@ const viewUser = (user: User) => {
   )
 }
 
-const suspendUser = async (user: User) => {
+const suspendUser = async (row: Record<string, unknown>) => {
+  const user = row as unknown as User
   showConfirmModal(
     'danger',
     "Suspendre l'utilisateur",
@@ -638,7 +640,8 @@ const suspendUser = async (user: User) => {
   )
 }
 
-const unsuspendUser = async (user: User) => {
+const unsuspendUser = async (row: Record<string, unknown>) => {
+  const user = row as unknown as User
   showConfirmModal(
     'success',
     "Réactiver l'utilisateur",

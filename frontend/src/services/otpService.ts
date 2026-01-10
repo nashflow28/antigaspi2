@@ -5,6 +5,26 @@
 
 import { apiService } from '@/services/api'
 
+// API Response types
+interface OTPApiResponse {
+  success: boolean
+  message?: string
+  data?: {
+    expires_at?: string
+    token?: string
+    user?: unknown
+  }
+}
+
+interface AuthRegisterResponse {
+  success: boolean
+  message?: string
+  data?: {
+    token?: string
+    user?: unknown
+  }
+}
+
 export interface OTPSendResult {
   success: boolean
   message?: string
@@ -15,7 +35,7 @@ export interface OTPSendResult {
 export interface OTPVerifyResult {
   success: boolean
   token?: string
-  user?: any
+  user?: unknown
   message?: string
   error?: string
 }
@@ -28,7 +48,7 @@ class OTPService {
    */
   async sendOTP(phone: string, purpose: 'login' | 'register' | 'verify' = 'verify'): Promise<OTPSendResult> {
     try {
-      const response = await apiService.post(`${this.baseUrl}/send`, {
+      const response = await apiService.post<OTPApiResponse>(`${this.baseUrl}/send`, {
         phone: this.formatPhone(phone),
         purpose
       })
@@ -45,10 +65,11 @@ class OTPService {
         success: false,
         error: response.message || 'Erreur lors de l\'envoi du code'
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const err = error as { response?: { data?: { message?: string } }; message?: string }
       return {
         success: false,
-        error: error.response?.data?.message || error.message || 'Erreur lors de l\'envoi du code'
+        error: err.response?.data?.message || err.message || 'Erreur lors de l\'envoi du code'
       }
     }
   }
@@ -58,7 +79,7 @@ class OTPService {
    */
   async verifyOTP(phone: string, code: string): Promise<OTPVerifyResult> {
     try {
-      const response = await apiService.post(`${this.baseUrl}/verify`, {
+      const response = await apiService.post<OTPApiResponse>(`${this.baseUrl}/verify`, {
         phone: this.formatPhone(phone),
         otp: code
       })
@@ -76,10 +97,11 @@ class OTPService {
         success: false,
         error: response.message || 'Code incorrect'
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const err = error as { response?: { data?: { message?: string } }; message?: string }
       return {
         success: false,
-        error: error.response?.data?.message || error.message || 'Erreur de vérification'
+        error: err.response?.data?.message || err.message || 'Erreur de vérification'
       }
     }
   }
@@ -89,7 +111,7 @@ class OTPService {
    */
   async resendOTP(phone: string): Promise<OTPSendResult> {
     try {
-      const response = await apiService.post(`${this.baseUrl}/resend`, {
+      const response = await apiService.post<OTPApiResponse>(`${this.baseUrl}/resend`, {
         phone: this.formatPhone(phone)
       })
 
@@ -105,9 +127,10 @@ class OTPService {
         success: false,
         error: response.message || 'Impossible de renvoyer le code'
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const err = error as { response?: { status?: number; data?: { message?: string } }; message?: string }
       // Handle rate limiting
-      if (error.response?.status === 429) {
+      if (err.response?.status === 429) {
         return {
           success: false,
           error: 'Veuillez patienter avant de demander un nouveau code'
@@ -116,7 +139,7 @@ class OTPService {
 
       return {
         success: false,
-        error: error.response?.data?.message || error.message || 'Erreur lors du renvoi'
+        error: err.response?.data?.message || err.message || 'Erreur lors du renvoi'
       }
     }
   }
@@ -126,7 +149,7 @@ class OTPService {
    */
   async loginWithOTP(phone: string, code: string): Promise<OTPVerifyResult> {
     try {
-      const response = await apiService.post('/auth/otp/verify', {
+      const response = await apiService.post<OTPApiResponse>('/auth/otp/verify', {
         phone: this.formatPhone(phone),
         otp: code,
         purpose: 'login'
@@ -145,10 +168,11 @@ class OTPService {
         success: false,
         error: response.message || 'Échec de connexion'
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const err = error as { response?: { data?: { message?: string } }; message?: string }
       return {
         success: false,
-        error: error.response?.data?.message || error.message || 'Erreur de connexion'
+        error: err.response?.data?.message || err.message || 'Erreur de connexion'
       }
     }
   }
@@ -165,7 +189,7 @@ class OTPService {
   }): Promise<OTPVerifyResult> {
     try {
       // First verify OTP
-      const verifyResponse = await apiService.post('/auth/otp/verify', {
+      const verifyResponse = await apiService.post<OTPApiResponse>('/auth/otp/verify', {
         phone: this.formatPhone(data.phone),
         otp: data.code,
         purpose: 'registration'
@@ -179,7 +203,7 @@ class OTPService {
       }
 
       // Then register the user
-      const response = await apiService.post('/auth/register', {
+      const response = await apiService.post<AuthRegisterResponse>('/auth/register', {
         name: data.name,
         email: data.email,
         phone: this.formatPhone(data.phone),
@@ -200,10 +224,11 @@ class OTPService {
         success: false,
         error: response.message || 'Échec de l\'inscription'
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const err = error as { response?: { data?: { message?: string } }; message?: string }
       return {
         success: false,
-        error: error.response?.data?.message || error.message || 'Erreur d\'inscription'
+        error: err.response?.data?.message || err.message || 'Erreur d\'inscription'
       }
     }
   }
@@ -213,7 +238,7 @@ class OTPService {
    */
   async verifyPhoneForUser(phone: string, code: string): Promise<OTPVerifyResult> {
     try {
-      const response = await apiService.post('/profile/verify-phone', {
+      const response = await apiService.post<OTPApiResponse>('/profile/verify-phone', {
         phone: this.formatPhone(phone),
         code
       })
@@ -229,10 +254,11 @@ class OTPService {
         success: false,
         error: response.message || 'Échec de la vérification'
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const err = error as { response?: { data?: { message?: string } }; message?: string }
       return {
         success: false,
-        error: error.response?.data?.message || error.message || 'Erreur de vérification'
+        error: err.response?.data?.message || err.message || 'Erreur de vérification'
       }
     }
   }

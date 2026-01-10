@@ -36,8 +36,10 @@ export const useReviewsStore = defineStore('reviews', () => {
   const fetchReviews = async (params: { merchantId?: number; productId?: number; page?: number }) => {
     try {
       state.value.loading = true
-      const response = await apiService.getReviews({
-        ...params,
+      const response = await apiService.getReviewsList({
+        merchant_id: params.merchantId!,
+        product_id: params.productId,
+        page: params.page,
         per_page: 15
       })
 
@@ -47,7 +49,9 @@ export const useReviewsStore = defineStore('reviews', () => {
         state.value.reviews.push(...response.data)
       }
 
-      state.value.pagination = response.pagination
+      if (response.pagination) {
+        state.value.pagination = response.pagination
+      }
       return { success: true }
     } catch (err: any) {
       notify.error(err.message || 'Erreur lors du chargement des avis', 'Avis')
@@ -66,7 +70,13 @@ export const useReviewsStore = defineStore('reviews', () => {
   }) => {
     try {
       state.value.loading = true
-      const response = await apiService.createReview(data)
+      const response = await apiService.createReview({
+        merchant_id: data.merchantId,
+        product_id: data.productId,
+        rating: data.rating,
+        title: data.title,
+        comment: data.comment
+      })
 
       notify.success('Avis publié avec succès!', 'Avis', { duration: 3000 })
 

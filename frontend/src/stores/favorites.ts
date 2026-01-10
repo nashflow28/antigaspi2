@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { computed, ref, watch } from 'vue'
-import type { Merchant, Product, FavoriteProductSummary } from '@/types'
+import type { Category, Merchant, Product, FavoriteProductSummary } from '@/types'
 import { apiService } from '@/services/api'
 import { notify, type Notification } from '@/composables/useNotifications'
 
@@ -85,7 +85,7 @@ const mapProductFavorite = (favorite: FavoriteProductSummary): FavoriteItem => {
     discount_percentage: favorite.discount_percentage ?? 0,
     savings: (favorite.original_price ?? 0) - (favorite.discounted_price ?? 0),
     days_until_expiration: 0,
-    category: favorite.category ?? undefined,
+    category: (favorite.category as Category | undefined) ?? undefined,
     merchant: merchant as any,
     created_at: addedAt
   }

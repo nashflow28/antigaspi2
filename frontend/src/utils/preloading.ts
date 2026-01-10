@@ -2,13 +2,8 @@
  * Intelligent preloading and resource optimization
  */
 
-interface PreloadConfig {
-  routes: string[]
-  components: string[]
-  images: string[]
-  priority: 'high' | 'low'
-  delay?: number
-}
+// PreloadConfig can be used in the future for typed configuration objects
+// interface PreloadConfig { routes: string[]; components: string[]; images: string[]; priority: 'high' | 'low'; delay?: number }
 
 class PreloadManager {
   private preloadedRoutes = new Set<string>()

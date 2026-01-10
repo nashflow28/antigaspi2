@@ -77,12 +77,14 @@ const extractMerchantDetail = (
     return null
   }
 
-  if ('merchant' in payload && payload.merchant) {
-    return payload.merchant
+  const payloadAny = payload as { merchant?: MerchantDetail; data?: MerchantDetail }
+
+  if ('merchant' in payload && payloadAny.merchant) {
+    return payloadAny.merchant
   }
 
-  if ('data' in payload && payload.data) {
-    return payload.data
+  if ('data' in payload && payloadAny.data) {
+    return payloadAny.data
   }
 
   return payload as MerchantDetail

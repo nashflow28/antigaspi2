@@ -32,7 +32,7 @@
       </DashboardHeader>
 
       <!-- Info Banner -->
-      <Card variant="soft" class="border-l-4 border-l-blue-500">
+      <Card variant="bordered" class="border-l-4 border-l-blue-500">
         <div class="flex items-start gap-4">
           <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-500/10">
             <Info class="h-5 w-5 text-blue-600" />
@@ -121,7 +121,7 @@
       </div>
 
       <!-- Quick Actions Card -->
-      <Card variant="soft">
+      <Card variant="bordered">
         <div class="flex items-start gap-4">
           <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-amber-500/10">
             <Zap class="h-5 w-5 text-amber-600" />
@@ -167,32 +167,21 @@
 import { ref, reactive, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { Calendar, Info, Zap } from 'lucide-vue-next'
-import DashboardLayout from '@/components/layout/DashboardLayout.vue'
-import DashboardHeader from '@/components/ui/2025/DashboardHeader.vue'
+import DashboardLayout from '@/components/ui/DashboardLayout.vue'
+import DashboardHeader from '@/components/dashboard/2025/DashboardHeader.vue'
 import Card from '@/components/ui/2025/Card.vue'
 import Button from '@/components/ui/2025/Button.vue'
 import { merchantService } from '@/services/merchantService'
 import { useAuthStore } from '@/stores/auth'
 import { notify } from '@/composables/useNotifications'
+import { useDashboardLayout } from '@/composables/useDashboardLayout'
 
 const router = useRouter()
 const authStore = useAuthStore()
 const user = computed(() => authStore.user)
 
-// Sidebar et header
-const sidebar = {
-  title: 'Antigaspi',
-  navigation: [
-    { name: 'Tableau de bord', href: '/merchant/dashboard' },
-    { name: 'Produits', href: '/merchant/products' },
-    { name: 'Réservations', href: '/merchant/reservations' },
-    { name: 'Horaires', href: '/merchant/opening-hours', current: true }
-  ]
-}
-
-const header = {
-  user: user.value
-}
+// Sidebar et header from composable
+const { sidebar, header } = useDashboardLayout('merchant')
 
 interface DayHours {
   is_open: boolean
@@ -237,8 +226,8 @@ const getHoursDisplay = (dayKey: string): string => {
 const loadOpeningHours = async () => {
   try {
     // Get merchant data from auth store
-    if (user.value?.merchant?.opening_hours) {
-      const savedHours = user.value.merchant.opening_hours
+    if ((user.value as any)?.merchant?.opening_hours) {
+      const savedHours = (user.value as any).merchant.opening_hours
 
       // Parse JSON if it's a string
       const hoursData = typeof savedHours === 'string' ? JSON.parse(savedHours) : savedHours

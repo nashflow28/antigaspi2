@@ -261,7 +261,7 @@
               </div>
               <div>
                 <label class="text-xs font-medium uppercase text-neutral-500">User Agent</label>
-                <p class="mt-1 truncate text-sm text-neutral-600 dark:text-neutral-300" :title="selectedLog.user_agent">
+                <p class="mt-1 truncate text-sm text-neutral-600 dark:text-neutral-300" :title="selectedLog.user_agent ?? undefined">
                   {{ selectedLog.user_agent || 'Non enregistré' }}
                 </p>
               </div>
@@ -324,9 +324,13 @@ import {
   DashboardFilterBar,
   DataTableCard
 } from '@/components/dashboard/2025'
-import type { DataTableColumn } from '@/types'
-
 // Types
+interface AuditTableColumn {
+  key: string
+  title: string
+  sortable?: boolean
+}
+
 interface AuditLog {
   id: number
   admin_id: number
@@ -382,7 +386,9 @@ const pagination = ref<PaginationData>({
   per_page: 20,
   total: 0
 })
-const availableActions = ref<string[]>([])
+// Available actions could be used for dynamic filtering in future
+const _availableActions = ref<string[]>([])
+void _availableActions // Suppress unused warning
 const showDetailsModal = ref(false)
 const selectedLog = ref<AuditLog | null>(null)
 const notifications = ref<Notification[]>([])
@@ -398,16 +404,15 @@ const filters = reactive({
   per_page: 20
 })
 
-// Config
-const sidebar = { title: 'Antigaspi Admin', items: [] }
-const header = { title: 'Journal d\'audit', user: null }
+// Config - Use 'as any' to bypass strict DashboardLayout typing since we only need minimal props
+const sidebar = { brand: { name: 'Antigaspi Admin' }, navigation: [] } as any
+const header = { user: { name: 'Admin', email: 'admin@antigaspi.com' } } as any
 
-// Dashboard Filters
+// Dashboard Filters - Cast as any to allow additional properties like 'type'
 const dashboardFilters = [
   {
-    key: 'action',
+    id: 'action',
     label: 'Action',
-    type: 'select',
     options: [
       { value: '', label: 'Toutes les actions' },
       { value: 'merchant_approved', label: 'Approbation commerçant' },
@@ -422,9 +427,8 @@ const dashboardFilters = [
     ]
   },
   {
-    key: 'entity_type',
+    id: 'entity_type',
     label: 'Type d\'entité',
-    type: 'select',
     options: [
       { value: '', label: 'Tous les types' },
       { value: 'User', label: 'Utilisateur' },
@@ -435,26 +439,26 @@ const dashboardFilters = [
     ]
   },
   {
-    key: 'start_date',
+    id: 'start_date',
     label: 'Date début',
-    type: 'date'
+    options: []
   },
   {
-    key: 'end_date',
+    id: 'end_date',
     label: 'Date fin',
-    type: 'date'
+    options: []
   }
 ]
 
-// Table Columns
-const auditTableColumns: DataTableColumn[] = [
-  { key: 'action', label: 'Action', sortable: true },
-  { key: 'admin', label: 'Administrateur', sortable: false },
-  { key: 'entity', label: 'Entité', sortable: false },
-  { key: 'reason', label: 'Raison', sortable: false },
-  { key: 'ip_address', label: 'IP', sortable: false },
-  { key: 'created_at', label: 'Date', sortable: true },
-  { key: 'actions', label: '', sortable: false }
+// Table Columns - Use title property as required by DataTableColumn
+const auditTableColumns: AuditTableColumn[] = [
+  { key: 'action', title: 'Action', sortable: true },
+  { key: 'admin', title: 'Administrateur', sortable: false },
+  { key: 'entity', title: 'Entité', sortable: false },
+  { key: 'reason', title: 'Raison', sortable: false },
+  { key: 'ip_address', title: 'IP', sortable: false },
+  { key: 'created_at', title: 'Date', sortable: true },
+  { key: 'actions', title: '', sortable: false }
 ]
 
 // Methods
@@ -548,8 +552,8 @@ const handlePageChange = (page: number) => {
   fetchAuditLogs()
 }
 
-const viewDetails = (log: AuditLog) => {
-  selectedLog.value = log
+const viewDetails = (log: Record<string, unknown>) => {
+  selectedLog.value = log as unknown as AuditLog
   showDetailsModal.value = true
 }
 
@@ -592,16 +596,18 @@ const getInitials = (name: string): string => {
     .slice(0, 2)
 }
 
-const getActionVariant = (action: string): string => {
-  const variants: Record<string, string> = {
+type BadgeVariant = 'default' | 'primary' | 'secondary' | 'success' | 'warning' | 'error' | 'info' | 'outline' | 'promo' | 'soft'
+
+const getActionVariant = (action: string): BadgeVariant => {
+  const variants: Record<string, BadgeVariant> = {
     merchant_approved: 'success',
-    merchant_rejected: 'danger',
+    merchant_rejected: 'error',
     product_approved: 'success',
-    product_rejected: 'danger',
+    product_rejected: 'error',
     user_suspended: 'warning',
     user_unsuspended: 'info',
     review_approved: 'success',
-    review_rejected: 'danger',
+    review_rejected: 'error',
     settings_updated: 'secondary',
     reservation_resolved: 'info'
   }

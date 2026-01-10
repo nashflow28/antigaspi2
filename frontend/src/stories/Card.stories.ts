@@ -2,18 +2,9 @@ import type { Meta, StoryObj } from '@storybook/vue3'
 import Card from '@/components/ui/2025/Card.vue'
 import Button from '@/components/ui/2025/Button.vue'
 
-type CardComponent = typeof Card;
 
-type StoryProps = {
-  title: string;
-  subtitle: string;
-  body: string;
-  footerLabel: string;
-  showHeader: boolean;
-  showFooter: boolean;
-};
-
-const meta: Meta<CardComponent & StoryProps> = {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const meta: Meta<any> = {
   title: 'UI/Card',
   component: Card,
   tags: ['autodocs'],
@@ -109,7 +100,8 @@ const meta: Meta<CardComponent & StoryProps> = {
 
 export default meta
 
-type Story = StoryObj<typeof meta>;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type Story = StoryObj<any>;
 
 export const Playground: Story = {}
 
@@ -162,7 +154,8 @@ export const ResponsiveGrid: Story = {
     viewport: { defaultViewport: 'tablet' }
   },
   decorators: [
-    (story, context) => ({
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    ((story: any, context: any) => ({
       components: { Story: story() },
       setup() {
         return { args: context.args }
@@ -174,6 +167,6 @@ export const ResponsiveGrid: Story = {
           <Story :args="{ ...args, variant: 'gradient', rounded: 'xl', title: 'Satisfaction client', body: 'Surveillez vos avis et retours.' }" />
         </div>
       `
-    })
+    })) as any
   ]
 }

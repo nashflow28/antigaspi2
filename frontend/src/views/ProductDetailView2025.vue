@@ -481,8 +481,10 @@ const formatExpiration = (date: string | Date | null | undefined) => {
 
 const expirationDisplay = computed(() => formatExpiration(product.value?.expiration_date ?? null))
 
-const getCategoryVariant = (categoryName?: string) => {
-  const variants: Record<string, string> = {
+type BadgeVariant = 'default' | 'primary' | 'secondary' | 'success' | 'warning' | 'error' | 'info' | 'outline' | 'promo' | 'soft'
+
+const getCategoryVariant = (categoryName?: string): BadgeVariant => {
+  const variants: Record<string, BadgeVariant> = {
     'Boulangerie': 'warning',
     'Fruits et Légumes': 'success',
     'Produits laitiers': 'info',

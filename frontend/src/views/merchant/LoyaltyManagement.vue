@@ -228,7 +228,8 @@
             <div>
               <Label>Nombre de points</Label>
               <Input
-                v-model.number="awardForm.points"
+                :model-value="awardForm.points ?? undefined"
+                @update:model-value="(v: number | string | undefined) => awardForm.points = typeof v === 'number' ? v : null"
                 type="number"
                 min="1"
                 max="1000"
@@ -330,12 +331,18 @@ const {
 
 // State
 const showAwardModal = ref(false)
-const selectedCustomer = ref(null)
+const selectedCustomer = ref<{ id: number; name: string; email: string; total_points: number; last_activity: string | null } | null>(null)
 const awarding = ref(false)
 const searchQuery = ref('')
 const sortBy = ref('total_points')
 
-const awardForm = ref({
+const awardForm = ref<{
+  user_id: string | number
+  points: number | null
+  earned_from: string
+  description: string
+  expires_at: string
+}>({
   user_id: '',
   points: null,
   earned_from: '',
@@ -399,7 +406,7 @@ const refreshData = async () => {
   await fetchAllUsersPoints()
 }
 
-const openAwardModal = (customer = null) => {
+const openAwardModal = (customer: { id: number; name: string; email: string; total_points: number; last_activity: string | null } | null = null) => {
   selectedCustomer.value = customer
   if (customer) {
     awardForm.value.user_id = customer.id
@@ -428,9 +435,9 @@ const submitAward = async () => {
   awarding.value = true
 
   const data = {
-    user_id: parseInt(awardForm.value.user_id),
-    points: awardForm.value.points,
-    earned_from: awardForm.value.earned_from,
+    user_id: parseInt(String(awardForm.value.user_id)),
+    points: awardForm.value.points ?? 0,
+    earned_from: awardForm.value.earned_from as 'purchase' | 'review' | 'referral' | 'bonus',
     description: awardForm.value.description,
     expires_at: awardForm.value.expires_at || undefined
   }

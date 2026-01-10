@@ -377,7 +377,7 @@
             @click="$router.push(`/products?category=${category.id}`)"
           >
             <div class="flex flex-col items-center justify-center p-6">
-              <div class="text-4xl mb-3">{{ category.icon || '📦' }}</div>
+              <div class="text-4xl mb-3">{{ (category as any).icon || '📦' }}</div>
               <h3 class="font-semibold text-gray-900">{{ category.name }}</h3>
             </div>
           </Card>
@@ -443,7 +443,7 @@
                   </span>
                 </div>
                 <Badge variant="success" size="sm">
-                  -{{ Math.round((1 - product.discounted_price / product.original_price) * 100) }}%
+                  -{{ Math.round((1 - Number(product.discounted_price) / Number(product.original_price)) * 100) }}%
                 </Badge>
               </div>
             </div>
@@ -500,7 +500,7 @@ const getImageUrl = (imageUrl: string | null | undefined): string => {
 onMounted(async () => {
   try {
     // Load featured products
-    const response = await apiService.getProducts({ limit: 8, is_active: true })
+    const response = await apiService.getProducts({ per_page: 8 } as any)
     featuredProducts.value = response.data.slice(0, 8) // Show first 8 products
   } catch (error) {
     console.error('Failed to load featured products:', error)

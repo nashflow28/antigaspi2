@@ -137,7 +137,7 @@ const loadReviews = async (page: number = 1) => {
     })
 
     if (response.success) {
-      reviews.value = response.data
+      reviews.value = response.data as unknown as Review[]
       pagination.value = response.pagination ?? null
     } else {
       const message = response.message || 'Erreur lors du chargement des avis en attente'

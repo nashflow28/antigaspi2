@@ -383,7 +383,11 @@ const toggleFavoriteMerchant = async (merchant: MerchantWithLocation) => {
     type: 'merchant',
     name: merchant.business_name,
     description: merchant.business_type,
-    merchant
+    merchant: {
+      ...merchant,
+      latitude: merchant.latitude ?? undefined,
+      longitude: merchant.longitude ?? undefined
+    }
   })
 }
 

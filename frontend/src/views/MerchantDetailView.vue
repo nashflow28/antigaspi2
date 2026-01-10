@@ -233,7 +233,7 @@ const productsPreview = computed(() => {
   return [] as Array<{ id: number; name: string; description: string; discounted_price: number }>
 })
 
-const loading = computed(() => detailLoading.value && !fallbackMerchant.value)
+const loading = computed(() => detailLoading.value && !activeMerchant.value)
 const isFavorite = computed(() => favoritesStore.isFavorite(merchantId.value, 'merchant'))
 
 const toggleFavorite = async () => {
@@ -246,7 +246,11 @@ const toggleFavorite = async () => {
     type: 'merchant',
     name: activeMerchant.value.business_name,
     description: activeMerchant.value.business_type,
-    merchant: activeMerchant.value
+    merchant: {
+      ...activeMerchant.value,
+      latitude: activeMerchant.value.latitude ?? undefined,
+      longitude: activeMerchant.value.longitude ?? undefined
+    }
   })
 }
 

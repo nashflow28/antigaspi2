@@ -221,15 +221,12 @@ const handleVerify = async () => {
 
     if (result.success && result.token) {
       // Store auth data
-      await authStore.setAuthData({
-        token: result.token,
-        user: result.user
-      })
+      authStore.setAuth(result.token, result.user as any)
 
       notify.success('Connexion réussie', 'Bienvenue sur Antigaspi !')
 
       // Check if profile needs completion
-      if (result.user && !result.user.profile_completed) {
+      if (result.user && !(result.user as any).profile_completed) {
         router.push({ name: 'complete-profile' })
       } else {
         router.push({ name: 'home' })

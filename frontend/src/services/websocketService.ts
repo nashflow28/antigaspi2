@@ -3,7 +3,7 @@
  * Handles real-time communication for messaging, notifications, and live updates
  */
 
-import { ref, computed, watch } from 'vue'
+import { ref, computed } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 
 export type WebSocketStatus = 'disconnected' | 'connecting' | 'connected' | 'error' | 'reconnecting'

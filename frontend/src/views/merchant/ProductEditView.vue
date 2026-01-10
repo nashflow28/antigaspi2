@@ -243,7 +243,7 @@
                     <Button
                       type="button"
                       variant="outline"
-                      @click="$refs.imageInput.click()"
+                      @click="imageInput?.click()"
                     >
                       <PhotoIcon class="h-4 w-4 mr-2" />
                       Choisir une image
@@ -317,7 +317,7 @@
               </div>
               <div class="flex justify-between">
                 <span class="text-gray-700">Statut:</span>
-                <Badge :variant="product.is_active ? 'success' : 'destructive'">
+                <Badge :variant="product.is_active ? 'success' : 'error'">
                   {{ product.is_active ? 'Actif' : 'Inactif' }}
                 </Badge>
               </div>
@@ -387,15 +387,15 @@ import type { Product, Category, ProductUpdateData } from '@/types'
 import DashboardLayout from '@/components/ui/DashboardLayout.vue'
 import { useDashboardLayout } from '@/composables/useDashboardLayout'
 import {
-  ArrowLeftIcon,
-  CheckIcon,
-  TrashIcon,
-  PhotoIcon,
-  TagIcon,
-  ExclamationTriangleIcon,
-  EyeIcon,
-  EyeSlashIcon,
-  DocumentDuplicateIcon
+  ArrowLeft as ArrowLeftIcon,
+  Check as CheckIcon,
+  Trash as TrashIcon,
+  Image as PhotoIcon,
+  Tag as TagIcon,
+  AlertTriangle as ExclamationTriangleIcon,
+  Eye as EyeIcon,
+  EyeOff as EyeSlashIcon,
+  Copy as DocumentDuplicateIcon
 } from 'lucide-vue-next'
 import ConfirmModal from '@/components/ui/ConfirmModal.vue'
 
@@ -416,6 +416,7 @@ const loading = ref(false)
 const error = ref('')
 const showDeleteModal = ref(false)
 const imagePreview = ref('')
+const imageInput = ref<HTMLInputElement | null>(null)
 
 // Formulaire
 const form = reactive<ProductUpdateData>({
@@ -658,7 +659,7 @@ const formatDate = (dateString: string) => {
 
 // Watchers pour validation en temps réel
 watch(() => form.original_price, () => {
-  if (form.discounted_price >= form.original_price) {
+  if (form.discounted_price !== undefined && form.original_price !== undefined && form.discounted_price >= form.original_price) {
     errors.discounted_price = 'Le prix réduit doit être inférieur au prix original'
   } else {
     delete errors.discounted_price
@@ -666,7 +667,7 @@ watch(() => form.original_price, () => {
 })
 
 watch(() => form.discounted_price, () => {
-  if (form.discounted_price >= form.original_price) {
+  if (form.discounted_price !== undefined && form.original_price !== undefined && form.discounted_price >= form.original_price) {
     errors.discounted_price = 'Le prix réduit doit être inférieur au prix original'
   } else {
     delete errors.discounted_price

@@ -147,7 +147,7 @@
       </Card>
 
       <!-- Profile Summary Card -->
-      <Card variant="soft" data-testid="profile-summary-card">
+      <Card variant="bordered" data-testid="profile-summary-card">
         <div class="flex items-start gap-4">
           <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-blue-500/10">
             <ShieldCheck class="h-6 w-6 text-blue-600" />
@@ -183,34 +183,23 @@
 import { ref, reactive, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { Store, Phone, ShieldCheck, CheckCircle2, Clock } from 'lucide-vue-next'
-import DashboardLayout from '@/components/layout/DashboardLayout.vue'
-import DashboardHeader from '@/components/ui/2025/DashboardHeader.vue'
+import DashboardLayout from '@/components/ui/DashboardLayout.vue'
+import DashboardHeader from '@/components/dashboard/2025/DashboardHeader.vue'
 import Card from '@/components/ui/2025/Card.vue'
 import Button from '@/components/ui/2025/Button.vue'
 import Input from '@/components/ui/2025/Input.vue'
 import { merchantService } from '@/services/merchantService'
 import { useAuthStore } from '@/stores/auth'
 import { notify } from '@/composables/useNotifications'
+import { useDashboardLayout } from '@/composables/useDashboardLayout'
 
 const router = useRouter()
 const authStore = useAuthStore()
 const user = computed(() => authStore.user)
 const merchant = ref<any>(null)
 
-// Sidebar et header
-const sidebar = {
-  title: 'Antigaspi',
-  navigation: [
-    { name: 'Tableau de bord', href: '/merchant/dashboard' },
-    { name: 'Produits', href: '/merchant/products' },
-    { name: 'Réservations', href: '/merchant/reservations' },
-    { name: 'Mon profil', href: '/merchant/profile/edit', current: true }
-  ]
-}
-
-const header = {
-  user: user.value
-}
+// Sidebar et header from composable
+const { sidebar, header } = useDashboardLayout('merchant')
 
 interface FormData {
   business_name: string
@@ -277,20 +266,20 @@ const validateForm = (): boolean => {
 
 const loadMerchantProfile = async () => {
   try {
-    const response = await merchantService.getStats()
+    void await merchantService.getStats()
 
     // Get merchant data from auth store if available
-    if (user.value?.merchant) {
-      merchant.value = user.value.merchant
+    if ((user.value as any)?.merchant) {
+      merchant.value = (user.value as any).merchant
 
       // Populate form with current data
       formData.business_name = merchant.value.business_name || ''
       formData.business_type = merchant.value.business_type || ''
       formData.description = merchant.value.description || ''
       formData.siret = merchant.value.siret || ''
-      formData.phone = user.value.phone || ''
-      formData.address = user.value.address || ''
-      formData.city = user.value.city || ''
+      formData.phone = user.value?.phone || ''
+      formData.address = user.value?.address || ''
+      formData.city = user.value?.city || ''
 
       // Save initial state
       Object.assign(initialData, formData)

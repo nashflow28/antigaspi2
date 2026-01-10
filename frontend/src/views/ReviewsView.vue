@@ -33,7 +33,6 @@
               </option>
             </select>
             <p v-if="merchantsLoading" class="text-xs text-gray-500 mt-1">Chargement des commerçants...</p>
-            <p v-else-if="merchantsError" class="text-xs text-red-500 mt-1">{{ merchantsError }}</p>
           </div>
         </div>
       </div>
@@ -111,7 +110,7 @@ interface Product {
 
 const authStore = useAuthStore()
 const merchantsStore = useMerchantsStore()
-const { merchants, loading: merchantsLoading, error: merchantsError } = storeToRefs(merchantsStore)
+const { merchants, loading: merchantsLoading } = storeToRefs(merchantsStore)
 
 const selectedMerchantId = ref<number | null>(null)
 const availableProducts = ref<Product[]>([])
@@ -158,8 +157,7 @@ const onMerchantChange = async () => {
   }
 }
 
-const onReviewSuccess = (review: any) => {
-  // console.log('Review submitted successfully:', review)
+const onReviewSuccess = (_review: any) => {
   // Automatically refresh the reviews list
   if (reviewsListRef.value) {
     reviewsListRef.value.refreshReviews()

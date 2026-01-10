@@ -240,7 +240,7 @@
       <div class="w-full max-w-xl space-y-4 rounded-2xl bg-white p-6 shadow-2xl">
         <header class="flex items-center justify-between">
           <h3 class="text-xl font-semibold text-slate-900">Transfert (bientôt disponible)</h3>
-          <Button variant="ghost" size="icon" @click="showTransferModal = false">
+          <Button variant="ghost" size="sm" @click="showTransferModal = false">
             <X class="h-5 w-5" />
           </Button>
         </header>
@@ -261,7 +261,7 @@
       <div class="w-full max-w-xl space-y-5 rounded-2xl bg-white p-6 shadow-2xl">
         <header class="flex items-center justify-between">
           <h3 class="text-xl font-semibold text-slate-900">Paramètres du portefeuille</h3>
-          <Button variant="ghost" size="icon" @click="showSettingsModal = false">
+          <Button variant="ghost" size="sm" @click="showSettingsModal = false">
             <X class="h-5 w-5" />
           </Button>
         </header>
@@ -311,7 +311,7 @@
       <div class="w-full max-w-xl space-y-4 rounded-2xl bg-white p-6 shadow-2xl">
         <header class="flex items-center justify-between">
           <h3 class="text-xl font-semibold text-slate-900">Statistiques détaillées</h3>
-          <Button variant="ghost" size="icon" @click="showStatsModal = false">
+          <Button variant="ghost" size="sm" @click="showStatsModal = false">
             <X class="h-5 w-5" />
           </Button>
         </header>
@@ -387,10 +387,6 @@ const showSettingsModal = ref(false)
 const showStatsModal = ref(false)
 const showPinSetupModal = ref(false)
 
-const transactions = ref(storeTransactions.value)
-const transactionsPagination = ref<Pagination | undefined>(storeTransactionsPagination.value || undefined)
-const transactionsComponent = ref<InstanceType<typeof WalletTransactions> | null>(null)
-
 const {
   wallet,
   stats,
@@ -405,6 +401,10 @@ const {
   transactionsLoading
 } = storeToRefs(walletStore)
 
+const transactions = ref(storeTransactions.value)
+const transactionsPagination = ref<Pagination | undefined>(storeTransactionsPagination.value || undefined)
+const transactionsComponent = ref<InstanceType<typeof WalletTransactions> | null>(null)
+
 const formatAmount = (amount: number): string => {
   return new Intl.NumberFormat('fr-FR', {
     minimumFractionDigits: 0,
@@ -412,8 +412,11 @@ const formatAmount = (amount: number): string => {
   }).format(amount)
 }
 
-const handleRecharge = async (data: { amount: number; payment_method: string; phone?: string }) => {
-  const success = await walletStore.rechargeWallet(data.amount, data.payment_method, data.phone)
+type PaymentMethod = 'flooz' | 'tmoney' | 'orange_money' | 'mtn_momo' | 'paystack'
+
+const handleRecharge = async (data: { amount: number | ''; payment_method: string; phone?: string }) => {
+  const amount = typeof data.amount === 'number' ? data.amount : 0
+  const success = await walletStore.rechargeWallet(amount, data.payment_method as PaymentMethod, data.phone)
 
   if (success) {
     notify.success('Demande de recharge initiée', 'Vous serez redirigé vers le provider de paiement.')

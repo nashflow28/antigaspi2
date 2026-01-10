@@ -152,7 +152,7 @@
 
         <!-- Side column -->
         <div class="space-y-6">
-          <Card variant="soft" class="p-6">
+          <Card variant="bordered" class="p-6">
             <h2 class="text-lg font-semibold text-neutral-900">Résumé du compte</h2>
             <p class="mt-1 text-sm text-neutral-500">
               Gardez un œil sur vos informations principales.
