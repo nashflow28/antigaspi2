@@ -132,22 +132,22 @@ class Merchant extends Model
 
     public function scopeNearby($query, $latitude, $longitude, $radiusKm = 10)
     {
-        return $query->selectRaw("
+        return $query->selectRaw('
             merchants.*,
             (6371 * acos(cos(radians(?))
                 * cos(radians(latitude))
                 * cos(radians(longitude) - radians(?))
                 + sin(radians(?))
                 * sin(radians(latitude)))) AS distance
-        ", [$latitude, $longitude, $latitude])
-        ->having('distance', '<', $radiusKm)
-        ->orderBy('distance');
+        ', [$latitude, $longitude, $latitude])
+            ->having('distance', '<', $radiusKm)
+            ->orderBy('distance');
     }
 
     // Helper methods
     public function getFullAddressAttribute(): string
     {
-        return $this->user->address . ', ' . $this->user->city;
+        return $this->user->address.', '.$this->user->city;
     }
 
     public function getTotalProductsAttribute(): int
@@ -163,6 +163,7 @@ class Merchant extends Model
         if ($productIds->isEmpty()) {
             return null;
         }
+
         return \App\Models\Review::whereIn('product_id', $productIds)->avg('rating');
     }
 }

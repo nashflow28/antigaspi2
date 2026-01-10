@@ -14,23 +14,26 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Str;
-use Tymon\JWTAuth\Facades\JWTAuth;
 use Tests\TestCase;
+use Tymon\JWTAuth\Facades\JWTAuth;
 
 class PaymentEdgeCasesTest extends TestCase
 {
     use RefreshDatabase;
 
     private User $consumer;
+
     private User $merchantUser;
+
     private Merchant $merchant;
+
     private Product $product;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        config(['app.key' => 'base64:' . base64_encode(random_bytes(32))]);
+        config(['app.key' => 'base64:'.base64_encode(random_bytes(32))]);
         config(['jwt.secret' => Str::random(32)]);
         config(['payments.paygate.base_url' => 'https://paygate.test']);
         config(['payments.paygate.auth_token' => 'test-token']);
@@ -61,7 +64,8 @@ class PaymentEdgeCasesTest extends TestCase
     protected function actingAsJwt(User $user): array
     {
         $token = JWTAuth::fromUser($user);
-        return ['Authorization' => 'Bearer ' . $token];
+
+        return ['Authorization' => 'Bearer '.$token];
     }
 
     // ==================== NETWORK ERROR TESTS ====================

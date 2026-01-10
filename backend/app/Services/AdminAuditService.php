@@ -5,7 +5,6 @@ namespace App\Services;
 use App\Models\AdminAuditLog;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class AdminAuditService
@@ -293,6 +292,7 @@ class AdminAuditService
     public function logReservationResolution(Model $reservation, string $resolution, ?string $reason = null): AdminAuditLog
     {
         $reservationCode = $reservation->reservation_code ?? $reservation->id;
+
         return $this->log(
             AdminAuditLog::ACTION_RESOLVE_RESERVATION,
             AdminAuditLog::ENTITY_RESERVATION,
@@ -313,31 +313,31 @@ class AdminAuditService
             ->orderByDesc('created_at');
 
         // Filtres
-        if (!empty($filters['action'])) {
+        if (! empty($filters['action'])) {
             $query->where('action', $filters['action']);
         }
 
-        if (!empty($filters['entity_type'])) {
+        if (! empty($filters['entity_type'])) {
             $query->where('entity_type', $filters['entity_type']);
         }
 
-        if (!empty($filters['admin_id'])) {
+        if (! empty($filters['admin_id'])) {
             $query->where('admin_id', $filters['admin_id']);
         }
 
-        if (!empty($filters['start_date'])) {
+        if (! empty($filters['start_date'])) {
             $query->where('created_at', '>=', $filters['start_date']);
         }
 
-        if (!empty($filters['end_date'])) {
+        if (! empty($filters['end_date'])) {
             $query->where('created_at', '<=', $filters['end_date']);
         }
 
-        if (!empty($filters['search'])) {
+        if (! empty($filters['search'])) {
             $search = $filters['search'];
             $query->where(function ($q) use ($search) {
                 $q->where('entity_name', 'like', "%{$search}%")
-                  ->orWhere('reason', 'like', "%{$search}%");
+                    ->orWhere('reason', 'like', "%{$search}%");
             });
         }
 
@@ -349,7 +349,7 @@ class AdminAuditService
      */
     public function getStats(string $period = 'week'): array
     {
-        $startDate = match($period) {
+        $startDate = match ($period) {
             'day' => now()->startOfDay(),
             'week' => now()->startOfWeek(),
             'month' => now()->startOfMonth(),

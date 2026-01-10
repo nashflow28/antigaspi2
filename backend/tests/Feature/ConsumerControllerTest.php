@@ -45,7 +45,7 @@ class ConsumerControllerTest extends TestCase
             'city' => 'Lomé',
         ];
 
-        $response = $this->withHeader('Authorization', 'Bearer ' . $token)
+        $response = $this->withHeader('Authorization', 'Bearer '.$token)
             ->putJson('/api/consumers/profile', $payload);
 
         $response->assertStatus(200)
@@ -75,7 +75,7 @@ class ConsumerControllerTest extends TestCase
             'phone' => '+123456',
         ];
 
-        $response = $this->withHeader('Authorization', 'Bearer ' . $token)
+        $response = $this->withHeader('Authorization', 'Bearer '.$token)
             ->putJson('/api/consumers/profile', $payload);
 
         $response->assertStatus(422)
@@ -94,7 +94,7 @@ class ConsumerControllerTest extends TestCase
 
         $photo = UploadedFile::fake()->image('avatar.jpg', 600, 600)->size(1024);
 
-        $response = $this->withHeader('Authorization', 'Bearer ' . $token)
+        $response = $this->withHeader('Authorization', 'Bearer '.$token)
             ->postJson('/api/consumers/profile/photo', [
                 'photo' => $photo,
             ]);
@@ -122,7 +122,7 @@ class ConsumerControllerTest extends TestCase
 
         $photo = UploadedFile::fake()->image('avatar.jpg')->size(6000);
 
-        $response = $this->withHeader('Authorization', 'Bearer ' . $token)
+        $response = $this->withHeader('Authorization', 'Bearer '.$token)
             ->postJson('/api/consumers/profile/photo', [
                 'photo' => $photo,
             ]);

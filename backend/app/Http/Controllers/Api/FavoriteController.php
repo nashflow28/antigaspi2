@@ -30,14 +30,14 @@ class FavoriteController extends Controller
                 ->where('user_id', $user->id)
                 ->whereHas('product', function ($query) {
                     $query->whereNotNull('category_id')
-                          ->whereNotNull('merchant_id');
+                        ->whereNotNull('merchant_id');
                 })
                 ->orderBy('created_at', 'desc')
                 ->paginate($perPage);
 
             $products = $favorites->getCollection()->map(function ($favorite) {
                 // Additional safety check
-                if (!$favorite->product || !$favorite->product->category || !$favorite->product->merchant) {
+                if (! $favorite->product || ! $favorite->product->category || ! $favorite->product->merchant) {
                     return null;
                 }
 

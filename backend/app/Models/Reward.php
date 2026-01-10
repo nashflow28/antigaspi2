@@ -98,24 +98,37 @@ class Reward extends Model
     // Helpers
     public function isAvailable(): bool
     {
-        if (!$this->is_active) return false;
-        if ($this->valid_from && $this->valid_from->isFuture()) return false;
-        if ($this->valid_until && $this->valid_until->isPast()) return false;
-        if ($this->quantity_available !== null && $this->quantity_redeemed >= $this->quantity_available) return false;
+        if (! $this->is_active) {
+            return false;
+        }
+        if ($this->valid_from && $this->valid_from->isFuture()) {
+            return false;
+        }
+        if ($this->valid_until && $this->valid_until->isPast()) {
+            return false;
+        }
+        if ($this->quantity_available !== null && $this->quantity_redeemed >= $this->quantity_available) {
+            return false;
+        }
+
         return true;
     }
 
     public function getRemainingQuantityAttribute(): ?int
     {
-        if ($this->quantity_available === null) return null;
+        if ($this->quantity_available === null) {
+            return null;
+        }
+
         return max(0, $this->quantity_available - $this->quantity_redeemed);
     }
 
     public function getFormattedValueAttribute(): string
     {
         if ($this->value_type === 'percentage') {
-            return $this->value . '%';
+            return $this->value.'%';
         }
-        return number_format($this->value, 0, ',', ' ') . ' XOF';
+
+        return number_format($this->value, 0, ',', ' ').' XOF';
     }
 }

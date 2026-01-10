@@ -25,7 +25,6 @@ abstract class Engine
     /**
      * Perform the given search on the engine.
      *
-     * @param  \Laravel\Scout\Builder  $builder
      * @return mixed
      */
     abstract public function search(Builder $builder);
@@ -33,7 +32,6 @@ abstract class Engine
     /**
      * Perform the given search on the engine.
      *
-     * @param  \Laravel\Scout\Builder  $builder
      * @param  int  $perPage
      * @param  int  $page
      * @return mixed
@@ -51,7 +49,6 @@ abstract class Engine
     /**
      * Map the given results to instances of the given model.
      *
-     * @param  \Laravel\Scout\Builder  $builder
      * @param  mixed  $results
      * @param  \Illuminate\Database\Eloquent\Model  $model
      * @return \Illuminate\Database\Eloquent\Collection
@@ -61,7 +58,6 @@ abstract class Engine
     /**
      * Map the given results to instances of the given model via a lazy collection.
      *
-     * @param  \Laravel\Scout\Builder  $builder
      * @param  mixed  $results
      * @param  \Illuminate\Database\Eloquent\Model  $model
      * @return \Illuminate\Support\LazyCollection
@@ -88,7 +84,6 @@ abstract class Engine
      * Create a search index.
      *
      * @param  string  $name
-     * @param  array  $options
      * @return mixed
      */
     abstract public function createIndex($name, array $options = []);
@@ -116,7 +111,6 @@ abstract class Engine
     /**
      * Get the results of the query as a Collection of primary keys.
      *
-     * @param  \Laravel\Scout\Builder  $builder
      * @return \Illuminate\Support\Collection
      */
     public function keys(Builder $builder)
@@ -127,7 +121,6 @@ abstract class Engine
     /**
      * Get the results of the given query mapped onto models.
      *
-     * @param  \Laravel\Scout\Builder  $builder
      * @return \Illuminate\Database\Eloquent\Collection
      */
     public function get(Builder $builder)
@@ -142,7 +135,6 @@ abstract class Engine
     /**
      * Get a lazy collection for the given query mapped onto models.
      *
-     * @param  \Laravel\Scout\Builder  $builder
      * @return \Illuminate\Database\Eloquent\Collection
      */
     public function cursor(Builder $builder)

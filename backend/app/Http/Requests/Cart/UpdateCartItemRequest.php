@@ -23,8 +23,9 @@ class UpdateCartItemRequest extends FormRequest
                     $item = $this->route('item');
                     $product = $item?->product;
 
-                    if (!$product) {
+                    if (! $product) {
                         $fail('Le produit associé à cet article est introuvable.');
+
                         return;
                     }
 

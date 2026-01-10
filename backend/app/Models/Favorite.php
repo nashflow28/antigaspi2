@@ -60,12 +60,14 @@ class Favorite extends Model
 
             if ($favorite) {
                 $favorite->delete();
+
                 return false; // Removed from favorites
             } else {
                 self::create([
                     'user_id' => $userId,
                     'product_id' => $productId,
                 ]);
+
                 return true; // Added to favorites
             }
         });

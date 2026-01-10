@@ -74,7 +74,7 @@ class ReservationResource extends JsonResource
                 $this->relationLoaded('user'),
                 [
                     'id' => $this->user->id,
-                    'name' => $this->user->full_name ?? $this->user->first_name . ' ' . $this->user->last_name,
+                    'name' => $this->user->full_name ?? $this->user->first_name.' '.$this->user->last_name,
                     'first_name' => $this->user->first_name,
                     'last_name' => $this->user->last_name,
                     'phone' => $this->user->phone,

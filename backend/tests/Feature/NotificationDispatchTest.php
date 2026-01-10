@@ -33,7 +33,7 @@ class NotificationDispatchTest extends TestCase
     {
         $token = JWTAuth::fromUser($user);
 
-        return $this->withHeader('Authorization', 'Bearer ' . $token);
+        return $this->withHeader('Authorization', 'Bearer '.$token);
     }
 
     public function test_confirming_reservation_creates_notification_record(): void

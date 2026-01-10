@@ -50,7 +50,7 @@ class CartControllerTest extends TestCase
         ]);
 
         $token = auth('api')->login($user);
-        $headers = ['Authorization' => 'Bearer ' . $token];
+        $headers = ['Authorization' => 'Bearer '.$token];
 
         $this->withHeaders($headers)->postJson('/api/cart/items', [
             'product_id' => $productA->id,
@@ -108,7 +108,7 @@ class CartControllerTest extends TestCase
         ]);
 
         $token = auth('api')->login($user);
-        $headers = ['Authorization' => 'Bearer ' . $token];
+        $headers = ['Authorization' => 'Bearer '.$token];
 
         $this->withHeaders($headers)->postJson('/api/cart/items', [
             'product_id' => $productA->id,

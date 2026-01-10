@@ -2,8 +2,8 @@
 
 namespace App\Services;
 
-use App\Models\User;
 use App\Models\Notification;
+use App\Models\User;
 use Illuminate\Support\Facades\Log;
 
 class LoyaltyTierService
@@ -193,7 +193,7 @@ class LoyaltyTierService
      */
     protected function calculateProgressPercentage(int $points, string $currentTier, ?string $nextTier): int
     {
-        if (!$nextTier) {
+        if (! $nextTier) {
             return 100; // Already at max tier
         }
 
@@ -201,7 +201,9 @@ class LoyaltyTierService
         $nextThreshold = self::TIER_THRESHOLDS[$nextTier];
         $range = $nextThreshold - $currentThreshold;
 
-        if ($range <= 0) return 100;
+        if ($range <= 0) {
+            return 100;
+        }
 
         $progress = (($points - $currentThreshold) / $range) * 100;
 
@@ -214,6 +216,7 @@ class LoyaltyTierService
     public function getPointsMultiplier(User $user): float
     {
         $tier = $user->loyalty_tier ?? 'bronze';
+
         return self::TIER_BENEFITS[$tier]['points_multiplier'] ?? 1.0;
     }
 
@@ -223,6 +226,7 @@ class LoyaltyTierService
     public function calculatePointsWithBonus(User $user, int $basePoints): int
     {
         $multiplier = $this->getPointsMultiplier($user);
+
         return (int) round($basePoints * $multiplier);
     }
 }

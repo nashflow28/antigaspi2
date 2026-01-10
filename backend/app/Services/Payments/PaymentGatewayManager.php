@@ -14,9 +14,7 @@ use InvalidArgumentException;
 
 class PaymentGatewayManager
 {
-    public function __construct(protected array $config, private ?WalletService $wallets = null)
-    {
-    }
+    public function __construct(protected array $config, private ?WalletService $wallets = null) {}
 
     public function forMethod(PaymentMethod $method): PaymentGateway
     {
@@ -28,7 +26,7 @@ class PaymentGatewayManager
             PaymentMethod::ORANGE_MONEY,
             PaymentMethod::MTN_MOMO => new CinetPayGateway($this->config['cinetpay'] ?? []),
             PaymentMethod::PAYSTACK => new PaystackGateway($this->config['paystack'] ?? []),
-            PaymentMethod::ON_SITE => new OnSiteGateway(),
+            PaymentMethod::ON_SITE => new OnSiteGateway,
             PaymentMethod::WALLET => $this->walletGateway(),
         };
     }
@@ -40,7 +38,7 @@ class PaymentGatewayManager
             'fedapay' => new FedaPayGateway($this->config['fedapay'] ?? []),
             'cinetpay' => new CinetPayGateway($this->config['cinetpay'] ?? []),
             'paystack' => new PaystackGateway($this->config['paystack'] ?? []),
-            'manual' => new OnSiteGateway(),
+            'manual' => new OnSiteGateway,
             'wallet' => $this->walletGateway(),
             default => throw new InvalidArgumentException("Unsupported payment provider [{$provider}]."),
         };

@@ -7,11 +7,11 @@ use App\Models\Product;
 use App\Models\SurpriseBasketItem;
 use App\Models\User;
 use App\Notifications\NewSurpriseBasketNotification;
-use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Notification;
+use Illuminate\Support\Facades\Validator;
 
 class SurpriseBasketController extends Controller
 {
@@ -45,7 +45,7 @@ class SurpriseBasketController extends Controller
         return response()->json([
             'success' => true,
             'data' => $surpriseBaskets,
-            'message' => 'Paniers surprise récupérés avec succès'
+            'message' => 'Paniers surprise récupérés avec succès',
         ]);
     }
 
@@ -59,7 +59,7 @@ class SurpriseBasketController extends Controller
         if ($user->role !== 'merchant') {
             return response()->json([
                 'success' => false,
-                'message' => 'Accès non autorisé'
+                'message' => 'Accès non autorisé',
             ], 403);
         }
 
@@ -72,7 +72,7 @@ class SurpriseBasketController extends Controller
         return response()->json([
             'success' => true,
             'data' => $surpriseBaskets,
-            'message' => 'Paniers surprise du commerçant récupérés avec succès'
+            'message' => 'Paniers surprise du commerçant récupérés avec succès',
         ]);
     }
 
@@ -86,7 +86,7 @@ class SurpriseBasketController extends Controller
         if ($user->role !== 'merchant') {
             return response()->json([
                 'success' => false,
-                'message' => 'Accès non autorisé'
+                'message' => 'Accès non autorisé',
             ], 403);
         }
 
@@ -110,7 +110,7 @@ class SurpriseBasketController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Données invalides',
-                'errors' => $validator->errors()
+                'errors' => $validator->errors(),
             ], 422);
         }
 
@@ -130,12 +130,13 @@ class SurpriseBasketController extends Controller
             // Verify ALL requested products were found and belong to this merchant
             if ($products->count() !== $productIds->count()) {
                 $missingIds = $productIds->diff($products->keys());
+
                 return response()->json([
                     'success' => false,
                     'message' => 'Certains produits ne vous appartiennent pas ou n\'existent pas',
                     'errors' => [
-                        'products' => ["Product IDs invalides: " . $missingIds->implode(', ')]
-                    ]
+                        'products' => ['Product IDs invalides: '.$missingIds->implode(', ')],
+                    ],
                 ], 422);
             }
 
@@ -214,7 +215,7 @@ class SurpriseBasketController extends Controller
         return response()->json([
             'success' => true,
             'data' => $surpriseBasket,
-            'message' => 'Panier surprise créé avec succès'
+            'message' => 'Panier surprise créé avec succès',
         ], 201);
     }
 
@@ -227,17 +228,17 @@ class SurpriseBasketController extends Controller
             ->with(['merchant', 'category', 'surpriseBasketItems.product'])
             ->find($id);
 
-        if (!$surpriseBasket) {
+        if (! $surpriseBasket) {
             return response()->json([
                 'success' => false,
-                'message' => 'Panier surprise non trouvé'
+                'message' => 'Panier surprise non trouvé',
             ], 404);
         }
 
         return response()->json([
             'success' => true,
             'data' => $surpriseBasket,
-            'message' => 'Panier surprise récupéré avec succès'
+            'message' => 'Panier surprise récupéré avec succès',
         ]);
     }
 
@@ -251,7 +252,7 @@ class SurpriseBasketController extends Controller
         if ($user->role !== 'merchant') {
             return response()->json([
                 'success' => false,
-                'message' => 'Accès non autorisé'
+                'message' => 'Accès non autorisé',
             ], 403);
         }
 
@@ -259,10 +260,10 @@ class SurpriseBasketController extends Controller
             ->where('merchant_id', $user->merchant->id)
             ->find($id);
 
-        if (!$surpriseBasket) {
+        if (! $surpriseBasket) {
             return response()->json([
                 'success' => false,
-                'message' => 'Panier surprise non trouvé'
+                'message' => 'Panier surprise non trouvé',
             ], 404);
         }
 
@@ -284,14 +285,14 @@ class SurpriseBasketController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Données invalides',
-                'errors' => $validator->errors()
+                'errors' => $validator->errors(),
             ], 422);
         }
 
         $surpriseBasket->update($request->only([
             'name', 'description', 'surprise_description', 'category_id',
             'discounted_price', 'quantity_available', 'min_items', 'max_items',
-            'expiration_date', 'image_url', 'is_active'
+            'expiration_date', 'image_url', 'is_active',
         ]));
 
         $surpriseBasket->load(['merchant', 'category', 'surpriseBasketItems.product']);
@@ -299,7 +300,7 @@ class SurpriseBasketController extends Controller
         return response()->json([
             'success' => true,
             'data' => $surpriseBasket,
-            'message' => 'Panier surprise mis à jour avec succès'
+            'message' => 'Panier surprise mis à jour avec succès',
         ]);
     }
 
@@ -313,7 +314,7 @@ class SurpriseBasketController extends Controller
         if ($user->role !== 'merchant') {
             return response()->json([
                 'success' => false,
-                'message' => 'Accès non autorisé'
+                'message' => 'Accès non autorisé',
             ], 403);
         }
 
@@ -321,10 +322,10 @@ class SurpriseBasketController extends Controller
             ->where('merchant_id', $user->merchant->id)
             ->find($id);
 
-        if (!$surpriseBasket) {
+        if (! $surpriseBasket) {
             return response()->json([
                 'success' => false,
-                'message' => 'Panier surprise non trouvé'
+                'message' => 'Panier surprise non trouvé',
             ], 404);
         }
 
@@ -332,7 +333,7 @@ class SurpriseBasketController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Panier surprise supprimé avec succès'
+            'message' => 'Panier surprise supprimé avec succès',
         ]);
     }
 
@@ -346,7 +347,7 @@ class SurpriseBasketController extends Controller
         if ($user->role !== 'merchant') {
             return response()->json([
                 'success' => false,
-                'message' => 'Accès non autorisé'
+                'message' => 'Accès non autorisé',
             ], 403);
         }
 
@@ -359,7 +360,7 @@ class SurpriseBasketController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Données invalides',
-                'errors' => $validator->errors()
+                'errors' => $validator->errors(),
             ], 422);
         }
 
@@ -367,10 +368,10 @@ class SurpriseBasketController extends Controller
             ->where('merchant_id', $user->merchant->id)
             ->find($basketId);
 
-        if (!$surpriseBasket) {
+        if (! $surpriseBasket) {
             return response()->json([
                 'success' => false,
-                'message' => 'Panier surprise non trouvé'
+                'message' => 'Panier surprise non trouvé',
             ], 404);
         }
 
@@ -378,19 +379,19 @@ class SurpriseBasketController extends Controller
             ->where('is_surprise_basket', false)
             ->find($request->product_id);
 
-        if (!$product) {
+        if (! $product) {
             return response()->json([
                 'success' => false,
-                'message' => 'Produit non trouvé'
+                'message' => 'Produit non trouvé',
             ], 404);
         }
 
         $success = $surpriseBasket->addItemToBasket($product, $request->quantity);
 
-        if (!$success) {
+        if (! $success) {
             return response()->json([
                 'success' => false,
-                'message' => 'Impossible d\'ajouter le produit au panier'
+                'message' => 'Impossible d\'ajouter le produit au panier',
             ], 400);
         }
 
@@ -399,7 +400,7 @@ class SurpriseBasketController extends Controller
         return response()->json([
             'success' => true,
             'data' => $surpriseBasket,
-            'message' => 'Produit ajouté au panier surprise avec succès'
+            'message' => 'Produit ajouté au panier surprise avec succès',
         ]);
     }
 
@@ -413,7 +414,7 @@ class SurpriseBasketController extends Controller
         if ($user->role !== 'merchant') {
             return response()->json([
                 'success' => false,
-                'message' => 'Accès non autorisé'
+                'message' => 'Accès non autorisé',
             ], 403);
         }
 
@@ -421,27 +422,27 @@ class SurpriseBasketController extends Controller
             ->where('merchant_id', $user->merchant->id)
             ->find($basketId);
 
-        if (!$surpriseBasket) {
+        if (! $surpriseBasket) {
             return response()->json([
                 'success' => false,
-                'message' => 'Panier surprise non trouvé'
+                'message' => 'Panier surprise non trouvé',
             ], 404);
         }
 
         $product = Product::find($productId);
-        if (!$product) {
+        if (! $product) {
             return response()->json([
                 'success' => false,
-                'message' => 'Produit non trouvé'
+                'message' => 'Produit non trouvé',
             ], 404);
         }
 
         $success = $surpriseBasket->removeItemFromBasket($product);
 
-        if (!$success) {
+        if (! $success) {
             return response()->json([
                 'success' => false,
-                'message' => 'Impossible de retirer le produit du panier'
+                'message' => 'Impossible de retirer le produit du panier',
             ], 400);
         }
 
@@ -450,7 +451,7 @@ class SurpriseBasketController extends Controller
         return response()->json([
             'success' => true,
             'data' => $surpriseBasket,
-            'message' => 'Produit retiré du panier surprise avec succès'
+            'message' => 'Produit retiré du panier surprise avec succès',
         ]);
     }
 }

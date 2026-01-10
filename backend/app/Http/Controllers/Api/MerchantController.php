@@ -29,7 +29,7 @@ class MerchantController extends Controller
                     },
                     'reviews as reviews_count' => function ($reviewQuery) {
                         $reviewQuery->approved();
-                    }
+                    },
                 ])
                 ->withAvg(['reviews as average_rating' => function ($reviewQuery) {
                     $reviewQuery->approved();
@@ -66,16 +66,16 @@ class MerchantController extends Controller
 
             if ($userLat !== null && $userLng !== null) {
                 // Add distance calculation using Haversine formula
-                $query->selectRaw("
+                $query->selectRaw('
                     merchants.*,
                     (6371 * acos(cos(radians(?))
                         * cos(radians(latitude))
                         * cos(radians(longitude) - radians(?))
                         + sin(radians(?))
                         * sin(radians(latitude)))) AS distance_km
-                ", [$userLat, $userLng, $userLat])
-                ->whereNotNull('latitude')
-                ->whereNotNull('longitude');
+                ', [$userLat, $userLng, $userLat])
+                    ->whereNotNull('latitude')
+                    ->whereNotNull('longitude');
 
                 // Filter by radius if provided
                 if ($radius !== null && $radius > 0) {
@@ -224,7 +224,7 @@ class MerchantController extends Controller
                     'time_ago' => $review->time_ago,
                     'user' => $review->user ? [
                         'id' => $review->user->id,
-                        'name' => trim($review->user->first_name . ' ' . substr($review->user->last_name, 0, 1) . '.'),
+                        'name' => trim($review->user->first_name.' '.substr($review->user->last_name, 0, 1).'.'),
                     ] : null,
                     'product' => $review->product ? [
                         'id' => $review->product->id,
@@ -281,15 +281,15 @@ class MerchantController extends Controller
             if ($user->role !== 'merchant') {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Accès non autorisé. Compte commerçant requis.'
+                    'message' => 'Accès non autorisé. Compte commerçant requis.',
                 ], 403);
             }
 
             $merchant = $user->merchant;
-            if (!$merchant) {
+            if (! $merchant) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Profil commerçant non trouvé.'
+                    'message' => 'Profil commerçant non trouvé.',
                 ], 404);
             }
 
@@ -307,7 +307,7 @@ class MerchantController extends Controller
                 return response()->json([
                     'success' => false,
                     'message' => 'Données de géolocalisation invalides',
-                    'errors' => $validator->errors()
+                    'errors' => $validator->errors(),
                 ], 422);
             }
 
@@ -322,14 +322,14 @@ class MerchantController extends Controller
                 'data' => [
                     'latitude' => $merchant->latitude,
                     'longitude' => $merchant->longitude,
-                ]
+                ],
             ]);
 
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur lors de la mise à jour de la localisation',
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ], 500);
         }
     }
@@ -345,15 +345,15 @@ class MerchantController extends Controller
             if ($user->role !== 'merchant') {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Accès non autorisé. Compte commerçant requis.'
+                    'message' => 'Accès non autorisé. Compte commerçant requis.',
                 ], 403);
             }
 
             $merchant = $user->merchant;
-            if (!$merchant) {
+            if (! $merchant) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Profil commerçant non trouvé.'
+                    'message' => 'Profil commerçant non trouvé.',
                 ], 404);
             }
 
@@ -362,15 +362,15 @@ class MerchantController extends Controller
                 'data' => [
                     'latitude' => $merchant->latitude,
                     'longitude' => $merchant->longitude,
-                    'has_location' => !is_null($merchant->latitude) && !is_null($merchant->longitude),
-                ]
+                    'has_location' => ! is_null($merchant->latitude) && ! is_null($merchant->longitude),
+                ],
             ]);
 
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur lors de la récupération de la localisation',
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ], 500);
         }
     }
@@ -391,7 +391,7 @@ class MerchantController extends Controller
                 return response()->json([
                     'success' => false,
                     'message' => 'Coordonnées invalides',
-                    'errors' => $validator->errors()
+                    'errors' => $validator->errors(),
                 ], 422);
             }
 
@@ -400,8 +400,8 @@ class MerchantController extends Controller
             $radiusKm = $request->get('radius', 10);
 
             $merchants = Merchant::with(['user', 'products' => function ($query) {
-                    $query->active()->available();
-                }])
+                $query->active()->available();
+            }])
                 ->verified()
                 ->whereNotNull('latitude')
                 ->whereNotNull('longitude')
@@ -423,7 +423,7 @@ class MerchantController extends Controller
                         'city' => $merchant->user->city,
                         'address' => $merchant->user->address,
                         'phone' => $merchant->user->phone,
-                    ]
+                    ],
                 ];
             });
 
@@ -434,15 +434,15 @@ class MerchantController extends Controller
                     'latitude' => $latitude,
                     'longitude' => $longitude,
                     'radius_km' => $radiusKm,
-                    'total_found' => $merchants->count()
-                ]
+                    'total_found' => $merchants->count(),
+                ],
             ]);
 
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur lors de la recherche de commerçants',
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ], 500);
         }
     }
@@ -454,8 +454,8 @@ class MerchantController extends Controller
     {
         try {
             $merchants = Merchant::with(['user', 'products' => function ($query) {
-                    $query->active()->available();
-                }])
+                $query->active()->available();
+            }])
                 ->verified()
                 ->whereNotNull('latitude')
                 ->whereNotNull('longitude')
@@ -475,21 +475,21 @@ class MerchantController extends Controller
                         'city' => $merchant->user->city,
                         'address' => $merchant->user->address,
                         'phone' => $merchant->user->phone,
-                    ]
+                    ],
                 ];
             });
 
             return response()->json([
                 'success' => true,
                 'data' => $merchants,
-                'total' => $merchants->count()
+                'total' => $merchants->count(),
             ]);
 
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur lors de la récupération des commerçants',
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ], 500);
         }
     }
@@ -505,15 +505,15 @@ class MerchantController extends Controller
             if ($user->role !== 'merchant') {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Accès non autorisé. Compte commerçant requis.'
+                    'message' => 'Accès non autorisé. Compte commerçant requis.',
                 ], 403);
             }
 
             $merchant = $user->merchant;
-            if (!$merchant) {
+            if (! $merchant) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Profil commerçant non trouvé.'
+                    'message' => 'Profil commerçant non trouvé.',
                 ], 404);
             }
 
@@ -522,7 +522,7 @@ class MerchantController extends Controller
                 'business_name' => 'nullable|string|max:255',
                 'business_type' => 'nullable|string|max:255',
                 'description' => 'nullable|string|max:1000',
-                'siret' => 'nullable|string|max:14|unique:merchants,siret,' . $merchant->id,
+                'siret' => 'nullable|string|max:14|unique:merchants,siret,'.$merchant->id,
                 'phone' => 'nullable|string|max:20',
                 'address' => 'nullable|string|max:500',
                 'city' => 'nullable|string|max:255',
@@ -536,7 +536,7 @@ class MerchantController extends Controller
                 return response()->json([
                     'success' => false,
                     'message' => 'Données invalides',
-                    'errors' => $validator->errors()
+                    'errors' => $validator->errors(),
                 ], 422);
             }
 
@@ -555,7 +555,7 @@ class MerchantController extends Controller
                 $merchantData['siret'] = $request->siret;
             }
 
-            if (!empty($merchantData)) {
+            if (! empty($merchantData)) {
                 $merchant->update($merchantData);
             }
 
@@ -571,7 +571,7 @@ class MerchantController extends Controller
                 $userData['city'] = $request->city;
             }
 
-            if (!empty($userData)) {
+            if (! empty($userData)) {
                 $user->update($userData);
             }
 
@@ -603,14 +603,14 @@ class MerchantController extends Controller
                         'created_at' => $merchant->user->created_at,
                         'updated_at' => $merchant->user->updated_at,
                     ],
-                ]
+                ],
             ]);
 
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur lors de la mise à jour du profil',
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ], 500);
         }
     }
@@ -628,15 +628,15 @@ class MerchantController extends Controller
             if ($user->role !== 'merchant') {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Accès non autorisé. Compte commerçant requis.'
+                    'message' => 'Accès non autorisé. Compte commerçant requis.',
                 ], 403);
             }
 
             $merchant = $user->merchant;
-            if (!$merchant) {
+            if (! $merchant) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Profil commerçant non trouvé.'
+                    'message' => 'Profil commerçant non trouvé.',
                 ], 404);
             }
 
@@ -655,7 +655,7 @@ class MerchantController extends Controller
                 return response()->json([
                     'success' => false,
                     'message' => 'Fichier invalide',
-                    'errors' => $validator->errors()
+                    'errors' => $validator->errors(),
                 ], 422);
             }
 
@@ -668,7 +668,7 @@ class MerchantController extends Controller
             if (is_null($mimeType) || empty($mimeType)) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Impossible de déterminer le type du fichier. Fichier corrompu ?'
+                    'message' => 'Impossible de déterminer le type du fichier. Fichier corrompu ?',
                 ], 422);
             }
 
@@ -679,11 +679,11 @@ class MerchantController extends Controller
                 'image/png' => ['png'],
             ];
 
-            if (!array_key_exists($mimeType, $allowedMimeTypes)) {
+            if (! array_key_exists($mimeType, $allowedMimeTypes)) {
                 return response()->json([
                     'success' => false,
                     'message' => 'Type de fichier non autorisé. Formats acceptés : JPEG, PNG',
-                    'error' => "MIME type '{$mimeType}' non supporté. Types valides : image/jpeg, image/png"
+                    'error' => "MIME type '{$mimeType}' non supporté. Types valides : image/jpeg, image/png",
                 ], 422);
             }
 
@@ -692,7 +692,7 @@ class MerchantController extends Controller
             if ($imageInfo === false) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Impossible de lire les dimensions de l\'image. Fichier corrompu ?'
+                    'message' => 'Impossible de lire les dimensions de l\'image. Fichier corrompu ?',
                 ], 422);
             }
 
@@ -701,14 +701,14 @@ class MerchantController extends Controller
                 return response()->json([
                     'success' => false,
                     'message' => 'Image trop grande. Dimensions maximales : 1000x1000px',
-                    'error' => "Current dimensions: {$width}x{$height}px"
+                    'error' => "Current dimensions: {$width}x{$height}px",
                 ], 422);
             }
 
             // 🐛 BUG FIX #17: Use first extension from mapping for consistency (.jpg, not .jpeg)
             // 🔒 SECURITY: Extension determined by server-verified MIME type, not client input
             $extension = $allowedMimeTypes[$mimeType][0];
-            $filename = \Illuminate\Support\Str::random(40) . '.' . $extension;
+            $filename = \Illuminate\Support\Str::random(40).'.'.$extension;
 
             // 🔒 SECURITY: Delete old photo safely using Storage facade
             if ($merchant->photo_url) {
@@ -718,21 +718,22 @@ class MerchantController extends Controller
                 if (str_contains($oldPath, '..') || str_contains($oldPath, '//')) {
                     \Log::error('Path traversal attempt detected in merchant photo deletion', [
                         'merchant_id' => $merchant->id,
-                        'suspicious_path' => $oldPath
+                        'suspicious_path' => $oldPath,
                     ]);
+
                     return response()->json([
                         'success' => false,
-                        'message' => 'Invalid file path detected'
+                        'message' => 'Invalid file path detected',
                     ], 400);
                 }
 
                 // 🐛 BUG FIX #5: Verify deletion success
                 // 🐛 BUG FIX #13: Standardize Storage facade usage
-                if (!Storage::disk('public')->delete($oldPath)) {
+                if (! Storage::disk('public')->delete($oldPath)) {
                     \Log::warning('Failed to delete old merchant photo', [
                         'merchant_id' => $merchant->id,
                         'path' => $oldPath,
-                        'exists' => Storage::disk('public')->exists($oldPath)
+                        'exists' => Storage::disk('public')->exists($oldPath),
                     ]);
                 }
             }
@@ -745,7 +746,7 @@ class MerchantController extends Controller
                 // 🔒 SECURITY: Use Storage facade for secure file handling
                 $path = $photo->storeAs('merchants', $filename, 'public');
                 $uploadedPath = $path; // Track uploaded path for cleanup
-                $photoUrl = '/storage/' . $path;
+                $photoUrl = '/storage/'.$path;
 
                 // Mettre à jour la base de données (dans transaction)
                 $merchant->update(['photo_url' => $photoUrl]);
@@ -759,7 +760,7 @@ class MerchantController extends Controller
                     'data' => [
                         'photo_url' => $photoUrl,
                         'full_url' => url($photoUrl),
-                    ]
+                    ],
                 ]);
 
             } catch (\Exception $dbException) {
@@ -772,7 +773,7 @@ class MerchantController extends Controller
                     Storage::disk('public')->delete($uploadedPath);
                     \Log::warning('Cleaned up orphan file after DB transaction failure', [
                         'path' => $uploadedPath,
-                        'merchant_id' => $merchant->id
+                        'merchant_id' => $merchant->id,
                     ]);
                 }
 
@@ -790,13 +791,13 @@ class MerchantController extends Controller
                 'error' => $e->getMessage(),
                 'file' => $e->getFile(),
                 'line' => $e->getLine(),
-                'trace' => app()->isLocal() ? $e->getTraceAsString() : null
+                'trace' => app()->isLocal() ? $e->getTraceAsString() : null,
             ]);
 
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur lors de l\'upload de la photo',
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ], 500);
         }
     }
@@ -812,15 +813,15 @@ class MerchantController extends Controller
             if ($user->role !== 'merchant') {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Accès non autorisé. Compte commerçant requis.'
+                    'message' => 'Accès non autorisé. Compte commerçant requis.',
                 ], 403);
             }
 
             $merchant = $user->merchant;
-            if (!$merchant) {
+            if (! $merchant) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Profil commerçant non trouvé.'
+                    'message' => 'Profil commerçant non trouvé.',
                 ], 404);
             }
 
@@ -828,14 +829,14 @@ class MerchantController extends Controller
                 'success' => true,
                 'data' => [
                     'opening_hours' => $merchant->opening_hours ?? [],
-                ]
+                ],
             ]);
 
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur lors de la récupération des heures d\'ouverture',
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ], 500);
         }
     }
@@ -851,15 +852,15 @@ class MerchantController extends Controller
             if ($user->role !== 'merchant') {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Accès non autorisé. Compte commerçant requis.'
+                    'message' => 'Accès non autorisé. Compte commerçant requis.',
                 ], 403);
             }
 
             $merchant = $user->merchant;
-            if (!$merchant) {
+            if (! $merchant) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Profil commerçant non trouvé.'
+                    'message' => 'Profil commerçant non trouvé.',
                 ], 404);
             }
 
@@ -889,7 +890,7 @@ class MerchantController extends Controller
                 return response()->json([
                     'success' => false,
                     'message' => 'Données invalides',
-                    'errors' => $validator->errors()
+                    'errors' => $validator->errors(),
                 ], 422);
             }
 
@@ -902,48 +903,48 @@ class MerchantController extends Controller
                 return response()->json([
                     'success' => false,
                     'message' => 'Erreur de validation',
-                    'errors' => ['opening_hours' => ['Chaque jour ne peut apparaître qu\'une seule fois']]
+                    'errors' => ['opening_hours' => ['Chaque jour ne peut apparaître qu\'une seule fois']],
                 ], 422);
             }
 
             foreach ($openingHours as $index => $hours) {
                 if ($hours['is_open']) {
                     // Morning validation
-                    if (!empty($hours['morning_start']) && !empty($hours['morning_end'])) {
+                    if (! empty($hours['morning_start']) && ! empty($hours['morning_end'])) {
                         if ($hours['morning_start'] >= $hours['morning_end']) {
                             return response()->json([
                                 'success' => false,
                                 'message' => 'Erreur de validation',
                                 'errors' => [
-                                    "opening_hours.{$index}.morning_end" => ["L'heure de fin doit être après l'heure de début"]
-                                ]
+                                    "opening_hours.{$index}.morning_end" => ["L'heure de fin doit être après l'heure de début"],
+                                ],
                             ], 422);
                         }
                     }
 
                     // Afternoon validation
-                    if (!empty($hours['afternoon_start']) && !empty($hours['afternoon_end'])) {
+                    if (! empty($hours['afternoon_start']) && ! empty($hours['afternoon_end'])) {
                         if ($hours['afternoon_start'] >= $hours['afternoon_end']) {
                             return response()->json([
                                 'success' => false,
                                 'message' => 'Erreur de validation',
                                 'errors' => [
-                                    "opening_hours.{$index}.afternoon_end" => ["L'heure de fin doit être après l'heure de début"]
-                                ]
+                                    "opening_hours.{$index}.afternoon_end" => ["L'heure de fin doit être après l'heure de début"],
+                                ],
                             ], 422);
                         }
                     }
 
                     // 🐛 BUG FIX #8: Allow continuous opening (changed <= to <)
                     // Validate afternoon starts after morning ends
-                    if (!empty($hours['morning_end']) && !empty($hours['afternoon_start'])) {
+                    if (! empty($hours['morning_end']) && ! empty($hours['afternoon_start'])) {
                         if ($hours['afternoon_start'] < $hours['morning_end']) {
                             return response()->json([
                                 'success' => false,
                                 'message' => 'Erreur de validation',
                                 'errors' => [
-                                    "opening_hours.{$index}.afternoon_start" => ["L'heure de début d'après-midi doit être après la fin du matin"]
-                                ]
+                                    "opening_hours.{$index}.afternoon_start" => ["L'heure de début d'après-midi doit être après la fin du matin"],
+                                ],
                             ], 422);
                         }
                     }
@@ -960,7 +961,7 @@ class MerchantController extends Controller
                 'message' => 'Heures d\'ouverture mises à jour avec succès',
                 'data' => [
                     'opening_hours' => $merchant->opening_hours,
-                ]
+                ],
             ]);
 
         } catch (\Exception $e) {
@@ -970,13 +971,13 @@ class MerchantController extends Controller
                 'error' => $e->getMessage(),
                 'file' => $e->getFile(),
                 'line' => $e->getLine(),
-                'trace' => app()->isLocal() ? $e->getTraceAsString() : null
+                'trace' => app()->isLocal() ? $e->getTraceAsString() : null,
             ]);
 
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur lors de la mise à jour des heures d\'ouverture',
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ], 500);
         }
     }
@@ -1000,12 +1001,12 @@ class MerchantController extends Controller
                     } else {
                         $segments = [];
 
-                        if (!empty($value['morning_start']) && !empty($value['morning_end'])) {
-                            $segments[] = $value['morning_start'] . ' - ' . $value['morning_end'];
+                        if (! empty($value['morning_start']) && ! empty($value['morning_end'])) {
+                            $segments[] = $value['morning_start'].' - '.$value['morning_end'];
                         }
 
-                        if (!empty($value['afternoon_start']) && !empty($value['afternoon_end'])) {
-                            $segments[] = $value['afternoon_start'] . ' - ' . $value['afternoon_end'];
+                        if (! empty($value['afternoon_start']) && ! empty($value['afternoon_end'])) {
+                            $segments[] = $value['afternoon_start'].' - '.$value['afternoon_end'];
                         }
 
                         $hours = $value['hours'] ?? ($segments ? implode(' / ', $segments) : 'Horaires non renseignés');
@@ -1032,7 +1033,7 @@ class MerchantController extends Controller
                     }
 
                     return [
-                        'day' => 'Jour ' . ($index + 1),
+                        'day' => 'Jour '.($index + 1),
                         'hours' => $line,
                     ];
                 })

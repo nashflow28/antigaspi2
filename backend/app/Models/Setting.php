@@ -26,8 +26,7 @@ class Setting extends Model
     /**
      * Get a setting value by key with optional caching
      *
-     * @param string $key
-     * @param mixed $default
+     * @param  mixed  $default
      * @return mixed
      */
     public static function get(string $key, $default = null)
@@ -35,7 +34,7 @@ class Setting extends Model
         return Cache::remember("setting.{$key}", 3600, function () use ($key, $default) {
             $setting = static::where('key', $key)->first();
 
-            if (!$setting) {
+            if (! $setting) {
                 return $default;
             }
 
@@ -46,15 +45,13 @@ class Setting extends Model
     /**
      * Set a setting value by key
      *
-     * @param string $key
-     * @param mixed $value
-     * @return bool
+     * @param  mixed  $value
      */
     public static function set(string $key, $value): bool
     {
         $setting = static::where('key', $key)->first();
 
-        if (!$setting) {
+        if (! $setting) {
             return false;
         }
 
@@ -70,8 +67,6 @@ class Setting extends Model
 
     /**
      * Get all settings grouped by category
-     *
-     * @return array
      */
     public static function getAllGrouped(): array
     {
@@ -90,13 +85,12 @@ class Setting extends Model
     /**
      * Cast value to appropriate type
      *
-     * @param mixed $value
-     * @param string $type
+     * @param  mixed  $value
      * @return mixed
      */
     protected static function castValue($value, string $type)
     {
-        return match($type) {
+        return match ($type) {
             'integer' => (int) $value,
             'boolean' => (bool) $value || $value === '1',
             'decimal' => (float) $value,
@@ -108,13 +102,11 @@ class Setting extends Model
     /**
      * Prepare value for storage
      *
-     * @param mixed $value
-     * @param string $type
-     * @return string
+     * @param  mixed  $value
      */
     protected static function prepareValue($value, string $type): string
     {
-        return match($type) {
+        return match ($type) {
             'boolean' => $value ? '1' : '0',
             'json' => json_encode($value),
             default => (string) $value,
@@ -123,8 +115,6 @@ class Setting extends Model
 
     /**
      * Clear all settings cache
-     *
-     * @return void
      */
     public static function clearCache(): void
     {

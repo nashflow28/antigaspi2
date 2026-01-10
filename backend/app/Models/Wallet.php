@@ -28,6 +28,7 @@ class Wallet extends Model
     ];
 
     const MAX_PIN_ATTEMPTS = 5;
+
     const PIN_LOCK_MINUTES = 30;
 
     protected function casts(): array
@@ -76,7 +77,7 @@ class Wallet extends Model
             'type' => 'credit',
             'amount' => $amount,
             'description' => $description,
-            'reference' => 'CR_' . Str::upper(Str::random(10)),
+            'reference' => 'CR_'.Str::upper(Str::random(10)),
             'metadata' => [
                 'payment_id' => $payment?->id,
                 'previous_balance' => $this->balance - $amount,
@@ -87,11 +88,11 @@ class Wallet extends Model
 
     public function debit(float $amount, string $description, ?Payment $payment = null): WalletTransaction
     {
-        if (!$this->hasBalance($amount)) {
+        if (! $this->hasBalance($amount)) {
             throw new \Exception('Insufficient wallet balance');
         }
 
-        if (!$this->canSpend($amount)) {
+        if (! $this->canSpend($amount)) {
             throw new \Exception('Daily spending limit exceeded');
         }
 
@@ -104,7 +105,7 @@ class Wallet extends Model
             'type' => 'debit',
             'amount' => $amount,
             'description' => $description,
-            'reference' => 'DB_' . Str::upper(Str::random(10)),
+            'reference' => 'DB_'.Str::upper(Str::random(10)),
             'metadata' => [
                 'payment_id' => $payment?->id,
                 'previous_balance' => $this->balance + $amount,
@@ -122,6 +123,7 @@ class Wallet extends Model
     public function canSpend(float $amount): bool
     {
         $this->resetDailySpentIfNeeded();
+
         return ($this->daily_spent + $amount) <= $this->daily_limit;
     }
 
@@ -138,13 +140,14 @@ class Wallet extends Model
             throw new \Exception('Wallet PIN is locked. Try again later.');
         }
 
-        if (!$this->pin_hash) {
+        if (! $this->pin_hash) {
             return false;
         }
 
         if (Hash::check($pin, $this->pin_hash)) {
             // Reset attempts on success
             $this->update(['pin_attempts' => 0, 'pin_locked_until' => null]);
+
             return true;
         }
 
@@ -157,6 +160,7 @@ class Wallet extends Model
         }
 
         $this->update($updateData);
+
         return false;
     }
 
@@ -167,15 +171,16 @@ class Wallet extends Model
 
     public function getRemainingLockMinutes(): ?int
     {
-        if (!$this->isPinLocked()) {
+        if (! $this->isPinLocked()) {
             return null;
         }
+
         return (int) now()->diffInMinutes($this->pin_locked_until, false);
     }
 
     public function hasPin(): bool
     {
-        return !is_null($this->pin_hash);
+        return ! is_null($this->pin_hash);
     }
 
     // Daily spending management
@@ -189,7 +194,7 @@ class Wallet extends Model
     private function resetDailySpentIfNeeded(): void
     {
         // BUG-001 FIX: Reset if date is any day before today (not just yesterday)
-        if (!$this->daily_spent_date || $this->daily_spent_date->lt(now()->startOfDay())) {
+        if (! $this->daily_spent_date || $this->daily_spent_date->lt(now()->startOfDay())) {
             $this->update([
                 'daily_spent' => 0,
                 'daily_spent_date' => now()->toDateString(),
@@ -211,12 +216,13 @@ class Wallet extends Model
     // Attributes
     public function getFormattedBalanceAttribute(): string
     {
-        return number_format($this->balance, 0, ',', ' ') . ' ' . $this->currency;
+        return number_format($this->balance, 0, ',', ' ').' '.$this->currency;
     }
 
     public function getRemainingDailyLimitAttribute(): float
     {
         $this->resetDailySpentIfNeeded();
+
         return max(0, $this->daily_limit - $this->daily_spent);
     }
 }

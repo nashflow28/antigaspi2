@@ -11,23 +11,26 @@ use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Str;
-use Tymon\JWTAuth\Facades\JWTAuth;
 use Tests\TestCase;
+use Tymon\JWTAuth\Facades\JWTAuth;
 
 class ReservationControllerTest extends TestCase
 {
     use RefreshDatabase;
 
     private User $consumer;
+
     private User $merchantUser;
+
     private Merchant $merchant;
+
     private Product $product;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        config(['app.key' => 'base64:' . base64_encode(random_bytes(32))]);
+        config(['app.key' => 'base64:'.base64_encode(random_bytes(32))]);
         config(['jwt.secret' => Str::random(32)]);
 
         Notification::fake();
@@ -70,7 +73,8 @@ class ReservationControllerTest extends TestCase
     protected function actingAsJwt(User $user): array
     {
         $token = JWTAuth::fromUser($user);
-        return ['Authorization' => 'Bearer ' . $token];
+
+        return ['Authorization' => 'Bearer '.$token];
     }
 
     // ==================== CREATION TESTS ====================

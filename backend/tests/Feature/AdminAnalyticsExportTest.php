@@ -2,11 +2,11 @@
 
 namespace Tests\Feature;
 
-use App\Models\User;
+use App\Models\Category;
 use App\Models\Merchant;
 use App\Models\Product;
-use App\Models\Category;
 use App\Models\Reservation;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 use Tymon\JWTAuth\Facades\JWTAuth;
@@ -38,7 +38,7 @@ class AdminAnalyticsExportTest extends TestCase
         ]);
 
         $token = JWTAuth::fromUser($admin);
-        $this->withHeader('Authorization', 'Bearer ' . $token);
+        $this->withHeader('Authorization', 'Bearer '.$token);
     }
 
     protected function createTestData(): void
@@ -125,7 +125,7 @@ class AdminAnalyticsExportTest extends TestCase
         ]);
 
         $token = JWTAuth::fromUser($consumer);
-        $this->withHeader('Authorization', 'Bearer ' . $token);
+        $this->withHeader('Authorization', 'Bearer '.$token);
 
         $response = $this->postJson('/api/admin/analytics/export', [
             'format' => 'csv',

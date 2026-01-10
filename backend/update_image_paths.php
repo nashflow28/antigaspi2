@@ -18,7 +18,7 @@ echo "🔄 Mise à jour des chemins d'images...\n\n";
 $updated = DB::table('products')
     ->where('image_url', 'LIKE', 'images/%')
     ->update([
-        'image_url' => DB::raw("REPLACE(image_url, 'images/', 'storage/products/')")
+        'image_url' => DB::raw("REPLACE(image_url, 'images/', 'storage/products/')"),
     ]);
 
 echo "✅ {$updated} produits mis à jour avec les nouveaux chemins d'images\n";

@@ -20,36 +20,26 @@ class TypesenseEngine extends Engine
 {
     /**
      * The Typesense client instance.
-     *
-     * @var \Typesense\Client
      */
     protected Typesense $typesense;
 
     /**
      * The specified search parameters.
-     *
-     * @var array
      */
     protected array $searchParameters = [];
 
     /**
      * The maximum number of results that can be fetched per page.
-     *
-     * @var int
      */
     private int $maxPerPage = 250;
 
     /**
      * The maximum number of results that can be fetched during pagination.
-     *
-     * @var int
      */
     protected int $maxTotalResults;
 
     /**
      * Create new Typesense engine instance.
-     *
-     * @param  Typesense  $typesense
      */
     public function __construct(Typesense $typesense, int $maxTotalResults)
     {
@@ -105,10 +95,6 @@ class TypesenseEngine extends Engine
     /**
      * Import the given documents into the index.
      *
-     * @param  TypesenseCollection  $collectionIndex
-     * @param  array  $documents
-     * @param  string  $action
-     * @return \Illuminate\Support\Collection
      *
      * @throws \JsonException
      * @throws \Typesense\Exceptions\TypesenseClientError
@@ -175,9 +161,7 @@ class TypesenseEngine extends Engine
     /**
      * Delete a document from the index.
      *
-     * @param  TypesenseCollection  $collectionIndex
      * @param  mixed  $modelId
-     * @return array
      *
      * @throws \Typesense\Exceptions\ObjectNotFound
      * @throws \Typesense\Exceptions\TypesenseClientError
@@ -199,7 +183,6 @@ class TypesenseEngine extends Engine
     /**
      * Perform the given search on the engine.
      *
-     * @param  \Laravel\Scout\Builder  $builder
      * @return mixed
      *
      * @throws \Http\Client\Exception
@@ -221,7 +204,6 @@ class TypesenseEngine extends Engine
     /**
      * Perform the given search on the engine with pagination.
      *
-     * @param  \Laravel\Scout\Builder  $builder
      * @param  int  $perPage
      * @param  int  $page
      * @return mixed
@@ -249,9 +231,6 @@ class TypesenseEngine extends Engine
     /**
      * Perform the given search on the engine.
      *
-     * @param  \Laravel\Scout\Builder  $builder
-     * @param  array  $options
-     * @return mixed
      *
      * @throws \Http\Client\Exception
      * @throws \Typesense\Exceptions\TypesenseClientError
@@ -280,7 +259,6 @@ class TypesenseEngine extends Engine
     /**
      * Perform a paginated search on the engine.
      *
-     * @param  \Laravel\Scout\Builder  $builder
      * @return mixed
      *
      * @throws \Http\Client\Exception
@@ -325,11 +303,6 @@ class TypesenseEngine extends Engine
 
     /**
      * Build the search parameters for a given Scout query builder.
-     *
-     * @param  \Laravel\Scout\Builder  $builder
-     * @param  int  $page
-     * @param  int|null  $perPage
-     * @return array
      */
     public function buildSearchParameters(Builder $builder, int $page, ?int $perPage): array
     {
@@ -374,9 +347,6 @@ class TypesenseEngine extends Engine
 
     /**
      * Prepare the filters for a given search query.
-     *
-     * @param  \Laravel\Scout\Builder  $builder
-     * @return string
      */
     protected function filters(Builder $builder): string
     {
@@ -405,7 +375,6 @@ class TypesenseEngine extends Engine
     /**
      * Parse the given filter value.
      *
-     * @param  array|string|bool|int|float  $value
      * @return array|bool|float|int|string
      */
     protected function parseFilterValue(array|string|bool|int|float $value)
@@ -423,10 +392,6 @@ class TypesenseEngine extends Engine
 
     /**
      * Create a "where" filter string.
-     *
-     * @param  array|string  $value
-     * @param  string  $key
-     * @return string
      */
     protected function parseWhereFilter(array|string $value, string $key): string
     {
@@ -437,10 +402,6 @@ class TypesenseEngine extends Engine
 
     /**
      * Create a "where in" filter string.
-     *
-     * @param  array  $value
-     * @param  string  $key
-     * @return string
      */
     protected function parseWhereInFilter(array $value, string $key): string
     {
@@ -451,8 +412,6 @@ class TypesenseEngine extends Engine
      * Create a "where not in" filter string.
      *
      * @param  array|string  $value
-     * @param  string  $key
-     * @return string
      */
     protected function parseWhereNotInFilter(array $value, string $key): string
     {
@@ -461,9 +420,6 @@ class TypesenseEngine extends Engine
 
     /**
      * Parse the order by fields for the query.
-     *
-     * @param  array  $orders
-     * @return string
      */
     protected function parseOrderBy(array $orders): string
     {
@@ -492,7 +448,6 @@ class TypesenseEngine extends Engine
     /**
      * Map the given results to instances of the given model.
      *
-     * @param  \Laravel\Scout\Builder  $builder
      * @param  mixed  $results
      * @param  \Illuminate\Database\Eloquent\Model  $model
      * @return \Illuminate\Database\Eloquent\Collection
@@ -527,7 +482,6 @@ class TypesenseEngine extends Engine
     /**
      * Map the given results to instances of the given model via a lazy collection.
      *
-     * @param  \Laravel\Scout\Builder  $builder
      * @param  mixed  $results
      * @param  \Illuminate\Database\Eloquent\Model  $model
      * @return \Illuminate\Support\LazyCollection
@@ -580,7 +534,6 @@ class TypesenseEngine extends Engine
      * Create a search index.
      *
      * @param  string  $name
-     * @param  array  $options
      * @return void
      *
      * @throws NotSupportedException
@@ -609,7 +562,6 @@ class TypesenseEngine extends Engine
      * Get collection from model or create new one.
      *
      * @param  \Illuminate\Database\Eloquent\Model  $model
-     * @return \Typesense\Collection
      *
      * @throws \Typesense\Exceptions\TypesenseClientError
      * @throws \Http\Client\Exception
@@ -666,7 +618,6 @@ class TypesenseEngine extends Engine
      * Determine if model uses soft deletes.
      *
      * @param  \Illuminate\Database\Eloquent\Model  $model
-     * @return bool
      */
     protected function usesSoftDelete($model): bool
     {

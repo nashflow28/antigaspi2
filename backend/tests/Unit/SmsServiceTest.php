@@ -19,7 +19,7 @@ class SmsServiceTest extends TestCase
         config(['services.sms.token' => 'test-token']);
         config(['services.sms.sender' => 'TestApp']);
 
-        $this->smsService = new SmsService();
+        $this->smsService = new SmsService;
     }
 
     // ==================== CONFIGURATION TESTS ====================
@@ -32,7 +32,7 @@ class SmsServiceTest extends TestCase
     public function test_is_configured_returns_false_when_token_empty(): void
     {
         config(['services.sms.token' => null]);
-        $service = new SmsService();
+        $service = new SmsService;
 
         $this->assertFalse($service->isConfigured());
     }
@@ -40,7 +40,7 @@ class SmsServiceTest extends TestCase
     public function test_send_returns_error_when_not_configured(): void
     {
         config(['services.sms.token' => null]);
-        $service = new SmsService();
+        $service = new SmsService;
 
         $result = $service->send('22891000000', 'Test message');
 

@@ -35,40 +35,40 @@ return new class extends Migration
 
         // Ajouter colonne rejection_reason aux tables existantes
         Schema::table('merchants', function (Blueprint $table) {
-            if (!Schema::hasColumn('merchants', 'rejection_reason')) {
+            if (! Schema::hasColumn('merchants', 'rejection_reason')) {
                 $table->text('rejection_reason')->nullable()->after('is_verified');
             }
-            if (!Schema::hasColumn('merchants', 'verified_at')) {
+            if (! Schema::hasColumn('merchants', 'verified_at')) {
                 $table->timestamp('verified_at')->nullable()->after('rejection_reason');
             }
-            if (!Schema::hasColumn('merchants', 'verified_by')) {
+            if (! Schema::hasColumn('merchants', 'verified_by')) {
                 $table->foreignId('verified_by')->nullable()->after('verified_at')->constrained('users')->nullOnDelete();
             }
         });
 
         Schema::table('products', function (Blueprint $table) {
-            if (!Schema::hasColumn('products', 'rejection_reason')) {
+            if (! Schema::hasColumn('products', 'rejection_reason')) {
                 $table->text('rejection_reason')->nullable()->after('is_active');
             }
-            if (!Schema::hasColumn('products', 'approved_at')) {
+            if (! Schema::hasColumn('products', 'approved_at')) {
                 $table->timestamp('approved_at')->nullable()->after('rejection_reason');
             }
-            if (!Schema::hasColumn('products', 'approved_by')) {
+            if (! Schema::hasColumn('products', 'approved_by')) {
                 $table->foreignId('approved_by')->nullable()->after('approved_at')->constrained('users')->nullOnDelete();
             }
-            if (!Schema::hasColumn('products', 'moderation_status')) {
+            if (! Schema::hasColumn('products', 'moderation_status')) {
                 $table->enum('moderation_status', ['pending', 'approved', 'rejected'])->default('pending')->after('approved_by');
             }
         });
 
         Schema::table('users', function (Blueprint $table) {
-            if (!Schema::hasColumn('users', 'suspension_reason')) {
+            if (! Schema::hasColumn('users', 'suspension_reason')) {
                 $table->text('suspension_reason')->nullable()->after('is_active');
             }
-            if (!Schema::hasColumn('users', 'suspended_at')) {
+            if (! Schema::hasColumn('users', 'suspended_at')) {
                 $table->timestamp('suspended_at')->nullable()->after('suspension_reason');
             }
-            if (!Schema::hasColumn('users', 'suspended_by')) {
+            if (! Schema::hasColumn('users', 'suspended_by')) {
                 $table->foreignId('suspended_by')->nullable()->after('suspended_at')->constrained('users')->nullOnDelete();
             }
         });

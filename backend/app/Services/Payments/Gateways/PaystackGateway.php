@@ -12,9 +12,7 @@ use Illuminate\Support\Facades\Http;
 
 class PaystackGateway implements PaymentGateway
 {
-    public function __construct(private array $config)
-    {
-    }
+    public function __construct(private array $config) {}
 
     public function initialize(Reservation $reservation, Payment $payment, array $data = []): Payment
     {
@@ -27,11 +25,11 @@ class PaystackGateway implements PaymentGateway
         ];
 
         $response = Http::withToken($this->config['secret_key'] ?? '')->post(
-            rtrim($this->config['base_url'] ?? 'https://api.paystack.co', '/') . '/transaction/initialize',
+            rtrim($this->config['base_url'] ?? 'https://api.paystack.co', '/').'/transaction/initialize',
             array_filter($payload)
         );
 
-        if (!$response->successful()) {
+        if (! $response->successful()) {
             throw PaymentException::initializationFailed($response->body());
         }
 
@@ -57,10 +55,10 @@ class PaystackGateway implements PaymentGateway
     public function refreshStatus(Payment $payment): Payment
     {
         $response = Http::withToken($this->config['secret_key'] ?? '')->get(
-            rtrim($this->config['base_url'] ?? 'https://api.paystack.co', '/') . '/transaction/verify/' . $payment->reference
+            rtrim($this->config['base_url'] ?? 'https://api.paystack.co', '/').'/transaction/verify/'.$payment->reference
         );
 
-        if (!$response->successful()) {
+        if (! $response->successful()) {
             throw PaymentException::refreshFailed($response->body());
         }
 
@@ -82,13 +80,13 @@ class PaystackGateway implements PaymentGateway
     {
         $reference = Arr::get($payload, 'data.reference', Arr::get($payload, 'reference'));
 
-        if (!$reference) {
+        if (! $reference) {
             return null;
         }
 
         $payment = Payment::where('reference', $reference)->first();
 
-        if (!$payment) {
+        if (! $payment) {
             return null;
         }
 

@@ -21,9 +21,7 @@ use Tymon\JWTAuth\Facades\JWTAuth;
 
 class CartController extends Controller
 {
-    public function __construct(private readonly ReservationService $reservations)
-    {
-    }
+    public function __construct(private readonly ReservationService $reservations) {}
 
     public function show(): JsonResponse
     {
@@ -42,7 +40,7 @@ class CartController extends Controller
         $product = Product::with('merchant')->findOrFail($request->product_id);
 
         $cart = $user->cart;
-        if (!$cart) {
+        if (! $cart) {
             $cart = Cart::create([
                 'user_id' => $user->id,
                 'merchant_id' => $product->merchant_id,
@@ -85,7 +83,7 @@ class CartController extends Controller
         $user = JWTAuth::parseToken()->authenticate();
         $cart = $user->cart;
 
-        if (!$cart || $item->cart_id !== $cart->id) {
+        if (! $cart || $item->cart_id !== $cart->id) {
             return response()->json([
                 'success' => false,
                 'message' => 'Article introuvable dans votre panier',
@@ -111,7 +109,7 @@ class CartController extends Controller
         $user = JWTAuth::parseToken()->authenticate();
         $cart = $user->cart;
 
-        if (!$cart || $item->cart_id !== $cart->id) {
+        if (! $cart || $item->cart_id !== $cart->id) {
             return response()->json([
                 'success' => false,
                 'message' => 'Article introuvable dans votre panier',
@@ -123,6 +121,7 @@ class CartController extends Controller
 
         if ($cart->isEmpty()) {
             $cart->delete();
+
             return response()->json([
                 'success' => true,
                 'message' => 'Panier vidé',
@@ -163,7 +162,7 @@ class CartController extends Controller
             $query->lockForUpdate();
         }, 'merchant']);
 
-        if (!$cart || $cart->items->isEmpty()) {
+        if (! $cart || $cart->items->isEmpty()) {
             return response()->json([
                 'success' => false,
                 'message' => 'Votre panier est vide.',
@@ -178,7 +177,7 @@ class CartController extends Controller
 
                 foreach ($cart->items as $item) {
                     $product = Product::lockForUpdate()->find($item->product_id);
-                    if (!$product || !$product->is_active || $product->isExpired()) {
+                    if (! $product || ! $product->is_active || $product->isExpired()) {
                         throw ValidationException::withMessages([
                             'cart' => 'Un des produits du panier n\'est plus disponible.',
                         ]);
@@ -225,7 +224,7 @@ class CartController extends Controller
                     'data' => $reservationData,
                 ];
 
-                if (!empty($payments)) {
+                if (! empty($payments)) {
                     $response['payments'] = collect($payments)
                         ->map(fn ($payment) => (new PaymentResource($payment))->toArray(request()))
                         ->all();

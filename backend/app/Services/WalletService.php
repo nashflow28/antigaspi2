@@ -2,12 +2,10 @@
 
 namespace App\Services;
 
+use App\Models\Payment;
 use App\Models\User;
 use App\Models\Wallet;
-use App\Models\Payment;
 use App\Models\WalletTransaction;
-use App\Enums\PaymentMethod;
-use App\Enums\PaymentStatus;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
@@ -54,7 +52,7 @@ class WalletService
             throw new \Exception('Ce portefeuille n\'utilise pas la devise XOF');
         }
 
-        if (!$wallet->is_active) {
+        if (! $wallet->is_active) {
             throw new \Exception('Le portefeuille est désactivé');
         }
 
@@ -89,25 +87,25 @@ class WalletService
             // Lock the wallet row to prevent concurrent debits (pessimistic locking)
             $wallet = Wallet::where('user_id', $user->id)->lockForUpdate()->first();
 
-            if (!$wallet) {
+            if (! $wallet) {
                 $wallet = $this->createWallet($user);
                 // Re-fetch with lock
                 $wallet = Wallet::where('user_id', $user->id)->lockForUpdate()->first();
             }
 
-            if (!$wallet->is_active) {
+            if (! $wallet->is_active) {
                 throw new \Exception('Le portefeuille est désactivé');
             }
 
-            if ($wallet->hasPin() && !$wallet->verifyPin($pin ?? '')) {
+            if ($wallet->hasPin() && ! $wallet->verifyPin($pin ?? '')) {
                 throw new \Exception('Code PIN incorrect');
             }
 
-            if (!$wallet->hasBalance($amount)) {
+            if (! $wallet->hasBalance($amount)) {
                 throw new \Exception('Solde insuffisant dans le portefeuille');
             }
 
-            if (!$wallet->canSpend($amount)) {
+            if (! $wallet->canSpend($amount)) {
                 throw new \Exception('Limite de dépense quotidienne dépassée');
             }
 
@@ -131,7 +129,7 @@ class WalletService
             throw new \InvalidArgumentException('Le code PIN doit contenir entre 4 et 6 chiffres');
         }
 
-        if (!ctype_digit($pin)) {
+        if (! ctype_digit($pin)) {
             throw new \InvalidArgumentException('Le code PIN ne doit contenir que des chiffres');
         }
 
@@ -148,11 +146,11 @@ class WalletService
     {
         $wallet = $this->getOrCreateWallet($user);
 
-        if (!$wallet->hasPin()) {
+        if (! $wallet->hasPin()) {
             throw new \Exception('Aucun code PIN configuré');
         }
 
-        if (!$wallet->verifyPin($currentPin)) {
+        if (! $wallet->verifyPin($currentPin)) {
             throw new \Exception('Code PIN actuel incorrect');
         }
 
@@ -261,12 +259,13 @@ class WalletService
      * BUG-010 FIX: Added lockForUpdate() to prevent race conditions
      * BUG-011 FIX: PIN verification now happens inside the transaction (atomic)
      *
-     * @param User $sender The user sending the money
-     * @param User $receiver The user receiving the money
-     * @param float $amount The amount to transfer
-     * @param string $description Optional description
-     * @param string|null $pin The sender's PIN (required if wallet has PIN)
+     * @param  User  $sender  The user sending the money
+     * @param  User  $receiver  The user receiving the money
+     * @param  float  $amount  The amount to transfer
+     * @param  string  $description  Optional description
+     * @param  string|null  $pin  The sender's PIN (required if wallet has PIN)
      * @return array The debit and credit transactions
+     *
      * @throws \Exception If transfer fails
      */
     public function transferBetweenWallets(User $sender, User $receiver, float $amount, string $description = 'Transfert entre portefeuilles', ?string $pin = null): array
@@ -286,20 +285,20 @@ class WalletService
             $receiverWallet = Wallet::where('user_id', $receiver->id)->lockForUpdate()->first();
 
             // Create wallets if they don't exist (rare case)
-            if (!$senderWallet) {
+            if (! $senderWallet) {
                 $senderWallet = $this->createWallet($sender);
                 $senderWallet = Wallet::where('user_id', $sender->id)->lockForUpdate()->first();
             }
-            if (!$receiverWallet) {
+            if (! $receiverWallet) {
                 $receiverWallet = $this->createWallet($receiver);
                 $receiverWallet = Wallet::where('user_id', $receiver->id)->lockForUpdate()->first();
             }
 
-            if (!$senderWallet->is_active) {
+            if (! $senderWallet->is_active) {
                 throw new \Exception('Votre portefeuille est désactivé');
             }
 
-            if (!$receiverWallet->is_active) {
+            if (! $receiverWallet->is_active) {
                 throw new \Exception('Le portefeuille du destinataire est désactivé');
             }
 
@@ -308,17 +307,17 @@ class WalletService
                 if (empty($pin)) {
                     throw new \Exception('Le code PIN est requis pour ce transfert');
                 }
-                if (!$senderWallet->verifyPin($pin)) {
+                if (! $senderWallet->verifyPin($pin)) {
                     throw new \Exception('Code PIN incorrect');
                 }
             }
 
             // Verify balance
-            if (!$senderWallet->hasBalance($amount)) {
+            if (! $senderWallet->hasBalance($amount)) {
                 throw new \Exception('Solde insuffisant dans le portefeuille');
             }
 
-            if (!$senderWallet->canSpend($amount)) {
+            if (! $senderWallet->canSpend($amount)) {
                 throw new \Exception('Limite de dépense quotidienne dépassée');
             }
 

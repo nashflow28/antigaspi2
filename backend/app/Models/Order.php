@@ -38,6 +38,7 @@ class Order extends Model
     {
         $date = now()->format('Ymd');
         $count = self::whereDate('created_at', today())->count() + 1;
+
         return sprintf('ORD-%s-%03d', $date, $count);
     }
 
@@ -86,7 +87,7 @@ class Order extends Model
      */
     public function cancel(): bool
     {
-        if (!$this->canBeCancelled()) {
+        if (! $this->canBeCancelled()) {
             return false;
         }
 

@@ -3,14 +3,14 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\Product;
 use App\Models\Category;
+use App\Models\Product;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Facades\Storage;
-use Tymon\JWTAuth\Facades\JWTAuth;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Validator;
+use Tymon\JWTAuth\Facades\JWTAuth;
 
 class ProductController extends Controller
 {
@@ -37,7 +37,7 @@ class ProductController extends Controller
 
             if ($request->has('city')) {
                 $query->whereHas('merchant.user', function ($q) use ($request) {
-                    $q->where('city', 'like', '%' . $request->city . '%');
+                    $q->where('city', 'like', '%'.$request->city.'%');
                 });
             }
 
@@ -57,24 +57,24 @@ class ProductController extends Controller
 
                 $query->whereHas('merchant', function ($q) use ($latitude, $longitude, $radiusKm) {
                     $q->whereNotNull('latitude')
-                      ->whereNotNull('longitude')
-                      ->selectRaw("
+                        ->whereNotNull('longitude')
+                        ->selectRaw('
                           merchants.*,
                           (6371 * acos(cos(radians(?))
                               * cos(radians(latitude))
                               * cos(radians(longitude) - radians(?))
                               + sin(radians(?))
                               * sin(radians(latitude)))) AS distance
-                      ", [$latitude, $longitude, $latitude])
-                      ->having('distance', '<', $radiusKm);
+                      ', [$latitude, $longitude, $latitude])
+                        ->having('distance', '<', $radiusKm);
                 });
             }
 
             if ($request->has('search')) {
                 $search = $request->search;
                 $query->where(function ($q) use ($search) {
-                    $q->where('name', 'like', '%' . $search . '%')
-                      ->orWhere('description', 'like', '%' . $search . '%');
+                    $q->where('name', 'like', '%'.$search.'%')
+                        ->orWhere('description', 'like', '%'.$search.'%');
                 });
             }
 
@@ -128,16 +128,16 @@ class ProductController extends Controller
                     $earthRadius = 6371; // Rayon de la Terre en km
                     $dLat = deg2rad($merchantLat - $userLat);
                     $dLng = deg2rad($merchantLng - $userLng);
-                    $a = sin($dLat/2) * sin($dLat/2) +
+                    $a = sin($dLat / 2) * sin($dLat / 2) +
                          cos(deg2rad($userLat)) * cos(deg2rad($merchantLat)) *
-                         sin($dLng/2) * sin($dLng/2);
+                         sin($dLng / 2) * sin($dLng / 2);
 
                     // 🐛 BUG FIX #16: Prevent division by zero when exact same location
                     if ($a >= 1.0) {
                         // Distance = 0 (même point GPS)
                         $merchantData['distance_km'] = 0.0;
                     } else {
-                        $c = 2 * atan2(sqrt($a), sqrt(1-$a));
+                        $c = 2 * atan2(sqrt($a), sqrt(1 - $a));
                         $distance = $earthRadius * $c;
                         $merchantData['distance_km'] = round($distance, 2);
                     }
@@ -174,14 +174,14 @@ class ProductController extends Controller
                     'last_page' => $products->lastPage(),
                     'per_page' => $products->perPage(),
                     'total' => $products->total(),
-                ]
+                ],
             ]);
 
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur lors de la récupération des produits',
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ], 500);
         }
     }
@@ -194,11 +194,11 @@ class ProductController extends Controller
                 ->findOrFail($id);
 
             // 🐛 BUG FIX #17: Verify merchant exists to prevent null pointer errors
-            if (!$product->merchant) {
+            if (! $product->merchant) {
                 return response()->json([
                     'success' => false,
                     'message' => 'Produit orphelin - Commerçant introuvable',
-                    'error' => 'Ce produit n\'est plus disponible (merchant manquant)'
+                    'error' => 'Ce produit n\'est plus disponible (merchant manquant)',
                 ], 404);
             }
 
@@ -246,14 +246,14 @@ class ProductController extends Controller
 
             return response()->json([
                 'success' => true,
-                'data' => $productData
+                'data' => $productData,
             ]);
 
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
                 'message' => 'Produit non trouvé',
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ], 404);
         }
     }
@@ -266,10 +266,10 @@ class ProductController extends Controller
         try {
             $user = JWTAuth::parseToken()->authenticate();
 
-            if (!$user->isMerchant()) {
+            if (! $user->isMerchant()) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Seuls les commerçants peuvent accéder à cette ressource'
+                    'message' => 'Seuls les commerçants peuvent accéder à cette ressource',
                 ], 403);
             }
 
@@ -277,10 +277,10 @@ class ProductController extends Controller
                 ->findOrFail($id);
 
             // 🐛 BUG FIX #15: Verify merchant relationship exists
-            if (!$product->merchant) {
+            if (! $product->merchant) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Produit orphelin détecté - merchant manquant'
+                    'message' => 'Produit orphelin détecté - merchant manquant',
                 ], 500);
             }
 
@@ -288,7 +288,7 @@ class ProductController extends Controller
             if ($product->merchant->user_id !== $user->id) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Vous ne pouvez accéder qu\'à vos propres produits'
+                    'message' => 'Vous ne pouvez accéder qu\'à vos propres produits',
                 ], 403);
             }
 
@@ -318,14 +318,14 @@ class ProductController extends Controller
 
             return response()->json([
                 'success' => true,
-                'data' => $productData
+                'data' => $productData,
             ]);
 
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
                 'message' => 'Produit non trouvé',
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ], 404);
         }
     }
@@ -335,10 +335,10 @@ class ProductController extends Controller
         try {
             $user = JWTAuth::parseToken()->authenticate();
 
-            if (!$user->isMerchant()) {
+            if (! $user->isMerchant()) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Seuls les commerçants peuvent ajouter des produits'
+                    'message' => 'Seuls les commerçants peuvent ajouter des produits',
                 ], 403);
             }
 
@@ -357,7 +357,7 @@ class ProductController extends Controller
                 return response()->json([
                     'success' => false,
                     'message' => 'Erreurs de validation',
-                    'errors' => $validator->errors()
+                    'errors' => $validator->errors(),
                 ], 422);
             }
 
@@ -365,7 +365,7 @@ class ProductController extends Controller
             $categoryId = $user->merchant->category_id;
 
             // Fallback to first available category if merchant doesn't have a category
-            if (!$categoryId) {
+            if (! $categoryId) {
                 $firstCategory = Category::first();
                 $categoryId = $firstCategory ? $firstCategory->id : 1;
             }
@@ -394,14 +394,14 @@ class ProductController extends Controller
                     'discounted_price' => $product->discounted_price,
                     'quantity_available' => $product->quantity_available,
                     'category' => $product->category->name,
-                ]
+                ],
             ], 201);
 
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur lors de l\'ajout du produit',
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ], 500);
         }
     }
@@ -419,17 +419,18 @@ class ProductController extends Controller
                 'authenticated_user_email' => $user->email,
                 'product_merchant_id' => $product->merchant->id,
                 'product_merchant_user_id' => $product->merchant->user_id,
-                'user_merchant_id' => $user->merchant ? $user->merchant->id : 'null'
+                'user_merchant_id' => $user->merchant ? $user->merchant->id : 'null',
             ]);
 
             if ($product->merchant->user_id !== $user->id) {
                 \Log::warning('UNAUTHORIZED UPDATE ATTEMPT', [
                     'product_merchant_user_id' => $product->merchant->user_id,
-                    'authenticated_user_id' => $user->id
+                    'authenticated_user_id' => $user->id,
                 ]);
+
                 return response()->json([
                     'success' => false,
-                    'message' => 'Vous ne pouvez modifier que vos propres produits'
+                    'message' => 'Vous ne pouvez modifier que vos propres produits',
                 ], 403);
             }
 
@@ -447,17 +448,18 @@ class ProductController extends Controller
 
             \Log::info('VALIDATION ATTEMPT', [
                 'request_data' => $request->all(),
-                'validation_passed' => !$validator->fails()
+                'validation_passed' => ! $validator->fails(),
             ]);
 
             if ($validator->fails()) {
                 \Log::error('VALIDATION FAILED', [
-                    'errors' => $validator->errors()->toArray()
+                    'errors' => $validator->errors()->toArray(),
                 ]);
+
                 return response()->json([
                     'success' => false,
                     'message' => 'Erreurs de validation',
-                    'errors' => $validator->errors()
+                    'errors' => $validator->errors(),
                 ], 422);
             }
 
@@ -470,8 +472,8 @@ class ProductController extends Controller
                     'success' => false,
                     'message' => 'Le prix remisé doit être inférieur au prix d\'origine',
                     'errors' => [
-                        'discounted_price' => ['Le prix remisé doit être inférieur au prix d\'origine']
-                    ]
+                        'discounted_price' => ['Le prix remisé doit être inférieur au prix d\'origine'],
+                    ],
                 ], 422);
             }
 
@@ -480,17 +482,18 @@ class ProductController extends Controller
             if ($request->filled('image_url')) {
                 $imagePath = $request->image_url;
                 // Only validate if it's NOT a valid HTTP/HTTPS URL
-                if (!filter_var($imagePath, FILTER_VALIDATE_URL)) {
+                if (! filter_var($imagePath, FILTER_VALIDATE_URL)) {
                     // For file paths, check for path traversal attempts
                     if (str_contains($imagePath, '..') || str_contains($imagePath, '//')) {
                         \Log::error('Path traversal attempt detected in product update', [
                             'product_id' => $id,
                             'user_id' => $user->id,
-                            'suspicious_path' => $imagePath
+                            'suspicious_path' => $imagePath,
                         ]);
+
                         return response()->json([
                             'success' => false,
-                            'message' => 'Invalid image path detected'
+                            'message' => 'Invalid image path detected',
                         ], 400);
                     }
                 }
@@ -501,15 +504,15 @@ class ProductController extends Controller
                 'update_data' => $request->only([
                     'name', 'description', 'original_price',
                     'discounted_price', 'quantity_available', 'expiration_date',
-                    'image_url', 'is_active'
-                ])
+                    'image_url', 'is_active',
+                ]),
             ]);
 
             // category_id excluded - cannot be changed (always merchant's category)
             $product->update($request->only([
                 'name', 'description', 'original_price',
                 'discounted_price', 'quantity_available', 'expiration_date',
-                'image_url', 'is_active'
+                'image_url', 'is_active',
             ]));
 
             \Log::info('PRODUCT UPDATED SUCCESSFULLY', ['product_id' => $id]);
@@ -522,7 +525,7 @@ class ProductController extends Controller
                     'name' => $product->name,
                     'discounted_price' => $product->discounted_price,
                     'quantity_available' => $product->quantity_available,
-                ]
+                ],
             ]);
 
         } catch (\Exception $e) {
@@ -532,12 +535,13 @@ class ProductController extends Controller
                 'error' => $e->getMessage(),
                 'file' => $e->getFile(),
                 'line' => $e->getLine(),
-                'trace' => app()->isLocal() ? $e->getTraceAsString() : null
+                'trace' => app()->isLocal() ? $e->getTraceAsString() : null,
             ]);
+
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur lors de la mise à jour',
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ], 500);
         }
     }
@@ -548,10 +552,10 @@ class ProductController extends Controller
             $user = JWTAuth::parseToken()->authenticate();
             $product = Product::findOrFail($id);
 
-            if ($product->merchant->user_id !== $user->id && !$user->isAdmin()) {
+            if ($product->merchant->user_id !== $user->id && ! $user->isAdmin()) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Vous ne pouvez supprimer que vos propres produits'
+                    'message' => 'Vous ne pouvez supprimer que vos propres produits',
                 ], 403);
             }
 
@@ -563,7 +567,7 @@ class ProductController extends Controller
             if ($activeReservations > 0) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Impossible de supprimer un produit avec des réservations actives'
+                    'message' => 'Impossible de supprimer un produit avec des réservations actives',
                 ], 400);
             }
 
@@ -571,14 +575,14 @@ class ProductController extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => 'Produit supprimé avec succès'
+                'message' => 'Produit supprimé avec succès',
             ]);
 
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur lors de la suppression',
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ], 500);
         }
     }
@@ -594,10 +598,10 @@ class ProductController extends Controller
         try {
             $user = JWTAuth::parseToken()->authenticate();
 
-            if (!$user->isMerchant()) {
+            if (! $user->isMerchant()) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Seuls les commerçants peuvent uploader des images'
+                    'message' => 'Seuls les commerçants peuvent uploader des images',
                 ], 403);
             }
 
@@ -610,14 +614,14 @@ class ProductController extends Controller
                 return response()->json([
                     'success' => false,
                     'message' => 'Erreurs de validation',
-                    'errors' => $validator->errors()
+                    'errors' => $validator->errors(),
                 ], 422);
             }
 
-            if (!$request->hasFile('image')) {
+            if (! $request->hasFile('image')) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Aucune image fournie'
+                    'message' => 'Aucune image fournie',
                 ], 400);
             }
 
@@ -630,7 +634,7 @@ class ProductController extends Controller
             if (is_null($mimeType) || empty($mimeType)) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Impossible de déterminer le type du fichier. Fichier corrompu ?'
+                    'message' => 'Impossible de déterminer le type du fichier. Fichier corrompu ?',
                 ], 422);
             }
 
@@ -642,11 +646,11 @@ class ProductController extends Controller
                 'image/webp' => ['webp'],
             ];
 
-            if (!array_key_exists($mimeType, $allowedMimeTypes)) {
+            if (! array_key_exists($mimeType, $allowedMimeTypes)) {
                 return response()->json([
                     'success' => false,
                     'message' => 'Type de fichier non autorisé. Formats acceptés : JPEG, PNG, WebP',
-                    'error' => "MIME type '{$mimeType}' non supporté. Types valides : image/jpeg, image/png, image/webp"
+                    'error' => "MIME type '{$mimeType}' non supporté. Types valides : image/jpeg, image/png, image/webp",
                 ], 422);
             }
 
@@ -655,7 +659,7 @@ class ProductController extends Controller
             if ($imageInfo === false) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Impossible de lire les dimensions de l\'image. Fichier corrompu ?'
+                    'message' => 'Impossible de lire les dimensions de l\'image. Fichier corrompu ?',
                 ], 422);
             }
 
@@ -664,14 +668,14 @@ class ProductController extends Controller
                 return response()->json([
                     'success' => false,
                     'message' => 'Image trop grande. Dimensions maximales : 2000x2000px',
-                    'error' => "Current dimensions: {$width}x{$height}px"
+                    'error' => "Current dimensions: {$width}x{$height}px",
                 ], 422);
             }
 
             // 🐛 BUG FIX #17: Use first extension from mapping for consistency (.jpg, not .jpeg)
             // 🔒 SECURITY: Extension determined by server-verified MIME type, not client input
             $extension = $allowedMimeTypes[$mimeType][0];
-            $filename = \Illuminate\Support\Str::random(40) . '.' . $extension;
+            $filename = \Illuminate\Support\Str::random(40).'.'.$extension;
 
             // 🔒 SECURITY: Use Storage facade for secure file handling
             $path = $image->storeAs('products', $filename, 'public');
@@ -686,8 +690,8 @@ class ProductController extends Controller
                 'data' => [
                     'url' => $url,
                     'path' => $path,
-                    'filename' => $filename
-                ]
+                    'filename' => $filename,
+                ],
             ], 200);
 
         } catch (\Exception $e) {
@@ -702,13 +706,13 @@ class ProductController extends Controller
                 'error' => $e->getMessage(),
                 'file' => $e->getFile(),
                 'line' => $e->getLine(),
-                'trace' => app()->isLocal() ? $e->getTraceAsString() : null
+                'trace' => app()->isLocal() ? $e->getTraceAsString() : null,
             ]);
 
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur lors de l\'upload',
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ], 500);
         }
     }
@@ -718,10 +722,10 @@ class ProductController extends Controller
         try {
             $user = JWTAuth::parseToken()->authenticate();
 
-            if (!$user->isMerchant()) {
+            if (! $user->isMerchant()) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Seuls les commerçants peuvent accéder à cette ressource'
+                    'message' => 'Seuls les commerçants peuvent accéder à cette ressource',
                 ], 403);
             }
 
@@ -736,8 +740,8 @@ class ProductController extends Controller
             if ($request->has('search')) {
                 $search = $request->search;
                 $query->where(function ($q) use ($search) {
-                    $q->where('name', 'like', '%' . $search . '%')
-                      ->orWhere('description', 'like', '%' . $search . '%');
+                    $q->where('name', 'like', '%'.$search.'%')
+                        ->orWhere('description', 'like', '%'.$search.'%');
                 });
             }
 
@@ -788,14 +792,14 @@ class ProductController extends Controller
                     'last_page' => $products->lastPage(),
                     'per_page' => $products->perPage(),
                     'total' => $products->total(),
-                ]
+                ],
             ]);
 
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur lors de la récupération des produits',
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ], 500);
         }
     }
@@ -810,14 +814,14 @@ class ProductController extends Controller
 
             return response()->json([
                 'success' => true,
-                'data' => $categories
+                'data' => $categories,
             ]);
 
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur lors de la récupération des catégories',
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ], 500);
         }
     }
@@ -830,10 +834,10 @@ class ProductController extends Controller
         try {
             $user = JWTAuth::parseToken()->authenticate();
 
-            if (!$user->isMerchant()) {
+            if (! $user->isMerchant()) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Seuls les commerçants peuvent accéder à cette ressource'
+                    'message' => 'Seuls les commerçants peuvent accéder à cette ressource',
                 ], 403);
             }
 
@@ -886,14 +890,14 @@ class ProductController extends Controller
                 'success' => true,
                 'data' => $categories,
                 'merchant_business_type' => $merchant->business_type,
-                'allowed_categories_count' => count($categories)
+                'allowed_categories_count' => count($categories),
             ]);
 
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur lors de la récupération des catégories',
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ], 500);
         }
     }

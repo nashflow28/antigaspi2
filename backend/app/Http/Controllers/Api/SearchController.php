@@ -139,9 +139,9 @@ class SearchController extends Controller
             });
         }
 
-        if (!empty($historyLookup)) {
+        if (! empty($historyLookup)) {
             $popularCollection = $popularCollection->filter(function ($row) use ($historyLookup) {
-                return !in_array(Str::lower($row->query), $historyLookup, true);
+                return ! in_array(Str::lower($row->query), $historyLookup, true);
             });
         }
 
@@ -181,7 +181,7 @@ class SearchController extends Controller
     {
         $user = $this->resolveAuthenticatedUser($request);
 
-        if (!$user instanceof User || $searchQuery->user_id !== $user->getKey()) {
+        if (! $user instanceof User || $searchQuery->user_id !== $user->getKey()) {
             return response()->json([
                 'success' => false,
                 'message' => 'Vous ne pouvez pas supprimer cette recherche.',
@@ -219,7 +219,7 @@ class SearchController extends Controller
         ];
 
         $sortOption = $this->mapSortForProducts($sort);
-        if (!empty($sortOption)) {
+        if (! empty($sortOption)) {
             $options['sort'] = $sortOption;
         }
 
@@ -227,7 +227,7 @@ class SearchController extends Controller
         $paginator = $builder->options($options)->paginate($perPage, 'page', $page);
 
         $hits = collect($raw['hits'] ?? [])->mapWithKeys(function (array $hit) {
-            return [(string) ($hit['id'] ?? $hit['document_id'] ?? '' ) => $hit];
+            return [(string) ($hit['id'] ?? $hit['document_id'] ?? '') => $hit];
         });
 
         $collection = $paginator->getCollection();
@@ -309,7 +309,7 @@ class SearchController extends Controller
         $paginator = $builder->options($options)->paginate($perPage, 'page', $page);
 
         $hits = collect($raw['hits'] ?? [])->mapWithKeys(function (array $hit) {
-            return [(string) ($hit['id'] ?? $hit['document_id'] ?? '' ) => $hit];
+            return [(string) ($hit['id'] ?? $hit['document_id'] ?? '') => $hit];
         });
 
         $collection = $paginator->getCollection();
@@ -371,7 +371,7 @@ class SearchController extends Controller
 
         $user = $this->resolveAuthenticatedUser($request);
 
-        if (!$user instanceof User) {
+        if (! $user instanceof User) {
             return;
         }
 
@@ -401,7 +401,7 @@ class SearchController extends Controller
         try {
             $token = JWTAuth::getToken();
 
-            if (!$token) {
+            if (! $token) {
                 return null;
             }
 
@@ -470,7 +470,7 @@ class SearchController extends Controller
         $result = [];
 
         foreach ($keys as $key) {
-            if (!array_key_exists($key, $filters)) {
+            if (! array_key_exists($key, $filters)) {
                 continue;
             }
 

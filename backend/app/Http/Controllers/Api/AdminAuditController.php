@@ -10,9 +10,7 @@ use Illuminate\Http\Request;
 
 class AdminAuditController extends Controller
 {
-    public function __construct(private readonly AdminAuditService $auditService)
-    {
-    }
+    public function __construct(private readonly AdminAuditService $auditService) {}
 
     /**
      * Obtenir l'historique des actions admin
@@ -22,7 +20,7 @@ class AdminAuditController extends Controller
     {
         $user = $request->user();
 
-        if (!$user || !$user->isAdmin()) {
+        if (! $user || ! $user->isAdmin()) {
             return response()->json([
                 'success' => false,
                 'message' => 'Accès réservé aux administrateurs',
@@ -61,7 +59,7 @@ class AdminAuditController extends Controller
     {
         $user = $request->user();
 
-        if (!$user || !$user->isAdmin()) {
+        if (! $user || ! $user->isAdmin()) {
             return response()->json([
                 'success' => false,
                 'message' => 'Accès réservé aux administrateurs',
@@ -85,7 +83,7 @@ class AdminAuditController extends Controller
     {
         $user = $request->user();
 
-        if (!$user || !$user->isAdmin()) {
+        if (! $user || ! $user->isAdmin()) {
             return response()->json([
                 'success' => false,
                 'message' => 'Accès réservé aux administrateurs',
@@ -94,7 +92,7 @@ class AdminAuditController extends Controller
 
         $log = AdminAuditLog::with('admin:id,first_name,last_name,email')->find($id);
 
-        if (!$log) {
+        if (! $log) {
             return response()->json([
                 'success' => false,
                 'message' => 'Action non trouvée',
@@ -115,7 +113,7 @@ class AdminAuditController extends Controller
     {
         $user = $request->user();
 
-        if (!$user || !$user->isAdmin()) {
+        if (! $user || ! $user->isAdmin()) {
             return response()->json([
                 'success' => false,
                 'message' => 'Accès réservé aux administrateurs',

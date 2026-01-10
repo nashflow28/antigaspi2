@@ -43,8 +43,6 @@ abstract class AlgoliaEngine extends Engine implements UpdatesIndexSettings
     /**
      * Perform the given search on the engine.
      *
-     * @param  \Laravel\Scout\Builder  $builder
-     * @param  array  $options
      * @return mixed
      */
     abstract protected function performSearch(Builder $builder, array $options = []);
@@ -93,7 +91,6 @@ abstract class AlgoliaEngine extends Engine implements UpdatesIndexSettings
     /**
      * Perform the given search on the engine.
      *
-     * @param  \Laravel\Scout\Builder  $builder
      * @return mixed
      */
     public function search(Builder $builder)
@@ -107,7 +104,6 @@ abstract class AlgoliaEngine extends Engine implements UpdatesIndexSettings
     /**
      * Perform the given search on the engine.
      *
-     * @param  \Laravel\Scout\Builder  $builder
      * @param  int  $perPage
      * @param  int  $page
      * @return mixed
@@ -124,7 +120,6 @@ abstract class AlgoliaEngine extends Engine implements UpdatesIndexSettings
     /**
      * Get the filter array for the query.
      *
-     * @param  \Laravel\Scout\Builder  $builder
      * @return array
      */
     protected function filters(Builder $builder)
@@ -158,7 +153,6 @@ abstract class AlgoliaEngine extends Engine implements UpdatesIndexSettings
     /**
      * Map the given results to instances of the given model.
      *
-     * @param  \Laravel\Scout\Builder  $builder
      * @param  mixed  $results
      * @param  \Illuminate\Database\Eloquent\Model  $model
      * @return \Illuminate\Database\Eloquent\Collection
@@ -193,7 +187,6 @@ abstract class AlgoliaEngine extends Engine implements UpdatesIndexSettings
     /**
      * Map the given results to instances of the given model via a lazy collection.
      *
-     * @param  \Laravel\Scout\Builder  $builder
      * @param  mixed  $results
      * @param  \Illuminate\Database\Eloquent\Model  $model
      * @return \Illuminate\Support\LazyCollection
@@ -240,7 +233,6 @@ abstract class AlgoliaEngine extends Engine implements UpdatesIndexSettings
      * Create a search index.
      *
      * @param  string  $name
-     * @param  array  $options
      * @return mixed
      *
      * @throws NotSupportedException

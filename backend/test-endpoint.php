@@ -1,4 +1,5 @@
 <?php
+
 // Test endpoint simple pour vérifier le problème JSON
 
 header('Content-Type: application/json');
@@ -17,10 +18,9 @@ $response = [
     'timestamp' => date('Y-m-d H:i:s'),
     'data' => [
         'test' => true,
-        'warnings_suppressed' => true
-    ]
+        'warnings_suppressed' => true,
+    ],
 ];
 
 echo json_encode($response, JSON_PRETTY_PRINT);
 exit;
-?>

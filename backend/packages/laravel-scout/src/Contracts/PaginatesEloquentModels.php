@@ -9,7 +9,6 @@ interface PaginatesEloquentModels
     /**
      * Paginate the given search on the engine.
      *
-     * @param  \Laravel\Scout\Builder  $builder
      * @param  int  $perPage
      * @param  int  $page
      * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
@@ -19,7 +18,6 @@ interface PaginatesEloquentModels
     /**
      * Paginate the given search on the engine using simple pagination.
      *
-     * @param  \Laravel\Scout\Builder  $builder
      * @param  int  $perPage
      * @param  int  $page
      * @return \Illuminate\Contracts\Pagination\Paginator

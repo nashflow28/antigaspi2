@@ -38,6 +38,7 @@ class CheckoutCartRequest extends FormRequest
                 'regex:/^\+?[0-9]{8,15}$/',
                 Rule::requiredIf(function () {
                     $method = $this->input('payment_method');
+
                     return in_array($method, [
                         PaymentMethod::FLOOZ->value,
                         PaymentMethod::TMONEY->value,
@@ -63,6 +64,7 @@ class CheckoutCartRequest extends FormRequest
                 'digits_between:4,6',
                 Rule::requiredIf(function () {
                     $method = $this->input('payment_method');
+
                     return $method === PaymentMethod::WALLET->value;
                 }),
             ],
@@ -105,7 +107,7 @@ class CheckoutCartRequest extends FormRequest
         $validator->after(function ($validator) {
             if ($this->input('pickup_date') && $this->input('pickup_time')) {
                 try {
-                    $pickupDateTime = Carbon::createFromFormat('Y-m-d H:i', $this->input('pickup_date') . ' ' . $this->input('pickup_time'), config('app.timezone'));
+                    $pickupDateTime = Carbon::createFromFormat('Y-m-d H:i', $this->input('pickup_date').' '.$this->input('pickup_time'), config('app.timezone'));
                     if ($pickupDateTime->lt(now())) {
                         $validator->errors()->add('pickup_time', 'Le créneau de retrait doit être dans le futur.');
                     }

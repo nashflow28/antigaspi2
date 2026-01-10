@@ -15,9 +15,7 @@ use Illuminate\Validation\Rule;
 
 class NotificationController extends Controller
 {
-    public function __construct(private readonly PushSubscriptionService $pushService)
-    {
-    }
+    public function __construct(private readonly PushSubscriptionService $pushService) {}
 
     public function index(Request $request): JsonResponse
     {
@@ -205,7 +203,7 @@ class NotificationController extends Controller
     {
         $user = $request->user();
 
-        if (!$user || !$user->isAdmin()) {
+        if (! $user || ! $user->isAdmin()) {
             return response()->json([
                 'success' => false,
                 'message' => 'Accès réservé aux administrateurs',
@@ -232,7 +230,7 @@ class NotificationController extends Controller
         $query = User::query()
             ->where('is_active', true);
 
-        if (!empty($roles)) {
+        if (! empty($roles)) {
             $query->whereIn('role', $roles);
         }
 
@@ -285,7 +283,7 @@ class NotificationController extends Controller
         $normalized['quiet_hours_enabled'] = (bool) $normalized['quiet_hours_enabled'];
 
         foreach (['quiet_hours_start', 'quiet_hours_end'] as $key) {
-            if (!is_string($normalized[$key]) || !preg_match('/^\d{2}:\d{2}$/', $normalized[$key])) {
+            if (! is_string($normalized[$key]) || ! preg_match('/^\d{2}:\d{2}$/', $normalized[$key])) {
                 $normalized[$key] = $defaults[$key];
             }
         }

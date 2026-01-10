@@ -101,16 +101,16 @@ class Product extends Model
     public function scopeAvailable($query)
     {
         return $query->where('quantity_available', '>', 0)
-                    ->where(function ($q) {
-                        $q->where('expiration_date', '>=', now()->toDateString())
-                          ->orWhereNull('expiration_date');
-                    });
+            ->where(function ($q) {
+                $q->where('expiration_date', '>=', now()->toDateString())
+                    ->orWhereNull('expiration_date');
+            });
     }
 
     public function scopeExpiringSoon($query, $days = 2)
     {
         return $query->where('expiration_date', '<=', now()->addDays($days)->toDateString())
-                    ->where('expiration_date', '>=', now()->toDateString());
+            ->where('expiration_date', '>=', now()->toDateString());
     }
 
     public function scopeByCategory($query, $categoryId)
@@ -131,6 +131,7 @@ class Product extends Model
         if ($maxPrice) {
             $query->where('discounted_price', '<=', $maxPrice);
         }
+
         return $query;
     }
 
@@ -179,15 +180,17 @@ class Product extends Model
 
     public function isExpiringSoon($days = 2): bool
     {
-        return $this->getDaysUntilExpirationAttribute() <= $days && !$this->isExpired();
+        return $this->getDaysUntilExpirationAttribute() <= $days && ! $this->isExpired();
     }
 
     public function decrementQuantity(int $quantity): bool
     {
         if ($this->quantity_available >= $quantity) {
             $this->decrement('quantity_available', $quantity);
+
             return true;
         }
+
         return false;
     }
 
@@ -229,12 +232,13 @@ class Product extends Model
         if ($this->total_original_value <= 0) {
             return 0;
         }
+
         return round((($this->total_original_value - $this->discounted_price) / $this->total_original_value) * 100);
     }
 
     public function addItemToBasket(Product $product, int $quantity = 1): bool
     {
-        if (!$this->is_surprise_basket) {
+        if (! $this->is_surprise_basket) {
             return false;
         }
 
@@ -251,17 +255,19 @@ class Product extends Model
         }
 
         $this->updateBasketTotalValue();
+
         return true;
     }
 
     public function removeItemFromBasket(Product $product): bool
     {
-        if (!$this->is_surprise_basket) {
+        if (! $this->is_surprise_basket) {
             return false;
         }
 
         $this->surpriseBasketItems()->where('product_id', $product->id)->delete();
         $this->updateBasketTotalValue();
+
         return true;
     }
 
@@ -301,6 +307,6 @@ class Product extends Model
 
     public function shouldBeSearchable(): bool
     {
-        return $this->is_active && $this->quantity_available > 0 && !$this->isExpired();
+        return $this->is_active && $this->quantity_available > 0 && ! $this->isExpired();
     }
 }

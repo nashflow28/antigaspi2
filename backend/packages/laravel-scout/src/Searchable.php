@@ -72,8 +72,8 @@ trait Searchable
         }
 
         dispatch((new Scout::$makeSearchableJob($models))
-                ->onQueue($models->first()->syncWithSearchUsingQueue())
-                ->onConnection($models->first()->syncWithSearchUsing()));
+            ->onQueue($models->first()->syncWithSearchUsingQueue())
+            ->onConnection($models->first()->syncWithSearchUsing()));
     }
 
     /**
@@ -201,7 +201,6 @@ trait Searchable
     /**
      * Modify the collection of models being made searchable.
      *
-     * @param  \Illuminate\Support\Collection  $models
      * @return \Illuminate\Support\Collection
      */
     public function makeSearchableUsing(BaseCollection $models)
@@ -212,7 +211,6 @@ trait Searchable
     /**
      * Modify the query used to retrieve models when making all of the models searchable.
      *
-     * @param  \Illuminate\Database\Eloquent\Builder  $query
      * @return \Illuminate\Database\Eloquent\Builder
      */
     protected function makeAllSearchableUsing(EloquentBuilder $query)
@@ -295,8 +293,6 @@ trait Searchable
     /**
      * Get the requested models from an array of object IDs.
      *
-     * @param  \Laravel\Scout\Builder  $builder
-     * @param  array  $ids
      * @return mixed
      */
     public function getScoutModelsByIds(Builder $builder, array $ids)
@@ -307,8 +303,6 @@ trait Searchable
     /**
      * Get a query builder for retrieving the requested models from an array of object IDs.
      *
-     * @param  \Laravel\Scout\Builder  $builder
-     * @param  array  $ids
      * @return mixed
      */
     public function queryScoutModelsByIds(Builder $builder, array $ids)

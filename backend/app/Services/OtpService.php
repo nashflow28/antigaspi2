@@ -3,8 +3,8 @@
 namespace App\Services;
 
 use App\Models\OtpVerification;
-use Illuminate\Support\Facades\Log;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Log;
 
 class OtpService
 {
@@ -12,8 +12,11 @@ class OtpService
 
     // OTP configuration
     private int $otpLength = 6;
+
     private int $expirationMinutes = 10;
+
     private int $maxAttempts = 3;
+
     private int $resendCooldownSeconds = 60;
 
     public function __construct(SmsService $smsService)
@@ -24,8 +27,8 @@ class OtpService
     /**
      * Generate and send OTP to phone number
      *
-     * @param string $phone Phone number
-     * @param string $purpose Purpose of OTP (registration, login, password_reset, phone_change)
+     * @param  string  $phone  Phone number
+     * @param  string  $purpose  Purpose of OTP (registration, login, password_reset, phone_change)
      * @return array{success: bool, message: string, data?: array}
      */
     public function sendOtp(string $phone, string $purpose = 'registration'): array
@@ -45,12 +48,13 @@ class OtpService
 
             if (now()->lt($cooldownEnds)) {
                 $remainingSeconds = now()->diffInSeconds($cooldownEnds);
+
                 return [
                     'success' => false,
                     'message' => "Veuillez attendre {$remainingSeconds} secondes avant de renvoyer un code",
                     'data' => [
-                        'cooldown_remaining' => $remainingSeconds
-                    ]
+                        'cooldown_remaining' => $remainingSeconds,
+                    ],
                 ];
             }
 
@@ -73,24 +77,24 @@ class OtpService
         // Send OTP via SMS
         $smsResult = $this->smsService->sendOtp($phone, $otp);
 
-        if (!$smsResult['success']) {
+        if (! $smsResult['success']) {
             // Delete OTP record if SMS failed
             $otpRecord->delete();
 
             Log::error('Failed to send OTP SMS', [
                 'phone' => $this->maskPhone($phone),
-                'error' => $smsResult['message']
+                'error' => $smsResult['message'],
             ]);
 
             return [
                 'success' => false,
-                'message' => 'Impossible d\'envoyer le SMS. Veuillez réessayer.'
+                'message' => 'Impossible d\'envoyer le SMS. Veuillez réessayer.',
             ];
         }
 
         Log::info('OTP sent successfully', [
             'phone' => $this->maskPhone($phone),
-            'purpose' => $purpose
+            'purpose' => $purpose,
         ]);
 
         return [
@@ -99,17 +103,17 @@ class OtpService
             'data' => [
                 'phone' => $phone,
                 'expires_in' => $this->expirationMinutes * 60, // seconds
-                'resend_cooldown' => $this->resendCooldownSeconds
-            ]
+                'resend_cooldown' => $this->resendCooldownSeconds,
+            ],
         ];
     }
 
     /**
      * Verify OTP code
      *
-     * @param string $phone Phone number
-     * @param string $otp OTP code entered by user
-     * @param string $purpose Purpose of OTP
+     * @param  string  $phone  Phone number
+     * @param  string  $otp  OTP code entered by user
+     * @param  string  $purpose  Purpose of OTP
      * @return array{success: bool, message: string, data?: array}
      */
     public function verifyOtp(string $phone, string $otp, string $purpose = 'registration'): array
@@ -123,24 +127,25 @@ class OtpService
             ->whereNull('verified_at')
             ->first();
 
-        if (!$otpRecord) {
+        if (! $otpRecord) {
             return [
                 'success' => false,
-                'message' => 'Code expiré ou invalide. Veuillez demander un nouveau code.'
+                'message' => 'Code expiré ou invalide. Veuillez demander un nouveau code.',
             ];
         }
 
         // Check max attempts
         if ($otpRecord->attempts >= $this->maxAttempts) {
             $otpRecord->delete();
+
             return [
                 'success' => false,
-                'message' => 'Trop de tentatives. Veuillez demander un nouveau code.'
+                'message' => 'Trop de tentatives. Veuillez demander un nouveau code.',
             ];
         }
 
         // Verify OTP
-        if (!$this->verifyOtpHash($otp, $otpRecord->otp)) {
+        if (! $this->verifyOtpHash($otp, $otpRecord->otp)) {
             $otpRecord->increment('attempts');
             $remainingAttempts = $this->maxAttempts - $otpRecord->attempts;
 
@@ -148,19 +153,19 @@ class OtpService
                 'success' => false,
                 'message' => "Code incorrect. {$remainingAttempts} tentative(s) restante(s).",
                 'data' => [
-                    'remaining_attempts' => $remainingAttempts
-                ]
+                    'remaining_attempts' => $remainingAttempts,
+                ],
             ];
         }
 
         // Mark as verified
         $otpRecord->update([
-            'verified_at' => now()
+            'verified_at' => now(),
         ]);
 
         Log::info('OTP verified successfully', [
             'phone' => $this->maskPhone($phone),
-            'purpose' => $purpose
+            'purpose' => $purpose,
         ]);
 
         return [
@@ -168,18 +173,17 @@ class OtpService
             'message' => 'Numéro de téléphone vérifié avec succès',
             'data' => [
                 'phone' => $phone,
-                'verified' => true
-            ]
+                'verified' => true,
+            ],
         ];
     }
 
     /**
      * Check if phone is verified (has recent verified OTP)
      *
-     * @param string $phone Phone number
-     * @param string $purpose Purpose
-     * @param int $validForMinutes How long the verification is considered valid
-     * @return bool
+     * @param  string  $phone  Phone number
+     * @param  string  $purpose  Purpose
+     * @param  int  $validForMinutes  How long the verification is considered valid
      */
     public function isPhoneVerified(string $phone, string $purpose = 'registration', int $validForMinutes = 30): bool
     {
@@ -210,6 +214,7 @@ class OtpService
         for ($i = 0; $i < $this->otpLength; $i++) {
             $otp .= random_int(0, 9);
         }
+
         return $otp;
     }
 
@@ -218,7 +223,7 @@ class OtpService
      */
     private function hashOtp(string $otp): string
     {
-        return hash('sha256', $otp . config('app.key'));
+        return hash('sha256', $otp.config('app.key'));
     }
 
     /**
@@ -241,11 +246,11 @@ class OtpService
         }
 
         if (strlen($phone) === 8) {
-            $phone = '228' . $phone;
+            $phone = '228'.$phone;
         }
 
         if (strlen($phone) === 9 && str_starts_with($phone, '0')) {
-            $phone = '228' . substr($phone, 1);
+            $phone = '228'.substr($phone, 1);
         }
 
         return $phone;
@@ -259,6 +264,7 @@ class OtpService
         if (strlen($phone) < 6) {
             return '***';
         }
-        return substr($phone, 0, 5) . '****' . substr($phone, -2);
+
+        return substr($phone, 0, 5).'****'.substr($phone, -2);
     }
 }

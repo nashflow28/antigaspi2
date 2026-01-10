@@ -70,7 +70,7 @@ class RewardRedemption extends Model
     public static function generateRedemptionCode(): string
     {
         do {
-            $code = 'RWD-' . strtoupper(Str::random(12));
+            $code = 'RWD-'.strtoupper(Str::random(12));
         } while (self::where('redemption_code', $code)->exists());
 
         return $code;
@@ -78,19 +78,26 @@ class RewardRedemption extends Model
 
     public function isExpired(): bool
     {
-        if ($this->status === 'expired') return true;
-        if ($this->expires_at && $this->expires_at->isPast()) return true;
+        if ($this->status === 'expired') {
+            return true;
+        }
+        if ($this->expires_at && $this->expires_at->isPast()) {
+            return true;
+        }
+
         return false;
     }
 
     public function isUsable(): bool
     {
-        return $this->status === 'pending' && !$this->isExpired();
+        return $this->status === 'pending' && ! $this->isExpired();
     }
 
     public function markAsUsed(): bool
     {
-        if (!$this->isUsable()) return false;
+        if (! $this->isUsable()) {
+            return false;
+        }
 
         $this->update([
             'status' => 'used',
@@ -102,7 +109,9 @@ class RewardRedemption extends Model
 
     public function markAsExpired(): bool
     {
-        if ($this->status !== 'pending') return false;
+        if ($this->status !== 'pending') {
+            return false;
+        }
 
         $this->update(['status' => 'expired']);
 

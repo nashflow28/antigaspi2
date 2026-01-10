@@ -19,8 +19,7 @@ class PaymentConfirmedNotification extends Notification implements ShouldQueue
     public function __construct(
         private readonly Reservation $reservation,
         private readonly Payment $payment
-    ) {
-    }
+    ) {}
 
     public function via(object $notifiable): array
     {
@@ -30,7 +29,7 @@ class PaymentConfirmedNotification extends Notification implements ShouldQueue
             $channels[] = 'mail';
         }
 
-        if (method_exists($notifiable, 'prefersSmsNotifications') && $notifiable->prefersSmsNotifications() && !empty($notifiable->phone)) {
+        if (method_exists($notifiable, 'prefersSmsNotifications') && $notifiable->prefersSmsNotifications() && ! empty($notifiable->phone)) {
             $channels[] = 'vonage';
         }
 
@@ -46,14 +45,14 @@ class PaymentConfirmedNotification extends Notification implements ShouldQueue
         $productName = $this->reservation->product?->name ?? 'Produit';
         $amount = number_format($this->payment->amount, 0, ',', ' ');
 
-        return (new MailMessage())
+        return (new MailMessage)
             ->subject('Paiement confirmé - Geladal')
-            ->greeting('Bonjour ' . ($notifiable->first_name ?? 'Client'))
-            ->line('Votre paiement de ' . $amount . ' XOF a été confirmé avec succès !')
-            ->line('Réservation : #' . $this->reservation->reservation_code)
-            ->line('Produit : ' . $productName)
-            ->line('Méthode : ' . $this->getPaymentMethodLabel())
-            ->action('Voir ma réservation', url('/reservations/' . $this->reservation->id))
+            ->greeting('Bonjour '.($notifiable->first_name ?? 'Client'))
+            ->line('Votre paiement de '.$amount.' XOF a été confirmé avec succès !')
+            ->line('Réservation : #'.$this->reservation->reservation_code)
+            ->line('Produit : '.$productName)
+            ->line('Méthode : '.$this->getPaymentMethodLabel())
+            ->action('Voir ma réservation', url('/reservations/'.$this->reservation->id))
             ->line('Vous pouvez maintenant récupérer votre commande chez le commerçant.')
             ->line('Merci d\'utiliser Geladal !');
     }
@@ -68,7 +67,7 @@ class PaymentConfirmedNotification extends Notification implements ShouldQueue
             $this->reservation->reservation_code
         );
 
-        return (new VonageMessage())->content($content);
+        return (new VonageMessage)->content($content);
     }
 
     public function toPushPayload(object $notifiable): array

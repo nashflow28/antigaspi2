@@ -63,10 +63,10 @@ class AnalyticsController extends Controller
         try {
             $user = JWTAuth::parseToken()->authenticate();
 
-            if (!$user->isMerchant()) {
+            if (! $user->isMerchant()) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Accès réservé aux commerçants'
+                    'message' => 'Accès réservé aux commerçants',
                 ], 403);
             }
 
@@ -97,12 +97,12 @@ class AnalyticsController extends Controller
                     $query->where(function ($q) {
                         // Réservations complétées aujourd'hui
                         $q->where('status', 'completed')
-                          ->whereDate('completed_at', now()->toDateString());
+                            ->whereDate('completed_at', now()->toDateString());
                     })->orWhere(function ($q) {
                         // Réservations confirmées et payées (wallet) aujourd'hui
                         $q->where('status', 'confirmed')
-                          ->where('payment_status', 'success')
-                          ->whereDate('confirmed_at', now()->toDateString());
+                            ->where('payment_status', 'success')
+                            ->whereDate('confirmed_at', now()->toDateString());
                     });
                 })
                 ->sum('total_amount');
@@ -121,14 +121,14 @@ class AnalyticsController extends Controller
                     'confirmed_reservations' => $confirmedReservations,
                     'completed_reservations' => $completedReservations,
                     'total_sales' => (float) $totalSales,
-                ]
+                ],
             ]);
 
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur lors du calcul des statistiques',
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ], 500);
         }
     }
@@ -141,17 +141,17 @@ class AnalyticsController extends Controller
         try {
             $user = JWTAuth::parseToken()->authenticate();
 
-            if (!$user->isMerchant()) {
+            if (! $user->isMerchant()) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Accès réservé aux commerçants'
+                    'message' => 'Accès réservé aux commerçants',
                 ], 403);
             }
 
             $merchantId = $user->merchant->id;
             $period = $request->query('period', 'week'); // week, month, quarter
 
-            $days = match($period) {
+            $days = match ($period) {
                 'week' => 7,
                 'month' => 30,
                 'quarter' => 90,
@@ -161,23 +161,23 @@ class AnalyticsController extends Controller
             // Récupérer les revenus par jour - BUG FIX #2 & #5: Completed + confirmed payés
             // On utilise COALESCE pour prendre completed_at ou confirmed_at selon le cas
             $revenues = Reservation::whereHas('product', function ($query) use ($merchantId) {
-                    $query->where('merchant_id', $merchantId);
-                })
+                $query->where('merchant_id', $merchantId);
+            })
                 ->where(function ($query) {
                     $query->where('status', 'completed')
-                          ->orWhere(function ($q) {
-                              $q->where('status', 'confirmed')
+                        ->orWhere(function ($q) {
+                            $q->where('status', 'confirmed')
                                 ->where('payment_status', 'success');
-                          });
+                        });
                 })
                 ->where(function ($query) use ($days) {
                     $query->where(function ($q) use ($days) {
                         $q->whereNotNull('completed_at')
-                          ->where('completed_at', '>=', now()->subDays($days));
+                            ->where('completed_at', '>=', now()->subDays($days));
                     })->orWhere(function ($q) use ($days) {
                         $q->whereNull('completed_at')
-                          ->whereNotNull('confirmed_at')
-                          ->where('confirmed_at', '>=', now()->subDays($days));
+                            ->whereNotNull('confirmed_at')
+                            ->where('confirmed_at', '>=', now()->subDays($days));
                     });
                 })
                 ->selectRaw('DATE(COALESCE(completed_at, confirmed_at)) as date, SUM(total_amount) as revenue')
@@ -190,18 +190,18 @@ class AnalyticsController extends Controller
                 'data' => [
                     'period' => $period,
                     'days' => $days,
-                    'chart_data' => $revenues->map(fn($item) => [
+                    'chart_data' => $revenues->map(fn ($item) => [
                         'date' => $item->date,
                         'revenue' => (float) $item->revenue,
-                    ])
-                ]
+                    ]),
+                ],
             ]);
 
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur lors du calcul des revenus',
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ], 500);
         }
     }
@@ -214,10 +214,10 @@ class AnalyticsController extends Controller
         try {
             $user = JWTAuth::parseToken()->authenticate();
 
-            if (!$user->isMerchant()) {
+            if (! $user->isMerchant()) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Accès réservé aux commerçants'
+                    'message' => 'Accès réservé aux commerçants',
                 ], 403);
             }
 
@@ -229,10 +229,10 @@ class AnalyticsController extends Controller
                 ->where('products.merchant_id', $merchantId)
                 ->where(function ($query) {
                     $query->where('reservations.status', 'completed')
-                          ->orWhere(function ($q) {
-                              $q->where('reservations.status', 'confirmed')
+                        ->orWhere(function ($q) {
+                            $q->where('reservations.status', 'confirmed')
                                 ->where('reservations.payment_status', 'success');
-                          });
+                        });
                 })
                 ->selectRaw('products.id, products.name, SUM(reservations.quantity_reserved) as total_sold')
                 ->groupBy('products.id', 'products.name')
@@ -243,19 +243,19 @@ class AnalyticsController extends Controller
             return response()->json([
                 'success' => true,
                 'data' => [
-                    'chart_data' => $topProducts->map(fn($item) => [
+                    'chart_data' => $topProducts->map(fn ($item) => [
                         'product_id' => $item->id,
                         'product_name' => $item->name,
                         'total_sold' => (int) $item->total_sold,
-                    ])
-                ]
+                    ]),
+                ],
             ]);
 
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur lors du calcul des produits',
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ], 500);
         }
     }
@@ -268,17 +268,17 @@ class AnalyticsController extends Controller
         try {
             $user = JWTAuth::parseToken()->authenticate();
 
-            if (!$user->isMerchant()) {
+            if (! $user->isMerchant()) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Accès réservé aux commerçants'
+                    'message' => 'Accès réservé aux commerçants',
                 ], 403);
             }
 
             $merchantId = $user->merchant->id;
             $period = $request->query('period', 'week');
 
-            $days = match($period) {
+            $days = match ($period) {
                 'week' => 7,
                 'month' => 30,
                 'quarter' => 90,
@@ -287,8 +287,8 @@ class AnalyticsController extends Controller
 
             // Tendance des réservations - BUG FIX #3: Exclure les réservations annulées
             $reservations = Reservation::whereHas('product', function ($query) use ($merchantId) {
-                    $query->where('merchant_id', $merchantId);
-                })
+                $query->where('merchant_id', $merchantId);
+            })
                 ->whereNotIn('status', ['cancelled'])
                 ->where('created_at', '>=', now()->subDays($days))
                 ->selectRaw('DATE(created_at) as date, COUNT(*) as count')
@@ -301,18 +301,18 @@ class AnalyticsController extends Controller
                 'data' => [
                     'period' => $period,
                     'days' => $days,
-                    'chart_data' => $reservations->map(fn($item) => [
+                    'chart_data' => $reservations->map(fn ($item) => [
                         'date' => $item->date,
                         'count' => (int) $item->count,
-                    ])
-                ]
+                    ]),
+                ],
             ]);
 
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur lors du calcul des réservations',
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ], 500);
         }
     }
@@ -348,8 +348,8 @@ class AnalyticsController extends Controller
 
         $geographicQuery = Reservation::query()
             ->selectRaw(
-                "COALESCE(NULLIF(TRIM(users.city), ''), 'Non renseigné') as city, " .
-                'COUNT(*) as reservation_count, ' .
+                "COALESCE(NULLIF(TRIM(users.city), ''), 'Non renseigné') as city, ".
+                'COUNT(*) as reservation_count, '.
                 'SUM(reservations.total_amount) as total_revenue'
             )
             ->leftJoin('users', 'reservations.user_id', '=', 'users.id')
@@ -393,10 +393,10 @@ class AnalyticsController extends Controller
 
         $merchantPerformanceRaw = (clone $merchantBaseQuery)
             ->selectRaw(
-                'products.merchant_id as merchant_id, ' .
-                'merchants.business_name as merchant_name, ' .
-                'COUNT(*) as reservation_count, ' .
-                'SUM(reservations.total_amount) as total_revenue, ' .
+                'products.merchant_id as merchant_id, '.
+                'merchants.business_name as merchant_name, '.
+                'COUNT(*) as reservation_count, '.
+                'SUM(reservations.total_amount) as total_revenue, '.
                 'AVG(reservations.total_amount) as average_order_value'
             )
             ->whereBetween('reservations.created_at', [$startDate, $endDate])

@@ -3,13 +3,12 @@
 namespace Tests\Feature;
 
 use App\Models\User;
-use App\Services\GeocodingService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
 use Mockery;
-use Tymon\JWTAuth\Facades\JWTAuth;
 use Tests\TestCase;
+use Tymon\JWTAuth\Facades\JWTAuth;
 
 class GeocodingControllerTest extends TestCase
 {
@@ -21,7 +20,7 @@ class GeocodingControllerTest extends TestCase
     {
         parent::setUp();
 
-        config(['app.key' => 'base64:' . base64_encode(random_bytes(32))]);
+        config(['app.key' => 'base64:'.base64_encode(random_bytes(32))]);
         config(['jwt.secret' => Str::random(32)]);
 
         $this->user = User::factory()->create(['role' => 'consumer']);
@@ -36,7 +35,8 @@ class GeocodingControllerTest extends TestCase
     protected function actingAsJwt(User $user): array
     {
         $token = JWTAuth::fromUser($user);
-        return ['Authorization' => 'Bearer ' . $token];
+
+        return ['Authorization' => 'Bearer '.$token];
     }
 
     // ==================== GEOCODE TESTS ====================
@@ -250,7 +250,7 @@ class GeocodingControllerTest extends TestCase
 
         // Make multiple requests - should not fail within reasonable limit
         for ($i = 0; $i < 5; $i++) {
-            $response = $this->getJson('/api/geocoding/geocode?address=Lomé' . $i, $this->actingAsJwt($this->user));
+            $response = $this->getJson('/api/geocoding/geocode?address=Lomé'.$i, $this->actingAsJwt($this->user));
             $response->assertOk();
         }
     }

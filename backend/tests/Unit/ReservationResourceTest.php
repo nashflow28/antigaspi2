@@ -17,7 +17,7 @@ class ReservationResourceTest extends TestCase
     {
         parent::setUp();
 
-        config(['app.key' => 'base64:' . base64_encode(random_bytes(32))]);
+        config(['app.key' => 'base64:'.base64_encode(random_bytes(32))]);
         config(['app.cipher' => 'AES-256-CBC']);
     }
 
@@ -31,7 +31,7 @@ class ReservationResourceTest extends TestCase
         $reservation->setRelation('product.category', $reservation->product->category);
 
         $resource = new ReservationResource($reservation);
-        $responseData = $resource->toResponse(new Request())->getData(true);
+        $responseData = $resource->toResponse(new Request)->getData(true);
         $productData = $responseData['data']['product'];
 
         $this->assertArrayHasKey('category', $productData);
@@ -56,7 +56,7 @@ class ReservationResourceTest extends TestCase
         $reservation->setRelation('product.category', $reservation->product->category);
 
         $resource = new ReservationResource($reservation);
-        $responseData = $resource->toResponse(new Request())->getData(true);
+        $responseData = $resource->toResponse(new Request)->getData(true);
         $productData = $responseData['data']['product'];
 
         $this->assertArrayHasKey('category', $productData);

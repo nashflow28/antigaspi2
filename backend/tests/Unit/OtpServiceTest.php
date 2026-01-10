@@ -3,11 +3,9 @@
 namespace Tests\Unit;
 
 use App\Models\OtpVerification;
-use App\Models\User;
 use App\Services\OtpService;
 use App\Services\SmsService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\Hash;
 use Mockery;
 use Tests\TestCase;
 
@@ -16,6 +14,7 @@ class OtpServiceTest extends TestCase
     use RefreshDatabase;
 
     private OtpService $otpService;
+
     private $smsServiceMock;
 
     protected function setUp(): void

@@ -2,8 +2,8 @@
 
 namespace Database\Seeders;
 
-use App\Models\User;
 use App\Models\Product;
+use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 
@@ -17,8 +17,9 @@ class ReviewSeeder extends Seeder
         // Récupérer le consumer de test
         $consumer = User::where('email', 'jean.dupont@email.com')->first();
 
-        if (!$consumer) {
+        if (! $consumer) {
             $this->command->warn('Consumer jean.dupont@email.com not found. Skipping review seeding.');
+
             return;
         }
 
@@ -27,6 +28,7 @@ class ReviewSeeder extends Seeder
 
         if ($products->isEmpty()) {
             $this->command->warn('No products found for merchant_id=1. Skipping review seeding.');
+
             return;
         }
 
@@ -121,7 +123,7 @@ class ReviewSeeder extends Seeder
         ];
 
         foreach ($reviewsData as $data) {
-            if (!$data['product']) {
+            if (! $data['product']) {
                 continue;
             }
 
@@ -142,6 +144,6 @@ class ReviewSeeder extends Seeder
             ]);
         }
 
-        $this->command->info('✅ ' . count($reviewsData) . ' avis créés avec succès');
+        $this->command->info('✅ '.count($reviewsData).' avis créés avec succès');
     }
 }

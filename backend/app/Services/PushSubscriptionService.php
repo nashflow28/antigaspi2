@@ -87,7 +87,7 @@ class PushSubscriptionService
         $privateKey = config('services.webpush.private_key');
         $subject = config('services.webpush.subject', 'mailto:admin@example.com');
 
-        if (!$publicKey || !$privateKey) {
+        if (! $publicKey || ! $privateKey) {
             return null;
         }
 
@@ -106,8 +106,9 @@ class PushSubscriptionService
     {
         $webPush = $this->makeClient();
 
-        if (!$webPush) {
+        if (! $webPush) {
             Log::warning('Push notification skipped: VAPID credentials missing');
+
             return;
         }
 
@@ -154,15 +155,15 @@ class PushSubscriptionService
                 'data' => $payload['data'] ?? [],
             ];
 
-            if (!empty($payload['sound'])) {
+            if (! empty($payload['sound'])) {
                 $message['sound'] = $payload['sound'];
             }
 
-            if (!empty($payload['badge'])) {
+            if (! empty($payload['badge'])) {
                 $message['badge'] = $payload['badge'];
             }
 
-            if (!empty($payload['channelId'])) {
+            if (! empty($payload['channelId'])) {
                 $message['channelId'] = $payload['channelId'];
             }
 
@@ -185,6 +186,7 @@ class PushSubscriptionService
                     'status' => $response->status(),
                     'body' => $response->body(),
                 ]);
+
                 continue;
             }
 
@@ -193,12 +195,13 @@ class PushSubscriptionService
             foreach ($data as $key => $ticket) {
                 $subscription = $chunkSubscriptions->get($key);
 
-                if (!$subscription) {
+                if (! $subscription) {
                     continue;
                 }
 
                 if (($ticket['status'] ?? null) === 'ok') {
                     $subscription->forceFill(['last_used_at' => now()])->save();
+
                     continue;
                 }
 

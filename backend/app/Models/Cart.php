@@ -47,7 +47,7 @@ class Cart extends Model
 
     public function isEmpty(): bool
     {
-        return !$this->relationLoaded('items')
+        return ! $this->relationLoaded('items')
             ? $this->items()->doesntExist()
             : $this->items->isEmpty();
     }

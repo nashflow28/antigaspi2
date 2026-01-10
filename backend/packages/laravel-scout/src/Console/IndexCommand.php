@@ -34,7 +34,6 @@ class IndexCommand extends Command
     /**
      * Execute the console command.
      *
-     * @param  \Laravel\Scout\EngineManager  $manager
      * @return void
      */
     public function handle(EngineManager $manager)
@@ -85,10 +84,8 @@ class IndexCommand extends Command
     /**
      * Create a search index.
      *
-     * @param  \Laravel\Scout\Engines\Engine  $engine
      * @param  string  $name
      * @param  array  $options
-     * @return void
      */
     protected function createIndex(Engine $engine, $name, $options): void
     {

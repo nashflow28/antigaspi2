@@ -9,7 +9,7 @@ class DatabaseRecordChannel
 {
     public function send($notifiable, Notification $notification): void
     {
-        if (!method_exists($notification, 'toDatabaseRecord')) {
+        if (! method_exists($notification, 'toDatabaseRecord')) {
             return;
         }
 

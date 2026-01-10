@@ -25,7 +25,7 @@ class MessageController extends Controller
             ->orderByDesc('last_message_at')
             ->orderByDesc('updated_at');
 
-        if (!$request->boolean('include_archived')) {
+        if (! $request->boolean('include_archived')) {
             $query->where(function (Builder $builder) use ($user) {
                 if ($user->isConsumer()) {
                     $builder->where('archived_by_consumer', false);

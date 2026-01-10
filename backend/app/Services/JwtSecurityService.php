@@ -9,11 +9,11 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use Tymon\JWTAuth\Facades\JWTAuth;
 use Tymon\JWTAuth\Token;
-use Carbon\Carbon;
 
 class JwtSecurityService
 {
     const REFRESH_TOKEN_TTL_DAYS = 30;
+
     const MAX_TOKENS_PER_USER = 5;
 
     /**
@@ -73,7 +73,7 @@ class JwtSecurityService
             return Hash::check($refreshTokenString, $token->token);
         });
 
-        if (!$refreshToken) {
+        if (! $refreshToken) {
             throw new \Exception('Refresh token invalide ou expiré');
         }
 
@@ -135,7 +135,7 @@ class JwtSecurityService
             $payload = JWTAuth::getPayload();
             $user = JWTAuth::authenticate();
 
-            if (!$user) {
+            if (! $user) {
                 throw new \Exception('Utilisateur non trouvé');
             }
 
@@ -143,7 +143,7 @@ class JwtSecurityService
             $jti = $payload->get('jti');
             $refreshToken = RefreshToken::where('jti', $jti)->valid()->first();
 
-            if (!$refreshToken) {
+            if (! $refreshToken) {
                 throw new \Exception('Session expirée');
             }
 
@@ -192,13 +192,15 @@ class JwtSecurityService
     {
         if (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
             $parts = explode('.', $ip);
-            return implode('.', array_slice($parts, 0, 3)) . '.0';
+
+            return implode('.', array_slice($parts, 0, 3)).'.0';
         }
 
         // Pour IPv6, garder seulement le préfixe
         if (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6)) {
             $parts = explode(':', $ip);
-            return implode(':', array_slice($parts, 0, 4)) . '::';
+
+            return implode(':', array_slice($parts, 0, 4)).'::';
         }
 
         return 'unknown';
@@ -209,7 +211,7 @@ class JwtSecurityService
      */
     private function generateSecureRefreshToken(): string
     {
-        return Str::random(64) . '.' . time() . '.' . Str::random(32);
+        return Str::random(64).'.'.time().'.'.Str::random(32);
     }
 
     /**
@@ -230,10 +232,10 @@ class JwtSecurityService
         if ($activeTokensCount >= self::MAX_TOKENS_PER_USER) {
             // Supprimer les plus anciens tokens
             $oldestTokens = RefreshToken::byUser($userId)
-                                      ->valid()
-                                      ->orderBy('created_at')
-                                      ->limit($activeTokensCount - self::MAX_TOKENS_PER_USER + 1)
-                                      ->get();
+                ->valid()
+                ->orderBy('created_at')
+                ->limit($activeTokensCount - self::MAX_TOKENS_PER_USER + 1)
+                ->get();
 
             foreach ($oldestTokens as $token) {
                 $token->revoke();
@@ -247,9 +249,9 @@ class JwtSecurityService
     public function getActiveSessions(int $userId): array
     {
         $sessions = RefreshToken::byUser($userId)
-                              ->valid()
-                              ->orderBy('created_at', 'desc')
-                              ->get();
+            ->valid()
+            ->orderBy('created_at', 'desc')
+            ->get();
 
         return $sessions->map(function ($token) {
             return [
@@ -270,11 +272,12 @@ class JwtSecurityService
     public function revokeSession(int $userId, int $sessionId): bool
     {
         $token = RefreshToken::where('id', $sessionId)
-                           ->where('user_id', $userId)
-                           ->first();
+            ->where('user_id', $userId)
+            ->first();
 
         if ($token) {
             $this->revokeToken($token->jti);
+
             return true;
         }
 

@@ -21,20 +21,20 @@ class GeocodingService
     /**
      * Forward geocode: Convert address to coordinates
      *
-     * @param string $address The address to geocode
-     * @param string|null $city Optional city for better accuracy
-     * @param string $country Country code (default: TG for Togo)
+     * @param  string  $address  The address to geocode
+     * @param  string|null  $city  Optional city for better accuracy
+     * @param  string  $country  Country code (default: TG for Togo)
      * @return array|null Returns ['lat' => float, 'lng' => float, 'display_name' => string] or null
      */
     public function geocode(string $address, ?string $city = null, string $country = 'TG'): ?array
     {
         $fullAddress = trim($address);
         if ($city) {
-            $fullAddress .= ', ' . $city;
+            $fullAddress .= ', '.$city;
         }
 
         // Check cache first
-        $cacheKey = 'geocode:' . md5($fullAddress . $country);
+        $cacheKey = 'geocode:'.md5($fullAddress.$country);
         if (Cache::has($cacheKey)) {
             return Cache::get($cacheKey);
         }
@@ -44,7 +44,7 @@ class GeocodingService
                 ->withHeaders([
                     'User-Agent' => 'Antigaspi/1.0 (https://antigaspi.jubtek.com)',
                 ])
-                ->get(self::NOMINATIM_URL . '/search', [
+                ->get(self::NOMINATIM_URL.'/search', [
                     'q' => $fullAddress,
                     'countrycodes' => $country,
                     'format' => 'json',
@@ -55,7 +55,7 @@ class GeocodingService
             if ($response->successful()) {
                 $data = $response->json();
 
-                if (!empty($data) && isset($data[0])) {
+                if (! empty($data) && isset($data[0])) {
                     $result = [
                         'lat' => (float) $data[0]['lat'],
                         'lng' => (float) $data[0]['lon'],
@@ -82,14 +82,12 @@ class GeocodingService
     /**
      * Reverse geocode: Convert coordinates to address
      *
-     * @param float $latitude
-     * @param float $longitude
      * @return array|null Returns address details or null
      */
     public function reverseGeocode(float $latitude, float $longitude): ?array
     {
         // Check cache first
-        $cacheKey = 'reverse_geocode:' . md5($latitude . ',' . $longitude);
+        $cacheKey = 'reverse_geocode:'.md5($latitude.','.$longitude);
         if (Cache::has($cacheKey)) {
             return Cache::get($cacheKey);
         }
@@ -99,7 +97,7 @@ class GeocodingService
                 ->withHeaders([
                     'User-Agent' => 'Antigaspi/1.0 (https://antigaspi.jubtek.com)',
                 ])
-                ->get(self::NOMINATIM_URL . '/reverse', [
+                ->get(self::NOMINATIM_URL.'/reverse', [
                     'lat' => $latitude,
                     'lon' => $longitude,
                     'format' => 'json',
@@ -109,7 +107,7 @@ class GeocodingService
             if ($response->successful()) {
                 $data = $response->json();
 
-                if (!empty($data) && isset($data['display_name'])) {
+                if (! empty($data) && isset($data['display_name'])) {
                     $result = [
                         'display_name' => $data['display_name'],
                         'address' => $data['address'] ?? [],
@@ -139,9 +137,9 @@ class GeocodingService
     /**
      * Search for address suggestions (autocomplete)
      *
-     * @param string $query The search query
-     * @param string $country Country code
-     * @param int $limit Maximum number of results
+     * @param  string  $query  The search query
+     * @param  string  $country  Country code
+     * @param  int  $limit  Maximum number of results
      * @return array List of suggestions
      */
     public function searchAddresses(string $query, string $country = 'TG', int $limit = 5): array
@@ -151,7 +149,7 @@ class GeocodingService
         }
 
         // Check cache first
-        $cacheKey = 'address_search:' . md5($query . $country . $limit);
+        $cacheKey = 'address_search:'.md5($query.$country.$limit);
         if (Cache::has($cacheKey)) {
             return Cache::get($cacheKey);
         }
@@ -161,7 +159,7 @@ class GeocodingService
                 ->withHeaders([
                     'User-Agent' => 'Antigaspi/1.0 (https://antigaspi.jubtek.com)',
                 ])
-                ->get(self::NOMINATIM_URL . '/search', [
+                ->get(self::NOMINATIM_URL.'/search', [
                     'q' => $query,
                     'countrycodes' => $country,
                     'format' => 'json',
@@ -199,10 +197,6 @@ class GeocodingService
 
     /**
      * Validate coordinates are within expected bounds for West Africa
-     *
-     * @param float $latitude
-     * @param float $longitude
-     * @return bool
      */
     public function validateCoordinates(float $latitude, float $longitude): bool
     {
@@ -219,18 +213,18 @@ class GeocodingService
     {
         $parts = [];
 
-        if (!empty($address['house_number'])) {
+        if (! empty($address['house_number'])) {
             $parts[] = $address['house_number'];
         }
 
-        if (!empty($address['road'])) {
+        if (! empty($address['road'])) {
             $parts[] = $address['road'];
-        } elseif (!empty($address['pedestrian'])) {
+        } elseif (! empty($address['pedestrian'])) {
             $parts[] = $address['pedestrian'];
-        } elseif (!empty($address['neighbourhood'])) {
+        } elseif (! empty($address['neighbourhood'])) {
             $parts[] = $address['neighbourhood'];
         }
 
-        return !empty($parts) ? implode(' ', $parts) : null;
+        return ! empty($parts) ? implode(' ', $parts) : null;
     }
 }

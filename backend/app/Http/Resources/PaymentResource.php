@@ -27,7 +27,7 @@ class PaymentResource extends JsonResource
             'updated_at' => $this->updated_at,
             'reservation' => $this->whenLoaded('reservation', function () {
                 $reservation = $this->reservation;
-                if (!$reservation) {
+                if (! $reservation) {
                     return null;
                 }
 
@@ -48,7 +48,7 @@ class PaymentResource extends JsonResource
                     ] : null,
                     'consumer' => $consumer ? [
                         'id' => $consumer->id,
-                        'name' => trim(($consumer->first_name ?? '') . ' ' . ($consumer->last_name ?? '')) ?: ($consumer->name ?? ''),
+                        'name' => trim(($consumer->first_name ?? '').' '.($consumer->last_name ?? '')) ?: ($consumer->name ?? ''),
                         'phone' => $consumer->phone,
                         'email' => $consumer->email,
                     ] : null,

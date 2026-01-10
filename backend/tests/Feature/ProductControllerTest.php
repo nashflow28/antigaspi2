@@ -2,12 +2,12 @@
 
 namespace Tests\Feature;
 
-use Tests\TestCase;
-use App\Models\User;
 use App\Models\Merchant;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
+use Tests\TestCase;
 
 /**
  * Critical MIME validation tests for ProductController uploadImage endpoint
@@ -56,7 +56,7 @@ class ProductControllerTest extends TestCase
         // Create valid JPEG test image (100x100px)
         $image = UploadedFile::fake()->image('product.jpg', 100, 100);
 
-        $response = $this->withHeader('Authorization', 'Bearer ' . $token)
+        $response = $this->withHeader('Authorization', 'Bearer '.$token)
             ->postJson('/api/products/upload-image', [
                 'image' => $image,
             ]);
@@ -72,7 +72,7 @@ class ProductControllerTest extends TestCase
 
         // Verify file was stored
         $filename = $response->json('data.filename');
-        Storage::disk('public')->assertExists('products/' . $filename);
+        Storage::disk('public')->assertExists('products/'.$filename);
     }
 
     /**
@@ -86,7 +86,7 @@ class ProductControllerTest extends TestCase
         // Create valid PNG test image (500x500px)
         $image = UploadedFile::fake()->image('product.png', 500, 500);
 
-        $response = $this->withHeader('Authorization', 'Bearer ' . $token)
+        $response = $this->withHeader('Authorization', 'Bearer '.$token)
             ->postJson('/api/products/upload-image', [
                 'image' => $image,
             ]);
@@ -99,7 +99,7 @@ class ProductControllerTest extends TestCase
 
         // Verify file was stored
         $filename = $response->json('data.filename');
-        Storage::disk('public')->assertExists('products/' . $filename);
+        Storage::disk('public')->assertExists('products/'.$filename);
     }
 
     /**
@@ -114,7 +114,7 @@ class ProductControllerTest extends TestCase
         // Create malicious PHP file disguised as image
         $maliciousFile = UploadedFile::fake()->create('malicious.php', 100, 'application/x-php');
 
-        $response = $this->withHeader('Authorization', 'Bearer ' . $token)
+        $response = $this->withHeader('Authorization', 'Bearer '.$token)
             ->postJson('/api/products/upload-image', [
                 'image' => $maliciousFile,
             ]);
@@ -140,7 +140,7 @@ class ProductControllerTest extends TestCase
         // Create image exceeding max dimensions (2500x2500px > 2000x2000px limit)
         $oversizedImage = UploadedFile::fake()->image('huge.jpg', 2500, 2500);
 
-        $response = $this->withHeader('Authorization', 'Bearer ' . $token)
+        $response = $this->withHeader('Authorization', 'Bearer '.$token)
             ->postJson('/api/products/upload-image', [
                 'image' => $oversizedImage,
             ]);
@@ -167,7 +167,7 @@ class ProductControllerTest extends TestCase
         // Create file exceeding max size (3MB > 2MB limit)
         $oversizedFile = UploadedFile::fake()->create('huge.jpg', 3072); // 3MB in KB
 
-        $response = $this->withHeader('Authorization', 'Bearer ' . $token)
+        $response = $this->withHeader('Authorization', 'Bearer '.$token)
             ->postJson('/api/products/upload-image', [
                 'image' => $oversizedFile,
             ]);

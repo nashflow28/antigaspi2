@@ -11,6 +11,7 @@ class PushSubscription extends Model
     use HasFactory;
 
     public const DRIVER_WEB = 'web';
+
     public const DRIVER_EXPO = 'expo';
 
     protected $fillable = [

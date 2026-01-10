@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Script temporaire pour supprimer les warnings PHP qui corrompent les réponses JSON
  */
@@ -12,4 +13,3 @@ ini_set('display_errors', 0);
 
 echo "✅ PHP warnings supprimés pour les réponses API\n";
 echo "Les warnings seront toujours loggés mais n'apparaîtront plus dans les réponses JSON\n";
-?>

@@ -2,13 +2,13 @@
 
 namespace Tests\Feature;
 
-use Tests\TestCase;
-use App\Models\User;
-use App\Models\Product;
-use App\Models\Merchant;
 use App\Models\Category;
 use App\Models\Favorite;
+use App\Models\Merchant;
+use App\Models\Product;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\TestCase;
 
 /**
  * Tests for FavoriteController API endpoints
@@ -19,7 +19,9 @@ class FavoriteControllerTest extends TestCase
     use RefreshDatabase;
 
     protected User $consumer;
+
     protected Product $product1;
+
     protected Product $product2;
 
     protected function setUp(): void
@@ -76,7 +78,7 @@ class FavoriteControllerTest extends TestCase
     {
         $token = auth('api')->login($this->consumer);
 
-        $response = $this->withHeader('Authorization', 'Bearer ' . $token)
+        $response = $this->withHeader('Authorization', 'Bearer '.$token)
             ->postJson("/api/favorites/{$this->product1->id}/toggle");
 
         $response->assertStatus(200)
@@ -107,7 +109,7 @@ class FavoriteControllerTest extends TestCase
             'product_id' => $this->product1->id,
         ]);
 
-        $response = $this->withHeader('Authorization', 'Bearer ' . $token)
+        $response = $this->withHeader('Authorization', 'Bearer '.$token)
             ->postJson("/api/favorites/{$this->product1->id}/toggle");
 
         $response->assertStatus(200)
@@ -136,7 +138,7 @@ class FavoriteControllerTest extends TestCase
         Favorite::create(['user_id' => $this->consumer->id, 'product_id' => $this->product1->id]);
         Favorite::create(['user_id' => $this->consumer->id, 'product_id' => $this->product2->id]);
 
-        $response = $this->withHeader('Authorization', 'Bearer ' . $token)
+        $response = $this->withHeader('Authorization', 'Bearer '.$token)
             ->getJson('/api/favorites');
 
         $response->assertStatus(200)
@@ -175,7 +177,7 @@ class FavoriteControllerTest extends TestCase
         // Add product1 to favorites
         Favorite::create(['user_id' => $this->consumer->id, 'product_id' => $this->product1->id]);
 
-        $response = $this->withHeader('Authorization', 'Bearer ' . $token)
+        $response = $this->withHeader('Authorization', 'Bearer '.$token)
             ->getJson("/api/favorites/check/{$this->product1->id}");
 
         $response->assertStatus(200)
@@ -193,7 +195,7 @@ class FavoriteControllerTest extends TestCase
     {
         $token = auth('api')->login($this->consumer);
 
-        $response = $this->withHeader('Authorization', 'Bearer ' . $token)
+        $response = $this->withHeader('Authorization', 'Bearer '.$token)
             ->getJson("/api/favorites/check/{$this->product1->id}");
 
         $response->assertStatus(200)
@@ -215,7 +217,7 @@ class FavoriteControllerTest extends TestCase
         Favorite::create(['user_id' => $this->consumer->id, 'product_id' => $this->product1->id]);
         Favorite::create(['user_id' => $this->consumer->id, 'product_id' => $this->product2->id]);
 
-        $response = $this->withHeader('Authorization', 'Bearer ' . $token)
+        $response = $this->withHeader('Authorization', 'Bearer '.$token)
             ->getJson('/api/favorites/batch-check');
 
         $response->assertStatus(200)
@@ -250,7 +252,7 @@ class FavoriteControllerTest extends TestCase
     {
         $token = auth('api')->login($this->consumer);
 
-        $response = $this->withHeader('Authorization', 'Bearer ' . $token)
+        $response = $this->withHeader('Authorization', 'Bearer '.$token)
             ->postJson('/api/favorites/99999/toggle');
 
         $response->assertStatus(404)
@@ -268,7 +270,7 @@ class FavoriteControllerTest extends TestCase
     {
         $token = auth('api')->login($this->consumer);
 
-        $response = $this->withHeader('Authorization', 'Bearer ' . $token)
+        $response = $this->withHeader('Authorization', 'Bearer '.$token)
             ->getJson('/api/favorites');
 
         $response->assertStatus(200)
@@ -295,7 +297,7 @@ class FavoriteControllerTest extends TestCase
         // Add favorite for current consumer
         Favorite::create(['user_id' => $this->consumer->id, 'product_id' => $this->product2->id]);
 
-        $response = $this->withHeader('Authorization', 'Bearer ' . $token)
+        $response = $this->withHeader('Authorization', 'Bearer '.$token)
             ->getJson('/api/favorites');
 
         $response->assertStatus(200)

@@ -15,9 +15,7 @@ class ReservationStatusNotification extends Notification implements ShouldQueue
 {
     use Queueable;
 
-    public function __construct(private readonly Reservation $reservation)
-    {
-    }
+    public function __construct(private readonly Reservation $reservation) {}
 
     public function via(object $notifiable): array
     {
@@ -27,7 +25,7 @@ class ReservationStatusNotification extends Notification implements ShouldQueue
             $channels[] = 'mail';
         }
 
-        if (method_exists($notifiable, 'prefersSmsNotifications') && $notifiable->prefersSmsNotifications() && !empty($notifiable->phone)) {
+        if (method_exists($notifiable, 'prefersSmsNotifications') && $notifiable->prefersSmsNotifications() && ! empty($notifiable->phone)) {
             $channels[] = 'vonage';
         }
 
@@ -40,12 +38,12 @@ class ReservationStatusNotification extends Notification implements ShouldQueue
 
     public function toMail(object $notifiable): MailMessage
     {
-        return (new MailMessage())
+        return (new MailMessage)
             ->subject('Mise à jour de votre réservation')
-            ->greeting('Bonjour ' . $notifiable->first_name)
-            ->line('Le statut de votre réservation #' . $this->reservation->reservation_code . ' a été mis à jour.')
-            ->line('Nouveau statut : ' . ucfirst($this->reservation->status))
-            ->action('Voir ma réservation', url('/reservations/' . $this->reservation->id))
+            ->greeting('Bonjour '.$notifiable->first_name)
+            ->line('Le statut de votre réservation #'.$this->reservation->reservation_code.' a été mis à jour.')
+            ->line('Nouveau statut : '.ucfirst($this->reservation->status))
+            ->action('Voir ma réservation', url('/reservations/'.$this->reservation->id))
             ->line('Merci d\'utiliser Antigaspi !');
     }
 
@@ -57,7 +55,7 @@ class ReservationStatusNotification extends Notification implements ShouldQueue
             $this->reservation->status
         );
 
-        return (new VonageMessage())->content($content);
+        return (new VonageMessage)->content($content);
     }
 
     public function toPushPayload(object $notifiable): array

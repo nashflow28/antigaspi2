@@ -30,7 +30,7 @@ class PaymentFactory extends Factory
             'status' => $status,
             'provider' => $method->provider(),
             'checkout_url' => $status === PaymentStatus::PENDING ? $this->faker->url() : null,
-            'customer_phone' => $method->requiresPhone() ? '+228' . $this->faker->numberBetween(90000000, 99999999) : null,
+            'customer_phone' => $method->requiresPhone() ? '+228'.$this->faker->numberBetween(90000000, 99999999) : null,
             'reference' => strtoupper(Str::random(12)),
             'payload' => [
                 'gateway' => $method->provider(),

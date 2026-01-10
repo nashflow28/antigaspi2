@@ -2,7 +2,6 @@
 
 namespace App\Services;
 
-use Carbon\Carbon;
 use App\Enums\PaymentMethod;
 use App\Models\Payment;
 use App\Models\Product;
@@ -11,7 +10,7 @@ use App\Models\User;
 use App\Models\Wallet;
 use App\Notifications\ReservationStatusNotification;
 use App\Services\Payments\PaymentService;
-use App\Services\SmsService;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\ValidationException;
 
@@ -20,11 +19,11 @@ class ReservationService
     public function __construct(
         private readonly PaymentService $payments,
         private readonly SmsService $sms
-    ) {
-    }
+    ) {}
 
     /**
      * @return array{0: Reservation, 1: Payment|null}
+     *
      * @throws ValidationException
      */
     public function createReservation(
@@ -48,7 +47,7 @@ class ReservationService
         }
 
         // Validate pickup_date if provided
-        if (!empty($options['pickup_date'])) {
+        if (! empty($options['pickup_date'])) {
             try {
                 $pickupDate = Carbon::parse($options['pickup_date']);
 
@@ -66,28 +65,28 @@ class ReservationService
         }
 
         // Validate pickup_time if provided
-        if (!empty($options['pickup_time']) && !preg_match('/^([01]?[0-9]|2[0-3]):[0-5][0-9]$/', $options['pickup_time'])) {
+        if (! empty($options['pickup_time']) && ! preg_match('/^([01]?[0-9]|2[0-3]):[0-5][0-9]$/', $options['pickup_time'])) {
             throw ValidationException::withMessages([
                 'pickup_time' => ['Format d\'heure invalide (HH:MM attendu).'],
             ]);
         }
 
         // Validate currency if provided
-        if (!empty($options['currency']) && $options['currency'] !== 'XOF') {
+        if (! empty($options['currency']) && $options['currency'] !== 'XOF') {
             throw ValidationException::withMessages([
                 'currency' => ['Seule la devise XOF est acceptée.'],
             ]);
         }
 
         // Validate wallet_pin if provided
-        if (!empty($options['wallet_pin']) && !preg_match('/^\d{4,6}$/', $options['wallet_pin'])) {
+        if (! empty($options['wallet_pin']) && ! preg_match('/^\d{4,6}$/', $options['wallet_pin'])) {
             throw ValidationException::withMessages([
                 'wallet_pin' => ['Le code PIN doit contenir entre 4 et 6 chiffres.'],
             ]);
         }
 
         // Validate notes length if provided
-        if (!empty($options['notes']) && strlen($options['notes']) > 500) {
+        if (! empty($options['notes']) && strlen($options['notes']) > 500) {
             throw ValidationException::withMessages([
                 'notes' => ['Les notes ne peuvent pas dépasser 500 caractères.'],
             ]);
@@ -104,7 +103,7 @@ class ReservationService
         }
 
         // 🐛 BUG FIX #11: Verify product is still active (additional safety check)
-        if (!$product->is_active) {
+        if (! $product->is_active) {
             throw ValidationException::withMessages([
                 'product' => ['Ce produit n\'est plus disponible.'],
             ]);
@@ -137,19 +136,19 @@ class ReservationService
         if ($paymentMethod === PaymentMethod::WALLET) {
             $wallet = Wallet::where('user_id', $user->id)->first();
 
-            if (!$wallet) {
+            if (! $wallet) {
                 throw ValidationException::withMessages([
                     'payment_method' => ['Vous n\'avez pas encore de portefeuille. Veuillez d\'abord en créer un.'],
                 ]);
             }
 
-            if (!$wallet->is_active) {
+            if (! $wallet->is_active) {
                 throw ValidationException::withMessages([
                     'payment_method' => ['Votre portefeuille est désactivé.'],
                 ]);
             }
 
-            if (!$wallet->pin_hash) {
+            if (! $wallet->pin_hash) {
                 throw ValidationException::withMessages([
                     'payment_method' => ['Veuillez d\'abord configurer votre code PIN.'],
                 ]);
@@ -164,7 +163,7 @@ class ReservationService
             }
 
             // 🐛 BUG FIX: Verify PIN before creating reservation
-            if (!$wallet->verifyPin($walletPin)) {
+            if (! $wallet->verifyPin($walletPin)) {
                 throw ValidationException::withMessages([
                     'wallet_pin' => ['Code PIN incorrect.'],
                 ]);
@@ -173,14 +172,14 @@ class ReservationService
             if ($wallet->balance < $totalAmount) {
                 throw ValidationException::withMessages([
                     'payment_method' => [
-                        "Solde insuffisant. Votre solde: " . number_format($wallet->balance, 0, ',', ' ') .
-                        " F CFA. Montant requis: " . number_format($totalAmount, 0, ',', ' ') . " F CFA."
+                        'Solde insuffisant. Votre solde: '.number_format($wallet->balance, 0, ',', ' ').
+                        ' F CFA. Montant requis: '.number_format($totalAmount, 0, ',', ' ').' F CFA.',
                     ],
                 ]);
             }
 
             // Check daily spending limit
-            if (!$wallet->canSpend($totalAmount)) {
+            if (! $wallet->canSpend($totalAmount)) {
                 throw ValidationException::withMessages([
                     'payment_method' => ['Limite de dépense quotidienne dépassée.'],
                 ]);
@@ -213,7 +212,7 @@ class ReservationService
                 ]);
 
                 // 🐛 BUG FIX: For wallet payments, verify payment was successful
-                if ($paymentMethod === PaymentMethod::WALLET && $payment && !$payment->isSuccessful()) {
+                if ($paymentMethod === PaymentMethod::WALLET && $payment && ! $payment->isSuccessful()) {
                     // Rollback: restore product stock and cancel reservation
                     $product->increment('quantity_available', $quantity);
                     $reservation->update(['status' => 'cancelled']);
@@ -231,13 +230,13 @@ class ReservationService
                     $product->increment('quantity_available', $quantity);
                     $reservation->update(['status' => 'cancelled']);
 
-                    Log::error('Wallet payment failed: ' . $exception->getMessage());
+                    Log::error('Wallet payment failed: '.$exception->getMessage());
                     throw ValidationException::withMessages([
-                        'payment_method' => ['Erreur lors du paiement: ' . $exception->getMessage()],
+                        'payment_method' => ['Erreur lors du paiement: '.$exception->getMessage()],
                     ]);
                 }
                 // For other payment methods, just log the warning (they may complete async)
-                Log::warning('Payment initialization failed: ' . $exception->getMessage());
+                Log::warning('Payment initialization failed: '.$exception->getMessage());
             }
         }
 
@@ -260,8 +259,9 @@ class ReservationService
     {
         try {
             // Skip if SMS service is not configured
-            if (!$this->sms->isConfigured()) {
+            if (! $this->sms->isConfigured()) {
                 Log::debug('SMS Service: Skipping SMS (not configured)');
+
                 return;
             }
 
@@ -271,6 +271,7 @@ class ReservationService
                 Log::debug('SMS Service: Skipping SMS (no phone number)', [
                     'user_id' => $user->id,
                 ]);
+
                 return;
             }
 
@@ -284,7 +285,7 @@ class ReservationService
                 $merchantName
             );
 
-            if (!$result['success']) {
+            if (! $result['success']) {
                 Log::warning('SMS Service: Failed to send reservation confirmation', [
                     'reservation_id' => $reservation->id,
                     'error' => $result['message'] ?? 'Unknown error',

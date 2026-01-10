@@ -14,6 +14,7 @@ use Illuminate\Validation\Rule;
 class StoreReservationRequest extends FormRequest
 {
     private ?Product $resolvedProduct = null;
+
     private bool $productLoaded = false;
 
     public function authorize(): bool
@@ -25,7 +26,7 @@ class StoreReservationRequest extends FormRequest
         // Verify user is authenticated (middleware guarantees this, but double-check)
         $user = auth()->user();
 
-        if (!$user) {
+        if (! $user) {
             return false;
         }
 
@@ -49,21 +50,24 @@ class StoreReservationRequest extends FormRequest
                 function ($attribute, $value, $fail) {
                     $product = Product::find($value);
 
-                    if (!$product) {
+                    if (! $product) {
                         $fail('Le produit sélectionné n\'existe pas.');
+
                         return;
                     }
 
-                    if (!$product->is_active) {
+                    if (! $product->is_active) {
                         $fail('Ce produit n\'est plus disponible.');
+
                         return;
                     }
 
                     if ($product->isExpired()) {
                         $fail('Ce produit a expiré.');
+
                         return;
                     }
-                }
+                },
             ],
             'quantity' => [
                 'required',
@@ -71,7 +75,7 @@ class StoreReservationRequest extends FormRequest
                 'min:1',
                 'max:100', // BUG FIX #29: Limit maximum reservation quantity to prevent abuse
                 function ($attribute, $value, $fail) {
-                    if (!$this->input('product_id')) {
+                    if (! $this->input('product_id')) {
                         return;
                     }
 
@@ -79,7 +83,7 @@ class StoreReservationRequest extends FormRequest
                     if ($product && $product->quantity_available < $value) {
                         $fail("Stock insuffisant. Disponible: {$product->quantity_available}");
                     }
-                }
+                },
             ],
             'payment_method' => ['required', Rule::enum(PaymentMethod::class)],
             'customer_phone' => [
@@ -88,6 +92,7 @@ class StoreReservationRequest extends FormRequest
                 'regex:/^\+?[0-9]{8,15}$/',
                 Rule::requiredIf(function () {
                     $method = $this->input('payment_method');
+
                     return in_array($method, [
                         PaymentMethod::FLOOZ->value,
                         PaymentMethod::TMONEY->value,
@@ -113,6 +118,7 @@ class StoreReservationRequest extends FormRequest
                 'digits_between:4,6',
                 Rule::requiredIf(function () {
                     $method = $this->input('payment_method');
+
                     return $method === PaymentMethod::WALLET->value;
                 }),
             ],
@@ -162,7 +168,7 @@ class StoreReservationRequest extends FormRequest
         $validator->after(function ($validator) {
             if ($this->input('pickup_date') && $this->input('pickup_time')) {
                 try {
-                    $pickupDateTime = Carbon::createFromFormat('Y-m-d H:i', $this->input('pickup_date') . ' ' . $this->input('pickup_time'), config('app.timezone'));
+                    $pickupDateTime = Carbon::createFromFormat('Y-m-d H:i', $this->input('pickup_date').' '.$this->input('pickup_time'), config('app.timezone'));
                     if ($pickupDateTime->lt(now())) {
                         $validator->errors()->add(
                             'pickup_time',
@@ -192,7 +198,7 @@ class StoreReservationRequest extends FormRequest
 
     private function getProduct(): ?Product
     {
-        if (!$this->productLoaded) {
+        if (! $this->productLoaded) {
             $this->resolvedProduct = $this->input('product_id')
                 ? Product::with('merchant')->find($this->input('product_id'))
                 : null;

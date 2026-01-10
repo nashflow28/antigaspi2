@@ -31,7 +31,7 @@ class InventoryControllerTest extends TestCase
     {
         $token = JWTAuth::fromUser($user);
 
-        return $this->withHeader('Authorization', 'Bearer ' . $token);
+        return $this->withHeader('Authorization', 'Bearer '.$token);
     }
 
     public function test_merchant_can_record_stock_entry(): void

@@ -2,18 +2,18 @@
 
 namespace App\Exceptions;
 
-use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\ValidationException;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\Exception\TooManyRequestsHttpException;
+use Throwable;
+use Tymon\JWTAuth\Exceptions\JWTException;
 use Tymon\JWTAuth\Exceptions\TokenExpiredException;
 use Tymon\JWTAuth\Exceptions\TokenInvalidException;
-use Tymon\JWTAuth\Exceptions\JWTException;
-use Illuminate\Support\Facades\Log;
-use Throwable;
 
 class Handler extends ExceptionHandler
 {
@@ -129,6 +129,7 @@ class Handler extends ExceptionHandler
 
         if ($exception instanceof ModelNotFoundException) {
             $model = strtolower(class_basename($exception->getModel()));
+
             return response()->json([
                 'success' => false,
                 'message' => "Ressource {$model} non trouvée",
@@ -155,6 +156,7 @@ class Handler extends ExceptionHandler
 
         if ($exception instanceof TooManyRequestsHttpException) {
             $retryAfter = $exception->getHeaders()['Retry-After'] ?? 60;
+
             return response()->json([
                 'success' => false,
                 'message' => 'Trop de requêtes. Veuillez réessayer plus tard.',

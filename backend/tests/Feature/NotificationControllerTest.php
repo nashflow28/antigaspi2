@@ -29,7 +29,7 @@ class NotificationControllerTest extends TestCase
     {
         $token = JWTAuth::fromUser($user);
 
-        return $this->withHeader('Authorization', 'Bearer ' . $token);
+        return $this->withHeader('Authorization', 'Bearer '.$token);
     }
 
     public function test_user_can_list_their_notifications(): void
@@ -66,7 +66,7 @@ class NotificationControllerTest extends TestCase
     public function test_user_can_manage_push_subscriptions(): void
     {
         $user = User::factory()->create();
-        $endpoint = 'https://example.com/push/' . uniqid();
+        $endpoint = 'https://example.com/push/'.uniqid();
 
         $subscribeResponse = $this->actingAsUser($user)->postJson('/api/notifications/subscriptions', [
             'endpoint' => $endpoint,

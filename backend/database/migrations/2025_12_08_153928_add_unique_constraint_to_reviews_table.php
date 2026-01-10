@@ -2,8 +2,8 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
@@ -16,14 +16,14 @@ return new class extends Migration
     public function up(): void
     {
         // D'abord, supprimer les doublons existants (garder le plus récent)
-        DB::statement("
+        DB::statement('
             DELETE r1 FROM reviews r1
             INNER JOIN reviews r2
             WHERE r1.id < r2.id
             AND r1.user_id = r2.user_id
             AND r1.merchant_id = r2.merchant_id
             AND (r1.product_id = r2.product_id OR (r1.product_id IS NULL AND r2.product_id IS NULL))
-        ");
+        ');
 
         Schema::table('reviews', function (Blueprint $table) {
             // Contrainte unique sur user_id + merchant_id + product_id

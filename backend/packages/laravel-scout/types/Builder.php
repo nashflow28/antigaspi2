@@ -13,6 +13,4 @@ function test(
     assertType('User', $builder->first());
 }
 
-class User extends Model
-{
-}
+class User extends Model {}

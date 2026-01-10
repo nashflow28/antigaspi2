@@ -11,9 +11,9 @@ class AnalyticsDaily extends Model
     use HasFactory;
 
     public $timestamps = false;
-    
+
     protected $table = 'analytics_daily';
-    
+
     protected $fillable = [
         'date',
         'merchant_id',
@@ -38,7 +38,7 @@ class AnalyticsDaily extends Model
     protected static function boot()
     {
         parent::boot();
-        
+
         static::creating(function ($analytics) {
             $analytics->created_at = now();
         });

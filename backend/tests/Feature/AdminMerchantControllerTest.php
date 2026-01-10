@@ -124,7 +124,7 @@ class AdminMerchantControllerTest extends TestCase
 
         $token = JWTAuth::fromUser($admin);
 
-        $this->withHeader('Authorization', 'Bearer ' . $token);
+        $this->withHeader('Authorization', 'Bearer '.$token);
     }
 
     public function test_moderation_returns_expected_payload(): void

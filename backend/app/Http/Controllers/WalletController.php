@@ -3,8 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Services\WalletService;
-use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 
@@ -442,7 +442,7 @@ class WalletController extends Controller
 
             $paymentMethod = $paymentMethodMap[$request->payment_method] ?? null;
 
-            if (!$paymentMethod) {
+            if (! $paymentMethod) {
                 return response()->json([
                     'success' => false,
                     'message' => 'Méthode de paiement non supportée pour la recharge',
@@ -457,7 +457,7 @@ class WalletController extends Controller
                 'currency' => 'XOF',
                 'status' => \App\Enums\PaymentStatus::PENDING,
                 'provider' => 'paygate',
-                'reference' => 'WLT-' . $user->id . '-' . time() . '-' . random_int(100, 999),
+                'reference' => 'WLT-'.$user->id.'-'.time().'-'.random_int(100, 999),
                 'customer_phone' => $request->phone,
                 'customer_email' => $user->email,
                 'payload' => [
@@ -485,7 +485,7 @@ class WalletController extends Controller
 
             $response = \Illuminate\Support\Facades\Http::timeout(30)
                 ->acceptJson()
-                ->post($paygateConfig['base_url'] . '/pay', $paygatePayload);
+                ->post($paygateConfig['base_url'].'/pay', $paygatePayload);
 
             $body = $response->json() ?? [];
 
@@ -494,7 +494,7 @@ class WalletController extends Controller
 
                 return response()->json([
                     'success' => false,
-                    'message' => 'Erreur lors de l\'initialisation du paiement: ' . ($body['message'] ?? 'Erreur inconnue'),
+                    'message' => 'Erreur lors de l\'initialisation du paiement: '.($body['message'] ?? 'Erreur inconnue'),
                 ], 400);
             }
 
@@ -536,7 +536,7 @@ class WalletController extends Controller
 
             return response()->json([
                 'success' => false,
-                'message' => 'Erreur lors de la recharge: ' . $e->getMessage(),
+                'message' => 'Erreur lors de la recharge: '.$e->getMessage(),
             ], 500);
         }
     }
@@ -557,10 +557,10 @@ class WalletController extends Controller
         }
 
         if (str_starts_with($phone, '0')) {
-            return '228' . substr($phone, 1);
+            return '228'.substr($phone, 1);
         }
 
-        return '228' . $phone;
+        return '228'.$phone;
     }
 
     /**
@@ -583,7 +583,7 @@ class WalletController extends Controller
 
         // In production: ONLY allow if explicitly enabled AND log the action
         if ($isProduction) {
-            if (!$explicitlyAllowed) {
+            if (! $explicitlyAllowed) {
                 \Log::warning('SEC-004: Test recharge attempt blocked in production', [
                     'user_id' => Auth::id(),
                     'ip' => request()->ip(),
@@ -605,7 +605,7 @@ class WalletController extends Controller
         }
 
         // In non-production: always allow (local, staging, testing)
-        if ($isProduction && !$explicitlyAllowed) {
+        if ($isProduction && ! $explicitlyAllowed) {
             return response()->json([
                 'success' => false,
                 'message' => 'Cette fonctionnalité n\'est disponible qu\'en mode test',

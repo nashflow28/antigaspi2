@@ -24,7 +24,7 @@ class PaymentServiceWalletTest extends TestCase
     {
         parent::setUp();
 
-        config(['app.key' => 'base64:' . base64_encode(random_bytes(32))]);
+        config(['app.key' => 'base64:'.base64_encode(random_bytes(32))]);
 
         $this->payments = app(PaymentService::class);
         $this->wallets = app(WalletService::class);

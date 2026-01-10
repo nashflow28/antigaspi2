@@ -7,13 +7,11 @@ use Illuminate\Notifications\Notification;
 
 class PushChannel
 {
-    public function __construct(private readonly PushSubscriptionService $pushService)
-    {
-    }
+    public function __construct(private readonly PushSubscriptionService $pushService) {}
 
     public function send($notifiable, Notification $notification): void
     {
-        if (!method_exists($notification, 'toPushPayload')) {
+        if (! method_exists($notification, 'toPushPayload')) {
             return;
         }
 

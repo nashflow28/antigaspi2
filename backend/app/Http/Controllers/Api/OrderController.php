@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Api;
 use App\Enums\PaymentMethod;
 use App\Enums\PaymentStatus;
 use App\Http\Controllers\Controller;
-use App\Models\Cart;
 use App\Models\Order;
 use App\Models\Payment;
 use App\Models\Product;
@@ -16,13 +15,10 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Str;
 
 class OrderController extends Controller
 {
-    public function __construct(private readonly PaymentService $paymentService)
-    {
-    }
+    public function __construct(private readonly PaymentService $paymentService) {}
 
     /**
      * Lister les commandes de l'utilisateur connecté
@@ -99,7 +95,7 @@ class OrderController extends Controller
             'user_id' => $user->id,
             'payment_method_received' => $request->input('payment_method'),
             'payment_method_used' => $paymentMethodStr,
-            'wallet_pin_present' => !empty($walletPin),
+            'wallet_pin_present' => ! empty($walletPin),
             'items_count' => count($items),
             'all_input_keys' => array_keys($request->all()),
         ]);
@@ -127,21 +123,21 @@ class OrderController extends Controller
             if ($paymentMethod === PaymentMethod::WALLET) {
                 $wallet = Wallet::where('user_id', $user->id)->first();
 
-                if (!$wallet) {
+                if (! $wallet) {
                     return response()->json([
                         'success' => false,
                         'message' => 'Vous n\'avez pas encore de portefeuille. Veuillez d\'abord en créer un.',
                     ], 400);
                 }
 
-                if (!$wallet->is_active) {
+                if (! $wallet->is_active) {
                     return response()->json([
                         'success' => false,
                         'message' => 'Votre portefeuille est désactivé.',
                     ], 400);
                 }
 
-                if (!$wallet->pin_hash) {
+                if (! $wallet->pin_hash) {
                     return response()->json([
                         'success' => false,
                         'message' => 'Veuillez d\'abord configurer votre code PIN.',
@@ -155,7 +151,7 @@ class OrderController extends Controller
                     ], 400);
                 }
 
-                if (!$wallet->verifyPin($walletPin)) {
+                if (! $wallet->verifyPin($walletPin)) {
                     return response()->json([
                         'success' => false,
                         'message' => 'Code PIN incorrect.',
@@ -165,12 +161,12 @@ class OrderController extends Controller
                 if ($wallet->balance < $totalAmount) {
                     return response()->json([
                         'success' => false,
-                        'message' => "Solde insuffisant. Votre solde: " . number_format($wallet->balance, 0, ',', ' ') .
-                            " F CFA. Montant requis: " . number_format($totalAmount, 0, ',', ' ') . " F CFA.",
+                        'message' => 'Solde insuffisant. Votre solde: '.number_format($wallet->balance, 0, ',', ' ').
+                            ' F CFA. Montant requis: '.number_format($totalAmount, 0, ',', ' ').' F CFA.',
                     ], 400);
                 }
 
-                if (!$wallet->canSpend($totalAmount)) {
+                if (! $wallet->canSpend($totalAmount)) {
                     return response()->json([
                         'success' => false,
                         'message' => 'Limite de dépense quotidienne dépassée.',
@@ -197,7 +193,7 @@ class OrderController extends Controller
                 $product = Product::lockForUpdate()->find($item['product_id']);
 
                 // Vérifier la disponibilité
-                if (!$product->is_active) {
+                if (! $product->is_active) {
                     throw new \Exception("Le produit '{$product->name}' n'est plus disponible");
                 }
 
@@ -263,7 +259,7 @@ class OrderController extends Controller
                                     'payment_status' => 'success',
                                 ]);
                             } else {
-                                throw new \Exception('Le paiement par portefeuille a échoué pour ' . $reservation->product->name);
+                                throw new \Exception('Le paiement par portefeuille a échoué pour '.$reservation->product->name);
                             }
                         }
                     }
@@ -284,7 +280,7 @@ class OrderController extends Controller
                     }
                 } catch (\Exception $paymentError) {
                     // BUG-003 FIX: Refund successful wallet payments before rolling back
-                    if ($paymentMethod === PaymentMethod::WALLET && !empty($payments)) {
+                    if ($paymentMethod === PaymentMethod::WALLET && ! empty($payments)) {
                         foreach ($payments as $payment) {
                             if ($payment && $payment->isSuccessful()) {
                                 try {
@@ -325,7 +321,7 @@ class OrderController extends Controller
                     }
                     $order->update(['status' => 'cancelled']);
 
-                    throw new \Exception('Erreur de paiement: ' . $paymentError->getMessage());
+                    throw new \Exception('Erreur de paiement: '.$paymentError->getMessage());
                 }
             }
 
@@ -370,7 +366,7 @@ class OrderController extends Controller
             ];
 
             // For Mobile Money payments, include payment info for status polling
-            if ($paymentMethod->requiresExternalProvider() && !empty($payments)) {
+            if ($paymentMethod->requiresExternalProvider() && ! empty($payments)) {
                 $firstPayment = $payments[0] ?? null;
                 if ($firstPayment) {
                     $responseData['payment'] = [
@@ -424,7 +420,7 @@ class OrderController extends Controller
             ->with(['reservations.product.category', 'reservations.product.merchant'])
             ->first();
 
-        if (!$order) {
+        if (! $order) {
             return response()->json([
                 'success' => false,
                 'message' => 'Commande non trouvée',
@@ -449,17 +445,17 @@ class OrderController extends Controller
             ->where('user_id', $user->id)
             ->first();
 
-        if (!$order) {
+        if (! $order) {
             return response()->json([
                 'success' => false,
                 'message' => 'Commande non trouvée',
             ], 404);
         }
 
-        if (!$order->canBeCancelled()) {
+        if (! $order->canBeCancelled()) {
             return response()->json([
                 'success' => false,
-                'message' => 'Cette commande ne peut plus être annulée (statut: ' . $order->status . ')',
+                'message' => 'Cette commande ne peut plus être annulée (statut: '.$order->status.')',
             ], 400);
         }
 

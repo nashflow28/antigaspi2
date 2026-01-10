@@ -25,18 +25,21 @@ class AddCartItemRequest extends FormRequest
                 function ($attribute, $value, $fail) {
                     $product = $this->getProduct();
 
-                    if (!$product) {
+                    if (! $product) {
                         $fail('Le produit sélectionné n\'existe pas.');
+
                         return;
                     }
 
-                    if (!$product->is_active) {
+                    if (! $product->is_active) {
                         $fail('Ce produit n\'est plus disponible.');
+
                         return;
                     }
 
                     if ($product->isExpired()) {
                         $fail('Ce produit a expiré.');
+
                         return;
                     }
 
@@ -52,7 +55,7 @@ class AddCartItemRequest extends FormRequest
                 'min:1',
                 function ($attribute, $value, $fail) {
                     $product = $this->getProduct();
-                    if (!$product) {
+                    if (! $product) {
                         return;
                     }
 
@@ -94,7 +97,7 @@ class AddCartItemRequest extends FormRequest
 
     private function getProduct(): ?Product
     {
-        if (!$this->resolvedProduct && $this->input('product_id')) {
+        if (! $this->resolvedProduct && $this->input('product_id')) {
             $this->resolvedProduct = Product::with('merchant')->find($this->input('product_id'));
         }
 

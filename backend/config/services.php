@@ -52,10 +52,6 @@ return [
         'access_token' => env('EXPO_ACCESS_TOKEN'),
     ],
 
-    'firebase' => [
-        'project_id' => env('FIREBASE_PROJECT_ID'),
-    ],
-
     /*
     |--------------------------------------------------------------------------
     | SMS.TG (smsvas.fr) - SMS Service for Togo

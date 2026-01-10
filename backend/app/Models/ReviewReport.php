@@ -75,7 +75,7 @@ class ReviewReport extends Model
             'offensive_language' => 'Langage offensant',
             'harassment' => 'Harcèlement',
             'copyright_violation' => 'Violation de droits d\'auteur',
-            'other' => 'Autre'
+            'other' => 'Autre',
         ];
 
         return $reasons[$this->reason] ?? 'Inconnu';
@@ -87,7 +87,7 @@ class ReviewReport extends Model
             'pending' => 'En attente',
             'reviewed' => 'Examiné',
             'resolved' => 'Résolu',
-            'dismissed' => 'Rejeté'
+            'dismissed' => 'Rejeté',
         ];
 
         return $statuses[$this->status] ?? 'Inconnu';
@@ -99,7 +99,7 @@ class ReviewReport extends Model
     }
 
     // Helper methods
-    public function markAsReviewed(User $admin, string $notes = null): void
+    public function markAsReviewed(User $admin, ?string $notes = null): void
     {
         $this->update([
             'status' => 'reviewed',
@@ -109,7 +109,7 @@ class ReviewReport extends Model
         ]);
     }
 
-    public function markAsResolved(User $admin, string $notes = null): void
+    public function markAsResolved(User $admin, ?string $notes = null): void
     {
         $this->update([
             'status' => 'resolved',
@@ -119,7 +119,7 @@ class ReviewReport extends Model
         ]);
     }
 
-    public function markAsDismissed(User $admin, string $notes = null): void
+    public function markAsDismissed(User $admin, ?string $notes = null): void
     {
         $this->update([
             'status' => 'dismissed',

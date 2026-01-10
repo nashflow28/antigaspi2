@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Api;
 use App\Enums\PaymentMethod;
 use App\Enums\PaymentStatus;
 use App\Http\Controllers\Controller;
-use App\Http\Controllers\Api\LoyaltyPointController;
 use App\Http\Requests\StoreReservationRequest;
 use App\Http\Resources\PaymentResource;
 use App\Http\Resources\ReservationResource;
@@ -26,8 +25,7 @@ class ReservationController extends Controller
     public function __construct(
         private readonly ReservationService $reservations,
         private readonly SmsService $sms
-    ) {
-    }
+    ) {}
 
     public function index(Request $request): JsonResponse
     {
@@ -36,7 +34,7 @@ class ReservationController extends Controller
 
             \Log::info('Fetching reservations for user', [
                 'user_id' => $user->id,
-                'user_email' => $user->email
+                'user_email' => $user->email,
             ]);
 
             $query = Reservation::with(['product.category', 'product.merchant.user'])
@@ -74,7 +72,7 @@ class ReservationController extends Controller
             \Log::info('Reservations found', [
                 'count' => $reservations->total(),
                 'current_page' => $reservations->currentPage(),
-                'items' => collect($reservations->items())->pluck('id', 'reservation_code')->toArray()
+                'items' => collect($reservations->items())->pluck('id', 'reservation_code')->toArray(),
             ]);
 
             return response()->json([
@@ -84,14 +82,14 @@ class ReservationController extends Controller
                     'current_page' => $reservations->currentPage(),
                     'last_page' => $reservations->lastPage(),
                     'per_page' => $reservations->perPage(),
-                    'total' => $reservations->total()
-                ]
+                    'total' => $reservations->total(),
+                ],
             ]);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur lors de la récupération des réservations',
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ], 500);
         }
     }
@@ -147,7 +145,7 @@ class ReservationController extends Controller
                 'message' => $e->getMessage(),
                 'file' => $e->getFile(),
                 'line' => $e->getLine(),
-                'trace' => $e->getTraceAsString()
+                'trace' => $e->getTraceAsString(),
             ]);
 
             $response = [
@@ -160,7 +158,7 @@ class ReservationController extends Controller
                 $response['error'] = $e->getMessage();
                 $response['debug'] = [
                     'file' => $e->getFile(),
-                    'line' => $e->getLine()
+                    'line' => $e->getLine(),
                 ];
             }
 
@@ -179,13 +177,13 @@ class ReservationController extends Controller
 
             return response()->json([
                 'success' => true,
-                'data' => new ReservationResource($reservation)
+                'data' => new ReservationResource($reservation),
             ]);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
                 'message' => 'Réservation non trouvée',
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ], 404);
         }
     }
@@ -200,10 +198,10 @@ class ReservationController extends Controller
                     ->where('user_id', $user->id)
                     ->findOrFail($id);
 
-                if (!$reservation->canBeCancelled()) {
+                if (! $reservation->canBeCancelled()) {
                     return response()->json([
                         'success' => false,
-                        'message' => 'Cette réservation ne peut plus être annulée'
+                        'message' => 'Cette réservation ne peut plus être annulée',
                     ], 400);
                 }
 
@@ -216,7 +214,7 @@ class ReservationController extends Controller
                     } catch (\Exception $e) {
                         \Log::warning('Notification failed but cancellation succeeded', [
                             'reservation_id' => $reservation->id,
-                            'error' => $e->getMessage()
+                            'error' => $e->getMessage(),
                         ]);
                     }
 
@@ -229,14 +227,14 @@ class ReservationController extends Controller
 
                 return response()->json([
                     'success' => false,
-                    'message' => 'Erreur lors de l\'annulation de la réservation'
+                    'message' => 'Erreur lors de l\'annulation de la réservation',
                 ], 500);
             });
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur lors de l\'annulation',
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ], 500);
         }
     }
@@ -250,10 +248,10 @@ class ReservationController extends Controller
         try {
             $user = JWTAuth::parseToken()->authenticate();
 
-            if (!$user->isMerchant()) {
+            if (! $user->isMerchant()) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Seuls les commerçants peuvent refuser les réservations'
+                    'message' => 'Seuls les commerçants peuvent refuser les réservations',
                 ], 403);
             }
 
@@ -263,25 +261,25 @@ class ReservationController extends Controller
                     ->findOrFail($id);
 
                 // Vérifier que le produit appartient au marchand
-                if (!$reservation->product || !$reservation->product->merchant) {
+                if (! $reservation->product || ! $reservation->product->merchant) {
                     return response()->json([
                         'success' => false,
-                        'message' => 'Produit ou commerçant associé introuvable'
+                        'message' => 'Produit ou commerçant associé introuvable',
                     ], 404);
                 }
 
                 if ($reservation->product->merchant->user_id !== $user->id) {
                     return response()->json([
                         'success' => false,
-                        'message' => 'Vous ne pouvez refuser que les réservations de vos propres produits'
+                        'message' => 'Vous ne pouvez refuser que les réservations de vos propres produits',
                     ], 403);
                 }
 
                 // Vérifier que la réservation peut être refusée (pending ou confirmed)
-                if (!in_array($reservation->status, ['pending', 'confirmed'])) {
+                if (! in_array($reservation->status, ['pending', 'confirmed'])) {
                     return response()->json([
                         'success' => false,
-                        'message' => 'Cette réservation ne peut plus être refusée (statut: ' . $reservation->status . ')'
+                        'message' => 'Cette réservation ne peut plus être refusée (statut: '.$reservation->status.')',
                     ], 400);
                 }
 
@@ -295,7 +293,7 @@ class ReservationController extends Controller
                     } catch (\Exception $e) {
                         \Log::warning('Notification failed but rejection succeeded', [
                             'reservation_id' => $reservation->id,
-                            'error' => $e->getMessage()
+                            'error' => $e->getMessage(),
                         ]);
                     }
 
@@ -308,14 +306,14 @@ class ReservationController extends Controller
 
                 return response()->json([
                     'success' => false,
-                    'message' => 'Erreur lors du refus de la réservation'
+                    'message' => 'Erreur lors du refus de la réservation',
                 ], 500);
             });
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur lors du refus',
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ], 500);
         }
     }
@@ -325,18 +323,18 @@ class ReservationController extends Controller
         try {
             $user = JWTAuth::parseToken()->authenticate();
 
-            if (!$user->isMerchant()) {
+            if (! $user->isMerchant()) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Accès réservé aux commerçants'
+                    'message' => 'Accès réservé aux commerçants',
                 ], 403);
             }
 
             // 🐛 BUG FIX: Verify merchant exists before accessing
-            if (!$user->merchant) {
+            if (! $user->merchant) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Profil commerçant introuvable'
+                    'message' => 'Profil commerçant introuvable',
                 ], 404);
             }
 
@@ -370,7 +368,7 @@ class ReservationController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur lors de la récupération des réservations',
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ], 500);
         }
     }
@@ -380,10 +378,10 @@ class ReservationController extends Controller
         try {
             $user = JWTAuth::parseToken()->authenticate();
 
-            if (!$user->isMerchant()) {
+            if (! $user->isMerchant()) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Seuls les commerçants peuvent confirmer les réservations'
+                    'message' => 'Seuls les commerçants peuvent confirmer les réservations',
                 ], 403);
             }
 
@@ -391,10 +389,10 @@ class ReservationController extends Controller
                 ->findOrFail($id);
 
             // 🐛 BUG FIX #5: Check product and merchant exist before accessing
-            if (!$reservation->product || !$reservation->product->merchant) {
+            if (! $reservation->product || ! $reservation->product->merchant) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Produit ou commerçant associé introuvable'
+                    'message' => 'Produit ou commerçant associé introuvable',
                 ], 404);
             }
 
@@ -402,7 +400,7 @@ class ReservationController extends Controller
             if ($reservation->product->merchant->user_id !== $user->id) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Vous ne pouvez confirmer que vos propres réservations'
+                    'message' => 'Vous ne pouvez confirmer que vos propres réservations',
                 ], 403);
             }
 
@@ -415,7 +413,7 @@ class ReservationController extends Controller
                 } catch (\Exception $e) {
                     \Log::warning('Notification failed but confirmation succeeded', [
                         'reservation_id' => $reservation->id,
-                        'error' => $e->getMessage()
+                        'error' => $e->getMessage(),
                     ]);
                 }
 
@@ -428,13 +426,13 @@ class ReservationController extends Controller
 
             return response()->json([
                 'success' => false,
-                'message' => 'Cette réservation ne peut pas être confirmée'
+                'message' => 'Cette réservation ne peut pas être confirmée',
             ], 400);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur lors de la confirmation',
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ], 500);
         }
     }
@@ -444,10 +442,10 @@ class ReservationController extends Controller
         try {
             $user = JWTAuth::parseToken()->authenticate();
 
-            if (!$user->isMerchant()) {
+            if (! $user->isMerchant()) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Seuls les commerçants peuvent marquer les réservations comme prêtes'
+                    'message' => 'Seuls les commerçants peuvent marquer les réservations comme prêtes',
                 ], 403);
             }
 
@@ -455,24 +453,24 @@ class ReservationController extends Controller
                 ->findOrFail($id);
 
             // 🐛 BUG FIX #5: Check product and merchant exist before accessing
-            if (!$reservation->product || !$reservation->product->merchant) {
+            if (! $reservation->product || ! $reservation->product->merchant) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Produit ou commerçant associé introuvable'
+                    'message' => 'Produit ou commerçant associé introuvable',
                 ], 404);
             }
 
             if ($reservation->product->merchant->user_id !== $user->id) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Vous ne pouvez gérer que vos propres réservations'
+                    'message' => 'Vous ne pouvez gérer que vos propres réservations',
                 ], 403);
             }
 
             if ($reservation->status !== 'confirmed') {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Cette réservation n\'est pas confirmée'
+                    'message' => 'Cette réservation n\'est pas confirmée',
                 ], 400);
             }
 
@@ -485,7 +483,7 @@ class ReservationController extends Controller
             } catch (\Exception $e) {
                 \Log::warning('Notification failed but ready status set', [
                     'reservation_id' => $reservation->id,
-                    'error' => $e->getMessage()
+                    'error' => $e->getMessage(),
                 ]);
             }
 
@@ -501,7 +499,7 @@ class ReservationController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur lors de la mise à jour',
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ], 500);
         }
     }
@@ -511,10 +509,10 @@ class ReservationController extends Controller
         try {
             $user = JWTAuth::parseToken()->authenticate();
 
-            if (!$user->isMerchant()) {
+            if (! $user->isMerchant()) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Seuls les commerçants peuvent marquer les réservations comme terminées'
+                    'message' => 'Seuls les commerçants peuvent marquer les réservations comme terminées',
                 ], 403);
             }
 
@@ -522,17 +520,17 @@ class ReservationController extends Controller
                 ->findOrFail($id);
 
             // 🐛 BUG FIX #5: Check product and merchant exist before accessing
-            if (!$reservation->product || !$reservation->product->merchant) {
+            if (! $reservation->product || ! $reservation->product->merchant) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Produit ou commerçant associé introuvable'
+                    'message' => 'Produit ou commerçant associé introuvable',
                 ], 404);
             }
 
             if ($reservation->product->merchant->user_id !== $user->id) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Vous ne pouvez finaliser que vos propres réservations'
+                    'message' => 'Vous ne pouvez finaliser que vos propres réservations',
                 ], 403);
             }
 
@@ -555,12 +553,12 @@ class ReservationController extends Controller
                     \Log::info('Loyalty points awarded for reservation', [
                         'reservation_id' => $reservation->id,
                         'user_id' => $reservation->user_id,
-                        'amount' => $reservation->total_amount
+                        'amount' => $reservation->total_amount,
                     ]);
                 } catch (\Exception $e) {
                     \Log::warning('Loyalty points award failed but completion succeeded', [
                         'reservation_id' => $reservation->id,
-                        'error' => $e->getMessage()
+                        'error' => $e->getMessage(),
                     ]);
                 }
 
@@ -572,7 +570,7 @@ class ReservationController extends Controller
                 } catch (\Exception $e) {
                     \Log::warning('Notification failed but completion succeeded', [
                         'reservation_id' => $reservation->id,
-                        'error' => $e->getMessage()
+                        'error' => $e->getMessage(),
                     ]);
                 }
 
@@ -585,13 +583,13 @@ class ReservationController extends Controller
 
             return response()->json([
                 'success' => false,
-                'message' => 'Cette réservation ne peut pas être finalisée'
+                'message' => 'Cette réservation ne peut pas être finalisée',
             ], 400);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur lors de la finalisation',
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ], 500);
         }
     }
@@ -624,7 +622,7 @@ class ReservationController extends Controller
                     return response()->json([
                         'success' => false,
                         'message' => 'Seules les réservations en attente peuvent être modifiées',
-                        'error' => 'La réservation a le statut: ' . $reservation->status
+                        'error' => 'La réservation a le statut: '.$reservation->status,
                     ], 400);
                 }
 
@@ -640,7 +638,7 @@ class ReservationController extends Controller
                         return response()->json([
                             'success' => false,
                             'message' => 'Stock insuffisant',
-                            'error' => "Seulement {$product->quantity_available} unités disponibles"
+                            'error' => "Seulement {$product->quantity_available} unités disponibles",
                         ], 400);
                     }
                     // Decrease available stock
@@ -676,7 +674,7 @@ class ReservationController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur lors de la modification de la quantité',
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ], 500);
         }
     }
@@ -709,7 +707,7 @@ class ReservationController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur lors du calcul des statistiques',
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ], 500);
         }
     }
@@ -721,8 +719,9 @@ class ReservationController extends Controller
     {
         try {
             // Skip if SMS service is not configured
-            if (!$this->sms->isConfigured()) {
+            if (! $this->sms->isConfigured()) {
                 \Log::debug('SMS Service: Skipping ready SMS (not configured)');
+
                 return;
             }
 
@@ -732,6 +731,7 @@ class ReservationController extends Controller
                 \Log::debug('SMS Service: Skipping ready SMS (no phone number)', [
                     'user_id' => $reservation->user_id,
                 ]);
+
                 return;
             }
 
@@ -747,7 +747,7 @@ class ReservationController extends Controller
                 $pickupTime
             );
 
-            if (!$result['success']) {
+            if (! $result['success']) {
                 \Log::warning('SMS Service: Failed to send ready notification', [
                     'reservation_id' => $reservation->id,
                     'error' => $result['message'] ?? 'Unknown error',

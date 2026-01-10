@@ -32,8 +32,9 @@ class CreateAdmin extends Command
         if ($validator->fails()) {
             $this->error('Erreur de validation:');
             foreach ($validator->errors()->all() as $error) {
-                $this->error('- ' . $error);
+                $this->error('- '.$error);
             }
+
             return 1;
         }
 
@@ -56,9 +57,9 @@ class CreateAdmin extends Command
 
         $this->info('✅ Administrateur créé avec succès !');
         $this->line('');
-        $this->line('📧 Email: ' . $user->email);
-        $this->line('🔑 Mot de passe: ' . $password);
-        $this->line('👤 Nom: ' . $user->first_name . ' ' . $user->last_name);
+        $this->line('📧 Email: '.$user->email);
+        $this->line('🔑 Mot de passe: '.$password);
+        $this->line('👤 Nom: '.$user->first_name.' '.$user->last_name);
         $this->line('');
         $this->warn('⚠️  Conservez précieusement ces informations !');
 
@@ -67,6 +68,6 @@ class CreateAdmin extends Command
 
     private function generatePassword(): string
     {
-        return 'Admin' . rand(1000, 9999) . '!';
+        return 'Admin'.rand(1000, 9999).'!';
     }
 }

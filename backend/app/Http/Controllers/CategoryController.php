@@ -3,8 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Category;
-use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 
 class CategoryController extends Controller
@@ -19,13 +19,13 @@ class CategoryController extends Controller
 
             return response()->json([
                 'success' => true,
-                'data' => $categories
+                'data' => $categories,
             ]);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur lors de la récupération des catégories',
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ], 500);
         }
     }
@@ -42,13 +42,13 @@ class CategoryController extends Controller
 
             return response()->json([
                 'success' => true,
-                'data' => $category
+                'data' => $category,
             ]);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
                 'message' => 'Catégorie non trouvée',
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ], 404);
         }
     }
@@ -62,40 +62,40 @@ class CategoryController extends Controller
             $validatedData = $request->validate([
                 'name' => 'required|string|max:100|unique:categories,name',
                 'description' => 'required|string|max:500',
-                'icon' => 'nullable|string|max:50'
+                'icon' => 'nullable|string|max:50',
             ], [
                 'name.required' => 'Le nom de la catégorie est requis',
                 'name.unique' => 'Une catégorie avec ce nom existe déjà',
                 'name.max' => 'Le nom ne peut pas dépasser 100 caractères',
                 'description.required' => 'La description est requise',
                 'description.max' => 'La description ne peut pas dépasser 500 caractères',
-                'icon.max' => 'L\'icône ne peut pas dépasser 50 caractères'
+                'icon.max' => 'L\'icône ne peut pas dépasser 50 caractères',
             ]);
 
             $category = Category::create([
                 'name' => $validatedData['name'],
                 'description' => $validatedData['description'],
                 'icon' => $validatedData['icon'] ?? '📦',
-                'is_active' => true
+                'is_active' => true,
             ]);
 
             return response()->json([
                 'success' => true,
                 'message' => 'Catégorie créée avec succès',
-                'data' => $category
+                'data' => $category,
             ], 201);
 
         } catch (\Illuminate\Validation\ValidationException $e) {
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur de validation',
-                'errors' => $e->errors()
+                'errors' => $e->errors(),
             ], 422);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur lors de la création de la catégorie',
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ], 500);
         }
     }
@@ -111,18 +111,18 @@ class CategoryController extends Controller
                     'required',
                     'string',
                     'max:100',
-                    Rule::unique('categories', 'name')->ignore($category->id)
+                    Rule::unique('categories', 'name')->ignore($category->id),
                 ],
                 'description' => 'required|string|max:500',
                 'icon' => 'nullable|string|max:50',
-                'is_active' => 'boolean'
+                'is_active' => 'boolean',
             ], [
                 'name.required' => 'Le nom de la catégorie est requis',
                 'name.unique' => 'Une catégorie avec ce nom existe déjà',
                 'name.max' => 'Le nom ne peut pas dépasser 100 caractères',
                 'description.required' => 'La description est requise',
                 'description.max' => 'La description ne peut pas dépasser 500 caractères',
-                'icon.max' => 'L\'icône ne peut pas dépasser 50 caractères'
+                'icon.max' => 'L\'icône ne peut pas dépasser 50 caractères',
             ]);
 
             $category->update($validatedData);
@@ -130,20 +130,20 @@ class CategoryController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => 'Catégorie mise à jour avec succès',
-                'data' => $category->fresh()
+                'data' => $category->fresh(),
             ]);
 
         } catch (\Illuminate\Validation\ValidationException $e) {
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur de validation',
-                'errors' => $e->errors()
+                'errors' => $e->errors(),
             ], 422);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur lors de la mise à jour de la catégorie',
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ], 500);
         }
     }
@@ -160,7 +160,7 @@ class CategoryController extends Controller
             if ($productsCount > 0) {
                 return response()->json([
                     'success' => false,
-                    'message' => "Impossible de supprimer cette catégorie car {$productsCount} produit(s) l'utilisent encore"
+                    'message' => "Impossible de supprimer cette catégorie car {$productsCount} produit(s) l'utilisent encore",
                 ], 409);
             }
 
@@ -169,14 +169,14 @@ class CategoryController extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => "La catégorie \"{$categoryName}\" a été supprimée avec succès"
+                'message' => "La catégorie \"{$categoryName}\" a été supprimée avec succès",
             ]);
 
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur lors de la suppression de la catégorie',
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ], 500);
         }
     }
@@ -188,7 +188,7 @@ class CategoryController extends Controller
     {
         try {
             $category->update([
-                'is_active' => !$category->is_active
+                'is_active' => ! $category->is_active,
             ]);
 
             $status = $category->is_active ? 'activée' : 'désactivée';
@@ -196,14 +196,14 @@ class CategoryController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => "La catégorie \"{$category->name}\" a été {$status}",
-                'data' => $category->fresh()
+                'data' => $category->fresh(),
             ]);
 
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur lors du changement de statut',
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ], 500);
         }
     }
@@ -221,19 +221,19 @@ class CategoryController extends Controller
                 'top_categories' => Category::withCount('products')
                     ->orderBy('products_count', 'desc')
                     ->limit(5)
-                    ->get(['id', 'name', 'products_count'])
+                    ->get(['id', 'name', 'products_count']),
             ];
 
             return response()->json([
                 'success' => true,
-                'data' => $stats
+                'data' => $stats,
             ]);
 
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur lors de la récupération des statistiques',
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ], 500);
         }
     }

@@ -50,7 +50,7 @@ class ThrottleApiRequests
             return response()->json([
                 'success' => false,
                 'message' => 'Trop de requêtes. Veuillez réessayer plus tard.',
-                'retry_after' => $seconds
+                'retry_after' => $seconds,
             ], 429, [
                 'X-RateLimit-Limit' => $maxAttempts,
                 'X-RateLimit-Remaining' => 0,

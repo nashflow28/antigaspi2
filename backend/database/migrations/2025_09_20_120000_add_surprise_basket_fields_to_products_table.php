@@ -28,7 +28,7 @@ return new class extends Migration
                 'min_items',
                 'max_items',
                 'total_original_value',
-                'surprise_description'
+                'surprise_description',
             ]);
         });
     }

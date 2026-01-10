@@ -15,8 +15,8 @@ class AdminBroadcastNotification extends Notification implements ShouldQueue
     use Queueable;
 
     /**
-     * @param array<int, string> $channels
-     * @param array<string, mixed> $payload
+     * @param  array<int, string>  $channels
+     * @param  array<string, mixed>  $payload
      */
     public function __construct(
         private readonly string $title,
@@ -24,8 +24,7 @@ class AdminBroadcastNotification extends Notification implements ShouldQueue
         private readonly array $channels = ['database'],
         private readonly ?string $actionUrl = null,
         private readonly array $payload = []
-    ) {
-    }
+    ) {}
 
     public function via(object $notifiable): array
     {
@@ -47,7 +46,7 @@ class AdminBroadcastNotification extends Notification implements ShouldQueue
             in_array('sms', $this->channels, true)
             && method_exists($notifiable, 'prefersSmsNotifications')
             && $notifiable->prefersSmsNotifications()
-            && !empty($notifiable->phone)
+            && ! empty($notifiable->phone)
         ) {
             $channels[] = 'vonage';
         }
@@ -69,9 +68,9 @@ class AdminBroadcastNotification extends Notification implements ShouldQueue
 
     public function toMail(object $notifiable): MailMessage
     {
-        $mail = (new MailMessage())
+        $mail = (new MailMessage)
             ->subject($this->title)
-            ->greeting('Bonjour ' . ($notifiable->first_name ?? ''))
+            ->greeting('Bonjour '.($notifiable->first_name ?? ''))
             ->line($this->message);
 
         if ($this->actionUrl) {
@@ -83,13 +82,13 @@ class AdminBroadcastNotification extends Notification implements ShouldQueue
 
     public function toVonage(object $notifiable): VonageMessage
     {
-        $content = $this->title . ': ' . $this->message;
+        $content = $this->title.': '.$this->message;
 
         if (mb_strlen($content) > 160) {
-            $content = mb_substr($content, 0, 157) . '...';
+            $content = mb_substr($content, 0, 157).'...';
         }
 
-        return (new VonageMessage())->content($content);
+        return (new VonageMessage)->content($content);
     }
 
     public function toPushPayload(object $notifiable): array

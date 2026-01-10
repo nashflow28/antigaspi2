@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        if (!Schema::hasTable('loyalty_points')) {
+        if (! Schema::hasTable('loyalty_points')) {
             return;
         }
 
@@ -27,7 +27,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        if (!Schema::hasTable('loyalty_points')) {
+        if (! Schema::hasTable('loyalty_points')) {
             return;
         }
 

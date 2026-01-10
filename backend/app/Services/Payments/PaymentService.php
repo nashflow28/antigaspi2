@@ -14,9 +14,7 @@ use Illuminate\Support\Str;
 
 class PaymentService
 {
-    public function __construct(private PaymentGatewayManager $gateways)
-    {
-    }
+    public function __construct(private PaymentGatewayManager $gateways) {}
 
     public function initializePayment(Reservation $reservation, PaymentMethod $method, array $attributes = []): Payment
     {
@@ -76,12 +74,12 @@ class PaymentService
             $payment = $gateway->handleCallback($payload);
         }
 
-        if (!$payment) {
+        if (! $payment) {
             return null;
         }
 
         $reservation = $payment->reservation()->firstOrFail();
-        $wasNotPaid = !$payment->wasChanged('status') || $payment->getOriginal('status') !== PaymentStatus::SUCCESS->value;
+        $wasNotPaid = ! $payment->wasChanged('status') || $payment->getOriginal('status') !== PaymentStatus::SUCCESS->value;
 
         $this->syncReservation($reservation, $payment);
 

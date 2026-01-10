@@ -74,7 +74,8 @@ class WalletTransaction extends Model
     public function getFormattedAmountAttribute(): string
     {
         $sign = $this->is_credit ? '+' : '-';
-        return $sign . number_format($this->amount, 0, ',', ' ') . ' XOF';
+
+        return $sign.number_format($this->amount, 0, ',', ' ').' XOF';
     }
 
     public function getTypeIconAttribute(): string

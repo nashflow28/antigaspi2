@@ -8,8 +8,8 @@ use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Str;
-use Tymon\JWTAuth\Facades\JWTAuth;
 use Tests\TestCase;
+use Tymon\JWTAuth\Facades\JWTAuth;
 
 class AnalyticsControllerTest extends TestCase
 {
@@ -19,7 +19,7 @@ class AnalyticsControllerTest extends TestCase
     {
         parent::setUp();
 
-        config(['app.key' => 'base64:' . base64_encode(random_bytes(32))]);
+        config(['app.key' => 'base64:'.base64_encode(random_bytes(32))]);
         config(['jwt.secret' => Str::random(32)]);
     }
 
@@ -94,7 +94,7 @@ class AnalyticsControllerTest extends TestCase
         $this->assertEquals(5000.0, (float) $merchantDaily->total_revenue);
         $this->assertSame(2, $merchantDaily->products_saved_from_waste);
 
-        $stats = $this->getJson('/api/analytics/stats?start_date=' . $today . '&end_date=' . $today, $headers);
+        $stats = $this->getJson('/api/analytics/stats?start_date='.$today.'&end_date='.$today, $headers);
 
         $stats->assertOk()
             ->assertJsonPath('summary.total_reservations', 1)
@@ -126,6 +126,6 @@ class AnalyticsControllerTest extends TestCase
     {
         $token = JWTAuth::fromUser($user);
 
-        return ['Authorization' => 'Bearer ' . $token];
+        return ['Authorization' => 'Bearer '.$token];
     }
 }

@@ -13,14 +13,12 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
-use Tymon\JWTAuth\Facades\JWTAuth;
 use Symfony\Component\HttpFoundation\StreamedResponse;
+use Tymon\JWTAuth\Facades\JWTAuth;
 
 class PaymentController extends Controller
 {
-    public function __construct(private PaymentService $payments)
-    {
-    }
+    public function __construct(private PaymentService $payments) {}
 
     /**
      * Retourne la liste des paiements du commerçant connecté avec filtres et export.
@@ -192,7 +190,7 @@ class PaymentController extends Controller
         if (($validated['export'] ?? null) === 'csv') {
             $exportQuery = (clone $paymentsQuery)->orderByDesc('created_at');
 
-            $fileName = 'paiements-' . now()->format('Ymd_His') . '.csv';
+            $fileName = 'paiements-'.now()->format('Ymd_His').'.csv';
 
             return response()->streamDownload(function () use ($exportQuery) {
                 $handle = fopen('php://output', 'w');
@@ -224,7 +222,7 @@ class PaymentController extends Controller
                         fputcsv($handle, [
                             $payment->reference,
                             $reservation?->reservation_code,
-                            $consumer ? trim(($consumer->first_name ?? '') . ' ' . ($consumer->last_name ?? '')) ?: ($consumer->name ?? '') : null,
+                            $consumer ? trim(($consumer->first_name ?? '').' '.($consumer->last_name ?? '')) ?: ($consumer->name ?? '') : null,
                             $consumer?->phone,
                             $product?->name,
                             number_format((float) $payment->amount, 2, ',', ' '),

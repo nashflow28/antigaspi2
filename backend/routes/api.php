@@ -1,30 +1,28 @@
 <?php
 
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\Auth;
+use App\Http\Controllers\Api\AdminController;
+use App\Http\Controllers\Api\AnalyticsController;
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\CartController;
+use App\Http\Controllers\Api\ConsumerController;
+use App\Http\Controllers\Api\FavoriteController;
+use App\Http\Controllers\Api\GeocodingController;
+use App\Http\Controllers\Api\InventoryController;
+use App\Http\Controllers\Api\MerchantController;
+use App\Http\Controllers\Api\MessageController;
+use App\Http\Controllers\Api\NotificationController;
+use App\Http\Controllers\Api\OtpController;
+use App\Http\Controllers\Api\PaymentController;
 use App\Http\Controllers\Api\ProductController;
 use App\Http\Controllers\Api\ReservationController;
-use App\Http\Controllers\Api\PaymentController;
-use App\Http\Controllers\Api\AnalyticsController;
-use App\Http\Controllers\Api\AdminController;
-use App\Http\Controllers\Api\MerchantController;
 use App\Http\Controllers\Api\ReviewController;
-use App\Http\Controllers\Api\SurpriseBasketController;
-use App\Http\Controllers\Api\NotificationController;
-use App\Http\Controllers\Api\FavoriteController;
-use App\Http\Controllers\Api\ConsumerController;
-use App\Http\Controllers\Api\CartController;
-use App\Http\Controllers\Api\MessageController;
-use App\Http\Controllers\Api\InventoryController;
-use App\Http\Controllers\Api\SearchController;
-use App\Http\Controllers\Api\FirebaseAuthController;
-use App\Http\Controllers\Api\OtpController;
 use App\Http\Controllers\Api\RewardController;
-use App\Http\Controllers\Api\GeocodingController;
+use App\Http\Controllers\Api\SearchController;
+use App\Http\Controllers\Api\SurpriseBasketController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\WalletController;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------
@@ -32,15 +30,10 @@ use App\Http\Controllers\WalletController;
 |--------------------------------------------------------------------------
 */
 
-
 // Routes d'authentification (publiques) - Rate limiting strict
 Route::prefix('auth')->middleware('throttle:auth')->group(function () {
     Route::post('register', [AuthController::class, 'register']);
     Route::post('login', [AuthController::class, 'login']); // Legacy
-
-    // Firebase Phone Authentication
-    Route::post('firebase-login', [FirebaseAuthController::class, 'login']);
-    Route::post('firebase-register', [FirebaseAuthController::class, 'register']);
 
     // SMS OTP Verification (SMS.TG)
     Route::post('otp/send', [OtpController::class, 'send']);
@@ -284,10 +277,11 @@ Route::prefix('merchants')->middleware('jwt.auth')->group(function () {
         // Route de test
         Route::get('/test', function () {
             $user = Auth::user();
+
             return response()->json([
                 'success' => true,
                 'user' => $user,
-                'auth_check' => Auth::check()
+                'auth_check' => Auth::check(),
             ]);
         });
 
@@ -449,7 +443,7 @@ Route::prefix('geocoding')->middleware('throttle:30,1')->group(function () {
 Route::get('health', function () {
     return response()->json([
         'timestamp' => now(),
-        'version' => '1.0.0'
+        'version' => '1.0.0',
     ]);
 });
 
@@ -465,6 +459,6 @@ Route::fallback(function () {
             'GET /api/products/{id}' => 'Détail produit',
             'POST /api/reservations' => 'Créer réservation',
             'GET /api/health' => 'Status API',
-        ]
+        ],
     ], 404);
 });

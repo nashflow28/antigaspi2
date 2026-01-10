@@ -2,8 +2,8 @@
 
 namespace Database\Seeders;
 
-use App\Models\User;
 use App\Models\Product;
+use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -18,8 +18,9 @@ class ReservationSeeder extends Seeder
         // Récupérer le consumer de test
         $consumer = User::where('email', 'jean.dupont@email.com')->first();
 
-        if (!$consumer) {
+        if (! $consumer) {
             $this->command->warn('Consumer jean.dupont@email.com not found. Skipping reservation seeding.');
+
             return;
         }
 
@@ -28,6 +29,7 @@ class ReservationSeeder extends Seeder
 
         if ($products->isEmpty()) {
             $this->command->warn('No products found for merchant_id=1. Skipping reservation seeding.');
+
             return;
         }
 
@@ -91,7 +93,7 @@ class ReservationSeeder extends Seeder
         ];
 
         foreach ($reservationsData as $data) {
-            if (!$data['product']) {
+            if (! $data['product']) {
                 continue;
             }
 
@@ -101,7 +103,7 @@ class ReservationSeeder extends Seeder
                 'quantity_reserved' => $data['quantity'],
                 'total_amount' => $data['product']->discounted_price * $data['quantity'],
                 'status' => $data['status'],
-                'reservation_code' => 'RES-' . strtoupper(Str::random(8)),
+                'reservation_code' => 'RES-'.strtoupper(Str::random(8)),
                 'reserved_at' => $data['created_at'],
                 'confirmed_at' => $data['confirmed_at'] ?? null,
                 'expires_at' => now()->addHours(24),
@@ -110,6 +112,6 @@ class ReservationSeeder extends Seeder
             ]);
         }
 
-        $this->command->info('✅ ' . count($reservationsData) . ' réservations créées avec succès');
+        $this->command->info('✅ '.count($reservationsData).' réservations créées avec succès');
     }
 }

@@ -13,9 +13,7 @@ use Throwable;
 
 class WalletGateway implements PaymentGateway
 {
-    public function __construct(private WalletService $wallets)
-    {
-    }
+    public function __construct(private WalletService $wallets) {}
 
     public function initialize(Reservation $reservation, Payment $payment, array $data = []): Payment
     {
@@ -26,11 +24,11 @@ class WalletGateway implements PaymentGateway
             'payment_id' => $payment->id,
             'user_id' => $user?->id,
             'amount' => $payment->amount,
-            'pin_present' => isset($data['pin']) && !empty($data['pin']),
+            'pin_present' => isset($data['pin']) && ! empty($data['pin']),
             'data_keys' => array_keys($data),
         ]);
 
-        if (!$user) {
+        if (! $user) {
             throw new InvalidArgumentException('Wallet payments require a reservation attached to a user.');
         }
 

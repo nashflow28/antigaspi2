@@ -2,13 +2,13 @@
 
 namespace Tests\Feature;
 
-use Tests\TestCase;
-use App\Models\User;
+use App\Models\Category;
 use App\Models\Merchant;
 use App\Models\Product;
 use App\Models\Reservation;
-use App\Models\Category;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\TestCase;
 
 /**
  * Critical tests for AdminController dashboard
@@ -46,7 +46,7 @@ class AdminControllerTest extends TestCase
     {
         $token = auth('api')->login($this->adminUser);
 
-        $response = $this->withHeader('Authorization', 'Bearer ' . $token)
+        $response = $this->withHeader('Authorization', 'Bearer '.$token)
             ->getJson('/api/admin/dashboard');
 
         $response->assertStatus(200)
@@ -104,7 +104,7 @@ class AdminControllerTest extends TestCase
         ]);
 
         // Execute dashboard (should use SQL SUM, not load all records)
-        $response = $this->withHeader('Authorization', 'Bearer ' . $token)
+        $response = $this->withHeader('Authorization', 'Bearer '.$token)
             ->getJson('/api/admin/dashboard');
 
         $response->assertStatus(200);
@@ -124,7 +124,7 @@ class AdminControllerTest extends TestCase
         $token = auth('api')->login($this->adminUser);
 
         // No data created, everything should be zero
-        $response = $this->withHeader('Authorization', 'Bearer ' . $token)
+        $response = $this->withHeader('Authorization', 'Bearer '.$token)
             ->getJson('/api/admin/dashboard');
 
         $response->assertStatus(200);
@@ -150,7 +150,7 @@ class AdminControllerTest extends TestCase
 
         $token = auth('api')->login($consumer);
 
-        $response = $this->withHeader('Authorization', 'Bearer ' . $token)
+        $response = $this->withHeader('Authorization', 'Bearer '.$token)
             ->getJson('/api/admin/dashboard');
 
         $response->assertStatus(403)
@@ -168,7 +168,7 @@ class AdminControllerTest extends TestCase
     {
         $token = auth('api')->login($this->adminUser);
 
-        $response = $this->withHeader('Authorization', 'Bearer ' . $token)
+        $response = $this->withHeader('Authorization', 'Bearer '.$token)
             ->getJson('/api/admin/system-health');
 
         $response->assertStatus(200)

@@ -15,9 +15,7 @@ class NewSurpriseBasketNotification extends Notification implements ShouldQueue
 {
     use Queueable;
 
-    public function __construct(private readonly Product $basket)
-    {
-    }
+    public function __construct(private readonly Product $basket) {}
 
     public function via(object $notifiable): array
     {
@@ -27,7 +25,7 @@ class NewSurpriseBasketNotification extends Notification implements ShouldQueue
             $channels[] = 'mail';
         }
 
-        if (method_exists($notifiable, 'prefersSmsNotifications') && $notifiable->prefersSmsNotifications() && !empty($notifiable->phone)) {
+        if (method_exists($notifiable, 'prefersSmsNotifications') && $notifiable->prefersSmsNotifications() && ! empty($notifiable->phone)) {
             $channels[] = 'vonage';
         }
 
@@ -40,13 +38,13 @@ class NewSurpriseBasketNotification extends Notification implements ShouldQueue
 
     public function toMail(object $notifiable): MailMessage
     {
-        return (new MailMessage())
+        return (new MailMessage)
             ->subject('Nouveau panier surprise disponible !')
-            ->greeting('Bonjour ' . $notifiable->first_name)
-            ->line('Un nouveau panier surprise vient d\'être publié par ' . $this->basket->merchant?->business_name . '.')
-            ->line('Panier : ' . $this->basket->name)
-            ->line('Prix : ' . number_format($this->basket->discounted_price, 2) . ' FCFA')
-            ->action('Réserver maintenant', url('/surprise-baskets/' . $this->basket->id))
+            ->greeting('Bonjour '.$notifiable->first_name)
+            ->line('Un nouveau panier surprise vient d\'être publié par '.$this->basket->merchant?->business_name.'.')
+            ->line('Panier : '.$this->basket->name)
+            ->line('Prix : '.number_format($this->basket->discounted_price, 2).' FCFA')
+            ->action('Réserver maintenant', url('/surprise-baskets/'.$this->basket->id))
             ->line('Dépêchez-vous avant qu\'il ne disparaisse !');
     }
 
@@ -59,7 +57,7 @@ class NewSurpriseBasketNotification extends Notification implements ShouldQueue
             $this->basket->merchant?->business_name
         );
 
-        return (new VonageMessage())->content($content);
+        return (new VonageMessage)->content($content);
     }
 
     public function toPushPayload(object $notifiable): array

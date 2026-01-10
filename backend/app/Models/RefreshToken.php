@@ -4,7 +4,6 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Carbon\Carbon;
 
 class RefreshToken extends Model
 {
@@ -37,7 +36,7 @@ class RefreshToken extends Model
     public function scopeValid($query)
     {
         return $query->where('revoked', false)
-                    ->where('expires_at', '>', now());
+            ->where('expires_at', '>', now());
     }
 
     public function scopeExpired($query)
@@ -63,7 +62,7 @@ class RefreshToken extends Model
     // Méthodes
     public function isValid(): bool
     {
-        return !$this->revoked && $this->expires_at->isFuture();
+        return ! $this->revoked && $this->expires_at->isFuture();
     }
 
     public function isExpired(): bool
@@ -74,6 +73,7 @@ class RefreshToken extends Model
     public function revoke(): bool
     {
         $this->revoked = true;
+
         return $this->save();
     }
 
@@ -100,7 +100,7 @@ class RefreshToken extends Model
     public static function revokeUserTokensExcept(int $userId, string $currentJti): int
     {
         return self::byUser($userId)
-                  ->where('jti', '!=', $currentJti)
-                  ->update(['revoked' => true]);
+            ->where('jti', '!=', $currentJti)
+            ->update(['revoked' => true]);
     }
 }

@@ -8,16 +8,14 @@ use App\Models\Product;
 use App\Models\Reservation;
 use App\Models\User;
 use App\Services\AdminAuditService;
-use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class AdminMerchantController extends Controller
 {
-    public function __construct(private readonly AdminAuditService $auditService)
-    {
-    }
+    public function __construct(private readonly AdminAuditService $auditService) {}
 
     /**
      * Get moderation dashboard data
@@ -41,7 +39,7 @@ class AdminMerchantController extends Controller
                 'activeMerchants' => $verifiedMerchants->count(),
                 'pendingMerchants' => $pendingMerchants->count(),
                 'totalProducts' => $totalProducts,
-                'totalReservations' => $totalReservations
+                'totalReservations' => $totalReservations,
             ];
 
             // Transform pending merchants for frontend
@@ -49,14 +47,14 @@ class AdminMerchantController extends Controller
                 return [
                     'id' => $merchant->id,
                     'business_name' => $merchant->business_name,
-                    'owner_name' => trim($merchant->user->first_name . ' ' . $merchant->user->last_name),
+                    'owner_name' => trim($merchant->user->first_name.' '.$merchant->user->last_name),
                     'email' => $merchant->user->email,
                     'phone' => $merchant->user->phone ?? 'Non renseigné',
                     'address' => $merchant->user->address ?? 'Non renseignée',
                     'business_type' => $merchant->business_type ?? 'Non spécifié',
                     'description' => $merchant->description ?? 'Commerçant en attente de vérification',
                     'rejection_reason' => $merchant->rejection_reason,
-                    'created_at' => $merchant->created_at ? $merchant->created_at->toISOString() : now()->toISOString()
+                    'created_at' => $merchant->created_at ? $merchant->created_at->toISOString() : now()->toISOString(),
                 ];
             })->values();
 
@@ -78,7 +76,7 @@ class AdminMerchantController extends Controller
                     'description' => $product->description ?? '',
                     'category' => $product->category?->name ?? 'Non catégorisé',
                     'moderation_status' => $product->moderation_status ?? 'pending',
-                    'rejection_reason' => $product->rejection_reason
+                    'rejection_reason' => $product->rejection_reason,
                 ];
             })->values();
 
@@ -91,12 +89,12 @@ class AdminMerchantController extends Controller
                     return [
                         'id' => $reservation->id,
                         'product_name' => $reservation->product->name,
-                        'customer_name' => trim($reservation->user->first_name . ' ' . $reservation->user->last_name),
+                        'customer_name' => trim($reservation->user->first_name.' '.$reservation->user->last_name),
                         'merchant_name' => $reservation->product->merchant->business_name,
                         'total_amount' => (float) $reservation->total_amount,
                         'quantity_reserved' => (int) $reservation->quantity_reserved,
                         'flag_reason' => 'Contrôle qualité',
-                        'created_at' => $reservation->created_at ? $reservation->created_at->toISOString() : now()->toISOString()
+                        'created_at' => $reservation->created_at ? $reservation->created_at->toISOString() : now()->toISOString(),
                     ];
                 })->values();
 
@@ -105,7 +103,7 @@ class AdminMerchantController extends Controller
                 return [
                     'id' => $merchant->id,
                     'business_name' => $merchant->business_name,
-                    'owner_name' => trim($merchant->user->first_name . ' ' . $merchant->user->last_name),
+                    'owner_name' => trim($merchant->user->first_name.' '.$merchant->user->last_name),
                     'email' => $merchant->user->email,
                     'phone' => $merchant->user->phone ?? 'Non renseigné',
                     'address' => $merchant->user->address ?? 'Non renseignée',
@@ -115,7 +113,7 @@ class AdminMerchantController extends Controller
                     'verification_date' => $merchant->verification_date,
                     'rejection_reason' => $merchant->rejection_reason,
                     'products_count' => $merchant->products->count(),
-                    'created_at' => $merchant->created_at ? $merchant->created_at->toISOString() : now()->toISOString()
+                    'created_at' => $merchant->created_at ? $merchant->created_at->toISOString() : now()->toISOString(),
                 ];
             })->values();
 
@@ -125,14 +123,14 @@ class AdminMerchantController extends Controller
                 'merchants' => $allMerchantsData,
                 'pendingMerchants' => $pendingMerchantsData,
                 'productsToModerate' => $productsToModerate,
-                'flaggedReservations' => $flaggedReservations
+                'flaggedReservations' => $flaggedReservations,
             ]);
 
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur lors de la récupération des données de modération',
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ], 500);
         }
     }
@@ -175,15 +173,16 @@ class AdminMerchantController extends Controller
                     'id' => $merchant->id,
                     'business_name' => $merchant->business_name,
                     'is_verified' => true,
-                    'verified_at' => now()->toISOString()
-                ]
+                    'verified_at' => now()->toISOString(),
+                ],
             ]);
         } catch (\Exception $e) {
             DB::rollBack();
+
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur lors de l\'approbation du commerçant',
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ], 500);
         }
     }
@@ -194,11 +193,11 @@ class AdminMerchantController extends Controller
     public function reject(Request $request, $id): JsonResponse
     {
         $data = $request->validate([
-            'reason' => 'required|string|min:10|max:1000'
+            'reason' => 'required|string|min:10|max:1000',
         ], [
             'reason.required' => 'La raison du rejet est obligatoire',
             'reason.min' => 'La raison doit contenir au moins 10 caractères',
-            'reason.max' => 'La raison ne peut pas dépasser 1000 caractères'
+            'reason.max' => 'La raison ne peut pas dépasser 1000 caractères',
         ]);
 
         try {
@@ -223,15 +222,16 @@ class AdminMerchantController extends Controller
                     'id' => $merchant->id,
                     'business_name' => $merchant->business_name,
                     'is_verified' => false,
-                    'rejection_reason' => $data['reason']
-                ]
+                    'rejection_reason' => $data['reason'],
+                ],
             ]);
         } catch (\Exception $e) {
             DB::rollBack();
+
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur lors du rejet du commerçant',
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ], 500);
         }
     }
@@ -276,15 +276,16 @@ class AdminMerchantController extends Controller
                     'id' => $product->id,
                     'name' => $product->name,
                     'is_active' => true,
-                    'moderation_status' => 'approved'
-                ]
+                    'moderation_status' => 'approved',
+                ],
             ]);
         } catch (\Exception $e) {
             DB::rollBack();
+
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur lors de l\'approbation du produit',
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ], 500);
         }
     }
@@ -295,11 +296,11 @@ class AdminMerchantController extends Controller
     public function rejectProduct(Request $request, $id): JsonResponse
     {
         $data = $request->validate([
-            'reason' => 'required|string|min:10|max:1000'
+            'reason' => 'required|string|min:10|max:1000',
         ], [
             'reason.required' => 'La raison du rejet est obligatoire',
             'reason.min' => 'La raison doit contenir au moins 10 caractères',
-            'reason.max' => 'La raison ne peut pas dépasser 1000 caractères'
+            'reason.max' => 'La raison ne peut pas dépasser 1000 caractères',
         ]);
 
         try {
@@ -331,15 +332,16 @@ class AdminMerchantController extends Controller
                     'name' => $product->name,
                     'is_active' => false,
                     'rejection_reason' => $data['reason'],
-                    'moderation_status' => 'rejected'
-                ]
+                    'moderation_status' => 'rejected',
+                ],
             ]);
         } catch (\Exception $e) {
             DB::rollBack();
+
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur lors du rejet du produit',
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ], 500);
         }
     }
@@ -351,7 +353,7 @@ class AdminMerchantController extends Controller
     {
         $data = $request->validate([
             'resolution' => 'required|string|in:approved,refunded,cancelled',
-            'reason' => 'nullable|string|max:1000'
+            'reason' => 'nullable|string|max:1000',
         ]);
 
         try {
@@ -389,15 +391,16 @@ class AdminMerchantController extends Controller
                 'data' => [
                     'id' => $reservation->id,
                     'status' => $reservation->status,
-                    'resolution' => $data['resolution']
-                ]
+                    'resolution' => $data['resolution'],
+                ],
             ]);
         } catch (\Exception $e) {
             DB::rollBack();
+
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur lors de la résolution du signalement',
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ], 500);
         }
     }

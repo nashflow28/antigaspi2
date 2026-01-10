@@ -161,7 +161,7 @@ class PaymentControllerTest extends TestCase
         $token = JWTAuth::fromUser($merchantUser);
 
         $response = $this->withHeaders([
-            'Authorization' => 'Bearer ' . $token,
+            'Authorization' => 'Bearer '.$token,
         ])->getJson('/api/payments?status=success&method=wallet');
 
         $response->assertOk()
@@ -225,7 +225,7 @@ class PaymentControllerTest extends TestCase
         $token = JWTAuth::fromUser($merchantUser);
 
         $response = $this->withHeaders([
-            'Authorization' => 'Bearer ' . $token,
+            'Authorization' => 'Bearer '.$token,
         ])->get('/api/payments?export=csv');
 
         $response->assertOk();

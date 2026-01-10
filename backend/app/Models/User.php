@@ -30,7 +30,6 @@ class User extends Authenticatable implements JWTSubject
         'prefers_sms_notifications',
         'prefers_push_notifications',
         'notification_settings',
-        'firebase_uid',
         'phone_verified_at',
         'referral_code',
         'referred_by',
@@ -112,7 +111,7 @@ class User extends Authenticatable implements JWTSubject
      */
     public function getNameAttribute(): string
     {
-        return trim(($this->first_name ?? '') . ' ' . ($this->last_name ?? ''));
+        return trim(($this->first_name ?? '').' '.($this->last_name ?? ''));
     }
 
     // JWT Methods
@@ -269,7 +268,7 @@ class User extends Authenticatable implements JWTSubject
 
     public function hasWallet(): bool
     {
-        return !is_null($this->wallet);
+        return ! is_null($this->wallet);
     }
 
     public function getWalletBalance(): float

@@ -2,8 +2,8 @@
 
 namespace Tests\Feature;
 
-use App\Models\User;
 use App\Models\Setting;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
@@ -40,7 +40,7 @@ class AdminSystemSettingsTest extends TestCase
         ]);
 
         $token = JWTAuth::fromUser($admin);
-        $this->withHeader('Authorization', 'Bearer ' . $token);
+        $this->withHeader('Authorization', 'Bearer '.$token);
     }
 
     protected function authenticateConsumer(): void
@@ -55,7 +55,7 @@ class AdminSystemSettingsTest extends TestCase
         ]);
 
         $token = JWTAuth::fromUser($consumer);
-        $this->withHeader('Authorization', 'Bearer ' . $token);
+        $this->withHeader('Authorization', 'Bearer '.$token);
     }
 
     /** @test */
@@ -86,23 +86,23 @@ class AdminSystemSettingsTest extends TestCase
 
         $response->assertStatus(200);
         $response->assertJson([
-            'success' => true
+            'success' => true,
         ]);
 
         $response->assertJsonStructure([
             'success',
             'data' => [
                 'general' => [
-                    '*' => ['key', 'value', 'type', 'description']
+                    '*' => ['key', 'value', 'type', 'description'],
                 ],
                 'commission' => [
-                    '*' => ['key', 'value', 'type', 'description']
+                    '*' => ['key', 'value', 'type', 'description'],
                 ],
                 'reservation',
                 'notifications',
                 'maintenance',
-                'limits'
-            ]
+                'limits',
+            ],
         ]);
 
         // Verify specific default settings
@@ -137,8 +137,8 @@ class AdminSystemSettingsTest extends TestCase
     {
         $response = $this->putJson('/api/admin/settings', [
             'settings' => [
-                'site_name' => 'New Name'
-            ]
+                'site_name' => 'New Name',
+            ],
         ]);
 
         $response->assertStatus(401);
@@ -151,8 +151,8 @@ class AdminSystemSettingsTest extends TestCase
 
         $response = $this->putJson('/api/admin/settings', [
             'settings' => [
-                'site_name' => 'New Name'
-            ]
+                'site_name' => 'New Name',
+            ],
         ]);
 
         // Laravel's can:admin middleware returns 403
@@ -176,7 +176,7 @@ class AdminSystemSettingsTest extends TestCase
         $this->authenticateAdmin();
 
         $response = $this->putJson('/api/admin/settings', [
-            'settings' => 'not-an-array'
+            'settings' => 'not-an-array',
         ]);
 
         $response->assertStatus(422);
@@ -190,8 +190,8 @@ class AdminSystemSettingsTest extends TestCase
 
         $response = $this->putJson('/api/admin/settings', [
             'settings' => [
-                'site_name' => 'Antigaspi Pro'
-            ]
+                'site_name' => 'Antigaspi Pro',
+            ],
         ]);
 
         $response->assertStatus(200);
@@ -199,7 +199,7 @@ class AdminSystemSettingsTest extends TestCase
             'success' => true,
             'message' => 'Paramètres mis à jour avec succès',
             'updated' => ['site_name'],
-            'failed' => []
+            'failed' => [],
         ]);
 
         // Verify database update
@@ -214,14 +214,14 @@ class AdminSystemSettingsTest extends TestCase
 
         $response = $this->putJson('/api/admin/settings', [
             'settings' => [
-                'max_reservation_duration' => 48
-            ]
+                'max_reservation_duration' => 48,
+            ],
         ]);
 
         $response->assertStatus(200);
         $response->assertJson([
             'success' => true,
-            'updated' => ['max_reservation_duration']
+            'updated' => ['max_reservation_duration'],
         ]);
 
         // Verify value is stored as string but casts to integer
@@ -237,14 +237,14 @@ class AdminSystemSettingsTest extends TestCase
 
         $response = $this->putJson('/api/admin/settings', [
             'settings' => [
-                'maintenance_mode' => true
-            ]
+                'maintenance_mode' => true,
+            ],
         ]);
 
         $response->assertStatus(200);
         $response->assertJson([
             'success' => true,
-            'updated' => ['maintenance_mode']
+            'updated' => ['maintenance_mode'],
         ]);
 
         // Verify boolean conversion
@@ -260,14 +260,14 @@ class AdminSystemSettingsTest extends TestCase
 
         $response = $this->putJson('/api/admin/settings', [
             'settings' => [
-                'commission_rate' => 15.5
-            ]
+                'commission_rate' => 15.5,
+            ],
         ]);
 
         $response->assertStatus(200);
         $response->assertJson([
             'success' => true,
-            'updated' => ['commission_rate']
+            'updated' => ['commission_rate'],
         ]);
 
         // Verify decimal value
@@ -284,8 +284,8 @@ class AdminSystemSettingsTest extends TestCase
                 'site_name' => 'Antigaspi v2',
                 'contact_email' => 'support@antigaspi.com',
                 'commission_rate' => 12,
-                'notifications_enabled' => false
-            ]
+                'notifications_enabled' => false,
+            ],
         ]);
 
         $response->assertStatus(200);
@@ -295,9 +295,9 @@ class AdminSystemSettingsTest extends TestCase
                 'site_name',
                 'contact_email',
                 'commission_rate',
-                'notifications_enabled'
+                'notifications_enabled',
             ],
-            'failed' => []
+            'failed' => [],
         ]);
 
         // Verify all updates
@@ -316,15 +316,15 @@ class AdminSystemSettingsTest extends TestCase
             'settings' => [
                 'site_name' => 'Valid Setting',
                 'invalid_key' => 'This does not exist',
-                'another_invalid' => 'Also invalid'
-            ]
+                'another_invalid' => 'Also invalid',
+            ],
         ]);
 
         $response->assertStatus(200);
         $response->assertJson([
             'success' => true,
             'updated' => ['site_name'],
-            'failed' => ['invalid_key', 'another_invalid']
+            'failed' => ['invalid_key', 'another_invalid'],
         ]);
     }
 
@@ -340,8 +340,8 @@ class AdminSystemSettingsTest extends TestCase
         // Update setting
         $this->putJson('/api/admin/settings', [
             'settings' => [
-                'site_name' => 'New Cached Name'
-            ]
+                'site_name' => 'New Cached Name',
+            ],
         ]);
 
         // Cache should be cleared
@@ -360,8 +360,8 @@ class AdminSystemSettingsTest extends TestCase
 
         $response = $this->putJson('/api/admin/settings', [
             'settings' => [
-                'site_name' => 'Audited Update'
-            ]
+                'site_name' => 'Audited Update',
+            ],
         ]);
 
         $response->assertStatus(200);
@@ -387,7 +387,7 @@ class AdminSystemSettingsTest extends TestCase
 
         // Empty settings array should fail validation
         $response = $this->putJson('/api/admin/settings', [
-            'settings' => []
+            'settings' => [],
         ]);
 
         // Laravel validation requires at least one value

@@ -3,13 +3,13 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\Review;
 use App\Models\Merchant;
 use App\Models\Product;
-use Illuminate\Http\Request;
+use App\Models\Review;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Facades\Validator;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Validator;
 
 class ReviewController extends Controller
 {
@@ -26,8 +26,8 @@ class ReviewController extends Controller
         ]);
 
         $query = Review::with(['user:id,first_name,last_name', 'product:id,name', 'merchant:id,business_name'])
-                      ->approved()
-                      ->recent();
+            ->approved()
+            ->recent();
 
         // Filter by merchant
         if ($request->merchant_id) {
@@ -63,7 +63,7 @@ class ReviewController extends Controller
                 ] : null,
                 'user' => [
                     'id' => $review->user->id,
-                    'name' => $review->user->first_name . ' ' . substr($review->user->last_name, 0, 1) . '.',
+                    'name' => $review->user->first_name.' '.substr($review->user->last_name, 0, 1).'.',
                 ],
                 'product' => $review->product ? [
                     'id' => $review->product->id,
@@ -81,7 +81,7 @@ class ReviewController extends Controller
                 'last_page' => $reviews->lastPage(),
                 'per_page' => $reviews->perPage(),
                 'total' => $reviews->total(),
-            ]
+            ],
         ]);
     }
 
@@ -112,7 +112,7 @@ class ReviewController extends Controller
 
         $messages = [];
         foreach ($mediaFields as $field) {
-            $messages[$field . '.prohibited'] = "L'ajout de médias pour les avis n'est pas encore pris en charge.";
+            $messages[$field.'.prohibited'] = "L'ajout de médias pour les avis n'est pas encore pris en charge.";
         }
 
         $validator = Validator::make($data, $rules, $messages);
@@ -130,7 +130,7 @@ class ReviewController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => $errorMessage,
-                'errors' => $validator->errors()
+                'errors' => $validator->errors(),
             ], 422);
         }
 
@@ -139,7 +139,7 @@ class ReviewController extends Controller
         // Check if user already reviewed this merchant/product combination
         // Un utilisateur ne peut avoir qu'UN SEUL avis par produit (ou par commerçant si pas de produit)
         $existingReviewQuery = Review::where('user_id', $user->id)
-                                     ->where('merchant_id', $data['merchant_id']);
+            ->where('merchant_id', $data['merchant_id']);
 
         $productId = $data['product_id'] ?? null;
 
@@ -158,20 +158,20 @@ class ReviewController extends Controller
                 'success' => false,
                 'message' => $productId
                     ? 'Vous avez déjà donné un avis pour ce produit'
-                    : 'Vous avez déjà donné un avis pour ce commerçant'
+                    : 'Vous avez déjà donné un avis pour ce commerçant',
             ], 409);
         }
 
         // Check if it's a verified purchase (user has a completed reservation)
         $isVerified = $user->reservations()
-                          ->whereHas('product', function ($query) use ($data) {
-                              $query->where('merchant_id', $data['merchant_id']);
-                          })
-                          ->when($data['product_id'] ?? null, function ($query) use ($data) {
-                              return $query->where('product_id', $data['product_id']);
-                          })
-                          ->where('status', 'completed')
-                          ->exists();
+            ->whereHas('product', function ($query) use ($data) {
+                $query->where('merchant_id', $data['merchant_id']);
+            })
+            ->when($data['product_id'] ?? null, function ($query) use ($data) {
+                return $query->where('product_id', $data['product_id']);
+            })
+            ->where('status', 'completed')
+            ->exists();
 
         $review = Review::create([
             'user_id' => $user->id,
@@ -194,7 +194,7 @@ class ReviewController extends Controller
                 'title' => $review->title,
                 'comment' => $review->comment,
                 'is_verified_purchase' => $review->is_verified_purchase,
-            ]
+            ],
         ], 201);
     }
 
@@ -209,7 +209,7 @@ class ReviewController extends Controller
         if ($review->user_id !== $user->id) {
             return response()->json([
                 'success' => false,
-                'message' => 'Non autorisé'
+                'message' => 'Non autorisé',
             ], 403);
         }
 
@@ -223,7 +223,7 @@ class ReviewController extends Controller
                 'is_verified_purchase' => $review->is_verified_purchase,
                 'created_at' => $review->created_at->format('c'),
                 'updated_at' => $review->updated_at->format('c'),
-            ]
+            ],
         ]);
     }
 
@@ -242,7 +242,7 @@ class ReviewController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Données invalides',
-                'errors' => $validator->errors()
+                'errors' => $validator->errors(),
             ], 422);
         }
 
@@ -252,7 +252,7 @@ class ReviewController extends Controller
         if ($review->user_id !== $user->id) {
             return response()->json([
                 'success' => false,
-                'message' => 'Non autorisé'
+                'message' => 'Non autorisé',
             ], 403);
         }
 
@@ -260,7 +260,7 @@ class ReviewController extends Controller
         if ($review->created_at->diffInDays(now()) > 30) {
             return response()->json([
                 'success' => false,
-                'message' => 'Impossible de modifier un avis de plus de 30 jours'
+                'message' => 'Impossible de modifier un avis de plus de 30 jours',
             ], 422);
         }
 
@@ -283,7 +283,7 @@ class ReviewController extends Controller
                 'comment' => $review->comment,
                 'is_verified_purchase' => $review->is_verified_purchase,
                 'updated_at' => $review->updated_at->format('c'),
-            ]
+            ],
         ]);
     }
 
@@ -298,7 +298,7 @@ class ReviewController extends Controller
         if ($review->user_id !== $user->id) {
             return response()->json([
                 'success' => false,
-                'message' => 'Non autorisé'
+                'message' => 'Non autorisé',
             ], 403);
         }
 
@@ -306,7 +306,7 @@ class ReviewController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Avis supprimé avec succès'
+            'message' => 'Avis supprimé avec succès',
         ]);
     }
 
@@ -331,9 +331,9 @@ class ReviewController extends Controller
             SUM(CASE WHEN rating = 1 THEN 1 ELSE 0 END) as one_star,
             SUM(CASE WHEN is_verified_purchase = 1 THEN 1 ELSE 0 END) as verified_reviews
         ')
-        ->where('merchant_id', $merchantId)
-        ->approved()
-        ->first();
+            ->where('merchant_id', $merchantId)
+            ->approved()
+            ->first();
 
         $ratingDistribution = [];
         if ($stats->total_reviews > 0) {
@@ -342,7 +342,7 @@ class ReviewController extends Controller
                 $ratingDistribution[] = [
                     'rating' => $i,
                     'count' => (int) $count,
-                    'percentage' => round(($count / $stats->total_reviews) * 100, 1)
+                    'percentage' => round(($count / $stats->total_reviews) * 100, 1),
                 ];
             }
         }
@@ -354,8 +354,7 @@ class ReviewController extends Controller
                 'average_rating' => $stats->average_rating ? round($stats->average_rating, 1) : 0,
                 'verified_reviews' => (int) $stats->verified_reviews,
                 'rating_distribution' => $ratingDistribution,
-            ]
+            ],
         ]);
     }
-
 }

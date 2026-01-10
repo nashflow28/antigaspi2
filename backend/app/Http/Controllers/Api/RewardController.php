@@ -3,12 +3,12 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\LoyaltyPoint;
 use App\Models\Reward;
 use App\Models\RewardRedemption;
-use App\Models\LoyaltyPoint;
 use App\Models\User;
-use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class RewardController extends Controller
@@ -97,7 +97,7 @@ class RewardController extends Controller
     {
         $user = $request->user();
 
-        if (!$reward->isAvailable()) {
+        if (! $reward->isAvailable()) {
             return response()->json([
                 'success' => false,
                 'message' => 'Cette récompense n\'est plus disponible',
@@ -126,7 +126,7 @@ class RewardController extends Controller
         $user = $request->user();
 
         // Check availability
-        if (!$reward->isAvailable()) {
+        if (! $reward->isAvailable()) {
             return response()->json([
                 'success' => false,
                 'message' => 'Cette récompense n\'est plus disponible',
@@ -152,7 +152,7 @@ class RewardController extends Controller
         if ($userPoints < $reward->points_required) {
             return response()->json([
                 'success' => false,
-                'message' => 'Points insuffisants. Vous avez ' . $userPoints . ' points, il en faut ' . $reward->points_required,
+                'message' => 'Points insuffisants. Vous avez '.$userPoints.' points, il en faut '.$reward->points_required,
             ], 400);
         }
 
@@ -164,7 +164,7 @@ class RewardController extends Controller
                 'user_id' => $user->id,
                 'points' => -$reward->points_required,
                 'type' => 'redemption',
-                'description' => 'Échange contre: ' . $reward->name,
+                'description' => 'Échange contre: '.$reward->name,
                 'reference_type' => Reward::class,
                 'reference_id' => $reward->id,
             ]);
@@ -196,9 +196,10 @@ class RewardController extends Controller
             ]);
         } catch (\Exception $e) {
             DB::rollBack();
+
             return response()->json([
                 'success' => false,
-                'message' => 'Erreur lors de l\'échange: ' . $e->getMessage(),
+                'message' => 'Erreur lors de l\'échange: '.$e->getMessage(),
             ], 500);
         }
     }
@@ -274,7 +275,7 @@ class RewardController extends Controller
             ->with('reward', 'user')
             ->first();
 
-        if (!$redemption) {
+        if (! $redemption) {
             return response()->json([
                 'success' => false,
                 'message' => 'Code de récompense invalide',
@@ -289,7 +290,7 @@ class RewardController extends Controller
             ], 403);
         }
 
-        if (!$redemption->isUsable()) {
+        if (! $redemption->isUsable()) {
             return response()->json([
                 'success' => false,
                 'message' => $redemption->isExpired() ? 'Ce code a expiré' : 'Ce code a déjà été utilisé',

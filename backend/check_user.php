@@ -5,8 +5,8 @@ require_once 'vendor/autoload.php';
 $app = require_once 'bootstrap/app.php';
 $app->make('Illuminate\Contracts\Console\Kernel')->bootstrap();
 
-use App\Models\User;
 use App\Models\Merchant;
+use App\Models\User;
 
 $email = 'senabolo@gmail.com';
 
@@ -20,7 +20,7 @@ if ($user) {
     echo "   Nom: {$user->name}\n";
     echo "   Email: {$user->email}\n";
     echo "   Rôle: {$user->role}\n";
-    echo "   Statut: " . ($user->status ?? 'null') . "\n";
+    echo '   Statut: '.($user->status ?? 'null')."\n";
     echo "   Créé le: {$user->created_at}\n";
 
     // Vérifier le merchant
@@ -45,7 +45,7 @@ if ($user) {
     $testUsers = User::whereIn('email', [
         'admin@antigaspi.com',
         'jean.dupont@email.com',
-        'boulangerie.martin@email.com'
+        'boulangerie.martin@email.com',
     ])->get();
 
     foreach ($testUsers as $testUser) {

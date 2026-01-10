@@ -31,19 +31,23 @@ class PayGateGateway implements PaymentGateway
 {
     // Initialization response codes
     private const INIT_SUCCESS = 0;
+
     private const INIT_INVALID_TOKEN = 2;
+
     private const INIT_INVALID_PARAMS = 4;
+
     private const INIT_DUPLICATE = 6;
 
     // Payment status codes
     private const PAYMENT_SUCCESS = 0;
+
     private const PAYMENT_PENDING = 2;
+
     private const PAYMENT_EXPIRED = 4;
+
     private const PAYMENT_CANCELLED = 6;
 
-    public function __construct(private array $config)
-    {
-    }
+    public function __construct(private array $config) {}
 
     /**
      * Initialize a Mobile Money payment via PayGate
@@ -88,13 +92,13 @@ class PayGateGateway implements PaymentGateway
             'identifier' => $identifier,
             'amount' => $payload['amount'],
             'network' => $payload['network'],
-            'phone' => substr($customerPhone, 0, 6) . '****', // Mask phone for logs
+            'phone' => substr($customerPhone, 0, 6).'****', // Mask phone for logs
         ]);
 
         try {
             $response = Http::timeout(30)
                 ->acceptJson()
-                ->post($this->config['base_url'] . '/pay', $payload);
+                ->post($this->config['base_url'].'/pay', $payload);
 
             $body = $response->json() ?? [];
 
@@ -149,7 +153,7 @@ class PayGateGateway implements PaymentGateway
             ]);
 
             throw PaymentException::initializationFailed(
-                'Erreur de connexion à PayGate: ' . $e->getMessage()
+                'Erreur de connexion à PayGate: '.$e->getMessage()
             );
         }
     }
@@ -165,6 +169,7 @@ class PayGateGateway implements PaymentGateway
             Log::warning('PayGate: Cannot refresh status - no reference', [
                 'payment_id' => $payment->id,
             ]);
+
             return $payment;
         }
 
@@ -172,17 +177,18 @@ class PayGateGateway implements PaymentGateway
             // Use v2 API with identifier (our reference)
             $response = Http::timeout(30)
                 ->acceptJson()
-                ->post(rtrim($this->config['base_url'], '/v1') . '/api/v2/status', [
+                ->post(rtrim($this->config['base_url'], '/v1').'/api/v2/status', [
                     'auth_token' => $this->config['auth_token'],
                     'identifier' => $payment->reference,
                 ]);
 
-            if (!$response->successful()) {
+            if (! $response->successful()) {
                 Log::warning('PayGate: Status check failed', [
                     'payment_id' => $payment->id,
                     'status_code' => $response->status(),
                     'response' => $response->body(),
                 ]);
+
                 return $payment;
             }
 
@@ -200,14 +206,14 @@ class PayGateGateway implements PaymentGateway
             ];
 
             // Update paid_at if payment succeeded
-            if ($status === PaymentStatus::SUCCESS && !$payment->paid_at) {
+            if ($status === PaymentStatus::SUCCESS && ! $payment->paid_at) {
                 $updateData['paid_at'] = isset($body['datetime'])
                     ? \Carbon\Carbon::parse($body['datetime'])
                     : now();
             }
 
             // Update transaction_id if provided
-            if (!empty($body['tx_reference'])) {
+            if (! empty($body['tx_reference'])) {
                 $updateData['transaction_id'] = $body['tx_reference'];
             }
 
@@ -229,6 +235,7 @@ class PayGateGateway implements PaymentGateway
                 'payment_id' => $payment->id,
                 'error' => $e->getMessage(),
             ]);
+
             return $payment;
         }
     }
@@ -250,24 +257,26 @@ class PayGateGateway implements PaymentGateway
     {
         Log::info('PayGate: Webhook received', [
             'payload' => array_diff_key($payload, ['phone_number' => '']), // Mask phone
-            'has_signature' => !empty($signatureHeader),
+            'has_signature' => ! empty($signatureHeader),
         ]);
 
         // SEC-003 FIX: Verify webhook signature if secret is configured
-        if (!$this->verifyWebhookSignature($payload, $rawBody, $signatureHeader)) {
+        if (! $this->verifyWebhookSignature($payload, $rawBody, $signatureHeader)) {
             Log::critical('SEC-003: PayGate webhook signature verification FAILED', [
                 'payload_keys' => array_keys($payload),
-                'has_raw_body' => !empty($rawBody),
-                'has_signature' => !empty($signatureHeader),
+                'has_raw_body' => ! empty($rawBody),
+                'has_signature' => ! empty($signatureHeader),
             ]);
+
             return null; // Reject unsigned/invalid webhooks
         }
 
         // PayGate sends 'identifier' which is our reference
         $identifier = $payload['identifier'] ?? null;
 
-        if (!$identifier) {
+        if (! $identifier) {
             Log::warning('PayGate: Webhook missing identifier', ['payload' => $payload]);
+
             return null;
         }
 
@@ -276,10 +285,11 @@ class PayGateGateway implements PaymentGateway
             ->where('provider', 'paygate')
             ->first();
 
-        if (!$payment) {
+        if (! $payment) {
             Log::warning('PayGate: Payment not found for webhook', [
                 'identifier' => $identifier,
             ]);
+
             return null;
         }
 
@@ -289,6 +299,7 @@ class PayGateGateway implements PaymentGateway
                 'payment_id' => $payment->id,
                 'current_status' => $payment->status->value ?? $payment->status,
             ]);
+
             return $payment; // Return existing payment without modification
         }
 
@@ -370,21 +381,23 @@ class PayGateGateway implements PaymentGateway
         $userId = $payloadData['user_id'] ?? null;
         $walletId = $payloadData['wallet_id'] ?? null;
 
-        if (!$userId || !$walletId) {
+        if (! $userId || ! $walletId) {
             Log::error('PayGate: Wallet recharge missing user_id or wallet_id', [
                 'payment_id' => $payment->id,
                 'payload' => $payloadData,
             ]);
+
             return;
         }
 
         try {
             $user = \App\Models\User::find($userId);
-            if (!$user) {
+            if (! $user) {
                 Log::error('PayGate: Wallet recharge user not found', [
                     'payment_id' => $payment->id,
                     'user_id' => $userId,
                 ]);
+
                 return;
             }
 
@@ -474,9 +487,9 @@ class PayGateGateway implements PaymentGateway
     {
         return match ($status) {
             self::INIT_INVALID_TOKEN => 'Token d\'authentification PayGate invalide',
-            self::INIT_INVALID_PARAMS => 'Paramètres de paiement invalides: ' . ($body['message'] ?? 'vérifiez le numéro et le montant'),
+            self::INIT_INVALID_PARAMS => 'Paramètres de paiement invalides: '.($body['message'] ?? 'vérifiez le numéro et le montant'),
             self::INIT_DUPLICATE => 'Une transaction avec cet identifiant existe déjà',
-            default => 'Erreur PayGate inconnue (code: ' . $status . '): ' . ($body['message'] ?? 'N/A'),
+            default => 'Erreur PayGate inconnue (code: '.$status.'): '.($body['message'] ?? 'N/A'),
         };
     }
 
@@ -487,7 +500,7 @@ class PayGateGateway implements PaymentGateway
      */
     private function generateIdentifier(Reservation $reservation): string
     {
-        return 'GLD-' . $reservation->id . '-' . time() . '-' . random_int(100, 999);
+        return 'GLD-'.$reservation->id.'-'.time().'-'.random_int(100, 999);
     }
 
     /**
@@ -514,11 +527,11 @@ class PayGateGateway implements PaymentGateway
 
         // If starts with 0, replace with 228
         if (str_starts_with($phone, '0')) {
-            return '228' . substr($phone, 1);
+            return '228'.substr($phone, 1);
         }
 
         // Otherwise, prepend 228
-        return '228' . $phone;
+        return '228'.$phone;
     }
 
     /**
@@ -545,9 +558,9 @@ class PayGateGateway implements PaymentGateway
      * 2. Signature field in payload
      * 3. IP whitelist fallback (if no secret configured)
      *
-     * @param array $payload The webhook payload
-     * @param string|null $rawBody The raw request body for signature verification
-     * @param string|null $signatureHeader The signature from request header
+     * @param  array  $payload  The webhook payload
+     * @param  string|null  $rawBody  The raw request body for signature verification
+     * @param  string|null  $signatureHeader  The signature from request header
      * @return bool True if signature is valid or verification is disabled
      */
     private function verifyWebhookSignature(array $payload, ?string $rawBody, ?string $signatureHeader): bool
@@ -569,10 +582,11 @@ class PayGateGateway implements PaymentGateway
                     ->where('provider', 'paygate')
                     ->exists();
 
-                if (!$paymentExists) {
+                if (! $paymentExists) {
                     Log::warning('SEC-003: Unknown identifier in webhook without signature', [
                         'identifier' => $identifier,
                     ]);
+
                     return false;
                 }
             }
@@ -581,47 +595,51 @@ class PayGateGateway implements PaymentGateway
         }
 
         // Strategy 1: Check signature header (X-PayGate-Signature or similar)
-        if (!empty($signatureHeader) && !empty($rawBody)) {
+        if (! empty($signatureHeader) && ! empty($rawBody)) {
             $expectedSignature = hash_hmac('sha256', $rawBody, $webhookSecret);
 
             // Use timing-safe comparison to prevent timing attacks
             if (hash_equals($expectedSignature, $signatureHeader)) {
                 Log::info('SEC-003: PayGate webhook signature verified via header');
+
                 return true;
             }
 
             // Try with hex encoding variations
-            if (hash_equals('sha256=' . $expectedSignature, $signatureHeader)) {
+            if (hash_equals('sha256='.$expectedSignature, $signatureHeader)) {
                 Log::info('SEC-003: PayGate webhook signature verified via header (sha256= prefix)');
+
                 return true;
             }
         }
 
         // Strategy 2: Check signature field in payload
         $payloadSignature = $payload['signature'] ?? $payload['hash'] ?? null;
-        if (!empty($payloadSignature)) {
+        if (! empty($payloadSignature)) {
             // Build signature from known fields (amount + identifier + auth_token)
-            $signatureData = ($payload['amount'] ?? '') .
-                ($payload['identifier'] ?? '') .
+            $signatureData = ($payload['amount'] ?? '').
+                ($payload['identifier'] ?? '').
                 ($this->config['auth_token'] ?? '');
 
             $expectedSignature = hash_hmac('sha256', $signatureData, $webhookSecret);
 
             if (hash_equals($expectedSignature, $payloadSignature)) {
                 Log::info('SEC-003: PayGate webhook signature verified via payload field');
+
                 return true;
             }
 
             // Alternative: signature might be md5
-            $expectedMd5 = md5($signatureData . $webhookSecret);
+            $expectedMd5 = md5($signatureData.$webhookSecret);
             if (hash_equals($expectedMd5, $payloadSignature)) {
                 Log::info('SEC-003: PayGate webhook signature verified via MD5 payload field');
+
                 return true;
             }
         }
 
         // Strategy 3: If raw body provided, verify with sorted payload
-        if (!empty($rawBody)) {
+        if (! empty($rawBody)) {
             $expectedSignature = hash_hmac('sha256', $rawBody, $webhookSecret);
 
             // Check if any provided signature matches
@@ -634,6 +652,7 @@ class PayGateGateway implements PaymentGateway
             foreach ($possibleSignatures as $sig) {
                 if (hash_equals($expectedSignature, $sig)) {
                     Log::info('SEC-003: PayGate webhook signature verified via raw body');
+
                     return true;
                 }
             }
@@ -641,9 +660,9 @@ class PayGateGateway implements PaymentGateway
 
         // No valid signature found
         Log::error('SEC-003: All PayGate signature verification strategies failed', [
-            'has_header_signature' => !empty($signatureHeader),
-            'has_payload_signature' => !empty($payload['signature'] ?? $payload['hash'] ?? null),
-            'has_raw_body' => !empty($rawBody),
+            'has_header_signature' => ! empty($signatureHeader),
+            'has_payload_signature' => ! empty($payload['signature'] ?? $payload['hash'] ?? null),
+            'has_raw_body' => ! empty($rawBody),
         ]);
 
         return false;

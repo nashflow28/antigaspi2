@@ -11,7 +11,7 @@ class LoyaltyPoint extends Model
     use HasFactory;
 
     public $timestamps = false;
-    
+
     protected $fillable = [
         'user_id',
         'points',
@@ -34,7 +34,7 @@ class LoyaltyPoint extends Model
     protected static function boot()
     {
         parent::boot();
-        
+
         static::creating(function ($loyaltyPoint) {
             $loyaltyPoint->created_at = now();
         });
@@ -51,7 +51,7 @@ class LoyaltyPoint extends Model
     {
         return $query->where(function ($q) {
             $q->whereNull('expires_at')
-              ->orWhere('expires_at', '>', now());
+                ->orWhere('expires_at', '>', now());
         });
     }
 

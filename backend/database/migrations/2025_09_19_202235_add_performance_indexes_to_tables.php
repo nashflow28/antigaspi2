@@ -1,8 +1,6 @@
 <?php
 
 use Illuminate\Database\Migrations\Migration;
-use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\DB;
 
 return new class extends Migration
@@ -72,12 +70,12 @@ return new class extends Migration
         }
 
         $columns = is_array($columns) ? $columns : [$columns];
-        $indexName = $indexName ?: $table . '_' . implode('_', $columns) . '_index';
+        $indexName = $indexName ?: $table.'_'.implode('_', $columns).'_index';
 
         // Check if all columns exist in the table
         $tableColumns = collect(DB::select("SHOW COLUMNS FROM {$table}"))->pluck('Field');
         foreach ($columns as $column) {
-            if (!$tableColumns->contains($column)) {
+            if (! $tableColumns->contains($column)) {
                 // Column doesn't exist yet, skip index creation
                 return;
             }
@@ -88,8 +86,10 @@ return new class extends Migration
             ->where('Key_name', $indexName)
             ->isNotEmpty();
 
-        if (!$exists) {
-            $columnsList = implode(', ', array_map(function($col) { return "`{$col}`"; }, $columns));
+        if (! $exists) {
+            $columnsList = implode(', ', array_map(function ($col) {
+                return "`{$col}`";
+            }, $columns));
             DB::statement("ALTER TABLE `{$table}` ADD INDEX `{$indexName}` ({$columnsList})");
         }
     }

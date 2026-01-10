@@ -36,34 +36,58 @@ class AdminAuditLog extends Model
      * Actions disponibles pour l'audit
      */
     public const ACTION_APPROVE_MERCHANT = 'approve_merchant';
+
     public const ACTION_REJECT_MERCHANT = 'reject_merchant';
+
     public const ACTION_APPROVE_PRODUCT = 'approve_product';
+
     public const ACTION_REJECT_PRODUCT = 'reject_product';
+
     public const ACTION_SUSPEND_USER = 'suspend_user';
+
     public const ACTION_UNSUSPEND_USER = 'unsuspend_user';
+
     public const ACTION_APPROVE_REVIEW = 'approve_review';
+
     public const ACTION_REJECT_REVIEW = 'reject_review';
+
     public const ACTION_RESOLVE_REPORT = 'resolve_report';
+
     public const ACTION_CREATE_CATEGORY = 'create_category';
+
     public const ACTION_UPDATE_CATEGORY = 'update_category';
+
     public const ACTION_DELETE_CATEGORY = 'delete_category';
+
     public const ACTION_BROADCAST_NOTIFICATION = 'broadcast_notification';
+
     public const ACTION_UPDATE_SETTINGS = 'update_settings';
+
     public const ACTION_AWARD_POINTS = 'award_points';
+
     public const ACTION_RESOLVE_RESERVATION = 'resolve_reservation';
 
     /**
      * Types d'entités
      */
     public const ENTITY_MERCHANT = 'merchant';
+
     public const ENTITY_PRODUCT = 'product';
+
     public const ENTITY_USER = 'user';
+
     public const ENTITY_REVIEW = 'review';
+
     public const ENTITY_REPORT = 'report';
+
     public const ENTITY_CATEGORY = 'category';
+
     public const ENTITY_NOTIFICATION = 'notification';
+
     public const ENTITY_SETTINGS = 'settings';
+
     public const ENTITY_LOYALTY = 'loyalty';
+
     public const ENTITY_RESERVATION = 'reservation';
 
     /**
@@ -111,7 +135,7 @@ class AdminAuditLog extends Model
      */
     public function getActionLabelAttribute(): string
     {
-        return match($this->action) {
+        return match ($this->action) {
             self::ACTION_APPROVE_MERCHANT => 'Approbation commerçant',
             self::ACTION_REJECT_MERCHANT => 'Rejet commerçant',
             self::ACTION_APPROVE_PRODUCT => 'Approbation produit',
@@ -137,7 +161,7 @@ class AdminAuditLog extends Model
      */
     public function getEntityTypeLabelAttribute(): string
     {
-        return match($this->entity_type) {
+        return match ($this->entity_type) {
             self::ENTITY_MERCHANT => 'Commerçant',
             self::ENTITY_PRODUCT => 'Produit',
             self::ENTITY_USER => 'Utilisateur',

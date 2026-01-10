@@ -68,7 +68,7 @@ class BroadcastService
                     config('broadcasting.connections.pusher.options')
                 );
 
-                $pusher->trigger('private-user.' . $userId, $event, $data);
+                $pusher->trigger('private-user.'.$userId, $event, $data);
             }
         } catch (\Exception $e) {
             Log::warning('Failed to send custom event to user', [
@@ -85,6 +85,6 @@ class BroadcastService
     public function isEnabled(): bool
     {
         return config('broadcasting.default') !== 'null' &&
-               !empty(config('broadcasting.connections.pusher.key'));
+               ! empty(config('broadcasting.connections.pusher.key'));
     }
 }

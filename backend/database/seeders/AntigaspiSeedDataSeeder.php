@@ -2,12 +2,12 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\Hash;
-use App\Models\User;
+use App\Models\Category;
 use App\Models\Merchant;
 use App\Models\Product;
-use App\Models\Category;
+use App\Models\User;
+use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Hash;
 
 class AntigaspiSeedDataSeeder extends Seeder
 {
@@ -23,13 +23,15 @@ class AntigaspiSeedDataSeeder extends Seeder
         $produitsPath = base_path('../antigaspi_seed_data/produits.json');
 
         // Vérifier que les fichiers existent
-        if (!file_exists($boutiquesPath)) {
+        if (! file_exists($boutiquesPath)) {
             $this->command->error("❌ Fichier boutiques.json introuvable: {$boutiquesPath}");
+
             return;
         }
 
-        if (!file_exists($produitsPath)) {
+        if (! file_exists($produitsPath)) {
             $this->command->error("❌ Fichier produits.json introuvable: {$produitsPath}");
+
             return;
         }
 
@@ -37,18 +39,20 @@ class AntigaspiSeedDataSeeder extends Seeder
         $boutiquesData = json_decode(file_get_contents($boutiquesPath), true);
         $produitsData = json_decode(file_get_contents($produitsPath), true);
 
-        if (!isset($boutiquesData['boutiques'])) {
-            $this->command->error("❌ Format JSON invalide pour boutiques.json");
+        if (! isset($boutiquesData['boutiques'])) {
+            $this->command->error('❌ Format JSON invalide pour boutiques.json');
+
             return;
         }
 
-        if (!isset($produitsData['produits'])) {
-            $this->command->error("❌ Format JSON invalide pour produits.json");
+        if (! isset($produitsData['produits'])) {
+            $this->command->error('❌ Format JSON invalide pour produits.json');
+
             return;
         }
 
-        $this->command->info("📦 " . count($boutiquesData['boutiques']) . " boutiques à importer");
-        $this->command->info("📦 " . count($produitsData['produits']) . " produits à importer");
+        $this->command->info('📦 '.count($boutiquesData['boutiques']).' boutiques à importer');
+        $this->command->info('📦 '.count($produitsData['produits']).' produits à importer');
 
         // Mapping des catégories
         $categoryMapping = [
@@ -67,7 +71,7 @@ class AntigaspiSeedDataSeeder extends Seeder
 
         foreach ($boutiquesData['boutiques'] as $boutique) {
             // Créer un utilisateur merchant pour cette boutique
-            $email = strtolower(str_replace(' ', '.', $boutique['nom'])) . '@antigaspi.tg';
+            $email = strtolower(str_replace(' ', '.', $boutique['nom'])).'@antigaspi.tg';
 
             $user = User::firstOrCreate(
                 ['email' => $email],
@@ -103,8 +107,9 @@ class AntigaspiSeedDataSeeder extends Seeder
 
         foreach ($produitsData['produits'] as $produit) {
             // Récupérer le merchant_id réel depuis le mapping
-            if (!isset($merchantsMap[$produit['boutique_id']])) {
+            if (! isset($merchantsMap[$produit['boutique_id']])) {
                 $this->command->warn("  ⚠️  Boutique ID {$produit['boutique_id']} introuvable pour produit: {$produit['nom']}");
+
                 continue;
             }
 
@@ -133,13 +138,13 @@ class AntigaspiSeedDataSeeder extends Seeder
         }
 
         $this->command->info("\n✅ Import terminé!");
-        $this->command->info("📊 Statistiques:");
-        $this->command->info("   - Boutiques: " . count($merchantsMap));
-        $this->command->info("   - Produits: " . Product::count());
+        $this->command->info('📊 Statistiques:');
+        $this->command->info('   - Boutiques: '.count($merchantsMap));
+        $this->command->info('   - Produits: '.Product::count());
         $this->command->info("\n💡 Comptes merchants créés:");
 
         foreach ($boutiquesData['boutiques'] as $boutique) {
-            $email = strtolower(str_replace(' ', '.', $boutique['nom'])) . '@antigaspi.tg';
+            $email = strtolower(str_replace(' ', '.', $boutique['nom'])).'@antigaspi.tg';
             $this->command->info("   📧 {$email} / password: password");
         }
     }

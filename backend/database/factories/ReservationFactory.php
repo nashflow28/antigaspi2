@@ -28,7 +28,7 @@ class ReservationFactory extends Factory
             'status' => $this->faker->randomElement(['pending', 'confirmed', 'ready', 'completed']),
             'payment_status' => PaymentStatus::PENDING,
             'latest_payment_id' => null,
-            'reservation_code' => 'RES' . strtoupper(Str::random(8)),
+            'reservation_code' => 'RES'.strtoupper(Str::random(8)),
             'reserved_at' => now()->subHours($this->faker->numberBetween(1, 48)),
             'confirmed_at' => now()->subHours($this->faker->numberBetween(0, 24)),
             'expires_at' => now()->addHours($this->faker->numberBetween(4, 48)),

@@ -3,16 +3,16 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\User;
 use App\Models\Merchant;
+use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cookie;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Support\Facades\Validator;
 use Tymon\JWTAuth\Facades\JWTAuth;
-use Illuminate\Support\Facades\Cookie;
 
 class SecureAuthController extends Controller
 {
@@ -20,6 +20,7 @@ class SecureAuthController extends Controller
      * Durée de vie des tokens en minutes
      */
     private const ACCESS_TOKEN_TTL = 15; // 15 minutes
+
     private const REFRESH_TOKEN_TTL = 10080; // 7 jours
 
     /**
@@ -45,7 +46,7 @@ class SecureAuthController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Erreurs de validation',
-                'errors' => $validator->errors()
+                'errors' => $validator->errors(),
             ], 422);
         }
 
@@ -76,7 +77,7 @@ class SecureAuthController extends Controller
             $accessToken = JWTAuth::customClaims(['type' => 'access'])->fromUser($user);
             $refreshToken = JWTAuth::customClaims([
                 'type' => 'refresh',
-                'access_jti' => JWTAuth::setToken($accessToken)->getPayload()->get('jti')
+                'access_jti' => JWTAuth::setToken($accessToken)->getPayload()->get('jti'),
             ])->setTTL(self::REFRESH_TOKEN_TTL)->fromUser($user);
 
             // Créer les cookies httpOnly
@@ -108,19 +109,19 @@ class SecureAuthController extends Controller
                 'success' => true,
                 'message' => 'Inscription réussie',
                 'data' => [
-                    'user' => $this->getUserData($user)
-                ]
+                    'user' => $this->getUserData($user),
+                ],
             ], 201)->withCookie($accessCookie)->withCookie($refreshCookie);
 
         } catch (\Exception $e) {
             Log::error('Registration error', [
                 'error' => $e->getMessage(),
-                'email' => $request->email
+                'email' => $request->email,
             ]);
 
             return response()->json([
                 'success' => false,
-                'message' => 'Erreur lors de l\'inscription'
+                'message' => 'Erreur lors de l\'inscription',
             ], 500);
         }
     }
@@ -130,7 +131,7 @@ class SecureAuthController extends Controller
      */
     public function login(Request $request): JsonResponse
     {
-        $key = 'login_attempts:' . $request->ip();
+        $key = 'login_attempts:'.$request->ip();
 
         // Rate limiting
         if (RateLimiter::tooManyAttempts($key, 5)) {
@@ -138,13 +139,13 @@ class SecureAuthController extends Controller
 
             Log::warning('Too many login attempts', [
                 'ip' => $request->ip(),
-                'email' => $request->email ?? 'unknown'
+                'email' => $request->email ?? 'unknown',
             ]);
 
             return response()->json([
                 'success' => false,
                 'message' => "Trop de tentatives. Réessayez dans {$seconds} secondes.",
-                'retry_after' => $seconds
+                'retry_after' => $seconds,
             ], 429);
         }
 
@@ -157,40 +158,41 @@ class SecureAuthController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Erreurs de validation',
-                'errors' => $validator->errors()
+                'errors' => $validator->errors(),
             ], 422);
         }
 
         try {
             $user = User::where('email', $request->email)->first();
 
-            if (!$user) {
+            if (! $user) {
                 RateLimiter::hit($key, 300);
+
                 return response()->json([
                     'success' => false,
-                    'message' => 'Identifiants incorrects'
+                    'message' => 'Identifiants incorrects',
                 ], 401);
             }
 
-            if (!$user->is_active) {
+            if (! $user->is_active) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Compte désactivé'
+                    'message' => 'Compte désactivé',
                 ], 403);
             }
 
-            if (!Hash::check($request->password, $user->password)) {
+            if (! Hash::check($request->password, $user->password)) {
                 RateLimiter::hit($key, 300);
 
                 Log::warning('Failed login attempt', [
                     'email' => $request->email,
                     'ip' => $request->ip(),
-                    'user_agent' => $request->userAgent()
+                    'user_agent' => $request->userAgent(),
                 ]);
 
                 return response()->json([
                     'success' => false,
-                    'message' => 'Identifiants incorrects'
+                    'message' => 'Identifiants incorrects',
                 ], 401);
             }
 
@@ -198,7 +200,7 @@ class SecureAuthController extends Controller
             $accessToken = JWTAuth::customClaims(['type' => 'access'])->fromUser($user);
             $refreshToken = JWTAuth::customClaims([
                 'type' => 'refresh',
-                'access_jti' => JWTAuth::setToken($accessToken)->getPayload()->get('jti')
+                'access_jti' => JWTAuth::setToken($accessToken)->getPayload()->get('jti'),
             ])->setTTL(self::REFRESH_TOKEN_TTL)->fromUser($user);
 
             // Effacer le rate limiter après succès
@@ -208,7 +210,7 @@ class SecureAuthController extends Controller
             Log::info('Successful login', [
                 'user_id' => $user->id,
                 'email' => $user->email,
-                'ip' => $request->ip()
+                'ip' => $request->ip(),
             ]);
 
             // Créer les cookies httpOnly
@@ -240,19 +242,19 @@ class SecureAuthController extends Controller
                 'success' => true,
                 'message' => 'Connexion réussie',
                 'data' => [
-                    'user' => $this->getUserData($user)
-                ]
+                    'user' => $this->getUserData($user),
+                ],
             ])->withCookie($accessCookie)->withCookie($refreshCookie);
 
         } catch (\Exception $e) {
             Log::error('Login error', [
                 'error' => $e->getMessage(),
-                'email' => $request->email
+                'email' => $request->email,
             ]);
 
             return response()->json([
                 'success' => false,
-                'message' => 'Erreur lors de la connexion'
+                'message' => 'Erreur lors de la connexion',
             ], 500);
         }
     }
@@ -265,31 +267,31 @@ class SecureAuthController extends Controller
         try {
             $token = $request->cookie('access_token');
 
-            if (!$token) {
+            if (! $token) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Token non trouvé'
+                    'message' => 'Token non trouvé',
                 ], 401);
             }
 
             $user = JWTAuth::setToken($token)->authenticate();
 
-            if (!$user) {
+            if (! $user) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Utilisateur non trouvé'
+                    'message' => 'Utilisateur non trouvé',
                 ], 404);
             }
 
             return response()->json([
                 'success' => true,
-                'data' => $this->getUserData($user)
+                'data' => $this->getUserData($user),
             ]);
 
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Token invalide'
+                'message' => 'Token invalide',
             ], 401);
         }
     }
@@ -302,10 +304,10 @@ class SecureAuthController extends Controller
         try {
             $refreshToken = $request->cookie('refresh_token');
 
-            if (!$refreshToken) {
+            if (! $refreshToken) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Refresh token non trouvé'
+                    'message' => 'Refresh token non trouvé',
                 ], 401);
             }
 
@@ -315,7 +317,7 @@ class SecureAuthController extends Controller
             if ($payload->get('type') !== 'refresh') {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Token invalide'
+                    'message' => 'Token invalide',
                 ], 401);
             }
 
@@ -341,19 +343,19 @@ class SecureAuthController extends Controller
                 'success' => true,
                 'message' => 'Token rafraîchi avec succès',
                 'data' => [
-                    'user' => $this->getUserData($user)
-                ]
+                    'user' => $this->getUserData($user),
+                ],
             ])->withCookie($accessCookie);
 
         } catch (\Exception $e) {
             Log::warning('Token refresh failed', [
                 'error' => $e->getMessage(),
-                'ip' => $request->ip()
+                'ip' => $request->ip(),
             ]);
 
             return response()->json([
                 'success' => false,
-                'message' => 'Erreur lors du rafraîchissement du token'
+                'message' => 'Erreur lors du rafraîchissement du token',
             ], 401);
         }
     }
@@ -380,13 +382,13 @@ class SecureAuthController extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => 'Déconnexion réussie'
+                'message' => 'Déconnexion réussie',
             ])->withCookie($accessCookie)->withCookie($refreshCookie);
 
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Erreur lors de la déconnexion'
+                'message' => 'Erreur lors de la déconnexion',
             ], 500);
         }
     }
@@ -399,10 +401,10 @@ class SecureAuthController extends Controller
         try {
             $token = $request->cookie('access_token');
 
-            if (!$token) {
+            if (! $token) {
                 return response()->json([
                     'success' => false,
-                    'authenticated' => false
+                    'authenticated' => false,
                 ]);
             }
 
@@ -411,13 +413,13 @@ class SecureAuthController extends Controller
             return response()->json([
                 'success' => true,
                 'authenticated' => true,
-                'user' => $this->getUserData($user)
+                'user' => $this->getUserData($user),
             ]);
 
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'authenticated' => false
+                'authenticated' => false,
             ]);
         }
     }
@@ -440,7 +442,7 @@ class SecureAuthController extends Controller
             'prefers_email_notifications' => $user->prefers_email_notifications,
             'prefers_sms_notifications' => $user->prefers_sms_notifications,
             'prefers_push_notifications' => $user->prefers_push_notifications,
-            'created_at' => $user->created_at
+            'created_at' => $user->created_at,
         ];
 
         if ($user->role === 'merchant' && $user->merchant) {

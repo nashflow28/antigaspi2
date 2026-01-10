@@ -4,8 +4,8 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Services\GeocodingService;
-use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 
 class GeocodingController extends Controller
 {
@@ -60,7 +60,7 @@ class GeocodingController extends Controller
         $longitude = (float) $request->longitude;
 
         // Validate coordinates are in expected region
-        if (!$this->geocodingService->validateCoordinates($latitude, $longitude)) {
+        if (! $this->geocodingService->validateCoordinates($latitude, $longitude)) {
             return response()->json([
                 'success' => false,
                 'message' => 'Coordonnées hors de la zone couverte',

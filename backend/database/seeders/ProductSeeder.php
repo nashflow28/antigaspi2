@@ -18,8 +18,9 @@ class ProductSeeder extends Seeder
         $merchantUser = User::where('email', 'boulangerie.martin@email.com')->first();
         $merchant = $merchantUser?->merchant;
 
-        if (!$merchant) {
+        if (! $merchant) {
             echo "❌ Merchant not found. Run AdminUserSeeder first.\n";
+
             return;
         }
 
@@ -102,6 +103,6 @@ class ProductSeeder extends Seeder
             Product::create($productData);
         }
 
-        echo "✅ Created " . count($products) . " products for merchant: " . $merchant->business_name . "\n";
+        echo '✅ Created '.count($products).' products for merchant: '.$merchant->business_name."\n";
     }
 }

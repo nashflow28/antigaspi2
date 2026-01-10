@@ -12,8 +12,7 @@ class ValidPickupDate implements Rule
     public function __construct(
         private readonly ?string $businessType,
         private readonly ?Carbon $latestAllowedDate = null
-    ) {
-    }
+    ) {}
 
     public function passes($attribute, $value): bool
     {
@@ -21,12 +20,14 @@ class ValidPickupDate implements Rule
             $pickupDate = Carbon::parse($value)->startOfDay();
         } catch (\Exception $exception) {
             $this->errorMessage = 'La date de retrait est invalide.';
+
             return false;
         }
 
         $today = now()->startOfDay();
         if ($pickupDate->lt($today)) {
             $this->errorMessage = 'La date de retrait doit être aujourd\'hui ou plus tard.';
+
             return false;
         }
 
@@ -41,11 +42,13 @@ class ValidPickupDate implements Rule
             $this->errorMessage = $maxDays === 1
                 ? 'Le retrait doit avoir lieu aujourd\'hui ou demain.'
                 : 'Le retrait doit avoir lieu dans les deux prochains jours.';
+
             return false;
         }
 
         if ($this->latestAllowedDate && $pickupDate->gt($this->latestAllowedDate->copy()->startOfDay())) {
             $this->errorMessage = 'La date de retrait ne peut pas dépasser la date d\'expiration du produit.';
+
             return false;
         }
 

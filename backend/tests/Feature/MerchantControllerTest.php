@@ -2,13 +2,13 @@
 
 namespace Tests\Feature;
 
-use Tests\TestCase;
-use App\Models\User;
 use App\Models\Merchant;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
+use Tests\TestCase;
 
 /**
  * Critical tests for MerchantController endpoints
@@ -20,6 +20,7 @@ class MerchantControllerTest extends TestCase
     use RefreshDatabase;
 
     protected User $merchantUser;
+
     protected Merchant $merchant;
 
     protected function setUp(): void
@@ -59,7 +60,7 @@ class MerchantControllerTest extends TestCase
         // Create valid JPEG test image (800x800px)
         $photo = UploadedFile::fake()->image('merchant.jpg', 800, 800);
 
-        $response = $this->withHeader('Authorization', 'Bearer ' . $token)
+        $response = $this->withHeader('Authorization', 'Bearer '.$token)
             ->postJson('/api/merchants/profile/photo', [
                 'photo' => $photo,
             ]);
@@ -90,7 +91,7 @@ class MerchantControllerTest extends TestCase
         // Create valid PNG test image (500x500px)
         $photo = UploadedFile::fake()->image('merchant.png', 500, 500);
 
-        $response = $this->withHeader('Authorization', 'Bearer ' . $token)
+        $response = $this->withHeader('Authorization', 'Bearer '.$token)
             ->postJson('/api/merchants/profile/photo', [
                 'photo' => $photo,
             ]);
@@ -119,7 +120,7 @@ class MerchantControllerTest extends TestCase
         // Create malicious PHP file disguised as image
         $maliciousFile = UploadedFile::fake()->create('malicious.php', 100, 'application/x-php');
 
-        $response = $this->withHeader('Authorization', 'Bearer ' . $token)
+        $response = $this->withHeader('Authorization', 'Bearer '.$token)
             ->postJson('/api/merchants/profile/photo', [
                 'photo' => $maliciousFile,
             ]);
@@ -145,7 +146,7 @@ class MerchantControllerTest extends TestCase
         // Create image exceeding max dimensions (1500x1500px > 1000x1000px limit)
         $oversizedImage = UploadedFile::fake()->image('huge.jpg', 1500, 1500);
 
-        $response = $this->withHeader('Authorization', 'Bearer ' . $token)
+        $response = $this->withHeader('Authorization', 'Bearer '.$token)
             ->postJson('/api/merchants/profile/photo', [
                 'photo' => $oversizedImage,
             ]);
@@ -172,7 +173,7 @@ class MerchantControllerTest extends TestCase
         // Create file exceeding max size (2MB > 1MB limit)
         $oversizedFile = UploadedFile::fake()->create('huge.jpg', 2048); // 2MB in KB
 
-        $response = $this->withHeader('Authorization', 'Bearer ' . $token)
+        $response = $this->withHeader('Authorization', 'Bearer '.$token)
             ->postJson('/api/merchants/profile/photo', [
                 'photo' => $oversizedFile,
             ]);
@@ -197,7 +198,7 @@ class MerchantControllerTest extends TestCase
 
         // Upload first photo
         $firstPhoto = UploadedFile::fake()->image('first.jpg', 500, 500);
-        $firstResponse = $this->withHeader('Authorization', 'Bearer ' . $token)
+        $firstResponse = $this->withHeader('Authorization', 'Bearer '.$token)
             ->postJson('/api/merchants/profile/photo', ['photo' => $firstPhoto]);
 
         $firstPhotoUrl = $firstResponse->json('data.photo_url');
@@ -206,7 +207,7 @@ class MerchantControllerTest extends TestCase
 
         // Upload second photo (should delete first)
         $secondPhoto = UploadedFile::fake()->image('second.jpg', 500, 500);
-        $secondResponse = $this->withHeader('Authorization', 'Bearer ' . $token)
+        $secondResponse = $this->withHeader('Authorization', 'Bearer '.$token)
             ->postJson('/api/merchants/profile/photo', ['photo' => $secondPhoto]);
 
         $secondPhotoUrl = $secondResponse->json('data.photo_url');
@@ -242,7 +243,7 @@ class MerchantControllerTest extends TestCase
             ],
         ];
 
-        $response = $this->withHeader('Authorization', 'Bearer ' . $token)
+        $response = $this->withHeader('Authorization', 'Bearer '.$token)
             ->putJson('/api/merchants/opening-hours', [
                 'opening_hours' => $openingHours,
             ]);
@@ -272,7 +273,7 @@ class MerchantControllerTest extends TestCase
             ['day' => 'monday', 'is_open' => false], // Duplicate
         ];
 
-        $response = $this->withHeader('Authorization', 'Bearer ' . $token)
+        $response = $this->withHeader('Authorization', 'Bearer '.$token)
             ->putJson('/api/merchants/opening-hours', [
                 'opening_hours' => $openingHours,
             ]);
@@ -303,7 +304,7 @@ class MerchantControllerTest extends TestCase
             ],
         ];
 
-        $response = $this->withHeader('Authorization', 'Bearer ' . $token)
+        $response = $this->withHeader('Authorization', 'Bearer '.$token)
             ->putJson('/api/merchants/opening-hours', [
                 'opening_hours' => $openingHours,
             ]);
@@ -331,7 +332,7 @@ class MerchantControllerTest extends TestCase
             ],
         ];
 
-        $response = $this->withHeader('Authorization', 'Bearer ' . $token)
+        $response = $this->withHeader('Authorization', 'Bearer '.$token)
             ->putJson('/api/merchants/opening-hours', [
                 'opening_hours' => $openingHours,
             ]);
@@ -351,7 +352,7 @@ class MerchantControllerTest extends TestCase
     {
         $token = auth('api')->login($this->merchantUser);
 
-        $response = $this->withHeader('Authorization', 'Bearer ' . $token)
+        $response = $this->withHeader('Authorization', 'Bearer '.$token)
             ->putJson('/api/merchants/opening-hours', [
                 'opening_hours' => [], // Empty array
             ]);

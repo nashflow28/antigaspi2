@@ -39,6 +39,7 @@ class RateLimitServiceProvider extends ServiceProvider
         RateLimiter::for('auth', function (Request $request) {
             // En mode test ou développement, permettre plus de requêtes
             $limit = app()->environment(['testing', 'local']) ? 100 : 5;
+
             return Limit::perMinute($limit)->by($request->ip());
         });
 
@@ -60,6 +61,7 @@ class RateLimitServiceProvider extends ServiceProvider
         // Rate limiting global de sécurité (1000 requêtes par heure par IP)
         RateLimiter::for('global', function (Request $request) {
             $perMinute = app()->environment(['testing', 'local']) ? 500 : 200;
+
             return [
                 Limit::perMinute($perMinute)->by($request->ip()),
                 Limit::perHour(1000)->by($request->ip()),

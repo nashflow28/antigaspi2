@@ -8,7 +8,9 @@ use Illuminate\Support\Facades\Log;
 class SmsService
 {
     private string $apiUrl = 'http://smsvas.fr/api/sms';
+
     private ?string $token;
+
     private string $sender;
 
     public function __construct()
@@ -20,17 +22,18 @@ class SmsService
     /**
      * Send SMS via SMS.TG API
      *
-     * @param string $phone Phone number with country code (e.g., 22891087733)
-     * @param string $message Message content
+     * @param  string  $phone  Phone number with country code (e.g., 22891087733)
+     * @param  string  $message  Message content
      * @return array{success: bool, message: string, data?: array}
      */
     public function send(string $phone, string $message): array
     {
         if (empty($this->token)) {
             Log::error('SMS Service: Token not configured');
+
             return [
                 'success' => false,
-                'message' => 'SMS service not configured'
+                'message' => 'SMS service not configured',
             ];
         }
 
@@ -50,7 +53,7 @@ class SmsService
             Log::info('SMS sent', [
                 'phone' => $this->maskPhone($phone),
                 'status' => $response->status(),
-                'response' => $responseBody
+                'response' => $responseBody,
             ]);
 
             if ($response->successful()) {
@@ -59,25 +62,25 @@ class SmsService
                     'message' => 'SMS sent successfully',
                     'data' => [
                         'phone' => $phone,
-                        'response' => $responseBody
-                    ]
+                        'response' => $responseBody,
+                    ],
                 ];
             }
 
             return [
                 'success' => false,
-                'message' => 'Failed to send SMS: ' . $responseBody
+                'message' => 'Failed to send SMS: '.$responseBody,
             ];
 
         } catch (\Exception $e) {
             Log::error('SMS Service Error', [
                 'phone' => $this->maskPhone($phone),
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ]);
 
             return [
                 'success' => false,
-                'message' => 'SMS service error: ' . $e->getMessage()
+                'message' => 'SMS service error: '.$e->getMessage(),
             ];
         }
     }
@@ -85,42 +88,42 @@ class SmsService
     /**
      * Send OTP SMS
      *
-     * @param string $phone Phone number
-     * @param string $otp OTP code
-     * @return array
+     * @param  string  $phone  Phone number
+     * @param  string  $otp  OTP code
      */
     public function sendOtp(string $phone, string $otp): array
     {
         $message = "Votre code de verification Antigaspi est: {$otp}. Valide pendant 10 minutes.";
+
         return $this->send($phone, $message);
     }
 
     /**
      * Send reservation confirmation SMS
      *
-     * @param string $phone Phone number
-     * @param string $reservationCode Reservation code
-     * @param string $merchantName Merchant name
-     * @return array
+     * @param  string  $phone  Phone number
+     * @param  string  $reservationCode  Reservation code
+     * @param  string  $merchantName  Merchant name
      */
     public function sendReservationConfirmation(string $phone, string $reservationCode, string $merchantName): array
     {
         $message = "Reservation {$reservationCode} confirmee! Rendez-vous chez {$merchantName} pour recuperer votre commande. - Antigaspi";
+
         return $this->send($phone, $message);
     }
 
     /**
      * Send pickup reminder SMS
      *
-     * @param string $phone Phone number
-     * @param string $reservationCode Reservation code
-     * @param string $merchantName Merchant name
-     * @param string $pickupTime Pickup time
-     * @return array
+     * @param  string  $phone  Phone number
+     * @param  string  $reservationCode  Reservation code
+     * @param  string  $merchantName  Merchant name
+     * @param  string  $pickupTime  Pickup time
      */
     public function sendPickupReminder(string $phone, string $reservationCode, string $merchantName, string $pickupTime): array
     {
         $message = "Rappel: Votre commande {$reservationCode} vous attend chez {$merchantName} jusqu'a {$pickupTime}. - Antigaspi";
+
         return $this->send($phone, $message);
     }
 
@@ -141,12 +144,12 @@ class SmsService
 
         // If it's a local number (8 digits), add Togo country code
         if (strlen($phone) === 8) {
-            $phone = '228' . $phone;
+            $phone = '228'.$phone;
         }
 
         // If starts with 0 and is 9 digits, replace 0 with 228
         if (strlen($phone) === 9 && str_starts_with($phone, '0')) {
-            $phone = '228' . substr($phone, 1);
+            $phone = '228'.substr($phone, 1);
         }
 
         return $phone;
@@ -160,7 +163,8 @@ class SmsService
         if (strlen($phone) < 6) {
             return '***';
         }
-        return substr($phone, 0, 5) . '****' . substr($phone, -2);
+
+        return substr($phone, 0, 5).'****'.substr($phone, -2);
     }
 
     /**
@@ -168,6 +172,6 @@ class SmsService
      */
     public function isConfigured(): bool
     {
-        return !empty($this->token);
+        return ! empty($this->token);
     }
 }

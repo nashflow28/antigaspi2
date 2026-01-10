@@ -4,8 +4,8 @@ namespace App\Http\Middleware;
 
 use App\Services\JwtSecurityService;
 use Closure;
-use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 
@@ -22,7 +22,7 @@ class ApiAuthMiddleware
     {
         // Vérifier la présence du token
         $authHeader = $request->header('Authorization');
-        if (!$authHeader || !str_starts_with($authHeader, 'Bearer ')) {
+        if (! $authHeader || ! str_starts_with($authHeader, 'Bearer ')) {
             return $this->unauthorizedResponse('Token d\'authentification requis');
         }
 
@@ -36,7 +36,7 @@ class ApiAuthMiddleware
         // Valider le token avec le service de sécurité
         $validation = $this->jwtService->validateAccessToken($token, $request);
 
-        if (!$validation['valid']) {
+        if (! $validation['valid']) {
             // Log les tentatives d'authentification échouées
             $this->logFailedAuth($request, $validation['error']);
 
@@ -47,7 +47,7 @@ class ApiAuthMiddleware
         $payload = $validation['payload'];
 
         // Vérifier les permissions si spécifiées
-        if (!empty($permissions) && !$this->hasPermissions($user, $permissions)) {
+        if (! empty($permissions) && ! $this->hasPermissions($user, $permissions)) {
             return $this->forbiddenResponse('Permissions insuffisantes');
         }
 
@@ -74,26 +74,35 @@ class ApiAuthMiddleware
         foreach ($permissions as $permission) {
             switch ($permission) {
                 case 'admin':
-                    if ($user->role !== 'admin') return false;
+                    if ($user->role !== 'admin') {
+                        return false;
+                    }
                     break;
                 case 'merchant':
-                    if (!in_array($user->role, ['admin', 'merchant'])) return false;
+                    if (! in_array($user->role, ['admin', 'merchant'])) {
+                        return false;
+                    }
                     break;
                 case 'consumer':
-                    if (!in_array($user->role, ['admin', 'consumer'])) return false;
+                    if (! in_array($user->role, ['admin', 'consumer'])) {
+                        return false;
+                    }
                     break;
                 default:
                     // Permission personnalisée
-                    if (!$user->hasPermission($permission)) return false;
+                    if (! $user->hasPermission($permission)) {
+                        return false;
+                    }
                     break;
             }
         }
+
         return true;
     }
 
     private function isRateLimited(Request $request): bool
     {
-        $key = 'rate_limit:auth:' . $request->ip();
+        $key = 'rate_limit:auth:'.$request->ip();
         $attempts = Cache::get($key, 0);
 
         if ($attempts >= 60) { // 60 tentatives par minute
@@ -101,6 +110,7 @@ class ApiAuthMiddleware
         }
 
         Cache::put($key, $attempts + 1, 60);
+
         return false;
     }
 
@@ -126,7 +136,7 @@ class ApiAuthMiddleware
         return response()->json([
             'success' => false,
             'message' => $message,
-            'code' => 'UNAUTHORIZED'
+            'code' => 'UNAUTHORIZED',
         ], 401);
     }
 
@@ -135,7 +145,7 @@ class ApiAuthMiddleware
         return response()->json([
             'success' => false,
             'message' => $message,
-            'code' => 'FORBIDDEN'
+            'code' => 'FORBIDDEN',
         ], 403);
     }
 
@@ -144,7 +154,7 @@ class ApiAuthMiddleware
         return response()->json([
             'success' => false,
             'message' => 'Trop de tentatives. Veuillez réessayer plus tard.',
-            'code' => 'RATE_LIMITED'
+            'code' => 'RATE_LIMITED',
         ], 429);
     }
 }

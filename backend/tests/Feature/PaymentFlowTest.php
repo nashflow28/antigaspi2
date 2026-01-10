@@ -13,8 +13,8 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Str;
-use Tymon\JWTAuth\Facades\JWTAuth;
 use Tests\TestCase;
+use Tymon\JWTAuth\Facades\JWTAuth;
 
 class PaymentFlowTest extends TestCase
 {
@@ -24,7 +24,7 @@ class PaymentFlowTest extends TestCase
     {
         parent::setUp();
 
-        config(['app.key' => 'base64:' . base64_encode(random_bytes(32))]);
+        config(['app.key' => 'base64:'.base64_encode(random_bytes(32))]);
         config(['jwt.secret' => Str::random(32)]);
         config(['payments.paygate.base_url' => 'https://paygate.test']);
         config(['payments.paygate.merchant_id' => 'merchant']);
@@ -48,7 +48,7 @@ class PaymentFlowTest extends TestCase
     {
         $token = JWTAuth::fromUser($user);
 
-        return ['Authorization' => 'Bearer ' . $token];
+        return ['Authorization' => 'Bearer '.$token];
     }
 
     public function test_user_can_initiate_flooz_payment_during_reservation_creation(): void

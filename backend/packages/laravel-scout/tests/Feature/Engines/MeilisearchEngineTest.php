@@ -119,7 +119,7 @@ class MeilisearchEngineTest extends TestCase
         $engine->search($builder);
     }
 
-    public function test_search_includes_at_least_scoutKeyName_in_attributesToRetrieve_on_builder_options()
+    public function test_search_includes_at_least_scout_key_name_in_attributes_to_retrieve_on_builder_options()
     {
         $engine = $this->app->make(EngineManager::class)->engine();
 

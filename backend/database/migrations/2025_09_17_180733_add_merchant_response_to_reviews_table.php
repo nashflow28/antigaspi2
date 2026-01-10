@@ -27,7 +27,7 @@ return new class extends Migration
             $table->dropColumn([
                 'merchant_response',
                 'merchant_response_at',
-                'merchant_response_updated_at'
+                'merchant_response_updated_at',
             ]);
         });
     }

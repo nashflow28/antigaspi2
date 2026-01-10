@@ -30,7 +30,6 @@ class SyncIndexSettingsCommand extends Command
     /**
      * Execute the console command.
      *
-     * @param  \Laravel\Scout\EngineManager  $manager
      * @return void
      */
     public function handle(EngineManager $manager)

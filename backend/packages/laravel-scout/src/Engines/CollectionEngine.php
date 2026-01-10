@@ -45,7 +45,6 @@ class CollectionEngine extends Engine
     /**
      * Perform the given search on the engine.
      *
-     * @param  \Laravel\Scout\Builder  $builder
      * @return mixed
      */
     public function search(Builder $builder)
@@ -61,7 +60,6 @@ class CollectionEngine extends Engine
     /**
      * Perform the given search on the engine.
      *
-     * @param  \Laravel\Scout\Builder  $builder
      * @param  int  $perPage
      * @param  int  $page
      * @return mixed
@@ -79,43 +77,42 @@ class CollectionEngine extends Engine
     /**
      * Get the Eloquent models for the given builder.
      *
-     * @param  \Laravel\Scout\Builder  $builder
      * @return \Illuminate\Database\Eloquent\Collection
      */
     protected function searchModels(Builder $builder)
     {
         $query = $builder->model->query()
-                        ->when(! is_null($builder->callback), function ($query) use ($builder) {
-                            call_user_func($builder->callback, $query, $builder, $builder->query);
-                        })
-                        ->when(! $builder->callback && count($builder->wheres) > 0, function ($query) use ($builder) {
-                            foreach ($builder->wheres as $key => $value) {
-                                if ($key !== '__soft_deleted') {
-                                    $query->where($key, $value);
-                                }
-                            }
-                        })
-                        ->when(! $builder->callback && count($builder->whereIns) > 0, function ($query) use ($builder) {
-                            foreach ($builder->whereIns as $key => $values) {
-                                $query->whereIn($key, $values);
-                            }
-                        })
-                        ->when(! $builder->callback && count($builder->whereNotIns) > 0, function ($query) use ($builder) {
-                            foreach ($builder->whereNotIns as $key => $values) {
-                                $query->whereNotIn($key, $values);
-                            }
-                        })
-                        ->when($builder->orders, function ($query) use ($builder) {
-                            foreach ($builder->orders as $order) {
-                                $query->orderBy($order['column'], $order['direction']);
-                            }
-                        }, function ($query) use ($builder) {
-                            $query->orderBy($builder->model->qualifyColumn($builder->model->getScoutKeyName()), 'desc');
-                        });
+            ->when(! is_null($builder->callback), function ($query) use ($builder) {
+                call_user_func($builder->callback, $query, $builder, $builder->query);
+            })
+            ->when(! $builder->callback && count($builder->wheres) > 0, function ($query) use ($builder) {
+                foreach ($builder->wheres as $key => $value) {
+                    if ($key !== '__soft_deleted') {
+                        $query->where($key, $value);
+                    }
+                }
+            })
+            ->when(! $builder->callback && count($builder->whereIns) > 0, function ($query) use ($builder) {
+                foreach ($builder->whereIns as $key => $values) {
+                    $query->whereIn($key, $values);
+                }
+            })
+            ->when(! $builder->callback && count($builder->whereNotIns) > 0, function ($query) use ($builder) {
+                foreach ($builder->whereNotIns as $key => $values) {
+                    $query->whereNotIn($key, $values);
+                }
+            })
+            ->when($builder->orders, function ($query) use ($builder) {
+                foreach ($builder->orders as $order) {
+                    $query->orderBy($order['column'], $order['direction']);
+                }
+            }, function ($query) use ($builder) {
+                $query->orderBy($builder->model->qualifyColumn($builder->model->getScoutKeyName()), 'desc');
+            });
 
         $models = $this->ensureSoftDeletesAreHandled($builder, $query)
-                        ->get()
-                        ->values();
+            ->get()
+            ->values();
 
         if (count($models) === 0) {
             return $models;
@@ -185,7 +182,6 @@ class CollectionEngine extends Engine
     /**
      * Map the given results to instances of the given model.
      *
-     * @param  \Laravel\Scout\Builder  $builder
      * @param  mixed  $results
      * @param  \Illuminate\Database\Eloquent\Model  $model
      * @return \Illuminate\Database\Eloquent\Collection
@@ -214,7 +210,6 @@ class CollectionEngine extends Engine
     /**
      * Map the given results to instances of the given model via a lazy collection.
      *
-     * @param  \Laravel\Scout\Builder  $builder
      * @param  mixed  $results
      * @param  \Illuminate\Database\Eloquent\Model  $model
      * @return \Illuminate\Support\LazyCollection
@@ -266,7 +261,6 @@ class CollectionEngine extends Engine
      * Create a search index.
      *
      * @param  string  $name
-     * @param  array  $options
      * @return mixed
      *
      * @throws \Exception

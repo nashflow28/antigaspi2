@@ -103,7 +103,6 @@ class Reservation extends Model
         return $this->belongsTo(Payment::class, 'latest_payment_id');
     }
 
-
     public function order(): BelongsTo
     {
         return $this->belongsTo(Order::class);
@@ -179,8 +178,10 @@ class Reservation extends Model
                 'confirmed_at' => now(),
                 'payment_status' => $this->payment_status ?? PaymentStatus::SUCCESS,
             ]);
+
             return true;
         }
+
         return false;
     }
 
@@ -191,8 +192,10 @@ class Reservation extends Model
                 'status' => 'completed',
                 'completed_at' => now(),
             ]);
+
             return true;
         }
+
         return false;
     }
 
@@ -214,8 +217,10 @@ class Reservation extends Model
                 'payment_status' => PaymentStatus::FAILED,
             ]);
             $this->product->increment('quantity_available', $this->quantity_reserved);
+
             return true;
         }
+
         return false;
     }
 
@@ -234,12 +239,12 @@ class Reservation extends Model
             ->latest()
             ->first();
 
-        if (!$walletPayment) {
+        if (! $walletPayment) {
             return; // No wallet payment to refund - OK to proceed
         }
 
         $user = $this->user;
-        if (!$user) {
+        if (! $user) {
             \Log::error('BUG-008: Cannot refund wallet - user not found', ['reservation_id' => $this->id]);
             throw new \Exception('Impossible de rembourser: utilisateur non trouvé. Contactez le support.');
         }
@@ -267,7 +272,7 @@ class Reservation extends Model
                 'error' => $e->getMessage(),
             ]);
             throw new \Exception(
-                'Échec du remboursement portefeuille: ' . $e->getMessage() .
+                'Échec du remboursement portefeuille: '.$e->getMessage().
                 '. L\'annulation a été bloquée. Contactez le support.'
             );
         }

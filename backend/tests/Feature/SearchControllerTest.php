@@ -9,22 +9,24 @@ use App\Models\SearchQuery;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Str;
-use Tymon\JWTAuth\Facades\JWTAuth;
 use Tests\TestCase;
+use Tymon\JWTAuth\Facades\JWTAuth;
 
 class SearchControllerTest extends TestCase
 {
     use RefreshDatabase;
 
     private User $consumer;
+
     private Merchant $merchant;
+
     private Category $category;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        config(['app.key' => 'base64:' . base64_encode(random_bytes(32))]);
+        config(['app.key' => 'base64:'.base64_encode(random_bytes(32))]);
         config(['jwt.secret' => Str::random(32)]);
 
         $this->consumer = User::factory()->create(['role' => 'consumer']);
@@ -42,7 +44,8 @@ class SearchControllerTest extends TestCase
     protected function actingAsJwt(User $user): array
     {
         $token = JWTAuth::fromUser($user);
-        return ['Authorization' => 'Bearer ' . $token];
+
+        return ['Authorization' => 'Bearer '.$token];
     }
 
     // ==================== SEARCH INDEX TESTS ====================

@@ -2,15 +2,15 @@
 
 namespace Tests\Feature;
 
-use Tests\TestCase;
-use App\Models\User;
+use App\Models\Category;
 use App\Models\Merchant;
 use App\Models\Product;
-use App\Models\Review;
 use App\Models\Reservation;
-use App\Models\Category;
+use App\Models\Review;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
+use Tests\TestCase;
 use Tymon\JWTAuth\Facades\JWTAuth;
 
 class ReviewControllerTest extends TestCase
@@ -18,10 +18,15 @@ class ReviewControllerTest extends TestCase
     use RefreshDatabase;
 
     protected $consumer;
+
     protected $merchant;
+
     protected $merchantModel;
+
     protected $category;
+
     protected $product;
+
     protected $otherConsumer;
 
     protected function setUp(): void
@@ -93,7 +98,7 @@ class ReviewControllerTest extends TestCase
     {
         $token = JWTAuth::fromUser($this->consumer);
 
-        $response = $this->withHeader('Authorization', 'Bearer ' . $token)
+        $response = $this->withHeader('Authorization', 'Bearer '.$token)
             ->postJson('/api/reviews', [
                 'merchant_id' => $this->merchantModel->id,
                 'rating' => 5,
@@ -131,7 +136,7 @@ class ReviewControllerTest extends TestCase
     {
         $token = JWTAuth::fromUser($this->consumer);
 
-        $response = $this->withHeader('Authorization', 'Bearer ' . $token)
+        $response = $this->withHeader('Authorization', 'Bearer '.$token)
             ->postJson('/api/reviews', [
                 'merchant_id' => $this->merchantModel->id,
                 'product_id' => $this->product->id,
@@ -164,14 +169,14 @@ class ReviewControllerTest extends TestCase
             'total_amount' => 2.00,
             'status' => 'completed',
             'payment_status' => 'pending',
-            'reservation_code' => 'RES' . strtoupper(uniqid()),
+            'reservation_code' => 'RES'.strtoupper(uniqid()),
             'created_at' => now(),
             'updated_at' => now(),
         ]);
 
         $token = JWTAuth::fromUser($this->consumer);
 
-        $response = $this->withHeader('Authorization', 'Bearer ' . $token)
+        $response = $this->withHeader('Authorization', 'Bearer '.$token)
             ->postJson('/api/reviews', [
                 'merchant_id' => $this->merchantModel->id,
                 'product_id' => $this->product->id,
@@ -199,7 +204,7 @@ class ReviewControllerTest extends TestCase
 
         $token = JWTAuth::fromUser($this->consumer);
 
-        $response = $this->withHeader('Authorization', 'Bearer ' . $token)
+        $response = $this->withHeader('Authorization', 'Bearer '.$token)
             ->postJson('/api/reviews', [
                 'merchant_id' => $this->merchantModel->id,
                 'rating' => 4,
@@ -230,7 +235,7 @@ class ReviewControllerTest extends TestCase
         $token = JWTAuth::fromUser($this->consumer);
 
         // Missing merchant_id
-        $response = $this->withHeader('Authorization', 'Bearer ' . $token)
+        $response = $this->withHeader('Authorization', 'Bearer '.$token)
             ->postJson('/api/reviews', [
                 'rating' => 5,
             ]);
@@ -243,7 +248,7 @@ class ReviewControllerTest extends TestCase
             ->assertJsonValidationErrors(['merchant_id']);
 
         // Missing rating
-        $response = $this->withHeader('Authorization', 'Bearer ' . $token)
+        $response = $this->withHeader('Authorization', 'Bearer '.$token)
             ->postJson('/api/reviews', [
                 'merchant_id' => $this->merchantModel->id,
             ]);
@@ -257,7 +262,7 @@ class ReviewControllerTest extends TestCase
     {
         $token = JWTAuth::fromUser($this->consumer);
 
-        $response = $this->withHeader('Authorization', 'Bearer ' . $token)
+        $response = $this->withHeader('Authorization', 'Bearer '.$token)
             ->postJson('/api/reviews', [
                 'merchant_id' => $this->merchantModel->id,
                 'rating' => 5,
@@ -279,7 +284,7 @@ class ReviewControllerTest extends TestCase
         $token = JWTAuth::fromUser($this->consumer);
 
         // Rating too low
-        $response = $this->withHeader('Authorization', 'Bearer ' . $token)
+        $response = $this->withHeader('Authorization', 'Bearer '.$token)
             ->postJson('/api/reviews', [
                 'merchant_id' => $this->merchantModel->id,
                 'rating' => 0,
@@ -289,7 +294,7 @@ class ReviewControllerTest extends TestCase
             ->assertJsonValidationErrors(['rating']);
 
         // Rating too high
-        $response = $this->withHeader('Authorization', 'Bearer ' . $token)
+        $response = $this->withHeader('Authorization', 'Bearer '.$token)
             ->postJson('/api/reviews', [
                 'merchant_id' => $this->merchantModel->id,
                 'rating' => 6,
@@ -332,7 +337,7 @@ class ReviewControllerTest extends TestCase
             'is_approved' => false,
         ]);
 
-        $response = $this->getJson('/api/reviews?merchant_id=' . $this->merchantModel->id);
+        $response = $this->getJson('/api/reviews?merchant_id='.$this->merchantModel->id);
 
         $response->assertStatus(200)
             ->assertJson([
@@ -386,7 +391,7 @@ class ReviewControllerTest extends TestCase
             'approved_at' => now(),
         ]);
 
-        $response = $this->getJson('/api/reviews?merchant_id=' . $this->merchantModel->id . '&rating=5');
+        $response = $this->getJson('/api/reviews?merchant_id='.$this->merchantModel->id.'&rating=5');
 
         $response->assertStatus(200);
 
@@ -427,7 +432,7 @@ class ReviewControllerTest extends TestCase
             'approved_at' => now(),
         ]);
 
-        $response = $this->getJson('/api/reviews/stats?merchant_id=' . $this->merchantModel->id);
+        $response = $this->getJson('/api/reviews/stats?merchant_id='.$this->merchantModel->id);
 
         $response->assertStatus(200)
             ->assertJson([
@@ -467,7 +472,7 @@ class ReviewControllerTest extends TestCase
 
         $token = JWTAuth::fromUser($this->consumer);
 
-        $response = $this->withHeader('Authorization', 'Bearer ' . $token)
+        $response = $this->withHeader('Authorization', 'Bearer '.$token)
             ->putJson("/api/reviews/{$review->id}", [
                 'rating' => 5,
                 'title' => 'Excellent',
@@ -501,7 +506,7 @@ class ReviewControllerTest extends TestCase
 
         $token = JWTAuth::fromUser($this->otherConsumer);
 
-        $response = $this->withHeader('Authorization', 'Bearer ' . $token)
+        $response = $this->withHeader('Authorization', 'Bearer '.$token)
             ->putJson("/api/reviews/{$review->id}", [
                 'rating' => 5,
                 'comment' => 'Tentative de modification',
@@ -531,7 +536,7 @@ class ReviewControllerTest extends TestCase
 
         $token = JWTAuth::fromUser($this->consumer);
 
-        $response = $this->withHeader('Authorization', 'Bearer ' . $token)
+        $response = $this->withHeader('Authorization', 'Bearer '.$token)
             ->putJson("/api/reviews/{$review->id}", [
                 'rating' => 5,
                 'comment' => 'Tentative de modification',
@@ -557,7 +562,7 @@ class ReviewControllerTest extends TestCase
 
         $token = JWTAuth::fromUser($this->consumer);
 
-        $response = $this->withHeader('Authorization', 'Bearer ' . $token)
+        $response = $this->withHeader('Authorization', 'Bearer '.$token)
             ->deleteJson("/api/reviews/{$review->id}");
 
         $response->assertStatus(200)
@@ -584,7 +589,7 @@ class ReviewControllerTest extends TestCase
 
         $token = JWTAuth::fromUser($this->otherConsumer);
 
-        $response = $this->withHeader('Authorization', 'Bearer ' . $token)
+        $response = $this->withHeader('Authorization', 'Bearer '.$token)
             ->deleteJson("/api/reviews/{$review->id}");
 
         $response->assertStatus(403)
@@ -613,7 +618,7 @@ class ReviewControllerTest extends TestCase
 
         $token = JWTAuth::fromUser($this->consumer);
 
-        $response = $this->withHeader('Authorization', 'Bearer ' . $token)
+        $response = $this->withHeader('Authorization', 'Bearer '.$token)
             ->getJson("/api/reviews/{$review->id}");
 
         $response->assertStatus(200)
@@ -641,7 +646,7 @@ class ReviewControllerTest extends TestCase
 
         $token = JWTAuth::fromUser($this->otherConsumer);
 
-        $response = $this->withHeader('Authorization', 'Bearer ' . $token)
+        $response = $this->withHeader('Authorization', 'Bearer '.$token)
             ->getJson("/api/reviews/{$review->id}");
 
         $response->assertStatus(403)

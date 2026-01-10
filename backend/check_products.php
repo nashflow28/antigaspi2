@@ -5,9 +5,9 @@ require_once 'vendor/autoload.php';
 $app = require_once 'bootstrap/app.php';
 $app->make('Illuminate\Contracts\Console\Kernel')->bootstrap();
 
+use App\Models\Merchant;
 use App\Models\Product;
 use App\Models\User;
-use App\Models\Merchant;
 
 $email = 'boulangerie.martin@email.com';
 
@@ -15,7 +15,7 @@ echo "=== Vérification des produits ===\n";
 
 // Trouver l'utilisateur boulangerie martin
 $user = User::where('email', $email)->first();
-if (!$user) {
+if (! $user) {
     echo "❌ Utilisateur boulangerie.martin non trouvé\n";
     exit;
 }
@@ -24,7 +24,7 @@ echo "✅ Utilisateur trouvé: {$user->name} (ID: {$user->id})\n";
 
 // Trouver le merchant
 $merchant = Merchant::where('user_id', $user->id)->first();
-if (!$merchant) {
+if (! $merchant) {
     echo "❌ Profil commerçant non trouvé\n";
     exit;
 }
@@ -37,7 +37,7 @@ $products = Product::where('merchant_id', $merchant->id)
     ->get();
 
 echo "\n=== Produits du commerçant ===\n";
-echo "Nombre total: " . $products->count() . "\n\n";
+echo 'Nombre total: '.$products->count()."\n\n";
 
 foreach ($products as $product) {
     echo "ID: {$product->id}\n";
@@ -61,7 +61,7 @@ if ($senabolo && $senabolo->role === 'merchant') {
             ->get();
 
         echo "\n=== Produits de Senabolo (ID: {$senaboloMerchant->id}) ===\n";
-        echo "Nombre total: " . $senaboloProducts->count() . "\n\n";
+        echo 'Nombre total: '.$senaboloProducts->count()."\n\n";
 
         foreach ($senaboloProducts as $product) {
             echo "ID: {$product->id} - {$product->name} - Créé le: {$product->created_at}\n";

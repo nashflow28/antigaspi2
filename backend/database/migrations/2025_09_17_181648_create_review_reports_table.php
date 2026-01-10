@@ -22,7 +22,7 @@ return new class extends Migration
                 'offensive_language',
                 'harassment',
                 'copyright_violation',
-                'other'
+                'other',
             ]);
             $table->text('description')->nullable();
             $table->enum('status', ['pending', 'reviewed', 'resolved', 'dismissed'])->default('pending');

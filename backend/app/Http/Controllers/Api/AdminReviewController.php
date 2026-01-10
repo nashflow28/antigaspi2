@@ -6,11 +6,11 @@ use App\Http\Controllers\Controller;
 use App\Models\Review;
 use App\Models\ReviewReport;
 use App\Models\User;
-use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Facades\Validator;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
 
 class AdminReviewController extends Controller
 {
@@ -25,7 +25,7 @@ class AdminReviewController extends Controller
         if ($user->role !== 'admin') {
             return response()->json([
                 'success' => false,
-                'message' => 'Accès réservé aux administrateurs'
+                'message' => 'Accès réservé aux administrateurs',
             ], 403);
         }
 
@@ -35,8 +35,8 @@ class AdminReviewController extends Controller
 
         try {
             $query = Review::with(['user:id,first_name,last_name', 'product:id,name', 'merchant.user:id,first_name,last_name'])
-                          ->where('is_approved', false)
-                          ->recent();
+                ->where('is_approved', false)
+                ->recent();
 
             $reviews = $query->paginate($request->per_page ?? 15);
 
@@ -51,13 +51,13 @@ class AdminReviewController extends Controller
                     'is_verified_purchase' => $review->is_verified_purchase,
                     'user' => [
                         'id' => $review->user->id,
-                        'name' => $review->user->first_name . ' ' . $review->user->last_name,
+                        'name' => $review->user->first_name.' '.$review->user->last_name,
                         'email' => $review->user->email,
                     ],
                     'merchant' => [
                         'id' => $review->merchant->id,
                         'business_name' => $review->merchant->business_name,
-                        'owner_name' => $review->merchant->user->first_name . ' ' . $review->merchant->user->last_name,
+                        'owner_name' => $review->merchant->user->first_name.' '.$review->merchant->user->last_name,
                     ],
                     'product' => $review->product ? [
                         'id' => $review->product->id,
@@ -76,14 +76,14 @@ class AdminReviewController extends Controller
                     'last_page' => $reviews->lastPage(),
                     'per_page' => $reviews->perPage(),
                     'total' => $reviews->total(),
-                ]
+                ],
             ]);
 
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur lors du chargement des avis en attente',
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ], 500);
         }
     }
@@ -99,7 +99,7 @@ class AdminReviewController extends Controller
         if ($user->role !== 'admin') {
             return response()->json([
                 'success' => false,
-                'message' => 'Accès réservé aux administrateurs'
+                'message' => 'Accès réservé aux administrateurs',
             ], 403);
         }
 
@@ -116,14 +116,14 @@ class AdminReviewController extends Controller
                     'id' => $review->id,
                     'is_approved' => $review->is_approved,
                     'approved_at' => $review->approved_at->toISOString(),
-                ]
+                ],
             ]);
 
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur lors de l\'approbation de l\'avis',
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ], 500);
         }
     }
@@ -139,7 +139,7 @@ class AdminReviewController extends Controller
         if ($user->role !== 'admin') {
             return response()->json([
                 'success' => false,
-                'message' => 'Accès réservé aux administrateurs'
+                'message' => 'Accès réservé aux administrateurs',
             ], 403);
         }
 
@@ -151,7 +151,7 @@ class AdminReviewController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Données invalides',
-                'errors' => $validator->errors()
+                'errors' => $validator->errors(),
             ], 422);
         }
 
@@ -161,14 +161,14 @@ class AdminReviewController extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => 'Avis rejeté et supprimé avec succès'
+                'message' => 'Avis rejeté et supprimé avec succès',
             ]);
 
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur lors du rejet de l\'avis',
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ], 500);
         }
     }
@@ -184,7 +184,7 @@ class AdminReviewController extends Controller
         if ($user->role !== 'admin') {
             return response()->json([
                 'success' => false,
-                'message' => 'Accès réservé aux administrateurs'
+                'message' => 'Accès réservé aux administrateurs',
             ], 403);
         }
 
@@ -200,7 +200,7 @@ class AdminReviewController extends Controller
                     $query->with(['user:id,first_name,last_name', 'product:id,name', 'merchant.user:id,first_name,last_name']);
                 },
                 'reporter:id,first_name,last_name,email',
-                'reviewer:id,first_name,last_name'
+                'reviewer:id,first_name,last_name',
             ])->recent();
 
             // Apply filters
@@ -233,7 +233,7 @@ class AdminReviewController extends Controller
                         'is_verified_purchase' => $report->review->is_verified_purchase,
                         'user' => [
                             'id' => $report->review->user->id,
-                            'name' => $report->review->user->first_name . ' ' . $report->review->user->last_name,
+                            'name' => $report->review->user->first_name.' '.$report->review->user->last_name,
                         ],
                         'merchant' => [
                             'id' => $report->review->merchant->id,
@@ -246,12 +246,12 @@ class AdminReviewController extends Controller
                     ],
                     'reporter' => [
                         'id' => $report->reporter->id,
-                        'name' => $report->reporter->first_name . ' ' . $report->reporter->last_name,
+                        'name' => $report->reporter->first_name.' '.$report->reporter->last_name,
                         'email' => $report->reporter->email,
                     ],
                     'reviewer' => $report->reviewer ? [
                         'id' => $report->reviewer->id,
-                        'name' => $report->reviewer->first_name . ' ' . $report->reviewer->last_name,
+                        'name' => $report->reviewer->first_name.' '.$report->reviewer->last_name,
                     ] : null,
                     'created_at' => $report->created_at->toISOString(),
                     'reviewed_at' => $report->reviewed_at ? $report->reviewed_at->toISOString() : null,
@@ -270,14 +270,14 @@ class AdminReviewController extends Controller
                 'filters' => [
                     'status' => $request->status,
                     'reason' => $request->reason,
-                ]
+                ],
             ]);
 
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur lors du chargement des signalements',
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ], 500);
         }
     }
@@ -298,20 +298,20 @@ class AdminReviewController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Données invalides',
-                'errors' => $validator->errors()
+                'errors' => $validator->errors(),
             ], 422);
         }
 
         try {
             // Check if user already reported this review
             $existingReport = ReviewReport::where('review_id', $review->id)
-                                         ->where('reported_by', $user->id)
-                                         ->first();
+                ->where('reported_by', $user->id)
+                ->first();
 
             if ($existingReport) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Vous avez déjà signalé cet avis'
+                    'message' => 'Vous avez déjà signalé cet avis',
                 ], 409);
             }
 
@@ -331,14 +331,14 @@ class AdminReviewController extends Controller
                     'reason_label' => $report->reason_label,
                     'status' => $report->status,
                     'created_at' => $report->created_at->toISOString(),
-                ]
+                ],
             ], 201);
 
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur lors du signalement',
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ], 500);
         }
     }
@@ -354,7 +354,7 @@ class AdminReviewController extends Controller
         if ($user->role !== 'admin') {
             return response()->json([
                 'success' => false,
-                'message' => 'Accès réservé aux administrateurs'
+                'message' => 'Accès réservé aux administrateurs',
             ], 403);
         }
 
@@ -367,7 +367,7 @@ class AdminReviewController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Données invalides',
-                'errors' => $validator->errors()
+                'errors' => $validator->errors(),
             ], 422);
         }
 
@@ -407,15 +407,16 @@ class AdminReviewController extends Controller
                     'status' => $report->status,
                     'admin_notes' => $report->admin_notes,
                     'reviewed_at' => $report->reviewed_at->toISOString(),
-                ]
+                ],
             ]);
 
         } catch (\Exception $e) {
             DB::rollBack();
+
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur lors de la résolution du signalement',
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ], 500);
         }
     }
@@ -431,7 +432,7 @@ class AdminReviewController extends Controller
         if ($user->role !== 'admin') {
             return response()->json([
                 'success' => false,
-                'message' => 'Accès réservé aux administrateurs'
+                'message' => 'Accès réservé aux administrateurs',
             ], 403);
         }
 
@@ -447,34 +448,35 @@ class AdminReviewController extends Controller
 
             // Report reasons distribution
             $reportReasons = ReviewReport::selectRaw('reason, COUNT(*) as count')
-                                       ->groupBy('reason')
-                                       ->get()
-                                       ->mapWithKeys(function ($item) {
-                                           $reasons = [
-                                               'inappropriate_content' => 'Contenu inapproprié',
-                                               'spam' => 'Spam',
-                                               'fake_review' => 'Faux avis',
-                                               'offensive_language' => 'Langage offensant',
-                                               'harassment' => 'Harcèlement',
-                                               'copyright_violation' => 'Violation de droits d\'auteur',
-                                               'other' => 'Autre'
-                                           ];
-                                           return [$reasons[$item->reason] ?? $item->reason => $item->count];
-                                       });
+                ->groupBy('reason')
+                ->get()
+                ->mapWithKeys(function ($item) {
+                    $reasons = [
+                        'inappropriate_content' => 'Contenu inapproprié',
+                        'spam' => 'Spam',
+                        'fake_review' => 'Faux avis',
+                        'offensive_language' => 'Langage offensant',
+                        'harassment' => 'Harcèlement',
+                        'copyright_violation' => 'Violation de droits d\'auteur',
+                        'other' => 'Autre',
+                    ];
+
+                    return [$reasons[$item->reason] ?? $item->reason => $item->count];
+                });
 
             return response()->json([
                 'success' => true,
                 'data' => [
                     'stats' => $stats,
                     'report_reasons' => $reportReasons,
-                ]
+                ],
             ]);
 
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur lors du chargement des statistiques',
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ], 500);
         }
     }

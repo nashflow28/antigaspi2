@@ -25,10 +25,10 @@ class ConsumerController extends Controller
         try {
             $user = JWTAuth::parseToken()->authenticate();
 
-            if (!$user || !$user->isConsumer()) {
+            if (! $user || ! $user->isConsumer()) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Accès non autorisé. Compte consommateur requis.'
+                    'message' => 'Accès non autorisé. Compte consommateur requis.',
                 ], 403);
             }
 
@@ -121,10 +121,10 @@ class ConsumerController extends Controller
         try {
             $user = JWTAuth::parseToken()->authenticate();
 
-            if (!$user || !$user->isConsumer()) {
+            if (! $user || ! $user->isConsumer()) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Accès non autorisé. Compte consommateur requis.'
+                    'message' => 'Accès non autorisé. Compte consommateur requis.',
                 ], 403);
             }
 
@@ -152,7 +152,7 @@ class ConsumerController extends Controller
             if (empty($mimeType)) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Impossible de déterminer le type du fichier. Fichier corrompu ?'
+                    'message' => 'Impossible de déterminer le type du fichier. Fichier corrompu ?',
                 ], 422);
             }
 
@@ -161,7 +161,7 @@ class ConsumerController extends Controller
                 'image/png' => ['png'],
             ];
 
-            if (!array_key_exists($mimeType, $allowedMimeTypes)) {
+            if (! array_key_exists($mimeType, $allowedMimeTypes)) {
                 return response()->json([
                     'success' => false,
                     'message' => 'Type de fichier non autorisé. Formats acceptés : JPEG, PNG',
@@ -170,7 +170,7 @@ class ConsumerController extends Controller
             }
 
             $extension = $allowedMimeTypes[$mimeType][0];
-            $filename = Str::random(40) . '.' . $extension;
+            $filename = Str::random(40).'.'.$extension;
 
             $oldPhotoPath = null;
             if ($user->photo_url) {
@@ -194,7 +194,7 @@ class ConsumerController extends Controller
             try {
                 $path = $photo->storeAs('consumers', $filename, 'public');
                 $uploadedPath = $path;
-                $photoUrl = '/storage/' . $path;
+                $photoUrl = '/storage/'.$path;
 
                 $user->update(['photo_url' => $photoUrl]);
 

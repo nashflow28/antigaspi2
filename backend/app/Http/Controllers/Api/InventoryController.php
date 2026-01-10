@@ -20,7 +20,7 @@ class InventoryController extends Controller
     {
         $user = JWTAuth::parseToken()->authenticate();
 
-        if (!$user->isMerchant() || !$user->merchant) {
+        if (! $user->isMerchant() || ! $user->merchant) {
             return response()->json([
                 'success' => false,
                 'message' => 'Accès réservé aux commerçants',
@@ -83,7 +83,7 @@ class InventoryController extends Controller
     {
         $user = JWTAuth::parseToken()->authenticate();
 
-        if (!$user->isMerchant() || !$user->merchant) {
+        if (! $user->isMerchant() || ! $user->merchant) {
             return response()->json([
                 'success' => false,
                 'message' => 'Accès réservé aux commerçants',
@@ -102,19 +102,19 @@ class InventoryController extends Controller
             ->where('merchant_id', $user->merchant->id)
             ->orderByDesc('created_at');
 
-        if (!empty($validated['product_id'])) {
+        if (! empty($validated['product_id'])) {
             $query->where('product_id', $validated['product_id']);
         }
 
-        if (!empty($validated['type'])) {
+        if (! empty($validated['type'])) {
             $query->where('movement_type', $validated['type']);
         }
 
-        if (!empty($validated['from'])) {
+        if (! empty($validated['from'])) {
             $query->whereDate('created_at', '>=', $validated['from']);
         }
 
-        if (!empty($validated['to'])) {
+        if (! empty($validated['to'])) {
             $query->whereDate('created_at', '<=', $validated['to']);
         }
 
@@ -151,7 +151,7 @@ class InventoryController extends Controller
     {
         $user = JWTAuth::parseToken()->authenticate();
 
-        if (!$user->isMerchant() || !$user->merchant) {
+        if (! $user->isMerchant() || ! $user->merchant) {
             return response()->json([
                 'success' => false,
                 'message' => 'Accès réservé aux commerçants',
@@ -180,7 +180,7 @@ class InventoryController extends Controller
                 ->lockForUpdate()
                 ->first();
 
-            if (!$product) {
+            if (! $product) {
                 throw ValidationException::withMessages([
                     'product_id' => __('Produit introuvable pour ce commerçant.'),
                 ]);
@@ -284,7 +284,7 @@ class InventoryController extends Controller
 
         $merchant = $product->merchant;
 
-        if (!$merchant || !$merchant->user) {
+        if (! $merchant || ! $merchant->user) {
             return;
         }
 

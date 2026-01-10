@@ -2,14 +2,14 @@
 
 namespace Tests\Feature;
 
-use App\Models\User;
-use App\Models\Merchant;
-use App\Models\Product;
-use App\Models\Category;
-use App\Models\Reservation;
-use App\Models\Payment;
-use App\Enums\PaymentStatus;
 use App\Enums\PaymentMethod;
+use App\Enums\PaymentStatus;
+use App\Models\Category;
+use App\Models\Merchant;
+use App\Models\Payment;
+use App\Models\Product;
+use App\Models\Reservation;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 use Tymon\JWTAuth\Facades\JWTAuth;
@@ -41,7 +41,7 @@ class AdminPaymentDashboardTest extends TestCase
         ]);
 
         $token = JWTAuth::fromUser($admin);
-        $this->withHeader('Authorization', 'Bearer ' . $token);
+        $this->withHeader('Authorization', 'Bearer '.$token);
     }
 
     protected function createPaymentTestData(): array
@@ -176,7 +176,7 @@ class AdminPaymentDashboardTest extends TestCase
         ]);
 
         $token = JWTAuth::fromUser($consumer);
-        $this->withHeader('Authorization', 'Bearer ' . $token);
+        $this->withHeader('Authorization', 'Bearer '.$token);
 
         $response = $this->getJson('/api/admin/payments');
 
@@ -209,7 +209,7 @@ class AdminPaymentDashboardTest extends TestCase
                         'customer' => ['id', 'name', 'email', 'phone'],
                         'merchant' => ['id', 'business_name', 'business_type', 'email'],
                         'reservation_id',
-                    ]
+                    ],
                 ],
                 'summary' => [
                     'total_payments',

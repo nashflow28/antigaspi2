@@ -161,7 +161,7 @@ class TypesenseSearchableTest extends TestCase
         ], $page2->pluck('name', 'id')->all());
     }
 
-    public function test_it_can_usePaginatedSearchWithEmptyQueryCallback()
+    public function test_it_can_use_paginated_search_with_empty_query_callback()
     {
         $res = $this->itCanUsePaginatedSearchWithEmptyQueryCallback();
 

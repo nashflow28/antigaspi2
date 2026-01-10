@@ -28,9 +28,6 @@ class Algolia4Engine extends AlgoliaEngine
     /**
      * Make a new engine instance.
      *
-     * @param  array  $config
-     * @param  array  $headers
-     * @param  bool  $softDelete
      * @return static
      */
     public static function make(array $config, array $headers, bool $softDelete = false)
@@ -141,8 +138,6 @@ class Algolia4Engine extends AlgoliaEngine
     /**
      * Perform the given search on the engine.
      *
-     * @param  \Laravel\Scout\Builder  $builder
-     * @param  array  $options
      * @return mixed
      */
     protected function performSearch(Builder $builder, array $options = [])

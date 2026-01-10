@@ -6,10 +6,10 @@ use App\Http\Controllers\Controller;
 use App\Models\LoyaltyPoint;
 use App\Models\User;
 use App\Services\LoyaltyTierService;
-use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Facades\Validator;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
 
 class LoyaltyPointController extends Controller
 {
@@ -64,13 +64,13 @@ class LoyaltyPointController extends Controller
                     'breakdown' => $pointsBreakdown,
                     'recent_history' => $recentHistory,
                     'tier' => $tierInfo,
-                ]
+                ],
             ]);
 
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Erreur lors de la récupération des points'
+                'message' => 'Erreur lors de la récupération des points',
             ], 500);
         }
     }
@@ -91,7 +91,7 @@ class LoyaltyPointController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Erreur lors de la récupération des informations de niveau'
+                'message' => 'Erreur lors de la récupération des informations de niveau',
             ], 500);
         }
     }
@@ -107,14 +107,14 @@ class LoyaltyPointController extends Controller
             'earned_from' => 'required|in:purchase,review,referral,bonus',
             'reference_id' => 'nullable|integer',
             'description' => 'required|string|max:255',
-            'expires_at' => 'nullable|date|after:now'
+            'expires_at' => 'nullable|date|after:now',
         ]);
 
         if ($validator->fails()) {
             return response()->json([
                 'success' => false,
                 'message' => 'Données invalides',
-                'errors' => $validator->errors()
+                'errors' => $validator->errors(),
             ], 422);
         }
 
@@ -131,13 +131,13 @@ class LoyaltyPointController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => 'Points attribués avec succès',
-                'data' => $loyaltyPoint
+                'data' => $loyaltyPoint,
             ], 201);
 
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Erreur lors de l\'attribution des points'
+                'message' => 'Erreur lors de l\'attribution des points',
             ], 500);
         }
     }
@@ -149,14 +149,14 @@ class LoyaltyPointController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'points' => 'required|integer|min:1',
-            'description' => 'required|string|max:255'
+            'description' => 'required|string|max:255',
         ]);
 
         if ($validator->fails()) {
             return response()->json([
                 'success' => false,
                 'message' => 'Données invalides',
-                'errors' => $validator->errors()
+                'errors' => $validator->errors(),
             ], 422);
         }
 
@@ -171,7 +171,7 @@ class LoyaltyPointController extends Controller
             if ($totalPoints < $request->points) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Points insuffisants'
+                    'message' => 'Points insuffisants',
                 ], 400);
             }
 
@@ -189,14 +189,14 @@ class LoyaltyPointController extends Controller
                 'data' => [
                     'redeemed_points' => $request->points,
                     'remaining_points' => $totalPoints - $request->points,
-                    'redemption' => $redemption
-                ]
+                    'redemption' => $redemption,
+                ],
             ]);
 
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Erreur lors de l\'échange des points'
+                'message' => 'Erreur lors de l\'échange des points',
             ], 500);
         }
     }
@@ -207,33 +207,34 @@ class LoyaltyPointController extends Controller
     public function getAllUsersPoints(Request $request): JsonResponse
     {
         try {
-            $users = User::with(['loyaltyPoints' => function($query) {
+            $users = User::with(['loyaltyPoints' => function ($query) {
                 $query->active();
             }])
-            ->where('role', 'consumer')
-            ->get()
-            ->map(function ($user) {
-                $totalPoints = $user->loyaltyPoints->sum('points');
-                return [
-                    'id' => $user->id,
-                    'name' => $user->name,
-                    'email' => $user->email,
-                    'total_points' => $totalPoints,
-                    'last_activity' => $user->loyaltyPoints->max('created_at')
-                ];
-            })
-            ->sortByDesc('total_points')
-            ->values();
+                ->where('role', 'consumer')
+                ->get()
+                ->map(function ($user) {
+                    $totalPoints = $user->loyaltyPoints->sum('points');
+
+                    return [
+                        'id' => $user->id,
+                        'name' => $user->name,
+                        'email' => $user->email,
+                        'total_points' => $totalPoints,
+                        'last_activity' => $user->loyaltyPoints->max('created_at'),
+                    ];
+                })
+                ->sortByDesc('total_points')
+                ->values();
 
             return response()->json([
                 'success' => true,
-                'data' => $users
+                'data' => $users,
             ]);
 
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Erreur lors de la récupération des points'
+                'message' => 'Erreur lors de la récupération des points',
             ], 500);
         }
     }
@@ -246,18 +247,18 @@ class LoyaltyPointController extends Controller
         try {
             $user = $request->user();
 
-            if (!$user || $user->role !== 'merchant') {
+            if (! $user || $user->role !== 'merchant') {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Accès réservé aux commerçants'
+                    'message' => 'Accès réservé aux commerçants',
                 ], 403);
             }
 
             $merchant = $user->merchant;
-            if (!$merchant) {
+            if (! $merchant) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Profil commerçant non trouvé'
+                    'message' => 'Profil commerçant non trouvé',
                 ], 404);
             }
 
@@ -285,27 +286,28 @@ class LoyaltyPointController extends Controller
 
             // Number of customers with points
             $customersWithPoints = User::whereIn('id', $customerIds)
-                ->whereHas('loyaltyPoints', function($query) {
+                ->whereHas('loyaltyPoints', function ($query) {
                     $query->where('points', '>', 0);
                 })
                 ->count();
 
             // Top 5 loyal customers
             $topCustomers = User::whereIn('id', $customerIds)
-                ->with(['loyaltyPoints' => function($query) {
+                ->with(['loyaltyPoints' => function ($query) {
                     $query->active();
                 }])
                 ->get()
                 ->map(function ($user) {
                     $totalPoints = $user->loyaltyPoints->sum('points');
+
                     return [
                         'id' => $user->id,
-                        'name' => $user->name ?: trim($user->first_name . ' ' . $user->last_name),
+                        'name' => $user->name ?: trim($user->first_name.' '.$user->last_name),
                         'email' => $user->email,
                         'total_points' => $totalPoints,
                     ];
                 })
-                ->filter(function($customer) {
+                ->filter(function ($customer) {
                     return $customer['total_points'] > 0;
                 })
                 ->sortByDesc('total_points')
@@ -319,14 +321,14 @@ class LoyaltyPointController extends Controller
                     'monthly_points_distributed' => (int) $monthlyPoints,
                     'customers_with_points' => $customersWithPoints,
                     'top_customers' => $topCustomers,
-                ]
+                ],
             ]);
 
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur lors de la récupération des statistiques',
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ], 500);
         }
     }
@@ -340,39 +342,40 @@ class LoyaltyPointController extends Controller
             $merchant = $request->user();
 
             // Get all customers who have made reservations with this merchant
-            $customers = User::with(['loyaltyPoints' => function($query) {
+            $customers = User::with(['loyaltyPoints' => function ($query) {
                 $query->active();
             }])
-            ->where('role', 'consumer')
-            ->whereHas('reservations', function($query) use ($merchant) {
-                $query->whereHas('product', function($productQuery) use ($merchant) {
-                    $productQuery->where('merchant_id', $merchant->id);
-                });
-            })
-            ->get()
-            ->map(function ($user) {
-                $totalPoints = $user->loyaltyPoints->sum('points');
-                $name = $user->name ?: trim($user->first_name . ' ' . $user->last_name);
-                return [
-                    'id' => $user->id,
-                    'name' => $name ?: 'Utilisateur #' . $user->id,
-                    'email' => $user->email,
-                    'total_points' => $totalPoints,
-                    'last_activity' => $user->loyaltyPoints->max('created_at')
-                ];
-            })
-            ->sortByDesc('total_points')
-            ->values();
+                ->where('role', 'consumer')
+                ->whereHas('reservations', function ($query) use ($merchant) {
+                    $query->whereHas('product', function ($productQuery) use ($merchant) {
+                        $productQuery->where('merchant_id', $merchant->id);
+                    });
+                })
+                ->get()
+                ->map(function ($user) {
+                    $totalPoints = $user->loyaltyPoints->sum('points');
+                    $name = $user->name ?: trim($user->first_name.' '.$user->last_name);
+
+                    return [
+                        'id' => $user->id,
+                        'name' => $name ?: 'Utilisateur #'.$user->id,
+                        'email' => $user->email,
+                        'total_points' => $totalPoints,
+                        'last_activity' => $user->loyaltyPoints->max('created_at'),
+                    ];
+                })
+                ->sortByDesc('total_points')
+                ->values();
 
             return response()->json([
                 'success' => true,
-                'data' => $customers
+                'data' => $customers,
             ]);
 
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Erreur lors de la récupération des clients'
+                'message' => 'Erreur lors de la récupération des clients',
             ], 500);
         }
     }
@@ -383,7 +386,9 @@ class LoyaltyPointController extends Controller
     public function awardPurchasePoints($userId, $reservationId, $amount): void
     {
         $user = User::find($userId);
-        if (!$user) return;
+        if (! $user) {
+            return;
+        }
 
         // Award 1 point per 100 XOF spent (configurable)
         $basePoints = intval($amount / 100);
@@ -454,7 +459,7 @@ class LoyaltyPointController extends Controller
                 'success' => true,
                 'data' => [
                     'referral_code' => $user->referral_code,
-                    'referral_link' => config('app.frontend_url', 'https://antigaspi.jubtek.com') . '/register?ref=' . $user->referral_code,
+                    'referral_link' => config('app.frontend_url', 'https://antigaspi.jubtek.com').'/register?ref='.$user->referral_code,
                     'total_referrals' => $totalReferrals,
                     'successful_referrals' => $successfulReferrals,
                     'points_earned' => (int) $referralPoints,
@@ -465,7 +470,7 @@ class LoyaltyPointController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur lors de la récupération des informations de parrainage',
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ], 500);
         }
     }
@@ -483,7 +488,7 @@ class LoyaltyPointController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Code de parrainage invalide',
-                'errors' => $validator->errors()
+                'errors' => $validator->errors(),
             ], 422);
         }
 
@@ -491,11 +496,11 @@ class LoyaltyPointController extends Controller
             ->where('is_active', true)
             ->first();
 
-        if (!$referrer) {
+        if (! $referrer) {
             return response()->json([
                 'success' => false,
                 'message' => 'Code de parrainage introuvable ou inactif',
-                'valid' => false
+                'valid' => false,
             ]);
         }
 
@@ -517,7 +522,7 @@ class LoyaltyPointController extends Controller
     {
         $user = User::find($userId);
 
-        if (!$user || !$user->referred_by || $user->referral_bonus_awarded) {
+        if (! $user || ! $user->referred_by || $user->referral_bonus_awarded) {
             return; // No referrer or bonus already awarded
         }
 

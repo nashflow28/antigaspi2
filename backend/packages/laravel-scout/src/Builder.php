@@ -284,7 +284,6 @@ class Builder
     /**
      * Set extra options for the search query.
      *
-     * @param  array  $options
      * @return $this
      */
     public function options(array $options)

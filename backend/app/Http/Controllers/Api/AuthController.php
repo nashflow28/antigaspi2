@@ -3,17 +3,16 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\User;
 use App\Models\Merchant;
 use App\Models\RefreshToken;
+use App\Models\User;
 use App\Services\JwtSecurityService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Support\Facades\Validator;
 use Tymon\JWTAuth\Facades\JWTAuth;
 
 class AuthController extends Controller
@@ -80,7 +79,7 @@ class AuthController extends Controller
                 'nullable',
                 'string',
                 'regex:/^\+\d{1,4}[\s]?[\d\s]{6,15}$/',
-                'max:25'
+                'max:25',
             ],
             'role' => 'required|in:consumer,merchant',
             'city' => 'required|string|max:100',
@@ -96,7 +95,7 @@ class AuthController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Erreurs de validation',
-                'errors' => $validator->errors()
+                'errors' => $validator->errors(),
             ], 422);
         }
 
@@ -138,8 +137,8 @@ class AuthController extends Controller
                     'user' => $this->formatUser($user),
                     'token' => $token,
                     'token_type' => 'Bearer',
-                    'expires_in' => JWTAuth::factory()->getTTL() * 60
-                ]
+                    'expires_in' => JWTAuth::factory()->getTTL() * 60,
+                ],
             ], 201);
 
         } catch (\Illuminate\Database\QueryException $e) {
@@ -149,21 +148,21 @@ class AuthController extends Controller
                     'success' => false,
                     'message' => 'Cette adresse email est déjà utilisée',
                     'errors' => [
-                        'email' => ['Cette adresse email est déjà utilisée.']
-                    ]
+                        'email' => ['Cette adresse email est déjà utilisée.'],
+                    ],
                 ], 422);
             }
 
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur lors de l\'inscription',
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ], 500);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur lors de l\'inscription',
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ], 500);
         }
     }
@@ -179,7 +178,7 @@ class AuthController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Erreurs de validation',
-                'errors' => $validator->errors()
+                'errors' => $validator->errors(),
             ], 422);
         }
 
@@ -189,23 +188,23 @@ class AuthController extends Controller
             // Vérifier si l'utilisateur existe et est actif
             $user = User::where('email', $request->email)->first();
 
-            if (!$user) {
+            if (! $user) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Utilisateur non trouvé'
+                    'message' => 'Utilisateur non trouvé',
                 ], 404);
             }
 
-            if (!$user->is_active) {
+            if (! $user->is_active) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Compte désactivé'
+                    'message' => 'Compte désactivé',
                 ], 403);
             }
 
             // Tenter la connexion
             // 🐛 BUG FIX #26: Log failed login attempts for security monitoring and audit trail
-            if (!$token = JWTAuth::attempt($credentials)) {
+            if (! $token = JWTAuth::attempt($credentials)) {
                 Log::warning('Failed login attempt', [
                     'email' => $request->email,
                     'ip' => $request->ip(),
@@ -215,7 +214,7 @@ class AuthController extends Controller
 
                 return response()->json([
                     'success' => false,
-                    'message' => 'Email ou mot de passe incorrect'
+                    'message' => 'Email ou mot de passe incorrect',
                 ], 401);
             }
 
@@ -228,15 +227,15 @@ class AuthController extends Controller
                     'user' => $this->formatUser($user),
                     'token' => $token,
                     'token_type' => 'Bearer',
-                    'expires_in' => JWTAuth::factory()->getTTL() * 60
-                ]
+                    'expires_in' => JWTAuth::factory()->getTTL() * 60,
+                ],
             ]);
 
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur lors de la connexion',
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ], 500);
         }
     }
@@ -246,23 +245,23 @@ class AuthController extends Controller
         try {
             $user = JWTAuth::parseToken()->authenticate();
 
-            if (!$user) {
+            if (! $user) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Utilisateur non trouvé'
+                    'message' => 'Utilisateur non trouvé',
                 ], 404);
             }
 
             return response()->json([
                 'success' => true,
-                'data' => $this->formatUser($user)
+                'data' => $this->formatUser($user),
             ]);
 
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
                 'message' => 'Token invalide',
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ], 401);
         }
     }
@@ -278,27 +277,27 @@ class AuthController extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => 'Déconnexion réussie'
+                'message' => 'Déconnexion réussie',
             ]);
 
         } catch (\Tymon\JWTAuth\Exceptions\TokenExpiredException $e) {
             // Token already expired, no need to invalidate it
             Log::info('Logout called with expired token', [
-                'ip' => request()->ip()
+                'ip' => request()->ip(),
             ]);
 
             return response()->json([
                 'success' => true,
-                'message' => 'Déconnexion réussie'
+                'message' => 'Déconnexion réussie',
             ]);
 
         } catch (\Exception $e) {
-            Log::error('Logout error: ' . $e->getMessage());
+            Log::error('Logout error: '.$e->getMessage());
 
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur lors de la déconnexion',
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ], 500);
         }
     }
@@ -313,15 +312,15 @@ class AuthController extends Controller
                 'data' => [
                     'token' => $token,
                     'token_type' => 'Bearer',
-                    'expires_in' => JWTAuth::factory()->getTTL() * 60
-                ]
+                    'expires_in' => JWTAuth::factory()->getTTL() * 60,
+                ],
             ]);
 
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur lors du rafraîchissement du token',
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ], 401);
         }
     }
@@ -332,7 +331,7 @@ class AuthController extends Controller
     public function secureLogin(Request $request): JsonResponse
     {
         // Rate limiting par IP
-        $key = 'login_attempts:' . $request->ip();
+        $key = 'login_attempts:'.$request->ip();
         if (RateLimiter::tooManyAttempts($key, 5)) {
             $remainingTime = RateLimiter::availableIn($key);
 
@@ -344,7 +343,7 @@ class AuthController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => "Trop de tentatives. Réessayez dans {$remainingTime} secondes.",
-                'retry_after' => $remainingTime
+                'retry_after' => $remainingTime,
             ], 429);
         }
 
@@ -357,14 +356,14 @@ class AuthController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Données invalides',
-                'errors' => $validator->errors()
+                'errors' => $validator->errors(),
             ], 422);
         }
 
         try {
             $user = User::where('email', $request->email)->first();
 
-            if (!$user || !Hash::check($request->password, $user->password)) {
+            if (! $user || ! Hash::check($request->password, $user->password)) {
                 RateLimiter::hit($key, 300); // 5 minutes
 
                 Log::warning('Failed login attempt', [
@@ -375,7 +374,7 @@ class AuthController extends Controller
 
                 return response()->json([
                     'success' => false,
-                    'message' => 'Identifiants incorrects'
+                    'message' => 'Identifiants incorrects',
                 ], 401);
             }
 
@@ -383,7 +382,7 @@ class AuthController extends Controller
             if ($user->status !== 'active') {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Compte suspendu ou inactif'
+                    'message' => 'Compte suspendu ou inactif',
                 ], 403);
             }
 
@@ -403,7 +402,7 @@ class AuthController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => 'Connexion réussie',
-                'data' => $tokenData
+                'data' => $tokenData,
             ]);
 
         } catch (\Exception $e) {
@@ -433,7 +432,7 @@ class AuthController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Refresh token requis',
-                'errors' => $validator->errors()
+                'errors' => $validator->errors(),
             ], 422);
         }
 
@@ -446,7 +445,7 @@ class AuthController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => 'Token rafraîchi avec succès',
-                'data' => $tokenData
+                'data' => $tokenData,
             ]);
 
         } catch (\Exception $e) {
@@ -457,7 +456,7 @@ class AuthController extends Controller
 
             return response()->json([
                 'success' => false,
-                'message' => $e->getMessage()
+                'message' => $e->getMessage(),
             ], 401);
         }
     }
@@ -480,13 +479,13 @@ class AuthController extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => 'Déconnexion réussie'
+                'message' => 'Déconnexion réussie',
             ]);
 
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Erreur lors de la déconnexion'
+                'message' => 'Erreur lors de la déconnexion',
             ], 500);
         }
     }
@@ -512,13 +511,13 @@ class AuthController extends Controller
 
             return response()->json([
                 'success' => true,
-                'data' => $sessions
+                'data' => $sessions,
             ]);
 
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Erreur lors de la récupération des sessions'
+                'message' => 'Erreur lors de la récupération des sessions',
             ], 500);
         }
     }
@@ -535,7 +534,7 @@ class AuthController extends Controller
         if ($validator->fails()) {
             return response()->json([
                 'success' => false,
-                'errors' => $validator->errors()
+                'errors' => $validator->errors(),
             ], 422);
         }
 
@@ -546,19 +545,19 @@ class AuthController extends Controller
             if ($success) {
                 return response()->json([
                     'success' => true,
-                    'message' => 'Session révoquée avec succès'
+                    'message' => 'Session révoquée avec succès',
                 ]);
             } else {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Session non trouvée'
+                    'message' => 'Session non trouvée',
                 ], 404);
             }
 
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Erreur lors de la révocation de la session'
+                'message' => 'Erreur lors de la révocation de la session',
             ], 500);
         }
     }
@@ -578,13 +577,13 @@ class AuthController extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => 'Toutes les autres sessions ont été révoquées'
+                'message' => 'Toutes les autres sessions ont été révoquées',
             ]);
 
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Erreur lors de la révocation des sessions'
+                'message' => 'Erreur lors de la révocation des sessions',
             ], 500);
         }
     }

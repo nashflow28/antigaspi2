@@ -3,13 +3,13 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\User;
+use App\Models\Category;
+use App\Models\Merchant;
+use App\Models\Payment;
 use App\Models\Product;
 use App\Models\Reservation;
-use App\Models\Merchant;
-use App\Models\Category;
-use App\Models\Payment;
 use App\Models\Setting;
+use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -27,10 +27,10 @@ class AdminController extends Controller
         try {
             $user = JWTAuth::parseToken()->authenticate();
 
-            if (!$user->isAdmin()) {
+            if (! $user->isAdmin()) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Accès réservé aux administrateurs'
+                    'message' => 'Accès réservé aux administrateurs',
                 ], 403);
             }
 
@@ -40,7 +40,7 @@ class AdminController extends Controller
             $newUsersThisMonth = User::whereMonth('created_at', now()->month)
                 ->whereYear('created_at', now()->year)
                 ->count();
-            $activeMerchants = Merchant::whereHas('user', function($q) {
+            $activeMerchants = Merchant::whereHas('user', function ($q) {
                 $q->where('role', 'merchant');
             })->count();
 
@@ -71,14 +71,14 @@ class AdminController extends Controller
 
             // Top commerçants
             $topMerchants = Merchant::with('user')
-                ->withCount(['products as completed_reservations' => function($q) {
-                    $q->whereHas('reservations', function($query) {
+                ->withCount(['products as completed_reservations' => function ($q) {
+                    $q->whereHas('reservations', function ($query) {
                         $query->where('status', 'completed');
                     });
                 }])
-                ->withSum(['products as total_revenue' => function($q) {
+                ->withSum(['products as total_revenue' => function ($q) {
                     $q->join('reservations', 'products.id', '=', 'reservations.product_id')
-                      ->where('reservations.status', 'completed');
+                        ->where('reservations.status', 'completed');
                 }], 'reservations.total_amount')
                 ->orderBy('total_revenue', 'desc')
                 ->take(5)
@@ -100,6 +100,7 @@ class AdminController extends Controller
                     $percentage = $productsSaved > 0
                         ? round(($category->product_count / $productsSaved) * 100, 0)
                         : 0;
+
                     return [
                         'id' => $category->id,
                         'name' => $category->name,
@@ -119,12 +120,12 @@ class AdminController extends Controller
                 ->get()
                 ->map(function ($user) {
                     return [
-                        'id' => 'user_' . $user->id,
+                        'id' => 'user_'.$user->id,
                         'type' => $user->role === 'merchant' ? 'merchant_joined' : 'user_registered',
                         'title' => $user->role === 'merchant' ? 'Nouveau commerçant' : 'Nouvel utilisateur inscrit',
-                        'description' => $user->first_name . ' ' . $user->last_name . ' s\'est inscrit(e)',
+                        'description' => $user->first_name.' '.$user->last_name.' s\'est inscrit(e)',
                         'timestamp' => $user->created_at->toISOString(),
-                        'status' => 'success'
+                        'status' => 'success',
                     ];
                 });
 
@@ -137,12 +138,12 @@ class AdminController extends Controller
                 ->get()
                 ->map(function ($reservation) {
                     return [
-                        'id' => 'reservation_' . $reservation->id,
+                        'id' => 'reservation_'.$reservation->id,
                         'type' => 'product_sold',
                         'title' => 'Produit vendu',
-                        'description' => $reservation->product->name . ' vendu à ' . $reservation->user->first_name,
+                        'description' => $reservation->product->name.' vendu à '.$reservation->user->first_name,
                         'timestamp' => $reservation->created_at->toISOString(),
-                        'status' => 'completed'
+                        'status' => 'completed',
                     ];
                 });
 
@@ -172,15 +173,15 @@ class AdminController extends Controller
                         'waterSaved' => $productsSaved * 1000, // 1000L d'eau par kg
                         'wasteSaved' => $productsSaved,
                         'treesEquivalent' => intval($productsSaved / 50), // 50kg = 1 arbre
-                    ]
-                ]
+                    ],
+                ],
             ]);
 
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur lors de la récupération des données du dashboard',
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ], 500);
         }
     }
@@ -193,10 +194,10 @@ class AdminController extends Controller
         try {
             $user = JWTAuth::parseToken()->authenticate();
 
-            if (!$user->isAdmin()) {
+            if (! $user->isAdmin()) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Accès réservé aux administrateurs'
+                    'message' => 'Accès réservé aux administrateurs',
                 ], 403);
             }
 
@@ -211,7 +212,7 @@ class AdminController extends Controller
                 $end = \Carbon\Carbon::parse($endDate)->endOfDay();
             } else {
                 $end = now();
-                $start = match($period) {
+                $start = match ($period) {
                     '7d' => now()->subDays(7),
                     '90d' => now()->subDays(90),
                     default => now()->subDays(30),
@@ -268,7 +269,7 @@ class AdminController extends Controller
 
             $revenueByDate = Reservation::where('status', 'completed')
                 ->whereBetween('created_at', [$start, $end])
-                ->selectRaw("DATE(created_at) as date, SUM(total_amount) as revenue")
+                ->selectRaw('DATE(created_at) as date, SUM(total_amount) as revenue')
                 ->groupBy('date')
                 ->orderBy('date')
                 ->pluck('revenue', 'date')
@@ -351,7 +352,7 @@ class AdminController extends Controller
                     'revenue_chart' => [
                         'labels' => $labels,
                         'datasets' => [
-                            ['data' => $revenueData]
+                            ['data' => $revenueData],
                         ],
                     ],
                     'geographic_distribution' => $geographicDistribution,
@@ -378,10 +379,10 @@ class AdminController extends Controller
         try {
             $user = JWTAuth::parseToken()->authenticate();
 
-            if (!$user->isAdmin()) {
+            if (! $user->isAdmin()) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Accès réservé aux administrateurs'
+                    'message' => 'Accès réservé aux administrateurs',
                 ], 403);
             }
 
@@ -392,34 +393,34 @@ class AdminController extends Controller
                     'description' => 'Services Laravel',
                     'status' => 'healthy',
                     'uptime' => '99.9%',
-                    'responseTime' => '45ms'
+                    'responseTime' => '45ms',
                 ],
                 [
                     'name' => 'Base de données',
                     'description' => 'MySQL Principal',
                     'status' => $this->testDatabaseConnection() ? 'healthy' : 'error',
                     'uptime' => '99.8%',
-                    'responseTime' => '12ms'
+                    'responseTime' => '12ms',
                 ],
                 [
                     'name' => 'Frontend',
                     'description' => 'Application Vue.js',
                     'status' => 'healthy',
                     'uptime' => '100%',
-                    'responseTime' => '120ms'
-                ]
+                    'responseTime' => '120ms',
+                ],
             ];
 
             return response()->json([
                 'success' => true,
-                'data' => $health
+                'data' => $health,
             ]);
 
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur lors de la vérification de la santé du système',
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ], 500);
         }
     }
@@ -428,6 +429,7 @@ class AdminController extends Controller
     {
         try {
             DB::connection()->getPdo();
+
             return true;
         } catch (\Exception $e) {
             return false;
@@ -442,10 +444,10 @@ class AdminController extends Controller
         try {
             $user = JWTAuth::parseToken()->authenticate();
 
-            if (!$user->isAdmin()) {
+            if (! $user->isAdmin()) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Accès réservé aux administrateurs'
+                    'message' => 'Accès réservé aux administrateurs',
                 ], 403);
             }
 
@@ -465,7 +467,7 @@ class AdminController extends Controller
                 $endDate = \Carbon\Carbon::parse($validated['end_date']);
             } else {
                 $endDate = now();
-                $startDate = match($period) {
+                $startDate = match ($period) {
                     'week' => now()->subWeek(),
                     'year' => now()->subYear(),
                     default => now()->subMonth(),
@@ -485,7 +487,7 @@ class AdminController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur lors de l\'export des données',
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ], 500);
         }
     }
@@ -564,10 +566,10 @@ class AdminController extends Controller
         });
 
         // Popular categories
-        $popularCategories = Category::withCount(['products' => function($q) use ($startDate, $endDate) {
-                $q->whereBetween('created_at', [$startDate, $endDate]);
-            }])
-            ->whereHas('products', function($q) use ($startDate, $endDate) {
+        $popularCategories = Category::withCount(['products' => function ($q) use ($startDate, $endDate) {
+            $q->whereBetween('created_at', [$startDate, $endDate]);
+        }])
+            ->whereHas('products', function ($q) use ($startDate, $endDate) {
                 $q->whereBetween('created_at', [$startDate, $endDate]);
             })
             ->orderBy('products_count', 'desc')
@@ -598,12 +600,12 @@ class AdminController extends Controller
                 'completed_reservations' => $completedReservations,
                 'pending_reservations' => $pendingReservations,
                 'cancelled_reservations' => $cancelledReservations,
-                'total_revenue' => number_format($totalRevenue, 0, ',', ' ') . ' XOF',
-                'average_order_value' => number_format($averageOrderValue, 0, ',', ' ') . ' XOF',
+                'total_revenue' => number_format($totalRevenue, 0, ',', ' ').' XOF',
+                'average_order_value' => number_format($averageOrderValue, 0, ',', ' ').' XOF',
                 'products_saved' => $productsSaved,
                 'environmental_impact' => [
-                    'co2_saved' => number_format($productsSaved * 2.5, 1) . ' kg',
-                    'water_saved' => number_format($productsSaved * 1000, 0) . ' L',
+                    'co2_saved' => number_format($productsSaved * 2.5, 1).' kg',
+                    'water_saved' => number_format($productsSaved * 1000, 0).' L',
                 ],
             ],
             'top_merchants' => $topMerchants,
@@ -616,9 +618,9 @@ class AdminController extends Controller
      */
     private function generateCSV(array $data, $startDate, $endDate)
     {
-        $filename = 'analytics-export-' . $startDate->format('Y-m-d') . '-to-' . $endDate->format('Y-m-d') . '.csv';
+        $filename = 'analytics-export-'.$startDate->format('Y-m-d').'-to-'.$endDate->format('Y-m-d').'.csv';
 
-        $callback = function() use ($data) {
+        $callback = function () use ($data) {
             $file = fopen('php://output', 'w');
 
             // UTF-8 BOM for Excel compatibility
@@ -626,7 +628,7 @@ class AdminController extends Controller
 
             // Header
             fputcsv($file, ['RAPPORT ANALYTICS ANTIGASPI']);
-            fputcsv($file, ['Période', $data['period']['start'] . ' au ' . $data['period']['end']]);
+            fputcsv($file, ['Période', $data['period']['start'].' au '.$data['period']['end']]);
             fputcsv($file, ['Généré le', now()->format('Y-m-d H:i:s')]);
             fputcsv($file, []); // Empty row
 
@@ -635,7 +637,7 @@ class AdminController extends Controller
             fputcsv($file, ['Métrique', 'Valeur']);
 
             foreach ($data['summary'] as $key => $value) {
-                if (!is_array($value)) {
+                if (! is_array($value)) {
                     $label = ucfirst(str_replace('_', ' ', $key));
                     fputcsv($file, [$label, $value]);
                 }
@@ -683,7 +685,7 @@ class AdminController extends Controller
 
         return response()->stream($callback, 200, [
             'Content-Type' => 'text/csv; charset=UTF-8',
-            'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+            'Content-Disposition' => 'attachment; filename="'.$filename.'"',
             'Cache-Control' => 'no-cache, no-store, must-revalidate',
             'Pragma' => 'no-cache',
             'Expires' => '0',
@@ -695,7 +697,7 @@ class AdminController extends Controller
      */
     private function generatePDFHTML(array $data, $startDate, $endDate)
     {
-        $filename = 'analytics-export-' . $startDate->format('Y-m-d') . '-to-' . $endDate->format('Y-m-d') . '.html';
+        $filename = 'analytics-export-'.$startDate->format('Y-m-d').'-to-'.$endDate->format('Y-m-d').'.html';
 
         $html = view('exports.analytics-pdf', [
             'data' => $data,
@@ -704,26 +706,23 @@ class AdminController extends Controller
 
         return response($html, 200, [
             'Content-Type' => 'text/html; charset=UTF-8',
-            'Content-Disposition' => 'inline; filename="' . $filename . '"',
+            'Content-Disposition' => 'inline; filename="'.$filename.'"',
             'Cache-Control' => 'no-cache, no-store, must-revalidate',
         ]);
     }
 
     /**
      * Get all payments dashboard with filters
-     *
-     * @param Request $request
-     * @return JsonResponse
      */
     public function payments(Request $request): JsonResponse
     {
         try {
             $user = JWTAuth::parseToken()->authenticate();
 
-            if (!$user->isAdmin()) {
+            if (! $user->isAdmin()) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Accès réservé aux administrateurs'
+                    'message' => 'Accès réservé aux administrateurs',
                 ], 403);
             }
 
@@ -780,7 +779,7 @@ class AdminController extends Controller
             ];
 
             // Transform payment data
-            $paymentsData = $payments->map(function($payment) {
+            $paymentsData = $payments->map(function ($payment) {
                 return [
                     'id' => $payment->id,
                     'amount' => $payment->amount,
@@ -795,7 +794,7 @@ class AdminController extends Controller
                     'created_at' => $payment->created_at->format('Y-m-d H:i:s'),
                     'customer' => $payment->reservation?->user ? [
                         'id' => $payment->reservation->user->id,
-                        'name' => $payment->reservation->user->first_name . ' ' . $payment->reservation->user->last_name,
+                        'name' => $payment->reservation->user->first_name.' '.$payment->reservation->user->last_name,
                         'email' => $payment->reservation->user->email,
                         'phone' => $payment->reservation->user->phone,
                     ] : null,
@@ -821,8 +820,8 @@ class AdminController extends Controller
                     'from' => $payments->firstItem(),
                     'to' => $payments->lastItem(),
                 ],
-                'filters_applied' => array_filter($validated, function($value) {
-                    return !is_null($value) && $value !== '';
+                'filters_applied' => array_filter($validated, function ($value) {
+                    return ! is_null($value) && $value !== '';
                 }),
             ], 200);
 
@@ -850,54 +849,53 @@ class AdminController extends Controller
     /**
      * Apply common payment filters to a query builder
      *
-     * @param \Illuminate\Database\Eloquent\Builder $query
-     * @param array $filters
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
      * @return \Illuminate\Database\Eloquent\Builder
      */
     private function applyPaymentFilters($query, array $filters)
     {
         // Filter by status
-        if (!empty($filters['status'])) {
+        if (! empty($filters['status'])) {
             $query->where('status', $filters['status']);
         }
 
         // Filter by payment method
-        if (!empty($filters['payment_method'])) {
+        if (! empty($filters['payment_method'])) {
             $query->where('payment_method', $filters['payment_method']);
         }
 
         // Filter by date range
-        if (!empty($filters['start_date'])) {
+        if (! empty($filters['start_date'])) {
             $query->whereDate('created_at', '>=', $filters['start_date']);
         }
 
-        if (!empty($filters['end_date'])) {
+        if (! empty($filters['end_date'])) {
             $query->whereDate('created_at', '<=', $filters['end_date']);
         }
 
         // Filter by merchant
-        if (!empty($filters['merchant_id'])) {
-            $query->whereHas('reservation.product', function($q) use ($filters) {
+        if (! empty($filters['merchant_id'])) {
+            $query->whereHas('reservation.product', function ($q) use ($filters) {
                 $q->where('merchant_id', $filters['merchant_id']);
             });
         }
 
         // Filter by amount range
-        if (!empty($filters['min_amount'])) {
+        if (! empty($filters['min_amount'])) {
             $query->where('amount', '>=', $filters['min_amount']);
         }
 
-        if (!empty($filters['max_amount'])) {
+        if (! empty($filters['max_amount'])) {
             $query->where('amount', '<=', $filters['max_amount']);
         }
 
         // Search by transaction_id, reference, or customer_phone
-        if (!empty($filters['search'])) {
+        if (! empty($filters['search'])) {
             $searchTerm = $filters['search'];
-            $query->where(function($q) use ($searchTerm) {
+            $query->where(function ($q) use ($searchTerm) {
                 $q->where('transaction_id', 'like', "%{$searchTerm}%")
-                  ->orWhere('reference', 'like', "%{$searchTerm}%")
-                  ->orWhere('customer_phone', 'like', "%{$searchTerm}%");
+                    ->orWhere('reference', 'like', "%{$searchTerm}%")
+                    ->orWhere('customer_phone', 'like', "%{$searchTerm}%");
             });
         }
 
@@ -906,19 +904,16 @@ class AdminController extends Controller
 
     /**
      * Get all system settings grouped by category
-     *
-     * @param Request $request
-     * @return JsonResponse
      */
     public function getSettings(Request $request): JsonResponse
     {
         try {
             $user = JWTAuth::parseToken()->authenticate();
 
-            if (!$user->isAdmin()) {
+            if (! $user->isAdmin()) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Accès réservé aux administrateurs'
+                    'message' => 'Accès réservé aux administrateurs',
                 ], 403);
             }
 
@@ -955,19 +950,16 @@ class AdminController extends Controller
 
     /**
      * Update system settings
-     *
-     * @param Request $request
-     * @return JsonResponse
      */
     public function updateSettings(Request $request): JsonResponse
     {
         try {
             $user = JWTAuth::parseToken()->authenticate();
 
-            if (!$user->isAdmin()) {
+            if (! $user->isAdmin()) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Accès réservé aux administrateurs'
+                    'message' => 'Accès réservé aux administrateurs',
                 ], 403);
             }
 

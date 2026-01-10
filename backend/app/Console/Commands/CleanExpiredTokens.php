@@ -24,7 +24,7 @@ class CleanExpiredTokens extends Command
 
     /**
      * Execute the console command.
-     * 
+     *
      * BUG FIX #21: Implement handle() method to delete expired refresh_tokens
      * This command should be scheduled to run daily to prevent token table bloat
      */
@@ -40,11 +40,13 @@ class CleanExpiredTokens extends Command
 
             if ($expiredCount === 0) {
                 $this->info('No expired tokens found.');
+
                 return self::SUCCESS;
             }
 
             if ($dryRun) {
                 $this->info("Would delete {$expiredCount} expired token(s) (dry-run mode)");
+
                 return self::SUCCESS;
             }
 
@@ -57,6 +59,7 @@ class CleanExpiredTokens extends Command
         } catch (\Exception $e) {
             $this->error("Error cleaning expired tokens: {$e->getMessage()}");
             Log::error('CleanExpiredTokens failed', ['error' => $e->getMessage()]);
+
             return self::FAILURE;
         }
     }

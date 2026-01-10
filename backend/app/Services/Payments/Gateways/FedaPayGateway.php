@@ -13,9 +13,7 @@ use Illuminate\Support\Str;
 
 class FedaPayGateway implements PaymentGateway
 {
-    public function __construct(private array $config)
-    {
-    }
+    public function __construct(private array $config) {}
 
     public function initialize(Reservation $reservation, Payment $payment, array $data = []): Payment
     {
@@ -29,7 +27,7 @@ class FedaPayGateway implements PaymentGateway
         $payload = [
             'transaction' => array_filter([
                 'amount' => (float) $payment->amount,
-                'description' => 'Reservation #' . $reservation->reservation_code,
+                'description' => 'Reservation #'.$reservation->reservation_code,
                 'currency' => ['iso' => $payment->currency],
                 'callback_url' => $this->config['callback_url'] ?? null,
                 'reference' => $reference,
@@ -50,9 +48,9 @@ class FedaPayGateway implements PaymentGateway
 
         $response = Http::withToken($this->config['api_key'] ?? '')
             ->acceptJson()
-            ->post(rtrim($this->config['base_url'] ?? '', '/') . '/transactions', $payload);
+            ->post(rtrim($this->config['base_url'] ?? '', '/').'/transactions', $payload);
 
-        if (!$response->successful()) {
+        if (! $response->successful()) {
             throw PaymentException::initializationFailed($response->body());
         }
 
@@ -88,9 +86,9 @@ class FedaPayGateway implements PaymentGateway
 
         $response = Http::withToken($this->config['api_key'] ?? '')
             ->acceptJson()
-            ->get(rtrim($this->config['base_url'] ?? '', '/') . '/transactions/' . $transactionId);
+            ->get(rtrim($this->config['base_url'] ?? '', '/').'/transactions/'.$transactionId);
 
-        if (!$response->successful()) {
+        if (! $response->successful()) {
             throw PaymentException::refreshFailed($response->body());
         }
 
@@ -121,11 +119,11 @@ class FedaPayGateway implements PaymentGateway
             $payment = Payment::where('transaction_id', (string) $transactionId)->first();
         }
 
-        if (!$payment && $reference) {
+        if (! $payment && $reference) {
             $payment = Payment::where('reference', $reference)->first();
         }
 
-        if (!$payment) {
+        if (! $payment) {
             return null;
         }
 
@@ -148,9 +146,9 @@ class FedaPayGateway implements PaymentGateway
 
         $response = Http::withToken($this->config['api_key'] ?? '')
             ->acceptJson()
-            ->post(rtrim($this->config['base_url'] ?? '', '/') . '/transactions/' . $transactionId . '/cancel');
+            ->post(rtrim($this->config['base_url'] ?? '', '/').'/transactions/'.$transactionId.'/cancel');
 
-        if (!$response->successful()) {
+        if (! $response->successful()) {
             throw PaymentException::cancellationFailed($response->body());
         }
 
@@ -188,7 +186,7 @@ class FedaPayGateway implements PaymentGateway
 
     private function generateReference(): string
     {
-        return 'FD-' . Str::upper(Str::random(10));
+        return 'FD-'.Str::upper(Str::random(10));
     }
 
     private function mergePayload(?array $existing, array $newPayload): array

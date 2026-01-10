@@ -22,8 +22,7 @@ class PaymentReceivedNotification extends Notification implements ShouldQueue
     public function __construct(
         private readonly Reservation $reservation,
         private readonly Payment $payment
-    ) {
-    }
+    ) {}
 
     public function via(object $notifiable): array
     {
@@ -33,7 +32,7 @@ class PaymentReceivedNotification extends Notification implements ShouldQueue
             $channels[] = 'mail';
         }
 
-        if (method_exists($notifiable, 'prefersSmsNotifications') && $notifiable->prefersSmsNotifications() && !empty($notifiable->phone)) {
+        if (method_exists($notifiable, 'prefersSmsNotifications') && $notifiable->prefersSmsNotifications() && ! empty($notifiable->phone)) {
             $channels[] = 'vonage';
         }
 
@@ -50,15 +49,15 @@ class PaymentReceivedNotification extends Notification implements ShouldQueue
         $customerName = $this->getCustomerName();
         $amount = number_format($this->payment->amount, 0, ',', ' ');
 
-        return (new MailMessage())
+        return (new MailMessage)
             ->subject('Nouveau paiement reçu - Geladal')
-            ->greeting('Bonjour ' . ($notifiable->first_name ?? 'Commerçant'))
+            ->greeting('Bonjour '.($notifiable->first_name ?? 'Commerçant'))
             ->line('Vous avez reçu un nouveau paiement !')
-            ->line('Montant : ' . $amount . ' XOF')
-            ->line('Client : ' . $customerName)
-            ->line('Réservation : #' . $this->reservation->reservation_code)
-            ->line('Produit : ' . $productName)
-            ->line('Méthode : ' . $this->getPaymentMethodLabel())
+            ->line('Montant : '.$amount.' XOF')
+            ->line('Client : '.$customerName)
+            ->line('Réservation : #'.$this->reservation->reservation_code)
+            ->line('Produit : '.$productName)
+            ->line('Méthode : '.$this->getPaymentMethodLabel())
             ->action('Voir mes réservations', url('/merchant/reservations'))
             ->line('N\'oubliez pas de préparer la commande pour le retrait.');
     }
@@ -73,7 +72,7 @@ class PaymentReceivedNotification extends Notification implements ShouldQueue
             $this->reservation->reservation_code
         );
 
-        return (new VonageMessage())->content($content);
+        return (new VonageMessage)->content($content);
     }
 
     public function toPushPayload(object $notifiable): array
@@ -128,11 +127,11 @@ class PaymentReceivedNotification extends Notification implements ShouldQueue
     {
         $user = $this->reservation->user;
 
-        if (!$user) {
+        if (! $user) {
             return 'Client';
         }
 
-        $name = trim(($user->first_name ?? '') . ' ' . ($user->last_name ?? ''));
+        $name = trim(($user->first_name ?? '').' '.($user->last_name ?? ''));
 
         return $name ?: ($user->name ?? 'Client');
     }

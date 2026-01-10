@@ -11,7 +11,7 @@ class Notification extends Model
     use HasFactory;
 
     public $timestamps = false;
-    
+
     protected $fillable = [
         'user_id',
         'type',
@@ -34,7 +34,7 @@ class Notification extends Model
     protected static function boot()
     {
         parent::boot();
-        
+
         static::creating(function ($notification) {
             $notification->created_at = now();
         });

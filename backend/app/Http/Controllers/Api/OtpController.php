@@ -5,10 +5,10 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Services\OtpService;
-use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Facades\Validator;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Validator;
 use Tymon\JWTAuth\Facades\JWTAuth;
 
 class OtpController extends Controller
@@ -57,9 +57,6 @@ class OtpController extends Controller
 
     /**
      * Send OTP to phone number
-     *
-     * @param Request $request
-     * @return JsonResponse
      */
     public function send(Request $request): JsonResponse
     {
@@ -77,7 +74,7 @@ class OtpController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => $validator->errors()->first(),
-                'errors' => $validator->errors()
+                'errors' => $validator->errors(),
             ], 422);
         }
 
@@ -91,9 +88,6 @@ class OtpController extends Controller
 
     /**
      * Verify OTP code
-     *
-     * @param Request $request
-     * @return JsonResponse
      */
     public function verify(Request $request): JsonResponse
     {
@@ -112,7 +106,7 @@ class OtpController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => $validator->errors()->first(),
-                'errors' => $validator->errors()
+                'errors' => $validator->errors(),
             ], 422);
         }
 
@@ -123,7 +117,7 @@ class OtpController extends Controller
         $result = $this->otpService->verifyOtp($phone, $otp, $purpose);
 
         // If verification failed, return error
-        if (!$result['success']) {
+        if (! $result['success']) {
             return response()->json($result, 400);
         }
 
@@ -134,26 +128,26 @@ class OtpController extends Controller
 
             // Find user by phone (check multiple formats)
             $user = User::where('phone', $normalizedPhone)
-                ->orWhere('phone', '+' . $normalizedPhone)
-                ->orWhere('phone', 'LIKE', '%' . substr($normalizedPhone, -8))
+                ->orWhere('phone', '+'.$normalizedPhone)
+                ->orWhere('phone', 'LIKE', '%'.substr($normalizedPhone, -8))
                 ->first();
 
-            if (!$user) {
+            if (! $user) {
                 return response()->json([
                     'success' => false,
                     'message' => 'Aucun compte associé à ce numéro. Veuillez vous inscrire.',
                     'data' => [
                         'phone' => $phone,
                         'verified' => true,
-                        'user_exists' => false
-                    ]
+                        'user_exists' => false,
+                    ],
                 ], 404);
             }
 
-            if (!$user->is_active) {
+            if (! $user->is_active) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Compte désactivé'
+                    'message' => 'Compte désactivé',
                 ], 403);
             }
 
@@ -162,7 +156,7 @@ class OtpController extends Controller
 
             Log::info('OTP Login successful', [
                 'user_id' => $user->id,
-                'phone' => substr($phone, 0, 5) . '****'
+                'phone' => substr($phone, 0, 5).'****',
             ]);
 
             return response()->json([
@@ -172,8 +166,8 @@ class OtpController extends Controller
                     'user' => $this->formatUser($user),
                     'token' => $token,
                     'token_type' => 'Bearer',
-                    'expires_in' => JWTAuth::factory()->getTTL() * 60
-                ]
+                    'expires_in' => JWTAuth::factory()->getTTL() * 60,
+                ],
             ]);
         }
 
@@ -196,12 +190,12 @@ class OtpController extends Controller
 
         // Add Togo country code if phone is 8 digits
         if (strlen($phone) === 8) {
-            $phone = '228' . $phone;
+            $phone = '228'.$phone;
         }
 
         // Handle 9 digit numbers starting with 0
         if (strlen($phone) === 9 && str_starts_with($phone, '0')) {
-            $phone = '228' . substr($phone, 1);
+            $phone = '228'.substr($phone, 1);
         }
 
         return $phone;
@@ -209,9 +203,6 @@ class OtpController extends Controller
 
     /**
      * Resend OTP (alias for send with same purpose)
-     *
-     * @param Request $request
-     * @return JsonResponse
      */
     public function resend(Request $request): JsonResponse
     {
@@ -220,9 +211,6 @@ class OtpController extends Controller
 
     /**
      * Check if phone is verified
-     *
-     * @param Request $request
-     * @return JsonResponse
      */
     public function checkStatus(Request $request): JsonResponse
     {
@@ -234,7 +222,7 @@ class OtpController extends Controller
         if ($validator->fails()) {
             return response()->json([
                 'success' => false,
-                'message' => $validator->errors()->first()
+                'message' => $validator->errors()->first(),
             ], 422);
         }
 
@@ -247,8 +235,8 @@ class OtpController extends Controller
             'success' => true,
             'data' => [
                 'phone' => $phone,
-                'verified' => $isVerified
-            ]
+                'verified' => $isVerified,
+            ],
         ]);
     }
 }

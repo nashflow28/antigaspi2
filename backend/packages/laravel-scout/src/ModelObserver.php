@@ -165,7 +165,6 @@ class ModelObserver
     /**
      * Execute the given callback while forcing updates.
      *
-     * @param  \Closure  $callback
      * @return mixed
      */
     protected function whileForcingUpdate(Closure $callback)

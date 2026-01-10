@@ -14,9 +14,7 @@ use Illuminate\Support\Str;
 
 class CinetPayGateway implements PaymentGateway
 {
-    public function __construct(private array $config)
-    {
-    }
+    public function __construct(private array $config) {}
 
     public function initialize(Reservation $reservation, Payment $payment, array $data = []): Payment
     {
@@ -33,7 +31,7 @@ class CinetPayGateway implements PaymentGateway
             'transaction_id' => $reference,
             'amount' => (float) $payment->amount,
             'currency' => $payment->currency,
-            'description' => 'Reservation #' . $reservation->reservation_code,
+            'description' => 'Reservation #'.$reservation->reservation_code,
             'customer_name' => $reservation->consumer?->first_name,
             'customer_surname' => $reservation->consumer?->last_name,
             'customer_email' => $data['customer_email'] ?? $reservation->consumer?->email,
@@ -48,9 +46,9 @@ class CinetPayGateway implements PaymentGateway
         ]);
 
         $response = Http::acceptJson()
-            ->post(rtrim($this->config['base_url'] ?? '', '/') . '/payment', $payload);
+            ->post(rtrim($this->config['base_url'] ?? '', '/').'/payment', $payload);
 
-        if (!$response->successful()) {
+        if (! $response->successful()) {
             throw PaymentException::initializationFailed($response->body());
         }
 
@@ -89,9 +87,9 @@ class CinetPayGateway implements PaymentGateway
         ]);
 
         $response = Http::acceptJson()
-            ->post(rtrim($this->config['base_url'] ?? '', '/') . '/payment/check', $payload);
+            ->post(rtrim($this->config['base_url'] ?? '', '/').'/payment/check', $payload);
 
-        if (!$response->successful()) {
+        if (! $response->successful()) {
             throw PaymentException::refreshFailed($response->body());
         }
 
@@ -121,11 +119,11 @@ class CinetPayGateway implements PaymentGateway
             $payment = Payment::where('transaction_id', (string) $transactionId)->first();
         }
 
-        if (!$payment && $reference) {
+        if (! $payment && $reference) {
             $payment = Payment::where('reference', $reference)->first();
         }
 
-        if (!$payment) {
+        if (! $payment) {
             return null;
         }
 
@@ -151,9 +149,9 @@ class CinetPayGateway implements PaymentGateway
         ]);
 
         $response = Http::acceptJson()
-            ->post(rtrim($this->config['base_url'] ?? '', '/') . '/payment/cancel', $payload);
+            ->post(rtrim($this->config['base_url'] ?? '', '/').'/payment/cancel', $payload);
 
-        if (!$response->successful()) {
+        if (! $response->successful()) {
             throw PaymentException::cancellationFailed($response->body());
         }
 
@@ -193,7 +191,7 @@ class CinetPayGateway implements PaymentGateway
 
     private function generateReference(): string
     {
-        return 'CP-' . Str::upper(Str::random(10));
+        return 'CP-'.Str::upper(Str::random(10));
     }
 
     private function mergePayload(?array $existing, array $newPayload): array
