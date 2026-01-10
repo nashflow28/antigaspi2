@@ -59,10 +59,8 @@ const AdminCategoriesScreen: React.FC = () => {
       const response = await apiService.get('/admin/categories')
       // apiService peut retourner le tableau directement ou {data: [...]}
       const allCategories = Array.isArray(response.data) ? response.data : (response.data?.data || [])
-      console.log('🟢 [AdminCategories] Nombre catégories:', allCategories.length)
       setCategories(allCategories)
     } catch (error: any) {
-      console.error('Erreur chargement categories:', error)
 
       // Gestion des erreurs d'autorisation
       if (error.response?.status === 401 || error.response?.status === 403) {
@@ -118,7 +116,6 @@ const AdminCategoriesScreen: React.FC = () => {
       setShowDeleteModal(false)
       showSuccess('Succès', 'Catégorie supprimée avec succès')
     } catch (error: any) {
-      console.error('Erreur suppression:', error)
       setCategories(previousCategories)
       showError(
         'Erreur',
@@ -173,7 +170,6 @@ const AdminCategoriesScreen: React.FC = () => {
       setShowFormModal(false)
       setFormData({ name: '', description: '' })
     } catch (error: any) {
-      console.error('Erreur soumission:', error)
       showError('Erreur', error.response?.data?.message || 'Impossible de sauvegarder la catégorie')
     } finally {
       setFormLoading(false)

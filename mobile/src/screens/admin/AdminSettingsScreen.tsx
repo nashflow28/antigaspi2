@@ -94,7 +94,6 @@ const AdminSettingsScreen: React.FC = () => {
         setFormData(newFormData)
       }
     } catch (error: any) {
-      console.error('Error fetching settings:', error)
       if (isMountedRef.current) {
         showError('Erreur', error.response?.data?.message || 'Impossible de charger les paramètres')
       }
@@ -145,7 +144,6 @@ const AdminSettingsScreen: React.FC = () => {
                 await loadSettings()
               }
             } catch (error: any) {
-              console.error('Error saving settings:', error)
               showError('Erreur', error.response?.data?.message || 'Impossible de sauvegarder les paramètres')
             } finally {
               setSaving(false)

@@ -61,8 +61,6 @@ const isPendingAdminApproval = (product: Product): boolean => {
 const MerchantProductsScreen: React.FC<Props> = ({ navigation }) => {
   const theme = useTheme()
   const { alertProps, showError, showSuccess, showWarning, hideAlert } = useAlert()
-  // 🐛 BUG FIX #MOB-L-001: Prevent console logs in production
-  const isDev = __DEV__
   const [products, setProducts] = useState<Product[]>([])
   const [refreshing, setRefreshing] = useState(false)
   const [loading, setLoading] = useState(true)
@@ -79,17 +77,12 @@ const MerchantProductsScreen: React.FC<Props> = ({ navigation }) => {
   const loadProducts = async () => {
     try {
       setLoading(true)
-      if (isDev) console.log('📦 [MerchantProducts] Chargement des produits...')
       const response = await apiService.get('/products/merchant')
-      if (isDev) console.log('📦 [MerchantProducts] Réponse API complète:', response)
       // apiService peut retourner le tableau directement ou {data: [...]}
       const allProducts = Array.isArray(response.data) ? response.data : (response.data?.data || [])
-      console.log('🟢 [MerchantProducts] Nombre de produits:', allProducts.length)
       setProducts(allProducts)
-      if (isDev) console.log('📦 [MerchantProducts] Produits définis dans le state:', response.data?.length)
     } catch (error: any) {
-      if (isDev) console.error('❌ [MerchantProducts] Erreur chargement produits:', error)
-      if (isDev) console.error('❌ [MerchantProducts] Error details:', error.response?.data)
+      // Error handled silently
     } finally {
       setLoading(false)
       setRefreshing(false)
@@ -135,17 +128,14 @@ const MerchantProductsScreen: React.FC<Props> = ({ navigation }) => {
           onPress: async () => {
             hideAlert()
             try {
-              if (isDev) console.log('🗑️ [MerchantProducts] Suppression du produit:', productId)
               setLoading(true)
               await apiService.delete(`/products/${productId}`)
-              if (isDev) console.log('✅ [MerchantProducts] Produit supprimé avec succès')
 
               // Recharger la liste
               await loadProducts()
 
               showSuccess('Succès', 'Le produit a été supprimé')
             } catch (error: any) {
-              if (isDev) console.error('❌ [MerchantProducts] Erreur suppression:', error)
               showError('Erreur', 'Impossible de supprimer le produit')
             } finally {
               setLoading(false)

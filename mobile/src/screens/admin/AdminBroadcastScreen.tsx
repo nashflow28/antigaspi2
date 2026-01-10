@@ -155,7 +155,6 @@ const AdminBroadcastScreen: React.FC = () => {
                 ]
               )
             } catch (error: any) {
-              console.error('Erreur envoi notification:', error)
               showError(
                 'Erreur',
                 error?.response?.data?.message || 'Impossible d\'envoyer la notification'

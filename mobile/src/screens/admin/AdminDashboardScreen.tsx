@@ -140,7 +140,6 @@ const AdminDashboardScreen: React.FC<AdminDashboardScreenProps> = ({ navigation 
       await dispatch(logoutUser())
       // Navigation will be handled by MainNavigator when auth state changes
     } catch (error) {
-      console.error('Erreur lors de la déconnexion:', error)
       showError('Erreur', 'Une erreur est survenue lors de la déconnexion')
     }
   }
@@ -164,13 +163,10 @@ const AdminDashboardScreen: React.FC<AdminDashboardScreenProps> = ({ navigation 
       // apiService retourne directement response.data d'axios
       // Backend retourne: { success, stats: {...}, topMerchants, popularCategories, recentActivities, environmentalImpact }
       const response = await apiService.get('/admin/dashboard')
-      console.log('🟢 [AdminDashboard] Response keys:', Object.keys(response || {}))
 
       // response EST directement l'objet {success, stats, ...}
       const backendData = response.stats ? response : response.data
       if (isMountedRef.current && backendData?.stats) {
-        console.log('🟢 [AdminDashboard] Stats:', backendData.stats)
-
         // Calculer le total des produits depuis les catégories
         const totalProducts = backendData.popularCategories?.reduce(
           (acc: number, cat: any) => acc + (cat.productCount || 0), 0
@@ -196,8 +192,6 @@ const AdminDashboardScreen: React.FC<AdminDashboardScreenProps> = ({ navigation 
         setStats(transformedStats)
       }
     } catch (error: any) {
-      console.error('Erreur chargement stats admin:', error)
-
       // Gestion des erreurs d'autorisation
       if (error.response?.status === 401 || error.response?.status === 403) {
         if (isMountedRef.current) {

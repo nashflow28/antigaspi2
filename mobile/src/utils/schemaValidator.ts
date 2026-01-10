@@ -303,10 +303,6 @@ export function createValidator<T>(schema: Schema) {
         throw new Error(`Validation failed: ${errorMessages}`)
       }
 
-      if (__DEV__) {
-        console.warn('[Schema Validation] Invalid data:', result.errors)
-      }
-
       return null
     }
 

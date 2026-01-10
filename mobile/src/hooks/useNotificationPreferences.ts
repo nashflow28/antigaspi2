@@ -74,13 +74,9 @@ export const useNotificationPreferences = () => {
       try {
         await dispatch(refreshProfile()).unwrap()
       } catch (refreshError) {
-        console.warn(
-          "Impossible de rafraîchir le profil après chargement des préférences",
-          refreshError
-        )
+        // Profile refresh error after loading preferences handled silently
       }
     } catch (loadError) {
-      console.error('Erreur chargement préférences notifications:', loadError)
       setError(formatSyncError(loadError))
     } finally {
       setLoading(false)
@@ -103,15 +99,11 @@ export const useNotificationPreferences = () => {
       try {
         await dispatch(refreshProfile()).unwrap()
       } catch (refreshError) {
-        console.warn(
-          "Impossible de rafraîchir le profil après sauvegarde des préférences",
-          refreshError
-        )
+        // Profile refresh error after saving preferences handled silently
       }
 
       return updatedPreferences
     } catch (saveError) {
-      console.error('Erreur sauvegarde préférences notifications:', saveError)
       const message = formatSyncError(saveError)
       setError(message)
       throw new Error(message)

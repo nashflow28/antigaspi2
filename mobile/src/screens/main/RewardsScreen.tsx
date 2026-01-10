@@ -88,7 +88,7 @@ export default function RewardsScreen() {
         setLoyaltyTier(response.user_context.loyalty_tier)
       }
     } catch (error) {
-      console.error('Error fetching rewards:', error)
+      // Error handled silently - rewards list stays empty
     }
   }, [selectedType, showAffordableOnly])
 
@@ -99,7 +99,7 @@ export default function RewardsScreen() {
         setRedemptions(response.data)
       }
     } catch (error) {
-      console.error('Error fetching redemptions:', error)
+      // Error handled silently - redemptions list stays empty
     }
   }, [])
 

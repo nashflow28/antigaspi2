@@ -81,17 +81,11 @@ const AdminMerchantsScreen: React.FC = () => {
       const response = await apiService.get('/admin/moderation')
       // apiService retourne directement response.data d'axios
       // Backend retourne {success, merchants, pendingMerchants, ...}
-      console.log('🟢 [AdminMerchants] Response keys:', Object.keys(response || {}))
-      console.log('🟢 [AdminMerchants] response.merchants:', response.merchants?.length)
-      console.log('🟢 [AdminMerchants] response.data:', response.data)
 
       // Essayer plusieurs chemins possibles
       const allMerchants = response.merchants || response.data?.merchants || response.data || []
-      console.log('🟢 [AdminMerchants] Nombre merchants:', allMerchants.length)
       setMerchants(allMerchants)
     } catch (error: any) {
-      console.error('Erreur chargement merchants:', error)
-
       // Gestion des erreurs d'autorisation
       if (error.response?.status === 401 || error.response?.status === 403) {
         showWarning(
@@ -172,8 +166,6 @@ const AdminMerchantsScreen: React.FC = () => {
               showSuccess('Succès', `${merchant.business_name} a été approuvé`)
               setShowDetailModal(false)
             } catch (error: any) {
-              console.error('Erreur approbation:', error)
-
               // Rollback en cas d'erreur
               setMerchants(previousMerchants)
 
@@ -228,8 +220,6 @@ const AdminMerchantsScreen: React.FC = () => {
       setShowDetailModal(false)
       setRejectReason('')
     } catch (error: any) {
-      console.error('Erreur rejet:', error)
-
       // Rollback en cas d'erreur
       setMerchants(previousMerchants)
 

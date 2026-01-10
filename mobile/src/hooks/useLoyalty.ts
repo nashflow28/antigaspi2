@@ -103,7 +103,7 @@ export const useLoyalty = (): UseLoyaltyReturn => {
         setReferralInfo(response.data)
       }
     } catch (err: any) {
-      console.error('Error fetching referral info:', err)
+      // Error handled silently - referralInfo stays null
     }
   }, [])
 

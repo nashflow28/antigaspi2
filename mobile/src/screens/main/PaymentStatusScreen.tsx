@@ -92,8 +92,7 @@ const PaymentStatusScreen = ({ navigation, route }: { navigation: any; route: an
         haptics.error()
       },
       (error) => {
-        // Error during polling - continue but log
-        console.warn('Payment polling error:', error)
+        // Error during polling - continue silently
       }
     )
 

@@ -106,7 +106,7 @@ export default function NotificationsScreen() {
         setPage(response.meta.current_page)
       }
     } catch (error) {
-      console.error('Error fetching notifications:', error)
+      // Error handled silently - list will remain empty or unchanged
     }
   }, [filter])
 
@@ -149,7 +149,7 @@ export default function NotificationsScreen() {
         // Update badge
         await notificationService.updateBadge()
       } catch (error) {
-        console.error('Error marking notification as read:', error)
+        // Error marking notification as read handled silently
       }
     }
 
@@ -173,7 +173,6 @@ export default function NotificationsScreen() {
         type: 'success',
       })
     } catch (error) {
-      console.error('Error marking all as read:', error)
       showAlert({
         title: 'Erreur',
         message: 'Impossible de marquer les notifications comme lues',

@@ -35,7 +35,7 @@ export const useFavorite = (productId: number) => {
     try {
       await dispatch(toggleFavorite(productId)).unwrap()
     } catch (error) {
-      console.error('Erreur toggle favori:', error)
+      // Error handled by Redux slice
     }
   }
 

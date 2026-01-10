@@ -122,7 +122,6 @@ const MerchantReviewsScreen: React.FC = () => {
         setReviews(listResponse.data || [])
       }
     } catch (error) {
-      console.error('Erreur chargement avis:', error)
       showAlert('error', 'Erreur', 'Impossible de charger les avis')
     } finally {
       setLoading(false)
@@ -168,7 +167,6 @@ const MerchantReviewsScreen: React.FC = () => {
       setSelectedReview(null)
       loadReviewsData()
     } catch (error: any) {
-      console.error('Erreur soumission réponse:', error)
       showAlert('error', 'Erreur', error.response?.data?.message || 'Impossible d\'ajouter la réponse')
     } finally {
       setSubmittingResponse(false)
@@ -192,7 +190,6 @@ const MerchantReviewsScreen: React.FC = () => {
               showAlert('success', 'Succès', 'Réponse supprimée')
               loadReviewsData()
             } catch (error) {
-              console.error('Erreur suppression:', error)
               showAlert('error', 'Erreur', 'Impossible de supprimer la réponse')
             }
           },

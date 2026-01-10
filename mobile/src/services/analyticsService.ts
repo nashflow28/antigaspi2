@@ -104,7 +104,7 @@ class AnalyticsService {
 
       this.isInitialized = true;
     } catch (error) {
-      console.error('Erreur lors de l\'initialisation d\'Analytics:', error);
+      // Analytics initialization error handled silently
     }
   }
 
@@ -394,8 +394,6 @@ class AnalyticsService {
       // Effacer les événements sauvegardés
       await AsyncStorage.removeItem('analytics_queue');
     } catch (error) {
-      console.error('Erreur lors de l\'envoi des événements:', error);
-
       // Remettre les événements dans la queue
       this.eventQueue = [...eventsToSend, ...this.eventQueue];
 
@@ -418,7 +416,7 @@ class AnalyticsService {
         this.eventQueue = JSON.parse(queueStr);
       }
     } catch (error) {
-      console.error('Erreur lors du chargement des événements:', error);
+      // Error loading queued events handled silently
     }
   }
 
@@ -429,7 +427,7 @@ class AnalyticsService {
     try {
       await AsyncStorage.setItem('analytics_queue', JSON.stringify(this.eventQueue));
     } catch (error) {
-      console.error('Erreur lors de la sauvegarde des événements:', error);
+      // Error saving queued events handled silently
     }
   }
 
@@ -443,7 +441,7 @@ class AnalyticsService {
       });
       return response.data;
     } catch (error) {
-      console.error('Erreur lors de l\'obtention des stats:', error);
+      // Error getting stats handled silently - return empty object
       return {};
     }
   }

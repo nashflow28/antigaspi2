@@ -82,7 +82,6 @@ const ExportButton: React.FC<ExportButtonProps> = ({
       onExportStart?.()
 
       const config = FORMAT_CONFIG[format]
-      console.log(`📊 Exporting analytics as ${config.label}...`)
 
       // BUG-001 FIX: Verify file system availability before proceeding
       if (!FileSystem.documentDirectory) {
@@ -122,8 +121,6 @@ const ExportButton: React.FC<ExportButtonProps> = ({
           }
         }
 
-        console.log(`✅ File saved to: ${fileUri}`)
-
         // Check if sharing is available
         const isAvailable = await Sharing.isAvailableAsync()
         if (!isAvailable) {
@@ -139,12 +136,10 @@ const ExportButton: React.FC<ExportButtonProps> = ({
         })
       }
 
-      console.log('✅ Export completed successfully')
       onExportComplete?.()
 
       showAlert('success', 'Succès', `Rapport ${config.label} exporté avec succès`)
     } catch (error: any) {
-      console.error(`❌ Export error:`, error)
       const config = FORMAT_CONFIG[format]
       const errorMessage = error?.response?.data?.message || error?.message || `Impossible d'exporter en ${config.label}`
       onExportError?.(errorMessage)

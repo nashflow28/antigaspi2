@@ -158,14 +158,11 @@ const AdminReviewModerationScreen: React.FC = () => {
       const response = await apiService.get('/admin/reviews/stats')
       // apiService peut retourner directement l'objet ou {data: {...}}
       const data: ModerationDashboardResponse = response.data?.stats ? response.data : (response.data?.data || response.data)
-      console.log('🟢 [Moderation] Stats loaded:', data?.stats ? 'OK' : 'null')
       if (data) {
         setStats(data.stats)
         setReportReasons(data.report_reasons || {})
       }
     } catch (error: any) {
-      console.error('Erreur chargement statistiques avis:', error)
-
       // Gestion des erreurs d'autorisation
       if (error.response?.status === 401 || error.response?.status === 403) {
         showWarning(
@@ -186,11 +183,8 @@ const AdminReviewModerationScreen: React.FC = () => {
       })
       // apiService peut retourner le tableau directement ou {data: [...]}
       const reviews = Array.isArray(response.data) ? response.data : (response.data?.data || [])
-      console.log('🟢 [Moderation] Pending reviews:', reviews.length)
       setPendingReviews(reviews)
     } catch (error: any) {
-      console.error('Erreur chargement avis en attente:', error)
-
       // Gestion des erreurs d'autorisation
       if (error.response?.status === 401 || error.response?.status === 403) {
         showWarning(
@@ -222,12 +216,9 @@ const AdminReviewModerationScreen: React.FC = () => {
       const response = await apiService.get('/admin/reviews/reported', { params })
       // apiService peut retourner le tableau directement ou {data: [...]}
       const reports = Array.isArray(response.data) ? response.data : (response.data?.data || [])
-      console.log('🟢 [Moderation] Reported reviews:', reports.length)
       setReportedReviews(reports)
       setHasLoadedReports(true)
     } catch (error: any) {
-      console.error('Erreur chargement signalements:', error)
-
       // Gestion des erreurs d'autorisation
       if (error.response?.status === 401 || error.response?.status === 403) {
         showWarning(
@@ -272,7 +263,6 @@ const AdminReviewModerationScreen: React.FC = () => {
               await loadStats()
               showSuccess('Succès', 'Avis approuvé')
             } catch (error) {
-              console.error('Erreur approbation avis:', error)
               showError('Erreur', 'Impossible d\'approuver cet avis')
             } finally {
               setActionLoadingId(null)
@@ -302,7 +292,6 @@ const AdminReviewModerationScreen: React.FC = () => {
               await loadStats()
               showSuccess('Succès', 'Avis rejeté et supprimé')
             } catch (error) {
-              console.error('Erreur rejet avis:', error)
               showError('Erreur', 'Impossible de rejeter cet avis')
             } finally {
               setActionLoadingId(null)
@@ -338,7 +327,6 @@ const AdminReviewModerationScreen: React.FC = () => {
         }
         showSuccess('Succès', message)
       } catch (error) {
-        console.error('Erreur résolution signalement:', error)
         showError('Erreur', 'Impossible de mettre à jour le signalement')
       } finally {
         setResolvingReportId(null)

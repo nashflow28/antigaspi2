@@ -246,13 +246,11 @@ const ProductDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
       navigationTimeoutRef.current = null
     }
     try {
-      console.log('🔵 [ProductDetails] Démarrage réservation...')
       // Recharger le produit pour avoir le stock à jour (protection race condition)
       await loadProduct()
 
       // Re-vérifier que la quantité est toujours disponible
       if (selectedQuantity > product.quantity_available) {
-        console.warn('⚠️ [ProductDetails] Stock insuffisant:', {selectedQuantity, available: product.quantity_available})
         showError(`Stock insuffisant. Seulement ${product.quantity_available} unité(s) disponible(s)`)
         setSelectedQuantity(Math.min(selectedQuantity, product.quantity_available))
         setReserving(false)
@@ -305,25 +303,6 @@ const ProductDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
         }
       }
 
-      console.log('🕐 [ProductDetails] Pickup calculation:', {
-        today,
-        currentTimeStr,
-        productPickupStart: product.pickup_start,
-        productPickupEnd: product.pickup_end,
-        expirationDate: product.expiration_date,
-        calculatedPickupDate: pickupDate,
-        calculatedPickupTime: pickupTime,
-      })
-
-      console.log('📤 [ProductDetails] Envoi réservation:', {
-        productId: product.id,
-        quantity: selectedQuantity,
-        paymentMethod: selectedPaymentMethod,
-        pickupDate,
-        pickupTime,
-        walletPin: selectedPaymentMethod === 'wallet' ? '****' : undefined
-      })
-
       const result = await dispatch(createReservation({
         productId: product.id,
         quantity: selectedQuantity,
@@ -333,8 +312,6 @@ const ProductDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
         notes: null,
         ...(selectedPaymentMethod === 'wallet' && walletPin ? { walletPin } : {}),
       }))
-
-      console.log('📥 [ProductDetails] Résultat réservation:', result)
 
       if (createReservation.fulfilled.match(result)) {
         const reservation = result.payload
@@ -351,12 +328,9 @@ const ProductDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
         }, 1500)
       } else if (createReservation.rejected.match(result)) {
         const errorMessage = result.payload as string || 'Impossible de créer la réservation'
-        console.error('❌ [ProductDetails] Réservation rejetée:', {errorMessage, payload: result.payload, error: result.error})
         showError(errorMessage)
       }
     } catch (error: any) {
-      console.error('❌ [ProductDetails] Exception lors de la réservation:', error)
-      console.error('❌ [ProductDetails] Stack trace:', error.stack)
       showError(error.message || 'Une erreur est survenue lors de la réservation')
     } finally {
       setReserving(false)

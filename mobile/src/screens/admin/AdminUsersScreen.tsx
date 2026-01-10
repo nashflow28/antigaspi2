@@ -139,7 +139,6 @@ const AdminUsersScreen: React.FC = () => {
       setShowDetailModal(false)
       showSuccess('Succès', isSuspended ? 'Utilisateur débloqué' : 'Utilisateur bloqué')
     } catch (error: any) {
-      console.error('Erreur mise à jour statut:', error)
       setUsers(previousUsers)
       showError('Erreur', 'Impossible de mettre à jour le statut')
     } finally {

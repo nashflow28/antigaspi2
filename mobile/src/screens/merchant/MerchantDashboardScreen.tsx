@@ -82,7 +82,7 @@ const MerchantDashboardScreen: React.FC = () => {
         setMerchantLocation(response.data)
       }
     } catch (error) {
-      console.error('Erreur chargement localisation:', error)
+      // Location loading error handled silently
     } finally {
       setLocationLoading(false)
     }
@@ -128,7 +128,6 @@ const MerchantDashboardScreen: React.FC = () => {
         showError(response.message || 'Erreur lors de la mise à jour')
       }
     } catch (error: any) {
-      console.error('Erreur mise à jour localisation:', error)
       showError(error.message || 'Erreur lors de la mise à jour')
     } finally {
       setSettingLocation(false)
@@ -157,11 +156,10 @@ const MerchantDashboardScreen: React.FC = () => {
         const reviewsResponse = await apiService.get('/merchants/reviews/list?limit=3')
         setRecentReviews(reviewsResponse.data?.data || reviewsResponse.data || [])
       } catch (reviewError) {
-        console.error('Erreur chargement avis:', reviewError)
         setRecentReviews([])
       }
     } catch (error) {
-      console.error('Erreur chargement dashboard:', error)
+      // Dashboard loading error handled silently
     } finally {
       setLoading(false)
       setRefreshing(false)

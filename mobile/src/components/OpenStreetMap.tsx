@@ -199,7 +199,7 @@ const OpenStreetMap: React.FC<OpenStreetMapProps> = ({
         onMarkerPress(data.id)
       }
     } catch (e) {
-      console.warn('Error parsing WebView message:', e)
+      // WebView message parsing error handled silently
     }
   }
 

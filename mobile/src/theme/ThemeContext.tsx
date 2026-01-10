@@ -327,7 +327,7 @@ export const ThemeProvider: React.FC<{ children: ReactNode }> = ({ children }) =
         setAccessibility(JSON.parse(savedAccessibility))
       }
     } catch (error) {
-      console.error('Error loading theme preferences:', error)
+      // Error loading theme preferences handled silently
     }
   }
 
@@ -336,7 +336,7 @@ export const ThemeProvider: React.FC<{ children: ReactNode }> = ({ children }) =
       setThemeModeState(mode)
       await AsyncStorage.setItem(STORAGE_KEYS.THEME_MODE, mode)
     } catch (error) {
-      console.error('Error saving theme mode:', error)
+      // Error saving theme mode handled silently
     }
   }
 
@@ -355,7 +355,7 @@ export const ThemeProvider: React.FC<{ children: ReactNode }> = ({ children }) =
       setAccessibility(newSettings)
       await AsyncStorage.setItem(STORAGE_KEYS.ACCESSIBILITY, JSON.stringify(newSettings))
     } catch (error) {
-      console.error('Error saving accessibility settings:', error)
+      // Error saving accessibility settings handled silently
     }
   }
 
@@ -368,7 +368,7 @@ export const ThemeProvider: React.FC<{ children: ReactNode }> = ({ children }) =
       setThemeModeState('auto')
       setAccessibility(defaultAccessibility)
     } catch (error) {
-      console.error('Error resetting theme:', error)
+      // Error resetting theme handled silently
     }
   }
 

@@ -79,7 +79,7 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
         setLocationPermissionGranted(false)
       }
     } catch (error) {
-      console.error('Erreur initialisation géolocalisation:', error)
+      // Location initialization error handled silently
     }
   }
 
@@ -175,7 +175,6 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
             }
           } catch (error) {
             // Include product by default if distance calculation fails
-            console.warn('[HomeScreen] Distance calculation error:', error)
           }
         }
       }

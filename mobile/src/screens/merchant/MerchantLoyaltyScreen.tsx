@@ -83,7 +83,6 @@ const MerchantLoyaltyScreen: React.FC = () => {
         setCustomers(customersResponse.data.data || [])
       }
     } catch (error) {
-      console.error('Erreur chargement fidélité:', error)
       showAlert('error', 'Erreur', 'Impossible de charger les données de fidélité')
     } finally {
       setLoading(false)
@@ -132,7 +131,6 @@ const MerchantLoyaltyScreen: React.FC = () => {
       setSelectedCustomer(null)
       loadLoyaltyData()
     } catch (error: any) {
-      console.error('Erreur attribution points:', error)
       showAlert('error', 'Erreur', error.response?.data?.message || 'Impossible d\'attribuer les points')
     } finally {
       setSubmitting(false)

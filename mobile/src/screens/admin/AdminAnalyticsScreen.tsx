@@ -90,8 +90,6 @@ const AdminAnalyticsScreen: React.FC<{ navigation: any }> = ({ navigation }) => 
 
       setData(analyticsData)
     } catch (error: any) {
-      console.error('❌ Error loading analytics:', error)
-
       // Gestion des erreurs d'autorisation
       if (error.response?.status === 401 || error.response?.status === 403) {
         showWarning(

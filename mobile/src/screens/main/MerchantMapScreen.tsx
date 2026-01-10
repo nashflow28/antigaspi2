@@ -89,7 +89,6 @@ const MerchantMapScreen: React.FC<Props> = ({ testID = TEST_IDS.merchantMapScree
       const { status } = await Location.requestForegroundPermissionsAsync()
 
       if (status !== 'granted') {
-        console.log('Location permission denied')
         setLocationPermissionGranted(false)
         return
       }
@@ -105,7 +104,6 @@ const MerchantMapScreen: React.FC<Props> = ({ testID = TEST_IDS.merchantMapScree
         longitude: location.coords.longitude,
       })
     } catch (err) {
-      console.error('Error getting location:', err)
       setLocationPermissionGranted(false)
     }
   }, [])
@@ -138,7 +136,6 @@ const MerchantMapScreen: React.FC<Props> = ({ testID = TEST_IDS.merchantMapScree
 
       setMerchants(merchantsWithLocation)
     } catch (err: any) {
-      console.error('Error fetching merchants:', err)
       setError(err.response?.data?.message || 'Impossible de charger les commerçants')
     } finally {
       setLoading(false)
@@ -169,7 +166,6 @@ const MerchantMapScreen: React.FC<Props> = ({ testID = TEST_IDS.merchantMapScree
 
   // Handle marker press
   const handleMarkerPress = useCallback((merchant: MerchantMapMarker) => {
-    console.log('Marker pressed:', merchant.business_name)
     setSelectedMerchant(merchant)
   }, [])
 
@@ -194,7 +190,7 @@ const MerchantMapScreen: React.FC<Props> = ({ testID = TEST_IDS.merchantMapScree
         }
         showError('Erreur', 'Impossible d\'ouvrir le composeur téléphonique')
       })
-      .catch((err) => console.error('Error opening phone:', err))
+      .catch(() => {})
   }, [showError])
 
   // Get directions
@@ -211,8 +207,7 @@ const MerchantMapScreen: React.FC<Props> = ({ testID = TEST_IDS.merchantMapScree
     })
 
     if (url) {
-      Linking.openURL(url).catch((err) => {
-        console.error('Error opening maps:', err)
+      Linking.openURL(url).catch(() => {
         showError('Erreur', 'Impossible d\'ouvrir l\'application de navigation')
       })
     }

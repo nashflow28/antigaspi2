@@ -54,7 +54,7 @@ class GeocodingService {
         return response.data
       }
     } catch (error) {
-      console.error('Error searching addresses:', error)
+      // Error handled silently - return empty array
     }
 
     return []
@@ -86,7 +86,7 @@ class GeocodingService {
         return response.data
       }
     } catch (error) {
-      console.error('Error geocoding address:', error)
+      // Error handled silently - return null
     }
 
     return null
@@ -115,7 +115,7 @@ class GeocodingService {
         return response.data
       }
     } catch (error) {
-      console.error('Error reverse geocoding:', error)
+      // Error handled silently - return null
     }
 
     return null

@@ -85,7 +85,6 @@ const MerchantDetailScreen: React.FC<Props> = ({ route, navigation }) => {
         } else {
           // 🐛 BUG FIX: Si aucun produit, essayer de récupérer le marchand depuis le store merchants
           if (isMounted) {
-            console.log('⚠️ No products found for merchant', merchantId, '- Trying to load from merchants store')
 
             // Essayer de charger les marchands si pas déjà en mémoire
             if (merchants.length === 0) {
@@ -120,7 +119,6 @@ const MerchantDetailScreen: React.FC<Props> = ({ route, navigation }) => {
           }
         }
       } catch (error) {
-        console.error('❌ Error loading merchant data:', error)
         if (isMounted) {
           // Ne pas faire goBack() directement, laisser l'utilisateur voir l'erreur et décider
           showError(
@@ -152,7 +150,7 @@ const MerchantDetailScreen: React.FC<Props> = ({ route, navigation }) => {
           }
         }
       } catch (error) {
-        console.error('Erreur initialisation géolocalisation (merchant detail):', error)
+        // Location initialization error handled silently
       }
     }
 

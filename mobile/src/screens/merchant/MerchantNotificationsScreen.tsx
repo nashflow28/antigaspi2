@@ -57,7 +57,6 @@ const MerchantNotificationsScreen: React.FC = () => {
       // apiService retourne response.data d'axios, donc response = {success, data, meta}
       // ou directement le tableau selon l'API
       const newNotifications = Array.isArray(response.data) ? response.data : (response.data || [])
-      console.log('🟢 [MerchantNotifications] Nombre notifications:', newNotifications.length)
 
       if (page === 1) {
         setNotifications(newNotifications)
@@ -72,7 +71,7 @@ const MerchantNotificationsScreen: React.FC = () => {
         setLastPage(meta.last_page ?? 1)
       }
     } catch (error) {
-      console.error('Erreur chargement notifications:', error)
+      // Error handled silently
     } finally {
       setLoading(false)
       setRefreshing(false)
@@ -92,7 +91,7 @@ const MerchantNotificationsScreen: React.FC = () => {
         prev.map((notif) => (notif.id === notificationId ? { ...notif, is_read: true } : notif))
       )
     } catch (error) {
-      console.error('Erreur marquage lu:', error)
+      // Error handled silently
     }
   }
 
@@ -101,7 +100,7 @@ const MerchantNotificationsScreen: React.FC = () => {
       await apiService.post('/notifications/read-all')
       setNotifications((prev) => prev.map((notif) => ({ ...notif, is_read: true })))
     } catch (error) {
-      console.error('Erreur marquage tout lu:', error)
+      // Error handled silently
     }
   }
 

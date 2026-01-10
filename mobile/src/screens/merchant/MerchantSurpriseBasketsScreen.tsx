@@ -67,9 +67,7 @@ const MerchantSurpriseBasketsScreen: React.FC<Props> = ({ navigation }) => {
     expiresIn: 24 * 60 * 60 * 1000, // 24 hours
     onRestore: (data) => {
       // If we have restored data and we're not editing, show the modal
-      if (data.name || data.description || data.discounted_price) {
-        console.log('📦 [SurpriseBasket] Form data restored from cache')
-      }
+      // Form data will be available when user opens the modal
     },
   })
 
@@ -106,14 +104,11 @@ const MerchantSurpriseBasketsScreen: React.FC<Props> = ({ navigation }) => {
   const loadBaskets = async () => {
     try {
       setLoading(true)
-      console.log('📦 [MerchantSurpriseBaskets] Chargement des paniers...')
       const response = await apiService.get('/surprise-baskets/merchant/list')
       // apiService peut retourner le tableau directement ou {data: [...]}
       const allBaskets = Array.isArray(response.data) ? response.data : (response.data?.data || [])
-      console.log('🟢 [MerchantSurpriseBaskets] Nombre baskets:', allBaskets.length)
       setBaskets(allBaskets)
     } catch (error: any) {
-      console.error('❌ [MerchantSurpriseBaskets] Erreur:', error)
       showErrorModal('Erreur de chargement', 'Impossible de charger les paniers surprise. Veuillez réessayer.')
     } finally {
       setLoading(false)
@@ -191,7 +186,6 @@ const MerchantSurpriseBasketsScreen: React.FC<Props> = ({ navigation }) => {
               await loadBaskets()
               showSuccessModal('Suppression réussie', 'Le panier a été supprimé avec succès.')
             } catch (error: any) {
-              console.error('❌ Erreur suppression:', error)
               showErrorModal('Erreur de suppression', 'Impossible de supprimer le panier. Veuillez réessayer.')
             } finally {
               setLoading(false)
@@ -214,7 +208,6 @@ const MerchantSurpriseBasketsScreen: React.FC<Props> = ({ navigation }) => {
         basket.is_active ? 'Le panier a été désactivé.' : 'Le panier a été activé.'
       )
     } catch (error: any) {
-      console.error('❌ Erreur toggle:', error)
       showErrorModal('Erreur de modification', 'Impossible de modifier le statut du panier.')
     } finally {
       setLoading(false)
@@ -287,7 +280,6 @@ const MerchantSurpriseBasketsScreen: React.FC<Props> = ({ navigation }) => {
         showSuccessModal('Création réussie', 'Le panier surprise a été créé avec succès.')
       }
     } catch (error: any) {
-      console.error('❌ Erreur soumission:', error)
       showErrorModal(
         'Erreur de sauvegarde',
         error?.message || 'Impossible de sauvegarder le panier. Veuillez réessayer.'

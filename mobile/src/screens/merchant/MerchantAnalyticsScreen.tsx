@@ -73,7 +73,7 @@ const MerchantAnalyticsScreen: React.FC = () => {
         setProductsData(productsRes.data?.chart_data || [])
       }
     } catch (error) {
-      console.error('Erreur chargement analytics:', error)
+      // Analytics loading error handled silently
     } finally {
       setLoading(false)
       setRefreshing(false)

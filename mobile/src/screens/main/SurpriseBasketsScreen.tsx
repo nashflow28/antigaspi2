@@ -46,7 +46,6 @@ const SurpriseBasketsScreen: React.FC<Props> = ({ navigation }) => {
       await dispatch(fetchSurpriseBaskets({ ...filters, page: 1 })).unwrap()
     } catch (error) {
       // Les erreurs sont déjà gérées dans le slice via l'état `error`
-      console.error('Error refreshing surprise baskets:', error)
     }
     setRefreshing(false)
   }, [dispatch, filters])

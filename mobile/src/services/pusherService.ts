@@ -111,11 +111,11 @@ class PusherService {
       this.userChannel = this.pusher.subscribe(channelName)
 
       this.userChannel.bind('pusher:subscription_succeeded', () => {
-        console.log(`[Pusher] Subscribed to ${channelName}`)
+        log.info(`Subscribed to ${channelName}`)
       })
 
       this.userChannel.bind('pusher:subscription_error', (error: any) => {
-        console.error(`[Pusher] Failed to subscribe to ${channelName}:`, error)
+        log.error(`Failed to subscribe to ${channelName}:`, error)
       })
 
       // Bind to notification events
@@ -146,7 +146,7 @@ class PusherService {
       this.pusher?.unsubscribe(channelName)
       this.userChannel = null
       this.userId = null
-      console.log(`[Pusher] Unsubscribed from ${channelName}`)
+      log.info(`Unsubscribed from ${channelName}`)
     }
   }
 

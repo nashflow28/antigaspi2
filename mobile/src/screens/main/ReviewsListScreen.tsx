@@ -96,7 +96,7 @@ const ReviewsListScreen = ({ route, navigation }: Props) => {
         })
       ).unwrap()
     } catch (err) {
-      console.error('Erreur chargement avis:', err)
+      // Error handled silently - pagination will stop
     } finally {
       setLoadingMore(false)
     }

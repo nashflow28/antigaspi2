@@ -186,11 +186,10 @@ const LeafletMapPicker: React.FC<LeafletMapPickerProps> = ({
       const data = JSON.parse(event.nativeEvent.data)
 
       if (data.type === 'locationSelected') {
-        console.log('[LeafletMapPicker] Location selected:', data.latitude, data.longitude)
         onLocationSelect(data.latitude, data.longitude)
       }
     } catch (error) {
-      console.error('[LeafletMapPicker] Error parsing message:', error)
+      // Message parsing error handled silently
     }
   }, [onLocationSelect])
 
@@ -236,8 +235,7 @@ const LeafletMapPicker: React.FC<LeafletMapPickerProps> = ({
         allowsInlineMediaPlayback={true}
         mediaPlaybackRequiresUserAction={false}
         onError={(syntheticEvent) => {
-          const { nativeEvent } = syntheticEvent
-          console.error('[LeafletMapPicker] WebView error:', nativeEvent)
+          // WebView error handled silently
         }}
       />
     </View>

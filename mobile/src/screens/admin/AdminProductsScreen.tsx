@@ -270,7 +270,6 @@ const AdminProductsScreen: React.FC = () => {
       setShowConfirmModal(false)
       showSuccess('Succès', getSuccessMessage())
     } catch (error) {
-      console.error('Erreur action:', error)
       setProducts(previousProducts)
       showError('Erreur', getErrorMessage())
     } finally {

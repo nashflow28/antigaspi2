@@ -38,6 +38,7 @@ import AlertModal from '../../components/AlertModal'
 import { useAlert } from '../../hooks/useAlert'
 import KeyboardAwareContainer from '../../components/KeyboardAwareContainer'
 import { useHaptics } from '../../hooks/useHaptics'
+import CheckoutConfirmationModal from '../../components/CheckoutConfirmationModal'
 
 type Props = {
   navigation: any
@@ -69,6 +70,7 @@ const CartScreen: React.FC<Props> = ({ navigation }) => {
   const [customerEmail, setCustomerEmail] = useState('')
   const [walletPin, setWalletPin] = useState('')
   const [showTimePicker, setShowTimePicker] = useState(false)
+  const [showConfirmation, setShowConfirmation] = useState(false)
 
   useFocusEffect(
     useCallback(() => {
@@ -305,6 +307,13 @@ const CartScreen: React.FC<Props> = ({ navigation }) => {
       showError(`Stock insuffisant pour: ${itemNames}. Veuillez mettre à jour votre panier.`)
       return
     }
+
+    // Show confirmation modal
+    setShowConfirmation(true)
+  }
+
+  const handleConfirmCheckout = async () => {
+    setShowConfirmation(false)
 
     try {
       // Haptic feedback on checkout initiation
@@ -773,6 +782,18 @@ const CartScreen: React.FC<Props> = ({ navigation }) => {
       )}
 
       <AlertModal {...alertProps} />
+      <CheckoutConfirmationModal
+        visible={showConfirmation}
+        onClose={() => setShowConfirmation(false)}
+        onConfirm={handleConfirmCheckout}
+        cart={cart}
+        paymentMethod={selectedPaymentMethod}
+        pickupDate={selectedPickupDate}
+        pickupTime={selectedPickupTime}
+        customerPhone={customerPhone}
+        notes={notes}
+        loading={checkoutLoading}
+      />
     </View>
   )
 }
