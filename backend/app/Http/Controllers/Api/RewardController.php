@@ -18,55 +18,76 @@ class RewardController extends Controller
      */
     public function index(Request $request): JsonResponse
     {
-        $user = $request->user();
-        $tier = $user->loyalty_tier ?? 'bronze';
+        try {
+            $user = $request->user();
+            $tier = $user->loyalty_tier ?? 'bronze';
 
-        $query = Reward::available()
-            ->forTier($tier)
-            ->with('merchant:id,business_name');
+            $query = Reward::available()
+                ->forTier($tier)
+                ->with('merchant:id,business_name');
 
-        // Filter by type
-        if ($request->has('type')) {
-            $query->where('type', $request->type);
-        }
+            // Filter by type
+            if ($request->has('type')) {
+                $query->where('type', $request->type);
+            }
 
-        // Filter by merchant
-        if ($request->has('merchant_id')) {
-            $query->where('merchant_id', $request->merchant_id);
-        }
+            // Filter by merchant
+            if ($request->has('merchant_id')) {
+                $query->where('merchant_id', $request->merchant_id);
+            }
 
-        // Filter by affordability
-        if ($request->boolean('affordable_only')) {
+            // Filter by affordability
+            if ($request->boolean('affordable_only')) {
+                $userPoints = $user->loyaltyPoints()->sum('points');
+                $query->where('points_required', '<=', $userPoints);
+            }
+
+            // Featured first
+            if ($request->boolean('featured_first', true)) {
+                $query->orderByDesc('is_featured');
+            }
+
+            $query->orderBy('points_required');
+
+            $rewards = $query->paginate($request->get('per_page', 20));
+
+            // Add user context
             $userPoints = $user->loyaltyPoints()->sum('points');
-            $query->where('points_required', '<=', $userPoints);
+
+            return response()->json([
+                'success' => true,
+                'data' => $rewards->items(),
+                'meta' => [
+                    'current_page' => $rewards->currentPage(),
+                    'last_page' => $rewards->lastPage(),
+                    'per_page' => $rewards->perPage(),
+                    'total' => $rewards->total(),
+                ],
+                'user_context' => [
+                    'current_points' => $userPoints,
+                    'loyalty_tier' => $tier,
+                ],
+            ]);
+        } catch (\Illuminate\Database\QueryException $e) {
+            // Table doesn't exist or column missing
+            \Log::error('RewardController@index - Database error: ' . $e->getMessage());
+
+            return response()->json([
+                'success' => true,
+                'data' => [],
+                'meta' => [
+                    'current_page' => 1,
+                    'last_page' => 1,
+                    'per_page' => 20,
+                    'total' => 0,
+                ],
+                'user_context' => [
+                    'current_points' => 0,
+                    'loyalty_tier' => 'bronze',
+                ],
+                'notice' => 'Le catalogue de récompenses n\'est pas encore configuré.',
+            ]);
         }
-
-        // Featured first
-        if ($request->boolean('featured_first', true)) {
-            $query->orderByDesc('is_featured');
-        }
-
-        $query->orderBy('points_required');
-
-        $rewards = $query->paginate($request->get('per_page', 20));
-
-        // Add user context
-        $userPoints = $user->loyaltyPoints()->sum('points');
-
-        return response()->json([
-            'success' => true,
-            'data' => $rewards->items(),
-            'meta' => [
-                'current_page' => $rewards->currentPage(),
-                'last_page' => $rewards->lastPage(),
-                'per_page' => $rewards->perPage(),
-                'total' => $rewards->total(),
-            ],
-            'user_context' => [
-                'current_points' => $userPoints,
-                'loyalty_tier' => $tier,
-            ],
-        ]);
     }
 
     /**
