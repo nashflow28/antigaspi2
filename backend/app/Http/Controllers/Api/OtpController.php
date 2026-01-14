@@ -133,15 +133,17 @@ class OtpController extends Controller
                 ->first();
 
             if (! $user) {
+                // OTP was verified successfully, but no user exists with this phone
+                // Return success: true so mobile knows OTP verification worked
                 return response()->json([
-                    'success' => false,
-                    'message' => 'Aucun compte associé à ce numéro. Veuillez vous inscrire.',
+                    'success' => true,
+                    'message' => 'Numéro vérifié. Veuillez créer votre compte.',
                     'data' => [
                         'phone' => $phone,
                         'verified' => true,
                         'user_exists' => false,
                     ],
-                ], 404);
+                ], 200);
             }
 
             if (! $user->is_active) {

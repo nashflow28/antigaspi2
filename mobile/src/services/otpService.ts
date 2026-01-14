@@ -50,11 +50,12 @@ class OtpService {
    */
   async sendOtp(phone: string, purpose: OtpPurpose = 'registration'): Promise<SendOtpResponse> {
     try {
-      const response = await api.post('/auth/otp/send', {
+      const response = await api.post<SendOtpResponse>('/auth/otp/send', {
         phone: this.normalizePhone(phone),
         purpose,
       })
-      return response.data as unknown as SendOtpResponse
+      // api.post already returns response.data, so return it directly
+      return response
     } catch (error: any) {
       if (error.response?.data) {
         return error.response.data as SendOtpResponse
@@ -74,12 +75,13 @@ class OtpService {
    */
   async verifyOtp(phone: string, otp: string, purpose: OtpPurpose = 'registration'): Promise<VerifyOtpResponse> {
     try {
-      const response = await api.post('/auth/otp/verify', {
+      const response = await api.post<VerifyOtpResponse>('/auth/otp/verify', {
         phone: this.normalizePhone(phone),
         otp,
         purpose,
       })
-      return response.data as unknown as VerifyOtpResponse
+      // api.post already returns response.data, so return it directly
+      return response
     } catch (error: any) {
       if (error.response?.data) {
         return error.response.data as VerifyOtpResponse
@@ -98,11 +100,12 @@ class OtpService {
    */
   async resendOtp(phone: string, purpose: OtpPurpose = 'registration'): Promise<SendOtpResponse> {
     try {
-      const response = await api.post('/auth/otp/resend', {
+      const response = await api.post<SendOtpResponse>('/auth/otp/resend', {
         phone: this.normalizePhone(phone),
         purpose,
       })
-      return response.data as unknown as SendOtpResponse
+      // api.post already returns response.data, so return it directly
+      return response
     } catch (error: any) {
       if (error.response?.data) {
         return error.response.data as SendOtpResponse
@@ -121,13 +124,14 @@ class OtpService {
    */
   async checkStatus(phone: string, purpose: OtpPurpose = 'registration'): Promise<OtpStatusResponse> {
     try {
-      const response = await api.get('/auth/otp/status', {
+      const response = await api.get<OtpStatusResponse>('/auth/otp/status', {
         params: {
           phone: this.normalizePhone(phone),
           purpose,
         },
       })
-      return response.data as unknown as OtpStatusResponse
+      // api.get already returns response.data, so return it directly
+      return response
     } catch (error: any) {
       return {
         success: false,
