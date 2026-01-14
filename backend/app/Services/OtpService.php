@@ -197,6 +197,27 @@ class OtpService
     }
 
     /**
+     * Clear verification status for a phone after successful registration/login
+     *
+     * @param  string  $phone  Phone number
+     * @param  string  $purpose  Purpose of OTP
+     */
+    public function clearVerification(string $phone, string $purpose = 'registration'): void
+    {
+        $phone = $this->normalizePhone($phone);
+
+        OtpVerification::where('phone', $phone)
+            ->where('purpose', $purpose)
+            ->whereNotNull('verified_at')
+            ->delete();
+
+        Log::info('OTP verification cleared', [
+            'phone' => $this->maskPhone($phone),
+            'purpose' => $purpose,
+        ]);
+    }
+
+    /**
      * Clean up expired OTPs (for scheduled task)
      */
     public function cleanupExpiredOtps(): int

@@ -5,6 +5,10 @@ use App\Http\Controllers\Api\AnalyticsController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\CartController;
 use App\Http\Controllers\Api\ConsumerController;
+use App\Http\Controllers\Api\DeliveryController;
+use App\Http\Controllers\Api\DeliveryZoneController;
+use App\Http\Controllers\Api\DriverController;
+use App\Http\Controllers\Api\DriverDeliveryController;
 use App\Http\Controllers\Api\FavoriteController;
 use App\Http\Controllers\Api\GeocodingController;
 use App\Http\Controllers\Api\InventoryController;
@@ -32,8 +36,12 @@ use Illuminate\Support\Facades\Route;
 
 // Routes d'authentification (publiques) - Rate limiting strict
 Route::prefix('auth')->middleware('throttle:auth')->group(function () {
-    Route::post('register', [AuthController::class, 'register']);
-    Route::post('login', [AuthController::class, 'login']); // Legacy
+    Route::post('register', [AuthController::class, 'register']); // Legacy (email-based)
+    Route::post('login', [AuthController::class, 'login']); // Legacy (email + password)
+
+    // Phone-based registration (NEW - Primary method)
+    Route::post('register-phone', [AuthController::class, 'registerWithPhone']); // Phone-first registration
+    Route::post('login-phone', [AuthController::class, 'loginWithPhone']); // Phone-based login
 
     // SMS OTP Verification (SMS.TG)
     Route::post('otp/send', [OtpController::class, 'send']);
@@ -437,6 +445,78 @@ Route::prefix('geocoding')->middleware('throttle:30,1')->group(function () {
     Route::get('/search', [GeocodingController::class, 'searchAddresses']); // Recherche d'adresses
     Route::post('/geocode', [GeocodingController::class, 'geocode']); // Adresse vers coordonnées
     Route::post('/reverse', [GeocodingController::class, 'reverseGeocode']); // Coordonnées vers adresse
+});
+
+// =========================================================================
+// DELIVERY FEATURE ROUTES
+// =========================================================================
+
+// Routes des zones de livraison (publiques)
+Route::prefix('delivery-zones')->group(function () {
+    Route::get('/', [DeliveryZoneController::class, 'index']); // Liste des zones actives
+    Route::get('/{zone}', [DeliveryZoneController::class, 'show']); // Détail d'une zone
+    Route::post('/estimate', [DeliveryZoneController::class, 'estimateFee']); // Estimer les frais
+    Route::post('/check-availability', [DeliveryZoneController::class, 'checkAvailability']); // Vérifier disponibilité
+});
+
+// Routes des livraisons (consommateurs)
+Route::prefix('deliveries')->middleware('jwt.auth')->group(function () {
+    // Consultation
+    Route::get('/history', [DeliveryController::class, 'history']); // Mon historique de livraisons
+    Route::get('/{delivery}', [DeliveryController::class, 'show']); // Détail d'une livraison
+    Route::get('/{delivery}/track', [DeliveryController::class, 'track']); // Suivi en temps réel
+
+    // Estimation
+    Route::post('/estimate/{reservation}', [DeliveryController::class, 'estimate']); // Estimer frais pour réservation
+
+    // Actions avec rate limiting
+    Route::middleware('throttle:write')->group(function () {
+        Route::post('/request/{reservation}', [DeliveryController::class, 'requestDelivery']); // Demander livraison
+        Route::post('/{delivery}/cancel', [DeliveryController::class, 'cancel']); // Annuler livraison
+        Route::post('/{delivery}/rate', [DeliveryController::class, 'rate']); // Noter la livraison
+    });
+});
+
+// Routes livreur - Gestion profil
+Route::prefix('driver')->middleware('jwt.auth')->group(function () {
+    // Profil et inscription
+    Route::get('/profile', [DriverController::class, 'profile']); // Mon profil livreur
+    Route::post('/register', [DriverController::class, 'register']); // S'inscrire comme livreur
+    Route::put('/profile', [DriverController::class, 'updateProfile']); // Mettre à jour profil
+
+    // Statut et localisation
+    Route::post('/toggle-availability', [DriverController::class, 'toggleAvailability']); // Online/Offline
+    Route::post('/location', [DriverController::class, 'updateLocation']); // Mettre à jour position
+
+    // Statistiques et gains
+    Route::get('/stats', [DriverController::class, 'stats']); // Mes statistiques
+    Route::get('/earnings', [DriverController::class, 'earnings']); // Mes gains
+});
+
+// Routes livreur - Gestion des livraisons
+Route::prefix('driver/deliveries')->middleware('jwt.auth')->group(function () {
+    // Consultation
+    Route::get('/available', [DriverDeliveryController::class, 'available']); // Livraisons disponibles
+    Route::get('/active', [DriverDeliveryController::class, 'active']); // Ma livraison en cours
+    Route::get('/history', [DriverDeliveryController::class, 'history']); // Mon historique
+
+    // Actions avec rate limiting
+    Route::middleware('throttle:write')->group(function () {
+        // Accepter/Refuser
+        Route::post('/{delivery}/accept', [DriverDeliveryController::class, 'accept']); // Accepter livraison
+        Route::post('/{delivery}/reject', [DriverDeliveryController::class, 'reject']); // Refuser offre
+
+        // Workflow de livraison
+        Route::post('/{delivery}/start-pickup', [DriverDeliveryController::class, 'startPickup']); // En route vers commerçant
+        Route::post('/{delivery}/confirm-pickup', [DriverDeliveryController::class, 'confirmPickup']); // Colis récupéré
+        Route::post('/{delivery}/start-delivery', [DriverDeliveryController::class, 'startDelivery']); // En route vers client
+        Route::post('/{delivery}/complete', [DriverDeliveryController::class, 'complete']); // Livraison terminée
+        Route::post('/{delivery}/report-failure', [DriverDeliveryController::class, 'reportFailure']); // Signaler échec
+
+        // Position et annulation
+        Route::post('/{delivery}/update-location', [DriverDeliveryController::class, 'updateLocation']); // MAJ position
+        Route::post('/{delivery}/cancel', [DriverDeliveryController::class, 'cancel']); // Annuler (avant pickup)
+    });
 });
 
 // Routes de test et informations

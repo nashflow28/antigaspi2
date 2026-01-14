@@ -587,4 +587,258 @@ class AuthController extends Controller
             ], 500);
         }
     }
+
+    /**
+     * Register with phone number (OTP verified)
+     * Phone is required, email is optional
+     */
+    public function registerWithPhone(Request $request): JsonResponse
+    {
+        $validator = Validator::make($request->all(), [
+            'phone' => 'required|string|min:8|max:20',
+            'first_name' => 'required|string|max:100',
+            'last_name' => 'required|string|max:100',
+            'email' => 'nullable|email|unique:users,email',
+            'role' => 'required|in:consumer,merchant',
+            'city' => 'nullable|string|max:100',
+            'password' => 'nullable|min:6', // Password optionnel pour inscription par téléphone
+
+            // Champs spécifiques aux commerçants
+            'business_name' => 'required_if:role,merchant|string|max:255',
+            'business_type' => 'required_if:role,merchant|string|max:100',
+            'siret' => 'nullable|string|max:20',
+        ], [
+            'phone.required' => 'Le numéro de téléphone est requis',
+            'first_name.required' => 'Le prénom est requis',
+            'last_name.required' => 'Le nom est requis',
+            'email.email' => 'L\'adresse email n\'est pas valide',
+            'email.unique' => 'Cette adresse email est déjà utilisée',
+            'role.required' => 'Le rôle est requis',
+            'role.in' => 'Le rôle doit être consumer ou merchant',
+            'business_name.required_if' => 'Le nom du commerce est requis pour les commerçants',
+            'business_type.required_if' => 'Le type de commerce est requis pour les commerçants',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Erreurs de validation',
+                'errors' => $validator->errors(),
+            ], 422);
+        }
+
+        // Normalize phone number
+        $phone = $this->normalizePhone($request->phone);
+
+        // Check if phone is already registered
+        $existingUser = User::where('phone', $phone)
+            ->orWhere('phone', '+'.$phone)
+            ->orWhere('phone', 'LIKE', '%'.substr($phone, -8))
+            ->first();
+
+        if ($existingUser) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Ce numéro de téléphone est déjà utilisé',
+                'errors' => [
+                    'phone' => ['Ce numéro de téléphone est déjà associé à un compte.'],
+                ],
+            ], 422);
+        }
+
+        // Verify OTP was validated for this phone (check cache/session)
+        $otpService = app(\App\Services\OtpService::class);
+        if (!$otpService->isPhoneVerified($phone, 'registration')) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Le numéro de téléphone n\'a pas été vérifié. Veuillez d\'abord valider votre code OTP.',
+                'errors' => [
+                    'phone' => ['Numéro non vérifié.'],
+                ],
+            ], 422);
+        }
+
+        try {
+            // Create user with phone as primary identifier
+            $user = User::create([
+                'phone' => $phone,
+                'email' => $request->email,
+                'password' => $request->password ? Hash::make($request->password) : Hash::make(bin2hex(random_bytes(16))), // Random password if not provided
+                'first_name' => $request->first_name,
+                'last_name' => $request->last_name,
+                'role' => $request->role,
+                'city' => $request->city ?? 'Lomé',
+                'is_active' => true,
+                'phone_verified_at' => now(), // Mark phone as verified
+            ]);
+
+            // Si c'est un commerçant, créer le profil merchant
+            if ($request->role === 'merchant') {
+                Merchant::create([
+                    'user_id' => $user->id,
+                    'business_name' => $request->business_name,
+                    'business_type' => $request->business_type,
+                    'siret' => $request->siret,
+                    'is_verified' => false,
+                ]);
+            }
+
+            // Clear OTP verification status after successful registration
+            $otpService->clearVerification($phone, 'registration');
+
+            // Générer le token JWT
+            $token = JWTAuth::fromUser($user);
+
+            $user->refresh();
+
+            Log::info('Phone registration successful', [
+                'user_id' => $user->id,
+                'phone' => substr($phone, 0, 5).'****',
+                'role' => $user->role,
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Inscription réussie',
+                'data' => [
+                    'user' => $this->formatUser($user),
+                    'token' => $token,
+                    'token_type' => 'Bearer',
+                    'expires_in' => JWTAuth::factory()->getTTL() * 60,
+                ],
+            ], 201);
+
+        } catch (\Illuminate\Database\QueryException $e) {
+            if ($e->errorInfo[1] == 1062) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Ce numéro de téléphone ou email est déjà utilisé',
+                    'errors' => [
+                        'phone' => ['Ce numéro est déjà associé à un compte.'],
+                    ],
+                ], 422);
+            }
+
+            Log::error('Phone registration DB error', [
+                'error' => $e->getMessage(),
+                'phone' => substr($phone, 0, 5).'****',
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Erreur lors de l\'inscription',
+            ], 500);
+        } catch (\Exception $e) {
+            Log::error('Phone registration error', [
+                'error' => $e->getMessage(),
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Erreur lors de l\'inscription',
+            ], 500);
+        }
+    }
+
+    /**
+     * Login with phone number (existing user)
+     * Called after OTP verification for login purpose
+     */
+    public function loginWithPhone(Request $request): JsonResponse
+    {
+        $validator = Validator::make($request->all(), [
+            'phone' => 'required|string|min:8|max:20',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Numéro de téléphone invalide',
+                'errors' => $validator->errors(),
+            ], 422);
+        }
+
+        $phone = $this->normalizePhone($request->phone);
+
+        // Verify OTP was validated for this phone
+        $otpService = app(\App\Services\OtpService::class);
+        if (!$otpService->isPhoneVerified($phone, 'login')) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Le numéro de téléphone n\'a pas été vérifié',
+            ], 422);
+        }
+
+        // Find user by phone
+        $user = User::where('phone', $phone)
+            ->orWhere('phone', '+'.$phone)
+            ->orWhere('phone', 'LIKE', '%'.substr($phone, -8))
+            ->first();
+
+        if (!$user) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Aucun compte associé à ce numéro',
+                'data' => [
+                    'user_exists' => false,
+                    'phone' => $phone,
+                ],
+            ], 404);
+        }
+
+        if (!$user->is_active) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Compte désactivé',
+            ], 403);
+        }
+
+        // Clear verification after successful login
+        $otpService->clearVerification($phone, 'login');
+
+        // Generate JWT
+        $token = JWTAuth::fromUser($user);
+
+        Log::info('Phone login successful', [
+            'user_id' => $user->id,
+            'phone' => substr($phone, 0, 5).'****',
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Connexion réussie',
+            'data' => [
+                'user' => $this->formatUser($user),
+                'token' => $token,
+                'token_type' => 'Bearer',
+                'expires_in' => JWTAuth::factory()->getTTL() * 60,
+            ],
+        ]);
+    }
+
+    /**
+     * Normalize phone number for storage and lookup
+     */
+    private function normalizePhone(string $phone): string
+    {
+        // Remove non-digit characters
+        $phone = preg_replace('/[^0-9]/', '', $phone);
+
+        // Remove leading 00 if present
+        if (str_starts_with($phone, '00')) {
+            $phone = substr($phone, 2);
+        }
+
+        // Add Togo country code if phone is 8 digits
+        if (strlen($phone) === 8) {
+            $phone = '228'.$phone;
+        }
+
+        // Handle 9 digit numbers starting with 0
+        if (strlen($phone) === 9 && str_starts_with($phone, '0')) {
+            $phone = '228'.substr($phone, 1);
+        }
+
+        return $phone;
+    }
 }
