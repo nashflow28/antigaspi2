@@ -66,14 +66,15 @@ class MerchantController extends Controller
 
             if ($userLat !== null && $userLng !== null) {
                 // Add distance calculation using Haversine formula
-                $query->selectRaw('
-                    merchants.*,
-                    (6371 * acos(cos(radians(?))
+                // Note: Only add distance_km column, don't re-select merchants.* to avoid duplicate column error
+                $query->selectRaw(
+                    '(6371 * acos(cos(radians(?))
                         * cos(radians(latitude))
                         * cos(radians(longitude) - radians(?))
                         + sin(radians(?))
-                        * sin(radians(latitude)))) AS distance_km
-                ', [$userLat, $userLng, $userLat])
+                        * sin(radians(latitude)))) AS distance_km',
+                    [$userLat, $userLng, $userLat]
+                )
                     ->whereNotNull('latitude')
                     ->whereNotNull('longitude');
 
