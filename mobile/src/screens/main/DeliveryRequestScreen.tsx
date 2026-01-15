@@ -8,6 +8,7 @@ import {
   TextInput,
   Alert,
   ActivityIndicator,
+  Switch,
 } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { Ionicons } from '@expo/vector-icons'
@@ -19,6 +20,28 @@ import { useHaptics } from '../../hooks/useHaptics'
 import { RootState, AppDispatch } from '../../store'
 import { estimateDelivery, requestDelivery, clearDeliveryError } from '../../store/slices/deliverySlice'
 import LoadingSpinner from '../../components/LoadingSpinner'
+
+/**
+ * Normalize phone number to +228 format (Togo)
+ */
+const normalizePhone = (phone: string): string => {
+  if (!phone) return ''
+  // Remove spaces, dashes, parentheses
+  let cleaned = phone.replace(/[\s\-()]/g, '')
+  // If starts with 00, replace with +
+  if (cleaned.startsWith('00')) {
+    cleaned = '+' + cleaned.substring(2)
+  }
+  // If 8 digits without prefix, assume Togo
+  if (/^\d{8}$/.test(cleaned)) {
+    cleaned = '+228' + cleaned
+  }
+  // If starts with 228 without +, add +
+  if (cleaned.startsWith('228') && !cleaned.startsWith('+')) {
+    cleaned = '+' + cleaned
+  }
+  return cleaned
+}
 
 const DeliveryRequestScreen: React.FC = () => {
   const theme = useTheme()
@@ -32,6 +55,7 @@ const DeliveryRequestScreen: React.FC = () => {
   const { estimate, estimateLoading, requestLoading, error } = useSelector(
     (state: RootState) => state.delivery
   )
+  const { user } = useSelector((state: RootState) => state.auth)
 
   const [deliveryAddress, setDeliveryAddress] = useState('')
   const [deliveryLatitude, setDeliveryLatitude] = useState<number | null>(null)
@@ -39,8 +63,25 @@ const DeliveryRequestScreen: React.FC = () => {
   const [deliveryInstructions, setDeliveryInstructions] = useState('')
   const [recipientName, setRecipientName] = useState('')
   const [recipientPhone, setRecipientPhone] = useState('')
+  const [useMyInfo, setUseMyInfo] = useState(false)
   const [useCurrentLocation, setUseCurrentLocation] = useState(false)
   const [locationLoading, setLocationLoading] = useState(false)
+
+  // Handle "use my info" toggle
+  const handleUseMyInfoToggle = useCallback((value: boolean) => {
+    setUseMyInfo(value)
+    haptics.lightTap()
+    if (value && user) {
+      // Pre-fill from user profile
+      const fullName = [user.first_name, user.last_name].filter(Boolean).join(' ')
+      setRecipientName(fullName || '')
+      setRecipientPhone(normalizePhone(user.phone || ''))
+    } else {
+      // Clear fields
+      setRecipientName('')
+      setRecipientPhone('')
+    }
+  }, [user, haptics])
 
   useEffect(() => {
     if (error) {
@@ -140,7 +181,7 @@ const DeliveryRequestScreen: React.FC = () => {
         delivery_longitude: deliveryLongitude,
         delivery_instructions: deliveryInstructions || undefined,
         recipient_name: recipientName.trim(),
-        recipient_phone: recipientPhone.trim(),
+        recipient_phone: normalizePhone(recipientPhone.trim()),
       })).unwrap()
 
       haptics.success()
@@ -227,6 +268,24 @@ const DeliveryRequestScreen: React.FC = () => {
             </View>
           )}
 
+          {/* Use my info toggle */}
+          {user && (
+            <View style={[styles.useMyInfoRow, { borderColor: theme.colors.border }]}>
+              <View style={styles.useMyInfoContent}>
+                <Ionicons name="person" size={18} color={theme.colors.primary[500]} />
+                <Text style={[styles.useMyInfoText, { color: theme.colors.text }]}>
+                  Utiliser mes informations
+                </Text>
+              </View>
+              <Switch
+                value={useMyInfo}
+                onValueChange={handleUseMyInfoToggle}
+                trackColor={{ false: theme.colors.neutral[300], true: theme.colors.primary[300] }}
+                thumbColor={useMyInfo ? theme.colors.primary[500] : theme.colors.neutral[100]}
+              />
+            </View>
+          )}
+
           {/* Recipient info */}
           <Text style={[styles.label, { color: theme.colors.textSecondary }]}>
             Nom du destinataire *
@@ -241,7 +300,10 @@ const DeliveryRequestScreen: React.FC = () => {
               },
             ]}
             value={recipientName}
-            onChangeText={setRecipientName}
+            onChangeText={(text) => {
+              setRecipientName(text)
+              if (useMyInfo) setUseMyInfo(false) // Turn off toggle if user edits
+            }}
             placeholder="Nom complet du destinataire"
             placeholderTextColor={theme.colors.textTertiary}
           />
@@ -259,7 +321,10 @@ const DeliveryRequestScreen: React.FC = () => {
               },
             ]}
             value={recipientPhone}
-            onChangeText={setRecipientPhone}
+            onChangeText={(text) => {
+              setRecipientPhone(text)
+              if (useMyInfo) setUseMyInfo(false) // Turn off toggle if user edits
+            }}
             placeholder="+228 90 12 34 56"
             placeholderTextColor={theme.colors.textTertiary}
             keyboardType="phone-pad"
@@ -348,6 +413,16 @@ const DeliveryRequestScreen: React.FC = () => {
                 </Text>
               </View>
             )}
+
+            {/* Unavailable warning */}
+            {!estimate.is_available && (
+              <View style={[styles.unavailableBadge, { backgroundColor: theme.colors.error + '20' }]}>
+                <Ionicons name="warning" size={16} color={theme.colors.error} />
+                <Text style={[styles.unavailableText, { color: theme.colors.error }]}>
+                  {estimate.unavailable_message || 'Livraison non disponible pour cette zone'}
+                </Text>
+              </View>
+            )}
           </View>
         )}
 
@@ -356,10 +431,10 @@ const DeliveryRequestScreen: React.FC = () => {
           style={[
             styles.submitButton,
             { backgroundColor: theme.colors.primary[500] },
-            (!estimate || requestLoading) && styles.submitButtonDisabled,
+            (!estimate || requestLoading || !estimate?.is_available) && styles.submitButtonDisabled,
           ]}
           onPress={handleRequestDelivery}
-          disabled={!estimate || requestLoading}
+          disabled={!estimate || requestLoading || !estimate?.is_available}
         >
           {requestLoading ? (
             <ActivityIndicator size="small" color="white" />
@@ -520,6 +595,36 @@ const styles = StyleSheet.create({
   },
   freeDeliveryText: {
     fontSize: 13,
+    fontWeight: '500',
+    marginLeft: 8,
+  },
+  unavailableBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 10,
+    borderRadius: 8,
+    marginTop: 12,
+  },
+  unavailableText: {
+    fontSize: 13,
+    fontWeight: '500',
+    marginLeft: 8,
+    flex: 1,
+  },
+  useMyInfoRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingVertical: 12,
+    marginTop: 12,
+    borderTopWidth: 1,
+  },
+  useMyInfoContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  useMyInfoText: {
+    fontSize: 14,
     fontWeight: '500',
     marginLeft: 8,
   },

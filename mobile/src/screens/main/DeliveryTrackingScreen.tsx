@@ -1,4 +1,4 @@
-import React, { useEffect, useCallback, useState, useRef } from 'react'
+import React, { useEffect, useCallback, useState, useRef, useMemo } from 'react'
 import {
   View,
   Text,
@@ -13,12 +13,79 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 import { Ionicons } from '@expo/vector-icons'
 import { useNavigation, useRoute } from '@react-navigation/native'
 import { useDispatch, useSelector } from 'react-redux'
-import MapView, { Marker, Polyline, PROVIDER_GOOGLE } from 'react-native-maps'
+import MapView, { Marker, Polyline, PROVIDER_GOOGLE, LatLng } from 'react-native-maps'
 import { useTheme } from '../../theme'
 import { useHaptics } from '../../hooks/useHaptics'
 import { RootState, AppDispatch } from '../../store'
 import { fetchDeliveryTracking, cancelDelivery, clearDeliveryError } from '../../store/slices/deliverySlice'
 import LoadingSpinner from '../../components/LoadingSpinner'
+
+/**
+ * Decode a Google-encoded polyline string into an array of LatLng coordinates
+ * @param encoded - The encoded polyline string
+ * @returns Array of {latitude, longitude} coordinates
+ */
+const decodePolyline = (encoded: string): LatLng[] => {
+  const points: LatLng[] = []
+  let index = 0
+  const len = encoded.length
+  let lat = 0
+  let lng = 0
+
+  while (index < len) {
+    let shift = 0
+    let result = 0
+    let byte: number
+
+    // Decode latitude
+    do {
+      byte = encoded.charCodeAt(index++) - 63
+      result |= (byte & 0x1f) << shift
+      shift += 5
+    } while (byte >= 0x20)
+    const deltaLat = result & 1 ? ~(result >> 1) : result >> 1
+    lat += deltaLat
+
+    shift = 0
+    result = 0
+
+    // Decode longitude
+    do {
+      byte = encoded.charCodeAt(index++) - 63
+      result |= (byte & 0x1f) << shift
+      shift += 5
+    } while (byte >= 0x20)
+    const deltaLng = result & 1 ? ~(result >> 1) : result >> 1
+    lng += deltaLng
+
+    points.push({
+      latitude: lat / 1e5,
+      longitude: lng / 1e5,
+    })
+  }
+
+  return points
+}
+
+/**
+ * Format duration in seconds to human-readable string
+ */
+const formatDuration = (seconds: number): string => {
+  if (seconds < 60) return `${seconds} sec`
+  const minutes = Math.ceil(seconds / 60)
+  if (minutes < 60) return `${minutes} min`
+  const hours = Math.floor(minutes / 60)
+  const remainingMinutes = minutes % 60
+  return remainingMinutes > 0 ? `${hours}h ${remainingMinutes}min` : `${hours}h`
+}
+
+/**
+ * Format distance in meters to human-readable string
+ */
+const formatDistance = (meters: number): string => {
+  if (meters < 1000) return `${Math.round(meters)} m`
+  return `${(meters / 1000).toFixed(1)} km`
+}
 
 const DeliveryTrackingScreen: React.FC = () => {
   const theme = useTheme()
@@ -36,6 +103,49 @@ const DeliveryTrackingScreen: React.FC = () => {
   )
 
   const [refreshing, setRefreshing] = useState(false)
+
+  // Decode route polyline if available, otherwise fall back to straight line
+  const routeCoordinates = useMemo((): LatLng[] => {
+    // If we have an encoded polyline from the API, decode it
+    if (trackingData?.route_polyline) {
+      try {
+        const decoded = decodePolyline(trackingData.route_polyline)
+        if (decoded.length > 0) return decoded
+      } catch (e) {
+        console.warn('Failed to decode route polyline:', e)
+      }
+    }
+
+    // Fallback: straight line from driver to destination (or pickup to destination)
+    if (trackingData?.driver_position) {
+      return [
+        {
+          latitude: trackingData.driver_position.latitude,
+          longitude: trackingData.driver_position.longitude,
+        },
+        {
+          latitude: trackingData.delivery.delivery_latitude,
+          longitude: trackingData.delivery.delivery_longitude,
+        },
+      ]
+    }
+
+    // Show route from pickup to delivery if no driver assigned yet
+    if (trackingData?.delivery.pickup_latitude && trackingData?.delivery.pickup_longitude) {
+      return [
+        {
+          latitude: trackingData.delivery.pickup_latitude,
+          longitude: trackingData.delivery.pickup_longitude,
+        },
+        {
+          latitude: trackingData.delivery.delivery_latitude,
+          longitude: trackingData.delivery.delivery_longitude,
+        },
+      ]
+    }
+
+    return []
+  }, [trackingData])
 
   // Pulse animation for driver marker
   useEffect(() => {
@@ -291,22 +401,13 @@ const DeliveryTrackingScreen: React.FC = () => {
           </Marker>
         )}
 
-        {/* Route line */}
-        {trackingData.driver_position && (
+        {/* Route line - uses real route polyline if available, otherwise straight line */}
+        {routeCoordinates.length >= 2 && (
           <Polyline
-            coordinates={[
-              {
-                latitude: trackingData.driver_position.latitude,
-                longitude: trackingData.driver_position.longitude,
-              },
-              {
-                latitude: trackingData.delivery.delivery_latitude,
-                longitude: trackingData.delivery.delivery_longitude,
-              },
-            ]}
+            coordinates={routeCoordinates}
             strokeColor={theme.colors.primary[500]}
-            strokeWidth={3}
-            lineDashPattern={[10, 5]}
+            strokeWidth={4}
+            lineDashPattern={trackingData.route_polyline ? undefined : [10, 5]}
           />
         )}
       </MapView>
@@ -321,15 +422,40 @@ const DeliveryTrackingScreen: React.FC = () => {
           </Text>
         </View>
 
-        {/* ETA - shows estimated time from delivery if available */}
-        {trackingData.delivery.estimated_duration && trackingData.delivery.status !== 'delivered' && (
-          <View style={styles.etaContainer}>
-            <Text style={[styles.etaLabel, { color: theme.colors.textSecondary }]}>
-              Temps estimé
-            </Text>
-            <Text style={[styles.etaValue, { color: theme.colors.text }]}>
-              {Math.ceil(trackingData.delivery.estimated_duration / 60)} min
-            </Text>
+        {/* ETA - shows estimated time and distance if available */}
+        {trackingData.delivery.status !== 'delivered' && (
+          trackingData.route_duration_seconds || trackingData.delivery.estimated_duration || trackingData.route_distance_meters
+        ) && (
+          <View style={[styles.etaCard, { backgroundColor: theme.colors.background }]}>
+            {/* Duration */}
+            {(trackingData.route_duration_seconds || trackingData.delivery.estimated_duration) && (
+              <View style={styles.etaItem}>
+                <Ionicons name="time" size={18} color={theme.colors.primary[500]} />
+                <View style={styles.etaItemContent}>
+                  <Text style={[styles.etaValue, { color: theme.colors.text }]}>
+                    {formatDuration(trackingData.route_duration_seconds || trackingData.delivery.estimated_duration || 0)}
+                  </Text>
+                  <Text style={[styles.etaLabel, { color: theme.colors.textSecondary }]}>
+                    Temps estimé
+                  </Text>
+                </View>
+              </View>
+            )}
+
+            {/* Distance */}
+            {(trackingData.route_distance_meters || trackingData.delivery.estimated_distance) && (
+              <View style={styles.etaItem}>
+                <Ionicons name="navigate" size={18} color={theme.colors.secondary} />
+                <View style={styles.etaItemContent}>
+                  <Text style={[styles.etaValue, { color: theme.colors.text }]}>
+                    {formatDistance(trackingData.route_distance_meters || trackingData.delivery.estimated_distance || 0)}
+                  </Text>
+                  <Text style={[styles.etaLabel, { color: theme.colors.textSecondary }]}>
+                    Distance restante
+                  </Text>
+                </View>
+              </View>
+            )}
           </View>
         )}
 
@@ -451,17 +577,26 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     marginLeft: 6,
   },
-  etaContainer: {
+  etaCard: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    padding: 12,
+    borderRadius: 12,
     marginBottom: 12,
   },
+  etaItem: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  etaItemContent: {
+    marginLeft: 8,
+  },
   etaLabel: {
-    fontSize: 14,
+    fontSize: 11,
+    marginTop: 2,
   },
   etaValue: {
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: 'bold',
   },
   driverCard: {

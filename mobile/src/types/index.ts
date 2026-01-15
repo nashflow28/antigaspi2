@@ -1061,6 +1061,10 @@ export interface DeliveryTrackingData {
     longitude: number
     address: string
   }
+  // Route data from routing service (Google-encoded polyline)
+  route_polyline?: string | null
+  route_distance_meters?: number | null
+  route_duration_seconds?: number | null
 }
 
 export interface DriverRegistrationPayload {
