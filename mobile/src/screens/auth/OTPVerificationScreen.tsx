@@ -99,7 +99,8 @@ const OTPVerificationScreen = ({ navigation, route }: any) => {
         if (payload.status === 'new_user') {
           // New user - navigate to phone-based profile completion
           navigation.replace('CompleteProfilePhone', {
-            phone: payload.phone || phoneNumber,
+            phoneNumber: payload.phone || phoneNumber,
+            phoneVerified: true,
           })
         } else {
           // Existing user - logged in successfully

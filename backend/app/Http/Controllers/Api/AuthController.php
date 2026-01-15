@@ -647,8 +647,13 @@ class AuthController extends Controller
         }
 
         // Verify OTP was validated for this phone (check cache/session)
+        // Accept verification from either 'registration' or 'login' purpose
+        // because user may have tried to login first and discovered they need to register
         $otpService = app(\App\Services\OtpService::class);
-        if (!$otpService->isPhoneVerified($phone, 'registration')) {
+        $isVerifiedForRegistration = $otpService->isPhoneVerified($phone, 'registration');
+        $isVerifiedForLogin = $otpService->isPhoneVerified($phone, 'login');
+
+        if (!$isVerifiedForRegistration && !$isVerifiedForLogin) {
             return response()->json([
                 'success' => false,
                 'message' => 'Le numéro de téléphone n\'a pas été vérifié. Veuillez d\'abord valider votre code OTP.',
@@ -683,8 +688,9 @@ class AuthController extends Controller
                 ]);
             }
 
-            // Clear OTP verification status after successful registration
+            // Clear OTP verification status after successful registration (both purposes)
             $otpService->clearVerification($phone, 'registration');
+            $otpService->clearVerification($phone, 'login');
 
             // Générer le token JWT
             $token = JWTAuth::fromUser($user);
