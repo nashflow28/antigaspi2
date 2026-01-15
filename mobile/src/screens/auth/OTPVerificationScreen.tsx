@@ -97,10 +97,9 @@ const OTPVerificationScreen = ({ navigation, route }: any) => {
         const payload = result.payload as OtpLoginResponse
 
         if (payload.status === 'new_user') {
-          // New user - navigate to complete profile
-          navigation.replace('CompleteProfile', {
-            phoneNumber: payload.phone || phoneNumber,
-            phoneVerified: true,
+          // New user - navigate to phone-based profile completion
+          navigation.replace('CompleteProfilePhone', {
+            phone: payload.phone || phoneNumber,
           })
         } else {
           // Existing user - logged in successfully
