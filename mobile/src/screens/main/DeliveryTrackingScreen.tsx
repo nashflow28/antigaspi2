@@ -215,8 +215,8 @@ const DeliveryTrackingScreen: React.FC = () => {
   }
 
   const callDriver = () => {
-    // Driver phone might be on driver directly or via user relation
-    const driverPhone = trackingData?.delivery.driver?.phone || trackingData?.delivery.driver?.user?.phone
+    // Driver phone is on the user relation
+    const driverPhone = trackingData?.delivery.driver?.user?.phone
     if (driverPhone) {
       Linking.openURL(`tel:${driverPhone}`)
     }
@@ -445,7 +445,7 @@ const DeliveryTrackingScreen: React.FC = () => {
             {/* Distance */}
             {(trackingData.route_distance_meters || trackingData.delivery.estimated_distance) && (
               <View style={styles.etaItem}>
-                <Ionicons name="navigate" size={18} color={theme.colors.secondary} />
+                <Ionicons name="navigate" size={18} color={theme.colors.accent.orange} />
                 <View style={styles.etaItemContent}>
                   <Text style={[styles.etaValue, { color: theme.colors.text }]}>
                     {formatDistance(trackingData.route_distance_meters || trackingData.delivery.estimated_distance || 0)}
@@ -464,12 +464,12 @@ const DeliveryTrackingScreen: React.FC = () => {
           <View style={[styles.driverCard, { backgroundColor: theme.colors.background }]}>
             <View style={[styles.driverAvatar, { backgroundColor: theme.colors.primary[100] }]}>
               <Text style={[styles.driverAvatarText, { color: theme.colors.primary[500] }]}>
-                {trackingData.delivery.driver.first_name?.charAt(0) || 'L'}
+                {trackingData.delivery.driver.user?.first_name?.charAt(0) || 'L'}
               </Text>
             </View>
             <View style={styles.driverInfo}>
               <Text style={[styles.driverName, { color: theme.colors.text }]}>
-                {trackingData.delivery.driver.first_name} {trackingData.delivery.driver.last_name}
+                {trackingData.delivery.driver.user?.first_name} {trackingData.delivery.driver.user?.last_name}
               </Text>
               <View style={styles.driverRating}>
                 <Ionicons name="star" size={14} color={theme.colors.warning} />
@@ -478,7 +478,7 @@ const DeliveryTrackingScreen: React.FC = () => {
                 </Text>
               </View>
             </View>
-            {(trackingData.delivery.driver.phone || trackingData.delivery.driver.user?.phone) && (
+            {trackingData.delivery.driver.user?.phone && (
               <TouchableOpacity
                 style={[styles.callButton, { backgroundColor: theme.colors.success }]}
                 onPress={callDriver}

@@ -161,7 +161,7 @@ export const rateDelivery = createAsyncThunk<
   try {
     const response = await deliveryService.rateDelivery(deliveryId, {
       consumer_rating: rating,
-      consumer_comment: comment,
+      consumer_feedback: comment,
     })
     return response.data
   } catch (error: any) {

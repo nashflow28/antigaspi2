@@ -1137,8 +1137,8 @@ export interface DeliveryCompletionPayload {
 }
 
 export interface DeliveryRatingPayload {
-  rating: number
-  feedback?: string | null
+  consumer_rating: number
+  consumer_feedback?: string | null
 }
 
 // Redux State Types

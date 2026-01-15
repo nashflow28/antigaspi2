@@ -355,7 +355,7 @@ const DeliveryRequestScreen: React.FC = () => {
 
         {/* Estimate button */}
         <TouchableOpacity
-          style={[styles.estimateButton, { backgroundColor: theme.colors.secondary }]}
+          style={[styles.estimateButton, { backgroundColor: theme.colors.accent.orange }]}
           onPress={handleEstimate}
           disabled={estimateLoading || !deliveryLatitude}
         >
