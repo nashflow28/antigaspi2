@@ -15,6 +15,7 @@ use App\Http\Controllers\Api\InventoryController;
 use App\Http\Controllers\Api\MerchantController;
 use App\Http\Controllers\Api\MessageController;
 use App\Http\Controllers\Api\NotificationController;
+use App\Http\Controllers\Api\DeviceAuthController;
 use App\Http\Controllers\Api\OtpController;
 use App\Http\Controllers\Api\PaymentController;
 use App\Http\Controllers\Api\ProductController;
@@ -49,6 +50,13 @@ Route::prefix('auth')->middleware('throttle:auth')->group(function () {
     Route::post('otp/resend', [OtpController::class, 'resend']);
     Route::get('otp/status', [OtpController::class, 'checkStatus']);
 
+    // Device-based authentication (NEW - Primary method)
+    Route::post('device/check-phone', [DeviceAuthController::class, 'checkPhone']);
+    Route::post('device/send-otp', [DeviceAuthController::class, 'sendOtp']);
+    Route::post('device/verify-otp', [DeviceAuthController::class, 'verifyOtpAndLogin']);
+    Route::post('device/login-pin', [DeviceAuthController::class, 'loginWithPin']);
+    Route::post('device/logout', [DeviceAuthController::class, 'logout']);
+
     // Routes sécurisées (nouvelles)
     Route::post('secure-login', [AuthController::class, 'secureLogin']);
     Route::post('secure-refresh', [AuthController::class, 'secureRefresh']);
@@ -64,6 +72,12 @@ Route::prefix('auth')->middleware('throttle:auth')->group(function () {
         Route::get('sessions', [AuthController::class, 'getActiveSessions']);
         Route::delete('sessions/{session_id}', [AuthController::class, 'revokeSession']);
         Route::post('revoke-all-sessions', [AuthController::class, 'revokeAllOtherSessions']);
+
+        // PIN and device management
+        Route::post('device/set-pin', [DeviceAuthController::class, 'setPin']);
+        Route::post('device/change-pin', [DeviceAuthController::class, 'changePin']);
+        Route::get('device/list', [DeviceAuthController::class, 'getDevices']);
+        Route::delete('device/{device}', [DeviceAuthController::class, 'revokeDevice']);
     });
 });
 

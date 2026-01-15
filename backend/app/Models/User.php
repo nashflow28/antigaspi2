@@ -37,11 +37,15 @@ class User extends Authenticatable implements JWTSubject
         'loyalty_tier',
         'lifetime_points',
         'tier_updated_at',
+        'pin_hash',
+        'pin_set_at',
+        'current_device_id',
     ];
 
     protected $hidden = [
         'password',
         'remember_token',
+        'pin_hash',
     ];
 
     protected function casts(): array
@@ -59,6 +63,7 @@ class User extends Authenticatable implements JWTSubject
             'referral_bonus_awarded' => 'boolean',
             'lifetime_points' => 'integer',
             'tier_updated_at' => 'datetime',
+            'pin_set_at' => 'datetime',
         ];
     }
 
@@ -185,6 +190,16 @@ class User extends Authenticatable implements JWTSubject
         return $this->hasMany(SearchQuery::class);
     }
 
+    public function devices(): HasMany
+    {
+        return $this->hasMany(UserDevice::class);
+    }
+
+    public function activeDevice(): HasOne
+    {
+        return $this->hasOne(UserDevice::class)->where('is_active', true);
+    }
+
     public function conversationsAsConsumer(): HasMany
     {
         return $this->hasMany(Conversation::class, 'consumer_id');
@@ -274,5 +289,80 @@ class User extends Authenticatable implements JWTSubject
     public function getWalletBalance(): float
     {
         return $this->wallet?->balance ?? 0.00;
+    }
+
+    // PIN Authentication methods
+
+    /**
+     * Check if user has a PIN set
+     */
+    public function hasPin(): bool
+    {
+        return !empty($this->pin_hash);
+    }
+
+    /**
+     * Set a new PIN for the user
+     */
+    public function setPin(string $pin): void
+    {
+        $this->update([
+            'pin_hash' => \Illuminate\Support\Facades\Hash::make($pin),
+            'pin_set_at' => now(),
+        ]);
+    }
+
+    /**
+     * Verify if the provided PIN matches
+     */
+    public function verifyPin(string $pin): bool
+    {
+        if (!$this->hasPin()) {
+            return false;
+        }
+
+        return \Illuminate\Support\Facades\Hash::check($pin, $this->pin_hash);
+    }
+
+    /**
+     * Get or create a device record for this user
+     */
+    public function getOrCreateDevice(string $deviceId, array $deviceInfo = []): UserDevice
+    {
+        $device = $this->devices()->where('device_id', $deviceId)->first();
+
+        if (!$device) {
+            $device = $this->devices()->create(array_merge([
+                'device_id' => $deviceId,
+            ], $deviceInfo));
+        } else {
+            // Update device info if provided
+            if (!empty($deviceInfo)) {
+                $device->update($deviceInfo);
+            }
+        }
+
+        return $device;
+    }
+
+    /**
+     * Deactivate all devices except the current one
+     * This enforces single session
+     */
+    public function deactivateOtherDevices(string $currentDeviceId): void
+    {
+        $this->devices()
+            ->where('device_id', '!=', $currentDeviceId)
+            ->update(['is_active' => false]);
+
+        $this->update(['current_device_id' => $currentDeviceId]);
+    }
+
+    /**
+     * Check if the given device is the current active device
+     */
+    public function isCurrentDevice(string $deviceId): bool
+    {
+        return $this->current_device_id === $deviceId;
     }
 }
