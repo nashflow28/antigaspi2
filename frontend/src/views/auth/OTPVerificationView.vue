@@ -326,16 +326,23 @@ onMounted(async () => {
           notify.success('Compte créé', 'Bienvenue sur Antigaspi !')
           sessionStorage.removeItem('pendingRegistration')
           router.push({ name: 'home' })
+          return // Only return on success
         } else {
           error.value = result.error || 'Erreur lors de la création du compte'
+          // Fall through to start countdown so user can go back or retry
         }
       } catch (err: any) {
         error.value = err.message || 'Erreur lors de la création du compte'
+        // Fall through to start countdown so user can go back or retry
       } finally {
         loading.value = false
       }
+    } else {
+      // No pending registration data - redirect back to phone-register
+      notify.error('Données manquantes', 'Veuillez recommencer l\'inscription')
+      router.push({ name: 'phone-register', query: { phone: phone.value } })
+      return
     }
-    return
   }
 
   startCountdown()
