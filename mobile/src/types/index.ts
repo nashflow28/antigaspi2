@@ -5,7 +5,7 @@ export interface User {
   first_name: string
   last_name: string
   email?: string | null // Optional for phone-only auth
-  role: 'consumer' | 'merchant' | 'admin'
+  role: 'consumer' | 'merchant' | 'admin' | 'driver'
   city: string
   phone?: string
   address?: string
@@ -880,26 +880,310 @@ export interface OrderCreationResponse {
   }
 }
 
-// === FIREBASE PHONE AUTHENTICATION ===
+// ============ DELIVERY FEATURE TYPES ============
 
-export interface FirebaseLoginResponse {
-  status: 'success' | 'new_user'
-  token?: string
-  refresh_token?: string
-  user?: User
-  // For new users
-  phone?: string
-  firebase_uid?: string
-  message?: string
+export type DeliveryStatus =
+  | 'pending'
+  | 'searching'
+  | 'assigned'
+  | 'picking_up'
+  | 'picked_up'
+  | 'delivering'
+  | 'delivered'
+  | 'cancelled'
+  | 'failed'
+
+export type VehicleType = 'moto' | 'velo' | 'voiture' | 'pied'
+
+export type DriverEarningType = 'delivery' | 'bonus' | 'tip' | 'adjustment' | 'withdrawal'
+
+export interface DeliveryZone {
+  id: number
+  name: string
+  city: string
+  is_active: boolean
+  base_fee: number
+  per_km_fee: number
+  min_fee: number
+  max_fee: number
+  center_latitude: number
+  center_longitude: number
+  polygon_coordinates?: string | null
+  created_at: string
+  updated_at: string
 }
 
-export interface FirebaseRegisterData {
-  firebase_token: string // SECURITY: Token re-verified by backend
-  first_name: string
-  last_name: string
-  email?: string
-  role: 'consumer' | 'merchant'
-  // Merchant-only fields
-  business_name?: string
-  business_type?: string
+export interface DeliveryDriver {
+  id: number
+  user_id: number
+  delivery_zone_id?: number | null
+  vehicle_type: VehicleType
+  vehicle_plate?: string | null
+  license_number?: string | null
+  id_card_url?: string | null
+  license_url?: string | null
+  photo_url?: string | null
+  is_verified: boolean
+  is_active: boolean
+  is_available: boolean
+  is_online: boolean
+  current_latitude?: number | null
+  current_longitude?: number | null
+  last_location_update?: string | null
+  rating: number
+  total_deliveries: number
+  total_earnings: number
+  created_at: string
+  updated_at: string
+  // Relations
+  user?: User
+  zone?: DeliveryZone | null
+}
+
+export interface Delivery {
+  id: number
+  reservation_id: number
+  driver_id?: number | null
+  delivery_zone_id?: number | null
+  delivery_code: string
+  status: DeliveryStatus
+  // Pickup location (merchant)
+  pickup_address: string
+  pickup_latitude: number
+  pickup_longitude: number
+  // Delivery location (consumer)
+  delivery_address: string
+  delivery_latitude: number
+  delivery_longitude: number
+  delivery_instructions?: string | null
+  // Recipient
+  recipient_name: string
+  recipient_phone: string
+  // Pricing
+  delivery_fee: number
+  driver_commission: number
+  platform_commission: number
+  // Route info
+  estimated_distance?: number | null
+  estimated_duration?: number | null
+  actual_distance?: number | null
+  actual_duration?: number | null
+  // Timestamps
+  assigned_at?: string | null
+  picked_up_at?: string | null
+  delivered_at?: string | null
+  cancelled_at?: string | null
+  failed_at?: string | null
+  // Proof
+  delivery_photo_url?: string | null
+  signature_url?: string | null
+  // Rating
+  consumer_rating?: number | null
+  consumer_feedback?: string | null
+  // Notes
+  cancellation_reason?: string | null
+  failure_reason?: string | null
+  driver_notes?: string | null
+  created_at: string
+  updated_at: string
+  // Relations
+  reservation?: Reservation
+  driver?: DeliveryDriver | null
+  zone?: DeliveryZone | null
+}
+
+export interface DeliveryTracking {
+  id: number
+  delivery_id: number
+  latitude: number
+  longitude: number
+  speed?: number | null
+  heading?: number | null
+  recorded_at: string
+}
+
+export interface DriverEarning {
+  id: number
+  driver_id: number
+  delivery_id?: number | null
+  type: DriverEarningType
+  amount: number
+  description?: string | null
+  status: 'pending' | 'completed' | 'failed'
+  processed_at?: string | null
+  created_at: string
+}
+
+// API Request/Response Types
+
+export interface DeliveryEstimate {
+  delivery_fee: number
+  driver_commission: number
+  platform_commission: number
+  distance_km: number
+  free_delivery: boolean
+  free_delivery_message?: string | null
+  zone?: {
+    id: number
+    name: string
+    city: string
+  } | null
+  estimated_time_minutes: number
+  estimated_time_text: string
+  is_available: boolean
+  unavailable_message?: string | null
+}
+
+export interface DeliveryRequestPayload {
+  delivery_address: string
+  delivery_latitude: number
+  delivery_longitude: number
+  delivery_instructions?: string | null
+  recipient_name: string
+  recipient_phone: string
+}
+
+export interface DeliveryTrackingData {
+  delivery: Delivery
+  driver_position?: {
+    latitude: number
+    longitude: number
+    updated_at: string
+  } | null
+  tracking_history: DeliveryTracking[]
+  pickup_location: {
+    latitude: number
+    longitude: number
+    address: string
+  }
+  delivery_location: {
+    latitude: number
+    longitude: number
+    address: string
+  }
+}
+
+export interface DriverRegistrationPayload {
+  vehicle_type: VehicleType
+  vehicle_plate?: string | null
+  license_number?: string | null
+  delivery_zone_id?: number | null
+  id_card_url?: string | null
+  license_url?: string | null
+  photo_url?: string | null
+}
+
+export interface DriverProfileUpdatePayload {
+  vehicle_type?: VehicleType
+  vehicle_plate?: string | null
+  license_number?: string | null
+  delivery_zone_id?: number | null
+  photo_url?: string | null
+}
+
+export interface DriverLocationPayload {
+  latitude: number
+  longitude: number
+  speed?: number | null
+  heading?: number | null
+  accuracy?: number | null
+}
+
+export interface DriverStats {
+  overview: {
+    total_deliveries: number
+    total_earnings: number
+    rating: number
+    member_since: string
+  }
+  daily_stats: Array<{
+    date: string
+    count: number
+    earnings: number
+  }>
+  rating_breakdown: Record<number, number> // { 5: 10, 4: 5, ... }
+  current_status: {
+    is_available: boolean
+    is_online: boolean
+    active_delivery?: Delivery | null
+  }
+}
+
+export interface DriverEarningsResponse {
+  earnings: {
+    data: DriverEarning[]
+    current_page: number
+    last_page: number
+    per_page: number
+    total: number
+  }
+  summary: {
+    total: number
+    deliveries: number
+    bonuses: number
+    tips: number
+    withdrawals: number
+  }
+}
+
+export interface DeliveryCompletionPayload {
+  photo_url?: string | null
+  signature_url?: string | null
+  notes?: string | null
+}
+
+export interface DeliveryRatingPayload {
+  rating: number
+  feedback?: string | null
+}
+
+// Redux State Types
+
+export interface DeliveryState {
+  // Consumer deliveries
+  activeDelivery: Delivery | null
+  deliveryHistory: Delivery[]
+  tracking: DeliveryTrackingData | null
+
+  // Estimates
+  currentEstimate: DeliveryEstimate | null
+
+  // Loading states
+  loading: boolean
+  trackingLoading: boolean
+  estimateLoading: boolean
+
+  // Errors
+  error: string | null
+}
+
+export interface DriverState {
+  // Profile
+  profile: DeliveryDriver | null
+  isDriver: boolean
+
+  // Deliveries
+  availableDeliveries: Delivery[]
+  activeDelivery: Delivery | null
+  deliveryHistory: Delivery[]
+
+  // Stats & Earnings
+  stats: DriverStats | null
+  earnings: DriverEarningsResponse | null
+
+  // Zones
+  zones: DeliveryZone[]
+
+  // Loading states
+  loading: boolean
+  profileLoading: boolean
+  statsLoading: boolean
+  earningsLoading: boolean
+  deliveriesLoading: boolean
+
+  // Errors
+  error: string | null
+
+  // Location tracking
+  isTrackingLocation: boolean
 }

@@ -45,8 +45,10 @@ class OTPService {
 
   /**
    * Send OTP to phone number
+   * @param phone Phone number
+   * @param purpose 'registration' | 'login' (must match backend OtpController validation)
    */
-  async sendOTP(phone: string, purpose: 'login' | 'register' | 'verify' = 'verify'): Promise<OTPSendResult> {
+  async sendOTP(phone: string, purpose: 'login' | 'registration' = 'registration'): Promise<OTPSendResult> {
     try {
       const response = await apiService.post<OTPApiResponse>(`${this.baseUrl}/send`, {
         phone: this.formatPhone(phone),
@@ -108,11 +110,14 @@ class OTPService {
 
   /**
    * Resend OTP (with rate limiting)
+   * @param phone Phone number
+   * @param purpose 'registration' | 'login' (must match backend validation)
    */
-  async resendOTP(phone: string): Promise<OTPSendResult> {
+  async resendOTP(phone: string, purpose: 'login' | 'registration' = 'registration'): Promise<OTPSendResult> {
     try {
       const response = await apiService.post<OTPApiResponse>(`${this.baseUrl}/resend`, {
-        phone: this.formatPhone(phone)
+        phone: this.formatPhone(phone),
+        purpose
       })
 
       if (response.success) {
@@ -178,14 +183,19 @@ class OTPService {
   }
 
   /**
-   * Register with OTP
+   * Register with OTP - Uses /auth/register-phone endpoint
+   * @param data Registration data with required fields for phone-based registration
    */
   async registerWithOTP(data: {
     phone: string
     code: string
-    name: string
+    first_name: string
+    last_name: string
     email?: string
-    password?: string
+    role?: 'consumer' | 'merchant'
+    city?: string
+    business_name?: string
+    business_type?: string
   }): Promise<OTPVerifyResult> {
     try {
       // First verify OTP
@@ -202,14 +212,88 @@ class OTPService {
         }
       }
 
-      // Then register the user
-      const response = await apiService.post<AuthRegisterResponse>('/auth/register', {
-        name: data.name,
-        email: data.email,
+      // Then register the user via phone-based endpoint
+      const registrationPayload: Record<string, unknown> = {
         phone: this.formatPhone(data.phone),
-        password: data.password || Math.random().toString(36).slice(-8), // Generate random password if not provided
-        phone_verified: true
-      })
+        first_name: data.first_name,
+        last_name: data.last_name,
+        role: data.role || 'consumer',
+        city: data.city || 'Lomé',
+      }
+
+      // Add optional fields
+      if (data.email) {
+        registrationPayload.email = data.email
+      }
+
+      // Merchant-specific fields
+      if (data.role === 'merchant') {
+        if (data.business_name) registrationPayload.business_name = data.business_name
+        if (data.business_type) registrationPayload.business_type = data.business_type
+      }
+
+      const response = await apiService.post<AuthRegisterResponse>('/auth/register-phone', registrationPayload)
+
+      if (response.success) {
+        return {
+          success: true,
+          token: response.data?.token,
+          user: response.data?.user,
+          message: 'Inscription réussie'
+        }
+      }
+
+      return {
+        success: false,
+        error: response.message || 'Échec de l\'inscription'
+      }
+    } catch (error: unknown) {
+      const err = error as { response?: { data?: { message?: string } }; message?: string }
+      return {
+        success: false,
+        error: err.response?.data?.message || err.message || 'Erreur d\'inscription'
+      }
+    }
+  }
+
+  /**
+   * Register user with already-verified phone (no OTP needed)
+   * Used when user verified phone during login flow but account doesn't exist
+   * @param data Registration data (phone already verified)
+   */
+  async registerWithVerifiedPhone(data: {
+    phone: string
+    first_name: string
+    last_name: string
+    email?: string
+    role?: 'consumer' | 'merchant'
+    city?: string
+    business_name?: string
+    business_type?: string
+  }): Promise<OTPVerifyResult> {
+    try {
+      // Build registration payload
+      const registrationPayload: Record<string, unknown> = {
+        phone: this.formatPhone(data.phone),
+        first_name: data.first_name,
+        last_name: data.last_name,
+        role: data.role || 'consumer',
+        city: data.city || 'Lomé',
+        phone_verified: true, // Signal that phone is already verified
+      }
+
+      // Add optional fields
+      if (data.email) {
+        registrationPayload.email = data.email
+      }
+
+      // Merchant-specific fields
+      if (data.role === 'merchant') {
+        if (data.business_name) registrationPayload.business_name = data.business_name
+        if (data.business_type) registrationPayload.business_type = data.business_type
+      }
+
+      const response = await apiService.post<AuthRegisterResponse>('/auth/register-phone', registrationPayload)
 
       if (response.success) {
         return {

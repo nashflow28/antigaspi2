@@ -120,7 +120,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { Phone, AlertCircle, Loader2 } from 'lucide-vue-next'
 import Card from '@/components/ui/2025/Card.vue'
@@ -136,13 +136,24 @@ const isLogin = ref(route.name === 'phone-login')
 const loading = ref(false)
 const error = ref('')
 
+// Check if phone is already verified (coming from OTP login for non-existent user)
+const phoneAlreadyVerified = ref(route.query.verified === 'true')
+
 const form = ref({
   name: '',
-  phone: '',
+  phone: (route.query.phone as string) || '', // Pre-fill phone if provided
   email: ''
 })
 
 const errors = ref<Record<string, string>>({})
+
+// On mount, check if we're coming from verified OTP and should skip OTP sending
+onMounted(() => {
+  if (phoneAlreadyVerified.value && form.value.phone) {
+    // Phone is already verified, we just need user info for registration
+    // No need to send OTP again
+  }
+})
 
 const isFormValid = computed(() => {
   if (!form.value.phone) return false
@@ -200,19 +211,58 @@ const handleSubmit = async () => {
   try {
     const fullPhone = formatPhoneNumber(form.value.phone)
 
-    // Send OTP via backend SMS service
+    // If phone is already verified (coming from OTP login for non-existent user),
+    // skip OTP sending and go directly to registration with verified status
+    if (phoneAlreadyVerified.value && !isLogin.value) {
+      // Split name into first_name and last_name
+      const nameParts = form.value.name.trim().split(' ')
+      const firstName = nameParts[0] || ''
+      const lastName = nameParts.slice(1).join(' ') || nameParts[0] || ''
+
+      sessionStorage.setItem('pendingRegistration', JSON.stringify({
+        first_name: firstName,
+        last_name: lastName,
+        email: form.value.email,
+        phone: fullPhone,
+        role: 'consumer',
+        city: 'Lomé'
+      }))
+
+      // Go directly to OTP verification with already-verified status
+      // OTPVerificationView will detect pendingRegistration and proceed to register
+      router.push({
+        name: 'otp-verify',
+        query: {
+          phone: fullPhone,
+          mode: 'register',
+          verified: 'true' // Signal that OTP is already verified
+        }
+      })
+      return
+    }
+
+    // Normal flow: Send OTP via backend SMS service
+    // Use 'login' for login flow, 'registration' for register flow (matches backend validation)
     const result = await otpService.sendOTP(
       fullPhone,
-      isLogin.value ? 'login' : 'register'
+      isLogin.value ? 'login' : 'registration'
     )
 
     if (result.success) {
-      // Store registration data if needed
+      // Store registration data if needed (use first_name/last_name for /auth/register-phone)
       if (!isLogin.value) {
+        // Split name into first_name and last_name
+        const nameParts = form.value.name.trim().split(' ')
+        const firstName = nameParts[0] || ''
+        const lastName = nameParts.slice(1).join(' ') || nameParts[0] || ''
+
         sessionStorage.setItem('pendingRegistration', JSON.stringify({
-          name: form.value.name,
+          first_name: firstName,
+          last_name: lastName,
           email: form.value.email,
-          phone: fullPhone
+          phone: fullPhone,
+          role: 'consumer', // Default role
+          city: 'Lomé' // Default city
         }))
       }
 

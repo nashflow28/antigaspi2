@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit'
-import { AuthState, User, LoginCredentials, RegisterData, AuthResponse, FirebaseLoginResponse, FirebaseRegisterData } from '../../types'
+import { AuthState, User, LoginCredentials, RegisterData, AuthResponse } from '../../types'
 import apiService from '../../services/api'
 import { secureStorage } from '../../services/secureStorage'
 import { clearAllFormCaches } from '../../hooks/usePersistedForm'
@@ -116,38 +116,6 @@ export const refreshProfile = createAsyncThunk(
       const response = await apiService.getProfile()
       return response.data
     } catch (error: any) {
-      return rejectWithValue(error.message)
-    }
-  }
-)
-
-// Firebase Phone Authentication - Login with Firebase ID token
-export const loginWithFirebase = createAsyncThunk(
-  'auth/loginWithFirebase',
-  async (firebaseIdToken: string, { rejectWithValue }) => {
-    try {
-      const response = await apiService.firebaseLogin(firebaseIdToken)
-      return response
-    } catch (error: any) {
-      return rejectWithValue(error.message)
-    }
-  }
-)
-
-// Firebase Phone Authentication - Register new user after phone verification
-export const registerWithFirebase = createAsyncThunk(
-  'auth/registerWithFirebase',
-  async (data: FirebaseRegisterData, { rejectWithValue }) => {
-    try {
-      const response = await apiService.firebaseRegister(data)
-      return response
-    } catch (error: any) {
-      if (error.validationErrors) {
-        return rejectWithValue({
-          message: error.message,
-          errors: error.validationErrors
-        })
-      }
       return rejectWithValue(error.message)
     }
   }
@@ -341,56 +309,6 @@ const authSlice = createSlice({
       // Refresh profile
       .addCase(refreshProfile.fulfilled, (state, action: PayloadAction<User>) => {
         state.user = action.payload
-      })
-
-      // Firebase Login
-      .addCase(loginWithFirebase.pending, (state) => {
-        state.loading = true
-        state.error = null
-      })
-      .addCase(loginWithFirebase.fulfilled, (state, action) => {
-        state.loading = false
-        const payload = action.payload as FirebaseLoginResponse
-        if (payload.status === 'success' && payload.user) {
-          state.user = payload.user
-          state.token = payload.token || null
-          state.isAuthenticated = true
-        }
-        // If status is 'new_user', don't authenticate yet - let the screen handle navigation
-        state.error = null
-      })
-      .addCase(loginWithFirebase.rejected, (state, action) => {
-        state.loading = false
-        state.error = action.payload as string
-        state.isAuthenticated = false
-      })
-
-      // Firebase Register
-      .addCase(registerWithFirebase.pending, (state) => {
-        state.loading = true
-        state.error = null
-      })
-      .addCase(registerWithFirebase.fulfilled, (state, action) => {
-        state.loading = false
-        const payload = action.payload as FirebaseLoginResponse
-        if (payload.status === 'success' && payload.user) {
-          state.user = payload.user
-          state.token = payload.token || null
-          state.isAuthenticated = true
-        }
-        state.error = null
-      })
-      .addCase(registerWithFirebase.rejected, (state, action) => {
-        state.loading = false
-        const payload = action.payload
-        if (typeof payload === 'string') {
-          state.error = payload
-        } else if (payload && typeof payload === 'object' && 'message' in payload) {
-          state.error = (payload as any).message
-        } else {
-          state.error = 'Erreur lors de l\'inscription'
-        }
-        state.isAuthenticated = false
       })
 
       // OTP Login

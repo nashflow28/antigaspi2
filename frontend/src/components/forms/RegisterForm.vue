@@ -412,8 +412,12 @@ const validateForm = (): boolean => {
   }
 
   // Phone validation (optional but if provided, should be valid)
-  if (form.phone && !/^\+?[\d\s\-()]{8,}$/.test(form.phone)) {
-    errors.value.phone = 'Veuillez saisir un numéro de téléphone valide'
+  if (form.phone) {
+    // Clean phone number for validation
+    const cleanedPhone = form.phone.replace(/[\s\-()]/g, '')
+    if (!/^\+?[\d]{8,}$/.test(cleanedPhone)) {
+      errors.value.phone = 'Veuillez saisir un numéro de téléphone valide'
+    }
   }
 
   // Terms acceptance
@@ -426,6 +430,32 @@ const validateForm = (): boolean => {
 
 const togglePasswordVisibility = () => {
   showPassword.value = !showPassword.value
+}
+
+// Normalize phone to international format with +228 prefix (Togo)
+const normalizePhone = (phone: string): string => {
+  if (!phone) return ''
+
+  // Clean the phone number (remove spaces, dashes, parentheses)
+  let cleaned = phone.replace(/[\s\-()]/g, '')
+
+  // If already has + prefix, return as-is (already international)
+  if (cleaned.startsWith('+')) {
+    return cleaned
+  }
+
+  // If starts with 00, replace with +
+  if (cleaned.startsWith('00')) {
+    return '+' + cleaned.substring(2)
+  }
+
+  // If starts with country code without +, add +
+  if (cleaned.startsWith('228')) {
+    return '+' + cleaned
+  }
+
+  // Otherwise, assume local Togo number and add +228
+  return '+228' + cleaned
 }
 
 const handleSubmit = async () => {
@@ -442,7 +472,7 @@ const handleSubmit = async () => {
       email: form.email.trim().toLowerCase(),
       password: form.password,
       password_confirmation: form.password_confirmation,
-      phone: form.phone?.trim() || undefined,
+      phone: form.phone?.trim() ? normalizePhone(form.phone.trim()) : undefined,
       city: form.city.trim(),
       role: form.role,
       business_name: form.role === 'merchant' ? form.business_name?.trim() : undefined,

@@ -116,6 +116,7 @@ let countdownInterval: ReturnType<typeof setInterval> | null = null
 
 const phone = computed(() => route.query.phone as string || '')
 const mode = computed(() => route.query.mode as 'login' | 'register' || 'login')
+const alreadyVerified = computed(() => route.query.verified === 'true')
 
 const maskedPhone = computed(() => {
   if (!phone.value) return ''
@@ -206,6 +207,28 @@ const handleVerify = async () => {
 
     if (mode.value === 'login') {
       result = await otpService.loginWithOTP(phone.value, otp.value)
+
+      // Handle case where OTP is valid but user doesn't exist (user_exists: false)
+      // This happens when someone tries to login with a phone that's not registered
+      if (result.success && !result.token && !result.user) {
+        // OTP verified but user doesn't exist - redirect to registration
+        notify.info('Numéro non inscrit', 'Créez votre compte pour continuer')
+
+        // Store phone as verified for registration
+        sessionStorage.setItem('pendingRegistration', JSON.stringify({
+          phone: phone.value,
+          first_name: '',
+          last_name: '',
+          role: 'consumer',
+          city: 'Lomé'
+        }))
+
+        router.push({
+          name: 'phone-register',
+          query: { phone: phone.value, verified: 'true' }
+        })
+        return
+      }
     } else {
       const pendingData = sessionStorage.getItem('pendingRegistration')
       if (pendingData) {
@@ -225,12 +248,8 @@ const handleVerify = async () => {
 
       notify.success('Connexion réussie', 'Bienvenue sur Antigaspi !')
 
-      // Check if profile needs completion
-      if (result.user && !(result.user as any).profile_completed) {
-        router.push({ name: 'complete-profile' })
-      } else {
-        router.push({ name: 'home' })
-      }
+      // Navigate to home (profile completion is optional on web)
+      router.push({ name: 'home' })
     } else {
       error.value = result.error || 'Code incorrect'
       // Clear OTP on error
@@ -251,7 +270,9 @@ const handleResend = async () => {
   error.value = ''
 
   try {
-    const result = await otpService.resendOTP(phone.value)
+    // Pass purpose to match the current flow (login or registration)
+    const purpose = mode.value === 'login' ? 'login' : 'registration'
+    const result = await otpService.resendOTP(phone.value, purpose)
 
     if (result.success) {
       notify.success('Code envoyé', 'Un nouveau code a été envoyé')
@@ -283,11 +304,40 @@ watch(otp, (newValue) => {
   })
 })
 
-onMounted(() => {
+onMounted(async () => {
   if (!phone.value) {
     router.push({ name: 'phone-login' })
     return
   }
+
+  // If phone is already verified (coming from login flow for non-existent user),
+  // skip OTP entry and proceed directly to registration
+  if (alreadyVerified.value && mode.value === 'register') {
+    const pendingData = sessionStorage.getItem('pendingRegistration')
+    if (pendingData) {
+      loading.value = true
+      try {
+        const userData = JSON.parse(pendingData)
+        // Register directly without requiring OTP again (phone already verified)
+        const result = await otpService.registerWithVerifiedPhone(userData)
+
+        if (result.success && result.token) {
+          authStore.setAuth(result.token, result.user as any)
+          notify.success('Compte créé', 'Bienvenue sur Antigaspi !')
+          sessionStorage.removeItem('pendingRegistration')
+          router.push({ name: 'home' })
+        } else {
+          error.value = result.error || 'Erreur lors de la création du compte'
+        }
+      } catch (err: any) {
+        error.value = err.message || 'Erreur lors de la création du compte'
+      } finally {
+        loading.value = false
+      }
+    }
+    return
+  }
+
   startCountdown()
   // Focus first input
   setTimeout(() => otpInputs.value[0]?.focus(), 100)

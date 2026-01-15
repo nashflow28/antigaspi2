@@ -32,11 +32,12 @@ interface RouteParams {
   phoneNumber: string
   isNewUser?: boolean
   fromForgotPin?: boolean
+  otpAlreadySent?: boolean // Flag to skip sending OTP on mount if already sent by previous screen
 }
 
 const OTPVerificationScreen = ({ navigation, route }: any) => {
   const params = route.params as RouteParams
-  const { phoneNumber, isNewUser = false, fromForgotPin = false } = params
+  const { phoneNumber, isNewUser = false, fromForgotPin = false, otpAlreadySent = false } = params
 
   const theme = useTheme()
   const insets = useSafeAreaInsets()
@@ -51,10 +52,20 @@ const OTPVerificationScreen = ({ navigation, route }: any) => {
 
   const inputRefs = useRef<(TextInput | null)[]>([])
 
-  // Send OTP on mount
+  // Send OTP on mount ONLY if not already sent by previous screen
+  // This prevents double SMS sends which can trigger cooldown errors
   useEffect(() => {
-    sendOtp()
-  }, [])
+    if (otpAlreadySent) {
+      // OTP was already sent by the previous screen (LoginScreen, PhoneAuthScreen)
+      // Just start the countdown and focus input
+      setOtpSent(true)
+      setResendTimer(RESEND_COOLDOWN)
+      setTimeout(() => inputRefs.current[0]?.focus(), 100)
+    } else {
+      // No OTP sent yet - send it now
+      sendOtp()
+    }
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   // Countdown timer for resend
   useEffect(() => {

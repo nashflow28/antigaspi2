@@ -88,9 +88,11 @@ const LoginScreen: React.FC<Props> = ({ navigation }) => {
 
       if (!data.user_exists) {
         // New user - navigate to registration flow
+        // OTP will be sent by OTPVerificationScreen (otpAlreadySent: false)
         navigation.navigate('OTPVerification', {
           phoneNumber,
           isNewUser: true,
+          otpAlreadySent: false, // OTP not sent yet - let OTPVerificationScreen send it
         })
       } else if (data.requires_pin && data.has_pin) {
         // Known device with valid OTP - can use PIN
@@ -99,9 +101,11 @@ const LoginScreen: React.FC<Props> = ({ navigation }) => {
         })
       } else {
         // User exists but needs OTP (new device or expired OTP)
+        // OTP will be sent by OTPVerificationScreen (otpAlreadySent: false)
         navigation.navigate('OTPVerification', {
           phoneNumber,
           isNewUser: false,
+          otpAlreadySent: false, // OTP not sent yet - let OTPVerificationScreen send it
         })
       }
     } catch (error: any) {

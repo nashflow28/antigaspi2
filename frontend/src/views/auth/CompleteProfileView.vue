@@ -181,11 +181,12 @@ const handleSubmit = async () => {
   error.value = ''
 
   try {
-    const response = await apiService.put<{ success: boolean; message?: string; data?: { user?: Record<string, unknown> } }>('/profile/complete', {
-      name: form.value.name,
+    // Use /consumers/profile endpoint which exists in backend
+    const response = await apiService.put<{ success: boolean; message?: string; data?: { user?: Record<string, unknown> } }>('/consumers/profile', {
+      first_name: form.value.name.split(' ')[0] || form.value.name,
+      last_name: form.value.name.split(' ').slice(1).join(' ') || '',
       email: form.value.email || undefined,
-      location: form.value.location || undefined,
-      preferences: form.value.preferences.length > 0 ? form.value.preferences : undefined
+      city: form.value.location || undefined,
     })
 
     if (response.success) {
@@ -207,12 +208,8 @@ const handleSubmit = async () => {
 }
 
 const skipProfile = async () => {
-  // Mark profile as skipped but not completed
-  try {
-    await apiService.post('/profile/skip-completion')
-  } catch {
-    // Ignore errors - just navigate away
-  }
+  // Simply navigate to home - profile completion is optional
+  // No API call needed since the user is already authenticated
   router.push({ name: 'home' })
 }
 

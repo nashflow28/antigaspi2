@@ -134,8 +134,13 @@ const PinEntryScreen: React.FC<Props> = ({ navigation, route }) => {
   }
 
   const handleUseOtp = () => {
-    // Send OTP and navigate to verification
-    navigation.navigate('PhoneAuth')
+    // Navigate to OTPVerification directly - it will send OTP on mount
+    // Don't go back to PhoneAuth to avoid extra navigation step
+    navigation.navigate('OTPVerification', {
+      phoneNumber,
+      isNewUser: false,
+      otpAlreadySent: false, // OTP not sent yet - let OTPVerificationScreen send it
+    })
   }
 
   const formatPhone = (phone: string): string => {

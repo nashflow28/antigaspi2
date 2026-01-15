@@ -57,8 +57,6 @@ import {
   Order,
   OrderCreationPayload,
   OrderCreationResponse,
-  FirebaseLoginResponse,
-  FirebaseRegisterData,
 } from '../types'
 import { getExpoExtraValue } from '../utils/expoConfig'
 
@@ -463,29 +461,43 @@ class ApiService {
     return this.request<ApiResponse<User>>('GET', '/auth/me')
   }
 
-  // === FIREBASE PHONE AUTHENTICATION ===
+  // === PHONE-BASED AUTHENTICATION (OTP) ===
 
-  async firebaseLogin(firebaseToken: string): Promise<FirebaseLoginResponse> {
-    const response = await this.request<FirebaseLoginResponse>('POST', '/auth/firebase-login', {
-      firebase_token: firebaseToken
-    })
+  /**
+   * Register with phone number (after OTP verification)
+   * Phone is the primary identifier, email is optional
+   */
+  async registerWithPhone(data: {
+    phone: string
+    first_name: string
+    last_name: string
+    email?: string
+    role: 'consumer' | 'merchant'
+    city?: string
+    business_name?: string
+    business_type?: string
+  }): Promise<AuthResponse> {
+    const snakeCaseData = toSnakeCase(data)
+    const response = await this.request<AuthResponse>('POST', '/auth/register-phone', snakeCaseData)
 
-    // If login successful, store token
-    if (response.status === 'success' && response.token && response.user) {
-      await secureStorage.setToken(response.token)
-      await this.setStoredUser(response.user)
+    if (response.success && response.data.token) {
+      await secureStorage.setToken(response.data.token)
+      await this.setStoredUser(response.data.user)
     }
 
     return response
   }
 
-  async firebaseRegister(data: FirebaseRegisterData): Promise<FirebaseLoginResponse> {
-    const response = await this.request<FirebaseLoginResponse>('POST', '/auth/firebase-register', data)
+  /**
+   * Login with phone number (after OTP verification)
+   * For existing users who have verified their phone via OTP
+   */
+  async loginWithPhone(phone: string): Promise<AuthResponse> {
+    const response = await this.request<AuthResponse>('POST', '/auth/login-phone', { phone })
 
-    // If registration successful, store token
-    if (response.status === 'success' && response.token && response.user) {
-      await secureStorage.setToken(response.token)
-      await this.setStoredUser(response.user)
+    if (response.success && response.data.token) {
+      await secureStorage.setToken(response.data.token)
+      await this.setStoredUser(response.data.user)
     }
 
     return response

@@ -32,11 +32,13 @@ class ConsumerController extends Controller
                 ], 403);
             }
 
+            // Note: Validation is lenient for phone-registered users who may not have email
+            // and may have single names (no last_name)
             $validator = Validator::make($request->all(), [
                 'first_name' => ['required', 'string', 'min:2', 'max:255'],
-                'last_name' => ['required', 'string', 'min:2', 'max:255'],
+                'last_name' => ['nullable', 'string', 'max:255'], // Optional for single-name users
                 'email' => [
-                    'required',
+                    'nullable', // Optional for phone-registered users
                     'email',
                     'max:255',
                     Rule::unique('users', 'email')->ignore($user->id),
@@ -47,9 +49,6 @@ class ConsumerController extends Controller
             ], [
                 'first_name.required' => 'Le prénom est requis.',
                 'first_name.min' => 'Le prénom doit contenir au moins 2 caractères.',
-                'last_name.required' => 'Le nom est requis.',
-                'last_name.min' => 'Le nom doit contenir au moins 2 caractères.',
-                'email.required' => "L'adresse email est requise.",
                 'email.email' => 'Adresse email invalide.',
                 'email.unique' => 'Cette adresse email est déjà utilisée.',
             ]);
@@ -64,8 +63,8 @@ class ConsumerController extends Controller
 
             $payload = [
                 'first_name' => trim($request->input('first_name')),
-                'last_name' => trim($request->input('last_name')),
-                'email' => trim($request->input('email')),
+                'last_name' => $request->filled('last_name') ? trim($request->input('last_name')) : null,
+                'email' => $request->filled('email') ? trim($request->input('email')) : null,
                 'phone' => $request->filled('phone') ? trim($request->input('phone')) : null,
                 'address' => $request->filled('address') ? trim($request->input('address')) : null,
                 'city' => $request->filled('city') ? trim($request->input('city')) : null,

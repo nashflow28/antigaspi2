@@ -84,8 +84,10 @@ const PhoneAuthScreen: React.FC<Props> = ({ navigation }) => {
       }
 
       // Navigate to OTP verification screen
+      // OTP was already sent above, so pass otpAlreadySent: true to avoid double send
       navigation.navigate('OTPVerification', {
         phoneNumber: fullPhoneNumber,
+        otpAlreadySent: true, // OTP already sent - don't send again on mount
       })
     } catch (error: any) {
       showError('Erreur', error.message || "Impossible d'envoyer le code SMS")
