@@ -322,13 +322,13 @@ const DeliveryTrackingScreen: React.FC = () => {
         </View>
 
         {/* ETA - shows estimated time from delivery if available */}
-        {trackingData.delivery.estimated_duration_minutes && trackingData.delivery.status !== 'delivered' && (
+        {trackingData.delivery.estimated_duration && trackingData.delivery.status !== 'delivered' && (
           <View style={styles.etaContainer}>
             <Text style={[styles.etaLabel, { color: theme.colors.textSecondary }]}>
               Temps estimé
             </Text>
             <Text style={[styles.etaValue, { color: theme.colors.text }]}>
-              {trackingData.delivery.estimated_duration_minutes} min
+              {Math.ceil(trackingData.delivery.estimated_duration / 60)} min
             </Text>
           </View>
         )}

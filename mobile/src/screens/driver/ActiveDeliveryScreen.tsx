@@ -259,7 +259,7 @@ const ActiveDeliveryScreen: React.FC = () => {
         ])
       }
     } catch (err: any) {
-      Alert.alert('Erreur', err || promptAction === 'report' ? 'Impossible de signaler' : "Impossible d'annuler")
+      Alert.alert('Erreur', err || (promptAction === 'report' ? 'Impossible de signaler' : "Impossible d'annuler"))
     }
 
     setLoading(false)
