@@ -195,28 +195,42 @@ export const loginWithOtp = createAsyncThunk(
   }
 )
 
+// Phone Registration Data interface
+export interface PhoneRegisterData {
+  phone: string
+  first_name: string
+  last_name: string
+  email?: string
+  role: 'consumer' | 'merchant'
+  city?: string
+  business_name?: string
+  business_type?: string
+}
+
 // Backend OTP Authentication - Register new user after OTP verification
-export const registerWithOtp = createAsyncThunk(
-  'auth/registerWithOtp',
-  async (data: { phone: string; first_name: string; last_name: string; email: string; role: string; city: string; password: string }, { rejectWithValue }) => {
+// Uses the new phone-based registration endpoint
+export const registerWithPhone = createAsyncThunk(
+  'auth/registerWithPhone',
+  async (data: PhoneRegisterData, { rejectWithValue }) => {
     try {
-      // Register the user with verified phone
-      const response = await apiService.register({
-        ...data,
-        phone_verified: true,
-      } as any)
+      // Register the user with verified phone using new endpoint
+      const response = await apiService.registerWithPhone(data)
       return response
     } catch (error: any) {
+      authLogger.error('Phone registration error:', error)
       if (error.validationErrors) {
         return rejectWithValue({
           message: error.message,
           errors: error.validationErrors
         })
       }
-      return rejectWithValue(error.message)
+      return rejectWithValue(error.message || "Erreur lors de l'inscription")
     }
   }
 )
+
+// Legacy: Kept for backward compatibility
+export const registerWithOtp = registerWithPhone
 
 const authSlice = createSlice({
   name: 'auth',
@@ -231,6 +245,14 @@ const authSlice = createSlice({
       state.isAuthenticated = false
       state.error = null
       state.loading = false
+    },
+    // Set auth state from device-based login (PIN or OTP)
+    setAuthFromDeviceLogin: (state, action: PayloadAction<{ user: User; token: string }>) => {
+      state.user = action.payload.user
+      state.token = action.payload.token
+      state.isAuthenticated = true
+      state.loading = false
+      state.error = null
     },
   },
   extraReducers: (builder) => {
@@ -420,6 +442,6 @@ const authSlice = createSlice({
   },
 })
 
-export const { clearError, clearAuth } = authSlice.actions
+export const { clearError, clearAuth, setAuthFromDeviceLogin } = authSlice.actions
 export const authReducer = authSlice.reducer
 export default authReducer

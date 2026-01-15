@@ -1,9 +1,9 @@
 /**
- * OTPVerificationScreen - 6-digit OTP verification
- * Uses backend OTP service for phone authentication
+ * OTPVerificationScreen - 6-digit OTP verification for device authentication
+ * Uses backend device auth service for phone verification
  */
 
-import React, { useState, useRef, useEffect, useCallback } from 'react'
+import React, { useState, useRef, useEffect } from 'react'
 import {
   View,
   TextInput,
@@ -15,8 +15,9 @@ import { Ionicons } from '@expo/vector-icons'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useDispatch } from 'react-redux'
 import { AppDispatch } from '../../store'
-import { loginWithOtp, OtpLoginResponse } from '../../store/slices/authSlice'
-import { otpService } from '../../services/otpService'
+import { setAuthFromDeviceLogin } from '../../store/slices/authSlice'
+import { deviceService } from '../../services/deviceService'
+import { secureStorage } from '../../services/secureStorage'
 import { Card, Typography, Button } from '../../components/2025'
 import BrandLogo from '../../components/BrandLogo'
 import KeyboardAwareContainer from '../../components/KeyboardAwareContainer'
@@ -27,8 +28,16 @@ import { useAlert } from '../../contexts/AlertContext'
 const OTP_LENGTH = 6
 const RESEND_COOLDOWN = 60 // seconds
 
+interface RouteParams {
+  phoneNumber: string
+  isNewUser?: boolean
+  fromForgotPin?: boolean
+}
+
 const OTPVerificationScreen = ({ navigation, route }: any) => {
-  const { phoneNumber } = route.params as { phoneNumber: string }
+  const params = route.params as RouteParams
+  const { phoneNumber, isNewUser = false, fromForgotPin = false } = params
+
   const theme = useTheme()
   const insets = useSafeAreaInsets()
   const dispatch = useDispatch<AppDispatch>()
@@ -36,9 +45,16 @@ const OTPVerificationScreen = ({ navigation, route }: any) => {
 
   const [otp, setOtp] = useState<string[]>(Array(OTP_LENGTH).fill(''))
   const [loading, setLoading] = useState(false)
-  const [resendTimer, setResendTimer] = useState(RESEND_COOLDOWN)
+  const [sendingOtp, setSendingOtp] = useState(false)
+  const [otpSent, setOtpSent] = useState(false)
+  const [resendTimer, setResendTimer] = useState(0)
 
   const inputRefs = useRef<(TextInput | null)[]>([])
+
+  // Send OTP on mount
+  useEffect(() => {
+    sendOtp()
+  }, [])
 
   // Countdown timer for resend
   useEffect(() => {
@@ -48,17 +64,36 @@ const OTPVerificationScreen = ({ navigation, route }: any) => {
     }
   }, [resendTimer])
 
-  // BUG-006 FIX: Auto-verify when all digits entered with proper dependencies
+  // Auto-verify when all digits entered
   useEffect(() => {
     const code = otp.join('')
-    if (code.length === OTP_LENGTH && !loading) {
-      // Delay slightly to allow state to settle
+    if (code.length === OTP_LENGTH && !loading && otpSent) {
       const timer = setTimeout(() => {
         handleVerifyOTP()
       }, 100)
       return () => clearTimeout(timer)
     }
-  }, [otp, loading]) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [otp, loading, otpSent]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  const sendOtp = async () => {
+    setSendingOtp(true)
+    try {
+      const result = await deviceService.sendOtp(phoneNumber)
+
+      if (result.success) {
+        setOtpSent(true)
+        setResendTimer(RESEND_COOLDOWN)
+        // Focus first input after OTP sent
+        setTimeout(() => inputRefs.current[0]?.focus(), 100)
+      } else {
+        showError('Erreur', result.message || "Impossible d'envoyer le code")
+      }
+    } catch (error: any) {
+      showError('Erreur', error.message || "Impossible d'envoyer le code")
+    } finally {
+      setSendingOtp(false)
+    }
+  }
 
   const handleOtpChange = (text: string, index: number) => {
     // Only allow digits
@@ -90,33 +125,58 @@ const OTPVerificationScreen = ({ navigation, route }: any) => {
 
     setLoading(true)
     try {
-      // Verify OTP via backend service
-      const result = await dispatch(loginWithOtp({ phone: phoneNumber, otp: code }))
+      // Verify OTP via device auth service
+      const result = await deviceService.verifyOtpAndLogin(phoneNumber, code)
 
-      if (loginWithOtp.fulfilled.match(result)) {
-        const payload = result.payload as OtpLoginResponse
+      if (!result.success) {
+        showError('Erreur', result.message || 'Code de vérification incorrect')
+        setOtp(Array(OTP_LENGTH).fill(''))
+        inputRefs.current[0]?.focus()
+        return
+      }
 
-        if (payload.status === 'new_user') {
-          // New user - navigate to phone-based profile completion
-          navigation.replace('CompleteProfilePhone', {
-            phoneNumber: payload.phone || phoneNumber,
-            phoneVerified: true,
+      const data = result.data!
+
+      if (data.status === 'new_user' || data.requires_registration) {
+        // New user - navigate to phone-based profile completion
+        navigation.replace('CompleteProfilePhone', {
+          phoneNumber: data.phone || phoneNumber,
+          phoneVerified: true,
+        })
+      } else if (data.status === 'success' && data.user && data.token) {
+        // Existing user - store token and user data
+        await secureStorage.setToken(data.token)
+        await secureStorage.setUserData(data.user)
+
+        // Update Redux state
+        dispatch(setAuthFromDeviceLogin({
+          user: data.user,
+          token: data.token,
+        }))
+
+        // Check if user needs to set up PIN
+        if (data.requires_pin_setup || !data.has_pin) {
+          // Navigate to PIN setup
+          navigation.replace('PinSetup', {
+            phoneNumber,
+          })
+        } else if (fromForgotPin) {
+          // User forgot PIN - let them set a new one
+          navigation.replace('PinSetup', {
+            phoneNumber,
           })
         } else {
-          // Existing user - logged in successfully
+          // All good - close auth modal
           showSuccess('Succes', 'Connexion reussie!')
-          // Fermer le modal Auth et retourner à l'écran précédent
           navigation.getParent()?.getParent()?.goBack()
         }
       } else {
-        showError('Erreur', (result.payload as string) || 'Erreur de connexion')
-        // Clear OTP on error
+        showError('Erreur', 'Réponse inattendue du serveur')
         setOtp(Array(OTP_LENGTH).fill(''))
         inputRefs.current[0]?.focus()
       }
     } catch (error: any) {
-      showError('Erreur', error.message || 'Code de verification incorrect')
-      // Clear OTP on error
+      showError('Erreur', error.message || 'Code de vérification incorrect')
       setOtp(Array(OTP_LENGTH).fill(''))
       inputRefs.current[0]?.focus()
     } finally {
@@ -126,38 +186,13 @@ const OTPVerificationScreen = ({ navigation, route }: any) => {
 
   const handleResendOTP = async () => {
     if (resendTimer > 0) return
-
-    setLoading(true)
-    try {
-      // Request a new OTP via backend service
-      const result = await otpService.resendOtp(phoneNumber, 'login')
-
-      if (!result.success) {
-        showError('Erreur', result.message || 'Impossible de renvoyer le code')
-        return
-      }
-
-      // Reset timer
-      setResendTimer(RESEND_COOLDOWN)
-      setOtp(Array(OTP_LENGTH).fill(''))
-      inputRefs.current[0]?.focus()
-
-      showSuccess('Code envoye', 'Un nouveau code a ete envoye')
-    } catch (error: any) {
-      showError('Erreur', error.message || 'Impossible de renvoyer le code')
-    } finally {
-      setLoading(false)
-    }
+    await sendOtp()
+    setOtp(Array(OTP_LENGTH).fill(''))
+    showSuccess('Code envoyé', 'Un nouveau code a été envoyé')
   }
 
   const formatPhoneNumber = (phone: string): string => {
-    // Format: +228 90 12 34 56
-    if (phone.length > 4) {
-      const countryCode = phone.slice(0, 4)
-      const number = phone.slice(4)
-      return `${countryCode} ${number.replace(/(\d{2})(?=\d)/g, '$1 ')}`
-    }
-    return phone
+    return deviceService.formatPhoneForDisplay(phone)
   }
 
   return (
@@ -184,13 +219,19 @@ const OTPVerificationScreen = ({ navigation, route }: any) => {
         <View style={[styles.header, { alignItems: 'center', marginBottom: theme.spacing['2xl'] }]}>
           <BrandLogo color={theme.colors.primary[500]} style={{ marginBottom: theme.spacing.sm }} />
           <Typography variant="h2" weight="bold" style={{ marginBottom: theme.spacing.xs }}>
-            Verification
+            Vérification
           </Typography>
           <Typography variant="body" color="secondary" style={{ textAlign: 'center' }}>
-            Entrez le code envoye au{'\n'}
-            <Typography variant="body" weight="semibold">
-              {formatPhoneNumber(phoneNumber)}
-            </Typography>
+            {sendingOtp ? (
+              'Envoi du code en cours...'
+            ) : (
+              <>
+                Entrez le code envoyé au{'\n'}
+                <Typography variant="body" weight="semibold">
+                  {formatPhoneNumber(phoneNumber)}
+                </Typography>
+              </>
+            )}
           </Typography>
         </View>
 
@@ -218,6 +259,7 @@ const OTPVerificationScreen = ({ navigation, route }: any) => {
                 keyboardType="number-pad"
                 maxLength={1}
                 selectTextOnFocus
+                editable={!loading && !sendingOtp && otpSent}
                 testID={`${TEST_IDS.otpInput || 'otp-input'}-${index}`}
               />
             ))}
@@ -229,11 +271,11 @@ const OTPVerificationScreen = ({ navigation, route }: any) => {
             size="lg"
             fullWidth
             onPress={handleVerifyOTP}
-            disabled={loading || otp.join('').length !== OTP_LENGTH}
+            disabled={loading || sendingOtp || otp.join('').length !== OTP_LENGTH}
             loading={loading}
             testID={TEST_IDS.verifyOtpButton || 'verify-otp-button'}
           >
-            {loading ? 'Verification...' : 'Verifier'}
+            {loading ? 'Vérification...' : 'Vérifier'}
           </Button>
 
           {/* Resend Timer */}
@@ -243,7 +285,7 @@ const OTPVerificationScreen = ({ navigation, route }: any) => {
                 Renvoyer le code dans {resendTimer}s
               </Typography>
             ) : (
-              <TouchableOpacity onPress={handleResendOTP} disabled={loading}>
+              <TouchableOpacity onPress={handleResendOTP} disabled={loading || sendingOtp}>
                 <Typography
                   variant="caption"
                   weight="semibold"
@@ -256,11 +298,23 @@ const OTPVerificationScreen = ({ navigation, route }: any) => {
           </View>
         </Card>
 
+        {/* Info message for new users */}
+        {isNewUser && (
+          <View style={[styles.infoCard, { backgroundColor: `${theme.colors.info}15`, padding: theme.spacing.md, borderRadius: theme.radius.md, marginBottom: theme.spacing.lg }]}>
+            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+              <Ionicons name="information-circle" size={20} color={theme.colors.info} />
+              <Typography variant="caption" color="secondary" style={{ marginLeft: theme.spacing.sm, flex: 1 }}>
+                Après vérification, vous pourrez créer votre compte.
+              </Typography>
+            </View>
+          </View>
+        )}
+
         {/* Change number link */}
         <View style={[styles.footer, { alignItems: 'center' }]}>
           <TouchableOpacity onPress={() => navigation.goBack()}>
             <Typography variant="caption" weight="semibold" style={{ color: theme.colors.primary[500] }}>
-              Changer de numero
+              Changer de numéro
             </Typography>
           </TouchableOpacity>
         </View>
@@ -299,6 +353,7 @@ const styles = StyleSheet.create({
   resendContainer: {
     alignItems: 'center',
   },
+  infoCard: {},
   footer: {},
 })
 

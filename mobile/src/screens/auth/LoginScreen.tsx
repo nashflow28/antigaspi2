@@ -1,3 +1,8 @@
+/**
+ * LoginScreen - Unified phone-based authentication
+ * Primary flow: Phone number → Check device → PIN or OTP
+ */
+
 import React, { useState } from 'react'
 import {
   View,
@@ -5,6 +10,7 @@ import {
   TouchableOpacity,
   StyleSheet,
   StatusBar,
+  ActivityIndicator,
 } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { Ionicons } from '@expo/vector-icons'
@@ -18,6 +24,7 @@ import KeyboardAwareContainer from '../../components/KeyboardAwareContainer'
 import { useTheme } from '../../theme'
 import { TEST_IDS } from '../../utils/testIds'
 import { useAlert } from '../../contexts/AlertContext'
+import { deviceService } from '../../services/deviceService'
 
 interface Props {
   navigation: any
@@ -27,20 +34,85 @@ const LoginScreen: React.FC<Props> = ({ navigation }) => {
   const theme = useTheme()
   const insets = useSafeAreaInsets()
   const dispatch = useDispatch<AppDispatch>()
-  const { loading, error } = useSelector((state: RootState) => state.auth)
+  const { loading: authLoading, error } = useSelector((state: RootState) => state.auth)
   const { showSuccess, showError } = useAlert()
 
-  // Fermer le modal Auth et retourner à l'exploration
-  const handleDismiss = () => {
-    navigation.getParent()?.goBack()
-  }
+  // Phone-based auth state
+  const [phoneNumber, setPhoneNumber] = useState('')
+  const [checkingPhone, setCheckingPhone] = useState(false)
 
+  // DEV mode: email/password login
+  const [showDevLogin, setShowDevLogin] = useState(false)
   const [credentials, setCredentials] = useState<LoginCredentials>({
     email: '',
     password: '',
   })
 
-  const handleLogin = async (creds?: LoginCredentials) => {
+  // Close modal and return to exploration
+  const handleDismiss = () => {
+    navigation.getParent()?.goBack()
+  }
+
+  // Format phone number for display
+  const formatPhoneInput = (text: string): string => {
+    // Remove non-digits except +
+    let cleaned = text.replace(/[^\d+]/g, '')
+
+    // Limit length
+    if (cleaned.startsWith('+')) {
+      cleaned = cleaned.slice(0, 12) // +228 XX XX XX XX
+    } else {
+      cleaned = cleaned.slice(0, 8) // XX XX XX XX
+    }
+
+    return cleaned
+  }
+
+  // Handle phone number submission
+  const handlePhoneSubmit = async () => {
+    if (!phoneNumber || phoneNumber.length < 8) {
+      showError('Erreur', 'Veuillez entrer un numéro de téléphone valide')
+      return
+    }
+
+    setCheckingPhone(true)
+    try {
+      const result = await deviceService.checkPhone(phoneNumber)
+
+      if (!result.success) {
+        showError('Erreur', result.message || 'Erreur de vérification')
+        return
+      }
+
+      const data = result.data!
+
+      if (!data.user_exists) {
+        // New user - navigate to registration flow
+        navigation.navigate('OTPVerification', {
+          phoneNumber,
+          isNewUser: true,
+        })
+      } else if (data.requires_pin && data.has_pin) {
+        // Known device with valid OTP - can use PIN
+        navigation.navigate('PinEntry', {
+          phoneNumber,
+        })
+      } else {
+        // User exists but needs OTP (new device or expired OTP)
+        navigation.navigate('OTPVerification', {
+          phoneNumber,
+          isNewUser: false,
+        })
+      }
+    } catch (error: any) {
+      showError('Erreur', error.message || 'Erreur de connexion')
+    } finally {
+      setCheckingPhone(false)
+    }
+  }
+
+  // DEV: Email/password login
+  const handleDevLogin = async (creds?: LoginCredentials) => {
     const loginCreds = creds || credentials
 
     if (!loginCreds.email || !loginCreds.password) {
@@ -53,7 +125,6 @@ const LoginScreen: React.FC<Props> = ({ navigation }) => {
 
       if (loginUser.fulfilled.match(result)) {
         showSuccess('Succès', 'Connexion réussie!')
-        // Fermer le modal Auth et retourner à l'écran précédent
         navigation.getParent()?.goBack()
       } else {
         showError('Erreur', result.payload as string || 'Erreur de connexion')
@@ -63,6 +134,8 @@ const LoginScreen: React.FC<Props> = ({ navigation }) => {
     }
   }
 
+  const loading = authLoading || checkingPhone
+
   return (
     <View
       style={[styles.container, { backgroundColor: theme.colors.background }]}
@@ -70,7 +143,7 @@ const LoginScreen: React.FC<Props> = ({ navigation }) => {
     >
       <StatusBar backgroundColor={theme.colors.background} barStyle={theme.isDark ? 'light-content' : 'dark-content'} />
 
-      {/* Close Button - pour fermer le modal et retourner à l'exploration */}
+      {/* Close Button */}
       <View style={[styles.closeButtonContainer, { paddingTop: insets.top + 8, paddingHorizontal: theme.spacing.md }]}>
         <TouchableOpacity
           onPress={handleDismiss}
@@ -85,65 +158,56 @@ const LoginScreen: React.FC<Props> = ({ navigation }) => {
       <KeyboardAwareContainer contentContainerStyle={[styles.scrollContent, { paddingHorizontal: theme.spacing.lg }]}>
         {/* Header */}
         <View style={[styles.header, { alignItems: 'center', marginBottom: theme.spacing['2xl'] }]}>
-          <BrandLogo color={theme.colors.primary[500]} style={{ marginBottom: theme.spacing.sm }} />
+          <BrandLogo color={theme.colors.primary[500]} style={{ marginBottom: theme.spacing.md }} />
+          <Typography variant="h2" weight="bold" style={{ textAlign: 'center', marginBottom: theme.spacing.sm }}>
+            Bienvenue
+          </Typography>
           <Typography variant="body" color="secondary" style={{ textAlign: 'center' }}>
-            Connectez-vous à votre compte
+            Entrez votre numéro pour continuer
           </Typography>
         </View>
 
-        {/* Form */}
+        {/* Phone Number Form */}
         <Card variant="elevated" style={{ padding: theme.spacing.lg, marginBottom: theme.spacing.lg }}>
           <View style={{ marginBottom: theme.spacing.lg }}>
             <Typography variant="body" weight="semibold" style={{ marginBottom: theme.spacing.sm }}>
-              Email
+              Numéro de téléphone
             </Typography>
-            <TextInput
-              style={[styles.input, {
+            <View style={[
+              styles.phoneInputContainer,
+              {
                 backgroundColor: theme.colors.inputBackground,
-                paddingHorizontal: theme.spacing.md,
-                paddingVertical: theme.spacing.sm,
                 borderRadius: theme.radius.md,
                 borderWidth: 1,
                 borderColor: theme.colors.inputBorder,
-                fontSize: 16,
-                color: theme.colors.text,
-              }]}
-              placeholder="votre@email.com"
-              placeholderTextColor={theme.colors.textSecondary}
-              value={credentials.email}
-              onChangeText={(text) => setCredentials({ ...credentials, email: text })}
-              keyboardType="email-address"
-              autoCapitalize="none"
-              autoCorrect={false}
-              testID={TEST_IDS.loginEmail}
-              accessibilityLabel={TEST_IDS.loginEmail}
-            />
-          </View>
-
-          <View style={{ marginBottom: theme.spacing.lg }}>
-            <Typography variant="body" weight="semibold" style={{ marginBottom: theme.spacing.sm }}>
-              Mot de passe
-            </Typography>
-            <TextInput
-              style={[styles.input, {
-                backgroundColor: theme.colors.inputBackground,
-                paddingHorizontal: theme.spacing.md,
-                paddingVertical: theme.spacing.sm,
-                borderRadius: theme.radius.md,
-                borderWidth: 1,
-                borderColor: theme.colors.inputBorder,
-                fontSize: 16,
-                color: theme.colors.text,
-              }]}
-              placeholder="Votre mot de passe"
-              placeholderTextColor={theme.colors.textSecondary}
-              value={credentials.password}
-              onChangeText={(text) => setCredentials({ ...credentials, password: text })}
-              secureTextEntry
-              autoCapitalize="none"
-              testID={TEST_IDS.loginPassword}
-              accessibilityLabel={TEST_IDS.loginPassword}
-            />
+              }
+            ]}>
+              <View style={[styles.countryCode, { borderRightColor: theme.colors.inputBorder }]}>
+                <Typography variant="body" weight="semibold" style={{ color: theme.colors.text }}>
+                  +228
+                </Typography>
+              </View>
+              <TextInput
+                style={[
+                  styles.phoneInput,
+                  {
+                    paddingHorizontal: theme.spacing.md,
+                    paddingVertical: theme.spacing.sm,
+                    fontSize: 18,
+                    color: theme.colors.text,
+                  }
+                ]}
+                placeholder="90 XX XX XX"
+                placeholderTextColor={theme.colors.textSecondary}
+                value={phoneNumber}
+                onChangeText={(text) => setPhoneNumber(formatPhoneInput(text))}
+                keyboardType="phone-pad"
+                autoComplete="tel"
+                autoFocus
+                editable={!loading}
+                testID={TEST_IDS.loginEmail}
+              />
+            </View>
           </View>
 
           {error && (
@@ -158,93 +222,98 @@ const LoginScreen: React.FC<Props> = ({ navigation }) => {
             variant="primary"
             size="lg"
             fullWidth
-            onPress={() => handleLogin()}
-            disabled={loading}
-            loading={loading}
+            onPress={handlePhoneSubmit}
+            disabled={loading || phoneNumber.length < 8}
             testID={TEST_IDS.loginSubmit}
             accessibilityLabel={TEST_IDS.loginSubmit}
           >
-            {loading ? 'Connexion...' : 'Se connecter'}
+            {checkingPhone ? (
+              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                <ActivityIndicator size="small" color="#fff" style={{ marginRight: 8 }} />
+                <Typography variant="body" weight="semibold" style={{ color: '#fff' }}>
+                  Vérification...
+                </Typography>
+              </View>
+            ) : (
+              'Continuer'
+            )}
           </Button>
         </Card>
 
-        {/* 🔒 SECURITY FIX: Test accounts only visible in development mode */}
-        {__DEV__ && (
-          <Card variant="flat" style={{ backgroundColor: theme.colors.info, padding: theme.spacing.md, marginBottom: theme.spacing.lg }}>
-            <Typography variant="caption" weight="semibold" style={{ marginBottom: theme.spacing.sm, textAlign: 'center' }}>
-              Comptes de test (DEV uniquement) :
+        {/* Info about the auth flow */}
+        <View style={[styles.infoContainer, { marginBottom: theme.spacing.xl }]}>
+          <View style={[styles.infoItem, { marginBottom: theme.spacing.sm }]}>
+            <Ionicons name="shield-checkmark-outline" size={20} color={theme.colors.primary[500]} />
+            <Typography variant="caption" color="secondary" style={{ marginLeft: theme.spacing.sm, flex: 1 }}>
+              Connexion sécurisée par code SMS
             </Typography>
-
-            <Button
-              variant="secondary"
-              size="md"
-              fullWidth
-              style={{ marginBottom: theme.spacing.sm }}
-              onPress={() => {
-                const consumerCreds = {
-                  email: 'jean.dupont@email.com',
-                  password: 'password'
-                }
-                setCredentials(consumerCreds)
-                handleLogin(consumerCreds)
-              }}
-              testID={TEST_IDS.loginConsumerQuick}
-              accessibilityLabel={TEST_IDS.loginConsumerQuick}
-            >
-              👤 Consumer
-            </Button>
-
-            <Button
-              variant="secondary"
-              size="md"
-              fullWidth
-              onPress={() => {
-                const merchantCreds = {
-                  email: 'boulangerie.martin@email.com',
-                  password: 'password'
-                }
-                setCredentials(merchantCreds)
-                handleLogin(merchantCreds)
-              }}
-              testID={TEST_IDS.loginMerchantQuick}
-              accessibilityLabel={TEST_IDS.loginMerchantQuick}
-            >
-              🏪 Merchant
-            </Button>
-          </Card>
-        )}
-
-        {/* Phone Auth Button */}
-        <TouchableOpacity
-          style={{
-            flexDirection: 'row',
-            alignItems: 'center',
-            justifyContent: 'center',
-            backgroundColor: theme.colors.surface.light,
-            padding: theme.spacing.md,
-            borderRadius: theme.radius.md,
-            marginBottom: theme.spacing.lg,
-            borderWidth: 1,
-            borderColor: theme.colors.inputBorder,
-          }}
-          onPress={() => navigation.navigate('PhoneAuth')}
-        >
-          <Typography variant="body" weight="semibold" style={{ color: theme.colors.primary[500] }}>
-            Se connecter avec telephone
-          </Typography>
-        </TouchableOpacity>
-
-        {/* Footer - Register */}
-        <View style={[styles.footer, { flexDirection: 'row', justifyContent: 'center', alignItems: 'center', marginBottom: theme.spacing.lg }]}>
-          <Typography variant="caption" color="secondary" style={{ marginRight: theme.spacing.xs }}>
-            Pas encore de compte ?
-          </Typography>
-          <TouchableOpacity onPress={() => navigation.navigate('Register')}>
-            <Typography variant="caption" weight="semibold" style={{ color: theme.colors.primary[500] }}>
-              Créer un compte
+          </View>
+          <View style={styles.infoItem}>
+            <Ionicons name="finger-print-outline" size={20} color={theme.colors.primary[500]} />
+            <Typography variant="caption" color="secondary" style={{ marginLeft: theme.spacing.sm, flex: 1 }}>
+              Code PIN pour connexion rapide
             </Typography>
-          </TouchableOpacity>
+          </View>
         </View>
+
+        {/* DEV: Test accounts (only in development mode) */}
+        {__DEV__ && (
+          <>
+            <TouchableOpacity
+              onPress={() => setShowDevLogin(!showDevLogin)}
+              style={{ alignItems: 'center', marginBottom: theme.spacing.md }}
+            >
+              <Typography variant="caption" color="secondary">
+                {showDevLogin ? 'Masquer connexion dev' : 'Afficher connexion dev'}
+              </Typography>
+            </TouchableOpacity>
+
+            {showDevLogin && (
+              <Card variant="flat" style={{ backgroundColor: `${theme.colors.info}20`, padding: theme.spacing.md, marginBottom: theme.spacing.lg }}>
+                <Typography variant="caption" weight="semibold" style={{ marginBottom: theme.spacing.sm, textAlign: 'center' }}>
+                  Comptes de test (DEV uniquement) :
+                </Typography>
+
+                <Button
+                  variant="secondary"
+                  size="md"
+                  fullWidth
+                  style={{ marginBottom: theme.spacing.sm }}
+                  onPress={() => {
+                    const consumerCreds = {
+                      email: 'jean.dupont@email.com',
+                      password: 'password'
+                    }
+                    setCredentials(consumerCreds)
+                    handleDevLogin(consumerCreds)
+                  }}
+                  testID={TEST_IDS.loginConsumerQuick}
+                  accessibilityLabel={TEST_IDS.loginConsumerQuick}
+                >
+                  Consumer
+                </Button>
+
+                <Button
+                  variant="secondary"
+                  size="md"
+                  fullWidth
+                  onPress={() => {
+                    const merchantCreds = {
+                      email: 'boulangerie.martin@email.com',
+                      password: 'password'
+                    }
+                    setCredentials(merchantCreds)
+                    handleDevLogin(merchantCreds)
+                  }}
+                  testID={TEST_IDS.loginMerchantQuick}
+                  accessibilityLabel={TEST_IDS.loginMerchantQuick}
+                >
+                  Merchant
+                </Button>
+              </Card>
+            )}
+          </>
+        )}
 
         {/* Continue without account */}
         <TouchableOpacity
@@ -279,8 +348,26 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   header: {},
-  input: {},
-  footer: {},
+  phoneInputContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  countryCode: {
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+    borderRightWidth: 1,
+  },
+  phoneInput: {
+    flex: 1,
+    letterSpacing: 1,
+  },
+  infoContainer: {
+    paddingHorizontal: 8,
+  },
+  infoItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
 })
 
 export default LoginScreen
