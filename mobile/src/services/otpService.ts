@@ -11,9 +11,10 @@ export interface SendOtpResponse {
   success: boolean
   message: string
   data?: {
-    phone: string
-    expires_in: number // seconds
-    resend_cooldown: number // seconds
+    phone?: string
+    expires_in?: number // seconds (when OTP sent successfully)
+    resend_cooldown?: number // seconds (when OTP sent successfully)
+    cooldown_remaining?: number // seconds (when OTP already exists and still valid)
   }
 }
 

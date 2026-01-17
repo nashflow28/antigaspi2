@@ -75,7 +75,10 @@ const PhoneRegisterScreen = ({ navigation }: any) => {
 
       // Check if we should navigate to OTP screen
       // Navigate if: success OR if there's a cooldown (OTP was already sent)
-      const hasExistingOtp = result.data?.resend_cooldown && result.data.resend_cooldown > 0
+      // Backend returns cooldown_remaining when OTP is still valid
+      const cooldownRemaining = result.data?.cooldown_remaining
+      const resendCooldown = result.data?.resend_cooldown
+      const hasExistingOtp = cooldownRemaining && cooldownRemaining > 0
 
       if (!result.success && !hasExistingOtp) {
         // Real error - not just "OTP already sent"
@@ -85,12 +88,12 @@ const PhoneRegisterScreen = ({ navigation }: any) => {
 
       // Navigate to OTP verification screen with registration purpose
       // Pass otpAlreadySent: true to prevent SmsOtpScreen from sending another OTP
-      // Pass resend_cooldown from backend to keep timer in sync
+      // Pass cooldown from backend to keep timer in sync (use cooldown_remaining or resend_cooldown)
       navigation.navigate('SmsOtp', {
         phoneNumber: fullPhoneNumber,
         purpose: 'registration',
         otpAlreadySent: true,
-        resendCooldown: result.data?.resend_cooldown,
+        resendCooldown: cooldownRemaining || resendCooldown,
         nextScreen: 'CompleteProfilePhone',
         nextParams: { phoneNumber: fullPhoneNumber },
       })
