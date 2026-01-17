@@ -73,7 +73,12 @@ const PhoneRegisterScreen = ({ navigation }: any) => {
       // Send OTP for registration purpose
       const result = await otpService.sendOtp(fullPhoneNumber, 'registration')
 
-      if (!result.success) {
+      // Check if we should navigate to OTP screen
+      // Navigate if: success OR if there's a cooldown (OTP was already sent)
+      const hasExistingOtp = result.data?.resend_cooldown && result.data.resend_cooldown > 0
+
+      if (!result.success && !hasExistingOtp) {
+        // Real error - not just "OTP already sent"
         showError('Erreur', result.message || "Impossible d'envoyer le code SMS")
         return
       }

@@ -246,6 +246,9 @@ const handleVerify = async () => {
       // Store auth data
       authStore.setAuth(result.token, result.user as any)
 
+      // Clean up sensitive pendingRegistration data
+      localStorage.removeItem('pendingRegistration')
+
       notify.success('Connexion réussie', 'Bienvenue sur Antigaspi !')
 
       // Navigate to home (profile completion is optional on web)

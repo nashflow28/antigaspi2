@@ -199,12 +199,23 @@ const validateForm = (): boolean => {
 }
 
 const formatPhoneNumber = (phone: string): string => {
-  // Remove spaces and format
-  let cleaned = phone.replace(/\s/g, '')
-  if (!cleaned.startsWith('+')) {
-    cleaned = '+228' + cleaned
+  // Remove spaces and non-digit chars except +
+  let cleaned = phone.replace(/[^\d+]/g, '')
+
+  // Handle various input formats
+  if (cleaned.startsWith('+228')) {
+    // Already formatted correctly
+    return cleaned
+  } else if (cleaned.startsWith('228') && cleaned.length >= 11) {
+    // Has country code without + (e.g., "22890123456")
+    return '+' + cleaned
+  } else if (cleaned.startsWith('+')) {
+    // Other country code - keep as is
+    return cleaned
+  } else {
+    // Local number without country code - add Togo prefix
+    return '+228' + cleaned
   }
-  return cleaned
 }
 
 const handleSubmit = async () => {
