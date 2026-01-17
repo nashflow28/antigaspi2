@@ -80,10 +80,12 @@ const PhoneRegisterScreen = ({ navigation }: any) => {
 
       // Navigate to OTP verification screen with registration purpose
       // Pass otpAlreadySent: true to prevent SmsOtpScreen from sending another OTP
+      // Pass resend_cooldown from backend to keep timer in sync
       navigation.navigate('SmsOtp', {
         phoneNumber: fullPhoneNumber,
         purpose: 'registration',
         otpAlreadySent: true,
+        resendCooldown: result.data?.resend_cooldown,
         nextScreen: 'CompleteProfilePhone',
         nextParams: { phoneNumber: fullPhoneNumber },
       })

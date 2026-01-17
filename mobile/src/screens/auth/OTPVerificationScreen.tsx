@@ -56,7 +56,7 @@ const OTPVerificationScreen = ({ navigation, route }: any) => {
   // This prevents double SMS sends which can trigger cooldown errors
   useEffect(() => {
     if (otpAlreadySent) {
-      // OTP was already sent by the previous screen (LoginScreen, PhoneAuthScreen)
+      // OTP was already sent by the previous screen (LoginScreen)
       // Just start the countdown and focus input
       setOtpSent(true)
       setResendTimer(RESEND_COOLDOWN)

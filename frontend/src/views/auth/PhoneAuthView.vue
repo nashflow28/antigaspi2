@@ -49,18 +49,9 @@
           </p>
         </div>
 
-        <!-- Role Selection (register only) -->
-        <div v-if="!isLogin">
-          <Label for="role">Vous êtes</Label>
-          <select
-            id="role"
-            v-model="form.role"
-            class="mt-1 block w-full rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-900 dark:text-white py-2 px-3 shadow-sm focus:border-primary-500 focus:ring-primary-500"
-          >
-            <option value="consumer">Un consommateur</option>
-            <option value="merchant">Un commerçant</option>
-          </select>
-        </div>
+        <!-- Role Selection (register only) - Consumer only for phone registration -->
+        <!-- Merchants must use email registration to provide business details -->
+        <input type="hidden" v-model="form.role" />
 
         <!-- Email (optional, register only) -->
         <div v-if="!isLogin">
@@ -156,7 +147,7 @@ const form = ref({
   name: '',
   phone: (route.query.phone as string) || '', // Pre-fill phone if provided
   email: '',
-  role: (route.query.role as string) || 'consumer' // Default to consumer, can be set via query param
+  role: 'consumer' // Phone registration is consumer-only; merchants use email registration
 })
 
 const errors = ref<Record<string, string>>({})

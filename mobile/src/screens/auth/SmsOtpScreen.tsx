@@ -31,6 +31,7 @@ const SmsOtpScreen = ({ navigation, route }: any) => {
     nextScreen,
     nextParams = {},
     otpAlreadySent = false, // If true, OTP was already sent by previous screen
+    resendCooldown, // Cooldown from backend when otpAlreadySent is true
   } = route.params
 
   const theme = useTheme()
@@ -50,8 +51,9 @@ const SmsOtpScreen = ({ navigation, route }: any) => {
       sendInitialOtp()
     } else {
       // OTP was already sent, just show confirmation and start cooldown
+      // Use backend's resend_cooldown if provided, otherwise use default
       showInfo('Code envoye', `Un code de verification a ete envoye au ${otpService.formatPhoneForDisplay(phoneNumber)}`)
-      setResendTimer(DEFAULT_RESEND_COOLDOWN)
+      setResendTimer(resendCooldown || DEFAULT_RESEND_COOLDOWN)
     }
   }, [])
 
