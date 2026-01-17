@@ -1,0 +1,36 @@
+# Maestro E2E Configuration for Antigaspi Mobile App
+# Documentation: https://maestro.mobile.dev/reference/configuration-values
+
+# Application settings
+appId: com.antigaspi.mobile
+
+# Flow execution settings
+env:
+  # Test environment
+  API_URL: https://antigaspi.jubtek.com/api
+
+  # Test accounts
+  TEST_CONSUMER_EMAIL: jean.dupont@email.com
+  TEST_CONSUMER_PASSWORD: password
+  TEST_MERCHANT_EMAIL: boulangerie.martin@email.com
+  TEST_MERCHANT_PASSWORD: password
+  TEST_ADMIN_EMAIL: admin@antigaspi.com
+  TEST_ADMIN_PASSWORD: password
+
+# Default timeouts (milliseconds)
+timeout:
+  defaultTimeout: 10000
+  launchTimeout: 30000
+
+# Screenshot settings
+screenshots:
+  enabled: true
+  path: ./e2e/screenshots
+  onFailureOnly: true
+
+# Video recording
+recording:
+  enabled: false
+
+# Retry settings
+retries: 1

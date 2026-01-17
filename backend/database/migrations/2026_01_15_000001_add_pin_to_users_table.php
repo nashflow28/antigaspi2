@@ -12,13 +12,13 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            if (!Schema::hasColumn('users', 'pin_hash')) {
+            if (! Schema::hasColumn('users', 'pin_hash')) {
                 $table->string('pin_hash', 255)->nullable()->after('password');
             }
-            if (!Schema::hasColumn('users', 'pin_set_at')) {
+            if (! Schema::hasColumn('users', 'pin_set_at')) {
                 $table->timestamp('pin_set_at')->nullable()->after('pin_hash');
             }
-            if (!Schema::hasColumn('users', 'current_device_id')) {
+            if (! Schema::hasColumn('users', 'current_device_id')) {
                 $table->string('current_device_id', 100)->nullable()->after('pin_set_at');
             }
         });

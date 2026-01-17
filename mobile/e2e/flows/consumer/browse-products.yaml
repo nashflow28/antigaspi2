@@ -1,0 +1,60 @@
+# Flow: Browse Products
+# Description: Teste la navigation et l'affichage des produits
+# Priority: HIGH - Fonctionnalité core
+
+appId: com.antigaspi.mobile
+name: "Browse Products Flow"
+tags:
+  - consumer
+  - products
+  - navigation
+
+---
+
+# Prérequis: Login consumer
+- runFlow: "../auth/login-consumer.yaml"
+
+# Étape 1: Aller sur Découvrir
+- tapOn: "Découvrir"
+
+# Étape 2: Attendre le chargement des produits
+- extendedWaitUntil:
+    visible:
+      textContains: "XOF"
+    timeout: 10000
+
+# Étape 3: Vérifier les éléments de liste
+- assertVisible:
+    text: "Catégories"
+    optional: true
+
+# Étape 4: Scroll pour voir plus de produits
+- scroll:
+    direction: DOWN
+- scroll:
+    direction: DOWN
+
+# Étape 5: Taper sur un produit pour voir les détails
+- tapOn:
+    textContains: "XOF"
+    index: 0
+
+# Étape 6: Vérifier l'écran de détails
+- extendedWaitUntil:
+    visible: "Réserver"
+    timeout: 5000
+
+- assertVisible:
+    text: "Description"
+    optional: true
+
+# Étape 7: Revenir à la liste
+- back
+
+# Étape 8: Vérifier qu'on est revenu sur Découvrir
+- assertVisible: "Découvrir"
+
+# Success
+- runScript:
+    script: |
+      console.log('✅ Product browsing successful')

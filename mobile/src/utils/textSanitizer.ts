@@ -25,7 +25,7 @@ const MAX_LENGTHS = {
  */
 const removeControlCharacters = (text: string): string => {
   // Remove control characters except common whitespace (space, tab, newline)
-  // eslint-disable-next-line no-control-regex
+   
   return text.replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, '')
 }
 
@@ -148,7 +148,7 @@ export const hasUnsafeContent = (text: string): boolean => {
   if (dangerousSchemes.test(text)) return true
 
   // Check for excessive control characters
-  // eslint-disable-next-line no-control-regex
+   
   const controlCharCount = (text.match(/[\x00-\x1F\x7F]/g) || []).length
   if (controlCharCount > 5) return true
 

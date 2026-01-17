@@ -1,0 +1,43 @@
+# Flow: User Logout
+# Description: Teste la déconnexion et vérification du retour à l'écran de connexion
+# Priority: HIGH - Sécurité
+
+appId: com.antigaspi.mobile
+name: "User Logout Flow"
+tags:
+  - auth
+  - security
+
+---
+
+# Prérequis: Login d'abord
+- runFlow: "login-consumer.yaml"
+
+# Étape 1: Naviguer vers le compte
+- tapOn: "Compte"
+
+# Étape 2: Trouver et taper sur Déconnexion
+- scrollUntilVisible:
+    element: "Déconnexion"
+    direction: DOWN
+    timeout: 5000
+
+- tapOn: "Déconnexion"
+
+# Étape 3: Confirmer la déconnexion si dialog présent
+- tapOn:
+    text: "Confirmer"
+    optional: true
+
+# Étape 4: Vérifier le retour à l'écran de connexion
+- extendedWaitUntil:
+    visible: "Connexion"
+    timeout: 10000
+
+- assertVisible: "Email"
+- assertVisible: "Mot de passe"
+
+# Success: User is logged out
+- runScript:
+    script: |
+      console.log('✅ Logout successful - returned to login screen')

@@ -156,6 +156,9 @@ class OtpController extends Controller
             // Generate JWT token
             $token = JWTAuth::fromUser($user);
 
+            // Clear OTP verification to prevent reuse without new OTP
+            $this->otpService->clearVerification($phone, 'login');
+
             Log::info('OTP Login successful', [
                 'user_id' => $user->id,
                 'phone' => substr($phone, 0, 5).'****',

@@ -1,0 +1,68 @@
+# Flow: Smoke Test Suite
+# Description: Tests de fumée rapides pour validation CI/CD
+# Priority: CRITICAL - Exécuter avant chaque release
+
+appId: com.antigaspi.mobile
+name: "Complete Smoke Test Suite"
+tags:
+  - smoke
+  - critical
+  - ci
+
+---
+
+# ==========================================
+# TEST 1: Consumer Login
+# ==========================================
+- runFlow: "auth/login-consumer.yaml"
+
+# Déconnexion pour le prochain test
+- tapOn: "Compte"
+- scrollUntilVisible:
+    element: "Déconnexion"
+    direction: DOWN
+    timeout: 5000
+- tapOn: "Déconnexion"
+- tapOn:
+    text: "Confirmer"
+    optional: true
+- extendedWaitUntil:
+    visible: "Connexion"
+    timeout: 10000
+
+# ==========================================
+# TEST 2: Merchant Login
+# ==========================================
+- runFlow: "auth/login-merchant.yaml"
+
+# Déconnexion pour le prochain test
+- tapOn: "Compte"
+- scrollUntilVisible:
+    element: "Déconnexion"
+    direction: DOWN
+    timeout: 5000
+- tapOn: "Déconnexion"
+- tapOn:
+    text: "Confirmer"
+    optional: true
+- extendedWaitUntil:
+    visible: "Connexion"
+    timeout: 10000
+
+# ==========================================
+# TEST 3: Browse Products (Consumer)
+# ==========================================
+- runFlow: "consumer/browse-products.yaml"
+
+# ==========================================
+# SUMMARY
+# ==========================================
+- runScript:
+    script: |
+      console.log('==========================================')
+      console.log('✅ SMOKE TESTS PASSED')
+      console.log('==========================================')
+      console.log('✓ Consumer Login')
+      console.log('✓ Merchant Login')
+      console.log('✓ Browse Products')
+      console.log('==========================================')

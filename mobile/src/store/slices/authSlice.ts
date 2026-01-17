@@ -1,5 +1,8 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit'
 import { AuthState, User, LoginCredentials, RegisterData, AuthResponse } from '../../types'
+
+// Re-export AuthState for test compatibility
+export type { AuthState }
 import apiService from '../../services/api'
 import { secureStorage } from '../../services/secureStorage'
 import { clearAllFormCaches } from '../../hooks/usePersistedForm'

@@ -1,0 +1,57 @@
+# Flow: Add to Favorites
+# Description: Teste l'ajout/retrait de produits des favoris
+# Priority: MEDIUM - Fonctionnalité engagement
+
+appId: com.antigaspi.mobile
+name: "Favorites Toggle Flow"
+tags:
+  - consumer
+  - favorites
+
+---
+
+# Prérequis: Login consumer
+- runFlow: "../auth/login-consumer.yaml"
+
+# Étape 1: Aller sur Découvrir
+- tapOn: "Découvrir"
+
+# Étape 2: Attendre les produits
+- extendedWaitUntil:
+    visible:
+      textContains: "XOF"
+    timeout: 10000
+
+# Étape 3: Ouvrir un produit
+- tapOn:
+    textContains: "XOF"
+    index: 0
+
+# Étape 4: Attendre les détails
+- extendedWaitUntil:
+    visible: "Réserver"
+    timeout: 5000
+
+# Étape 5: Ajouter aux favoris (clic sur icône coeur)
+- tapOn:
+    id: "favorite-button"
+    optional: true
+- tapOn:
+    textContains: "♡"
+    optional: true
+
+# Étape 6: Revenir et vérifier dans Favoris
+- back
+- tapOn: "Favoris"
+
+# Étape 7: Attendre la liste des favoris
+- extendedWaitUntil:
+    timeout: 5000
+    visible:
+      textContains: "XOF"
+      optional: true
+
+# Note: Si aucun favori précédemment ajouté, peut afficher "vide"
+- runScript:
+    script: |
+      console.log('✅ Favorites flow completed')

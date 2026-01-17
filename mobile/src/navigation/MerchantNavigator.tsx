@@ -20,6 +20,7 @@ import MerchantNotificationsScreen from '../screens/merchant/MerchantNotificatio
 import NotificationSettingsScreen from '../screens/merchant/NotificationSettingsScreen'
 import ProfileScreen from '../screens/main/ProfileScreen'
 import ProductFormScreen from '../screens/merchant/ProductFormScreen'
+import LinkPhoneScreen from '../screens/main/LinkPhoneScreen'
 
 const Tab = createBottomTabNavigator()
 const Stack = createNativeStackNavigator()
@@ -61,6 +62,7 @@ const AccountStack = () => (
   <Stack.Navigator screenOptions={{ headerShown: false }}>
     <Stack.Screen name="AccountMain" component={ProfileScreen} />
     <Stack.Screen name="ProfileEdit" component={MerchantProfileEditScreen} />
+    <Stack.Screen name="LinkPhone" component={LinkPhoneScreen} />
     <Stack.Screen name="OpeningHours" component={MerchantOpeningHoursScreen} />
     <Stack.Screen name="Reviews" component={MerchantReviewsScreen} />
     <Stack.Screen name="Notifications" component={MerchantNotificationsScreen} />

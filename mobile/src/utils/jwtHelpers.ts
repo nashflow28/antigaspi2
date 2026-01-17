@@ -22,7 +22,7 @@ export function decodeJWT(token: string): { exp?: number; iat?: number; [key: st
     // Décoder le base64
     const jsonPayload = atob(base64)
     return JSON.parse(jsonPayload)
-  } catch (error) {
+  } catch {
     authLogger.warn('JWT decode error')
     return null
   }

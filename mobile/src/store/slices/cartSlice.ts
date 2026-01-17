@@ -11,6 +11,9 @@ import {
   CartState,
   CartUpdatePayload,
 } from '../../types'
+
+// Re-export CartState for test compatibility
+export type { CartState }
 import { logoutUser } from './authSlice'
 import { fetchWallet } from './walletSlice'
 

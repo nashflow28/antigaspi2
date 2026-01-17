@@ -1,0 +1,80 @@
+# Flow: Create Reservation
+# Description: Teste le flux complet de création de réservation
+# Priority: CRITICAL - Flow business principal
+
+appId: com.antigaspi.mobile
+name: "Create Reservation Flow"
+tags:
+  - consumer
+  - reservation
+  - critical
+  - business
+
+---
+
+# Prérequis: Login consumer
+- runFlow: "../auth/login-consumer.yaml"
+
+# Étape 1: Aller sur Découvrir
+- tapOn: "Découvrir"
+
+# Étape 2: Attendre les produits
+- extendedWaitUntil:
+    visible:
+      textContains: "XOF"
+    timeout: 10000
+
+# Étape 3: Sélectionner un produit avec stock disponible
+- tapOn:
+    textContains: "XOF"
+    index: 0
+
+# Étape 4: Attendre l'écran de détails
+- extendedWaitUntil:
+    visible: "Réserver"
+    timeout: 5000
+
+# Étape 5: Vérifier le prix et la disponibilité
+- assertVisible:
+    textContains: "XOF"
+
+# Étape 6: Cliquer sur Réserver
+- tapOn: "Réserver"
+
+# Étape 7: Attendre la confirmation ou l'écran de panier
+- extendedWaitUntil:
+    anyVisible:
+      - "Panier"
+      - "Confirmer"
+      - "Réservation créée"
+      - "Quantité"
+    timeout: 10000
+
+# Étape 8: Gérer la quantité si demandée
+- tapOn:
+    text: "+"
+    optional: true
+    index: 0
+
+# Étape 9: Confirmer si nécessaire
+- tapOn:
+    text: "Confirmer"
+    optional: true
+
+- tapOn:
+    text: "Valider"
+    optional: true
+
+# Étape 10: Vérifier le succès
+- extendedWaitUntil:
+    anyVisible:
+      - "Réservation créée"
+      - "Succès"
+      - "Commandes"
+      - "Mes réservations"
+    timeout: 15000
+
+# Success
+- runScript:
+    script: |
+      console.log('✅ Reservation created successfully')

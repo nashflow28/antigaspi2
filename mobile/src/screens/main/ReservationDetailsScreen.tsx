@@ -374,6 +374,19 @@ const ReservationDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
               </Button>
             )}
 
+            {/* Delivery button - for confirmed reservations */}
+            {reservation.status === 'confirmed' && (
+              <Button
+                variant="primary"
+                size="md"
+                onPress={() => navigation.navigate('DeliveryRequest', { reservationId: reservation.id })}
+                leftIcon={<Ionicons name="bicycle" size={20} color="#FFFFFF" />}
+                style={{ width: '100%' }}
+              >
+                Demander une livraison
+              </Button>
+            )}
+
             <Button
               variant="destructive"
               size="md"

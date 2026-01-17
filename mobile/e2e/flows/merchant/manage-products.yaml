@@ -1,0 +1,62 @@
+# Flow: Merchant Manage Products
+# Description: Teste la gestion des produits par un commerçant
+# Priority: CRITICAL - Fonctionnalité core merchant
+
+appId: com.antigaspi.mobile
+name: "Merchant Product Management Flow"
+tags:
+  - merchant
+  - products
+  - critical
+
+---
+
+# Prérequis: Login merchant
+- runFlow: "../auth/login-merchant.yaml"
+
+# Étape 1: Aller sur l'onglet Produits
+- tapOn: "Produits"
+
+# Étape 2: Attendre la liste des produits
+- extendedWaitUntil:
+    anyVisible:
+      - "Mes produits"
+      - "Ajouter"
+      - "XOF"
+      - "Aucun produit"
+    timeout: 10000
+
+# Étape 3: Vérifier l'existence du bouton d'ajout
+- assertVisible:
+    anyOf:
+      - "Ajouter"
+      - "+"
+      - id: "add-product-button"
+    optional: true
+
+# Étape 4: Taper sur un produit existant pour le modifier
+- tapOn:
+    textContains: "XOF"
+    optional: true
+    index: 0
+
+# Étape 5: Vérifier les options de modification
+- extendedWaitUntil:
+    anyVisible:
+      - "Modifier"
+      - "Stock"
+      - "Prix"
+      - "Description"
+    timeout: 5000
+    optional: true
+
+# Étape 6: Revenir à la liste
+- back
+
+# Étape 7: Vérifier qu'on est de retour sur la liste
+- assertVisible: "Produits"
+
+# Success
+- runScript:
+    script: |
+      console.log('✅ Merchant product management flow completed')

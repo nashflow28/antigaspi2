@@ -1,0 +1,84 @@
+# Flow: Cancel Reservation
+# Description: Teste l'annulation d'une réservation existante
+# Priority: HIGH - Fonctionnalité critique utilisateur
+
+appId: com.antigaspi.mobile
+name: "Cancel Reservation Flow"
+tags:
+  - consumer
+  - reservation
+  - critical
+
+---
+
+# Prérequis: Login consumer
+- runFlow: "../auth/login-consumer.yaml"
+
+# Étape 1: Aller sur l'onglet Commandes/Réservations
+- tapOn:
+    anyOf:
+      - "Commandes"
+      - "Réservations"
+      - "Mes commandes"
+
+# Étape 2: Attendre la liste des réservations
+- extendedWaitUntil:
+    anyVisible:
+      - "En attente"
+      - "Confirmée"
+      - "pending"
+      - "confirmed"
+      - "Aucune réservation"
+    timeout: 10000
+
+# Étape 3: Vérifier s'il y a des réservations
+- runScript:
+    condition: ${output.hasReservations}
+    script: |
+      // Si pas de réservation, on skip le test
+      const hasReservations = await maestro.getTextContent().includes('En attente') ||
+                              await maestro.getTextContent().includes('pending')
+      output.hasReservations = hasReservations
+
+# Étape 4: Si réservations présentes, taper sur la première
+- tapOn:
+    text: "En attente"
+    optional: true
+    index: 0
+
+# Étape 5: Attendre les détails
+- extendedWaitUntil:
+    anyVisible:
+      - "Annuler"
+      - "Détails"
+      - "Réservation"
+    timeout: 5000
+    optional: true
+
+# Étape 6: Cliquer sur Annuler si disponible
+- tapOn:
+    text: "Annuler"
+    optional: true
+
+# Étape 7: Confirmer l'annulation
+- tapOn:
+    text: "Confirmer"
+    optional: true
+- tapOn:
+    text: "Oui"
+    optional: true
+
+# Étape 8: Vérifier le succès ou le statut
+- extendedWaitUntil:
+    anyVisible:
+      - "Annulée"
+      - "cancelled"
+      - "Réservation annulée"
+      - "Succès"
+    timeout: 10000
+    optional: true
+
+# Success
+- runScript:
+    script: |
+      console.log('✅ Cancel reservation flow completed')

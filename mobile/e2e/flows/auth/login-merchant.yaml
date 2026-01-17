@@ -1,0 +1,43 @@
+# Flow: Merchant Login
+# Description: Teste le flux de connexion complet pour un commerçant
+# Priority: CRITICAL - Gate pour tous les autres tests merchant
+
+appId: com.antigaspi.mobile
+name: "Merchant Login Flow"
+tags:
+  - auth
+  - critical
+  - merchant
+
+---
+
+# Étape 1: Vérifier l'écran de connexion
+- assertVisible: "Connexion"
+
+# Étape 2: Entrer les identifiants merchant
+- tapOn: "Email"
+- inputText: "${TEST_MERCHANT_EMAIL}"
+
+- tapOn: "Mot de passe"
+- inputText: "${TEST_MERCHANT_PASSWORD}"
+
+# Étape 3: Soumettre le formulaire
+- tapOn: "Se connecter"
+
+# Étape 4: Attendre la redirection vers dashboard merchant
+- extendedWaitUntil:
+    visible: "Dashboard"
+    timeout: 15000
+
+# Étape 5: Vérifier les éléments merchant
+- assertVisible:
+    text: "Produits"
+    optional: true
+- assertVisible:
+    text: "Réservations"
+    optional: true
+
+# Success
+- runScript:
+    script: |
+      console.log('✅ Merchant login successful')

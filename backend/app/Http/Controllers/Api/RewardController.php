@@ -70,7 +70,7 @@ class RewardController extends Controller
             ]);
         } catch (\Illuminate\Database\QueryException $e) {
             // Table doesn't exist or column missing
-            \Log::error('RewardController@index - Database error: ' . $e->getMessage());
+            \Log::error('RewardController@index - Database error: '.$e->getMessage());
 
             return response()->json([
                 'success' => true,

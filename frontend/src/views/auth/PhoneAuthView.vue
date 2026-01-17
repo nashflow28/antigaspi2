@@ -49,6 +49,19 @@
           </p>
         </div>
 
+        <!-- Role Selection (register only) -->
+        <div v-if="!isLogin">
+          <Label for="role">Vous êtes</Label>
+          <select
+            id="role"
+            v-model="form.role"
+            class="mt-1 block w-full rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-900 dark:text-white py-2 px-3 shadow-sm focus:border-primary-500 focus:ring-primary-500"
+          >
+            <option value="consumer">Un consommateur</option>
+            <option value="merchant">Un commerçant</option>
+          </select>
+        </div>
+
         <!-- Email (optional, register only) -->
         <div v-if="!isLogin">
           <Label for="email">Email (optionnel)</Label>
@@ -142,7 +155,8 @@ const phoneAlreadyVerified = ref(route.query.verified === 'true')
 const form = ref({
   name: '',
   phone: (route.query.phone as string) || '', // Pre-fill phone if provided
-  email: ''
+  email: '',
+  role: (route.query.role as string) || 'consumer' // Default to consumer, can be set via query param
 })
 
 const errors = ref<Record<string, string>>({})
@@ -219,12 +233,12 @@ const handleSubmit = async () => {
       const firstName = nameParts[0] || ''
       const lastName = nameParts.slice(1).join(' ') || nameParts[0] || ''
 
-      sessionStorage.setItem('pendingRegistration', JSON.stringify({
+      localStorage.setItem('pendingRegistration', JSON.stringify({
         first_name: firstName,
         last_name: lastName,
         email: form.value.email,
         phone: fullPhone,
-        role: 'consumer',
+        role: form.value.role,
         city: 'Lomé'
       }))
 
@@ -256,13 +270,13 @@ const handleSubmit = async () => {
         const firstName = nameParts[0] || ''
         const lastName = nameParts.slice(1).join(' ') || nameParts[0] || ''
 
-        sessionStorage.setItem('pendingRegistration', JSON.stringify({
+        localStorage.setItem('pendingRegistration', JSON.stringify({
           first_name: firstName,
           last_name: lastName,
           email: form.value.email,
           phone: fullPhone,
-          role: 'consumer', // Default role
-          city: 'Lomé' // Default city
+          role: form.value.role,
+          city: 'Lomé' // Default city for West Africa
         }))
       }
 

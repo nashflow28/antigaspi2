@@ -65,7 +65,7 @@ export const initSentry = (): void => {
       attachStacktrace: true,
 
       // Filter events before sending
-      beforeSend: (event, hint) => {
+      beforeSend: (event, _hint) => {
         // Don't send events in development unless explicitly enabled
         if (__DEV__ && !process.env.EXPO_PUBLIC_SENTRY_DEBUG) {
           console.log('[Sentry] Event captured (not sent in dev):', event.message || event.exception?.values?.[0]?.value)
@@ -91,7 +91,7 @@ export const initSentry = (): void => {
 
       // Integration configuration
       integrations: (integrations) => {
-        return integrations.filter(integration => {
+        return integrations.filter(_integration => {
           // Keep all default integrations
           return true
         })

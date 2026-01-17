@@ -45,7 +45,7 @@ class UserDevice extends Model
      */
     public function isOtpVerificationValid(): bool
     {
-        if (!$this->otp_verified_at) {
+        if (! $this->otp_verified_at) {
             return false;
         }
 
@@ -57,7 +57,7 @@ class UserDevice extends Model
      */
     public function requiresOtp(): bool
     {
-        return !$this->isOtpVerificationValid();
+        return ! $this->isOtpVerificationValid();
     }
 
     /**

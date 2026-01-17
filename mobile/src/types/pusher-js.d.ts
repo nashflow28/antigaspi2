@@ -25,11 +25,11 @@ declare module 'pusher-js/react-native' {
     trigger(eventName: string, data: any): boolean
   }
 
-  interface PrivateChannel extends Channel {
+  export interface PrivateChannel extends Channel {
     // Private channels can trigger client events
   }
 
-  interface PresenceChannel extends Channel {
+  export interface PresenceChannel extends Channel {
     members: {
       count: number
       each(callback: (member: { id: string; info: any }) => void): void

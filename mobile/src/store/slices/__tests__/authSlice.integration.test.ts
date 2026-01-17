@@ -1,9 +1,4 @@
-/**
- * INTEGRATION TESTS - authSlice
- * Tests complets pour l'authentification avec vérification d'état Redux
- */
-
-import { configureStore, EnhancedStore } from '@reduxjs/toolkit'
+import { configureStore } from '@reduxjs/toolkit'
 import authReducer, {
   loginUser,
   logoutUser,
@@ -12,13 +7,10 @@ import authReducer, {
   refreshProfile,
   clearError,
   clearAuth,
-  authInitialState,
-  AuthState
 } from '../authSlice'
 import apiService from '../../../services/api'
 import { clearAllFormCaches } from '../../../hooks/usePersistedForm'
 
-// Mocks
 jest.mock('../../../services/api', () => ({
   __esModule: true,
   default: {
@@ -31,9 +23,11 @@ jest.mock('../../../services/api', () => ({
     clearStoredAuth: jest.fn(),
   },
 }))
+
 jest.mock('../../../hooks/usePersistedForm', () => ({
   clearAllFormCaches: jest.fn().mockResolvedValue(undefined),
 }))
+
 jest.mock('../../../services/secureStorage', () => ({
   secureStorage: {
     setToken: jest.fn().mockResolvedValue(undefined),
@@ -43,43 +37,57 @@ jest.mock('../../../services/secureStorage', () => ({
     clear: jest.fn().mockResolvedValue(undefined),
   },
 }))
+
 jest.mock('../../../utils/logger', () => ({
   authLogger: { log: jest.fn(), warn: jest.fn(), error: jest.fn() },
   storeLogger: { warn: jest.fn(), log: jest.fn() },
   createLogger: () => ({ warn: jest.fn(), log: jest.fn() }),
 }))
+
 jest.mock('../../../services/otpService', () => ({
-  otpService: {
-    verifyOtp: jest.fn(),
-  },
+  otpService: { verifyOtp: jest.fn() },
 }))
 
 const mockedApi = apiService as jest.Mocked<typeof apiService>
 const mockedClearFormCaches = clearAllFormCaches as jest.MockedFunction<typeof clearAllFormCaches>
 
-// Factory pour créer des utilisateurs de test
-const createMockUser = (overrides = {}) => ({
-  id: 1,
-  first_name: 'Jean',
-  last_name: 'Dupont',
-  email: 'jean.dupont@email.com',
-  phone: '+228 90 00 00 00',
-  role: 'consumer' as const,
-  city: 'Lomé',
-  is_active: true,
-  created_at: '2026-01-01T00:00:00Z',
-  ...overrides,
-})
+type User = import('../../../types').User
+type AuthResponse = import('../../../types').AuthResponse
+
+function createMockUser(overrides: Partial<User> = {}): User {
+  return {
+    id: 1,
+    first_name: 'Jean',
+    last_name: 'Dupont',
+    email: 'jean.dupont@email.com',
+    phone: '+228 90 00 00 00',
+    role: 'consumer',
+    city: 'Lomé',
+    created_at: '2026-01-01T00:00:00Z',
+    updated_at: '2026-01-01T00:00:00Z',
+    ...overrides,
+  }
+}
+
+function createAuthResponse(user: User, token: string): AuthResponse {
+  return {
+    success: true,
+    message: 'Authentification réussie',
+    data: { user, token, token_type: 'Bearer', expires_in: 86400 },
+  }
+}
+
+function createAuthTestStore() {
+  return configureStore({ reducer: { auth: authReducer } })
+}
+
+type AuthTestStore = ReturnType<typeof createAuthTestStore>
 
 describe('authSlice - Integration Tests', () => {
-  let store: EnhancedStore<{ auth: AuthState }>
+  let store: AuthTestStore
 
   beforeEach(() => {
-    store = configureStore({
-      reducer: {
-        auth: authReducer,
-      },
-    })
+    store = createAuthTestStore()
     jest.clearAllMocks()
   })
 
@@ -92,25 +100,14 @@ describe('authSlice - Integration Tests', () => {
     it('should authenticate user and update state on successful login', async () => {
       const mockUser = createMockUser()
       const mockToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.test'
+      mockedApi.login.mockResolvedValue(createAuthResponse(mockUser, mockToken))
 
-      mockedApi.login.mockResolvedValue({
-        success: true,
-        message: 'Connexion réussie',
-        data: {
-          user: mockUser,
-          token: mockToken,
-        },
-      })
-
-      // État initial: non authentifié
       expect(store.getState().auth.isAuthenticated).toBe(false)
       expect(store.getState().auth.user).toBeNull()
 
       const result = await store.dispatch(loginUser(validCredentials))
 
       expect(result.type).toBe('auth/login/fulfilled')
-
-      // VÉRIFICATION CRITIQUE: État mis à jour
       const state = store.getState().auth
       expect(state.isAuthenticated).toBe(true)
       expect(state.user).toEqual(mockUser)
@@ -134,22 +131,15 @@ describe('authSlice - Integration Tests', () => {
 
     it('should set loading during login process', async () => {
       let resolvePromise: (value: any) => void
-      const pendingPromise = new Promise((resolve) => {
-        resolvePromise = resolve
-      })
+      const pendingPromise = new Promise((resolve) => { resolvePromise = resolve })
       mockedApi.login.mockReturnValue(pendingPromise as any)
 
       const dispatchPromise = store.dispatch(loginUser(validCredentials))
 
-      // Pendant la requête
       expect(store.getState().auth.loading).toBe(true)
       expect(store.getState().auth.error).toBeNull()
 
-      // Résoudre
-      resolvePromise!({
-        success: true,
-        data: { user: createMockUser(), token: 'token' },
-      })
+      resolvePromise!(createAuthResponse(createMockUser(), 'token'))
       await dispatchPromise
 
       expect(store.getState().auth.loading).toBe(false)
@@ -157,10 +147,7 @@ describe('authSlice - Integration Tests', () => {
 
     it('should authenticate merchant user with correct role', async () => {
       const merchantUser = createMockUser({ role: 'merchant' })
-      mockedApi.login.mockResolvedValue({
-        success: true,
-        data: { user: merchantUser, token: 'merchant-token' },
-      })
+      mockedApi.login.mockResolvedValue(createAuthResponse(merchantUser, 'merchant-token'))
 
       await store.dispatch(loginUser({
         email: 'merchant@test.com',
@@ -172,10 +159,7 @@ describe('authSlice - Integration Tests', () => {
 
     it('should authenticate admin user with correct role', async () => {
       const adminUser = createMockUser({ role: 'admin' })
-      mockedApi.login.mockResolvedValue({
-        success: true,
-        data: { user: adminUser, token: 'admin-token' },
-      })
+      mockedApi.login.mockResolvedValue(createAuthResponse(adminUser, 'admin-token'))
 
       await store.dispatch(loginUser({
         email: 'admin@test.com',
@@ -188,23 +172,17 @@ describe('authSlice - Integration Tests', () => {
 
   describe('logoutUser', () => {
     beforeEach(async () => {
-      // Setup: Simuler un utilisateur connecté
-      mockedApi.login.mockResolvedValue({
-        success: true,
-        data: { user: createMockUser(), token: 'token' },
-      })
+      mockedApi.login.mockResolvedValue(createAuthResponse(createMockUser(), 'token'))
       await store.dispatch(loginUser({ email: 'test@test.com', password: 'pass' }))
       expect(store.getState().auth.isAuthenticated).toBe(true)
     })
 
     it('should clear authentication state on successful logout', async () => {
-      mockedApi.logout.mockResolvedValue({ success: true })
+      mockedApi.logout.mockResolvedValue(undefined)
 
       const result = await store.dispatch(logoutUser())
 
       expect(result.type).toBe('auth/logout/fulfilled')
-
-      // VÉRIFICATION CRITIQUE: Session effacée
       const state = store.getState().auth
       expect(state.isAuthenticated).toBe(false)
       expect(state.user).toBeNull()
@@ -213,7 +191,7 @@ describe('authSlice - Integration Tests', () => {
     })
 
     it('should clear form caches on logout', async () => {
-      mockedApi.logout.mockResolvedValue({ success: true })
+      mockedApi.logout.mockResolvedValue(undefined)
 
       await store.dispatch(logoutUser())
 
@@ -225,9 +203,7 @@ describe('authSlice - Integration Tests', () => {
 
       const result = await store.dispatch(logoutUser())
 
-      // Même en cas d'erreur API, la déconnexion locale est forcée
       expect(result.type).toBe('auth/logout/rejected')
-
       const state = store.getState().auth
       expect(state.isAuthenticated).toBe(false)
       expect(state.user).toBeNull()
@@ -239,7 +215,6 @@ describe('authSlice - Integration Tests', () => {
 
       await store.dispatch(logoutUser())
 
-      // Les caches sont nettoyés même en cas d'erreur
       expect(mockedClearFormCaches).toHaveBeenCalled()
     })
   })
@@ -250,6 +225,7 @@ describe('authSlice - Integration Tests', () => {
       last_name: 'Utilisateur',
       email: 'nouveau@test.com',
       password: 'password123',
+      password_confirmation: 'password123',
       phone: '+228 90 00 00 01',
       role: 'consumer' as const,
       city: 'Lomé',
@@ -261,11 +237,7 @@ describe('authSlice - Integration Tests', () => {
         last_name: 'Utilisateur',
         email: 'nouveau@test.com',
       })
-      mockedApi.register.mockResolvedValue({
-        success: true,
-        message: 'Inscription réussie',
-        data: { user: newUser, token: 'new-user-token' },
-      })
+      mockedApi.register.mockResolvedValue(createAuthResponse(newUser, 'new-user-token'))
 
       const result = await store.dispatch(registerUser(validRegisterData))
 
@@ -307,11 +279,9 @@ describe('authSlice - Integration Tests', () => {
     it('should restore session from stored credentials', async () => {
       const storedUser = createMockUser()
       const storedToken = 'stored-token'
-
       mockedApi.getStoredToken.mockResolvedValue(storedToken)
       mockedApi.getStoredUser.mockResolvedValue(storedUser)
 
-      // Mock jwtHelpers
       jest.doMock('../../../utils/jwtHelpers', () => ({
         isTokenExpired: () => false,
       }))
@@ -340,11 +310,7 @@ describe('authSlice - Integration Tests', () => {
 
   describe('refreshProfile', () => {
     beforeEach(async () => {
-      // Setup: Utilisateur connecté
-      mockedApi.login.mockResolvedValue({
-        success: true,
-        data: { user: createMockUser(), token: 'token' },
-      })
+      mockedApi.login.mockResolvedValue(createAuthResponse(createMockUser(), 'token'))
       await store.dispatch(loginUser({ email: 'test@test.com', password: 'pass' }))
     })
 
@@ -353,7 +319,7 @@ describe('authSlice - Integration Tests', () => {
         first_name: 'Jean-Pierre',
         phone: '+228 90 00 00 99',
       })
-      mockedApi.getProfile.mockResolvedValue({ data: updatedUser })
+      mockedApi.getProfile.mockResolvedValue({ success: true, data: updatedUser })
 
       await store.dispatch(refreshProfile())
 
@@ -367,19 +333,16 @@ describe('authSlice - Integration Tests', () => {
 
       await store.dispatch(refreshProfile())
 
-      // L'utilisateur reste connecté malgré l'échec du refresh
       expect(store.getState().auth.isAuthenticated).toBe(true)
     })
   })
 
   describe('clearError', () => {
     it('should clear error state', async () => {
-      // Create an error
       mockedApi.login.mockRejectedValue(new Error('Test error'))
       await store.dispatch(loginUser({ email: 'test', password: 'test' }))
       expect(store.getState().auth.error).toBe('Test error')
 
-      // Clear it
       store.dispatch(clearError())
 
       expect(store.getState().auth.error).toBeNull()
@@ -388,11 +351,7 @@ describe('authSlice - Integration Tests', () => {
 
   describe('clearAuth', () => {
     it('should completely reset auth state', async () => {
-      // Setup: Utilisateur connecté
-      mockedApi.login.mockResolvedValue({
-        success: true,
-        data: { user: createMockUser(), token: 'token' },
-      })
+      mockedApi.login.mockResolvedValue(createAuthResponse(createMockUser(), 'token'))
       await store.dispatch(loginUser({ email: 'test', password: 'test' }))
 
       store.dispatch(clearAuth())
@@ -412,10 +371,7 @@ describe('authSlice - Integration Tests', () => {
     roles.forEach(role => {
       it(`should correctly authenticate ${role} role`, async () => {
         const user = createMockUser({ role })
-        mockedApi.login.mockResolvedValue({
-          success: true,
-          data: { user, token: `${role}-token` },
-        })
+        mockedApi.login.mockResolvedValue(createAuthResponse(user, `${role}-token`))
 
         await store.dispatch(loginUser({ email: `${role}@test.com`, password: 'pass' }))
 
@@ -428,10 +384,7 @@ describe('authSlice - Integration Tests', () => {
   describe('Session Persistence', () => {
     it('should maintain session across multiple state updates', async () => {
       const user = createMockUser()
-      mockedApi.login.mockResolvedValue({
-        success: true,
-        data: { user, token: 'persistent-token' },
-      })
+      mockedApi.login.mockResolvedValue(createAuthResponse(user, 'persistent-token'))
 
       await store.dispatch(loginUser({ email: 'test', password: 'test' }))
 

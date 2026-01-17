@@ -1,0 +1,65 @@
+# Flow: Merchant Dashboard Stats
+# Description: Vérifie l'affichage des statistiques du dashboard merchant
+# Priority: MEDIUM - Analytics
+
+appId: com.antigaspi.mobile
+name: "Merchant Dashboard Statistics Flow"
+tags:
+  - merchant
+  - dashboard
+  - analytics
+
+---
+
+# Prérequis: Login merchant
+- runFlow: "../auth/login-merchant.yaml"
+
+# Étape 1: Le dashboard devrait être l'écran par défaut après login
+- extendedWaitUntil:
+    anyVisible:
+      - "Dashboard"
+      - "Tableau de bord"
+      - "Revenus"
+      - "Commandes"
+    timeout: 10000
+
+# Étape 2: Vérifier les métriques principales
+- assertVisible:
+    anyOf:
+      - "XOF"
+      - "Revenus"
+      - "Chiffre d'affaires"
+    optional: true
+
+- assertVisible:
+    anyOf:
+      - "Commandes"
+      - "Réservations"
+    optional: true
+
+# Étape 3: Scroll pour voir plus de stats
+- scroll:
+    direction: DOWN
+
+# Étape 4: Vérifier les graphiques/analytics
+- assertVisible:
+    anyOf:
+      - "Cette semaine"
+      - "Ce mois"
+      - "Statistiques"
+      - "Analytics"
+    optional: true
+
+# Étape 5: Tapper sur un widget pour plus de détails
+- tapOn:
+    textContains: "Voir plus"
+    optional: true
+
+- tapOn:
+    textContains: "Détails"
+    optional: true
+
+# Success
+- runScript:
+    script: |
+      console.log('✅ Merchant dashboard stats flow completed')

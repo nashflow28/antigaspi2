@@ -199,7 +199,7 @@ class SurpriseBasketController extends Controller
                     }
                 } catch (\Illuminate\Database\QueryException $e) {
                     // Table might not exist in production - log error but continue
-                    \Log::warning('SurpriseBasketController@store - Could not add items (table might not exist): ' . $e->getMessage());
+                    \Log::warning('SurpriseBasketController@store - Could not add items (table might not exist): '.$e->getMessage());
                 }
             }
 
@@ -226,7 +226,7 @@ class SurpriseBasketController extends Controller
                     Notification::send($interestedUsers, new NewSurpriseBasketNotification($surpriseBasket));
                 }
             } catch (\Exception $e) {
-                \Log::warning('SurpriseBasketController@store - Notification failed: ' . $e->getMessage());
+                \Log::warning('SurpriseBasketController@store - Notification failed: '.$e->getMessage());
             }
 
             return response()->json([
@@ -236,7 +236,7 @@ class SurpriseBasketController extends Controller
             ], 201);
 
         } catch (\Illuminate\Database\QueryException $e) {
-            \Log::error('SurpriseBasketController@store - Database error: ' . $e->getMessage());
+            \Log::error('SurpriseBasketController@store - Database error: '.$e->getMessage());
 
             return response()->json([
                 'success' => false,
@@ -244,7 +244,7 @@ class SurpriseBasketController extends Controller
                 'error' => config('app.debug') ? $e->getMessage() : 'Database error',
             ], 500);
         } catch (\Exception $e) {
-            \Log::error('SurpriseBasketController@store - General error: ' . $e->getMessage());
+            \Log::error('SurpriseBasketController@store - General error: '.$e->getMessage());
 
             return response()->json([
                 'success' => false,

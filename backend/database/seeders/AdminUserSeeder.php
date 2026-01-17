@@ -10,10 +10,20 @@ use Illuminate\Support\Facades\Hash;
 class AdminUserSeeder extends Seeder
 {
     /**
+     * Default PIN for test users (hashed)
+     * PIN: 1234
+     */
+    private function getDefaultPin(): string
+    {
+        return Hash::make('1234');
+    }
+
+    /**
      * Run the database seeds.
      */
     public function run(): void
     {
+        // Admin user (phone: +22891000001, PIN: 1234)
         User::updateOrCreate(
             ['email' => 'admin@antigaspi.com'],
             [
@@ -21,15 +31,18 @@ class AdminUserSeeder extends Seeder
                 'last_name' => 'System',
                 'name' => 'Admin System',
                 'password' => Hash::make('password'),
-                'phone' => '+33100000001',
+                'phone' => '22891000001', // Togo format without +
                 'role' => 'admin',
-                'city' => 'Paris',
-                'address' => '1 Avenue de la République, Paris',
+                'city' => 'Lomé',
+                'address' => '1 Boulevard du 13 Janvier, Lomé',
                 'is_active' => true,
                 'email_verified_at' => now(),
+                'phone_verified_at' => now(), // Phone verified for new auth flow
+                'pin' => $this->getDefaultPin(), // PIN: 1234
             ]
         );
 
+        // Merchant user (phone: +22890123456, PIN: 1234)
         $merchantUser = User::updateOrCreate(
             ['email' => 'boulangerie.martin@email.com'],
             [
@@ -37,12 +50,14 @@ class AdminUserSeeder extends Seeder
                 'last_name' => 'Boulanger',
                 'name' => 'Martin Boulanger',
                 'password' => Hash::make('password'),
-                'phone' => '+22890123456',
+                'phone' => '22890123456', // Togo format without +
                 'role' => 'merchant',
                 'city' => 'Lomé',
                 'address' => '15 Boulevard du 13 Janvier, Lomé',
                 'is_active' => true,
                 'email_verified_at' => now(),
+                'phone_verified_at' => now(), // Phone verified for new auth flow
+                'pin' => $this->getDefaultPin(), // PIN: 1234
             ]
         );
 
@@ -52,8 +67,8 @@ class AdminUserSeeder extends Seeder
                 'business_name' => 'Boulangerie du Centre',
                 'business_type' => 'bakery',
                 'siret' => '12345678901234',
-                'latitude' => 45.764043,
-                'longitude' => 4.835659,
+                'latitude' => 6.1319, // Lomé coordinates
+                'longitude' => 1.2228,
                 'opening_hours' => [
                     'monday' => ['07:30', '19:00'],
                     'tuesday' => ['07:30', '19:00'],
@@ -68,6 +83,7 @@ class AdminUserSeeder extends Seeder
             ]
         );
 
+        // Consumer user (phone: +22890654321, PIN: 1234)
         User::updateOrCreate(
             ['email' => 'jean.dupont@email.com'],
             [
@@ -75,12 +91,14 @@ class AdminUserSeeder extends Seeder
                 'last_name' => 'Dupont',
                 'name' => 'Jean Dupont',
                 'password' => Hash::make('password'),
-                'phone' => '+22890654321',
+                'phone' => '22890654321', // Togo format without +
                 'role' => 'consumer',
                 'city' => 'Lomé',
                 'address' => '25 Rue de la Paix, Lomé',
                 'is_active' => true,
                 'email_verified_at' => now(),
+                'phone_verified_at' => now(), // Phone verified for new auth flow
+                'pin' => $this->getDefaultPin(), // PIN: 1234
             ]
         );
     }

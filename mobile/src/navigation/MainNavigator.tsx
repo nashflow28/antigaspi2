@@ -4,6 +4,7 @@ import { RootState } from '../store'
 import ConsumerNavigator from './ConsumerNavigator'
 import MerchantNavigator from './MerchantNavigator'
 import AdminNavigator from './AdminNavigator'
+import DriverNavigator from './DriverNavigator'
 import { navLogger } from '../utils/logger'
 
 const MainNavigator: React.FC = () => {
@@ -23,6 +24,11 @@ const MainNavigator: React.FC = () => {
   if (user?.role === 'admin') {
     navLogger.log('✅ [MainNavigator] Routing to ADMIN Navigator')
     return <AdminNavigator />
+  }
+
+  if (user?.role === 'driver') {
+    navLogger.log('✅ [MainNavigator] Routing to DRIVER Navigator')
+    return <DriverNavigator />
   }
 
   // Par défaut : navigateur consommateur

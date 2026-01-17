@@ -286,6 +286,71 @@ class DeviceService {
   }
 
   /**
+   * Send OTP to link phone to existing account
+   */
+  async sendLinkPhoneOtp(phone: string): Promise<{ success: boolean; message: string }> {
+    try {
+      const response = await api.post<{ success: boolean; message: string }>('/auth/device/link-phone/send-otp', {
+        phone: this.normalizePhone(phone),
+      })
+
+      return response
+    } catch (error: any) {
+      console.error('Send link phone OTP error:', error)
+      if (error.response?.data) {
+        return error.response.data
+      }
+      return {
+        success: false,
+        message: error.message || "Erreur lors de l'envoi du code OTP",
+      }
+    }
+  }
+
+  /**
+   * Verify OTP and link phone to account
+   */
+  async verifyAndLinkPhone(phone: string, otp: string): Promise<{
+    success: boolean
+    message: string
+    data?: {
+      user: any
+      has_pin: boolean
+      requires_pin_setup: boolean
+    }
+  }> {
+    const deviceInfo = await this.getDeviceInfo()
+
+    try {
+      const response = await api.post<{
+        success: boolean
+        message: string
+        data?: {
+          user: any
+          has_pin: boolean
+          requires_pin_setup: boolean
+        }
+      }>('/auth/device/link-phone/verify', {
+        phone: this.normalizePhone(phone),
+        otp,
+        device_id: deviceInfo.device_id,
+        device_info: deviceInfo,
+      })
+
+      return response
+    } catch (error: any) {
+      console.error('Verify and link phone error:', error)
+      if (error.response?.data) {
+        return error.response.data
+      }
+      return {
+        success: false,
+        message: error.message || 'Erreur lors de la vérification',
+      }
+    }
+  }
+
+  /**
    * Logout and deactivate device
    */
   async logout(): Promise<{ success: boolean; message: string }> {

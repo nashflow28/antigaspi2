@@ -215,7 +215,7 @@ const handleVerify = async () => {
         notify.info('Numéro non inscrit', 'Créez votre compte pour continuer')
 
         // Store phone as verified for registration
-        sessionStorage.setItem('pendingRegistration', JSON.stringify({
+        localStorage.setItem('pendingRegistration', JSON.stringify({
           phone: phone.value,
           first_name: '',
           last_name: '',
@@ -230,7 +230,7 @@ const handleVerify = async () => {
         return
       }
     } else {
-      const pendingData = sessionStorage.getItem('pendingRegistration')
+      const pendingData = localStorage.getItem('pendingRegistration')
       if (pendingData) {
         const userData = JSON.parse(pendingData)
         result = await otpService.registerWithOTP({
@@ -313,7 +313,7 @@ onMounted(async () => {
   // If phone is already verified (coming from login flow for non-existent user),
   // skip OTP entry and proceed directly to registration
   if (alreadyVerified.value && mode.value === 'register') {
-    const pendingData = sessionStorage.getItem('pendingRegistration')
+    const pendingData = localStorage.getItem('pendingRegistration')
     if (pendingData) {
       loading.value = true
       try {
@@ -324,7 +324,7 @@ onMounted(async () => {
         if (result.success && result.token) {
           authStore.setAuth(result.token, result.user as any)
           notify.success('Compte créé', 'Bienvenue sur Antigaspi !')
-          sessionStorage.removeItem('pendingRegistration')
+          localStorage.removeItem('pendingRegistration')
           router.push({ name: 'home' })
           return // Only return on success
         } else {

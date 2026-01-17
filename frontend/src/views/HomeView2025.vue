@@ -493,7 +493,7 @@ const categoriesLoading = ref(true)
 const getImageUrl = (imageUrl: string | null | undefined): string => {
   if (!imageUrl) return ''
   if (imageUrl.startsWith('http')) return imageUrl
-  const baseUrl = import.meta.env.VITE_API_BASE_URL?.replace('/api', '') || 'http://localhost:8000'
+  const baseUrl = import.meta.env.VITE_API_BASE_URL?.replace('/api', '') || 'https://antigaspi.jubtek.com'
   return `${baseUrl}/${imageUrl}`
 }
 

@@ -17,7 +17,7 @@ return new class extends Migration
     {
         Schema::table('users', function (Blueprint $table) {
             // Add phone_verified_at column if it doesn't exist
-            if (!Schema::hasColumn('users', 'phone_verified_at')) {
+            if (! Schema::hasColumn('users', 'phone_verified_at')) {
                 $table->timestamp('phone_verified_at')->nullable()->after('email_verified_at');
             }
         });

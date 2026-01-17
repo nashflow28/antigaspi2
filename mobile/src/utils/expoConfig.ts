@@ -20,7 +20,7 @@ const getExtraFromConstants = (): ExpoExtra | undefined => {
 
 const getExtraFromUpdates = (): ExpoExtra | undefined => {
   try {
-    // eslint-disable-next-line @typescript-eslint/no-var-requires, global-require
+     
     const updatesModule = require('expo-updates') as {
       manifestExtra?: unknown
       manifest?: { extra?: unknown }
@@ -38,7 +38,7 @@ const getExtraFromUpdates = (): ExpoExtra | undefined => {
     if (isRecord(updatesModule?.manifest?.extra)) {
       return updatesModule.manifest.extra
     }
-  } catch (error) {
+  } catch {
     // expo-updates est indisponible (ex: plateforme web)
   }
 
@@ -47,7 +47,7 @@ const getExtraFromUpdates = (): ExpoExtra | undefined => {
 
 const getExtraFromNativeModules = (): ExpoExtra | undefined => {
   try {
-    // eslint-disable-next-line @typescript-eslint/no-var-requires, global-require
+     
     const { NativeModules } = require('react-native') as typeof import('react-native')
 
     const candidates: unknown[] = [
@@ -61,7 +61,7 @@ const getExtraFromNativeModules = (): ExpoExtra | undefined => {
         return candidate
       }
     }
-  } catch (error) {
+  } catch {
     // NativeModules peut être indisponible lors de l'exécution web/test
   }
 

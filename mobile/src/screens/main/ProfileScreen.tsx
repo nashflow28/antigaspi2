@@ -275,6 +275,26 @@ const ProfileScreen: React.FC = () => {
           <Ionicons name="chevron-forward" size={20} color={theme.colors.neutral[400]} />
         </TouchableOpacity>
 
+        {/* Link Phone option - show only if user has no verified phone */}
+        {(!user?.phone || !user?.phone_verified_at) && (
+          <TouchableOpacity
+            style={[styles.menuItem, { paddingHorizontal: theme.spacing.lg, paddingVertical: theme.spacing.md, borderBottomWidth: 1, borderBottomColor: theme.colors.border }]}
+            onPress={() => (navigation as any).navigate('LinkPhone')}
+            accessibilityLabel="Lier mon telephone"
+          >
+            <Ionicons name="phone-portrait-outline" size={24} color={theme.colors.primary[500]} />
+            <View style={{ flex: 1, marginLeft: theme.spacing.md }}>
+              <Typography variant="body" style={{ color: theme.colors.primary[500] }}>
+                Lier mon telephone
+              </Typography>
+              <Typography variant="caption" color="secondary">
+                Activez la connexion rapide par PIN
+              </Typography>
+            </View>
+            <Badge variant="promo" size="sm">Nouveau</Badge>
+          </TouchableOpacity>
+        )}
+
         {user?.role === 'merchant' && (
           <TouchableOpacity
             style={[styles.menuItem, { paddingHorizontal: theme.spacing.lg, paddingVertical: theme.spacing.md, borderBottomWidth: 1, borderBottomColor: theme.colors.border }]}
@@ -362,6 +382,28 @@ const ProfileScreen: React.FC = () => {
             <Ionicons name="gift-outline" size={24} color={theme.colors.text} />
             <Typography variant="body" style={{ flex: 1, marginLeft: theme.spacing.md }}>
               Points de fidélité
+            </Typography>
+            <Ionicons name="chevron-forward" size={20} color={theme.colors.neutral[400]} />
+          </TouchableOpacity>
+        )}
+
+        {user?.role === 'consumer' && (
+          <TouchableOpacity
+            style={[
+              styles.menuItem,
+              {
+                paddingHorizontal: theme.spacing.lg,
+                paddingVertical: theme.spacing.md,
+                borderBottomWidth: 1,
+                borderBottomColor: theme.colors.border,
+              },
+            ]}
+            onPress={() => (navigation as any).navigate('DeliveryHistory')}
+            accessibilityLabel="Accéder à mes livraisons"
+          >
+            <Ionicons name="bicycle-outline" size={24} color={theme.colors.text} />
+            <Typography variant="body" style={{ flex: 1, marginLeft: theme.spacing.md }}>
+              Mes livraisons
             </Typography>
             <Ionicons name="chevron-forward" size={20} color={theme.colors.neutral[400]} />
           </TouchableOpacity>

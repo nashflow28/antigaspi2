@@ -1,0 +1,50 @@
+# Flow: Consumer Login
+# Description: Teste le flux de connexion complet pour un consommateur
+# Priority: CRITICAL - Gate pour tous les autres tests consumer
+
+appId: com.antigaspi.mobile
+name: "Consumer Login Flow"
+tags:
+  - auth
+  - critical
+  - consumer
+
+---
+
+# Étape 1: Vérifier l'écran de connexion
+- assertVisible: "Connexion"
+- assertVisible:
+    text: "Email"
+    optional: true
+
+# Étape 2: Entrer les identifiants
+- tapOn: "Email"
+- inputText: "${TEST_CONSUMER_EMAIL}"
+
+- tapOn: "Mot de passe"
+- inputText: "${TEST_CONSUMER_PASSWORD}"
+
+# Étape 3: Soumettre le formulaire
+- tapOn: "Se connecter"
+
+# Étape 4: Attendre la redirection
+- extendedWaitUntil:
+    visible: "Accueil"
+    timeout: 15000
+
+# Étape 5: Vérifier que l'utilisateur est connecté
+- assertVisible:
+    text: "Découvrir"
+    optional: true
+- assertVisible:
+    text: "Favoris"
+    optional: true
+
+# Étape 6: Vérifier la navigation
+- tapOn: "Compte"
+- assertVisible: "Jean"
+
+# Success: User is logged in and sees account screen
+- runScript:
+    script: |
+      console.log('✅ Consumer login successful')

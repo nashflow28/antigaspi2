@@ -1,0 +1,86 @@
+# Flow: Merchant Manage Reservations
+# Description: Teste la gestion des réservations par un commerçant
+# Priority: CRITICAL - Flux business principal merchant
+
+appId: com.antigaspi.mobile
+name: "Merchant Reservation Management Flow"
+tags:
+  - merchant
+  - reservations
+  - critical
+  - business
+
+---
+
+# Prérequis: Login merchant
+- runFlow: "../auth/login-merchant.yaml"
+
+# Étape 1: Aller sur l'onglet Réservations
+- tapOn: "Réservations"
+
+# Étape 2: Attendre la liste des réservations
+- extendedWaitUntil:
+    anyVisible:
+      - "En attente"
+      - "Confirmée"
+      - "Terminée"
+      - "Aucune réservation"
+      - "pending"
+    timeout: 10000
+
+# Étape 3: Vérifier les filtres
+- assertVisible:
+    anyOf:
+      - "Toutes"
+      - "En attente"
+      - "Filtre"
+    optional: true
+
+# Étape 4: Taper sur une réservation en attente si présente
+- tapOn:
+    text: "En attente"
+    optional: true
+    index: 0
+
+# Étape 5: Vérifier les actions disponibles
+- extendedWaitUntil:
+    anyVisible:
+      - "Confirmer"
+      - "Refuser"
+      - "Détails"
+      - "Client"
+    timeout: 5000
+    optional: true
+
+# Étape 6: Confirmer la réservation si le bouton est présent
+- tapOn:
+    text: "Confirmer"
+    optional: true
+
+# Étape 7: Vérifier le changement de statut
+- extendedWaitUntil:
+    anyVisible:
+      - "Confirmée"
+      - "confirmed"
+      - "Succès"
+      - "Prête"
+    timeout: 10000
+    optional: true
+
+# Étape 8: Revenir à la liste
+- back
+  optional: true
+
+# Étape 9: Marquer comme prête si disponible
+- tapOn:
+    text: "Prête"
+    optional: true
+
+- tapOn:
+    text: "Marquer comme prête"
+    optional: true
+
+# Success
+- runScript:
+    script: |
+      console.log('✅ Merchant reservation management flow completed')

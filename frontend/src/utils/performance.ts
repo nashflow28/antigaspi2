@@ -238,9 +238,12 @@ export function addResourceHint(href: string, rel: 'preload' | 'prefetch' | 'pre
 
 export function preloadCriticalResources() {
   // Preconnect to API
-  const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api'
-  const apiOrigin = new URL(apiBaseUrl).origin
-  addResourceHint(apiOrigin, 'preconnect')
+  const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || '/api'
+  // Only preconnect if we have a full URL (not relative path)
+  if (apiBaseUrl.startsWith('http')) {
+    const apiOrigin = new URL(apiBaseUrl).origin
+    addResourceHint(apiOrigin, 'preconnect')
+  }
 
   // Preload critical fonts
   addResourceHint('/fonts/inter-var.woff2', 'preload', 'font')

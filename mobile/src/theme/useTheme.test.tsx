@@ -334,7 +334,7 @@ describe('useTheme Hook', () => {
         try {
           const theme = useTheme()
           return <Text>{theme.isDark ? 'Dark' : 'Light'}</Text>
-        } catch (error) {
+        } catch {
           return <Text>Error caught</Text>
         }
       }

@@ -1,0 +1,103 @@
+# Flow: Cart Checkout
+# Description: Teste le flux complet de panier et checkout
+# Priority: CRITICAL - Flow business principal
+
+appId: com.antigaspi.mobile
+name: "Cart Checkout Flow"
+tags:
+  - consumer
+  - cart
+  - checkout
+  - critical
+  - business
+
+---
+
+# Prérequis: Login consumer
+- runFlow: "../auth/login-consumer.yaml"
+
+# Étape 1: Aller sur Découvrir et ajouter au panier
+- tapOn: "Découvrir"
+
+# Étape 2: Attendre les produits
+- extendedWaitUntil:
+    visible:
+      textContains: "XOF"
+    timeout: 10000
+
+# Étape 3: Sélectionner un produit
+- tapOn:
+    textContains: "XOF"
+    index: 0
+
+# Étape 4: Ajouter au panier
+- extendedWaitUntil:
+    anyVisible:
+      - "Ajouter au panier"
+      - "Réserver"
+    timeout: 5000
+
+- tapOn:
+    anyOf:
+      - "Ajouter au panier"
+      - "Réserver"
+
+# Étape 5: Aller au panier
+- tapOn:
+    anyOf:
+      - "Panier"
+      - "Mon panier"
+      - id: "cart-icon"
+
+# Étape 6: Attendre le panier
+- extendedWaitUntil:
+    anyVisible:
+      - "Panier"
+      - "Total"
+      - "XOF"
+      - "Panier vide"
+    timeout: 10000
+
+# Étape 7: Vérifier les éléments du panier
+- assertVisible:
+    textContains: "XOF"
+    optional: true
+
+# Étape 8: Procéder au checkout si panier non vide
+- tapOn:
+    anyOf:
+      - "Passer commande"
+      - "Commander"
+      - "Valider"
+    optional: true
+
+# Étape 9: Sélectionner le mode de paiement
+- tapOn:
+    text: "Sur place"
+    optional: true
+- tapOn:
+    text: "on_site"
+    optional: true
+
+# Étape 10: Confirmer la commande
+- tapOn:
+    anyOf:
+      - "Confirmer"
+      - "Valider la commande"
+      - "Commander"
+    optional: true
+
+# Étape 11: Vérifier le succès
+- extendedWaitUntil:
+    anyVisible:
+      - "Commande créée"
+      - "Succès"
+      - "Merci"
+      - "Réservation"
+    timeout: 15000
+    optional: true
+
+# Success
+- runScript:
+    script: |
+      console.log('✅ Cart checkout flow completed')

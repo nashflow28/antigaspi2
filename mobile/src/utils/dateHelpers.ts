@@ -11,14 +11,10 @@ import {
   parseISO,
   differenceInDays,
   differenceInHours,
-  differenceInMinutes,
   startOfDay,
   format,
   isValid,
   isBefore,
-  isAfter,
-  addDays,
-  addHours,
 } from 'date-fns'
 import { fr } from 'date-fns/locale'
 import { EXPIRATION_THRESHOLDS } from '../constants/business'
@@ -195,7 +191,7 @@ export const getExpirationColor = (
  */
 export const getPickupWindow = (
   expirationDate: string | null | undefined,
-  offsetDays: number = 1
+  _offsetDays: number = 1
 ): { start: Date; end: Date } | null => {
   const expiry = safeParseDate(expirationDate)
   if (!expiry) return null

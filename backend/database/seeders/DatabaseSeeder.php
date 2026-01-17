@@ -27,8 +27,9 @@ class DatabaseSeeder extends Seeder
         echo "   - Reservations: 8 test reservations created\n";
         echo "   - Reviews: 10 test reviews created\n\n";
         echo "📝 Test credentials (matching CLAUDE.md):\n";
-        echo "   Admin: admin@antigaspi.com / password\n";
-        echo "   Merchant: boulangerie.martin@email.com / password\n";
-        echo "   Consumer: jean.dupont@email.com / password\n\n";
+        echo "   Admin:    +228 91 00 00 01 | admin@antigaspi.com | PIN: 1234\n";
+        echo "   Merchant: +228 90 12 34 56 | boulangerie.martin@email.com | PIN: 1234\n";
+        echo "   Consumer: +228 90 65 43 21 | jean.dupont@email.com | PIN: 1234\n";
+        echo "   Password (all): password\n\n";
     }
 }

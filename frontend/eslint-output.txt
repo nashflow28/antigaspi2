@@ -1,0 +1,1382 @@
+
+> frontend@1.0.0 lint
+> eslint . --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix
+
+
+C:\xampp\htdocs\antigaspi2\frontend\src\components\dashboard\2025\DashboardTabs.vue
+  50:10  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  56:5   warning  Prop "tabs" should be optional            vue/no-required-prop-with-default
+
+C:\xampp\htdocs\antigaspi2\frontend\src\components\dashboard\2025\DataTableCard.vue
+  118:5   warning  Prop "rows" should be optional            vue/no-required-prop-with-default
+  118:26  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  143:37  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\xampp\htdocs\antigaspi2\frontend\src\components\dashboard\2025\QuickActionsCard.vue
+  54:32  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\xampp\htdocs\antigaspi2\frontend\src\components\debug\SequentialThinking.vue
+  294:47  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  299:32  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  299:43  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  385:33  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\xampp\htdocs\antigaspi2\frontend\src\components\forms\LoginForm.vue
+  213:7  warning  Unexpected console statement  no-console
+  214:7  warning  Unexpected console statement  no-console
+  215:7  warning  Unexpected console statement  no-console
+  216:7  warning  Unexpected console statement  no-console
+  221:7  warning  Unexpected console statement  no-console
+  226:9  warning  Unexpected console statement  no-console
+  233:7  warning  Unexpected console statement  no-console
+  238:9  warning  Unexpected console statement  no-console
+  241:9  warning  Unexpected console statement  no-console
+  243:9  warning  Unexpected console statement  no-console
+  246:7  warning  Unexpected console statement  no-console
+  248:7  warning  Unexpected console statement  no-console
+  249:7  warning  Unexpected console statement  no-console
+
+C:\xampp\htdocs\antigaspi2\frontend\src\components\maps\AddressSearch.vue
+  214:26  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  330:33  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  351:7   warning  Unexpected console statement              no-console
+
+C:\xampp\htdocs\antigaspi2\frontend\src\components\maps\LocationPicker.vue
+  199:10  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  200:21  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  250:34  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  275:5   warning  Unexpected console statement              no-console
+  311:44  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\xampp\htdocs\antigaspi2\frontend\src\components\maps\SimpleMap.vue
+  79:19  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\xampp\htdocs\antigaspi2\frontend\src\components\merchant\CreateSurpriseBasket.vue
+  330:21  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\xampp\htdocs\antigaspi2\frontend\src\components\merchant\EditSurpriseBasket.vue
+  307:11  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  314:21  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  345:57  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\xampp\htdocs\antigaspi2\frontend\src\components\merchant\LocationManager.vue
+  277:10  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  278:13  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  478:30  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  485:23  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  500:30  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  539:36  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\xampp\htdocs\antigaspi2\frontend\src\components\merchant\ProductSelectorModal.vue
+  266:33  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\xampp\htdocs\antigaspi2\frontend\src\components\merchant\SurpriseBasketDetail.vue
+  265:11  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  271:18  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\xampp\htdocs\antigaspi2\frontend\src\components\merchant\SurpriseBasketsList.vue
+  250:18  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  251:18  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  271:29  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  276:29  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  281:43  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  286:32  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\xampp\htdocs\antigaspi2\frontend\src\components\payment\MobileMoneyPayment.vue
+  363:19  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  410:19  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  449:21  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\xampp\htdocs\antigaspi2\frontend\src\components\reservation\ReservationCard.vue
+  451:21  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  451:35  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  459:19  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\xampp\htdocs\antigaspi2\frontend\src\components\reviews\EditReviewForm.vue
+  164:21  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  200:55  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\xampp\htdocs\antigaspi2\frontend\src\components\reviews\MerchantResponse.vue
+  146:47  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  147:49  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  235:54  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\xampp\htdocs\antigaspi2\frontend\src\components\reviews\ReviewForm.vue
+  130:8  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\xampp\htdocs\antigaspi2\frontend\src\components\reviews\ReviewsList.vue
+  408:41  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\xampp\htdocs\antigaspi2\frontend\src\components\ui\2025\Badge.vue
+  51:14  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  52:15  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\xampp\htdocs\antigaspi2\frontend\src\components\ui\2025\Button.vue
+  61:14  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  62:15  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\xampp\htdocs\antigaspi2\frontend\src\components\ui\2025\Dropdown.vue
+  60:11  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  61:10  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\xampp\htdocs\antigaspi2\frontend\src\components\ui\2025\EmptyState.vue
+   97:10  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  109:10  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\xampp\htdocs\antigaspi2\frontend\src\components\ui\2025\Input.vue
+  103:14  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  104:15  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\xampp\htdocs\antigaspi2\frontend\src\components\ui\2025\Navigation.vue
+  336:10  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  346:10  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  356:10  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\xampp\htdocs\antigaspi2\frontend\src\components\ui\2025\Pagination.vue
+  97:24  warning  Variable 'size' is already declared in the upper scope  vue/no-template-shadow
+
+C:\xampp\htdocs\antigaspi2\frontend\src\components\ui\2025\ProductCard.vue
+  156:10  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  162:10  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\xampp\htdocs\antigaspi2\frontend\src\components\ui\2025\Table.vue
+  76:24  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\xampp\htdocs\antigaspi2\frontend\src\components\ui\2025\Tabs.vue
+  36:16  warning  'v-html' directive can lead to XSS attack  vue/no-v-html
+  51:10  warning  Unexpected any. Specify a different type   @typescript-eslint/no-explicit-any
+
+C:\xampp\htdocs\antigaspi2\frontend\src\components\ui\AdminModal.vue
+  116:10  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\xampp\htdocs\antigaspi2\frontend\src\components\ui\ErrorBoundary.vue
+  122:26  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  171:25  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\xampp\htdocs\antigaspi2\frontend\src\components\ui\PWAInstall.vue
+  55:28  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\xampp\htdocs\antigaspi2\frontend\src\components\wallet\WalletCard.vue
+  34:25  warning  The "recharge" event has been triggered but not declared on `defineEmits`  vue/require-explicit-emits
+  40:25  warning  The "settings" event has been triggered but not declared on `defineEmits`  vue/require-explicit-emits
+
+C:\xampp\htdocs\antigaspi2\frontend\src\components\wallet\WalletRecharge.vue
+  163:35  warning  There is more than one component in this file  vue/one-component-per-file
+  167:40  warning  There is more than one component in this file  vue/one-component-per-file
+
+C:\xampp\htdocs\antigaspi2\frontend\src\components\wallet\WalletTransactions.vue
+  209:31  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\xampp\htdocs\antigaspi2\frontend\src\composables\ui\useForm.ts
+    4:10  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+    7:23  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   11:34  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   12:39  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   13:38  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   37:49  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   37:79  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   46:42  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   98:31  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  112:29  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\xampp\htdocs\antigaspi2\frontend\src\composables\useCategories.ts
+  21:7  warning  Unexpected console statement  no-console
+
+C:\xampp\htdocs\antigaspi2\frontend\src\composables\useDesignSystem2025.ts
+  38:7   warning  Unexpected console statement              no-console
+  45:7   warning  Unexpected console statement              no-console
+  55:70  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  57:7   warning  Unexpected console statement              no-console
+
+C:\xampp\htdocs\antigaspi2\frontend\src\composables\useErrorHandler.ts
+  178:5  warning  Unexpected console statement  no-console
+  179:5  warning  Unexpected console statement  no-console
+  180:5  warning  Unexpected console statement  no-console
+  181:5  warning  Unexpected console statement  no-console
+
+C:\xampp\htdocs\antigaspi2\frontend\src\composables\useErrorReporting.ts
+  78:9  warning  Unexpected console statement  no-console
+  80:9  warning  Unexpected console statement  no-console
+
+C:\xampp\htdocs\antigaspi2\frontend\src\composables\useGeolocation.ts
+  112:7  warning  Unexpected console statement  no-console
+  247:7  warning  Unexpected console statement  no-console
+
+C:\xampp\htdocs\antigaspi2\frontend\src\composables\useLoyaltyPoints.ts
+  33:78  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\xampp\htdocs\antigaspi2\frontend\src\composables\useNetworkError.ts
+   25:45  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   42:34  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   58:36  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   66:35  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  121:20  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\xampp\htdocs\antigaspi2\frontend\src\composables\useNotifications.ts
+  82:7  warning  Unexpected console statement  no-console
+
+C:\xampp\htdocs\antigaspi2\frontend\src\composables\usePWA.ts
+   41:7   warning  Unexpected console statement              no-console
+   52:7   warning  Unexpected console statement              no-console
+   66:17  warning  Unexpected console statement              no-console
+   75:7   warning  Unexpected console statement              no-console
+  105:30  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  134:9   warning  Unexpected console statement              no-console
+  139:9   warning  Unexpected console statement              no-console
+  143:7   warning  Unexpected console statement              no-console
+  212:7   warning  Unexpected console statement              no-console
+  217:36  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  218:7   warning  Unexpected console statement              no-console
+  221:7   warning  Unexpected console statement              no-console
+  233:9   warning  Unexpected console statement              no-console
+  239:29  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  268:5   warning  Unexpected console statement              no-console
+
+C:\xampp\htdocs\antigaspi2\frontend\src\composables\usePerformance.ts
+  80:44  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\xampp\htdocs\antigaspi2\frontend\src\composables\useProducts.ts
+  17:7  warning  Unexpected console statement  no-console
+
+C:\xampp\htdocs\antigaspi2\frontend\src\composables\useSequentialThinking.ts
+    9:10  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   22:27  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   29:26  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   30:26  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   71:63  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   85:5   warning  Unexpected console statement              no-console
+   86:5   warning  Unexpected console statement              no-console
+  102:5   warning  Unexpected console statement              no-console
+  103:5   warning  Unexpected console statement              no-console
+  117:12  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  121:7   warning  Unexpected console statement              no-console
+  140:5   warning  Unexpected console statement              no-console
+  141:5   warning  Unexpected console statement              no-console
+  143:7   warning  Unexpected console statement              no-console
+  151:78  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  165:7   warning  Unexpected console statement              no-console
+  177:12  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  201:5   warning  Unexpected console statement              no-console
+  202:5   warning  Unexpected console statement              no-console
+  244:63  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  250:67  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  254:69  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  258:56  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  258:68  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  294:78  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  299:70  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\xampp\htdocs\antigaspi2\frontend\src\composables\useSurpriseBaskets.ts
+   50:7  warning  Unexpected console statement  no-console
+   81:7  warning  Unexpected console statement  no-console
+  106:7  warning  Unexpected console statement  no-console
+  137:7  warning  Unexpected console statement  no-console
+  181:7  warning  Unexpected console statement  no-console
+  219:7  warning  Unexpected console statement  no-console
+  255:7  warning  Unexpected console statement  no-console
+  289:7  warning  Unexpected console statement  no-console
+
+C:\xampp\htdocs\antigaspi2\frontend\src\main.ts
+   16:3   warning  Unexpected console statement              no-console
+   25:5   warning  Unexpected console statement              no-console
+   26:5   warning  Unexpected console statement              no-console
+   27:5   warning  Unexpected console statement              no-console
+   28:5   warning  Unexpected console statement              no-console
+   29:5   warning  Unexpected console statement              no-console
+   30:5   warning  Unexpected console statement              no-console
+   36:5   warning  Unexpected console statement              no-console
+   39:7   warning  Unexpected console statement              no-console
+   40:7   warning  Unexpected console statement              no-console
+   41:7   warning  Unexpected console statement              no-console
+   42:7   warning  Unexpected console statement              no-console
+   43:7   warning  Unexpected console statement              no-console
+   49:3   warning  Unexpected console statement              no-console
+   54:3   warning  Unexpected console statement              no-console
+   68:3   warning  Unexpected console statement              no-console
+   73:3   warning  Unexpected console statement              no-console
+   75:3   warning  Unexpected console statement              no-console
+   98:7   warning  Unexpected console statement              no-console
+  105:15  warning  Unexpected console statement              no-console
+  118:11  warning  Unexpected console statement              no-console
+  123:7   warning  Unexpected console statement              no-console
+  128:21  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  132:3   warning  Unexpected console statement              no-console
+  140:7   warning  Unexpected console statement              no-console
+  146:5   warning  Unexpected console statement              no-console
+  172:5   warning  Unexpected console statement              no-console
+  173:5   warning  Unexpected console statement              no-console
+
+C:\xampp\htdocs\antigaspi2\frontend\src\performance.ts
+   23:3   warning  Unexpected console statement              no-console
+   28:7   warning  Unexpected console statement              no-console
+   54:9   warning  Unexpected console statement              no-console
+   67:5   warning  Unexpected console statement              no-console
+   70:7   warning  Unexpected console statement              no-console
+  150:5   warning  Unexpected console statement              no-console
+  166:7   warning  Unexpected console statement              no-console
+  172:7   warning  Unexpected console statement              no-console
+  173:7   warning  Unexpected console statement              no-console
+  189:16  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\xampp\htdocs\antigaspi2\frontend\src\router\index.ts
+  436:3   warning  Unexpected console statement  no-console
+  440:3   warning  Unexpected console statement  no-console
+  441:3   warning  Unexpected console statement  no-console
+  442:3   warning  Unexpected console statement  no-console
+  446:5   warning  Unexpected console statement  no-console
+  475:5   warning  Unexpected console statement  no-console
+  482:5   warning  Unexpected console statement  no-console
+  487:11  warning  Unexpected console statement  no-console
+  491:11  warning  Unexpected console statement  no-console
+  496:11  warning  Unexpected console statement  no-console
+  510:5   warning  Unexpected console statement  no-console
+  513:7   warning  Unexpected console statement  no-console
+  532:3   warning  Unexpected console statement  no-console
+
+C:\xampp\htdocs\antigaspi2\frontend\src\services\api.ts
+  190:18  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  193:20  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  289:37  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  296:36  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  303:38  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  421:32  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  830:27  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  852:37  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  874:26  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  875:37  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\xampp\htdocs\antigaspi2\frontend\src\services\apiClient.ts
+   86:20  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   87:20  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   97:21  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   99:27  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  112:42  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  123:41  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  134:43  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\xampp\htdocs\antigaspi2\frontend\src\services\merchantService.ts
+  141:26  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  142:21  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  143:41  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  158:26  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  159:21  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  160:41  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  170:26  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  171:21  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  172:41  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  182:26  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  183:21  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  184:41  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  196:26  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  197:21  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  198:41  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  227:26  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  228:21  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  229:41  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  258:26  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  259:21  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  260:41  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  267:56  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  270:26  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  271:21  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  272:41  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  284:26  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  285:21  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  286:41  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  313:26  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  314:21  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  315:41  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  328:26  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  329:21  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  330:41  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  342:26  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  343:21  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  344:41  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  354:26  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  355:21  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  356:41  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  366:26  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  367:21  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  368:41  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  375:63  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  378:26  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  379:21  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  380:41  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  389:77  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  392:26  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  393:21  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  394:41  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  401:82  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  406:29  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  407:21  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  408:41  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  420:26  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  421:21  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  422:41  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  435:26  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  436:21  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  437:41  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  451:39  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  454:26  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  455:21  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  456:41  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  463:30  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  463:48  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\xampp\htdocs\antigaspi2\frontend\src\services\mobileMoneyService.ts
+   84:29  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  134:7   warning  Unexpected console statement              no-console
+  232:21  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  263:21  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  294:21  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  325:21  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  365:21  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  427:41  error    Unnecessary escape character: \(          no-useless-escape
+  427:43  error    Unnecessary escape character: \)          no-useless-escape
+  492:39  error    Unnecessary escape character: \(          no-useless-escape
+  492:41  error    Unnecessary escape character: \)          no-useless-escape
+  514:41  error    Unnecessary escape character: \(          no-useless-escape
+  514:43  error    Unnecessary escape character: \)          no-useless-escape
+  580:7   warning  Unexpected console statement              no-console
+
+C:\xampp\htdocs\antigaspi2\frontend\src\services\notificationService.ts
+  78:5  warning  Unexpected console statement  no-console
+
+C:\xampp\htdocs\antigaspi2\frontend\src\services\otpService.ts
+  271:39  error  Unnecessary escape character: \(  no-useless-escape
+  271:41  error  Unnecessary escape character: \)  no-useless-escape
+  309:41  error  Unnecessary escape character: \(  no-useless-escape
+  309:43  error  Unnecessary escape character: \)  no-useless-escape
+
+C:\xampp\htdocs\antigaspi2\frontend\src\services\websocketService.ts
+   14:10  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   20:20  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   29:49  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   83:11  warning  Unexpected console statement              no-console
+  122:29  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  124:7   warning  Unexpected console statement              no-console
+  139:7   warning  Unexpected console statement              no-console
+  147:47  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  168:49  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  186:52  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  193:68  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  200:45  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  203:7   warning  Unexpected console statement              no-console
+  212:66  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  219:38  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  222:7   warning  Unexpected console statement              no-console
+  242:9   warning  Unexpected console statement              no-console
+  254:15  warning  Unexpected console statement              no-console
+  263:7   warning  Unexpected console statement              no-console
+  270:50  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  272:38  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  284:39  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  291:42  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  298:11  warning  Unexpected console statement              no-console
+  312:5   warning  Unexpected console statement              no-console
+  317:11  warning  Unexpected console statement              no-console
+  376:38  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  377:56  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  378:47  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\xampp\htdocs\antigaspi2\frontend\src\stores\auth.ts
+   20:9   warning  Unexpected console statement              no-console
+   83:19  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  106:19  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  126:23  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  145:19  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  146:7   warning  Unexpected console statement              no-console
+
+C:\xampp\htdocs\antigaspi2\frontend\src\stores\favorites.ts
+   56:5   warning  Unexpected console statement              no-console
+   72:50  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   89:27  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  300:50  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  325:48  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  456:9   warning  Unexpected console statement              no-console
+
+C:\xampp\htdocs\antigaspi2\frontend\src\stores\merchants.ts
+  188:66  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  198:21  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  239:62  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  257:21  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\xampp\htdocs\antigaspi2\frontend\src\stores\messaging.ts
+   34:9   warning  Unexpected console statement              no-console
+   36:9   warning  Unexpected console statement              no-console
+   66:33  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   91:9   warning  Unexpected console statement              no-console
+  137:23  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  161:23  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  194:23  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  215:23  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\xampp\htdocs\antigaspi2\frontend\src\stores\notification.ts
+  127:7  warning  Unexpected console statement  no-console
+
+C:\xampp\htdocs\antigaspi2\frontend\src\stores\onboarding.ts
+  36:7  warning  Unexpected console statement  no-console
+
+C:\xampp\htdocs\antigaspi2\frontend\src\stores\payments.ts
+   62:19  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   96:19  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  121:19  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\xampp\htdocs\antigaspi2\frontend\src\stores\products.ts
+  110:19  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  127:46  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  128:26  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  135:19  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  159:19  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  190:19  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  218:19  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  233:69  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  240:40  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  241:23  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  242:34  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  242:71  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\xampp\htdocs\antigaspi2\frontend\src\stores\reservations.ts
+   54:45  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   59:41  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   59:82  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   88:13  warning  Unexpected console statement              no-console
+  110:19  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  138:19  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  165:19  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  184:19  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  211:19  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  237:33  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  270:19  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\xampp\htdocs\antigaspi2\frontend\src\stores\reviews.ts
+  56:19  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  87:19  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\xampp\htdocs\antigaspi2\frontend\src\stores\wallet.ts
+   20:38  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   67:7   warning  Unexpected console statement              no-console
+   94:7   warning  Unexpected console statement              no-console
+  126:7   warning  Unexpected console statement              no-console
+  150:7   warning  Unexpected console statement              no-console
+  175:7   warning  Unexpected console statement              no-console
+  201:7   warning  Unexpected console statement              no-console
+  228:7   warning  Unexpected console statement              no-console
+  251:7   warning  Unexpected console statement              no-console
+  272:7   warning  Unexpected console statement              no-console
+  300:7   warning  Unexpected console statement              no-console
+
+C:\xampp\htdocs\antigaspi2\frontend\src\stories\ThemeToggle.stories.ts
+  33:11  warning  Unexpected console statement  no-console
+
+C:\xampp\htdocs\antigaspi2\frontend\src\types\wallet.ts
+   22:28  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  103:34  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\xampp\htdocs\antigaspi2\frontend\src\utils\errorTypes.ts
+   22:26  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   65:26  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  168:29  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\xampp\htdocs\antigaspi2\frontend\src\utils\lazyLoading.ts
+  41:9   warning  Unexpected console statement              no-console
+  62:51  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  73:60  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  84:58  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\xampp\htdocs\antigaspi2\frontend\src\utils\performance.ts
+   34:60  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   40:9   warning  Unexpected console statement              no-console
+   47:35  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   54:9   warning  Unexpected console statement              no-console
+   61:45  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   71:9   warning  Unexpected console statement              no-console
+  181:9   warning  Unexpected console statement              no-console
+  189:38  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  258:5   warning  Unexpected console statement              no-console
+
+C:\xampp\htdocs\antigaspi2\frontend\src\utils\preloading.ts
+   55:5   warning  Unexpected console statement              no-console
+   69:5   warning  Unexpected console statement              no-console
+   72:44  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  123:9   warning  Unexpected console statement              no-console
+  125:9   warning  Unexpected console statement              no-console
+
+C:\xampp\htdocs\antigaspi2\frontend\src\utils\productNormalizer.ts
+  104:45  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  108:48  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  112:52  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  113:29  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  120:48  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\xampp\htdocs\antigaspi2\frontend\src\utils\sanitization.ts
+  188:5  warning  Unexpected console statement  no-console
+
+C:\xampp\htdocs\antigaspi2\frontend\src\utils\securityHeaders.ts
+  179:5  warning  Unexpected console statement  no-console
+  185:5  warning  Unexpected console statement  no-console
+
+C:\xampp\htdocs\antigaspi2\frontend\src\utils\webVitals.ts
+   31:7   warning  Unexpected console statement              no-console
+   61:60  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   76:9   warning  Unexpected console statement              no-console
+   85:45  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  102:9   warning  Unexpected console statement              no-console
+  113:45  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  132:9   warning  Unexpected console statement              no-console
+
+C:\xampp\htdocs\antigaspi2\frontend\src\views\DashboardView.vue
+  429:66  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  432:54  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  485:31  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\xampp\htdocs\antigaspi2\frontend\src\views\DashboardView2025.vue
+  503:31  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\xampp\htdocs\antigaspi2\frontend\src\views\HomeView2025.vue
+  503:70  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  506:5   warning  Unexpected console statement              no-console
+  518:5   warning  Unexpected console statement              no-console
+
+C:\xampp\htdocs\antigaspi2\frontend\src\views\MerchantDetailView.vue
+  194:43  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  223:45  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  225:47  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\xampp\htdocs\antigaspi2\frontend\src\views\MerchantsMapView.vue
+  366:10  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  367:17  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  368:24  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\xampp\htdocs\antigaspi2\frontend\src\views\NotificationSettingsView.vue
+  305:19  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  328:19  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\xampp\htdocs\antigaspi2\frontend\src\views\NotificationsCenterView.vue
+  495:19  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  525:19  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  537:19  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  587:19  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  608:19  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\xampp\htdocs\antigaspi2\frontend\src\views\NotificationsView.vue
+  324:19  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  354:19  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  366:19  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\xampp\htdocs\antigaspi2\frontend\src\views\OpeningHoursView.vue
+  289:19  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  313:24  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  425:19  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\xampp\htdocs\antigaspi2\frontend\src\views\ProductDetailView2025.vue
+  609:37  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  636:43  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  677:39  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\xampp\htdocs\antigaspi2\frontend\src\views\ProductReserveView2025.vue
+  994:41  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\xampp\htdocs\antigaspi2\frontend\src\views\ProductsView2025.vue
+   832:5   warning  Unexpected console statement              no-console
+   954:13  warning  Unexpected console statement              no-console
+   973:19  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  1096:38  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  1171:19  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\xampp\htdocs\antigaspi2\frontend\src\views\ProfileEditView.vue
+  341:19  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  394:19  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\xampp\htdocs\antigaspi2\frontend\src\views\ProfileView.vue
+  426:19  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  479:19  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\xampp\htdocs\antigaspi2\frontend\src\views\ReservationDetailView2025.vue
+  379:74  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  393:17  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  460:17  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\xampp\htdocs\antigaspi2\frontend\src\views\ReservationsView.vue
+  474:19  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\xampp\htdocs\antigaspi2\frontend\src\views\ReviewAddView.vue
+  47:35  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\xampp\htdocs\antigaspi2\frontend\src\views\ReviewsView.vue
+  160:35  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\xampp\htdocs\antigaspi2\frontend\src\views\admin\AuditLogView.vue
+  341:30  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  342:30  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  408:75  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  409:77  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  495:19  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  496:5   warning  Unexpected console statement              no-console
+  518:5   warning  Unexpected console statement              no-console
+  522:61  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\xampp\htdocs\antigaspi2\frontend\src\views\admin\BroadcastView.vue
+  390:20  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  415:5   warning  Unexpected console statement              no-console
+
+C:\xampp\htdocs\antigaspi2\frontend\src\views\admin\CategoriesView.vue
+  93:75  error  Irregular whitespace not allowed  no-irregular-whitespace
+
+C:\xampp\htdocs\antigaspi2\frontend\src\views\admin\DashboardView.vue
+  433:19  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  434:22  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  447:30  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  448:26  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  455:26  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  456:31  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  551:31  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  591:31  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  756:10  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\xampp\htdocs\antigaspi2\frontend\src\views\admin\DashboardView2025.vue
+   761:19   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   762:22   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  1638:31   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  1668:31   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  1748:116  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\xampp\htdocs\antigaspi2\frontend\src\views\admin\PaymentDashboardView.vue
+  273:11  error    'Pagination' is already defined           no-redeclare
+  324:75  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  325:77  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  414:19  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  415:5   warning  Unexpected console statement              no-console
+  426:61  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  461:3   warning  Unexpected console statement              no-console
+
+C:\xampp\htdocs\antigaspi2\frontend\src\views\admin\ProductsView.vue
+  147:42  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  256:19  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  268:54  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\xampp\htdocs\antigaspi2\frontend\src\views\admin\SystemSettingsView.vue
+  388:10  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  413:42  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  417:75  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  418:77  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  448:19  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  449:5   warning  Unexpected console statement              no-console
+  495:19  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  496:5   warning  Unexpected console statement              no-console
+
+C:\xampp\htdocs\antigaspi2\frontend\src\views\auth\CompleteProfileView.vue
+  194:49  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  202:17  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  226:39  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\xampp\htdocs\antigaspi2\frontend\src\views\auth\OTPVerificationView.vue
+  224:54  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  229:43  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  240:17  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  264:17  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\xampp\htdocs\antigaspi2\frontend\src\views\auth\PhoneAuthView.vue
+  229:17  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\xampp\htdocs\antigaspi2\frontend\src\views\consumer\SurpriseBasketDetailView.vue
+  485:13  warning  Unexpected console statement  no-console
+
+C:\xampp\htdocs\antigaspi2\frontend\src\views\merchant\DashboardView.vue
+  330:32   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  331:28   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  332:27   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  552:65   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  553:44   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  553:83   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  558:53   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  559:35   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  560:43   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  560:86   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  561:25   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  562:29   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  602:38   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  603:49   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  604:47   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  605:39   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  606:30   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  650:65   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  651:67   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  653:48   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  657:50   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  657:106  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  720:40   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  720:74   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  722:43   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  726:32   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  726:131  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  728:37   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\xampp\htdocs\antigaspi2\frontend\src\views\merchant\OpeningHoursView.vue
+  229:24  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  230:41  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  242:19  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  243:5   warning  Unexpected console statement              no-console
+  292:22  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  314:19  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\xampp\htdocs\antigaspi2\frontend\src\views\merchant\PaymentsView.vue
+  513:17  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  601:17  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\xampp\htdocs\antigaspi2\frontend\src\views\merchant\ProductEditView.vue
+  500:17  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  545:17  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  599:17  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  643:17  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\xampp\htdocs\antigaspi2\frontend\src\views\merchant\ProductEditView2025.vue
+  384:43  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  424:44  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  425:24  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  434:42  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  500:46  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  505:17  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  540:3   warning  Unexpected console statement              no-console
+  543:3   warning  Unexpected console statement              no-console
+  545:5   warning  Unexpected console statement              no-console
+  552:5   warning  Unexpected console statement              no-console
+  555:5   warning  Unexpected console statement              no-console
+  557:31  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  559:5   warning  Unexpected console statement              no-console
+  567:7   warning  Unexpected console statement              no-console
+  572:5   warning  Unexpected console statement              no-console
+  573:29  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\xampp\htdocs\antigaspi2\frontend\src\views\merchant\ProductsView.vue
+  567:22  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  568:24  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  575:29  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  670:34  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  678:42  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  704:34  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  712:33  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  720:31  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  842:19  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  862:45  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  882:39  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\xampp\htdocs\antigaspi2\frontend\src\views\merchant\ProfileEditView.vue
+  199:22  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  272:24  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  273:39  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  287:19  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  303:20  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  343:19  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\xampp\htdocs\antigaspi2\frontend\src\views\merchant\ReservationsView.vue
+  490:26  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  496:33  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  666:33  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  670:32  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  682:53  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  719:41  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  736:39  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  743:46  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  790:47  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  837:33  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  838:23  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  839:32  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  840:36  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  841:40  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  841:74  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  842:22  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  843:27  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  844:29  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  845:27  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  846:28  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  848:21  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  849:23  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  850:30  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  851:28  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  852:21  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  856:22  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  856:66  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  857:19  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  858:22  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  858:62  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  860:24  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  860:57  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\xampp\htdocs\antigaspi2\frontend\src\views\merchant\ReviewsList.vue
+  346:54  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  354:56  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\xampp\htdocs\antigaspi2\frontend\src\views\onboarding\OnboardingFlow.vue
+  157:9  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  164:9  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\xampp\htdocs\antigaspi2\frontend\tests\e2e\00-run-all-tests.spec.ts
+   13:5   warning  Unexpected console statement  no-console
+   14:5   warning  Unexpected console statement  no-console
+   15:5   warning  Unexpected console statement  no-console
+   43:11  warning  Unexpected console statement  no-console
+   45:11  warning  Unexpected console statement  no-console
+   51:5   warning  Unexpected console statement  no-console
+   52:5   warning  Unexpected console statement  no-console
+   53:5   warning  Unexpected console statement  no-console
+   56:7   warning  Unexpected console statement  no-console
+   58:7   warning  Unexpected console statement  no-console
+   62:11  warning  Unexpected console statement  no-console
+   64:13  warning  Unexpected console statement  no-console
+  131:5   warning  Unexpected console statement  no-console
+  150:5   warning  Unexpected console statement  no-console
+  151:5   warning  Unexpected console statement  no-console
+
+C:\xampp\htdocs\antigaspi2\frontend\tests\e2e\01-consumer-flows.spec.ts
+    1:16  error    'expect' is defined but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+    8:3   warning  Unexpected console statement                                              no-console
+   20:5   warning  Unexpected console statement                                              no-console
+   27:7   warning  Unexpected console statement                                              no-console
+   35:5   warning  Unexpected console statement                                              no-console
+   40:7   warning  Unexpected console statement                                              no-console
+   47:5   warning  Unexpected console statement                                              no-console
+   92:9   warning  Unexpected console statement                                              no-console
+  105:9   warning  Unexpected console statement                                              no-console
+  113:7   warning  Unexpected console statement                                              no-console
+  119:5   warning  Unexpected console statement                                              no-console
+  124:7   warning  Unexpected console statement                                              no-console
+  133:5   warning  Unexpected console statement                                              no-console
+  150:7   warning  Unexpected console statement                                              no-console
+  156:5   warning  Unexpected console statement                                              no-console
+  165:7   warning  Unexpected console statement                                              no-console
+  173:5   warning  Unexpected console statement                                              no-console
+  177:5   warning  Unexpected console statement                                              no-console
+  182:5   warning  Unexpected console statement                                              no-console
+  192:7   warning  Unexpected console statement                                              no-console
+  198:9   warning  Unexpected console statement                                              no-console
+  206:9   warning  Unexpected console statement                                              no-console
+  214:7   warning  Unexpected console statement                                              no-console
+  224:13  warning  Unexpected console statement                                              no-console
+  243:11  warning  Unexpected console statement                                              no-console
+  255:5   warning  Unexpected console statement                                              no-console
+  262:5   warning  Unexpected console statement                                              no-console
+  267:5   warning  Unexpected console statement                                              no-console
+  274:7   warning  Unexpected console statement                                              no-console
+  282:5   warning  Unexpected console statement                                              no-console
+  283:5   warning  Unexpected console statement                                              no-console
+  285:7   warning  Unexpected console statement                                              no-console
+  287:9   warning  Unexpected console statement                                              no-console
+  290:7   warning  Unexpected console statement                                              no-console
+
+C:\xampp\htdocs\antigaspi2\frontend\tests\e2e\02-merchant-flows.spec.ts
+    1:16  error    'expect' is defined but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+    9:3   warning  Unexpected console statement                                              no-console
+   19:5   warning  Unexpected console statement                                              no-console
+   36:7   warning  Unexpected console statement                                              no-console
+   44:5   warning  Unexpected console statement                                              no-console
+   51:5   warning  Unexpected console statement                                              no-console
+   60:5   warning  Unexpected console statement                                              no-console
+   65:5   warning  Unexpected console statement                                              no-console
+   71:7   warning  Unexpected console statement                                              no-console
+   79:7   warning  Unexpected console statement                                              no-console
+   87:5   warning  Unexpected console statement                                              no-console
+   92:5   warning  Unexpected console statement                                              no-console
+  109:9   warning  Unexpected console statement                                              no-console
+  126:9   warning  Unexpected console statement                                              no-console
+  140:11  warning  Unexpected console statement                                              no-console
+  152:7   warning  Unexpected console statement                                              no-console
+  158:5   warning  Unexpected console statement                                              no-console
+  168:7   warning  Unexpected console statement                                              no-console
+  173:7   warning  Unexpected console statement                                              no-console
+  182:7   warning  Unexpected console statement                                              no-console
+  187:9   warning  Unexpected console statement                                              no-console
+  192:9   warning  Unexpected console statement                                              no-console
+  201:11  warning  Unexpected console statement                                              no-console
+  228:11  warning  Unexpected console statement                                              no-console
+  240:5   warning  Unexpected console statement                                              no-console
+  245:5   warning  Unexpected console statement                                              no-console
+  255:9   warning  Unexpected console statement                                              no-console
+  279:11  warning  Unexpected console statement                                              no-console
+  282:13  warning  Unexpected console statement                                              no-console
+  293:5   warning  Unexpected console statement                                              no-console
+  299:5   warning  Unexpected console statement                                              no-console
+  302:7   warning  Unexpected console statement                                              no-console
+  307:7   warning  Unexpected console statement                                              no-console
+  317:5   warning  Unexpected console statement                                              no-console
+  322:7   warning  Unexpected console statement                                              no-console
+  327:7   warning  Unexpected console statement                                              no-console
+  332:9   warning  Unexpected console statement                                              no-console
+  339:5   warning  Unexpected console statement                                              no-console
+  362:9   warning  Unexpected console statement                                              no-console
+  368:5   warning  Unexpected console statement                                              no-console
+  369:5   warning  Unexpected console statement                                              no-console
+  371:7   warning  Unexpected console statement                                              no-console
+  373:9   warning  Unexpected console statement                                              no-console
+  376:7   warning  Unexpected console statement                                              no-console
+
+C:\xampp\htdocs\antigaspi2\frontend\tests\e2e\03-admin-and-ui.spec.ts
+    1:16  error    'expect' is defined but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+    8:3   warning  Unexpected console statement                                              no-console
+   16:5   warning  Unexpected console statement                                              no-console
+   33:7   warning  Unexpected console statement                                              no-console
+   39:5   warning  Unexpected console statement                                              no-console
+   46:5   warning  Unexpected console statement                                              no-console
+   51:7   warning  Unexpected console statement                                              no-console
+   57:5   warning  Unexpected console statement                                              no-console
+   62:5   warning  Unexpected console statement                                              no-console
+   68:7   warning  Unexpected console statement                                              no-console
+   72:7   warning  Unexpected console statement                                              no-console
+   84:5   warning  Unexpected console statement                                              no-console
+   89:5   warning  Unexpected console statement                                              no-console
+   95:5   warning  Unexpected console statement                                              no-console
+  100:5   warning  Unexpected console statement                                              no-console
+  105:5   warning  Unexpected console statement                                              no-console
+  119:9   warning  Unexpected console statement                                              no-console
+  123:9   warning  Unexpected console statement                                              no-console
+  135:5   warning  Unexpected console statement                                              no-console
+  138:5   warning  Unexpected console statement                                              no-console
+  167:9   warning  Unexpected console statement                                              no-console
+  178:9   warning  Unexpected console statement                                              no-console
+  191:5   warning  Unexpected console statement                                              no-console
+  217:7   warning  Unexpected console statement                                              no-console
+  227:5   warning  Unexpected console statement                                              no-console
+  245:7   warning  Unexpected console statement                                              no-console
+  255:5   warning  Unexpected console statement                                              no-console
+  259:5   warning  Unexpected console statement                                              no-console
+  285:5   warning  Unexpected console statement                                              no-console
+  294:7   warning  Unexpected console statement                                              no-console
+  310:5   warning  Unexpected console statement                                              no-console
+  316:5   warning  Unexpected console statement                                              no-console
+  324:9   warning  Unexpected console statement                                              no-console
+  332:9   warning  Unexpected console statement                                              no-console
+  341:5   warning  Unexpected console statement                                              no-console
+  358:7   warning  Unexpected console statement                                              no-console
+  381:5   warning  Unexpected console statement                                              no-console
+  382:5   warning  Unexpected console statement                                              no-console
+  384:7   warning  Unexpected console statement                                              no-console
+  386:9   warning  Unexpected console statement                                              no-console
+  389:7   warning  Unexpected console statement                                              no-console
+
+C:\xampp\htdocs\antigaspi2\frontend\tests\e2e\04-buttons-styling.spec.ts
+    1:16  error    'expect' is defined but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+    8:3   warning  Unexpected console statement                                              no-console
+   15:5   warning  Unexpected console statement                                              no-console
+   23:5   warning  Unexpected console statement                                              no-console
+   49:7   warning  Unexpected console statement                                              no-console
+   58:7   warning  Unexpected console statement                                              no-console
+   61:9   warning  Unexpected console statement                                              no-console
+   62:9   warning  Unexpected console statement                                              no-console
+   63:9   warning  Unexpected console statement                                              no-console
+   66:7   warning  Unexpected console statement                                              no-console
+   72:5   warning  Unexpected console statement                                              no-console
+   83:7   warning  Unexpected console statement                                              no-console
+   87:7   warning  Unexpected console statement                                              no-console
+   91:7   warning  Unexpected console statement                                              no-console
+  106:9   warning  Unexpected console statement                                              no-console
+  121:5   warning  Unexpected console statement                                              no-console
+  122:5   warning  Unexpected console statement                                              no-console
+  124:7   warning  Unexpected console statement                                              no-console
+  126:9   warning  Unexpected console statement                                              no-console
+  129:7   warning  Unexpected console statement                                              no-console
+
+C:\xampp\htdocs\antigaspi2\frontend\tests\e2e\05-admin-core.spec.ts
+    1:16  error    'expect' is defined but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+    8:3   warning  Unexpected console statement                                              no-console
+   16:5   warning  Unexpected console statement                                              no-console
+   33:7   warning  Unexpected console statement                                              no-console
+   41:5   warning  Unexpected console statement                                              no-console
+   48:5   warning  Unexpected console statement                                              no-console
+   53:7   warning  Unexpected console statement                                              no-console
+   59:5   warning  Unexpected console statement                                              no-console
+   64:5   warning  Unexpected console statement                                              no-console
+   70:7   warning  Unexpected console statement                                              no-console
+   74:7   warning  Unexpected console statement                                              no-console
+   86:5   warning  Unexpected console statement                                              no-console
+   92:5   warning  Unexpected console statement                                              no-console
+   97:7   warning  Unexpected console statement                                              no-console
+  103:5   warning  Unexpected console statement                                              no-console
+  117:9   warning  Unexpected console statement                                              no-console
+  121:9   warning  Unexpected console statement                                              no-console
+  133:5   warning  Unexpected console statement                                              no-console
+  134:5   warning  Unexpected console statement                                              no-console
+  136:7   warning  Unexpected console statement                                              no-console
+  138:9   warning  Unexpected console statement                                              no-console
+  141:7   warning  Unexpected console statement                                              no-console
+
+C:\xampp\htdocs\antigaspi2\frontend\tests\e2e\06-admin-ui-styling.spec.ts
+    1:16  error    'expect' is defined but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+    8:3   warning  Unexpected console statement                                              no-console
+   16:5   warning  Unexpected console statement                                              no-console
+   43:9   warning  Unexpected console statement                                              no-console
+   49:11  warning  Unexpected console statement                                              no-console
+   65:9   warning  Unexpected console statement                                              no-console
+   70:5   warning  Unexpected console statement                                              no-console
+   95:7   warning  Unexpected console statement                                              no-console
+  100:9   warning  Unexpected console statement                                              no-console
+  105:7   warning  Unexpected console statement                                              no-console
+  109:5   warning  Unexpected console statement                                              no-console
+  115:5   warning  Unexpected console statement                                              no-console
+  130:7   warning  Unexpected console statement                                              no-console
+  140:7   warning  Unexpected console statement                                              no-console
+  146:5   warning  Unexpected console statement                                              no-console
+  150:5   warning  Unexpected console statement                                              no-console
+  167:7   warning  Unexpected console statement                                              no-console
+  175:7   warning  Unexpected console statement                                              no-console
+  177:7   warning  Unexpected console statement                                              no-console
+  183:5   warning  Unexpected console statement                                              no-console
+  184:5   warning  Unexpected console statement                                              no-console
+  186:7   warning  Unexpected console statement                                              no-console
+  188:9   warning  Unexpected console statement                                              no-console
+  191:7   warning  Unexpected console statement                                              no-console
+
+C:\xampp\htdocs\antigaspi2\frontend\tests\e2e\07-responsive-a11y.spec.ts
+    1:16  error    'expect' is defined but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+    8:3   warning  Unexpected console statement                                              no-console
+   16:5   warning  Unexpected console statement                                              no-console
+   27:7   warning  Unexpected console statement                                              no-console
+   38:5   warning  Unexpected console statement                                              no-console
+   44:5   warning  Unexpected console statement                                              no-console
+   50:5   warning  Unexpected console statement                                              no-console
+   55:7   warning  Unexpected console statement                                              no-console
+   61:9   warning  Unexpected console statement                                              no-console
+   69:9   warning  Unexpected console statement                                              no-console
+   78:5   warning  Unexpected console statement                                              no-console
+   95:7   warning  Unexpected console statement                                              no-console
+  116:7   warning  Unexpected console statement                                              no-console
+  121:5   warning  Unexpected console statement                                              no-console
+  128:7   warning  Unexpected console statement                                              no-console
+  136:7   warning  Unexpected console statement                                              no-console
+  138:7   warning  Unexpected console statement                                              no-console
+  144:5   warning  Unexpected console statement                                              no-console
+  145:5   warning  Unexpected console statement                                              no-console
+  147:7   warning  Unexpected console statement                                              no-console
+  149:9   warning  Unexpected console statement                                              no-console
+  152:7   warning  Unexpected console statement                                              no-console
+
+C:\xampp\htdocs\antigaspi2\frontend\tests\e2e\08-admin-broadcast.spec.ts
+  180:39  error  Unnecessary escape character: \/  no-useless-escape
+  186:40  error  Unnecessary escape character: \/  no-useless-escape
+
+C:\xampp\htdocs\antigaspi2\frontend\tests\e2e\09-admin-payments.spec.ts
+    1:16  error    'expect' is defined but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+    8:3   warning  Unexpected console statement                                              no-console
+   16:5   warning  Unexpected console statement                                              no-console
+   32:7   warning  Unexpected console statement                                              no-console
+   39:5   warning  Unexpected console statement                                              no-console
+   52:7   warning  Unexpected console statement                                              no-console
+   56:9   warning  Unexpected console statement                                              no-console
+   67:7   warning  Unexpected console statement                                              no-console
+   71:7   warning  Unexpected console statement                                              no-console
+   74:9   warning  Unexpected console statement                                              no-console
+   82:9   warning  Unexpected console statement                                              no-console
+   95:7   warning  Unexpected console statement                                              no-console
+  102:11  warning  Unexpected console statement                                              no-console
+  110:7   warning  Unexpected console statement                                              no-console
+  113:9   warning  Unexpected console statement                                              no-console
+  115:9   warning  Unexpected console statement                                              no-console
+  125:5   warning  Unexpected console statement                                              no-console
+  137:7   warning  Unexpected console statement                                              no-console
+  142:9   warning  Unexpected console statement                                              no-console
+  146:9   warning  Unexpected console statement                                              no-console
+  156:9   warning  Unexpected console statement                                              no-console
+  163:9   warning  Unexpected console statement                                              no-console
+  171:9   warning  Unexpected console statement                                              no-console
+  178:9   warning  Unexpected console statement                                              no-console
+  186:9   warning  Unexpected console statement                                              no-console
+  191:9   warning  Unexpected console statement                                              no-console
+  197:9   warning  Unexpected console statement                                              no-console
+  204:9   warning  Unexpected console statement                                              no-console
+  216:5   warning  Unexpected console statement                                              no-console
+  228:7   warning  Unexpected console statement                                              no-console
+  235:9   warning  Unexpected console statement                                              no-console
+  239:9   warning  Unexpected console statement                                              no-console
+  245:9   warning  Unexpected console statement                                              no-console
+  248:7   warning  Unexpected console statement                                              no-console
+  255:5   warning  Unexpected console statement                                              no-console
+  264:7   warning  Unexpected console statement                                              no-console
+  268:7   warning  Unexpected console statement                                              no-console
+  278:9   warning  Unexpected console statement                                              no-console
+  280:11  warning  Unexpected console statement                                              no-console
+  284:7   warning  Unexpected console statement                                              no-console
+  293:5   warning  Unexpected console statement                                              no-console
+  300:5   warning  Unexpected console statement                                              no-console
+  304:7   warning  Unexpected console statement                                              no-console
+  316:5   warning  Unexpected console statement                                              no-console
+  320:7   warning  Unexpected console statement                                              no-console
+  332:5   warning  Unexpected console statement                                              no-console
+  333:5   warning  Unexpected console statement                                              no-console
+  336:7   warning  Unexpected console statement                                              no-console
+  338:9   warning  Unexpected console statement                                              no-console
+  341:7   warning  Unexpected console statement                                              no-console
+
+C:\xampp\htdocs\antigaspi2\frontend\tests\e2e\10-admin-settings.spec.ts
+    1:16  error    'expect' is defined but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+    8:3   warning  Unexpected console statement                                              no-console
+   16:5   warning  Unexpected console statement                                              no-console
+   32:7   warning  Unexpected console statement                                              no-console
+   39:5   warning  Unexpected console statement                                              no-console
+   52:7   warning  Unexpected console statement                                              no-console
+   56:9   warning  Unexpected console statement                                              no-console
+   63:9   warning  Unexpected console statement                                              no-console
+   72:7   warning  Unexpected console statement                                              no-console
+   81:5   warning  Unexpected console statement                                              no-console
+  104:9   warning  Unexpected console statement                                              no-console
+  109:11  warning  Unexpected console statement                                              no-console
+  122:5   warning  Unexpected console statement                                              no-console
+  131:7   warning  Unexpected console statement                                              no-console
+  141:11  warning  Unexpected console statement                                              no-console
+  146:13  warning  Unexpected console statement                                              no-console
+  162:5   warning  Unexpected console statement                                              no-console
+  171:7   warning  Unexpected console statement                                              no-console
+  176:9   warning  Unexpected console statement                                              no-console
+  179:9   warning  Unexpected console statement                                              no-console
+  184:11  warning  Unexpected console statement                                              no-console
+  195:9   warning  Unexpected console statement                                              no-console
+  201:9   warning  Unexpected console statement                                              no-console
+  205:11  warning  Unexpected console statement                                              no-console
+  218:5   warning  Unexpected console statement                                              no-console
+  227:7   warning  Unexpected console statement                                              no-console
+  241:11  warning  Unexpected console statement                                              no-console
+  246:13  warning  Unexpected console statement                                              no-console
+  250:13  warning  Unexpected console statement                                              no-console
+  262:7   warning  Unexpected console statement                                              no-console
+  265:9   warning  Unexpected console statement                                              no-console
+  277:5   warning  Unexpected console statement                                              no-console
+  287:7   warning  Unexpected console statement                                              no-console
+  292:9   warning  Unexpected console statement                                              no-console
+  299:9   warning  Unexpected console statement                                              no-console
+  304:9   warning  Unexpected console statement                                              no-console
+  308:9   warning  Unexpected console statement                                              no-console
+  318:11  warning  Unexpected console statement                                              no-console
+  320:11  warning  Unexpected console statement                                              no-console
+  328:9   warning  Unexpected console statement                                              no-console
+  340:5   warning  Unexpected console statement                                              no-console
+  350:7   warning  Unexpected console statement                                              no-console
+  356:9   warning  Unexpected console statement                                              no-console
+  360:9   warning  Unexpected console statement                                              no-console
+  364:9   warning  Unexpected console statement                                              no-console
+  372:11  warning  Unexpected console statement                                              no-console
+  387:5   warning  Unexpected console statement                                              no-console
+  395:5   warning  Unexpected console statement                                              no-console
+  399:7   warning  Unexpected console statement                                              no-console
+  406:7   warning  Unexpected console statement                                              no-console
+  419:5   warning  Unexpected console statement                                              no-console
+  422:5   warning  Unexpected console statement                                              no-console
+  425:7   warning  Unexpected console statement                                              no-console
+  437:5   warning  Unexpected console statement                                              no-console
+  438:5   warning  Unexpected console statement                                              no-console
+  441:7   warning  Unexpected console statement                                              no-console
+  443:9   warning  Unexpected console statement                                              no-console
+  446:7   warning  Unexpected console statement                                              no-console
+
+C:\xampp\htdocs\antigaspi2\frontend\tests\e2e\11-admin-extended.spec.ts
+    1:16  error    'expect' is defined but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+    8:3   warning  Unexpected console statement                                              no-console
+   16:5   warning  Unexpected console statement                                              no-console
+   32:7   warning  Unexpected console statement                                              no-console
+   39:5   warning  Unexpected console statement                                              no-console
+   49:7   warning  Unexpected console statement                                              no-console
+   59:7   warning  Unexpected console statement                                              no-console
+   63:7   warning  Unexpected console statement                                              no-console
+   66:9   warning  Unexpected console statement                                              no-console
+   68:9   warning  Unexpected console statement                                              no-console
+   71:7   warning  Unexpected console statement                                              no-console
+   76:9   warning  Unexpected console statement                                              no-console
+   85:7   warning  Unexpected console statement                                              no-console
+   93:7   warning  Unexpected console statement                                              no-console
+  100:5   warning  Unexpected console statement                                              no-console
+  110:7   warning  Unexpected console statement                                              no-console
+  120:7   warning  Unexpected console statement                                              no-console
+  124:7   warning  Unexpected console statement                                              no-console
+  127:9   warning  Unexpected console statement                                              no-console
+  135:11  warning  Unexpected console statement                                              no-console
+  141:11  warning  Unexpected console statement                                              no-console
+  144:9   warning  Unexpected console statement                                              no-console
+  147:7   warning  Unexpected console statement                                              no-console
+  153:5   warning  Unexpected console statement                                              no-console
+  160:7   warning  Unexpected console statement                                              no-console
+  162:7   warning  Unexpected console statement                                              no-console
+  169:5   warning  Unexpected console statement                                              no-console
+  179:7   warning  Unexpected console statement                                              no-console
+  189:7   warning  Unexpected console statement                                              no-console
+  193:7   warning  Unexpected console statement                                              no-console
+  196:9   warning  Unexpected console statement                                              no-console
+  204:11  warning  Unexpected console statement                                              no-console
+  210:11  warning  Unexpected console statement                                              no-console
+  213:9   warning  Unexpected console statement                                              no-console
+  216:7   warning  Unexpected console statement                                              no-console
+  224:7   warning  Unexpected console statement                                              no-console
+  226:7   warning  Unexpected console statement                                              no-console
+  234:7   warning  Unexpected console statement                                              no-console
+  236:7   warning  Unexpected console statement                                              no-console
+  243:5   warning  Unexpected console statement                                              no-console
+  253:7   warning  Unexpected console statement                                              no-console
+  263:7   warning  Unexpected console statement                                              no-console
+  267:7   warning  Unexpected console statement                                              no-console
+  270:9   warning  Unexpected console statement                                              no-console
+  278:11  warning  Unexpected console statement                                              no-console
+  284:11  warning  Unexpected console statement                                              no-console
+  290:11  warning  Unexpected console statement                                              no-console
+  293:9   warning  Unexpected console statement                                              no-console
+  296:7   warning  Unexpected console statement                                              no-console
+  302:5   warning  Unexpected console statement                                              no-console
+  309:7   warning  Unexpected console statement                                              no-console
+  311:7   warning  Unexpected console statement                                              no-console
+  318:5   warning  Unexpected console statement                                              no-console
+  328:7   warning  Unexpected console statement                                              no-console
+  338:7   warning  Unexpected console statement                                              no-console
+  342:7   warning  Unexpected console statement                                              no-console
+  345:9   warning  Unexpected console statement                                              no-console
+  358:9   warning  Unexpected console statement                                              no-console
+  364:11  warning  Unexpected console statement                                              no-console
+  378:7   warning  Unexpected console statement                                              no-console
+  380:7   warning  Unexpected console statement                                              no-console
+  386:7   warning  Unexpected console statement                                              no-console
+  393:5   warning  Unexpected console statement                                              no-console
+  417:9   warning  Unexpected console statement                                              no-console
+  424:5   warning  Unexpected console statement                                              no-console
+  434:5   warning  Unexpected console statement                                              no-console
+  435:5   warning  Unexpected console statement                                              no-console
+  438:7   warning  Unexpected console statement                                              no-console
+  440:9   warning  Unexpected console statement                                              no-console
+  443:7   warning  Unexpected console statement                                              no-console
+
+C:\xampp\htdocs\antigaspi2\frontend\tests\e2e\12-payment-flows.spec.ts
+  351:7  warning  Unexpected console statement  no-console
+  352:7  warning  Unexpected console statement  no-console
+
+C:\xampp\htdocs\antigaspi2\frontend\tests\e2e\13-loyalty-program.spec.ts
+  572:7  warning  Unexpected console statement  no-console
+
+C:\xampp\htdocs\antigaspi2\frontend\tests\e2e\critical-user-flows.spec.ts
+  226:9  warning  Unexpected console statement  no-console
+
+C:\xampp\htdocs\antigaspi2\frontend\tests\e2e\product-image-upload.spec.ts
+    1:16  error    'expect' is defined but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+   13:7   warning  Unexpected console statement                                              no-console
+   18:7   warning  Unexpected console statement                                              no-console
+   24:9   warning  Unexpected console statement                                              no-console
+   30:9   warning  Unexpected console statement                                              no-console
+   34:5   warning  Unexpected console statement                                              no-console
+   37:5   warning  Unexpected console statement                                              no-console
+   43:5   warning  Unexpected console statement                                              no-console
+   48:5   warning  Unexpected console statement                                              no-console
+   53:7   warning  Unexpected console statement                                              no-console
+   59:5   warning  Unexpected console statement                                              no-console
+   62:5   warning  Unexpected console statement                                              no-console
+   69:5   warning  Unexpected console statement                                              no-console
+   72:5   warning  Unexpected console statement                                              no-console
+   77:7   warning  Unexpected console statement                                              no-console
+   81:7   warning  Unexpected console statement                                              no-console
+   84:7   warning  Unexpected console statement                                              no-console
+   91:7   warning  Unexpected console statement                                              no-console
+   94:7   warning  Unexpected console statement                                              no-console
+  105:9   warning  Unexpected console statement                                              no-console
+  108:11  warning  Unexpected console statement                                              no-console
+  112:7   warning  Unexpected console statement                                              no-console
+  116:5   warning  Unexpected console statement                                              no-console
+  117:5   warning  Unexpected console statement                                              no-console
+  118:32  warning  Unexpected console statement                                              no-console
+  120:5   warning  Unexpected console statement                                              no-console
+  121:34  warning  Unexpected console statement                                              no-console
+  123:5   warning  Unexpected console statement                                              no-console
+  127:5   warning  Unexpected console statement                                              no-console
+
+✖ 1101 problems (25 errors, 1076 warnings)
+

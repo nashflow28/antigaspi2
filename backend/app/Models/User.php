@@ -298,7 +298,7 @@ class User extends Authenticatable implements JWTSubject
      */
     public function hasPin(): bool
     {
-        return !empty($this->pin_hash);
+        return ! empty($this->pin_hash);
     }
 
     /**
@@ -317,7 +317,7 @@ class User extends Authenticatable implements JWTSubject
      */
     public function verifyPin(string $pin): bool
     {
-        if (!$this->hasPin()) {
+        if (! $this->hasPin()) {
             return false;
         }
 
@@ -331,13 +331,13 @@ class User extends Authenticatable implements JWTSubject
     {
         $device = $this->devices()->where('device_id', $deviceId)->first();
 
-        if (!$device) {
+        if (! $device) {
             $device = $this->devices()->create(array_merge([
                 'device_id' => $deviceId,
             ], $deviceInfo));
         } else {
             // Update device info if provided
-            if (!empty($deviceInfo)) {
+            if (! empty($deviceInfo)) {
                 $device->update($deviceInfo);
             }
         }

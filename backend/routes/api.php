@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\CartController;
 use App\Http\Controllers\Api\ConsumerController;
 use App\Http\Controllers\Api\DeliveryController;
 use App\Http\Controllers\Api\DeliveryZoneController;
+use App\Http\Controllers\Api\DeviceAuthController;
 use App\Http\Controllers\Api\DriverController;
 use App\Http\Controllers\Api\DriverDeliveryController;
 use App\Http\Controllers\Api\FavoriteController;
@@ -15,7 +16,6 @@ use App\Http\Controllers\Api\InventoryController;
 use App\Http\Controllers\Api\MerchantController;
 use App\Http\Controllers\Api\MessageController;
 use App\Http\Controllers\Api\NotificationController;
-use App\Http\Controllers\Api\DeviceAuthController;
 use App\Http\Controllers\Api\OtpController;
 use App\Http\Controllers\Api\PaymentController;
 use App\Http\Controllers\Api\ProductController;
@@ -78,6 +78,10 @@ Route::prefix('auth')->middleware('throttle:auth')->group(function () {
         Route::post('device/change-pin', [DeviceAuthController::class, 'changePin']);
         Route::get('device/list', [DeviceAuthController::class, 'getDevices']);
         Route::delete('device/{device}', [DeviceAuthController::class, 'revokeDevice']);
+
+        // Link phone to existing account (for email-registered users)
+        Route::post('device/link-phone/send-otp', [DeviceAuthController::class, 'sendLinkPhoneOtp']);
+        Route::post('device/link-phone/verify', [DeviceAuthController::class, 'verifyAndLinkPhone']);
     });
 });
 

@@ -1,5 +1,5 @@
-import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit'
-import { Review, ReviewStats, ReviewsState } from '../../types'
+import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
+import { ReviewStats, ReviewsState } from '../../types'
 import apiService from '../../services/api'
 
 export const reviewsInitialState: ReviewsState = {
@@ -190,7 +190,7 @@ const reviewsSlice = createSlice({
         state.loading = true
         state.error = null
       })
-      .addCase(createReview.fulfilled, (state, action) => {
+      .addCase(createReview.fulfilled, (state, _action) => {
         state.loading = false
         // Optionally prepend the new review to the list (API doesn't return full review)
         // We'll refetch reviews after creation instead

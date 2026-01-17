@@ -79,9 +79,12 @@ class PreloadManager {
 
   private preloadCriticalResources() {
     // Preconnect to API
-    const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api'
-    const apiOrigin = new URL(apiBaseUrl).origin
-    this.addResourceHint(apiOrigin, 'preconnect')
+    const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || '/api'
+    // Only preconnect if we have a full URL (not relative path)
+    if (apiBaseUrl.startsWith('http')) {
+      const apiOrigin = new URL(apiBaseUrl).origin
+      this.addResourceHint(apiOrigin, 'preconnect')
+    }
 
     // Preload critical routes based on user role
     setTimeout(() => {

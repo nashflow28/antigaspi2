@@ -65,7 +65,7 @@ const OTPVerificationScreen = ({ navigation, route }: any) => {
       // No OTP sent yet - send it now
       sendOtp()
     }
-  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [])  
 
   // Countdown timer for resend
   useEffect(() => {
@@ -84,7 +84,7 @@ const OTPVerificationScreen = ({ navigation, route }: any) => {
       }, 100)
       return () => clearTimeout(timer)
     }
-  }, [otp, loading, otpSent]) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [otp, loading, otpSent])  
 
   const sendOtp = async () => {
     setSendingOtp(true)

@@ -10,6 +10,8 @@ import { cartReducer } from './slices/cartSlice'
 import { surpriseBasketsReducer } from './slices/surpriseBasketsSlice'
 import { walletReducer } from './slices/walletSlice'
 import { messagingReducer } from './slices/messagingSlice'
+import { deliveryReducer } from './slices/deliverySlice'
+import { driverReducer } from './slices/driverSlice'
 
 export const store = configureStore({
   reducer: {
@@ -24,6 +26,8 @@ export const store = configureStore({
     cart: cartReducer,
     wallet: walletReducer,
     messaging: messagingReducer,
+    delivery: deliveryReducer,
+    driver: driverReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

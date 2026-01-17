@@ -30,6 +30,7 @@ const SmsOtpScreen = ({ navigation, route }: any) => {
     onVerified,
     nextScreen,
     nextParams = {},
+    otpAlreadySent = false, // If true, OTP was already sent by previous screen
   } = route.params
 
   const theme = useTheme()
@@ -43,9 +44,15 @@ const SmsOtpScreen = ({ navigation, route }: any) => {
 
   const inputRefs = useRef<(TextInput | null)[]>([])
 
-  // Send OTP on mount
+  // Send OTP on mount only if not already sent by previous screen
   useEffect(() => {
-    sendInitialOtp()
+    if (!otpAlreadySent) {
+      sendInitialOtp()
+    } else {
+      // OTP was already sent, just show confirmation and start cooldown
+      showInfo('Code envoye', `Un code de verification a ete envoye au ${otpService.formatPhoneForDisplay(phoneNumber)}`)
+      setResendTimer(DEFAULT_RESEND_COOLDOWN)
+    }
   }, [])
 
   // Countdown timer for resend

@@ -152,6 +152,28 @@ jest.mock('react-native-webview', () => {
   }
 })
 
+// Mock react-native-maps
+jest.mock('react-native-maps', () => {
+  const { View } = require('react-native')
+  const MockMapView = View
+  MockMapView.Marker = View
+  MockMapView.Polyline = View
+  MockMapView.Polygon = View
+  MockMapView.Circle = View
+  MockMapView.Callout = View
+  return {
+    __esModule: true,
+    default: MockMapView,
+    Marker: View,
+    Polyline: View,
+    Polygon: View,
+    Circle: View,
+    Callout: View,
+    PROVIDER_GOOGLE: 'google',
+    PROVIDER_DEFAULT: null,
+  }
+})
+
 // Mock React Navigation
 jest.mock('@react-navigation/native', () => {
   const actualNav = jest.requireActual('@react-navigation/native')

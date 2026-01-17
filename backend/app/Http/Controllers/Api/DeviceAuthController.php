@@ -4,11 +4,9 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
-use App\Models\UserDevice;
 use App\Services\OtpService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use Tymon\JWTAuth\Facades\JWTAuth;
@@ -65,7 +63,7 @@ class DeviceAuthController extends Controller
         // Find user by phone
         $user = $this->findUserByPhone($phone);
 
-        if (!$user) {
+        if (! $user) {
             // User doesn't exist - need to register
             return response()->json([
                 'success' => true,
@@ -79,7 +77,7 @@ class DeviceAuthController extends Controller
             ]);
         }
 
-        if (!$user->is_active) {
+        if (! $user->is_active) {
             return response()->json([
                 'success' => false,
                 'message' => 'Ce compte a été désactivé.',
@@ -89,7 +87,7 @@ class DeviceAuthController extends Controller
         // Check if this device is known for this user
         $device = $user->devices()->where('device_id', $deviceId)->first();
 
-        if (!$device) {
+        if (! $device) {
             // New device - require OTP
             return response()->json([
                 'success' => true,
@@ -118,7 +116,7 @@ class DeviceAuthController extends Controller
         }
 
         // Device is valid and OTP not expired
-        if (!$user->hasPin()) {
+        if (! $user->hasPin()) {
             // User doesn't have PIN set yet - require OTP to set one
             return response()->json([
                 'success' => true,
@@ -193,14 +191,14 @@ class DeviceAuthController extends Controller
         // Verify OTP
         $otpResult = $this->otpService->verifyOtp($phone, $request->otp, 'login');
 
-        if (!$otpResult['success']) {
+        if (! $otpResult['success']) {
             return response()->json($otpResult, 400);
         }
 
         // Find user
         $user = $this->findUserByPhone($phone);
 
-        if (!$user) {
+        if (! $user) {
             // OTP verified but user doesn't exist - need registration
             return response()->json([
                 'success' => true,
@@ -213,7 +211,7 @@ class DeviceAuthController extends Controller
             ]);
         }
 
-        if (!$user->is_active) {
+        if (! $user->is_active) {
             return response()->json([
                 'success' => false,
                 'message' => 'Ce compte a été désactivé.',
@@ -239,7 +237,7 @@ class DeviceAuthController extends Controller
 
         Log::info('OTP login successful', [
             'user_id' => $user->id,
-            'device_id' => substr($deviceId, 0, 10) . '...',
+            'device_id' => substr($deviceId, 0, 10).'...',
             'phone' => $this->maskPhone($phone),
         ]);
 
@@ -252,7 +250,7 @@ class DeviceAuthController extends Controller
                 'token_type' => 'Bearer',
                 'expires_in' => JWTAuth::factory()->getTTL() * 60,
                 'has_pin' => $user->hasPin(),
-                'requires_pin_setup' => !$user->hasPin(),
+                'requires_pin_setup' => ! $user->hasPin(),
             ],
         ]);
     }
@@ -281,14 +279,14 @@ class DeviceAuthController extends Controller
         // Find user
         $user = $this->findUserByPhone($phone);
 
-        if (!$user) {
+        if (! $user) {
             return response()->json([
                 'success' => false,
                 'message' => 'Numéro de téléphone non reconnu.',
             ], 404);
         }
 
-        if (!$user->is_active) {
+        if (! $user->is_active) {
             return response()->json([
                 'success' => false,
                 'message' => 'Ce compte a été désactivé.',
@@ -298,7 +296,7 @@ class DeviceAuthController extends Controller
         // Check device
         $device = $user->devices()->where('device_id', $deviceId)->first();
 
-        if (!$device || $device->requiresOtp()) {
+        if (! $device || $device->requiresOtp()) {
             return response()->json([
                 'success' => false,
                 'message' => 'Vérification OTP requise pour cet appareil.',
@@ -309,7 +307,7 @@ class DeviceAuthController extends Controller
         }
 
         // Verify PIN
-        if (!$user->verifyPin($request->pin)) {
+        if (! $user->verifyPin($request->pin)) {
             return response()->json([
                 'success' => false,
                 'message' => 'Code PIN incorrect.',
@@ -327,7 +325,7 @@ class DeviceAuthController extends Controller
 
         Log::info('PIN login successful', [
             'user_id' => $user->id,
-            'device_id' => substr($deviceId, 0, 10) . '...',
+            'device_id' => substr($deviceId, 0, 10).'...',
         ]);
 
         return response()->json([
@@ -367,7 +365,7 @@ class DeviceAuthController extends Controller
 
         $user = auth()->user();
 
-        if (!$user) {
+        if (! $user) {
             return response()->json([
                 'success' => false,
                 'message' => 'Non authentifié.',
@@ -413,7 +411,7 @@ class DeviceAuthController extends Controller
 
         $user = auth()->user();
 
-        if (!$user->verifyPin($request->current_pin)) {
+        if (! $user->verifyPin($request->current_pin)) {
             return response()->json([
                 'success' => false,
                 'message' => 'Code PIN actuel incorrect.',
@@ -456,6 +454,135 @@ class DeviceAuthController extends Controller
     }
 
     /**
+     * Link phone number to existing account (for email-registered users)
+     * Step 1: Send OTP to the new phone
+     */
+    public function sendLinkPhoneOtp(Request $request): JsonResponse
+    {
+        $validator = Validator::make($request->all(), [
+            'phone' => 'required|string|min:8|max:20',
+        ], [
+            'phone.required' => 'Le numéro de téléphone est requis',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => $validator->errors()->first(),
+            ], 422);
+        }
+
+        $user = auth()->user();
+        if (! $user) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Non authentifié.',
+            ], 401);
+        }
+
+        $phone = $this->normalizePhone($request->phone);
+
+        // Check if phone is already used by another user
+        $existingUser = $this->findUserByPhone($phone);
+        if ($existingUser && $existingUser->id !== $user->id) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Ce numéro est déjà associé à un autre compte.',
+            ], 409);
+        }
+
+        // Send OTP for phone linking
+        $result = $this->otpService->sendOtp($phone, 'phone_change');
+
+        return response()->json($result, $result['success'] ? 200 : 400);
+    }
+
+    /**
+     * Link phone number to existing account (for email-registered users)
+     * Step 2: Verify OTP and link phone
+     */
+    public function verifyAndLinkPhone(Request $request): JsonResponse
+    {
+        $validator = Validator::make($request->all(), [
+            'phone' => 'required|string|min:8|max:20',
+            'otp' => 'required|string|size:6',
+            'device_id' => 'required|string|max:100',
+            'device_info' => 'sometimes|array',
+        ], [
+            'phone.required' => 'Le numéro de téléphone est requis',
+            'otp.required' => 'Le code de vérification est requis',
+            'otp.size' => 'Le code de vérification doit contenir 6 chiffres',
+            'device_id.required' => 'L\'identifiant de l\'appareil est requis',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => $validator->errors()->first(),
+            ], 422);
+        }
+
+        $user = auth()->user();
+        if (! $user) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Non authentifié.',
+            ], 401);
+        }
+
+        $phone = $this->normalizePhone($request->phone);
+        $deviceId = $request->device_id;
+        $deviceInfo = $request->device_info ?? [];
+
+        // Verify OTP
+        $otpResult = $this->otpService->verifyOtp($phone, $request->otp, 'phone_change');
+
+        if (! $otpResult['success']) {
+            return response()->json($otpResult, 400);
+        }
+
+        // Check again if phone is already used
+        $existingUser = $this->findUserByPhone($phone);
+        if ($existingUser && $existingUser->id !== $user->id) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Ce numéro est déjà associé à un autre compte.',
+            ], 409);
+        }
+
+        // Update user's phone number
+        $user->phone = $phone;
+        $user->phone_verified_at = now();
+        $user->save();
+
+        // Create/update device record
+        $device = $user->getOrCreateDevice($deviceId, array_merge($deviceInfo, [
+            'ip_address' => $request->ip(),
+        ]));
+
+        // Mark OTP as verified for this device
+        $device->markOtpVerified();
+
+        // Clear OTP verification
+        $this->otpService->clearVerification($phone, 'phone_change');
+
+        Log::info('Phone linked to account', [
+            'user_id' => $user->id,
+            'phone' => $this->maskPhone($phone),
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Numéro de téléphone lié avec succès.',
+            'data' => [
+                'user' => $this->formatUser($user->fresh()),
+                'has_pin' => $user->hasPin(),
+                'requires_pin_setup' => ! $user->hasPin(),
+            ],
+        ]);
+    }
+
+    /**
      * Get user's devices
      */
     public function getDevices(): JsonResponse
@@ -488,7 +615,7 @@ class DeviceAuthController extends Controller
         $user = auth()->user();
         $device = $user->devices()->find($deviceId);
 
-        if (!$device) {
+        if (! $device) {
             return response()->json([
                 'success' => false,
                 'message' => 'Appareil non trouvé.',
@@ -514,11 +641,11 @@ class DeviceAuthController extends Controller
         }
 
         if (strlen($phone) === 8) {
-            $phone = '228' . $phone;
+            $phone = '228'.$phone;
         }
 
         if (strlen($phone) === 9 && str_starts_with($phone, '0')) {
-            $phone = '228' . substr($phone, 1);
+            $phone = '228'.substr($phone, 1);
         }
 
         return $phone;
@@ -527,8 +654,8 @@ class DeviceAuthController extends Controller
     private function findUserByPhone(string $phone): ?User
     {
         return User::where('phone', $phone)
-            ->orWhere('phone', '+' . $phone)
-            ->orWhere('phone', 'LIKE', '%' . substr($phone, -8))
+            ->orWhere('phone', '+'.$phone)
+            ->orWhere('phone', 'LIKE', '%'.substr($phone, -8))
             ->first();
     }
 
@@ -537,7 +664,8 @@ class DeviceAuthController extends Controller
         if (strlen($phone) < 6) {
             return '***';
         }
-        return substr($phone, 0, 5) . '****' . substr($phone, -2);
+
+        return substr($phone, 0, 5).'****'.substr($phone, -2);
     }
 
     private function formatUser(User $user): array

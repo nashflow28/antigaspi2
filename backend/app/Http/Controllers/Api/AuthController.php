@@ -653,7 +653,7 @@ class AuthController extends Controller
         $isVerifiedForRegistration = $otpService->isPhoneVerified($phone, 'registration');
         $isVerifiedForLogin = $otpService->isPhoneVerified($phone, 'login');
 
-        if (!$isVerifiedForRegistration && !$isVerifiedForLogin) {
+        if (! $isVerifiedForRegistration && ! $isVerifiedForLogin) {
             return response()->json([
                 'success' => false,
                 'message' => 'Le numéro de téléphone n\'a pas été vérifié. Veuillez d\'abord valider votre code OTP.',
@@ -768,7 +768,7 @@ class AuthController extends Controller
 
         // Verify OTP was validated for this phone
         $otpService = app(\App\Services\OtpService::class);
-        if (!$otpService->isPhoneVerified($phone, 'login')) {
+        if (! $otpService->isPhoneVerified($phone, 'login')) {
             return response()->json([
                 'success' => false,
                 'message' => 'Le numéro de téléphone n\'a pas été vérifié',
@@ -781,7 +781,7 @@ class AuthController extends Controller
             ->orWhere('phone', 'LIKE', '%'.substr($phone, -8))
             ->first();
 
-        if (!$user) {
+        if (! $user) {
             return response()->json([
                 'success' => false,
                 'message' => 'Aucun compte associé à ce numéro',
@@ -792,7 +792,7 @@ class AuthController extends Controller
             ], 404);
         }
 
-        if (!$user->is_active) {
+        if (! $user->is_active) {
             return response()->json([
                 'success' => false,
                 'message' => 'Compte désactivé',

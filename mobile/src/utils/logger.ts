@@ -6,7 +6,7 @@
  * Integrates with Sentry for production error tracking.
  */
 
-import { captureException, addBreadcrumb } from './sentryInit'
+import { captureException } from './sentryInit'
 
 const isDev = __DEV__ && process.env.NODE_ENV !== 'test'
 const isTest = process.env.NODE_ENV === 'test'

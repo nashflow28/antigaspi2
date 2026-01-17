@@ -5,7 +5,7 @@
 
 import { useContext } from 'react'
 import { TextStyle, ViewStyle } from 'react-native'
-import { ThemeContext, Theme, ThemeContextValue } from './ThemeContext'
+import { ThemeContext, Theme } from './ThemeContext'
 
 // Type helpers
 type SpacingKey = keyof Theme['spacing']

@@ -1,6 +1,5 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit'
 import {
-  DeliveryState,
   Delivery,
   DeliveryEstimate,
   DeliveryTrackingData,
@@ -362,3 +361,4 @@ export const {
 } = deliverySlice.actions
 
 export const deliveryReducer = deliverySlice.reducer
+export const deliveryInitialState = initialState

@@ -32,6 +32,11 @@ import MerchantMapScreen from '../screens/main/MerchantMapScreen'
 import { TEST_IDS } from '../utils/testIds'
 import LoyaltyScreen from '../screens/main/LoyaltyScreen'
 import SurpriseBasketDetailsScreen from '../screens/main/SurpriseBasketDetailsScreen'
+import DeliveryRequestScreen from '../screens/main/DeliveryRequestScreen'
+import DeliveryTrackingScreen from '../screens/main/DeliveryTrackingScreen'
+import DeliveryRatingScreen from '../screens/main/DeliveryRatingScreen'
+import DeliveryHistoryScreen from '../screens/main/DeliveryHistoryScreen'
+import LinkPhoneScreen from '../screens/main/LinkPhoneScreen'
 
 const Tab = createBottomTabNavigator()
 const Stack = createNativeStackNavigator()
@@ -94,6 +99,9 @@ const OrdersStack = () => (
     <Stack.Screen name="ReviewsList" component={ReviewsListScreen} />
     <Stack.Screen name="AddReview" component={AddReviewScreen} />
     <Stack.Screen name="MerchantMessaging" component={MerchantMessagingScreen} />
+    <Stack.Screen name="DeliveryRequest" component={DeliveryRequestScreen} />
+    <Stack.Screen name="DeliveryTracking" component={DeliveryTrackingScreen} />
+    <Stack.Screen name="DeliveryRating" component={DeliveryRatingScreen} />
   </Stack.Navigator>
 )
 
@@ -101,10 +109,14 @@ const AccountStack = () => (
   <Stack.Navigator screenOptions={{ headerShown: false }}>
     <Stack.Screen name="AccountMain" component={ProfileScreen} />
     <Stack.Screen name="ProfileEdit" component={ProfileEditScreen} />
+    <Stack.Screen name="LinkPhone" component={LinkPhoneScreen} />
     <Stack.Screen name="Wallet" component={WalletScreen} />
     <Stack.Screen name="NotificationsInbox" component={NotificationsScreen} />
     <Stack.Screen name="NotificationSettings" component={NotificationSettingsScreen} />
     <Stack.Screen name="Loyalty" component={LoyaltyScreen} />
+    <Stack.Screen name="DeliveryHistory" component={DeliveryHistoryScreen} />
+    <Stack.Screen name="DeliveryTracking" component={DeliveryTrackingScreen} />
+    <Stack.Screen name="DeliveryRating" component={DeliveryRatingScreen} />
     <Stack.Screen name="ProductDetails" component={ProductDetailsScreen} />
     <Stack.Screen name="ReservationDetails" component={ReservationDetailsScreen} />
     <Stack.Screen name="MerchantDetail" component={MerchantDetailScreen} />

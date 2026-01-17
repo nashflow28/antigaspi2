@@ -6,7 +6,6 @@ import type {
   WalletTransaction,
   WalletStats,
   WalletTransactionsPagination,
-  WalletTransactionsResponse,
   WalletTransactionFilters,
   WalletRechargePayload,
   WalletPinPayload,

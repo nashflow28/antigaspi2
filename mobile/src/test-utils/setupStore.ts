@@ -1,7 +1,4 @@
 import { configureStore } from '@reduxjs/toolkit'
-
-import { RootState } from '../store'
-
 import { authReducer, authInitialState } from '../store/slices/authSlice'
 import { connectivityReducer, connectivityInitialState } from '../store/slices/connectivitySlice'
 import { productsReducer, productsInitialState } from '../store/slices/productsSlice'
@@ -11,9 +8,6 @@ import { favoritesReducer, favoritesInitialState } from '../store/slices/favorit
 import { reviewsReducer, reviewsInitialState } from '../store/slices/reviewsSlice'
 import { cartReducer, cartInitialState } from '../store/slices/cartSlice'
 import { ProductsState } from '../types'
-
-// PreloadedState type compatibility for older @reduxjs/toolkit versions
-type PreloadedState<S> = Partial<S>
 
 const reducers = {
   auth: authReducer,
@@ -26,17 +20,17 @@ const reducers = {
   cart: cartReducer,
 } as const
 
-export const setupStore = (preloadedState?: any) =>
-  configureStore({
+export function setupStore(preloadedState?: any) {
+  return configureStore({
     reducer: reducers as any,
     preloadedState,
   })
+}
 
 export type AppStore = ReturnType<typeof setupStore>
 
-export const buildProductsState = (overrides: Partial<ProductsState> = {}): ProductsState => {
+export function buildProductsState(overrides: Partial<ProductsState> = {}): ProductsState {
   const { filters, products, categories, ...rest } = overrides
-
   return {
     ...productsInitialState,
     products: products ?? [...productsInitialState.products],
@@ -46,10 +40,30 @@ export const buildProductsState = (overrides: Partial<ProductsState> = {}): Prod
   }
 }
 
-export const buildAuthState = () => ({ ...authInitialState })
-export const buildConnectivityState = () => ({ ...connectivityInitialState })
-export const buildReservationsState = () => ({ ...reservationsInitialState })
-export const buildMerchantsState = () => ({ ...merchantsInitialState })
-export const buildFavoritesState = () => ({ ...favoritesInitialState })
-export const buildReviewsState = () => ({ ...reviewsInitialState })
-export const buildCartState = () => ({ ...cartInitialState })
+export function buildAuthState() {
+  return { ...authInitialState }
+}
+
+export function buildConnectivityState() {
+  return { ...connectivityInitialState }
+}
+
+export function buildReservationsState() {
+  return { ...reservationsInitialState }
+}
+
+export function buildMerchantsState() {
+  return { ...merchantsInitialState }
+}
+
+export function buildFavoritesState() {
+  return { ...favoritesInitialState }
+}
+
+export function buildReviewsState() {
+  return { ...reviewsInitialState }
+}
+
+export function buildCartState() {
+  return { ...cartInitialState }
+}

@@ -1,5 +1,9 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit'
 import { ReservationsState, Reservation, ReservationCreationPayload, ReservationCreationResponse } from '../../types'
+
+// Re-export ReservationsState for test compatibility
+export type { ReservationsState }
+
 import apiService from '../../services/api'
 import offlineService from '../../services/offlineService'
 import { storeLogger } from '../../utils/logger'

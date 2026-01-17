@@ -1,16 +1,5 @@
-/**
- * Test Utilities - Point d'entrée centralisé
- *
- * Usage:
- * ```typescript
- * import { render, createTestStore, createTestUser, createTestProduct } from '@test-utils'
- * ```
- */
-
-// Helpers de rendu
 export { render, renderWithProviders } from './test-utils'
 
-// Store helpers
 export { createTestStore } from './store'
 
 export {
@@ -25,7 +14,6 @@ export {
   buildCartState,
 } from './setupStore'
 
-// Factories de données
 export {
   createTestUser,
   createTestProduct,
@@ -38,16 +26,15 @@ export {
 
 export { makeMerchant, makeProduct, makeCategory, resetFixtures } from './fixtures'
 
-// Navigation mocks
 export {
   createMockNavigation,
   createMockRoute,
   expectNavigationCalled,
   resetNavigationMocks,
 } from './navigation'
+
 export type { MockNavigation, MockRoute } from './navigation'
 
-// Re-export des utilitaires de testing-library pour cohérence
 export {
   fireEvent,
   waitFor,

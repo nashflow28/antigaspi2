@@ -12,6 +12,7 @@
 7. **Vérifier le lint et le build** du projet (TypeScript, ESLint, compilation frontend, etc.) afin de détecter toute régression ou erreur de syntaxe.
 8. **Ne déclarer la tâche "terminée" qu'après validation** par l'agent de revue (Phase 2) **ET** par un agent de validation finale (Phase 3) **ET** Phase 4 (reality-checker) avec confirmation explicite de chacun.
 9. **🚨 TOUJOURS DEMANDER CONFIRMATION avant de lancer un build APK mobile (eas build)**. Ne JAMAIS lancer de build automatiquement sans l'accord explicite de l'utilisateur.
+10. **🧹 CORRIGER LES WARNINGS ESLint opportunément** : Lorsqu'on modifie un fichier, profiter pour corriger les warnings ESLint présents dans ce fichier (imports inutilisés, variables non utilisées avec préfixe `_`, `catch (error)` → `catch`, etc.). Cela permet un nettoyage progressif du codebase sans effort dédié.
 
 ## 🚨 GARDE-FOUS ANTI-BIAIS OBLIGATOIRES
 **Protection contre auto-validation, optimisme systémique et métriques biaisées**
@@ -393,20 +394,35 @@ antigaspi2/
 
 ## 👥 **Comptes de Test Disponibles**
 
+### **Authentification Mobile (Méthode principale)**
+Tous les comptes de test supportent l'authentification par téléphone + PIN :
+- **PIN par défaut :** `1234`
+- **Format téléphone :** Togo (+228)
+
 ### **Administrateur**
 - Email: `admin@antigaspi.com`
+- Phone: `+228 91 00 00 01`
 - Password: `password`
+- PIN: `1234`
 - Rôle: Gestion complète de la plateforme
 
 ### **Consommateur**
 - Email: `jean.dupont@email.com`
+- Phone: `+228 90 65 43 21`
 - Password: `password`
+- PIN: `1234`
 - Rôle: Navigation et réservation des produits
 
 ### **Commerçant**
 - Email: `boulangerie.martin@email.com`
+- Phone: `+228 90 12 34 56`
 - Password: `password`
+- PIN: `1234`
 - Rôle: Ajout de produits et gestion des réservations
+
+### **Connexion Mobile**
+1. **Par téléphone + OTP** : Entrer le numéro → Recevoir SMS → Entrer PIN
+2. **Par email + password** : Connexion classique (legacy, toujours supporté)
 
 ### **Produits de Test**
 - Pain complet artisanal - 250 XOF
@@ -679,11 +695,11 @@ git log --oneline -10
 ## 🔐 **Accès & Credentials**
 
 ### **Comptes de Test Production**
-| Rôle | Email | Password | Usage |
-|------|-------|----------|-------|
-| Admin | admin@antigaspi.com | password | Gestion plateforme |
-| Consumer | jean.dupont@email.com | password | Tests réservations |
-| Merchant | boulangerie.martin@email.com | password | Tests gestion produits |
+| Rôle | Email | Phone | Password | PIN | Usage |
+|------|-------|-------|----------|-----|-------|
+| Admin | admin@antigaspi.com | +228 91 00 00 01 | password | 1234 | Gestion plateforme |
+| Consumer | jean.dupont@email.com | +228 90 65 43 21 | password | 1234 | Tests réservations |
+| Merchant | boulangerie.martin@email.com | +228 90 12 34 56 | password | 1234 | Tests gestion produits |
 
 ### **Serveurs & Base de Données**
 - **Serveur VPS** : web58.hosting-systems.io

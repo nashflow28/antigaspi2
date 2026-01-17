@@ -17,6 +17,8 @@ import { cartReducer, cartInitialState } from '../store/slices/cartSlice'
 import { surpriseBasketsReducer, surpriseBasketsInitialState } from '../store/slices/surpriseBasketsSlice'
 import { walletReducer, walletInitialState } from '../store/slices/walletSlice'
 import { messagingReducer, messagingInitialState } from '../store/slices/messagingSlice'
+import { deliveryReducer, deliveryInitialState } from '../store/slices/deliverySlice'
+import { driverReducer, driverInitialState } from '../store/slices/driverSlice'
 
 const reducers = {
   auth: authReducer,
@@ -30,6 +32,8 @@ const reducers = {
   cart: cartReducer,
   wallet: walletReducer,
   messaging: messagingReducer,
+  delivery: deliveryReducer,
+  driver: driverReducer,
 }
 
 type ReducerKey = keyof typeof reducers
@@ -83,6 +87,8 @@ const buildDefaultState = (): StateFromReducers => ({
   cart: clone(cartInitialState),
   wallet: clone(walletInitialState),
   messaging: clone(messagingInitialState),
+  delivery: clone(deliveryInitialState),
+  driver: clone(driverInitialState),
 })
 
 export const createTestStore = (partialState: DeepPartial<RootState> = {}) => {
