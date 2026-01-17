@@ -37,7 +37,7 @@ class User extends Authenticatable implements JWTSubject
         'loyalty_tier',
         'lifetime_points',
         'tier_updated_at',
-        'pin_hash',
+        'pin',
         'pin_set_at',
         'current_device_id',
     ];
@@ -45,7 +45,7 @@ class User extends Authenticatable implements JWTSubject
     protected $hidden = [
         'password',
         'remember_token',
-        'pin_hash',
+        'pin',
     ];
 
     protected function casts(): array
@@ -298,7 +298,7 @@ class User extends Authenticatable implements JWTSubject
      */
     public function hasPin(): bool
     {
-        return ! empty($this->pin_hash);
+        return ! empty($this->pin);
     }
 
     /**
@@ -307,7 +307,7 @@ class User extends Authenticatable implements JWTSubject
     public function setPin(string $pin): void
     {
         $this->update([
-            'pin_hash' => \Illuminate\Support\Facades\Hash::make($pin),
+            'pin' => \Illuminate\Support\Facades\Hash::make($pin),
             'pin_set_at' => now(),
         ]);
     }
@@ -321,7 +321,7 @@ class User extends Authenticatable implements JWTSubject
             return false;
         }
 
-        return \Illuminate\Support\Facades\Hash::check($pin, $this->pin_hash);
+        return \Illuminate\Support\Facades\Hash::check($pin, $this->pin);
     }
 
     /**

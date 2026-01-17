@@ -12,11 +12,11 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            if (! Schema::hasColumn('users', 'pin_hash')) {
-                $table->string('pin_hash', 255)->nullable()->after('password');
+            if (! Schema::hasColumn('users', 'pin')) {
+                $table->string('pin', 255)->nullable()->after('password');
             }
             if (! Schema::hasColumn('users', 'pin_set_at')) {
-                $table->timestamp('pin_set_at')->nullable()->after('pin_hash');
+                $table->timestamp('pin_set_at')->nullable()->after('pin');
             }
             if (! Schema::hasColumn('users', 'current_device_id')) {
                 $table->string('current_device_id', 100)->nullable()->after('pin_set_at');
@@ -30,7 +30,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->dropColumn(['pin_hash', 'pin_set_at', 'current_device_id']);
+            $table->dropColumn(['pin', 'pin_set_at', 'current_device_id']);
         });
     }
 };
