@@ -119,21 +119,48 @@
             <slot
               name="cta"
               :reserve="handleReserve"
+              :add-to-cart="handleAddToCart"
               :disabled="isDisabled"
               :loading="reserveLoading"
               :aria-label="ariaLabel"
             >
-              <Button
-                :variant="isPromo ? 'promo' : 'primary'"
-                size="sm"
-                data-testid="add-to-cart"
-                :aria-label="ariaLabel"
-                :loading="reserveLoading"
-                :disabled="isDisabled"
-                @click.stop.prevent="handleReserve"
-              >
-                {{ reserveLabel }}
-              </Button>
+              <div class="flex gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  data-testid="add-to-cart"
+                  :aria-label="`Ajouter ${name} au panier`"
+                  :disabled="isDisabled"
+                  @click.stop.prevent="handleAddToCart"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    class="h-4 w-4"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"
+                    />
+                  </svg>
+                </Button>
+                <Button
+                  :variant="isPromo ? 'promo' : 'primary'"
+                  size="sm"
+                  class="flex-1"
+                  data-testid="view-product"
+                  :aria-label="ariaLabel"
+                  :loading="reserveLoading"
+                  :disabled="isDisabled"
+                  @click.stop.prevent="handleReserve"
+                >
+                  {{ reserveLabel }}
+                </Button>
+              </div>
             </slot>
           </div>
         </div>
@@ -207,6 +234,7 @@ const props = withDefaults(defineProps<Props>(), {
 const emit = defineEmits<{
   (event: 'reserve'): void
   (event: 'onReserve'): void
+  (event: 'add-to-cart'): void
 }>()
 
 const attrs = useAttrs()
@@ -279,6 +307,17 @@ const handleReserve = (event?: MouseEvent) => {
   props.onReserve?.()
   emit('reserve')
   emit('onReserve')
+}
+
+const handleAddToCart = (event?: MouseEvent) => {
+  event?.stopPropagation?.()
+  event?.preventDefault?.()
+
+  if (isDisabled.value) {
+    return
+  }
+
+  emit('add-to-cart')
 }
 </script>
 
