@@ -63,8 +63,22 @@ class PayGateGateway implements PaymentGateway
         // Generate unique identifier for this transaction
         $identifier = $this->generateIdentifier($reservation);
 
+        // DEBUG: Log incoming data to trace customer_phone issue
+        Log::debug('PayGate::initialize - Received data', [
+            'data_keys' => array_keys($data),
+            'data_customer_phone' => $data['customer_phone'] ?? '[NOT_SET]',
+            'payment_customer_phone' => $payment->customer_phone ?? '[NOT_SET]',
+            'reservation_id' => $reservation->id,
+        ]);
+
         // Format phone number for PayGate (must include country code)
         $customerPhone = $this->formatPhoneNumber($data['customer_phone'] ?? $payment->customer_phone);
+
+        // DEBUG: Log the formatted result
+        Log::debug('PayGate::initialize - After formatPhoneNumber', [
+            'formatted_phone' => $customerPhone ?: '[EMPTY]',
+            'raw_input' => $data['customer_phone'] ?? $payment->customer_phone ?? '[BOTH_NULL]',
+        ]);
 
         // Validate required data
         if (empty($customerPhone)) {

@@ -18,6 +18,14 @@ class PaymentService
 
     public function initializePayment(Reservation $reservation, PaymentMethod $method, array $attributes = []): Payment
     {
+        // DEBUG: Log incoming attributes to trace customer_phone flow
+        Log::debug('PaymentService::initializePayment - Received attributes', [
+            'attribute_keys' => array_keys($attributes),
+            'customer_phone' => $attributes['customer_phone'] ?? '[NOT_SET]',
+            'payment_method' => $method->value,
+            'reservation_id' => $reservation->id,
+        ]);
+
         if (array_key_exists('wallet_pin', $attributes)) {
             $attributes['pin'] = $attributes['wallet_pin'];
             unset($attributes['wallet_pin']);

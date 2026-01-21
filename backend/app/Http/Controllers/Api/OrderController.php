@@ -10,7 +10,9 @@ use App\Models\Payment;
 use App\Models\Product;
 use App\Models\Reservation;
 use App\Models\Wallet;
+use App\Notifications\ReservationStatusNotification;
 use App\Services\Payments\PaymentService;
+use App\Services\SmsService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -18,7 +20,10 @@ use Illuminate\Support\Facades\Validator;
 
 class OrderController extends Controller
 {
-    public function __construct(private readonly PaymentService $paymentService) {}
+    public function __construct(
+        private readonly PaymentService $paymentService,
+        private readonly SmsService $smsService
+    ) {}
 
     /**
      * Lister les commandes de l'utilisateur connecté
@@ -63,18 +68,38 @@ class OrderController extends Controller
             'content_type' => $request->header('Content-Type'),
         ]);
 
+        // Determine if payment method requires customer_phone (Mobile Money)
+        $paymentMethod = $request->input('payment_method', 'on_site');
+        $mobileMoneyMethods = ['flooz', 'tmoney', 'orange_money', 'mtn_momo'];
+        $isMobileMoney = in_array($paymentMethod, $mobileMoneyMethods, true);
+
         $validator = Validator::make($request->all(), [
             'items' => 'required|array|min:1',
             'items.*.product_id' => 'required|exists:products,id',
             'items.*.quantity' => 'required|integer|min:1',
             'payment_method' => 'nullable|string|in:wallet,on_site,flooz,tmoney,orange_money,mtn_momo',
-            'wallet_pin' => 'nullable|string|digits_between:4,6',
-            'notes' => 'nullable|string|max:1000',
+            'wallet_pin' => $paymentMethod === 'wallet' ? 'required|string|digits_between:4,6' : 'nullable|string|digits_between:4,6',
+            'customer_phone' => array_filter([
+                $isMobileMoney ? 'required' : 'nullable',
+                'string',
+                'regex:/^\+?[0-9]{8,15}$/',
+            ]),
+            'customer_email' => 'nullable|email|max:255',
+            'pickup_date' => 'nullable|date|after_or_equal:today',
+            'pickup_time' => 'nullable|string|regex:/^([01]?[0-9]|2[0-3]):[0-5][0-9]$/',
+            'notes' => 'nullable|string|max:500',
         ], [
             'items.required' => 'Vous devez ajouter au moins un produit',
             'items.*.product_id.exists' => 'Un des produits n\'existe pas',
             'items.*.quantity.min' => 'La quantité doit être au moins 1',
+            'wallet_pin.required' => 'Le code PIN du portefeuille est requis pour un paiement wallet',
             'wallet_pin.digits_between' => 'Le code PIN doit contenir entre 4 et 6 chiffres',
+            'customer_phone.required' => 'Le numéro de téléphone est requis pour les paiements Mobile Money',
+            'customer_phone.regex' => 'Le numéro de téléphone doit contenir entre 8 et 15 chiffres et peut commencer par +',
+            'customer_email.email' => 'Format d\'email invalide',
+            'pickup_date.date' => 'Format de date invalide',
+            'pickup_date.after_or_equal' => 'La date de retrait doit être aujourd\'hui ou dans le futur',
+            'pickup_time.regex' => 'Format d\'heure invalide (HH:MM attendu)',
         ]);
 
         if ($validator->fails()) {
@@ -89,6 +114,10 @@ class OrderController extends Controller
         $items = $request->input('items');
         $paymentMethodStr = $request->input('payment_method', 'on_site');
         $walletPin = $request->input('wallet_pin');
+        $customerPhone = $request->input('customer_phone');
+        $customerEmail = $request->input('customer_email');
+        $pickupDate = $request->input('pickup_date');
+        $pickupTime = $request->input('pickup_time');
 
         // DEBUG: Log received payment data
         Log::info('Order creation - payment data received', [
@@ -96,6 +125,10 @@ class OrderController extends Controller
             'payment_method_received' => $request->input('payment_method'),
             'payment_method_used' => $paymentMethodStr,
             'wallet_pin_present' => ! empty($walletPin),
+            'customer_phone' => $customerPhone ?? '[ABSENT]',
+            'customer_email' => $customerEmail ?? '[ABSENT]',
+            'pickup_date' => $pickupDate ?? '[ABSENT]',
+            'pickup_time' => $pickupTime ?? '[ABSENT]',
             'items_count' => count($items),
             'all_input_keys' => array_keys($request->all()),
         ]);
@@ -201,8 +234,8 @@ class OrderController extends Controller
                     throw new \Exception("Stock insuffisant pour '{$product->name}' (demandé: {$item['quantity']}, disponible: {$product->quantity_available})");
                 }
 
-                // Vérifier la date d'expiration
-                if ($product->expiration_date < now()->toDateString()) {
+                // Vérifier la date d'expiration (utiliser la méthode isExpired() qui gère correctement null et les comparaisons)
+                if ($product->isExpired()) {
                     throw new \Exception("Le produit '{$product->name}' a expiré");
                 }
 
@@ -210,7 +243,7 @@ class OrderController extends Controller
                 $itemTotal = $product->discounted_price * $item['quantity'];
                 $totalAmount += $itemTotal;
 
-                // Créer la réservation
+                // Créer la réservation avec pickup_date/time si fournis
                 $reservation = Reservation::create([
                     'order_id' => $order->id,
                     'user_id' => $user->id,
@@ -221,6 +254,8 @@ class OrderController extends Controller
                     'payment_status' => 'pending',
                     'reserved_at' => now(),
                     'expires_at' => now()->addHours(24), // 24h pour confirmer
+                    'pickup_date' => $pickupDate,
+                    'pickup_time' => $pickupTime,
                 ]);
 
                 // Déduire du stock
@@ -236,12 +271,22 @@ class OrderController extends Controller
             $payments = [];
             if ($paymentMethod !== PaymentMethod::ON_SITE && count($createdReservations) > 0) {
                 try {
+                    // DEBUG: Log payment data right before PaymentService call
+                    Log::debug('OrderController: About to call PaymentService', [
+                        'customerPhone_value' => $customerPhone ?? '[NULL]',
+                        'customerPhone_type' => gettype($customerPhone),
+                        'paymentMethod' => $paymentMethodStr,
+                        'reservations_count' => count($createdReservations),
+                    ]);
+
                     foreach ($createdReservations as $reservation) {
                         $payment = $this->paymentService->initializePayment(
                             $reservation,
                             $paymentMethod,
                             [
                                 'wallet_pin' => $walletPin,
+                                'customer_phone' => $customerPhone,
+                                'customer_email' => $customerEmail,
                                 'currency' => 'XOF',
                                 'notes' => $request->input('notes'),
                             ]
@@ -354,6 +399,37 @@ class OrderController extends Controller
 
             // Charger les relations pour la réponse
             $order->load(['reservations.product.category', 'reservations.product.merchant']);
+
+            // Envoyer les notifications pour chaque réservation créée (comme ReservationService)
+            foreach ($createdReservations as $reservation) {
+                try {
+                    // Recharger la réservation avec ses relations pour la notification
+                    $reservation->load(['product.merchant', 'user']);
+
+                    // Notifier l'utilisateur (in-app notification)
+                    $user->notify(new ReservationStatusNotification($reservation));
+
+                    // Notifier le commerçant si disponible
+                    $merchant = $reservation->product?->merchant;
+                    if ($merchant && $merchant->user) {
+                        $merchant->user->notify(new ReservationStatusNotification($reservation));
+                    }
+
+                    // Envoyer SMS de confirmation (comme ReservationService)
+                    $this->sendSmsConfirmation($user, $reservation);
+
+                    Log::info('Notifications sent for reservation', [
+                        'reservation_id' => $reservation->id,
+                        'user_id' => $user->id,
+                    ]);
+                } catch (\Exception $notifError) {
+                    // Ne pas bloquer la commande si la notification échoue
+                    Log::warning('Failed to send notification for reservation', [
+                        'reservation_id' => $reservation->id,
+                        'error' => $notifError->getMessage(),
+                    ]);
+                }
+            }
 
             // Build response data
             $responseData = [
@@ -489,6 +565,62 @@ class OrderController extends Controller
                 'message' => 'Erreur lors de l\'annulation',
                 'error' => $e->getMessage(),
             ], 500);
+        }
+    }
+
+    /**
+     * Send SMS confirmation for a reservation (non-blocking)
+     * Mirrors the implementation in ReservationService
+     */
+    private function sendSmsConfirmation(\App\Models\User $user, Reservation $reservation): void
+    {
+        try {
+            // Skip if SMS service is not configured
+            if (! $this->smsService->isConfigured()) {
+                Log::debug('SMS Service: Skipping SMS (not configured)');
+
+                return;
+            }
+
+            // Get user phone number
+            $phone = $user->phone;
+            if (empty($phone)) {
+                Log::debug('SMS Service: Skipping SMS (no phone number)', [
+                    'user_id' => $user->id,
+                ]);
+
+                return;
+            }
+
+            // Get merchant name
+            $merchantName = $reservation->product->merchant->business_name ?? 'le commerçant';
+
+            // Send confirmation SMS
+            $result = $this->smsService->sendReservationConfirmation(
+                $phone,
+                $reservation->reservation_code,
+                $merchantName
+            );
+
+            if (! $result['success']) {
+                Log::warning('SMS Service: Failed to send reservation confirmation', [
+                    'reservation_id' => $reservation->id,
+                    'user_id' => $user->id,
+                    'phone' => $phone,
+                    'error' => $result['message'] ?? 'Unknown error',
+                ]);
+            } else {
+                Log::info('SMS Service: Reservation confirmation sent', [
+                    'reservation_id' => $reservation->id,
+                    'user_id' => $user->id,
+                ]);
+            }
+        } catch (\Exception $e) {
+            // Never block the order creation due to SMS failure
+            Log::error('SMS Service: Exception while sending SMS', [
+                'reservation_id' => $reservation->id,
+                'error' => $e->getMessage(),
+            ]);
         }
     }
 }
