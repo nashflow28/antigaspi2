@@ -27,6 +27,24 @@
     </template>
 
     <template #utilities>
+      <!-- Cart Badge -->
+      <RouterLink
+        v-if="authStore.isAuthenticated"
+        to="/cart"
+        class="relative inline-flex items-center justify-center rounded-full p-2 text-neutral-700 transition-all duration-300 ease-spring-out focus-2025 hover:bg-neutral-100 hover:text-primary-900 dark:text-dark-100 dark:hover:bg-dark-700"
+        aria-label="Voir mon panier"
+      >
+        <ShoppingCart class="h-5 w-5" />
+        <Badge
+          v-if="cartStore.itemsCount > 0"
+          variant="primary"
+          size="xs"
+          class="absolute -top-1 -right-1 min-w-[20px] h-5 flex items-center justify-center"
+        >
+          {{ cartStore.itemsCount }}
+        </Badge>
+      </RouterLink>
+
       <ThemeToggle aria-label="Basculer le thème" />
     </template>
 
@@ -341,6 +359,7 @@ import {
   ChevronDown,
   Package,
   ShoppingBag,
+  ShoppingCart,
   MessageCircle,
   MessageSquare,
   Star,
@@ -350,6 +369,7 @@ import {
   Bell
 } from 'lucide-vue-next'
 import { useAuthStore } from '@/stores/auth'
+import { useCartStore } from '@/stores/cart'
 import { useAccessibility } from '@/composables/useAccessibility'
 import { Button, Badge, ThemeToggle } from '@/components/ui/2025'
 import Navigation2025, { type NavigationBrand, type NavigationCta, type NavigationLink } from '@/components/ui/2025/Navigation.vue'
@@ -363,6 +383,7 @@ interface UserMenuLink {
 const router = useRouter()
 const route = useRoute()
 const authStore = useAuthStore()
+const cartStore = useCartStore()
 
 const brand = computed<NavigationBrand>(() => ({
   name: 'Antigaspi',

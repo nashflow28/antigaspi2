@@ -348,8 +348,10 @@
                   :reserve-disabled="isProductSoldOut(product)"
                   :disabled="isProductSoldOut(product) || quickReserveLoadingId === product.id"
                   :featured="true"
+                  reserve-label="Voir détails"
                   class="h-full"
                   @reserve="() => onReserve(product)"
+                  @add-to-cart="() => handleAddToCart(product)"
                   @click="() => viewProduct(product)"
                 />
               </div>
@@ -428,9 +430,11 @@
             :reserve-disabled="isProductSoldOut(product)"
             :disabled="isProductSoldOut(product) || quickReserveLoadingId === product.id"
             :aria-label="`Réserver ${product.name}`"
+            reserve-label="Voir détails"
             data-testid="product-card"
             class="h-full"
             @reserve="() => onReserve(product)"
+            @add-to-cart="() => handleAddToCart(product)"
             @click="() => viewProduct(product)"
           />
         </div>
@@ -457,6 +461,7 @@ import LocationPermissionModal from '@/components/ui/2025/LocationPermissionModa
 import CollectionCard from '@/components/ui/2025/CollectionCard.vue'
 import { notify } from '@/composables/useNotifications'
 import { useAuthStore } from '@/stores/auth'
+import { useCartStore } from '@/stores/cart'
 import { useReservationsStore } from '@/stores/reservations'
 import { usePaymentsStore } from '@/stores/payments'
 import { apiService } from '@/services/api'
@@ -465,6 +470,7 @@ import { normalizeProduct, getCategoryKey, type NormalizedProduct } from '@/util
 
 const router = useRouter()
 const authStore = useAuthStore()
+const cartStore = useCartStore()
 const reservationsStore = useReservationsStore()
 const paymentsStore = usePaymentsStore()
 
@@ -1117,17 +1123,19 @@ const viewProduct = (product: NormalizedProduct) => {
   router.push(`/products/${product.id}`)
 }
 
-const onReserve = async (product: NormalizedProduct) => {
+const handleAddToCart = (product: NormalizedProduct) => {
   if (isProductSoldOut(product)) {
-    notify.info('Ce produit est complet pour le moment.', 'Réservation rapide')
+    notify.info('Ce produit est complet pour le moment.', 'Panier')
     return
   }
 
-  if (!authStore.isAuthenticated) {
-    notify.info('Connectez-vous pour réserver ce produit instantanément.', 'Connexion requise')
-    router.push({ name: 'login', query: { redirect: `/products/${product.id}` } })
-    return
-  }
+  cartStore.addProduct(product as any, 1)
+}
+
+const onReserve = async (product: NormalizedProduct) => {
+  // Redirect to product details page instead of quick reserve
+  viewProduct(product)
+}
 
   if (quickReserveLoadingId.value === product.id) {
     return
