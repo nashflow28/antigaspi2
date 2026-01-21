@@ -68,7 +68,7 @@ const ProfileScreen: React.FC = () => {
   }
 
   const handleHelpPress = async () => {
-    const helpUrl = 'https://antigaspi.support/help'
+    const helpUrl = 'https://geladal.support/help'
     try {
       const supported = await Linking.canOpenURL(helpUrl)
       if (supported) {
@@ -76,7 +76,7 @@ const ProfileScreen: React.FC = () => {
         return
       }
 
-      const fallback = 'mailto:support@antigaspi.app'
+      const fallback = 'mailto:support@geladal.com'
       const fallbackSupported = await Linking.canOpenURL(fallback)
       if (fallbackSupported) {
         await Linking.openURL(fallback)
@@ -101,7 +101,8 @@ const ProfileScreen: React.FC = () => {
   }
 
   const handleRegister = () => {
-    navigationRef.navigate('Auth', { screen: 'Register' })
+    // Phone-based auth handles both login and registration
+    navigationRef.navigate('Auth', { screen: 'Login' })
   }
 
   // Vue non connectee
@@ -119,7 +120,7 @@ const ProfileScreen: React.FC = () => {
             <Ionicons name="person-outline" size={48} color={theme.colors.primary[500]} />
           </View>
           <Typography variant="h2" weight="bold" style={{ marginBottom: theme.spacing.sm, textAlign: 'center' }}>
-            Bienvenue sur Antigaspi
+            Bienvenue sur GÊLADAL
           </Typography>
           <Typography variant="body" color="secondary" style={{ textAlign: 'center', paddingHorizontal: theme.spacing.lg, marginBottom: theme.spacing['2xl'] }}>
             Connectez-vous pour acceder a toutes les fonctionnalites et sauvegarder vos favoris
@@ -271,6 +272,18 @@ const ProfileScreen: React.FC = () => {
           <Ionicons name="person-outline" size={24} color={theme.colors.text} />
           <Typography variant="body" style={{ flex: 1, marginLeft: theme.spacing.md }}>
             Modifier le profil
+          </Typography>
+          <Ionicons name="chevron-forward" size={20} color={theme.colors.neutral[400]} />
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={[styles.menuItem, { paddingHorizontal: theme.spacing.lg, paddingVertical: theme.spacing.md, borderBottomWidth: 1, borderBottomColor: theme.colors.border }]}
+          onPress={() => (navigation as any).navigate('ChangePin')}
+          accessibilityLabel="Modifier le code PIN"
+        >
+          <Ionicons name="key-outline" size={24} color={theme.colors.text} />
+          <Typography variant="body" style={{ flex: 1, marginLeft: theme.spacing.md }}>
+            Modifier le code PIN
           </Typography>
           <Ionicons name="chevron-forward" size={20} color={theme.colors.neutral[400]} />
         </TouchableOpacity>

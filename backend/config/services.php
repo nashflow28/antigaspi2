@@ -62,4 +62,37 @@ return [
         'sender' => env('SMS_TG_SENDER', 'Antigaspi'),
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Test/Demo Accounts - OTP Bypass
+    |--------------------------------------------------------------------------
+    | Phone numbers in this list will:
+    | - NOT receive actual SMS (bypass SMS sending)
+    | - Accept fixed OTP code: 123456
+    | Format: normalized phone numbers (e.g., 22899000001)
+    */
+    'test_phones' => [
+        // Admin
+        '22899000001', // Admin System
+
+        // Merchants (Commerçants)
+        '22890854244', // Pierre Martin - Boulangerie
+        '745678901',   // Bella Traoré - Superette (CI)
+        '756789012',   // Aminata Ouattara - Restaurant (CI)
+        '22890868657', // Yao N'Guessan - Marché
+        '778901234',   // Koffi Brou - Patisserie (CI)
+        '22896352414', // Bonobo SEXY
+
+        // Consumers (Consommateurs)
+        '22899000002', // Jean Dupont
+        '701234567',   // Marie Kouamé (CI)
+        '712345678',   // Ibrahim Koné (CI)
+        '723456789',   // Fatou Diallo (CI)
+        '734567890',   // Kofi Asante (CI)
+        '22896854123', // Kaled YERIMA
+        '22896587423', // Dieudo TEST
+        '22899999999', // Test TEST
+        '22891234567', // Test User
+    ],
+
 ];

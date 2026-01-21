@@ -36,6 +36,7 @@ import DeliveryRequestScreen from '../screens/main/DeliveryRequestScreen'
 import DeliveryTrackingScreen from '../screens/main/DeliveryTrackingScreen'
 import DeliveryRatingScreen from '../screens/main/DeliveryRatingScreen'
 import DeliveryHistoryScreen from '../screens/main/DeliveryHistoryScreen'
+import ChangePinScreen from '../screens/main/ChangePinScreen'
 
 const Tab = createBottomTabNavigator()
 const Stack = createNativeStackNavigator()
@@ -108,6 +109,7 @@ const AccountStack = () => (
   <Stack.Navigator screenOptions={{ headerShown: false }}>
     <Stack.Screen name="AccountMain" component={ProfileScreen} />
     <Stack.Screen name="ProfileEdit" component={ProfileEditScreen} />
+    <Stack.Screen name="ChangePin" component={ChangePinScreen} />
     <Stack.Screen name="Wallet" component={WalletScreen} />
     <Stack.Screen name="NotificationsInbox" component={NotificationsScreen} />
     <Stack.Screen name="NotificationSettings" component={NotificationSettingsScreen} />

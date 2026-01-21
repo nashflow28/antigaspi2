@@ -19,6 +19,9 @@ class OtpService
 
     private int $resendCooldownSeconds = 60;
 
+    // Fixed OTP for test accounts
+    private string $testOtp = '123456';
+
     public function __construct(SmsService $smsService)
     {
         $this->smsService = $smsService;
@@ -34,6 +37,28 @@ class OtpService
     public function sendOtp(string $phone, string $purpose = 'registration'): array
     {
         $phone = $this->normalizePhone($phone);
+
+        // Test accounts: bypass SMS sending, use fixed OTP
+        if ($this->isTestPhone($phone)) {
+            Log::info('OTP bypassed for test account', [
+                'phone' => $this->maskPhone($phone),
+                'purpose' => $purpose,
+                'test_mode' => true,
+                'hint' => 'Use OTP: 123456',
+            ]);
+
+            return [
+                'success' => true,
+                'message' => 'Code de vérification: 123456 (compte test)',
+                'data' => [
+                    'phone' => $phone,
+                    'expires_in' => $this->expirationMinutes * 60,
+                    'resend_cooldown' => 0, // No cooldown for test accounts
+                    'test_mode' => true,
+                    'test_otp' => $this->testOtp, // Return OTP for test accounts
+                ],
+            ];
+        }
 
         // Check for existing non-expired OTP (cooldown)
         $existingOtp = OtpVerification::where('phone', $phone)
@@ -120,6 +145,25 @@ class OtpService
     {
         $phone = $this->normalizePhone($phone);
 
+        // Test accounts: accept fixed OTP without database check
+        if ($this->isTestPhone($phone) && $otp === $this->testOtp) {
+            Log::info('OTP verified for test account', [
+                'phone' => $this->maskPhone($phone),
+                'purpose' => $purpose,
+                'test_mode' => true,
+            ]);
+
+            return [
+                'success' => true,
+                'message' => 'Numéro de téléphone vérifié avec succès',
+                'data' => [
+                    'phone' => $phone,
+                    'verified' => true,
+                    'test_mode' => true,
+                ],
+            ];
+        }
+
         // Find valid OTP record
         $otpRecord = OtpVerification::where('phone', $phone)
             ->where('purpose', $purpose)
@@ -179,6 +223,16 @@ class OtpService
     }
 
     /**
+     * Check if phone number is a test account
+     */
+    private function isTestPhone(string $phone): bool
+    {
+        $testPhones = config('services.test_phones', []);
+
+        return in_array($phone, $testPhones);
+    }
+
+    /**
      * Check if phone is verified (has recent verified OTP)
      *
      * @param  string  $phone  Phone number
@@ -188,6 +242,11 @@ class OtpService
     public function isPhoneVerified(string $phone, string $purpose = 'registration', int $validForMinutes = 30): bool
     {
         $phone = $this->normalizePhone($phone);
+
+        // Test accounts are always considered verified
+        if ($this->isTestPhone($phone)) {
+            return true;
+        }
 
         return OtpVerification::where('phone', $phone)
             ->where('purpose', $purpose)

@@ -765,6 +765,30 @@ class ApiService {
     )
   }
 
+  // ==================== Account PIN Management ====================
+
+  /**
+   * Change account authentication PIN
+   * Requires current PIN verification
+   */
+  async changePin(payload: {
+    current_pin: string
+    new_pin: string
+    new_pin_confirmation: string
+  }): Promise<ApiResponse<any>> {
+    return this.request<ApiResponse<any>>('POST', '/auth/device/change-pin', payload)
+  }
+
+  /**
+   * Set account authentication PIN (for new users)
+   */
+  async setPin(payload: {
+    pin: string
+    pin_confirmation: string
+  }): Promise<ApiResponse<any>> {
+    return this.request<ApiResponse<any>>('POST', '/auth/device/set-pin', payload)
+  }
+
   async getFavoriteIds(): Promise<ApiResponse<number[]>> {
     return this.request<ApiResponse<number[]>>('GET', '/favorites/batch-check')
   }

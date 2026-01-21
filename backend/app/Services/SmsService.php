@@ -93,9 +93,39 @@ class SmsService
      */
     public function sendOtp(string $phone, string $otp): array
     {
+        $normalizedPhone = $this->normalizePhone($phone);
+
+        // Bypass SMS for test accounts
+        if ($this->isTestPhone($normalizedPhone)) {
+            Log::info('SMS bypassed for test account', [
+                'phone' => $this->maskPhone($normalizedPhone),
+                'otp' => '******',
+            ]);
+
+            return [
+                'success' => true,
+                'message' => 'SMS bypassed (test account)',
+                'data' => [
+                    'phone' => $normalizedPhone,
+                    'test_mode' => true,
+                ],
+            ];
+        }
+
         $message = "Votre code de verification Antigaspi est: {$otp}. Valide pendant 10 minutes.";
 
         return $this->send($phone, $message);
+    }
+
+    /**
+     * Check if phone number is a test account
+     */
+    public function isTestPhone(string $phone): bool
+    {
+        $normalizedPhone = $this->normalizePhone($phone);
+        $testPhones = config('services.test_phones', []);
+
+        return in_array($normalizedPhone, $testPhones);
     }
 
     /**
