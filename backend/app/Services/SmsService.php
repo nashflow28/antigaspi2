@@ -28,6 +28,27 @@ class SmsService
      */
     public function send(string $phone, string $message): array
     {
+        // Normalize phone number (remove spaces, +, etc.)
+        $phone = $this->normalizePhone($phone);
+
+        // Bypass ALL SMS for test accounts (save SMS credits)
+        if ($this->isTestPhone($phone)) {
+            Log::info('SMS bypassed for test account', [
+                'phone' => $this->maskPhone($phone),
+                'message_type' => $this->detectMessageType($message),
+                'message_preview' => mb_substr($message, 0, 40).'...',
+            ]);
+
+            return [
+                'success' => true,
+                'message' => 'SMS bypassed (test account)',
+                'data' => [
+                    'phone' => $phone,
+                    'test_mode' => true,
+                ],
+            ];
+        }
+
         if (empty($this->token)) {
             Log::error('SMS Service: Token not configured');
 
@@ -36,9 +57,6 @@ class SmsService
                 'message' => 'SMS service not configured',
             ];
         }
-
-        // Normalize phone number (remove spaces, +, etc.)
-        $phone = $this->normalizePhone($phone);
 
         try {
             $response = Http::timeout(30)->get($this->apiUrl, [
@@ -203,5 +221,26 @@ class SmsService
     public function isConfigured(): bool
     {
         return ! empty($this->token);
+    }
+
+    /**
+     * Detect message type from content (for logging purposes)
+     */
+    private function detectMessageType(string $message): string
+    {
+        if (str_contains($message, 'code de verification') || str_contains($message, 'Valide pendant')) {
+            return 'OTP';
+        }
+        if (str_contains($message, 'Reservation') && str_contains($message, 'confirmee')) {
+            return 'RESERVATION_CONFIRMATION';
+        }
+        if (str_contains($message, 'Rappel') && str_contains($message, 'vous attend')) {
+            return 'PICKUP_REMINDER';
+        }
+        if (str_contains($message, 'commande') || str_contains($message, 'Commande')) {
+            return 'ORDER_UPDATE';
+        }
+
+        return 'GENERIC';
     }
 }
