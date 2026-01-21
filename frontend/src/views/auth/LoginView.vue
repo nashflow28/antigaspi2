@@ -15,9 +15,48 @@
         </p>
       </div>
 
-      <!-- Login Form -->
+      <!-- Login Forms -->
       <Card>
-        <LoginForm />
+        <!-- Phone Login (Primary) -->
+        <PhoneLoginForm
+          v-if="authFlow === 'phone'"
+          @switch-to-email="authFlow = 'email'"
+          @go-to-otp="handleGoToOtp"
+          @go-to-pin="handleGoToPin"
+        />
+
+        <!-- OTP Verification -->
+        <OTPVerificationForm
+          v-else-if="authFlow === 'otp'"
+          :phone-number="phoneNumber"
+          :is-new-user="isNewUser"
+          @go-back="authFlow = 'phone'"
+          @verified="handleVerified"
+          @new-user-verified="handleNewUserVerified"
+        />
+
+        <!-- PIN Entry -->
+        <PINEntryForm
+          v-else-if="authFlow === 'pin'"
+          :phone-number="phoneNumber"
+          @go-back="authFlow = 'phone'"
+          @use-otp-instead="handleUseOtpInstead"
+          @verified="handleVerified"
+        />
+
+        <!-- Email Login (Legacy) -->
+        <div v-else-if="authFlow === 'email'" class="space-y-6">
+          <LoginForm2025 />
+          <div class="text-left sm:text-center text-sm text-gray-700">
+            <button
+              type="button"
+              class="font-semibold text-blue-600 hover:text-blue-900"
+              @click="authFlow = 'phone'"
+            >
+              Utiliser le téléphone à la place
+            </button>
+          </div>
+        </div>
       </Card>
 
       <!-- Additional Links -->
@@ -34,6 +73,71 @@
 </template>
 
 <script setup lang="ts">
-import LoginForm from '@/components/forms/LoginForm.vue'
+import { ref } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
+import LoginForm2025 from '@/components/forms/LoginForm2025.vue'
+import PhoneLoginForm from '@/components/forms/PhoneLoginForm.vue'
+import OTPVerificationForm from '@/components/forms/OTPVerificationForm.vue'
+import PINEntryForm from '@/components/forms/PINEntryForm.vue'
 import Card from '@/components/ui/2025/Card.vue'
+import { useAuthStore } from '@/stores/auth'
+
+// Composables
+const router = useRouter()
+const route = useRoute()
+const authStore = useAuthStore()
+
+// Type for authentication flow
+type AuthFlow = 'phone' | 'email' | 'otp' | 'pin'
+
+// Reactive state
+const authFlow = ref<AuthFlow>('phone') // Start with phone by default (primary method)
+const phoneNumber = ref('')
+const isNewUser = ref(false)
+
+// Methods
+const handleGoToOtp = (phone: string, newUser: boolean) => {
+  phoneNumber.value = phone
+  isNewUser.value = newUser
+  authFlow.value = 'otp'
+}
+
+const handleGoToPin = (phone: string) => {
+  phoneNumber.value = phone
+  authFlow.value = 'pin'
+}
+
+const handleUseOtpInstead = () => {
+  authFlow.value = 'otp'
+}
+
+const handleVerified = (token: string, user: any) => {
+  // User is already logged in via authStore in the child components
+  // Redirect based on user role
+  const redirectTarget = route.query.redirect
+
+  if (typeof redirectTarget === 'string' && redirectTarget.startsWith('/') && !redirectTarget.startsWith('//')) {
+    router.push(redirectTarget)
+    return
+  }
+
+  if (user?.role === 'admin') {
+    router.push('/admin/dashboard')
+  } else if (user?.role === 'merchant') {
+    router.push('/merchant/dashboard')
+  } else {
+    router.push('/dashboard')
+  }
+}
+
+const handleNewUserVerified = (phone: string) => {
+  // New user verified - redirect to registration page with verified phone
+  router.push({
+    name: 'register',
+    query: {
+      phone,
+      verified: 'true',
+    },
+  })
+}
 </script>

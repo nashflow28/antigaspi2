@@ -2,6 +2,7 @@ import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import type { User, LoginCredentials, RegisterData } from '@/types'
 import { apiService } from '@/services/api'
+import { deviceService } from '@/services/deviceService'
 import { notify } from '@/composables/useNotifications'
 
 export const useAuthStore = defineStore('auth', () => {
@@ -122,7 +123,11 @@ export const useAuthStore = defineStore('auth', () => {
 
       if (token.value) {
         try {
-          await apiService.logout()
+          // Call both legacy logout and device logout
+          await Promise.allSettled([
+            apiService.logout(),
+            deviceService.logout(),
+          ])
         } catch (err: any) {
           // Ignore logout API errors - token will be cleared locally anyway
           // This can happen if token is already expired or invalid
