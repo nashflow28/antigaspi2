@@ -60,6 +60,21 @@ class OrderController extends Controller
      */
     public function store(Request $request)
     {
+        // ========== DEBUG TEMPORAIRE - À SUPPRIMER ==========
+        Log::info('=== ORDERCONTROLLER::STORE CALLED ===', [
+            'timestamp' => now()->toDateTimeString(),
+            'method' => $request->method(),
+            'url' => $request->fullUrl(),
+        ]);
+
+        Log::info('STEP 1: Raw request received', [
+            'all_keys' => array_keys($request->all()),
+            'customer_phone_exists' => $request->has('customer_phone'),
+            'customer_phone_value' => $request->input('customer_phone', '[NOT_FOUND]'),
+            'payment_method' => $request->input('payment_method', '[NOT_FOUND]'),
+        ]);
+        // ========== FIN DEBUG TEMPORAIRE ==========
+
         // DEBUG: Log the entire request body
         Log::info('OrderController::store - Raw request data', [
             'all' => $request->all(),
@@ -72,6 +87,14 @@ class OrderController extends Controller
         $paymentMethod = $request->input('payment_method', 'on_site');
         $mobileMoneyMethods = ['flooz', 'tmoney', 'orange_money', 'mtn_momo'];
         $isMobileMoney = in_array($paymentMethod, $mobileMoneyMethods, true);
+
+        // ========== DEBUG TEMPORAIRE ==========
+        Log::info('STEP 2: Before validation', [
+            'isMobileMoney' => $isMobileMoney,
+            'paymentMethod' => $paymentMethod,
+            'customer_phone_for_validation' => $request->input('customer_phone'),
+        ]);
+        // ========== FIN DEBUG TEMPORAIRE ==========
 
         $validator = Validator::make($request->all(), [
             'items' => 'required|array|min:1',
@@ -100,13 +123,26 @@ class OrderController extends Controller
             'pickup_time.regex' => 'Format d\'heure invalide (HH:MM attendu)',
         ]);
 
+        // ========== DEBUG TEMPORAIRE ==========
+        Log::info('STEP 3: Validation check', [
+            'validation_passed' => !$validator->fails(),
+            'errors' => $validator->fails() ? $validator->errors()->toArray() : [],
+        ]);
+        // ========== FIN DEBUG TEMPORAIRE ==========
+
         if ($validator->fails()) {
+            Log::warning('STEP 3b: Validation FAILED', [
+                'errors' => $validator->errors()->toArray(),
+                'input_customer_phone' => $request->input('customer_phone'),
+            ]);
             return response()->json([
                 'success' => false,
                 'message' => 'Données invalides',
                 'errors' => $validator->errors(),
             ], 422);
         }
+
+        Log::info('STEP 3c: Validation PASSED - continuing');
 
         $user = $request->user();
         $items = $request->input('items');
