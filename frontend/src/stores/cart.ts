@@ -5,6 +5,9 @@ import { notify, type Notification } from '@/composables/useNotifications'
 
 export interface CartItem {
   id: number
+  type: 'product' | 'surprise_basket' // Type d'item pour différencier
+  productId?: number // ID produit si type=product
+  basketId?: number // ID panier surprise si type=surprise_basket
   name: string
   price: number
   originalPrice?: number | null
@@ -12,6 +15,8 @@ export interface CartItem {
   imageUrl?: string | null
   merchantId?: number | null
   merchantName?: string | null
+  expiryDate?: string | null // Date d'expiration (important pour réservations)
+  maxQuantity?: number | null // Quantité maximum disponible
 }
 
 interface AddItemPayload {
@@ -244,8 +249,27 @@ export const useCartStore = defineStore('cart', () => {
   }
 
   const addProduct = (product: Product, quantity = 1, options: { silent?: boolean } = {}) => {
-    return upsertItem({
+    // Vérifier si le produit est déjà dans le panier
+    const existing = items.value.find(item =>
+      item.type === 'product' && item.productId === product.id
+    )
+
+    if (existing) {
+      // Augmenter la quantité
+      existing.quantity += quantity
+      if (!options.silent) {
+        emitCartSuccess({
+          message: `${product.name} ajouté au panier (x${existing.quantity})`
+        })
+      }
+      return { success: true }
+    }
+
+    // Ajouter nouveau produit
+    items.value.push({
       id: product.id,
+      type: 'product',
+      productId: product.id,
       name: product.name,
       price: resolvePrice(product.discounted_price ?? product.original_price),
       originalPrice: resolvePrice(product.original_price),
@@ -253,8 +277,17 @@ export const useCartStore = defineStore('cart', () => {
       imageUrl: product.image_url ?? null,
       merchantId: product.merchant?.id ?? null,
       merchantName: product.merchant?.business_name ?? null,
-      silent: options.silent
+      expiryDate: product.expiration_date ?? null,
+      maxQuantity: product.quantity_available ?? null
     })
+
+    if (!options.silent) {
+      emitCartSuccess({
+        message: `${product.name} ajouté au panier`
+      })
+    }
+
+    return { success: true }
   }
 
   const updateQuantity = (id: number, quantity: number) => {
