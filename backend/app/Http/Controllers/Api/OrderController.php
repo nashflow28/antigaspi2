@@ -79,11 +79,9 @@ class OrderController extends Controller
             'items.*.quantity' => 'required|integer|min:1',
             'payment_method' => 'nullable|string|in:wallet,on_site,flooz,tmoney,orange_money,mtn_momo',
             'wallet_pin' => $paymentMethod === 'wallet' ? 'required|string|digits_between:4,6' : 'nullable|string|digits_between:4,6',
-            'customer_phone' => array_filter([
-                $isMobileMoney ? 'required' : 'nullable',
-                'string',
-                'regex:/^\+?[0-9]{8,15}$/',
-            ]),
+            'customer_phone' => $isMobileMoney
+                ? ['required', 'string', 'regex:/^\+?[0-9]{8,15}$/']
+                : ['nullable', 'string', 'regex:/^\+?[0-9]{8,15}$/'],
             'customer_email' => 'nullable|email|max:255',
             'pickup_date' => 'nullable|date|after_or_equal:today',
             'pickup_time' => 'nullable|string|regex:/^([01]?[0-9]|2[0-3]):[0-5][0-9]$/',
