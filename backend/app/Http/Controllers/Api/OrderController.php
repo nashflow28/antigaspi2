@@ -88,6 +88,12 @@ class OrderController extends Controller
         $mobileMoneyMethods = ['flooz', 'tmoney', 'orange_money', 'mtn_momo'];
         $isMobileMoney = in_array($paymentMethod, $mobileMoneyMethods, true);
 
+        // Clean customer_phone: remove spaces, dashes, parentheses (keep + and digits only)
+        if ($request->has('customer_phone') && $request->input('customer_phone')) {
+            $cleanedPhone = preg_replace('/[^+0-9]/', '', $request->input('customer_phone'));
+            $request->merge(['customer_phone' => $cleanedPhone]);
+        }
+
         // ========== DEBUG TEMPORAIRE ==========
         Log::info('STEP 2: Before validation', [
             'isMobileMoney' => $isMobileMoney,
@@ -107,7 +113,7 @@ class OrderController extends Controller
                 : ['nullable', 'string', 'regex:/^\+?[0-9]{8,15}$/'],
             'customer_email' => 'nullable|email|max:255',
             'pickup_date' => 'nullable|date|after_or_equal:today',
-            'pickup_time' => 'nullable|string|regex:/^([01]?[0-9]|2[0-3]):[0-5][0-9]$/',
+            'pickup_time' => ['nullable', 'string', 'regex:/^([01]?[0-9]|2[0-3]):[0-5][0-9]$/'],
             'notes' => 'nullable|string|max:500',
         ], [
             'items.required' => 'Vous devez ajouter au moins un produit',
@@ -152,6 +158,23 @@ class OrderController extends Controller
         $customerEmail = $request->input('customer_email');
         $pickupDate = $request->input('pickup_date');
         $pickupTime = $request->input('pickup_time');
+
+        // Validate pickup datetime is not in the past
+        if ($pickupDate && $pickupTime) {
+            $today = now()->format('Y-m-d');
+            if ($pickupDate === $today) {
+                $pickupDateTime = \Carbon\Carbon::parse("$pickupDate $pickupTime");
+                $minimumPickupTime = now()->addMinutes(15);
+
+                if ($pickupDateTime->lt($minimumPickupTime)) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => "L'heure de retrait doit être au moins 15 minutes dans le futur.",
+                        'errors' => ['pickup_time' => ["L'heure de retrait est passée ou trop proche."]],
+                    ], 422);
+                }
+            }
+        }
 
         // DEBUG: Log received payment data
         Log::info('Order creation - payment data received', [

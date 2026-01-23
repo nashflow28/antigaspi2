@@ -34,6 +34,19 @@ class StoreReservationRequest extends FormRequest
         return $user->role === 'consumer';
     }
 
+    /**
+     * Prepare the data for validation.
+     * Clean phone number by removing spaces and formatting characters.
+     */
+    protected function prepareForValidation(): void
+    {
+        if ($this->has('customer_phone') && $this->input('customer_phone')) {
+            $this->merge([
+                'customer_phone' => preg_replace('/[^+0-9]/', '', $this->input('customer_phone')),
+            ]);
+        }
+    }
+
     public function rules(): array
     {
         $product = $this->getProduct();

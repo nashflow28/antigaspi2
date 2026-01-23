@@ -336,6 +336,12 @@ class PaymentController extends Controller
     {
         $user = JWTAuth::parseToken()->authenticate();
 
+        // Clean customer_phone: remove spaces, dashes, parentheses (keep + and digits only)
+        if ($request->has('customer_phone') && $request->input('customer_phone')) {
+            $cleanedPhone = preg_replace('/[^+0-9]/', '', $request->input('customer_phone'));
+            $request->merge(['customer_phone' => $cleanedPhone]);
+        }
+
         $validated = $request->validate([
             'reservation_id' => ['required', 'integer', 'exists:reservations,id'],
             'provider' => ['required', 'string', Rule::in(['flooz', 'tmoney', 'orange_money', 'mtn_momo'])],
