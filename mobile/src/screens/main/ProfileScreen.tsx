@@ -391,6 +391,28 @@ const ProfileScreen: React.FC = () => {
                 borderBottomColor: theme.colors.border,
               },
             ]}
+            onPress={() => (navigation as any).navigate('MoneySavingTips')}
+            accessibilityLabel="Voir les astuces pour économiser"
+          >
+            <Ionicons name="bulb-outline" size={24} color={theme.colors.text} />
+            <Typography variant="body" style={{ flex: 1, marginLeft: theme.spacing.md }}>
+              Astuces économies
+            </Typography>
+            <Ionicons name="chevron-forward" size={20} color={theme.colors.neutral[400]} />
+          </TouchableOpacity>
+        )}
+
+        {user?.role === 'consumer' && (
+          <TouchableOpacity
+            style={[
+              styles.menuItem,
+              {
+                paddingHorizontal: theme.spacing.lg,
+                paddingVertical: theme.spacing.md,
+                borderBottomWidth: 1,
+                borderBottomColor: theme.colors.border,
+              },
+            ]}
             onPress={() => (navigation as any).navigate('DeliveryHistory')}
             accessibilityLabel="Accéder à mes livraisons"
           >

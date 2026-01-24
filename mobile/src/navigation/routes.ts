@@ -35,6 +35,7 @@ export const MAIN_ROUTES = {
   WALLET: 'Wallet',
   WALLET_RECHARGE: 'WalletRecharge',
   LOYALTY: 'Loyalty',
+  MONEY_SAVING_TIPS: 'MoneySavingTips',
   SETTINGS: 'Settings',
 
   // Surprise baskets

@@ -37,6 +37,7 @@ import DeliveryTrackingScreen from '../screens/main/DeliveryTrackingScreen'
 import DeliveryRatingScreen from '../screens/main/DeliveryRatingScreen'
 import DeliveryHistoryScreen from '../screens/main/DeliveryHistoryScreen'
 import ChangePinScreen from '../screens/main/ChangePinScreen'
+import MoneySavingTipsScreen from '../screens/main/MoneySavingTipsScreen'
 
 const Tab = createBottomTabNavigator()
 const Stack = createNativeStackNavigator()
@@ -114,6 +115,7 @@ const AccountStack = () => (
     <Stack.Screen name="NotificationsInbox" component={NotificationsScreen} />
     <Stack.Screen name="NotificationSettings" component={NotificationSettingsScreen} />
     <Stack.Screen name="Loyalty" component={LoyaltyScreen} />
+    <Stack.Screen name="MoneySavingTips" component={MoneySavingTipsScreen} />
     <Stack.Screen name="DeliveryHistory" component={DeliveryHistoryScreen} />
     <Stack.Screen name="DeliveryTracking" component={DeliveryTrackingScreen} />
     <Stack.Screen name="DeliveryRating" component={DeliveryRatingScreen} />
