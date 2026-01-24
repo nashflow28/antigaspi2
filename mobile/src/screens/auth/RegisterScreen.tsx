@@ -95,14 +95,18 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
     expiresIn: 24 * 60 * 60 * 1000, // 24 heures
   })
 
-  // Mots de passe NON persistés pour la sécurité
+  // Mots de passe et PIN NON persistés pour la sécurité
   const [password, setPassword] = useState('')
   const [passwordConfirmation, setPasswordConfirmation] = useState('')
+  const [pin, setPin] = useState('')
+  const [pinConfirmation, setPinConfirmation] = useState('')
 
   // UI state
   const [showBusinessTypePicker, setShowBusinessTypePicker] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
   const [showPasswordConfirm, setShowPasswordConfirm] = useState(false)
+  const [showPin, setShowPin] = useState(false)
+  const [showPinConfirm, setShowPinConfirm] = useState(false)
   const roleAnimation = useRef(new Animated.Value(0)).current
 
   // Error modal state
@@ -175,9 +179,11 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
     if (!formData.lastName.trim()) {
       validationErrors.push('Le nom est requis')
     }
-    if (!formData.email.trim()) {
-      validationErrors.push('L\'email est requis')
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+    if (!formData.phone.trim()) {
+      validationErrors.push('Le numéro de téléphone est requis')
+    }
+    // Email is optional, but validate format if provided
+    if (formData.email.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
       validationErrors.push('L\'email n\'est pas valide')
     }
     if (!formData.city.trim()) {
@@ -190,6 +196,17 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
     }
     if (password !== passwordConfirmation) {
       validationErrors.push('Les mots de passe ne correspondent pas')
+    }
+
+    // Validation du PIN (optionnel mais doit correspondre si fourni)
+    if (pin) {
+      if (pin.length < 4 || pin.length > 6) {
+        validationErrors.push('Le code PIN doit contenir entre 4 et 6 chiffres')
+      } else if (!/^\d+$/.test(pin)) {
+        validationErrors.push('Le code PIN ne doit contenir que des chiffres')
+      } else if (pin !== pinConfirmation) {
+        validationErrors.push('Les codes PIN ne correspondent pas')
+      }
     }
 
     // Validation spécifique merchant
@@ -211,12 +228,13 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
     const registerData: RegisterData = {
       first_name: formData.firstName.trim(),
       last_name: formData.lastName.trim(),
-      email: formData.email.trim().toLowerCase(),
+      email: formData.email.trim().toLowerCase() || undefined, // Email is optional
       password: password,
       password_confirmation: passwordConfirmation,
-      phone: formData.phone.trim() || undefined,
+      phone: formData.phone.trim(), // Phone is required
       city: formData.city.trim(),
       role: formData.role,
+      pin: pin || undefined, // PIN is optional
     }
 
     // Ajouter les champs merchant seulement si role = merchant
@@ -355,7 +373,7 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
             Créer un compte
           </Typography>
           <Typography variant="body" color="secondary" style={{ textAlign: 'center' }}>
-            Rejoignez la communauté Antigaspi
+            Rejoignez la communauté GÊLADAL
           </Typography>
         </View>
 
@@ -381,15 +399,17 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
                 color={formData.role === 'consumer' ? '#fff' : theme.colors.textSecondary}
               />
               <Typography
-                variant="body"
-                weight="semibold"
+                variant="caption"
+                weight="bold"
                 style={{ color: formData.role === 'consumer' ? '#fff' : theme.colors.text, marginTop: 4 }}
+                numberOfLines={1}
               >
                 Consommateur
               </Typography>
               <Typography
                 variant="caption"
-                style={{ color: formData.role === 'consumer' ? 'rgba(255,255,255,0.8)' : theme.colors.textSecondary, textAlign: 'center', marginTop: 2 }}
+                style={{ color: formData.role === 'consumer' ? 'rgba(255,255,255,0.8)' : theme.colors.textSecondary, textAlign: 'center', marginTop: 2, fontSize: 11 }}
+                numberOfLines={2}
               >
                 Je cherche des bons plans
               </Typography>
@@ -411,15 +431,17 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
                 color={formData.role === 'merchant' ? '#fff' : theme.colors.textSecondary}
               />
               <Typography
-                variant="body"
-                weight="semibold"
+                variant="caption"
+                weight="bold"
                 style={{ color: formData.role === 'merchant' ? '#fff' : theme.colors.text, marginTop: 4 }}
+                numberOfLines={1}
               >
                 Commerçant
               </Typography>
               <Typography
                 variant="caption"
-                style={{ color: formData.role === 'merchant' ? 'rgba(255,255,255,0.8)' : theme.colors.textSecondary, textAlign: 'center', marginTop: 2 }}
+                style={{ color: formData.role === 'merchant' ? 'rgba(255,255,255,0.8)' : theme.colors.textSecondary, textAlign: 'center', marginTop: 2, fontSize: 11 }}
+                numberOfLines={2}
               >
                 Je vends mes invendus
               </Typography>
@@ -445,14 +467,14 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
             </View>
           </View>
 
-          {renderInput('Email *', formData.email, (v) => setField('email', v), 'jean@exemple.com', {
+          {renderInput('Email (optionnel)', formData.email, (v) => setField('email', v), 'jean@exemple.com', {
             keyboardType: 'email-address',
             icon: 'mail-outline',
             autoCapitalize: 'none',
           })}
 
           <PhoneInput
-            label="Téléphone"
+            label="Téléphone *"
             value={formData.phone}
             onChangeText={(v) => setField('phone', v)}
             placeholder="90 12 34 56"
@@ -545,6 +567,39 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
             showToggle: true,
             toggleValue: showPasswordConfirm,
             onToggle: () => setShowPasswordConfirm(!showPasswordConfirm),
+          })}
+
+          {/* Séparateur PIN */}
+          <View style={{ marginTop: theme.spacing.md, marginBottom: theme.spacing.sm }}>
+            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+              <View style={[styles.sectionIcon, { backgroundColor: `${theme.colors.primary[500]}15`, width: 28, height: 28 }]}>
+                <Ionicons name="keypad" size={16} color={theme.colors.primary[500]} />
+              </View>
+              <Typography variant="body" weight="semibold" style={{ marginLeft: theme.spacing.sm }}>
+                Code PIN (optionnel)
+              </Typography>
+            </View>
+            <Typography variant="caption" color="secondary" style={{ marginTop: theme.spacing.xs, marginLeft: 36 }}>
+              Pour des connexions rapides et sécurisées
+            </Typography>
+          </View>
+
+          {renderInput('Code PIN', pin, setPin, '4 à 6 chiffres', {
+            keyboardType: 'number-pad',
+            secureTextEntry: true,
+            icon: 'keypad-outline',
+            showToggle: true,
+            toggleValue: showPin,
+            onToggle: () => setShowPin(!showPin),
+          })}
+
+          {pin.length > 0 && renderInput('Confirmer le PIN', pinConfirmation, setPinConfirmation, 'Répétez le code PIN', {
+            keyboardType: 'number-pad',
+            secureTextEntry: true,
+            icon: 'keypad-outline',
+            showToggle: true,
+            toggleValue: showPinConfirm,
+            onToggle: () => setShowPinConfirm(!showPinConfirm),
           })}
         </Card>
 
@@ -691,11 +746,12 @@ const styles = StyleSheet.create({
   },
   roleButton: {
     flex: 1,
-    paddingVertical: 16,
-    paddingHorizontal: 12,
+    paddingVertical: 14,
+    paddingHorizontal: 8,
     borderRadius: 12,
     borderWidth: 2,
     alignItems: 'center',
+    minHeight: 100,
   },
   sectionHeader: {
     flexDirection: 'row',

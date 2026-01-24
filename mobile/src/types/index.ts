@@ -541,7 +541,7 @@ export interface LoginCredentials {
 export interface RegisterData {
   first_name: string
   last_name: string
-  email: string
+  email?: string
   password: string
   password_confirmation: string
   phone?: string
@@ -549,6 +549,7 @@ export interface RegisterData {
   role: 'consumer' | 'merchant'
   business_name?: string
   business_type?: string
+  pin?: string
 }
 
 export interface ProductFilters {
@@ -855,6 +856,10 @@ export interface OrderCreationPayload {
   items: Array<{ product_id: number; quantity: number }>
   payment_method?: PaymentMethod
   wallet_pin?: string
+  customer_phone?: string
+  customer_email?: string
+  pickup_date?: string
+  pickup_time?: string
   notes?: string
 }
 

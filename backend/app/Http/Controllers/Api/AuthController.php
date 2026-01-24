@@ -89,6 +89,9 @@ class AuthController extends Controller
             'business_name' => 'required_if:role,merchant|string|max:255',
             'business_type' => 'required_if:role,merchant|string|max:100',
             'siret' => 'nullable|string|max:20',
+
+            // Code PIN optionnel (4-6 chiffres)
+            'pin' => 'nullable|string|digits_between:4,6',
         ]);
 
         if ($validator->fails()) {
@@ -123,6 +126,11 @@ class AuthController extends Controller
                     'siret' => $request->siret,
                     'is_verified' => false,
                 ]);
+            }
+
+            // Définir le code PIN si fourni
+            if ($request->filled('pin')) {
+                $user->setPin($request->pin);
             }
 
             // Générer le token JWT
